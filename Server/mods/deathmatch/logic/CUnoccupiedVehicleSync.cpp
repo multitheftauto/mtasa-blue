@@ -131,7 +131,8 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
         if (pSyncer)
         {
             // He isn't close enough to the vehicle and in the right dimension?
-            if (!IsSyncerPersistent() && (!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance)) ||
+            if (!IsSyncerPersistent() &&
+                    (!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance)) ||
                 (pVehicle->GetDimension() != pSyncer->GetDimension()))
             {
                 // Stop him from syncing it
@@ -497,7 +498,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehicle
                     {
                         OverrideSyncer(pVehicle, pPlayer);
                     }
-                    
+
                     // Reset our push time
                     pVehicle->ResetLastPushTime();
                 }

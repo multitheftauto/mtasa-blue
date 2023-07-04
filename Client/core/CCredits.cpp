@@ -112,6 +112,7 @@ CCredits::CCredits()
         "Enes \"cleopatra\" Akıllıok\n"
         "Nawaf \"xLive\" Alqarni\n"
         "Nicolás \"Platin\" Barrios\n"
+        "Efe \"efex\" Batır\n"
         "Amine \"UndR\" Bidah\n"
         "Lukasz \"W\" Biegaj\n"
         "Pacal \"buepas\" Buerklin\n"
@@ -136,6 +137,7 @@ CCredits::CCredits()
         "Marcin \"FileEX\" Pawlicki\n"
         "Ali \"Haxardous\" Qamber\n"
         "Sam \"samr46\" R.\n"
+        "Fernando Rocha\n"
         "Fedor \"Ted\" Sinev\n"
         "Jordy \"MegadreamsBE\" Sleeubus\n"
         "Simon \"Simi23\" Tamás\n"
@@ -146,6 +148,7 @@ CCredits::CCredits()
         "AfuSensi\n"
         "AleksCore\n"
         "AlιAѕѕaѕѕιN\n"
+        "androksi\n"
         "ApeLsiN4eG\n"
         "asturel\n"
         "Audifire\n"
@@ -166,7 +169,6 @@ CCredits::CCredits()
         "emre1702\n"
         "Fabio(GNR)\n"
         "fastman92\n"
-        "Fernando Rocha\n"
         "FrankZZ\n"
         "Gothem\n"
         "GRascm\n"
@@ -191,6 +193,7 @@ CCredits::CCredits()
         "MCvarial\n"
         "Merlin\n"
         "mickdermack\n"
+        "Mvrat\n"
         "NeO_D-Power\n"
         "Patrick2562\n"
         "PauloKim1246\n"
@@ -201,6 +204,7 @@ CCredits::CCredits()
         "rafalh\n"
         "samt2497\n"
         "Santi\n"
+        "Sarrum\n"
         "SDraw\n"
         "se16n\n"
         "Sergeanur\n"
@@ -209,11 +213,12 @@ CCredits::CCredits()
         "TAPL-93\n"
         "TEDERIs\n"
         "TFP-dev\n"
-        "theSarrum\n"
         "Totto8492\n"
+        "Tracer\n"
         "turret001\n"
         "tvc\n"
         "vahook\n"
+        "vyn666\n"
         "x0rh4x\n"
         "xerox8521\n"
         "[GP_A]XetaQuake\n"
@@ -275,6 +280,7 @@ CCredits::CCredits()
         "Docker (https://www.docker.com/)\n"
         "Embedded HTTP Server (https://ehs.fritz-elfert.de/)\n"
         "FreeType (https://freetype.org/)\n"
+        "GNU Unifont (https://unifoundry.com/unifont/index.html)\n"
         "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n"
         "json-c (https://github.com/json-c/json-c)\n"
         "GitBook (https://www.gitbook.com/)\n"
@@ -412,7 +418,7 @@ void CCredits::Update()
         float fCurrentTop = 1.0f - 0.0001f * static_cast<float>(clock() - m_clkStart);
 
         // If we're too far down or up, make sure we restart next pulse
-        if (fCurrentTop <= -14.5f || fCurrentTop >= 1.0f)
+        if (fCurrentTop <= -14.75f || fCurrentTop >= 1.0f)
         {
             m_clkStart = clock();
         }
