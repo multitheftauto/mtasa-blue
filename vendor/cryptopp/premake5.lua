@@ -3,6 +3,9 @@ project "cryptopp"
 	kind "StaticLib"
 	targetname "cryptopp"
 
+	pchheader "pch.h"
+	pchsource "pch.cpp"
+
 	vpaths {
 		["Headers/*"] = "**.h",
 		["Sources"] = "**.cpp",
@@ -11,12 +14,11 @@ project "cryptopp"
 	}
 
 	defines {
-		"_WINSOCK_DEPRECATED_NO_WARNINGS",
 		"CRYPTOPP_DISABLE_CLMUL",
 		"CRYPTOPP_DISABLE_AESNI",
 		"CRYPTOPP_DISABLE_SSE4",
 		"CRYPTOPP_DISABLE_SSSE3",
-		"_LIB"
+		"USE_PRECOMPILED_HEADERS",
 	}
 
 	files {
@@ -203,8 +205,11 @@ project "cryptopp"
 		"zlib.cpp",
 	}
 
+	filter "files:dll.cpp or iterhash.cpp"
+		flags { "NoPCH" }
+
 	filter "system:macosx"
-		defines {"CRYPTOPP_DISABLE_ASM"}
+		defines { "CRYPTOPP_DISABLE_ASM" }
 
 	filter { "platforms:arm*" }
 		defines { "CRYPTOPP_DISABLE_ASM" }
