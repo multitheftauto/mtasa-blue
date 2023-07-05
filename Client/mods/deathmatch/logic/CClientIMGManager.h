@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientIMGManager.h
- *  PURPOSE:     .img container manager class
+ *  FILE:        Client/mods/deathmatch/logic/CClientIMGManager.h
+ *  PURPOSE:     IMG container manager class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 

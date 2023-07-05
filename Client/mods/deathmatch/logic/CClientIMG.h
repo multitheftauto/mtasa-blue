@@ -1,23 +1,20 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto v1.0
-*               (Shared logic for modifications)
-*  LICENSE:     See LICENSE in the top level directory
-*  FILE:        mods/shared_logic/CClientIMG.h
-*  PURPOSE:     IMG container class header
-
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Client/mods/deathmatch/logic/CClientIMG.h
+ *  PURPOSE:     IMG container class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
 #include "CClientEntity.h"
-#include <vector>
 #include <fstream>
-#include <optional>
-#include <variant>
-#include <string_view>
 #include <filesystem>
+
 namespace fs = std::filesystem;
 
 struct tImgFileInfo

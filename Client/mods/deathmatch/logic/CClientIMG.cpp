@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientIMG.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CClientIMG.cpp
  *  PURPOSE:     IMG container class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -30,6 +31,7 @@ CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID)
 CClientIMG::~CClientIMG()
 {
     m_pImgManager->RemoveFromList(this);
+
     if (IsStreamed())
         StreamDisable();
 
@@ -137,6 +139,7 @@ std::optional<size_t> CClientIMG::GetFileID(std::string_view filename)
 
     if (it == m_fileInfos.end())
         return std::nullopt;
+
     return std::distance(m_fileInfos.begin(), it);
 }
 

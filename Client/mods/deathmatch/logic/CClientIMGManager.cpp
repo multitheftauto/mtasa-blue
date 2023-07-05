@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientIMGManager.cpp
- *  PURPOSE:     .img container manager class
+ *  FILE:        Client/mods/deathmatch/logic/CClientIMGManager.cpp
+ *  PURPOSE:     IMG container manager class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -32,7 +33,7 @@ CClientIMG* CClientIMGManager::GetElementFromArchiveID(unsigned char ucArchiveID
 {
     // By default GTA has 5 IMG's
     if (ucArchiveID < 6)
-        return NULL;
+        return nullptr;
 
     std::list<CClientIMG*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)
@@ -44,7 +45,7 @@ CClientIMG* CClientIMGManager::GetElementFromArchiveID(unsigned char ucArchiveID
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void CClientIMGManager::RemoveAll()
@@ -70,19 +71,20 @@ bool CClientIMGManager::Exists(CClientIMG* pIMG)
 
 CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
 {
-    uchar ucArhiveID = g_pGame->GetStreaming()->GetStreamingInfo(uiModel)->archiveId;
+    unsigned char ucArhiveID = g_pGame->GetStreaming()->GetStreamingInfo(uiModel)->archiveId;
     return GetElementFromArchiveID(ucArhiveID);
 }
 
 bool CClientIMGManager::IsLinkableModel(unsigned int uiModel)
 {
-    return uiModel <= 26316;            // StreamModelInfoSize
+    return uiModel <= g_pGame->GetCountOfAllFileIDs();            // StreamModelInfoSize
 }
 
 bool CClientIMGManager::RestoreModel(unsigned int uiModel)
 {
     // Get the DFF file that replaced it
     CClientIMG* pIMG = GetElementThatLinked(uiModel);
+
     if (pIMG)
     {
         // Restore it
@@ -104,15 +106,16 @@ void CClientIMGManager::RemoveFromList(CClientIMG* pIMG)
 
 void CClientIMGManager::UpdateStreamerBufferSize()
 {
-    ushort usRequestStreamSize = m_uiDefaultStreamerBufferSize;
+    unsigned short usRequestStreamSize = m_uiDefaultStreamerBufferSize;
 
     for (CClientIMG* pImg : m_List)
     {
         if (!pImg->IsStreamed())
             continue;
-        ushort usStreamSize = pImg->GetRequiredBufferSize();
+        unsigned short usStreamSize = pImg->GetRequiredBufferSize();
         if (usStreamSize > usRequestStreamSize)
             usRequestStreamSize = usStreamSize;
     }
+
     g_pGame->GetStreaming()->SetStreamingBufferSize(usRequestStreamSize);
 }
