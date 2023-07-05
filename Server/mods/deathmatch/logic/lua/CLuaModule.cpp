@@ -34,22 +34,22 @@ CLuaModule::CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* p
 
 CLuaModule::~CLuaModule()
 {
-    if (m_hModule)
+    if (!m_hModule)
+        return;
+
+    if (m_bInitialised)
     {
-        if (m_bInitialised)
-        {
-            // Shutdown module
-            m_FunctionInfo.ShutdownModule();
+        // Shutdown module
+        m_FunctionInfo.ShutdownModule();
 
-            // Unregister Functions
-            _UnregisterFunctions();
+        // Unregister Functions
+        _UnregisterFunctions();
 
-            CLogger::LogPrintf("MODULE: Unloaded \"%s\" (%.2f) by \"%s\"\n", m_FunctionInfo.szModuleName, m_FunctionInfo.fVersion, m_FunctionInfo.szAuthor);
-        }
-
-        // Unload Module
-        _UnloadModule();
+        CLogger::LogPrintf("MODULE: Unloaded \"%s\" (%.2f) by \"%s\"\n", m_FunctionInfo.szModuleName, m_FunctionInfo.fVersion, m_FunctionInfo.szAuthor);
     }
+
+    // Unload Module
+    _UnloadModule();
 }
 
 #ifdef WIN32
@@ -199,16 +199,16 @@ void CLuaModule::_UnregisterFunctions()
     list<CLuaMain*>::const_iterator liter = m_pLuaModuleManager->GetLuaManager()->IterBegin();
     for (; liter != m_pLuaModuleManager->GetLuaManager()->IterEnd(); ++liter)
     {
-        lua_State*                luaVM = (*liter)->GetVM();
-        vector<SString>::iterator iter = m_Functions.begin();
-        for (; iter != m_Functions.end(); ++iter)
+        lua_State* luaVM = (*liter)->GetVM();
+
+        for (auto iter : m_Functions)
         {
-            // points function to nill
+            // points function to nil
             lua_pushnil(luaVM);
-            lua_setglobal(luaVM, iter->c_str());
+            lua_setglobal(luaVM, iter.c_str());
 
             // Remove func from CLuaCFunctions
-            CLuaCFunctions::RemoveFunction(*iter);
+            CLuaCFunctions::RemoveFunction(iter);
         }
     }
 }
@@ -229,24 +229,19 @@ void CLuaModule::_ResourceStopped(lua_State* luaVM)
     if (m_FunctionInfo.ResourceStopped)
         m_FunctionInfo.ResourceStopped(luaVM);
 
-    vector<SString>::iterator iter = m_Functions.begin();
-    for (; iter != m_Functions.end(); ++iter)
+    for (auto iter : m_Functions)
     {
-        // points function to nil
         lua_pushnil(luaVM);
-        lua_setglobal(luaVM, (iter)->c_str());
+        lua_setglobal(luaVM, iter.c_str());
     }
 }
 
 bool CLuaModule::_DoesFunctionExist(const char* szFunctionName)
 {
-    vector<SString>::iterator iter = m_Functions.begin();
-    for (; iter != m_Functions.end(); ++iter)
+    for (auto iter : m_Functions)
     {
-        if (strcmp((iter)->c_str(), szFunctionName) == 0)
-        {
+        if (!strcmp(iter.c_str(), szFunctionName))
             return true;
-        }
     }
     return false;
 }
@@ -297,59 +292,56 @@ bool CLuaModule::RegisterFunction(lua_State* luaVM, const char* szFunctionName, 
     return true;
 }
 
-bool CLuaModule::GetResourceName(lua_State* luaVM, std::string& strName)
+std::string CLuaModule::GetResourceName(lua_State* luaVM)
 {
-    if (luaVM)
-    {
-        CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                strName = pResource->GetName();
-                return true;
-            }
-        }
-    }
-    return false;
+    if (!luaVM)
+        return "";
+
+    CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return "";
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return "";
+
+    return pResource->GetName();
 }
 
 CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM)
 {
-    if (luaVM)
-    {
-        CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                return pResource->GetLastMetaChecksum();
-            }
-        }
-    }
-    return CChecksum();
+    if (!luaVM)
+        return CChecksum();
+
+    CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return CChecksum();
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return CChecksum();
+
+    return pResource ? pResource->GetLastMetaChecksum() : CChecksum();
 }
 
 CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFile)
 {
-    if (luaVM)
+    if (!luaVM)
+        return CChecksum();
+
+    CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return CChecksum();
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return CChecksum();
+
+    list<CResourceFile*>::iterator iter = pResource->IterBegin();
+    for (; iter != pResource->IterEnd(); ++iter)
     {
-        CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                list<CResourceFile*>::iterator iter = pResource->IterBegin();
-                for (; iter != pResource->IterEnd(); ++iter)
-                {
-                    if (strcmp((*iter)->GetName(), szFile) == 0)
-                        return (*iter)->GetLastChecksum();
-                }
-            }
-        }
+        if (!strcmp((*iter)->GetName(), szFile))
+            return (*iter)->GetLastChecksum();
     }
     return CChecksum();
 }
@@ -383,47 +375,44 @@ lua_State* CLuaModule::GetResourceFromName(const char* szResourceName)
 {
     CResource* pResource = g_pGame->GetResourceManager()->GetResource(szResourceName);
 
-    if (pResource)
-    {
-        CLuaMain* pLuaMain = pResource->GetVirtualMachine();
-        if (pLuaMain)
-        {
-            return pLuaMain->GetVM();
-        }
-    }
+    if (!pResource)
+        return NULL;
 
-    return NULL;
+    CLuaMain* pLuaMain = pResource->GetVirtualMachine();
+
+    return pLuaMain ? pLuaMain->GetVM() : NULL;
 }
 
-bool CLuaModule::GetResourceName(lua_State* luaVM, char* szName, size_t length)
-{
-    std::string resourceName;
-    if (GetResourceName(luaVM, resourceName))
-    {
-        std::strncpy(szName, resourceName.c_str(), length);
-        return true;
-    }
-
-    return false;
-}
-
-bool CLuaModule::GetResourceFilePath(lua_State* luaVM, const char* fileName, char* path, size_t length)
+std::string CLuaModule::GetResourceFilePath(lua_State* luaVM, const char* fileName)
 {
     if (!luaVM)
-        return false;
+        return "";
 
     CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
     if (!pLuaMain)
-        return false;
+        return "";
 
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return false;
+        return "";
 
-    std::string p;
-    if (!pResource->GetFilePath(fileName, p))
-        return false;
+    std::string path;
+    if (!pResource->GetFilePath(fileName, path))
+        return "";
 
-    std::strncpy(path, p.c_str(), length);
-    return true;
+    return path;
+}
+
+CVehicleManager* CLuaModule::GetVehicleManager() {
+    return g_pGame->GetVehicleManager();
+}
+
+CMainConfig* CLuaModule::GetConfigManager()
+{
+    return g_pGame->GetConfig();
+}
+
+CTeamManager* CLuaModule::GetTeamManager()
+{
+    return g_pGame->GetTeamManager();
 }

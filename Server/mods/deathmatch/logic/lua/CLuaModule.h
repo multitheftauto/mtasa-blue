@@ -47,32 +47,36 @@ struct FunctionInfo
     RegisterModuleFunc ResourceStopped;
 };
 
-class CLuaModule : public ILuaModuleManager10
+class CLuaModule : public ILuaModuleManager
 {
 public:
     CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* pScriptDebugging, const char* szFileName, const char* szShortFileName);
     virtual ~CLuaModule();
 
     // functions for external modules until DP2.3
-    void      Printf(const char* szFormat, ...);
-    void      ErrorPrintf(const char* szFormat, ...);
-    void      DebugPrintf(lua_State* luaVM, const char* szFormat, ...);
-    bool      RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func);
-    bool      GetResourceName(lua_State*   luaVM,
-                              std::string& strName);            // This function might not work if module and MTA were compiled with different compiler versions
+    void Printf(const char* szFormat, ...);
+    void ErrorPrintf(const char* szFormat, ...);
+    void DebugPrintf(lua_State* luaVM, const char* szFormat, ...);
+
+    bool        RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func);
+    std::string GetResourceName(lua_State* luaVM);
+
     CChecksum GetResourceMetaChecksum(lua_State* luaVM);
     CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile);
 
     // functions for external modules until 1.0
-    unsigned long GetVersion();
-    const char*   GetVersionString();
-    const char*   GetVersionName();
-    unsigned long GetNetcodeVersion();
-    const char*   GetOperatingSystemName();
-    lua_State*    GetResourceFromName(const char* szResourceName);
-    // GetResourceName above might not work if module and MTA were compiled with different compiler versions
-    bool GetResourceName(lua_State* luaVM, char* szName, size_t length) override;
-    bool GetResourceFilePath(lua_State* luaVM, const char* fileName, char* path, size_t length) override;
+    ulong       GetVersion();
+    const char* GetVersionString();
+    const char* GetVersionName();
+    ulong       GetNetcodeVersion();
+    const char* GetOperatingSystemName();
+    lua_State*  GetResourceFromName(const char* szResourceName);
+
+    std::string GetResourceFilePath(lua_State* luaVM, const char* fileName) override;
+
+    CVehicleManager* GetVehicleManager();
+    CMainConfig*     GetConfigManager();
+    CTeamManager*    GetTeamManager();
 
     // functions for deathmatch
     int  _LoadModule();
