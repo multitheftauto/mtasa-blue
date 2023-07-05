@@ -20,7 +20,7 @@ struct tImgHeader
 };
 
 CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID)
-    : ClassInit(this), CClientEntity(ID), m_pImgManager(pManager->GetIMGManager()), m_ucArchiveID(INVALID_ARCHIVE_ID), m_usRequiredBufferSize(0)
+    : ClassInit(this), CClientEntity(ID), m_pImgManager(pManager->GetIMGManager()), m_ucArchiveID(INVALID_ARCHIVE_ID), m_LargestFileSizeBlocks(0)
 {
     m_pManager = pManager;
     SetTypeName("img");
@@ -106,11 +106,11 @@ bool CClientIMG::GetFile(size_t fileID, std::string& buffer)
     if (!pFileInfo)
         throw std::invalid_argument("Invalid file id");
 
-    const auto ulToReadSize = pFileInfo->usSize * 2048;
+    const auto toReadBytes = (size_t)pFileInfo->usSize * 2048u;
 
     try
     {
-        buffer.resize(ulToReadSize);
+        buffer.resize(toReadBytes);
     }
     catch (const std::bad_alloc&)
     {
@@ -118,7 +118,7 @@ bool CClientIMG::GetFile(size_t fileID, std::string& buffer)
     }
 
     m_ifs.seekg((std::streampos)pFileInfo->uiOffset * 2048);
-    m_ifs.read(buffer.data(), ulToReadSize);
+    m_ifs.read(buffer.data(), toReadBytes);
 
     return !m_ifs.fail() && !m_ifs.eof();
 }
@@ -153,10 +153,10 @@ bool CClientIMG::StreamEnable()
     if (IsStreamed())
         return false;
 
-    if (m_usRequiredBufferSize == 0)
+    if (m_LargestFileSizeBlocks == 0)
     {
         for (const auto& fileInfo : m_fileInfos)
-            m_usRequiredBufferSize = Max(m_usRequiredBufferSize, fileInfo.usSize);
+            m_LargestFileSizeBlocks = std::max(m_LargestFileSizeBlocks, (size_t)fileInfo.usSize);
     }
 
     m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(m_filePath.c_str());
