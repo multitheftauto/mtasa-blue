@@ -293,6 +293,11 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                         {
                             ms_bIgnoreNextEscapeCharacter = true;
                             pConsole->SetVisible(false);
+
+                            CGUI* pGUI = g_pCore->GetGUI();
+                            if (!g_pCore->IsMenuVisible())
+                                pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
+
                             return true;
                         }
 

@@ -8,6 +8,7 @@
 #endif
 
 #include <map>
+#include <string_view>
 
 #include <pme.h>
 
@@ -87,8 +88,11 @@ class HttpRequest {
 	/// takes the cookie header and breaks it down into usable chunks -- returns number of name/value pairs found
 	int ParseCookieData ( std::string & irsData );
 
-	/// interprets the given string as if it's name=value pairs and puts them into oFormElements
-	void GetFormDataFromString ( const std::string & irsString );
+	/// parses the request uri, extracts the query segment and puts its key=value pairs into oFormElements
+	void ParseRequestURI(std::string_view uri);
+
+	/// parses the form data as if it's key=value pairs and puts them into oFormElements
+	void ParseFormData(std::string_view formData);
 
 	/// the current parse state -- where we are in looking at the data from the client
 	HttpParseStates nCurrentHttpParseState;
