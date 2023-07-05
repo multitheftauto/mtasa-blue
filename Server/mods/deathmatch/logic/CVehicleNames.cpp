@@ -234,15 +234,10 @@ static const SFixedArray<SVehicleName, 212> VehicleNames = {{{"Landstalker"},
                                                              {"Farm Trailer"},
                                                              {"Street Clean Trailer"}}};
 
-bool CVehicleNames::IsValidModel(unsigned long ulModel)
-{
-    return ulModel >= 400 && ulModel <= 611;
-}
-
 const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
 {
     // Valid?
-    if (IsValidModel(ulModel) && ((ulModel - 400) < NUMELMS(VehicleNames)))
+    if (CVehicleManager::IsValidModel(ulModel) && ((ulModel - 400) < NUMELMS(VehicleNames)))
     {
         // Look it up in the table
         return VehicleNames[ulModel - 400].szName;

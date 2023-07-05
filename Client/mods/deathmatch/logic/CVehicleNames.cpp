@@ -243,11 +243,6 @@ static const SFixedArray<unsigned char, 212> ucVehicleTypes = {
     0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 0, 0, 8, 8, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5, 5, 0,
     0, 8, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 6, 0, 2, 0, 0, 0, 5, 6, 1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 0, 6, 6};
 
-bool CVehicleNames::IsValidModel(unsigned long ulModel)
-{
-    return ulModel >= 400 && ulModel <= 611;
-}
-
 bool CVehicleNames::IsModelTrailer(unsigned long ulModel)
 {
     // IsValidModel excludes trailers, so we need the ability to check separately if it is a trailer
@@ -258,7 +253,7 @@ bool CVehicleNames::IsModelTrailer(unsigned long ulModel)
 const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
 {
     // Valid?
-    if (IsValidModel(ulModel))
+    if (CClientVehicleManager::IsStandardModel(ulModel))
     {
         // Look it up in the table
         return VehicleNames[ulModel - 400].szName;
@@ -288,11 +283,11 @@ unsigned int CVehicleNames::GetVehicleModel(const char* szName)
 const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
 {
     // Use parent model ID for non-standard vehicle model IDs.
-    if ((ulModel < 400 || ulModel > 611) && CClientVehicleManager::IsValidModel(ulModel))
+    if (CClientVehicleManager::IsStandardModel(ulModel) && CClientVehicleManager::IsValidModel(ulModel))
         ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
 
     // Check whether the model is valid
-    if ((IsValidModel(ulModel) || IsModelTrailer(ulModel)) && ((ulModel - 400) < NUMELMS(ucVehicleTypes)))
+    if ((CClientVehicleManager::IsStandardModel(ulModel) || IsModelTrailer(ulModel)) && ((ulModel - 400) < NUMELMS(ucVehicleTypes)))
     {
         int iVehicleType = ucVehicleTypes[ulModel - 400];
         return VehicleTypes[iVehicleType].szName;

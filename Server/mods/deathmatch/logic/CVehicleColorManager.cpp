@@ -13,6 +13,7 @@
 #include "CVehicleColorManager.h"
 #include "CVehicleDefaultColors.h"
 #include "Utils.h"
+#include "CVehicleManager.h"
 
 CVehicleColor CVehicleColors::GetRandomColor()
 {
@@ -143,7 +144,7 @@ void CVehicleColorManager::Reset()
 
 void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor& colVehicle)
 {
-    if (usModel >= 400 && usModel <= 611)
+    if (CVehicleManager::IsValidModel(usModel))
     {
         m_Colors[usModel - 400].AddColor(colVehicle);
     }
@@ -151,7 +152,7 @@ void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor&
 
 CVehicleColor CVehicleColorManager::GetRandomColor(unsigned short usModel)
 {
-    if (usModel >= 400 && usModel <= 611)
+    if (CVehicleManager::IsValidModel(usModel))
     {
         return m_Colors[usModel - 400].GetRandomColor();
     }

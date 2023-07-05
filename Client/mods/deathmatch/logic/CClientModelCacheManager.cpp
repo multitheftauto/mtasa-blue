@@ -385,10 +385,10 @@ void CClientModelCacheManagerImpl::ProcessVehicleList(std::map<ushort, float>& o
     const ulong ulTimeNow = CClientTime::GetTime();
     for (std::vector<CClientVehicle*>::const_iterator iter = vehicleList.begin(); iter != vehicleList.end(); ++iter)
     {
-        CClientVehicle* pVehicle = *iter;
-        const ushort    usModelId = pVehicle->GetModel();
+        CClientVehicle*      pVehicle = *iter;
+        const unsigned short usModelId = pVehicle->GetModel();
 
-        if (usModelId < 400 || usModelId > 611)
+        if (CClientVehicleManager::IsStandardModel(usModelId))
             continue;
 
         // Check if currently within distance
