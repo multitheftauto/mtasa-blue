@@ -16,6 +16,14 @@ CClientIMGManager::CClientIMGManager(CClientManager* pManager)
 {
     // Init
     m_bRemoveFromList = true;
+
+    // Buffer size as calculated by GTA - This is also the size of the largest file in all of the loaded IMGs
+
+    // g_pGame->GetStreaming()->GetStreamingBufferSize() / 2048;
+    // TODO: In the default gta3.img the biggest file is 1260 sectors, so to be fail safe, we double it
+    // ideally, we'd just take this value from the game, but there's no clean/easy way to do that [without loading the img archives]
+    // so, for now, this is good enough
+    m_LargestFileSizeBlocks = m_GTALargestFileSizeBlocks = 1260 * 2;
 }
 
 CClientIMGManager::~CClientIMGManager()
@@ -26,7 +34,6 @@ CClientIMGManager::~CClientIMGManager()
 
 void CClientIMGManager::InitDefaultBufferSize()
 {
-    m_uiDefaultStreamerBufferSize = g_pGame->GetStreaming()->GetStreamingBufferSize();
 }
 
 CClientIMG* CClientIMGManager::GetElementFromArchiveID(unsigned char ucArchiveID)
@@ -35,10 +42,9 @@ CClientIMG* CClientIMGManager::GetElementFromArchiveID(unsigned char ucArchiveID
     if (ucArchiveID < 6)
         return nullptr;
 
-    std::list<CClientIMG*>::iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+    for (auto iter : m_List)
     {
-        CClientIMG* pIMG = *iter;
+        CClientIMG* pIMG = iter;
         if (ucArchiveID == pIMG->GetArchiveID())
         {
             return pIMG;
@@ -54,10 +60,9 @@ void CClientIMGManager::RemoveAll()
     m_bRemoveFromList = false;
 
     // Run through our list deleting the IMG's
-    std::list<CClientIMG*>::iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+    for (auto iter : m_List)
     {
-        delete *iter;
+        delete iter;
     }
 
     // Allow list removal again
@@ -71,7 +76,7 @@ bool CClientIMGManager::Exists(CClientIMG* pIMG)
 
 CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
 {
-    unsigned char ucArhiveID = g_pGame->GetStreaming()->GetStreamingInfo(uiModel)->archiveId;
+    uchar ucArhiveID = g_pGame->GetStreaming()->GetStreamingInfo(uiModel)->archiveId;
     return GetElementFromArchiveID(ucArhiveID);
 }
 
@@ -95,6 +100,21 @@ bool CClientIMGManager::RestoreModel(unsigned int uiModel)
     return false;
 }
 
+size_t CClientIMGManager::CalculateLargestFile() const
+{
+    auto largest = m_GTALargestFileSizeBlocks;
+
+    for (const auto img : m_List)
+    {
+        if (!img->IsStreamed())
+            continue;
+
+        largest = std::max(img->GetLargestFileSizeBlocks(), largest);
+    }
+
+    return largest;
+}
+
 void CClientIMGManager::RemoveFromList(CClientIMG* pIMG)
 {
     // Can we remove anything from the list?
@@ -106,16 +126,11 @@ void CClientIMGManager::RemoveFromList(CClientIMG* pIMG)
 
 void CClientIMGManager::UpdateStreamerBufferSize()
 {
-    unsigned short usRequestStreamSize = m_uiDefaultStreamerBufferSize;
+    m_LargestFileSizeBlocks = CalculateLargestFile();
 
-    for (CClientIMG* pImg : m_List)
+    // Only update if necessary, otherwise leave it be [User might've set it manually - we don't want to touch that]
+    if (const auto s = g_pGame->GetStreaming(); m_LargestFileSizeBlocks > s->GetStreamingBufferSize())
     {
-        if (!pImg->IsStreamed())
-            continue;
-        unsigned short usStreamSize = pImg->GetRequiredBufferSize();
-        if (usStreamSize > usRequestStreamSize)
-            usRequestStreamSize = usStreamSize;
+        s->SetStreamingBufferSize(m_LargestFileSizeBlocks);
     }
-
-    g_pGame->GetStreaming()->SetStreamingBufferSize(usRequestStreamSize);
 }
