@@ -201,7 +201,7 @@ void CLuaModule::_UnregisterFunctions()
     {
         lua_State* luaVM = (*liter)->GetVM();
 
-        for (auto iter : m_Functions)
+        for (const auto& iter : m_Functions)
         {
             // points function to nil
             lua_pushnil(luaVM);
@@ -229,7 +229,7 @@ void CLuaModule::_ResourceStopped(lua_State* luaVM)
     if (m_FunctionInfo.ResourceStopped)
         m_FunctionInfo.ResourceStopped(luaVM);
 
-    for (auto iter : m_Functions)
+    for (const auto& iter : m_Functions)
     {
         lua_pushnil(luaVM);
         lua_setglobal(luaVM, iter.c_str());
@@ -238,7 +238,7 @@ void CLuaModule::_ResourceStopped(lua_State* luaVM)
 
 bool CLuaModule::_DoesFunctionExist(const char* szFunctionName)
 {
-    for (auto iter : m_Functions)
+    for (const auto& iter : m_Functions)
     {
         if (!strcmp(iter.c_str(), szFunctionName))
             return true;
@@ -311,15 +311,15 @@ std::string CLuaModule::GetResourceName(lua_State* luaVM)
 CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM)
 {
     if (!luaVM)
-        return CChecksum();
+        return {};
 
     CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
     if (!pLuaMain)
-        return CChecksum();
+        return {};
 
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return CChecksum();
+        return {};
 
     return pResource ? pResource->GetLastMetaChecksum() : CChecksum();
 }
@@ -327,15 +327,15 @@ CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM)
 CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFile)
 {
     if (!luaVM)
-        return CChecksum();
+        return {};
 
     CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
     if (!pLuaMain)
-        return CChecksum();
+        return {};
 
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return CChecksum();
+        return {};
 
     list<CResourceFile*>::iterator iter = pResource->IterBegin();
     for (; iter != pResource->IterEnd(); ++iter)
@@ -376,11 +376,11 @@ lua_State* CLuaModule::GetResourceFromName(const char* szResourceName)
     CResource* pResource = g_pGame->GetResourceManager()->GetResource(szResourceName);
 
     if (!pResource)
-        return NULL;
+        return nullptr;
 
     CLuaMain* pLuaMain = pResource->GetVirtualMachine();
 
-    return pLuaMain ? pLuaMain->GetVM() : NULL;
+    return pLuaMain ? pLuaMain->GetVM() : nullptr;
 }
 
 std::string CLuaModule::GetResourceFilePath(lua_State* luaVM, const char* fileName)
