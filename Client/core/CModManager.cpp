@@ -19,13 +19,13 @@
 using SharedUtil::CalcMTASAPath;
 
 template <>
-CModManager* CSingleton<CModManager>::m_pSingleton = NULL;
+CModManager* CSingleton<CModManager>::m_pSingleton = nullptr;
 
 CModManager::CModManager()
 {
     // Init
-    m_hClientDLL = NULL;
-    m_pClientBase = NULL;
+    m_hClientDLL = nullptr;
+    m_pClientBase = nullptr;
     m_bUnloadRequested = false;
 
     // Default mod name defaults to "default"
@@ -70,7 +70,7 @@ void CModManager::RequestLoadDefault(const char* szArguments)
 
 void CModManager::RequestUnload()
 {
-    RequestLoad(NULL, NULL);
+    RequestLoad(nullptr, nullptr);
     CCore::GetSingletonPtr()->OnModUnload();
 }
 
@@ -88,7 +88,7 @@ void CModManager::ClearRequest()
 
 bool CModManager::IsLoaded()
 {
-    return (m_hClientDLL != NULL);
+    return (m_hClientDLL != nullptr);
 }
 
 CClientBase* CModManager::Load(const char* szName, const char* szArguments)
@@ -99,11 +99,11 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(false);
 
     // Get the entry for the given name
-    std::map<std::string, std::string>::iterator itMod = m_ModDLLFiles.find(szName);
+    auto itMod = m_ModDLLFiles.find(szName);
     if (itMod == m_ModDLLFiles.end())
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to load %s (unknown mod)", szName);
-        return NULL;
+        return nullptr;
     }
 
     // Ensure DllDirectory has not been changed
@@ -115,14 +115,14 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
     }
 
     // Load the library and use the supplied path as an extra place to search for dependencies
-    m_hClientDLL = LoadLibraryEx(itMod->second.c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH);
+    m_hClientDLL = LoadLibraryEx(itMod->second.c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH);
     if (!m_hClientDLL)
     {
         DWORD dwError = GetLastError();
         char  szError[2048];
         char* p;
 
-        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, dwError, LANG_NEUTRAL, szError, sizeof(szError), NULL);
+        FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY, nullptr, dwError, LANG_NEUTRAL, szError, sizeof(szError), nullptr);
 
         // Remove newlines from the error message
         p = szError + strlen(szError) - 1;
@@ -133,19 +133,19 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
         }
 
         CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (reason: %s)", szName, szError);
-        return NULL;
+        return nullptr;
     }
 
     // Get the address of InitClient
     typedef CClientBase*(__cdecl pfnClientInitializer)(); /* FIXME: Should probably not be here */
 
     pfnClientInitializer* pClientInitializer = reinterpret_cast<pfnClientInitializer*>(GetProcAddress(m_hClientDLL, "InitClient"));
-    if (pClientInitializer == NULL)
+    if (pClientInitializer == nullptr)
     {
         CCore::GetSingleton().GetConsole()->Printf("Unable to load %s's DLL (unknown mod)", szName, GetLastError());
         FreeLibrary(m_hClientDLL);
         m_hClientDLL = nullptr;
-        return NULL;
+        return nullptr;
     }
 
     // Call InitClient and store the Client interface in m_pClientBase
@@ -158,7 +158,7 @@ CClientBase* CModManager::Load(const char* szName, const char* szArguments)
         FreeLibrary(m_hClientDLL);
         m_pClientBase = nullptr;
         m_hClientDLL = nullptr;
-        return NULL;
+        return nullptr;
     }
 
     // HACK: make the console input active if its visible
@@ -179,13 +179,13 @@ void CModManager::Unload()
     CMessageLoopHook::GetSingleton().SetRefreshMsgQueueEnabled(false);
 
     // If a mod is loaded, we call m_pClientBase->ClientShutdown and then free the library
-    if (m_hClientDLL != NULL)
+    if (m_hClientDLL != nullptr)
     {
         // Call m_pClientBase->ClientShutdown
         if (m_pClientBase)
         {
             m_pClientBase->ClientShutdown();
-            m_pClientBase = NULL;
+            m_pClientBase = nullptr;
         }
 
         // Unregister the commands it had registered
@@ -196,14 +196,14 @@ void CModManager::Unload()
 
         // Free the Client DLL
         FreeLibrary(m_hClientDLL);
-        m_hClientDLL = NULL;
+        m_hClientDLL = nullptr;
 
         // Call the on mod unload func
         CCore::GetSingletonPtr()->OnModUnload();
 
         // Reset chatbox status (so it won't prevent further input), and clear it
-        /*CLocalGUI::GetSingleton ().GetChatBox ()->SetInputEnabled ( false );
-        CLocalGUI::GetSingleton ().GetChatBox ()->Clear ();*/
+        /*CLocalGUI::GetSingleton().GetChatBox()->SetInputEnabled(false);
+        CLocalGUI::GetSingleton().GetChatBox()->Clear();*/
         CLocalGUI::GetSingleton().GetChat()->SetInputVisible(false);
         CLocalGUI::GetSingleton().GetChat()->Clear();
         CLocalGUI::GetSingleton().SetChatBoxVisible(true);
@@ -213,9 +213,9 @@ void CModManager::Unload()
         CLocalGUI::GetSingleton().GetDebugView()->Clear();
         CLocalGUI::GetSingleton().SetDebugViewVisible(false);
 
-        // NULL the message processor and the unhandled command handler
-        CCore::GetSingleton().SetClientMessageProcessor(NULL);
-        CCore::GetSingleton().GetCommands()->SetExecuteHandler(NULL);
+        // Nullptr the message processor and the unhandled command handler
+        CCore::GetSingleton().SetClientMessageProcessor(nullptr);
+        CCore::GetSingleton().GetCommands()->SetExecuteHandler(nullptr);
 
         // Reset cursor alpha
         CCore::GetSingleton().GetGUI()->SetCursorAlpha(1.0f, true);
@@ -281,12 +281,6 @@ void CModManager::DoPulsePostFrame()
         CCore::GetSingleton().GetNetwork()->DoPulse();
     }
 
-    // Make sure frame rate limit gets applied
-    if (m_pClientBase)
-        CCore::GetSingleton().EnsureFrameRateLimitApplied();            // Catch missed frames
-    else
-        CCore::GetSingleton().ApplyFrameRateLimit(88);            // Limit when not connected
-
     // Load/unload requested?
     if (m_bUnloadRequested)
     {
@@ -347,7 +341,7 @@ void CModManager::InitializeModList(const char* szModFolderPath)
         VerifyAndAddEntry(szModFolderPath, ToUTF8(FindData.cFileName));
 
         // Search until there aren't any files left
-        while (FindNextFileW(hFind, &FindData) == TRUE)
+        while (FindNextFileW(hFind, &FindData) == true)
         {
             VerifyAndAddEntry(szModFolderPath, ToUTF8(FindData.cFileName));
         }
@@ -376,11 +370,11 @@ void CModManager::VerifyAndAddEntry(const char* szModFolderPath, const char* szN
         SString strClientDLL("%s%s\\%s", szModFolderPath, szName, CMODMANAGER_CLIENTDLL);
 
         // Attempt to load the primary client DLL
-        HMODULE hDLL = LoadLibraryEx(strClientDLL, NULL, DONT_RESOLVE_DLL_REFERENCES);
+        HMODULE hDLL = LoadLibraryEx(strClientDLL, nullptr, DONT_RESOLVE_DLL_REFERENCES);
         if (hDLL != 0)
         {
             // Check if InitClient symbol exists
-            if (GetProcAddress(hDLL, "InitClient") != NULL)
+            if (GetProcAddress(hDLL, "InitClient") != nullptr)
             {
                 // Add it to the list
                 m_ModDLLFiles[szName] = strClientDLL;
