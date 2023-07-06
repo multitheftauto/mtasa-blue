@@ -40,6 +40,11 @@ public:
     void ResourceStopping(lua_State* luaVM);
     void ResourceStopped(lua_State* luaVM);
 
+    list<CLuaModule*>::iterator       begin() noexcept { return m_Modules.begin(); }
+    list<CLuaModule*>::iterator       end() noexcept { return m_Modules.begin(); }
+    list<CLuaModule*>::const_iterator cbegin() const noexcept { return m_Modules.cbegin(); }
+    list<CLuaModule*>::const_iterator cend() const noexcept { return m_Modules.cbegin(); }
+
     CLuaManager*      GetLuaManager() { return m_pLuaManager; };
     list<CLuaModule*> GetLoadedModules() { return m_Modules; };
 

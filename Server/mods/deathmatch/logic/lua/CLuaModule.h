@@ -54,29 +54,29 @@ public:
     virtual ~CLuaModule();
 
     // functions for external modules until DP2.3
-    void Printf(const char* szFormat, ...);
-    void ErrorPrintf(const char* szFormat, ...);
-    void DebugPrintf(lua_State* luaVM, const char* szFormat, ...);
+    void Printf(const char* szFormat, ...) const noexcept;
+    void ErrorPrintf(const char* szFormat, ...) const noexcept;
+    void DebugPrintf(lua_State* luaVM, const char* szFormat, ...) const noexcept;
 
     bool        RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func);
-    std::string GetResourceName(lua_State* luaVM);
+    std::string GetResourceName(lua_State* luaVM) const noexcept;
 
-    CChecksum GetResourceMetaChecksum(lua_State* luaVM);
-    CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile);
+    CChecksum GetResourceMetaChecksum(lua_State* luaVM) const noexcept;
+    CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept;
 
     // functions for external modules until 1.0
-    ulong       GetVersion();
-    const char* GetVersionString();
-    const char* GetVersionName();
-    ulong       GetNetcodeVersion();
-    const char* GetOperatingSystemName();
-    lua_State*  GetResourceFromName(const char* szResourceName);
+    ulong       GetVersion() const noexcept;
+    const char* GetVersionString() const noexcept;
+    const char* GetVersionName() const noexcept;
+    ulong       GetNetcodeVersion() const noexcept;
+    const char* GetOperatingSystemName() const noexcept;
+    lua_State*  GetResourceFromName(const char* szResourceName) const noexcept;
 
-    std::string GetResourceFilePath(lua_State* luaVM, const char* fileName) override;
+    std::optional<std::string> GetResourceFilePath(lua_State* luaVM, const char* fileName) const noexcept override;
 
-    CVehicleManager* GetVehicleManager();
-    CMainConfig*     GetConfigManager();
-    CTeamManager*    GetTeamManager();
+    CVehicleManager* GetVehicleManager() const noexcept;
+    CMainConfig*     GetConfigManager() const noexcept;
+    CTeamManager*    GetTeamManager() const noexcept;
 
     // functions for deathmatch
     int  _LoadModule();

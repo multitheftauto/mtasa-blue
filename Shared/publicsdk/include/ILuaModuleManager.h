@@ -22,6 +22,7 @@ extern "C"
     #include <lauxlib.h>
 }
 #include <string>
+#include <optional>
 
 #ifndef __CChecksum_H
 #define __CChecksum_H
@@ -39,27 +40,27 @@ struct CChecksum
 class ILuaModuleManager
 {
 public:
-    virtual unsigned long GetVersion() = 0;
-    virtual const char*   GetVersionString() = 0;
-    virtual const char*   GetVersionName() = 0;
-    virtual unsigned long GetNetcodeVersion() = 0;
-    virtual const char*   GetOperatingSystemName() = 0;
+    virtual unsigned long GetVersion() const noexcept = 0;
+    virtual const char*   GetVersionString() const noexcept = 0;
+    virtual const char*   GetVersionName() const noexcept = 0;
+    virtual unsigned long GetNetcodeVersion() const noexcept = 0;
+    virtual const char*   GetOperatingSystemName() const noexcept = 0;
 
-    virtual void ErrorPrintf(const char* szFormat, ...) = 0;
-    virtual void DebugPrintf(lua_State* luaVM, const char* szFormat, ...) = 0;
-    virtual void Printf(const char* szFormat, ...) = 0;
+    virtual void ErrorPrintf(const char* szFormat, ...) const noexcept = 0;
+    virtual void DebugPrintf(lua_State* luaVM, const char* szFormat, ...) const noexcept = 0;
+    virtual void Printf(const char* szFormat, ...) const noexcept = 0;
 
     virtual bool RegisterFunction(lua_State* luaVM, const char* szFunctionName,
         lua_CFunction Func) = 0;
 
-    virtual lua_State*  GetResourceFromName(const char* szResourceName) = 0;
-    virtual std::string GetResourceName(lua_State* luaVM) = 0;
+    virtual lua_State*  GetResourceFromName(const char* szResourceName) const noexcept = 0;
+    virtual std::string GetResourceName(lua_State* luaVM) const noexcept = 0;
 
-    virtual std::string GetResourceFilePath(lua_State* luaVM, const char* fileName) = 0;
-    virtual CChecksum   GetResourceMetaChecksum(lua_State* luaVM) = 0;
-    virtual CChecksum   GetResourceFileChecksum(lua_State* luaVM, const char* szFile) = 0;
+    virtual std::optional<std::string> GetResourceFilePath(lua_State* luaVM, const char* fileName) const noexcept = 0;
+    virtual CChecksum                  GetResourceMetaChecksum(lua_State* luaVM) const noexcept = 0;
+    virtual CChecksum                  GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept = 0;
 
-    virtual CVehicleManager* GetVehicleManager() = 0;
-    virtual CMainConfig*     GetConfigManager() = 0;
-    virtual CTeamManager*    GetTeamManager() = 0;
+    virtual CVehicleManager* GetVehicleManager() const noexcept = 0;
+    virtual CMainConfig*     GetConfigManager() const noexcept = 0;
+    virtual CTeamManager*    GetTeamManager() const noexcept = 0;
 };

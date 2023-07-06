@@ -196,19 +196,18 @@ void CLuaModule::_RegisterFunctions(lua_State* luaVM)
 
 void CLuaModule::_UnregisterFunctions()
 {
-    list<CLuaMain*>::const_iterator liter = m_pLuaModuleManager->GetLuaManager()->IterBegin();
-    for (; liter != m_pLuaModuleManager->GetLuaManager()->IterEnd(); ++liter)
+    for (const auto& liter : *m_pLuaModuleManager->GetLuaManager())
     {
-        lua_State* luaVM = (*liter)->GetVM();
+        lua_State* luaVM = liter->GetVM();
 
-        for (const auto& iter : m_Functions)
+        for (const auto& function : m_Functions)
         {
             // points function to nil
             lua_pushnil(luaVM);
-            lua_setglobal(luaVM, iter.c_str());
+            lua_setglobal(luaVM, function.c_str());
 
             // Remove func from CLuaCFunctions
-            CLuaCFunctions::RemoveFunction(iter);
+            CLuaCFunctions::RemoveFunction(function);
         }
     }
 }
@@ -247,7 +246,7 @@ bool CLuaModule::_DoesFunctionExist(const char* szFunctionName)
 }
 
 // Module Functions
-void CLuaModule::ErrorPrintf(const char* szFormat, ...)
+void CLuaModule::ErrorPrintf(const char* szFormat, ...) const noexcept
 {
     va_list args;
     va_start(args, szFormat);
@@ -255,7 +254,7 @@ void CLuaModule::ErrorPrintf(const char* szFormat, ...)
     va_end(args);
 }
 
-void CLuaModule::DebugPrintf(lua_State* luaVM, const char* szFormat, ...)
+void CLuaModule::DebugPrintf(lua_State* luaVM, const char* szFormat, ...) const noexcept
 {
     va_list args;
     va_start(args, szFormat);
@@ -263,7 +262,7 @@ void CLuaModule::DebugPrintf(lua_State* luaVM, const char* szFormat, ...)
     va_end(args);
 }
 
-void CLuaModule::Printf(const char* szFormat, ...)
+void CLuaModule::Printf(const char* szFormat, ...) const noexcept
 {
     va_list args;
     va_start(args, szFormat);
@@ -275,14 +274,15 @@ bool CLuaModule::RegisterFunction(lua_State* luaVM, const char* szFunctionName, 
 {
     if (luaVM)
     {
-        if (szFunctionName)
+        if (!szFunctionName)
+            return false; // if the name wasn't provided, why returning true (success)?
+
+        CLuaCFunctions::AddFunction(szFunctionName, Func);
+        lua_register(luaVM, szFunctionName, Func);
+        if (!_DoesFunctionExist(szFunctionName))
         {
-            CLuaCFunctions::AddFunction(szFunctionName, Func);
-            lua_register(luaVM, szFunctionName, Func);
-            if (!_DoesFunctionExist(szFunctionName))
-            {            // Check or it adds for each resource
-                m_Functions.push_back(szFunctionName);
-            }
+            // Check or it adds for each resource
+            m_Functions.push_back(szFunctionName);
         }
     }
     else
@@ -292,7 +292,7 @@ bool CLuaModule::RegisterFunction(lua_State* luaVM, const char* szFunctionName, 
     return true;
 }
 
-std::string CLuaModule::GetResourceName(lua_State* luaVM)
+std::string CLuaModule::GetResourceName(lua_State* luaVM) const noexcept
 {
     if (!luaVM)
         return "";
@@ -308,7 +308,7 @@ std::string CLuaModule::GetResourceName(lua_State* luaVM)
     return pResource->GetName();
 }
 
-CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM)
+CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM) const noexcept
 {
     if (!luaVM)
         return {};
@@ -324,7 +324,7 @@ CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM)
     return pResource ? pResource->GetLastMetaChecksum() : CChecksum();
 }
 
-CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFile)
+CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept
 {
     if (!luaVM)
         return {};
@@ -337,7 +337,7 @@ CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFi
     if (!pResource)
         return {};
 
-    list<CResourceFile*>::iterator iter = pResource->IterBegin();
+    auto iter = pResource->IterBegin();
     for (; iter != pResource->IterEnd(); ++iter)
     {
         if (!strcmp((*iter)->GetName(), szFile))
@@ -346,32 +346,32 @@ CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFi
     return CChecksum();
 }
 
-unsigned long CLuaModule::GetVersion()
+unsigned long CLuaModule::GetVersion() const noexcept
 {
     return CStaticFunctionDefinitions::GetVersion();
 }
 
-const char* CLuaModule::GetVersionString()
+const char* CLuaModule::GetVersionString() const noexcept
 {
     return CStaticFunctionDefinitions::GetVersionString();
 }
 
-const char* CLuaModule::GetVersionName()
+const char* CLuaModule::GetVersionName() const noexcept
 {
     return CStaticFunctionDefinitions::GetVersionName();
 }
 
-unsigned long CLuaModule::GetNetcodeVersion()
+unsigned long CLuaModule::GetNetcodeVersion() const noexcept
 {
     return CStaticFunctionDefinitions::GetNetcodeVersion();
 }
 
-const char* CLuaModule::GetOperatingSystemName()
+const char* CLuaModule::GetOperatingSystemName() const noexcept
 {
     return CStaticFunctionDefinitions::GetOperatingSystemName();
 }
 
-lua_State* CLuaModule::GetResourceFromName(const char* szResourceName)
+lua_State* CLuaModule::GetResourceFromName(const char* szResourceName) const noexcept
 {
     CResource* pResource = g_pGame->GetResourceManager()->GetResource(szResourceName);
 
@@ -383,36 +383,37 @@ lua_State* CLuaModule::GetResourceFromName(const char* szResourceName)
     return pLuaMain ? pLuaMain->GetVM() : nullptr;
 }
 
-std::string CLuaModule::GetResourceFilePath(lua_State* luaVM, const char* fileName)
+std::optional<std::string> CLuaModule::GetResourceFilePath(lua_State* luaVM, const char* fileName) const noexcept
 {
     if (!luaVM)
-        return "";
+        return nullptr;
 
     CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
     if (!pLuaMain)
-        return "";
+        return nullptr;
 
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return "";
+        return nullptr;
 
     std::string path;
     if (!pResource->GetFilePath(fileName, path))
-        return "";
+        return nullptr;
 
     return path;
 }
 
-CVehicleManager* CLuaModule::GetVehicleManager() {
+CVehicleManager* CLuaModule::GetVehicleManager() const noexcept
+{
     return g_pGame->GetVehicleManager();
 }
 
-CMainConfig* CLuaModule::GetConfigManager()
+CMainConfig* CLuaModule::GetConfigManager() const noexcept
 {
     return g_pGame->GetConfig();
 }
 
-CTeamManager* CLuaModule::GetTeamManager()
+CTeamManager* CLuaModule::GetTeamManager() const noexcept
 {
     return g_pGame->GetTeamManager();
 }
