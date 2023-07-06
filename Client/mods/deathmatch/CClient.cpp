@@ -20,6 +20,7 @@ CGame*                  g_pGame = NULL;
 CMultiplayer*           g_pMultiplayer = NULL;
 CNet*                   g_pNet = NULL;
 CClientGame*            g_pClientGame = NULL;
+CClientGame*            g_pSharedGame = nullptr;
 
 int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
 {
@@ -138,6 +139,7 @@ int CClient::ClientInitialize(const char* szArguments, CCoreInterface* pCore)
         {
             // Create new clientgame
             g_pClientGame = new CClientGame(true);
+            g_pSharedGame = g_pClientGame;
 
             // Connect
             g_pCore->GetConsole()->Echo("Starting playback...");
@@ -205,6 +207,7 @@ void CClient::ClientShutdown()
     {
         delete g_pClientGame;
         g_pClientGame = NULL;
+        g_pSharedGame = nullptr;
     }
 }
 

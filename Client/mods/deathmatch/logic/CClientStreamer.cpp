@@ -108,7 +108,6 @@ void CClientStreamer::ConnectRow(CClientStreamSectorRow* pRow)
 }
 
 #include "..\deathmatch\logic\CClientGame.h"
-extern CClientGame* g_pClientGame;
 void                CClientStreamer::DoPulse(CVector& vecPosition)
 {
     /* Debug code

@@ -15,8 +15,6 @@
 
 using std::list;
 
-extern CClientGame* g_pClientGame;
-
 static CLuaManager* m_pLuaManager;
 SString             CLuaMain::ms_strExpectedUndumpHash;
 

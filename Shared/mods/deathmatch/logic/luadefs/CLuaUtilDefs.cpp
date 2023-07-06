@@ -617,11 +617,7 @@ int CLuaUtilDefs::DebugSleep(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-#ifdef MTA_CLIENT
-        if (!g_pClientGame->GetDevelopmentMode())
-#else
-        if (!g_pGame->GetDevelopmentMode())
-#endif
+        if (!g_pSharedGame->GetDevelopmentMode())
         {
             m_pScriptDebugging->LogError(luaVM, "This function can only be used in development mode");
             lua_pushboolean(luaVM, false);
@@ -629,11 +625,7 @@ int CLuaUtilDefs::DebugSleep(lua_State* luaVM)
         }
 
         // Process HTTP
-#ifdef MTA_CLIENT
-        g_pClientGame->GetRemoteCalls()->ProcessQueuedFiles();
-#else
-        g_pGame->GetRemoteCalls()->ProcessQueuedFiles();
-#endif
+        g_pSharedGame->GetRemoteCalls()->ProcessQueuedFiles();
 
         // Sleep a bit
         std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));

@@ -90,9 +90,5 @@ void CLuaShared::AddClasses(lua_State* luaVM)
 
 SharedUtil::CAsyncTaskScheduler* CLuaShared::GetAsyncTaskScheduler()
 {
-#ifdef MTA_CLIENT
-    return g_pClientGame->GetAsyncTaskScheduler();
-#else
-    return g_pGame->GetAsyncTaskScheduler();
-#endif
+    return g_pSharedGame->GetAsyncTaskScheduler();
 }

@@ -51,7 +51,6 @@ using std::vector;
 #pragma warning(disable:4312)
 
 // Used within this file by the packet handler to grab the this pointer of CClientGame
-extern CClientGame* g_pClientGame;
 extern int          g_iDamageEventLimit;
 float               g_fApplyDamageLastAmount;
 uchar               g_ucApplyDamageLastHitZone;

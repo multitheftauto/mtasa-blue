@@ -13,8 +13,6 @@
 
 using std::list;
 
-extern CClientGame* g_pClientGame;
-
 #define PED_SYNC_RATE   ( g_TickRateSettings.iPedSync )
 
 CPedSync::CPedSync(CClientPedManager* pPedManager)

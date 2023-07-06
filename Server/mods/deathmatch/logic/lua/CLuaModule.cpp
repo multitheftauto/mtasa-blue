@@ -17,8 +17,6 @@
 #include "CGame.h"
 #include "CResourceManager.h"
 
-extern CGame* g_pGame;
-
 CLuaModule::CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* pScriptDebugging, const char* szFileName, const char* szShortFileName)
 {
     // Set module manager

@@ -93,6 +93,7 @@
 #endif
 
 CGame* g_pGame = NULL;
+CGame* g_pSharedGame = NULL;
 
 char          szProgress[4] = {'-', '\\', '|', '/'};
 unsigned char ucProgress = 0;
@@ -153,6 +154,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
 {
     // Set our global pointer
     g_pGame = this;
+    g_pSharedGame = g_pGame;
 
     m_bServerFullyUp = false;
 

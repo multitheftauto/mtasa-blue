@@ -20,8 +20,6 @@
 
 using std::list;
 
-extern CClientGame* g_pClientGame;
-
 CElementGroup::~CElementGroup()
 {
     CElementDeleter* deleter = g_pClientGame->GetElementDeleter();

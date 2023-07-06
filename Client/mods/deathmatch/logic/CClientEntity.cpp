@@ -12,8 +12,6 @@
 
 using std::list;
 
-extern CClientGame* g_pClientGame;
-
 #pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
 
 CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)

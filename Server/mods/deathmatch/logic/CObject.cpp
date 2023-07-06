@@ -14,8 +14,6 @@
 #include "CLogger.h"
 #include "Utils.h"
 
-extern CGame* g_pGame;
-
 CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod) : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
 {
     // Init

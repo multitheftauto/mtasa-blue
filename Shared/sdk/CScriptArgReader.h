@@ -1412,11 +1412,7 @@ public:
         // Output warning here (there's no better way to integrate it without huge code changes
         if (!m_bError && !m_strCustomWarning.empty())
         {
-            #ifdef MTA_CLIENT
-            CLuaFunctionDefs::m_pScriptDebugging->LogWarning(m_luaVM, m_strCustomWarning);
-            #else
-            g_pGame->GetScriptDebugging()->LogWarning(m_luaVM, m_strCustomWarning);
-            #endif
+            g_pSharedGame->GetScriptDebugging()->LogWarning(m_luaVM, m_strCustomWarning);
 
             m_strCustomWarning.clear();
         }

@@ -655,3 +655,6 @@ private:
     bool m_DevelopmentModeEnabled;
     bool m_showClientTransferBox = true;
 };
+
+extern CGame* g_pGame;
+extern CGame* g_pSharedGame;

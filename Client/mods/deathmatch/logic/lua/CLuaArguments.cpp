@@ -18,8 +18,6 @@ using namespace std;
 #define VERIFY_ENTITY(entity) (CStaticFunctionDefinitions::GetRootElement()->IsMyChild(entity,true)&&!entity->IsBeingDeleted())
 #endif
 
-extern CClientGame* g_pClientGame;
-
 CLuaArguments::CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
 {
     ReadFromBitStream(bitStream, pKnownTables);

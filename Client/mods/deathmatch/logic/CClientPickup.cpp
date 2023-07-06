@@ -12,8 +12,6 @@
 #include <game/CPickups.h>
 #include <game/CPickup.h>
 
-extern CClientGame* g_pClientGame;
-
 CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition)
     : ClassInit(this), CClientStreamElement(pManager->GetPickupStreamer(), ID)
 {

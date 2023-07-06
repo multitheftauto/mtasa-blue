@@ -24,8 +24,6 @@
 #include "Enums.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 
-extern CGame* g_pGame;
-
 CResourceMapItem::CResourceMapItem(CResource* pResource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* pXMLAttributes,
                                    int iDimension)
     : CResourceFile(pResource, szShortName, szResourceFileName, pXMLAttributes)

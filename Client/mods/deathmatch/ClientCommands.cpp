@@ -27,8 +27,6 @@ using std::vector;
 // Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
 #pragma warning(disable:4312)
 
-extern CClientGame* g_pClientGame;
-
 bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind)
 {
     // Has the core already handled this command?

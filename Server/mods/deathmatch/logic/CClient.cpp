@@ -14,8 +14,6 @@
 #include "CGame.h"
 #include "CAccountManager.h"
 
-extern CGame* g_pGame;
-
 CClient::CClient(bool bAddGuestAccount)
 {
     if (bAddGuestAccount)
