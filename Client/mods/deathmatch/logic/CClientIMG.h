@@ -78,7 +78,7 @@ private:
     std::string               m_filePath;
     unsigned char             m_ucArchiveID;
     std::vector<tImgFileInfo> m_fileInfos;
-    size_t                    m_LargestFileSizeBlocks;            // The size of the largest file [in streaming blocks/sectors]
+    size_t                    m_LargestFileSizeBlocks; // The size of the largest file [in streaming blocks/sectors]
 
     std::vector<tLinkedModelRestoreInfo> m_restoreInfo;
 };
