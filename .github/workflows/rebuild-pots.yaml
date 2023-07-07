@@ -55,14 +55,14 @@ jobs:
           if [[ $(git diff --unified=0 "Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot" | grep -v POT-Creation-Date | grep '^[+|-][^+|-]') ]]
           then
             git add "Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot"
-            git commit -m "Update client en_US pot"
+            git commit -m "Update client en_US pot" -m "[ci skip]"
           fi
 
           # Check that diff contains something and it's not only POT-Creation-Date
           if [[ $(git diff --unified=0 "Shared/installer/locale/en_US.pot" | grep -v POT-Creation-Date | grep '^[+|-][^+|-]') ]]
           then
             git add "Shared/installer/locale/en_US.pot"
-            git commit -m "Update installer en_US pot"
+            git commit -m "Update installer en_US pot" -m "[ci skip]"
           fi
 
           # Check for local commits

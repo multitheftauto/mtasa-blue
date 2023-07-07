@@ -84,8 +84,7 @@ void CLuaCompatibilityDefs::LoadFunctions()
 
         // Old Discord implementation (see #2499)
         {"setPlayerDiscordJoinParams",
-         [](lua_State* luaVM) -> int
-         {
+         [](lua_State* luaVM) -> int {
              lua_pushboolean(luaVM, false);
              return 1;
          }},

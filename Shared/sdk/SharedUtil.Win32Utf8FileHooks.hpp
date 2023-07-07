@@ -49,23 +49,23 @@ BUT
 #ifdef UTF8_FILE_HOOKS_PERSONALITY_Core
     #include <filesystem>
 
-    extern std::filesystem::path g_gtaDirectory;
+extern std::filesystem::path g_gtaDirectory;
 
-    /**
-     * @brief Converts a filesystem path to a string encoded with the active code page.
-     * @param path Path to convert to a string
-    */
-    auto ToACP(const std::filesystem::path& path) -> std::string
-    {
-        if (path.empty())
-            return {};
+/**
+ * @brief Converts a filesystem path to a string encoded with the active code page.
+ * @param path Path to convert to a string
+ */
+auto ToACP(const std::filesystem::path& path) -> std::string
+{
+    if (path.empty())
+        return {};
 
-        const std::wstring widePath = path.wstring();
-        const int          narrowLength = WideCharToMultiByte(CP_ACP, 0, widePath.data(), static_cast<int>(widePath.size()), nullptr, 0, nullptr, nullptr);
-        std::string        narrowPath(narrowLength, 0);
-        WideCharToMultiByte(CP_ACP, 0, widePath.data(), static_cast<int>(widePath.size()), narrowPath.data(), narrowLength, nullptr, nullptr);
-        return narrowPath;
-    }
+    const std::wstring widePath = path.wstring();
+    const int          narrowLength = WideCharToMultiByte(CP_ACP, 0, widePath.data(), static_cast<int>(widePath.size()), nullptr, 0, nullptr, nullptr);
+    std::string        narrowPath(narrowLength, 0);
+    WideCharToMultiByte(CP_ACP, 0, widePath.data(), static_cast<int>(widePath.size()), narrowPath.data(), narrowLength, nullptr, nullptr);
+    return narrowPath;
+}
 #endif
 
 namespace SharedUtil

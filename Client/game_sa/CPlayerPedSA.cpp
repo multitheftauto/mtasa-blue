@@ -19,9 +19,8 @@
 #include "CPlayerPedSA.h"
 #include "CWorldSA.h"
 
-
 extern CCoreInterface* g_pCore;
-extern CGameSA* pGame;
+extern CGameSA*        pGame;
 
 class CPedClothesDesc;
 

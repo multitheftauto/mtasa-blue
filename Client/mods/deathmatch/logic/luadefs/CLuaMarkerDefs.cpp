@@ -17,11 +17,18 @@ void CLuaMarkerDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createMarker", CreateMarker},
 
-        {"getMarkerCount", GetMarkerCount},   {"getMarkerType", GetMarkerType},     {"getMarkerSize", GetMarkerSize},
-        {"getMarkerColor", GetMarkerColor},   {"getMarkerTarget", GetMarkerTarget}, {"getMarkerIcon", GetMarkerIcon},
+        {"getMarkerCount", GetMarkerCount},
+        {"getMarkerType", GetMarkerType},
+        {"getMarkerSize", GetMarkerSize},
+        {"getMarkerColor", GetMarkerColor},
+        {"getMarkerTarget", GetMarkerTarget},
+        {"getMarkerIcon", GetMarkerIcon},
 
-        {"setMarkerType", SetMarkerType},     {"setMarkerSize", SetMarkerSize},     {"setMarkerColor", SetMarkerColor},
-        {"setMarkerTarget", SetMarkerTarget}, {"setMarkerIcon", SetMarkerIcon},
+        {"setMarkerType", SetMarkerType},
+        {"setMarkerSize", SetMarkerSize},
+        {"setMarkerColor", SetMarkerColor},
+        {"setMarkerTarget", SetMarkerTarget},
+        {"setMarkerIcon", SetMarkerIcon},
 
         {"setCoronaReflectionEnabled", ArgumentParser<SetCoronaReflectionEnabled>},
         {"isCoronaReflectionEnabled", ArgumentParser<IsCoronaReflectionEnabled>},

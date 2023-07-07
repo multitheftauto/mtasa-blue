@@ -1,0 +1,412 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-04-16 19:11\n"
+"PO-Revision-Date: 2023-04-16 19:36\n"
+"Last-Translator: \n"
+"Language-Team: French\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
+"X-Crowdin-Project-ID: 13\n"
+"X-Crowdin-Language: fr\n"
+"X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/installer/locale/en_US.pot\n"
+"X-Crowdin-File-ID: 89\n"
+
+#. GET_XPVISTA_PLEASE
+#: Shared/installer/nightly.nsi:205
+msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
+msgstr "La version de MTA:SA que vous avez téléchargée n'est pas compatible avec Windows XP ou Vista. Veuillez télécharger une version alternative sur www.mtasa.com."
+
+#. GET_WIN81_PLEASE
+#: Shared/installer/nightly.nsi:206
+msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
+msgstr "La version de MTA:SA que vous avez téléchargée n'est pas compatible avec Windows 7, 8 ou 8.1. Veuillez télécharger une version alternative sur www.mtasa.com."
+
+#. GET_MASTER_PLEASE
+#: Shared/installer/nightly.nsi:207
+msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
+msgstr ""
+
+#. WELCOME_TEXT
+#: Shared/installer/nightly.nsi:208
+msgid "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n"
+"It is recommended that you close all other applications before starting Setup.\n\n"
+"[Admin access may be requested for Vista and up]\n\n"
+"Click Next to continue."
+msgstr "Cet assistant vous guidera dans l'installation ou la mise à jour de $(^Name) ${REVISION_TAG}\n\n"
+"Il est recommandé de fermer toutes les autres applications avant de commencer l'installation.\n\n"
+"Un accès Administrateur pourrait être demandé.\n\n"
+"Cliquez sur Suivant pour continuer."
+
+#. HEADER_Text
+#: Shared/installer/nightly.nsi:212
+msgid "Grand Theft Auto: San Andreas location"
+msgstr "Emplacement de Grand Theft Auto: San Andreas"
+
+#. DIRECTORY_Text_Dest
+#: Shared/installer/nightly.nsi:213
+msgid "Grand Theft Auto: San Andreas folder"
+msgstr "Dossier de Grand Theft Auto: San Andreas"
+
+#. DIRECTORY_Text_Top
+#: Shared/installer/nightly.nsi:214
+msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
+"$\n"
+"You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
+"$\n"
+"Click Install to begin installing."
+msgstr "Veuillez sélectionner le dossier de Grand Theft Auto: San Andreas.$\n"
+"$\n"
+"Vous devez avoir Grand Theft Auto: San Andreas v1.0 pour utiliser MTA:SA, les autres versions ne sont pas compatibles.$\n"
+"$\n"
+"Cliquez sur Installer pour commencer l'installation."
+
+#. DESC_Section10
+#: Shared/installer/nightly.nsi:217
+msgid "Create a Start Menu group for installed applications"
+msgstr "Créer un raccourci dans le menu Démarrer"
+
+#. DESC_Section11
+#: Shared/installer/nightly.nsi:218
+msgid "Create a Desktop Shortcut for the MTA:SA Client."
+msgstr "Créer un raccourci sur le Bureau pour le Client MTA:SA."
+
+#. DESC_Section12
+#: Shared/installer/nightly.nsi:219
+msgid "Register mtasa:// protocol for browser clickable-ness."
+msgstr "Enregistrer le protocole mtasa:// pour les navigateurs."
+
+#. DESC_Section13
+#: Shared/installer/nightly.nsi:220
+msgid "Add to Windows Games Explorer (if present)."
+msgstr "Ajouter à l'Explorateur de Jeux Windows (si disponible)."
+
+#. DESC_DirectX
+#: Shared/installer/nightly.nsi:221
+msgid "Install or update DirectX (if required)."
+msgstr "Installer ou mettre à jour DirectX (si nécessaire)."
+
+#. DESC_Section1
+#: Shared/installer/nightly.nsi:222
+msgid "The core components required to run Multi Theft Auto."
+msgstr "Les composants de base nécessaires pour lancer MTA:SA."
+
+#. DESC_Section2
+#: Shared/installer/nightly.nsi:223
+msgid "The MTA:SA modification, allowing you to play online."
+msgstr "La modification MTA:SA, vous permettant de jouer en ligne."
+
+#. DESC_SectionGroupServer
+#: Shared/installer/nightly.nsi:226
+msgid "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
+msgstr "Le Serveur Multi Theft Auto. Pour héberger votre propre serveur depuis votre ordinateur. Nécessite une connexion internet rapide."
+
+#. DESC_Section4
+#: Shared/installer/nightly.nsi:227
+msgid "The Multi Theft Auto server. This is a required component."
+msgstr "Le Serveur Multi Theft Auto. Ceci est un composant nécessaire."
+
+#. DESC_Section5
+#: Shared/installer/nightly.nsi:228
+msgid "The MTA:SA modification for the server."
+msgstr "La modification MTA:SA pour le Serveur."
+
+#. DESC_Section6
+#: Shared/installer/nightly.nsi:229
+msgid "This is a set of required resources for your server."
+msgstr "Il s'agit d'un ensemble de ressources nécessaires pour votre serveur."
+
+#. DESC_Section7
+#: Shared/installer/nightly.nsi:230
+msgid "This is an optional set of gamemodes and maps for your server."
+msgstr "Il s'agit d'un ensemble facultatif de gamemodes et maps pour votre serveur."
+
+#. DESC_Section8
+#: Shared/installer/nightly.nsi:231
+msgid "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
+msgstr "L'Editeur de Map pour MTA:SA.  Pour créer vos propres maps et les utiliser dans les gamemodes de MTA:SA."
+
+#. DESC_Section9
+#: Shared/installer/nightly.nsi:232
+msgid "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
+msgstr "Il s'agit du SDK pour créer des modules binaires pour le Serveur MTA:SA. Installez uniquement si vous avez une bonne connaissance du C++!"
+
+#. DESC_SectionGroupDev
+#: Shared/installer/nightly.nsi:234
+msgid "Development code and tools that aid in the creation of mods for Multi Theft Auto"
+msgstr "Outils et code de développement facilitant la création de mods pour Multi Theft Auto."
+
+#. DESC_SectionGroupClient
+#: Shared/installer/nightly.nsi:235
+msgid "The client is the program you run to play on a Multi Theft Auto server"
+msgstr "Le client est le programme que vous exécutez pour jouer sur un serveur MTA:SA"
+
+#. INST_CLIENTSERVER
+#: Shared/installer/nightly.nsi:441
+msgid "Client and Server"
+msgstr "Client et Serveur"
+
+#. INST_SERVER
+#: Shared/installer/nightly.nsi:442
+msgid "Server only"
+msgstr "Serveur uniquement"
+
+#. INST_STARTMENU_GROUP
+#: Shared/installer/nightly.nsi:456
+msgid "Start menu group"
+msgstr "Raccourci dans le menu Démarrer"
+
+#. INST_DESKTOP_ICON
+#: Shared/installer/nightly.nsi:457
+msgid "Desktop icon"
+msgstr "Raccourci sur le Bureau"
+
+#. INST_PROTOCOL
+#: Shared/installer/nightly.nsi:458
+msgid "Register mtasa:// protocol"
+msgstr "Enregistrer le protocole mtasa://"
+
+#. INST_GAMES_EXPLORER
+#: Shared/installer/nightly.nsi:459
+msgid "Add to Games Explorer"
+msgstr "Ajouter à l'Explorateur de Jeux"
+
+#. INST_DIRECTX
+#: Shared/installer/nightly.nsi:460
+msgid "Install DirectX"
+msgstr "Installer DirectX"
+
+#. INST_SEC_CLIENT
+#: Shared/installer/nightly.nsi:494
+msgid "Game client"
+msgstr "Client"
+
+#. INST_SEC_SERVER
+#: Shared/installer/nightly.nsi:495
+msgid "Dedicated server"
+msgstr "Serveur dédié"
+
+#. INST_SEC_CORE
+#: Shared/installer/nightly.nsi:496
+msgid "Core components"
+msgstr "Composants de base"
+
+#. INST_SEC_GAME
+#: Shared/installer/nightly.nsi:497
+msgid "Game module"
+msgstr "Module du jeu"
+
+#. INFO_INPLACE_UPGRADE
+#: Shared/installer/nightly.nsi:499
+msgid "Performing in-place upgrade..."
+msgstr "Mise à niveau en cours..."
+
+#. INFO_UPDATE_PERMISSIONS
+#: Shared/installer/nightly.nsi:500
+msgid "Updating permissions. This could take a few minutes..."
+msgstr "Mise à jour des permissions. Ceci peut prendre quelques minutes..."
+
+#. MSGBOX_INVALID_GTASA
+#: Shared/installer/nightly.nsi:501
+msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
+"However installation will continue.$\\r$\n"
+"Please reinstall if there are problems later."
+msgstr "Aucune version valide de Grand Theft Auto: San Andreas n'a été détectée.$\\r$\n"
+"Cependant, l'installation va continuer.$\\r$\n"
+"Veuillez réinstaller si vous rencontrez des problèmes plus tard."
+
+#. INST_SEC_CORE_RESOURCES
+#: Shared/installer/nightly.nsi:504
+msgid "Core Resources"
+msgstr "Ressources principales"
+
+#. INST_SEC_OPTIONAL_RESOURCES
+#: Shared/installer/nightly.nsi:505
+msgid "Optional Resources"
+msgstr "Ressources facultatives"
+
+#. INST_SEC_EDITOR
+#: Shared/installer/nightly.nsi:506
+msgid "Editor"
+msgstr "Editeur"
+
+#. INST_SEC_DEVELOPER
+#: Shared/installer/nightly.nsi:1001
+msgid "Development"
+msgstr "Développement"
+
+#. UNINST_SUCCESS
+#: Shared/installer/nightly.nsi:1049
+msgid "$(^Name) was successfully removed from your computer."
+msgstr "$(^Name) a été désinstallé de votre ordinateur."
+
+#. UNINST_FAIL
+#: Shared/installer/nightly.nsi:1056
+msgid "Uninstallation has failed!"
+msgstr "La désinstallation a échoué!"
+
+#. UNINST_REQUEST
+#: Shared/installer/nightly.nsi:1064
+msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
+msgstr "Êtes-vous sûr de vouloir supprimer complètement $(^Name) et tous ses composants?"
+
+#. UNINST_REQUEST_NOTE
+#: Shared/installer/nightly.nsi:1065
+msgid "Uninstalling before update?$\\r$\n"
+"It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
+"Run the new installer to upgrade and preserve your settings."
+msgstr "Désinstaller avant la mise à jour?$\\r$\n"
+"Il n'est pas nécessaire de désinstaller avant d'installer une nouvelle version de MTA:SA$\\r$\n"
+"Exécutez le nouveau programme d'installation pour mettre à niveau en conservant vos paramètres."
+
+#. UNINST_DATA_REQUEST
+#: Shared/installer/nightly.nsi:1078
+msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
+msgstr "Voulez-vous conserver vos fichiers de données (tels que ressources, captures d'écran et configuration du serveur)? Si vous cliquez sur Non, ces fichiers seront perdus."
+
+#. UAC_RIGHTS1
+#: Shared/installer/nightly.nsi:1253
+msgid "This installer requires admin access, try again"
+msgstr "Cet installeur nécessite un accès administrateur, veuillez réessayer"
+
+#. UAC_RIGHTS_UN
+#: Shared/installer/nightly.nsi:1254
+msgid "This uninstaller requires admin access, try again"
+msgstr "Ce désinstalleur nécessite un accès administrateur, veuillez réessayer"
+
+#. UAC_RIGHTS3
+#: Shared/installer/nightly.nsi:1255
+msgid "Logon service not running, aborting!"
+msgstr "Le service Logon n'est pas en cours d'exécution, annulation!"
+
+#. UAC_RIGHTS4
+#: Shared/installer/nightly.nsi:1256
+msgid "Unable to elevate"
+msgstr "Impossible d'élever"
+
+#. INST_MTA_CONFLICT
+#: Shared/installer/nightly.nsi:1852
+msgid "A different major version of MTA ($1) already exists at that path.$\n"
+"$\n"
+"MTA is designed for major versions to be installed in different paths.$\n"
+" Are you sure you want to overwrite MTA $1 at $INSTDIR ?"
+msgstr "Une version différente de MTA ($1) existe déjà à cet emplacement.$\n"
+"$\n"
+"MTA est conçu pour installer les versions différentes dans des dossiers différents.$\n"
+"Êtes-vous sûr de vouloir remplacer MTA $1 à l'emplacement $INSTDIR ?"
+
+#. INST_GTA_CONFLICT
+#: Shared/installer/nightly.nsi:1856
+msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
+"$\n"
+"Do you want to use the default install directory$\n"
+"$DEFAULT_INSTDIR ?"
+msgstr "MTA ne peut pas être installé dans le même répertoire que GTA:SA.$\n"
+"$\n"
+"Voulez-vous utiliser le répertoire d'installation par défaut$\n"
+"$DEFAULT_INSTDIR ?"
+
+#. INST_GTA_ERROR1
+#: Shared/installer/nightly.nsi:1859
+msgid "The selected directory does not exist.$\n"
+"$\n"
+"Please select the GTA:SA install directory"
+msgstr "L'emplacement sélectionné n'existe pas.$\n"
+"$\n"
+"Veuillez sélectionner le dossier d'installation de GTA:SA"
+
+#. INST_GTA_ERROR2
+#: Shared/installer/nightly.nsi:1861
+msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
+"$\n"
+"Are you sure you want to continue ?"
+msgstr "Impossible de trouver GTA:SA à l'emplacement $GTA_DIR $\n"
+"$\n"
+"Êtes-vous sûr de vouloir continuer?"
+
+#. INST_CHOOSE_LOC_TOP
+#: Shared/installer/nightly.nsi:1979
+msgid "Choose Install Location"
+msgstr "Choisissez l'emplacement de l'installation"
+
+#. INST_CHOOSE_LOC
+#: Shared/installer/nightly.nsi:1980
+msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+msgstr "Choisissez le dossier dans lequel sera installé ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+
+#. INST_CHOOSE_LOC2
+#: Shared/installer/nightly.nsi:1981
+msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
+"To install in a different folder, click Browse and select another folder.$\n"
+"$\n"
+" Click Next to continue."
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} sera installé à l'emplacement suivant.$\n"
+"Pour installer à un emplacement différent, cliquez sur Parcourir et sélectionnez un autre dossier.$\n"
+"$\n"
+"Cliquez sur Suivant pour continuer."
+
+#. INST_CHOOSE_LOC3
+#: Shared/installer/nightly.nsi:1983
+msgid "Destination Folder"
+msgstr "Dossier de destination"
+
+#. INST_CHOOSE_LOC_BROWSE
+#: Shared/installer/nightly.nsi:1984
+msgid "Browse..."
+msgstr "Parcourir..."
+
+#. INST_CHOOSE_LOC_DEFAULT
+#: Shared/installer/nightly.nsi:1985
+msgid "Default"
+msgstr "Par défaut"
+
+#. INST_CHOOSE_LOC_LAST_USED
+#: Shared/installer/nightly.nsi:1986
+msgid "Last used"
+msgstr "Dernière utilisation"
+
+#. INST_CHOOSE_LOC_CUSTOM
+#: Shared/installer/nightly.nsi:1987
+msgid "Custom"
+msgstr "Personnalisée"
+
+#. INST_CHOOSE_LOC4
+#: Shared/installer/nightly.nsi:2165
+msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
+msgstr "Sélectionnez le dossier dans lequel sera installé ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} :"
+
+#. INST_LOC_OW
+#: Shared/installer/nightly.nsi:2183
+msgid "Warning: A different major version of MTA ($1) already exists at that path."
+msgstr "Avertissement: Une version différente de MTA ($1) existe déjà à cet emplacement."
+
+#. INST_LOC_UPGRADE
+#: Shared/installer/nightly.nsi:2184
+msgid "Installation type:  Upgrade"
+msgstr "Type d'installation: Mise à niveau"
+
+#. NETTEST_TITLE1
+#: Shared/installer/nightly.nsi:2418
+msgid "Online update"
+msgstr "Mise à jour en ligne"
+
+#. NETTEST_TITLE2
+#: Shared/installer/nightly.nsi:2419
+msgid "Checking for update information"
+msgstr "Vérification des informations de mise à jour"
+
+#. NETTEST_STATUS1
+#: Shared/installer/nightly.nsi:2420
+msgid "Checking for installer update information..."
+msgstr "Vérification des informations de mise à jour du programme d'installation..."
+
+#. NETTEST_STATUS2
+#: Shared/installer/nightly.nsi:2421
+msgid "Please ensure your firewall is not blocking"
+msgstr "Veuillez vous assurer que votre pare-feu ne bloque pas"
+

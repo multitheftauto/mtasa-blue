@@ -1925,7 +1925,7 @@ void CKeyBinds::DoPostFramePulse()
     {
         if (!bInVehicle)
         {
-            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;     // Fire
+            cs.ButtonCircle = (g_bcControls[0].bState && !bHasDetonator) ? 255 : 0;            // Fire
             if (bAimingWeapon)
             {
                 cs.RightShoulder2 = g_bcControls[8].bState ? 255 : 0;            // Zoom Out

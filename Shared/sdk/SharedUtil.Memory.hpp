@@ -104,7 +104,7 @@ namespace SharedUtil
 
         if (rawPageSize <= 0)
             return false;
-        
+
         auto pageSize = static_cast<size_t>(rawPageSize);
 
         std::ifstream stat("/proc/self/statm");
@@ -115,7 +115,7 @@ namespace SharedUtil
         size_t size = 0, resident = 0, shared = 0;
         stat >> size >> resident >> shared;
         stat.close();
-        
+
         out.virtualMemorySize = size * pageSize;
         out.residentMemorySize = resident * pageSize;
         out.sharedMemorySize = shared * pageSize;
@@ -125,4 +125,4 @@ namespace SharedUtil
         return true;
 #endif
     }
-}
+}            // namespace SharedUtil

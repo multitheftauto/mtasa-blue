@@ -537,12 +537,10 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
 {
     assert(table);
 
-    // Grab it and return a pointer to the variable
-    map<string, SCustomData>::const_iterator iter = m_pCustomData->IterBegin();
-    for (; iter != m_pCustomData->IterEnd(); iter++)
+    for (auto it = m_pCustomData->IterBegin(); it != m_pCustomData->IterEnd(); it++)
     {
-        table->PushString(iter->first.c_str());                // key
-        table->PushArgument(iter->second.Variable);            // value
+        table->PushString(it->first);                        // key
+        table->PushArgument(it->second.Variable);            // value
     }
 
     return table;

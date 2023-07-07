@@ -199,9 +199,9 @@ public:
     unsigned int bJustGotOffTrain : 1;
     unsigned int bDeathPickupsPersist : 1;
     unsigned int bTestForShotInVehicle : 1;
-    //#ifdef GTA_REPLAY
+    // #ifdef GTA_REPLAY
     unsigned int bUsedForReplay : 1;            // This ped is controlled by replay and should be removed when replay is done.
-    //#endif
+    // #endif
 };
 
 class CPedWeaponAudioEntitySAInterface
@@ -254,7 +254,7 @@ public:
     BYTE                bFightingStyle;            // 1837
     BYTE                bFightingStyleExtra;
     BYTE                bPad7[1];
-    CFireSAInterface*     pFireOnPed;
+    CFireSAInterface*   pFireOnPed;
     BYTE                bPad10[104];
     CEntitySAInterface* pTargetedEntity;            // 1948
 };
@@ -269,6 +269,7 @@ private:
     CPedIntelligenceSA* m_pPedIntelligence;
     CPedSAInterface*    m_pPedInterface;
     CPedSoundSA*        m_pPedSound;
+    CPedSoundSA*        m_pDefaultPedSound;
 
     DWORD         m_dwType;
     unsigned char m_ucOccupiedSeat;
@@ -383,6 +384,7 @@ public:
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
     void SetVoice(short sVoiceType, short sVoiceID);
     void SetVoice(const char* szVoiceType, const char* szVoice);
+    void ResetVoice();
     void SetLanding(bool bIsLanding) { GetPedInterface()->pedFlags.bIsLanding = bIsLanding; }
     void SetUpdateMetricsRequired(bool required) { GetPedInterface()->pedFlags.bUpdateMatricesRequired = required; }
 

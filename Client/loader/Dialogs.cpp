@@ -288,7 +288,7 @@ void ShowSplash(HINSTANCE hInstance)
         splashWindowClass.lpfnWndProc = DefWindowProc;
         splashWindowClass.hInstance = hInstance;
         splashWindowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-        splashWindowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110)); // IDI_ICON1 from Launcher
+        splashWindowClass.hIcon = LoadIconA(GetModuleHandle(nullptr), MAKEINTRESOURCE(110));            // IDI_ICON1 from Launcher
         splashWindowClass.lpszClassName = TEXT("SplashWindow");
         RegisterClass(&splashWindowClass);
     }
@@ -299,8 +299,8 @@ void ShowSplash(HINSTANCE hInstance)
     }
     else
     {
-        WindowScope window(CreateWindowEx(WS_EX_LAYERED, splashWindowClass.lpszClassName, "Multi Theft Auto Launcher", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0,
-                                          NULL, NULL, hInstance, NULL));
+        WindowScope window(CreateWindowEx(WS_EX_LAYERED, splashWindowClass.lpszClassName, "Multi Theft Auto Launcher", WS_POPUP | WS_VISIBLE, 0, 0, 0, 0, NULL,
+                                          NULL, hInstance, NULL));
 
         if (!window.handle)
             return;

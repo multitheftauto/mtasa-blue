@@ -264,9 +264,9 @@ CEntity* CPhysicalSA::GetAttachedEntity()
 void CPhysicalSA::AttachEntityToEntity(CPhysical& Entity, const CVector& vecPosition, const CVector& vecRotation)
 {
     CPhysicalSA& EntitySA = dynamic_cast<CPhysicalSA&>(Entity);
-	DWORD        dwEntityInterface = (DWORD)EntitySA.GetInterface();
+    DWORD        dwEntityInterface = (DWORD)EntitySA.GetInterface();
 
-	InternalAttachEntityToEntity(dwEntityInterface, &vecPosition, &vecRotation);
+    InternalAttachEntityToEntity(dwEntityInterface, &vecPosition, &vecRotation);
 }
 
 void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, bool bUnk)

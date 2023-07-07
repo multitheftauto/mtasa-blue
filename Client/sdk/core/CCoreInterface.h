@@ -90,7 +90,7 @@ public:
     virtual void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...) = 0;
     virtual void SetChatVisible(bool bVisible, bool bInputBlocked = true) = 0;
     virtual bool IsChatVisible() = 0;
-    virtual void TakeScreenShot() = 0;
+    virtual void InitiateScreenShot(bool bCameraShot) = 0;
     virtual void EnableChatInput(char* szCommand, DWORD dwColor) = 0;
     virtual bool IsChatInputEnabled() = 0;
     virtual bool IsSettingsVisible() = 0;
@@ -179,6 +179,10 @@ public:
     virtual void ResetChatboxCharacterLimit() = 0;
     virtual int  GetChatboxCharacterLimit() = 0;
     virtual int  GetChatboxMaxCharacterLimit() = 0;
+
+    virtual void   SetCustomStreamingMemory(size_t sizeBytes) = 0;
+    virtual bool   IsUsingCustomStreamingMemorySize() = 0;
+    virtual size_t GetStreamingMemory() = 0;
 };
 
 class CClientTime

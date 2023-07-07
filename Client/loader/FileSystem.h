@@ -17,7 +17,7 @@
 /**
  * @brief Returns the size of a file in bytes without error reporting.
  * @param path Path to the file
-*/
+ */
 auto GetFileSize(const std::filesystem::path& path) -> uintmax_t;
 
 /**
@@ -32,7 +32,7 @@ auto GetTempFilePath(size_t attempts, std::error_code& ec) -> std::filesystem::p
  * @param path Path to the file
  * @param buffer Buffer for the file content
  * @param ec Parameter for error reporting
-*/
+ */
 bool GetFileContent(const std::filesystem::path& path, std::vector<unsigned char>& buffer, std::error_code& ec);
 
 /**
@@ -40,7 +40,7 @@ bool GetFileContent(const std::filesystem::path& path, std::vector<unsigned char
  * @param path Path to the file
  * @param buffer Buffer for the file content
  * @param ec Parameter for error reporting
-*/
+ */
 bool SetFileContent(const std::filesystem::path& path, const std::vector<unsigned char>& buffer, std::error_code& ec);
 
 /**
@@ -64,14 +64,14 @@ bool AreFilesEqual(const std::filesystem::path& base, const std::filesystem::pat
  * @param path Path to the file
  * @param hash Result of the hash
  * @param ec Parameter for error reporting
-*/
+ */
 bool GetFileHash(const std::filesystem::path& path, FileHash& hash, std::error_code& ec);
 
 /**
  * @brief Computes the SHA256 hash for the provided buffer.
  * @param buffer Buffer to generate a hash for
  * @return Result of the hash
-*/
+ */
 auto GetFileBufferHash(const std::vector<unsigned char>& buffer) -> FileHash;
 
 /**
@@ -79,5 +79,5 @@ auto GetFileBufferHash(const std::vector<unsigned char>& buffer) -> FileHash;
  * @param from The directory the symlink should point to
  * @param to The symlink path
  * @param ec Parameter for error reporting
-*/
+ */
 bool SetDirectoryJunction(const std::filesystem::path& from, const std::filesystem::path& to, std::error_code& ec);

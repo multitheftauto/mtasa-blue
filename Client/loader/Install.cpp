@@ -65,7 +65,7 @@ using ArchiveHandle = std::unique_ptr<std::remove_pointer_t<HANDLE>, ArchiveHand
 
 /**
  * @brief Deletes a directory, its subfolders and the files contained on destruction.
-*/
+ */
 struct DirectoryDeleteScope
 {
     std::filesystem::path directoryPath;
@@ -297,7 +297,7 @@ static bool TerminateFileLockingProcesses(const SString& absolutePath, const SSt
  * @brief Creates a writable directory for any purpose.
  * @param templateRoot The template path to a directory
  * @return A path to a new directory, empty string on error
-*/
+ */
 static SString CreateWritableDirectory(const SString& templateRoot)
 {
     SString fileName = ExtractFilename(templateRoot);
@@ -336,7 +336,7 @@ static SString CreateWritableDirectory(const SString& templateRoot)
  * @brief Retrieves the list of files for the update.
  * @param sourceRoot Path to the directory with update files
  * @param archivePath Optional path to the archive with the update files
-*/
+ */
 static auto GetUpdateFiles(const SString& sourceRoot, const SString& archivePath) -> std::vector<ManifestFile>
 {
     std::vector<ManifestFile> files{};
@@ -395,7 +395,7 @@ static auto GetBackupFiles(const SString& backupRoot) -> std::vector<ManifestFil
 /**
  * @brief Returns the content of a file that will be deleted.
  * @param filePath The path to get the content of and delete
-*/
+ */
 static auto GetOneShotFile(const SString& filePath) -> SString
 {
     SString fileContent;
@@ -408,7 +408,7 @@ static auto GetOneShotFile(const SString& filePath) -> SString
  * @brief Executes the rollback for the installed files, by copying the backup to the target.
  * @param files The files to restore
  * @return The amount of non-recoverable files
-*/
+ */
 static auto RunRollback(std::vector<InstallableFile>& files) -> size_t
 {
     size_t disasterCounter{};
@@ -484,7 +484,7 @@ static auto RunRollback(std::vector<InstallableFile>& files) -> size_t
         AddReportLog(5055, SString("RunRollback: Rollback failed for %zu out of %zu files", disasterCounter, files.size()));
         OutputDebugLine(SString("RunRollback: Rollback failed for %zu out of %zu files", disasterCounter, files.size()));
     }
-    
+
     return disasterCounter;
 }
 
@@ -492,7 +492,7 @@ static auto RunRollback(std::vector<InstallableFile>& files) -> size_t
  * @brief Completes a pending rollback.
  * @param sourceRoot Path to the directory with install files
  * @param targetRoot Path to the possibly corrupt target directory
-*/
+ */
 static bool CompletePendingRollback(const SString& sourceRoot, const SString& targetRoot)
 {
     const SString hintFile = PathJoin(sourceRoot, ROLLBACK_NAME);
@@ -512,13 +512,13 @@ static bool CompletePendingRollback(const SString& sourceRoot, const SString& ta
         return false;
     }
 
-	// Check if we have to restore any files at all.
+    // Check if we have to restore any files at all.
     std::vector<ManifestFile> backupFiles = GetBackupFiles(backupRoot);
 
     if (backupFiles.empty())
         return true;
 
-	std::vector<InstallableFile> files;
+    std::vector<InstallableFile> files;
     files.reserve(backupFiles.size());
 
     for (const ManifestFile& manifestFile : backupFiles)
@@ -552,17 +552,18 @@ static bool CompletePendingRollback(const SString& sourceRoot, const SString& ta
         deleteBackupRoot.Release();
 
         bool hasHint = FileSave(PathJoin(sourceRoot, ROLLBACK_NAME), backupRoot);
-        AddReportLog(5055, SString("CompletePendingRollback: %zu out of %zu files may be corrupt after rollback (hint: %d)", disasterCounter, files.size(), hasHint));
+        AddReportLog(5055,
+                     SString("CompletePendingRollback: %zu out of %zu files may be corrupt after rollback (hint: %d)", disasterCounter, files.size(), hasHint));
         return false;
     }
-    
+
     return true;
 }
 
 /**
  * @brief Installs files from the current temporary directory to the Multi Theft Auto installation directory.
  * @return Zero on success, otherwise the step number the installation failed at
-*/
+ */
 static int RunInstall()
 {
     const SString sourceRoot = PathConform(GetSystemCurrentDirectory());
@@ -628,7 +629,7 @@ static int RunInstall()
         file.sourceFile = PathJoin(sourceRoot, manifestFile.relativePath);
         file.sourceFile.checksum = manifestFile.checksum;
 
-		if (file.sourceFile != file.targetFile)
+        if (file.sourceFile != file.targetFile)
             files.emplace_back(file);
     }
 
@@ -677,7 +678,7 @@ static int RunInstall()
                 file.backupFile.ComputeChecksum();
                 success = (file.backupFile == file.targetFile);
             }
-            
+
             if (!success)
             {
                 if (!FileExists(file.targetFile.absolutePath))
@@ -799,8 +800,7 @@ static int RunInstall()
     else
         OutputDebugLine(SString("RunInstall: Updated %zu files", files.size()));
 
-    const auto Rollback = [&]()
-    {
+    const auto Rollback = [&]() {
         if (size_t disasterCounter = RunRollback(files); disasterCounter > 0)
         {
             // Do not delete the backup directory if we need it for recovery.
@@ -932,7 +932,7 @@ SString CheckOnRestartCommand()
 
             // Try to extract the files
             bool success = ExtractFiles(strFile, /* withManifest */ true);
-            
+
             if (!success)
             {
                 // If extract failed and update file is an .exe or .msu, try to run it

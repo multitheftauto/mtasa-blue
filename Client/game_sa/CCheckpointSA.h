@@ -42,24 +42,24 @@ public:
 
     CCheckpointSAInterface* GetInterface() { return internalInterface; }
 
-    void     SetPosition(CVector* vecPosition);
-    CVector* GetPosition();
-    void     SetPointDirection(CVector* vecPointDirection);
-    CVector* GetPointDirection();
-    DWORD    GetType();                      // need enum?
-    void     SetType(WORD wType);            // doesn't work propperly (not virtualed)
-    bool     IsActive();
-    void     Activate();
-    DWORD    GetIdentifier();
-    void     SetIdentifier(DWORD dwIdentifier);
-    SharedUtil::SColor   GetColor();
-    void     SetColor(const SharedUtil::SColor color);
-    void     SetPulsePeriod(WORD wPulsePeriod);
-    void     SetRotateRate(short RotateRate);
-    float    GetSize();
-    void     SetSize(float fSize);
-    void     SetCameraRange(float fCameraRange);
-    void     SetPulseFraction(float fPulseFraction);            // doesn't work propperly (not virtualed)
-    float    GetPulseFraction();
-    void     Remove();
+    void               SetPosition(CVector* vecPosition);
+    CVector*           GetPosition();
+    void               SetPointDirection(CVector* vecPointDirection);
+    CVector*           GetPointDirection();
+    DWORD              GetType();                      // need enum?
+    void               SetType(WORD wType);            // doesn't work propperly (not virtualed)
+    bool               IsActive();
+    void               Activate();
+    DWORD              GetIdentifier();
+    void               SetIdentifier(DWORD dwIdentifier);
+    SharedUtil::SColor GetColor();
+    void               SetColor(const SharedUtil::SColor color);
+    void               SetPulsePeriod(WORD wPulsePeriod);
+    void               SetRotateRate(short RotateRate);
+    float              GetSize();
+    void               SetSize(float fSize);
+    void               SetCameraRange(float fCameraRange);
+    void               SetPulseFraction(float fPulseFraction);            // doesn't work propperly (not virtualed)
+    float              GetPulseFraction();
+    void               Remove();
 };

@@ -20,8 +20,8 @@ using namespace LatentTransfer;
     #include "Utils.h"
     #include <net/CNetServer.h>
 
-    extern CNetServer*       g_pNetServer;
-    extern CTimeUsMarker<20> markerLatentEvent;
+extern CNetServer*       g_pNetServer;
+extern CTimeUsMarker<20> markerLatentEvent;
 #endif
 
 ///////////////////////////////////////////////////////////////
@@ -86,13 +86,18 @@ void CLatentTransferManager::RemoveRemote(NetPlayerID remoteId)
 {
     CLatentSendQueue* pSendQueue = FindSendQueueForRemote(remoteId);
     CLatentReceiver*  pReceiver = FindReceiverForRemote(remoteId);
-
     ListRemove(m_SendQueueList, pSendQueue);
     MapRemove(m_SendQueueMap, remoteId);
-    MapRemove(m_ReceiverMap, remoteId);
 
     SAFE_DELETE(pSendQueue);
-    SAFE_DELETE(pReceiver);
+
+    if (pReceiver && pReceiver->IsInside())
+        pReceiver->SetDeferredDelete();
+    else
+    {
+        MapRemove(m_ReceiverMap, remoteId);
+        SAFE_DELETE(pReceiver);
+    }
 }
 
 ///////////////////////////////////////////////////////////////
@@ -125,10 +130,10 @@ void CLatentTransferManager::AddSendBatchBegin(unsigned char ucPacketId, NetBitS
     uint uiBitStreamBitsUsed = pBitStream->GetNumberOfBitsUsed();
     uint uiBitStreamBytesUsed = (uiBitStreamBitsUsed + 7) >> 3;
 
-    // Make a buffer containing enough info to recreate ucPacketId+BitStream at the other 
+    // Make a buffer containing enough info to recreate ucPacketId+BitStream at the other
     m_pBatchBufferRef = std::make_shared<CBuffer>();
 
-    CBuffer& buffer = *m_pBatchBufferRef;
+    CBuffer&           buffer = *m_pBatchBufferRef;
     CBufferWriteStream stream(buffer);
     stream.Write(ucPacketId);
     stream.Write(uiBitStreamBitsUsed);
@@ -293,6 +298,12 @@ void CLatentTransferManager::OnReceive(NetPlayerID remoteId, NetBitStreamInterfa
 {
     CLatentReceiver* pReceiver = GetReceiverForRemote(remoteId, pBitStream->Version());
     pReceiver->OnReceive(pBitStream);
+
+    if (pReceiver->IsDeferredDelete())
+    {
+        MapRemove(m_ReceiverMap, remoteId);
+        SAFE_DELETE(pReceiver);
+    }
 }
 
 ///////////////////////////////////////////////////////////////

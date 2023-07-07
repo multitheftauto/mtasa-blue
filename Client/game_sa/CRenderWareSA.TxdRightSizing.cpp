@@ -18,7 +18,7 @@
 #include "gamesa_renderware.h"
 
 extern CCoreInterface* g_pCore;
-extern CGameSA* pGame;
+extern CGameSA*        pGame;
 
 /////////////////////////////////////////////////////////////////////////////
 //

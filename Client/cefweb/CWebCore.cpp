@@ -18,7 +18,7 @@
 #include "WebBrowserHelpers.h"
 #include "CWebApp.h"
 
-//#define CEF_ENABLE_SANDBOX
+// #define CEF_ENABLE_SANDBOX
 #ifdef CEF_ENABLE_SANDBOX
     #pragma comment(lib, "cef_sandbox.lib")
 #endif
@@ -87,7 +87,6 @@ bool CWebCore::Initialise()
     bool state = CefInitialize(mainArgs, settings, app, sandboxInfo);
 
     // Register custom scheme handler factory
-    CefRegisterSchemeHandlerFactory("mtalocal", "", app);
     CefRegisterSchemeHandlerFactory("http", "mta", app);
 
     return state;

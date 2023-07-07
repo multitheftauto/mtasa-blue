@@ -27,7 +27,7 @@ bool CPlayerChangeNickPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(ID);
 
         // Write the nick
-        BitStream.WriteStringCharacters(m_strNewNick, m_strNewNick.length());
+        BitStream.WriteStringCharacters(m_strNewNick);
         return true;
     }
 

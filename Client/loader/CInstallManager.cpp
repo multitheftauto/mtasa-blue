@@ -82,122 +82,122 @@ CInstallManager* GetInstallManager()
 void CInstallManager::InitSequencer()
 {
     #define CR "\n"
-    SString strSource = CR "initial: "                                             // *** Starts here  by default
-        CR "            CALL CheckOnRestartCommand "                               ////// Start of 'update game' //////
-        CR "            IF LastResult != ok GOTO update_end: "                     //
-        CR " "                                                                     //
-        CR "            CALL MaybeSwitchToTempExe "                                // If update files comes with an .exe, switch to that for the install
-        CR " "                                                                     //
-        CR "copy_files: "                                                          //
-        CR "            CALL InstallFiles "                                        // Try to install update files
-        CR "            IF LastResult == ok GOTO update_end: "                     //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If install failed, try as admin
-        CR " "                                                                     //
-        CR "copy_files_admin: "                                                    //
-        CR "            CALL InstallFiles "                                        // Try to install update files
-        CR "            IF LastResult == ok GOTO update_end_admin: "               //
-        CR " "                                                                     //
-        CR "            CALL ShowCopyFailDialog "                                  // If install failed as admin, show message box
-        CR "            IF LastResult == retry GOTO copy_files_admin: "            //
-        CR " "                                                                     //
-        CR "update_end_admin: "                                                    //
-        CR "            CALL ChangeFromAdmin "                                     //
-        CR " "                                                                     //
-        CR "update_end: "                                                          ////// End of 'update game' //////
-        CR "            CALL SwitchBackFromTempExe "                               //
-        CR " "                                                                     //
-        CR "newlayout_check:"                                                      ////// Start of 'new layout check' //////
-        CR "            CALL ProcessLayoutChecks "                                 //
-        CR "            IF LastResult == ok GOTO newlayout_end: "                  //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO newlayout_check: "                //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "newlayout_end: "                                                       ////// End of 'new layout check' //////
-        CR " "                                                                     //
-        CR "langfile_check: "                                                      ////// Start of 'Lang file fix' //////
-        CR "            CALL ProcessLangFileChecks "                               // Make changes to comply with requirements
-        CR "            IF LastResult == ok GOTO langfile_end: "                   //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO langfile_check: "                 //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "langfile_end: "                                                        ////// End of 'Lang file fix' //////
-        CR " "                                                                     //
-        CR "prepare_launch_location:"                                              ////// Start of 'prepare launch location' //////
-        CR "            CALL PrepareLaunchLocation "                               //
-        CR "            IF LastResult == ok GOTO prepare_launch_location_end: "    //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO prepare_launch_location: "        //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "prepare_launch_location_end:"                                          ////// End of 'prepare launch location' //////
-        CR " "                                                                     //
-        CR "gta_patch_check:"                                                      ////// Start of 'gta patch check' //////
-        CR "            CALL ProcessGtaPatchCheck "                                //
-        CR "            IF LastResult != ok GOTO do_quit: "                        // Switching to admin has zero impact
-        CR " "                                                                     //
-        CR "gta_patch_check_end:"                                                  ////// End of 'gta patch check' ////// 
-        CR " "                                                                     //
-        CR "gta_dll_check:"                                                        ////// Start of 'gta dll check' //////
-        CR "            CALL ProcessGtaDllCheck "                                  //
-        CR "            IF LastResult == ok GOTO gta_dll_end: "                    //
-        CR "            IF LastResult == quit GOTO do_quit: "                      //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO gta_dll_check: "                  //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "gta_dll_end: "                                                         ////// End of 'gta dll check' //////
-        CR " "                                                                     //
-        CR "gta_version_check:"                                                    ////// Start of 'gta version check' //////
-        CR "            CALL ProcessGtaVersionCheck "                              //
-        CR "            IF LastResult == ok GOTO gta_version_end: "                //
-        CR "            IF LastResult == quit GOTO do_quit: "                      //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO gta_version_check: "              //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "gta_version_end: "                                                     ////// End of 'gta version check' //////
-        CR " "                                                                     //
-        CR "service_check: "                                                       ////// Start of 'Service checks' //////
-        CR "            CALL ProcessServiceChecks "                                // Make changes to comply with service requirements
-        CR "            IF LastResult == ok GOTO service_end: "                    //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO service_check: "                  //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "service_end: "                                                         ////// End of 'Service checks' //////
-        CR " "                                                                     //
-        CR "appcompat_check: "                                                     ////// Start of 'AppCompat checks' //////
-        CR "            CALL ProcessAppCompatChecks "                              // Make changes to comply with appcompat requirements
-        CR "            IF LastResult == ok GOTO appcompat_end: "                  //
-        CR " "                                                                     //
-        CR "            CALL ChangeToAdmin "                                       // If changes failed, try as admin
-        CR "            IF LastResult == ok GOTO appcompat_check: "                //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "appcompat_end: "                                                       ////// End of 'AppCompat checks' //////
-        CR " "                                                                     //
-        CR "            CALL ChangeFromAdmin "                                     //
-        CR "            CALL InstallNewsItems "                                    // Install pending news
-        CR "            GOTO launch: "                                             //
-        CR " "                                                                     //
-        CR "do_quit: "                                                             // Quit ensuring termination of both user & admin instance
-        CR "            CALL ChangeFromAdmin "                                     //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
-        CR "crashed: "                                                             // *** Starts here when restarting after crash
-        CR "            CALL ShowCrashFailDialog "                                 //
-        CR "            IF LastResult == ok GOTO initial: "                        //
-        CR "            CALL Quit "                                                //
-        CR " "                                                                     //
+    SString strSource = CR "initial: "                                                     // *** Starts here  by default
+        CR "            CALL CheckOnRestartCommand "                                       ////// Start of 'update game' //////
+        CR "            IF LastResult != ok GOTO update_end: "                             //
+        CR " "                                                                             //
+        CR "            CALL MaybeSwitchToTempExe "                                        // If update files comes with an .exe, switch to that for the install
+        CR " "                                                                             //
+        CR "copy_files: "                                                                  //
+        CR "            CALL InstallFiles "                                                // Try to install update files
+        CR "            IF LastResult == ok GOTO update_end: "                             //
+        CR " "                                                                             //
+        CR "            CALL ChangeToAdmin "                                               // If install failed, try as admin
+        CR " "                                                                             //
+        CR "copy_files_admin: "                                                            //
+        CR "            CALL InstallFiles "                                                // Try to install update files
+        CR "            IF LastResult == ok GOTO update_end_admin: "                       //
+        CR " "                                                                             //
+        CR "            CALL ShowCopyFailDialog "                                          // If install failed as admin, show message box
+        CR "            IF LastResult == retry GOTO copy_files_admin: "                    //
+        CR " "                                                                             //
+        CR "update_end_admin: "                                                            //
+        CR "            CALL ChangeFromAdmin "                                             //
+        CR " "                                                                             //
+        CR "update_end: "                                                                  ////// End of 'update game' //////
+        CR "            CALL SwitchBackFromTempExe "                                       //
+        CR " "                                                                             //
+        CR "newlayout_check:"                                                              ////// Start of 'new layout check' //////
+        CR "            CALL ProcessLayoutChecks "                                         //
+        CR "            IF LastResult == ok GOTO newlayout_end: "                          //
+        CR " "                                                                             //
+        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO newlayout_check: "                        //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
+        CR "newlayout_end: "                                                               ////// End of 'new layout check' //////
+        CR " "                                                                             //
+        CR "langfile_check: "                                                              ////// Start of 'Lang file fix' //////
+        CR "            CALL ProcessLangFileChecks "                                       // Make changes to comply with requirements
+        CR "            IF LastResult == ok GOTO langfile_end: "                           //
+        CR " "                                                                             //
+        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO langfile_check: "                         //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
+        CR "langfile_end: "                                                                ////// End of 'Lang file fix' //////
+        CR " "                                                                             //
+        CR "prepare_launch_location:"                                                      ////// Start of 'prepare launch location' //////
+        CR "            CALL PrepareLaunchLocation "                                       //
+        CR "            IF LastResult == ok GOTO prepare_launch_location_end: "            //
+        CR " "                                                                             //
+        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO prepare_launch_location: "                //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
+        CR "prepare_launch_location_end:"                                                  ////// End of 'prepare launch location' //////
+        CR " "                                                                             //
+        CR "gta_patch_check:"                                                              ////// Start of 'gta patch check' //////
+        CR "            CALL ProcessGtaPatchCheck "                                        //
+        CR "            IF LastResult != ok GOTO do_quit: "                                // Switching to admin has zero impact
+        CR " "                                                                             //
+        CR "gta_patch_check_end:"                                                          ////// End of 'gta patch check' //////
+        CR " "                                                                             //
+        CR "gta_dll_check:"                                                                ////// Start of 'gta dll check' //////
+        CR "            CALL ProcessGtaDllCheck "                                          //
+        CR "            IF LastResult == ok GOTO gta_dll_end: "                            //
+        CR "            IF LastResult == quit GOTO do_quit: "                              //
+        CR " "                                                                             //
+        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO gta_dll_check: "                          //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
+        CR "gta_dll_end: "                                                                 ////// End of 'gta dll check' //////
+        CR " "                                                                             //
+        CR "gta_version_check:"                                                            ////// Start of 'gta version check' //////
+        CR "            CALL ProcessGtaVersionCheck "                                      //
+        CR "            IF LastResult == ok GOTO gta_version_end: "                        //
+        CR "            IF LastResult == quit GOTO do_quit: "                              //
+        CR " "                                                                             //
+        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO gta_version_check: "                      //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
+        CR "gta_version_end: "                                                             ////// End of 'gta version check' //////
+        CR " "                                                                             //
+        CR "service_check: "                                                               ////// Start of 'Service checks' //////
+        CR "            CALL ProcessServiceChecks "                                        // Make changes to comply with service requirements
+        CR "            IF LastResult == ok GOTO service_end: "                            //
+        CR " "                                                                             //
+        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO service_check: "                          //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
+        CR "service_end: "                                                                 ////// End of 'Service checks' //////
+        CR " "                                                                             //
+        CR "appcompat_check: "                                                             ////// Start of 'AppCompat checks' //////
+        CR "            CALL ProcessAppCompatChecks "                                      // Make changes to comply with appcompat requirements
+        CR "            IF LastResult == ok GOTO appcompat_end: "                          //
+        CR " "                                                                             //
+        CR "            CALL ChangeToAdmin "                                               // If changes failed, try as admin
+        CR "            IF LastResult == ok GOTO appcompat_check: "                        //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
+        CR "appcompat_end: "                                                               ////// End of 'AppCompat checks' //////
+        CR " "                                                                             //
+        CR "            CALL ChangeFromAdmin "                                             //
+        CR "            CALL InstallNewsItems "                                            // Install pending news
+        CR "            GOTO launch: "                                                     //
+        CR " "                                                                             //
+        CR "do_quit: "                                                                     // Quit ensuring termination of both user & admin instance
+        CR "            CALL ChangeFromAdmin "                                             //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
+        CR "crashed: "                                                                     // *** Starts here when restarting after crash
+        CR "            CALL ShowCrashFailDialog "                                         //
+        CR "            IF LastResult == ok GOTO initial: "                                //
+        CR "            CALL Quit "                                                        //
+        CR " "                                                                             //
         CR "launch: ";
 
     m_pSequencer = new CSequencerType();
@@ -664,7 +664,7 @@ SString CInstallManager::_PrepareLaunchLocation()
                     strMessage += "\n\n" + sourcePath.u8string();
                     BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
                 }
-                
+
                 return "quit";
             }
             else
@@ -742,7 +742,7 @@ SString CInstallManager::_ProcessGtaDllCheck()
 
     const fs::path launchDir = GetGameLaunchDirectory();
     const bool     isAdmin = IsUserAdmin();
-    
+
     FileGenerator gtasa{};
 
     for (size_t i = 0; i < dependencies.size(); ++i)

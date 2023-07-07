@@ -15,5 +15,5 @@
 class CHeli : public virtual CAutomobile
 {
 public:
-	virtual ~CHeli(){};
+    virtual ~CHeli(){};
 };

@@ -43,13 +43,13 @@ public:
     float     m_moveBlendRatio;              // 20
     float     m_fSprintEnergy;               // 24
     // FLOAT m_fSprintControlCounter; // Removed arbitatrily to aligned next byte, should be here really
-    BYTE         m_nChosenWeapon;                   // 28
-    BYTE         m_nCarDangerCounter;               // 29
-    BYTE         m_pad0;                            // 30
-    BYTE         m_pad1;                            // 31
-    long         m_nStandStillTimer;                // 32
-    DWORD        m_nHitAnimDelayTimer;              // 36
-    float        m_fAttackButtonCounter;            // 40
+    BYTE                    m_nChosenWeapon;                   // 28
+    BYTE                    m_nCarDangerCounter;               // 29
+    BYTE                    m_pad0;                            // 30
+    BYTE                    m_pad1;                            // 31
+    long                    m_nStandStillTimer;                // 32
+    DWORD                   m_nHitAnimDelayTimer;              // 36
+    float                   m_fAttackButtonCounter;            // 40
     CAutomobileSAInterface* m_pDangerCar;                      // 44
 
     DWORD m_bStoppedMoving : 1;            // 48
@@ -249,11 +249,11 @@ public:
 
     CPlayerInfoSAInterface* GetInterface() { return internalInterface; }
 
-    CWanted*    GetWanted();
-    long        GetPlayerMoney();
-    void        SetPlayerMoney(long lMoney, bool bInstant);
+    CWanted* GetWanted();
+    long     GetPlayerMoney();
+    void     SetPlayerMoney(long lMoney, bool bInstant);
 
-    void  SetLastTimeEaten(short sTime);
+    void SetLastTimeEaten(short sTime);
 
     float GetFPSMoveHeading();
 

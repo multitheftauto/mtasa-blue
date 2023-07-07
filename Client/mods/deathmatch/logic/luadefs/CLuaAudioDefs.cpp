@@ -1402,11 +1402,13 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
     argStream.ReadUserData(pSound);
     argStream.ReadEnumString(eEffectType);
 
-    if (argStream.HasErrors()) {
+    if (argStream.HasErrors())
+    {
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
     }
 
-    if (!pSound->IsFxEffectEnabled(eEffectType)) {
+    if (!pSound->IsFxEffectEnabled(eEffectType))
+    {
         return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
     }
 
@@ -1421,12 +1423,8 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
 
         // Unsuccessful, log error. (Hard error on usage mistakes)
         // `luaL_error` with a format string straight out crashes, so we have to do it this way..
-        const SString msg("BASS Error %i, after setting parameter %s -> %s. (Message: %s)",
-            CBassAudio::ErrorGetCode(),
-            EnumToString(eEffectType).c_str(),
-            EnumToString(effectParam).c_str(),
-            CBassAudio::ErrorGetMessage()
-        );
+        const SString msg("BASS Error %i, after setting parameter %s -> %s. (Message: %s)", CBassAudio::ErrorGetCode(), EnumToString(eEffectType).c_str(),
+                          EnumToString(effectParam).c_str(), CBassAudio::ErrorGetMessage());
 
         // Do not use `luaL_error` here and pass in `msg` as the format string,
         // user could inject paramters into the format string, and that would be bad :D
@@ -1442,407 +1440,407 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
     using namespace eSoundEffectParams;
     switch (eEffectType)
     {
-    case BASS_FX_DX8_CHORUS:
-    {
-        BASS_DX8_CHORUS params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+        case BASS_FX_DX8_CHORUS:
+        {
+            BASS_DX8_CHORUS params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        Chorus eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case Chorus::WET_DRY_MIX:
-        {
-            argStream.ReadNumber(params.fWetDryMix);
-            break;
-        }
-        case Chorus::DEPTH:
-        {
-            argStream.ReadNumber(params.fDepth);
-            break;
-        }
-        case Chorus::FEEDBACK:
-        {
-            argStream.ReadNumber(params.fFeedback);
-            break;
-        }
-        case Chorus::FREQUENCY:
-        {
-            argStream.ReadNumber(params.fFrequency);
-            break;
-        }
-        case Chorus::WAVEFORM:
-        {
-            argStream.ReadNumber(params.lWaveform);
-            break;
-        }
-        case Chorus::DELAY:
-        {
-            argStream.ReadNumber(params.fDelay);
-            break;
-        }
-        case Chorus::PHASE:
-        {
-            argStream.ReadNumber(params.lPhase);
-            break;
-        }
-        }
+            Chorus eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case Chorus::WET_DRY_MIX:
+                {
+                    argStream.ReadNumber(params.fWetDryMix);
+                    break;
+                }
+                case Chorus::DEPTH:
+                {
+                    argStream.ReadNumber(params.fDepth);
+                    break;
+                }
+                case Chorus::FEEDBACK:
+                {
+                    argStream.ReadNumber(params.fFeedback);
+                    break;
+                }
+                case Chorus::FREQUENCY:
+                {
+                    argStream.ReadNumber(params.fFrequency);
+                    break;
+                }
+                case Chorus::WAVEFORM:
+                {
+                    argStream.ReadNumber(params.lWaveform);
+                    break;
+                }
+                case Chorus::DELAY:
+                {
+                    argStream.ReadNumber(params.fDelay);
+                    break;
+                }
+                case Chorus::PHASE:
+                {
+                    argStream.ReadNumber(params.lPhase);
+                    break;
+                }
+            }
 
-        if (argStream.HasErrors())
-            break;
+            if (argStream.HasErrors())
+                break;
 
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
-    case BASS_FX_DX8_COMPRESSOR:
-    {
-        BASS_DX8_COMPRESSOR params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+            return SetParamWithErrorLog(eEffectParameter, params);
+        }
+        case BASS_FX_DX8_COMPRESSOR:
+        {
+            BASS_DX8_COMPRESSOR params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        Compressor eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case Compressor::GAIN:
-        {
-            argStream.ReadNumber(params.fGain);
-            break;
-        }
-        case Compressor::ATTACK:
-        {
-            argStream.ReadNumber(params.fAttack);
-            break;
-        }
-        case Compressor::RELEASE:
-        {
-            argStream.ReadNumber(params.fRelease);
-            break;
-        }
-        case Compressor::THRESHOLD:
-        {
-            argStream.ReadNumber(params.fThreshold);
-            break;
-        }
-        case Compressor::RATIO:
-        {
-            argStream.ReadNumber(params.fRatio);
-            break;
-        }
-        case Compressor::PREDELAY:
-        {
-            argStream.ReadNumber(params.fPredelay);
-            break;
-        }
-        }
+            Compressor eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case Compressor::GAIN:
+                {
+                    argStream.ReadNumber(params.fGain);
+                    break;
+                }
+                case Compressor::ATTACK:
+                {
+                    argStream.ReadNumber(params.fAttack);
+                    break;
+                }
+                case Compressor::RELEASE:
+                {
+                    argStream.ReadNumber(params.fRelease);
+                    break;
+                }
+                case Compressor::THRESHOLD:
+                {
+                    argStream.ReadNumber(params.fThreshold);
+                    break;
+                }
+                case Compressor::RATIO:
+                {
+                    argStream.ReadNumber(params.fRatio);
+                    break;
+                }
+                case Compressor::PREDELAY:
+                {
+                    argStream.ReadNumber(params.fPredelay);
+                    break;
+                }
+            }
 
-        if (argStream.HasErrors())
-            break;
+            if (argStream.HasErrors())
+                break;
 
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
-    case BASS_FX_DX8_DISTORTION:
-    {
-        BASS_DX8_DISTORTION params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+            return SetParamWithErrorLog(eEffectParameter, params);
+        }
+        case BASS_FX_DX8_DISTORTION:
+        {
+            BASS_DX8_DISTORTION params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        Distortion eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case Distortion::GAIN:
-        {
-            argStream.ReadNumber(params.fGain);
-            break;
-        }
-        case Distortion::EDGE:
-        {
-            argStream.ReadNumber(params.fEdge);
-            break;
-        }
-        case Distortion::POST_EQ_CENTER_FREQUENCY:
-        {
-            argStream.ReadNumber(params.fPostEQCenterFrequency);
-            break;
-        }
-        case Distortion::POST_EQ_BANDWIDTH:
-        {
-            argStream.ReadNumber(params.fPostEQBandwidth);
-            break;
-        }
-        case Distortion::PRE_LOWPASS_CUTOFF:
-        {
-            argStream.ReadNumber(params.fPreLowpassCutoff);
-            break;
-        }
-        }
+            Distortion eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case Distortion::GAIN:
+                {
+                    argStream.ReadNumber(params.fGain);
+                    break;
+                }
+                case Distortion::EDGE:
+                {
+                    argStream.ReadNumber(params.fEdge);
+                    break;
+                }
+                case Distortion::POST_EQ_CENTER_FREQUENCY:
+                {
+                    argStream.ReadNumber(params.fPostEQCenterFrequency);
+                    break;
+                }
+                case Distortion::POST_EQ_BANDWIDTH:
+                {
+                    argStream.ReadNumber(params.fPostEQBandwidth);
+                    break;
+                }
+                case Distortion::PRE_LOWPASS_CUTOFF:
+                {
+                    argStream.ReadNumber(params.fPreLowpassCutoff);
+                    break;
+                }
+            }
 
-        if (argStream.HasErrors())
-            break;
+            if (argStream.HasErrors())
+                break;
 
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
-    case BASS_FX_DX8_ECHO:
-    {
-        BASS_DX8_ECHO params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+            return SetParamWithErrorLog(eEffectParameter, params);
+        }
+        case BASS_FX_DX8_ECHO:
+        {
+            BASS_DX8_ECHO params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        Echo eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case Echo::WET_DRY_MIX:
-        {
-            argStream.ReadNumber(params.fWetDryMix);
-            break;
-        }
-        case Echo::FEEDBACK:
-        {
-            argStream.ReadNumber(params.fFeedback);
-            break;
-        }
-        case Echo::LEFT_DELAY:
-        {
-            argStream.ReadNumber(params.fLeftDelay);
-            break;
-        }
-        case Echo::RIGHT_DELAY:
-        {
-            argStream.ReadNumber(params.fRightDelay);
-            break;
-        }
-        case Echo::PAN_DELAY:
-        {
-            bool bPanDelay;
-            argStream.ReadBool(bPanDelay);
-            params.lPanDelay = bPanDelay;
-            break;
-        }
-        }
+            Echo eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case Echo::WET_DRY_MIX:
+                {
+                    argStream.ReadNumber(params.fWetDryMix);
+                    break;
+                }
+                case Echo::FEEDBACK:
+                {
+                    argStream.ReadNumber(params.fFeedback);
+                    break;
+                }
+                case Echo::LEFT_DELAY:
+                {
+                    argStream.ReadNumber(params.fLeftDelay);
+                    break;
+                }
+                case Echo::RIGHT_DELAY:
+                {
+                    argStream.ReadNumber(params.fRightDelay);
+                    break;
+                }
+                case Echo::PAN_DELAY:
+                {
+                    bool bPanDelay;
+                    argStream.ReadBool(bPanDelay);
+                    params.lPanDelay = bPanDelay;
+                    break;
+                }
+            }
 
-        if (argStream.HasErrors())
-            break;
+            if (argStream.HasErrors())
+                break;
 
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
-    case BASS_FX_DX8_FLANGER:
-    {
-        BASS_DX8_FLANGER params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+            return SetParamWithErrorLog(eEffectParameter, params);
+        }
+        case BASS_FX_DX8_FLANGER:
+        {
+            BASS_DX8_FLANGER params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        Flanger eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case Flanger::WET_DRY_MIX:
-        {
-            argStream.ReadNumber(params.fWetDryMix);
-            break;
-        }
-        case Flanger::DEPTH:
-        {
-            argStream.ReadNumber(params.fDepth);
-            break;
-        }
-        case Flanger::FEEDBACK:
-        {
-            argStream.ReadNumber(params.fFeedback);
-            break;
-        }
-        case Flanger::FREQUENCY:
-        {
-            argStream.ReadNumber(params.fFrequency);
-            break;
-        }
-        case Flanger::WAVEFORM:
-        {
-            argStream.ReadNumber(params.lWaveform);
-            break;
-        }
-        case Flanger::DELAY:
-        {
-            argStream.ReadNumber(params.fDelay);
-            break;
-        }
-        case Flanger::PHASE:
-        {
-            argStream.ReadNumber(params.lPhase);
-            break;
-        }
-        }
+            Flanger eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case Flanger::WET_DRY_MIX:
+                {
+                    argStream.ReadNumber(params.fWetDryMix);
+                    break;
+                }
+                case Flanger::DEPTH:
+                {
+                    argStream.ReadNumber(params.fDepth);
+                    break;
+                }
+                case Flanger::FEEDBACK:
+                {
+                    argStream.ReadNumber(params.fFeedback);
+                    break;
+                }
+                case Flanger::FREQUENCY:
+                {
+                    argStream.ReadNumber(params.fFrequency);
+                    break;
+                }
+                case Flanger::WAVEFORM:
+                {
+                    argStream.ReadNumber(params.lWaveform);
+                    break;
+                }
+                case Flanger::DELAY:
+                {
+                    argStream.ReadNumber(params.fDelay);
+                    break;
+                }
+                case Flanger::PHASE:
+                {
+                    argStream.ReadNumber(params.lPhase);
+                    break;
+                }
+            }
 
-        if (argStream.HasErrors())
-            break;
+            if (argStream.HasErrors())
+                break;
 
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
-    case BASS_FX_DX8_GARGLE:
-    {
-        BASS_DX8_GARGLE params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+            return SetParamWithErrorLog(eEffectParameter, params);
+        }
+        case BASS_FX_DX8_GARGLE:
+        {
+            BASS_DX8_GARGLE params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        Gargle eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case Gargle::RATE_HZ:
-        {
-            argStream.ReadNumber(params.dwRateHz);
-            break;
-        }
-        case Gargle::WAVE_SHAPE:
-        {
-            argStream.ReadNumber(params.dwWaveShape);
-            break;
-        }
-        }
+            Gargle eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case Gargle::RATE_HZ:
+                {
+                    argStream.ReadNumber(params.dwRateHz);
+                    break;
+                }
+                case Gargle::WAVE_SHAPE:
+                {
+                    argStream.ReadNumber(params.dwWaveShape);
+                    break;
+                }
+            }
 
-        if (argStream.HasErrors())
-            break;
+            if (argStream.HasErrors())
+                break;
 
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
-    case BASS_FX_DX8_I3DL2REVERB:
-    {
-        BASS_DX8_I3DL2REVERB params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+            return SetParamWithErrorLog(eEffectParameter, params);
+        }
+        case BASS_FX_DX8_I3DL2REVERB:
+        {
+            BASS_DX8_I3DL2REVERB params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        I3DL2Reverb eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case I3DL2Reverb::ROOM:
-        {
-            argStream.ReadNumber(params.lRoom);
-            break;
-        }
-        case I3DL2Reverb::ROOM_HF:
-        {
-            argStream.ReadNumber(params.lRoomHF);
-            break;
-        }
-        case I3DL2Reverb::ROOM_ROLLOFF_FACTOR:
-        {
-            argStream.ReadNumber(params.flRoomRolloffFactor);
-            break;
-        }
-        case I3DL2Reverb::DECAY_TIME:
-        {
-            argStream.ReadNumber(params.flDecayTime);
-            break;
-        }
-        case I3DL2Reverb::DECAY_HF_RATIO:
-        {
-            argStream.ReadNumber(params.flDecayHFRatio);
-            break;
-        }
-        case I3DL2Reverb::REFLECTIONS:
-        {
-            argStream.ReadNumber(params.lReflections);
-            break;
-        }
-        case I3DL2Reverb::REFLECTIONS_DELAY:
-        {
-            argStream.ReadNumber(params.flReflectionsDelay);
-            break;
-        }
-        case I3DL2Reverb::REVERB:
-        {
-            argStream.ReadNumber(params.lReverb);
-            break;
-        }
-        case I3DL2Reverb::REVERB_DELAY:
-        {
-            argStream.ReadNumber(params.flReverbDelay);
-            break;
-        }
-        case I3DL2Reverb::DIFFUSION:
-        {
-            argStream.ReadNumber(params.flDiffusion);
-            break;
-        }
-        case I3DL2Reverb::DENSITY:
-        {
-            argStream.ReadNumber(params.flDensity);
-            break;
-        }
-        case I3DL2Reverb::HF_REFERENCE:
-        {
-            argStream.ReadNumber(params.flHFReference);
-            break;
-        }
-        }
+            I3DL2Reverb eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case I3DL2Reverb::ROOM:
+                {
+                    argStream.ReadNumber(params.lRoom);
+                    break;
+                }
+                case I3DL2Reverb::ROOM_HF:
+                {
+                    argStream.ReadNumber(params.lRoomHF);
+                    break;
+                }
+                case I3DL2Reverb::ROOM_ROLLOFF_FACTOR:
+                {
+                    argStream.ReadNumber(params.flRoomRolloffFactor);
+                    break;
+                }
+                case I3DL2Reverb::DECAY_TIME:
+                {
+                    argStream.ReadNumber(params.flDecayTime);
+                    break;
+                }
+                case I3DL2Reverb::DECAY_HF_RATIO:
+                {
+                    argStream.ReadNumber(params.flDecayHFRatio);
+                    break;
+                }
+                case I3DL2Reverb::REFLECTIONS:
+                {
+                    argStream.ReadNumber(params.lReflections);
+                    break;
+                }
+                case I3DL2Reverb::REFLECTIONS_DELAY:
+                {
+                    argStream.ReadNumber(params.flReflectionsDelay);
+                    break;
+                }
+                case I3DL2Reverb::REVERB:
+                {
+                    argStream.ReadNumber(params.lReverb);
+                    break;
+                }
+                case I3DL2Reverb::REVERB_DELAY:
+                {
+                    argStream.ReadNumber(params.flReverbDelay);
+                    break;
+                }
+                case I3DL2Reverb::DIFFUSION:
+                {
+                    argStream.ReadNumber(params.flDiffusion);
+                    break;
+                }
+                case I3DL2Reverb::DENSITY:
+                {
+                    argStream.ReadNumber(params.flDensity);
+                    break;
+                }
+                case I3DL2Reverb::HF_REFERENCE:
+                {
+                    argStream.ReadNumber(params.flHFReference);
+                    break;
+                }
+            }
 
-        if (argStream.HasErrors())
-            break;
-        
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
-    case BASS_FX_DX8_PARAMEQ:
-    {
-        BASS_DX8_PARAMEQ params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+            if (argStream.HasErrors())
+                break;
 
-        ParamEq eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case ParamEq::CENTER:
-        {
-            argStream.ReadNumber(params.fCenter);
-            break;
+            return SetParamWithErrorLog(eEffectParameter, params);
         }
-        case ParamEq::BANDWIDTH:
+        case BASS_FX_DX8_PARAMEQ:
         {
-            argStream.ReadNumber(params.fBandwidth);
-            break;
-        }
-        case ParamEq::GAIN:
-        {
-            argStream.ReadNumber(params.fGain);
-            break;
-        }
-        }
+            BASS_DX8_PARAMEQ params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        if (argStream.HasErrors())
-            break;
+            ParamEq eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case ParamEq::CENTER:
+                {
+                    argStream.ReadNumber(params.fCenter);
+                    break;
+                }
+                case ParamEq::BANDWIDTH:
+                {
+                    argStream.ReadNumber(params.fBandwidth);
+                    break;
+                }
+                case ParamEq::GAIN:
+                {
+                    argStream.ReadNumber(params.fGain);
+                    break;
+                }
+            }
 
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
-    case BASS_FX_DX8_REVERB:
-    {
-        BASS_DX8_REVERB params;
-        pSound->GetFxEffectParameters(eEffectType, &params);
+            if (argStream.HasErrors())
+                break;
 
-        Reverb eEffectParameter;
-        argStream.ReadEnumString(eEffectParameter);
-        switch (eEffectParameter)
-        {
-        case Reverb::IN_GAIN:
-        {
-            argStream.ReadNumber(params.fInGain);
-            break;
+            return SetParamWithErrorLog(eEffectParameter, params);
         }
-        case Reverb::REVERB_MIX:
+        case BASS_FX_DX8_REVERB:
         {
-            argStream.ReadNumber(params.fReverbMix);
-            break;
-        }
-        case Reverb::REVERB_TIME:
-        {
-            argStream.ReadNumber(params.fReverbTime);
-            break;
-        }
-        case Reverb::HIGH_FREQ_RT_RATIO:
-        {
-            argStream.ReadNumber(params.fHighFreqRTRatio);
-            break;
-        }
-        }
+            BASS_DX8_REVERB params;
+            pSound->GetFxEffectParameters(eEffectType, &params);
 
-        if (argStream.HasErrors())
-            break;
+            Reverb eEffectParameter;
+            argStream.ReadEnumString(eEffectParameter);
+            switch (eEffectParameter)
+            {
+                case Reverb::IN_GAIN:
+                {
+                    argStream.ReadNumber(params.fInGain);
+                    break;
+                }
+                case Reverb::REVERB_MIX:
+                {
+                    argStream.ReadNumber(params.fReverbMix);
+                    break;
+                }
+                case Reverb::REVERB_TIME:
+                {
+                    argStream.ReadNumber(params.fReverbTime);
+                    break;
+                }
+                case Reverb::HIGH_FREQ_RT_RATIO:
+                {
+                    argStream.ReadNumber(params.fHighFreqRTRatio);
+                    break;
+                }
+            }
 
-        return SetParamWithErrorLog(eEffectParameter, params);
-    }
+            if (argStream.HasErrors())
+                break;
+
+            return SetParamWithErrorLog(eEffectParameter, params);
+        }
     }
 
     // Only ever reaches this point if there's an error

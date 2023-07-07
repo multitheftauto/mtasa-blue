@@ -229,3 +229,21 @@ a02c4b3a71b5a6e9d77ba849edd14a8048256120
 # Date:   Sun Jan 9 15:36:06 2022 +0200
 #
 # Run clang-format
+
+b42518e64803762d27fe6277b36044d1a71fc2c4
+# Author: Marek Kulik <me@botder.com>
+# Date:   Fri Apr 7 15:46:10 2023 +0200
+#
+# Apply win-apply-clang-format.bat
+
+483cd28a1ee618538771e3bf33f9ebddfca2cde9
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Sat Apr 8 15:17:22 2023 +0300
+#
+# Apply win-apply-clang-format.bat
+
+6f26c2ad77600c2fd055d9d7a30ced5bf91d4f14
+# Author: patrikjuvonen <22572159+patrikjuvonen@users.noreply.github.com>
+# Date:   Mon Jun 12 19:01:59 2023 +0300
+#
+# Apply win-apply-clang-format.bat

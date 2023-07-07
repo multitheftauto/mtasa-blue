@@ -238,7 +238,7 @@ void CClientObjectManager::UpdateLimitInfo()
     unsigned int nEntryInfoNodeEntries = pPools->GetEntryInfoNodePool()->GetNumberOfUsedSpaces();
     unsigned int nPointerNodeSingleLinkEntries = pPools->GetPointerNodeSingleLinkPool()->GetNumberOfUsedSpaces();
     unsigned int nPointerNodeDoubleLinkEntries = pPools->GetPointerNodeDoubleLinkPool()->GetNumberOfUsedSpaces();
-    
+
     g_pCore->ChatPrintf("%d = %d ### %d = %d ### %d = %d", false, nEntryInfoNodeEntries, m_iEntryInfoNodeEntries, nPointerNodeSingleLinkEntries,
                         m_iPointerNodeSingleLinkEntries, nPointerNodeDoubleLinkEntries, m_iPointerNodeDoubleLinkEntries);
 

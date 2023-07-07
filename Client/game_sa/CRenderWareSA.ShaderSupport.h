@@ -14,9 +14,9 @@
 #include "CRenderWareSA.h"
 
 #ifdef MTA_DEBUG
-    // Comment out the lines below for your desired debug options
-    //#define SHADER_DEBUG_CHECKS         // Do lots of validation which can slow a debug build
-    //#define SHADER_DEBUG_OUTPUT         // Output lots of debug strings
+// Comment out the lines below for your desired debug options
+// #define SHADER_DEBUG_CHECKS         // Do lots of validation which can slow a debug build
+// #define SHADER_DEBUG_OUTPUT         // Output lots of debug strings
 #endif
 
 // Various dodgy pointer values

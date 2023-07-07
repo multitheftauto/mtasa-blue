@@ -303,7 +303,7 @@ public:
     void SetStaticWaitingForCollision(bool bStatic) { m_pInterface->bIsStaticWaitingForCollision = bStatic; }
 
     RwMatrix* GetBoneRwMatrix(eBone boneId);
-    bool         SetBoneMatrix(eBone boneId, const CMatrix& matrix);
+    bool      SetBoneMatrix(eBone boneId, const CMatrix& matrix);
 
     bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll);
     bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll);
@@ -317,8 +317,8 @@ private:
     static unsigned long FUNC_CClumpModelInfo__GetFrameFromId;
     static unsigned long FUNC_RwFrameGetLTM;
 
-    void*         m_pStoredPointer;
-    CVector       m_LastGoodPosition;
+    void*   m_pStoredPointer;
+    CVector m_LastGoodPosition;
 };
 
 //

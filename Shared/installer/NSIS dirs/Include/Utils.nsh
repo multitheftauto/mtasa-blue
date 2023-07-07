@@ -103,8 +103,8 @@ Function DetailUpdate
   System::Call *(&t${NSIS_MAX_STRLEN}R0)i.R2
   System::Call *(i0,i0,i0,i0,i0,iR2,i${NSIS_MAX_STRLEN},i0,i0)i.R3
  
-  !define LVM_GETITEMCOUNT 0x1004
-  !define LVM_SETITEMTEXTW 0x1074
+  ; !define LVM_GETITEMCOUNT 0x1004
+  ; !define LVM_SETITEMTEXTW 0x1074
   SendMessage $R1 ${LVM_GETITEMCOUNT} 0 0 $R0
   IntOp $R0 $R0 - 1
   System::Call user32::SendMessage(iR1,i${LVM_SETITEMTEXTW},iR0,iR3)
