@@ -804,9 +804,9 @@ private:
     bool                      m_bDoPaintballs;
     bool                      m_bShowInterpolation;
     #endif
-    bool m_bDevelopmentMode;
-    bool m_bShowCollision;
-    bool m_bShowSound;
+    bool                      m_bDevelopmentMode;
+    bool                      m_bShowCollision;
+    bool                      m_bShowSound;
 
     // Debug class. Empty in release.
 public:
