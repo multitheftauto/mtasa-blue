@@ -3198,13 +3198,11 @@ retry:
 
                     // Read out the vehicle
                     unsigned short usModel = 0;
-                    bitStream.Read(usModel);
 
-                    if (!CClientVehicleManager::IsStandardModel(usModel))
-                    {
-                        RaiseEntityAddError(39);
-                        return;
-                    }
+                    if (CClientVehicleManager::IsStandardModel(usModel))
+                        bitStream.Read(usModel);
+                    else
+                        return RaiseEntityAddError(39);
 
                     // Read out the health
                     SVehicleHealthSync health;
