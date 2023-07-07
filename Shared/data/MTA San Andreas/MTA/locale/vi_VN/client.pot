@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 22:39+0000\n"
-"PO-Revision-Date: 2023-07-02 22:57\n"
+"POT-Creation-Date: 2023-07-07 17:03+0000\n"
+"PO-Revision-Date: 2023-07-07 18:00\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -17,7 +17,81 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:968
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "Yêu cầu trang web"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "Server yêu cầu các địa chỉ trang web sau để load chúng (sau):"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "KHÔNG CUNG CẤP CÁC THÔNG TIN NHẠY CẢM ĐỂ TRÁNH BỊ ĐÁNH CẮP"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "Ghi nhớ quyết định"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
+msgid "Allow"
+msgstr "Cho phép"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "Từ chối"
+
+#. Create buttons
+#. OK button
+#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/loader/Dialogs.cpp:133
+#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
+#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
+#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
+#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
+#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4694
+msgid "OK"
+msgstr "Đồng ý"
+
+#. Cancel button
+#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:136
+#: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
+#: Client/core/CVersionUpdater.cpp:1841 Client/core/CSettings.cpp:132
+#: Client/core/CSettings.cpp:4693
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+msgid "Cancel"
+msgstr "Hủy"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
+#: Client/core/CMainMenu.cpp:1170 Client/core/CVersionUpdater.cpp:1572
+#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
+#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:1371
+#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
+#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
+#: Client/core/CQuestionBox.cpp:195
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "Yes"
+msgstr "Có"
+
+#: Client/loader/Utils.cpp:534 Client/loader/Dialogs.cpp:890
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Đang tìm Grand Theft Auto San Andreas"
+
+#: Client/loader/Utils.cpp:536 Client/loader/Dialogs.cpp:893
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Hãy bắt đầu khởi động Grand Theft Auto San Andreas"
+
+#: Client/loader/Utils.cpp:600
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Chọn thư mục nơi cài đặt Grand Theft Auto: San Andreas"
+
+#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
@@ -26,35 +100,100 @@ msgstr "MTA:SA cần quyền Administrator để thực hiện task sau:\n\n"
 "  '%s'\n\n"
 "Vui lòng xác nhận ở hộp thoại tiếp theo."
 
-#: Client/loader/CInstallManager.cpp:376
+#: Client/loader/Utils.cpp:1069
 #, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA không thể thực hiện task sau:\n\n"
-"  '%s'\n"
+msgid "Error loading %s module! (%s)"
+msgstr "Lỗi khi tải module %s ! (%s)"
 
-#: Client/loader/CInstallManager.cpp:426
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** Lỗi xung đột được gây ra bởi driver đồ họa **\n\n"
-"** Hãy cập nhật driver đồ họa của bạn **"
+#: Client/loader/Utils.cpp:1394 Client/loader/Dialogs.cpp:914
+msgid "Copying files..."
+msgstr "Đang sao chép file..."
 
-#: Client/loader/CInstallManager.cpp:532
-msgid "Install updated MTA:SA files"
-msgstr "Cài đặt những file MTA:SA đã cập nhật"
+#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:919
+msgid "Copy finished early. Everything OK."
+msgstr "Việc sao chép được hoàn thành sớm. Mọi thứ đều TỐT."
 
-#: Client/loader/CInstallManager.cpp:552
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Không thể cập nhật do xung đột tệp. Vui lòng đóng các ứng dụng khác và thử lại"
+#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:924
+msgid "Finishing..."
+msgstr "Đang hoàn thành..."
 
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
+#: Client/loader/Utils.cpp:1462 Client/loader/Dialogs.cpp:928
+msgid "Done!"
+msgstr "Xong!"
+
+#: Client/loader/Utils.cpp:1502
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Đã phát hiện cài đặt mới của %s.\n\n"
+"Bạn có muốn sao chép các tùy chỉnh cài đặt của mình từ %s không?"
+
+#: Client/loader/Utils.cpp:1541
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA bị lỗi khi mở file '%s'"
+
+#: Client/loader/Utils.cpp:1563
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA bị thiếu file '%s'."
+
+#: Client/loader/Utils.cpp:1588
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA bị lỗi khi load model."
+
+#: Client/loader/Utils.cpp:1590
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Nếu như bạn đã chỉnh sửa file gta3.img, Hãy thử cài đặt lại GTA:SA."
+
+#: Client/loader/Utils.cpp:1615
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA bị lỗi khi thêm một nâng cấp cho xe cộ."
+
+#: Client/loader/Utils.cpp:1634
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA tìm thấy lỗi ở file '%s'"
+
+#: Client/loader/Utils.cpp:1716
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Máy tính bạn đã khởi động lại khi đang chơi MTA:SA?"
+
+#: Client/loader/Utils.cpp:1781
+msgid "Please terminate the following programs before continuing:"
+msgstr "Vui lòng tắt hẳn các chương trình sau trước khi tiếp tục:"
+
+#: Client/loader/MainFunctions.cpp:247
+msgid "Trouble restarting MTA:SA\n\n"
+"If the problem persists, open Task Manager and\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
+"Try to launch MTA:SA again?"
+msgstr "Lỗi khi khởi động lại MTA:SA\n\n"
+"Nếu vẫn còn bị lỗi, hãy mở Task Manager và\n"
+"tắt(stop) 'gta_sa.exe' và 'Multi Theft Auto.exe'\n\n\n"
+"Sau đó thử chạy lại MTA:SA?"
+
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
-#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
+#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
+#: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1227
+#: Client/core/CCore.cpp:1240 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:591
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
@@ -66,337 +205,10 @@ msgstr "Không thể cập nhật do xung đột tệp. Vui lòng đóng các �
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1275
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1287
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
-#: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
-#: Client/core/CSettings.cpp:4673 Client/core/CCore.cpp:1227
-#: Client/core/CCore.cpp:1240 Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
 msgstr "Lỗi"
-
-#: Client/loader/CInstallManager.cpp:561
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto không được cài đặt đúng cách, vui lòng cài đặt lại. %s"
-
-#: Client/loader/CInstallManager.cpp:613
-msgid "Create GTA:SA junctions"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:657
-msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
-msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:672
-msgid "Copy MTA:SA files"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
-msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:780
-msgid "Patch GTA:SA dependency"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:828
-msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:832
-msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:838
-msgid "Generate GTA:SA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:853
-msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
-msgid "Patch GTA:SA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:876
-msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:763
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA không thể tiếp tục vì ổ đĩa %s không đủ bộ nhớ lưu trữ."
-
-#: Client/loader/CInstallManager.cpp:1113
-msgid "Missing file:"
-msgstr "File bị mất:"
-
-#: Client/loader/CInstallManager.cpp:1117
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Nếu MTA không chạy được, vui lòng cài đặt lại GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:1152
-msgid "Update install settings"
-msgstr "Cập nhật cài đặt cài đặt"
-
-#: Client/loader/CInstallManager.cpp:1291
-msgid "Update compatibility settings"
-msgstr "Cập nhật cài đặt tương thích"
-
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr ""
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr ""
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Đang cài đặt bản cập nhật..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Đang giải nén file..."
-
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/loader/Dialogs.cpp:131 Client/gui/CGUIMessageBox_Impl.cpp:72
-#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
-#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
-#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
-#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
-#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
-#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "Yes"
-msgstr "Có"
-
-#: Client/loader/Dialogs.cpp:132 Client/core/CQuestionBox.cpp:194
-#: Client/core/CMainMenu.cpp:1169 Client/core/CVersionUpdater.cpp:1571
-#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
-#: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1370
-#: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
-#: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
-msgid "No"
-msgstr "Không"
-
-#. Create buttons
-#. OK button
-#: Client/loader/Dialogs.cpp:133 Client/gui/CGUIMessageBox_Impl.cpp:64
-#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
-#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
-#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
-#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
-#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
-#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4694
-msgid "OK"
-msgstr "Đồng ý"
-
-#: Client/loader/Dialogs.cpp:134
-msgid "Quit"
-msgstr "Thoát"
-
-#: Client/loader/Dialogs.cpp:135
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
-msgid "Help"
-msgstr "Trợ giúp"
-
-#. Cancel button
-#: Client/loader/Dialogs.cpp:136 Client/gui/CGUIMessageBox_Impl.cpp:68
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
-#: Client/core/CVersionUpdater.cpp:1841 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4693
-msgid "Cancel"
-msgstr "Hủy"
-
-#: Client/loader/Dialogs.cpp:151
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas đã gặp sự cố"
-
-#: Client/loader/Dialogs.cpp:152
-msgid "Crash information"
-msgstr "Thông tin lỗi xung đột"
-
-#: Client/loader/Dialogs.cpp:153
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Tích vào ô để gửi thông tin lỗi xung đột này đến nhà phát triển MTA thông qua 'internet'"
-
-#: Client/loader/Dialogs.cpp:154
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Bằng việc làm vậy thì lỗi xung đột sẽ được sửa sớm nhất có thể."
-
-#: Client/loader/Dialogs.cpp:155
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Bạn có muốn khởi động lại MTA: San Andreas ?"
-
-#: Client/loader/Dialogs.cpp:162
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Cảnh báo"
-
-#: Client/loader/Dialogs.cpp:163
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:165
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:167
-msgid "Keep these files, but also show this warning on next start"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:168
-msgid "Do not remind me about these files again"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:169
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:170
-msgid "Show me these files"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:171
-msgid "Play MTA:SA"
-msgstr "Chơi MTA:SA"
-
-#: Client/loader/Dialogs.cpp:177
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Các tùy chọn dễ gây nhầm lẫn"
-
-#: Client/loader/Dialogs.cpp:178
-msgid "NVidia Optimus detected!"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:179
-msgid "Try each option and see what works:"
-msgstr "Hãy thử từng tùy chọn và xem xem cái nào chạy được:"
-
-#: Client/loader/Dialogs.cpp:180
-msgid "A - Standard NVidia"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:181
-msgid "B - Alternate NVidia"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:182
-msgid "C - Standard Intel"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:183
-msgid "D - Alternate Intel"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:184
-msgid "If you get desperate, this might help:"
-msgstr "Nếu bạn không tìm ra cách giải quyết, cái này có thể giúp ích cho bạn:"
-
-#: Client/loader/Dialogs.cpp:185
-msgid "If you have already selected an option that works, this might help:"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:186
-msgid "Force windowed mode"
-msgstr "Bắt buộc ở chế độ cửa sổ"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "Don't show again"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:195
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Cảnh báo: Không tìm thấy chương trình diệt vi-rút"
-
-#: Client/loader/Dialogs.cpp:197
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA không tìm thấy phần mềm diệt vi-rút trong máy tính của bạn.\n\n"
-"Vi-rút có thể làm ảnh hưởng đến MTA và làm giảm trải nghiệm khi chơi game.\n\n"
-"Nhấn 'Trợ giúp' để xem thêm."
-
-#: Client/loader/Dialogs.cpp:200
-msgid "I have already installed an anti-virus"
-msgstr "Tôi đã cài đặt phần mềm diệt vi-rút"
-
-#: Client/loader/Dialogs.cpp:202
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "Tôi sẽ không cài đặt phầm mềm diệt vi-rút.\n"
-"Tôi muốn máy tính của tôi bị lag và là một phần của botnet."
-
-#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:534
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Đang tìm Grand Theft Auto San Andreas"
-
-#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:536
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Hãy bắt đầu khởi động Grand Theft Auto San Andreas"
-
-#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1394
-msgid "Copying files..."
-msgstr "Đang sao chép file..."
-
-#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1454
-msgid "Copy finished early. Everything OK."
-msgstr "Việc sao chép được hoàn thành sớm. Mọi thứ đều TỐT."
-
-#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1460
-msgid "Finishing..."
-msgstr "Đang hoàn thành..."
-
-#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1462
-msgid "Done!"
-msgstr "Xong!"
-
-#: Client/loader/MainFunctions.cpp:247
-msgid "Trouble restarting MTA:SA\n\n"
-"If the problem persists, open Task Manager and\n"
-"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
-"Try to launch MTA:SA again?"
-msgstr "Lỗi khi khởi động lại MTA:SA\n\n"
-"Nếu vẫn còn bị lỗi, hãy mở Task Manager và\n"
-"tắt(stop) 'gta_sa.exe' và 'Multi Theft Auto.exe'\n\n\n"
-"Sau đó thử chạy lại MTA:SA?"
 
 #: Client/loader/MainFunctions.cpp:265
 msgid "Another instance of MTA is already running.\n\n"
@@ -595,724 +407,274 @@ msgstr "Không thể chạy Grand Theft Auto: San Andreas.  Thử khởi động
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas bị lỗi khi chạy. Bạn có muốn tắt nó không?"
 
-#: Client/loader/Utils.cpp:600
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Chọn thư mục nơi cài đặt Grand Theft Auto: San Andreas"
-
-#: Client/loader/Utils.cpp:1069
+#: Client/loader/CInstallManager.cpp:376
 #, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Lỗi khi tải module %s ! (%s)"
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA không thể thực hiện task sau:\n\n"
+"  '%s'\n"
 
-#: Client/loader/Utils.cpp:1502
+#: Client/loader/CInstallManager.cpp:426
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** Lỗi xung đột được gây ra bởi driver đồ họa **\n\n"
+"** Hãy cập nhật driver đồ họa của bạn **"
+
+#: Client/loader/CInstallManager.cpp:532
+msgid "Install updated MTA:SA files"
+msgstr "Cài đặt những file MTA:SA đã cập nhật"
+
+#: Client/loader/CInstallManager.cpp:552
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Không thể cập nhật do xung đột tệp. Vui lòng đóng các ứng dụng khác và thử lại"
+
+#: Client/loader/CInstallManager.cpp:561
 #, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Đã phát hiện cài đặt mới của %s.\n\n"
-"Bạn có muốn sao chép các tùy chỉnh cài đặt của mình từ %s không?"
-
-#: Client/loader/Utils.cpp:1541
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA bị lỗi khi mở file '%s'"
-
-#: Client/loader/Utils.cpp:1563
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA bị thiếu file '%s'."
-
-#: Client/loader/Utils.cpp:1588
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA bị lỗi khi load model."
-
-#: Client/loader/Utils.cpp:1590
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Nếu như bạn đã chỉnh sửa file gta3.img, Hãy thử cài đặt lại GTA:SA."
-
-#: Client/loader/Utils.cpp:1615
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA bị lỗi khi thêm một nâng cấp cho xe cộ."
-
-#: Client/loader/Utils.cpp:1634
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA tìm thấy lỗi ở file '%s'"
-
-#: Client/loader/Utils.cpp:1716
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Máy tính bạn đã khởi động lại khi đang chơi MTA:SA?"
-
-#: Client/loader/Utils.cpp:1781
-msgid "Please terminate the following programs before continuing:"
-msgstr "Vui lòng tắt hẳn các chương trình sau trước khi tiếp tục:"
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1381
-msgid "Problem with graphics driver"
-msgstr "Vấn đề với trình điều khiển đồ họa"
-
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "Yêu cầu trang web"
-
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "Server yêu cầu các địa chỉ trang web sau để load chúng (sau):"
-
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "KHÔNG CUNG CẤP CÁC THÔNG TIN NHẠY CẢM ĐỂ TRÁNH BỊ ĐÁNH CẮP"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "Ghi nhớ quyết định"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
-msgid "Allow"
-msgstr "Cho phép"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "Từ chối"
-
-#: Client/mods/deathmatch/CClient.cpp:36
-msgid "This version has expired."
-msgstr "Phiên bản này đã hết hạn."
-
-#: Client/mods/deathmatch/CClient.cpp:56
-msgid "disconnect from the game"
-msgstr "ngắt kết nối khỏi game"
-
-#: Client/mods/deathmatch/CClient.cpp:57
-msgid "shows the nametags"
-msgstr "hiển thị thẻ gắn tên"
-
-#: Client/mods/deathmatch/CClient.cpp:58
-msgid "shows the chatbox"
-msgstr "hiển thị chatbox"
-
-#: Client/mods/deathmatch/CClient.cpp:59
-msgid "shows the network statistics"
-msgstr "hiển thị thống kê mạng"
-
-#. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
-msgid "open the chat input"
-msgstr "mở khung nhập chữ chat"
-
-#: Client/mods/deathmatch/CClient.cpp:64
-msgid "transmits voice to other players"
-msgstr "truyền giọng nói cho người chơi khác"
-
-#: Client/mods/deathmatch/CClient.cpp:65
-msgid "enters a car as passenger"
-msgstr "đi vào xe hơi như hành khách"
-
-#: Client/mods/deathmatch/CClient.cpp:66
-msgid "next radio channel"
-msgstr "kênh radio tiếp theo"
-
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "previous radio channel"
-msgstr "kênh radio trước"
-
-#: Client/mods/deathmatch/CClient.cpp:68
-msgid "enables the radar view"
-msgstr "bật góc nhìn radar"
-
-#: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the radar in"
-msgstr "Phóng to radar"
-
-#: Client/mods/deathmatch/CClient.cpp:70
-msgid "zooms the radar out"
-msgstr "Thu nhỏ radar"
-
-#: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the radar north"
-msgstr "di chuyển radar về phía bắc"
-
-#: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the radar south"
-msgstr "di chuyển radar về phía nam"
-
-#: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the radar east"
-msgstr "di chuyển radar về phía đông"
-
-#: Client/mods/deathmatch/CClient.cpp:74
-msgid "moves the radar west"
-msgstr "di chuyển radar về phía tây"
-
-#: Client/mods/deathmatch/CClient.cpp:75
-msgid "attaches the radar"
-msgstr "gắn radar"
-
-#: Client/mods/deathmatch/CClient.cpp:76
-msgid "reduces radar opacity"
-msgstr "giảm độ mờ của radar"
-
-#: Client/mods/deathmatch/CClient.cpp:77
-msgid "increases radar opacity"
-msgstr "tăng độ mờ của radar"
-
-#: Client/mods/deathmatch/CClient.cpp:78
-msgid "toggles radar help text"
-msgstr "chuyển đổi văn bản trợ giúp radar"
-
-#: Client/mods/deathmatch/CClient.cpp:79
-msgid "sends a message to the targetted player"
-msgstr "gửi tin nhắn đến trình phát được nhắm mục tiêu"
-
-#: Client/mods/deathmatch/CClient.cpp:80
-msgid "changes to the next weapon whilst in a vehicle"
-msgstr "thay đổi vũ khí tiếp theo khi đang ở trong xe"
-
-#: Client/mods/deathmatch/CClient.cpp:81
-msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "thay đổi vũ khí trước đó khi đang ở trong xe"
-
-#: Client/mods/deathmatch/CClient.cpp:82
-msgid "outputs info about the current server"
-msgstr "thông tin đầu ra của server hiện tại"
-
-#. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
-msgid "defines the scale multiplier of all text-displays"
-msgstr "xác định tỉ lệ số nhân của tất cả các chữ hiển thị"
-
-#. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
-msgid "(Development mode) shows the colshapes"
-msgstr "(Chế độ dev) hiển thị colshapes"
-
-#: Client/mods/deathmatch/CClient.cpp:93
-msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Chế độ phát triển) in id âm thanh thế giới vào cửa sổ gỡ lỗi"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Lỗi tải xuống: %s"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:591
-#: Client/mods/deathmatch/logic/CClientGame.cpp:689
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Nickname không hợp lệ! Hãy vào Cài Đặt và tạo cái mới!"
-
-#. Display the status box
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
-#: Client/core/CConnectManager.cpp:148
-msgid "CONNECTING"
-msgstr "ĐANG KẾT NỐI"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
-msgid "Entering the game ..."
-msgstr "Đang vào game ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:665
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Không thể kết nối; Chọn Kết nối server hoặc dùng lệnh 'kết nối' để kết nối đến server."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:711
-msgid "The server is not installed"
-msgstr "Server chưa cài đặt"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:721
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
-msgid "Local Server"
-msgstr "Server cục bộ"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:721
-msgid "Starting local server ..."
-msgstr "Đang khởi động server cục bộ ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "Bạn đã bị kick khỏi game ( %s )"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
-msgid "Connecting to local server..."
-msgstr "Đang kết nối đến server cục bộ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
-msgid "Error connecting to server."
-msgstr "Lỗi khi kết nối đến server."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1120
-msgid "Connecting to local server timed out. See console for details."
-msgstr "Hết thời gian kết nối đến server cục bộ. Xem console để biết thêm thông tin."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
-#: Client/core/CConnectManager.cpp:263
-msgid "Connection timed out"
-msgstr "Hết thời gian kết nối"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1226
-msgid "Connection with the server was lost"
-msgstr "Không thể kết nối đến server"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-msgid "Disconnected: unknown protocol error"
-msgstr "Ngắt kết nối: giao thức không hợp lệ"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
-#: Client/core/CConnectManager.cpp:285
-msgid "Disconnected: disconnected remotely"
-msgstr "Ngắt kết nối: ngắt kết nối từ xa"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
-#: Client/core/CConnectManager.cpp:289
-msgid "Disconnected: connection lost remotely"
-msgstr "Ngắt kết nối: mất kết nối từ xa"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
-#: Client/core/CConnectManager.cpp:293
-msgid "Disconnected: you are banned from this server"
-msgstr "Ngắt kết nối: bạn bị cấm khỏi server này"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
-msgid "Disconnected: the server is currently full"
-msgstr "Đã ngắt kết nối: server hiện đã đầy người chơi"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
-#: Client/core/CConnectManager.cpp:300
-msgid "Disconnected: disconnected from the server"
-msgstr "Ngắt kết nối: ngắt kết nối khỏi server"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-#: Client/core/CConnectManager.cpp:304
-msgid "Disconnected: connection to the server was lost"
-msgstr "Đã ngắt kết nối: không thể kết nối đến server"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1265
-msgid "Disconnected: invalid password specified"
-msgstr "Đã ngắt kết nối: mật khẩu không hợp lệ được chỉ định"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-#: Client/core/CConnectManager.cpp:311
-msgid "Disconnected: connection was refused"
-msgstr "Đã ngắt kết nối: kết nối đã bị từ chối"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1287
-msgid "MTA Client verification failed!"
-msgstr "Không thể xác minh Client MTA!"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:487
-msgid "Disconnected: Invalid nickname"
-msgstr "Đã ngắt kết nối: nickname không hợp lệ"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:491
-msgid "Disconnect from server"
-msgstr "Ngắt kết nối khỏi server"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:495
-#, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "Đã ngắt kết nối: Serial đã bị cấm.\n"
-"Lý do: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:501
-#, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "Đã ngắt kết nối: Bạn đã bị cấm.\n"
-"Lý do: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
-#, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "Đã ngắt kết nối: Tài khoản đã bị cấm.\n"
-"Lý do: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:512
-msgid "Disconnected: Version mismatch"
-msgstr "Đã ngắt kết nối: Phiên bản không khớp"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:516
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Đã ngắt kết nối: Join flood. Vui lòng chờ trong giây lát, rồi thử lại sau."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
-#, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "Đã ngắt kết nối: Server từ các nhánh khác nhau.\n"
-"Thông tin: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
-#, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "Đã ngắt kết nối: Phiên bản không hợp lệ.\n"
-"Thông tin: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "Đã ngắt kết nối: Server đang sử dụng phiên bản MTA mới hơn.\n"
-"Thông tin: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "Đã ngắt kết nối: Server đang sử dụng phiên bản MTA cũ hơn.\n"
-"Thông tin: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:540
-msgid "Disconnected: Nick already in use"
-msgstr "Đã ngắt kết nối: Nickname đã được sử dụng"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
-msgid "Disconnected: Player element could not be created."
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto không được cài đặt đúng cách, vui lòng cài đặt lại. %s"
+
+#: Client/loader/CInstallManager.cpp:613
+msgid "Create GTA:SA junctions"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
+#: Client/loader/CInstallManager.cpp:657
+msgid "MTA:SA cannot launch because copying a file failed:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:672
+msgid "Copy MTA:SA files"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:780
+msgid "Patch GTA:SA dependency"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:828
+msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:832
+msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:838
+msgid "Generate GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:853
+msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
+msgid "Patch GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:876
+msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:763
 #, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "Đã ngắt kết nối: Server hủy kết nối: %s"
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA không thể tiếp tục vì ổ đĩa %s không đủ bộ nhớ lưu trữ."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
-msgid "Disconnected: Serial verification failed"
-msgstr "Đã ngắt kết nối: Không thể xác minh serial"
+#: Client/loader/CInstallManager.cpp:1113
+msgid "Missing file:"
+msgstr "File bị mất:"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:557
+#: Client/loader/CInstallManager.cpp:1117
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Nếu MTA không chạy được, vui lòng cài đặt lại GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:1152
+msgid "Update install settings"
+msgstr "Cập nhật cài đặt cài đặt"
+
+#: Client/loader/CInstallManager.cpp:1291
+msgid "Update compatibility settings"
+msgstr "Cập nhật cài đặt tương thích"
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:272
 #, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "Đã ngắt kết nối: Kết nối không đồng bộ %s"
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
+#: Client/loader/Install.cpp:479
 #, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "Đã ngắt kết nối: Bạn đã bị kick bởi %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "Đã ngắt kết nối: Bạn đã bị cấm bởi %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "Đã ngắt kết nối: Server bảo trì hoặc đang khởi động lại"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
-msgid "You were kicked from the game"
-msgstr "Bạn đã bị kick khỏi game"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
-msgid "This server requires a non-modifed gta_sa.exe"
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:615
-msgid "Please replace gta_sa.exe"
+#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
+msgid "Installing update..."
+msgstr "Đang cài đặt bản cập nhật..."
+
+#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
+msgid "Extracting files..."
+msgstr "Đang giải nén file..."
+
+#: Client/loader/Dialogs.cpp:132 Client/core/CMainMenu.cpp:1169
+#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
+#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
+#: Client/core/CSettings.cpp:1370 Client/core/CSettings.cpp:1394
+#: Client/core/CSettings.cpp:4434 Client/core/CSettings.cpp:4501
+#: Client/core/CSettings.cpp:4550 Client/core/CQuestionBox.cpp:194
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+msgid "No"
+msgstr "Không"
+
+#: Client/loader/Dialogs.cpp:134
+msgid "Quit"
+msgstr "Thoát"
+
+#: Client/loader/Dialogs.cpp:135
+#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+msgid "Help"
+msgstr "Trợ giúp"
+
+#: Client/loader/Dialogs.cpp:151
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas đã gặp sự cố"
+
+#: Client/loader/Dialogs.cpp:152
+msgid "Crash information"
+msgstr "Thông tin lỗi xung đột"
+
+#: Client/loader/Dialogs.cpp:153
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Tích vào ô để gửi thông tin lỗi xung đột này đến nhà phát triển MTA thông qua 'internet'"
+
+#: Client/loader/Dialogs.cpp:154
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Bằng việc làm vậy thì lỗi xung đột sẽ được sửa sớm nhất có thể."
+
+#: Client/loader/Dialogs.cpp:155
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "Bạn có muốn khởi động lại MTA: San Andreas ?"
+
+#: Client/loader/Dialogs.cpp:162
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - Cảnh báo"
+
+#: Client/loader/Dialogs.cpp:163
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
-msgid "This server does not allow custom D3D9.DLLs"
+#: Client/loader/Dialogs.cpp:165
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+#: Client/loader/Dialogs.cpp:167
+msgid "Keep these files, but also show this warning on next start"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
-msgid "This server does not allow virtual machines"
+#: Client/loader/Dialogs.cpp:168
+msgid "Do not remind me about these files again"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
-msgid "This server requires driver signing to be enabled"
+#: Client/loader/Dialogs.cpp:169
+msgid "Rename these files from *.dll to *.dll.bak"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
-msgid "Please restart your PC"
+#: Client/loader/Dialogs.cpp:170
+msgid "Show me these files"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
-msgid "This server has detected missing anti-cheat components"
+#: Client/loader/Dialogs.cpp:171
+msgid "Play MTA:SA"
+msgstr "Chơi MTA:SA"
+
+#: Client/loader/Dialogs.cpp:177
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - Các tùy chọn dễ gây nhầm lẫn"
+
+#: Client/loader/Dialogs.cpp:178
+msgid "NVidia Optimus detected!"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
-msgid "Try restarting MTA"
+#: Client/loader/Dialogs.cpp:179
+msgid "Try each option and see what works:"
+msgstr "Hãy thử từng tùy chọn và xem xem cái nào chạy được:"
+
+#: Client/loader/Dialogs.cpp:180
+msgid "A - Standard NVidia"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
+#: Client/loader/Dialogs.cpp:181
+msgid "B - Alternate NVidia"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
-msgid "Please replace gta3.img or gta_int.img"
+#: Client/loader/Dialogs.cpp:182
+msgid "C - Standard Intel"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:616
-msgid "This server does not allow Wine"
+#: Client/loader/Dialogs.cpp:183
+msgid "D - Alternate Intel"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:617
-msgid "Ensure no other program is modifying MTA:SA"
+#: Client/loader/Dialogs.cpp:184
+msgid "If you get desperate, this might help:"
+msgstr "Nếu bạn không tìm ra cách giải quyết, cái này có thể giúp ích cho bạn:"
+
+#: Client/loader/Dialogs.cpp:185
+msgid "If you have already selected an option that works, this might help:"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
-msgid "Time Remaining: "
-msgstr "Thời gian còn lại:"
+#: Client/loader/Dialogs.cpp:186
+msgid "Force windowed mode"
+msgstr "Bắt buộc ở chế độ cửa sổ"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:641
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d ngày"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:643
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d giờ"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:645
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "% d phút%d phút"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d giây"
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
-msgid "Disconnected"
-msgstr "Đã ngắt kết nối"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
+#: Client/loader/Dialogs.cpp:187
+msgid "Don't show again"
 msgstr ""
 
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
-#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2000
-msgid "General"
-msgstr "Chung"
-
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+msgid "MTA: San Andreas"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Tên server:"
+#: Client/loader/Dialogs.cpp:195
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Cảnh báo: Không tìm thấy chương trình diệt vi-rút"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Mật khẩu:"
+#: Client/loader/Dialogs.cpp:197
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA không tìm thấy phần mềm diệt vi-rút trong máy tính của bạn.\n\n"
+"Vi-rút có thể làm ảnh hưởng đến MTA và làm giảm trải nghiệm khi chơi game.\n\n"
+"Nhấn 'Trợ giúp' để xem thêm."
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Người chơi tối đa:"
+#: Client/loader/Dialogs.cpp:200
+msgid "I have already installed an anti-virus"
+msgstr "Tôi đã cài đặt phần mềm diệt vi-rút"
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr ""
+#: Client/loader/Dialogs.cpp:202
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "Tôi sẽ không cài đặt phầm mềm diệt vi-rút.\n"
+"Tôi muốn máy tính của tôi bị lag và là một phần của botnet."
 
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr ""
-
-#. Create the tabs
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-msgid "Internet"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Đã chọn"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Tất cả"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Bắt đầu"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Tiến trình tải xuống bản đồ:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Tiến độ tải xuống:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s trong số %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Ngắt kết nối để hủy tải xuống"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Không thể khởi động server cục bộ. Xem console để biết thêm thông tin."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Lỗi: Không thể khởi động server cục bộ. [%s]"
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Bạn có muốn tìm kiếm trợ giúp về vẫn đề này ở trên mạng không?"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "CONSOLE"
-
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Tiếng Việt"
-
-#: Client/core/CCredits.cpp:32
-msgid "Programming"
-msgstr "Lập trình"
-
-#: Client/core/CCredits.cpp:61
-msgid "Contributors"
-msgstr "Cộng tác viên"
-
-#: Client/core/CCredits.cpp:82
-msgid "Game Design / Scripting"
-msgstr "Thiết kế Game / Scripting"
-
-#: Client/core/CCredits.cpp:102
-msgid "Language Localization"
-msgstr "Ngôn ngữ bản địa hóa"
-
-#: Client/core/CCredits.cpp:108
-msgid "Patch contributors"
-msgstr "Người trợ giúp bản patch"
-
-#: Client/core/CCredits.cpp:232
-msgid "Special Thanks"
-msgstr "Lời cảm ơn sâu sắc"
-
-#: Client/core/CCredits.cpp:263
-msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
-
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr ""
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "Cập nhật các thông tin mới nhất"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Kết nối thất bại. Tài khoản không hợp lệ!"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Kết nối thất bại. Địa chỉ server không hợp lệ!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Kết nối đến %s tại port %u không thành công!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Đang kết nối đến %s:%u ..."
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Chưa cài đặt bản mod nào (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Phản hồi của server kém (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Phản hồi của server kém (1)"
-
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ LỆNH TRỢ GIÚP ]***\n"
-
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Thời gian %d:%02d:%02d"
-
-#: Client/core/CCommandFuncs.cpp:242
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "kết nối: Cú pháp là 'connect <host> [<port> <nick> <pass>]'"
-
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
-msgid "connect: Bad port number"
-msgstr "Kết nối: Số port nguy hiểm"
-
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "kết nối: Đang kết nối đến %s:%u..."
-
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "kết nối : không thể kết nối đến %s:%u!"
-
-#: Client/core/CCommandFuncs.cpp:281
-msgid "connect: Failed to unload current mod"
-msgstr "kết nối: Không thể gỡ bản mod hiện tại"
-
-#: Client/core/CCommandFuncs.cpp:371
-msgid "Bound all controls from GTA"
-msgstr "Ràng buộc tất cả các điều khiển từ GTA"
-
-#: Client/core/CCommandFuncs.cpp:385
-msgid "Saved configuration file"
-msgstr "Đã lưu file cấu hình"
-
-#. Print it
-#: Client/core/CCommandFuncs.cpp:451
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* Mã serial của bạn: %s"
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "Lệnh không hợp lệ được hoặc cvar: ~"
 
 #: Client/core/CMainMenu.cpp:322
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -1333,25 +695,6 @@ msgstr "Thao tác này sẽ ngắt kết nối bạn khỏi server đang kết n
 #: Client/core/CMainMenu.cpp:1167
 msgid "DISCONNECT WARNING"
 msgstr "CẢNH BÁO NGẮT KẾT NỐI"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Giao diện mà bạn chọn không thể sử dụng, và đồng thời giao diện mặc định cũng không hoạt động luôn, vui lòng cài đặt lại MTA."
-
-#: Client/core/CScreenShot.cpp:104
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ảnh chụp màn hình có dung lượng %d bytes, nhưng yêu cầu phải đạt %d"
-
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "Lỗi! không thể chụp màn hình"
-
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Ảnh đã được chụp: '%s'"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -1497,11 +840,6 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Đang chờ phản hồi  -  %-3d"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Lệnh không hợp lệ được hoặc cvar: ~"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1684,6 +1022,15 @@ msgstr "Âm lượng đàm thoại:"
 #: Client/core/CSettings.cpp:423 Client/core/CSettings.cpp:548
 msgid "Play mode:"
 msgstr "Chế độ:"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/core/CSettings.cpp:425 Client/core/CSettings.cpp:613
+#: Client/core/CSettings.cpp:887 Client/core/CSettings.cpp:2000
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+msgid "General"
+msgstr "Chung"
 
 #: Client/core/CSettings.cpp:526
 msgid "Radio options"
@@ -2446,116 +1793,32 @@ msgstr "Sửa chuột:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Sửa lỗi di chuyển chuột - Có thể cần khởi động lại máy tính"
 
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Lỗi nghiêm trọng"
+#: Client/core/CCredits.cpp:32
+msgid "Programming"
+msgstr "Lập trình"
 
-#: Client/core/CCore.cpp:890
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "ĐỂ SỬA, XÓA TỆP NÀY:"
+#: Client/core/CCredits.cpp:61
+msgid "Contributors"
+msgstr "Cộng tác viên"
 
-#: Client/core/CCore.cpp:922
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s mô-đun không hợp lệ!"
+#: Client/core/CCredits.cpp:82
+msgid "Game Design / Scripting"
+msgstr "Thiết kế Game / Scripting"
 
-#: Client/core/CCore.cpp:1227
-msgid "Error executing URL"
-msgstr "Lỗi thực thi URL"
+#: Client/core/CCredits.cpp:102
+msgid "Language Localization"
+msgstr "Ngôn ngữ bản địa hóa"
 
-#: Client/core/CCore.cpp:1239
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Lỗi khi chạy mod được chỉ ra ở command line ('%s')"
+#: Client/core/CCredits.cpp:108
+msgid "Patch contributors"
+msgstr "Người trợ giúp bản patch"
 
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
-msgid "this help screen"
-msgstr "màn hình trợ giúp này"
+#: Client/core/CCredits.cpp:232
+msgid "Special Thanks"
+msgstr "Lời cảm ơn sâu sắc"
 
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
-msgid "exits the application"
-msgstr "thoát khỏi ứng dụng"
-
-#: Client/core/CCore.cpp:1330
-msgid "shows the version"
-msgstr "hiển thị phiên bản"
-
-#: Client/core/CCore.cpp:1331
-msgid "shows the time"
-msgstr "hiển thị thời gian"
-
-#: Client/core/CCore.cpp:1332
-msgid "shows the hud"
-msgstr "hiển thị hud"
-
-#: Client/core/CCore.cpp:1333
-msgid "shows all the binds"
-msgstr "hiển thị tất cả các phím"
-
-#: Client/core/CCore.cpp:1334
-msgid "shows your serial"
-msgstr "hiển thị mã serial của bạn"
-
-#: Client/core/CCore.cpp:1343
-msgid "connects to a server (host port nick pass)"
-msgstr "kết nối đến một server (host port nick pass)"
-
-#: Client/core/CCore.cpp:1344
-msgid "connects to a previous server"
-msgstr "kết nối với server trước đó đã dùng"
-
-#: Client/core/CCore.cpp:1345
-msgid "binds a key (key control)"
-msgstr "gán một phím (điều khiển phím)"
-
-#: Client/core/CCore.cpp:1346
-msgid "unbinds a key (key)"
-msgstr "bỏ gán một key (key)"
-
-#: Client/core/CCore.cpp:1347
-msgid "copies the default gta controls"
-msgstr "Sao chép các phím điều khiển mặc định của gta"
-
-#: Client/core/CCore.cpp:1348
-msgid "outputs a screenshot"
-msgstr "Xuất ra một ảnh chụp màn hình"
-
-#: Client/core/CCore.cpp:1349
-msgid "immediately saves the config"
-msgstr "Lưu các thông tin tùy chỉnh ngay"
-
-#: Client/core/CCore.cpp:1351
-msgid "clears the debug view"
-msgstr "xóa các chế độ xem gỡ lỗi"
-
-#: Client/core/CCore.cpp:1352
-msgid "scrolls the chatbox upwards"
-msgstr "kéo khung trò chuyện lên"
-
-#: Client/core/CCore.cpp:1353
-msgid "scrolls the chatbox downwards"
-msgstr "kéo khung trò chuyện xuống"
-
-#: Client/core/CCore.cpp:1354
-msgid "scrolls the debug view upwards"
-msgstr "kéo khung xem debug lên"
-
-#: Client/core/CCore.cpp:1355
-msgid "scrolls the debug view downwards"
-msgstr "kéo khung xem debug xuống"
-
-#: Client/core/CCore.cpp:1358
-msgid "shows the memory statistics"
-msgstr "hiển thị thống kê bộ nhớ"
-
-#: Client/core/CCore.cpp:1359
-msgid "shows the frame timing graph"
-msgstr "hiển thị biểu đồ khung thời gian"
-
-#: Client/core/CCore.cpp:1363
-msgid "for developers: reload news"
+#: Client/core/CCredits.cpp:263
+msgid "This software and project makes use of the following libraries and software:"
 msgstr ""
 
 #: Client/core/CJoystickManager.cpp:1578
@@ -2565,6 +1828,16 @@ msgstr "Nút tăng tốc"
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
 msgstr "Nút phanh"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr ""
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+msgid "Visit latest news article"
+msgstr "Cập nhật các thông tin mới nhất"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2738,10 +2011,285 @@ msgstr "Điều khiển nhóm tiến"
 msgid "Group control backwards"
 msgstr "Nhóm điều khiển ngược"
 
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Ảnh chụp màn hình có dung lượng %d bytes, nhưng yêu cầu phải đạt %d"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Lỗi! không thể chụp màn hình"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Ảnh đã được chụp: '%s'"
+
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ LỆNH TRỢ GIÚP ]***\n"
+
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Thời gian %d:%02d:%02d"
+
+#: Client/core/CCommandFuncs.cpp:242
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "kết nối: Cú pháp là 'connect <host> [<port> <nick> <pass>]'"
+
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+msgid "connect: Bad port number"
+msgstr "Kết nối: Số port nguy hiểm"
+
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "kết nối: Đang kết nối đến %s:%u..."
+
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "kết nối : không thể kết nối đến %s:%u!"
+
+#: Client/core/CCommandFuncs.cpp:281
+msgid "connect: Failed to unload current mod"
+msgstr "kết nối: Không thể gỡ bản mod hiện tại"
+
+#: Client/core/CCommandFuncs.cpp:371
+msgid "Bound all controls from GTA"
+msgstr "Ràng buộc tất cả các điều khiển từ GTA"
+
+#: Client/core/CCommandFuncs.cpp:385
+msgid "Saved configuration file"
+msgstr "Đã lưu file cấu hình"
+
+#. Print it
+#: Client/core/CCommandFuncs.cpp:451
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Mã serial của bạn: %s"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Bạn có muốn tìm kiếm trợ giúp về vẫn đề này ở trên mạng không?"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Tiếng Việt"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Kết nối thất bại. Tài khoản không hợp lệ!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Kết nối thất bại. Địa chỉ server không hợp lệ!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Kết nối đến %s tại port %u không thành công!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Đang kết nối đến %s:%u ..."
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+msgid "CONNECTING"
+msgstr "ĐANG KẾT NỐI"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+msgid "Connection timed out"
+msgstr "Hết thời gian kết nối"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+msgid "Disconnected: unknown protocol error"
+msgstr "Ngắt kết nối: giao thức không hợp lệ"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+msgid "Disconnected: disconnected remotely"
+msgstr "Ngắt kết nối: ngắt kết nối từ xa"
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
+msgid "Disconnected: connection lost remotely"
+msgstr "Ngắt kết nối: mất kết nối từ xa"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+msgid "Disconnected: you are banned from this server"
+msgstr "Ngắt kết nối: bạn bị cấm khỏi server này"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
+msgid "Disconnected: disconnected from the server"
+msgstr "Ngắt kết nối: ngắt kết nối khỏi server"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+msgid "Disconnected: connection to the server was lost"
+msgstr "Đã ngắt kết nối: không thể kết nối đến server"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+msgid "Disconnected: connection was refused"
+msgstr "Đã ngắt kết nối: kết nối đã bị từ chối"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Chưa cài đặt bản mod nào (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Phản hồi của server kém (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Phản hồi của server kém (1)"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Giao diện mà bạn chọn không thể sử dụng, và đồng thời giao diện mặc định cũng không hoạt động luôn, vui lòng cài đặt lại MTA."
+
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Lỗi nghiêm trọng"
+
+#: Client/core/CCore.cpp:890
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "ĐỂ SỬA, XÓA TỆP NÀY:"
+
+#: Client/core/CCore.cpp:922
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s mô-đun không hợp lệ!"
+
+#: Client/core/CCore.cpp:1227
+msgid "Error executing URL"
+msgstr "Lỗi thực thi URL"
+
+#: Client/core/CCore.cpp:1239
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Lỗi khi chạy mod được chỉ ra ở command line ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1327
+msgid "this help screen"
+msgstr "màn hình trợ giúp này"
+
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+msgid "exits the application"
+msgstr "thoát khỏi ứng dụng"
+
+#: Client/core/CCore.cpp:1330
+msgid "shows the version"
+msgstr "hiển thị phiên bản"
+
+#: Client/core/CCore.cpp:1331
+msgid "shows the time"
+msgstr "hiển thị thời gian"
+
+#: Client/core/CCore.cpp:1332
+msgid "shows the hud"
+msgstr "hiển thị hud"
+
+#: Client/core/CCore.cpp:1333
+msgid "shows all the binds"
+msgstr "hiển thị tất cả các phím"
+
+#: Client/core/CCore.cpp:1334
+msgid "shows your serial"
+msgstr "hiển thị mã serial của bạn"
+
+#: Client/core/CCore.cpp:1343
+msgid "connects to a server (host port nick pass)"
+msgstr "kết nối đến một server (host port nick pass)"
+
+#: Client/core/CCore.cpp:1344
+msgid "connects to a previous server"
+msgstr "kết nối với server trước đó đã dùng"
+
+#: Client/core/CCore.cpp:1345
+msgid "binds a key (key control)"
+msgstr "gán một phím (điều khiển phím)"
+
+#: Client/core/CCore.cpp:1346
+msgid "unbinds a key (key)"
+msgstr "bỏ gán một key (key)"
+
+#: Client/core/CCore.cpp:1347
+msgid "copies the default gta controls"
+msgstr "Sao chép các phím điều khiển mặc định của gta"
+
+#: Client/core/CCore.cpp:1348
+msgid "outputs a screenshot"
+msgstr "Xuất ra một ảnh chụp màn hình"
+
+#: Client/core/CCore.cpp:1349
+msgid "immediately saves the config"
+msgstr "Lưu các thông tin tùy chỉnh ngay"
+
+#: Client/core/CCore.cpp:1351
+msgid "clears the debug view"
+msgstr "xóa các chế độ xem gỡ lỗi"
+
+#: Client/core/CCore.cpp:1352
+msgid "scrolls the chatbox upwards"
+msgstr "kéo khung trò chuyện lên"
+
+#: Client/core/CCore.cpp:1353
+msgid "scrolls the chatbox downwards"
+msgstr "kéo khung trò chuyện xuống"
+
+#: Client/core/CCore.cpp:1354
+msgid "scrolls the debug view upwards"
+msgstr "kéo khung xem debug lên"
+
+#: Client/core/CCore.cpp:1355
+msgid "scrolls the debug view downwards"
+msgstr "kéo khung xem debug xuống"
+
+#: Client/core/CCore.cpp:1358
+msgid "shows the memory statistics"
+msgstr "hiển thị thống kê bộ nhớ"
+
+#: Client/core/CCore.cpp:1359
+msgid "shows the frame timing graph"
+msgstr "hiển thị biểu đồ khung thời gian"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr ""
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "CONSOLE"
+
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
 msgstr "TRÌNH DUYỆT CỦA SERVER"
+
+#. Create the tabs
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+msgid "Internet"
+msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
@@ -2888,6 +2436,13 @@ msgstr "Giao thức không xác định"
 msgid "Please use the mtasa:// protocol!"
 msgstr "Hãy sử dụng giao thức mtasa:// !"
 
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/mods/deathmatch/logic/CClientGame.cpp:591
+#: Client/mods/deathmatch/logic/CClientGame.cpp:689
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Nickname không hợp lệ! Hãy vào Cài Đặt và tạo cái mới!"
+
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Bạn phải chọn một server nào đó để có thể kết nối."
@@ -3028,6 +2583,452 @@ msgid "Could not initialize Direct3D9.\n\n"
 msgstr "Không thể thiết lập Direct3D9.\n\n"
 "Hãy chắc chắn rằng DirectX End-User Runtime và\n"
 "bản Windows Service Packs mới nhất đã được cài đặt."
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1381
+msgid "Problem with graphics driver"
+msgstr "Vấn đề với trình điều khiển đồ họa"
+
+#: Client/mods/deathmatch/CClient.cpp:36
+msgid "This version has expired."
+msgstr "Phiên bản này đã hết hạn."
+
+#: Client/mods/deathmatch/CClient.cpp:56
+msgid "disconnect from the game"
+msgstr "ngắt kết nối khỏi game"
+
+#: Client/mods/deathmatch/CClient.cpp:57
+msgid "shows the nametags"
+msgstr "hiển thị thẻ gắn tên"
+
+#: Client/mods/deathmatch/CClient.cpp:58
+msgid "shows the chatbox"
+msgstr "hiển thị chatbox"
+
+#: Client/mods/deathmatch/CClient.cpp:59
+msgid "shows the network statistics"
+msgstr "hiển thị thống kê mạng"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: Client/mods/deathmatch/CClient.cpp:63
+msgid "open the chat input"
+msgstr "mở khung nhập chữ chat"
+
+#: Client/mods/deathmatch/CClient.cpp:64
+msgid "transmits voice to other players"
+msgstr "truyền giọng nói cho người chơi khác"
+
+#: Client/mods/deathmatch/CClient.cpp:65
+msgid "enters a car as passenger"
+msgstr "đi vào xe hơi như hành khách"
+
+#: Client/mods/deathmatch/CClient.cpp:66
+msgid "next radio channel"
+msgstr "kênh radio tiếp theo"
+
+#: Client/mods/deathmatch/CClient.cpp:67
+msgid "previous radio channel"
+msgstr "kênh radio trước"
+
+#: Client/mods/deathmatch/CClient.cpp:68
+msgid "enables the radar view"
+msgstr "bật góc nhìn radar"
+
+#: Client/mods/deathmatch/CClient.cpp:69
+msgid "zooms the radar in"
+msgstr "Phóng to radar"
+
+#: Client/mods/deathmatch/CClient.cpp:70
+msgid "zooms the radar out"
+msgstr "Thu nhỏ radar"
+
+#: Client/mods/deathmatch/CClient.cpp:71
+msgid "moves the radar north"
+msgstr "di chuyển radar về phía bắc"
+
+#: Client/mods/deathmatch/CClient.cpp:72
+msgid "moves the radar south"
+msgstr "di chuyển radar về phía nam"
+
+#: Client/mods/deathmatch/CClient.cpp:73
+msgid "moves the radar east"
+msgstr "di chuyển radar về phía đông"
+
+#: Client/mods/deathmatch/CClient.cpp:74
+msgid "moves the radar west"
+msgstr "di chuyển radar về phía tây"
+
+#: Client/mods/deathmatch/CClient.cpp:75
+msgid "attaches the radar"
+msgstr "gắn radar"
+
+#: Client/mods/deathmatch/CClient.cpp:76
+msgid "reduces radar opacity"
+msgstr "giảm độ mờ của radar"
+
+#: Client/mods/deathmatch/CClient.cpp:77
+msgid "increases radar opacity"
+msgstr "tăng độ mờ của radar"
+
+#: Client/mods/deathmatch/CClient.cpp:78
+msgid "toggles radar help text"
+msgstr "chuyển đổi văn bản trợ giúp radar"
+
+#: Client/mods/deathmatch/CClient.cpp:79
+msgid "sends a message to the targetted player"
+msgstr "gửi tin nhắn đến trình phát được nhắm mục tiêu"
+
+#: Client/mods/deathmatch/CClient.cpp:80
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "thay đổi vũ khí tiếp theo khi đang ở trong xe"
+
+#: Client/mods/deathmatch/CClient.cpp:81
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "thay đổi vũ khí trước đó khi đang ở trong xe"
+
+#: Client/mods/deathmatch/CClient.cpp:82
+msgid "outputs info about the current server"
+msgstr "thông tin đầu ra của server hiện tại"
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: Client/mods/deathmatch/CClient.cpp:85
+msgid "defines the scale multiplier of all text-displays"
+msgstr "xác định tỉ lệ số nhân của tất cả các chữ hiển thị"
+
+#. Development mode
+#: Client/mods/deathmatch/CClient.cpp:92
+msgid "(Development mode) shows the colshapes"
+msgstr "(Chế độ dev) hiển thị colshapes"
+
+#: Client/mods/deathmatch/CClient.cpp:93
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(Chế độ phát triển) in id âm thanh thế giới vào cửa sổ gỡ lỗi"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:487
+msgid "Disconnected: Invalid nickname"
+msgstr "Đã ngắt kết nối: nickname không hợp lệ"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:491
+msgid "Disconnect from server"
+msgstr "Ngắt kết nối khỏi server"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:495
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "Đã ngắt kết nối: Serial đã bị cấm.\n"
+"Lý do: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:501
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "Đã ngắt kết nối: Bạn đã bị cấm.\n"
+"Lý do: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "Đã ngắt kết nối: Tài khoản đã bị cấm.\n"
+"Lý do: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:512
+msgid "Disconnected: Version mismatch"
+msgstr "Đã ngắt kết nối: Phiên bản không khớp"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:516
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "Đã ngắt kết nối: Join flood. Vui lòng chờ trong giây lát, rồi thử lại sau."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "Đã ngắt kết nối: Server từ các nhánh khác nhau.\n"
+"Thông tin: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "Đã ngắt kết nối: Phiên bản không hợp lệ.\n"
+"Thông tin: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "Đã ngắt kết nối: Server đang sử dụng phiên bản MTA mới hơn.\n"
+"Thông tin: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "Đã ngắt kết nối: Server đang sử dụng phiên bản MTA cũ hơn.\n"
+"Thông tin: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:540
+msgid "Disconnected: Nick already in use"
+msgstr "Đã ngắt kết nối: Nickname đã được sử dụng"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
+msgid "Disconnected: Player element could not be created."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Đã ngắt kết nối: Server hủy kết nối: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
+msgid "Disconnected: Serial verification failed"
+msgstr "Đã ngắt kết nối: Không thể xác minh serial"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:557
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "Đã ngắt kết nối: Kết nối không đồng bộ %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "Đã ngắt kết nối: Bạn đã bị kick bởi %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "Đã ngắt kết nối: Bạn đã bị cấm bởi %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "Đã ngắt kết nối: Server bảo trì hoặc đang khởi động lại"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+msgid "You were kicked from the game"
+msgstr "Bạn đã bị kick khỏi game"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:615
+msgid "Please replace gta_sa.exe"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+msgid "This server does not allow virtual machines"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+msgid "This server requires driver signing to be enabled"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+msgid "Please restart your PC"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+msgid "This server has detected missing anti-cheat components"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+msgid "Try restarting MTA"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+msgid "Please replace gta3.img or gta_int.img"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:616
+msgid "This server does not allow Wine"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:617
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+msgid "Time Remaining: "
+msgstr "Thời gian còn lại:"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:641
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d ngày"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:643
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d giờ"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:645
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "% d phút%d phút"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d giây"
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
+msgid "Disconnected"
+msgstr "Đã ngắt kết nối"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Tiến trình tải xuống bản đồ:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Tiến độ tải xuống:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s trong số %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Ngắt kết nối để hủy tải xuống"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Lỗi tải xuống: %s"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Không thể khởi động server cục bộ. Xem console để biết thêm thông tin."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Lỗi: Không thể khởi động server cục bộ. [%s]"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr ""
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Tên server:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Mật khẩu:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Người chơi tối đa:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Đã chọn"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Tất cả"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Bắt đầu"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+msgid "Entering the game ..."
+msgstr "Đang vào game ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Không thể kết nối; Chọn Kết nối server hoặc dùng lệnh 'kết nối' để kết nối đến server."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:711
+msgid "The server is not installed"
+msgstr "Server chưa cài đặt"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:721
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
+msgid "Local Server"
+msgstr "Server cục bộ"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:721
+msgid "Starting local server ..."
+msgstr "Đang khởi động server cục bộ ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "Bạn đã bị kick khỏi game ( %s )"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
+msgid "Connecting to local server..."
+msgstr "Đang kết nối đến server cục bộ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+msgid "Error connecting to server."
+msgstr "Lỗi khi kết nối đến server."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1120
+msgid "Connecting to local server timed out. See console for details."
+msgstr "Hết thời gian kết nối đến server cục bộ. Xem console để biết thêm thông tin."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1226
+msgid "Connection with the server was lost"
+msgstr "Không thể kết nối đến server"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+msgid "Disconnected: the server is currently full"
+msgstr "Đã ngắt kết nối: server hiện đã đầy người chơi"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1265
+msgid "Disconnected: invalid password specified"
+msgstr "Đã ngắt kết nối: mật khẩu không hợp lệ được chỉ định"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+msgid "MTA Client verification failed!"
+msgstr "Không thể xác minh Client MTA!"
 
 #: Client/game_sa/CSettingsSA.cpp:804
 msgid "Can't find valid screen resolution."
