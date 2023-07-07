@@ -450,8 +450,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     // Write the vehicle
                     unsigned short usVehicleModel = pVehicle->GetModel();
-                    if (CVehicleManager::IsValidModel(usVehicleModel))
-                        BitStream.Write(usVehicleModel);
+                    assert(CVehicleManager::IsValidModel(usVehicleModel));
+                    BitStream.Write(usVehicleModel);
 
                     // Health
                     SVehicleHealthSync health;
