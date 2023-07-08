@@ -1777,9 +1777,33 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             CClientPed* pJacked = pVehicle->GetOccupant(ucSeat);
 
                             // If it's the local player or syncing ped getting jacked, reset some stuff
-                            if (pJacked && (pJacked->IsLocalPlayer() || pJacked->IsSyncing()))
-                            {
-                                pJacked->ResetVehicleInOut();
+                            if (pJacked)
+                                if ((pJacked->IsLocalPlayer() || pJacked->IsSyncing()))
+                                {
+                                    pJacked->ResetVehicleInOut();
+                                }
+                                else {
+                                // Desynced? Outside but supposed to be in
+                                // For local player or synced peds this is taken care of in CClientPed::UpdateVehicleInOut()
+                                if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle())
+                                {
+                                    // Warp him back in
+                                    pJacked->WarpIntoVehicle(pJacked->GetOccupiedVehicle(), pJacked->GetOccupiedVehicleSeat());
+
+                                    // For bikes and cars where jacked through passenger door, warp the passenger back in if desynced
+                                    if (ucSeat == 0)
+                                    {
+                                        CClientPed* pPassenger = pJacked->GetOccupiedVehicle()->GetOccupant(1);
+                                        if (pPassenger &&
+                                            !pPassenger->IsLocalPlayer() &&
+                                            !pPassenger->IsSyncing() &&
+                                            pPassenger->GetOccupiedVehicle() &&
+                                            !pPassenger->GetRealOccupiedVehicle())
+                                        {
+                                            pPassenger->WarpIntoVehicle(pPassenger->GetOccupiedVehicle(), pPassenger->GetOccupiedVehicleSeat());
+                                        }
+                                    }
+                                }
                             }
                         }
 
