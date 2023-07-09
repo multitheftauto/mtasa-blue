@@ -5,8 +5,7 @@
 
 namespace lunasvg {
 
-class StopElement : public StyledElement
-{
+class StopElement : public StyledElement {
 public:
     StopElement();
 

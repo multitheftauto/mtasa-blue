@@ -5,8 +5,7 @@
 
 namespace lunasvg {
 
-class StyledElement : public Element
-{
+class StyledElement : public Element {
 public:
     StyledElement(ElementID id);
 
