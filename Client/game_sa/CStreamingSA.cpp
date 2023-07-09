@@ -50,9 +50,10 @@ namespace
         }
     };
 
-    constexpr size_t MAX_IMAGES_NUM = 0xFF;
-    constexpr size_t MAX_STREAMS_NUM = 0xFF;
-    constexpr size_t STREAM_HANDLES_FACTOR = 4;
+    constexpr size_t RESERVED_STREAMS_NUM = 10; // GTA3 + 9 SFX archives(FEET, GENRL, PAIN_A, SCRIPT, SPC_EA, SPC_FA, SPC_GA, SPC_NA, SPC_PA)
+    constexpr size_t MAX_STREAMS_NUM = 255;
+    constexpr size_t MAX_IMAGES_NUM = MAX_STREAMS_NUM - RESERVED_STREAMS_NUM;
+    constexpr size_t MIN_IMAGES_NUM = 6; // GTA3(yes, it is presented twice), GTA_INT, CARREC, SCRIPT, CUTSCENE, PLAYER
 } // namespace
 
 bool IsUpgradeModelId(DWORD dwModelID)
@@ -62,26 +63,25 @@ bool IsUpgradeModelId(DWORD dwModelID)
 
 CStreamingSA::CStreamingSA()
 {
-    SetArchivesNum(VAR_DefaultMaxArchives);
+    SetArchivesNum(MIN_IMAGES_NUM);
 
     // Copy the default data
     HANDLE (&defaultStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010;
     SStreamName (&defaultStreamingNames)[32] = *(SStreamName(*)[32])0x8E4098;
     CArchiveInfo (&defaultAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8;
 
-    assert(m_StreamHandles.size() == VAR_DefaultStreamHandlersMaxCount);
-    assert(m_StreamNames.size() == VAR_DefaultStreamHandlersMaxCount);
-    assert(m_Imgs.size() == VAR_DefaultMaxArchives);
-
-    std::memcpy(m_StreamHandles.data(), defaultStreamingHandlers, sizeof(HANDLE) * VAR_DefaultStreamHandlersMaxCount);
-    std::memcpy(m_StreamNames.data(), defaultStreamingNames, sizeof(SStreamName) * VAR_DefaultStreamHandlersMaxCount);
-    std::memcpy(m_Imgs.data(), defaultAchiveInfo, sizeof(CArchiveInfo) * VAR_DefaultMaxArchives);
+    std::memcpy(m_StreamHandles.data(), defaultStreamingHandlers,
+        sizeof(HANDLE) * std::min(m_StreamHandles.size(), (size_t)VAR_DefaultStreamHandlersMaxCount));
+    std::memcpy(m_StreamNames.data(), defaultStreamingNames,
+        sizeof(SStreamName) *  std::min(m_StreamNames.size(), (size_t)VAR_DefaultStreamHandlersMaxCount));
+    std::memcpy(m_Imgs.data(), defaultAchiveInfo,
+        sizeof(CArchiveInfo) * std::min(m_Imgs.size(), (size_t)VAR_DefaultMaxArchives));
 }
 
 void CStreamingSA::SetArchivesNum(size_t imagesNum)
 {
-    if (imagesNum > MAX_IMAGES_NUM)
-        return;    
+    if (imagesNum < MIN_IMAGES_NUM || imagesNum > MAX_IMAGES_NUM)
+        return;
 
     /*
         IMGs
@@ -149,7 +149,7 @@ void CStreamingSA::SetArchivesNum(size_t imagesNum)
     /*
         Stream handles
     */
-    const size_t handlesNum = std::min(imagesNum * STREAM_HANDLES_FACTOR, MAX_STREAMS_NUM);
+    const size_t handlesNum = std::min(imagesNum + RESERVED_STREAMS_NUM, MAX_STREAMS_NUM);
     if (m_StreamHandles.size() != handlesNum)
     {
         try
