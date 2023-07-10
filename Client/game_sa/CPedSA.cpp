@@ -27,12 +27,14 @@ extern CGameSA* pGame;
 
 int g_bOnlyUpdateRotations = false;
 
-CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL), m_iCustomMoveAnim(0)
+CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL),
+m_pDefaultPedSound(NULL), m_iCustomMoveAnim(0)
 {
     MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
 
-CPedSA::CPedSA(CPedSAInterface* pPedInterface) : m_pPedIntelligence(NULL), m_pPedInterface(pPedInterface), m_pPedSound(NULL), m_iCustomMoveAnim(0)
+CPedSA::CPedSA(CPedSAInterface* pPedInterface) : m_pPedIntelligence(NULL), m_pPedInterface(pPedInterface),
+m_pPedSound(NULL), m_pDefaultPedSound(NULL), m_iCustomMoveAnim(0)
 {
     MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
@@ -48,6 +50,8 @@ CPedSA::~CPedSA()
         delete m_pPedIntelligence;
     if (m_pPedSound)
         delete m_pPedSound;
+    if (m_pDefaultPedSound)
+        delete m_pDefaultPedSound;
 
     for (int i = 0; i < WEAPONSLOT_MAX; i++)
     {
@@ -90,6 +94,7 @@ void CPedSA::Init()
     CPedIntelligenceSAInterface* m_pPedIntelligenceInterface = (CPedIntelligenceSAInterface*)(dwPedIntelligence);
     m_pPedIntelligence = new CPedIntelligenceSA(m_pPedIntelligenceInterface, this);
     m_pPedSound = new CPedSoundSA(&pedInterface->pedSound);
+    m_pDefaultPedSound = new CPedSoundSA(&pedInterface->pedSound);
 
     for (int i = 0; i < WEAPONSLOT_MAX; i++)
         m_pWeapons[i] = new CWeaponSA(&(pedInterface->Weapons[i]), this, (eWeaponSlot)i);
@@ -464,9 +469,14 @@ void CPedSA::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
         eWeaponSlot currentSlot = GetCurrentWeaponSlot();
         if (weaponSlot != GetCurrentWeaponSlot())
         {
-            CWeapon* pWeapon = GetWeapon(currentSlot);
-            if (pWeapon)
-                RemoveWeaponModel(pWeapon->GetInfo(WEAPONSKILL_STD)->GetModel());
+            CWeapon* weapon = GetWeapon(currentSlot);
+            if (weapon)
+            {
+                CWeaponInfo* weaponInfo = weapon->GetInfo(WEAPONSKILL_STD);
+
+                if (weaponInfo)
+                    RemoveWeaponModel(weaponInfo->GetModel());
+            }
 
             CPedSAInterface* thisPed = (CPedSAInterface*)GetInterface();
 
@@ -939,6 +949,11 @@ void CPedSA::SetVoice(const char* szVoiceType, const char* szVoice)
     if (sVoiceID < 0)
         return;
     SetVoice(sVoiceType, sVoiceID);
+}
+
+void CPedSA::ResetVoice()
+{
+    SetVoice(m_pDefaultPedSound->GetVoiceTypeID(), m_pDefaultPedSound->GetVoiceID());
 }
 
 // GetCurrentWeaponStat will only work if the game ped context is currently set to this ped

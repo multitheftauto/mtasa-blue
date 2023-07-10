@@ -5,7 +5,7 @@ project "curl"
 	targetname "curl"
 
 	includedirs { "include", "lib", "../mbedtls/include", "../zlib" }
-	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H", "HAVE_CONFIG_H" }
+	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H", "HAVE_CONFIG_H", "CURL_DISABLE_LIBCURL_OPTION" }
 	warnings "off"
 
 	files {
@@ -28,7 +28,7 @@ project "curl"
 	}
 
 	filter { "system:windows" }
-		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI", "USE_WIN32_IDN", "WANT_IDN_PROTOTYPES" }
+		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI", "USE_WIN32_IDN" }
 		links { "crypt32", "Normaliz" }
 
 	filter { "system:not windows" }
