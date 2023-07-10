@@ -12,23 +12,23 @@
 // IMPLEMENTATION of Lua dynamic modules
 
 #ifndef WIN32
-typedef void* HMODULE;
+using HMODULE = void*;
 #endif
 
 class CLuaModule;
 
 #pragma once
 
-#include "ILuaModuleManager.h"
+#include <modules/IModuleManager.h>
 
 class CScriptDebugging;
 class CLuaModuleManager;
 
 struct lua_State;
 
-typedef bool (*DefaultModuleFunc)();
-typedef void (*RegisterModuleFunc)(lua_State*);
-typedef bool (*InitModuleFunc)(ILuaModuleManager*, char*, char*, float*);
+using DefaultModuleFunc = bool (*)();
+using RegisterModuleFunc = void (*)(lua_State*);
+using InitModuleFunc = bool (*)(ILuaModuleManager*, char*, char*, float*);
 
 struct FunctionInfo
 {
@@ -53,16 +53,15 @@ public:
     CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* pScriptDebugging, const char* szFileName, const char* szShortFileName);
     virtual ~CLuaModule();
 
-    // functions for external modules until DP2.3
     void Printf(const char* szFormat, ...) const noexcept;
     void ErrorPrintf(const char* szFormat, ...) const noexcept;
     void DebugPrintf(lua_State* luaVM, const char* szFormat, ...) const noexcept;
 
     bool        RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func);
-    std::string GetResourceName(lua_State* luaVM) const noexcept;
+    std::optional<std::string> GetResourceName(lua_State* luaVM) const noexcept;
 
-    CChecksum GetResourceMetaChecksum(lua_State* luaVM) const noexcept;
-    CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept;
+    std::optional<CChecksum> GetResourceMetaChecksum(lua_State* luaVM) const noexcept;
+    std::optional<CChecksum> GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept;
 
     // functions for external modules until 1.0
     ulong       GetVersion() const noexcept;

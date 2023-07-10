@@ -15,12 +15,15 @@ class CLuaModuleManager;
 
 #pragma once
 
-#include "CLuaMain.h"
-#include "ILuaModuleManager.h"
-#include "CLuaManager.h"
-#include "../CLogger.h"
-#include "../CResource.h"
-#include "CLuaModule.h"
+// Core headers
+#include <lua/CLuaMain.h>
+#include <lua/CLuaManager.h>
+#include <CLogger.h>
+#include <CResource.h>
+
+// Server SDK headers
+#include <modules/CLuaModule.h>
+#include <modules/IModuleManager.h>
 
 class CScriptDebugging;
 

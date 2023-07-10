@@ -77,16 +77,16 @@ int CLuaModule::_LoadModule()
     SString strSavedCurrentDirectory = GetSystemCurrentDirectory();
     SetCurrentDirectory(PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD));
     m_hModule = LoadLibrary(m_szFileName);
-    if (m_hModule == NULL)
+    if (!m_hModule)
         strError = SString("%d", GetLastError());
     SetCurrentDirectory(strSavedCurrentDirectory);
 #else
     m_hModule = dlopen(m_szFileName, RTLD_NOW);
-    if (m_hModule == NULL)
+    if (!m_hModule)
         strError = dlerror();
 #endif
 
-    if (m_hModule == NULL)
+    if (!m_hModule)
     {
         // Module failed to load
         SString strExpectedPathFilename = PathJoin(SERVER_BIN_PATH_MOD, "modules", m_szShortFileName);
@@ -118,7 +118,7 @@ int CLuaModule::_LoadModule()
     // Find the initialisation function
 #ifdef WIN32
     pfnInitFunc = (InitModuleFunc)(GetProcAddress(m_hModule, "InitModule"));
-    if (pfnInitFunc == NULL)
+    if (!pfnInitFunc)
     {
         CLogger::LogPrintf("MODULE: Unable to initialize %s!\n", *PathJoin(SERVER_BIN_PATH_MOD, "modules", m_szShortFileName));
         return 2;
@@ -136,35 +136,35 @@ int CLuaModule::_LoadModule()
     m_FunctionInfo.szFileName = m_szShortFileName;
 #ifdef WIN32
     m_FunctionInfo.DoPulse = (DefaultModuleFunc)(GetProcAddress(m_hModule, "DoPulse"));
-    if (m_FunctionInfo.DoPulse == NULL)
+    if (!m_FunctionInfo.DoPulse)
         return 3;
     m_FunctionInfo.ShutdownModule = (DefaultModuleFunc)(GetProcAddress(m_hModule, "ShutdownModule"));
-    if (m_FunctionInfo.ShutdownModule == NULL)
+    if (!m_FunctionInfo.ShutdownModule)
         return 4;
     m_FunctionInfo.RegisterFunctions = (RegisterModuleFunc)(GetProcAddress(m_hModule, "RegisterFunctions"));
-    if (m_FunctionInfo.RegisterFunctions == NULL)
+    if (!m_FunctionInfo.RegisterFunctions)
         return 5;
 
     m_FunctionInfo.ResourceStopping = (RegisterModuleFunc)(GetProcAddress(m_hModule, "ResourceStopping"));
     // No error for backward compatibility
-    // if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
+    // if ( !m_FunctionInfo.ResourceStopping ) return 6;
     m_FunctionInfo.ResourceStopped = (RegisterModuleFunc)(GetProcAddress(m_hModule, "ResourceStopped"));
-    // if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
+    // if ( !m_FunctionInfo.ResourceStopped ) return 7;
 #else
     m_FunctionInfo.DoPulse = (DefaultModuleFunc)(dlsym(m_hModule, "DoPulse"));
-    if (m_FunctionInfo.DoPulse == NULL)
+    if (!m_FunctionInfo.DoPulse)
         return 3;
     m_FunctionInfo.ShutdownModule = (DefaultModuleFunc)(dlsym(m_hModule, "ShutdownModule"));
-    if (m_FunctionInfo.ShutdownModule == NULL)
+    if (!m_FunctionInfo.ShutdownModule)
         return 4;
     m_FunctionInfo.RegisterFunctions = (RegisterModuleFunc)(dlsym(m_hModule, "RegisterFunctions"));
-    if (m_FunctionInfo.RegisterFunctions == NULL)
+    if (!m_FunctionInfo.RegisterFunctions)
         return 5;
 
     m_FunctionInfo.ResourceStopping = (RegisterModuleFunc)(dlsym(m_hModule, "ResourceStopping"));
-    // if ( m_FunctionInfo.ResourceStopping == NULL ) return 6;
+    // if ( !m_FunctionInfo.ResourceStopping ) return 6;
     m_FunctionInfo.ResourceStopped = (RegisterModuleFunc)(dlsym(m_hModule, "ResourceStopped"));
-    // if ( m_FunctionInfo.ResourceStopped == NULL ) return 7;
+    // if ( !m_FunctionInfo.ResourceStopped ) return 7;
 #endif
     // Run initialisation function
     if (!pfnInitFunc(this, &m_FunctionInfo.szModuleName[0], &m_FunctionInfo.szAuthor[0], &m_FunctionInfo.fVersion))
@@ -238,10 +238,9 @@ void CLuaModule::_ResourceStopped(lua_State* luaVM)
 bool CLuaModule::_DoesFunctionExist(const char* szFunctionName)
 {
     for (const auto& iter : m_Functions)
-    {
         if (!strcmp(iter.c_str(), szFunctionName))
             return true;
-    }
+
     return false;
 }
 
@@ -292,23 +291,23 @@ bool CLuaModule::RegisterFunction(lua_State* luaVM, const char* szFunctionName, 
     return true;
 }
 
-std::string CLuaModule::GetResourceName(lua_State* luaVM) const noexcept
+std::optional<std::string> CLuaModule::GetResourceName(lua_State* luaVM) const noexcept
 {
     if (!luaVM)
-        return "";
+        return nullptr;
 
     CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
     if (!pLuaMain)
-        return "";
+        return nullptr;
 
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return "";
+        return nullptr;
 
     return pResource->GetName();
 }
 
-CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM) const noexcept
+std::optional<CChecksum> CLuaModule::GetResourceMetaChecksum(lua_State* luaVM) const noexcept
 {
     if (!luaVM)
         return {};
@@ -324,7 +323,7 @@ CChecksum CLuaModule::GetResourceMetaChecksum(lua_State* luaVM) const noexcept
     return pResource ? pResource->GetLastMetaChecksum() : CChecksum();
 }
 
-CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept
+std::optional<CChecksum> CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept
 {
     if (!luaVM)
         return {};
@@ -339,10 +338,9 @@ CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFi
 
     auto iter = pResource->IterBegin();
     for (; iter != pResource->IterEnd(); ++iter)
-    {
         if (!strcmp((*iter)->GetName(), szFile))
             return (*iter)->GetLastChecksum();
-    }
+
     return CChecksum();
 }
 
