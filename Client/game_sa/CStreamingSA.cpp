@@ -417,13 +417,13 @@ unsigned char CStreamingSA::AddArchive(const char* szFilePath)
     return ucArchiveId;
 }
 
-void CStreamingSA::RemoveArchive(unsigned char ucArhiveID)
+void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 {
-    unsigned int uiStreamHandlerID = m_Imgs[ucArhiveID].uiStreamHandleId >> 24;
+    unsigned int uiStreamHandlerID = m_Imgs[ucArchiveID].uiStreamHandleId >> 24;
     if (!uiStreamHandlerID)
         return;
 
-    m_Imgs[ucArhiveID].uiStreamHandleId = 0;
+    m_Imgs[ucArchiveID].uiStreamHandleId = 0;
 
     CloseHandle(m_StreamHandles[uiStreamHandlerID]);
     m_StreamHandles[uiStreamHandlerID] = nullptr;

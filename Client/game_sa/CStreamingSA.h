@@ -70,7 +70,7 @@ public:
     unsigned char   GetUnusedArchive();
     unsigned char   GetUnusedStreamHandle();
     unsigned char   AddArchive(const char* szFilePath);
-    void            RemoveArchive(unsigned char ucStreamHandler);
+    void            RemoveArchive(unsigned char ucArchiveID);
     void            SetStreamingBufferSize(uint32 uiSize);
     uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; }; // In bytes
 
