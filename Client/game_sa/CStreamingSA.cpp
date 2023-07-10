@@ -195,7 +195,7 @@ void CStreamingSA::SetArchivesNum(size_t imagesNum)
 
         MemPutFast<BYTE>((void*)(dwExeCodePtr + 15), (BYTE)0x46);
         MemPutFast<WORD>((void*)(dwExeCodePtr + 16), (WORD)0xFE81);
-        MemPutFast<DWORD>((void*)(dwExeCodePtr + 18), (DWORD)399); // MAX_NUMBER_OF_STREAM_HANDLES
+        MemPutFast<DWORD>((void*)(dwExeCodePtr + 18), (DWORD)(handlesNum - 1)); // MAX_NUMBER_OF_STREAM_HANDLES
 
         MemPutFast<BYTE>((void*)(dwExeCodePtr + 22), (BYTE)0x7C);
         MemPutFast<BYTE>((void*)(dwExeCodePtr + 23), (BYTE)(dwExeCodePtr - (dwExeCodePtr+24)));
