@@ -63,7 +63,8 @@ bool IsUpgradeModelId(DWORD dwModelID)
 
 CStreamingSA::CStreamingSA()
 {
-    SetArchivesNum(MIN_IMAGES_NUM);
+    // Allocate the default number of archives in order to keep modded games working as before.
+    SetArchivesNum(VAR_DefaultMaxArchives);
 
     // Copy the default data
     HANDLE (&defaultStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010;
@@ -149,7 +150,7 @@ void CStreamingSA::SetArchivesNum(size_t imagesNum)
     /*
         Stream handles
     */
-    const size_t handlesNum = std::min(imagesNum + RESERVED_STREAMS_NUM, MAX_STREAMS_NUM);
+    const size_t handlesNum = Clamp((size_t)VAR_DefaultStreamHandlersMaxCount, imagesNum + RESERVED_STREAMS_NUM, MAX_STREAMS_NUM);
     if (m_StreamHandles.size() != handlesNum)
     {
         try
