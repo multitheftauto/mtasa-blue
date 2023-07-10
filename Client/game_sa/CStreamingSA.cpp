@@ -426,7 +426,7 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
     m_Imgs[ucArchiveID].uiStreamHandleId = 0;
 
     CloseHandle(m_StreamHandles[uiStreamHandlerID]);
-    m_StreamHandles[uiStreamHandlerID] = nullptr;
+    m_StreamHandles[uiStreamHandlerID] = NULL;
 }
 
 void CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
