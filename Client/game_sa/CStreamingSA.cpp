@@ -210,7 +210,7 @@ unsigned char CStreamingSA::GetUnusedStreamHandle()
 {
     for (size_t i = 0; i < VAR_StreamHandlersMaxCount; i++)
     {
-        if (m_aStreamingHandlers[i])
+        if (!m_aStreamingHandlers[i])
             return (unsigned char)i;
     }
     return -1;
