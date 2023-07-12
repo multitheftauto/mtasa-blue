@@ -2,6 +2,7 @@ project "tracy"
     language "C++"
     kind "SharedLib"
     targetname "tracy"
+    targetdir(buildpath("mta"))
     warnings "Off"
 
     vpaths {
@@ -66,11 +67,12 @@ project "tracy"
         "public/common/TracyYield.hpp",
     }
 
+workspace "*"
     defines {
         "TRACY_ENABLE",
         "TRACY_CALLSTACK",
         "TRACY_ON_DEMAND",
         "TRACY_NO_CODE_TRANSFER",
-        "TRACY_IMPORTS"
+        "TRACY_EXPORTS"
     }
     

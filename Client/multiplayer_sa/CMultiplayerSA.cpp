@@ -7150,8 +7150,10 @@ constexpr DWORD RETURN_Idle_Beginning = 0x53E92D;
 void _declspec(naked) HOOK_Idle_Beginning() {
     // The hook itself replaces a few unused functions calls, so no need to care about restoring them
 
+    _asm pushad
     FrameMark;
+    _asm popad
 
-    // Jump after the unused function call to `CTimer`
+    // Jump back to before the frame limiter
     _asm jmp RETURN_Idle_Beginning
 }
