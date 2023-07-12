@@ -1639,6 +1639,8 @@ CGUIWebBrowser* CGUI_Impl::CreateWebBrowser(CGUITab* pParent)
 
 void CGUI_Impl::CleanDeadPool()
 {
+    ZoneScoped;
+
     if (m_pWindowManager)
         m_pWindowManager->cleanDeadPool();
 }

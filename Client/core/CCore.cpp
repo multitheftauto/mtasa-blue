@@ -1833,7 +1833,8 @@ void CCore::EnsureFrameRateLimitApplied()
 //
 void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 {
-    ;
+    ZoneScoped;
+
     ms_TimingCheckpoints.EndTimingCheckpoints();
 
     // Frame rate limit stuff starts here
@@ -1852,9 +1853,6 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
     }
 
     DoReliablePulse();
-
-    TIMING_GRAPH("FrameEnd");
-    TIMING_GRAPH("");
 }
 
 //
@@ -1862,6 +1860,8 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 //
 void CCore::ApplyQueuedFrameRateLimit()
 {
+    ZoneScoped;
+
     if (m_bQueuedFrameRateValid)
     {
         m_bQueuedFrameRateValid = false;

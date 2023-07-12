@@ -59,6 +59,8 @@ CServer::~CServer()
 
 void CServer::DoPulse()
 {
+    ZoneScoped;
+
     if (IsRunning())
     {
         // Make sure the server doesn't happen to be adding anything right now

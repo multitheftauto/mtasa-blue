@@ -55,6 +55,8 @@ CLatentTransferManager::~CLatentTransferManager()
 ///////////////////////////////////////////////////////////////
 void CLatentTransferManager::DoPulse()
 {
+    ZoneScoped;
+
     // Update timing info
     CTickCount tickCountNow = CTickCount::Now();
 

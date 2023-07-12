@@ -880,6 +880,8 @@ bool CGameSA::HasCreditScreenFadedOut()
 // Ensure replaced/restored textures for models in the GTA map are correct
 void CGameSA::FlushPendingRestreamIPL()
 {
+    ZoneScoped;
+
     CModelInfoSA::StaticFlushPendingRestreamIPL();
     m_pRenderWare->ResetStats();
 }

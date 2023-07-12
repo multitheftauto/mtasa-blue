@@ -585,6 +585,8 @@ bool CRenderItemManager::SaveDefaultRenderTarget()
 ////////////////////////////////////////////////////////////////
 bool CRenderItemManager::RestoreDefaultRenderTarget()
 {
+    ZoneScoped;
+
     // Only need to change if we have info
     if (m_pDefaultD3DRenderTarget)
     {

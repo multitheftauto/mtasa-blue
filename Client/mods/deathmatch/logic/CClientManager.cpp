@@ -232,6 +232,8 @@ void CClientManager::DoRender()
 
 void CClientManager::UpdateStreamers()
 {
+    ZoneScoped;
+
     // Is the game loaded?
     if (IsGameLoaded())
     {

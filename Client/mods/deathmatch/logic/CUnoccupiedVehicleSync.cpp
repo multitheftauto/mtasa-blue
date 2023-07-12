@@ -56,6 +56,8 @@ bool CUnoccupiedVehicleSync::ProcessPacket(unsigned char ucPacketID, NetBitStrea
 
 void CUnoccupiedVehicleSync::DoPulse()
 {
+    ZoneScoped;
+
     // Check all our vehicles for damage
     UpdateDamageModels();
 

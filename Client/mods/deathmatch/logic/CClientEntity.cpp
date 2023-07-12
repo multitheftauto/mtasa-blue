@@ -744,6 +744,10 @@ bool CClientEntity::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaF
 
 bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren)
 {
+    char zoneNameBuf[1024];
+    sprintf_s(zoneNameBuf, "CallEvent(%s)", szName);
+    ZoneTransientN(CallEventZone, zoneNameBuf, true);
+
     if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, NULL))
         return false;
 

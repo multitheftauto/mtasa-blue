@@ -359,6 +359,8 @@ void CLuaMain::UnloadScript()
 
 void CLuaMain::DoPulse()
 {
+    ZoneScoped;
+
     m_pLuaTimerManager->DoPulse(this);
 }
 

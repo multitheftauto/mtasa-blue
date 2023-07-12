@@ -13,6 +13,8 @@
 
 void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
 {
+    ZoneScoped;
+
     assert(m_ProcessQueue.empty());
     assert(!m_pPendingDelete);
     assert(!m_pProcessingTimer);

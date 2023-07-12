@@ -30,6 +30,8 @@ CBlendedWeather::CBlendedWeather()
 
 void CBlendedWeather::DoPulse()
 {
+    ZoneScoped;
+
     // Grab the current time
     unsigned char ucHour, ucMinute;
     m_pClock->Get(&ucHour, &ucMinute);
