@@ -169,7 +169,7 @@ void CRenderWareSA::PulseWorldTextureWatch()
     UpdateModuleTickCount64();
     UpdateDisableGTAVertexShadersTimer();
 
-    TIMING_CHECKPOINT("+TextureWatch");
+    ZoneScoped;
 
     // Go through ms_txdStreamEventList
     for (std::vector<STxdStreamEvent>::const_iterator iter = ms_txdStreamEventList.begin(); iter != ms_txdStreamEventList.end(); ++iter)
@@ -207,7 +207,6 @@ void CRenderWareSA::PulseWorldTextureWatch()
     }
 
     ms_txdStreamEventList.clear();
-    TIMING_CHECKPOINT("-TextureWatch");
 }
 
 ////////////////////////////////////////////////////////////////
@@ -234,7 +233,7 @@ void CRenderWareSA::StreamingAddedTexture(ushort usTxdId, const SString& strText
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
 {
-    TIMING_CHECKPOINT("+StreamingRemovedTxd");
+    ZoneScoped;
 
     typedef std::multimap<ushort, STexInfo*>::const_iterator ConstIterType;
     std::pair<ConstIterType, ConstIterType>                  range = m_TexInfoMap.equal_range(usTxdId);
@@ -250,8 +249,6 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
         else
             ++iter;
     }
-
-    TIMING_CHECKPOINT("-StreamingRemovedTxd");
 }
 
 ////////////////////////////////////////////////////////////////
@@ -264,7 +261,8 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::ScriptAddedTxd(RwTexDictionary* pTxd)
 {
-    TIMING_CHECKPOINT("+ScriptAddedTxd");
+    ZoneScoped;
+
     std::vector<RwTexture*> textureList;
     GetTxdTextures(textureList, pTxd);
     for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
@@ -277,7 +275,6 @@ void CRenderWareSA::ScriptAddedTxd(RwTexDictionary* pTxd)
         STexInfo* pTexInfo = CreateTexInfo(texture, szTextureName, pD3DData);
         OnTextureStreamIn(pTexInfo);
     }
-    TIMING_CHECKPOINT("-ScriptAddedTxd");
 }
 
 ////////////////////////////////////////////////////////////////
@@ -290,7 +287,7 @@ void CRenderWareSA::ScriptAddedTxd(RwTexDictionary* pTxd)
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
 {
-    TIMING_CHECKPOINT("+ScriptRemovedTexture");
+    ZoneScopedN("ScriptRemovedTexture");
     // Find TexInfo for this script added texture
     for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
     {
@@ -304,7 +301,6 @@ void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
         else
             ++iter;
     }
-    TIMING_CHECKPOINT("-ScriptRemovedTexture");
 }
 
 ////////////////////////////////////////////////////////////////
@@ -466,7 +462,7 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData
 void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* szTextureNameMatch, float fShaderPriority,
                                         bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers)
 {
-    TIMING_CHECKPOINT("+AppendAddMatch");
+    ZoneScopedN("AppendAddMatch");
 
     // Make previous versions usage of "CJ" work with new way
     SString strTextureNameMatch = szTextureNameMatch;
@@ -475,7 +471,6 @@ void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntity
 
     m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strTextureNameMatch, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime,
                                                 bShaderUsesVertexShader, bAppendLayers);
-    TIMING_CHECKPOINT("-AppendAddMatch");
 }
 
 ////////////////////////////////////////////////////////////////
@@ -487,7 +482,7 @@ void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntity
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* szTextureNameMatch)
 {
-    TIMING_CHECKPOINT("+AppendSubMatch");
+    ZoneScopedN("AppendSubMatch");
 
     // Make previous versions usage of "CJ" work with new way
     SString strTextureNameMatch = szTextureNameMatch;
@@ -495,7 +490,6 @@ void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEnt
         strTextureNameMatch = "cj_ped_*";
 
     m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strTextureNameMatch);
-    TIMING_CHECKPOINT("-AppendSubMatch");
 }
 
 ////////////////////////////////////////////////////////////////
@@ -532,9 +526,9 @@ void CRenderWareSA::OnTextureStreamOut(STexInfo* pTexInfo)
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::RemoveClientEntityRefs(CClientEntityBase* pClientEntity)
 {
-    TIMING_CHECKPOINT("+RemoveEntityRefs");
+    ZoneScoped;
+
     m_pMatchChannelManager->RemoveClientEntityRefs(pClientEntity);
-    TIMING_CHECKPOINT("-RemoveEntityRefs");
 }
 
 ////////////////////////////////////////////////////////////////
@@ -546,9 +540,9 @@ void CRenderWareSA::RemoveClientEntityRefs(CClientEntityBase* pClientEntity)
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::RemoveShaderRefs(CSHADERDUMMY* pShaderItem)
 {
-    TIMING_CHECKPOINT("+RemoveShaderRefs");
+    ZoneScoped;
+
     m_pMatchChannelManager->RemoveShaderRefs(pShaderItem);
-    TIMING_CHECKPOINT("-RemoveShaderRefs");
 }
 
 ////////////////////////////////////////////////////////////////

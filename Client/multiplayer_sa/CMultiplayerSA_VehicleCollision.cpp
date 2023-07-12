@@ -21,6 +21,8 @@ void CMultiplayerSA::SetVehicleCollisionHandler(VehicleCollisionHandler* pHandle
 
 void TriggerVehicleCollisionEvent()
 {
+    ZoneScoped;
+
     if (!pVehicleCollisionHandler || !pCollisionVehicle)
         return;
 
@@ -29,7 +31,7 @@ void TriggerVehicleCollisionEvent()
     if (!pEntity)
         return;
 
-    TIMING_CHECKPOINT("+TriggerVehColEvent");
+
     if (pEntity->nType == ENTITY_TYPE_VEHICLE)
     {
         auto pInterface = static_cast<CVehicleSAInterface*>(pEntity);
@@ -43,7 +45,6 @@ void TriggerVehicleCollisionEvent()
         pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,
                                  pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity);
     }
-    TIMING_CHECKPOINT("-TriggerVehColEvent");
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

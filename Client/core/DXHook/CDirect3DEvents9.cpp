@@ -103,91 +103,94 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
 
 void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 {
-    TIMING_CHECKPOINT("+OnPresent1");
-    // Start a new scene. This isn't ideal and is not really recommended by MSDN.
-    // I tried disabling EndScene from GTA and just end it after this code ourselves
-    // before present, but that caused graphical issues randomly with the sky.
-    if (pDevice->BeginScene() == D3D_OK)
-        g_bInMTAScene = true;
-
-    // Reset samplers on first call
-    static bool bDoneReset = false;
-    if (!bDoneReset)
     {
-        bDoneReset = true;
-        for (uint i = 0; i < 16; i++)
+        ZoneScopedN("OnPresent1");
+        
+        // Start a new scene. This isn't ideal and is not really recommended by MSDN.
+        // I tried disabling EndScene from GTA and just end it after this code ourselves
+        // before present, but that caused graphical issues randomly with the sky.
+        if (pDevice->BeginScene() == D3D_OK)
+            g_bInMTAScene = true;
+
+        // Reset samplers on first call
+        static bool bDoneReset = false;
+        if (!bDoneReset)
         {
-            pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-            pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-            pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            bDoneReset = true;
+            for (uint i = 0; i < 16; i++)
+            {
+                pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+                pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            }
         }
+
+        CGraphics::GetSingleton().EnteringMTARenderZone();
+
+        // Tell everyone that the zbuffer will need clearing before use
+        CGraphics::GetSingleton().OnZBufferModified();
     }
 
-    CGraphics::GetSingleton().EnteringMTARenderZone();
-
-    // Tell everyone that the zbuffer will need clearing before use
-    CGraphics::GetSingleton().OnZBufferModified();
-
-    TIMING_CHECKPOINT("-OnPresent1");
     // Make a screenshot if needed (before GUI)
     CScreenShot::CheckForScreenShot(true);
 
     // Notify core
     CCore::GetSingleton().DoPostFramePulse();
-    TIMING_CHECKPOINT("+OnPresent2");
 
-    // Restore in case script forgets
-    CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
-
-    // Must do this before GUI draw to prevent NVidia performance problems
-    CGraphics::GetSingleton().GetRenderItemManager()->FlushNonAARenderTarget();
-
-    bool bTookScreenShot = false;
-    if (!CGraphics::GetSingleton().GetScreenGrabber()->IsQueueEmpty())
     {
-        if (g_pCore->IsWebCoreLoaded())
-            g_pCore->GetWebCore()->OnPreScreenshot();
+        ZoneScopedN("OnPresent2");
 
-        bTookScreenShot = true;
+        // Restore in case script forgets
+        CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
+
+        // Must do this before GUI draw to prevent NVidia performance problems
+        CGraphics::GetSingleton().GetRenderItemManager()->FlushNonAARenderTarget();
+
+        bool bTookScreenShot = false;
+        if (!CGraphics::GetSingleton().GetScreenGrabber()->IsQueueEmpty())
+        {
+            if (g_pCore->IsWebCoreLoaded())
+                g_pCore->GetWebCore()->OnPreScreenshot();
+
+            bTookScreenShot = true;
+        }
+
+        // Draw pre-GUI primitives
+        CGraphics::GetSingleton().DrawPreGUIQueue();
+
+        // Maybe grab screen for upload
+        CGraphics::GetSingleton().GetScreenGrabber()->DoPulse();
+
+        if (bTookScreenShot && g_pCore->IsWebCoreLoaded())
+            g_pCore->GetWebCore()->OnPostScreenshot();
+
+        // Draw the GUI
+        CLocalGUI::GetSingleton().Draw();
+
+        // Draw post-GUI primitives
+        CGraphics::GetSingleton().DrawPostGUIQueue();
+
+        // Redraw the mouse cursor so it will always be over other elements
+        CLocalGUI::GetSingleton().DrawMouseCursor();
+
+        CGraphics::GetSingleton().DidRenderScene();
+
+        CGraphics::GetSingleton().LeavingMTARenderZone();
+
+        // End the scene that we started.
+        pDevice->EndScene();
+        g_bInMTAScene = false;
+
+        // Update incase settings changed
+        int iAnisotropic;
+        CVARS_GET("anisotropic", iAnisotropic);
+        ms_RequiredAnisotropicLevel = 1 << iAnisotropic;
+        ms_DiagnosticDebug = CCore::GetSingleton().GetDiagnosticDebug();
+        CCore::GetSingleton().GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778);
+
+        // Make a screenshot if needed (after GUI)
+        CScreenShot::CheckForScreenShot(false);
     }
-
-    // Draw pre-GUI primitives
-    CGraphics::GetSingleton().DrawPreGUIQueue();
-
-    // Maybe grab screen for upload
-    CGraphics::GetSingleton().GetScreenGrabber()->DoPulse();
-
-    if (bTookScreenShot && g_pCore->IsWebCoreLoaded())
-        g_pCore->GetWebCore()->OnPostScreenshot();
-
-    // Draw the GUI
-    CLocalGUI::GetSingleton().Draw();
-
-    // Draw post-GUI primitives
-    CGraphics::GetSingleton().DrawPostGUIQueue();
-
-    // Redraw the mouse cursor so it will always be over other elements
-    CLocalGUI::GetSingleton().DrawMouseCursor();
-
-    CGraphics::GetSingleton().DidRenderScene();
-
-    CGraphics::GetSingleton().LeavingMTARenderZone();
-
-    // End the scene that we started.
-    pDevice->EndScene();
-    g_bInMTAScene = false;
-
-    // Update incase settings changed
-    int iAnisotropic;
-    CVARS_GET("anisotropic", iAnisotropic);
-    ms_RequiredAnisotropicLevel = 1 << iAnisotropic;
-    ms_DiagnosticDebug = CCore::GetSingleton().GetDiagnosticDebug();
-    CCore::GetSingleton().GetGUI()->SetBidiEnabled(ms_DiagnosticDebug != EDiagnosticDebug::BIDI_6778);
-
-    // Make a screenshot if needed (after GUI)
-    CScreenShot::CheckForScreenShot(false);
-
-    TIMING_CHECKPOINT("-OnPresent2");
 }
 
 #define SAVE_RENDERSTATE_AND_SET( reg, value ) \

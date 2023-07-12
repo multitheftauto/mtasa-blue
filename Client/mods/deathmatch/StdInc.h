@@ -24,6 +24,7 @@
 #include <optional>
 
 #include <zlib.h>
+#include <tracy/Tracy.hpp>
 
 // SDK includes
 #include <core/CLocalizationInterface.h>

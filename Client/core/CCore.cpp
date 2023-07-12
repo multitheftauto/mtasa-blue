@@ -1146,7 +1146,7 @@ bool CCore::IsWindowMinimized()
 
 void CCore::DoPreFramePulse()
 {
-    TIMING_CHECKPOINT("+CorePreFrame");
+    ZoneScopedN("CorePreFrame");
 
     m_pKeyBinds->DoPreFramePulse();
 
@@ -1156,142 +1156,143 @@ void CCore::DoPreFramePulse()
     m_pLocalGUI->DoPulse();
 
     CCrashDumpWriter::UpdateCounters();
-
-    TIMING_CHECKPOINT("-CorePreFrame");
 }
 
 void CCore::DoPostFramePulse()
 {
-    TIMING_CHECKPOINT("+CorePostFrame1");
-    if (m_bQuitOnPulse)
-        Quit();
-
-    if (m_bDestroyMessageBox)
     {
-        RemoveMessageBox();
-        m_bDestroyMessageBox = false;
-    }
+        ZoneScopedN("CorePostFrame1");
+        if (m_bQuitOnPulse)
+            Quit();
 
-    static bool bFirstPulse = true;
-    if (bFirstPulse)
-    {
-        bFirstPulse = false;
-
-        // Validate CVARS
-        CClientVariables::GetSingleton().ValidateValues();
-
-        // Apply all settings
-        ApplyConsoleSettings();
-        ApplyGameSettings();
-
-        m_pGUI->SelectInputHandlers(INPUT_CORE);
-    }
-
-    if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE
-    {
-        WatchDogCompletedSection("L2");            // gta_sa.set seems ok
-        WatchDogCompletedSection("L3");            // No hang on startup
-    }
-
-    // This is the first frame in the menu?
-    if (m_pGame->GetSystemState() == 7)            // GS_FRONTEND
-    {
-        // Wait 250 frames more than the time it took to get status 7 (fade-out time)
-        static short WaitForMenu = 0;
-
-        // Do crash dump encryption while the credit screen is displayed
-        if (WaitForMenu == 0)
-            HandleCrashDumpEncryption();
-
-        // Cope with early finish
-        if (m_pGame->HasCreditScreenFadedOut())
-            WaitForMenu = 250;
-
-        if (WaitForMenu >= 250)
+        if (m_bDestroyMessageBox)
         {
-            if (m_bFirstFrame)
+            RemoveMessageBox();
+            m_bDestroyMessageBox = false;
+        }
+
+        static bool bFirstPulse = true;
+        if (bFirstPulse)
+        {
+            bFirstPulse = false;
+
+            // Validate CVARS
+            CClientVariables::GetSingleton().ValidateValues();
+
+            // Apply all settings
+            ApplyConsoleSettings();
+            ApplyGameSettings();
+
+            m_pGUI->SelectInputHandlers(INPUT_CORE);
+        }
+
+        if (m_pGame->GetSystemState() == 5)            // GS_INIT_ONCE
+        {
+            WatchDogCompletedSection("L2");            // gta_sa.set seems ok
+            WatchDogCompletedSection("L3");            // No hang on startup
+        }
+
+        // This is the first frame in the menu?
+        if (m_pGame->GetSystemState() == 7)            // GS_FRONTEND
+        {
+            // Wait 250 frames more than the time it took to get status 7 (fade-out time)
+            static short WaitForMenu = 0;
+
+            // Do crash dump encryption while the credit screen is displayed
+            if (WaitForMenu == 0)
+                HandleCrashDumpEncryption();
+
+            // Cope with early finish
+            if (m_pGame->HasCreditScreenFadedOut())
+                WaitForMenu = 250;
+
+            if (WaitForMenu >= 250)
             {
-                m_bFirstFrame = false;
-
-                // Disable vsync while it's all dark
-                m_pGame->DisableVSync();
-
-                // Parse the command line
-                // Does it begin with mtasa://?
-                if (m_szCommandLineArgs && strnicmp(m_szCommandLineArgs, "mtasa://", 8) == 0)
+                if (m_bFirstFrame)
                 {
-                    SString strArguments = GetConnectCommandFromURI(m_szCommandLineArgs);
-                    // Run the connect command
-                    if (strArguments.length() > 0 && !m_pCommands->Execute(strArguments))
+                    m_bFirstFrame = false;
+
+                    // Disable vsync while it's all dark
+                    m_pGame->DisableVSync();
+
+                    // Parse the command line
+                    // Does it begin with mtasa://?
+                    if (m_szCommandLineArgs && strnicmp(m_szCommandLineArgs, "mtasa://", 8) == 0)
                     {
-                        ShowMessageBox(_("Error") + _E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR);
-                    }
-                }
-                else
-                {
-                    // We want to load a mod?
-                    const char* szOptionValue;
-                    if (szOptionValue = GetCommandLineOption("l"))
-                    {
-                        // Try to load the mod
-                        if (!m_pModManager->Load(szOptionValue, m_szCommandLineArgs))
+                        SString strArguments = GetConnectCommandFromURI(m_szCommandLineArgs);
+                        // Run the connect command
+                        if (strArguments.length() > 0 && !m_pCommands->Execute(strArguments))
                         {
-                            SString strTemp(_("Error running mod specified in command line ('%s')"), szOptionValue);
-                            ShowMessageBox(_("Error") + _E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR);            // Command line Mod load failed
+                            ShowMessageBox(_("Error") + _E("CC41"), _("Error executing URL"), MB_BUTTON_OK | MB_ICON_ERROR);
                         }
                     }
-                    // We want to connect to a server?
-                    else if (szOptionValue = GetCommandLineOption("c"))
+                    else
                     {
-                        CCommandFuncs::Connect(szOptionValue);
+                        // We want to load a mod?
+                        const char* szOptionValue;
+                        if (szOptionValue = GetCommandLineOption("l"))
+                        {
+                            // Try to load the mod
+                            if (!m_pModManager->Load(szOptionValue, m_szCommandLineArgs))
+                            {
+                                SString strTemp(_("Error running mod specified in command line ('%s')"), szOptionValue);
+                                ShowMessageBox(_("Error") + _E("CC42"), strTemp, MB_BUTTON_OK | MB_ICON_ERROR);            // Command line Mod load failed
+                            }
+                        }
+                        // We want to connect to a server?
+                        else if (szOptionValue = GetCommandLineOption("c"))
+                        {
+                            CCommandFuncs::Connect(szOptionValue);
+                        }
                     }
                 }
             }
-        }
-        else
-        {
-            WaitForMenu++;
-        }
-
-        if (m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
-        {
-            if (m_uiNewNickWaitFrames > 75)
-            {
-                // Request a new nickname if we're waiting for one
-                GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
-                m_bWaitToSetNick = false;
-            }
             else
-                m_uiNewNickWaitFrames++;
+            {
+                WaitForMenu++;
+            }
+
+            if (m_bWaitToSetNick && GetLocalGUI()->GetMainMenu()->IsVisible() && !GetLocalGUI()->GetMainMenu()->IsFading())
+            {
+                if (m_uiNewNickWaitFrames > 75)
+                {
+                    // Request a new nickname if we're waiting for one
+                    GetLocalGUI()->GetMainMenu()->GetSettingsWindow()->RequestNewNickname();
+                    m_bWaitToSetNick = false;
+                }
+                else
+                    m_uiNewNickWaitFrames++;
+            }
         }
+
+        if (!IsFocused() && m_bLastFocused)
+        {
+            // Fix for #4948
+            m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
+            m_bLastFocused = false;
+        }
+        else if (IsFocused() && !m_bLastFocused)
+        {
+            m_bLastFocused = true;
+        }
+
+        GetJoystickManager()->DoPulse();            // Note: This may indirectly call CMessageLoopHook::ProcessMessage
+        m_pKeyBinds->DoPostFramePulse();
+
+        if (m_pWebCore)
+            m_pWebCore->DoPulse();
+
     }
-
-    if (!IsFocused() && m_bLastFocused)
-    {
-        // Fix for #4948
-        m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
-        m_bLastFocused = false;
-    }
-    else if (IsFocused() && !m_bLastFocused)
-    {
-        m_bLastFocused = true;
-    }
-
-    GetJoystickManager()->DoPulse();            // Note: This may indirectly call CMessageLoopHook::ProcessMessage
-    m_pKeyBinds->DoPostFramePulse();
-
-    if (m_pWebCore)
-        m_pWebCore->DoPulse();
-
+    
     // Notify the mod manager and the connect manager
-    TIMING_CHECKPOINT("-CorePostFrame1");
     m_pModManager->DoPulsePostFrame();
-    TIMING_CHECKPOINT("+CorePostFrame2");
-    GetMemStats()->Draw();
-    GetGraphStats()->Draw();
-    m_pConnectManager->DoPulse();
 
-    TIMING_CHECKPOINT("-CorePostFrame2");
+    {
+        ZoneScopedN("CorePostFrame2");
+        GetMemStats()->Draw();
+        GetGraphStats()->Draw();
+        m_pConnectManager->DoPulse();
+    }
 }
 
 // Called after MOD is unloaded
@@ -1832,7 +1833,7 @@ void CCore::EnsureFrameRateLimitApplied()
 //
 void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 {
-    TIMING_CHECKPOINT("-CallIdle1");
+    ;
     ms_TimingCheckpoints.EndTimingCheckpoints();
 
     // Frame rate limit stuff starts here
@@ -1889,7 +1890,8 @@ void CCore::ApplyQueuedFrameRateLimit()
 void CCore::DoReliablePulse()
 {
     ms_TimingCheckpoints.BeginTimingCheckpoints();
-    TIMING_CHECKPOINT("+CallIdle2");
+
+    ZoneScopedN("CallIdle2");
 
     UpdateIsWindowMinimized();
 

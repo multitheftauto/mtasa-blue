@@ -787,7 +787,8 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 
 void CClientGame::DoPulsePostFrame()
 {
-    TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
+    ZoneScoped;
+
     #ifdef DEBUG_KEYSTATES
     // Get the controller state
     CControllerState cs;
@@ -963,11 +964,9 @@ void CClientGame::DoPulsePostFrame()
 
 void CClientGame::DoPulses()
 {
-    TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame");
-
     g_pCore->ApplyFrameRateLimit();
 
-    TIMING_CHECKPOINT("+CClientGame::DoPulses");
+    ZoneScoped;
 
     m_BuiltCollisionMapThisFrame = false;
 
@@ -1337,7 +1336,7 @@ void CClientGame::DoPulses()
     // Collect async task scheduler results
     m_pAsyncTaskScheduler->CollectResults();
 
-    TIMING_CHECKPOINT("-CClientGame::DoPulses");
+    ;
 }
 
 // Extrapolation test
@@ -1374,10 +1373,11 @@ void CClientGame::DoPulses2(bool bCalledFromIdle)
         ChangeFloatPrecision(true);
 
         // Pulse the network interface
-        TIMING_CHECKPOINT("+NetPulse");
-        g_pNet->DoPulse();
-        TIMING_CHECKPOINT("-NetPulse");
-
+        {
+            ZoneScopedN("NetPulse");
+            g_pNet->DoPulse();
+        }
+        
         // Change precision back, and check we are in low precision mode 4 sure
         ChangeFloatPrecision(false);
         assert(!IsHighFloatPrecision());

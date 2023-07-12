@@ -515,13 +515,13 @@ const SString& CLuaMain::GetFunctionTag(int iLuaFunction)
 ///////////////////////////////////////////////////////////////
 int CLuaMain::PCall(lua_State* L, int nargs, int nresults, int errfunc)
 {
-    TIMING_CHECKPOINT("+pcall");
+    ZoneScoped;
+
     g_pClientGame->ChangeFloatPrecision(true);
     g_pClientGame->GetScriptDebugging()->PushLuaMain(this);
     const int iret = lua_pcall(L, nargs, nresults, errfunc);
     g_pClientGame->GetScriptDebugging()->PopLuaMain(this);
     g_pClientGame->ChangeFloatPrecision(false);
-    TIMING_CHECKPOINT("-pcall");
     return iret;
 }
 

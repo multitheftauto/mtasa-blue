@@ -20,6 +20,7 @@ project "Client Core"
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/detours/4.0.1/src",
+			"../../vendor/tracy/public/"
 		}
 
 	pchheader "StdInc.h"
@@ -32,7 +33,7 @@ project "Client Core"
 		["*"] = "premake5.lua"
 	}
 
-	links { "detours" }
+	links { "detours", "tracy" }
 
 	files {
 		"premake5.lua",

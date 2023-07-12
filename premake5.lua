@@ -115,6 +115,7 @@ workspace "MTASA"
 		libdirs {
 			path.join(dxdir, "Lib/x86")
 		}
+		buildoptions { "/Zc:preprocessor" } -- Enable new preprocessor
 
 	filter {"system:windows", "configurations:Debug"}
 		runtime "Release" -- Always use Release runtime

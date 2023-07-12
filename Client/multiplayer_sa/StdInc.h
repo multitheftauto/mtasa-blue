@@ -17,6 +17,8 @@
 #include <string>
 #include <vector>
 
+#include <tracy/Tracy.hpp>
+
 // SDK includes
 #include <core/CCoreInterface.h>
 #include <game/CGame.h>

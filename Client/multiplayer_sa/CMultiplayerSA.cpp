@@ -3556,7 +3556,7 @@ void _declspec(naked) HOOK_CObject_PostRender()
         pushad
     }
 
-    TIMING_CHECKPOINT("-ObjRndr");
+    ;
     RestoreAlphaValues();
 
     _asm
@@ -3576,7 +3576,6 @@ void _declspec(naked) HOOK_CObject_Render()
         pushad
     }
 
-    TIMING_CHECKPOINT("+ObjRndr");
     SetObjectAlpha();
 
     _asm
@@ -3930,7 +3929,7 @@ void CMultiplayerSA::ConvertMatrixToEulerAngles(const CMatrix& Matrix, float& fX
 
 void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
 {
-    TIMING_CHECKPOINT("+RebuldMulplrPlr");
+    ZoneScopedN("RebuldMulplrPlr");
 
     CPlayerPed*           playerPed = dynamic_cast<CPlayerPed*>(player);
     CRemoteDataStorageSA* data = NULL;
@@ -3959,7 +3958,6 @@ void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
         MemCpyFast((void*)0xb79000, &localStats.StatTypesInt, sizeof(int) * MAX_INT_STATS);
         MemCpyFast((void*)0xb78f10, &localStats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
     }
-    TIMING_CHECKPOINT("-RebuldMulplrPlr");
 }
 
 void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
@@ -4791,7 +4789,6 @@ void _declspec(naked) HOOK_CGame_Process()
         pushad
     }
 
-    TIMING_CHECKPOINT("+CWorld_Process");
     if (m_pPreWorldProcessHandler)
         m_pPreWorldProcessHandler();
 
@@ -4803,9 +4800,8 @@ void _declspec(naked) HOOK_CGame_Process()
         pushad
     }
 
-    if (m_pPostWorldProcessHandler) m_pPostWorldProcessHandler();
-
-    TIMING_CHECKPOINT("-CWorld_Process");
+    if (m_pPostWorldProcessHandler) 
+        m_pPostWorldProcessHandler();
 
     _asm
     {
@@ -4816,6 +4812,8 @@ void _declspec(naked) HOOK_CGame_Process()
 
 void __cdecl HandleIdle()
 {
+    ZoneScoped;
+
     static bool bAnimGroupArrayAddressLogged = false;
     if (!bAnimGroupArrayAddressLogged)
     {
@@ -4828,22 +4826,17 @@ void __cdecl HandleIdle()
 }
 
 DWORD CALL_CGame_Process = 0x53BEE0;
-void _declspec(naked) HOOK_Idle()
+void _declspec(naked) HOOK_Idle() // NOTE: Name is misleading - The hook is actually placed where `CGame::Process` is called
 {
-    TIMING_CHECKPOINT("+CGame_Process");
     _asm
     {
         call    CALL_CGame_Process
         pushad
     }
 
-    TIMING_CHECKPOINT("-CGame_Process");
-
-    TIMING_CHECKPOINT("+Idle");
     if (m_pIdleHandler)
         HandleIdle();
-    TIMING_CHECKPOINT("-Idle");
-
+    
     _asm
     {
         popad
@@ -5968,9 +5961,8 @@ bool CheckRemovedModelNoSet()
 // Binary
 bool CheckRemovedModel()
 {
-    TIMING_CHECKPOINT("+CheckRemovedModel");
+    ZoneScopedN("CheckRemovedModel");
     bNextHookSetModel = CheckRemovedModelNoSet();
-    TIMING_CHECKPOINT("-CheckRemovedModel");
     bCodePathCheck = true;
     return bNextHookSetModel;
 }
@@ -5999,7 +5991,8 @@ static bool bTest = false;
 // Binary
 void HideEntitySomehow()
 {
-    TIMING_CHECKPOINT("+HideEntitySomehow");
+    ZoneScoped;
+
     // Did we get instructed to set the model
     if (bNextHookSetModel && pLODInterface)
     {
@@ -6032,7 +6025,7 @@ void HideEntitySomehow()
     // Reset our next hook variable
     bNextHookSetModel = false;
     bCodePathCheck = bNextHookSetModel;
-    TIMING_CHECKPOINT("-HideEntitySomehow");
+    ;
 }
 // Binary
 // Hook 2
@@ -6113,7 +6106,7 @@ void _declspec(naked) Hook_CWorld_ADD_CPopulation_ConvertToRealObject()
 
 void RemoveObjectIfNeeded()
 {
-    TIMING_CHECKPOINT("+RemoveObjectIfNeeded");
+    ZoneScopedN("RemoveObjectIfNeeded");
     SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
@@ -6129,7 +6122,6 @@ void RemoveObjectIfNeeded()
             pGameInterface->GetWorld()->Remove(pLODInterface, BuildingRemoval4);
         }
     }
-    TIMING_CHECKPOINT("-RemoveObjectIfNeeded");
 }
 
 // on stream in -> create and remove it from the world just after so we can restore easily
@@ -6179,11 +6171,9 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
         mov pBuildingAdd, edi
         mov pLODInterface, edi
     }
-    TIMING_CHECKPOINT("+RemovePointerToBuilding");
     RemovePointerToBuilding();
     StorePointerToBuilding();
     RemoveObjectIfNeeded();
-    TIMING_CHECKPOINT("-RemovePointerToBuilding");
     _asm
     {
         popad
@@ -6214,11 +6204,10 @@ void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
         mov pBuildingAdd, edi
     }
 
-    TIMING_CHECKPOINT("+CheckForRemoval");
     StorePointerToBuilding();
+
     if (CheckForRemoval())
     {
-        TIMING_CHECKPOINT("-CheckForRemoval");
         _asm
         {
             popad
@@ -6227,7 +6216,6 @@ void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
     }
     else
     {
-        TIMING_CHECKPOINT("-CheckForRemoval");
         _asm
         {
             popad
