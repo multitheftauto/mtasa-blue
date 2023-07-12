@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <tracy/Tracy.hpp>
 #include <game/CWorld.h>
 #include <game/CAnimBlendAssocGroup.h>
 #include <game/CPedDamageResponse.h>
@@ -302,6 +303,8 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 #define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
 
+#define HOOKPOS_Idle_Beginning 0x53E923
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -548,6 +551,7 @@ void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
 void HOOK_CWeapon__TakePhotograph();
 
 void HOOK_CCollision__CheckCameraCollisionObjects();
+void HOOK_Idle_Beginning();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -785,6 +789,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
+
+    HookInstall(0x53E923, (DWORD)HOOK_Idle_Beginning, 5); 
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
@@ -7138,4 +7144,14 @@ void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
     out1: jmp   RETURN_CCollision__CheckCameraCollisionObjects
     out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
     }
+}
+
+constexpr DWORD RETURN_Idle_Beginning = 0x53E92D;
+void _declspec(naked) HOOK_Idle_Beginning() {
+    // The hook itself replaces a few unused functions calls, so no need to care about restoring them
+
+    FrameMark;
+
+    // Jump after the unused function call to `CTimer`
+    _asm jmp RETURN_Idle_Beginning
 }

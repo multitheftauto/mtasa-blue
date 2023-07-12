@@ -22,10 +22,15 @@ project "Game SA"
 
 	filter {}
 
+	links {
+		"tracy"
+	}
+
 	includedirs {
 		"../../Shared/sdk",
 		"../sdk/",
-		"../../vendor/sparsehash/src/"
+		"../../vendor/sparsehash/src/",
+		"../../vendor/tracy/public/"
 	}
 
 	files {

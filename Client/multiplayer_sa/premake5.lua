@@ -20,7 +20,12 @@ project "Multiplayer SA"
 			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/sparsehash/src/",
+			"../../vendor/tracy/public/"
 		}
+
+	links {
+		"tracy"
+	}
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
