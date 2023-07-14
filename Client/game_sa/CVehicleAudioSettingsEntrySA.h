@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleAudioSettingsEntry.h
+ *  FILE:        game_sa/CVehicleAudioSettingsEntrySA.h
  *  PURPOSE:     Header file for vehicle audio settings entry class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -12,6 +12,7 @@
 #pragma once
 
 #include "game/CVehicleAudioSettingsEntry.h"
+#include <game/Common.h>
 
 struct tVehicleAudioSettings
 {
@@ -41,7 +42,7 @@ class CVehicleAudioSettingsEntrySA : public CVehicleAudioSettingsEntry
 public:
     CVehicleAudioSettingsEntrySA();
     CVehicleAudioSettingsEntrySA(tVehicleAudioSettings* pSettings);
-    ~CVehicleAudioSettingsEntrySA();
+    ~CVehicleAudioSettingsEntrySA() = default;
 
     tVehicleAudioSettings* getInterface() { return &m_Settings; };
 

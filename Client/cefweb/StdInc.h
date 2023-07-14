@@ -21,5 +21,5 @@
 #include "CWebCore.h"
 #include "CWebView.h"
 
-extern CCoreInterface* g_pCore;
+extern CCoreInterface*         g_pCore;
 extern CLocalizationInterface* g_pLocalization;

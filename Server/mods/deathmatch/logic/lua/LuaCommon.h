@@ -18,9 +18,13 @@ extern "C"
     #include "lauxlib.h"
 }
 
-CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
+#include "CLuaFunctionRef.h"
 
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
+#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast<unsigned long>(x))
+
+class CVector2D;
+
+CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 
 // Lua pop macros for our datatypes
 class CElement* lua_toelement(lua_State* luaVM, int iArgument);
@@ -45,11 +49,8 @@ void lua_pushvector(lua_State* luaVM, const CVector& vector);
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector);
 void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix);
 
-class CLuaMain& lua_getownercluamain(lua_State* L);
+class CLuaMain&  lua_getownercluamain(lua_State* L);
 class CResource& lua_getownerresource(lua_State* L);
-
-// Converts any type to string
-const char* lua_makestring(lua_State* luaVM, int iArgument);
 
 // Internal use
 void lua_initclasses(lua_State* luaVM);

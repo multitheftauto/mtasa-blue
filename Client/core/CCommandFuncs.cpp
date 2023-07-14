@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CHud.h>
 
 using std::list;
 
@@ -20,12 +21,6 @@ extern bool   g_bBoundsChecker;
 void CCommandFuncs::Help(const char* szParameters)
 {
     CConsoleInterface* pConsole = g_pCore->GetConsole();
-
-    if (szParameters && atoi(szParameters) == 1)
-        CCore::GetSingleton().GetMultiplayer()->AllowWindowsCursorShowing(true);
-    else
-        CCore::GetSingleton().GetMultiplayer()->AllowWindowsCursorShowing(false);
-
     pConsole->Print(_("***[ COMMAND HELP ]***\n"));
 
     // Loop through all the available commands
@@ -46,10 +41,6 @@ void CCommandFuncs::Exit(const char* szParameters)
 
 void CCommandFuncs::Ver(const char* szParameters)
 {
-    ShowCursor(TRUE);
-    HCURSOR hc = LoadCursor(NULL, IDC_ARROW);
-    SetCursor(hc);
-
     // Compose version string
     unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
     unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
@@ -65,7 +56,7 @@ void CCommandFuncs::Ver(const char* szParameters)
 
 void CCommandFuncs::ScreenShot(const char* szParameters)
 {
-    g_pCore->TakeScreenShot();
+    g_pCore->InitiateScreenShot(false);
 }
 
 void CCommandFuncs::Vid(const char* szParameters)
@@ -464,7 +455,7 @@ void CCommandFuncs::FakeLag(const char* szCmdLine)
 {
     if (!CCore::GetSingleton().IsFakeLagCommandEnabled())
     {
-        g_pCore->GetConsole()->Print("fakelag command no enabled");
+        g_pCore->GetConsole()->Print("fakelag command not enabled");
         return;
     }
 

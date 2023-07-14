@@ -8,15 +8,18 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #include "StdInc.h"
+#include "CPointLightsSA.h"
+#include "CEntitySA.h"
 
 using CHeli_SearchLightCone_t = void(__cdecl*)(int handleId, CVector startPos, CVector endPos, float radius1, float unknownConstant, int unkown1,
                                                bool renderSpot, CVector* unkown3, CVector* unkown4, CVector* unknown5, int unknown6, float radius2);
 using CHeli_PreSearchLightCone_t = int(__cdecl*)();
 using CHeli_PostSearchLightCone_t = int(__cdecl*)();
 
-void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SColor color, unsigned char uc_8, bool bCreatesShadow,
-                              CEntity* pAffected)
+void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SharedUtil::SColor color, unsigned char uc_8,
+                              bool bCreatesShadow, CEntity* pAffected)
 {
     DWORD dwEntityInterface = 0;
     if (pAffected)

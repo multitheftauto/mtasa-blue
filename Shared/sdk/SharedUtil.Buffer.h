@@ -16,7 +16,6 @@
 #include "SharedUtil.File.h"
 #include "SString.h"
 
-
 namespace SharedUtil
 {
     //
@@ -38,7 +37,7 @@ namespace SharedUtil
 
     // Assuming compiled on little endian machine
     #define CBUFFER_LITTLE_ENDIAN
-    //#define CBUFFER_BIG_ENDIAN
+    // #define CBUFFER_BIG_ENDIAN
 
     //////////////////////////////////////////////////////
     //
@@ -53,6 +52,7 @@ namespace SharedUtil
         CBuffer() {}
         CBuffer(const void* pData, uint uiSize) { AddBytes(pData, uiSize, 0); }
 
+        void ZeroClear() { std::fill(begin(), end(), 0); }
         void Clear() { clear(); }
 
         bool IsEmpty() const { return empty(); }
@@ -289,7 +289,7 @@ namespace SharedUtil
             return ReadBytes(&e, sizeof(e), m_bToFromNetwork);
         }
 
-#ifdef ANY_x64
+#if defined(ANY_x64) || defined(ANY_arm64)
         // Force all these types to use 4 bytes
         bool Read(unsigned long& e)
         {
@@ -385,7 +385,7 @@ namespace SharedUtil
             WriteBytes(&e, sizeof(e), m_bToFromNetwork);
         }
 
-#ifdef ANY_x64
+#if defined(ANY_x64) || defined(ANY_arm64)
         // Force all these types to use 4 bytes
         void Write(unsigned long e) { Write((uint)e); }
         void Write(long e) { Write((int)e); }

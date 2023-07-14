@@ -19,7 +19,7 @@ class CClientEntity;
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+// #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
 class CClientManager;
 
@@ -46,7 +46,6 @@ enum eClientEntityType
     CCLIENTVEHICLE,
     CCLIENTRADARMARKER,
     CCLIENTOBJECT,
-    CCLIENTCIVILIAN,
     CCLIENTPICKUP,
     CCLIENTRADARAREA,
     CCLIENTMARKER,
@@ -77,9 +76,12 @@ enum eClientEntityType
     CCLIENTBROWSER,
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
+    CCLIENTVECTORGRAPHIC,
     CCLIENTUNKNOWN,
+    CCLIENTIMG,
 };
 
+class CEntity;
 class CClientColShape;
 class CClientPed;
 class CCustomData;
@@ -90,16 +92,13 @@ class CLuaMain;
 class CMapEventManager;
 typedef CFastList<CClientEntity*> CChildListType;
 
-// List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot : public std::vector<CClientEntity*>, public CRefCountableST
-{
-};
+typedef std::vector<CClientEntity*>           CElementListSnapshot;
+typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 enum eCClientEntityClassTypes
 {
     CLASS_CClientEntity,
     CLASS_CClientCamera,
-    CLASS_CClientCivilian,
     CLASS_CClientColModel,
     CLASS_CClientDFF,
     CLASS_CClientGUIElement,
@@ -138,10 +137,12 @@ enum eCClientEntityClassTypes
     CLASS_CClientRenderTarget,
     CLASS_CClientScreenSource,
     CLASS_CClientWebBrowser,
+    CLASS_CClientVectorGraphic,
     CLASS_CClientWeapon,
     CLASS_CClientEffect,
     CLASS_CClientPointLights,
-    CLASS_CClientSearchLight
+    CLASS_CClientSearchLight,
+    CLASS_CClientIMG,
 };
 
 class CClientEntity : public CClientEntityBase
@@ -192,19 +193,20 @@ public:
 
     CChildListType ::const_iterator IterBegin() { return m_Children.begin(); }
     CChildListType ::const_iterator IterEnd() { return m_Children.end(); }
-    CElementListSnapshot*           GetChildrenListSnapshot();
+    CElementListSnapshotRef         GetChildrenListSnapshot();
 
     ElementID GetID() { return m_ID; };
     void      SetID(ElementID ID);
 
-    CCustomData*  GetCustomDataPointer() { return m_pCustomData; }
-    CLuaArgument* GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = nullptr);
-    bool          GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
-    bool          GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
-    bool          GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);
-    bool          GetCustomDataBool(const char* szKey, bool& bOut, bool bInheritData);
-    void          SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
-    void          DeleteCustomData(const char* szName);
+    CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
+    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced = nullptr);
+    CLuaArguments* GetAllCustomData(CLuaArguments* table);
+    bool           GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
+    bool           GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
+    bool           GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);
+    bool           GetCustomDataBool(const char* szKey, bool& bOut, bool bInheritData);
+    void           SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
+    void           DeleteCustomData(const char* szName);
 
     virtual bool GetMatrix(CMatrix& matrix) const;
     virtual bool SetMatrix(const CMatrix& matrix);
@@ -328,20 +330,17 @@ public:
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
 protected:
-    CClientManager*       m_pManager;
-    CClientEntity*        m_pParent;
-    CChildListType        m_Children;
-    CElementListSnapshot* m_pChildrenListSnapshot;
-    uint                  m_uiChildrenListSnapshotRevision;
+    CClientManager*         m_pManager;
+    CClientEntity*          m_pParent;
+    CChildListType          m_Children;
+    CElementListSnapshotRef m_pChildrenListSnapshot;
+    uint                    m_uiChildrenListSnapshotRevision;
 
     CCustomData* m_pCustomData;
 
     ElementID m_ID;
-    CVector   m_vecRelativePosition;
 
     unsigned short m_usDimension;
-
-    unsigned int m_uiLine;
 
 private:
     unsigned int m_uiTypeHash;

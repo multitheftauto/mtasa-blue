@@ -10,6 +10,22 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CEntityAddPacket.h"
+#include "CColShape.h"
+#include "CColCuboid.h"
+#include "CColCircle.h"
+#include "CColPolygon.h"
+#include "CColRectangle.h"
+#include "CColTube.h"
+#include "CDummy.h"
+#include "CPickup.h"
+#include "CMarker.h"
+#include "CBlip.h"
+#include "CRadarArea.h"
+#include "CWater.h"
+#include "CVehicleManager.h"
+#include "CHandlingManager.h"
+#include "CGame.h"
 
 //
 // Temporary helper functions for fixing crashes on pre r6459 clients.
@@ -224,6 +240,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Double sided
                     bool bIsDoubleSided = pObject->IsDoubleSided();
                     BitStream.WriteBit(bIsDoubleSided);
+
+                    // Breakable
+                    if (BitStream.Can(eBitStreamVersion::CEntityAddPacket_ObjectBreakable))
+                        BitStream.WriteBit(pObject->IsBreakable());
 
                     // Visible in all dimensions
                     if (BitStream.Can(eBitStreamVersion::DimensionOmnipresence))
@@ -731,17 +751,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Write the icon
                     SIntegerSync<unsigned char, 6> icon(pBlip->m_ucIcon);
                     BitStream.Write(&icon);
-                    if (pBlip->m_ucIcon == 0)
-                    {
-                        // Write the size
-                        SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
-                        BitStream.Write(&size);
 
-                        // Write the color
-                        SColorSync color;
-                        color = pBlip->GetColor();
-                        BitStream.Write(&color);
-                    }
+                    // Write the size
+                    SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
+                    BitStream.Write(&size);
+
+                    // Write the color
+                    SColorSync color;
+                    color = pBlip->GetColor();
+                    BitStream.Write(&color);
 
                     break;
                 }

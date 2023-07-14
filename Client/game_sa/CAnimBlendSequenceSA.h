@@ -20,7 +20,8 @@
 class CAnimBlendSequenceSAInterface
 {
 public:
-    union {
+    union
+    {
         uint16_t m_boneId;            // m_boneId is set if ( sFlags & 0x10u ) is true
         uint32_t m_hash;              // otherwise m_hash is set
     };

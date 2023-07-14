@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CColPolygon.h"
+#include "CVector2D.h"
+#include "CSpatialDatabase.h"
 
 CColPolygon::CColPolygon(CColManager* pManager, CElement* pParent, const CVector& vecPosition) : CColShape(pManager, pParent)
 {

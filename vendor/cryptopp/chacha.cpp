@@ -28,9 +28,7 @@ extern void ChaCha_OperateKeystream_AVX2(const word32 *state, const byte* input,
 extern void ChaCha_OperateKeystream_SSE2(const word32 *state, const byte* input, byte *output, unsigned int rounds);
 #endif
 
-#if (CRYPTOPP_POWER8_AVAILABLE)
-extern void ChaCha_OperateKeystream_POWER8(const word32 *state, const byte* input, byte *output, unsigned int rounds);
-#elif (CRYPTOPP_ALTIVEC_AVAILABLE)
+#if (CRYPTOPP_ALTIVEC_AVAILABLE)
 extern void ChaCha_OperateKeystream_ALTIVEC(const word32 *state, const byte* input, byte *output, unsigned int rounds);
 #endif
 
@@ -104,7 +102,7 @@ void ChaCha_OperateKeystream(KeystreamOperation operation,
         {
             while (iterationCount >= 8 && MultiBlockSafe(state[12], 8))
             {
-                const bool xorInput = (operation & INPUT_NULL) != INPUT_NULL;
+                const bool xorInput = (operation & EnumToInt(INPUT_NULL)) != EnumToInt(INPUT_NULL);
                 ChaCha_OperateKeystream_AVX2(state, xorInput ? input : NULLPTR, output, rounds);
 
                 // MultiBlockSafe avoids overflow on the counter words
@@ -122,7 +120,7 @@ void ChaCha_OperateKeystream(KeystreamOperation operation,
         {
             while (iterationCount >= 4 && MultiBlockSafe(state[12], 4))
             {
-                const bool xorInput = (operation & INPUT_NULL) != INPUT_NULL;
+                const bool xorInput = (operation & EnumToInt(INPUT_NULL)) != EnumToInt(INPUT_NULL);
                 ChaCha_OperateKeystream_SSE2(state, xorInput ? input : NULLPTR, output, rounds);
 
                 // MultiBlockSafe avoids overflow on the counter words
@@ -140,7 +138,7 @@ void ChaCha_OperateKeystream(KeystreamOperation operation,
         {
             while (iterationCount >= 4 && MultiBlockSafe(state[12], 4))
             {
-                const bool xorInput = (operation & INPUT_NULL) != INPUT_NULL;
+                const bool xorInput = (operation & EnumToInt(INPUT_NULL)) != EnumToInt(INPUT_NULL);
                 ChaCha_OperateKeystream_NEON(state, xorInput ? input : NULLPTR, output, rounds);
 
                 // MultiBlockSafe avoids overflow on the counter words
@@ -153,28 +151,12 @@ void ChaCha_OperateKeystream(KeystreamOperation operation,
         }
 #endif
 
-#if (CRYPTOPP_POWER8_AVAILABLE)
-        if (HasPower8())
-        {
-            while (iterationCount >= 4 && MultiBlockSafe(state[12], 4))
-            {
-                const bool xorInput = (operation & INPUT_NULL) != INPUT_NULL;
-                ChaCha_OperateKeystream_POWER8(state, xorInput ? input : NULLPTR, output, rounds);
-
-                // MultiBlockSafe avoids overflow on the counter words
-                state[12] += 4;
-
-                input += (!!xorInput)*4*BYTES_PER_ITERATION;
-                output += 4*BYTES_PER_ITERATION;
-                iterationCount -= 4;
-            }
-        }
-#elif (CRYPTOPP_ALTIVEC_AVAILABLE)
+#if (CRYPTOPP_ALTIVEC_AVAILABLE)
         if (HasAltivec())
         {
             while (iterationCount >= 4 && MultiBlockSafe(state[12], 4))
             {
-                const bool xorInput = (operation & INPUT_NULL) != INPUT_NULL;
+                const bool xorInput = (operation & EnumToInt(INPUT_NULL)) != EnumToInt(INPUT_NULL);
                 ChaCha_OperateKeystream_ALTIVEC(state, xorInput ? input : NULLPTR, output, rounds);
 
                 // MultiBlockSafe avoids overflow on the counter words
@@ -267,11 +249,7 @@ std::string ChaCha_AlgorithmProvider()
         return "NEON";
     else
 #endif
-#if (CRYPTOPP_POWER8_AVAILABLE)
-    if (HasPower8())
-        return "Power8";
-    else
-#elif (CRYPTOPP_ALTIVEC_AVAILABLE)
+#if (CRYPTOPP_ALTIVEC_AVAILABLE)
     if (HasAltivec())
         return "Altivec";
     else
@@ -464,7 +442,7 @@ void ChaChaTLS_Policy::SeekToIteration(lword iterationCount)
     // large then we can wrap and process more data as long as
     // data processed in the security context does not exceed
     // 2^32 blocks or approximately 256 GB of data.
-    CRYPTOPP_ASSERT(iterationCount <= std::numeric_limits<word32>::max());
+    CRYPTOPP_ASSERT(iterationCount <= (std::numeric_limits<word32>::max)());
     m_state[12] = (word32)iterationCount;  // low word
 }
 

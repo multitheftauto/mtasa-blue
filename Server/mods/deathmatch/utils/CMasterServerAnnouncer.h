@@ -8,6 +8,10 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include "version.h"
+
 struct SMasterServerDefinition
 {
     bool    bAcceptsPush;

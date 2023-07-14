@@ -9,18 +9,16 @@
  *
  *****************************************************************************/
 
-#include "CVehicleSA.h"
-#include "CPedSA.h"
-
 #pragma once
 
 #include <game/CObject.h>
 #include "CPhysicalSA.h"
 
+class CFireSAInterface;
+
 #define FUNC_CObject_Create             0x5A1F60
 #define FUNC_CObject_Explode            0x5A1340
 #define FUNC_CGlass_WindowRespondsToCollision 0x71BC40
-#define FUNC_CObject_AddToControlCodeList 0x59F400 // Dynamic objects-combinations like garage doors, train crossings, cranes use this to be processed
 
 class CObjectInfo
 {
@@ -158,8 +156,3 @@ public:
 private:
     void CheckForGangTag();
 };
-
-/*
-#define COBJECTSA_DEFINED
-#define COBJECTSAINTERFACE_DEFINED
-*/

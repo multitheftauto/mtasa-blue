@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CXMLConfig.h"
 
 CXMLConfig::CXMLConfig(const char* szFileName)
 {
@@ -97,8 +98,8 @@ int CXMLConfig::GetRGBA(CXMLNode* pParent, const char* szKey, unsigned char& R, 
     CXMLNode* pNode = pParent->FindSubNode(szKey);
     if (pNode)
     {
-        char          cDelimiter;
-        istringstream iss;
+        char               cDelimiter;
+        std::istringstream iss;
 
         std::string strValue;
         strValue = pNode->GetTagContent();

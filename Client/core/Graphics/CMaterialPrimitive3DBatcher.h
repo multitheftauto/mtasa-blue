@@ -34,8 +34,8 @@ public:
     void ClearQueue();
 
 protected:
-    bool m_bPreGUI;
-    IDirect3DDevice9*                     m_pDevice;
-    CGraphics*                            m_pGraphics;
-    std::vector<sPrimitiveMaterial3D>     m_primitiveList;
+    bool                              m_bPreGUI;
+    IDirect3DDevice9*                 m_pDevice;
+    CGraphics*                        m_pGraphics;
+    std::vector<sPrimitiveMaterial3D> m_primitiveList;
 };

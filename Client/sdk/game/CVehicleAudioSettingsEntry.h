@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <CVector.h>
+#include "Common.h"
 
 class CVehicleAudioSettingsEntry
 {

@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaTimerManager.h"
+#include "CGame.h"
+#include "CScriptDebugging.h"
+#include "CIdArray.h"
 
 void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
 {

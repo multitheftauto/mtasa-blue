@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleAudioSettingsManager.h
+ *  FILE:        game_sa/CVehicleAudioSettingsManagerSA.h
  *  PURPOSE:     Header file for vehicle audio settings manager class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/

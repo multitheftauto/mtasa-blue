@@ -11,24 +11,20 @@
 
 #pragma once
 
-class CTaskManager;
-
+#include <memory>
 #include "Common.h"
 #include "CPhysical.h"
-#include "CWeapon.h"
-#include "CPedIntelligence.h"
-#include "CPedSound.h"
-#include "CPedIK.h"
-#include <CVector2D.h>
+#include "CWeaponInfo.h"
 
-#include <windows.h>
-
-// forward declaration, avoid compile error
-class CVehicle;
 class CObject;
-class CWeaponStat;
-
+class CPedIK;
 class CPedIKSAInterface;
+class CPedIntelligence;
+class CPedSound;
+class CTaskManager;
+class CVehicle;
+class CWeapon;
+class CWeaponStat;
 
 enum ePedPieceTypes
 {
@@ -181,17 +177,15 @@ public:
 
     virtual class CPedSAInterface* GetPedInterface() = 0;
 
-    virtual void AttachPedToBike(CEntity* entity, CVector* vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType) = 0;
     virtual void DetachPedFromEntity() = 0;
 
-    virtual bool      CanSeeEntity(CEntity* entity, FLOAT fDistance) = 0;
     virtual CVehicle* GetVehicle() = 0;
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
     virtual void SetModelIndex(unsigned long ulModel) = 0;
     virtual void RemoveGeometryRef() = 0;
 
-    virtual FLOAT    GetHealth() = 0;
+    virtual float    GetHealth() = 0;
     virtual void     SetHealth(float fHealth) = 0;
     virtual float    GetArmor() = 0;
     virtual void     SetArmor(float fArmor) = 0;
@@ -209,12 +203,11 @@ public:
     virtual DWORD             GetType() = 0;
     virtual CPedIntelligence* GetPedIntelligence() = 0;
     virtual CPedSound*        GetPedSound() = 0;
-    virtual DWORD*            GetMemoryValue(DWORD dwOffset) = 0;
 
-    virtual FLOAT       GetCurrentRotation() = 0;
-    virtual FLOAT       GetTargetRotation() = 0;
-    virtual void        SetCurrentRotation(FLOAT fRotation) = 0;
-    virtual void        SetTargetRotation(FLOAT fRotation) = 0;
+    virtual float       GetCurrentRotation() = 0;
+    virtual float       GetTargetRotation() = 0;
+    virtual void        SetCurrentRotation(float fRotation) = 0;
+    virtual void        SetTargetRotation(float fRotation) = 0;
     virtual eWeaponSlot GetCurrentWeaponSlot() = 0;
     virtual void        SetCurrentWeaponSlot(eWeaponSlot weaponSlot) = 0;
 
@@ -270,6 +263,7 @@ public:
     virtual void GetVoice(const char** pszVoiceType, const char** pszVoice) = 0;
     virtual void SetVoice(short sVoiceType, short sVoiceID) = 0;
     virtual void SetVoice(const char* szVoiceType, const char* szVoice) = 0;
+    virtual void ResetVoice() = 0;
     virtual void SetLanding(bool bIsLanding) = 0;
     virtual void SetUpdateMetricsRequired(bool required) = 0;
 
@@ -277,10 +271,10 @@ public:
     virtual float        GetCurrentWeaponRange() = 0;
     virtual void         AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType) = 0;
 
-    virtual int GetCustomMoveAnim() = 0;
+    virtual int  GetCustomMoveAnim() = 0;
     virtual bool IsDoingGangDriveby() = 0;
 
-    virtual CPedIKSAInterface* GetPedIKInterface() = 0;
-    virtual void*              GetPedNodeInterface(std::int32_t nodeId) = 0;
+    virtual CPedIKSAInterface*      GetPedIKInterface() = 0;
+    virtual void*                   GetPedNodeInterface(std::int32_t nodeId) = 0;
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
 };

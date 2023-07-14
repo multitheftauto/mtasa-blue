@@ -10,6 +10,8 @@
 
 #include "StdInc.h"
 #include "CLuaGenericDefs.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CScriptArgReader.h"
 
 void CLuaGenericDefs::LoadFunctions()
 {
@@ -64,8 +66,8 @@ std::variant<bool, std::string, CLuaArguments> CLuaGenericDefs::GetServerConfigS
 
 bool CLuaGenericDefs::SetServerPassword(std::optional<std::string> rawPassword)
 {
-if (!CStaticFunctionDefinitions::SetServerPassword(rawPassword.value_or(""), true))
-    throw std::invalid_argument("password must be shorter than 32 chars and just contain visible characters");
+    if (!CStaticFunctionDefinitions::SetServerPassword(rawPassword.value_or(""), true))
+        throw std::invalid_argument("password must be shorter than 32 chars and just contain visible characters");
     return true;
 }
 
@@ -91,7 +93,8 @@ std::string_view CLuaGenericDefs::GetServerName()
 
 bool CLuaGenericDefs::OutputServerLog(std::string_view message)
 {
-    CLogger::LogPrintf(LOGLEVEL_MEDIUM, "%.*s\n", message.length(), message.data());
+    CLogger::LogPrintf(LOGLEVEL_MEDIUM, "%.*s", message.length(), message.data());
+    CLogger::LogPrintNoStamp("\n");
     return true;
 }
 

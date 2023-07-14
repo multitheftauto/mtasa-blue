@@ -34,11 +34,8 @@ class CPedIntelligenceSAInterface;
 
 #define SIZEOF_CPLAYERPED                           1956
 
-#define FUNC_SetModelIndex                          0x5E4880 // ##SA##
-#define FUNC_AttachPedToBike                        0x5E7E60
+#define FUNC_SetModelIndex                          0x5E4880
 #define FUNC_AttachPedToEntity                      0x5E7CB0
-#define FUNC_CanSeeEntity                           0x5E0730
-#define FUNC_GiveObjectToPedToHold                  0x5E4390
 #define FUNC_RestorePlayerStuffDuringResurrection   0x442060
 #define FUNC_SetIsStanding                          0x4ABBE0
 #define FUNC_MakeChangesForNewWeapon_Slot           0x60D000
@@ -49,76 +46,21 @@ class CPedIntelligenceSAInterface;
 
 #define FUNC_QuitEnteringCar                        0x650130 // really belongs in CCarEnterExit
 
-#define FUNC_CanPedReturnToState        0x5018D0
-#define FUNC_ClearAimFlag               0x50B4A0
-#define FUNC_ClearAll                   0x509DF0
-#define FUNC_ClearAttackByRemovingAnim  0x52CF70
-#define FUNC_ClearInvestigateEvent      0x526BA0
-#define FUNC_ClearLookFlag              0x50B9C0
-#define FUNC_ClearObjective             0x521720
-#define FUNC_ClearPointGunAt            0x52DBE0
-#define FUNC_ClearWeapons               0x4FF740
-#define FUNC_CreateDeadPedMoney         0x43E2C0
-#define FUNC_CreateDeadPedWeaponPickups 0x43DF30
-#define FUNC_GetLocalDirection          0x5035F0
-#define FUNC_GetWeaponSlot              0x5DF200 // ##SA##
-#define FUNC_SetCurrentWeapon           0x5E61F0 // ##SA##
-#define FUNC_GiveWeapon                 0x5E6080 // ##SA##
-#define FUNC_GetBonePosition            0x5E4280 // ##SA##
-#define FUNC_GetTransformedBonePosition 0x5E01C0 // ##SA##
-#define FUNC_IsWearingGoggles           0x479D10 // ##SA##
-#define FUNC_TakeOffGoggles             0x5E6010 // ##SA##
-#define FUNC_PutOnGoggles               0x5E3AE0 // ##SA##
-#define FUNC_RemoveWeaponModel          0x5E3990 // ##SA## (call with -1 to remove any model, I think)
-#define FUNC_RemoveGogglesModel         0x5DF170 // ##SA##
-#define FUNC_ClearWeapon                0x5E62B0 // ##SA##
-#define FUNC_GetHealth                  0x4ABC20
-#define FUNC_SetCurrentWeaponFromID     0x4FF8E0
-#define FUNC_SetCurrentWeaponFromSlot   0x4FF900
-#define FUNC_IsPedInControl             0x501950
-#define FUNC_IsPedShootable             0x501930
-#define FUNC_SetAttackTimer             0x4FCAB0
-#define FUNC_SetDead                    0x4F6430
-#define FUNC_SetDie                     0x4F65C0
-#define FUNC_SetEvasiveDive             0x4F6A20
-#define FUNC_SetEvasiveStep             0x4F7170
-#define FUNC_SetFall                    0x4FD9F0
-#define FUNC_SetFlee                    0x4FBA90
-#define FUNC_SetIdle                    0x4FDFD0
-#define FUNC_SetLeader                  0x4F07D0
-#define FUNC_SetLookFlag                0x50BB70
-#define FUNC_SetLookTimer               0x4FCAF0
-#define FUNC_SetMoveState               0x50D110
-#define FUNC_SetObjective_ENTITY        0x521F10
-#define FUNC_SetObjective               0x5224B0
-#define FUNC_SetObjective_VECTOR        0x521840
-#define FUNC_SetSeekCar                 0x4F54D0
-#define FUNC_SetShootTimer              0x4FCA90
-#define FUNC_SetSolicit                 0x4F1400
-#define FUNC_SetStoredState             0x50CC40
-#define FUNC_RestorePreviousState       0x50C600
-#define FUNC_SetWaitState               0x4F28A0
-#define FUNC_Teleport                   0x4F5690
-#define FUNC_WarpPedIntoCar             0x4EF8B0
+#define FUNC_SetCurrentWeapon           0x5E61F0
+#define FUNC_GiveWeapon                 0x5E6080
+#define FUNC_GetBonePosition            0x5E4280
+#define FUNC_GetTransformedBonePosition 0x5E01C0
+#define FUNC_IsWearingGoggles           0x479D10
+#define FUNC_TakeOffGoggles             0x5E6010
+#define FUNC_PutOnGoggles               0x5E3AE0
+#define FUNC_RemoveWeaponModel          0x5E3990
+#define FUNC_RemoveGogglesModel         0x5DF170
+#define FUNC_ClearWeapon                0x5E62B0
 #define FUNC_DetachPedFromEntity        0x5E7EC0
 #define FUNC_CPed_RemoveBodyPart        0x5f0140
 #define FUNC_PreRenderAfterTest         0x5E65A0
 
 #define VAR_LocalPlayer                 0x94AD28
-
-/*
-#ifndef CVehicleSA_DEFINED
-#define CVehicleSA void
-#endif
-
-#ifdef CPedSA
-#undef CPedSA
-#endif
-
-#ifdef CPedSAInterface
-#undef CPedSAInterface
-#endif
-*/
 
 //+1328 = Ped state
 //+1344 = ped health
@@ -150,8 +92,8 @@ public:
     unsigned int bIsPedDieAnimPlaying : 1;            // is ped die animation finished so can dead now
     unsigned int bStayInSamePlace : 1;                // when set, ped stays put
     unsigned int
-                 bKindaStayInSamePlace : 1;            // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
-    unsigned int bBeingChasedByPolice : 1;             // use nodes for routefind
+        bKindaStayInSamePlace : 1;                    // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
+    unsigned int bBeingChasedByPolice : 1;            // use nodes for routefind
 
     unsigned int bNotAllowedToDuck : 1;              // Is this ped allowed to duck at all?
     unsigned int bCrouchWhenShooting : 1;            // duck behind cars etc
@@ -257,9 +199,9 @@ public:
     unsigned int bJustGotOffTrain : 1;
     unsigned int bDeathPickupsPersist : 1;
     unsigned int bTestForShotInVehicle : 1;
-    //#ifdef GTA_REPLAY
+    // #ifdef GTA_REPLAY
     unsigned int bUsedForReplay : 1;            // This ped is controlled by replay and should be removed when replay is done.
-    //#endif
+    // #endif
 };
 
 class CPedWeaponAudioEntitySAInterface
@@ -312,7 +254,7 @@ public:
     BYTE                bFightingStyle;            // 1837
     BYTE                bFightingStyleExtra;
     BYTE                bPad7[1];
-    CFireInterface*     pFireOnPed;
+    CFireSAInterface*   pFireOnPed;
     BYTE                bPad10[104];
     CEntitySAInterface* pTargetedEntity;            // 1948
 };
@@ -327,6 +269,7 @@ private:
     CPedIntelligenceSA* m_pPedIntelligence;
     CPedSAInterface*    m_pPedInterface;
     CPedSoundSA*        m_pPedSound;
+    CPedSoundSA*        m_pDefaultPedSound;
 
     DWORD         m_dwType;
     unsigned char m_ucOccupiedSeat;
@@ -339,22 +282,20 @@ public:
     CPedSA(CPedSAInterface* pedInterface);
     ~CPedSA();
 
-    VOID             SetInterface(CEntitySAInterface* intInterface);
+    void             SetInterface(CEntitySAInterface* intInterface);
     CPedSAInterface* GetPedInterface() { return (CPedSAInterface*)GetInterface(); }
     void             Init();
     void             SetModelIndex(DWORD dwModelIndex);
     void             RemoveGeometryRef();
-    void             AttachPedToBike(CEntity* entity, CVector* vector, unsigned short sUnk, FLOAT fUnk, FLOAT fUnk2, eWeaponType weaponType);
-    void             AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, FLOAT fRotationLimit, eWeaponType weaponType,
+    void             AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, float fRotationLimit, eWeaponType weaponType,
                                        bool bChangeCamera);
     void             DetachPedFromEntity();
 
-    bool      CanSeeEntity(CEntity* entity, FLOAT fDistance);
     CVehicle* GetVehicle();
     void      Respawn(CVector* position, bool bCameraCut);
     bool      AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
 
-    FLOAT GetHealth();
+    float GetHealth();
     void  SetHealth(float fHealth);
 
     float GetArmor();
@@ -375,13 +316,12 @@ public:
     CPedSound*        GetPedSound() { return m_pPedSound; }
     DWORD             GetType();
     void              SetType(DWORD dwType);
-    DWORD*            GetMemoryValue(DWORD dwOffset);
 
     virtual void RestoreLastGoodPhysicsState();
-    FLOAT        GetCurrentRotation();
-    FLOAT        GetTargetRotation();
-    void         SetCurrentRotation(FLOAT fRotation);
-    void         SetTargetRotation(FLOAT fRotation);
+    float        GetCurrentRotation();
+    float        GetTargetRotation();
+    void         SetCurrentRotation(float fRotation);
+    void         SetTargetRotation(float fRotation);
 
     eWeaponSlot GetCurrentWeaponSlot();
     void        SetCurrentWeaponSlot(eWeaponSlot weaponSlot);
@@ -444,6 +384,7 @@ public:
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
     void SetVoice(short sVoiceType, short sVoiceID);
     void SetVoice(const char* szVoiceType, const char* szVoice);
+    void ResetVoice();
     void SetLanding(bool bIsLanding) { GetPedInterface()->pedFlags.bIsLanding = bIsLanding; }
     void SetUpdateMetricsRequired(bool required) { GetPedInterface()->pedFlags.bUpdateMatricesRequired = required; }
 
@@ -454,8 +395,8 @@ public:
     virtual int GetCustomMoveAnim();
     bool        IsDoingGangDriveby();
 
-    CPedIKSAInterface* GetPedIKInterface() { return &reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedIK;}
-    void*              GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
-    std::unique_ptr<CPedIK> GetPedIK() {return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
-    static void StaticSetHooks();
+    CPedIKSAInterface*      GetPedIKInterface() { return &reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedIK; }
+    void*                   GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
+    std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
+    static void             StaticSetHooks();
 };

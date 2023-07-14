@@ -11,21 +11,18 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include <CVector.h>
 #include <game/CGarage.h>
-#include "CEntitySA.h"
-#include "CAutomobileSA.h"
 
-class CGarageSAInterface : public CGarageInterface
+class CGarageSAInterface
 {
 public:
     CVector vecPosition;                           //  0
-    FLOAT   DirectionA_X, DirectionA_Y;            // 12
-    FLOAT   DirectionB_X, DirectionB_Y;            // 20
-    FLOAT   Height, Width, Depth;                  // 28
-    FLOAT   Left, Right, Front, Back;              // 40
-    FLOAT   DoorPosition;                          // 56
+    float   DirectionA_X, DirectionA_Y;            // 12
+    float   DirectionB_X, DirectionB_Y;            // 20
+    float   Height, Width, Depth;                  // 28
+    float   Left, Right, Front, Back;              // 40
+    float   DoorPosition;                          // 56
     DWORD   pad;                                   // 60
     DWORD   pad2;                                  // 64
     char    Name[8];                               // 68
@@ -42,7 +39,7 @@ public:
     CGarageSA(CGarageSAInterface* pInterface);
 
     void SetType(BYTE type);
-    BYTE GetType() const { return this->internalInterface->Type; }
+    BYTE GetType() const { return internalInterface->Type; }
 
     void GetPosition(CVector& vecPosition) const;
     void GetDirection(float& x1, float& y1, float& x2, float& y2) const;
@@ -52,7 +49,7 @@ public:
     void SetOpen(bool bOpen);
     bool IsOpen() const;
 
-    CGarageInterface* GetInterface() { return this->internalInterface; }
+    CGarageSAInterface* GetInterface() { return internalInterface; }
 
 private:
     CGarageSAInterface* internalInterface;

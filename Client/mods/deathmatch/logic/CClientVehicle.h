@@ -15,6 +15,8 @@ class CClientVehicle;
 
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
+#include <game/CModelInfo.h>
+#include <game/CVehicleAudioSettingsEntry.h>
 
 #include "CClientCommon.h"
 #include "CClientCamera.h"
@@ -24,6 +26,10 @@ class CClientVehicle;
 #include "CClientVehicleManager.h"
 #include "CVehicleUpgrades.h"
 #include "CClientModel.h"
+
+class CBikeHandlingEntry;
+class CBoatHandlingEntry;
+class CClientProjectile;
 
 #define INVALID_PASSENGER_SEAT 0xFF
 #define DEFAULT_VEHICLE_HEALTH 1000
@@ -139,7 +145,6 @@ struct SVehicleComponentData
     bool    m_bScaleChanged;
     bool    m_bVisible;
 };
-class CClientProjectile;
 
 class CClientVehicle : public CClientStreamElement
 {
@@ -183,7 +188,6 @@ public:
     virtual CSphere GetWorldBoundingSphere();
 
     void GetMoveSpeed(CVector& vecMoveSpeed) const;
-    void GetMoveSpeedMeters(CVector& vecMoveSpeed) const;
     void SetMoveSpeed(const CVector& vecMoveSpeed);
     void GetTurnSpeed(CVector& vecTurnSpeed) const;
     void SetTurnSpeed(const CVector& vecTurnSpeed);
@@ -317,9 +321,7 @@ public:
 
     void FuckCarCompletely(bool bKeepWheels);
 
-    unsigned long GetMemoryValue(unsigned long ulOffset);
-    unsigned long GetGameBaseAddress();
-    void          WorldIgnore(bool bWorldIgnore);
+    void WorldIgnore(bool bWorldIgnore);
 
     bool IsVirtual() { return m_pVehicle == NULL; };
 
@@ -573,10 +575,6 @@ protected:
     CClientVehiclePtr            m_pPreviousLink;
     CClientVehiclePtr            m_pNextLink;
     CMatrix                      m_Matrix;
-    CMatrix                      m_MatrixLast;
-    CMatrix                      m_MatrixPure;
-    CVector                      m_vecMoveSpeedInterpolate;
-    CVector                      m_vecMoveSpeedMeters;
     CVector                      m_vecMoveSpeed;
     CVector                      m_vecTurnSpeed;
     float                        m_fHealth;

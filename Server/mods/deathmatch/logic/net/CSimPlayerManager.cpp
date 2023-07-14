@@ -130,8 +130,9 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_bIsJoined = pPlayer->IsJoined();
     pSim->m_usBitStreamVersion = pPlayer->GetBitStreamVersion();
     pSim->m_bHasOccupiedVehicle = pVehicle != NULL;
+    pSim->m_bIsExitingVehicle = pPlayer->GetVehicleAction() == CPed::VEHICLEACTION_EXITING;
     pSim->m_PlayerID = pPlayer->GetID();
-    pSim->m_usLatency = pPlayer->GetPing();
+    pSim->m_usLatency = static_cast<unsigned short>(pPlayer->GetPing());
     pSim->m_ucWeaponType = pPlayer->GetWeaponType();
     pSim->m_usVehicleModel = pVehicle ? pVehicle->GetModel() : 0;
     pSim->m_ucSyncTimeContext = pPlayer->GetSyncTimeContext();
@@ -233,7 +234,7 @@ bool CSimPlayerManager::HandlePlayerPureSync(const NetServerPlayerID& Socket, Ne
     CSimPlayer* pSourceSimPlayer = Get(Socket);
 
     // Check is good for player pure sync
-    if (pSourceSimPlayer && pSourceSimPlayer->IsJoined() && !pSourceSimPlayer->m_bHasOccupiedVehicle)
+    if (pSourceSimPlayer && pSourceSimPlayer->IsJoined() && (!pSourceSimPlayer->m_bHasOccupiedVehicle || pSourceSimPlayer->m_bIsExitingVehicle))
     {
         // Read the incoming packet data
         CSimPlayerPuresyncPacket* pPacket =
@@ -487,19 +488,19 @@ void CSimPlayerManager::Broadcast(const CSimPacket& Packet, const std::multimap<
         if (Packet.Write(*pBitStream))
         {
             // For each player, send the packet
-            const pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
+            const std::pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
             for (s_it = keyRange.first; s_it != keyRange.second; ++s_it)
             {
                 CSimPlayer* pPlayer = s_it->second;
                 dassert(usBitStreamVersion == pPlayer->GetBitStreamVersion());
-                g_pRealNetServer->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, FALSE, packetPriority, Reliability,
+                g_pRealNetServer->SendPacket(Packet.GetPacketID(), pPlayer->GetSocket(), pBitStream, false, packetPriority, Reliability,
                                              Packet.GetPacketOrdering());
             }
         }
         else
         {
             // Skip
-            const pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
+            const std::pair<mapIter, mapIter> keyRange = groupMap.equal_range(usBitStreamVersion);
             for (s_it = keyRange.first; s_it != keyRange.second; ++s_it)
             {
             }

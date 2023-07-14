@@ -23,14 +23,15 @@
 # include <immintrin.h>
 #endif
 
-// C1189: error: This header is specific to ARM targets
-#if (CRYPTOPP_ARM_NEON_AVAILABLE) && !defined(_M_ARM64)
-# include <arm_neon.h>
-#endif
-
-#if (CRYPTOPP_ARM_ACLE_AVAILABLE)
-# include <stdint.h>
-# include <arm_acle.h>
+// Android makes <arm_acle.h> available with ARMv7-a
+#if (CRYPTOPP_BOOL_ARMV8)
+# if (CRYPTOPP_ARM_NEON_HEADER)
+#  include <arm_neon.h>
+# endif
+# if (CRYPTOPP_ARM_ACLE_HEADER)
+#  include <stdint.h>
+#  include <arm_acle.h>
+# endif
 #endif
 
 #if CRYPTOPP_POWER8_SHA_AVAILABLE
@@ -45,10 +46,6 @@
 #ifndef EXCEPTION_EXECUTE_HANDLER
 # define EXCEPTION_EXECUTE_HANDLER 1
 #endif
-
-// Clang __m128i casts
-#define M128_CAST(x) ((__m128i *)(void *)(x))
-#define CONST_M128_CAST(x) ((const __m128i *)(const void *)(x))
 
 // Squash MS LNK4221 and libtool warnings
 extern const char SHA_SIMD_FNAME[] = __FILE__;
@@ -114,7 +111,10 @@ bool CPU_ProbeSHA1()
 
     volatile sigset_t oldMask;
     if (sigprocmask(0, NULLPTR, (sigset_t*)&oldMask))
+    {
+        signal(SIGILL, oldHandler);
         return false;
+    }
 
     if (setjmp(s_jmpSIGILL))
         result = false;
@@ -143,7 +143,7 @@ bool CPU_ProbeSHA1()
 #endif  // CRYPTOPP_ARM_SHA1_AVAILABLE
 }
 
-bool CPU_ProbeSHA2()
+bool CPU_ProbeSHA256()
 {
 #if defined(CRYPTOPP_NO_CPU_FEATURE_PROBES)
     return false;
@@ -181,7 +181,10 @@ bool CPU_ProbeSHA2()
 
     volatile sigset_t oldMask;
     if (sigprocmask(0, NULLPTR, (sigset_t*)&oldMask))
+    {
+        signal(SIGILL, oldHandler);
         return false;
+    }
 
     if (setjmp(s_jmpSIGILL))
         result = false;
@@ -862,7 +865,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP1 = vaddq_u32(MSG1, vld1q_u32(&SHA256_K[0x04]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP0);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);
-        MSG0 = vsha256su1q_u32(MSG0, MSG2, MSG3);;
+        MSG0 = vsha256su1q_u32(MSG0, MSG2, MSG3);
 
         // Rounds 4-7
         MSG1 = vsha256su0q_u32(MSG1, MSG2);
@@ -870,7 +873,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP0 = vaddq_u32(MSG2, vld1q_u32(&SHA256_K[0x08]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP1);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);
-        MSG1 = vsha256su1q_u32(MSG1, MSG3, MSG0);;
+        MSG1 = vsha256su1q_u32(MSG1, MSG3, MSG0);
 
         // Rounds 8-11
         MSG2 = vsha256su0q_u32(MSG2, MSG3);
@@ -878,7 +881,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP1 = vaddq_u32(MSG3, vld1q_u32(&SHA256_K[0x0c]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP0);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);
-        MSG2 = vsha256su1q_u32(MSG2, MSG0, MSG1);;
+        MSG2 = vsha256su1q_u32(MSG2, MSG0, MSG1);
 
         // Rounds 12-15
         MSG3 = vsha256su0q_u32(MSG3, MSG0);
@@ -886,7 +889,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP0 = vaddq_u32(MSG0, vld1q_u32(&SHA256_K[0x10]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP1);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);
-        MSG3 = vsha256su1q_u32(MSG3, MSG1, MSG2);;
+        MSG3 = vsha256su1q_u32(MSG3, MSG1, MSG2);
 
         // Rounds 16-19
         MSG0 = vsha256su0q_u32(MSG0, MSG1);
@@ -894,7 +897,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP1 = vaddq_u32(MSG1, vld1q_u32(&SHA256_K[0x14]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP0);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);
-        MSG0 = vsha256su1q_u32(MSG0, MSG2, MSG3);;
+        MSG0 = vsha256su1q_u32(MSG0, MSG2, MSG3);
 
         // Rounds 20-23
         MSG1 = vsha256su0q_u32(MSG1, MSG2);
@@ -902,7 +905,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP0 = vaddq_u32(MSG2, vld1q_u32(&SHA256_K[0x18]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP1);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);
-        MSG1 = vsha256su1q_u32(MSG1, MSG3, MSG0);;
+        MSG1 = vsha256su1q_u32(MSG1, MSG3, MSG0);
 
         // Rounds 24-27
         MSG2 = vsha256su0q_u32(MSG2, MSG3);
@@ -910,7 +913,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP1 = vaddq_u32(MSG3, vld1q_u32(&SHA256_K[0x1c]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP0);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);
-        MSG2 = vsha256su1q_u32(MSG2, MSG0, MSG1);;
+        MSG2 = vsha256su1q_u32(MSG2, MSG0, MSG1);
 
         // Rounds 28-31
         MSG3 = vsha256su0q_u32(MSG3, MSG0);
@@ -918,7 +921,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP0 = vaddq_u32(MSG0, vld1q_u32(&SHA256_K[0x20]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP1);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);
-        MSG3 = vsha256su1q_u32(MSG3, MSG1, MSG2);;
+        MSG3 = vsha256su1q_u32(MSG3, MSG1, MSG2);
 
         // Rounds 32-35
         MSG0 = vsha256su0q_u32(MSG0, MSG1);
@@ -926,7 +929,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP1 = vaddq_u32(MSG1, vld1q_u32(&SHA256_K[0x24]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP0);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);
-        MSG0 = vsha256su1q_u32(MSG0, MSG2, MSG3);;
+        MSG0 = vsha256su1q_u32(MSG0, MSG2, MSG3);
 
         // Rounds 36-39
         MSG1 = vsha256su0q_u32(MSG1, MSG2);
@@ -934,7 +937,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP0 = vaddq_u32(MSG2, vld1q_u32(&SHA256_K[0x28]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP1);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);
-        MSG1 = vsha256su1q_u32(MSG1, MSG3, MSG0);;
+        MSG1 = vsha256su1q_u32(MSG1, MSG3, MSG0);
 
         // Rounds 40-43
         MSG2 = vsha256su0q_u32(MSG2, MSG3);
@@ -942,7 +945,7 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP1 = vaddq_u32(MSG3, vld1q_u32(&SHA256_K[0x2c]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP0);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);
-        MSG2 = vsha256su1q_u32(MSG2, MSG0, MSG1);;
+        MSG2 = vsha256su1q_u32(MSG2, MSG0, MSG1);
 
         // Rounds 44-47
         MSG3 = vsha256su0q_u32(MSG3, MSG0);
@@ -950,30 +953,30 @@ void SHA256_HashMultipleBlocks_ARMV8(word32 *state, const word32 *data, size_t l
         TMP0 = vaddq_u32(MSG0, vld1q_u32(&SHA256_K[0x30]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP1);
         STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);
-        MSG3 = vsha256su1q_u32(MSG3, MSG1, MSG2);;
+        MSG3 = vsha256su1q_u32(MSG3, MSG1, MSG2);
 
         // Rounds 48-51
         TMP2 = STATE0;
         TMP1 = vaddq_u32(MSG1, vld1q_u32(&SHA256_K[0x34]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP0);
-        STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);;
+        STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);
 
         // Rounds 52-55
         TMP2 = STATE0;
         TMP0 = vaddq_u32(MSG2, vld1q_u32(&SHA256_K[0x38]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP1);
-        STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);;
+        STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);
 
         // Rounds 56-59
         TMP2 = STATE0;
         TMP1 = vaddq_u32(MSG3, vld1q_u32(&SHA256_K[0x3c]));
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP0);
-        STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);;
+        STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP0);
 
         // Rounds 60-63
         TMP2 = STATE0;
         STATE0 = vsha256hq_u32(STATE0, STATE1, TMP1);
-        STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);;
+        STATE1 = vsha256h2q_u32(STATE1, TMP2, TMP1);
 
         // Add back to state
         STATE0 = vaddq_u32(STATE0, ABEF_SAVE);

@@ -11,6 +11,7 @@
 #include <StdInc.h>
 #include <Psapi.h>
 #include <game/CGame.h>
+#include <game/CPools.h>
 #include "CModelCacheManager.h"
 
 DECLARE_ENUM(ePools);
@@ -471,17 +472,17 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
         memStatsInfo.iProcessTotalVirtualKB = status.ullTotalVirtual / 1024LL;
     }
 
-    memStatsInfo.iStreamingMemoryUsed = *(int*)0x08E4CB4;
-    memStatsInfo.iStreamingMemoryAvailable = *(int*)0x08A5A80;
+    memStatsInfo.iStreamingMemoryUsed = *(size_t*)0x08E4CB4;
+    memStatsInfo.iStreamingMemoryAvailable = *(size_t*)0x08A5A80;
 
-    char* pFileInfoArray = *(char**)(0x5B8B08 + 6);
-    CGame* pGame = g_pCore->GetGame();
+    char*        pFileInfoArray = *(char**)(0x5B8B08 + 6);
+    CGame*       pGame = g_pCore->GetGame();
     unsigned int RRR_BASE_ID = pGame->GetBaseIDforRRR();
 
     for (uint i = 0; i < RRR_BASE_ID; i++)
     {
         char* pModelInfo = pFileInfoArray + 20 /* sizeof(CStreamingInfo) */ * i;
-        char uiLoadedFlag = pModelInfo[0x10];  // CStreamingInfo.uiLoadFlag
+        char  uiLoadedFlag = pModelInfo[0x10];            // CStreamingInfo.uiLoadFlag
         if (uiLoadedFlag)
         {
             memStatsInfo.modelInfo.uiTotal++;
@@ -664,8 +665,8 @@ void CMemStats::CreateTables()
     m_TableList.clear();
 
 //
-    // Color setups
-    //
+// Color setups
+//
     #define YELLOW "#FFFF00"
     #define RED "#FF0000"
     #define BLUE "#0000FF"
@@ -901,17 +902,15 @@ void CMemStats::CreateTables()
         table.AddRow(SString("1194-%d|(World)|^1~.%d|%d", pGame->GetBaseIDforTXD() - 1, m_MemStatsDelta.modelInfo.uiUnknown_1194_19999,
                              m_MemStatsNow.modelInfo.uiUnknown_1194_19999));
         table.AddRow(SString("%d-%d|(Textures)|^1~.%d|%d", pGame->GetBaseIDforTXD(), pGame->GetBaseIDforCOL() - 1,
-            m_MemStatsDelta.modelInfo.uiTextures_20000_24999,
-                             m_MemStatsNow.modelInfo.uiTextures_20000_24999));
+                             m_MemStatsDelta.modelInfo.uiTextures_20000_24999, m_MemStatsNow.modelInfo.uiTextures_20000_24999));
         table.AddRow(SString("%d-%d|(Collisions)|^1~.%d|%d", pGame->GetBaseIDforCOL(), pGame->GetBaseIDforIPL() - 1,
-            m_MemStatsDelta.modelInfo.uiCollisions_25000_25254,
-                             m_MemStatsNow.modelInfo.uiCollisions_25000_25254));
-        table.AddRow(SString("%d-%d|(Ipls)|^1~.%d|%d", pGame->GetBaseIDforIPL(), pGame->GetBaseIDforDAT() - 1,
-            m_MemStatsDelta.modelInfo.uiIpls_25255_25510, m_MemStatsNow.modelInfo.uiIpls_25255_25510));
-        table.AddRow(SString("%d-%d|(Paths)|^1~.%d|%d", pGame->GetBaseIDforDAT(), pGame->GetBaseIDforIFP() - 1,
-            m_MemStatsDelta.modelInfo.uiPaths_25511_25574, m_MemStatsNow.modelInfo.uiPaths_25511_25574));
-        table.AddRow(SString("%d-%d|(Anims)|^1~.%d|%d", pGame->GetBaseIDforIFP(), pGame->GetBaseIDforRRR() - 1,
-            m_MemStatsDelta.modelInfo.uiAnims_25575_25754, m_MemStatsNow.modelInfo.uiAnims_25575_25754));
+                             m_MemStatsDelta.modelInfo.uiCollisions_25000_25254, m_MemStatsNow.modelInfo.uiCollisions_25000_25254));
+        table.AddRow(SString("%d-%d|(Ipls)|^1~.%d|%d", pGame->GetBaseIDforIPL(), pGame->GetBaseIDforDAT() - 1, m_MemStatsDelta.modelInfo.uiIpls_25255_25510,
+                             m_MemStatsNow.modelInfo.uiIpls_25255_25510));
+        table.AddRow(SString("%d-%d|(Paths)|^1~.%d|%d", pGame->GetBaseIDforDAT(), pGame->GetBaseIDforIFP() - 1, m_MemStatsDelta.modelInfo.uiPaths_25511_25574,
+                             m_MemStatsNow.modelInfo.uiPaths_25511_25574));
+        table.AddRow(SString("%d-%d|(Anims)|^1~.%d|%d", pGame->GetBaseIDforIFP(), pGame->GetBaseIDforRRR() - 1, m_MemStatsDelta.modelInfo.uiAnims_25575_25754,
+                             m_MemStatsNow.modelInfo.uiAnims_25575_25754));
         table.AddRow(SString("|Total:|^1~.%d|%d", m_MemStatsDelta.modelInfo.uiTotal, m_MemStatsNow.modelInfo.uiTotal));
     }
 

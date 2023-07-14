@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CWeapon.h>
 #include "lua/CLuaFunctionParser.h"
 #include "CMatrix_Pad.h"
 
@@ -23,6 +24,7 @@ void CLuaPedDefs::LoadFunctions()
         {"detonateSatchels", DetonateSatchels},
         {"killPed", KillPed},
 
+        {"resetPedVoice", ArgumentParser<ResetPedVoice>},
         {"getPedVoice", GetPedVoice},
         {"setPedVoice", SetPedVoice},
         {"getPedRotation", GetPedRotation},
@@ -148,6 +150,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTask", "getPedTask");
     lua_classfunction(luaVM, "getTotalAmmo", "getPedTotalAmmo");
     lua_classfunction(luaVM, "getVoice", "getPedVoice");
+    lua_classfunction(luaVM, "resetVoice", "resetPedVoice");
     lua_classfunction(luaVM, "getWeapon", "getPedWeapon");
     lua_classfunction(luaVM, "isChocking", "isPedChoking");
     lua_classfunction(luaVM, "isDoingGangDriveby", "isPedDoingGangDriveby");
@@ -230,6 +233,15 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
     lua_registerclass(luaVM, "Ped", "Element");
+}
+
+bool CLuaPedDefs::ResetPedVoice(CClientPed* ped)
+{
+    short szOldType, szNewType, szOldVoice, szNewVoice;
+    ped->GetVoice(&szOldType, &szOldVoice);
+    ped->ResetVoice();
+    ped->GetVoice(&szNewType, &szNewVoice);
+    return szNewType != szOldType && szNewVoice != szOldVoice;
 }
 
 int CLuaPedDefs::GetPedVoice(lua_State* luaVM)
@@ -1022,8 +1034,7 @@ bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entit
     return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::variant<bool, std::array<std::array<float, 4>, 4>>
-CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity)
@@ -2370,7 +2381,7 @@ int CLuaPedDefs::DetonateSatchels(lua_State* luaVM)
 bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle, std::optional<bool> bOptPassenger)
 {
     CClientVehicle* pVehicle = pOptVehicle.value_or(nullptr);
-    bool bPassenger = bOptPassenger.value_or(false);
+    bool            bPassenger = bOptPassenger.value_or(false);
     return pPed->EnterVehicle(pVehicle, bPassenger);
 }
 

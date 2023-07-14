@@ -23,6 +23,7 @@ public:
     LUA_DECLARE(KillPed);
     LUA_DECLARE(DetonateSatchels);
 
+    static bool ResetPedVoice(CClientPed* ped);
     LUA_DECLARE(GetPedVoice);
     LUA_DECLARE(SetPedVoice);
     LUA_DECLARE(GetPedTarget);
@@ -51,17 +52,13 @@ public:
     LUA_DECLARE(CanPedBeKnockedOffBike);
     static bool SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CVector position);
     static bool SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float yaw, float pitch, float roll);
-    static std::variant<bool, CLuaMultiReturn<float, float, float>>
-    GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
 
-    static std::variant<bool, CLuaMultiReturn<float, float, float>>
-    GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
+    static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
 
-    static bool
-    SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CMatrix boneMatrix);
+    static bool SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CMatrix boneMatrix);
 
-    static std::variant<bool, std::array<std::array<float, 4>, 4>>
-    GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
+    static std::variant<bool, std::array<std::array<float, 4>, 4>> GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
 
     static bool UpdateElementRpHAnim(lua_State* const luaVM, CClientEntity* entity);
     LUA_DECLARE_OOP(GetPedBonePosition);

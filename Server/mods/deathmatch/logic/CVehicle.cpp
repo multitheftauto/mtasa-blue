@@ -10,6 +10,14 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicle.h"
+#include "CVehicleManager.h"
+#include "CHandlingManager.h"
+#include "CElementRefManager.h"
+#include "CGame.h"
+#include "packets/CVehicleInOutPacket.h"
+#include "CBandwidthSettings.h"
+#include "Utils.h"
 
 extern CGame* g_pGame;
 
@@ -610,6 +618,9 @@ bool CVehicle::SetOccupant(CPed* pPed, unsigned int uiSeat)
     static bool bAlreadySetting = false;
     if (!bAlreadySetting)
     {
+        if (uiSeat >= MAX_VEHICLE_SEATS)
+            return false;
+
         // Set the Player
         if (m_pOccupants[uiSeat] != pPed)
         {
@@ -827,6 +838,7 @@ void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOut
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
+        case VT_BLOODRA:
             memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
 
             // Keep the bonet and boot intact

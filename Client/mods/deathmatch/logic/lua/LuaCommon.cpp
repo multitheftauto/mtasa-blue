@@ -98,21 +98,21 @@ void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
 
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
-    if (CClientEntity* pEntity = UserDataCast<CClientEntity>((CClientEntity*)NULL, pData, luaVM))
+    if (CClientEntity* pEntity = UserDataCast((CClientEntity*)pData, luaVM))
         return lua_pushelement(luaVM, pEntity);
-    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, luaVM))
+    else if (CResource* pResource = UserDataCast((CResource*)pData, luaVM))
         return lua_pushresource(luaVM, pResource);
-    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, luaVM))
+    else if (CXMLNode* pNode = UserDataCast((CXMLNode*)pData, luaVM))
         return lua_pushxmlnode(luaVM, pNode);
-    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
+    else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pData, luaVM))
         return lua_pushtimer(luaVM, pTimer);
-    else if (CLuaVector2D* pVector = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, pData, luaVM))
+    else if (CLuaVector2D* pVector = UserDataCast((CLuaVector2D*)pData, luaVM))
         return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector3D* pVector = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, pData, luaVM))
+    else if (CLuaVector3D* pVector = UserDataCast((CLuaVector3D*)pData, luaVM))
         return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector4D* pVector = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, pData, luaVM))
+    else if (CLuaVector4D* pVector = UserDataCast((CLuaVector4D*)pData, luaVM))
         return lua_pushvector(luaVM, *pVector);
-    else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
+    else if (CLuaMatrix* pMatrix = UserDataCast((CLuaMatrix*)pData, luaVM))
         return lua_pushmatrix(luaVM, *pMatrix);
 
     lua_pushobject(luaVM, NULL, pData);
@@ -200,24 +200,6 @@ CLuaMain& lua_getownercluamain(lua_State* L)
 CResource& lua_getownerresource(lua_State* L)
 {
     return *lua_getownercluamain(L).GetResource();
-}
-
-// Just do a type check vs LUA_TNONE before calling this, or bant
-const char* lua_makestring(lua_State* luaVM, int iArgument)
-{
-    if (lua_type(luaVM, iArgument) == LUA_TSTRING)
-    {
-        return lua_tostring(luaVM, iArgument);
-    }
-    lua_pushvalue(luaVM, iArgument);
-    lua_getglobal(luaVM, "tostring");
-    lua_pushvalue(luaVM, -2);
-    lua_call(luaVM, 1, 1);
-
-    const char* szString = lua_tostring(luaVM, -1);
-    lua_pop(luaVM, 2);
-
-    return szString;
 }
 
 void lua_initclasses(lua_State* luaVM)

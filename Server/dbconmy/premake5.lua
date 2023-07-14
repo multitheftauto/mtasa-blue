@@ -38,7 +38,15 @@ project "Dbconmy"
 		links { "rt" }
 
 	filter "system:macosx"
-		includedirs { os.findheader("mysql.h", "/usr/local/opt/mysql/include/mysql") }
+		includedirs {
+			os.findheader("mysql.h", {
+				"/usr/local/opt/mysql/include/mysql",
+				"/opt/osxcross/macports/pkgs/opt/local/include/mysql8/mysql",
+			})
+		}
+		libdirs {
+			os.findlib("libmysqlclient.a", "/opt/osxcross/macports/pkgs/opt/local/lib/mysql8/mysql")
+		}
 
 	if GLIBC_COMPAT then
 		filter { "system:linux" }
@@ -58,6 +66,16 @@ project "Dbconmy"
 		links { "../../vendor/mysql/lib/x64/libmysql.lib" }
 	filter { "system:windows", "platforms:x86" }
 		links { "../../vendor/mysql/lib/x86/libmysql.lib" }
+	filter { "system:windows", "platforms:arm" }
+		links { "../../vendor/mysql/lib/arm/libmysql.lib" }
+	filter { "system:windows", "platforms:arm64" }
+		links { "../../vendor/mysql/lib/arm64/libmysql.lib" }
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
+
+	filter "platforms:arm"
+		targetdir(buildpath("server/arm"))
+
+	filter "platforms:arm64"
+		targetdir(buildpath("server/arm64"))

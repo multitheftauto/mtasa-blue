@@ -30,13 +30,7 @@ public:
 
     constexpr CVector4D& operator=(const CVector4D&) noexcept = default;
 
-    constexpr CVector4D(float x, float y, float z, float w) noexcept :
-        fX(x),
-        fY(y),
-        fZ(z),
-        fW(w)
-    {
-    }
+    constexpr CVector4D(float x, float y, float z, float w) noexcept : fX(x), fY(y), fZ(z), fW(w) {}
 
     // Warning, this function is returning the wrong value(fW is missing), its kept because nothing uses it, only
     // CLuaVector4DDefs.
@@ -64,13 +58,20 @@ public:
 
     constexpr CVector4D operator*(const float fRight) const noexcept { return CVector4D(fX * fRight, fY * fRight, fZ * fRight, fW * fRight); }
 
+    constexpr CVector4D operator+(const CVector4D& vecRight) const noexcept
+    {
+        return CVector4D(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ, fW + vecRight.fW);
+    }
 
-    constexpr CVector4D operator+(const CVector4D& vecRight) const noexcept { return CVector4D(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ, fW + vecRight.fW); }
+    constexpr CVector4D operator-(const CVector4D& vecRight) const noexcept
+    {
+        return CVector4D(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ, fW - vecRight.fW);
+    }
 
-    constexpr CVector4D operator-(const CVector4D& vecRight) const noexcept { return CVector4D(fX - vecRight.fX, fY - vecRight.fY, fZ - vecRight.fZ, fW - vecRight.fW); }
-
-
-    constexpr CVector4D operator/(const CVector4D& vecRight) const noexcept { return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW); }
+    constexpr CVector4D operator/(const CVector4D& vecRight) const noexcept
+    {
+        return CVector4D(fX / vecRight.fX, fY / vecRight.fY, fZ / vecRight.fZ, fW / vecRight.fW);
+    }
 
     constexpr CVector4D operator/(const float fRight) const noexcept { return CVector4D(fX / fRight, fY / fRight, fZ / fRight, fW / fRight); }
 
@@ -114,7 +115,6 @@ public:
         fW *= fRight;
     }
 
-
     constexpr void operator/=(const float fRight) noexcept
     {
         fX /= fRight;
@@ -137,5 +137,5 @@ public:
                 (fabs(fW - param.fW) < FLOAT_EPSILON));
     }
 
-     bool operator!=(const CVector4D& param) const noexcept { return !(*this == param); }
+    bool operator!=(const CVector4D& param) const noexcept { return !(*this == param); }
 };

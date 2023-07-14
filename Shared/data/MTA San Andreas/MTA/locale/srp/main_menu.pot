@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-10 16:36+0000\n"
+"PO-Revision-Date: 2023-06-20 19:48\n"
+"Last-Translator: \n"
+"Language-Team: Serbian\n"
+"Language: srp\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Crowdin-Project: 2d3d942aa8adf891478198912ac0b233\n"
+"X-Crowdin-Project-ID: 13\n"
+"X-Crowdin-Language: sr\n"
+"X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/main_menu.pot\n"
+"X-Crowdin-File-ID: 223\n"
+
+#. Found in the main menu navigation
+msgid "Quick connect"
+msgstr "Brzo povezivanje"
+
+#. Found in the main menu navigation
+msgid "Disconnect"
+msgstr "Isključenje"
+
+#. Found in the main menu navigation
+msgid "Server browser"
+msgstr "Pretraživač servera"
+
+#. Found in the main menu navigation
+msgid "Host game"
+msgstr "Hostuj igru"
+
+#. Found in the main menu navigation
+msgid "Map editor"
+msgstr "Editor mape"
+
+#. Found in the main menu navigation
+msgid "Settings"
+msgstr "Podešavanja"
+
+#. Found in the main menu navigation
+msgid "About"
+msgstr "O aplikaciji"
+
+#. Found in the main menu navigation
+msgid "Quit"
+msgstr "Izađi"
+
+#. Found in the main menu above the news listing
+msgid "The Latest News"
+msgstr "Najnovije vesti"
+

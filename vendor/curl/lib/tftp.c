@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -46,6 +48,7 @@
 
 #include "urldata.h"
 #include <curl/curl.h>
+#include "cf-socket.h"
 #include "transfer.h"
 #include "sendf.h"
 #include "tftp.h"
@@ -186,7 +189,7 @@ const struct Curl_handler Curl_handler_tftp = {
   PORT_TFTP,                            /* defport */
   CURLPROTO_TFTP,                       /* protocol */
   CURLPROTO_TFTP,                       /* family */
-  PROTOPT_NONE | PROTOPT_NOURLQUERY     /* flags */
+  PROTOPT_NOTCPPROXY | PROTOPT_NOURLQUERY /* flags */
 };
 
 /**********************************************************
@@ -327,7 +330,7 @@ static CURLcode tftp_parse_option_ack(struct tftp_state_data *state,
 
     infof(data, "got option=(%s) value=(%s)", option, value);
 
-    if(checkprefix(option, TFTP_OPTION_BLKSIZE)) {
+    if(checkprefix(TFTP_OPTION_BLKSIZE, option)) {
       long blksize;
 
       blksize = strtol(value, NULL, 10);
@@ -359,7 +362,7 @@ static CURLcode tftp_parse_option_ack(struct tftp_state_data *state,
       infof(data, "%s (%d) %s (%d)", "blksize parsed from OACK",
             state->blksize, "requested", state->requested_blksize);
     }
-    else if(checkprefix(option, TFTP_OPTION_TSIZE)) {
+    else if(checkprefix(TFTP_OPTION_TSIZE, option)) {
       long tsize = 0;
 
       tsize = strtol(value, NULL, 10);
@@ -367,7 +370,7 @@ static CURLcode tftp_parse_option_ack(struct tftp_state_data *state,
 
       /* tsize should be ignored on upload: Who cares about the size of the
          remote file? */
-      if(!data->set.upload) {
+      if(!data->state.upload) {
         if(!tsize) {
           failf(data, "invalid tsize -:%s:- value in OACK packet", value);
           return CURLE_TFTP_ILLEGAL;
@@ -448,7 +451,7 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,
       return result;
     }
 
-    if(data->set.upload) {
+    if(data->state.upload) {
       /* If we are uploading, send an WRQ */
       setpacketevent(&state->spacket, TFTP_EVENT_WRQ);
       state->data->req.upload_fromhere =
@@ -463,7 +466,7 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,
     /* As RFC3617 describes the separator slash is not actually part of the
        file name so we skip the always-present first letter of the path
        string. */
-    result = Curl_urldecode(data, &state->data->state.up.path[1], 0,
+    result = Curl_urldecode(&state->data->state.up.path[1], 0,
                             &filename, NULL, REJECT_ZERO);
     if(result)
       return result;
@@ -483,7 +486,7 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,
     if(!data->set.tftp_no_options) {
       char buf[64];
       /* add tsize option */
-      if(data->set.upload && (data->state.infilesize != -1))
+      if(data->state.upload && (data->state.infilesize != -1))
         msnprintf(buf, sizeof(buf), "%" CURL_FORMAT_CURL_OFF_T,
                   data->state.infilesize);
       else
@@ -527,8 +530,8 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,
        not have a size_t argument, like older unixes that want an 'int' */
     senddata = sendto(state->sockfd, (void *)state->spacket.data,
                       (SEND_TYPE_ARG3)sbytes, 0,
-                      data->conn->ip_addr->ai_addr,
-                      data->conn->ip_addr->ai_addrlen);
+                      &data->conn->remote_addr->sa_addr,
+                      data->conn->remote_addr->addrlen);
     if(senddata != (ssize_t)sbytes) {
       char buffer[STRERROR_LEN];
       failf(data, "%s", Curl_strerror(SOCKERRNO, buffer, sizeof(buffer)));
@@ -537,7 +540,7 @@ static CURLcode tftp_send_first(struct tftp_state_data *state,
     break;
 
   case TFTP_EVENT_OACK:
-    if(data->set.upload) {
+    if(data->state.upload) {
       result = tftp_connect_for_tx(state, event);
     }
     else {
@@ -720,7 +723,7 @@ static CURLcode tftp_tx(struct tftp_state_data *state, tftp_event_t event)
          /* There's a bug in tftpd-hpa that causes it to send us an ack for
           * 65535 when the block number wraps to 0. So when we're expecting
           * 0, also accept 65535. See
-          * http://syslinux.zytor.com/archives/2010-September/015253.html
+          * https://www.syslinux.org/archives/2010-September/015612.html
           * */
          !(state->block == 0 && rblock == 65535)) {
         /* This isn't the expected block.  Log it and up the retry counter */
@@ -1012,7 +1015,7 @@ static CURLcode tftp_connect(struct Curl_easy *data, bool *done)
   state->requested_blksize = blksize;
 
   ((struct sockaddr *)&state->local_addr)->sa_family =
-    (CURL_SA_FAMILY_T)(conn->ip_addr->ai_family);
+    (CURL_SA_FAMILY_T)(conn->remote_addr->family);
 
   tftp_set_timeouts(state);
 
@@ -1031,7 +1034,7 @@ static CURLcode tftp_connect(struct Curl_easy *data, bool *done)
      * IPv4 and IPv6...
      */
     int rc = bind(state->sockfd, (struct sockaddr *)&state->local_addr,
-                  conn->ip_addr->ai_addrlen);
+                  conn->remote_addr->addrlen);
     if(rc) {
       char buffer[STRERROR_LEN];
       failf(data, "bind() failed; %s",
@@ -1304,9 +1307,9 @@ static CURLcode tftp_doing(struct Curl_easy *data, bool *dophase_done)
 
 /**********************************************************
  *
- * tftp_peform
+ * tftp_perform
  *
- * Entry point for transfer from tftp_do, sarts state mach
+ * Entry point for transfer from tftp_do, starts state mach
  *
  **********************************************************/
 static CURLcode tftp_perform(struct Curl_easy *data, bool *dophase_done)

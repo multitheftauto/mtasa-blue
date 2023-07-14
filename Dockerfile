@@ -1,22 +1,21 @@
 FROM jetbrains/teamcity-minimal-agent:latest
 
-# Set to 1 to configure this image as Teamcity build agent
-# Default value is 0 (manual build)
-ENV AS_BUILDAGENT 0
-
-# Set default target platform to 64-bits
-ENV BUILD_BITS 64
-
 # This is important for using apt-get
 USER root
 
-# Install latest gcc and libs
-RUN dpkg --add-architecture i386 && apt-get update && \
+# Default build configuration
+ENV AS_BUILDAGENT=0 \
+    BUILD_ARCHITECTURE=x64 \
+    BUILD_CONFIG=release \
+    AR=x86_64-linux-gnu-gcc-ar-10 \
+    CC=x86_64-linux-gnu-gcc-10 \
+    CXX=x86_64-linux-gnu-g++-10
+
+# Install build-time dependencies
+RUN apt-get update && \
     apt-get install -y software-properties-common wget ca-certificates git build-essential \
-        gcc-multilib g++-multilib gcc-10-multilib g++-10-multilib curl subversion ncftp \
-        libncurses-dev libncursesw5 \
-        libncurses-dev:i386 libncursesw5:i386 \
-        libmysqlclient-dev
+        gcc-10 g++-10 curl subversion ncftp \
+        libncurses-dev libncursesw5 libmysqlclient-dev
 
 # Set build directory
 VOLUME /build
@@ -24,6 +23,7 @@ WORKDIR /build
 
 # Copy entrypoint script
 COPY utils/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
 
 # Add GLIB compat 
 COPY utils/compat /compat

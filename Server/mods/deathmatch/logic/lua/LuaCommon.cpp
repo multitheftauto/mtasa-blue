@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "LuaCommon.h"
+#include "Common.h"
+#include "CElementIDs.h"
+#include "CBan.h"
+#include "CGame.h"
+#include "lua/CLuaShared.h"
+#include "luadefs/CLuaClassDefs.h"
 
 extern CGame* g_pGame;
 
@@ -164,37 +171,37 @@ void lua_pushquery(lua_State* luaVM, CDbJobData* pJobData)
 
 void lua_pushuserdata(lua_State* luaVM, void* pData)
 {
-    if (CElement* pEntity = UserDataCast<CElement>((CElement*)NULL, pData, NULL))
+    if (CElement* pEntity = UserDataCast((CElement*)pData, NULL))
         return lua_pushelement(luaVM, pEntity);
-    if (CPlayer* pEntity = UserDataCast<CPlayer>((CPlayer*)NULL, pData, NULL))
+    if (CPlayer* pEntity = UserDataCast((CPlayer*)pData, NULL))
         return lua_pushelement(luaVM, pEntity);
-    else if (CResource* pResource = UserDataCast<CResource>((CResource*)NULL, pData, NULL))
+    else if (CResource* pResource = UserDataCast((CResource*)pData, NULL))
         return lua_pushresource(luaVM, pResource);
-    else if (CXMLNode* pNode = UserDataCast<CXMLNode>((CXMLNode*)NULL, pData, NULL))
+    else if (CXMLNode* pNode = UserDataCast((CXMLNode*)pData, NULL))
         return lua_pushxmlnode(luaVM, pNode);
-    else if (CLuaTimer* pTimer = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, pData, luaVM))
+    else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pData, luaVM))
         return lua_pushtimer(luaVM, pTimer);
-    else if (CLuaVector2D* pVector = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, pData, luaVM))
+    else if (CLuaVector2D* pVector = UserDataCast((CLuaVector2D*)pData, luaVM))
         return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector3D* pVector = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, pData, luaVM))
+    else if (CLuaVector3D* pVector = UserDataCast((CLuaVector3D*)pData, luaVM))
         return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector4D* pVector = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, pData, luaVM))
+    else if (CLuaVector4D* pVector = UserDataCast((CLuaVector4D*)pData, luaVM))
         return lua_pushvector(luaVM, *pVector);
-    else if (CLuaMatrix* pMatrix = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, pData, luaVM))
+    else if (CLuaMatrix* pMatrix = UserDataCast((CLuaMatrix*)pData, luaVM))
         return lua_pushmatrix(luaVM, *pMatrix);
-    else if (CAccount* pAccount = UserDataCast<CAccount>((CAccount*)NULL, pData, luaVM))
+    else if (CAccount* pAccount = UserDataCast((CAccount*)pData, luaVM))
         return lua_pushaccount(luaVM, pAccount);
-    else if (CAccessControlList* pACL = UserDataCast<CAccessControlList>((CAccessControlList*)NULL, pData, luaVM))
+    else if (CAccessControlList* pACL = UserDataCast((CAccessControlList*)pData, luaVM))
         return lua_pushacl(luaVM, pACL);
-    else if (CAccessControlListGroup* pACLGroup = UserDataCast<CAccessControlListGroup>((CAccessControlListGroup*)NULL, pData, luaVM))
+    else if (CAccessControlListGroup* pACLGroup = UserDataCast((CAccessControlListGroup*)pData, luaVM))
         return lua_pushaclgroup(luaVM, pACLGroup);
-    else if (CBan* pBan = UserDataCast<CBan>((CBan*)NULL, pData, luaVM))
+    else if (CBan* pBan = UserDataCast((CBan*)pData, luaVM))
         return lua_pushban(luaVM, pBan);
-    else if (CTextDisplay* pTextDisplay = UserDataCast<CTextDisplay>((CTextDisplay*)NULL, pData, luaVM))
+    else if (CTextDisplay* pTextDisplay = UserDataCast((CTextDisplay*)pData, luaVM))
         return lua_pushtextdisplay(luaVM, pTextDisplay);
-    else if (CTextItem* pTextItem = UserDataCast<CTextItem>((CTextItem*)NULL, pData, luaVM))
+    else if (CTextItem* pTextItem = UserDataCast((CTextItem*)pData, luaVM))
         return lua_pushtextitem(luaVM, pTextItem);
-    else if (CDbJobData* pQuery = UserDataCast<CDbJobData>((CDbJobData*)NULL, pData, luaVM))
+    else if (CDbJobData* pQuery = UserDataCast((CDbJobData*)pData, luaVM))
         return lua_pushquery(luaVM, pQuery);
 
     lua_pushobject(luaVM, NULL, pData);
@@ -282,24 +289,6 @@ CLuaMain& lua_getownercluamain(lua_State* L)
 CResource& lua_getownerresource(lua_State* L)
 {
     return *lua_getownercluamain(L).GetResource();
-}
-
-// Just do a type check vs LUA_TNONE before calling this, or bant
-const char* lua_makestring(lua_State* luaVM, int iArgument)
-{
-    if (lua_type(luaVM, iArgument) == LUA_TSTRING)
-    {
-        return lua_tostring(luaVM, iArgument);
-    }
-    lua_pushvalue(luaVM, iArgument);
-    lua_getglobal(luaVM, "tostring");
-    lua_pushvalue(luaVM, -2);
-    lua_call(luaVM, 1, 1);
-
-    const char* szString = lua_tostring(luaVM, -1);
-    lua_pop(luaVM, 2);
-
-    return szString;
 }
 
 void lua_initclasses(lua_State* luaVM)

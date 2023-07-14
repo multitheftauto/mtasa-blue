@@ -10,6 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPed.h"
+#include "CPedManager.h"
+#include "CLogger.h"
+#include "Utils.h"
+#include "CStaticFunctionDefinitions.h"
 
 char szBodyPartNameEmpty[] = "";
 struct SBodyPartName
@@ -75,6 +80,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_bCollisionsEnabled = true;
 
     m_pJackingVehicle = NULL;
+    m_nearPlayersList.reserve(20);
 
     // Add us to the Ped manager
     if (pPedManager)
@@ -462,8 +468,8 @@ void CPed::SetSyncer(CPlayer* pPlayer)
         {
             case VEHICLEACTION_ENTERING:
             {
-                CVehicle* pVehicle = GetOccupiedVehicle();
-                unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
+                CVehicle*     pVehicle = GetOccupiedVehicle();
+                unsigned char ucOccupiedSeat = static_cast<unsigned char>(GetOccupiedVehicleSeat());
                 // Does it have an occupant and is the occupant us?
                 if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
                 {
@@ -474,7 +480,7 @@ void CPed::SetSyncer(CPlayer* pPlayer)
 
             case VEHICLEACTION_EXITING:
             {
-                CVehicle* pVehicle = GetOccupiedVehicle();
+                CVehicle*     pVehicle = GetOccupiedVehicle();
                 unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
                 // Does it have an occupant and is the occupant us?
                 if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))

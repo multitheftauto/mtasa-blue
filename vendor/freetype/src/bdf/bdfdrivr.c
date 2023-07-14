@@ -92,23 +92,17 @@ THE SOFTWARE.
   {
     BDF_CMap          cmap      = (BDF_CMap)bdfcmap;
     BDF_encoding_el*  encodings = cmap->encodings;
-    FT_ULong          min, max, mid; /* num_encodings */
     FT_UShort         result    = 0; /* encodings->glyph */
 
+    FT_ULong  min = 0;
+    FT_ULong  max = cmap->num_encodings;
+    FT_ULong  mid = ( min + max ) >> 1;
 
-    min = 0;
-    max = cmap->num_encodings;
-    mid = ( min + max ) >> 1;
 
     while ( min < max )
     {
-      FT_ULong  code;
+      FT_ULong  code = encodings[mid].enc;
 
-
-      if ( mid >= max || mid < min )
-        mid = ( min + max ) >> 1;
-
-      code = encodings[mid].enc;
 
       if ( charcode == code )
       {
@@ -123,8 +117,10 @@ THE SOFTWARE.
       else
         min = mid + 1;
 
-      /* prediction in a continuous block */
+      /* reasonable prediction in a continuous block */
       mid += charcode - code;
+      if ( mid >= max || mid < min )
+        mid = ( min + max ) >> 1;
     }
 
     return result;
@@ -137,24 +133,18 @@ THE SOFTWARE.
   {
     BDF_CMap          cmap      = (BDF_CMap)bdfcmap;
     BDF_encoding_el*  encodings = cmap->encodings;
-    FT_ULong          min, max, mid; /* num_encodings */
     FT_UShort         result   = 0;  /* encodings->glyph */
     FT_ULong          charcode = *acharcode + 1;
 
+    FT_ULong  min = 0;
+    FT_ULong  max = cmap->num_encodings;
+    FT_ULong  mid = ( min + max ) >> 1;
 
-    min = 0;
-    max = cmap->num_encodings;
-    mid = ( min + max ) >> 1;
 
     while ( min < max )
     {
-      FT_ULong  code; /* same as BDF_encoding_el.enc */
+      FT_ULong  code = encodings[mid].enc;
 
-
-      if ( mid >= max || mid < min )
-        mid = ( min + max ) >> 1;
-
-      code = encodings[mid].enc;
 
       if ( charcode == code )
       {
@@ -171,6 +161,8 @@ THE SOFTWARE.
 
       /* prediction in a continuous block */
       mid += charcode - code;
+      if ( mid >= max || mid < min )
+        mid = ( min + max ) >> 1;
     }
 
     charcode = 0;
@@ -276,7 +268,7 @@ THE SOFTWARE.
       char*  s;
 
 
-      if ( FT_ALLOC( face->style_name, len ) )
+      if ( FT_QALLOC( face->style_name, len ) )
         return error;
 
       s = face->style_name;
@@ -442,7 +434,7 @@ THE SOFTWARE.
       bdfface->num_glyphs = (FT_Long)( font->glyphs_size + 1 );
 
       bdfface->num_fixed_sizes = 1;
-      if ( FT_NEW_ARRAY( bdfface->available_sizes, 1 ) )
+      if ( FT_NEW( bdfface->available_sizes ) )
         goto Exit;
 
       {
@@ -450,8 +442,6 @@ THE SOFTWARE.
         FT_Short         resolution_x = 0, resolution_y = 0;
         long             value;
 
-
-        FT_ZERO( bsize );
 
         /* sanity checks */
         if ( font->font_ascent > 0x7FFF || font->font_ascent < -0x7FFF )
@@ -489,7 +479,7 @@ THE SOFTWARE.
         else
         {
           /* this is a heuristical value */
-          bsize->width = (FT_Short)FT_MulDiv( bsize->height, 2, 3 );
+          bsize->width = ( bsize->height * 2 + 1 ) / 3;
         }
 
         prop = bdf_get_font_property( font, "POINT_SIZE" );
@@ -608,7 +598,7 @@ THE SOFTWARE.
         unsigned long  n;
 
 
-        if ( FT_NEW_ARRAY( face->en_table, font->glyphs_size ) )
+        if ( FT_QNEW_ARRAY( face->en_table, font->glyphs_size ) )
           goto Exit;
 
         face->default_glyph = 0;

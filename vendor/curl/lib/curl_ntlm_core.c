@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,6 +18,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -27,19 +29,20 @@
 /*
  * NTLM details:
  *
- * https://davenport.sourceforge.io/ntlm.html
+ * https://davenport.sourceforge.net/ntlm.html
  * https://www.innovation.ch/java/ntlm.html
  */
 
 /* Please keep the SSL backend-specific #if branches in this order:
 
    1. USE_OPENSSL
-   2. USE_GNUTLS
-   3. USE_NSS
-   4. USE_MBEDTLS
-   5. USE_SECTRANSP
-   6. USE_OS400CRYPTO
-   7. USE_WIN32_CRYPTO
+   2. USE_WOLFSSL
+   3. USE_GNUTLS
+   4. USE_NSS
+   5. USE_MBEDTLS
+   6. USE_SECTRANSP
+   7. USE_OS400CRYPTO
+   8. USE_WIN32_CRYPTO
 
    This ensures that:
    - the same SSL branch gets activated throughout this source
@@ -49,16 +52,28 @@
      in NTLM type-3 messages.
  */
 
-#if defined(USE_OPENSSL) || defined(USE_WOLFSSL)
-
-#ifdef USE_WOLFSSL
-#include <wolfssl/options.h>
+#if defined(USE_OPENSSL)
+  #include <openssl/opensslconf.h>
+  #if !defined(OPENSSL_NO_DES) && !defined(OPENSSL_NO_DEPRECATED_3_0)
+    #define USE_OPENSSL_DES
+  #endif
 #endif
 
+#if defined(USE_OPENSSL_DES) || defined(USE_WOLFSSL)
+
+#if defined(USE_OPENSSL)
 #  include <openssl/des.h>
 #  include <openssl/md5.h>
 #  include <openssl/ssl.h>
 #  include <openssl/rand.h>
+#else
+#  include <wolfssl/options.h>
+#  include <wolfssl/openssl/des.h>
+#  include <wolfssl/openssl/md5.h>
+#  include <wolfssl/openssl/ssl.h>
+#  include <wolfssl/openssl/rand.h>
+#endif
+
 #  if (defined(OPENSSL_VERSION_NUMBER) && \
        (OPENSSL_VERSION_NUMBER < 0x00907001L)) && !defined(USE_WOLFSSL)
 #    define DES_key_schedule des_key_schedule
@@ -68,6 +83,10 @@
 #    define DES_ecb_encrypt des_ecb_encrypt
 #    define DESKEY(x) x
 #    define DESKEYARG(x) x
+#  elif defined(OPENSSL_IS_AWSLC)
+#    define DES_set_key_unchecked (void)DES_set_key
+#    define DESKEYARG(x) *x
+#    define DESKEY(x) &x
 #  else
 #    define DESKEYARG(x) *x
 #    define DESKEY(x) &x
@@ -97,11 +116,10 @@
 #elif defined(USE_WIN32_CRYPTO)
 #  include <wincrypt.h>
 #else
-#  error "Can't compile NTLM support without a crypto library."
+#  error "Can't compile NTLM support without a crypto library with DES."
 #endif
 
 #include "urldata.h"
-#include "non-ascii.h"
 #include "strcase.h"
 #include "curl_ntlm_core.h"
 #include "curl_md5.h"
@@ -133,7 +151,7 @@ static void extend_key_56_to_64(const unsigned char *key_56, char *key)
   key[7] = (unsigned char) ((key_56[6] << 1) & 0xFF);
 }
 
-#if defined(USE_OPENSSL) || defined(USE_WOLFSSL)
+#if defined(USE_OPENSSL_DES) || defined(USE_WOLFSSL)
 /*
  * Turns a 56 bit key into the 64 bit, odd parity key and sets the key.  The
  * key schedule ks is also set.
@@ -150,7 +168,7 @@ static void setup_des_key(const unsigned char *key_56,
   DES_set_odd_parity(&key);
 
   /* Set the key */
-  DES_set_key(&key, ks);
+  DES_set_key_unchecked(&key, ks);
 }
 
 #elif defined(USE_GNUTLS)
@@ -173,9 +191,9 @@ static void setup_des_key(const unsigned char *key_56,
 #elif defined(USE_NSS)
 
 /*
- * Expands a 56 bit key KEY_56 to 64 bit and encrypts 64 bit of data, using
- * the expanded key.  The caller is responsible for giving 64 bit of valid
- * data is IN and (at least) 64 bit large buffer as OUT.
+ * encrypt_des() expands a 56 bit key KEY_56 to 64 bit and encrypts 64 bit of
+ * data, using the expanded key. IN should point to 64 bits of source data,
+ * OUT to a 64 bit output buffer.
  */
 static bool encrypt_des(const unsigned char *in, unsigned char *out,
                         const unsigned char *key_56)
@@ -362,7 +380,7 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
                             const unsigned char *plaintext,
                             unsigned char *results)
 {
-#if defined(USE_OPENSSL) || defined(USE_WOLFSSL)
+#if defined(USE_OPENSSL_DES) || defined(USE_WOLFSSL)
   DES_key_schedule ks;
 
   setup_des_key(keys, DESKEY(ks));
@@ -395,11 +413,9 @@ void Curl_ntlm_core_lm_resp(const unsigned char *keys,
 /*
  * Set up lanmanager hashed password
  */
-CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
-                                   const char *password,
+CURLcode Curl_ntlm_core_mk_lm_hash(const char *password,
                                    unsigned char *lmbuffer /* 21 bytes */)
 {
-  CURLcode result;
   unsigned char pw[14];
   static const unsigned char magic[] = {
     0x4B, 0x47, 0x53, 0x21, 0x40, 0x23, 0x24, 0x25 /* i.e. KGS!@#$% */
@@ -409,18 +425,10 @@ CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
   Curl_strntoupper((char *)pw, password, len);
   memset(&pw[len], 0, 14 - len);
 
-  /*
-   * The LanManager hashed password needs to be created using the
-   * password in the network encoding not the host encoding.
-   */
-  result = Curl_convert_to_network(data, (char *)pw, 14);
-  if(result)
-    return result;
-
   {
     /* Create LanManager hashed password. */
 
-#if defined(USE_OPENSSL) || defined(USE_WOLFSSL)
+#if defined(USE_OPENSSL_DES) || defined(USE_WOLFSSL)
     DES_key_schedule ks;
 
     setup_des_key(pw, DESKEY(ks));
@@ -448,7 +456,6 @@ CURLcode Curl_ntlm_core_mk_lm_hash(struct Curl_easy *data,
   return CURLE_OK;
 }
 
-#ifdef USE_NTRESPONSES
 static void ascii_to_unicode_le(unsigned char *dest, const char *src,
                                 size_t srclen)
 {
@@ -459,7 +466,7 @@ static void ascii_to_unicode_le(unsigned char *dest, const char *src,
   }
 }
 
-#if defined(USE_NTLM_V2) && !defined(USE_WINDOWS_SSPI)
+#if !defined(USE_WINDOWS_SSPI)
 
 static void ascii_uppercase_to_unicode_le(unsigned char *dest,
                                           const char *src, size_t srclen)
@@ -471,19 +478,17 @@ static void ascii_uppercase_to_unicode_le(unsigned char *dest,
   }
 }
 
-#endif /* USE_NTLM_V2 && !USE_WINDOWS_SSPI */
+#endif /* !USE_WINDOWS_SSPI */
 
 /*
  * Set up nt hashed passwords
  * @unittest: 1600
  */
-CURLcode Curl_ntlm_core_mk_nt_hash(struct Curl_easy *data,
-                                   const char *password,
+CURLcode Curl_ntlm_core_mk_nt_hash(const char *password,
                                    unsigned char *ntbuffer /* 21 bytes */)
 {
   size_t len = strlen(password);
   unsigned char *pw;
-  CURLcode result;
   if(len > SIZE_T_MAX/2) /* avoid integer overflow */
     return CURLE_OUT_OF_MEMORY;
   pw = len ? malloc(len * 2) : (unsigned char *)strdup("");
@@ -492,22 +497,16 @@ CURLcode Curl_ntlm_core_mk_nt_hash(struct Curl_easy *data,
 
   ascii_to_unicode_le(pw, password, len);
 
-  /*
-   * The NT hashed password needs to be created using the password in the
-   * network encoding not the host encoding.
-   */
-  result = Curl_convert_to_network(data, (char *)pw, len * 2);
-  if(!result) {
-    /* Create NT hashed password. */
-    Curl_md4it(ntbuffer, pw, 2 * len);
-    memset(ntbuffer + 16, 0, 21 - 16);
-  }
+  /* Create NT hashed password. */
+  Curl_md4it(ntbuffer, pw, 2 * len);
+  memset(ntbuffer + 16, 0, 21 - 16);
+
   free(pw);
 
-  return result;
+  return CURLE_OK;
 }
 
-#if defined(USE_NTLM_V2) && !defined(USE_WINDOWS_SSPI)
+#if !defined(USE_WINDOWS_SSPI)
 
 /* Timestamp in tenths of a microsecond since January 1, 1601 00:00:00 UTC. */
 struct ms_filetime {
@@ -664,7 +663,8 @@ CURLcode Curl_ntlm_core_mk_ntlmv2_resp(unsigned char *ntlmv2hash,
             LONGQUARTET(tw.dwLowDateTime), LONGQUARTET(tw.dwHighDateTime));
 
   memcpy(ptr + 32, challenge_client, 8);
-  memcpy(ptr + 44, ntlm->target_info, ntlm->target_info_len);
+  if(ntlm->target_info_len)
+    memcpy(ptr + 44, ntlm->target_info, ntlm->target_info_len);
 
   /* Concatenate the Type 2 challenge with the BLOB and do HMAC MD5 */
   memcpy(ptr + 8, &ntlm->nonce[0], 8);
@@ -723,8 +723,6 @@ CURLcode  Curl_ntlm_core_mk_lmv2_resp(unsigned char *ntlmv2hash,
   return result;
 }
 
-#endif /* USE_NTLM_V2 && !USE_WINDOWS_SSPI */
-
-#endif /* USE_NTRESPONSES */
+#endif /* !USE_WINDOWS_SSPI */
 
 #endif /* USE_CURL_NTLM_CORE */

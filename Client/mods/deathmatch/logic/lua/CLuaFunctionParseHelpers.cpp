@@ -1,14 +1,13 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10/mods/shared_logic/lua/CLuaFunctionParseHelpers.cpp
- *  PURPOSE:
+ *  FILE:        Client/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 
 //
 // enum values <-> script strings
@@ -613,8 +612,8 @@ ADD_ENUM(SURFACE_PROPERTY_SOFTLANDING, "softlanding")
 // crash when enabling on surfaces without setting plants and trees
 // table at offset 0xC38070 contain information about which are read from plants.dat
 // i don't know did this will work on objects created by createObject function
-//ADD_ENUM(SURFACE_PROPERTY_CREATEOBJECTS, "createobjects")
-//ADD_ENUM(SURFACE_PROPERTY_CREATEPLANTS, "createplants")
+// ADD_ENUM(SURFACE_PROPERTY_CREATEOBJECTS, "createobjects")
+// ADD_ENUM(SURFACE_PROPERTY_CREATEPLANTS, "createplants")
 IMPLEMENT_ENUM_END("surface-property-type")
 
 IMPLEMENT_ENUM_BEGIN(eSurfaceAudio)
@@ -625,7 +624,7 @@ ADD_ENUM(SURFACE_AUDIO_GRAVEL, "gravel")
 ADD_ENUM(SURFACE_AUDIO_WOOD, "wood")
 ADD_ENUM(SURFACE_AUDIO_WATER, "water")
 ADD_ENUM(SURFACE_AUDIO_METAL, "metal")
-//ADD_ENUM(SURFACE_AUDIO_LONGGRASS, "longgrass") // same sound as grass
+// ADD_ENUM(SURFACE_AUDIO_LONGGRASS, "longgrass") // same sound as grass
 IMPLEMENT_ENUM_END("surface-audio-type")
 
 IMPLEMENT_ENUM_BEGIN(eSurfaceWheelEffect)
@@ -665,6 +664,7 @@ IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
 ADD_ENUM(eClientModelType::PED, "ped")
 ADD_ENUM(eClientModelType::OBJECT, "object")
 ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
+ADD_ENUM(eClientModelType::TIMED_OBJECT, "timed-object")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 // Sound effects
@@ -758,6 +758,26 @@ ADD_ENUM(eSoundEffectParams::Reverb::REVERB_TIME, "reverbTime")
 ADD_ENUM(eSoundEffectParams::Reverb::HIGH_FREQ_RT_RATIO, "highFreqRTRatio")
 IMPLEMENT_ENUM_CLASS_END("soundeffect-params-reverb")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eModelIdeFlag)
+ADD_ENUM(eModelIdeFlag::IS_ROAD, "is_road")
+ADD_ENUM(eModelIdeFlag::DRAW_LAST, "draw_last")
+ADD_ENUM(eModelIdeFlag::ADDITIVE, "additive")
+ADD_ENUM(eModelIdeFlag::IGNORE_LIGHTING, "ignore_lighting")
+ADD_ENUM(eModelIdeFlag::NO_ZBUFFER_WRITE, "no_zbuffer_write")
+ADD_ENUM(eModelIdeFlag::DONT_RECEIVE_SHADOWS, "dont_receive_shadows")
+ADD_ENUM(eModelIdeFlag::IS_GLASS_TYPE_1, "is_glass_type_1")
+ADD_ENUM(eModelIdeFlag::IS_GLASS_TYPE_2, "is_glass_type_2")
+ADD_ENUM(eModelIdeFlag::IS_GARAGE_DOOR, "is_garage_door")
+ADD_ENUM(eModelIdeFlag::IS_DAMAGABLE, "is_damagable")
+ADD_ENUM(eModelIdeFlag::IS_TREE, "is_tree")
+ADD_ENUM(eModelIdeFlag::IS_PALM, "is_palm")
+ADD_ENUM(eModelIdeFlag::DOES_NOT_COLLIDE_WITH_FLYER, "does_not_collide_with_flyer")
+ADD_ENUM(eModelIdeFlag::IS_TAG, "is_tag")
+ADD_ENUM(eModelIdeFlag::DISABLE_BACKFACE_CULLING, "disable_backface_culling")
+ADD_ENUM(eModelIdeFlag::IS_BREAKABLE_STATUE, "is_breakable_statue")
+ADD_ENUM(eModelIdeFlag::IS_CRANE, "is_crane")
+IMPLEMENT_ENUM_CLASS_END("model-ide-flag")
+
 IMPLEMENT_ENUM_CLASS_BEGIN(eVehicleAudioSettingProperty)
 ADD_ENUM(eVehicleAudioSettingProperty::DOOR_SOUND, "door-sound")
 ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID, "engine-off-soundbank-id")
@@ -775,13 +795,99 @@ ADD_ENUM(eVehicleAudioSettingProperty::UNK6, "unk6")
 ADD_ENUM(eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-audio")
 IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
 
+
+//
+// CResource from userdata
+//
+CResource* UserDataCast(CResource* ptr, lua_State* luaState)
+{
+    return g_pClientGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CXMLNode from userdata
+//
+CXMLNode* UserDataCast(CXMLNode* ptr, lua_State* luaState)
+{
+    return g_pCore->GetXML()->GetNodeFromID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CLuaTimer from userdata
+//
+CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
+{
+    if (CLuaMain* luaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(luaState); luaMain)
+    {
+        return luaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+
+    return nullptr;
+}
+
+//
+// CLuaVector2D from userdata
+//
+CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
+{
+    return CLuaVector2D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CLuaVector3D from userdata
+//
+CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
+{
+    return CLuaVector3D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CLuaVector4D from userdata
+//
+CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
+{
+    return CLuaVector4D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CLuaMatrix from userdata
+//
+CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
+{
+    return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+}
+
+//
+// CClientEntity from userdata
+//
+CClientEntity* UserDataToElementCast(CClientEntity* ptr, SharedUtil::ClassId classId, lua_State* luaState)
+{
+    CClientEntity* element = CElementIDs::GetElement(TO_ELEMENTID(ptr));
+
+    if (element == nullptr || element->IsBeingDeleted() || !element->IsA(classId))
+        return nullptr;
+
+    return element;
+}
+
+//
+// CRemoteCall from userdata
+//
+CRemoteCall* UserDataCast(CRemoteCall* ptr, lua_State* luaState)
+{
+    if (ptr && g_pClientGame->GetRemoteCalls()->CallExists(ptr))
+        return ptr;
+
+    return nullptr;
+}
+
 //
 // Get best guess at name of userdata type
 //
 SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
 {
     // Try element
-    if (CClientEntity* pClientElement = UserDataCast<CClientEntity>((CClientEntity*)NULL, ptr, NULL))
+    if (CClientEntity* pClientElement = UserDataCast((CClientEntity*)ptr, nullptr))
     {
         if (bFindElementType)
             // Try gui element first
@@ -793,17 +899,19 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
             return GetClassTypeName(pClientElement);
     }
 
-    if (auto* pVar = UserDataCast<CResource>((CResource*)NULL, ptr, luaVM))            // Try resource
+    if (auto* pVar = UserDataCast((CResource*)ptr, luaVM))            // Try resource
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CXMLNode>((CXMLNode*)NULL, ptr, luaVM))            // Try xml node
+    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))            // Try xml node
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, ptr, luaVM))            // Try timer
+    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, ptr, luaVM))            // Try 2D Vector
+    if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))            // Try 2D Vector
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, ptr, luaVM))            // Try 3D Vector
+    if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))            // Try 3D Vector
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast((CRemoteCall*)ptr, luaVM))
         return GetClassTypeName(pVar);
 
     return "";

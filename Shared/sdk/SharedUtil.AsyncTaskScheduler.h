@@ -1,9 +1,17 @@
 #pragma once
+
+#include <version>
+
+// Workaround MultiplayerSA including this header for whatever reason..
+#ifdef __cpp_lib_is_invocable
+#define HAS_ASYNC_TASK_SCHED
+
 #include <queue>
 #include <functional>
 #include <memory>
 #include <thread>
 #include <mutex>
+#include <type_traits>
 
 namespace SharedUtil
 {
@@ -24,17 +32,16 @@ namespace SharedUtil
             virtual void ProcessResult() = 0;
         };
 
-        template <typename ResultType>
+        template <typename TaskFn, typename ReadyFn>
         struct STask : public SBaseTask
         {
-            using TaskFunction_t = std::function<ResultType()>;
-            using ReadyFunction_t = std::function<void(const ResultType&)>;
+            using Result = std::invoke_result_t<TaskFn>;
 
-            TaskFunction_t  m_TaskFunction;
-            ReadyFunction_t m_ReadyFunction;
-            ResultType      m_Result;
+            TaskFn  m_TaskFunction;
+            ReadyFn m_ReadyFunction;
+            Result  m_Result;
 
-            STask(const TaskFunction_t& taskFunc, const ReadyFunction_t& readyFunc) : m_TaskFunction(taskFunc), m_ReadyFunction(readyFunc) {}
+            STask(TaskFn&& task, ReadyFn&& ready) : m_TaskFunction(std::move(task)), m_ReadyFunction(std::move(ready)) {}
 
             void Execute() override { m_Result = std::move(m_TaskFunction()); }
 
@@ -60,13 +67,13 @@ namespace SharedUtil
         // taskFunc: Time-consuming function that is executed on the secondary thread (be aware of thread safety!)
         // readyFunc: Function that is called once the result is ready (called on the main thread)
         //
-        template <typename ResultType>
-        void PushTask(const std::function<ResultType()>& taskFunc, const std::function<void(const ResultType&)>& readyFunc)
+        template <typename TaskFn, typename ReadyFn>
+        void PushTask(TaskFn&& task, ReadyFn&& ready)
         {
-            std::unique_ptr<SBaseTask> pTask{new STask<ResultType>{taskFunc, readyFunc}};
+            std::unique_ptr<SBaseTask> pTask{new STask{std::move(task), std::move(ready)}};
 
-            std::lock_guard<std::mutex> lock{m_TasksMutex};
-            m_Tasks.push(std::move(pTask));
+            std::scoped_lock<std::mutex> lock{m_TasksMutex};
+            m_Tasks.emplace(std::move(pTask));
         }
 
         //
@@ -90,3 +97,4 @@ namespace SharedUtil
         std::mutex                              m_TaskResultsMutex;
     };
 }            // namespace SharedUtil
+#endif

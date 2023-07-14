@@ -94,6 +94,12 @@ public:
     float  GetSoundBPM();
     void   SetSoundBPM(float fBPM) { m_fBPM = fBPM; }
 
+    // Retrieves the error message for the most recent BASS function call in the current thread.
+    static const char* ErrorGetMessage();
+
+    // Retrieves the error code for the most recent BASS function call in the current thread.
+    static int ErrorGetCode();
+
 protected:
     HSTREAM             ConvertFileToMono(const SString& strPath);
     static DWORD WINAPI PlayStreamIntern(LPVOID argument);

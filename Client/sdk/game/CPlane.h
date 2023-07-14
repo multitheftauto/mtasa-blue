@@ -11,9 +11,9 @@
 
 #pragma once
 
-#include "CVehicle.h"
+#include "CAutomobile.h"
 
-class CPlane : public virtual CVehicle
+class CPlane : public virtual CAutomobile
 {
 public:
     virtual ~CPlane(){};

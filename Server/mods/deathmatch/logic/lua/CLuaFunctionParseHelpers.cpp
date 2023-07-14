@@ -1,14 +1,22 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        MTA10_Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
- *  PURPOSE:
+ *  FILE:        Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.cpp
  *
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaFunctionParseHelpers.h"
+#include "CScriptArgReader.h"
+#include "CResource.h"
+#include "CResourceManager.h"
+#include "CGame.h"
+#include "CRemoteCalls.h"
+#include "CMainConfig.h"
+#include "CAccessControlListManager.h"
+#include "CDatabaseManager.h"
+#include "CBan.h"
 
 //
 // enum values <-> script strings
@@ -278,41 +286,240 @@ ADD_ENUM(ESyncType::SUBSCRIBE, "subscribe")
 IMPLEMENT_ENUM_CLASS_END("sync-mode")
 
 //
+// CResource from userdata
+//
+CResource* UserDataCast(CResource* ptr, lua_State* luaState)
+{
+    return g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CXMLNode from userdata
+//
+CXMLNode* UserDataCast(CXMLNode* ptr, lua_State* luaState)
+{
+    return g_pServerInterface->GetXML()->GetNodeFromID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CLuaTimer from userdata
+//
+CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
+{
+    if (CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaState); luaMain != nullptr)
+    {
+        return luaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+
+    return nullptr;
+}
+
+//
+// CAccount from userdata
+//
+CAccount* UserDataCast(CAccount* ptr, lua_State* luaState)
+{
+    return g_pGame->GetAccountManager()->GetAccountFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CDbJobData from userdata
+//
+CDbJobData* UserDataCast(CDbJobData* ptr, lua_State* luaState)
+{
+    return g_pGame->GetDatabaseManager()->GetQueryFromId(reinterpret_cast<SDbJobId>(ptr));
+}
+
+//
+// CAccessControlList from userdata
+//
+CAccessControlList* UserDataCast(CAccessControlList* ptr, lua_State* luaState)
+{
+    return g_pGame->GetACLManager()->GetACLFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CAccessControlListGroup from userdata
+//
+CAccessControlListGroup* UserDataCast(CAccessControlListGroup* ptr, lua_State* luaState)
+{
+    return g_pGame->GetACLManager()->GetGroupFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CTextItem from userdata
+//
+CTextItem* UserDataCast(CTextItem* ptr, lua_State* luaState)
+{
+    if (CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaState); luaMain != nullptr)
+    {
+        return luaMain->GetTextItemFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+
+    return nullptr;
+}
+
+//
+// CTextDisplay from userdata
+//
+CTextDisplay* UserDataCast(CTextDisplay* ptr, lua_State* luaState)
+{
+    if (CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaState); luaMain != nullptr)
+    {
+        return luaMain->GetTextDisplayFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    }
+
+    return nullptr;
+}
+
+//
+// CBan from userdata
+//
+CBan* UserDataCast(CBan* ptr, lua_State* luaState)
+{
+    return g_pGame->GetBanManager()->GetBanFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CLuaVector2D from userdata
+//
+CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
+{
+    return CLuaVector2D::GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CLuaVector3D from userdata
+//
+CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
+{
+    return CLuaVector3D::GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CLuaVector4D from userdata
+//
+CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
+{
+    return CLuaVector4D::GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CLuaMatrix from userdata
+//
+CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
+{
+    return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+}
+
+//
+// CElement from userdata
+//
+CElement* UserDataToElementCast(CElement* ptr, eEntityType entityType, lua_State* luaState)
+{
+    CElement* element = CElementIDs::GetElement(TO_ELEMENTID(ptr));
+
+    if (element == nullptr || element->IsBeingDeleted() || (element->GetType() != entityType && entityType != -1))
+        return nullptr;
+
+    return element;
+}
+
+//
+// CPed from userdata
+//
+CPed* UserDataCast(CPed* ptr, lua_State* luaState)
+{
+    ElementID ID = TO_ELEMENTID(ptr);
+    CElement* pElement = CElementIDs::GetElement(ID);
+    if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != CElement::PED && pElement->GetType() != CElement::PLAYER))
+        return nullptr;
+    return (CPed*)pElement;
+}
+
+//
+// CRemoteCall from userdata
+//
+CRemoteCall* UserDataCast(CRemoteCall* ptr, lua_State* luaState)
+{
+    if (ptr && g_pGame->GetRemoteCalls()->CallExists(ptr))
+    {
+        return ptr;
+    }
+
+    return nullptr;
+}
+
+//
+// CPlayer from userdata
+// Disallows conversion of CPeds to CPlayers
+//
+CPlayer* UserDataCast(CPlayer* ptr, lua_State* luaState)
+{
+    ElementID ID = TO_ELEMENTID(ptr);
+    CElement* pElement = CElementIDs::GetElement(ID);
+    if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != CElement::PLAYER))
+        return nullptr;
+    return (CPlayer*)pElement;
+}
+
+//
+// CClient from CConsoleClient or a CPlayer
+//
+CClient* UserDataCast(CClient* ptr, lua_State* luaState)
+{
+    ElementID ID = TO_ELEMENTID(ptr);
+    CElement* pElement = CElementIDs::GetElement(ID);
+    if (!pElement || pElement->IsBeingDeleted())
+        return nullptr;
+
+    CClient* pClient = nullptr;
+    if (pElement->GetType() == CElement::PLAYER)
+        pClient = reinterpret_cast<CPlayer*>(pElement);
+    else if (pElement->GetType() == CElement::CONSOLE)
+        pClient = reinterpret_cast<CConsoleClient*>(pElement);
+
+    return pClient;
+}
+
+//
 // Get best guess at name of userdata type
 //
 SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
 {
-    if (CElement* pVar = UserDataCast<CElement>((CElement*)NULL, ptr, luaVM))            // Try element
+    if (CElement* pVar = UserDataCast((CElement*)ptr, luaVM))            // Try element
         return bFindElementType ? pVar->GetTypeName() : GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CResource>((CResource*)NULL, ptr, luaVM))            // Try resource
+    if (auto* pVar = UserDataCast(static_cast<CResource*>(ptr), luaVM))            // Try resource
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CXMLNode>((CXMLNode*)NULL, ptr, luaVM))            // Try xml node
+    if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))            // Try xml node
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaTimer>((CLuaTimer*)NULL, ptr, luaVM))            // Try timer
+    if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))            // Try timer
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CAccount>((CAccount*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CAccount*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CDbJobData>((CDbJobData*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CDbJobData*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CAccessControlList>((CAccessControlList*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CAccessControlList*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CAccessControlListGroup>((CAccessControlListGroup*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CAccessControlListGroup*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CCustomWeapon>((CCustomWeapon*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CCustomWeapon*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CBan>((CBan*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CBan*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CTextItem>((CTextItem*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CTextItem*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CTextDisplay>((CTextDisplay*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CTextDisplay*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector2D>((CLuaVector2D*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector3D>((CLuaVector3D*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaVector4D>((CLuaVector4D*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
         return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast<CLuaMatrix>((CLuaMatrix*)NULL, ptr, luaVM))
+    if (auto* pVar = UserDataCast((CLuaMatrix*)ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast((CRemoteCall*)ptr, luaVM))
         return GetClassTypeName(pVar);
 
     return "";
@@ -511,16 +718,18 @@ eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource*
         return eResourceModifyScope::SINGLE_RESOURCE;
 
     CAccessControlListManager* const pACLManager = g_pGame->GetACLManager();
-    const SString& strResourceName = pThisResource->GetName();
+    const SString&                   strResourceName = pThisResource->GetName();
 
     // Check if resource has right to modify any resource
-    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "ModifyOtherObjects", CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
+    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, "ModifyOtherObjects",
+                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
         return eResourceModifyScope::EVERY_RESOURCE;
 
     // Check if resource has right to modify only pOtherResource
     const SString strRightName("ModifyOtherObjects.%s", pOtherResource->GetName().c_str());
 
-    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strRightName.c_str(), CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
+    if (pACLManager->CanObjectUseRight(strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE, strRightName.c_str(),
+                                       CAccessControlListRight::RIGHT_TYPE_GENERAL, false))
         return eResourceModifyScope::SINGLE_RESOURCE;
 
     return eResourceModifyScope::NONE;
@@ -532,7 +741,9 @@ eResourceModifyScope GetResourceModifyScope(CResource* pThisResource, CResource*
 void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource)
 {
     if (GetResourceModifyScope(pThisResource, pOtherResource) == eResourceModifyScope::NONE)
-        argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), pOtherResource->GetName().c_str()), "Access denied");
+        argStream.SetCustomError(
+            SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), pOtherResource->GetName().c_str()),
+            "Access denied");
 }
 
 //
@@ -560,7 +771,7 @@ void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisR
         return;
 
     std::stringstream ssResourceNames;
-    size_t remainingElements = setNoPermissionResources.size();
+    size_t            remainingElements = setNoPermissionResources.size();
 
     for (CResource* pResource : setNoPermissionResources)
     {
@@ -572,14 +783,15 @@ void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisR
         --remainingElements;
     }
 
-    argStream.SetCustomError(SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), ssResourceNames.str().c_str()), "Access denied");
+    argStream.SetCustomError(
+        SString("ModifyOtherObjects in ACL denied resource %s to access %s", pThisResource->GetName().c_str(), ssResourceNames.str().c_str()), "Access denied");
 }
 
 //
 // Set error if resource file access is blocked due to reasons
 //
 void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
-    bool* pbReadOnly)
+                                     bool* pbReadOnly)
 {
     if (!g_pGame->GetConfig()->IsDatabaseCredentialsProtectionEnabled())
         return;

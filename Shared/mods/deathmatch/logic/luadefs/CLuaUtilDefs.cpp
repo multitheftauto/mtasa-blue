@@ -9,6 +9,32 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaUtilDefs.h"
+#include "CScriptArgReader.h"
+#include "Utils.h"
+#include <lua/CLuaFunctionParser.h>
+#include <SharedUtil.Memory.h>
+
+#ifndef MTA_CLIENT
+    #include "CRemoteCalls.h"
+#endif
+
+static auto GetProcessMemoryStats() -> std::optional<std::unordered_map<const char*, lua_Number>>
+{
+    ProcessMemoryStats memoryStats{};
+
+    if (TryGetProcessMemoryStats(memoryStats))
+    {
+        return std::unordered_map<const char*, lua_Number>{
+            {"virtual", memoryStats.virtualMemorySize},
+            {"resident", memoryStats.residentMemorySize},
+            {"shared", memoryStats.sharedMemorySize},
+            {"private", memoryStats.privateMemorySize},
+        };
+    }
+
+    return std::nullopt;
+}
 
 void CLuaUtilDefs::LoadFunctions()
 {
@@ -46,6 +72,7 @@ void CLuaUtilDefs::LoadFunctions()
         // Utility functions
         {"gettok", GetTok},
         {"tocolor", tocolor},
+        {"getProcessMemoryStats", ArgumentParser<GetProcessMemoryStats>},
     };
 
     // Add functions
@@ -563,7 +590,7 @@ int CLuaUtilDefs::PregMatch(lua_State* luaVM)
         pcrecpp::StringPiece strInput(strBase);
 
         std::string strGet;
-        int    i = 1;
+        int         i = 1;
         while (pPattern.FindAndConsume(&strInput, &strGet) && i <= iMaxResults)
         {
             lua_pushnumber(luaVM, i);
@@ -634,7 +661,7 @@ int CLuaUtilDefs::GetTok(lua_State* luaVM)
     if (argStream.NextIsNumber())
     {
         argStream.ReadNumber(uiDelimiter);
-        wchar_t wUNICODE[2] = { static_cast<wchar_t>(uiDelimiter), '\0' };
+        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
     else            // It's already a string

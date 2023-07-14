@@ -23,13 +23,14 @@ public:
     static CLuaMultiReturn<unsigned char, unsigned char> GetCameraViewMode();
 
     // Cam get funcs
-    LUA_DECLARE(GetCamera);
-    LUA_DECLARE_OOP(GetCameraMatrix);
-    LUA_DECLARE(GetCameraTarget);
-    LUA_DECLARE(GetCameraInterior);
-    LUA_DECLARE(GetCameraGoggleEffect);
-    LUA_DECLARE(GetCameraShakeLevel);
+    static std::variant<CClientCamera*, bool>                                      GetCamera();
+    static CLuaMultiReturn<float, float, float, float, float, float, float, float> GetCameraMatrix();
+    static CMatrix                                                                 OOP_GetCameraMatrix();
+    static std::variant<CClientEntity*, bool>                                      GetCameraTarget();
+    static unsigned char                                                           GetCameraInterior();
+    static std::string                                                             GetCameraGoggleEffect();
     LUA_DECLARE(GetCameraFieldOfView);
+    static unsigned char GetCameraDrunkLevel();
 
     // Cam set funcs
     LUA_DECLARE(SetCameraMatrix);
@@ -40,11 +41,13 @@ public:
     LUA_DECLARE(SetCameraClip);
     LUA_DECLARE(GetCameraClip);
     LUA_DECLARE(SetCameraGoggleEffect);
-    LUA_DECLARE(SetCameraShakeLevel);
+    static bool SetCameraDrunkLevel(short drunkLevel);
 
     // For OOP only
     LUA_DECLARE(OOP_GetCameraPosition);
     LUA_DECLARE(OOP_SetCameraPosition);
     LUA_DECLARE(OOP_GetCameraRotation);
     LUA_DECLARE(OOP_SetCameraRotation);
+
+    static const SString& GetElementType();
 };

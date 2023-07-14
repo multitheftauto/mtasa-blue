@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CWeather.h>
-#include "Common.h"
 
 class CWeatherSA : public CWeather
 {
@@ -21,23 +20,16 @@ class CWeatherSA : public CWeather
 public:
     unsigned char Get();
     void          Set(unsigned char primary, unsigned char secondary);
-    void          SetPrimary(unsigned char weather);
-    void          SetSecondary(unsigned char weather);
 
-    void ForceWeather(unsigned char weather);
-    void ForceWeatherNow(unsigned char weather);
     void Release();
 
-    bool  IsRaining();
     float GetAmountOfRain();
     void  SetAmountOfRain(float fAmount);
     void  ResetAmountOfRain();
 
 private:
-    static unsigned char* VAR_CurrentWeather;
-    static unsigned char* VAR_CurrentWeather_b;
-    static unsigned char* VAR_CurrentWeather_c;
-    static float*         VAR_AmountOfRain;
-
-    static unsigned long FUNC_IsRaining;
+    static unsigned char* VAR_CWeather__ForcedWeatherType;
+    static unsigned char* VAR_CWeather__OldWeatherType;
+    static unsigned char* VAR_CWeather__NewWeatherType;
+    static float*         VAR_CWeather__Rain;
 };

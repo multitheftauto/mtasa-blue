@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerJoinDataPacket.h"
 
 bool CPlayerJoinDataPacket::Read(NetBitStreamInterface& BitStream)
 {
@@ -30,12 +31,6 @@ bool CPlayerJoinDataPacket::Read(NetBitStreamInterface& BitStream)
         // Shrink string sizes to fit
         m_strNick = *m_strNick;
         m_strSerialUser = *m_strSerialUser;
-
-        if (static_cast<eBitStreamVersion>(m_usBitStreamVersion) >= eBitStreamVersion::Discord_InitialImplementation)
-        {
-            if (!BitStream.ReadString<uchar>(m_strDiscordSecret))
-                return false;
-        }
 
         return true;
     }

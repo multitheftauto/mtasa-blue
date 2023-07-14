@@ -11,8 +11,9 @@
 
 #pragma once
 
-struct RpClump;
 class CAnimBlendHierarchySAInterface;
+class CAnimBlendStaticAssociationSAInterface;
+struct RpClump;
 
 class CAnimBlendStaticAssociation
 {

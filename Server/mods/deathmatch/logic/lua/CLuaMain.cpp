@@ -10,6 +10,41 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaMain.h"
+#include "LuaCommon.h"
+#include "lua/CLuaShared.h"
+#include "luadefs/CLuaHTTPDefs.h"
+#include "luadefs/CLuaUtilDefs.h"
+#include "luadefs/CLuaElementDefs.h"
+#include "luadefs/CLuaAccountDefs.h"
+#include "luadefs/CLuaACLDefs.h"
+#include "luadefs/CLuaBanDefs.h"
+#include "luadefs/CLuaBlipDefs.h"
+#include "luadefs/CLuaColShapeDefs.h"
+#include "luadefs/CLuaDatabaseDefs.h"
+#include "luadefs/CLuaMarkerDefs.h"
+#include "luadefs/CLuaObjectDefs.h"
+#include "luadefs/CLuaPedDefs.h"
+#include "luadefs/CLuaPickupDefs.h"
+#include "luadefs/CLuaPlayerDefs.h"
+#include "luadefs/CLuaRadarAreaDefs.h"
+#include "luadefs/CLuaResourceDefs.h"
+#include "luadefs/CLuaTeamDefs.h"
+#include "luadefs/CLuaTextDefs.h"
+#include "luadefs/CLuaTimerDefs.h"
+#include "luadefs/CLuaVehicleDefs.h"
+#include "luadefs/CLuaWaterDefs.h"
+#include "CPerfStatManager.h"
+#include "CRemoteCalls.h"
+#include "CLatentTransferManager.h"
+#include "CDebugHookManager.h"
+#include "lua/CLuaCallback.h"
+#include "CGame.h"
+#include "CMapManager.h"
+#include "CDummy.h"
+#include "CKeyBinds.h"
+#include "CIdArray.h"
+#include "CResourceConfigItem.h"
 #include "luadefs/CLuaFunctionDefs.h"
 #include <clocale>
 
@@ -107,17 +142,10 @@ void CLuaMain::ResetInstructionCount()
 void CLuaMain::InitSecurity()
 {
     // Disable dangerous Lua Os library functions
-    static const luaL_reg osfuncs[] =
-    {
-        { "execute", CLuaUtilDefs::DisabledFunction },
-        { "rename", CLuaUtilDefs::DisabledFunction },
-        { "remove", CLuaUtilDefs::DisabledFunction },
-        { "exit", CLuaUtilDefs::DisabledFunction },
-        { "getenv", CLuaUtilDefs::DisabledFunction },
-        { "tmpname", CLuaUtilDefs::DisabledFunction },
-        { "setlocale", CLuaUtilDefs::DisabledFunction },
-        { NULL, NULL }
-    };
+    static const luaL_reg osfuncs[] = {{"execute", CLuaUtilDefs::DisabledFunction},   {"rename", CLuaUtilDefs::DisabledFunction},
+                                       {"remove", CLuaUtilDefs::DisabledFunction},    {"exit", CLuaUtilDefs::DisabledFunction},
+                                       {"getenv", CLuaUtilDefs::DisabledFunction},    {"tmpname", CLuaUtilDefs::DisabledFunction},
+                                       {"setlocale", CLuaUtilDefs::DisabledFunction}, {NULL, NULL}};
     luaL_register(m_luaVM, "os", osfuncs);
 
     lua_register(m_luaVM, "dofile", CLuaUtilDefs::DisabledFunction);
@@ -666,4 +694,14 @@ int CLuaMain::OnUndump(const char* p, size_t n)
         return 0;
     }
     return 1;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CLuaMain::GetElementCount
+//
+///////////////////////////////////////////////////////////////
+unsigned long CLuaMain::GetElementCount() const
+{
+    return m_pResource && m_pResource->GetElementGroup() ? m_pResource->GetElementGroup()->GetCount() : 0;
 }

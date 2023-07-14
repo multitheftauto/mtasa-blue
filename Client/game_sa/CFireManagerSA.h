@@ -12,21 +12,18 @@
 #pragma once
 
 #include <game/CFireManager.h>
-#include "Common.h"
-#include "CFireSA.h"
+
+class CEntity;
+class CFireSA;
+class CFireSAInterface;
 
 #define FUNC_ExtinguishPoint            0x539450
 
-#define FUNC_StartFire                  0x48EC30
-#define FUNC_StartFire_Vec              0x539F00 // ##SA##
-
-#define ARRAY_CFire             (VAR_CFireCount + 4)
-
-#define CLASS_CFireManager      0xB71F80 //##SA##
+#define ARRAY_CFire                     (VAR_CFireCount + 4)
+#define CLASS_CFireManager              0xB71F80
 
 #define DEFAULT_FIRE_PARTICLE_SIZE      1.8
-
-#define MAX_FIRES               60 //##SA##
+#define MAX_FIRES                       60
 
 class CFireManagerSA : public CFireManager
 {
@@ -34,14 +31,13 @@ private:
     CFireSA* Fires[MAX_FIRES];
 
 public:
-    // constructor
     CFireManagerSA();
     ~CFireManagerSA();
 
-    VOID   ExtinguishPoint(CVector& vecPosition, float fRadius);
+    void   ExtinguishPoint(CVector& vecPosition, float fRadius);
     CFire* StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize);
     CFire* StartFire(CVector& vecPosition, float fSize);
-    VOID   ExtinguishAllFires();
+    void   ExtinguishAllFires();
     CFire* GetFire(DWORD ID);
     DWORD  GetFireCount();
     CFire* FindFreeFire();

@@ -12,6 +12,8 @@
 
 #include <cstdint>
 
+class CVector;
+
 using CollisionSlot = std::uint8_t;
 
 class CColStore

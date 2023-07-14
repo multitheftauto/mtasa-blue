@@ -10,6 +10,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPerfStatManager.h"
+#include "CDatabaseManager.h"
+#include "CGame.h"
+#include "CMainConfig.h"
+#include "CRegistry.h"
+#include <net/ns_common.h>
 
 namespace
 {

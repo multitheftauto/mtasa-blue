@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <game/CPools.h>
+
 class CClientManager;
 class CClientObject;
 class CObject;
@@ -26,9 +28,9 @@ public:
     void DeleteAll();
 
     const CMappedArray<CClientObject*>& GetObjects() const { return m_Objects; };
-    unsigned int          Count() { return static_cast<unsigned int>(m_Objects.size()); };
-    unsigned int          CountCreatedObjects() { return static_cast<unsigned int>(g_pGame->GetPools()->GetObjectCount()); };
-    static CClientObject* Get(ElementID ID);
+    unsigned int                        Count() { return static_cast<unsigned int>(m_Objects.size()); };
+    unsigned int                        CountCreatedObjects() { return static_cast<unsigned int>(g_pGame->GetPools()->GetObjectCount()); };
+    static CClientObject*               Get(ElementID ID);
 
     static bool IsValidModel(unsigned long ulObjectModel);
     static bool IsBreakableModel(unsigned long ulObjectModel);

@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CServerImpl.h"
+#include "version.h"
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include "ErrorCodes.h"

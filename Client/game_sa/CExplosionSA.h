@@ -11,31 +11,33 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CExplosion.h>
-#include "CEntitySA.h"
+
+class CEntitySAInterface;
 
 class CExplosionSAInterface            // 124 bytes, ok
 {
 public:
     eExplosionType      m_ExplosionType;
     CVector             m_vecPosition;
-    FLOAT               m_fExplosionRadius;
-    FLOAT               m_fExplosionPropagationRate;
+    float               m_fExplosionRadius;
+    float               m_fExplosionPropagationRate;
     CEntitySAInterface* m_pEntExplosionOwner;
     CEntitySAInterface* m_pExplodingEntity;            // 28
     DWORD               m_TimeExpires;
-    FLOAT               m_DamagePercentage;
+    float               m_DamagePercentage;
     BYTE                m_cExplosionActive;            // 36
     BYTE                m_nTriggerExplosionSfx;
     BYTE                m_bMakeSound;
-    FLOAT               m_ParticleTimer;              // 40
+    float               m_ParticleTimer;              // 40
     DWORD               m_ActivationTime;             // 44
-    FLOAT               m_fExplosionForce;            // 48
-    FLOAT               m_fGroundZ;
+    float               m_fExplosionForce;            // 48
+    float               m_fGroundZ;
     DWORD               m_fuelTime;
     CVector             m_fuelDir[3];
-    FLOAT               m_fuelOffsetDist[3];
-    FLOAT               m_fuelSpeed[3];
+    float               m_fuelOffsetDist[3];
+    float               m_fuelSpeed[3];
 };
 
 class CExplosionSA : public CExplosion
@@ -44,17 +46,17 @@ private:
     CExplosionSAInterface* internalInterface;
 
 public:
-    CExplosionSA(CExplosionSAInterface* explosionInterface) { this->internalInterface = explosionInterface; }
+    CExplosionSA(CExplosionSAInterface* explosionInterface) { internalInterface = explosionInterface; }
 
-    CExplosionSAInterface* GetInterface() { return this->internalInterface; };
+    CExplosionSAInterface* GetInterface() { return internalInterface; };
 
     eExplosionType GetExplosionType();
     CVector*       GetExplosionPosition();
     void           SetExplosionPosition(const CVector* vecPosition);
     CEntity*       GetExplosionCreator();
     CEntity*       GetExplodingEntity();
-    BOOL           IsActive();
-    VOID           Remove();
+    bool           IsActive();
+    void           Remove();
     float          GetExplosionForce();
     void           SetExplosionForce(float fForce);
     void           SetSilent(bool bSilent);

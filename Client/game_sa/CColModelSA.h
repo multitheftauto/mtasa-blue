@@ -11,7 +11,9 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CColModel.h>
+#include <game/CColPoint.h>
 #include "CCompressedVectorSA.h"
 
 #define FUNC_CColModel_Constructor      0x40FB60
@@ -82,7 +84,7 @@ struct CColSphereSA : CSphereSA
         {
             std::uint8_t m_hasSpheresBoxesTriangles : 1;
             std::uint8_t m_isSingleAllocationCollisionData : 1;
-            std::uint8_t m_isActive: 1;
+            std::uint8_t m_isActive : 1;
             std::uint8_t m_flag0x08 : 1;
             std::uint8_t m_flag0x10 : 1;
             std::uint8_t m_flag0x20 : 1;

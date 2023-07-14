@@ -11,10 +11,8 @@
 
 #pragma once
 
-#include "Common.h"
-#include "CRegisteredCorona.h"
-
-#include <windows.h>
+class CRegisteredCorona;
+class CVector;
 
 // these are the IDs that are used internally for coronas
 #define CORONA_SUN                  1
@@ -28,4 +26,6 @@ public:
     virtual CRegisteredCorona* FindFreeCorona() = 0;
     virtual CRegisteredCorona* FindCorona(DWORD Identifier) = 0;
     virtual void               DisableSunAndMoon(bool bDisabled) = 0;
+    virtual void               SetCoronaReflectionsEnabled(unsigned char ucEnabled) = 0;
+    virtual unsigned char      GetCoronaReflectionsEnabled() = 0;
 };

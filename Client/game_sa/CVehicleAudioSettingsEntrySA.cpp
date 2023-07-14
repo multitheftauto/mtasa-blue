@@ -1,5 +1,16 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CVehicleAudioSettingsEntrySA.cpp
+ *  PURPOSE:     Implementation file for vehicle audio settings entry class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
+#include "CVehicleAudioSettingsEntrySA.h"
 
 CVehicleAudioSettingsEntrySA::CVehicleAudioSettingsEntrySA()
 {
@@ -9,11 +20,6 @@ CVehicleAudioSettingsEntrySA::CVehicleAudioSettingsEntrySA()
 CVehicleAudioSettingsEntrySA::CVehicleAudioSettingsEntrySA(tVehicleAudioSettings* pSettingsEntry)
 {
     m_Settings = *pSettingsEntry;
-}
-
-CVehicleAudioSettingsEntrySA::~CVehicleAudioSettingsEntrySA()
-{
-
 }
 
 void CVehicleAudioSettingsEntrySA::Assign(const CVehicleAudioSettingsEntry* pData)

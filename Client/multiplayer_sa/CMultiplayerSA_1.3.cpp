@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CWorld.h>
 
 extern CCoreInterface* g_pCore;
 
@@ -237,8 +238,6 @@ void CMultiplayerSA::InitMemoryCopies_13()
     // Fixes
     // MemPut < BYTE > ( 0x685AC1, 0xEB );
     // MemPut < BYTE > ( 0x685C2D, 0xEB );
-
-    MemPut<BYTE>(0x0706AB0, 0xC3);            // Skip CRealTimeShadowManager::Update
 }
 
 // Siren Stuff
@@ -337,7 +336,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
         // Grab our siren vehicle
         mov pVehicleWithTheSiren, esi
     }
-    // Call our Get siren type function which edits dwSirenType to our desired type
+    //   Call our Get siren type function which edits dwSirenType to our desired type
     GetVehicleSirenType();
     _asm
     {
@@ -632,7 +631,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeDual()
         // Store our post hook default siren type
         mov dwSirenTypePostHook, edi
     }
-    // Do our test and edit dwSirenType2 appropriately
+    //   Do our test and edit dwSirenType2 appropriately
     TestSirenTypeDualDefaultFix();
     _asm
     {
@@ -791,7 +790,7 @@ void _declspec(naked) HOOK_CVehicle_DoesVehicleUseSiren()
         // Grab our vehicle interface
         mov pVehicleWithTheSiren, ecx
     }
-    // Test our vehicle for sirens
+    //   Test our vehicle for sirens
     if (TestVehicleForSiren())
     {
         _asm
@@ -843,7 +842,7 @@ void _declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
         // Grab our vehicle
         mov pVehicleWithTheSiren, esi
     }
-    // Check if we disable or enable the 360 effect
+    //   Check if we disable or enable the 360 effect
     if (SirenCheckCameraPosition())
     {
         _asm
@@ -1457,7 +1456,7 @@ void _declspec(naked) HOOK_CVehicleModelInterface_SetClump()
         mov pLoadingClump, eax
         mov pLoadingModelInfo, esi
     }
-    // Init our supported upgrades structure for this model info
+    //   Init our supported upgrades structure for this model info
     CVehicleModelInterface_SetClump();
     // Perform overwrite sequence and jump back
     _asm

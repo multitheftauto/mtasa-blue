@@ -13,27 +13,13 @@
 
 #include "Common.h"
 
-#include "CMarker.h"
-#include "CObject.h"
-#include "CPed.h"
-#include "CVehicle.h"
-
-#include <windows.h>
+class CMarker;
+class CVector;
 
 class CRadar
 {
 public:
     virtual CMarker* CreateMarker(CVector* vecPosition) = 0;
-    virtual CMarker* CreateMarker(CVehicle* vehicle) = 0;
-    virtual CMarker* CreateMarker(CObject* object) = 0;
-    virtual CMarker* CreateMarker(CPed* ped) = 0;
-
     virtual CMarker* GetFreeMarker() = 0;
-    virtual CMarker* GetMarker(DWORD dwMarkerID) = 0;
-
-    virtual VOID ClearMarkerForEntity(CVehicle* vehicle) = 0;
-    virtual VOID ClearMarkerForEntity(CObject* object) = 0;
-    virtual VOID ClearMarkerForEntity(CPed* ped) = 0;
-
-    virtual VOID DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SColor color) = 0;
+    virtual void     DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color) = 0;
 };

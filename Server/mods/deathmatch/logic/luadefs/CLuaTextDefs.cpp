@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaTextDefs.h"
+#include "CScriptArgReader.h"
 
 void CLuaTextDefs::LoadFunctions()
 {

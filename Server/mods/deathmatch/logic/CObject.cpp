@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CObject.h"
+#include "CLogger.h"
+#include "Utils.h"
 
 extern CGame* g_pGame;
 
@@ -180,6 +183,9 @@ bool CObject::ReadSpecialData(const int iLine)
         m_ucAlpha = static_cast<unsigned char>(iTemp);
 
     GetCustomDataBool("frozen", m_bIsFrozen, true);
+
+    if (!GetCustomDataBool("breakable", m_bBreakable, true))
+        m_bBreakable = CObjectManager::IsBreakableModel(m_usModel);
 
     return true;
 }

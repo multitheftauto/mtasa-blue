@@ -250,7 +250,7 @@ void Poly1305_Base<T>::Update(const byte *input, size_t length)
 	}
 
 	if (rem)
-		memcpy(m_acc, input, rem);
+		std::memcpy(m_acc, input, rem);
 
 	m_idx = rem;
 }
@@ -283,7 +283,7 @@ template <class T>
 void Poly1305_Base<T>::Resynchronize(const byte *nonce, int nonceLength)
 {
 	CRYPTOPP_ASSERT(nonceLength == -1 || nonceLength == (int)BLOCKSIZE);
-	nonceLength == -1 ? nonceLength = BLOCKSIZE : nonceLength;
+	if (nonceLength == -1) { nonceLength = BLOCKSIZE; }
 
 	// Encrypt the nonce, stash in m_nk
 	m_cipher.ProcessBlock(nonce, m_nk.begin());
@@ -366,7 +366,7 @@ void Poly1305TLS_Base::Update(const byte *input, size_t length)
 	}
 
 	if (rem)
-		memcpy(m_acc, input, rem);
+		std::memcpy(m_acc, input, rem);
 
 	m_idx = rem;
 }

@@ -21,6 +21,10 @@ class CClientPed;
 #include "CClientModel.h"
 #include <memory>
 
+#include <game/CPad.h>
+#include <game/TaskTypes.h>
+
+class CAnimBlock;
 class CClientCamera;
 class CClientManager;
 class CClientModelRequestManager;
@@ -28,8 +32,9 @@ class CClientPed;
 class CClientPedManager;
 class CClientPlayer;
 class CClientPlayerClothes;
-class CClientVehicle;
 class CClientProjectile;
+class CClientVehicle;
+class CTask;
 
 enum eDelayedSyncData
 {
@@ -241,8 +246,9 @@ public:
     CClientVehicle* GetOccupyingVehicle() { return m_pOccupyingVehicle; };
 
     CClientVehicle* GetRealOccupiedVehicle();
-    CClientVehicle* GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors, bool bCheckStreamedOutVehicles,
-                                             unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL, float fWithinRange = 6000.0f);
+    CClientVehicle* GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
+                                               bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL,
+                                               float fWithinRange = 6000.0f);
     bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
                                    CVector* pClosestDoorPosition = NULL);
 
@@ -321,17 +327,14 @@ public:
             fDirectionY = m_shotSyncData->m_fArmDirectionY;
         }
     };
-    CVector        GetAim() const;
-    const CVector& GetAimSource() { return m_shotSyncData->m_vecShotOrigin; };
-    const CVector& GetAimTarget() { return m_shotSyncData->m_vecShotTarget; };
+    CVector              GetAim() const;
+    const CVector&       GetAimSource() { return m_shotSyncData->m_vecShotOrigin; };
+    const CVector&       GetAimTarget() { return m_shotSyncData->m_vecShotTarget; };
     eVehicleAimDirection GetVehicleAimAnim() { return m_shotSyncData->m_cInVehicleAimDirection; };
-    void           SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim);
-    void           SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim);
-    void           SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim,
-                                 CVector* pSource, bool bInterpolateAim);
-
-    unsigned long GetMemoryValue(unsigned long ulOffset) { return (m_pPlayerPed) ? *m_pPlayerPed->GetMemoryValue(ulOffset) : 0; };
-    unsigned long GetGameBaseAddress() { return (m_pPlayerPed) ? (unsigned long)m_pPlayerPed->GetMemoryValue(0) : 0; };
+    void                 SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim);
+    void SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim);
+    void SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY,
+                       eVehicleAimDirection cInVehicleAimAnim, CVector* pSource, bool bInterpolateAim);
 
     void Duck(bool bDuck);
     bool IsDucked();
@@ -464,7 +467,7 @@ public:
 
     bool IsFootBloodEnabled();
     void SetFootBloodEnabled(bool bHasFootBlood);
-    
+
     bool IsBleeding() const { return m_bBleeding; };
     void SetBleeding(bool bBleeding);
 
@@ -475,6 +478,7 @@ public:
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
     void SetVoice(short sVoiceType, short sVoiceID);
     void SetVoice(const char* szVoiceType, const char* szVoice);
+    void ResetVoice();
 
     bool IsSpeechEnabled();
     void SetSpeechEnabled(bool bEnabled);
@@ -602,14 +606,15 @@ public:
     CClientVehiclePtr           m_pOccupiedVehicle;
     CClientVehiclePtr           m_pOccupyingVehicle;
     // unsigned int                m_uiOccupyingSeat;
-    unsigned int                             m_uiOccupiedVehicleSeat;
-    bool                                     m_bForceGettingIn;
-    bool                                     m_bForceGettingOut;
-    CShotSyncData*                           m_shotSyncData;
-    CStatsData*                              m_stats;
-    CControllerState*                        m_currentControllerState;
-    CControllerState*                        m_lastControllerState;
-    CControllerState                         m_rawControllerState; // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to prevent stuff like rapid input glitch)
+    unsigned int      m_uiOccupiedVehicleSeat;
+    bool              m_bForceGettingIn;
+    bool              m_bForceGettingOut;
+    CShotSyncData*    m_shotSyncData;
+    CStatsData*       m_stats;
+    CControllerState* m_currentControllerState;
+    CControllerState* m_lastControllerState;
+    CControllerState m_rawControllerState;            // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to
+                                                      // prevent stuff like rapid input glitch)
     CRemoteDataStorage*                      m_remoteDataStorage;
     unsigned long                            m_ulLastTimeFired;
     unsigned long                            m_ulLastTimeBeganAiming;
@@ -752,16 +757,16 @@ public:
     bool              m_bWarpInToVehicleRequired = false;
 
     // Enter/exit variables
-    unsigned long  m_ulLastVehicleInOutTime;    // Last tick where we sent an enter/exit request
-    bool           m_bIsGettingOutOfVehicle;    // Indicates we are exiting a vehicle
-    bool           m_bIsGettingIntoVehicle;     // Indicates we are entering a vehicle
-    bool           m_bIsJackingVehicle;         // Indicates we are jacking a vehicle
-    bool           m_bIsGettingJacked;          // Indicates we are getting jacked
-    ElementID      m_VehicleInOutID;            // ElementID of vehicle received from server
-    unsigned char  m_ucVehicleInOutSeat;        // Seat ID we are entering/exiting received from server
-    bool           m_bNoNewVehicleTask;         // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
-    ElementID      m_NoNewVehicleTaskReasonID;  // ElementID of the vehicle that we are waiting on
-    CClientPed*    m_pGettingJackedBy;          // The ped that is jacking us
+    unsigned long m_ulLastVehicleInOutTime;            // Last tick where we sent an enter/exit request
+    bool          m_bIsGettingOutOfVehicle;            // Indicates we are exiting a vehicle
+    bool          m_bIsGettingIntoVehicle;             // Indicates we are entering a vehicle
+    bool          m_bIsJackingVehicle;                 // Indicates we are jacking a vehicle
+    bool          m_bIsGettingJacked;                  // Indicates we are getting jacked
+    ElementID     m_VehicleInOutID;                    // ElementID of vehicle received from server
+    unsigned char m_ucVehicleInOutSeat;                // Seat ID we are entering/exiting received from server
+    bool          m_bNoNewVehicleTask;                 // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
+    ElementID     m_NoNewVehicleTaskReasonID;            // ElementID of the vehicle that we are waiting on
+    CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
 
     std::shared_ptr<CClientModel> m_clientModel;
 };

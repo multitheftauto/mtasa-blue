@@ -27,6 +27,9 @@
 #else
     #include <dirent.h>
     #include <sys/stat.h>
+    #include <unistd.h>
+    #include <limits.h>
+    #include <filesystem>
 #endif
 
 //
@@ -40,10 +43,8 @@ bool SharedUtil::FileExists(const SString& strFilename)
         return false;
     return ((dwAtr & FILE_ATTRIBUTE_DIRECTORY) == 0);
 #else
-    struct stat Info;
-    if (stat(strFilename, &Info) == -1)
-        return false;
-    return !(S_ISDIR(Info.st_mode));
+    std::error_code ec{};
+    return std::filesystem::is_regular_file(static_cast<const std::string&>(strFilename), ec);
 #endif
 }
 
@@ -58,10 +59,8 @@ bool SharedUtil::DirectoryExists(const SString& strPath)
         return false;
     return ((dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0);
 #else
-    struct stat Info;
-    if (stat(strPath, &Info) == -1)
-        return false;
-    return (S_ISDIR(Info.st_mode));
+    std::error_code ec{};
+    return std::filesystem::is_directory(static_cast<const std::string&>(strPath), ec);
 #endif
 }
 
@@ -337,6 +336,7 @@ uint64 SharedUtil::FileSize(const SString& strFilename)
 //
 void SharedUtil::MakeSureDirExists(const SString& strPath)
 {
+#ifdef WIN32
     std::vector<SString> parts;
     PathConform(strPath).Split(PATH_SEPERATOR, parts);
 
@@ -357,6 +357,11 @@ void SharedUtil::MakeSureDirExists(const SString& strPath)
         // Call mkdir on this path
         File::Mkdir(strTemp);
     }
+#else
+    std::filesystem::path filePath = static_cast<std::string>(PathConform(strPath));
+    std::error_code       ec{};
+    std::filesystem::create_directories(filePath.parent_path(), ec);
+#endif
 }
 
 SString SharedUtil::PathConform(const SString& strPath)
@@ -429,8 +434,8 @@ SString SharedUtil::GetSystemCurrentDirectory()
         return GetSystemLongPathName(ToUTF8(szResult));
     return ToUTF8(szResult);
 #else
-    char szBuffer[MAX_PATH];
-    getcwd(szBuffer, MAX_PATH - 1);
+    char szBuffer[PATH_MAX];
+    getcwd(szBuffer, PATH_MAX - 1);
     return szBuffer;
 #endif
 }
@@ -907,6 +912,40 @@ SString SharedUtil::MakeUniquePath(const SString& strInPathFilename)
         strTest = SString("%s_%d%s", strBeforeUniqueChar.c_str(), iCount++, strAfterUniqueChar.c_str());
     }
     return strTest;
+}
+
+// Tries to resolve the original path used for MakeUniquePath
+SString SharedUtil::MakeGenericPath(const SString& uniqueFilePath)
+{
+    if (DirectoryExists(uniqueFilePath) || FileExists(uniqueFilePath))
+        return uniqueFilePath;
+
+    SString basePath, fileName;
+    ExtractFilename(uniqueFilePath, &basePath, &fileName);
+
+    SString withoutExtension, extensionName;
+    bool    usingExtension = ExtractExtension(fileName, &withoutExtension, &extensionName);
+    size_t  underscore = withoutExtension.find_last_not_of("0123456789");
+
+    if (underscore != std::string::npos)
+    {
+        if (withoutExtension[underscore] == '_')
+        {
+            withoutExtension = withoutExtension.SubStr(0, underscore);
+
+            SString filePath;
+
+            if (usingExtension)
+                filePath = PathJoin(basePath, SString("%s.%s", withoutExtension.c_str(), extensionName.c_str()));
+            else
+                filePath = PathJoin(basePath, withoutExtension);
+
+            if (DirectoryExists(filePath) || FileExists(filePath))
+                return filePath;
+        }
+    }
+
+    return {};
 }
 
 // Conform a path string for sorting

@@ -28,6 +28,7 @@
 
 #include "cryptlib.h"
 #include "secblock.h"
+#include "seckey.h"
 #include "misc.h"
 
 NAMESPACE_BEGIN(CryptoPP)
@@ -39,7 +40,7 @@ class SipHash_Info : public FixedKeyLength<16>
 {
 public:
 	CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return "SipHash";}
-	CRYPTOPP_CONSTANT(DIGESTSIZE = (T_128bit ? 16 : 8))
+	CRYPTOPP_CONSTANT(DIGESTSIZE = (T_128bit ? 16 : 8));
 };
 
 /// \brief SipHash message authentication code base class
@@ -148,7 +149,8 @@ public:
 	/// \param key a byte array used to key the cipher
 	/// \param length the size of the byte array, in bytes
 	SipHash(const byte *key, unsigned int length)
-		{this->UncheckedSetKey(key, length, g_nullNameValuePairs);}
+		{this->ThrowIfInvalidKeyLength(length);
+		 this->UncheckedSetKey(key, length, g_nullNameValuePairs);}
 };
 
 template <unsigned int C, unsigned int D, bool T_128bit>
@@ -160,7 +162,7 @@ void SipHash_Base<C,D,T_128bit>::Update(const byte *input, size_t length)
 	if (m_idx)
 	{
 		size_t head = STDMIN(size_t(8U-m_idx), length);
-		memcpy(m_acc+m_idx, input, head);
+		std::memcpy(m_acc+m_idx, input, head);
 		m_idx += head; input += head; length -= head;
 
 		if (m_idx == 8)
@@ -195,7 +197,7 @@ void SipHash_Base<C,D,T_128bit>::Update(const byte *input, size_t length)
 	size_t tail = length % 8;
 	if (tail)
 	{
-		memcpy(m_acc+m_idx, input, tail);
+		std::memcpy(m_acc+m_idx, input, tail);
 		m_idx += tail;
 	}
 }
