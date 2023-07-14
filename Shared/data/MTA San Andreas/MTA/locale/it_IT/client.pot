@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-07-07 17:03+0000\n"
-"PO-Revision-Date: 2023-07-07 17:59\n"
+"PO-Revision-Date: 2023-07-14 17:50\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -439,7 +439,7 @@ msgstr "Multi Theft Auto non è stato installato correttamente, per favore insta
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "Crea giunzioni per GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
@@ -459,7 +459,7 @@ msgstr "MTA:SA non si può avviare perchè un file di GTA:SA non è corretto o m
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Patch dipendenze di GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
@@ -479,7 +479,7 @@ msgstr "MTA:SA non si è avviato perchè l'eseguibile di GTA:SA non si carica:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Patch GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
