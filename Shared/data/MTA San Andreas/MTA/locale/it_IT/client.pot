@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-07-07 17:03+0000\n"
-"PO-Revision-Date: 2023-07-14 17:50\n"
+"PO-Revision-Date: 2023-07-14 18:50\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -131,12 +131,12 @@ msgstr "Nuova installazione di %s rilevata.\n\n"
 #: Client/loader/Utils.cpp:1541
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA sta avendo problemi ad aprire il file '%s'"
+msgstr "GTA:SA sta avendo problemi ad aprire il file '%s"
 
 #: Client/loader/Utils.cpp:1563
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA non ha il file '%s'."
+msgstr "GTA:SA non ha il file %s."
 
 #: Client/loader/Utils.cpp:1588
 msgid "GTA:SA had trouble loading a model."
