@@ -9,9 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(g_pGame->GetBaseIDforTXD()))
+CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(g_pGame->GetBaseIDforCOL()))
 {
-    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforTXD();
+    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
     for (unsigned int i = 0; i < uiMaxModelID; i++)
     {
         m_Models[i] = nullptr;
@@ -25,7 +25,7 @@ CClientModelManager::~CClientModelManager(void)
 
 void CClientModelManager::RemoveAll(void)
 {
-    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforTXD();
+    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
     for (unsigned int i = 0; i < uiMaxModelID; i++)
     {
         m_Models[i] = nullptr;
@@ -59,7 +59,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 
 int CClientModelManager::GetFirstFreeModelID(void)
 {
-    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforTXD();
+    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
     for (unsigned int i = 0; i < uiMaxModelID; i++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
@@ -81,7 +81,7 @@ int CClientModelManager::GetFreeTxdModelID()
 
 std::shared_ptr<CClientModel>  CClientModelManager::FindModelByID(int iModelID)
 {
-    int32_t iMaxModelId = g_pGame->GetBaseIDforTXD();
+    int32_t iMaxModelId = g_pGame->GetBaseIDforCOL();
 
     if (iModelID < iMaxModelId)
         return m_Models[iModelID];
@@ -106,7 +106,7 @@ std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(
     std::vector<std::shared_ptr<CClientModel>> found;
     found.reserve(m_modelCount);
 
-    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforTXD();
+    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
     for (unsigned int i = minModelID; i < uiMaxModelID; i++)
     {
         const std::shared_ptr<CClientModel>& model = m_Models[i];
@@ -120,7 +120,7 @@ std::vector<std::shared_ptr<CClientModel>> CClientModelManager::GetModelsByType(
 
 void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResource)
 {
-    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforTXD();
+    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
     for (unsigned int i = 0; i < uiMaxModelID; i++)
     {
         if (m_Models[i] != nullptr && m_Models[i]->GetParentResource() == pResource)
