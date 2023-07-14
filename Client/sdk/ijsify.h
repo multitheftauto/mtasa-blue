@@ -81,45 +81,45 @@ extern DWORD* g_Table;
 extern DWORD* g_TableSize;
 extern DWORD  g_dwTable;
 
-    /*
-    inline void* __cdecl operator new ( unsigned int uiSize )
-    {
-        DWORD dwOld, dwData;
+/*
+inline void* __cdecl operator new ( unsigned int uiSize )
+{
+    DWORD dwOld, dwData;
 
-        if ( !g_bBoundsChecker ) {
-            dwData = (DWORD)HeapAlloc (GetProcessHeap(), HEAP_ZERO_MEMORY, uiSize);
-            VirtualProtect ( (void*)dwData, uiSize, PAGE_EXECUTE_READWRITE, &dwOld );
-            return (void*)dwData;
-        }
-        // define the guard bytes
-        DWORD dwGuardBegin = 0xBEEFFDFD;
-        WORD wGuardEnd = 0xDEAC;
+    if ( !g_bBoundsChecker ) {
+        dwData = (DWORD)HeapAlloc (GetProcessHeap(), HEAP_ZERO_MEMORY, uiSize);
+        VirtualProtect ( (void*)dwData, uiSize, PAGE_EXECUTE_READWRITE, &dwOld );
+        return (void*)dwData;
+    }
+    // define the guard bytes
+    DWORD dwGuardBegin = 0xBEEFFDFD;
+    WORD wGuardEnd = 0xDEAC;
 
-        // allocate ( size + 4 (begin) + 2 (end) )
-        dwData = (DWORD) HeapAlloc ( GetProcessHeap (), HEAP_ZERO_MEMORY, uiSize + 6 );
+    // allocate ( size + 4 (begin) + 2 (end) )
+    dwData = (DWORD) HeapAlloc ( GetProcessHeap (), HEAP_ZERO_MEMORY, uiSize + 6 );
 
-        // [0   -> 4]       insert begin guard bytes
-        memcpy ( (void*)(dwData), &dwGuardBegin, 4 );
-        uiSize += 4;
+    // [0   -> 4]       insert begin guard bytes
+    memcpy ( (void*)(dwData), &dwGuardBegin, 4 );
+    uiSize += 4;
 
-        // [x   -> x+2]     insert end guard bytes
-        memcpy ( (void*)(dwData + uiSize), &wGuardEnd, 2 );
-        uiSize += 2;
+    // [x   -> x+2]     insert end guard bytes
+    memcpy ( (void*)(dwData + uiSize), &wGuardEnd, 2 );
+    uiSize += 2;
 
-        // set guard protection state
-        VirtualProtect ( (void*)dwData, uiSize, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld );
+    // set guard protection state
+    VirtualProtect ( (void*)dwData, uiSize, PAGE_EXECUTE_READWRITE | PAGE_GUARD, &dwOld );
 
-        g_Table[g_dwTable]          = dwData;
-        g_TableSize[g_dwTable++]    = (DWORD)uiSize;
+    g_Table[g_dwTable]          = dwData;
+    g_TableSize[g_dwTable++]    = (DWORD)uiSize;
 
-        // and return the correct data pointer
-        return (void*)( dwData + 4 );
+    // and return the correct data pointer
+    return (void*)( dwData + 4 );
 
-    };
+};
 
-    inline void __cdecl operator delete ( void* pData )
-    {
-        HeapFree ( GetProcessHeap(), 0, pData );
-    };
-    */
+inline void __cdecl operator delete ( void* pData )
+{
+    HeapFree ( GetProcessHeap(), 0, pData );
+};
+*/
 #endif

@@ -5,7 +5,7 @@
  *  FILE:        core/CCredits.cpp
  *  PURPOSE:     In-game credits window implementation
  *
- *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -112,6 +112,7 @@ CCredits::CCredits()
         "Enes \"cleopatra\" Akıllıok\n"
         "Nawaf \"xLive\" Alqarni\n"
         "Nicolás \"Platin\" Barrios\n"
+        "Efe \"efex\" Batır\n"
         "Amine \"UndR\" Bidah\n"
         "Lukasz \"W\" Biegaj\n"
         "Pacal \"buepas\" Buerklin\n"
@@ -136,6 +137,7 @@ CCredits::CCredits()
         "Marcin \"FileEX\" Pawlicki\n"
         "Ali \"Haxardous\" Qamber\n"
         "Sam \"samr46\" R.\n"
+        "Fernando Rocha\n"
         "Fedor \"Ted\" Sinev\n"
         "Jordy \"MegadreamsBE\" Sleeubus\n"
         "Simon \"Simi23\" Tamás\n"
@@ -146,6 +148,7 @@ CCredits::CCredits()
         "AfuSensi\n"
         "AleksCore\n"
         "AlιAѕѕaѕѕιN\n"
+        "androksi\n"
         "ApeLsiN4eG\n"
         "asturel\n"
         "Audifire\n"
@@ -166,7 +169,6 @@ CCredits::CCredits()
         "emre1702\n"
         "Fabio(GNR)\n"
         "fastman92\n"
-        "Fernando Rocha\n"
         "FrankZZ\n"
         "Gothem\n"
         "GRascm\n"
@@ -191,6 +193,7 @@ CCredits::CCredits()
         "MCvarial\n"
         "Merlin\n"
         "mickdermack\n"
+        "Mvrat\n"
         "NeO_D-Power\n"
         "Patrick2562\n"
         "PauloKim1246\n"
@@ -201,6 +204,7 @@ CCredits::CCredits()
         "rafalh\n"
         "samt2497\n"
         "Santi\n"
+        "Sarrum\n"
         "SDraw\n"
         "se16n\n"
         "Sergeanur\n"
@@ -209,11 +213,12 @@ CCredits::CCredits()
         "TAPL-93\n"
         "TEDERIs\n"
         "TFP-dev\n"
-        "theSarrum\n"
         "Totto8492\n"
+        "Tracer\n"
         "turret001\n"
         "tvc\n"
         "vahook\n"
+        "vyn666\n"
         "x0rh4x\n"
         "xerox8521\n"
         "[GP_A]XetaQuake\n"
@@ -255,23 +260,31 @@ CCredits::CCredits()
         "\n"
         "\n";
 
-    m_strCredits += _("This software makes use of the following libraries and software:");
+    m_strCredits += _("This software and project makes use of the following libraries and software:");
     m_strCredits +=
         "\n"
+        "1Password (https://1password.com/)\n"
         "BASS (https://www.un4seen.com/bass.html)\n"
         "bcrypt (https://www.openwall.com/crypt/)\n"
         "breakpad (https://chromium.googlesource.com/breakpad/breakpad/)\n"
         "bzip2 (http://www.bzip.org/)\n"
         "CEF (https://bitbucket.org/chromiumembedded/cef/)\n"
         "CEGUI (http://cegui.org.uk/)\n"
+        "Cloudflare (https://www.cloudflare.com/)\n"
         "CRC-32 (https://bochs.sourceforge.io/)\n"
+        "Crowdin (https://crowdin.com/)\n"
         "cryptopp (https://cryptopp.com/)\n"
         "cURL (https://curl.se/)\n"
         "Detours (https://github.com/microsoft/Detours)\n"
+        "Discord (https://discord.com/)\n"
+        "Docker (https://www.docker.com/)\n"
         "Embedded HTTP Server (https://ehs.fritz-elfert.de/)\n"
         "FreeType (https://freetype.org/)\n"
+        "GNU Unifont (https://unifoundry.com/unifont/index.html)\n"
         "inspect.lua by kikito (https://github.com/kikito/inspect.lua)\n"
         "json-c (https://github.com/json-c/json-c)\n"
+        "GitBook (https://www.gitbook.com/)\n"
+        "GitHub (https://github.com/)\n"
         "ksignals (https://github.com/xforce/ksignals)\n"
         "libjpeg (https://libjpeg.sourceforge.net/)\n"
         "libpcre (https://www.pcre.org/)\n"
@@ -279,9 +292,11 @@ CCredits::CCredits()
         "Lua (https://www.lua.org/)\n"
         "lunasvg (https://github.com/sammycage/lunasvg)\n"
         "mbedtls (https://github.com/Mbed-TLS/mbedtls)\n"
+        "MediaWiki (https://www.mediawiki.org/wiki/MediaWiki)\n"
         "minizip (https://www.winimage.com/zLibDll/minizip.html)\n"
         "mysql-connector-c (https://downloads.mysql.com/archives/c-c/)\n"
         "nvapi (https://developer.nvidia.com/rtx/path-tracing/nvapi/get-started)\n"
+        "Open Collective (https://opencollective.com/)\n"
         "pme by Zac Hansen\n"
         "PortAudio (http://www.portaudio.com/)\n"
         "pthreads-win32 (https://sourceware.org/pthreads-win32/)\n"
@@ -290,6 +305,9 @@ CCredits::CCredits()
         "sparsehash (https://github.com/sparsehash/sparsehash)\n"
         "speex (https://www.speex.org/)\n"
         "SQLite (https://www.sqlite.org/)\n"
+        "TeamCity by JetBrains (https://www.jetbrains.com/teamcity/)\n"
+        "Teleport (https://goteleport.com/)\n"
+        "The Language Icon by A’ Design Award & Competition, Onur Müştak Çobanlı and\nFarhat Datta (https://www.languageicon.org)\n"
         "tinygettext (https://github.com/tinygettext/tinygettext/)\n"
         "tinyxml (https://sourceforge.net/projects/tinyxml/)\n"
         "UnRAR (https://www.rarlab.com/)\n"
@@ -334,7 +352,7 @@ CCredits::CCredits()
             // Create the label
             m_pLabels[uiLabelIndex] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, strBuffer.c_str()));
             m_pLabels[uiLabelIndex]->SetPosition(CVector2D(0.022f, fStartPosition), true);
-            m_pLabels[uiLabelIndex]->SetSize(CVector2D(532.0f, 1200.0f));            // relative 0.95, 6.0
+            m_pLabels[uiLabelIndex]->SetSize(CVector2D(532.0f, 1500.0f));            // relative 0.95, 6.0
             m_pLabels[uiLabelIndex]->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
             ++uiLabelIndex;
 
@@ -400,7 +418,7 @@ void CCredits::Update()
         float fCurrentTop = 1.0f - 0.0001f * static_cast<float>(clock() - m_clkStart);
 
         // If we're too far down or up, make sure we restart next pulse
-        if (fCurrentTop <= -11.0f || fCurrentTop >= 1.0f)
+        if (fCurrentTop <= -14.75f || fCurrentTop >= 1.0f)
         {
             m_clkStart = clock();
         }

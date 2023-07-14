@@ -74,7 +74,7 @@ public:
     static bool                                            EngineRestoreTXDImage(uint uiModelID);
     static std::vector<std::string_view>                   EngineImageGetFileList(CClientIMG* pImg);
     static std::string                                     EngineImageGetFile(CClientIMG* pImg, std::variant<size_t, std::string_view> file);
-    static bool                                            EngineRestreamWorld();
+    static bool                                            EngineRestreamWorld(lua_State* const luaVM);
     static bool                                            EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
 

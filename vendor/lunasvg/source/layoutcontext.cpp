@@ -43,8 +43,7 @@ const Rect& LayoutContainer::fillBoundingBox() const
     if(m_fillBoundingBox.valid())
         return m_fillBoundingBox;
 
-    for(const auto& child : children)
-    {
+    for(const auto& child : children) {
         if(child->isHidden())
             continue;
         m_fillBoundingBox.unite(child->map(child->fillBoundingBox()));
@@ -58,8 +57,7 @@ const Rect& LayoutContainer::strokeBoundingBox() const
     if(m_strokeBoundingBox.valid())
         return m_strokeBoundingBox;
 
-    for(const auto& child : children)
-    {
+    for(const auto& child : children) {
         if(child->isHidden())
             continue;
         m_strokeBoundingBox.unite(child->map(child->strokeBoundingBox()));
@@ -78,14 +76,14 @@ LayoutObject* LayoutContainer::addChildIfNotEmpty(std::unique_ptr<LayoutContaine
 {
     if(child->children.empty())
         return nullptr;
-
     return addChild(std::move(child));
 }
 
 void LayoutContainer::renderChildren(RenderState& state) const
 {
-    for(const auto& child : children)
+    for(const auto& child : children) {
         child->render(state);
+    }
 }
 
 LayoutClipPath::LayoutClipPath()
@@ -98,8 +96,7 @@ void LayoutClipPath::apply(RenderState& state) const
     RenderState newState(this, RenderMode::Clipping);
     newState.canvas = Canvas::create(state.canvas->box());
     newState.transform = transform * state.transform;
-    if(units == Units::ObjectBoundingBox)
-    {
+    if(units == Units::ObjectBoundingBox) {
         const auto& box = state.objectBoundingBox();
         newState.transform.translate(box.x, box.y);
         newState.transform.scale(box.w, box.h);
@@ -118,8 +115,7 @@ LayoutMask::LayoutMask()
 void LayoutMask::apply(RenderState& state) const
 {
     Rect rect{x, y, width, height};
-    if(units == Units::ObjectBoundingBox)
-    {
+    if(units == Units::ObjectBoundingBox) {
         const auto& box = state.objectBoundingBox();
         rect.x = rect.x * box.w + box.x;
         rect.y = rect.y * box.h + box.y;
@@ -130,8 +126,7 @@ void LayoutMask::apply(RenderState& state) const
     RenderState newState(this, state.mode());
     newState.canvas = Canvas::create(state.canvas->box());
     newState.transform = state.transform;
-    if(contentUnits == Units::ObjectBoundingBox)
-    {
+    if(contentUnits == Units::ObjectBoundingBox) {
         const auto& box = state.objectBoundingBox();
         newState.transform.translate(box.x, box.y);
         newState.transform.scale(box.w, box.h);
@@ -230,8 +225,7 @@ LayoutPattern::LayoutPattern()
 void LayoutPattern::apply(RenderState& state) const
 {
     Rect rect{x, y, width, height};
-    if(units == Units::ObjectBoundingBox)
-    {
+    if(units == Units::ObjectBoundingBox) {
         const auto& box = state.objectBoundingBox();
         rect.x = rect.x * box.w + box.x;
         rect.y = rect.y * box.h + box.y;
@@ -250,13 +244,10 @@ void LayoutPattern::apply(RenderState& state) const
     newState.canvas = Canvas::create(0, 0, width, height);
     newState.transform = Transform::scaled(scalex, scaley);
 
-    if(viewBox.valid())
-    {
+    if(viewBox.valid()) {
         auto viewTransform = preserveAspectRatio.getMatrix(rect.w, rect.h, viewBox);
         newState.transform.premultiply(viewTransform);
-    }
-    else if(contentUnits == Units::ObjectBoundingBox)
-    {
+    } else if(contentUnits == Units::ObjectBoundingBox) {
         const auto& box = state.objectBoundingBox();
         newState.transform.scale(box.w, box.h);
     }
@@ -282,8 +273,7 @@ LayoutLinearGradient::LayoutLinearGradient()
 void LayoutLinearGradient::apply(RenderState& state) const
 {
     auto transform = this->transform;
-    if(units == Units::ObjectBoundingBox)
-    {
+    if(units == Units::ObjectBoundingBox) {
         const auto& box = state.objectBoundingBox();
         transform *= Transform(box.w, 0, 0, box.h, box.x, box.y);
     }
@@ -299,8 +289,7 @@ LayoutRadialGradient::LayoutRadialGradient()
 void LayoutRadialGradient::apply(RenderState& state) const
 {
     auto transform = this->transform;
-    if(units == Units::ObjectBoundingBox)
-    {
+    if(units == Units::ObjectBoundingBox) {
         const auto& box = state.objectBoundingBox();
         transform *= Transform(box.w, 0, 0, box.h, box.x, box.y);
     }
@@ -378,14 +367,16 @@ void MarkerData::add(const LayoutMarker* marker, const Point& origin, double ang
 
 void MarkerData::render(RenderState& state) const
 {
-    for(const auto& position : positions)
+    for(const auto& position : positions) {
         position.marker->renderMarker(state, position.origin, position.angle, strokeWidth);
+    }
 }
 
 void MarkerData::inflate(Rect& box) const
 {
-    for(const auto& position : positions)
+    for(const auto& position : positions) {
         box.unite(position.marker->markerBoundingBox(position.origin, position.angle, strokeWidth));
+    }
 }
 
 LayoutShape::LayoutShape()
@@ -403,14 +394,11 @@ void LayoutShape::render(RenderState& state) const
     newState.transform = transform * state.transform;
     newState.beginGroup(state, info);
 
-    if(newState.mode() == RenderMode::Display)
-    {
+    if(newState.mode() == RenderMode::Display) {
         fillData.fill(newState, path);
         strokeData.stroke(newState, path);
         markerData.render(newState);
-    }
-    else
-    {
+    } else {
         newState.canvas->setColor(Color::Black);
         newState.canvas->fill(path, newState.transform, clipRule, BlendMode::Src, 1.0);
     }
@@ -450,8 +438,8 @@ RenderState::RenderState(const LayoutObject* object, RenderMode mode)
 
 void RenderState::beginGroup(RenderState& state, const BlendInfo& info)
 {
-    if(!info.clipper && !info.clip.valid() && (m_mode == RenderMode::Display && !(info.masker || info.opacity < 1.0)))
-    {
+    if(!info.clipper && !info.clip.valid()
+        && (m_mode == RenderMode::Display && !(info.masker || info.opacity < 1.0))) {
         canvas = state.canvas;
         return;
     }
@@ -494,7 +482,6 @@ LayoutObject* LayoutContext::getResourcesById(const std::string& id) const
     auto it = m_resourcesCache.find(id);
     if(it == m_resourcesCache.end())
         return nullptr;
-
     return it->second;
 }
 
@@ -597,8 +584,7 @@ DashData LayoutContext::dashData(const StyledElement* element)
 
     LengthContext lengthContex(element);
     DashArray dashes;
-    for(auto& dash : dasharray)
-    {
+    for(auto& dash : dasharray) {
         auto value = lengthContex.valueForLength(dash, LengthMode::Both);
         dashes.push_back(value);
     }
@@ -610,8 +596,7 @@ DashData LayoutContext::dashData(const StyledElement* element)
     DashData dashData;
     dashData.array.resize(num_dash);
     double sum = 0.0;
-    for(std::size_t i = 0;i < num_dash;i++)
-    {
+    for(std::size_t i = 0; i < num_dash; i++) {
         dashData.array[i] = dashes[i % dashes.size()];
         sum += dashData.array[i];
     }
@@ -623,7 +608,6 @@ DashData LayoutContext::dashData(const StyledElement* element)
     dashData.offset = std::fmod(offset, sum);
     if(dashData.offset < 0.0)
         dashData.offset += sum;
-
     return dashData;
 }
 
@@ -669,8 +653,7 @@ MarkerData LayoutContext::markerData(const GeometryElement* element, const Path&
 
     int index = 0;
     std::array<Point, 3> points;
-    while(!it.isDone())
-    {
+    while(!it.isDone()) {
         switch(it.currentSegment(points)) {
         case PathCommand::MoveTo:
             startPoint = points[0];
@@ -699,22 +682,19 @@ MarkerData LayoutContext::markerData(const GeometryElement* element, const Path&
         index += 1;
         it.next();
 
-        if(!it.isDone() && (markerStart || markerMid))
-        {
+        if(!it.isDone() && (markerStart || markerMid)) {
             it.currentSegment(points);
             outslopePoints[0] = origin;
             outslopePoints[1] = points[0];
 
-            if(index == 1 && markerStart)
-            {
+            if(index == 1 && markerStart) {
                 Point slope{outslopePoints[1].x - outslopePoints[0].x, outslopePoints[1].y - outslopePoints[0].y};
                 auto angle = 180.0 * std::atan2(slope.y, slope.x) / pi;
 
                 markerData.add(markerStart, origin, angle);
             }
 
-            if(index > 1 && markerMid)
-            {
+            if(index > 1 && markerMid) {
                 Point inslope{inslopePoints[1].x - inslopePoints[0].x, inslopePoints[1].y - inslopePoints[0].y};
                 Point outslope{outslopePoints[1].x - outslopePoints[0].x, outslopePoints[1].y - outslopePoints[0].y};
                 auto inangle = 180.0 * std::atan2(inslope.y, inslope.x) / pi;
@@ -725,8 +705,7 @@ MarkerData LayoutContext::markerData(const GeometryElement* element, const Path&
             }
         }
 
-        if(it.isDone() && markerEnd)
-        {
+        if(it.isDone() && markerEnd) {
             Point slope{inslopePoints[1].x - inslopePoints[0].x, inslopePoints[1].y - inslopePoints[0].y};
             auto angle = 180.0 * std::atan2(slope.y, slope.x) / pi;
 

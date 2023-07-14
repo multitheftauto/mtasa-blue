@@ -1360,7 +1360,7 @@ void CCore::RegisterCommands()
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
 
-    m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
+    m_pCommands->Add("reloadnews", _("for developers: reload news"), CCommandFuncs::ReloadNews);
 }
 
 void CCore::SwitchRenderWindow(HWND hWnd, HWND hWndInput)
@@ -2315,4 +2315,25 @@ SString CCore::GetBlueCopyrightString()
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
+}
+
+// Set streaming memory size override [See `engineStreamingSetMemorySize`]
+// Use `0` to turn it off, and thus restore the value to the `cvar` setting
+void CCore::SetCustomStreamingMemory(size_t sizeBytes) {
+    // NOTE: The override is applied to the game in `CClientGame::DoPulsePostFrame`
+    // There's no specific reason we couldn't do it here, but we wont
+    m_CustomStreamingMemoryLimitBytes = sizeBytes;
+}
+
+bool CCore::IsUsingCustomStreamingMemorySize()
+{
+    return m_CustomStreamingMemoryLimitBytes != 0;
+}
+
+// Streaming memory size used [In Bytes]
+size_t CCore::GetStreamingMemory()
+{
+    return IsUsingCustomStreamingMemorySize()
+        ? m_CustomStreamingMemoryLimitBytes
+        : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
 }

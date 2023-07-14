@@ -273,5 +273,7 @@ enum eElementRPCFunctions
     SET_TRANSFER_BOX_VISIBILITY,
     SET_COLPOLYGON_HEIGHT,
 
+    SET_OBJECT_BREAKABLE,
+
     NUM_RPC_FUNCS            // Add above this line
 };

@@ -57,6 +57,7 @@ public:
     bool HasModelLoaded(DWORD dwModelID);
     void RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel);
     void ReinitStreaming();
+    void RemoveBigBuildings() override;
 
     CStreamingInfo* GetStreamingInfo(uint32 id);
     void            SetStreamingInfo(uint32 modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
@@ -65,7 +66,7 @@ public:
     unsigned char   AddArchive(const char* szFilePath);
     void            RemoveArchive(unsigned char ucStreamHandler);
     void            SetStreamingBufferSize(uint32 uiSize);
-    uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; };
+    uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; }; // In bytes
 
     void          MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
     std::uint32_t GetMemoryUsed() const override;

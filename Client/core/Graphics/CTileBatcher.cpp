@@ -278,9 +278,9 @@ void CTileBatcher::AddTile(float fX1, float fY1, float fX2, float fY2, float fU1
     if (m_bUseCustomMatrices)
         Flush();
 
-    m_bUseCustomMatrices = false;
     uint uiTessellationX = 1;
     uint uiTessellationY = 1;
+    bool bUseCustomMatrices{false};
 
     // Get settings from shader
     if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
@@ -289,7 +289,7 @@ void CTileBatcher::AddTile(float fX1, float fY1, float fX2, float fY2, float fU1
         if (pShaderInstance && pShaderInstance->m_bHasModifiedTransform)
         {
             MakeCustomMatrices(pShaderInstance->m_Transform, fX1, fY1, fX2, fY2, m_MatCustomWorld, m_MatCustomProjection);
-            m_bUseCustomMatrices = true;
+            bUseCustomMatrices = true;
         }
 
         // Get tessellation setting
@@ -321,13 +321,14 @@ void CTileBatcher::AddTile(float fX1, float fY1, float fX2, float fY2, float fU1
 
     // Check if we need to flush what has been done so far
     if (pMaterial != m_pCurrentMaterial || fRotation != m_fCurrentRotation || fRotCenX != m_fCurrentRotCenX || fRotCenY != m_fCurrentRotCenY ||
-        uiNumVertices + m_Vertices.size() > 65535 || m_bUseCustomMatrices)
+        uiNumVertices + m_Vertices.size() > 65535 || bUseCustomMatrices != m_bUseCustomMatrices)
     {
         Flush();
         SetCurrentMaterial(pMaterial);
         m_fCurrentRotation = fRotation;
         m_fCurrentRotCenX = fRotCenX;
         m_fCurrentRotCenY = fRotCenY;
+        m_bUseCustomMatrices = bUseCustomMatrices;
     }
 
     uint uiBaseIndex = m_Vertices.size();
