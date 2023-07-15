@@ -49,33 +49,33 @@ public:
     void Assign(const CVehicleAudioSettingsEntry* pData);
 
     eVehicleSoundType GetSoundType() { return m_Settings.m_eVehicleSoundType; };
-    uchar             GetEngineOnSoundBankID() { return m_Settings.m_wEngineOnSoundBankId; };
-    uchar             GetEngineOffSoundBankID() { return m_Settings.m_wEngineOffSoundBankId; };
-    uchar             GetStereo() { return m_Settings.m_nStereo; };
+    short             GetEngineOnSoundBankID() { return m_Settings.m_wEngineOnSoundBankId; };
+    short             GetEngineOffSoundBankID() { return m_Settings.m_wEngineOffSoundBankId; };
+    char              GetStereo() { return m_Settings.m_nStereo; };
     float             GetUnk3() { return m_Settings.unk3; };
     float             GetUnk4() { return m_Settings.unk4; };
-    uchar             GetHornTon() { return m_Settings.m_bHornTon; };
+    char              GetHornTon() { return m_Settings.m_bHornTon; };
     float             GetHornHign() { return m_Settings.m_fHornHigh; };
-    uchar             GetUnk6() { return m_Settings.unk6; };
-    uchar             GetDoorSound() { return m_Settings.m_nDoorSound; };
-    uchar             GetRadioNum() { return m_Settings.m_nRadioNum; };
-    uchar             GetRadioType() { return m_Settings.m_nRadioType; };
-    uchar             GetVehicleTypeForAudio() { return m_Settings.m_nVehTypeForAudio; };
+    char              GetUnk6() { return m_Settings.unk6; };
+    char              GetDoorSound() { return m_Settings.m_nDoorSound; };
+    char              GetRadioNum() { return m_Settings.m_nRadioNum; };
+    char              GetRadioType() { return m_Settings.m_nRadioType; };
+    char              GetVehicleTypeForAudio() { return m_Settings.m_nVehTypeForAudio; };
     float             GetHornVolumeDelta() { return m_Settings.m_fHornVolumeDelta; };
 
     void SetSoundType(eVehicleSoundType value) { m_Settings.m_eVehicleSoundType = value; };
-    void SetEngineOnSoundBankID(uchar value) { m_Settings.m_wEngineOnSoundBankId = value; };
-    void SetEngineOffSoundBankID(uchar value) { m_Settings.m_wEngineOffSoundBankId = value; };
-    void SetStereo(uchar value) { m_Settings.m_nStereo = value; };
+    void SetEngineOnSoundBankID(short value) { m_Settings.m_wEngineOnSoundBankId = value; };
+    void SetEngineOffSoundBankID(short value) { m_Settings.m_wEngineOffSoundBankId = value; };
+    void SetStereo(char value) { m_Settings.m_nStereo = value; };
     void SetUnk3(float value) { m_Settings.unk3= value; };
     void SetUnk4(float value) { m_Settings.unk4= value; };
-    void SetHornTon(uchar value) { m_Settings.m_bHornTon = value; };
+    void SetHornTon(char value) { m_Settings.m_bHornTon = value; };
     void SetHornHign(float value) { m_Settings.m_fHornHigh = value; };
-    void SetUnk6(uchar value) { m_Settings.unk6= value; };
-    void SetDoorSound(uchar value) { m_Settings.m_nDoorSound = value; };
-    void SetRadioNum(uchar value) { m_Settings.m_nRadioNum = value; };
-    void SetRadioType(uchar value) { m_Settings.m_nRadioType = value; };
-    void SetVehicleTypeForAudio(uchar value) { m_Settings.m_nVehTypeForAudio = value; };
+    void SetUnk6(char value) { m_Settings.unk6= value; };
+    void SetDoorSound(char value) { m_Settings.m_nDoorSound = value; };
+    void SetRadioNum(char value) { m_Settings.m_nRadioNum = value; };
+    void SetRadioType(char value) { m_Settings.m_nRadioType = value; };
+    void SetVehicleTypeForAudio(char value) { m_Settings.m_nVehTypeForAudio = value; };
     void SetHornVolumeDelta(float value) { m_Settings.m_fHornVolumeDelta = value; };
 
 private:

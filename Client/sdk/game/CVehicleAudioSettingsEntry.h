@@ -24,33 +24,33 @@ public:
 
     // Get
     virtual eVehicleSoundType GetSoundType() = 0;
-    virtual uchar             GetEngineOnSoundBankID() = 0;
-    virtual uchar             GetEngineOffSoundBankID() = 0;
-    virtual uchar             GetStereo() = 0;
+    virtual short             GetEngineOnSoundBankID() = 0;
+    virtual short             GetEngineOffSoundBankID() = 0;
+    virtual char              GetStereo() = 0;
     virtual float             GetUnk3() = 0;
     virtual float             GetUnk4() = 0;
-    virtual uchar             GetHornTon() = 0;
+    virtual char              GetHornTon() = 0;
     virtual float             GetHornHign() = 0;
-    virtual uchar             GetUnk6() = 0;
-    virtual uchar             GetDoorSound() = 0;
-    virtual uchar             GetRadioNum() = 0;
-    virtual uchar             GetRadioType() = 0;
-    virtual uchar             GetVehicleTypeForAudio() = 0;
+    virtual char              GetUnk6() = 0;
+    virtual char              GetDoorSound() = 0;
+    virtual char              GetRadioNum() = 0;
+    virtual char              GetRadioType() = 0;
+    virtual char              GetVehicleTypeForAudio() = 0;
     virtual float             GetHornVolumeDelta() = 0;
 
     // Set
     virtual void SetSoundType(eVehicleSoundType value) = 0;
-    virtual void SetEngineOnSoundBankID(uchar value) = 0;
-    virtual void SetEngineOffSoundBankID(uchar value) = 0;
-    virtual void SetStereo(uchar value) = 0;
+    virtual void SetEngineOnSoundBankID(short value) = 0;
+    virtual void SetEngineOffSoundBankID(short value) = 0;
+    virtual void SetStereo(char value) = 0;
     virtual void SetUnk3(float value) = 0;
     virtual void SetUnk4(float value) = 0;
-    virtual void SetHornTon(uchar value) = 0;
+    virtual void SetHornTon(char value) = 0;
     virtual void SetHornHign(float value) = 0;
-    virtual void SetUnk6(uchar value) = 0;
-    virtual void SetDoorSound(uchar value) = 0;
-    virtual void SetRadioNum(uchar value) = 0;
-    virtual void SetRadioType(uchar value) = 0;
-    virtual void SetVehicleTypeForAudio(uchar value) = 0;
+    virtual void SetUnk6(char value) = 0;
+    virtual void SetDoorSound(char value) = 0;
+    virtual void SetRadioNum(char value) = 0;
+    virtual void SetRadioType(char value) = 0;
+    virtual void SetVehicleTypeForAudio(char value) = 0;
     virtual void SetHornVolumeDelta(float value) = 0;
 };

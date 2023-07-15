@@ -4166,34 +4166,34 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint uiModel, const eVeh
     switch (eProperty)
     {
         case eVehicleAudioSettingProperty::DOOR_SOUND:
-            pModelSettings->SetDoorSound((int)(varValue));
+            pModelSettings->SetDoorSound(varValue);
             break;
         case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
-            pModelSettings->SetEngineOffSoundBankID((int)(varValue));
+            pModelSettings->SetEngineOffSoundBankID(varValue);
             break;
         case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
-            pModelSettings->SetEngineOnSoundBankID((int)(varValue));
+            pModelSettings->SetEngineOnSoundBankID(varValue);
             break;
         case eVehicleAudioSettingProperty::HORN_HIGH:
             pModelSettings->SetHornHign(varValue);
             break;
         case eVehicleAudioSettingProperty::HORN_TON:
-            pModelSettings->SetHornTon((int)(varValue));
+            pModelSettings->SetHornTon(varValue);
             break;
         case eVehicleAudioSettingProperty::HORN_VOLUME_DELTA:
             pModelSettings->SetHornVolumeDelta(varValue);
             break;
         case eVehicleAudioSettingProperty::RADIO_NUM:
-            pModelSettings->SetRadioNum((int)(varValue));
+            pModelSettings->SetRadioNum(varValue);
             break;
         case eVehicleAudioSettingProperty::RADIO_TYPE:
-            pModelSettings->SetRadioType((int)(varValue));
+            pModelSettings->SetRadioType(varValue);
             break;
         case eVehicleAudioSettingProperty::SOUND_TYPE:
             pModelSettings->SetSoundType((eVehicleSoundType)(int)(varValue));
             break;
         case eVehicleAudioSettingProperty::STEREO:
-            pModelSettings->SetStereo((int)(varValue));
+            pModelSettings->SetStereo(varValue);
             break;
         case eVehicleAudioSettingProperty::UNK3:
             pModelSettings->SetUnk3(varValue);
@@ -4202,10 +4202,10 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint uiModel, const eVeh
             pModelSettings->SetUnk4(varValue);
             break;
         case eVehicleAudioSettingProperty::UNK6:
-            pModelSettings->SetUnk6((int)(varValue));
+            pModelSettings->SetUnk6(varValue);
             break;
         case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
-            pModelSettings->SetVehicleTypeForAudio((int)(varValue));
+            pModelSettings->SetVehicleTypeForAudio(varValue);
             break;
         default:
             return false;
@@ -4224,34 +4224,34 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
     switch (eProperty)
     {
         case eVehicleAudioSettingProperty::DOOR_SOUND:
-            pModelSettings->SetDoorSound((int)(varValue));
+            pModelSettings->SetDoorSound(varValue);
             break;
         case eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID:
-            pModelSettings->SetEngineOffSoundBankID((int)(varValue));
+            pModelSettings->SetEngineOffSoundBankID(varValue);
             break;
         case eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID:
-            pModelSettings->SetEngineOnSoundBankID((int)(varValue));
+            pModelSettings->SetEngineOnSoundBankID(varValue);
             break;
         case eVehicleAudioSettingProperty::HORN_HIGH:
             pModelSettings->SetHornHign(varValue);
             break;
         case eVehicleAudioSettingProperty::HORN_TON:
-            pModelSettings->SetHornTon((int)(varValue));
+            pModelSettings->SetHornTon(varValue);
             break;
         case eVehicleAudioSettingProperty::HORN_VOLUME_DELTA:
             pModelSettings->SetHornVolumeDelta(varValue);
             break;
         case eVehicleAudioSettingProperty::RADIO_NUM:
-            pModelSettings->SetRadioNum((int)(varValue));
+            pModelSettings->SetRadioNum(varValue);
             break;
         case eVehicleAudioSettingProperty::RADIO_TYPE:
-            pModelSettings->SetRadioType((int)(varValue));
+            pModelSettings->SetRadioType(varValue);
             break;
         case eVehicleAudioSettingProperty::SOUND_TYPE:
             pModelSettings->SetSoundType((eVehicleSoundType)(int)(varValue));
             break;
         case eVehicleAudioSettingProperty::STEREO:
-            pModelSettings->SetStereo((int)(varValue));
+            pModelSettings->SetStereo(varValue);
             break;
         case eVehicleAudioSettingProperty::UNK3:
             pModelSettings->SetUnk3(varValue);
@@ -4260,10 +4260,10 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
             pModelSettings->SetUnk4(varValue);
             break;
         case eVehicleAudioSettingProperty::UNK6:
-            pModelSettings->SetUnk6((int)(varValue));
+            pModelSettings->SetUnk6(varValue);
             break;
         case eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO:
-            pModelSettings->SetVehicleTypeForAudio((int)(varValue));
+            pModelSettings->SetVehicleTypeForAudio(varValue);
             break;
         default:
             return false;
