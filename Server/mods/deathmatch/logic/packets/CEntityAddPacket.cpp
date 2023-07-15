@@ -241,6 +241,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     bool bIsDoubleSided = pObject->IsDoubleSided();
                     BitStream.WriteBit(bIsDoubleSided);
 
+                    // Breakable
+                    if (BitStream.Can(eBitStreamVersion::CEntityAddPacket_ObjectBreakable))
+                        BitStream.WriteBit(pObject->IsBreakable());
+
                     // Visible in all dimensions
                     if (BitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                     {

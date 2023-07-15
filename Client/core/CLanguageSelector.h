@@ -10,14 +10,14 @@
 
 struct CLangListItem
 {
-    CLangListItem() : fFocusEffectPos(0), fFocusEffectTarget(0), pContainerPane(nullptr), pFlag(nullptr), pLabel(nullptr) {}
+    CLangListItem() : fFocusEffectPos(0), fFocusEffectTarget(0), pContainerPane(nullptr), pIcon(nullptr), pLabel(nullptr) {}
     float            fFocusEffectPos;
     float            fFocusEffectTarget;
     SString          strLocale;
     CGUIElement*     pContainerPane;
-    CGUIStaticImage* pFlag;
-    CVector2D        vecFlagInitialPos;
-    CVector2D        vecFlagInitialSize;
+    CGUIStaticImage* pIcon;
+    CVector2D        vecIconInitialPos;
+    CVector2D        vecIconInitialSize;
     CGUILabel*       pLabel;
     CVector2D        vecLabelInitialPos;
     CVector2D        vecLabelInitialSize;
@@ -35,7 +35,6 @@ protected:
     void           CreateGUI(CGUIElement* pMainMenuCanvas);
     CLangListItem  CreateGUILangItem(CGUIElement* pGUIParent, const CVector2D& vecPanePosition, const SString& strLocale = "");
     void           SetLanguageListVisible(bool bVisible);
-    SString        GetFlagFilename(SString strLocale = "");
     CLangListItem* GetListItemByIndex(uint uiIndex);
     bool           OnButtonEnter(CGUIElement* pElement);
     bool           OnButtonLeave(CGUIElement* pElement);

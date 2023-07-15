@@ -210,7 +210,7 @@ unsigned char CStreamingSA::GetUnusedStreamHandle()
 {
     for (size_t i = 0; i < VAR_StreamHandlersMaxCount; i++)
     {
-        if (m_aStreamingHandlers[i])
+        if (!m_aStreamingHandlers[i])
             return (unsigned char)i;
     }
     return -1;
@@ -256,39 +256,39 @@ void CStreamingSA::RemoveArchive(unsigned char ucArhiveID)
     m_aStreamingHandlers[uiStreamHandlerID] = NULL;
 }
 
-void CStreamingSA::SetStreamingBufferSize(uint32 uiBlockSize)
+void CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
-    if (uiBlockSize == ms_streamingHalfOfBufferSize * 2)
+    if (numBlocks == ms_streamingHalfOfBufferSize * 2)
         return;
 
     int pointer = *(int*)0x8E3FFC;
     SGtaStream(&streaming)[5] = *(SGtaStream(*)[5])(pointer);
 
     // Wait while streaming threads ends tasks
-    while (streaming[0].bInUse && streaming[1].bInUse)
+    while (streaming[0].bInUse && streaming[1].bInUse);
 
-        // Suspend streaming handle
-        SuspendThread(*phStreamingThread);
-
+    // Suspend streaming handle
+    SuspendThread(*phStreamingThread);
+    
     // Create new buffer
-    if (uiBlockSize & 1)
-        uiBlockSize++;
+    if (numBlocks & 1) // Make it be even
+        numBlocks++;
 
     typedef void*(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
-    void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(uiBlockSize << 11, 2048);
+    void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(numBlocks * 2048, 2048);
 
     // Copy data from old buffer to new buffer
-    uint uiCopySize = std::min(ms_streamingHalfOfBufferSize, uiBlockSize / 2);
+    uint uiCopySize = std::min(ms_streamingHalfOfBufferSize, numBlocks / 2); // TODO: This probably won't work as expected 
     MemCpyFast(pNewBuffer, (void*)ms_pStreamingBuffer[0], uiCopySize);
-    MemCpyFast((void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * uiBlockSize), (void*)ms_pStreamingBuffer[1], uiCopySize);
+    MemCpyFast((void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * numBlocks), (void*)ms_pStreamingBuffer[1], uiCopySize);
 
     typedef void(__cdecl * Function_CMemoryMgr_FreeAlign)(void* pos);
     ((Function_CMemoryMgr_FreeAlign)(0x72F4F0))(ms_pStreamingBuffer[0]);
 
-    ms_streamingHalfOfBufferSize = uiBlockSize / 2;
+    ms_streamingHalfOfBufferSize = numBlocks / 2;
 
     ms_pStreamingBuffer[0] = pNewBuffer;
-    ms_pStreamingBuffer[1] = (void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * uiBlockSize);
+    ms_pStreamingBuffer[1] = (void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * numBlocks);
 
     streaming[0].pBuffer = ms_pStreamingBuffer[0];
     streaming[1].pBuffer = ms_pStreamingBuffer[1];
@@ -305,4 +305,9 @@ void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
 std::uint32_t CStreamingSA::GetMemoryUsed() const
 {
     return *reinterpret_cast<std::uint32_t*>(0x8E4CB4);
+}
+
+void CStreamingSA::RemoveBigBuildings()
+{
+    (reinterpret_cast<void(__cdecl*)()>(0x4093B0))();
 }

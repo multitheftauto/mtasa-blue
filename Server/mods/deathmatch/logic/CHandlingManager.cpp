@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CHandlingManager.h"
 #include "CCommon.h"
+#include "CVehicleManager.h"
 
 CHandlingManager::CHandlingManager()
 {

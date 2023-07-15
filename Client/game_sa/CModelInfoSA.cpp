@@ -1511,6 +1511,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
         // SetColModel sets bDoWeOwnTheColModel if the last parameter is truthy
         m_pInterface->bDoWeOwnTheColModel = false;
+        m_pInterface->bIsColLoaded = false;
 
         // Fix random foliage on custom collisions by calling CPlantMgr::SetPlantFriendlyFlagInAtomicMI
         (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(m_pInterface);
