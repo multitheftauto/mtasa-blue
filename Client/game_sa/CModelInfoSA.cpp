@@ -34,6 +34,7 @@ std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfo
 std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
 
 union tIdeFlags
 {
@@ -781,8 +782,39 @@ unsigned short CModelInfoSA::GetTextureDictionaryID()
 void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
-    if (m_pInterface)
-        m_pInterface->usTextureDictionary = usID;
+    if (!m_pInterface)
+        return;
+
+    if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
+        ms_DefaultTxdIDMap[m_dwModelID] = m_pInterface->usTextureDictionary;
+
+    
+    m_pInterface->usTextureDictionary = usID;
+}
+
+void CModelInfoSA::ResetTextureDictionaryID()
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface)
+        return;
+
+    if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
+        return;
+
+    m_pInterface->usTextureDictionary = ms_DefaultTxdIDMap[m_dwModelID];
+    MapRemove(ms_DefaultTxdIDMap, m_dwModelID);
+}
+
+void CModelInfoSA::StaticResetTextureDictionarys()
+{
+    for (const auto& item : ms_DefaultTxdIDMap)
+    {
+        CBaseModelInfoSAInterface* pInterface = ppModelInfo[item.first];
+        if (pInterface)
+            pInterface->usTextureDictionary = item.second;
+    }
+
+    ms_DefaultTxdIDMap.clear();
 }
 
 float CModelInfoSA::GetLODDistance()

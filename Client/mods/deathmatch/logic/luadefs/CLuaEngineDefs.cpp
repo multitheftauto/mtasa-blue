@@ -115,6 +115,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineImageGetFiles", ArgumentParser<EngineImageGetFileList>},
         {"engineImageGetFile", ArgumentParser<EngineImageGetFile>},
         {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
+        {"engineSetModelTXDID", ArgumentParser<EngineSetModelTXDID>},
+        {"engineResetModelTXDID", ArgumentParser<EngineResetModelTXDID>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
         {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
@@ -1256,7 +1258,34 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
 
 uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 {
-    return g_pGame->GetRenderWare()->GetTXDIDForModelID(uiModelID);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    return pModelInfo->GetTextureDictionaryID();
+}
+
+bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    pModelInfo->SetTextureDictionaryID(usTxdId);
+    return true;
+}
+
+bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    pModelInfo->ResetTextureDictionaryID();
+    return true;
 }
 
 int CLuaEngineDefs::EngineGetModelNameFromID(lua_State* luaVM)
