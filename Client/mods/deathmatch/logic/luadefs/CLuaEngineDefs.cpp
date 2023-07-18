@@ -169,6 +169,10 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "resetModelFlags", "engineResetModelFlags");
     lua_classfunction(luaVM, "getModelFlags", "engineGetModelFlags");
 
+    lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
+    lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
+    lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
+
     lua_registerstaticclass(luaVM, "Engine");
 
     // `EngineStreaming` class
