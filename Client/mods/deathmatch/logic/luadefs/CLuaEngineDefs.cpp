@@ -1260,8 +1260,8 @@ uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
 
-    if (uiModelID >= 20000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     return pModelInfo->GetTextureDictionaryID();
 }
@@ -1270,8 +1270,8 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
 
-    if (uiModelID >= 20000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     pModelInfo->SetTextureDictionaryID(usTxdId);
     return true;
@@ -1281,8 +1281,8 @@ bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
 
-    if (uiModelID >= 20000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     pModelInfo->ResetTextureDictionaryID();
     return true;
