@@ -42,10 +42,6 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LP
     // Init
     //
 
-    // Enable "Use customized GTA:SA files" by default
-    SetApplicationSettingInt("customized-sa-files-request", 1);
-    SetApplicationSettingInt("customized-sa-files-show", 1);
-
     // Let install manager figure out what MTASA path to use
     GetInstallManager()->SetMTASAPathSource(lpCmdLine);
 
