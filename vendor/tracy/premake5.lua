@@ -15,6 +15,13 @@ project "tracy"
         "./public/",
     }
 
+    defines {
+        "TRACY_ENABLE",
+        --"TRACY_CALLSTACK",
+        "TRACY_ON_DEMAND",
+        "TRACY_EXPORTS"
+    }
+
     files {
         "public/TracyClient.cpp",
         
@@ -66,12 +73,3 @@ project "tracy"
         "public/common/TracyUwp.hpp",
         "public/common/TracyYield.hpp",
     }
-
-workspace "*"
-    defines {
-        "TRACY_ENABLE",
-        --"TRACY_CALLSTACK",
-        "TRACY_ON_DEMAND",
-        "TRACY_EXPORTS"
-    }
-    

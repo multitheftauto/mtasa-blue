@@ -33,7 +33,17 @@ project "Client Core"
 		["*"] = "premake5.lua"
 	}
 
-	links { "detours", "tracy" }
+	links { 
+		"detours", 
+		"tracy"
+	}
+	
+	defines {
+        "TRACY_ENABLE",
+        --"TRACY_CALLSTACK",
+        "TRACY_ON_DEMAND",
+        "TRACY_IMPORTS"
+    }
 
 	files {
 		"premake5.lua",

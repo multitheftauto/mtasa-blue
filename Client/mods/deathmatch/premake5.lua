@@ -7,7 +7,16 @@ project "Client Deathmatch"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
-	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
+	defines { 
+		"LUA_USE_APICHECK", 
+		"SDK_WITH_BCRYPT",
+
+		"TRACY_ENABLE",
+		--"TRACY_CALLSTACK",
+		"TRACY_ON_DEMAND",
+		"TRACY_IMPORTS"
+	}
+	
 	links {
 		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg", "tracy",
 		"../../../vendor/bass/lib/bass",

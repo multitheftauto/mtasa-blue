@@ -27,6 +27,13 @@ project "Multiplayer SA"
 		"tracy"
 	}
 
+	defines {
+        "TRACY_ENABLE",
+        --"TRACY_CALLSTACK",
+        "TRACY_ON_DEMAND",
+        "TRACY_EXPORTS"
+    }
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 

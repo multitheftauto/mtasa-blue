@@ -26,6 +26,13 @@ project "Game SA"
 		"tracy"
 	}
 
+	defines {
+        "TRACY_ENABLE",
+        --"TRACY_CALLSTACK",
+        "TRACY_ON_DEMAND",
+        "TRACY_IMPORTS"
+    }
+
 	includedirs {
 		"../../Shared/sdk",
 		"../sdk/",
