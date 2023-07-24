@@ -13,8 +13,8 @@
 
 #include <game/CStreaming.h>
 
-#define VAR_StreamHandlersMaxCount                   32
-#define VAR_MaxArchives                              8
+#define VAR_DefaultStreamHandlersMaxCount                   32
+#define VAR_DefaultMaxArchives                              8
 
 #define FUNC_CStreaming__RequestModel                0x4087E0
 #define FUNC_LoadAllRequestedModels                  0x40EA10
@@ -26,7 +26,7 @@ struct CArchiveInfo
     char  szName[40];
     BYTE  bUnknow = 1;            // Only in player.img is 0. Maybe, it is DWORD value
     BYTE  bUnused[3];
-    DWORD uiStreamHandleId;
+    DWORD uiStreamHandleId{};
 };
 
 struct SGtaStream
@@ -45,12 +45,18 @@ struct SGtaStream
 };
 static_assert(sizeof(SGtaStream) == 0x30, "Invalid size for SGtaStream");
 
+struct SStreamName
+{
+    char szName[64];
+};
+
 class CStreamingSA final : public CStreaming
 {
-private:
-    static CArchiveInfo* GetArchiveInfo(uint id) { return &ms_aAchiveInfo[id]; };
-
 public:
+    CStreamingSA();
+
+    void SetArchivesNum(size_t imagesNum);
+
     void RequestModel(DWORD dwModelID, DWORD dwFlags);
     void RemoveModel(std::uint32_t model) override;
     void LoadAllRequestedModels(bool bOnlyPriorityModels = false, const char* szTag = NULL);
@@ -64,7 +70,7 @@ public:
     unsigned char   GetUnusedArchive();
     unsigned char   GetUnusedStreamHandle();
     unsigned char   AddArchive(const char* szFilePath);
-    void            RemoveArchive(unsigned char ucStreamHandler);
+    void            RemoveArchive(unsigned char ucArchiveID);
     void            SetStreamingBufferSize(uint32 uiSize);
     uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; }; // In bytes
 
@@ -72,9 +78,13 @@ public:
     std::uint32_t GetMemoryUsed() const override;
 
 private:
+    void AllocateArchive();
+
+    std::vector<CArchiveInfo> m_Imgs;
+    std::vector<HANDLE> m_StreamHandles;
+    std::vector<SStreamName> m_StreamNames;
+
     static void* (&ms_pStreamingBuffer)[2];
     static uint32(&ms_streamingHalfOfBufferSize);
     static CStreamingInfo (&ms_aInfoForModel)[26316];            // count: 26316 in unmodified game
-    static HANDLE (&m_aStreamingHandlers)[32];
-    static CArchiveInfo (&ms_aAchiveInfo)[8];
 };

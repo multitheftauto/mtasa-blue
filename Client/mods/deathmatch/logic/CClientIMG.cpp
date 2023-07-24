@@ -11,8 +11,6 @@
 #include <StdInc.h>
 #include "game/CStreaming.h"
 
-#define INVALID_ARCHIVE_ID 0xFF
-
 struct tImgHeader
 {
     char         szMagic[4];

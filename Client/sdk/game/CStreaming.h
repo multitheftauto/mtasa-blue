@@ -13,6 +13,9 @@
 
 #include <stdint.h>
 
+#define INVALID_ARCHIVE_ID 0xFF
+#define INVALID_STREAM_ID 0xFF
+
 struct CStreamingInfo
 {
     uint16_t prevId = (uint16_t)-1;
