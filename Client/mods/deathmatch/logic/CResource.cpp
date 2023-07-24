@@ -21,7 +21,8 @@ extern CClientGame* g_pClientGame;
 int CResource::m_iShowingCursor = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                     const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
+                     const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP, bool isUnsafe)
+    : m_bOOPEnabled{bEnableOOP}, m_isUnsafe{isUnsafe}
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
     m_usNetID = usNetID;
@@ -80,12 +81,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     if (!m_strResourcePrivateDirectoryPathOld.empty())
         m_strResourcePrivateDirectoryPathOld = PathJoin(m_strResourcePrivateDirectoryPathOld, m_strResourceName);
 
-    // Move this after the CreateVirtualMachine line and heads will roll
-    m_bOOPEnabled = bEnableOOP;
-    m_iDownloadPriorityGroup = 0;
-
-    m_pLuaVM = m_pLuaManager->CreateVirtualMachine(this, bEnableOOP);
-    if (m_pLuaVM)
+    if (m_pLuaVM = m_pLuaManager->CreateVirtualMachine(this, bEnableOOP, isUnsafe); m_pLuaVM != nullptr)
     {
         m_pLuaVM->SetScriptName(szResourceName);
         m_pLuaVM->LoadEmbeddedScripts();

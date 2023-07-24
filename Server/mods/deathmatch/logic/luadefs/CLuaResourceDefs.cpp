@@ -71,8 +71,6 @@ void CLuaResourceDefs::LoadFunctions()
         {"refreshResources", refreshResources},
 
         {"getResourceACLRequests", getResourceACLRequests},
-        {"loadstring", LoadString},
-        {"load", Load},
     };
 
     // Add functions
@@ -80,6 +78,8 @@ void CLuaResourceDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 
     CLuaCFunctions::AddFunction("updateResourceACLRequest", updateResourceACLRequest, true);
+    CLuaCFunctions::AddFunction("loadstring", LoadString, true);
+    CLuaCFunctions::AddFunction("load", Load, true);
 }
 
 void CLuaResourceDefs::AddClass(lua_State* luaVM)
@@ -1320,6 +1320,14 @@ int CLuaResourceDefs::updateResourceACLRequest(lua_State* luaVM)
 
 int CLuaResourceDefs::LoadString(lua_State* luaVM)
 {
+    CLuaMain& luaMain = lua_getownercluamain(luaVM);
+
+    if (!luaMain.IsUnsafe())
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
     //  func,err loadstring( string text[, string name] )
     SString strInput;
     SString strName;
@@ -1371,6 +1379,14 @@ int CLuaResourceDefs::LoadString(lua_State* luaVM)
 
 int CLuaResourceDefs::Load(lua_State* luaVM)
 {
+    CLuaMain& luaMain = lua_getownercluamain(luaVM);
+
+    if (!luaMain.IsUnsafe())
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
     //  func,err load( callback callbackFunction[, string name] )
     CLuaFunctionRef iLuaFunction;
     SString         strName;
@@ -1386,18 +1402,19 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
         // Should apply some limit here?
         SString       strInput;
         CLuaArguments callbackArguments;
-        CLuaMain*     pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        while (pLuaMain)
+
+        while (true)
         {
             CLuaArguments returnValues;
-            callbackArguments.Call(pLuaMain, iLuaFunction, &returnValues);
+            callbackArguments.Call(&luaMain, iLuaFunction, &returnValues);
+
             if (returnValues.Count())
             {
                 CLuaArgument* returnedValue = *returnValues.IterBegin();
                 int           iType = returnedValue->GetType();
+
                 if (iType == LUA_TNIL)
                     break;
-
                 else if (iType == LUA_TSTRING)
                 {
                     std::string str = returnedValue->GetString();
@@ -1408,6 +1425,7 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
                     continue;
                 }
             }
+
             break;
         }
 

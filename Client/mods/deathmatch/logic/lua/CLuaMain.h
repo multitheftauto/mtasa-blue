@@ -37,7 +37,7 @@ class CLuaMain            //: public CClient
 {
 public:
     ZERO_ON_NEW
-    CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP);
+    CLuaMain(class CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP, bool isUnsafe);
     ~CLuaMain();
 
     bool LoadScriptFromBuffer(const char* cpBuffer, unsigned int uiSize, const char* szFileName);
@@ -80,6 +80,11 @@ public:
 
     bool IsOOPEnabled() { return m_bEnableOOP; }
 
+    /**
+     * @brief Returns a boolean whether this Lua virtual machine is running in unsafe mode.
+     */
+    bool IsUnsafe() const noexcept { return m_isUnsafe; }
+
 private:
     void InitSecurity();
 
@@ -100,7 +105,8 @@ private:
     std::unordered_set<std::unique_ptr<SXMLString>> m_XMLStringNodes;
     static SString                                  ms_strExpectedUndumpHash;
 
-    bool m_bEnableOOP;
+    bool m_bEnableOOP{false};
+    bool m_isUnsafe{false};            // A boolean whether this Lua virtual machine is running in unsafe mode.
 
 public:
     CFastHashMap<const void*, CRefInfo> m_CallbackTable;

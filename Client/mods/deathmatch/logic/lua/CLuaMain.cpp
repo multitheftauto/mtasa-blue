@@ -27,7 +27,7 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
 
-CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
+CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP, bool isUnsafe) : m_bEnableOOP{bEnableOOP}, m_isUnsafe{isUnsafe}
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;
@@ -37,8 +37,6 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEn
     m_FunctionEnterTimer.SetMaxIncrement(500);
 
     m_pResource = pResourceOwner;
-
-    m_bEnableOOP = bEnableOOP;
 
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainCreate(this);
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainCreate(this);
@@ -87,6 +85,14 @@ void CLuaMain::InitSecurity()
     lua_register(m_luaVM, "loadlib", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "getfenv", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "newproxy", CLuaUtilDefs::DisabledFunction);
+
+    // Disable certain functions, if this Lua virtual machine is running in safe mode. It's not really necessary here, because we overwrite them with our own
+    // functions anyway.
+    if (!m_isUnsafe)
+    {
+        lua_register(m_luaVM, "loadstring", CLuaUtilDefs::DisabledFunction);
+        lua_register(m_luaVM, "load", CLuaUtilDefs::DisabledFunction);
+    }
 }
 
 void CLuaMain::InitClasses(lua_State* luaVM)

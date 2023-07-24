@@ -105,6 +105,7 @@ bool CResource::Load()
     m_bClientFiles = true;
 
     m_bOOPEnabledInMetaXml = false;
+    m_isUnsafeInMetaXml = false;
 
     m_pVM = nullptr;
     // @@@@@ Set some type of HTTP access here
@@ -199,12 +200,14 @@ bool CResource::Load()
                 m_bSyncMapElementDataDefined = true;
             }
 
-            m_bOOPEnabledInMetaXml = false;
-            CXMLNode* pNodeClientOOP = pRoot->FindSubNode("oop", 0);
-
-            if (pNodeClientOOP)
+            if (CXMLNode* node = pRoot->FindSubNode("oop", 0); node != nullptr)
             {
-                m_bOOPEnabledInMetaXml = StringToBool(pNodeClientOOP->GetTagContent().c_str());
+                m_bOOPEnabledInMetaXml = StringToBool(node->GetTagContent().c_str());
+            }
+
+            if (CXMLNode* node = pRoot->FindSubNode("unsafe", 0); node != nullptr)
+            {
+                m_isUnsafeInMetaXml = StringToBool(node->GetTagContent().c_str());
             }
 
             m_iDownloadPriorityGroup = 0;
@@ -842,8 +845,20 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     // Set the Resource Element name
     m_pResourceElement->SetName(m_strResourceName.c_str());
 
+    // Consider every resource to be safe by default.
+    m_isUnsafe = false;
+
+    if (m_isUnsafeInMetaXml)
+    {
+        bool canModifyOtherObjects = g_pGame->GetACLManager()->CanObjectUseRight(m_strResourceName.c_str(), CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE,
+                                                                                 "ModifyOtherObjects", CAccessControlListRight::RIGHT_TYPE_GENERAL, false);
+
+        // We only grant unsafe to resources which can't access nor modify all other resources.
+        m_isUnsafe = (canModifyOtherObjects == false);
+    }
+
     // Create the virtual machine for this resource
-    CreateVM(m_bOOPEnabledInMetaXml);
+    CreateVM(m_bOOPEnabledInMetaXml, m_isUnsafe);
 
     // We're now active
     CLogger::LogPrintf(LOGLEVEL_LOW, "Starting %s\n", m_strResourceName.c_str());
@@ -1117,11 +1132,11 @@ bool CResource::Stop(bool bManualStop)
     return true;
 }
 
-bool CResource::CreateVM(bool bEnableOOP)
+bool CResource::CreateVM(bool bEnableOOP, bool isUnsafe)
 {
     if (!m_pVM)
     {
-        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(this, bEnableOOP);
+        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(this, bEnableOOP, isUnsafe);
         m_pResourceManager->NotifyResourceVMOpen(this, m_pVM);
     }
 

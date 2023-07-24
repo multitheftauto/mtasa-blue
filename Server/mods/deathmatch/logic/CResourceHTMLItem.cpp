@@ -25,7 +25,7 @@ extern CGame*            g_pGame;
 
 CResourceHTMLItem::CResourceHTMLItem(CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes,
                                      bool bIsDefault, bool bIsRaw, bool bRestricted, bool bOOPEnabled)
-    : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)
+    : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes), m_bOOPEnabled{bOOPEnabled}
 {
     m_bIsRaw = bIsRaw;
     m_type = RESOURCE_FILE_TYPE_HTML;
@@ -33,7 +33,6 @@ CResourceHTMLItem::CResourceHTMLItem(CResource* resource, const char* szShortNam
     m_pVM = NULL;
     m_bIsBeingRequested = false;
     m_bRestricted = bRestricted;
-    m_bOOPEnabled = bOOPEnabled;
 }
 
 CResourceHTMLItem::~CResourceHTMLItem()
@@ -298,7 +297,7 @@ bool CResourceHTMLItem::Start()
              fwrite ( m_szBuffer, 1, strlen(m_szBuffer), debug );
              fclose ( debug );*/
 
-        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(m_resource, m_bOOPEnabled);
+        m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(m_resource, m_bOOPEnabled, m_resource->IsUnsafe());
         m_pVM->LoadEmbeddedScripts();
         m_pVM->RegisterModuleFunctions();
         m_pVM->LoadScript(strScript.c_str());

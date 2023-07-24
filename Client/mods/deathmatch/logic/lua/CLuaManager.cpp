@@ -56,10 +56,10 @@ CLuaManager::~CLuaManager()
     CLuaCFunctions::RemoveAllFunctions();
 }
 
-CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP)
+CLuaMain* CLuaManager::CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP, bool isUnsafe)
 {
     // Create it and add it to the list over VM's
-    CLuaMain* pLuaMain = new CLuaMain(this, pResourceOwner, bEnableOOP);
+    CLuaMain* pLuaMain = new CLuaMain(this, pResourceOwner, bEnableOOP, isUnsafe);
     m_virtualMachines.push_back(pLuaMain);
     pLuaMain->InitVM();
     return pLuaMain;

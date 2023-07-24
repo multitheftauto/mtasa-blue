@@ -38,7 +38,7 @@ class CResource
 {
 public:
     CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-              const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
+              const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP, bool isUnsafe);
     ~CResource();
 
     unsigned short GetNetID() { return m_usNetID; };
@@ -93,11 +93,18 @@ public:
     void               LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
     const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
-    bool               IsOOPEnabled() { return m_bOOPEnabled; }
+    bool               IsOOPEnabled() const noexcept { return m_bOOPEnabled; }
     void               HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
     bool               IsWaitingForInitialDownloads();
     int                GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
     void               SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
+
+    /**
+     * @brief Returns a boolean whether this resource is running in unsafe mode.
+     *
+     * The unsafe mode is controlled by the server and this value never changes on the client.
+     */
+    bool IsUnsafe() const noexcept { return m_isUnsafe; }
 
 private:
     unsigned short       m_usNetID;
@@ -121,8 +128,9 @@ private:
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
     CMtaVersion          m_strMinServerReq;
     CMtaVersion          m_strMinClientReq;
-    bool                 m_bOOPEnabled;
-    int                  m_iDownloadPriorityGroup;
+    bool                 m_bOOPEnabled{false};
+    bool                 m_isUnsafe{false};            // A boolean whether this resource is running in unsafe mode.
+    int                  m_iDownloadPriorityGroup{0};
 
     // To control cursor show/hide
     static int m_iShowingCursor;

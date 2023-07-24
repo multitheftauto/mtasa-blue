@@ -62,7 +62,9 @@ extern CNetServer* g_pRealNetServer;
 #include "luascripts/inspect.lua.h"
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
-                   CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP)
+                   CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP,
+                   bool isUnsafe)
+    : m_bEnableOOP{bEnableOOP}, m_isUnsafe{isUnsafe}
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;
@@ -82,8 +84,6 @@ CLuaMain::CLuaMain(CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPl
     m_pVehicleManager = pVehicleManager;
     m_pBlipManager = pBlipManager;
     m_pMapManager = pMapManager;
-
-    m_bEnableOOP = bEnableOOP;
 
     CPerfStatLuaMemory::GetSingleton()->OnLuaMainCreate(this);
     CPerfStatLuaTiming::GetSingleton()->OnLuaMainCreate(this);
@@ -154,6 +154,14 @@ void CLuaMain::InitSecurity()
     lua_register(m_luaVM, "loadlib", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "getfenv", CLuaUtilDefs::DisabledFunction);
     lua_register(m_luaVM, "newproxy", CLuaUtilDefs::DisabledFunction);
+
+    // Disable certain functions, if this Lua virtual machine is running in safe mode. It's not really necessary here, because we overwrite them with our own
+    // functions anyway.
+    if (!m_isUnsafe)
+    {
+        lua_register(m_luaVM, "loadstring", CLuaUtilDefs::DisabledFunction);
+        lua_register(m_luaVM, "load", CLuaUtilDefs::DisabledFunction);
+    }
 }
 
 void CLuaMain::InitClasses(lua_State* luaVM)

@@ -40,7 +40,8 @@ class CLuaMain            //: public CClient
 public:
     ZERO_ON_NEW
     CLuaMain(class CLuaManager* pLuaManager, CObjectManager* pObjectManager, CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager,
-             CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP);
+             CBlipManager* pBlipManager, CRadarAreaManager* pRadarAreaManager, CMapManager* pMapManager, CResource* pResourceOwner, bool bEnableOOP,
+             bool isUnsafe);
 
     ~CLuaMain();
 
@@ -114,7 +115,12 @@ private:
     void InitClasses(lua_State* luaVM);
 
 public:
-    bool IsOOPEnabled() { return m_bEnableOOP; }
+    bool IsOOPEnabled() const noexcept { return m_bEnableOOP; }
+
+    /**
+     * @brief Returns a boolean whether this Lua virtual machine is running in unsafe mode.
+    */
+    bool IsUnsafe() const noexcept { return m_isUnsafe; }
 
 private:
     static void InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug);
@@ -138,9 +144,9 @@ private:
     list<CTextDisplay*>                             m_Displays;
     list<CTextItem*>                                m_TextItems;
 
-    bool m_bEnableOOP;
-
-    bool m_bBeingDeleted;            // prevent it being deleted twice
+    bool m_bEnableOOP{};
+    bool m_isUnsafe{};                 // A boolean whether this Lua virtual machine is running in unsafe mode.
+    bool m_bBeingDeleted{};            // prevent it being deleted twice
 
     CElapsedTime         m_FunctionEnterTimer;
     CElapsedTimeApprox   m_WarningTimer;

@@ -5007,6 +5007,13 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         bitStream.Read(iDownloadPriorityGroup);
     }
 
+    // A boolean whether the resource will run in unsafe mode or not. To remain backwards compatible, we have to run in unsafe mode by default.
+    bool isUnsafe{true};
+    if (bitStream.Can(eBitStreamVersion::IsUnsafeResource))
+    {
+        bitStream.ReadBit(isUnsafe);
+    }
+
     // Get the resource entity
     CClientEntity* pResourceEntity = CElementIDs::GetElement(ResourceEntityID);
 
@@ -5022,7 +5029,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     bool bFatalError = false;
 
     CResource* pResource = g_pClientGame->m_pResourceManager->Add(usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq,
-                                                                  strMinClientReq, bEnableOOP);
+                                                                  strMinClientReq, bEnableOOP, isUnsafe);
     if (pResource)
     {
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);

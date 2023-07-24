@@ -47,6 +47,7 @@ void CLuaUtilDefs::LoadFunctions()
         {"getRealTime", GetCTime},
         {"split", Split},
         {"isOOPEnabled", IsOOPEnabled},
+        {"isUnsafeResource", IsUnsafeResource},
         {"getUserdataType", GetUserdataType},
         {"print", luaB_print},
         {"getColorFromString", GetColorFromString},
@@ -241,12 +242,15 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
 
 int CLuaUtilDefs::IsOOPEnabled(lua_State* luaVM)
 {
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (pLuaMain)
-        lua_pushboolean(luaVM, pLuaMain->IsOOPEnabled());
-    else
-        lua_pushnil(luaVM);
+    CLuaMain& luaMain = lua_getownercluamain(luaVM);
+    lua_pushboolean(luaVM, luaMain.IsOOPEnabled());
+    return 1;
+}
 
+int CLuaUtilDefs::IsUnsafeResource(lua_State* luaVM)
+{
+    CLuaMain& luaMain = lua_getownercluamain(luaVM);
+    lua_pushboolean(luaVM, luaMain.IsUnsafe());
     return 1;
 }
 

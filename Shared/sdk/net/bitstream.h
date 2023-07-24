@@ -526,7 +526,12 @@ enum class eBitStreamVersion : unsigned short
     // 1.6.0 RELEASED - 2023-04-07
     //
 
+    // 0x77
     CEntityAddPacket_ObjectBreakable,
+
+    // Add unsafe resource marker to disable load/loadstring functions
+    // 2022-07-25 0x78
+    IsUnsafeResource,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

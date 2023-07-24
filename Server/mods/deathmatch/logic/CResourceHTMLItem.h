@@ -51,7 +51,7 @@ private:
     std::string m_strMime;
     bool        m_bRestricted;
 
-    bool m_bOOPEnabled;
+    bool m_bOOPEnabled{false};
 
     ResponseCode  m_responseCode;
     HttpResponse* m_currentResponse;

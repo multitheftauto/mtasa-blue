@@ -30,9 +30,10 @@ CResourceManager::~CResourceManager()
 }
 
 CResource* CResourceManager::Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                                 const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
+                                 const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP, bool isUnsafe)
 {
-    CResource* pResource = new CResource(usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP);
+    CResource* pResource =
+        new CResource(usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP, isUnsafe);
     if (pResource)
     {
         m_resources.push_back(pResource);

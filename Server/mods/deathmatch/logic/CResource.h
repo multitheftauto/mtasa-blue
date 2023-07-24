@@ -308,6 +308,14 @@ public:
 
     bool IsOOPEnabledInMetaXml() const noexcept { return m_bOOPEnabledInMetaXml; }
 
+    /**
+     * @brief Returns a boolean whether this resource is running in unsafe mode.
+     * 
+     * The return value is meaningless if the resource is not running.
+     * An unsafe resource has access to the loadstring function, but only if the resource has no grant for "general.ModifyOtherObjects".
+    */
+    bool IsUnsafe() const noexcept { return m_isUnsafe; }
+
     bool CheckFunctionRightCache(lua_CFunction f, bool* pbOutAllowed);
     void UpdateFunctionRightCache(lua_CFunction f, bool bAllowed);
 
@@ -344,7 +352,7 @@ private:
     bool ReadIncludedHTML(CXMLNode* pRoot);
     bool ReadIncludedExports(CXMLNode* pRoot);
     bool ReadIncludedFiles(CXMLNode* pRoot);
-    bool CreateVM(bool bEnableOOP);
+    bool CreateVM(bool bEnableOOP, bool isUnsafe);
     bool DestroyVM();
     void TidyUp();
 
@@ -412,8 +420,11 @@ private:
 
     bool m_bOOPEnabledInMetaXml = false;
     bool m_bLinked = false;                  // if true, the included resources are already linked to this resource
-    bool m_bIsPersistent = false;            // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
+    bool m_bIsPersistent = false;            // if true, this resource will remain even if it has no Dependents, mainly if started by the user or the startup
     bool m_bDestroyed = false;
+
+    bool m_isUnsafeInMetaXml = false;            // If true, this resource is marked as unsafe in the meta.xml file.
+    bool m_isUnsafe = false;                     // A boolean whether this resource is running in unsafe mode. Use only when the resource is running.
 
     CXMLNode* m_pNodeSettings = nullptr;            // Settings XML node, read from meta.xml and copied into it's own instance
     CXMLNode* m_pNodeStorage = nullptr;             // Dummy XML node used for temporary storage of stuff returned by CSettings::Get

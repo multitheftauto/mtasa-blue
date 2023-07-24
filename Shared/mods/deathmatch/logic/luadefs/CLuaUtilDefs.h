@@ -27,6 +27,7 @@ public:
     LUA_DECLARE(GetCTime);
     LUA_DECLARE(Split);
     LUA_DECLARE(IsOOPEnabled);
+    LUA_DECLARE(IsUnsafeResource);
     LUA_DECLARE(GetUserdataType);
     LUA_DECLARE(luaB_print);
     LUA_DECLARE(GetColorFromString);

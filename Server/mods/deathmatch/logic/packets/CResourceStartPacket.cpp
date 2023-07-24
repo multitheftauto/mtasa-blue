@@ -77,6 +77,11 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(m_pResource->GetDownloadPriorityGroup());
         }
 
+        if (BitStream.Can(eBitStreamVersion::IsUnsafeResource))
+        {
+            BitStream.WriteBit(m_pResource->IsUnsafe());
+        }
+
         // Send the resource files info
         std::list<CResourceFile*>::iterator iter = m_pResource->IterBegin();
         for (; iter != m_pResource->IterEnd(); iter++)
