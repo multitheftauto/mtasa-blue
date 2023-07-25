@@ -665,6 +665,7 @@ ADD_ENUM(eClientModelType::PED, "ped")
 ADD_ENUM(eClientModelType::OBJECT, "object")
 ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
 ADD_ENUM(eClientModelType::TIMED_OBJECT, "timed-object")
+ADD_ENUM(eClientModelType::ATOMIC, "atomic")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 // Sound effects

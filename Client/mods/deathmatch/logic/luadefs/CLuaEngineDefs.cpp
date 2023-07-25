@@ -852,6 +852,12 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                             case eClientModelType::PED:
                                 usParentID = 7;            // male01
                                 break;
+                            case eClientModelType::TIMED_OBJECT:
+                                usParentID = 4715;            // LTSLAsky1_LAn2
+                                break;
+                            case eClientModelType::ATOMIC:
+                                usParentID = 3425;            // nt_windmill (windmill)
+                                break;
                             case eClientModelType::OBJECT:
                                 usParentID = 1337;            // BinNt07_LA (trash can)
                                 break;

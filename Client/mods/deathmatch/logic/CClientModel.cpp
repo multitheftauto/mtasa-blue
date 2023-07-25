@@ -50,6 +50,13 @@ bool CClientModel::Allocate(ushort usParentID)
                 return true;
             }
             break;
+        case eClientModelType::ATOMIC:
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            {
+                pModelInfo->MakeAtomicModel(usParentID);
+                return true;
+            }
+            break;
         case eClientModelType::TIMED_OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {

@@ -243,6 +243,12 @@ struct CTimeInfoSAInterface
     short m_wOtherTimeModel;
 };
 
+class CAtomicModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    unsigned short usAnimId;
+};
+
 class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 public:
@@ -435,6 +441,7 @@ public:
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
+    void         MakeAtomicModel(ushort usBaseModelID);
     void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 
