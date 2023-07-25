@@ -79,6 +79,8 @@ public:
     const SString& GetName() { return m_strName; }
     void           SetName(const std::string& strName);
 
+    EAccountType   GetType() { return m_AccountType; }
+
     void           SetPassword(const SString& strPassword);
     bool           IsPassword(const SString& strPassword, bool* pbUsedHttpPassAppend = nullptr);
     SString        GetPasswordHash();
