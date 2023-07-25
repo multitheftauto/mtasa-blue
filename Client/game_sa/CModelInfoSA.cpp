@@ -1710,11 +1710,11 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
-void CModelInfoSA::MakeAtomicModel(ushort usBaseID)
+void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 {
-    CAtomicModelInfoSAInterface* m_pInterface = new CAtomicModelInfoSAInterface();
+    CClumpModelInfoSAInterface* m_pInterface = new CClumpModelInfoSAInterface();
     CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
-    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CAtomicModelInfoSAInterface));
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->usUnknown = 65535;
@@ -1758,6 +1758,9 @@ void CModelInfoSA::DeallocateModel(void)
             break;
         case eModelInfoType::ATOMIC:
             delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::CLUMP:
+            delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::TIME:
             delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);

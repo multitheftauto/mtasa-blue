@@ -50,10 +50,10 @@ bool CClientModel::Allocate(ushort usParentID)
                 return true;
             }
             break;
-        case eClientModelType::ATOMIC:
+        case eClientModelType::CLUMP:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
-                pModelInfo->MakeAtomicModel(usParentID);
+                pModelInfo->MakeClumpModel(usParentID);
                 return true;
             }
             break;
@@ -121,6 +121,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
             break;
         }
+        case eClientModelType::CLUMP:
         case eClientModelType::OBJECT:
         case eClientModelType::TIMED_OBJECT:
         {

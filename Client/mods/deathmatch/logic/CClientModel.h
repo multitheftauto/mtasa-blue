@@ -20,7 +20,7 @@ enum class eClientModelType
     OBJECT,
     VEHICLE,
     TIMED_OBJECT,
-    ATOMIC,
+    CLUMP,
 };
 
 class CResource;
