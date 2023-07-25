@@ -261,20 +261,20 @@ void CPerfStatBandwidthUsageImpl::LoadStats()
 
     if (result->nRows > 0 && result->nColumns >= 5)
     {
-        for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+        for (const auto& row : result->Data)
         {
-            const CRegistryResultRow& row = *iter;
-            SString                   strType = (const char*)row[0].pVal;
-            uint                      uiIndex = static_cast<uint>(row[1].nVal);
-            float                     GameRecv = std::max(0.f, row[2].fVal);
-            float                     GameSent = std::max(0.f, row[3].fVal);
-            float                     HttpSent = std::max(0.f, row[4].fVal);
-            float                     GameRecvBlocked = 0;
+            SString strType = row[0].GetString();
+            uint    uiIndex = row[1].GetNumber<uint>();
+            float   GameRecv = std::max(0.f, row[2].GetNumber<float>());
+            float   GameSent = std::max(0.f, row[3].GetNumber<float>());
+            float   HttpSent = std::max(0.f, row[4].GetNumber<float>());
+            float   GameRecvBlocked = 0;
+
             if (result->nColumns >= 6)
-                GameRecvBlocked = std::max(0.f, row[5].fVal);
+                GameRecvBlocked = std::max(0.f, row[5].GetNumber<float>());
             float GameResent = 0;
             if (result->nColumns >= 7)
-                GameResent = std::max(0.f, row[6].fVal);
+                GameResent = std::max(0.f, row[6].GetNumber<float>());
 
             uint uiType = BWStatNameToIndex(strType);
 

@@ -165,12 +165,12 @@ bool CAccountManager::Load()
     {
         const CRegistryResultRow& row = *iter;
         // Fill User ID, Name & Password (Required data)
-        int     iUserID = static_cast<int>(row[0].nVal);
-        SString strName = (const char*)row[1].pVal;
-        SString strPassword = (const char*)row[2].pVal;
-        SString strIP = (const char*)row[3].pVal;
-        SString strSerial = (const char*)row[4].pVal;
-        SString strHttpPassAppend = (const char*)row[5].pVal;
+        int     iUserID = row[0].GetNumber<int>();
+        SString strName = row[1].GetString();
+        SString strPassword = row[2].GetString();
+        SString strIP = row[3].GetString();
+        SString strSerial = row[4].GetString();
+        SString strHttpPassAppend = row[5].GetString();
 
         // Check for overlong names and incorrect escapement
         bool bRemoveAccount = false;
@@ -330,7 +330,7 @@ bool CAccountManager::IntegrityCheck()
         {
             CRegistryResultCell& cell = result->Data.front()[0];
             if (cell.nType == SQLITE_TEXT)
-                strResult = std::string((const char*)cell.pVal, cell.nLength - 1);
+                strResult = std::string(cell.GetString(), cell.nLength - 1);
         }
 
         // Process result
@@ -378,7 +378,7 @@ bool CAccountManager::IntegrityCheck()
         {
             CRegistryResultCell& cell = result->Data.front()[0];
             if (cell.nType == SQLITE_TEXT)
-                strResult = std::string((const char*)cell.pVal, cell.nLength - 1);
+                strResult = std::string(cell.GetString(), cell.nLength - 1);
         }
 
         // Process result
@@ -698,8 +698,8 @@ std::shared_ptr<CLuaArgument> CAccountManager::GetAccountData(CAccount* pAccount
     {
         const CRegistryResultRow& row = result->Data.front();
 
-        const auto type = static_cast<int>(row[1].nVal);
-        const auto value = (const char*)row[0].pVal;
+        const auto type = row[1].GetNumber<int>();
+        const auto value = row[0].GetString();
 
         // Cache value for next get
         pAccount->SetData(szKey, value, type);
@@ -799,14 +799,13 @@ bool CAccountManager::CopyAccountData(CAccount* pFromAccount, CAccount* pToAccou
         // Do we have any results?
         if (result->nRows > 0)
         {
-            for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+            for (const auto& row : result->Data)
             {
-                const CRegistryResultRow& row = *iter;
                 // Get our key
-                strKey = (const char*)row[0].pVal;
+                strKey = row[0].GetString();
                 // Get our value
-                strValue = (const char*)row[1].pVal;
-                int iType = static_cast<int>(row[2].nVal);
+                strValue = row[1].GetString();
+                int iType = row[2].GetNumber<int>();
 
                 MapSet(copiedData, strKey, CAccountData(strKey, strValue, iType));
             }
@@ -815,29 +814,27 @@ bool CAccountManager::CopyAccountData(CAccount* pFromAccount, CAccount* pToAccou
 
     if (copiedData.size() > 0)            // got anything to copy?
     {
-        std::map<SString, CAccountData>::iterator iter = copiedData.begin();
-
-        for (; iter != copiedData.end(); iter++)
+        for (const auto& iter : copiedData)
         {
             if (!pToAccount->IsRegistered())            // store to memory
             {
-                pToAccount->SetData(iter->second.GetKey(), iter->second.GetStrValue(), iter->second.GetType());
+                pToAccount->SetData(iter.second.GetKey(), iter.second.GetStrValue(), iter.second.GetType());
             }
             else            // store to database
             {
                 CRegistryResult subResult;
 
                 m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &subResult, "SELECT id,userid from userdata where userid=? and key=? LIMIT 1",
-                                                     SQLITE_INTEGER, pToAccount->GetID(), SQLITE_TEXT, iter->second.GetKey().c_str());
+                                                     SQLITE_INTEGER, pToAccount->GetID(), SQLITE_TEXT, iter.second.GetKey().c_str());
                 // If there is a key with this value update it otherwise insert it and store the return value in bRetVal
                 if (subResult->nRows > 0)
                     m_pDatabaseManager->Execf(m_hDbConnection, "UPDATE userdata SET value=?, type=? WHERE userid=? AND key=?", SQLITE_TEXT,
-                                              iter->second.GetStrValue().c_str(), SQLITE_INTEGER, iter->second.GetType(), SQLITE_INTEGER, pToAccount->GetID(),
-                                              SQLITE_TEXT, iter->second.GetKey().c_str());
+                                              iter.second.GetStrValue().c_str(), SQLITE_INTEGER, iter.second.GetType(), SQLITE_INTEGER, pToAccount->GetID(),
+                                              SQLITE_TEXT, iter.second.GetKey().c_str());
                 else
                     m_pDatabaseManager->Execf(m_hDbConnection, "INSERT INTO userdata (userid, key, value, type) VALUES(?,?,?,?)", SQLITE_INTEGER,
-                                              pToAccount->GetID(), SQLITE_TEXT, iter->second.GetKey().c_str(), SQLITE_TEXT, iter->second.GetStrValue().c_str(),
-                                              SQLITE_INTEGER, iter->second.GetType());
+                                              pToAccount->GetID(), SQLITE_TEXT, iter.second.GetKey().c_str(), SQLITE_TEXT, iter.second.GetStrValue().c_str(),
+                                              SQLITE_INTEGER, iter.second.GetType());
             }
         }
         return true;
@@ -897,9 +894,9 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
     for (const auto& row : result->Data)
     {
         // Get our key
-        strKey = reinterpret_cast<const char*>(row[0].pVal);
+        strKey = row[0].GetString();
         // Get our type
-        int iType = static_cast<int>(row[2].nVal);
+        int iType = row[2].GetNumber<int>();
         // Account data is stored as text so we don't need to check what type it is just return it
         if (iType == LUA_TNIL)
         {
@@ -909,7 +906,7 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
         }
         if (iType == LUA_TBOOLEAN)
         {
-            SString strResult = (const char*)row[1].pVal;
+            SString strResult = row[1].GetString();
             lua_pushstring(pLua, strKey);
             lua_pushboolean(pLua, strResult == "true");
             lua_settable(pLua, -3);
@@ -917,13 +914,13 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
         if (iType == LUA_TNUMBER)
         {
             lua_pushstring(pLua, strKey);
-            lua_pushnumber(pLua, strtod((const char*)row[1].pVal, NULL));
+            lua_pushnumber(pLua, strtod(row[1].GetString(), NULL));
             lua_settable(pLua, -3);
         }
         else
         {
             lua_pushstring(pLua, strKey);
-            lua_pushstring(pLua, ((const char*)row[1].pVal));
+            lua_pushstring(pLua, (row[1].GetString()));
             lua_settable(pLua, -3);
         }
     }
@@ -938,7 +935,7 @@ void CAccountManager::GetAccountsBySerial(const SString& strSerial, std::vector<
 
     for (const auto& row : result->Data)
     {
-        CAccount* pAccount = Get((const char*)row[0].pVal);
+        CAccount* pAccount = Get(row[0].GetString());
         if (pAccount)
             outAccounts.push_back(pAccount);
     }
@@ -952,7 +949,7 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
 
     for (const auto& row : result->Data)
     {
-        CAccount* pAccount = Get((const char*)row[0].pVal);
+        CAccount* pAccount = Get(row[0].GetString());
         if (pAccount)
             outAccounts.push_back(pAccount);
     }
@@ -965,7 +962,7 @@ CAccount* CAccountManager::GetAccountByID(int ID)
 
     for (const auto& row : result->Data)
     {
-        return Get(reinterpret_cast<const char*>(row[0].pVal));
+        return Get(row[0].GetString());
     }
 
     return nullptr;
@@ -981,7 +978,7 @@ void CAccountManager::GetAccountsByData(const SString& dataName, const SString& 
 
     for (const auto& row : result->Data)
     {
-        CAccount* pAccount = Get((const char*)row[0].pVal);
+        CAccount* pAccount = Get(row[0].GetString());
         if (pAccount)
             outAccounts.push_back(pAccount);
     }
@@ -1176,12 +1173,12 @@ void CAccountManager::LoadAccountSerialUsage(CAccount* pAccount)
     {
         outSerialUsageList.push_back(CAccount::SSerialUsage());
         CAccount::SSerialUsage& info = outSerialUsageList.back();
-        info.strSerial = (const char*)row[0].pVal;
-        info.strAddedIp = (const char*)row[1].pVal;
+        info.strSerial = row[0].GetString();
+        info.strAddedIp = row[1].GetString();
         info.tAddedDate = row[2].GetNumber<time_t>();
-        info.strAuthWho = (const char*)row[3].pVal;
+        info.strAuthWho = row[3].GetString();
         info.tAuthDate = row[4].GetNumber<time_t>();
-        info.strLastLoginIp = (const char*)row[5].pVal;
+        info.strLastLoginIp = row[5].GetString();
         info.tLastLoginDate = row[6].GetNumber<time_t>();
         info.tLastLoginHttpDate = row[7].GetNumber<time_t>();
     }

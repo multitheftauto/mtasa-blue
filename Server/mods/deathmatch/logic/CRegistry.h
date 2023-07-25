@@ -42,7 +42,7 @@ public:
     bool Query(const char* szQuery, ...);
     bool Query(CRegistryResult* pResult, const char* szQuery, ...);
 
-    const SString& GetLastError() { return m_strLastErrorMessage; }
+    const SString& GetLastError() const { return m_strLastErrorMessage; }
 
 protected:
     bool SetLastErrorMessage(const std::string& strLastErrorMessage, const std::string& strQuery);
@@ -71,41 +71,29 @@ struct CRegistryResultCell
     {
         nType = SQLITE_NULL;
         nLength = 0;
-        pVal = NULL;
+        value.pVal = NULL;
     }
     CRegistryResultCell(const CRegistryResultCell& cell)
     {
-        nType = cell.nType;
-        nLength = cell.nLength;
-        nVal = cell.nVal;
-        fVal = cell.fVal;
-        pVal = NULL;
-        if ((nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.pVal && nLength > 0)
+        set(cell);
+        if ((nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.value.pVal && nLength > 0)
         {
-            pVal = new unsigned char[nLength];
-            memcpy(pVal, cell.pVal, nLength);
+            value.pVal = new uchar[nLength];
+            memcpy(value.pVal, cell.value.pVal, nLength);
         }
     };
-    ~CRegistryResultCell()
-    {
-        if (pVal)
-            delete[] pVal;
-    }
+    ~CRegistryResultCell() { SAFE_DELETE(value.pVal); }
 
     CRegistryResultCell& operator=(const CRegistryResultCell& cell)
     {
-        if (pVal)
-            delete[] pVal;
+        SAFE_DELETE(value.pVal);
 
-        nType = cell.nType;
-        nLength = cell.nLength;
-        nVal = cell.nVal;
-        fVal = cell.fVal;
-        pVal = NULL;
-        if ((nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.pVal && nLength > 0)
+        set(cell);
+
+        if ((nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.value.pVal && nLength > 0)
         {
-            pVal = new unsigned char[nLength];
-            memcpy(pVal, cell.pVal, nLength);
+            value.pVal = new uchar[nLength];
+            memcpy(value.pVal, cell.value.pVal, nLength);
         }
         return *this;
     }
@@ -120,18 +108,61 @@ struct CRegistryResultCell
     T GetNumber() const
     {
         if (nType == SQLITE_INTEGER)
-            return static_cast<T>(nVal);
+            return static_cast<T>(value.nVal);
         if (nType == SQLITE_FLOAT)
-            return static_cast<T>(fVal);
+            return static_cast<T>(value.fVal);
         return 0;
     }
 
     int nType;              // Type identifier, SQLITE_*
     int nLength;            // Length in bytes if nType == SQLITE_BLOB or SQLITE_TEXT
                             //    (includes zero terminator if TEXT)
-    long long int  nVal;
-    float          fVal;
-    unsigned char* pVal;
+    union
+    {
+        std::int64_t nVal;
+        float        fVal;
+        uchar*       pVal;
+    } value;
+
+    void swap(
+        const std::int64_t nVal = 0,
+        const float fVal = 0,
+        const char* const pVal = 0,
+        const size_t length = 0
+    ) noexcept {
+        if (nVal)
+        {
+            value.nVal = nVal;
+            value.fVal = 0;
+            value.pVal = 0;
+        }
+        else if (fVal)
+        {
+            value.nVal = 0;
+            value.fVal = fVal;
+            value.pVal = 0;
+        }
+        else if (pVal && length)
+        {
+            value.nVal = 0;
+            value.fVal = 0;
+            SAFE_DELETE(value.pVal);
+            value.pVal = new uchar[length];
+            memcpy(value.pVal, reinterpret_cast<const uchar*>(pVal), length);
+        }
+    }
+    const char* GetString() const noexcept {
+        return reinterpret_cast<const char*>(value.pVal);
+    }
+
+private:
+    CRegistryResultCell& set(const CRegistryResultCell& cell) noexcept {
+        nType = cell.nType;
+        nLength = cell.nLength;
+        value.nVal = cell.value.nVal;
+        value.fVal = cell.value.fVal;
+        value.pVal = NULL;
+    }
 };
 
 typedef std::vector<CRegistryResultCell>              CRegistryResultRow;

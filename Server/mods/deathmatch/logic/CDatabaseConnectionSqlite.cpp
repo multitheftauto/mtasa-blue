@@ -255,28 +255,26 @@ bool CDatabaseConnectionSqlite::QueryInternal(const SString& strQuery, CRegistry
                     case SQLITE_NULL:
                         break;
                     case SQLITE_INTEGER:
-                        cell.nVal = sqlite3_column_int64(pStmt, i);
+                        cell.swap(sqlite3_column_int64(pStmt, i));
                         break;
                     case SQLITE_FLOAT:
-                        cell.fVal = (float)sqlite3_column_double(pStmt, i);
+                        cell.swap(0, sqlite3_column_double(pStmt, i));
                         break;
                     case SQLITE_BLOB:
-                        cell.nLength = sqlite3_column_bytes(pStmt, i);
-                        if (cell.nLength == 0)
-                        {
-                            cell.pVal = NULL;
-                        }
-                        else
-                        {
-                            cell.pVal = new unsigned char[cell.nLength];
-                            memcpy(cell.pVal, sqlite3_column_blob(pStmt, i), cell.nLength);
-                        }
+                    {
+                        const auto inLength = sqlite3_column_bytes(pStmt, i);
+                        const auto inData = reinterpret_cast<const char*>(sqlite3_column_blob(pStmt, i));
+                        cell.swap(0, 0, inData, inLength);
+
                         break;
+                    }
                     default:
-                        cell.nLength = sqlite3_column_bytes(pStmt, i) + 1;
-                        cell.pVal = new unsigned char[cell.nLength];
-                        memcpy(cell.pVal, sqlite3_column_text(pStmt, i), cell.nLength);
+                    {
+                        const auto inLength = sqlite3_column_bytes(pStmt, i) + 1;
+                        const auto inData = reinterpret_cast<const char*>(sqlite3_column_text(pStmt, i));
+                        cell.swap(0, 0, inData, inLength);
                         break;
+                    }
                 }
             }
             pResult->nRows++;
