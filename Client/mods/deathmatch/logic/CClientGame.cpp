@@ -5345,6 +5345,10 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->ResetWater();
     g_pMultiplayer->ResetColorFilter();
 
+    // Grain effect
+    g_pMultiplayer->SetGrainMultiplier(eGrainMultiplierType::ALL, 1.0f);
+    g_pMultiplayer->SetGrainLevel(0);
+
     // Water
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
 
