@@ -83,6 +83,7 @@
 #define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
 #define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
 #define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION   "1.5.1"
+#define DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION  "1.6.0-9.21897"
 
 #ifndef WIN32
     #include <limits.h>
@@ -4584,6 +4585,11 @@ CMtaVersion CGame::CalculateMinClientRequirement()
         if (strNewMin < HIT_ANIM_CLIENT_VERSION)
             strNewMin = HIT_ANIM_CLIENT_VERSION;
     }
+    if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+    {
+        if (strNewMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
+            strNewMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
+    }
 
     // Log effective min client version
     if (strNewMin != m_strPrevMinClientConnectRequirement)
@@ -4620,6 +4626,16 @@ CMtaVersion CGame::CalculateMinClientRequirement()
         {
             if (strKickMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION)
                 strKickMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
+        }
+        if (g_pGame->IsGlitchEnabled(GLITCH_HITANIM))
+        {
+            if (strKickMin < HIT_ANIM_CLIENT_VERSION)
+                strKickMin = HIT_ANIM_CLIENT_VERSION;
+        }
+        if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+        {
+            if (strKickMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
+                strKickMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
         }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)
