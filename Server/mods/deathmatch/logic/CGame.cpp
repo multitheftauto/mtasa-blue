@@ -74,15 +74,8 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
-#define RELEASE_MIN_CLIENT_VERSION              "1.4.0-0.00000"
-#define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
-#define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
-#define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
-#define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
-#define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.5-9.06054"
-#define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
-#define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
-#define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION   "1.5.1"
+#define RELEASE_MIN_CLIENT_VERSION              "1.6.0-0.00000"
+#define DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION  "1.6.0-5.21897"
 
 #ifndef WIN32
     #include <limits.h>
@@ -237,6 +230,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+    m_Glitches[GLITCH_DONTBURNFLIPPEDCARS] = false;
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
 
@@ -254,6 +248,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_GlitchNames["baddrivebyhitbox"] = GLITCH_BADDRIVEBYHITBOX;
     m_GlitchNames["quickstand"] = GLITCH_QUICKSTAND;
     m_GlitchNames["kickoutofvehicle_onmodelreplace"] = GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE;
+    m_GlitchNames["dontburnflippedcars"] = GLITCH_DONTBURNFLIPPEDCARS;
 
     m_bCloudsEnabled = true;
 
@@ -4475,15 +4470,10 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
         eWeaponType weaponList[] = {
             WEAPONTYPE_PISTOL,         WEAPONTYPE_PISTOL_SILENCED, WEAPONTYPE_DESERT_EAGLE, WEAPONTYPE_SHOTGUN, WEAPONTYPE_SAWNOFF_SHOTGUN,
             WEAPONTYPE_SPAS12_SHOTGUN, WEAPONTYPE_MICRO_UZI,       WEAPONTYPE_MP5,          WEAPONTYPE_AK47,    WEAPONTYPE_M4,
-            WEAPONTYPE_TEC9,           WEAPONTYPE_COUNTRYRIFLE};
+            WEAPONTYPE_TEC9,           WEAPONTYPE_COUNTRYRIFLE,    WEAPONTYPE_SNIPERRIFLE};
 
         for (uint i = 0; i < NUMELMS(weaponList); i++)
             MapInsert(weaponTypesUsingBulletSync, weaponList[i]);
-
-        // Add sniper if all clients can handle it
-        if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >=
-            ExtractVersionStringBuildNumber(SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION))
-            MapInsert(weaponTypesUsingBulletSync, WEAPONTYPE_SNIPERRIFLE);
     }
 
     short sVehExtrapolateBaseMs = 5;
@@ -4491,22 +4481,9 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
     short sVehExtrapolateMaxMs = m_pMainConfig->GetVehExtrapolatePingLimit();
     uchar ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
     uchar ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder() != 0;
-    uchar ucAllowFastSprintFix = false;
-    uchar ucAllowDrivebyAnimFix = false;
-    uchar ucAllowShotgunDamageFix = false;
-
-    // Add sprint fix if all clients can handle it
-    if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >= ExtractVersionStringBuildNumber(SPRINT_FIX_MIN_CLIENT_VERSION))
-        ucAllowFastSprintFix = true;
-
-    // Add driveby animation fix if all clients can handle it
-    if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >=
-        ExtractVersionStringBuildNumber(DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION))
-        ucAllowDrivebyAnimFix = true;
-
-    // Add shotgun bullet sync damage fix if all clients can handle it
-    if (m_pPlayerManager->GetLowestConnectedPlayerVersion() >= SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION)
-        ucAllowShotgunDamageFix = true;
+    uchar ucAllowFastSprintFix = true;
+    uchar ucAllowDrivebyAnimFix = true;
+    uchar ucAllowShotgunDamageFix = true;
 
     CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs,
                                ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix);
@@ -4564,25 +4541,10 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < strMinClientRequirementFromResources)
         strNewMin = strMinClientRequirementFromResources;
 
-    if (g_pGame->IsBulletSyncActive())
+    if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
     {
-        if (strNewMin < BULLET_SYNC_MIN_CLIENT_VERSION)
-            strNewMin = BULLET_SYNC_MIN_CLIENT_VERSION;
-    }
-    if (m_pMainConfig->GetVehExtrapolatePercent() > 0)
-    {
-        if (strNewMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION)
-            strNewMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
-    }
-    if (m_pMainConfig->GetUseAltPulseOrder())
-    {
-        if (strNewMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION)
-            strNewMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
-    }
-    if (g_pGame->IsGlitchEnabled(GLITCH_HITANIM))
-    {
-        if (strNewMin < HIT_ANIM_CLIENT_VERSION)
-            strNewMin = HIT_ANIM_CLIENT_VERSION;
+        if (strNewMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
+            strNewMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
     }
 
     // Log effective min client version
@@ -4606,20 +4568,10 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     {
         CMtaVersion strKickMin;
 
-        if (g_pGame->IsBulletSyncActive())
+        if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
         {
-            if (strKickMin < BULLET_SYNC_MIN_CLIENT_VERSION)
-                strKickMin = BULLET_SYNC_MIN_CLIENT_VERSION;
-        }
-        if (m_pMainConfig->GetVehExtrapolatePercent() > 0)
-        {
-            if (strKickMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION)
-                strKickMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
-        }
-        if (m_pMainConfig->GetUseAltPulseOrder())
-        {
-            if (strKickMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION)
-                strKickMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
+            if (strKickMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
+                strKickMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
         }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)
