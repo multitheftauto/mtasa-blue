@@ -1744,54 +1744,56 @@ bool GetFirstAtomic(RpAtomic* atomic, void* data)
     return false;
 }
 
-bool CModelInfoSA::MakeAtomicModel(ushort usModelId)
+bool CModelInfoSA::MakeAtomicModel()
 {
     if (GetModelType() != eModelInfoType::CLUMP)
         return false;
 
-    CBaseModelInfoSAInterface*   pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[usModelId];
-    CAtomicModelInfoSAInterface* m_pInterface = new CAtomicModelInfoSAInterface();
-    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
+    CBaseModelInfoSAInterface*   pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[m_dwModelID];
+    CAtomicModelInfoSAInterface* pInterface = new CAtomicModelInfoSAInterface();
+    MemCpyFast(pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
 
     CAtomicModelInfo_SA_VTBL* vfbl = (CAtomicModelInfo_SA_VTBL*)vftable_CAtomicModelModelInfo;
-    m_pInterface->VFTBL = vfbl;
-    RpClump*  pClump = (RpClump*)m_pInterface->pRwObject;
+    pInterface->VFTBL = vfbl;
+    RpClump*  pClump = (RpClump*)pInterface->pRwObject;
     RpAtomic* firstAtomic = nullptr;
     RpClumpForAllAtomics(pClump, GetFirstAtomic, &firstAtomic);
     RwFrame* pFrame = RwFrameCreate();
     RpAtomic* pClonedAtomic = RpAtomicClone(firstAtomic);
     RpAtomicSetFrame(pClonedAtomic, pFrame);
 
-    m_pInterface->pRwObject = nullptr;
-    ((void(__thiscall*)(CAtomicModelInfoSAInterface * pThis, RpAtomic * pAtomic)) vfbl->SetAtomic)(m_pInterface, pClonedAtomic);
+    pInterface->pRwObject = nullptr;
+    ((void(__thiscall*)(CAtomicModelInfoSAInterface * pThis, RpAtomic * pAtomic)) vfbl->SetAtomic)(pInterface, pClonedAtomic);
 
-    ppModelInfo[m_dwModelID] = m_pInterface;
+    delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+    ppModelInfo[m_dwModelID] = pInterface;
 
     RpClumpDestroy(pClump);
     m_dwParentID = -1;
     return true;
 }
 
-bool CModelInfoSA::MakeClumpModel(ushort usModelId)
+bool CModelInfoSA::MakeClumpModel()
 {
     if (GetModelType() != eModelInfoType::ATOMIC)
         return false;
 
-    CBaseModelInfoSAInterface*  pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[usModelId];
-    CClumpModelInfoSAInterface* m_pInterface = new CClumpModelInfoSAInterface();
-    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
-    m_pInterface->m_nAnimFileIndex = -1;
+    CBaseModelInfoSAInterface*  pBaseObjectInfo = (CBaseModelInfoSAInterface*)ppModelInfo[m_dwModelID];
+    CClumpModelInfoSAInterface* pInterface = new CClumpModelInfoSAInterface();
+    MemCpyFast(pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
+    pInterface->m_nAnimFileIndex = -1;
 
     CClumpModelInfo_SA_VTBL* vfbl = (CClumpModelInfo_SA_VTBL*)vftable_CClumpModelModelInfo;
-    m_pInterface->VFTBL = vfbl;
+    pInterface->VFTBL = vfbl;
     RpClump*  pClump = RpClumpCreate();
-    RpAtomic* pAtomic = (RpAtomic*)m_pInterface->pRwObject;
+    RpAtomic* pAtomic = (RpAtomic*)pInterface->pRwObject;
     RpSetFrame(pClump, RwFrameCreate());
     RpClumpAddAtomic(pClump, pAtomic);
 
-    ((void(__thiscall*)(CClumpModelInfoSAInterface * pThis, RpClump * clump)) vfbl->SetClump)(m_pInterface, pClump);
+    ((void(__thiscall*)(CClumpModelInfoSAInterface * pThis, RpClump * clump)) vfbl->SetClump)(pInterface, pClump);
 
-    ppModelInfo[m_dwModelID] = m_pInterface;
+    delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+    ppModelInfo[m_dwModelID] = pInterface;
 
     m_dwParentID = -1;
     return true;
@@ -1811,6 +1813,9 @@ void CModelInfoSA::DeallocateModel(void)
             break;
         case eModelInfoType::ATOMIC:
             delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::CLUMP:
+            delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::TIME:
             delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);

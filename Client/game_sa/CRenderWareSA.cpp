@@ -507,11 +507,12 @@ static void CVisibilityPlugins_SetAtomicId(RpAtomic* pRpAtomic, int id)
     return ((void(__cdecl*)(RpAtomic*, int))0x732230)(pRpAtomic, id);
 }
 
-typedef struct
+struct SAtomicsAppend
 {
     RpClump* pClump;
     ushort   usModelId;
-} SAtomicsAppend;
+};
+
 bool AppendAtomic(RpAtomic* atomic, void* data)
 {
     RpAtomic*       pClonedAtomic = RpAtomicClone(atomic);

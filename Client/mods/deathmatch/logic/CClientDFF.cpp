@@ -294,7 +294,7 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
 
     if (pClump->object.type == RwObjectType::Clump)
-        pModelInfo->MakeClumpModel(usModel);
+        pModelInfo->MakeClumpModel();
 
     if (!pModelInfo->SetCustomModel(pClump))
         return false;

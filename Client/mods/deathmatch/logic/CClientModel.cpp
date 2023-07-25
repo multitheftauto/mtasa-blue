@@ -77,7 +77,7 @@ bool CClientModel::MakeAtomicModel()
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
 
-    if (!pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
+    if (pModelInfo != nullptr && !pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
         return false;
 
     eModelInfoType modelInfoType = pModelInfo->GetModelType();
@@ -85,7 +85,7 @@ bool CClientModel::MakeAtomicModel()
         return true;
 
     pModelInfo->Request(BLOCKING, "CClientModel::MakeAtomicModel");
-    if (pModelInfo->MakeAtomicModel(m_iModelID))
+    if (pModelInfo->MakeAtomicModel())
         m_bWasConvertedToClump = false;
     return true;
 }
@@ -94,7 +94,7 @@ bool CClientModel::MakeClumpModel()
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
 
-    if (!pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
+    if (pModelInfo != nullptr && !pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
         return false;
 
     eModelInfoType modelInfoType = pModelInfo->GetModelType();
@@ -102,7 +102,7 @@ bool CClientModel::MakeClumpModel()
         return true;
 
     pModelInfo->Request(BLOCKING, "CClientModel::MakeClumpModel");
-    if (pModelInfo->MakeClumpModel(m_iModelID))
+    if (pModelInfo->MakeClumpModel())
         m_bWasConvertedToClump = true;
     return true;
 }

@@ -303,8 +303,8 @@ public:
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
-    bool         MakeAtomicModel(ushort usBaseID);
-    bool         MakeClumpModel(ushort usBaseID);
+    bool         MakeAtomicModel();
+    bool         MakeClumpModel();
     void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 
