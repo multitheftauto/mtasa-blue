@@ -20,11 +20,6 @@ using StoreShadowToBeRendered_t = int(__cdecl*)(char type, RwTexture* texture, C
                                                 char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
 auto StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
 
-CFxSA::CFxSA(CFxSAInterface* pInterface) : m_pInterface(pInterface)
-{
-    m_textureMap[eShadowType::PLANE] = new RwTexture();
-}
-
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
     CVector* pvecPosition = &vecPosition;
