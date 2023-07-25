@@ -779,10 +779,9 @@ bool CAccountManager::CopyAccountData(CAccount* pFromAccount, CAccount* pToAccou
 
     if (!pFromAccount->IsRegistered())            // is not registered account, retrieve data from memory
     {
-        std::map<SString, CAccountData>::iterator iter = pFromAccount->DataBegin();
-        for (; iter != pFromAccount->DataEnd(); iter++)
+        for (const auto& iter : *pFromAccount)
         {
-            MapSet(copiedData, iter->second.GetKey(), CAccountData(iter->second.GetKey(), iter->second.GetStrValue(), iter->second.GetType()));
+            MapSet(copiedData, iter.second.GetKey(), CAccountData(iter.second.GetKey(), iter.second.GetStrValue(), iter.second.GetType()));
         }
     }
     else            // is registered account, retrieve from database
@@ -851,31 +850,30 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
 {
     if (!pAccount->IsRegistered())
     {
-        std::map<SString, CAccountData>::iterator iter = pAccount->DataBegin();
-        for (; iter != pAccount->DataEnd(); iter++)
+        for (const auto& iter : *pAccount)
         {
-            if (iter->second.GetType() == LUA_TNIL)
+            if (iter.second.GetType() == LUA_TNIL)
             {
-                lua_pushstring(pLua, iter->second.GetKey().c_str());
+                lua_pushstring(pLua, iter.second.GetKey().c_str());
                 lua_pushnil(pLua);
                 lua_settable(pLua, -3);
             }
-            if (iter->second.GetType() == LUA_TBOOLEAN)
+            if (iter.second.GetType() == LUA_TBOOLEAN)
             {
-                lua_pushstring(pLua, iter->second.GetKey().c_str());
-                lua_pushboolean(pLua, iter->second.GetStrValue() == "true");
+                lua_pushstring(pLua, iter.second.GetKey().c_str());
+                lua_pushboolean(pLua, iter.second.GetStrValue() == "true");
                 lua_settable(pLua, -3);
             }
-            if (iter->second.GetType() == LUA_TNUMBER)
+            if (iter.second.GetType() == LUA_TNUMBER)
             {
-                lua_pushstring(pLua, iter->second.GetKey().c_str());
-                lua_pushnumber(pLua, strtod(iter->second.GetStrValue().c_str(), NULL));
+                lua_pushstring(pLua, iter.second.GetKey().c_str());
+                lua_pushnumber(pLua, strtod(iter.second.GetStrValue().c_str(), NULL));
                 lua_settable(pLua, -3);
             }
             else
             {
-                lua_pushstring(pLua, iter->second.GetKey().c_str());
-                lua_pushstring(pLua, iter->second.GetStrValue().c_str());
+                lua_pushstring(pLua, iter.second.GetKey().c_str());
+                lua_pushstring(pLua, iter.second.GetStrValue().c_str());
                 lua_settable(pLua, -3);
             }
         }
@@ -896,7 +894,7 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
         return false;
 
     // Loop through until i is the same as the number of rows
-    for (const auto& row : *result.operator->())
+    for (const auto& row : result->Data)
     {
         // Get our key
         strKey = reinterpret_cast<const char*>(row[0].pVal);
@@ -938,7 +936,7 @@ void CAccountManager::GetAccountsBySerial(const SString& strSerial, std::vector<
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE serial = ?", SQLITE_TEXT, strSerial.c_str());
 
-    for (const auto& row : *result.operator->())
+    for (const auto& row : result->Data)
     {
         CAccount* pAccount = Get((const char*)row[0].pVal);
         if (pAccount)
@@ -952,7 +950,7 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE ip = ?", SQLITE_TEXT, strIP.c_str());
 
-    for (const auto& row : *result.operator->())
+    for (const auto& row : result->Data)
     {
         CAccount* pAccount = Get((const char*)row[0].pVal);
         if (pAccount)
@@ -965,7 +963,7 @@ CAccount* CAccountManager::GetAccountByID(int ID)
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE id = ?", SQLITE_INTEGER, ID);
 
-    for (const auto& row : *result.operator->())
+    for (const auto& row : result->Data)
     {
         return Get(reinterpret_cast<const char*>(row[0].pVal));
     }
@@ -981,7 +979,7 @@ void CAccountManager::GetAccountsByData(const SString& dataName, const SString& 
                                          "SELECT acc.name FROM accounts acc, userdata dat WHERE dat.key = ? AND dat.value = ? AND dat.userid = acc.id",
                                          SQLITE_TEXT, dataName.c_str(), SQLITE_TEXT, value.c_str());
 
-    for (const auto& row : *result.operator->())
+    for (const auto& row : result->Data)
     {
         CAccount* pAccount = Get((const char*)row[0].pVal);
         if (pAccount)
@@ -1174,7 +1172,7 @@ void CAccountManager::LoadAccountSerialUsage(CAccount* pAccount)
                                          " WHERE userid=?",
                                          SQLITE_INTEGER, pAccount->GetID());
 
-    for (const auto& row : *result.operator->())
+    for (const auto& row : result->Data)
     {
         outSerialUsageList.push_back(CAccount::SSerialUsage());
         CAccount::SSerialUsage& info = outSerialUsageList.back();
