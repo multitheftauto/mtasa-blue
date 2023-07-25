@@ -170,11 +170,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.WriteBit(pElement->IsCallPropagationEnabled());
 
             // Write custom data
-            CCustomData* pCustomData = pElement->GetCustomDataPointer();
-            assert(pCustomData);
-            BitStream.WriteCompressed(pCustomData->CountOnlySynchronized());
-            map<string, SCustomData>::const_iterator iter = pCustomData->SyncedIterBegin();
-            for (; iter != pCustomData->SyncedIterEnd(); ++iter)
+            CCustomData& pCustomData = pElement->GetCustomDataManager();
+            BitStream.WriteCompressed(pCustomData.CountOnlySynchronized());
+            map<string, SCustomData>::const_iterator iter = pCustomData.SyncedIterBegin();
+            for (; iter != pCustomData.SyncedIterEnd(); ++iter)
             {
                 const char*         szName = iter->first.c_str();
                 const CLuaArgument* pArgument = &iter->second.Variable;
@@ -240,6 +239,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Double sided
                     bool bIsDoubleSided = pObject->IsDoubleSided();
                     BitStream.WriteBit(bIsDoubleSided);
+
+                    // Breakable
+                    if (BitStream.Can(eBitStreamVersion::CEntityAddPacket_ObjectBreakable))
+                        BitStream.WriteBit(pObject->IsBreakable());
 
                     // Visible in all dimensions
                     if (BitStream.Can(eBitStreamVersion::DimensionOmnipresence))

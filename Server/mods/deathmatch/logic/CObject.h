@@ -78,6 +78,9 @@ public:
     bool IsVisibleInAllDimensions() { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible) { m_bVisibleInAllDimensions = bVisible; };
 
+    bool IsBreakable() { return m_bBreakable; }
+    void SetBreakable(bool bBreakable) { m_bBreakable = bBreakable; }
+
 protected:
     bool ReadSpecialData(const int iLine) override;
 

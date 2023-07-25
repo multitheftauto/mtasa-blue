@@ -21,14 +21,14 @@ void CLuaCameraDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Cam get funcs
-        {"getCamera", GetCamera},
+        {"getCamera", ArgumentParserWarn<false, GetCamera>},
         {"getCameraViewMode", ArgumentParserWarn<false, GetCameraViewMode>},
-        {"getCameraMatrix", GetCameraMatrix},
-        {"getCameraTarget", GetCameraTarget},
-        {"getCameraInterior", GetCameraInterior},
-        {"getCameraGoggleEffect", GetCameraGoggleEffect},
-        {"getCameraShakeLevel", GetCameraShakeLevel},
+        {"getCameraMatrix", ArgumentParserWarn<false, GetCameraMatrix>},
+        {"getCameraTarget", ArgumentParserWarn<false, GetCameraTarget>},
+        {"getCameraInterior", ArgumentParserWarn<false, GetCameraInterior>},
+        {"getCameraGoggleEffect", ArgumentParserWarn<false, GetCameraGoggleEffect>},
         {"getCameraFieldOfView", GetCameraFieldOfView},
+        {"getCameraDrunkLevel", ArgumentParserWarn<false, GetCameraDrunkLevel>},
 
         // Cam set funcs
         {"setCameraMatrix", SetCameraMatrix},
@@ -40,7 +40,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraClip", GetCameraClip},
         {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
-        {"setCameraShakeLevel", SetCameraShakeLevel},
+        {"setCameraDrunkLevel", ArgumentParserWarn<false, SetCameraDrunkLevel>},
     };
 
     // Add functions
@@ -61,7 +61,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTarget", "getCameraTarget");
     lua_classfunction(luaVM, "getInterior", "getCameraInterior");
     lua_classfunction(luaVM, "getViewMode", "getCameraViewMode");
-    lua_classfunction(luaVM, "getMatrix", OOP_GetCameraMatrix);
+    lua_classfunction(luaVM, "getMatrix", ArgumentParserWarn<false, OOP_GetCameraMatrix>);
     lua_classfunction(luaVM, "getFieldOfView", "getCameraFieldOfView");
     lua_classfunction(luaVM, "getGoggleEffect", "getCameraGoggleEffect");
     lua_classfunction(luaVM, "getClip", "getCameraClip");
@@ -90,23 +90,18 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "position", OOP_SetCameraPosition, OOP_GetCameraPosition);
     lua_classvariable(luaVM, "rotation", OOP_SetCameraRotation, OOP_GetCameraRotation);
-    lua_classvariable(luaVM, "matrix", NULL, OOP_GetCameraMatrix);
+    lua_classvariable(luaVM, "matrix", NULL, ArgumentParserWarn<false, OOP_GetCameraMatrix>);
     lua_classvariable(luaVM, "type", nullptr, ArgumentParser<GetElementType>);
 
     lua_registerstaticclass(luaVM, "Camera");
 }
 
-int CLuaCameraDefs::GetCamera(lua_State* luaVM)
+std::variant<CClientCamera*, bool> CLuaCameraDefs::GetCamera()
 {
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
     if (pCamera)
-    {
-        lua_pushelement(luaVM, pCamera);
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+        return pCamera;
+    return false;
 }
 
 CLuaMultiReturn<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode()
@@ -119,89 +114,52 @@ CLuaMultiReturn<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode(
     return {ucVehicleMode, ucPedMode};
 }
 
-int CLuaCameraDefs::GetCameraMatrix(lua_State* luaVM)
+CLuaMultiReturn<float, float, float, float, float, float, float, float> CLuaCameraDefs::GetCameraMatrix()
 {
     CVector vecPosition, vecLookAt;
     float   fRoll, fFOV;
-    if (CStaticFunctionDefinitions::GetCameraMatrix(vecPosition, vecLookAt, fRoll, fFOV))
-    {
-        lua_pushnumber(luaVM, vecPosition.fX);
-        lua_pushnumber(luaVM, vecPosition.fY);
-        lua_pushnumber(luaVM, vecPosition.fZ);
-        lua_pushnumber(luaVM, vecLookAt.fX);
-        lua_pushnumber(luaVM, vecLookAt.fY);
-        lua_pushnumber(luaVM, vecLookAt.fZ);
-        lua_pushnumber(luaVM, fRoll);
-        lua_pushnumber(luaVM, fFOV);
-        return 8;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CStaticFunctionDefinitions::GetCameraMatrix(vecPosition, vecLookAt, fRoll, fFOV);
+    return {vecPosition.fX, vecPosition.fY, vecPosition.fZ, vecLookAt.fX, vecLookAt.fY, vecLookAt.fZ, fRoll, fFOV};
 }
 
-int CLuaCameraDefs::OOP_GetCameraMatrix(lua_State* luaVM)
+CMatrix CLuaCameraDefs::OOP_GetCameraMatrix()
 {
     CMatrix matrix;
     m_pManager->GetCamera()->GetMatrix(matrix);
-
-    lua_pushmatrix(luaVM, matrix);
-    return 1;
+    return matrix;
 }
 
-int CLuaCameraDefs::GetCameraTarget(lua_State* luaVM)
+std::variant<CClientEntity*, bool> CLuaCameraDefs::GetCameraTarget()
 {
     CClientEntity* pTarget = CStaticFunctionDefinitions::GetCameraTarget();
     if (pTarget)
-    {
-        lua_pushelement(luaVM, pTarget);
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+        return pTarget;
+    return false;
 }
 
-int CLuaCameraDefs::GetCameraInterior(lua_State* luaVM)
+unsigned char CLuaCameraDefs::GetCameraInterior()
 {
     unsigned char ucInterior;
-    if (CStaticFunctionDefinitions::GetCameraInterior(ucInterior))
-    {
-        lua_pushnumber(luaVM, ucInterior);
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CStaticFunctionDefinitions::GetCameraInterior(ucInterior);
+    return ucInterior;
 }
 
-int CLuaCameraDefs::GetCameraGoggleEffect(lua_State* luaVM)
+std::string CLuaCameraDefs::GetCameraGoggleEffect()
 {
     bool bNightVision = g_pMultiplayer->IsNightVisionEnabled();
     bool bThermalVision = g_pMultiplayer->IsThermalVisionEnabled();
 
     if (bNightVision)
-        lua_pushstring(luaVM, "nightvision");
+        return "nightvision";
     else if (bThermalVision)
-        lua_pushstring(luaVM, "thermalvision");
+        return "thermalvision";
     else
-        lua_pushstring(luaVM, "normal");
-
-    return 1;
+        return "normal";
 }
 
-int CLuaCameraDefs::GetCameraShakeLevel(lua_State* luaVM)
+unsigned char CLuaCameraDefs::GetCameraDrunkLevel()
 {
-    //  int getCameraShakeLevel ()
-    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
-    if (pPlayerInfo)
-    {
-        lua_pushnumber(luaVM, pPlayerInfo->GetCamDrunkLevel());
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return g_pGame->GetPlayerInfo()->GetCamDrunkLevel();
 }
 
 int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
@@ -506,34 +464,15 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
     return 1;
 }
 
-int CLuaCameraDefs::SetCameraShakeLevel(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)
 {
-    //  bool setCameraShakeLevel ( int level )
-    int              drunkLevel;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(drunkLevel);
+    if (drunkLevel < 0 || drunkLevel > 255)
+        throw std::invalid_argument("Invalid range (0-255)");
 
-    if (!argStream.HasErrors())
-    {
-        if (drunkLevel >= 0 && drunkLevel <= 255)
-        {
-            CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
-            if (pPlayerInfo)
-            {
-                pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(drunkLevel));
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-            argStream.SetCustomError("Invalid range (0-255)");
-    }
+    CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
+    pPlayerInfo->SetCamDrunkLevel(drunkLevel);
 
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return true;
 }
 
 int CLuaCameraDefs::OOP_GetCameraPosition(lua_State* luaVM)

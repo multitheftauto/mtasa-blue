@@ -130,6 +130,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+    m_Glitches[GLITCH_DONTBURNFLIPPEDCARS] = false;
+    g_pMultiplayer->SetBurnFlippedCarsEnabled(true);
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
@@ -532,6 +534,9 @@ CClientGame::~CClientGame()
     m_bBeingDeleted = false;
 
     CStaticFunctionDefinitions::ResetAllSurfaceInfo();
+
+    // Reset custom streaming memory size [possibly] set by the server
+    g_pCore->SetCustomStreamingMemory(0);
 }
 
 /*
@@ -883,18 +888,21 @@ void CClientGame::DoPulsePostFrame()
                                                DT_NOCLIP | DT_CENTER);
         }
 
-        // Adjust the streaming memory limit.
-        unsigned int uiStreamingMemoryPrev;
-        g_pCore->GetCVars()->Get("streaming_memory", uiStreamingMemoryPrev);
-        uint uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemoryPrev, g_pCore->GetMaxStreamingMemory());
-        if (uiStreamingMemory != uiStreamingMemoryPrev)
-            g_pCore->GetCVars()->Set("streaming_memory", uiStreamingMemory);
+        // Adjust the streaming memory size cvar [if needed]
+        if (!g_pCore->IsUsingCustomStreamingMemorySize()) {
+            unsigned int uiStreamingMemoryPrev;
+            g_pCore->GetCVars()->Get("streaming_memory", uiStreamingMemoryPrev);
+            uint uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemoryPrev, g_pCore->GetMaxStreamingMemory());
+            if (uiStreamingMemory != uiStreamingMemoryPrev)
+                g_pCore->GetCVars()->Set("streaming_memory", uiStreamingMemory);
+        }
 
-        int iStreamingMemoryBytes = static_cast<int>(uiStreamingMemory) * 1024 * 1024;
-        if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != iStreamingMemoryBytes)
-            g_pMultiplayer->GetLimits()->SetStreamingMemory(iStreamingMemoryBytes);
+        const auto streamingMemorySizeBytes = g_pCore->GetStreamingMemory();
+        if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != streamingMemorySizeBytes) {
+            g_pMultiplayer->GetLimits()->SetStreamingMemory(streamingMemorySizeBytes);
+        }
 
-            // If we're in debug mode and are supposed to show task data, do it
+        // If we're in debug mode and are supposed to show task data, do it
         #ifdef MTA_DEBUG
         if (m_pShowPlayerTasks)
         {
@@ -5344,6 +5352,10 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->ResetWater();
     g_pMultiplayer->ResetColorFilter();
 
+    // Grain effect
+    g_pMultiplayer->SetGrainMultiplier(eGrainMultiplierType::ALL, 1.0f);
+    g_pMultiplayer->SetGrainLevel(0);
+
     // Water
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
 
@@ -5429,7 +5441,7 @@ void CClientGame::ResetMapInfo()
     if (pPlayerInfo)
         pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
-    RestreamWorld();
+    RestreamWorld(true);
 }
 
 void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,
@@ -5883,6 +5895,8 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
             g_pMultiplayer->DisableQuickReload(!bEnabled);
         if (ucGlitch == GLITCH_CLOSEDAMAGE)
             g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
+        if (ucGlitch == GLITCH_DONTBURNFLIPPEDCARS)
+            g_pMultiplayer->SetBurnFlippedCarsEnabled(!bEnabled);
         return true;
     }
     return false;
@@ -6551,7 +6565,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
-void CClientGame::RestreamWorld()
+void CClientGame::RestreamWorld(bool removeBigBuildings)
 {
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
@@ -6563,6 +6577,9 @@ void CClientGame::RestreamWorld()
     m_pManager->GetVehicleManager()->RestreamAllVehicles();
     m_pManager->GetPedManager()->RestreamAllPeds();
     m_pManager->GetPickupManager()->RestreamAllPickups();
+
+    if (removeBigBuildings)
+        g_pGame->GetStreaming()->RemoveBigBuildings();
 
     g_pGame->GetStreaming()->ReinitStreaming();
 }

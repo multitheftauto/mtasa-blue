@@ -47,6 +47,16 @@ enum EVehicleWeaponType : int
     HEAT_SEEKING_ROCKET,
 };
 
+enum class eGrainMultiplierType
+{
+    MASTER = 0,
+    INFRARED,
+    NIGHT,
+    RAIN,
+    OVERLAY,
+    ALL
+};
+
 struct SVehicleWeaponHitEvent
 {
     EVehicleWeaponType  weaponType;
@@ -204,6 +214,7 @@ public:
     virtual void DisableQuickReload(bool bDisable) = 0;
     virtual void DisableCloseRangeDamage(bool bDisable) = 0;
     virtual void DisableBadDrivebyHitboxes(bool bDisable) = 0;
+    virtual void SetBurnFlippedCarsEnabled(bool bEnable) = 0;
 
     virtual bool  GetExplosionsDisabled() = 0;
     virtual void  DisableExplosions(bool bDisabled) = 0;
@@ -260,6 +271,8 @@ public:
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
     virtual void  ResetColorFilter() = 0;
     virtual void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color) = 0;
+    virtual void  SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier) = 0;
+    virtual void  SetGrainLevel(BYTE ucLevel) = 0;
     virtual void  ResetHeatHaze() = 0;
     virtual void  SetHeatHazeEnabled(bool bEnabled) = 0;
     virtual bool  HasWaterColor() = 0;

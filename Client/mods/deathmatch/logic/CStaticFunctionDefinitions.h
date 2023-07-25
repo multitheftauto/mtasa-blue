@@ -561,7 +561,7 @@ public:
     // World functions
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMin);
     static bool ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity,
-                                   const SLineOfSightFlags& flags = SLineOfSightFlags(), std::vector<CClientEntity*> vecIgnoredElements = {},
+                                   const SLineOfSightFlags& flags = SLineOfSightFlags(), CEntity* pIgnoredEntity = NULL,
                                    SLineOfSightBuildingResult* pBuildingResult = NULL);
     static bool IsLineOfSightClear(const CVector& vecStart, const CVector& vecEnd, bool& bIsClear, const SLineOfSightFlags& flags = SLineOfSightFlags(),
                                    CEntity* pIgnoredEntity = NULL);

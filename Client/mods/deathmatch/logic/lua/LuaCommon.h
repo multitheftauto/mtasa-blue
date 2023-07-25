@@ -84,8 +84,6 @@ void lua_classvariable(lua_State* luaVM, const char* szVariable, lua_CFunction s
 void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* set, const char* get);
 void lua_classmetamethod(lua_State* luaVM, const char* szName, lua_CFunction fn);
 
-const char* lua_makestring(lua_State* luaVM, int iArgument);
-
 class CLuaMain&  lua_getownercluamain(lua_State* L);
 class CResource& lua_getownerresource(lua_State* L);
 

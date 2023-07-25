@@ -191,6 +191,7 @@ public:
         GLITCH_BADDRIVEBYHITBOX,
         GLITCH_QUICKSTAND,
         GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE,
+        GLITCH_DONTBURNFLIPPEDCARS,
         NUM_GLITCHES
     };
 
@@ -440,7 +441,7 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
-    void RestreamWorld();
+    void RestreamWorld(bool removeBigBuildings);
 
     void OnWindowFocusChange(bool state);
 
@@ -805,9 +806,9 @@ private:
     bool                      m_bDoPaintballs;
     bool                      m_bShowInterpolation;
     #endif
-    bool m_bDevelopmentMode;
-    bool m_bShowCollision;
-    bool m_bShowSound;
+    bool                      m_bDevelopmentMode;
+    bool                      m_bShowCollision;
+    bool                      m_bShowSound;
 
     // Debug class. Empty in release.
 public:
