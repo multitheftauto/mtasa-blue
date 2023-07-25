@@ -83,6 +83,7 @@
 #define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
 #define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
 #define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION   "1.5.1"
+#define DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION  "1.6.0-9.21897"
 
 #ifndef WIN32
     #include <limits.h>
@@ -235,6 +236,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
+    m_Glitches[GLITCH_DONTBURNFLIPPEDCARS] = false;
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
 
@@ -252,6 +254,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_GlitchNames["baddrivebyhitbox"] = GLITCH_BADDRIVEBYHITBOX;
     m_GlitchNames["quickstand"] = GLITCH_QUICKSTAND;
     m_GlitchNames["kickoutofvehicle_onmodelreplace"] = GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE;
+    m_GlitchNames["dontburnflippedcars"] = GLITCH_DONTBURNFLIPPEDCARS;
 
     m_bCloudsEnabled = true;
 
@@ -4582,6 +4585,11 @@ CMtaVersion CGame::CalculateMinClientRequirement()
         if (strNewMin < HIT_ANIM_CLIENT_VERSION)
             strNewMin = HIT_ANIM_CLIENT_VERSION;
     }
+    if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+    {
+        if (strNewMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
+            strNewMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
+    }
 
     // Log effective min client version
     if (strNewMin != m_strPrevMinClientConnectRequirement)
@@ -4618,6 +4626,16 @@ CMtaVersion CGame::CalculateMinClientRequirement()
         {
             if (strKickMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION)
                 strKickMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
+        }
+        if (g_pGame->IsGlitchEnabled(GLITCH_HITANIM))
+        {
+            if (strKickMin < HIT_ANIM_CLIENT_VERSION)
+                strKickMin = HIT_ANIM_CLIENT_VERSION;
+        }
+        if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+        {
+            if (strKickMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
+                strKickMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
         }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)
