@@ -75,7 +75,6 @@
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
 #define RELEASE_MIN_CLIENT_VERSION              "1.6.0-0.00000"
-#define DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION  "1.6.0-5.21897"
 
 #ifndef WIN32
     #include <limits.h>
@@ -228,7 +227,6 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
-    m_Glitches[GLITCH_DONTBURNFLIPPEDCARS] = false;
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
 
@@ -246,7 +244,6 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_GlitchNames["baddrivebyhitbox"] = GLITCH_BADDRIVEBYHITBOX;
     m_GlitchNames["quickstand"] = GLITCH_QUICKSTAND;
     m_GlitchNames["kickoutofvehicle_onmodelreplace"] = GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE;
-    m_GlitchNames["dontburnflippedcars"] = GLITCH_DONTBURNFLIPPEDCARS;
 
     m_bCloudsEnabled = true;
 
@@ -4539,11 +4536,13 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < strMinClientRequirementFromResources)
         strNewMin = strMinClientRequirementFromResources;
 
+#if 0
     if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
     {
         if (strNewMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
             strNewMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
     }
+#endif
 
     // Log effective min client version
     if (strNewMin != m_strPrevMinClientConnectRequirement)
@@ -4562,6 +4561,7 @@ CMtaVersion CGame::CalculateMinClientRequirement()
         SendSyncSettings();
     }
 
+#if 0
     // Do version based kick check as well
     {
         CMtaVersion strKickMin;
@@ -4592,6 +4592,7 @@ CMtaVersion CGame::CalculateMinClientRequirement()
                 CLogger::LogPrintf(SString("Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin));
         }
     }
+#endif
 
     // Also seems a good place to keep this setting synchronized
     g_pBandwidthSettings->NotifyBulletSyncEnabled(g_pGame->IsBulletSyncActive());
