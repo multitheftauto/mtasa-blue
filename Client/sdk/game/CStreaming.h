@@ -13,6 +13,9 @@
 
 #include <stdint.h>
 
+#define INVALID_ARCHIVE_ID 0xFF
+#define INVALID_STREAM_ID 0xFF
+
 struct CStreamingInfo
 {
     uint16_t prevId = (uint16_t)-1;
@@ -43,4 +46,5 @@ public:
     virtual uint32 GetStreamingBufferSize() = 0;
     virtual void   MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
     virtual std::uint32_t GetMemoryUsed() const = 0;
+    virtual void          RemoveBigBuildings() = 0;
 };

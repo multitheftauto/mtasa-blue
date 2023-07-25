@@ -9,8 +9,11 @@ on:
     - '.github/workflows/dockerimage.yaml'
     - 'utils/compat/**'
     - 'Dockerfile'
+    - 'Dockerfile.i386'
     - 'Dockerfile.armhf'
     - 'Dockerfile.arm64'
+    - 'Dockerfile.osx-x64'
+    - 'Dockerfile.osx-arm64'
 
 jobs:
   build:
@@ -19,10 +22,16 @@ jobs:
         include:
         - tag: latest
           dockerfile: Dockerfile
+        - tag: i386
+          dockerfile: Dockerfile.i386
         - tag: armhf
           dockerfile: Dockerfile.armhf
         - tag: arm64
           dockerfile: Dockerfile.arm64
+        - tag: osx-x64
+          dockerfile: Dockerfile.osx-x64
+        - tag: osx-arm64
+          dockerfile: Dockerfile.osx-arm64
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
