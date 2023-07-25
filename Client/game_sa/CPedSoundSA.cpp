@@ -18,12 +18,12 @@ SPedVoiceName* CPedSoundSA::m_pVoiceNamesPerType[] = {(SPedVoiceName*)VAR_CAEPed
                                                       (SPedVoiceName*)VAR_CAEPedSound__VoiceNames_PLAYER, (SPedVoiceName*)VAR_CAEPedSound__VoiceNames_GANG,
                                                       (SPedVoiceName*)VAR_CAEPedSound__VoiceNames_GFD};
 
-short CPedSoundSA::GetVoiceTypeID()
+short CPedSoundSA::GetVoiceTypeID() const
 {
     return m_pInterface->m_sVoiceType;
 }
 
-short CPedSoundSA::GetVoiceID()
+short CPedSoundSA::GetVoiceID() const
 {
     return m_pInterface->m_sVoiceID;
 }
@@ -38,7 +38,7 @@ void CPedSoundSA::SetVoiceID(short sVoiceID)
     m_pInterface->m_sVoiceID = sVoiceID;
 }
 
-bool CPedSoundSA::IsSpeechDisabled()
+bool CPedSoundSA::IsSpeechDisabled() const
 {
     bool  bReturn;
     DWORD dwThis = (DWORD)m_pInterface;

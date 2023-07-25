@@ -235,7 +235,7 @@ public:
     CEntitySAInterface* m_pInterface;
 
     CEntitySA();
-    CEntitySAInterface* GetInterface() { return m_pInterface; };
+    CEntitySAInterface* GetInterface() const { return m_pInterface; };
     void                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
     bool IsPed() { return GetEntityType() == ENTITY_TYPE_PED; }

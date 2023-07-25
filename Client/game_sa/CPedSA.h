@@ -209,9 +209,8 @@ class CPedWeaponAudioEntitySAInterface
 public:
 };
 
-class CPedSAInterface : public CPhysicalSAInterface            // +1420  = current vehicle   312 first byte
+struct CPedSAInterface : public CPhysicalSAInterface  // +1420  = current vehicle   312 first byte
 {
-public:
     // current weapon slot 1184 ( and +1816?)
     // CPedIKSAInterface     pedIK; // 528
     // CWeaponSAInterface    Weapons[9]; // 1032
@@ -265,25 +264,24 @@ class CPedSA : public virtual CPed, public virtual CPhysicalSA
 
 private:
     CWeaponSA*          m_pWeapons[WEAPONSLOT_MAX];
-    CPedIKSA*           m_pPedIK;
-    CPedIntelligenceSA* m_pPedIntelligence;
-    CPedSAInterface*    m_pPedInterface;
-    CPedSoundSA*        m_pPedSound;
-    CPedSoundSA*        m_pDefaultPedSound;
+    CPedIKSA*           m_pPedIK = NULL;
+    CPedIntelligenceSA* m_pPedIntelligence = NULL;
+    CPedSAInterface*    m_pPedInterface = NULL;
+    CPedSoundSA*        m_pPedSound = NULL;
+    CPedSoundSA*        m_pDefaultPedSound = NULL;
 
-    DWORD         m_dwType;
-    unsigned char m_ucOccupiedSeat;
+    DWORD         m_dwType{};
+    unsigned char m_ucOccupiedSeat{};
 
 protected:
-    int m_iCustomMoveAnim;
+    int m_iCustomMoveAnim = 0;
 
 public:
-    CPedSA();
-    CPedSA(CPedSAInterface* pedInterface);
+    CPedSA(CPedSAInterface* pedInterface = NULL);
     ~CPedSA();
 
     void             SetInterface(CEntitySAInterface* intInterface);
-    CPedSAInterface* GetPedInterface() { return (CPedSAInterface*)GetInterface(); }
+    CPedSAInterface* GetPedInterface() const { return static_cast<CPedSAInterface*>(GetInterface()); }
     void             Init();
     void             SetModelIndex(DWORD dwModelIndex);
     void             RemoveGeometryRef();

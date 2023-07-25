@@ -70,15 +70,22 @@ private:
     CPedSoundSAInterface* m_pInterface;
 
 public:
-    CPedSoundSA(CPedSoundSAInterface* pInterface) { m_pInterface = pInterface; }
-    CPedSoundSAInterface* GetInterface() { return m_pInterface; }
+    CPedSoundSA(CPedSoundSAInterface&& pInterface) noexcept
+        : m_pInterface(new CPedSoundSAInterface())
+    {
+        SetVoiceID(pInterface.m_sVoiceID);
+        SetVoiceTypeID(pInterface.m_sVoiceType);
+    }
 
-    short GetVoiceTypeID();
-    short GetVoiceID();
+    CPedSoundSA(CPedSoundSAInterface* pInterface) { m_pInterface = pInterface; }
+    CPedSoundSAInterface* GetInterface() const { return m_pInterface; }
+
+    short GetVoiceTypeID() const;
+    short GetVoiceID() const;
     void  SetVoiceTypeID(short sVoiceType);
     void  SetVoiceID(short sVoiceID);
 
-    bool IsSpeechDisabled();
+    bool IsSpeechDisabled() const;
     void EnablePedSpeech();
     void DisablePedSpeech(bool bStopCurrent);
 

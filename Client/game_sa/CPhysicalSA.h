@@ -26,9 +26,8 @@
 #define PHYSICAL_MAXNOOFCOLLISIONRECORDS        6
 #define PHYSICAL_MAXMASS                        99999.0
 
-class CPhysicalSAInterface : public CEntitySAInterface
+struct CPhysicalSAInterface : public CEntitySAInterface
 {
-public:
     float  pad1;            // 56
     uint32 pad2;            // 60
 

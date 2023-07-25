@@ -56,7 +56,7 @@ public:
     virtual ~CEntity(){};
 
     //  virtual VOID                        SetModelAlpha ( int iAlpha )=0;
-    virtual class CEntitySAInterface* GetInterface() = 0;
+    virtual class CEntitySAInterface* GetInterface() const = 0;
     virtual void                      UpdateRpHAnim() = 0;
     virtual bool                      SetScaleInternal(const CVector& scale) = 0;
     virtual void                      SetPosition(float fX, float fY, float fZ) = 0;

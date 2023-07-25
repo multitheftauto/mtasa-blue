@@ -16,14 +16,14 @@ class CPedSoundSAInterface;
 class CPedSound
 {
 public:
-    virtual CPedSoundSAInterface* GetInterface() = 0;
+    virtual CPedSoundSAInterface* GetInterface() const = 0;
 
-    virtual short GetVoiceTypeID() = 0;
-    virtual short GetVoiceID() = 0;
+    virtual short GetVoiceTypeID() const = 0;
+    virtual short GetVoiceID() const = 0;
     virtual void  SetVoiceTypeID(short sVoiceType) = 0;
     virtual void  SetVoiceID(short sVoiceID) = 0;
 
-    virtual bool IsSpeechDisabled() = 0;
+    virtual bool IsSpeechDisabled() const = 0;
     virtual void EnablePedSpeech() = 0;
     virtual void DisablePedSpeech(bool bStopCurrent) = 0;
 };
