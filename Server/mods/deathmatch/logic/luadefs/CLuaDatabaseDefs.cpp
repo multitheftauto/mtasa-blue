@@ -515,8 +515,9 @@ void PushRegistryResultTable(lua_State* luaVM, const CRegistryResultData* Result
 {
     lua_newtable(luaVM);
     int i = 0;
-    for (const auto& row : Result->Data)
+    for (CRegistryResultIterator iter = Result->begin(); iter != Result->end(); ++iter, ++i)
     {
+        const CRegistryResultRow& row = *iter;
         lua_pushnumber(luaVM, i + 1);
         lua_newtable(luaVM);
         for (int j = 0; j < Result->nColumns; j++)
@@ -528,16 +529,16 @@ void PushRegistryResultTable(lua_State* luaVM, const CRegistryResultData* Result
             switch (cell.nType)            // push the value with the right type
             {
                 case SQLITE_INTEGER:
-                    lua_pushnumber(luaVM, cell.GetNumber<double>());
+                    lua_pushnumber(luaVM, static_cast<double>(cell.nVal));
                     break;
                 case SQLITE_FLOAT:
-                    lua_pushnumber(luaVM, cell.GetNumber<float>());
+                    lua_pushnumber(luaVM, cell.fVal);
                     break;
                 case SQLITE_BLOB:
-                    lua_pushlstring(luaVM, cell.GetString(), cell.nLength);
+                    lua_pushlstring(luaVM, (const char*)cell.pVal, cell.nLength);
                     break;
                 case SQLITE_TEXT:
-                    lua_pushlstring(luaVM, cell.GetString(), cell.nLength - 1);
+                    lua_pushlstring(luaVM, (const char*)cell.pVal, cell.nLength - 1);
                     break;
                 default:
                     lua_pushboolean(luaVM, false);
@@ -682,8 +683,9 @@ int CLuaDatabaseDefs::ExecuteSQLQuery(lua_State* luaVM)
         {
             lua_newtable(luaVM);
             int i = 0;
-            for (const auto& row : Result->Data)
+            for (CRegistryResultIterator iter = Result->begin(); iter != Result->end(); ++iter, ++i)
             {
+                const CRegistryResultRow& row = *iter;
                 // for ( int i = 0; i < Result.nRows; i++ ) {
                 lua_newtable(luaVM);                     // new table
                 lua_pushnumber(luaVM, i + 1);            // row index number (starting at 1, not 0)
@@ -700,16 +702,16 @@ int CLuaDatabaseDefs::ExecuteSQLQuery(lua_State* luaVM)
                     switch (cell.nType)            // push the value with the right type
                     {
                         case SQLITE_INTEGER:
-                            lua_pushnumber(luaVM, cell.GetNumber<double>());
+                            lua_pushnumber(luaVM, static_cast<double>(cell.nVal));
                             break;
                         case SQLITE_FLOAT:
-                            lua_pushnumber(luaVM, cell.GetNumber<float>());
+                            lua_pushnumber(luaVM, cell.fVal);
                             break;
                         case SQLITE_BLOB:
-                            lua_pushlstring(luaVM, cell.GetString(), cell.nLength);
+                            lua_pushlstring(luaVM, (const char*)cell.pVal, cell.nLength);
                             break;
                         case SQLITE_TEXT:
-                            lua_pushlstring(luaVM, cell.GetString(), cell.nLength - 1);
+                            lua_pushlstring(luaVM, (const char*)cell.pVal, cell.nLength - 1);
                             break;
                         default:
                             lua_pushnil(luaVM);
@@ -778,16 +780,16 @@ int CLuaDatabaseDefs::ExecuteSQLSelect(lua_State* luaVM)
                     switch (cell.nType)            // push the value with the right type
                     {
                         case SQLITE_INTEGER:
-                            lua_pushnumber(luaVM, cell.GetNumber<double>());
+                            lua_pushnumber(luaVM, static_cast<double>(cell.nVal));
                             break;
                         case SQLITE_FLOAT:
-                            lua_pushnumber(luaVM, cell.GetNumber<float>());
+                            lua_pushnumber(luaVM, cell.fVal);
                             break;
                         case SQLITE_BLOB:
-                            lua_pushlstring(luaVM, cell.GetString(), cell.nLength);
+                            lua_pushlstring(luaVM, (const char*)cell.pVal, cell.nLength);
                             break;
                         case SQLITE_TEXT:
-                            lua_pushlstring(luaVM, cell.GetString(), cell.nLength - 1);
+                            lua_pushlstring(luaVM, (const char*)cell.pVal, cell.nLength - 1);
                             break;
                         default:
                             lua_pushnil(luaVM);

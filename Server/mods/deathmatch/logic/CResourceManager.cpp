@@ -1365,10 +1365,11 @@ void CResourceManager::LoadBlockedFileReasons()
     if (result->nRows > 0 && result->nColumns >= 2)
     {
         m_BlockedFileReasonMap.clear();
-        for (const auto& row : result->Data)
+        for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
         {
-            SString strFileHash = row[0].GetString();
-            SString strReason = row[1].GetString();
+            const CRegistryResultRow& row = *iter;
+            SString                   strFileHash = (const char*)row[0].pVal;
+            SString                   strReason = (const char*)row[1].pVal;
             MapSet(m_BlockedFileReasonMap, strFileHash, strReason);
         }
     }

@@ -301,16 +301,27 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
                         case SQLITE_NULL:
                             break;
                         case SQLITE_INTEGER:
-                            cell.swap(std::atoll(inData));
+                            cell.nVal = std::atoll(inData);
                             break;
                         case SQLITE_FLOAT:
-                            cell.swap(0, static_cast<float>(atof(inData)));
+                            cell.fVal = (float)atof(inData);
                             break;
                         case SQLITE_BLOB:
-                            cell.swap(0, 0, inData, inLength);
+                            cell.nLength = inLength;
+                            if (cell.nLength == 0)
+                            {
+                                cell.pVal = NULL;
+                            }
+                            else
+                            {
+                                cell.pVal = new unsigned char[cell.nLength];
+                                memcpy(cell.pVal, inData, cell.nLength);
+                            }
                             break;
                         default:
-                            cell.swap(0, 0, inData, inLength + 1);
+                            cell.nLength = inLength + 1;
+                            cell.pVal = new unsigned char[cell.nLength];
+                            memcpy(cell.pVal, inData, cell.nLength);
                             break;
                     }
                 }
