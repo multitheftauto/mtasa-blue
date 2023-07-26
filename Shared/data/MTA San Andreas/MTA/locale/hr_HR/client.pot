@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-25 20:20+0000\n"
-"PO-Revision-Date: 2023-07-25 21:02\n"
+"POT-Creation-Date: 2023-07-26 09:56+0000\n"
+"PO-Revision-Date: 2023-07-26 10:12\n"
 "Last-Translator: \n"
 "Language-Team: Croatian\n"
 "Language: hr_HR\n"
@@ -1793,31 +1793,31 @@ msgstr "Miš fix:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Popravak pomicanja miša - Može zahtijevati ponovno pokretanje računala"
 
-#: Client/core/CCredits.cpp:32
+#: Client/core/CCredits.cpp:34
 msgid "Programming"
 msgstr "Programiranje"
 
-#: Client/core/CCredits.cpp:61
+#: Client/core/CCredits.cpp:63
 msgid "Contributors"
 msgstr "Doprinositelji"
 
-#: Client/core/CCredits.cpp:82
+#: Client/core/CCredits.cpp:84
 msgid "Game Design / Scripting"
 msgstr "Dizajn igre / Skriptanje"
 
-#: Client/core/CCredits.cpp:102
+#: Client/core/CCredits.cpp:104
 msgid "Language Localization"
 msgstr "Lokalizacija jezika"
 
-#: Client/core/CCredits.cpp:108
+#: Client/core/CCredits.cpp:110
 msgid "Patch contributors"
 msgstr "Doprinositelji zakrpa"
 
-#: Client/core/CCredits.cpp:232
+#: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
 msgstr "Posebne zahvale"
 
-#: Client/core/CCredits.cpp:263
+#: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
 msgstr ""
 
