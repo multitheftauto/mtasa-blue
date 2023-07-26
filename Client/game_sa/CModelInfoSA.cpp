@@ -1712,15 +1712,15 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 
 void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 {
-    CClumpModelInfoSAInterface* m_pInterface = new CClumpModelInfoSAInterface();
+    CClumpModelInfoSAInterface* pNewInterface = new CClumpModelInfoSAInterface();
     CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
-    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
-    m_pInterface->usNumberOfRefs = 0;
-    m_pInterface->pRwObject = nullptr;
-    m_pInterface->usUnknown = 65535;
-    m_pInterface->usDynamicIndex = 65535;
+    MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
+    pNewInterface->usNumberOfRefs = 0;
+    pNewInterface->pRwObject = nullptr;
+    pNewInterface->usUnknown = 65535;
+    pNewInterface->usDynamicIndex = 65535;
 
-    ppModelInfo[m_dwModelID] = m_pInterface;
+    ppModelInfo[m_dwModelID] = pNewInterface;
 
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
