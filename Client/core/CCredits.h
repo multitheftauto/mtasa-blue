@@ -16,6 +16,8 @@ class CCredits;
 #include "CMainMenu.h"
 #include <ctime>
 
+#define MAX_CREDITS_LABEL_COUNT 120
+
 class CCredits
 {
 public:
@@ -31,7 +33,7 @@ public:
 
 private:
     CGUIWindow* m_pWindow;
-    CGUILabel*  m_pLabels[30];
+    CGUILabel*  m_pLabels[MAX_CREDITS_LABEL_COUNT];
     CGUIButton* m_pButtonOK;
     SString     m_strCredits;
 

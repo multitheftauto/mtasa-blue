@@ -60,6 +60,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              // World set funcs
                                                                              {"setTime", SetTime},
                                                                              {"setColorFilter", ArgumentParser<SetColorFilter>},
+                                                                             {"setGrainMultiplier", ArgumentParser<SetGrainMultiplier>},
+                                                                             {"setGrainLevel", ArgumentParser<SetGrainLevel>},
                                                                              {"setSkyGradient", SetSkyGradient},
                                                                              {"setHeatHaze", SetHeatHaze},
                                                                              {"setWeather", SetWeather},
@@ -1996,6 +1998,18 @@ bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar u
     unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
     unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
     g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
+    return true;
+}
+
+bool CLuaWorldDefs::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)
+{
+    g_pMultiplayer->SetGrainMultiplier(type, fMultiplier);
+    return true;
+}
+
+bool CLuaWorldDefs::SetGrainLevel(uchar ucLevel)
+{
+    g_pMultiplayer->SetGrainLevel(ucLevel);
     return true;
 }
 

@@ -773,7 +773,7 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);    
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
@@ -1593,6 +1593,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_FrameRateFixes();
     InitHooks_ProjectileCollisionFix();
     InitHooks_ObjectStreamerOptimization();
+
+    InitHooks_Postprocess();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -3954,58 +3956,6 @@ void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
         MemCpyFast((void*)0xb78f10, &localStats.StatReactionValue, sizeof(float) * MAX_REACTION_STATS);
     }
     TIMING_CHECKPOINT("-RebuldMulplrPlr");
-}
-
-void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
-{
-    if (bEnabled)
-    {
-        MemPutFast<BYTE>(0xC402B8, 1);
-    }
-    else
-    {
-        MemPutFast<BYTE>(0xC402B8, 0);
-    }
-    if (bNoiseEnabled)
-    {
-        BYTE originalCodes[5] = {0xE8, 0xD3, 0xE8, 0xFF, 0xFF};
-        MemCpy((void*)0x704EE8, &originalCodes, 5);
-    }
-    else
-    {
-        MemSet((void*)0x704EE8, 0x90, 5);
-    }
-}
-
-void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
-{
-    if (bEnabled)
-    {
-        MemPutFast<BYTE>(0xC402B9, 1);
-    }
-    else
-    {
-        MemPutFast<BYTE>(0xC402B9, 0);
-    }
-    if (bNoiseEnabled)
-    {
-        BYTE originalCodes[5] = {0xE8, 0x62, 0xE8, 0xFF, 0xFF};
-        MemCpy((void*)0x704F59, &originalCodes, 5);
-    }
-    else
-    {
-        MemSet((void*)0x704F59, 0x90, 5);
-    }
-}
-
-bool CMultiplayerSA::IsNightVisionEnabled()
-{
-    return (*(BYTE*)0xC402B8 == 1);
-}
-
-bool CMultiplayerSA::IsThermalVisionEnabled()
-{
-    return (*(BYTE*)0xC402B9 == 1);
 }
 
 float CMultiplayerSA::GetGlobalGravity()
