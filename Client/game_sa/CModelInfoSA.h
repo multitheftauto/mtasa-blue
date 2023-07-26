@@ -248,8 +248,8 @@ class CClumpModelInfoSAInterface : public CBaseModelInfoSAInterface
 public:
     union
     {
-        char*  m_animFileName;
-        uint32 m_nAnimFileIndex;
+        char*    m_animFileName;
+        uint32_t m_nAnimFileIndex;
     };
 };
 
