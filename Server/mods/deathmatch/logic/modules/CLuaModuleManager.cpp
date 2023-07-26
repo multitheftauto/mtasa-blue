@@ -36,13 +36,13 @@ void CLuaModuleManager::SetScriptDebugging(CScriptDebugging* pScriptDebugging)
 void CLuaModuleManager::RegisterFunctions(lua_State* luaVM)
 {
     for (const auto& iter : m_Modules)
-        iter->_RegisterFunctions(luaVM);
+        (static_cast<CLuaModule*>(iter))->_RegisterFunctions(luaVM);
 }
 
 void CLuaModuleManager::DoPulse()
 {
     for (const auto& iter : m_Modules)
-        iter->_DoPulse();
+        (static_cast<CLuaModule*>(iter))->_DoPulse();
 }
 
 int CLuaModuleManager::LoadModule(const char* szShortFileName, const char* szFileName, bool bLateLoad)
@@ -56,7 +56,7 @@ int CLuaModuleManager::LoadModule(const char* szShortFileName, const char* szFil
 
     // Check if the module is already loaded
     for (const auto& iter : m_Modules)
-        if (!strcmp(iter->_GetName().c_str(), szShortFileName))
+        if (!strcmp((static_cast<CLuaModule*>(iter))->_GetName().c_str(), szShortFileName))
             return 8;
 
     // Initialize
@@ -97,7 +97,7 @@ int CLuaModuleManager::UnloadModule(const char* szShortFileName)
     // 0 = Success, 9 = Can't find module by name
     for (const auto& iter : m_Modules)
     {
-        if (!strcmp(iter->_GetName().c_str(), szShortFileName))
+        if (!strcmp((static_cast<CLuaModule*>(iter))->_GetName().c_str(), szShortFileName))
         {
             delete iter;
             m_Modules.remove(iter);
@@ -110,11 +110,11 @@ int CLuaModuleManager::UnloadModule(const char* szShortFileName)
 void CLuaModuleManager::ResourceStopping(lua_State* luaVM)
 {
     for (const auto& iter : m_Modules)
-        iter->_ResourceStopping(luaVM);
+        (static_cast<CLuaModule*>(iter))->_ResourceStopping(luaVM);
 }
 
 void CLuaModuleManager::ResourceStopped(lua_State* luaVM)
 {
     for (const auto& iter : m_Modules)
-        iter->_ResourceStopped(luaVM);
+        (static_cast<CLuaModule*>(iter))->_ResourceStopped(luaVM);
 }

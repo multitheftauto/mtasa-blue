@@ -19,7 +19,7 @@ class CLuaModule;
 
 #pragma once
 
-#include <modules/IModuleManager.h>
+#include <ILuaModule.hpp>
 
 class CScriptDebugging;
 class CLuaModuleManager;
@@ -28,7 +28,7 @@ struct lua_State;
 
 using DefaultModuleFunc = bool (*)();
 using RegisterModuleFunc = void (*)(lua_State*);
-using InitModuleFunc = bool (*)(ILuaModuleManager*, char*, char*, float*);
+using InitModuleFunc = bool (*)(ILuaModule*, char*, char*, float*);
 
 struct FunctionInfo
 {
@@ -47,7 +47,7 @@ struct FunctionInfo
     RegisterModuleFunc ResourceStopped;
 };
 
-class CLuaModule : public ILuaModuleManager
+class CLuaModule : public ILuaModule
 {
 public:
     CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* pScriptDebugging, const char* szFileName, const char* szShortFileName);
@@ -73,9 +73,7 @@ public:
 
     std::optional<std::string> GetResourceFilePath(lua_State* luaVM, const char* fileName) const noexcept override;
 
-    CVehicleManager* GetVehicleManager() const noexcept;
-    CMainConfig*     GetConfigManager() const noexcept;
-    CTeamManager*    GetTeamManager() const noexcept;
+    IAccountManager* GetAccountManager() const noexcept;
 
     // functions for deathmatch
     int  _LoadModule();

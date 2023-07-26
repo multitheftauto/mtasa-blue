@@ -46,7 +46,7 @@ CAccount::~CAccount()
     m_pManager->MarkAsChanged(this);
 }
 
-void CAccount::SetName(const std::string& strName)
+void CAccount::SetName(const std::string& strName) noexcept
 {
     std::string strNewName = strName.substr(0, CAccountManager::MAX_USERNAME_LENGTH);
     if (m_strName != strNewName)
@@ -65,7 +65,7 @@ void CAccount::SetClient(CClient* pClient)
         m_Data.clear();
 }
 
-bool CAccount::IsPassword(const SString& strPassword, bool* pbUsedHttpPassAppend)
+bool CAccount::IsPassword(const SString& strPassword, bool* pbUsedHttpPassAppend) const noexcept
 {
     if (pbUsedHttpPassAppend == nullptr)
     {
@@ -92,7 +92,7 @@ bool CAccount::IsPassword(const SString& strPassword, bool* pbUsedHttpPassAppend
     }
 }
 
-void CAccount::SetPassword(const SString& strPassword)
+void CAccount::SetPassword(const SString& strPassword) noexcept
 {
     if (m_Password.CanChangePasswordTo(strPassword))
     {
@@ -101,7 +101,7 @@ void CAccount::SetPassword(const SString& strPassword)
     }
 }
 
-SString CAccount::GetPasswordHash()
+SString CAccount::GetPasswordHash() const noexcept
 {
     return m_Password.GetPasswordHash();
 }

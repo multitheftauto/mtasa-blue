@@ -401,17 +401,7 @@ std::optional<std::string> CLuaModule::GetResourceFilePath(lua_State* luaVM, con
     return path;
 }
 
-CVehicleManager* CLuaModule::GetVehicleManager() const noexcept
+IAccountManager* CLuaModule::GetAccountManager() const noexcept
 {
-    return g_pGame->GetVehicleManager();
-}
-
-CMainConfig* CLuaModule::GetConfigManager() const noexcept
-{
-    return g_pGame->GetConfig();
-}
-
-CTeamManager* CLuaModule::GetTeamManager() const noexcept
-{
-    return g_pGame->GetTeamManager();
+    return reinterpret_cast<IAccountManager*>(g_pGame->GetAccountManager());
 }
