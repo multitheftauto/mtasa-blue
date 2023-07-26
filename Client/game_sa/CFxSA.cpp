@@ -16,7 +16,7 @@
 #include "CFxSA.h"
 #include "CEntitySA.h"
 
-using StoreShadowToBeRendered_t = int(__cdecl*)(char type, RwTexture* texture, CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
+using StoreShadowToBeRendered_t = int(__cdecl*)(char type, RwTexture* texture, const CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
                                                 char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
 auto StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
 
@@ -247,13 +247,13 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     }
 }
 
-bool CFxSA::IsShadowsLimitReached()
+bool CFxSA::IsShadowsLimitReached() const
 {
     unsigned short& CShadows_ShadowsStoredToBeRendered = *(unsigned short*)0xC403DC;
     return CShadows_ShadowsStoredToBeRendered >= 48;
 }
 
-bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& vecOffset1, CVector2D& vecOffset2, SColor color, float fZDistance,
+bool CFxSA::AddShadow(eShadowType shadowType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color, float fZDistance,
                       bool bDrawOnWater, bool bDrawOnBuildings)
 {
     if (IsShadowsLimitReached())
@@ -262,7 +262,7 @@ bool CFxSA::AddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& v
 
     void*      textureAddress = *(void**)(SHADOW_BASE_TEXTURE_OFFSET + (int)shadowType * 4);
     RwTexture* pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
-    char       type = 1;
+    uint8_t    type = 1;
 
     switch (shadowType)
     {

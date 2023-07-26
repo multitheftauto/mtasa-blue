@@ -7877,7 +7877,8 @@ bool CStaticFunctionDefinitions::FxAddFootSplash(CVector& vecPosition)
     return true;
 }
 
-bool CStaticFunctionDefinitions::FxAddShadow(eShadowType shadowType, CVector& vecPosition, CVector2D& vecOffset1, CVector2D& vecOffset2, SColor color,
+bool CStaticFunctionDefinitions::FxAddShadow(eShadowType shadowType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2,
+                                             SColor color,
                                              float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings)
 {
     return g_pGame->GetFx()->AddShadow(shadowType, vecPosition, vecOffset1, vecOffset2, color, fZDistance, bDrawOnWater, bDrawOnBuildings);
