@@ -740,20 +740,24 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
     m_isCoronaZTestEnabled = isEnabled;
 }
 
-bool CGameSA::IsWaterCreaturesEnabled()
+void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
 {
-    return m_bWaterCreatures;
-}
-
-void CGameSA::SetWaterCreaturesEnabled(bool bEnabled)
-{
-    if (bEnabled == m_bWaterCreatures)
+    if (isEnabled == m_areWaterCreaturesEnabled)
         return;
 
-    typedef int(__thiscall * Func_t)(void*);
-    (Func_t(bEnabled ? 0x6E3F90 : 0x6E3FD0))((void*)0xC1DF30);            // Init/Deinit WaterCreateManager
+    const auto manager = reinterpret_cast<class WaterCreatureManager_c*>(0xC1DF30);
+    if (isEnabled)
+    {
+        unsigned char(__thiscall * Init)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Init)>(0x6E3F90);
+        Init(manager);
+    }
+    else
+    {
+        void(__thiscall * Exit)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Exit)>(0x6E3FD0);
+        Exit(manager);
+    }
 
-    m_bWaterCreatures = bEnabled;
+    m_areWaterCreaturesEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()

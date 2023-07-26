@@ -213,7 +213,7 @@ public:
     void SetCoronaZTestEnabled(bool isEnabled);
     bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
 
-    bool IsWaterCreaturesEnabled();
+    bool IsWaterCreaturesEnabled() const noexcept { return m_areWaterCreaturesEnabled; }
     void SetWaterCreaturesEnabled(bool isEnabled);
 
     unsigned long GetMinuteDuration();
@@ -326,7 +326,7 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
-    bool         m_bWaterCreatures{true};
+    bool         m_areWaterCreaturesEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
