@@ -16,7 +16,7 @@
 #include "CFxSA.h"
 #include "CEntitySA.h"
 
-using StoreShadowToBeRendered_t = int(__cdecl*)(char type, RwTexture* texture, const CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
+using StoreShadowToBeRendered_t = int(__cdecl*)(uint8_t type, RwTexture* texture, const CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
                                                 char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
 auto StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
 
@@ -253,13 +253,24 @@ bool CFxSA::IsShadowsLimitReached() const
     return CShadows_ShadowsStoredToBeRendered >= 48;
 }
 
-bool CFxSA::AddShadow(eShadowType shadowType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color, float fZDistance,
-                      bool bDrawOnWater, bool bDrawOnBuildings)
+bool CFxSA::AddShadow(RwTexture* pRwTexture, uint8_t type, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
+                      float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings)
 {
     if (IsShadowsLimitReached())
         return false;
 
+    if (pRwTexture == nullptr)
+        return false;
 
+    StoreShadowToBeRendered(type, pRwTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B,
+                            fZDistance, bDrawOnWater, 1, 0, bDrawOnBuildings);
+
+    return true;
+}
+
+bool CFxSA::AddShadow(eShadowType shadowType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color, float fZDistance,
+                      bool bDrawOnWater, bool bDrawOnBuildings)
+{
     void*      textureAddress = *(void**)(SHADOW_BASE_TEXTURE_OFFSET + (int)shadowType * 4);
     RwTexture* pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
     uint8_t    type = 1;
@@ -272,11 +283,5 @@ bool CFxSA::AddShadow(eShadowType shadowType, const CVector& vecPosition, const 
             type = 2;
     }
 
-    if (pRwTexture == nullptr)
-        return false;
-
-    StoreShadowToBeRendered(type, pRwTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B,
-                            fZDistance, bDrawOnWater, 1, 0, bDrawOnBuildings);
-
-    return true;
+    return AddShadow(pRwTexture, type, vecPosition, vecOffset1, vecOffset2, color, fZDistance, bDrawOnWater, bDrawOnBuildings);
 }
