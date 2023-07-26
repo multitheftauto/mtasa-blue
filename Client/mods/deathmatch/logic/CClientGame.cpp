@@ -130,8 +130,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
-    m_Glitches[GLITCH_DONTBURNFLIPPEDCARS] = false;
-    g_pMultiplayer->SetBurnFlippedCarsEnabled(true);
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
 
     // Remove Night & Thermal vision view (if enabled).
@@ -5895,8 +5893,6 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
             g_pMultiplayer->DisableQuickReload(!bEnabled);
         if (ucGlitch == GLITCH_CLOSEDAMAGE)
             g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
-        if (ucGlitch == GLITCH_DONTBURNFLIPPEDCARS)
-            g_pMultiplayer->SetBurnFlippedCarsEnabled(!bEnabled);
         return true;
     }
     return false;

@@ -5000,7 +5000,7 @@ bool CStaticFunctionDefinitions::FadeCamera(bool bFadeIn, float fFadeTime, unsig
 
 bool CStaticFunctionDefinitions::GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld)
 {
-    if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled())
+    if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled() || g_pCore->GetConsole()->IsVisible() || g_pCore->IsChatInputEnabled())
     {
         tagPOINT point;
         GetCursorPos(&point);
