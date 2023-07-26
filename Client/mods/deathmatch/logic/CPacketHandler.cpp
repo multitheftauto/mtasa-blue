@@ -1791,6 +1791,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                         // For bikes and cars where jacked through passenger door, warp the passenger back in if desynced
                                         if (ucSeat == 0) {
                                             CClientPed* pPassenger = pJacked->GetOccupiedVehicle()->GetOccupant(1);
+                                            // Is the passenger a remote player or ped and is he physically outside but supposed to be in
                                             if (pPassenger &&
                                                 !pPassenger->IsLocalPlayer() &&
                                                 !pPassenger->IsSyncing() &&
