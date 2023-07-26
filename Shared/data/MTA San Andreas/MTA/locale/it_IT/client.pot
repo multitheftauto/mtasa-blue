@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-25 20:20+0000\n"
-"PO-Revision-Date: 2023-07-25 21:00\n"
+"POT-Creation-Date: 2023-07-26 09:56+0000\n"
+"PO-Revision-Date: 2023-07-26 10:11\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Language: it_IT\n"
@@ -1808,31 +1808,31 @@ msgstr "Correzione del mouse:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Correzione del movimento del mouse: potrebbe essere necessario riavviare il PC"
 
-#: Client/core/CCredits.cpp:32
+#: Client/core/CCredits.cpp:34
 msgid "Programming"
 msgstr "Programmazione"
 
-#: Client/core/CCredits.cpp:61
+#: Client/core/CCredits.cpp:63
 msgid "Contributors"
 msgstr "Collaboratori"
 
-#: Client/core/CCredits.cpp:82
+#: Client/core/CCredits.cpp:84
 msgid "Game Design / Scripting"
 msgstr "Progettazione / Scripting"
 
-#: Client/core/CCredits.cpp:102
+#: Client/core/CCredits.cpp:104
 msgid "Language Localization"
 msgstr "localizzazione lingua"
 
-#: Client/core/CCredits.cpp:108
+#: Client/core/CCredits.cpp:110
 msgid "Patch contributors"
 msgstr "Collaboratori per le patch"
 
-#: Client/core/CCredits.cpp:232
+#: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
 msgstr "Ringraziamenti particolari"
 
-#: Client/core/CCredits.cpp:263
+#: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
 msgstr "Questo software e progetto fa uso delle seguenti librerie e software:"
 
