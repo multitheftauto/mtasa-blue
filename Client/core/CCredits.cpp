@@ -25,6 +25,8 @@ CCredits::CCredits()
     CGUI* pManager = g_pCore->GetGUI();
 
     // Define our credits string
+    m_strCredits += "Grand Theft Auto: San Andreas (TM) (c) 2005 Rockstar Games, Inc.\n\n\n";
+
     m_strCredits += "== Multi Theft Auto: San Andreas v" MTA_DM_BUILDTAG_SHORT
                     " ==\n"
                     "\n";
