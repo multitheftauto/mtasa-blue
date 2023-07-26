@@ -1,6 +1,6 @@
 project "Modules"
 	language "C++"
-	kind "SharedLib"
+	kind "None"
 	targetname "Modules"
 	targetdir(buildpath("server"))
 
