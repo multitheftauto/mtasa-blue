@@ -51,6 +51,13 @@ bool CClientModel::Allocate(ushort usParentID)
                 return true;
             }
             break;
+        case eClientModelType::CLUMP:
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            {
+                pModelInfo->MakeClumpModel(usParentID);
+                return true;
+            }
+            break;
         case eClientModelType::TIMED_OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
@@ -126,6 +133,7 @@ bool CClientModel::DeallocateDFF(CModelInfo* pModelInfo)
             unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
             break;
         }
+        case eClientModelType::CLUMP:
         case eClientModelType::OBJECT:
         case eClientModelType::TIMED_OBJECT:
         {
