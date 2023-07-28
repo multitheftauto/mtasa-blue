@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-28 21:30\n"
+"PO-Revision-Date: 2023-07-28 22:30\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -358,14 +358,18 @@ msgstr "Galvenā faila certifikāta problēma. Iespējama vīrusu aktivitāte..\
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Datu fails %s ir pazudis. Iespējama vīrusu aktivitāte.\n\n"
+"Apsveriet Multi Theft Auto pārinstalēšanu drošības nolūkos.\n"
+"Ja MTA nedarbojas pareizi, skatieties tiešsaistes palīdzību."
 
 #: Client/loader/MainFunctions.cpp:892
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Datu fails %s ir modificēts. Iespējama vīrusu aktivitāte.\n\n"
+"Apsveriet Multi Theft Auto pārinstalēšanu drošības nolūkos.\n"
+"Ja MTA nedarbojas pareizi, skatieties tiešsaistes palīdzību."
 
 #: Client/loader/MainFunctions.cpp:906
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -435,51 +439,51 @@ msgstr "Multi Theft Auto netika uzinstalēts pareizi, lūdzu pārinstalējiet. %
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr ""
+msgstr "Izveidojiet GTA:SA saites"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA nevar tikt palaists, jo faila kopēšana neizdevās:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA nevar tikt palaists, jo MTA:SA fails ir nepareizs vai trūkst:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Kopēt MTA:SA failus"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA nevar tikt palaists, jo GTA:SA fails ir nepareizs vai trūkst:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Izlabot GTA:SA bibliotēkas"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA nevar tikt palaists, jo GTA:SA izpildāmais fails ir nepareizs vai trūkst:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Lūdzu, pārbaudiet savu pretvīrusa programmu, iespējams, notikusi nepamatota pozitīva atklāšana. Mēģiniet pievienot izņēmumu GTA:SA izpildāmajam failam un restartējiet MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Ģenerēt GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA nevar tikt palaists, jo GTA:SA izpildāmais fails nav ielādējams:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Izlabot GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA nevar palaist, jo GTA:SA labošana neizdevās:"
 
 #: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:763
 #, c-format
@@ -504,14 +508,16 @@ msgstr "Atjaunot saderības uzstādījumus"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Nezināms"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr ""
+msgstr "Fails '%s' pašlaik ir bloķēts %zu procesu dēļ.\n\n"
+"Vai vēlaties pārtraukt sekojošos procesus un turpināt atjaunināšanu?\n\n"
+"%s"
 
 #: Client/loader/Install.cpp:479
 #, c-format
@@ -519,7 +525,10 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr ""
+msgstr "Jūsu instalācija varētu būt bojāta.\n\n"
+"%zu no %zu failiem nevarēja tikt atjaunoti no rezerves kopijas.\n\n"
+"Jums vajadzētu pārinstalēt Multi Theft Auto no vietnes www.multitheftauto.com\n"
+"vai mēģināt palaist atjaunošanu ar administratora tiesībām."
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -624,11 +633,11 @@ msgstr "B - Alternatīvā NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Standarta Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Alternatīvā Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -1219,7 +1228,7 @@ msgstr "Riepu dūmi utml"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr "Dynamic ped shadows"
+msgstr "Dinamiskas ped ēnas"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
