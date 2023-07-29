@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-29 14:20\n"
+"PO-Revision-Date: 2023-07-29 15:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -125,13 +125,13 @@ msgstr "تمام!"
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
-msgstr "نصب جدید %s شناسایی شد.\n\n"
-"آیا می خواهید تنظیمات خود را از %s کپی کنید؟"
+msgstr "نسخه نصبی جدید %s شناسایی شد.\n\n"
+"آیا میخواهید تنظیمات خود را از %s بازیابی کنید ؟"
 
 #: Client/loader/Utils.cpp:1541
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA برای باز کردن فایل '%s' مشکل داشت"
+msgstr "GTA:SA مشکل در باز کردن فایل '%s' دارد"
 
 #: Client/loader/Utils.cpp:1563
 #, c-format
