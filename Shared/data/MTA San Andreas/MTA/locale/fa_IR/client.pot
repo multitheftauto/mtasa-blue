@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-26 10:12\n"
+"PO-Revision-Date: 2023-07-29 14:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -103,7 +103,7 @@ msgstr "ام تی ای:اس ای برای عملیات های زیر نیاز ب
 #: Client/loader/Utils.cpp:1069
 #, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "خطا در هنگام بارگذاری ماژول %s ! (%s)"
+msgstr "خطا در بارگذاری ماژول %s module! (%s)"
 
 #: Client/loader/Utils.cpp:1394 Client/loader/Dialogs.cpp:914
 msgid "Copying files..."
