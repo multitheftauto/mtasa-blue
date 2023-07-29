@@ -2709,7 +2709,8 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
     arguments.PushNumber(explosionPosition.fY);
     arguments.PushNumber(explosionPosition.fZ);
     arguments.PushNumber(explosionType);
-    arguments.PushElement(explosionSource);
+    // TODO: The client uses a nearby player as the origin, if there is none, and we don't want that.
+    // arguments.PushElement(explosionSource);
     syncToPlayers = clientSource->CallEvent("onExplosion", arguments);
 
     if (!syncToPlayers)
