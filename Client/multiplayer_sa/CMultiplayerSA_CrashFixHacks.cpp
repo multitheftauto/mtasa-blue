@@ -400,13 +400,9 @@ void _cdecl DoWait(HANDLE hHandle)
 }
 
 // hook info
-#define HOOKPOS_FreezeFix_Misc15_US                         0x156CDAE
-#define HOOKSIZE_FreezeFix_Misc15_US                        6
-#define HOOKPOS_FreezeFix_Misc15_EU                         0x156CDEE
-#define HOOKSIZE_FreezeFix_Misc15_EU                        6
-DWORD RETURN_FreezeFix_Misc15_US = 0x156CDB4;
-DWORD RETURN_FreezeFix_Misc15_EU = 0x156CDF4;
-DWORD RETURN_FreezeFix_Misc15_BOTH = 0;
+#define HOOKPOS_FreezeFix_Misc15                        	0x156CDAE
+#define HOOKSIZE_FreezeFix_Misc15                        	6
+DWORD RETURN_FreezeFix_Misc15 = 0x156CDB4;
 void _declspec(naked) HOOK_FreezeFix_Misc15()
 {
     _asm
@@ -420,7 +416,7 @@ void _declspec(naked) HOOK_FreezeFix_Misc15()
         add esp, 4
 
         popad
-        jmp     RETURN_FreezeFix_Misc15_BOTH
+        jmp     RETURN_FreezeFix_Misc15
     }
 }
 
@@ -451,16 +447,10 @@ void _declspec(naked) HOOK_CrashFix_Misc16()
 
 ////////////////////////////////////////////////////////////////////////
 // Handle RwFrameSetStaticPluginsSize having NULL member at 0x90
-#define HOOKPOS_CrashFix_Misc17_US                          0x7F120E
-#define HOOKSIZE_CrashFix_Misc17_US                         6
-#define HOOKPOS_CrashFix_Misc17_EU                          0x7F124E
-#define HOOKSIZE_CrashFix_Misc17_EU                         6
-DWORD RETURN_CrashFix_Misc17_US = 0x7F1214;
-DWORD RETURN_CrashFix_Misc17_EU = 0x7F1254;
-DWORD RETURN_CrashFix_Misc17_BOTH = 0;
-DWORD RETURN_CrashFix_Misc17B_US = 0x7F1236;
-DWORD RETURN_CrashFix_Misc17B_EU = 0x7F1276;
-DWORD RETURN_CrashFix_Misc17B_BOTH = 0;
+#define HOOKPOS_CrashFix_Misc17                             0x7F120E
+#define HOOKSIZE_CrashFix_Misc17                            6
+DWORD RETURN_CrashFix_Misc17 = 0x7F1214;
+DWORD RETURN_CrashFix_Misc17B = 0x7F1236;
 void _declspec(naked) HOOK_CrashFix_Misc17()
 {
     _asm
@@ -470,12 +460,12 @@ void _declspec(naked) HOOK_CrashFix_Misc17()
 
         // continue standard path
         mov     eax, [eax+90h]
-        jmp     RETURN_CrashFix_Misc17_BOTH
+        jmp     RETURN_CrashFix_Misc17
 
     cont:
         push    17
         call    CrashAverted
-        jmp     RETURN_CrashFix_Misc17B_BOTH
+        jmp     RETURN_CrashFix_Misc17B
     }
 }
 
@@ -512,16 +502,10 @@ void _declspec(naked) HOOK_CrashFix_Misc18()
 
 ////////////////////////////////////////////////////////////////////////
 // Handle RwFrameCloneHierarchy having wrong data
-#define HOOKPOS_CrashFix_Misc19_US                          0x7F0BF7
-#define HOOKSIZE_CrashFix_Misc19_US                         6
-#define HOOKPOS_CrashFix_Misc19_EU                          0x7F0C37
-#define HOOKSIZE_CrashFix_Misc19_EU                         6
-DWORD RETURN_CrashFix_Misc19_US = 0x7F0BFD;
-DWORD RETURN_CrashFix_Misc19_EU = 0x7F0C3D;
-DWORD RETURN_CrashFix_Misc19_BOTH = 0;
-DWORD RETURN_CrashFix_Misc19B_US = 0x7F0C20;
-DWORD RETURN_CrashFix_Misc19B_EU = 0x7F0C60;
-DWORD RETURN_CrashFix_Misc19B_BOTH = 0;
+#define HOOKPOS_CrashFix_Misc19                             0x7F0BF7
+#define HOOKSIZE_CrashFix_Misc19                            6
+DWORD RETURN_CrashFix_Misc19 = 0x7F0BFD;
+DWORD RETURN_CrashFix_Misc19B = 0x7F0C20;
 void _declspec(naked) HOOK_CrashFix_Misc19()
 {
     _asm
@@ -531,14 +515,14 @@ void _declspec(naked) HOOK_CrashFix_Misc19()
 
         // continue standard path
         mov     eax, [esi+98h]
-        jmp     RETURN_CrashFix_Misc19_BOTH
+        jmp     RETURN_CrashFix_Misc19
 
     cont:
         push    19
         call    CrashAverted
         mov     edx,dword ptr [ecx+98h]
         test    edx,edx
-        jmp     RETURN_CrashFix_Misc19B_BOTH
+        jmp     RETURN_CrashFix_Misc19B
     }
 }
 
@@ -700,13 +684,9 @@ void _declspec(naked) HOOK_CrashFix_Misc23()
 
 ////////////////////////////////////////////////////////////////////////
 // Handle _RwFrameForAllChildren being called with NULL
-#define HOOKPOS_CrashFix_Misc24_US                          0x7F0DC8
-#define HOOKSIZE_CrashFix_Misc24_US                         6
-#define HOOKPOS_CrashFix_Misc24_EU                          0x7F0E08
-#define HOOKSIZE_CrashFix_Misc24_EU                         6
-DWORD RETURN_CrashFix_Misc24_US = 0x7F0DCE;
-DWORD RETURN_CrashFix_Misc24_EU = 0x7F0E0E;
-DWORD RETURN_CrashFix_Misc24_BOTH = 0;
+#define HOOKPOS_CrashFix_Misc24                             0x7F0DC8
+#define HOOKSIZE_CrashFix_Misc24                            6
+DWORD RETURN_CrashFix_Misc24 = 0x7F0DCE;
 void _declspec(naked) HOOK_CrashFix_Misc24()
 {
     _asm
@@ -716,14 +696,14 @@ void _declspec(naked) HOOK_CrashFix_Misc24()
 
         // continue standard path
         mov     eax, [ebp+98h]
-        jmp     RETURN_CrashFix_Misc24_BOTH
+        jmp     RETURN_CrashFix_Misc24
 
     cont:
         push    24
         call    CrashAverted
         mov     ebp, 0
         mov     eax, 0
-        jmp     RETURN_CrashFix_Misc24_BOTH
+        jmp     RETURN_CrashFix_Misc24
     }
 }
 
@@ -1391,15 +1371,10 @@ void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
 }
 
 // hook info
-#define HOOKPOS_printf_US                         0x821982
-#define HOOKSIZE_printf_US                        7
-#define HOOKCHECK_printf_US                       0x6A
-#define HOOKPOS_printf_EU                         0x8219C2
-#define HOOKSIZE_printf_EU                        7
-#define HOOKCHECK_printf_EU                       0x6A
-DWORD RETURN_printf_US = 0x821989;
-DWORD RETURN_printf_EU = 0x8219C9;
-DWORD RETURN_printf_BOTH = 0;
+#define HOOKPOS_printf                            0x821982
+#define HOOKSIZE_printf                           7
+#define HOOKCHECK_printf                          0x6A
+DWORD RETURN_printf = 0x821989;
 void _declspec(naked) HOOK_printf()
 {
     _asm
@@ -1414,7 +1389,7 @@ void _declspec(naked) HOOK_printf()
         // Replaced code
         push    10h
         push    887DC0h
-        jmp     RETURN_printf_BOTH
+        jmp     RETURN_printf
     }
 }
 
@@ -1425,15 +1400,10 @@ void _declspec(naked) HOOK_printf()
 // Check for invalid matix pointer
 //
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_RwMatrixMultiply_US             0x7F18B0
-#define HOOKSIZE_RwMatrixMultiply_US            6
-#define HOOKCHECK_RwMatrixMultiply_US           0x8B
-#define HOOKPOS_RwMatrixMultiply_EU             0x7F18F0
-#define HOOKSIZE_RwMatrixMultiply_EU            6
-#define HOOKCHECK_RwMatrixMultiply_EU           0x8B
-DWORD RETURN_RwMatrixMultiply_US = 0x7F18B6;
-DWORD RETURN_RwMatrixMultiply_EU = 0x7F18F6;
-DWORD RETURN_RwMatrixMultiply_BOTH = 0;
+#define HOOKPOS_RwMatrixMultiply                0x7F18B0
+#define HOOKSIZE_RwMatrixMultiply               6
+#define HOOKCHECK_RwMatrixMultiply              0x8B
+DWORD RETURN_RwMatrixMultiply = 0x7F18B6;
 void _declspec(naked) HOOK_RwMatrixMultiply()
 {
     _asm
@@ -1443,7 +1413,7 @@ void _declspec(naked) HOOK_RwMatrixMultiply()
         jb      cont  // Skip code if eax is low
 
         mov     ecx, dword ptr ds:[0C979BCh]
-        jmp     RETURN_RwMatrixMultiply_BOTH
+        jmp     RETURN_RwMatrixMultiply
 
 cont:
         push    31
