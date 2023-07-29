@@ -1502,6 +1502,11 @@ std::string SharedUtil::UTF16ToMbUTF8(const wchar_t* input)
     return utf8_wcstombs(input);
 }
 
+std::string SharedUtil::UTF16ToMbUTF8(const char16_t* input)
+{
+    return UTF16ToMbUTF8(input);
+}
+
 // Get UTF8 confidence
 int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 {
