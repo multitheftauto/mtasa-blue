@@ -39,7 +39,7 @@ jobs:
         run: win-build.bat release ${{ matrix.platform }}
         shell: cmd
         env:
-          DXSDK_DIR: './utils/DXFiles/'
+          DXSDK_DIR: 'utils/DXFiles/'
           CI: 'true'
 
       - name: Create build artifacts
