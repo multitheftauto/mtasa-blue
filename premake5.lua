@@ -45,7 +45,7 @@ workspace "MTASA"
 	symbols "On"
 	flags "MultiProcessorCompile"
 
-	dxdir = '$(DXSDK_DIR)' --os.getenv("DXSDK_DIR") or ""
+	dxdir = '$(DXSDK_DIR)' -- os.getenv("DXSDK_DIR") or ""
 
 	includedirs {
 		"vendor",

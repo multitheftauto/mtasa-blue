@@ -40,7 +40,7 @@ jobs:
         shell: cmd
         env:
           DXSDK_DIR: utils/DXFiles
-          CI: 'true'
+          CI: true
 
       - name: Create build artifacts
         run: utils\premake5 compose_files
