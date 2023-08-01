@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-26 10:12\n"
+"POT-Creation-Date: 2023-08-01 17:40+0000\n"
+"PO-Revision-Date: 2023-08-01 18:23\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -17,29 +17,18 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "Požiadavky stránky"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "Nedá sa nájsť platné rozlíšenie obrazovky."
 
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "Server si vyžiadal povolenie na načítanie týchto stránok (neskoršie):"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "Naozaj chcete použiť toto rozlíšenie obrazovky?"
 
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "NIKDY NEZADÁVAJTE CITLIVÉ INFORMÁCIE ABY VÁM NEBOLI UKRADNUTÉ"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "Zapamätať rozhodnutie"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
-msgid "Allow"
-msgstr "Povoliť"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "Zakázať"
+#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
 
 #. Create buttons
 #. OK button
@@ -69,13 +58,12 @@ msgstr "Zrušiť"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
-#: Client/core/CMainMenu.cpp:1170 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
-#: Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
+#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
+#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
+#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
+#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
 msgstr "Áno"
 
@@ -180,20 +168,19 @@ msgstr "Problémy pri reštartovaní MTA:SA\n\n"
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
-#: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1227
-#: Client/core/CCore.cpp:1240 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
+#: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
+#: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
+#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
+#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
+#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:421
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:591
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
@@ -205,6 +192,8 @@ msgstr "Problémy pri reštartovaní MTA:SA\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1275
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -296,8 +285,8 @@ msgstr "Časť GTA: San Andreas je už spustená. Je potrebné ju pred štartom 
 
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
 #: Client/loader/MainFunctions.cpp:1217
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "Information"
 msgstr "Informácia"
 
@@ -506,44 +495,12 @@ msgstr "Aktualizovať nastavenia inštalácie"
 msgid "Update compatibility settings"
 msgstr "Aktualizujte nastavenia kompatibility"
 
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr "Neznámy"
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr "Súbor '%s' je blokovaný %zu procesmi.\n\n"
-"Praješ si ukončiť tieto procesy a pokračovať v aktualizácii?\n\n"
-"%s"
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr "Tvoja inštalácia môže byť poškodená.\n\n"
-"%zu z %zu súborov sa nepodarilo obnoviť zo zálohy.\n\n"
-"Mal by si preinštalovať Multi Theft Auto zo stránky www.multitheftauto.com\n"
-"alebo skúsiť spustiť aktualizáciu s oprávnením administrátora."
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Inštalujú sa aktualizácie..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Extrahovanie súborov..."
-
-#: Client/loader/Dialogs.cpp:132 Client/core/CMainMenu.cpp:1169
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/CSettings.cpp:1370 Client/core/CSettings.cpp:1394
-#: Client/core/CSettings.cpp:4434 Client/core/CSettings.cpp:4501
-#: Client/core/CSettings.cpp:4550 Client/core/CQuestionBox.cpp:194
+#: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1169 Client/core/CSettings.cpp:1370
+#: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
+#: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "Nie"
@@ -655,10 +612,6 @@ msgstr "Vynútiť režim v okne"
 msgid "Don't show again"
 msgstr "Nabudúce nezobrazovať"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
 #: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Upozornenie: Nepodarilo sa zistiť antivírus"
@@ -681,30 +634,71 @@ msgid "I will not install an anti-virus.\n"
 msgstr "Nebudem inštalovať antivírus.\n"
 "Chcem, aby môj počítač zaostal a bol súčasťou botnetu."
 
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+msgid "Installing update..."
+msgstr "Inštalujú sa aktualizácie..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+msgid "Extracting files..."
+msgstr "Extrahovanie súborov..."
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr "Neznámy"
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr "Súbor '%s' je blokovaný %zu procesmi.\n\n"
+"Praješ si ukončiť tieto procesy a pokračovať v aktualizácii?\n\n"
+"%s"
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr "Tvoja inštalácia môže byť poškodená.\n\n"
+"%zu z %zu súborov sa nepodarilo obnoviť zo zálohy.\n\n"
+"Mal by si preinštalovať Multi Theft Auto zo stránky www.multitheftauto.com\n"
+"alebo skúsiť spustiť aktualizáciu s oprávnením administrátora."
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "Požiadavky stránky"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "Server si vyžiadal povolenie na načítanie týchto stránok (neskoršie):"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "NIKDY NEZADÁVAJTE CITLIVÉ INFORMÁCIE ABY VÁM NEBOLI UKRADNUTÉ"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "Zapamätať rozhodnutie"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
+msgid "Allow"
+msgstr "Povoliť"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "Zakázať"
+
 #. Unknown command
 #: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
 msgstr "Neznámy príkaz alebo výraz"
 
-#: Client/core/CMainMenu.cpp:322
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Používate novšiu verziu (feature-branch build)! Je to testovacia verzia a nemôže byť použitá na pripojenie na public servery!"
-
-#: Client/core/CMainMenu.cpp:341
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA nebude podporovať XP/Vista po Júli 2019.\n\n"
-"Aktualizujte Windows aby ste mohli hrať na aktuálnych serveroch."
-
-#: Client/core/CMainMenu.cpp:1163
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Toto ťa odpojí z aktuálneho serveru.\n\n"
-"Si si istý, že sa chceš odpojiť?"
-
-#: Client/core/CMainMenu.cpp:1167
-msgid "DISCONNECT WARNING"
-msgstr "VAROVANIE O ODPOJENÍ"
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Slovenčina"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -850,6 +844,198 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Čakám na odpoveď - %-3d"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "Novinky"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+msgid "Visit latest news article"
+msgstr "Navštíviť najnovšie oznámenie"
+
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Fatálna chyba"
+
+#: Client/core/CCore.cpp:890
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "PRE OPRAVU, ODSTRÁŇTE NÁSLEDUJÚCI SÚBOR:"
+
+#: Client/core/CCore.cpp:922
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s modul je neplatný!"
+
+#: Client/core/CCore.cpp:1227
+msgid "Error executing URL"
+msgstr "Chyba pri otváraní URL"
+
+#: Client/core/CCore.cpp:1239
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Chybne spustený mód špecifikovaný v príkazovom riadku ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1327
+msgid "this help screen"
+msgstr "táto pomocná obrazovka"
+
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+msgid "exits the application"
+msgstr "ukončí aplikáciu"
+
+#: Client/core/CCore.cpp:1330
+msgid "shows the version"
+msgstr "zobrazí verziu"
+
+#: Client/core/CCore.cpp:1331
+msgid "shows the time"
+msgstr "zobrazí čas"
+
+#: Client/core/CCore.cpp:1332
+msgid "shows the hud"
+msgstr "zobrazí hud"
+
+#: Client/core/CCore.cpp:1333
+msgid "shows all the binds"
+msgstr "zobrazí všetky bindy"
+
+#: Client/core/CCore.cpp:1334
+msgid "shows your serial"
+msgstr "zobrazí tvoj serial"
+
+#: Client/core/CCore.cpp:1343
+msgid "connects to a server (host port nick pass)"
+msgstr "pripojí na server (hostiteľ port nick heslo)"
+
+#: Client/core/CCore.cpp:1344
+msgid "connects to a previous server"
+msgstr "pripojí k predchádzajúcemu serveru"
+
+#: Client/core/CCore.cpp:1345
+msgid "binds a key (key control)"
+msgstr "nastaví bind (kontrola klávesy)"
+
+#: Client/core/CCore.cpp:1346
+msgid "unbinds a key (key)"
+msgstr "zruší bind (klávesa)"
+
+#: Client/core/CCore.cpp:1347
+msgid "copies the default gta controls"
+msgstr "skopíruje predvolené gta ovládanie"
+
+#: Client/core/CCore.cpp:1348
+msgid "outputs a screenshot"
+msgstr "uloží screenshot"
+
+#: Client/core/CCore.cpp:1349
+msgid "immediately saves the config"
+msgstr "okamžite uloží config"
+
+#: Client/core/CCore.cpp:1351
+msgid "clears the debug view"
+msgstr "vyčistí debug"
+
+#: Client/core/CCore.cpp:1352
+msgid "scrolls the chatbox upwards"
+msgstr "roluje chatom hore"
+
+#: Client/core/CCore.cpp:1353
+msgid "scrolls the chatbox downwards"
+msgstr "roluje chatom dole"
+
+#: Client/core/CCore.cpp:1354
+msgid "scrolls the debug view upwards"
+msgstr "roluje debugom hore"
+
+#: Client/core/CCore.cpp:1355
+msgid "scrolls the debug view downwards"
+msgstr "roluje debugom dole"
+
+#: Client/core/CCore.cpp:1358
+msgid "shows the memory statistics"
+msgstr "zobrazí štatistiky pamäte"
+
+#: Client/core/CCore.cpp:1359
+msgid "shows the frame timing graph"
+msgstr "zobrazí graf časovania snímkov"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr "pre vývojárov: znovunačítajte novinky"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Chceš sa pozrieť na online pomoc o tomto probléme ?"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONZOLA"
+
+#: Client/core/CMainMenu.cpp:322
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Používate novšiu verziu (feature-branch build)! Je to testovacia verzia a nemôže byť použitá na pripojenie na public servery!"
+
+#: Client/core/CMainMenu.cpp:341
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA nebude podporovať XP/Vista po Júli 2019.\n\n"
+"Aktualizujte Windows aby ste mohli hrať na aktuálnych serveroch."
+
+#: Client/core/CMainMenu.cpp:1163
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Toto ťa odpojí z aktuálneho serveru.\n\n"
+"Si si istý, že sa chceš odpojiť?"
+
+#: Client/core/CMainMenu.cpp:1167
+msgid "DISCONNECT WARNING"
+msgstr "VAROVANIE O ODPOJENÍ"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "Programovanie"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "Prispievatelia"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "Herný Design / Scriptovanie"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "Jazyková lokalizácia"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "Patch prispievatelia"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "Špeciálne poďakovanie"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr "Tento software a projekt používa nasledujúce knižnice a software:"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Vybraný skin nemôže byť načítaný ako aj predvolený skin, prosím preinštaluj MTA."
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Os akcelerácie"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Os brzdenia"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1808,51 +1994,143 @@ msgstr "Oprava myši:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Oprava pohybu myši - Možno bude potrebné reštartovať počítač"
 
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "Programovanie"
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ PRÍKAZY ]***\n"
 
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "Prispievatelia"
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Práve je %d:%02d:%02d"
 
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "Herný Design / Scriptovanie"
+#: Client/core/CCommandFuncs.cpp:242
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "connect: Správny tvar je 'connect <host> [<port> <nick> <pass>]'"
 
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "Jazyková lokalizácia"
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+msgid "connect: Bad port number"
+msgstr "connect: Nesprávne číslo portu"
 
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "Patch prispievatelia"
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "connect: Pripája sa k %s:%u..."
 
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "Špeciálne poďakovanie"
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "connect: nemôže sa pripojiť k %s:%u!"
 
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr "Tento software a projekt používa nasledujúce knižnice a software:"
+#: Client/core/CCommandFuncs.cpp:281
+msgid "connect: Failed to unload current mod"
+msgstr "connect: Zlyhalo vypínanie aktuálneho modu"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Os akcelerácie"
+#: Client/core/CCommandFuncs.cpp:371
+msgid "Bound all controls from GTA"
+msgstr "Načítané všetky ovládania z GTA"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Os brzdenia"
+#: Client/core/CCommandFuncs.cpp:385
+msgid "Saved configuration file"
+msgstr "Konfiguračné súbory uložené"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "Novinky"
+#. Print it
+#: Client/core/CCommandFuncs.cpp:451
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Tvoj serial je: %s"
 
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "Navštíviť najnovšie oznámenie"
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Screenshot má %d bytov, ale má byť %d"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Screenshot zlyhal"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Screenshot zachytený: '%s'"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Pripájanie zlyhalo. Neplatný nick!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Pripájanie zlyhalo. Neplatný hostiteľ!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Pripájanie k %s na porte %u zlyhalo!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Pripájanie k %s:%u ..."
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+msgid "CONNECTING"
+msgstr "PRIPÁJANIE"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+msgid "Connection timed out"
+msgstr "Časový limit spojenia vypršal"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+msgid "Disconnected: unknown protocol error"
+msgstr "Odpojené: neznámy protokol"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+msgid "Disconnected: disconnected remotely"
+msgstr "Odpojené: odpojené vzdialene"
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
+msgid "Disconnected: connection lost remotely"
+msgstr "Odpojené: spojenie vzdialene stratené"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+msgid "Disconnected: you are banned from this server"
+msgstr "Odpojené: si zabanovaný na tomto serveri"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
+msgid "Disconnected: disconnected from the server"
+msgstr "Odpojené: odpojené zo servera"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+msgid "Disconnected: connection to the server was lost"
+msgstr "Odpojené: pripojenie na server bolo stratené"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+msgid "Disconnected: connection was refused"
+msgstr "Odpojené: pripojenie bolo odmietnuté"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Nie je inštalovaný taký mód (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Chybná odpoveď servera (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Chybná odpoveď servera (1)"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2026,274 +2304,147 @@ msgstr "Skupinové ovládanie dopredu"
 msgid "Group control backwards"
 msgstr "Skupinové ovládanie dozadu"
 
-#: Client/core/CScreenShot.cpp:104
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "Nečinný"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "hráčov"
+msgstr[1] "hráč"
+msgstr[2] "hráči"
+msgstr[3] "hráčov"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "na"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "serverov"
+msgstr[1] "server"
+msgstr[2] "servery"
+msgstr[3] "servery"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Screenshot má %d bytov, ale má byť %d"
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Požiadavka na hlavný zoznam serverov (%lu ms ubehlo)"
 
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "Screenshot zlyhal"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "Zoznam hlavných serverov nemohol byť načítaný."
 
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Screenshot zachytený: '%s'"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "Zoznam hlavných serverov nemohol byť načítaný."
 
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ PRÍKAZY ]***\n"
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(Záložný zoznam serverov)"
 
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Práve je %d:%02d:%02d"
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "Nie je možné pripojenie LAN"
 
-#: Client/core/CCommandFuncs.cpp:242
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "connect: Správny tvar je 'connect <host> [<port> <nick> <pass>]'"
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "Pokúšam sa nájsť LAN servery"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
-msgid "connect: Bad port number"
-msgstr "connect: Nesprávne číslo portu"
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "SERVER JE PLNÝ"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "connect: Pripája sa k %s:%u..."
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "Názov:"
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "connect: nemôže sa pripojiť k %s:%u!"
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "Adresa servera:"
 
-#: Client/core/CCommandFuncs.cpp:281
-msgid "connect: Failed to unload current mod"
-msgstr "connect: Zlyhalo vypínanie aktuálneho modu"
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "Herný mód:"
 
-#: Client/core/CCommandFuncs.cpp:371
-msgid "Bound all controls from GTA"
-msgstr "Načítané všetky ovládania z GTA"
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "Mapa:"
 
-#: Client/core/CCommandFuncs.cpp:385
-msgid "Saved configuration file"
-msgstr "Konfiguračné súbory uložené"
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "Hráči:"
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:451
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* Tvoj serial je: %s"
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "Zaheslované:"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Chceš sa pozrieť na online pomoc o tomto probléme ?"
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "Oneskorenie:"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Slovenčina"
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "Zoznam hráčov"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Pripájanie zlyhalo. Neplatný nick!"
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "Zavrieť"
 
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Pripájanie zlyhalo. Neplatný hostiteľ!"
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "Pripojiť do hry"
 
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Pripájanie k %s na porte %u zlyhalo!"
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "Prosím zadajte heslo pre tento server:"
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Pripájanie k %s:%u ..."
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "Pripojiť na server hneď keď sa uvolní slot."
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
-msgid "CONNECTING"
-msgstr "PRIPÁJANIE"
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "PROSÍM ZADAJ HESLO K SERVERU"
 
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
-msgid "Connection timed out"
-msgstr "Časový limit spojenia vypršal"
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "Čas vypršal"
 
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-msgid "Disconnected: unknown protocol error"
-msgstr "Odpojené: neznámy protokol"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
-msgid "Disconnected: disconnected remotely"
-msgstr "Odpojené: odpojené vzdialene"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
-msgid "Disconnected: connection lost remotely"
-msgstr "Odpojené: spojenie vzdialene stratené"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
-msgid "Disconnected: you are banned from this server"
-msgstr "Odpojené: si zabanovaný na tomto serveri"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
-msgid "Disconnected: disconnected from the server"
-msgstr "Odpojené: odpojené zo servera"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-msgid "Disconnected: connection to the server was lost"
-msgstr "Odpojené: pripojenie na server bolo stratené"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-msgid "Disconnected: connection was refused"
-msgstr "Odpojené: pripojenie bolo odmietnuté"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Nie je inštalovaný taký mód (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Chybná odpoveď servera (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Chybná odpoveď servera (1)"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Vybraný skin nemôže byť načítaný ako aj predvolený skin, prosím preinštaluj MTA."
-
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Fatálna chyba"
-
-#: Client/core/CCore.cpp:890
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "PRE OPRAVU, ODSTRÁŇTE NÁSLEDUJÚCI SÚBOR:"
-
-#: Client/core/CCore.cpp:922
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s modul je neplatný!"
-
-#: Client/core/CCore.cpp:1227
-msgid "Error executing URL"
-msgstr "Chyba pri otváraní URL"
-
-#: Client/core/CCore.cpp:1239
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Chybne spustený mód špecifikovaný v príkazovom riadku ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
-msgid "this help screen"
-msgstr "táto pomocná obrazovka"
-
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
-msgid "exits the application"
-msgstr "ukončí aplikáciu"
-
-#: Client/core/CCore.cpp:1330
-msgid "shows the version"
-msgstr "zobrazí verziu"
-
-#: Client/core/CCore.cpp:1331
-msgid "shows the time"
-msgstr "zobrazí čas"
-
-#: Client/core/CCore.cpp:1332
-msgid "shows the hud"
-msgstr "zobrazí hud"
-
-#: Client/core/CCore.cpp:1333
-msgid "shows all the binds"
-msgstr "zobrazí všetky bindy"
-
-#: Client/core/CCore.cpp:1334
-msgid "shows your serial"
-msgstr "zobrazí tvoj serial"
-
-#: Client/core/CCore.cpp:1343
-msgid "connects to a server (host port nick pass)"
-msgstr "pripojí na server (hostiteľ port nick heslo)"
-
-#: Client/core/CCore.cpp:1344
-msgid "connects to a previous server"
-msgstr "pripojí k predchádzajúcemu serveru"
-
-#: Client/core/CCore.cpp:1345
-msgid "binds a key (key control)"
-msgstr "nastaví bind (kontrola klávesy)"
-
-#: Client/core/CCore.cpp:1346
-msgid "unbinds a key (key)"
-msgstr "zruší bind (klávesa)"
-
-#: Client/core/CCore.cpp:1347
-msgid "copies the default gta controls"
-msgstr "skopíruje predvolené gta ovládanie"
-
-#: Client/core/CCore.cpp:1348
-msgid "outputs a screenshot"
-msgstr "uloží screenshot"
-
-#: Client/core/CCore.cpp:1349
-msgid "immediately saves the config"
-msgstr "okamžite uloží config"
-
-#: Client/core/CCore.cpp:1351
-msgid "clears the debug view"
-msgstr "vyčistí debug"
-
-#: Client/core/CCore.cpp:1352
-msgid "scrolls the chatbox upwards"
-msgstr "roluje chatom hore"
-
-#: Client/core/CCore.cpp:1353
-msgid "scrolls the chatbox downwards"
-msgstr "roluje chatom dole"
-
-#: Client/core/CCore.cpp:1354
-msgid "scrolls the debug view upwards"
-msgstr "roluje debugom hore"
-
-#: Client/core/CCore.cpp:1355
-msgid "scrolls the debug view downwards"
-msgstr "roluje debugom dole"
-
-#: Client/core/CCore.cpp:1358
-msgid "shows the memory statistics"
-msgstr "zobrazí štatistiky pamäte"
-
-#: Client/core/CCore.cpp:1359
-msgid "shows the frame timing graph"
-msgstr "zobrazí graf časovania snímkov"
-
-#: Client/core/CCore.cpp:1363
-msgid "for developers: reload news"
-msgstr "pre vývojárov: znovunačítajte novinky"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONZOLA"
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "Zisťovanie..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2393,13 +2544,6 @@ msgstr "Odozva"
 msgid "Gamemode"
 msgstr "Herný mód"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "Zoznam hráčov"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -2461,141 +2605,6 @@ msgstr "Neplatný nick! Choď do Nastavení a nastav si iný!"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Musíš zvoliť server na pripojenie."
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "SERVER JE PLNÝ"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "Názov:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "Adresa servera:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "Herný mód:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "Mapa:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "Hráči:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "Zaheslované:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "Oneskorenie:"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "Zavrieť"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "Pripojiť do hry"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "Prosím zadajte heslo pre tento server:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "Pripojiť na server hneď keď sa uvolní slot."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "PROSÍM ZADAJ HESLO K SERVERU"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "Čas vypršal"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "Zisťovanie..."
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "Nečinný"
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "hráčov"
-msgstr[1] "hráč"
-msgstr[2] "hráči"
-msgstr[3] "hráčov"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "na"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "serverov"
-msgstr[1] "server"
-msgstr[2] "servery"
-msgstr[3] "servery"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Požiadavka na hlavný zoznam serverov (%lu ms ubehlo)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "Zoznam hlavných serverov nemohol byť načítaný."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "Zoznam hlavných serverov nemohol byť načítaný."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(Záložný zoznam serverov)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "Nie je možné pripojenie LAN"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "Pokúšam sa nájsť LAN servery"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
@@ -2929,41 +2938,6 @@ msgstr[3] "%d Sekundy"
 msgid "Disconnected"
 msgstr "Odpojené"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Priebeh sťahovania mapy:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Priebeh sťahovania:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s z %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Odpoj sa pre zrušenie sťahovania"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Chyba sťahovania: %s"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Nemožno spustiť lokálny server. Pozri konzolu pre viac informácií."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Chyba: Nemožno spustiť lokálny server. [%s]"
-
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "VYTVORIŤ HRU"
@@ -3063,14 +3037,40 @@ msgstr "Odpojené: zadané nesprávne heslo"
 msgid "MTA Client verification failed!"
 msgstr "Overenie MTA Klienta zlyhalo!"
 
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "Nedá sa nájsť platné rozlíšenie obrazovky."
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Priebeh sťahovania mapy:"
 
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "Naozaj chcete použiť toto rozlíšenie obrazovky?"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Priebeh sťahovania:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s z %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Odpoj sa pre zrušenie sťahovania"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Chyba sťahovania: %s"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Nemožno spustiť lokálny server. Pozri konzolu pre viac informácií."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Chyba: Nemožno spustiť lokálny server. [%s]"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
