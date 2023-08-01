@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-26 10:12\n"
+"POT-Creation-Date: 2023-08-01 17:40+0000\n"
+"PO-Revision-Date: 2023-08-01 18:23\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -17,29 +17,18 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "Website istekleri"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "Geçerli ekran çözünürlüğü bulunamadı."
 
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "Sunucu, (sonradan) yükleme yapmak için şu siteleri talep ediyor:"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "Bu çözünürlüğü kullanmak istediğinizden emin misiniz?"
 
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "ÇALINMASINI ÖNLEMEK İÇİN ASLA ÖNEMLİ BİLGİLERİ GİRMEYİN"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "Seçimi hatırla"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
-msgid "Allow"
-msgstr "İzin ver"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "Reddet"
+#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
 
 #. Create buttons
 #. OK button
@@ -69,13 +58,12 @@ msgstr "İptal et"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
-#: Client/core/CMainMenu.cpp:1170 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
-#: Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
+#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
+#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
+#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
+#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
 msgstr "Evet"
 
@@ -180,20 +168,19 @@ msgstr "MTA:SA yeniden başlatılırken hata oluştu\n\n"
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
-#: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1227
-#: Client/core/CCore.cpp:1240 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
+#: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
+#: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
+#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
+#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
+#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:421
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:591
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
@@ -205,6 +192,8 @@ msgstr "MTA:SA yeniden başlatılırken hata oluştu\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1275
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -296,8 +285,8 @@ msgstr "Başka bir GTA:San Andreas işlemi zaten çalışıyor. MTA:SA'nın baş
 
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
 #: Client/loader/MainFunctions.cpp:1217
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "Information"
 msgstr "Bilgiler"
 
@@ -506,44 +495,12 @@ msgstr "Yükleme ayarlarını güncelle"
 msgid "Update compatibility settings"
 msgstr "Uyumluluk ayarlarını güncelle"
 
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr "Bilinmeyen"
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr "'%s' dosyası şu anda %zu işlemleri tarafından kilitlendi.\n\n"
-"Aşağıdaki süreçleri sonlandırmak ve güncellemeye devam etmek istiyor musunuz?\n\n"
-"%s"
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr "Kurulumunuz bozulmuş olabilir.\n\n"
-"%zu dosyalarından %zu yedekten geri yüklenemedi.\n\n"
-"Multi Theft Auto'yu www.multitheftauto.com adresinden yeniden yüklemeyi\n"
-"veya güncellemeyi yönetici olarak çalıştırmayı deneyebilirsiniz."
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Güncelleme kuruluyor..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Dosyalar çıkarılıyor..."
-
-#: Client/loader/Dialogs.cpp:132 Client/core/CMainMenu.cpp:1169
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/CSettings.cpp:1370 Client/core/CSettings.cpp:1394
-#: Client/core/CSettings.cpp:4434 Client/core/CSettings.cpp:4501
-#: Client/core/CSettings.cpp:4550 Client/core/CQuestionBox.cpp:194
+#: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1169 Client/core/CSettings.cpp:1370
+#: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
+#: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "Hayır"
@@ -655,10 +612,6 @@ msgstr "Pencere moduna zorla"
 msgid "Don't show again"
 msgstr "Bir daha gösterme"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
 #: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Uyarı: Anti-virüs programı bulunamadı"
@@ -681,30 +634,71 @@ msgid "I will not install an anti-virus.\n"
 msgstr "Anti-virüs kurmayacağım.\n"
 "Bilgisayarımın yavaşlamasını ve botnetin bir parçası olmasını istiyorum."
 
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+msgid "Installing update..."
+msgstr "Güncelleme kuruluyor..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+msgid "Extracting files..."
+msgstr "Dosyalar çıkarılıyor..."
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr "Bilinmeyen"
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr "'%s' dosyası şu anda %zu işlemleri tarafından kilitlendi.\n\n"
+"Aşağıdaki süreçleri sonlandırmak ve güncellemeye devam etmek istiyor musunuz?\n\n"
+"%s"
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr "Kurulumunuz bozulmuş olabilir.\n\n"
+"%zu dosyalarından %zu yedekten geri yüklenemedi.\n\n"
+"Multi Theft Auto'yu www.multitheftauto.com adresinden yeniden yüklemeyi\n"
+"veya güncellemeyi yönetici olarak çalıştırmayı deneyebilirsiniz."
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "Website istekleri"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "Sunucu, (sonradan) yükleme yapmak için şu siteleri talep ediyor:"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "ÇALINMASINI ÖNLEMEK İÇİN ASLA ÖNEMLİ BİLGİLERİ GİRMEYİN"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "Seçimi hatırla"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
+msgid "Allow"
+msgstr "İzin ver"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "Reddet"
+
 #. Unknown command
 #: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
 msgstr "Bilinmeyen komut veya cvar: "
 
-#: Client/core/CMainMenu.cpp:322
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Yeni özelliklerin olduğu bir versiyon kullanıyorsun! Bu versiyon sadece deneme amaçlıdır ve herhangi bir sunucuya bağlanmak için kullanılamaz!"
-
-#: Client/core/CMainMenu.cpp:341
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "XP ve Vista, Temmuz 2019'dan sonra güncelleme almayacak.\n\n"
-"En son ve güncel serverlarda oynamak için, Windows'unuzu güncelleyin."
-
-#: Client/core/CMainMenu.cpp:1163
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Bu sizi mevcut sunucudan atacaktır.\n\n"
-"Çıkmak istediğinizden emin misiniz?"
-
-#: Client/core/CMainMenu.cpp:1167
-msgid "DISCONNECT WARNING"
-msgstr "BAĞLANTI KESME UYARISI"
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Türkçe"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -850,6 +844,198 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Cevap bekleniyor  -  %-3d"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "HABERLER"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+msgid "Visit latest news article"
+msgstr "Son haber makalesini ziyaret et"
+
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Sistemsel hata"
+
+#: Client/core/CCore.cpp:890
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "DÜZELTMEK İÇİN, ŞU DOSYAYI SİL:"
+
+#: Client/core/CCore.cpp:922
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s modülü yanlış!"
+
+#: Client/core/CCore.cpp:1227
+msgid "Error executing URL"
+msgstr "URL çalıştırılırken bir hata oluştu"
+
+#: Client/core/CCore.cpp:1239
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Komut satırında ('%s') belirtilen mod'u çalıştırırken hata"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1327
+msgid "this help screen"
+msgstr "bu yardım ekranı"
+
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+msgid "exits the application"
+msgstr "uygulamadan çıkar"
+
+#: Client/core/CCore.cpp:1330
+msgid "shows the version"
+msgstr "versiyonu gösterir"
+
+#: Client/core/CCore.cpp:1331
+msgid "shows the time"
+msgstr "zamanı gösterir"
+
+#: Client/core/CCore.cpp:1332
+msgid "shows the hud"
+msgstr "arayüzü gösterir"
+
+#: Client/core/CCore.cpp:1333
+msgid "shows all the binds"
+msgstr "bütün tuş atamalarını gösterir"
+
+#: Client/core/CCore.cpp:1334
+msgid "shows your serial"
+msgstr "seri numaranızı gösterir"
+
+#: Client/core/CCore.cpp:1343
+msgid "connects to a server (host port nick pass)"
+msgstr "bir sunucuya (ip port takma-ad şifre) bağlanır"
+
+#: Client/core/CCore.cpp:1344
+msgid "connects to a previous server"
+msgstr "bir önceki sunucuya bağlanır"
+
+#: Client/core/CCore.cpp:1345
+msgid "binds a key (key control)"
+msgstr "bir tuş atamasını kaydeder (tuş kontrol)"
+
+#: Client/core/CCore.cpp:1346
+msgid "unbinds a key (key)"
+msgstr "tuş atamasını çıkarır (tuş)"
+
+#: Client/core/CCore.cpp:1347
+msgid "copies the default gta controls"
+msgstr "varsayılan gta kontrollerini kopyalar"
+
+#: Client/core/CCore.cpp:1348
+msgid "outputs a screenshot"
+msgstr "bir ekran görüntüsü kaydeder"
+
+#: Client/core/CCore.cpp:1349
+msgid "immediately saves the config"
+msgstr "yapılandırmayı hemen kaydeder"
+
+#: Client/core/CCore.cpp:1351
+msgid "clears the debug view"
+msgstr "debug görünümünü temizler"
+
+#: Client/core/CCore.cpp:1352
+msgid "scrolls the chatbox upwards"
+msgstr "konuşma penceresini yukarı kaydırır"
+
+#: Client/core/CCore.cpp:1353
+msgid "scrolls the chatbox downwards"
+msgstr "konuşma penceresini aşağı kaydırır"
+
+#: Client/core/CCore.cpp:1354
+msgid "scrolls the debug view upwards"
+msgstr "debug görünümünü yukarıya doğru kaydırır"
+
+#: Client/core/CCore.cpp:1355
+msgid "scrolls the debug view downwards"
+msgstr "debug görünümünü aşağı doğru kaydırır"
+
+#: Client/core/CCore.cpp:1358
+msgid "shows the memory statistics"
+msgstr "hafıza istatistiklerini gösterir"
+
+#: Client/core/CCore.cpp:1359
+msgid "shows the frame timing graph"
+msgstr "çerçeve zamanlama grafiğini gösterir"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr "geliştiriciler için: haberleri yeniden yükle"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Bu problem hakkında önerilen çözümü görmek ister misiniz?"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONSOL"
+
+#: Client/core/CMainMenu.cpp:322
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Yeni özelliklerin olduğu bir versiyon kullanıyorsun! Bu versiyon sadece deneme amaçlıdır ve herhangi bir sunucuya bağlanmak için kullanılamaz!"
+
+#: Client/core/CMainMenu.cpp:341
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "XP ve Vista, Temmuz 2019'dan sonra güncelleme almayacak.\n\n"
+"En son ve güncel serverlarda oynamak için, Windows'unuzu güncelleyin."
+
+#: Client/core/CMainMenu.cpp:1163
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Bu sizi mevcut sunucudan atacaktır.\n\n"
+"Çıkmak istediğinizden emin misiniz?"
+
+#: Client/core/CMainMenu.cpp:1167
+msgid "DISCONNECT WARNING"
+msgstr "BAĞLANTI KESME UYARISI"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "Programlama"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "Katkıda Bulunanlar"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "Oyun Dizaynı / Modlama"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "Yerelleştirme"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "Aktif Katkıda Bulunanlar"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "Özel Teşekkürler"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr "Bu yazılım ve proje aşağıdaki kütüphaneleri ve yazılımları kullanır:"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Seçtiğiniz oyuncu tipi yüklenemedi, ayrıca varsayılan tip de yüklenememiştir. Lütfen MTA' yı yeniden yükleyiniz."
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Ekseni hızlandır"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Ekseni yavaşlat"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1808,51 +1994,143 @@ msgstr "Fare düzeltmesi:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Fare hareketini düzelt - Bilgisayarı yeniden başlatmayı gerektirebilir"
 
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "Programlama"
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ KOMUT YARDIMI ]***\n"
 
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "Katkıda Bulunanlar"
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Saat %d:%02d:%02d"
 
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "Oyun Dizaynı / Modlama"
+#: Client/core/CCommandFuncs.cpp:242
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "bağlan (/connect): Sözdizimi 'connect <sunucu ip> [<port> <kullanıcı adı> <şifre>]'"
 
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "Yerelleştirme"
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+msgid "connect: Bad port number"
+msgstr "bağlan: Hatalı port adresi"
 
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "Aktif Katkıda Bulunanlar"
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "bağlan: %s:%u...'e bağlanılıyor..."
 
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "Özel Teşekkürler"
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "bağlan: %s:%u adresine bağlanılamadı!"
 
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr "Bu yazılım ve proje aşağıdaki kütüphaneleri ve yazılımları kullanır:"
+#: Client/core/CCommandFuncs.cpp:281
+msgid "connect: Failed to unload current mod"
+msgstr "bağlan: Mevcut mod devre dışı bırakılamadı"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Ekseni hızlandır"
+#: Client/core/CCommandFuncs.cpp:371
+msgid "Bound all controls from GTA"
+msgstr "Tüm kontrol atamaları GTA'dan alındı"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Ekseni yavaşlat"
+#: Client/core/CCommandFuncs.cpp:385
+msgid "Saved configuration file"
+msgstr "Yapılandırma dosyası kaydedildi"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "HABERLER"
+#. Print it
+#: Client/core/CCommandFuncs.cpp:451
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Seri numaran: %s"
 
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "Son haber makalesini ziyaret et"
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Ekran görüntüsü  %d boyutunda, ancak %d olması gerekiyor"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Ekran görüntüsü alınamadı"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Ekran görüntüsü alındı: '%s'"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Bağlantı başarısız. Girilen kullanıcı adı geçersiz!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Bağlantı başarısız. Girilen sunucu adresi geçersiz!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "%s sunucusuna %u portundan yapılan bağlantı başarısız!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "%s:%u'a bağlanılıyor..."
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+msgid "CONNECTING"
+msgstr "BAĞLANILIYOR"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+msgid "Connection timed out"
+msgstr "Bağlantı zaman aşımına uğradı"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+msgid "Disconnected: unknown protocol error"
+msgstr "Bağlantı kesildi: Bilinmeyen protokol hatası"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+msgid "Disconnected: disconnected remotely"
+msgstr "Bağlantı kesildi: bağlantı uzaktan kesildi."
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
+msgid "Disconnected: connection lost remotely"
+msgstr "Bağlanti kesildi: bağlantı uzaktan kaybedildi"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+msgid "Disconnected: you are banned from this server"
+msgstr "Bağlantı kesildi: bu sunucudan yasaklandınız"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
+msgid "Disconnected: disconnected from the server"
+msgstr "Bağlantı kesildi: sunucu ile olan bağlantı kesildi"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+msgid "Disconnected: connection to the server was lost"
+msgstr "Bağlantı kesildi: sunucu ile yapılan bağlantı koptu"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+msgid "Disconnected: connection was refused"
+msgstr "Bağlantı Koptu: bağlantı reddedildi"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Böyle bir mod yüklü değil (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Sunucudan yanıt alınamıyor (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Sunucudan yanıt alınamıyor (1)"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2026,274 +2304,143 @@ msgstr "Grup kontrol ileri"
 msgid "Group control backwards"
 msgstr "Grup kontrol geri"
 
-#: Client/core/CScreenShot.cpp:104
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "Beklemede"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "oyuncu"
+msgstr[1] "oyuncular"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "açık"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "sunucu"
+msgstr[1] "sunucular"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ekran görüntüsü  %d boyutunda, ancak %d olması gerekiyor"
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Ana sunucu listesi alınıyor. (%lu ms geçti)"
 
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "Ekran görüntüsü alınamadı"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "Ana sunucu listesi ayrıştırılamadı."
 
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Ekran görüntüsü alındı: '%s'"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "Ana sunucu listesi alınamadı."
 
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ KOMUT YARDIMI ]***\n"
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(Yedek sunucu listesi)"
 
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Saat %d:%02d:%02d"
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "LAN-yayın soketi atanamadı"
 
-#: Client/core/CCommandFuncs.cpp:242
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "bağlan (/connect): Sözdizimi 'connect <sunucu ip> [<port> <kullanıcı adı> <şifre>]'"
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "LAN sunucuları aranıyor"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
-msgid "connect: Bad port number"
-msgstr "bağlan: Hatalı port adresi"
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "SUNUCU DOLU"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "bağlan: %s:%u...'e bağlanılıyor..."
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "İsim:"
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "bağlan: %s:%u adresine bağlanılamadı!"
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "Sunucu Adresi:"
 
-#: Client/core/CCommandFuncs.cpp:281
-msgid "connect: Failed to unload current mod"
-msgstr "bağlan: Mevcut mod devre dışı bırakılamadı"
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "Oyun modu:"
 
-#: Client/core/CCommandFuncs.cpp:371
-msgid "Bound all controls from GTA"
-msgstr "Tüm kontrol atamaları GTA'dan alındı"
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "Harita:"
 
-#: Client/core/CCommandFuncs.cpp:385
-msgid "Saved configuration file"
-msgstr "Yapılandırma dosyası kaydedildi"
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "Oyuncular:"
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:451
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* Seri numaran: %s"
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "Parola:"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Bu problem hakkında önerilen çözümü görmek ister misiniz?"
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "Gecikme:"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Türkçe"
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "Oyuncu listesi"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Bağlantı başarısız. Girilen kullanıcı adı geçersiz!"
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "Kapat"
 
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Bağlantı başarısız. Girilen sunucu adresi geçersiz!"
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "Oyuna Katıl"
 
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "%s sunucusuna %u portundan yapılan bağlantı başarısız!"
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "Sunucu şifresini girin:"
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "%s:%u'a bağlanılıyor..."
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "Sunucuda yer açılınca otomatik olarak bağlan."
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
-msgid "CONNECTING"
-msgstr "BAĞLANILIYOR"
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "LÜTFEN SUNUCU ŞİFRESİNİ GİRİN"
 
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
-msgid "Connection timed out"
-msgstr "Bağlantı zaman aşımına uğradı"
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "Zaman Aşımı"
 
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-msgid "Disconnected: unknown protocol error"
-msgstr "Bağlantı kesildi: Bilinmeyen protokol hatası"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
-msgid "Disconnected: disconnected remotely"
-msgstr "Bağlantı kesildi: bağlantı uzaktan kesildi."
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
-msgid "Disconnected: connection lost remotely"
-msgstr "Bağlanti kesildi: bağlantı uzaktan kaybedildi"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
-msgid "Disconnected: you are banned from this server"
-msgstr "Bağlantı kesildi: bu sunucudan yasaklandınız"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
-msgid "Disconnected: disconnected from the server"
-msgstr "Bağlantı kesildi: sunucu ile olan bağlantı kesildi"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-msgid "Disconnected: connection to the server was lost"
-msgstr "Bağlantı kesildi: sunucu ile yapılan bağlantı koptu"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-msgid "Disconnected: connection was refused"
-msgstr "Bağlantı Koptu: bağlantı reddedildi"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Böyle bir mod yüklü değil (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Sunucudan yanıt alınamıyor (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Sunucudan yanıt alınamıyor (1)"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Seçtiğiniz oyuncu tipi yüklenemedi, ayrıca varsayılan tip de yüklenememiştir. Lütfen MTA' yı yeniden yükleyiniz."
-
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Sistemsel hata"
-
-#: Client/core/CCore.cpp:890
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "DÜZELTMEK İÇİN, ŞU DOSYAYI SİL:"
-
-#: Client/core/CCore.cpp:922
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s modülü yanlış!"
-
-#: Client/core/CCore.cpp:1227
-msgid "Error executing URL"
-msgstr "URL çalıştırılırken bir hata oluştu"
-
-#: Client/core/CCore.cpp:1239
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Komut satırında ('%s') belirtilen mod'u çalıştırırken hata"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
-msgid "this help screen"
-msgstr "bu yardım ekranı"
-
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
-msgid "exits the application"
-msgstr "uygulamadan çıkar"
-
-#: Client/core/CCore.cpp:1330
-msgid "shows the version"
-msgstr "versiyonu gösterir"
-
-#: Client/core/CCore.cpp:1331
-msgid "shows the time"
-msgstr "zamanı gösterir"
-
-#: Client/core/CCore.cpp:1332
-msgid "shows the hud"
-msgstr "arayüzü gösterir"
-
-#: Client/core/CCore.cpp:1333
-msgid "shows all the binds"
-msgstr "bütün tuş atamalarını gösterir"
-
-#: Client/core/CCore.cpp:1334
-msgid "shows your serial"
-msgstr "seri numaranızı gösterir"
-
-#: Client/core/CCore.cpp:1343
-msgid "connects to a server (host port nick pass)"
-msgstr "bir sunucuya (ip port takma-ad şifre) bağlanır"
-
-#: Client/core/CCore.cpp:1344
-msgid "connects to a previous server"
-msgstr "bir önceki sunucuya bağlanır"
-
-#: Client/core/CCore.cpp:1345
-msgid "binds a key (key control)"
-msgstr "bir tuş atamasını kaydeder (tuş kontrol)"
-
-#: Client/core/CCore.cpp:1346
-msgid "unbinds a key (key)"
-msgstr "tuş atamasını çıkarır (tuş)"
-
-#: Client/core/CCore.cpp:1347
-msgid "copies the default gta controls"
-msgstr "varsayılan gta kontrollerini kopyalar"
-
-#: Client/core/CCore.cpp:1348
-msgid "outputs a screenshot"
-msgstr "bir ekran görüntüsü kaydeder"
-
-#: Client/core/CCore.cpp:1349
-msgid "immediately saves the config"
-msgstr "yapılandırmayı hemen kaydeder"
-
-#: Client/core/CCore.cpp:1351
-msgid "clears the debug view"
-msgstr "debug görünümünü temizler"
-
-#: Client/core/CCore.cpp:1352
-msgid "scrolls the chatbox upwards"
-msgstr "konuşma penceresini yukarı kaydırır"
-
-#: Client/core/CCore.cpp:1353
-msgid "scrolls the chatbox downwards"
-msgstr "konuşma penceresini aşağı kaydırır"
-
-#: Client/core/CCore.cpp:1354
-msgid "scrolls the debug view upwards"
-msgstr "debug görünümünü yukarıya doğru kaydırır"
-
-#: Client/core/CCore.cpp:1355
-msgid "scrolls the debug view downwards"
-msgstr "debug görünümünü aşağı doğru kaydırır"
-
-#: Client/core/CCore.cpp:1358
-msgid "shows the memory statistics"
-msgstr "hafıza istatistiklerini gösterir"
-
-#: Client/core/CCore.cpp:1359
-msgid "shows the frame timing graph"
-msgstr "çerçeve zamanlama grafiğini gösterir"
-
-#: Client/core/CCore.cpp:1363
-msgid "for developers: reload news"
-msgstr "geliştiriciler için: haberleri yeniden yükle"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONSOL"
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "Sorguluyor..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2393,13 +2540,6 @@ msgstr "Gecikme"
 msgid "Gamemode"
 msgstr "Oyun modu"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "Oyuncu listesi"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -2461,137 +2601,6 @@ msgstr "Geçersiz isim! Ayarlardan yeni bir isim belirleyin!"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Bağlanmak için bir sunucu seçmeniz gerekiyor."
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "SUNUCU DOLU"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "İsim:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "Sunucu Adresi:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "Oyun modu:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "Harita:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "Oyuncular:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "Parola:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "Gecikme:"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "Kapat"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "Oyuna Katıl"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "Sunucu şifresini girin:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "Sunucuda yer açılınca otomatik olarak bağlan."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "LÜTFEN SUNUCU ŞİFRESİNİ GİRİN"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "Zaman Aşımı"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "Sorguluyor..."
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "Beklemede"
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "oyuncu"
-msgstr[1] "oyuncular"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "açık"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "sunucu"
-msgstr[1] "sunucular"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Ana sunucu listesi alınıyor. (%lu ms geçti)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "Ana sunucu listesi ayrıştırılamadı."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "Ana sunucu listesi alınamadı."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(Yedek sunucu listesi)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "LAN-yayın soketi atanamadı"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "LAN sunucuları aranıyor"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
@@ -2917,41 +2926,6 @@ msgstr[1] "%d saniye"
 msgid "Disconnected"
 msgstr "Bağlantı kesildi"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Harita indirme süreci:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "İndirme Süreci: "
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s'nin %s'i"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "İndirmeyi iptal etmek için bağlantıyı kes"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "İndirme hatası: %s"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Yerel sunucu başlatılamadı. Ayrıntılar için konsola bakın. "
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Hata: Yerel sunucu başlatılamadı. [%s]"
-
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "SUNUCU KUR"
@@ -3051,14 +3025,40 @@ msgstr "Bağlantı Kesildi: yanlış şifre girildi"
 msgid "MTA Client verification failed!"
 msgstr "MTA İstemci doğrulaması yapılamadı!"
 
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "Geçerli ekran çözünürlüğü bulunamadı."
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Harita indirme süreci:"
 
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "Bu çözünürlüğü kullanmak istediğinizden emin misiniz?"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "İndirme Süreci: "
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s'nin %s'i"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "İndirmeyi iptal etmek için bağlantıyı kes"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "İndirme hatası: %s"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Yerel sunucu başlatılamadı. Ayrıntılar için konsola bakın. "
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Hata: Yerel sunucu başlatılamadı. [%s]"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
