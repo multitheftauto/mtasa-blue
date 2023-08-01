@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-26 10:11\n"
+"POT-Creation-Date: 2023-08-01 17:40+0000\n"
+"PO-Revision-Date: 2023-08-01 18:22\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -17,29 +17,18 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "Αιτήματα ιστότοπου"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "Δεν μπορεί να βρεθεί έγκυρη ανάλυση οθόνης"
 
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "Ο διακομιστής ζητάει τα ακόλουθους ιστότοπους έτσι ώστε να τους φορτώσει (αργότερα):"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "Είστε σίγουρος ότι θέλετε να χρησιμοποιήσετε αυτή την ανάλυση οθόνης;"
 
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "ΠΟΤΕ ΜΗΝ ΕΙΣΑΓΕΤΕ ΕΥΑΙΣΘΗΤΑ ΔΕΔΟΜΕΝΑ ΩΣΤΕ ΝΑ ΜΗΝ ΚΛΑΠΟΥΝ"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "Θυμήσου την απόφαση"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
-msgid "Allow"
-msgstr "Επέτρεψε"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "Αρνούμαι"
+#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
 
 #. Create buttons
 #. OK button
@@ -69,13 +58,12 @@ msgstr "Ακύρωση"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
-#: Client/core/CMainMenu.cpp:1170 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
-#: Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
+#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
+#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
+#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
+#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
 msgstr "Ναι"
 
@@ -180,20 +168,19 @@ msgstr "Πρόβλημα επανεκκίνησης του MTA:SΑ\n\n"
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
-#: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1227
-#: Client/core/CCore.cpp:1240 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
+#: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
+#: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
+#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
+#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
+#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:421
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:591
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
@@ -205,6 +192,8 @@ msgstr "Πρόβλημα επανεκκίνησης του MTA:SΑ\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1275
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -296,8 +285,8 @@ msgstr "Μια αναφορά του GTA: San Andreas είναι ήδη σε λ�
 
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
 #: Client/loader/MainFunctions.cpp:1217
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "Information"
 msgstr "Πληροφορία"
 
@@ -502,39 +491,12 @@ msgstr "Αναβάθμιση ρυθμίσεων εγκατάστασης"
 msgid "Update compatibility settings"
 msgstr "Αναβάθμιση ρυθμίσεων συμβατότητας"
 
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr ""
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr ""
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Εγκατάσταση ενημέρωσης..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Εξαγωγή αρχείων..."
-
-#: Client/loader/Dialogs.cpp:132 Client/core/CMainMenu.cpp:1169
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/CSettings.cpp:1370 Client/core/CSettings.cpp:1394
-#: Client/core/CSettings.cpp:4434 Client/core/CSettings.cpp:4501
-#: Client/core/CSettings.cpp:4550 Client/core/CQuestionBox.cpp:194
+#: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1169 Client/core/CSettings.cpp:1370
+#: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
+#: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "Όχι"
@@ -645,10 +607,6 @@ msgstr "Αναγκάστε λειτουργία παραθύρου"
 msgid "Don't show again"
 msgstr "Να μην εμφανιστεί ξανά"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
 #: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "Προειδοποίηση: Δεν ήταν δυνατή η ανίχνευση anti-virus προϊόντων "
@@ -671,30 +629,66 @@ msgid "I will not install an anti-virus.\n"
 msgstr "Δεν θα εγκαταστήσω ένα anti-virus.\n"
 "Θέλω ο υπολογιστής μου να μείνει και να είναι μέρος ενός botnet."
 
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+msgid "Installing update..."
+msgstr "Εγκατάσταση ενημέρωσης..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+msgid "Extracting files..."
+msgstr "Εξαγωγή αρχείων..."
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "Αιτήματα ιστότοπου"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "Ο διακομιστής ζητάει τα ακόλουθους ιστότοπους έτσι ώστε να τους φορτώσει (αργότερα):"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "ΠΟΤΕ ΜΗΝ ΕΙΣΑΓΕΤΕ ΕΥΑΙΣΘΗΤΑ ΔΕΔΟΜΕΝΑ ΩΣΤΕ ΝΑ ΜΗΝ ΚΛΑΠΟΥΝ"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "Θυμήσου την απόφαση"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
+msgid "Allow"
+msgstr "Επέτρεψε"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "Αρνούμαι"
+
 #. Unknown command
 #: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
 msgstr "Άγνωστη εντολή ή cvar: "
 
-#: Client/core/CMainMenu.cpp:322
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Χρησιμοποιείται ένα χαρακτηριστικό τμήμα έκδοσης! Αυτή είναι μια δοκιμαστική έκδοση μόνο για όσους δεν μπορούν να συνδεθούν στους ανοιχτούς διακοσμητές!"
-
-#: Client/core/CMainMenu.cpp:341
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "Το MTA δεν θα δεχτεί αναβάθμισεις σε XP/Vista μετά τον Ιούλιο του 2019.\n\n"
-"Αναβάθμιστε σε windows για να συνεχίζεται να παίζεται στους τελευταίους Διακομιστές."
-
-#: Client/core/CMainMenu.cpp:1163
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Αυτό θα σας αποσυνδέσει από τον τρέχων διακομιστή.\n\n"
-"Είστε σίγουρος ότι θέλετε να αποσυνδεθείτε;"
-
-#: Client/core/CMainMenu.cpp:1167
-msgid "DISCONNECT WARNING"
-msgstr "ΠΡΟΕΙΔΟΠΟΙΗΣΗ ΑΠΟΣΥΝΔΕΣΗΣ"
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Ελληνικά"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -840,6 +834,198 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Αναμονή για απόκριση  -  %-3d"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr ""
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+msgid "Visit latest news article"
+msgstr "Επισκεφθείτε το τελευταίο άρθρο ειδήσεων"
+
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Κρίσιμο σφάλμα"
+
+#: Client/core/CCore.cpp:890
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "ΓΙΑ ΔΙΟΡΘΩΣΗ, ΑΦΑΙΡΕΣΤΕ ΑΥΤΟ ΤΟ ΑΡΧΕΙΟ:"
+
+#: Client/core/CCore.cpp:922
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s δομοστοιχείο είναι εσφαλμένο!"
+
+#: Client/core/CCore.cpp:1227
+msgid "Error executing URL"
+msgstr "Σφάλμα κατά την εκτέλεση του URL"
+
+#: Client/core/CCore.cpp:1239
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Σφάλμα κατά την εκτέλεση της τροποποίησης στη γραμμή εκτέλεσης ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1327
+msgid "this help screen"
+msgstr "αυτή η οθόνη βοήθειας"
+
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+msgid "exits the application"
+msgstr "έξοδος από την εφαρμογή"
+
+#: Client/core/CCore.cpp:1330
+msgid "shows the version"
+msgstr "εμφάνιση της έκδοσης"
+
+#: Client/core/CCore.cpp:1331
+msgid "shows the time"
+msgstr "εμφάνιση της ώρας"
+
+#: Client/core/CCore.cpp:1332
+msgid "shows the hud"
+msgstr "εμφάνιση του hud"
+
+#: Client/core/CCore.cpp:1333
+msgid "shows all the binds"
+msgstr "εμφάνιση όλων των δεσμευμένων κουμπιών"
+
+#: Client/core/CCore.cpp:1334
+msgid "shows your serial"
+msgstr "εμφάνιση του σειριακού αριθμού"
+
+#: Client/core/CCore.cpp:1343
+msgid "connects to a server (host port nick pass)"
+msgstr "σύνδεση με τον διακομιστή (διοργανωτής θύρα όνομα κωδικός)"
+
+#: Client/core/CCore.cpp:1344
+msgid "connects to a previous server"
+msgstr "συνδέετε σε έναν προηγούμενο διακομιστή"
+
+#: Client/core/CCore.cpp:1345
+msgid "binds a key (key control)"
+msgstr "δέσμευση ενός πλήκτρου (πλήκτρο έλεγχος)"
+
+#: Client/core/CCore.cpp:1346
+msgid "unbinds a key (key)"
+msgstr "Αποδέσμευση ενός πλήκτρου (πλήκτρο)"
+
+#: Client/core/CCore.cpp:1347
+msgid "copies the default gta controls"
+msgstr "αντιγραφή των προεπιλεγμένων gta πλήκτρων "
+
+#: Client/core/CCore.cpp:1348
+msgid "outputs a screenshot"
+msgstr "απόδοση στιγμιότυπου οθόνης"
+
+#: Client/core/CCore.cpp:1349
+msgid "immediately saves the config"
+msgstr "άμεση αποθήκευση του config"
+
+#: Client/core/CCore.cpp:1351
+msgid "clears the debug view"
+msgstr "εκκαθάριση της απασφαλματωμένης όψης"
+
+#: Client/core/CCore.cpp:1352
+msgid "scrolls the chatbox upwards"
+msgstr "κύλιση του πλαισίου συνομιλίας προς τα επάνω"
+
+#: Client/core/CCore.cpp:1353
+msgid "scrolls the chatbox downwards"
+msgstr "κύλιση του πλαισίου συνομιλίας προς τα κάτω"
+
+#: Client/core/CCore.cpp:1354
+msgid "scrolls the debug view upwards"
+msgstr "κύλιση της απασφαλματωμένης όψης προς τα πάνω"
+
+#: Client/core/CCore.cpp:1355
+msgid "scrolls the debug view downwards"
+msgstr "κύλιση της απασφαλματωμένης όψης προς τα κάτω"
+
+#: Client/core/CCore.cpp:1358
+msgid "shows the memory statistics"
+msgstr "προβολή στατιστικών στοιχείων μνήμης"
+
+#: Client/core/CCore.cpp:1359
+msgid "shows the frame timing graph"
+msgstr "προβολή γραφήματος συγχρονισμού εικόνας"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr ""
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Θέλεις να δεις κάποια βοήθεια στο διαδίκτυο για αυτό το πρόβλημα ;"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "Κονσόλα"
+
+#: Client/core/CMainMenu.cpp:322
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Χρησιμοποιείται ένα χαρακτηριστικό τμήμα έκδοσης! Αυτή είναι μια δοκιμαστική έκδοση μόνο για όσους δεν μπορούν να συνδεθούν στους ανοιχτούς διακοσμητές!"
+
+#: Client/core/CMainMenu.cpp:341
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "Το MTA δεν θα δεχτεί αναβάθμισεις σε XP/Vista μετά τον Ιούλιο του 2019.\n\n"
+"Αναβάθμιστε σε windows για να συνεχίζεται να παίζεται στους τελευταίους Διακομιστές."
+
+#: Client/core/CMainMenu.cpp:1163
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Αυτό θα σας αποσυνδέσει από τον τρέχων διακομιστή.\n\n"
+"Είστε σίγουρος ότι θέλετε να αποσυνδεθείτε;"
+
+#: Client/core/CMainMenu.cpp:1167
+msgid "DISCONNECT WARNING"
+msgstr "ΠΡΟΕΙΔΟΠΟΙΗΣΗ ΑΠΟΣΥΝΔΕΣΗΣ"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "Προγραμματισμός"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "Συνεργάτες"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "Σχεδίαση / Scripting Παιχνιδιού"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "Γλωσσική τοπικοποίηση"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "Συνεργάτες λογισμικού ενημέρωσης"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "Ιδιαίτερες Ευχαριστίες!"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr ""
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Το σώμα που επιλέξατε δεν μπόρεσε να φορτώσει, και το προεπιλεγμένο σώμα επίσης δεν μπόρεσε να φορτώσει, παρακαλώ επανεγκαταστήστε το MTA."
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Άξονας επιτάχυνσης"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Άξονας επιβράδυνσης"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1797,51 +1983,143 @@ msgstr "Σταθεροποιήση ποντικιού:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Σταθεροποιήση κίνησης ποντικιού - Μπορεί να χρειαστεί επανεκκίνηση του υπολογιστή"
 
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "Προγραμματισμός"
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ ΕΝΤΟΛH ΒΟHΘΕΙΑ ]***\n"
 
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "Συνεργάτες"
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Η ώρα είναι %d:%02d:%02d"
 
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "Σχεδίαση / Scripting Παιχνιδιού"
+#: Client/core/CCommandFuncs.cpp:242
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "Σύνδεση: Η σύνταξη είναι 'connect <host> [<port> <nick> <pass>]'"
 
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "Γλωσσική τοπικοποίηση"
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+msgid "connect: Bad port number"
+msgstr "Σύνδεση: Κακός αριθμός θύρας"
 
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "Συνεργάτες λογισμικού ενημέρωσης"
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "Σύνδεση: Συνδέεται στο %s:%u..."
 
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "Ιδιαίτερες Ευχαριστίες!"
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "Σύνδεση: δεν μπόρεσε να συνδεθεί στο %s:%u!"
 
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+#: Client/core/CCommandFuncs.cpp:281
+msgid "connect: Failed to unload current mod"
+msgstr "Σύνδεση: H αποφόρτωση της τροποποίησης ήταν ανεπιτυχής"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Άξονας επιτάχυνσης"
+#: Client/core/CCommandFuncs.cpp:371
+msgid "Bound all controls from GTA"
+msgstr "Δεσμεύτηκαν όλα τα κουμπιά από το GTA"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Άξονας επιβράδυνσης"
+#: Client/core/CCommandFuncs.cpp:385
+msgid "Saved configuration file"
+msgstr "To αρχείο ρυθμίσεων αποθηκεύτηκε"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr ""
+#. Print it
+#: Client/core/CCommandFuncs.cpp:451
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Ο σειριακός αριθμός σου είναι: %s"
 
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "Επισκεφθείτε το τελευταίο άρθρο ειδήσεων"
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Το στιγμιότυπο οθόνης έλαβε %d bytes, αλλά αναμένονταν %d"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Το στιγμιότυπο οθόνης απέτυχε"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Στιγμιότυπο οθόνης προστέθηκε: '%s'"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Η σύνδεση απέτυχε: Δόθηκε άτοπο ψευδώνυμο!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Η Σύνδεση απέτυχε. Δόθηκε άτοπος διοργανωτής!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "H σύνδεση στο %s με θύρα %u απέτυχε!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Σύνδεση στο %s:%u... "
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+msgid "CONNECTING"
+msgstr "ΣΥΝΔΕΕΤΕ"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+msgid "Connection timed out"
+msgstr "Λήξη χρόνου σύνδεσης"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+msgid "Disconnected: unknown protocol error"
+msgstr "Αποσυνδέθηκες: άγνωστο σφάλμα πρωτοκόλλου"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+msgid "Disconnected: disconnected remotely"
+msgstr "Αποσυνδέθηκες: αποσυνδέθηκες απομακρυσμένα"
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
+msgid "Disconnected: connection lost remotely"
+msgstr "Αποσυνδέθηκες: χάθηκε η απομακρυσμένη σύνδεση"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+msgid "Disconnected: you are banned from this server"
+msgstr "Αποσυνδέθηκες: Έχεις αποκλειστεί από αυτό τον διακομιστή"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
+msgid "Disconnected: disconnected from the server"
+msgstr "Αποσυνδέθηκες: αποσυνδέθηκες από τον διακομιστή"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+msgid "Disconnected: connection to the server was lost"
+msgstr "Αποσυνδέθηκες: χάθηκε η σύνδεση με τον διακομιστή"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+msgid "Disconnected: connection was refused"
+msgstr "Αποσυνδέθηκες: η σύνδεση απορρίφθηκε"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Δεν έχει εγκατασταθεί τέτοια τροποποίηση (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Κακή ανταπόκριση διακομιστή (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Κακή ανταπόκριση διακομιστή (1)"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2015,274 +2293,143 @@ msgstr "Πλήκτρο ομάδας μπροστά"
 msgid "Group control backwards"
 msgstr "Πλήκτρο ομάδας πίσω"
 
-#: Client/core/CScreenShot.cpp:104
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "Αδρανής"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "παίχτης"
+msgstr[1] "παίχτες"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "ενεργοποίηση"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "διακομιστής"
+msgstr[1] "διακομιστές"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Το στιγμιότυπο οθόνης έλαβε %d bytes, αλλά αναμένονταν %d"
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Αίτηση της κύριας λίστας διακομιστών (%lu ms πέρασαν)"
 
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "Το στιγμιότυπο οθόνης απέτυχε"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "Η κύρια λίστα διακομιστών δεν μπόρεσε να αναλυθεί."
 
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Στιγμιότυπο οθόνης προστέθηκε: '%s'"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "Η κύρια λίστα διακομιστών δεν μπορούσε να ανακτηθεί."
 
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ ΕΝΤΟΛH ΒΟHΘΕΙΑ ]***\n"
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(Αντίγραφο ασφαλείας λίστας διακομιστών)"
 
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Η ώρα είναι %d:%02d:%02d"
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "Δεν είναι δυνατή η δέσμευση LAN-broadcast socket"
 
-#: Client/core/CCommandFuncs.cpp:242
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "Σύνδεση: Η σύνταξη είναι 'connect <host> [<port> <nick> <pass>]'"
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "Προσπάθεια εντοπισμού LAN διακομιστών"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
-msgid "connect: Bad port number"
-msgstr "Σύνδεση: Κακός αριθμός θύρας"
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "Ο ΔΙΑΚΟΜΙΣΤΗΣ ΕΙΝΑΙ ΠΛΗΡΗΣ"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "Σύνδεση: Συνδέεται στο %s:%u..."
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "Όνομα:"
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "Σύνδεση: δεν μπόρεσε να συνδεθεί στο %s:%u!"
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "Διεύθυνση διακομιστή:"
 
-#: Client/core/CCommandFuncs.cpp:281
-msgid "connect: Failed to unload current mod"
-msgstr "Σύνδεση: H αποφόρτωση της τροποποίησης ήταν ανεπιτυχής"
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "Τύπος παιχνιδιού:"
 
-#: Client/core/CCommandFuncs.cpp:371
-msgid "Bound all controls from GTA"
-msgstr "Δεσμεύτηκαν όλα τα κουμπιά από το GTA"
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "Χάρτης:"
 
-#: Client/core/CCommandFuncs.cpp:385
-msgid "Saved configuration file"
-msgstr "To αρχείο ρυθμίσεων αποθηκεύτηκε"
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "Παίχτες:"
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:451
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* Ο σειριακός αριθμός σου είναι: %s"
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "Με προστασία:"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Θέλεις να δεις κάποια βοήθεια στο διαδίκτυο για αυτό το πρόβλημα ;"
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "Καθυστέρηση μεταφοράς:"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Ελληνικά"
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "Λίστα παιχτών"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Η σύνδεση απέτυχε: Δόθηκε άτοπο ψευδώνυμο!"
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "Κλείσιμο"
 
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Η Σύνδεση απέτυχε. Δόθηκε άτοπος διοργανωτής!"
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "Σύνδεση στο παιχνίδι"
 
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "H σύνδεση στο %s με θύρα %u απέτυχε!"
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "Παρακαλώ εισάγετε τον κωδικό του διακομιστή:"
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Σύνδεση στο %s:%u... "
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "Συνδεθείτε στον διακομιστή αμέσως μόλις υπάρχει μια διαθέσιμη θέση παίχτη."
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
-msgid "CONNECTING"
-msgstr "ΣΥΝΔΕΕΤΕ"
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "ΠΑΡΑΚΑΛΩ ΕΙΣΑΓΕΤΕ ΤΟΝ ΚΩΔΙΚΟ ΤΟΥ ΔΙΑΚΟΜΙΣΤΗ"
 
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
-msgid "Connection timed out"
-msgstr "Λήξη χρόνου σύνδεσης"
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "Λήξη χρόνου"
 
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-msgid "Disconnected: unknown protocol error"
-msgstr "Αποσυνδέθηκες: άγνωστο σφάλμα πρωτοκόλλου"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
-msgid "Disconnected: disconnected remotely"
-msgstr "Αποσυνδέθηκες: αποσυνδέθηκες απομακρυσμένα"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
-msgid "Disconnected: connection lost remotely"
-msgstr "Αποσυνδέθηκες: χάθηκε η απομακρυσμένη σύνδεση"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
-msgid "Disconnected: you are banned from this server"
-msgstr "Αποσυνδέθηκες: Έχεις αποκλειστεί από αυτό τον διακομιστή"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
-msgid "Disconnected: disconnected from the server"
-msgstr "Αποσυνδέθηκες: αποσυνδέθηκες από τον διακομιστή"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-msgid "Disconnected: connection to the server was lost"
-msgstr "Αποσυνδέθηκες: χάθηκε η σύνδεση με τον διακομιστή"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-msgid "Disconnected: connection was refused"
-msgstr "Αποσυνδέθηκες: η σύνδεση απορρίφθηκε"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Δεν έχει εγκατασταθεί τέτοια τροποποίηση (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Κακή ανταπόκριση διακομιστή (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Κακή ανταπόκριση διακομιστή (1)"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Το σώμα που επιλέξατε δεν μπόρεσε να φορτώσει, και το προεπιλεγμένο σώμα επίσης δεν μπόρεσε να φορτώσει, παρακαλώ επανεγκαταστήστε το MTA."
-
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Κρίσιμο σφάλμα"
-
-#: Client/core/CCore.cpp:890
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "ΓΙΑ ΔΙΟΡΘΩΣΗ, ΑΦΑΙΡΕΣΤΕ ΑΥΤΟ ΤΟ ΑΡΧΕΙΟ:"
-
-#: Client/core/CCore.cpp:922
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s δομοστοιχείο είναι εσφαλμένο!"
-
-#: Client/core/CCore.cpp:1227
-msgid "Error executing URL"
-msgstr "Σφάλμα κατά την εκτέλεση του URL"
-
-#: Client/core/CCore.cpp:1239
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Σφάλμα κατά την εκτέλεση της τροποποίησης στη γραμμή εκτέλεσης ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
-msgid "this help screen"
-msgstr "αυτή η οθόνη βοήθειας"
-
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
-msgid "exits the application"
-msgstr "έξοδος από την εφαρμογή"
-
-#: Client/core/CCore.cpp:1330
-msgid "shows the version"
-msgstr "εμφάνιση της έκδοσης"
-
-#: Client/core/CCore.cpp:1331
-msgid "shows the time"
-msgstr "εμφάνιση της ώρας"
-
-#: Client/core/CCore.cpp:1332
-msgid "shows the hud"
-msgstr "εμφάνιση του hud"
-
-#: Client/core/CCore.cpp:1333
-msgid "shows all the binds"
-msgstr "εμφάνιση όλων των δεσμευμένων κουμπιών"
-
-#: Client/core/CCore.cpp:1334
-msgid "shows your serial"
-msgstr "εμφάνιση του σειριακού αριθμού"
-
-#: Client/core/CCore.cpp:1343
-msgid "connects to a server (host port nick pass)"
-msgstr "σύνδεση με τον διακομιστή (διοργανωτής θύρα όνομα κωδικός)"
-
-#: Client/core/CCore.cpp:1344
-msgid "connects to a previous server"
-msgstr "συνδέετε σε έναν προηγούμενο διακομιστή"
-
-#: Client/core/CCore.cpp:1345
-msgid "binds a key (key control)"
-msgstr "δέσμευση ενός πλήκτρου (πλήκτρο έλεγχος)"
-
-#: Client/core/CCore.cpp:1346
-msgid "unbinds a key (key)"
-msgstr "Αποδέσμευση ενός πλήκτρου (πλήκτρο)"
-
-#: Client/core/CCore.cpp:1347
-msgid "copies the default gta controls"
-msgstr "αντιγραφή των προεπιλεγμένων gta πλήκτρων "
-
-#: Client/core/CCore.cpp:1348
-msgid "outputs a screenshot"
-msgstr "απόδοση στιγμιότυπου οθόνης"
-
-#: Client/core/CCore.cpp:1349
-msgid "immediately saves the config"
-msgstr "άμεση αποθήκευση του config"
-
-#: Client/core/CCore.cpp:1351
-msgid "clears the debug view"
-msgstr "εκκαθάριση της απασφαλματωμένης όψης"
-
-#: Client/core/CCore.cpp:1352
-msgid "scrolls the chatbox upwards"
-msgstr "κύλιση του πλαισίου συνομιλίας προς τα επάνω"
-
-#: Client/core/CCore.cpp:1353
-msgid "scrolls the chatbox downwards"
-msgstr "κύλιση του πλαισίου συνομιλίας προς τα κάτω"
-
-#: Client/core/CCore.cpp:1354
-msgid "scrolls the debug view upwards"
-msgstr "κύλιση της απασφαλματωμένης όψης προς τα πάνω"
-
-#: Client/core/CCore.cpp:1355
-msgid "scrolls the debug view downwards"
-msgstr "κύλιση της απασφαλματωμένης όψης προς τα κάτω"
-
-#: Client/core/CCore.cpp:1358
-msgid "shows the memory statistics"
-msgstr "προβολή στατιστικών στοιχείων μνήμης"
-
-#: Client/core/CCore.cpp:1359
-msgid "shows the frame timing graph"
-msgstr "προβολή γραφήματος συγχρονισμού εικόνας"
-
-#: Client/core/CCore.cpp:1363
-msgid "for developers: reload news"
-msgstr ""
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "Κονσόλα"
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "Αμφισβήτηση..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2382,13 +2529,6 @@ msgstr "Ping"
 msgid "Gamemode"
 msgstr "Τύπος παιχνιδιού"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "Λίστα παιχτών"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -2450,137 +2590,6 @@ msgstr "Άτοπο ψευδώνυμο! Παρακαλώ πηγαίνετε στ�
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Πρέπει να επιλέξετε ένα διακομιστή για να συνδεθείτε σε αυτόν."
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "Ο ΔΙΑΚΟΜΙΣΤΗΣ ΕΙΝΑΙ ΠΛΗΡΗΣ"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "Όνομα:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "Διεύθυνση διακομιστή:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "Τύπος παιχνιδιού:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "Χάρτης:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "Παίχτες:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "Με προστασία:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "Καθυστέρηση μεταφοράς:"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "Κλείσιμο"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "Σύνδεση στο παιχνίδι"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "Παρακαλώ εισάγετε τον κωδικό του διακομιστή:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "Συνδεθείτε στον διακομιστή αμέσως μόλις υπάρχει μια διαθέσιμη θέση παίχτη."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "ΠΑΡΑΚΑΛΩ ΕΙΣΑΓΕΤΕ ΤΟΝ ΚΩΔΙΚΟ ΤΟΥ ΔΙΑΚΟΜΙΣΤΗ"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "Λήξη χρόνου"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "Αμφισβήτηση..."
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "Αδρανής"
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "παίχτης"
-msgstr[1] "παίχτες"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "ενεργοποίηση"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "διακομιστής"
-msgstr[1] "διακομιστές"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Αίτηση της κύριας λίστας διακομιστών (%lu ms πέρασαν)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "Η κύρια λίστα διακομιστών δεν μπόρεσε να αναλυθεί."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "Η κύρια λίστα διακομιστών δεν μπορούσε να ανακτηθεί."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(Αντίγραφο ασφαλείας λίστας διακομιστών)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "Δεν είναι δυνατή η δέσμευση LAN-broadcast socket"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "Προσπάθεια εντοπισμού LAN διακομιστών"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
@@ -2906,41 +2915,6 @@ msgstr[1] "%d δευτερόλεπτα"
 msgid "Disconnected"
 msgstr "Αποσύνδεση"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Πρόοδος λήψης χάρτη:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Πρόοδος λήψης:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s του %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Αποσυνδεθείτε για να ακυρώσετε την λήψη"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Σφάλμα λήψης: %s"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Δεν ήταν δυνατή η εκκίνηση του τοπικού διακομιστή. Ανατρέξτε στην κονσόλα για λεπτομέρειες."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Σφάλμα: Δεν ήταν δυνατή η εκκίνηση του τοπικού διακομιστή. [%s]"
-
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "ΔΙΟΡΓΑΝΩΣΤΕ ΠΑΙΧΝΙΔΙ"
@@ -3040,14 +3014,40 @@ msgstr "Αποσύνδεση: καθορίστηκε μη έγκυρος κωδ�
 msgid "MTA Client verification failed!"
 msgstr "Η επαλήθευση του πρόγραμμα-πελάτη του MTA απέτυχε!"
 
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "Δεν μπορεί να βρεθεί έγκυρη ανάλυση οθόνης"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Πρόοδος λήψης χάρτη:"
 
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "Είστε σίγουρος ότι θέλετε να χρησιμοποιήσετε αυτή την ανάλυση οθόνης;"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Πρόοδος λήψης:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s του %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Αποσυνδεθείτε για να ακυρώσετε την λήψη"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Σφάλμα λήψης: %s"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Δεν ήταν δυνατή η εκκίνηση του τοπικού διακομιστή. Ανατρέξτε στην κονσόλα για λεπτομέρειες."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Σφάλμα: Δεν ήταν δυνατή η εκκίνηση του τοπικού διακομιστή. [%s]"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
