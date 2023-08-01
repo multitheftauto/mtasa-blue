@@ -581,6 +581,15 @@ ADD_ENUM(WING_AIRTRAIL, "wing_airtrail")
 ADD_ENUM(VEH_GUN, "veh_gun")
 IMPLEMENT_ENUM_END("vehicle-dummy")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eGrainMultiplierType)
+ADD_ENUM(eGrainMultiplierType::MASTER, "master")
+ADD_ENUM(eGrainMultiplierType::INFRARED, "infrared")
+ADD_ENUM(eGrainMultiplierType::NIGHT, "night")
+ADD_ENUM(eGrainMultiplierType::RAIN, "rain")
+ADD_ENUM(eGrainMultiplierType::OVERLAY, "overlay")
+ADD_ENUM(eGrainMultiplierType::ALL, "all")
+IMPLEMENT_ENUM_CLASS_END("grain-multiplier-type")
+
 IMPLEMENT_ENUM_CLASS_BEGIN(eResizableVehicleWheelGroup)
 ADD_ENUM(eResizableVehicleWheelGroup::FRONT_AXLE, "front_axle")
 ADD_ENUM(eResizableVehicleWheelGroup::REAR_AXLE, "rear_axle")
@@ -665,6 +674,7 @@ ADD_ENUM(eClientModelType::PED, "ped")
 ADD_ENUM(eClientModelType::OBJECT, "object")
 ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
 ADD_ENUM(eClientModelType::TIMED_OBJECT, "timed-object")
+ADD_ENUM(eClientModelType::CLUMP, "clump")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 // Sound effects

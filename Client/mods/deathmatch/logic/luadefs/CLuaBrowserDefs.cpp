@@ -459,7 +459,7 @@ int CLuaBrowserDefs::ExecuteBrowserJavascript(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pWebBrowser->ExecuteJavascript(strJavascriptCode))
+        if (strJavascriptCode.empty() || pWebBrowser->ExecuteJavascript(strJavascriptCode))
         {
             lua_pushboolean(luaVM, true);
             return 1;
