@@ -9,10 +9,13 @@
  *
  *****************************************************************************/
 
-#include "StdInc.h"
-#include "CLuaTimer.h"
-#include "CLuaMain.h"
-#include "CIdArray.h"
+#include <StdInc.h>
+
+#ifndef MTA_CLIENT
+    #include "CLuaTimer.h"
+    #include "lua/CLuaMain.h"
+    #include "CIdArray.h"
+#endif
 
 CLuaTimer::CLuaTimer(const CLuaFunctionRef& iLuaFunction, const CLuaArguments& Arguments)
 {
