@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-26 10:12\n"
+"POT-Creation-Date: 2023-08-01 17:40+0000\n"
+"PO-Revision-Date: 2023-08-01 18:23\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -17,29 +17,18 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "網站請求"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "無法找到有效的螢幕分辨率。"
 
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "現在的伺服器 (以後) 需要讀取以下網站："
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "你確定你想要使用此螢幕分辨率?"
 
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "為了防止您重要資訊被竊取，請不要輸入任何隱私訊息"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "記住我的選擇"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
-msgid "Allow"
-msgstr "允許"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "拒絕"
+#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
 
 #. Create buttons
 #. OK button
@@ -69,13 +58,12 @@ msgstr "取消"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
-#: Client/core/CMainMenu.cpp:1170 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
-#: Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
+#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
+#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
+#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
+#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
 msgstr "是"
 
@@ -180,20 +168,19 @@ msgstr "重啟MTA:SA時有故障\n\n"
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
-#: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1227
-#: Client/core/CCore.cpp:1240 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
+#: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
+#: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
+#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
+#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
+#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:421
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:591
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
@@ -205,6 +192,8 @@ msgstr "重啟MTA:SA時有故障\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1275
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -296,8 +285,8 @@ msgstr "另一個GTA:SA正在運行，啟動MTA:SA前需要先終止它。你想
 
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
 #: Client/loader/MainFunctions.cpp:1217
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "Information"
 msgstr "資訊"
 
@@ -502,39 +491,12 @@ msgstr "更新安裝設定"
 msgid "Update compatibility settings"
 msgstr "更新相容性設置"
 
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr ""
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr ""
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "安装更新..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "解開檔案中..."
-
-#: Client/loader/Dialogs.cpp:132 Client/core/CMainMenu.cpp:1169
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/CSettings.cpp:1370 Client/core/CSettings.cpp:1394
-#: Client/core/CSettings.cpp:4434 Client/core/CSettings.cpp:4501
-#: Client/core/CSettings.cpp:4550 Client/core/CQuestionBox.cpp:194
+#: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1169 Client/core/CSettings.cpp:1370
+#: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
+#: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "否"
@@ -646,10 +608,6 @@ msgstr "強制窗口模式"
 msgid "Don't show again"
 msgstr "以後不再顯示"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
 #: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "警告：無法檢測到的防病毒軟體"
@@ -672,30 +630,66 @@ msgid "I will not install an anti-virus.\n"
 msgstr "我將不安裝防病毒。\n"
 "我希望我的PC 變lag，並成為殭屍網絡的一部分。"
 
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+msgid "Installing update..."
+msgstr "安装更新..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+msgid "Extracting files..."
+msgstr "解開檔案中..."
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "網站請求"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "現在的伺服器 (以後) 需要讀取以下網站："
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "為了防止您重要資訊被竊取，請不要輸入任何隱私訊息"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "記住我的選擇"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
+msgid "Allow"
+msgstr "允許"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "拒絕"
+
 #. Unknown command
 #: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
 msgstr "不明的命令或指令:"
 
-#: Client/core/CMainMenu.cpp:322
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "您正在使用分支構建的版本！構建版本並無法用來連接公開伺服器！"
-
-#: Client/core/CMainMenu.cpp:341
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA自2019年7月以後將不再更新XP/Vista的版本。\n\n"
-"請升級您的Windows以便在最新版本的伺服器暢遊。"
-
-#: Client/core/CMainMenu.cpp:1163
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "這將會使你從目前伺服器結束連線。\n\n"
-"你確定要結束連線嗎?"
-
-#: Client/core/CMainMenu.cpp:1167
-msgid "DISCONNECT WARNING"
-msgstr "斷線警告"
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "繁體中文"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -841,6 +835,198 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "等待回應中  -  %-3d"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "最新訊息"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+msgid "Visit latest news article"
+msgstr "閱讀最新消息"
+
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "嚴重的錯誤"
+
+#: Client/core/CCore.cpp:890
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "為了修復問題，請移除該檔案："
+
+#: Client/core/CCore.cpp:922
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s 模組不正確！"
+
+#: Client/core/CCore.cpp:1227
+msgid "Error executing URL"
+msgstr "執行網址時發生錯誤"
+
+#: Client/core/CCore.cpp:1239
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "於運行模組發生錯誤，命令列 ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1327
+msgid "this help screen"
+msgstr "這個說明畫面"
+
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+msgid "exits the application"
+msgstr "退出應用程式"
+
+#: Client/core/CCore.cpp:1330
+msgid "shows the version"
+msgstr "顯示版本"
+
+#: Client/core/CCore.cpp:1331
+msgid "shows the time"
+msgstr "顯示時間"
+
+#: Client/core/CCore.cpp:1332
+msgid "shows the hud"
+msgstr "顯示 Hud"
+
+#: Client/core/CCore.cpp:1333
+msgid "shows all the binds"
+msgstr "顯示所有綁定設置"
+
+#: Client/core/CCore.cpp:1334
+msgid "shows your serial"
+msgstr "顯示你的序列"
+
+#: Client/core/CCore.cpp:1343
+msgid "connects to a server (host port nick pass)"
+msgstr "連線到一個伺服器 (伺服器 埠口 暱稱 密碼)"
+
+#: Client/core/CCore.cpp:1344
+msgid "connects to a previous server"
+msgstr "連線到前一次登入過的伺服器"
+
+#: Client/core/CCore.cpp:1345
+msgid "binds a key (key control)"
+msgstr "綁定一個按鍵 (控制鍵)"
+
+#: Client/core/CCore.cpp:1346
+msgid "unbinds a key (key)"
+msgstr "解除綁定按鍵 (按鍵)"
+
+#: Client/core/CCore.cpp:1347
+msgid "copies the default gta controls"
+msgstr "複製預設的GTA控制"
+
+#: Client/core/CCore.cpp:1348
+msgid "outputs a screenshot"
+msgstr "輸出截圖"
+
+#: Client/core/CCore.cpp:1349
+msgid "immediately saves the config"
+msgstr "立刻地儲存配置"
+
+#: Client/core/CCore.cpp:1351
+msgid "clears the debug view"
+msgstr "清除除錯視圖"
+
+#: Client/core/CCore.cpp:1352
+msgid "scrolls the chatbox upwards"
+msgstr "把對話框向上移"
+
+#: Client/core/CCore.cpp:1353
+msgid "scrolls the chatbox downwards"
+msgstr "把對話框向下移"
+
+#: Client/core/CCore.cpp:1354
+msgid "scrolls the debug view upwards"
+msgstr "把除錯視圖向上移"
+
+#: Client/core/CCore.cpp:1355
+msgid "scrolls the debug view downwards"
+msgstr "把除錯視圖向下移"
+
+#: Client/core/CCore.cpp:1358
+msgid "shows the memory statistics"
+msgstr "顯示記憶體狀態"
+
+#: Client/core/CCore.cpp:1359
+msgid "shows the frame timing graph"
+msgstr "顯示每秒幀數時間圖"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr "開發者專用功能: 重新讀取最新消息"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "你希望在線上看看關於此問題的幫助嗎?"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "控制臺"
+
+#: Client/core/CMainMenu.cpp:322
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "您正在使用分支構建的版本！構建版本並無法用來連接公開伺服器！"
+
+#: Client/core/CMainMenu.cpp:341
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA自2019年7月以後將不再更新XP/Vista的版本。\n\n"
+"請升級您的Windows以便在最新版本的伺服器暢遊。"
+
+#: Client/core/CMainMenu.cpp:1163
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "這將會使你從目前伺服器結束連線。\n\n"
+"你確定要結束連線嗎?"
+
+#: Client/core/CMainMenu.cpp:1167
+msgid "DISCONNECT WARNING"
+msgstr "斷線警告"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "程式開發"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "協助開發者:"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "遊戲設計/腳本師"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "本土語言翻譯"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "補丁協助開發員"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "特別感謝"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr "這個軟體和專案使用了以下的庫和軟體："
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "你選擇的皮膚無法被讀取，默認的皮膚也無法被讀取，請重新安裝MTA。"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "加速軸"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "制動軸"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1799,51 +1985,143 @@ msgstr "修正滑鼠"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "滑鼠移動修正 - 可能需要重啟電腦"
 
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "程式開發"
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ 指令幫助 ]***\n"
 
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "協助開發者:"
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* 現在時間是 %d:%02d:%02d"
 
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "遊戲設計/腳本師"
+#: Client/core/CCommandFuncs.cpp:242
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "連線: 指令為 'connect <伺服器> [<連接埠> <暱稱> <密碼>]'"
 
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "本土語言翻譯"
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+msgid "connect: Bad port number"
+msgstr "連線: 無效的連接埠號碼"
 
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "補丁協助開發員"
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "連線: 正在連線到 %s:%u..."
 
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "特別感謝"
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "連線: 無法連線到 %s:%u!"
 
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr "這個軟體和專案使用了以下的庫和軟體："
+#: Client/core/CCommandFuncs.cpp:281
+msgid "connect: Failed to unload current mod"
+msgstr "連線: 移除指定 mod 失敗"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "加速軸"
+#: Client/core/CCommandFuncs.cpp:371
+msgid "Bound all controls from GTA"
+msgstr "綁定GTA 所有的控制設定"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "制動軸"
+#: Client/core/CCommandFuncs.cpp:385
+msgid "Saved configuration file"
+msgstr "設定已經保存"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "最新訊息"
+#. Print it
+#: Client/core/CCommandFuncs.cpp:451
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* 您的序列號為: %s"
 
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "閱讀最新消息"
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "截圖包含%d 個字節，但預期為 %d 字節"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "截圖失敗"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "螢幕截圖已拍攝: '%s'"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "連線失敗。無效的匿名ID!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "連線失敗。提供無效的主機"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "連接到 %s 於埠口 %u 失敗"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "正在連線至 %s:%u ..."
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+msgid "CONNECTING"
+msgstr "連接中"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+msgid "Connection timed out"
+msgstr "連線已逾時"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+msgid "Disconnected: unknown protocol error"
+msgstr "連線中斷: 未知的協定錯誤"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+msgid "Disconnected: disconnected remotely"
+msgstr "連線中斷: 遠程連線中斷"
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
+msgid "Disconnected: connection lost remotely"
+msgstr "連線中斷: 伺服器連線中斷"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+msgid "Disconnected: you are banned from this server"
+msgstr "連線中斷: 你已經被封鎖禁止進入該伺服器"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
+msgid "Disconnected: disconnected from the server"
+msgstr "連線中斷: 伺服器連線中斷"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+msgid "Disconnected: connection to the server was lost"
+msgstr "連線中斷: 與伺服器的連線已遺失"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+msgid "Disconnected: connection was refused"
+msgstr "連線中斷: 連線已被拒絕"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "未發現指定的 Mod (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "不當的伺服器回應 (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "不當的伺服器回應 (1)"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2017,274 +2295,141 @@ msgstr "團體控制往前"
 msgid "Group control backwards"
 msgstr "團體控制往後"
 
-#: Client/core/CScreenShot.cpp:104
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "閒置"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "玩家玩家數"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "於"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "伺服器伺服器數"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "截圖包含%d 個字節，但預期為 %d 字節"
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "請求主伺服器列表（已過 %lu 毫秒）"
 
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "截圖失敗"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "主伺服器列表無法解析。"
 
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "螢幕截圖已拍攝: '%s'"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "主伺服器列表無法檢索。"
 
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ 指令幫助 ]***\n"
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(備分伺服器列表)"
 
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* 現在時間是 %d:%02d:%02d"
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "不能綁定局域網廣播插座"
 
-#: Client/core/CCommandFuncs.cpp:242
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "連線: 指令為 'connect <伺服器> [<連接埠> <暱稱> <密碼>]'"
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "正在嘗試尋找區域網路中的伺服器"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
-msgid "connect: Bad port number"
-msgstr "連線: 無效的連接埠號碼"
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "伺服器已滿"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "連線: 正在連線到 %s:%u..."
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "名稱:"
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "連線: 無法連線到 %s:%u!"
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "伺服器位址:"
 
-#: Client/core/CCommandFuncs.cpp:281
-msgid "connect: Failed to unload current mod"
-msgstr "連線: 移除指定 mod 失敗"
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "遊戲模式:"
 
-#: Client/core/CCommandFuncs.cpp:371
-msgid "Bound all controls from GTA"
-msgstr "綁定GTA 所有的控制設定"
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "地圖:"
 
-#: Client/core/CCommandFuncs.cpp:385
-msgid "Saved configuration file"
-msgstr "設定已經保存"
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "玩家數:"
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:451
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* 您的序列號為: %s"
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "已被密碼保護:"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "你希望在線上看看關於此問題的幫助嗎?"
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "延遲:"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "繁體中文"
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "玩家清單"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "連線失敗。無效的匿名ID!"
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "關閉"
 
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "連線失敗。提供無效的主機"
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "加入遊戲"
 
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "連接到 %s 於埠口 %u 失敗"
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "請輸入密碼來進入伺服器："
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "正在連線至 %s:%u ..."
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "伺服器人數有空缺時會自動進入"
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
-msgid "CONNECTING"
-msgstr "連接中"
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "請輸入伺服器密碼"
 
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
-msgid "Connection timed out"
-msgstr "連線已逾時"
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "已逾時"
 
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-msgid "Disconnected: unknown protocol error"
-msgstr "連線中斷: 未知的協定錯誤"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
-msgid "Disconnected: disconnected remotely"
-msgstr "連線中斷: 遠程連線中斷"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
-msgid "Disconnected: connection lost remotely"
-msgstr "連線中斷: 伺服器連線中斷"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
-msgid "Disconnected: you are banned from this server"
-msgstr "連線中斷: 你已經被封鎖禁止進入該伺服器"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
-msgid "Disconnected: disconnected from the server"
-msgstr "連線中斷: 伺服器連線中斷"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-msgid "Disconnected: connection to the server was lost"
-msgstr "連線中斷: 與伺服器的連線已遺失"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-msgid "Disconnected: connection was refused"
-msgstr "連線中斷: 連線已被拒絕"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "未發現指定的 Mod (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "不當的伺服器回應 (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "不當的伺服器回應 (1)"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "你選擇的皮膚無法被讀取，默認的皮膚也無法被讀取，請重新安裝MTA。"
-
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "嚴重的錯誤"
-
-#: Client/core/CCore.cpp:890
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "為了修復問題，請移除該檔案："
-
-#: Client/core/CCore.cpp:922
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s 模組不正確！"
-
-#: Client/core/CCore.cpp:1227
-msgid "Error executing URL"
-msgstr "執行網址時發生錯誤"
-
-#: Client/core/CCore.cpp:1239
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "於運行模組發生錯誤，命令列 ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
-msgid "this help screen"
-msgstr "這個說明畫面"
-
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
-msgid "exits the application"
-msgstr "退出應用程式"
-
-#: Client/core/CCore.cpp:1330
-msgid "shows the version"
-msgstr "顯示版本"
-
-#: Client/core/CCore.cpp:1331
-msgid "shows the time"
-msgstr "顯示時間"
-
-#: Client/core/CCore.cpp:1332
-msgid "shows the hud"
-msgstr "顯示 Hud"
-
-#: Client/core/CCore.cpp:1333
-msgid "shows all the binds"
-msgstr "顯示所有綁定設置"
-
-#: Client/core/CCore.cpp:1334
-msgid "shows your serial"
-msgstr "顯示你的序列"
-
-#: Client/core/CCore.cpp:1343
-msgid "connects to a server (host port nick pass)"
-msgstr "連線到一個伺服器 (伺服器 埠口 暱稱 密碼)"
-
-#: Client/core/CCore.cpp:1344
-msgid "connects to a previous server"
-msgstr "連線到前一次登入過的伺服器"
-
-#: Client/core/CCore.cpp:1345
-msgid "binds a key (key control)"
-msgstr "綁定一個按鍵 (控制鍵)"
-
-#: Client/core/CCore.cpp:1346
-msgid "unbinds a key (key)"
-msgstr "解除綁定按鍵 (按鍵)"
-
-#: Client/core/CCore.cpp:1347
-msgid "copies the default gta controls"
-msgstr "複製預設的GTA控制"
-
-#: Client/core/CCore.cpp:1348
-msgid "outputs a screenshot"
-msgstr "輸出截圖"
-
-#: Client/core/CCore.cpp:1349
-msgid "immediately saves the config"
-msgstr "立刻地儲存配置"
-
-#: Client/core/CCore.cpp:1351
-msgid "clears the debug view"
-msgstr "清除除錯視圖"
-
-#: Client/core/CCore.cpp:1352
-msgid "scrolls the chatbox upwards"
-msgstr "把對話框向上移"
-
-#: Client/core/CCore.cpp:1353
-msgid "scrolls the chatbox downwards"
-msgstr "把對話框向下移"
-
-#: Client/core/CCore.cpp:1354
-msgid "scrolls the debug view upwards"
-msgstr "把除錯視圖向上移"
-
-#: Client/core/CCore.cpp:1355
-msgid "scrolls the debug view downwards"
-msgstr "把除錯視圖向下移"
-
-#: Client/core/CCore.cpp:1358
-msgid "shows the memory statistics"
-msgstr "顯示記憶體狀態"
-
-#: Client/core/CCore.cpp:1359
-msgid "shows the frame timing graph"
-msgstr "顯示每秒幀數時間圖"
-
-#: Client/core/CCore.cpp:1363
-msgid "for developers: reload news"
-msgstr "開發者專用功能: 重新讀取最新消息"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "控制臺"
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "正在查詢..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2384,13 +2529,6 @@ msgstr "延遲"
 msgid "Gamemode"
 msgstr "遊戲模式"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "玩家清單"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -2452,135 +2590,6 @@ msgstr "無效的暱稱! 請去設置那裏設定新的暱稱!"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "你需要選擇一個伺服器來連接。"
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "伺服器已滿"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "名稱:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "伺服器位址:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "遊戲模式:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "地圖:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "玩家數:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "已被密碼保護:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "延遲:"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "關閉"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "加入遊戲"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "請輸入密碼來進入伺服器："
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "伺服器人數有空缺時會自動進入"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "請輸入伺服器密碼"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "已逾時"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "正在查詢..."
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "閒置"
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "玩家玩家數"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "於"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "伺服器伺服器數"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "請求主伺服器列表（已過 %lu 毫秒）"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "主伺服器列表無法解析。"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "主伺服器列表無法檢索。"
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(備分伺服器列表)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "不能綁定局域網廣播插座"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "正在嘗試尋找區域網路中的伺服器"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
@@ -2902,41 +2911,6 @@ msgstr[0] "%d 秒"
 msgid "Disconnected"
 msgstr "已中斷連線"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "地圖下載進度:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "下載進度:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s 的 %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "中斷連線以取消下載"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "下載錯誤: %s"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "無法啟動本地伺服器.查看控制台以了解詳情."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "錯誤: 無法啟動本地伺服器。[%s]"
-
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "主辦遊戲"
@@ -3036,14 +3010,40 @@ msgstr "連線中斷: 指定的密碼無效"
 msgid "MTA Client verification failed!"
 msgstr "MTA 客戶端驗證失敗"
 
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "無法找到有效的螢幕分辨率。"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "地圖下載進度:"
 
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "你確定你想要使用此螢幕分辨率?"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "下載進度:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s 的 %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "中斷連線以取消下載"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "下載錯誤: %s"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "無法啟動本地伺服器.查看控制台以了解詳情."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "錯誤: 無法啟動本地伺服器。[%s]"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
