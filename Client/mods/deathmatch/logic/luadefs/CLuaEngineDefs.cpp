@@ -14,7 +14,6 @@
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
-#include "../../../core/CModelCacheManager.h"
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
