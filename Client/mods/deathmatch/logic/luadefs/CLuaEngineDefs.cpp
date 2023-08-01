@@ -19,7 +19,7 @@
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
 void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
-    g_pCore->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
+    g_pClientGame->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
 }
 
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
