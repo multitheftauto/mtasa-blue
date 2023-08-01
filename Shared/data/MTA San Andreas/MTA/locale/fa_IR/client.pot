@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-29 15:20\n"
+"POT-Creation-Date: 2023-08-01 17:40+0000\n"
+"PO-Revision-Date: 2023-08-01 18:23\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -17,29 +17,18 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "درخواست های وبسایت‫"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr "نمی توان وضوح درست را پیدا کرد."
 
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "سرور وبسایت های زیر را برای لود کردن درخواست کرده است (بعدا):"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr "آیا برای استفاده از این وضوح صفحه اطمینان دارید؟"
 
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "جهت حفظ اطلاعات حساس خود از دزدیده شدن به هیچ عنوان آن ها را وارد ننماید"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "بیاد بسپار"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
-msgid "Allow"
-msgstr "اجازه بده"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "اجازه نده"
+#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
 
 #. Create buttons
 #. OK button
@@ -69,13 +58,12 @@ msgstr "لغو"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
-#: Client/core/CMainMenu.cpp:1170 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
-#: Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
+#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
+#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
+#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
+#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
 msgstr "بلی"
 
@@ -180,20 +168,19 @@ msgstr "مشکل در راه اندازی مجددی MTA:SA\n\n"
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
-#: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1227
-#: Client/core/CCore.cpp:1240 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
+#: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
+#: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
+#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
+#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
+#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:421
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:591
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
@@ -205,6 +192,8 @@ msgstr "مشکل در راه اندازی مجددی MTA:SA\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1275
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -296,8 +285,8 @@ msgstr "یک نمونه از جی تی ای سن آندریاس در حال اج
 
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
 #: Client/loader/MainFunctions.cpp:1217
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "Information"
 msgstr "اطلاعات"
 
@@ -504,44 +493,12 @@ msgstr "بروزرسانی تنظیمات نصب"
 msgid "Update compatibility settings"
 msgstr "بروزرسانی تنظیمات سازگاری"
 
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr "ناشناخته"
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr "فایل '%s' در حال حاضر توسط فرآیندهای %zu قفل شده است.\n\n"
-"آیا می خواهید فعالیت زیر را خاتمه دهید و به به روز رسانی ادامه دهید؟\n\n"
-"%s"
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr "فرایند نصب شما ممکن است در حال حاضر خراب باشد.\n\n"
-"%zu از %zu فایل از نسخه پشتیبان نمی تواند بازیابی شود.\n\n"
-"باید Multi Theft Auto را از www.multitheftauto.com دوباره نصب کنید\n"
-"یا سعی کنید به روز رسانی را با حقوق سرپرست اجرا کنید."
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "در حال نصب بروزرسانی..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "در حال استخراج فایل ها..."
-
-#: Client/loader/Dialogs.cpp:132 Client/core/CMainMenu.cpp:1169
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/CSettings.cpp:1370 Client/core/CSettings.cpp:1394
-#: Client/core/CSettings.cpp:4434 Client/core/CSettings.cpp:4501
-#: Client/core/CSettings.cpp:4550 Client/core/CQuestionBox.cpp:194
+#: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1169 Client/core/CSettings.cpp:1370
+#: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
+#: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "خیر"
@@ -653,10 +610,6 @@ msgstr "اجبار حالت پنجره ای"
 msgid "Don't show again"
 msgstr "دیگر نمایش نده"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
 #: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr "هشدار: برنامه آنتی ویروس شناسایی نشد"
@@ -679,30 +632,71 @@ msgid "I will not install an anti-virus.\n"
 msgstr "من آنتی ویروس نصب نمی‌کنم.\n"
 "میخواهم سیستم من دچار لگ و جز سیستم های ویروسی باشد."
 
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+msgid "Installing update..."
+msgstr "در حال نصب بروزرسانی..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+msgid "Extracting files..."
+msgstr "در حال استخراج فایل ها..."
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr "ناشناخته"
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr "فایل '%s' در حال حاضر توسط فرآیندهای %zu قفل شده است.\n\n"
+"آیا می خواهید فعالیت زیر را خاتمه دهید و به به روز رسانی ادامه دهید؟\n\n"
+"%s"
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr "فرایند نصب شما ممکن است در حال حاضر خراب باشد.\n\n"
+"%zu از %zu فایل از نسخه پشتیبان نمی تواند بازیابی شود.\n\n"
+"باید Multi Theft Auto را از www.multitheftauto.com دوباره نصب کنید\n"
+"یا سعی کنید به روز رسانی را با حقوق سرپرست اجرا کنید."
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "درخواست های وبسایت‫"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "سرور وبسایت های زیر را برای لود کردن درخواست کرده است (بعدا):"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "جهت حفظ اطلاعات حساس خود از دزدیده شدن به هیچ عنوان آن ها را وارد ننماید"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "بیاد بسپار"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
+msgid "Allow"
+msgstr "اجازه بده"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "اجازه نده"
+
 #. Unknown command
 #: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
 msgstr "فرمان یا دستور ناشناخته: "
 
-#: Client/core/CMainMenu.cpp:322
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "شما از نسخه (نمایش قابلیت جدید) استفاده می کنید! این نسخه تست می باشد و نمی توان از آن برای اتصال به سرور های عمومی استفاده کرد."
-
-#: Client/core/CMainMenu.cpp:341
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "از جولای 2019 به بعد ام تی ای برای ویندوز ویستا/اکس پی آپدیت نخواهد.\n\n"
-"برای بازی کردن در سرور های جدید ویندوز خود را ارتقا دهید."
-
-#: Client/core/CMainMenu.cpp:1163
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "این کار شما را از سرور فعلی قطع اتصال می کند.\n\n"
-"آیا مطمئن هستید که می خواهید قطع اتصال کنید؟"
-
-#: Client/core/CMainMenu.cpp:1167
-msgid "DISCONNECT WARNING"
-msgstr "اخطار قطع اتصال"
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "انگلیسی"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -848,6 +842,198 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "منتظر پاسخ - %-3d"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "اخبار"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+msgid "Visit latest news article"
+msgstr "مشاهده آخرین مقاله خبری"
+
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "خطای مهلک"
+
+#: Client/core/CCore.cpp:890
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "برای درست کردن، این فایل را حذف کنید:"
+
+#: Client/core/CCore.cpp:922
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "ماژول %s نادرست است!"
+
+#: Client/core/CCore.cpp:1227
+msgid "Error executing URL"
+msgstr "خطا در اجرای لینک"
+
+#: Client/core/CCore.cpp:1239
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "خطا در اجرای مود ذکر شده در خط فرمان ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1327
+msgid "this help screen"
+msgstr "این صفحه راهنما"
+
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+msgid "exits the application"
+msgstr "از برنامه خارج می شود"
+
+#: Client/core/CCore.cpp:1330
+msgid "shows the version"
+msgstr "نسخه را نشان می دهد"
+
+#: Client/core/CCore.cpp:1331
+msgid "shows the time"
+msgstr "زمان را نشان می دهد"
+
+#: Client/core/CCore.cpp:1332
+msgid "shows the hud"
+msgstr "هاد را نشان می دهد"
+
+#: Client/core/CCore.cpp:1333
+msgid "shows all the binds"
+msgstr "تمامی بایند ها را نشان می دهد"
+
+#: Client/core/CCore.cpp:1334
+msgid "shows your serial"
+msgstr "سریال شما را نشان می دهد"
+
+#: Client/core/CCore.cpp:1343
+msgid "connects to a server (host port nick pass)"
+msgstr "اتصال به یک سرور (آدرس پورت لقب رمز)"
+
+#: Client/core/CCore.cpp:1344
+msgid "connects to a previous server"
+msgstr "اتصال به سرور پیشین"
+
+#: Client/core/CCore.cpp:1345
+msgid "binds a key (key control)"
+msgstr "یک کلید را بایند می کند (کلید کنترل)"
+
+#: Client/core/CCore.cpp:1346
+msgid "unbinds a key (key)"
+msgstr "یک کلید را آنباید می کند (کلید)"
+
+#: Client/core/CCore.cpp:1347
+msgid "copies the default gta controls"
+msgstr "تنظیمات کنترل پیشفرض GTA را کپی می کند"
+
+#: Client/core/CCore.cpp:1348
+msgid "outputs a screenshot"
+msgstr "یک اسکرین شات را خروجی می دهد"
+
+#: Client/core/CCore.cpp:1349
+msgid "immediately saves the config"
+msgstr "بلافاصله تنظیمات را ذخیره می کند"
+
+#: Client/core/CCore.cpp:1351
+msgid "clears the debug view"
+msgstr "نمای دیباگ را پاک می کند"
+
+#: Client/core/CCore.cpp:1352
+msgid "scrolls the chatbox upwards"
+msgstr "چت باکس را به سمت بالا اسکرول می کند"
+
+#: Client/core/CCore.cpp:1353
+msgid "scrolls the chatbox downwards"
+msgstr "چت باکس را به سمت پایین اسکرول می کند"
+
+#: Client/core/CCore.cpp:1354
+msgid "scrolls the debug view upwards"
+msgstr "دیباگ را به سمت بالا اسکرول می کند"
+
+#: Client/core/CCore.cpp:1355
+msgid "scrolls the debug view downwards"
+msgstr "دیباگ را به سمت پایین اسکرول می کند"
+
+#: Client/core/CCore.cpp:1358
+msgid "shows the memory statistics"
+msgstr "جزییات حافظه را نشان می دهد"
+
+#: Client/core/CCore.cpp:1359
+msgid "shows the frame timing graph"
+msgstr "زمانبندی فریم را به صورت نمودار نشان می دهد"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr "برای توسعه دهندگان : بارگذاری مجدد خبر ها"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "آیا می خواهید در مورد این مشکل راهنمای آنلاین را مشاهده نمایید؟"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "کنسول"
+
+#: Client/core/CMainMenu.cpp:322
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "شما از نسخه (نمایش قابلیت جدید) استفاده می کنید! این نسخه تست می باشد و نمی توان از آن برای اتصال به سرور های عمومی استفاده کرد."
+
+#: Client/core/CMainMenu.cpp:341
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "از جولای 2019 به بعد ام تی ای برای ویندوز ویستا/اکس پی آپدیت نخواهد.\n\n"
+"برای بازی کردن در سرور های جدید ویندوز خود را ارتقا دهید."
+
+#: Client/core/CMainMenu.cpp:1163
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "این کار شما را از سرور فعلی قطع اتصال می کند.\n\n"
+"آیا مطمئن هستید که می خواهید قطع اتصال کنید؟"
+
+#: Client/core/CMainMenu.cpp:1167
+msgid "DISCONNECT WARNING"
+msgstr "اخطار قطع اتصال"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "برنامه نویسی"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "اهدا کنندگان"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "طراحی بازی / اسکریپ نویسی"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "بومی سازی زبان"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "اهدا کنندگان پچ"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "تشکر ویژه"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr "این برنامه از کتابخانه ها و نرم‌افزار های زیر استفاده می کند:"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "اسکین انتخابی شما نمی تواند باگذاری شود, همچنین اسکین های پیشفرض, لطفا مجددا MTA را نصب نمایید."
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "جوی استیک گاز"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "جوی استیک ترمز"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1804,51 +1990,143 @@ msgstr "فیکس موس:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "رفع مشکل موس - ممکن است نیاز به راه انداری مجدد رایانه باشد"
 
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "برنامه نویسی"
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ کمک دستور ]***\n"
 
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "اهدا کنندگان"
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "زمان %d:%02d:%02d می باشد"
 
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "طراحی بازی / اسکریپ نویسی"
+#: Client/core/CCommandFuncs.cpp:242
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "اتصال: سینکس 'connect <آدرس> [<پورت> <لقب> <گذرواژه>]'"
 
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "بومی سازی زبان"
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+msgid "connect: Bad port number"
+msgstr "اتصال: شماره پورت نادرست"
 
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "اهدا کنندگان پچ"
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "اتصال: در حال اتصال به %s:%u..."
 
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "تشکر ویژه"
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "اتصال: اتصال به %s:%u ناموفق!"
 
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr "این برنامه از کتابخانه ها و نرم‌افزار های زیر استفاده می کند:"
+#: Client/core/CCommandFuncs.cpp:281
+msgid "connect: Failed to unload current mod"
+msgstr "اتصال: آنلود سازی مود فعلی ناموفق"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "جوی استیک گاز"
+#: Client/core/CCommandFuncs.cpp:371
+msgid "Bound all controls from GTA"
+msgstr "استفاده از تنظیمات کنترل GTA"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "جوی استیک ترمز"
+#: Client/core/CCommandFuncs.cpp:385
+msgid "Saved configuration file"
+msgstr "فایل تنظیمات ذخیره شد"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "اخبار"
+#. Print it
+#: Client/core/CCommandFuncs.cpp:451
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* سریال شما: %s"
 
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "مشاهده آخرین مقاله خبری"
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "حجم اسکرین شات %d بایت می باشد، ولی باید %d بایت می بود"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "خطای اسکرین شات"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "اسکرین شات گرفته شد: '%s'"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "اتصال ناموفق. لقب وارد شده نامعتبر است!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "اتصال ناموفق. آدرس وارد شده نامعتبر است!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "اتصال به %s با پورت %u ناموفق بود!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "در حال اتصال به %s:%u ..."
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+msgid "CONNECTING"
+msgstr "در حال اتصال"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+msgid "Connection timed out"
+msgstr "اتصال تایم اوت شد"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+msgid "Disconnected: unknown protocol error"
+msgstr "اتصال قطع شد: خطای پروتوکل ناشناخته"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+msgid "Disconnected: disconnected remotely"
+msgstr "اتصال قطع شد: قطع اتصال از راه دور"
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
+msgid "Disconnected: connection lost remotely"
+msgstr "قطع اتصال: ارتباط از راه دور قطع شد"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+msgid "Disconnected: you are banned from this server"
+msgstr "قطع اتصال: شما از این سرور محروم شده اید"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
+msgid "Disconnected: disconnected from the server"
+msgstr "قطع اتصال: شما از سرور قطع اتصال کردید"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+msgid "Disconnected: connection to the server was lost"
+msgstr "قطع اتصال: ارتباط با سرور قطع شد"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+msgid "Disconnected: connection was refused"
+msgstr "قطع اتصال: ارتباط با سرور رد شد"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "مود مورد نظر نصب نشده است (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "پاسخ بد از سرور (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "پاسخ بد از سرور (1)"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2022,274 +2300,143 @@ msgstr "کنترل گروه جلو"
 msgid "Group control backwards"
 msgstr "کنترل گروه عقب"
 
-#: Client/core/CScreenShot.cpp:104
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "بیکار"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "پلیر"
+msgstr[1] "پلیر ها"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "روشن"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] "سرورسرورها"
+msgstr[1] "سرورها"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "حجم اسکرین شات %d بایت می باشد، ولی باید %d بایت می بود"
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "در حال درخواست سرور لیست اصلی (%lu میلی ثانیه گذشته)"
 
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "خطای اسکرین شات"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "نمی توان سرور لیست را تحلیل کرد."
 
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "اسکرین شات گرفته شد: '%s'"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "نمی توان سرور لیست را دریافت کرد."
 
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ کمک دستور ]***\n"
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(سرور لیست پشتیبان)"
 
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "زمان %d:%02d:%02d می باشد"
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "نمی توان پخش شبکه لن را بایند سوکت کرد"
 
-#: Client/core/CCommandFuncs.cpp:242
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "اتصال: سینکس 'connect <آدرس> [<پورت> <لقب> <گذرواژه>]'"
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "تلاش برای یافتن سرور های لن"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
-msgid "connect: Bad port number"
-msgstr "اتصال: شماره پورت نادرست"
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "سرور پر است"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "اتصال: در حال اتصال به %s:%u..."
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "نام:"
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "اتصال: اتصال به %s:%u ناموفق!"
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "آدرس سرور:"
 
-#: Client/core/CCommandFuncs.cpp:281
-msgid "connect: Failed to unload current mod"
-msgstr "اتصال: آنلود سازی مود فعلی ناموفق"
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "گیم مود:"
 
-#: Client/core/CCommandFuncs.cpp:371
-msgid "Bound all controls from GTA"
-msgstr "استفاده از تنظیمات کنترل GTA"
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "نقشه:"
 
-#: Client/core/CCommandFuncs.cpp:385
-msgid "Saved configuration file"
-msgstr "فایل تنظیمات ذخیره شد"
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "پلیرها:"
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:451
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* سریال شما: %s"
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "رمزدار:"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "آیا می خواهید در مورد این مشکل راهنمای آنلاین را مشاهده نمایید؟"
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "لتسنی:"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "انگلیسی"
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "لیست پلیر"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "اتصال ناموفق. لقب وارد شده نامعتبر است!"
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "بستن"
 
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "اتصال ناموفق. آدرس وارد شده نامعتبر است!"
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "ورود به بازی"
 
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "اتصال به %s با پورت %u ناموفق بود!"
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "لطفا پسورد ورود به سرور را وارد نمایید:"
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "در حال اتصال به %s:%u ..."
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "ورود به سرور در اولین موقعیتی که سرور جای خالی داشت."
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
-msgid "CONNECTING"
-msgstr "در حال اتصال"
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "لطفا پسورد سرور را وارد نمایید"
 
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
-msgid "Connection timed out"
-msgstr "اتصال تایم اوت شد"
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "تایم اوت شد"
 
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-msgid "Disconnected: unknown protocol error"
-msgstr "اتصال قطع شد: خطای پروتوکل ناشناخته"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
-msgid "Disconnected: disconnected remotely"
-msgstr "اتصال قطع شد: قطع اتصال از راه دور"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
-msgid "Disconnected: connection lost remotely"
-msgstr "قطع اتصال: ارتباط از راه دور قطع شد"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
-msgid "Disconnected: you are banned from this server"
-msgstr "قطع اتصال: شما از این سرور محروم شده اید"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
-msgid "Disconnected: disconnected from the server"
-msgstr "قطع اتصال: شما از سرور قطع اتصال کردید"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-msgid "Disconnected: connection to the server was lost"
-msgstr "قطع اتصال: ارتباط با سرور قطع شد"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-msgid "Disconnected: connection was refused"
-msgstr "قطع اتصال: ارتباط با سرور رد شد"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "مود مورد نظر نصب نشده است (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "پاسخ بد از سرور (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "پاسخ بد از سرور (1)"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "اسکین انتخابی شما نمی تواند باگذاری شود, همچنین اسکین های پیشفرض, لطفا مجددا MTA را نصب نمایید."
-
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "خطای مهلک"
-
-#: Client/core/CCore.cpp:890
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "برای درست کردن، این فایل را حذف کنید:"
-
-#: Client/core/CCore.cpp:922
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "ماژول %s نادرست است!"
-
-#: Client/core/CCore.cpp:1227
-msgid "Error executing URL"
-msgstr "خطا در اجرای لینک"
-
-#: Client/core/CCore.cpp:1239
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "خطا در اجرای مود ذکر شده در خط فرمان ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
-msgid "this help screen"
-msgstr "این صفحه راهنما"
-
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
-msgid "exits the application"
-msgstr "از برنامه خارج می شود"
-
-#: Client/core/CCore.cpp:1330
-msgid "shows the version"
-msgstr "نسخه را نشان می دهد"
-
-#: Client/core/CCore.cpp:1331
-msgid "shows the time"
-msgstr "زمان را نشان می دهد"
-
-#: Client/core/CCore.cpp:1332
-msgid "shows the hud"
-msgstr "هاد را نشان می دهد"
-
-#: Client/core/CCore.cpp:1333
-msgid "shows all the binds"
-msgstr "تمامی بایند ها را نشان می دهد"
-
-#: Client/core/CCore.cpp:1334
-msgid "shows your serial"
-msgstr "سریال شما را نشان می دهد"
-
-#: Client/core/CCore.cpp:1343
-msgid "connects to a server (host port nick pass)"
-msgstr "اتصال به یک سرور (آدرس پورت لقب رمز)"
-
-#: Client/core/CCore.cpp:1344
-msgid "connects to a previous server"
-msgstr "اتصال به سرور پیشین"
-
-#: Client/core/CCore.cpp:1345
-msgid "binds a key (key control)"
-msgstr "یک کلید را بایند می کند (کلید کنترل)"
-
-#: Client/core/CCore.cpp:1346
-msgid "unbinds a key (key)"
-msgstr "یک کلید را آنباید می کند (کلید)"
-
-#: Client/core/CCore.cpp:1347
-msgid "copies the default gta controls"
-msgstr "تنظیمات کنترل پیشفرض GTA را کپی می کند"
-
-#: Client/core/CCore.cpp:1348
-msgid "outputs a screenshot"
-msgstr "یک اسکرین شات را خروجی می دهد"
-
-#: Client/core/CCore.cpp:1349
-msgid "immediately saves the config"
-msgstr "بلافاصله تنظیمات را ذخیره می کند"
-
-#: Client/core/CCore.cpp:1351
-msgid "clears the debug view"
-msgstr "نمای دیباگ را پاک می کند"
-
-#: Client/core/CCore.cpp:1352
-msgid "scrolls the chatbox upwards"
-msgstr "چت باکس را به سمت بالا اسکرول می کند"
-
-#: Client/core/CCore.cpp:1353
-msgid "scrolls the chatbox downwards"
-msgstr "چت باکس را به سمت پایین اسکرول می کند"
-
-#: Client/core/CCore.cpp:1354
-msgid "scrolls the debug view upwards"
-msgstr "دیباگ را به سمت بالا اسکرول می کند"
-
-#: Client/core/CCore.cpp:1355
-msgid "scrolls the debug view downwards"
-msgstr "دیباگ را به سمت پایین اسکرول می کند"
-
-#: Client/core/CCore.cpp:1358
-msgid "shows the memory statistics"
-msgstr "جزییات حافظه را نشان می دهد"
-
-#: Client/core/CCore.cpp:1359
-msgid "shows the frame timing graph"
-msgstr "زمانبندی فریم را به صورت نمودار نشان می دهد"
-
-#: Client/core/CCore.cpp:1363
-msgid "for developers: reload news"
-msgstr "برای توسعه دهندگان : بارگذاری مجدد خبر ها"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "کنسول"
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "دریافت اطلاعات..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2389,13 +2536,6 @@ msgstr "پینگ"
 msgid "Gamemode"
 msgstr "گیم مود"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "لیست پلیر"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -2457,137 +2597,6 @@ msgstr "نیک نیم نادرست! لطفا به تنظیمات رفته و ن�
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "برای اتصال سروری را انتخاب نمایید."
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "سرور پر است"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "نام:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "آدرس سرور:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "گیم مود:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "نقشه:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "پلیرها:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "رمزدار:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "لتسنی:"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "بستن"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "ورود به بازی"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "لطفا پسورد ورود به سرور را وارد نمایید:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "ورود به سرور در اولین موقعیتی که سرور جای خالی داشت."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "لطفا پسورد سرور را وارد نمایید"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "تایم اوت شد"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "دریافت اطلاعات..."
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "بیکار"
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "پلیر"
-msgstr[1] "پلیر ها"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "روشن"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] "سرورسرورها"
-msgstr[1] "سرورها"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "در حال درخواست سرور لیست اصلی (%lu میلی ثانیه گذشته)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "نمی توان سرور لیست را تحلیل کرد."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "نمی توان سرور لیست را دریافت کرد."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(سرور لیست پشتیبان)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "نمی توان پخش شبکه لن را بایند سوکت کرد"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "تلاش برای یافتن سرور های لن"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
@@ -2912,41 +2921,6 @@ msgstr[1] "%d ثانیه ها"
 msgid "Disconnected"
 msgstr "قطع شد"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "پیشرفت دانلود نقشه:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "پیشرفت دانلود:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s از %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "برای لغو دانلود، اتصال را قطع کنید"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "خطای دانلود: %s"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "سرور محلی راه‌اندازی نشد. برای جزئیات بیشتر به کنسول مراجعه کنید."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "خطا: سرور محلی راه‌اندازی نشد. [%s]"
-
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "میزبان بازی"
@@ -3046,14 +3020,40 @@ msgstr "اتصال قطع شد: رمز عبور اشتباه میباشد"
 msgid "MTA Client verification failed!"
 msgstr "مشکلی در تایید MTA وجود داشت!"
 
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr "نمی توان وضوح درست را پیدا کرد."
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "پیشرفت دانلود نقشه:"
 
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr "آیا برای استفاده از این وضوح صفحه اطمینان دارید؟"
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "پیشرفت دانلود:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s از %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "برای لغو دانلود، اتصال را قطع کنید"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "خطای دانلود: %s"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "سرور محلی راه‌اندازی نشد. برای جزئیات بیشتر به کنسول مراجعه کنید."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "خطا: سرور محلی راه‌اندازی نشد. [%s]"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
