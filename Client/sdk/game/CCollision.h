@@ -1,7 +1,7 @@
 #pragma once
 
-class CColLineSA;
-class CColSphereSA;
+struct CColLineSA;
+struct CColSphereSA;
 
 class CCollision {
 public:

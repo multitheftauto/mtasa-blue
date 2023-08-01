@@ -382,8 +382,6 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         c.minHitDistSq = c.dirOS.LengthSquared();            // By setting it to this value we avoid collisions that would be detected after the line segment
                                                              // [but are still ont the ray]
 
-        // const auto lineMagSq = (ctx.originOS - ctx.endOS).LengthSquared();
-
         // Do raycast against the DFF to get hit position material UV and name
         // This is very slow
         // Perhaps we could paralellize it somehow? [OpenMP?]
@@ -469,7 +467,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
             RpClumpForAllAtomics(targetEntity->m_pRwObject, ProcessOneAtomic, &c);
         }
         else
-        {            // Object is an atomic, so process directly
+        {            // Object is a single atomic, so process directly
             ProcessOneAtomic(reinterpret_cast<RpAtomic*>(targetEntity->m_pRwObject), &c);
         }
 
