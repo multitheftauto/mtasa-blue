@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-26 09:56+0000\n"
-"PO-Revision-Date: 2023-07-26 10:12\n"
+"POT-Creation-Date: 2023-08-01 17:40+0000\n"
+"PO-Revision-Date: 2023-08-01 18:23\n"
 "Last-Translator: \n"
 "Language-Team: Estonian\n"
 "Language: et_EE\n"
@@ -17,29 +17,18 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "Veebilehe Taotlused"
+#: Client/game_sa/CSettingsSA.cpp:804
+msgid "Can't find valid screen resolution."
+msgstr ""
 
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "Server taotleb nende laadimiseks (hiljem) järgmisi veebisaite:"
+#. Confirm that res should be used
+#: Client/game_sa/CSettingsSA.cpp:880
+msgid "Are you sure you want to use this screen resolution?"
+msgstr ""
 
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "ÄRGE KUNAGI SISESTAGE TÄHTSAID ANDMEID, ET KAITSTA ENNAST NENDE VARGUSTE EEST"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "Jäta meelde otsus"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
-msgid "Allow"
-msgstr "Luba"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "Eira"
+#: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
+msgid "MTA: San Andreas"
+msgstr ""
 
 #. Create buttons
 #. OK button
@@ -69,13 +58,12 @@ msgstr "Loobu"
 #.
 #. /////////////////////////////////////////////////////////////////////////
 #: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/loader/Dialogs.cpp:131
-#: Client/core/CMainMenu.cpp:1170 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878 Client/core/CSettings.cpp:1371
-#: Client/core/CSettings.cpp:1395 Client/core/CSettings.cpp:4435
-#: Client/core/CSettings.cpp:4502 Client/core/CSettings.cpp:4551
-#: Client/core/CQuestionBox.cpp:195
-#: Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
+#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1170
+#: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
+#: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
+#: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
 msgstr "Jah"
 
@@ -179,20 +167,19 @@ msgstr "Probleem MTA:SA taaskäivitamisel\n\n"
 #: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
 #: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CSettings.cpp:2923 Client/core/CSettings.cpp:4112
-#: Client/core/CSettings.cpp:4140 Client/core/CSettings.cpp:4673
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1227
-#: Client/core/CCore.cpp:1240 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
+#: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
+#: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
+#: Client/core/CConnectManager.cpp:111 Client/core/CConnectManager.cpp:127
+#: Client/core/CConnectManager.cpp:263 Client/core/CConnectManager.cpp:321
+#: Client/core/CConnectManager.cpp:404 Client/core/CConnectManager.cpp:411
+#: Client/core/CConnectManager.cpp:421
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CClientGame.cpp:591
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
@@ -204,6 +191,8 @@ msgstr "Probleem MTA:SA taaskäivitamisel\n\n"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1275
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Error"
@@ -291,8 +280,8 @@ msgstr "Üks GTA: San Andreas juba käib. See peab olema suletud enne kui soovit
 
 #: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
 #: Client/loader/MainFunctions.cpp:1217
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "Information"
 msgstr "Informatsioon"
 
@@ -494,39 +483,12 @@ msgstr "Uuenda paigaldamise seadeid"
 msgid "Update compatibility settings"
 msgstr ""
 
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr ""
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr ""
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr ""
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:132 Client/core/CMainMenu.cpp:1169
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/CSettings.cpp:1370 Client/core/CSettings.cpp:1394
-#: Client/core/CSettings.cpp:4434 Client/core/CSettings.cpp:4501
-#: Client/core/CSettings.cpp:4550 Client/core/CQuestionBox.cpp:194
+#: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
+#: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1169 Client/core/CSettings.cpp:1370
+#: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
+#: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "Ei"
@@ -637,10 +599,6 @@ msgstr ""
 msgid "Don't show again"
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr ""
-
 #: Client/loader/Dialogs.cpp:195
 msgid "Warning: Could not detect anti-virus product"
 msgstr ""
@@ -660,30 +618,66 @@ msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr ""
 
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+msgid "Installing update..."
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+msgid "Extracting files..."
+msgstr ""
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "Veebilehe Taotlused"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "Server taotleb nende laadimiseks (hiljem) järgmisi veebisaite:"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "ÄRGE KUNAGI SISESTAGE TÄHTSAID ANDMEID, ET KAITSTA ENNAST NENDE VARGUSTE EEST"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "Jäta meelde otsus"
+
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:957
+msgid "Allow"
+msgstr "Luba"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "Eira"
+
 #. Unknown command
 #: Client/core/CCommands.cpp:216
 msgid "Unknown command or cvar: "
 msgstr "Tundmatu käsk või sõna:"
 
-#: Client/core/CMainMenu.cpp:322
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Kasutate funktsiooniharu järgu! See on ainult testversioon, mida ei saa kasutada avalike serveritega ühenduse loomiseks!"
-
-#: Client/core/CMainMenu.cpp:341
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA ei saa uuendusi XP-l/Vista-l pärast juulit 2019.\n\n"
-"Uuenda oma Windowsi versiooni, et mängida uuematel serveritel."
-
-#: Client/core/CMainMenu.cpp:1163
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "See toiming katkestab ühenduse praeguse serveriga.\n\n"
-"Oled sa kindel, et tahad ühendust katkestada?"
-
-#: Client/core/CMainMenu.cpp:1167
-msgid "DISCONNECT WARNING"
-msgstr "ÜHENDUSE KATKEMISE HOIATUS"
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Eesti"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -829,6 +823,198 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 "Ootan vastust - %-3d"
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr ""
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+msgid "Visit latest news article"
+msgstr "Külastage viimast uudiste artiklit"
+
+#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+msgid "Fatal error"
+msgstr "Tõsine viga"
+
+#: Client/core/CCore.cpp:890
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "ET PARANDADA, EEMALDAGE JÄRGMINE FAIL:"
+
+#: Client/core/CCore.cpp:922
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s moodul on ebasobiv!"
+
+#: Client/core/CCore.cpp:1227
+msgid "Error executing URL"
+msgstr "Viga URL-i avamisel"
+
+#: Client/core/CCore.cpp:1239
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Viga modifikatsiooni jooksutamises, mis oli edastatud käsus ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1327
+msgid "this help screen"
+msgstr "see abi leht"
+
+#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+msgid "exits the application"
+msgstr "sulgeb rakenduse"
+
+#: Client/core/CCore.cpp:1330
+msgid "shows the version"
+msgstr "näitab versiooni"
+
+#: Client/core/CCore.cpp:1331
+msgid "shows the time"
+msgstr "näitab aega"
+
+#: Client/core/CCore.cpp:1332
+msgid "shows the hud"
+msgstr "näitab displeid"
+
+#: Client/core/CCore.cpp:1333
+msgid "shows all the binds"
+msgstr "näitab kõiki binde"
+
+#: Client/core/CCore.cpp:1334
+msgid "shows your serial"
+msgstr "näitab sinu seriali"
+
+#: Client/core/CCore.cpp:1343
+msgid "connects to a server (host port nick pass)"
+msgstr "ühendab serveriga (ip port mängunimi salasõna)"
+
+#: Client/core/CCore.cpp:1344
+msgid "connects to a previous server"
+msgstr "ühendab eelmise serveriga"
+
+#: Client/core/CCore.cpp:1345
+msgid "binds a key (key control)"
+msgstr "bindib nupu (nupp)"
+
+#: Client/core/CCore.cpp:1346
+msgid "unbinds a key (key)"
+msgstr "vabastab nupu bindist (nupp)"
+
+#: Client/core/CCore.cpp:1347
+msgid "copies the default gta controls"
+msgstr "kopeerib tavalise GTA nupud"
+
+#: Client/core/CCore.cpp:1348
+msgid "outputs a screenshot"
+msgstr "väljastab pildi mängust"
+
+#: Client/core/CCore.cpp:1349
+msgid "immediately saves the config"
+msgstr "salvestab seaded koheselt"
+
+#: Client/core/CCore.cpp:1351
+msgid "clears the debug view"
+msgstr "puhastab debug akna"
+
+#: Client/core/CCore.cpp:1352
+msgid "scrolls the chatbox upwards"
+msgstr "kerib chati üles"
+
+#: Client/core/CCore.cpp:1353
+msgid "scrolls the chatbox downwards"
+msgstr "kerib chati alla"
+
+#: Client/core/CCore.cpp:1354
+msgid "scrolls the debug view upwards"
+msgstr "kerib debug akent üles"
+
+#: Client/core/CCore.cpp:1355
+msgid "scrolls the debug view downwards"
+msgstr "kerib debug akent alla"
+
+#: Client/core/CCore.cpp:1358
+msgid "shows the memory statistics"
+msgstr "näitab mälu(RAM) statistikat"
+
+#: Client/core/CCore.cpp:1359
+msgid "shows the frame timing graph"
+msgstr "näitab kaadrite kohta graafikut"
+
+#: Client/core/CCore.cpp:1363
+msgid "for developers: reload news"
+msgstr ""
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Kas soovid näha onlain abi selle probleemi kohta ?"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONSOOL"
+
+#: Client/core/CMainMenu.cpp:322
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Kasutate funktsiooniharu järgu! See on ainult testversioon, mida ei saa kasutada avalike serveritega ühenduse loomiseks!"
+
+#: Client/core/CMainMenu.cpp:341
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA ei saa uuendusi XP-l/Vista-l pärast juulit 2019.\n\n"
+"Uuenda oma Windowsi versiooni, et mängida uuematel serveritel."
+
+#: Client/core/CMainMenu.cpp:1163
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "See toiming katkestab ühenduse praeguse serveriga.\n\n"
+"Oled sa kindel, et tahad ühendust katkestada?"
+
+#: Client/core/CMainMenu.cpp:1167
+msgid "DISCONNECT WARNING"
+msgstr "ÜHENDUSE KATKEMISE HOIATUS"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "Programmeerimine"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "Panustajad"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "Mängu disain / Koodimine"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "Keel lokaliseerimine"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "Patchi koostajad"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "Eriline tänu"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr ""
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Valitud välimust pole võimalik laadida, ka tavalist välimust ei suudetud laadida. Palun installi MTA uuesti."
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Kiirenduse kang"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Pidurdamise kang"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1782,51 +1968,143 @@ msgstr ""
 msgid "Mouse movement fix - May need PC restart"
 msgstr ""
 
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "Programmeerimine"
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ KÄSK ABI ]***\n"
 
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "Panustajad"
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Aeg on %d:%02d:%02d"
 
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "Mängu disain / Koodimine"
+#: Client/core/CCommandFuncs.cpp:242
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "Ühendus: Syntax on 'connect <host> [<port> <nick> <pass>]'"
 
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "Keel lokaliseerimine"
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+msgid "connect: Bad port number"
+msgstr "ühenda: Port number ei sobi"
 
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "Patchi koostajad"
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "ühenda: Loon ühendust serveriga %s:%u ..."
 
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "Eriline tänu"
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "ühenda: Ei suutnud luua ühendust serveriga %s:%u!"
 
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+#: Client/core/CCommandFuncs.cpp:281
+msgid "connect: Failed to unload current mod"
+msgstr "ühenda: Ei suutnud eemaldada modifikatsiooni"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Kiirenduse kang"
+#: Client/core/CCommandFuncs.cpp:371
+msgid "Bound all controls from GTA"
+msgstr "Seo kõik nupud GTA-ga"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Pidurdamise kang"
+#: Client/core/CCommandFuncs.cpp:385
+msgid "Saved configuration file"
+msgstr "Seadistusfail on salvestatud"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr ""
+#. Print it
+#: Client/core/CCommandFuncs.cpp:451
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Sinu serial on: %s"
 
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "Külastage viimast uudiste artiklit"
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Pilt tuli %d baiti, aga eeldati %d"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Pildi tegemine ebaõnnestus"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Pilt on tehtud: '%s'"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Ühendamine ebaõnnestus. Teie mängunimi ei sobi!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Ühendamine ebaõnnestus. Vale serveri IP!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Ühendumine serveriga %s pordiga %u ebaõnnstus!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Loon ühendust serveriga %s:%u ..."
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:148
+#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+msgid "CONNECTING"
+msgstr "Ühendan"
+
+#: Client/core/CConnectManager.cpp:263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+msgid "Connection timed out"
+msgstr "Ühendus aegus"
+
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+msgid "Disconnected: unknown protocol error"
+msgstr "Ühendus katkestati: teadmata protokolli viga"
+
+#: Client/core/CConnectManager.cpp:285
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+msgid "Disconnected: disconnected remotely"
+msgstr "Ühendus katkestati: katkestati kuskilt mujalt"
+
+#: Client/core/CConnectManager.cpp:289
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
+msgid "Disconnected: connection lost remotely"
+msgstr "Ühendus katkestati: ühendus kadus"
+
+#: Client/core/CConnectManager.cpp:293
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+msgid "Disconnected: you are banned from this server"
+msgstr "Ühendus katkestati: sa oled bannitud selles serverist"
+
+#: Client/core/CConnectManager.cpp:300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
+msgid "Disconnected: disconnected from the server"
+msgstr "Ühendus katkestati: lahkusid serverist"
+
+#: Client/core/CConnectManager.cpp:304
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+msgid "Disconnected: connection to the server was lost"
+msgstr "Ühendus katkestati: ühendus serveriga katkes"
+
+#: Client/core/CConnectManager.cpp:311
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+msgid "Disconnected: connection was refused"
+msgstr "Ühendus katkestati: server ei soovi ühendada"
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Pole sellist modifikatsiooni installeeritud (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Server ei vasta (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Server ei vasta (1)"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2000,274 +2278,143 @@ msgstr "Grupi käsk edasi"
 msgid "Group control backwards"
 msgstr "Grupi käsk tagasi"
 
-#: Client/core/CScreenShot.cpp:104
+#: Client/core/ServerBrowser/CServerList.cpp:25
+msgid "Idle"
+msgstr "Tegevuseta"
+
+#: Client/core/ServerBrowser/CServerList.cpp:150
+msgid "player"
+msgid_plural "players"
+msgstr[0] "mängija"
+msgstr[1] "mängijad"
+
+#: Client/core/ServerBrowser/CServerList.cpp:151
+msgid "on"
+msgstr "peal"
+
+#: Client/core/ServerBrowser/CServerList.cpp:154
+msgid "server"
+msgid_plural "servers"
+msgstr[0] ""
+msgstr[1] "serverid"
+
+#. We are polling for the master server list (first pass)
+#: Client/core/ServerBrowser/CServerList.cpp:238
 #, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Pilt tuli %d baiti, aga eeldati %d"
+msgid "Requesting master server list (%lu ms elapsed)"
+msgstr "Nõuan peaserveri listi (%lu ms läbitud)"
 
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "Pildi tegemine ebaõnnestus"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:254
+msgid "Master server list could not be parsed."
+msgstr "Peaserveri listi pole võimalik lugeda."
 
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Pilt on tehtud: '%s'"
+#. Abort
+#: Client/core/ServerBrowser/CServerList.cpp:264
+msgid "Master server list could not be retrieved."
+msgstr "Peaserveri listi pole võimalik laadida."
 
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ KÄSK ABI ]***\n"
+#: Client/core/ServerBrowser/CServerList.cpp:274
+msgid "(Backup server list)"
+msgstr "(Tagavara serveri list)"
 
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Aeg on %d:%02d:%02d"
+#: Client/core/ServerBrowser/CServerList.cpp:326
+msgid "Cannot bind LAN-broadcast socket"
+msgstr "Ei suuda siduda LAN-braodcast pesa"
 
-#: Client/core/CCommandFuncs.cpp:242
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "Ühendus: Syntax on 'connect <host> [<port> <nick> <pass>]'"
+#: Client/core/ServerBrowser/CServerList.cpp:345
+msgid "Attempting to discover LAN servers"
+msgstr "Proovin avastada LAN servereid"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
-msgid "connect: Bad port number"
-msgstr "ühenda: Port number ei sobi"
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "SERVER ON TÄIS"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "ühenda: Loon ühendust serveriga %s:%u ..."
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "Nimi:"
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "ühenda: Ei suutnud luua ühendust serveriga %s:%u!"
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "Serveri aadress:"
 
-#: Client/core/CCommandFuncs.cpp:281
-msgid "connect: Failed to unload current mod"
-msgstr "ühenda: Ei suutnud eemaldada modifikatsiooni"
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "Mängutüüp:"
 
-#: Client/core/CCommandFuncs.cpp:371
-msgid "Bound all controls from GTA"
-msgstr "Seo kõik nupud GTA-ga"
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "Kaart:"
 
-#: Client/core/CCommandFuncs.cpp:385
-msgid "Saved configuration file"
-msgstr "Seadistusfail on salvestatud"
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "Mängijaid:"
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:451
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* Sinu serial on: %s"
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "Lukustatud:"
 
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Kas soovid näha onlain abi selle probleemi kohta ?"
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "Latents:"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Eesti"
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "Mängijate list"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Ühendamine ebaõnnestus. Teie mängunimi ei sobi!"
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "Sulge"
 
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Ühendamine ebaõnnestus. Vale serveri IP!"
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "Liitu mänguga"
 
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Ühendumine serveriga %s pordiga %u ebaõnnstus!"
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "Palun sisestage serveri salasõna:"
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Loon ühendust serveriga %s:%u ..."
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "Liitu serveriga esimesel võimalusel kui koht vabaneb."
 
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
-msgid "CONNECTING"
-msgstr "Ühendan"
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "PALUN SISESTA SERVERI SALASÕNA"
 
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
-msgid "Connection timed out"
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
 msgstr "Ühendus aegus"
 
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-msgid "Disconnected: unknown protocol error"
-msgstr "Ühendus katkestati: teadmata protokolli viga"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
-msgid "Disconnected: disconnected remotely"
-msgstr "Ühendus katkestati: katkestati kuskilt mujalt"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
-msgid "Disconnected: connection lost remotely"
-msgstr "Ühendus katkestati: ühendus kadus"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
-msgid "Disconnected: you are banned from this server"
-msgstr "Ühendus katkestati: sa oled bannitud selles serverist"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
-msgid "Disconnected: disconnected from the server"
-msgstr "Ühendus katkestati: lahkusid serverist"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-msgid "Disconnected: connection to the server was lost"
-msgstr "Ühendus katkestati: ühendus serveriga katkes"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
-msgid "Disconnected: connection was refused"
-msgstr "Ühendus katkestati: server ei soovi ühendada"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Pole sellist modifikatsiooni installeeritud (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Server ei vasta (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Server ei vasta (1)"
-
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Valitud välimust pole võimalik laadida, ka tavalist välimust ei suudetud laadida. Palun installi MTA uuesti."
-
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Tõsine viga"
-
-#: Client/core/CCore.cpp:890
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "ET PARANDADA, EEMALDAGE JÄRGMINE FAIL:"
-
-#: Client/core/CCore.cpp:922
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s moodul on ebasobiv!"
-
-#: Client/core/CCore.cpp:1227
-msgid "Error executing URL"
-msgstr "Viga URL-i avamisel"
-
-#: Client/core/CCore.cpp:1239
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Viga modifikatsiooni jooksutamises, mis oli edastatud käsus ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
-msgid "this help screen"
-msgstr "see abi leht"
-
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
-msgid "exits the application"
-msgstr "sulgeb rakenduse"
-
-#: Client/core/CCore.cpp:1330
-msgid "shows the version"
-msgstr "näitab versiooni"
-
-#: Client/core/CCore.cpp:1331
-msgid "shows the time"
-msgstr "näitab aega"
-
-#: Client/core/CCore.cpp:1332
-msgid "shows the hud"
-msgstr "näitab displeid"
-
-#: Client/core/CCore.cpp:1333
-msgid "shows all the binds"
-msgstr "näitab kõiki binde"
-
-#: Client/core/CCore.cpp:1334
-msgid "shows your serial"
-msgstr "näitab sinu seriali"
-
-#: Client/core/CCore.cpp:1343
-msgid "connects to a server (host port nick pass)"
-msgstr "ühendab serveriga (ip port mängunimi salasõna)"
-
-#: Client/core/CCore.cpp:1344
-msgid "connects to a previous server"
-msgstr "ühendab eelmise serveriga"
-
-#: Client/core/CCore.cpp:1345
-msgid "binds a key (key control)"
-msgstr "bindib nupu (nupp)"
-
-#: Client/core/CCore.cpp:1346
-msgid "unbinds a key (key)"
-msgstr "vabastab nupu bindist (nupp)"
-
-#: Client/core/CCore.cpp:1347
-msgid "copies the default gta controls"
-msgstr "kopeerib tavalise GTA nupud"
-
-#: Client/core/CCore.cpp:1348
-msgid "outputs a screenshot"
-msgstr "väljastab pildi mängust"
-
-#: Client/core/CCore.cpp:1349
-msgid "immediately saves the config"
-msgstr "salvestab seaded koheselt"
-
-#: Client/core/CCore.cpp:1351
-msgid "clears the debug view"
-msgstr "puhastab debug akna"
-
-#: Client/core/CCore.cpp:1352
-msgid "scrolls the chatbox upwards"
-msgstr "kerib chati üles"
-
-#: Client/core/CCore.cpp:1353
-msgid "scrolls the chatbox downwards"
-msgstr "kerib chati alla"
-
-#: Client/core/CCore.cpp:1354
-msgid "scrolls the debug view upwards"
-msgstr "kerib debug akent üles"
-
-#: Client/core/CCore.cpp:1355
-msgid "scrolls the debug view downwards"
-msgstr "kerib debug akent alla"
-
-#: Client/core/CCore.cpp:1358
-msgid "shows the memory statistics"
-msgstr "näitab mälu(RAM) statistikat"
-
-#: Client/core/CCore.cpp:1359
-msgid "shows the frame timing graph"
-msgstr "näitab kaadrite kohta graafikut"
-
-#: Client/core/CCore.cpp:1363
-msgid "for developers: reload news"
-msgstr ""
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONSOOL"
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "Päring..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2367,13 +2514,6 @@ msgstr ""
 msgid "Gamemode"
 msgstr "Mängutüüp"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "Mängijate list"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -2435,137 +2575,6 @@ msgstr "Vale mängunimi! Palun mine seadetesse ja vali uus!"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Sa pead valima serveri millega ühenduda."
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "SERVER ON TÄIS"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "Nimi:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "Serveri aadress:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "Mängutüüp:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "Kaart:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "Mängijaid:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "Lukustatud:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "Latents:"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "Sulge"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "Liitu mänguga"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "Palun sisestage serveri salasõna:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "Liitu serveriga esimesel võimalusel kui koht vabaneb."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "PALUN SISESTA SERVERI SALASÕNA"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "Ühendus aegus"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "Päring..."
-
-#: Client/core/ServerBrowser/CServerList.cpp:25
-msgid "Idle"
-msgstr "Tegevuseta"
-
-#: Client/core/ServerBrowser/CServerList.cpp:150
-msgid "player"
-msgid_plural "players"
-msgstr[0] "mängija"
-msgstr[1] "mängijad"
-
-#: Client/core/ServerBrowser/CServerList.cpp:151
-msgid "on"
-msgstr "peal"
-
-#: Client/core/ServerBrowser/CServerList.cpp:154
-msgid "server"
-msgid_plural "servers"
-msgstr[0] ""
-msgstr[1] "serverid"
-
-#. We are polling for the master server list (first pass)
-#: Client/core/ServerBrowser/CServerList.cpp:238
-#, c-format
-msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Nõuan peaserveri listi (%lu ms läbitud)"
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:254
-msgid "Master server list could not be parsed."
-msgstr "Peaserveri listi pole võimalik lugeda."
-
-#. Abort
-#: Client/core/ServerBrowser/CServerList.cpp:264
-msgid "Master server list could not be retrieved."
-msgstr "Peaserveri listi pole võimalik laadida."
-
-#: Client/core/ServerBrowser/CServerList.cpp:274
-msgid "(Backup server list)"
-msgstr "(Tagavara serveri list)"
-
-#: Client/core/ServerBrowser/CServerList.cpp:326
-msgid "Cannot bind LAN-broadcast socket"
-msgstr "Ei suuda siduda LAN-braodcast pesa"
-
-#: Client/core/ServerBrowser/CServerList.cpp:345
-msgid "Attempting to discover LAN servers"
-msgstr "Proovin avastada LAN servereid"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
@@ -2891,41 +2900,6 @@ msgstr[1] ""
 msgid "Disconnected"
 msgstr "Ühendus katkestatud"
 
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Kaardi allalaadimise protsess:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Allalaadimise protsess:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s / %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Katkesta ühendus, et loobuda allalaadimisest"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Alla laadimise viga: %s"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Ei suuda kohalikku serverit käivitada. Rohkem informatsiooni konsoolis."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Viga: Ei suuda käivitada kohalikku serverit. [%s]"
-
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
 msgstr "LOO MÄNG"
@@ -3025,14 +2999,40 @@ msgstr "Ühendus katkestatud: vale salasõna"
 msgid "MTA Client verification failed!"
 msgstr "MTA Kliendi auditeerimine ebaõnnestus!"
 
-#: Client/game_sa/CSettingsSA.cpp:804
-msgid "Can't find valid screen resolution."
-msgstr ""
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Kaardi allalaadimise protsess:"
 
-#. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
-msgid "Are you sure you want to use this screen resolution?"
-msgstr ""
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Allalaadimise protsess:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s / %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Katkesta ühendus, et loobuda allalaadimisest"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Alla laadimise viga: %s"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Ei suuda kohalikku serverit käivitada. Rohkem informatsiooni konsoolis."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Viga: Ei suuda käivitada kohalikku serverit. [%s]"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
