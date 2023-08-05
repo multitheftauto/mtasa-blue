@@ -28,8 +28,7 @@ DWORD RETURN_CAnimManager_AddAnimationAndSync_NORMAL_FLOW = 0x4D3B3A;
 DWORD RETURN_CAnimManager_AddAnimationAndSync = 0x4D3B4C;
 DWORD RETURN_CAnimManager_BlendAnimation_Hierarchy = 0x4D4577;
 
-auto CAnimBlendAssociation_NewOperator_US = (hCAnimBlendAssociation_NewOperator)0x82119A;
-auto CAnimBlendAssociation_NewOperator_EU = (hCAnimBlendAssociation_NewOperator)0x8211DA;
+auto CAnimBlendAssociation_NewOperator = (hCAnimBlendAssociation_NewOperator)0x82119A;
 
 AddAnimationHandler*            m_pAddAnimationHandler = nullptr;
 AddAnimationAndSyncHandler*     m_pAddAnimationAndSyncHandler = nullptr;
@@ -129,8 +128,6 @@ void _declspec(naked) HOOK_RpAnimBlendClumpUpdateAnimations()
 
 CAnimBlendAssociationSAInterface* __cdecl CAnimBlendAssocGroup_CopyAnimation(RpClump* pClump, eAnimGroup u32AnimGroupID, eAnimID animID)
 {
-    auto CAnimBlendAssociation_NewOperator =
-        pGameInterface->GetGameVersion() == VERSION_EU_10 ? CAnimBlendAssociation_NewOperator_EU : CAnimBlendAssociation_NewOperator_US;
     auto pAnimAssociationInterface =
         reinterpret_cast<CAnimBlendAssociationSAInterface*>(CAnimBlendAssociation_NewOperator(sizeof(CAnimBlendAssociationSAInterface)));
 
