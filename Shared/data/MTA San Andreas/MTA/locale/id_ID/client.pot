@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-01 17:40+0000\n"
-"PO-Revision-Date: 2023-08-01 18:23\n"
+"POT-Creation-Date: 2023-08-05 14:59+0000\n"
+"PO-Revision-Date: 2023-08-05 15:03\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -2607,7 +2607,7 @@ msgstr "Tidak dapat menginisialisasi Direct3D9.\n\n"
 "Windows Service Packs yang terbaru telah terpasang dengan benar."
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1381
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1361
 msgid "Problem with graphics driver"
 msgstr "Masalah dengan driver grafik"
 
