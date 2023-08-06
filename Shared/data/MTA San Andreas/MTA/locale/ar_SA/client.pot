@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-05 14:59+0000\n"
-"PO-Revision-Date: 2023-08-05 15:02\n"
+"POT-Creation-Date: 2023-08-06 18:33+0000\n"
+"PO-Revision-Date: 2023-08-06 19:30\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -2616,7 +2616,7 @@ msgstr "تعذر تهئية Direct3D9.\n\n"
 "وآخر اصدار من حزمة خدمات وندوز بشكل صحيح."
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1361
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1360
 msgid "Problem with graphics driver"
 msgstr "مشكلة في معرّف الرسوم"
 
