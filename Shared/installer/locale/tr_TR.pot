@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-16 19:37\n"
+"PO-Revision-Date: 2023-06-20 21:46\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -94,7 +94,7 @@ msgstr "DirectX'i yükle veya güncelle (eğer gerekliyse)."
 #. DESC_Section1
 #: Shared/installer/nightly.nsi:222
 msgid "The core components required to run Multi Theft Auto."
-msgstr "Temel bileşenler Multi Theft Auto çalıştırmak için gerekli."
+msgstr "Temel bileşenler, Multi Theft Auto'yu çalıştırmak için gerekli."
 
 #. DESC_Section2
 #: Shared/installer/nightly.nsi:223
@@ -159,7 +159,7 @@ msgstr "Sadece sunucu"
 #. INST_STARTMENU_GROUP
 #: Shared/installer/nightly.nsi:456
 msgid "Start menu group"
-msgstr "Başlat menüsü"
+msgstr "Başlat menüsü grubu"
 
 #. INST_DESKTOP_ICON
 #: Shared/installer/nightly.nsi:457
@@ -228,7 +228,7 @@ msgstr "Temel Kaynaklar"
 #. INST_SEC_OPTIONAL_RESOURCES
 #: Shared/installer/nightly.nsi:505
 msgid "Optional Resources"
-msgstr "Opyisonel Kaynaklar"
+msgstr "İsteğe Bağlı Kaynaklar"
 
 #. INST_SEC_EDITOR
 #: Shared/installer/nightly.nsi:506

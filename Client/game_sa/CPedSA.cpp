@@ -947,9 +947,7 @@ void CPedSA::SetVoice(const char* szVoiceType, const char* szVoice)
 
 void CPedSA::ResetVoice()
 {
-    short sVoiceType = m_pDefaultPedSound->GetVoiceTypeID();
-    short sVoiceID = m_pDefaultPedSound->GetVoiceID();
-    SetVoice(sVoiceType, sVoiceID);
+    SetVoice(m_pDefaultPedSound->GetVoiceTypeID(), m_pDefaultPedSound->GetVoiceID());
 }
 
 // GetCurrentWeaponStat will only work if the game ped context is currently set to this ped

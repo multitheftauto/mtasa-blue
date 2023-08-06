@@ -67,7 +67,6 @@ CElement::CElement(CElement* pParent)
 
     // Make an event manager for us
     m_pEventManager = new CMapEventManager;
-    m_pCustomData = new CCustomData;
 
     m_pAttachedTo = NULL;
 }
@@ -83,7 +82,6 @@ CElement::~CElement()
         m_pElementGroup->Remove(this);
 
     // Delete our event manager
-    delete m_pCustomData;
     delete m_pEventManager;
 
     // Unreference us from what's referencing us
@@ -515,7 +513,7 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESy
     assert(szName);
 
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_pCustomData->Get(szName);
+    SCustomData* pData = m_CustomData.Get(szName);
     if (pData)
     {
         if (pSyncType)
@@ -537,10 +535,12 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
 {
     assert(table);
 
-    for (auto it = m_pCustomData->IterBegin(); it != m_pCustomData->IterEnd(); it++)
+    // Grab it and return a pointer to the variable
+    map<string, SCustomData>::const_iterator iter = m_CustomData.IterBegin();
+    for (; iter != m_CustomData.IterEnd(); iter++)
     {
-        table->PushString(it->first);                        // key
-        table->PushArgument(it->second.Variable);            // value
+        table->PushString(iter->first.c_str());                // key
+        table->PushArgument(iter->second.Variable);            // value
     }
 
     return table;
@@ -717,14 +717,14 @@ void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, E
 
     // Grab the old variable
     CLuaArgument       oldVariable;
-    const SCustomData* pData = m_pCustomData->Get(szName);
+    const SCustomData* pData = m_CustomData.Get(szName);
     if (pData)
     {
         oldVariable = pData->Variable;
     }
 
     // Set the new data
-    m_pCustomData->Set(szName, Variable, syncType);
+    m_CustomData.Set(szName, Variable, syncType);
 
     if (bTriggerEvent)
     {
@@ -740,14 +740,14 @@ void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, E
 void CElement::DeleteCustomData(const char* szName)
 {
     // Grab the old variable
-    SCustomData* pData = m_pCustomData->Get(szName);
+    SCustomData* pData = m_CustomData.Get(szName);
     if (pData)
     {
         CLuaArgument oldVariable;
         oldVariable = pData->Variable;
 
         // Delete the custom data
-        m_pCustomData->Delete(szName);
+        m_CustomData.Delete(szName);
 
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
@@ -761,7 +761,7 @@ void CElement::DeleteCustomData(const char* szName)
 // Used to send the root element data when a player joins
 void CElement::SendAllCustomData(CPlayer* pPlayer)
 {
-    for (map<std::string, SCustomData>::const_iterator iter = m_pCustomData->SyncedIterBegin(); iter != m_pCustomData->SyncedIterEnd(); ++iter)
+    for (map<std::string, SCustomData>::const_iterator iter = m_CustomData.SyncedIterBegin(); iter != m_CustomData.SyncedIterEnd(); ++iter)
     {
         const std::string& strName = iter->first;
         const SCustomData& customData = iter->second;
@@ -787,7 +787,7 @@ CXMLNode* CElement::OutputToXML(CXMLNode* pNodeParent)
     CXMLNode* pNode = pNodeParent->CreateSubNode(GetTypeName().c_str());
 
     // Output the custom data values to it as arguments
-    m_pCustomData->OutputToXML(pNode);
+    m_CustomData.OutputToXML(pNode);
 
     // Go through each child element and call this function on it
     CChildListType ::const_iterator iter = m_Children.begin();

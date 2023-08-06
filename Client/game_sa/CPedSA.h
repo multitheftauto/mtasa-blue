@@ -264,11 +264,11 @@ class CPedSA : public virtual CPed, public virtual CPhysicalSA
 
 private:
     CWeaponSA*          m_pWeapons[WEAPONSLOT_MAX];
-    CPedIKSA*           m_pPedIK = NULL;
-    CPedIntelligenceSA* m_pPedIntelligence = NULL;
-    CPedSAInterface*    m_pPedInterface = NULL;
-    CPedSoundSA*        m_pPedSound = NULL;
-    CPedSoundSA*        m_pDefaultPedSound = NULL;
+    CPedIKSA*           m_pPedIK = nullptr;
+    CPedIntelligenceSA* m_pPedIntelligence = nullptr;
+    CPedSAInterface*    m_pPedInterface = nullptr;
+    CPedSoundSA*        m_pPedSound = nullptr;
+    CPedSoundSA*        m_pDefaultPedSound = nullptr;
 
     DWORD         m_dwType{};
     unsigned char m_ucOccupiedSeat{};

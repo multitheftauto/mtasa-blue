@@ -234,6 +234,7 @@ namespace SharedUtil
 
     std::string UTF16ToMbUTF8(const std::wstring& ws);
     std::string UTF16ToMbUTF8(const wchar_t* ws);
+    std::string UTF16ToMbUTF8(const char16_t* ws);
 
     std::wstring ANSIToUTF16(const SString& s);
 

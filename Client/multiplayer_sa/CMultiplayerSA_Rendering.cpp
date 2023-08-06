@@ -319,13 +319,9 @@ void OnMY_WinLoop()
 }
 
 // Hook info
-#define HOOKPOS_WinLoop_US                         0x748A93
-#define HOOKPOS_WinLoop_EU                         0x748AE3
-#define HOOKSIZE_WinLoop_US                        5
-#define HOOKSIZE_WinLoop_EU                        5
-DWORD RETURN_WinLoop_US = 0x748A98;
-DWORD RETURN_WinLoop_EU = 0x748AE8;
-DWORD RETURN_WinLoop_BOTH = 0;
+#define HOOKPOS_WinLoop                            0x748A93
+#define HOOKSIZE_WinLoop                           5
+DWORD RETURN_WinLoop = 0x748A98;
 void _declspec(naked) HOOK_WinLoop()
 {
     _asm
@@ -335,7 +331,7 @@ void _declspec(naked) HOOK_WinLoop()
         popad
 
         mov     eax, ds:0x0C8D4C0
-        jmp     RETURN_WinLoop_BOTH
+        jmp     RETURN_WinLoop
     }
 }
 
@@ -499,15 +495,10 @@ float OnMY_RwCameraSetNearClipPlane(DWORD dwCalledFrom, void* pUnknown, float fD
 }
 
 // Hook info
-#define HOOKCHECK_RwCameraSetNearClipPlane_US       0xD9
-#define HOOKCHECK_RwCameraSetNearClipPlane_EU       0xD9
-#define HOOKPOS_RwCameraSetNearClipPlane_US         0x7EE1D0
-#define HOOKPOS_RwCameraSetNearClipPlane_EU         0x7EE210
-#define HOOKSIZE_RwCameraSetNearClipPlane_US        5
-#define HOOKSIZE_RwCameraSetNearClipPlane_EU        5
-DWORD RETURN_RwCameraSetNearClipPlane_US = 0x7EE1D5;
-DWORD RETURN_RwCameraSetNearClipPlane_EU = 0x7EE215;
-DWORD RETURN_RwCameraSetNearClipPlane_BOTH = 0;
+#define HOOKCHECK_RwCameraSetNearClipPlane          0xD9
+#define HOOKPOS_RwCameraSetNearClipPlane            0x7EE1D0
+#define HOOKSIZE_RwCameraSetNearClipPlane           5
+DWORD RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
 void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
     _asm
@@ -523,7 +514,7 @@ void _declspec(naked) HOOK_RwCameraSetNearClipPlane()
         // Result is on fp stack
         //fld     [esp+8]
         push    esi
-        jmp     RETURN_RwCameraSetNearClipPlane_BOTH
+        jmp     RETURN_RwCameraSetNearClipPlane
     }
 }
 
