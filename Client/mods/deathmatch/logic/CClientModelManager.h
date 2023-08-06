@@ -17,6 +17,11 @@ class CClientModelManager;
 #include <memory>
 #include "CClientModel.h"
 
+struct SModelFrameInfo
+{
+    CMatrix matrix;
+};
+
 class CClientModelManager
 {
     friend class CClientModel;
@@ -38,7 +43,14 @@ public:
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
+    void SetModelFramePosition(uint16_t modelId, std::string& frameName, CVector vecPotation);
+    void SetModelFrameRotation(uint16_t modelId, std::string& frameName, CVector vecRotation);
+    void SetModelFrameScale(uint16_t modelId, std::string& frameName, CVector vecScale);
+    bool TryGetModelFrameInfos(uint16_t modelId, std::unordered_map<std::string, SModelFrameInfo>& infos);
+
 private:
-    std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
-    unsigned int                                     m_modelCount = 0;
+    void InitializeModelFrameInfo(uint16_t modelId, std::string& frameName);
+    std::unique_ptr<std::shared_ptr<CClientModel>[]>                               m_Models;
+    std::unordered_map<uint16_t, std::unordered_map<std::string, SModelFrameInfo>> m_modelFramesInfo;
+    unsigned int                                                                   m_modelCount = 0;
 };

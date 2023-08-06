@@ -71,6 +71,7 @@ class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociationSAInterface;
 class CAnimBlendAssocGroupSAInterface;
 class CIFPAnimations;
+class CObjectSAInterface;
 typedef unsigned long AssocGroupId;
 typedef unsigned long AnimationId;
 enum class eAnimGroup;
@@ -103,6 +104,7 @@ typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
 typedef void(IdleHandler)();
 typedef void(PreFxRenderHandler)();
 typedef void(PreHudRenderHandler)();
+typedef void(CustomObjectPreprocessorHandler)(CObjectSAInterface* pObject);
 typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
 typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                       AssocGroupId animGroup, AnimationId animID);
@@ -232,6 +234,7 @@ public:
     virtual void  SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void  SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void  SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
+    virtual void  SetCustomObjectPreprocessorHandler(CustomObjectPreprocessorHandler* pHandler) = 0;
     virtual void  DisableCallsToCAnimBlendNode(bool bDisableCalls) = 0;
     virtual void  SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler) = 0;
     virtual void  SetAddAnimationHandler(AddAnimationHandler* pHandler) = 0;

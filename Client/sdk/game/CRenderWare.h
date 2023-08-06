@@ -110,6 +110,10 @@ public:
     virtual void     RemoveClientEntityRefs(CClientEntityBase* pClientEntity) = 0;
     virtual void     RemoveShaderRefs(CSHADERDUMMY* pShaderItem) = 0;
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
+    virtual CVector  GetFramePosition(RwFrame* pFrame) = 0;
+    virtual void     SetFramePosition(RwFrame* pFrame, CVector position) = 0;
+    virtual CVector  GetFrameRotation(RwFrame* pFrame) = 0;
+    virtual void     SetFrameRotation(RwFrame* pFrame, CVector rotation) = 0;
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
     virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
 

@@ -60,6 +60,24 @@ size_t EngineStreamingGetBufferSize() {
     return g_pGame->GetStreaming()->GetStreamingBufferSize();
 }
 
+bool EngineModelSetFramePosition(uint16_t modelId, std::string frameName, CVector vecPosition)
+{
+    g_pClientGame->GetManager()->GetModelManager()->SetModelFramePosition(modelId, frameName, vecPosition);
+    return true;
+}
+
+bool EngineModelSetFrameRotation(uint16_t modelId, std::string frameName, CVector vecRotation)
+{
+    g_pClientGame->GetManager()->GetModelManager()->SetModelFrameRotation(modelId, frameName, vecRotation);
+    return true;
+}
+
+bool EngineModelSetFrameScale(uint16_t modelId, std::string frameName, CVector vecScale)
+{
+    g_pClientGame->GetManager()->GetModelManager()->SetModelFrameScale(modelId, frameName, vecScale);
+    return true;
+}
+
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -122,6 +140,10 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
+
+        {"engineModelSetFramePosition", ArgumentParser<EngineModelSetFramePosition>},
+        {"engineModelSetFrameRotation", ArgumentParser<EngineModelSetFrameRotation>},
+        {"engineModelSetFrameScale", ArgumentParser<EngineModelSetFrameScale>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );

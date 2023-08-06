@@ -109,3 +109,51 @@ void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResour
             Remove(m_Models[i]);
     }
 }
+
+void CClientModelManager::SetModelFramePosition(uint16_t modelId, std::string& frameName, CVector vecRotation)
+{
+    InitializeModelFrameInfo(modelId, frameName);
+    m_modelFramesInfo[modelId][frameName].matrix.SetPosition(vecRotation);
+}
+
+void CClientModelManager::SetModelFrameRotation(uint16_t modelId, std::string& frameName, CVector vecRotation)
+{
+    InitializeModelFrameInfo(modelId, frameName);
+    ConvertDegreesToRadians(vecRotation);
+    m_modelFramesInfo[modelId][frameName].matrix.SetRotation(vecRotation);
+}
+
+void CClientModelManager::SetModelFrameScale(uint16_t modelId, std::string& frameName, CVector vecRotation)
+{
+    InitializeModelFrameInfo(modelId, frameName);
+    m_modelFramesInfo[modelId][frameName].matrix.SetScale(vecRotation);
+}
+
+bool CClientModelManager::TryGetModelFrameInfos(uint16_t modelId, std::unordered_map<std::string, SModelFrameInfo>& infos)
+{
+    auto itModel = m_modelFramesInfo.find(modelId);
+    if (itModel != m_modelFramesInfo.end())
+    {
+        auto& innerMap = itModel->second;
+        if (innerMap.size() == 0)
+            return false;
+        infos = innerMap;
+        return true;
+    }
+    return false;
+}
+
+void CClientModelManager::InitializeModelFrameInfo(uint16_t modelId, std::string& frameName)
+{
+    {
+        auto it = m_modelFramesInfo.find(modelId);
+        if (it == m_modelFramesInfo.end())
+            m_modelFramesInfo[modelId] = std::unordered_map<std::string, SModelFrameInfo>();
+    }
+
+    {
+        auto it = m_modelFramesInfo[modelId].find(frameName);
+        if (it == m_modelFramesInfo[modelId].end())
+            m_modelFramesInfo[modelId][frameName] = SModelFrameInfo{};
+    }
+}

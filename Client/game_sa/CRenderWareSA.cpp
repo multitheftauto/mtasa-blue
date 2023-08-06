@@ -927,6 +927,32 @@ RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
     return RwFrameFindFrame(RpGetFrame(pRoot), strName);
 }
 
+CVector CRenderWareSA::GetFramePosition(RwFrame* pFrame)
+{
+    CVector position;
+    RwMatrixGetPosition(pFrame->modelling, position);
+    return position;
+}
+
+void CRenderWareSA::SetFramePosition(RwFrame* pFrame, CVector position)
+{
+    RwMatrixSetPosition(pFrame->modelling, position);
+    RwFrameUpdateObjects(pFrame);
+}
+
+CVector CRenderWareSA::GetFrameRotation(RwFrame* pFrame)
+{
+    CVector rotation;
+    RwMatrixGetRotation(pFrame->modelling, rotation);
+    return rotation;
+}
+
+void CRenderWareSA::SetFrameRotation(RwFrame* pFrame, CVector rotation)
+{
+    RwMatrixSetRotation(pFrame->modelling, rotation);
+    RwFrameUpdateObjects(pFrame);
+}
+
 void CRenderWareSA::CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix)
 {
     rwOutMatrix.right = (RwV3d&)mat.vRight;
