@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-06 18:33+0000\n"
-"PO-Revision-Date: 2023-08-06 19:30\n"
+"POT-Creation-Date: 2023-08-06 20:57+0000\n"
+"PO-Revision-Date: 2023-08-06 21:30\n"
 "Last-Translator: \n"
 "Language-Team: Greek\n"
 "Language: el_GR\n"
@@ -151,7 +151,7 @@ msgstr "Έγινε επανεκκίνηση του υπολογιστή σας �
 msgid "Please terminate the following programs before continuing:"
 msgstr "Παρακαλείστε να τερματίσετε τα ακόλουθα προγράμματα πριν συνεχίσετε:"
 
-#: Client/loader/MainFunctions.cpp:247
+#: Client/loader/MainFunctions.cpp:248
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
@@ -165,8 +165,8 @@ msgstr "Πρόβλημα επανεκκίνησης του MTA:SΑ\n\n"
 #. Show failed message and abort the attempt
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
-#: Client/loader/MainFunctions.cpp:251 Client/loader/MainFunctions.cpp:266
-#: Client/loader/MainFunctions.cpp:268 Client/loader/MainFunctions.cpp:845
+#: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
+#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
@@ -199,25 +199,25 @@ msgstr "Πρόβλημα επανεκκίνησης του MTA:SΑ\n\n"
 msgid "Error"
 msgstr "Σφάλμα"
 
-#: Client/loader/MainFunctions.cpp:265
+#: Client/loader/MainFunctions.cpp:266
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "Μια άλλη παράμετρος του MTA εκτελείται ήδη.\n\n"
 "Εάν το πρόβλημα παραμένει, κάντε επανεκκίνηση του υπολογιστή σας"
 
-#: Client/loader/MainFunctions.cpp:268
+#: Client/loader/MainFunctions.cpp:269
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "Μια άλλη παράμετρος του MTA εκτελείται ήδη.\n\n"
 "Θέλετε να τη τερματίσετε;"
 
-#: Client/loader/MainFunctions.cpp:293
+#: Client/loader/MainFunctions.cpp:294
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "Έχετε προβλήματα με την εκτέλεση του MTA:SA;.\n\n"
 "Θέλετε να επανέλθετε σε προηγούμενη έκδοση;"
 
-#: Client/loader/MainFunctions.cpp:323
+#: Client/loader/MainFunctions.cpp:324
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
@@ -225,48 +225,48 @@ msgstr "Φαίνεται ότι υπάρχει πρόβλημα με την εκ
 "Η επαναφορά των ρυθμίσεων GTA μπορεί μερικές φορές να διορθώσει αυτό το πρόβλημα.\n\n"
 "Θέλετε να επαναφέρετε τις ρυθμίσεις GTA τώρα;"
 
-#: Client/loader/MainFunctions.cpp:338
+#: Client/loader/MainFunctions.cpp:339
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
 msgstr "Οι ρυθμίσεις GTA έχουν επαναφερθεί.\n\n"
 "Πατήστε Εντάξει για να συνεχίσετε."
 
-#: Client/loader/MainFunctions.cpp:343
+#: Client/loader/MainFunctions.cpp:344
 #, c-format
 msgid "File could not be deleted: '%s'"
 msgstr "Το αρχείο δεν μπόρεσε να διαγραφεί: '%s'"
 
 #. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:351
+#: Client/loader/MainFunctions.cpp:352
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "Έχετε προβλήματα με την εκτέλεση του MTA:SA?.\n\n"
 "Θέλετε να δείτε κάποια βοήθεια στο διαδίκτυο;"
 
 #. Inform user
-#: Client/loader/MainFunctions.cpp:387
+#: Client/loader/MainFunctions.cpp:388
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
 msgstr "Έχετε προβλήματα με την εκτέλεση του MTA:SA;.\n\n"
 "Θέλετε να αλλάξετε την ακόλουθη ρύθμιση;"
 
-#: Client/loader/MainFunctions.cpp:388 Client/core/CSettings.cpp:645
+#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:645
 #: Client/core/CSettings.cpp:987
 msgid "Fullscreen mode:"
 msgstr "Πλήρης οθόνη:"
 
-#: Client/loader/MainFunctions.cpp:388 Client/core/CSettings.cpp:653
+#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:653
 #: Client/core/CSettings.cpp:1597
 msgid "Borderless window"
 msgstr "Παράθυρο χωρίς περιθώρια"
 
-#: Client/loader/MainFunctions.cpp:430
+#: Client/loader/MainFunctions.cpp:431
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
 msgstr "Έχετε προβλήματα με την εκτέλεση του MTA:SA;.\n\n"
 "Δοκιμάστε να απενεργοποιήσετε τα παρακάτω προϊόντα για το GTA και το MTA:"
 
-#: Client/loader/MainFunctions.cpp:464
+#: Client/loader/MainFunctions.cpp:465
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
@@ -274,35 +274,35 @@ msgstr "ΠΡΟΕΙΔΟΠΟΙΗΣΗ\n\n"
 "Το MTA:SA έχει εντοπίσει ασυνήθιστη δραστηριότητα.\n"
 "Εκτελέστε μια σάρωση ιών για να βεβαιωθείτε ότι το σύστημά σας είναι ασφαλές.\n\n"
 
-#: Client/loader/MainFunctions.cpp:467
+#: Client/loader/MainFunctions.cpp:468
 #, c-format
 msgid "The detected file was:  %s\n"
 msgstr "Το αρχείο που εντοπίστηκε ήταν:  %s\n"
 
-#: Client/loader/MainFunctions.cpp:601
+#: Client/loader/MainFunctions.cpp:602
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
 msgstr "Μια αναφορά του GTA: San Andreas είναι ήδη σε λειτουργία. Πρέπει να τερματιστεί πριν ξεκινήσει το MTA:SA. Θέλετε να το κάνετε τώρα;"
 
-#: Client/loader/MainFunctions.cpp:602 Client/loader/MainFunctions.cpp:609
-#: Client/loader/MainFunctions.cpp:1217
+#: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
+#: Client/loader/MainFunctions.cpp:1218
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "Information"
 msgstr "Πληροφορία"
 
-#: Client/loader/MainFunctions.cpp:608
+#: Client/loader/MainFunctions.cpp:609
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
 msgstr "Δεν είναι δυνατό να τερματιστεί το GTA:San Andreas. Εάν το πρόβλημα παραμένει, παρακαλώ κάντε επανεκκίνηση του υπολογιστή σας."
 
-#: Client/loader/MainFunctions.cpp:631
+#: Client/loader/MainFunctions.cpp:632
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
 msgstr "Δεν υπάρχουν καταχωρήσεις μητρώου. Παρακαλώ επανεγκαταστήστε το Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:637
+#: Client/loader/MainFunctions.cpp:638
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
 msgstr "Η διαδρομή για την εγκατάσταση του GTA: San Andreas περιέχει μη υποστηριζόμενους χαρακτήρες (unicode). Μετακινήστε την εγκατάσταση Grand Theft Auto: San Andreas σε συμβατή διαδρομή που περιέχει μόνο τυπικούς χαρακτήρες ASCII και επανεγκαταστήστε το Multi Theft Auto: San Andreas."
 
-#: Client/loader/MainFunctions.cpp:647
+#: Client/loader/MainFunctions.cpp:648
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 " If you experience problems when running MTA:SA,\n"
@@ -312,87 +312,87 @@ msgstr "Η διαδρομή για την εγκατάσταση του 'MTA:SA'
 "Αν αντιμετωπίζετε προβλήματα κατά την εκτέλεση του MTA:SA,\n"
 "μετακινήστε την εγκατάσταση ή τις εγκαταστάσεις σας σε μια διαδρομή που δεν περιέχει ερωτηματικό."
 
-#: Client/loader/MainFunctions.cpp:809
+#: Client/loader/MainFunctions.cpp:810
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
 msgstr "Η φόρτωση απέτυχε. Βεβαιωθείτε ότι τα τελευταία αρχεία δεδομένων έχουν εγκατασταθεί σωστά."
 
-#: Client/loader/MainFunctions.cpp:818
+#: Client/loader/MainFunctions.cpp:819
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
 msgstr "Η φόρτωση απέτυχε. Βεβαιωθείτε ότι το %s έχει εγκατασταθεί σωστά."
 
-#: Client/loader/MainFunctions.cpp:825
+#: Client/loader/MainFunctions.cpp:826
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
 msgstr "Η φόρτωση απέτυχε. Δεν ήταν δυνατή η εύρεση του gta_sa.exe στο %s."
 
-#: Client/loader/MainFunctions.cpp:835
+#: Client/loader/MainFunctions.cpp:836
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
 msgstr "Η φόρτωση απέτυχε. %s υπάρχει στον προορισμό του GTA. Παρακαλώ διαγράψτε πριν συνεχίσετε."
 
-#: Client/loader/MainFunctions.cpp:844
+#: Client/loader/MainFunctions.cpp:845
 #, c-format
 msgid "Main file has an incorrect name (%s)"
 msgstr "Το κύριο αρχείο έχει ένα λάθος όνομα (%s)"
 
-#: Client/loader/MainFunctions.cpp:855
+#: Client/loader/MainFunctions.cpp:856
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "Το κύριο αρχείο δεν είναι υπογεγραμμένο. Πιθανή δραστηριότητα ιού.\n\n"
 "Ανατρέξτε στην ηλεκτρονική βοήθεια, εάν το MTA δεν λειτουργεί σωστά."
 
-#: Client/loader/MainFunctions.cpp:881
+#: Client/loader/MainFunctions.cpp:882
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:892
+#: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
 msgstr ""
 
-#: Client/loader/MainFunctions.cpp:906
+#: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
 msgstr "Αρχεία .asi βρίσκονται στον προορισμό εγκατάστασης του 'MTA:SA' ή του 'GTA: San Andreas'.\n\n"
 "Καταργήστε αυτά τα αρχεία .asi αν αντιμετωπίσετε προβλήματα με το MTA:SA."
 
-#: Client/loader/MainFunctions.cpp:1008
+#: Client/loader/MainFunctions.cpp:1009
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Σφάλμα αναντιστοιχίας έκδοσης αρχείου. Επανεγκαταστήστε το MTA:SA αν αντιμετωπίσετε προβλήματα.\n"
 
-#: Client/loader/MainFunctions.cpp:1017
+#: Client/loader/MainFunctions.cpp:1018
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
 msgstr "Κάποια αρχεία λείπουν. Επανεγκαταστήστε το MTA:SA αν αντιμετωπίσετε προβλήματα.\n"
 
-#: Client/loader/MainFunctions.cpp:1029
+#: Client/loader/MainFunctions.cpp:1030
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "Το MTA:SA δεν είναι συμβατό με την 'ασφαλή λειτουργία' των Windows.\n\n"
 "Κάντε επανεκκίνηση του υπολογιστή σας.\n"
 
-#: Client/loader/MainFunctions.cpp:1121
+#: Client/loader/MainFunctions.cpp:1122
 msgid "Fix configuration issue"
 msgstr "Επίλυση ζητήματος διαμόρφωσης"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1155
+#: Client/loader/MainFunctions.cpp:1156
 msgid "Fix elevation required error"
 msgstr "Επιδιόρθωση σφάλματος ανύψωσης"
 
-#: Client/loader/MainFunctions.cpp:1162
+#: Client/loader/MainFunctions.cpp:1163
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Δεν ήταν δυνατή η εκκίνηση του Grand Theft Auto: San Andreas.   Παρακαλώ δοκιμάστε να κάνετε επανεκκίνηση ή εάν το πρόβλημα παραμένει, επικοινωνήστε με το MTA στη διεύθυνση www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1217
+#: Client/loader/MainFunctions.cpp:1218
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "Το GTA: San Andreas μπορεί να μην έχει ξεκινήσει σωστά. Θέλετε να το τερματίσετε;"
 
