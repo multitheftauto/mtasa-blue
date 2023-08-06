@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-05 14:59+0000\n"
-"PO-Revision-Date: 2023-08-05 15:02\n"
+"POT-Creation-Date: 2023-08-06 18:33+0000\n"
+"PO-Revision-Date: 2023-08-06 19:31\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -2595,7 +2595,7 @@ msgstr "Не беше во можност да иницијализира Direct
 "најновиот сервисен пакет на Windows е инсталиран правилно."
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1361
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1360
 msgid "Problem with graphics driver"
 msgstr "Проблеми со графичките драјвери"
 
