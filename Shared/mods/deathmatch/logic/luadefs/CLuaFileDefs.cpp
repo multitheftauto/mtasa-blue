@@ -9,6 +9,12 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#ifndef MTA_CLIENT
+    // NOTE: Must be included before ILuaModuleManager.h which defines its own CChecksum type.
+    #include "CChecksum.h"
+#endif
+
 #include "CLuaFileDefs.h"
 #include "CScriptFile.h"
 #include "CScriptArgReader.h"
@@ -18,14 +24,10 @@
 void CLuaFileDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"fileOpen", fileOpen},     {"fileCreate", fileCreate},   {"fileExists", fileExists},   {"fileCopy", fileCopy},
-        {"fileRename", fileRename}, {"fileDelete", fileDelete},
-
-        {"fileClose", fileClose},   {"fileFlush", fileFlush},     {"fileRead", fileRead},       {"fileWrite", fileWrite},
-
-        {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize}, {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},
-
-        {"fileSetPos", fileSetPos},
+        {"fileOpen", fileOpen},       {"fileCreate", fileCreate}, {"fileExists", fileExists}, {"fileCopy", fileCopy},
+        {"fileRename", fileRename},   {"fileDelete", fileDelete}, {"fileClose", fileClose},   {"fileFlush", fileFlush},
+        {"fileRead", fileRead},       {"fileWrite", fileWrite},   {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},   {"fileSetPos", fileSetPos}, {"fileGetContents", fileGetContents},
     };
 
     // Add functions
@@ -779,6 +781,92 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
 
     // Error
     lua_pushnil(luaVM);
+    return 1;
+}
+
+int CLuaFileDefs::fileGetContents(lua_State* L)
+{
+    // bool fileGetContents ( file target [, bool verifyContents = true ] )
+    CScriptFile* targetFile{};
+    bool         verifyContents{};
+
+    CScriptArgReader argStream(L);
+    argStream.ReadUserData(targetFile);
+    argStream.ReadBool(verifyContents, true);
+
+    if (argStream.HasErrors())
+        return luaL_error(L, argStream.GetFullErrorMessage());
+
+    SString buffer;
+
+    // We abuse the logic of CScriptFile::Read to determine size of file and to resize the buffer accordingly, to avoid doing that work twice.
+    const long bytesRead = targetFile->Read(std::numeric_limits<long>::max(), buffer);
+
+    if (bytesRead >= 0)
+    {
+        bool returnContents = true;
+
+        if (verifyContents)
+        {
+            const auto getResourceName = [](CResource* resource)
+            {
+#ifdef MTA_CLIENT
+                return resource->GetName();
+#else
+                return resource->GetName().c_str();
+#endif
+            };
+
+            if (CResourceFile* resourceFile = targetFile->GetResourceFile(); resourceFile != nullptr)
+            {
+                auto bufferLength = static_cast<unsigned long>(buffer.size());
+
+                // Remove EOF byte at the end of the buffer, which breaks checksum.
+                if (bufferLength)
+                    --bufferLength;
+
+                CChecksum current = CChecksum::GenerateChecksumFromBuffer(buffer.data(), bufferLength);
+
+#ifdef MTA_CLIENT
+                CChecksum expected = resourceFile->GetServerChecksum();
+#else
+                CChecksum expected = resourceFile->GetLastChecksum();
+#endif
+
+                if (current != expected)
+                {
+                    m_pScriptDebugging->LogWarning(L, "verification failed: checksum mismatch for resource file ':%s/%s' (expected %08X, got %08X)",
+                                                   getResourceName(targetFile->GetResource()), targetFile->GetFilePath().c_str(), expected.ulCRC,
+                                                   current.ulCRC);
+                    returnContents = false;
+                }
+            }
+            else
+            {
+                m_pScriptDebugging->LogWarning(L, "verification failed: resource file '%s' not found in '%s'", targetFile->GetFilePath().c_str(),
+                                               getResourceName(targetFile->GetResource()));
+                returnContents = false;
+            }
+        }
+
+        if (returnContents)
+        {
+            // Push the string onto the Lua stack. Use pushlstring so we are binary
+            // compatible. Normal push string takes zero terminated strings.
+            lua_pushlstring(L, buffer.data(), bytesRead);
+            return 1;
+        }
+    }
+    else if (bytesRead == -2)
+    {
+        m_pScriptDebugging->LogWarning(L, "out of memory");
+    }
+    else
+    {
+        m_pScriptDebugging->LogBadPointer(L, "file", 1);
+    }
+
+    lua_pushnil(L);
     return 1;
 }
 

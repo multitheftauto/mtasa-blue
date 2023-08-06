@@ -30,6 +30,7 @@ private:
     LUA_DECLARE(fileFlush);
     LUA_DECLARE(fileRead);
     LUA_DECLARE(fileWrite);
+    LUA_DECLARE(fileGetContents);
 
     LUA_DECLARE(fileGetPos);
     LUA_DECLARE(fileGetSize);
