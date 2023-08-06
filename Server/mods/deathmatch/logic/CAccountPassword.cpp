@@ -19,7 +19,7 @@
 // Returns true if might need saving
 //
 ///////////////////////////////////////////////////////////////
-bool CAccountPassword::SetPassword(const SString& strPassword)
+bool CAccountPassword::SetPassword(const SString& strPassword) noexcept
 {
     if (strPassword.empty())
     {
@@ -63,7 +63,7 @@ bool CAccountPassword::SetPassword(const SString& strPassword)
 // Check if supplied clear text password is correct
 //
 ///////////////////////////////////////////////////////////////
-bool CAccountPassword::IsPassword(const SString& strPassword)
+bool CAccountPassword::IsPassword(const SString& strPassword) const noexcept
 {
     // Empty passwords never match
     if (strPassword.empty() || m_strSha256.empty())
@@ -91,7 +91,7 @@ bool CAccountPassword::IsPassword(const SString& strPassword)
 // Check if supplied clear text password is different to what we have
 //
 ///////////////////////////////////////////////////////////////
-bool CAccountPassword::CanChangePasswordTo(const SString& strPassword)
+bool CAccountPassword::CanChangePasswordTo(const SString& strPassword) const noexcept
 {
     // No change if going from empty to empty
     if (strPassword.empty() && m_strSha256.empty())
@@ -116,7 +116,7 @@ bool CAccountPassword::CanChangePasswordTo(const SString& strPassword)
 // Return password hash for saving
 //
 ///////////////////////////////////////////////////////////////
-SString CAccountPassword::GetPasswordHash()
+SString CAccountPassword::GetPasswordHash() const noexcept
 {
     return m_strSha256 + m_strType + m_strSalt;
 }

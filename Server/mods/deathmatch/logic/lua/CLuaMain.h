@@ -17,7 +17,7 @@ class CLuaMain;
 #include "lua/CLuaVector3.h"
 #include "lua/CLuaVector4.h"
 #include "lua/CLuaMatrix.h"
-#include "CLuaModuleManager.h"
+#include "modules/CLuaModuleManager.h"
 #include "../CTextDisplay.h"
 
 #define MAX_SCRIPTNAME_LENGTH 64

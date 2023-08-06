@@ -15,15 +15,17 @@
 #include <string>
 #include "lua/CLuaArgument.h"
 
+#include <IAccount.hpp>
+
 class CClient;
 
 class CAccountPassword
 {
 public:
-    bool    SetPassword(const SString& strPassword);
-    bool    IsPassword(const SString& strPassword);
-    bool    CanChangePasswordTo(const SString& strPassword);
-    SString GetPasswordHash();
+    bool    SetPassword(const SString& strPassword) noexcept;
+    bool    IsPassword(const SString& strPassword) const noexcept;
+    bool    CanChangePasswordTo(const SString& strPassword) const noexcept;
+    SString GetPasswordHash() const noexcept;
 
     enum EAccountPasswordType
     {
@@ -50,7 +52,7 @@ enum class EAccountType
 };
 
 class CAccountData;
-class CAccount
+class CAccount : public IAccount
 {
 public:
     struct SSerialUsage
@@ -76,18 +78,18 @@ public:
     void OnLoginSuccess(const SString& strSerial, const SString& strIp);
     void OnLoginHttpSuccess(const SString& strIp);
 
-    const SString& GetName() { return m_strName; }
-    void           SetName(const std::string& strName);
+    const SString& GetName() const noexcept { return m_strName; }
+    void           SetName(const std::string& strName) noexcept;
 
-    void           SetPassword(const SString& strPassword);
-    bool           IsPassword(const SString& strPassword, bool* pbUsedHttpPassAppend = nullptr);
-    SString        GetPasswordHash();
+    void           SetPassword(const SString& strPassword) noexcept;
+    bool           IsPassword(const SString& strPassword, bool* pbUsedHttpPassAppend = nullptr) const noexcept;
+    SString        GetPasswordHash() const noexcept;
     const SString& GetHttpPassAppend() { return m_strHttpPassAppend; }
     void           SetHttpPassAppend(const SString& strHttpPassAppend);
 
-    const std::string& GetIP() { return m_strIP; }
-    const std::string& GetSerial() { return m_strSerial; }
-    int                GetID() { return m_iUserID; }
+    const std::string& GetIP() const noexcept { return m_strIP; }
+    const std::string& GetSerial() const noexcept { return m_strSerial; }
+    const int          GetID() const noexcept { return m_iUserID; }
 
     bool                       HasLoadedSerialUsage();
     void                       EnsureLoadedSerialUsage();

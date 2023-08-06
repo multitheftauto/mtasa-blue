@@ -15,16 +15,19 @@ class CLuaModuleManager;
 
 #pragma once
 
-#include "CLuaMain.h"
-#include "ILuaModuleManager.h"
-#include "CLuaManager.h"
-#include "../CLogger.h"
-#include "../CResource.h"
-#include "CLuaModule.h"
+// Core headers
+#include <lua/CLuaMain.h>
+#include <lua/CLuaManager.h>
+#include <CLogger.h>
+#include <CResource.h>
+
+// Server SDK headers
+#include <modules/CLuaModule.h>
+#include <ILuaModuleManager.hpp>
 
 class CScriptDebugging;
 
-class CLuaModuleManager
+class CLuaModuleManager : public ILuaModuleManager
 {
 public:
     CLuaModuleManager(CLuaManager* pLuaManager);
@@ -40,11 +43,16 @@ public:
     void ResourceStopping(lua_State* luaVM);
     void ResourceStopped(lua_State* luaVM);
 
-    CLuaManager*      GetLuaManager() { return m_pLuaManager; };
-    list<CLuaModule*> GetLoadedModules() { return m_Modules; };
+    list<ILuaModule*>::iterator       begin() noexcept { return m_Modules.begin(); }
+    list<ILuaModule*>::iterator       end() noexcept { return m_Modules.begin(); }
+    list<ILuaModule*>::const_iterator cbegin() const noexcept { return m_Modules.cbegin(); }
+    list<ILuaModule*>::const_iterator cend() const noexcept { return m_Modules.cbegin(); }
+
+    CLuaManager*      GetLuaManager() const noexcept { return m_pLuaManager; };
+    list<ILuaModule*> GetLoadedModules() const noexcept { return m_Modules; };
 
 private:
     CScriptDebugging* m_pScriptDebugging;
     CLuaManager*      m_pLuaManager;
-    list<CLuaModule*> m_Modules;
+    list<ILuaModule*> m_Modules;
 };
