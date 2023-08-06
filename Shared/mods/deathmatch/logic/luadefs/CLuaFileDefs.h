@@ -30,7 +30,7 @@ private:
     LUA_DECLARE(fileFlush);
     LUA_DECLARE(fileRead);
     LUA_DECLARE(fileWrite);
-    LUA_DECLARE(fileGetContents);
+    static std::optional<SString> fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents);
 
     LUA_DECLARE(fileGetPos);
     LUA_DECLARE(fileGetSize);
