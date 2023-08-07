@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include <game/CAnimManager.h>
 #include "../game_sa/CTrainSA.h"
-#include "../game_sa/CTasksSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
 #include "../game_sa/TaskBasicSA.h"
