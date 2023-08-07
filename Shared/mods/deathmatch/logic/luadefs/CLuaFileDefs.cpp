@@ -9,23 +9,39 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
+#ifndef MTA_CLIENT
+    // NOTE: Must be included before ILuaModuleManager.h which defines its own CChecksum type.
+    #include "CChecksum.h"
+#endif
+
 #include "CLuaFileDefs.h"
 #include "CScriptFile.h"
 #include "CScriptArgReader.h"
+#include <lua/CLuaFunctionParser.h>
 
 #define DEFAULT_MAX_FILESIZE 52428800
+
+static auto getResourceFilePath(CResource* thisResource, CResource* fileResource, const SString& relativePath) -> SString
+{
+    if (thisResource == fileResource)
+        return relativePath;
+
+    // If the current resource is not the resource the file resides in, then we must prepend :resourceName to the path.
+#ifdef MTA_CLIENT
+    return SString(":%s/%s", fileResource->GetName(), relativePath.c_str());
+#else
+    return SString(":%s/%s", fileResource->GetName().c_str(), relativePath.c_str());
+#endif
+};
 
 void CLuaFileDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"fileOpen", fileOpen},     {"fileCreate", fileCreate},   {"fileExists", fileExists},   {"fileCopy", fileCopy},
-        {"fileRename", fileRename}, {"fileDelete", fileDelete},
-
-        {"fileClose", fileClose},   {"fileFlush", fileFlush},     {"fileRead", fileRead},       {"fileWrite", fileWrite},
-
-        {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize}, {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},
-
-        {"fileSetPos", fileSetPos},
+        {"fileOpen", fileOpen},       {"fileCreate", fileCreate}, {"fileExists", fileExists}, {"fileCopy", fileCopy},
+        {"fileRename", fileRename},   {"fileDelete", fileDelete}, {"fileClose", fileClose},   {"fileFlush", fileFlush},
+        {"fileRead", fileRead},       {"fileWrite", fileWrite},   {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},   {"fileSetPos", fileSetPos}, {"fileGetContents", ArgumentParser<fileGetContents>},
     };
 
     // Add functions
@@ -782,6 +798,61 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     return 1;
 }
 
+std::optional<SString> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents)
+{
+    // bool fileGetContents ( file target [, bool verifyContents = true ] )
+
+    SString buffer;
+
+    // We abuse the logic of CScriptFile::Read to determine size of file and to resize the buffer accordingly, to avoid doing that work twice.
+    const long bytesRead = scriptFile->Read(std::numeric_limits<long>::max(), buffer);
+
+    if (bytesRead == -2)
+    {
+        m_pScriptDebugging->LogWarning(L, "out of memory");
+        return {};
+    }
+    else if (bytesRead < 0)
+    {
+        m_pScriptDebugging->LogBadPointer(L, "file", 1);
+        return {};
+    }
+
+    // Remove EOF byte at the end of the buffer (which breaks checksum if we have to compute it below).
+    if (!buffer.empty())
+        buffer.resize(buffer.size() - 1);
+
+    if (maybeVerifyContents.value_or(true) == false)
+        return buffer;
+
+    CResource& thisResource = lua_getownerresource(L);
+
+    if (CResourceFile* resourceFile = scriptFile->GetResourceFile(); resourceFile != nullptr)
+    {
+        const CChecksum current = CChecksum::GenerateChecksumFromBuffer(buffer.data(), static_cast<unsigned long>(buffer.size()));
+
+#ifdef MTA_CLIENT
+        const CChecksum expected = resourceFile->GetServerChecksum();
+#else
+        const CChecksum expected = resourceFile->GetLastChecksum();
+#endif
+
+        if (current == expected)
+            return buffer;
+
+        const SString warningFilePath = getResourceFilePath(&thisResource, scriptFile->GetResource(), scriptFile->GetFilePath());
+        m_pScriptDebugging->LogWarning(L, "verification failed: checksum mismatch for resource file '%s' (expected %08X, got %08X)", warningFilePath.c_str(),
+                                       expected.ulCRC, current.ulCRC);
+    }
+    else
+    {
+        const SString warningFilePath = getResourceFilePath(&thisResource, scriptFile->GetResource(), scriptFile->GetFilePath());
+        m_pScriptDebugging->LogWarning(L, "verification failed: resource file not found '%s'", warningFilePath.c_str());
+    }
+
+    return {};
+}
+
 int CLuaFileDefs::fileGetPos(lua_State* luaVM)
 {
     //  int fileGetPos ( file theFile )
@@ -852,23 +923,10 @@ int CLuaFileDefs::fileGetPath(lua_State* luaVM)
         CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
         if (pLuaMain)
         {
-            CResource* pThisResource = pLuaMain->GetResource();
-            CResource* pFileResource = pFile->GetResource();
-
-            SString strFilePath = pFile->GetFilePath();
-
-            // If the calling resource is not the resource the file resides in
-            // we need to prepend :resourceName to the path
-            if (pThisResource != pFileResource)
-            {
-#ifdef MTA_CLIENT
-                strFilePath = SString(":%s/%s", pFileResource->GetName(), *strFilePath);
-#else
-                strFilePath = SString(":%s/%s", *pFileResource->GetName(), *strFilePath);
-#endif
-            }
-
-            lua_pushlstring(luaVM, strFilePath, strFilePath.length());
+            CResource* const thisResource = pLuaMain->GetResource();
+            CResource* const fileResource = pFile->GetResource();
+            const SString    filePath = getResourceFilePath(thisResource, fileResource, pFile->GetFilePath());
+            lua_pushlstring(luaVM, filePath, filePath.length());
             return 1;
         }
     }

@@ -213,3 +213,8 @@ CResource* CScriptFile::GetResource()
 {
     return m_pResource;
 }
+
+CResourceFile* CScriptFile::GetResourceFile() const
+{
+    return m_pResource->GetResourceFile(m_strFilename);
+}
