@@ -6866,7 +6866,7 @@ void PostCWorld_ProcessPedsAfterPreRender()
                 objectInterface->bUpdateScale = false;
             }
             RpClump* clump = objectInterface->m_pRwObject;
-            if (clump && clump->object.type == RP_TYPE_CLUMP)
+            if (clump && clump->object.type == RwObjectType::Clump)
             {
                 //CRenderWare* pRenderWare =  g_pCore->GetGame()->GetRenderWare();
                 //RwFrame* pFrame = pRenderWare->GetFrameFromName(clump, "des_windfan_");

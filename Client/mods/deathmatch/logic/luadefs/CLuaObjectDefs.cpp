@@ -23,7 +23,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"getObjectScale", GetObjectScale},
         {"isObjectBreakable", IsObjectBreakable},
         {"getObjectMass", GetObjectMass},
-        {"getObjectProperty", GetObjectProperty},
+        {"getObjectProperty", GetObjectProperty}, 
         {"isObjectMoving", ArgumentParser<IsObjectMoving>},
 
         // Object set funcs
