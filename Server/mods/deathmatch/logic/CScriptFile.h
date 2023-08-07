@@ -62,6 +62,8 @@ public:
     long Read(unsigned long ulSize, SString& outBuffer);
     long Write(unsigned long ulSize, const char* pData);
 
+    long GetContents(std::string& buffer);
+
     // Debug info for garbage collected files
     const SLuaDebugInfo& GetLuaDebugInfo() { return m_LuaDebugInfo; };
     void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; };
