@@ -31,9 +31,8 @@ struct CChecksum
 };
 #endif
 
-class ILuaModule
+struct ILuaModule
 {
-public:
     virtual unsigned long GetVersion() const noexcept = 0;
     virtual const char*   GetVersionString() const noexcept = 0;
     virtual const char*   GetVersionName() const noexcept = 0;

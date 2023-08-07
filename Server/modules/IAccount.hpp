@@ -1,8 +1,9 @@
 #pragma once
 
-class IAccount
+#include "../../Shared/sdk/SString.h"
+
+struct IAccount
 {
-public:
     virtual const SString& GetName() const noexcept = 0;
     virtual void           SetName(const std::string& strName) noexcept = 0;
 

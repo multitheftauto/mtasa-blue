@@ -933,18 +933,32 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
     return false;
 }
 
-std::vector<IAccount*> CAccountManager::GetAllAccounts() const noexcept
+DynamicArray<IAccount*> CAccountManager::GetAllAccounts() const noexcept
 {
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts", SQLITE_TEXT);
 
-    std::vector<IAccount*> outAccounts;
+    /*
+    ArrTest<IAccount*> outAccounts;
+    outAccounts.size = result->Data.size();
+    outAccounts.buffer = new IAccount*[outAccounts.size];
+
+    auto i = 0;
 
     for (const auto& row : result->Data)
     {
         auto pAccount = Get((const char*)row[0].pVal);
         if (pAccount)
-            outAccounts.push_back(pAccount);
+            outAccounts.buffer[i++] = reinterpret_cast<IAccount*>(pAccount);
+    }
+    */
+
+    DynamicArray<IAccount*> outAccounts;
+    for (const auto& row : result->Data)
+    {
+        auto pAccount = Get((const char*)row[0].pVal);
+        if (pAccount)
+            outAccounts.append(pAccount);
     }
 
     return outAccounts;
@@ -962,22 +976,29 @@ void CAccountManager::GetAccountsBySerial(const SString& strSerial, std::vector<
             outAccounts.push_back(pAccount);
     }
 }
-std::vector<IAccount*> CAccountManager::GetAccountsBySerial(const SString& strSerial) const noexcept
+
+DynamicArray<IAccount*> CAccountManager::GetAccountsBySerial(const SString& strSerial) const noexcept
 {
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE serial = ?", SQLITE_TEXT, strSerial.c_str());
-
-    std::vector<IAccount*> outAccounts;
-
-    for (const auto& row : result->Data)
+    std::vector<CAccount*> cAccs;
+    GetAccountsByIP(strSerial, cAccs);
+    /*
+    ArrTest<IAccount*> iAccs;
+    iAccs.buffer = new IAccount*[cAccs.size()];
+    for (const auto& acc : cAccs)
     {
-        auto pAccount = Get((const char*)row[0].pVal);
-        if (pAccount)
-            outAccounts.push_back(pAccount);
+        iAccs.buffer[iAccs.size++] = reinterpret_cast<IAccount*>(acc);
+    }
+    */
+
+    DynamicArray<IAccount*> iAccs;
+    for (const auto& acc : cAccs)
+    {
+        iAccs.append(reinterpret_cast<IAccount*>(acc));
     }
 
-    return outAccounts;
+    return iAccs;
 }
+
 
 void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts) const noexcept
 {
@@ -991,21 +1012,27 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
             outAccounts.push_back(pAccount);
     }
 }
-std::vector<IAccount*> CAccountManager::GetAccountsByIP(const SString& strIP) const noexcept
+
+DynamicArray<IAccount*> CAccountManager::GetAccountsByIP(const SString& strIP) const noexcept
 {
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE ip = ?", SQLITE_TEXT, strIP.c_str());
-
-    std::vector<IAccount*> outAccounts;
-
-    for (const auto& row : result->Data)
+    std::vector<CAccount*> cAccs;
+    GetAccountsByIP(strIP, cAccs);
+    /*
+    ArrTest<IAccount*> iAccs;
+    iAccs.buffer = new IAccount*[cAccs.size()];
+    for (const auto& acc : cAccs)
     {
-        auto pAccount = Get((const char*)row[0].pVal);
-        if (pAccount)
-            outAccounts.push_back(pAccount);
+        iAccs.buffer[iAccs.size++] = reinterpret_cast<IAccount*>(acc);
+    }
+    */
+
+    DynamicArray<IAccount*> iAccs;
+    for (const auto& acc : cAccs)
+    {
+        iAccs.append(reinterpret_cast<IAccount*>(acc));
     }
 
-    return outAccounts;
+    return iAccs;
 }
 
 CAccount* CAccountManager::GetAccountByID(const int ID) const noexcept
@@ -1035,24 +1062,29 @@ void CAccountManager::GetAccountsByData(const SString& dataName, const SString& 
             outAccounts.push_back(pAccount);
     }
 }
-std::vector<IAccount*> CAccountManager::GetAccountsByData(const SString& dataName, const SString& value) const noexcept
+
+DynamicArray<IAccount*> CAccountManager::GetAccountsByData(const SString& dataName, const SString& value) const noexcept
 {
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result,
-                                         "SELECT acc.name FROM accounts acc, userdata dat WHERE dat.key = ? AND dat.value = ? AND dat.userid = acc.id",
-                                         SQLITE_TEXT, dataName.c_str(), SQLITE_TEXT, value.c_str());
-
-    std::vector<IAccount*> outAccounts;
-
-    for (const auto& row : result->Data)
+    std::vector<CAccount*> cAccs;
+    GetAccountsByData(dataName, value, cAccs);
+    /*
+    ArrTest<IAccount*> iAccs;
+    iAccs.buffer = new IAccount*[cAccs.size()];
+    for (const auto& acc : cAccs)
     {
-        auto pAccount = Get((const char*)row[0].pVal);
-        if (pAccount)
-            outAccounts.push_back(pAccount);
+        iAccs.buffer[iAccs.size++] = reinterpret_cast<IAccount*>(acc);
+    }
+    */
+
+    DynamicArray<IAccount*> iAccs;
+    for (const auto& acc : cAccs)
+    {
+        iAccs.append(reinterpret_cast<IAccount*>(acc));
     }
 
-    return outAccounts;
+    return iAccs;
 }
+
 
 CAccount* CAccountManager::AddGuestAccount(const SString& strName)
 {

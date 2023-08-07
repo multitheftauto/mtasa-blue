@@ -148,14 +148,14 @@ public:
     bool                          CopyAccountData(CAccount* pFromAccount, CAccount* pToAccount);
     bool                          GetAllAccountData(CAccount* pAccount, lua_State* pLua);
 
-    std::vector<IAccount*> GetAllAccounts() const noexcept override;
-    void                   GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts) const noexcept;
-    std::vector<IAccount*> GetAccountsBySerial(const SString& strSerial) const noexcept override;
-    void                   GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts) const noexcept;
-    std::vector<IAccount*> GetAccountsByIP(const SString& strIP) const noexcept override;
-    CAccount*              GetAccountByID(const int ID) const noexcept;
-    void                   GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts) const noexcept;
-    std::vector<IAccount*> GetAccountsByData(const SString& dataName, const SString& value) const noexcept override;
+    DynamicArray<IAccount*> GetAllAccounts() const noexcept override;
+    void                    GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts) const noexcept;
+    DynamicArray<IAccount*> GetAccountsBySerial(const SString& strSerial) const noexcept override;
+    void                    GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts) const noexcept;
+    DynamicArray<IAccount*> GetAccountsByIP(const SString& strIP) const noexcept override;
+    CAccount*               GetAccountByID(const int ID) const noexcept;
+    void                    GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts) const noexcept;
+    DynamicArray<IAccount*> GetAccountsByData(const SString& dataName, const SString& value) const noexcept override;
 
     CAccount* AddGuestAccount(const SString& strName);
     CAccount* AddConsoleAccount(const SString& strName);

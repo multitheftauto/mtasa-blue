@@ -4,9 +4,8 @@
 
 #include "ILuaModule.hpp"
 
-class ILuaModuleManager
+struct ILuaModuleManager
 {
-public:
     virtual std::list<ILuaModule*>::iterator       begin() noexcept = 0;
     virtual std::list<ILuaModule*>::iterator       end() noexcept = 0;
     virtual std::list<ILuaModule*>::const_iterator cbegin() const noexcept = 0;
