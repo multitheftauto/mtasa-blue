@@ -104,7 +104,7 @@ typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
 typedef void(IdleHandler)();
 typedef void(PreFxRenderHandler)();
 typedef void(PreHudRenderHandler)();
-typedef void(CustomObjectPreprocessorHandler)(CObjectSAInterface* pObject);
+typedef bool(CustomObjectPreprocessorHandler)(CObjectSAInterface* pObject);
 typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
 typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                       AssocGroupId animGroup, AnimationId animID);

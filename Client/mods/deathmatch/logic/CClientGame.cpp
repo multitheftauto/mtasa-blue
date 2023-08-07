@@ -3618,10 +3618,10 @@ void CClientGame::StaticAudioZoneRadioSwitchHandler(DWORD dwStationID)
 }
 
 #include "../game_sa/CObjectSA.h"
-void CClientGame::StaticCustomObjectPreprocessorHandler(CObjectSAInterface* pObjectSAInterface)
+bool CClientGame::StaticCustomObjectPreprocessorHandler(CObjectSAInterface* pObjectSAInterface)
 {
     if (!pObjectSAInterface)
-        return;
+        return false;
 
     CClientModelManager* pModelManager = g_pClientGame->GetManager()->GetModelManager();
 
@@ -3632,7 +3632,7 @@ void CClientGame::StaticCustomObjectPreprocessorHandler(CObjectSAInterface* pObj
         for (auto& pair : modelFrameInfos)
         {
             RwFrame* pFrame = pRenderWare->GetFrameFromName(pObjectSAInterface->m_pRwObject, pair.first);
-            if (pFrame) // TODO: remove
+            if (pFrame)
             {
                 //pRenderWare->RwMatrixToCMatrix(pFrame->modelling, pair.second.matrix);
                 pRenderWare->RwMatrixSetPosition(pFrame->modelling, pair.second.matrix.GetPosition());
@@ -3640,6 +3640,7 @@ void CClientGame::StaticCustomObjectPreprocessorHandler(CObjectSAInterface* pObj
                 pRenderWare->RwMatrixSetScale(pFrame->modelling, pair.second.matrix.GetScale());
             }
         }
+        return true;
     }
     //CPools*                   pPools = g_pGame->GetPools();
     //SClientEntity<CObjectSA>* pObjectEntity = pPools->GetObject((DWORD*)pObjectSAInterface);
@@ -3651,6 +3652,7 @@ void CClientGame::StaticCustomObjectPreprocessorHandler(CObjectSAInterface* pObj
     //{
     //    int a = 5;
     //}
+    return false;
 }
 
 void CClientGame::DrawRadarAreasHandler()

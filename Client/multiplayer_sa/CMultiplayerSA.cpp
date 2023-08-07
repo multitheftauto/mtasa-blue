@@ -6874,9 +6874,13 @@ void PostCWorld_ProcessPedsAfterPreRender()
                 //{
                 //    pRenderWare->SetFrameRotation(pFrame, CVector(asd++, 44, 55));
                 //}
-                objectEntity->UpdateRpHAnim();
                 if (m_pCustomObjectPreprocessorHandler)
-                    m_pCustomObjectPreprocessorHandler(objectInterface);
+                {
+                    if(!m_pCustomObjectPreprocessorHandler(objectInterface))
+                        objectEntity->UpdateRpHAnim();
+                }
+                else
+                    objectEntity->UpdateRpHAnim();
             }
             objectEntity->SetPreRenderRequired(false);
         }
