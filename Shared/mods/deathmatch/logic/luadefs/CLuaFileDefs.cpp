@@ -799,14 +799,12 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     return 1;
 }
 
-std::optional<SString> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents)
+std::optional<std::string> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents)
 {
-    // bool fileGetContents ( file target [, bool verifyContents = true ] )
+    // string fileGetContents ( file target [, bool verifyContents = true ] )
 
-    SString buffer;
-
-    // We abuse the logic of CScriptFile::Read to determine size of file and to resize the buffer accordingly, to avoid doing that work twice.
-    const long bytesRead = scriptFile->Read(std::numeric_limits<long>::max(), buffer);
+    std::string buffer;
+    const long bytesRead = scriptFile->GetContents(buffer);
 
     if (bytesRead == -2)
     {
@@ -818,10 +816,6 @@ std::optional<SString> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFile* 
         m_pScriptDebugging->LogBadPointer(L, "file", 1);
         return {};
     }
-
-    // Remove EOF byte at the end of the buffer (which breaks checksum if we have to compute it below).
-    if (!buffer.empty())
-        buffer.resize(buffer.size() - 1);
 
     if (maybeVerifyContents.value_or(true) == false)
         return buffer;
