@@ -80,6 +80,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
 DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
+DECLARE_ENUM(eWorldProperty);
 
 class CRemoteCall;
 
@@ -488,6 +489,10 @@ inline SString GetClassTypeName(eSoundEffectParams::ParamEq*)
 inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
 {
     return "soundeffect-params-reverb";
+}
+inline SString GetClassTypeName(eWorldProperty*)
+{
+    return "world-property";
 }
 
 inline SString GetClassTypeName(CClientVectorGraphic*)

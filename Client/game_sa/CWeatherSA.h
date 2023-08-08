@@ -27,6 +27,34 @@ public:
     void  SetAmountOfRain(float fAmount);
     void  ResetAmountOfRain();
 
+    float GetWetRoads();
+    bool  SetWetRoads(float fAmount);
+    bool  ResetWetRoads();
+
+    float GetFoggyness();
+    bool  SetFoggyness(float fAmount);
+    bool  ResetFoggyness();
+
+    float GetFog();
+    bool  SetFog(float fAmount);
+    bool  ResetFog();
+
+    float GetRainFog();
+    bool  SetRainFog(float fAmount);
+    bool  ResetRainFog();
+
+    float GetWaterFog();
+    bool  SetWaterFog(float fAmount);
+    bool  ResetWaterFog();
+
+    float GetSandstorm();
+    bool  SetSandstorm(float fAmount);
+    bool  ResetSandstorm();
+
+    float GetRainbow();
+    bool  SetRainbow(float fAmount);
+    bool  ResetRainbow();
+
 private:
     static unsigned char* VAR_CWeather__ForcedWeatherType;
     static unsigned char* VAR_CWeather__OldWeatherType;
