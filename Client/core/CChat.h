@@ -52,6 +52,8 @@ public:
     }
     bool operator==(const CColor& other) const { return R == other.R && G == other.G && B == other.B && A == other.A; }
 
+    [[nodiscard]] unsigned long ToLong() { return (R | (G << 8) | (B << 16) | (A << 24)); }
+
     unsigned char R, G, B, A;
 };
 
@@ -190,8 +192,6 @@ public:
     static void  DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
                                 float fScaleY, bool bOutline, const CRect2D& RenderBounds);
 
-    void SetColor(const CColor& Color);
-    void SetInputColor(const CColor& Color);
     void SetTextColor(const CColor& Color) { m_TextColor = Color; };
     void SetNumLines(unsigned int uiNumLines);
 
@@ -247,11 +247,6 @@ protected:
     CVector2D m_vecInputPosition;
     CVector2D m_vecInputSize;
 
-    CGUITexture*     m_pBackgroundTexture;
-    CGUITexture*     m_pInputTexture;
-    CGUIStaticImage* m_pBackground;
-    CGUIStaticImage* m_pInput;
-
     std::string m_strInputText;
     std::string m_strCommand;
 
@@ -284,8 +279,8 @@ protected:
     float         m_fNativeWidth;
     float         m_fRcpUsingDxFontScale;
 
-    bool m_bCanChangeWidth;
-    int  m_iCVarsRevision;
+    bool m_bCanChangeWidth{true};
+    int  m_iCVarsRevision{-1};
 
     SDrawList          m_PrevDrawList;
     CRenderTargetItem* m_pCacheTexture;
