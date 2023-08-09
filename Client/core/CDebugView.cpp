@@ -55,22 +55,7 @@ CDebugView::CDebugView(CGUI* pManager, const CVector2D& vecPosition) : CChat()
     m_iReportCount = 0;
     m_Color = CColor(0, 0, 0, 100);
     m_TextColor = DEBUGVIEW_TEXT_COLOR;
-    unsigned long ulBackgroundColor = COLOR_ARGB(m_Color.A, m_Color.R, m_Color.G, m_Color.B);
-
-    m_pBackground = m_pManager->CreateStaticImage();
-    m_pBackgroundTexture = m_pManager->CreateTexture();
-
-    m_pBackgroundTexture->LoadFromMemory(&ulBackgroundColor, 1, 1);
-    m_pBackground->LoadFromTexture(m_pBackgroundTexture);
-    m_pBackground->MoveToBack();
-    m_pBackground->SetPosition(m_vecBackgroundPosition);
-    m_pBackground->SetSize(m_vecBackgroundSize);
-    m_pBackground->SetEnabled(false);
-    m_pBackground->SetVisible(false);
-
-    m_pInput = NULL;
-    m_pInputTexture = NULL;
-
+    
     g_pChat = pChat;
 
     UpdateGUI();
@@ -93,7 +78,6 @@ void CDebugView::Draw(bool bUseCacheTexture, bool bAllowOutline)
     m_vecBackgroundPosition = vecPosition * vecResolution - CVector2D(0, height);
     m_vecBackgroundPosition.fX = Round(m_vecBackgroundPosition.fX);
     m_vecBackgroundPosition.fY = Round(m_vecBackgroundPosition.fY);
-    m_pBackground->SetPosition(m_vecBackgroundPosition);
 
     CChat::Draw(bUseCacheTexture, bAllowOutline);
     g_pChat = pChat;
