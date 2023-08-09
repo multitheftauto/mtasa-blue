@@ -1004,12 +1004,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
             m_pUpgrades->RemoveAll(false);
 
         // Are we swapping from a vehicle without doors?
-        bool bResetWheelAndDoorStates =
-            ((m_usModel == VT_VORTEX || m_usModel == VT_TRACTOR || m_usModel == VT_CADDY || m_usModel == VT_BAGGAGE || m_usModel == VT_BANDITO ||
-              m_usModel == VT_BFINJECT || m_usModel == VT_DOZER || m_usModel == VT_FORKLIFT || m_usModel == VT_KART || m_usModel == VT_MOWER ||
-              m_usModel == VT_QUAD || m_usModel == VT_RCBANDIT || m_usModel == VT_RCCAM || m_usModel == VT_RCGOBLIN || m_usModel == VT_RCRAIDER ||
-              m_usModel == VT_RCTIGER || m_usModel == VT_BLOODRA) ||
-             m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel));
+        bool bResetWheelAndDoorStates = (!CClientVehicleManager::HasDoors(m_usModel) || m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel));
 
         // Apply variant requirements
         if (ucVariant == 255 && ucVariant2 == 255)
