@@ -1464,6 +1464,30 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
 
                 // Update the wheel's visibility
                 m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING));
+
+                // restart wheels component visibility (fix #1556)
+                std::map<SString, SVehicleComponentData>::iterator iter = m_ComponentData.begin();
+
+                for (; iter != m_ComponentData.end(); iter++)
+                {
+                    SString strComponentName = (*iter).first;
+                    if (strComponentName.BeginsWith("wheel_"))
+                    {
+                        unsigned char ucComponentWheel;
+
+                        if (strComponentName == "wheel_lf_dummy")
+                            ucComponentWheel = FRONT_LEFT_WHEEL;
+                        else if (strComponentName == "wheel_rf_dummy")
+                            ucComponentWheel = FRONT_RIGHT_WHEEL;
+                        else if (strComponentName == "wheel_lb_dummy")
+                            ucComponentWheel = REAR_LEFT_WHEEL;
+                        else if (strComponentName == "wheel_rb_dummy")
+                            ucComponentWheel = REAR_RIGHT_WHEEL;
+
+                        if (ucComponentWheel == ucWheel && m_ucWheelStates[ucWheel] != DT_WHEEL_MISSING && ucStatus != DT_WHEEL_MISSING)
+                            SetComponentVisible(strComponentName, (*iter).second.m_bVisible);
+                    }
+                }
             }
             else if (m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2)
                 m_pVehicle->SetBikeWheelStatus(ucWheel, ucGTAStatus);
