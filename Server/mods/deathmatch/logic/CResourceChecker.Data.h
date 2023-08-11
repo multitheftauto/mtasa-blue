@@ -41,6 +41,7 @@ namespace
         {"engineGetModelFlag", "1.6.0-9.21695"},
         {"engineSetModelFlag", "1.6.0-9.21695"},
         {"fileGetContents", "1.6.0-9.21938"},
+        {"engineStreamingSetModelCacheLimits", "1.6.0-9.21946"},
     };
 
     SVersionItem serverFunctionInitList[] = {
