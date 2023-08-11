@@ -406,17 +406,40 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
             case CCLIENTPLAYER:
             {
                 CClientPed* pPed = static_cast<CClientPed*>(pSource);
+
                 if (pPed->IsHealthLocked())
                     pPed->LockHealth(fHealth);
                 else
-                    pPed->SetHealth(fHealth);
-                break;
+                {
+                    const float fCurHealth = pPed->GetHealth();
+               
+                    if (fCurHealth != fHealth)
+                    {
+                        pPed->SetHealth(fHealth);
+
+                        CLuaArguments Arguments;
+                        Arguments.PushNumber(fCurHealth);
+                        Arguments.PushNumber(fHealth);
+                        pPed->CallEvent("onClientElementHealthChange", Arguments, true); 
+                    }
+                    break;
+                }
             }
 
             case CCLIENTVEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
-                pVehicle->SetHealth(fHealth);
+                const float     fCurHealth = pVehicle->GetHealth();
+
+                if (fCurHealth != fHealth)
+                {
+                    pVehicle->SetHealth(fHealth);
+
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(fCurHealth);
+                    Arguments.PushNumber(fHealth);
+                    pVehicle->CallEvent("onClientElementHealthChange", Arguments, true);
+                }
                 break;
             }
 
@@ -424,7 +447,17 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
             case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
-                pObject->SetHealth(fHealth);
+                const float    fCurHealth = pObject->GetHealth();
+
+                if (fCurHealth != fHealth)
+                {
+                    pObject->SetHealth(fHealth);
+
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(fCurHealth);
+                    Arguments.PushNumber(fHealth);
+                    pObject->CallEvent("onClientElementHealthChange", Arguments, true);
+                }
                 break;
             }
         }

@@ -1641,6 +1641,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
             {
                 // Limit their max health to what the stat says
                 float fMaxHealth = pPed->GetMaxHealth();
+                float fCurHealth = pPed->GetHealth();
+
                 if (fHealth > fMaxHealth)
                     fHealth = fMaxHealth;
 
@@ -1648,10 +1650,27 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 if (fHealth < 0.0f)
                     fHealth = 0.0f;
 
+                if (fCurHealth == fHealth)
+                    return false;
+
                 // This makes sure the health is set to what will get reported
                 unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
                 pPed->SetHealth(fHealth);
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber(fCurHealth);
+                Arguments.PushNumber(fHealth);
+                bool bContinue = pPed->CallEvent("onElementHealthChange", Arguments);
+
+                if (fHealth != pPed->GetHealth())
+                    return false;
+
+                if (!bContinue)
+                {
+                    pPed->SetHealth(fCurHealth);
+                    return false;
+                }
             }
             else
                 return false;
@@ -1659,14 +1678,52 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
         }
         case CElement::VEHICLE:
         {
-            CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+            CVehicle*     pVehicle = static_cast<CVehicle*>(pElement);
+            float         fCurHealth = pVehicle->GetHealth();
+
+            if (fCurHealth == fHealth)
+                return false;
+
             pVehicle->SetHealth(fHealth);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(fCurHealth);
+            Arguments.PushNumber(fHealth);
+            bool bContinue = pVehicle->CallEvent("onElementHealthChange", Arguments);
+
+            if (fHealth != pVehicle->GetHealth())
+                return false;
+
+            if (!bContinue)
+            {
+                pVehicle->SetHealth(fCurHealth);
+                return false;
+            }
             break;
         }
         case CElement::OBJECT:
         {
-            CObject* pObject = static_cast<CObject*>(pElement);
+            CObject*      pObject = static_cast<CObject*>(pElement);
+            float         fCurHealth = pObject->GetHealth();
+
+            if (fCurHealth == fHealth)
+                return false;
+
             pObject->SetHealth(fHealth);
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(fCurHealth);
+            Arguments.PushNumber(fHealth);
+            bool bContinue = pObject->CallEvent("onElementHealthChange", Arguments);
+
+            if (fHealth != pObject->GetHealth())
+                return false;
+
+            if (!bContinue)
+            {
+                pObject->SetHealth(fCurHealth);
+                return false;
+            }
             break;
         }
         default:
@@ -8663,7 +8720,7 @@ bool CStaticFunctionDefinitions::CreateExplosion(const CVector& vecPosition, uns
     if (pElement)
     {
         RUN_CHILDREN(CreateExplosion(vecPosition, ucType, *iter))
-        
+
         if (IS_PLAYER(pElement))
         {
             CPlayer* player = static_cast<CPlayer*>(pElement);
