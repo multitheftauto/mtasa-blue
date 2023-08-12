@@ -1463,31 +1463,18 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus);
 
                 // Update the wheel's visibility
-                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING));
+                SString componentName;
 
-                // restart wheels component visibility (fix #1556)
-                static const SString strWheelPrefix = "wheel_";
+                if (ucWheel == FRONT_LEFT_WHEEL)
+                    componentName = "wheel_lf_dummy";
+                else if (ucWheel == FRONT_RIGHT_WHEEL)
+                    componentName = "wheel_rf_dummy";
+                else if (ucWheel == REAR_LEFT_WHEEL)
+                    componentName = "wheel_lb_dummy";
+                else if (ucWheel == REAR_RIGHT_WHEEL)
+                    componentName = "wheel_rb_dummy";
 
-                for (const auto& [key, value] : m_ComponentData)
-                {
-                    SString strComponentName = key;
-                    if (strComponentName.BeginsWith(strWheelPrefix))
-                    {
-                        unsigned char ucComponentWheel;
-
-                        if (strComponentName == "wheel_lf_dummy")
-                            ucComponentWheel = FRONT_LEFT_WHEEL;
-                        else if (strComponentName == "wheel_rf_dummy")
-                            ucComponentWheel = FRONT_RIGHT_WHEEL;
-                        else if (strComponentName == "wheel_lb_dummy")
-                            ucComponentWheel = REAR_LEFT_WHEEL;
-                        else if (strComponentName == "wheel_rb_dummy")
-                            ucComponentWheel = REAR_RIGHT_WHEEL;
-
-                        if (ucComponentWheel == ucWheel && m_ucWheelStates[ucWheel] != DT_WHEEL_MISSING && ucStatus != DT_WHEEL_MISSING)
-                            SetComponentVisible(strComponentName, value.m_bVisible);
-                    }
-                }
+                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING ? m_ComponentData[componentName].m_bVisible : false));
             }
             else if (m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2)
                 m_pVehicle->SetBikeWheelStatus(ucWheel, ucGTAStatus);
