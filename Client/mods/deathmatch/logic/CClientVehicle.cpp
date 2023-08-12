@@ -1466,14 +1466,15 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING));
 
                 // restart wheels component visibility (fix #1556)
-                static SString strComponentName;
-                static unsigned char ucComponentWheel;
+                static const SString strWheelPrefix = "wheel_";
 
                 for (const auto& [key, value] : m_ComponentData)
                 {
-                    strComponentName = key;
-                    if (strComponentName.BeginsWith("wheel_"))
+                    SString strComponentName = key;
+                    if (strComponentName.BeginsWith(strWheelPrefix))
                     {
+                        unsigned char ucComponentWheel;
+
                         if (strComponentName == "wheel_lf_dummy")
                             ucComponentWheel = FRONT_LEFT_WHEEL;
                         else if (strComponentName == "wheel_rf_dummy")
