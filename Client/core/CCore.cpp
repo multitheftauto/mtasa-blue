@@ -24,6 +24,7 @@
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordRichPresence.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -136,11 +137,17 @@ CCore::CCore()
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    // Create discord rich presence
+    m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    // Reset discord rich presence
+    m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -630,6 +637,20 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    auto discord = g_pCore->GetDiscord();
+    discord->SetPresenceState(bConnected ? "In-game" : "Main menu");
+    discord->SetPresenceStartTimestamp(0);
+    discord->SetPresenceDetails("");
+
+    if (bConnected)
+    {
+        time_t timer;
+        time(&timer);
+        discord->SetPresenceStartTimestamp((long)timer);
+    }
+
+    discord->UpdatePresence();
 }
 
 bool CCore::IsConnected()
@@ -2336,4 +2357,10 @@ size_t CCore::GetStreamingMemory()
     return IsUsingCustomStreamingMemorySize()
         ? m_CustomStreamingMemoryLimitBytes
         : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+}
+
+// Discord rich presence
+std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
+{
+    return m_pDiscordRichPresence;
 }

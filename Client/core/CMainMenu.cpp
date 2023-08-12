@@ -13,6 +13,7 @@
 #include <game/CGame.h>
 #include "CNewsBrowser.h"
 #include "CLanguageSelector.h"
+#include "CDiscordRichPresence.h"
 
 #define NATIVE_RES_X    1280.0f
 #define NATIVE_RES_Y    1024.0f
@@ -292,6 +293,11 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     // We're not ingame
     SetIsIngame(false);
+
+    // Discord
+    auto discord = g_pCore->GetDiscord();
+    discord->SetPresenceState("Main menu");
+    discord->UpdatePresence();
 
     // Store the pointer to the graphics subsystem
     m_pGraphics = CGraphics::GetSingletonPtr();
