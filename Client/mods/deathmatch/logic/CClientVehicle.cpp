@@ -1463,17 +1463,7 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus);
 
                 // Update the wheel's visibility
-                SString componentName;
-
-                if (ucWheel == FRONT_LEFT_WHEEL)
-                    componentName = "wheel_lf_dummy";
-                else if (ucWheel == FRONT_RIGHT_WHEEL)
-                    componentName = "wheel_rf_dummy";
-                else if (ucWheel == REAR_LEFT_WHEEL)
-                    componentName = "wheel_lb_dummy";
-                else if (ucWheel == REAR_RIGHT_WHEEL)
-                    componentName = "wheel_rb_dummy";
-
+                SString componentName = GetComponentNameForWheel(ucWheel);
                 m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING ? m_ComponentData[componentName].m_bVisible : false));
             }
             else if (m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2)
@@ -1481,6 +1471,32 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
         }
         m_ucWheelStates[ucWheel] = ucStatus;
     }
+}
+
+//
+// Returns component name for eWheelPosition enum
+//
+SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel)
+{
+    SString componentName;
+
+    switch (ucWheel)
+    {
+        case FRONT_LEFT_WHEEL:
+            componentName = "wheel_lf_dummy";
+            break;
+        case FRONT_RIGHT_WHEEL:
+            componentName = "wheel_rf_dummy";
+            break;
+        case REAR_LEFT_WHEEL:
+            componentName = "wheel_lb_dummy";
+            break;
+        case REAR_RIGHT_WHEEL:
+            componentName = "wheel_rb_dummy";
+            break;
+    }
+
+    return componentName;
 }
 
 //
