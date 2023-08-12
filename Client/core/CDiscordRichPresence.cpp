@@ -37,7 +37,8 @@ CDiscordRichPresence::CDiscordRichPresence()
 
 CDiscordRichPresence::~CDiscordRichPresence()
 {
-    Discord_Shutdown();
+    if (m_bDiscordRPCEnabled)
+        Discord_Shutdown();
 }
 
 void CDiscordRichPresence::UpdatePresence()
