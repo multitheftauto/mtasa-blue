@@ -27,7 +27,7 @@
  *      1. Set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
  *      2. Use netc.dll from https://mirror-cdn.multitheftauto.com/bdata/netc.dll (preferably run utils/buildactions/install_data.lua)
  *
- * To compile and host an offical public server (anyone on official MTA client can connect):
+ * To compile and host an official public server (anyone on official MTA client can connect):
  *      1. Copy net.dll or net.so from a nightly release (see https://nightly.multitheftauto.com/)
  *      2. Set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
  *      3. Set MTASA_VERSION_BUILD to the build number from the network library (see file version information)
