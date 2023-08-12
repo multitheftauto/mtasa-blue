@@ -21,9 +21,6 @@
 
 CDiscordRichPresence::CDiscordRichPresence()
 {
-    DiscordEventHandlers handlers;
-    memset(&handlers, 0, sizeof(handlers));
-
     m_strDiscordAppId = DEFAULT_APP_ID;
     m_strDiscordAppAsset = DEFAULT_APP_ASSET;
     m_strDiscordAppAssetText = DEFAULT_APP_ASSET_TEXT;
@@ -34,10 +31,8 @@ CDiscordRichPresence::CDiscordRichPresence()
     m_strDiscordAppCurrentId = DEFAULT_APP_ID;
     m_strDiscordAppState = "";
     m_strDiscordAppDetails = "";
-    m_uiDiscordAppStart = 0; // timestamp time to elapsed time
-    m_uiDiscordAppEnd = 0; // timestamp time to remaining time
-
-    Discord_Initialize(m_strDiscordAppId.c_str(), &handlers, 1, nullptr);
+    m_uiDiscordAppStart = 0;            // timestamp time to elapsed time
+    m_uiDiscordAppEnd = 0;              // timestamp time to remaining time
 }
 
 CDiscordRichPresence::~CDiscordRichPresence()
@@ -75,4 +70,26 @@ bool CDiscordRichPresence::SetPresenceDetails(const char* szDetails, bool bCusto
 void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart)
 {
     m_uiDiscordAppStart = ulStart;
+}
+
+bool CDiscordRichPresence::SetDiscordRPCEnabled(bool bEnabled)
+{
+    m_bDiscordRPCEnabled = bEnabled;
+
+    if (!bEnabled)
+    {
+        Discord_Shutdown();
+        return true;
+    }
+
+    DiscordEventHandlers handlers;
+    memset(&handlers, 0, sizeof(handlers));
+
+    Discord_Initialize(m_strDiscordAppId.c_str(), &handlers, 1, nullptr);
+    return true;
+}
+
+bool CDiscordRichPresence::IsDiscordRPCEnabled()
+{
+    return m_bDiscordRPCEnabled;
 }

@@ -147,7 +147,8 @@ CCore::~CCore()
     WriteDebugEvent("CCore::~CCore");
 
     // Reset discord rich presence
-    m_pDiscordRichPresence.reset();
+    if (g_pCore->GetDiscord()->IsDiscordRPCEnabled())
+        m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -638,19 +639,22 @@ void CCore::SetConnected(bool bConnected)
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
 
-    auto discord = g_pCore->GetDiscord();
-    discord->SetPresenceState(bConnected ? "In-game" : "Main menu");
-    discord->SetPresenceStartTimestamp(0);
-    discord->SetPresenceDetails("");
-
-    if (bConnected)
+    if (g_pCore->GetDiscord()->IsDiscordRPCEnabled())
     {
-        time_t timer;
-        time(&timer);
-        discord->SetPresenceStartTimestamp((long)timer);
-    }
+        auto discord = g_pCore->GetDiscord();
+        discord->SetPresenceState(bConnected ? "In-game" : "Main menu");
+        discord->SetPresenceStartTimestamp(0);
+        discord->SetPresenceDetails("");
 
-    discord->UpdatePresence();
+        if (bConnected)
+        {
+            time_t timer;
+            time(&timer);
+            discord->SetPresenceStartTimestamp((long)timer);
+        }
+
+        discord->UpdatePresence();
+    }
 }
 
 bool CCore::IsConnected()

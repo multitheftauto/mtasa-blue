@@ -24,6 +24,8 @@ public:
     void SetPresenceState(const char* szState);
     bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
     void SetPresenceStartTimestamp(const unsigned long ulStart);
+    bool SetDiscordRPCEnabled(bool bEnabled) override;
+    bool IsDiscordRPCEnabled() override;
     // void SetPresenceTimestamp();
     // void SetPresenceImage();
     // void SetPresenceText();
@@ -43,4 +45,5 @@ private:
     unsigned long m_uiDiscordAppEnd;
 
     bool m_bAllowCustomDetails;
+    bool m_bDiscordRPCEnabled;
 };

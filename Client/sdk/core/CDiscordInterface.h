@@ -19,4 +19,7 @@ public:
     virtual bool SetPresenceDetails(const char* szDetails, bool bCustom = false) = 0;
     virtual void SetPresenceStartTimestamp(const unsigned long ulStart) = 0;
     //virtual void SetPresenceEndTimestamp(const unsigned long ulEnd) = 0;
+
+    virtual bool SetDiscordRPCEnabled(bool bEnabled = false) = 0;
+    virtual bool IsDiscordRPCEnabled() = 0;
 };

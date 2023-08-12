@@ -388,6 +388,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
     m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
 
+    m_pCheckBoxAllowDiscordRPC = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), true));
+    m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -1252,6 +1257,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
     m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
+    m_pCheckBoxAllowDiscordRPC->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowDiscordRPC, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
@@ -3010,6 +3016,11 @@ void CSettings::LoadData()
     CVARS_GET("always_show_transferbox", alwaysShowTransferBox);
     m_pCheckBoxAlwaysShowTransferBox->SetSelected(alwaysShowTransferBox);
 
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC;
+    CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
+    m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
+
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
     m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
@@ -3435,6 +3446,11 @@ void CSettings::SaveData()
     bool alwaysShowTransferBox = m_pCheckBoxAlwaysShowTransferBox->GetSelected();
     CVARS_SET("always_show_transferbox", alwaysShowTransferBox);
     g_pCore->GetModManager()->TriggerCommand(mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX, alwaysShowTransferBox);
+
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    CVARS_SET("allow_discord_rpc", bAllowDiscordRPC);
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(bAllowDiscordRPC);
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
@@ -4471,6 +4487,17 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
               "\nbandwidth consumption.\n");
         CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
+    return true;
+}
+
+//
+// DiscordRPC
+//
+bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
+{
+    bool bEnabled = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    CVARS_SET("allow_discord_rpc", bEnabled);
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(bEnabled);
     return true;
 }
 
