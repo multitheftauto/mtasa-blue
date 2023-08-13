@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-06 20:57+0000\n"
-"PO-Revision-Date: 2023-08-06 21:30\n"
+"POT-Creation-Date: 2023-08-13 11:56+0000\n"
+"PO-Revision-Date: 2023-08-13 12:01\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -168,7 +168,7 @@ msgstr "Ongelmia MTA:SA:n uudelleenkäynnistyksessä\n\n"
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CCore.cpp:1251 Client/core/CCore.cpp:1264
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
 #: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
 #: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
@@ -473,7 +473,7 @@ msgstr "Korjaa GTA:SA"
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA:n korjaus epäonnistui:"
 
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:763
+#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:787
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA ei voi jatkaa, koska %s levyllä ei ole tarpeeksi tilaa."
@@ -854,115 +854,115 @@ msgstr "UUTISET"
 msgid "Visit latest news article"
 msgstr "Tutustu uusimpaan uutisartikkeliin"
 
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:789 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Vakava virhe"
 
-#: Client/core/CCore.cpp:890
+#: Client/core/CCore.cpp:914
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "KORJAA POISTAMALLA TÄMÄ TIEDOSTO:"
 
-#: Client/core/CCore.cpp:922
+#: Client/core/CCore.cpp:946
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s moduuli on väärä!"
 
-#: Client/core/CCore.cpp:1227
+#: Client/core/CCore.cpp:1251
 msgid "Error executing URL"
 msgstr "Virhe suoritettaessa URL:ää"
 
-#: Client/core/CCore.cpp:1239
+#: Client/core/CCore.cpp:1263
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Virhe suoritettaessa komentorivillä määriteltyä modia ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
+#: Client/core/CCore.cpp:1351
 msgid "this help screen"
 msgstr "tämä ohje"
 
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+#: Client/core/CCore.cpp:1352 Client/core/CCore.cpp:1353
 msgid "exits the application"
 msgstr "poistuu sovelluksesta"
 
-#: Client/core/CCore.cpp:1330
+#: Client/core/CCore.cpp:1354
 msgid "shows the version"
 msgstr "näyttää version"
 
-#: Client/core/CCore.cpp:1331
+#: Client/core/CCore.cpp:1355
 msgid "shows the time"
 msgstr "näyttää ajan"
 
-#: Client/core/CCore.cpp:1332
+#: Client/core/CCore.cpp:1356
 msgid "shows the hud"
 msgstr "näyttää hud:n"
 
-#: Client/core/CCore.cpp:1333
+#: Client/core/CCore.cpp:1357
 msgid "shows all the binds"
 msgstr "näyttää kaikki näppäinmääritykset"
 
-#: Client/core/CCore.cpp:1334
+#: Client/core/CCore.cpp:1358
 msgid "shows your serial"
 msgstr "näyttää serialin"
 
-#: Client/core/CCore.cpp:1343
+#: Client/core/CCore.cpp:1367
 msgid "connects to a server (host port nick pass)"
 msgstr "yhdistää palvelimeen (isäntä portti nimimerkki salasana)"
 
-#: Client/core/CCore.cpp:1344
+#: Client/core/CCore.cpp:1368
 msgid "connects to a previous server"
 msgstr "yhdistää aikaisempaan palvelimeen"
 
-#: Client/core/CCore.cpp:1345
+#: Client/core/CCore.cpp:1369
 msgid "binds a key (key control)"
 msgstr "määrittää näppäimen"
 
-#: Client/core/CCore.cpp:1346
+#: Client/core/CCore.cpp:1370
 msgid "unbinds a key (key)"
 msgstr "poistaa näppäimen määrityksen"
 
-#: Client/core/CCore.cpp:1347
+#: Client/core/CCore.cpp:1371
 msgid "copies the default gta controls"
 msgstr "kopioi gta:n oletusnäppäinmääritykset"
 
-#: Client/core/CCore.cpp:1348
+#: Client/core/CCore.cpp:1372
 msgid "outputs a screenshot"
 msgstr "ottaa kuvakaappauksen"
 
-#: Client/core/CCore.cpp:1349
+#: Client/core/CCore.cpp:1373
 msgid "immediately saves the config"
 msgstr "tallentaa asetustiedoston välittömästi"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1375
 msgid "clears the debug view"
 msgstr "tyhjentää vianetsintäikkunan"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1376
 msgid "scrolls the chatbox upwards"
 msgstr "vierittää chat-ruutua ylöspäin"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1377
 msgid "scrolls the chatbox downwards"
 msgstr "vierittää chat-ruutua alaspäin"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1378
 msgid "scrolls the debug view upwards"
 msgstr "vierittää vianetsintäikkunaa ylöspäin"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1379
 msgid "scrolls the debug view downwards"
 msgstr "vierittää vianetsintäikkunaa alaspäin"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1382
 msgid "shows the memory statistics"
 msgstr "näyttää muistitilastot"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1383
 msgid "shows the frame timing graph"
 msgstr "näyttää ruutuaikakuvaajan"
 
-#: Client/core/CCore.cpp:1363
+#: Client/core/CCore.cpp:1387
 msgid "for developers: reload news"
 msgstr "kehittäjille: päivitä uutiset"
 
