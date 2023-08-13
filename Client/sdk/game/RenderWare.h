@@ -444,12 +444,12 @@ inline auto RwFrameGetParent(RwFrame* f) {
     return (RwFrame*)rwObjectGetParent((RwObject*)f);
 }
 
-inline auto RwFrameGetMatrix(RwFrame* f) {
+inline RwMatrix* RwFrameGetMatrix(RwFrame* f) {
     return &f->modelling;
 }
 
 inline void _rpAtomicResyncInterpolatedSphere(RpAtomic* atomic) {
-    ((void(__cdecl*)(RpAtomic*))0x7491F0)(atomic);
+    reinterpret_cast<void(__cdecl*)(RpAtomic*)>(0x7491F0)(atomic);
 }
 
 /* NB "RpAtomicGetBoundingSphere(atomic++)" will break it */
