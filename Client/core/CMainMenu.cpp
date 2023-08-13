@@ -302,6 +302,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
             discord->SetDiscordRPCEnabled(true);
 
         discord->SetPresenceState("Main menu");
+        discord->SetPresenceStartTimestamp(0);
         discord->UpdatePresence();
     }
 

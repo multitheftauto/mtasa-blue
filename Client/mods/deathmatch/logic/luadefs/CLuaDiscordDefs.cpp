@@ -14,6 +14,7 @@ void CLuaDiscordDefs::LoadFunctions()
 {
     // Backwards compatibility functions
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"setDiscordRichPresenceAppID", ArgumentParser<SetAppID>},
         {"setDiscordRichPresenceDetails", ArgumentParser<SetDetails>},
     };
 
@@ -26,13 +27,29 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
-    //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
+    lua_classfunction(luaVM, "setID", "setDiscordRichPresenceAppID");
     lua_classfunction(luaVM, "setDetails", "setDiscordRichPresenceDetails");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
 
 
     lua_registerclass(luaVM, "DiscordRPC");
+}
+
+bool CLuaDiscordDefs::SetAppID(std::string strAppID)
+{
+    int appIDLength = strAppID.length();
+
+    if (appIDLength > 32)
+        throw std::invalid_argument("Application ID must be greater than 0, or less than/equal to 32");
+
+    auto discord = g_pCore->GetDiscord();
+
+    if (!discord || !discord->SetApplicationID(strAppID.c_str()))
+        return false;
+
+    discord->UpdatePresence();
+    return true;
 }
 
 bool CLuaDiscordDefs::SetDetails(std::string strDetails)

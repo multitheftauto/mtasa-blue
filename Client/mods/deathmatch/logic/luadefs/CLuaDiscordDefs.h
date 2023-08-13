@@ -16,5 +16,6 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
+    static bool SetAppID(std::string strAppID);
     static bool SetDetails(std::string strDetails);
 };

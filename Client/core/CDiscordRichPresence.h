@@ -19,13 +19,18 @@ public:
     CDiscordRichPresence();
     ~CDiscordRichPresence();
 
-    // void SetApplicationId();
+    void InitializeDiscord();
+    void ShutdownDiscord();
+
     void UpdatePresence();
     void SetPresenceState(const char* szState);
-    bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
     void SetPresenceStartTimestamp(const unsigned long ulStart);
+
+    bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
     bool SetDiscordRPCEnabled(bool bEnabled) override;
     bool IsDiscordRPCEnabled() override;
+    bool SetApplicationID(const char* szAppID);
+
     // void SetPresenceTimestamp();
     // void SetPresenceImage();
     // void SetPresenceText();

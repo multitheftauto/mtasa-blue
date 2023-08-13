@@ -73,21 +73,42 @@ void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart
     m_uiDiscordAppStart = ulStart;
 }
 
+void CDiscordRichPresence::InitializeDiscord()
+{
+    DiscordEventHandlers handlers;
+    memset(&handlers, 0, sizeof(handlers));
+
+    Discord_Initialize((m_strDiscordAppCurrentId != m_strDiscordAppId) ? m_strDiscordAppCurrentId.c_str() : m_strDiscordAppId.c_str(), &handlers, 1, nullptr);
+}
+
+void CDiscordRichPresence::ShutdownDiscord()
+{
+    Discord_Shutdown();
+}
+
+bool CDiscordRichPresence::SetApplicationID(const char* szAppID)
+{
+    m_strDiscordAppCurrentId = (szAppID && szAppID[0] != '\0') ? szAppID : DEFAULT_APP_ID;
+
+    if (m_bDiscordRPCEnabled)
+    {
+        ShutdownDiscord();
+        InitializeDiscord();
+    }
+}
+
 bool CDiscordRichPresence::SetDiscordRPCEnabled(bool bEnabled)
 {
     m_bDiscordRPCEnabled = bEnabled;
 
     if (!bEnabled)
     {
-        Discord_Shutdown();
+        ShutdownDiscord();
         return true;
     }
 
-    DiscordEventHandlers handlers;
-    memset(&handlers, 0, sizeof(handlers));
-
-    Discord_Initialize(m_strDiscordAppId.c_str(), &handlers, 1, nullptr);
-    CDiscordRichPresence::UpdatePresence();
+    InitializeDiscord();
+    UpdatePresence();
     return true;
 }
 
