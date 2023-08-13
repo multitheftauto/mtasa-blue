@@ -61,10 +61,10 @@ CDuplicateLineFilter<SReportLine> ms_ReportLineFilter;
 #define PRODUCT_COMMON_DATA_DIR     "MTA San Andreas All"                               // C:\ProgramData
 #define TROUBLE_URL1 "http://updatesa.multitheftauto.com/sa/trouble/?v=_VERSION_&id=_ID_&tr=_TROUBLE_"
 
-    //
-    // Output a UTF8 encoded messagebox
-    // Used in the Win32 Client only
-    //
+//
+// Output a UTF8 encoded messagebox
+// Used in the Win32 Client only
+//
 #ifdef _WINDOWS_ //Only for modules that use windows.h
 int SharedUtil::MessageBoxUTF8(HWND hWnd, SString lpText, SString lpCaption, UINT uType)
 {
@@ -1500,6 +1500,11 @@ std::string SharedUtil::UTF16ToMbUTF8(const wchar_t* input)
     if (input == nullptr)
         return "";
     return utf8_wcstombs(input);
+}
+
+std::string SharedUtil::UTF16ToMbUTF8(const char16_t* input)
+{
+    return UTF16ToMbUTF8((const wchar_t*)input);
 }
 
 // Get UTF8 confidence

@@ -136,7 +136,7 @@ public:
     void DeleteAllEvents();
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
-    CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
+    CCustomData&   GetCustomDataManager() { return m_CustomData; }
     CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = NULL);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData);
@@ -249,7 +249,7 @@ protected:
     void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL);
 
     CMapEventManager* m_pEventManager;
-    CCustomData*      m_pCustomData;
+    CCustomData       m_CustomData;
 
     EElementType m_iType;
     ElementID    m_ID;

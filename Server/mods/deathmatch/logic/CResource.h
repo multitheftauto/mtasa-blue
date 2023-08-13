@@ -319,6 +319,13 @@ public:
     bool IsUsingDbConnectMysql();
     bool IsFileDbConnectMysqlProtected(const SString& strFilename, bool bReadOnly);
 
+    /**
+     * @brief Searches for a CResourceFile with the given relative path.
+     * @param relativePath Relative resource file path (from meta)
+     * @return A pointer to CResourceFile on success, null otherwise
+     */
+    CResourceFile* GetResourceFile(const SString& relativePath) const;
+
 public:
     static std::list<CResource*> m_StartedResources;
 

@@ -13,6 +13,7 @@
 #include "Utils.h"
 #include "Dialogs.h"
 #include "D3DStuff.h"
+#include <version.h>
 #include <array>
 #include <locale.h>
 
@@ -862,14 +863,14 @@ void CheckDataFiles()
     {
         const char* expected;
         const char* fileName;
-    } integrityCheckList[] = {{"489E9B107C5ED41AF000CD462239C66F", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
+    } integrityCheckList[] = {{"5A9390706862F2B7A79A80CF0B9218C8", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
                               {"07C11F7D8058F350ADF6FC9AB81B38AC", "bass_ac3.dll"},       {"D8CCB4B8235F31A3C73485FDE18B0187", "bass_fx.dll"},
-                              {"64C96631887874F7ED9D8881FC016846", "bassflac.dll"},       {"9EAA041CCDA34A481E00F048E48AF6A9", "bassmidi.dll"},
+                              {"64C96631887874F7ED9D8881FC016846", "bassflac.dll"},       {"8EDCB256F1213099528E03EBC2C480B3", "bassmidi.dll"},
                               {"5DEEC10A943E352EF7E0223327E8B48C", "bassmix.dll"},        {"B04050AD912FB7E03F529F2C3F7D991D", "bassopus.dll"},
                               {"0F1B2FC6C0C703A43A24DC05352E7ADA", "basswebm.dll"},       {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
-                              {"6E2C5DCF4EE973E69ECA39288D20C436", "tags.dll"},           {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
+                              {"9C12FF87F03610EBD24D35A85D0A14C3", "tags.dll"},           {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
                               {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"1C9B45E87528B8BB8CFA884EA0099A85", "d3dcompiler_43.dll"},
-                              {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
+                              {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"3B4647BCB9FEB591C2C05D1A606ED988", "d3dcompiler_47.dll"},
                               {"F137D5BE2D8E76597B3F269B73DBB6A6", "XInput9_1_0_mta.dll"}};
 
     for (const auto& item : integrityCheckList)

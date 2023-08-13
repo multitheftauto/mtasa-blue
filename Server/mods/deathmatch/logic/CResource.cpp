@@ -3098,3 +3098,16 @@ bool CResource::IsFileDbConnectMysqlProtected(const SString& strAbsFilename, boo
 
     return false;
 }
+
+CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
+{
+    for (CResourceFile* resourceFile : m_ResourceFiles)
+    {
+        if (!stricmp(relativePath.c_str(), resourceFile->GetName()))
+        {
+            return resourceFile;
+        }
+    }
+
+    return nullptr;
+}

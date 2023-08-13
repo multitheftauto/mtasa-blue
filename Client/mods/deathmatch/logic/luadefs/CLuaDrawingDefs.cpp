@@ -1187,12 +1187,21 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 int CLuaDrawingDefs::DxCreateRenderTarget(lua_State* luaVM)
 {
     //  element dxCreateRenderTarget( int sizeX, int sizeY [, int withAlphaChannel = false ] )
+    //  element dxCreateRenderTarget( int sizeX, int sizeY, SurfaceFormat surfaceFormat )
     CVector2D vecSize;
-    bool      bWithAlphaChannel;
+    bool      bWithAlphaChannel = false;
+    bool      bHasSurfaceFormat = false;
+    _D3DFORMAT surfaceFormat;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecSize);
-    argStream.ReadBool(bWithAlphaChannel, false);
+    if (argStream.NextIsString())
+    {
+        argStream.ReadEnumString(surfaceFormat);
+        bHasSurfaceFormat = true;
+    }
+    else
+        argStream.ReadBool(bWithAlphaChannel, false);
 
     if (!argStream.HasErrors())
     {
@@ -1200,8 +1209,8 @@ int CLuaDrawingDefs::DxCreateRenderTarget(lua_State* luaVM)
         CResource* pParentResource = pLuaMain ? pLuaMain->GetResource() : NULL;
         if (pParentResource)
         {
-            CClientRenderTarget* pRenderTarget =
-                g_pClientGame->GetManager()->GetRenderElementManager()->CreateRenderTarget((uint)vecSize.fX, (uint)vecSize.fY, bWithAlphaChannel);
+            CClientRenderTarget* pRenderTarget = g_pClientGame->GetManager()->GetRenderElementManager()->CreateRenderTarget(
+                (uint)vecSize.fX, (uint)vecSize.fY, bHasSurfaceFormat, bWithAlphaChannel, surfaceFormat);
             if (pRenderTarget)
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
@@ -1729,25 +1738,25 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
         lua_settable(luaVM, -3);
 
         lua::Push(luaVM, "SettingDebugMode");
-        lua::Push(luaVM, []{
+        lua::Push(luaVM, [] {
             switch (g_pCore->GetDiagnosticDebug())
             {
-            case EDiagnosticDebug::GRAPHICS_6734:
-                return "#6734 Graphics";
-            case EDiagnosticDebug::D3D_6732:
-                return "#6732 D3D";
-            case EDiagnosticDebug::LOG_TIMING_0000:
-                return "#0000 Log timing";
-            case EDiagnosticDebug::JOYSTICK_0000:
-                return "#0000 Joystick";
-            case EDiagnosticDebug::LUA_TRACE_0000:
-                return "#0000 Lua trace";
-            case EDiagnosticDebug::RESIZE_ALWAYS_0000:
-                return "#0000 Resize always";
-            case EDiagnosticDebug::RESIZE_NEVER_0000:
-                return "#0000 Resize never";
-            default:
-                return "Default";
+                case EDiagnosticDebug::GRAPHICS_6734:
+                    return "#6734 Graphics";
+                case EDiagnosticDebug::D3D_6732:
+                    return "#6732 D3D";
+                case EDiagnosticDebug::LOG_TIMING_0000:
+                    return "#0000 Log timing";
+                case EDiagnosticDebug::JOYSTICK_0000:
+                    return "#0000 Joystick";
+                case EDiagnosticDebug::LUA_TRACE_0000:
+                    return "#0000 Lua trace";
+                case EDiagnosticDebug::RESIZE_ALWAYS_0000:
+                    return "#0000 Resize always";
+                case EDiagnosticDebug::RESIZE_NEVER_0000:
+                    return "#0000 Resize never";
+                default:
+                    return "Default";
             }
         }());
         lua_settable(luaVM, -3);

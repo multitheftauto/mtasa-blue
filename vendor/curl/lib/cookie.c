@@ -1387,7 +1387,7 @@ static struct Cookie *dup_cookie(struct Cookie *src)
   }
   return d;
 
-  fail:
+fail:
   freecookie(d);
   return NULL;
 }
@@ -1721,7 +1721,7 @@ static CURLcode cookie_output(struct Curl_easy *data,
   }
 
   /*
-   * If we reach here we have successfully written a cookie file so theree is
+   * If we reach here we have successfully written a cookie file so there is
    * no need to inspect the error, any error case should have jumped into the
    * error block below.
    */
