@@ -189,6 +189,36 @@ long CScriptFile::Write(unsigned long ulSize, const char* pData)
     return m_pFile->FWrite(pData, ulSize);
 }
 
+long CScriptFile::GetContents(std::string& buffer)
+{
+    if (!m_pFile)
+        return -1;
+
+    // Store the current position to restore it later.
+    const int currentPos = m_pFile->FTell();
+
+    // Move to the end of the file to determine the size.
+    m_pFile->FSeek(0, SEEK_END);
+    const int fileSize = m_pFile->FTell();
+
+    try
+    {
+        buffer.resize(fileSize);
+    }
+    catch (const std::bad_alloc&)
+    {
+        m_pFile->FSeek(currentPos, SEEK_SET);
+        return -2;
+    }
+
+    // Move to the start of the file to read the entire file.
+    m_pFile->FSeek(0, SEEK_SET);
+    const int bytesRead = m_pFile->FRead(buffer.data(), fileSize);
+    m_pFile->FSeek(currentPos, SEEK_SET);
+    buffer.resize(bytesRead);
+    return bytesRead;
+}
+
 // If file was downloaded with a resource, validate checksum
 void CScriptFile::DoResourceFileCheck()
 {
@@ -222,4 +252,9 @@ void CScriptFile::DoResourceFileCheck()
 CResource* CScriptFile::GetResource()
 {
     return m_pResource;
+}
+
+CResourceFile* CScriptFile::GetResourceFile() const
+{
+    return m_pResource->GetResourceFile(m_strFilename);
 }

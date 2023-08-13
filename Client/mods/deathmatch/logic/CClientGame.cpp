@@ -529,6 +529,9 @@ CClientGame::~CClientGame()
     m_bBeingDeleted = false;
 
     CStaticFunctionDefinitions::ResetAllSurfaceInfo();
+
+    // Reset custom streaming memory size [possibly] set by the server
+    g_pCore->SetCustomStreamingMemory(0);
 }
 
 /*
@@ -880,18 +883,21 @@ void CClientGame::DoPulsePostFrame()
                                                DT_NOCLIP | DT_CENTER);
         }
 
-        // Adjust the streaming memory limit.
-        unsigned int uiStreamingMemoryPrev;
-        g_pCore->GetCVars()->Get("streaming_memory", uiStreamingMemoryPrev);
-        uint uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemoryPrev, g_pCore->GetMaxStreamingMemory());
-        if (uiStreamingMemory != uiStreamingMemoryPrev)
-            g_pCore->GetCVars()->Set("streaming_memory", uiStreamingMemory);
+        // Adjust the streaming memory size cvar [if needed]
+        if (!g_pCore->IsUsingCustomStreamingMemorySize()) {
+            unsigned int uiStreamingMemoryPrev;
+            g_pCore->GetCVars()->Get("streaming_memory", uiStreamingMemoryPrev);
+            uint uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemoryPrev, g_pCore->GetMaxStreamingMemory());
+            if (uiStreamingMemory != uiStreamingMemoryPrev)
+                g_pCore->GetCVars()->Set("streaming_memory", uiStreamingMemory);
+        }
 
-        int iStreamingMemoryBytes = static_cast<int>(uiStreamingMemory) * 1024 * 1024;
-        if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != iStreamingMemoryBytes)
-            g_pMultiplayer->GetLimits()->SetStreamingMemory(iStreamingMemoryBytes);
+        const auto streamingMemorySizeBytes = g_pCore->GetStreamingMemory();
+        if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != streamingMemorySizeBytes) {
+            g_pMultiplayer->GetLimits()->SetStreamingMemory(streamingMemorySizeBytes);
+        }
 
-            // If we're in debug mode and are supposed to show task data, do it
+        // If we're in debug mode and are supposed to show task data, do it
         #ifdef MTA_DEBUG
         if (m_pShowPlayerTasks)
         {
@@ -5338,6 +5344,10 @@ void CClientGame::ResetMapInfo()
     // Water-colour
     g_pMultiplayer->ResetWater();
     g_pMultiplayer->ResetColorFilter();
+
+    // Grain effect
+    g_pMultiplayer->SetGrainMultiplier(eGrainMultiplierType::ALL, 1.0f);
+    g_pMultiplayer->SetGrainLevel(0);
 
     // Water
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
