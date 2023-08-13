@@ -323,7 +323,7 @@ struct RwGeometry
 };
 
 /* Interpolator flags */
-enum RpInterpolatorFlag : int32
+enum RpInterpolatorFlag : int32_t
 {
     rpINTERPOLATORDIRTYINSTANCE = 0x01,
     rpINTERPOLATORDIRTYSPHERE = 0x02,
@@ -331,12 +331,12 @@ enum RpInterpolatorFlag : int32
 };
 struct RpInterpolator
 {
-    int32 flags;
-    int16 startMorphTarget;
-    int16 endMorphTarget;
-    float time;
-    float recipTime;
-    float position;
+    int32_t flags;
+    int16_t startMorphTarget;
+    int16_t endMorphTarget;
+    float   time;
+    float   recipTime;
+    float   position;
 };
 
 struct RpAtomic
@@ -449,7 +449,7 @@ inline auto RwFrameGetMatrix(RwFrame* f) {
 }
 
 inline void _rpAtomicResyncInterpolatedSphere(RpAtomic* atomic) {
-    ((void(__cdecl*)(RpAtomic*))0x7491F0)(atomic);
+    reinterpret_cast<void(__cdecl*)(RpAtomic*)>(0x7491F0)(atomic);
 }
 
 /* NB "RpAtomicGetBoundingSphere(atomic++)" will break it */
