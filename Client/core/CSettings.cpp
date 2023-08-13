@@ -388,7 +388,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
     m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
 
-    m_pCheckBoxAllowDiscordRPC = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), true));
+    m_pCheckBoxAllowDiscordRPC = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), false));
     m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
@@ -4495,9 +4495,7 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
 //
 bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
 {
-    bool bEnabled = m_pCheckBoxAllowDiscordRPC->GetSelected();
-    CVARS_SET("allow_discord_rpc", bEnabled);
-    g_pCore->GetDiscord()->SetDiscordRPCEnabled(bEnabled);
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(m_pCheckBoxAllowDiscordRPC->GetSelected());
     return true;
 }
 

@@ -295,9 +295,15 @@ CMainMenu::CMainMenu(CGUI* pManager)
     SetIsIngame(false);
 
     // Discord
-    auto discord = g_pCore->GetDiscord();
-    discord->SetPresenceState("Main menu");
-    discord->UpdatePresence();
+    if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
+    {
+        auto discord = g_pCore->GetDiscord();
+        if (!discord->IsDiscordRPCEnabled())
+            discord->SetDiscordRPCEnabled(true);
+
+        discord->SetPresenceState("Main menu");
+        discord->UpdatePresence();
+    }
 
     // Store the pointer to the graphics subsystem
     m_pGraphics = CGraphics::GetSingletonPtr();

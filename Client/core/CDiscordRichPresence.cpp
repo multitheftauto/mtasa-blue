@@ -87,6 +87,7 @@ bool CDiscordRichPresence::SetDiscordRPCEnabled(bool bEnabled)
     memset(&handlers, 0, sizeof(handlers));
 
     Discord_Initialize(m_strDiscordAppId.c_str(), &handlers, 1, nullptr);
+    CDiscordRichPresence::UpdatePresence();
     return true;
 }
 

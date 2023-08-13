@@ -639,9 +639,12 @@ void CCore::SetConnected(bool bConnected)
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
 
-    if (g_pCore->GetDiscord()->IsDiscordRPCEnabled())
+    if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
     {
         auto discord = g_pCore->GetDiscord();
+        if (!discord->IsDiscordRPCEnabled())
+            discord->SetDiscordRPCEnabled(true);
+
         discord->SetPresenceState(bConnected ? "In-game" : "Main menu");
         discord->SetPresenceStartTimestamp(0);
         discord->SetPresenceDetails("");
