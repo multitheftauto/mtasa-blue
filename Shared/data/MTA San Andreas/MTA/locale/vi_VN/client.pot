@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-06 20:57+0000\n"
-"PO-Revision-Date: 2023-08-06 21:31\n"
+"POT-Creation-Date: 2023-08-13 11:56+0000\n"
+"PO-Revision-Date: 2023-08-13 12:01\n"
 "Last-Translator: \n"
 "Language-Team: Vietnamese\n"
 "Language: vi_VN\n"
@@ -168,7 +168,7 @@ msgstr "Lỗi khi khởi động lại MTA:SA\n\n"
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CCore.cpp:1251 Client/core/CCore.cpp:1264
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
 #: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
 #: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
@@ -470,7 +470,7 @@ msgstr ""
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:763
+#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:787
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA không thể tiếp tục vì ổ đĩa %s không đủ bộ nhớ lưu trữ."
@@ -845,115 +845,115 @@ msgstr ""
 msgid "Visit latest news article"
 msgstr "Cập nhật các thông tin mới nhất"
 
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:789 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Lỗi nghiêm trọng"
 
-#: Client/core/CCore.cpp:890
+#: Client/core/CCore.cpp:914
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "ĐỂ SỬA, XÓA TỆP NÀY:"
 
-#: Client/core/CCore.cpp:922
+#: Client/core/CCore.cpp:946
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s mô-đun không hợp lệ!"
 
-#: Client/core/CCore.cpp:1227
+#: Client/core/CCore.cpp:1251
 msgid "Error executing URL"
 msgstr "Lỗi thực thi URL"
 
-#: Client/core/CCore.cpp:1239
+#: Client/core/CCore.cpp:1263
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Lỗi khi chạy mod được chỉ ra ở command line ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
+#: Client/core/CCore.cpp:1351
 msgid "this help screen"
 msgstr "màn hình trợ giúp này"
 
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+#: Client/core/CCore.cpp:1352 Client/core/CCore.cpp:1353
 msgid "exits the application"
 msgstr "thoát khỏi ứng dụng"
 
-#: Client/core/CCore.cpp:1330
+#: Client/core/CCore.cpp:1354
 msgid "shows the version"
 msgstr "hiển thị phiên bản"
 
-#: Client/core/CCore.cpp:1331
+#: Client/core/CCore.cpp:1355
 msgid "shows the time"
 msgstr "hiển thị thời gian"
 
-#: Client/core/CCore.cpp:1332
+#: Client/core/CCore.cpp:1356
 msgid "shows the hud"
 msgstr "hiển thị hud"
 
-#: Client/core/CCore.cpp:1333
+#: Client/core/CCore.cpp:1357
 msgid "shows all the binds"
 msgstr "hiển thị tất cả các phím"
 
-#: Client/core/CCore.cpp:1334
+#: Client/core/CCore.cpp:1358
 msgid "shows your serial"
 msgstr "hiển thị mã serial của bạn"
 
-#: Client/core/CCore.cpp:1343
+#: Client/core/CCore.cpp:1367
 msgid "connects to a server (host port nick pass)"
 msgstr "kết nối đến một server (host port nick pass)"
 
-#: Client/core/CCore.cpp:1344
+#: Client/core/CCore.cpp:1368
 msgid "connects to a previous server"
 msgstr "kết nối với server trước đó đã dùng"
 
-#: Client/core/CCore.cpp:1345
+#: Client/core/CCore.cpp:1369
 msgid "binds a key (key control)"
 msgstr "gán một phím (điều khiển phím)"
 
-#: Client/core/CCore.cpp:1346
+#: Client/core/CCore.cpp:1370
 msgid "unbinds a key (key)"
 msgstr "bỏ gán một key (key)"
 
-#: Client/core/CCore.cpp:1347
+#: Client/core/CCore.cpp:1371
 msgid "copies the default gta controls"
 msgstr "Sao chép các phím điều khiển mặc định của gta"
 
-#: Client/core/CCore.cpp:1348
+#: Client/core/CCore.cpp:1372
 msgid "outputs a screenshot"
 msgstr "Xuất ra một ảnh chụp màn hình"
 
-#: Client/core/CCore.cpp:1349
+#: Client/core/CCore.cpp:1373
 msgid "immediately saves the config"
 msgstr "Lưu các thông tin tùy chỉnh ngay"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1375
 msgid "clears the debug view"
 msgstr "xóa các chế độ xem gỡ lỗi"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1376
 msgid "scrolls the chatbox upwards"
 msgstr "kéo khung trò chuyện lên"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1377
 msgid "scrolls the chatbox downwards"
 msgstr "kéo khung trò chuyện xuống"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1378
 msgid "scrolls the debug view upwards"
 msgstr "kéo khung xem debug lên"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1379
 msgid "scrolls the debug view downwards"
 msgstr "kéo khung xem debug xuống"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1382
 msgid "shows the memory statistics"
 msgstr "hiển thị thống kê bộ nhớ"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1383
 msgid "shows the frame timing graph"
 msgstr "hiển thị biểu đồ khung thời gian"
 
-#: Client/core/CCore.cpp:1363
+#: Client/core/CCore.cpp:1387
 msgid "for developers: reload news"
 msgstr ""
 
