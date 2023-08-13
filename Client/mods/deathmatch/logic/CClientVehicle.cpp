@@ -1482,16 +1482,12 @@ const SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) co
     {
         case FRONT_LEFT_WHEEL:
             return "wheel_lf_dummy";
-            break;
         case FRONT_RIGHT_WHEEL:
             return "wheel_rf_dummy";
-            break;
         case REAR_LEFT_WHEEL:
             return "wheel_lb_dummy";
-            break;
         case REAR_RIGHT_WHEEL:
             return "wheel_rb_dummy";
-            break;
     }
 }
 
