@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-06 20:57+0000\n"
-"PO-Revision-Date: 2023-08-06 21:31\n"
+"POT-Creation-Date: 2023-08-13 11:56+0000\n"
+"PO-Revision-Date: 2023-08-13 12:02\n"
 "Last-Translator: \n"
 "Language-Team: Norwegian Bokmal\n"
 "Language: nb_NO\n"
@@ -168,7 +168,7 @@ msgstr "Problemer med omstart av MTA:SA\n\n"
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/core/CCore.cpp:1227 Client/core/CCore.cpp:1240
+#: Client/core/CCore.cpp:1251 Client/core/CCore.cpp:1264
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2923
 #: Client/core/CSettings.cpp:4112 Client/core/CSettings.cpp:4140
 #: Client/core/CSettings.cpp:4673 Client/core/CConnectManager.cpp:80
@@ -470,7 +470,7 @@ msgstr ""
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
 msgstr ""
 
-#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:763
+#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:787
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr "MTA:SA kan ikke fortsette siden disk %s har ikke nok plass."
@@ -845,115 +845,115 @@ msgstr ""
 msgid "Visit latest news article"
 msgstr "از آخرین مقاله خبری دیدن کنید"
 
-#: Client/core/CCore.cpp:765 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:789 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Kritisk feil"
 
-#: Client/core/CCore.cpp:890
+#: Client/core/CCore.cpp:914
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "FOR Å FIKSE, FJERN DENNE FILEN:"
 
-#: Client/core/CCore.cpp:922
+#: Client/core/CCore.cpp:946
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "%s modul er feil!"
 
-#: Client/core/CCore.cpp:1227
+#: Client/core/CCore.cpp:1251
 msgid "Error executing URL"
 msgstr "Feil ved utføring av URL"
 
-#: Client/core/CCore.cpp:1239
+#: Client/core/CCore.cpp:1263
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Feil ved kjøring av modifikasjonen spesifisert i kommandolinjen ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1327
+#: Client/core/CCore.cpp:1351
 msgid "this help screen"
 msgstr "denne hjelpeskjermen"
 
-#: Client/core/CCore.cpp:1328 Client/core/CCore.cpp:1329
+#: Client/core/CCore.cpp:1352 Client/core/CCore.cpp:1353
 msgid "exits the application"
 msgstr "avslutter programmet"
 
-#: Client/core/CCore.cpp:1330
+#: Client/core/CCore.cpp:1354
 msgid "shows the version"
 msgstr "viser versjonen"
 
-#: Client/core/CCore.cpp:1331
+#: Client/core/CCore.cpp:1355
 msgid "shows the time"
 msgstr "viser tiden"
 
-#: Client/core/CCore.cpp:1332
+#: Client/core/CCore.cpp:1356
 msgid "shows the hud"
 msgstr "viser HUDen"
 
-#: Client/core/CCore.cpp:1333
+#: Client/core/CCore.cpp:1357
 msgid "shows all the binds"
 msgstr "viser alle bindingene"
 
-#: Client/core/CCore.cpp:1334
+#: Client/core/CCore.cpp:1358
 msgid "shows your serial"
 msgstr "viser din serial"
 
-#: Client/core/CCore.cpp:1343
+#: Client/core/CCore.cpp:1367
 msgid "connects to a server (host port nick pass)"
 msgstr "kobler till en server (host port navn pass)"
 
-#: Client/core/CCore.cpp:1344
+#: Client/core/CCore.cpp:1368
 msgid "connects to a previous server"
 msgstr "kobler til en tidligere server"
 
-#: Client/core/CCore.cpp:1345
+#: Client/core/CCore.cpp:1369
 msgid "binds a key (key control)"
 msgstr "binder en knapp (knapp kontrol)"
 
-#: Client/core/CCore.cpp:1346
+#: Client/core/CCore.cpp:1370
 msgid "unbinds a key (key)"
 msgstr "fjerner bindingen til en knapp (knapp)"
 
-#: Client/core/CCore.cpp:1347
+#: Client/core/CCore.cpp:1371
 msgid "copies the default gta controls"
 msgstr "kopierer de vanlige gta kontrollene"
 
-#: Client/core/CCore.cpp:1348
+#: Client/core/CCore.cpp:1372
 msgid "outputs a screenshot"
 msgstr "gir et skjermbilde"
 
-#: Client/core/CCore.cpp:1349
+#: Client/core/CCore.cpp:1373
 msgid "immediately saves the config"
 msgstr "lagrer umiddelbart konfigen"
 
-#: Client/core/CCore.cpp:1351
+#: Client/core/CCore.cpp:1375
 msgid "clears the debug view"
 msgstr "tømmer debug vinduet"
 
-#: Client/core/CCore.cpp:1352
+#: Client/core/CCore.cpp:1376
 msgid "scrolls the chatbox upwards"
 msgstr "ruller chatbox oppover"
 
-#: Client/core/CCore.cpp:1353
+#: Client/core/CCore.cpp:1377
 msgid "scrolls the chatbox downwards"
 msgstr "ruller chatbox nedover"
 
-#: Client/core/CCore.cpp:1354
+#: Client/core/CCore.cpp:1378
 msgid "scrolls the debug view upwards"
 msgstr "ruller debug vinduet nedover"
 
-#: Client/core/CCore.cpp:1355
+#: Client/core/CCore.cpp:1379
 msgid "scrolls the debug view downwards"
 msgstr "ruller debug vinduet nedover"
 
-#: Client/core/CCore.cpp:1358
+#: Client/core/CCore.cpp:1382
 msgid "shows the memory statistics"
 msgstr "viser minnestatistikken"
 
-#: Client/core/CCore.cpp:1359
+#: Client/core/CCore.cpp:1383
 msgid "shows the frame timing graph"
 msgstr "viser bildetid grafen"
 
-#: Client/core/CCore.cpp:1363
+#: Client/core/CCore.cpp:1387
 msgid "for developers: reload news"
 msgstr ""
 
