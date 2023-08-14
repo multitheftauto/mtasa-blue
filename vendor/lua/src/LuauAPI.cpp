@@ -492,12 +492,20 @@ lua_State *(VluauL_newstate) (void *mtasaowner)
 
 int (VluauL_ref) (struct lua_State *L, int t)
 {
-    return g_Luau.lua_ref(L, -1);
+    // If the object at the top of the stack is nil, luaL_ref returns the constant LUA_REFNIL
+    if (t != LUA_REGISTRYINDEX || g_Luau.lua_type(L, -1) == LUA_TNIL)
+        return LUA_NOREF;
+
+    // lua_ref in Luau doesn't change the stack in any way, it simply pins the object and returns the reference.
+    const int ref = g_Luau.lua_ref(L, -1);
+    g_Luau.lua_settop(L, -(1)-1); // lua_pop macro
+    return ref;
 }
 
 void (VluauL_unref) (struct lua_State *L, int t, int ref)
 {
-    g_Luau.lua_unref(L, ref);
+    if (t == LUA_REGISTRYINDEX)
+        g_Luau.lua_unref(L, ref);
 }
 
 int (VluauL_loadbuffer) (struct lua_State *L, const char *buff, size_t sz, const char *name)
