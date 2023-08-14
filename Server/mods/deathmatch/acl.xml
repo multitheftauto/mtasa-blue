@@ -29,7 +29,7 @@
       <acl name="SuperModerator" />
       <acl name="Admin" />
       <acl name="RPC" />
-      <object name="user.Console" />
+      <!-- You can use this code to add a user to a group. <object name="user.UserName" /> -->
    </group>
    <group name="RPC">
       <acl name="RPC" />
