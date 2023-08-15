@@ -1463,7 +1463,6 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus);
 
                 // Update the wheel's visibility
-                SString componentName = GetComponentNameForWheel(ucWheel);
                 m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, ucStatus != DT_WHEEL_MISSING && m_ComponentData[GetComponentNameForWheel(ucWheel)].m_bVisible);
             }
             else if (m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2)
