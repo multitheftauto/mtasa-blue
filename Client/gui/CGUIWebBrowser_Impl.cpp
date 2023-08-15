@@ -159,11 +159,11 @@ bool CGUIWebBrowser_Impl::Event_MouseButtonDown(const CEGUI::EventArgs& e)
     const CEGUI::MouseEventArgs& args = reinterpret_cast<const CEGUI::MouseEventArgs&>(e);
 
     if (args.button == CEGUI::MouseButton::LeftButton)
-        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_LEFT);
+        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_LEFT, 1);
     else if (args.button == CEGUI::MouseButton::MiddleButton)
-        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_MIDDLE);
+        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_MIDDLE, 1);
     else if (args.button == CEGUI::MouseButton::RightButton)
-        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_RIGHT);
+        m_pWebView->InjectMouseDown(eWebBrowserMouseButton::BROWSER_MOUSEBUTTON_RIGHT, 1);
 
     return true;
 }
