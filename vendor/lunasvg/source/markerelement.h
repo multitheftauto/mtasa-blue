@@ -7,8 +7,7 @@ namespace lunasvg {
 
 class LayoutMarker;
 
-class MarkerElement : public StyledElement
-{
+class MarkerElement : public StyledElement {
 public:
     MarkerElement();
 

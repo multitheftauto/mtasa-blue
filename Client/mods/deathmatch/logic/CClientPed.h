@@ -478,6 +478,7 @@ public:
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
     void SetVoice(short sVoiceType, short sVoiceID);
     void SetVoice(const char* szVoiceType, const char* szVoice);
+    void ResetVoice();
 
     bool IsSpeechEnabled();
     void SetSpeechEnabled(bool bEnabled);

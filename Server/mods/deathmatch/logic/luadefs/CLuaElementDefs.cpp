@@ -1006,8 +1006,7 @@ CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius
     if (interior || dimension || typeHash)
     {
         result.erase(std::remove_if(result.begin(), result.end(),
-                                    [&, radiusSq = radius * radius](CElement* pElement)
-                                    {
+                                    [&, radiusSq = radius * radius](CElement* pElement) {
                                         if (typeHash && typeHash != pElement->GetTypeHash())
                                             return true;
 
@@ -2236,17 +2235,21 @@ int CLuaElementDefs::setElementSyncer(lua_State* luaVM)
     CElement* pElement;
     CPlayer*  pPlayer = NULL;
     bool      bEnable = true;
+    bool      bPersist = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     if (argStream.NextIsBool())
         argStream.ReadBool(bEnable);
     else
+    {
         argStream.ReadUserData(pPlayer);
+        argStream.ReadBool(bPersist, false);
+    }
 
     if (!argStream.HasErrors())
     {
-        bool bResult = CStaticFunctionDefinitions::SetElementSyncer(pElement, pPlayer, bEnable);
+        bool bResult = CStaticFunctionDefinitions::SetElementSyncer(pElement, pPlayer, bEnable, bPersist);
         lua_pushboolean(luaVM, bResult);
         return 1;
     }

@@ -15,14 +15,55 @@
 #include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
 
+//! Set the CModelCacheManager limits
+//! By passing `nil`/no value the original values are restored
+void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
+    g_pClientGame->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
+}
+
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
 {
     g_pGame->GetStreaming()->MakeSpaceFor(bytes);
 }
 
+// Get currenlty used memory for stremaing [In bytes]
 std::uint32_t EngineStreamingGetUsedMemory()
 {
     return g_pGame->GetStreaming()->GetMemoryUsed();
+}
+
+// Set the streaming memory size to a custom value
+void EngineStreamingSetMemorySize(size_t sizeBytes) {
+    if (sizeBytes == 0) {
+        throw std::invalid_argument{"Memory size must be > 0"};
+    }
+    g_pCore->SetCustomStreamingMemory(sizeBytes);
+}
+
+// Restore memory size to cvar
+void EngineStreamingRestoreMemorySize() {
+    g_pCore->SetCustomStreamingMemory(0);
+}
+
+// Get the streaming memory size [In bytes] - This is the limit, not the amount currently used! [See `EngineStreamingGetUsedMemory`]
+size_t EngineStreamingGetMemorySize() {
+    return g_pCore->GetStreamingMemory();
+}
+
+// Set streaming buffer size
+bool EngineStreamingSetBufferSize(size_t sizeBytes) {
+    const auto sizeBlocks = sizeBytes / 2048;
+    if (sizeBlocks > g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks()) { // Can't allow it to be less than the largest file
+        g_pGame->GetStreaming()->SetStreamingBufferSize(sizeBlocks);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Get current streaming buffer size
+size_t EngineStreamingGetBufferSize() {
+    return g_pGame->GetStreaming()->GetStreamingBufferSize();
 }
 
 void CLuaEngineDefs::LoadFunctions()
@@ -82,7 +123,13 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
-
+        {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
+        {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
+        {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
+        {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
+        {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
+        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+        
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
         // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
@@ -129,6 +176,24 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
 
     lua_registerstaticclass(luaVM, "Engine");
 
+    // `EngineStreaming` class
+    lua_newclass(luaVM);
+    {
+        lua_classfunction(luaVM, "freeUpMemory", "engineStreamingFreeUpMemory");
+        lua_classfunction(luaVM, "getUsedMemory", "engineStreamingGetUsedMemory");
+        lua_classfunction(luaVM, "setMemorySize", "engineStreamingSetMemorySize");
+        lua_classfunction(luaVM, "getMemorySize", "engineStreamingGetMemorySize");
+        lua_classfunction(luaVM, "restoreMemorySize", "engineStreamingRestoreMemorySize");
+        lua_classfunction(luaVM, "getBufferSize", "engineStreamingGetBufferSize");
+        lua_classfunction(luaVM, "setBufferSize", "engineStreamingSetBufferSize");
+        lua_classfunction(luaVM, "setModelCacheLimits", "engineStreamingSetModelCacheLimits");
+
+        lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
+        lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetMemorySize");
+        lua_classvariable(luaVM, "usedMemory", NULL, "engineStreamingGetUsedMemory");
+    }
+    lua_registerstaticclass(luaVM, "EngineStreaming");
+
     AddEngineColClass(luaVM);
     AddEngineTxdClass(luaVM);
     AddEngineDffClass(luaVM);
@@ -174,7 +239,6 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
 
     lua_registerclass(luaVM, "EngineIMG", "Element");
 }
-
 
 void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 {
@@ -641,7 +705,7 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<si
 {
     std::string buffer;
 
-    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer)) // Get file might throw 
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))            // Get file might throw
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     return buffer;
@@ -652,7 +716,7 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
     if (uiModelID >= 20000)
         throw std::invalid_argument(SString("Expected modelid in range 0 - 19999, got %d", uiModelID));
 
-    size_t fileID = ResolveIMGFileID(pIMG, file);
+    size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
     if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
@@ -668,7 +732,7 @@ bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, s
     if (uiTxdID >= 5000)
         throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
 
-    size_t fileID = ResolveIMGFileID(pIMG, file);
+    size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
     if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
@@ -795,6 +859,12 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         {
                             case eClientModelType::PED:
                                 usParentID = 7;            // male01
+                                break;
+                            case eClientModelType::TIMED_OBJECT:
+                                usParentID = 4715;            // LTSLAsky1_LAn2
+                                break;
+                            case eClientModelType::CLUMP:
+                                usParentID = 3425;            // nt_windmill (windmill)
                                 break;
                             case eClientModelType::OBJECT:
                                 usParentID = 1337;            // BinNt07_LA (trash can)
@@ -2277,7 +2347,7 @@ bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::opti
     else
         pModelInfo->SetFlags(uiFlags);
 
-    return true; 
+    return true;
 }
 
 bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool bState)
@@ -2297,8 +2367,9 @@ bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, boo
 bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-    if (!pModelInfo)
-        return false;
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
 
     ushort usCurrentFlags = pModelInfo->GetFlags();
     ushort usOriginalFlags = pModelInfo->GetOriginalFlags();
@@ -2311,8 +2382,13 @@ bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
     return false;
 }
 
-bool CLuaEngineDefs::EngineRestreamWorld()
+bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
-    g_pClientGame->RestreamWorld();
+    bool restreamLODs{};
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(restreamLODs, false);
+
+    g_pClientGame->RestreamWorld(restreamLODs);
     return true;
 }

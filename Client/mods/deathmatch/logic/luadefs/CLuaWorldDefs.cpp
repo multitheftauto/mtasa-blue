@@ -60,6 +60,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              // World set funcs
                                                                              {"setTime", SetTime},
                                                                              {"setColorFilter", ArgumentParser<SetColorFilter>},
+                                                                             {"setGrainMultiplier", ArgumentParser<SetGrainMultiplier>},
+                                                                             {"setGrainLevel", ArgumentParser<SetGrainLevel>},
                                                                              {"setSkyGradient", SetSkyGradient},
                                                                              {"setHeatHaze", SetHeatHaze},
                                                                              {"setWeather", SetWeather},
@@ -232,23 +234,13 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
     //  float endZ,
     //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
-    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil [,
-    //        element ignoredElement2,
-    //        element ignoredElement3,
-    //        ... etc
-    //        ], bool returnBuildingInfo = false, bCheckCarTires = false ] )
-
-    //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
-    //  float endZ,
-    //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
-    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, table ignoredElements = nil,
-    //        bool returnBuildingInfo = false, bCheckCarTires = false ] )
-
-    CVector                     vecStart;
-    CVector                     vecEnd;
-    SLineOfSightFlags           flags;
-    std::vector<CClientEntity*> vecIgnoredElements;
-    bool                        bIncludeBuildingInfo;
+    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool
+    //        returnBuildingInfo = false, bCheckCarTires = false ] )
+    CVector           vecStart;
+    CVector           vecEnd;
+    SLineOfSightFlags flags;
+    CClientEntity*    pIgnoredElement;
+    bool              bIncludeBuildingInfo;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecStart);
@@ -261,31 +253,18 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     argStream.ReadBool(flags.bSeeThroughStuff, false);
     argStream.ReadBool(flags.bIgnoreSomeObjectsForCamera, false);
     argStream.ReadBool(flags.bShootThroughStuff, false);
-
-    if (argStream.NextIsTable()) // Is the next value a table? Read it as a user data table (will error if table contains invalid type)
-    {
-        argStream.ReadUserDataTable(vecIgnoredElements);
-    }
-    else {
-        CClientEntity* pIgnoredElement;
-        argStream.ReadUserData(pIgnoredElement, NULL);
-
-        if (pIgnoredElement != NULL)
-        {
-            vecIgnoredElements.push_back(pIgnoredElement);
-        }
-    }
-
+    argStream.ReadUserData(pIgnoredElement, NULL);
     argStream.ReadBool(bIncludeBuildingInfo, false);
     argStream.ReadBool(flags.bCheckCarTires, false);
 
     if (!argStream.HasErrors())
     {
+        CEntity*                   pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
         CColPoint*                 pColPoint = NULL;
         CClientEntity*             pColEntity = NULL;
         bool                       bCollision;
         SLineOfSightBuildingResult buildingResult;
-        if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, vecIgnoredElements,
+        if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, pIgnoredEntity,
                                                            bIncludeBuildingInfo ? &buildingResult : NULL))
         {
             // Got a collision?
@@ -2019,6 +1998,18 @@ bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar u
     unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
     unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
     g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
+    return true;
+}
+
+bool CLuaWorldDefs::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)
+{
+    g_pMultiplayer->SetGrainMultiplier(type, fMultiplier);
+    return true;
+}
+
+bool CLuaWorldDefs::SetGrainLevel(uchar ucLevel)
+{
+    g_pMultiplayer->SetGrainLevel(ucLevel);
     return true;
 }
 

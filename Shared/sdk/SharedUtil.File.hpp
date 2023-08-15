@@ -29,6 +29,7 @@
     #include <sys/stat.h>
     #include <unistd.h>
     #include <limits.h>
+    #include <filesystem>
 #endif
 
 //
@@ -42,10 +43,8 @@ bool SharedUtil::FileExists(const SString& strFilename)
         return false;
     return ((dwAtr & FILE_ATTRIBUTE_DIRECTORY) == 0);
 #else
-    struct stat Info;
-    if (stat(strFilename, &Info) == -1)
-        return false;
-    return !(S_ISDIR(Info.st_mode));
+    std::error_code ec{};
+    return std::filesystem::is_regular_file(static_cast<const std::string&>(strFilename), ec);
 #endif
 }
 
@@ -60,10 +59,8 @@ bool SharedUtil::DirectoryExists(const SString& strPath)
         return false;
     return ((dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0);
 #else
-    struct stat Info;
-    if (stat(strPath, &Info) == -1)
-        return false;
-    return (S_ISDIR(Info.st_mode));
+    std::error_code ec{};
+    return std::filesystem::is_directory(static_cast<const std::string&>(strPath), ec);
 #endif
 }
 
@@ -339,6 +336,7 @@ uint64 SharedUtil::FileSize(const SString& strFilename)
 //
 void SharedUtil::MakeSureDirExists(const SString& strPath)
 {
+#ifdef WIN32
     std::vector<SString> parts;
     PathConform(strPath).Split(PATH_SEPERATOR, parts);
 
@@ -359,6 +357,11 @@ void SharedUtil::MakeSureDirExists(const SString& strPath)
         // Call mkdir on this path
         File::Mkdir(strTemp);
     }
+#else
+    std::filesystem::path filePath = static_cast<std::string>(PathConform(strPath));
+    std::error_code       ec{};
+    std::filesystem::create_directories(filePath.parent_path(), ec);
+#endif
 }
 
 SString SharedUtil::PathConform(const SString& strPath)
@@ -949,14 +952,12 @@ SString SharedUtil::MakeGenericPath(const SString& uniqueFilePath)
 SString SharedUtil::ConformPathForSorting(const SString& strPathFilename)
 {
     SString strResult = strPathFilename;
-    std::transform(strResult.begin(), strResult.end(), strResult.begin(),
-                   [](int c)
-                   {
-                       // Ignores locale and always does this:
-                       if (c >= 'A' && c <= 'Z')
-                           c = c - 'A' + 'a';
-                       return c;
-                   });
+    std::transform(strResult.begin(), strResult.end(), strResult.begin(), [](int c) {
+        // Ignores locale and always does this:
+        if (c >= 'A' && c <= 'Z')
+            c = c - 'A' + 'a';
+        return c;
+    });
     return strResult;
 }
 

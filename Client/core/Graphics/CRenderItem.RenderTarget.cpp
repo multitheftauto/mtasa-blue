@@ -16,14 +16,17 @@
 //
 //
 ////////////////////////////////////////////////////////////////
-void CRenderTargetItem::PostConstruct(CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bIncludeInMemoryStats)
+void CRenderTargetItem::PostConstruct(CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel,
+                                      int surfaceFormat, bool bIncludeInMemoryStats)
 {
     Super::PostConstruct(pManager, bIncludeInMemoryStats);
     m_uiSizeX = uiSizeX;
     m_uiSizeY = uiSizeY;
     m_uiSurfaceSizeX = uiSizeX;
     m_uiSurfaceSizeY = uiSizeY;
+    m_bHasSurfaceFormat = bHasSurfaceFormat;
     m_bWithAlphaChannel = bWithAlphaChannel;
+    m_eSurfaceFormat = surfaceFormat;
 
     // Initial creation of d3d data
     CreateUnderlyingData();
@@ -98,9 +101,15 @@ void CRenderTargetItem::CreateUnderlyingData()
         //            i == 1  - EvictManagedResources
         // 3rd try -  i == 2  - 32 bit target
         // 4th try -  i == 3  - 16 bit target
-        D3DFORMAT Format = i & 1 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
-        if (m_bWithAlphaChannel)
-            Format = D3DFMT_A8R8G8B8;
+        D3DFORMAT Format;
+        if (m_bHasSurfaceFormat)
+            Format = (D3DFORMAT)m_eSurfaceFormat;
+        else
+        {
+            Format = i & 1 ? D3DFMT_R5G6B5 : D3DFMT_X8R8G8B8;
+            if (m_bWithAlphaChannel)
+                Format = D3DFMT_A8R8G8B8;
+        }
         if (SUCCEEDED(
                 m_pDevice->CreateTexture(m_uiSizeX, m_uiSizeY, 1, D3DUSAGE_RENDERTARGET, Format, D3DPOOL_DEFAULT, (IDirect3DTexture9**)&m_pD3DTexture, NULL)))
             break;

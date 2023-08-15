@@ -26,6 +26,9 @@ using std::list;
 
 class CCore;
 
+std::wstring utf8_mbstowcs(const std::string& str);
+std::string  utf8_wcstombs(const std::wstring& wstr);
+
 // TODO: Make this independant of g_pClientGame. Just moved it here to get it out of the
 //       horribly big CClientGame file.
 bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
@@ -1774,9 +1777,32 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             CClientPed* pJacked = pVehicle->GetOccupant(ucSeat);
 
                             // If it's the local player or syncing ped getting jacked, reset some stuff
-                            if (pJacked && (pJacked->IsLocalPlayer() || pJacked->IsSyncing()))
-                            {
-                                pJacked->ResetVehicleInOut();
+                            if (pJacked) {
+                                if (pJacked->IsLocalPlayer() || pJacked->IsSyncing()) {
+                                    pJacked->ResetVehicleInOut();
+                                }
+                                else {
+                                    // Desynced? Outside but supposed to be in
+                                    // For local player or synced peds this is taken care of in CClientPed::UpdateVehicleInOut()
+                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle()) {
+                                        // Warp him back in
+                                        pJacked->WarpIntoVehicle(pJacked->GetOccupiedVehicle(), pJacked->GetOccupiedVehicleSeat());
+
+                                        // For bikes and cars where jacked through passenger door, warp the passenger back in if desynced
+                                        if (ucSeat == 0) {
+                                            CClientPed* pPassenger = pJacked->GetOccupiedVehicle()->GetOccupant(1);
+                                            // Is the passenger a remote player or ped and is he physically outside but supposed to be in
+                                            if (pPassenger &&
+                                                !pPassenger->IsLocalPlayer() &&
+                                                !pPassenger->IsSyncing() &&
+                                                pPassenger->GetOccupiedVehicle() &&
+                                                !pPassenger->GetRealOccupiedVehicle())
+                                            {
+                                                pPassenger->WarpIntoVehicle(pPassenger->GetOccupiedVehicle(), pPassenger->GetOccupiedVehicleSeat());
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -2953,6 +2979,9 @@ retry:
 
                         if (bitStream.ReadBit())
                             pObject->SetDoubleSided(true);
+
+                        if (bitStream.Can(eBitStreamVersion::CEntityAddPacket_ObjectBreakable))
+                            pObject->SetBreakable(bitStream.ReadBit());
 
                         if (bitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                             if (bitStream.ReadBit())
@@ -4934,21 +4963,39 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     unsigned short usNoClientCacheScriptCount = 0;
 
     // Resource Name Size
-    unsigned char ucResourceNameSize;
-    bitStream.Read(ucResourceNameSize);
+    unsigned char ucResourceNameSizeTemp;
+    bitStream.Read(ucResourceNameSizeTemp);
 
-    // ucResourceNameSize > 255 ??
-    if (ucResourceNameSize > MAX_RESOURCE_NAME_LENGTH)
+    // ucResourceNameSizeTemp > 255 ??
+    if (ucResourceNameSizeTemp > MAX_RESOURCE_NAME_LENGTH)
     {
         RaiseFatalError(14);
         return;
     }
 
     // Resource Name
-    char* szResourceName = new char[ucResourceNameSize + 1];
-    bitStream.Read(szResourceName, ucResourceNameSize);
-    if (ucResourceNameSize)
-        szResourceName[ucResourceNameSize] = NULL;
+    auto szResourceNameTemp = new char[ucResourceNameSizeTemp + 1];
+    bitStream.Read(szResourceNameTemp, ucResourceNameSizeTemp);
+    if (ucResourceNameSizeTemp)
+        szResourceNameTemp[ucResourceNameSizeTemp] = NULL;
+
+    // Clean resource name (remove Windows unsupported characters from filename)
+    std::string strResourceName = szResourceNameTemp;
+    delete[] szResourceNameTemp;
+    szResourceNameTemp = nullptr;
+    std::wstring         wstrResourceNameTemp = utf8_mbstowcs(strResourceName);
+    constexpr std::array arrRemoveDirChars = {'/', '\\', ':', '*', '?', '"', '<', '>', '|'};
+    for (auto szChar : arrRemoveDirChars)
+        wstrResourceNameTemp.erase(std::remove(wstrResourceNameTemp.begin(), wstrResourceNameTemp.end(), szChar), wstrResourceNameTemp.end());
+    strResourceName = utf8_wcstombs(wstrResourceNameTemp);
+    const char* szResourceName = strResourceName.c_str();
+
+    // Must have at least one character left in the resource name
+    if (strResourceName.length() < 1)
+    {
+        RaiseFatalError(15);
+        return;
+    }
 
     // Resource ID
     unsigned short usResourceID;
@@ -5009,7 +5056,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         // Resource Chunk Size
         unsigned char ucChunkSize;
         // Resource Chunk Data
-        char* szChunkData = NULL;
+        char* szChunkData = nullptr;
         // Resource Chunk Sub Type
         unsigned char ucChunkSubType;
         // Resource Chunk checksum
@@ -5045,18 +5092,33 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                         }
                         szChunkData[ucChunkSize] = NULL;
 
-                        std::string strChunkData = szChunkData;
+                        // Clean resource name (remove Windows unsupported characters from filename)
+                        std::string          strChunkData = szChunkData;
+                        std::wstring         wstrChunkDataTemp = utf8_mbstowcs(strChunkData);
+                        constexpr std::array arrRemoveFileChars = {':', '*', '?', '"', '<', '>', '|'};
+                        for (auto szChar : arrRemoveFileChars)
+                            wstrChunkDataTemp.erase(std::remove(wstrChunkDataTemp.begin(), wstrChunkDataTemp.end(), szChar), wstrChunkDataTemp.end());
+                        strChunkData = utf8_wcstombs(wstrChunkDataTemp);
+                        if (strChunkData.empty())
+                        {
+                            bFatalError = true;
+                            AddReportLog(2081, "Empty");
+                            break;
+                        }
+                        const char* szParsedChunkData = strChunkData.c_str();
+
                         // make the full file path (c:/path/to/mods/deathmatch/resources/resource/)
                         std::string           strMetaPathTemp;
                         std::string           strResPathTemp = pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, strMetaPathTemp);
                         std::filesystem::path fsResPath = std::filesystem::path(strResPathTemp).lexically_normal();
                         std::string           strResPath = fsResPath.string();
                         // make the full file path (c:/path/to/mods/deathmatch/resources/resource/file.lua)
-                        std::string           strResFilePathTemp = strResPath + static_cast<char>(std::filesystem::path::preferred_separator) + strChunkData;
+                        std::string strResFilePathTemp = strResPath + static_cast<char>(std::filesystem::path::preferred_separator);
+                        strResFilePathTemp += strChunkData;
                         std::filesystem::path fsResFilePath = std::filesystem::path(strResFilePathTemp).lexically_normal();
                         std::string           strResFilePath = fsResFilePath.string();
                         // check that full file path contains full resource path
-                        if (strResFilePath.rfind(strResPath.c_str(), 0) != 0)
+                        if (strResFilePath.rfind(strResPath, 0) != 0)
                         {
                             bFatalError = true;
                             AddReportLog(2081, SString("Path %s (expected %s)", strResFilePath.c_str(), strResPath.c_str()));
@@ -5065,33 +5127,33 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                         {
                             bitStream.Read(ucChunkSubType);
                             bitStream.Read(chunkChecksum.ulCRC);
-                            bitStream.Read((char*)chunkChecksum.md5.data, sizeof(chunkChecksum.md5.data));
+                            bitStream.Read(reinterpret_cast<char*>(chunkChecksum.md5.data), sizeof(chunkChecksum.md5.data));
                             bitStream.Read(dChunkDataSize);
 
-                            uint uiDownloadSize = (uint)dChunkDataSize;
+                            uint uiDownloadSize = static_cast<uint>(dChunkDataSize);
                             uiTotalSizeProcessed += uiDownloadSize;
                             if (uiTotalSizeProcessed / 1024 / 1024 > 50)
                                 g_pCore->UpdateDummyProgress(uiTotalSizeProcessed / 1024 / 1024, " MB");
 
                             // Create the resource downloadable
-                            CDownloadableResource* pDownloadableResource = NULL;
+                            CDownloadableResource* pDownloadableResource = nullptr;
                             switch (ucChunkSubType)
                             {
                                 case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
                                 {
                                     bool bDownload = bitStream.ReadBit();
-                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData,
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szParsedChunkData,
                                                                                        uiDownloadSize, chunkChecksum, bDownload);
 
                                     break;
                                 }
                                 case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData,
-                                                                                       uiDownloadSize, chunkChecksum, true);
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT,
+                                                                                       szParsedChunkData, uiDownloadSize, chunkChecksum, true);
 
                                     break;
                                 case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                                    pDownloadableResource = pResource->AddConfigFile(szChunkData, uiDownloadSize, chunkChecksum);
+                                    pDownloadableResource = pResource->AddConfigFile(szParsedChunkData, uiDownloadSize, chunkChecksum);
 
                                     break;
                                 default:
@@ -5102,11 +5164,13 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                             // Does the Client and Server checksum differ?
                             if (pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch())
                             {
+                                const SString strName = pDownloadableResource->GetName();
+
                                 // Delete the file that already exists
-                                FileDelete(pDownloadableResource->GetName());
-                                if (FileExists(pDownloadableResource->GetName()))
+                                FileDelete(strName);
+                                if (FileExists(strName))
                                 {
-                                    SString strMessage("Unable to delete old file %s", *ConformResourcePath(pDownloadableResource->GetName()));
+                                    SString strMessage("Unable to delete old file %s", *ConformResourcePath(strName));
                                     g_pClientGame->TellServerSomethingImportant(1009, strMessage);
                                 }
 
@@ -5114,7 +5178,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                 if (pDownloadableResource->IsAutoDownload())
                                 {
                                     // Make sure the directory exists
-                                    MakeSureDirExists(pDownloadableResource->GetName());
+                                    MakeSureDirExists(strName);
 
                                     // Queue the file to be downloaded
                                     g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pDownloadableResource);
@@ -5131,7 +5195,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
             {
                 // Delete the chunk data
                 delete[] szChunkData;
-                szChunkData = NULL;
+                szChunkData = nullptr;
             }
 
             if (bFatalError)
@@ -5156,14 +5220,12 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         }
     }
 
-    delete[] szResourceName;
-    szResourceName = NULL;
-
     g_pCore->UpdateDummyProgress(0);
     totalSizeProcessedResetTimer.Reset();
 
     if (bFatalError)
     {
+        g_pClientGame->m_pResourceManager->Remove(pResource);
         RaiseFatalError(2081);
     }
 }

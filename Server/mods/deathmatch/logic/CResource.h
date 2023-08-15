@@ -319,6 +319,13 @@ public:
     bool IsUsingDbConnectMysql();
     bool IsFileDbConnectMysqlProtected(const SString& strFilename, bool bReadOnly);
 
+    /**
+     * @brief Searches for a CResourceFile with the given relative path.
+     * @param relativePath Relative resource file path (from meta)
+     * @return A pointer to CResourceFile on success, null otherwise
+     */
+    CResourceFile* GetResourceFile(const SString& relativePath) const;
+
 public:
     static std::list<CResource*> m_StartedResources;
 
@@ -386,7 +393,7 @@ private:
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;            // we store them here temporarily, then read them once all the resources are loaded
     std::list<CResourceFile*>      m_ResourceFiles;
-    std::list<CResource*>          m_Dependents;                   // resources that have "included" or loaded this one
+    std::list<CResource*>          m_Dependents;            // resources that have "included" or loaded this one
     std::list<CExportedFunction>   m_ExportedFunctions;
     std::list<CResource*>          m_TemporaryIncludes;            // started by startResource script command
 
@@ -415,8 +422,8 @@ private:
     bool m_bIsPersistent = false;            // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
     bool m_bDestroyed = false;
 
-    CXMLNode* m_pNodeSettings = nullptr;                // Settings XML node, read from meta.xml and copied into it's own instance
-    CXMLNode* m_pNodeStorage = nullptr;                 // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
+    CXMLNode* m_pNodeSettings = nullptr;            // Settings XML node, read from meta.xml and copied into it's own instance
+    CXMLNode* m_pNodeStorage = nullptr;             // Dummy XML node used for temporary storage of stuff returned by CSettings::Get
 
     CMtaVersion m_strMinClientRequirement;              // Min MTA client version
     CMtaVersion m_strMinServerRequirement;              // Min MTA server version

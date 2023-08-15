@@ -529,6 +529,9 @@ CClientGame::~CClientGame()
     m_bBeingDeleted = false;
 
     CStaticFunctionDefinitions::ResetAllSurfaceInfo();
+
+    // Reset custom streaming memory size [possibly] set by the server
+    g_pCore->SetCustomStreamingMemory(0);
 }
 
 /*
@@ -880,18 +883,21 @@ void CClientGame::DoPulsePostFrame()
                                                DT_NOCLIP | DT_CENTER);
         }
 
-        // Adjust the streaming memory limit.
-        unsigned int uiStreamingMemoryPrev;
-        g_pCore->GetCVars()->Get("streaming_memory", uiStreamingMemoryPrev);
-        uint uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemoryPrev, g_pCore->GetMaxStreamingMemory());
-        if (uiStreamingMemory != uiStreamingMemoryPrev)
-            g_pCore->GetCVars()->Set("streaming_memory", uiStreamingMemory);
+        // Adjust the streaming memory size cvar [if needed]
+        if (!g_pCore->IsUsingCustomStreamingMemorySize()) {
+            unsigned int uiStreamingMemoryPrev;
+            g_pCore->GetCVars()->Get("streaming_memory", uiStreamingMemoryPrev);
+            uint uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemoryPrev, g_pCore->GetMaxStreamingMemory());
+            if (uiStreamingMemory != uiStreamingMemoryPrev)
+                g_pCore->GetCVars()->Set("streaming_memory", uiStreamingMemory);
+        }
 
-        int iStreamingMemoryBytes = static_cast<int>(uiStreamingMemory) * 1024 * 1024;
-        if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != iStreamingMemoryBytes)
-            g_pMultiplayer->GetLimits()->SetStreamingMemory(iStreamingMemoryBytes);
+        const auto streamingMemorySizeBytes = g_pCore->GetStreamingMemory();
+        if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != streamingMemorySizeBytes) {
+            g_pMultiplayer->GetLimits()->SetStreamingMemory(streamingMemorySizeBytes);
+        }
 
-            // If we're in debug mode and are supposed to show task data, do it
+        // If we're in debug mode and are supposed to show task data, do it
         #ifdef MTA_DEBUG
         if (m_pShowPlayerTasks)
         {
@@ -2056,14 +2062,14 @@ bool CClientGame::KeyStrokeHandler(const SString& strKey, bool bState, bool bIsC
             if (g_pCore->IsMenuVisible() || (g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey) ||
                 (pFocusedBrowser && !pFocusedBrowser->IsLocal() && !isMouseKey))
 
-                bIgnore = true;                                // Ignore this keydown and the matching keyup
+                bIgnore = true;            // Ignore this keydown and the matching keyup
             else
                 MapInsert(m_AllowKeyUpMap, strKey);            // Use this keydown and the matching keyup
         }
         else
         {
             if (!MapContains(m_AllowKeyUpMap, strKey))
-                bIgnore = true;                                // Ignore this keyup
+                bIgnore = true;            // Ignore this keyup
             else
                 MapRemove(m_AllowKeyUpMap, strKey);            // Use this keyup
         }
@@ -3353,23 +3359,21 @@ void CClientGame::Event_OnIngameAndConnected()
 void CClientGame::SetupGlobalLuaEvents()
 {
     // Setup onClientPaste event
-    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste,
-                       [this](const SString& clipboardText)
-                       {
-                           // Don't trigger if main menu or console is open or the cursor is not visible
-                           if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
-                               return;
+    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste, [this](const SString& clipboardText) {
+        // Don't trigger if main menu or console is open or the cursor is not visible
+        if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
+            return;
 
-                           // Also don't trigger if remote web browser view is focused
-                           CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
-                           if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
-                               return;
+        // Also don't trigger if remote web browser view is focused
+        CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
+        if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
+            return;
 
-                           // Call event now
-                           CLuaArguments args;
-                           args.PushString(clipboardText);
-                           m_pRootEntity->CallEvent("onClientPaste", args, false);
-                       });
+        // Call event now
+        CLuaArguments args;
+        args.PushString(clipboardText);
+        m_pRootEntity->CallEvent("onClientPaste", args, false);
+    });
 }
 
 bool CClientGame::StaticBreakTowLinkHandler(CVehicle* pTowingVehicle)
@@ -5341,6 +5345,10 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->ResetWater();
     g_pMultiplayer->ResetColorFilter();
 
+    // Grain effect
+    g_pMultiplayer->SetGrainMultiplier(eGrainMultiplierType::ALL, 1.0f);
+    g_pMultiplayer->SetGrainLevel(0);
+
     // Water
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
 
@@ -5426,7 +5434,7 @@ void CClientGame::ResetMapInfo()
     if (pPlayerInfo)
         pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
-    RestreamWorld();
+    RestreamWorld(true);
 }
 
 void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,
@@ -6545,10 +6553,10 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
-            m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+        m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
-void CClientGame::RestreamWorld()
+void CClientGame::RestreamWorld(bool removeBigBuildings)
 {
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
@@ -6560,6 +6568,9 @@ void CClientGame::RestreamWorld()
     m_pManager->GetVehicleManager()->RestreamAllVehicles();
     m_pManager->GetPedManager()->RestreamAllPeds();
     m_pManager->GetPickupManager()->RestreamAllPickups();
+
+    if (removeBigBuildings)
+        g_pGame->GetStreaming()->RemoveBigBuildings();
 
     g_pGame->GetStreaming()->ReinitStreaming();
 }

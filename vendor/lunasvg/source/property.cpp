@@ -1,5 +1,5 @@
 #include "property.h"
-#include "styledelement.h"
+#include "element.h"
 #include "lunasvg.h"
 
 #include <algorithm>
@@ -238,8 +238,7 @@ Rect Transform::map(const Rect& rect) const
     auto r = p[0].x;
     auto b = p[0].y;
 
-    for(int i = 1;i < 4;i++)
-    {
+    for(int i = 1; i < 4; i++) {
         if(p[i].x < l) l = p[i].x;
         if(p[i].x > r) r = p[i].x;
         if(p[i].y < t) t = p[i].y;
@@ -356,8 +355,7 @@ void Path::arcTo(double cx, double cy, double rx, double ry, double xAxisRotatio
     auto Px = dx1 * dx1;
     auto Py = dy1 * dy1;
     auto check = Px / Pr1 + Py / Pr2;
-    if(check > 1)
-    {
+    if(check > 1) {
         rx = rx * std::sqrt(check);
         ry = ry * std::sqrt(check);
     }
@@ -388,8 +386,7 @@ void Path::arcTo(double cx, double cy, double rx, double ry, double xAxisRotatio
         th_arc -= 2.0 * pi;
 
     auto n_segs = static_cast<int>(std::ceil(std::fabs(th_arc / (pi * 0.5 + 0.001))));
-    for(int i = 0;i < n_segs;i++)
-    {
+    for(int i = 0; i < n_segs; i++) {
         auto th2 = th0 + i * th_arc / n_segs;
         auto th3 = th0 + (i + 1) * th_arc / n_segs;
 
@@ -445,17 +442,14 @@ void Path::rect(double x, double y, double w, double h, double rx, double ry)
     auto right = x + w;
     auto bottom = y + h;
 
-    if(rx == 0.0 && ry == 0.0)
-    {
+    if(rx == 0.0 && ry == 0.0) {
         moveTo(x, y);
         lineTo(right, y);
         lineTo(right, bottom);
         lineTo(x, bottom);
         lineTo(x, y);
         close();
-    }
-    else
-    {
+    } else {
         double cpx = rx * kappa;
         double cpy = ry * kappa;
         moveTo(x, y+ry);
@@ -481,8 +475,7 @@ Rect Path::box() const
     auto r = m_points[0].x;
     auto b = m_points[0].y;
 
-    for(std::size_t i = 1;i < m_points.size();i++)
-    {
+    for(std::size_t i = 1; i < m_points.size(); i++) {
         if(m_points[i].x < l) l = m_points[i].x;
         if(m_points[i].x > r) r = m_points[i].x;
         if(m_points[i].y < t) t = m_points[i].y;
@@ -547,7 +540,7 @@ void PathIterator::next()
 const Length Length::Unknown{0, LengthUnits::Unknown};
 const Length Length::Zero{0, LengthUnits::Number};
 const Length Length::One{1, LengthUnits::Number};
-const Length Length::ThreePercent{3, LengthUnits::Percent};
+const Length Length::Three{3, LengthUnits::Number};
 const Length Length::HundredPercent{100, LengthUnits::Percent};
 const Length Length::FiftyPercent{50, LengthUnits::Percent};
 const Length Length::OneTwentyPercent{120, LengthUnits::Percent};
@@ -594,8 +587,7 @@ static const double sqrt2 = 1.41421356237309504880;
 
 double Length::value(const Element* element, LengthMode mode) const
 {
-    if(m_units == LengthUnits::Percent)
-    {
+    if(m_units == LengthUnits::Percent) {
         auto viewport = element->currentViewport();
         auto w = viewport.w;
         auto h = viewport.h;
@@ -635,8 +627,7 @@ Transform PreserveAspectRatio::getMatrix(double width, double height, const Rect
 
     auto xscale = width / viewBox.w;
     auto yscale = height / viewBox.h;
-    if(m_align == Align::None)
-    {
+    if(m_align == Align::None) {
         auto xoffset = -viewBox.x * xscale;
         auto yoffset = -viewBox.y * yscale;
         return Transform{xscale, 0, 0, yscale, xoffset, yoffset};

@@ -25,4 +25,5 @@ public:
     DECLARE_ELEMENT_RPC(StopObject);
     DECLARE_ELEMENT_RPC(SetObjectScale);
     DECLARE_ELEMENT_RPC(SetObjectVisibleInAllDimensions);
+    DECLARE_ELEMENT_RPC(SetObjectBreakable);
 };

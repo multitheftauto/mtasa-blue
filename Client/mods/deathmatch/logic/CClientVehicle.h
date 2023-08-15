@@ -153,8 +153,8 @@ class CClientVehicle : public CClientStreamElement
     friend class CClientVehicleManager;
     friend class CClientGame;            // TEMP HACK
 
-protected:                               // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
-                                         // cleaned up.
+protected:            // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
+                      // cleaned up.
     CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2);
 
 public:
@@ -187,7 +187,6 @@ public:
     virtual CSphere GetWorldBoundingSphere();
 
     void GetMoveSpeed(CVector& vecMoveSpeed) const;
-    void GetMoveSpeedMeters(CVector& vecMoveSpeed) const;
     void SetMoveSpeed(const CVector& vecMoveSpeed);
     void GetTurnSpeed(CVector& vecTurnSpeed) const;
     void SetTurnSpeed(const CVector& vecTurnSpeed);
@@ -574,10 +573,6 @@ protected:
     CClientVehiclePtr            m_pPreviousLink;
     CClientVehiclePtr            m_pNextLink;
     CMatrix                      m_Matrix;
-    CMatrix                      m_MatrixLast;
-    CMatrix                      m_MatrixPure;
-    CVector                      m_vecMoveSpeedInterpolate;
-    CVector                      m_vecMoveSpeedMeters;
     CVector                      m_vecMoveSpeed;
     CVector                      m_vecTurnSpeed;
     float                        m_fHealth;

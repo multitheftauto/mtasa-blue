@@ -21,8 +21,8 @@
 class CPadSAInterface
 {
 public:
-    CControllerState NewState;                                             // 0
-    CControllerState OldState;                                             // 48
+    CControllerState NewState;            // 0
+    CControllerState OldState;            // 48
 
     signed short SteeringLeftRightBuffer[STEERINGBUFFERLENGTH];            // 96
     signed long  DrunkDrivingBufferUsed;                                   // 116

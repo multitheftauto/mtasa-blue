@@ -2152,8 +2152,7 @@ bool IsErrorCodeLoggable(const std::error_code& ec)
 
 bool IsNativeArm64Host()
 {
-    static bool isArm64 = ([]
-    {
+    static bool isArm64 = ([] {
         HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll");
 
         if (kernel32)

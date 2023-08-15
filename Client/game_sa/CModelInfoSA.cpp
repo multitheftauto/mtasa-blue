@@ -572,7 +572,6 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
         default:
             break;
     }
-
 }
 
 void CModelInfoSA::SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState)
@@ -652,7 +651,7 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
         case eModelIdeFlag::IS_ROAD:
             return m_pInterface->bIsRoad;
         case eModelIdeFlag::DRAW_LAST:
-           return m_pInterface->bAlphaTransparency;
+            return m_pInterface->bAlphaTransparency;
         case eModelIdeFlag::ADDITIVE:
             return m_pInterface->bAdditiveRender;
         case eModelIdeFlag::IGNORE_LIGHTING:
@@ -707,7 +706,7 @@ void CModelInfoSA::StaticResetFlags()
             // Don't change bIsColLoaded flag
             ushort usFlags = iter->second;
             usFlags &= 0xFF7F;
-            usFlags |= pInterface->usFlags & 0x80; 
+            usFlags |= pInterface->usFlags & 0x80;
             pInterface->usFlags = usFlags;
         }
     }
@@ -1263,7 +1262,7 @@ CVector CModelInfoSA::GetVehicleDummyDefaultPosition(eVehicleDummies eDummy)
 
     ModelAddRef(BLOCKING, "GetVehicleDummyDefaultPosition");
 
-    auto modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
+    auto    modelInfo = reinterpret_cast<CVehicleModelInfoSAInterface*>(GetInterface());
     CVector vec = modelInfo->pVisualInfo->vecDummies[eDummy];
 
     RemoveRef();
@@ -1512,6 +1511,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
 
         // SetColModel sets bDoWeOwnTheColModel if the last parameter is truthy
         m_pInterface->bDoWeOwnTheColModel = false;
+        m_pInterface->bIsColLoaded = false;
 
         // Fix random foliage on custom collisions by calling CPlantMgr::SetPlantFriendlyFlagInAtomicMI
         (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(m_pInterface);
@@ -1710,6 +1710,22 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
+void CModelInfoSA::MakeClumpModel(ushort usBaseID)
+{
+    CClumpModelInfoSAInterface* pNewInterface = new CClumpModelInfoSAInterface();
+    CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
+    MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
+    pNewInterface->usNumberOfRefs = 0;
+    pNewInterface->pRwObject = nullptr;
+    pNewInterface->usUnknown = 65535;
+    pNewInterface->usDynamicIndex = 65535;
+
+    ppModelInfo[m_dwModelID] = pNewInterface;
+
+    m_dwParentID = usBaseID;
+    CopyStreamingInfoFromModel(usBaseID);
+}
+
 void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 {
     CVehicleModelInfoSAInterface* m_pInterface = new CVehicleModelInfoSAInterface();
@@ -1742,6 +1758,9 @@ void CModelInfoSA::DeallocateModel(void)
             break;
         case eModelInfoType::ATOMIC:
             delete reinterpret_cast<CBaseModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            break;
+        case eModelInfoType::CLUMP:
+            delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::TIME:
             delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);

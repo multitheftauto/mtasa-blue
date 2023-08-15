@@ -563,6 +563,9 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
     if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
         return IsCoronaZTestEnabled();
 
+    if (!strcmp(szCheatName, PROP_WATER_CREATURES))
+        return IsWaterCreaturesEnabled();
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -607,6 +610,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
         return true;
     }
 
+    if (!strcmp(szCheatName, PROP_WATER_CREATURES))
+    {
+        SetWaterCreaturesEnabled(bEnable);
+        return true;
+    }
+
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -625,6 +634,7 @@ void CGameSA::ResetCheats()
     SetUnderWorldWarpEnabled(true);
     SetCoronaZTestEnabled(true);
     CVehicleSA::SetVehiclesSunGlareEnabled(false);
+    SetWaterCreaturesEnabled(true);
 
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
@@ -730,6 +740,26 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
     m_isCoronaZTestEnabled = isEnabled;
 }
 
+void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
+{
+    if (isEnabled == m_areWaterCreaturesEnabled)
+        return;
+
+    const auto manager = reinterpret_cast<class WaterCreatureManager_c*>(0xC1DF30);
+    if (isEnabled)
+    {
+        unsigned char(__thiscall * Init)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Init)>(0x6E3F90);
+        Init(manager);
+    }
+    else
+    {
+        void(__thiscall * Exit)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Exit)>(0x6E3FD0);
+        Exit(manager);
+    }
+
+    m_areWaterCreaturesEnabled = isEnabled;
+}
+
 bool CGameSA::PerformChecks()
 {
     std::map<std::string, SCheatSA*>::iterator it;
@@ -833,7 +863,6 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[310].MakePedModel("BBTHIN");
     ModelInfo[311].MakePedModel("SMOKEV");
     ModelInfo[312].MakePedModel("PSYCHO");
-
 
     // ModelInfo[190].MakePedModel ( "BARBARA" );
     // ModelInfo[191].MakePedModel ( "HELENA" );

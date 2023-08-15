@@ -114,8 +114,8 @@ struct RpHAnimNodeInfo
 
 struct RpHAnimHierarchy
 {
-    int flags;                          /**< Flags for the hierarchy  */
-    int numNodes;                       /**< Number of nodes in the hierarchy  */
+    int flags;    /**< Flags for the hierarchy  */
+    int numNodes; /**< Number of nodes in the hierarchy  */
 
     RwMatrix* pMatrixArray;             /**< Pointer to node matrices*/
     void*     pMatrixArrayUnaligned;    /**< Pointer to memory used for node matrices
@@ -126,7 +126,7 @@ struct RpHAnimHierarchy
     RpHAnimHierarchy* parentHierarchy;  /**< Internal use */
     int               rootParentOffset; /**< Internal use */
 
-    RtAnimInterpolator* currentAnim;    /**< Internal use */
+    RtAnimInterpolator* currentAnim; /**< Internal use */
 };
 
 // RenderWare enumerations
