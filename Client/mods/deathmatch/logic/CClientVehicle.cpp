@@ -1475,7 +1475,7 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
 //
 // Returns component name for eWheelPosition enum
 //
-const SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) const noexcept
+SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) const noexcept
 {
     switch (ucWheel)
     {
@@ -1487,6 +1487,8 @@ const SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) co
             return "wheel_lb_dummy";
         case REAR_RIGHT_WHEEL:
             return "wheel_rb_dummy";
+        default:
+            return "";
     }
 }
 

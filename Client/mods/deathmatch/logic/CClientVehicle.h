@@ -282,7 +282,7 @@ public:
     int           GetWheelFrictionState(unsigned char ucWheel);
     unsigned char GetPanelStatus(unsigned char ucPanel);
     unsigned char GetLightStatus(unsigned char ucLight);
-    const SString GetComponentNameForWheel(unsigned char ucWheel) const noexcept;
+    SString GetComponentNameForWheel(unsigned char ucWheel) const noexcept;
 
     bool AreLightsOn();
 
