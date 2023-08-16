@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-13 11:56+0000\n"
-"PO-Revision-Date: 2023-08-16 11:00\n"
+"PO-Revision-Date: 2023-08-16 12:02\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -2728,115 +2728,122 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:487
 msgid "Disconnected: Invalid nickname"
-msgstr ""
+msgstr "연결 끊김: 잘못된 닉네임"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:491
 msgid "Disconnect from server"
-msgstr ""
+msgstr "서버와의 연결이 끊겼습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:495
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "연결 끊김: 이용이 금지된 시리얼 넘버입니다.\n"
+"이유: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:501
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "연결 끊김: 당신은 이용이 금지되었습니다.\n"
+"이유: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr ""
+msgstr "연결 끊김: 이용이 금지된 계정입니다.\n"
+"이유: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:512
 msgid "Disconnected: Version mismatch"
-msgstr ""
+msgstr "연결 끊김: 버전이 다름."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:516
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr ""
+msgstr "연결 끊김: 대량 접속. 잠시 기다렸다가 다시 연결하십시오."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr ""
+msgstr "연결 끊김: 다른 지점의 서버입니다.\n"
+"정보: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr ""
+msgstr "연결 끊김: 잘못된 버전.\n"
+"정보: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr ""
+msgstr "연결 끊김: 서버에서 최신 빌드로 구동되고 있습니다.\n"
+"정보: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr ""
+msgstr "연결 끊김: 서버에서 오래된 빌드로 구동되고 있습니다.\n"
+"정보: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:540
 msgid "Disconnected: Nick already in use"
-msgstr ""
+msgstr "연결 끊김: 이미 사용 중인 닉네임."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
 msgid "Disconnected: Player element could not be created."
-msgstr ""
+msgstr "연결 끊김: 플레이어 요소를 만들 수 없습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
-msgstr ""
+msgstr "연결 끊김: 서버가 연결을 거부했습니다. %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
 msgid "Disconnected: Serial verification failed"
-msgstr ""
+msgstr "연결 끊김: 시리얼 넘버 인증 실패."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:557
 #, c-format
 msgid "Disconnected: Connection desync %s"
-msgstr ""
+msgstr "연결 끊김: 연결 비동기화 %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
 #, c-format
 msgid "Disconnected: You were kicked by %s"
-msgstr ""
+msgstr "연결 끊김: %s에 의해 추방되었습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
 #, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr ""
+msgstr "연결 끊김: 당신은 %s 에 의해 이용이 금지되었습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
 msgid "Disconnected: Server shutdown or restarting"
-msgstr ""
+msgstr "연결 끊김: 서버 종료 또는 다시 시작"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "You were kicked from the game"
-msgstr ""
+msgstr "당신은 게임에서 추방되었습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr ""
+msgstr "이 서버에는 수정되지 않은 gta_sa.exe가 필요합니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:615
 msgid "Please replace gta_sa.exe"
-msgstr ""
+msgstr "Gta_sa.exe를 교체하십시오."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr ""
+msgstr "이 서버는 사용자 지정 D3D9.DLL을 허용하지 않습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
