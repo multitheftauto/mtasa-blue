@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-13 11:56+0000\n"
-"PO-Revision-Date: 2023-08-13 12:01\n"
+"PO-Revision-Date: 2023-08-16 08:01\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -19,16 +19,16 @@ msgstr ""
 
 #: Client/game_sa/CSettingsSA.cpp:804
 msgid "Can't find valid screen resolution."
-msgstr ""
+msgstr "올바른 화면 해상도를 찾을 수 없습니다."
 
 #. Confirm that res should be used
 #: Client/game_sa/CSettingsSA.cpp:880
 msgid "Are you sure you want to use this screen resolution?"
-msgstr ""
+msgstr "이 화면 해상도를 사용하시겠습니까?"
 
 #: Client/game_sa/CSettingsSA.cpp:882 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
-msgstr ""
+msgstr "MTA: San Andreas"
 
 #. Create buttons
 #. OK button
@@ -40,7 +40,7 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
 #: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4694
 msgid "OK"
-msgstr ""
+msgstr "확인"
 
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/loader/Dialogs.cpp:136
@@ -49,7 +49,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:4693
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -65,19 +65,19 @@ msgstr ""
 #: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
 #: Client/core/CSettings.cpp:4551 Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Yes"
-msgstr ""
+msgstr "예"
 
 #: Client/loader/Utils.cpp:534 Client/loader/Dialogs.cpp:890
 msgid "Searching for Grand Theft Auto San Andreas"
-msgstr ""
+msgstr "Grand Theft Auto San Andreas를 찾는 중"
 
 #: Client/loader/Utils.cpp:536 Client/loader/Dialogs.cpp:893
 msgid "Please start Grand Theft Auto San Andreas"
-msgstr ""
+msgstr "Grand Theft Auto San Andreas를 시작하십시오"
 
 #: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr ""
+msgstr "Grand Theft Auto: San Andreas가 설치된 폴더를 지정하십시오"
 
 #: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
 #, c-format
