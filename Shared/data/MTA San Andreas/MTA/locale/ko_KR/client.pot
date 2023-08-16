@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-13 11:56+0000\n"
-"PO-Revision-Date: 2023-08-16 13:01\n"
+"PO-Revision-Date: 2023-08-16 15:40\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -2887,77 +2887,77 @@ msgstr "다른 프로그램이 MTA:SA를 수정하지 않는지 확인합니다.
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Time Remaining: "
-msgstr ""
+msgstr "남은 시간: "
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:641
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] ""
+msgstr[0] "%d일"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:643
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] ""
+msgstr[0] "%d 시간"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:645
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] ""
+msgstr[0] "%d 분"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] ""
+msgstr[0] "%d 초"
 
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
 msgid "Disconnected"
-msgstr ""
+msgstr "연결 끊김"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
-msgstr ""
+msgstr "호스트 게임"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:53
 msgid "Resources"
-msgstr ""
+msgstr "리소스"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
 msgid "Server name:"
-msgstr ""
+msgstr "서버 이름:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
 msgid "Password:"
-msgstr ""
+msgstr "비밀번호:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:73
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:75
 msgid "Max players:"
-msgstr ""
+msgstr "최대 인원:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr ""
+msgstr "브로드캐스트:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
-msgstr ""
+msgstr "랜"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
-msgstr ""
+msgstr "선택됨"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:116
 msgid "All"
-msgstr ""
+msgstr "모두"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
@@ -2965,11 +2965,11 @@ msgstr "시작"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:607
 msgid "Entering the game ..."
-msgstr ""
+msgstr "게임에 접속하는 중..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:665
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr ""
+msgstr "연결되지 않았습니다. 빠른 연결 또는 '연결' 명령을 사용하여 서버에 연결하십시오."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:711
 msgid "The server is not installed"
