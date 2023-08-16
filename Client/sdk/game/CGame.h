@@ -210,6 +210,9 @@ public:
     virtual bool IsWaterCreaturesEnabled() const = 0;
     virtual void SetWaterCreaturesEnabled(bool isEnabled) = 0;
 
+    virtual bool IsBurnFlippedCarsEnabled() const = 0;
+    virtual void SetBurnFlippedCarsEnabled(bool isEnabled) = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 

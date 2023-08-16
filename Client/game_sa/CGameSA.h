@@ -208,6 +208,9 @@ public:
     bool IsWaterCreaturesEnabled() const noexcept { return m_areWaterCreaturesEnabled; }
     void SetWaterCreaturesEnabled(bool isEnabled);
 
+    bool IsBurnFlippedCarsEnabled() const noexcept { return m_isBurnFlippedCarsEnabled; }
+    void SetBurnFlippedCarsEnabled(bool isEnabled);
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -319,6 +322,7 @@ private:
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
     bool         m_areWaterCreaturesEnabled{true};
+    bool         m_isBurnFlippedCarsEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;

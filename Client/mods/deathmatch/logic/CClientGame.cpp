@@ -5928,6 +5928,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::WATERCREATURES:
             g_pGame->SetWaterCreaturesEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::BURNFLIPPEDCARS:
+            g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -5955,6 +5958,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsCoronaZTestEnabled();
         case WorldSpecialProperty::WATERCREATURES:
             return g_pGame->IsWaterCreaturesEnabled();
+        case WorldSpecialProperty::BURNFLIPPEDCARS:
+            return g_pGame->IsBurnFlippedCarsEnabled();
     }
     return false;
 }

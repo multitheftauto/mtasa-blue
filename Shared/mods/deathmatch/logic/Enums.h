@@ -86,6 +86,7 @@ enum class WorldSpecialProperty
     VEHICLESUNGLARE,
     CORONAZTEST,
     WATERCREATURES,
+    BURNFLIPPEDCARS,
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 

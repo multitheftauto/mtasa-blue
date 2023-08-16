@@ -242,6 +242,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::VEHICLESUNGLARE] = false;
     m_WorldSpecialProps[WorldSpecialProperty::CORONAZTEST] = true;
     m_WorldSpecialProps[WorldSpecialProperty::WATERCREATURES] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::BURNFLIPPEDCARS] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;

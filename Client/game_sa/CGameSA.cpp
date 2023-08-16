@@ -692,6 +692,38 @@ void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
     m_areWaterCreaturesEnabled = isEnabled;
 }
 
+void CGameSA::SetBurnFlippedCarsEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isBurnFlippedCarsEnabled)
+        return;
+
+    // CAutomobile::VehicleDamage
+    if (isEnabled)
+    {
+        BYTE originalCodes[6] = {0xD9, 0x9E, 0xC0, 0x04, 0x00, 0x00};
+        MemCpy((void*)0x6A776B, &originalCodes, 6);
+    }
+    else
+    {
+        BYTE newCodes[6] = {0xD8, 0xDD, 0x90, 0x90, 0x90, 0x90};
+        MemCpy((void*)0x6A776B, &newCodes, 6);
+    }
+
+    // CPlayerInfo::Process
+    if (isEnabled)
+    {
+        BYTE originalCodes[6] = {0xD9, 0x99, 0xC0, 0x04, 0x00, 0x00};
+        MemCpy((void*)0x570E7F, &originalCodes, 6);
+    }
+    else
+    {
+        BYTE newCodes[6] = {0xD8, 0xDD, 0x90, 0x90, 0x90, 0x90};
+        MemCpy((void*)0x570E7F, &newCodes, 6);
+    }
+
+    m_isBurnFlippedCarsEnabled = isEnabled;
+}
+
 bool CGameSA::PerformChecks()
 {
     std::map<std::string, SCheatSA*>::iterator it;

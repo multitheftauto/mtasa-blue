@@ -2367,6 +2367,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLESUNGLARE, wsProps.data.vehiclesunglare);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::CORONAZTEST, wsProps.data.coronaztest);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::WATERCREATURES, wsProps.data.watercreatures);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::BURNFLIPPEDCARS, wsProps.data.burnflippedcars);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
