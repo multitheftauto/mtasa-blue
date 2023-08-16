@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-13 11:56+0000\n"
-"PO-Revision-Date: 2023-08-16 12:02\n"
+"PO-Revision-Date: 2023-08-16 13:01\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -2847,43 +2847,43 @@ msgstr "이 서버는 사용자 지정 D3D9.DLL을 허용하지 않습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr ""
+msgstr "GTA 설치 디렉토리에서 D3D9.DLL을 제거하고 MTA를 다시 시작하십시오."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
 msgid "This server does not allow virtual machines"
-msgstr ""
+msgstr "이 서버는 가상 시스템을 허용하지 않습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
 msgid "This server requires driver signing to be enabled"
-msgstr ""
+msgstr "이 서버에서 드라이버 서명을 사용하도록 설정해야 합니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
 msgid "Please restart your PC"
-msgstr ""
+msgstr "PC를 재시작 하십시오."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
 msgid "This server has detected missing anti-cheat components"
-msgstr ""
+msgstr "이 서버가 부정행위 방지 구성요소 누락을 감지했습니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
 msgid "Try restarting MTA"
-msgstr ""
+msgstr "MTA를 다시 시작하십시오."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr ""
+msgstr "이 서버에는 수정되지 않은 gta3.img 및 gta_int.img가 필요합니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
 msgid "Please replace gta3.img or gta_int.img"
-msgstr ""
+msgstr "Gta3.img 또는 gta_int.img를 교체하십시오."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:616
 msgid "This server does not allow Wine"
-msgstr ""
+msgstr "이 서버는 Wine을 허용하지 않습니다"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:617
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr ""
+msgstr "다른 프로그램이 MTA:SA를 수정하지 않는지 확인합니다."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Time Remaining: "
