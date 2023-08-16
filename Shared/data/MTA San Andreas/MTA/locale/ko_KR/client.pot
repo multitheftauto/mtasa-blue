@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-13 11:56+0000\n"
-"PO-Revision-Date: 2023-08-16 15:40\n"
+"PO-Revision-Date: 2023-08-16 16:40\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -1366,84 +1366,84 @@ msgstr "끄기"
 
 #: Client/core/CSettings.cpp:768 Client/core/CSettings.cpp:1511
 msgid "1x"
-msgstr ""
+msgstr "1x"
 
 #: Client/core/CSettings.cpp:769 Client/core/CSettings.cpp:1513
 msgid "2x"
-msgstr ""
+msgstr "2x"
 
 #: Client/core/CSettings.cpp:770 Client/core/CSettings.cpp:1515
 msgid "3x"
-msgstr ""
+msgstr "3x"
 
 #: Client/core/CSettings.cpp:783 Client/core/CSettings.cpp:1002
 #: Client/core/CSettings.cpp:1521 Client/core/CSettings.cpp:3125
 msgid "Auto"
-msgstr ""
+msgstr "자동"
 
 #: Client/core/CSettings.cpp:784 Client/core/CSettings.cpp:1523
 msgid "4:3"
-msgstr ""
+msgstr "4:3"
 
 #: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1525
 msgid "16:10"
-msgstr ""
+msgstr "16:10"
 
 #: Client/core/CSettings.cpp:786 Client/core/CSettings.cpp:1527
 msgid "16:9"
-msgstr ""
+msgstr "16:9"
 
 #: Client/core/CSettings.cpp:789
 msgid "HUD Match Aspect Ratio"
-msgstr ""
+msgstr "HUD 일치 종횡비"
 
 #: Client/core/CSettings.cpp:795
 msgid "Volumetric Shadows"
-msgstr ""
+msgstr "체적 그림자"
 
 #: Client/core/CSettings.cpp:799
 msgid "Grass effect"
-msgstr ""
+msgstr "잔디 효과"
 
 #: Client/core/CSettings.cpp:803
 msgid "Heat haze"
-msgstr ""
+msgstr "열 헤이즈"
 
 #: Client/core/CSettings.cpp:807
 msgid "Tyre Smoke etc"
-msgstr ""
+msgstr "타이어 연기 등"
 
 #: Client/core/CSettings.cpp:811
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "다이나믹 패드 그림자"
 
 #: Client/core/CSettings.cpp:815
 msgid "Motion blur"
-msgstr ""
+msgstr "모션블러"
 
 #: Client/core/CSettings.cpp:820
 msgid "Full Screen Minimize"
-msgstr ""
+msgstr "전체화면 최소화"
 
 #: Client/core/CSettings.cpp:832
 msgid "Enable Device Selection Dialog"
-msgstr ""
+msgstr "장치 선택 다이얼로그 활성화"
 
 #: Client/core/CSettings.cpp:844
 msgid "Show unsafe resolutions"
-msgstr ""
+msgstr "불안전한 해상도 표시"
 
 #: Client/core/CSettings.cpp:856
 msgid "Render vehicles always in high detail"
-msgstr ""
+msgstr "차량을 항상 최고 디테일로 렌더링"
 
 #: Client/core/CSettings.cpp:860
 msgid "Render peds always in high detail"
-msgstr ""
+msgstr "패드를 항상 최고 디테일 렌더링"
 
 #: Client/core/CSettings.cpp:864
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Corona 비 반사"
 
 #: Client/core/CSettings.cpp:893
 msgid "Enable remote websites"
@@ -1451,7 +1451,7 @@ msgstr "원격 웹 사이트 사용"
 
 #: Client/core/CSettings.cpp:898
 msgid "Enable Javascript on remote websites"
-msgstr ""
+msgstr "원격 웹 사이트에서 자바스크립트 사용"
 
 #: Client/core/CSettings.cpp:903
 msgid "Custom blacklist"
@@ -1692,121 +1692,121 @@ msgstr "채팅 배경"
 
 #: Client/core/CSettings.cpp:2077
 msgid "Chat Text"
-msgstr ""
+msgstr "채팅 텍스트"
 
 #: Client/core/CSettings.cpp:2077
 msgid "Input Background"
-msgstr ""
+msgstr "채팅 배경"
 
 #: Client/core/CSettings.cpp:2077
 msgid "Input Text"
-msgstr ""
+msgstr "텍스트 입력"
 
 #: Client/core/CSettings.cpp:2100
 msgid "Lines:"
-msgstr ""
+msgstr "줄:"
 
 #: Client/core/CSettings.cpp:2100
 msgid "Scale:"
-msgstr ""
+msgstr "스케일:"
 
 #: Client/core/CSettings.cpp:2100
 msgid "Width:"
-msgstr ""
+msgstr "너비:"
 
 #: Client/core/CSettings.cpp:2103
 msgid "Size"
-msgstr ""
+msgstr "크기:"
 
 #: Client/core/CSettings.cpp:2152
 msgid "after"
-msgstr ""
+msgstr "후"
 
 #: Client/core/CSettings.cpp:2152
 msgid "for"
-msgstr ""
+msgstr "동안"
 
 #: Client/core/CSettings.cpp:2152
 msgid "sec"
-msgstr ""
+msgstr "초"
 
 #: Client/core/CSettings.cpp:2155
 msgid "Fading"
-msgstr ""
+msgstr "페이딩"
 
 #: Client/core/CSettings.cpp:2161
 msgid "Fade out old lines"
-msgstr ""
+msgstr "오래된 줄 사라짐"
 
 #: Client/core/CSettings.cpp:2201
 msgid "Horizontal:"
-msgstr ""
+msgstr "수평:"
 
 #: Client/core/CSettings.cpp:2201
 msgid "Vertical:"
-msgstr ""
+msgstr "수직:"
 
 #: Client/core/CSettings.cpp:2201
 msgid "Text-Align:"
-msgstr ""
+msgstr "텍스트 정렬:"
 
 #: Client/core/CSettings.cpp:2201
 msgid "X-Offset:"
-msgstr ""
+msgstr "X-오프셋:"
 
 #: Client/core/CSettings.cpp:2202
 msgid "Y-Offset:"
-msgstr ""
+msgstr "Y-오프셋:"
 
 #: Client/core/CSettings.cpp:2208
 msgid "Position"
-msgstr ""
+msgstr "위치"
 
 #: Client/core/CSettings.cpp:2222 Client/core/CSettings.cpp:2250
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
-msgstr ""
+msgstr "왼쪽"
 
 #: Client/core/CSettings.cpp:2223 Client/core/CSettings.cpp:2237
 msgid "Center"
-msgstr ""
+msgstr "중앙"
 
 #: Client/core/CSettings.cpp:2224 Client/core/CSettings.cpp:2251
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
-msgstr ""
+msgstr "오른쪽"
 
 #: Client/core/CSettings.cpp:2236
 msgid "Top"
-msgstr ""
+msgstr "상단"
 
 #: Client/core/CSettings.cpp:2238
 msgid "Bottom"
-msgstr ""
+msgstr "하단"
 
 #: Client/core/CSettings.cpp:2286
 msgid "Font"
-msgstr ""
+msgstr "폰트"
 
 #: Client/core/CSettings.cpp:2323
 msgid "Hide background when not typing"
-msgstr ""
+msgstr "입력하지 않을 때 배경 숨기기"
 
 #: Client/core/CSettings.cpp:2328
 msgid "Nickname completion using the \"Tab\" key"
-msgstr ""
+msgstr "\"탭\" 키를 사용하여 닉네임 완성"
 
 #: Client/core/CSettings.cpp:2333
 msgid "Allow server to flash the window"
-msgstr ""
+msgstr "서버가 창을 깜박일 수 있도록 허용"
 
 #: Client/core/CSettings.cpp:2338
 msgid "Allow tray balloon notifications"
-msgstr ""
+msgstr "트레이 풍선 알림 허용"
 
 #: Client/core/CSettings.cpp:2343
 msgid "Chat text black/white outline"
-msgstr ""
+msgstr "채팅 텍스트 검은색/흰색 윤곽선"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -2410,35 +2410,35 @@ msgstr "플레이어 목록"
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
 msgid "Close"
-msgstr ""
+msgstr "닫기"
 
 #. Join Game button
 #: Client/core/ServerBrowser/CServerInfo.cpp:152
 msgid "Join Game"
-msgstr ""
+msgstr "참가"
 
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr ""
+msgstr "서버에 대한 암호를 입력하십시오:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr ""
+msgstr "플레이어 슬롯을 사용할 수 있는 즉시 서버에 접속합니다."
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr ""
+msgstr "서버 암호를 입력하십시오"
 
 #. The server has timed out
 #: Client/core/ServerBrowser/CServerInfo.cpp:402
 msgid "Timed Out"
-msgstr ""
+msgstr "시간 초과됨"
 
 #. Set every GUI elements text to blank
 #: Client/core/ServerBrowser/CServerInfo.cpp:431
 msgid "Querying..."
-msgstr ""
+msgstr "쿼리 중..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2449,7 +2449,7 @@ msgstr "서버 브라우저"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:133
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:90
 msgid "Internet"
-msgstr ""
+msgstr "인터넷"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
@@ -2545,186 +2545,188 @@ msgstr "포함:"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:492
 msgid "Empty"
-msgstr "비우다"
+msgstr "비어있음"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:498
 msgid "Full"
-msgstr ""
+msgstr "가득 참"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:504
 msgid "Locked"
-msgstr ""
+msgstr "잠김"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:516
 msgid "Offline"
-msgstr ""
+msgstr "오프라인"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:529
 msgid "Other Versions"
-msgstr ""
+msgstr "다른 버전"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:550
 msgid "Back"
-msgstr ""
+msgstr "뒤로가기"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:741
 msgid "Loading..."
-msgstr ""
+msgstr "불러오는 중…"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1240
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2182
 msgid "  ..loading.."
-msgstr ""
+msgstr "  ..불러오는 중.."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 msgid "No address specified!"
-msgstr ""
+msgstr "주소가 입력되지 않았습니다!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1291
 msgid "Unknown protocol"
-msgstr ""
+msgstr "알 수 없는 프로토콜"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1291
 msgid "Please use the mtasa:// protocol!"
-msgstr ""
+msgstr "Mtasa:// 프로토콜을 사용하십시오!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/mods/deathmatch/logic/CClientGame.cpp:591
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr ""
+msgstr "잘못된 닉네임입니다! 설정으로 이동하여 새 닉네임을 설정하십시오!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
-msgstr ""
+msgstr "연결할 서버를 선택해야 합니다."
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
-msgstr ""
+msgstr "Direct3D9를 초기화할 수 없습니다.\n\n"
+"DirectX 최종 사용자 런타임을 확인하고\n"
+"최신 Windows 서비스 팩이 올바르게 설치되었는지 확인하십시오."
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1360
 msgid "Problem with graphics driver"
-msgstr ""
+msgstr "그래픽 드라이버 문제"
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
-msgstr ""
+msgstr "이 버전은 만료되었습니다."
 
 #: Client/mods/deathmatch/CClient.cpp:56
 msgid "disconnect from the game"
-msgstr ""
+msgstr "서버와 연결 끊기"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
-msgstr ""
+msgstr "네임태그 표시"
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the chatbox"
-msgstr ""
+msgstr "채팅창 표시"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
-msgstr ""
+msgstr "인터넷 통계 표시"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:63
 msgid "open the chat input"
-msgstr ""
+msgstr "채팅 입력창 열기"
 
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
-msgstr ""
+msgstr "다른 플레이어에게 음성 전송"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
-msgstr ""
+msgstr "승객으로 탑승"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
-msgstr ""
+msgstr "다음 라디오 채널"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
-msgstr ""
+msgstr "이전 라디오 채널"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
-msgstr ""
+msgstr "지도 보기 활성화"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar in"
-msgstr ""
+msgstr "지도 줌 인"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the radar out"
-msgstr ""
+msgstr "지도 줌 아웃"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the radar north"
-msgstr ""
+msgstr "지도 북쪽으로 이동하기"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the radar south"
-msgstr ""
+msgstr "지도 남쪽으로 이동하기"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the radar east"
-msgstr ""
+msgstr "지도 동쪽으로 이동하기"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the radar west"
-msgstr ""
+msgstr "지도 서쪽으로 이동하기"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the radar"
-msgstr ""
+msgstr "지도 부착"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
-msgstr ""
+msgstr "지도 불투명도 감소"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases radar opacity"
-msgstr ""
+msgstr "지도 불투명도 증가"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles radar help text"
-msgstr ""
+msgstr "지도 도움말 텍스트 토글"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
-msgstr ""
+msgstr "대상 플레이어에게 메시지를 보냅니다"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr ""
+msgstr "차량에 탑승하는 동안 다음 무기로 변경"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr ""
+msgstr "차량에 탑승하는 동안 이전 무기로 변경"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
-msgstr ""
+msgstr "현재 서버에 대한 정보 출력"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
-msgstr ""
+msgstr "모든 텍스트 디스플레이의 스케일 멀티플러를 정의"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
-msgstr ""
+msgstr "(개발자 모드) colshapes 표시"
 
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr ""
+msgstr "(개발자 모드) 월드 사운드 Id를 디버그 창에 출력"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:487
 msgid "Disconnected: Invalid nickname"
@@ -2973,69 +2975,69 @@ msgstr "연결되지 않았습니다. 빠른 연결 또는 '연결' 명령을 �
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:711
 msgid "The server is not installed"
-msgstr ""
+msgstr "서버가 설치되지 않았습니다."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:721
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1099
 msgid "Local Server"
-msgstr ""
+msgstr "로컬 서버"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:721
 msgid "Starting local server ..."
-msgstr ""
+msgstr "로컬 서버 시작 중..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1030
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr ""
+msgstr "당신은 게임에서 추방되었습니다. (%s)"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1099
 msgid "Connecting to local server..."
-msgstr ""
+msgstr "로컬 서버에 연결 중..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1110
 msgid "Error connecting to server."
-msgstr ""
+msgstr "서버에 접속 중 오류 발생."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1120
 msgid "Connecting to local server timed out. See console for details."
-msgstr ""
+msgstr "로컬 서버에 접속 중 타임아웃 되었습니다. 자세한 사항은 콘솔을 확인하십시오."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1226
 msgid "Connection with the server was lost"
-msgstr ""
+msgstr "서버와의 연결이 끊어졌습니다."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1253
 msgid "Disconnected: the server is currently full"
-msgstr ""
+msgstr "연결 끊김: 서버 인원이 꽉 찼습니다."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1265
 msgid "Disconnected: invalid password specified"
-msgstr ""
+msgstr "연결 끊김: 잘못된 암호입니다."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1287
 msgid "MTA Client verification failed!"
-msgstr ""
+msgstr "MTA 클라이언트 인증 실패!"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr ""
+msgstr "맵 다운로드 진행률:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr ""
+msgstr "다운로드 진행률:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:105
 #, c-format
 msgid "%s of %s"
-msgstr ""
+msgstr "%s 중 %s"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr ""
+msgstr "다운로드를 취소하려면 연결을 끊으십시오"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -3045,18 +3047,18 @@ msgstr "다운로드 오류: %s"
 
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 msgid "Could not start the local server. See console for details."
-msgstr ""
+msgstr "로컬 서버를 시작할 수 없습니다. 자세한 내용은 콘솔을 참조하십시오."
 
 #: Client/mods/deathmatch/logic/CServer.cpp:182
 #, c-format
 msgid "Error: Could not start local server. [%s]"
-msgstr ""
+msgstr "오류: 로컬 서버를 시작할 수 없습니다. [%s]"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr ""
+msgstr "치명적인 오류(%u). 이 문제가 지속되면 mtasa.com 에서 도움을 받으십시오."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3065,18 +3067,19 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr ""
+msgstr "프로토콜 오류(%u). 이 문제가 지속되면 mtasa.com 에서 도움을 받으십시오."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
-msgstr ""
+msgstr "연결 오류"
 
 #: Shared/sdk/SharedUtil.Misc.hpp:137
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr ""
+msgstr "Multi Theft Auto가 제대로 설치되지 않았습니다. 다시 설치하십시오."
 
 #: Shared/sdk/SharedUtil.Misc.hpp:702
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
-msgstr ""
+msgstr "이제 브라우저에 도움말 정보가 포함된 웹 페이지가 표시됩니다.\n\n"
+"(페이지가 로드되지 않을 경우, URL을 웹 브라우저에 붙여넣기(CTRL-V) 하십시오"
 
