@@ -18,7 +18,7 @@ jobs:
         name: Sync commits
         run: |
           # GitHub Actions bot user
-          git config --global user.name "Mætro Bot"
+          git config --global user.name "Maetro Bot"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git checkout release/maetro

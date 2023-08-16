@@ -89,6 +89,13 @@ public:
     std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
 
+    /**
+     * @brief Searches for a CResourceFile with the given relative path.
+     * @param relativePath Relative resource file path (from meta)
+     * @return A pointer to CResourceFile on success, null otherwise
+     */
+    CResourceFile* GetResourceFile(const SString& relativePath) const;
+
     void               SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
     void               LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }

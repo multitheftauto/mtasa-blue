@@ -40,12 +40,15 @@ namespace
         {"engineResetModelFlags", "1.6.0-9.21695"},
         {"engineGetModelFlag", "1.6.0-9.21695"},
         {"engineSetModelFlag", "1.6.0-9.21695"},
+        {"fileGetContents", "1.6.0-9.21938"},
+        {"engineStreamingSetModelCacheLimits", "1.6.0-9.21946"},
     };
 
     SVersionItem serverFunctionInitList[] = {
         // Features added in 1.6.0
         {"isObjectBreakable", "1.6.0-9.21765"},
         {"setObjectBreakable", "1.6.0-9.21765"},
+        {"fileGetContents", "1.6.0-9.21938"},
     };
 
     //

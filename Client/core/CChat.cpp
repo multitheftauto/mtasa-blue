@@ -211,7 +211,7 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
         // Make sure render target size is reasonable
         int iRenderTargetSizeX = Clamp<int>(8, chatSize.fX, pGraphics->GetViewportWidth());
         int iRenderTargetSizeY = Clamp<int>(8, chatSize.fY, pGraphics->GetViewportHeight());
-        m_pCacheTexture = pGraphics->GetRenderItemManager()->CreateRenderTarget(iRenderTargetSizeX, iRenderTargetSizeY, true, true);
+        m_pCacheTexture = pGraphics->GetRenderItemManager()->CreateRenderTarget(iRenderTargetSizeX, iRenderTargetSizeY, false, true, 0, true);
         if (m_pCacheTexture)
             m_RenderTargetChatSize = chatSize;
         else

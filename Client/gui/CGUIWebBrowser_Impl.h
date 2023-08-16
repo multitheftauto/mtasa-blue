@@ -46,6 +46,7 @@ public:
 protected:
     bool Event_MouseButtonDown(const CEGUI::EventArgs& e);
     bool Event_MouseButtonUp(const CEGUI::EventArgs& e);
+    bool Event_MouseDoubleClick(const CEGUI::EventArgs& e);
     bool Event_MouseWheel(const CEGUI::EventArgs& e);
     bool Event_MouseMove(const CEGUI::EventArgs& e);
     bool Event_Activated(const CEGUI::EventArgs& e);

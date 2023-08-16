@@ -1187,12 +1187,21 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 int CLuaDrawingDefs::DxCreateRenderTarget(lua_State* luaVM)
 {
     //  element dxCreateRenderTarget( int sizeX, int sizeY [, int withAlphaChannel = false ] )
+    //  element dxCreateRenderTarget( int sizeX, int sizeY, SurfaceFormat surfaceFormat )
     CVector2D vecSize;
-    bool      bWithAlphaChannel;
+    bool      bWithAlphaChannel = false;
+    bool      bHasSurfaceFormat = false;
+    _D3DFORMAT surfaceFormat;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecSize);
-    argStream.ReadBool(bWithAlphaChannel, false);
+    if (argStream.NextIsString())
+    {
+        argStream.ReadEnumString(surfaceFormat);
+        bHasSurfaceFormat = true;
+    }
+    else
+        argStream.ReadBool(bWithAlphaChannel, false);
 
     if (!argStream.HasErrors())
     {
@@ -1200,8 +1209,8 @@ int CLuaDrawingDefs::DxCreateRenderTarget(lua_State* luaVM)
         CResource* pParentResource = pLuaMain ? pLuaMain->GetResource() : NULL;
         if (pParentResource)
         {
-            CClientRenderTarget* pRenderTarget =
-                g_pClientGame->GetManager()->GetRenderElementManager()->CreateRenderTarget((uint)vecSize.fX, (uint)vecSize.fY, bWithAlphaChannel);
+            CClientRenderTarget* pRenderTarget = g_pClientGame->GetManager()->GetRenderElementManager()->CreateRenderTarget(
+                (uint)vecSize.fX, (uint)vecSize.fY, bHasSurfaceFormat, bWithAlphaChannel, surfaceFormat);
             if (pRenderTarget)
             {
                 // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
