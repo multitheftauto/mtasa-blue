@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-16 19:36\n"
+"PO-Revision-Date: 2023-08-16 16:40\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -25,12 +25,12 @@ msgstr "다운로드한 MTA:SA 버전은 Windows XP 또는 Vista를 지원하지
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "다운로드한 MTA:SA 버전이 Windows 7, 8 또는 8.1을 지원하지 않습니다. www.mtasa.com 에서 다른 버전을 다운로드하십시오."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "다운로드한 MTA:SA 버전은 이전 버전의 Windows용으로 설계되었습니다. www.mtasa.com 에서 다른 버전을 다운로드하십시오."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
@@ -306,31 +306,38 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
-msgstr ""
+msgstr "MTA를 GTA:SA.$와 동일한 디렉토리에 설치할 수 없습니다.\n"
+"$\n"
+"기본 설치 디렉토리 $를 사용하시겠습니까\n"
+"$DEFAULT_INSTDIR?"
 
 #. INST_GTA_ERROR1
 #: Shared/installer/nightly.nsi:1859
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
-msgstr ""
+msgstr "선택한 디렉토리가 존재하지 않습니다\n"
+"$\n"
+"GTA:SA 설치 디렉토리를 선택하십시오"
 
 #. INST_GTA_ERROR2
 #: Shared/installer/nightly.nsi:1861
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
-msgstr ""
+msgstr "$GTA_DIR $에 설치된 GTA:SA를 찾을 수 없습니다\n"
+"$\n"
+"계속하시겠습니까?"
 
 #. INST_CHOOSE_LOC_TOP
 #: Shared/installer/nightly.nsi:1979
 msgid "Choose Install Location"
-msgstr ""
+msgstr "설치 위치 선택"
 
 #. INST_CHOOSE_LOC
 #: Shared/installer/nightly.nsi:1980
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
-msgstr ""
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} 을(를) 설치할 폴더를 선택합니다"
 
 #. INST_CHOOSE_LOC2
 #: Shared/installer/nightly.nsi:1981
@@ -338,17 +345,20 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
 " Click Next to continue."
-msgstr ""
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} 이(가) 다음 폴더에 설치됩니다.$\n"
+"다른 폴더에 설치하려면 찾아보기를 클릭하고 다른 폴더를 선택하십시오.$\n"
+"$\n"
+" 계속하려면 다음을 클릭합니다."
 
 #. INST_CHOOSE_LOC3
 #: Shared/installer/nightly.nsi:1983
 msgid "Destination Folder"
-msgstr ""
+msgstr "대상 폴더"
 
 #. INST_CHOOSE_LOC_BROWSE
 #: Shared/installer/nightly.nsi:1984
 msgid "Browse..."
-msgstr ""
+msgstr "찾아보기..."
 
 #. INST_CHOOSE_LOC_DEFAULT
 #: Shared/installer/nightly.nsi:1985
@@ -358,45 +368,45 @@ msgstr "기본값"
 #. INST_CHOOSE_LOC_LAST_USED
 #: Shared/installer/nightly.nsi:1986
 msgid "Last used"
-msgstr ""
+msgstr "최근 사용"
 
 #. INST_CHOOSE_LOC_CUSTOM
 #: Shared/installer/nightly.nsi:1987
 msgid "Custom"
-msgstr ""
+msgstr "사용자 정의"
 
 #. INST_CHOOSE_LOC4
 #: Shared/installer/nightly.nsi:2165
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr ""
+msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} 을(를) 설치할 폴더를 선택하십시오:"
 
 #. INST_LOC_OW
 #: Shared/installer/nightly.nsi:2183
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
-msgstr ""
+msgstr "경고: 해당 경로에 다른 주 버전의 MTA($1) 가 이미 있습니다."
 
 #. INST_LOC_UPGRADE
 #: Shared/installer/nightly.nsi:2184
 msgid "Installation type:  Upgrade"
-msgstr ""
+msgstr "설치 유형: 업그레이드"
 
 #. NETTEST_TITLE1
 #: Shared/installer/nightly.nsi:2418
 msgid "Online update"
-msgstr ""
+msgstr "온라인 업데이트"
 
 #. NETTEST_TITLE2
 #: Shared/installer/nightly.nsi:2419
 msgid "Checking for update information"
-msgstr ""
+msgstr "업데이트 정보 확인 중"
 
 #. NETTEST_STATUS1
 #: Shared/installer/nightly.nsi:2420
 msgid "Checking for installer update information..."
-msgstr ""
+msgstr "설치 관리자 업데이트 정보를 확인하는 중..."
 
 #. NETTEST_STATUS2
 #: Shared/installer/nightly.nsi:2421
 msgid "Please ensure your firewall is not blocking"
-msgstr ""
+msgstr "방화벽이 차단되어 있지 않은지 확인하십시오"
 
