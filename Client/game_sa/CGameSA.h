@@ -76,14 +76,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
-#define PROP_RANDOM_FOLIAGE         "randomfoliage"
-#define PROP_SNIPER_MOON            "snipermoon"
-#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
-#define PROP_UNDERWORLD_WARP        "underworldwarp"
-#define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
-#define PROP_CORONA_ZTEST           "coronaztest"
-#define PROP_WATER_CREATURES        "watercreatures"
-
 struct SCheatSA
 {
     BYTE* m_byAddress;            // Cheat Address

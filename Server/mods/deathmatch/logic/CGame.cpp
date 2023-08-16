@@ -230,6 +230,19 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
 
+    // Setup world special properties
+    m_WorldSpecialProps[WorldSpecialProperty::HOVERCARS] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::AIRCARS] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRABUNNY] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRAJUMP] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::RANDOMFOLIAGE] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::SNIPERMOON] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRAAIRRESISTANCE] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::UNDERWORLDWARP] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLESUNGLARE] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::CORONAZTEST] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::WATERCREATURES] = true;
+
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
     m_JetpackWeapons[WEAPONTYPE_PISTOL] = true;

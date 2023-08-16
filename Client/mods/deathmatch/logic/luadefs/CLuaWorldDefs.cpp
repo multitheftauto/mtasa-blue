@@ -71,7 +71,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setWaveHeight", SetWaveHeight},
                                                                              {"setMinuteDuration", SetMinuteDuration},
                                                                              {"setGarageOpen", SetGarageOpen},
-                                                                             {"setWorldSpecialPropertyEnabled", SetWorldSpecialPropertyEnabled},
+                                                                             {"setWorldSpecialPropertyEnabled", ArgumentParserWarn<false, SetWorldSpecialPropertyEnabled>},
                                                                              {"setBlurLevel", SetBlurLevel},
                                                                              {"setJetpackMaxHeight", SetJetpackMaxHeight},
                                                                              {"setCloudsEnabled", SetCloudsEnabled},
@@ -125,7 +125,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
-                                                                             {"isWorldSpecialPropertyEnabled", IsWorldSpecialPropertyEnabled},
+                                                                             {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
                                                                              {"isGarageOpen", IsGarageOpen}};
 
     // Add functions
@@ -1217,50 +1217,14 @@ int CLuaWorldDefs::SetOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWorldDefs::IsWorldSpecialPropertyEnabled(lua_State* luaVM)
+bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
 {
-    //  bool isWorldSpecialPropertyEnabled ( string propname )
-    SString strPropName;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strPropName);
-
-    if (!argStream.HasErrors())
-    {
-        bool bResult = CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(strPropName);
-        lua_pushboolean(luaVM, bResult);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return m_pClientGame->IsWorldSpecialProperty(property);
 }
 
-int CLuaWorldDefs::SetWorldSpecialPropertyEnabled(lua_State* luaVM)
+bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
 {
-    //  bool setWorldSpecialPropertyEnabled ( string propname, bool enable )
-    SString strPropName;
-    bool    bEnable;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strPropName);
-    argStream.ReadBool(bEnable);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(strPropName, bEnable))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return m_pClientGame->SetWorldSpecialProperty(property, isEnabled);
 }
 
 int CLuaWorldDefs::SetCloudsEnabled(lua_State* luaVM)

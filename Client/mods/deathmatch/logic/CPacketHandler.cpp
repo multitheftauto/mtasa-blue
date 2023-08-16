@@ -2352,6 +2352,22 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_BADDRIVEBYHITBOX, funBugs.data4.bBadDrivebyHitboxes);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_QUICKSTAND, funBugs.data5.bQuickStand);
 
+    SWorldSpecialPropertiesStateSync wsProps;
+    if (bitStream.Can(eBitStreamVersion::WorldSpecialProperties))
+        bitStream.Read(&wsProps);
+
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::HOVERCARS, wsProps.data.hovercars);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::AIRCARS, wsProps.data.aircars);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRABUNNY, wsProps.data.extrabunny);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRAJUMP, wsProps.data.extrajump);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::RANDOMFOLIAGE, wsProps.data.randomfoliage);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::SNIPERMOON, wsProps.data.snipermoon);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRAAIRRESISTANCE, wsProps.data.extraairresistance);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::UNDERWORLDWARP, wsProps.data.underworldwarp);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLESUNGLARE, wsProps.data.vehiclesunglare);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::CORONAZTEST, wsProps.data.coronaztest);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::WATERCREATURES, wsProps.data.watercreatures);
+
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
         return;

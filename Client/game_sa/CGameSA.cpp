@@ -545,27 +545,6 @@ void CGameSA::SetMinuteDuration(unsigned long ulTime)
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
 {
-    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))
-        return IsRandomFoliageEnabled();
-
-    if (!strcmp(szCheatName, PROP_SNIPER_MOON))
-        return IsMoonEasterEggEnabled();
-
-    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
-        return IsExtraAirResistanceEnabled();
-
-    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
-        return IsUnderWorldWarpEnabled();
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-        return IsVehicleSunGlareEnabled();
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-        return IsCoronaZTestEnabled();
-
-    if (!strcmp(szCheatName, PROP_WATER_CREATURES))
-        return IsWaterCreaturesEnabled();
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -574,48 +553,6 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
 
 bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 {
-    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))
-    {
-        SetRandomFoliageEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_SNIPER_MOON))
-    {
-        SetMoonEasterEggEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
-    {
-        SetExtraAirResistanceEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
-    {
-        SetUnderWorldWarpEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-    {
-        SetVehicleSunGlareEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-    {
-        SetCoronaZTestEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_WATER_CREATURES))
-    {
-        SetWaterCreaturesEnabled(bEnable);
-        return true;
-    }
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -628,17 +565,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 
 void CGameSA::ResetCheats()
 {
-    SetRandomFoliageEnabled(true);
-    SetMoonEasterEggEnabled(false);
-    SetExtraAirResistanceEnabled(true);
-    SetUnderWorldWarpEnabled(true);
-    SetCoronaZTestEnabled(true);
-    CVehicleSA::SetVehiclesSunGlareEnabled(false);
-    SetWaterCreaturesEnabled(true);
-
+    // Reset cheats that can't be set by setWorldSpecialPropertyEnabled
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
     {
+        if (it->second->m_bCanBeSet)
+            continue;
         if (it->second->m_byAddress > (BYTE*)0x8A4000)
             MemPutFast<BYTE>(it->second->m_byAddress, 0);
         else
