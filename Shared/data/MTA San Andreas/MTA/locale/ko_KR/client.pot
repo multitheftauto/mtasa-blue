@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-13 11:56+0000\n"
-"PO-Revision-Date: 2023-08-16 16:40\n"
+"PO-Revision-Date: 2023-08-17 02:00\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -128,7 +128,7 @@ msgstr "GTA:SA에 '%s' 파일이 없습니다."
 
 #: Client/loader/Utils.cpp:1588
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA에서 모델을 로드하는 데 문제가 있었습니다."
+msgstr "GTA:SA에서 모델을 불러오는 데 문제가 있었습니다."
 
 #: Client/loader/Utils.cpp:1590
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
