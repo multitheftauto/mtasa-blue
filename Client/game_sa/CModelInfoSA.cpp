@@ -1716,6 +1716,22 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
+void CModelInfoSA::MakeClumpModel(ushort usBaseID)
+{
+    CClumpModelInfoSAInterface* pNewInterface = new CClumpModelInfoSAInterface();
+    CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
+    MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
+    pNewInterface->usNumberOfRefs = 0;
+    pNewInterface->pRwObject = nullptr;
+    pNewInterface->usUnknown = 65535;
+    pNewInterface->usDynamicIndex = 65535;
+
+    ppModelInfo[m_dwModelID] = pNewInterface;
+
+    m_dwParentID = usBaseID;
+    CopyStreamingInfoFromModel(usBaseID);
+}
+
 void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 {
     CVehicleModelInfoSAInterface* m_pInterface = new CVehicleModelInfoSAInterface();

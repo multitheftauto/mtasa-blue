@@ -111,6 +111,16 @@ struct CTimeInfoSAInterface
     short m_wOtherTimeModel;
 };
 
+class CClumpModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    union
+    {
+        char*    m_animFileName;
+        uint32_t m_nAnimFileIndex;
+    };
+};
+
 class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 public:
@@ -303,6 +313,7 @@ public:
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
+    void         MakeClumpModel(ushort usBaseModelID);
     bool         MakeAtomicModel();
     bool         MakeClumpModel();
     void         DeallocateModel(void);

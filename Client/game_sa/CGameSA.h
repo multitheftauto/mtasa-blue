@@ -82,6 +82,7 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define PROP_UNDERWORLD_WARP        "underworldwarp"
 #define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
 #define PROP_CORONA_ZTEST           "coronaztest"
+#define PROP_WATER_CREATURES        "watercreatures"
 
 struct SCheatSA
 {
@@ -212,6 +213,9 @@ public:
     void SetCoronaZTestEnabled(bool isEnabled);
     bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
 
+    bool IsWaterCreaturesEnabled() const noexcept { return m_areWaterCreaturesEnabled; }
+    void SetWaterCreaturesEnabled(bool isEnabled);
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -322,6 +326,7 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
+    bool         m_areWaterCreaturesEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
