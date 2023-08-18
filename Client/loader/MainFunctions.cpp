@@ -13,6 +13,7 @@
 #include "Utils.h"
 #include "Dialogs.h"
 #include "D3DStuff.h"
+#include <version.h>
 #include <array>
 #include <locale.h>
 

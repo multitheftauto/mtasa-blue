@@ -1970,6 +1970,8 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     if (pPed && !pPed->IsDead())
     {
         pPed->SetIsDead(true);
+        pPed->SetHealth(0.0f);
+        pPed->SetArmor(0.0f);
         pPed->SetPosition(Packet.m_vecPosition);
 
         // Reset his vehicle action, but only if not jacking

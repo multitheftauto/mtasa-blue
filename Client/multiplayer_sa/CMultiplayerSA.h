@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CGame.h>
-#include <multiplayer/CMultiplayer.h>
 
 #include "multiplayersa_init.h"
 #include "CLimitsSA.h"
