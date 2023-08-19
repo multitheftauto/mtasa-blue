@@ -21,14 +21,19 @@ public:
 
     void InitializeDiscord();
     void ShutdownDiscord();
+    void RestartDiscord();
+    void SetDefaultData();
 
     void UpdatePresence();
-    void SetPresenceState(const char* szState);
     void SetPresenceStartTimestamp(const unsigned long ulStart);
+    void SetAssetLargeData(const char* szAsset, const char* szAssetText);
+    void SetAssetSmallData(const char* szAsset, const char* szAssetText);
 
+    bool ResetDiscordData();
+    bool SetPresenceState(const char* szState, bool bCustom = false);
     bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
-    bool SetDiscordRPCEnabled(bool bEnabled) override;
-    bool IsDiscordRPCEnabled() override;
+    bool SetDiscordRPCEnabled(bool bEnabled);
+    bool IsDiscordRPCEnabled();
     bool SetApplicationID(const char* szAppID);
 
     // void SetPresenceTimestamp();
@@ -42,9 +47,10 @@ private:
     std::string m_strDiscordAppAssetSmall;
     std::string m_strDiscordAppAssetSmallText;
 
-    std::string   m_strDiscordAppCurrentId;
-    std::string   m_strDiscordAppState;
-    std::string   m_strDiscordAppDetails;
+    std::string m_strDiscordAppCurrentId;
+    std::string m_strDiscordAppState;
+    std::string m_strDiscordAppDetails;
+    std::string m_strDiscordAppCustomState;
 
     unsigned long m_uiDiscordAppStart;
     unsigned long m_uiDiscordAppEnd;

@@ -301,7 +301,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
         if (!discord->IsDiscordRPCEnabled())
             discord->SetDiscordRPCEnabled(true);
 
-        discord->SetPresenceState("Main menu");
+        discord->SetPresenceState("In the main menu", false);
         discord->SetPresenceStartTimestamp(0);
         discord->UpdatePresence();
     }

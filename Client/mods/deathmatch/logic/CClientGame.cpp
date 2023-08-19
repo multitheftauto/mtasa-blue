@@ -481,6 +481,14 @@ CClientGame::~CClientGame()
     g_pCore->ForceCursorVisible(false);
     SetCursorEventsEnabled(false);
 
+    // Reset discord stuff
+    auto discord = g_pCore->GetDiscord();
+    if (discord && discord->IsDiscordRPCEnabled())
+    {
+        discord->ResetDiscordData();
+        discord->UpdatePresence();
+    }
+
     // Destroy our stuff
     SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop
     SAFE_DELETE(m_pNametags);
