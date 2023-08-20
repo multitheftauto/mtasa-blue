@@ -35,6 +35,7 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setID", "setDiscordApplicationID");
     lua_classfunction(luaVM, "setDetails", "setDiscordRichPresenceDetails");
     lua_classfunction(luaVM, "setLargeAsset", "setDiscordRichPresenceLargeAsset");
+    lua_classfunction(luaVM, "setSmallAsset", "setDiscordRichPresenceSmallAsset");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
 
@@ -101,44 +102,40 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
     return true;
 }
 
-//setDiscordRichPresenceLargeAsset("image", "Description")
-bool CLuaDiscordDefs::SetLargeAsset(std::string strAssetImage, std::string strAssetImageText)
+bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, bool bIsLarge)
 {
-    int imageLength = strAssetImage.length();
-    int imageTextLength = strAssetImageText.length();
+    int imageLength = szAsset.length();
+    int imageTextLength = szAssetText.length();
 
-    if (imageLength < 1 || imageTextLength > 32)
-        throw std::invalid_argument("Asset image length must be greater than 0, or less than/equal to 32");
+    if (imageLength < 1 || imageLength > 32)
+        throw std::invalid_argument("Asset name length must be greater than 0, or less than/equal to 32");
     if (imageTextLength < 1 || imageTextLength > 32)
-        throw std::invalid_argument("Asset image text length must be greater than 0, or less than/equal to 32");
+        throw std::invalid_argument("Asset text length must be greater than 0, or less than/equal to 32");
 
     auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
 
-    discord->SetAssetLargeData(strAssetImage.c_str(), strAssetImageText.c_str());
+    if (bIsLarge)
+    {
+        discord->SetAssetLargeData(szAsset.c_str(), szAssetText.c_str());
+    }
+    else
+    {
+        discord->SetAssetSmallData(szAsset.c_str(), szAssetText.c_str());
+    }
+
     discord->UpdatePresence();
     return true;
 }
 
-// setDiscordRichPresenceSmallAsset("image", "Description")
-bool CLuaDiscordDefs::SetSmallAsset(std::string strAssetImage, std::string strAssetImageText)
+bool CLuaDiscordDefs::SetLargeAsset(std::string szAsset, std::string szAssetText)
 {
-    int imageLength = strAssetImage.length();
-    int imageTextLength = strAssetImageText.length();
+    return SetAsset(szAsset, szAssetText, true);
+}
 
-    if (imageLength < 1 || imageTextLength > 32)
-        throw std::invalid_argument("Asset image length must be greater than 0, or less than/equal to 32");
-    if (imageTextLength < 1 || imageTextLength > 32)
-        throw std::invalid_argument("Asset image text length must be greater than 0, or less than/equal to 32");
-
-    auto discord = g_pCore->GetDiscord();
-
-    if (!discord || !discord->IsDiscordRPCEnabled())
-        return false;
-
-    discord->SetAssetSmallData(strAssetImage.c_str(), strAssetImageText.c_str());
-    discord->UpdatePresence();
-    return true;
+bool CLuaDiscordDefs::SetSmallAsset(std::string szAsset, std::string szAssetText)
+{
+    return SetAsset(szAsset, szAssetText, false);
 }

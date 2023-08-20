@@ -13,19 +13,17 @@
 #include "discord_rpc.h"
 #include "CDiscordRichPresence.h"
 
-#define DEFAULT_APP_ID               "1139666477813866546"
-#define DEFAULT_APP_ASSET            "mta_logo_round"
-#define DEFAULT_APP_ASSET_TEXT       "Multi Theft Auto"
-#define DEFAULT_APP_ASSET_SMALL      ""
-#define DEFAULT_APP_ASSET_SMALL_TEXT ""
+constexpr char DEFAULT_APP_ID[] = "1139666477813866546";
+constexpr char DEFAULT_APP_ASSET[] = "mta_logo_round";
+constexpr char DEFAULT_APP_ASSET_TEXT[] = "Multi Theft Auto";
+constexpr char DEFAULT_APP_ASSET_SMALL[] = "";
+constexpr char DEFAULT_APP_ASSET_SMALL_TEXT[] = "";
 
-CDiscordRichPresence::CDiscordRichPresence()
+CDiscordRichPresence::CDiscordRichPresence() : m_uiDiscordAppStart(0), m_uiDiscordAppEnd(0)
 {
     SetDefaultData();
 
-    m_strDiscordAppState = "";
-    m_uiDiscordAppStart = 0;            // timestamp time to elapsed time
-    m_uiDiscordAppEnd = 0;              // timestamp time to remaining time
+    m_strDiscordAppState.clear();
 }
 
 CDiscordRichPresence::~CDiscordRichPresence()
@@ -39,7 +37,8 @@ void CDiscordRichPresence::InitializeDiscord()
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
 
-    Discord_Initialize((m_strDiscordAppCurrentId != m_strDiscordAppId) ? m_strDiscordAppCurrentId.c_str() : m_strDiscordAppId.c_str(), &handlers, 1, nullptr);
+    // Handlers .ready .disconnected .errored maybe use in future?
+    Discord_Initialize((m_strDiscordAppCurrentId.empty()) ? DEFAULT_APP_ID : m_strDiscordAppCurrentId.c_str(), &handlers, 1, nullptr);
 }
 
 void CDiscordRichPresence::ShutdownDiscord()
@@ -63,19 +62,23 @@ void CDiscordRichPresence::SetDefaultData()
     m_strDiscordAppAssetSmallText = DEFAULT_APP_ASSET_SMALL_TEXT;
 
     m_strDiscordAppCurrentId = DEFAULT_APP_ID;
-    m_strDiscordAppDetails = "";
-    m_strDiscordAppCustomState = "";
+    m_strDiscordAppDetails.clear();
+    m_strDiscordAppCustomState.clear();
 }
 
 void CDiscordRichPresence::UpdatePresence()
 {
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
+
     discordPresence.largeImageKey = m_strDiscordAppAsset.c_str();
     discordPresence.largeImageText = m_strDiscordAppAssetText.c_str();
     discordPresence.smallImageKey = m_strDiscordAppAssetSmall.c_str();
     discordPresence.smallImageText = m_strDiscordAppAssetSmallText.c_str();
-    discordPresence.state = (m_strDiscordAppCustomState[0] != '\0') ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
+
+    const char* state = (!m_strDiscordAppCustomState.empty() && m_bAllowCustomDetails) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
+    discordPresence.state = state;
+
     discordPresence.details = m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
 
@@ -89,14 +92,26 @@ void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart
 
 void CDiscordRichPresence::SetAssetLargeData(const char* szAsset, const char* szAssetText)
 {
-    m_strDiscordAppAsset = (szAsset && szAsset[0] != '\0') ? szAsset : DEFAULT_APP_ID;
-    m_strDiscordAppAssetText = (szAssetText && szAssetText[0] != '\0') ? szAssetText : DEFAULT_APP_ASSET_TEXT;
+    SetAsset(szAsset, szAssetText, true);
 }
 
 void CDiscordRichPresence::SetAssetSmallData(const char* szAsset, const char* szAssetText)
 {
-    m_strDiscordAppAssetSmall = (szAsset && szAsset[0] != '\0') ? szAsset : DEFAULT_APP_ASSET_SMALL;
-    m_strDiscordAppAssetSmallText = (szAssetText && szAssetText[0] != '\0') ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
+    SetAsset(szAsset, szAssetText, false);
+}
+
+void CDiscordRichPresence::SetAsset(const char* szAsset, const char* szAssetText, bool isLarge)
+{
+    if (isLarge)
+    {
+        m_strDiscordAppAsset = (szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET;
+        m_strDiscordAppAssetText = (szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_TEXT;
+    }
+    else
+    {
+        m_strDiscordAppAssetSmall = (szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET_SMALL;
+        m_strDiscordAppAssetSmallText = (szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
+    }
 }
 
 bool CDiscordRichPresence::SetPresenceState(const char* szState, bool bCustom)
@@ -132,7 +147,7 @@ bool CDiscordRichPresence::ResetDiscordData()
 
 bool CDiscordRichPresence::SetApplicationID(const char* szAppID)
     {
-    m_strDiscordAppCurrentId = (szAppID && szAppID[0] != '\0') ? szAppID : DEFAULT_APP_ID;
+    m_strDiscordAppCurrentId = (szAppID && *szAppID) ? szAppID : DEFAULT_APP_ID;
 
     if (m_bDiscordRPCEnabled)
     {
