@@ -117,7 +117,6 @@ public:
 
     void Delete(uint index)
     {
-        delete m_pObjects[index];
         Release(index);
     }
 
