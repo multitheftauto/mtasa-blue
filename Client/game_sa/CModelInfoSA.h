@@ -378,7 +378,7 @@ public:
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
     void           ResetTextureDictionaryID();
-    static void    StaticResetTextureDictionarys();
+    static void    StaticResetTextureDictionaries();
     float          GetLODDistance();
     float          GetOriginalLODDistance();
     void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);

@@ -785,36 +785,35 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!m_pInterface)
         return;
 
+    // Remove ref from the old TXD
+    CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
+
+    // Store vanilla TXD ID
     if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
         ms_DefaultTxdIDMap[m_dwModelID] = m_pInterface->usTextureDictionary;
 
-    
+    // Set new TXD and increase ref of it
     m_pInterface->usTextureDictionary = usID;
+    CTxdStore_AddRef(usID);
 }
 
 void CModelInfoSA::ResetTextureDictionaryID()
 {
-    m_pInterface = ppModelInfo[m_dwModelID];
-    if (!m_pInterface)
+    const auto it = ms_DefaultTxdIDMap.find(m_dwModelID);
+    if (it == ms_DefaultTxdIDMap.end()) {
         return;
-
-    if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
-        return;
-
-    m_pInterface->usTextureDictionary = ms_DefaultTxdIDMap[m_dwModelID];
-    MapRemove(ms_DefaultTxdIDMap, m_dwModelID);
+    }
+    SetTextureDictionaryID(it->second);
+    ms_DefaultTxdIDMap.erase(it); // Only erase after calling the function above [otherwise gets reinserted]
 }
 
-void CModelInfoSA::StaticResetTextureDictionarys()
+void CModelInfoSA::StaticResetTextureDictionaries()
 {
-    for (const auto& item : ms_DefaultTxdIDMap)
-    {
-        CBaseModelInfoSAInterface* pInterface = ppModelInfo[item.first];
-        if (pInterface)
-            pInterface->usTextureDictionary = item.second;
+    while (!ms_DefaultTxdIDMap.empty()) {
+        const auto mi = pGame->GetModelInfo(ms_DefaultTxdIDMap.begin()->first);
+        assert(mi);
+        mi->ResetTextureDictionaryID();
     }
-
-    ms_DefaultTxdIDMap.clear();
 }
 
 float CModelInfoSA::GetLODDistance()
