@@ -1619,6 +1619,7 @@ void CGame::AddBuiltInEvents()
     // Other events
     m_Events.AddEvent("onSettingChange", "setting, oldValue, newValue", NULL, false);
     m_Events.AddEvent("onChatMessage", "message, element", NULL, false);
+    m_Events.AddEvent("onExplosion", "x, y, z, type, origin", nullptr, false);
 
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
@@ -1969,6 +1970,8 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     if (pPed && !pPed->IsDead())
     {
         pPed->SetIsDead(true);
+        pPed->SetHealth(0.0f);
+        pPed->SetArmor(0.0f);
         pPed->SetPosition(Packet.m_vecPosition);
 
         // Reset his vehicle action, but only if not jacking
@@ -2619,112 +2622,121 @@ void CGame::Packet_DestroySatchels(CDestroySatchelsPacket& Packet)
 
 void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
 {
-    // Grab the source player
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer && pPlayer->IsJoined())
+    CPlayer* const clientSource = Packet.GetSourcePlayer();
+
+    if (!clientSource || !clientSource->IsJoined())
+        return;
+
+    bool          syncToPlayers = true;
+    CVector       explosionPosition = Packet.m_vecPosition;
+    CElement*     explosionSource = nullptr;
+    unsigned char explosionType = Packet.m_ucType;
+
+    if (ElementID originID = Packet.m_OriginID; originID != INVALID_ELEMENT_ID)
     {
-        bool          bBroadcast = true;
-        ElementID     OriginID = Packet.m_OriginID;
-        unsigned char ucType = Packet.m_ucType;
-        CVector       vecPosition = Packet.m_vecPosition;
-        if (OriginID != INVALID_ELEMENT_ID)
+        if (explosionSource = CElementIDs::GetElement(originID); explosionSource != nullptr)
         {
-            CElement* pOrigin = CElementIDs::GetElement(OriginID);
-            // Do we have an origin source?
-            if (pOrigin)
+            switch (explosionSource->GetType())
             {
-                // Is the source of the explosion a vehicle?
-                switch (pOrigin->GetType())
+                case CElement::PLAYER:
                 {
-                    case CElement::PLAYER:
+                    // Shift the relative explosion position to an absolute position in the world.
+                    CVehicle* occupiedVehicle = static_cast<CPlayer*>(explosionSource)->GetOccupiedVehicle();
+
+                    if (occupiedVehicle)
                     {
-                        // Correct our position vector
-                        CVehicle* pVehicle = static_cast<CPlayer*>(pOrigin)->GetOccupiedVehicle();
-                        if (pVehicle)
-                        {
-                            // Use the vehicle's position?
-                            vecPosition += pVehicle->GetPosition();
-                        }
-                        else
-                        {
-                            // Use the player's position
-                            vecPosition += pOrigin->GetPosition();
-                        }
-                        break;
+                        explosionPosition += occupiedVehicle->GetPosition();
+                        explosionSource = occupiedVehicle;
                     }
-                    case CElement::VEHICLE:
+                    else
+                        explosionPosition += explosionSource->GetPosition();
+
+                    break;
+                }
+                case CElement::VEHICLE:
+                {
+                    // Shift the relative explosion position to an absolute position in the world.
+                    explosionPosition += explosionSource->GetPosition();
+
+                    // Has the vehicle blown up?
+                    switch (explosionType)
                     {
-                        // Correct our position vector
-                        vecPosition += pOrigin->GetPosition();
-
-                        // Has the vehicle blown up?
-                        switch (ucType)
+                        case CExplosionSyncPacket::EXPLOSION_CAR:
+                        case CExplosionSyncPacket::EXPLOSION_CAR_QUICK:
+                        case CExplosionSyncPacket::EXPLOSION_BOAT:
+                        case CExplosionSyncPacket::EXPLOSION_HELI:
+                        case CExplosionSyncPacket::EXPLOSION_TINY:
                         {
-                            case 4:             // EXP_TYPE_CAR
-                            case 5:             // EXP_TYPE_CAR_QUICK
-                            case 6:             // EXP_TYPE_BOAT
-                            case 7:             // EXP_TYPE_HELI
-                            case 12:            // EXP_TYPE_TINY - RC Vehicles
+                            CVehicle*        vehicle = static_cast<CVehicle*>(explosionSource);
+                            VehicleBlowState previousBlowState = vehicle->GetBlowState();
+
+                            if (previousBlowState != VehicleBlowState::BLOWN)
                             {
-                                CVehicle*        vehicle = static_cast<CVehicle*>(pOrigin);
-                                VehicleBlowState previousBlowState = vehicle->GetBlowState();
+                                vehicle->SetBlowState(VehicleBlowState::BLOWN);
+                                vehicle->SetEngineOn(false);
 
-                                if (previousBlowState != VehicleBlowState::BLOWN)
+                                // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
+                                if (previousBlowState == VehicleBlowState::INTACT)
                                 {
-                                    vehicle->SetBlowState(VehicleBlowState::BLOWN);
-                                    vehicle->SetEngineOn(false);
-
-                                    // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
-                                    if (previousBlowState == VehicleBlowState::INTACT)
-                                    {
-                                        CLuaArguments arguments;
-                                        arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
-                                        vehicle->CallEvent("onVehicleExplode", arguments);
-                                    }
-
-                                    bBroadcast = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
+                                    CLuaArguments arguments;
+                                    arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                    vehicle->CallEvent("onVehicleExplode", arguments);
                                 }
-                                else
-                                {
-                                    bBroadcast = false;
-                                }
+
+                                syncToPlayers = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
+                            }
+                            else
+                            {
+                                syncToPlayers = false;
                             }
                         }
-                        break;
                     }
-                    default:
-                        break;
+
+                    break;
                 }
+                default:
+                    break;
             }
-        }
-
-        if (bBroadcast)
-        {
-            // Make a list of players to send this packet to
-            CSendList sendList;
-
-            // Loop through all the players
-            std::list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-            for (; iter != m_pPlayerManager->IterEnd(); iter++)
-            {
-                CPlayer* pSendPlayer = *iter;
-
-                // We tell the reporter to create the explosion too
-                // Grab this player's camera position
-                CVector vecCameraPosition;
-                pSendPlayer->GetCamera()->GetPosition(vecCameraPosition);
-
-                // Is this players camera close enough to send?
-                if (IsPointNearPoint3D(vecPosition, vecCameraPosition, MAX_EXPLOSION_SYNC_DISTANCE))
-                {
-                    // Send the packet to him
-                    sendList.push_back(pSendPlayer);
-                }
-            }
-
-            CPlayerManager::Broadcast(Packet, sendList);
         }
     }
+
+    if (!syncToPlayers)
+        return;
+
+    if (!explosionSource)
+        explosionSource = m_pMapManager->GetRootElement();
+
+    CLuaArguments arguments;
+    arguments.PushNumber(explosionPosition.fX);
+    arguments.PushNumber(explosionPosition.fY);
+    arguments.PushNumber(explosionPosition.fZ);
+    arguments.PushNumber(explosionType);
+    // TODO: The client uses a nearby player as the origin, if there is none, and we don't want that.
+    // arguments.PushElement(explosionSource);
+    syncToPlayers = clientSource->CallEvent("onExplosion", arguments);
+
+    if (!syncToPlayers)
+        return;
+
+    // Make a list of players to send this packet to (including the explosion reporter).
+    CSendList sendList;
+
+    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
+    {
+        CPlayer* player = *iter;
+
+        CVector cameraPosition;
+        player->GetCamera()->GetPosition(cameraPosition);
+
+        // Is this players camera close enough to send?
+        if (IsPointNearPoint3D(explosionPosition, cameraPosition, MAX_EXPLOSION_SYNC_DISTANCE))
+        {
+            sendList.push_back(player);
+        }
+    }
+
+    if (!sendList.empty())
+        CPlayerManager::Broadcast(Packet, sendList);
 }
 
 void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)

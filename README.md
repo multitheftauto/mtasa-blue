@@ -4,6 +4,10 @@
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
 
+> **Note**
+> If you're a fork developer, please read this note carefully. We have changed the default build type back to *CUSTOM* in `Shared/sdk/version.h`. If you're developing without the anti-cheat in mind, say in the Debug configuration, this doesn't affect you at all. Now, if you plan to test your custom client with anti-cheat enabled, you should change your build type to `UNTESTED`. If you want to publish a release of your custom client, you must switch to a *fork support* hardened release of `netc.dll`.
+> Please read our [Forks_Full_AC](https://wiki.multitheftauto.com/wiki/Forks_Full_AC) wiki page for more information.
+
 ## Introduction
 
 Multi Theft Auto is based on code injection and hooking techniques whereby the game is manipulated without altering any original files supplied with the game. The software functions as a game engine that installs itself as an extension of the original game, adding core functionality such as networking and GUI rendering while exposing the original game's engine functionality through a scripting language.
