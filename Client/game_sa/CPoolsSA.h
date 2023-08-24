@@ -14,16 +14,9 @@
 #include "CPedSA.h"
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
+#include "CTextureDictonarySA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
-
-struct CTextureDictonarySAInterface
-{
-    RwTexDictionary* rwTexDictonary;
-    unsigned short   usUsagesCount;
-    unsigned short   usParentIndex;
-    unsigned int     hash;
-};
 
 class CClientEntity;
 
