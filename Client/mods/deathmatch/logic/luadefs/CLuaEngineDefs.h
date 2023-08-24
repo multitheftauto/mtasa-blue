@@ -78,8 +78,8 @@ public:
     static bool                                            EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
 
-    static uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName);
-    static bool CLuaEngineDefs::EngineFreeTXD(uint txdID);
+    static uint EngineRequestTXD(lua_State* const luaVM, std::string strTxdName);
+    static bool EngineFreeTXD(uint txdID);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);
