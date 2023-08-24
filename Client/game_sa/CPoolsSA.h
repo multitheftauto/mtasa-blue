@@ -91,11 +91,20 @@ public:
 
     B* Allocate()
     {
-        uint index = GetFreeSlot();
-        if (index == -1)
-            return nullptr;
-
-        return AllocateAt(index);
+        m_nFirstFree++;          // Continue after the last allocated slot
+        const auto sz = m_nSize; // Storing size to avoid reloads from memory - should help out the optimizer
+        for (auto i = 0u; i < sz; i++) {
+            const auto slot = (m_nFirstFree + i) % sz;
+            const auto e    = &m_byteMap[slot];
+            if (!e->bEmpty) {
+                continue;
+            }
+            m_nFirstFree = slot;
+            e->bEmpty = false;
+            e->nId++;
+            return &m_pObjects[slot];
+        }
+        return nullptr;
     }
 
     B* AllocateAt(uint uiSlot)
