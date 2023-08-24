@@ -18,6 +18,7 @@
 #if defined(MTA_DEBUG)
     #include "SharedUtil.Tests.hpp"
 #endif
+#include <version.h>
 
 ///////////////////////////////////////////////////////////////
 //

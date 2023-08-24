@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CGame.h>
-#include <multiplayer/CMultiplayer.h>
 
 #include "multiplayersa_init.h"
 #include "CLimitsSA.h"
@@ -338,34 +337,4 @@ private:
     WORD                        GetInVehicleLocalPlayerKeyStates();*/
     //  Vector3D                    * GetLocalStartVector();
     //  VOID                        SetPlayerStartVector(CPlayerPed* player, Vector3D * vecStart);
-
-private:
-    static unsigned long HOOKPOS_FindPlayerCoors;
-    static unsigned long HOOKPOS_FindPlayerCentreOfWorld;
-    static unsigned long HOOKPOS_FindPlayerHeading;
-    static unsigned long HOOKPOS_CStreaming_Update_Caller;
-    static unsigned long HOOKPOS_CHud_Draw_Caller;
-    static unsigned long HOOKPOS_CRunningScript_Process;
-    static unsigned long HOOKPOS_CExplosion_AddExplosion;
-    static unsigned long HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
-    static unsigned long HOOKPOS_Trailer_BreakTowLink;
-    static unsigned long HOOKPOS_CRadar__DrawRadarGangOverlay;
-    static unsigned long HOOKPOS_CTaskComplexJump__CreateSubTask;
-    static unsigned long HOOKPOS_CTrain_ProcessControl_Derail;
-    static unsigned long HOOKPOS_CVehicle_SetupRender;
-    static unsigned long HOOKPOS_CVehicle_ResetAfterRender;
-    static unsigned long HOOKPOS_CObject_Render;
-    static unsigned long HOOKPOS_EndWorldColors;
-    static unsigned long HOOKPOS_CWorld_ProcessVerticalLineSectorList;
-    static unsigned long HOOKPOS_ComputeDamageResponse_StartChoking;
-    static unsigned long HOOKPOS_CAutomobile__ProcessSwingingDoor;
-
-    static unsigned long FUNC_CStreaming_Update;
-    static unsigned long FUNC_CAudioEngine__DisplayRadioStationName;
-    static unsigned long FUNC_CHud_Draw;
-
-    static unsigned long ADDR_CursorHiding;
-    static unsigned long ADDR_GotFocus;
-
-    static unsigned long FUNC_CPlayerInfoBase;
 };

@@ -15,6 +15,12 @@
 #include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
 
+//! Set the CModelCacheManager limits
+//! By passing `nil`/no value the original values are restored
+void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
+    g_pClientGame->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
+}
+
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
 {
     g_pGame->GetStreaming()->MakeSpaceFor(bytes);
@@ -122,9 +128,11 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
+        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+        
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
-
+        
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
         // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
@@ -181,6 +189,7 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
         lua_classfunction(luaVM, "restoreMemorySize", "engineStreamingRestoreMemorySize");
         lua_classfunction(luaVM, "getBufferSize", "engineStreamingGetBufferSize");
         lua_classfunction(luaVM, "setBufferSize", "engineStreamingSetBufferSize");
+        lua_classfunction(luaVM, "setModelCacheLimits", "engineStreamingSetModelCacheLimits");
 
         lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
         lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetMemorySize");
