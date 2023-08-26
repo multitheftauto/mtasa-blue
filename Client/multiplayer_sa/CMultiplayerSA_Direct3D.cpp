@@ -50,13 +50,9 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 }
 
 // Hook info
-#define HOOKPOS_PreCreateDevice_US          0x007F675B
-#define HOOKPOS_PreCreateDevice_EU          0x007F679B
-#define HOOKSIZE_PreCreateDevice_US         6
-#define HOOKSIZE_PreCreateDevice_EU         6
-DWORD RETURN_PreCreateDevice_US = 0x07F6781;
-DWORD RETURN_PreCreateDevice_EU = 0x07F67C1;
-DWORD RETURN_PreCreateDevice_BOTH = 0;
+#define HOOKPOS_PreCreateDevice             0x007F675B
+#define HOOKSIZE_PreCreateDevice            6
+DWORD RETURN_PreCreateDevice = 0x07F6781;
 void _declspec(naked) HOOK_PreCreateDevice()
 {
     _asm
@@ -90,7 +86,7 @@ void _declspec(naked) HOOK_PreCreateDevice()
         popad
 
         // Continue
-        jmp     RETURN_PreCreateDevice_BOTH
+        jmp     RETURN_PreCreateDevice
     }
 }
 
@@ -108,16 +104,10 @@ HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
 }
 
 // Hook info
-#define HOOKPOS_PostCreateDevice_US         0x07F6784
-#define HOOKPOS_PostCreateDevice_EU         0x07F67C4
-#define HOOKSIZE_PostCreateDevice_US        6
-#define HOOKSIZE_PostCreateDevice_EU        6
-DWORD RETURN_PostCreateDevice_US = 0x07F678A;
-DWORD RETURN_PostCreateDevice_EU = 0x07F67CA;
-DWORD RETURN_PostCreateDevice_BOTH = 0;
-DWORD RETURN_PostCreateDeviceB_US = 0x07F6799;
-DWORD RETURN_PostCreateDeviceB_EU = 0x07F67D9;
-DWORD RETURN_PostCreateDeviceB_BOTH = 0;
+#define HOOKPOS_PostCreateDevice            0x07F6784
+#define HOOKSIZE_PostCreateDevice           6
+DWORD RETURN_PostCreateDevice = 0x07F678A;
+DWORD RETURN_PostCreateDeviceB = 0x07F6799;
 void _declspec(naked) HOOK_PostCreateDevice()
 {
     _asm
@@ -135,10 +125,10 @@ void _declspec(naked) HOOK_PostCreateDevice()
         test    eax, eax
         jge     ok
         xor     eax, eax
-        jmp     RETURN_PostCreateDevice_BOTH
+        jmp     RETURN_PostCreateDevice
 
 ok:
-        jmp     RETURN_PostCreateDeviceB_BOTH
+        jmp     RETURN_PostCreateDeviceB
     }
 }
 
@@ -151,6 +141,6 @@ ok:
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_Direct3D()
 {
-    EZHookInstall(PreCreateDevice);
+    EZHookInstallRestore(PreCreateDevice);
     EZHookInstall(PostCreateDevice);
 }

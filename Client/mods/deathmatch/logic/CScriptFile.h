@@ -14,6 +14,8 @@
 #include <stdio.h>
 #include <string>
 
+class CResourceFile;
+
 class CScriptFile final : public CClientEntity
 {
     DECLARE_CLASS(CScriptFile, CClientEntity)
@@ -46,6 +48,14 @@ public:
     // Get the owning resource
     CResource* GetResource();
 
+    // Get the respective resource file (null if not found).
+
+    /**
+     * @brief Returns a pointer to CResourceFile if the script file points to one.
+     * @return A pointer to CResourceFile on success, null otherwise
+    */
+    CResourceFile* GetResourceFile() const;
+
     // Only call functions below this if you're sure that the file is loaded.
     // Or you will crash.
     bool IsEOF();
@@ -57,6 +67,8 @@ public:
     void Flush();
     long Read(unsigned long ulSize, SString& outBuffer);
     long Write(unsigned long ulSize, const char* pData);
+
+    long GetContents(std::string& buffer);
 
     // Debug info for garbage collected files
     const SLuaDebugInfo& GetLuaDebugInfo() { return m_LuaDebugInfo; };
