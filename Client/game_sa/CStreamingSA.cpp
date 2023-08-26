@@ -436,9 +436,10 @@ bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
         return true;
 
     // First of all, allocate the new buffer
+    // NOTE: Due to a bug in the `MallocAlign` code the function will just *crash* instead of returning nullptr on alloc. failure :D
     typedef void*(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
     void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(numBlocks * 2048, 2048);
-    if (!pNewBuffer)
+    if (!pNewBuffer) // ...so this code is useless for now
         return false;
 
     int pointer = *(int*)0x8E3FFC;
@@ -456,12 +457,12 @@ bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 
     // Calculate new buffer pointers
     void* const pNewBuff0 = pNewBuffer;
-    void* const pNewBuff1 = (void*)(reinterpret_cast<uintptr_t>(pNewBuffer) + 2048u * numBlocks);
+    void* const pNewBuff1 = (void*)(reinterpret_cast<uintptr_t>(pNewBuffer) + 2048u * (numBlocks / 2));
 
     // Copy data from old buffer to new buffer
-    uint uiCopySize = std::min(ms_streamingHalfOfBufferSizeBlocks, numBlocks / 2);
-    MemCpyFast(pNewBuff0, ms_pStreamingBuffer[0], uiCopySize);
-    MemCpyFast(pNewBuff1, ms_pStreamingBuffer[1], uiCopySize);
+    const auto copySizeBytes = std::min(ms_streamingHalfOfBufferSizeBlocks, numBlocks / 2) * 2048;
+    MemCpyFast(pNewBuff0, ms_pStreamingBuffer[0], copySizeBytes);
+    MemCpyFast(pNewBuff1, ms_pStreamingBuffer[1], copySizeBytes);
 
     // Now, we can deallocate the old buffer safely
     typedef void(__cdecl * Function_CMemoryMgr_FreeAlign)(void* pos);
