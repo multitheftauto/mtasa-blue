@@ -524,14 +524,17 @@ CClientGame::~CClientGame()
     // Delete PerfStatManager
     delete CClientPerfStatManager::GetSingleton();
 
+    // Reset custom streaming memory size [possibly] set by the server...
+    g_pCore->SetCustomStreamingMemory(0);
+
+    // ...and restore the buffer size too
+    g_pGame->GetStreaming()->SetStreamingBufferSize(g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks());
+
     // NULL the global CClientGame var
     g_pClientGame = NULL;
     m_bBeingDeleted = false;
 
     CStaticFunctionDefinitions::ResetAllSurfaceInfo();
-
-    // Reset custom streaming memory size [possibly] set by the server
-    g_pCore->SetCustomStreamingMemory(0);
 }
 
 /*
