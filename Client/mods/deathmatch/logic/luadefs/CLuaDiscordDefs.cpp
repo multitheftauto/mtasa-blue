@@ -20,6 +20,8 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresenceLargeAsset", ArgumentParser<SetLargeAsset>},
         {"setDiscordRichPresenceSmallAsset", ArgumentParser<SetSmallAsset>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
+        {"isDiscordRichPresenceConnected", ArgumentParser < IsDiscordRPCConnected>},
+
 
     };
 
@@ -36,6 +38,8 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setDetails", "setDiscordRichPresenceDetails");
     lua_classfunction(luaVM, "setLargeAsset", "setDiscordRichPresenceLargeAsset");
     lua_classfunction(luaVM, "setSmallAsset", "setDiscordRichPresenceSmallAsset");
+
+    lua_classfunction(luaVM, "isConnected", "isDiscordRichPresenceConnected");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
 
@@ -56,9 +60,9 @@ bool CLuaDiscordDefs::ResetData()
 
 bool CLuaDiscordDefs::SetState(std::string strState)
 {
-    int strStateLength = strState.length();
+    int stateLength = strState.length();
 
-    if (strStateLength > 64)
+    if (stateLength < 1 || stateLength > 64)
         throw std::invalid_argument("State name must be greater than 0, or less than/equal to 64");
 
     auto discord = g_pCore->GetDiscord();
@@ -104,12 +108,12 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 
 bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, bool bIsLarge)
 {
-    int imageLength = szAsset.length();
-    int imageTextLength = szAssetText.length();
+    int assetLength = szAsset.length();
+    int assetTextLength = szAssetText.length();
 
-    if (imageLength < 1 || imageLength > 32)
+    if (assetLength < 1 || assetLength > 32)
         throw std::invalid_argument("Asset name length must be greater than 0, or less than/equal to 32");
-    if (imageTextLength < 1 || imageTextLength > 32)
+    if (assetTextLength < 1 || assetTextLength > 32)
         throw std::invalid_argument("Asset text length must be greater than 0, or less than/equal to 32");
 
     auto discord = g_pCore->GetDiscord();
@@ -138,4 +142,14 @@ bool CLuaDiscordDefs::SetLargeAsset(std::string szAsset, std::string szAssetText
 bool CLuaDiscordDefs::SetSmallAsset(std::string szAsset, std::string szAssetText)
 {
     return SetAsset(szAsset, szAssetText, false);
+}
+
+bool CLuaDiscordDefs::IsDiscordRPCConnected()
+{
+    auto discord = g_pCore->GetDiscord();
+
+    if (!discord)
+        return false;
+
+    return discord->IsDiscordRPCEnabled();
 }

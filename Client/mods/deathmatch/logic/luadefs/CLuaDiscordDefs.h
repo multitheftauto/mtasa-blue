@@ -24,6 +24,7 @@ private:
     static bool SetAsset(std::string szAsset, std::string szAssetText, bool bIsLarge = false);
     static bool SetLargeAsset(std::string szAsset, std::string szAssetText);
     static bool SetSmallAsset(std::string szAsset, std::string szAssetText);
+    static bool IsDiscordRPCConnected();
 
 };
 
