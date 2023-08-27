@@ -12,6 +12,7 @@
 
 #include <core/CDiscordInterface.h>
 #include <string>
+#include <optional>
 
 class CDiscordRichPresence : public CDiscordInterface
 {
@@ -33,6 +34,7 @@ public:
     bool ResetDiscordData();
     bool SetPresenceState(const char* szState, bool bCustom = false);
     bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
+    bool SetPresenceButtons(const int iIndex, const char* szName, const char* szUrl);
     bool SetDiscordRPCEnabled(bool bEnabled);
     bool IsDiscordRPCEnabled();
     bool SetApplicationID(const char* szAppID);
@@ -53,9 +55,12 @@ private:
     std::string m_strDiscordAppDetails;
     std::string m_strDiscordAppCustomState;
 
+    std::optional<std::tuple<std::pair<std::string, std::string>, std::pair<std::string, std::string>>> m_aButtons;
+
     unsigned long m_uiDiscordAppStart;
     unsigned long m_uiDiscordAppEnd;
 
     bool m_bAllowCustomDetails;
     bool m_bDiscordRPCEnabled;
+    bool m_bUpdateRichPresence;
 };

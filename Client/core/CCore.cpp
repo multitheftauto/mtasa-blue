@@ -1305,6 +1305,10 @@ void CCore::DoPostFramePulse()
         m_bLastFocused = true;
     }
 
+    static auto discord = g_pCore->GetDiscord();
+    if (discord && discord->IsDiscordRPCEnabled())
+        discord->UpdatePresence();
+
     GetJoystickManager()->DoPulse();            // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse();
 

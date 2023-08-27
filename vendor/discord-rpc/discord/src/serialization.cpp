@@ -149,17 +149,41 @@ size_t JsonWriteRichPresenceObj(char* dest,
                     }
                 }
 
-                if ((presence->matchSecret && presence->matchSecret[0]) ||
-                    (presence->joinSecret && presence->joinSecret[0]) ||
-                    (presence->spectateSecret && presence->spectateSecret[0])) {
-                    WriteObject secrets(writer, "secrets");
-                    WriteOptionalString(writer, "match", presence->matchSecret);
-                    WriteOptionalString(writer, "join", presence->joinSecret);
-                    WriteOptionalString(writer, "spectate", presence->spectateSecret);
+                // Send secrets only when buttons aren't set
+                if (!presence->buttons) {
+                    if ((presence->matchSecret && presence->matchSecret[0]) ||
+                        (presence->joinSecret && presence->joinSecret[0]) ||
+                        (presence->spectateSecret && presence->spectateSecret[0])) {
+                        WriteObject secrets(writer, "secrets");
+                        WriteOptionalString(writer, "match", presence->matchSecret);
+                        WriteOptionalString(writer, "join", presence->joinSecret);
+                        WriteOptionalString(writer, "spectate", presence->spectateSecret);
+                    }
                 }
 
                 writer.Key("instance");
                 writer.Bool(presence->instance != 0);
+
+                if (presence->buttons) {
+                    const auto btns = presence->buttons;
+                    WriteArray buttons(writer, "buttons");
+
+                    if (btns[0].label[0]) {
+                        WriteObject button0(writer);
+                        WriteKey(writer, "url");
+                        writer.String(btns[0].url);
+                        WriteKey(writer, "label");
+                        writer.String(btns[0].label);
+                    }
+
+                    if (btns[1].label[0]) {
+                        WriteObject button1(writer);
+                        WriteKey(writer, "url");
+                        writer.String(btns[1].url);
+                        WriteKey(writer, "label");
+                        writer.String(btns[1].label);
+                    }
+                }
             }
         }
     }

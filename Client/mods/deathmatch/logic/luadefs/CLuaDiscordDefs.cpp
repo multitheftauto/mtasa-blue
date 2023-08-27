@@ -19,9 +19,9 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresenceState", ArgumentParser<SetState>},
         {"setDiscordRichPresenceLargeAsset", ArgumentParser<SetLargeAsset>},
         {"setDiscordRichPresenceSmallAsset", ArgumentParser<SetSmallAsset>},
+        {"setDiscordRichPresenceButton", ArgumentParser<SetButtons>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
         {"isDiscordRichPresenceConnected", ArgumentParser < IsDiscordRPCConnected>},
-
 
     };
 
@@ -54,7 +54,6 @@ bool CLuaDiscordDefs::ResetData()
     if (!discord || !discord->IsDiscordRPCEnabled() || !discord->ResetDiscordData())
         return false;
 
-    discord->UpdatePresence();
     return true;
 }
 
@@ -62,15 +61,14 @@ bool CLuaDiscordDefs::SetState(std::string strState)
 {
     int stateLength = strState.length();
 
-    if (stateLength < 1 || stateLength > 64)
-        throw std::invalid_argument("State name must be greater than 0, or less than/equal to 64");
+    if (stateLength < 1 || stateLength > 128)
+        throw std::invalid_argument("State name must be greater than 0, or less than/equal to 128");
 
     auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetPresenceState(strState.c_str(), true))
         return false;
 
-    discord->UpdatePresence();
     return true;
 }
 
@@ -86,7 +84,6 @@ bool CLuaDiscordDefs::SetAppID(std::string strAppID)
     if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetApplicationID(strAppID.c_str()))
         return false;
 
-    discord->UpdatePresence();
     return true;
 }
 
@@ -94,15 +91,14 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 {
     int detailsLength = strDetails.length();
 
-    if (detailsLength < 1 || detailsLength > 64)
-        throw std::invalid_argument("Details length must be greater than 0, or less than/equal to 64");
+    if (detailsLength < 1 || detailsLength > 128)
+        throw std::invalid_argument("Details length must be greater than 0, or less than/equal to 128");
 
     auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetPresenceDetails(strDetails.c_str()))
         return false;
 
-    discord->UpdatePresence();
     return true;
 }
 
@@ -113,8 +109,8 @@ bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, boo
 
     if (assetLength < 1 || assetLength > 32)
         throw std::invalid_argument("Asset name length must be greater than 0, or less than/equal to 32");
-    if (assetTextLength < 1 || assetTextLength > 32)
-        throw std::invalid_argument("Asset text length must be greater than 0, or less than/equal to 32");
+    if (assetTextLength < 1 || assetTextLength > 128)
+        throw std::invalid_argument("Asset text length must be greater than 0, or less than/equal to 128");
 
     auto discord = g_pCore->GetDiscord();
 
@@ -129,8 +125,6 @@ bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, boo
     {
         discord->SetAssetSmallData(szAsset.c_str(), szAssetText.c_str());
     }
-
-    discord->UpdatePresence();
     return true;
 }
 
@@ -142,6 +136,31 @@ bool CLuaDiscordDefs::SetLargeAsset(std::string szAsset, std::string szAssetText
 bool CLuaDiscordDefs::SetSmallAsset(std::string szAsset, std::string szAssetText)
 {
     return SetAsset(szAsset, szAssetText, false);
+}
+
+bool CLuaDiscordDefs::SetButtons(const int iIndex, std::string szName, std::string szUrl)
+{
+    if (iIndex < 0 || iIndex >= 2)
+        return false;
+
+    int nameLength = szName.length();
+    int urlLength = szUrl.length();
+
+    if (nameLength < 1 || nameLength > 32)
+        throw std::invalid_argument("Button name length must be greater than 0, or less than/equal to 32");
+    if (urlLength < 1 || urlLength > 128)
+        throw std::invalid_argument("Button URL length must be greater than 0, or less than/equal to 128");
+
+    if (szUrl.find("https://") != 0 && szUrl.find("mtasa://") != 0)
+        throw std::invalid_argument("Button URL must contains link mtasa:// or https://");
+
+    auto discord = g_pCore->GetDiscord();
+
+    if (!discord)
+        return false;
+
+    discord->SetPresenceButtons(iIndex, szName.c_str(), szUrl.c_str());
+    return true;
 }
 
 bool CLuaDiscordDefs::IsDiscordRPCConnected()

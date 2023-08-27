@@ -29,7 +29,7 @@ CDiscordRichPresence::CDiscordRichPresence() : m_uiDiscordAppStart(0), m_uiDisco
 CDiscordRichPresence::~CDiscordRichPresence()
 {
     if (m_bDiscordRPCEnabled)
-        Discord_Shutdown();
+        ShutdownDiscord();
 }
 
 void CDiscordRichPresence::InitializeDiscord()
@@ -48,7 +48,7 @@ void CDiscordRichPresence::ShutdownDiscord()
 
 void CDiscordRichPresence::RestartDiscord()
 {
-    Discord_Shutdown();
+    ShutdownDiscord();
     InitializeDiscord();
 }
 
@@ -64,10 +64,16 @@ void CDiscordRichPresence::SetDefaultData()
     m_strDiscordAppCurrentId = DEFAULT_APP_ID;
     m_strDiscordAppDetails.clear();
     m_strDiscordAppCustomState.clear();
+
+    m_aButtons = {};
+    m_bUpdateRichPresence = true;
 }
 
 void CDiscordRichPresence::UpdatePresence()
 {
+    if (!m_bUpdateRichPresence)
+        return;
+
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
 
@@ -82,7 +88,19 @@ void CDiscordRichPresence::UpdatePresence()
     discordPresence.details = m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
 
+    DiscordButton buttons[2];
+    if (m_aButtons)
+    {
+        buttons[0].label = std::get<0>(*m_aButtons).first.c_str();
+        buttons[0].url = std::get<0>(*m_aButtons).second.c_str();
+        buttons[1].label = std::get<1>(*m_aButtons).first.c_str();
+        buttons[1].url = std::get<1>(*m_aButtons).second.c_str();
+
+        discordPresence.buttons = buttons;
+    }
+
     Discord_UpdatePresence(&discordPresence);
+    m_bUpdateRichPresence = false;
 }
 
 void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart)
@@ -112,6 +130,7 @@ void CDiscordRichPresence::SetAsset(const char* szAsset, const char* szAssetText
         m_strDiscordAppAssetSmall = (szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET_SMALL;
         m_strDiscordAppAssetSmallText = (szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
     }
+    m_bUpdateRichPresence = true;
 }
 
 bool CDiscordRichPresence::SetPresenceState(const char* szState, bool bCustom)
@@ -120,6 +139,24 @@ bool CDiscordRichPresence::SetPresenceState(const char* szState, bool bCustom)
         m_strDiscordAppCustomState = szState;
     else
         m_strDiscordAppState = szState;
+
+    m_bUpdateRichPresence = true;
+    return true;
+}
+
+bool CDiscordRichPresence::SetPresenceButtons(const int iIndex, const char* szName, const char* szUrl)
+{
+    std::decay_t<decltype(*m_aButtons)> buttons;
+    if (m_aButtons)
+        buttons = *m_aButtons;
+
+    if (iIndex == 0)
+        std::get<0>(buttons) = {szName, szUrl};
+    else if (iIndex == 1)
+        std::get<1>(buttons) = {szName, szUrl};
+
+    m_aButtons = buttons;
+    m_bUpdateRichPresence = true;
 
     return true;
 }
@@ -130,6 +167,7 @@ bool CDiscordRichPresence::SetPresenceDetails(const char* szDetails, bool bCusto
         return false;
 
     m_strDiscordAppDetails = szDetails;
+    m_bUpdateRichPresence = true;
     return true;
 }
 
@@ -140,7 +178,7 @@ bool CDiscordRichPresence::ResetDiscordData()
     if (m_bDiscordRPCEnabled)
     {
         RestartDiscord();
-        UpdatePresence();
+        m_bUpdateRichPresence = true;
     }
     return true;
 }
@@ -167,7 +205,7 @@ bool CDiscordRichPresence::SetDiscordRPCEnabled(bool bEnabled)
     }
 
     InitializeDiscord();
-    UpdatePresence();
+    m_bUpdateRichPresence = true;
     return true;
 }
 
