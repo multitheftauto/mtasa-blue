@@ -82,8 +82,7 @@ void CDiscordRichPresence::UpdatePresence()
     discordPresence.smallImageKey = m_strDiscordAppAssetSmall.c_str();
     discordPresence.smallImageText = m_strDiscordAppAssetSmallText.c_str();
 
-    const char* state = (!m_strDiscordAppCustomState.empty() && m_bAllowCustomDetails) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
-    discordPresence.state = state;
+    discordPresence.state = (!m_strDiscordAppCustomState.empty() && m_bAllowCustomDetails) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
 
     discordPresence.details = m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
@@ -106,6 +105,7 @@ void CDiscordRichPresence::UpdatePresence()
 void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart)
 {
     m_uiDiscordAppStart = ulStart;
+    m_bUpdateRichPresence = true;
 }
 
 void CDiscordRichPresence::SetAssetLargeData(const char* szAsset, const char* szAssetText)
@@ -144,21 +144,27 @@ bool CDiscordRichPresence::SetPresenceState(const char* szState, bool bCustom)
     return true;
 }
 
-bool CDiscordRichPresence::SetPresenceButtons(const int iIndex, const char* szName, const char* szUrl)
+bool CDiscordRichPresence::SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl)
 {
-    std::decay_t<decltype(*m_aButtons)> buttons;
-    if (m_aButtons)
-        buttons = *m_aButtons;
+    // Should it always return true?
+    if (iIndex <= 2)
+    {
+        std::decay_t<decltype(*m_aButtons)> buttons;
+        if (m_aButtons)
+            buttons = *m_aButtons;
 
-    if (iIndex == 0)
-        std::get<0>(buttons) = {szName, szUrl};
-    else if (iIndex == 1)
-        std::get<1>(buttons) = {szName, szUrl};
+        if (iIndex == 1)
+            std::get<0>(buttons) = {szName, szUrl};
+        else if (iIndex == 2)
+            std::get<1>(buttons) = {szName, szUrl};
 
-    m_aButtons = buttons;
-    m_bUpdateRichPresence = true;
+        m_aButtons = buttons;
+        m_bUpdateRichPresence = true;
 
-    return true;
+        return true;
+    }
+
+    return false;
 }
 
 bool CDiscordRichPresence::SetPresenceDetails(const char* szDetails, bool bCustom)

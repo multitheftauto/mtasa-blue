@@ -22,7 +22,7 @@ private:
     static bool SetAppID(std::string strAppID);
     static bool SetDetails(std::string strDetails);
     static bool SetAsset(std::string szAsset, std::string szAssetText, bool bIsLarge = false);
-    static bool SetButtons(const int iIndex, std::string szName, std::string szUrl);
+    static bool SetButtons(unsigned short int iIndex, std::string szName, std::string szUrl);
     static bool SetLargeAsset(std::string szAsset, std::string szAssetText);
     static bool SetSmallAsset(std::string szAsset, std::string szAssetText);
     static bool IsDiscordRPCConnected();

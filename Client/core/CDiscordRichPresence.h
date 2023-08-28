@@ -11,7 +11,6 @@
 #pragma once
 
 #include <core/CDiscordInterface.h>
-#include <string>
 #include <optional>
 
 class CDiscordRichPresence : public CDiscordInterface
@@ -34,7 +33,7 @@ public:
     bool ResetDiscordData();
     bool SetPresenceState(const char* szState, bool bCustom = false);
     bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
-    bool SetPresenceButtons(const int iIndex, const char* szName, const char* szUrl);
+    bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl);
     bool SetDiscordRPCEnabled(bool bEnabled);
     bool IsDiscordRPCEnabled();
     bool SetApplicationID(const char* szAppID);

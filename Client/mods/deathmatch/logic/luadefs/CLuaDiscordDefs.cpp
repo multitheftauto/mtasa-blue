@@ -17,7 +17,7 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordApplicationID", ArgumentParser<SetAppID>},
         {"setDiscordRichPresenceDetails", ArgumentParser<SetDetails>},
         {"setDiscordRichPresenceState", ArgumentParser<SetState>},
-        {"setDiscordRichPresenceLargeAsset", ArgumentParser<SetLargeAsset>},
+        {"setDiscordRichPresenceAsset", ArgumentParser<SetLargeAsset>},
         {"setDiscordRichPresenceSmallAsset", ArgumentParser<SetSmallAsset>},
         {"setDiscordRichPresenceButton", ArgumentParser<SetButtons>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
@@ -34,10 +34,12 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
-    lua_classfunction(luaVM, "setID", "setDiscordApplicationID");
+    lua_classfunction(luaVM, "setApplication", "setDiscordApplicationID");
+    lua_classfunction(luaVM, "setState", "setDiscordRichPresenceState");
     lua_classfunction(luaVM, "setDetails", "setDiscordRichPresenceDetails");
-    lua_classfunction(luaVM, "setLargeAsset", "setDiscordRichPresenceLargeAsset");
+    lua_classfunction(luaVM, "setAsset", "setDiscordRichPresenceAsset");
     lua_classfunction(luaVM, "setSmallAsset", "setDiscordRichPresenceSmallAsset");
+    lua_classfunction(luaVM, "setButton", "setDiscordRichPresenceButton");
 
     lua_classfunction(luaVM, "isConnected", "isDiscordRichPresenceConnected");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
@@ -118,13 +120,10 @@ bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, boo
         return false;
 
     if (bIsLarge)
-    {
         discord->SetAssetLargeData(szAsset.c_str(), szAssetText.c_str());
-    }
     else
-    {
         discord->SetAssetSmallData(szAsset.c_str(), szAssetText.c_str());
-    }
+
     return true;
 }
 
@@ -138,9 +137,9 @@ bool CLuaDiscordDefs::SetSmallAsset(std::string szAsset, std::string szAssetText
     return SetAsset(szAsset, szAssetText, false);
 }
 
-bool CLuaDiscordDefs::SetButtons(const int iIndex, std::string szName, std::string szUrl)
+bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, std::string szUrl)
 {
-    if (iIndex < 0 || iIndex >= 2)
+    if (iIndex < 1 || iIndex > 2)
         return false;
 
     int nameLength = szName.length();
@@ -152,14 +151,13 @@ bool CLuaDiscordDefs::SetButtons(const int iIndex, std::string szName, std::stri
         throw std::invalid_argument("Button URL length must be greater than 0, or less than/equal to 128");
 
     if (szUrl.find("https://") != 0 && szUrl.find("mtasa://") != 0)
-        throw std::invalid_argument("Button URL must contains link mtasa:// or https://");
+        throw std::invalid_argument("Button URL should include the https:// or mtasa:// link");
 
     auto discord = g_pCore->GetDiscord();
 
-    if (!discord)
+    if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetPresenceButtons(iIndex, szName.c_str(), szUrl.c_str()))
         return false;
 
-    discord->SetPresenceButtons(iIndex, szName.c_str(), szUrl.c_str());
     return true;
 }
 
