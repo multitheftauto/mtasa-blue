@@ -637,7 +637,8 @@ void CWorldRPCs::SetWorldSpecialPropertyEnabled(NetBitStreamInterface& bitStream
 {
     uchar property;
     bool  isEnabled;
-    bitStream.Read(property);
-    bitStream.ReadBit(isEnabled);
-    g_pClientGame->SetWorldSpecialProperty((WorldSpecialProperty)property, isEnabled);
+    if (bitStream.Read(property) && bitStream.ReadBit(isEnabled))
+    {
+        g_pClientGame->SetWorldSpecialProperty((WorldSpecialProperty)property, isEnabled);
+    }
 }
