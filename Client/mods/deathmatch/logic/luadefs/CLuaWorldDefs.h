@@ -118,6 +118,9 @@ public:
                                                                                                   uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha);
     static CLuaMultiReturn<uchar, uchar, uchar, uchar, uchar, uchar, uchar, uchar> GetColorFilter(bool isOriginal = false);
 
+    static bool SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier);
+    static bool SetGrainLevel(uchar ucLevel);
+
     static bool  SetCoronaReflectionsEnabled(uchar ucEnabled);
     static uchar GetCoronaReflectionsEnabled();
     static bool  ResetCoronaReflectionsEnabled();

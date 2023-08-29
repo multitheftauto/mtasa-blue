@@ -1,37 +1,38 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        core/CLanguageSelector.cpp
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "CLanguageSelector.h"
 
-#define FLAG_SIZE_X             26
-#define FLAG_SIZE_Y             16
-#define FLAG_LABEL_GAP_X        10    // Gap between flag and label
-#define FLAG_ZOOM_SCALE         0.75f
-#define LABEL_SIZE_X            95
-#define LABEL_SIZE_Y            16
-#define LABEL_OFFSET_Y          ((FLAG_SIZE_Y - LABEL_SIZE_Y) / 2)
+#define LANGUAGE_ICON_SIZE_X         20
+#define LANGUAGE_ICON_SIZE_Y         24
+#define LANGUAGE_ICON_LABEL_GAP_X    10            // Gap between language icon and label
 
-// Flag 'n' label combo
-#define ITEM_SIZE_X             145
-#define ITEM_SIZE_Y             30
+#define LABEL_SIZE_X                 165
+#define LABEL_SIZE_Y                 16
+
+#define LANGUAGE_ICON_LABEL_OFFSET_Y ((LANGUAGE_ICON_SIZE_Y - LABEL_SIZE_Y) / 2)
+
+// Language icon and label combo
+#define ITEM_SIZE_X                  165
+#define ITEM_SIZE_Y                  24
 
 // Current language button
-#define BUTTON_MARGIN_X         20
-#define BUTTON_MARGIN_Y         5
+#define BUTTON_MARGIN_X              20
+#define BUTTON_MARGIN_Y              5
 
 // All languages list
-#define LIST_MARGIN_X           22
-#define LIST_MARGIN_Y           13
-#define LIST_ITEM_SPACING_X     12
-#define LIST_ITEM_SPACING_Y     1
+#define LIST_MARGIN_X                20
+#define LIST_MARGIN_Y                18
+#define LIST_ITEM_SPACING_X          10
+#define LIST_ITEM_SPACING_Y          1
 
 ///////////////////////////////////////////////////////////////
 //
@@ -57,12 +58,12 @@ CLanguageSelector::~CLanguageSelector()
     SAFE_DELETE(m_pButtonWindow);
     SAFE_DELETE(m_pListWindow);
     SAFE_DELETE(m_ButtonItem.pContainerPane);
-    SAFE_DELETE(m_ButtonItem.pFlag);
+    SAFE_DELETE(m_ButtonItem.pIcon);
     SAFE_DELETE(m_ButtonItem.pLabel);
     for (CLangListItem& item : m_ListItems)
     {
         SAFE_DELETE(item.pContainerPane);
-        SAFE_DELETE(item.pFlag);
+        SAFE_DELETE(item.pIcon);
         SAFE_DELETE(item.pLabel);
     }
 }
@@ -92,7 +93,40 @@ void CLanguageSelector::CreateGUI(CGUIElement* pMainMenuCanvas)
         m_pButtonWindow->SetVisible(true);
 
         CVector2D vecItemPosition(BUTTON_MARGIN_X, BUTTON_MARGIN_Y);
-        m_ButtonItem = CreateGUILangItem(m_pButtonWindow, vecItemPosition);
+
+        CVector2D vecPaneSize(ITEM_SIZE_X, ITEM_SIZE_Y);
+        CVector2D vecIconPos = vecItemPosition + CVector2D(LANGUAGE_ICON_SIZE_X / 2, (vecPaneSize.fY - LANGUAGE_ICON_SIZE_Y) / 2);
+        CVector2D vecLabelPos = vecIconPos + CVector2D(LANGUAGE_ICON_SIZE_X + LANGUAGE_ICON_LABEL_GAP_X, LANGUAGE_ICON_LABEL_OFFSET_Y);
+
+        CGUIScrollPane* pContainerPane = reinterpret_cast<CGUIScrollPane*>(g_pCore->GetGUI()->CreateScrollPane(m_pButtonWindow));
+        pContainerPane->SetProperty("ContentPaneAutoSized", "False");
+        pContainerPane->SetPosition(vecItemPosition);
+        pContainerPane->SetSize(vecPaneSize);
+        pContainerPane->SetZOrderingEnabled(false);
+        pContainerPane->SetAlwaysOnTop(true);
+        pContainerPane->SetVisible(true);
+
+        CGUIStaticImage* pIcon = reinterpret_cast<CGUIStaticImage*>(g_pCore->GetGUI()->CreateStaticImage(m_pButtonWindow));
+        pIcon->SetPosition(vecIconPos);
+        pIcon->SetSize(CVector2D(LANGUAGE_ICON_SIZE_X, LANGUAGE_ICON_SIZE_Y));
+        pIcon->SetZOrderingEnabled(false);
+        pIcon->LoadFromFile(CalcMTASAPath("MTA\\cgui\\images\\the_language_icon.png"));
+
+        CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(g_pCore->GetGUI()->CreateLabel(m_pButtonWindow));
+        pLabel->SetPosition(vecLabelPos);
+        pLabel->SetSize(CVector2D(LABEL_SIZE_X, LABEL_SIZE_Y));
+        pLabel->SetZOrderingEnabled(false);
+        pLabel->SetText(g_pLocalization->GetLanguageNativeName());
+
+        CLangListItem m_ButtonItem;
+        m_ButtonItem.strLocale = "";
+        m_ButtonItem.pContainerPane = pContainerPane;
+        m_ButtonItem.pIcon = pIcon;
+        m_ButtonItem.vecIconInitialPos = pIcon->GetPosition();
+        m_ButtonItem.vecIconInitialSize = pIcon->GetSize();
+        m_ButtonItem.pLabel = pLabel;
+        m_ButtonItem.vecLabelInitialPos = pLabel->GetPosition();
+        m_ButtonItem.vecLabelInitialSize = pLabel->GetSize();
         m_ButtonItem.pContainerPane->SetMouseButtonDownHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonClick, this));
         m_ButtonItem.pContainerPane->SetMouseEnterHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonEnter, this));
         m_ButtonItem.pContainerPane->SetMouseLeaveHandler(GUI_CALLBACK(&CLanguageSelector::OnButtonLeave, this));
@@ -151,15 +185,14 @@ void CLanguageSelector::CreateGUI(CGUIElement* pMainMenuCanvas)
 //
 // CLanguageSelector::CreateGUILangItem
 //
-// Create GUI items for one flag with language name.
+// Create GUI items for a language.
 // ContainerPane is used to handle mouse interaction
 //
 ///////////////////////////////////////////////////////////////
 CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, const CVector2D& vecPanePosition, const SString& strLocale)
 {
     CVector2D vecPaneSize(ITEM_SIZE_X, ITEM_SIZE_Y);
-    CVector2D vecFlagPos = vecPanePosition + CVector2D((FLAG_SIZE_X * FLAG_ZOOM_SCALE) / 2, (vecPaneSize.fY - FLAG_SIZE_Y) / 2);
-    CVector2D vecLabelPos = vecFlagPos + CVector2D(FLAG_SIZE_X + FLAG_LABEL_GAP_X, LABEL_OFFSET_Y);
+    CVector2D vecLabelPos = vecPanePosition;
 
     CGUIScrollPane* pContainerPane = reinterpret_cast<CGUIScrollPane*>(g_pCore->GetGUI()->CreateScrollPane(pGUIParent));
     pContainerPane->SetProperty("ContentPaneAutoSized", "False");
@@ -168,12 +201,6 @@ CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, cons
     pContainerPane->SetZOrderingEnabled(false);
     pContainerPane->SetAlwaysOnTop(true);
     pContainerPane->SetVisible(true);
-
-    CGUIStaticImage* pFlag = reinterpret_cast<CGUIStaticImage*>(g_pCore->GetGUI()->CreateStaticImage(pGUIParent));
-    pFlag->SetPosition(vecFlagPos);
-    pFlag->SetSize(CVector2D(FLAG_SIZE_X, FLAG_SIZE_Y));
-    pFlag->SetZOrderingEnabled(false);
-    pFlag->LoadFromFile(GetFlagFilename(strLocale));
 
     CGUILabel* pLabel = reinterpret_cast<CGUILabel*>(g_pCore->GetGUI()->CreateLabel(pGUIParent));
     pLabel->SetPosition(vecLabelPos);
@@ -184,9 +211,6 @@ CLangListItem CLanguageSelector::CreateGUILangItem(CGUIElement* pGUIParent, cons
     CLangListItem item;
     item.strLocale = strLocale;
     item.pContainerPane = pContainerPane;
-    item.pFlag = pFlag;
-    item.vecFlagInitialPos = pFlag->GetPosition();
-    item.vecFlagInitialSize = pFlag->GetSize();
     item.pLabel = pLabel;
     item.vecLabelInitialPos = pLabel->GetPosition();
     item.vecLabelInitialSize = pLabel->GetSize();
@@ -231,16 +255,9 @@ void CLanguageSelector::DoPulse()
             // Update animation position
             float fMaxAmount = fDeltaSeconds * 16.0f;
             pItem->fFocusEffectPos += Clamp(-fMaxAmount, pItem->fFocusEffectTarget - pItem->fFocusEffectPos, fMaxAmount);
-            float fFlagScale = 1 + pItem->fFocusEffectPos * FLAG_ZOOM_SCALE;
 
-            // Scale flag
-            CVector2D vecFlagZoomPos = pItem->vecFlagInitialPos - (pItem->vecFlagInitialSize * pItem->fFocusEffectPos * FLAG_ZOOM_SCALE * 0.5f);
-            pItem->pFlag->SetPosition(vecFlagZoomPos);
-            pItem->pFlag->SetSize(CVector2D(FLAG_SIZE_X * fFlagScale, FLAG_SIZE_Y * fFlagScale));
-
-            // Move label to accommodate scaled flag
-            CVector2D vecLabelZoomPos =
-                pItem->vecLabelInitialPos + CVector2D(pItem->vecFlagInitialSize.fX * pItem->fFocusEffectPos * FLAG_ZOOM_SCALE * 0.5f, 0);
+            // Move label
+            CVector2D vecLabelZoomPos = pItem->vecLabelInitialPos + CVector2D(pItem->vecLabelInitialSize.fX * pItem->fFocusEffectPos * 0.05f, 0);
             pItem->pLabel->SetPosition(vecLabelZoomPos);
         }
     }
@@ -262,20 +279,6 @@ void CLanguageSelector::SetLanguageListVisible(bool bVisible)
             m_pListWindow->Activate();
     }
     m_pListWindow->SetVisible(bVisible);
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CLanguageSelector::GetFlagFilename
-//
-// Get image filename for supplied locale, or the current locale
-//
-///////////////////////////////////////////////////////////////
-SString CLanguageSelector::GetFlagFilename(SString strLocale)
-{
-    if (strLocale.empty())
-        strLocale = CVARS_GET_VALUE<SString>("locale");
-    return CalcMTASAPath(SString(MTA_LOCALE_DIR "%s\\flag.png", *strLocale));
 }
 
 ///////////////////////////////////////////////////////////////

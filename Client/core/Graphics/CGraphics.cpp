@@ -2154,7 +2154,7 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
             // Save backbuffer pixels
             if (!m_pTempBackBufferData)
                 m_pTempBackBufferData =
-                    CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget(BackBufferDesc.Width, BackBufferDesc.Height, true, true);
+                    CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget(BackBufferDesc.Width, BackBufferDesc.Height, false, true, 0, true);
             if (!m_pTempBackBufferData)
                 break;
             hr = m_pDevice->StretchRect(pD3DBackBufferSurface, NULL, m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, D3DTEXF_POINT);
@@ -2417,7 +2417,7 @@ namespace
 
         // Initial octahedron
         static SFixedArray<CVector, 6>     vecPoints = {CVector(0, 0, 1),  CVector(0, 0, -1), CVector(-1, -1, 0),
-                                                        CVector(1, -1, 0), CVector(1, 1, 0),  CVector(-1, 1, 0)};
+                                                    CVector(1, -1, 0), CVector(1, 1, 0),  CVector(-1, 1, 0)};
         static const SFixedArray<WORD, 24> indices = {0, 3, 4, 0, 4, 5, 0, 5, 2, 0, 2, 3, 1, 4, 3, 1, 5, 4, 1, 2, 5, 1, 3, 2};
 
         for (uint i = 0; i < NUMELMS(vecPoints); i++)

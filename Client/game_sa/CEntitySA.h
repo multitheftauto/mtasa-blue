@@ -123,20 +123,20 @@ public:
 class CEntitySAInterface
 {
 public:
-    CEntitySAInterfaceVTBL* vtbl;               // the virtual table
+    CEntitySAInterfaceVTBL* vtbl;            // the virtual table
 
     CPlaceableSAInterface Placeable;            // 4
 
-    RpClump* m_pRwObject;                       // 24
+    RpClump* m_pRwObject;            // 24
     /********** BEGIN CFLAGS **************/
-    unsigned long bUsesCollision : 1;                  // does entity use collision
-    unsigned long bCollisionProcessed : 1;             // has object been processed by a ProcessEntityCollision function
-    unsigned long bIsStatic : 1;                       // is entity static
-    unsigned long bHasContacted : 1;                   // has entity processed some contact forces
-    unsigned long bIsStuck : 1;                        // is entity stuck
-    unsigned long bIsInSafePosition : 1;               // is entity in a collision free safe position
-    unsigned long bWasPostponed : 1;                   // was entity control processing postponed
-    unsigned long bIsVisible : 1;                      // is the entity visible
+    unsigned long bUsesCollision : 1;                 // does entity use collision
+    unsigned long bCollisionProcessed : 1;            // has object been processed by a ProcessEntityCollision function
+    unsigned long bIsStatic : 1;                      // is entity static
+    unsigned long bHasContacted : 1;                  // has entity processed some contact forces
+    unsigned long bIsStuck : 1;                       // is entity stuck
+    unsigned long bIsInSafePosition : 1;              // is entity in a collision free safe position
+    unsigned long bWasPostponed : 1;                  // was entity control processing postponed
+    unsigned long bIsVisible : 1;                     // is the entity visible
 
     unsigned long bIsBIGBuilding : 1;                  // Set if this entity is a big building
     unsigned long bRenderDamaged : 1;                  // use damaged LOD models for objects with applicable damage
@@ -147,8 +147,8 @@ public:
     unsigned long bDrawLast : 1;                       // draw object last
     unsigned long bDistanceFade : 1;                   // Fade entity because it is far away
 
-    unsigned long bDontCastShadowsOn : 1;              // Dont cast shadows on this object
-    unsigned long bOffscreen : 1;                      // offscreen flag. This can only be trusted when it is set to true
+    unsigned long bDontCastShadowsOn : 1;            // Dont cast shadows on this object
+    unsigned long bOffscreen : 1;                    // offscreen flag. This can only be trusted when it is set to true
     unsigned long
         bIsStaticWaitingForCollision : 1;              // this is used by script created entities - they are static until the collision is loaded below them
     unsigned long bDontStream : 1;                     // tell the streaming not to stream me
@@ -157,14 +157,14 @@ public:
     unsigned long bIsTempBuilding : 1;                 // whether or not the building is temporary (i.e. can be created and deleted more than once)
     unsigned long bDontUpdateHierarchy : 1;            // Don't update the aniamtion hierarchy this frame
 
-    unsigned long bHasRoadsignText : 1;                // entity is roadsign and has some 2deffect text stuff to be rendered
+    unsigned long bHasRoadsignText : 1;            // entity is roadsign and has some 2deffect text stuff to be rendered
     unsigned long bDisplayedSuperLowLOD : 1;
-    unsigned long bIsProcObject : 1;                   // set object has been generate by procedural object generator
-    unsigned long bBackfaceCulled : 1;                 // has backface culling on
-    unsigned long bLightObject : 1;                    // light object with directional lights
-    unsigned long bUnimportantStream : 1;              // set that this object is unimportant, if streaming is having problems
-    unsigned long bTunnel : 1;                         // Is this model part of a tunnel
-    unsigned long bTunnelTransition : 1;               // This model should be rendered from within and outside of the tunnel
+    unsigned long bIsProcObject : 1;                 // set object has been generate by procedural object generator
+    unsigned long bBackfaceCulled : 1;               // has backface culling on
+    unsigned long bLightObject : 1;                  // light object with directional lights
+    unsigned long bUnimportantStream : 1;            // set that this object is unimportant, if streaming is having problems
+    unsigned long bTunnel : 1;                       // Is this model part of a tunnel
+    unsigned long bTunnelTransition : 1;             // This model should be rendered from within and outside of the tunnel
     /********** END CFLAGS **************/
 
     WORD         RandomSeed;               // 32
@@ -173,9 +173,9 @@ public:
 
     DWORD* m_pLastRenderedLink;            //   CLink<CEntity*>* m_pLastRenderedLink; +40
 
-    WORD m_nScanCode;                      // 44
-    BYTE m_iplIndex;                       // used to define which IPL file object is in +46
-    BYTE m_areaCode;                       // used to define what objects are visible at this point +47
+    WORD m_nScanCode;            // 44
+    BYTE m_iplIndex;             // used to define which IPL file object is in +46
+    BYTE m_areaCode;             // used to define what objects are visible at this point +47
 
     // LOD shit
     CEntitySAInterface* m_pLod;            // 48

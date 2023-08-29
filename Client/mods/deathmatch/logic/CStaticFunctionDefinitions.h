@@ -560,8 +560,8 @@ public:
     // World functions
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMin);
     static bool ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity,
-                                   const SLineOfSightFlags& flags = SLineOfSightFlags(), std::vector<CClientEntity*> vecIgnoredElements = {},
-                                   SLineOfSightBuildingResult* pBuildingResult = NULL);
+                                   const SLineOfSightFlags& flags = SLineOfSightFlags(), CEntity* pIgnoredEntity = NULL,
+                                   SLineOfSightBuildingResult* pBuildingResult = NULL, SProcessLineOfSightMaterialInfoResult* outMatInfo = nullptr);
     static bool IsLineOfSightClear(const CVector& vecStart, const CVector& vecEnd, bool& bIsClear, const SLineOfSightFlags& flags = SLineOfSightFlags(),
                                    CEntity* pIgnoredEntity = NULL);
     static bool TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision);

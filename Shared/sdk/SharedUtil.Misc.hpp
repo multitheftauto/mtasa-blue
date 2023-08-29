@@ -1502,6 +1502,11 @@ std::string SharedUtil::UTF16ToMbUTF8(const wchar_t* input)
     return utf8_wcstombs(input);
 }
 
+std::string SharedUtil::UTF16ToMbUTF8(const char16_t* input)
+{
+    return UTF16ToMbUTF8((const wchar_t*)input);
+}
+
 // Get UTF8 confidence
 int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
 {
@@ -1638,15 +1643,9 @@ namespace SharedUtil
         m_cEscapeCharacter = '#';
     }
 
-    void CArgMap::SetEscapeCharacter(char cEscapeCharacter)
-    {
-        m_cEscapeCharacter = cEscapeCharacter;
-    }
+    void CArgMap::SetEscapeCharacter(char cEscapeCharacter) { m_cEscapeCharacter = cEscapeCharacter; }
 
-    void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues)
-    {
-        MergeFromString(other.ToString(), bAllowMultiValues);
-    }
+    void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues) { MergeFromString(other.ToString(), bAllowMultiValues); }
 
     void CArgMap::SetFromString(const SString& strLine, bool bAllowMultiValues)
     {
@@ -1699,15 +1698,9 @@ namespace SharedUtil
             SetFromString(ToString(), false);
     }
 
-    SString CArgMap::Escape(const SString& strIn) const
-    {
-        return EscapeString(strIn, m_strDisallowedChars, m_cEscapeCharacter);
-    }
+    SString CArgMap::Escape(const SString& strIn) const { return EscapeString(strIn, m_strDisallowedChars, m_cEscapeCharacter); }
 
-    SString CArgMap::Unescape(const SString& strIn) const
-    {
-        return UnescapeString(strIn, m_cEscapeCharacter);
-    }
+    SString CArgMap::Unescape(const SString& strIn) const { return UnescapeString(strIn, m_cEscapeCharacter); }
 
     // Set a unique key string value
     void CArgMap::Set(const SString& strCmd, const SString& strValue)
@@ -1724,10 +1717,7 @@ namespace SharedUtil
     }
 
     // Insert a key int value
-    void CArgMap::Insert(const SString& strCmd, int iValue)
-    {
-        Insert(strCmd, SString("%d", iValue));
-    }
+    void CArgMap::Insert(const SString& strCmd, int iValue) { Insert(strCmd, SString("%d", iValue)); }
 
     // Insert a key string value
     void CArgMap::Insert(const SString& strCmd, const SString& strValue)
@@ -1737,10 +1727,7 @@ namespace SharedUtil
     }
 
     // Test if key exists
-    bool CArgMap::Contains(const SString& strCmd) const
-    {
-        return MapFind(m_Map, Escape(strCmd)) != NULL;
-    }
+    bool CArgMap::Contains(const SString& strCmd) const { return MapFind(m_Map, Escape(strCmd)) != NULL; }
 
     // First result as string
     bool CArgMap::Get(const SString& strCmd, SString& strOut, const char* szDefault) const

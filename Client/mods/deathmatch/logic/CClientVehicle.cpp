@@ -94,7 +94,6 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_Matrix.vFront.fY = 1.0f;
     m_Matrix.vUp.fZ = 1.0f;
     m_Matrix.vRight.fX = 1.0f;
-    m_MatrixLast = m_Matrix;
     m_dLastRotationTime = 0;
     m_fHealth = DEFAULT_VEHICLE_HEALTH;
     m_fTurretHorizontal = 0.0f;
@@ -528,7 +527,6 @@ bool CClientVehicle::SetMatrix(const CMatrix& Matrix)
 
     m_Matrix = Matrix;
     m_matFrozen = Matrix;
-    m_MatrixPure = Matrix;
 
     // If we have any occupants, update their positions
     // Make sure we dont update their position if they are getting out and have physically left the car
@@ -556,18 +554,6 @@ void CClientVehicle::GetMoveSpeed(CVector& vecMoveSpeed) const
         {
             vecMoveSpeed = m_vecMoveSpeed;
         }
-    }
-}
-
-void CClientVehicle::GetMoveSpeedMeters(CVector& vecMoveSpeed) const
-{
-    if (m_bIsFrozen)
-    {
-        vecMoveSpeed = CVector(0, 0, 0);
-    }
-    else
-    {
-        vecMoveSpeed = m_vecMoveSpeedMeters;
     }
 }
 
@@ -1017,9 +1003,8 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         if (m_pUpgrades)
             m_pUpgrades->RemoveAll(false);
 
-        // Are we swapping from a vortex or skimmer?
-        bool bResetWheelAndDoorStates = (m_usModel == VT_VORTEX || m_usModel == VT_SKIMMER ||
-                                         (m_eVehicleType == CLIENTVEHICLE_PLANE && m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel)));
+        // Are we swapping from a vehicle without doors?
+        bool bResetWheelAndDoorStates = (!CClientVehicleManager::HasDoors(m_usModel) || m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel));
 
         // Apply variant requirements
         if (ucVariant == 255 && ucVariant2 == 255)
@@ -2188,13 +2173,6 @@ void CClientVehicle::StreamedInPulse()
                 m_pVehicle->SetUsesCollision(false);
             }
         }
-
-        // Calculate the velocity
-        CMatrix MatrixCurrent;
-        m_pVehicle->GetMatrix(&MatrixCurrent);
-        m_vecMoveSpeedMeters = (MatrixCurrent.vPos - m_MatrixLast.vPos) * g_pGame->GetFPS();
-        // Store the current matrix
-        m_MatrixLast = MatrixCurrent;
 
         // We dont interpolate attached trailers
         if (m_pTowedByVehicle)
@@ -3524,6 +3502,7 @@ void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>&
         case VT_RCTIGER:
         case VT_TRACTOR:
         case VT_VORTEX:
+        case VT_BLOODRA:
             memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
 
             // Keep the bonet and boot intact
@@ -4278,7 +4257,6 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
     m_pVehicle->SetMatrix(&m_matFrozen);
     m_pVehicle->SetMoveSpeed(&vecTemp);
     m_pVehicle->SetTurnSpeed(&vecTemp);
-    m_vecMoveSpeedMeters = vecTemp;
     m_vecMoveSpeed = vecTemp;
     m_vecTurnSpeed = vecTemp;
 

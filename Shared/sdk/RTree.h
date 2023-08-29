@@ -271,7 +271,7 @@ public:
         StackElement m_stack[MAX_STACK];            ///< Stack as we are doing iteration instead of recursion
         int          m_tos;                         ///< Top Of Stack index
 
-        friend class RTree;                         // Allow hiding of non-public functions while allowing manipulation by logical owner
+        friend class RTree;            // Allow hiding of non-public functions while allowing manipulation by logical owner
     };
 
     /// Get 'first' for iteration
@@ -333,9 +333,9 @@ protected:
         bool IsInternalNode() { return (m_level > 0); }            // Not a leaf, but a internal node
         bool IsLeaf() { return (m_level == 0); }                   // A leaf, contains data
 
-        int    m_count;                                            ///< Count
-        int    m_level;                                            ///< Leaf is zero, others positive
-        Branch m_branch[MAXNODES];                                 ///< Branch
+        int    m_count;                       ///< Count
+        int    m_level;                       ///< Leaf is zero, others positive
+        Branch m_branch[MAXNODES];            ///< Branch
     };
 
     /// A link list of nodes for reinsertion after a delete operation
@@ -939,7 +939,7 @@ bool RTREE_QUAL::InsertRect(Rect* a_rect, const DATATYPE& a_id, Node** a_root, i
 
     if (InsertRectRec(a_rect, a_id, *a_root, &newNode, a_level))            // Root split
     {
-        newRoot = AllocNode();                                              // Grow tree taller and new root
+        newRoot = AllocNode();            // Grow tree taller and new root
         newRoot->m_level = (*a_root)->m_level + 1;
         branch.m_rect = NodeCover(*a_root);
         branch.m_child = *a_root;

@@ -33,7 +33,7 @@ class CPedIntelligenceSAInterface
 public:
     // CEventHandlerHistory @ + 56
     CPedSAInterface*        pPed;
-    DWORD                   taskManager;               // +4 (really CTaskManagerSAInterface)
+    DWORD                   taskManager;            // +4 (really CTaskManagerSAInterface)
     BYTE                    bPad[16];
     CFightManagerInterface* fightInterface;            // +24
     BYTE                    bPad2[184];

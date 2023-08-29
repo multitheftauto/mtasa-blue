@@ -61,6 +61,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              // World set funcs
                                                                              {"setTime", SetTime},
                                                                              {"setColorFilter", ArgumentParser<SetColorFilter>},
+                                                                             {"setGrainMultiplier", ArgumentParser<SetGrainMultiplier>},
+                                                                             {"setGrainLevel", ArgumentParser<SetGrainLevel>},
                                                                              {"setSkyGradient", SetSkyGradient},
                                                                              {"setHeatHaze", SetHeatHaze},
                                                                              {"setWeather", SetWeather},
@@ -228,30 +230,21 @@ int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
+int CLuaWorldDefs::ProcessLineOfSight(lua_State* L)
 {
     //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
     //  float endZ,
     //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
-    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil [,
-    //        element ignoredElement2,
-    //        element ignoredElement3,
-    //        ... etc
-    //        ], bool returnBuildingInfo = false, bCheckCarTires = false ] )
+    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, element ignoredElement = nil, bool
+    //        returnBuildingInfo = false, bCheckCarTires = false ] )
+    CVector           vecStart;
+    CVector           vecEnd;
+    SLineOfSightFlags flags;
+    CClientEntity*    pIgnoredElement;
+    bool              bIncludeBuildingInfo;
+    bool              bIncludeExtraMateriaInfo;
 
-    //  bool float float float element float float float int int int processLineOfSight ( float startX, float startY, float startZ, float endX, float endY,
-    //  float endZ,
-    //      [ bool checkBuildings = true, bool checkVehicles = true, bool checkPlayers = true, bool checkObjects = true, bool checkDummies = true,
-    //        bool seeThroughStuff = false, bool ignoreSomeObjectsForCamera = false, bool shootThroughStuff = false, table ignoredElements = nil,
-    //        bool returnBuildingInfo = false, bCheckCarTires = false ] )
-
-    CVector                     vecStart;
-    CVector                     vecEnd;
-    SLineOfSightFlags           flags;
-    std::vector<CClientEntity*> vecIgnoredElements;
-    bool                        bIncludeBuildingInfo;
-
-    CScriptArgReader argStream(luaVM);
+    CScriptArgReader argStream(L);
     argStream.ReadVector3D(vecStart);
     argStream.ReadVector3D(vecEnd);
     argStream.ReadBool(flags.bCheckBuildings, true);
@@ -262,32 +255,21 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
     argStream.ReadBool(flags.bSeeThroughStuff, false);
     argStream.ReadBool(flags.bIgnoreSomeObjectsForCamera, false);
     argStream.ReadBool(flags.bShootThroughStuff, false);
-
-    if (argStream.NextIsTable()) // Is the next value a table? Read it as a user data table (will error if table contains invalid type)
-    {
-        argStream.ReadUserDataTable(vecIgnoredElements);
-    }
-    else {
-        CClientEntity* pIgnoredElement;
-        argStream.ReadUserData(pIgnoredElement, NULL);
-
-        if (pIgnoredElement != NULL)
-        {
-            vecIgnoredElements.push_back(pIgnoredElement);
-        }
-    }
-
+    argStream.ReadUserData(pIgnoredElement, NULL);
     argStream.ReadBool(bIncludeBuildingInfo, false);
     argStream.ReadBool(flags.bCheckCarTires, false);
+    argStream.ReadBool(bIncludeExtraMateriaInfo, false);
 
     if (!argStream.HasErrors())
     {
-        CColPoint*                 pColPoint = NULL;
-        CClientEntity*             pColEntity = NULL;
-        bool                       bCollision;
-        SLineOfSightBuildingResult buildingResult;
-        if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, vecIgnoredElements,
-                                                           bIncludeBuildingInfo ? &buildingResult : NULL))
+        CEntity*                              pIgnoredEntity = pIgnoredElement ? pIgnoredElement->GetGameEntity() : NULL;
+        CColPoint*                            pColPoint = NULL;
+        CClientEntity*                        pColEntity = NULL;
+        bool                                  bCollision;
+        SLineOfSightBuildingResult            buildingResult;
+        SProcessLineOfSightMaterialInfoResult matInfo;
+        if (CStaticFunctionDefinitions::ProcessLineOfSight(vecStart, vecEnd, bCollision, &pColPoint, &pColEntity, flags, pIgnoredEntity,
+                                                           bIncludeBuildingInfo ? &buildingResult : NULL, bIncludeExtraMateriaInfo ? &matInfo : nullptr))
         {
             // Got a collision?
             CVector vecColPosition;
@@ -310,50 +292,70 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* luaVM)
                 pColPoint->Destroy();
             }
 
-            lua_pushboolean(luaVM, bCollision);
+            lua_pushboolean(L, bCollision);
             if (bCollision)
             {
-                lua_pushnumber(luaVM, vecColPosition.fX);
-                lua_pushnumber(luaVM, vecColPosition.fY);
-                lua_pushnumber(luaVM, vecColPosition.fZ);
+                lua_pushnumber(L, vecColPosition.fX);
+                lua_pushnumber(L, vecColPosition.fY);
+                lua_pushnumber(L, vecColPosition.fZ);
 
                 if (pColEntity)
-                    lua_pushelement(luaVM, pColEntity);
+                    lua_pushelement(L, pColEntity);
                 else
-                    lua_pushnil(luaVM);
+                    lua_pushnil(L);
 
-                lua_pushnumber(luaVM, vecColNormal.fX);
-                lua_pushnumber(luaVM, vecColNormal.fY);
-                lua_pushnumber(luaVM, vecColNormal.fZ);
+                lua_pushnumber(L, vecColNormal.fX);
+                lua_pushnumber(L, vecColNormal.fY);
+                lua_pushnumber(L, vecColNormal.fZ);
 
-                lua_pushinteger(luaVM, iMaterial);
-                lua_pushnumber(luaVM, fLighting);
-                lua_pushinteger(luaVM, iPiece);
+                lua_pushinteger(L, iMaterial);
+                lua_pushnumber(L, fLighting);
+                lua_pushinteger(L, iPiece);
 
-                if (bIncludeBuildingInfo && buildingResult.bValid)
+                if (bIncludeBuildingInfo && buildingResult.bValid) // 8 args
                 {
-                    lua_pushnumber(luaVM, buildingResult.usModelID);
+                    lua_pushnumber(L, buildingResult.usModelID);
 
-                    lua_pushnumber(luaVM, buildingResult.vecPosition.fX);
-                    lua_pushnumber(luaVM, buildingResult.vecPosition.fY);
-                    lua_pushnumber(luaVM, buildingResult.vecPosition.fZ);
+                    lua_pushnumber(L, buildingResult.vecPosition.fX);
+                    lua_pushnumber(L, buildingResult.vecPosition.fY);
+                    lua_pushnumber(L, buildingResult.vecPosition.fZ);
 
-                    lua_pushnumber(luaVM, ConvertRadiansToDegrees(buildingResult.vecRotation.fX));
-                    lua_pushnumber(luaVM, ConvertRadiansToDegrees(buildingResult.vecRotation.fY));
-                    lua_pushnumber(luaVM, ConvertRadiansToDegrees(buildingResult.vecRotation.fZ));
+                    lua_pushnumber(L, ConvertRadiansToDegrees(buildingResult.vecRotation.fX));
+                    lua_pushnumber(L, ConvertRadiansToDegrees(buildingResult.vecRotation.fY));
+                    lua_pushnumber(L, ConvertRadiansToDegrees(buildingResult.vecRotation.fZ));
 
-                    lua_pushnumber(luaVM, buildingResult.usLODModelID);
-                    return 19;
+                    lua_pushnumber(L, buildingResult.usLODModelID);
+                } else {
+                    for (auto i = 1 + 3 + 3 + 1; i-- > 0;) {
+                        lua_pushnil(L);
+                    }
                 }
-                return 11;
+
+                if (bIncludeExtraMateriaInfo && matInfo.valid)  { // 7 args
+                    lua::Push(L, matInfo.uv.fX);
+                    lua::Push(L, matInfo.uv.fY);
+
+                    lua::Push(L, matInfo.textureName);
+                    lua::Push(L, matInfo.frameName);
+
+                    lua::Push(L, matInfo.hitPos.fX);
+                    lua::Push(L, matInfo.hitPos.fY);
+                    lua::Push(L, matInfo.hitPos.fZ);
+                } else {
+                    for (auto i = 2 + 1 + 1 + 3; i-- > 0;) {
+                        lua_pushnil(L);
+                    }
+                }
+
+                return 11 + 8 + 7;
             }
             return 1;
         }
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        m_pScriptDebugging->LogCustom(L, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
+    lua_pushboolean(L, false);
     return 1;
 }
 
@@ -2032,6 +2034,18 @@ CLuaMultiReturn<uchar, uchar, uchar, uchar, uchar, uchar, uchar, uchar> CLuaWorl
         uColor0.R, uColor0.G, uColor0.B, uColor0.A,
         uColor1.R, uColor1.G, uColor1.B, uColor1.A,
     };
+}
+
+bool CLuaWorldDefs::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)
+{
+    g_pMultiplayer->SetGrainMultiplier(type, fMultiplier);
+    return true;
+}
+
+bool CLuaWorldDefs::SetGrainLevel(uchar ucLevel)
+{
+    g_pMultiplayer->SetGrainLevel(ucLevel);
+    return true;
 }
 
 bool CLuaWorldDefs::SetCoronaReflectionsEnabled(uchar ucEnabled)

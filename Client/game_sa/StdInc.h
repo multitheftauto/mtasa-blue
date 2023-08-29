@@ -24,9 +24,6 @@
 #include <string>
 #include <vector>
 
-// SDK includes
-#include <ijsify.h>
-
 // Game includes
 #include "HookSystem.h"
 #include "gamesa_init.h"

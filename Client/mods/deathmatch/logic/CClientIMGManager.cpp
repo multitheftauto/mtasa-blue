@@ -15,6 +15,14 @@ CClientIMGManager::CClientIMGManager(CClientManager* pManager)
 {
     // Init
     m_bRemoveFromList = true;
+
+    // Buffer size as calculated by GTA - This is also the size of the largest file in all of the loaded IMGs
+
+    // g_pGame->GetStreaming()->GetStreamingBufferSize() / 2048;
+    // TODO: In the default gta3.img the biggest file is 1260 sectors, so to be fail safe, we double it
+    // ideally, we'd just take this value from the game, but there's no clean/easy way to do that [without loading the img archives]
+    // so, for now, this is good enough
+    m_LargestFileSizeBlocks = m_GTALargestFileSizeBlocks = 1260 * 2; 
 }
 
 CClientIMGManager::~CClientIMGManager()
@@ -25,7 +33,6 @@ CClientIMGManager::~CClientIMGManager()
 
 void CClientIMGManager::InitDefaultBufferSize()
 {
-    m_uiDefaultStreamerBufferSize = g_pGame->GetStreaming()->GetStreamingBufferSize();
 }
 
 CClientIMG* CClientIMGManager::GetElementFromArchiveID(unsigned char ucArchiveID)
@@ -76,7 +83,7 @@ CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
 
 bool CClientIMGManager::IsLinkableModel(unsigned int uiModel)
 {
-    return uiModel <= 26316; // StreamModelInfoSize
+    return uiModel <= 26316;            // StreamModelInfoSize
 }
 
 bool CClientIMGManager::RestoreModel(unsigned int uiModel)
@@ -93,6 +100,21 @@ bool CClientIMGManager::RestoreModel(unsigned int uiModel)
     return false;
 }
 
+size_t CClientIMGManager::CalculateLargestFile() const
+{
+    auto largest = m_GTALargestFileSizeBlocks;
+
+    for (const auto img : m_List)
+    {
+        if (!img->IsStreamed())
+            continue;
+
+        largest = std::max(img->GetLargestFileSizeBlocks(), largest);
+    }
+
+    return largest;
+}
+
 void CClientIMGManager::RemoveFromList(CClientIMG* pIMG)
 {
     // Can we remove anything from the list?
@@ -104,15 +126,10 @@ void CClientIMGManager::RemoveFromList(CClientIMG* pIMG)
 
 void CClientIMGManager::UpdateStreamerBufferSize()
 {
-    ushort usRequestStreamSize = m_uiDefaultStreamerBufferSize;
+    m_LargestFileSizeBlocks = CalculateLargestFile();
 
-    for (CClientIMG* pImg : m_List)
-    {
-        if (!pImg->IsStreamed())
-            continue;
-        ushort usStreamSize = pImg->GetRequiredBufferSize();
-        if (usStreamSize > usRequestStreamSize)
-            usRequestStreamSize = usStreamSize;
+    // Only update if necessary, otherwise leave it be [User might've set it manually - we don't want to touch that]
+    if (const auto s = g_pGame->GetStreaming(); m_LargestFileSizeBlocks > s->GetStreamingBufferSize()) {
+        s->SetStreamingBufferSize(m_LargestFileSizeBlocks);
     }
-    g_pGame->GetStreaming()->SetStreamingBufferSize(usRequestStreamSize);
 }

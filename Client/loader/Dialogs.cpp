@@ -809,7 +809,7 @@ void ShowNoAvDialog(HINSTANCE hInstance, bool bEnableScaremongering)
     else
     {
         if (bEnableScaremongering)
-            uiAskHoursInterval = 24 * 7;                     // Once a week if ticked
+            uiAskHoursInterval = 24 * 7;            // Once a week if ticked
         else
             uiAskHoursInterval = 24 * 365 * 1000;            // Once every 1000 years if ticked and WSC not monitoring
     }

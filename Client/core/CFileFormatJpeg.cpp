@@ -140,7 +140,7 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
     unsigned char* membuffer = NULL;
     jpeg_mem_dest(&cinfo, &membuffer, &memlen);
 
-    cinfo.image_width = uiWidth;    /* image width and height, in pixels */
+    cinfo.image_width = uiWidth; /* image width and height, in pixels */
     cinfo.image_height = uiHeight;
     cinfo.input_components = 3;     /* # of color components per pixel */
     cinfo.in_color_space = JCS_RGB; /* colorspace of input image */

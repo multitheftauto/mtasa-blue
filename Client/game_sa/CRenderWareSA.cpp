@@ -149,7 +149,7 @@ static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
             data->pReplacements[i].atomic->renderCallback = atomic->renderCallback;
             data->pReplacements[i].atomic->frame = atomic->frame;
             data->pReplacements[i].atomic->render = atomic->render;
-            data->pReplacements[i].atomic->interpolation = atomic->interpolation;
+            data->pReplacements[i].atomic->interpolator = atomic->interpolator;
             data->pReplacements[i].atomic->info = atomic->info;
 
             // add the new atomic to the vehicle clump
@@ -307,8 +307,7 @@ void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& 
 {
     RpClumpForAllAtomics(
         pClump,
-        [](RpAtomic* pAtomic, void* pData)
-        {
+        [](RpAtomic* pAtomic, void* pData) {
             reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
             return true;
         },

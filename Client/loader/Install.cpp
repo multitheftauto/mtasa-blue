@@ -800,8 +800,7 @@ static int RunInstall()
     else
         OutputDebugLine(SString("RunInstall: Updated %zu files", files.size()));
 
-    const auto Rollback = [&]()
-    {
+    const auto Rollback = [&]() {
         if (size_t disasterCounter = RunRollback(files); disasterCounter > 0)
         {
             // Do not delete the backup directory if we need it for recovery.

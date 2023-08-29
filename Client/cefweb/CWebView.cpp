@@ -343,7 +343,7 @@ void CWebView::InjectMouseMove(int iPosX, int iPosY)
     m_vecMousePosition.y = iPosY;
 }
 
-void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton)
+void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton, int count)
 {
     if (!m_pWebView)
         return;
@@ -355,7 +355,7 @@ void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton)
     // Save mouse button states
     m_mouseButtonStates[static_cast<int>(mouseButton)] = true;
 
-    m_pWebView->GetHost()->SendMouseClickEvent(mouseEvent, static_cast<CefBrowserHost::MouseButtonType>(mouseButton), false, 1);
+    m_pWebView->GetHost()->SendMouseClickEvent(mouseEvent, static_cast<CefBrowserHost::MouseButtonType>(mouseButton), false, count);
 }
 
 void CWebView::InjectMouseUp(eWebBrowserMouseButton mouseButton)
@@ -470,8 +470,7 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
     bool result = false;
 
     g_pCore->GetWebCore()->WaitForTask(
-        [&](bool aborted)
-        {
+        [&](bool aborted) {
             if (aborted)
                 return;
 
@@ -518,8 +517,7 @@ bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
     bool result = false;
 
     g_pCore->GetWebCore()->WaitForTask(
-        [&](bool aborted)
-        {
+        [&](bool aborted) {
             if (aborted)
                 return;
 
@@ -812,7 +810,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
         if (host != "mta")
         {
             if (IsLocal() || g_pCore->GetWebCore()->GetDomainState(host, true) != eURLState::WEBPAGE_ALLOWED)
-                bResult = true;             // Block remote here
+                bResult = true;            // Block remote here
             else
                 bResult = false;            // Allow
         }
@@ -820,7 +818,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
             bResult = false;
     }
     else
-        bResult = true;             // Block other schemes
+        bResult = true;            // Block other schemes
 
     // Check if we're in the browser's main frame or only a frame element of the current page
     bool bIsMainFrame = frame->IsMain();
@@ -1044,8 +1042,9 @@ bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_
     if (g_pCore->GetWebCore()->IsTestModeEnabled())
     {
         g_pCore->GetWebCore()->AddEventToEventQueue(
-            [message, source]()
-            { g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str()); },
+            [message, source]() {
+                g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str());
+            },
             this, "OnConsoleMessage");
     }
 

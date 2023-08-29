@@ -95,6 +95,9 @@ workspace "MTASA"
 
 		filter { "system:linux" }
 			linkoptions { "-s" }
+	else
+		filter "system:windows"
+			defaultplatform "x86"
 	end
 
 	filter {"system:windows", "configurations:Nightly", "kind:not StaticLib"}
@@ -106,7 +109,6 @@ workspace "MTASA"
 		staticruntime "On"
 		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		buildoptions { "/Zc:__cplusplus" }
-		defaultplatform "x86"
 		includedirs {
 			path.join(dxdir, "Include")
 		}
@@ -121,7 +123,7 @@ workspace "MTASA"
 	filter { "system:linux or macosx", "configurations:not Debug" }
 		buildoptions { "-fvisibility=hidden" }
 
-	filter { "system:linux or macosx", "configurations:not Debug", "language:C++" }
+	filter { "system:linux or macosx", "configurations:not Debug", "files:*.cpp" }
 		buildoptions { "-fvisibility-inlines-hidden" }
 
 	filter { "system:linux", "platforms:x86 or x64" }

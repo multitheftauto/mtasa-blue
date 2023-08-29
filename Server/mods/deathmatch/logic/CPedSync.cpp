@@ -18,6 +18,8 @@
 #include "packets/CPedStopSyncPacket.h"
 #include "CGame.h"
 #include "CColManager.h"
+#include "CSpatialDatabase.h"
+#include "CPlayerCamera.h"
 
 CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 {
@@ -27,11 +29,18 @@ CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 
 void CPedSync::DoPulse()
 {
-    // Time to check for players that should no longer be syncing a ped or peds that should be synced?
-    if (m_UpdateTimer.Get() > 500)
+    // Time to update lists of players near peds?
+    if (m_UpdateNearListTimer.Get() > 1000)
     {
-        m_UpdateTimer.Reset();
-        Update();
+        m_UpdateNearListTimer.Reset();
+        UpdateNearPlayersList();
+    }
+
+    // Time to check for players that should no longer be syncing a ped or peds that should be synced?
+    if (m_UpdateSyncerTimer.Get() > 500)
+    {
+        m_UpdateSyncerTimer.Reset();
+        UpdateAllSyncer();
     }
 }
 
@@ -46,36 +55,43 @@ bool CPedSync::ProcessPacket(CPacket& Packet)
     return false;
 }
 
-void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer)
+void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist)
 {
     CPlayer* pSyncer = pPed->GetSyncer();
     if (pSyncer)
     {
         if (pSyncer == pPlayer)
+        {
+            if (bPersist == false)
+            {
+                SetSyncerAsPersistent(false);
+            }
+
             return;
+        }
 
         StopSync(pPed);
     }
 
     if (pPlayer && !pPed->IsBeingDeleted())
-        StartSync(pPlayer, pPed);
-}
-
-void CPedSync::Update()
-{
-    // Update all the ped's sync states
-    list<CPed*>::const_iterator iter = m_pPedManager->IterBegin();
-    for (; iter != m_pPedManager->IterEnd();)
     {
-        // It is a ped, yet not a player
-        if (IS_PED(*iter) && !IS_PLAYER(*iter))
-            UpdatePed(*(iter++));
-        else
-            iter++;
+        SetSyncerAsPersistent(bPersist);
+        StartSync(pPlayer, pPed);
     }
 }
 
-void CPedSync::UpdatePed(CPed* pPed)
+void CPedSync::UpdateAllSyncer()
+{
+    // Update all the ped's sync states
+    for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); iter++)
+    {
+        // It is a ped, yet not a player
+        if (IS_PED(*iter) && !IS_PLAYER(*iter))
+            UpdateSyncer(*iter);
+    }
+}
+
+void CPedSync::UpdateSyncer(CPed* pPed)
 {
     CPlayer* pSyncer = pPed->GetSyncer();
 
@@ -94,25 +110,20 @@ void CPedSync::UpdatePed(CPed* pPed)
     // This ped got a syncer?
     if (pSyncer)
     {
-        // He isn't close enough to the ped and in the right dimension?
-        if ((!IsPointNearPoint3D(pSyncer->GetPosition(), pPed->GetPosition(), (float)g_TickRateSettings.iPedSyncerDistance)) ||
-            (pPed->GetDimension() != pSyncer->GetDimension()))
-        {
-            // Stop him from syncing it
-            StopSync(pPed);
+        // Is he close enough, and in the right dimension?
+        if (IsSyncerPersistent() || (pPed->GetDimension() == pSyncer->GetDimension() &&
+                                     IsPointNearPoint3D(pSyncer->GetPosition(), pPed->GetPosition(), (float)g_TickRateSettings.iPedSyncerDistance)))
+            return;
 
-            if (!pPed->IsBeingDeleted())
-            {
-                // Find a new syncer for it
-                FindSyncer(pPed);
-            }
-        }
+        // Stop him from syncing it
+        StopSync(pPed);
     }
-    else
-    {
-        // Try to find a syncer for it
-        FindSyncer(pPed);
-    }
+
+    if (pPed->IsBeingDeleted())
+        return;
+
+    // Find a new syncer for it
+    FindSyncer(pPed);
 }
 
 void CPedSync::FindSyncer(CPed* pPed)
@@ -154,6 +165,8 @@ void CPedSync::StopSync(CPed* pPed)
     // Unmark him as the syncing player
     pPed->SetSyncer(NULL);
 
+    SetSyncerAsPersistent(false);
+
     // Call the onElementStopSync event
     CLuaArguments Arguments;
     Arguments.PushElement(pSyncer);            // Old syncer
@@ -166,29 +179,26 @@ CPlayer* CPedSync::FindPlayerCloseToPed(CPed* pPed, float fMaxDistance)
     CVector vecPedPosition = pPed->GetPosition();
 
     // See if any players are close enough
-    CPlayer*                       pLastPlayerSyncing = NULL;
-    CPlayer*                       pPlayer = NULL;
-    list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-    for (; iter != m_pPlayerManager->IterEnd(); iter++)
+    CPlayer* pLastPlayerSyncing = nullptr;
+    CPlayer* pPlayer = nullptr;
+    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
     {
         pPlayer = *iter;
         // Is he joined?
-        if (pPlayer->IsJoined())
-        {
-            // He's near enough?
-            if (IsPointNearPoint3D(vecPedPosition, pPlayer->GetPosition(), fMaxDistance))
-            {
-                // Same dimension?
-                if (pPlayer->GetDimension() == pPed->GetDimension())
-                {
-                    // He syncs less peds than the previous player close enough?
-                    if (!pLastPlayerSyncing || pPlayer->CountSyncingPeds() < pLastPlayerSyncing->CountSyncingPeds())
-                    {
-                        pLastPlayerSyncing = pPlayer;
-                    }
-                }
-            }
-        }
+        if (!pPlayer->IsJoined())
+            continue;
+
+        // Same dimension?
+        if (pPlayer->GetDimension() != pPed->GetDimension())
+            continue;
+
+        // He's near enough?
+        if (!IsPointNearPoint3D(vecPedPosition, pPlayer->GetPosition(), fMaxDistance))
+            continue;
+
+        // He syncs less peds than the previous player close enough?
+        if (!pLastPlayerSyncing || pPlayer->CountSyncingPeds() < pLastPlayerSyncing->CountSyncingPeds())
+            pLastPlayerSyncing = pPlayer;
     }
 
     // Return the player we found that syncs the least number of peds
@@ -199,73 +209,146 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
 {
     // Grab the player
     CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer && pPlayer->IsJoined())
+    if (!pPlayer || !pPlayer->IsJoined())
+        return;
+
+    // Grab the tick count
+    long long llTickCountNow = GetModuleTickCount64();
+
+    // Apply the data for each ped in the packet
+    for (auto& Data : Packet.m_Syncs)
     {
-        // Apply the data for each ped in the packet
-        std::vector<CPedSyncPacket::SyncData*>::const_iterator iter = Packet.IterBegin();
-        for (; iter != Packet.IterEnd(); iter++)
+        // Grab the ped this packet is for
+        CElement* pPedElement = CElementIDs::GetElement(Data.ID);
+        if (!pPedElement || !IS_PED(pPedElement))
+            continue;
+
+        // Convert to a CPed
+        CPed* pPed = static_cast<CPed*>(pPedElement);
+
+        // Is the player syncing this ped?
+        // Check if the time context matches.
+        if (pPed->GetSyncer() != pPlayer || !pPed->CanUpdateSync(Data.ucSyncTimeContext))
+            continue;
+
+        // Apply the data to the ped
+        if (Data.ucFlags & 0x01)
         {
-            CPedSyncPacket::SyncData* pData = *iter;
+            pPed->SetPosition(Data.vecPosition);
+            g_pGame->GetColManager()->DoHitDetection(pPed->GetPosition(), pPed);
+        }
+        if (Data.ucFlags & 0x02)
+            pPed->SetRotation(Data.fRotation);
+        if (Data.ucFlags & 0x04)
+            pPed->SetVelocity(Data.vecVelocity);
 
-            // Grab the ped this packet is for
-            CElement* pPedElement = CElementIDs::GetElement(pData->Model);
-            if (pPedElement && IS_PED(pPedElement))
+        if (Data.ucFlags & 0x08)
+        {
+            // Less health than last time?
+            float fPreviousHealth = pPed->GetHealth();
+            pPed->SetHealth(Data.fHealth);
+
+            if (Data.fHealth < fPreviousHealth)
             {
-                // Convert to a CPed
-                CPed* pPed = static_cast<CPed*>(pPedElement);
+                // Grab the delta health
+                float fDeltaHealth = fPreviousHealth - Data.fHealth;
 
-                // Is the player syncing this ped?
-                // this packet if the time context matches.
-                if (pPed->GetSyncer() == pPlayer && pPed->CanUpdateSync(pData->ucSyncTimeContext))
+                if (fDeltaHealth > 0.0f)
                 {
-                    // Apply the data to the ped
-                    if (pData->ucFlags & 0x01)
-                    {
-                        pPed->SetPosition(pData->vecPosition);
-                        g_pGame->GetColManager()->DoHitDetection(pPed->GetPosition(), pPed);
-                    }
-                    if (pData->ucFlags & 0x02)
-                        pPed->SetRotation(pData->fRotation);
-                    if (pData->ucFlags & 0x04)
-                        pPed->SetVelocity(pData->vecVelocity);
-
-                    if (pData->ucFlags & 0x08)
-                    {
-                        // Less health than last time?
-                        float fPreviousHealth = pPed->GetHealth();
-                        pPed->SetHealth(pData->fHealth);
-
-                        if (pData->fHealth < fPreviousHealth)
-                        {
-                            // Grab the delta health
-                            float fDeltaHealth = fPreviousHealth - pData->fHealth;
-
-                            if (fDeltaHealth > 0.0f)
-                            {
-                                // Call the onPedDamage event
-                                CLuaArguments Arguments;
-                                Arguments.PushNumber(fDeltaHealth);
-                                pPed->CallEvent("onPedDamage", Arguments);
-                            }
-                        }
-                    }
-
-                    if (pData->ucFlags & 0x10)
-                        pPed->SetArmor(pData->fArmor);
-
-                    if (pData->ucFlags & 0x20 && pPlayer->GetBitStreamVersion() >= 0x04E)
-                        pPed->SetOnFire(pData->bOnFire);
-
-                    if (pData->ucFlags & 0x40 && pPlayer->GetBitStreamVersion() >= 0x55)
-                        pPed->SetInWater(pData->bIsInWater);
-
-                    // Send this sync
-                    pData->bSend = true;
+                    // Call the onPedDamage event
+                    CLuaArguments Arguments;
+                    Arguments.PushNumber(fDeltaHealth);
+                    pPed->CallEvent("onPedDamage", Arguments);
                 }
             }
         }
 
-        // Tell everyone
-        m_pPlayerManager->BroadcastOnlyJoined(Packet, pPlayer);
+        if (Data.ucFlags & 0x10)
+            pPed->SetArmor(Data.fArmor);
+
+        if (Data.ucFlags & 0x20)
+            pPed->SetOnFire(Data.bOnFire);
+
+        if (Data.ucFlags & 0x40)
+            pPed->SetInWater(Data.bIsInWater);
+
+        // Is it time to sync to everyone
+        bool bDoFarSync = llTickCountNow - pPed->GetLastFarSyncTick() >= g_TickRateSettings.iPedFarSync;
+
+        if (!bDoFarSync && pPed->IsNearPlayersListEmpty())
+            continue;
+
+        // Create a new packet, containing only the struct for this ped
+        CPedSyncPacket PedPacket(Data);
+        if (!&PedPacket)
+            continue;
+
+        if (bDoFarSync)
+        {
+            // Store the tick
+            pPed->SetLastFarSyncTick(llTickCountNow);
+            // Send to everyone
+            m_pPlayerManager->BroadcastOnlyJoined(PedPacket, pPlayer);
+            continue;
+        }
+
+        // Send to players nearby the ped
+        CSendList sendList;
+        for (auto iter = pPed->NearPlayersIterBegin(); iter != pPed->NearPlayersIterEnd(); iter++)
+        {
+            CPlayer* pRemotePlayer = *iter;
+            // If the syncer changes between UpdateNearPlayersList() he can be in the list, make sure we don't send to him
+            if (pRemotePlayer && pRemotePlayer != pPlayer)
+                sendList.push_back(pRemotePlayer);
+        }
+
+        if (!sendList.empty())
+            m_pPlayerManager->Broadcast(PedPacket, sendList);
+    }
+}
+
+void CPedSync::UpdateNearPlayersList()
+{
+    for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); iter++)
+    {
+        CPed* pPed = *iter;
+        // Clear the list
+        pPed->ClearNearPlayersList();
+    }
+
+    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+    {
+        CPlayer* pPlayer = *iter;
+        if (!pPlayer->IsJoined() || pPlayer->IsBeingDeleted())
+            continue;
+
+        // Grab the camera position
+        CVector vecCameraPosition;
+        pPlayer->GetCamera()->GetPosition(vecCameraPosition);
+
+        // Do a query in the spatial database
+        CElementResult resultNearCamera;
+        GetSpatialDatabase()->SphereQuery(resultNearCamera, CSphere(vecCameraPosition, DISTANCE_FOR_NEAR_VIEWER));
+
+        for (CElement* pElement : resultNearCamera)
+        {
+            // Make sure it's a ped
+            if (pElement->GetType() != CElement::PED)
+                continue;
+
+            CPed* pPed = static_cast<CPed*>(pElement);
+
+            // Check dimension matches
+            if (pPlayer->GetDimension() != pPed->GetDimension())
+                continue;
+
+            // If the player is syncing it, don't add the player
+            if (pPed->GetSyncer() == pPlayer)
+                continue;
+
+            // Check distance accurately because the spatial database is 2D
+            if ((vecCameraPosition - pPed->GetPosition()).LengthSquared() < DISTANCE_FOR_NEAR_VIEWER * DISTANCE_FOR_NEAR_VIEWER)
+                pPed->AddPlayerToNearList(pPlayer);
+        }
     }
 }
