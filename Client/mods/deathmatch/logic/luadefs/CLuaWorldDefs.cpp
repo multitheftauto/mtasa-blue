@@ -18,6 +18,7 @@ void CLuaWorldDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{// World get functions
                                                                              {"getTime", GetTime},
+                                                                             {"getColorFilter", ArgumentParser<GetColorFilter>},
                                                                              {"getRoofPosition", GetRoofPosition},
                                                                              {"getGroundPosition", GetGroundPosition},
                                                                              {"processLineOfSight", ProcessLineOfSight},
@@ -2022,6 +2023,17 @@ bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar u
     unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
     g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
     return true;
+}
+
+CLuaMultiReturn<uchar, uchar, uchar, uchar, uchar, uchar, uchar, uchar> CLuaWorldDefs::GetColorFilter(bool isOriginal)
+{
+    SColor uColor0 = 0;
+    SColor uColor1 = 0;
+    g_pMultiplayer->GetColorFilter(uColor0.ulARGB, uColor1.ulARGB, isOriginal);
+    return {
+        uColor0.R, uColor0.G, uColor0.B, uColor0.A,
+        uColor1.R, uColor1.G, uColor1.B, uColor1.A,
+    };
 }
 
 bool CLuaWorldDefs::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)
