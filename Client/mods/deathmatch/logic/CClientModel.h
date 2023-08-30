@@ -37,6 +37,8 @@ public:
     int              GetModelID(void) const { return m_iModelID; };
     eClientModelType GetModelType(void) const { return m_eModelType; };
     bool             Allocate(ushort usParentID);
+    bool             MakeClumpModel();
+    bool             MakeAtomicModel();
     bool             Deallocate(void);
     void             RestoreEntitiesUsingThisModel();
     void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
@@ -49,4 +51,5 @@ protected:
     eClientModelType m_eModelType;
     bool             m_bAllocatedByUs = false;
     CResource*       m_pParentResource = nullptr;            // Resource that allocated model
+    bool             m_bWasConvertedToClump = false;
 };

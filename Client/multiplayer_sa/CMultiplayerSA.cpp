@@ -6876,7 +6876,7 @@ void PostCWorld_ProcessPedsAfterPreRender()
                 objectInterface->bUpdateScale = false;
             }
             RpClump* clump = objectInterface->m_pRwObject;
-            if (clump && clump->object.type == RP_TYPE_CLUMP)
+            if (clump && clump->object.type == RwObjectType::Clump)
                 objectEntity->UpdateRpHAnim();
             objectEntity->SetPreRenderRequired(false);
         }
