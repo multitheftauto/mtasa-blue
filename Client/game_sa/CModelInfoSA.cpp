@@ -34,6 +34,7 @@ std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfo
 std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
 std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
 
 union tIdeFlags
 {
@@ -781,8 +782,38 @@ unsigned short CModelInfoSA::GetTextureDictionaryID()
 void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
-    if (m_pInterface)
-        m_pInterface->usTextureDictionary = usID;
+    if (!m_pInterface)
+        return;
+
+    // Remove ref from the old TXD
+    CTxdStore_RemoveRef(m_pInterface->usTextureDictionary);
+
+    // Store vanilla TXD ID
+    if (!MapContains(ms_DefaultTxdIDMap, m_dwModelID))
+        ms_DefaultTxdIDMap[m_dwModelID] = m_pInterface->usTextureDictionary;
+
+    // Set new TXD and increase ref of it
+    m_pInterface->usTextureDictionary = usID;
+    CTxdStore_AddRef(usID);
+}
+
+void CModelInfoSA::ResetTextureDictionaryID()
+{
+    const auto it = ms_DefaultTxdIDMap.find(m_dwModelID);
+    if (it == ms_DefaultTxdIDMap.end()) {
+        return;
+    }
+    SetTextureDictionaryID(it->second);
+    ms_DefaultTxdIDMap.erase(it); // Only erase after calling the function above [otherwise gets reinserted]
+}
+
+void CModelInfoSA::StaticResetTextureDictionaries()
+{
+    while (!ms_DefaultTxdIDMap.empty()) {
+        const auto mi = pGame->GetModelInfo(ms_DefaultTxdIDMap.begin()->first);
+        assert(mi);
+        mi->ResetTextureDictionaryID();
+    }
 }
 
 float CModelInfoSA::GetLODDistance()

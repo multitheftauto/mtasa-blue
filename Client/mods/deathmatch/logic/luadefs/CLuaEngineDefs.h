@@ -64,6 +64,8 @@ public:
     static bool                                            EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool state);
     static bool                                            EngineResetModelFlags(uint uiModelID);
     static uint                                            EngineGetModelTXDID(uint uiDffModelID);
+    static bool                                            EngineSetModelTXDID(uint uiDffModelID, unsigned short uiTxdId);
+    static bool                                            EngineResetModelTXDID(uint uiDffModelID);
     static CClientIMG*                                     EngineLoadIMG(lua_State* const luaVM, std::string strFilePath);
     static bool                                            EngineAddImage(CClientIMG* pImg);
     static bool                                            EngineRemoveImage(CClientIMG* pImg);
