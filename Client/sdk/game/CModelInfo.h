@@ -166,7 +166,8 @@ public:
     virtual bool           IsValid() = 0;
     virtual bool           IsAllocatedInArchive() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;
-    virtual void           SetTextureDictionaryID(unsigned short usSlotID) = 0;
+    virtual void           SetTextureDictionaryID(unsigned short usTxdId) = 0;
+    virtual void           ResetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
     virtual float          GetOriginalLODDistance() = 0;
     virtual void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false) = 0;

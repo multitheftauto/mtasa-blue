@@ -443,6 +443,9 @@ void CGameSA::Reset()
 
         // Restore vehicle model wheel sizes
         CModelInfoSA::ResetAllVehiclesWheelSizes();
+
+        // Restore changed TXD IDs
+        CModelInfoSA::StaticResetTextureDictionaries();
     }
 }
 
