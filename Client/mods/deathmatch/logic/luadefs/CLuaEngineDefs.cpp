@@ -128,6 +128,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
         {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
         {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
+        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
         {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
@@ -186,10 +187,11 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
         lua_classfunction(luaVM, "getUsedMemory", "engineStreamingGetUsedMemory");
         lua_classfunction(luaVM, "setMemorySize", "engineStreamingSetMemorySize");
         lua_classfunction(luaVM, "getMemorySize", "engineStreamingGetMemorySize");
+        lua_classfunction(luaVM, "setModelCacheLimits", "engineStreamingSetModelCacheLimits");
         lua_classfunction(luaVM, "restoreMemorySize", "engineStreamingRestoreMemorySize");
         lua_classfunction(luaVM, "getBufferSize", "engineStreamingGetBufferSize");
         lua_classfunction(luaVM, "setBufferSize", "engineStreamingSetBufferSize");
-        lua_classfunction(luaVM, "restoreBufferSize", "engineStreamingSetBufferSize");
+        lua_classfunction(luaVM, "restoreBufferSize", "engineStreamingRestoreBufferSize");
 
         lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
         lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetBufferSize");
