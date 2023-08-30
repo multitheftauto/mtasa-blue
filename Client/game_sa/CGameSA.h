@@ -36,6 +36,10 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define NUM_WeaponInfosOtherSkill       11
 #define NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
+#define MODELINFO_DFF_MAX               20000
+#define MODELINFO_TXD_MAX               25000
+#define MODELINFO_MAX                   26000       // Actual max is 25755
+
 #define VAR_FlyingCarsEnabled           0x969160
 #define VAR_ExtraBunnyhopEnabled        0x969161
 #define VAR_HoveringCarsEnabled         0x969152
