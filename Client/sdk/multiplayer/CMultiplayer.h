@@ -270,6 +270,7 @@ public:
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
     virtual void  ResetColorFilter() = 0;
     virtual void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color) = 0;
+    virtual void  GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bool isOriginal) = 0;
     virtual void  SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier) = 0;
     virtual void  SetGrainLevel(BYTE ucLevel) = 0;
     virtual void  ResetHeatHaze() = 0;
