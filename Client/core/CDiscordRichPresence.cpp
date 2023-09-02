@@ -82,7 +82,7 @@ void CDiscordRichPresence::UpdatePresence()
     discordPresence.smallImageKey = m_strDiscordAppAssetSmall.c_str();
     discordPresence.smallImageText = m_strDiscordAppAssetSmallText.c_str();
 
-    discordPresence.state = (!m_strDiscordAppCustomState.empty() && m_bAllowCustomDetails) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
+    discordPresence.state = (!m_strDiscordAppCustomState.empty()) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
 
     discordPresence.details = m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
