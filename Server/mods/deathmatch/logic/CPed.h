@@ -171,7 +171,7 @@ public:
 
     float GetMaxHealth();
     float GetHealth() { return m_fHealth; }
-    void  SetHealth(float fHealth) { m_fHealth = fHealth; }
+    void  SetHealth(float fHealth);
     float GetArmor() { return m_fArmor; }
     void  SetArmor(float fArmor) { m_fArmor = fArmor; }
 

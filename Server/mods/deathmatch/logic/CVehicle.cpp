@@ -531,6 +531,16 @@ void CVehicle::SetHealth(float fHealth)
     if (fHealth < 0.0f || IsBlown())
         fHealth = 0.0f;
 
+    float fOldHealth = m_fHealth;
+    
+    if (fabs(fOldHealth - fHealth) >= FLOAT_EPSILON)
+    {
+        CLuaArguments arguments;
+        arguments.PushNumber(fOldHealth);
+        arguments.PushNumber(fHealth);
+        CallEvent("onElementHealthChange", arguments);
+    }
+
     m_fHealth = fHealth;
 }
 
