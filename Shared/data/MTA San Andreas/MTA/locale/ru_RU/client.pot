@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-23 08:26+0000\n"
-"PO-Revision-Date: 2023-08-23 09:25\n"
+"PO-Revision-Date: 2023-09-02 18:20\n"
 "Last-Translator: \n"
 "Language-Team: Russian\n"
 "Language: ru_RU\n"
@@ -1565,7 +1565,7 @@ msgstr "Отдельная благодарность"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "Это программное обеспечение и проект используют следующие библиотеки и программное обеспечение:"
 
 #: Client/core/CMainMenu.cpp:322
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -2970,15 +2970,15 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA не удается запустить, поскольку исполняемый файл GTA:SA недоступен для загрузки:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Патч GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA не удается запустить из-за сбоя установки патча GTA:SA:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
