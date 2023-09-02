@@ -190,12 +190,13 @@ bool CDiscordRichPresence::ResetDiscordData()
 }
 
 bool CDiscordRichPresence::SetApplicationID(const char* szAppID)
-    {
+{
     m_strDiscordAppCurrentId = (szAppID && *szAppID) ? szAppID : DEFAULT_APP_ID;
 
     if (m_bDiscordRPCEnabled)
     {
         RestartDiscord();
+        m_bUpdateRichPresence = true;
     }
     return true;
 }

@@ -146,8 +146,8 @@ CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
-    // Reset discord rich presence
-    if (g_pCore->GetDiscord()->IsDiscordRPCEnabled())
+    // Reset Discord rich presence
+    if (m_pDiscordRichPresence)
         m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
