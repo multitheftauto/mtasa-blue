@@ -301,9 +301,8 @@ CMainMenu::CMainMenu(CGUI* pManager)
         if (!discord->IsDiscordRPCEnabled())
             discord->SetDiscordRPCEnabled(true);
 
-        discord->SetPresenceState("In the main menu", false);
+        discord->SetPresenceState("Main menu", false);
         discord->SetPresenceStartTimestamp(0);
-        discord->UpdatePresence();
     }
 
     // Store the pointer to the graphics subsystem

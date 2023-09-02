@@ -645,18 +645,12 @@ void CCore::SetConnected(bool bConnected)
         if (!discord->IsDiscordRPCEnabled())
             discord->SetDiscordRPCEnabled(true);
 
-        discord->SetPresenceState(bConnected ? "In-game" : "In the main menu", false);
+        discord->SetPresenceState(bConnected ? "In-game" : "Main menu", false);
         discord->SetPresenceStartTimestamp(0);
         discord->SetPresenceDetails("");
 
         if (bConnected)
-        {
-            time_t timer;
-            time(&timer);
-            discord->SetPresenceStartTimestamp((long)timer);
-        }
-
-        discord->UpdatePresence();
+            discord->SetPresenceStartTimestamp(time(nullptr));
     }
 }
 
