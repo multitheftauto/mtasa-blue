@@ -1491,6 +1491,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::ATOMIC:
         case eModelInfoType::LOD_ATOMIC:
         case eModelInfoType::TIME:
+        case eModelInfoType::CLUMP:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         default:
