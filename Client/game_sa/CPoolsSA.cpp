@@ -23,6 +23,7 @@
 #include "CTrailerSA.h"
 #include "CTrainSA.h"
 #include "CWorldSA.h"
+#include "CKeyGenSA.h"
 
 extern CGameSA* pGame;
 
@@ -31,6 +32,7 @@ CPoolsSA::CPoolsSA()
     m_ppPedPoolInterface = (CPoolSAInterface<CPedSAInterface>**)0xB74490;
     m_ppObjectPoolInterface = (CPoolSAInterface<CObjectSAInterface>**)0xB7449C;
     m_ppVehiclePoolInterface = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
+    m_ppTxdPoolInterface = (CPoolSAInterface<CTextureDictonarySAInterface>**)0xC8800C;
 
     m_bGetVehicleEnabled = true;
 }
@@ -1052,4 +1054,41 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
 void CPoolsSA::InvalidateLocalPlayerClientEntity()
 {
     m_pedPool.arrayOfClientEntities[0] = {m_pedPool.arrayOfClientEntities[0].pEntity, nullptr};
+}
+
+unsigned int CPoolsSA::AllocateTextureDictonarySlot(uint uiSlotId, std::string& strTxdName)
+{
+    CTextureDictonarySAInterface* pTxd = (*m_ppTxdPoolInterface)->AllocateAt(uiSlotId);
+    if (!pTxd)
+        return -1;
+
+    strTxdName.resize(24);
+
+    pTxd->usUsagesCount = 0;
+    pTxd->hash = pGame->GetKeyGen()->GetUppercaseKey(strTxdName.c_str());
+    pTxd->rwTexDictonary = nullptr;
+    pTxd->usParentIndex = -1;
+
+    return (*m_ppTxdPoolInterface)->GetObjectIndex(pTxd);
+}
+
+void CPoolsSA::RemoveTextureDictonarySlot(uint uiTxdId)
+{
+    if (!(*m_ppTxdPoolInterface)->IsContains(uiTxdId))
+        return;
+
+    typedef uint(__cdecl * Function_TxdReleaseSlot)(uint uiTxdId);
+    ((Function_TxdReleaseSlot)(0x731E90))(uiTxdId);
+
+    (*m_ppTxdPoolInterface)->Release(uiTxdId);
+}
+
+bool CPoolsSA::IsFreeTextureDictonarySlot(uint uiTxdId)
+{
+    return (*m_ppTxdPoolInterface)->IsEmpty(uiTxdId);
+}
+
+ushort CPoolsSA::GetFreeTextureDictonarySlot()
+{
+    return (*m_ppTxdPoolInterface)->GetFreeSlot();
 }

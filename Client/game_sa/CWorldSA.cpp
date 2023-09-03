@@ -15,6 +15,9 @@
 #include "CGameSA.h"
 #include "CPoolsSA.h"
 #include "CWorldSA.h"
+#include "CColModelSA.h"
+#include "gamesa_renderware.h"
+#include "CCollisionSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -265,7 +268,7 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
 }
 
 bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
-                                  const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult)
+                                  const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult, SProcessLineOfSightMaterialInfoResult* outMatInfo)
 {
     DWORD dwPadding[100];            // stops the function missbehaving and overwriting the return address
     dwPadding[0] = 0;                // prevent the warning and eventual compiler optimizations from removing it
@@ -363,6 +366,157 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
             }
         }
     }
+
+    if (outMatInfo && targetEntity && targetEntity->m_pRwObject)
+    {
+        struct Context
+        {
+            float               minHitDistSq{};                    //< [squared] hit distance from the line segment's origin
+            CVector             originOS, endOS, dirOS;            //< Line origin, end and dir [in object space]
+            CMatrix             entMat, entInvMat;                 //< The hit entity's matrix, and it's inverse
+            RpTriangle*         hitTri{};                          //< The triangle hit
+            RpAtomic*           hitAtomic{};                       //< The atomic of the hit triangle's geometry
+            RpGeometry*         hitGeo{};                          //< The geometry of the hit triangle
+            CVector             hitBary{};                         //< Barycentric coordinates [on the hit triangle] of the hit
+            CVector             hitPosOS{};                        //< Hit position in object space
+            CEntitySAInterface* entity{};                          //< The hit entity
+        } c = {};
+
+        c.entity = targetEntity;
+
+        // Get matrix, and it's inverse
+        targetEntity->Placeable.matrix->ConvertToMatrix(c.entMat);
+        c.entInvMat = c.entMat.Inverse();
+
+        // ...to transform the line origin and end into object space
+        c.originOS = c.entInvMat.TransformVector(*vecStart);
+        c.endOS = c.entInvMat.TransformVector(*vecEnd);
+        c.dirOS = c.endOS - c.originOS;
+        c.minHitDistSq = c.dirOS.LengthSquared();            // By setting it to this value we avoid collisions that would be detected after the line segment
+                                                             // [but are still ont the ray]
+
+        // Do raycast against the DFF to get hit position material UV and name
+        // This is very slow
+        // Perhaps we could paralellize it somehow? [OpenMP?]
+        const auto ProcessOneAtomic = [](RpAtomic* a, void* data)
+        {
+            const auto c = (Context*)data;
+            const auto f = RpAtomicGetFrame(a);
+
+            const auto GetFrameCMatrix = [](RwFrame* f)
+            {
+                CMatrix out;
+                pGame->GetRenderWare()->RwMatrixToCMatrix(*RwFrameGetMatrix(f), out);
+                return out;
+            };
+
+            // Atomic not visible
+            if (!a->renderCallback || !(a->object.object.flags & 0x04 /*rpATOMICRENDER*/))
+            {
+                return true;
+            }
+
+            // Sometimes atomics have no geometry [I don't think that should be possible, but okay]
+            const auto geo = a->geometry;
+            if (!geo)
+            {
+                return true;
+            }
+
+            // Calculate transformation by traversing the hierarchy from the bottom (this frame) -> top (root frame)
+            CMatrix localToObjTransform{};
+            for (auto i = f; i && i != i->root; i = RwFrameGetParent(i))
+            {
+                localToObjTransform = GetFrameCMatrix(i) * localToObjTransform;
+            }
+            const auto objToLocalTransform = localToObjTransform.Inverse();
+
+            const auto ObjectToLocalSpace = [&](const CVector& in) { return objToLocalTransform.TransformVector(in); };
+
+            // Transform from object space, into local (the frame's) space
+            const auto localOrigin = ObjectToLocalSpace(c->originOS);
+            const auto localEnd = ObjectToLocalSpace(c->endOS);
+
+#if 0
+            if (!CCollisionSA::TestLineSphere(
+                CColLineSA{localOrigin, 0.f, localEnd, 0.f},
+                reinterpret_cast<CColSphereSA&>(*RpAtomicGetBoundingSphere(a)) // Fine for now
+            )) {
+                return true; // Line segment doesn't touch bsp
+            }
+#endif
+            const auto localDir = localEnd - localOrigin;
+
+            const auto verts = reinterpret_cast<CVector*>(geo->morph_target->verts);            // It's fine, trust me bro
+            for (auto i = geo->triangles_size; i-- > 0;)
+            {
+                const auto tri = &geo->triangles[i];
+
+                // Process the line against the triangle
+                CVector hitBary, hitPos;
+                if (!localOrigin.IntersectsSegmentTriangle(localDir, verts[tri->verts[0]], verts[tri->verts[1]], verts[tri->verts[2]], &hitPos, &hitBary))
+                {
+                    continue;            // No intersection at all
+                }
+
+                // Intersection, check if it's closer than the previous one
+                const auto hitDistSq = (hitPos - localOrigin).LengthSquared();
+                if (c->minHitDistSq > hitDistSq)
+                {
+                    c->minHitDistSq = hitDistSq;
+                    c->hitGeo = geo;
+                    c->hitAtomic = a;
+                    c->hitTri = tri;
+                    c->hitBary = hitBary;
+                    c->hitPosOS = localToObjTransform.TransformVector(hitPos);            // Transform back into object space
+                }
+            }
+
+            return true;
+        };
+
+        if (targetEntity->m_pRwObject->object.type == 2 /*rpCLUMP*/)
+        {
+            RpClumpForAllAtomics(targetEntity->m_pRwObject, ProcessOneAtomic, &c);
+        }
+        else
+        {            // Object is a single atomic, so process directly
+            ProcessOneAtomic(reinterpret_cast<RpAtomic*>(targetEntity->m_pRwObject), &c);
+        }
+
+        // It might be false if the collision model differs from the clump
+        // This is completely normal as collisions models are meant to be simplified
+        // compared to the clump's geometry
+        if (outMatInfo->valid = c.hitGeo != nullptr)
+        {
+            // Now, calculate texture UV, etc based on the hit [if we've hit anything at all]
+            // Since we have the barycentric coords of the hit, calculating it is easy
+            outMatInfo->uv = {};
+            for (auto i = 3u; i-- > 0;)
+            {
+                // UV set index - Usually models only use level 0 indices, so let's stick with that
+                const auto uvSetIdx = 0;
+
+                // Vertex's UV position
+                const auto vtxUV = &c.hitGeo->texcoords[uvSetIdx][c.hitTri->verts[i]];
+
+                // Now, just interpolate
+                outMatInfo->uv += CVector2D{vtxUV->u, vtxUV->v} * c.hitBary[i];
+            }
+
+            // Find out material texture name
+            // For some reason this is sometimes null
+            const auto tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
+            outMatInfo->textureName = tex ? tex->name : nullptr;
+
+            const auto frame = RpAtomicGetFrame(c.hitAtomic);            // `RpAtomicGetFrame`
+            outMatInfo->frameName = frame ? frame->szName : nullptr;
+
+            // Get hit position in world space
+            outMatInfo->hitPos = c.entMat.TransformVector(c.hitPosOS);
+        }
+    }
+
     if (colCollision)
         *colCollision = pColPointSA;
     else

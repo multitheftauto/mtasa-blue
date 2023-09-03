@@ -27,34 +27,33 @@ char* CMultiplayerSA::ms_PlayerImgCachePtr = NULL;
 
 extern CGame* pGameInterface;
 
-unsigned long CMultiplayerSA::HOOKPOS_FindPlayerCoors;
-unsigned long CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld;
-unsigned long CMultiplayerSA::HOOKPOS_FindPlayerHeading;
-unsigned long CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller;
-unsigned long CMultiplayerSA::HOOKPOS_CHud_Draw_Caller;
-unsigned long CMultiplayerSA::HOOKPOS_CRunningScript_Process;
-unsigned long CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion;
-unsigned long CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic;
-unsigned long CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink;
-unsigned long CMultiplayerSA::HOOKPOS_CRadar__DrawRadarGangOverlay;
-unsigned long CMultiplayerSA::HOOKPOS_CTaskComplexJump__CreateSubTask;
-unsigned long CMultiplayerSA::HOOKPOS_CTrain_ProcessControl_Derail;
-unsigned long CMultiplayerSA::HOOKPOS_CVehicle_SetupRender;
-unsigned long CMultiplayerSA::HOOKPOS_CVehicle_ResetAfterRender;
-unsigned long CMultiplayerSA::HOOKPOS_CObject_Render;
-unsigned long CMultiplayerSA::HOOKPOS_EndWorldColors;
-unsigned long CMultiplayerSA::HOOKPOS_CWorld_ProcessVerticalLineSectorList;
-unsigned long CMultiplayerSA::HOOKPOS_ComputeDamageResponse_StartChoking;
-unsigned long CMultiplayerSA::HOOKPOS_CAutomobile__ProcessSwingingDoor;
+#define HOOKPOS_FindPlayerCoors                          0x56E010
+#define HOOKPOS_FindPlayerCentreOfWorld                  0x56E250
+#define HOOKPOS_FindPlayerHeading                        0x56E450
+#define HOOKPOS_CStreaming_Update_Caller                 0x53BF09
+#define HOOKPOS_CHud_Draw_Caller                         0x53E4FA
+#define HOOKPOS_CRunningScript_Process                   0x469F00
+#define HOOKPOS_CExplosion_AddExplosion                  0x736A50
+#define HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic 0x6FF35B
+#define HOOKPOS_Trailer_BreakTowLink                     0x6E0027
+#define HOOKPOS_CRadar__DrawRadarGangOverlay             0x586650
+#define HOOKPOS_CTaskComplexJump__CreateSubTask          0x67DABE
+#define HOOKPOS_CTrain_ProcessControl_Derail             0x6F8DBA
+#define HOOKPOS_CVehicle_SetupRender                     0x6D6512
+#define HOOKPOS_CVehicle_ResetAfterRender                0x6D0E3E
+#define HOOKPOS_CObject_Render                           0x59F1ED
+#define HOOKPOS_EndWorldColors                           0x561795
+#define HOOKPOS_CWorld_ProcessVerticalLineSectorList     0x563357
+#define HOOKPOS_ComputeDamageResponse_StartChoking       0x4C05B9
+#define HOOKPOS_CAutomobile__ProcessSwingingDoor         0x6A9DAF
 
-unsigned long CMultiplayerSA::FUNC_CStreaming_Update;
-unsigned long CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName;
-unsigned long CMultiplayerSA::FUNC_CHud_Draw;
+#define FUNC_CStreaming_Update                           0x40E670
+#define FUNC_CAudioEngine__DisplayRadioStationName       0x507030
+#define FUNC_CHud_Draw                                   0x58FAE0
+#define FUNC_CPlayerInfoBase                             0xB7CD98
 
-unsigned long CMultiplayerSA::ADDR_CursorHiding;
-unsigned long CMultiplayerSA::ADDR_GotFocus;
-
-unsigned long CMultiplayerSA::FUNC_CPlayerInfoBase;
+#define ADDR_CursorHiding                                0x7481CD
+#define ADDR_GotFocus                                    0x748054
 
 #define HOOKPOS_FxManager_CreateFxSystem                    0x4A9BE0
 #define HOOKPOS_FxManager_DestroyFxSystem                   0x4A9810
@@ -172,11 +171,8 @@ DWORD**       VAR_TagInfoArray = (DWORD**)0xA9A8C0;
 #define HOOKPOS_CPhysical_ProcessCollisionSectorList        0x54BB93
 DWORD RETURN_CPhysical_ProcessCollisionSectorList = 0x54BB9A;
 
-#define HOOKPOS_CheckAnimMatrix_US                          0x7C5A5C
-#define HOOKPOS_CheckAnimMatrix_EU                          0x7C5A9C
-DWORD RETURN_CheckAnimMatrix_US = 0x7C5A61;
-DWORD RETURN_CheckAnimMatrix_EU = 0x7C5AA1;
-DWORD RETURN_CheckAnimMatrix_BOTH = 0;
+#define HOOKPOS_CheckAnimMatrix                          	0x7C5A5C
+DWORD RETURN_CheckAnimMatrix = 0x7C5A61;
 
 #define HOOKPOS_VehColCB                                    0x04C838D
 DWORD RETURN_VehColCB = 0x04C83AA;
@@ -199,9 +195,7 @@ DWORD RETURN_CHandlingData_isNotFWD = 0x6A04C3;
 DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 
 #define HOOKPOS_PreFxRender                                     0x049E650
-DWORD RETURN_PreFxRender_US = 0x0404D1E;
-DWORD RETURN_PreFxRender_EU = 0x0405855;
-DWORD RETURN_PreFxRender_BOTH = 0;
+DWORD RETURN_PreFxRender = 0x0404D1E;
 
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender = 0x053EADD;
@@ -556,24 +550,6 @@ CMultiplayerSA::CMultiplayerSA()
     // Unprotect all of the GTASA code at once and leave it that way
     SetInitialVirtualProtect();
 
-    // Initialize the offsets
-    eGameVersion version = pGameInterface->GetGameVersion();
-    switch (version)
-    {
-        case VERSION_EU_10:
-            COffsetsMP::Initialize10EU();
-            break;
-        case VERSION_US_10:
-            COffsetsMP::Initialize10US();
-            break;
-        case VERSION_11:
-            COffsetsMP::Initialize11();
-            break;
-        case VERSION_20:
-            COffsetsMP::Initialize20();
-            break;
-    }
-
     CRemoteDataSA::Init();
 
     m_bExplosionsDisabled = false;
@@ -609,8 +585,6 @@ void CMultiplayerSA::InitHooks()
     bSetCenterOfWorld = false;
     bHasProcessedScript = false;
     m_fNearClipDistance = DEFAULT_NEAR_CLIP_DISTANCE;
-
-    eGameVersion version = pGameInterface->GetGameVersion();
 
     bSetCenterOfWorld = false;
 
@@ -678,18 +652,8 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
-    if (version == VERSION_US_10)
-    {
-        HookInstall(HOOKPOS_CheckAnimMatrix_US, (DWORD)HOOK_CheckAnimMatrix, 5);
-        RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_US;
-        RETURN_PreFxRender_BOTH = RETURN_PreFxRender_US;
-    }
-    if (version == VERSION_EU_10)
-    {
-        HookInstall(HOOKPOS_CheckAnimMatrix_EU, (DWORD)HOOK_CheckAnimMatrix, 5);
-        RETURN_CheckAnimMatrix_BOTH = RETURN_CheckAnimMatrix_EU;
-        RETURN_PreFxRender_BOTH = RETURN_PreFxRender_EU;
-    }
+    HookInstall(HOOKPOS_CheckAnimMatrix, (DWORD)HOOK_CheckAnimMatrix, 5);
+
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9);
@@ -775,7 +739,7 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_CAnimManager_AddAnimation, (DWORD)HOOK_CAnimManager_AddAnimation, 10);
     HookInstall(HOOKPOS_CAnimManager_AddAnimationAndSync, (DWORD)HOOK_CAnimManager_AddAnimationAndSync, 10);
-    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);
+    HookInstall(HOOKPOS_CAnimManager_BlendAnimation_Hierarchy, (DWORD)HOOK_CAnimManager_BlendAnimation_Hierarchy, 5);    
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
@@ -790,7 +754,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CRenderer__RenderFadingInEntities_MID, (DWORD)HOOK_CRenderer__RenderFadingInEntities_MID, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
-    MemSet((void*)ADDR_GotFocus, 0x90, pGameInterface->GetGameVersion() == VERSION_EU_10 ? 6 : 10);
+    MemSet((void*)ADDR_GotFocus, 0x90, 10);
 
     // Disable GTA being able to call CAudio::StopRadio ()
     // Well this isn't really CAudio::StopRadio, it's some global class
@@ -1078,15 +1042,8 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x522423, 0x90);
     MemPut<BYTE>(0x522424, 0x90);
 
-    LPVOID patchAddress = NULL;
     // ALLOW ALT+TABBING WITHOUT PAUSING
-    // if ( pGameInterface->GetGameVersion() == GAME_VERSION_US ) // won't work as pGameInterface isn't inited
-    if (*(BYTE*)0x748ADD == 0xFF && *(BYTE*)0x748ADE == 0x53)
-        patchAddress = (LPVOID)0x748A8D;
-    else
-        patchAddress = (LPVOID)0x748ADD;
-
-    MemSet(patchAddress, 0x90, 6);
+    MemSet((void*)0x748A8D, 0x90, 6);
 
     // CENTER VEHICLE NAME and ZONE NAME messages
     // 0058B0AD   6A 02            PUSH 2 // orientation
@@ -1317,18 +1274,9 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x58FC3E, 0x90, 14);
 
     // No intro movies kthx
-    if (version == VERSION_US_10)
-    {
-        MemPut<DWORD>(0x748EF8, 0x748AE7);
-        MemPut<DWORD>(0x748EFC, 0x748B08);
-        MemPut<BYTE>(0x748B0E, 5);
-    }
-    else if (version == VERSION_EU_10)
-    {
-        MemPut<DWORD>(0x748F48, 0x748B37);
-        MemPut<DWORD>(0x748F4C, 0x748B58);
-        MemPut<BYTE>(0x748B5E, 5);
-    }
+    MemPut<DWORD>(0x748EF8, 0x748AE7);
+    MemPut<DWORD>(0x748EFC, 0x748B08);
+    MemPut<BYTE>(0x748B0E, 5);
 
     // Force triggering of the damage event for players on fire
     MemSet((void*)0x633695, 0x90, 6);
@@ -1404,11 +1352,8 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x57BA57, 0x90, 6);
 
     // Disable the loading screen tune.
-    if (version == VERSION_US_10)
-        MemSet((void*)0x748CF6, 0x90, 5);
-    else if (version == VERSION_EU_10)
-        MemSet((void*)0x748D46, 0x90, 5);
-
+    MemSet((void*)0x748CF6, 0x90, 5);
+	
     // Do not render the loading screen.
     MemSet((void*)0x590D7C, 0x90, 5);
     MemSet((void*)0x590DB3, 0x90, 5);
@@ -1596,6 +1541,8 @@ void CMultiplayerSA::InitHooks()
     InitHooks_FrameRateFixes();
     InitHooks_ProjectileCollisionFix();
     InitHooks_ObjectStreamerOptimization();
+
+    InitHooks_Postprocess();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -1730,6 +1677,23 @@ void CMultiplayerSA::SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color)
     {
         MemPut<BYTE>(0x70373D, 0xB8);            // mov eax
         MemPut<DWORD>(0x70373E, dwPass1Color);
+    }
+}
+
+void CMultiplayerSA::GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bool isOriginal)
+{
+    // GTASA PC has 2 color filters, one of them is static color filter, and another one is blended by time cycle
+    bool bUseTimeCycle = *(BYTE*)0x7036EC == 0xC1;
+    if (bUseTimeCycle || isOriginal){ //If we are using color filter from time cycle or we specified color filter from time cycle
+        SColorRGBA pass0SColor(*(float*)0xB7C518, *(float*)0xB7C51C, *(float*)0xB7C520, *(float*)0xB7C524);
+        SColorRGBA pass1SColor(*(float*)0xB7C528, *(float*)0xB7C52C, *(float*)0xB7C530, *(float*)0xB7C534);
+        dwPass0Color = pass0SColor.ulARGB;
+        dwPass1Color = pass1SColor.ulARGB;
+    }
+    else
+    {
+        dwPass0Color = *(DWORD*)0x7036ED;
+        dwPass1Color = *(DWORD*)0x70373E;
     }
 }
 
@@ -2507,7 +2471,7 @@ void _declspec(naked) HOOK_FindPlayerCoors()
         pop     eax
         mov     eax, [esp+8]
         xor     edx, edx
-        mov     ecx, CMultiplayerSA::HOOKPOS_FindPlayerCoors
+        mov     ecx, HOOKPOS_FindPlayerCoors
         add     ecx, 6
         jmp     ecx
     }
@@ -2535,7 +2499,7 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
         // Do something...
         _asm
         {
-            mov     edi, CMultiplayerSA::FUNC_CPlayerInfoBase
+            mov     edi, FUNC_CPlayerInfoBase
             mov     ebx, [edi]
             mov     dwSavedPlayerPointer, ebx
             mov     ebx, activeEntityForStreaming
@@ -2547,8 +2511,8 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
     {
         mov     edi, eax
 
-        // Call CMultiplayerSA::FUNC_CStreaming_Update
-        mov     eax, CMultiplayerSA::FUNC_CStreaming_Update
+        // Call FUNC_CStreaming_Update
+        mov     eax, FUNC_CStreaming_Update
         call    eax
     }
 
@@ -2558,7 +2522,7 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
         _asm
         {
             // ...
-            mov     edi, CMultiplayerSA::FUNC_CPlayerInfoBase
+            mov     edi, FUNC_CPlayerInfoBase
             mov     ebx, dwSavedPlayerPointer
             mov     [edi], ebx
         }
@@ -2572,7 +2536,7 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
         popad
 
         // Continue at the old func
-        mov     eax, CMultiplayerSA::HOOKPOS_CStreaming_Update_Caller
+        mov     eax, HOOKPOS_CStreaming_Update_Caller
         add     eax, 7
         jmp     eax
     }
@@ -2588,7 +2552,7 @@ void _declspec(naked) HOOK_CHud_Draw_Caller()
     {
         pushad
 
-        mov     edx, CMultiplayerSA::FUNC_CAudioEngine__DisplayRadioStationName
+        mov     edx, FUNC_CAudioEngine__DisplayRadioStationName
         call    edx
     }
 
@@ -2596,7 +2560,7 @@ void _declspec(naked) HOOK_CHud_Draw_Caller()
     {
         _asm
         {
-            mov     edx, CMultiplayerSA::FUNC_CHud_Draw
+            mov     edx, FUNC_CHud_Draw
             call    edx
         }
     }
@@ -2638,7 +2602,7 @@ void _declspec(naked) HOOK_CHud_Draw_Caller()
     {
         popad
 
-        mov     eax, CMultiplayerSA::HOOKPOS_CHud_Draw_Caller
+        mov     eax, HOOKPOS_CHud_Draw_Caller
         add     eax, 10
         jmp     eax
     }
@@ -2660,7 +2624,7 @@ void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
         mov     eax, [esp+4]
         test    eax, eax
 
-        mov     edx, CMultiplayerSA::HOOKPOS_FindPlayerCentreOfWorld
+        mov     edx, HOOKPOS_FindPlayerCentreOfWorld
         add     edx, 6
         jmp     edx
 
@@ -2691,7 +2655,7 @@ void _declspec(naked) HOOK_FindPlayerHeading()
         mov     edx, ecx
 
         // Return to the hookpos
-        mov     eax, CMultiplayerSA::HOOKPOS_FindPlayerHeading
+        mov     eax, HOOKPOS_FindPlayerHeading
         add     eax, 6
         jmp     eax
 
@@ -2713,7 +2677,7 @@ void _declspec(naked) HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic()
         // original code
         mov     eax, dword ptr[esi+4]
         fsub    [eax+64]
-        mov     edx, CMultiplayerSA::HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic
+        mov     edx, HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic
         add     edx, 6
         jmp     edx
 no_render:
@@ -2777,7 +2741,7 @@ void _declspec(naked) HOOK_Trailer_BreakTowLink()
 
     _asm
     {
-        mov     ecx, CMultiplayerSA::HOOKPOS_Trailer_BreakTowLink
+        mov     ecx, HOOKPOS_Trailer_BreakTowLink
         add     ecx, 6
         jmp     ecx
     }
@@ -2887,7 +2851,7 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         push    esi
 
         // Return to the calling function and resume (do the explosion)
-        mov     edx, CMultiplayerSA::HOOKPOS_CExplosion_AddExplosion
+        mov     edx, HOOKPOS_CExplosion_AddExplosion
         add     edx, 6
         jmp     edx
     }
@@ -3959,58 +3923,6 @@ void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
     TIMING_CHECKPOINT("-RebuldMulplrPlr");
 }
 
-void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
-{
-    if (bEnabled)
-    {
-        MemPutFast<BYTE>(0xC402B8, 1);
-    }
-    else
-    {
-        MemPutFast<BYTE>(0xC402B8, 0);
-    }
-    if (bNoiseEnabled)
-    {
-        BYTE originalCodes[5] = {0xE8, 0xD3, 0xE8, 0xFF, 0xFF};
-        MemCpy((void*)0x704EE8, &originalCodes, 5);
-    }
-    else
-    {
-        MemSet((void*)0x704EE8, 0x90, 5);
-    }
-}
-
-void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
-{
-    if (bEnabled)
-    {
-        MemPutFast<BYTE>(0xC402B9, 1);
-    }
-    else
-    {
-        MemPutFast<BYTE>(0xC402B9, 0);
-    }
-    if (bNoiseEnabled)
-    {
-        BYTE originalCodes[5] = {0xE8, 0x62, 0xE8, 0xFF, 0xFF};
-        MemCpy((void*)0x704F59, &originalCodes, 5);
-    }
-    else
-    {
-        MemSet((void*)0x704F59, 0x90, 5);
-    }
-}
-
-bool CMultiplayerSA::IsNightVisionEnabled()
-{
-    return (*(BYTE*)0xC402B8 == 1);
-}
-
-bool CMultiplayerSA::IsThermalVisionEnabled()
-{
-    return (*(BYTE*)0xC402B9 == 1);
-}
-
 float CMultiplayerSA::GetGlobalGravity()
 {
     return fGlobalGravity;
@@ -4866,7 +4778,7 @@ void _declspec(naked) HOOK_PreFxRender()
     {
 skip:
         popad
-        jmp     RETURN_PreFxRender_BOTH  // 00404D1E / 00405855
+        jmp     RETURN_PreFxRender  // 00404D1E
     }
 }
 
@@ -5697,7 +5609,7 @@ void _cdecl CheckMatrix(float* pMatrix)
     }
 }
 
-// hooked at 7C5A5C/7C5A9C 5 bytes
+// hooked at 7C5A5C 5 bytes
 void _declspec(naked) HOOK_CheckAnimMatrix()
 {
     _asm
@@ -5714,7 +5626,7 @@ void _declspec(naked) HOOK_CheckAnimMatrix()
         popad
         // continue standard path
         push    eax
-        jmp     RETURN_CheckAnimMatrix_BOTH      // 7C5A61/7C5AA1
+        jmp     RETURN_CheckAnimMatrix      // 7C5A61
     }
 }
 
