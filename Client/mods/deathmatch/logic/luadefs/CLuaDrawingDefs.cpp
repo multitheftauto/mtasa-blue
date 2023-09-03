@@ -19,13 +19,14 @@
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
-bool DxDrawModel3d(uint16_t usModel, CVector position)
+bool DxDrawModel3d(uint16_t usModel, CVector position, CVector rotation, std::optional<CVector> scale)
 {
-    auto modelInfo = g_pGame->GetModelInfo(usModel);
-    if (!modelInfo->IsLoaded())
-        return false;
-
-    modelInfo->Render(position);
+    SModelToRender modelToRender;
+    modelToRender.usModel = usModel;
+    ConvertDegreesToRadians(rotation);
+    CMatrix matrix(position, rotation, scale.value_or(CVector(1.0f, 1.0f, 1.0f)));
+    modelToRender.matrix = matrix;
+    g_pClientGame->EnqueueModelToRender(modelToRender);
     return true;
 }
 

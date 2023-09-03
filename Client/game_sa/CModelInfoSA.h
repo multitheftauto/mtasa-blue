@@ -466,7 +466,7 @@ public:
     bool IsTowableBy(CModelInfo* towingModel) override;
 
     // It can crash when called in wrong moment, be careful. Good moment is when all objects are rendered.
-    bool Render(CVector position);
+    bool Render(CMatrix& matrix);
 
 private:
     void CopyStreamingInfoFromModel(ushort usCopyFromModelID);

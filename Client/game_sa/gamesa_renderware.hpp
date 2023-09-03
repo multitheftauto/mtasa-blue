@@ -26,6 +26,7 @@ void InitRwFunctions(eGameVersion version)
             RwStreamSkip = (RwStreamSkip_t)0x007ECD40;            // check
             RpClumpDestroy = (RpClumpDestroy_t)0x0074A360;
             RpClumpGetNumAtomics = (RpClumpGetNumAtomics_t)0x00749930;
+            RwFrameTransform = (RwFrameTransform_t)0x007F0F70;
             RwFrameTranslate = (RwFrameTranslate_t)0x007F0E70;
             RpClumpForAllAtomics = (RpClumpForAllAtomics_t)0x00749BC0;
             RwFrameAddChild = (RwFrameAddChild_t)0x007F0B40;
@@ -124,6 +125,7 @@ void InitRwFunctions(eGameVersion version)
             RwStreamSkip = (RwStreamSkip_t)0x007ECD00;
             RpClumpDestroy = (RpClumpDestroy_t)0x0074A310;
             RpClumpGetNumAtomics = (RpClumpGetNumAtomics_t)0x007498E0;
+            RwFrameTransform = (RwFrameTransform_t)0x007F0F70;
             RwFrameTranslate = (RwFrameTranslate_t)0x007F0E30;
             RpClumpForAllAtomics = (RpClumpForAllAtomics_t)0x00749B70;
             RwFrameAddChild = (RwFrameAddChild_t)0x007F0B00;
