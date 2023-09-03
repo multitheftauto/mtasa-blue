@@ -538,8 +538,7 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
     if (pModelInfo)
     {
         RwObject*                  pRwObject = pModelInfo->GetRwObject();
-        static auto                CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-        CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[usModelID];
+        CBaseModelInfoSAInterface* pBaseModelInfo = g_pCore->GetGame()->GetModelInfo(usModelID)->GetInterface();
 
         // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
         RpClump*                   pCopy = RpClumpClone(pNew);
