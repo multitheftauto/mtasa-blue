@@ -69,7 +69,7 @@ public:
     void            SetStreamingInfo(uint32 modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
     unsigned char   GetUnusedArchive();
     unsigned char   GetUnusedStreamHandle();
-    unsigned char   AddArchive(const char* szFilePath);
+    unsigned char   AddArchive(const wchar_t* szFilePath);
     void            RemoveArchive(unsigned char ucArchiveID);
     void            SetStreamingBufferSize(uint32 uiSize);
     uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSize * 2; }; // In bytes

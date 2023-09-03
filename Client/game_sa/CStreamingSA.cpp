@@ -381,7 +381,7 @@ unsigned char CStreamingSA::GetUnusedStreamHandle()
     return INVALID_STREAM_ID;
 }
 
-unsigned char CStreamingSA::AddArchive(const char* szFilePath)
+unsigned char CStreamingSA::AddArchive(const wchar_t* szFilePath)
 {
     auto ucArchiveId = GetUnusedArchive();
     if (ucArchiveId == INVALID_ARCHIVE_ID)
@@ -402,7 +402,7 @@ unsigned char CStreamingSA::AddArchive(const char* szFilePath)
 
     // Create new stream handler
     const auto streamCreateFlags = *(DWORD*)0x8E3FE0;
-    HANDLE     hFile = CreateFileA(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+    HANDLE     hFile = CreateFileW(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
                                streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS, NULL);
 
     if (hFile == INVALID_HANDLE_VALUE)
