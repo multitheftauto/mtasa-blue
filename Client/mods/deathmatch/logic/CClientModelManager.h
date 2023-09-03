@@ -49,9 +49,15 @@ public:
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
-    void SetModelFramePosition(uint16_t modelId, std::string& frameName, CVector vecPotation);
+    void SetModelFramePosition(uint16_t modelId, std::string& frameName, CVector vecPosition);
     void SetModelFrameRotation(uint16_t modelId, std::string& frameName, CVector vecRotation);
     void SetModelFrameScale(uint16_t modelId, std::string& frameName, CVector vecScale);
+    bool GetModelFrameMatrix(uint16_t modelId, std::string& frameName, CMatrix& matrix);
+    bool GetModelFramePosition(uint16_t modelId, std::string& frameName, CVector& vecPosition);
+    bool GetModelFrameRotation(uint16_t modelId, std::string& frameName, CVector& vecRotation);
+    bool GetModelFrameScale(uint16_t modelId, std::string& frameName, CVector& vecScale);
+    bool ResetModelFrame(uint16_t modelId, std::string& frameName);
+    bool ResetModelFrame(uint16_t modelId);
     bool TryGetModelFrameInfos(uint16_t modelId, std::unordered_map<std::string, SModelFrameInfo>& infos);
 
 private:

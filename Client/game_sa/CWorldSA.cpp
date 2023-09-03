@@ -462,7 +462,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
             return true;
         };
 
-        if (targetEntity->m_pRwObject->object.type == 2 /*rpCLUMP*/)
+        if (targetEntity->m_pRwObject->object.type == RwObjectType::Clump /*rpCLUMP*/)
         {
             RpClumpForAllAtomics(targetEntity->m_pRwObject, ProcessOneAtomic, &c);
         }

@@ -147,6 +147,79 @@ void CClientModelManager::SetModelFrameScale(uint16_t modelId, std::string& fram
     m_modelFramesInfo[modelId][frameName].matrix.SetScale(vecRotation);
 }
 
+bool CClientModelManager::GetModelFrameMatrix(uint16_t modelId, std::string& frameName, CMatrix& matrix)
+{
+    auto it = m_modelFramesInfo.find(modelId);
+    if (it != m_modelFramesInfo.end())
+    {
+        auto it2 = m_modelFramesInfo[modelId].find(frameName);
+        if (it2 != m_modelFramesInfo[modelId].end())
+        {
+            matrix = it2->second.matrix;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CClientModelManager::GetModelFramePosition(uint16_t modelId, std::string& frameName, CVector& vecPosition)
+{
+    CMatrix matrix;
+    if (GetModelFrameMatrix(modelId, frameName, matrix))
+    {
+        vecPosition = matrix.GetPosition();
+        return true;
+    }
+    return false;
+}
+
+bool CClientModelManager::GetModelFrameRotation(uint16_t modelId, std::string& frameName, CVector& vecRotation)
+{
+    CMatrix matrix;
+    if (GetModelFrameMatrix(modelId, frameName, matrix))
+    {
+        vecRotation = matrix.GetRotation();
+        ConvertRadiansToDegrees(vecRotation);
+        return true;
+    }
+    return false;
+}
+
+bool CClientModelManager::GetModelFrameScale(uint16_t modelId, std::string& frameName, CVector& vecScale)
+{
+    CMatrix matrix;
+    if (GetModelFrameMatrix(modelId, frameName, matrix))
+    {
+        vecScale = matrix.GetScale();
+        return true;
+    }
+    return false;
+}
+
+bool CClientModelManager::ResetModelFrame(uint16_t modelId, std::string& frameName)
+{
+    auto it = m_modelFramesInfo.find(modelId);
+    if (it != m_modelFramesInfo.end())
+    {
+        m_modelFramesInfo[modelId].erase(frameName);
+        if (m_modelFramesInfo[modelId].empty())
+            m_modelFramesInfo.erase(modelId);
+        return true;
+    }
+    return false;
+}
+
+bool CClientModelManager::ResetModelFrame(uint16_t modelId)
+{
+    auto it = m_modelFramesInfo.find(modelId);
+    if (it != m_modelFramesInfo.end())
+    {
+        m_modelFramesInfo.erase(modelId);
+        return true;
+    }
+    return false;
+}
+
 bool CClientModelManager::TryGetModelFrameInfos(uint16_t modelId, std::unordered_map<std::string, SModelFrameInfo>& infos)
 {
     auto itModel = m_modelFramesInfo.find(modelId);
