@@ -1427,90 +1427,27 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            float       fCurHealth = Ped.GetHealth();
 
             // Limit to max health
             float fMaxHealth = Ped.GetMaxHealth();
             if (fHealth > fMaxHealth)
                 fHealth = fMaxHealth;
 
-            if (fCurHealth == fHealth)
-                return false;
-
-            CLuaArguments Arguments;
-
-            // Set health
+            // Set the new health
             Ped.SetHealth(fHealth);
-
-            Arguments.PushNumber(fCurHealth);
-            Arguments.PushNumber(fHealth);
-            bool bContinue = Ped.CallEvent("onClientElementHealthChange", Arguments, true);
-
-            if (fHealth != Ped.GetHealth())
-                return false;
-
-            if (!bContinue)
-            {
-                Ped.SetHealth(fCurHealth);
-                return false;
-            }
             break;
         }
         case CCLIENTVEHICLE:
         {
-            // Grab the model
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-            float           fCurHealth = Vehicle.GetHealth();
-
-            if (fCurHealth == fHealth)
-                return false;
-
-            CLuaArguments Arguments;
-
-            // Set health
             Vehicle.SetHealth(fHealth);
-
-            Arguments.PushNumber(fCurHealth);
-            Arguments.PushNumber(fHealth);
-            bool bContinue = Vehicle.CallEvent("onClientElementHealthChange", Arguments, true);
-
-            if (fHealth != Vehicle.GetHealth())
-                return false;
-
-            if (!bContinue)
-            {
-                Vehicle.SetHealth(fCurHealth);
-                return false;
-            }
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
-            // Grab the model
             CClientObject& Object = static_cast<CClientObject&>(Entity);
-            float          fCurHealth = Object.GetHealth();
-
-            if (fCurHealth == fHealth)
-                return false;
-
-            CLuaArguments Arguments;
-
-            // Set health
             Object.SetHealth(fHealth);
-
-            Arguments.PushNumber(fCurHealth);
-            Arguments.PushNumber(fHealth);
-            bool bContinue = Object.CallEvent("onClientElementHealthChange", Arguments, true);
-
-            if (fHealth != Object.GetHealth())
-                return false;
-
-            if (!bContinue)
-            {
-                Object.SetHealth(fCurHealth);
-                return false;
-            }
             break;
         }
         default:
