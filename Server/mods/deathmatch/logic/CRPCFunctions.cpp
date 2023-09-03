@@ -17,6 +17,7 @@
 #include "CElementIDs.h"
 #include "CWeaponNames.h"
 #include "CPerfStatManager.h"
+#include "packets/CElementRPCPacket.h"
 #include "CKeyBinds.h"
 #include "CStaticFunctionDefinitions.h"
 #include "net/SyncStructures.h"
@@ -178,6 +179,24 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
             Arguments.PushNumber(m_pSourcePlayer->GetWeaponType(uiSlot));
 
             m_pSourcePlayer->CallEvent("onPlayerWeaponSwitch", Arguments);
+
+            SViewerMapType&              nearList = m_pSourcePlayer->GetNearPlayerList();
+            static std::vector<CPlayer*> playersInNearList;
+            playersInNearList.clear();
+
+            for (auto it = nearList.begin(); it != nearList.end(); ++it)
+            {
+                playersInNearList.push_back(it->first);
+            }
+
+            if (!playersInNearList.empty())
+            {
+                CBitStream BitStream;
+                BitStream.pBitStream->Write((unsigned int)ucPrevSlot);
+                BitStream.pBitStream->Write(uiSlot);
+
+                m_pPlayerManager->Broadcast(CElementRPCPacket(m_pSourcePlayer, REMOTE_PLAYER_WEAPON_SWITCH, *BitStream.pBitStream), playersInNearList);
+            }
         }
 
         m_pSourcePlayer->SetWeaponSlot(uiSlot);
