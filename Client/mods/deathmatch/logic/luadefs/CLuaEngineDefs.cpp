@@ -139,6 +139,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineImageGetFiles", ArgumentParser<EngineImageGetFileList>},
         {"engineImageGetFile", ArgumentParser<EngineImageGetFile>},
         {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
+        {"engineSetModelTXDID", ArgumentParser<EngineSetModelTXDID>},
+        {"engineResetModelTXDID", ArgumentParser<EngineResetModelTXDID>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
         {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
@@ -148,7 +150,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
         {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
         
-
+        {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
+        {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
         {"engineModelSetFramePosition", ArgumentParser<EngineModelSetFramePosition>},
         {"engineModelSetFrameRotation", ArgumentParser<EngineModelSetFrameRotation>},
         {"engineModelSetFrameScale", ArgumentParser<EngineModelSetFrameScale>},
@@ -196,6 +199,10 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setModelFlags", "engineSetModelFlags");
     lua_classfunction(luaVM, "resetModelFlags", "engineResetModelFlags");
     lua_classfunction(luaVM, "getModelFlags", "engineGetModelFlags");
+
+    lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
+    lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
+    lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
 
     lua_registerstaticclass(luaVM, "Engine");
 
@@ -866,12 +873,9 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
             if (!argStream.HasErrors())
             {
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
-                if (iModelID != INVALID_MODEL_ID)
-                {
-                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-                    if (pModel == nullptr)
-                        pModel = std::make_shared<CClientModel>(m_pManager, iModelID, eModelType);
-                    m_pManager->GetModelManager()->Add(pModel);
+                if (iModelID != INVALID_MODEL_ID) {
+                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
+
                     ushort usParentID = -1;
 
                     if (argStream.NextIsNumber())
@@ -1293,7 +1297,34 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
 
 uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 {
-    return g_pGame->GetRenderWare()->GetTXDIDForModelID(uiModelID);
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    return pModelInfo->GetTextureDictionaryID();
+}
+
+bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    pModelInfo->SetTextureDictionaryID(usTxdId);
+    return true;
+}
+
+bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    pModelInfo->ResetTextureDictionaryID();
+    return true;
 }
 
 int CLuaEngineDefs::EngineGetModelNameFromID(lua_State* luaVM)
@@ -2414,4 +2445,28 @@ bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 
     g_pClientGame->RestreamWorld(restreamLODs);
     return true;
+}
+
+uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName)
+{
+    if (strTxdName.size() > 24)
+        throw std::invalid_argument("TXD name length shoudn't be more than 24 characters");
+
+    int iModelID = m_pManager->GetModelManager()->GetFreeTxdModelID();
+    if (iModelID == INVALID_MODEL_ID)
+        return false;
+
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eClientModelType::TXD);
+
+    pModel->AllocateTXD(strTxdName);
+    pModel->SetParentResource(m_pLuaManager->GetVirtualMachine(luaVM)->GetResource());
+    m_pManager->GetModelManager()->Add(pModel);
+
+    return iModelID - MAX_MODEL_DFF_ID;
+}
+
+bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
+{
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(MAX_MODEL_DFF_ID + txdID);
+    return pModel && pModel->Deallocate();
 }

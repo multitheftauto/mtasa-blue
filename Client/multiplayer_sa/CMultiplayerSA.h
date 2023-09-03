@@ -155,6 +155,7 @@ public:
     void  GetHeatHaze(SHeatHazeSettings& settings);
     void  ResetColorFilter();
     void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color);
+    void  GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bool isOriginal);
     void  SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier);
     void  SetGrainLevel(BYTE ucLevel);
     void  ResetHeatHaze();

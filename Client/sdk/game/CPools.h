@@ -97,4 +97,10 @@ public:
 
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;
+
+    virtual uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName) = 0;
+    virtual void RemoveTextureDictonarySlot(uint uiTxdID) = 0;
+    virtual bool IsFreeTextureDictonarySlot(uint uiTxdID) = 0;
+
+    virtual ushort GetFreeTextureDictonarySlot() = 0;
 };
