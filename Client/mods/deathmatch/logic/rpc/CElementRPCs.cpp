@@ -410,16 +410,14 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
                 if (pPed->IsHealthLocked())
                     pPed->LockHealth(fHealth);
                 else
-                {
                     pPed->SetHealth(fHealth);
-                    break;
-                }
+                break;
             }
 
             case CCLIENTVEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
-  
+
                 pVehicle->SetHealth(fHealth);
                 break;
             }
