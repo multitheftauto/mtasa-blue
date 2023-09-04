@@ -986,3 +986,26 @@ void CRenderWareSA::RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vec
     rwInOutMatrix.up = (RwV3d&)matTemp.vFront;
     rwInOutMatrix.at = (RwV3d&)matTemp.vUp;
 }
+
+void RwFrameDump(RwFrame* parent, std::vector<std::vector<std::string>>& frames)
+{
+    RwFrame* ret = parent->child;
+    while (ret != NULL)
+    {
+        // recurse into the child
+        if (ret->child != NULL)
+        {
+            RwFrameDump(ret, frames);
+        }
+        frames.push_back({ret->szName, parent->szName});
+        ret = ret->next;
+    }
+}
+
+void CRenderWareSA::GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames)
+{
+    if (RpGetFrame(pRoot) == nullptr)
+        return;
+    RwFrameDump(RpGetFrame(pRoot), frames);
+}
+

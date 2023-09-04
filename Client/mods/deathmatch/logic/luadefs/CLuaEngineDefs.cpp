@@ -66,6 +66,20 @@ size_t EngineStreamingGetBufferSize() {
     return g_pGame->GetStreaming()->GetStreamingBufferSize();
 }
 
+std::vector<std::vector<std::string>> EngineModelGetFramesHierarchy(uint16_t usModel)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (pModelInfo == nullptr)
+        throw std::invalid_argument("Invalid model id");
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        throw std::invalid_argument("Model not loaded");
+
+    std::vector<std::vector<std::string>> hierarchy;
+    g_pGame->GetRenderWare()->GetFrameHierarchy(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), hierarchy);
+    return hierarchy;
+}
+
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -131,6 +145,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
         {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+        {"engineModelGetFramesHierarchy", ArgumentParser<EngineModelGetFramesHierarchy>},
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},

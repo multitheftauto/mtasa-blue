@@ -114,6 +114,7 @@ public:
     void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition);
     void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale);
     void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale);
+    void GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
