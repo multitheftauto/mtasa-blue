@@ -81,7 +81,7 @@ std::vector<std::vector<std::string>> EngineModelGetFramesHierarchy(uint16_t usM
     return hierarchy;
 }
 
-std::unordered_map<std::string, std::variant<float, CVector>> EngineModelGetFramesGeometryInfo(uint16_t usModel, std::string frameName)
+std::unordered_map<std::string, std::variant<float, CVector>> EngineModelGetFrameGeometryInfo(uint16_t usModel, std::string frameName)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
     if (pModelInfo == nullptr)
@@ -101,7 +101,7 @@ std::unordered_map<std::string, std::variant<float, CVector>> EngineModelGetFram
     return frameGeometryInfo;
 }
 
-std::unordered_map < std::string, std::variant<std::vector<CVectorAsTable>, std::vector<int>>> EngineModelGetFramesGeometry(uint16_t usModel, std::string frameName)
+std::unordered_map < std::string, std::variant<std::vector<CVectorAsTable>, std::vector<int>>> EngineModelGetFrameGeometry(uint16_t usModel, std::string frameName)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
     if (pModelInfo == nullptr)
@@ -116,6 +116,17 @@ std::unordered_map < std::string, std::variant<std::vector<CVectorAsTable>, std:
     frameGeometry["vertices"] = *reinterpret_cast<std::vector<CVectorAsTable>*>(&info.vertices);
     frameGeometry["triangles"] = info.triangles;
     return frameGeometry;
+}
+
+bool EngineModelFrameSetVertexPosition(uint16_t usModel, std::string frameName, int vertexIndex, CVector vertexPosition)
+{
+    return g_pGame->GetRenderWare()->QueueSetVertexPositionUpdate(usModel, frameName, vertexIndex,
+                                                                  vertexPosition);
+}
+
+bool EngineModelFlushChanges(uint16_t usModel, std::string frameName)
+{
+    return g_pGame->GetRenderWare()->FlushChanged(usModel, frameName);
 }
 
 void CLuaEngineDefs::LoadFunctions()
@@ -185,8 +196,10 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
 
         {"engineModelGetFramesHierarchy", ArgumentParser<EngineModelGetFramesHierarchy>},
-        {"engineModelGetFramesGeometryInfo", ArgumentParser<EngineModelGetFramesGeometryInfo>},
-        {"engineModelGetFramesGeometry", ArgumentParser<EngineModelGetFramesGeometry>},
+        {"engineModelGetFrameGeometryInfo", ArgumentParser<EngineModelGetFrameGeometryInfo>},
+        {"engineModelGetFrameGeometry", ArgumentParser<EngineModelGetFrameGeometry>},
+        {"engineModelFrameSetVertexPosition", ArgumentParser<EngineModelFrameSetVertexPosition>},
+        {"engineModelFlushChanges", ArgumentParser<EngineModelFlushChanges>},
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},

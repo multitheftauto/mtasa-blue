@@ -1038,42 +1038,23 @@ void CRenderWareSA::GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<st
 
 bool CRenderWareSA::GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info)
 {
-    RwFrame* pFrame = GetFrameFromName(pRoot, frameName);
-    if (pFrame == nullptr)
+    RpAtomic* pAtomic = GetAtomicFromFrameName(pRoot, frameName);
+    if (pAtomic == nullptr)
         return false;
 
-    std::vector<RpAtomic*> atomics;
-    GetClumpAtomicsWithFrameName(pRoot, pFrame, atomics);
-    if (atomics.size() == 1)
-    {
-        RpAtomic* pAtomic = atomics[0];
-        RpGeometry* pGeomtry = pAtomic->geometry;
-        if (pGeomtry == nullptr)
-            return false;
+    RpGeometry* pGeomtry = pAtomic->geometry;
+    if (pGeomtry == nullptr)
+        return false;
 
-        info.texCoordsCount = pGeomtry->texcoords_size;
-        info.trianglesCount = pGeomtry->triangles_size;
-        info.verticesCount = pGeomtry->vertices_size;
-        info.boundingSphereCenter = *(CVector*)&pAtomic->boundingSphere.position;
-        info.boundingSphereRadius = pAtomic->boundingSphere.radius;
-        //RpGeometryLock(pGeomtry, 0x0fff);
-        //for (int i = 0; i < 100; i++)
-        //{
-        //    RwV3d* asd = &pGeomtry->morph_target->verts[i + 50];
-        //    asd->x = 100 + i;
-        //    asd->y = 100 - i;
-        //    asd->z = asd->z + 5;
-        //    int skldjf = 5;
-        //}
-        //RpGeometryUnlock(pGeomtry);
-        //RpAtomicSetFlags(atomic, rpATOMICRENDER);
-        return true;
-    }
-    // Frame contains no atomics or more than two
-    return false;
+    info.texCoordsCount = pGeomtry->texcoords_size;
+    info.trianglesCount = pGeomtry->triangles_size;
+    info.verticesCount = pGeomtry->vertices_size;
+    info.boundingSphereCenter = *(CVector*)&pAtomic->boundingSphere.position;
+    info.boundingSphereRadius = pAtomic->boundingSphere.radius;
+    return true;
 }
 
-bool CRenderWareSA::GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info)
+RpAtomic* CRenderWareSA::GetAtomicFromFrameName(RpClump* pRoot, std::string& frameName)
 {
     RwFrame* pFrame = GetFrameFromName(pRoot, frameName);
     if (pFrame == nullptr)
@@ -1082,23 +1063,106 @@ bool CRenderWareSA::GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFr
     std::vector<RpAtomic*> atomics;
     GetClumpAtomicsWithFrameName(pRoot, pFrame, atomics);
     if (atomics.size() == 1)
-    {
-        RpAtomic* pAtomic = atomics[0];
-        RpGeometry* pGeomtry = pAtomic->geometry;
-        if (pGeomtry == nullptr)
-            return false;
+        return atomics[0];
+    return nullptr;
+}
 
-        info.vertices = std::move(std::vector<CVector>((CVector*)pGeomtry->morph_target->verts, (CVector*)pGeomtry->morph_target->verts + pGeomtry->vertices_size));
-        info.triangles.reserve(pGeomtry->triangles_size * 3);
-        for (int i = 0; i < pGeomtry->triangles_size; i++)
-        {
-            RpTriangle triangle = pGeomtry->triangles[i];
-            info.triangles.push_back(triangle.verts[0]);
-            info.triangles.push_back(triangle.verts[1]);
-            info.triangles.push_back(triangle.verts[2]);
-        }
-        return true;
+bool CRenderWareSA::GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info)
+{
+    RpAtomic* pAtomic = GetAtomicFromFrameName(pRoot, frameName);
+    if (pAtomic == nullptr)
+        return false;
+
+    RpGeometry* pGeomtry = pAtomic->geometry;
+    if (pGeomtry == nullptr)
+        return false;
+
+    info.vertices = std::move(std::vector<CVector>((CVector*)pGeomtry->morph_target->verts, (CVector*)pGeomtry->morph_target->verts + pGeomtry->vertices_size));
+    info.triangles.reserve(pGeomtry->triangles_size * 3);
+    for (int i = 0; i < pGeomtry->triangles_size; i++)
+    {
+        RpTriangle triangle = pGeomtry->triangles[i];
+        info.triangles.push_back(triangle.verts[0]);
+        info.triangles.push_back(triangle.verts[1]);
+        info.triangles.push_back(triangle.verts[2]);
     }
-    // Frame contains no atomics or more than two
-    return false;
+    return true;
+}
+
+bool CRenderWareSA::QueueSetVertexPositionUpdate(int16_t usModelId, std::string& frameName, int vertexIndex, CVector position)
+{
+    CModelInfo* pModelInfo = g_pCore->GetGame()->GetModelInfo(usModelId);
+    if (pModelInfo == nullptr)
+        return false;
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        return false;
+
+    RpAtomic* pAtomic = GetAtomicFromFrameName(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName);
+    if (pAtomic == nullptr)
+        return false;
+
+    CGeometryUpdate* pGeometryUpdate = nullptr;
+    if (m_mapGeometryUpdateQueue.find(usModelId) == m_mapGeometryUpdateQueue.end())
+    {
+        pGeometryUpdate = new CGeometryUpdate();
+        m_mapGeometryUpdateQueue[usModelId] = pGeometryUpdate;
+    }
+    if (pGeometryUpdate == nullptr)
+    {
+        if (m_mapGeometryUpdateQueue.find(usModelId) != m_mapGeometryUpdateQueue.end())
+            pGeometryUpdate = m_mapGeometryUpdateQueue.find(usModelId)->second;
+    }
+
+    if (pGeometryUpdate != nullptr)
+        pGeometryUpdate->VertexSetPosition(frameName, vertexIndex, position);
+    int klasjd = 5;
+}
+
+bool CRenderWareSA::FlushChanged(int16_t usModelId, std::string& frameName)
+{
+    if (m_mapGeometryUpdateQueue.find(usModelId) == m_mapGeometryUpdateQueue.end())
+        return false;
+
+    CModelInfo* pModelInfo = g_pCore->GetGame()->GetModelInfo(usModelId);
+    if (pModelInfo == nullptr)
+        return false;
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        return false;
+
+    RpAtomic* pAtomic = GetAtomicFromFrameName(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName);
+    if (pAtomic == nullptr)
+        return false;
+
+    RpGeometry* pGeometry = pAtomic->geometry;
+    if (pGeometry == nullptr)
+        return false;
+
+    m_mapGeometryUpdateQueue[usModelId]->FlushChanged(pGeometry, frameName);
+
+}
+
+void CGeometryUpdate::VertexSetPosition(std::string& frameName, int vertexIndex, CVector position)
+{
+    if (m_mapGeometryFrameUpdate.find(frameName) == m_mapGeometryFrameUpdate.end())
+        m_mapGeometryFrameUpdate[frameName] = {};
+    m_mapGeometryFrameUpdate[frameName].m_vecVertexSetPosition.push_back(SGeometryVertexSetPosition{vertexIndex, position});
+}
+
+bool CGeometryUpdate::FlushChanged(RpGeometry* pGeometry, std::string& frameName)
+{
+    if (m_mapGeometryFrameUpdate.find(frameName) == m_mapGeometryFrameUpdate.end())
+        return false;
+
+    RpGeometryLock(pGeometry, 0x0fff);
+    for (auto const& setVertexPosition : m_mapGeometryFrameUpdate[frameName].m_vecVertexSetPosition)
+    {
+        RwV3d* vertex = &pGeometry->morph_target->verts[setVertexPosition.vertexIndex];
+        vertex->x = setVertexPosition.position.fX;
+        vertex->y = setVertexPosition.position.fY;
+        vertex->z = setVertexPosition.position.fZ;
+    }
+    m_mapGeometryFrameUpdate[frameName].m_vecVertexSetPosition.clear();
+    RpGeometryUnlock(pGeometry);
 }

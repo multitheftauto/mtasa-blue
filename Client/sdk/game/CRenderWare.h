@@ -125,4 +125,6 @@ public:
     virtual void GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames) = 0;
     virtual bool GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info) = 0;
     virtual bool GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info) = 0;
+    virtual bool QueueSetVertexPositionUpdate(int16_t usModelId, std::string& frameName, int vertexIndex, CVector position) = 0;
+    virtual bool FlushChanged(int16_t usModelId, std::string& frameName) = 0;
 };

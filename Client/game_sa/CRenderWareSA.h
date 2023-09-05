@@ -22,6 +22,7 @@ struct RpAtomic;
 struct SShaderReplacementStats;
 struct STexInfo;
 struct STexTag;
+struct RpGeometry;
 
 struct SFrameGeometryInfo
 {
@@ -38,6 +39,29 @@ struct SFrameGeometry
 public:
     std::vector<CVector> vertices;
     std::vector<int> triangles;
+};
+
+struct SGeometryVertexSetPosition
+{
+public:
+    int vertexIndex;
+    CVector position;
+};
+
+class CGeometryFrameUpdate
+{
+public:
+    std::vector<SGeometryVertexSetPosition> m_vecVertexSetPosition;
+};
+
+class CGeometryUpdate
+{
+public:
+    void VertexSetPosition(std::string& frameName, int vertexIndex, CVector position);
+    bool FlushChanged(RpGeometry* pGeometry, std::string& frameName);
+
+private:
+    std::map<std::string, CGeometryFrameUpdate> m_mapGeometryFrameUpdate;
 };
 
 class CRenderWareSA : public CRenderWare
@@ -135,6 +159,9 @@ public:
     void GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames);
     bool GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info);
     bool GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info);
+    bool QueueSetVertexPositionUpdate(int16_t usModelId, std::string& frameName, int vertexIndex, CVector position);
+    bool FlushChanged(int16_t usModelId, std::string& frameName);
+    RpAtomic* GetAtomicFromFrameName(RpClump* pRoot, std::string& frameName);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
@@ -186,4 +213,5 @@ public:
     bool                                m_bGTAVertexShadersEnabled;
     std::set<RwTexture*>                m_SpecialTextures;
     static int                          ms_iRenderingType;
+    std::map<int16_t, CGeometryUpdate*> m_mapGeometryUpdateQueue;
 };
