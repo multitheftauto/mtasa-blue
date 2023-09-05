@@ -101,6 +101,23 @@ std::unordered_map<std::string, std::variant<float, CVector>> EngineModelGetFram
     return frameGeometryInfo;
 }
 
+std::unordered_map < std::string, std::variant<std::vector<CVectorAsTable>, std::vector<int>>> EngineModelGetFramesGeometry(uint16_t usModel, std::string frameName)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (pModelInfo == nullptr)
+        throw std::invalid_argument("Invalid model id");
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        throw std::invalid_argument("Model not loaded");
+
+    SFrameGeometry info;
+    g_pGame->GetRenderWare()->GetFrameGeometry(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName, info);
+    std::unordered_map<std::string, std::variant<std::vector<CVectorAsTable>, std::vector<int>>> frameGeometry;
+    frameGeometry["vertices"] = *reinterpret_cast<std::vector<CVectorAsTable>*>(&info.vertices);
+    frameGeometry["triangles"] = info.triangles;
+    return frameGeometry;
+}
+
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -169,6 +186,7 @@ void CLuaEngineDefs::LoadFunctions()
 
         {"engineModelGetFramesHierarchy", ArgumentParser<EngineModelGetFramesHierarchy>},
         {"engineModelGetFramesGeometryInfo", ArgumentParser<EngineModelGetFramesGeometryInfo>},
+        {"engineModelGetFramesGeometry", ArgumentParser<EngineModelGetFramesGeometry>},
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},

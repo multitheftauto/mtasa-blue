@@ -33,6 +33,13 @@ public:
     float boundingSphereRadius;
 };
 
+struct SFrameGeometry
+{
+public:
+    std::vector<CVector> vertices;
+    std::vector<int> triangles;
+};
+
 class CRenderWareSA : public CRenderWare
 {
 public:
@@ -127,6 +134,7 @@ public:
     void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale);
     void GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames);
     bool GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info);
+    bool GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);

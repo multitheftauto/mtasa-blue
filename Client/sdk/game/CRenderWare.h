@@ -26,6 +26,7 @@ struct RwTexDictionary;
 struct RwTexture;
 struct RpClump;
 struct SFrameGeometryInfo;
+struct SFrameGeometry;
 
 typedef CShaderItem CSHADERDUMMY;
 
@@ -123,4 +124,5 @@ public:
     virtual void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale) = 0;
     virtual void GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames) = 0;
     virtual bool GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info) = 0;
+    virtual bool GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info) = 0;
 };

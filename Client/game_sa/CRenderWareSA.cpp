@@ -1036,7 +1036,6 @@ void CRenderWareSA::GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<st
     RwFrameDump(RpGetFrame(pRoot), frames);
 }
 
-#define rwObjectGetParent(object) (((const RwObject*)(object))->parent)
 bool CRenderWareSA::GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info)
 {
     RwFrame* pFrame = GetFrameFromName(pRoot, frameName);
@@ -1057,7 +1056,47 @@ bool CRenderWareSA::GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName,
         info.verticesCount = pGeomtry->vertices_size;
         info.boundingSphereCenter = *(CVector*)&pAtomic->boundingSphere.position;
         info.boundingSphereRadius = pAtomic->boundingSphere.radius;
+        //RpGeometryLock(pGeomtry, 0x0fff);
+        //for (int i = 0; i < 100; i++)
+        //{
+        //    RwV3d* asd = &pGeomtry->morph_target->verts[i + 50];
+        //    asd->x = 100 + i;
+        //    asd->y = 100 - i;
+        //    asd->z = asd->z + 5;
+        //    int skldjf = 5;
+        //}
+        //RpGeometryUnlock(pGeomtry);
+        //RpAtomicSetFlags(atomic, rpATOMICRENDER);
+        return true;
+    }
+    // Frame contains no atomics or more than two
+    return false;
+}
 
+bool CRenderWareSA::GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info)
+{
+    RwFrame* pFrame = GetFrameFromName(pRoot, frameName);
+    if (pFrame == nullptr)
+        return false;
+
+    std::vector<RpAtomic*> atomics;
+    GetClumpAtomicsWithFrameName(pRoot, pFrame, atomics);
+    if (atomics.size() == 1)
+    {
+        RpAtomic* pAtomic = atomics[0];
+        RpGeometry* pGeomtry = pAtomic->geometry;
+        if (pGeomtry == nullptr)
+            return false;
+
+        info.vertices = std::move(std::vector<CVector>((CVector*)pGeomtry->morph_target->verts, (CVector*)pGeomtry->morph_target->verts + pGeomtry->vertices_size));
+        info.triangles.reserve(pGeomtry->triangles_size * 3);
+        for (int i = 0; i < pGeomtry->triangles_size; i++)
+        {
+            RpTriangle triangle = pGeomtry->triangles[i];
+            info.triangles.push_back(triangle.verts[0]);
+            info.triangles.push_back(triangle.verts[1]);
+            info.triangles.push_back(triangle.verts[2]);
+        }
         return true;
     }
     // Frame contains no atomics or more than two

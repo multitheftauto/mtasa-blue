@@ -20,7 +20,9 @@
 #include <variant>
 #include <array>
 
-/*
+class CVectorAsTable : public CVector { };
+
+    /*
     Basic Lua operations:
         void Push(L, T value)
         T PopPrimitive(L, int& stackIndex)
@@ -64,6 +66,20 @@ namespace lua
     inline void Push(lua_State* L, const CLuaArguments& args) { args.PushAsTable(L); }
 
     inline void Push(lua_State* L, const CVector2D& value) { lua_pushvector(L, value); }
+
+    inline void Push(lua_State* L, const CVectorAsTable& value)
+    {
+        lua_newtable(L);
+        Push(L, 1);
+        Push(L, value.fX);
+        lua_settable(L, -3);
+        Push(L, 2);
+        Push(L, value.fY);
+        lua_settable(L, -3);
+        Push(L, 3);
+        Push(L, value.fZ);
+        lua_settable(L, -3);
+    }
 
     inline void Push(lua_State* L, const CVector& value) { lua_pushvector(L, value); }
 
