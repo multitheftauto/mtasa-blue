@@ -14,6 +14,7 @@
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
+#include "../../../../game_sa/CRenderWareSA.h"
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
@@ -78,6 +79,26 @@ std::vector<std::vector<std::string>> EngineModelGetFramesHierarchy(uint16_t usM
     std::vector<std::vector<std::string>> hierarchy;
     g_pGame->GetRenderWare()->GetFrameHierarchy(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), hierarchy);
     return hierarchy;
+}
+
+std::unordered_map<std::string, std::variant<float, CVector>> EngineModelGetFramesGeometryInfo(uint16_t usModel, std::string frameName)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (pModelInfo == nullptr)
+        throw std::invalid_argument("Invalid model id");
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        throw std::invalid_argument("Model not loaded");
+
+    SFrameGeometryInfo info;
+    g_pGame->GetRenderWare()->GetFrameGeometryInfo(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName, info);
+    std::unordered_map<std::string, std::variant<float, CVector>> frameGeometryInfo;
+    frameGeometryInfo["texCoordsCount"] = info.texCoordsCount;
+    frameGeometryInfo["trianglesCount"] = info.trianglesCount;
+    frameGeometryInfo["verticesCount"] = info.verticesCount;
+    frameGeometryInfo["boundingSphereCenter"] = info.boundingSphereCenter;
+    frameGeometryInfo["boundingSphereRadius"] = info.boundingSphereRadius;
+    return frameGeometryInfo;
 }
 
 void CLuaEngineDefs::LoadFunctions()
@@ -145,7 +166,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
         {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+
         {"engineModelGetFramesHierarchy", ArgumentParser<EngineModelGetFramesHierarchy>},
+        {"engineModelGetFramesGeometryInfo", ArgumentParser<EngineModelGetFramesGeometryInfo>},
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},

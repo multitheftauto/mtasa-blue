@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <variant>
 #include <game/CRenderWare.h>
 #include "CModelInfoSA.h"
 #include "CRenderWareSA.ShaderSupport.h"
@@ -21,6 +22,16 @@ struct RpAtomic;
 struct SShaderReplacementStats;
 struct STexInfo;
 struct STexTag;
+
+struct SFrameGeometryInfo
+{
+public:
+    int texCoordsCount;
+    int trianglesCount;
+    int verticesCount;
+    CVector boundingSphereCenter;
+    float boundingSphereRadius;
+};
 
 class CRenderWareSA : public CRenderWare
 {
@@ -115,6 +126,7 @@ public:
     void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale);
     void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale);
     void GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames);
+    bool GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
@@ -142,6 +154,7 @@ public:
     void      DestroyTexInfo(STexInfo* pTexInfo);
 
     static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
+    static void GetClumpAtomicsWithFrameName(RpClump* pClump, RwFrame* pFrame, std::vector<RpAtomic*>& outAtomicList);
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
 
     void OnTextureStreamIn(STexInfo* pTexInfo);

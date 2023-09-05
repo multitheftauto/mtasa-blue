@@ -315,6 +315,33 @@ void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& 
 }
 
 //
+// Returns list of atomics inside a clump with given frame name
+//
+struct SGetClumpAtomicList
+{
+    std::vector<RpAtomic*>* vecAtomics;
+    RwFrame*                pFrame;
+};
+void CRenderWareSA::GetClumpAtomicsWithFrameName(RpClump* pClump, RwFrame* pFrame, std::vector<RpAtomic*>& outAtomicList)
+{
+    SGetClumpAtomicList data;
+    data.pFrame = pFrame;
+    data.vecAtomics = &outAtomicList;
+    RpClumpForAllAtomics(
+        pClump,
+        [](RpAtomic* pAtomic, void* pData)
+        {
+
+            SGetClumpAtomicList* data = reinterpret_cast<SGetClumpAtomicList*>(pData);
+            RwFrame *pFrame = RpAtomicGetFrame(pAtomic);
+            if (data->pFrame == pFrame)
+                data->vecAtomics->push_back(pAtomic);
+            return true;
+        },
+        &data);
+}
+
+//
 // Returns true if the clump geometry sort of matches
 //
 // ClumpA vs ClumpB(or)AtomicB
@@ -1009,3 +1036,30 @@ void CRenderWareSA::GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<st
     RwFrameDump(RpGetFrame(pRoot), frames);
 }
 
+#define rwObjectGetParent(object) (((const RwObject*)(object))->parent)
+bool CRenderWareSA::GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info)
+{
+    RwFrame* pFrame = GetFrameFromName(pRoot, frameName);
+    if (pFrame == nullptr)
+        return false;
+
+    std::vector<RpAtomic*> atomics;
+    GetClumpAtomicsWithFrameName(pRoot, pFrame, atomics);
+    if (atomics.size() == 1)
+    {
+        RpAtomic* pAtomic = atomics[0];
+        RpGeometry* pGeomtry = pAtomic->geometry;
+        if (pGeomtry == nullptr)
+            return false;
+
+        info.texCoordsCount = pGeomtry->texcoords_size;
+        info.trianglesCount = pGeomtry->triangles_size;
+        info.verticesCount = pGeomtry->vertices_size;
+        info.boundingSphereCenter = *(CVector*)&pAtomic->boundingSphere.position;
+        info.boundingSphereRadius = pAtomic->boundingSphere.radius;
+
+        return true;
+    }
+    // Frame contains no atomics or more than two
+    return false;
+}
