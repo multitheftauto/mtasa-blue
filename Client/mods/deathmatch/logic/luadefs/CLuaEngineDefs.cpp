@@ -14,6 +14,7 @@
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
+#include "../../../../game_sa/CRenderWareSA.h"
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
@@ -64,6 +65,68 @@ bool EngineStreamingSetBufferSize(size_t sizeBytes) {
 // Get current streaming buffer size
 size_t EngineStreamingGetBufferSize() {
     return g_pGame->GetStreaming()->GetStreamingBufferSize();
+}
+
+std::vector<std::vector<std::string>> EngineModelGetFramesHierarchy(uint16_t usModel)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (pModelInfo == nullptr)
+        throw std::invalid_argument("Invalid model id");
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        throw std::invalid_argument("Model not loaded");
+
+    std::vector<std::vector<std::string>> hierarchy;
+    g_pGame->GetRenderWare()->GetFrameHierarchy(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), hierarchy);
+    return hierarchy;
+}
+
+std::unordered_map<std::string, std::variant<float, CVector>> EngineModelGetFrameGeometryInfo(uint16_t usModel, std::string frameName)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (pModelInfo == nullptr)
+        throw std::invalid_argument("Invalid model id");
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        throw std::invalid_argument("Model not loaded");
+
+    SFrameGeometryInfo info;
+    g_pGame->GetRenderWare()->GetFrameGeometryInfo(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName, info);
+    std::unordered_map<std::string, std::variant<float, CVector>> frameGeometryInfo;
+    frameGeometryInfo["texCoordsCount"] = info.texCoordsCount;
+    frameGeometryInfo["trianglesCount"] = info.trianglesCount;
+    frameGeometryInfo["verticesCount"] = info.verticesCount;
+    frameGeometryInfo["boundingSphereCenter"] = info.boundingSphereCenter;
+    frameGeometryInfo["boundingSphereRadius"] = info.boundingSphereRadius;
+    return frameGeometryInfo;
+}
+
+std::unordered_map < std::string, std::variant<std::vector<CVectorAsTable>, std::vector<int>>> EngineModelGetFrameGeometry(uint16_t usModel, std::string frameName)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (pModelInfo == nullptr)
+        throw std::invalid_argument("Invalid model id");
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        throw std::invalid_argument("Model not loaded");
+
+    SFrameGeometry info;
+    g_pGame->GetRenderWare()->GetFrameGeometry(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName, info);
+    std::unordered_map<std::string, std::variant<std::vector<CVectorAsTable>, std::vector<int>>> frameGeometry;
+    frameGeometry["vertices"] = *reinterpret_cast<std::vector<CVectorAsTable>*>(&info.vertices);
+    frameGeometry["triangles"] = info.triangles;
+    return frameGeometry;
+}
+
+bool EngineModelFrameSetVertexPosition(uint16_t usModel, std::string frameName, int vertexIndex, CVector vertexPosition)
+{
+    return g_pGame->GetRenderWare()->QueueSetVertexPositionUpdate(usModel, frameName, vertexIndex,
+                                                                  vertexPosition);
+}
+
+bool EngineModelFlushChanges(uint16_t usModel, std::string frameName)
+{
+    return g_pGame->GetRenderWare()->FlushChanged(usModel, frameName);
 }
 
 void CLuaEngineDefs::LoadFunctions()
@@ -131,6 +194,12 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
         {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+
+        {"engineModelGetFramesHierarchy", ArgumentParser<EngineModelGetFramesHierarchy>},
+        {"engineModelGetFrameGeometryInfo", ArgumentParser<EngineModelGetFrameGeometryInfo>},
+        {"engineModelGetFrameGeometry", ArgumentParser<EngineModelGetFrameGeometry>},
+        {"engineModelFrameSetVertexPosition", ArgumentParser<EngineModelFrameSetVertexPosition>},
+        {"engineModelFlushChanges", ArgumentParser<EngineModelFlushChanges>},
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},

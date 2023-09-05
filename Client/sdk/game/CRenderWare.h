@@ -12,7 +12,6 @@
 #pragma once
 
 #include <vector>
-
 class CClientEntityBase;
 class CD3DDUMMY;
 class CMatrix;
@@ -26,6 +25,8 @@ struct RwMatrix;
 struct RwTexDictionary;
 struct RwTexture;
 struct RpClump;
+struct SFrameGeometryInfo;
+struct SFrameGeometry;
 
 typedef CShaderItem CSHADERDUMMY;
 
@@ -121,4 +122,9 @@ public:
     virtual void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) = 0;
     virtual void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale) = 0;
     virtual void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale) = 0;
+    virtual void GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames) = 0;
+    virtual bool GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info) = 0;
+    virtual bool GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info) = 0;
+    virtual bool QueueSetVertexPositionUpdate(int16_t usModelId, std::string& frameName, int vertexIndex, CVector position) = 0;
+    virtual bool FlushChanged(int16_t usModelId, std::string& frameName) = 0;
 };
