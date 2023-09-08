@@ -56,6 +56,10 @@ struct SProcessLineOfSightMaterialInfoResult {
     const char* textureName;   //< GTA texture name
     const char* frameName;     //< The name of the frame the hit geometry belongs to
     CVector     hitPos;        //< Precise hit position on the clump [World space]
+
+    int vertexIndices[3];
+    int triangleIndex;
+
     bool        valid{};       //< Data found in this struct is only valid if this is `true`!
 };
 

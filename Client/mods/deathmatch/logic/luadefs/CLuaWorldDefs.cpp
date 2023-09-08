@@ -331,7 +331,7 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* L)
                     }
                 }
 
-                if (bIncludeExtraMateriaInfo && matInfo.valid)  { // 7 args
+                if (bIncludeExtraMateriaInfo && matInfo.valid)  { // 7+4 args
                     lua::Push(L, matInfo.uv.fX);
                     lua::Push(L, matInfo.uv.fY);
 
@@ -341,8 +341,13 @@ int CLuaWorldDefs::ProcessLineOfSight(lua_State* L)
                     lua::Push(L, matInfo.hitPos.fX);
                     lua::Push(L, matInfo.hitPos.fY);
                     lua::Push(L, matInfo.hitPos.fZ);
+
+                    lua::Push(L, matInfo.triangleIndex);
+                    lua::Push(L, matInfo.vertexIndices[0]);
+                    lua::Push(L, matInfo.vertexIndices[1]);
+                    lua::Push(L, matInfo.vertexIndices[2]);
                 } else {
-                    for (auto i = 2 + 1 + 1 + 3; i-- > 0;) {
+                    for (auto i = 2 + 1 + 1 + 3 + 4; i-- > 0;) {
                         lua_pushnil(L);
                     }
                 }

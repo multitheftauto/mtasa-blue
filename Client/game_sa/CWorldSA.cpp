@@ -367,6 +367,8 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
             CVector             hitBary{};                         //< Barycentric coordinates [on the hit triangle] of the hit
             CVector             hitPosOS{};                        //< Hit position in object space
             CEntitySAInterface* entity{};                          //< The hit entity
+            uint16_t            vertexIndices[3];
+            int                 triangleIndex;
         } c = {};
 
         c.entity = targetEntity;
@@ -456,6 +458,10 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
                     c->hitTri = tri;
                     c->hitBary = hitBary;
                     c->hitPosOS = localToObjTransform.TransformVector(hitPos);            // Transform back into object space
+                    c->triangleIndex = i;
+                    c->vertexIndices[0] = tri->verts[0];
+                    c->vertexIndices[1] = tri->verts[1];
+                    c->vertexIndices[2] = tri->verts[2];
                 }
             }
 
@@ -501,6 +507,11 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
 
             // Get hit position in world space
             outMatInfo->hitPos = c.entMat.TransformVector(c.hitPosOS);
+
+            outMatInfo->triangleIndex = c.triangleIndex;
+            outMatInfo->vertexIndices[0] = c.vertexIndices[0];
+            outMatInfo->vertexIndices[1] = c.vertexIndices[1];
+            outMatInfo->vertexIndices[2] = c.vertexIndices[2];
         }
     }
 
