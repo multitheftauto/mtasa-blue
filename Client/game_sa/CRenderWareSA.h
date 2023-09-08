@@ -48,16 +48,25 @@ public:
     CVector position;
 };
 
+struct SGeometryVertexSetColor
+{
+public:
+    int vertexIndex;
+    SColor color;
+};
+
 class CGeometryFrameUpdate
 {
 public:
     std::vector<SGeometryVertexSetPosition> m_vecVertexSetPosition;
+    std::vector<SGeometryVertexSetColor> m_vecVertexSetColor;
 };
 
 class CGeometryUpdate
 {
 public:
     void VertexSetPosition(std::string& frameName, int vertexIndex, CVector position);
+    void VertexSetColor(std::string& frameName, int vertexIndex, SColor color);
     bool FlushChanged(RpGeometry* pGeometry, std::string& frameName);
 
 private:
@@ -156,12 +165,13 @@ public:
     void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition);
     void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale);
     void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale);
-    void GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames);
-    bool GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info);
-    bool GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info);
+    void GetFrameHierarchy(RwObject* rwObject, std::vector<std::vector<std::string>>& frames);
+    bool GetFrameGeometryInfo(RwObject* rwObject, std::string& frameName, SFrameGeometryInfo& info);
+    bool GetFrameGeometry(RwObject* rwObject, std::string& frameName, SFrameGeometry& info);
     bool QueueSetVertexPositionUpdate(int16_t usModelId, std::string& frameName, int vertexIndex, CVector position);
+    bool QueueSetVertexColorUpdate(int16_t usModelId, std::string& frameName, int vertexIndex, SColor color);
     bool FlushChanged(int16_t usModelId, std::string& frameName);
-    RpAtomic* GetAtomicFromFrameName(RpClump* pRoot, std::string& frameName);
+    RpAtomic* GetAtomicFromFrameName(RwObject* rwObject, std::string& frameName);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);

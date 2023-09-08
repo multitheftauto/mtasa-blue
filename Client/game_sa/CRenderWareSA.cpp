@@ -1029,16 +1029,16 @@ void RwFrameDump(RwFrame* parent, std::vector<std::vector<std::string>>& frames)
     }
 }
 
-void CRenderWareSA::GetFrameHierarchy(RpClump* pRoot, std::vector<std::vector<std::string>>& frames)
+void CRenderWareSA::GetFrameHierarchy(RwObject* rwObject, std::vector<std::vector<std::string>>& frames)
 {
-    if (RpGetFrame(pRoot) == nullptr)
+    if (RpGetFrame(rwObject) == nullptr)
         return;
-    RwFrameDump(RpGetFrame(pRoot), frames);
+    RwFrameDump(RpGetFrame(rwObject), frames);
 }
 
-bool CRenderWareSA::GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName, SFrameGeometryInfo& info)
+bool CRenderWareSA::GetFrameGeometryInfo(RwObject* rwObject, std::string& frameName, SFrameGeometryInfo& info)
 {
-    RpAtomic* pAtomic = GetAtomicFromFrameName(pRoot, frameName);
+    RpAtomic* pAtomic = GetAtomicFromFrameName(rwObject, frameName);
     if (pAtomic == nullptr)
         return false;
 
@@ -1054,22 +1054,29 @@ bool CRenderWareSA::GetFrameGeometryInfo(RpClump* pRoot, std::string& frameName,
     return true;
 }
 
-RpAtomic* CRenderWareSA::GetAtomicFromFrameName(RpClump* pRoot, std::string& frameName)
+RpAtomic* CRenderWareSA::GetAtomicFromFrameName(RwObject* rwObject, std::string& frameName)
 {
-    RwFrame* pFrame = GetFrameFromName(pRoot, frameName);
+    if (rwObject->type == RP_TYPE_ATOMIC)
+    {
+        return reinterpret_cast<RpAtomic*>(rwObject);
+    }
+
+    RpClump* pClump = reinterpret_cast<RpClump*>(rwObject);
+    RwFrame* pFrame = GetFrameFromName(pClump, frameName);
+
     if (pFrame == nullptr)
         return false;
 
     std::vector<RpAtomic*> atomics;
-    GetClumpAtomicsWithFrameName(pRoot, pFrame, atomics);
+    GetClumpAtomicsWithFrameName(pClump, pFrame, atomics);
     if (atomics.size() == 1)
         return atomics[0];
     return nullptr;
 }
 
-bool CRenderWareSA::GetFrameGeometry(RpClump* pRoot, std::string& frameName, SFrameGeometry& info)
+bool CRenderWareSA::GetFrameGeometry(RwObject* rwObject, std::string& frameName, SFrameGeometry& info)
 {
-    RpAtomic* pAtomic = GetAtomicFromFrameName(pRoot, frameName);
+    RpAtomic* pAtomic = GetAtomicFromFrameName(rwObject, frameName);
     if (pAtomic == nullptr)
         return false;
 
@@ -1098,7 +1105,7 @@ bool CRenderWareSA::QueueSetVertexPositionUpdate(int16_t usModelId, std::string&
     if (pModelInfo->GetRwObject() == nullptr)
         return false;
 
-    RpAtomic* pAtomic = GetAtomicFromFrameName(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName);
+    RpAtomic* pAtomic = GetAtomicFromFrameName(pModelInfo->GetRwObject(), frameName);
     if (pAtomic == nullptr)
         return false;
 
@@ -1116,7 +1123,36 @@ bool CRenderWareSA::QueueSetVertexPositionUpdate(int16_t usModelId, std::string&
 
     if (pGeometryUpdate != nullptr)
         pGeometryUpdate->VertexSetPosition(frameName, vertexIndex, position);
-    int klasjd = 5;
+}
+
+
+bool CRenderWareSA::QueueSetVertexColorUpdate(int16_t usModelId, std::string& frameName, int vertexIndex, SColor color)
+{
+    CModelInfo* pModelInfo = g_pCore->GetGame()->GetModelInfo(usModelId);
+    if (pModelInfo == nullptr)
+        return false;
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        return false;
+
+    RpAtomic* pAtomic = GetAtomicFromFrameName(pModelInfo->GetRwObject(), frameName);
+    if (pAtomic == nullptr)
+        return false;
+
+    CGeometryUpdate* pGeometryUpdate = nullptr;
+    if (m_mapGeometryUpdateQueue.find(usModelId) == m_mapGeometryUpdateQueue.end())
+    {
+        pGeometryUpdate = new CGeometryUpdate();
+        m_mapGeometryUpdateQueue[usModelId] = pGeometryUpdate;
+    }
+    if (pGeometryUpdate == nullptr)
+    {
+        if (m_mapGeometryUpdateQueue.find(usModelId) != m_mapGeometryUpdateQueue.end())
+            pGeometryUpdate = m_mapGeometryUpdateQueue.find(usModelId)->second;
+    }
+
+    if (pGeometryUpdate != nullptr)
+        pGeometryUpdate->VertexSetColor(frameName, vertexIndex, color);
 }
 
 bool CRenderWareSA::FlushChanged(int16_t usModelId, std::string& frameName)
@@ -1131,7 +1167,7 @@ bool CRenderWareSA::FlushChanged(int16_t usModelId, std::string& frameName)
     if (pModelInfo->GetRwObject() == nullptr)
         return false;
 
-    RpAtomic* pAtomic = GetAtomicFromFrameName(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName);
+    RpAtomic* pAtomic = GetAtomicFromFrameName(pModelInfo->GetRwObject(), frameName);
     if (pAtomic == nullptr)
         return false;
 
@@ -1150,6 +1186,13 @@ void CGeometryUpdate::VertexSetPosition(std::string& frameName, int vertexIndex,
     m_mapGeometryFrameUpdate[frameName].m_vecVertexSetPosition.push_back(SGeometryVertexSetPosition{vertexIndex, position});
 }
 
+void CGeometryUpdate::VertexSetColor(std::string& frameName, int vertexIndex, SColor color)
+{
+    if (m_mapGeometryFrameUpdate.find(frameName) == m_mapGeometryFrameUpdate.end())
+        m_mapGeometryFrameUpdate[frameName] = {};
+    m_mapGeometryFrameUpdate[frameName].m_vecVertexSetColor.push_back(SGeometryVertexSetColor{vertexIndex, color});
+}
+
 bool CGeometryUpdate::FlushChanged(RpGeometry* pGeometry, std::string& frameName)
 {
     if (m_mapGeometryFrameUpdate.find(frameName) == m_mapGeometryFrameUpdate.end())
@@ -1163,6 +1206,15 @@ bool CGeometryUpdate::FlushChanged(RpGeometry* pGeometry, std::string& frameName
         vertex->y = setVertexPosition.position.fY;
         vertex->z = setVertexPosition.position.fZ;
     }
-    m_mapGeometryFrameUpdate[frameName].m_vecVertexSetPosition.clear();
+    // geometry->numVertices
+    for (auto const& setVertexColor : m_mapGeometryFrameUpdate[frameName].m_vecVertexSetColor)
+    {
+        RwColor* color = &pGeometry->colors[setVertexColor.vertexIndex];
+        color->r = setVertexColor.color.R;
+        color->g = setVertexColor.color.G;
+        color->b = setVertexColor.color.B;
+        color->a = setVertexColor.color.A;
+    }
+    m_mapGeometryFrameUpdate[frameName].m_vecVertexSetColor.clear();
     RpGeometryUnlock(pGeometry);
 }

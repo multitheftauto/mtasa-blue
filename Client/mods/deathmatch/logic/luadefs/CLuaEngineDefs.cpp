@@ -77,7 +77,7 @@ std::vector<std::vector<std::string>> EngineModelGetFramesHierarchy(uint16_t usM
         throw std::invalid_argument("Model not loaded");
 
     std::vector<std::vector<std::string>> hierarchy;
-    g_pGame->GetRenderWare()->GetFrameHierarchy(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), hierarchy);
+    g_pGame->GetRenderWare()->GetFrameHierarchy(pModelInfo->GetRwObject(), hierarchy);
     return hierarchy;
 }
 
@@ -91,7 +91,7 @@ std::unordered_map<std::string, std::variant<float, CVector>> EngineModelGetFram
         throw std::invalid_argument("Model not loaded");
 
     SFrameGeometryInfo info;
-    g_pGame->GetRenderWare()->GetFrameGeometryInfo(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName, info);
+    g_pGame->GetRenderWare()->GetFrameGeometryInfo(pModelInfo->GetRwObject(), frameName, info);
     std::unordered_map<std::string, std::variant<float, CVector>> frameGeometryInfo;
     frameGeometryInfo["texCoordsCount"] = info.texCoordsCount;
     frameGeometryInfo["trianglesCount"] = info.trianglesCount;
@@ -111,7 +111,7 @@ std::unordered_map < std::string, std::variant<std::vector<CVectorAsTable>, std:
         throw std::invalid_argument("Model not loaded");
 
     SFrameGeometry info;
-    g_pGame->GetRenderWare()->GetFrameGeometry(reinterpret_cast<RpClump*>(pModelInfo->GetRwObject()), frameName, info);
+    g_pGame->GetRenderWare()->GetFrameGeometry(pModelInfo->GetRwObject(), frameName, info);
     std::unordered_map<std::string, std::variant<std::vector<CVectorAsTable>, std::vector<int>>> frameGeometry;
     frameGeometry["vertices"] = *reinterpret_cast<std::vector<CVectorAsTable>*>(&info.vertices);
     frameGeometry["triangles"] = info.triangles;
@@ -123,6 +123,12 @@ bool EngineModelFrameSetVertexPosition(uint16_t usModel, std::string frameName, 
     return g_pGame->GetRenderWare()->QueueSetVertexPositionUpdate(usModel, frameName, vertexIndex,
                                                                   vertexPosition);
 }
+
+bool EngineModelFrameSetVertexColor(uint16_t usModel, std::string frameName, int vertexIndex, SColor color)
+{
+    return g_pGame->GetRenderWare()->QueueSetVertexColorUpdate(usModel, frameName, vertexIndex, color);
+}
+
 
 bool EngineModelFlushChanges(uint16_t usModel, std::string frameName)
 {
@@ -199,6 +205,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineModelGetFrameGeometryInfo", ArgumentParser<EngineModelGetFrameGeometryInfo>},
         {"engineModelGetFrameGeometry", ArgumentParser<EngineModelGetFrameGeometry>},
         {"engineModelFrameSetVertexPosition", ArgumentParser<EngineModelFrameSetVertexPosition>},
+        {"engineModelFrameSetVertexColor", ArgumentParser<EngineModelFrameSetVertexColor>},
         {"engineModelFlushChanges", ArgumentParser<EngineModelFlushChanges>},
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
