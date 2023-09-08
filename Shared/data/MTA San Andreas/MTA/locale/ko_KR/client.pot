@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-23 08:26+0000\n"
-"PO-Revision-Date: 2023-08-23 09:25\n"
+"POT-Creation-Date: 2023-09-08 13:16+0000\n"
+"PO-Revision-Date: 2023-09-08 13:45\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -908,17 +908,17 @@ msgstr "멀티플레이 컨트롤"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/mods/deathmatch/logic/CClientGame.cpp:591
-#: Client/mods/deathmatch/logic/CClientGame.cpp:665
-#: Client/mods/deathmatch/logic/CClientGame.cpp:689
-#: Client/mods/deathmatch/logic/CClientGame.cpp:711
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1120
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1226
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1275
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+#: Client/mods/deathmatch/logic/CClientGame.cpp:594
+#: Client/mods/deathmatch/logic/CClientGame.cpp:668
+#: Client/mods/deathmatch/logic/CClientGame.cpp:692
+#: Client/mods/deathmatch/logic/CClientGame.cpp:714
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1033
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1113
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1123
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1192
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1229
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1278
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1290
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
@@ -1666,47 +1666,47 @@ msgstr "%s:%u ... 에 연결 중"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+#: Client/mods/deathmatch/logic/CClientGame.cpp:610
 msgid "CONNECTING"
 msgstr "연결 중"
 
 #: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1189
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1192
 msgid "Connection timed out"
 msgstr "연결 시간이 초과되었습니다."
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
 msgid "Disconnected: unknown protocol error"
 msgstr "연결 끊김: 알 수 없는 프로토콜 오류"
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1241
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1244
 msgid "Disconnected: disconnected remotely"
 msgstr "연결 끊김: 원격으로 연결이 끊어짐"
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1245
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
 msgid "Disconnected: connection lost remotely"
 msgstr "연결 끊김: 원격으로 연결이 끊어짐"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1249
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
 msgid "Disconnected: you are banned from this server"
 msgstr "연결 끊김: 이 서버에서 밴되었습니다"
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1257
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
 msgid "Disconnected: disconnected from the server"
 msgstr "연결 끊김: 서버와의 연결이 끊어졌습니다"
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
 msgid "Disconnected: connection to the server was lost"
 msgstr "연결 끊김: 서버에 대한 연결이 끊어졌습니다"
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1269
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
 msgid "Disconnected: connection was refused"
 msgstr "연결 끊김: 연결이 거부되었습니다"
 
@@ -1944,8 +1944,8 @@ msgstr "Mtasa:// 프로토콜을 사용하십시오!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:591
-#: Client/mods/deathmatch/logic/CClientGame.cpp:689
+#: Client/mods/deathmatch/logic/CClientGame.cpp:594
+#: Client/mods/deathmatch/logic/CClientGame.cpp:692
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "잘못된 닉네임입니다! 설정으로 이동하여 새 닉네임을 설정하십시오!"
 
@@ -2376,57 +2376,57 @@ msgstr[0] "%d 초"
 msgid "Disconnected"
 msgstr "연결 끊김"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:607
+#: Client/mods/deathmatch/logic/CClientGame.cpp:610
 msgid "Entering the game ..."
 msgstr "게임에 접속하는 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:665
+#: Client/mods/deathmatch/logic/CClientGame.cpp:668
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "연결되지 않았습니다. 빠른 연결 또는 '연결' 명령을 사용하여 서버에 연결하십시오."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:711
+#: Client/mods/deathmatch/logic/CClientGame.cpp:714
 msgid "The server is not installed"
 msgstr "서버가 설치되지 않았습니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:721
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
+#: Client/mods/deathmatch/logic/CClientGame.cpp:724
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1102
 msgid "Local Server"
 msgstr "로컬 서버"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:721
+#: Client/mods/deathmatch/logic/CClientGame.cpp:724
 msgid "Starting local server ..."
 msgstr "로컬 서버 시작 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1030
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1033
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "당신은 게임에서 추방되었습니다. (%s)"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1099
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1102
 msgid "Connecting to local server..."
 msgstr "로컬 서버에 연결 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1113
 msgid "Error connecting to server."
 msgstr "서버에 접속 중 오류 발생."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1120
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1123
 msgid "Connecting to local server timed out. See console for details."
 msgstr "로컬 서버에 접속 중 타임아웃 되었습니다. 자세한 사항은 콘솔을 확인하십시오."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1226
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1229
 msgid "Connection with the server was lost"
 msgstr "서버와의 연결이 끊어졌습니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
 msgid "Disconnected: the server is currently full"
 msgstr "연결 끊김: 서버 인원이 꽉 찼습니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1265
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Disconnected: invalid password specified"
 msgstr "연결 끊김: 잘못된 암호입니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1287
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1290
 msgid "MTA Client verification failed!"
 msgstr "MTA 클라이언트 인증 실패!"
 
