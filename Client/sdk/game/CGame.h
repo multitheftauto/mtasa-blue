@@ -213,6 +213,9 @@ public:
     virtual bool IsBurnFlippedCarsEnabled() const = 0;
     virtual void SetBurnFlippedCarsEnabled(bool isEnabled) = 0;
 
+    virtual bool IsFireballDestructEnabled() const = 0;
+    virtual void SetFireballDestructEnabled(bool isEnabled) = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 

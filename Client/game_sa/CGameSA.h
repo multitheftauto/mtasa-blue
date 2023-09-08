@@ -215,6 +215,9 @@ public:
     bool IsBurnFlippedCarsEnabled() const noexcept { return m_isBurnFlippedCarsEnabled; }
     void SetBurnFlippedCarsEnabled(bool isEnabled);
 
+    bool IsFireballDestructEnabled() const noexcept { return m_isFireballDestructEnabled; }
+    void SetFireballDestructEnabled(bool isEnabled);
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -327,6 +330,7 @@ private:
     bool         m_isCoronaZTestEnabled{true};
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
+    bool         m_isFireballDestructEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
