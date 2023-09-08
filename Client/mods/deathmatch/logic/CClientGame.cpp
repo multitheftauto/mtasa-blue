@@ -370,10 +370,16 @@ CClientGame::~CClientGame()
     // if a vehicle is destroyed while it explodes.
     g_pGame->GetExplosionManager()->RemoveAllExplosions();
 
+    // Reset custom streaming memory size [possibly] set by the server...
+    g_pCore->SetCustomStreamingMemory(0);
+
+    // ...and restore the buffer size too
+    g_pGame->GetStreaming()->SetStreamingBufferSize(g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks());
+
     // Reset camera shaking
     g_pGame->GetCamera()->SetShakeForce(0.0f);
 
-    // Stop playing the continious sounds
+    // Stop playing the continuous sounds
     // if the game was loaded. This is done by
     // playing these special IDS.
     if (m_bGameLoaded)
@@ -529,9 +535,6 @@ CClientGame::~CClientGame()
     m_bBeingDeleted = false;
 
     CStaticFunctionDefinitions::ResetAllSurfaceInfo();
-
-    // Reset custom streaming memory size [possibly] set by the server
-    g_pCore->SetCustomStreamingMemory(0);
 }
 
 /*
