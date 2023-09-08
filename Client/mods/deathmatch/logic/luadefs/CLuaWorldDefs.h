@@ -15,9 +15,11 @@ class CLuaWorldDefs : public CLuaDefs
 public:
     static void LoadFunctions();
 
+
     LUA_DECLARE(GetTime);
     LUA_DECLARE(GetGroundPosition);
     LUA_DECLARE(GetRoofPosition);
+    static std::variant<bool, CLuaMultiReturn<float, float, const char*, const char*, float, float, float>> ProcessLineAgainstMesh(CClientEntity* e, CVector start, CVector end);
     LUA_DECLARE(ProcessLineOfSight);
     LUA_DECLARE(IsLineOfSightClear);
     LUA_DECLARE(GetWorldFromScreenPosition);
