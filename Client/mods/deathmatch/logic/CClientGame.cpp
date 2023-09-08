@@ -5898,6 +5898,72 @@ bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
 
+bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled)
+{
+    switch (property)
+    {
+        case WorldSpecialProperty::HOVERCARS:
+        case WorldSpecialProperty::AIRCARS:
+        case WorldSpecialProperty::EXTRABUNNY:
+        case WorldSpecialProperty::EXTRAJUMP:
+            return g_pGame->SetCheatEnabled(EnumToString(property), isEnabled);
+        case WorldSpecialProperty::RANDOMFOLIAGE:
+            g_pGame->SetRandomFoliageEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::SNIPERMOON:
+            g_pGame->SetMoonEasterEggEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::EXTRAAIRRESISTANCE:
+            g_pGame->SetExtraAirResistanceEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::UNDERWORLDWARP:
+            g_pGame->SetUnderWorldWarpEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::VEHICLESUNGLARE:
+            g_pGame->SetVehicleSunGlareEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::CORONAZTEST:
+            g_pGame->SetCoronaZTestEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::WATERCREATURES:
+            g_pGame->SetWaterCreaturesEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::BURNFLIPPEDCARS:
+            g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
+            return true;
+    }
+    return false;
+}
+
+bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
+{
+    switch (property)
+    {
+        case WorldSpecialProperty::HOVERCARS:
+        case WorldSpecialProperty::AIRCARS:
+        case WorldSpecialProperty::EXTRABUNNY:
+        case WorldSpecialProperty::EXTRAJUMP:
+            return g_pGame->IsCheatEnabled(EnumToString(property));
+        case WorldSpecialProperty::RANDOMFOLIAGE:
+            return g_pGame->IsRandomFoliageEnabled();
+        case WorldSpecialProperty::SNIPERMOON:
+            return g_pGame->IsMoonEasterEggEnabled();
+        case WorldSpecialProperty::EXTRAAIRRESISTANCE:
+            return g_pGame->IsExtraAirResistanceEnabled();
+        case WorldSpecialProperty::UNDERWORLDWARP:
+            return g_pGame->IsUnderWorldWarpEnabled();
+        case WorldSpecialProperty::VEHICLESUNGLARE:
+            return g_pGame->IsVehicleSunGlareEnabled();
+        case WorldSpecialProperty::CORONAZTEST:
+            return g_pGame->IsCoronaZTestEnabled();
+        case WorldSpecialProperty::WATERCREATURES:
+            return g_pGame->IsWaterCreaturesEnabled();
+        case WorldSpecialProperty::BURNFLIPPEDCARS:
+            return g_pGame->IsBurnFlippedCarsEnabled();
+    }
+    return false;
+}
+
 bool CClientGame::SetCloudsEnabled(bool bEnabled)
 {
     m_bCloudsEnabled = bEnabled;
