@@ -11025,6 +11025,25 @@ bool CStaticFunctionDefinitions::IsGlitchEnabled(const std::string& strGlitchNam
     return false;
 }
 
+bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
+{
+    return g_pGame->IsWorldSpecialPropertyEnabled(property);
+}
+
+bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
+{
+    if (g_pGame->IsWorldSpecialPropertyEnabled(property) == isEnabled)
+        return false;
+
+    g_pGame->SetWorldSpecialPropertyEnabled(property, isEnabled);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write((uchar)property);
+    BitStream.pBitStream->WriteBit(isEnabled);
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_WORLD_SPECIAL_PROPERTY, *BitStream.pBitStream));
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
 {
     if (g_pGame->GetJetpackWeaponEnabled(weaponType) != bEnabled)
