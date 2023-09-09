@@ -42,6 +42,7 @@ namespace
         {"engineSetModelFlag", "1.6.0-9.21695"},
         {"fileGetContents", "1.6.0-9.21938"},
         {"engineStreamingSetModelCacheLimits", "1.6.0-9.21946"},
+        {"engineStreamingRestoreBufferSize", "1.6.0-9.22195"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -49,6 +50,8 @@ namespace
         {"isObjectBreakable", "1.6.0-9.21765"},
         {"setObjectBreakable", "1.6.0-9.21765"},
         {"fileGetContents", "1.6.0-9.21938"},
+        {"isWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
+        {"setWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
     };
 
     //
