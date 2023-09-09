@@ -57,7 +57,7 @@ void CLuaACLDefs::LoadFunctions()
 
         {"isObjectInACLGroup", isObjectInACLGroup},
         {"hasObjectPermissionTo", hasObjectPermissionTo},
-        {"aclObjectGetGroups", aclObjectGetGroups},
+        {"aclObjectGetGroups", ArgumentParser<aclObjectGetGroups>},
     };
 
     // Add functions
@@ -1052,54 +1052,35 @@ int CLuaACLDefs::OOP_isObjectInACLGroup(lua_State* luaVM)
     return 1;
 }
 
-int CLuaACLDefs::aclObjectGetGroups(lua_State* luaVM)
+std::variant<std::vector<CAccessControlListGroup*>, bool> CLuaACLDefs::aclObjectGetGroups(SString strObject)
 {
-    // table aclObjectGetGroups ( string theObject )
-    SString                                    strObject;
     CAccessControlListGroupObject::EObjectType objectType;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strObject);
-
-    if (!argStream.HasErrors())
+    const char* szObjectAfterDot = strObject;
+    if (StringBeginsWith(strObject, "resource."))
     {
-        // Figure out what type of object this is
-        const char* szObjectAfterDot = strObject;
-        if (StringBeginsWith(strObject, "resource."))
-        {
-            szObjectAfterDot += 9;
-            objectType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
-        }
-        else if (StringBeginsWith(strObject, "user."))
-        {
-            szObjectAfterDot += 5;
-            objectType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
-        }
-        else
-        {
-            // Invalid group type
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        lua_newtable(luaVM);
-
-        uint32_t uiIndex = 0;
-        list<CAccessControlListGroup*>::const_iterator iter = m_pACLManager->Groups_Begin();
-        for (; iter != m_pACLManager->Groups_End(); ++iter)
-        {
-            if (!(*iter)->FindObjectMatch(szObjectAfterDot, objectType))
-                continue;
-
-            lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushaclgroup(luaVM, *iter);
-            lua_settable(luaVM, -3);
-        }
-        return 1;
+        szObjectAfterDot += 9;
+        objectType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
+    }
+    else if (StringBeginsWith(strObject, "user."))
+    {
+        szObjectAfterDot += 5;
+        objectType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
     }
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        return false;
+    }
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    std::vector<CAccessControlListGroup*> groups;
+
+    uint32_t                                       uiIndex = 0;
+    list<CAccessControlListGroup*>::const_iterator iter = m_pACLManager->Groups_Begin();
+    for (; iter != m_pACLManager->Groups_End(); ++iter)
+    {
+        if (!(*iter)->FindObjectMatch(szObjectAfterDot, objectType))
+            continue;
+
+        groups.push_back(*iter);
+    }
+    return groups;
 }
