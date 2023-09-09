@@ -2070,10 +2070,16 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 
     SWorldSpecialPropertiesStateSync()
     {
-        // Override default values (default = false)
+        // Set default states
+        data.hovercars = false;
+        data.aircars = false;
+        data.extrabunny = false;
+        data.extrajump = false;
         data.randomfoliage = true;
+        data.snipermoon = false;
         data.extraairresistance = true;
         data.underworldwarp = true;
+        data.vehiclesunglare = false;
         data.coronaztest = true;
         data.watercreatures = true;
         data.burnflippedcars = true;
