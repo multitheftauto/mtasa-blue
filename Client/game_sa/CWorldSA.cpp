@@ -255,7 +255,7 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
 }
 
 
-auto CWorldSA::ProcessLineAgainstMesh(CEntity* targetEntity, CVector start, CVector end) -> SProcessLineOfSightMaterialInfoResult
+auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector start, CVector end) -> SProcessLineOfSightMaterialInfoResult
 {
     assert(targetEntity);
 
@@ -274,7 +274,7 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntity* targetEntity, CVector start, CVec
         CEntitySAInterface* entity{};                          //< The hit entity
     } c = {};
 
-    c.entity = targetEntity->GetInterface();
+    c.entity = targetEntity;
 
     if (!c.entity->m_pRwObject) {
         return ret; // isValid will be false in this case
@@ -515,9 +515,13 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         }
     }
 
-    if (outMatInfo && *CollisionEntity)
+    if (outMatInfo)
     {
-        *outMatInfo = ProcessLineAgainstMesh(*CollisionEntity, *vecStart, *vecEnd);
+        outMatInfo->valid = false;
+        if (targetEntity)
+        {
+            *outMatInfo = ProcessLineAgainstMesh(targetEntity, *vecStart, *vecEnd);
+        }
     }
 
     if (colCollision)

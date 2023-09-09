@@ -239,7 +239,7 @@ std::variant<bool, CLuaMultiReturn<float, float, const char*, const char*, float
         return { false };
     }
     SProcessLineOfSightMaterialInfoResult matInfo{};
-    g_pGame->GetWorld()->ProcessLineAgainstMesh(ge, start, end);
+    g_pGame->GetWorld()->ProcessLineAgainstMesh(ge->GetInterface(), start, end);
     if (!matInfo.valid) {
         return { false }; // No hit
     }
