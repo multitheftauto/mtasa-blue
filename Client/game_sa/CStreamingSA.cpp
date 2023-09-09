@@ -21,7 +21,7 @@ extern CCoreInterface* g_pCore;
 // count: 26316 in unmodified game
 CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
 HANDLE* phStreamingThread = (HANDLE*)0x8E4008;
-uint32(&CStreamingSA::ms_streamingHalfOfBufferSize) = *(uint32*)0x8E4CA8;
+uint32(&CStreamingSA::ms_streamingHalfOfBufferSizeBlocks) = *(uint32*)0x8E4CA8;
 void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void* (*)[2])0x8E4CAC;
 
 namespace
@@ -429,45 +429,56 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
     m_StreamHandles[uiStreamHandlerID] = NULL;
 }
 
-void CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
+bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
-    if (numBlocks == ms_streamingHalfOfBufferSize * 2)
-        return;
+    // Check if the size is the same already
+    if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
+        return true;
+
+    // First of all, allocate the new buffer
+    // NOTE: Due to a bug in the `MallocAlign` code the function will just *crash* instead of returning nullptr on alloc. failure :D
+    typedef void*(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
+    void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(numBlocks * 2048, 2048);
+    if (!pNewBuffer) // ...so this code is useless for now
+        return false;
 
     int pointer = *(int*)0x8E3FFC;
     SGtaStream(&streaming)[5] = *(SGtaStream(*)[5])(pointer);
 
-    // Wait while streaming threads ends tasks
-    while (streaming[0].bInUse && streaming[1].bInUse);
+    // Wait while streaming thread ends tasks
+    while (streaming[0].bInUse || streaming[1].bInUse);
 
-    // Suspend streaming handle
+    // Suspend streaming thread [otherwise data might become corrupted]
     SuspendThread(*phStreamingThread);
     
     // Create new buffer
-    if (numBlocks & 1) // Make it be even
+    if (numBlocks & 1) // Make it be even [Otherwise it can't be split in half properly]
         numBlocks++;
 
-    typedef void*(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
-    void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(numBlocks * 2048, 2048);
+    // Calculate new buffer pointers
+    void* const pNewBuff0 = pNewBuffer;
+    void* const pNewBuff1 = (void*)(reinterpret_cast<uintptr_t>(pNewBuffer) + 2048u * (numBlocks / 2));
 
     // Copy data from old buffer to new buffer
-    uint uiCopySize = std::min(ms_streamingHalfOfBufferSize, numBlocks / 2); // TODO: This probably won't work as expected 
-    MemCpyFast(pNewBuffer, (void*)ms_pStreamingBuffer[0], uiCopySize);
-    MemCpyFast((void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * numBlocks), (void*)ms_pStreamingBuffer[1], uiCopySize);
+    const auto copySizeBytes = std::min(ms_streamingHalfOfBufferSizeBlocks, numBlocks / 2) * 2048;
+    MemCpyFast(pNewBuff0, ms_pStreamingBuffer[0], copySizeBytes);
+    MemCpyFast(pNewBuff1, ms_pStreamingBuffer[1], copySizeBytes);
 
+    // Now, we can deallocate the old buffer safely
     typedef void(__cdecl * Function_CMemoryMgr_FreeAlign)(void* pos);
     ((Function_CMemoryMgr_FreeAlign)(0x72F4F0))(ms_pStreamingBuffer[0]);
 
-    ms_streamingHalfOfBufferSize = numBlocks / 2;
+    // Update the buffer size now
+    ms_streamingHalfOfBufferSizeBlocks = numBlocks / 2;
 
-    ms_pStreamingBuffer[0] = pNewBuffer;
-    ms_pStreamingBuffer[1] = (void*)(reinterpret_cast<int>(pNewBuffer) + 1024 * numBlocks);
+    // Update internal pointers too
+    streaming[0].pBuffer = ms_pStreamingBuffer[0] = pNewBuff0;
+    streaming[1].pBuffer = ms_pStreamingBuffer[1] = pNewBuff1;
 
-    streaming[0].pBuffer = ms_pStreamingBuffer[0];
-    streaming[1].pBuffer = ms_pStreamingBuffer[1];
-
-    // Well done
+    // Now we can resume streaming
     ResumeThread(*phStreamingThread);
+
+    return true;
 }
 
 void CStreamingSA::MakeSpaceFor(std::uint32_t memoryToCleanInBytes)
