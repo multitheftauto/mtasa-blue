@@ -15,6 +15,8 @@
 
 #include "CVector4D.h"
 
+class CVector2D;
+
 /**
  * CVector Structure used to store a 3D vertex.
  */
@@ -137,15 +139,15 @@ public:
     }
 
     // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-    bool IntersectsSegmentTriangle(const CVector& vecSegment, const CVector& vecVert1, const CVector& vecVert2, const CVector& vecVert3,
-                                   CVector* outVec) const noexcept
+    bool IntersectsSegmentTriangle(const CVector& dir, const CVector& vecVert1, const CVector& vecVert2, const CVector& vecVert3,
+                                   CVector* outVec, CVector* outHitBary = nullptr) const noexcept
     {
         constexpr float fEpsilon = 1e-6f;
 
         CVector vecEdge1, vecEdge2, h, s;
         float   a, f, u, v;
 
-        CVector vecRay = vecSegment;
+        CVector vecRay = dir;
         vecRay.Normalize();
         h = vecRay;
 
@@ -177,11 +179,15 @@ public:
         }
 
         float t = f * vecEdge2.DotProduct(&sCrossE1);
-        if (t > fEpsilon && t <= vecSegment.Length())
+        if (t > fEpsilon && t <= dir.Length())
         {
             *outVec = *this + vecRay * t;
+            if (outHitBary) { // Calculate all barycentric coords if necessary
+                *outHitBary = { 1.f - u - v, u, v }; // For vertices A, B, C [I assume?]
+            }
             return true;
         }
+
         return false;
     }
 
@@ -261,4 +267,6 @@ public:
     }
 
     bool operator!=(const CVector& param) const noexcept { return !(*this == param); }
+
+    float operator[](size_t i) const noexcept { return ((float*)this)[i]; }
 };

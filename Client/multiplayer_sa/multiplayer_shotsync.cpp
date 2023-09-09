@@ -15,17 +15,12 @@
 #include <game/CProjectile.h>
 #include <game/CProjectileInfo.h>
 #include <game/CEventList.h>
-// These includes have to be fixed!
-#include "../game_sa/CPedSA.h"
 #include "../game_sa/CEventDamageSA.h"
-#include "../game_sa/CColPointSA.h"
 #include <net/SyncStructures.h>
 
 extern CMultiplayerSA* pMultiplayer;
 
-using std::list;
-
-list<CShotSyncData*> ShotSyncData;
+std::list<CShotSyncData*> ShotSyncData;
 CShotSyncData        LocalShotSyncData;
 
 float*                        fDirectionX;

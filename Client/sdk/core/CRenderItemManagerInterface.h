@@ -47,6 +47,8 @@ enum ERenderFormat
 {
     RFORMAT_UNKNOWN,
     RFORMAT_ARGB = 21,            // D3DFMT_A8R8G8B8
+    RFORMAT_XRGB = 22,            // D3DFMT_X8R8G8B8
+    RFORMAT_RGB  = 23,            // D3DFMT_R5G6B5
     RFORMAT_DXT1 = '1TXD',
     RFORMAT_DXT2 = '2TXD',
     RFORMAT_DXT3 = '3TXD',
@@ -157,7 +159,8 @@ public:
                                               ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1) = 0;
     virtual CShaderItem*        CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros) = 0;
-    virtual CRenderTargetItem*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false) = 0;
+    virtual CRenderTargetItem*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel,
+                                                   int surfaceFormat, bool bForce = false) = 0;
     virtual CScreenSourceItem*  CreateScreenSource(uint uiSizeX, uint uiSizeY) = 0;
     virtual CWebBrowserItem*    CreateWebBrowser(uint uiSizeX, uint uiSizeY) = 0;
     virtual CVectorGraphicItem* CreateVectorGraphic(uint uiSizeX, uint uiSizeY) = 0;
@@ -500,7 +503,8 @@ class CRenderTargetItem : public CTextureItem
 {
     DECLARE_CLASS(CRenderTargetItem, CTextureItem)
     CRenderTargetItem() : ClassInit(this) {}
-    virtual void PostConstruct(CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bIncludeInMemoryStats);
+    virtual void PostConstruct(CRenderItemManager* pManager, uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel,
+                               int surfaceFormat, bool bIncludeInMemoryStats);
     virtual void PreDestruct();
     virtual bool IsValid();
     virtual void OnLostDevice();
@@ -510,6 +514,8 @@ class CRenderTargetItem : public CTextureItem
     bool         ReadPixels(CBuffer& outBuffer, SString& strOutError);
 
     bool               m_bWithAlphaChannel;
+    bool               m_bHasSurfaceFormat;
+    int                m_eSurfaceFormat;
     IDirect3DSurface9* m_pD3DRenderTargetSurface;
     IDirect3DSurface9* m_pD3DZStencilSurface;
     IDirect3DSurface9* m_pD3DReadSurface;

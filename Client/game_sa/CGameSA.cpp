@@ -443,6 +443,9 @@ void CGameSA::Reset()
 
         // Restore vehicle model wheel sizes
         CModelInfoSA::ResetAllVehiclesWheelSizes();
+
+        // Restore changed TXD IDs
+        CModelInfoSA::StaticResetTextureDictionaries();
     }
 }
 
@@ -545,24 +548,6 @@ void CGameSA::SetMinuteDuration(unsigned long ulTime)
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
 {
-    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))
-        return IsRandomFoliageEnabled();
-
-    if (!strcmp(szCheatName, PROP_SNIPER_MOON))
-        return IsMoonEasterEggEnabled();
-
-    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
-        return IsExtraAirResistanceEnabled();
-
-    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
-        return IsUnderWorldWarpEnabled();
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-        return IsVehicleSunGlareEnabled();
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-        return IsCoronaZTestEnabled();
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -571,42 +556,6 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
 
 bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 {
-    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))
-    {
-        SetRandomFoliageEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_SNIPER_MOON))
-    {
-        SetMoonEasterEggEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
-    {
-        SetExtraAirResistanceEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
-    {
-        SetUnderWorldWarpEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-    {
-        SetVehicleSunGlareEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-    {
-        SetCoronaZTestEnabled(bEnable);
-        return true;
-    }
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -619,16 +568,12 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 
 void CGameSA::ResetCheats()
 {
-    SetRandomFoliageEnabled(true);
-    SetMoonEasterEggEnabled(false);
-    SetExtraAirResistanceEnabled(true);
-    SetUnderWorldWarpEnabled(true);
-    SetCoronaZTestEnabled(true);
-    CVehicleSA::SetVehiclesSunGlareEnabled(false);
-
+    // Reset cheats that can't be set by setWorldSpecialPropertyEnabled
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
     {
+        if (it->second->m_bCanBeSet)
+            continue;
         if (it->second->m_byAddress > (BYTE*)0x8A4000)
             MemPutFast<BYTE>(it->second->m_byAddress, 0);
         else
@@ -728,6 +673,58 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
     }
 
     m_isCoronaZTestEnabled = isEnabled;
+}
+
+void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
+{
+    if (isEnabled == m_areWaterCreaturesEnabled)
+        return;
+
+    const auto manager = reinterpret_cast<class WaterCreatureManager_c*>(0xC1DF30);
+    if (isEnabled)
+    {
+        unsigned char(__thiscall * Init)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Init)>(0x6E3F90);
+        Init(manager);
+    }
+    else
+    {
+        void(__thiscall * Exit)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Exit)>(0x6E3FD0);
+        Exit(manager);
+    }
+
+    m_areWaterCreaturesEnabled = isEnabled;
+}
+
+void CGameSA::SetBurnFlippedCarsEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isBurnFlippedCarsEnabled)
+        return;
+
+    // CAutomobile::VehicleDamage
+    if (isEnabled)
+    {
+        BYTE originalCodes[6] = {0xD9, 0x9E, 0xC0, 0x04, 0x00, 0x00};
+        MemCpy((void*)0x6A776B, &originalCodes, 6);
+    }
+    else
+    {
+        BYTE newCodes[6] = {0xD8, 0xDD, 0x90, 0x90, 0x90, 0x90};
+        MemCpy((void*)0x6A776B, &newCodes, 6);
+    }
+
+    // CPlayerInfo::Process
+    if (isEnabled)
+    {
+        BYTE originalCodes[6] = {0xD9, 0x99, 0xC0, 0x04, 0x00, 0x00};
+        MemCpy((void*)0x570E7F, &originalCodes, 6);
+    }
+    else
+    {
+        BYTE newCodes[6] = {0xD8, 0xDD, 0x90, 0x90, 0x90, 0x90};
+        MemCpy((void*)0x570E7F, &newCodes, 6);
+    }
+
+    m_isBurnFlippedCarsEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()
