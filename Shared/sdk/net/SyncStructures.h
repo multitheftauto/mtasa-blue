@@ -2026,12 +2026,20 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 13
+        BITCOUNT = 12
+    };
+    enum
+    {
+        BITCOUNT2 = 1
     };
 
     bool Read(NetBitStreamInterface& bitStream)
     {
         bool isOK = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
+         else
+             data2.fireballdestruct = true;
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2044,6 +2052,8 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     void Write(NetBitStreamInterface& bitStream) const
     {
         bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2064,10 +2074,13 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool coronaztest : 1;
         bool watercreatures : 1;
         bool burnflippedcars : 1;
-        bool fireballdestruct : 1;
     } data;
 
     // Add new ones in separate structs
+    struct
+    {
+        bool fireballdestruct : 1;
+    } data2;
 
     SWorldSpecialPropertiesStateSync()
     {
@@ -2078,7 +2091,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.coronaztest = true;
         data.watercreatures = true;
         data.burnflippedcars = true;
-        data.fireballdestruct = true;
+        data2.fireballdestruct = true;
     }
 };
 
