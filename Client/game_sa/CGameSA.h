@@ -80,14 +80,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
-#define PROP_RANDOM_FOLIAGE         "randomfoliage"
-#define PROP_SNIPER_MOON            "snipermoon"
-#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
-#define PROP_UNDERWORLD_WARP        "underworldwarp"
-#define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
-#define PROP_CORONA_ZTEST           "coronaztest"
-#define PROP_WATER_CREATURES        "watercreatures"
-
 struct SCheatSA
 {
     BYTE* m_byAddress;            // Cheat Address
@@ -220,6 +212,9 @@ public:
     bool IsWaterCreaturesEnabled() const noexcept { return m_areWaterCreaturesEnabled; }
     void SetWaterCreaturesEnabled(bool isEnabled);
 
+    bool IsBurnFlippedCarsEnabled() const noexcept { return m_isBurnFlippedCarsEnabled; }
+    void SetBurnFlippedCarsEnabled(bool isEnabled);
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -331,6 +326,7 @@ private:
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
     bool         m_areWaterCreaturesEnabled{true};
+    bool         m_isBurnFlippedCarsEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
