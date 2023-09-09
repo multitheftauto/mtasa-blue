@@ -205,15 +205,15 @@ public:
     virtual bool IsVehicleSunGlareEnabled() = 0;
 
     virtual void SetCoronaZTestEnabled(bool isEnabled) = 0;
-    virtual bool IsCoronaZTestEnabled() const = 0;
+    virtual bool IsCoronaZTestEnabled() const noexcept = 0;
 
-    virtual bool IsWaterCreaturesEnabled() const = 0;
+    virtual bool IsWaterCreaturesEnabled() const noexcept = 0;
     virtual void SetWaterCreaturesEnabled(bool isEnabled) = 0;
 
-    virtual bool IsBurnFlippedCarsEnabled() const = 0;
+    virtual bool IsBurnFlippedCarsEnabled() const noexcept = 0;
     virtual void SetBurnFlippedCarsEnabled(bool isEnabled) = 0;
 
-    virtual bool IsFireballDestructEnabled() const = 0;
+    virtual bool IsFireballDestructEnabled() const noexcept = 0;
     virtual void SetFireballDestructEnabled(bool isEnabled) = 0;
 
     virtual CWeapon*     CreateWeapon() = 0;
