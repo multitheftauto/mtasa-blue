@@ -48,4 +48,5 @@ public:
     LUA_DECLARE(aclGroupRemoveObject);
     LUA_DECLARE_OOP(isObjectInACLGroup);
     LUA_DECLARE(hasObjectPermissionTo);
+    LUA_DECLARE(aclObjectGetGroups);
 };
