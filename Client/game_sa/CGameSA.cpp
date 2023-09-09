@@ -568,12 +568,9 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 
 void CGameSA::ResetCheats()
 {
-    // Reset cheats that can't be set by setWorldSpecialPropertyEnabled
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
     {
-        if (it->second->m_bCanBeSet)
-            continue;
         if (it->second->m_byAddress > (BYTE*)0x8A4000)
             MemPutFast<BYTE>(it->second->m_byAddress, 0);
         else
