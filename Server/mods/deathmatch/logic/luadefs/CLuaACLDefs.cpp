@@ -1075,7 +1075,7 @@ CLuaACLDefs::aclObjectGetGroups(std::string strObject)
     std::vector<CAccessControlListGroup*> groups;
 
     uint32_t uiIndex = 0;
-    for (auto& iter = m_pACLManager->Groups_Begin();
+    for (auto iter = m_pACLManager->Groups_Begin();
         iter != m_pACLManager->Groups_End(); ++iter)
     {
         if (!(*iter)->FindObjectMatch(szObjectAfterDot, objectType))
