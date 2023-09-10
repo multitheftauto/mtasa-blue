@@ -75,6 +75,7 @@
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
 #define RELEASE_MIN_CLIENT_VERSION              "1.6.0-0.00000"
+#define FIREBALLDESTRUCT_MIN_CLIENT_VERSION     "1.6.0-9.22199"
 
 #ifndef WIN32
     #include <limits.h>
@@ -4563,13 +4564,11 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < strMinClientRequirementFromResources)
         strNewMin = strMinClientRequirementFromResources;
 
-#if 0
-    if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+    if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
     {
-        if (strNewMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
-            strNewMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
+        if (strNewMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
+            strNewMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
     }
-#endif
 
     // Log effective min client version
     if (strNewMin != m_strPrevMinClientConnectRequirement)
@@ -4588,15 +4587,14 @@ CMtaVersion CGame::CalculateMinClientRequirement()
         SendSyncSettings();
     }
 
-#if 0
     // Do version based kick check as well
     {
         CMtaVersion strKickMin;
 
-        if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+        if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
         {
-            if (strKickMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
-                strKickMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
+            if (strKickMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
+                strKickMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
         }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)
@@ -4619,7 +4617,6 @@ CMtaVersion CGame::CalculateMinClientRequirement()
                 CLogger::LogPrintf(SString("Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin));
         }
     }
-#endif
 
     // Also seems a good place to keep this setting synchronized
     g_pBandwidthSettings->NotifyBulletSyncEnabled(g_pGame->IsBulletSyncActive());
