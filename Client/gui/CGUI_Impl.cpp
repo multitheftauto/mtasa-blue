@@ -232,13 +232,7 @@ void CGUI_Impl::Restore()
 
 void CGUI_Impl::DrawMouseCursor()
 {
-    // Disable render queueing in order to render cursor in current frame
-    GetRenderer()->setQueueingEnabled(false);
-
     CEGUI::MouseCursor::getSingleton().draw();
-
-    // Enable render queueing back
-    GetRenderer()->setQueueingEnabled(true);
 }
 
 void CGUI_Impl::ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX, unsigned long ulY, CGUIMouseButton eMouseButton)

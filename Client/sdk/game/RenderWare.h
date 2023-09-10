@@ -321,25 +321,35 @@ struct RwGeometry
     unsigned char  unknown1[14];
     unsigned short refs;
 };
-struct RpInterpolation
+
+/* Interpolator flags */
+enum RpInterpolatorFlag : int32_t
 {
-    unsigned int unknown1;
-    unsigned int unknown2;
-    float        unknown3;
-    float        unknown4;
-    float        unknown5;
+    rpINTERPOLATORDIRTYINSTANCE = 0x01,
+    rpINTERPOLATORDIRTYSPHERE = 0x02,
+    rpINTERPOLATORNOFRAMEDIRTY = 0x04,
 };
+struct RpInterpolator
+{
+    int32_t flags;
+    int16_t startMorphTarget;
+    int16_t endMorphTarget;
+    float   time;
+    float   recipTime;
+    float   position;
+};
+
 struct RpAtomic
 {
     RwObjectFrame    object;
     void*            info;
     RpGeometry*      geometry;
-    RwSphere         bsphereLocal;
-    RwSphere         bsphereWorld;
+    RwSphere         boundingSphere;
+    RwSphere         worldBoundingSphere;
     RpClump*         clump;
     RwListEntry      globalClumps;
     RpAtomicCallback renderCallback;
-    RpInterpolation  interpolation;
+    RpInterpolator   interpolator;
     unsigned short   frame;
     unsigned short   unknown7;
     RwList           sectors;
@@ -391,8 +401,15 @@ struct RpMaterials
 };
 struct RpTriangle
 {
-    unsigned short v1, v2, v3;
+    unsigned short verts[3];
     unsigned short materialId;
+};
+struct RpMorphTarget
+{
+    RpGeometry* parentGeom;
+    RwSphere   boundingSphere;
+    RwV3d* verts;
+    RwV3d* normals;
 };
 struct RpGeometry
 {
@@ -412,8 +429,34 @@ struct RpGeometry
     RwTextureCoordinates* texcoords[RW_MAX_TEXTURE_COORDS];
     void*                 unknown2;
     void*                 info;
-    void*                 unknown3;
+    RpMorphTarget*        morph_target;
 };
+
+inline auto rwObjectGetParent(RwObject* o) {
+    return (RwObject*)o->parent;
+}
+
+inline auto RpAtomicGetFrame(RpAtomic* atomic) {
+    return (RwFrame*)atomic->object.object.parent;
+}
+
+inline auto RwFrameGetParent(RwFrame* f) {
+    return (RwFrame*)rwObjectGetParent((RwObject*)f);
+}
+
+inline RwMatrix* RwFrameGetMatrix(RwFrame* f) {
+    return &f->modelling;
+}
+
+inline void _rpAtomicResyncInterpolatedSphere(RpAtomic* atomic) {
+    reinterpret_cast<void(__cdecl*)(RpAtomic*)>(0x7491F0)(atomic);
+}
+
+/* NB "RpAtomicGetBoundingSphere(atomic++)" will break it */
+#define RpAtomicGetBoundingSphere(_atomic)                              \
+    ((((_atomic)->interpolator.flags & rpINTERPOLATORDIRTYSPHERE)?      \
+      _rpAtomicResyncInterpolatedSphere(_atomic), 0: 0),                \
+      &((_atomic)->boundingSphere))
 
 /*****************************************************************************/
 /** RenderWare I/O                                                          **/

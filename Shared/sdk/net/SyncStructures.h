@@ -2019,6 +2019,75 @@ struct SFunBugsStateSync : public ISyncStructure
 
 //////////////////////////////////////////
 //                                      //
+//    World special properties state    //
+//                                      //
+//////////////////////////////////////////
+struct SWorldSpecialPropertiesStateSync : public ISyncStructure
+{
+    enum
+    {
+        BITCOUNT = 12
+    };
+
+    bool Read(NetBitStreamInterface& bitStream)
+    {
+        bool isOK = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
+
+        //// Example for adding item:
+        // if (bitStream.Can(eBitStreamVersion::YourProperty))
+        //     isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
+        // else
+        //     data9.YourPropertyVariable = DefaultState (true / false);
+
+        return isOK;
+    }
+    void Write(NetBitStreamInterface& bitStream) const
+    {
+        bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
+
+        //// Example for adding item:
+        // if (bitStream.Can(eBitStreamVersion::YourProperty))
+        //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
+    }
+
+    struct
+    {
+        bool hovercars : 1;
+        bool aircars : 1;
+        bool extrabunny : 1;
+        bool extrajump : 1;
+        bool randomfoliage : 1;
+        bool snipermoon : 1;
+        bool extraairresistance : 1;
+        bool underworldwarp : 1;
+        bool vehiclesunglare : 1;
+        bool coronaztest : 1;
+        bool watercreatures : 1;
+        bool burnflippedcars : 1;
+    } data;
+
+    // Add new ones in separate structs
+
+    SWorldSpecialPropertiesStateSync()
+    {
+        // Set default states
+        data.hovercars = false;
+        data.aircars = false;
+        data.extrabunny = false;
+        data.extrajump = false;
+        data.randomfoliage = true;
+        data.snipermoon = false;
+        data.extraairresistance = true;
+        data.underworldwarp = true;
+        data.vehiclesunglare = false;
+        data.coronaztest = true;
+        data.watercreatures = true;
+        data.burnflippedcars = true;
+    }
+};
+
+//////////////////////////////////////////
+//                                      //
 //             Quit reasons             //
 //                                      //
 //////////////////////////////////////////

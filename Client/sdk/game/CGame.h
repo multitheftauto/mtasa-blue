@@ -195,6 +195,24 @@ public:
     virtual bool IsMoonEasterEggEnabled() = 0;
     virtual void SetMoonEasterEggEnabled(bool bEnable) = 0;
 
+    virtual bool IsExtraAirResistanceEnabled() = 0;
+    virtual void SetExtraAirResistanceEnabled(bool bEnable) = 0;
+
+    virtual bool IsUnderWorldWarpEnabled() = 0;
+    virtual void SetUnderWorldWarpEnabled(bool bEnable) = 0;
+
+    virtual void SetVehicleSunGlareEnabled(bool bEnabled) = 0;
+    virtual bool IsVehicleSunGlareEnabled() = 0;
+
+    virtual void SetCoronaZTestEnabled(bool isEnabled) = 0;
+    virtual bool IsCoronaZTestEnabled() const = 0;
+
+    virtual bool IsWaterCreaturesEnabled() const = 0;
+    virtual void SetWaterCreaturesEnabled(bool isEnabled) = 0;
+
+    virtual bool IsBurnFlippedCarsEnabled() const = 0;
+    virtual void SetBurnFlippedCarsEnabled(bool isEnabled) = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 

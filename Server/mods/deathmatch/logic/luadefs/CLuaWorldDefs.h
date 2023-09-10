@@ -48,6 +48,7 @@ public:
     LUA_DECLARE(setOcclusionsEnabled);
     LUA_DECLARE(getOcclusionsEnabled);
     LUA_DECLARE(getMoonSize);
+    static bool isWorldSpecialPropertyEnabled(WorldSpecialProperty property);
 
     // Set
     LUA_DECLARE(setTime);
@@ -78,6 +79,7 @@ public:
     LUA_DECLARE(setPedTargetingMarkerEnabled);
     LUA_DECLARE(isPedTargetingMarkerEnabled);
     LUA_DECLARE(setMoonSize);
+    static bool setWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled);
 
     // Reset
     LUA_DECLARE(resetSkyGradient);

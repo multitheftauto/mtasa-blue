@@ -51,6 +51,14 @@ struct SLineOfSightBuildingResult
     CEntitySAInterface* pInterface;
 };
 
+struct SProcessLineOfSightMaterialInfoResult {
+    CVector2D   uv;            //< On-texture UV coordinates of the intersection point
+    const char* textureName;   //< GTA texture name
+    const char* frameName;     //< The name of the frame the hit geometry belongs to
+    CVector     hitPos;        //< Precise hit position on the clump [World space]
+    bool        valid{};       //< Data found in this struct is only valid if this is `true`!
+};
+
 struct SBuildingRemoval
 {
     SBuildingRemoval()
@@ -308,7 +316,7 @@ public:
     virtual void  Remove(CEntity* entity, eDebugCaller CallerId) = 0;
     virtual void  Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
     virtual bool  ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
-                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
+                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL, SProcessLineOfSightMaterialInfoResult* outMatInfo = {}) = 0;
     virtual void  IgnoreEntity(CEntity* entity) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
     virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;

@@ -440,6 +440,19 @@ SString CResource::GetResourceDirectoryPath(eAccessType accessType, const SStrin
     return PathJoin(m_strResourceDirectoryPath, strMetaPath);
 }
 
+CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
+{
+    for (CResourceFile* resourceFile : m_ResourceFiles)
+    {
+        if (!stricmp(relativePath.c_str(), resourceFile->GetShortName()))
+        {
+            return resourceFile;
+        }
+    }
+
+    return nullptr;
+}
+
 void CResource::LoadNoClientCacheScript(const char* chunk, unsigned int len, const SString& strFilename)
 {
     if (m_usRemainingNoClientCacheScripts > 0)

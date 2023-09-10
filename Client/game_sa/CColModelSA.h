@@ -72,13 +72,13 @@ struct CColSphereSA : CSphereSA
 {
     union
     {
-        EColSurface  m_material;
+        EColSurface  m_material{};
         std::uint8_t m_collisionSlot;
     };
 
     union
     {
-        std::uint8_t m_flags;
+        std::uint8_t m_flags{};
 
         struct
         {
@@ -93,15 +93,13 @@ struct CColSphereSA : CSphereSA
         };
     };
 
-    std::uint8_t m_lighting;
-    std::uint8_t m_light;
+    std::uint8_t m_lighting{};
+    std::uint8_t m_light{};
 
-    CColSphereSA()
+    CColSphereSA() = default;
+    CColSphereSA(const CSphereSA& sp) :
+        CSphereSA{ sp }
     {
-        m_collisionSlot = 0;
-        m_flags = 0;
-        m_lighting = 0;
-        m_light = 0;
     }
 };
 static_assert(sizeof(CColSphereSA) == 0x14, "Invalid size for CColSphereSA");

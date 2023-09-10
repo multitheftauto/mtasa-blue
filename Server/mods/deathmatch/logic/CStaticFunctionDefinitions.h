@@ -651,6 +651,8 @@ public:
     static bool SendSyncIntervals(CPlayer* pPlayer = NULL);
     static bool SetMoonSize(int iMoonSize);
     static bool ResetMoonSize();
+    static bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property);
+    static bool SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled);
 
     // Loaded Map Functions
     static CElement* GetRootElement();
