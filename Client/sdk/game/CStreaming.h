@@ -42,7 +42,7 @@ public:
     virtual unsigned char   AddArchive(const char* szFilePath) = 0;
     virtual void            RemoveArchive(unsigned char ucArchiveID) = 0;
     virtual void   SetStreamingInfo(unsigned int id, unsigned char usStreamID, unsigned int uiOffset, unsigned short usSize, unsigned int uiNextInImg = -1) = 0;
-    virtual void   SetStreamingBufferSize(uint32 uiSize) = 0;
+    virtual bool   SetStreamingBufferSize(uint32 uiSize) = 0;
     virtual uint32 GetStreamingBufferSize() = 0;
     virtual void   MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
     virtual std::uint32_t GetMemoryUsed() const = 0;

@@ -341,6 +341,112 @@ bool CPixelsManager::SetVolumePixels(IDirect3DVolume9* pD3DSurface, const CPixel
 
 ////////////////////////////////////////////////////////////////
 //
+// CPixelsManager::D3DXGetVolumePixels
+//
+// Returns D3DXIMAGE_FILEFORMAT pixels
+//
+////////////////////////////////////////////////////////////////
+bool CPixelsManager::D3DXGetVolumePixels(IDirect3DVolumeTexture9* pD3DVolumeTexture, CPixels& outPixels, EPixelsFormatType pixelsFormat,
+                                         ERenderFormat renderFormat, bool bMipMaps, const RECT* pRect, uint uiSlice)
+{
+    if (!pD3DVolumeTexture)
+        return false;
+
+    IDirect3DVolume9*                pVolume = NULL;
+    CAutoReleaseMe<IDirect3DVolume9> Thanks1(pVolume);
+
+    pD3DVolumeTexture->GetVolumeLevel(0, &pVolume);
+    if (!pVolume)
+        return false;
+
+    D3DVOLUME_DESC Desc;
+    pVolume->GetDesc(&Desc);
+
+    D3DBOX box;
+    if (pRect)
+    {
+        assert(pRect->left >= 0 && pRect->top >= 0 && pRect->right <= (int)Desc.Width && pRect->bottom <= (int)Desc.Height);
+        box.Left = pRect->left;
+        box.Top = pRect->top;
+        box.Right = pRect->right;
+        box.Bottom = pRect->bottom;
+        Desc.Width = pRect->right - pRect->left;
+        Desc.Height = pRect->bottom - pRect->top;
+    }
+    else
+    {
+        box.Left = 0;
+        box.Top = 0;
+        box.Right = Desc.Width;
+        box.Bottom = Desc.Height;
+    }
+    box.Front = uiSlice;
+    box.Back = uiSlice + 1;
+
+    D3DXIMAGE_FILEFORMAT dxFileFormat = D3DXIFF_DDS;
+    switch (pixelsFormat)
+    {
+        case EPixelsFormat::PNG:
+            dxFileFormat = D3DXIFF_PNG;
+            break;
+        case EPixelsFormat::JPEG:
+            dxFileFormat = D3DXIFF_JPG;
+            break;
+    }
+
+    D3DFORMAT dxFormat = (D3DFORMAT)renderFormat;
+    if (dxFormat == D3DFMT_UNKNOWN)
+        dxFormat = Desc.Format;
+
+    bool bNeedToConvert = dxFileFormat == D3DXIFF_DDS;
+    if (bNeedToConvert && Desc.Format == dxFormat && !bMipMaps)
+        bNeedToConvert = false; // No need to convert DDS if compression is the same and no mipmaps required
+
+    ID3DXBuffer*                dxBuffer;
+    CAutoReleaseMe<ID3DXBuffer> Thanks2(dxBuffer);
+    if (!FAILED(D3DXSaveVolumeToFileInMemory(&dxBuffer, bNeedToConvert ? D3DXIFF_DDS : dxFileFormat, pVolume, NULL, &box)))
+    {
+        if (bNeedToConvert)
+        {
+            // Convert volume slice to DDS texture of requested format
+            IDirect3DTexture9*                pD3DTempTexture = NULL;
+            IDirect3DSurface9*                pD3DTempSurface = NULL;
+            CAutoReleaseMe<IDirect3DTexture9> Thanks3(pD3DTempTexture);
+            CAutoReleaseMe<IDirect3DSurface9> Thanks4(pD3DTempSurface);
+
+            if (FAILED(m_pDevice->CreateTexture(Desc.Width, Desc.Height, !bMipMaps, NULL, dxFormat, D3DPOOL_SYSTEMMEM, &pD3DTempTexture, NULL)))
+                return false;
+
+            if (FAILED(pD3DTempTexture->GetSurfaceLevel(0, &pD3DTempSurface)))
+                return false;
+
+            if (FAILED(D3DXLoadSurfaceFromFileInMemory(pD3DTempSurface, NULL, NULL, dxBuffer->GetBufferPointer(), dxBuffer->GetBufferSize(), NULL,
+                                                       D3DX_FILTER_NONE, 0, NULL)))
+                return false;
+
+            // Extract pixels from converted texture
+            if (!FAILED(D3DXSaveTextureToFileInMemory(&dxBuffer, dxFileFormat, pD3DTempTexture, NULL)))
+            {
+                outPixels.SetSize(dxBuffer->GetBufferSize());
+                char* pPixelsData = outPixels.GetData();
+                memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
+                return true;
+            }
+        }
+        else
+        {
+            // Use source pixels buffer
+            outPixels.SetSize(dxBuffer->GetBufferSize());
+            char* pPixelsData = outPixels.GetData();
+            memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
+            return true;
+        }
+    }
+    return false;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CPixelsManager::LockVolumeRect
 //
 // Static utility functions

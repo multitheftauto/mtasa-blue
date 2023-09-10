@@ -1773,16 +1773,27 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetTexturePixels(lua_State* luaVM)
 {
-    //  string dxGetTexturePixels( [ int surfaceIndex, ] element texture [, int x, int y, int width, int height ] )
-    CClientTexture* pTexture;
-    CVector2D       vecPosition;
-    CVector2D       vecSize;
-    int             surfaceIndex = 0;
+    //  string dxGetTexturePixels( [ int surfaceIndex, ] element texture [, string pixelsFormat = "plain" [, string textureFormat = "argb"] [, bool mipmaps = true]]
+    //                             [, int x, int y, int width, int height ] )
+    CClientTexture*   pTexture;
+    CVector2D         vecPosition;
+    CVector2D         vecSize;
+    int               surfaceIndex = 0;
+    EPixelsFormatType pixelsFormat = EPixelsFormat::PLAIN;
+    ERenderFormat     textureFormat = RFORMAT_UNKNOWN;
+    bool              bMipMaps = true;
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsNumber())
         argStream.ReadNumber(surfaceIndex);
     argStream.ReadUserData(pTexture);
+
+    if (argStream.NextIsEnumString(pixelsFormat))
+    {
+        argStream.ReadEnumString(pixelsFormat, EPixelsFormat::PLAIN);
+        argStream.ReadIfNextIsEnumString(textureFormat, RFORMAT_UNKNOWN);
+        argStream.ReadIfNextIsBool(bMipMaps, true);
+    }
 
     argStream.ReadVector2D(vecPosition, CVector2D());
     argStream.ReadVector2D(vecSize, CVector2D());
@@ -1794,8 +1805,8 @@ int CLuaDrawingDefs::DxGetTexturePixels(lua_State* luaVM)
         CPixels   pixels;
 
         // TODO: "height ? &rc : NULL" - height will always be set to 0 or another number! Why does this exist?
-        if (g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pTexture->GetTextureItem()->m_pD3DTexture, pixels, vecSize.fY == 0 ? NULL : &rc,
-                                                                         surfaceIndex))
+        if (g_pCore->GetGraphics()->GetPixelsManager()->GetTexturePixels(pTexture->GetTextureItem()->m_pD3DTexture, pixels, pixelsFormat, textureFormat,
+                                                                         bMipMaps, vecSize.fY == 0 ? NULL : &rc, surfaceIndex))
         {
             lua_pushlstring(luaVM, pixels.GetData(), pixels.GetSize());
             return 1;
