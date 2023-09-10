@@ -68,6 +68,8 @@ void CWorldRPCs::LoadFunctions()
 
     AddHandler(SET_MOON_SIZE, SetMoonSize, "SetMoonSize");
     AddHandler(RESET_MOON_SIZE, ResetMoonSize, "ResetMoonSize");
+
+    AddHandler(SET_WORLD_SPECIAL_PROPERTY, SetWorldSpecialPropertyEnabled, "SetWorldSpecialPropertyEnabled");
 }
 
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
@@ -629,4 +631,14 @@ void CWorldRPCs::SetMoonSize(NetBitStreamInterface& bitStream)
 void CWorldRPCs::ResetMoonSize(NetBitStreamInterface& bitStream)
 {
     g_pMultiplayer->ResetMoonSize();
+}
+
+void CWorldRPCs::SetWorldSpecialPropertyEnabled(NetBitStreamInterface& bitStream)
+{
+    uchar property;
+    bool  isEnabled;
+    if (bitStream.Read(property) && bitStream.ReadBit(isEnabled))
+    {
+        g_pClientGame->SetWorldSpecialProperty((WorldSpecialProperty)property, isEnabled);
+    }
 }
