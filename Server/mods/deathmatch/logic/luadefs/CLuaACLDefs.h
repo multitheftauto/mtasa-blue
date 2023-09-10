@@ -49,5 +49,6 @@ public:
     LUA_DECLARE_OOP(isObjectInACLGroup);
     LUA_DECLARE(hasObjectPermissionTo);
 
-    static std::variant<std::vector<CAccessControlListGroup*>, bool> aclObjectGetGroups(SString strObject);
+    static std::variant<std::vector<CAccessControlListGroup*>, bool>
+        aclObjectGetGroups(std::string strObject);
 };

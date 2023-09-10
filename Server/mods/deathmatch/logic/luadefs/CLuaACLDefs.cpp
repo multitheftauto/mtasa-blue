@@ -1052,16 +1052,17 @@ int CLuaACLDefs::OOP_isObjectInACLGroup(lua_State* luaVM)
     return 1;
 }
 
-std::variant<std::vector<CAccessControlListGroup*>, bool> CLuaACLDefs::aclObjectGetGroups(SString strObject)
+std::variant<std::vector<CAccessControlListGroup*>, bool>
+CLuaACLDefs::aclObjectGetGroups(std::string strObject)
 {
     CAccessControlListGroupObject::EObjectType objectType;
-    const char* szObjectAfterDot = strObject;
-    if (StringBeginsWith(strObject, "resource."))
+    const char* szObjectAfterDot = strObject.c_str();
+    if (StringBeginsWith(szObjectAfterDot, "resource."))
     {
         szObjectAfterDot += 9;
         objectType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
     }
-    else if (StringBeginsWith(strObject, "user."))
+    else if (StringBeginsWith(szObjectAfterDot, "user."))
     {
         szObjectAfterDot += 5;
         objectType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
@@ -1073,9 +1074,9 @@ std::variant<std::vector<CAccessControlListGroup*>, bool> CLuaACLDefs::aclObject
 
     std::vector<CAccessControlListGroup*> groups;
 
-    uint32_t                                       uiIndex = 0;
-    list<CAccessControlListGroup*>::const_iterator iter = m_pACLManager->Groups_Begin();
-    for (; iter != m_pACLManager->Groups_End(); ++iter)
+    uint32_t uiIndex = 0;
+    for (auto& iter = m_pACLManager->Groups_Begin();
+        iter != m_pACLManager->Groups_End(); ++iter)
     {
         if (!(*iter)->FindObjectMatch(szObjectAfterDot, objectType))
             continue;
