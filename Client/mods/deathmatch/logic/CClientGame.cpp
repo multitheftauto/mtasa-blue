@@ -5975,6 +5975,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::BURNFLIPPEDCARS:
             g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::FIREBALLDESTRUCT:
+            g_pGame->SetFireballDestructEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -6004,6 +6007,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsWaterCreaturesEnabled();
         case WorldSpecialProperty::BURNFLIPPEDCARS:
             return g_pGame->IsBurnFlippedCarsEnabled();
+        case WorldSpecialProperty::FIREBALLDESTRUCT:
+            return g_pGame->IsFireballDestructEnabled();
     }
     return false;
 }
