@@ -206,14 +206,17 @@ public:
     void SetVehicleSunGlareEnabled(bool bEnabled);
     bool IsVehicleSunGlareEnabled();
 
-    void SetCoronaZTestEnabled(bool isEnabled);
-    bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
+    void SetCoronaZTestEnabled(bool isEnabled) override;
+    bool IsCoronaZTestEnabled() const noexcept override { return m_isCoronaZTestEnabled; }
 
-    bool IsWaterCreaturesEnabled() const noexcept { return m_areWaterCreaturesEnabled; }
-    void SetWaterCreaturesEnabled(bool isEnabled);
+    bool IsWaterCreaturesEnabled() const noexcept override { return m_areWaterCreaturesEnabled; }
+    void SetWaterCreaturesEnabled(bool isEnabled) override;
 
-    bool IsBurnFlippedCarsEnabled() const noexcept { return m_isBurnFlippedCarsEnabled; }
-    void SetBurnFlippedCarsEnabled(bool isEnabled);
+    bool IsBurnFlippedCarsEnabled() const noexcept override { return m_isBurnFlippedCarsEnabled; }
+    void SetBurnFlippedCarsEnabled(bool isEnabled) override;
+
+    bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
+    void SetFireballDestructEnabled(bool isEnabled) override;
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -327,6 +330,7 @@ private:
     bool         m_isCoronaZTestEnabled{true};
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
+    bool         m_isFireballDestructEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;

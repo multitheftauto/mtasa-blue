@@ -87,6 +87,7 @@ enum class WorldSpecialProperty
     CORONAZTEST,
     WATERCREATURES,
     BURNFLIPPEDCARS,
+    FIREBALLDESTRUCT,
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 
