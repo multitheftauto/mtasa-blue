@@ -231,19 +231,20 @@ int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
     return 1;
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, const char*, const char*, float, float, float>> CLuaWorldDefs::ProcessLineAgainstMesh(CClientEntity* e, CVector start, CVector end) {
+std::variant<bool, CLuaMultiReturn<bool, float, float, const char*, const char*, float, float, float>> CLuaWorldDefs::ProcessLineAgainstMesh(CClientEntity* e, CVector start, CVector end) {
     const auto ge = e->GetGameEntity();
     if (!ge) {
         // Element likely not streamed in, and such
         // Can't process it. This isn't an error per-se, thus we won't raise anything and treat this as a no-hit scenario
         return { false };
     }
-    SProcessLineOfSightMaterialInfoResult matInfo{};
-    g_pGame->GetWorld()->ProcessLineAgainstMesh(ge->GetInterface(), start, end);
+    const SProcessLineOfSightMaterialInfoResult matInfo{g_pGame->GetWorld()->ProcessLineAgainstMesh(ge->GetInterface(), start, end)};
     if (!matInfo.valid) {
         return { false }; // No hit
     }
-    return CLuaMultiReturn<float, float, const char*, const char*, float, float, float>{
+    return CLuaMultiReturn<bool, float, float, const char*, const char*, float, float, float>{
+        true,
+
         matInfo.uv.fX,
         matInfo.uv.fY,
 
