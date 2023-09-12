@@ -54,11 +54,14 @@ size_t EngineStreamingGetMemorySize() {
 bool EngineStreamingSetBufferSize(size_t sizeBytes) {
     const auto sizeBlocks = sizeBytes / 2048;
     if (sizeBlocks > g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks()) { // Can't allow it to be less than the largest file
-        g_pGame->GetStreaming()->SetStreamingBufferSize(sizeBlocks);
-        return true;
+        return g_pGame->GetStreaming()->SetStreamingBufferSize(sizeBlocks);
     } else {
         return false;
     }
+}
+
+void EngineStreamingRestoreBufferSize() {
+    g_pGame->GetStreaming()->SetStreamingBufferSize(g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks());
 }
 
 // Get current streaming buffer size
@@ -127,10 +130,14 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
         {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
         {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
+        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
         {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
-        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+        {"engineStreamingRestoreBufferSize", ArgumentParser<EngineStreamingRestoreBufferSize>},
+        
+        {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
+        {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -189,13 +196,14 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
         lua_classfunction(luaVM, "getUsedMemory", "engineStreamingGetUsedMemory");
         lua_classfunction(luaVM, "setMemorySize", "engineStreamingSetMemorySize");
         lua_classfunction(luaVM, "getMemorySize", "engineStreamingGetMemorySize");
+        lua_classfunction(luaVM, "setModelCacheLimits", "engineStreamingSetModelCacheLimits");
         lua_classfunction(luaVM, "restoreMemorySize", "engineStreamingRestoreMemorySize");
         lua_classfunction(luaVM, "getBufferSize", "engineStreamingGetBufferSize");
         lua_classfunction(luaVM, "setBufferSize", "engineStreamingSetBufferSize");
-        lua_classfunction(luaVM, "setModelCacheLimits", "engineStreamingSetModelCacheLimits");
+        lua_classfunction(luaVM, "restoreBufferSize", "engineStreamingRestoreBufferSize");
 
         lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
-        lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetMemorySize");
+        lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetBufferSize");
         lua_classvariable(luaVM, "usedMemory", NULL, "engineStreamingGetUsedMemory");
     }
     lua_registerstaticclass(luaVM, "EngineStreaming");
@@ -849,12 +857,9 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
             if (!argStream.HasErrors())
             {
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
-                if (iModelID != INVALID_MODEL_ID)
-                {
-                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-                    if (pModel == nullptr)
-                        pModel = std::make_shared<CClientModel>(m_pManager, iModelID, eModelType);
-                    m_pManager->GetModelManager()->Add(pModel);
+                if (iModelID != INVALID_MODEL_ID) {
+                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
+
                     ushort usParentID = -1;
 
                     if (argStream.NextIsNumber())
@@ -2424,4 +2429,28 @@ bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 
     g_pClientGame->RestreamWorld(restreamLODs);
     return true;
+}
+
+uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName)
+{
+    if (strTxdName.size() > 24)
+        throw std::invalid_argument("TXD name length shoudn't be more than 24 characters");
+
+    int iModelID = m_pManager->GetModelManager()->GetFreeTxdModelID();
+    if (iModelID == INVALID_MODEL_ID)
+        return false;
+
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eClientModelType::TXD);
+
+    pModel->AllocateTXD(strTxdName);
+    pModel->SetParentResource(m_pLuaManager->GetVirtualMachine(luaVM)->GetResource());
+    m_pManager->GetModelManager()->Add(pModel);
+
+    return iModelID - MAX_MODEL_DFF_ID;
+}
+
+bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
+{
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(MAX_MODEL_DFF_ID + txdID);
+    return pModel && pModel->Deallocate();
 }

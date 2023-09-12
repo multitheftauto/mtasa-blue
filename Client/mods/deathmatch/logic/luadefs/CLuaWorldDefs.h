@@ -34,7 +34,7 @@ public:
     LUA_DECLARE(GetGaragePosition);
     LUA_DECLARE(GetGarageSize);
     LUA_DECLARE(GetGarageBoundingBox);
-    LUA_DECLARE(IsWorldSpecialPropertyEnabled);
+    static bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property);
     LUA_DECLARE(GetBlurLevel);
     LUA_DECLARE(GetTrafficLightState);
     LUA_DECLARE(AreTrafficLightsLocked);
@@ -57,7 +57,7 @@ public:
     LUA_DECLARE(SetMinuteDuration);
     LUA_DECLARE(SetWaveHeight);
     LUA_DECLARE(SetGarageOpen);
-    LUA_DECLARE(SetWorldSpecialPropertyEnabled);
+    static bool SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled);
     LUA_DECLARE(SetBlurLevel);
     LUA_DECLARE(ResetBlurLevel);
     LUA_DECLARE(SetJetpackMaxHeight);

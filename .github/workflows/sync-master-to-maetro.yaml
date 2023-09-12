@@ -22,7 +22,7 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git checkout release/maetro
-          git merge master --no-ff --no-edit --no-commit
+          git merge master --no-ff --no-edit --no-commit || true
           
           # Discard locale conflicts
           git checkout --ours -- Shared/installer/locale "Shared/data/MTA San Andreas/MTA/locale"
