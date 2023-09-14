@@ -18,6 +18,7 @@
 #include "CColModelSA.h"
 #include "gamesa_renderware.h"
 #include "CCollisionSA.h"
+#include <SharedUtil.Detours.h>
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -81,6 +82,49 @@ bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
     return false;
 }
 
+struct RwRGBA
+{
+    unsigned char red;   /**< red component */
+    unsigned char green; /**< green component */
+    unsigned char blue;  /**< blue component */
+    unsigned char alpha; /**< alpha component */
+};
+
+
+struct ExtraVertColour
+{                                               // AKA `gtaVertexColorPlugin`
+    RwRGBA *NightColors, *DayColors;            // heap allocated
+    float   Intensity;
+};
+
+RwStream* pluginExtraVertColourStreamWriteCB(RwStream* stream, int binaryLength, const RpGeometry* geo)
+{
+    uint32_t original_ms_extraVertColourPluginOffset = *(uint32_t*)(void*)0x8D12BC;
+    const auto self = (ExtraVertColour*)((unsigned char*)geo + original_ms_extraVertColourPluginOffset);
+
+    uint32_t length = (sizeof(RwRGBA) * (geo->vertices_size));
+    RwStreamWrite(stream, &geo->vertices_size, sizeof(self->NightColors));
+    if (self->NightColors)
+    {
+        RwStreamWrite(stream, self->NightColors, length);
+    }
+    return stream;
+}
+
+int pluginExtraVertColourStreamGetSizeCB(const RpGeometry* geometry)
+{
+    if (geometry == nullptr)
+        return 0;
+
+    uint32_t size = (sizeof(RwRGBA) * (geometry->vertices_size)) + 4;
+    return size;
+}
+
+int BreakableStreamGetSize()
+{
+    return 4;
+}
+
 void HOOK_FallenPeds();
 void HOOK_FallenCars();
 
@@ -88,6 +132,16 @@ void CWorldSA::InstallHooks()
 {
     HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
     HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
+
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    int pluginExtraVertColourStreamWriteCBPtr = 0x5D6D80;
+    int pluginExtraVertColourStreamGetSizeCBPtr = 0x005D6DC0;
+    int BreakableStreamGetSizePtr = 0x0059D0F0;
+    DetourAttach(&(PVOID&)pluginExtraVertColourStreamWriteCBPtr, pluginExtraVertColourStreamWriteCB);
+    DetourAttach(&(PVOID&)pluginExtraVertColourStreamGetSizeCBPtr, pluginExtraVertColourStreamGetSizeCB);
+    DetourAttach(&(PVOID&)BreakableStreamGetSizePtr, BreakableStreamGetSize);
+    DetourTransactionCommit();
 }
 
 DWORD CONTINUE_CWorld_FallenPeds = 0x00565CBA;

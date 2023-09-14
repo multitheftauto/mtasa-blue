@@ -11,6 +11,7 @@ project "Game SA"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
+	links { "detours" }
 	vpaths {
 		["Headers/*"] = { "**.h", "**.hpp" },
 		["Sources/*"] = "**.cpp",
@@ -18,7 +19,10 @@ project "Game SA"
 	}
 
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/src/windows" }
+		includedirs {
+			"../../vendor/sparsehash/src/windows",
+			"../../vendor/detours/4.0.1/src"
+		}
 
 	filter {}
 

@@ -1218,3 +1218,31 @@ bool CGeometryUpdate::FlushChanged(RpGeometry* pGeometry, std::string& frameName
     m_mapGeometryFrameUpdate[frameName].m_vecVertexSetColor.clear();
     RpGeometryUnlock(pGeometry);
 }
+
+typedef uint32_t(__cdecl* RpGeometryRegisterPluginStream_t)(int pluginID, void* readBC, void* writeCB, void* getSizeCB);
+
+#define RWPLUGINOFFSET(_type, _base, _offset) ((_type*)((unsigned char*)(_base) + (_offset)))
+
+
+bool CRenderWareSA::ExportModel(uint16_t usModelId, std::string& outString)
+{
+    CModelInfo* pModelInfo = g_pCore->GetGame()->GetModelInfo(usModelId);
+    if (pModelInfo == nullptr)
+        return false;
+
+    if (pModelInfo->GetRwObject() == nullptr)
+        return false;
+
+    RwStream* stream = nullptr;
+
+    std::string file("out.dff");
+    //stream = RwStreamOpen(STREAM_TYPE_FILENAME, STREAM_MODE_WRITE, file.c_str());
+    stream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_WRITE, nullptr);
+    if (stream == nullptr)
+        return false;
+    RpClumpStreamWrite((RpClump*)pModelInfo->GetRwObject(), stream);
+    RwStreamClose(stream, nullptr);
+    outString = std::string((char*)stream->data.ptr_file, stream->data.size);
+    return true;
+    //return false;
+}

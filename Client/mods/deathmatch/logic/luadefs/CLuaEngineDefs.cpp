@@ -129,10 +129,17 @@ bool EngineModelFrameSetVertexColor(uint16_t usModel, std::string frameName, int
     return g_pGame->GetRenderWare()->QueueSetVertexColorUpdate(usModel, frameName, vertexIndex, color);
 }
 
-
 bool EngineModelFlushChanges(uint16_t usModel, std::string frameName)
 {
     return g_pGame->GetRenderWare()->FlushChanged(usModel, frameName);
+}
+
+std::variant<bool, std::string> EngineExportModel(uint16_t usModel)
+{
+    std::string data;
+    if (g_pGame->GetRenderWare()->ExportModel(usModel, data))
+        return data;
+    return false;
 }
 
 void CLuaEngineDefs::LoadFunctions()
@@ -207,6 +214,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineModelFrameSetVertexPosition", ArgumentParser<EngineModelFrameSetVertexPosition>},
         {"engineModelFrameSetVertexColor", ArgumentParser<EngineModelFrameSetVertexColor>},
         {"engineModelFlushChanges", ArgumentParser<EngineModelFlushChanges>},
+        {"engineExportModel", ArgumentParser<EngineExportModel>},
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},

@@ -86,6 +86,7 @@ typedef RwStream*(__cdecl* RwStreamOpen_t)(RwStreamType type, RwStreamMode mode,
 typedef int(__cdecl* RwStreamClose_t)(RwStream* stream, void* pData);
 typedef int(__cdecl* RwStreamRead_t)(RwStream* stream, void* pData, uint size);
 typedef int(__cdecl* RwStreamSkip_t)(RwStream* stream, uint size);
+typedef RwStream*(__cdecl* RwStreamWrite_t)(RwStream* stream, const void* buffer, uint32_t length);
 typedef int(__cdecl* RpClumpDestroy_t)(RpClump* clump);
 using RpClumpForAllAtomicsCB_t = bool(__cdecl*)(RpAtomic*, void*);
 typedef RpClump*(__cdecl* RpClumpForAllAtomics_t)(RpClump* clump, RpClumpForAllAtomicsCB_t callback, void* pData);
@@ -103,6 +104,7 @@ typedef RpHAnimHierarchy*(__cdecl* GetAnimHierarchyFromSkinClump_t)(RpClump*);
 typedef int(__cdecl* RpHAnimIDGetIndex_t)(RpHAnimHierarchy*, int);
 typedef RwMatrix*(__cdecl* RpHAnimHierarchyGetMatrixArray_t)(RpHAnimHierarchy*);
 typedef RtQuat*(__cdecl* RtQuatRotate_t)(RtQuat* quat, const RwV3d* axis, float angle, RwOpCombineType combineOp);
+typedef RpClump*(__cdecl* RpClumpStreamWrite_t)(RpClump* pClump, RwStream* pStream);
 
 /*****************************************************************************/
 /** Renderware function mappings                                            **/
@@ -122,6 +124,7 @@ RWFUNC(RwStreamOpen_t RwStreamOpen, (RwStreamOpen_t)0xDEAD)
 RWFUNC(RwStreamClose_t RwStreamClose, (RwStreamClose_t)0xDEAD)
 RWFUNC(RwStreamRead_t RwStreamRead, (RwStreamRead_t)0xDEAD)
 RWFUNC(RwStreamSkip_t RwStreamSkip, (RwStreamSkip_t)0xDEAD)
+RWFUNC(RwStreamWrite_t RwStreamWrite, (RwStreamWrite_t)0xDEAD)
 RWFUNC(RpClumpDestroy_t RpClumpDestroy, (RpClumpDestroy_t)0xDEAD)
 RWFUNC(RpClumpGetNumAtomics_t RpClumpGetNumAtomics, (RpClumpGetNumAtomics_t)0xDEAD)
 RWFUNC(RwFrameTranslate_t RwFrameTranslate, (RwFrameTranslate_t)0xDEAD)
@@ -191,6 +194,7 @@ RWFUNC(GetAnimHierarchyFromSkinClump_t GetAnimHierarchyFromSkinClump, (GetAnimHi
 RWFUNC(RpHAnimIDGetIndex_t RpHAnimIDGetIndex, (RpHAnimIDGetIndex_t)0xDEAD)
 RWFUNC(RpHAnimHierarchyGetMatrixArray_t RpHAnimHierarchyGetMatrixArray, (RpHAnimHierarchyGetMatrixArray_t)0xDEAD)
 RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
+RWFUNC(RpClumpStreamWrite_t RpClumpStreamWrite, (RpClumpStreamWrite_t)0xDEAD)
 
 /*****************************************************************************/
 /** GTA function definitions and mappings                                   **/

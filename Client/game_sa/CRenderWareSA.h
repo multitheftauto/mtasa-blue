@@ -172,6 +172,7 @@ public:
     bool QueueSetVertexColorUpdate(int16_t usModelId, std::string& frameName, int vertexIndex, SColor color);
     bool FlushChanged(int16_t usModelId, std::string& frameName);
     RpAtomic* GetAtomicFromFrameName(RwObject* rwObject, std::string& frameName);
+    bool      ExportModel(uint16_t usModelId, std::string& outString);
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
