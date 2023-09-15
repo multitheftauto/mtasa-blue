@@ -14,6 +14,7 @@
 #include "CPedSA.h"
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
+#include "CTextureDictonarySA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
@@ -54,8 +55,84 @@ public:
         m_bOwnsAllocations = false;
     }
 
+    uint GetFreeSlot()
+    {
+        bool bLooped = false;
+        uint index = m_nFirstFree + 1;
+
+        while (true)
+        {
+            if (index >= m_nSize)
+            {
+                if (bLooped)
+                    return -1;
+
+                index = 0;
+                bLooped = true;
+            }
+
+            if (m_byteMap[index].bEmpty)
+            {
+                m_nFirstFree = index;
+                return index;
+            }
+            index++;
+        }
+
+        return -1;
+    };
+
+    B* Allocate()
+    {
+        m_nFirstFree++;          // Continue after the last allocated slot
+        const auto sz = m_nSize; // Storing size to avoid reloads from memory - should help out the optimizer
+        for (auto i = 0u; i < sz; i++) {
+            const auto slot = (m_nFirstFree + i) % sz;
+            const auto e    = &m_byteMap[slot];
+            if (!e->bEmpty) {
+                continue;
+            }
+            m_nFirstFree = slot;
+            e->bEmpty = false;
+            e->nId++;
+            return &m_pObjects[slot];
+        }
+        return nullptr;
+    }
+
+    B* AllocateAt(uint uiSlot)
+    {
+        m_pObjects[uiSlot] = B();
+        m_byteMap[uiSlot].bEmpty = false;
+        m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
+
+        return &m_pObjects[uiSlot];
+    }
+
+    void Release(uint index)
+    {
+        m_byteMap[index].bEmpty = true;
+        m_byteMap[index].nId = 0;
+        if (index == m_nFirstFree)
+            --m_nFirstFree;
+    }
+
+    void Delete(uint index)
+    {
+        Release(index);
+    }
+
     bool IsEmpty(std::int32_t objectIndex) { return m_byteMap[objectIndex].bEmpty; }
+    bool IsContains(uint index)
+    {
+        if (m_nSize <= index)
+            return false;
+        return !IsEmpty(index);
+    }
+
     B*   GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
+
+    uint GetObjectIndex(B* pObject) { return ((DWORD)pObject - (DWORD)m_pObjects) / sizeof(B); }
 };
 
 class CPoolsSA : public CPools
@@ -127,6 +204,12 @@ public:
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
 
+    uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName);
+    void RemoveTextureDictonarySlot(uint uiTxdId);
+    bool IsFreeTextureDictonarySlot(uint uiTxdId);
+
+    ushort GetFreeTextureDictonarySlot();
+
 private:
     // Generic container for pools
     template <class T, class I, unsigned long MAX>
@@ -157,6 +240,7 @@ private:
     CPoolSAInterface<CPedSAInterface>**                              m_ppPedPoolInterface;
     CPoolSAInterface<CObjectSAInterface>**                           m_ppObjectPoolInterface;
     CPoolSAInterface<CVehicleSAInterface>**                          m_ppVehiclePoolInterface;
+    CPoolSAInterface<CTextureDictonarySAInterface>**                 m_ppTxdPoolInterface;
 
     bool m_bGetVehicleEnabled;
 };
