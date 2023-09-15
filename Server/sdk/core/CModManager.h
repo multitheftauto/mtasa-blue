@@ -19,4 +19,7 @@ public:
     virtual const char* GetServerPath() = 0;
     virtual const char* GetModPath() = 0;
     virtual SString     GetAbsolutePath(const char* szRelative) = 0;
+
+    virtual void SetExitCode(int exitCode) = 0;
+    virtual int  GetExitCode() const = 0;
 };

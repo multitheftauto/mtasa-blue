@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "../packets/CPacket.h"
+#include "CPacket.h"
 
 class CPlayerDisconnectedPacket final : public CPacket
 {

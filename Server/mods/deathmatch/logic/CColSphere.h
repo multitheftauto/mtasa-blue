@@ -17,7 +17,7 @@ class CColSphere : public CColShape
 {
 public:
     CColSphere(CColManager* pManager, CElement* pParent, const CVector& vecPosition, float fRadius, bool bIsPartnered = false);
-    CElement*       Clone(bool* bAddEntity, CResource* pResource) override;
+    CElement* Clone(bool* bAddEntity, CResource* pResource) override;
 
     virtual CSphere GetWorldBoundingSphere();
 

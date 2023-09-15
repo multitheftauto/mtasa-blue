@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPedWastedPacket.h"
+#include "CPed.h"
+#include <net/SyncStructures.h>
 
 CPedWastedPacket::CPedWastedPacket()
 {

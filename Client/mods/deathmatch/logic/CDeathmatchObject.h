@@ -13,7 +13,7 @@
 
 #include "CClientObject.h"
 
-class CDeathmatchObject : public CClientObject
+class CDeathmatchObject final : public CClientObject
 {
     DECLARE_CLASS(CDeathmatchObject, CClientObject)
 public:

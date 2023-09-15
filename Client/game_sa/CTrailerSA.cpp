@@ -10,14 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CTrailerSA.h"
 
-CTrailerSA::CTrailerSA(CTrailerSAInterface* trailer) : CAutomobileSA(trailer)
+CTrailerSA::CTrailerSA(CTrailerSAInterface* pInterface)
 {
-    DEBUG_TRACE("CTrailerSA::CTrailerSA( CTrailerSAInterface * trailer )");
-    this->m_pInterface = trailer;
-}
-
-CTrailerSA::CTrailerSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2) : CAutomobileSA(dwModelID, ucVariation, ucVariation2)
-{
-    DEBUG_TRACE("CTrailerSA::CTrailerSA( eVehicleTypes dwModelID ):CVehicleSA( dwModelID )");
+    SetInterface(pInterface);
+    Init();
 }

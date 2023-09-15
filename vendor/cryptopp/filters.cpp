@@ -4,11 +4,7 @@
 #include "config.h"
 
 #if CRYPTOPP_MSC_VERSION
-# pragma warning(disable: 4100 4189 4355)
-#endif
-
-#if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
-# pragma GCC diagnostic ignored "-Wunused-value"
+# pragma warning(disable: 4189 4355)
 #endif
 
 #ifndef CRYPTOPP_IMPORTS
@@ -87,7 +83,7 @@ bool Filter::Flush(bool hardFlush, int propagation, bool blocking)
 		if (OutputFlush(1, hardFlush, propagation, blocking))
 			return true;
 		// fall through
-	default: ;;
+	default: ;
 	}
 	return false;
 }
@@ -104,7 +100,7 @@ bool Filter::MessageSeriesEnd(int propagation, bool blocking)
 		if (ShouldPropagateMessageSeriesEnd() && OutputMessageSeriesEnd(1, propagation, blocking))
 			return true;
 		// fall through
-	default: ;;
+	default: ;
 	}
 	return false;
 }
@@ -292,8 +288,8 @@ size_t FilterWithBufferedInput::BlockQueue::GetAll(byte *outString)
 	size_t size = m_size;
 	size_t numberOfBytes = m_maxBlocks*m_blockSize;
 	const byte *ptr = GetContigousBlocks(numberOfBytes);
-	memcpy(outString, ptr, numberOfBytes);
-	memcpy(PtrAdd(outString, numberOfBytes), m_begin, m_size);
+	std::memcpy(outString, ptr, numberOfBytes);
+	std::memcpy(PtrAdd(outString, numberOfBytes), m_begin, m_size);
 	m_size = 0;
 	return size;
 }
@@ -307,9 +303,9 @@ void FilterWithBufferedInput::BlockQueue::Put(const byte *inString, size_t lengt
 	byte *end = (m_size < static_cast<size_t>(PtrDiff(m_buffer.end(), m_begin)) ?
 		PtrAdd(m_begin, m_size) : PtrAdd(m_begin, m_size - m_buffer.size()));
 	size_t len = STDMIN(length, size_t(m_buffer.end()-end));
-	memcpy(end, inString, len);
+	std::memcpy(end, inString, len);
 	if (len < length)
-		memcpy(m_buffer, PtrAdd(inString, len), length-len);
+		std::memcpy(m_buffer, PtrAdd(inString, len), length-len);
 	m_size += length;
 }
 
@@ -536,13 +532,13 @@ size_t ArraySink::Put2(const byte *begin, size_t length, int messageEnd, bool bl
 {
 	CRYPTOPP_UNUSED(messageEnd); CRYPTOPP_UNUSED(blocking);
 
-	// Avoid passing NULL pointer to memcpy. Using memmove due to
+	// Avoid passing NULL pointer to memcpy. Using std::memmove due to
 	//  Valgrind finding on overlapping buffers.
 	size_t copied = 0;
 	if (m_buf && begin)
 	{
 		copied = STDMIN(length, SaturatingSubtract(m_size, m_total));
-		memmove(PtrAdd(m_buf, m_total), begin, copied);
+		std::memmove(PtrAdd(m_buf, m_total), begin, copied);
 	}
 	m_total += copied;
 	return length - copied;
@@ -595,7 +591,9 @@ StreamTransformationFilter::StreamTransformationFilter(StreamTransformation &c, 
 	m_isSpecial = m_cipher.IsLastBlockSpecial() && m_mandatoryBlockSize > 1;
 	m_reservedBufferSize = STDMAX(2*m_mandatoryBlockSize, m_optimalBufferSize);
 
-	IsolatedInitialize(MakeParameters(Name::BlockPaddingScheme(), padding));
+	FilterWithBufferedInput::IsolatedInitialize(
+		MakeParameters
+			(Name::BlockPaddingScheme(), padding));
 }
 
 StreamTransformationFilter::StreamTransformationFilter(StreamTransformation &c, BufferedTransformation *attachment, BlockPaddingScheme padding, bool authenticated)
@@ -616,7 +614,9 @@ StreamTransformationFilter::StreamTransformationFilter(StreamTransformation &c, 
 	m_isSpecial = m_cipher.IsLastBlockSpecial() && m_mandatoryBlockSize > 1;
 	m_reservedBufferSize = STDMAX(2*m_mandatoryBlockSize, m_optimalBufferSize);
 
-	IsolatedInitialize(MakeParameters(Name::BlockPaddingScheme(), padding));
+	FilterWithBufferedInput::IsolatedInitialize(
+		MakeParameters
+			(Name::BlockPaddingScheme(), padding));
 }
 
 size_t StreamTransformationFilter::LastBlockSize(StreamTransformation &c, BlockPaddingScheme padding)
@@ -697,7 +697,7 @@ void StreamTransformationFilter::LastPut(const byte *inString, size_t length)
 	// This block is new to StreamTransformationFilter. It is somewhat of a hack and was
 	//  added for OCB mode; see GitHub Issue 515. The rub with OCB is, its a block cipher
 	//  and the last block size can be 0. However, "last block = 0" is not the 0 predicated
-	//  in the original code. In the orginal code 0 means "nothing special" so
+	//  in the original code. In the original code 0 means "nothing special" so
 	//  DEFAULT_PADDING is applied. OCB's 0 literally means a final block size can be 0 or
 	//  non-0; and no padding is needed in either case because OCB has its own scheme (see
 	//  handling of P_* and A_*).
@@ -758,8 +758,8 @@ void StreamTransformationFilter::LastPut(const byte *inString, size_t length)
 				// do padding
 				size_t blockSize = STDMAX(minLastBlockSize, (size_t)m_mandatoryBlockSize);
 				byte* space = HelpCreatePutSpace(*AttachedTransformation(), DEFAULT_CHANNEL, blockSize);
-				if (inString) {memcpy(space, inString, length);}
-				memset(PtrAdd(space, length), 0, blockSize - length);
+				if (inString) {std::memcpy(space, inString, length);}
+				std::memset(PtrAdd(space, length), 0, blockSize - length);
 				size_t used = m_cipher.ProcessLastBlock(space, blockSize, space, blockSize);
 				AttachedTransformation()->Put(space, used);
 			}
@@ -791,23 +791,23 @@ void StreamTransformationFilter::LastPut(const byte *inString, size_t length)
 		if (m_cipher.IsForwardTransformation())
 		{
 			CRYPTOPP_ASSERT(length < s);
-			if (inString) {memcpy(space, inString, length);}
+			if (inString) {std::memcpy(space, inString, length);}
 			if (m_padding == PKCS_PADDING)
 			{
 				CRYPTOPP_ASSERT(s < 256);
 				byte pad = static_cast<byte>(s-length);
-				memset(PtrAdd(space, length), pad, s-length);
+				std::memset(PtrAdd(space, length), pad, s-length);
 			}
 			else if (m_padding == W3C_PADDING)
 			{
 				CRYPTOPP_ASSERT(s < 256);
-				memset(PtrAdd(space, length), 0, s-length-1);
+				std::memset(PtrAdd(space, length), 0, s-length-1);
 				space[s-1] = static_cast<byte>(s-length);
 			}
 			else
 			{
 				space[length] = 0x80;
-				memset(PtrAdd(space, length+1), 0, s-length-1);
+				std::memset(PtrAdd(space, length+1), 0, s-length-1);
 			}
 			m_cipher.ProcessData(space, space, s);
 			AttachedTransformation()->Put(space, s);
@@ -889,7 +889,10 @@ HashVerificationFilter::HashVerificationFilter(HashTransformation &hm, BufferedT
 	: FilterWithBufferedInput(attachment)
 	, m_hashModule(hm), m_flags(0), m_digestSize(0), m_verified(false)
 {
-	IsolatedInitialize(MakeParameters(Name::HashVerificationFilterFlags(), flags)(Name::TruncatedDigestSize(), truncatedDigestSize));
+	FilterWithBufferedInput::IsolatedInitialize(
+		MakeParameters
+			(Name::HashVerificationFilterFlags(), flags)
+			(Name::TruncatedDigestSize(), truncatedDigestSize));
 }
 
 void HashVerificationFilter::InitializeDerivedAndReturnNewSizes(const NameValuePairs &parameters, size_t &firstSize, size_t &blockSize, size_t &lastSize)
@@ -908,7 +911,7 @@ void HashVerificationFilter::FirstPut(const byte *inString)
 	if (m_flags & HASH_AT_BEGIN)
 	{
 		m_expectedHash.New(m_digestSize);
-		if (inString) {memcpy(m_expectedHash, inString, m_expectedHash.size());}
+		if (inString) {std::memcpy(m_expectedHash, inString, m_expectedHash.size());}
 		if (m_flags & PUT_HASH)
 			AttachedTransformation()->Put(inString, m_expectedHash.size());
 	}
@@ -994,7 +997,11 @@ AuthenticatedDecryptionFilter::AuthenticatedDecryptionFilter(AuthenticatedSymmet
 	, m_streamFilter(c, new OutputProxy(*this, false), padding, true)
 {
 	CRYPTOPP_ASSERT(!c.IsForwardTransformation() || c.IsSelfInverting());
-	IsolatedInitialize(MakeParameters(Name::BlockPaddingScheme(), padding)(Name::AuthenticatedDecryptionFilterFlags(), flags)(Name::TruncatedDigestSize(), truncatedDigestSize));
+	FilterWithBufferedInput::IsolatedInitialize(
+		MakeParameters
+			(Name::BlockPaddingScheme(), padding)
+			(Name::AuthenticatedDecryptionFilterFlags(), flags)
+			(Name::TruncatedDigestSize(), truncatedDigestSize));
 }
 
 void AuthenticatedDecryptionFilter::InitializeDerivedAndReturnNewSizes(const NameValuePairs &parameters, size_t &firstSize, size_t &blockSize, size_t &lastSize)
@@ -1079,7 +1086,9 @@ SignatureVerificationFilter::SignatureVerificationFilter(const PK_Verifier &veri
 	: FilterWithBufferedInput(attachment)
 	, m_verifier(verifier), m_flags(0), m_verified(0)
 {
-	IsolatedInitialize(MakeParameters(Name::SignatureVerificationFilterFlags(), flags));
+	FilterWithBufferedInput::IsolatedInitialize(
+		MakeParameters
+			(Name::SignatureVerificationFilterFlags(), flags));
 }
 
 void SignatureVerificationFilter::InitializeDerivedAndReturnNewSizes(const NameValuePairs &parameters, size_t &firstSize, size_t &blockSize, size_t &lastSize)
@@ -1103,7 +1112,7 @@ void SignatureVerificationFilter::FirstPut(const byte *inString)
 		else
 		{
 			m_signature.New(m_verifier.SignatureLength());
-			if (inString) {memcpy(m_signature, inString, m_signature.size());}
+			if (inString) {std::memcpy(m_signature, inString, m_signature.size());}
 		}
 
 		if (m_flags & PUT_SIGNATURE)

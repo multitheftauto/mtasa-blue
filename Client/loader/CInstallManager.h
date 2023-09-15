@@ -1,13 +1,14 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:
- *  PURPOSE:
+ *  FILE:        Client/loader/CInstallManager.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
+
+#pragma once
 
 #include "CSequencer.h"
 
@@ -28,7 +29,6 @@ public:
     SString GetSequencerSnapshot();
     SString GetLauncherPathFilename();
     bool    UpdateOptimusSymbolExport();
-    SString MaybeRenameExe(const SString& strGTAPath);
 
 protected:
     SString _ShowCrashFailDialog();
@@ -38,10 +38,12 @@ protected:
     SString _InstallFiles();
     SString _ChangeToAdmin();
     SString _ShowCopyFailDialog();
+    SString _PrepareLaunchLocation();
+    SString _ProcessGtaPatchCheck();
+    SString _ProcessGtaDllCheck();
     SString _ProcessGtaVersionCheck();
     SString _ProcessLayoutChecks();
     SString _ProcessLangFileChecks();
-    SString _ProcessExePatchChecks();
     SString _ProcessServiceChecks();
     SString _ProcessAppCompatChecks();
     SString _ChangeFromAdmin();

@@ -11,8 +11,9 @@
 
 #pragma once
 
-#include "CEntity.h"
-#include "CColPoint.h"
+class CEntitySAInterface;
+class CVector;
+class CColPoint;
 
 struct SLineOfSightFlags
 {
@@ -48,6 +49,14 @@ struct SLineOfSightBuildingResult
     CVector             vecPosition;
     CVector             vecRotation;
     CEntitySAInterface* pInterface;
+};
+
+struct SProcessLineOfSightMaterialInfoResult {
+    CVector2D   uv;            //< On-texture UV coordinates of the intersection point
+    const char* textureName;   //< GTA texture name
+    const char* frameName;     //< The name of the frame the hit geometry belongs to
+    CVector     hitPos;        //< Precise hit position on the clump [World space]
+    bool        valid{};       //< Data found in this struct is only valid if this is `true`!
 };
 
 struct SBuildingRemoval
@@ -228,7 +237,8 @@ public:
     uint8_t  m_tyreGrip;
     uint8_t  m_wetGrip;            // 2
     uint16_t pad;                  // 4
-    union {
+    union
+    {
         struct            // size 8
         {
             uint32_t flags[2];
@@ -290,9 +300,7 @@ public:
                 flags[flagsGroup] &= ~(1UL << (sFlagID + usForNext));
         }
     }
-    inline bool getFlagEnabled(char flagsGroup, short sFlagID) {
-        return ((flags[flagsGroup] >> sFlagID) & 1U) == 1;
-    }
+    bool getFlagEnabled(char flagsGroup, short sFlagID) { return ((flags[flagsGroup] >> sFlagID) & 1U) == 1; }
 };
 
 struct CSurfaceType
@@ -304,19 +312,14 @@ struct CSurfaceType
 class CWorld
 {
 public:
-    virtual void Add(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntity* entity, eDebugCaller CallerId) = 0;
-    virtual void Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
-    virtual bool ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
-                                    const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
-    // THIS FUNCTION IS INCOMPLETE AND SHOULD NOT BE USED ----------v
-    virtual bool  TestLineSphere(CVector* vecStart, CVector* vecEnd, CVector* vecSphereCenter, float fSphereRadius, CColPoint** colCollision) = 0;
+    virtual void  Add(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Remove(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
+    virtual bool  ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
+                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL, SProcessLineOfSightMaterialInfoResult* outMatInfo = {}) = 0;
     virtual void  IgnoreEntity(CEntity* entity) = 0;
-    virtual BYTE  GetLevelFromPosition(CVector* vecPosition) = 0;
-    virtual float FindGroundZForPosition(float fX, float fY) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
     virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;
-    virtual void  LoadMapAroundPoint(CVector* vecPosition, float fRadius) = 0;
     virtual bool  IsLineOfSightClear(const CVector* vecStart, const CVector* vecEnd, const SLineOfSightFlags flags = SLineOfSightFlags()) = 0;
     virtual bool  HasCollisionBeenLoaded(CVector* vecPosition) = 0;
     virtual DWORD GetCurrentArea() = 0;
@@ -346,7 +349,7 @@ public:
     virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
     virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
 
-    virtual CSurfaceType*     GetSurfaceInfo() = 0;
-    virtual void              ResetAllSurfaceInfo() = 0;
-    virtual bool              ResetSurfaceInfo(short sSurfaceID) = 0;
+    virtual CSurfaceType* GetSurfaceInfo() = 0;
+    virtual void          ResetAllSurfaceInfo() = 0;
+    virtual bool          ResetSurfaceInfo(short sSurfaceID) = 0;
 };

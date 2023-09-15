@@ -25,7 +25,12 @@ class CLanBroadcastDLL;
     #include <sys/stat.h>
     #include <netinet/in.h>
     #include <arpa/inet.h>
+    #include <unistd.h>
+    #include <fcntl.h>
     #define closesocket close
+    #ifndef INVALID_SOCKET
+        #define INVALID_SOCKET -1
+    #endif
 #endif
 
 class CLanBroadcast

@@ -417,6 +417,9 @@ public:
     eGlitchType GetGlitchIndex(const std::string& strGlitch) { return m_GlitchNames[strGlitch]; }
     bool        IsGlitch(const std::string& strGlitch) { return m_GlitchNames.count(strGlitch) > 0; }
 
+    bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property) { return m_WorldSpecialProps[property]; }
+    void SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled) { m_WorldSpecialProps[property] = isEnabled; }
+
     void SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
 
@@ -451,13 +454,16 @@ public:
     void SendSyncSettings(CPlayer* pPlayer = NULL);
 
     CMtaVersion CalculateMinClientRequirement();
-    bool    IsBelowMinimumClient(const CMtaVersion& strVersion);
-    bool    IsBelowRecommendedClient(const CMtaVersion& strVersion);
-    void    ApplyAseSetting();
-    bool    IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
+    bool        IsBelowMinimumClient(const CMtaVersion& strVersion);
+    bool        IsBelowRecommendedClient(const CMtaVersion& strVersion);
+    void        ApplyAseSetting();
+    bool        IsUsingMtaServerConf() { return m_bUsingMtaServerConf; }
 
     void SetDevelopmentMode(bool enabled) { m_DevelopmentModeEnabled = enabled; }
     bool GetDevelopmentMode() { return m_DevelopmentModeEnabled; }
+
+    bool IsClientTransferBoxVisible() const { return m_showClientTransferBox; }
+    void SetClientTransferBoxVisible(bool visible) { m_showClientTransferBox = visible; }
 
 private:
     void AddBuiltInEvents();
@@ -498,7 +504,7 @@ private:
     void Packet_PlayerScreenShot(class CPlayerScreenShotPacket& Packet);
     void Packet_PlayerNoSocket(class CPlayerNoSocketPacket& Packet);
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
-    void Packet_DiscordJoin(class CDiscordJoinPacket& Packet);
+    void Packet_PlayerResourceStart(class CPlayerResourceStartPacket& Packet);
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
@@ -622,6 +628,7 @@ private:
     std::map<std::string, eGlitchType>            m_GlitchNames;
     SFixedArray<bool, NUM_GLITCHES>               m_Glitches;
     SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
+    std::map<WorldSpecialProperty, bool>          m_WorldSpecialProps;
 
     // This is ticked to true when the app should end
     bool m_bIsFinished;
@@ -650,4 +657,5 @@ private:
     SharedUtil::CAsyncTaskScheduler* m_pAsyncTaskScheduler;
 
     bool m_DevelopmentModeEnabled;
+    bool m_showClientTransferBox = true;
 };

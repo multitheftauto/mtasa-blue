@@ -143,6 +143,7 @@ public:
     void        SetCursorEnabled(bool bEnabled);
     bool        IsCursorEnabled();
     void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false);
+    void        SetCurrentServerCursorAlpha(float fAlpha);
     float       GetCurrentServerCursorAlpha();
     eCursorType GetCursorType();
 
@@ -255,9 +256,6 @@ public:
     void ClearInputHandlers(eInputChannel channel);
     void ClearSystemKeys();
 
-    bool IsTransferBoxVisible() { return m_bTransferBoxVisible; };
-    void SetTransferBoxVisible(bool bVisible) { m_bTransferBoxVisible = bVisible; };
-
     bool Event_CharacterKey(const CEGUI::EventArgs& e);
     bool Event_KeyDown(const CEGUI::EventArgs& e);
     bool Event_MouseClick(const CEGUI::EventArgs& e);
@@ -348,8 +346,6 @@ private:
     eInputChannel m_Channel;
 
     std::list<SString> m_GuiWorkingDirectoryStack;
-
-    bool m_bTransferBoxVisible;
 
     bool         m_HasSchemeLoaded;
     SString      m_CurrentSchemeName;

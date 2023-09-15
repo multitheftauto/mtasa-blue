@@ -46,7 +46,7 @@ class CLuaArguments
 public:
     CLuaArguments() {}
     CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
-    
+
     ~CLuaArguments() { DeleteArguments(); };
 
     void CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
@@ -98,6 +98,8 @@ public:
     unsigned int                               Count() const { return static_cast<unsigned int>(m_Arguments.size()); };
     std::vector<CLuaArgument*>::const_iterator IterBegin() const { return m_Arguments.begin(); };
     std::vector<CLuaArgument*>::const_iterator IterEnd() const { return m_Arguments.end(); };
+
+    bool IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
 
 private:
     std::vector<CLuaArgument*> m_Arguments;

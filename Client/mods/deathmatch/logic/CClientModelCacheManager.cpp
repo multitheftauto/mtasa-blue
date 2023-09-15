@@ -38,6 +38,7 @@ public:
     // CClientModelCacheManager interface
     virtual void DoPulse();
     virtual void OnRestreamModel(ushort usModelId);
+    virtual void SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds);
 
     // CClientModelCacheManagerImpl methods
     CClientModelCacheManagerImpl();
@@ -246,7 +247,7 @@ void CClientModelCacheManagerImpl::ProcessPlayerList(std::map<ushort, float>& ou
         CClientPlayer* pPlayer = *iter;
         ushort         usModelId = (ushort)pPlayer->GetModel();
 
-        if (usModelId < 7 || usModelId > 312)
+        if (usModelId < 1 || usModelId > 312)
             continue;
 
         // Check if currently within distance
@@ -323,7 +324,7 @@ void CClientModelCacheManagerImpl::ProcessPedList(std::map<ushort, float>& outNe
         CClientPed*  pPed = *iter;
         const ushort usModelId = (ushort)pPed->GetModel();
 
-        if (usModelId < 7 || usModelId > 312)
+        if (usModelId < 1 || usModelId > 312)
             continue;
 
         // Check if currently within distance
@@ -517,4 +518,9 @@ void CClientModelCacheManagerImpl::AddProcessStat(const char* szTag, bool bCache
 void CClientModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
 {
     m_pCoreModelCacheManager->OnRestreamModel(usModelId);
+}
+
+void CClientModelCacheManagerImpl::SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds)
+{
+    m_pCoreModelCacheManager->SetCustomLimits(numVehicles, numPeds);
 }

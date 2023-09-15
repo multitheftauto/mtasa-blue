@@ -10,18 +10,26 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
+#include "CAnimBlendAssocGroupSA.h"
+#include "CAnimManagerSA.h"
+#include "CGameSA.h"
+#include "CPlayerInfoSA.h"
+#include "CPlayerPedSA.h"
+#include "CWorldSA.h"
 
-/**
- * Constructor for CPlayerPedSA
- */
+extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
+
+class CPedClothesDesc;
 
 static CPedClothesDesc*    pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;
 static std::set<SString>   ms_DoneAnimBlockRefMap;
 
-CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
+CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
 {
-    DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( ePedModel pedType )");
     // based on CPlayerPed::SetupPlayerPed (R*)
     DWORD CPedOperatorNew = FUNC_CPedOperatorNew;
     DWORD CPlayerPedConstructor = FUNC_CPlayerPedConstructor;
@@ -41,17 +49,16 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
         call    CPlayerPedConstructor
     }
 
-    this->SetInterface((CEntitySAInterface*)dwPedPointer);
+    SetInterface((CEntitySAInterface*)dwPedPointer);
 
-    this->Init();            // init our interfaces
+    Init();            // init our interfaces
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
-    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
     CWorldSA* world = (CWorldSA*)pGame->GetWorld();
 
-    this->SetModelIndex(pedType);
-    this->BeingDeleted = FALSE;
-    this->DoNotRemoveFromGame = FALSE;
-    this->SetType(PLAYER_PED);
+    SetModelIndex(nModelIndex);
+    BeingDeleted = false;
+    DoNotRemoveFromGame = false;
+    SetType(PLAYER_PED);
 
     // Allocate a player data struct and set it as the players
     m_bIsLocal = false;
@@ -93,15 +100,13 @@ CPlayerPedSA::CPlayerPedSA(ePedModel pedType)
 
 CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 {
-    DEBUG_TRACE("CPlayerPedSA::CPlayerPedSA( CPedSAInterface * ped )");
     // based on CPlayerPed::SetupPlayerPed (R*)
-    this->SetInterface((CEntitySAInterface*)pPlayer);
+    SetInterface((CEntitySAInterface*)pPlayer);
 
-    this->Init();
+    Init();
     CPoolsSA* pools = (CPoolsSA*)pGame->GetPools();
-    this->internalID = pools->GetPedRef((DWORD*)this->GetInterface());
-    this->SetType(PLAYER_PED);
-    this->BeingDeleted = FALSE;
+    SetType(PLAYER_PED);
+    BeingDeleted = false;
 
     m_bIsLocal = true;
     DoNotRemoveFromGame = true;
@@ -125,12 +130,11 @@ CPlayerPedSA::CPlayerPedSA(CPlayerPedSAInterface* pPlayer)
 
 CPlayerPedSA::~CPlayerPedSA()
 {
-    DEBUG_TRACE("CPlayerPedSA::~CPlayerPedSA( )");
-    if (!this->BeingDeleted && DoNotRemoveFromGame == false)
+    if (!BeingDeleted && DoNotRemoveFromGame == false)
     {
         DWORD dwInterface = (DWORD)m_pInterface;
 
-        if ((DWORD)this->GetInterface()->vtbl != VTBL_CPlaceable)
+        if ((DWORD)GetInterface()->vtbl != VTBL_CPlaceable)
         {
             CWorldSA* world = (CWorldSA*)pGame->GetWorld();
             world->Remove(m_pInterface, CPlayerPed_Destructor);
@@ -144,7 +148,7 @@ CPlayerPedSA::~CPlayerPedSA()
                 call    dwFunc
             }
         }
-        this->BeingDeleted = true;
+        BeingDeleted = true;
         ((CPoolsSA*)pGame->GetPools())->RemovePed((CPed*)(CPedSA*)this, false);
     }
 
@@ -158,31 +162,6 @@ CPlayerPedSA::~CPlayerPedSA()
 CWanted* CPlayerPedSA::GetWanted()
 {
     return m_pWanted;
-}
-
-float CPlayerPedSA::GetSprintEnergy()
-{
-    /*
-    OutputDebugString("GetSprintEnergy HACK\n");
-
-    m_pData->bCanBeDamaged = true;
-    m_pData->m_bRenderWeapon = true;
-    m_pData->m_bDontAllowWeaponChange = true;
-
-    ((CPedSAInterface*)GetInterface())->pedFlags.bUpdateAnimHeading = true;
-    ((CPedSAInterface*)GetInterface())->pedFlags.bHeadStuckInCollision = true;
-    ((CPedSAInterface*)GetInterface())->pedFlags.bDonePositionOutOfCollision = true;
-    ((CPedSAInterface*)GetInterface())->pedFlags.bIsRestoringGun = true;
-
-    RebuildPlayer ();
-    */
-
-    return m_pData->m_fSprintEnergy;
-}
-
-void CPlayerPedSA::SetSprintEnergy(float fSprintEnergy)
-{
-    m_pData->m_fSprintEnergy = fSprintEnergy;
 }
 
 void CPlayerPedSA::SetInitialState()
@@ -207,7 +186,7 @@ void CPlayerPedSA::SetInitialState()
 
 eMoveAnim CPlayerPedSA::GetMoveAnim()
 {
-    CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
+    CPedSAInterface* pedInterface = (CPedSAInterface*)GetInterface();
     return (eMoveAnim)pedInterface->iMoveAnimGroup;
 }
 
@@ -316,7 +295,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
     m_iCustomMoveAnim = iAnimGroup;
 
     // Set the the new move animation group now, although it does get updated through the hooks as well
-    CPedSAInterface* pedInterface = (CPedSAInterface*)this->GetInterface();
+    CPedSAInterface* pedInterface = (CPedSAInterface*)GetInterface();
     pedInterface->iMoveAnimGroup = (int)iAnimGroup;
 
     DWORD dwThis = (DWORD)pedInterface;
@@ -327,76 +306,6 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
         call    dwFunc
     }
 }
-
-/**
- * Gets information on the player's wanted status
- * @return Pointer to a CWanted class containing the wanted information for the PlayerPed.
- */
-// CWanted   * CPlayerPedSA::GetWanted (  )
-//{
-// return internalInterface->Wanted;
-//}
-
-/**
- * Gets the current weapon type that the playerped is using
- * @return DWORD containing the current weapon type
- * \todo Check this is the weapon type, not the actual weapon ID (or whatever)
- */
-/*DWORD CPlayerPedSA::GetCurrentWeaponType (  )
-{
-    return internalInterface->CurrentWeapon;
-}*/
-
-/**
- * Gets the time the last shot was fired by the playerped
- * @return DWORD containing a system time value
- */
-/*DWORD CPlayerPedSA::GetLastShotTime (  )
-{
-    return internalInterface->LastShotTime;
-}
-*/
-/**
- * Checks if the player is stationary on foot
- * \todo Does this duplicate?
- * @return BOOL TRUE if the player is stationary on foot, FALSE otherwise
- */
-/*
-BOOL CPlayerPedSA::IsStationaryOnFoot (  )
-{
-    return internalInterface->StationaryOnFoot;
-}*/
-
-/**
- * Resets the played ped to their initial state
- * \note This also resets some global values, such as game speed
- */
-/*
-VOID CPlayerPedSA::ResetToInitialState (  )
-{
-    DWORD dwFunction = FUNC_SetInitialState;
-    DWORD dwThis = (DWORD)internalInterface;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunction
-    }
-}*/
-
-/**
- * Clears information related to the player targeting
- */
-/*
-VOID CPlayerPedSA::ClearWeaponTarget (  )
-{
-    DWORD dwFunction = FUNC_ClearWeaponTarget;
-    DWORD dwThis = (DWORD)internalInterface;
-    _asm
-    {
-        mov     ecx, dwThis
-        call    dwFunction
-    }
-}*/
 
 ////////////////////////////////////////////////////////////////
 //

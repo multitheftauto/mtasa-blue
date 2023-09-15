@@ -17,9 +17,9 @@ project "Multiplayer SA"
 
 	filter {}
 		includedirs {
+			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/hwbrk"
 		}
 
 	pchheader "StdInc.h"
@@ -31,15 +31,13 @@ project "Multiplayer SA"
 		["*"] = "premake5.lua"
 	}
 
-	links { "hwbrk" }
-
 	files {
 		"premake5.lua",
 		"*.h",
 		"*.cpp"
 	}
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

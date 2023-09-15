@@ -11,17 +11,16 @@
 
 #include "StdInc.h"
 
-// These includes have to be fixed!
-#include "../game_sa/CPedSA.h"
+#include <game/CFireManager.h>
+#include <game/CProjectile.h>
+#include <game/CProjectileInfo.h>
+#include <game/CEventList.h>
 #include "../game_sa/CEventDamageSA.h"
-#include "../game_sa/CColPointSA.h"
 #include <net/SyncStructures.h>
 
 extern CMultiplayerSA* pMultiplayer;
 
-using std::list;
-
-list<CShotSyncData*> ShotSyncData;
+std::list<CShotSyncData*> ShotSyncData;
 CShotSyncData        LocalShotSyncData;
 
 float*                        fDirectionX;
@@ -313,12 +312,12 @@ static void Event_BulletImpact()
     }
 }
 
-CPedSAInterface*       pAPed = NULL;
-float                  fTempPosX = 0, fTempPosY = 0, fTempPosZ = 0;
-CPed*                  pATargetingPed = NULL;
-CVector*               pTempVec;
-bool*                  pSkipAim;
-CRemoteDataStorageSA*  pTempRemote;
+CPedSAInterface*      pAPed = NULL;
+float                 fTempPosX = 0, fTempPosY = 0, fTempPosZ = 0;
+CPed*                 pATargetingPed = NULL;
+CVector*              pTempVec;
+bool*                 pSkipAim;
+CRemoteDataStorageSA* pTempRemote;
 
 VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
 {
@@ -340,7 +339,7 @@ VOID _declspec(naked) HOOK_CTaskSimpleUsegun_ProcessPed()
     }
 }
 
-static CPed * GetTargetingPed()
+static CPed* GetTargetingPed()
 {
     SClientEntity<CPedSA>* pClientEntity = m_pools->GetPed((DWORD*)pAPed);
     return pClientEntity ? pClientEntity->pEntity : nullptr;
@@ -930,7 +929,7 @@ void _declspec(naked) HOOK_CFireManager__StartFire_()
     }
 }
 
-static CEntity* GetProjectileOwner(CPools*  pPools)
+static CEntity* GetProjectileOwner(CPools* pPools)
 {
     CEntity* pOwner = nullptr;
     if (pProjectileOwner)
@@ -960,7 +959,7 @@ static CEntity* GetProjectileOwner(CPools*  pPools)
     return pOwner;
 }
 
-static void GetProjectileTarget(CPools*  pPools)
+static void GetProjectileTarget(CPools* pPools)
 {
     projectileTargetEntity = nullptr;
 
@@ -1012,7 +1011,7 @@ void ProcessProjectile()
     if (m_pProjectileHandler != NULL)
     {
         CPoolsSA* pPools = (CPoolsSA*)pGameInterface->GetPools();
-        CEntity* pOwner = GetProjectileOwner(pPools);
+        CEntity*  pOwner = GetProjectileOwner(pPools);
         GetProjectileTarget(pPools);
 
         CProjectileInfo* projectileInfo = pGameInterface->GetProjectileInfo()->GetProjectileInfo(dwProjectileInfoIndex);

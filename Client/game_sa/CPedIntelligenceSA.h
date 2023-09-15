@@ -12,21 +12,11 @@
 #pragma once
 
 #include <game/CPedIntelligence.h>
-#include "CEventSA.h"
+
+class CPedSAInterface;
 class CTaskManagerSA;
-class CVehicleScannerSA;
-class CTaskSimpleUseGunSAInterface;
 
-#include "CTaskManagerSA.h"
-#include "CVehicleScannerSA.h"
-
-#define FUNC_IsRespondingToEvent                    0x600DB0
-#define FUNC_GetCurrentEvent                        0x4ABE70
-#define FUNC_GetCurrentEventType                    0x4ABE60
 #define FUNC_CPedIntelligence_TestForStealthKill    0x601E00
-#define FUNC_CPedIntelligence_GetTaskUseGun         0x600F70
-
-class CPed;
 
 class CFightManagerInterface
 {
@@ -56,18 +46,12 @@ private:
     CPedIntelligenceSAInterface* internalInterface;
     CPed*                        ped;
     CTaskManagerSA*              TaskManager;
-    CVehicleScannerSA*           VehicleScanner;
 
 public:
     CPedIntelligenceSA(CPedIntelligenceSAInterface* pedIntelligenceSAInterface, CPed* ped);
     ~CPedIntelligenceSA();
-    CPedIntelligenceSAInterface*  GetInterface() { return this->internalInterface; }
-    bool                          IsRespondingToEvent();
-    int                           GetCurrentEventType();
-    CEvent*                       GetCurrentEvent();
-    CTaskManager*                 GetTaskManager();
-    CVehicleScanner*              GetVehicleScanner();
-    bool                          TestForStealthKill(CPed* pPed, bool bUnk);
-    CTaskSimpleUseGunSAInterface* GetTaskUseGun();
-    CTaskSAInterface*             SetTaskDuckSecondary(unsigned short nLengthOfDuck);
+    CPedIntelligenceSAInterface* GetInterface() { return internalInterface; }
+    CTaskManager*                GetTaskManager();
+    bool                         TestForStealthKill(CPed* pPed, bool bUnk);
+    CTaskSAInterface*            SetTaskDuckSecondary(unsigned short nLengthOfDuck);
 };

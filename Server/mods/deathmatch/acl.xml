@@ -33,6 +33,7 @@
    </group>
    <group name="RPC">
       <acl name="RPC" />
+      <object name="resource.ip2c" />
    </group>
    <group name="MapEditor">
       <acl name="Default" />
@@ -137,6 +138,8 @@
       <right name="function.updateResourceACLRequest" access="false" />
       <right name="function.shutdown" access="false" />
       <right name="function.setPlayerScriptDebugLevel" access="false" />
+      <right name="function.loadstring" access="false" />
+      <right name="function.load" access="false" />
    </acl>
    <acl name="Moderator">
       <right name="general.ModifyOtherObjects" access="false" />
@@ -254,6 +257,7 @@
       <right name="function.removeResourceDefaultSetting" access="true" />
       <right name="function.xmlLoadFile" access="true" />
       <right name="function.refreshResources" access="true" />
+      <right name="function.loadstring" access="true" />
    </acl>
    <acl name="raceACL">
       <right name="general.ModifyOtherObjects" access="true" />

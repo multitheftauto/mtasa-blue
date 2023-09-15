@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CHandlingManager.h"
+#include "CCommon.h"
+#include "CVehicleManager.h"
 
 SFixedArray<tHandlingData, HT_MAX> CHandlingManager::m_OriginalHandlingData;
 
@@ -97,7 +100,7 @@ CHandlingEntry* CHandlingManager::CreateHandlingData()
 bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -113,7 +116,7 @@ bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* p
 const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -127,7 +130,7 @@ const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eM
 const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -154,7 +157,7 @@ eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
 bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -8174,27 +8177,27 @@ void CHandlingManager::InitializeDefaultHandlings()
     m_OriginalHandlingData[209].ucTailLight = 1;
     m_OriginalHandlingData[209].ucAnimGroup = 0;
 
-    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];   // HT_HOTRINA = HT_HOTRING
+    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];            // HT_HOTRINA = HT_HOTRING
     m_OriginalHandlingData[210].iVehicleID = 210;
 
-    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];   // HT_HOTRINB = HT_HOTRING
+    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];            // HT_HOTRINB = HT_HOTRING
     m_OriginalHandlingData[211].iVehicleID = 211;
 
-    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];  // HT_SADLSHIT = HT_SADLER
+    m_OriginalHandlingData[212] = m_OriginalHandlingData[103];            // HT_SADLSHIT = HT_SADLER
     m_OriginalHandlingData[212].iVehicleID = 212;
 
-    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];   // HT_GLENSHIT = HT_GLENDALE
+    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];            // HT_GLENSHIT = HT_GLENDALE
     m_OriginalHandlingData[213].iVehicleID = 213;
 
-    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];  // HT_FAGGIO = HT_PIZZABOY
+    m_OriginalHandlingData[214] = m_OriginalHandlingData[163];            // HT_FAGGIO = HT_PIZZABOY
     m_OriginalHandlingData[214].iVehicleID = 214;
 
-    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];    // HT_FIRELA = HT_FIRETRUK
+    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];            // HT_FIRELA = HT_FIRETRUK
     m_OriginalHandlingData[215].iVehicleID = 215;
 
-    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];   // HT_RNCHLURE = HT_RANCHER
+    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];            // HT_RNCHLURE = HT_RANCHER
     m_OriginalHandlingData[216].iVehicleID = 216;
 
-    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];  // HT_FREIBOX = HT_FREIFLAT
+    m_OriginalHandlingData[217] = m_OriginalHandlingData[126];            // HT_FREIBOX = HT_FREIFLAT
     m_OriginalHandlingData[217].iVehicleID = 217;
 }

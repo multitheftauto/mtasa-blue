@@ -98,8 +98,6 @@ public:
     void               SetPlayerVersion(const CMtaVersion& strPlayerVersion);
     const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
     bool               ShouldIgnoreMinClientVersionChecks();
-    void               SetDiscordJoinSecret(const SString& joinSecret) { m_strDiscordJoinSecret = joinSecret; }
-    SString            GetDiscordJoinSecret() const { return m_strDiscordJoinSecret; }
 
     bool IsMuted() { return m_bIsMuted; };
     void SetMuted(bool bSetMuted) { m_bIsMuted = bSetMuted; };
@@ -117,16 +115,16 @@ public:
     long GetMoney() { return m_lMoney; };
     void SetMoney(long lMoney) { m_lMoney = lMoney; };
 
-    const CVector& GetSniperSourceVector() { return m_vecSniperSource; };
-    void           SetSniperSourceVector(const CVector& vecSource) { m_vecSniperSource = vecSource; };
-    void           GetTargettingVector(CVector& vecTarget) { vecTarget = m_vecTargetting; };
-    void           SetTargettingVector(const CVector& vecTarget) { m_vecTargetting = vecTarget; };
-    float          GetAimDirection() { return m_fAimDirection; };
-    void           SetAimDirection(float fDirection) { m_fAimDirection = fDirection; };
+    const CVector&       GetSniperSourceVector() { return m_vecSniperSource; };
+    void                 SetSniperSourceVector(const CVector& vecSource) { m_vecSniperSource = vecSource; };
+    void                 GetTargettingVector(CVector& vecTarget) { vecTarget = m_vecTargetting; };
+    void                 SetTargettingVector(const CVector& vecTarget) { m_vecTargetting = vecTarget; };
+    float                GetAimDirection() { return m_fAimDirection; };
+    void                 SetAimDirection(float fDirection) { m_fAimDirection = fDirection; };
     eVehicleAimDirection GetDriveByDirection() { return m_ucDriveByDirection; };
-    void           SetDriveByDirection(eVehicleAimDirection ucDirection) { m_ucDriveByDirection = ucDirection; };
-    bool           IsAkimboArmUp() { return m_bAkimboArmUp; };
-    void           SetAkimboArmUp(bool bUp) { m_bAkimboArmUp = bUp; };
+    void                 SetDriveByDirection(eVehicleAimDirection ucDirection) { m_ucDriveByDirection = ucDirection; };
+    bool                 IsAkimboArmUp() { return m_bAkimboArmUp; };
+    void                 SetAkimboArmUp(bool bUp) { m_bAkimboArmUp = bUp; };
 
     NetServerPlayerID& GetSocket() { return m_PlayerSocket; };
     const char*        GetSourceIP();
@@ -264,6 +262,9 @@ public:
     void SetLeavingServer(bool bLeaving) noexcept { m_bIsLeavingServer = bLeaving; }
     bool IsLeavingServer() const noexcept { return m_bIsLeavingServer; }
 
+    void SetRedirecting(bool bRedirecting) noexcept { m_bIsRedirecting = bRedirecting; }
+    bool IsRedirecting() const noexcept { return m_bIsRedirecting; }
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -361,16 +362,16 @@ private:
     CMtaVersion    m_strPlayerVersion;
     bool           m_bIsMuted;
     bool           m_bIsLeavingServer;
+    bool           m_bIsRedirecting;
     bool           m_bIsJoined;
-    SString        m_strDiscordJoinSecret;
 
     bool m_bNametagColorOverridden;
 
-    float         m_fCameraRotation;
-    long          m_lMoney;
-    CVector       m_vecSniperSource;
-    CVector       m_vecTargetting;
-    float         m_fAimDirection;
+    float                m_fCameraRotation;
+    long                 m_lMoney;
+    CVector              m_vecSniperSource;
+    CVector              m_vecTargetting;
+    float                m_fAimDirection;
     eVehicleAimDirection m_ucDriveByDirection;
 
     bool m_bAkimboArmUp;

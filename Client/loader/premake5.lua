@@ -8,21 +8,22 @@ project "Loader"
 		linkoptions { "/SAFESEH:NO" }
 
 	includedirs {
+		"../../Shared/sdk",
 		"../sdk",
-		"../../vendor"
-	}
-
-	libdirs {
-		"../../vendor/detours/lib"
+		"../../vendor",
+		"../../vendor/detours/4.0.1/src",
 	}
 
 	links {
 		"unrar", "d3d9",
-		"../../vendor/nvapi/x86/nvapi.lib"
+		"detours", "Imagehlp",
+		"../../vendor/nvapi/x86/nvapi.lib",
+		"cryptopp",
 	}
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
+	forceincludes { "StdInc.h" }
 
 	vpaths {
 		["Headers/*"] = "**.h",
@@ -43,7 +44,7 @@ project "Loader"
 			"resource/splash.bmp"
 		}
 
-	filter "architecture:x64"
+	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
 	filter "system:not windows"

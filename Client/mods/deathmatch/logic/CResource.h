@@ -76,6 +76,7 @@ public:
     CClientEntity*       GetResourceDFFRoot() { return m_pResourceDFFEntity; };
     CClientEntity*       GetResourceTXDRoot() { return m_pResourceTXDRoot; };
     CClientEntity*       GetResourceIFPRoot() { return m_pResourceIFPRoot; };
+    CClientEntity*       GetResourceIMGRoot() { return m_pResourceIMGRoot; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void DeleteClientChildren();
@@ -88,15 +89,22 @@ public:
     std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
 
-    void           SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
-    void           LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
+    /**
+     * @brief Searches for a CResourceFile with the given relative path.
+     * @param relativePath Relative resource file path (from meta)
+     * @return A pointer to CResourceFile on success, null otherwise
+     */
+    CResourceFile* GetResourceFile(const SString& relativePath) const;
+
+    void               SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
+    void               LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
     const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
-    bool           IsOOPEnabled() { return m_bOOPEnabled; }
-    void           HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
-    bool           IsWaitingForInitialDownloads();
-    int            GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
-    void           SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
+    bool               IsOOPEnabled() { return m_bOOPEnabled; }
+    void               HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript);
+    bool               IsWaitingForInitialDownloads();
+    int                GetDownloadPriorityGroup() { return m_iDownloadPriorityGroup; }
+    void               SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
 
 private:
     unsigned short       m_usNetID;
@@ -115,6 +123,7 @@ private:
     class CClientEntity* m_pResourceGUIEntity;
     class CClientEntity* m_pResourceTXDRoot;
     class CClientEntity* m_pResourceIFPRoot;
+    class CClientEntity* m_pResourceIMGRoot;
     unsigned short       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
     CMtaVersion          m_strMinServerReq;

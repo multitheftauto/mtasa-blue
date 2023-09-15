@@ -17,15 +17,13 @@
 class CScreenShot
 {
 public:
-    static SString PreScreenShot();
-    static void    PostScreenShot(const SString& strFileName);
-    static void    SetPath(const char* szPath);
+    static void InitiateScreenShot(bool bIsCameraShot);
+    static void CheckForScreenShot(bool bBeforeGUI);
 
-    static SString GetScreenShotPath(int iNumber);
-    static SString GetValidScreenshotFilename();
-    static int     GetScreenShots();
-
-    static void  BeginSave(const char* szFileName, void* pData, uint uiDataSize, uint uiWidth, uint uiHeight);
-    static bool  IsSaving();
-    static DWORD ThreadProc(LPVOID lpdwThreadParam);
+protected:
+    static void    StartSaveThread();
+    static void    ClearBuffer();
+    static SString GetScreenshotPath();
+    static bool    IsRateLimited(bool bIsCameraShot);
+    static DWORD   ThreadProc(LPVOID lpdwThreadParam);
 };

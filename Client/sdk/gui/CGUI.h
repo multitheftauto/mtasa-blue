@@ -126,6 +126,7 @@ public:
     virtual void        SetCursorEnabled(bool bEnabled) = 0;
     virtual bool        IsCursorEnabled() = 0;
     virtual void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false) = 0;
+    virtual void        SetCurrentServerCursorAlpha(float fAlpha) = 0;
     virtual float       GetCurrentServerCursorAlpha() = 0;
     virtual eCursorType GetCursorType() = 0;
 
@@ -163,9 +164,6 @@ public:
     virtual void SelectInputHandlers(eInputChannel channel) = 0;
     virtual void ClearInputHandlers(eInputChannel channel) = 0;
     virtual void ClearSystemKeys() = 0;
-
-    virtual bool IsTransferBoxVisible() = 0;
-    virtual void SetTransferBoxVisible(bool bVisible) = 0;
 
     virtual void CleanDeadPool() = 0;
 

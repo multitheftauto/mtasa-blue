@@ -10,6 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CResourceStartPacket.h"
+#include "CResourceClientScriptItem.h"
+#include "CResourceClientFileItem.h"
+#include "CResourceScriptItem.h"
+#include "CChecksum.h"
+#include "CResource.h"
+#include "CDummy.h"
 
 CResourceStartPacket::CResourceStartPacket(const char* szResourceName, CResource* pResource)
 {
@@ -42,7 +49,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
         unsigned short usNoClientCacheScriptCount = 0;
         if (m_pResource->IsClientScriptsOn() == true)
         {
-            list<CResourceFile*>::iterator iter = m_pResource->IterBegin();
+            std::list<CResourceFile*>::iterator iter = m_pResource->IterBegin();
             for (; iter != m_pResource->IterEnd(); ++iter)
             {
                 if ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_SCRIPT &&
@@ -71,7 +78,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Send the resource files info
-        list<CResourceFile*>::iterator iter = m_pResource->IterBegin();
+        std::list<CResourceFile*>::iterator iter = m_pResource->IterBegin();
         for (; iter != m_pResource->IterEnd(); iter++)
         {
             if (((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_CONFIG && m_pResource->IsClientConfigsOn()) ||
@@ -119,7 +126,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Loop through the exported functions
-        list<CExportedFunction>::iterator iterExportedFunction = m_pResource->IterBeginExportedFunctions();
+        std::list<CExportedFunction>::iterator iterExportedFunction = m_pResource->IterBeginExportedFunctions();
         for (; iterExportedFunction != m_pResource->IterEndExportedFunctions(); iterExportedFunction++)
         {
             // Check to see if the exported function is 'client'

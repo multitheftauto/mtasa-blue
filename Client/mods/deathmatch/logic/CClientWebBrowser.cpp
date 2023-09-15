@@ -101,9 +101,9 @@ void CClientWebBrowser::InjectMouseMove(int iPosX, int iPosY)
     m_pWebView->InjectMouseMove(iPosX, iPosY);
 }
 
-void CClientWebBrowser::InjectMouseDown(eWebBrowserMouseButton mouseButton)
+void CClientWebBrowser::InjectMouseDown(eWebBrowserMouseButton mouseButton, int count)
 {
-    m_pWebView->InjectMouseDown(mouseButton);
+    m_pWebView->InjectMouseDown(mouseButton, count);
 }
 
 void CClientWebBrowser::InjectMouseUp(eWebBrowserMouseButton mouseButton)
@@ -336,7 +336,7 @@ CClientGUIWebBrowser::CClientGUIWebBrowser(bool isLocal, bool isTransparent, uin
 
     if (m_pBrowser)
     {
-        m_pBrowser->SetParent(this); // m_pBrowser gets deleted automatically by the element tree logic
+        m_pBrowser->SetParent(this);            // m_pBrowser gets deleted automatically by the element tree logic
 
         // Set our owner resource
         m_pBrowser->SetResource(pLuaMain->GetResource());

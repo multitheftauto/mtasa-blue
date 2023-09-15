@@ -24,6 +24,7 @@ public:
     virtual SString            GetURL() = 0;
     virtual const SString&     GetTitle() = 0;
     virtual void               SetRenderingPaused(bool bPaused) = 0;
+    virtual const bool         GetRenderingPaused() const = 0;
     virtual void               Focus(bool state = true) = 0;
     virtual IDirect3DTexture9* GetTexture() = 0;
 
@@ -35,7 +36,7 @@ public:
     virtual bool GetProperty(const SString& strKey, SString& outProperty) = 0;
 
     virtual void InjectMouseMove(int iPosX, int iPosY) = 0;
-    virtual void InjectMouseDown(eWebBrowserMouseButton mouseButton) = 0;
+    virtual void InjectMouseDown(eWebBrowserMouseButton mouseButton, int count) = 0;
     virtual void InjectMouseUp(eWebBrowserMouseButton mouseButton) = 0;
     virtual void InjectMouseWheel(int iScrollVert, int iScrollHorz) = 0;
 

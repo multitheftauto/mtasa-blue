@@ -8,11 +8,14 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
-
+// Note: Cannot use #pragma once here, due to a duplicate existing in publicsdk
 #ifndef __CChecksum_H
 #define __CChecksum_H
 
 #include <variant>
+#include "SharedUtil.Hash.h"
+#include "SString.h"
+#include <bochs_internal/bochs_crc32.h>
 
 // Depends on CMD5Hasher and CRCGenerator
 class CChecksum
@@ -33,13 +36,17 @@ public:
     // GenerateChecksumFromFile returns either a CChecksum or an error message.
     static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
+        // Reset error number before using it to report an error
+        errno = 0;
+
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
 
-        if (!result.ulCRC)
+        if (!result.ulCRC && errno)
             return SString("CRC could not open file: %s", std::strerror(errno));
 
         bool success = CMD5Hasher().Calculate(strFilename, result.md5);
+
         if (!success)
             return SString("MD5 could not open file: %s", std::strerror(errno));
 

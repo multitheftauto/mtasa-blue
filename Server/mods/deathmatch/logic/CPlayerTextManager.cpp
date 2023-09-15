@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerTextManager.h"
+#include "packets/CServerTextItemPacket.h"
 
 CPlayerTextManager::CPlayerTextManager(CPlayer* player)
 {

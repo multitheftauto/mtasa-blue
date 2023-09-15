@@ -19,12 +19,10 @@ class CQuadBikeSAInterface : public CAutomobileSAInterface
     // fill this
 };
 
-class CQuadBikeSA : public virtual CQuadBike, public virtual CAutomobileSA
+class CQuadBikeSA final : public virtual CQuadBike, public virtual CAutomobileSA
 {
-private:
 public:
-    CQuadBikeSA(CQuadBikeSAInterface* quadbike);
-    CQuadBikeSA(eVehicleTypes dwModelID, unsigned char ucVariation, unsigned char ucVariation2);
+    CQuadBikeSA(CQuadBikeSAInterface* pInterface);
 
-    virtual ~CQuadBikeSA() {}
+    CQuadBikeSAInterface* GetQuadBikeInterface() { return reinterpret_cast<CQuadBikeSAInterface*>(GetInterface()); }
 };

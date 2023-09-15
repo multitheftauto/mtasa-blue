@@ -10,12 +10,24 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CClock.h>
+#include <game/CFireManager.h>
+#include <game/CGarage.h>
+#include <game/CGarages.h>
+#include <game/CHandlingEntry.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeaponStatManager.h>
+#include <game/CWeather.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
 
 using std::list;
 
 class CCore;
+
+std::wstring utf8_mbstowcs(const std::string& str);
+std::string  utf8_wcstombs(const std::wstring& wstr);
 
 // TODO: Make this independant of g_pClientGame. Just moved it here to get it out of the
 //       horribly big CClientGame file.
@@ -348,16 +360,11 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
     pPlayer->SetID(g_pClientGame->m_LocalID);
 
-    // Read out number of players
-    unsigned char ucNumberOfPlayers = 0;
-    bitStream.Read(ucNumberOfPlayers);
-
-    // Can't be 0
-    if (ucNumberOfPlayers == 0)
-    {
-        RaiseProtocolError(14);
-        return;
-    }
+    // For protocol backwards compatibility: read a single byte value.
+    // This used to hold the number of players, it was never used on the client side,
+    // and caused protocol error 14 whenever the player count was narrowed down to a single byte.
+    uint8_t numPlayers = 0;
+    bitStream.Read(numPlayers);
 
     // Read out the root element id
     ElementID RootElementID;
@@ -994,8 +1001,6 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             pPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
         }
     }
-
-    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
@@ -1027,8 +1032,6 @@ void CPacketHandler::Packet_PlayerQuit(NetBitStreamInterface& bitStream)
     {
         RaiseProtocolError(15);
     }
-
-    g_pClientGame->UpdateDiscordState();
 }
 
 void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
@@ -1336,14 +1339,15 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
     unsigned char ucRed;
     unsigned char ucGreen;
     unsigned char ucBlue;
-    bool          ucColorCoded;
+    bool          bColorCoded;
 
     CClientEntity* pClient = nullptr;
 
-    if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(ucColorCoded))
+    if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.ReadBit(bColorCoded))
     {
         // Read the client's ID
-        int iNumberOfBytesUsed;
+        int           iNumberOfBytesUsed;
+        unsigned char ucMessageType;
 
         if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
         {
@@ -1357,6 +1361,13 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
             iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - 4;
         }
 
+        if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
+        {
+            // Get the message type and push the argument
+            bitStream.Read(ucMessageType);
+            iNumberOfBytesUsed -= 1;
+        }
+
         // Valid length?
         if (iNumberOfBytesUsed >= MIN_CHATECHO_LENGTH)
         {
@@ -1366,7 +1377,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
             szMessage[iNumberOfBytesUsed] = 0;
             // actual limits enforced on the remote client, this is the maximum a string can be to be printed.
             if (MbUTF8ToUTF16(szMessage).size() <=
-                MAX_OUTPUTCHATBOX_LENGTH + 6)            // Extra 6 characters to fix #7125 (Teamsay + long name + long message = too long message)
+                MAX_CHATECHO_LENGTH + 6)            // Extra 6 characters to fix #7125 (Teamsay + long name + long message = too long message)
             {
                 // Strip it for bad characters
                 StripControlCodes(szMessage, ' ');
@@ -1381,11 +1392,16 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
                 Arguments.PushNumber(ucRed);
                 Arguments.PushNumber(ucGreen);
                 Arguments.PushNumber(ucBlue);
-                bool bCancelled = !pEntity->CallEvent("onClientChatMessage", Arguments, pEntity != pRootEntity);
-                if (!bCancelled)
+
+                if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
+                {
+                    Arguments.PushNumber(ucMessageType);
+                }
+
+                if (pEntity->CallEvent("onClientChatMessage", Arguments, pEntity != pRootEntity))
                 {
                     // Echo it
-                    g_pCore->ChatEchoColor(szMessage, ucRed, ucGreen, ucBlue, ucColorCoded);
+                    g_pCore->ChatEchoColor(szMessage, ucRed, ucGreen, ucBlue, bColorCoded);
                 }
             }
             delete[] szMessage;
@@ -1761,9 +1777,32 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             CClientPed* pJacked = pVehicle->GetOccupant(ucSeat);
 
                             // If it's the local player or syncing ped getting jacked, reset some stuff
-                            if (pJacked && (pJacked->IsLocalPlayer() || pJacked->IsSyncing()))
-                            {
-                                pJacked->ResetVehicleInOut();
+                            if (pJacked) {
+                                if (pJacked->IsLocalPlayer() || pJacked->IsSyncing()) {
+                                    pJacked->ResetVehicleInOut();
+                                }
+                                else {
+                                    // Desynced? Outside but supposed to be in
+                                    // For local player or synced peds this is taken care of in CClientPed::UpdateVehicleInOut()
+                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle()) {
+                                        // Warp him back in
+                                        pJacked->WarpIntoVehicle(pJacked->GetOccupiedVehicle(), pJacked->GetOccupiedVehicleSeat());
+
+                                        // For bikes and cars where jacked through passenger door, warp the passenger back in if desynced
+                                        if (ucSeat == 0) {
+                                            CClientPed* pPassenger = pJacked->GetOccupiedVehicle()->GetOccupant(1);
+                                            // Is the passenger a remote player or ped and is he physically outside but supposed to be in
+                                            if (pPassenger &&
+                                                !pPassenger->IsLocalPlayer() &&
+                                                !pPassenger->IsSyncing() &&
+                                                pPassenger->GetOccupiedVehicle() &&
+                                                !pPassenger->GetRealOccupiedVehicle())
+                                            {
+                                                pPassenger->WarpIntoVehicle(pPassenger->GetOccupiedVehicle(), pPassenger->GetOccupiedVehicleSeat());
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -2274,7 +2313,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Apply world non-sea level (to all world water)
     if (bHasNonSeaLevel)
         g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fNonSeaLevel, nullptr, true, false, false);
-     // Apply outside world level (before -3000 and after 3000)
+    // Apply outside world level (before -3000 and after 3000)
     if (bHasOutsideLevel)
         g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fOutsideLevel, nullptr, false, false, true);
     // Apply world sea level (to world sea level water only)
@@ -2312,6 +2351,24 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_FASTSPRINT, funBugs.data3.bFastSprint);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_BADDRIVEBYHITBOX, funBugs.data4.bBadDrivebyHitboxes);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_QUICKSTAND, funBugs.data5.bQuickStand);
+
+    SWorldSpecialPropertiesStateSync wsProps;
+    if (bitStream.Can(eBitStreamVersion::WorldSpecialProperties))
+        bitStream.Read(&wsProps);
+
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::HOVERCARS, wsProps.data.hovercars);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::AIRCARS, wsProps.data.aircars);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRABUNNY, wsProps.data.extrabunny);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRAJUMP, wsProps.data.extrajump);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::RANDOMFOLIAGE, wsProps.data.randomfoliage);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::SNIPERMOON, wsProps.data.snipermoon);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRAAIRRESISTANCE, wsProps.data.extraairresistance);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::UNDERWORLDWARP, wsProps.data.underworldwarp);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLESUNGLARE, wsProps.data.vehiclesunglare);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::CORONAZTEST, wsProps.data.coronaztest);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::WATERCREATURES, wsProps.data.watercreatures);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::BURNFLIPPEDCARS, wsProps.data.burnflippedcars);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FIREBALLDESTRUCT, wsProps.data2.fireballdestruct);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
@@ -2653,6 +2710,7 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // CMatrix              (48)    - matrix
         // unsigned char        (1)     - vehicle id
         // float                (4)     - health
+        // unsigned char        (1)     - blow state (if supported)
         // unsigned char        (1)     - color 1
         // unsigned char        (1)     - color 2
         // unsigned char        (1)     - color 3
@@ -2940,6 +2998,9 @@ retry:
                         if (bitStream.ReadBit())
                             pObject->SetDoubleSided(true);
 
+                        if (bitStream.Can(eBitStreamVersion::CEntityAddPacket_ObjectBreakable))
+                            pObject->SetBreakable(bitStream.ReadBit());
+
                         if (bitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                             if (bitStream.ReadBit())
                                 pObject->SetVisibleInAllDimensions(true);
@@ -3202,6 +3263,35 @@ retry:
                         return;
                     }
 
+                    // Read out blow state
+                    VehicleBlowState blowState = VehicleBlowState::INTACT;
+                    unsigned char    rawBlowState = 0;
+
+                    if (bitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+                    {
+                        if (!bitStream.ReadBits(&rawBlowState, 2))
+                        {
+                            RaiseEntityAddError(75);
+                            return;
+                        }
+
+                        switch (rawBlowState)
+                        {
+                            case 1:
+                                blowState = VehicleBlowState::AWAITING_EXPLOSION_SYNC;
+                                break;
+                            case 2:
+                                blowState = VehicleBlowState::BLOWN;
+                                break;
+                        }
+                    }
+                    else if (health.data.fValue <= 0.0f)
+                    {
+                        // Blow state is not supported by the server and we are required to blow the vehicle
+                        // if the health is equal to or below zero
+                        blowState = VehicleBlowState::AWAITING_EXPLOSION_SYNC;
+                    }
+
                     // Read out the color
                     CVehicleColor vehColor;
                     uchar         ucNumColors = 0;
@@ -3255,8 +3345,9 @@ retry:
                         return;
                     }
 
-                    // Set the health, color and paintjob
+                    // Set the health, blow state, color and paintjob
                     pVehicle->SetHealth(health.data.fValue);
+                    pVehicle->SetBlowState(blowState);
                     pVehicle->SetPaintjob(paintjob.data.ucPaintjob);
                     pVehicle->SetColor(vehColor);
 
@@ -3575,20 +3666,16 @@ retry:
                     if (icon <= RADAR_MARKER_LIMIT)
                         pBlip->SetSprite(icon);
 
-                    // Read out size and color if there's no icon
-                    if (icon == 0)
-                    {
-                        // Read out the size
-                        SIntegerSync<unsigned char, 5> size;
-                        bitStream.Read(&size);
+                    // Read out the size
+                    SIntegerSync<unsigned char, 5> size;
+                    bitStream.Read(&size);
 
-                        // Read out the color
-                        SColorSync color;
-                        bitStream.Read(&color);
+                    // Read out the color
+                    SColorSync color;
+                    bitStream.Read(&color);
 
-                        pBlip->SetScale(size);
-                        pBlip->SetColor(color);
-                    }
+                    pBlip->SetScale(size);
+                    pBlip->SetColor(color);
 
                     break;
                 }
@@ -3964,6 +4051,12 @@ retry:
                                 pPolygon->AddPoint(vertex.data.vecPosition);
                             }
                             pEntity = pShape = pPolygon;
+                            if (bitStream.Can(eBitStreamVersion::SetColPolygonHeight))
+                            {
+                                float fFloor, fCeil;
+                                if (bitStream.Read(fFloor) && bitStream.Read(fCeil))
+                                    pPolygon->SetHeight(fFloor, fCeil);
+                            }
                             break;
                         }
                         default:
@@ -4016,7 +4109,8 @@ retry:
                     }
                     else
                     {
-                        pWater = new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
+                        pWater =
+                            new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
                     if (!pWater->Exists())
                     {
@@ -4085,7 +4179,7 @@ retry:
             pTempEntity->SetParent(pParent);
         }
 
-        if (TempAttachedToID != INVALID_ELEMENT_ID && pTempEntity->GetType() != CCLIENTPLAYER)
+        if (TempAttachedToID != INVALID_ELEMENT_ID)
         {
             CClientEntity* pAttachedToEntity = CElementIDs::GetElement(TempAttachedToID);
             if (pAttachedToEntity)
@@ -4392,6 +4486,19 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
     if (bHasOrigin && !bitStream.Read(OriginID))
         return;
 
+    // Explosion sync may include information, whether a vehicle was blown without an explosion
+    bool isVehicleResponsible = false;
+    bool blowVehicleWithoutExplosion = false;
+
+    if (bHasOrigin && bitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
+    {
+        if (!bitStream.ReadBit(isVehicleResponsible))
+            return;
+
+        if (isVehicleResponsible && !bitStream.ReadBit(blowVehicleWithoutExplosion))
+            return;
+    }
+
     // Read out the position
     SPositionSync position(false);
     if (!bitStream.Read(&position))
@@ -4497,17 +4604,34 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
             case EXP_TYPE_CAR_QUICK:
             case EXP_TYPE_HELI:
             {
-                // Make sure the vehicle's blown
-                CClientVehicle* pExplodingVehicle = static_cast<CClientVehicle*>(pOrigin);
-                pExplodingVehicle->Blow(false);
+                CClientVehicle* vehicle = static_cast<CClientVehicle*>(pOrigin);
+
+                if (blowVehicleWithoutExplosion)
+                    bCancelExplosion = true;
+
+                // Make sure the vehicle is blown (even if fixed before)
+                if (vehicle->GetBlowState() == VehicleBlowState::INTACT)
+                {
+                    VehicleBlowFlags blow;
+                    blow.withMovement = false;
+                    blow.withExplosion = !bCancelExplosion;
+                    vehicle->Blow(blow);
+                }
+
+                // Change the blow state only if the vehicle wasn't fixed
+                if (vehicle->GetBlowState() != VehicleBlowState::INTACT)
+                    vehicle->SetBlowState(VehicleBlowState::BLOWN);
 
                 // Call onClientVehicleExplode
-                CLuaArguments Arguments;
-                pExplodingVehicle->CallEvent("onClientVehicleExplode", Arguments, true);
+                CLuaArguments arguments;
+                arguments.PushBoolean(!bCancelExplosion);            // withExplosion
+                vehicle->CallEvent("onClientVehicleExplode", arguments, true);
 
                 if (!bCancelExplosion)
+                {
                     g_pClientGame->m_pManager->GetExplosionManager()->Create(EXP_TYPE_GRENADE, position.data.vecPosition, pCreator, true, -1.0f, false,
                                                                              WEAPONTYPE_EXPLOSION);
+                }
                 break;
             }
             default:
@@ -4800,7 +4924,7 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
             // Read out the arguments aswell
             CLuaArguments Arguments(bitStream);
 
-            // Grab the event. Does it exist and is it remotly triggerable?
+            // Grab the event. Does it exist and is it remotely triggerable?
             SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
             if (pEvent)
             {
@@ -4814,7 +4938,7 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
                     }
                 }
                 else
-                    g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not marked as remotly triggerable",
+                    g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not marked as remotely triggerable",
                                                                 szName);
             }
             else
@@ -4857,21 +4981,39 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     unsigned short usNoClientCacheScriptCount = 0;
 
     // Resource Name Size
-    unsigned char ucResourceNameSize;
-    bitStream.Read(ucResourceNameSize);
+    unsigned char ucResourceNameSizeTemp;
+    bitStream.Read(ucResourceNameSizeTemp);
 
-    // ucResourceNameSize > 255 ??
-    if (ucResourceNameSize > MAX_RESOURCE_NAME_LENGTH)
+    // ucResourceNameSizeTemp > 255 ??
+    if (ucResourceNameSizeTemp > MAX_RESOURCE_NAME_LENGTH)
     {
         RaiseFatalError(14);
         return;
     }
 
     // Resource Name
-    char* szResourceName = new char[ucResourceNameSize + 1];
-    bitStream.Read(szResourceName, ucResourceNameSize);
-    if (ucResourceNameSize)
-        szResourceName[ucResourceNameSize] = NULL;
+    auto szResourceNameTemp = new char[ucResourceNameSizeTemp + 1];
+    bitStream.Read(szResourceNameTemp, ucResourceNameSizeTemp);
+    if (ucResourceNameSizeTemp)
+        szResourceNameTemp[ucResourceNameSizeTemp] = NULL;
+
+    // Clean resource name (remove Windows unsupported characters from filename)
+    std::string strResourceName = szResourceNameTemp;
+    delete[] szResourceNameTemp;
+    szResourceNameTemp = nullptr;
+    std::wstring         wstrResourceNameTemp = utf8_mbstowcs(strResourceName);
+    constexpr std::array arrRemoveDirChars = {'/', '\\', ':', '*', '?', '"', '<', '>', '|'};
+    for (auto szChar : arrRemoveDirChars)
+        wstrResourceNameTemp.erase(std::remove(wstrResourceNameTemp.begin(), wstrResourceNameTemp.end(), szChar), wstrResourceNameTemp.end());
+    strResourceName = utf8_wcstombs(wstrResourceNameTemp);
+    const char* szResourceName = strResourceName.c_str();
+
+    // Must have at least one character left in the resource name
+    if (strResourceName.length() < 1)
+    {
+        RaiseFatalError(15);
+        return;
+    }
 
     // Resource ID
     unsigned short usResourceID;
@@ -4918,6 +5060,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         return;
     }
 
+    bool bFatalError = false;
+
     CResource* pResource = g_pClientGame->m_pResourceManager->Add(usResourceID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq,
                                                                   strMinClientReq, bEnableOOP);
     if (pResource)
@@ -4930,7 +5074,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         // Resource Chunk Size
         unsigned char ucChunkSize;
         // Resource Chunk Data
-        char* szChunkData = NULL;
+        char* szChunkData = nullptr;
         // Resource Chunk Sub Type
         unsigned char ucChunkSubType;
         // Resource Chunk checksum
@@ -4966,61 +5110,97 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                         }
                         szChunkData[ucChunkSize] = NULL;
 
-                        bitStream.Read(ucChunkSubType);
-                        bitStream.Read(chunkChecksum.ulCRC);
-                        bitStream.Read((char*)chunkChecksum.md5.data, sizeof(chunkChecksum.md5.data));
-                        bitStream.Read(dChunkDataSize);
-
-                        uint uiDownloadSize = (uint)dChunkDataSize;
-                        uiTotalSizeProcessed += uiDownloadSize;
-                        if (uiTotalSizeProcessed / 1024 / 1024 > 50)
-                            g_pCore->UpdateDummyProgress(uiTotalSizeProcessed / 1024 / 1024, " MB");
-
-                        // Create the resource downloadable
-                        CDownloadableResource* pDownloadableResource = NULL;
-                        switch (ucChunkSubType)
+                        // Clean resource name (remove Windows unsupported characters from filename)
+                        std::string          strChunkData = szChunkData;
+                        std::wstring         wstrChunkDataTemp = utf8_mbstowcs(strChunkData);
+                        constexpr std::array arrRemoveFileChars = {':', '*', '?', '"', '<', '>', '|'};
+                        for (auto szChar : arrRemoveFileChars)
+                            wstrChunkDataTemp.erase(std::remove(wstrChunkDataTemp.begin(), wstrChunkDataTemp.end(), szChar), wstrChunkDataTemp.end());
+                        strChunkData = utf8_wcstombs(wstrChunkDataTemp);
+                        if (strChunkData.empty())
                         {
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                            {
-                                bool bDownload = bitStream.ReadBit();
-                                pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szChunkData,
-                                                                                   uiDownloadSize, chunkChecksum, bDownload);
-
-                                break;
-                            }
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                                pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT, szChunkData,
-                                                                                   uiDownloadSize, chunkChecksum, true);
-
-                                break;
-                            case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                                pDownloadableResource = pResource->AddConfigFile(szChunkData, uiDownloadSize, chunkChecksum);
-
-                                break;
-                            default:
-
-                                break;
+                            bFatalError = true;
+                            AddReportLog(2081, "Empty");
+                            break;
                         }
+                        const char* szParsedChunkData = strChunkData.c_str();
 
-                        // Does the Client and Server checksum differ?
-                        if (pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch())
+                        // make the full file path (c:/path/to/mods/deathmatch/resources/resource/)
+                        std::string           strMetaPathTemp;
+                        std::string           strResPathTemp = pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, strMetaPathTemp);
+                        std::filesystem::path fsResPath = std::filesystem::path(strResPathTemp).lexically_normal();
+                        std::string           strResPath = fsResPath.string();
+                        // make the full file path (c:/path/to/mods/deathmatch/resources/resource/file.lua)
+                        std::string strResFilePathTemp = strResPath + static_cast<char>(std::filesystem::path::preferred_separator);
+                        strResFilePathTemp += strChunkData;
+                        std::filesystem::path fsResFilePath = std::filesystem::path(strResFilePathTemp).lexically_normal();
+                        std::string           strResFilePath = fsResFilePath.string();
+                        // check that full file path contains full resource path
+                        if (strResFilePath.rfind(strResPath, 0) != 0)
                         {
-                            // Delete the file that already exists
-                            FileDelete(pDownloadableResource->GetName());
-                            if (FileExists(pDownloadableResource->GetName()))
+                            bFatalError = true;
+                            AddReportLog(2081, SString("Path %s (expected %s)", strResFilePath.c_str(), strResPath.c_str()));
+                        }
+                        else
+                        {
+                            bitStream.Read(ucChunkSubType);
+                            bitStream.Read(chunkChecksum.ulCRC);
+                            bitStream.Read(reinterpret_cast<char*>(chunkChecksum.md5.data), sizeof(chunkChecksum.md5.data));
+                            bitStream.Read(dChunkDataSize);
+
+                            uint uiDownloadSize = static_cast<uint>(dChunkDataSize);
+                            uiTotalSizeProcessed += uiDownloadSize;
+                            if (uiTotalSizeProcessed / 1024 / 1024 > 50)
+                                g_pCore->UpdateDummyProgress(uiTotalSizeProcessed / 1024 / 1024, " MB");
+
+                            // Create the resource downloadable
+                            CDownloadableResource* pDownloadableResource = nullptr;
+                            switch (ucChunkSubType)
                             {
-                                SString strMessage("Unable to delete old file %s", *ConformResourcePath(pDownloadableResource->GetName()));
-                                g_pClientGame->TellServerSomethingImportant(1009, strMessage);
+                                case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE:
+                                {
+                                    bool bDownload = bitStream.ReadBit();
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_FILE, szParsedChunkData,
+                                                                                       uiDownloadSize, chunkChecksum, bDownload);
+
+                                    break;
+                                }
+                                case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_SCRIPT,
+                                                                                       szParsedChunkData, uiDownloadSize, chunkChecksum, true);
+
+                                    break;
+                                case CDownloadableResource::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+                                    pDownloadableResource = pResource->AddConfigFile(szParsedChunkData, uiDownloadSize, chunkChecksum);
+
+                                    break;
+                                default:
+
+                                    break;
                             }
 
-                            // Is it downloadable now?
-                            if (pDownloadableResource->IsAutoDownload())
+                            // Does the Client and Server checksum differ?
+                            if (pDownloadableResource && !pDownloadableResource->DoesClientAndServerChecksumMatch())
                             {
-                                // Make sure the directory exists
-                                MakeSureDirExists(pDownloadableResource->GetName());
+                                const SString strName = pDownloadableResource->GetName();
 
-                                // Queue the file to be downloaded
-                                g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pDownloadableResource);
+                                // Delete the file that already exists
+                                FileDelete(strName);
+                                if (FileExists(strName))
+                                {
+                                    SString strMessage("Unable to delete old file %s", *ConformResourcePath(strName));
+                                    g_pClientGame->TellServerSomethingImportant(1009, strMessage);
+                                }
+
+                                // Is it downloadable now?
+                                if (pDownloadableResource->IsAutoDownload())
+                                {
+                                    // Make sure the directory exists
+                                    MakeSureDirExists(strName);
+
+                                    // Queue the file to be downloaded
+                                    g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pDownloadableResource);
+                                }
                             }
                         }
                     }
@@ -5033,28 +5213,39 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
             {
                 // Delete the chunk data
                 delete[] szChunkData;
-                szChunkData = NULL;
+                szChunkData = nullptr;
+            }
+
+            if (bFatalError)
+            {
+                break;
             }
         }
 
-        g_pClientGame->GetResourceFileDownloadManager()->UpdatePendingDownloads();
-
-        // Are there any resources to being downloaded?
-        if (!g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles())
+        if (!bFatalError)
         {
-            // Load the resource now
-            if (pResource->CanBeLoaded())
+            g_pClientGame->GetResourceFileDownloadManager()->UpdatePendingDownloads();
+
+            // Are there any resources to being downloaded?
+            if (!g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles())
             {
-                pResource->Load();
+                // Load the resource now
+                if (pResource->CanBeLoaded())
+                {
+                    pResource->Load();
+                }
             }
         }
     }
 
-    delete[] szResourceName;
-    szResourceName = NULL;
-
     g_pCore->UpdateDummyProgress(0);
     totalSizeProcessedResetTimer.Reset();
+
+    if (bFatalError)
+    {
+        g_pClientGame->m_pResourceManager->Remove(pResource);
+        RaiseFatalError(2081);
+    }
 }
 
 void CPacketHandler::Packet_ResourceStop(NetBitStreamInterface& bitStream)

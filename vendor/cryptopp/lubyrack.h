@@ -37,7 +37,7 @@ class LR : public LR_Info<T>, public BlockCipherDocumentation
 		}
 
 	protected:
-		CRYPTOPP_CONSTANT(S=T::DIGESTSIZE)
+		CRYPTOPP_CONSTANT(S=T::DIGESTSIZE);
 		unsigned int L;	// key length / 2
 		SecByteBlock key;
 
@@ -115,7 +115,7 @@ class LR : public LR_Info<T>, public BlockCipherDocumentation
 			if (xorBlock)
 				xorbuf(outBlock, xorBlock, this->buffer, 2*this->S);
 			else
-				memcpy(outBlock, this->buffer, 2*this->S);
+				std::memcpy(outBlock, this->buffer, 2*this->S);
 		}
 #undef KL
 #undef KR

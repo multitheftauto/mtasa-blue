@@ -85,8 +85,8 @@ public:
 
     // our function(s)
     void              SetInterface(CTaskSAInterface* pInterface) { TaskInterface = pInterface; };
-    CTaskSAInterface* GetInterface() { return this->TaskInterface; }
-    bool              IsValid() { return this->GetInterface() != NULL; }
+    CTaskSAInterface* GetInterface() { return TaskInterface; }
+    bool              IsValid() { return GetInterface() != NULL; }
 
     void CreateTaskInterface(size_t nSize);
 
@@ -96,7 +96,8 @@ public:
     void DestroyJustThis();
 };
 
-union UCTask {
+union UCTask
+{
     CTask*   pTask;
     CTaskSA* pTaskSA;
 };

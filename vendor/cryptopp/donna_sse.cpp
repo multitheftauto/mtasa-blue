@@ -6,7 +6,7 @@
 // clean, but it has one potential problem. The original code is C and relies
 // upon unions. Accessing the inactive union member is undefined behavior in
 // C++. That means copying the array into packedelem8.u is OK; but then using
-// packedelem8.v in a calcualtion is UB. Fortunately most (all?) compilers
+// packedelem8.v in a calculation is UB. Fortunately most (all?) compilers
 // take pity on C++ developers and compile the code. We will have to keep an
 // eye on things or rewrite significant portions of this code.
 
@@ -25,6 +25,10 @@
 #if CRYPTOPP_GCC_DIAGNOSTIC_AVAILABLE
 # pragma GCC diagnostic ignored "-Wcast-align"
 # pragma GCC diagnostic ignored "-Wunused-function"
+#endif
+
+#if CRYPTOPP_MSC_VERSION
+# pragma warning(disable: 4244)
 #endif
 
 // Squash MS LNK4221 and libtool warnings
@@ -1059,13 +1063,13 @@ int curve25519_mult_SSE2(byte sharedKey[32], const byte secretKey[32], const byt
     packed32bignum25519 qx, qz, pqz, pqx;
     packed64bignum25519 nq, sq, sqscalar, prime, primex, primez, nqpq;
     bignum25519mulprecomp preq;
-    size_t i=0, bit=0, lastbit=0;
+    size_t bit=0;
 
     curve25519_expand(nqpqx, othersKey);
     curve25519_mul_precompute(&preq, nqpqx);
 
     /* do bits 254..3 */
-    for (i = 254, lastbit=0; i >= 3; i--) {
+    for (size_t i = 254, lastbit=0; i >= 3; i--) {
         bit = (e[i/8] >> (i & 7)) & 1;
         curve25519_swap_conditional(nqx, nqpqx, (word32)(bit ^ lastbit));
         curve25519_swap_conditional(nqz, nqpqz, (word32)(bit ^ lastbit));
@@ -1098,7 +1102,7 @@ int curve25519_mult_SSE2(byte sharedKey[32], const byte secretKey[32], const byt
     curve25519_swap_conditional(nqz, nqpqz, (word32)bit);
 
     /* do bits 2..0 */
-    for (i = 0; i < 3; i++) {
+    for (size_t i = 0; i < 3; i++) {
         curve25519_compute_nq(nq, nqx, nqz);
         curve25519_square_packed64(sq, nq); /* sq = nq^2 */
         curve25519_121665_packed64(sqscalar, sq); /* sqscalar = sq * [121666,121665] */

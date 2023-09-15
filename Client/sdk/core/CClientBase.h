@@ -28,11 +28,10 @@ public:
 
     virtual bool WebsiteRequestResultHandler(const std::unordered_set<SString>& newPages) = 0;
 
-    virtual bool ProcessCommand(const char* szCommandLine) = 0;
-    // virtual bool    ProcessInput                ( CInputMessage* pInputMessage ) = 0  *TODO*
+    virtual bool ProcessCommand(const char* commandName, size_t commandNameLength, const void* userdata, size_t userdataSize) = 0;
 
     virtual bool HandleException(CExceptionInformation* pExceptionInformation) = 0;
     virtual void GetPlayerNames(std::vector<SString>& vPlayerNames) = 0;
 
-    virtual void TriggerDiscordJoin(SString strSecret) = 0;
+    virtual void OnWindowFocusChange(bool state) = 0;
 };

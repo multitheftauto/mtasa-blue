@@ -13,6 +13,11 @@
 #include "CMouseControl.h"
 #include <windowsx.h>
 #include <game/CGame.h>
+#include <game/CModelInfo.h>
+#include <game/CPed.h>
+#include <game/CPools.h>
+#include <game/CSettings.h>
+#include <game/CVehicle.h>
 
 #define MOUSE_CONTROL_MULTIPLIER    35
 

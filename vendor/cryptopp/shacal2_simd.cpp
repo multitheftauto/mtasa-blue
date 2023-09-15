@@ -1,4 +1,4 @@
-// shacla2-simd.cpp - written and placed in the public domain by
+// shacla2_simd.cpp - written and placed in the public domain by
 //                    Jeffrey Walton and Jack Lloyd
 //
 //    Jack Lloyd and the Botan team allowed Crypto++ to use parts of
@@ -21,10 +21,6 @@
 # include <nmmintrin.h>
 # include <immintrin.h>
 #endif
-
-// Clang __m128i casts, http://bugs.llvm.org/show_bug.cgi?id=20670
-#define M128_CAST(x) ((__m128i *)(void *)(x))
-#define CONST_M128_CAST(x) ((const __m128i *)(const void *)(x))
 
 // Squash MS LNK4221 and libtool warnings
 extern const char SHACAL2_SIMD_FNAME[] = __FILE__;

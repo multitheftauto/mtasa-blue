@@ -225,7 +225,7 @@ public:
     unsigned char GetFightingStyle() { return m_ucFightingStyle; }
     void          SetFightingStyle(unsigned char ucStyle) { m_ucFightingStyle = ucStyle; }
 
-    unsigned char GetMoveAnim() { return m_iMoveAnim; }
+    unsigned char GetMoveAnim() { return static_cast<unsigned char>(m_iMoveAnim); }
     void          SetMoveAnim(int iMoveAnim) { m_iMoveAnim = iMoveAnim; }
 
     float GetGravity() { return m_fGravity; }
@@ -267,6 +267,15 @@ public:
 
     bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
+
+    long long GetLastFarSyncTick() { return m_llLastFarSyncTick; }
+    void      SetLastFarSyncTick(long long llLastSyncTick) { m_llLastFarSyncTick = llLastSyncTick; }
+
+    void                                  ClearNearPlayersList() { m_nearPlayersList.clear(); }
+    void                                  AddPlayerToNearList(CPlayer* pPlayer) { m_nearPlayersList.push_back(pPlayer); }
+    bool                                  IsNearPlayersListEmpty() { return m_nearPlayersList.empty(); }
+    std::vector<CPlayer*>::const_iterator NearPlayersIterBegin() { return m_nearPlayersList.begin(); }
+    std::vector<CPlayer*>::const_iterator NearPlayersIterEnd() { return m_nearPlayersList.end(); }
 
 protected:
     bool ReadSpecialData(const int iLine) override;
@@ -313,6 +322,9 @@ protected:
 
     bool m_bSyncable;
     bool m_bCollisionsEnabled;
+
+    long long             m_llLastFarSyncTick = 0;
+    std::vector<CPlayer*> m_nearPlayersList;
 
 private:
     CPedManager* m_pPedManager;

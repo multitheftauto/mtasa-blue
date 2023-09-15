@@ -79,8 +79,8 @@ inline void MakeOddKey(const word64 evenkey[NB], word64 oddkey[NB])
     const byte* even = reinterpret_cast<const byte*>(evenkey);
     byte* odd = reinterpret_cast<byte*>(oddkey);
 
-    memcpy(odd, even + V, U - V);
-    memcpy(odd + U - V, even, V);
+    std::memcpy(odd, even + V, U - V);
+    std::memcpy(odd + U - V, even, V);
 #endif
 }
 
@@ -421,7 +421,7 @@ void Kalyna128::Base::SetKey_22(const word64 key[2])
     word64 *ks = m_wspace+0, *ksc = m_wspace+2, *t1 = m_wspace+4;
     word64 *t2 = m_wspace+6, *k = m_wspace+8, *kswapped = m_wspace+10;
 
-    memset(t1, 0, 2*8);
+    std::memset(t1, 0, 2*8);
     t1[0] = (128 + 128 + 64) / 64;
 
     AddKey<2>(t1, t2, key);
@@ -432,7 +432,7 @@ void Kalyna128::Base::SetKey_22(const word64 key[2])
     word64 constant = W64LIT(0x0001000100010001);
 
     // round 0
-    memcpy(k, key, 16);
+    std::memcpy(k, key, 16);
     kswapped[1] = k[0];
     kswapped[0] = k[1];
 
@@ -496,10 +496,10 @@ void Kalyna128::Base::SetKey_24(const word64 key[4])
     word64 *ks = m_wspace+0, *ksc = m_wspace+2, *t1 = m_wspace+4, *t2 = m_wspace+6;
     word64 *k = m_wspace+8, *ka = m_wspace+12, *ko = m_wspace+14;
 
-    memset(t1, 0, 2*8);
+    std::memset(t1, 0, 2*8);
     t1[0] = (128 + 256 + 64) / 64;
-    memcpy(ka, key, 16);
-    memcpy(ko, key + 2, 16);
+    std::memcpy(ka, key, 16);
+    std::memcpy(ko, key + 2, 16);
 
     AddKey<2>(t1, t2, ka);
     G128(t2, t1, ko);
@@ -509,7 +509,7 @@ void Kalyna128::Base::SetKey_24(const word64 key[4])
     word64 constant = W64LIT(0x0001000100010001);
 
     // round 0
-    memcpy(k, key, 256 / 8);
+    std::memcpy(k, key, 256 / 8);
     AddConstant<2>(ks, ksc, constant);
     AddKey<2>(k, t2, ksc);
     G128(t2, t1, ksc);
@@ -597,7 +597,7 @@ void Kalyna256::Base::SetKey_44(const word64 key[4])
     word64 *ks = m_wspace+0, *ksc = m_wspace+4, *t1 = m_wspace+8;
     word64 *t2 = m_wspace+12, *k = m_wspace+16;
 
-    memset(t1, 0, 32);
+    std::memset(t1, 0, 32);
     t1[0] = (256 + 256 + 64) / 64;
 
     AddKey<4>(t1, t2, key);
@@ -608,7 +608,7 @@ void Kalyna256::Base::SetKey_44(const word64 key[4])
     word64 constant = W64LIT(0x0001000100010001);
 
     // round 0
-    memcpy(k, key, 32);
+    std::memcpy(k, key, 32);
     AddConstant<4>(ks, ksc, constant);
     AddKey<4>(k, t2, ksc);
     G256(t2, t1, ksc);
@@ -700,10 +700,10 @@ void Kalyna256::Base::SetKey_48(const word64 key[8])
     word64 *ks = m_wspace+0, *ksc = m_wspace+4, *t1 = m_wspace+8, *t2 = m_wspace+12;
     word64 *k = m_wspace+16, *ka = m_wspace+24, *ko = m_wspace+28;
 
-    memset(t1, 0, 4*8);
+    std::memset(t1, 0, 4*8);
     t1[0] = (512 + 256 + 64) / 64;
-    memcpy(ka, key, 32);
-    memcpy(ko, key+4, 32);
+    std::memcpy(ka, key, 32);
+    std::memcpy(ko, key+4, 32);
 
     AddKey<4>(t1, t2, ka);
     G256(t2, t1, ko);
@@ -713,7 +713,7 @@ void Kalyna256::Base::SetKey_48(const word64 key[8])
     word64 constant = W64LIT(0x0001000100010001);
 
     // round 0
-    memcpy(k, key, 512 / 8);
+    std::memcpy(k, key, 512 / 8);
     AddConstant<4>(ks, ksc, constant);
     AddKey<4>(k, t2, ksc);
     G256(t2, t1, ksc);
@@ -822,7 +822,7 @@ void Kalyna512::Base::SetKey_88(const word64 key[8])
     word64 *ks = m_wspace+0, *ksc = m_wspace+8, *t1 = m_wspace+16;
     word64 *t2 = m_wspace+24, *k = m_wspace+32;
 
-    memset(t1, 0, 8*8);
+    std::memset(t1, 0, 8*8);
     t1[0] = (512 + 512 + 64) / 64;
 
     AddKey<8>(t1, t2, key);
@@ -833,7 +833,7 @@ void Kalyna512::Base::SetKey_88(const word64 key[8])
     word64 constant = W64LIT(0x0001000100010001);
 
     // round 0
-    memcpy(k, key, 512 / 8);
+    std::memcpy(k, key, 512 / 8);
     AddConstant<8>(ks, ksc, constant);
     AddKey<8>(k, t2, ksc);
     G512(t2, t1, ksc);
@@ -932,7 +932,7 @@ void Kalyna512::Base::SetKey_88(const word64 key[8])
 
 // *********************** ProcessAndXorBlock specializations *********************** //
 
-void Kalyna128::Base::ProcessBlock_22(const word64 inBlock[2], const word64 xorBlock[2], word64 outBlock[2]) const
+void Kalyna128::Base::ProcessBlock_22(const byte* inBlock, const byte* xorBlock, byte* outBlock) const
 {
     word64 *t1 = m_wspace+0, *t2 = m_wspace+2, *msg = m_wspace+4;
 
@@ -941,10 +941,9 @@ void Kalyna128::Base::ProcessBlock_22(const word64 inBlock[2], const word64 xorB
     InBlock iblk(inBlock);
     iblk(msg[0])(msg[1]);
 
-    inBlock = msg;
     if (IsForwardTransformation())
     {
-        AddKey<2>(inBlock, t1, m_rkeys);
+        AddKey<2>(msg, t1, m_rkeys);
         G128(t1, t2, &m_rkeys[2]);   // 1
         G128(t2, t1, &m_rkeys[4]);   // 2
         G128(t1, t2, &m_rkeys[6]);   // 3
@@ -958,7 +957,7 @@ void Kalyna128::Base::ProcessBlock_22(const word64 inBlock[2], const word64 xorB
     }
     else
     {
-        SubKey<2>(inBlock, t1, &m_rkeys[20]);
+        SubKey<2>(msg, t1, &m_rkeys[20]);
         IMC128(t1);
         IG128(t1, t2, &m_rkeys[18]);
         IG128(t2, t1, &m_rkeys[16]);
@@ -978,7 +977,7 @@ void Kalyna128::Base::ProcessBlock_22(const word64 inBlock[2], const word64 xorB
     oblk(t1[0])(t1[1]);
 }
 
-void Kalyna128::Base::ProcessBlock_24(const word64 inBlock[2], const word64 xorBlock[2], word64 outBlock[2]) const
+void Kalyna128::Base::ProcessBlock_24(const byte *inBlock, const byte *xorBlock, byte *outBlock) const
 {
     word64 *t1 = m_wspace+0, *t2 = m_wspace+2, *msg = m_wspace+4;
 
@@ -987,10 +986,9 @@ void Kalyna128::Base::ProcessBlock_24(const word64 inBlock[2], const word64 xorB
     InBlock iblk(inBlock);
     iblk(msg[0])(msg[1]);
 
-    inBlock = msg;
     if (IsForwardTransformation())
     {
-        AddKey<2>(inBlock, t1, m_rkeys);
+        AddKey<2>(msg, t1, m_rkeys);
         G128(t1, t2, &m_rkeys[ 2]); // 1
         G128(t2, t1, &m_rkeys[ 4]); // 2
         G128(t1, t2, &m_rkeys[ 6]); // 3
@@ -1008,7 +1006,7 @@ void Kalyna128::Base::ProcessBlock_24(const word64 inBlock[2], const word64 xorB
     }
     else
     {
-        SubKey<2>(inBlock, t1, &m_rkeys[28]);
+        SubKey<2>(msg, t1, &m_rkeys[28]);
         IMC128(t1);
         IG128(t1, t2, &m_rkeys[26]);
         IG128(t2, t1, &m_rkeys[24]);
@@ -1032,7 +1030,7 @@ void Kalyna128::Base::ProcessBlock_24(const word64 inBlock[2], const word64 xorB
     oblk(t1[0])(t1[1]);
 }
 
-void Kalyna256::Base::ProcessBlock_44(const word64 inBlock[4], const word64 xorBlock[4], word64 outBlock[4]) const
+void Kalyna256::Base::ProcessBlock_44(const byte *inBlock, const byte *xorBlock, byte *outBlock) const
 {
     word64 *t1 = m_wspace+0, *t2 = m_wspace+4, *msg = m_wspace+8;
 
@@ -1041,10 +1039,9 @@ void Kalyna256::Base::ProcessBlock_44(const word64 inBlock[4], const word64 xorB
     InBlock iblk(inBlock);
     iblk(msg[0])(msg[1])(msg[2])(msg[3]);
 
-    inBlock = msg;
     if (IsForwardTransformation())
     {
-        AddKey<4>(inBlock, t1, m_rkeys);
+        AddKey<4>(msg, t1, m_rkeys);
         G256(t1, t2, &m_rkeys[4]); // 1
         G256(t2, t1, &m_rkeys[8]); // 2
         G256(t1, t2, &m_rkeys[12]); // 3
@@ -1062,7 +1059,7 @@ void Kalyna256::Base::ProcessBlock_44(const word64 inBlock[4], const word64 xorB
     }
     else
     {
-        SubKey<4>(inBlock, t1, &m_rkeys[56]);
+        SubKey<4>(msg, t1, &m_rkeys[56]);
         IMC256(t1);
         IG256(t1, t2, &m_rkeys[52]);
         IG256(t2, t1, &m_rkeys[48]);
@@ -1086,7 +1083,7 @@ void Kalyna256::Base::ProcessBlock_44(const word64 inBlock[4], const word64 xorB
     oblk(t1[0])(t1[1])(t1[2])(t1[3]);
 }
 
-void Kalyna256::Base::ProcessBlock_48(const word64 inBlock[4], const word64 xorBlock[4], word64 outBlock[4]) const
+void Kalyna256::Base::ProcessBlock_48(const byte *inBlock, const byte *xorBlock, byte *outBlock) const
 {
     word64 *t1 = m_wspace+0, *t2 = m_wspace+4, *msg = m_wspace+8;
 
@@ -1095,10 +1092,9 @@ void Kalyna256::Base::ProcessBlock_48(const word64 inBlock[4], const word64 xorB
     InBlock iblk(inBlock);
     iblk(msg[0])(msg[1])(msg[2])(msg[3]);
 
-    inBlock = msg;
     if (IsForwardTransformation())
     {
-        AddKey<4>(inBlock, t1, m_rkeys);
+        AddKey<4>(msg, t1, m_rkeys);
         G256(t1, t2, &m_rkeys[4]); // 1
         G256(t2, t1, &m_rkeys[8]); // 2
         G256(t1, t2, &m_rkeys[12]); // 3
@@ -1120,7 +1116,7 @@ void Kalyna256::Base::ProcessBlock_48(const word64 inBlock[4], const word64 xorB
     }
     else
     {
-        SubKey<4>(inBlock, t1, &m_rkeys[72]);
+        SubKey<4>(msg, t1, &m_rkeys[72]);
         IMC256(t1);
         IG256(t1, t2, &m_rkeys[68]);
         IG256(t2, t1, &m_rkeys[64]);
@@ -1148,7 +1144,7 @@ void Kalyna256::Base::ProcessBlock_48(const word64 inBlock[4], const word64 xorB
     oblk(t1[0])(t1[1])(t1[2])(t1[3]);
 }
 
-void Kalyna512::Base::ProcessBlock_88(const word64 inBlock[8], const word64 xorBlock[8], word64 outBlock[8]) const
+void Kalyna512::Base::ProcessBlock_88(const byte *inBlock, const byte *xorBlock, byte *outBlock) const
 {
     word64 *t1 = m_wspace+0, *t2 = m_wspace+8, *msg = m_wspace+16;
 
@@ -1157,10 +1153,9 @@ void Kalyna512::Base::ProcessBlock_88(const word64 inBlock[8], const word64 xorB
     InBlock iblk(inBlock);
     iblk(msg[0])(msg[1])(msg[2])(msg[3])(msg[4])(msg[5])(msg[6])(msg[7]);
 
-    inBlock = msg;
     if (IsForwardTransformation())
     {
-        AddKey<8>(inBlock, t1, m_rkeys);
+        AddKey<8>(msg, t1, m_rkeys);
         G512(t1, t2, &m_rkeys[8]); // 1
         G512(t2, t1, &m_rkeys[16]); // 2
         G512(t1, t2, &m_rkeys[24]); // 3
@@ -1182,7 +1177,7 @@ void Kalyna512::Base::ProcessBlock_88(const word64 inBlock[8], const word64 xorB
     }
     else
     {
-        SubKey<8>(inBlock, t1, &m_rkeys[144]);
+        SubKey<8>(msg, t1, &m_rkeys[144]);
         IMC512(t1);
         IG512(t1, t2, &m_rkeys[136]);
         IG512(t2, t1, &m_rkeys[128]);
@@ -1258,12 +1253,10 @@ void Kalyna128::Base::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlo
     switch ((m_nb << 8) | m_nk)
     {
     case (2 << 8) | 2:
-        ProcessBlock_22(reinterpret_cast<const word64*>(inBlock),
-            reinterpret_cast<const word64*>(xorBlock), reinterpret_cast<word64*>(outBlock));
+        ProcessBlock_22(inBlock, xorBlock, outBlock);
         break;
     case (2 << 8) | 4:
-        ProcessBlock_24(reinterpret_cast<const word64*>(inBlock),
-            reinterpret_cast<const word64*>(xorBlock), reinterpret_cast<word64*>(outBlock));
+        ProcessBlock_24(inBlock, xorBlock, outBlock);
         break;
     default:
         CRYPTOPP_ASSERT(0);
@@ -1316,12 +1309,10 @@ void Kalyna256::Base::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlo
     switch ((m_nb << 8) | m_nk)
     {
     case (4 << 8) | 4:
-        ProcessBlock_44(reinterpret_cast<const word64*>(inBlock),
-            reinterpret_cast<const word64*>(xorBlock), reinterpret_cast<word64*>(outBlock));
+        ProcessBlock_44(inBlock, xorBlock, outBlock);
         break;
     case (4 << 8) | 8:
-        ProcessBlock_48(reinterpret_cast<const word64*>(inBlock),
-            reinterpret_cast<const word64*>(xorBlock), reinterpret_cast<word64*>(outBlock));
+        ProcessBlock_48(inBlock, xorBlock, outBlock);
         break;
     default:
         CRYPTOPP_ASSERT(0);
@@ -1365,8 +1356,7 @@ void Kalyna512::Base::ProcessAndXorBlock(const byte *inBlock, const byte *xorBlo
         u ^= *reinterpret_cast<const word64*>(p+i);
     m_wspace[0] = u;
 
-    ProcessBlock_88(reinterpret_cast<const word64*>(inBlock),
-        reinterpret_cast<const word64*>(xorBlock), reinterpret_cast<word64*>(outBlock));
+    ProcessBlock_88(inBlock, xorBlock, outBlock);
 }
 
 NAMESPACE_END

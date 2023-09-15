@@ -26,16 +26,17 @@ struct SMemStatsInfo
     CProxyDirect3DDevice9::SMemoryState d3dMemory;
     CProxyDirect3DDevice9::SFrameStats  frameStats;
     SDxStatus                           dxStatus;
-    int                                 iProcessMemSizeKB;
-    int                                 iProcessTotalVirtualKB;
-    int                                 iStreamingMemoryUsed;
-    int                                 iStreamingMemoryAvailable;
+    size_t                              iProcessMemSizeKB;
+    size_t                              iProcessTotalVirtualKB;
+    size_t                              iStreamingMemoryUsed;
+    size_t                              iStreamingMemoryAvailable;
     SRwResourceStats                    rwResourceStats;
     SClothesCacheStats                  clothesCacheStats;
     SShaderReplacementStats             shaderReplacementStats;
     SModelCacheStats                    modelCacheStats;
 
-    union {
+    union
+    {
         uint uiArray[14];
         struct
         {

@@ -1,5 +1,8 @@
 #include "SharedUtil.AsyncTaskScheduler.h"
 
+// Workaround MultiplayerSA including this header for whatever reason..
+#ifdef HAS_ASYNC_TASK_SCHED
+
 namespace SharedUtil
 {
     CAsyncTaskScheduler::CAsyncTaskScheduler(std::size_t numWorkers)
@@ -65,3 +68,4 @@ namespace SharedUtil
         }
     }
 }            // namespace SharedUtil
+#endif

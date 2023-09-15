@@ -6,7 +6,10 @@
  *  PURPOSE:     Client/server shared enum definitions
  *
  *****************************************************************************/
+
 #pragma once
+
+#include <net/Packets.h>
 
 namespace EEventPriority
 {
@@ -64,7 +67,28 @@ enum eEulerRotationOrder
 DECLARE_ENUM(eEulerRotationOrder);
 
 DECLARE_ENUM(EHashFunction::EHashFunctionType);
+DECLARE_ENUM_CLASS(HashFunctionType);
 DECLARE_ENUM_CLASS(PasswordHashFunction);
-DECLARE_ENUM_CLASS(StringEncryptFunction);
+DECLARE_ENUM_CLASS(StringEncodeFunction);
+DECLARE_ENUM_CLASS(KeyPairAlgorithm);
+DECLARE_ENUM_CLASS(HmacAlgorithm);
+
+enum class WorldSpecialProperty
+{
+    HOVERCARS,
+    AIRCARS,
+    EXTRABUNNY,
+    EXTRAJUMP,
+    RANDOMFOLIAGE,
+    SNIPERMOON,
+    EXTRAAIRRESISTANCE,
+    UNDERWORLDWARP,
+    VEHICLESUNGLARE,
+    CORONAZTEST,
+    WATERCREATURES,
+    BURNFLIPPEDCARS,
+    FIREBALLDESTRUCT,
+};
+DECLARE_ENUM_CLASS(WorldSpecialProperty);
 
 DECLARE_ENUM(ePacketID);

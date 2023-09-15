@@ -11,11 +11,10 @@
 
 #pragma once
 
-#include "RenderWare.h"
-
-class CVector;
 class CEntity;
+class CVector;
 class CVehicle;
+struct RwColor;
 
 class CFx
 {

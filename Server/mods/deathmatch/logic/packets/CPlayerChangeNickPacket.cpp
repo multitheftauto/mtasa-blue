@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CPlayerChangeNickPacket.h"
+#include "CElement.h"
 
 CPlayerChangeNickPacket::CPlayerChangeNickPacket(const char* szNewNick)
 {
@@ -25,7 +27,7 @@ bool CPlayerChangeNickPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(ID);
 
         // Write the nick
-        BitStream.WriteStringCharacters(m_strNewNick, m_strNewNick.length());
+        BitStream.WriteStringCharacters(m_strNewNick);
         return true;
     }
 

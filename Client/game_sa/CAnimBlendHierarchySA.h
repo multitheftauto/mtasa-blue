@@ -13,17 +13,14 @@
 #pragma once
 
 #include <game/CAnimBlendHierarchy.h>
-#include "Common.h"
+
+class CAnimBlendSequence;
 
 #define FUNC_CAnimBlendHierarchy_SetName                     0x4CF2D0
 #define FUNC_CAnimBlendHierarchy_RemoveAnimSequences         0x4CF8E0
 #define FUNC_CAnimBlendHierarchy_RemoveFromUncompressedCache 0x4D42A0
 #define FUNC_CAnimBlendHierarchy_RemoveQuaternionFlips       0x4CF4E0
 #define FUNC_CAnimBlendHierarchy_CalculateTotalTime          0x4CF2F0
-#define FUNC_CAnimBlendHierarchy_GetAnimSequence             0x4ce8f0
-#define FUNC_CAnimBlendHierarchy_GetAnimSequences            0x4d1350
-
-class CAnimBlendSequence;
 
 class CAnimBlendHierarchySAInterface
 {
@@ -68,4 +65,3 @@ public:
 protected:
     CAnimBlendHierarchySAInterface* m_pInterface;
 };
-

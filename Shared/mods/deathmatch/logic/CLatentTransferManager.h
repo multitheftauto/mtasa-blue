@@ -7,10 +7,15 @@
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
-typedef uint                       SSendHandle;
-typedef CAutoRefedPointer<CBuffer> CBufferRef;
+#ifndef MTA_CLIENT
+    #include <net/ns_common.h>
+#endif
+
+typedef uint                     SSendHandle;
+typedef std::shared_ptr<CBuffer> CBufferRef;
 
 namespace LatentTransfer
 {
@@ -136,11 +141,16 @@ protected:
 ///////////////////////////////////////////////////////////////
 class CLatentReceiver
 {
+    friend struct SScopedGuardInsideMark;
+
 public:
     ZERO_ON_NEW
     CLatentReceiver(NetPlayerID remoteId, ushort usBitStreamVersion);
     ~CLatentReceiver();
     void OnReceive(NetBitStreamInterface* pBitStream);
+    bool IsInside() const { return m_bInside; }
+    bool IsDeferredDelete() const { return m_bDeferredDelete; }
+    void SetDeferredDelete() { m_bDeferredDelete = true; }
 
 protected:
     void OnReceiveError(const SString& strMessage);
@@ -148,6 +158,8 @@ protected:
     const NetPlayerID m_RemoteId;
     const ushort      m_usBitStreamVersion;
     SReceiveItem      activeRx;
+    bool              m_bInside{};
+    bool              m_bDeferredDelete{};
 };
 
 ///////////////////////////////////////////////////////////////
@@ -193,7 +205,7 @@ protected:
     // Send variables
     std::vector<CLatentSendQueue*>           m_SendQueueList;
     std::map<NetPlayerID, CLatentSendQueue*> m_SendQueueMap;
-    CBufferRef*                              m_pBatchBufferRef;
+    CBufferRef                               m_pBatchBufferRef;
 
     // Receive variables
     std::map<NetPlayerID, CLatentReceiver*> m_ReceiverMap;

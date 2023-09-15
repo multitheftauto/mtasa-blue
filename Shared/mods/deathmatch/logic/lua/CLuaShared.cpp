@@ -7,6 +7,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaShared.h"
+
+#ifndef MTA_CLIENT
+    #include "CGame.h"
+#endif
 
 // If compiled script, make sure correct chunkname is embedded
 void CLuaShared::EmbedChunkName(SString strChunkName, const char** pcpOutBuffer, uint* puiOutSize)

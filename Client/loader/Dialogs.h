@@ -1,12 +1,16 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Dialogs.h
+ *  FILE:        Client/loader/Dialogs.h
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
+
+#pragma once
+
+#include <vector>
 
 void ShowSplash(HINSTANCE hInstance);
 void HideSplash();
@@ -21,8 +25,19 @@ void StopPseudoProgress();
 SString ShowCrashedDialog(HINSTANCE hInstance, const SString& strMessage);
 void    HideCrashedDialog();
 
-void ShowD3dDllDialog(HINSTANCE hInstance, const SString& strPath);
-void HideD3dDllDialog();
+struct GraphicsLibrary
+{
+    SString stem;            // filename without the final extension
+    SString absoluteFilePath;
+    SString md5Hash;
+    SString appLastHash;
+    SString appDontRemind;
+
+    explicit GraphicsLibrary(const char* libraryStemName) : stem(std::string(libraryStemName)) {}
+};
+
+void ShowGraphicsDllDialog(HINSTANCE hInstance, const std::vector<GraphicsLibrary>& offenders);
+void HideGraphicsDllDialog();
 
 void ShowOptimusDialog(HINSTANCE hInstance);
 void HideOptimusDialog();

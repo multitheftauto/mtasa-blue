@@ -13,7 +13,7 @@ class CCore;
 
 #pragma once
 
-#include "../version.h"
+#include "version.h"
 
 #include "CClientVariables.h"
 #include "CCommands.h"
@@ -28,7 +28,6 @@ class CCore;
 #include "CMessageLoopHook.h"
 #include "CConsoleLogger.h"
 #include "CModManager.h"
-#include <core/CClientBase.h>
 #include <core/CClientEntityBase.h>
 #include <core/CCoreInterface.h>
 #include <DXHook/CDirect3DData.h>
@@ -83,26 +82,25 @@ public:
     ~CCore();
 
     // Subsystems (query)
-    eCoreVersion              GetVersion();
-    CConsoleInterface*        GetConsole();
-    CCommandsInterface*       GetCommands();
-    CConnectManager*          GetConnectManager() { return m_pConnectManager; };
-    CGame*                    GetGame();
-    CGUI*                     GetGUI();
-    CGraphicsInterface*       GetGraphics();
-    CModManagerInterface*     GetModManager();
-    CMultiplayer*             GetMultiplayer();
-    CNet*                     GetNetwork();
-    CXML*                     GetXML() { return m_pXML; };
-    CXMLNode*                 GetConfig();
-    CClientVariables*         GetCVars() { return &m_ClientVariables; };
-    CKeyBindsInterface*       GetKeyBinds();
-    CMouseControl*            GetMouseControl() { return m_pMouseControl; };
-    CLocalGUI*                GetLocalGUI();
-    CLocalizationInterface*   GetLocalization() { return g_pLocalization; };
-    CWebCoreInterface*        GetWebCore();
-    CTrayIconInterface*       GetTrayIcon() { return m_pTrayIcon; };
-    CDiscordManagerInterface* GetDiscordManager() { return reinterpret_cast<CDiscordManagerInterface*>(m_DiscordManager.get()); }
+    eCoreVersion            GetVersion();
+    CConsoleInterface*      GetConsole();
+    CCommandsInterface*     GetCommands();
+    CConnectManager*        GetConnectManager() { return m_pConnectManager; };
+    CGame*                  GetGame();
+    CGUI*                   GetGUI();
+    CGraphicsInterface*     GetGraphics();
+    CModManagerInterface*   GetModManager();
+    CMultiplayer*           GetMultiplayer();
+    CNet*                   GetNetwork();
+    CXML*                   GetXML() { return m_pXML; };
+    CXMLNode*               GetConfig();
+    CClientVariables*       GetCVars() { return &m_ClientVariables; };
+    CKeyBindsInterface*     GetKeyBinds();
+    CMouseControl*          GetMouseControl() { return m_pMouseControl; };
+    CLocalGUI*              GetLocalGUI();
+    CLocalizationInterface* GetLocalization() { return g_pLocalization; };
+    CWebCoreInterface*      GetWebCore();
+    CTrayIconInterface*     GetTrayIcon() { return m_pTrayIcon; };
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -120,15 +118,20 @@ public:
     void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false);
     void ChatPrintf(const char* szFormat, bool bColorCoded, ...);
     void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...);
-    void SetChatVisible(bool bVisible);
+    void SetChatVisible(bool bVisible, bool bInputBlocked);
     bool IsChatVisible();
+    bool IsChatInputBlocked();
     void EnableChatInput(char* szCommand, DWORD dwColor);
     bool IsChatInputEnabled();
     bool ClearChat();
     void OnGameTimerUpdate();
+    bool SetChatboxCharacterLimit(int charLimit);
+    void ResetChatboxCharacterLimit();
+    int  GetChatboxCharacterLimit();
+    int  GetChatboxMaxCharacterLimit();
 
-    // Screenshots
-    void TakeScreenShot();
+    // Screenshot
+    void InitiateScreenShot(bool bIsCameraShot);
 
     // GUI
     bool IsSettingsVisible();
@@ -227,11 +230,8 @@ public:
     uint GetMinStreamingMemory();
     uint GetMaxStreamingMemory();
 
-    void ResetDiscordRichPresence();
-
     SString GetConnectCommandFromURI(const char* szURI);
     void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
-    bool    bScreenShot;
     std::map<std::string, std::string>& GetCommandLineOptions() { return m_CommandLineOptions; }
     const char*                         GetCommandLineOption(const char* szOption);
     const char*                         GetCommandLineArgs() { return m_szCommandLineArgs; }
@@ -277,9 +277,11 @@ public:
     void        SetFakeLagCommandEnabled(bool bEnabled) { m_bFakeLagCommandEnabled = bEnabled; }
     bool        IsFakeLagCommandEnabled() { return m_bFakeLagCommandEnabled; }
     SString     GetBlueCopyrightString();
-    HANDLE      SetThreadHardwareBreakPoint(HANDLE hThread, HWBRK_TYPE Type, HWBRK_SIZE Size, DWORD dwAddress);
     bool        IsFirstFrame() const noexcept { return m_bFirstFrame; }
 
+    void   SetCustomStreamingMemory(size_t szMB);
+    bool   IsUsingCustomStreamingMemorySize();
+    size_t GetStreamingMemory();
 private:
     void ApplyCoreInitSettings();
 
@@ -298,8 +300,6 @@ private:
     CClientVariables   m_ClientVariables;
     CWebCoreInterface* m_pWebCore = nullptr;
     CTrayIcon*         m_pTrayIcon;
-
-    std::unique_ptr<class CDiscordManager> m_DiscordManager;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;
@@ -363,8 +363,15 @@ private:
     bool                 m_bWaitToSetNick;
     uint                 m_uiNewNickWaitFrames;
     EDiagnosticDebugType m_DiagnosticDebug;
-    float                m_fMinStreamingMemory;
-    float                m_fMaxStreamingMemory;
+
+    // Below 2 are used for the UI only
+    float                m_fMinStreamingMemory{};
+    float                m_fMaxStreamingMemory{};
+
+    // Custom streaming memory limit set by `engineStreamingSetMemorySize` - Reset on server connects (= set to 0), or by the scripter
+    // `0` means "not set" [so the value should be ignored]
+    size_t               m_CustomStreamingMemoryLimitBytes{};
+
     bool                 m_bGettingIdleCallsFromMultiplayer;
     bool                 m_bWindowsTimerEnabled;
     bool                 m_bModulesLoaded;

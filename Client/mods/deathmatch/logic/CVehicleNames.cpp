@@ -287,6 +287,10 @@ unsigned int CVehicleNames::GetVehicleModel(const char* szName)
 
 const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
 {
+    // Use parent model ID for non-standard vehicle model IDs.
+    if ((ulModel < 400 || ulModel > 611) && CClientVehicleManager::IsValidModel(ulModel))
+        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+
     // Check whether the model is valid
     if ((IsValidModel(ulModel) || IsModelTrailer(ulModel)) && ((ulModel - 400) < NUMELMS(ucVehicleTypes)))
     {

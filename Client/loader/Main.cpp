@@ -1,19 +1,24 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        loader/Main.cpp
+ *  FILE:        Client/loader/Main.cpp
  *  PURPOSE:     MTA loader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
-#include "StdInc.h"
+#include "Main.h"
+#include "CInstallManager.h"
+#include "MainFunctions.h"
+#include "Dialogs.h"
+#include "Utils.h"
 #include "SharedUtil.Win32Utf8FileHooks.hpp"
 #if defined(MTA_DEBUG)
     #include "SharedUtil.Tests.hpp"
 #endif
+#include <version.h>
 
 ///////////////////////////////////////////////////////////////
 //
@@ -81,8 +86,8 @@ MTAEXPORT int DoWinMain(HINSTANCE hLauncherInstance, HINSTANCE hPrevInstance, LP
 
     // Stuff
     HandleCustomStartMessage();
-    #ifndef MTA_DEBUG
-        ForbodenProgramsMessage();
+    #if !defined(MTA_DEBUG) && MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
+    ForbodenProgramsMessage();
     #endif
     CycleEventLog();
     BsodDetectionPreLaunch();

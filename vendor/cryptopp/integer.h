@@ -3,14 +3,14 @@
 /// \file integer.h
 /// \brief Multiple precision integer with arithmetic operations
 /// \details The Integer class can represent positive and negative integers
-///   with absolute value less than (256**sizeof(word))<sup>(256**sizeof(int))</sup>.
+///  with absolute value less than (256**sizeof(word))<sup>(256**sizeof(int))</sup>.
 /// \details Internally, the library uses a sign magnitude representation, and the class
-///   has two data members. The first is a IntegerSecBlock (a SecBlock<word>) and it is
-///   used to hold the representation. The second is a Sign (an enumeration), and it is
-///   used to track the sign of the Integer.
+///  has two data members. The first is a IntegerSecBlock (a SecBlock<word>) and it is
+///  used to hold the representation. The second is a Sign (an enumeration), and it is
+///  used to track the sign of the Integer.
 /// \details For details on how the Integer class initializes its function pointers using
-///   InitializeInteger and how it creates Integer::Zero(), Integer::One(), and
-///   Integer::Two(), then see the comments at the top of <tt>integer.cpp</tt>.
+///  InitializeInteger and how it creates Integer::Zero(), Integer::One(), and
+///  Integer::Two(), then see the comments at the top of <tt>integer.cpp</tt>.
 /// \since Crypto++ 1.0
 
 #ifndef CRYPTOPP_INTEGER_H
@@ -36,14 +36,14 @@ typedef SecBlock<word, AllocatorWithCleanup<word, true> > IntegerSecBlock;
 
 /// \brief Multiple precision integer with arithmetic operations
 /// \details The Integer class can represent positive and negative integers
-///   with absolute value less than (256**sizeof(word))<sup>(256**sizeof(int))</sup>.
+///  with absolute value less than (256**sizeof(word))<sup>(256**sizeof(int))</sup>.
 /// \details Internally, the library uses a sign magnitude representation, and the class
-///   has two data members. The first is a IntegerSecBlock (a SecBlock<word>) and it is
-///   used to hold the representation. The second is a Sign (an enumeration), and it is
-///   used to track the sign of the Integer.
+///  has two data members. The first is a IntegerSecBlock (a SecBlock<word>) and it is
+///  used to hold the representation. The second is a Sign (an enumeration), and it is
+///  used to track the sign of the Integer.
 /// \details For details on how the Integer class initializes its function pointers using
-///   InitializeInteger and how it creates Integer::Zero(), Integer::One(), and
-///   Integer::Two(), then see the comments at the top of <tt>integer.cpp</tt>.
+///  InitializeInteger and how it creates Integer::Zero(), Integer::One(), and
+///  Integer::Two(), then see the comments at the top of <tt>integer.cpp</tt>.
 /// \since Crypto++ 1.0
 /// \nosubgrouping
 class CRYPTOPP_DLL Integer : private InitializeInteger, public ASN1Object
@@ -59,7 +59,7 @@ public:
 		};
 
 		/// \brief Exception thrown when a random number cannot be found that
-		///   satisfies the condition
+		///  satisfies the condition
 		class RandomNumberNotFound : public Exception
 		{
 		public:
@@ -120,19 +120,21 @@ public:
 		/// \brief Convert from a C-string
 		/// \param str C-string value
 		/// \param order the ByteOrder of the string to be processed
-		/// \details \p str can be in base 2, 8, 10, or 16. Base is determined by a case
-		///   insensitive suffix of 'h', 'o', or 'b'.  No suffix means base 10.
+		/// \details \p str can be in base 8, 10, or 16. Base is determined
+		///  by a case insensitive suffix of 'o' (8), '.' (10), or 'h' (16).
+		///  No suffix means base 10.
 		/// \details Byte order was added at Crypto++ 5.7 to allow use of little-endian
-		///   integers with curve25519, Poly1305 and Microsoft CAPI.
+		///  integers with curve25519, Poly1305 and Microsoft CAPI.
 		explicit Integer(const char *str, ByteOrder order = BIG_ENDIAN_ORDER);
 
 		/// \brief Convert from a wide C-string
 		/// \param str wide C-string value
 		/// \param order the ByteOrder of the string to be processed
-		/// \details \p str can be in base 2, 8, 10, or 16. Base is determined by a case
-		///   insensitive suffix of 'h', 'o', or 'b'.  No suffix means base 10.
+		/// \details \p str can be in base 8, 10, or 16. Base is determined
+		///  by a case insensitive suffix of 'o' (8), '.' (10), or 'h' (16).
+		///  No suffix means base 10.
 		/// \details Byte order was added at Crypto++ 5.7 to allow use of little-endian
-		///   integers with curve25519, Poly1305 and Microsoft CAPI.
+		///  integers with curve25519, Poly1305 and Microsoft CAPI.
 		explicit Integer(const wchar_t *str, ByteOrder order = BIG_ENDIAN_ORDER);
 
 		/// \brief Convert from a big-endian byte array
@@ -141,7 +143,7 @@ public:
 		/// \param sign enumeration indicating Signedness
 		/// \param order the ByteOrder of the array to be processed
 		/// \details Byte order was added at Crypto++ 5.7 to allow use of little-endian
-		///   integers with curve25519, Poly1305 and Microsoft CAPI.
+		///  integers with curve25519, Poly1305 and Microsoft CAPI.
 		Integer(const byte *encodedInteger, size_t byteCount, Signedness sign=UNSIGNED, ByteOrder order = BIG_ENDIAN_ORDER);
 
 		/// \brief Convert from a big-endian array
@@ -150,7 +152,7 @@ public:
 		/// \param sign enumeration indicating Signedness
 		/// \param order the ByteOrder of the data to be processed
 		/// \details Byte order was added at Crypto++ 5.7 to allow use of little-endian
-		///   integers with curve25519, Poly1305 and Microsoft CAPI.
+		///  integers with curve25519, Poly1305 and Microsoft CAPI.
 		Integer(BufferedTransformation &bt, size_t byteCount, Signedness sign=UNSIGNED, ByteOrder order = BIG_ENDIAN_ORDER);
 
 		/// \brief Convert from a BER encoded byte array
@@ -164,15 +166,15 @@ public:
 		Integer(RandomNumberGenerator &rng, size_t bitCount);
 
 		/// \brief Integer representing 0
-		/// \returns an Integer representing 0
+		/// \return an Integer representing 0
 		/// \details Zero() avoids calling constructors for frequently used integers
 		static const Integer & CRYPTOPP_API Zero();
 		/// \brief Integer representing 1
-		/// \returns an Integer representing 1
+		/// \return an Integer representing 1
 		/// \details One() avoids calling constructors for frequently used integers
 		static const Integer & CRYPTOPP_API One();
 		/// \brief Integer representing 2
-		/// \returns an Integer representing 2
+		/// \return an Integer representing 2
 		/// \details Two() avoids calling constructors for frequently used integers
 		static const Integer & CRYPTOPP_API Two();
 
@@ -185,17 +187,17 @@ public:
 		/// \param mod the modulus used to reduce the equivalence class
 		/// \throw RandomNumberNotFound if the set is empty.
 		/// \details Ideally, the random integer created should be uniformly distributed
-		///   over <tt>{x | min \<= x \<= max</tt> and \p x is of rnType and <tt>x \% mod == equiv}</tt>.
-		///   However the actual distribution may not be uniform because sequential
-		///   search is used to find an appropriate number from a random starting
-		///   point.
+		///  over <tt>{x | min \<= x \<= max</tt> and \p x is of rnType and <tt>x \% mod == equiv}</tt>.
+		///  However the actual distribution may not be uniform because sequential
+		///  search is used to find an appropriate number from a random starting
+		///  point.
 		/// \details May return (with very small probability) a pseudoprime when a prime
-		///   is requested and <tt>max \> lastSmallPrime*lastSmallPrime</tt>. \p lastSmallPrime
-		///   is declared in nbtheory.h.
+		///  is requested and <tt>max \> lastSmallPrime*lastSmallPrime</tt>. \p lastSmallPrime
+		///  is declared in nbtheory.h.
 		Integer(RandomNumberGenerator &rng, const Integer &min, const Integer &max, RandomNumberType rnType=ANY, const Integer &equiv=Zero(), const Integer &mod=One());
 
 		/// \brief Exponentiates to a power of 2
-		/// \returns the Integer 2<sup>e</sup>
+		/// \return the Integer 2<sup>e</sup>
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
 		static Integer CRYPTOPP_API Power2(size_t e);
 	//@}
@@ -213,7 +215,7 @@ public:
 		/// \param sign enumeration indicating Signedness
 		/// \details Unsigned means encode absolute value, signed means encode two's complement if negative.
 		/// \details outputLen can be used to ensure an Integer is encoded to an exact size (rather than a
-		///   minimum size). An exact size is useful, for example, when encoding to a field element size.
+		///  minimum size). An exact size is useful, for example, when encoding to a field element size.
 		void Encode(byte *output, size_t outputLen, Signedness sign=UNSIGNED) const;
 
 		/// \brief Encode in big-endian format
@@ -222,13 +224,13 @@ public:
 		/// \param sign enumeration indicating Signedness
 		/// \details Unsigned means encode absolute value, signed means encode two's complement if negative.
 		/// \details outputLen can be used to ensure an Integer is encoded to an exact size (rather than a
-		///   minimum size). An exact size is useful, for example, when encoding to a field element size.
+		///  minimum size). An exact size is useful, for example, when encoding to a field element size.
 		void Encode(BufferedTransformation &bt, size_t outputLen, Signedness sign=UNSIGNED) const;
 
 		/// \brief Encode in DER format
 		/// \param bt BufferedTransformation object
 		/// \details Encodes the Integer using Distinguished Encoding Rules
-		///   The result is placed into a BufferedTransformation object
+		///  The result is placed into a BufferedTransformation object
 		void DEREncode(BufferedTransformation &bt) const;
 
 		/// \brief Encode absolute value as big-endian octet string
@@ -239,16 +241,16 @@ public:
 		/// \brief Encode absolute value in OpenPGP format
 		/// \param output big-endian byte array
 		/// \param bufferSize length of the byte array
-		/// \returns length of the output
+		/// \return length of the output
 		/// \details OpenPGPEncode places result into the buffer and returns the
-		///   number of bytes used for the encoding
+		///  number of bytes used for the encoding
 		size_t OpenPGPEncode(byte *output, size_t bufferSize) const;
 
 		/// \brief Encode absolute value in OpenPGP format
 		/// \param bt BufferedTransformation object
-		/// \returns length of the output
+		/// \return length of the output
 		/// \details OpenPGPEncode places result into a BufferedTransformation object and returns the
-		///   number of bytes used for the encoding
+		///  number of bytes used for the encoding
 		size_t OpenPGPEncode(BufferedTransformation &bt) const;
 
 		/// \brief Decode from big-endian byte array
@@ -297,7 +299,7 @@ public:
 	/// \name ACCESSORS
 	//@{
 		/// \brief Determines if the Integer is convertable to Long
-		/// \returns true if *this can be represented as a signed long
+		/// \return true if <tt>*this</tt> can be represented as a signed long
 		/// \sa ConvertToLong()
 		bool IsConvertableToLong() const;
 		/// \brief Convert the Integer to Long
@@ -306,113 +308,135 @@ public:
 		signed long ConvertToLong() const;
 
 		/// \brief Determines the number of bits required to represent the Integer
-		/// \returns number of significant bits = floor(log2(abs(*this))) + 1
+		/// \return number of significant bits
+		/// \details BitCount is calculated as <tt>floor(log2(abs(*this))) + 1</tt>.
 		unsigned int BitCount() const;
 		/// \brief Determines the number of bytes required to represent the Integer
-		/// \returns number of significant bytes = ceiling(BitCount()/8)
+		/// \return number of significant bytes
+		/// \details ByteCount is calculated as <tt>ceiling(BitCount()/8)</tt>.
 		unsigned int ByteCount() const;
 		/// \brief Determines the number of words required to represent the Integer
-		/// \returns number of significant words = ceiling(ByteCount()/sizeof(word))
+		/// \return number of significant words
+		/// \details WordCount is calculated as <tt>ceiling(ByteCount()/sizeof(word))</tt>.
 		unsigned int WordCount() const;
 
 		/// \brief Provides the i-th bit of the Integer
-		/// \returns the i-th bit, i=0 being the least significant bit
+		/// \return the i-th bit, i=0 being the least significant bit
 		bool GetBit(size_t i) const;
 		/// \brief Provides the i-th byte of the Integer
-		/// \returns the i-th byte
+		/// \return the i-th byte
 		byte GetByte(size_t i) const;
 		/// \brief Provides the low order bits of the Integer
-		/// \returns n lowest bits of *this >> i
+		/// \return n lowest bits of <tt>*this >> i</tt>
 		lword GetBits(size_t i, size_t n) const;
 
 		/// \brief Determines if the Integer is 0
-		/// \returns true if the Integer is 0, false otherwise
+		/// \return true if the Integer is 0, false otherwise
 		bool IsZero() const {return !*this;}
 		/// \brief Determines if the Integer is non-0
-		/// \returns true if the Integer is non-0, false otherwise
+		/// \return true if the Integer is non-0, false otherwise
 		bool NotZero() const {return !IsZero();}
 		/// \brief Determines if the Integer is negative
-		/// \returns true if the Integer is negative, false otherwise
+		/// \return true if the Integer is negative, false otherwise
 		bool IsNegative() const {return sign == NEGATIVE;}
 		/// \brief Determines if the Integer is non-negative
-		/// \returns true if the Integer is non-negative, false otherwise
+		/// \return true if the Integer is non-negative, false otherwise
 		bool NotNegative() const {return !IsNegative();}
 		/// \brief Determines if the Integer is positive
-		/// \returns true if the Integer is positive, false otherwise
+		/// \return true if the Integer is positive, false otherwise
 		bool IsPositive() const {return NotNegative() && NotZero();}
 		/// \brief Determines if the Integer is non-positive
-		/// \returns true if the Integer is non-positive, false otherwise
+		/// \return true if the Integer is non-positive, false otherwise
 		bool NotPositive() const {return !IsPositive();}
 		/// \brief Determines if the Integer is even parity
-		/// \returns true if the Integer is even, false otherwise
+		/// \return true if the Integer is even, false otherwise
 		bool IsEven() const {return GetBit(0) == 0;}
 		/// \brief Determines if the Integer is odd parity
-		/// \returns true if the Integer is odd, false otherwise
+		/// \return true if the Integer is odd, false otherwise
 		bool IsOdd() const	{return GetBit(0) == 1;}
 	//@}
 
 	/// \name MANIPULATORS
 	//@{
 		/// \brief Assignment
+		/// \param t the other Integer
+		/// \return the result of assignment
 		Integer&  operator=(const Integer& t);
-
 		/// \brief Addition Assignment
+		/// \param t the other Integer
+		/// \return the result of <tt>*this + t</tt>
 		Integer&  operator+=(const Integer& t);
 		/// \brief Subtraction Assignment
+		/// \param t the other Integer
+		/// \return the result of <tt>*this - t</tt>
 		Integer&  operator-=(const Integer& t);
 		/// \brief Multiplication Assignment
+		/// \param t the other Integer
+		/// \return the result of <tt>*this * t</tt>
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
 		Integer&  operator*=(const Integer& t)	{return *this = Times(t);}
 		/// \brief Division Assignment
+		/// \param t the other Integer
+		/// \return the result of <tt>*this / t</tt>
 		Integer&  operator/=(const Integer& t)	{return *this = DividedBy(t);}
 		/// \brief Remainder Assignment
+		/// \param t the other Integer
+		/// \return the result of <tt>*this % t</tt>
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
 		Integer&  operator%=(const Integer& t)	{return *this = Modulo(t);}
 		/// \brief Division Assignment
+		/// \param t the other word
+		/// \return the result of <tt>*this / t</tt>
 		Integer&  operator/=(word t)  {return *this = DividedBy(t);}
 		/// \brief Remainder Assignment
+		/// \param t the other word
+		/// \return the result of <tt>*this % t</tt>
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
 		Integer&  operator%=(word t)  {return *this = Integer(POSITIVE, 0, Modulo(t));}
 
 		/// \brief Left-shift Assignment
+		/// \param n number of bits to shift
+		/// \return reference to this Integer
 		Integer&  operator<<=(size_t n);
 		/// \brief Right-shift Assignment
+		/// \param n number of bits to shift
+		/// \return reference to this Integer
 		Integer&  operator>>=(size_t n);
 
 		/// \brief Bitwise AND Assignment
 		/// \param t the other Integer
-		/// \returns the result of *this & t
-		/// \details operator&=() performs a bitwise AND on *this. Missing bits are truncated
-		///   at the most significant bit positions, so the result is as small as the
-		///   smaller of the operands.
+		/// \return the result of <tt>*this & t</tt>
+		/// \details operator&=() performs a bitwise AND on <tt>*this</tt>. Missing bits are truncated
+		///  at the most significant bit positions, so the result is as small as the
+		///  smaller of the operands.
 		/// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-		///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-		///   the integer should be converted to a 2's compliment representation before performing
-		///   the operation.
+		///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+		///  the integer should be converted to a 2's compliment representation before performing
+		///  the operation.
 		/// \since Crypto++ 6.0
 		Integer& operator&=(const Integer& t);
 		/// \brief Bitwise OR Assignment
 		/// \param t the second Integer
-		/// \returns the result of *this | t
-		/// \details operator|=() performs a bitwise OR on *this. Missing bits are shifted in
-		///   at the most significant bit positions, so the result is as large as the
-		///   larger of the operands.
+		/// \return the result of <tt>*this | t</tt>
+		/// \details operator|=() performs a bitwise OR on <tt>*this</tt>. Missing bits are shifted in
+		///  at the most significant bit positions, so the result is as large as the
+		///  larger of the operands.
 		/// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-		///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-		///   the integer should be converted to a 2's compliment representation before performing
-		///   the operation.
+		///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+		///  the integer should be converted to a 2's compliment representation before performing
+		///  the operation.
 		/// \since Crypto++ 6.0
 		Integer& operator|=(const Integer& t);
 		/// \brief Bitwise XOR Assignment
 		/// \param t the other Integer
-		/// \returns the result of *this ^ t
-		/// \details operator^=() performs a bitwise XOR on *this. Missing bits are shifted
-		///   in at the most significant bit positions, so the result is as large as the
-		///   larger of the operands.
+		/// \return the result of <tt>*this ^ t</tt>
+		/// \details operator^=() performs a bitwise XOR on <tt>*this</tt>. Missing bits are shifted
+		///  in at the most significant bit positions, so the result is as large as the
+		///  larger of the operands.
 		/// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-		///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-		///   the integer should be converted to a 2's compliment representation before performing
-		///   the operation.
+		///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+		///  the integer should be converted to a 2's compliment representation before performing
+		///  the operation.
 		/// \since Crypto++ 6.0
 		Integer& operator^=(const Integer& t);
 
@@ -420,6 +444,7 @@ public:
 		/// \param rng RandomNumberGenerator used to generate material
 		/// \param bitCount the number of bits in the resulting integer
 		/// \details The random integer created is uniformly distributed over <tt>[0, 2<sup>bitCount</sup>]</tt>.
+		/// \note If \p bitCount is 0, then this Integer is set to 0 (and not 0 or 1).
 		void Randomize(RandomNumberGenerator &rng, size_t bitCount);
 
 		/// \brief Set this Integer to random integer
@@ -438,30 +463,30 @@ public:
 		/// \param mod the modulus used to reduce the equivalence class
 		/// \throw RandomNumberNotFound if the set is empty.
 		/// \details Ideally, the random integer created should be uniformly distributed
-		///   over <tt>{x | min \<= x \<= max</tt> and \p x is of rnType and <tt>x \% mod == equiv}</tt>.
-		///   However the actual distribution may not be uniform because sequential
-		///   search is used to find an appropriate number from a random starting
-		///   point.
+		///  over <tt>{x | min \<= x \<= max</tt> and \p x is of rnType and <tt>x \% mod == equiv}</tt>.
+		///  However the actual distribution may not be uniform because sequential
+		///  search is used to find an appropriate number from a random starting
+		///  point.
 		/// \details May return (with very small probability) a pseudoprime when a prime
-		///   is requested and <tt>max \> lastSmallPrime*lastSmallPrime</tt>. \p lastSmallPrime
-		///   is declared in nbtheory.h.
+		///  is requested and <tt>max \> lastSmallPrime*lastSmallPrime</tt>. \p lastSmallPrime
+		///  is declared in nbtheory.h.
 		bool Randomize(RandomNumberGenerator &rng, const Integer &min, const Integer &max, RandomNumberType rnType, const Integer &equiv=Zero(), const Integer &mod=One());
 
 		/// \brief Generate a random number
 		/// \param rng RandomNumberGenerator used to generate material
 		/// \param params additional parameters that cannot be passed directly to the function
-		/// \returns true if a random number was generated, false otherwise
+		/// \return true if a random number was generated, false otherwise
 		/// \details GenerateRandomNoThrow attempts to generate a random number according to the
-		///   parameters specified in params. The function does not throw RandomNumberNotFound.
+		///  parameters specified in params. The function does not throw RandomNumberNotFound.
 		/// \details The example below generates a prime number using NameValuePairs that Integer
-		///   class recognizes. The names are not provided in argnames.h.
+		///  class recognizes. The names are not provided in argnames.h.
 		/// <pre>
-		///     AutoSeededRandomPool prng;
-		///     AlgorithmParameters params = MakeParameters("BitLength", 2048)
-		///                                                ("RandomNumberType", Integer::PRIME);
-		///     Integer x;
-		///     if (x.GenerateRandomNoThrow(prng, params) == false)
-		///         throw std::runtime_error("Failed to generate prime number");
+		///    AutoSeededRandomPool prng;
+		///    AlgorithmParameters params = MakeParameters("BitLength", 2048)
+		///                                               ("RandomNumberType", Integer::PRIME);
+		///    Integer x;
+		///    if (x.GenerateRandomNoThrow(prng, params) == false)
+		///        throw std::runtime_error("Failed to generate prime number");
 		/// </pre>
 		bool GenerateRandomNoThrow(RandomNumberGenerator &rng, const NameValuePairs &params = g_nullNameValuePairs);
 
@@ -470,16 +495,16 @@ public:
 		/// \param params additional parameters that cannot be passed directly to the function
 		/// \throw RandomNumberNotFound if a random number is not found
 		/// \details GenerateRandom attempts to generate a random number according to the
-		///   parameters specified in params.
+		///  parameters specified in params.
 		/// \details The example below generates a prime number using NameValuePairs that Integer
-		///   class recognizes. The names are not provided in argnames.h.
+		///  class recognizes. The names are not provided in argnames.h.
 		/// <pre>
-		///     AutoSeededRandomPool prng;
-		///     AlgorithmParameters params = MakeParameters("BitLength", 2048)
-		///                                                ("RandomNumberType", Integer::PRIME);
-		///     Integer x;
-		///     try { x.GenerateRandom(prng, params); }
-		///     catch (RandomNumberNotFound&) { x = -1; }
+		///    AutoSeededRandomPool prng;
+		///    AlgorithmParameters params = MakeParameters("BitLength", 2048)
+		///                                               ("RandomNumberType", Integer::PRIME);
+		///    Integer x;
+		///    try { x.GenerateRandom(prng, params); }
+		///    catch (RandomNumberNotFound&) { x = -1; }
 		/// </pre>
 		void GenerateRandom(RandomNumberGenerator &rng, const NameValuePairs &params = g_nullNameValuePairs)
 		{
@@ -529,10 +554,10 @@ public:
 	/// \name BINARY OPERATORS
 	//@{
 		/// \brief Perform signed comparison
-		/// \param a the Integer to comapre
-		///   \retval -1 if <tt>*this < a</tt>
-		///   \retval  0 if <tt>*this = a</tt>
-		///   \retval  1 if <tt>*this > a</tt>
+		/// \param a the Integer to compare
+		/// \retval -1 if <tt>*this < a</tt>
+		/// \retval  0 if <tt>*this = a</tt>
+		/// \retval  1 if <tt>*this > a</tt>
 		int Compare(const Integer& a) const;
 
 		/// \brief Addition
@@ -555,40 +580,40 @@ public:
 
 		/// \brief Bitwise AND
 		/// \param t the other Integer
-		/// \returns the result of <tt>*this & t</tt>
+		/// \return the result of <tt>*this & t</tt>
 		/// \details And() performs a bitwise AND on the operands. Missing bits are truncated
-		///   at the most significant bit positions, so the result is as small as the
-		///   smaller of the operands.
+		///  at the most significant bit positions, so the result is as small as the
+		///  smaller of the operands.
 		/// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-		///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-		///   the integer should be converted to a 2's compliment representation before performing
-		///   the operation.
+		///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+		///  the integer should be converted to a 2's compliment representation before performing
+		///  the operation.
 		/// \since Crypto++ 6.0
 		Integer And(const Integer& t) const;
 
 		/// \brief Bitwise OR
 		/// \param t the other Integer
-		/// \returns the result of <tt>*this | t</tt>
+		/// \return the result of <tt>*this | t</tt>
 		/// \details Or() performs a bitwise OR on the operands. Missing bits are shifted in
-		///   at the most significant bit positions, so the result is as large as the
-		///   larger of the operands.
+		///  at the most significant bit positions, so the result is as large as the
+		///  larger of the operands.
 		/// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-		///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-		///   the integer should be converted to a 2's compliment representation before performing
-		///   the operation.
+		///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+		///  the integer should be converted to a 2's compliment representation before performing
+		///  the operation.
 		/// \since Crypto++ 6.0
 		Integer Or(const Integer& t) const;
 
 		/// \brief Bitwise XOR
 		/// \param t the other Integer
-		/// \returns the result of <tt>*this ^ t</tt>
+		/// \return the result of <tt>*this ^ t</tt>
 		/// \details Xor() performs a bitwise XOR on the operands. Missing bits are shifted in
-		///   at the most significant bit positions, so the result is as large as the
-		///   larger of the operands.
+		///  at the most significant bit positions, so the result is as large as the
+		///  larger of the operands.
 		/// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-		///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-		///   the integer should be converted to a 2's compliment representation before performing
-		///   the operation.
+		///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+		///  the integer should be converted to a 2's compliment representation before performing
+		///  the operation.
 		/// \since Crypto++ 6.0
 		Integer Xor(const Integer& t) const;
 
@@ -614,48 +639,48 @@ public:
 		bool IsSquare() const;
 
 		/// \brief Determine if 1 or -1
-		/// \returns true if this integer is 1 or -1, false otherwise
+		/// \return true if this integer is 1 or -1, false otherwise
 		bool IsUnit() const;
 		/// \brief Calculate multiplicative inverse
-		/// \returns MultiplicativeInverse inverse if 1 or -1, otherwise return 0.
+		/// \return MultiplicativeInverse inverse if 1 or -1, otherwise return 0.
 		Integer MultiplicativeInverse() const;
 
 		/// \brief Extended Division
 		/// \param r a reference for the remainder
 		/// \param q a reference for the quotient
-		/// \param a a reference to the dividend
-		/// \param d a reference to the divisor
+		/// \param a reference to the dividend
+		/// \param d reference to the divisor
 		/// \details Divide calculates r and q such that (a == d*q + r) && (0 <= r < abs(d)).
 		static void CRYPTOPP_API Divide(Integer &r, Integer &q, const Integer &a, const Integer &d);
 
 		/// \brief Extended Division
 		/// \param r a reference for the remainder
 		/// \param q a reference for the quotient
-		/// \param a a reference to the dividend
-		/// \param d a reference to the divisor
+		/// \param a reference to the dividend
+		/// \param d reference to the divisor
 		/// \details Divide calculates r and q such that (a == d*q + r) && (0 <= r < abs(d)).
-		///   This overload uses a faster division algorithm because the divisor is short.
+		///  This overload uses a faster division algorithm because the divisor is short.
 		static void CRYPTOPP_API Divide(word &r, Integer &q, const Integer &a, word d);
 
 		/// \brief Extended Division
 		/// \param r a reference for the remainder
 		/// \param q a reference for the quotient
-		/// \param a a reference to the dividend
-		/// \param n a reference to the divisor
+		/// \param a reference to the dividend
+		/// \param n reference to the divisor
 		/// \details DivideByPowerOf2 calculates r and q such that (a == d*q + r) && (0 <= r < abs(d)).
-		///   It returns same result as Divide(r, q, a, Power2(n)), but faster.
-		///   This overload uses a faster division algorithm because the divisor is a power of 2.
+		///  It returns same result as Divide(r, q, a, Power2(n)), but faster.
+		///  This overload uses a faster division algorithm because the divisor is a power of 2.
 		static void CRYPTOPP_API DivideByPowerOf2(Integer &r, Integer &q, const Integer &a, unsigned int n);
 
 		/// \brief Calculate greatest common divisor
-		/// \param a a reference to the first number
-		/// \param n a reference to the secind number
-		/// \returns the greatest common divisor <tt>a</tt> and <tt>n</tt>.
+		/// \param a reference to the first number
+		/// \param n reference to the secind number
+		/// \return the greatest common divisor <tt>a</tt> and <tt>n</tt>.
 		static Integer CRYPTOPP_API Gcd(const Integer &a, const Integer &n);
 
 		/// \brief Calculate multiplicative inverse
-		/// \param n a reference to the modulus
-		/// \returns an Integer <tt>*this % n</tt>.
+		/// \param n reference to the modulus
+		/// \return an Integer <tt>*this % n</tt>.
 		/// \details InverseMod returns the multiplicative inverse of the Integer <tt>*this</tt>
 		///  modulo the Integer <tt>n</tt>. If no Integer exists then Integer 0 is returned.
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
@@ -663,7 +688,7 @@ public:
 
 		/// \brief Calculate multiplicative inverse
 		/// \param n the modulus
-		/// \returns a word <tt>*this % n</tt>.
+		/// \return a word <tt>*this % n</tt>.
 		/// \details InverseMod returns the multiplicative inverse of the Integer <tt>*this</tt>
 		///  modulo the word <tt>n</tt>. If no Integer exists then word 0 is returned.
 		/// \sa a_times_b_mod_c() and a_exp_b_mod_c()
@@ -673,35 +698,35 @@ public:
 	/// \name INPUT/OUTPUT
 	//@{
 		/// \brief Extraction operator
-		/// \param in a reference to a std::istream
-		/// \param a a reference to an Integer
-		/// \returns a reference to a std::istream reference
+		/// \param in reference to a std::istream
+		/// \param a reference to an Integer
+		/// \return reference to a std::istream reference
 		friend CRYPTOPP_DLL std::istream& CRYPTOPP_API operator>>(std::istream& in, Integer &a);
 
 		/// \brief Insertion operator
-		/// \param out a reference to a std::ostream
+		/// \param out reference to a std::ostream
 		/// \param a a constant reference to an Integer
-		/// \returns a reference to a std::ostream reference
-		/// \details The output integer responds to std::hex, std::oct, std::hex, std::upper and
-		///   std::lower. The output includes the suffix \a \b h (for hex), \a \b . (\a \b dot, for dec)
-		///   and \a \b o (for octal). There is currently no way to suppress the suffix.
+		/// \return reference to a std::ostream reference
+		/// \details The output integer responds to hex, std::oct, std::hex, std::upper and
+		///  std::lower. The output includes the suffix \a h (for hex), \a . (\a dot, for dec)
+		///  and \a o (for octal). There is currently no way to suppress the suffix.
 		/// \details If you want to print an Integer without the suffix or using an arbitrary base, then
-		///   use IntToString<Integer>().
+		///  use IntToString<Integer>().
 		/// \sa IntToString<Integer>
 		friend CRYPTOPP_DLL std::ostream& CRYPTOPP_API operator<<(std::ostream& out, const Integer &a);
 	//@}
 
 	/// \brief Modular multiplication
-	/// \param x a reference to the first term
-	/// \param y a reference to the second term
-	/// \param m a reference to the modulus
-	/// \returns an Integer <tt>(a * b) % m</tt>.
+	/// \param x reference to the first term
+	/// \param y reference to the second term
+	/// \param m reference to the modulus
+	/// \return an Integer <tt>(a * b) % m</tt>.
 	CRYPTOPP_DLL friend Integer CRYPTOPP_API a_times_b_mod_c(const Integer &x, const Integer& y, const Integer& m);
 	/// \brief Modular exponentiation
-	/// \param x a reference to the base
-	/// \param e a reference to the exponent
-	/// \param m a reference to the modulus
-	/// \returns an Integer <tt>(a ^ b) % m</tt>.
+	/// \param x reference to the base
+	/// \param e reference to the exponent
+	/// \param m reference to the modulus
+	/// \return an Integer <tt>(a ^ b) % m</tt>.
 	CRYPTOPP_DLL friend Integer CRYPTOPP_API a_exp_b_mod_c(const Integer &x, const Integer& e, const Integer& m);
 
 protected:
@@ -762,42 +787,42 @@ inline CryptoPP::word    operator%(const CryptoPP::Integer &a, CryptoPP::word b)
 /// \brief Bitwise AND
 /// \param a the first Integer
 /// \param b the second Integer
-/// \returns the result of a & b
+/// \return the result of a & b
 /// \details operator&() performs a bitwise AND on the operands. Missing bits are truncated
-///   at the most significant bit positions, so the result is as small as the
-///   smaller of the operands.
+///  at the most significant bit positions, so the result is as small as the
+///  smaller of the operands.
 /// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-///   the integer should be converted to a 2's compliment representation before performing
-///   the operation.
+///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+///  the integer should be converted to a 2's compliment representation before performing
+///  the operation.
 /// \since Crypto++ 6.0
 inline CryptoPP::Integer operator&(const CryptoPP::Integer &a, const CryptoPP::Integer &b) {return a.And(b);}
 
 /// \brief Bitwise OR
 /// \param a the first Integer
 /// \param b the second Integer
-/// \returns the result of a | b
+/// \return the result of a | b
 /// \details operator|() performs a bitwise OR on the operands. Missing bits are shifted in
-///   at the most significant bit positions, so the result is as large as the
-///   larger of the operands.
+///  at the most significant bit positions, so the result is as large as the
+///  larger of the operands.
 /// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-///   the integer should be converted to a 2's compliment representation before performing
-///   the operation.
+///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+///  the integer should be converted to a 2's compliment representation before performing
+///  the operation.
 /// \since Crypto++ 6.0
 inline CryptoPP::Integer operator|(const CryptoPP::Integer &a, const CryptoPP::Integer &b) {return a.Or(b);}
 
 /// \brief Bitwise XOR
 /// \param a the first Integer
 /// \param b the second Integer
-/// \returns the result of a ^ b
+/// \return the result of a ^ b
 /// \details operator^() performs a bitwise XOR on the operands. Missing bits are shifted
-///   in at the most significant bit positions, so the result is as large as the
-///   larger of the operands.
+///  in at the most significant bit positions, so the result is as large as the
+///  larger of the operands.
 /// \details Internally, Crypto++ uses a sign-magnitude representation. The library
-///   does not attempt to interpret bits, and the result is always POSITIVE. If needed,
-///   the integer should be converted to a 2's compliment representation before performing
-///   the operation.
+///  does not attempt to interpret bits, and the result is always POSITIVE. If needed,
+///  the integer should be converted to a 2's compliment representation before performing
+///  the operation.
 /// \since Crypto++ 6.0
 inline CryptoPP::Integer operator^(const CryptoPP::Integer &a, const CryptoPP::Integer &b) {return a.Xor(b);}
 

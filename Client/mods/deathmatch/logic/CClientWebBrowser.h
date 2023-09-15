@@ -31,6 +31,7 @@ public:
     const SString& GetTitle();
     SString        GetURL();
     void           SetRenderingPaused(bool bPaused);
+    const bool     GetRenderingPaused() const { return m_pWebView->GetRenderingPaused(); }
     void           Focus();
 
     bool ExecuteJavascript(const SString& strJavascriptCode);
@@ -39,7 +40,7 @@ public:
     bool GetProperty(const SString& strKey, SString& outValue);
 
     void InjectMouseMove(int iPosX, int iPosY);
-    void InjectMouseDown(eWebBrowserMouseButton mouseButton);
+    void InjectMouseDown(eWebBrowserMouseButton mouseButton, int count);
     void InjectMouseUp(eWebBrowserMouseButton mouseButton);
     void InjectMouseWheel(int iScrollVert, int iScrollHorz);
 

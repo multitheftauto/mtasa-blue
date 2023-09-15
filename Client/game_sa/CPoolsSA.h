@@ -14,33 +14,15 @@
 #include "CPedSA.h"
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
-#include "CBuildingSA.h"
-#include <array>
+#include "CTextureDictonarySA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
 class CClientEntity;
 
-class CEntryInfoNodePoolSA : public CEntryInfoNodePool
-{
-public:
-    int GetNumberOfUsedSpaces();
-};
-
-class CPointerNodeDoubleLinkPoolSA : public CPointerNodeDoubleLinkPool
-{
-public:
-    int GetNumberOfUsedSpaces();
-};
-
-class CPointerNodeSingleLinkPoolSA : public CPointerNodeSingleLinkPool
-{
-public:
-    int GetNumberOfUsedSpaces();
-};
-
 // size of tPoolObjectFlags is 1 byte only
-union tPoolObjectFlags {
+union tPoolObjectFlags
+{
     struct
     {
         unsigned char nId : 7;
@@ -73,8 +55,84 @@ public:
         m_bOwnsAllocations = false;
     }
 
+    uint GetFreeSlot()
+    {
+        bool bLooped = false;
+        uint index = m_nFirstFree + 1;
+
+        while (true)
+        {
+            if (index >= m_nSize)
+            {
+                if (bLooped)
+                    return -1;
+
+                index = 0;
+                bLooped = true;
+            }
+
+            if (m_byteMap[index].bEmpty)
+            {
+                m_nFirstFree = index;
+                return index;
+            }
+            index++;
+        }
+
+        return -1;
+    };
+
+    B* Allocate()
+    {
+        m_nFirstFree++;          // Continue after the last allocated slot
+        const auto sz = m_nSize; // Storing size to avoid reloads from memory - should help out the optimizer
+        for (auto i = 0u; i < sz; i++) {
+            const auto slot = (m_nFirstFree + i) % sz;
+            const auto e    = &m_byteMap[slot];
+            if (!e->bEmpty) {
+                continue;
+            }
+            m_nFirstFree = slot;
+            e->bEmpty = false;
+            e->nId++;
+            return &m_pObjects[slot];
+        }
+        return nullptr;
+    }
+
+    B* AllocateAt(uint uiSlot)
+    {
+        m_pObjects[uiSlot] = B();
+        m_byteMap[uiSlot].bEmpty = false;
+        m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
+
+        return &m_pObjects[uiSlot];
+    }
+
+    void Release(uint index)
+    {
+        m_byteMap[index].bEmpty = true;
+        m_byteMap[index].nId = 0;
+        if (index == m_nFirstFree)
+            --m_nFirstFree;
+    }
+
+    void Delete(uint index)
+    {
+        Release(index);
+    }
+
     bool IsEmpty(std::int32_t objectIndex) { return m_byteMap[objectIndex].bEmpty; }
+    bool IsContains(uint index)
+    {
+        if (m_nSize <= index)
+            return false;
+        return !IsEmpty(index);
+    }
+
     B*   GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
+
+    uint GetObjectIndex(B* pObject) { return ((DWORD)pObject - (DWORD)m_pObjects) / sizeof(B); }
 };
 
 class CPoolsSA : public CPools
@@ -85,7 +143,6 @@ public:
 
     // Vehicles pool
     CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
-    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, DWORD* pGameInterface);
 
 private:
     bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
@@ -93,9 +150,6 @@ private:
 public:
     void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
     SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface);
-    DWORD                      GetVehicleRef(CVehicle* pVehicle);
-    DWORD                      GetVehicleRef(DWORD* pGameInterface);
-    CVehicle*                  GetVehicleFromRef(DWORD dwGameRef);
     unsigned long              GetVehicleCount()
     {
         return m_vehiclePool.ulCount;
@@ -112,41 +166,31 @@ private:
 public:
     void                      RemoveObject(CObject* pObject, bool bDelete = true);
     SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface);
-    DWORD                     GetObjectRef(CObject* pObject);
-    DWORD                     GetObjectRef(DWORD* pGameInterface);
-    CObject*                  GetObjectFromRef(DWORD dwGameRef);
     CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool);
     unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
     void                      DeleteAllObjects();
 
     // Peds pool
-    CPed* AddPed(CClientPed* pClientPed, ePedModel ePedType);
+    CPed* AddPed(CClientPed* pClientPed, unsigned int nModelIndex);
     CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
-    CPed* AddCivilianPed(DWORD* pGameInterface);
 
 private:
     bool AddPedToPool(CClientPed* pClientPed, CPedSA* pPed);
 
 public:
-    void RemovePed(CPed* ped, bool bDelete = true);
-
+    void                   RemovePed(CPed* ped, bool bDelete = true);
     SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
-
-    DWORD            GetPedRef(CPed* pPed);
-    DWORD            GetPedRef(DWORD* pGameInterface);
-    CPed*            GetPedFromRef(DWORD dwGameRef);
-    CPedSAInterface* GetPedInterface(DWORD dwGameRef);            // game_sa specific
-    unsigned long    GetPedCount() { return m_pedPool.ulCount; }
-    void             DeleteAllPeds();
+    CPed*                  GetPedFromRef(DWORD dwGameRef);
+    CPedSAInterface*       GetPedInterface(DWORD dwGameRef);            // game_sa specific
+    unsigned long          GetPedCount() { return m_pedPool.ulCount; }
+    void                   DeleteAllPeds();
 
     CEntity*       GetEntity(DWORD* pGameInterface);
     CClientEntity* GetClientEntity(DWORD* pGameInterface);
     uint           GetModelIdFromClump(RpClump* pRpClump);
 
     // Others
-    CBuilding* AddBuilding(DWORD dwModelID);
-    void       DeleteAllBuildings();
-    CVehicle*  AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
+    CVehicle* AddTrain(CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool bDirection, uchar ucTrackId = 0xFF);
 
     DWORD GetPedPoolIndex(std::uint8_t* pInterface);
     DWORD GetVehiclePoolIndex(std::uint8_t* pInterfacee);
@@ -157,13 +201,14 @@ public:
     int  GetPoolCapacity(ePools pool);
     void SetPoolCapacity(ePools pool, int iValue);
 
-    // stuff that really maybe should be elsewhere or not, perhaps
-    CEntryInfoNodePool*         GetEntryInfoNodePool();
-    CPointerNodeSingleLinkPool* GetPointerNodeSingleLinkPool();
-    CPointerNodeDoubleLinkPool* GetPointerNodeDoubleLinkPool();
-
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
+
+    uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName);
+    void RemoveTextureDictonarySlot(uint uiTxdId);
+    bool IsFreeTextureDictonarySlot(uint uiTxdId);
+
+    ushort GetFreeTextureDictonarySlot();
 
 private:
     // Generic container for pools
@@ -195,26 +240,12 @@ private:
     CPoolSAInterface<CPedSAInterface>**                              m_ppPedPoolInterface;
     CPoolSAInterface<CObjectSAInterface>**                           m_ppObjectPoolInterface;
     CPoolSAInterface<CVehicleSAInterface>**                          m_ppVehiclePoolInterface;
-
-    CBuildingSA*  Buildings[MAX_BUILDINGS];
-    unsigned long m_ulBuildingCount;
+    CPoolSAInterface<CTextureDictonarySAInterface>**                 m_ppTxdPoolInterface;
 
     bool m_bGetVehicleEnabled;
-
-    CEntryInfoNodePool*         EntryInfoNodePool;
-    CPointerNodeDoubleLinkPool* PointerNodeDoubleLinkPool;
-    CPointerNodeSingleLinkPool* PointerNodeSingleLinkPool;
 };
 
-#define FUNC_GetVehicle 0x54fff0
-#define FUNC_GetVehicleRef 0x54ffc0
-//#define FUNC_GetVehicleCount              0x429510
 #define FUNC_GetPed 0x54ff90
-#define FUNC_GetPedRef 0x54ff60
-//#define FUNC_GetPedCount                  0x4A7440
-#define FUNC_GetObject 0x550050
-#define FUNC_GetObjectRef 0x550020
-//#define FUNC_GetObjectCount                   0x4A74D0
 
 #define CLASS_CPool_Vehicle 0xB74494
 #define CLASS_CPool_Ped 0xB74490

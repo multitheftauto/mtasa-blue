@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/C3DMarkers.h>
+#include <game/CVisibilityPlugins.h>
 
 extern CClientGame* g_pClientGame;
 

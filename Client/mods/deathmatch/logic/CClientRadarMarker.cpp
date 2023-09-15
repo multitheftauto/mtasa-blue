@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CRadar.h>
 
 using SharedUtil::CalcMTASAPath;
 

@@ -1,0 +1,21 @@
+name: 'Stale draft PR handler'
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: multitheftauto/stale-action@v3.0.0
+        id: stale
+        with:
+          close-pr-message: "This draft pull request was closed because it has been marked stale for 30 days with no activity."
+          days-before-pr-close: 30
+          days-before-pr-stale: 90
+          ignored-label: "keep"
+          stale-pr-label-description: "Inactive for over 90 days, to be closed"
+          stale-pr-message: "This draft pull request is stale because it has been open for at least 90 days with no activity. Please continue on your draft pull request or it will be closed in 30 days automatically."
+      - name: Print outputs
+        run: echo ${{ join(steps.stale.outputs.*, ',') }}

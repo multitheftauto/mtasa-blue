@@ -12,10 +12,10 @@ class CClientProjectile;
 
 #pragma once
 
+#include <game/CProjectile.h>
 #include "CClientEntity.h"
 #include "CClientCommon.h"
 
-class CProjectile;
 class CProjectileInfo;
 class CClientEntity;
 class CVector;
@@ -49,7 +49,7 @@ public:
     unsigned short usModel;
 };
 
-class CClientProjectile : public CClientEntity
+class CClientProjectile final : public CClientEntity
 {
     DECLARE_CLASS(CClientProjectile, CClientEntity)
     friend class CClientProjectileManager;

@@ -13,6 +13,15 @@
 
 #include <CVector.h>
 #include <net/bitstream.h>
+#include "SharedUtil.Game.h"
+#include "SharedUtil.Misc.h"
+#include "CVector2D.h"
+
+#ifndef MTA_CLIENT
+    #include "CVehicle.h"
+#else
+    #include <game/CVehicle.h>
+#endif
 
 // Used to make sure that any position values we receive are at least half sane
 #define SYNC_POSITION_LIMIT 100000.0f
@@ -677,7 +686,6 @@ struct SVehiclePuresyncFlags : public ISyncStructure
         bool bIsHeliSearchLightVisible : 1;
     } data;
 };
-
 
 enum class eVehicleAimDirection : unsigned char
 {
@@ -2007,6 +2015,90 @@ struct SFunBugsStateSync : public ISyncStructure
     {
         bool bQuickStand : 1;
     } data5;
+};
+
+//////////////////////////////////////////
+//                                      //
+//    World special properties state    //
+//                                      //
+//////////////////////////////////////////
+struct SWorldSpecialPropertiesStateSync : public ISyncStructure
+{
+    enum
+    {
+        BITCOUNT = 12
+    };
+    enum
+    {
+        BITCOUNT2 = 1
+    };
+
+    bool Read(NetBitStreamInterface& bitStream)
+    {
+        bool isOK = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
+         else
+             data2.fireballdestruct = true;
+
+        //// Example for adding item:
+        // if (bitStream.Can(eBitStreamVersion::YourProperty))
+        //     isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
+        // else
+        //     data9.YourPropertyVariable = DefaultState (true / false);
+
+        return isOK;
+    }
+    void Write(NetBitStreamInterface& bitStream) const
+    {
+        bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
+
+        //// Example for adding item:
+        // if (bitStream.Can(eBitStreamVersion::YourProperty))
+        //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
+    }
+
+    struct
+    {
+        bool hovercars : 1;
+        bool aircars : 1;
+        bool extrabunny : 1;
+        bool extrajump : 1;
+        bool randomfoliage : 1;
+        bool snipermoon : 1;
+        bool extraairresistance : 1;
+        bool underworldwarp : 1;
+        bool vehiclesunglare : 1;
+        bool coronaztest : 1;
+        bool watercreatures : 1;
+        bool burnflippedcars : 1;
+    } data;
+
+    // Add new ones in separate structs
+    struct
+    {
+        bool fireballdestruct : 1;
+    } data2;
+
+    SWorldSpecialPropertiesStateSync()
+    {
+        // Set default states
+        data.hovercars = false;
+        data.aircars = false;
+        data.extrabunny = false;
+        data.extrajump = false;
+        data.randomfoliage = true;
+        data.snipermoon = false;
+        data.extraairresistance = true;
+        data.underworldwarp = true;
+        data.vehiclesunglare = false;
+        data.coronaztest = true;
+        data.watercreatures = true;
+        data.burnflippedcars = true;
+        data2.fireballdestruct = true;
+    }
 };
 
 //////////////////////////////////////////

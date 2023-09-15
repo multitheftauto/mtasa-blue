@@ -323,7 +323,7 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 //
 // GetWMIVideoAdapterMemorySize
 //  Note that this will never return more than 4 GB of video memory
-//  
+//
 //
 /////////////////////////////////////////////////////////////////////
 unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev)

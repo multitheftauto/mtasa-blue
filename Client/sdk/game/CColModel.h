@@ -11,10 +11,13 @@
 
 #pragma once
 
-class CColModelSAInterface;
+struct CColModelSAInterface;
 
 class CColModel
 {
+protected:
+    ~CColModel() = default;
+
 public:
     virtual CColModelSAInterface* GetInterface() = 0;
     virtual void                  Destroy() = 0;

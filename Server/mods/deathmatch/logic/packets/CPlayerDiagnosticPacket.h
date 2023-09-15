@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "CPacket.h"
+
 class CPlayerDiagnosticPacket final : public CPacket
 {
 public:

@@ -163,6 +163,7 @@ protected:
     CGUIComboBox*    m_pComboAddressHistory[SERVER_BROWSER_TYPE_COUNT];
     CGUIStaticImage* m_pSearchTypeIcon[SERVER_BROWSER_TYPE_COUNT];
     CGUIStaticImage* m_pAddressFavoriteIcon[SERVER_BROWSER_TYPE_COUNT];
+    CGUIStaticImage* m_pRemoveFromRecentIcon[SERVER_BROWSER_TYPE_COUNT];
 
     CGUIComboBox* m_pComboSearchType[SERVER_BROWSER_TYPE_COUNT];
     CGUIEdit*     m_pEditSearch[SERVER_BROWSER_TYPE_COUNT];
@@ -216,6 +217,7 @@ private:
     bool OnRefreshClick(CGUIElement* pElement);
     bool OnInfoClick(CGUIElement* pElement);
     bool OnFavouritesClick(CGUIElement* pElement);
+    bool OnRemoveFromRecentClick(CGUIElement* pElement);
     bool OnBackClick(CGUIElement* pElement);
     bool OnGeneralHelpClick(CGUIElement* pElement);
     bool OnGeneralHelpDeactivate(CGUIElement* pElement);

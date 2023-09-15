@@ -23,7 +23,11 @@ void HMAC_Base::UncheckedSetKey(const byte *userKey, unsigned int keylength, con
 	m_buf.resize(2*AccessHash().BlockSize() + AccessHash().DigestSize());
 
 	if (keylength <= blockSize)
-		memcpy(AccessIpad(), userKey, keylength);
+	{
+		// hmac.cpp:26:9: runtime error: null pointer passed as argument 2
+		if (AccessIpad() && userKey && keylength)
+			std::memcpy(AccessIpad(), userKey, keylength);
+	}
 	else
 	{
 		AccessHash().CalculateDigest(AccessIpad(), userKey, keylength);
@@ -31,7 +35,7 @@ void HMAC_Base::UncheckedSetKey(const byte *userKey, unsigned int keylength, con
 	}
 
 	CRYPTOPP_ASSERT(keylength <= blockSize);
-	memset(AccessIpad()+keylength, 0, blockSize-keylength);
+	std::memset(AccessIpad()+keylength, 0, blockSize-keylength);
 
 	for (unsigned int i=0; i<blockSize; i++)
 	{

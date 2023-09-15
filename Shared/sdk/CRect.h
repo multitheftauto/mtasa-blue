@@ -6,7 +6,7 @@
  *  PURPOSE:     This is an actual GTA SA class. MTA has its own version of
  *               CRect, and it's called CRect2D. CRect behaves similarly to
  *               CRect2D, except it's used by GTA:SA, and the initial values
- *               are NOT zero when constructed. 
+ *               are NOT zero when constructed.
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -85,7 +85,9 @@ public:
     // the top and left values are always less than the bottom and right values.
     void FixIncorrectTopLeft()
     {
-        if (left > right) left = right - 1.0f;
-        if (top > bottom) top = bottom - 1.0f;
+        if (left > right)
+            left = right - 1.0f;
+        if (top > bottom)
+            top = bottom - 1.0f;
     }
 };

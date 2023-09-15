@@ -1,16 +1,26 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        Shared/mods/deathmatch/logic/luadefs/CLuaElementDefsShared.cpp
+ *  PURPOSE:     Lua element definitions class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include "StdInc.h"
+#include "luadefs/CLuaElementDefs.h"
+#include "CScriptArgReader.h"
+#include "CStaticFunctionDefinitions.h"
 
 int CLuaElementDefs::GetElementData(lua_State* luaVM)
 {
     //  var getElementData ( element theElement, string key [, inherit = true] )
 
-#ifdef MTA_CLIENT
-    CClientEntity* pElement;
-#else
     CElement* pElement;
-#endif
-    SString strKey;
-    bool    bInherit;
+    SString   strKey;
+    bool      bInherit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -50,15 +60,18 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
     return 1;
 }
 
+CLuaArguments CLuaElementDefs::GetAllElementData(CElement* pElement)
+{
+    CLuaArguments customData;
+    pElement->GetAllCustomData(&customData);
+    return customData;
+}
+
 int CLuaElementDefs::HasElementData(lua_State* luaVM)
 {
     //  bool hasElementData ( element theElement, string key [, bool inherit = true ] )
 
-#ifdef MTA_CLIENT
-    CClientEntity* pElement;
-#else
     CElement* pElement;
-#endif
     SString   strKey;
     bool      bInherit;
 
