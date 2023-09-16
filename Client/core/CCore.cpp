@@ -14,6 +14,7 @@
 #include <game/CSettings.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
+#include <filesystem>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
@@ -29,11 +30,15 @@
 using SharedUtil::CalcMTASAPath;
 using namespace std;
 
+namespace fs = std::filesystem;
+
 static float fTest = 1;
 
 extern CCore* g_pCore;
 bool          g_bBoundsChecker = false;
 SString       g_strJingleBells;
+
+extern fs::path g_gtaDirectory;
 
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
@@ -42,11 +47,30 @@ static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
-    if (StrCmpIA("dpnhpast.dll", fileName) != 0)
-        return Win32LoadLibraryA(fileName);
-
     // GTA:SA expects a valid module handle for DirectPlay. We return a handle for an already loaded library.
-    return Win32LoadLibraryA("d3d8.dll");
+    if (!StrCmpIA("dpnhpast.dll", fileName))
+        return Win32LoadLibraryA("d3d8.dll");
+
+    if (!StrCmpIA("enbseries\\enbhelper.dll", fileName))
+    {
+        std::error_code ec;
+        
+        // Try to load enbhelper.dll from our custom launch directory first.
+        const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
+
+        if (fs::is_regular_file(inLaunchDir, ec))
+            return Win32LoadLibraryA(inLaunchDir.u8string().c_str());
+
+        // Try to load enbhelper.dll from the GTA install directory second.
+        const fs::path inGTADir = g_gtaDirectory / "enbseries" / "enbhelper.dll";
+
+        if (fs::is_regular_file(inGTADir, ec))
+            return Win32LoadLibraryA(inGTADir.u8string().c_str());
+
+        return nullptr;
+    }
+
+    return Win32LoadLibraryA(fileName);
 }
 
 CCore::CCore()
