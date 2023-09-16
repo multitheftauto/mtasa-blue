@@ -417,6 +417,9 @@ public:
     eGlitchType GetGlitchIndex(const std::string& strGlitch) { return m_GlitchNames[strGlitch]; }
     bool        IsGlitch(const std::string& strGlitch) { return m_GlitchNames.count(strGlitch) > 0; }
 
+    bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property) { return m_WorldSpecialProps[property]; }
+    void SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled) { m_WorldSpecialProps[property] = isEnabled; }
+
     void SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
 
@@ -625,6 +628,7 @@ private:
     std::map<std::string, eGlitchType>            m_GlitchNames;
     SFixedArray<bool, NUM_GLITCHES>               m_Glitches;
     SFixedArray<bool, WEAPONTYPE_LAST_WEAPONTYPE> m_JetpackWeapons;
+    std::map<WorldSpecialProperty, bool>          m_WorldSpecialProps;
 
     // This is ticked to true when the app should end
     bool m_bIsFinished;

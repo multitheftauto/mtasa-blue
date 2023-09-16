@@ -6637,11 +6637,6 @@ bool CStaticFunctionDefinitions::GetWindVelocity(float& fX, float& fY, float& fZ
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(const char* szPropName)
-{
-    return g_pGame->IsCheatEnabled(szPropName);
-}
-
 bool CStaticFunctionDefinitions::GetTrafficLightState(unsigned char& ucState)
 {
     ucState = g_pMultiplayer->GetTrafficLightState();
@@ -6827,11 +6822,6 @@ bool CStaticFunctionDefinitions::SetGarageOpen(unsigned char ucGarageID, bool bI
     }
 
     return false;
-}
-
-bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(const char* szPropName, bool bEnabled)
-{
-    return g_pGame->SetCheatEnabled(szPropName, bEnabled);
 }
 
 bool CStaticFunctionDefinitions::SetCloudsEnabled(bool bEnabled)
@@ -8809,9 +8799,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8828,9 +8815,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
@@ -8849,9 +8833,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8868,9 +8849,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
@@ -8889,9 +8867,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8909,9 +8884,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     eVehicleTypes         eModel = (eVehicleTypes)pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
@@ -8974,9 +8946,6 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pVehicle, eHandlingProperty eProperty)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
     const CHandlingEntry* pOrigEntry = pVehicle->GetOriginalHandlingData();
