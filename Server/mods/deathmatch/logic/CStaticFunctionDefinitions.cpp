@@ -8654,21 +8654,30 @@ bool CStaticFunctionDefinitions::UsePickup(CElement* pElement, CPlayer* pPlayer)
 
 bool CStaticFunctionDefinitions::CreateExplosion(const CVector& vecPosition, unsigned char ucType, CElement* pElement)
 {
+    CLuaArguments arguments;
+    arguments.PushNumber(vecPosition.fX);
+    arguments.PushNumber(vecPosition.fY);
+    arguments.PushNumber(vecPosition.fZ);
+    arguments.PushNumber(ucType);
+
     if (pElement)
     {
         RUN_CHILDREN(CreateExplosion(vecPosition, ucType, *iter))
-
-        // Tell everyone
+        
         if (IS_PLAYER(pElement))
         {
-            CPlayer*             pPlayer = static_cast<CPlayer*>(pElement);
-            CExplosionSyncPacket Packet(vecPosition, ucType);
-            Packet.SetSourceElement(pPlayer);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-            return true;
+            CPlayer* player = static_cast<CPlayer*>(pElement);
+
+            if (player->CallEvent("onExplosion", arguments))
+            {
+                CExplosionSyncPacket Packet(vecPosition, ucType);
+                Packet.SetSourceElement(player);
+                m_pPlayerManager->BroadcastOnlyJoined(Packet);
+                return true;
+            }
         }
     }
-    else
+    else if (m_pMapManager->GetRootElement()->CallEvent("onExplosion", arguments))
     {
         CExplosionSyncPacket Packet(vecPosition, ucType);
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
@@ -11014,6 +11023,25 @@ bool CStaticFunctionDefinitions::IsGlitchEnabled(const std::string& strGlitchNam
         return true;
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
+{
+    return g_pGame->IsWorldSpecialPropertyEnabled(property);
+}
+
+bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
+{
+    if (g_pGame->IsWorldSpecialPropertyEnabled(property) == isEnabled)
+        return false;
+
+    g_pGame->SetWorldSpecialPropertyEnabled(property, isEnabled);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write((uchar)property);
+    BitStream.pBitStream->WriteBit(isEnabled);
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_WORLD_SPECIAL_PROPERTY, *BitStream.pBitStream));
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)

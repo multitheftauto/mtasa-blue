@@ -32,7 +32,7 @@ public:
     LUA_DECLARE(GetGaragePosition);
     LUA_DECLARE(GetGarageSize);
     LUA_DECLARE(GetGarageBoundingBox);
-    LUA_DECLARE(IsWorldSpecialPropertyEnabled);
+    static bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property);
     LUA_DECLARE(GetBlurLevel);
     LUA_DECLARE(GetTrafficLightState);
     LUA_DECLARE(AreTrafficLightsLocked);
@@ -55,7 +55,7 @@ public:
     LUA_DECLARE(SetMinuteDuration);
     LUA_DECLARE(SetWaveHeight);
     LUA_DECLARE(SetGarageOpen);
-    LUA_DECLARE(SetWorldSpecialPropertyEnabled);
+    static bool SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled);
     LUA_DECLARE(SetBlurLevel);
     LUA_DECLARE(ResetBlurLevel);
     LUA_DECLARE(SetJetpackMaxHeight);
@@ -113,9 +113,10 @@ public:
 
     LUA_DECLARE(CreateExplosion);
 
-    static bool ResetColorFilter();
-    static bool SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha, uchar ucPass1Red, uchar ucPass1Green,
-                               uchar ucPass1Blue, uchar ucPass1Alpha);
+    static bool                                                                    ResetColorFilter();
+    static bool                                                                    SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha,
+                                                                                                  uchar ucPass1Red, uchar ucPass1Green, uchar ucPass1Blue, uchar ucPass1Alpha);
+    static CLuaMultiReturn<uchar, uchar, uchar, uchar, uchar, uchar, uchar, uchar> GetColorFilter(bool isOriginal = false);
 
     static bool SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier);
     static bool SetGrainLevel(uchar ucLevel);

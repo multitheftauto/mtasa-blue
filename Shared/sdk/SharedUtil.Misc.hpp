@@ -1504,7 +1504,7 @@ std::string SharedUtil::UTF16ToMbUTF8(const wchar_t* input)
 
 std::string SharedUtil::UTF16ToMbUTF8(const char16_t* input)
 {
-    return UTF16ToMbUTF8(input);
+    return UTF16ToMbUTF8((const wchar_t*)input);
 }
 
 // Get UTF8 confidence
