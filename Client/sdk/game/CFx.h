@@ -28,9 +28,7 @@ public:
     virtual void AddPunchImpact(CVector& vecPosition, CVector& vecDirection, int i) = 0;
     virtual void AddDebris(CVector& vecPosition, RwColor& rwColor, float fScale, int iCount) = 0;
     virtual void AddGlass(CVector& vecPosition, RwColor& rwColor, float fScale, int iCount) = 0;
-    virtual bool AddShadow(eShadowType shadowType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
-                           float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings) = 0;
-    virtual bool AddShadow(RwTexture* pRwTexture, uint8_t type, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
+    virtual bool AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color, eShadowType shadowType,
                            float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings) = 0;
     virtual void TriggerWaterHydrant(CVector& vecPosition) = 0;
     virtual void TriggerGunshot(CEntity* pEntity, CVector& vecPosition, CVector& vecDirection, bool bIncludeSparks) = 0;

@@ -12,8 +12,8 @@
 #include "StdInc.h"
 #include "lua/CLuaFunctionParser.h"
 
-bool FxAddShadow(std::variant<eShadowType, CClientMaterial*> shadowTypeOrTexture, CVector vecPosition, CVector2D vecOffset1, CVector2D vecOffset2, SColor color,
-                 float zDistance, bool bDrawOnWater, bool bDrawOnBuildings)
+bool FxAddShadow(eShadowTextureType shadowTextureType, CVector vecPosition, CVector2D vecOffset1, CVector2D vecOffset2, SColor color, eShadowType shadowType, float zDistance,
+                 bool bDrawOnWater, bool bDrawOnBuildings)
 {
     if (vecOffset1.Length() > 32)
     {
@@ -27,13 +27,8 @@ bool FxAddShadow(std::variant<eShadowType, CClientMaterial*> shadowTypeOrTexture
     {
         throw std::invalid_argument("Z Distance must be between 0.0 and 3000.0");
     }
-    if (std::holds_alternative<eShadowType>(shadowTypeOrTexture))
-        return CStaticFunctionDefinitions::FxAddShadow(std::get<eShadowType>(shadowTypeOrTexture), vecPosition, vecOffset1, vecOffset2, color, zDistance,
-                                                       bDrawOnWater,
-                                                       bDrawOnBuildings);
-    else
-        return CStaticFunctionDefinitions::FxAddShadow(std::get<CClientMaterial*>(shadowTypeOrTexture), vecPosition, vecOffset1, vecOffset2, color, zDistance,
-                                                       bDrawOnWater, bDrawOnBuildings);
+    return CStaticFunctionDefinitions::FxAddShadow(shadowTextureType, vecPosition, vecOffset1, vecOffset2, color, shadowType, zDistance, bDrawOnWater,
+                                                   bDrawOnBuildings);
 
 }
 

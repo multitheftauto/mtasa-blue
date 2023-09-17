@@ -1442,7 +1442,7 @@ enum eObjectProperty
     OBJECT_PROPERTY_MAX,
 };
 
-enum class eShadowType
+enum class eShadowTextureType
 {
     // use only color instead of texture
     PLANE = -1,
@@ -1458,7 +1458,14 @@ enum class eShadowType
     HEADMAN,
     WINCRACK,
     LAMP,
-    _COUNT,
+};
+
+enum class eShadowType
+{
+    NONE,
+    DEFAULT,
+    ADDITIVE,
+    INVCOLOR,
 };
 
 namespace eObjectGroup

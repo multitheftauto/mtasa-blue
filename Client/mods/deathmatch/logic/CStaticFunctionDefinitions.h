@@ -731,9 +731,7 @@ public:
     static bool           FxAddWaterSplash(CVector& vecPosition);
     static bool           FxAddBulletSplash(CVector& vecPosition);
     static bool           FxAddFootSplash(CVector& vecPosition);
-    static bool FxAddShadow(eShadowType shadowType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
-                            float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings);
-    static bool FxAddShadow(CClientMaterial* pMaterial, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
+    static bool FxAddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color, eShadowType shadowType,
                             float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings);
     static CClientEffect* CreateEffect(CResource& Resource, const SString& strFxName, const CVector& vecPosition, bool bSoundEnable);
 
