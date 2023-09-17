@@ -435,6 +435,9 @@ bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
         return true;
 
+    if (ms_pStreamingBuffer[0] == nullptr || ms_pStreamingBuffer[1] == nullptr)
+        return false;
+
     // First of all, allocate the new buffer
     // NOTE: Due to a bug in the `MallocAlign` code the function will just *crash* instead of returning nullptr on alloc. failure :D
     typedef void*(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
