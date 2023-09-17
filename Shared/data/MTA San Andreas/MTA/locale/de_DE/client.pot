@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-15 16:40+0000\n"
-"PO-Revision-Date: 2023-09-15 17:13\n"
+"POT-Creation-Date: 2023-09-17 12:45+0000\n"
+"PO-Revision-Date: 2023-09-17 12:50\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Language: de_DE\n"
@@ -44,7 +44,7 @@ msgstr "Abbrechen"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CMainMenu.cpp:1170
+#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CMainMenu.cpp:1176
 #: Client/core/CSettings.cpp:1371 Client/core/CSettings.cpp:1395
 #: Client/core/CSettings.cpp:4435 Client/core/CSettings.cpp:4502
 #: Client/core/CSettings.cpp:4551 Client/core/CVersionUpdater.cpp:1572
@@ -306,17 +306,17 @@ msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 msgstr "MTA wird für XP/Vista ab Juli 2019 keine Updates mehr erhalten.\n\n"
 "Aktualisiere Windows, um auf aktuellen Servern zu spielen."
 
-#: Client/core/CMainMenu.cpp:1163
+#: Client/core/CMainMenu.cpp:1169
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Dies wird deine Verbindung zum aktuellen Server trennen.\n\n"
 "Bist du sicher, dass du die Verbindung trennen willst?"
 
-#: Client/core/CMainMenu.cpp:1167
+#: Client/core/CMainMenu.cpp:1173
 msgid "DISCONNECT WARNING"
 msgstr "VERBINDUNG GETRENNT"
 
-#: Client/core/CMainMenu.cpp:1169 Client/core/CSettings.cpp:1370
+#: Client/core/CMainMenu.cpp:1175 Client/core/CSettings.cpp:1370
 #: Client/core/CSettings.cpp:1394 Client/core/CSettings.cpp:4434
 #: Client/core/CSettings.cpp:4501 Client/core/CSettings.cpp:4550
 #: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
