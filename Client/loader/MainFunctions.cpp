@@ -13,6 +13,7 @@
 #include "Utils.h"
 #include "Dialogs.h"
 #include "D3DStuff.h"
+#include <version.h>
 #include <array>
 #include <locale.h>
 
@@ -862,10 +863,10 @@ void CheckDataFiles()
     {
         const char* expected;
         const char* fileName;
-    } integrityCheckList[] = {{"8EB9167D68897A89B3EFE47162C1574A", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
-                              {"07C11F7D8058F350ADF6FC9AB81B38AC", "bass_ac3.dll"},       {"D8CCB4B8235F31A3C73485FDE18B0187", "bass_fx.dll"},
-                              {"64C96631887874F7ED9D8881FC016846", "bassflac.dll"},       {"4D34014DB481244EABA366B827DDD1B5", "bassmidi.dll"},
-                              {"5DEEC10A943E352EF7E0223327E8B48C", "bassmix.dll"},        {"B04050AD912FB7E03F529F2C3F7D991D", "bassopus.dll"},
+    } integrityCheckList[] = {{"332EFF2D3BE0CD15264E9D54CD1FA25F", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
+                              {"0752692DA87EBF6595AFAC9BC3D3B1BF", "bass_ac3.dll"},       {"DF3BE351F8EDE366FBE542FEBE114508", "bass_fx.dll"},
+                              {"64C96631887874F7ED9D8881FC016846", "bassflac.dll"},       {"4E89426025D1E1F524495D910B60C709", "bassmidi.dll"},
+                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},        {"B04050AD912FB7E03F529F2C3F7D991D", "bassopus.dll"},
                               {"0F1B2FC6C0C703A43A24DC05352E7ADA", "basswebm.dll"},       {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
                               {"9C12FF87F03610EBD24D35A85D0A14C3", "tags.dll"},           {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
                               {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"1C9B45E87528B8BB8CFA884EA0099A85", "d3dcompiler_43.dll"},
