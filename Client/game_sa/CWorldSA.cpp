@@ -296,8 +296,8 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
     // Perhaps we could parallelize it somehow? [OpenMP?]
     const auto ProcessOneAtomic = [](RpAtomic* a, void* data)
         {
-            const auto c = (Context*)data;
-            const auto f = RpAtomicGetFrame(a);
+            Context* const c = static_cast<Context*>(data);
+            RwFrame* const f = RpAtomicGetFrame(a);
 
             const auto GetFrameCMatrix = [](RwFrame* f)
                 {
@@ -313,7 +313,7 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
             }
 
             // Sometimes atomics have no geometry [I don't think that should be possible, but okay]
-            const auto geo = a->geometry;
+            RpGeometry* const geo = a->geometry;
             if (!geo)
             {
                 return true;
@@ -321,17 +321,17 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
 
             // Calculate transformation by traversing the hierarchy from the bottom (this frame) -> top (root frame)
             CMatrix localToObjTransform{};
-            for (auto i = f; i && i != i->root; i = RwFrameGetParent(i))
+            for (RwFrame* i = f; i && i != i->root; i = RwFrameGetParent(i))
             {
                 localToObjTransform = GetFrameCMatrix(i) * localToObjTransform;
             }
-            const auto objToLocalTransform = localToObjTransform.Inverse();
+            const CMatrix objToLocalTransform = localToObjTransform.Inverse();
 
             const auto ObjectToLocalSpace = [&](const CVector& in) { return objToLocalTransform.TransformVector(in); };
 
             // Transform from object space, into local (the frame's) space
-            const auto localOrigin = ObjectToLocalSpace(c->originOS);
-            const auto localEnd = ObjectToLocalSpace(c->endOS);
+            const CVector localOrigin = ObjectToLocalSpace(c->originOS);
+            const CVector localEnd = ObjectToLocalSpace(c->endOS);
 
 #if 0
             if (!CCollisionSA::TestLineSphere(
@@ -341,12 +341,12 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
                 return true; // Line segment doesn't touch bsp
             }
 #endif
-            const auto localDir = localEnd - localOrigin;
+            const CVector localDir = localEnd - localOrigin;
 
-            const auto verts = reinterpret_cast<CVector*>(geo->morph_target->verts);            // It's fine, trust me bro
+            const CVector* const verts = reinterpret_cast<CVector*>(geo->morph_target->verts);            // It's fine, trust me bro
             for (auto i = geo->triangles_size; i-- > 0;)
             {
-                const auto tri = &geo->triangles[i];
+                RpTriangle* const tri = &geo->triangles[i];
 
                 // Process the line against the triangle
                 CVector hitBary, hitPos;
@@ -356,7 +356,7 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
                 }
 
                 // Intersection, check if it's closer than the previous one
-                const auto hitDistSq = (hitPos - localOrigin).LengthSquared();
+                const float hitDistSq = (hitPos - localOrigin).LengthSquared();
                 if (c->minHitDistSq > hitDistSq)
                 {
                     c->minHitDistSq = hitDistSq;
@@ -380,21 +380,18 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
         ProcessOneAtomic(reinterpret_cast<RpAtomic*>(c.entity->m_pRwObject), &c);
     }
 
-    // It might be false if the collision model differs from the clump
-    // This is completely normal as collisions models are meant to be simplified
-    // compared to the clump's geometry
     if (ret.valid = c.hitGeo != nullptr)
     {
         // Now, calculate texture UV, etc based on the hit [if we've hit anything at all]
         // Since we have the barycentric coords of the hit, calculating it is easy
         ret.uv = {};
-        for (auto i = 3u; i-- > 0;)
+        for (int i = 0; i < 3; i++)
         {
             // UV set index - Usually models only use level 0 indices, so let's stick with that
-            const auto uvSetIdx = 0;
+            const int uvSetIdx = 0;
 
             // Vertex's UV position
-            const auto vtxUV = &c.hitGeo->texcoords[uvSetIdx][c.hitTri->verts[i]];
+            RwTextureCoordinates* const vtxUV = &c.hitGeo->texcoords[uvSetIdx][c.hitTri->verts[i]];
 
             // Now, just interpolate
             ret.uv += CVector2D{vtxUV->u, vtxUV->v} * c.hitBary[i];
@@ -402,11 +399,11 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
 
         // Find out material texture name
         // For some reason this is sometimes null
-        const auto tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
+        RwTexture* const tex = c.hitGeo->materials.materials[c.hitTri->materialId]->texture;
         ret.textureName = tex ? tex->name : nullptr;
 
-        const auto frame = RpAtomicGetFrame(c.hitAtomic);            // `RpAtomicGetFrame`
-        ret.frameName = frame ? frame->szName : nullptr;
+        RwFrame* const hitFrame = RpAtomicGetFrame(c.hitAtomic);
+        ret.frameName = hitFrame ? hitFrame->szName : nullptr;
 
         // Get hit position in world space
         ret.hitPos = c.entMat.TransformVector(c.hitPosOS);
@@ -520,6 +517,9 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         outMatInfo->valid = false;
         if (targetEntity)
         {
+            // There might not be a texture hit info result as the collision model differs from the mesh itself.
+            // This is completely normal as collisions models are meant to be simplified
+            // compared to the mesh
             *outMatInfo = ProcessLineAgainstMesh(targetEntity, *vecStart, *vecEnd);
         }
     }
