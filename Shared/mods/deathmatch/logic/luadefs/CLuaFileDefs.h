@@ -31,6 +31,7 @@ private:
     LUA_DECLARE(fileRead);
     LUA_DECLARE(fileWrite);
     static std::optional<std::string> fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents);
+    static std::optional<std::vector<std::string>> fileListDir(lua_State* luaVM, std::string path);
 
     LUA_DECLARE(fileGetPos);
     LUA_DECLARE(fileGetSize);

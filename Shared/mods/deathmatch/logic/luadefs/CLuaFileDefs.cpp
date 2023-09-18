@@ -38,10 +38,23 @@ static auto getResourceFilePath(CResource* thisResource, CResource* fileResource
 void CLuaFileDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"fileOpen", fileOpen},       {"fileCreate", fileCreate}, {"fileExists", fileExists}, {"fileCopy", fileCopy},
-        {"fileRename", fileRename},   {"fileDelete", fileDelete}, {"fileClose", fileClose},   {"fileFlush", fileFlush},
-        {"fileRead", fileRead},       {"fileWrite", fileWrite},   {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize},
-        {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},   {"fileSetPos", fileSetPos}, {"fileGetContents", ArgumentParser<fileGetContents>},
+        {"fileOpen", fileOpen},
+        {"fileCreate", fileCreate},
+        {"fileExists", fileExists},
+        {"fileCopy", fileCopy},
+        {"fileRename", fileRename},
+        {"fileDelete", fileDelete},
+        {"fileClose", fileClose},
+        {"fileFlush", fileFlush},
+        {"fileRead", fileRead},
+        {"fileWrite", fileWrite},
+        {"fileGetPos", fileGetPos},
+        {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath},
+        {"fileIsEOF", fileIsEOF},
+        {"fileSetPos", fileSetPos},
+        {"fileGetContents", ArgumentParser<fileGetContents>},
+        {"fileListDir", ArgumentParser<fileListDir>},
     };
 
     // Add functions
@@ -388,8 +401,6 @@ int CLuaFileDefs::fileExists(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             if (CResourceManager::ParseResourcePathInput(strInputPath, pResource, &strAbsPath))
             {
-                SString strFilePath;
-
                 // Does file exist?
                 bool bResult = FileExists(strAbsPath);
                 lua_pushboolean(luaVM, bResult);
@@ -1009,4 +1020,23 @@ int CLuaFileDefs::fileCloseGC(lua_State* luaVM)
 
     lua_pushnil(luaVM);
     return 1;
+}
+
+std::optional<std::vector<std::string>> CLuaFileDefs::fileListDir(lua_State* luaVM, std::string path)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return std::nullopt;
+
+    SString strAbsPath;
+
+    CResource* pResource = pLuaMain->GetResource();
+    pResource->GetResourceDirectoryPath();
+    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
+        return std::nullopt;
+
+    if (!DirectoryExists(strAbsPath))
+        return std::nullopt;
+
+    return SharedUtil::ListDir(strAbsPath, pResource->GetResourceDirectoryPath().c_str());
 }
