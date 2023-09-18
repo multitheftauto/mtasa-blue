@@ -854,6 +854,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
                     std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
+                    m_pManager->GetModelManager()->Add(pModel);
 
                     ushort usParentID = -1;
 
