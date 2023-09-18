@@ -166,12 +166,13 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
         }
         else if (CClientMarkerManager::IsMarkerModel(usModel))
         {
-            bool bResult = ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
+            bool wasReplaced = ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
 
             // 'Restream' 3D markers
-            g_pClientGame->ReinitMarkers();
+            if (wasReplaced)
+                g_pClientGame->ReinitMarkers();
 
-            return bResult;
+            return wasReplaced;
         }
         else if (CClientObjectManager::IsValidModel(usModel))
         {
