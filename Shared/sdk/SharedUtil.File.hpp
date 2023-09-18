@@ -1061,8 +1061,9 @@ int SharedUtil::File::Rename(const char* szOldFilename, const char* szNewFilenam
 
 std::vector<std::string> SharedUtil::ListDir(const char* szPath, const char* szRelativeTo)
 {
-    namespace fs = std::filesystem;
     std::vector<std::string> entries;
+#if _HAS_CXX17
+    namespace fs = std::filesystem;
     if (!DirectoryExists(szPath))
         return {};
 
@@ -1073,6 +1074,38 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath, const char* szR
         else
             entries.push_back(entry.path().string());
     }
+#else
+    #ifdef _WIN32
+    std::string          search_path = szPath + std::string("/*.*");
+    WIN32_FIND_DATA fd;
+    HANDLE          hFind = ::FindFirstFile(search_path.c_str(), &fd);
+    if (hFind == INVALID_HANDLE_VALUE)
+        return {};
+
+    do
+    {
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            continue;
+
+        entries.push_back(fd.cFileName);
+    } while (::FindNextFile(hFind, &fd));
+    ::FindClose(hFind);
+
+    return entries;
+    #else
+    DIR*           dir;
+    struct dirent* ent;
+    if (!(dir = opendir("c:\\src\\")))
+        return {};
+
+    /* print all the files and directories within directory */
+    while ((ent = readdir(dir)))
+    {
+        entries.push_back(ent->d_name);
+    }
+    closedir(dir);
+    #endif
+#endif
 
     return entries;
 }

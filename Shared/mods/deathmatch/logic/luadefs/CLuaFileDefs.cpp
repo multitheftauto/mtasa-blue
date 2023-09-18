@@ -1031,7 +1031,6 @@ std::optional<std::vector<std::string>> CLuaFileDefs::fileListDir(lua_State* lua
     SString strAbsPath;
 
     CResource* pResource = pLuaMain->GetResource();
-    pResource->GetResourceDirectoryPath();
     if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
         return std::nullopt;
 
