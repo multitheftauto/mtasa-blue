@@ -6,7 +6,10 @@ USER root
 # Default build configuration
 ENV AS_BUILDAGENT=0 \
     BUILD_ARCHITECTURE=x64 \
-    BUILD_CONFIG=release
+    BUILD_CONFIG=release \
+    AR=x86_64-linux-gnu-gcc-ar-10 \
+    CC=x86_64-linux-gnu-gcc-10 \
+    CXX=x86_64-linux-gnu-g++-10
 
 # Install build-time dependencies
 RUN apt-get update && \

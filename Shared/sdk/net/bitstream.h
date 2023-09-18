@@ -219,7 +219,7 @@ public:
     }
 
     // Write all characters in `value` (incl. length as `SizeType`)
-    template<typename SizeType = unsigned short>
+    template <typename SizeType = unsigned short>
     void WriteString(std::string_view value)
     {
         // Write the length
@@ -527,6 +527,14 @@ enum class eBitStreamVersion : unsigned short
     //
 
     CEntityAddPacket_ObjectBreakable,
+
+    // Add serverside setWorldSpecialPropertyEnabled
+    // 2023-08-17
+    WorldSpecialProperties,
+
+    // Add "fireballdestruct" to setWorldSpecialPropertyEnabled
+    // 2023-09-09
+    WorldSpecialProperty_FireballDestruct,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

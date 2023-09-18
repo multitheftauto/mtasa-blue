@@ -36,7 +36,7 @@ public:
     virtual bool GetProperty(const SString& strKey, SString& outProperty) = 0;
 
     virtual void InjectMouseMove(int iPosX, int iPosY) = 0;
-    virtual void InjectMouseDown(eWebBrowserMouseButton mouseButton) = 0;
+    virtual void InjectMouseDown(eWebBrowserMouseButton mouseButton, int count) = 0;
     virtual void InjectMouseUp(eWebBrowserMouseButton mouseButton) = 0;
     virtual void InjectMouseWheel(int iScrollVert, int iScrollHorz) = 0;
 
