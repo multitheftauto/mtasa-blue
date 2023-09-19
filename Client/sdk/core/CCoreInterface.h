@@ -27,6 +27,7 @@
 #include <gui/CGUI.h>
 
 typedef bool (*pfnProcessMessage)(HWND, UINT, WPARAM, LPARAM);
+typedef void (*pfnHandleDroppedFiles)(std::vector<std::string>& files);
 
 class CMultiplayer;
 class CNet;
@@ -183,6 +184,7 @@ public:
     virtual void   SetCustomStreamingMemory(size_t sizeBytes) = 0;
     virtual bool   IsUsingCustomStreamingMemorySize() = 0;
     virtual size_t GetStreamingMemory() = 0;
+    virtual void   SetDroppedFilesHandler(pfnHandleDroppedFiles pfnHandler) = 0;
 };
 
 class CClientTime

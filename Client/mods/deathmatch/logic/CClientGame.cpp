@@ -2659,6 +2659,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
 
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
+    m_Events.AddEvent("onFilesDrop", "files", nullptr, false);
 }
 
 void CClientGame::DrawFPS()
