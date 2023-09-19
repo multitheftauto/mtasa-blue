@@ -30,7 +30,8 @@ public:
                                               ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
     virtual CShaderItem*        CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority,
                                              float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
-    virtual CRenderTargetItem*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce = false);
+    virtual CRenderTargetItem*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel, int surfaceFormat,
+                                                   bool bForce = false);
     virtual CScreenSourceItem*  CreateScreenSource(uint uiSizeX, uint uiSizeY);
     virtual CVectorGraphicItem* CreateVectorGraphic(uint width, uint height);
     virtual CWebBrowserItem*    CreateWebBrowser(uint uiSizeX, uint uiSizeY);

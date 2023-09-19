@@ -400,6 +400,9 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
+    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled);
+    bool IsWorldSpecialProperty(WorldSpecialProperty property);
+
     bool SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
 
@@ -804,9 +807,9 @@ private:
     bool                      m_bDoPaintballs;
     bool                      m_bShowInterpolation;
     #endif
-    bool m_bDevelopmentMode;
-    bool m_bShowCollision;
-    bool m_bShowSound;
+    bool                      m_bDevelopmentMode;
+    bool                      m_bShowCollision;
+    bool                      m_bShowSound;
 
     // Debug class. Empty in release.
 public:

@@ -32,7 +32,7 @@ public:
                                   ETextureType textureType = TTYPE_TEXTURE, uint uiVolumeDepth = 1);
     CClientShader* CreateShader(const SString& strFile, const SString& strRootPath, bool bIsRawData, SString& strOutStatus, float fPriority, float fMaxDistance,
                                 bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros);
-    CClientRenderTarget*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel);
+    CClientRenderTarget*  CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel, _D3DFORMAT surfaceFormat);
     CClientScreenSource*  CreateScreenSource(uint uiSizeX, uint uiSizeY);
     CClientWebBrowser*    CreateWebBrowser(uint uiSizeX, uint uiSizeY, bool bIsLocal, bool bTransparent);
     CClientVectorGraphic* CreateVectorGraphic(uint width, uint height);

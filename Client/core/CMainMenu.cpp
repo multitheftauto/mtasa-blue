@@ -76,6 +76,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_bStarted = false;
     m_fFader = 0;
     m_ucFade = FADE_INVISIBLE;
+    m_bCursorAlphaReset = false;
 
     // Adjust window size to resolution
     CVector2D ScreenSize = m_pManager->GetResolution();
@@ -587,6 +588,17 @@ void CMainMenu::Update()
         if (m_fFader > 0.0f)
         {
             m_bIsVisible = true;            // Make cursor appear faster
+
+            if (!m_bCursorAlphaReset)
+            {
+                CGUI* pGUI = g_pCore->GetGUI();
+
+                if (pGUI)
+                {
+                    pGUI->SetCursorAlpha(1.0f);
+                    m_bCursorAlphaReset = true;
+                }
+            }
         }
 
         // If the fade is complete
@@ -595,6 +607,7 @@ void CMainMenu::Update()
             m_ucFade = FADE_VISIBLE;
             m_bIsVisible = true;
             m_bIsFullyVisible = true;
+
         }
     }
     // Fade out
@@ -608,7 +621,11 @@ void CMainMenu::Update()
         m_pBackground->SetAlpha(Clamp(0.f, m_fFader, CORE_MTA_BG_MAX_ALPHA));
 
         if (m_fFader < 1.0f)
+        {
             m_bIsVisible = false;            // Make cursor disappear faster
+            m_bCursorAlphaReset = false;
+        }
+            
 
         // If the fade is complete
         if (m_fFader <= 0)
@@ -709,6 +726,7 @@ void CMainMenu::OnEscapePressedOffLine()
 void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
 {
     CMultiplayer* pMultiplayer = CCore::GetSingleton().GetMultiplayer();
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pMultiplayer->DisablePadHandler(bVisible);
 
     if ((m_ucFade == FADE_VISIBLE || m_ucFade == FADE_IN) && bVisible == false)
@@ -730,6 +748,11 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
         m_Credits.SetVisible(false);
         m_pNewsBrowser->SetVisible(false);
 
+        if (GetIsIngame() && pQuestionBox->IsVisible())
+        {
+            pQuestionBox->Reset();
+            pQuestionBox->Hide();
+        }
         //        m_bIsInSubWindow = false;
     }
     else
