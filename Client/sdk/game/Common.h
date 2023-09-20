@@ -1455,7 +1455,7 @@ enum class eShadowTextureType
     HEADLIGHT1,
     HEADLIGHT2,
     BLOOD,
-    HEADMAN,
+    HANDMAN,
     WINCRACK,
     LAMP,
 };

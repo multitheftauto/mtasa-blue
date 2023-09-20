@@ -15,12 +15,10 @@
 #include "CVector2D.h"
 #include "CFxSA.h"
 #include "CEntitySA.h"
-
-//using StoreShadowToBeRendered_t = int(__cdecl*)(eShadowType type, RwTexture* texture, const CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
-//                                                char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
+;
 using StoreShadowToBeRendered_t = int(__cdecl*)(eShadowType, struct RwTexture*, const CVector*, float, float, float, float, short, unsigned char,
                                                 unsigned char, unsigned char, float, bool, float, class CRealTimeShadow*, bool);
-auto            StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
+auto            StoreShadowToBeRendered = reinterpret_cast<StoreShadowToBeRendered_t>(0x707390);
 unsigned short& CShadows_ShadowsStoredToBeRendered = *(unsigned short*)0xC403DC;
 
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
@@ -250,7 +248,7 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     }
 }
 
-bool CFxSA::IsShadowsLimitReached() const
+bool CFxSA::IsShadowsLimitReached()
 {
     return CShadows_ShadowsStoredToBeRendered >= 48;
 }

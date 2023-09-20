@@ -50,8 +50,8 @@ public:
     void AddPunchImpact(CVector& vecPosition, CVector& vecDirection, int);
     void AddDebris(CVector& vecPosition, RwColor& rwColor, float fScale, int iCount);
     void AddGlass(CVector& vecPosition, RwColor& rwColor, float fScale, int iCount);
-    bool AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color, eShadowType shadowType, float fZDistance,
-                    bool bDrawOnWater, bool bDrawOnBuildings);
+    bool AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
+                   eShadowType shadowType, float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings);
     void TriggerWaterHydrant(CVector& vecPosition);
     void TriggerGunshot(CEntity* pEntity, CVector& vecPosition, CVector& vecDirection, bool bIncludeSparks);
     void TriggerTankFire(CVector& vecPosition, CVector& vecDirection);
@@ -59,7 +59,7 @@ public:
     void TriggerBulletSplash(CVector& vecPosition);
     void TriggerFootSplash(CVector& vecPosition);
 
-    bool IsShadowsLimitReached() const;
+    static bool IsShadowsLimitReached();
 private:
     CFxSAInterface* m_pInterface;
 };
