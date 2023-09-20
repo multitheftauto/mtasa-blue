@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-07-02 09:15\n"
+"PO-Revision-Date: 2023-04-16 19:37\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -25,12 +25,12 @@ msgstr "Versi MTA:SA yang telah anda unduh tidak mendukung Windows XP atau Vista
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "Versi MTA:SA yang telah Anda unduh tidak mendukung Windows 7, 8 atau 8.1. Silahkan unduh versi alternatif dari www.mtasa.com."
+msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr "Versi MTA:SA yang telah Anda unduh itu didesain untuk versi Windows yang lama. Silahkan unduh versi alternatif dari www.mtasa.com."
+msgstr ""
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208

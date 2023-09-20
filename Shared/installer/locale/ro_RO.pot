@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-09-11 08:22\n"
+"PO-Revision-Date: 2023-04-16 19:36\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -25,12 +25,12 @@ msgstr "Versiunea de MTA:SA pe care ați descărcat-o nu suportă Windows XP sau
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "Versiunea de MTA:SA pe care ați descărcat-o nu este compatibilă cu Windows 7, 8 sau 8.1. Vă rugăm să descărcați o versiune alternativă de pe www.mtasa.com."
+msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr "Versiunea de MTA:SA pe care ați descărcat-o este destinată versiunilor vechi de Windows. Vă rugăm să descărcați o versiune alternativă de pe www.mtasa.com."
+msgstr ""
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208

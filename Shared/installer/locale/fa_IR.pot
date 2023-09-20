@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-06-24 11:27\n"
+"PO-Revision-Date: 2023-04-16 19:37\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -25,12 +25,12 @@ msgstr "این نسخه از MTA:SA که دانلود کرده اید از وی�
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "این نسخه از MTA:SA که دانلود کرده اید برای ویندوز 7, 8 یا 8.1  پشتیبانی نمی شود. لطفا یک نسخه دیگر را از www.mtasa.com دانلود کنید."
+msgstr ""
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr "این نسخه از MTA:SA برای نسخه های قدیمی ویندوز طراحی شده است. لطفا جدیدترین نسخه را از www.mtasa.com دانلود کنید."
+msgstr ""
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
@@ -84,7 +84,7 @@ msgstr "پروتکل mtasa:// را برای قابلیت کلیک مرورگر �
 #. DESC_Section13
 #: Shared/installer/nightly.nsi:220
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "اضافه کردن به Windows Games Explorer (در صورت وجود)."
+msgstr "به Windows Games Explorer (در صورت وجود) اضافه کنید."
 
 #. DESC_DirectX
 #: Shared/installer/nightly.nsi:221
@@ -378,7 +378,7 @@ msgstr "سفارشی"
 #. INST_CHOOSE_LOC4
 #: Shared/installer/nightly.nsi:2165
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr "پوشه را برای نصب ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} در اینجا انتخاب کنید:"
+msgstr "پوشه را برای نصب ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} در آن انتخاب کنید:"
 
 #. INST_LOC_OW
 #: Shared/installer/nightly.nsi:2183
