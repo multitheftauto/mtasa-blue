@@ -10,7 +10,7 @@ local UNIFONT_PATH = "Shared/data/MTA San Andreas/MTA/cgui"
 
 -- Change these to update the version
 local UNIFONT_TAG = "v15.1.01"
-local UNIFONT_HASH = "1f3e34208384fa116ea5a2dbef092614c3935a3f0d22d7981de45206b3541d8f"
+local UNIFONT_HASH = "46dce92d451faeb23d1d08a1c7448f10c60af444d2d688674dc91e85081f2c3b"
 
 newaction {
 	trigger = "install_unifont",
