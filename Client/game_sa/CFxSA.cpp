@@ -16,9 +16,12 @@
 #include "CFxSA.h"
 #include "CEntitySA.h"
 
-using StoreShadowToBeRendered_t = int(__cdecl*)(eShadowType type, RwTexture* texture, const CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
-                                                char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
-auto StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
+//using StoreShadowToBeRendered_t = int(__cdecl*)(eShadowType type, RwTexture* texture, const CVector* pos, float x1, float y1, float x2, float y2, __int16 intensity, char r,
+//                                                char g, char b, float zDistance, char bDrawOnWater, float scale, void* shadowData, char bDrawOnBuildings);
+using StoreShadowToBeRendered_t = int(__cdecl*)(eShadowType, struct RwTexture*, const CVector*, float, float, float, float, short, unsigned char,
+                                                unsigned char, unsigned char, float, bool, float, class CRealTimeShadow*, bool);
+auto            StoreShadowToBeRendered = (StoreShadowToBeRendered_t)0x707390;
+unsigned short& CShadows_ShadowsStoredToBeRendered = *(unsigned short*)0xC403DC;
 
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
@@ -249,7 +252,6 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
 
 bool CFxSA::IsShadowsLimitReached() const
 {
-    unsigned short& CShadows_ShadowsStoredToBeRendered = *(unsigned short*)0xC403DC;
     return CShadows_ShadowsStoredToBeRendered >= 48;
 }
 
@@ -263,6 +265,5 @@ bool CFxSA::AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPo
     RwTexture* pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
 
     
-    return StoreShadowToBeRendered(shadowType, pRwTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B,
-                            fZDistance, bDrawOnWater, 1, 0, bDrawOnBuildings);
+    return StoreShadowToBeRendered(shadowType, pRwTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B, fZDistance, bDrawOnWater, 1, 0, bDrawOnBuildings);
 }
