@@ -250,7 +250,8 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
 
 bool CFxSA::IsShadowsLimitReached()
 {
-    return CShadows_ShadowsStoredToBeRendered >= 48;
+    constexpr int shadowsLimit = 48;
+    return CShadows_ShadowsStoredToBeRendered >= shadowsLimit;
 }
 
 bool CFxSA::AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color, eShadowType shadowType, float fZDistance,
