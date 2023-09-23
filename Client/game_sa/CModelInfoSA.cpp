@@ -821,8 +821,8 @@ void CModelInfoSA::StaticResetTextureDictionaries()
         }
         else
         {
-            // Model was dealocated. Skip it and remove from list 
-            ms_DefaultTxdIDMap.erase(ms_DefaultTxdIDMap.begin()->first);
+            // Model was deallocated. Skip and remove it from our list.
+            ms_DefaultTxdIDMap.erase(ms_DefaultTxdIDMap.begin());
         }
     }
 }
