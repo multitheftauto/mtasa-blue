@@ -310,17 +310,19 @@ int CLuaBrowserDefs::InjectBrowserMouseMove(lua_State* luaVM)
 
 int CLuaBrowserDefs::InjectBrowserMouseDown(lua_State* luaVM)
 {
-    //  bool injectBrowserMouseDown ( browser webBrowser, string mouseButton )
-    CClientWebBrowser*     pWebBrowser;
-    eWebBrowserMouseButton mouseButton;
+    //  bool injectBrowserMouseDown ( browser webBrowser, string mouseButton [ , bool doubleClick = false ] )
+    CClientWebBrowser*     pWebBrowser{};
+    eWebBrowserMouseButton mouseButton{};
+    bool                   doubleClick{};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pWebBrowser);
     argStream.ReadEnumString(mouseButton);
+    argStream.ReadBool(doubleClick, false);
 
     if (!argStream.HasErrors())
     {
-        pWebBrowser->InjectMouseDown(mouseButton);
+        pWebBrowser->InjectMouseDown(mouseButton, doubleClick ? 2 : 1);
         lua_pushboolean(luaVM, true);
         return 1;
     }

@@ -166,6 +166,8 @@ public:
     virtual bool           IsValid() = 0;
     virtual bool           IsAllocatedInArchive() = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;
+    virtual void           SetTextureDictionaryID(unsigned short usTxdId) = 0;
+    virtual void           ResetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
     virtual float          GetOriginalLODDistance() = 0;
     virtual void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false) = 0;
@@ -231,6 +233,7 @@ public:
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
     virtual void      MakeTimedObjectModel(unsigned short usBaseID) = 0;
+    virtual void      MakeClumpModel(unsigned short usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;

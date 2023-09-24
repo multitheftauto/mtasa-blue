@@ -40,7 +40,7 @@ public:
     bool GetProperty(const SString& strKey, SString& outValue);
 
     void InjectMouseMove(int iPosX, int iPosY);
-    void InjectMouseDown(eWebBrowserMouseButton mouseButton);
+    void InjectMouseDown(eWebBrowserMouseButton mouseButton, int count);
     void InjectMouseUp(eWebBrowserMouseButton mouseButton);
     void InjectMouseWheel(int iScrollVert, int iScrollHorz);
 

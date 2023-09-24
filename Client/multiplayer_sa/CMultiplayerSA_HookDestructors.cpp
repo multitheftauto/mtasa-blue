@@ -207,13 +207,9 @@ void _cdecl OnVehicleDestructor(DWORD calledFrom, CVehicleSAInterface* pVehicle)
 }
 
 // Hook info
-#define HOOKPOS_CVehicleDestructor_US        0x6E2B40
-#define HOOKPOS_CVehicleDestructor_EU        0x6E2B40
-#define HOOKSIZE_CVehicleDestructor_US       7
-#define HOOKSIZE_CVehicleDestructor_EU       7
-DWORD RETURN_CVehicleDestructor_US = 0x401355;
-DWORD RETURN_CVehicleDestructor_EU = 0x401357;
-DWORD RETURN_CVehicleDestructor_BOTH = NULL;
+#define HOOKPOS_CVehicleDestructor           0x6E2B40
+#define HOOKSIZE_CVehicleDestructor          7
+DWORD RETURN_CVehicleDestructor = 0x401355;
 void _declspec(naked) HOOK_CVehicleDestructor()
 {
     _asm
@@ -226,7 +222,7 @@ void _declspec(naked) HOOK_CVehicleDestructor()
         popad
 
         push    0FFFFFFFFh
-        jmp     RETURN_CVehicleDestructor_BOTH
+        jmp     RETURN_CVehicleDestructor
     }
 }
 

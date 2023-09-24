@@ -101,9 +101,9 @@ void CClientWebBrowser::InjectMouseMove(int iPosX, int iPosY)
     m_pWebView->InjectMouseMove(iPosX, iPosY);
 }
 
-void CClientWebBrowser::InjectMouseDown(eWebBrowserMouseButton mouseButton)
+void CClientWebBrowser::InjectMouseDown(eWebBrowserMouseButton mouseButton, int count)
 {
-    m_pWebView->InjectMouseDown(mouseButton);
+    m_pWebView->InjectMouseDown(mouseButton, count);
 }
 
 void CClientWebBrowser::InjectMouseUp(eWebBrowserMouseButton mouseButton)

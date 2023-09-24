@@ -23,6 +23,7 @@ public:
     LUA_DECLARE(KillPed);
     LUA_DECLARE(DetonateSatchels);
 
+    static bool ResetPedVoice(CClientPed* ped);
     LUA_DECLARE(GetPedVoice);
     LUA_DECLARE(SetPedVoice);
     LUA_DECLARE(GetPedTarget);

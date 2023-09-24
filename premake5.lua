@@ -123,7 +123,7 @@ workspace "MTASA"
 	filter { "system:linux or macosx", "configurations:not Debug" }
 		buildoptions { "-fvisibility=hidden" }
 
-	filter { "system:linux or macosx", "configurations:not Debug", "language:C++" }
+	filter { "system:linux or macosx", "configurations:not Debug", "files:*.cpp" }
 		buildoptions { "-fvisibility-inlines-hidden" }
 
 	filter { "system:linux", "platforms:x86 or x64" }

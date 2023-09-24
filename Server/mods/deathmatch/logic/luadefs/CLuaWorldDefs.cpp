@@ -72,6 +72,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setOcclusionsEnabled", setOcclusionsEnabled},
                                                                              {"setMoonSize", setMoonSize},
                                                                              {"setJetpackWeaponEnabled", setJetpackWeaponEnabled},
+                                                                             {"setWorldSpecialPropertyEnabled", ArgumentParserWarn<false, setWorldSpecialPropertyEnabled>},
 
                                                                              // Reset
                                                                              {"resetSkyGradient", resetSkyGradient},
@@ -90,6 +91,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              // Check
                                                                              {"isGarageOpen", isGarageOpen},
                                                                              {"isGlitchEnabled", isGlitchEnabled},
+                                                                             {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, isWorldSpecialPropertyEnabled>},
                                                                              {"areTrafficLightsLocked", areTrafficLightsLocked}};
 
     // Add functions
@@ -1265,6 +1267,16 @@ int CLuaWorldDefs::setJetpackWeaponEnabled(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaWorldDefs::isWorldSpecialPropertyEnabled(WorldSpecialProperty property)
+{
+    return CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(property);
+}
+
+bool CLuaWorldDefs::setWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
+{
+    return CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(property, isEnabled);
 }
 
 int CLuaWorldDefs::getJetpackWeaponEnabled(lua_State* luaVM)

@@ -14,10 +14,10 @@ class CLuaTimer;
 #pragma once
 
 // Define includes
-#include "LuaCommon.h"
-#include "CLuaArguments.h"
+#include "lua/LuaCommon.h"
+#include "lua/CLuaArguments.h"
 
-#define LUA_TIMER_MIN_INTERVAL 0
+#define LUA_TIMER_MIN_INTERVAL      0
 
 class CLuaTimer
 {

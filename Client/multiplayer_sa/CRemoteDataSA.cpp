@@ -13,7 +13,6 @@
 
 // These includes have to be fixed!
 #include "../game_sa/CPedSA.h"
-#include "../game_sa/CVehicleSA.h"
 
 CPools*                                      CRemoteDataSA::m_pPools;
 std::map<CPlayerPed*, CRemoteDataStorageSA*> CRemoteDataSA::m_RemoteData;

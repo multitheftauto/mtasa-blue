@@ -62,7 +62,8 @@ void CPixelsManager::OnDeviceCreate(IDirect3DDevice9* pDevice)
 // Copy pixels from texture
 //
 ////////////////////////////////////////////////////////////////
-bool CPixelsManager::GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CPixels& outPixels, const RECT* pRect, uint uiSurfaceIndex)
+bool CPixelsManager::GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CPixels& outPixels, EPixelsFormatType pixelsFormat, ERenderFormat renderFormat,
+                                      bool bMipMaps, const RECT* pRect, uint uiSurfaceIndex)
 {
     if (!pD3DBaseTexture)
         return false;
@@ -73,6 +74,9 @@ bool CPixelsManager::GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CP
     D3DRESOURCETYPE resourceType = pD3DBaseTexture->GetType();
     if (resourceType == D3DRTYPE_VOLUMETEXTURE)
     {
+        if (pixelsFormat != EPixelsFormat::PLAIN)
+            return D3DXGetVolumePixels((IDirect3DVolumeTexture9*)pD3DBaseTexture, outPixels, pixelsFormat, renderFormat, bMipMaps, pRect, uiSurfaceIndex);
+
         return GetVolumeTexturePixels((IDirect3DVolumeTexture9*)pD3DBaseTexture, outPixels, pRect, uiSurfaceIndex);
     }
     else if (resourceType == D3DRTYPE_CUBETEXTURE)
@@ -100,6 +104,9 @@ bool CPixelsManager::GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CP
         CVARS_GET("allow_screen_upload", bAllowScreenUpload);
         if (bAllowScreenUpload)
         {
+            if (pixelsFormat != EPixelsFormat::PLAIN)
+                return D3DXGetSurfacePixels(pD3DSurface, outPixels, pixelsFormat, renderFormat, bMipMaps, pRect);
+
             // Get pixels onto offscreen surface
             IDirect3DSurface9* pLockableSurface = GetRTLockableSurface(pD3DSurface);
 
@@ -118,6 +125,9 @@ bool CPixelsManager::GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CP
     }
     else if (Desc.Usage == 0)
     {
+        if (pixelsFormat != EPixelsFormat::PLAIN)
+            return D3DXGetSurfacePixels(pD3DSurface, outPixels, pixelsFormat, renderFormat, bMipMaps, pRect);
+
         if (Desc.Format == D3DFMT_A8R8G8B8 || Desc.Format == D3DFMT_X8R8G8B8 || Desc.Format == D3DFMT_R5G6B5)
         {
             // Direct reading will work here
@@ -465,6 +475,85 @@ bool CPixelsManager::SetSurfacePixels(IDirect3DSurface9* pD3DSurface, const CPix
 
     pD3DSurface->UnlockRect();
     return true;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CPixelsManager::D3DXGetSurfacePixels
+//
+// Returns D3DXIMAGE_FILEFORMAT pixels
+//
+////////////////////////////////////////////////////////////////
+bool CPixelsManager::D3DXGetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixels& outPixels, EPixelsFormatType pixelsFormat, ERenderFormat renderFormat,
+                                          bool bMipMaps, const RECT* pRect)
+{
+    if (!pD3DSurface)
+        return false;
+
+    ID3DXBuffer*                dxBuffer;
+    CAutoReleaseMe<ID3DXBuffer> Thanks1(dxBuffer);
+
+    D3DXIMAGE_FILEFORMAT dxFileFormat = D3DXIFF_DDS;
+    switch (pixelsFormat)
+    {
+        case EPixelsFormat::PNG:
+            dxFileFormat = D3DXIFF_PNG;
+            break;
+        case EPixelsFormat::JPEG:
+            dxFileFormat = D3DXIFF_JPG;
+            break;
+    }
+
+    if (dxFileFormat != D3DXIFF_DDS)
+    {
+        if (!FAILED(D3DXSaveSurfaceToFileInMemory(&dxBuffer, dxFileFormat, pD3DSurface, NULL, pRect)))
+        {
+            outPixels.SetSize(dxBuffer->GetBufferSize());
+            char* pPixelsData = outPixels.GetData();
+            memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
+            return true;
+        }
+        return false;
+    }
+
+    // Convert surface to DDS texture of requested format
+
+    IDirect3DTexture9*                pD3DTempTexture = NULL;
+    IDirect3DSurface9*                pD3DTempSurface = NULL;
+    CAutoReleaseMe<IDirect3DTexture9> Thanks2(pD3DTempTexture);
+    CAutoReleaseMe<IDirect3DSurface9> Thanks3(pD3DTempSurface);
+
+    D3DSURFACE_DESC Desc;
+    pD3DSurface->GetDesc(&Desc);
+
+    D3DFORMAT dxFormat = (D3DFORMAT)renderFormat;
+    if (dxFormat == D3DFMT_UNKNOWN)
+        dxFormat = Desc.Format;
+
+    if (pRect)
+    {
+        Desc.Width = pRect->right - pRect->left;
+        Desc.Height = pRect->bottom - pRect->top;
+    }
+
+    if (FAILED(D3DXCreateTexture(m_pDevice, Desc.Width, Desc.Height, !bMipMaps, NULL, dxFormat, D3DPOOL_SYSTEMMEM, &pD3DTempTexture)))
+        return false;
+
+    if (FAILED(pD3DTempTexture->GetSurfaceLevel(0, &pD3DTempSurface)))
+        return false;
+
+    if (FAILED(D3DXLoadSurfaceFromSurface(pD3DTempSurface, NULL, NULL, pD3DSurface, NULL, pRect, D3DX_FILTER_NONE, 0)))
+        return false;
+
+    // Extract pixels from converted texture
+    if (!FAILED(D3DXSaveTextureToFileInMemory(&dxBuffer, dxFileFormat, pD3DTempTexture, NULL)))
+    {
+        outPixels.SetSize(dxBuffer->GetBufferSize());
+        char* pPixelsData = outPixels.GetData();
+        memcpy(pPixelsData, dxBuffer->GetBufferPointer(), outPixels.GetSize());
+        return true;
+    }
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////

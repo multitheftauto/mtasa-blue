@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CHandlingManager.h"
 #include "CCommon.h"
+#include "CVehicleManager.h"
 
 SFixedArray<tHandlingData, HT_MAX> CHandlingManager::m_OriginalHandlingData;
 
@@ -99,7 +100,7 @@ CHandlingEntry* CHandlingManager::CreateHandlingData()
 bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -115,7 +116,7 @@ bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* p
 const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -129,7 +130,7 @@ const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eM
 const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);
@@ -156,7 +157,7 @@ eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
 bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
 {
     // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
         eHandlingTypes eHandling = GetHandlingID(eModel);

@@ -4973,7 +4973,7 @@ bool CStaticFunctionDefinitions::FadeCamera(bool bFadeIn, float fFadeTime, unsig
 
 bool CStaticFunctionDefinitions::GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld)
 {
-    if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled())
+    if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled() || g_pCore->GetConsole()->IsVisible() || g_pCore->IsChatInputEnabled())
     {
         tagPOINT point;
         GetCursorPos(&point);
@@ -6316,7 +6316,7 @@ bool CStaticFunctionDefinitions::SetTime(unsigned char ucHour, unsigned char ucM
 
 bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint,
                                                     CClientEntity** pColEntity, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity,
-                                                    SLineOfSightBuildingResult* pBuildingResult)
+                                                    SLineOfSightBuildingResult* pBuildingResult, SProcessLineOfSightMaterialInfoResult* outMatInfo)
 {
     assert(pColPoint);
     assert(pColEntity);
@@ -6325,7 +6325,7 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
         g_pGame->GetWorld()->IgnoreEntity(pIgnoredEntity);
 
     CEntity* pColGameEntity = 0;
-    bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult);
+    bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult, outMatInfo);
 
     if (pIgnoredEntity)
         g_pGame->GetWorld()->IgnoreEntity(NULL);
@@ -6638,11 +6638,6 @@ bool CStaticFunctionDefinitions::GetWindVelocity(float& fX, float& fY, float& fZ
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(const char* szPropName)
-{
-    return g_pGame->IsCheatEnabled(szPropName);
-}
-
 bool CStaticFunctionDefinitions::GetTrafficLightState(unsigned char& ucState)
 {
     ucState = g_pMultiplayer->GetTrafficLightState();
@@ -6828,11 +6823,6 @@ bool CStaticFunctionDefinitions::SetGarageOpen(unsigned char ucGarageID, bool bI
     }
 
     return false;
-}
-
-bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(const char* szPropName, bool bEnabled)
-{
-    return g_pGame->SetCheatEnabled(szPropName, bEnabled);
 }
 
 bool CStaticFunctionDefinitions::SetCloudsEnabled(bool bEnabled)
@@ -8810,9 +8800,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8829,9 +8816,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
@@ -8850,9 +8834,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8869,9 +8850,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
@@ -8890,9 +8868,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8910,9 +8885,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     eVehicleTypes         eModel = (eVehicleTypes)pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
@@ -8975,9 +8947,6 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pVehicle, eHandlingProperty eProperty)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
     const CHandlingEntry* pOrigEntry = pVehicle->GetOriginalHandlingData();

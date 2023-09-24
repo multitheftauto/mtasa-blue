@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2023-05-19 18:06\n"
+"PO-Revision-Date: 2023-06-20 19:48\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -31,7 +31,7 @@ msgstr "Pretraživač servera"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr "Lokalna igra"
+msgstr "Hostuj igru"
 
 #. Found in the main menu navigation
 msgid "Map editor"

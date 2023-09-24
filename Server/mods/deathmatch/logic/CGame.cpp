@@ -74,15 +74,8 @@
 #define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
-#define RELEASE_MIN_CLIENT_VERSION              "1.4.0-0.00000"
-#define BULLET_SYNC_MIN_CLIENT_VERSION          "1.3.0-9.04311"
-#define VEH_EXTRAPOLATION_MIN_CLIENT_VERSION    "1.3.0-9.04460"
-#define ALT_PULSE_ORDER_MIN_CLIENT_VERSION      "1.3.1-9.04913"
-#define HIT_ANIM_CLIENT_VERSION                 "1.3.2"
-#define SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION   "1.3.5-9.06054"
-#define SPRINT_FIX_MIN_CLIENT_VERSION           "1.3.5-9.06277"
-#define DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION   "1.4.0-5.06399"
-#define SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION   "1.5.1"
+#define RELEASE_MIN_CLIENT_VERSION              "1.6.0-0.00000"
+#define FIREBALLDESTRUCT_MIN_CLIENT_VERSION     "1.6.0-9.22199"
 
 #ifndef WIN32
     #include <limits.h>
@@ -237,6 +230,21 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
+
+    // Setup world special properties
+    m_WorldSpecialProps[WorldSpecialProperty::HOVERCARS] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::AIRCARS] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRABUNNY] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRAJUMP] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::RANDOMFOLIAGE] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::SNIPERMOON] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRAAIRRESISTANCE] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::UNDERWORLDWARP] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLESUNGLARE] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::CORONAZTEST] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::WATERCREATURES] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::BURNFLIPPEDCARS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::FIREBALLDESTRUCT] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -1627,6 +1635,7 @@ void CGame::AddBuiltInEvents()
     // Other events
     m_Events.AddEvent("onSettingChange", "setting, oldValue, newValue", NULL, false);
     m_Events.AddEvent("onChatMessage", "message, element", NULL, false);
+    m_Events.AddEvent("onExplosion", "x, y, z, type, origin", nullptr, false);
 
     // Weapon events
     m_Events.AddEvent("onWeaponFire", "", NULL, false);
@@ -1977,6 +1986,8 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     if (pPed && !pPed->IsDead())
     {
         pPed->SetIsDead(true);
+        pPed->SetHealth(0.0f);
+        pPed->SetArmor(0.0f);
         pPed->SetPosition(Packet.m_vecPosition);
 
         // Reset his vehicle action, but only if not jacking
@@ -2627,112 +2638,121 @@ void CGame::Packet_DestroySatchels(CDestroySatchelsPacket& Packet)
 
 void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
 {
-    // Grab the source player
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer && pPlayer->IsJoined())
+    CPlayer* const clientSource = Packet.GetSourcePlayer();
+
+    if (!clientSource || !clientSource->IsJoined())
+        return;
+
+    bool          syncToPlayers = true;
+    CVector       explosionPosition = Packet.m_vecPosition;
+    CElement*     explosionSource = nullptr;
+    unsigned char explosionType = Packet.m_ucType;
+
+    if (ElementID originID = Packet.m_OriginID; originID != INVALID_ELEMENT_ID)
     {
-        bool          bBroadcast = true;
-        ElementID     OriginID = Packet.m_OriginID;
-        unsigned char ucType = Packet.m_ucType;
-        CVector       vecPosition = Packet.m_vecPosition;
-        if (OriginID != INVALID_ELEMENT_ID)
+        if (explosionSource = CElementIDs::GetElement(originID); explosionSource != nullptr)
         {
-            CElement* pOrigin = CElementIDs::GetElement(OriginID);
-            // Do we have an origin source?
-            if (pOrigin)
+            switch (explosionSource->GetType())
             {
-                // Is the source of the explosion a vehicle?
-                switch (pOrigin->GetType())
+                case CElement::PLAYER:
                 {
-                    case CElement::PLAYER:
+                    // Shift the relative explosion position to an absolute position in the world.
+                    CVehicle* occupiedVehicle = static_cast<CPlayer*>(explosionSource)->GetOccupiedVehicle();
+
+                    if (occupiedVehicle)
                     {
-                        // Correct our position vector
-                        CVehicle* pVehicle = static_cast<CPlayer*>(pOrigin)->GetOccupiedVehicle();
-                        if (pVehicle)
-                        {
-                            // Use the vehicle's position?
-                            vecPosition += pVehicle->GetPosition();
-                        }
-                        else
-                        {
-                            // Use the player's position
-                            vecPosition += pOrigin->GetPosition();
-                        }
-                        break;
+                        explosionPosition += occupiedVehicle->GetPosition();
+                        explosionSource = occupiedVehicle;
                     }
-                    case CElement::VEHICLE:
+                    else
+                        explosionPosition += explosionSource->GetPosition();
+
+                    break;
+                }
+                case CElement::VEHICLE:
+                {
+                    // Shift the relative explosion position to an absolute position in the world.
+                    explosionPosition += explosionSource->GetPosition();
+
+                    // Has the vehicle blown up?
+                    switch (explosionType)
                     {
-                        // Correct our position vector
-                        vecPosition += pOrigin->GetPosition();
-
-                        // Has the vehicle blown up?
-                        switch (ucType)
+                        case CExplosionSyncPacket::EXPLOSION_CAR:
+                        case CExplosionSyncPacket::EXPLOSION_CAR_QUICK:
+                        case CExplosionSyncPacket::EXPLOSION_BOAT:
+                        case CExplosionSyncPacket::EXPLOSION_HELI:
+                        case CExplosionSyncPacket::EXPLOSION_TINY:
                         {
-                            case 4:             // EXP_TYPE_CAR
-                            case 5:             // EXP_TYPE_CAR_QUICK
-                            case 6:             // EXP_TYPE_BOAT
-                            case 7:             // EXP_TYPE_HELI
-                            case 12:            // EXP_TYPE_TINY - RC Vehicles
+                            CVehicle*        vehicle = static_cast<CVehicle*>(explosionSource);
+                            VehicleBlowState previousBlowState = vehicle->GetBlowState();
+
+                            if (previousBlowState != VehicleBlowState::BLOWN)
                             {
-                                CVehicle*        vehicle = static_cast<CVehicle*>(pOrigin);
-                                VehicleBlowState previousBlowState = vehicle->GetBlowState();
+                                vehicle->SetBlowState(VehicleBlowState::BLOWN);
+                                vehicle->SetEngineOn(false);
 
-                                if (previousBlowState != VehicleBlowState::BLOWN)
+                                // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
+                                if (previousBlowState == VehicleBlowState::INTACT)
                                 {
-                                    vehicle->SetBlowState(VehicleBlowState::BLOWN);
-                                    vehicle->SetEngineOn(false);
-
-                                    // NOTE(botder): We only trigger this event if we didn't blow up a vehicle with `blowVehicle`
-                                    if (previousBlowState == VehicleBlowState::INTACT)
-                                    {
-                                        CLuaArguments arguments;
-                                        arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
-                                        vehicle->CallEvent("onVehicleExplode", arguments);
-                                    }
-
-                                    bBroadcast = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
+                                    CLuaArguments arguments;
+                                    arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                    vehicle->CallEvent("onVehicleExplode", arguments);
                                 }
-                                else
-                                {
-                                    bBroadcast = false;
-                                }
+
+                                syncToPlayers = vehicle->GetBlowState() == VehicleBlowState::BLOWN && !vehicle->IsBeingDeleted();
+                            }
+                            else
+                            {
+                                syncToPlayers = false;
                             }
                         }
-                        break;
                     }
-                    default:
-                        break;
+
+                    break;
                 }
+                default:
+                    break;
             }
-        }
-
-        if (bBroadcast)
-        {
-            // Make a list of players to send this packet to
-            CSendList sendList;
-
-            // Loop through all the players
-            std::list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
-            for (; iter != m_pPlayerManager->IterEnd(); iter++)
-            {
-                CPlayer* pSendPlayer = *iter;
-
-                // We tell the reporter to create the explosion too
-                // Grab this player's camera position
-                CVector vecCameraPosition;
-                pSendPlayer->GetCamera()->GetPosition(vecCameraPosition);
-
-                // Is this players camera close enough to send?
-                if (IsPointNearPoint3D(vecPosition, vecCameraPosition, MAX_EXPLOSION_SYNC_DISTANCE))
-                {
-                    // Send the packet to him
-                    sendList.push_back(pSendPlayer);
-                }
-            }
-
-            CPlayerManager::Broadcast(Packet, sendList);
         }
     }
+
+    if (!syncToPlayers)
+        return;
+
+    if (!explosionSource)
+        explosionSource = m_pMapManager->GetRootElement();
+
+    CLuaArguments arguments;
+    arguments.PushNumber(explosionPosition.fX);
+    arguments.PushNumber(explosionPosition.fY);
+    arguments.PushNumber(explosionPosition.fZ);
+    arguments.PushNumber(explosionType);
+    // TODO: The client uses a nearby player as the origin, if there is none, and we don't want that.
+    // arguments.PushElement(explosionSource);
+    syncToPlayers = clientSource->CallEvent("onExplosion", arguments);
+
+    if (!syncToPlayers)
+        return;
+
+    // Make a list of players to send this packet to (including the explosion reporter).
+    CSendList sendList;
+
+    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
+    {
+        CPlayer* player = *iter;
+
+        CVector cameraPosition;
+        player->GetCamera()->GetPosition(cameraPosition);
+
+        // Is this players camera close enough to send?
+        if (IsPointNearPoint3D(explosionPosition, cameraPosition, MAX_EXPLOSION_SYNC_DISTANCE))
+        {
+            sendList.push_back(player);
+        }
+    }
+
+    if (!sendList.empty())
+        CPlayerManager::Broadcast(Packet, sendList);
 }
 
 void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
@@ -4473,15 +4493,10 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
         eWeaponType weaponList[] = {
             WEAPONTYPE_PISTOL,         WEAPONTYPE_PISTOL_SILENCED, WEAPONTYPE_DESERT_EAGLE, WEAPONTYPE_SHOTGUN, WEAPONTYPE_SAWNOFF_SHOTGUN,
             WEAPONTYPE_SPAS12_SHOTGUN, WEAPONTYPE_MICRO_UZI,       WEAPONTYPE_MP5,          WEAPONTYPE_AK47,    WEAPONTYPE_M4,
-            WEAPONTYPE_TEC9,           WEAPONTYPE_COUNTRYRIFLE};
+            WEAPONTYPE_TEC9,           WEAPONTYPE_COUNTRYRIFLE,    WEAPONTYPE_SNIPERRIFLE};
 
         for (uint i = 0; i < NUMELMS(weaponList); i++)
             MapInsert(weaponTypesUsingBulletSync, weaponList[i]);
-
-        // Add sniper if all clients can handle it
-        if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >=
-            ExtractVersionStringBuildNumber(SNIPER_BULLET_SYNC_MIN_CLIENT_VERSION))
-            MapInsert(weaponTypesUsingBulletSync, WEAPONTYPE_SNIPERRIFLE);
     }
 
     short sVehExtrapolateBaseMs = 5;
@@ -4489,22 +4504,9 @@ void CGame::SendSyncSettings(CPlayer* pPlayer)
     short sVehExtrapolateMaxMs = m_pMainConfig->GetVehExtrapolatePingLimit();
     uchar ucVehExtrapolateEnabled = sVehExtrapolatePercent != 0;
     uchar ucUseAltPulseOrder = m_pMainConfig->GetUseAltPulseOrder() != 0;
-    uchar ucAllowFastSprintFix = false;
-    uchar ucAllowDrivebyAnimFix = false;
-    uchar ucAllowShotgunDamageFix = false;
-
-    // Add sprint fix if all clients can handle it
-    if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >= ExtractVersionStringBuildNumber(SPRINT_FIX_MIN_CLIENT_VERSION))
-        ucAllowFastSprintFix = true;
-
-    // Add driveby animation fix if all clients can handle it
-    if (ExtractVersionStringBuildNumber(m_pPlayerManager->GetLowestConnectedPlayerVersion()) >=
-        ExtractVersionStringBuildNumber(DRIVEBY_HITBOX_FIX_MIN_CLIENT_VERSION))
-        ucAllowDrivebyAnimFix = true;
-
-    // Add shotgun bullet sync damage fix if all clients can handle it
-    if (m_pPlayerManager->GetLowestConnectedPlayerVersion() >= SHOTGUN_DAMAGE_FIX_MIN_CLIENT_VERSION)
-        ucAllowShotgunDamageFix = true;
+    uchar ucAllowFastSprintFix = true;
+    uchar ucAllowDrivebyAnimFix = true;
+    uchar ucAllowShotgunDamageFix = true;
 
     CSyncSettingsPacket packet(weaponTypesUsingBulletSync, ucVehExtrapolateEnabled, sVehExtrapolateBaseMs, sVehExtrapolatePercent, sVehExtrapolateMaxMs,
                                ucUseAltPulseOrder, ucAllowFastSprintFix, ucAllowDrivebyAnimFix, ucAllowShotgunDamageFix);
@@ -4562,25 +4564,10 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < strMinClientRequirementFromResources)
         strNewMin = strMinClientRequirementFromResources;
 
-    if (g_pGame->IsBulletSyncActive())
+    if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
     {
-        if (strNewMin < BULLET_SYNC_MIN_CLIENT_VERSION)
-            strNewMin = BULLET_SYNC_MIN_CLIENT_VERSION;
-    }
-    if (m_pMainConfig->GetVehExtrapolatePercent() > 0)
-    {
-        if (strNewMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION)
-            strNewMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
-    }
-    if (m_pMainConfig->GetUseAltPulseOrder())
-    {
-        if (strNewMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION)
-            strNewMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
-    }
-    if (g_pGame->IsGlitchEnabled(GLITCH_HITANIM))
-    {
-        if (strNewMin < HIT_ANIM_CLIENT_VERSION)
-            strNewMin = HIT_ANIM_CLIENT_VERSION;
+        if (strNewMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
+            strNewMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
     }
 
     // Log effective min client version
@@ -4604,20 +4591,10 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     {
         CMtaVersion strKickMin;
 
-        if (g_pGame->IsBulletSyncActive())
+        if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
         {
-            if (strKickMin < BULLET_SYNC_MIN_CLIENT_VERSION)
-                strKickMin = BULLET_SYNC_MIN_CLIENT_VERSION;
-        }
-        if (m_pMainConfig->GetVehExtrapolatePercent() > 0)
-        {
-            if (strKickMin < VEH_EXTRAPOLATION_MIN_CLIENT_VERSION)
-                strKickMin = VEH_EXTRAPOLATION_MIN_CLIENT_VERSION;
-        }
-        if (m_pMainConfig->GetUseAltPulseOrder())
-        {
-            if (strKickMin < ALT_PULSE_ORDER_MIN_CLIENT_VERSION)
-                strKickMin = ALT_PULSE_ORDER_MIN_CLIENT_VERSION;
+            if (strKickMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
+                strKickMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
         }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)

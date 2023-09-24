@@ -243,6 +243,16 @@ struct CTimeInfoSAInterface
     short m_wOtherTimeModel;
 };
 
+class CClumpModelInfoSAInterface : public CBaseModelInfoSAInterface
+{
+public:
+    union
+    {
+        char*    m_animFileName;
+        uint32_t m_nAnimFileIndex;
+    };
+};
+
 class CTimeModelInfoSAInterface : public CBaseModelInfoSAInterface
 {
 public:
@@ -318,6 +328,7 @@ protected:
     static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                ms_ModelDefaultModelTimeInfo;
     static std::unordered_map<DWORD, unsigned short>                             ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                    ms_VehicleModelDefaultWheelSizes;
+    static std::map<unsigned short, int>                                         ms_DefaultTxdIDMap;
     SVehicleSupportedUpgrades                                                    m_ModelSupportedUpgrades;
 
 public:
@@ -366,6 +377,8 @@ public:
     float          GetDistanceFromCentreOfMassToBaseOfModel();
     unsigned short GetTextureDictionaryID();
     void           SetTextureDictionaryID(unsigned short usID);
+    void           ResetTextureDictionaryID();
+    static void    StaticResetTextureDictionaries();
     float          GetLODDistance();
     float          GetOriginalLODDistance();
     void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
@@ -435,6 +448,7 @@ public:
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
+    void         MakeClumpModel(ushort usBaseModelID);
     void         DeallocateModel(void);
     unsigned int GetParentID() { return m_dwParentID; };
 

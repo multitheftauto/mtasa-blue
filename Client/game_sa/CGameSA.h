@@ -36,6 +36,10 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define NUM_WeaponInfosOtherSkill       11
 #define NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
 
+#define MODELINFO_DFF_MAX               20000
+#define MODELINFO_TXD_MAX               25000
+#define MODELINFO_MAX                   26000       // Actual max is 25755
+
 #define VAR_FlyingCarsEnabled           0x969160
 #define VAR_ExtraBunnyhopEnabled        0x969161
 #define VAR_HoveringCarsEnabled         0x969152
@@ -75,13 +79,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CHEAT_INFINITEHEALTH        "infinitehealth"
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
-
-#define PROP_RANDOM_FOLIAGE         "randomfoliage"
-#define PROP_SNIPER_MOON            "snipermoon"
-#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
-#define PROP_UNDERWORLD_WARP        "underworldwarp"
-#define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
-#define PROP_CORONA_ZTEST           "coronaztest"
 
 struct SCheatSA
 {
@@ -209,8 +206,17 @@ public:
     void SetVehicleSunGlareEnabled(bool bEnabled);
     bool IsVehicleSunGlareEnabled();
 
-    void SetCoronaZTestEnabled(bool isEnabled);
-    bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
+    void SetCoronaZTestEnabled(bool isEnabled) override;
+    bool IsCoronaZTestEnabled() const noexcept override { return m_isCoronaZTestEnabled; }
+
+    bool IsWaterCreaturesEnabled() const noexcept override { return m_areWaterCreaturesEnabled; }
+    void SetWaterCreaturesEnabled(bool isEnabled) override;
+
+    bool IsBurnFlippedCarsEnabled() const noexcept override { return m_isBurnFlippedCarsEnabled; }
+    void SetBurnFlippedCarsEnabled(bool isEnabled) override;
+
+    bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
+    void SetFireballDestructEnabled(bool isEnabled) override;
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -322,6 +328,9 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
+    bool         m_areWaterCreaturesEnabled{true};
+    bool         m_isBurnFlippedCarsEnabled{true};
+    bool         m_isFireballDestructEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
