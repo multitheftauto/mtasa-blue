@@ -568,12 +568,9 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 
 void CGameSA::ResetCheats()
 {
-    // Reset cheats that can't be set by setWorldSpecialPropertyEnabled
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
     {
-        if (it->second->m_bCanBeSet)
-            continue;
         if (it->second->m_byAddress > (BYTE*)0x8A4000)
             MemPutFast<BYTE>(it->second->m_byAddress, 0);
         else
@@ -725,6 +722,21 @@ void CGameSA::SetBurnFlippedCarsEnabled(bool isEnabled)
     }
 
     m_isBurnFlippedCarsEnabled = isEnabled;
+}
+
+void CGameSA::SetFireballDestructEnabled(bool isEnabled)
+{
+    if (isEnabled)
+    {
+        BYTE originalCodes[7] = {0x81, 0x66, 0x1C, 0x7E, 0xFF, 0xFF, 0xFF};
+        MemCpy((void*)0x6CCE45, &originalCodes, 7); // CPlane::BlowUpCar
+        MemCpy((void*)0x6C6E01, &originalCodes, 7); // CHeli::BlowUpCar
+    }
+    else
+    {
+        MemSet((void*)0x6CCE45, 0x90, 7); // CPlane::BlowUpCar
+        MemSet((void*)0x6C6E01, 0x90, 7); // CHeli::BlowUpCar
+    }
 }
 
 bool CGameSA::PerformChecks()
