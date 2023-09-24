@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/CStreaming.h"
 
 CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType)
 {
@@ -77,19 +78,30 @@ bool CClientModel::Allocate(ushort usParentID)
     return false;
 }
 
-bool CClientModel::Deallocate(void)
+bool CClientModel::Deallocate()
 {
     if (!m_bAllocatedByUs)
         return false;
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
     if (!pModelInfo || !pModelInfo->IsValid())
         return false;
-    pModelInfo->DeallocateModel();
+
     SetParentResource(nullptr);
-    return true;
+
+    switch (m_eModelType)
+    {
+        case eClientModelType::PED:
+        case eClientModelType::OBJECT:
+        case eClientModelType::VEHICLE:
+            return DeallocateDFF(pModelInfo);
+        case eClientModelType::TXD:
+            return DeallocateTXD(pModelInfo);
+        default:
+            return false;
+    }
 }
 
-void CClientModel::RestoreEntitiesUsingThisModel()
+bool CClientModel::DeallocateDFF(CModelInfo* pModelInfo)
 {
     auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
@@ -152,4 +164,38 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 
     // Restore DFF/TXD
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
+
+    // Remove model info
+    pModelInfo->DeallocateModel();
+
+    return true;
+}
+
+bool CClientModel::AllocateTXD(std::string &strTxdName)
+{
+    uint uiSlotID = g_pGame->GetPools()->AllocateTextureDictonarySlot(m_iModelID - MAX_MODEL_DFF_ID, strTxdName);
+    if (uiSlotID != -1)
+    {
+        m_bAllocatedByUs = true;
+        return true;
+    }
+    return false;
+}
+
+bool CClientModel::DeallocateTXD(CModelInfo* pModelInfo)
+{
+    uint uiTextureDictonarySlotID = pModelInfo->GetModel() - MAX_MODEL_DFF_ID;
+
+    for (uint uiModelID = 0; uiModelID < MAX_MODEL_DFF_ID; uiModelID++)
+    {
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID, true);
+
+        if (pModelInfo->GetTextureDictionaryID() == uiTextureDictonarySlotID)
+            pModelInfo->SetTextureDictionaryID(0);
+    }
+
+    g_pGame->GetPools()->RemoveTextureDictonarySlot(uiTextureDictonarySlotID);
+    g_pGame->GetStreaming()->SetStreamingInfo(pModelInfo->GetModel(), 0, 0, 0, -1);
+
+    return true;
 }
