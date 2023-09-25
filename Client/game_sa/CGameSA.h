@@ -80,14 +80,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
-#define PROP_RANDOM_FOLIAGE         "randomfoliage"
-#define PROP_SNIPER_MOON            "snipermoon"
-#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
-#define PROP_UNDERWORLD_WARP        "underworldwarp"
-#define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
-#define PROP_CORONA_ZTEST           "coronaztest"
-#define PROP_WATER_CREATURES        "watercreatures"
-
 struct SCheatSA
 {
     BYTE* m_byAddress;            // Cheat Address
@@ -214,11 +206,17 @@ public:
     void SetVehicleSunGlareEnabled(bool bEnabled);
     bool IsVehicleSunGlareEnabled();
 
-    void SetCoronaZTestEnabled(bool isEnabled);
-    bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
+    void SetCoronaZTestEnabled(bool isEnabled) override;
+    bool IsCoronaZTestEnabled() const noexcept override { return m_isCoronaZTestEnabled; }
 
-    bool IsWaterCreaturesEnabled() const noexcept { return m_areWaterCreaturesEnabled; }
-    void SetWaterCreaturesEnabled(bool isEnabled);
+    bool IsWaterCreaturesEnabled() const noexcept override { return m_areWaterCreaturesEnabled; }
+    void SetWaterCreaturesEnabled(bool isEnabled) override;
+
+    bool IsBurnFlippedCarsEnabled() const noexcept override { return m_isBurnFlippedCarsEnabled; }
+    void SetBurnFlippedCarsEnabled(bool isEnabled) override;
+
+    bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
+    void SetFireballDestructEnabled(bool isEnabled) override;
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -331,6 +329,8 @@ private:
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
     bool         m_areWaterCreaturesEnabled{true};
+    bool         m_isBurnFlippedCarsEnabled{true};
+    bool         m_isFireballDestructEnabled{true};
 
     static unsigned int&  ClumpOffset;
     static unsigned long* VAR_SystemTime;
