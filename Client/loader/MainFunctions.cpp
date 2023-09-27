@@ -866,9 +866,9 @@ void CheckDataFiles()
     } integrityCheckList[] = {{"332EFF2D3BE0CD15264E9D54CD1FA25F", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
                               {"0752692DA87EBF6595AFAC9BC3D3B1BF", "bass_ac3.dll"},       {"DF3BE351F8EDE366FBE542FEBE114508", "bass_fx.dll"},
                               {"64C96631887874F7ED9D8881FC016846", "bassflac.dll"},       {"4E89426025D1E1F524495D910B60C709", "bassmidi.dll"},
-                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},        {"B04050AD912FB7E03F529F2C3F7D991D", "bassopus.dll"},
+                              {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},        {"740214D5D3068C2A725D9E5E1B961ED3", "bassopus.dll"},
                               {"0F1B2FC6C0C703A43A24DC05352E7ADA", "basswebm.dll"},       {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
-                              {"9C12FF87F03610EBD24D35A85D0A14C3", "tags.dll"},           {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
+                              {"1815A2C87B114A262F97D0FCC78D17A3", "tags.dll"},           {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
                               {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"1C9B45E87528B8BB8CFA884EA0099A85", "d3dcompiler_43.dll"},
                               {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
                               {"F137D5BE2D8E76597B3F269B73DBB6A6", "XInput9_1_0_mta.dll"}};
