@@ -1,5 +1,3 @@
-#ifndef HEADER_CURL_EASY_LOCK_H
-#define HEADER_CURL_EASY_LOCK_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -105,5 +103,3 @@ static inline void curl_simple_lock_unlock(curl_simple_lock *lock)
 #undef  GLOBAL_INIT_IS_THREADSAFE
 
 #endif
-
-#endif /* HEADER_CURL_EASY_LOCK_H */

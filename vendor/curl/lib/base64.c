@@ -32,19 +32,18 @@
   !defined(CURL_DISABLE_POP3) || \
   !defined(CURL_DISABLE_IMAP) || \
   !defined(CURL_DISABLE_DOH) || defined(USE_SSL)
-#include "curl/curl.h"
+
+#include "urldata.h" /* for the Curl_easy definition */
 #include "warnless.h"
 #include "curl_base64.h"
 
 /* The last 2 #include files should be in this order */
-#ifdef BUILDING_LIBCURL
 #include "curl_memory.h"
-#endif
 #include "memdebug.h"
 
 /* ---- Base64 Encoding/Decoding Table --- */
 /* Padding character string starts at offset 64. */
-static const char base64encdec[]=
+static const char base64[]=
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
 /* The Base 64 encoding with a URL and filename safe alphabet, RFC 4648
@@ -121,7 +120,7 @@ CURLcode Curl_base64_decode(const char *src,
   /* replaces
   {
     unsigned char c;
-    const unsigned char *p = (const unsigned char *)base64encdec;
+    const unsigned char *p = (const unsigned char *)base64;
     for(c = 0; *p; c++, p++)
       lookup[*p] = c;
   }
@@ -265,7 +264,7 @@ static CURLcode base64_encode(const char *table64,
 CURLcode Curl_base64_encode(const char *inputbuff, size_t insize,
                             char **outptr, size_t *outlen)
 {
-  return base64_encode(base64encdec, inputbuff, insize, outptr, outlen);
+  return base64_encode(base64, inputbuff, insize, outptr, outlen);
 }
 
 /*

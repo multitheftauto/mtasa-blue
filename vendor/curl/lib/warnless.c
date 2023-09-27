@@ -35,12 +35,9 @@
 
 #endif /* __INTEL_COMPILER && __unix__ */
 
-#include "warnless.h"
+#define BUILDING_WARNLESS_C 1
 
-#ifdef WIN32
-#undef read
-#undef write
-#endif
+#include "warnless.h"
 
 #include <limits.h>
 
@@ -378,9 +375,6 @@ ssize_t curlx_write(int fd, const void *buf, size_t count)
 {
   return (ssize_t)write(fd, buf, curlx_uztoui(count));
 }
-
-/* Ensure that warnless.h continues to have an effect in "unity" builds. */
-#undef HEADER_CURL_WARNLESS_H
 
 #endif /* WIN32 */
 

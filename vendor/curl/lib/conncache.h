@@ -39,8 +39,7 @@ struct connectdata;
 struct conncache {
   struct Curl_hash hash;
   size_t num_conn;
-  curl_off_t next_connection_id;
-  curl_off_t next_easy_id;
+  long next_connection_id;
   struct curltime last_cleanup;
   /* handle used for closing cached connections */
   struct Curl_easy *closure_handle;

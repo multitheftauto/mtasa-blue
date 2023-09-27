@@ -26,7 +26,7 @@
 
 #include "curl_setup.h"
 
-#ifndef CURL_DISABLE_FORM_API
+#ifndef CURL_DISABLE_MIME
 
 /* used by FormAdd for temporary storage */
 struct FormInfo {
@@ -53,7 +53,10 @@ CURLcode Curl_getformdata(struct Curl_easy *data,
                           curl_mimepart *,
                           struct curl_httppost *post,
                           curl_read_callback fread_func);
-#endif /* CURL_DISABLE_FORM_API */
+#else
+/* disabled */
+#define Curl_getformdata(a,b,c,d) CURLE_NOT_BUILT_IN
+#endif
 
 
 #endif /* HEADER_CURL_FORMDATA_H */

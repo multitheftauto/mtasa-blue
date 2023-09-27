@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_MD4_H
-#define HEADER_CURL_MD4_H
+#ifndef HEADER_CURL_NSSG_H
+#define HEADER_CURL_NSSG_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -23,16 +23,19 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
 
-#if !defined(CURL_DISABLE_CRYPTO_AUTH)
+#ifdef USE_NSS
+/*
+ * This header should only be needed to get included by vtls.c and nss.c
+ */
 
-#define MD4_DIGEST_LENGTH 16
+#include "urldata.h"
 
-void Curl_md4it(unsigned char *output, const unsigned char *input,
-                const size_t len);
+/* initialize NSS library if not already */
+CURLcode Curl_nss_force_init(struct Curl_easy *data);
 
-#endif /* !defined(CURL_DISABLE_CRYPTO_AUTH) */
+extern const struct Curl_ssl Curl_ssl_nss;
 
-#endif /* HEADER_CURL_MD4_H */
+#endif /* USE_NSS */
+#endif /* HEADER_CURL_NSSG_H */

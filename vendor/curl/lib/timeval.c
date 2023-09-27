@@ -58,8 +58,7 @@ struct curltime Curl_now(void)
   return now;
 }
 
-#elif defined(HAVE_CLOCK_GETTIME_MONOTONIC) ||  \
-  defined(HAVE_CLOCK_GETTIME_MONOTONIC_RAW)
+#elif defined(HAVE_CLOCK_GETTIME_MONOTONIC)
 
 struct curltime Curl_now(void)
 {
@@ -86,19 +85,6 @@ struct curltime Curl_now(void)
   bool have_clock_gettime = FALSE;
   if(__builtin_available(macOS 10.12, iOS 10, tvOS 10, watchOS 3, *))
     have_clock_gettime = TRUE;
-#endif
-
-#ifdef HAVE_CLOCK_GETTIME_MONOTONIC_RAW
-  if(
-#if defined(__APPLE__) && defined(HAVE_BUILTIN_AVAILABLE) &&    \
-        (HAVE_BUILTIN_AVAILABLE == 1)
-    have_clock_gettime &&
-#endif
-    (0 == clock_gettime(CLOCK_MONOTONIC_RAW, &tsnow))) {
-    cnow.tv_sec = tsnow.tv_sec;
-    cnow.tv_usec = (unsigned int)(tsnow.tv_nsec / 1000);
-  }
-  else
 #endif
 
   if(

@@ -24,8 +24,7 @@
 
 #include "curl_setup.h"
 
-#if (defined(USE_CURL_NTLM_CORE) && !defined(USE_WINDOWS_SSPI)) \
-    || !defined(CURL_DISABLE_DIGEST_AUTH)
+#ifndef CURL_DISABLE_CRYPTO_AUTH
 
 #include <string.h>
 #include <curl/curl.h>
@@ -214,8 +213,7 @@ static CURLcode my_md5_init(my_md5_ctx *ctx)
 
   if(!CryptCreateHash(ctx->hCryptProv, CALG_MD5, 0, 0, &ctx->hHash)) {
     CryptReleaseContext(ctx->hCryptProv, 0);
-    ctx->hCryptProv = 0;
-    return CURLE_FAILED_INIT;
+    return CURLE_OUT_OF_MEMORY;
   }
 
   return CURLE_OK;
@@ -653,4 +651,4 @@ CURLcode Curl_MD5_final(struct MD5_context *context, unsigned char *result)
   return CURLE_OK;
 }
 
-#endif /* Using NTLM (without SSPI) || Digest */
+#endif /* CURL_DISABLE_CRYPTO_AUTH */

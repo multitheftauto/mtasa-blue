@@ -418,8 +418,7 @@ ssize_t Curl_bufq_write(struct bufq *q,
       break;
     }
     n = chunk_append(tail, buf, len);
-    if(!n)
-      break;
+    DEBUGASSERT(n);
     nwritten += n;
     buf += n;
     len -= n;
@@ -529,14 +528,6 @@ ssize_t Curl_bufq_pass(struct bufq *q, Curl_bufq_writer *writer,
       }
       break;
     }
-    if(!chunk_written) {
-      if(!nwritten) {
-        /* treat as blocked */
-        *err = CURLE_AGAIN;
-        nwritten = -1;
-      }
-      break;
-    }
     Curl_bufq_skip(q, (size_t)chunk_written);
     nwritten += chunk_written;
   }
@@ -560,8 +551,7 @@ ssize_t Curl_bufq_write_pass(struct bufq *q,
           /* real error, fail */
           return -1;
         }
-        /* would block, bufq is full, give up */
-        break;
+        /* would block */
       }
     }
 
@@ -572,25 +562,16 @@ ssize_t Curl_bufq_write_pass(struct bufq *q,
         /* real error, fail */
         return -1;
       }
-      /* no room in bufq */
-      break;
+      /* no room in bufq, bail out */
+      goto out;
     }
-    /* edge case of writer returning 0 (and len is >0)
-     * break or we might enter an infinite loop here */
-    if(n == 0)
-      break;
-
     /* Maybe only part of `data` has been added, continue to loop */
     buf += (size_t)n;
     len -= (size_t)n;
     nwritten += (size_t)n;
   }
 
-  if(!nwritten && len) {
-    *err = CURLE_AGAIN;
-    return -1;
-  }
-  *err = CURLE_OK;
+out:
   return nwritten;
 }
 

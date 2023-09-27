@@ -25,8 +25,7 @@
 
 #include "curl_setup.h"
 
-#if !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH) \
-    || defined(USE_LIBSSH2)
+#ifndef CURL_DISABLE_CRYPTO_AUTH
 
 #include "warnless.h"
 #include "curl_sha256.h"
@@ -111,10 +110,7 @@ static CURLcode my_sha256_init(my_sha256_ctx *ctx)
   if(!ctx->openssl_ctx)
     return CURLE_OUT_OF_MEMORY;
 
-  if(!EVP_DigestInit_ex(ctx->openssl_ctx, EVP_sha256(), NULL)) {
-    EVP_MD_CTX_destroy(ctx->openssl_ctx);
-    return CURLE_FAILED_INIT;
-  }
+  EVP_DigestInit_ex(ctx->openssl_ctx, EVP_sha256(), NULL);
   return CURLE_OK;
 }
 
@@ -222,14 +218,9 @@ typedef struct sha256_ctx my_sha256_ctx;
 
 static CURLcode my_sha256_init(my_sha256_ctx *ctx)
 {
-  if(!CryptAcquireContext(&ctx->hCryptProv, NULL, NULL, PROV_RSA_AES,
-                         CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
-    return CURLE_OUT_OF_MEMORY;
-
-  if(!CryptCreateHash(ctx->hCryptProv, CALG_SHA_256, 0, 0, &ctx->hHash)) {
-    CryptReleaseContext(ctx->hCryptProv, 0);
-    ctx->hCryptProv = 0;
-    return CURLE_FAILED_INIT;
+  if(CryptAcquireContext(&ctx->hCryptProv, NULL, NULL, PROV_RSA_AES,
+                         CRYPT_VERIFYCONTEXT | CRYPT_SILENT)) {
+    CryptCreateHash(ctx->hCryptProv, CALG_SHA_256, 0, 0, &ctx->hHash);
   }
 
   return CURLE_OK;
@@ -542,4 +533,4 @@ const struct HMAC_params Curl_HMAC_SHA256[] = {
 };
 
 
-#endif /* AWS, DIGEST, or libSSH2 */
+#endif /* CURL_DISABLE_CRYPTO_AUTH */

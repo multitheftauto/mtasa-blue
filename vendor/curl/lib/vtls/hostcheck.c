@@ -24,7 +24,8 @@
 
 #include "curl_setup.h"
 
-#if defined(USE_OPENSSL)                        \
+#if defined(USE_OPENSSL)                                \
+  || defined(USE_GSKIT)                                 \
   || defined(USE_SCHANNEL)
 /* these backends use functions from this file */
 
@@ -132,4 +133,4 @@ bool Curl_cert_hostcheck(const char *match, size_t matchlen,
   return FALSE;
 }
 
-#endif /* OPENSSL or SCHANNEL */
+#endif /* OPENSSL, GSKIT or schannel+wince */
