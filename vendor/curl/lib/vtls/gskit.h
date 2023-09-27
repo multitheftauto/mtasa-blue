@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_MD4_H
-#define HEADER_CURL_MD4_H
+#ifndef HEADER_CURL_GSKIT_H
+#define HEADER_CURL_GSKIT_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -23,16 +23,18 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
 
-#if !defined(CURL_DISABLE_CRYPTO_AUTH)
+/*
+ * This header should only be needed to get included by vtls.c and gskit.c
+ */
 
-#define MD4_DIGEST_LENGTH 16
+#include "urldata.h"
 
-void Curl_md4it(unsigned char *output, const unsigned char *input,
-                const size_t len);
+#ifdef USE_GSKIT
 
-#endif /* !defined(CURL_DISABLE_CRYPTO_AUTH) */
+extern const struct Curl_ssl Curl_ssl_gskit;
 
-#endif /* HEADER_CURL_MD4_H */
+#endif /* USE_GSKIT */
+
+#endif /* HEADER_CURL_GSKIT_H */

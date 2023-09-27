@@ -25,9 +25,7 @@
  *
  ***************************************************************************/
 
-#if !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH) \
-    || defined(USE_LIBSSH2)
-
+#ifndef CURL_DISABLE_CRYPTO_AUTH
 #include <curl/curl.h>
 #include "curl_hmac.h"
 

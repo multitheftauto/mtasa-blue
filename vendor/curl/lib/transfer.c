@@ -428,10 +428,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
   size_t excess = 0; /* excess bytes read */
   bool readmore = FALSE; /* used by RTP to signal for more data */
   int maxloops = 100;
-  curl_off_t max_recv = data->set.max_recv_speed?
-                        data->set.max_recv_speed : CURL_OFF_T_MAX;
   char *buf = data->state.buffer;
-  bool data_eof_handled = FALSE;
   DEBUGASSERT(buf);
 
   *done = FALSE;
@@ -449,7 +446,8 @@ static CURLcode readwrite_data(struct Curl_easy *data,
        to ensure that http2_handle_stream_close is called when we read all
        incoming bytes for a particular stream. */
     bool is_http3 = Curl_conn_is_http3(data, conn, FIRSTSOCKET);
-    data_eof_handled = is_http3 || Curl_conn_is_http2(data, conn, FIRSTSOCKET);
+    bool data_eof_handled = is_http3
+                            || Curl_conn_is_http2(data, conn, FIRSTSOCKET);
 
     if(!data_eof_handled && k->size != -1 && !k->header) {
       /* make sure we don't read too much */
@@ -474,7 +472,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
     else {
       /* read nothing but since we wanted nothing we consider this an OK
          situation to proceed from */
-      DEBUGF(infof(data, "readwrite_data: we're done"));
+      DEBUGF(infof(data, DMSG(data, "readwrite_data: we're done")));
       nread = 0;
     }
 
@@ -492,16 +490,15 @@ static CURLcode readwrite_data(struct Curl_easy *data,
     if(0 < nread || is_empty_data) {
       buf[nread] = 0;
     }
-    if(!nread) {
+    else {
       /* if we receive 0 or less here, either the data transfer is done or the
          server closed the connection and we bail out from this! */
       if(data_eof_handled)
         DEBUGF(infof(data, "nread == 0, stream closed, bailing"));
       else
         DEBUGF(infof(data, "nread <= 0, server closed connection, bailing"));
-      k->keepon = 0; /* stop sending as well */
-      if(!is_empty_data)
-        break;
+      k->keepon &= ~KEEP_RECV;
+      break;
     }
 
     /* Default buffer to use when we write the buffer, it may be changed
@@ -669,7 +666,6 @@ static CURLcode readwrite_data(struct Curl_easy *data,
       }
 
       k->bytecount += nread;
-      max_recv -= nread;
 
       Curl_pgrsSetDownloadCounter(data, k->bytecount);
 
@@ -753,16 +749,16 @@ static CURLcode readwrite_data(struct Curl_easy *data,
       break;
     }
 
-  } while((max_recv > 0) && data_pending(data) && maxloops--);
+  } while(data_pending(data) && maxloops--);
 
-  if(maxloops <= 0 || max_recv <= 0) {
+  if(maxloops <= 0) {
     /* we mark it as read-again-please */
     data->state.dselect_bits = CURL_CSELECT_IN;
     *comeback = TRUE;
   }
 
   if(((k->keepon & (KEEP_RECV|KEEP_SEND)) == KEEP_SEND) &&
-     (conn->bits.close || data_eof_handled)) {
+     conn->bits.close) {
     /* When we've read the entire thing and the close bit is set, the server
        may now close the connection. If there's now any kind of sending going
        on from our side, we need to stop that immediately. */
@@ -772,7 +768,7 @@ static CURLcode readwrite_data(struct Curl_easy *data,
 
 out:
   if(result)
-    DEBUGF(infof(data, "readwrite_data() -> %d", result));
+    DEBUGF(infof(data, DMSG(data, "readwrite_data() -> %d"), result));
   return result;
 }
 
@@ -824,6 +820,9 @@ static CURLcode readwrite_upload(struct Curl_easy *data,
   ssize_t nread; /* number of bytes read */
   bool sending_http_headers = FALSE;
   struct SingleRequest *k = &data->req;
+
+  if((k->bytecount == 0) && (k->writebytecount == 0))
+    Curl_pgrsTime(data, TIMER_STARTTRANSFER);
 
   *didwhat |= KEEP_SEND;
 
@@ -1234,7 +1233,7 @@ CURLcode Curl_readwrite(struct connectdata *conn,
   *done = (0 == (k->keepon&(KEEP_RECVBITS|KEEP_SENDBITS))) ? TRUE : FALSE;
 out:
   if(result)
-    DEBUGF(infof(data, "Curl_readwrite() -> %d", result));
+    DEBUGF(infof(data, DMSG(data, "Curl_readwrite() -> %d"), result));
   return result;
 }
 
@@ -1333,9 +1332,7 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
   }
 
   data->state.prefer_ascii = data->set.prefer_ascii;
-#ifdef CURL_LIST_ONLY_PROTOCOL
   data->state.list_only = data->set.list_only;
-#endif
   data->state.httpreq = data->set.method;
   data->state.url = data->set.str[STRING_SET_URL];
 
@@ -1397,7 +1394,7 @@ CURLcode Curl_pretransfer(struct Curl_easy *data)
     Curl_pgrsResetTransferSizes(data);
     Curl_pgrsStartNow(data);
 
-    /* In case the handle is reused and an authentication method was picked
+    /* In case the handle is re-used and an authentication method was picked
        in the session we need to make sure we only use the one(s) we now
        consider to be fine */
     data->state.authhost.picked &= data->state.authhost.want;
@@ -1554,11 +1551,10 @@ CURLcode Curl_follow(struct Curl_easy *data,
 
   if((type != FOLLOW_RETRY) &&
      (data->req.httpcode != 401) && (data->req.httpcode != 407) &&
-     Curl_is_absolute_url(newurl, NULL, 0, FALSE)) {
+     Curl_is_absolute_url(newurl, NULL, 0, FALSE))
     /* If this is not redirect due to a 401 or 407 response and an absolute
        URL: don't allow a custom port number */
     disallowport = TRUE;
-  }
 
   DEBUGASSERT(data->state.uh);
   uc = curl_url_set(data->state.uh, CURLUPART_URL, newurl,
@@ -1787,7 +1783,7 @@ CURLcode Curl_retry_request(struct Curl_easy *data, char **url)
      && (data->set.rtspreq != RTSPREQ_RECEIVE)
 #endif
     )
-    /* We got no data, we attempted to reuse a connection. For HTTP this
+    /* We got no data, we attempted to re-use a connection. For HTTP this
        can be a retry so we try again regardless if we expected a body.
        For other protocols we only try again only if we expected a body.
 

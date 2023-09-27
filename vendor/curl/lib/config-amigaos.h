@@ -40,6 +40,7 @@
 #define HAVE_NETINET_IN_H 1
 #define HAVE_NET_IF_H 1
 #define HAVE_PWD_H 1
+#define HAVE_RAND_EGD 1
 #define HAVE_SELECT 1
 #define HAVE_SETJMP_H 1
 #define HAVE_SIGNAL 1
