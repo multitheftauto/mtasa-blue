@@ -1458,8 +1458,8 @@
  * );
  * ```
  * The \c context value is initialized to 0 before the first call.
- * The function must fill the \c output buffer with \p output_size bytes
- * of random data and set \c *output_length to \p output_size.
+ * The function must fill the \c output buffer with \c output_size bytes
+ * of random data and set \c *output_length to \c output_size.
  *
  * Requires: MBEDTLS_PSA_CRYPTO_C
  *
@@ -2371,8 +2371,7 @@
  *
  * This modules adds support for the AES-NI instructions on x86.
  */
-// NOTE(patrik): Commented out on MTA, set conditionally via premake5.lua
-// #define MBEDTLS_AESNI_C
+#define MBEDTLS_AESNI_C
 
 /**
  * \def MBEDTLS_AES_C
