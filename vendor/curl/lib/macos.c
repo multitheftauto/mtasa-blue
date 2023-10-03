@@ -1,5 +1,3 @@
-#ifndef HEADER_CURL_NSSG_H
-#define HEADER_CURL_NSSG_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -23,19 +21,35 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
+
 #include "curl_setup.h"
 
-#ifdef USE_NSS
-/*
- * This header should only be needed to get included by vtls.c and nss.c
- */
+#ifdef CURL_MACOS_CALL_COPYPROXIES
 
-#include "urldata.h"
+#include <curl/curl.h>
 
-/* initialize NSS library if not already */
-CURLcode Curl_nss_force_init(struct Curl_easy *data);
+#include "macos.h"
 
-extern const struct Curl_ssl Curl_ssl_nss;
+#include <SystemConfiguration/SCDynamicStoreCopySpecific.h>
 
-#endif /* USE_NSS */
-#endif /* HEADER_CURL_NSSG_H */
+CURLcode Curl_macos_init(void)
+{
+  {
+    /*
+     * The automagic conversion from IPv4 literals to IPv6 literals only
+     * works if the SCDynamicStoreCopyProxies system function gets called
+     * first. As Curl currently doesn't support system-wide HTTP proxies, we
+     * therefore don't use any value this function might return.
+     *
+     * This function is only available on macOS and is not needed for
+     * IPv4-only builds, hence the conditions for defining
+     * CURL_MACOS_CALL_COPYPROXIES in curl_setup.h.
+     */
+    CFDictionaryRef dict = SCDynamicStoreCopyProxies(NULL);
+    if(dict)
+      CFRelease(dict);
+  }
+  return CURLE_OK;
+}
+
+#endif
