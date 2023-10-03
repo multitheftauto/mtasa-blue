@@ -45,7 +45,7 @@
 #define   MCHelpCmdR         L"\n  r             Repair archive"
 #define   MCHelpCmdRC        L"\n  rc            Reconstruct missing volumes"
 #define   MCHelpCmdRN        L"\n  rn            Rename archived files"
-#define   MCHelpCmdRR        L"\n  rr[N]         Add data recovery record"
+#define   MCHelpCmdRR        L"\n  rr[N]         Add the data recovery record"
 #define   MCHelpCmdRV        L"\n  rv[N]         Create recovery volumes"
 #define   MCHelpCmdS         L"\n  s[name|-]     Convert archive to or from SFX"
 #define   MCHelpCmdT         L"\n  t             Test archive files"
