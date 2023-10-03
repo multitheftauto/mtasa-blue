@@ -3,3 +3,5 @@
 !premake5.lua
 !include/
 !lib/
+!lib/**.c
+!include/**.h
