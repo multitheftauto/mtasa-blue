@@ -11,7 +11,6 @@
 #define  SIZEOF_SUBBLOCKHEAD    14
 #define  SIZEOF_COMMHEAD        13
 #define  SIZEOF_PROTECTHEAD     26
-#define  SIZEOF_UOHEAD          18
 #define  SIZEOF_STREAMHEAD      26
 
 #define  VER_PACK               29U
@@ -322,16 +321,6 @@ struct ProtectHeader:BlockHeader
   ushort RecSectors;
   uint TotalBlocks;
   byte Mark[8];
-};
-
-
-struct UnixOwnersHeader:SubBlockHeader
-{
-  ushort OwnerNameSize;
-  ushort GroupNameSize;
-/* dummy */
-  char OwnerName[256];
-  char GroupName[256];
 };
 
 
