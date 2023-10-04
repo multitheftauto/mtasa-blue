@@ -31,6 +31,10 @@ jobs:
           # Discard install_cef.lua conflicts
           git checkout --ours -- utils/buildactions/install_cef.lua
           git add --verbose utils/buildactions/install_cef.lua
+
+          # Discard d3dcompiler_47.dll conflicts (Due to old CEF version on maetro)
+          git checkout --ours -- "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
+          git add --verbose "Shared/data/MTA San Andreas/MTA/d3dcompiler_47.dll"
           
           # We should be done with the merge now
           printf "Synchronize changes from 1.6 master branch [ci skip]\n\n" > commit.txt
