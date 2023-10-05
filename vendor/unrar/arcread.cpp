@@ -254,7 +254,11 @@ size_t Archive::ReadHeader15()
         hd->SplitAfter=(hd->Flags & LHD_SPLIT_AFTER)!=0;
         hd->Encrypted=(hd->Flags & LHD_PASSWORD)!=0;
         hd->SaltSet=(hd->Flags & LHD_SALT)!=0;
+        
+        // RAR versions earlier than 2.0 do not set the solid flag
+        // in file header. They use only a global solid archive flag.
         hd->Solid=FileBlock && (hd->Flags & LHD_SOLID)!=0;
+
         hd->SubBlock=!FileBlock && (hd->Flags & LHD_SOLID)!=0;
         hd->Dir=(hd->Flags & LHD_WINDOWMASK)==LHD_DIRECTORY;
         hd->WinSize=hd->Dir ? 0:0x10000<<((hd->Flags & LHD_WINDOWMASK)>>5);
@@ -472,19 +476,6 @@ size_t Archive::ReadHeader15()
       SubBlockHead.Level=Raw.Get1();
       switch(SubBlockHead.SubType)
       {
-        case UO_HEAD:
-          *(SubBlockHeader *)&UOHead=SubBlockHead;
-          UOHead.OwnerNameSize=Raw.Get2();
-          UOHead.GroupNameSize=Raw.Get2();
-          if (UOHead.OwnerNameSize>=ASIZE(UOHead.OwnerName))
-            UOHead.OwnerNameSize=ASIZE(UOHead.OwnerName)-1;
-          if (UOHead.GroupNameSize>=ASIZE(UOHead.GroupName))
-            UOHead.GroupNameSize=ASIZE(UOHead.GroupName)-1;
-          Raw.GetB(UOHead.OwnerName,UOHead.OwnerNameSize);
-          Raw.GetB(UOHead.GroupName,UOHead.GroupNameSize);
-          UOHead.OwnerName[UOHead.OwnerNameSize]=0;
-          UOHead.GroupName[UOHead.GroupNameSize]=0;
-          break;
         case NTACL_HEAD:
           *(SubBlockHeader *)&EAHead=SubBlockHead;
           EAHead.UnpSize=Raw.Get4();
@@ -516,8 +507,12 @@ size_t Archive::ReadHeader15()
   ushort HeaderCRC=Raw.GetCRC15(false);
 
   // Old AV header does not have header CRC properly set.
+  // Old Unix owners header didn't include string fields into header size,
+  // but included them into CRC, so it couldn't be verified with generic
+  // approach here.
   if (ShortBlock.HeadCRC!=HeaderCRC && ShortBlock.HeaderType!=HEAD3_SIGN &&
-      ShortBlock.HeaderType!=HEAD3_AV)
+      ShortBlock.HeaderType!=HEAD3_AV && 
+      (ShortBlock.HeaderType!=HEAD3_OLDSERVICE || SubBlockHead.SubType!=UO_HEAD))
   {
     bool Recovered=false;
     if (ShortBlock.HeaderType==HEAD_ENDARC && EndArcHead.RevSpace)
@@ -996,7 +991,7 @@ void Archive::ProcessExtra50(RawRead *Raw,size_t ExtraSize,const BaseBlock *bb)
             if ((Flags & MHEXTRA_METADATA_NAME)!=0)
             {
               uint64 NameSize=Raw->GetV();
-              if (NameSize<0x10000) // Prevent excessive allocation.
+              if (NameSize>0 && NameSize<0x10000) // Prevent excessive allocation.
               {
                 std::vector<char> NameU((size_t)NameSize); // UTF-8 name.
                 Raw->GetB(&NameU[0],(size_t)NameSize);

@@ -107,7 +107,6 @@ class Archive:public File
     FileHeader SubHead;
     CommentHeader CommHead;
     ProtectHeader ProtectHead;
-    UnixOwnersHeader UOHead;
     EAHeader EAHead;
     StreamHeader StreamHead;
 

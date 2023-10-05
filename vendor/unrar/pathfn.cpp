@@ -482,7 +482,7 @@ void MakeNameUsable(wchar *Name,bool Extended)
         *s='_';
 
       // No spaces or dots before the path separator are allowed on Windows
-      // shares. But they are allowed and automtically removed at the end of
+      // shares. But they are allowed and automatically removed at the end of
       // file or folder name, so it is useless to replace them here.
       // Since such files or folders are created successfully, a supposed
       // conversion here would never be invoked.
@@ -746,7 +746,7 @@ static void GenArcName(wchar *ArcName,size_t MaxSize,const wchar *GenerateMask,u
       // Here we ensure that we have enough 'N' characters to fit all digits
       // of archive number. We'll replace them by actual number later
       // in this function.
-      if (NCount<Digits)
+      if (NCount<Digits && wcslen(Mask)+Digits-NCount<ASIZE(Mask))
       {
         wmemmove(Mask+I+Digits,Mask+I+NCount,wcslen(Mask+I+NCount)+1);
         wmemset(Mask+I,'N',Digits);
@@ -783,7 +783,7 @@ static void GenArcName(wchar *ArcName,size_t MaxSize,const wchar *GenerateMask,u
   if (StartWeekDay%7>=4)
     CurWeek++;
 
-  char Field[10][6];
+  char Field[10][11];
 
   sprintf(Field[0],"%04u",rlt.Year);
   sprintf(Field[1],"%02u",rlt.Month);

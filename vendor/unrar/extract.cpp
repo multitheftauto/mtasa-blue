@@ -14,20 +14,16 @@ CmdExtract::CmdExtract(CommandData *Cmd)
   TotalFileCount=0;
 
   // Common for all archives involved. Set here instead of DoExtract()
-  // to use in unrar.dll too. Allows to avoid LinksToDirs() calls
-  // and save CPU time in no symlinks including ".." in target were extracted.
-#if defined(_WIN_ALL)
-  // We can't expand symlink path components in another symlink target
-  // in Windows. We can't create symlinks in Android now. Even though we do not
-  // really need LinksToDirs() calls in these systems, we still call it
-  // for extra safety, but only if symlink with ".." in target was extracted.
-  ConvertSymlinkPaths=false;
-#else
+  // to use in unrar.dll too.
   // We enable it by default in Unix to care about the case when several
   // archives are unpacked to same directory with several independent RAR runs.
   // Worst case performance penalty for a lot of small files seems to be ~3%.
+  // 2023.09.15: Windows performance impact seems to be negligible,
+  // less than 0.5% when extracting mix of small files and folders.
+  // So for extra security we enabled it for Windows too, even though
+  // unlike Unix, Windows doesn't expand lnk1 in symlink targets like
+  // "lnk1/../dir", but converts such path to "dir".
   ConvertSymlinkPaths=true;
-#endif
 
   Unp=new Unpack(&DataIO);
 #ifdef RAR_SMP
@@ -806,6 +802,11 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
             {
               bool UpLink;
               LinkSuccess=ExtractSymlink(Cmd,DataIO,Arc,DestFileName,UpLink);
+
+              // Unix symlink can have its own owner data.
+              if (LinkSuccess)
+                SetFileHeaderExtra(Cmd,Arc,DestFileName);
+              
               ConvertSymlinkPaths|=LinkSuccess && UpLink;
 
               // We do not actually need to reset the cache here if we cache
@@ -846,6 +847,7 @@ bool CmdExtract::ExtractCurrentFile(Archive &Arc,size_t HeaderSize,bool &Repeat)
             Unp->Init(Arc.FileHead.WinSize,Arc.FileHead.Solid);
             Unp->SetDestSize(Arc.FileHead.UnpSize);
 #ifndef SFX_MODULE
+            // RAR 1.3 - 1.5 archives do not set per file solid flag.
             if (Arc.Format!=RARFMT50 && Arc.FileHead.UnpVer<=15)
               Unp->DoUnpack(15,FileCount>1 && Arc.Solid);
             else
@@ -1520,6 +1522,15 @@ void CmdExtract::AnalyzeArchive(const wchar *ArcName,bool Volume,bool NewNumberi
       }
       if (HeaderType==HEAD_FILE)
       {
+        if ((Arc.Format==RARFMT14 || Arc.Format==RARFMT15) && Arc.FileHead.UnpVer<=15)
+        {
+          // RAR versions earlier than 2.0 do not set per file solid flag.
+          // They have only the global archive solid flag, so we can't
+          // reliably analyze them here.
+          OpenNext=false;
+          break;
+        }
+
         if (!Arc.FileHead.SplitBefore)
         {
           if (!MatchFound && !Arc.FileHead.Solid) // Can start extraction from here.

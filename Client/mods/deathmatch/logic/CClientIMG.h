@@ -78,7 +78,7 @@ private:
     class CClientIMGManager* m_pImgManager;
 
     std::ifstream             m_ifs;
-    std::string               m_filePath;
+    fs::path                  m_filePath;
     unsigned char             m_ucArchiveID;
     std::vector<tImgFileInfo> m_fileInfos;
     size_t                    m_LargestFileSizeBlocks; // The size of the largest file [in streaming blocks/sectors]
