@@ -1068,13 +1068,10 @@ CLuaACLDefs::aclObjectGetGroups(std::string strObject)
         objectType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
     }
     else
-    {
-        return false;
-    }
+        throw std::invalid_argument("Object must be either a resource or an user.");
 
     std::vector<CAccessControlListGroup*> groups;
 
-    uint32_t uiIndex = 0;
     for (auto iter = m_pACLManager->Groups_Begin();
         iter != m_pACLManager->Groups_End(); ++iter)
     {
