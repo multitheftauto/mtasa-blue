@@ -55,6 +55,8 @@ void CLuaFileDefs::LoadFunctions()
         {"fileSetPos", fileSetPos},
         {"fileGetContents", ArgumentParser<fileGetContents>},
         {"fileListDir", ArgumentParser<fileListDir>},
+        {"isFile", ArgumentParser<isFile>},
+        {"isDirectory", ArgumentParser<isDirectory>},
     };
 
     // Add functions
@@ -1037,5 +1039,35 @@ std::optional<std::vector<std::string>> CLuaFileDefs::fileListDir(lua_State* lua
     if (!DirectoryExists(strAbsPath))
         return std::nullopt;
 
-    return SharedUtil::ListDir(strAbsPath, pResource->GetResourceDirectoryPath().c_str());
+    return SharedUtil::ListDir(strAbsPath);
+}
+
+bool CLuaFileDefs::isFile(lua_State* luaVM, std::string path)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    SString strAbsPath;
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
+        return false;
+
+    return SharedUtil::FileExists(strAbsPath);
+}
+
+bool CLuaFileDefs::isDirectory(lua_State* luaVM, std::string path)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    SString strAbsPath;
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
+        return false;
+
+    return SharedUtil::DirectoryExists(strAbsPath);
 }

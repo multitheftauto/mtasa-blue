@@ -102,7 +102,7 @@ namespace SharedUtil
     WString FromUTF8(const SString& strPath);
     SString ToUTF8(const WString& strPath);
 
-    std::vector<std::string> ListDir(const char* szPath, const char* szRelativeTo = "");
+    std::vector<std::string> ListDir(const char* szPath);
 
     namespace File
     {

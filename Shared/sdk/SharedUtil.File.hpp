@@ -37,14 +37,21 @@
 //
 bool SharedUtil::FileExists(const SString& strFilename)
 {
-#ifdef _WIN32
+#if _HAS_CXX17
+    namespace fs = std::filesystem;
+    return fs::is_regular_file(static_cast<const std::string&>(strFilename));
+#else
+    #ifdef _WIN32
     DWORD dwAtr = GetFileAttributes(strFilename);
     if (dwAtr == INVALID_FILE_ATTRIBUTES)
         return false;
-    return ((dwAtr & FILE_ATTRIBUTE_DIRECTORY) == 0);
-#else
-    std::error_code ec{};
-    return std::filesystem::is_regular_file(static_cast<const std::string&>(strFilename), ec);
+    return !(dwAtr & FILE_ATTRIBUTE_DIRECTORY);
+    #else
+    struct stat s;
+    if (!stat(strFilename.c_str(), &s))
+        return false;
+    return s.st_mode & S_IFREG;
+    #endif
 #endif
 }
 
@@ -53,14 +60,21 @@ bool SharedUtil::FileExists(const SString& strFilename)
 //
 bool SharedUtil::DirectoryExists(const SString& strPath)
 {
-#ifdef _WIN32
+#if _HAS_CXX17
+    namespace fs = std::filesystem;
+    return fs::is_directory(static_cast<const std::string&>(strPath));
+#else
+    #ifdef _WIN32
     DWORD dwAtr = GetFileAttributes(strPath);
     if (dwAtr == INVALID_FILE_ATTRIBUTES)
         return false;
-    return ((dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0);
-#else
-    std::error_code ec{};
-    return std::filesystem::is_directory(static_cast<const std::string&>(strPath), ec);
+    return (dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    #else
+    struct stat s;
+    if (!stat(strPath.c_str(), &s))
+        return false;
+    return s.st_mode & S_IFDIR;
+    #endif
 #endif
 }
 
@@ -1059,7 +1073,7 @@ int SharedUtil::File::Rename(const char* szOldFilename, const char* szNewFilenam
 #endif
 }
 
-std::vector<std::string> SharedUtil::ListDir(const char* szPath, const char* szRelativeTo)
+std::vector<std::string> SharedUtil::ListDir(const char* szPath)
 {
     std::vector<std::string> entries;
 #if _HAS_CXX17
@@ -1069,14 +1083,14 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath, const char* szR
 
     for (const auto& entry : fs::directory_iterator(szPath))
     {
-        if (szRelativeTo)
-            entries.push_back(fs::relative(entry.path(), szRelativeTo).string());
-        else
-            entries.push_back(entry.path().string());
+        entries.push_back(entry.path().filename().string());
     }
 #else
     #ifdef _WIN32
-    std::string          search_path = szPath + std::string("/*.*");
+    std::string search_path = szPath;
+    if (search_path.back() != '/')
+        search_path += "/*";
+
     WIN32_FIND_DATA fd;
     HANDLE          hFind = ::FindFirstFile(search_path.c_str(), &fd);
     if (hFind == INVALID_HANDLE_VALUE)
@@ -1084,21 +1098,16 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath, const char* szR
 
     do
     {
-        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-            continue;
-
         entries.push_back(fd.cFileName);
     } while (::FindNextFile(hFind, &fd));
     ::FindClose(hFind);
 
-    return entries;
     #else
     DIR*           dir;
     struct dirent* ent;
-    if (!(dir = opendir("c:\\src\\")))
+    if (!(dir = opendir(szPath)))
         return {};
 
-    /* print all the files and directories within directory */
     while ((ent = readdir(dir)))
     {
         entries.push_back(ent->d_name);
