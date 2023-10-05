@@ -5438,6 +5438,8 @@ void CClientGame::ResetMapInfo()
         pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
     RestreamWorld(true);
+
+    ReinitMarkers();
 }
 
 void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,
@@ -5934,6 +5936,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::BURNFLIPPEDCARS:
             g_pGame->SetBurnFlippedCarsEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::FIREBALLDESTRUCT:
+            g_pGame->SetFireballDestructEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -5963,6 +5968,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsWaterCreaturesEnabled();
         case WorldSpecialProperty::BURNFLIPPEDCARS:
             return g_pGame->IsBurnFlippedCarsEnabled();
+        case WorldSpecialProperty::FIREBALLDESTRUCT:
+            return g_pGame->IsFireballDestructEnabled();
     }
     return false;
 }
@@ -6642,6 +6649,11 @@ void CClientGame::RestreamWorld(bool removeBigBuildings)
         g_pGame->GetStreaming()->RemoveBigBuildings();
 
     g_pGame->GetStreaming()->ReinitStreaming();
+}
+
+void CClientGame::ReinitMarkers()
+{
+    g_pGame->Get3DMarkers()->ReinitMarkers();
 }
 
 void CClientGame::OnWindowFocusChange(bool state)
