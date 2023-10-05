@@ -612,36 +612,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         #############################################################
 
         #############################################################
-        # Fix missing or incorrect VS2013 redist files
-        SetOutPath $SYSDIR
-        Push $SYSDIR\msvcp120.dll
-        Call IsDll32Bit
-        Pop $0
-        ${If} $0 != 1
-            File "${FILES_ROOT}\redist\msvcp120.dll"
-        ${EndIf}
-
-        Push $SYSDIR\msvcr120.dll
-        Call IsDll32Bit
-        Pop $0
-        ${If} $0 != 1
-            File "${FILES_ROOT}\redist\msvcr120.dll"
-        ${EndIf}
-        #############################################################
-
-        #############################################################
-        # For XP, install Microsoft Internationalized Domain Names (IDN) Mitigation APIs
-        SetOutPath "$TEMP"
-        ${If} ${AtMostWinXP}
-            ${IfNot} ${FileExists} $SYSDIR\normaliz.dll
-                ${LogText} "Did not find $SYSDIR\normaliz.dll"
-                File "${FILES_ROOT}\redist\idndl.x86.exe"
-                ExecWait '"$TEMP\idndl.x86.exe" /passive'
-            ${EndIf}
-        ${EndIf}
-        #############################################################
-
-        #############################################################
         # Install SHA2 support for older Win7 x64
         ${If} ${IsWin7}
             ${If} ${RunningX64}
