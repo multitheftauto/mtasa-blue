@@ -1052,8 +1052,7 @@ int CLuaACLDefs::OOP_isObjectInACLGroup(lua_State* luaVM)
     return 1;
 }
 
-std::variant<std::vector<CAccessControlListGroup*>, bool>
-CLuaACLDefs::aclObjectGetGroups(std::string strObject)
+std::vector<CAccessControlListGroup*> CLuaACLDefs::aclObjectGetGroups(std::string strObject)
 {
     CAccessControlListGroupObject::EObjectType objectType;
     const char* szObjectAfterDot = strObject.c_str();
