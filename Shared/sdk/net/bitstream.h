@@ -532,6 +532,14 @@ enum class eBitStreamVersion : unsigned short
     // yyyy-mm-dd 0xFF add date later ;-)
     SimpleModelAllocation,
 
+    // Add serverside setWorldSpecialPropertyEnabled
+    // 2023-08-17
+    WorldSpecialProperties,
+
+    // Add "fireballdestruct" to setWorldSpecialPropertyEnabled
+    // 2023-09-09
+    WorldSpecialProperty_FireballDestruct,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

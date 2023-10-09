@@ -603,31 +603,31 @@ bool CResource::HasResourceChanged()
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
-        if (GetFilePath(pResourceFile->GetName(), strPath))
+        if (!GetFilePath(pResourceFile->GetName(), strPath))
+            return true;
+
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+
+        if (pResourceFile->GetLastChecksum() != checksum)
+            return true;
+
+        // Also check if file in http cache has been externally altered
+        switch (pResourceFile->GetType())
         {
-            CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
-
-            if (pResourceFile->GetLastChecksum() != checksum)
-                return true;
-
-            // Also check if file in http cache has been externally altered
-            switch (pResourceFile->GetType())
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
             {
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                {
-                    string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
-                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
+                string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
+                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
-                    if (cachedChecksum != checksum)
-                        return true;
+                if (cachedChecksum != checksum)
+                    return true;
 
-                    break;
-                }
-                default:
-                    break;
+                break;
             }
+            default:
+                break;
         }
     }
 
@@ -3413,4 +3413,17 @@ bool CResource::IsFileDbConnectMysqlProtected(const SString& strAbsFilename, boo
     }
 
     return false;
+}
+
+CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
+{
+    for (CResourceFile* resourceFile : m_ResourceFiles)
+    {
+        if (!stricmp(relativePath.c_str(), resourceFile->GetName()))
+        {
+            return resourceFile;
+        }
+    }
+
+    return nullptr;
 }

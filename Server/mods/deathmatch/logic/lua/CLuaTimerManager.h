@@ -14,7 +14,7 @@ class CLuaTimerManager;
 #pragma once
 
 #include "LuaCommon.h"
-#include "CLuaTimer.h"
+#include "lua/CLuaTimer.h"
 #include <list>
 
 class CLuaTimerManager

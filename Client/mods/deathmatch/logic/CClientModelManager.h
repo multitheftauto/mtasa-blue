@@ -18,6 +18,10 @@ class CClientModelManager;
 #include <memory>
 #include "CClientModel.h"
 
+#define MAX_MODEL_DFF_ID 20000
+#define MAX_MODEL_TXD_ID 25000
+#define MAX_MODEL_ID     25000
+
 class CClientModelManager
 {
     friend class CClientModel;
@@ -33,8 +37,10 @@ public:
     bool RemoveClientModel(const int modelId);
 
     int GetFirstFreeModelID(void);
+    int GetFreeTxdModelID();
 
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
+    std::shared_ptr<CClientModel> Request(CClientManager* pManager, int iModelID, eClientModelType eType);
 
     std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eModelInfoType type, const unsigned int minModelID = 0);
 

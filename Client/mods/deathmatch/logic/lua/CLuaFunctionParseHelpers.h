@@ -62,6 +62,7 @@ DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
 DECLARE_ENUM(eVehicleDummies);
+DECLARE_ENUM_CLASS(eGrainMultiplierType);
 DECLARE_ENUM_CLASS(eResizableVehicleWheelGroup);
 DECLARE_ENUM(eSurfaceProperties);
 DECLARE_ENUM(eSurfaceAudio);
@@ -81,6 +82,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
 DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
+DECLARE_ENUM_CLASS(_D3DFORMAT);
 
 class CRemoteCall;
 

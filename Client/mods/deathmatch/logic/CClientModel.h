@@ -14,7 +14,16 @@ class CClientModel;
 #pragma once
 
 #include <list>
-#include "game/CModelInfo.h"
+
+enum class eClientModelType
+{
+    PED,
+    OBJECT,
+    VEHICLE,
+    TIMED_OBJECT,
+    CLUMP,
+    TXD,
+};
 
 class CResource;
 class CClientManager;
@@ -27,13 +36,18 @@ public:
     CClientModel(CClientManager* pManager, int iModelID, eModelInfoType eModelType);
     ~CClientModel();
 
-    int            GetModelID() const { return m_iModelID; };
-    eModelInfoType GetModelType() const { return m_eModelType; };
-    bool           Allocate(ushort usParentID);
-    bool           Deallocate();
-    void           RestoreEntitiesUsingThisModel();
-    void           SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
-    CResource*     GetParentResource() const { return m_pParentResource; }
+    int              GetModelID(void) const { return m_iModelID; };
+    eClientModelType GetModelType(void) const { return m_eModelType; };
+    bool             Allocate(ushort usParentID);
+    bool             AllocateTXD(std::string& strTxdName);
+    bool             Deallocate(void);
+    void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
+    CResource*       GetParentResource(void) const { return m_pParentResource; }
+    void             RestoreEntitiesUsingThisModel();
+
+private:
+    void RestoreDFF(CModelInfo* pModelInfo);
+    void RestoreTXD(CModelInfo* pModelInfo);
 
 protected:
     CClientManager* m_pManager;
