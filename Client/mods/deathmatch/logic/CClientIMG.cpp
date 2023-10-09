@@ -11,8 +11,6 @@
 #include <StdInc.h>
 #include "game/CStreaming.h"
 
-#define INVALID_ARCHIVE_ID 0xFF
-
 struct tImgHeader
 {
     char         szMagic[4];
@@ -51,7 +49,7 @@ bool CClientIMG::Load(fs::path filePath)
     if (!fs::exists(filePath))
         return false;
 
-    m_filePath = filePath.string();
+    m_filePath = filePath;
     m_ifs = std::ifstream(filePath, std::ios::binary);
 
     // Open the file
@@ -159,7 +157,7 @@ bool CClientIMG::StreamEnable()
             m_LargestFileSizeBlocks = std::max(m_LargestFileSizeBlocks, (size_t)fileInfo.usSize);
     }
 
-    m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(m_filePath.c_str());
+    m_ucArchiveID = g_pGame->GetStreaming()->AddArchive(m_filePath.wstring().c_str());
 
     if (IsStreamed())
     {

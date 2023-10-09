@@ -400,6 +400,9 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
+    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled);
+    bool IsWorldSpecialProperty(WorldSpecialProperty property);
+
     bool SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
 
@@ -440,6 +443,7 @@ public:
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
     void RestreamWorld(bool removeBigBuildings);
+    void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
 

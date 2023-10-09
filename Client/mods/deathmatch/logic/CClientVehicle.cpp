@@ -1008,9 +1008,8 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         if (m_pUpgrades)
             m_pUpgrades->RemoveAll(false);
 
-        // Are we swapping from a vortex or skimmer?
-        bool bResetWheelAndDoorStates = (m_usModel == VT_VORTEX || m_usModel == VT_SKIMMER ||
-                                         (m_eVehicleType == CLIENTVEHICLE_PLANE && m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel)));
+        // Are we swapping from a vehicle without doors?
+        bool bResetWheelAndDoorStates = (!CClientVehicleManager::HasDoors(m_usModel) || m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel));
 
         // Apply variant requirements
         if (ucVariant == 255 && ucVariant2 == 255)

@@ -183,6 +183,7 @@ void uiMsgStore::Msg()
       Log(NULL,St(MNeedAdmin));
       break;
     case UIERROR_ARCBROKEN:
+      mprintf(L"\n"); // So it is not merged with preceding UIERROR_HEADERBROKEN.
       Log(Str[0],St(MErrBrokenArc));
       break;
     case UIERROR_HEADERBROKEN:
