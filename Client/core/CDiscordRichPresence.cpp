@@ -216,7 +216,7 @@ bool CDiscordRichPresence::SetDiscordRPCEnabled(bool bEnabled)
     return true;
 }
 
-bool CDiscordRichPresence::IsDiscordRPCEnabled()
+bool CDiscordRichPresence::IsDiscordRPCEnabled() const
 {
     return m_bDiscordRPCEnabled;
 }

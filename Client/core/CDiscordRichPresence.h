@@ -35,7 +35,7 @@ public:
     bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
     bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl);
     bool SetDiscordRPCEnabled(bool bEnabled);
-    bool IsDiscordRPCEnabled();
+    bool IsDiscordRPCEnabled() const;
     bool SetApplicationID(const char* szAppID);
 
     // void SetPresenceTimestamp();

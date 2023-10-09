@@ -26,5 +26,5 @@ public:
     //virtual void SetPresenceEndTimestamp(const unsigned long ulEnd) = 0;
 
     virtual bool SetDiscordRPCEnabled(bool bEnabled = false) = 0;
-    virtual bool IsDiscordRPCEnabled() = 0;
+    virtual bool IsDiscordRPCEnabled() const = 0;
 };
