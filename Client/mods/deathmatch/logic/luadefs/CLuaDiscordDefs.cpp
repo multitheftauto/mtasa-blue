@@ -78,7 +78,7 @@ bool CLuaDiscordDefs::SetAppID(std::string strAppID)
 {
     int appIDLength = strAppID.length();
 
-    if (appIDLength > 32)
+    if (appIDLength < 1 || appIDLength > 32)
         throw std::invalid_argument("Application ID must be greater than 0, or less than/equal to 32");
 
     auto discord = g_pCore->GetDiscord();
