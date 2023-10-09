@@ -147,7 +147,30 @@ bool CClientModelManager::AllocateModelFromParent(uint32_t uiNewModelID, uint32_
     if (pModel)
         return false;
 
-    pModel = std::make_shared<CClientModel>(g_pClientGame->GetManager(), uiNewModelID, eModelType);
+    eClientModelType clientModelType;
+
+    switch (eModelType)
+    {
+        case eModelInfoType::ATOMIC:
+            clientModelType = eClientModelType::OBJECT;
+            break;
+        case eModelInfoType::TIMED_OBJECT:
+            clientModelType = eClientModelType::TIMED_OBJECT;
+            break;
+        case eModelInfoType::CLUMP:
+            clientModelType = eClientModelType::CLUMP;
+            break;
+        case eModelInfoType::VEHICLE:
+            clientModelType = eClientModelType::VEHICLE;
+            break;
+        case eModelInfoType::PED:
+            clientModelType = eClientModelType::PED;
+            break;
+        default:
+            return false;
+    }
+
+    pModel = std::make_shared<CClientModel>(g_pClientGame->GetManager(), uiNewModelID, clientModelType);
 
     Add(pModel);
 

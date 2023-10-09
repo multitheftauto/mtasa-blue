@@ -42,7 +42,7 @@ public:
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
     std::shared_ptr<CClientModel> Request(CClientManager* pManager, int iModelID, eClientModelType eType);
 
-    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eModelInfoType type, const unsigned int minModelID = 0);
+    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const unsigned int minModelID = 0);
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
     bool AllocateModelFromParent(uint32_t usModelID, uint32_t usParentModel);

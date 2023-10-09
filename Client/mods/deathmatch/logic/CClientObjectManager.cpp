@@ -110,7 +110,7 @@ bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
         return false;
 
     eModelInfoType eType = pModelInfo->GetModelType();
-    return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
+    return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIMED_OBJECT);
 }
 
 bool CClientObjectManager::IsBreakableModel(unsigned long ulObjectModel)

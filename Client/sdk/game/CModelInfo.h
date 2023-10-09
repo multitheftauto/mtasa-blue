@@ -55,7 +55,7 @@ enum class eModelInfoType
 {
     INVALID = 0,
     ATOMIC = 1,
-    TIME = 3,
+    TIMED_OBJECT = 3,
     WEAPON = 4,
     CLUMP = 5,
     VEHICLE = 6,

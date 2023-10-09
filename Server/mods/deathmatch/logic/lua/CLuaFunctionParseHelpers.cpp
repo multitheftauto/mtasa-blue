@@ -297,7 +297,7 @@ ADD_ENUM(eModelInfoType::CLUMP, "clump")
 ADD_ENUM(eModelInfoType::VEHICLE, "vehicle")
 ADD_ENUM(eModelInfoType::PED, "ped")
 ADD_ENUM(eModelInfoType::LOD_ATOMIC, "lod-atomic")
-IMPLEMENT_ENUM_CLASS_END("model-info-type")
+IMPLEMENT_ENUM_CLASS_END("model-type")
 
 //
 // CResource from userdata

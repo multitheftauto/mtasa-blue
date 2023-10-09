@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "game/CStreaming.h"
 
-CClientModel::CClientModel(CClientManager* pManager, int iModelID, eModelInfoType eModelType)
+CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType)
 {
     m_pManager = pManager;
     m_iModelID = iModelID;
@@ -42,31 +42,31 @@ bool CClientModel::Allocate(ushort usParentID)
 
     switch (m_eModelType)
     {
-        case eModelInfoType::PED:
+        case eClientModelType::PED:
             pModelInfo->MakePedModel("PSYCHO");
             return true;
-        case eModelInfoType::ATOMIC:
+        case eClientModelType::OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeObjectModel(usParentID);
                 return true;
             }
             break;
-        case eModelInfoType::CLUMP:
+        case eClientModelType::CLUMP:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeClumpModel(usParentID);
                 return true;
             }
             break;
-        case eModelInfoType::TIME:
+        case eClientModelType::TIMED_OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeTimedObjectModel(usParentID);
                 return true;
             }
             break;
-        case eModelInfoType::VEHICLE:
+        case eClientModelType::VEHICLE:
             if (g_pClientGame->GetVehicleManager()->IsValidModel(usParentID))
             {
                 pModelInfo->MakeVehicleAutomobile(usParentID);
@@ -145,7 +145,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 
     switch (m_eModelType)
     {
-        case eModelInfoType::PED:
+        case eClientModelType::PED:
         {
             // If some ped is using this ID, change him to CJ
             CClientPedManager* pPedManager = g_pClientGame->GetManager()->GetPedManager();
@@ -153,9 +153,9 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
             break;
         }
-        case eModelInfoType::ATOMIC:
-        case eModelInfoType::CLUMP:
-        case eModelInfoType::TIME:
+        case eClientModelType::OBJECT:
+        case eClientModelType::CLUMP:
+        case eClientModelType::TIMED_OBJECT:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
             unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
@@ -171,7 +171,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);
             break;
         }
-        case eModelInfoType::VEHICLE:
+        case eClientModelType::VEHICLE:
         {
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
             unsigned short         usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();

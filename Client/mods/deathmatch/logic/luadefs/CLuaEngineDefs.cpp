@@ -846,7 +846,7 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 {
-    eModelInfoType eModelType;
+    eClientModelType eModelType;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(eModelType);
@@ -872,7 +872,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                     {
                         switch (eModelType)
                         {
-                            case eModelInfoType::PED:
+                            case eClientModelType::PED:
                                 usParentID = 7;            // male01
                                 break;
                             case eClientModelType::TIMED_OBJECT:
@@ -884,7 +884,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                             case eClientModelType::OBJECT:
                                 usParentID = 1337;            // BinNt07_LA (trash can)
                                 break;
-                            case eModelInfoType::VEHICLE:
+                            case eClientModelType::VEHICLE:
                                 usParentID = VT_LANDSTAL;
                                 break;
                             default:
