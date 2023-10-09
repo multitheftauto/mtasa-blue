@@ -34,6 +34,7 @@
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>
+#include <glob/glob.h>
 
 #ifdef WIN32
     #include <zip/iowin32.h>
@@ -385,6 +386,7 @@ void CResource::TidyUp()
         delete pResourceFile;
 
     m_ResourceFiles.clear();
+    m_ResourceFilesCountPerDir.clear();
 
     // Go through each included resource item and delete it
     for (CIncludedResources* pIncludedResources : m_IncludedResources)
@@ -592,8 +594,12 @@ bool CResource::GenerateChecksums()
 bool CResource::HasResourceChanged()
 {
     std::string strPath;
+    std::string strDirPath = m_strResourceDirectoryPath;
+
     if (IsResourceZip())
     {
+        strDirPath = m_strResourceCachePath;
+
         // Zip file might have changed
         CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
         if (checksum != m_zipHash)
@@ -628,6 +634,14 @@ bool CResource::HasResourceChanged()
             default:
                 break;
         }
+    }
+
+    for (auto& [strGlob, uiFileCount] : m_ResourceFilesCountPerDir)
+    {
+        std::vector<std::filesystem::path> files = glob::rglob(strDirPath + strGlob);
+
+        if (files.size() != uiFileCount)
+            return true;
     }
 
     if (GetFilePath("meta.xml", strPath))
@@ -1300,6 +1314,23 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
     return FileExists(strPath);
 }
 
+std::vector<std::string> CResource::GetFilePaths(const char* szFilename)
+{
+    std::vector<std::string>    vecFiles;
+    std::string                 strDirectory = IsResourceZip() ? m_strResourceCachePath : m_strResourceDirectoryPath;
+    std::string                 strFilePath = strDirectory + szFilename;
+
+    for (std::filesystem::path path : glob::rglob(strFilePath))
+    {
+        std::string strPath = path.string().substr(strDirectory.length());
+        ReplaceSlashes(strPath);
+
+        vecFiles.push_back(strPath);
+    }
+
+    return vecFiles;
+}
+
 // Return true if file name is used by this resource
 bool CResource::IsFilenameUsed(const SString& strFilename, bool bClient)
 {
@@ -1545,37 +1576,53 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (IsFilenameUsed(strFilename, true))
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                    continue;
-                }
-
-                bool           bDownload = true;
-                CXMLAttribute* pDownload = Attributes.Find("download");
-
-                if (pDownload)
-                {
-                    const char* szDownload = pDownload->GetValue().c_str();
-
-                    if (!stricmp(szDownload, "no") || !stricmp(szDownload, "false"))
-                        bDownload = false;
-                }
-
-                // Create a new resourcefile item
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-                {
-                    m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
-                }
-                else
-                {
-                    m_strFailureReason = SString("Couldn't find file %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find file(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+
+                if (vecFiles.empty())
+                {
+                    m_strFailureReason = SString("Couldn't find file(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                for (const std::string strFilePath : vecFiles)
+                {
+                    std::string strFullFilename;
+
+                    if (IsFilenameUsed(strFilePath, true))
+                    {
+                        CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilePath.c_str());
+                        continue;
+                    }
+
+                    bool           bDownload = true;
+                    CXMLAttribute* pDownload = Attributes.Find("download");
+
+                    if (pDownload)
+                    {
+                        const char* szDownload = pDownload->GetValue().c_str();
+
+                        if (!stricmp(szDownload, "no") || !stricmp(szDownload, "false"))
+                            bDownload = false;
+                    }
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                    }
+                }
+
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
             }
             else
             {
@@ -1725,35 +1772,61 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (bClient && IsFilenameUsed(strFilename, true))
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
-                                       strFilename.c_str());
-                    bClient = false;
-                }
-                if (bServer && IsFilenameUsed(strFilename, false))
-                {
-                    CLogger::LogPrintf("WARNING: Duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                }
-
-                // Extract / get the filepath of the file
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-                {
-                    // Create it depending on the type (client or server or shared) and add it to the list of resource files
-                    if (bServer)
-                        m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
-                    if (bClient)
-                        m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
-                }
-                else
-                {
-                    m_strFailureReason = SString("Couldn't find script %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find script(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+
+                if (vecFiles.empty())
+                {
+                    m_strFailureReason = SString("Couldn't find script(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                for (const std::string strFilePath : vecFiles)
+                {
+                    std::string strFullFilename;
+                    bool        bLoadClient = bClient;
+                    bool        bLoadServer = bServer;
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        // Check if the filename is already used by this resource
+
+                        if (bClient && IsFilenameUsed(strFilePath, true))
+                        {
+                            CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                               strFilePath.c_str());
+                            bLoadClient = false;
+                        }
+
+                        if (bServer && IsFilenameUsed(strFilePath, false))
+                        {
+                            CLogger::LogPrintf("WARNING: Ignoring duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                               strFilePath.c_str());
+
+                            bLoadServer = false;
+                        }
+
+                        // Create it depending on the type (client or server or shared) and add it to the list of resource files
+
+                        if (bLoadServer)
+                            m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+
+                        if (bLoadClient)
+                            m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+                    }
+                }
+
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
             }
             else
             {
