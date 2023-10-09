@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_NSSG_H
-#define HEADER_CURL_NSSG_H
+#ifndef HEADER_CURL_MACOS_H
+#define HEADER_CURL_MACOS_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -23,19 +23,17 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
+
 #include "curl_setup.h"
 
-#ifdef USE_NSS
-/*
- * This header should only be needed to get included by vtls.c and nss.c
- */
+#ifdef CURL_MACOS_CALL_COPYPROXIES
 
-#include "urldata.h"
+CURLcode Curl_macos_init(void);
 
-/* initialize NSS library if not already */
-CURLcode Curl_nss_force_init(struct Curl_easy *data);
+#else
 
-extern const struct Curl_ssl Curl_ssl_nss;
+#define Curl_macos_init() CURLE_OK
 
-#endif /* USE_NSS */
-#endif /* HEADER_CURL_NSSG_H */
+#endif
+
+#endif /* HEADER_CURL_MACOS_H */

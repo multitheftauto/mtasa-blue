@@ -738,6 +738,7 @@ void CMainMenu::OnEscapePressedOffLine()
 void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
 {
     CMultiplayer* pMultiplayer = CCore::GetSingleton().GetMultiplayer();
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pMultiplayer->DisablePadHandler(bVisible);
 
     if ((m_ucFade == FADE_VISIBLE || m_ucFade == FADE_IN) && bVisible == false)
@@ -759,6 +760,11 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
         m_Credits.SetVisible(false);
         m_pNewsBrowser->SetVisible(false);
 
+        if (GetIsIngame() && pQuestionBox->IsVisible())
+        {
+            pQuestionBox->Reset();
+            pQuestionBox->Hide();
+        }
         //        m_bIsInSubWindow = false;
     }
     else
