@@ -15,8 +15,8 @@ local RAPID_URL = "https://github.com/multitheftauto/rapidjson/archive/refs/tags
 local RAPID_EXT = ".zip"
 
 -- Auto-update variables
-local DISCORD_VERSION = "v3.4.1"
-local DISCORD_HASH = "d64dcb04497ab556f9e362b272a9a36da2d4366c64be3fb6758aa8fabba0b599"
+local DISCORD_VERSION = "v3.4.2"
+local DISCORD_HASH = "0bb4fea79983ce0d6aafa458958d4c6fbb04880870a38801f2147a07e9e7699a"
 local RAPID_VERSION = "v1.1.1"
 local RAPID_HASH = "3d638ad2549645a4831e8e98cf7b919f191de0d60816e63e1d5aa08cd56e6db8"
 
