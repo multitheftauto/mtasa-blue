@@ -35,6 +35,7 @@ public:
     bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
     bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl);
     bool SetDiscordRPCEnabled(bool bEnabled);
+    bool IsDiscordCustomDetailsDisallowed() const;
     bool IsDiscordRPCEnabled() const;
     bool SetApplicationID(const char* szAppID);
 
@@ -59,7 +60,7 @@ private:
     unsigned long m_uiDiscordAppStart;
     unsigned long m_uiDiscordAppEnd;
 
-    bool m_bAllowCustomDetails;
+    bool m_bDisallowCustomDetails;
     bool m_bDiscordRPCEnabled;
     bool m_bUpdateRichPresence;
 };

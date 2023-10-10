@@ -45,7 +45,6 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
 
-
     lua_registerclass(luaVM, "DiscordRPC");
 }
 
@@ -68,7 +67,13 @@ bool CLuaDiscordDefs::SetState(std::string strState)
 
     auto discord = g_pCore->GetDiscord();
 
-    if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetPresenceState(strState.c_str(), true))
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return false;
+
+    if (discord->IsDiscordCustomDetailsDisallowed())
+        return false;
+
+    if (!discord->SetPresenceState(strState.c_str(), true))
         return false;
 
     return true;
@@ -98,7 +103,13 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 
     auto discord = g_pCore->GetDiscord();
 
-    if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetPresenceDetails(strDetails.c_str()))
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return false;
+
+    if (discord->IsDiscordCustomDetailsDisallowed())
+        return false;
+
+    if (!discord->SetPresenceDetails(strDetails.c_str()))
         return false;
 
     return true;
@@ -117,6 +128,9 @@ bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, boo
     auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
+        return false;
+
+    if (discord->IsDiscordCustomDetailsDisallowed())
         return false;
 
     if (bIsLarge)
@@ -155,7 +169,13 @@ bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, 
 
     auto discord = g_pCore->GetDiscord();
 
-    if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetPresenceButtons(iIndex, szName.c_str(), szUrl.c_str()))
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return false;
+
+    if (discord->IsDiscordCustomDetailsDisallowed())
+        return false;
+
+    if (!discord->SetPresenceButtons(iIndex, szName.c_str(), szUrl.c_str()))
         return false;
 
     return true;

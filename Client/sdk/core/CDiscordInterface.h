@@ -27,4 +27,5 @@ public:
 
     virtual bool SetDiscordRPCEnabled(bool bEnabled = false) = 0;
     virtual bool IsDiscordRPCEnabled() const = 0;
+    virtual bool IsDiscordCustomDetailsDisallowed() const = 0;
 };

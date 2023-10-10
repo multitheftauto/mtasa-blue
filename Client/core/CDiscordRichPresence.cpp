@@ -13,7 +13,7 @@
 #include "discord_rpc.h"
 #include "CDiscordRichPresence.h"
 
-constexpr char DEFAULT_APP_ID[] = "1139666477813866546";
+constexpr char DEFAULT_APP_ID[] = "1139666477813866546"; // remember to change it to default mta :)
 constexpr char DEFAULT_APP_ASSET[] = "mta_logo_round";
 constexpr char DEFAULT_APP_ASSET_TEXT[] = "Multi Theft Auto";
 constexpr char DEFAULT_APP_ASSET_SMALL[] = "";
@@ -39,6 +39,8 @@ void CDiscordRichPresence::InitializeDiscord()
 
     // Handlers .ready .disconnected .errored maybe use in future?
     Discord_Initialize((m_strDiscordAppCurrentId.empty()) ? DEFAULT_APP_ID : m_strDiscordAppCurrentId.c_str(), &handlers, 1, nullptr);
+
+    m_bDisallowCustomDetails = (m_strDiscordAppCurrentId == DEFAULT_APP_ID) ? true : false;
 }
 
 void CDiscordRichPresence::ShutdownDiscord()
@@ -67,6 +69,7 @@ void CDiscordRichPresence::SetDefaultData()
 
     m_aButtons = {};
     m_bUpdateRichPresence = true;
+    m_bDisallowCustomDetails = true;
 }
 
 void CDiscordRichPresence::UpdatePresence()
@@ -82,7 +85,7 @@ void CDiscordRichPresence::UpdatePresence()
     discordPresence.smallImageKey = m_strDiscordAppAssetSmall.c_str();
     discordPresence.smallImageText = m_strDiscordAppAssetSmallText.c_str();
 
-    discordPresence.state = (!m_strDiscordAppCustomState.empty()) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
+    discordPresence.state = (!m_strDiscordAppCustomState.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
 
     discordPresence.details = m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
@@ -135,7 +138,7 @@ void CDiscordRichPresence::SetAsset(const char* szAsset, const char* szAssetText
 
 bool CDiscordRichPresence::SetPresenceState(const char* szState, bool bCustom)
 {
-    if (bCustom && !m_bAllowCustomDetails)
+    if (bCustom)
         m_strDiscordAppCustomState = szState;
     else
         m_strDiscordAppState = szState;
@@ -169,9 +172,6 @@ bool CDiscordRichPresence::SetPresenceButtons(unsigned short int iIndex, const c
 
 bool CDiscordRichPresence::SetPresenceDetails(const char* szDetails, bool bCustom)
 {
-    if (bCustom && !m_bAllowCustomDetails)
-        return false;
-
     m_strDiscordAppDetails = szDetails;
     m_bUpdateRichPresence = true;
     return true;
@@ -219,4 +219,9 @@ bool CDiscordRichPresence::SetDiscordRPCEnabled(bool bEnabled)
 bool CDiscordRichPresence::IsDiscordRPCEnabled() const
 {
     return m_bDiscordRPCEnabled;
+}
+
+bool CDiscordRichPresence::IsDiscordCustomDetailsDisallowed() const
+{
+    return m_bDisallowCustomDetails;
 }
