@@ -13,7 +13,7 @@
 #include "discord_rpc.h"
 #include "CDiscordRichPresence.h"
 
-constexpr char DEFAULT_APP_ID[] = "1139666477813866546"; // remember to change it to default mta :)
+constexpr char DEFAULT_APP_ID[] = "468493322583801867"; // remember to change it to default mta :)
 constexpr char DEFAULT_APP_ASSET[] = "mta_logo_round";
 constexpr char DEFAULT_APP_ASSET_TEXT[] = "Multi Theft Auto";
 constexpr char DEFAULT_APP_ASSET_SMALL[] = "";
