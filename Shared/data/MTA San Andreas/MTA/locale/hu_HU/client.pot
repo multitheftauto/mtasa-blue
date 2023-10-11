@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-11 01:12+0000\n"
-"PO-Revision-Date: 2023-10-11 01:40\n"
+"PO-Revision-Date: 2023-10-11 04:40\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -928,7 +928,7 @@ msgstr "Ha kétségbeesett, ez segíthet:"
 
 #: Client/loader/Dialogs.cpp:185
 msgid "If you have already selected an option that works, this might help:"
-msgstr "Ha már kiválasztottál egy működő opciót, ez segíthet:"
+msgstr "Ha már kiválasztott egy működő opciót, ez segíthet:"
 
 #: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
@@ -1207,7 +1207,7 @@ msgstr "GTA: San Andreas nem indult el megfelelően. Szeretnéd ezt megszüntetn
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Szeretnél néhány online tanácsot kapni erről a hibáról?"
+msgstr "Szeretne néhány online tanácsot kapni erről a hibáról?"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -1731,7 +1731,7 @@ msgstr "Mindig mutassa a letöltési ablakot"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Engedélyezze a csatlakozást a Discord Gazdag Játékadataival"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
