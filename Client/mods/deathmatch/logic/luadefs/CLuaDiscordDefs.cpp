@@ -134,9 +134,6 @@ bool CLuaDiscordDefs::SetStartTime(unsigned long iSecondsSinceEpoch)
 }
 bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
 {
-    if (iMax < 0)
-        throw std::invalid_argument("Max size must be greater than or equal to 0");
-
     if (iSize > iMax)
         throw std::invalid_argument("Party size must be less than or equal to max party size");
 
