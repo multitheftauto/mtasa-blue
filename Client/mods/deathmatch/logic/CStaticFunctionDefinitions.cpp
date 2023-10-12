@@ -9813,6 +9813,24 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
     Arguments2.PushNumber(uiSeat);            // seat
     pVehicle->CallEvent("onClientVehicleEnter", Arguments2, true);
 
+    if (pPed->IsLocalPlayer())
+    {
+        auto discord = g_pCore->GetDiscord();
+        if (discord->IsDiscordRPCEnabled())
+        {
+            CVector position;
+            SString zoneName;
+
+            pPed->GetPosition(position);
+            GetZoneName(position, zoneName, true);
+
+            eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->GetModel());
+            std::string        vehiclePrefix = g_vehicleTypePrefixes.at(vehicleType);
+
+            discord->SetPresenceState(SString("%s %s", vehiclePrefix.c_str(), zoneName.c_str()), false);
+        }
+    }
+
     return true;
 }
 

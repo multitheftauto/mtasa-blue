@@ -3468,7 +3468,7 @@ void CSettings::SaveData()
                 discord->SetPresenceDetails(serverName.c_str(), false);
             }
 
-            discord->SetPresenceState(state, false);
+            discord->SetPresenceState(state.c_str(), false);
         }
     }
 

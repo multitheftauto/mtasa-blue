@@ -106,6 +106,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_fGameSpeed = 1.0f;
     m_lMoney = 0;
     m_dwWanted = 0;
+    m_timeLastDiscordStateUpdate = 0;
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
@@ -957,6 +958,38 @@ void CClientGame::DoPulsePostFrame()
             // Clear our list now
             m_HeliCollisionsMap.clear();
             m_LastClearTime.Reset();
+        }
+
+        // Check if we need to update the Discord Rich Presence state
+        if (time(nullptr) > m_timeLastDiscordStateUpdate + m_timeDiscordUpdateRate)
+        {
+            auto discord = g_pCore->GetDiscord();
+
+            if (discord && discord->IsDiscordRPCEnabled())
+            {
+                auto pLocalPlayer = g_pClientGame->GetLocalPlayer();
+
+                if (pLocalPlayer)
+                {
+                    auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
+
+                    CVector position;
+                    SString zoneName;
+
+                    pLocalPlayer->GetPosition(position);
+                    CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
+
+                    if (pVehicle)
+                    {
+                        eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->GetModel());
+                        discord->SetPresenceState(SString("%s %s", g_vehicleTypePrefixes.at(vehicleType).c_str(), zoneName.c_str()), false);
+                    }
+                    else
+                        discord->SetPresenceState(SString("Walking around %s", zoneName.c_str()), false);
+
+                    m_timeLastDiscordStateUpdate = time(nullptr);
+                }
+            }
         }
 
         CClientPerfStatManager::GetSingleton()->DoPulse();
@@ -5554,6 +5587,15 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             // Send the packet
             g_pNet->SendPacket(PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
+
+            auto discord = g_pCore->GetDiscord();
+            if (discord->IsDiscordRPCEnabled())
+            {
+                std::vector<std::string> states{"In a ditch", "En-route to hospital", "Meeting their maker", "Regretting their decisions", "Wasted"};
+                std::string              state = states[rand() % states.size()];
+                discord->SetPresenceState(state.c_str(), false);
+            }
+            
         }
     }
 }
