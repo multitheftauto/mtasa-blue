@@ -121,10 +121,10 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 
 bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 {
-    unsigned long iSecondsSinceEpoch = time(nullptr) + ulTime;
+    unsigned long ulSecondsSinceEpoch = time(nullptr) + ulTime;
 
     if (ulTime == 0)
-        iSecondsSinceEpoch = 0;
+        ulSecondsSinceEpoch = 0;
 
     auto discord = g_pCore->GetDiscord();
 
@@ -134,7 +134,7 @@ bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
     if (discord->IsDiscordCustomDetailsDisallowed())
         return false;
 
-    discord->SetPresenceStartTimestamp(iSecondsSinceEpoch);
+    discord->SetPresenceStartTimestamp(ulSecondsSinceEpoch);
     return true;
 }
 bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
