@@ -119,8 +119,13 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
     return true;
 }
 
-bool CLuaDiscordDefs::SetStartTime(unsigned long iSecondsSinceEpoch)
+bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 {
+    unsigned long iSecondsSinceEpoch = time(nullptr) + ulTime;
+
+    if (ulTime == 0)
+        iSecondsSinceEpoch = 0;
+
     auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
