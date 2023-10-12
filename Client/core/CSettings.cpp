@@ -3452,6 +3452,14 @@ void CSettings::SaveData()
     CVARS_SET("allow_discord_rpc", bAllowDiscordRPC);
     g_pCore->GetDiscord()->SetDiscordRPCEnabled(bAllowDiscordRPC);
 
+    if (bAllowDiscordRPC)
+    {
+        auto discord = g_pCore->GetDiscord();
+
+        if (discord)
+            discord->SetPresenceState(CCore::GetSingleton().IsConnected() ? SString("In-game (%s)", g_pCore->GetLastConnectedServerName()) : "Main menu", false);
+    }
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);

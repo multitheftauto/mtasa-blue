@@ -324,6 +324,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     // 2 - URL
     // unsigned short   (2)     - HTTP Download URL Size
     // unsigned char    (X)     - HTTP Download URL
+    // unsigned char    (X)     - Server name
 
     // Make sure any existing messageboxes are hided
     g_pCore->RemoveMessageBox();
@@ -464,6 +465,20 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     g_pClientGame->m_pLocalPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
 
     g_pCore->UpdateRecentlyPlayed();
+
+    if (bitStream.Can(eBitStreamVersion::CPlayerJoinCompletePacket_ServerName))
+    {
+        auto discord = g_pCore->GetDiscord();
+        if (discord && discord->IsDiscordRPCEnabled())
+        {
+            std::string serverName;
+            bitStream.ReadString(serverName);
+
+            g_pCore->SetLastConnectedServerName(serverName);
+            discord->SetPresenceState(SString("In-game (%s)", serverName), false);
+        }
+    }
+        
 }
 
 void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)

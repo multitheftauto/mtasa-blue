@@ -492,6 +492,7 @@ CClientGame::~CClientGame()
     if (discord && discord->IsDiscordRPCEnabled())
     {
         discord->ResetDiscordData();
+        discord->SetPresenceState("Main menu", false);
         discord->UpdatePresence();
     }
 
