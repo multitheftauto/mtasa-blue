@@ -3460,7 +3460,7 @@ void CSettings::SaveData()
         {
             SString state = "Main menu";
 
-            if (CCore::GetSingleton().IsConnected())
+            if (g_pCore->IsConnected())
             {
                 SString serverName = g_pCore->GetLastConnectedServerName();
                 state = (serverName.length() > 0) ? SString("In-game (%s)", serverName) : "In-game";
