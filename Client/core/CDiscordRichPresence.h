@@ -26,6 +26,7 @@ public:
 
     void UpdatePresence();
     void SetPresenceStartTimestamp(const unsigned long ulStart);
+    void SetPresenceEndTimestamp(const unsigned long ulEnd);
     void SetAsset(const char* szAsset, const char* szAssetText, bool bIsLarge = false);
     void SetAssetLargeData(const char* szAsset, const char* szAssetText);
     void SetAssetSmallData(const char* szAsset, const char* szAssetText);

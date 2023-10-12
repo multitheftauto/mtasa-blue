@@ -21,6 +21,7 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresenceSmallAsset", ArgumentParser<SetSmallAsset>},
         {"setDiscordRichPresenceButton", ArgumentParser<SetButtons>},
         {"setDiscordRichPresenceStartTime", ArgumentParser<SetStartTime>},
+        {"setDiscordRichPresenceEndTime", ArgumentParser<SetEndTime>},
         {"setDiscordRichPresencePartySize", ArgumentParser<SetPartySize>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
         {"isDiscordRichPresenceConnected", ArgumentParser < IsDiscordRPCConnected>},
@@ -137,6 +138,26 @@ bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
     discord->SetPresenceStartTimestamp(ulSecondsSinceEpoch);
     return true;
 }
+
+bool CLuaDiscordDefs::SetEndTime(unsigned long ulTime)
+{
+    unsigned long ulSecondsSinceEpoch = time(nullptr) + ulTime;
+
+    if (ulTime == 0)
+        ulSecondsSinceEpoch = 0;
+
+    auto discord = g_pCore->GetDiscord();
+
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return false;
+
+    if (discord->IsDiscordCustomDetailsDisallowed())
+        return false;
+
+    discord->SetPresenceEndTimestamp(ulSecondsSinceEpoch);
+    return true;
+}
+
 bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
 {
     if (iSize > iMax)

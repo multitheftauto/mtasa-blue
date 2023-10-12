@@ -70,6 +70,9 @@ void CDiscordRichPresence::SetDefaultData()
     m_aButtons = {};
     m_bUpdateRichPresence = true;
     m_bDisallowCustomDetails = true;
+
+    m_uiDiscordAppStart = 0;
+    m_uiDiscordAppEnd = 0;
 }
 
 void CDiscordRichPresence::UpdatePresence()
@@ -89,6 +92,7 @@ void CDiscordRichPresence::UpdatePresence()
 
     discordPresence.details = m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
+    discordPresence.endTimestamp = m_uiDiscordAppEnd;
 
     DiscordButton buttons[2];
     if (m_aButtons)
@@ -113,6 +117,13 @@ void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart
     m_uiDiscordAppStart = ulStart;
     m_bUpdateRichPresence = true;
 }
+
+void CDiscordRichPresence::SetPresenceEndTimestamp(const unsigned long ulEnd)
+{
+    m_uiDiscordAppEnd = ulEnd;
+    m_bUpdateRichPresence = true;
+}
+
 
 void CDiscordRichPresence::SetAssetLargeData(const char* szAsset, const char* szAssetText)
 {
