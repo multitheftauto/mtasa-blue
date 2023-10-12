@@ -23,6 +23,7 @@ public:
     virtual void SetAssetSmallData(const char* szAsset, const char* szAssetText) = 0;
     virtual void SetPresenceStartTimestamp(const unsigned long ulStart) = 0;
     virtual bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl) = 0;
+    virtual void SetPresencePartySize(int iSize, int iMax) = 0;
     //virtual void SetPresenceEndTimestamp(const unsigned long ulEnd) = 0;
 
     virtual bool SetDiscordRPCEnabled(bool bEnabled = false) = 0;
