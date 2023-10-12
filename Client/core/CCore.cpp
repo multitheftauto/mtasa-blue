@@ -2393,8 +2393,3 @@ std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
 {
     return m_pDiscordRichPresence;
 }
-
-SString CCore::GetLastConnectedServerName() const
-{
-    return m_strLastConnectedServerName;
-}
