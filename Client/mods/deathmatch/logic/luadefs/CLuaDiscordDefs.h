@@ -26,6 +26,7 @@ private:
     static bool SetLargeAsset(std::string szAsset, std::string szAssetText);
     static bool SetSmallAsset(std::string szAsset, std::string szAssetText);
     static bool SetStartTime(unsigned long ulTime);
+    static bool SetEndTime(unsigned long ulTime);
     static bool SetPartySize(int iMin, int iMax);
     static bool IsDiscordRPCConnected();
 
