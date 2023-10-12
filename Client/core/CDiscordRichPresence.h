@@ -38,6 +38,7 @@ public:
     bool IsDiscordCustomDetailsDisallowed() const;
     bool IsDiscordRPCEnabled() const;
     bool SetApplicationID(const char* szAppID);
+    int  GetMaxServerNameLength() const;
 
     // void SetPresenceTimestamp();
     // void SetPresenceImage();
