@@ -474,8 +474,11 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
             std::string serverName;
             bitStream.ReadString(serverName);
 
-            g_pCore->SetLastConnectedServerName(serverName);
-            discord->SetPresenceState(SString("In-game (%s)", serverName), false);
+            if (serverName.length() > 0)
+            {
+                g_pCore->SetLastConnectedServerName(serverName);
+                discord->SetPresenceState(SString("In-game (%s)", serverName), false);
+            }
         }
     }
         

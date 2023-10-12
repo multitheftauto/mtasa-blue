@@ -3457,7 +3457,17 @@ void CSettings::SaveData()
         auto discord = g_pCore->GetDiscord();
 
         if (discord)
-            discord->SetPresenceState(CCore::GetSingleton().IsConnected() ? SString("In-game (%s)", g_pCore->GetLastConnectedServerName()) : "Main menu", false);
+        {
+            SString state = "Main menu";
+
+            if (CCore::GetSingleton().IsConnected())
+            {
+                SString serverName = g_pCore->GetLastConnectedServerName();
+                state = (serverName.length() > 0) ? SString("In-game (%s)", serverName) : "In-game";
+            }
+
+            discord->SetPresenceState(state, false);
+        }
     }
 
     // Grass
