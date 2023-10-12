@@ -44,6 +44,7 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setSmallAsset", "setDiscordRichPresenceSmallAsset");
     lua_classfunction(luaVM, "setButton", "setDiscordRichPresenceButton");
     lua_classfunction(luaVM, "setStartTime", "setDiscordRichPresenceStartTime");
+    lua_classfunction(luaVM, "setEndTime", "setDiscordRichPresenceEndTime");
     lua_classfunction(luaVM, "setPartySize", "setDiscordRichPresencePartySize");
 
     lua_classfunction(luaVM, "isConnected", "isDiscordRichPresenceConnected");
