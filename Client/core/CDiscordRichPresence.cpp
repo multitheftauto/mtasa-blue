@@ -90,7 +90,8 @@ void CDiscordRichPresence::UpdatePresence()
 
     discordPresence.state = (!m_strDiscordAppCustomState.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
 
-    discordPresence.details = m_strDiscordAppDetails.c_str();
+    discordPresence.details =
+        (!m_strDiscordAppCustomDetails.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomDetails.c_str() : m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
     discordPresence.endTimestamp = m_uiDiscordAppEnd;
 
@@ -139,13 +140,13 @@ void CDiscordRichPresence::SetAsset(const char* szAsset, const char* szAssetText
 {
     if (isLarge)
     {
-        m_strDiscordAppAsset = (szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET;
-        m_strDiscordAppAssetText = (szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_TEXT;
+        m_strDiscordAppAsset = (std::string(szAsset).length() > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET;
+        m_strDiscordAppAssetText = (std::string(szAssetText).length() > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_TEXT;
     }
     else
     {
-        m_strDiscordAppAssetSmall = (szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET_SMALL;
-        m_strDiscordAppAssetSmallText = (szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
+        m_strDiscordAppAssetSmall = (std::string(szAsset).length() > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET_SMALL;
+        m_strDiscordAppAssetSmallText = (std::string(szAssetText).length() > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
     }
     m_bUpdateRichPresence = true;
 }
@@ -186,7 +187,11 @@ bool CDiscordRichPresence::SetPresenceButtons(unsigned short int iIndex, const c
 
 bool CDiscordRichPresence::SetPresenceDetails(const char* szDetails, bool bCustom)
 {
-    m_strDiscordAppDetails = szDetails;
+    if (bCustom)
+        m_strDiscordAppCustomDetails = szDetails;
+    else
+        m_strDiscordAppDetails = szDetails;
+
     m_bUpdateRichPresence = true;
     return true;
 }

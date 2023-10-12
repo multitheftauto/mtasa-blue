@@ -104,8 +104,8 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 {
     int detailsLength = strDetails.length();
 
-    if (detailsLength < 1 || detailsLength > 128)
-        throw std::invalid_argument("Details length must be greater than 0, or less than/equal to 128");
+    if (detailsLength > 128)
+        throw std::invalid_argument("Details length must be less than/equal to 128");
 
     auto discord = g_pCore->GetDiscord();
 
@@ -181,10 +181,10 @@ bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, boo
     int assetLength = szAsset.length();
     int assetTextLength = szAssetText.length();
 
-    if (assetLength < 1 || assetLength > 32)
-        throw std::invalid_argument("Asset name length must be greater than 0, or less than/equal to 32");
-    if (assetTextLength < 1 || assetTextLength > 128)
-        throw std::invalid_argument("Asset text length must be greater than 0, or less than/equal to 128");
+    if (assetLength > 32)
+        throw std::invalid_argument("Asset name length must be less than/equal to 32");
+    if (assetTextLength > 128)
+        throw std::invalid_argument("Asset text length must be less than/equal to 128");
 
     auto discord = g_pCore->GetDiscord();
 
@@ -220,10 +220,10 @@ bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, 
     int nameLength = szName.length();
     int urlLength = szUrl.length();
 
-    if (nameLength < 1 || nameLength > 32)
-        throw std::invalid_argument("Button name length must be greater than 0, or less than/equal to 32");
-    if (urlLength < 1 || urlLength > 128)
-        throw std::invalid_argument("Button URL length must be greater than 0, or less than/equal to 128");
+    if (nameLength > 32)
+        throw std::invalid_argument("Button name length must be less than/equal to 32");
+    if (urlLength > 128)
+        throw std::invalid_argument("Button URL length must be less than/equal to 128");
 
     if (szUrl.find("https://") != 0 && szUrl.find("mtasa://") != 0)
         throw std::invalid_argument("Button URL should include the https:// or mtasa:// link");

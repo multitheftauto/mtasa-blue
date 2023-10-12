@@ -56,6 +56,7 @@ private:
     std::string m_strDiscordAppState;
     std::string m_strDiscordAppDetails;
     std::string m_strDiscordAppCustomState;
+    std::string m_strDiscordAppCustomDetails;
 
     std::optional<std::tuple<std::pair<std::string, std::string>, std::pair<std::string, std::string>>> m_aButtons;
 
