@@ -32,7 +32,7 @@ class CClientProjectile;
 
 #define INVALID_PASSENGER_SEAT 0xFF
 #define DEFAULT_VEHICLE_HEALTH 1000
-#define MAX_VEHICLE_HEALTH 10000
+#define MAX_VEHICLE_HEALTH     10000
 
 enum eClientVehicleType
 {
@@ -144,6 +144,12 @@ struct SVehicleComponentData
     bool    m_bScaleChanged;
     bool    m_bVisible;
 };
+
+const std::map<eClientVehicleType, std::string> g_vehicleTypePrefixes{
+    {CLIENTVEHICLE_CAR, "Cruising around"},          {CLIENTVEHICLE_PLANE, "Flying around"},      {CLIENTVEHICLE_BIKE, "Riding around"},
+    {CLIENTVEHICLE_HELI, "Flying around"},           {CLIENTVEHICLE_BOAT, "Riding the waves of"}, {CLIENTVEHICLE_TRAIN, "Riding the train in"},
+    {CLIENTVEHICLE_TRAILER, "Doing weird stuff in"}, {CLIENTVEHICLE_BMX, "Bunny hopping around"}, {CLIENTVEHICLE_MONSTERTRUCK, "Monster truckin' around"},
+    {CLIENTVEHICLE_QUADBIKE, "Quaddin' around"}};
 
 class CClientVehicle : public CClientStreamElement
 {

@@ -1136,6 +1136,18 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
 
             // Reset return position so we can't warp back to where we were if local player
             g_pClientGame->m_pNetAPI->ResetReturnPosition();
+
+            auto discord = g_pCore->GetDiscord();
+            if (discord->IsDiscordRPCEnabled())
+            {
+                CVector position;
+                SString zoneName;
+
+                pPlayer->GetPosition(position);
+                CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
+
+                discord->SetPresenceState(SString("Walking around %s", zoneName.c_str()), false);
+            }
         }
         else
         {
@@ -1771,6 +1783,22 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                         Arguments2.PushElement(pPed);             // player / ped
                         Arguments2.PushNumber(ucSeat);            // seat
                         pVehicle->CallEvent("onClientVehicleEnter", Arguments2, true);
+
+                        if (pPed->IsLocalPlayer())
+                        {
+                            auto discord = g_pCore->GetDiscord();
+                            if (discord->IsDiscordRPCEnabled())
+                            {
+                                CVector position;
+                                SString zoneName;
+
+                                pPed->GetPosition(position);
+                                CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
+
+                                eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->GetModel());
+                                discord->SetPresenceState(SString("%s %s", g_vehicleTypePrefixes.at(vehicleType).c_str(), zoneName.c_str()), false);
+                            }
+                        }
                         break;
                     }
 
@@ -1896,6 +1924,21 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                         Arguments2.PushNumber(ucSeat);            // seat
                         Arguments2.PushBoolean(false);            // jacker
                         pVehicle->CallEvent("onClientVehicleExit", Arguments2, true);
+
+                        if (pPed->IsLocalPlayer())
+                        {
+                            auto discord = g_pCore->GetDiscord();
+                            if (discord->IsDiscordRPCEnabled())
+                            {
+                                CVector position;
+                                SString zoneName;
+
+                                pPed->GetPosition(position);
+                                CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
+                                discord->SetPresenceState(SString("Walking around %s", zoneName.c_str()), false);
+                            }
+                        }
+
                         break;
                     }
 
@@ -1943,6 +1986,22 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                         Arguments2.PushNumber(ucSeat);            // seat
                         Arguments2.PushBoolean(false);            // jacker
                         pVehicle->CallEvent("onClientVehicleExit", Arguments2, true);
+
+                        if (pPed->IsLocalPlayer())
+                        {
+                            auto discord = g_pCore->GetDiscord();
+                            if (discord->IsDiscordRPCEnabled())
+                            {
+                                CVector position;
+                                SString zoneName;
+
+                                pPed->GetPosition(position);
+                                CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
+
+                                eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->GetModel());
+                                discord->SetPresenceState(SString("Walking around %s", zoneName.c_str()), false);
+                            }
+                        }
                         break;
                     }
 
@@ -1996,6 +2055,27 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                         Arguments2.PushNumber(ucSeat);              // seat
                         Arguments2.PushNumber(ucDoor);              // door
                         pVehicle->CallEvent("onClientVehicleStartExit", Arguments2, true);
+
+                        if (pPed->IsLocalPlayer() || pJacked->IsLocalPlayer())
+                        {
+                            auto discord = g_pCore->GetDiscord();
+                            if (discord->IsDiscordRPCEnabled())
+                            {
+                                CVector position;
+                                SString zoneName;
+
+                                pPed->GetPosition(position);
+                                CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
+
+                                eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->GetModel());
+
+                                if (pPed->IsLocalPlayer())
+                                    discord->SetPresenceState(SString("%s %s", g_vehicleTypePrefixes.at(vehicleType).c_str(), zoneName.c_str()), false);
+                                else if (pJacked->IsLocalPlayer())
+                                    discord->SetPresenceState(SString("Walking around %s", zoneName.c_str()), false);
+                            }
+                        }
+
                         break;
                     }
 
@@ -2084,6 +2164,26 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                     pInsidePed->CallEvent("onClientPlayerVehicleEnter", Arguments4, true);
                                 else
                                     pInsidePed->CallEvent("onClientPedVehicleEnter", Arguments4, true);
+
+                                if (pInsidePed->IsLocalPlayer() || pOutsidePed->IsLocalPlayer())
+                                {
+                                    auto discord = g_pCore->GetDiscord();
+                                    if (discord->IsDiscordRPCEnabled())
+                                    {
+                                        CVector position;
+                                        SString zoneName;
+
+                                        pInsidePed->GetPosition(position);
+                                        CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
+
+                                        eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->GetModel());
+
+                                        if (pInsidePed->IsLocalPlayer())
+                                            discord->SetPresenceState(SString("%s %s", g_vehicleTypePrefixes.at(vehicleType).c_str(), zoneName.c_str()), false);
+                                        else if (pOutsidePed->IsLocalPlayer())
+                                            discord->SetPresenceState(SString("Walking around %s", zoneName.c_str()), false);
+                                    }
+                                }
                             }
                         }
 
