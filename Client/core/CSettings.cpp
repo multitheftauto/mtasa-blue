@@ -3463,7 +3463,9 @@ void CSettings::SaveData()
             if (g_pCore->IsConnected())
             {
                 SString serverName = g_pCore->GetLastConnectedServerName();
-                state = (serverName.length() > 0) ? SString("In-game (%s)", serverName) : "In-game";
+                state = "In-game";
+
+                discord->SetPresenceDetails(serverName.c_str(), false);
             }
 
             discord->SetPresenceState(state, false);

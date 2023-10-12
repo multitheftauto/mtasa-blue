@@ -477,7 +477,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
             if (serverName.length() > 0)
             {
                 g_pCore->SetLastConnectedServerName(serverName);
-                discord->SetPresenceState(SString("In-game (%s)", serverName), false);
+                discord->SetPresenceDetails(serverName.c_str(), false);
             }
         }
     }
