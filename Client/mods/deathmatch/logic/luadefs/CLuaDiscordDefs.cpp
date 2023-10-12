@@ -20,6 +20,8 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresenceAsset", ArgumentParser<SetLargeAsset>},
         {"setDiscordRichPresenceSmallAsset", ArgumentParser<SetSmallAsset>},
         {"setDiscordRichPresenceButton", ArgumentParser<SetButtons>},
+        {"setDiscordRichPresenceStartTime", ArgumentParser<SetStartTime>},
+        {"setDiscordRichPresencePartySize", ArgumentParser<SetPartySize>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
         {"isDiscordRichPresenceConnected", ArgumentParser < IsDiscordRPCConnected>},
 
@@ -40,6 +42,8 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setAsset", "setDiscordRichPresenceAsset");
     lua_classfunction(luaVM, "setSmallAsset", "setDiscordRichPresenceSmallAsset");
     lua_classfunction(luaVM, "setButton", "setDiscordRichPresenceButton");
+    lua_classfunction(luaVM, "setStartTime", "setDiscordRichPresenceStartTime");
+    lua_classfunction(luaVM, "setPartySize", "setDiscordRichPresencePartySize");
 
     lua_classfunction(luaVM, "isConnected", "isDiscordRichPresenceConnected");
     //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
@@ -112,6 +116,39 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
     if (!discord->SetPresenceDetails(strDetails.c_str()))
         return false;
 
+    return true;
+}
+
+bool CLuaDiscordDefs::SetStartTime(unsigned long iSecondsSinceEpoch)
+{
+    auto discord = g_pCore->GetDiscord();
+
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return false;
+
+    if (discord->IsDiscordCustomDetailsDisallowed())
+        return false;
+
+    discord->SetPresenceStartTimestamp(iSecondsSinceEpoch);
+    return true;
+}
+bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
+{
+    if (iMax < 0)
+        throw std::invalid_argument("Max size must be greater than or equal to 0");
+
+    if (iSize > iMax)
+        throw std::invalid_argument("Party size must be less than or equal to max party size");
+
+    auto discord = g_pCore->GetDiscord();
+
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return false;
+
+    if (discord->IsDiscordCustomDetailsDisallowed())
+        return false;
+
+    discord->SetPresencePartySize(iSize, iMax);
     return true;
 }
 

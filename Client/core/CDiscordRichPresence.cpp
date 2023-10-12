@@ -101,6 +101,9 @@ void CDiscordRichPresence::UpdatePresence()
         discordPresence.buttons = buttons;
     }
 
+    discordPresence.partySize = (m_bDisallowCustomDetails) ? 0 : m_iPartySize;
+    discordPresence.partyMax = (m_bDisallowCustomDetails) ? 0 : m_iPartyMax;
+
     Discord_UpdatePresence(&discordPresence);
     m_bUpdateRichPresence = false;
 }
@@ -224,4 +227,10 @@ bool CDiscordRichPresence::IsDiscordRPCEnabled() const
 bool CDiscordRichPresence::IsDiscordCustomDetailsDisallowed() const
 {
     return m_bDisallowCustomDetails;
+}
+
+void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax)
+{
+    m_iPartySize = iSize;
+    m_iPartyMax = iMax;
 }
