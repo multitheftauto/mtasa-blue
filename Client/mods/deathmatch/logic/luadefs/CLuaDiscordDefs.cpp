@@ -66,8 +66,8 @@ bool CLuaDiscordDefs::SetState(std::string strState)
 {
     int stateLength = strState.length();
 
-    if (stateLength < 1 || stateLength > 128)
-        throw std::invalid_argument("State name must be greater than 0, or less than/equal to 128");
+    if (stateLength > 128)
+        throw std::invalid_argument("State must be less than/equal to 128");
 
     auto discord = g_pCore->GetDiscord();
 
