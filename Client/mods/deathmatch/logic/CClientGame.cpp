@@ -989,6 +989,8 @@ void CClientGame::DoPulsePostFrame()
 
                     m_timeLastDiscordStateUpdate = time(nullptr);
                 }
+                else
+                    discord->SetPresenceState("In-game", false);
             }
         }
 
