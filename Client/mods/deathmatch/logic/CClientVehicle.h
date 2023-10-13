@@ -145,7 +145,7 @@ struct SVehicleComponentData
     bool    m_bVisible;
 };
 
-const std::map<eClientVehicleType, std::string> g_vehicleTypePrefixes{
+static const std::map<eClientVehicleType, std::string> g_vehicleTypePrefixes{
     {CLIENTVEHICLE_CAR, "Cruising around"},          {CLIENTVEHICLE_PLANE, "Flying around"},      {CLIENTVEHICLE_BIKE, "Riding around"},
     {CLIENTVEHICLE_HELI, "Flying around"},           {CLIENTVEHICLE_BOAT, "Riding the waves of"}, {CLIENTVEHICLE_TRAIN, "Riding the train in"},
     {CLIENTVEHICLE_TRAILER, "Doing weird stuff in"}, {CLIENTVEHICLE_BMX, "Bunny hopping around"}, {CLIENTVEHICLE_MONSTERTRUCK, "Monster truckin' around"},
