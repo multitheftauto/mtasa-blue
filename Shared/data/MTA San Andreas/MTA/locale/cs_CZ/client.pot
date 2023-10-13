@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-11 01:12+0000\n"
-"PO-Revision-Date: 2023-10-11 01:40\n"
+"PO-Revision-Date: 2023-10-13 09:41\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -761,7 +761,7 @@ msgstr "MTA:SA nebylo možno spustit z důvodu poškozeného nebo chybějícího
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "Prosím zkontrolujte svůj anitivirový program a zkuste v něm zapnout výjimku pro spouštěč GTA:SA, následně restartujte MTA:SA."
+msgstr "Prosím zkontrolujte svůj antivirový program a zkuste v něm zapnout výjimku pro spouštěč GTA:SA, následně restartujte MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -1736,7 +1736,7 @@ msgstr "Vždy zobrazit okno stahování"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Povolit připojení přes Discord RPC"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
