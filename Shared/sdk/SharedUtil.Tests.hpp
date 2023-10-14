@@ -22,11 +22,12 @@ void SharedUtil_String_Tests();
 void SharedUtil_Hash_Tests();
 
 #ifdef MTA_CLIENT
-static const SString tempFilepath = SString("%s\\%s", GetMTATempPath().c_str(),
-                                            "hash_"
-                                            "\xD0"
-                                            "\x98"
-                                            "_test");
+static const char* tempFilepath = SString("%s\\%s", GetMTATempPath().c_str(),
+                                          "hash_"
+                                          "\xD0"
+                                          "\x98"
+                                          "_test")
+                                      .c_str();
 #else
 static const char* tempFilepath =
     "hash_"
