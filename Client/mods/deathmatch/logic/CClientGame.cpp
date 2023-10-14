@@ -3559,8 +3559,36 @@ void CClientGame::StaticGameRunNamedAnimDestructorHandler(class CTaskSimpleRunNa
     g_pClientGame->GameRunNamedAnimDestructorHandler(pTask);
 }
 
+void CClientGame::EnqueueModelToRender(SModelToRender modelToRender)
+{
+    m_vecModelsToRender.push_back(modelToRender);
+}
+
+void CClientGame::GameEntityRenderHandler(CEntitySAInterface* pGameEntity)
+{
+    if (m_vecModelsToRender.empty())
+        return;
+    
+    for (auto& extraEntity : m_vecModelsToRender)
+    {
+        auto modelInfo = g_pGame->GetModelInfo(extraEntity.usModel);
+        if (modelInfo == nullptr)
+            continue;
+        if (!modelInfo->IsLoaded())
+            modelInfo->Request(EModelRequestType::BLOCKING, "Lua::DxDrawModel3D");
+        if (!modelInfo->IsLoaded())
+            continue;
+
+        modelInfo->Render(extraEntity.matrix);
+    }
+
+    m_vecModelsToRender.clear();
+}
+
 void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
 {
+    g_pClientGame->GameEntityRenderHandler(pGameEntity);
+
     if (pGameEntity)
     {
         CPools* pPools = g_pGame->GetPools();
@@ -3698,6 +3726,11 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
 
 void CClientGame::Render3DStuffHandler()
 {
+    //auto modelInfo = g_pGame->GetModelInfo(1632);
+    //if (!modelInfo->IsLoaded())
+    //    return;
+
+    //modelInfo->Render(CVector(0,30,6.0f));
 }
 
 void CClientGame::PreRenderSkyHandler()

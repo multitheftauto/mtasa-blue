@@ -26,6 +26,7 @@ void InitRwFunctions(eGameVersion version)
             RwStreamSkip = (RwStreamSkip_t)0x007ECD40;            // check
             RpClumpDestroy = (RpClumpDestroy_t)0x0074A360;
             RpClumpGetNumAtomics = (RpClumpGetNumAtomics_t)0x00749930;
+            RwFrameTransform = (RwFrameTransform_t)0x007F0F70;
             RwFrameTranslate = (RwFrameTranslate_t)0x007F0E70;
             RpClumpForAllAtomics = (RpClumpForAllAtomics_t)0x00749BC0;
             RwFrameAddChild = (RwFrameAddChild_t)0x007F0B40;
@@ -40,6 +41,7 @@ void InitRwFunctions(eGameVersion version)
             RwTexDictionaryStreamWrite = (RwTexDictionaryStreamWrite_t)0x00804A30;
             rwD3D9NativeTextureRead = (rwD3D9NativeTextureRead_t)0x004CD820;
             RpPrtStdGlobalDataSetStreamEmbedded = (RpPrtStdGlobalDataSetStreamEmbedded_t)0x0041B350;
+            RpClumpRender = (RpClumpRender_t)0x00749B20;
             RpClumpRemoveAtomic = (RpClumpRemoveAtomic_t)0x0074A510;
             RpAtomicClone = (RpAtomicClone_t)0x00749EB0;
             RwTexDictionaryFindNamedTexture = (RwTexDictionaryFindNamedTexture_t)0x007F3A30;
@@ -123,6 +125,7 @@ void InitRwFunctions(eGameVersion version)
             RwStreamSkip = (RwStreamSkip_t)0x007ECD00;
             RpClumpDestroy = (RpClumpDestroy_t)0x0074A310;
             RpClumpGetNumAtomics = (RpClumpGetNumAtomics_t)0x007498E0;
+            RwFrameTransform = (RwFrameTransform_t)0x007F0F70;
             RwFrameTranslate = (RwFrameTranslate_t)0x007F0E30;
             RpClumpForAllAtomics = (RpClumpForAllAtomics_t)0x00749B70;
             RwFrameAddChild = (RwFrameAddChild_t)0x007F0B00;
@@ -137,6 +140,7 @@ void InitRwFunctions(eGameVersion version)
             RwTexDictionaryStreamWrite = (RwTexDictionaryStreamWrite_t)0x008049F0;
             rwD3D9NativeTextureRead = (rwD3D9NativeTextureRead_t)0x004CD820;
             RpPrtStdGlobalDataSetStreamEmbedded = (RpPrtStdGlobalDataSetStreamEmbedded_t)0x0041B350;
+            RpClumpRender = (RpClumpRender_t)0x00749B20;
             RpClumpRemoveAtomic = (RpClumpRemoveAtomic_t)0x0074A4C0;
             RpAtomicClone = (RpAtomicClone_t)0x00749E60;
             RwTexDictionaryFindNamedTexture = (RwTexDictionaryFindNamedTexture_t)0x007F39F0;
