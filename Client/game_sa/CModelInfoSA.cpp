@@ -812,10 +812,18 @@ void CModelInfoSA::ResetTextureDictionaryID()
 
 void CModelInfoSA::StaticResetTextureDictionaries()
 {
-    while (!ms_DefaultTxdIDMap.empty()) {
+    while (!ms_DefaultTxdIDMap.empty())
+    {
         const auto mi = pGame->GetModelInfo(ms_DefaultTxdIDMap.begin()->first);
-        assert(mi);
-        mi->ResetTextureDictionaryID();
+        if (mi)
+        {
+            mi->ResetTextureDictionaryID();
+        }
+        else
+        {
+            // Model was deallocated. Skip and remove it from our list.
+            ms_DefaultTxdIDMap.erase(ms_DefaultTxdIDMap.begin());
+        }
     }
 }
 

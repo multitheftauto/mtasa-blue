@@ -21,17 +21,11 @@
 #ifndef SFX_MODULE
 void SetExtraInfo20(CommandData *Cmd,Archive &Arc,wchar *Name)
 {
+#ifdef _WIN_ALL
   if (Cmd->Test)
     return;
   switch(Arc.SubBlockHead.SubType)
   {
-#ifdef _UNIX
-    case UO_HEAD:
-      if (Cmd->ProcessOwners)
-        ExtractUnixOwner20(Arc,Name);
-      break;
-#endif
-#ifdef _WIN_ALL
     case NTACL_HEAD:
       if (Cmd->ProcessOwners)
         ExtractACL20(Arc,Name);
@@ -39,8 +33,8 @@ void SetExtraInfo20(CommandData *Cmd,Archive &Arc,wchar *Name)
     case STREAM_HEAD:
       ExtractStreams20(Arc,Name);
       break;
-#endif
   }
+#endif
 }
 #endif
 
@@ -86,10 +80,13 @@ static int CalcAllowedDepth(const wchar *Name)
       bool Dot2=Name[1]=='.' && Name[2]=='.' && (IsPathDiv(Name[3]) || Name[3]==0);
       if (!Dot && !Dot2)
         AllowedDepth++;
+      else
+        if (Dot2)
+          AllowedDepth--;
     }
     Name++;
   }
-  return AllowedDepth;
+  return AllowedDepth < 0 ? 0 : AllowedDepth;
 }
 
 
