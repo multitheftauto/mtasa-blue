@@ -18,6 +18,7 @@
 class CBaseModelInfoSAInterface;
 class CColModel;
 class CPedModelInfo;
+class CMatrix;
 struct RpClump;
 struct RwObject;
 
@@ -246,4 +247,6 @@ public:
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 
     virtual unsigned int GetParentID() = 0;
+
+    virtual bool Render(CMatrix& transform) = 0;
 };
