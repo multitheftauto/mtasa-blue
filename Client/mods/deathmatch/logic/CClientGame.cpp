@@ -3575,7 +3575,7 @@ void CClientGame::GameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         if (modelInfo == nullptr)
             continue;
         if (!modelInfo->IsLoaded())
-            modelInfo->Request(EModelRequestType::BLOCKING, "Lua::DxDrawModel3d");
+            modelInfo->Request(EModelRequestType::BLOCKING, "Lua::DxDrawModel3D");
         if (!modelInfo->IsLoaded())
             continue;
 
