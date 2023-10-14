@@ -971,8 +971,7 @@ void SharedUtil_Hash_Tests()
         strResult = GenerateHashHexString(EHashFunction::MD5, a);
         assert(strResult == result);
 
-        auto filepath = tempFilepath;
-        bool save = FileSave(tempFilepath, a);
+        FileSave(tempFilepath, a);
 
         strResult = GenerateHashHexStringFromFile(EHashFunction::MD5, tempFilepath);
         assert(strResult == result);
