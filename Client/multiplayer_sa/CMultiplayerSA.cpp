@@ -3053,8 +3053,7 @@ void _declspec(naked) HOOK_Render3DStuff()
     {
         pushad
     }
-    //if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
-
+    
     _asm
     {
         popad

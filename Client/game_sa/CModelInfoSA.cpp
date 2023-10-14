@@ -2105,7 +2105,6 @@ bool CModelInfoSA::Render(CMatrix& matrix)
 {
     CBaseModelInfoSAInterface* pModelInfoSAInterface = GetInterface();
     RwObject* pRwObject = pModelInfoSAInterface->pRwObject;
-    // RwEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, 100u);
     RwFrame* pFrame = RpGetFrame(pRwObject);
     RwFrameSetIdentity(pFrame);
     RwMatrix rwMatrix;
@@ -2115,7 +2114,6 @@ bool CModelInfoSA::Render(CMatrix& matrix)
     rwMatrix.pos = (RwV3d&)matrix.vPos;
     RwFrameTransform(pFrame, &rwMatrix, rwCOMBINEREPLACE);
     RwFrameUpdateObjects(pFrame);
-    //RwFrameRotate(pFrame, &yaxis, rotation.fX, RwOpCombineType::rwCOMBINEREPLACE);
 
     if (pRwObject->type == RP_TYPE_ATOMIC)
     {

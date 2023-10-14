@@ -3726,11 +3726,6 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
 
 void CClientGame::Render3DStuffHandler()
 {
-    //auto modelInfo = g_pGame->GetModelInfo(1632);
-    //if (!modelInfo->IsLoaded())
-    //    return;
-
-    //modelInfo->Render(CVector(0,30,6.0f));
 }
 
 void CClientGame::PreRenderSkyHandler()
