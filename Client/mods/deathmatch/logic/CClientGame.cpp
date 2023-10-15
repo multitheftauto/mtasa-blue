@@ -1005,14 +1005,17 @@ void CClientGame::DoPulsePostFrame()
                         while (it != taskStates.end())
                         {
                             STaskState taskState = (*it);
-                            auto       taskSecondary = (taskState.eSecondaryType == -1) ? nullptr : taskManager->GetTaskSecondary(taskState.eSecondaryType);
-                            bool       useState = (taskState.eSubTask == -1 && taskState.eSecondaryTask == -1);
+
+                            auto taskSecondary =
+                                (!taskState.eSecondaryType.has_value()) ? nullptr : taskManager->GetTaskSecondary(taskState.eSecondaryType.value());
+                            bool useState = (!taskState.eSubTask.has_value() && !taskState.eSecondaryTask.has_value());
 
                             if (!useState)
                             {
-                                if (taskSub != nullptr && taskState.eSubTask == taskSub->GetTaskType())
+                                if (taskSub != nullptr && taskState.eSubTask.has_value() && taskState.eSubTask.value() == taskSub->GetTaskType())
                                     useState = true;
-                                else if (taskSecondary != nullptr && taskState.eSecondaryTask == taskSecondary->GetTaskType())
+                                else if (taskSecondary != nullptr && taskState.eSecondaryTask.has_value() &&
+                                         taskState.eSecondaryTask.value() == taskSecondary->GetTaskType())
                                     useState = true;
                             }
 
