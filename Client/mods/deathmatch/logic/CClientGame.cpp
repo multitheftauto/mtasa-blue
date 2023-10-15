@@ -34,6 +34,7 @@
 #include <game/Task.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
+#include <any>
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
