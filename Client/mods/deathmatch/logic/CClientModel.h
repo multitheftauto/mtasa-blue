@@ -44,10 +44,11 @@ public:
     bool             Deallocate(void);
     void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
     CResource*       GetParentResource(void) const { return m_pParentResource; }
+    void             RestoreEntitiesUsingThisModel();
 
 private:
-    bool DeallocateDFF(CModelInfo* pModelInfo);
-    bool DeallocateTXD(CModelInfo* pModelInfo);
+    void RestoreDFF(CModelInfo* pModelInfo);
+    void RestoreTXD(CModelInfo* pModelInfo);
 
 protected:
     CClientManager* m_pManager;

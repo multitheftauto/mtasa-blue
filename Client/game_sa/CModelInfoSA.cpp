@@ -816,10 +816,18 @@ void CModelInfoSA::ResetTextureDictionaryID()
 
 void CModelInfoSA::StaticResetTextureDictionaries()
 {
-    while (!ms_DefaultTxdIDMap.empty()) {
+    while (!ms_DefaultTxdIDMap.empty())
+    {
         const auto mi = pGame->GetModelInfo(ms_DefaultTxdIDMap.begin()->first);
-        assert(mi);
-        mi->ResetTextureDictionaryID();
+        if (mi)
+        {
+            mi->ResetTextureDictionaryID();
+        }
+        else
+        {
+            // Model was deallocated. Skip and remove it from our list.
+            ms_DefaultTxdIDMap.erase(ms_DefaultTxdIDMap.begin());
+        }
     }
 }
 
@@ -2160,5 +2168,34 @@ bool CModelInfoSA::ForceUnload()
     if (usTxdId)
         pGame->GetRenderWare()->TxdForceUnload(usTxdId, true);
 
+    return true;
+}
+
+bool CModelInfoSA::Render(CMatrix& matrix)
+{
+    CBaseModelInfoSAInterface* pModelInfoSAInterface = GetInterface();
+    RwObject* pRwObject = pModelInfoSAInterface->pRwObject;
+    // RwEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, 100u);
+    RwFrame* pFrame = RpGetFrame(pRwObject);
+    RwFrameSetIdentity(pFrame);
+    RwMatrix rwMatrix;
+    rwMatrix.right = (RwV3d&)matrix.vRight;
+    rwMatrix.up = (RwV3d&)matrix.vFront;
+    rwMatrix.at = (RwV3d&)matrix.vUp;
+    rwMatrix.pos = (RwV3d&)matrix.vPos;
+    RwFrameTransform(pFrame, &rwMatrix, rwCOMBINEREPLACE);
+    RwFrameUpdateObjects(pFrame);
+    //RwFrameRotate(pFrame, &yaxis, rotation.fX, RwOpCombineType::rwCOMBINEREPLACE);
+
+    if (pRwObject->type == RP_TYPE_ATOMIC)
+    {
+        RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
+        pRpAtomic->renderCallback(pRpAtomic);
+    }
+    else
+    {
+        RpClump* pRpClump = reinterpret_cast<RpClump*>(pRwObject);
+        RpClumpRender(pRpClump);
+    }
     return true;
 }

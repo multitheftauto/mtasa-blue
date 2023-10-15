@@ -19,6 +19,22 @@
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
 
+bool DxDrawModel3D(uint16_t usModel, CVector position, CVector rotation, std::optional<CVector> scale)
+{
+    CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModel);
+    if (pModelInfo->GetModelType() == eModelInfoType::VEHICLE || pModelInfo->GetModelType() == eModelInfoType::PED)
+    {
+        throw std::invalid_argument("Vehicle and Ped models are not allowed");
+    }
+    SModelToRender modelToRender;
+    modelToRender.usModel = usModel;
+    ConvertDegreesToRadians(rotation);
+    CMatrix matrix(position, rotation, scale.value_or(CVector(1.0f, 1.0f, 1.0f)));
+    modelToRender.matrix = matrix;
+    g_pClientGame->EnqueueModelToRender(modelToRender);
+    return true;
+}
+
 void CLuaDrawingDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -64,6 +80,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxSetAspectRatioAdjustmentEnabled", DxSetAspectRatioAdjustmentEnabled},
         {"dxIsAspectRatioAdjustmentEnabled", DxIsAspectRatioAdjustmentEnabled},
         {"dxSetTextureEdge", DxSetTextureEdge},
+        {"dxDrawModel3D", ArgumentParser<DxDrawModel3D>},
     };
 
     // Add functions

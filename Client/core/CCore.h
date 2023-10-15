@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 class CCore;
+class CDiscordRichPresence;
+class CDiscordInterface;
 
 #pragma once
 
@@ -82,25 +84,26 @@ public:
     ~CCore();
 
     // Subsystems (query)
-    eCoreVersion            GetVersion();
-    CConsoleInterface*      GetConsole();
-    CCommandsInterface*     GetCommands();
-    CConnectManager*        GetConnectManager() { return m_pConnectManager; };
-    CGame*                  GetGame();
-    CGUI*                   GetGUI();
-    CGraphicsInterface*     GetGraphics();
-    CModManagerInterface*   GetModManager();
-    CMultiplayer*           GetMultiplayer();
-    CNet*                   GetNetwork();
-    CXML*                   GetXML() { return m_pXML; };
-    CXMLNode*               GetConfig();
-    CClientVariables*       GetCVars() { return &m_ClientVariables; };
-    CKeyBindsInterface*     GetKeyBinds();
-    CMouseControl*          GetMouseControl() { return m_pMouseControl; };
-    CLocalGUI*              GetLocalGUI();
-    CLocalizationInterface* GetLocalization() { return g_pLocalization; };
-    CWebCoreInterface*      GetWebCore();
-    CTrayIconInterface*     GetTrayIcon() { return m_pTrayIcon; };
+    eCoreVersion                        GetVersion();
+    CConsoleInterface*                  GetConsole();
+    CCommandsInterface*                 GetCommands();
+    CConnectManager*                    GetConnectManager() { return m_pConnectManager; };
+    CGame*                              GetGame();
+    CGUI*                               GetGUI();
+    CGraphicsInterface*                 GetGraphics();
+    CModManagerInterface*               GetModManager();
+    CMultiplayer*                       GetMultiplayer();
+    CNet*                               GetNetwork();
+    CXML*                               GetXML() { return m_pXML; };
+    CXMLNode*                           GetConfig();
+    CClientVariables*                   GetCVars() { return &m_ClientVariables; };
+    CKeyBindsInterface*                 GetKeyBinds();
+    CMouseControl*                      GetMouseControl() { return m_pMouseControl; };
+    CLocalGUI*                          GetLocalGUI();
+    CLocalizationInterface*             GetLocalization() { return g_pLocalization; };
+    CWebCoreInterface*                  GetWebCore();
+    CTrayIconInterface*                 GetTrayIcon() { return m_pTrayIcon; };
+    std::shared_ptr<CDiscordInterface>  GetDiscord();
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -296,10 +299,11 @@ private:
     CModelCacheManager* m_pModelCacheManager;
 
     // Instances (put new classes here!)
-    CXMLFile*          m_pConfigFile;
-    CClientVariables   m_ClientVariables;
-    CWebCoreInterface* m_pWebCore = nullptr;
-    CTrayIcon*         m_pTrayIcon;
+    CXMLFile*                               m_pConfigFile;
+    CClientVariables                        m_ClientVariables;
+    CWebCoreInterface*                      m_pWebCore = nullptr;
+    CTrayIcon*                              m_pTrayIcon;
+    std::shared_ptr<CDiscordRichPresence>   m_pDiscordRichPresence;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;

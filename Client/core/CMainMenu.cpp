@@ -13,6 +13,7 @@
 #include <game/CGame.h>
 #include "CNewsBrowser.h"
 #include "CLanguageSelector.h"
+#include "CDiscordRichPresence.h"
 
 #define NATIVE_RES_X    1280.0f
 #define NATIVE_RES_Y    1024.0f
@@ -292,6 +293,17 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     // We're not ingame
     SetIsIngame(false);
+
+    // Discord
+    if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
+    {
+        auto discord = g_pCore->GetDiscord();
+        if (!discord->IsDiscordRPCEnabled())
+            discord->SetDiscordRPCEnabled(true);
+
+        discord->SetPresenceState("Main menu", false);
+        discord->SetPresenceStartTimestamp(0);
+    }
 
     // Store the pointer to the graphics subsystem
     m_pGraphics = CGraphics::GetSingletonPtr();
@@ -726,6 +738,7 @@ void CMainMenu::OnEscapePressedOffLine()
 void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
 {
     CMultiplayer* pMultiplayer = CCore::GetSingleton().GetMultiplayer();
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
     pMultiplayer->DisablePadHandler(bVisible);
 
     if ((m_ucFade == FADE_VISIBLE || m_ucFade == FADE_IN) && bVisible == false)
@@ -747,6 +760,11 @@ void CMainMenu::SetVisible(bool bVisible, bool bOverlay, bool bFrameDelay)
         m_Credits.SetVisible(false);
         m_pNewsBrowser->SetVisible(false);
 
+        if (GetIsIngame() && pQuestionBox->IsVisible())
+        {
+            pQuestionBox->Reset();
+            pQuestionBox->Hide();
+        }
         //        m_bIsInSubWindow = false;
     }
     else

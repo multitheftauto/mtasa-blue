@@ -536,7 +536,7 @@ bool CPixelsManager::D3DXGetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixel
         Desc.Height = pRect->bottom - pRect->top;
     }
 
-    if (FAILED(m_pDevice->CreateTexture(Desc.Width, Desc.Height, !bMipMaps, NULL, dxFormat, D3DPOOL_SYSTEMMEM, &pD3DTempTexture, NULL)))
+    if (FAILED(D3DXCreateTexture(m_pDevice, Desc.Width, Desc.Height, !bMipMaps, NULL, dxFormat, D3DPOOL_SYSTEMMEM, &pD3DTempTexture)))
         return false;
 
     if (FAILED(pD3DTempTexture->GetSurfaceLevel(0, &pD3DTempSurface)))

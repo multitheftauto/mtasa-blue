@@ -714,8 +714,11 @@ CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string st
         // Create the img handle
         CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
 
+        // Fix path encoding for sdt::filesystem
+        std::wstring utf8Path = SharedUtil::MbUTF8ToUTF16(strFullPath);
+
         // Attempt loading the file
-        if (pImg->Load(std::move(strFullPath)))
+        if (pImg->Load(std::move(utf8Path)))
         {
             // Success. Make it a child of the resource img root
             pImg->SetParent(pRoot);
@@ -915,6 +918,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
                     std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
+                    m_pManager->GetModelManager()->Add(pModel);
 
                     ushort usParentID = -1;
 
