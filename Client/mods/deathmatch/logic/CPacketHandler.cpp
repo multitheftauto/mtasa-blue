@@ -466,7 +466,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
     g_pCore->UpdateRecentlyPlayed();
 
-    if (bitStream.Can(eBitStreamVersion::CPlayerJoinCompletePacket_ServerName))
+    if (g_pNet->CanServerBitStream((eBitStreamVersion::CPlayerJoinCompletePacket_ServerName)))
     {
         auto discord = g_pCore->GetDiscord();
         if (discord && discord->IsDiscordRPCEnabled())
