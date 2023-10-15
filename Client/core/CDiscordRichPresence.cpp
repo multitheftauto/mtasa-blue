@@ -64,7 +64,7 @@ void CDiscordRichPresence::SetDefaultData()
     m_strDiscordAppAssetSmallText = DEFAULT_APP_ASSET_SMALL_TEXT;
 
     m_strDiscordAppCurrentId = DEFAULT_APP_ID;
-    m_strDiscordAppDetails.clear();
+    m_strDiscordAppCustomDetails.clear();
     m_strDiscordAppCustomState.clear();
 
     m_aButtons = {};
