@@ -102,7 +102,7 @@ public:
 #define MAX_MAPNAME_LENGTH 255
 
 // Max args length when connecting via mtasa:// protocol
-#define MAX_PROTOCOL_CONNECT_ARGS_LENGTH 512
+#define MAX_PROTOCOL_CONNECT_ARGS_LENGTH 1024
 
 // Timeouts
 #define NET_CONNECT_TIMEOUT 30000

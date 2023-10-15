@@ -72,7 +72,7 @@
 #define MAX_BAN_RESPONSIBLE_LENGTH 30
 
 // Max args length when connecting via mtasa:// protocol
-#define MAX_PROTOCOL_CONNECT_ARGS_LENGTH 512
+#define MAX_PROTOCOL_CONNECT_ARGS_LENGTH 1024
 
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255
