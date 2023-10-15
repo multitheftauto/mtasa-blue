@@ -1666,6 +1666,9 @@ void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost,
         if (optionalParts[CURLUPART_USER] != CURLUE_NO_USER)
             strNick = user;
 
+        if (strNick.empty())
+            CVARS_GET("nick", strNick);
+
         if (optionalParts[CURLUPART_PASSWORD] != CURLUE_NO_PASSWORD)
             strPassword = password;
 
