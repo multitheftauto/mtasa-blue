@@ -2065,7 +2065,7 @@ namespace SharedUtil
         return false;
     }
 
-    std::vector<std::string> SharedUtil::Explode(std::string const& s, char delim)
+    std::vector<std::string> Explode(std::string const& s, char delim)
     {
         std::vector<std::string> result;
         std::istringstream       iss(s);
