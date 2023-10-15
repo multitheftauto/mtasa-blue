@@ -34,7 +34,6 @@
 #include <game/Task.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
-#include <any>
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -667,7 +666,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
 
             // Send the packet as joindata
             if (g_pNet->CanServerBitStream(eBitStreamVersion::CPlayerJoinDataPacket_ProtocolConnectArgs))
-                pBitStream->Write(std::any_cast<std::string>(g_pCore->GetProtocolConnectArgs()).c_str(), MAX_PROTOCOL_CONNECT_ARGS_LENGTH);
+                pBitStream->Write(g_pCore->GetProtocolConnectArgs().c_str(), MAX_PROTOCOL_CONNECT_ARGS_LENGTH);
 
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
