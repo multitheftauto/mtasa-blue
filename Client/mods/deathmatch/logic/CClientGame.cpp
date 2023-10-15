@@ -48,7 +48,7 @@ using std::list;
 using std::vector;
 
 // Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
-#pragma warning(disable:4312)
+#pragma warning(disable : 4312)
 
 // Used within this file by the packet handler to grab the this pointer of CClientGame
 extern CClientGame* g_pClientGame;
@@ -331,17 +331,17 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     m_bBeingDeleted = false;
 
-    #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
     m_bShowSyncingInfo = false;
-    #endif
+#endif
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     m_pShowPlayer = m_pShowPlayerTasks = NULL;
     m_bMimicLag = false;
     m_ulLastMimicLag = 0;
     m_bDoPaintballs = false;
     m_bShowInterpolation = false;
-    #endif
+#endif
 
     // Add our lua events
     AddBuiltInEvents();
@@ -395,8 +395,8 @@ CClientGame::~CClientGame()
     // Reset CGUI's global events
     g_pCore->GetGUI()->ClearInputHandlers(INPUT_MOD);
 
-    // Destroy mimics
-    #ifdef MTA_DEBUG
+// Destroy mimics
+#ifdef MTA_DEBUG
     list<CClientPlayer*>::const_iterator iterMimics = m_Mimics.begin();
     for (; iterMimics != m_Mimics.end(); iterMimics++)
     {
@@ -407,7 +407,7 @@ CClientGame::~CClientGame()
 
         delete pPlayer;
     }
-    #endif
+#endif
 
     // Hide the transfer box incase it is showing
     m_pTransferBox->Hide();
@@ -801,7 +801,7 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 void CClientGame::DoPulsePostFrame()
 {
     TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
-    #ifdef DEBUG_KEYSTATES
+#ifdef DEBUG_KEYSTATES
     // Get the controller state
     CControllerState cs;
     g_pGame->GetPad()->GetCurrentControllerState(&cs);
@@ -839,7 +839,7 @@ void CClientGame::DoPulsePostFrame()
         cs.m_bVehicleMouseLook, cs.LeftStickX, cs.LeftStickY, cs.RightStickX, cs.RightStickY);
 
     g_pCore->GetGraphics()->DrawTextTTF(300, 320, 1280, 800, 0xFFFFFFFF, strBuffer, 1.0f, 0);
-    #endif
+#endif
 
     UpdateModuleTickCount64();
 
@@ -897,7 +897,8 @@ void CClientGame::DoPulsePostFrame()
         }
 
         // Adjust the streaming memory size cvar [if needed]
-        if (!g_pCore->IsUsingCustomStreamingMemorySize()) {
+        if (!g_pCore->IsUsingCustomStreamingMemorySize())
+        {
             unsigned int uiStreamingMemoryPrev;
             g_pCore->GetCVars()->Get("streaming_memory", uiStreamingMemoryPrev);
             uint uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemoryPrev, g_pCore->GetMaxStreamingMemory());
@@ -906,12 +907,13 @@ void CClientGame::DoPulsePostFrame()
         }
 
         const auto streamingMemorySizeBytes = g_pCore->GetStreamingMemory();
-        if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != streamingMemorySizeBytes) {
+        if (g_pMultiplayer->GetLimits()->GetStreamingMemory() != streamingMemorySizeBytes)
+        {
             g_pMultiplayer->GetLimits()->SetStreamingMemory(streamingMemorySizeBytes);
         }
 
-        // If we're in debug mode and are supposed to show task data, do it
-        #ifdef MTA_DEBUG
+// If we're in debug mode and are supposed to show task data, do it
+#ifdef MTA_DEBUG
         if (m_pShowPlayerTasks)
         {
             DrawTasks(m_pShowPlayerTasks);
@@ -929,9 +931,9 @@ void CClientGame::DoPulsePostFrame()
             if (pPlayer->IsStreamedIn() && pPlayer->IsShowingWepdata())
                 DrawWeaponsyncData(pPlayer);
         }
-        #endif
+#endif
 
-        #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
         if (m_bShowSyncingInfo)
         {
             // Draw the header boxz
@@ -951,7 +953,7 @@ void CClientGame::DoPulsePostFrame()
                 m_pDisplayManager->DrawText2D(strBuffer, vecPosition, 1.0f, 0xFFFFFFFF);
             }
         }
-        #endif
+#endif
         // Heli Clear time
         if (m_LastClearTime.Get() > HeliKill_List_Clear_Rate)
         {
@@ -971,26 +973,79 @@ void CClientGame::DoPulsePostFrame()
 
                 if (pLocalPlayer)
                 {
-                    auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
-
                     CVector position;
                     SString zoneName;
 
                     pLocalPlayer->GetPosition(position);
                     CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
 
-                    if (pVehicle)
-                    {
-                        eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->GetModel());
-                        discord->SetPresenceState(SString("%s %s", g_vehicleTypePrefixes.at(vehicleType).c_str(), zoneName.c_str()), false);
-                    }
-                    else
-                        discord->SetPresenceState(SString("Walking around %s", zoneName.c_str()), false);
+                    auto taskManager = pLocalPlayer->GetTaskManager();
+                    auto task = taskManager->GetActiveTask();
+                    auto taskSub = task->GetSubTask();
+                    auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
+                    bool useZoneName = true;
 
-                    m_timeLastDiscordStateUpdate = time(nullptr);
+                    eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
+                    std::string        discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : "Walking around";
+
+                    if (task && task->IsValid())
+                    {
+                        auto taskType = task->GetTaskType();
+
+                        // Check for states which match our primary task
+                        std::vector<STaskState> taskStates{};
+                        for (auto it = g_playerTaskStates.begin(); it != g_playerTaskStates.end(); it++)
+                        {
+                            if (it->first == taskType)
+                                taskStates.push_back(it->second);
+                        }
+
+                        // Check for non-matching sub/secondary tasks and remove them
+                        std::vector<STaskState>::iterator it = taskStates.begin();
+                        while (it != taskStates.end())
+                        {
+                            STaskState taskState = (*it);
+                            auto       taskSecondary = (taskState.eSecondaryType == -1) ? nullptr : taskManager->GetTaskSecondary(taskState.eSecondaryType);
+                            bool       useState = (taskState.eSubTask == -1 && taskState.eSecondaryTask == -1);
+
+                            if (!useState)
+                            {
+                                if (taskSub != nullptr && taskState.eSubTask == taskSub->GetTaskType())
+                                    useState = true;
+                                else if (taskSecondary != nullptr && taskState.eSecondaryTask == taskSecondary->GetTaskType())
+                                    useState = true;
+                            }
+
+                            if (!useState)
+                                taskStates.erase(it);
+                            else
+                                ++it;
+                        }
+
+                        // Choose a random task state (if we have any)
+                        int stateCount = taskStates.size();
+                        if (stateCount > 0)
+                        {
+                            std::srand(time(nullptr));
+                            int  index = (std::rand() % stateCount);
+                            auto taskState = taskStates[index];
+
+                            discordState = taskState.strState;
+                            useZoneName = taskState.bUseZone;
+                        }
+
+                        zoneName = (zoneName == "Unknown") ? "Area 51" : zoneName;
+                        discordState = useZoneName ? SString(std::string(discordState + " %s").c_str(), zoneName.c_str()) : discordState;
+
+                        discord->SetPresenceState(discordState.c_str(), false);
+                    }
                 }
                 else
+                {
                     discord->SetPresenceState("In-game", false);
+                }
+
+                m_timeLastDiscordStateUpdate = time(nullptr);
             }
         }
 
@@ -1115,9 +1170,9 @@ void CClientGame::DoPulses()
 
     GetModelCacheManager()->DoPulse();
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     UpdateMimics();
-    #endif
+#endif
 
     // Grab the current time
     unsigned long ulCurrentTime = CClientTime::GetTime();
@@ -3406,21 +3461,23 @@ void CClientGame::Event_OnIngameAndConnected()
 void CClientGame::SetupGlobalLuaEvents()
 {
     // Setup onClientPaste event
-    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste, [this](const SString& clipboardText) {
-        // Don't trigger if main menu or console is open or the cursor is not visible
-        if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
-            return;
+    m_Delegate.connect(g_pCore->GetKeyBinds()->OnPaste,
+                       [this](const SString& clipboardText)
+                       {
+                           // Don't trigger if main menu or console is open or the cursor is not visible
+                           if (!AreCursorEventsEnabled() || g_pCore->IsMenuVisible() || g_pCore->GetConsole()->IsInputActive())
+                               return;
 
-        // Also don't trigger if remote web browser view is focused
-        CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
-        if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
-            return;
+                           // Also don't trigger if remote web browser view is focused
+                           CWebViewInterface* pFocusedBrowser = g_pCore->IsWebCoreLoaded() ? g_pCore->GetWebCore()->GetFocusedWebView() : nullptr;
+                           if (pFocusedBrowser && !pFocusedBrowser->IsLocal())
+                               return;
 
-        // Call event now
-        CLuaArguments args;
-        args.PushString(clipboardText);
-        m_pRootEntity->CallEvent("onClientPaste", args, false);
-    });
+                           // Call event now
+                           CLuaArguments args;
+                           args.PushString(clipboardText);
+                           m_pRootEntity->CallEvent("onClientPaste", args, false);
+                       });
 }
 
 bool CClientGame::StaticBreakTowLinkHandler(CVehicle* pTowingVehicle)
@@ -3999,13 +4056,13 @@ bool CClientGame::ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CE
 
                 if (pEntity && pColEntity)
                 {
-                    #if MTA_DEBUG
+#if MTA_DEBUG
                     CClientEntity* ppThisEntity2 = iter1->second;
                     CClientEntity* ppOtherEntity2 = iter2->second;
                     // These should match, but its not essential.
                     assert(ppThisEntity2 == pEntity);
                     assert(ppOtherEntity2 == pColEntity);
-                    #endif
+#endif
                     if (!pEntity->IsCollidableWith(pColEntity))
                         return false;
                 }
@@ -5597,7 +5654,6 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
                 std::string              state = states[rand() % states.size()];
                 discord->SetPresenceState(state.c_str(), false);
             }
-            
         }
     }
 }
@@ -6682,7 +6738,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
         // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
         if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
-        m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+            m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
 void CClientGame::RestreamWorld(bool removeBigBuildings)
