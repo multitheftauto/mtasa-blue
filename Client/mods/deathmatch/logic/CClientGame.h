@@ -849,7 +849,7 @@ private:
     // Key is the task and value is the CClientPed*
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
 
-    const time_t m_timeDiscordUpdateRate = 20;
+    const time_t m_timeDiscordUpdateRate = 15;
     time_t m_timeLastDiscordStateUpdate;
 };
 
