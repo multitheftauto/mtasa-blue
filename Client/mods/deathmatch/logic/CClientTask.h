@@ -33,7 +33,7 @@ struct STaskState
     std::optional<eSecondaryTaskType> eSecondaryType = {};
 };
 
-static const std::multimap<eTaskType, STaskState> g_playerTaskStates{
+static const std::unordered_multimap<eTaskType, STaskState> g_playerTaskStates{
     {TASK_COMPLEX_JUMP, {true, "Climbing around in", TASK_SIMPLE_CLIMB}},
     {TASK_SIMPLE_GANG_DRIVEBY, {true, "Doing a drive-by in"}},
     {TASK_SIMPLE_DRIVEBY_SHOOT, {true, "Doing a drive-by in"}},
