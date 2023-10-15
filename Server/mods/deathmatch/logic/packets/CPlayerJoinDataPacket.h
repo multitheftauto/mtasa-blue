@@ -44,6 +44,12 @@ public:
 
     bool IsOptionalUpdateInfoRequired() { return m_bOptionalUpdateInfoRequired; }
 
+    const char* GetProtocolConnectArgs() { return m_strProtocolConnectArgs; };
+    void        SetProtocolConnectArgs(const char* szProtocolConnectArgs)
+    {
+        m_strProtocolConnectArgs.AssignLeft(szProtocolConnectArgs, MAX_PROTOCOL_CONNECT_ARGS_LENGTH);
+    };
+
 private:
     unsigned short m_usNetVersion;
     unsigned short m_usMTAVersion;
@@ -54,4 +60,5 @@ private:
     MD5            m_Password;
     SString        m_strSerialUser;
     CMtaVersion    m_strPlayerVersion;
+    SString        m_strProtocolConnectArgs;
 };

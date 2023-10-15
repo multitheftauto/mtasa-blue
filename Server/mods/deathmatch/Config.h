@@ -71,6 +71,9 @@
 #define MAX_BAN_REASON_LENGTH      128
 #define MAX_BAN_RESPONSIBLE_LENGTH 30
 
+// Max args length when connecting via mtasa:// protocol
+#define MAX_PROTOCOL_CONNECT_ARGS_LENGTH 512
+
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255
     #error MAX_CHAT_LENGTH "macro can't exceed 255"

@@ -15,7 +15,7 @@
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include <filesystem>
-#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
+#include "Userenv.h"            // This will enable SharedUtil::ExpandEnvString
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
@@ -26,6 +26,7 @@
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordRichPresence.h"
+#include <curl/include/curl/curl.h>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -54,7 +55,7 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
     if (!StrCmpIA("enbseries\\enbhelper.dll", fileName))
     {
         std::error_code ec;
-        
+
         // Try to load enbhelper.dll from our custom launch directory first.
         const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
 
@@ -1266,7 +1267,11 @@ void CCore::DoPostFramePulse()
                 // Does it begin with mtasa://?
                 if (m_szCommandLineArgs && strnicmp(m_szCommandLineArgs, "mtasa://", 8) == 0)
                 {
-                    SString strArguments = GetConnectCommandFromURI(m_szCommandLineArgs);
+                    std::string strQueryParams;
+
+                    SString strArguments = GetConnectCommandFromURI(m_szCommandLineArgs, strQueryParams);
+                    g_pCore->SetProtocolConnectArgs(strQueryParams);
+
                     // Run the connect command
                     if (strArguments.length() > 0 && !m_pCommands->Execute(strArguments))
                     {
@@ -1600,11 +1605,12 @@ const char* CCore::GetCommandLineOption(const char* szOption)
         return NULL;
 }
 
-SString CCore::GetConnectCommandFromURI(const char* szURI)
+SString CCore::GetConnectCommandFromURI(const char* szURI, std::string& strQueryParams)
 {
     unsigned short usPort;
     std::string    strHost, strNick, strPassword;
-    GetConnectParametersFromURI(szURI, strHost, usPort, strNick, strPassword);
+
+    GetConnectParametersFromURI(szURI, strHost, usPort, strNick, strPassword, strQueryParams);
 
     // Generate a string with the arguments to send to the mod IF we got a host
     SString strDest;
@@ -1619,136 +1625,55 @@ SString CCore::GetConnectCommandFromURI(const char* szURI)
     return strDest;
 }
 
-void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword)
+void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword,
+                                        std::string& strQueryParams)
 {
-    // Grab the length of the string
-    size_t sizeURI = strlen(szURI);
+    auto* curlURL = curl_url();
 
-    // Parse it right to left
-    char szLeft[256];
-    szLeft[255] = 0;
-    char* szLeftIter = szLeft + 255;
+    curl_url_set(curlURL, CURLUPART_URL, szURI, CURLU_NON_SUPPORT_SCHEME);
+    char *scheme{}, *user{}, *password{}, *host{}, *port{}, *path{};
+    auto  flags = CURLU_NO_DEFAULT_PORT | CURLU_URLDECODE;
 
-    char szRight[256];
-    szRight[255] = 0;
-    char* szRightIter = szRight + 255;
+    std::map<CURLUPart, CURLUcode> requiredParts;
+    std::map<CURLUPart, CURLUcode> optionalParts;
 
-    const char* szIterator = szURI + sizeURI;
-    bool        bHitAt = false;
+    // Store error of required URI parts
+    requiredParts.insert({CURLUPART_SCHEME, curl_url_get(curlURL, CURLUPART_SCHEME, &scheme, flags)});
+    requiredParts.insert({CURLUPART_HOST, curl_url_get(curlURL, CURLUPART_HOST, &host, flags)});
+    requiredParts.insert({CURLUPART_PORT, curl_url_get(curlURL, CURLUPART_PORT, &port, flags)});
 
-    for (; szIterator >= szURI + 8; szIterator--)
+    // Store error of optional URI parts
+    optionalParts.insert({CURLUPART_USER, curl_url_get(curlURL, CURLUPART_USER, &user, flags)});
+    optionalParts.insert({CURLUPART_PASSWORD, curl_url_get(curlURL, CURLUPART_PASSWORD, &password, flags)});
+    optionalParts.insert({CURLUPART_PATH, curl_url_get(curlURL, CURLUPART_PATH, &path, flags)});
+
+    bool hasRequiredError = false;
+
+    for (auto& error : requiredParts)
     {
-        if (!bHitAt && *szIterator == '@')
+        if (error.second != CURLUE_OK)
         {
-            bHitAt = true;
-        }
-        else
-        {
-            if (bHitAt)
-            {
-                if (szLeftIter > szLeft)
-                {
-                    *(--szLeftIter) = *szIterator;
-                }
-            }
-            else
-            {
-                if (szRightIter > szRight)
-                {
-                    *(--szRightIter) = *szIterator;
-                }
-            }
+            // Show error & write to log
+            hasRequiredError = true;
         }
     }
 
-    // Parse the host/port
-    char  szHost[64];
-    char  szPort[12];
-    char* szHostIter = szHost;
-    char* szPortIter = szPort;
-    memset(szHost, 0, sizeof(szHost));
-    memset(szPort, 0, sizeof(szPort));
-
-    bool   bIsInPort = false;
-    size_t sizeRight = strlen(szRightIter);
-    for (size_t i = 0; i < sizeRight; i++)
+    if (!hasRequiredError)
     {
-        if (!bIsInPort && szRightIter[i] == ':')
-        {
-            bIsInPort = true;
-        }
-        else
-        {
-            if (bIsInPort)
-            {
-                if (szPortIter < szPort + 11)
-                {
-                    *(szPortIter++) = szRightIter[i];
-                }
-            }
-            else
-            {
-                if (szHostIter < szHost + 63)
-                {
-                    *(szHostIter++) = szRightIter[i];
-                }
-            }
-        }
+        strHost = host;
+        usPort = std::stoi(port);
+
+        if (optionalParts[CURLUPART_USER] != CURLUE_NO_USER)
+            strNick = user;
+
+        if (optionalParts[CURLUPART_PASSWORD] != CURLUE_NO_PASSWORD)
+            strPassword = password;
+
+        if (optionalParts[CURLUPART_PATH] != CURLUE_BAD_PATH)
+            strQueryParams = std::string(path).erase(0, 1);
     }
 
-    // Parse the nickname / password
-    char  szNickname[64];
-    char  szPassword[64];
-    char* szNicknameIter = szNickname;
-    char* szPasswordIter = szPassword;
-    memset(szNickname, 0, sizeof(szNickname));
-    memset(szPassword, 0, sizeof(szPassword));
-
-    bool   bIsInPassword = false;
-    size_t sizeLeft = strlen(szLeftIter);
-    for (size_t i = 0; i < sizeLeft; i++)
-    {
-        if (!bIsInPassword && szLeftIter[i] == ':')
-        {
-            bIsInPassword = true;
-        }
-        else
-        {
-            if (bIsInPassword)
-            {
-                if (szPasswordIter < szPassword + 63)
-                {
-                    *(szPasswordIter++) = szLeftIter[i];
-                }
-            }
-            else
-            {
-                if (szNicknameIter < szNickname + 63)
-                {
-                    *(szNicknameIter++) = szLeftIter[i];
-                }
-            }
-        }
-    }
-
-    // If we got any port, convert it to an integral type
-    usPort = 22003;
-    if (strlen(szPort) > 0)
-    {
-        usPort = static_cast<unsigned short>(atoi(szPort));
-    }
-
-    // Grab the nickname
-    if (strlen(szNickname) > 0)
-    {
-        strNick = szNickname;
-    }
-    else
-    {
-        CVARS_GET("nick", strNick);
-    }
-    strHost = szHost;
-    strPassword = szPassword;
+    curl_free(curlURL);
 }
 
 void CCore::UpdateRecentlyPlayed()
@@ -1777,7 +1702,7 @@ void CCore::UpdateRecentlyPlayed()
 
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
+#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)            // Windows Vista
     bool bValue;
     CVARS_GET("process_dpi_aware", bValue);
 
@@ -2369,7 +2294,8 @@ SString CCore::GetBlueCopyrightString()
 
 // Set streaming memory size override [See `engineStreamingSetMemorySize`]
 // Use `0` to turn it off, and thus restore the value to the `cvar` setting
-void CCore::SetCustomStreamingMemory(size_t sizeBytes) {
+void CCore::SetCustomStreamingMemory(size_t sizeBytes)
+{
     // NOTE: The override is applied to the game in `CClientGame::DoPulsePostFrame`
     // There's no specific reason we couldn't do it here, but we wont
     m_CustomStreamingMemoryLimitBytes = sizeBytes;
@@ -2383,9 +2309,8 @@ bool CCore::IsUsingCustomStreamingMemorySize()
 // Streaming memory size used [In Bytes]
 size_t CCore::GetStreamingMemory()
 {
-    return IsUsingCustomStreamingMemorySize()
-        ? m_CustomStreamingMemoryLimitBytes
-        : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+    return IsUsingCustomStreamingMemorySize() ? m_CustomStreamingMemoryLimitBytes
+                                              : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024;            // MB to B conversion
 }
 
 // Discord rich presence

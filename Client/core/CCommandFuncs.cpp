@@ -217,7 +217,10 @@ void CCommandFuncs::Connect(const char* szParameters)
     if (!strncmp(szBuffer, "mtasa://", 8))
     {
         // Using a mtasa:// URI to connect
-        SString strArguments = g_pCore->GetConnectCommandFromURI(szBuffer);
+        std::string strQueryParams;
+
+        SString strArguments = g_pCore->GetConnectCommandFromURI(szBuffer, strQueryParams);
+        g_pCore->SetProtocolConnectArgs(strQueryParams);
 
         if (strArguments.length() > 0 && g_pCore->GetCommands()->Execute(strArguments))
         {

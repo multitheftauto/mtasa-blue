@@ -19,18 +19,18 @@ extern CCore* g_pCore;
 template <>
 CServerBrowser* CSingleton<CServerBrowser>::m_pSingleton = NULL;
 
-#define SB_SPAN 0.85f                  // How much % of the screen the server browser should fill
-#define SB_NAVBAR_SIZE_Y 40            // Navbar button size
-#define SB_BUTTON_SIZE_X 26
-#define SB_BUTTON_SIZE_Y 26
-#define SB_SPACER 10            // Spacer between searchbar and navbar
-#define SB_SMALL_SPACER 5
+#define SB_SPAN                      0.85f            // How much % of the screen the server browser should fill
+#define SB_NAVBAR_SIZE_Y             40               // Navbar button size
+#define SB_BUTTON_SIZE_X             26
+#define SB_BUTTON_SIZE_Y             26
+#define SB_SPACER                    10            // Spacer between searchbar and navbar
+#define SB_SMALL_SPACER              5
 #define SB_SEARCHBAR_COMBOBOX_SIZE_X 45            // Mow much the search type combobox occupies of searchbar
 #define SB_SEARCHBAR_COMBOBOX_SIZE_Y 22
-#define SB_PLAYERLIST_SIZE_X 200            // Width of players list [NB. adjusted for low resolutions in CServerBrowser::CreateTab]
-#define SB_BACK_BUTTON_SIZE_Y 40            // Size of the back butt
-#define COMBOBOX_ARROW_SIZE_X 23            // Fixed CEGUI size of the 'combobox' arrow
-#define TAB_SIZE_Y 25                       // Fixed CEGUI size of the Tab in a tab panel
+#define SB_PLAYERLIST_SIZE_X         200            // Width of players list [NB. adjusted for low resolutions in CServerBrowser::CreateTab]
+#define SB_BACK_BUTTON_SIZE_Y        40             // Size of the back butt
+#define COMBOBOX_ARROW_SIZE_X        23             // Fixed CEGUI size of the 'combobox' arrow
+#define TAB_SIZE_Y                   25             // Fixed CEGUI size of the Tab in a tab panel
 
 #define CONNECT_HISTORY_LIMIT 20
 
@@ -1292,7 +1292,9 @@ bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
         return true;
     }
 
-    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
+    std::string strQueryParams;
+    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword, strQueryParams);
+    g_pCore->SetProtocolConnectArgs(strQueryParams);
 
     // Valid nick?
     if (!CCore::GetSingleton().IsValidNick(strNick.c_str()))
@@ -1407,7 +1409,9 @@ bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
         return true;
     }
 
-    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
+    std::string strQueryParams;
+    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword, strQueryParams);
+    g_pCore->SetProtocolConnectArgs(strQueryParams);
 
     CServerInfo::GetSingletonPtr()->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str());
     return true;
@@ -1418,7 +1422,9 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
     unsigned short usPort;
     std::string    strHost, strNick, strPassword;
     std::string    strURI = m_pEditAddress[GetCurrentServerBrowserType()]->GetText();
-    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
+    std::string    strQueryParams;
+    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword, strQueryParams);
+    g_pCore->SetProtocolConnectArgs(strQueryParams);
 
     // If there are more than 0 items selected in the browser
     if (strHost.size() > 0 && usPort)
@@ -1463,7 +1469,9 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
     std::string       strHost, strNick, strPassword;
     ServerBrowserType Type = GetCurrentServerBrowserType();
     std::string       strURI = m_pEditAddress[Type]->GetText();
-    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
+    std::string       strQueryParams;
+    g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword, strQueryParams);
+    g_pCore->SetProtocolConnectArgs(strQueryParams);
 
     // Adjust our other address bars to be consistent
     for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)

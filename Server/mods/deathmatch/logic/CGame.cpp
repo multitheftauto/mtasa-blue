@@ -1732,6 +1732,8 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
         pPlayer->SetBitStreamVersion(Packet.GetBitStreamVersion());
         g_pNetServer->SetClientBitStreamVersion(Packet.GetSourceSocket(), Packet.GetBitStreamVersion());
 
+        pPlayer->SetProtocolConnectArgs(Packet.GetProtocolConnectArgs());
+
         // Get the serial number from the packet source
         NetServerPlayerID p = Packet.GetSourceSocket();
         SString           strSerial;
@@ -4204,12 +4206,27 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     SString strIPAndSerial("IP: %s  Serial: %s  Version: %s", pPlayer->GetSourceIP(), pPlayer->GetSerial().c_str(), pPlayer->GetPlayerVersion().c_str());
     // Call the onPlayerConnect event. If it returns false, disconnect the player
     CLuaArguments Arguments;
+    CLuaArguments ProtocolConnectArgs;
     Arguments.PushString(pPlayer->GetNick());
     Arguments.PushString(pPlayer->GetSourceIP());
     Arguments.PushString(pPlayer->GetSerialUser().c_str());
     Arguments.PushString(pPlayer->GetSerial().c_str());
     Arguments.PushNumber(pPlayer->GetMTAVersion());
     Arguments.PushString(pPlayer->GetPlayerVersion());
+
+    auto vecArgs = SharedUtil::Explode(pPlayer->GetProtocolConnectArgs(), '/');
+
+    if (vecArgs.size() > 1)
+    {
+        for (size_t i = 0; i < vecArgs.size() - 1; i += 2)
+        {
+            ProtocolConnectArgs.PushString(vecArgs[i]);
+            ProtocolConnectArgs.PushString(vecArgs[i + 1]);
+        }
+    }
+
+    Arguments.PushTable(&ProtocolConnectArgs);
+
     if (!g_pGame->GetMapManager()->GetRootElement()->CallEvent("onPlayerConnect", Arguments))
     {
         // event cancelled, disconnect the player

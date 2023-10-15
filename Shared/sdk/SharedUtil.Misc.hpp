@@ -16,6 +16,8 @@
 #include "UTF8Detect.hpp"
 #include "CDuplicateLineFilter.h"
 #include "version.h"
+#include <sstream>
+#include <utility>
 #ifdef WIN32
     #include <ctime>
     #include <windows.h>
@@ -2063,6 +2065,18 @@ namespace SharedUtil
         return false;
     }
 
+    std::vector<std::string> SharedUtil::Explode(std::string const& s, char delim)
+    {
+        std::vector<std::string> result;
+        std::istringstream       iss(s);
+
+        for (std::string token; std::getline(iss, token, delim);)
+        {
+            result.push_back(std::move(token));
+        }
+
+        return result;
+    }
 }            // namespace SharedUtil
 
 //
@@ -2083,3 +2097,4 @@ MTAEXPORT void GetLibMtaVersion(char* pBuffer, uint uiMaxSize)
     uint uiLengthInclTerm = strVersion.length() + 1;
     STRNCPY(pBuffer, *strVersion, std::max(uiLengthInclTerm, uiMaxSize));
 }
+
