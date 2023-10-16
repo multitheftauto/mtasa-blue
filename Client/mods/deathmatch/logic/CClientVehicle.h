@@ -49,6 +49,8 @@ enum eClientVehicleType
     CLIENTVEHICLE_TRAILER
 };
 
+static constexpr int NUM_VEHICLE_TYPES = 11; 
+
 enum eDelayedSyncVehicleData
 {
     DELAYEDSYNC_VEHICLE_KEYSYNC,
@@ -145,11 +147,9 @@ struct SVehicleComponentData
     bool    m_bVisible;
 };
 
-static const std::map<eClientVehicleType, std::string> g_vehicleTypePrefixes{
-    {CLIENTVEHICLE_CAR, "Cruising around"},          {CLIENTVEHICLE_PLANE, "Flying around"},      {CLIENTVEHICLE_BIKE, "Riding around"},
-    {CLIENTVEHICLE_HELI, "Flying around"},           {CLIENTVEHICLE_BOAT, "Riding the waves of"}, {CLIENTVEHICLE_TRAIN, "Riding the train in"},
-    {CLIENTVEHICLE_TRAILER, "Doing weird stuff in"}, {CLIENTVEHICLE_BMX, "Bunny hopping around"}, {CLIENTVEHICLE_MONSTERTRUCK, "Monster truckin' around"},
-    {CLIENTVEHICLE_QUADBIKE, "Quaddin' around"}};
+static const std::array<std::string, NUM_VEHICLE_TYPES> g_vehicleTypePrefixes = {
+    "Flying a UFO around", "Cruising around",     "Flying around",        "Riding around",        "Flying around",           "Riding the waves of",
+    "Riding the train in", "Doing weird stuff in", "Bunny hopping around", "Monster truckin' around", "Quaddin' around"};
 
 class CClientVehicle : public CClientStreamElement
 {

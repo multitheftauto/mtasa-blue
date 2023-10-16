@@ -963,7 +963,7 @@ void CClientGame::DoPulsePostFrame()
         }
 
         // Check if we need to update the Discord Rich Presence state
-        if (time(nullptr) > m_timeLastDiscordStateUpdate + m_timeDiscordUpdateRate)
+        if (GetTickCount64_() > m_timeLastDiscordStateUpdate + m_timeDiscordUpdateRate)
         {
             auto discord = g_pCore->GetDiscord();
 
@@ -994,10 +994,10 @@ void CClientGame::DoPulsePostFrame()
 
                         // Check for states which match our primary task
                         std::vector<STaskState> taskStates{};
-                        for (auto it = g_playerTaskStates.begin(); it != g_playerTaskStates.end(); it++)
+                        for (const auto& [task, state] : g_playerTaskStates)
                         {
-                            if (it->first == taskType)
-                                taskStates.push_back(it->second);
+                            if (task == taskType)
+                                taskStates.push_back(state);
                         }
 
                         // Check for non-matching sub/secondary tasks and remove them
@@ -1029,7 +1029,7 @@ void CClientGame::DoPulsePostFrame()
                         int stateCount = taskStates.size();
                         if (stateCount > 0)
                         {
-                            std::srand(time(nullptr));
+                            std::srand(GetTickCount64_());
                             int  index = (std::rand() % stateCount);
                             auto taskState = taskStates[index];
 
@@ -1048,7 +1048,7 @@ void CClientGame::DoPulsePostFrame()
                     discord->SetPresenceState("In-game", false);
                 }
 
-                m_timeLastDiscordStateUpdate = time(nullptr);
+                m_timeLastDiscordStateUpdate = GetTickCount64_();
             }
         }
 
@@ -5653,8 +5653,10 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             auto discord = g_pCore->GetDiscord();
             if (discord->IsDiscordRPCEnabled())
             {
-                std::vector<std::string> states{"In a ditch", "En-route to hospital", "Meeting their maker", "Regretting their decisions", "Wasted"};
-                std::string              state = states[rand() % states.size()];
+                static const std::vector<std::string> states{"In a ditch", "En-route to hospital", "Meeting their maker", "Regretting their decisions",
+                                                             "Wasted"};
+
+                const std::string& state = states[rand() % states.size()];
                 discord->SetPresenceState(state.c_str(), false);
             }
         }

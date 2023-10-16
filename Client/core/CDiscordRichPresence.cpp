@@ -140,13 +140,13 @@ void CDiscordRichPresence::SetAsset(const char* szAsset, const char* szAssetText
 {
     if (isLarge)
     {
-        m_strDiscordAppAsset = (std::string(szAsset).length() > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET;
-        m_strDiscordAppAssetText = (std::string(szAssetText).length() > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_TEXT;
+        m_strDiscordAppAsset = (std::strlen(szAsset) > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET;
+        m_strDiscordAppAssetText = (std::strlen(szAssetText) > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_TEXT;
     }
     else
     {
-        m_strDiscordAppAssetSmall = (std::string(szAsset).length() > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET_SMALL;
-        m_strDiscordAppAssetSmallText = (std::string(szAssetText).length() > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
+        m_strDiscordAppAssetSmall = (std::strlen(szAsset) > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET_SMALL;
+        m_strDiscordAppAssetSmallText = (std::strlen(szAssetText) > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
     }
     m_bUpdateRichPresence = true;
 }
