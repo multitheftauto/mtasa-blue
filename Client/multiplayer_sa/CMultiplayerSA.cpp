@@ -295,7 +295,6 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 #define HOOKPOS_CWeapon__TakePhotograph 0x73C26E
 
 #define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
-#define HOOKPOS_CRenderer__RenderFadingInEntities_MID   0x55320E
 
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
@@ -543,7 +542,6 @@ void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
 void HOOK_CWeapon__TakePhotograph();
 
 void HOOK_CCollision__CheckCameraCollisionObjects();
-void HOOK_CRenderer__RenderFadingInEntities_MID();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -751,7 +749,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
-    HookInstall(HOOKPOS_CRenderer__RenderFadingInEntities_MID, (DWORD)HOOK_CRenderer__RenderFadingInEntities_MID, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, 10);
@@ -3053,7 +3050,7 @@ void _declspec(naked) HOOK_Render3DStuff()
     {
         pushad
     }
-    //if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
+    if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
 
     _asm
     {
@@ -7025,24 +7022,6 @@ bool CanEntityCollideWithCamera(CEntitySAInterface* pEntity)
     }
 
     return true;
-}
-
-constexpr DWORD _Z17SetAmbientColoursv = 0x735D30;
-
-constexpr DWORD CONTINUE_CRenderer__RenderFadingInEntities_MID = 0x553213;
-void _declspec(naked) HOOK_CRenderer__RenderFadingInEntities_MID()
-{
-    _asm {
-        call _Z17SetAmbientColoursv
-        pushad
-    }
-
-    if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
-
-    _asm {
-        popad
-        jmp CONTINUE_CRenderer__RenderFadingInEntities_MID
-    }
 }
 
 void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
