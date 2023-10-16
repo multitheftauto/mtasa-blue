@@ -71,12 +71,6 @@ struct SMiscGameSettings
     bool bAllowShotgunDamageFix;
 };
 
-struct SModelToRender
-{
-    uint16_t usModel;
-    CMatrix  matrix;
-};
-
 class CClientGame
 {
     friend class CPacketHandler;
@@ -591,7 +585,6 @@ private:
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
-    void        GameEntityRenderHandler(CEntitySAInterface* pGameEntity);
 
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool        ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -644,7 +637,6 @@ public:
 
     void PedStepHandler(CPedSAInterface* pPed, bool bFoot);
     void VehicleWeaponHitHandler(SVehicleWeaponHitEvent& event);
-    void EnqueueModelToRender(SModelToRender modelToRender);
 
 private:
     eStatus       m_Status;
@@ -819,8 +811,6 @@ private:
     bool                      m_bDevelopmentMode;
     bool                      m_bShowCollision;
     bool                      m_bShowSound;
-
-    std::vector<SModelToRender> m_vecModelsToRender;
 
     // Debug class. Empty in release.
 public:

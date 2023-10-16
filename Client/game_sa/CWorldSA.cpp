@@ -84,23 +84,10 @@ bool CWorldSA::ResetSurfaceInfo(short sSurfaceID)
 void HOOK_FallenPeds();
 void HOOK_FallenCars();
 
-DWORD CONTINUE_HookDefaultRender = 0x7491C5;
-
-void _declspec(naked) HookDefaultRender()
-{
-    _asm
-    {
-        push esi
-        mov     esi, [esp+4+4]
-        jmp CONTINUE_HookDefaultRender
-    }
-}
-
 void CWorldSA::InstallHooks()
 {
     HookInstall(0x565CB0, (DWORD)HOOK_FallenPeds, 5);
     HookInstall(0x565E80, (DWORD)HOOK_FallenCars, 5);
-    HookInstall(0x7491C0, (DWORD)HookDefaultRender, 5);
 }
 
 DWORD CONTINUE_CWorld_FallenPeds = 0x00565CBA;

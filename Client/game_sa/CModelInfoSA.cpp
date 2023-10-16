@@ -2100,32 +2100,3 @@ bool CModelInfoSA::ForceUnload()
 
     return true;
 }
-
-bool CModelInfoSA::Render(CMatrix& matrix)
-{
-    CBaseModelInfoSAInterface* pModelInfoSAInterface = GetInterface();
-    RwObject* pRwObject = pModelInfoSAInterface->pRwObject;
-    // RwEngineInstance->dOpenDevice.fpRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, 100u);
-    RwFrame* pFrame = RpGetFrame(pRwObject);
-    RwFrameSetIdentity(pFrame);
-    RwMatrix rwMatrix;
-    rwMatrix.right = (RwV3d&)matrix.vRight;
-    rwMatrix.up = (RwV3d&)matrix.vFront;
-    rwMatrix.at = (RwV3d&)matrix.vUp;
-    rwMatrix.pos = (RwV3d&)matrix.vPos;
-    RwFrameTransform(pFrame, &rwMatrix, rwCOMBINEREPLACE);
-    RwFrameUpdateObjects(pFrame);
-    //RwFrameRotate(pFrame, &yaxis, rotation.fX, RwOpCombineType::rwCOMBINEREPLACE);
-
-    if (pRwObject->type == RP_TYPE_ATOMIC)
-    {
-        RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
-        pRpAtomic->renderCallback(pRpAtomic);
-    }
-    else
-    {
-        RpClump* pRpClump = reinterpret_cast<RpClump*>(pRwObject);
-        RpClumpRender(pRpClump);
-    }
-    return true;
-}
