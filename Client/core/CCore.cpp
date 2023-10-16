@@ -674,7 +674,7 @@ void CCore::SetConnected(bool bConnected)
         discord->SetPresenceDetails("");
 
         if (bConnected)
-            discord->SetPresenceStartTimestamp(GetTickCount64_());
+            discord->SetPresenceStartTimestamp(time(nullptr));
     }
 }
 
