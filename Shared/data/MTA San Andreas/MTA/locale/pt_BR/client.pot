@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-11 01:12+0000\n"
-"PO-Revision-Date: 2023-10-15 21:51\n"
+"PO-Revision-Date: 2023-10-17 04:10\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -1727,7 +1727,7 @@ msgstr "Sempre mostrar a janela de download"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "Permitir conexão com Discord Status de Atividade"
+msgstr "Permitir conexão com o Status de Atividade do Discord"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
