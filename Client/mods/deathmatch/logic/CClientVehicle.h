@@ -148,8 +148,8 @@ struct SVehicleComponentData
 };
 
 static const std::array<std::string, NUM_VEHICLE_TYPES> g_vehicleTypePrefixes = {
-    "Flying a UFO around", "Cruising around",     "Flying around",        "Riding around",        "Flying around",           "Riding the waves of",
-    "Riding the train in", "Doing weird stuff in", "Bunny hopping around", "Monster truckin' around", "Quaddin' around"};
+    "Flying a UFO around", "Cruising around",         "Riding the waves of", "Riding the train in",  "Flying around",       "Flying around",
+    "Riding around",       "Monster truckin' around", "Quaddin' around",     "Bunny hopping around", "Doing weird stuff in"};
 
 class CClientVehicle : public CClientStreamElement
 {
