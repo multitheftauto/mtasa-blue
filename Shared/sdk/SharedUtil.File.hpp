@@ -1073,7 +1073,7 @@ int SharedUtil::File::Rename(const char* szOldFilename, const char* szNewFilenam
 #endif
 }
 
-std::vector<std::string> SharedUtil::ListDir(const char* szPath)
+std::vector<std::string> SharedUtil::ListDir(const char* szPath) noexcept
 {
     std::vector<std::string> entries;
 #if _HAS_CXX17
@@ -1081,10 +1081,15 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath)
     if (!DirectoryExists(szPath))
         return {};
 
-    for (const auto& entry : fs::directory_iterator(szPath))
+    try
     {
-        entries.push_back(entry.path().filename().string());
+        for (const auto& entry : fs::directory_iterator(szPath))
+        {
+            if (entry.is_regular_file() || entry.is_directory())
+                entries.push_back(entry.path().filename().string());
+        }
     }
+    catch (const fs::filesystem_error& exc) {}
 #else
     #ifdef _WIN32
     std::string search_path = szPath;
