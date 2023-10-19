@@ -5,6 +5,7 @@ require "install_data"
 require "install_resources"
 require "install_cef"
 require "install_unifont"
+require "install_discord"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -153,6 +154,7 @@ workspace "MTASA"
 		group "Vendor"
 		include "vendor/portaudio"
 		include "vendor/cef3"
+		include "vendor/discord-rpc"
 		include "vendor/freetype"
 		include "vendor/jpeg-9e"
 		include "vendor/ksignals"

@@ -25,6 +25,7 @@
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordRichPresence.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -160,11 +161,18 @@ CCore::CCore()
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    // Create discord rich presence
+    m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    // Reset Discord rich presence
+    if (m_pDiscordRichPresence)
+        m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -654,6 +662,20 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
+    {
+        auto discord = g_pCore->GetDiscord();
+        if (!discord->IsDiscordRPCEnabled())
+            discord->SetDiscordRPCEnabled(true);
+
+        discord->SetPresenceState(bConnected ? "In-game" : "Main menu", false);
+        discord->SetPresenceStartTimestamp(0);
+        discord->SetPresenceDetails("");
+
+        if (bConnected)
+            discord->SetPresenceStartTimestamp(time(nullptr));
+    }
 }
 
 bool CCore::IsConnected()
@@ -1314,6 +1336,10 @@ void CCore::DoPostFramePulse()
     GetMemStats()->Draw();
     GetGraphStats()->Draw();
     m_pConnectManager->DoPulse();
+
+    static auto discord = g_pCore->GetDiscord();
+    if (discord && discord->IsDiscordRPCEnabled())
+        discord->UpdatePresence();
 
     TIMING_CHECKPOINT("-CorePostFrame2");
 }
@@ -2360,4 +2386,10 @@ size_t CCore::GetStreamingMemory()
     return IsUsingCustomStreamingMemorySize()
         ? m_CustomStreamingMemoryLimitBytes
         : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+}
+
+// Discord rich presence
+std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
+{
+    return m_pDiscordRichPresence;
 }
