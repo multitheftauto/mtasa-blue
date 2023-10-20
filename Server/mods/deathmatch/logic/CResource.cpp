@@ -594,7 +594,7 @@ bool CResource::GenerateChecksums()
 bool CResource::HasResourceChanged()
 {
     std::string strPath;
-    std::string strDirPath = m_strResourceDirectoryPath;
+    std::string_view strDirPath = m_strResourceDirectoryPath;
 
     if (IsResourceZip())
     {
@@ -636,9 +636,9 @@ bool CResource::HasResourceChanged()
         }
     }
 
-    for (auto& [strGlob, uiFileCount] : m_ResourceFilesCountPerDir)
+    for (const auto& [strGlob, uiFileCount] : m_ResourceFilesCountPerDir)
     {
-        std::vector<std::filesystem::path> files = glob::rglob(strDirPath + strGlob);
+        std::vector<std::filesystem::path> files = glob::rglob(strDirPath.data() + strGlob);
 
         if (files.size() != uiFileCount)
             return true;
@@ -1317,12 +1317,12 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
 std::vector<std::string> CResource::GetFilePaths(const char* szFilename)
 {
     std::vector<std::string>    vecFiles;
-    std::string                 strDirectory = IsResourceZip() ? m_strResourceCachePath : m_strResourceDirectoryPath;
+    std::string&                strDirectory = IsResourceZip() ? m_strResourceCachePath : m_strResourceDirectoryPath;
     std::string                 strFilePath = strDirectory + szFilename;
 
-    for (std::filesystem::path path : glob::rglob(strFilePath))
+    for (const std::filesystem::path& path : glob::rglob(strFilePath))
     {
-        std::string strPath = path.string().substr(strDirectory.length());
+        std::string strPath = std::filesystem::relative(path, strDirectory).string();
         ReplaceSlashes(strPath);
 
         vecFiles.push_back(strPath);
@@ -1594,7 +1594,7 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
                     return false;
                 }
 
-                for (const std::string strFilePath : vecFiles)
+                for (const std::string& strFilePath : vecFiles)
                 {
                     std::string strFullFilename;
 
@@ -1790,7 +1790,7 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
                     return false;
                 }
 
-                for (const std::string strFilePath : vecFiles)
+                for (const std::string& strFilePath : vecFiles)
                 {
                     std::string strFullFilename;
                     bool        bLoadClient = bClient;
