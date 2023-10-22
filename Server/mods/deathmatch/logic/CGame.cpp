@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CGame.cpp
  *  PURPOSE:     Server game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -41,6 +41,12 @@
 #include "CScriptDebugging.h"
 #include "CBandwidthSettings.h"
 #include "CMainConfig.h"
+#include "CVehiclesConfig.h"
+#include "CHandlingConfig.h"
+#include "CVehicleColorConfig.h"
+#include "CPedConfig.h"
+#include "CObjectConfig.h"
+#include "models/CModelManager.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CRegistryManager.h"
 #include "CLatentTransferManager.h"
@@ -195,6 +201,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_pBuildingRemovalManager = NULL;
     m_pCustomWeaponManager = NULL;
     m_pFunctionUseLogger = NULL;
+    m_pModelManager = NULL;
 #ifdef WITH_OBJECT_SYNC
     m_pObjectSync = NULL;
 #endif
@@ -397,6 +404,7 @@ CGame::~CGame()
     SAFE_DELETE(m_pMasterServerAnnouncer);
     SAFE_DELETE(m_pASE);
     SAFE_RELEASE(m_pHqComms);
+    SAFE_DELETE(m_pModelManager)
     CSimControl::Shutdown();
 
     // Clear our global pointer
@@ -601,6 +609,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pCustomWeaponManager = new CCustomWeaponManager();
 
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
+
+    m_pModelManager = new CModelManager();
 
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))
@@ -890,14 +900,34 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Add our builtin events
     AddBuiltInEvents();
 
+    // Load vehicles config
+    CVehiclesConfig vehiclesConfig;
+    const char*     strVehiclesPath = g_pServerInterface->GetModManager()->GetAbsolutePath("vehicles.conf");
+    vehiclesConfig.SetFileName(strVehiclesPath);
+    if (!vehiclesConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'vehicles.conf' failed\n");
+        return false;
+    }
+
+    // Load handling config
+    const char*     strHandlingPath = g_pServerInterface->GetModManager()->GetAbsolutePath("handling.conf");
+    CHandlingConfig handlingConfig(strHandlingPath);
+    if (!handlingConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'hadling.conf' failed\n");
+        return false;
+    }
+
     // Load the vehicle colors before the main config
     strBuffer = g_pServerInterface->GetModManager()->GetAbsolutePath("vehiclecolors.conf");
-    if (!m_pVehicleManager->GetColorManager()->Load(strBuffer))
+    CVehicleColorConfig colorConfig;
+    if (!colorConfig.Load(strBuffer))
     {
         // Try to generate a new one and load it again
-        if (m_pVehicleManager->GetColorManager()->Generate(strBuffer))
+        if (colorConfig.Generate(strBuffer))
         {
-            if (!m_pVehicleManager->GetColorManager()->Load(strBuffer))
+            if (!colorConfig.Load(strBuffer))
             {
                 CLogger::ErrorPrintf("%s", "Loading 'vehiclecolors.conf' failed\n ");
             }
@@ -906,6 +936,24 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         {
             CLogger::ErrorPrintf("%s", "Generating a new 'vehiclecolors.conf' failed\n ");
         }
+    }
+
+    // Load ped config
+    const char* strPedsPath = g_pServerInterface->GetModManager()->GetAbsolutePath("peds.conf");
+    CPedConfig  pedConfig(strPedsPath);
+    if (!pedConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'peds.conf' failed\n");
+        return false;
+    }
+
+    // Load object config
+    const char*   strObjectsPath = g_pServerInterface->GetModManager()->GetAbsolutePath("objects.conf");
+    CObjectConfig objectConfig(strObjectsPath);
+    if (!objectConfig.Load())
+    {
+        CLogger::ErrorPrintf("%s", "Loading 'objects.conf' failed\n");
+        return false;
     }
 
     // Load the registry
@@ -2938,7 +2986,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                             // Is this vehicle enterable? (not a trailer)
                             unsigned short usVehicleModel = pVehicle->GetModel();
-                            if (!CVehicleManager::IsTrailer(usVehicleModel))
+                            if (!g_pGame->GetModelManager()->GetVehicleModel(usVehicleModel)->IsTrailer())
                             {
                                 // He musn't already be doing something
                                 if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_NONE)
@@ -2975,7 +3023,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
 
                                             // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the
                                             // player on the first seat being the vehicle syncer (Todo)
-                                            if (pVehicle->GetVehicleType() == VEHICLE_TRAIN && ucSeat == 0 && pVehicle->GetTowedByVehicle())
+                                            if (pVehicle->GetVehicleType() == eVehicleType::TRAIN && ucSeat == 0 && pVehicle->GetTowedByVehicle())
                                                 ucSeat++;
 
                                             // Going for driver?
@@ -4383,6 +4431,10 @@ void CGame::HandleBackup()
     zipMaker.InsertFile(m_pMainConfig->GetIdFile(), PathJoin("config", "server-id.keys"));
     zipMaker.InsertFile(pModManager->GetAbsolutePath(FILENAME_SETTINGS), PathJoin("config", "settings.xml"));
     zipMaker.InsertFile(pModManager->GetAbsolutePath("vehiclecolors.conf"), PathJoin("config", "vehiclecolors.conf"));
+    zipMaker.InsertFile(pModManager->GetAbsolutePath("handling.conf"), PathJoin("config", "handling.conf"));
+    zipMaker.InsertFile(pModManager->GetAbsolutePath("vehicles.conf"), PathJoin("config", "vehicles.conf"));
+    zipMaker.InsertFile(pModManager->GetAbsolutePath("peds.conf"), PathJoin("config", "peds.conf"));
+    zipMaker.InsertFile(pModManager->GetAbsolutePath("objects.conf"), PathJoin("config", "objects.conf"));
 
     // Backup database files
     zipMaker.InsertDirectoryTree(m_pMainConfig->GetGlobalDatabasesPath(), PathJoin("databases", "global"));

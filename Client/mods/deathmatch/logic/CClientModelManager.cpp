@@ -1,7 +1,6 @@
 /*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto
- *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CClientModelManager.cpp
  *  PURPOSE:     Model manager class
@@ -9,6 +8,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+
 CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(g_pGame->GetBaseIDforCOL()))
 {
     const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
@@ -44,9 +44,8 @@ void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
     m_modelCount++;
 }
 
-bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
+bool CClientModelManager::Remove(const int modelId)
 {
-    int modelId = pModel->GetModelID();
     if (m_Models[modelId] != nullptr)
     {
         m_Models[modelId]->RestoreEntitiesUsingThisModel();
@@ -55,6 +54,18 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
         return true;
     }
     return false;
+}
+
+bool CClientModelManager::RemoveClientModel(const int modelId)
+{
+    if (m_Models[modelId] == nullptr)
+        return false;
+
+    // Model was allocated clientside
+    if (!m_Models[modelId]->GetParentResource())
+        return false;
+
+    return Remove(modelId);
 }
 
 int CClientModelManager::GetFirstFreeModelID(void)
@@ -124,6 +135,47 @@ void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResour
     for (unsigned int i = 0; i < uiMaxModelID; i++)
     {
         if (m_Models[i] != nullptr && m_Models[i]->GetParentResource() == pResource)
-            Remove(m_Models[i]);
+            Remove(i);
     }
+}
+
+bool CClientModelManager::AllocateModelFromParent(uint32_t uiNewModelID, uint32_t uiParentModelID)
+{
+    eModelInfoType eModelType = g_pGame->GetModelInfo(uiParentModelID)->GetModelType();
+
+    std::shared_ptr<CClientModel> pModel = FindModelByID(uiNewModelID);
+    if (pModel)
+        return false;
+
+    eClientModelType clientModelType;
+
+    switch (eModelType)
+    {
+        case eModelInfoType::ATOMIC:
+            clientModelType = eClientModelType::OBJECT;
+            break;
+        case eModelInfoType::TIMED_OBJECT:
+            clientModelType = eClientModelType::TIMED_OBJECT;
+            break;
+        case eModelInfoType::CLUMP:
+            clientModelType = eClientModelType::CLUMP;
+            break;
+        case eModelInfoType::VEHICLE:
+            clientModelType = eClientModelType::VEHICLE;
+            break;
+        case eModelInfoType::PED:
+            clientModelType = eClientModelType::PED;
+            break;
+        default:
+            return false;
+    }
+
+    pModel = std::make_shared<CClientModel>(g_pClientGame->GetManager(), uiNewModelID, clientModelType);
+
+    Add(pModel);
+
+    if (pModel->Allocate(uiParentModelID))
+        return true;
+
+    return false;
 }

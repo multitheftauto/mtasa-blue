@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/packets/CPlayerJoinCompletePacket.cpp
  *  PURPOSE:     Player join completion packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -14,6 +14,7 @@
 #include "CGame.h"
 #include "CMainConfig.h"
 #include <net/SyncStructures.h>
+#include "models/CModelManager.h"
 
 CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
 {
@@ -118,6 +119,20 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
         break;
         default:
             break;
+    }
+
+    std::list<CModelBase*> listSimpleAllocatedModels = g_pGame->GetModelManager()->GetSimpleAllocatedModels();
+
+    if (BitStream.Can(eBitStreamVersion::SimpleModelAllocation))
+    {
+        uint32_t uiModelsCount = listSimpleAllocatedModels.size();
+        BitStream.Write(uiModelsCount);
+
+        for (auto model : listSimpleAllocatedModels)
+        {
+            BitStream.Write(model->GetModelID());
+            BitStream.Write(model->GetParentModel());
+        }
     }
 
     return true;

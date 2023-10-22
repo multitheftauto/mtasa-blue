@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CVehicle.cpp
  *  PURPOSE:     Vehicle entity class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,6 +15,7 @@
 #include "CHandlingManager.h"
 #include "CElementRefManager.h"
 #include "CGame.h"
+#include "models/CModelManager.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "CBandwidthSettings.h"
 #include "Utils.h"
@@ -537,7 +538,7 @@ void CVehicle::SetHealth(float fHealth)
 CVehicleColor& CVehicle::RandomizeColor()
 {
     // Grab a random color for this vehicle and return it
-    m_Color = m_pVehicleManager->GetRandomColor(m_usModel);
+    m_Color = g_pGame->GetModelManager()->GetVehicleModel(m_usModel)->GetRandomColor();
     return m_Color;
 }
 
@@ -820,32 +821,16 @@ void CVehicle::SetPaintjob(unsigned char ucPaintjob)
 
 void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (m_usModel)
+    if (g_pGame->GetModelManager()->GetVehicleModel(m_usModel)->HasDoors())
     {
-        case VT_BAGGAGE:
-        case VT_BANDITO:
-        case VT_BFINJECT:
-        case VT_CADDY:
-        case VT_DOZER:
-        case VT_FORKLIFT:
-        case VT_KART:
-        case VT_MOWER:
-        case VT_QUAD:
-        case VT_RCBANDIT:
-        case VT_RCCAM:
-        case VT_RCGOBLIN:
-        case VT_RCRAIDER:
-        case VT_RCTIGER:
-        case VT_TRACTOR:
-        case VT_VORTEX:
-        case VT_BLOODRA:
-            memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
+        memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+    }
+    else
+    {
+        memset(&ucOutDoorStates[0], DT_DOOR_MISSING, MAX_DOORS);
 
-            // Keep the bonet and boot intact
-            ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
-            break;
-        default:
-            memset(&ucOutDoorStates[0], DT_DOOR_INTACT, MAX_DOORS);
+        // Keep the bonet and boot intact
+        ucOutDoorStates[0] = ucOutDoorStates[1] = DT_DOOR_INTACT;
     }
 }
 
@@ -853,9 +838,9 @@ void CVehicle::GenerateHandlingData()
 {
     // Make a new CHandlingEntry
     if (m_pHandlingEntry == NULL)
-        m_pHandlingEntry = g_pGame->GetHandlingManager()->CreateHandlingData();
+        m_pHandlingEntry = new CHandlingEntry();
     // Apply the model handling info
-    m_pHandlingEntry->ApplyHandlingData(g_pGame->GetHandlingManager()->GetModelHandlingData(static_cast<eVehicleTypes>(m_usModel)));
+    m_pHandlingEntry->ApplyHandlingData(g_pGame->GetModelManager()->GetVehicleModel(m_usModel)->GetVehicleHandling());
 
     m_bHandlingChanged = false;
 }

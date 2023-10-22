@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/packets/CEntityAddPacket.cpp
  *  PURPOSE:     Entity-add packet class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,8 +24,8 @@
 #include "CRadarArea.h"
 #include "CWater.h"
 #include "CVehicleManager.h"
-#include "CHandlingManager.h"
 #include "CGame.h"
+#include "models/CModelManager.h"
 
 //
 // Temporary helper functions for fixing crashes on pre r6459 clients.
@@ -447,12 +447,19 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&position);
                     BitStream.Write(&rotationDegrees);
 
-                    // Vehicle id as a char
-                    // I'm assuming the "-400" is for adjustment so that all car values can
-                    // fit into a char?  Why doesn't someone document this?
-                    //
-                    // --slush
-                    BitStream.Write(static_cast<unsigned char>(pVehicle->GetModel() - 400));
+                    if (BitStream.Can(eBitStreamVersion::SimpleModelAllocation))
+                    {
+                        BitStream.Write(pVehicle->GetModel());
+                    }
+                    else
+                    {
+                        // Vehicle id as a char
+                        // I'm assuming the "-400" is for adjustment so that all car values can
+                        // fit into a char?  Why doesn't someone document this?
+                        //
+                        // --slush
+                        BitStream.Write(static_cast<unsigned char>(pVehicle->GetModel() - 400));
+                    }
 
                     // Health
                     SVehicleHealthSync health;
@@ -604,8 +611,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(false);
 
                     // Write handling
-                    if (g_pGame->GetHandlingManager()->HasModelHandlingChanged(static_cast<eVehicleTypes>(pVehicle->GetModel())) ||
-                        pVehicle->HasHandlingChanged())
+                    if (g_pGame->GetModelManager()->GetVehicleModel(pVehicle->GetModel())->HasVehicleHandlingChanged() || pVehicle->HasHandlingChanged())
                     {
                         BitStream.WriteBit(true);
                         SVehicleHandlingSync handling;
@@ -646,7 +652,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         handling.data.ucAnimGroup = pEntry->GetAnimGroup();
 
                         // Lower and Upper limits cannot match or LSOD (unless boat)
-                        // if ( pVehicle->GetModel() != VEHICLE_BOAT )     // Commented until fully tested
+                        // if ( pVehicle->GetModel() != eVehicleType::BOAT )     // Commented until fully tested
                         {
                             float fSuspensionLimitSize = handling.data.fSuspensionUpperLimit - handling.data.fSuspensionLowerLimit;
                             if (fSuspensionLimitSize > -0.1f && fSuspensionLimitSize < 0.1f)

@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CGame.h
  *  PURPOSE:     Server game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -105,6 +105,8 @@ class CWaterManager;
 class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
+class CModelManager;
+class CModelLoader;
 
 class CCustomWeaponManager;
 class COpenPortsTester;
@@ -252,6 +254,7 @@ public:
     CFunctionUseLogger*              GetFunctionUseLogger() { return m_pFunctionUseLogger; }
     CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
+    CModelManager*                   GetModelManager() { return m_pModelManager; }
 
     std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
 
@@ -558,6 +561,7 @@ private:
     CRPCFunctions*             m_pRPCFunctions;
     CLanBroadcast*             m_pLanBroadcast;
     CWaterManager*             m_pWaterManager;
+    CModelManager*             m_pModelManager;
 
     CWeaponStatManager*      m_pWeaponStatsManager;
     CBuildingRemovalManager* m_pBuildingRemovalManager;

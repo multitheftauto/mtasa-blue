@@ -1,7 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -66,7 +68,7 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
         m_Cache.PlrPosition = position.data.vecPosition;
 
-        if (CVehicleManager::GetVehicleType(m_Cache.iModelID) == VEHICLE_TRAIN)
+        if (CVehicleManager::GetVehicleType(m_Cache.iModelID) == eVehicleType::TRAIN)
         {
             // Train specific data
             float fRailPosition = 0.0f;

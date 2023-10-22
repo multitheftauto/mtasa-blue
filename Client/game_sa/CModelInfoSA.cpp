@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CModelInfoSA.cpp
  *  PURPOSE:     Entity model information handler
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -538,7 +538,7 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
     switch (GetModelType())
     {
         case eModelInfoType::ATOMIC:
-        case eModelInfoType::TIME:
+        case eModelInfoType::TIMED_OBJECT:
         {
             // SetAtomicModelInfoFlags
             m_pInterface->bIsRoad = ideFlags.bIsRoad;
@@ -842,7 +842,7 @@ bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
     if (!m_pInterface)
         return false;
 
-    if (GetModelType() != eModelInfoType::TIME)
+    if (GetModelType() != eModelInfoType::TIMED_OBJECT)
         return false;
 
     CTimeInfoSAInterface* pTime = &static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo;
@@ -861,7 +861,7 @@ bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
     if (!m_pInterface)
         return false;
 
-    if (GetModelType() != eModelInfoType::TIME)
+    if (GetModelType() != eModelInfoType::TIMED_OBJECT)
         return false;
 
     CTimeInfoSAInterface* pTime = &static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo;
@@ -1498,7 +1498,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             break;
         case eModelInfoType::ATOMIC:
         case eModelInfoType::LOD_ATOMIC:
-        case eModelInfoType::TIME:
+        case eModelInfoType::TIMED_OBJECT:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         default:
@@ -1804,7 +1804,7 @@ void CModelInfoSA::DeallocateModel(void)
         case eModelInfoType::CLUMP:
             delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
-        case eModelInfoType::TIME:
+        case eModelInfoType::TIMED_OBJECT:
             delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         default:
@@ -2022,7 +2022,7 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 
 eModelInfoType CModelInfoSA::GetModelType()
 {
-    return ((eModelInfoType(*)())m_pInterface->VFTBL->GetModelType)();
+    return (eModelInfoType)((uint8_t(*)())m_pInterface->VFTBL->GetModelType)();
 }
 
 bool CModelInfoSA::IsTowableBy(CModelInfo* towingModel)

@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CPacketHandler.cpp
  *  PURPOSE:     Packet handling and processing
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -419,6 +419,19 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     if (ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL)
     {
         bitStream.ReadString(strExternalHTTPDownloadURL);
+    }
+
+    if (bitStream.Can(eBitStreamVersion::SimpleModelAllocation))
+    {
+        uint32_t modelsCount = 0;
+        bitStream.Read(modelsCount);
+        for (int i = 0; i < modelsCount; i++)
+        {
+            uint32_t usModelID, usParentID;
+            bitStream.Read(usModelID);
+            bitStream.Read(usParentID);
+            g_pClientGame->GetManager()->GetModelManager()->AllocateModelFromParent(usModelID, usParentID);
+        }
     }
 
     //
@@ -3238,17 +3251,27 @@ retry:
                     bitStream.Read(&rotationDegrees);
 
                     // Read out the vehicle value as a char, then convert
-                    unsigned char ucModel = 0xFF;
-                    bitStream.Read(ucModel);
+                    unsigned short usModel = 0xFFFF;
 
-                    // The server appears to subtract 400 from the vehicle id before
-                    // sending it to us, as to allow the value to fit into an unsigned
-                    // char.
-                    //
-                    // Too bad this was never documented.
-                    //
-                    // --slush
-                    unsigned short usModel = ucModel + 400;
+                    if (bitStream.Can(eBitStreamVersion::SimpleModelAllocation))
+                    {
+                        bitStream.Read(usModel);
+                    }
+                    else
+                    {
+                        // The server appears to subtract 400 from the vehicle id before
+                        // sending it to us, as to allow the value to fit into an unsigned
+                        // char.
+                        //
+                        // Too bad this was never documented.
+                        //
+                        // --slush
+                        unsigned char ucModel = 0xFF;
+
+                        bitStream.Read(ucModel);
+                        unsigned short usModel = ucModel + 400;
+                    }
+
                     if (!CClientVehicleManager::IsValidModel(usModel))
                     {
                         RaiseEntityAddError(39);

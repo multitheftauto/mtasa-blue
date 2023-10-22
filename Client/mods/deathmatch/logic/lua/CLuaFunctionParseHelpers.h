@@ -2,7 +2,9 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Client/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
+ *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -68,7 +70,7 @@ DECLARE_ENUM(eSurfaceBulletEffect);
 DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
-DECLARE_ENUM_CLASS(eClientModelType);
+DECLARE_ENUM_CLASS(eModelInfoType);
 DECLARE_ENUM(eSoundEffectType);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Chorus);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Compressor);
@@ -80,6 +82,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
 DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
+DECLARE_ENUM_CLASS(eClientModelType);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
 
 class CRemoteCall;

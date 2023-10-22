@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientVehicleManager.h
+ *  FILE:        mods/deathmatch/logic/CClientVehicleManager.h
  *  PURPOSE:     Vehicle entity manager class header
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -35,6 +36,7 @@ public:
     static bool               IsTrainModel(unsigned long ulModel);
     static bool               IsValidModel(unsigned long ulModel);
     static bool               IsStandardModel(unsigned long ulModel);
+    static unsigned long      GetRootModelId(unsigned long ulModel);
     static eClientVehicleType GetVehicleType(unsigned long ulModel);
     static unsigned char      GetMaxPassengerCount(unsigned long ulModel);
     static unsigned char      ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex);

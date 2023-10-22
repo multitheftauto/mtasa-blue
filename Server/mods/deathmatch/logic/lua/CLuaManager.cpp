@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/lua/CLuaManager.cpp
  *  PURPOSE:     Lua virtual machine manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -42,6 +42,7 @@
 #include "luadefs/CLuaVoiceDefs.h"
 #include "luadefs/CLuaWorldDefs.h"
 #include "luadefs/CLuaCompatibilityDefs.h"
+#include "luadefs/CLuaModelDefs.h"
 
 extern CGame* g_pGame;
 
@@ -214,6 +215,7 @@ void CLuaManager::LoadCFunctions()
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
     CLuaGenericDefs::LoadFunctions();
+    CLuaModelDefs::LoadFunctions();
     // Backward compatibility functions at the end, so the new function name is used in ACL
     CLuaCompatibilityDefs::LoadFunctions();
 }

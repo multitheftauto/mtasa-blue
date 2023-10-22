@@ -1,9 +1,9 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -139,7 +139,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_ucOccupiedVehicleSeat = pPlayer->GetOccupiedVehicleSeat();
     pSim->m_fWeaponRange = pPlayer->GetWeaponRangeFromSlot();
     pSim->m_bVehicleHasHydraulics = pVehicle ? pVehicle->GetUpgrades()->HasUpgrade(1087) : false;
-    pSim->m_bVehicleIsPlaneOrHeli = pVehicle ? pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI : false;
+    pSim->m_bVehicleIsPlaneOrHeli = pVehicle ? pVehicle->GetVehicleType() == eVehicleType::PLANE || pVehicle->GetVehicleType() == eVehicleType::HELI : false;
     pSim->m_sharedControllerState.Copy(pPlayer->GetPad()->GetCurrentControllerState());
     if (pVehicle)
     {

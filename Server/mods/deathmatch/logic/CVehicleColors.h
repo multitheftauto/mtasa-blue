@@ -1,17 +1,14 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleColorManager.h
- *  PURPOSE:     Vehicle entity color manager class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
-
-#include <list>
+#include "StdInc.h"
 
 class CVehicleColors
 {
@@ -24,18 +21,4 @@ public:
 
 private:
     std::list<CVehicleColor> m_Colors;
-};
-
-class CVehicleColorManager
-{
-public:
-    bool Load(const char* szFilename);
-    bool Generate(const char* szFilename);
-    void Reset();
-
-    void          AddColor(unsigned short usModel, const CVehicleColor& colVehicle);
-    CVehicleColor GetRandomColor(unsigned short usModel);
-
-private:
-    SFixedArray<CVehicleColors, 212> m_Colors;
 };

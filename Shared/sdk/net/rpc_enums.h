@@ -5,7 +5,7 @@
  *  FILE:        Shared/sdk/net/rpc_enums.h
  *  PURPOSE:     Lua RPC enums
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -276,6 +276,9 @@ enum eElementRPCFunctions
     SET_OBJECT_BREAKABLE,
 
     SET_WORLD_SPECIAL_PROPERTY,
+    
+    ALLOCATE_MODEL_FROM_PARENT,
+    UNLOAD_MODEL,
 
     NUM_RPC_FUNCS            // Add above this line
 };

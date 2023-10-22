@@ -1,51 +1,22 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CVehicleColorManager.cpp
- *  PURPOSE:     Vehicle entity color manager class
+ *  FILE:        mods/deathmatch/logic/CVehicleColorConfig.cpp
+ *  PURPOSE:     Vehicle colors loader
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVehicleColorManager.h"
+#include "CVehicleColorConfig.h"
 #include "CVehicleDefaultColors.h"
-#include "Utils.h"
+#include "models/CModelManager.h"
+#include "CGame.h"
 
-CVehicleColor CVehicleColors::GetRandomColor()
+bool CVehicleColorConfig::Load(const char* szFilename)
 {
-    // Grab a random index
-    unsigned int uiSize = CountColors();
-    if (uiSize > 0)
-    {
-        // Create a random index
-        unsigned int uiRandomIndex = GetRandom(0, uiSize - 1);
-
-        // Grab the random color we got off the list
-        unsigned int                       uiIndex = 0;
-        std::list<CVehicleColor>::iterator iter = m_Colors.begin();
-        for (; iter != m_Colors.end(); ++iter)
-        {
-            if (uiIndex == uiRandomIndex)
-            {
-                return *iter;
-            }
-
-            ++uiIndex;
-        }
-    }
-
-    // No items, return default color (black)
-    return CVehicleColor();
-}
-
-bool CVehicleColorManager::Load(const char* szFilename)
-{
-    // Make sure we're cleared
-    Reset();
-
     // Load vehiclecolors.conf
     FILE* pFile = File::Fopen(szFilename, "r");
     if (pFile)
@@ -97,10 +68,14 @@ bool CVehicleColorManager::Load(const char* szFilename)
                         }
                     }
 
-                    // Add it to the list
-                    CVehicleColor color;
-                    color.SetPaletteColors(ucColor1, ucColor2, ucColor3, ucColor4);
-                    AddColor(usModel, color);
+                    // Can be zero for invalid config string
+                    if (usModel)
+                    {
+                        // Add it to the list
+                        CVehicleColor color;
+                        color.SetPaletteColors(ucColor1, ucColor2, ucColor3, ucColor4);
+                        g_pGame->GetModelManager()->GetVehicleModel(usModel)->AddColor(color);
+                    }
                 }
             }
         }
@@ -114,7 +89,7 @@ bool CVehicleColorManager::Load(const char* szFilename)
     return false;
 }
 
-bool CVehicleColorManager::Generate(const char* szFilename)
+bool CVehicleColorConfig::Generate(const char* szFilename)
 {
     // Try to open the file
     FILE* pFile = File::Fopen(szFilename, "w+");
@@ -130,33 +105,4 @@ bool CVehicleColorManager::Generate(const char* szFilename)
 
     // Failed
     return false;
-}
-
-void CVehicleColorManager::Reset()
-{
-    // Remove all colors from all vehicles
-    for (int i = 0; i < 212; i++)
-    {
-        m_Colors[i].RemoveAllColors();
-    }
-}
-
-void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor& colVehicle)
-{
-    if (usModel >= 400 && usModel <= 611)
-    {
-        m_Colors[usModel - 400].AddColor(colVehicle);
-    }
-}
-
-CVehicleColor CVehicleColorManager::GetRandomColor(unsigned short usModel)
-{
-    if (usModel >= 400 && usModel <= 611)
-    {
-        return m_Colors[usModel - 400].GetRandomColor();
-    }
-    else
-    {
-        return CVehicleColor();
-    }
 }

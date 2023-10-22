@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CVehicleNames.cpp
  *  PURPOSE:     GTA vehicle name definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -275,37 +275,37 @@ const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
     const char* pVehicleName = "";
     switch (CVehicleManager::GetVehicleType(static_cast<unsigned short>(ulModel)))
     {
-        case VEHICLE_NONE:
+        case eVehicleType::NONE:
             pVehicleName = "Unknown";
             break;
-        case VEHICLE_CAR:
+        case eVehicleType::CAR:
             pVehicleName = "Automobile";
             break;
-        case VEHICLE_BOAT:
+        case eVehicleType::BOAT:
             pVehicleName = "Boat";
             break;
-        case VEHICLE_TRAIN:
+        case eVehicleType::TRAIN:
             pVehicleName = "Train";
             break;
-        case VEHICLE_HELI:
+        case eVehicleType::HELI:
             pVehicleName = "Helicopter";
             break;
-        case VEHICLE_PLANE:
+        case eVehicleType::PLANE:
             pVehicleName = "Plane";
             break;
-        case VEHICLE_BIKE:
+        case eVehicleType::BIKE:
             pVehicleName = "Bike";
             break;
-        case VEHICLE_MONSTERTRUCK:
+        case eVehicleType::MONSTERTRUCK:
             pVehicleName = "Monster Truck";
             break;
-        case VEHICLE_QUADBIKE:
+        case eVehicleType::QUADBIKE:
             pVehicleName = "Quad";
             break;
-        case VEHICLE_BMX:
+        case eVehicleType::BMX:
             pVehicleName = "BMX";
             break;
-        case VEHICLE_TRAILER:
+        case eVehicleType::TRAILER:
             pVehicleName = "Trailer";
             break;
     }

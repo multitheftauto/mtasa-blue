@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto
- *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CClientModel.h
  *  PURPOSE:     Model handling class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -33,7 +34,7 @@ class CClientModel final
 
 public:
     CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType);
-    ~CClientModel(void);
+    ~CClientModel();
 
     int              GetModelID(void) const { return m_iModelID; };
     eClientModelType GetModelType(void) const { return m_eModelType; };

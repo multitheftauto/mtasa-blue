@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/rpc/CRPCFunctions.cpp
  *  PURPOSE:     Remote procedure calls manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -31,6 +31,7 @@
 #include "CWaterRPCs.h"
 #include "CWorldRPCs.h"
 #include "CColShapeRPCs.h"
+#include "CModelRPCs.h"
 
 CClientManager*            CRPCFunctions::m_pManager;
 CClientCamera*             CRPCFunctions::m_pCamera;
@@ -100,6 +101,7 @@ void CRPCFunctions::AddHandlers()
     CWaterRPCs::LoadFunctions();
     CWorldRPCs::LoadFunctions();
     CColShapeRPCs::LoadFunctions();
+    CModelRPCs::LoadFunctions();
 }
 
 void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback, const char* szName)

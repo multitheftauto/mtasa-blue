@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Shared/sdk/net/bitstream.h
  *  PURPOSE:     Network bitstream interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -527,6 +527,10 @@ enum class eBitStreamVersion : unsigned short
     //
 
     CEntityAddPacket_ObjectBreakable,
+    
+    // Implement simple serverside model allocating
+    // yyyy-mm-dd 0xFF add date later ;-)
+    SimpleModelAllocation,
 
     // Add serverside setWorldSpecialPropertyEnabled
     // 2023-08-17

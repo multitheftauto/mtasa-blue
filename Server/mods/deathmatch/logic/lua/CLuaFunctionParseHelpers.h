@@ -2,7 +2,9 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Server/mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
+ *  FILE:        mods/deathmatch/logic/lua/CLuaFunctionParseHelpers.h
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -15,6 +17,7 @@
 #include "CEasingCurve.h"
 #include "CAccessControlListRight.h"
 #include <type_traits>
+#include "models/CModelBase.h"
 
 class CLuaVector2D;
 class CLuaVector3D;
@@ -38,6 +41,7 @@ DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
 DECLARE_ENUM_CLASS(ESyncType);
+DECLARE_ENUM_CLASS(eModelInfoType);
 
 enum eHudComponent
 {

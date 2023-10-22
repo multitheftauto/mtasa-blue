@@ -2,10 +2,10 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/luadefs/CLuaEngineDefs.cpp
+ *  FILE:        mods/deathmatch/logic/luadefs/CLuaEngineDefs.cpp
  *  PURPOSE:     Lua definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -892,7 +892,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         }
                     }
 
-                    if (pModel->Allocate(usParentID))
+                    if (usParentID != -1 && pModel->Allocate(usParentID))
                     {
                         pModel->SetParentResource(pResource);
 
@@ -900,7 +900,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         return 1;
                     }
 
-                    m_pManager->GetModelManager()->Remove(pModel);
+                    m_pManager->GetModelManager()->Remove(iModelID);
                     argStream.SetCustomError("Expected valid original model ID at argument 2");
                 }
             }
@@ -923,9 +923,8 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        auto                          modelManager = m_pManager->GetModelManager();
-        std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(iModelID);
-        if (pModel && modelManager->Remove(pModel))
+        auto modelManager = m_pManager->GetModelManager();
+        if (modelManager->RemoveClientModel(iModelID))
         {
             lua_pushboolean(luaVM, true);
             return 1;

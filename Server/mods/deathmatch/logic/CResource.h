@@ -5,7 +5,7 @@
  *  FILE:        mods/deathmatch/logic/CResource.h
  *  PURPOSE:     Resource handler class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -296,6 +296,8 @@ public:
     std::list<CExportedFunction>::iterator IterBeginExportedFunctions() { return m_ExportedFunctions.begin(); }
     std::list<CExportedFunction>::iterator IterEndExportedFunctions() { return m_ExportedFunctions.end(); }
 
+    std::list<uint32_t>& GetAllocatedModels() { return m_allocatedModels; };
+
     void GetAclRequests(std::vector<SAclRequest>& outResultList);
     bool HandleAclRequestListCommand(bool bDetail);
     bool HandleAclRequestChangeCommand(const SString& strRightName, bool bAccess, const SString& strWho);
@@ -396,6 +398,7 @@ private:
     std::list<CResource*>          m_Dependents;            // resources that have "included" or loaded this one
     std::list<CExportedFunction>   m_ExportedFunctions;
     std::list<CResource*>          m_TemporaryIncludes;            // started by startResource script command
+    std::list<uint32_t>            m_allocatedModels;
 
     std::string m_strCircularInclude;
     SString     m_strFailureReason;

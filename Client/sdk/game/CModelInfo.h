@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        sdk/game/CModelInfo.h
  *  PURPOSE:     Entity model info interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -51,10 +51,11 @@ enum class eModelIdeFlag
     IS_CRANE,
 };
 
-enum class eModelInfoType : unsigned char
+enum class eModelInfoType
 {
+    INVALID = 0,
     ATOMIC = 1,
-    TIME = 3,
+    TIMED_OBJECT = 3,
     WEAPON = 4,
     CLUMP = 5,
     VEHICLE = 6,

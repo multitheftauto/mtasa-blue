@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/luadefs/CLuaVehicleDefs.cpp
  *  PURPOSE:     Lua function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1705,7 +1705,7 @@ int CLuaVehicleDefs::GetTrainPosition(lua_State* luaVM)
 
 std::variant<CTrainTrack*, bool> CLuaVehicleDefs::GetTrainTrack(CVehicle* pVehicle)
 {
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
     else if (pVehicle->IsDerailed())
         return false;
@@ -2779,7 +2779,7 @@ int CLuaVehicleDefs::SetTrainSpeed(lua_State* luaVM)
 
 bool CLuaVehicleDefs::SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrainTrack)
 {
-    if (pVehicle->GetVehicleType() != VEHICLE_TRAIN)
+    if (pVehicle->GetVehicleType() != eVehicleType::TRAIN)
         return false;
     else if (pVehicle->IsDerailed())
     {

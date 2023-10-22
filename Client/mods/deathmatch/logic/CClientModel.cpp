@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto
- *               (Shared logic for modifications)
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CClientModel.h
  *  PURPOSE:     Model handling class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -152,8 +153,8 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
             break;
         }
-        case eClientModelType::CLUMP:
         case eClientModelType::OBJECT:
+        case eClientModelType::CLUMP:
         case eClientModelType::TIMED_OBJECT:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();

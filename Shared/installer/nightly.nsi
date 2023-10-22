@@ -861,6 +861,8 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\editor.conf"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\vehiclecolors.conf"
+        File "${SERVER_FILES_ROOT}\mods\deathmatch\vehicles.conf"
+        File "${SERVER_FILES_ROOT}\mods\deathmatch\handling.conf"
 
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\local.conf"

@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -130,6 +130,9 @@ namespace lua
     template <typename T>
     void Push(lua_State* L, const std::vector<T>& val);
 
+    template <typename T>
+    void Push(lua_State* L, const std::list<T>& val);
+
     template <typename K, typename V>
     void Push(lua_State* L, const std::unordered_map<K, V>& val);
 
@@ -167,6 +170,19 @@ namespace lua
 
     template <typename T>
     void Push(lua_State* L, const std::vector<T>& val)
+    {
+        lua_newtable(L);
+        int i = 1;
+        for (const auto& v : val)
+        {
+            Push(L, i++);
+            Push(L, v);
+            lua_settable(L, -3);
+        }
+    }
+
+    template <typename T>
+    void Push(lua_State* L, const std::list<T>& val)
     {
         lua_newtable(L);
         int i = 1;
