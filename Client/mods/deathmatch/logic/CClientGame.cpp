@@ -69,6 +69,8 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
+static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
+
 CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
     // Init the global var with ourself
@@ -963,15 +965,13 @@ void CClientGame::DoPulsePostFrame()
         }
 
         // Check if we need to update the Discord Rich Presence state
-        if (GetTickCount64_() > m_timeLastDiscordStateUpdate + m_timeDiscordUpdateRate)
+        if (const long long ticks = GetTickCount64_(); ticks > m_timeLastDiscordStateUpdate + TIME_DISCORD_UPDATE_RATE)
         {
             auto discord = g_pCore->GetDiscord();
 
             if (discord && discord->IsDiscordRPCEnabled())
-            {
-                auto pLocalPlayer = g_pClientGame->GetLocalPlayer();
-
-                if (pLocalPlayer)
+            {  
+                if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
                 {
                     CVector position;
                     SString zoneName;
@@ -979,21 +979,26 @@ void CClientGame::DoPulsePostFrame()
                     pLocalPlayer->GetPosition(position);
                     CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
 
+                    if (zoneName == "Unknown")
+                    {
+                        zoneName = "Area 51";
+                    }
+
                     auto taskManager = pLocalPlayer->GetTaskManager();
-                    auto task = taskManager->GetActiveTask();
-                    auto taskSub = task->GetSubTask();
+                    auto task = taskManager->GetActiveTask();                    
                     auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
                     bool useZoneName = true;
 
-                    eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
-                    std::string        discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : "Walking around";
+                    const eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
+                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : "Walking around ";
 
                     if (task && task->IsValid())
                     {
-                        auto taskType = task->GetTaskType();
+                        const auto taskSub = task->GetSubTask();
+                        const auto taskType = task->GetTaskType();
 
                         // Check for states which match our primary task
-                        std::vector<STaskState> taskStates{};
+                        std::vector<STaskState> taskStates;
                         for (const auto& [task, state] : g_playerTaskStates)
                         {
                             if (task == taskType)
@@ -1001,12 +1006,11 @@ void CClientGame::DoPulsePostFrame()
                         }
 
                         // Check for non-matching sub/secondary tasks and remove them
-                        std::vector<STaskState>::iterator it = taskStates.begin();
-                        while (it != taskStates.end())
+                        for (auto it = taskStates.begin(); it != taskStates.end(); )
                         {
-                            STaskState taskState = (*it);
+                            const STaskState& taskState = (*it);
 
-                            auto taskSecondary =
+                            const auto taskSecondary =
                                 (!taskState.eSecondaryType.has_value()) ? nullptr : taskManager->GetTaskSecondary(taskState.eSecondaryType.value());
                             bool useState = (!taskState.eSubTask.has_value() && !taskState.eSecondaryTask.has_value());
 
@@ -1020,25 +1024,27 @@ void CClientGame::DoPulsePostFrame()
                             }
 
                             if (!useState)
-                                taskStates.erase(it);
+                                it = taskStates.erase(it);
                             else
                                 ++it;
                         }
 
                         // Choose a random task state (if we have any)
-                        int stateCount = taskStates.size();
+                        const int stateCount = taskStates.size();
                         if (stateCount > 0)
                         {
                             std::srand(GetTickCount64_());
-                            int  index = (std::rand() % stateCount);
-                            auto taskState = taskStates[index];
+                            const int  index = (std::rand() % stateCount);
+                            const auto& taskState = taskStates[index];
 
                             discordState = taskState.strState;
                             useZoneName = taskState.bUseZone;
-                        }
+                        }                                       
 
-                        zoneName = (zoneName == "Unknown") ? "Area 51" : zoneName;
-                        discordState = useZoneName ? SString(std::string(discordState + " %s").c_str(), zoneName.c_str()) : discordState;
+                        if (useZoneName)
+                        {
+                            discordState.append(" " + zoneName);
+                        }
 
                         discord->SetPresenceState(discordState.c_str(), false);
                     }
@@ -1048,7 +1054,7 @@ void CClientGame::DoPulsePostFrame()
                     discord->SetPresenceState("In-game", false);
                 }
 
-                m_timeLastDiscordStateUpdate = GetTickCount64_();
+                m_timeLastDiscordStateUpdate = ticks;
             }
         }
 

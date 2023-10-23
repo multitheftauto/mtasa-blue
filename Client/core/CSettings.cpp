@@ -3458,17 +3458,17 @@ void CSettings::SaveData()
 
         if (discord)
         {
-            SString state = "Main menu";
+            const char* state = "Main menu";
 
             if (g_pCore->IsConnected())
-            {
-                SString serverName = g_pCore->GetLastConnectedServerName();
+            {                
                 state = "In-game";
 
+                const SString& serverName = g_pCore->GetLastConnectedServerName();
                 discord->SetPresenceDetails(serverName.c_str(), false);
             }
 
-            discord->SetPresenceState(state.c_str(), false);
+            discord->SetPresenceState(state, false);
         }
     }
 

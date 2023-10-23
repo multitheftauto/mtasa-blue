@@ -286,7 +286,7 @@ public:
     bool   IsUsingCustomStreamingMemorySize();
     size_t GetStreamingMemory();
 
-    const SString& GetLastConnectedServerName() { return m_strLastConnectedServerName; }
+    const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
 private:
