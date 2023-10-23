@@ -190,7 +190,7 @@ public:
     virtual bool   IsUsingCustomStreamingMemorySize() = 0;
     virtual size_t GetStreamingMemory() = 0;
 
-    virtual const SString& GetLastConnectedServerName() = 0;
+    virtual const SString& GetLastConnectedServerName() const = 0;
     virtual void           SetLastConnectedServerName(const SString& strServerName) = 0;
 };
 
