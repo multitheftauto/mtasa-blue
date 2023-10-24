@@ -13,6 +13,7 @@
 #include <list>
 #include "lua/LuaCommon.h"
 #include "CClientEntity.h"
+#include <game/CTaskManager.h>
 
 class CClientEntity;
 class CClientManager;
@@ -22,6 +23,36 @@ class CLuaArgument;
 class CPed;
 class CTask;
 class CVehicle;
+
+struct STaskState
+{
+    bool                              bUseZone;
+    std::string                       strState;
+    std::optional<eTaskType>          eSubTask = {};
+    std::optional<eTaskType>          eSecondaryTask = {};
+    std::optional<eSecondaryTaskType> eSecondaryType = {};
+};
+
+static const std::unordered_multimap<eTaskType, STaskState> g_playerTaskStates{
+    {TASK_COMPLEX_JUMP, {true, "Climbing around in", TASK_SIMPLE_CLIMB}},
+    {TASK_SIMPLE_GANG_DRIVEBY, {true, "Doing a drive-by in"}},
+    {TASK_SIMPLE_DRIVEBY_SHOOT, {true, "Doing a drive-by in"}},
+    {TASK_SIMPLE_DIE, {false, "Blub blub...", TASK_SIMPLE_DROWN}},
+    {TASK_SIMPLE_DIE, {false, "Breathing water", TASK_SIMPLE_DROWN}},
+    {TASK_SIMPLE_DIE, {true, "Drowning in", TASK_SIMPLE_DROWN}},
+    {TASK_SIMPLE_PLAYER_ON_FOOT, {true, "Ducking for cover in", {}, TASK_SIMPLE_DUCK, TASK_SECONDARY_DUCK}},
+    {TASK_SIMPLE_PLAYER_ON_FOOT, {true, "Fighting in", {}, TASK_SIMPLE_FIGHT, TASK_SECONDARY_ATTACK}},
+    {TASK_SIMPLE_PLAYER_ON_FOOT, {true, "Throwing fists in", {}, TASK_SIMPLE_FIGHT, TASK_SECONDARY_ATTACK}},
+    {TASK_SIMPLE_PLAYER_ON_FOOT, {true, "Blastin' fools in", {}, TASK_SIMPLE_USE_GUN, TASK_SECONDARY_ATTACK}},
+    {TASK_SIMPLE_PLAYER_ON_FOOT, {true, "Shooting up", {}, TASK_SIMPLE_USE_GUN, TASK_SECONDARY_ATTACK}},
+    {TASK_SIMPLE_JETPACK, {true, "Jetpacking in"}},
+    {TASK_SIMPLE_PLAYER_ON_FOOT, {true, "Literally on fire in", {}, TASK_SIMPLE_PLAYER_ON_FIRE, TASK_SECONDARY_PARTIAL_ANIM}},
+    {TASK_SIMPLE_PLAYER_ON_FOOT, {true, "Burning up in", {}, TASK_SIMPLE_PLAYER_ON_FIRE, TASK_SECONDARY_PARTIAL_ANIM}},
+    {TASK_COMPLEX_IN_WATER, {true, "Swimming in", TASK_SIMPLE_SWIM}},
+    {TASK_COMPLEX_IN_WATER, {true, "Floating around in", TASK_SIMPLE_SWIM}},
+    {TASK_COMPLEX_IN_WATER, {false, "Being chased by a shark", TASK_SIMPLE_SWIM}},
+    {TASK_SIMPLE_CHOKING, {true, "Choking to death in"}},
+};
 
 class CClientTask
 {

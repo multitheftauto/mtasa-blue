@@ -32,7 +32,7 @@ class CClientProjectile;
 
 #define INVALID_PASSENGER_SEAT 0xFF
 #define DEFAULT_VEHICLE_HEALTH 1000
-#define MAX_VEHICLE_HEALTH 10000
+#define MAX_VEHICLE_HEALTH     10000
 
 enum eClientVehicleType
 {
@@ -48,6 +48,8 @@ enum eClientVehicleType
     CLIENTVEHICLE_BMX,
     CLIENTVEHICLE_TRAILER
 };
+
+static constexpr int NUM_VEHICLE_TYPES = 11; 
 
 enum eDelayedSyncVehicleData
 {
@@ -144,6 +146,10 @@ struct SVehicleComponentData
     bool    m_bScaleChanged;
     bool    m_bVisible;
 };
+
+static const std::array<std::string, NUM_VEHICLE_TYPES> g_vehicleTypePrefixes = {
+    "Flying a UFO around", "Cruising around",         "Riding the waves of", "Riding the train in",  "Flying around",       "Flying around",
+    "Riding around",       "Monster truckin' around", "Quaddin' around",     "Bunny hopping around", "Doing weird stuff in"};
 
 class CClientVehicle : public CClientStreamElement
 {

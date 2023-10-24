@@ -26,6 +26,7 @@ public:
 
     void UpdatePresence();
     void SetPresenceStartTimestamp(const unsigned long ulStart);
+    void SetPresenceEndTimestamp(const unsigned long ulEnd);
     void SetAsset(const char* szAsset, const char* szAssetText, bool bIsLarge = false);
     void SetAssetLargeData(const char* szAsset, const char* szAssetText);
     void SetAssetSmallData(const char* szAsset, const char* szAssetText);
@@ -34,6 +35,7 @@ public:
     bool SetPresenceState(const char* szState, bool bCustom = false);
     bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
     bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl);
+    void SetPresencePartySize(int iSize, int iMax);
     bool SetDiscordRPCEnabled(bool bEnabled);
     bool IsDiscordCustomDetailsDisallowed() const;
     bool IsDiscordRPCEnabled() const;
@@ -54,6 +56,7 @@ private:
     std::string m_strDiscordAppState;
     std::string m_strDiscordAppDetails;
     std::string m_strDiscordAppCustomState;
+    std::string m_strDiscordAppCustomDetails;
 
     std::optional<std::tuple<std::pair<std::string, std::string>, std::pair<std::string, std::string>>> m_aButtons;
 
@@ -63,4 +66,7 @@ private:
     bool m_bDisallowCustomDetails;
     bool m_bDiscordRPCEnabled;
     bool m_bUpdateRichPresence;
+
+    int m_iPartySize;
+    int m_iPartyMax;
 };
