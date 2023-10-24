@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-21 17:28+0000\n"
-"PO-Revision-Date: 2023-10-21 17:30\n"
+"POT-Creation-Date: 2023-10-24 02:34+0000\n"
+"PO-Revision-Date: 2023-10-24 03:20\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -25,14 +25,14 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
 #: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
 #: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4719 Client/loader/Dialogs.cpp:133
+#: Client/core/CSettings.cpp:4739 Client/loader/Dialogs.cpp:133
 msgid "OK"
 msgstr "확인"
 
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/core/CVersionUpdater.cpp:1790
 #: Client/core/CVersionUpdater.cpp:1806 Client/core/CVersionUpdater.cpp:1841
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4718
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4738
 #: Client/loader/Dialogs.cpp:136
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
@@ -48,8 +48,8 @@ msgstr "취소"
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CSettings.cpp:1377 Client/core/CSettings.cpp:1401
-#: Client/core/CSettings.cpp:4451 Client/core/CSettings.cpp:4527
-#: Client/core/CSettings.cpp:4576 Client/core/CMainMenu.cpp:1188
+#: Client/core/CSettings.cpp:4471 Client/core/CSettings.cpp:4547
+#: Client/core/CSettings.cpp:4596 Client/core/CMainMenu.cpp:1188
 #: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
 msgid "Yes"
 msgstr "예"
@@ -91,8 +91,8 @@ msgstr "연결에 실패했습니다. 잘못된 닉네임!"
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2929
-#: Client/core/CSettings.cpp:4128 Client/core/CSettings.cpp:4156
-#: Client/core/CSettings.cpp:4698 Client/core/CCore.cpp:1273
+#: Client/core/CSettings.cpp:4148 Client/core/CSettings.cpp:4176
+#: Client/core/CSettings.cpp:4718 Client/core/CCore.cpp:1273
 #: Client/core/CCore.cpp:1286 Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
@@ -101,17 +101,17 @@ msgstr "연결에 실패했습니다. 잘못된 닉네임!"
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
-#: Client/mods/deathmatch/logic/CClientGame.cpp:602
-#: Client/mods/deathmatch/logic/CClientGame.cpp:676
-#: Client/mods/deathmatch/logic/CClientGame.cpp:700
-#: Client/mods/deathmatch/logic/CClientGame.cpp:722
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1041
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1121
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1131
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1200
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1286
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1298
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:680
+#: Client/mods/deathmatch/logic/CClientGame.cpp:704
+#: Client/mods/deathmatch/logic/CClientGame.cpp:726
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1141
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
@@ -136,47 +136,47 @@ msgstr "%s:%u ... 에 연결 중"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:618
+#: Client/mods/deathmatch/logic/CClientGame.cpp:622
 msgid "CONNECTING"
 msgstr "연결 중"
 
 #: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1200
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1300
 msgid "Connection timed out"
 msgstr "연결 시간이 초과되었습니다."
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1348
 msgid "Disconnected: unknown protocol error"
 msgstr "연결 끊김: 알 수 없는 프로토콜 오류"
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1352
 msgid "Disconnected: disconnected remotely"
 msgstr "연결 끊김: 원격으로 연결이 끊어짐"
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1356
 msgid "Disconnected: connection lost remotely"
 msgstr "연결 끊김: 원격으로 연결이 끊어짐"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1360
 msgid "Disconnected: you are banned from this server"
 msgstr "연결 끊김: 이 서버에서 밴되었습니다"
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1368
 msgid "Disconnected: disconnected from the server"
 msgstr "연결 끊김: 서버와의 연결이 끊어졌습니다"
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1372
 msgid "Disconnected: connection to the server was lost"
 msgstr "연결 끊김: 서버에 대한 연결이 끊어졌습니다"
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
 msgid "Disconnected: connection was refused"
 msgstr "연결 끊김: 연결이 거부되었습니다"
 
@@ -201,8 +201,8 @@ msgstr "이 문제에 대한 온라인 도움말을 보시겠습니까?"
 #: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1376
-#: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4450
-#: Client/core/CSettings.cpp:4526 Client/core/CSettings.cpp:4575
+#: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4470
+#: Client/core/CSettings.cpp:4546 Client/core/CSettings.cpp:4595
 #: Client/core/CMainMenu.cpp:1187 Client/core/ServerBrowser/CServerInfo.cpp:479
 #: Client/loader/Dialogs.cpp:132
 msgid "No"
@@ -433,7 +433,7 @@ msgstr "다운로드 완료"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - _DialogUpdateResult의 알 수 없는 문제"
 
-#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4524
+#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4544
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "사용자 정의된 GTA:SA 파일"
 
@@ -982,7 +982,7 @@ msgstr "매우 높음"
 #: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1059
 #: Client/core/CSettings.cpp:1189 Client/core/CSettings.cpp:1515
 #: Client/core/CSettings.cpp:3134 Client/core/CSettings.cpp:3166
-#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4196
+#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4216
 msgid "Off"
 msgstr "끄기"
 
@@ -1107,49 +1107,49 @@ msgstr "기타"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:998
-#: Client/core/CSettings.cpp:4737
+#: Client/core/CSettings.cpp:4757
 msgid "Fast CJ clothes loading:"
 msgstr "빠른 CJ 옷 로딩:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1012
-#: Client/core/CSettings.cpp:4739
+#: Client/core/CSettings.cpp:4759
 msgid "Browser speed:"
 msgstr "브라우저 속도:"
 
 #. Single download
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1026
-#: Client/core/CSettings.cpp:4741
+#: Client/core/CSettings.cpp:4761
 msgid "Single connection:"
 msgstr "단일 연결:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1039
-#: Client/core/CSettings.cpp:4743
+#: Client/core/CSettings.cpp:4763
 msgid "Packet tag:"
 msgstr "패킷 태그:"
 
 #. Progress animation
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1052
-#: Client/core/CSettings.cpp:4745
+#: Client/core/CSettings.cpp:4765
 msgid "Progress animation:"
 msgstr "진행 애니메이션:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1065
-#: Client/core/CSettings.cpp:4735
+#: Client/core/CSettings.cpp:4755
 msgid "Process priority:"
 msgstr "프로세스 우선도:"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1079
-#: Client/core/CSettings.cpp:4747
+#: Client/core/CSettings.cpp:4767
 msgid "Debug setting:"
 msgstr "디버그 설정:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1102
-#: Client/core/CSettings.cpp:4749
+#: Client/core/CSettings.cpp:4769
 msgid "Streaming memory:"
 msgstr "스트리밍 메모리:"
 
@@ -1444,74 +1444,74 @@ msgstr "GTA 게임 컨트롤"
 msgid "MULTIPLAYER CONTROLS"
 msgstr "멀티플레이 컨트롤"
 
-#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4698
+#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4718
 msgid "Your nickname contains invalid characters!"
 msgstr "닉네임에 잘못된 문자가 포함되어 있습니다!"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Red:"
 msgstr "빨강:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Green:"
 msgstr "초록:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Blue:"
 msgstr "파랑:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Transparency:"
 msgstr "투명도:"
 
-#: Client/core/CSettings.cpp:3743
+#: Client/core/CSettings.cpp:3763
 msgid "Color"
 msgstr "색상:"
 
-#: Client/core/CSettings.cpp:3820
+#: Client/core/CSettings.cpp:3840
 msgid "Preview"
 msgstr "미리보기"
 
-#: Client/core/CSettings.cpp:4128
+#: Client/core/CSettings.cpp:4148
 msgid "Please disconnect before changing language"
 msgstr "언어를 변경하기 전에 연결을 끊으십시오"
 
-#: Client/core/CSettings.cpp:4156
+#: Client/core/CSettings.cpp:4176
 msgid "Please disconnect before changing skin"
 msgstr "스킨을 변경하기 전에 연결을 끊으십시오"
 
-#: Client/core/CSettings.cpp:4444
+#: Client/core/CSettings.cpp:4464
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "그림자로 인해 일부 시스템의 속도가 느려질 수 있습니다.\n\n"
 "사용하도록 설정하시겠습니까?"
 
-#: Client/core/CSettings.cpp:4448
+#: Client/core/CSettings.cpp:4468
 msgid "PERFORMANCE WARNING"
 msgstr "성능 주의"
 
-#: Client/core/CSettings.cpp:4468
+#: Client/core/CSettings.cpp:4488
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "부정행위 방지를 위해 일부 서버에서 화면 업로드가 필요합니다.\n\n"
 "(채팅창 및 GUI는 업로드 대상에서 제외)\n"
 
-#: Client/core/CSettings.cpp:4470
+#: Client/core/CSettings.cpp:4490
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "화면 업로드 정보"
 
-#: Client/core/CSettings.cpp:4485
+#: Client/core/CSettings.cpp:4505
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr "일부 스크립트는 인터넷에서 라디오와 같은 소리를 재생할 수 있습니다.\n\n"
 "이 설정을 비활성화하면 네트워크 대역폭 소비가 감소할 수 있습니다.\n"
 
-#: Client/core/CSettings.cpp:4488
+#: Client/core/CSettings.cpp:4508
 msgid "EXTERNAL SOUNDS"
 msgstr "외부 사운드"
 
-#: Client/core/CSettings.cpp:4518
+#: Client/core/CSettings.cpp:4538
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -1521,7 +1521,7 @@ msgstr "GTA:SA 데이터 디렉토리의 일부 파일이 사용자 정의됩니
 "그러나 사용자 정의된 GTA:SA 파일이 많은 서버에 의해 차단되었습니다.\n\n"
 "사용하시겠습니까?"
 
-#: Client/core/CSettings.cpp:4567
+#: Client/core/CSettings.cpp:4587
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -1531,77 +1531,77 @@ msgstr "DPI awareness을 활성화하는 것은 실험적인 기능입니다.\n"
 "이 옵션을 활성화하면 그래픽 문제가 발생할 수 있습니다.\n\n"
 "이 옵션을 활성화하시겠습니까?"
 
-#: Client/core/CSettings.cpp:4573
+#: Client/core/CSettings.cpp:4593
 msgid "EXPERIMENTAL FEATURE"
 msgstr "실험적인 기능"
 
-#: Client/core/CSettings.cpp:4716
+#: Client/core/CSettings.cpp:4736
 msgid "Please enter a nickname"
 msgstr "닉네임을 입력하십시오."
 
-#: Client/core/CSettings.cpp:4717
+#: Client/core/CSettings.cpp:4737
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "게임 내에서 사용할 닉네임을 입력하십시오. \n"
 "이것은 서버에 연결하고 서버에서 재생할 때 귀하의 이름이 될 것입니다."
 
-#: Client/core/CSettings.cpp:4735
+#: Client/core/CSettings.cpp:4755
 msgid "Very experimental feature."
 msgstr "매우 실험적인 기능."
 
-#: Client/core/CSettings.cpp:4737
+#: Client/core/CSettings.cpp:4757
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "CJ 버전으로 스톨 중지(65MB 이상의 RAM 사용)"
 
-#: Client/core/CSettings.cpp:4739
+#: Client/core/CSettings.cpp:4759
 msgid "Older routers may require a slower scan speed."
 msgstr "구형 라우터는 스캔 속도가 느려질 수 있습니다."
 
-#: Client/core/CSettings.cpp:4741
+#: Client/core/CSettings.cpp:4761
 msgid "Switch on to use only one connection when downloading."
 msgstr "다운로드할 때 연결을 하나만 사용하려면 켜십시오."
 
-#: Client/core/CSettings.cpp:4743
+#: Client/core/CSettings.cpp:4763
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "ISP가 MTA 트래픽을 식별할 수 있도록 네트워크 패킷에 태그를 지정합니다."
 
-#: Client/core/CSettings.cpp:4745
+#: Client/core/CSettings.cpp:4765
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "화면 하단의 회전 원 애니메이션"
 
-#: Client/core/CSettings.cpp:4747
+#: Client/core/CSettings.cpp:4767
 msgid "Select default always. (This setting is not saved)"
 msgstr "항상 기본값을 선택합니다. (이 설정은 저장되지 않음)"
 
-#: Client/core/CSettings.cpp:4749
+#: Client/core/CSettings.cpp:4769
 msgid "Maximum is usually best"
 msgstr "일반적으로 최대값이 가장 좋습니다."
 
-#: Client/core/CSettings.cpp:4751 Client/core/CSettings.cpp:4753
+#: Client/core/CSettings.cpp:4771 Client/core/CSettings.cpp:4773
 msgid "Auto updater:"
 msgstr "자동 업데이터:"
 
-#: Client/core/CSettings.cpp:4751
+#: Client/core/CSettings.cpp:4771
 msgid "Select default unless you like filling out bug reports."
 msgstr "버그 보고서 작성을 원하지 않는 경우 기본값을 선택하십시오."
 
-#: Client/core/CSettings.cpp:4753
+#: Client/core/CSettings.cpp:4773
 msgid "Select default to automatically install important updates."
 msgstr "중요한 업데이트를 자동으로 설치하려면 기본값을 선택하십시오."
 
-#: Client/core/CSettings.cpp:4755
+#: Client/core/CSettings.cpp:4775
 msgid "16-bit color:"
 msgstr "16비트 색상:"
 
-#: Client/core/CSettings.cpp:4755
+#: Client/core/CSettings.cpp:4775
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "16비트 색상 모드 사용 - MTA를 다시 시작해야 합니다."
 
-#: Client/core/CSettings.cpp:4757
+#: Client/core/CSettings.cpp:4777
 msgid "Mouse fix:"
 msgstr "마우스 수정:"
 
-#: Client/core/CSettings.cpp:4757
+#: Client/core/CSettings.cpp:4777
 msgid "Mouse movement fix - May need PC restart"
 msgstr "마우스 이동 수정 - PC를 다시 시작해야 할 수 있습니다."
 
@@ -1928,8 +1928,8 @@ msgstr "Mtasa:// 프로토콜을 사용하십시오!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:602
-#: Client/mods/deathmatch/logic/CClientGame.cpp:700
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:704
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "잘못된 닉네임입니다! 설정으로 이동하여 새 닉네임을 설정하십시오!"
 
@@ -2767,249 +2767,249 @@ msgstr "모두"
 msgid "Start"
 msgstr "시작"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:618
+#: Client/mods/deathmatch/logic/CClientGame.cpp:622
 msgid "Entering the game ..."
 msgstr "게임에 접속하는 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:680
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "연결되지 않았습니다. 빠른 연결 또는 '연결' 명령을 사용하여 서버에 연결하십시오."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:722
+#: Client/mods/deathmatch/logic/CClientGame.cpp:726
 msgid "The server is not installed"
 msgstr "서버가 설치되지 않았습니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:732
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:736
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1210
 msgid "Local Server"
 msgstr "로컬 서버"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:732
+#: Client/mods/deathmatch/logic/CClientGame.cpp:736
 msgid "Starting local server ..."
 msgstr "로컬 서버 시작 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1041
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1141
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "당신은 게임에서 추방되었습니다. (%s)"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1210
 msgid "Connecting to local server..."
 msgstr "로컬 서버에 연결 중..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1121
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
 msgid "Error connecting to server."
 msgstr "서버에 접속 중 오류 발생."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1131
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
 msgid "Connecting to local server timed out. See console for details."
 msgstr "로컬 서버에 접속 중 타임아웃 되었습니다. 자세한 사항은 콘솔을 확인하십시오."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
 msgid "Connection with the server was lost"
 msgstr "서버와의 연결이 끊어졌습니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1364
 msgid "Disconnected: the server is currently full"
 msgstr "연결 끊김: 서버 인원이 꽉 찼습니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1276
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1376
 msgid "Disconnected: invalid password specified"
 msgstr "연결 끊김: 잘못된 암호입니다."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1298
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
 msgid "MTA Client verification failed!"
 msgstr "MTA 클라이언트 인증 실패!"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:487
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:505
 msgid "Disconnected: Invalid nickname"
 msgstr "연결 끊김: 잘못된 닉네임"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:491
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
 msgid "Disconnect from server"
 msgstr "서버와의 연결이 끊겼습니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:495
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr "연결 끊김: 이용이 금지된 시리얼 넘버입니다.\n"
 "이유: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:501
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr "연결 끊김: 당신은 이용이 금지되었습니다.\n"
 "이유: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr "연결 끊김: 이용이 금지된 계정입니다.\n"
 "이유: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:512
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
 msgid "Disconnected: Version mismatch"
 msgstr "연결 끊김: 버전이 다름."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:516
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:534
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "연결 끊김: 대량 접속. 잠시 기다렸다가 다시 연결하십시오."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:538
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr "연결 끊김: 다른 지점의 서버입니다.\n"
 "정보: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:543
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr "연결 끊김: 잘못된 버전.\n"
 "정보: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr "연결 끊김: 서버에서 최신 빌드로 구동되고 있습니다.\n"
 "정보: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr "연결 끊김: 서버에서 오래된 빌드로 구동되고 있습니다.\n"
 "정보: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:540
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:558
 msgid "Disconnected: Nick already in use"
 msgstr "연결 끊김: 이미 사용 중인 닉네임."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
 msgid "Disconnected: Player element could not be created."
 msgstr "연결 끊김: 플레이어 요소를 만들 수 없습니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "연결 끊김: 서버가 연결을 거부했습니다. %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
 msgid "Disconnected: Serial verification failed"
 msgstr "연결 끊김: 시리얼 넘버 인증 실패."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:557
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "연결 끊김: 연결 비동기화 %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:584
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "연결 끊김: %s에 의해 추방되었습니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "연결 끊김: 당신은 %s 에 의해 이용이 금지되었습니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "연결 끊김: 서버 종료 또는 다시 시작"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
 msgid "You were kicked from the game"
 msgstr "당신은 게임에서 추방되었습니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr "이 서버에는 수정되지 않은 gta_sa.exe가 필요합니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:615
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Please replace gta_sa.exe"
 msgstr "Gta_sa.exe를 교체하십시오."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr "이 서버는 사용자 지정 D3D9.DLL을 허용하지 않습니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr "GTA 설치 디렉토리에서 D3D9.DLL을 제거하고 MTA를 다시 시작하십시오."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow virtual machines"
 msgstr "이 서버는 가상 시스템을 허용하지 않습니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "This server requires driver signing to be enabled"
 msgstr "이 서버에서 드라이버 서명을 사용하도록 설정해야 합니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "Please restart your PC"
 msgstr "PC를 재시작 하십시오."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server has detected missing anti-cheat components"
 msgstr "이 서버가 부정행위 방지 구성요소 누락을 감지했습니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Try restarting MTA"
 msgstr "MTA를 다시 시작하십시오."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr "이 서버에는 수정되지 않은 gta3.img 및 gta_int.img가 필요합니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Please replace gta3.img or gta_int.img"
 msgstr "Gta3.img 또는 gta_int.img를 교체하십시오."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:616
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server does not allow Wine"
 msgstr "이 서버는 Wine을 허용하지 않습니다"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:617
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr "다른 프로그램이 MTA:SA를 수정하지 않는지 확인합니다."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
 msgid "Time Remaining: "
 msgstr "남은 시간: "
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:641
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d일"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:643
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d 시간"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:645
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 분"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d 초"
 
 #. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
 msgid "Disconnected"
 msgstr "연결 끊김"
 
