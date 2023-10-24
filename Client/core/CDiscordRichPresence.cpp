@@ -73,6 +73,9 @@ void CDiscordRichPresence::SetDefaultData()
 
     m_uiDiscordAppStart = 0;
     m_uiDiscordAppEnd = 0;
+
+    m_iPartySize = 0;
+    m_iPartyMax = 0;
 }
 
 void CDiscordRichPresence::UpdatePresence()
