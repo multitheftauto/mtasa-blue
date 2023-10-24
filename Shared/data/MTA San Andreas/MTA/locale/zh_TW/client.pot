@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-21 17:28+0000\n"
-"PO-Revision-Date: 2023-10-21 17:31\n"
+"POT-Creation-Date: 2023-10-24 02:34+0000\n"
+"PO-Revision-Date: 2023-10-24 03:21\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -25,14 +25,14 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
 #: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
 #: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4719 Client/loader/Dialogs.cpp:133
+#: Client/core/CSettings.cpp:4739 Client/loader/Dialogs.cpp:133
 msgid "OK"
 msgstr "確定"
 
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/core/CVersionUpdater.cpp:1790
 #: Client/core/CVersionUpdater.cpp:1806 Client/core/CVersionUpdater.cpp:1841
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4718
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4738
 #: Client/loader/Dialogs.cpp:136
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
@@ -48,8 +48,8 @@ msgstr "取消"
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CSettings.cpp:1377 Client/core/CSettings.cpp:1401
-#: Client/core/CSettings.cpp:4451 Client/core/CSettings.cpp:4527
-#: Client/core/CSettings.cpp:4576 Client/core/CMainMenu.cpp:1188
+#: Client/core/CSettings.cpp:4471 Client/core/CSettings.cpp:4547
+#: Client/core/CSettings.cpp:4596 Client/core/CMainMenu.cpp:1188
 #: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
 msgid "Yes"
 msgstr "是"
@@ -91,8 +91,8 @@ msgstr "連線失敗。無效的匿名ID!"
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2929
-#: Client/core/CSettings.cpp:4128 Client/core/CSettings.cpp:4156
-#: Client/core/CSettings.cpp:4698 Client/core/CCore.cpp:1273
+#: Client/core/CSettings.cpp:4148 Client/core/CSettings.cpp:4176
+#: Client/core/CSettings.cpp:4718 Client/core/CCore.cpp:1273
 #: Client/core/CCore.cpp:1286 Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
@@ -101,17 +101,17 @@ msgstr "連線失敗。無效的匿名ID!"
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
-#: Client/mods/deathmatch/logic/CClientGame.cpp:602
-#: Client/mods/deathmatch/logic/CClientGame.cpp:676
-#: Client/mods/deathmatch/logic/CClientGame.cpp:700
-#: Client/mods/deathmatch/logic/CClientGame.cpp:722
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1041
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1121
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1131
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1200
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1286
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1298
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:680
+#: Client/mods/deathmatch/logic/CClientGame.cpp:704
+#: Client/mods/deathmatch/logic/CClientGame.cpp:726
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1141
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
@@ -136,47 +136,47 @@ msgstr "正在連線至 %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:618
+#: Client/mods/deathmatch/logic/CClientGame.cpp:622
 msgid "CONNECTING"
 msgstr "連接中"
 
 #: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1200
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1300
 msgid "Connection timed out"
 msgstr "連線已逾時"
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1348
 msgid "Disconnected: unknown protocol error"
 msgstr "連線中斷: 未知的協定錯誤"
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1352
 msgid "Disconnected: disconnected remotely"
 msgstr "連線中斷: 遠程連線中斷"
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1356
 msgid "Disconnected: connection lost remotely"
 msgstr "連線中斷: 伺服器連線中斷"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1360
 msgid "Disconnected: you are banned from this server"
 msgstr "連線中斷: 你已經被封鎖禁止進入該伺服器"
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1368
 msgid "Disconnected: disconnected from the server"
 msgstr "連線中斷: 伺服器連線中斷"
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1372
 msgid "Disconnected: connection to the server was lost"
 msgstr "連線中斷: 與伺服器的連線已遺失"
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
 msgid "Disconnected: connection was refused"
 msgstr "連線中斷: 連線已被拒絕"
 
@@ -201,8 +201,8 @@ msgstr "你希望在線上看看關於此問題的幫助嗎?"
 #: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1376
-#: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4450
-#: Client/core/CSettings.cpp:4526 Client/core/CSettings.cpp:4575
+#: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4470
+#: Client/core/CSettings.cpp:4546 Client/core/CSettings.cpp:4595
 #: Client/core/CMainMenu.cpp:1187 Client/core/ServerBrowser/CServerInfo.cpp:479
 #: Client/loader/Dialogs.cpp:132
 msgid "No"
@@ -433,7 +433,7 @@ msgstr "下載完成"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr "- 未知的問題發生在 _DialogUpdateResult"
 
-#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4524
+#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4544
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "已修改俠盜獵車手:聖安地列斯的文件檔"
 
@@ -982,7 +982,7 @@ msgstr "非常高"
 #: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1059
 #: Client/core/CSettings.cpp:1189 Client/core/CSettings.cpp:1515
 #: Client/core/CSettings.cpp:3134 Client/core/CSettings.cpp:3166
-#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4196
+#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4216
 msgid "Off"
 msgstr "關閉"
 
@@ -1107,49 +1107,49 @@ msgstr "其它"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:998
-#: Client/core/CSettings.cpp:4737
+#: Client/core/CSettings.cpp:4757
 msgid "Fast CJ clothes loading:"
 msgstr "快速載入CJ服裝:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1012
-#: Client/core/CSettings.cpp:4739
+#: Client/core/CSettings.cpp:4759
 msgid "Browser speed:"
 msgstr "瀏覧器速度:"
 
 #. Single download
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1026
-#: Client/core/CSettings.cpp:4741
+#: Client/core/CSettings.cpp:4761
 msgid "Single connection:"
 msgstr "單一連線:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1039
-#: Client/core/CSettings.cpp:4743
+#: Client/core/CSettings.cpp:4763
 msgid "Packet tag:"
 msgstr "封包標籤："
 
 #. Progress animation
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1052
-#: Client/core/CSettings.cpp:4745
+#: Client/core/CSettings.cpp:4765
 msgid "Progress animation:"
 msgstr "進度動畫："
 
 #. Process priority
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1065
-#: Client/core/CSettings.cpp:4735
+#: Client/core/CSettings.cpp:4755
 msgid "Process priority:"
 msgstr "優先處理權:"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1079
-#: Client/core/CSettings.cpp:4747
+#: Client/core/CSettings.cpp:4767
 msgid "Debug setting:"
 msgstr "除錯設定:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1102
-#: Client/core/CSettings.cpp:4749
+#: Client/core/CSettings.cpp:4769
 msgid "Streaming memory:"
 msgstr "串流記憶體:"
 
@@ -1444,63 +1444,63 @@ msgstr "GTA遊戲控制"
 msgid "MULTIPLAYER CONTROLS"
 msgstr "多人遊戲控制"
 
-#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4698
+#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4718
 msgid "Your nickname contains invalid characters!"
 msgstr "你的暱稱中含有不正當的字元!"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Red:"
 msgstr "紅:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Green:"
 msgstr "綠:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Blue:"
 msgstr "藍色:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Transparency:"
 msgstr "透明度:"
 
-#: Client/core/CSettings.cpp:3743
+#: Client/core/CSettings.cpp:3763
 msgid "Color"
 msgstr "顏色"
 
-#: Client/core/CSettings.cpp:3820
+#: Client/core/CSettings.cpp:3840
 msgid "Preview"
 msgstr "預覽"
 
-#: Client/core/CSettings.cpp:4128
+#: Client/core/CSettings.cpp:4148
 msgid "Please disconnect before changing language"
 msgstr "請先離線後再變更語言"
 
-#: Client/core/CSettings.cpp:4156
+#: Client/core/CSettings.cpp:4176
 msgid "Please disconnect before changing skin"
 msgstr "在更換皮膚前請先斷線"
 
-#: Client/core/CSettings.cpp:4444
+#: Client/core/CSettings.cpp:4464
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "陰影體積化有可能會導致系統速度變慢\n\n"
 "你確定要啟用陰影體積化?"
 
-#: Client/core/CSettings.cpp:4448
+#: Client/core/CSettings.cpp:4468
 msgid "PERFORMANCE WARNING"
 msgstr "效能警告"
 
-#: Client/core/CSettings.cpp:4468
+#: Client/core/CSettings.cpp:4488
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "為達防止外掛發生目的，在某些伺服器中你需要上傳螢幕截圖來證明。\n\n"
 "(對話框及其圖像將不會連同螢幕截圖一併上傳)\n"
 
-#: Client/core/CSettings.cpp:4470
+#: Client/core/CSettings.cpp:4490
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "截圖上傳資訊"
 
-#: Client/core/CSettings.cpp:4485
+#: Client/core/CSettings.cpp:4505
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
@@ -1508,11 +1508,11 @@ msgstr "有些腳本會播放音效，像是網路上的電台音樂。\n\n"
 "關閉該設定\n"
 "會減少網路流量的使用。\n"
 
-#: Client/core/CSettings.cpp:4488
+#: Client/core/CSettings.cpp:4508
 msgid "EXTERNAL SOUNDS"
 msgstr "外部音效"
 
-#: Client/core/CSettings.cpp:4518
+#: Client/core/CSettings.cpp:4538
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -1522,7 +1522,7 @@ msgstr "在你的GTA:SA目錄有些東西是有經過自行更改的.\n"
 "然而,更改過的GTA SA將會備很多伺服器禁止\n\n"
 "你確定你要使用他們嗎?"
 
-#: Client/core/CSettings.cpp:4567
+#: Client/core/CSettings.cpp:4587
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -1532,77 +1532,77 @@ msgstr "DPI感知是實驗性功能，\n"
 "若開啟該選項可能會導致畫面產生問題。\n\n"
 "您確定要開啟這個功能嗎？"
 
-#: Client/core/CSettings.cpp:4573
+#: Client/core/CSettings.cpp:4593
 msgid "EXPERIMENTAL FEATURE"
 msgstr "實驗性功能"
 
-#: Client/core/CSettings.cpp:4716
+#: Client/core/CSettings.cpp:4736
 msgid "Please enter a nickname"
 msgstr "請輸入一個暱稱"
 
-#: Client/core/CSettings.cpp:4717
+#: Client/core/CSettings.cpp:4737
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "請輸入暱稱以用於遊戲內。  \n"
 "當你進入伺服器後這將會成為你的名稱"
 
-#: Client/core/CSettings.cpp:4735
+#: Client/core/CSettings.cpp:4755
 msgid "Very experimental feature."
 msgstr "非常實驗性的功能。"
 
-#: Client/core/CSettings.cpp:4737
+#: Client/core/CSettings.cpp:4757
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "請停止使用CJ變數暫存檔(使用超過65MB記憶體)"
 
-#: Client/core/CSettings.cpp:4739
+#: Client/core/CSettings.cpp:4759
 msgid "Older routers may require a slower scan speed."
 msgstr "較舊的路由器掃描速度可能較慢。"
 
-#: Client/core/CSettings.cpp:4741
+#: Client/core/CSettings.cpp:4761
 msgid "Switch on to use only one connection when downloading."
 msgstr "當下載時，開啟以只使用單一連線。"
 
-#: Client/core/CSettings.cpp:4743
+#: Client/core/CSettings.cpp:4763
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "標記網路封包來幫助網路供應商識別MTA的流量。"
 
-#: Client/core/CSettings.cpp:4745
+#: Client/core/CSettings.cpp:4765
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "在畫面底部顯示轉圈動畫"
 
-#: Client/core/CSettings.cpp:4747
+#: Client/core/CSettings.cpp:4767
 msgid "Select default always. (This setting is not saved)"
 msgstr "經常選擇預設。(此項設定並不會儲存)"
 
-#: Client/core/CSettings.cpp:4749
+#: Client/core/CSettings.cpp:4769
 msgid "Maximum is usually best"
 msgstr "最大通常是最好"
 
-#: Client/core/CSettings.cpp:4751 Client/core/CSettings.cpp:4753
+#: Client/core/CSettings.cpp:4771 Client/core/CSettings.cpp:4773
 msgid "Auto updater:"
 msgstr "自動更新:"
 
-#: Client/core/CSettings.cpp:4751
+#: Client/core/CSettings.cpp:4771
 msgid "Select default unless you like filling out bug reports."
 msgstr "請選擇預設，有意願要填寫漏洞報告。"
 
-#: Client/core/CSettings.cpp:4753
+#: Client/core/CSettings.cpp:4773
 msgid "Select default to automatically install important updates."
 msgstr "選擇預設會自動安裝重要更新。"
 
-#: Client/core/CSettings.cpp:4755
+#: Client/core/CSettings.cpp:4775
 msgid "16-bit color:"
 msgstr "16位元的顏色:"
 
-#: Client/core/CSettings.cpp:4755
+#: Client/core/CSettings.cpp:4775
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "啟動 16位元顏色 並將MTA重啟"
 
-#: Client/core/CSettings.cpp:4757
+#: Client/core/CSettings.cpp:4777
 msgid "Mouse fix:"
 msgstr "修正滑鼠"
 
-#: Client/core/CSettings.cpp:4757
+#: Client/core/CSettings.cpp:4777
 msgid "Mouse movement fix - May need PC restart"
 msgstr "滑鼠移動修正 - 可能需要重啟電腦"
 
@@ -1929,8 +1929,8 @@ msgstr "請使用 mtasa:// protocol!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:602
-#: Client/mods/deathmatch/logic/CClientGame.cpp:700
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:704
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "無效的暱稱! 請去設置那裏設定新的暱稱!"
 
@@ -2758,249 +2758,249 @@ msgstr "全部"
 msgid "Start"
 msgstr "啟動"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:618
+#: Client/mods/deathmatch/logic/CClientGame.cpp:622
 msgid "Entering the game ..."
 msgstr "進入遊戲中..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:680
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "未連線；請使用'快速連線'或'連線'指令去連線到伺服器。"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:722
+#: Client/mods/deathmatch/logic/CClientGame.cpp:726
 msgid "The server is not installed"
 msgstr "此伺服器並未安裝完成"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:732
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:736
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1210
 msgid "Local Server"
 msgstr "本地伺服器"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:732
+#: Client/mods/deathmatch/logic/CClientGame.cpp:736
 msgid "Starting local server ..."
 msgstr "啟動本地伺服器中..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1041
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1141
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "你從遊戲中被剔除了 ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1210
 msgid "Connecting to local server..."
 msgstr "正在連線至本地伺服器..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1121
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
 msgid "Error connecting to server."
 msgstr "連線到伺服器時發生錯誤。"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1131
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
 msgid "Connecting to local server timed out. See console for details."
 msgstr "連線到本地伺服器逾時，請查看控制台以詳細了解。"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
 msgid "Connection with the server was lost"
 msgstr "與伺服器的連線已遺失"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1364
 msgid "Disconnected: the server is currently full"
 msgstr "連線中斷: 該伺服器目前滿人"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1276
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1376
 msgid "Disconnected: invalid password specified"
 msgstr "連線中斷: 指定的密碼無效"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1298
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
 msgid "MTA Client verification failed!"
 msgstr "MTA 客戶端驗證失敗"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:487
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:505
 msgid "Disconnected: Invalid nickname"
 msgstr "連線中斷: 無效的暱稱"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:491
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
 msgid "Disconnect from server"
 msgstr "從伺服中斷連線"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:495
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr "連線中斷: 序列被禁止。\n"
 "原因: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:501
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr "連線中斷: 你已被禁止。\n"
 "原因: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr "連線中斷: 帳號已被禁止。\n"
 "原因: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:512
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
 msgid "Disconnected: Version mismatch"
 msgstr "連線中斷: 版本不相符"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:516
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:534
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "連線中斷: 加入流量過大，請稍等再重新連線。"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:538
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr "連線中斷: 不同分支的伺服器。\n"
 "資訊: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:543
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr "連線中斷: 錯誤版本。\n"
 "資訊: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr "連線中斷: 伺服器正在運行一個更新版本的組建。\n"
 "資訊: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr "連線中斷: 伺服器正在運行一個較舊版本的組建。\n"
 "資訊: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:540
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:558
 msgid "Disconnected: Nick already in use"
 msgstr "連線中斷: 暱稱已被使用"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
 msgid "Disconnected: Player element could not be created."
 msgstr "已斷線：玩家元素建立失敗。"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "連線中斷: 伺服器已拒絕連線: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
 msgid "Disconnected: Serial verification failed"
 msgstr "連線中斷: 序列驗證失敗"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:557
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "連線中斷: 連線不同步 %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:584
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "連線中斷: 你己被 %s 剔除"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "連線中斷: 你已被 %s 禁止"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "已斷線：伺服器已經關閉或是正在重新啟動。"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
 msgid "You were kicked from the game"
 msgstr "你從遊戲中被剔除了"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr "該伺服器必須使用未經修改過的 gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:615
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Please replace gta_sa.exe"
 msgstr "請更換 gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr "該伺服器禁止使用自訂的D3D9.DLL"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr "請從GTA資料夾中刪除D3D9.DLL並重新啟動MTA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow virtual machines"
 msgstr "該伺服器禁止在虛擬機器上執行"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "This server requires driver signing to be enabled"
 msgstr "該伺服器需要開啟驅動程式強制簽章"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "Please restart your PC"
 msgstr "請重新啟動您的電腦"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server has detected missing anti-cheat components"
 msgstr "該伺服器檢測到遺失的防作弊組件"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Try restarting MTA"
 msgstr "嘗試重開MTA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr "該伺服器必須使用未經修改的 gta3.img 和 gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Please replace gta3.img or gta_int.img"
 msgstr "請更換 gta3.img 或是 gta_int.img 回原版檔案"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:616
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server does not allow Wine"
 msgstr "該伺服器禁止使用Wine"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:617
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr "請確認是否有其他程式正在修改MTA:SA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
 msgid "Time Remaining: "
 msgstr "剩餘時間："
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:641
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 天"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:643
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d 小時"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:645
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分鐘"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d 秒"
 
 #. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
 msgid "Disconnected"
 msgstr "已中斷連線"
 
