@@ -115,7 +115,7 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
     if (discord->IsDiscordCustomDetailsDisallowed())
         return false;
 
-    if (!discord->SetPresenceDetails(strDetails.c_str()))
+    if (!discord->SetPresenceDetails(strDetails.c_str(), true))
         return false;
 
     return true;
