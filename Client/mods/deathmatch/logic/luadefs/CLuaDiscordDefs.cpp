@@ -58,7 +58,13 @@ bool CLuaDiscordDefs::ResetData()
 {
     auto discord = g_pCore->GetDiscord();
 
-    if (!discord || !discord->IsDiscordRPCEnabled() || !discord->ResetDiscordData())
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return false;
+
+    if (discord->IsDiscordCustomDetailsDisallowed())
+        return false;
+
+    if (!discord->ResetDiscordData())
         return false;
 
     return true;
