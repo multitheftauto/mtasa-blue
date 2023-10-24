@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-21 17:28+0000\n"
-"PO-Revision-Date: 2023-10-21 17:31\n"
+"POT-Creation-Date: 2023-10-24 02:34+0000\n"
+"PO-Revision-Date: 2023-10-24 03:21\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -25,14 +25,14 @@ msgstr ""
 #: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
 #: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
 #: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4719 Client/loader/Dialogs.cpp:133
+#: Client/core/CSettings.cpp:4739 Client/loader/Dialogs.cpp:133
 msgid "OK"
 msgstr "确定"
 
 #. Cancel button
 #: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/core/CVersionUpdater.cpp:1790
 #: Client/core/CVersionUpdater.cpp:1806 Client/core/CVersionUpdater.cpp:1841
-#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4718
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4738
 #: Client/loader/Dialogs.cpp:136
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
@@ -48,8 +48,8 @@ msgstr "取消"
 #: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
 #: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
 #: Client/core/CSettings.cpp:1377 Client/core/CSettings.cpp:1401
-#: Client/core/CSettings.cpp:4451 Client/core/CSettings.cpp:4527
-#: Client/core/CSettings.cpp:4576 Client/core/CMainMenu.cpp:1188
+#: Client/core/CSettings.cpp:4471 Client/core/CSettings.cpp:4547
+#: Client/core/CSettings.cpp:4596 Client/core/CMainMenu.cpp:1188
 #: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
 msgid "Yes"
 msgstr "是"
@@ -91,8 +91,8 @@ msgstr "连接失败。使用了不可用的昵称!"
 #: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
 #: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
 #: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2929
-#: Client/core/CSettings.cpp:4128 Client/core/CSettings.cpp:4156
-#: Client/core/CSettings.cpp:4698 Client/core/CCore.cpp:1273
+#: Client/core/CSettings.cpp:4148 Client/core/CSettings.cpp:4176
+#: Client/core/CSettings.cpp:4718 Client/core/CCore.cpp:1273
 #: Client/core/CCore.cpp:1286 Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1278
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
@@ -101,17 +101,17 @@ msgstr "连接失败。使用了不可用的昵称!"
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
-#: Client/mods/deathmatch/logic/CClientGame.cpp:602
-#: Client/mods/deathmatch/logic/CClientGame.cpp:676
-#: Client/mods/deathmatch/logic/CClientGame.cpp:700
-#: Client/mods/deathmatch/logic/CClientGame.cpp:722
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1041
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1121
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1131
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1200
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1286
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1298
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:680
+#: Client/mods/deathmatch/logic/CClientGame.cpp:704
+#: Client/mods/deathmatch/logic/CClientGame.cpp:726
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1141
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1300
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1386
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
 #: Client/mods/deathmatch/logic/CServer.cpp:181
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
@@ -136,47 +136,47 @@ msgstr "正在连接到 %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:618
+#: Client/mods/deathmatch/logic/CClientGame.cpp:622
 msgid "CONNECTING"
 msgstr "连接中"
 
 #: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1200
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1300
 msgid "Connection timed out"
 msgstr "连接已超时"
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1248
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1348
 msgid "Disconnected: unknown protocol error"
 msgstr "已断开连接: 未知协议错误"
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1252
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1352
 msgid "Disconnected: disconnected remotely"
 msgstr "已断开连接: 服务器主动断开连接"
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1256
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1356
 msgid "Disconnected: connection lost remotely"
 msgstr "已断开连接: 与服务器连接中断"
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1260
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1360
 msgid "Disconnected: you are banned from this server"
 msgstr "已断开连接: 你已被该服务器封禁 (Banned)"
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1268
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1368
 msgid "Disconnected: disconnected from the server"
 msgstr "已断开连接: 从服务器断开连接"
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1272
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1372
 msgid "Disconnected: connection to the server was lost"
 msgstr "已断开连接: 与服务器的连接已中断"
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1280
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
 msgid "Disconnected: connection was refused"
 msgstr "已断开连接: 服务器拒绝连接"
 
@@ -201,8 +201,8 @@ msgstr "你希望查看一些与此问题相关的在线帮助吗?"
 #: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
 #: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1376
-#: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4450
-#: Client/core/CSettings.cpp:4526 Client/core/CSettings.cpp:4575
+#: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4470
+#: Client/core/CSettings.cpp:4546 Client/core/CSettings.cpp:4595
 #: Client/core/CMainMenu.cpp:1187 Client/core/ServerBrowser/CServerInfo.cpp:479
 #: Client/loader/Dialogs.cpp:132
 msgid "No"
@@ -433,7 +433,7 @@ msgstr "下载完毕"
 msgid " - Unknown problem in _DialogUpdateResult"
 msgstr " - 在 _DialogUpdateResult 出现未知错误"
 
-#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4524
+#: Client/core/CVersionUpdater.cpp:2081 Client/core/CSettings.cpp:4544
 msgid "CUSTOMIZED GTA:SA FILES"
 msgstr "定制的 GTA:SA 文件"
 
@@ -982,7 +982,7 @@ msgstr "非常高"
 #: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1059
 #: Client/core/CSettings.cpp:1189 Client/core/CSettings.cpp:1515
 #: Client/core/CSettings.cpp:3134 Client/core/CSettings.cpp:3166
-#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4196
+#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4216
 msgid "Off"
 msgstr "关"
 
@@ -1107,49 +1107,49 @@ msgstr "其它"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:998
-#: Client/core/CSettings.cpp:4737
+#: Client/core/CSettings.cpp:4757
 msgid "Fast CJ clothes loading:"
 msgstr "快速载入CJ服装:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1012
-#: Client/core/CSettings.cpp:4739
+#: Client/core/CSettings.cpp:4759
 msgid "Browser speed:"
 msgstr "浏览器速度:"
 
 #. Single download
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1026
-#: Client/core/CSettings.cpp:4741
+#: Client/core/CSettings.cpp:4761
 msgid "Single connection:"
 msgstr "单程连接:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1039
-#: Client/core/CSettings.cpp:4743
+#: Client/core/CSettings.cpp:4763
 msgid "Packet tag:"
 msgstr "数据包标签："
 
 #. Progress animation
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1052
-#: Client/core/CSettings.cpp:4745
+#: Client/core/CSettings.cpp:4765
 msgid "Progress animation:"
 msgstr "进度动画："
 
 #. Process priority
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1065
-#: Client/core/CSettings.cpp:4735
+#: Client/core/CSettings.cpp:4755
 msgid "Process priority:"
 msgstr "进程优先级:"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1079
-#: Client/core/CSettings.cpp:4747
+#: Client/core/CSettings.cpp:4767
 msgid "Debug setting:"
 msgstr "Debug 设置:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1102
-#: Client/core/CSettings.cpp:4749
+#: Client/core/CSettings.cpp:4769
 msgid "Streaming memory:"
 msgstr "流媒体缓存:"
 
@@ -1444,74 +1444,74 @@ msgstr "GTA 内置游戏控制"
 msgid "MULTIPLAYER CONTROLS"
 msgstr "多人游戏控制"
 
-#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4698
+#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4718
 msgid "Your nickname contains invalid characters!"
 msgstr "你的昵称包含非法字符!"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Red:"
 msgstr "红:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Green:"
 msgstr "绿:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Blue:"
 msgstr "蓝:"
 
-#: Client/core/CSettings.cpp:3740
+#: Client/core/CSettings.cpp:3760
 msgid "Transparency:"
 msgstr "透明度:"
 
-#: Client/core/CSettings.cpp:3743
+#: Client/core/CSettings.cpp:3763
 msgid "Color"
 msgstr "颜色"
 
-#: Client/core/CSettings.cpp:3820
+#: Client/core/CSettings.cpp:3840
 msgid "Preview"
 msgstr "预览"
 
-#: Client/core/CSettings.cpp:4128
+#: Client/core/CSettings.cpp:4148
 msgid "Please disconnect before changing language"
 msgstr "请在更换皮肤前断开服务器的连接"
 
-#: Client/core/CSettings.cpp:4156
+#: Client/core/CSettings.cpp:4176
 msgid "Please disconnect before changing skin"
 msgstr "请在更换皮肤前断开服务器的连接"
 
-#: Client/core/CSettings.cpp:4444
+#: Client/core/CSettings.cpp:4464
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "多重阴影将会导致部分系统速度下降.\n\n"
 "你确定要启用这个功能吗?"
 
-#: Client/core/CSettings.cpp:4448
+#: Client/core/CSettings.cpp:4468
 msgid "PERFORMANCE WARNING"
 msgstr "性能警告"
 
-#: Client/core/CSettings.cpp:4468
+#: Client/core/CSettings.cpp:4488
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "一些服务器将会以反作弊的原因要求使用上传屏幕功能.\n\n"
 "(聊天框和GUI界面将不会被上传)\n"
 
-#: Client/core/CSettings.cpp:4470
+#: Client/core/CSettings.cpp:4490
 msgid "SCREEN UPLOAD INFORMATION"
 msgstr "屏幕上传信息"
 
-#: Client/core/CSettings.cpp:4485
+#: Client/core/CSettings.cpp:4505
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr "某些脚本可能会播放来自 网络上 的声音，例如电台。\n\n"
 "禁用此设置会减少相应的网络流量消耗。\n"
 
-#: Client/core/CSettings.cpp:4488
+#: Client/core/CSettings.cpp:4508
 msgid "EXTERNAL SOUNDS"
 msgstr "外部声音"
 
-#: Client/core/CSettings.cpp:4518
+#: Client/core/CSettings.cpp:4538
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
@@ -1521,7 +1521,7 @@ msgstr "有些文件在你的GTA:SA数据目录是定制的.\n"
 "但是,定制的GTA:SA文件被许多服务器过滤\n\n"
 "你确定你想使用它们吗?"
 
-#: Client/core/CSettings.cpp:4567
+#: Client/core/CSettings.cpp:4587
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
@@ -1531,77 +1531,77 @@ msgstr "启用 DPI 感知是一项实验性功能，并且\n"
 "如果启用此选项，可能将会遇到图形问题。\n\n"
 "你确定要启用此选项吗？"
 
-#: Client/core/CSettings.cpp:4573
+#: Client/core/CSettings.cpp:4593
 msgid "EXPERIMENTAL FEATURE"
 msgstr "实验室特性"
 
-#: Client/core/CSettings.cpp:4716
+#: Client/core/CSettings.cpp:4736
 msgid "Please enter a nickname"
 msgstr "请输入一个昵称"
 
-#: Client/core/CSettings.cpp:4717
+#: Client/core/CSettings.cpp:4737
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
 msgstr "请输入一个在游戏里面使用的昵称      \n"
 " 这将会在你登陆服务器时显示"
 
-#: Client/core/CSettings.cpp:4735
+#: Client/core/CSettings.cpp:4755
 msgid "Very experimental feature."
 msgstr "大量实验性功能."
 
-#: Client/core/CSettings.cpp:4737
+#: Client/core/CSettings.cpp:4757
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
 msgstr "停止CJ的跳舞命令 (将会增加65MB内存占用)"
 
-#: Client/core/CSettings.cpp:4739
+#: Client/core/CSettings.cpp:4759
 msgid "Older routers may require a slower scan speed."
 msgstr "比较老的路由会降慢扫描的速度"
 
-#: Client/core/CSettings.cpp:4741
+#: Client/core/CSettings.cpp:4761
 msgid "Switch on to use only one connection when downloading."
 msgstr "打开将会启用单线程下载"
 
-#: Client/core/CSettings.cpp:4743
+#: Client/core/CSettings.cpp:4763
 msgid "Tag network packets to help ISPs identify MTA traffic."
 msgstr "标记网络包以帮助ISP识别MTA流量"
 
-#: Client/core/CSettings.cpp:4745
+#: Client/core/CSettings.cpp:4765
 msgid "Spinning circle animation at the bottom of the screen"
 msgstr "在屏幕底部显示旋转圈圈动画"
 
-#: Client/core/CSettings.cpp:4747
+#: Client/core/CSettings.cpp:4767
 msgid "Select default always. (This setting is not saved)"
 msgstr "总是设为默认值. (不保存设置)"
 
-#: Client/core/CSettings.cpp:4749
+#: Client/core/CSettings.cpp:4769
 msgid "Maximum is usually best"
 msgstr "数值最大通常是最好的"
 
-#: Client/core/CSettings.cpp:4751 Client/core/CSettings.cpp:4753
+#: Client/core/CSettings.cpp:4771 Client/core/CSettings.cpp:4773
 msgid "Auto updater:"
 msgstr "自动更新:"
 
-#: Client/core/CSettings.cpp:4751
+#: Client/core/CSettings.cpp:4771
 msgid "Select default unless you like filling out bug reports."
 msgstr "如果你喜欢发送错误报告就可以不选择默认."
 
-#: Client/core/CSettings.cpp:4753
+#: Client/core/CSettings.cpp:4773
 msgid "Select default to automatically install important updates."
 msgstr "选项默认安装重要更新"
 
-#: Client/core/CSettings.cpp:4755
+#: Client/core/CSettings.cpp:4775
 msgid "16-bit color:"
 msgstr "16位色"
 
-#: Client/core/CSettings.cpp:4755
+#: Client/core/CSettings.cpp:4775
 msgid "Enable 16 bit color modes - Requires MTA restart"
 msgstr "启动16位色模式 -需要重启MTA"
 
-#: Client/core/CSettings.cpp:4757
+#: Client/core/CSettings.cpp:4777
 msgid "Mouse fix:"
 msgstr "鼠标修正:"
 
-#: Client/core/CSettings.cpp:4757
+#: Client/core/CSettings.cpp:4777
 msgid "Mouse movement fix - May need PC restart"
 msgstr "鼠标移动修正 - 可能需要重启计算机"
 
@@ -1928,8 +1928,8 @@ msgstr "请使用 mtasa:// 协议格式!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:602
-#: Client/mods/deathmatch/logic/CClientGame.cpp:700
+#: Client/mods/deathmatch/logic/CClientGame.cpp:606
+#: Client/mods/deathmatch/logic/CClientGame.cpp:704
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr "无效的昵称! 请去设置画面那里设定一个新昵称!"
 
@@ -2756,249 +2756,249 @@ msgstr "所有"
 msgid "Start"
 msgstr "开启"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:618
+#: Client/mods/deathmatch/logic/CClientGame.cpp:622
 msgid "Entering the game ..."
 msgstr "进入游戏中 ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:676
+#: Client/mods/deathmatch/logic/CClientGame.cpp:680
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
 msgstr "未连接; 请使用快速连接或者 'connect' 命令来连接服务器."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:722
+#: Client/mods/deathmatch/logic/CClientGame.cpp:726
 msgid "The server is not installed"
 msgstr "服务器未被安装"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:732
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:736
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1210
 msgid "Local Server"
 msgstr "本地服务器"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:732
+#: Client/mods/deathmatch/logic/CClientGame.cpp:736
 msgid "Starting local server ..."
 msgstr "正在启用本地服务器 ..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1041
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1141
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr "您已经被踢出游戏 ( %s )"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1110
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1210
 msgid "Connecting to local server..."
 msgstr "正在连接到本地服务器..."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1121
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
 msgid "Error connecting to server."
 msgstr "连接到服务器时发生错误."
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1131
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
 msgid "Connecting to local server timed out. See console for details."
 msgstr "连接本地服务器超时.请在console中查看详细内容"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1237
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
 msgid "Connection with the server was lost"
 msgstr "与服务器丢失连接"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1364
 msgid "Disconnected: the server is currently full"
 msgstr "断开连接:服务器满载"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1276
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1376
 msgid "Disconnected: invalid password specified"
 msgstr "断开连接: 无效的密码"
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1298
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
 msgid "MTA Client verification failed!"
 msgstr "MTA客户端验证失败!"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:487
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:505
 msgid "Disconnected: Invalid nickname"
 msgstr "断开连接: 无效的昵称"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:491
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
 msgid "Disconnect from server"
 msgstr "与服务器断开连接"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:495
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
 msgstr "断开连接: 序列号被封禁.\n"
 "原因: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:501
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
 msgstr "断开连接: 您被封禁.\n"
 "原因: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
 msgstr "断开连接: 账号被封禁.\n"
 "原因: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:512
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
 msgid "Disconnected: Version mismatch"
 msgstr "断开连接: 游戏版本不对应"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:516
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:534
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
 msgstr "断开连接: 过多玩家同时进入服务器,请等候几分钟后再进入."
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:538
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
 msgstr "断开连接: 服务器来自不同的分支.\n"
 "相关信息: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:543
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
 msgstr "断开连接: 版本已损坏.\n"
 "相关信息: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
 msgstr "断开连接: 用户版本比服务器版本旧.\n"
 "相关信息: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
 msgstr "断开连接: 用户版本比服务器版本新.\n"
 "相关信息: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:540
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:558
 msgid "Disconnected: Nick already in use"
 msgstr "断开连接: 昵称已有人使用"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
 msgid "Disconnected: Player element could not be created."
 msgstr "断开连接：无法创建玩家元素。"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
 msgstr "断开连接: 服务器拒绝连接: %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
 msgid "Disconnected: Serial verification failed"
 msgstr "断开连接: 序列验证失败"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:557
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
 #, c-format
 msgid "Disconnected: Connection desync %s"
 msgstr "断开连接: 数据不同步 %s"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:584
 #, c-format
 msgid "Disconnected: You were kicked by %s"
 msgstr "断开连接: 您已经被 %s 踢出服务器(KICKED)"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
 #, c-format
 msgid "Disconnected: You were banned by %s"
 msgstr "断开连接: 您已经被 %s 禁止进入服务器"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:582
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 msgid "Disconnected: Server shutdown or restarting"
 msgstr "断开连接：服务器已关闭或重启"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
 msgid "You were kicked from the game"
 msgstr "您已经被踢出游戏"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:603
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:614
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta_sa.exe"
 msgstr "此服务器要求未修改的 gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:604
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:615
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Please replace gta_sa.exe"
 msgstr "请替换 gta_sa.exe"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:605
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 msgid "This server does not allow custom D3D9.DLLs"
 msgstr "此服务器不允许使用 自定义的D3D9.DLLs"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:606
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
 msgstr "从 GTA 目录中删除 D3D9.DLL 并 重新启动 MTA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:607
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow virtual machines"
 msgstr "此服务器不允许使用 虚拟机"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:608
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "This server requires driver signing to be enabled"
 msgstr "此服务器要求启用驱动程序签名"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:609
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "Please restart your PC"
 msgstr "重启你的电脑"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:610
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server has detected missing anti-cheat components"
 msgstr "此服务器检测到缺少反作弊组件"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:611
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Try restarting MTA"
 msgstr "尝试重启MTA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:612
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
 msgstr "此服务器要求 原版的 gta3.img 和 gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:613
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Please replace gta3.img or gta_int.img"
 msgstr "请替换 gta3.img 或 gta_int.img"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:616
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server does not allow Wine"
 msgstr "此服务器不允许使用 Linux Wine"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:617
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Ensure no other program is modifying MTA:SA"
 msgstr "确保没有其他程序正在修改 MTA:SA"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
 msgid "Time Remaining: "
 msgstr "剩余时间"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:641
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d 天"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:643
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d 时"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:645
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d 分"
 
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:647
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d 秒"
 
 #. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
 msgid "Disconnected"
 msgstr "断开连接"
 
