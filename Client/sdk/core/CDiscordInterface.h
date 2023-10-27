@@ -9,6 +9,9 @@
  *****************************************************************************/
 
 #pragma once
+//#define DISCORD_DISABLE_IO_THREAD
+// Uncomment to use manuall refresh of discord connection
+// (important) Don't forget to write same in discord-rpc.h
 
 class CDiscordInterface
 {
@@ -29,4 +32,8 @@ public:
     virtual bool SetDiscordRPCEnabled(bool bEnabled = false) = 0;
     virtual bool IsDiscordRPCEnabled() const = 0;
     virtual bool IsDiscordCustomDetailsDisallowed() const = 0;
+
+#ifdef DISCORD_DISABLE_IO_THREAD
+    virtual void UpdatePresenceConnection() = 0;
+#endif
 };

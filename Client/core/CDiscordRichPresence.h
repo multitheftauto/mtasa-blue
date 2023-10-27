@@ -41,9 +41,9 @@ public:
     bool IsDiscordRPCEnabled() const;
     bool SetApplicationID(const char* szAppID);
 
-    // void SetPresenceTimestamp();
-    // void SetPresenceImage();
-    // void SetPresenceText();
+#ifdef DISCORD_DISABLE_IO_THREAD
+    void UpdatePresenceConnection();
+#endif
 
 private:
     std::string m_strDiscordAppId;

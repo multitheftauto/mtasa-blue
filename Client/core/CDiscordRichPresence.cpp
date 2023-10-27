@@ -254,3 +254,10 @@ void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax)
     m_iPartySize = iSize;
     m_iPartyMax = iMax;
 }
+
+#ifdef DISCORD_DISABLE_IO_THREAD
+void CDiscordRichPresence::UpdatePresenceConnection()
+{
+    Discord_UpdateConnection();
+}
+#endif

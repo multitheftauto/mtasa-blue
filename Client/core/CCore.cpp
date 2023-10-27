@@ -1346,6 +1346,10 @@ void CCore::DoPostFramePulse()
         {
             discord->UpdatePresence();
             m_timeDiscordAppLastUpdate = ticks;
+#ifdef DISCORD_DISABLE_IO_THREAD
+            // Update manually if we're not using the IO thread
+            discord->UpdatePresenceConnection();
+#endif
         }
     }
 
