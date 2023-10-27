@@ -24,7 +24,7 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresenceEndTime", ArgumentParser<SetEndTime>},
         {"setDiscordRichPresencePartySize", ArgumentParser<SetPartySize>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
-        {"isDiscordRichPresenceConnected", ArgumentParser < IsDiscordRPCConnected>},
+        {"isDiscordRichPresenceConnected", ArgumentParser <IsDiscordRPCConnected>},
 
     };
 
@@ -178,7 +178,7 @@ bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
     if (discord->IsDiscordCustomDetailsDisallowed())
         return false;
 
-    discord->SetPresencePartySize(iSize, iMax);
+    discord->SetPresencePartySize(iSize, iMax, true);
     return true;
 }
 

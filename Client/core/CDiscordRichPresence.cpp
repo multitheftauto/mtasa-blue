@@ -77,6 +77,9 @@ void CDiscordRichPresence::SetDefaultData()
 
     m_iPartySize = 0;
     m_iPartyMax = 0;
+
+    m_iPlayersCount = 0;
+    m_iMaxPlayers = 0;
 }
 
 void CDiscordRichPresence::UpdatePresence()
@@ -111,8 +114,8 @@ void CDiscordRichPresence::UpdatePresence()
         discordPresence.buttons = buttons;
     }
 
-    discordPresence.partySize = (m_bDisallowCustomDetails) ? 0 : m_iPartySize;
-    discordPresence.partyMax = (m_bDisallowCustomDetails) ? 0 : m_iPartyMax;
+    discordPresence.partySize = (m_bDisallowCustomDetails) ? m_iPlayersCount : m_iPartySize;
+    discordPresence.partyMax = (m_bDisallowCustomDetails) ? m_iMaxPlayers : m_iPartyMax;
 
     Discord_UpdatePresence(&discordPresence);
     m_bUpdateRichPresence = false;
@@ -249,10 +252,18 @@ bool CDiscordRichPresence::IsDiscordCustomDetailsDisallowed() const
     return m_bDisallowCustomDetails;
 }
 
-void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax)
+void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax, bool bCustom)
 {
-    m_iPartySize = iSize;
-    m_iPartyMax = iMax;
+    if (bCustom)
+    {
+        m_iPartySize = iSize;
+        m_iPartyMax = iMax;
+    }
+    else
+    {
+        m_iPlayersCount = iSize;
+        m_iMaxPlayers = iMax;
+    }
 }
 
 #ifdef DISCORD_DISABLE_IO_THREAD

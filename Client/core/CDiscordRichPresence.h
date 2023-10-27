@@ -35,7 +35,7 @@ public:
     bool SetPresenceState(const char* szState, bool bCustom = false);
     bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
     bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl);
-    void SetPresencePartySize(int iSize, int iMax);
+    void SetPresencePartySize(int iSize, int iMax, bool bCustom = false);
     bool SetDiscordRPCEnabled(bool bEnabled);
     bool IsDiscordCustomDetailsDisallowed() const;
     bool IsDiscordRPCEnabled() const;
@@ -69,4 +69,7 @@ private:
 
     int m_iPartySize;
     int m_iPartyMax;
+
+    int m_iPlayersCount;
+    int m_iMaxPlayers;
 };

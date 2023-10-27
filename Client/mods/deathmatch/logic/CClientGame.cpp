@@ -1054,6 +1054,7 @@ void CClientGame::DoPulsePostFrame()
                     discord->SetPresenceState("In-game", false);
                 }
 
+                discord->SetPresencePartySize(m_pPlayerManager->Count(), g_pClientGame->GetServerInfo()->GetMaxPlayers(), false);
                 m_timeLastDiscordStateUpdate = ticks;
             }
         }
