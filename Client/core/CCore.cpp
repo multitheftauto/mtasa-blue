@@ -44,6 +44,7 @@ template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
 static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
@@ -158,6 +159,7 @@ CCore::CCore()
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+    m_timeDiscordAppLastUpdate = 0;
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
@@ -1337,9 +1339,15 @@ void CCore::DoPostFramePulse()
     GetGraphStats()->Draw();
     m_pConnectManager->DoPulse();
 
-    static auto discord = g_pCore->GetDiscord();
-    if (discord && discord->IsDiscordRPCEnabled())
-        discord->UpdatePresence();
+    // Update Discord Rich Presence status
+    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    {
+        if (static auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        {
+            discord->UpdatePresence();
+            m_timeDiscordAppLastUpdate = ticks;
+        }
+    }
 
     TIMING_CHECKPOINT("-CorePostFrame2");
 }

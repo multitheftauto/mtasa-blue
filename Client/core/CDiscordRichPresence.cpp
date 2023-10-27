@@ -45,6 +45,7 @@ void CDiscordRichPresence::InitializeDiscord()
 
 void CDiscordRichPresence::ShutdownDiscord()
 {
+    Discord_ClearPresence();
     Discord_Shutdown();
 }
 
@@ -97,6 +98,7 @@ void CDiscordRichPresence::UpdatePresence()
         (!m_strDiscordAppCustomDetails.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomDetails.c_str() : m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
     discordPresence.endTimestamp = m_uiDiscordAppEnd;
+    discordPresence.instance = 0;
 
     DiscordButton buttons[2];
     if (m_aButtons)
@@ -127,7 +129,6 @@ void CDiscordRichPresence::SetPresenceEndTimestamp(const unsigned long ulEnd)
     m_uiDiscordAppEnd = ulEnd;
     m_bUpdateRichPresence = true;
 }
-
 
 void CDiscordRichPresence::SetAssetLargeData(const char* szAsset, const char* szAssetText)
 {
