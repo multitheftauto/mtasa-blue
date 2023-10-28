@@ -364,6 +364,35 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Setup builtin Lua events
     SetupGlobalLuaEvents();
+
+    // Setup default states for Rich Presence
+    g_vehicleTypePrefixes = {
+        _("Flying a UFO around"),      _("Cruising around"),            _("Riding the waves of"),
+        _("Riding the train in"),      _("Flying around"),              _("Flying around"),
+        _("Riding around"),            _("Monster truckin' around"),    _("Quaddin' around"),
+        _("Bunny hopping around"),     _("Doing weird stuff in")
+    };
+
+    g_playerTaskStates = {
+        {TASK_COMPLEX_JUMP, {true, _("Climbing around in"), TASK_SIMPLE_CLIMB}},
+        {TASK_SIMPLE_GANG_DRIVEBY, {true, _("Doing a drive-by in")}},
+        {TASK_SIMPLE_DRIVEBY_SHOOT, {true, _("Doing a drive-by in")}},
+        {TASK_SIMPLE_DIE, {false, _("Blub blub..."), TASK_SIMPLE_DROWN}},
+        {TASK_SIMPLE_DIE, {false, _("Breathing water"), TASK_SIMPLE_DROWN}},
+        {TASK_SIMPLE_DIE, {true, _("Drowning in"), TASK_SIMPLE_DROWN}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Ducking for cover in"), {}, TASK_SIMPLE_DUCK, TASK_SECONDARY_DUCK}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Fighting in"), {}, TASK_SIMPLE_FIGHT, TASK_SECONDARY_ATTACK}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Throwing fists in"), {}, TASK_SIMPLE_FIGHT, TASK_SECONDARY_ATTACK}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Blastin' fools in"), {}, TASK_SIMPLE_USE_GUN, TASK_SECONDARY_ATTACK}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Shooting up"), {}, TASK_SIMPLE_USE_GUN, TASK_SECONDARY_ATTACK}},
+        {TASK_SIMPLE_JETPACK, {true, _("Jetpacking in")}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Literally on fire in"), {}, TASK_SIMPLE_PLAYER_ON_FIRE, TASK_SECONDARY_PARTIAL_ANIM}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Burning up in"), {}, TASK_SIMPLE_PLAYER_ON_FIRE, TASK_SECONDARY_PARTIAL_ANIM}},
+        {TASK_COMPLEX_IN_WATER, {true, _("Swimming in"), TASK_SIMPLE_SWIM}},
+        {TASK_COMPLEX_IN_WATER, {true, _("Floating around in"), TASK_SIMPLE_SWIM}},
+        {TASK_COMPLEX_IN_WATER, {false, _("Being chased by a shark"), TASK_SIMPLE_SWIM}},
+        {TASK_SIMPLE_CHOKING, {true, _("Choking to death in")}},
+    };
 }
 
 CClientGame::~CClientGame()
@@ -495,7 +524,7 @@ CClientGame::~CClientGame()
     if (discord && discord->IsDiscordRPCEnabled())
     {
         discord->ResetDiscordData();
-        discord->SetPresenceState("Main menu", false);
+        discord->SetPresenceState(_("Main menu"), false);
         discord->UpdatePresence();
     }
 
@@ -970,7 +999,7 @@ void CClientGame::DoPulsePostFrame()
             auto discord = g_pCore->GetDiscord();
 
             if (discord && discord->IsDiscordRPCEnabled())
-            {  
+            {
                 if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
                 {
                     CVector position;
@@ -981,7 +1010,7 @@ void CClientGame::DoPulsePostFrame()
 
                     if (zoneName == "Unknown")
                     {
-                        zoneName = "Area 51";
+                        zoneName = _("Area 51");
                     }
 
                     auto taskManager = pLocalPlayer->GetTaskManager();
@@ -990,7 +1019,7 @@ void CClientGame::DoPulsePostFrame()
                     bool useZoneName = true;
 
                     const eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
-                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : "Walking around ";
+                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : _("Walking around ");
 
                     if (task && task->IsValid())
                     {
@@ -1051,7 +1080,7 @@ void CClientGame::DoPulsePostFrame()
                 }
                 else
                 {
-                    discord->SetPresenceState("In-game", false);
+                    discord->SetPresenceState(_("In-game"), false);
                 }
 
                 discord->SetPresencePartySize(m_pPlayerManager->Count(), g_pClientGame->GetServerInfo()->GetMaxPlayers(), false);
@@ -5660,8 +5689,10 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             auto discord = g_pCore->GetDiscord();
             if (discord->IsDiscordRPCEnabled())
             {
-                static const std::vector<std::string> states{"In a ditch", "En-route to hospital", "Meeting their maker", "Regretting their decisions",
-                                                             "Wasted"};
+                static const std::vector<std::string> states{
+                    _("In a ditch"), _("En-route to hospital"), _("Meeting their maker"),
+                    _("Regretting their decisions"), _("Wasted")
+                };
 
                 const std::string& state = states[rand() % states.size()];
                 discord->SetPresenceState(state.c_str(), false);
