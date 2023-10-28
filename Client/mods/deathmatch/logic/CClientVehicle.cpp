@@ -2692,14 +2692,12 @@ void CClientVehicle::Create()
         if (m_ComponentData.empty())
         {
             // grab our map of components
-            std::map<SString, SVehicleFrame> componentMap = m_pVehicle->GetComponentMap();
-            // get our beginning
-            std::map<SString, SVehicleFrame>::iterator iter = componentMap.begin();
+            auto& componentMap = m_pVehicle->GetComponentMap();
             // loop through all the components.... we don't care about the RwFrame we just want the names.
-            for (; iter != componentMap.end(); iter++)
+            for (const auto& iter : componentMap)
             {
-                const SString&       strName = iter->first;
-                const SVehicleFrame& frame = iter->second;
+                const SString&       strName = (&iter)->first;
+                const SVehicleFrame& frame = (&iter)->second;
 
                 SVehicleComponentData vehicleComponentData;
 
@@ -2707,20 +2705,20 @@ void CClientVehicle::Create()
                 if (!frame.frameList.empty())
                 {
                     RwFrame* pParentRwFrame = frame.frameList.back();
-                    for (std::map<SString, SVehicleFrame>::const_iterator iter2 = componentMap.begin(); iter2 != componentMap.end(); iter2++)
+                    for (const auto& iter2 : componentMap)
                     {
-                        if (iter2->second.pFrame == pParentRwFrame)
+                        if ((&iter2)->second.pFrame == pParentRwFrame)
                         {
-                            vehicleComponentData.m_strParentName = iter2->first;
+                            vehicleComponentData.m_strParentName = (&iter2)->first;
                             break;
                         }
                     }
                 }
 
                 // Grab our start position
-                GetComponentPosition((*iter).first, vehicleComponentData.m_vecComponentPosition);
-                GetComponentRotation((*iter).first, vehicleComponentData.m_vecComponentRotation);
-                GetComponentScale((*iter).first, vehicleComponentData.m_vecComponentScale);
+                GetComponentPosition(iter.first, vehicleComponentData.m_vecComponentPosition);
+                GetComponentRotation(iter.first, vehicleComponentData.m_vecComponentRotation);
+                GetComponentScale(iter.first, vehicleComponentData.m_vecComponentScale);
 
                 // copy it into our original positions
                 vehicleComponentData.m_vecOriginalComponentPosition = vehicleComponentData.m_vecComponentPosition;
@@ -2728,56 +2726,56 @@ void CClientVehicle::Create()
                 vehicleComponentData.m_vecOriginalComponentScale = vehicleComponentData.m_vecComponentScale;
 
                 // insert it into our component data list
-                m_ComponentData.insert(std::pair<SString, SVehicleComponentData>((*iter).first, vehicleComponentData));
+                m_ComponentData.insert(std::pair<SString, SVehicleComponentData>(iter.first, vehicleComponentData));
 
                 // # prefix means hidden by default.
-                if ((*iter).first[0] == '#')
+                if (iter.first[0] == '#')
                 {
-                    SetComponentVisible((*iter).first, false);
+                    SetComponentVisible(iter.first, false);
                 }
             }
         }
 
         // Loop through our component data
-        for (const auto& iter : m_ComponentData)
+        for (const auto& component : m_ComponentData)
         {
             // store our string in a temporary variable
-            SString strTemp = iter.first;
+            SString strTemp = component.first;
             // get our poisition and rotation and store it into
-            // GetComponentPosition(strTemp, (*iter).second.m_vecComponentPosition);
-            // GetComponentRotation(strTemp, (*iter).second.m_vecComponentRotation);
+            // GetComponentPosition(strTemp, component.second.m_vecComponentPosition);
+            // GetComponentRotation(strTemp, component.second.m_vecComponentRotation);
             // is our position changed?
-            if (iter.second.m_bPositionChanged)
+            if (component.second.m_bPositionChanged)
             {
                 // Make sure it's different
-                if (iter.second.m_vecOriginalComponentPosition != iter.second.m_vecComponentPosition)
+                if (component.second.m_vecOriginalComponentPosition != component.second.m_vecComponentPosition)
                 {
                     // apply our new position
-                    SetComponentPosition(strTemp, iter.second.m_vecComponentPosition);
+                    SetComponentPosition(strTemp, component.second.m_vecComponentPosition);
                 }
             }
             // is our rotation changed?
-            if (iter.second.m_bRotationChanged)
+            if (component.second.m_bRotationChanged)
             {
                 // Make sure it's different
-                if (iter.second.m_vecOriginalComponentRotation != iter.second.m_vecComponentRotation)
+                if (component.second.m_vecOriginalComponentRotation != component.second.m_vecComponentRotation)
                 {
                     // apple our new rotation
-                    SetComponentRotation(strTemp, iter.second.m_vecComponentRotation);
+                    SetComponentRotation(strTemp, component.second.m_vecComponentRotation);
                 }
             }
             // is our scale changed?
-            if (iter.second.m_bScaleChanged)
+            if (component.second.m_bScaleChanged)
             {
                 // Make sure it's different
-                if (iter.second.m_vecOriginalComponentScale != iter.second.m_vecComponentScale)
+                if (component.second.m_vecOriginalComponentScale != component.second.m_vecComponentScale)
                 {
                     // apple our new scale
-                    SetComponentScale(strTemp, iter.second.m_vecComponentScale);
+                    SetComponentScale(strTemp, component.second.m_vecComponentScale);
                 }
             }
             // set our visibility
-            SetComponentVisible(strTemp, iter.second.m_bVisible);
+            SetComponentVisible(strTemp, component.second.m_bVisible);
         }
         // store our spawn position in case we fall through the map
         m_matCreate = m_Matrix;
