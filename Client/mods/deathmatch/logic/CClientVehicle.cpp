@@ -810,13 +810,13 @@ void CClientVehicle::Fix()
     SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
     for (size_t i = 0; i < MAX_DOORS; i++)
-        SetDoorStatus(i, ucDoorStates[i], true);
+        SetDoorStatus(static_cast<unsigned char>(i), ucDoorStates[i], true);
     for (size_t i = 0; i < MAX_PANELS; i++)
-        SetPanelStatus(i, 0);
+        SetPanelStatus(static_cast<unsigned char>(i), 0);
     for (size_t i = 0; i < MAX_LIGHTS; i++)
-        SetLightStatus(i, 0);
+        SetLightStatus(static_cast<unsigned char>(i), 0);
     for (size_t i = 0; i < MAX_WHEELS; i++)
-        SetWheelStatus(i, 0);
+        SetWheelStatus(static_cast<unsigned char>(i), 0);
 
     // These components get a funny rotation when calling Fix() (unknown reason)
     struct
