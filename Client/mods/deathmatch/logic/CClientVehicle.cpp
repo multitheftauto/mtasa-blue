@@ -1052,7 +1052,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         if (IsLocalEntity() || CClientVehicleManager::IsStandardModel(usModel))
         {
             unsigned short usHandlingModel = usModel;
-            if (CClientVehicleManager::IsStandardModel(usHandlingModel))
+            if (!CClientVehicleManager::IsStandardModel(usHandlingModel))
                 usHandlingModel = m_pModelInfo->GetParentID();
 
             m_pOriginalHandlingEntry = g_pGame->GetHandlingManager()->GetOriginalHandlingData((eVehicleTypes)usHandlingModel);
