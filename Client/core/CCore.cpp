@@ -1342,7 +1342,7 @@ void CCore::DoPostFramePulse()
     // Update Discord Rich Presence status
     if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
     {
-        if (static const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
         {
             discord->UpdatePresence();
             m_timeDiscordAppLastUpdate = ticks;
