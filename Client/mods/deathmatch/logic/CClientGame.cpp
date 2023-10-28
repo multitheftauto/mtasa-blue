@@ -520,7 +520,7 @@ CClientGame::~CClientGame()
     SetCursorEventsEnabled(false);
 
     // Reset discord stuff
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
     if (discord && discord->IsDiscordRPCEnabled())
     {
         discord->ResetDiscordData();
@@ -996,9 +996,9 @@ void CClientGame::DoPulsePostFrame()
         // Check if we need to update the Discord Rich Presence state
         if (const long long ticks = GetTickCount64_(); ticks > m_timeLastDiscordStateUpdate + TIME_DISCORD_UPDATE_RATE)
         {
-            auto discord = g_pCore->GetDiscord();
+            const auto discord = g_pCore->GetDiscord();
 
-            if (discord && discord->IsDiscordRPCEnabled())
+            if (discord && discord->IsDiscordRPCEnabled() && discord->IsDiscordCustomDetailsDisallowed())
             {
                 if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
                 {
@@ -5686,8 +5686,8 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             g_pNet->SendPacket(PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
 
-            auto discord = g_pCore->GetDiscord();
-            if (discord->IsDiscordRPCEnabled())
+            const auto discord = g_pCore->GetDiscord();
+            if (discord && discord->IsDiscordRPCEnabled() && discord->IsDiscordCustomDetailsDisallowed())
             {
                 static const std::vector<std::string> states{
                     _("In a ditch"), _("En-route to hospital"), _("Meeting their maker"),

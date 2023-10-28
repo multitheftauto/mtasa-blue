@@ -3454,7 +3454,7 @@ void CSettings::SaveData()
 
     if (bAllowDiscordRPC)
     {
-        auto discord = g_pCore->GetDiscord();
+        const auto discord = g_pCore->GetDiscord();
 
         if (discord)
         {

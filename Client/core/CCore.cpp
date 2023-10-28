@@ -667,7 +667,7 @@ void CCore::SetConnected(bool bConnected)
 
     if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
     {
-        auto discord = g_pCore->GetDiscord();
+        const auto discord = g_pCore->GetDiscord();
         if (!discord->IsDiscordRPCEnabled())
             discord->SetDiscordRPCEnabled(true);
 
@@ -1342,7 +1342,7 @@ void CCore::DoPostFramePulse()
     // Update Discord Rich Presence status
     if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
     {
-        if (static auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        if (static const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
         {
             discord->UpdatePresence();
             m_timeDiscordAppLastUpdate = ticks;
