@@ -26,7 +26,7 @@ public:
 
     void DeleteAll();
 
-    unsigned short         Count() { return static_cast<unsigned short>(m_List.size()); };
+    size_t                 Count() { return static_cast<size_t>(m_List.size()); };
     static CClientVehicle* Get(ElementID ID);
     CClientVehicle*        GetClosest(CVector& vecPosition, float fRadius);
 

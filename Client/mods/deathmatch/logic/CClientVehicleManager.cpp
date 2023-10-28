@@ -137,9 +137,9 @@ void CClientVehicleManager::DeleteAll()
     // Delete all the vehicles
     m_bCanRemoveFromList = false;
 
-    for (const auto& iter : m_List)
+    for (const auto& pVehicle : m_List)
     {
-        delete iter;
+        delete pVehicle;
     }
 
     // Clear the list
@@ -176,15 +176,15 @@ CClientVehicle* CClientVehicleManager::GetClosest(CVector& vecPosition, float fR
     float           fClosestDistance = 0.0f;
     CVector         vecVehiclePosition;
     CClientVehicle* pClosest = nullptr;
-    for (const auto& iter : m_List)
+    for (const auto& pVehicle : m_List)
     {
-        iter->GetPosition(vecVehiclePosition);
+        pVehicle->GetPosition(vecVehiclePosition);
         const auto fDistance = DistanceBetweenPoints3D(vecPosition, vecVehiclePosition);
         if (fDistance <= fRadius)
         {
-            if (pClosest == nullptr || fDistance < fClosestDistance)
+            if (!pClosest || fDistance < fClosestDistance)
             {
-                pClosest = iter;
+                pClosest = pVehicle;
                 fClosestDistance = fDistance;
             }
         }

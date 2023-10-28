@@ -249,7 +249,7 @@ CClientVehicle::~CClientVehicle()
     }
 
     // And the passenger models
-    for (int i = 0; i < (sizeof(m_pPassengers) / sizeof(CClientPed*)); i++)
+    for (size_t i = 0; i < (sizeof(m_pPassengers) / sizeof(CClientPed*)); i++)
     {
         if (m_pPassengers[i])
         {
@@ -260,7 +260,7 @@ CClientVehicle::~CClientVehicle()
     }
 
     // Occupying passenger models
-    for (int i = 0; i < (sizeof(m_pOccupyingPassengers) / sizeof(CClientPed*)); i++)
+    for (size_t i = 0; i < (sizeof(m_pOccupyingPassengers) / sizeof(CClientPed*)); i++)
     {
         if (m_pOccupyingPassengers[i])
         {
@@ -809,13 +809,13 @@ void CClientVehicle::Fix()
 
     SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
-    for (unsigned char i = 0; i < MAX_DOORS; i++)
+    for (size_t i = 0; i < MAX_DOORS; i++)
         SetDoorStatus(i, ucDoorStates[i], true);
-    for (unsigned char i = 0; i < MAX_PANELS; i++)
+    for (size_t i = 0; i < MAX_PANELS; i++)
         SetPanelStatus(i, 0);
-    for (unsigned char i = 0; i < MAX_LIGHTS; i++)
+    for (size_t i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
-    for (unsigned char i = 0; i < MAX_WHEELS; i++)
+    for (size_t i = 0; i < MAX_WHEELS; i++)
         SetWheelStatus(i, 0);
 
     // These components get a funny rotation when calling Fix() (unknown reason)
@@ -834,50 +834,50 @@ void CClientVehicle::Fix()
             szFixComponentName = fixRotationsList[i].szComponentName;
 
     // Loop through our component data
-    for (const auto& iter : m_ComponentData)
+    for (const auto& component : m_ComponentData)
     {
         // store our string in a temporary variable
-        SString strTemp = iter.first;
+        SString strTemp = component.first;
 
         // Do rotation fix if required
         if (szFixComponentName && strTemp == szFixComponentName)
         {
-            SetComponentRotation(strTemp, iter.second.m_vecComponentRotation);
+            SetComponentRotation(strTemp, component.second.m_vecComponentRotation);
         }
 
         // is our position changed?
-        if (iter.second.m_bPositionChanged)
+        if (component.second.m_bPositionChanged)
         {
             // Make sure it's different
-            if (iter.second.m_vecOriginalComponentPosition != iter.second.m_vecComponentPosition)
+            if (component.second.m_vecOriginalComponentPosition != component.second.m_vecComponentPosition)
             {
                 // apply our new position
-                SetComponentPosition(strTemp, iter.second.m_vecComponentPosition);
+                SetComponentPosition(strTemp, component.second.m_vecComponentPosition);
             }
         }
         // is our rotation changed?
-        if (iter.second.m_bRotationChanged)
+        if (component.second.m_bRotationChanged)
         {
             // Make sure it's different
-            if (iter.second.m_vecOriginalComponentRotation != iter.second.m_vecComponentRotation)
+            if (component.second.m_vecOriginalComponentRotation != component.second.m_vecComponentRotation)
             {
                 // apply our new rotation
-                SetComponentRotation(strTemp, iter.second.m_vecComponentRotation);
+                SetComponentRotation(strTemp, component.second.m_vecComponentRotation);
             }
         }
         // is our scale changed?
-        if (iter.second.m_bScaleChanged)
+        if (component.second.m_bScaleChanged)
         {
             // Make sure it's different
-            if (iter.second.m_vecOriginalComponentScale != iter.second.m_vecComponentScale)
+            if (component.second.m_vecOriginalComponentScale != component.second.m_vecComponentScale)
             {
                 // apply our new rotation
-                SetComponentScale(strTemp, iter.second.m_vecComponentScale);
+                SetComponentScale(strTemp, component.second.m_vecComponentScale);
             }
         }
 
         // set our visibility
-        SetComponentVisible(strTemp, iter.second.m_bVisible);
+        SetComponentVisible(strTemp, component.second.m_bVisible);
     }
 }
 
@@ -3828,10 +3828,8 @@ bool CClientVehicle::HasPoliceRadio()
 
 void CClientVehicle::RemoveAllProjectiles()
 {
-    CClientProjectile* pProjectile = nullptr;
-    for (const auto& iter : m_Projectiles)
+    for (auto& pProjectile : m_Projectiles)
     {
-        pProjectile = iter;
         pProjectile->m_pCreator = nullptr;
         g_pClientGame->GetElementDeleter()->Delete(pProjectile);
     }
