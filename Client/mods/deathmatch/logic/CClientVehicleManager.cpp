@@ -1,18 +1,16 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientVehicleManager.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CClientVehicleManager.cpp
  *  PURPOSE:     Vehicle entity manager class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include <game/TaskCar.h>
-
-using std::list;
-using std::vector;
 
 // List over all vehicles with their passenger max counts
 const SFixedArray<unsigned char, 212> g_ucMaxPassengers = {3, 1,   1,   1,   3,   3, 0,   1,  1, 3, 1, 1,   1, 3, 1, 1,            // 400->415
@@ -69,281 +67,61 @@ CClientVehicleManager::CClientVehicleManager(CClientManager* pManager)
         iVehicleID = i + 400;
         switch (iVehicleID)
         {
-            case 416:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 435:
-            {
-                g_ucVariants[i] = 5;
-                break;
-            }
-            case 450:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 607:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 485:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 433:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 499:
-            {
-                g_ucVariants[i] = 3;
-                break;
-            }
-            case 581:
-            {
-                g_ucVariants[i] = 4;
-                break;
-            }
-            case 424:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 504:
-            {
-                g_ucVariants[i] = 5;
-                break;
-            }
-            case 422:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 482:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 457:
-            {
-                g_ucVariants[i] = 5;
-                break;
-            }
-            case 483:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 415:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 437:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 472:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 521:
-            {
-                g_ucVariants[i] = 4;
-                break;
-            }
-            case 407:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 455:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 434:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 502:
-            {
-                g_ucVariants[i] = 5;
-                break;
-            }
-            case 503:
-            {
-                g_ucVariants[i] = 5;
-                break;
-            }
-            case 571:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 595:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 484:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 500:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 556:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 557:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 423:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 414:
-            {
-                g_ucVariants[i] = 3;
-                break;
-            }
-            case 522:
-            {
-                g_ucVariants[i] = 4;
-                break;
-            }
-            case 470:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 404:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 600:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 413:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 453:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 442:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 440:
-            {
-                g_ucVariants[i] = 5;
-                break;
-            }
-            case 543:
-            {
-                g_ucVariants[i] = 3;
-                break;
-            }
-            case 605:
-            {
-                g_ucVariants[i] = 3;
-                break;
-            }
-            case 428:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 535:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 439:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 506:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 601:
-            {
-                g_ucVariants[i] = 3;
-                break;
-            }
-            case 459:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 449:
-            {
-                g_ucVariants[i] = 3;
-                break;
-            }
-            case 408:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 583:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 552:
-            {
-                g_ucVariants[i] = 1;
-                break;
-            }
-            case 478:
-            {
-                g_ucVariants[i] = 2;
-                break;
-            }
-            case 555:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
-            case 456:
-            {
-                g_ucVariants[i] = 3;
-                break;
-            }
-            case 477:
-            {
-                g_ucVariants[i] = 0;
-                break;
-            }
+            case 416: { g_ucVariants[i] = 1; break; }
+            case 435: { g_ucVariants[i] = 5; break; }
+            case 450: { g_ucVariants[i] = 0; break; }
+            case 607: { g_ucVariants[i] = 2; break; }
+            case 485: { g_ucVariants[i] = 2; break; }
+            case 433: { g_ucVariants[i] = 1; break; }
+            case 499: { g_ucVariants[i] = 3; break; }
+            case 581: { g_ucVariants[i] = 4; break; }
+            case 424: { g_ucVariants[i] = 1; break; }
+            case 504: { g_ucVariants[i] = 5; break; }
+            case 422: { g_ucVariants[i] = 1; break; }
+            case 482: { g_ucVariants[i] = 0; break; }
+            case 457: { g_ucVariants[i] = 5; break; }
+            case 483: { g_ucVariants[i] = 1; break; }
+            case 415: { g_ucVariants[i] = 1; break; }
+            case 437: { g_ucVariants[i] = 1; break; }
+            case 472: { g_ucVariants[i] = 2; break; }
+            case 521: { g_ucVariants[i] = 4; break; }
+            case 407: { g_ucVariants[i] = 2; break; }
+            case 455: { g_ucVariants[i] = 2; break; }
+            case 434: { g_ucVariants[i] = 0; break; }
+            case 502: { g_ucVariants[i] = 5; break; }
+            case 503: { g_ucVariants[i] = 5; break; }
+            case 571: { g_ucVariants[i] = 1; break; }
+            case 595: { g_ucVariants[i] = 1; break; }
+            case 484: { g_ucVariants[i] = 0; break; }
+            case 500: { g_ucVariants[i] = 1; break; }
+            case 556: { g_ucVariants[i] = 2; break; }
+            case 557: { g_ucVariants[i] = 1; break; }
+            case 423: { g_ucVariants[i] = 1; break; }
+            case 414: { g_ucVariants[i] = 3; break; }
+            case 522: { g_ucVariants[i] = 4; break; }
+            case 470: { g_ucVariants[i] = 2; break; }
+            case 404: { g_ucVariants[i] = 0; break; }
+            case 600: { g_ucVariants[i] = 1; break; }
+            case 413: { g_ucVariants[i] = 0; break; }
+            case 453: { g_ucVariants[i] = 1; break; }
+            case 442: { g_ucVariants[i] = 2; break; }
+            case 440: { g_ucVariants[i] = 5; break; }
+            case 543: { g_ucVariants[i] = 3; break; }
+            case 605: { g_ucVariants[i] = 3; break; }
+            case 428: { g_ucVariants[i] = 1; break; }
+            case 535: { g_ucVariants[i] = 1; break; }
+            case 439: { g_ucVariants[i] = 2; break; }
+            case 506: { g_ucVariants[i] = 0; break; }
+            case 601: { g_ucVariants[i] = 3; break; }
+            case 459: { g_ucVariants[i] = 0; break; }
+            case 449: { g_ucVariants[i] = 3; break; }
+            case 408: { g_ucVariants[i] = 0; break; }
+            case 583: { g_ucVariants[i] = 1; break; }
+            case 552: { g_ucVariants[i] = 1; break; }
+            case 478: { g_ucVariants[i] = 2; break; }
+            case 555: { g_ucVariants[i] = 0; break; }
+            case 456: { g_ucVariants[i] = 3; break; }
+            case 477: { g_ucVariants[i] = 0; break; }
         }
     }
 }
@@ -358,10 +136,10 @@ void CClientVehicleManager::DeleteAll()
 {
     // Delete all the vehicles
     m_bCanRemoveFromList = false;
-    vector<CClientVehicle*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+
+    for (const auto& iter : m_List)
     {
-        delete *iter;
+        delete iter;
     }
 
     // Clear the list
@@ -371,7 +149,6 @@ void CClientVehicleManager::DeleteAll()
 
 void CClientVehicleManager::DoPulse()
 {
-    CClientVehicle* pVehicle = NULL;
     // Loop through our streamed-in vehicles
     for (uint i = 0; i < m_StreamedIn.size(); i++)
     {
@@ -385,30 +162,29 @@ void CClientVehicleManager::DoPulse()
 CClientVehicle* CClientVehicleManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
-    CClientEntity* pEntity = CElementIDs::GetElement(ID);
+    auto pEntity = CElementIDs::GetElement(ID);
     if (pEntity && pEntity->GetType() == CCLIENTVEHICLE)
     {
         return static_cast<CClientVehicle*>(pEntity);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 CClientVehicle* CClientVehicleManager::GetClosest(CVector& vecPosition, float fRadius)
 {
-    float                                   fClosestDistance = 0.0f;
-    CVector                                 vecVehiclePosition;
-    CClientVehicle*                         pClosest = NULL;
-    vector<CClientVehicle*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+    float           fClosestDistance = 0.0f;
+    CVector         vecVehiclePosition;
+    CClientVehicle* pClosest = nullptr;
+    for (const auto& iter : m_List)
     {
-        (*iter)->GetPosition(vecVehiclePosition);
-        float fDistance = DistanceBetweenPoints3D(vecPosition, vecVehiclePosition);
+        iter->GetPosition(vecVehiclePosition);
+        const auto fDistance = DistanceBetweenPoints3D(vecPosition, vecVehiclePosition);
         if (fDistance <= fRadius)
         {
-            if (pClosest == NULL || fDistance < fClosestDistance)
+            if (pClosest == nullptr || fDistance < fClosestDistance)
             {
-                pClosest = *iter;
+                pClosest = iter;
                 fClosestDistance = fDistance;
             }
         }
@@ -416,29 +192,29 @@ CClientVehicle* CClientVehicleManager::GetClosest(CVector& vecPosition, float fR
     return pClosest;
 }
 
-bool CClientVehicleManager::IsTrainModel(unsigned long ulModel)
+bool CClientVehicleManager::IsTrainModel(unsigned short usModel)
 {
-    return (ulModel == 449 || ulModel == 537 || ulModel == 538 || ulModel == 569 || ulModel == 590 || ulModel == 570);
+    return (usModel == 449 || usModel == 537 || usModel == 538 || usModel == 569 || usModel == 590 || usModel == 570);
 }
 
-bool CClientVehicleManager::IsValidModel(unsigned long ulModel)
+bool CClientVehicleManager::IsValidModel(unsigned short usModel)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
+    const auto pModelInfo = g_pGame->GetModelInfo(usModel);
     return pModelInfo && pModelInfo->IsVehicle();
 }
 
-bool CClientVehicleManager::IsStandardModel(unsigned long ulModel)
+bool CClientVehicleManager::IsStandardModel(unsigned short usModel)
 {
-    return ulModel >= 400 && ulModel <= 611;
+    return usModel >= 400 && usModel <= 611;
 }
 
-eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned long ulModel)
+eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned short usModel)
 {
     // Valid vehicle id?
-    if (IsValidModel(ulModel))
+    if (IsValidModel(usModel))
     {
         // Grab the model info for the current vehicle
-        CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
+        const auto pModelInfo = g_pGame->GetModelInfo(usModel);
         if (pModelInfo)
         {
             // Return the appropriate type
@@ -469,16 +245,16 @@ eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned long ulModel)
     return CLIENTVEHICLE_NONE;
 }
 
-unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
+unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned short usModel)
 {
     // Use parent model ID for non-standard vehicle model IDs.
-    if ((ulModel < 400 || ulModel > 611) && IsValidModel(ulModel))
-        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+    if (!IsStandardModel(usModel) && IsValidModel(usModel))
+        usModel = g_pGame->GetModelInfo(usModel)->GetParentID();
 
     // Valid model?
-    if (IsStandardModel(ulModel))
+    if (IsStandardModel(usModel))
     {
-        return g_ucMaxPassengers[ulModel - 400];
+        return g_ucMaxPassengers[usModel - 400];
     }
 
     // Invalid index
@@ -533,12 +309,12 @@ void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned 
     }
 }
 
-unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex)
+unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned short usModel, unsigned char ucIndex)
 {
-    eClientVehicleType vehicleType = GetVehicleType(ulModel);
+    const eClientVehicleType vehicleType = GetVehicleType(usModel);
 
     // Grab the max passenger count for the given ID
-    unsigned char ucMaxPassengerCount = GetMaxPassengerCount(ulModel);
+    const unsigned char ucMaxPassengerCount = GetMaxPassengerCount(usModel);
     switch (ucMaxPassengerCount)
     {
         // Not passenger seats in this vehicle?
@@ -556,7 +332,7 @@ unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned long ulMode
         // Only one seat?
         case 1:
         {
-            bool bIsBike = (vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_QUADBIKE);
+            const bool bIsBike = (vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_QUADBIKE);
             if (ucIndex == 0)
             {
                 return DOOR_FRONT_LEFT;
@@ -623,44 +399,44 @@ unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned long ulMode
     return 0xFF;
 }
 
-bool CClientVehicleManager::HasTurret(unsigned long ulModel)
+bool CClientVehicleManager::HasTurret(unsigned short usModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TURRENT));
+    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_TURRENT));
 }
 
-bool CClientVehicleManager::HasSirens(unsigned long ulModel)
+bool CClientVehicleManager::HasSirens(unsigned short usModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SIRENS));
+    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_SIRENS));
 }
 
-bool CClientVehicleManager::HasTaxiLight(unsigned long ulModel)
+bool CClientVehicleManager::HasTaxiLight(unsigned short usModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
+    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
 }
 
-bool CClientVehicleManager::HasSearchLight(unsigned long ulModel)
+bool CClientVehicleManager::HasSearchLight(unsigned short usModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SEARCH_LIGHT));
+    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_SEARCH_LIGHT));
 }
 
-bool CClientVehicleManager::HasLandingGears(unsigned long ulModel)
+bool CClientVehicleManager::HasLandingGears(unsigned short usModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_LANDING_GEARS));
+    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_LANDING_GEARS));
 }
 
-bool CClientVehicleManager::HasAdjustableProperty(unsigned long ulModel)
+bool CClientVehicleManager::HasAdjustableProperty(unsigned short usModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
+    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
 }
 
-bool CClientVehicleManager::HasSmokeTrail(unsigned long ulModel)
+bool CClientVehicleManager::HasSmokeTrail(unsigned short usModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
+    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
 }
 
-bool CClientVehicleManager::HasDamageModel(unsigned long ulModel)
+bool CClientVehicleManager::HasDamageModel(unsigned short usModel)
 {
-    return HasDamageModel(GetVehicleType(ulModel));
+    return HasDamageModel(GetVehicleType(usModel));
 }
 
 bool CClientVehicleManager::HasDamageModel(eClientVehicleType Type)
@@ -679,13 +455,13 @@ bool CClientVehicleManager::HasDamageModel(eClientVehicleType Type)
     }
 }
 
-bool CClientVehicleManager::HasDoors(unsigned long ulModel)
+bool CClientVehicleManager::HasDoors(unsigned short usModel)
 {
     bool bHasDoors = false;
 
-    if (HasDamageModel(ulModel) == true)
+    if (HasDamageModel(usModel))
     {
-        switch (ulModel)
+        switch (usModel)
         {
             case VT_BFINJECT:
             case VT_RCBANDIT:
@@ -770,7 +546,7 @@ void CClientVehicleManager::RestreamAllVehicles()
     if (m_StreamedIn.empty())
         return;
 
-    for (auto& pVehicle : m_List)
+    for (const auto& pVehicle : m_List)
     {
         // Streamed in and same vehicle ID?
         if (pVehicle->IsStreamedIn())

@@ -26,30 +26,30 @@ public:
 
     void DeleteAll();
 
-    unsigned int           Count() { return static_cast<unsigned int>(m_List.size()); };
+    unsigned short         Count() { return static_cast<unsigned short>(m_List.size()); };
     static CClientVehicle* Get(ElementID ID);
     CClientVehicle*        GetClosest(CVector& vecPosition, float fRadius);
 
     void DoPulse();
 
-    static bool               IsTrainModel(unsigned long ulModel);
-    static bool               IsValidModel(unsigned long ulModel);
-    static bool               IsStandardModel(unsigned long ulModel);
-    static eClientVehicleType GetVehicleType(unsigned long ulModel);
-    static unsigned char      GetMaxPassengerCount(unsigned long ulModel);
-    static unsigned char      ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex);
+    static bool               IsTrainModel(unsigned short usModel);
+    static bool               IsValidModel(unsigned short usModel);
+    static bool               IsStandardModel(unsigned short usModel);
+    static eClientVehicleType GetVehicleType(unsigned short usModel);
+    static unsigned char      GetMaxPassengerCount(unsigned short usModel);
+    static unsigned char      ConvertIndexToGameSeat(unsigned short usModel, unsigned char ucIndex);
     static void               GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
 
-    static bool HasTurret(unsigned long ulModel);
-    static bool HasSirens(unsigned long ulModel);
-    static bool HasLandingGears(unsigned long ulModel);
-    static bool HasAdjustableProperty(unsigned long ulModel);
-    static bool HasSmokeTrail(unsigned long ulModel);
-    static bool HasTaxiLight(unsigned long ulModel);
-    static bool HasSearchLight(unsigned long ulModel);
-    static bool HasDamageModel(unsigned long ulModel);
-    static bool HasDamageModel(enum eClientVehicleType Type);
-    static bool HasDoors(unsigned long ulModel);
+    static bool HasTurret(unsigned short usModel);
+    static bool HasSirens(unsigned short usModel);
+    static bool HasLandingGears(unsigned short usModel);
+    static bool HasAdjustableProperty(unsigned short usModel);
+    static bool HasSmokeTrail(unsigned short usModel);
+    static bool HasTaxiLight(unsigned short usModel);
+    static bool HasSearchLight(unsigned short usModel);
+    static bool HasDamageModel(unsigned short usModel);
+    static bool HasDamageModel(eClientVehicleType Type);
+    static bool HasDoors(unsigned short usModel);
 
     bool Exists(CClientVehicle* pVehicle);
 

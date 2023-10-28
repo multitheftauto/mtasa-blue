@@ -1562,13 +1562,13 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
 
     // Use parent model ID for non-standard vehicle model IDs.
     // This avoids a mismatch between client and server, ensuring doors and damage sync correctly.
-    int iModelID = pVehicle->GetModel();
-    if (iModelID < 400 || iModelID > 611)
-        iModelID = pVehicle->GetModelInfo()->GetParentID();
+    int iModel = pVehicle->GetModel();
+    if (!CClientVehicleManager::IsStandardModel(iModel))
+        iModel = pVehicle->GetModelInfo()->GetParentID();
 
     // Write the clientside model
     if (BitStream.Version() >= 0x05F)
-        BitStream.Write(iModelID);
+        BitStream.Write(iModel);
 
     // Grab the vehicle position
     CVector vecPosition;

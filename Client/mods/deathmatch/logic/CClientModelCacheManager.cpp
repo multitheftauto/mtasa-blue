@@ -387,9 +387,9 @@ void CClientModelCacheManagerImpl::ProcessVehicleList(std::map<ushort, float>& o
     for (std::vector<CClientVehicle*>::const_iterator iter = vehicleList.begin(); iter != vehicleList.end(); ++iter)
     {
         CClientVehicle* pVehicle = *iter;
-        const ushort    usModelId = pVehicle->GetModel();
+        const ushort    usModel = pVehicle->GetModel();
 
-        if (usModelId < 400 || usModelId > 611)
+        if (!CClientVehicleManager::IsStandardModel(usModel))
             continue;
 
         // Check if currently within distance
@@ -401,8 +401,8 @@ void CClientModelCacheManagerImpl::ProcessVehicleList(std::map<ushort, float>& o
             if (fDistSq < fMaxStreamDistanceSq)
             {
                 // Add model to needed list
-                InsertIntoNeedCacheList(outNeedCacheList, usModelId, fDistSq);
-                AddProcessStat("p", true, PURESYNC_TYPE_NONE, usModelId, vecPosition, vecPosition);
+                InsertIntoNeedCacheList(outNeedCacheList, usModel, fDistSq);
+                AddProcessStat("p", true, PURESYNC_TYPE_NONE, usModel, vecPosition, vecPosition);
                 continue;
             }
         }
@@ -439,11 +439,11 @@ void CClientModelCacheManagerImpl::ProcessVehicleList(std::map<ushort, float>& o
                 if (fDistSq < fMaxStreamDistanceSq)
                 {
                     // Add model to needed list
-                    InsertIntoNeedCacheList(outNeedCacheList, usModelId, fDistSq);
-                    AddProcessStat("l", true, syncType, usModelId, vecPosition, vecNewPosition);
+                    InsertIntoNeedCacheList(outNeedCacheList, usModel, fDistSq);
+                    AddProcessStat("l", true, syncType, usModel, vecPosition, vecNewPosition);
                     continue;
                 }
-                AddProcessStat("n", false, syncType, usModelId, vecPosition, vecNewPosition);
+                AddProcessStat("n", false, syncType, usModel, vecPosition, vecNewPosition);
                 continue;
             }
         }
