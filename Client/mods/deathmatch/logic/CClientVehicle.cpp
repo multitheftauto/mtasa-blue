@@ -2504,7 +2504,7 @@ void CClientVehicle::Create()
             if (m_pPreviousLink && !m_bIsDerailed && !m_pPreviousLink->IsDerailed())
             {
                 m_pVehicle->SetPreviousTrainCarriage(m_pPreviousLink->m_pVehicle);
-                this->SetTrainTrack(m_pPreviousLink->GetTrainTrack());
+                SetTrainTrack(m_pPreviousLink->GetTrainTrack());
                 if (m_pPreviousLink->GetGameVehicle())
                     m_pPreviousLink->GetGameVehicle()->AttachTrainCarriage(m_pVehicle);
             }
