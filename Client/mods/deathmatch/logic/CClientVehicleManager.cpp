@@ -150,9 +150,8 @@ void CClientVehicleManager::DeleteAll()
 void CClientVehicleManager::DoPulse()
 {
     // Loop through our streamed-in vehicles
-    for (uint i = 0; i < m_StreamedIn.size(); i++)
+    for (const auto& pVehicle : m_StreamedIn)
     {
-        CClientVehicle* pVehicle = m_StreamedIn[i];
         // We should have a game vehicle here
         assert(pVehicle->GetGameVehicle());
         pVehicle->StreamedInPulse();
@@ -526,10 +525,8 @@ void CClientVehicleManager::RestreamVehicles(unsigned short usModel)
     if (m_StreamedIn.empty())
         return;
 
-    for (uint i = 0; i < m_List.size(); i++)
+    for (const auto& pVehicle : m_List)
     {
-        CClientVehicle* pVehicle = m_List[i];
-
         // Streamed in and same vehicle ID?
         if (pVehicle->IsStreamedIn() && pVehicle->GetModel() == usModel)
         {
@@ -560,9 +557,8 @@ void CClientVehicleManager::RestreamAllVehicles()
 
 void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
 {
-    for (uint i = 0; i < m_List.size(); i++)
+    for (const auto& pVehicle : m_List)
     {
-        CClientVehicle* pVehicle = m_List[i];
         pVehicle->GetUpgrades()->RestreamVehicleUpgrades(usModel);
     }
 }
