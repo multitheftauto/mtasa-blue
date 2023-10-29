@@ -252,8 +252,8 @@ bool CLuaDiscordDefs::IsDiscordRPCConnected()
 {
     auto discord = g_pCore->GetDiscord();
 
-    if (!discord)
+    if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
 
-    return discord->IsDiscordRPCEnabled();
+    return discord->IsDiscordClientConnected();
 }

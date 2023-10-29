@@ -40,6 +40,13 @@ public:
     bool IsDiscordCustomDetailsDisallowed() const;
     bool IsDiscordRPCEnabled() const;
     bool SetApplicationID(const char* szAppID);
+    void SetDiscordClientConnected(bool bConnected) { m_bConnected = bConnected; };
+    bool IsDiscordClientConnected() const;
+
+    // handlers
+    static void HandleDiscordReady(const struct DiscordUser* pDiscordUser);
+    static void HandleDiscordDisconnected(int iErrorCode, const char* szMessage);
+    static void HandleDiscordError(int iErrorCode, const char* szMessage);
 
 #ifdef DISCORD_DISABLE_IO_THREAD
     void UpdatePresenceConnection();
@@ -66,6 +73,7 @@ private:
     bool m_bDisallowCustomDetails;
     bool m_bDiscordRPCEnabled;
     bool m_bUpdateRichPresence;
+    bool m_bConnected;
 
     int m_iPartySize;
     int m_iPartyMax;

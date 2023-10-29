@@ -673,7 +673,7 @@ void CCore::SetConnected(bool bConnected)
 
         discord->SetPresenceState(bConnected ? _("In-game") : _("Main menu"), false);
         discord->SetPresenceStartTimestamp(0);
-        discord->SetPresenceDetails("");
+        discord->SetPresenceDetails("", false);
 
         if (bConnected)
             discord->SetPresenceStartTimestamp(time(nullptr));
