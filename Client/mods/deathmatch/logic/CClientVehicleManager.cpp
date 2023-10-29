@@ -191,29 +191,29 @@ CClientVehicle* CClientVehicleManager::GetClosest(CVector& vecPosition, float fR
     return pClosest;
 }
 
-bool CClientVehicleManager::IsTrainModel(unsigned short usModel)
+bool CClientVehicleManager::IsTrainModel(unsigned long ulModel)
 {
-    return (usModel == 449 || usModel == 537 || usModel == 538 || usModel == 569 || usModel == 590 || usModel == 570);
+    return (ulModel == 449 || ulModel == 537 || ulModel == 538 || ulModel == 569 || ulModel == 590 || ulModel == 570);
 }
 
-bool CClientVehicleManager::IsValidModel(unsigned short usModel)
+bool CClientVehicleManager::IsValidModel(unsigned long ulModel)
 {
-    const auto pModelInfo = g_pGame->GetModelInfo(usModel);
+    const auto pModelInfo = g_pGame->GetModelInfo(ulModel);
     return pModelInfo && pModelInfo->IsVehicle();
 }
 
-bool CClientVehicleManager::IsStandardModel(unsigned short usModel)
+bool CClientVehicleManager::IsStandardModel(unsigned long ulModel)
 {
-    return usModel >= 400 && usModel <= 611;
+    return ulModel >= 400 && ulModel <= 611;
 }
 
-eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned short usModel)
+eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned long ulModel)
 {
     // Valid vehicle id?
-    if (IsValidModel(usModel))
+    if (IsValidModel(ulModel))
     {
         // Grab the model info for the current vehicle
-        const auto pModelInfo = g_pGame->GetModelInfo(usModel);
+        const auto pModelInfo = g_pGame->GetModelInfo(ulModel);
         if (pModelInfo)
         {
             // Return the appropriate type
@@ -244,32 +244,32 @@ eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned short usModel)
     return CLIENTVEHICLE_NONE;
 }
 
-unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned short usModel)
+unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 {
     // Use parent model ID for non-standard vehicle model IDs.
-    if (!IsStandardModel(usModel) && IsValidModel(usModel))
-        usModel = g_pGame->GetModelInfo(usModel)->GetParentID();
+    if (!IsStandardModel(ulModel) && IsValidModel(ulModel))
+        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
 
     // Valid model?
-    if (IsStandardModel(usModel))
+    if (IsStandardModel(ulModel))
     {
-        return g_ucMaxPassengers[usModel - 400];
+        return g_ucMaxPassengers[ulModel - 400];
     }
 
     // Invalid index
     return 0xFF;
 }
 
-void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
+void CClientVehicleManager::GetRandomVariation(unsigned long ulModel, unsigned char& ucVariant, unsigned char& ucVariant2)
 {
     RandomizeRandomSeed();
     ucVariant = 255;
     ucVariant2 = 255;
     // Valid model?
-    if (IsStandardModel(usModel) && g_ucVariants[usModel - 400] != 255)
+    if (IsStandardModel(ulModel) && g_ucVariants[ulModel - 400] != 255)
     {
         // caddy || cropduster
-        if (usModel == 457 || usModel == 512)
+        if (ulModel == 457 || ulModel == 512)
         {
             // 255, 0, 1, 2
             ucVariant = (rand() % 4) - 1;
@@ -280,14 +280,14 @@ void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned 
             return;
         }
         // Slamvan
-        else if (usModel == 535)
+        else if (ulModel == 535)
         {
             // Slamvan has steering wheel "extras" we want one of those so default cannot be an option.
-            ucVariant = (rand() % (g_ucVariants[usModel - 400] + 1));
+            ucVariant = (rand() % (g_ucVariants[ulModel - 400] + 1));
             return;
         }
         // NRG 500 || BF400
-        else if (usModel == 522 || usModel == 581)
+        else if (ulModel == 522 || ulModel == 581)
         {
             // e.g. 581 ( BF400 )
             // first 3 properties are Exhaust
@@ -304,16 +304,16 @@ void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned 
         // e.g. ( rand () % ( 5 + 2 ) ) - 1
         // Can generate 6 then minus 1 = 5
         // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
-        ucVariant = (rand() % (g_ucVariants[usModel - 400] + 2)) - 1;
+        ucVariant = (rand() % (g_ucVariants[ulModel - 400] + 2)) - 1;
     }
 }
 
-unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned short usModel, unsigned char ucIndex)
+unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex)
 {
-    const eClientVehicleType vehicleType = GetVehicleType(usModel);
+    const eClientVehicleType vehicleType = GetVehicleType(ulModel);
 
     // Grab the max passenger count for the given ID
-    const unsigned char ucMaxPassengerCount = GetMaxPassengerCount(usModel);
+    const unsigned char ucMaxPassengerCount = GetMaxPassengerCount(ulModel);
     switch (ucMaxPassengerCount)
     {
         // Not passenger seats in this vehicle?
@@ -398,44 +398,44 @@ unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned short usMod
     return 0xFF;
 }
 
-bool CClientVehicleManager::HasTurret(unsigned short usModel)
+bool CClientVehicleManager::HasTurret(unsigned long ulModel)
 {
-    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_TURRENT));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TURRENT));
 }
 
-bool CClientVehicleManager::HasSirens(unsigned short usModel)
+bool CClientVehicleManager::HasSirens(unsigned long ulModel)
 {
-    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_SIRENS));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SIRENS));
 }
 
-bool CClientVehicleManager::HasTaxiLight(unsigned short usModel)
+bool CClientVehicleManager::HasTaxiLight(unsigned long ulModel)
 {
-    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
 }
 
-bool CClientVehicleManager::HasSearchLight(unsigned short usModel)
+bool CClientVehicleManager::HasSearchLight(unsigned long ulModel)
 {
-    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_SEARCH_LIGHT));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SEARCH_LIGHT));
 }
 
-bool CClientVehicleManager::HasLandingGears(unsigned short usModel)
+bool CClientVehicleManager::HasLandingGears(unsigned long ulModel)
 {
-    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_LANDING_GEARS));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_LANDING_GEARS));
 }
 
-bool CClientVehicleManager::HasAdjustableProperty(unsigned short usModel)
+bool CClientVehicleManager::HasAdjustableProperty(unsigned long ulModel)
 {
-    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
 }
 
-bool CClientVehicleManager::HasSmokeTrail(unsigned short usModel)
+bool CClientVehicleManager::HasSmokeTrail(unsigned long ulModel)
 {
-    return (IsStandardModel(usModel) && (g_ulVehicleAttributes[usModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
+    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
 }
 
-bool CClientVehicleManager::HasDamageModel(unsigned short usModel)
+bool CClientVehicleManager::HasDamageModel(unsigned long ulModel)
 {
-    return HasDamageModel(GetVehicleType(usModel));
+    return HasDamageModel(GetVehicleType(ulModel));
 }
 
 bool CClientVehicleManager::HasDamageModel(eClientVehicleType Type)
@@ -454,13 +454,13 @@ bool CClientVehicleManager::HasDamageModel(eClientVehicleType Type)
     }
 }
 
-bool CClientVehicleManager::HasDoors(unsigned short usModel)
+bool CClientVehicleManager::HasDoors(unsigned long ulModel)
 {
     bool bHasDoors = false;
 
-    if (HasDamageModel(usModel))
+    if (HasDamageModel(ulModel))
     {
-        switch (usModel)
+        switch (ulModel)
         {
             case VT_BFINJECT:
             case VT_RCBANDIT:
@@ -517,9 +517,9 @@ void CClientVehicleManager::OnDestruction(CClientVehicle* pVehicle)
     ListRemove(m_StreamedIn, pVehicle);
 }
 
-void CClientVehicleManager::RestreamVehicles(unsigned short usModel)
+void CClientVehicleManager::RestreamVehicles(unsigned long ulModel)
 {
-    g_pClientGame->GetModelCacheManager()->OnRestreamModel(usModel);
+    g_pClientGame->GetModelCacheManager()->OnRestreamModel(ulModel);
 
     // This can speed up initial connect
     if (m_StreamedIn.empty())
@@ -528,7 +528,7 @@ void CClientVehicleManager::RestreamVehicles(unsigned short usModel)
     for (const auto& pVehicle : m_List)
     {
         // Streamed in and same vehicle ID?
-        if (pVehicle->IsStreamedIn() && pVehicle->GetModel() == usModel)
+        if (pVehicle->IsStreamedIn() && pVehicle->GetModel() == ulModel)
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually
@@ -555,10 +555,10 @@ void CClientVehicleManager::RestreamAllVehicles()
     }
 }
 
-void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
+void CClientVehicleManager::RestreamVehicleUpgrades(unsigned long ulModel)
 {
     for (const auto& pVehicle : m_List)
     {
-        pVehicle->GetUpgrades()->RestreamVehicleUpgrades(usModel);
+        pVehicle->GetUpgrades()->RestreamVehicleUpgrades(ulModel);
     }
 }
