@@ -106,7 +106,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_bSireneOrAlarmActive = false;
     m_bLandingGearDown = true;
     m_usAdjustablePropertyValue = 0;
-    for (unsigned char i = 0; i < MAX_DOORS; ++i)
+    for (size_t i = 0; i < MAX_DOORS; ++i)
     {
         m_bAllowDoorRatioSetting[i] = true;
         m_fDoorOpenRatio[i] = 0.0f;
@@ -169,7 +169,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_cNitroCount = 0;
     m_fWheelScale = 1.0f;
 
-    for (unsigned char i = 0; i < MAX_WINDOWS; ++i)
+    for (size_t i = 0; i < MAX_WINDOWS; ++i)
     {
         m_bWindowOpen[i] = false;
     }
@@ -619,10 +619,10 @@ void CClientVehicle::SetDoorOpenRatioInterpolated(unsigned char ucDoor, float fR
 
 void CClientVehicle::ResetDoorInterpolation()
 {
-    for (unsigned char i = 0; i < MAX_DOORS; ++i)
+    for (size_t i = 0; i < MAX_DOORS; ++i)
     {
         if (m_doorInterp.ulTargetTime[i] != 0)
-            SetDoorOpenRatio(i, m_doorInterp.fTarget[i], 0, true);
+            SetDoorOpenRatio(static_cast<unsigned char>(i), m_doorInterp.fTarget[i], 0, true);
         m_doorInterp.ulTargetTime[i] = 0;
     }
 }
@@ -636,14 +636,14 @@ void CClientVehicle::ProcessDoorInterpolation()
 {
     const auto ulTime = CClientTime::GetTime();
 
-    for (unsigned char i = 0; i < MAX_DOORS; ++i)
+    for (size_t i = 0; i < MAX_DOORS; ++i)
     {
         if (m_doorInterp.ulTargetTime[i] != 0)
         {
             if (m_doorInterp.ulTargetTime[i] <= ulTime)
             {
                 // Interpolation finished.
-                SetDoorOpenRatio(i, m_doorInterp.fTarget[i], 0, true);
+                SetDoorOpenRatio(static_cast<unsigned char>(i), m_doorInterp.fTarget[i], 0, true);
                 m_doorInterp.ulTargetTime[i] = 0;
             }
             else
@@ -652,7 +652,7 @@ void CClientVehicle::ProcessDoorInterpolation()
                 const auto  ulDelay = m_doorInterp.ulTargetTime[i] - m_doorInterp.ulStartTime[i];
                 const float fStep = ulElapsedTime / (float)ulDelay;
                 const float fRatio = SharedUtil::Lerp(m_doorInterp.fStart[i], fStep, m_doorInterp.fTarget[i]);
-                SetDoorOpenRatio(i, fRatio, 0, true);
+                SetDoorOpenRatio(static_cast<unsigned char>(i), fRatio, 0, true);
             }
         }
     }
@@ -2078,11 +2078,11 @@ void CClientVehicle::StreamedInPulse()
                 // Set the damage model doors
                 const auto pDamageManager = m_pVehicle->GetDamageManager();
 
-                for (unsigned char i = 0; i < MAX_DOORS; i++)
+                for (size_t i = 0; i < MAX_DOORS; i++)
                     pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], true);
-                for (unsigned char i = 0; i < MAX_PANELS; i++)
+                for (size_t i = 0; i < MAX_PANELS; i++)
                     pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i]);
-                for (unsigned char i = 0; i < MAX_LIGHTS; i++)
+                for (size_t i = 0; i < MAX_LIGHTS; i++)
                     pDamageManager->SetLightStatus(static_cast<eLights>(i), m_ucLightStates[i]);
             }
 
@@ -2303,9 +2303,9 @@ void CClientVehicle::StreamedInPulse()
         // Update doors
         if (CClientVehicleManager::HasDoors(GetModel()))
         {
-            for (unsigned char i = 0; i < MAX_DOORS; ++i)
+            for (size_t i = 0; i < MAX_DOORS; ++i)
             {
-                const auto pDoor = m_pVehicle->GetDoor(i);
+                const auto pDoor = m_pVehicle->GetDoor(static_cast<unsigned char>(i));
                 if (pDoor)
                     m_fDoorOpenRatio[i] = pDoor->GetAngleOpenRatio();
             }
@@ -2449,11 +2449,11 @@ void CClientVehicle::Create()
         if (m_tSirenBeaconInfo.m_bOverrideSirens)
         {
             GiveVehicleSirens(m_tSirenBeaconInfo.m_ucSirenType, m_tSirenBeaconInfo.m_ucSirenCount);
-            for (unsigned char i = 0; i < m_tSirenBeaconInfo.m_ucSirenCount; i++)
+            for (size_t i = 0; i < m_tSirenBeaconInfo.m_ucSirenCount; i++)
             {
-                m_pVehicle->SetVehicleSirenPosition(i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions);
-                m_pVehicle->SetVehicleSirenMinimumAlpha(i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_dwMinSirenAlpha);
-                m_pVehicle->SetVehicleSirenColour(i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour);
+                m_pVehicle->SetVehicleSirenPosition(static_cast<unsigned char>(i), m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions);
+                m_pVehicle->SetVehicleSirenMinimumAlpha(static_cast<unsigned char>(i), m_tSirenBeaconInfo.m_tSirenInfo[i].m_dwMinSirenAlpha);
+                m_pVehicle->SetVehicleSirenColour(static_cast<unsigned char>(i), m_tSirenBeaconInfo.m_tSirenInfo[i].m_RGBBeaconColour);
             }
             SetVehicleFlags(m_tSirenBeaconInfo.m_b360Flag, m_tSirenBeaconInfo.m_bUseRandomiser, m_tSirenBeaconInfo.m_bDoLOSCheck,
                             m_tSirenBeaconInfo.m_bSirenSilent);
@@ -2559,15 +2559,15 @@ void CClientVehicle::Create()
             m_pVehicle->SetTurretRotation(m_fTurretHorizontal, m_fTurretVertical);
         }
 
-        for (unsigned char i = 0; i < MAX_WHEELS; i++)
-            SetWheelStatus(i, m_ucWheelStates[i], true);
+        for (size_t i = 0; i < MAX_WHEELS; i++)
+            SetWheelStatus(static_cast<unsigned char>(i), m_ucWheelStates[i], true);
 
         // Eventually warp driver back in
         if (m_pDriver)
             m_pDriver->WarpIntoVehicle(this, 0);
 
         // Warp the passengers back in
-        for (unsigned char i = 0; i < 8; i++)
+        for (size_t i = 0; i < 8; i++)
         {
             if (m_pPassengers[i])
             {
@@ -2645,11 +2645,11 @@ void CClientVehicle::Create()
         ResetInterpolation();
         ResetDoorInterpolation();
 
-        for (unsigned char i = 0; i < MAX_DOORS; ++i)
-            SetDoorOpenRatio(i, m_fDoorOpenRatio[i], 0, true);
+        for (size_t i = 0; i < MAX_DOORS; ++i)
+            SetDoorOpenRatio(static_cast<unsigned char>(i), m_fDoorOpenRatio[i], 0, true);
 
-        for (unsigned char i = 0; i < MAX_WINDOWS; ++i)
-            SetWindowOpen(i, m_bWindowOpen[i]);
+        for (size_t i = 0; i < MAX_WINDOWS; ++i)
+            SetWindowOpen(static_cast<unsigned char>(i), m_bWindowOpen[i]);
 
         // Re-apply handling entry
         if (m_pHandlingEntry)
@@ -2853,16 +2853,16 @@ void CClientVehicle::Destroy()
             // Grab the damage model
             const auto pDamageManager = m_pVehicle->GetDamageManager();
 
-            for (unsigned char i = 0; i < MAX_DOORS; i++)
+            for (size_t i = 0; i < MAX_DOORS; i++)
                 m_ucDoorStates[i] = pDamageManager->GetDoorStatus(static_cast<eDoors>(i));
-            for (unsigned char i = 0; i < MAX_PANELS; i++)
+            for (size_t i = 0; i < MAX_PANELS; i++)
                 m_ucPanelStates[i] = pDamageManager->GetPanelStatus(static_cast<ePanels>(i));
-            for (unsigned char i = 0; i < MAX_LIGHTS; i++)
+            for (size_t i = 0; i < MAX_LIGHTS; i++)
                 m_ucLightStates[i] = pDamageManager->GetLightStatus(static_cast<eLights>(i));
         }
 
-        for (unsigned char i = 0; i < MAX_WHEELS; i++)
-            m_ucWheelStates[i] = GetWheelStatus(i);
+        for (size_t i = 0; i < MAX_WHEELS; i++)
+            m_ucWheelStates[i] = GetWheelStatus(static_cast<unsigned char>(i));
 
         // Remove the driver from the vehicle
         const auto pPed = GetOccupant();
@@ -2876,7 +2876,7 @@ void CClientVehicle::Destroy()
 
         // Remove all the passengers physically
         const bool bWarpInToVehicleRequired = !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE);
-        for (unsigned char i = 0; i < 8; i++)
+        for (size_t i = 0; i < 8; i++)
         {
             const auto pPassenger = m_pPassengers[i];
             if (pPassenger)
@@ -2894,7 +2894,8 @@ void CClientVehicle::Destroy()
                 m_pOccupyingDriver->RemoveFromVehicle();
             }
         }
-        for (unsigned char i = 0; i < 8; i++)
+
+        for (size_t i = 0; i < 8; i++)
         {
             if (m_pOccupyingPassengers[i] && m_pOccupyingPassengers[i]->m_pOccupyingVehicle == this)
             {

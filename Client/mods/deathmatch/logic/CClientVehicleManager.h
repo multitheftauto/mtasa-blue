@@ -26,7 +26,7 @@ public:
 
     void DeleteAll();
 
-    size_t                 Count() { return static_cast<size_t>(m_List.size()); };
+    size_t                 Count() { return m_List.size(); };
     static CClientVehicle* Get(ElementID ID);
     CClientVehicle*        GetClosest(CVector& vecPosition, float fRadius);
 
