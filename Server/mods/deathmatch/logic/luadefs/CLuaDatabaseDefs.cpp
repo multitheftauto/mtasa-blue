@@ -20,6 +20,7 @@
 void CLuaDatabaseDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Database
         {"dbConnect", DbConnect},
         {"dbExec", DbExec},
         {"dbQuery", DbQuery},
@@ -27,12 +28,13 @@ void CLuaDatabaseDefs::LoadFunctions()
         {"dbPoll", DbPoll},
         {"dbPrepareString", DbPrepareString},
 
-        {"executeSQLCreateTable", ExecuteSQLCreateTable},
-        {"executeSQLDropTable", ExecuteSQLDropTable},
-        {"executeSQLDelete", ExecuteSQLDelete},
-        {"executeSQLSelect", ExecuteSQLSelect},
-        {"executeSQLUpdate", ExecuteSQLUpdate},
-        {"executeSQLInsert", ExecuteSQLInsert},
+        // ExecuteSQL
+        // {"executeSQLCreateTable", ExecuteSQLCreateTable},
+        // {"executeSQLDropTable", ExecuteSQLDropTable},
+        // {"executeSQLDelete", ExecuteSQLDelete},
+        // {"executeSQLSelect", ExecuteSQLSelect},
+        // {"executeSQLUpdate", ExecuteSQLUpdate},
+        // {"executeSQLInsert", ExecuteSQLInsert},
         {"executeSQLQuery", ExecuteSQLQuery},
     };
 

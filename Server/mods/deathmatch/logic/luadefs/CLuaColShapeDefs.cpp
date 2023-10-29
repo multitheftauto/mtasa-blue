@@ -22,6 +22,9 @@
 void CLuaColShapeDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Col Create/destroy
+        {"addColPolygonPoint", AddColPolygonPoint},
+        {"removeColPolygonPoint", RemoveColPolygonPoint},
         {"createColCircle", CreateColCircle},
         {"createColCuboid", CreateColCuboid},
         {"createColSphere", CreateColSphere},
@@ -29,20 +32,20 @@ void CLuaColShapeDefs::LoadFunctions()
         {"createColPolygon", CreateColPolygon},
         {"createColTube", CreateColTube},
 
-        {"getColShapeRadius", GetColShapeRadius},
-        {"setColShapeRadius", SetColShapeRadius},
-        {"getColShapeSize", GetColShapeSize},
-        {"setColShapeSize", SetColShapeSize},
-        {"getColPolygonPoints", GetColPolygonPoints},
-        {"getColPolygonPointPosition", GetColPolygonPointPosition},
-        {"setColPolygonPointPosition", SetColPolygonPointPosition},
-        {"addColPolygonPoint", AddColPolygonPoint},
-        {"removeColPolygonPoint", RemoveColPolygonPoint},
-        {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
-        {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
-
+        // Col get funcs
         {"isInsideColShape", IsInsideColShape},
         {"getColShapeType", GetColShapeType},
+        {"getColShapeRadius", GetColShapeRadius},
+        {"getColShapeSize", GetColShapeSize},
+        {"getColPolygonPoints", GetColPolygonPoints},
+        {"getColPolygonPointPosition", GetColPolygonPointPosition},
+        {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
+
+        // Col set funcs
+        {"setColShapeSize", SetColShapeSize},
+        {"setColPolygonPointPosition", SetColPolygonPointPosition},
+        {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
+        {"setColShapeRadius", SetColShapeRadius},
     };
 
     // Add functions

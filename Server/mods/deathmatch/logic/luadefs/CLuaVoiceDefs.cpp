@@ -28,12 +28,14 @@ void CLuaVoiceDefs::LoadFunctions()
 
 int CLuaVoiceDefs::IsVoiceEnabled(lua_State* luaVM)
 {
+    //  bool isVoiceEnabled ( )
     lua_pushboolean(luaVM, g_pGame->GetConfig()->IsVoiceEnabled());
     return 1;
 }
 
 int CLuaVoiceDefs::SetPlayerVoiceBroadcastTo(lua_State* luaVM)
 {
+    //  bool setPlayerVoiceBroadcastTo ( element thePlayer, mixed broadcastTo )
     CPlayer* pPlayer;
 
     CScriptArgReader argStream(luaVM);
@@ -87,6 +89,7 @@ int CLuaVoiceDefs::SetPlayerVoiceBroadcastTo(lua_State* luaVM)
 
 int CLuaVoiceDefs::setPlayerVoiceIgnoreFrom(lua_State* luaVM)
 {
+    // bool setPlayerVoiceIgnoreFrom ( element thePlayer, mixed ignoreFrom )
     CPlayer* pPlayer;
 
     CScriptArgReader argStream(luaVM);

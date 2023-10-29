@@ -19,13 +19,16 @@ void CLuaWaterDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createWater", CreateWater},
-        {"setWaterLevel", SetWaterLevel},
+
         {"resetWaterLevel", ResetWaterLevel},
-        {"getWaterVertexPosition", GetWaterVertexPosition},
-        {"setWaterVertexPosition", SetWaterVertexPosition},
-        {"getWaterColor", GetWaterColor},
-        {"setWaterColor", SetWaterColor},
         {"resetWaterColor", ResetWaterColor},
+
+        {"getWaterVertexPosition", GetWaterVertexPosition},
+        {"getWaterColor", GetWaterColor},
+
+        {"setWaterLevel", SetWaterLevel},
+        {"setWaterVertexPosition", SetWaterVertexPosition},
+        {"setWaterColor", SetWaterColor},
     };
 
     // Add functions
@@ -57,6 +60,7 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
 
 int CLuaWaterDefs::CreateWater(lua_State* luaVM)
 {
+    //  water createWater ( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3 [, float x4, float y4, float z4 ] [, bool bShallow = false ] )
     CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
     if (!pLuaMain)
     {
@@ -134,8 +138,7 @@ int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
     else
     {
         // Call type 2
-        //  bool setWaterLevel ( float level, bool bIncludeWorldNonSeaLevel, bool bIncludeAllWaterElements, bool bIncludeWorldSeaLevel, bool
-        //  bIncludeOutsideWorldLevel )
+        //  bool setWaterLevel ( float level [, bool includeWaterFeatures = true, bool includeWaterElements = true, bool includeWorldSea = true, bool includeOutsideWorldSea = false ] )
         float fLevel;
         bool  bIncludeWorldNonSeaLevel;
         bool  bIncludeAllWaterElements;
@@ -169,6 +172,7 @@ int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)
 
 int CLuaWaterDefs::ResetWaterLevel(lua_State* luaVM)
 {
+    //  bool resetWaterLevel ( )
     CStaticFunctionDefinitions::ResetWorldWaterLevel();
     lua_pushboolean(luaVM, true);
     return 1;
@@ -176,6 +180,7 @@ int CLuaWaterDefs::ResetWaterLevel(lua_State* luaVM)
 
 int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)
 {
+    //  int int float getWaterVertexPosition ( water theWater, int vertexIndex )
     CWater* pWater;
     int     iVertexIndex;
 
@@ -203,6 +208,7 @@ int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)
 
 int CLuaWaterDefs::SetWaterVertexPosition(lua_State* luaVM)
 {
+    //  bool setWaterVertexPosition ( water theWater, int vertexIndex, int x, int y, float z )
     CWater* pElement;
     int     iVertex;
     CVector vecPosition;
@@ -229,6 +235,7 @@ int CLuaWaterDefs::SetWaterVertexPosition(lua_State* luaVM)
 
 int CLuaWaterDefs::GetWaterColor(lua_State* luaVM)
 {
+    //  int, int, int, int getWaterColor ( )
     unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
 
     bool bColorOverride = CStaticFunctionDefinitions::GetWaterColor(ucRed, ucGreen, ucBlue, ucAlpha);
@@ -249,6 +256,7 @@ int CLuaWaterDefs::GetWaterColor(lua_State* luaVM)
 
 int CLuaWaterDefs::SetWaterColor(lua_State* luaVM)
 {
+    //  bool setWaterColor ( int red, int green, int blue, [ int alpha = 200 ] )
     unsigned char ucR;
     unsigned char ucG;
     unsigned char ucB;
@@ -277,6 +285,7 @@ int CLuaWaterDefs::SetWaterColor(lua_State* luaVM)
 
 int CLuaWaterDefs::ResetWaterColor(lua_State* luaVM)
 {
+    //  bool resetWaterColor ( )
     bool bSuccess = CStaticFunctionDefinitions::ResetWaterColor();
 
     lua_pushboolean(luaVM, bSuccess);

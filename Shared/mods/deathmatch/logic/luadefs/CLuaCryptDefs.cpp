@@ -20,16 +20,18 @@
 void CLuaCryptDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"passwordHash", ArgumentParserWarn<false, PasswordHash>},
+        {"generateKeyPair", ArgumentParser<GenerateKeyPair>},
+        {"passwordVerify", PasswordVerify},
+
         {"md5", ArgumentParserWarn<false, Md5>},
         {"sha256", ArgumentParserWarn<false, Sha256>},
         {"hash", ArgumentParserWarn<false, Hash>},
+
         {"teaEncode", ArgumentParserWarn<false, TeaEncode>},
         {"teaDecode", ArgumentParserWarn<false, TeaDecode>},
         {"base64Encode", ArgumentParserWarn<false, Base64encode>},
         {"base64Decode", ArgumentParserWarn<false, Base64decode>},
-        {"passwordHash", ArgumentParserWarn<false, PasswordHash>},
-        {"generateKeyPair", ArgumentParser<GenerateKeyPair>},
-        {"passwordVerify", PasswordVerify},
         {"encodeString", EncodeString},
         {"decodeString", DecodeString},
     };

@@ -22,9 +22,9 @@ void CLuaAccountDefs::LoadFunctions()
         {"logOut", LogOut},
 
         // Account get functions
+        {"isGuestAccount", IsGuestAccount},
         {"getAccountName", GetAccountName},
         {"getAccountPlayer", GetAccountPlayer},
-        {"isGuestAccount", IsGuestAccount},
         {"getAccountData", GetAccountData},
         {"getAllAccountData", GetAllAccountData},
         {"getAccount", GetAccount},

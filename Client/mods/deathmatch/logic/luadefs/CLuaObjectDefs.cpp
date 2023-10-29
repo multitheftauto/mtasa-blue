@@ -20,23 +20,23 @@ void CLuaObjectDefs::LoadFunctions()
 
         // Object get funcs
         {"isObjectStatic", IsObjectStatic},
-        {"getObjectScale", GetObjectScale},
         {"isObjectBreakable", IsObjectBreakable},
+        {"isObjectMoving", ArgumentParser<IsObjectMoving>},
+        {"getObjectScale", GetObjectScale},
         {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
-        {"isObjectMoving", ArgumentParser<IsObjectMoving>},
 
         // Object set funcs
         {"moveObject", MoveObject},
         {"stopObject", StopObject},
+        {"breakObject", BreakObject},
         {"setObjectScale", SetObjectScale},
         {"setObjectStatic", SetObjectStatic},
         {"setObjectBreakable", SetObjectBreakable},
-        {"breakObject", BreakObject},
         {"respawnObject", RespawnObject},
-        {"toggleObjectRespawn", ToggleObjectRespawn},
         {"setObjectMass", SetObjectMass},
         {"setObjectProperty", SetObjectProperty},
+        {"toggleObjectRespawn", ToggleObjectRespawn},
     };
 
     // Add functions

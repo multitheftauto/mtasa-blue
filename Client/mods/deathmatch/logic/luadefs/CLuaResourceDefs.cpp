@@ -16,6 +16,7 @@ void CLuaResourceDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"call", Call},
+
         {"getThisResource", GetThisResource},
         {"getResourceConfig", GetResourceConfig},
         {"getResourceName", GetResourceName},
@@ -25,6 +26,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceDynamicElementRoot", GetResourceDynamicElementRoot},
         {"getResourceExportedFunctions", GetResourceExportedFunctions},
         {"getResourceState", GetResourceState},
+
         {"loadstring", LoadString},
         {"load", Load},
     };
@@ -64,6 +66,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
 
 int CLuaResourceDefs::Call(lua_State* luaVM)
 {
+    //  var... call ( resource theResource, string theFunction, [ arguments... ] )
     CResource*       pResource = NULL;
     SString          strFunctionName = "";
     CScriptArgReader argStream(luaVM);
@@ -142,6 +145,8 @@ int CLuaResourceDefs::Call(lua_State* luaVM)
 
 int CLuaResourceDefs::GetThisResource(lua_State* luaVM)
 {
+    //  resource getThisResource ( )
+
     // Grab our virtual machine
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (pLuaMain)
@@ -163,6 +168,7 @@ int CLuaResourceDefs::GetThisResource(lua_State* luaVM)
 
 int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
 {
+    //  xmlnode getResourceConfig ( string filePath )
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserData())
         m_pScriptDebugging->LogCustom(luaVM, "getResourceConfig may be using an outdated syntax. Please check and update.");
@@ -222,6 +228,8 @@ int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
 
 int CLuaResourceDefs::GetResourceName(lua_State* luaVM)
 {
+    //  string getResourceName ( resource res )
+
     // Verify arguments
     CResource*       pResource = NULL;
     CScriptArgReader argStream(luaVM);
@@ -252,6 +260,8 @@ int CLuaResourceDefs::GetResourceName(lua_State* luaVM)
 
 int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
 {
+    //  resource getResourceFromName ( string resourceName )
+
     // Verify arguments
     SString          strResourceName = "";
     CScriptArgReader argStream(luaVM);
@@ -277,6 +287,8 @@ int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
 
 int CLuaResourceDefs::GetResourceRootElement(lua_State* luaVM)
 {
+    //  element getResourceRootElement ( [resource theResource=getThisResource()] )
+
     // Verify arguments
     CResource*       pResource = NULL;
     CScriptArgReader argStream(luaVM);
@@ -317,6 +329,8 @@ int CLuaResourceDefs::GetResourceRootElement(lua_State* luaVM)
 
 int CLuaResourceDefs::GetResourceGUIElement(lua_State* luaVM)
 {
+    //  element getResourceGUIElement ( [ resource theResource = getThisResource( ) ] )
+
     // Verify arguments
     CResource*       pResource = NULL;
     CScriptArgReader argStream(luaVM);
@@ -354,6 +368,7 @@ int CLuaResourceDefs::GetResourceGUIElement(lua_State* luaVM)
 
 int CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM)
 {
+    //  element getResourceDynamicElementRoot ( resource theResource ) 
     CResource*       pResource = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pResource);
@@ -378,6 +393,7 @@ int CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM)
 
 int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
 {
+    //  table getResourceExportedFunctions ( [ resource theResource = getThisResource( ) ] )
     CResource*       pResource = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pResource, NULL);

@@ -16,37 +16,37 @@ void CLuaPlayerDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Player get funcs
+        {"isPlayerNametagShowing", IsPlayerNametagShowing},
+        {"isPlayerHudComponentVisible", IsPlayerHudComponentVisible},
         {"getLocalPlayer", GetLocalPlayer},
         {"getPlayerName", GetPlayerName},
         {"getPlayerNametagText", GetPlayerNametagText},
         {"getPlayerNametagColor", GetPlayerNametagColor},
-        {"isPlayerNametagShowing", IsPlayerNametagShowing},
         {"getPlayerPing", GetPlayerPing},
         {"getPlayerTeam", GetPlayerTeam},
         {"getPlayerFromNick", GetPlayerFromName},
         {"getPlayerFromName", GetPlayerFromName},
-        {"isPlayerHudComponentVisible", IsPlayerHudComponentVisible},
         {"getPlayerMoney", GetPlayerMoney},
         {"getPlayerWantedLevel", GetPlayerWantedLevel},
 
         // Player set funcs
-        {"showPlayerHudComponent", ShowPlayerHudComponent},
-        {"setPlayerHudComponentVisible", ShowPlayerHudComponent},
-        {"setPlayerMoney", SetPlayerMoney},
         {"givePlayerMoney", GivePlayerMoney},
         {"takePlayerMoney", TakePlayerMoney},
+        {"setPlayerHudComponentVisible", ShowPlayerHudComponent},
+        {"setPlayerMoney", SetPlayerMoney},
         {"setPlayerNametagText", SetPlayerNametagText},
         {"setPlayerNametagColor", SetPlayerNametagColor},
         {"setPlayerNametagShowing", SetPlayerNametagShowing},
+        {"showPlayerHudComponent", ShowPlayerHudComponent},
 
         // Community funcs
         {"getPlayerUserName", GetPlayerUserName},
         {"getPlayerSerial", GetPlayerSerial},
 
         // Map funcs
-        {"forcePlayerMap", ForcePlayerMap},
         {"isPlayerMapForced", IsPlayerMapForced},
         {"isPlayerMapVisible", IsPlayerMapVisible},
+        {"forcePlayerMap", ForcePlayerMap},
         {"getPlayerMapBoundingBox", GetPlayerMapBoundingBox},
         {"getPlayerMapOpacity", ArgumentParser<GetPlayerMapOpacity>},
     };

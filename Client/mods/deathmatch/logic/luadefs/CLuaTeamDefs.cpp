@@ -15,8 +15,12 @@ using std::list;
 void CLuaTeamDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"getTeamFromName", GetTeamFromName},         {"getTeamName", GetTeamName},           {"getTeamColor", GetTeamColor},
-        {"getTeamFriendlyFire", GetTeamFriendlyFire}, {"getPlayersInTeam", GetPlayersInTeam}, {"countPlayersInTeam", CountPlayersInTeam},
+        {"getTeamName", GetTeamName}, 
+        {"getTeamFromName", GetTeamFromName}, 
+        {"getTeamColor", GetTeamColor},
+        {"getTeamFriendlyFire", GetTeamFriendlyFire},
+        {"getPlayersInTeam", GetPlayersInTeam},
+        {"countPlayersInTeam", CountPlayersInTeam},
     };
 
     // Add functions
@@ -46,6 +50,7 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
 
 int CLuaTeamDefs::GetTeamFromName(lua_State* luaVM)
 {
+    //  team getTeamFromName ( string teamName )
     SString          strName = "";
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strName);
@@ -68,6 +73,7 @@ int CLuaTeamDefs::GetTeamFromName(lua_State* luaVM)
 
 int CLuaTeamDefs::GetTeamName(lua_State* luaVM)
 {
+    //  string getTeamName ( team theTeam )
     CClientTeam*     pTeam = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pTeam);
@@ -90,6 +96,7 @@ int CLuaTeamDefs::GetTeamName(lua_State* luaVM)
 
 int CLuaTeamDefs::GetTeamColor(lua_State* luaVM)
 {
+    //  int, int, int getTeamColor ( team theTeam )
     CClientTeam*     pTeam = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pTeam);
@@ -113,6 +120,7 @@ int CLuaTeamDefs::GetTeamColor(lua_State* luaVM)
 
 int CLuaTeamDefs::GetTeamFriendlyFire(lua_State* luaVM)
 {
+    //  bool getTeamFriendlyFire ( team theTeam )
     CClientTeam*     pTeam = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pTeam);
@@ -132,6 +140,7 @@ int CLuaTeamDefs::GetTeamFriendlyFire(lua_State* luaVM)
 
 int CLuaTeamDefs::GetPlayersInTeam(lua_State* luaVM)
 {
+    //  table getPlayersInTeam ( team theTeam )
     CClientTeam*     pTeam = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pTeam);
@@ -165,6 +174,7 @@ int CLuaTeamDefs::GetPlayersInTeam(lua_State* luaVM)
 
 int CLuaTeamDefs::CountPlayersInTeam(lua_State* luaVM)
 {
+    //  int countPlayersInTeam ( team theTeam )
     CClientTeam*     pTeam = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pTeam);

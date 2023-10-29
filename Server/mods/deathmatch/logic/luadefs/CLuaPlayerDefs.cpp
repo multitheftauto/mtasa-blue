@@ -76,8 +76,6 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerAnnounceValue", SetPlayerAnnounceValue},
 
         // Audio funcs
-        // {"playMissionAudio", CLuaFunctionDefinitions::PlayMissionAudio},
-        // {"preloadMissionAudio", CLuaFunctionDefinitions::PreloadMissionAudio},
         {"playSoundFrontEnd", PlaySoundFrontEnd},
 
         // Input funcs

@@ -14,14 +14,18 @@
 void CLuaBlipDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Blip create
         {"createBlip", CreateBlip},
         {"createBlipAttachedTo", CreateBlipAttachedTo},
+
+        // Blip get funcs
         {"getBlipIcon", GetBlipIcon},
         {"getBlipSize", GetBlipSize},
         {"getBlipColor", GetBlipColor},
         {"getBlipOrdering", GetBlipOrdering},
         {"getBlipVisibleDistance", GetBlipVisibleDistance},
 
+        // Blip Set funcs
         {"setBlipIcon", SetBlipIcon},
         {"setBlipSize", SetBlipSize},
         {"setBlipColor", SetBlipColor},
@@ -64,6 +68,7 @@ void CLuaBlipDefs::AddClass(lua_State* luaVM)
 
 int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
 {
+    //  blip createBlip ( float x, float y, float z [, int icon = 0, int size = 2, int r = 255, int g = 0, int b = 0, int a = 255, int ordering = 0, float visibleDistance = 16383.0 ] )
     CVector          vecPosition;
     unsigned char    ucIcon = 0;
     int              iSize = 2;
@@ -127,6 +132,7 @@ int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
 
 int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
 {
+    //  blip createBlipAttachedTo ( element elementToAttachTo [, int icon = 0, int size = 2, int r = 255, int g = 0, int b = 0, int a = 255, int ordering = 0, float visibleDistance = 16383.0 ] )
     CClientEntity* pEntity = NULL;
     // Default colors and size
     unsigned char    ucIcon = 0;
@@ -190,6 +196,7 @@ int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
 
 int CLuaBlipDefs::GetBlipIcon(lua_State* luaVM)
 {
+    //  int getBlipIcon ( blip theBlip )
     CClientRadarMarker* pMarker = NULL;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
@@ -209,6 +216,7 @@ int CLuaBlipDefs::GetBlipIcon(lua_State* luaVM)
 
 int CLuaBlipDefs::GetBlipSize(lua_State* luaVM)
 {
+    //  int getBlipSize ( blip theBlip )
     CClientRadarMarker* pMarker = NULL;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
@@ -228,6 +236,7 @@ int CLuaBlipDefs::GetBlipSize(lua_State* luaVM)
 
 int CLuaBlipDefs::GetBlipColor(lua_State* luaVM)
 {
+    //  int int int int getBlipColor ( blip theBlip )
     CClientRadarMarker* pMarker = NULL;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
@@ -250,6 +259,7 @@ int CLuaBlipDefs::GetBlipColor(lua_State* luaVM)
 
 int CLuaBlipDefs::GetBlipOrdering(lua_State* luaVM)
 {
+    //  int getBlipOrdering ( blip theBlip )
     CClientRadarMarker* pMarker = NULL;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
@@ -269,6 +279,7 @@ int CLuaBlipDefs::GetBlipOrdering(lua_State* luaVM)
 
 int CLuaBlipDefs::GetBlipVisibleDistance(lua_State* luaVM)
 {
+    //  float getBlipVisibleDistance ( blip theBlip )
     CClientRadarMarker* pMarker = NULL;
     CScriptArgReader    argStream(luaVM);
     argStream.ReadUserData(pMarker);
@@ -288,6 +299,7 @@ int CLuaBlipDefs::GetBlipVisibleDistance(lua_State* luaVM)
 
 int CLuaBlipDefs::SetBlipIcon(lua_State* luaVM)
 {
+    //  bool setBlipIcon ( blip theBlip, int icon )
     CClientEntity*   pEntity = NULL;
     unsigned char    ucIcon = 0;
     CScriptArgReader argStream(luaVM);
@@ -311,6 +323,7 @@ int CLuaBlipDefs::SetBlipIcon(lua_State* luaVM)
 
 int CLuaBlipDefs::SetBlipSize(lua_State* luaVM)
 {
+    //  bool setBlipSize ( blip theBlip, int iconSize )
     CClientEntity*   pEntity = NULL;
     int              iSize = 0;
     CScriptArgReader argStream(luaVM);
@@ -339,6 +352,7 @@ int CLuaBlipDefs::SetBlipSize(lua_State* luaVM)
 
 int CLuaBlipDefs::SetBlipColor(lua_State* luaVM)
 {
+    //  bool setBlipColor ( blip theBlip, int red, int green, int blue, int alpha )
     CClientEntity*   pEntity = NULL;
     SColor           color;
     CScriptArgReader argStream(luaVM);
@@ -365,6 +379,7 @@ int CLuaBlipDefs::SetBlipColor(lua_State* luaVM)
 
 int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 {
+    //  bool setBlipOrdering ( blip theBlip, int ordering )
     CClientEntity*   pEntity = NULL;
     int              iOrdering;
     CScriptArgReader argStream(luaVM);
@@ -390,6 +405,7 @@ int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
 
 int CLuaBlipDefs::SetBlipVisibleDistance(lua_State* luaVM)
 {
+    //  bool setBlipVisibleDistance ( blip theBlip, float theDistance )
     CClientEntity*   pEntity = NULL;
     int              iVisibleDistance;
     CScriptArgReader argStream(luaVM);

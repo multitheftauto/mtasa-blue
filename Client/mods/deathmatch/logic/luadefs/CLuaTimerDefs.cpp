@@ -14,8 +14,13 @@
 void CLuaTimerDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"setTimer", SetTimer},   {"killTimer", KillTimer}, {"resetTimer", ResetTimer},
-        {"getTimers", GetTimers}, {"isTimer", IsTimer},     {"getTimerDetails", GetTimerDetails},
+        {"setTimer", SetTimer},  
+        {"killTimer", KillTimer},
+        {"resetTimer", ResetTimer},
+
+        {"isTimer", IsTimer},
+        {"getTimers", GetTimers},
+        {"getTimerDetails", GetTimerDetails},
     };
 
     // Add functions
@@ -30,8 +35,8 @@ void CLuaTimerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "setTimer");
     lua_classfunction(luaVM, "destroy", "killTimer");
     lua_classfunction(luaVM, "reset", "resetTimer");
-    lua_classfunction(luaVM, "isValid", "isTimer");
 
+    lua_classfunction(luaVM, "isValid", "isTimer");
     lua_classfunction(luaVM, "getDetails", "getTimerDetails");
 
     lua_classvariable(luaVM, "valid", NULL, "isTimer");

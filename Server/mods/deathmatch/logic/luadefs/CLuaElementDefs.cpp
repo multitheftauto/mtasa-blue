@@ -19,20 +19,21 @@
 void CLuaElementDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        // Create/destroy
+        // Element Create/destroy
         {"createElement", createElement},
         {"destroyElement", destroyElement},
         {"cloneElement", cloneElement},
 
-        // Get
+        // Element get funcs
         {"isElement", isElement},
         {"isElementWithinColShape", isElementWithinColShape},
         {"isElementWithinMarker", isElementWithinMarker},
         {"isElementInWater", isElementInWater},
         {"isElementFrozen", isElementFrozen},
         {"isElementLowLOD", isElementLowLOD},
-        {"setElementCallPropagationEnabled", setElementCallPropagationEnabled},
         {"isElementCallPropagationEnabled", isElementCallPropagationEnabled},
+        {"isElementDoubleSided", isElementDoubleSided},
+        {"isElementVisibleTo", isElementVisibleTo},
 
         {"getElementByID", getElementByID},
         {"getElementByIndex", getElementByIndex},
@@ -55,14 +56,13 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementZoneName", getElementZoneName},
         {"getElementColShape", getElementColShape},
         {"getElementAlpha", getElementAlpha},
-        {"isElementDoubleSided", isElementDoubleSided},
         {"getElementHealth", getElementHealth},
         {"getElementModel", getElementModel},
         {"getElementSyncer", getElementSyncer},
         {"getElementCollisionsEnabled", getElementCollisionsEnabled},
         {"getLowLODElement", getLowLODElement},
 
-        // Attachement
+        // Attachement funcs
         {"attachElements", attachElements},
         {"detachElements", detachElements},
         {"isElementAttached", isElementAttached},
@@ -71,7 +71,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementAttachedOffsets", setElementAttachedOffsets},
         {"getElementAttachedOffsets", getElementAttachedOffsets},
 
-        // Element data
+        // Element data funcs
         {"getElementData", GetElementData},
         {"getAllElementData", ArgumentParserWarn<false, GetAllElementData>},
         {"hasElementData", HasElementData},
@@ -81,7 +81,7 @@ void CLuaElementDefs::LoadFunctions()
         {"removeElementDataSubscriber", removeElementDataSubscriber},
         {"hasElementDataSubscriber", hasElementDataSubscriber},
 
-        // Set
+        // Element set funcs
         {"setElementID", setElementID},
         {"setElementParent", setElementParent},
         {"setElementMatrix", setElementMatrix},
@@ -91,7 +91,6 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementAngularVelocity", setElementTurnVelocity},
         {"setElementVisibleTo", setElementVisibleTo},
         {"clearElementVisibleTo", clearElementVisibleTo},
-        {"isElementVisibleTo", isElementVisibleTo},
         {"setElementInterior", setElementInterior},
         {"setElementDimension", setElementDimension},
         {"setElementAlpha", setElementAlpha},
@@ -102,6 +101,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementCollisionsEnabled", setElementCollisionsEnabled},
         {"setElementFrozen", setElementFrozen},
         {"setLowLODElement", setLowLODElement},
+        {"setElementCallPropagationEnabled", setElementCallPropagationEnabled},
     };
 
     // Add functions
@@ -223,7 +223,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
 
 int CLuaElementDefs::createElement(lua_State* luaVM)
 {
-    //  element createElement ( string elementType, [ string elementID ] )
+    //  element createElement ( string elementType, [ string elementID = nil ] )
     SString strTypeName;
     SString strId;
 
@@ -579,6 +579,7 @@ int CLuaElementDefs::OOP_getElementPosition(lua_State* luaVM)
 
 int CLuaElementDefs::getElementMatrix(lua_State* luaVM)
 {
+    //  table getElementMatrix ( element theElement [, bool legacy = true ] )
     CElement* pElement = NULL;
     bool      bBadSyntax;
 
@@ -997,6 +998,7 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
 CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
                                                        std::optional<unsigned short> dimension)
 {
+    //  table getElementsWithinRange ( float x, float y, float z, float range [, string elemType = "", int interior, int dimension ] )
     const auto typeHash = (type.has_value() && !type.value().empty()) ? CElement::GetTypeHashFromString(type.value()) : 0;
 
     CElementResult result;
@@ -1175,8 +1177,7 @@ int CLuaElementDefs::getAttachedElements(lua_State* luaVM)
 
 int CLuaElementDefs::setElementAttachedOffsets(lua_State* luaVM)
 {
-    //  bool setElementAttachedOffsets ( element theElement, [ float xPosOffset, float yPosOffset, float zPosOffset, float xRotOffset, float yRotOffset, float
-    //  zRotOffset ])
+    //  bool setElementAttachedOffsets ( element theElement, [ float xPosOffset, float yPosOffset, float zPosOffset, float xRotOffset, float yRotOffset, float zRotOffset ])
     CElement* pElement;
     CVector   vecPosition;
     CVector   vecRotation;

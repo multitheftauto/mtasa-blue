@@ -16,11 +16,13 @@
 void CLuaTextDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Text Create/destroy
         {"textCreateDisplay", textCreateDisplay},
         {"textDestroyDisplay", textDestroyDisplay},
         {"textCreateTextItem", textCreateTextItem},
         {"textDestroyTextItem", textDestroyTextItem},
 
+        // Displayer funcs
         {"textDisplayAddText", textDisplayAddText},
         {"textDisplayRemoveText", textDisplayRemoveText},
         {"textDisplayAddObserver", textDisplayAddObserver},
@@ -28,16 +30,19 @@ void CLuaTextDefs::LoadFunctions()
         {"textDisplayIsObserver", textDisplayIsObserver},
         {"textDisplayGetObservers", textDisplayGetObservers},
 
-        {"textItemSetText", textItemSetText},
+        // Text get funcs
         {"textItemGetText", textItemGetText},
-        {"textItemSetScale", textItemSetScale},
         {"textItemGetScale", textItemGetScale},
-        {"textItemSetPosition", textItemSetPosition},
         {"textItemGetPosition", textItemGetPosition},
-        {"textItemSetColor", textItemSetColor},
         {"textItemGetColor", textItemGetColor},
-        {"textItemSetPriority", textItemSetPriority},
         {"textItemGetPriority", textItemGetPriority},
+
+        // Text set funcs
+        {"textItemSetScale", textItemSetScale},
+        {"textItemSetText", textItemSetText},
+        {"textItemSetPosition", textItemSetPosition},
+        {"textItemSetPriority", textItemSetPriority},
+        {"textItemSetColor", textItemSetColor},
     };
 
     // Add functions
@@ -92,6 +97,8 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
 
 int CLuaTextDefs::textCreateDisplay(lua_State* luaVM)
 {
+    //  textdisplay textCreateDisplay ( )
+
     // Get our current VM
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (luaMain)
@@ -108,6 +115,7 @@ int CLuaTextDefs::textCreateDisplay(lua_State* luaVM)
 
 int CLuaTextDefs::textDestroyDisplay(lua_State* luaVM)
 {
+    //  bool textDestroyDisplay ( textdisplay display )
     CTextDisplay* pTextDisplay;
 
     CScriptArgReader argStream(luaVM);
@@ -133,6 +141,10 @@ int CLuaTextDefs::textDestroyDisplay(lua_State* luaVM)
 
 int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
 {
+    /*
+          textitem textCreateTextItem ( string text, float x, float y, 
+          [string priority, int red = 255, int green = 255, int blue = 255, int alpha = 255, float scale = 1, string alignX = "left", string alignY = "top", int shadowAlpha = 0] )
+    */
     SString       strText, strHorzAlign, strVertAlign;
     float         fX, fY, fScale;
     int           iPriority;
@@ -201,6 +213,7 @@ int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
 
 int CLuaTextDefs::textDestroyTextItem(lua_State* luaVM)
 {
+    //  void textDestroyTextItem ( textitem theTextitem )
     CTextItem* pTextItem;
 
     CScriptArgReader argStream(luaVM);
@@ -226,6 +239,7 @@ int CLuaTextDefs::textDestroyTextItem(lua_State* luaVM)
 
 int CLuaTextDefs::textDisplayAddText(lua_State* luaVM)
 {
+    //  void textDisplayAddText ( textdisplay displayToAddTo, textitem itemToAdd )
     CTextDisplay* pTextDisplay;
     CTextItem*    pTextItem;
 
@@ -249,6 +263,7 @@ int CLuaTextDefs::textDisplayAddText(lua_State* luaVM)
 
 int CLuaTextDefs::textDisplayRemoveText(lua_State* luaVM)
 {
+    //  void textDisplayRemoveText ( textdisplay displayToRemoveFrom, textitem itemToRemove )
     CTextDisplay* pTextDisplay;
     CTextItem*    pTextItem;
 
@@ -272,6 +287,7 @@ int CLuaTextDefs::textDisplayRemoveText(lua_State* luaVM)
 
 int CLuaTextDefs::textDisplayAddObserver(lua_State* luaVM)
 {
+    //  void textDisplayAddObserver ( textdisplay display, player playerToAdd )
     CTextDisplay* pTextDisplay;
     CPlayer*      pPlayer;
 
@@ -295,6 +311,7 @@ int CLuaTextDefs::textDisplayAddObserver(lua_State* luaVM)
 
 int CLuaTextDefs::textDisplayRemoveObserver(lua_State* luaVM)
 {
+    //  bool textDisplayRemoveObserver ( textdisplay display, player playerToRemove )
     CTextDisplay* pTextDisplay;
     CPlayer*      pPlayer;
 
@@ -318,6 +335,7 @@ int CLuaTextDefs::textDisplayRemoveObserver(lua_State* luaVM)
 
 int CLuaTextDefs::textDisplayIsObserver(lua_State* luaVM)
 {
+    //  bool textDisplayIsObserver ( textdisplay display, player thePlayer )
     CTextDisplay* pTextDisplay;
     CPlayer*      pPlayer;
 
@@ -339,6 +357,7 @@ int CLuaTextDefs::textDisplayIsObserver(lua_State* luaVM)
 
 int CLuaTextDefs::textDisplayGetObservers(lua_State* luaVM)
 {
+    //  table textDisplayGetObservers ( textdisplay theDisplay )
     CTextDisplay* pTextDisplay;
 
     CScriptArgReader argStream(luaVM);
@@ -360,6 +379,7 @@ int CLuaTextDefs::textDisplayGetObservers(lua_State* luaVM)
 
 int CLuaTextDefs::textItemSetText(lua_State* luaVM)
 {
+    //  void textItemSetText ( textitem theTextitem, string text )
     CTextItem* pTextItem;
     SString    strText;
 
@@ -383,6 +403,7 @@ int CLuaTextDefs::textItemSetText(lua_State* luaVM)
 
 int CLuaTextDefs::textItemGetText(lua_State* luaVM)
 {
+    //  string textItemGetText ( textitem theTextitem )
     CTextItem* pTextItem;
 
     CScriptArgReader argStream(luaVM);
@@ -402,6 +423,7 @@ int CLuaTextDefs::textItemGetText(lua_State* luaVM)
 
 int CLuaTextDefs::textItemSetScale(lua_State* luaVM)
 {
+    //  bool textItemSetScale ( textitem theTextitem, float scale )
     CTextItem* pTextItem;
     float      fScale;
 
@@ -425,6 +447,7 @@ int CLuaTextDefs::textItemSetScale(lua_State* luaVM)
 
 int CLuaTextDefs::textItemGetScale(lua_State* luaVM)
 {
+    //  float textItemGetScale ( textitem theTextitem )
     CTextItem* pTextItem;
 
     CScriptArgReader argStream(luaVM);
@@ -444,6 +467,7 @@ int CLuaTextDefs::textItemGetScale(lua_State* luaVM)
 
 int CLuaTextDefs::textItemSetPosition(lua_State* luaVM)
 {
+    //  bool textItemSetPosition ( textitem theTextItem, float x, float y )
     CTextItem* pTextItem;
     CVector2D  vecPosition;
 
@@ -468,6 +492,7 @@ int CLuaTextDefs::textItemSetPosition(lua_State* luaVM)
 
 int CLuaTextDefs::textItemGetPosition(lua_State* luaVM)
 {
+    //  float float textItemGetPosition ( textitem theTextItem )
     CTextItem* pTextItem;
 
     CScriptArgReader argStream(luaVM);
@@ -489,6 +514,7 @@ int CLuaTextDefs::textItemGetPosition(lua_State* luaVM)
 
 int CLuaTextDefs::textItemSetColor(lua_State* luaVM)
 {
+    //  bool textItemSetColor ( textitem theTextItem, int r, int g, int b, int a )
     CTextItem* pTextItem;
     SColor     color;
 
@@ -515,6 +541,7 @@ int CLuaTextDefs::textItemSetColor(lua_State* luaVM)
 
 int CLuaTextDefs::textItemGetColor(lua_State* luaVM)
 {
+    //  int int int int textItemGetColor ( textitem theTextItem )
     CTextItem* pTextItem;
 
     CScriptArgReader argStream(luaVM);
@@ -538,6 +565,7 @@ int CLuaTextDefs::textItemGetColor(lua_State* luaVM)
 
 int CLuaTextDefs::textItemSetPriority(lua_State* luaVM)
 {
+    //  void textItemSetPriority ( textitem theTextItem, string priority )
     CTextItem* pTextItem;
     int        iPriority;
 
@@ -574,6 +602,7 @@ int CLuaTextDefs::textItemSetPriority(lua_State* luaVM)
 
 int CLuaTextDefs::textItemGetPriority(lua_State* luaVM)
 {
+    //  int textItemGetPriority ( textitem textitemToCheck )
     CTextItem* pTextItem;
 
     CScriptArgReader argStream(luaVM);

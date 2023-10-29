@@ -1025,12 +1025,6 @@ bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const cha
     return false;
 }
 
-bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, const char* szName)
-{
-    // TODO
-    return false;
-}
-
 bool CStaticFunctionDefinitions::SetElementMatrix(CClientEntity& Entity, const CMatrix& matrix)
 {
     RUN_CHILDREN(SetElementMatrix(**iter, matrix))

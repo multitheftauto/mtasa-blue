@@ -41,21 +41,22 @@ void CLuaUtilDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Util functions to make scripting easier for the end user
         // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
-        {"deref", Dereference},
-        {"ref", Reference},
+        {"getUserdataType", GetUserdataType},
         {"getTickCount", GetTickCount_},
         {"getRealTime", GetCTime},
-        {"split", Split},
-        {"isOOPEnabled", IsOOPEnabled},
-        {"getUserdataType", GetUserdataType},
-        {"print", luaB_print},
         {"getColorFromString", GetColorFromString},
 
+        {"deref", Dereference},
+        {"ref", Reference},
+        {"split", Split},
+        {"isOOPEnabled", IsOOPEnabled},
+        {"print", luaB_print},
+
         // Utility vector math functions
+        {"interpolateBetween", InterpolateBetween},
         {"getDistanceBetweenPoints2D", GetDistanceBetweenPoints2D},
         {"getDistanceBetweenPoints3D", GetDistanceBetweenPoints3D},
         {"getEasingValue", GetEasingValue},
-        {"interpolateBetween", InterpolateBetween},
 
         // JSON funcs
         {"toJSON", toJSON},

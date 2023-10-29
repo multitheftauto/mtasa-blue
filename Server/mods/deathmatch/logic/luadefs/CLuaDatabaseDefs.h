@@ -29,11 +29,11 @@ public:
     LUA_DECLARE(DbPoll);
     LUA_DECLARE(DbPrepareString);
 
-    LUA_DECLARE(ExecuteSQLCreateTable);
-    LUA_DECLARE(ExecuteSQLDropTable);
-    LUA_DECLARE(ExecuteSQLDelete);
-    LUA_DECLARE(ExecuteSQLInsert);
-    LUA_DECLARE(ExecuteSQLSelect);
-    LUA_DECLARE(ExecuteSQLUpdate);
+    // LUA_DECLARE(ExecuteSQLCreateTable);
+    // LUA_DECLARE(ExecuteSQLDropTable);
+    // LUA_DECLARE(ExecuteSQLDelete);
+    // LUA_DECLARE(ExecuteSQLInsert);
+    // LUA_DECLARE(ExecuteSQLSelect);
+    // LUA_DECLARE(ExecuteSQLUpdate);
     LUA_DECLARE(ExecuteSQLQuery);
 };

@@ -72,73 +72,94 @@ size_t EngineStreamingGetBufferSize() {
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Engine set funcs
         {"engineFreeModel", EngineFreeModel},
+        {"engineRequestModel", EngineRequestModel},
+
+        {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
+        {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
+
+        {"engineLoadIMG", ArgumentParser<EngineLoadIMG>},
+        {"engineAddImage", ArgumentParser<EngineAddImage>},
+        {"engineRemoveImage", ArgumentParser<EngineRemoveImage>},
+        {"engineImageLinkDFF", ArgumentParser<EngineImageLinkDFF>},
+        {"engineImageLinkTXD", ArgumentParser<EngineImageLinkTXD>},
+        {"engineRestoreDFFImage", ArgumentParser<EngineRestoreDFFImage>},
+        {"engineRestoreTXDImage", ArgumentParser<EngineRestoreTXDImage>},
+
         {"engineLoadTXD", EngineLoadTXD},
         {"engineLoadCOL", EngineLoadCOL},
         {"engineLoadDFF", EngineLoadDFF},
         {"engineLoadIFP", EngineLoadIFP},
         {"engineImportTXD", EngineImportTXD},
         {"engineReplaceCOL", EngineReplaceCOL},
-        {"engineRestoreCOL", EngineRestoreCOL},
         {"engineReplaceModel", EngineReplaceModel},
-        {"engineRestoreModel", EngineRestoreModel},
         {"engineReplaceAnimation", EngineReplaceAnimation},
+        {"engineRestoreCOL", EngineRestoreCOL},
+        {"engineRestoreModel", EngineRestoreModel},
         {"engineRestoreAnimation", EngineRestoreAnimation},
-        {"engineRequestModel", EngineRequestModel},
-        {"engineGetModelLODDistance", EngineGetModelLODDistance},
-        {"engineSetModelLODDistance", EngineSetModelLODDistance},
+
+        {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
+        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+        {"engineSetModelPhysicalPropertiesGroup", EngineSetModelPhysicalPropertiesGroup},
+        {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
+
+        {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
+        {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
+
         {"engineResetModelLODDistance", EngineResetModelLODDistance},
-        {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
+        {"engineSetModelLODDistance", EngineSetModelLODDistance},
+
+        {"engineResetModelFlags", ArgumentParser<EngineResetModelFlags>},
+        {"engineSetModelFlags", ArgumentParser<EngineSetModelFlags>},
+        {"engineSetModelFlag", ArgumentParser<EngineSetModelFlag>},
+
+        {"engineResetModelTXDID", ArgumentParser<EngineResetModelTXDID>},
+        {"engineSetModelTXDID", ArgumentParser<EngineSetModelTXDID>},
+
         {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
         {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
+
+        {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
+        {"engineSetModelVisibleTime", ArgumentParser<EngineSetModelVisibleTime>},
+
+        {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
+        {"engineStreamingRestoreBufferSize", ArgumentParser<EngineStreamingRestoreBufferSize>},
+        {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
+        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+        {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
+        {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
+
+        {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
+
+        // Engine get funcs
+        {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
+        {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
+
+        {"engineGetModelLODDistance", EngineGetModelLODDistance},
         {"engineGetModelNameFromID", EngineGetModelNameFromID},
         {"engineGetModelIDFromName", EngineGetModelIDFromName},
         {"engineGetModelTextureNames", EngineGetModelTextureNames},
-        {"engineGetVisibleTextureNames", EngineGetVisibleTextureNames},
-        {"engineSetModelVisibleTime", ArgumentParser<EngineSetModelVisibleTime>},
         {"engineGetModelVisibleTime", ArgumentParser<EngineGetModelVisibleTime>},
         {"engineGetModelTextures", EngineGetModelTextures},
+
         {"engineGetSurfaceProperties", EngineGetSurfaceProperties},
-        {"engineSetSurfaceProperties", EngineSetSurfaceProperties},
-        {"engineResetSurfaceProperties", EngineResetSurfaceProperties},
+
         {"engineGetModelPhysicalPropertiesGroup", EngineGetModelPhysicalPropertiesGroup},
-        {"engineSetModelPhysicalPropertiesGroup", EngineSetModelPhysicalPropertiesGroup},
-        {"engineRestoreModelPhysicalPropertiesGroup", EngineRestoreModelPhysicalPropertiesGroup},
-        {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
-        {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+
         {"engineGetModelFlags", ArgumentParser<EngineGetModelFlags>},
-        {"engineSetModelFlags", ArgumentParser<EngineSetModelFlags>},
         {"engineGetModelFlag", ArgumentParser<EngineGetModelFlag>},
-        {"engineSetModelFlag", ArgumentParser<EngineSetModelFlag>},
-        {"engineResetModelFlags", ArgumentParser<EngineResetModelFlags>},
-        {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
-        {"engineLoadIMG", ArgumentParser<EngineLoadIMG>},
-        {"engineImageLinkDFF", ArgumentParser<EngineImageLinkDFF>},
-        {"engineImageLinkTXD", ArgumentParser<EngineImageLinkTXD>},
-        {"engineRestoreDFFImage", ArgumentParser<EngineRestoreDFFImage>},
-        {"engineRestoreTXDImage", ArgumentParser<EngineRestoreTXDImage>},
-        {"engineAddImage", ArgumentParser<EngineAddImage>},
-        {"engineRemoveImage", ArgumentParser<EngineRemoveImage>},
+
+        //  table engineImageGetFiles ( img imgArchive )
         {"engineImageGetFilesCount", ArgumentParser<EngineImageGetFilesCount>},
         {"engineImageGetFiles", ArgumentParser<EngineImageGetFileList>},
         {"engineImageGetFile", ArgumentParser<EngineImageGetFile>},
-        {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
-        {"engineSetModelTXDID", ArgumentParser<EngineSetModelTXDID>},
-        {"engineResetModelTXDID", ArgumentParser<EngineResetModelTXDID>},
-        {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
+
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
-        {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
         {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
-        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
-        {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
-        {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
-        {"engineStreamingRestoreBufferSize", ArgumentParser<EngineStreamingRestoreBufferSize>},
-        
-        {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
-        {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
-        
+
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
         // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
@@ -251,6 +272,7 @@ void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
     lua_classvariable(luaVM, "filesCount", nullptr, ArgumentParser<EngineImageGetFilesCount>);
     lua_classvariable(luaVM, "files", nullptr, ArgumentParser<EngineImageGetFileList>);
 
+//  table engineImageGetFiles ( img imgArchive )
     lua_registerclass(luaVM, "EngineIMG", "Element");
 }
 
@@ -266,6 +288,7 @@ void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
 {
+    //  col engineLoadCOL ( string col_file / string raw_data ) 
     SString          input;
     CScriptArgReader argStream(luaVM);
     // Grab the COL filename or data
@@ -339,6 +362,7 @@ int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
 {
+    //  dff engineLoadDFF ( string dff_file / string raw_data ) 
     SString          input = "";
     CScriptArgReader argStream(luaVM);
     // Grab the DFF filename or data (model ID ignored after 1.3.1)
@@ -411,6 +435,7 @@ int CLuaEngineDefs::EngineLoadDFF(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
 {
+    //  txd engineLoadTXD ( string txd_file / string raw_data [, bool filteringEnabled = true ] )
     SString          input;
     bool             bFilteringEnabled = true;
     CScriptArgReader argStream(luaVM);
@@ -483,6 +508,7 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
 {
+    //  ifp engineLoadIFP ( string ifp_file / string raw_data, string custom_block_name )
     SString input;
     SString blockName;
 
@@ -550,6 +576,7 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineReplaceCOL(lua_State* luaVM)
 {
+    //  bool engineReplaceCOL ( col theCol, int modelID )
     CClientColModel* pCol = NULL;
     unsigned short   usModel = 0;
     CScriptArgReader argStream(luaVM);
@@ -582,6 +609,7 @@ int CLuaEngineDefs::EngineReplaceCOL(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineRestoreCOL(lua_State* luaVM)
 {
+    //  bool engineRestoreCOL ( int modelID )
     SString          strModelName = "";
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModelName);
@@ -607,6 +635,7 @@ int CLuaEngineDefs::EngineRestoreCOL(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
 {
+    //  bool engineImportTXD ( txd texture, int model_id ) 
     CClientTXD*      pTXD = NULL;
     SString          strModelName;
     CScriptArgReader argStream(luaVM);
@@ -642,6 +671,7 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
 
 CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strRelativeFilePath)
 {
+    //  img engineLoadIMG ( string img_file )
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
     // Get the resource we belong to
@@ -681,21 +711,25 @@ CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string st
 
 bool CLuaEngineDefs::EngineAddImage(CClientIMG* pIMG)
 {
+    //  bool engineAddImage ( img imgArchive )
     return pIMG->StreamEnable();
 }
 
 bool CLuaEngineDefs::EngineRemoveImage(CClientIMG* pIMG)
 {
+    //  bool engineRemoveImage ( img img_file )
     return pIMG->StreamDisable();
 }
 
 uint CLuaEngineDefs::EngineImageGetFilesCount(CClientIMG* pIMG)
 {
+    //  int engineImageGetFilesCount ( img imgArchive )
     return pIMG->GetFilesCount();
 }
 
 std::vector<std::string_view> CLuaEngineDefs::EngineImageGetFileList(CClientIMG* pIMG)
 {
+    //  table engineImageGetFiles ( img imgArchive )
     const auto& fileInfos = pIMG->GetFileInfos();
 
     std::vector<std::string_view> out;
@@ -720,6 +754,7 @@ static size_t ResolveIMGFileID(CClientIMG* pIMG, std::variant<size_t, std::strin
 
 std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<size_t, std::string_view> file)
 {
+    //  string engineImageGetFile ( img img_file, string/number file )
     std::string buffer;
 
     if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))            // Get file might throw
@@ -730,6 +765,7 @@ std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<si
 
 bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiModelID)
 {
+    //  bool engineImageLinkDFF ( img img_file, string file_path, int modelID )
     if (uiModelID >= 20000)
         throw std::invalid_argument(SString("Expected modelid in range 0 - 19999, got %d", uiModelID));
 
@@ -746,6 +782,7 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
 
 bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
 {
+    //  bool engineImageLinkTXD ( img img_file, string file_path, int modelID )
     if (uiTxdID >= 5000)
         throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
 
@@ -762,6 +799,7 @@ bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, s
 
 bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
 {
+    //  img engineRestoreDFFImage ( int modelID )
     if (uiModelID >= 20000)
         throw std::invalid_argument("Expected model ID in range [0-19999] at argument 1");
 
@@ -773,6 +811,7 @@ bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
 
 bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
 {
+    //  img engineRestoreTXDImage ( int modelID )
     if (uiModelID >= 5000)
         throw std::invalid_argument("Expected TXD ID in range [0-4999] at argument 1");
 
@@ -784,6 +823,7 @@ bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
 
 int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 {
+    //  bool engineReplaceModel ( dff theModel, int modelID [, bool alphaTransparency = false ] )
     CClientDFF* pDFF;
     SString     strModelName;
     bool        bAlphaTransparency;
@@ -820,6 +860,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 {
+    //  bool engineRestoreModel ( int modelID )
     // Grab the model ID
     unsigned short usModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
 
@@ -846,6 +887,7 @@ int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 {
+    //  int engineRequestModel ( string elementType [, int parentID ] )
     eClientModelType eModelType;
 
     CScriptArgReader argStream(luaVM);
@@ -916,6 +958,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 {
+    //  bool engineFreeModel ( int modelID )
     int iModelID;
 
     CScriptArgReader argStream(luaVM);
@@ -940,6 +983,7 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineReplaceAnimation(lua_State* luaVM)
 {
+    //  bool engineReplaceAnimation ( ped thePed, string InternalBlockName, string InternalAnimName, string CustomBlockName, string CustomAnimName )
     CClientEntity* pEntity = nullptr;
     SString        strInternalBlockName = "";
     SString        strInternalAnimName = "";
@@ -970,6 +1014,7 @@ int CLuaEngineDefs::EngineReplaceAnimation(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineRestoreAnimation(lua_State* luaVM)
 {
+    //  bool engineRestoreAnimation ( ped thePed [, string InternalBlockName, string InternalAnimName ] )
     CClientEntity*                pEntity = nullptr;
     CIFPEngine::eRestoreAnimation eRestoreType = CIFPEngine::eRestoreAnimation::SINGLE;
     SString                       strInternalBlockName = "";
@@ -1077,6 +1122,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
 {
+    //  bool engineResetModelLODDistance ( int model ) 
     SString          strModel = "";
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModel);
@@ -1105,6 +1151,7 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineSetAsynchronousLoading(lua_State* luaVM)
 {
+    //  bool engineSetAsynchronousLoading ( bool enable, bool force ) 
     bool             bEnabled = false;
     bool             bForced = false;
     CScriptArgReader argStream(luaVM);
@@ -1285,6 +1332,7 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
 
 uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 {
+    //  img engineGetModelTXDID ( int modelID )
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
 
     if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
@@ -1306,6 +1354,7 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 
 bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
 {
+    //  bool engineResetModelTXDID( int modelID )
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
 
     if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
@@ -1442,6 +1491,7 @@ int CLuaEngineDefs::EngineGetVisibleTextureNames(lua_State* luaVM)
 
 bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff)
 {
+    //  bool engineSetModelVisibleTime ( int modelID, int timeOn, int timeOff )
     ushort      usModelID = CModelNames::ResolveModelID(strModelId);
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
@@ -1456,6 +1506,7 @@ bool CLuaEngineDefs::EngineSetModelVisibleTime(std::string strModelId, char cHou
 
 std::variant<bool, CLuaMultiReturn<char, char>> CLuaEngineDefs::EngineGetModelVisibleTime(std::string strModelId)
 {
+    //  int, int engineGetModelVisibleTime ( int modelId )
     ushort      usModelID = CModelNames::ResolveModelID(strModelId);
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
@@ -1526,6 +1577,7 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineSetSurfaceProperties(lua_State* luaVM)
 {
+    //  bool engineSetSurfaceProperties ( int surfaceID, string property, mixed value )
     int                iSurfaceID;
     eSurfaceProperties eType;
     CScriptArgReader   argStream(luaVM);
@@ -1774,6 +1826,7 @@ const char* cSurfaceAdhesionGroup[6] = {"rubber", "hard", "road", "loose", "sand
 
 int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
 {
+    //  mixed engineGetSurfaceProperties ( int surfaceID, string property )
     int                iSurfaceID;
     eSurfaceProperties eType;
     CScriptArgReader   argStream(luaVM);
@@ -1893,6 +1946,7 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineResetSurfaceProperties(lua_State* luaVM)
 {
+    //  mixed engineResetSurfaceProperties ( [ int surfaceID ] )
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsNumber())
     {
@@ -2357,6 +2411,7 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 
 uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelId)
 {
+    //  int engineGetModelFlags( int modelID )
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
 
     if (uiModelId >= 20000 || !pModelInfo)
@@ -2367,6 +2422,7 @@ uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelId)
 
 bool CLuaEngineDefs::EngineGetModelFlag(uint uiModelId, eModelIdeFlag eFlag)
 {
+    //  bool engineGetModelFlag( int modelID, string flagName )
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
 
     if (uiModelId >= 20000 || !pModelInfo)
@@ -2408,6 +2464,7 @@ bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, boo
 
 bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
 {
+    //  bool engineResetModelFlags( int modelID )
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
 
     if (uiModelID >= 20000 || !pModelInfo)
@@ -2426,6 +2483,7 @@ bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
 
 bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
+    //  bool engineRestreamWorld ( [bool includeLODs] )
     bool restreamLODs{};
 
     CScriptArgReader argStream(luaVM);
@@ -2437,6 +2495,7 @@ bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 
 uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName)
 {
+    //  int engineRequestTXD ( string name )
     if (strTxdName.size() > 24)
         throw std::invalid_argument("TXD name length shoudn't be more than 24 characters");
 
@@ -2455,6 +2514,7 @@ uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxd
 
 bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
+    //  bool engineFreeTXD ( int txdID )
     std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(MAX_MODEL_DFF_ID + txdID);
     return pModel && pModel->Deallocate();
 }

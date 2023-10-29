@@ -14,7 +14,6 @@
 #include "luadefs/CLuaCryptDefs.h"
 #include <luadefs/CLuaFileDefs.h>
 #include "luadefs/CLuaMatrixDefs.h"
-#include "luadefs/CLuaTrainTrackDefs.h"
 #include "luadefs/CLuaUTFDefs.h"
 #include "luadefs/CLuaUtilDefs.h"
 #include "luadefs/CLuaVector2Defs.h"

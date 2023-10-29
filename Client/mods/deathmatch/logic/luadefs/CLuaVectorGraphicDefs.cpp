@@ -15,12 +15,13 @@ void CLuaVectorGraphicDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"svgCreate", ArgumentParser<SVGCreate>},
-        {"svgGetDocumentXML", ArgumentParser<SVGGetDocumentXML>},
-        {"svgSetDocumentXML", ArgumentParser<SVGSetDocumentXML>},
-        {"svgGetSize", ArgumentParser<SVGGetSize>},
-        {"svgSetSize", ArgumentParser<SVGSetSize>},
-        {"svgSetUpdateCallback", ArgumentParser<SVGSetUpdateCallback>},
 
+        {"svgGetDocumentXML", ArgumentParser<SVGGetDocumentXML>},
+        {"svgGetSize", ArgumentParser<SVGGetSize>},
+
+        {"svgSetSize", ArgumentParser<SVGSetSize>},
+        {"svgSetDocumentXML", ArgumentParser<SVGSetDocumentXML>},
+        {"svgSetUpdateCallback", ArgumentParser<SVGSetUpdateCallback>},
     };
 
     // Add functions
@@ -35,8 +36,9 @@ void CLuaVectorGraphicDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "svgCreate");
 
     lua_classfunction(luaVM, "getDocumentXML", "svgGetDocumentXML");
-    lua_classfunction(luaVM, "setDocumentXML", "svgSetDocumentXML");
     lua_classfunction(luaVM, "getSize", "svgGetSize");
+
+    lua_classfunction(luaVM, "setDocumentXML", "svgSetDocumentXML");
     lua_classfunction(luaVM, "setSize", "svgSetSize");
 
     lua_registerclass(luaVM, "SVG");
@@ -113,6 +115,7 @@ bool CLuaVectorGraphicDefs::SetSize(CClientVectorGraphic* vectorGraphic, CVector
 CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector2D size, std::optional<std::string> pathOrRawData,
                                                        std::optional<CLuaFunctionRef> luaFunctionRef)
 {
+    //  svg svgCreate ( int width, int height [, string pathOrRawData, function callback ( element svg ) ] )
     if (size.fX <= 0 || size.fY <= 0)
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
 
@@ -201,11 +204,13 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
 
 CXMLNode* CLuaVectorGraphicDefs::SVGGetDocumentXML(CClientVectorGraphic* vectorGraphic)
 {
+    //  xmlnode svgGetDocumentXML ( svg svgElement )
     return vectorGraphic->GetXMLDocument();
 }
 
 bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* vectorGraphic, CXMLNode* xmlNode, std::optional<CLuaFunctionRef> luaFunctionRef)
 {
+    //  bool svgSetDocumentXML ( svg svgElement, xmlnode xmlDocument [, function callback ( element svg ) ] )
     bool didLoad = SetDocument(vectorGraphic, xmlNode);
 
     // Retain support for callback functions (#2589)
@@ -219,11 +224,13 @@ bool CLuaVectorGraphicDefs::SVGSetDocumentXML(CClientVectorGraphic* vectorGraphi
 
 CLuaMultiReturn<int, int> CLuaVectorGraphicDefs::SVGGetSize(CClientVectorGraphic* vectorGraphic)
 {
+    //  int, int svgGetSize( svg svgElement )
     return {(int)vectorGraphic->GetRenderItem()->m_uiSizeX, (int)vectorGraphic->GetRenderItem()->m_uiSizeY};
 }
 
 bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* vectorGraphic, CVector2D size, std::optional<CLuaFunctionRef> luaFunctionRef)
 {
+    //  bool svgSetSize( svg svgElement, int width, int height [, function callback ( element svg ) ] )
     if (size.fX <= 0 || size.fY <= 0)
         throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
 
@@ -243,6 +250,7 @@ bool CLuaVectorGraphicDefs::SVGSetSize(CClientVectorGraphic* vectorGraphic, CVec
 
 bool CLuaVectorGraphicDefs::SVGSetUpdateCallback(CClientVectorGraphic* vectorGraphic, std::variant<CLuaFunctionRef, bool> luaFunctionRef)
 {
+    //  bool svgSetUpdateCallback( svg svgElement, function / bool callback )
     if (std::holds_alternative<CLuaFunctionRef>(luaFunctionRef))
     {
         vectorGraphic->SetUpdateCallback(std::get<CLuaFunctionRef>(luaFunctionRef));
@@ -253,16 +261,6 @@ bool CLuaVectorGraphicDefs::SVGSetUpdateCallback(CClientVectorGraphic* vectorGra
         vectorGraphic->RemoveUpdateCallback();
         return true;
     }
-
-    return false;
-}
-
-std::variant<CLuaFunctionRef, bool> CLuaVectorGraphicDefs::SVGGetUpdateCallback(CClientVectorGraphic* vectorGraphic)
-{
-    auto func = vectorGraphic->GetUpdateCallback();
-
-    if (std::holds_alternative<CLuaFunctionRef>(func))
-        return func;
 
     return false;
 }

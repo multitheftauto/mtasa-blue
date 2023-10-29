@@ -34,5 +34,4 @@ private:
     static bool SetSize(CClientVectorGraphic* vectorGraphic, CVector2D size);
 
     static bool                                SVGSetUpdateCallback(CClientVectorGraphic* vectorGraphic, std::variant<CLuaFunctionRef, bool> luaFunctionRef);
-    static std::variant<CLuaFunctionRef, bool> SVGGetUpdateCallback(CClientVectorGraphic* vectorGraphic);
 };

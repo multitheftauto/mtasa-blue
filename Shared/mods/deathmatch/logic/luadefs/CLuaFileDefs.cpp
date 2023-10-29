@@ -38,10 +38,22 @@ static auto getResourceFilePath(CResource* thisResource, CResource* fileResource
 void CLuaFileDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"fileOpen", fileOpen},       {"fileCreate", fileCreate}, {"fileExists", fileExists}, {"fileCopy", fileCopy},
-        {"fileRename", fileRename},   {"fileDelete", fileDelete}, {"fileClose", fileClose},   {"fileFlush", fileFlush},
-        {"fileRead", fileRead},       {"fileWrite", fileWrite},   {"fileGetPos", fileGetPos}, {"fileGetSize", fileGetSize},
-        {"fileGetPath", fileGetPath}, {"fileIsEOF", fileIsEOF},   {"fileSetPos", fileSetPos}, {"fileGetContents", ArgumentParser<fileGetContents>},
+        {"fileOpen", fileOpen},
+        {"fileCreate", fileCreate},
+        {"fileExists", fileExists},
+        {"fileCopy", fileCopy},
+        {"fileRename", fileRename},
+        {"fileDelete", fileDelete},
+        {"fileClose", fileClose},
+        {"fileFlush", fileFlush},
+        {"fileRead", fileRead},
+        {"fileWrite", fileWrite},
+        {"fileGetPos", fileGetPos},
+        {"fileGetSize", fileGetSize},
+        {"fileGetPath", fileGetPath},
+        {"fileIsEOF", fileIsEOF},
+        {"fileSetPos", fileSetPos
+        {"fileGetContents", ArgumentParser<fileGetContents>},
     };
 
     // Add functions

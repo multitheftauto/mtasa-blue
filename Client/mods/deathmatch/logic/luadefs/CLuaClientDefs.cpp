@@ -15,15 +15,22 @@
 
 void CLuaClientDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{{"setTransferBoxVisible", ArgumentParser<SetTransferBoxVisible>},
-                                                                             {"isTransferBoxVisible", ArgumentParser<IsTransferBoxVisible>},
-                                                                             {"isTransferBoxAlwaysVisible", ArgumentParser<IsTransferBoxAlwaysVisible>},
-                                                                             {"showChat", ArgumentParserWarn<false, ShowChat>},
-                                                                             {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
-                                                                             {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
-                                                                             {"clearDebugBox", ArgumentParser<ClearDebug>},
-                                                                             {"isMTAWindowFocused", ArgumentParser<IsMTAWindowFocused>},
-                                                                             {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>}};
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Transferbox get funcs
+        {"isTransferBoxVisible", ArgumentParser<IsTransferBoxVisible>},
+        {"isTransferBoxAlwaysVisible", ArgumentParser<IsTransferBoxAlwaysVisible>},
+        {"isChatVisible", ArgumentParserWarn<false, IsChatVisible>},
+        {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
+        {"isMTAWindowFocused", ArgumentParser<IsMTAWindowFocused>},
+        {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>}
+
+        // Transferbox set funcs
+        {"setTransferBoxVisible", ArgumentParser<SetTransferBoxVisible>},
+
+        // Transferbox dev funcs
+        {"showChat", ArgumentParserWarn<false, ShowChat>},
+        {"clearDebugBox", ArgumentParser<ClearDebug>},
+    };
 
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
@@ -31,21 +38,26 @@ void CLuaClientDefs::LoadFunctions()
 
 bool CLuaClientDefs::SetTransferBoxVisible(bool visible)
 {
+    //  bool setTransferBoxVisible ( bool visible )
     return g_pClientGame->GetTransferBox()->SetClientVisibility(visible);
 }
 
 bool CLuaClientDefs::IsTransferBoxVisible()
 {
+    //  bool isTransferBoxVisible ( )
     return g_pClientGame->GetTransferBox()->IsVisible();
 }
 
 bool CLuaClientDefs::IsTransferBoxAlwaysVisible()
 {
+    //  bool isTransferBoxAlwaysVisible ( )
     return g_pClientGame->GetTransferBox()->IsAlwaysVisible();
 }
 
 bool CLuaClientDefs::ShowChat(bool bVisible, std::optional<bool> optInputBlocked)
 {
+    //  bool showChat ( bool show [, bool inputBlocked ] )
+
     // Keep old behaviour: input is blocked when chat is hidden
     bool bInputBlocked = !bVisible;
     if (optInputBlocked.has_value())
@@ -57,11 +69,13 @@ bool CLuaClientDefs::ShowChat(bool bVisible, std::optional<bool> optInputBlocked
 
 bool CLuaClientDefs::IsChatVisible()
 {
+    //  bool isChatVisible ( )
     return g_pCore->IsChatVisible();
 }
 
 bool CLuaClientDefs::IsChatInputBlocked()
 {
+    //  bool isChatInputBlocked ( )
     return g_pCore->IsChatInputBlocked();
 }
 
@@ -73,10 +87,12 @@ bool CLuaClientDefs::ClearDebug()
 
 bool CLuaClientDefs::IsMTAWindowFocused()
 {
+    //  bool isMTAWindowFocused ( )
     return m_pClientGame->IsWindowFocused();
 }
 
 bool CLuaClientDefs::IsCapsLockEnabled()
 {
+    //  bool isCapsLockEnabled ( )
     return ((::GetKeyState(VK_CAPITAL) & 0x0001) != 0);
 }

@@ -14,6 +14,8 @@ void CLuaDiscordDefs::LoadFunctions()
 {
     // Backwards compatibility functions
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        {"isDiscordRichPresenceConnected", ArgumentParser < IsDiscordRPCConnected>},
+        {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
         {"setDiscordApplicationID", ArgumentParser<SetAppID>},
         {"setDiscordRichPresenceDetails", ArgumentParser<SetDetails>},
         {"setDiscordRichPresenceState", ArgumentParser<SetState>},
@@ -23,9 +25,6 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresenceStartTime", ArgumentParser<SetStartTime>},
         {"setDiscordRichPresenceEndTime", ArgumentParser<SetEndTime>},
         {"setDiscordRichPresencePartySize", ArgumentParser<SetPartySize>},
-        {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
-        {"isDiscordRichPresenceConnected", ArgumentParser < IsDiscordRPCConnected>},
-
     };
 
     // Add functions
@@ -37,6 +36,7 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
+    lua_classfunction(luaVM, "isConnected", "isDiscordRichPresenceConnected");
     lua_classfunction(luaVM, "setApplication", "setDiscordApplicationID");
     lua_classfunction(luaVM, "setState", "setDiscordRichPresenceState");
     lua_classfunction(luaVM, "setDetails", "setDiscordRichPresenceDetails");
@@ -47,15 +47,12 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setEndTime", "setDiscordRichPresenceEndTime");
     lua_classfunction(luaVM, "setPartySize", "setDiscordRichPresencePartySize");
 
-    lua_classfunction(luaVM, "isConnected", "isDiscordRichPresenceConnected");
-    //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
-    //lua_classfunction(luaVM, "setAppID", "setDiscordRichPresenceAppID");
-
     lua_registerclass(luaVM, "DiscordRPC");
 }
 
 bool CLuaDiscordDefs::ResetData()
 {
+    //  bool resetDiscordRichPresenceData ( )
     auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
@@ -72,6 +69,7 @@ bool CLuaDiscordDefs::ResetData()
 
 bool CLuaDiscordDefs::SetState(std::string strState)
 {
+    //  bool setDiscordRichPresenceState ( string state )
     int stateLength = strState.length();
 
     if (stateLength > 128)
@@ -93,6 +91,7 @@ bool CLuaDiscordDefs::SetState(std::string strState)
 
 bool CLuaDiscordDefs::SetAppID(std::string strAppID)
 {
+    //  bool setDiscordApplicationID ( string applicationID )
     int appIDLength = strAppID.length();
 
     if (appIDLength < 1 || appIDLength > 32)
@@ -108,6 +107,7 @@ bool CLuaDiscordDefs::SetAppID(std::string strAppID)
 
 bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 {
+    //  bool setDiscordRichPresenceDetails ( string details )
     int detailsLength = strDetails.length();
 
     if (detailsLength > 128)
@@ -129,6 +129,7 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 
 bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 {
+    //  bool setDiscordRichPresenceStartTime ( int seconds )
     unsigned long ulSecondsSinceEpoch = time(nullptr) + ulTime;
 
     if (ulTime == 0)
@@ -148,6 +149,7 @@ bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
 
 bool CLuaDiscordDefs::SetEndTime(unsigned long ulTime)
 {
+    //  bool setDiscordRichPresenceEndTime ( int seconds )
     unsigned long ulSecondsSinceEpoch = time(nullptr) + ulTime;
 
     if (ulTime == 0)
@@ -167,6 +169,7 @@ bool CLuaDiscordDefs::SetEndTime(unsigned long ulTime)
 
 bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
 {
+    //  bool setDiscordRichPresencePartySize ( int size, int max )
     if (iSize > iMax)
         throw std::invalid_argument("Party size must be less than or equal to max party size");
 
@@ -184,6 +187,7 @@ bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
 
 bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, bool bIsLarge)
 {
+    //  bool setDiscordRichPresenceAsset ( string assetImage, string text )
     int assetLength = szAsset.length();
     int assetTextLength = szAssetText.length();
 
@@ -220,6 +224,7 @@ bool CLuaDiscordDefs::SetSmallAsset(std::string szAsset, std::string szAssetText
 
 bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, std::string szUrl)
 {
+    //  bool setDiscordRichPresenceButton ( int index, string text, string url )
     if (iIndex < 1 || iIndex > 2)
         return false;
 
@@ -250,6 +255,7 @@ bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, 
 
 bool CLuaDiscordDefs::IsDiscordRPCConnected()
 {
+    //  bool isDiscordRichPresenceConnected ( )
     auto discord = g_pCore->GetDiscord();
 
     if (!discord)

@@ -136,7 +136,6 @@
 #include <luadefs/CLuaRadarAreaDefs.h>
 #include <luadefs/CLuaResourceDefs.h>
 #include <luadefs/CLuaSearchLightDefs.h>
-#include <luadefs/CLuaTaskDefs.h>
 #include <luadefs/CLuaTeamDefs.h>
 #include <luadefs/CLuaTimerDefs.h>
 #include <luadefs/CLuaVehicleDefs.h>

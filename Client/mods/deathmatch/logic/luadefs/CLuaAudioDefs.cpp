@@ -15,62 +15,69 @@
 
 void CLuaAudioDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{// Audio funcs
-                                                                             {"playSoundFrontEnd", PlaySoundFrontEnd},
-                                                                             {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
-                                                                             {"isAmbientSoundEnabled", IsAmbientSoundEnabled},
-                                                                             {"resetAmbientSounds", ResetAmbientSounds},
-                                                                             {"setWorldSoundEnabled", SetWorldSoundEnabled},
-                                                                             {"isWorldSoundEnabled", IsWorldSoundEnabled},
-                                                                             {"resetWorldSounds", ResetWorldSounds},
-                                                                             {"playSFX", PlaySFX},
-                                                                             {"playSFX3D", PlaySFX3D},
-                                                                             {"getSFXStatus", GetSFXStatus},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Audio funcs
+        {"playSoundFrontEnd", PlaySoundFrontEnd},
+        {"playSFX", PlaySFX},
+        {"playSFX3D", PlaySFX3D},
+        {"resetAmbientSounds", ResetAmbientSounds},
+        {"resetWorldSounds", ResetWorldSounds},
+        {"isAmbientSoundEnabled", IsAmbientSoundEnabled},
+        {"isWorldSoundEnabled", IsWorldSoundEnabled},
+        {"getSFXStatus", GetSFXStatus},
+        {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
+        {"setWorldSoundEnabled", SetWorldSoundEnabled},
 
-                                                                             // Sound effects and synth funcs
-                                                                             {"playSound", PlaySound},
-                                                                             {"playSound3D", PlaySound3D},
-                                                                             {"stopSound", StopSound},
-                                                                             {"setSoundPosition", SetSoundPosition},
-                                                                             {"getSoundPosition", GetSoundPosition},
-                                                                             {"getSoundLength", GetSoundLength},
-                                                                             {"getSoundBufferLength", GetSoundBufferLength},
-                                                                             {"setSoundLooped", ArgumentParser<SetSoundLooped>},
-                                                                             {"isSoundLooped", ArgumentParser<IsSoundLooped>},
-                                                                             {"setSoundPaused", SetSoundPaused},
-                                                                             {"isSoundPaused", IsSoundPaused},
-                                                                             {"setSoundVolume", SetSoundVolume},
-                                                                             {"getSoundVolume", GetSoundVolume},
-                                                                             {"setSoundSpeed", SetSoundSpeed},
-                                                                             {"getSoundSpeed", GetSoundSpeed},
-                                                                             {"setSoundProperties", SetSoundProperties},
-                                                                             {"getSoundProperties", GetSoundProperties},
-                                                                             {"getSoundFFTData", GetSoundFFTData},
-                                                                             {"getSoundWaveData", GetSoundWaveData},
-                                                                             {"getSoundLevelData", GetSoundLevelData},
-                                                                             {"getSoundBPM", GetSoundBPM},
-                                                                             {"setSoundPanningEnabled", SetSoundPanEnabled},
-                                                                             {"isSoundPanningEnabled", IsSoundPanEnabled},
-                                                                             {"setSoundMinDistance", SetSoundMinDistance},
-                                                                             {"getSoundMinDistance", GetSoundMinDistance},
-                                                                             {"setSoundMaxDistance", SetSoundMaxDistance},
-                                                                             {"getSoundMaxDistance", GetSoundMaxDistance},
-                                                                             {"getSoundMetaTags", GetSoundMetaTags},
-                                                                             {"setSoundEffectEnabled", SetSoundEffectEnabled},
-                                                                             {"getSoundEffects", GetSoundEffects},
-                                                                             {"setSoundEffectParameter", SetSoundEffectParameter},
-                                                                             {"getSoundEffectParameters", GetSoundEffectParameters},
-                                                                             {"setSoundPan", SetSoundPan},
-                                                                             {"getSoundPan", GetSoundPan},
+        // Sound effects and synth funcs
+        {"playSound", PlaySound},
+        {"playSound3D", PlaySound3D},
+        {"stopSound", StopSound},
 
-                                                                             // Radio funcs
-                                                                             {"setRadioChannel", SetRadioChannel},
-                                                                             {"getRadioChannel", GetRadioChannel},
-                                                                             {"getRadioChannelName", GetRadioChannelName},
+        // Sound effect get funcs
+        {"isSoundLooped", ArgumentParser<IsSoundLooped>},
+        {"isSoundPaused", IsSoundPaused},
+        {"isSoundPanningEnabled", IsSoundPanEnabled},
+        {"getSoundPosition", GetSoundPosition},
+        {"getSoundLength", GetSoundLength},
+        {"getSoundBufferLength", GetSoundBufferLength},
+        {"getSoundVolume", GetSoundVolume},
+        {"getSoundSpeed", GetSoundSpeed},
+        {"getSoundProperties", GetSoundProperties},
+        {"getSoundFFTData", GetSoundFFTData},
+        {"getSoundWaveData", GetSoundWaveData},
+        {"getSoundLevelData", GetSoundLevelData},
+        {"getSoundBPM", GetSoundBPM},
+        {"getSoundMinDistance", GetSoundMinDistance},
+        {"getSoundMaxDistance", GetSoundMaxDistance},
+        {"getSoundMetaTags", GetSoundMetaTags},
+        {"getSoundEffects", GetSoundEffects},
+        {"getSoundPan", GetSoundPan},
+        {"getSoundEffectParameters", GetSoundEffectParameters},
 
-                                                                             // Dev funcs
-                                                                             {"showSound", ArgumentParser<ShowSound>},
-                                                                             {"isShowSoundEnabled", ArgumentParser<IsShowSoundEnabled>}};
+        // Sound effect set funcs
+        {"setSoundPosition", SetSoundPosition},
+        {"setSoundLooped", ArgumentParser<SetSoundLooped>},
+        {"setSoundPaused", SetSoundPaused},
+        {"setSoundVolume", SetSoundVolume},
+        {"setSoundSpeed", SetSoundSpeed},
+        {"setSoundProperties", SetSoundProperties},
+        {"setSoundPanningEnabled", SetSoundPanEnabled},
+        {"setSoundMinDistance", SetSoundMinDistance},
+        //  bool setSoundPanningEnabled ( element sound, bool enable )
+        {"setSoundMaxDistance", SetSoundMaxDistance},
+        {"setSoundEffectEnabled", SetSoundEffectEnabled},
+        {"setSoundEffectParameter", SetSoundEffectParameter},
+        {"setSoundPan", SetSoundPan},
+
+        // Radio funcs
+        {"setRadioChannel", SetRadioChannel},
+        {"getRadioChannel", GetRadioChannel},
+        {"getRadioChannelName", GetRadioChannelName},
+
+        // Sound dev funcs
+        {"showSound", ArgumentParser<ShowSound>},
+        {"isShowSoundEnabled", ArgumentParser<IsShowSoundEnabled>}
+    };
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -98,9 +105,10 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setPanningEnabled", "setSoundPanningEnabled");
     lua_classfunction(luaVM, "setProperties", "setSoundProperties");
 
+    lua_classfunction(luaVM, "isLooped", "isSoundLooped");
+    lua_classfunction(luaVM, "isPanningEnabled", "isSoundPanningEnabled");
     lua_classfunction(luaVM, "getLength", "getSoundLength");
     lua_classfunction(luaVM, "getBufferLength", "getSoundBufferLength");
-    lua_classfunction(luaVM, "isLooped", "isSoundLooped");
     lua_classfunction(luaVM, "getMetaTags", "getSoundMetaTags");
     lua_classfunction(luaVM, "getBPM", "getSoundBPM");
     lua_classfunction(luaVM, "getFFTData", "getSoundFFTData");
@@ -112,7 +120,6 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSpeed", "getSoundSpeed");
     lua_classfunction(luaVM, "getVolume", "getSoundVolume");
     lua_classfunction(luaVM, "getPan", "getSoundPan");
-    lua_classfunction(luaVM, "isPanningEnabled", "isSoundPanningEnabled");
     lua_classfunction(luaVM, "getProperties", "getSoundProperties");
 
     lua_classvariable(luaVM, "playbackPosition", "setSoundPosition", "getSoundPosition");
@@ -146,6 +153,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
 
 int CLuaAudioDefs::PlaySound(lua_State* luaVM)
 {
+    //  element playSound ( string soundPath, [ bool looped = false, bool throttled = true ] )
     SString          strSound = "";
     bool             bLoop = false;
     bool             bThrottle = true;
@@ -204,6 +212,7 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
 
 int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
 {
+    //  element playSound3D ( string soundURL, float x, float y, float z, [ bool looped = false, bool throttled = true ] )
     SString          strSound = "";
     CVector          vecPosition;
     bool             bLoop = false;
@@ -264,6 +273,7 @@ int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
 
 int CLuaAudioDefs::StopSound(lua_State* luaVM)
 {
+    //  bool stopSound ( element theSound )
     CClientSound*    pSound = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pSound);
@@ -288,6 +298,7 @@ int CLuaAudioDefs::StopSound(lua_State* luaVM)
 
 int CLuaAudioDefs::SetSoundPosition(lua_State* luaVM)
 {
+    //  bool setSoundPosition ( element theSound, float pos )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     double           dPosition = 0.0;
@@ -336,6 +347,7 @@ int CLuaAudioDefs::SetSoundPosition(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundPosition(lua_State* luaVM)
 {
+    //  float getSoundPosition ( element theSound )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     CScriptArgReader argStream(luaVM);
@@ -384,6 +396,7 @@ int CLuaAudioDefs::GetSoundPosition(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundLength(lua_State* luaVM)
 {
+    //  float getSoundLength ( element theSound )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     CScriptArgReader argStream(luaVM);
@@ -432,6 +445,7 @@ int CLuaAudioDefs::GetSoundLength(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
 {
+    //  float getSoundBufferLength ( element theSound )
     CClientSound* pSound;
 
     CScriptArgReader argStream(luaVM);
@@ -463,16 +477,19 @@ int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
 
 bool CLuaAudioDefs::SetSoundLooped(CClientSound* pSound, bool bLoop)
 {
+    //  bool setSoundLooped ( element theSound, bool loop )
     return pSound->SetLooped(bLoop);
 }
 
 bool CLuaAudioDefs::IsSoundLooped(CClientSound* pSound)
 {
+    //  bool isSoundLooped ( element theSound )
     return pSound->IsLooped();
 }
 
 int CLuaAudioDefs::SetSoundPaused(lua_State* luaVM)
 {
+    //  bool setSoundPaused ( element theSound, bool paused )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     bool             bPaused = false;
@@ -521,6 +538,7 @@ int CLuaAudioDefs::SetSoundPaused(lua_State* luaVM)
 
 int CLuaAudioDefs::IsSoundPaused(lua_State* luaVM)
 {
+    //  bool isSoundPaused ( element theSound )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     CScriptArgReader argStream(luaVM);
@@ -569,6 +587,7 @@ int CLuaAudioDefs::IsSoundPaused(lua_State* luaVM)
 
 int CLuaAudioDefs::SetSoundVolume(lua_State* luaVM)
 {
+    //  bool setSoundVolume ( element theSound/thePlayer, float volume )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     float            fVolume = 0.0f;
@@ -617,6 +636,7 @@ int CLuaAudioDefs::SetSoundVolume(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundVolume(lua_State* luaVM)
 {
+    //  float getSoundVolume ( element theSound )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     CScriptArgReader argStream(luaVM);
@@ -665,6 +685,7 @@ int CLuaAudioDefs::GetSoundVolume(lua_State* luaVM)
 
 int CLuaAudioDefs::SetSoundSpeed(lua_State* luaVM)
 {
+    //  bool setSoundSpeed ( element theSound, float speed )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     float            fSpeed = 0.0f;
@@ -713,6 +734,7 @@ int CLuaAudioDefs::SetSoundSpeed(lua_State* luaVM)
 
 int CLuaAudioDefs::SetSoundProperties(lua_State* luaVM)
 {
+    //  bool setSoundProperties ( element sound, float fSampleRate, float fTempo, float fPitch [, bool bReverse = false ] )
     CClientSound*    pSound = NULL;
     bool             bReversed = false;
     float            fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
@@ -743,6 +765,7 @@ int CLuaAudioDefs::SetSoundProperties(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundProperties(lua_State* luaVM)
 {
+    //  float, float, float, bool getSoundProperties( element sound )
     CClientSound*    pSound = NULL;
     bool             bReversed = false;
     float            fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
@@ -772,6 +795,7 @@ int CLuaAudioDefs::GetSoundProperties(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
 {
+    //  table getSoundFFTData ( element sound, int iSamples [, int iBands = 0 ] )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     float*           pData = NULL;
@@ -843,6 +867,7 @@ int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundWaveData(lua_State* luaVM)
 {
+    //  table getSoundWaveData ( element sound, int iSamples )
     CClientSound*    pSound = NULL;
     CClientPlayer*   pPlayer = NULL;
     float*           pData = NULL;
@@ -904,6 +929,7 @@ int CLuaAudioDefs::GetSoundWaveData(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundLevelData(lua_State* luaVM)
 {
+    //  int, int getSoundLevelData ( element theSound )
     CClientSound*    pSound = NULL;
     CClientPlayer*   pPlayer = NULL;
     DWORD            dwLeft = 0, dwRight = 0;
@@ -952,6 +978,7 @@ int CLuaAudioDefs::GetSoundLevelData(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundBPM(lua_State* luaVM)
 {
+    //  int getSoundBPM ( element sound )
     CClientSound*    pSound = NULL;
     float            fBPM = 0.0f;
     CScriptArgReader argStream(luaVM);
@@ -974,6 +1001,7 @@ int CLuaAudioDefs::GetSoundBPM(lua_State* luaVM)
 
 int CLuaAudioDefs::SetSoundPanEnabled(lua_State* luaVM)
 {
+    //  bool setSoundPanningEnabled ( element sound, bool enable )
     CClientSound*    pSound = NULL;
     bool             bEnabled = true;
     CScriptArgReader argStream(luaVM);
@@ -1000,6 +1028,7 @@ int CLuaAudioDefs::SetSoundPanEnabled(lua_State* luaVM)
 
 int CLuaAudioDefs::IsSoundPanEnabled(lua_State* luaVM)
 {
+    //  bool isSoundPanningEnabled ( element theSound )
     CClientSound*    pSound = NULL;
     bool             bEnabled = true;
     CScriptArgReader argStream(luaVM);
@@ -1025,6 +1054,7 @@ int CLuaAudioDefs::IsSoundPanEnabled(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundSpeed(lua_State* luaVM)
 {
+    //  float getSoundSpeed ( element theSound )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1073,6 +1103,7 @@ int CLuaAudioDefs::GetSoundSpeed(lua_State* luaVM)
 
 int CLuaAudioDefs::SetSoundMinDistance(lua_State* luaVM)
 {
+    //  bool setSoundMinDistance ( element sound, int distance )
     CClientSound*    pSound = NULL;
     float            fDistance = 0.0f;
     CScriptArgReader argStream(luaVM);
@@ -1099,6 +1130,7 @@ int CLuaAudioDefs::SetSoundMinDistance(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundMinDistance(lua_State* luaVM)
 {
+    //  int getSoundMinDistance ( element sound )
     CClientSound*    pSound = NULL;
     float            fDistance = 0.0f;
     CScriptArgReader argStream(luaVM);
@@ -1124,6 +1156,7 @@ int CLuaAudioDefs::GetSoundMinDistance(lua_State* luaVM)
 
 int CLuaAudioDefs::SetSoundMaxDistance(lua_State* luaVM)
 {
+    //  bool setSoundMaxDistance ( element sound, int distance )
     CClientSound*    pSound = NULL;
     float            fDistance = 0.0f;
     CScriptArgReader argStream(luaVM);
@@ -1150,6 +1183,7 @@ int CLuaAudioDefs::SetSoundMaxDistance(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundMaxDistance(lua_State* luaVM)
 {
+    //  int getSoundMaxDistance ( element sound )
     CClientSound*    pSound = NULL;
     float            fDistance = 0.0f;
     CScriptArgReader argStream(luaVM);
@@ -1175,6 +1209,7 @@ int CLuaAudioDefs::GetSoundMaxDistance(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundMetaTags(lua_State* luaVM)
 {
+    //  table getSoundMetaTags ( element sound [, string format = "" ] )
     CClientSound*    pSound = NULL;
     SString          strFormat = "";
     CScriptArgReader argStream(luaVM);
@@ -1291,6 +1326,7 @@ int CLuaAudioDefs::GetSoundMetaTags(lua_State* luaVM)
 
 int CLuaAudioDefs::SetSoundEffectEnabled(lua_State* luaVM)
 {
+    //  bool setSoundEffectEnabled ( element theSound/thePlayer, string effectName, bool bEnable )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     SString          strEffectName = "";
@@ -1341,6 +1377,7 @@ int CLuaAudioDefs::SetSoundEffectEnabled(lua_State* luaVM)
 
 int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
 {
+    //  table getSoundEffects ( element sound )
     CClientPlayer*   pPlayer = NULL;
     CClientSound*    pSound = NULL;
     CScriptArgReader argStream(luaVM);
@@ -2117,6 +2154,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
 
 int CLuaAudioDefs::PlaySoundFrontEnd(lua_State* luaVM)
 {
+    //  bool playSoundFrontEnd ( int sound )
     CClientSound*    pSound = NULL;
     CVector          vecPosition;
     unsigned char    ucSound = 0;
@@ -2145,6 +2183,7 @@ int CLuaAudioDefs::PlaySoundFrontEnd(lua_State* luaVM)
 
 int CLuaAudioDefs::SetAmbientSoundEnabled(lua_State* luaVM)
 {
+    //  bool setAmbientSoundEnabled( string theType, bool enable )
     eAmbientSoundType eType;
     bool              bEnabled;
 
@@ -2169,6 +2208,7 @@ int CLuaAudioDefs::SetAmbientSoundEnabled(lua_State* luaVM)
 
 int CLuaAudioDefs::IsAmbientSoundEnabled(lua_State* luaVM)
 {
+    //  bool isAmbientSoundEnabled( string theType )
     eAmbientSoundType eType;
 
     CScriptArgReader argStream(luaVM);
@@ -2192,6 +2232,7 @@ int CLuaAudioDefs::IsAmbientSoundEnabled(lua_State* luaVM)
 
 int CLuaAudioDefs::ResetAmbientSounds(lua_State* luaVM)
 {
+    //  bool resetAmbientSounds ( )
     if (CStaticFunctionDefinitions::ResetAmbientSounds())
     {
         lua_pushboolean(luaVM, true);
@@ -2262,6 +2303,7 @@ int CLuaAudioDefs::IsWorldSoundEnabled(lua_State* luaVM)
 
 int CLuaAudioDefs::ResetWorldSounds(lua_State* luaVM)
 {
+    //  bool resetWorldSounds ( )
     if (CStaticFunctionDefinitions::ResetWorldSounds())
     {
         lua_pushboolean(luaVM, true);
@@ -2479,6 +2521,7 @@ int CLuaAudioDefs::GetSoundPan(lua_State* luaVM)
 // Radio
 int CLuaAudioDefs::SetRadioChannel(lua_State* luaVM)
 {
+    //  bool setRadioChannel ( int ID )
     unsigned char    ucChannel = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucChannel);
@@ -2500,6 +2543,7 @@ int CLuaAudioDefs::SetRadioChannel(lua_State* luaVM)
 
 int CLuaAudioDefs::GetRadioChannel(lua_State* luaVM)
 {
+    //  int getRadioChannel ( )
     unsigned char ucChannel = 0;
     if (CStaticFunctionDefinitions::GetRadioChannel(ucChannel))
     {
@@ -2513,6 +2557,7 @@ int CLuaAudioDefs::GetRadioChannel(lua_State* luaVM)
 
 int CLuaAudioDefs::GetRadioChannelName(lua_State* luaVM)
 {
+    //  string getRadioChannelName ( int id )
     static const SFixedArray<const char*, 13> szRadioStations = {{"Radio off", "Playback FM", "K-Rose", "K-DST", "Bounce FM", "SF-UR", "Radio Los Santos",
                                                                   "Radio X", "CSR 103.9", "K-Jah West", "Master Sounds 98.3", "WCTR", "User Track Player"}};
 
@@ -2537,6 +2582,7 @@ int CLuaAudioDefs::GetRadioChannelName(lua_State* luaVM)
 
 bool CLuaAudioDefs::ShowSound(bool state)
 {
+    //  bool showSound ( bool state )
     if (!g_pClientGame->GetDevelopmentMode())
         return false;
 
@@ -2546,5 +2592,6 @@ bool CLuaAudioDefs::ShowSound(bool state)
 
 bool CLuaAudioDefs::IsShowSoundEnabled()
 {
+    //  bool isShowSoundEnabled ( )
     return g_pClientGame->GetShowSound();
 }

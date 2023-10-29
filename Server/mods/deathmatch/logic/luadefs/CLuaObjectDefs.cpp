@@ -21,14 +21,15 @@ void CLuaObjectDefs::LoadFunctions()
         {"createObject", CreateObject},
 
         // Object get funcs
+        {"isObjectBreakable", ArgumentParser<IsObjectBreakable>},
         {"getObjectRotation", GetObjectRotation},
         {"getObjectScale", GetObjectScale},
-        {"isObjectBreakable", ArgumentParser<IsObjectBreakable>},
 
         // Object set funcs
         {"setObjectRotation", SetObjectRotation},
         {"setObjectScale", SetObjectScale},
         {"setObjectBreakable", ArgumentParser<SetObjectBreakable>},
+
         {"moveObject", MoveObject},
         {"stopObject", StopObject},
     };

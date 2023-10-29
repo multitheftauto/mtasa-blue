@@ -18,12 +18,14 @@
 void CLuaBanDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Ban add/remove
         {"addBan", AddBan},
         {"removeBan", RemoveBan},
-
-        {"getBans", GetBans},
         {"reloadBans", ReloadBanList},
 
+        // Ban get funcs
+        {"isBan", IsBan},
+        {"getBans", GetBans},
         {"getBanIP", GetBanIP},
         {"getBanSerial", GetBanSerial},
         {"getBanUsername", GetBanUsername},
@@ -33,11 +35,11 @@ void CLuaBanDefs::LoadFunctions()
         {"getBanReason", GetBanReason},
         {"getBanAdmin", GetBanAdmin},
 
+        // Ban set funcs
         {"setUnbanTime", SetUnbanTime},
         {"setBanReason", SetBanReason},
         {"setBanAdmin", SetBanAdmin},
         {"setBanNick", SetBanNick},
-        {"isBan", IsBan},
     };
 
     // Add functions

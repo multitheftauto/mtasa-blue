@@ -14,30 +14,36 @@
 
 void CLuaColShapeDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{{"createColCircle", CreateColCircle},
-                                                                             {"createColCuboid", CreateColCuboid},
-                                                                             {"createColSphere", CreateColSphere},
-                                                                             {"createColRectangle", CreateColRectangle},
-                                                                             {"createColPolygon", CreateColPolygon},
-                                                                             {"createColTube", CreateColTube},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Col Create/destroy
+        {"addColPolygonPoint", AddColPolygonPoint},
+        {"removeColPolygonPoint", RemoveColPolygonPoint},
+        {"createColCircle", CreateColCircle},
+        {"createColCuboid", CreateColCuboid},
+        {"createColSphere", CreateColSphere},
+        {"createColRectangle", CreateColRectangle},
+        {"createColPolygon", CreateColPolygon},
+        {"createColTube", CreateColTube},
 
-                                                                             {"getColShapeRadius", GetColShapeRadius},
-                                                                             {"setColShapeRadius", SetColShapeRadius},
-                                                                             {"getColShapeSize", GetColShapeSize},
-                                                                             {"setColShapeSize", SetColShapeSize},
-                                                                             {"getColPolygonPoints", GetColPolygonPoints},
-                                                                             {"getColPolygonPointPosition", GetColPolygonPointPosition},
-                                                                             {"setColPolygonPointPosition", SetColPolygonPointPosition},
-                                                                             {"addColPolygonPoint", AddColPolygonPoint},
-                                                                             {"removeColPolygonPoint", RemoveColPolygonPoint},
+        // Col get funcs
+        {"isInsideColShape", IsInsideColShape},
+        {"isShowCollisionsEnabled", ArgumentParser<IsShowCollisionsEnabled>}
+        {"getColShapeRadius", GetColShapeRadius},
+        {"getColShapeSize", GetColShapeSize},
+        {"getColPolygonPoints", GetColPolygonPoints},
+        {"getColPolygonPointPosition", GetColPolygonPointPosition},
+        {"getColShapeType", GetColShapeType},
+        {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
 
-                                                                             {"isInsideColShape", IsInsideColShape},
-                                                                             {"getColShapeType", GetColShapeType},
-                                                                             {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
-                                                                             {"getColPolygonHeight", ArgumentParser<GetColPolygonHeight>},
+        // Col set funcs
+        {"setColShapeRadius", SetColShapeRadius},
+        {"setColShapeSize", SetColShapeSize},
+        {"setColPolygonPointPosition", SetColPolygonPointPosition},
+        {"setColPolygonHeight", ArgumentParser<SetColPolygonHeight>},
 
-                                                                             {"showCol", ArgumentParser<SetShowCollision>},
-                                                                             {"isShowCollisionsEnabled", ArgumentParser<IsShowCollisionsEnabled>}};
+        // Col dev funcs
+        {"showCol", ArgumentParser<SetShowCollision>},
+    };
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -83,6 +89,8 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
 int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
 {
+    //  int getColShapeType ( colshape shape )
+
     // Verify the arguments
     CClientColShape* pColShape = nullptr;
     CScriptArgReader argStream(luaVM);
@@ -108,6 +116,7 @@ int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
 
 int CLuaColShapeDefs::CreateColCircle(lua_State* luaVM)
 {
+    //  colshape createColCircle ( float fX, float fY, float radius )
     CVector2D        vecPosition;
     float            fRadius = 0.1f;
     CScriptArgReader argStream(luaVM);
@@ -151,6 +160,7 @@ int CLuaColShapeDefs::CreateColCircle(lua_State* luaVM)
 
 int CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM)
 {
+    //  colshape createColCuboid ( float fX, float fY, float fZ, float fWidth, float fDepth, float fHeight )
     CVector          vecPosition, vecSize;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
@@ -197,6 +207,7 @@ int CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM)
 
 int CLuaColShapeDefs::CreateColSphere(lua_State* luaVM)
 {
+    //  colshape createColSphere ( float fX, float fY, float fZ, float fRadius )
     CVector          vecPosition;
     float            fRadius = 0.1f;
     CScriptArgReader argStream(luaVM);
@@ -240,6 +251,7 @@ int CLuaColShapeDefs::CreateColSphere(lua_State* luaVM)
 
 int CLuaColShapeDefs::CreateColRectangle(lua_State* luaVM)
 {
+    //  colshape createColRectangle ( float fX, float fY, float fWidth, float fHeight )
     CVector2D        vecPosition;
     CVector2D        vecSize;
     CScriptArgReader argStream(luaVM);
@@ -287,6 +299,7 @@ int CLuaColShapeDefs::CreateColRectangle(lua_State* luaVM)
 
 int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
 {
+    //  colshape createColPolygon ( float fCenterX, float fCenterY, float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, ... )
     CVector2D        vecPosition;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector2D(vecPosition);
@@ -338,6 +351,7 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
 
 int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
 {
+    //  colshape createColTube ( float fX, float fY, float fZ, float fRadius, float fHeight )
     CVector          vecPosition;
     float            fRadius = 0.1f, fHeight = 0.1f;
     CScriptArgReader argStream(luaVM);
@@ -413,6 +427,7 @@ int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)
 
 int CLuaColShapeDefs::GetColShapeRadius(lua_State* luaVM)
 {
+    //  float getColShapeRadius ( colshape shape )
     CClientColShape* pColShape;
 
     CScriptArgReader argStream(luaVM);
@@ -434,6 +449,7 @@ int CLuaColShapeDefs::GetColShapeRadius(lua_State* luaVM)
 
 int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
 {
+    //  bool setColShapeRadius ( colshape shape, float radius )
     CClientColShape* pColShape;
     float            fRadius;
 
@@ -456,6 +472,7 @@ int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
 
 int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)
 {
+    //  float, float, float getColShapeSize ( colshape shape )
     CClientColShape* pColShape;
 
     CScriptArgReader argStream(luaVM);
@@ -531,6 +548,7 @@ int CLuaColShapeDefs::OOP_GetColShapeSize(lua_State* luaVM)
 
 int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
 {
+    //  bool setColShapeSize ( colshape shape, float width, float depth, float height )
     CClientColShape* pColShape;
     CVector          vecSize;
 
@@ -579,6 +597,7 @@ int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
 
 int CLuaColShapeDefs::GetColPolygonPoints(lua_State* luaVM)
 {
+    //  table getColPolygonPoints ( colshape shape )
     CClientColShape* pColShape;
 
     CScriptArgReader argStream(luaVM);
@@ -649,6 +668,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPoints(lua_State* luaVM)
 
 int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
 {
+    //  float, float getColPolygonPointPosition ( colshape shape, int index )
     CClientColShape* pColShape;
     uint             uiPointIndex;
 
@@ -713,6 +733,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPointPosition(lua_State* luaVM)
 
 int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
 {
+    //  bool setColPolygonPointPosition ( colshape shape, int index, float fX, float fY )
     CClientColShape* pColShape;
     uint             uiPointIndex;
     CVector2D        vecPoint;
@@ -746,6 +767,7 @@ int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
 
 int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
 {
+    //  bool addColPolygonPoint ( colshape shape, float fX, float fY [, int index = 0 ] )
     CClientColShape* pColShape;
     uint             uiPointIndex;
     CVector2D        vecPoint;
@@ -783,6 +805,7 @@ int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
 
 int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
 {
+    //  bool removeColPolygonPoint ( colshape shape, int index )
     CClientColShape* pColShape;
     uint             uiPointIndex;
 
@@ -819,6 +842,7 @@ int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
 
 CLuaMultiReturn<float, float> CLuaColShapeDefs::GetColPolygonHeight(CClientColPolygon* pColPolygon)
 {
+    //  float, float getColPolygonHeight ( colshape shape )
     float fFloor, fCeil;
     pColPolygon->GetHeight(fFloor, fCeil);
     return {fFloor, fCeil};
@@ -862,5 +886,6 @@ bool CLuaColShapeDefs::SetShowCollision(bool state)
 
 bool CLuaColShapeDefs::IsShowCollisionsEnabled()
 {
+    //  bool isShowCollisionsEnabled ( )
     return g_pClientGame->GetShowCollision();
 }

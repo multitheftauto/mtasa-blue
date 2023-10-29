@@ -74,7 +74,7 @@ void CLuaEffectDefs::AddClass(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddBlood(lua_State* luaVM)
 {
-    // bool fxAddBlood ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ, [int count=1, float fBrightness=1.0] )
+    //  bool fxAddBlood ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ [, int count = 1, float brightness = 1.0 ] )
 
     CVector vecPosition, vecDirection;
     int     iCount = 1;
@@ -104,7 +104,7 @@ int CLuaEffectDefs::fxAddBlood(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddWood(lua_State* luaVM)
 {
-    // bool fxAddWood ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ, [int count=1, float fBrightness=1.0] )
+    //  bool fxAddWood ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ [, int count = 1, float brightness = 1.0 ] )
 
     CVector vecPosition, vecDirection;
     int     iCount = 1;
@@ -134,8 +134,10 @@ int CLuaEffectDefs::fxAddWood(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddSparks(lua_State* luaVM)
 {
-    // bool fxAddSparks ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ, [float force=1, int count=1, float acrossLineX=0, float
-    // acrossLineY=0, float acrossLineZ=0, bool blur=false, float spread=1, float life=1] )
+    /*
+         bool fxAddSparks ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ [, float force = 1.0, int count = 1,
+                   float acrossLineX = 0.0, float acrossLineY = 0.0, float acrossLineZ = 0.0, bool blur = false, float spread = 1.0, float life = 1.0 ] )
+    */
 
     // Verify types
     CVector vecPosition, vecDirection;
@@ -174,7 +176,7 @@ int CLuaEffectDefs::fxAddSparks(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddTyreBurst(lua_State* luaVM)
 {
-    // bool fxAddTyreBurst ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ )
+    //  bool fxAddTyreBurst ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ )
 
     CVector vecPosition, vecDirection;
     int     iCount = 1;
@@ -202,8 +204,7 @@ int CLuaEffectDefs::fxAddTyreBurst(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddBulletImpact(lua_State* luaVM)
 {
-    // bool fxAddBulletImpact ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ, [int smokeSize=1, int sparkCount=1, float
-    // fSmokeIntensity=1.0] )
+    //  bool fxAddBulletImpact ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ [, int smokeSize = 1, int sparkCount = 1, float smokeIntensity = 1.0 ] )
 
     // Verify types
     CVector vecPosition, vecDirection;
@@ -236,7 +237,7 @@ int CLuaEffectDefs::fxAddBulletImpact(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddPunchImpact(lua_State* luaVM)
 {
-    // bool fxAddPunchImpact ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ )
+    //  bool fxAddPunchImpact ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ )
 
     // Verify types
     CVector vecPosition, vecDirection;
@@ -263,7 +264,7 @@ int CLuaEffectDefs::fxAddPunchImpact(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddDebris(lua_State* luaVM)
 {
-    // bool fxAddDebris ( float posX, float posY, float posZ, [int colorR=255, int colorG=0, int colorB=0, int colorA=255, float scale=1.0, int count=1] )
+    //  bool fxAddDebris ( float posX, float posY, float posZ [, int colorR = 255, int colorG = 0, int colorB = 0, int colorA = 255, float scale = 1.0, int count = 1 ] )
 
     // Verify types
     CVector vecPosition;
@@ -302,7 +303,7 @@ int CLuaEffectDefs::fxAddDebris(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddGlass(lua_State* luaVM)
 {
-    // bool fxAddGlass ( float posX, float posY, float posZ, [int colorR=255, int colorG=0, int colorB=0, int colorA=255, float scale=1.0, int count=1] )
+    //  bool fxAddGlass ( float posX, float posY, float posZ [, int colorR = 255, int colorG = 0, int colorB = 0, int colorA = 255, float scale = 1.0, int count = 1 ] )
 
     // Verify types
     CVector vecPosition;
@@ -341,7 +342,7 @@ int CLuaEffectDefs::fxAddGlass(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddWaterHydrant(lua_State* luaVM)
 {
-    // bool fxAddWaterHydrant ( float posX, float posY, float posZ )
+    //  bool fxAddWaterHydrant ( float posX, float posY, float posZ )
 
     // Verify types
     CVector vecPosition;
@@ -367,7 +368,7 @@ int CLuaEffectDefs::fxAddWaterHydrant(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddGunshot(lua_State* luaVM)
 {
-    // bool fxAddGunshot ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ, [bool includeSparks=true] )
+    //  bool fxAddGunshot ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ [, bool includeSparks = true ] )
 
     // Verify types
     CVector vecPosition, vecDirection;
@@ -396,7 +397,7 @@ int CLuaEffectDefs::fxAddGunshot(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddTankFire(lua_State* luaVM)
 {
-    // bool fxAddTankFire ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ )
+    //  bool fxAddTankFire ( float posX, float posY, float posZ, float dirX, float dirY, float dirZ )
 
     // Verify types
     CVector vecPosition, vecDirection;
@@ -423,7 +424,7 @@ int CLuaEffectDefs::fxAddTankFire(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddWaterSplash(lua_State* luaVM)
 {
-    // bool fxAddWaterSplash ( float posX, float posY, float posZ )
+    //  bool fxAddWaterSplash ( float posX, float posY, float posZ )
 
     // Verify types
     CVector          vecPosition;
@@ -448,7 +449,7 @@ int CLuaEffectDefs::fxAddWaterSplash(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddBulletSplash(lua_State* luaVM)
 {
-    // bool fxAddBulletSplash ( float posX, float posY, float posZ )
+    //  bool fxAddBulletSplash ( float posX, float posY, float posZ )
 
     CVector vecPosition;
 
@@ -473,7 +474,7 @@ int CLuaEffectDefs::fxAddBulletSplash(lua_State* luaVM)
 
 int CLuaEffectDefs::fxAddFootSplash(lua_State* luaVM)
 {
-    // bool fxAddFootSplash ( float posX, float posY, float posZ )
+    //  bool fxAddFootSplash ( float posX, float posY, float posZ )
 
     CVector vecPosition;
 
@@ -498,8 +499,7 @@ int CLuaEffectDefs::fxAddFootSplash(lua_State* luaVM)
 
 int CLuaEffectDefs::CreateEffect(lua_State* luaVM)
 {
-    // bool createEffect ( string fxName, float posX, float posY, float posZ[, float rotX, float rotY, float rotZ, float drawDistance, bool soundEnable = false]
-    // )
+    //  effect createEffect ( string name, float x, float y, float z [, float rX, float rY, float rZ, float drawDistance = 0, bool soundEnable = false ] )
 
     CVector vecPosition;
     CVector vecRotation;
@@ -544,7 +544,7 @@ int CLuaEffectDefs::CreateEffect(lua_State* luaVM)
 
 int CLuaEffectDefs::GetEffectSpeed(lua_State* luaVM)
 {
-    // float getEffectSpeed ( effect theEffect )
+    //  float getEffectSpeed ( effect theEffect )
 
     CClientEffect* pEffect;
 
@@ -566,7 +566,7 @@ int CLuaEffectDefs::GetEffectSpeed(lua_State* luaVM)
 
 int CLuaEffectDefs::SetEffectSpeed(lua_State* luaVM)
 {
-    // void setEffectSpeed ( effect theEffect, float fSpeed )
+    //  void setEffectSpeed ( effect theEffect, float fSpeed )
 
     CClientEffect* pEffect;
     float          fSpeed;
@@ -591,7 +591,7 @@ int CLuaEffectDefs::SetEffectSpeed(lua_State* luaVM)
 
 int CLuaEffectDefs::GetEffectDensity(lua_State* luaVM)
 {
-    // float getEffectDensity ( effect theEffect )
+    //  float getEffectDensity ( effect theEffect )
 
     CClientEffect* pEffect;
 
@@ -613,7 +613,7 @@ int CLuaEffectDefs::GetEffectDensity(lua_State* luaVM)
 
 int CLuaEffectDefs::SetEffectDensity(lua_State* luaVM)
 {
-    // void setEffectDensity ( effect theEffect, float fDensity )
+     // void setEffectDensity ( effect theEffect, float fDensity )
 
     CClientEffect* pEffect;
     float          fDensity;

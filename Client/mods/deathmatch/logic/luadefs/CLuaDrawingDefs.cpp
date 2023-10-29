@@ -217,9 +217,10 @@ int CLuaDrawingDefs::DxDrawLine3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
 {
-    //  bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, [bool flipUV,] element material, int width [,
-    //  int color = white,
-    //                          float faceX, float faceY, float faceZ ] )
+    /*
+         bool dxDrawMaterialLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, [ bool flipUV = false, ] element material, float width, 
+            [ int color = white, [ bool postGUI = false, ] float faceTowardX, float faceTowardY, float faceTowardZ ] )
+    */
     CVector          vecBegin;
     CVector          vecEnd;
     bool             bFlipUV;
@@ -261,9 +262,11 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
 {
-    //  bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, float u, float v, float usize, float
-    //  vsize,
-    //                                  [bool flipUV,] element material, int width, [int color = white, float faceX, float faceY, float faceZ ] )
+    /*
+         bool dxDrawMaterialSectionLine3D ( float startX, float startY, float startZ, float endX, float endY, float endZ, 
+                float u, float v, float usize, float vsize, [ bool flipUV = false, ] element material, float width, 
+                [ int color = white, [ bool postGUI = false, ] float faceX, float faceY, float faceZ ] )
+    */
     CVector          vecBegin;
     CVector          vecEnd;
     CVector2D        vecSectionPos;
@@ -309,9 +312,12 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
 {
-    //  bool dxDrawText ( string text, float left, float top [, float right=left, float bottom=top, int color=white, float scale=1, mixed font="default",
-    //      string alignX="left", string alignY="top", bool clip=false, bool wordBreak=false, bool postGUI=false, bool colorCoded=false, bool
-    //      subPixelPositioning=false, float rotation=0, float rotationCenterX=(left+right)/2, float rotationCenterY=(top+bottom)/2] )
+    /*
+         bool DxDrawText ( string text, float leftX, float topY [, float rightX = leftX, float bottom = topY, int color = white, float scaleXY = 1.0 [, float scaleY = 1.0], 
+            mixed font = "default", string alingX = "left", string alingY = "top", bool clip = false, bool wordBreak = false, 
+            bool postGUI = false, bool colorCoded = false, bool subPixelPositioning = false, 
+            float fRotation = 0.0, float fRotationCenterX = 0.0, float fRotationCenterY = 0.0, float fLineSpacing = 0.0 ] )
+    */
     SString            strText;
     CVector2D          vecTopLeft;
     CVector2D          vecBottomRight;
@@ -399,8 +405,7 @@ int CLuaDrawingDefs::DxDrawText(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawRectangle(lua_State* luaVM)
 {
-    //  bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning=false]
-    //  )
+    //  bool dxDrawRectangle ( float startX, float startY, float width, float height [, int color = white, bool postGUI = false, bool subPixelPositioning = false ] )
     CVector2D vecPosition;
     CVector2D vecSize;
     SColor    color;
@@ -430,6 +435,10 @@ int CLuaDrawingDefs::DxDrawRectangle(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawCircle(lua_State* luaVM)
 {
+    /*
+         bool dxDrawCircle ( float posX, float posY, float radius [, float startAngle = 0.0, float stopAngle = 360.0, int theColor = white,
+                    int theCenterColor = theColor, int segments = 32, int ratio = 1, bool postGUI = false ] )
+    */
     CVector2D vecPosition;
     float     fRadius;
     float     fStartAngle;
@@ -539,8 +548,12 @@ int CLuaDrawingDefs::DxDrawImage(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
 {
-    //  bool dxDrawImageSection ( float posX, float posY, float width, float height, float u, float v, float usize, float vsize, string filepath,
-    //      [ float rotation = 0, float rotationCenterOffsetX = 0, float rotationCenterOffsetY = 0, int color = white, bool postGUI = false ] )
+    /*
+         bool dxDrawImageSection ( float posX, float posY, float width, float height,
+                          float u, float v, float usize, float vsize, mixed image,
+                        [ float rotation = 0, float rotationCenterOffsetX = 0, float rotationCenterOffsetY = 0,
+                          int color = white, bool postGUI = false ] )
+    */
     CVector2D        vecPosition;
     CVector2D        vecSize;
     CVector2D        vecSectionPosition;
@@ -583,7 +596,7 @@ int CLuaDrawingDefs::DxDrawImageSection(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 {
-    // bool DxDrawPrimitive3D (string primitiveType, bool postGUI, table vertice1, ...)
+    //  bool dxDrawPrimitive3D ( string primitiveType, bool postGUI, table vertex1, table vertex2, table vertex3 [, table vertex4, ...] )
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveVertice>();
     bool             bPostGUI;
@@ -632,7 +645,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 {
-    // bool DxDrawMaterialPrimitive3D (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
+    //  bool dxDrawMaterialPrimitive3D ( primitiveType pType, mixed material, bool postGUI, table vertex1 [, table vertex2, ...] )
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
     CClientMaterial* pMaterialElement;
@@ -687,7 +700,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 {
-    // bool dxDrawPrimitive (string primitiveType, bool postGUI, table vertice1, ...)
+    //  bool dxDrawPrimitive ( string pType, bool postGUI, table vertex1 [, table vertex2, ...] )
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveVertice>();
     bool             bPostGUI;
@@ -736,7 +749,7 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
 {
-    // bool dxDrawPrimitive (string primitiveType, dxMaterial material, bool postGUI, table vertice1, ...)
+    //  bool dxDrawMaterialPrimitive ( primitiveType pType, mixed material, bool postGUI, table vertex1 [, table vertex2, ...] )
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
     CClientMaterial* pMaterialElement;
@@ -790,7 +803,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetTextWidth(lua_State* luaVM)
 {
-    //  float dxGetTextWidth ( string text, [float scale=1, mixed font="default", bool colorCoded=false] )
+    //  float dxGetTextWidth ( string text, [float scale=1, mixed font="default", bool bColorCoded=false] )
     SString        strText;
     float          fScale;
     eFontType      fontType;
@@ -833,7 +846,7 @@ int CLuaDrawingDefs::DxGetTextWidth(lua_State* luaVM)
 
 int CLuaDrawingDefs::OOP_DxGetTextWidth(lua_State* luaVM)
 {
-    //  float dxGetTextWidth ( string text, [float scale=1, mixed font="default", bool colorCoded=false] )
+    //  float dxGetTextWidth ( string text, [float scale=1, mixed font="default", bool bColorCoded=false] )
     SString        strText;
     float          fScale;
     CClientDxFont* pDxFontElement;
@@ -877,8 +890,7 @@ CVector2D CLuaDrawingDefs::OOP_DxGetTextSize(std::variant<CClientDxFont*, eFontT
                                              const std::optional<std::variant<CVector2D, float>> optScaleXY, const std::optional<bool> optWordBreak,
                                              const std::optional<bool> optColorCoded)
 {
-    // float, float dxGetTextSize ( string text, [float width=0, float scaleXY=1.0, float=scaleY=1.0, mixed font="default",
-    // bool wordBreak=false, bool colorCoded=false] )
+    //  float, float dxGetTextSize ( string text [, float width = 0, float scaleXY = 1.0 [, float scaleY = 1.0 ], mixed font = "default", bool wordBreak = false, bool colorCoded = false] )
     CGraphicsInterface* const graphics = g_pCore->GetGraphics();
 
     // resolve scale (use X as Y value, if optScaleY is empty)
@@ -1186,8 +1198,9 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxCreateRenderTarget(lua_State* luaVM)
 {
-    //  element dxCreateRenderTarget( int sizeX, int sizeY [, int withAlphaChannel = false ] )
-    //  element dxCreateRenderTarget( int sizeX, int sizeY, SurfaceFormat surfaceFormat )
+    //  element dxCreateRenderTarget ( int width, int height [, bool withAlpha = false ] )
+    //  BETA: NEW FEATURE (BUILD: 1.6.0 r21938)
+    //  element dxCreateRenderTarget ( int width, int height, surface-format surfaceFormat )
     CVector2D vecSize;
     bool      bWithAlphaChannel = false;
     bool      bHasSurfaceFormat = false;
@@ -1231,7 +1244,7 @@ int CLuaDrawingDefs::DxCreateRenderTarget(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxCreateScreenSource(lua_State* luaVM)
 {
-    //  element dxCreateScreenSource( int sizeX, int sizeY )
+    //  element dxCreateScreenSource ( int width, int height )
     CVector2D vecSize;
 
     CScriptArgReader argStream(luaVM);
@@ -1263,7 +1276,7 @@ int CLuaDrawingDefs::DxCreateScreenSource(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetMaterialSize(lua_State* luaVM)
 {
-    //  int, int [, int] dxGetMaterialSize( element material )
+    //  int, int [, int] dxGetMaterialSize ( element material )
     CClientMaterial* pMaterial;
     SString          strName;
 
@@ -1294,7 +1307,7 @@ int CLuaDrawingDefs::DxGetMaterialSize(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
 {
-    //  bool dxSetShaderValue( element shader, string name, mixed value )
+    //  bool dxSetShaderValue ( element theShader, string parameterName, mixed value )
     CClientShader* pShader;
     SString        strName;
 
@@ -1407,8 +1420,8 @@ int CLuaDrawingDefs::DxSetShaderValue(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetShaderTessellation(lua_State* luaVM)
 {
-    //  bool dxSetShaderTessellation( element shader, int tessellationX, int tessellationY )
-    //  bool shader:setShaderTessellation( element shader, Vector2 tessellation )
+    //  bool dxSetShaderTessellation ( element theShader, int tessellationX, int tessellationY )
+    //  bool theShader:setShaderTessellation ( element theShader, Vector2 tessellation )
     CClientShader* pShader;
     CVector2D      vecTessellation;
 
@@ -1432,7 +1445,15 @@ int CLuaDrawingDefs::DxSetShaderTessellation(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetShaderTransform(lua_State* luaVM)
 {
-    //  bool dxSetShaderTransform( element shader, lots )
+    /*
+         bool dxSetShaderTransform ( element theShader,
+                            float rotationX, float rotationY, float rotationZ,
+                          [ float rotationCenterOffsetX = 0, float rotationCenterOffsetY = 0, float rotationCenterOffsetZ = 0,
+                            bool bRotationCenterOffsetOriginIsScreen = false,
+                            float perspectiveCenterOffsetX = 0, float perspectiveCenterOffsetY = 0,
+                            bool bPerspectiveCenterOffsetOriginIsScreen = false ] )
+        theShader:setTransform ( ... ) 
+    */
     CClientShader*   pShader;
     SShaderTransform transform;
 
@@ -1461,7 +1482,8 @@ int CLuaDrawingDefs::DxSetShaderTransform(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetRenderTarget(lua_State* luaVM)
 {
-    //  bool setRenderTaget( element renderTarget [, bool clear = false ] )
+    //  bool dxSetRenderTarget ( [ element renderTarget, bool clear = false ] )
+    //  renderTarget:setAsTarget ( ... )
     CClientRenderTarget* pRenderTarget;
     bool                 bClear;
 
@@ -1494,7 +1516,8 @@ int CLuaDrawingDefs::DxSetRenderTarget(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxUpdateScreenSource(lua_State* luaVM)
 {
-    //  bool dxUpdateScreenSource( element screenSource [, bool resampleNow] )
+    //  bool dxUpdateScreenSource ( element screenSource [, bool resampleNow = false ] )
+    //  screenSource:update ( ... )
     CClientScreenSource* pScreenSource;
     bool                 bResampleNow;
 
@@ -1518,7 +1541,7 @@ int CLuaDrawingDefs::DxUpdateScreenSource(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxCreateFont(lua_State* luaVM)
 {
-    //  element dxCreateFont( string filepath [, int size=9, bool bold=false ] )
+    //  element dxCreateFont ( string filepath[, int size=9, bool bold=false, string quality="proof" ] )
     SString      strFilePath;
     int          iSize;
     bool         bBold;
@@ -1572,7 +1595,7 @@ int CLuaDrawingDefs::DxCreateFont(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetTestMode(lua_State* luaVM)
 {
-    //  bool dxSetTestMode( string testMode )
+    //  bool dxSetTestMode ( string testMode )
     eDxTestMode testMode;
 
     CScriptArgReader argStream(luaVM);
@@ -1594,7 +1617,7 @@ int CLuaDrawingDefs::DxSetTestMode(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
 {
-    //  table dxGetStatus()
+    //  table dxGetStatus ( )
 
     CScriptArgReader argStream(luaVM);
 
@@ -1773,8 +1796,11 @@ int CLuaDrawingDefs::DxGetStatus(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetTexturePixels(lua_State* luaVM)
 {
-    //  string dxGetTexturePixels( [ int surfaceIndex, ] element texture [, string pixelsFormat = "plain" [, string textureFormat = "argb"] [, bool mipmaps = true]]
-    //                             [, int x, int y, int width, int height ] )
+    /*
+         string dxGetTexturePixels ( 
+            [ int surfaceIndex = 0, ] element texture [, string pixelsFormat = "plain" [, string textureFormat = "unknown"] [, 
+            bool mipmaps = true] ] [, int x = 0, int y = 0, int width = 0, int height = 0 ] )
+    */
     CClientTexture*   pTexture;
     CVector2D         vecPosition;
     CVector2D         vecSize;
@@ -1822,7 +1848,7 @@ int CLuaDrawingDefs::DxGetTexturePixels(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetTexturePixels(lua_State* luaVM)
 {
-    //  bool dxSetTexturePixels( [ int sufaceIndex, ] element texture, string pixels [, int x, int y, int width, int height ] )
+    //  bool dxSetTexturePixels ( [ int surfaceIndex = 0, ] element texture, string pixels [, int x = 0, int y = 0, int width = 0, int height = 0 ] )
     CClientTexture* pTexture;
     CPixels         pixels;
     CVector2D       vecPosition;
@@ -1858,7 +1884,7 @@ int CLuaDrawingDefs::DxSetTexturePixels(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetPixelsSize(lua_State* luaVM)
 {
-    //  int x,y dxGetPixelsSize( string pixels )
+    //  int, int dxGetPixelsSize ( string pixels )
     CPixels pixels;
 
     CScriptArgReader argStream(luaVM);
@@ -1885,7 +1911,7 @@ int CLuaDrawingDefs::DxGetPixelsSize(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetPixelsFormat(lua_State* luaVM)
 {
-    //  string dxGetPixelsFormat( string pixels )
+    //  string dxGetPixelsFormat ( string pixels )
     CPixels pixels;
 
     CScriptArgReader argStream(luaVM);
@@ -1910,7 +1936,7 @@ int CLuaDrawingDefs::DxGetPixelsFormat(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxConvertPixels(lua_State* luaVM)
 {
-    //  string dxConvertPixels( string pixels, string pixelFormat [, int quality] )
+    //  string dxConvertPixels ( string pixels, string newFormat [, int quality = 80 ] )
     CPixels           pixels;
     EPixelsFormatType format;
     int               quality;
@@ -1939,7 +1965,7 @@ int CLuaDrawingDefs::DxConvertPixels(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxGetPixelColor(lua_State* luaVM)
 {
-    //  int r,g,b,a dxGetPixelColor( string pixels, int x, int y )
+    //  int, int, int, int dxGetPixelColor( string pixels, int x, int y )
     CPixels   pixels;
     CVector2D vecPosition;
 
@@ -1969,7 +1995,7 @@ int CLuaDrawingDefs::DxGetPixelColor(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetPixelColor(lua_State* luaVM)
 {
-    //  bool dxSetPixelColor( string pixels, int x, int y, int r, int g, int b [, int a] )
+    //  bool dxSetPixelColor ( string pixels, int x, int y, int r, int g, int b [, int a = 255 ] )
     CPixels   pixels;
     CVector2D vecPosition;
     SColor    color;
@@ -2030,7 +2056,7 @@ int CLuaDrawingDefs::DxGetBlendMode(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetAspectRatioAdjustmentEnabled(lua_State* luaVM)
 {
-    //  bool dxSetAspectRatioAdjustmentEnabled( bool enabled, float sourceRatio = 4/3 )
+    //  bool dxSetAspectRatioAdjustmentEnabled ( bool bEnabled [, float sourceRatio = 4/3 ] )
     bool  bEnabled;
     float fSourceRatio;
 
@@ -2057,7 +2083,7 @@ int CLuaDrawingDefs::DxSetAspectRatioAdjustmentEnabled(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxIsAspectRatioAdjustmentEnabled(lua_State* luaVM)
 {
-    //  bool, float dxIsAspectRatioAdjustmentEnabled()
+    //  bool, float dxIsAspectRatioAdjustmentEnabled ( )
     bool  bEnabled = g_pCore->GetGraphics()->IsAspectRatioAdjustmentEnabled();
     float fSourceRatio = g_pCore->GetGraphics()->GetAspectRatioAdjustmentSourceRatio();
     lua_pushboolean(luaVM, bEnabled);
@@ -2067,7 +2093,7 @@ int CLuaDrawingDefs::DxIsAspectRatioAdjustmentEnabled(lua_State* luaVM)
 
 int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
 {
-    //  bool dxSetTextureEdge ( texture theTexture, string textureEdge [, int border-color )
+    //  bool dxSetTextureEdge ( texture theTexture, string textureEdge [, int border-color] )
     CClientTexture* pTexture;
     ETextureAddress textureAddress;
     SColor          borderColor;
@@ -2094,6 +2120,8 @@ int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
 bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector position, const float radius, std::optional<SColor> color,
                                         const std::optional<float> lineWidth, const std::optional<unsigned int> iterations)
 {
+    //  bool dxDrawWiredSphere( float x, float y, float z, float radius, int theColor, float fLineWidth, uint iterations )
+
     // Greater than 4, crash the game
     if (iterations.has_value() && (*iterations == 0 || *iterations > 4))
         throw std::invalid_argument("Iterations must be between 1 and 4");

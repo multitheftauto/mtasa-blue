@@ -20,7 +20,7 @@
 void CLuaCameraDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        // Cam get funcs
+        // Camera get funcs
         {"getCamera", ArgumentParserWarn<false, GetCamera>},
         {"getCameraViewMode", ArgumentParserWarn<false, GetCameraViewMode>},
         {"getCameraMatrix", ArgumentParserWarn<false, GetCameraMatrix>},
@@ -30,7 +30,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraFieldOfView", GetCameraFieldOfView},
         {"getCameraDrunkLevel", ArgumentParserWarn<false, GetCameraDrunkLevel>},
 
-        // Cam set funcs
+        // Camera set funcs
         {"setCameraMatrix", SetCameraMatrix},
         {"setCameraFieldOfView", SetCameraFieldOfView},
         {"setCameraTarget", SetCameraTarget},
@@ -98,6 +98,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
 
 std::variant<CClientCamera*, bool> CLuaCameraDefs::GetCamera()
 {
+    //  element getCamera ( )
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
     if (pCamera)
         return pCamera;
@@ -106,6 +107,7 @@ std::variant<CClientCamera*, bool> CLuaCameraDefs::GetCamera()
 
 CLuaMultiReturn<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode()
 {
+    //  int, int getCameraViewMode ( )
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
     unsigned char ucVehicleMode = (unsigned char)pCamera->GetCameraVehicleViewMode();
@@ -116,6 +118,7 @@ CLuaMultiReturn<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode(
 
 CLuaMultiReturn<float, float, float, float, float, float, float, float> CLuaCameraDefs::GetCameraMatrix()
 {
+    //  float float float float float float float float getCameraMatrix ( )
     CVector vecPosition, vecLookAt;
     float   fRoll, fFOV;
     CStaticFunctionDefinitions::GetCameraMatrix(vecPosition, vecLookAt, fRoll, fFOV);
@@ -131,6 +134,7 @@ CMatrix CLuaCameraDefs::OOP_GetCameraMatrix()
 
 std::variant<CClientEntity*, bool> CLuaCameraDefs::GetCameraTarget()
 {
+    //  element getCameraTarget ( )
     CClientEntity* pTarget = CStaticFunctionDefinitions::GetCameraTarget();
     if (pTarget)
         return pTarget;
@@ -139,6 +143,7 @@ std::variant<CClientEntity*, bool> CLuaCameraDefs::GetCameraTarget()
 
 unsigned char CLuaCameraDefs::GetCameraInterior()
 {
+    //  int getCameraInterior ( )
     unsigned char ucInterior;
     CStaticFunctionDefinitions::GetCameraInterior(ucInterior);
     return ucInterior;
@@ -146,6 +151,7 @@ unsigned char CLuaCameraDefs::GetCameraInterior()
 
 std::string CLuaCameraDefs::GetCameraGoggleEffect()
 {
+    //  string getCameraGoggleEffect (  )
     bool bNightVision = g_pMultiplayer->IsNightVisionEnabled();
     bool bThermalVision = g_pMultiplayer->IsThermalVisionEnabled();
 
@@ -159,11 +165,13 @@ std::string CLuaCameraDefs::GetCameraGoggleEffect()
 
 unsigned char CLuaCameraDefs::GetCameraDrunkLevel()
 {
+    //  int getCameraDrunkLevel ( )
     return g_pGame->GetPlayerInfo()->GetCamDrunkLevel();
 }
 
 int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
 {
+    //  bool setCameraMatrix ( float positionX, float positionY, float positionZ [, float lookAtX, float lookAtY, float lookAtZ, float roll = 0, float fov = 70 ] )
     CVector          vecPosition;
     CVector          vecLookAt;
     float            fRoll = 0.0f;
@@ -210,6 +218,7 @@ int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
 // Only when onfoot/invehicle
 int CLuaCameraDefs::SetCameraFieldOfView(lua_State* luaVM)
 {
+    //  bool setCameraFieldOfView ( string cameraMode, float fieldOfView )
     float            fFOV;
     eFieldOfViewMode eMode;
     CScriptArgReader argStream(luaVM);
@@ -253,6 +262,7 @@ int CLuaCameraDefs::SetCameraFieldOfView(lua_State* luaVM)
 // Only when onfoot/invehicle
 int CLuaCameraDefs::GetCameraFieldOfView(lua_State* luaVM)
 {
+    //  float getCameraFieldOfView ( string cameraMode )
     eFieldOfViewMode eMode;
     CScriptArgReader argStream(luaVM);
 
@@ -330,6 +340,7 @@ int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
 
 int CLuaCameraDefs::SetCameraInterior(lua_State* luaVM)
 {
+    //  bool setCameraInterior ( int interior )
     unsigned char    ucInterior = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucInterior);
@@ -351,6 +362,7 @@ int CLuaCameraDefs::SetCameraInterior(lua_State* luaVM)
 
 int CLuaCameraDefs::FadeCamera(lua_State* luaVM)
 {
+    //  bool fadeCamera ( bool fadeIn, [ float timeToFade = 1.0, int red = 0, int green = 0, int blue = 0 ] )
     bool          bFadeIn = false;
     unsigned char ucRed = 0;
     unsigned char ucGreen = 0;
@@ -381,6 +393,7 @@ int CLuaCameraDefs::FadeCamera(lua_State* luaVM)
 
 int CLuaCameraDefs::SetCameraClip(lua_State* luaVM)
 {
+    //  bool setCameraClip ( [ bool objects = true, bool vehicles = true ] ) 
     bool bObjects = true;
     bool bVehicles = true;
 
@@ -396,6 +409,7 @@ int CLuaCameraDefs::SetCameraClip(lua_State* luaVM)
 
 int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
 {
+    //  bool, bool getCameraClip ( )
     bool bObjects, bVehicles;
     m_pManager->GetCamera()->GetCameraClip(bObjects, bVehicles);
 
@@ -406,6 +420,7 @@ int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
 
 bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleViewMode, std::optional<unsigned char> ucPedViewMode)
 {
+    //  bool setCameraViewMode ( int vehicleCameraMode [, int pedCameraMode ] )
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
     if (ucVehicleViewMode)
@@ -419,6 +434,7 @@ bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleVie
 
 int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 {
+    //  bool setCameraGoggleEffect ( string goggleEffect [, bool noiseEnabled = true ] )
     SString          strMode;
     bool             bNoiseEnabled;
     CScriptArgReader argStream(luaVM);
@@ -466,6 +482,7 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 
 bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)
 {
+    //  bool setCameraDrunkLevel ( int shakeLevel )
     if (drunkLevel < 0 || drunkLevel > 255)
         throw std::invalid_argument("Invalid range (0-255)");
 
@@ -541,5 +558,6 @@ int CLuaCameraDefs::OOP_SetCameraRotation(lua_State* luaVM)
 
 const SString& CLuaCameraDefs::GetElementType()
 {
+    //  string getElementType ( element theElement )
     return m_pManager->GetCamera()->GetTypeName();
 }

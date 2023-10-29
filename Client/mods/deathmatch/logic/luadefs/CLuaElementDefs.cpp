@@ -17,13 +17,30 @@ using std::list;
 void CLuaElementDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Element Create/destroy
+        {"createElement", CreateElement},
+        {"destroyElement", DestroyElement},
+
         // Element get funcs
-        {"getRootElement", GetRootElement},
         {"isElement", IsElement},
+        {"isElementLocal", IsElementLocal},
+        {"isElementWithinColShape", IsElementWithinColShape},
+        {"isElementWithinMarker", IsElementWithinMarker},
+        {"isElementInWater", IsElementInWater},
+        {"isElementFrozen", IsElementFrozen},
+        {"isElementLowLOD", IsElementLowLod},
+        {"isElementCallPropagationEnabled", IsElementCallPropagationEnabled},
+        {"isElementDoubleSided", IsElementDoubleSided},
+        {"isElementCollidableWith", IsElementCollidableWith},
+        {"isElementWaitingForGroundToLoad", IsElementWaitingForGroundToLoad},
+        {"isElementSyncer", IsElementSyncer},
+        {"isElementStreamedIn", IsElementStreamedIn},
+        {"isElementStreamable", IsElementStreamable},
+        {"isElementOnScreen", IsElementOnScreen},
+
+        {"getRootElement", GetRootElement},
         {"getElementByID", GetElementByID},
         {"getElementByIndex", GetElementByIndex},
-        {"getElementData", GetElementData},
-        {"getAllElementData", ArgumentParserWarn<false, GetAllElementData>},
         {"getElementMatrix", GetElementMatrix},
         {"getElementPosition", GetElementPosition},
         {"getElementRotation", GetElementRotation},
@@ -37,46 +54,38 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementParent", GetElementParent},
         {"getElementsByType", GetElementsByType},
         {"getElementInterior", GetElementInterior},
-        {"isElementWithinColShape", IsElementWithinColShape},
-        {"isElementWithinMarker", IsElementWithinMarker},
         {"getElementsWithinColShape", GetElementsWithinColShape},
         {"getElementsWithinRange", ArgumentParserWarn<false, GetElementsWithinRange>},
         {"getElementDimension", GetElementDimension},
         {"getElementBoundingBox", GetElementBoundingBox},
         {"getElementRadius", GetElementRadius},
-        {"isElementAttached", IsElementAttached},
-        {"getElementAttachedTo", GetElementAttachedTo},
-        {"getAttachedElements", GetAttachedElements},
         {"getElementDistanceFromCentreOfMassToBaseOfModel", GetElementDistanceFromCentreOfMassToBaseOfModel},
-        {"isElementLocal", IsElementLocal},
-        {"hasElementData", HasElementData},
-        {"getElementAttachedOffsets", GetElementAttachedOffsets},
         {"getElementAlpha", GetElementAlpha},
         {"getElementLighting", ArgumentParser<GetElementLighting>},
-        {"isElementOnScreen", IsElementOnScreen},
         {"getElementHealth", GetElementHealth},
         {"getElementModel", GetElementModel},
-        {"isElementStreamedIn", IsElementStreamedIn},
-        {"isElementStreamable", IsElementStreamable},
         {"getElementColShape", GetElementColShape},
-        {"isElementInWater", IsElementInWater},
-        {"isElementSyncer", IsElementSyncer},
-        {"isElementCollidableWith", IsElementCollidableWith},
-        {"isElementDoubleSided", IsElementDoubleSided},
         {"getElementCollisionsEnabled", GetElementCollisionsEnabled},
-        {"isElementFrozen", IsElementFrozen},
         {"getLowLODElement", GetLowLodElement},
-        {"isElementLowLOD", IsElementLowLod},
-        {"isElementCallPropagationEnabled", IsElementCallPropagationEnabled},
-        {"isElementWaitingForGroundToLoad", IsElementWaitingForGroundToLoad},
+
+        // Attachement funcs
+        {"attachElements", AttachElements},
+        {"detachElements", DetachElements},
+        {"isElementAttached", IsElementAttached},
+        {"getAttachedElements", GetAttachedElements},
+        {"getElementAttachedTo", GetElementAttachedTo},
+        {"setElementAttachedOffsets", SetElementAttachedOffsets},
+        {"getElementAttachedOffsets", GetElementAttachedOffsets},
+
+        // Element data funcs
+        {"getAllElementData", ArgumentParserWarn<false, GetAllElementData>},
+        {"getElementData", GetElementData},
+        {"hasElementData", HasElementData},
+        {"setElementData", SetElementData},
 
         // Element set funcs
-        {"createElement", CreateElement},
-        {"destroyElement", DestroyElement},
         {"setElementID", SetElementID},
         {"setElementParent", SetElementParent},
-        {"setElementData", SetElementData},
-        // {"removeElementData", RemoveElementData}, TODO Clientside
         {"setElementMatrix", SetElementMatrix},
         {"setElementPosition", SetElementPosition},
         {"setElementRotation", SetElementRotation},
@@ -84,16 +93,13 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementAngularVelocity", SetElementAngularVelocity},
         {"setElementInterior", SetElementInterior},
         {"setElementDimension", SetElementDimension},
-        {"attachElements", AttachElements},
-        {"detachElements", DetachElements},
-        {"setElementAttachedOffsets", SetElementAttachedOffsets},
         {"setElementAlpha", SetElementAlpha},
         {"setElementHealth", SetElementHealth},
         {"setElementModel", SetElementModel},
         {"setElementStreamable", SetElementStreamable},
+        {"setElementDoubleSided", SetElementDoubleSided},
         {"setElementCollisionsEnabled", SetElementCollisionsEnabled},
         {"setElementCollidableWith", SetElementCollidableWith},
-        {"setElementDoubleSided", SetElementDoubleSided},
         {"setElementFrozen", SetElementFrozen},
         {"setLowLODElement", SetLowLodElement},
         {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
@@ -111,16 +117,15 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     // Class functions
     lua_classfunction(luaVM, "getByID", "getElementByID");
     lua_classfunction(luaVM, "getAllByType", "getElementsByType");
+    lua_classfunction(luaVM, "getWithinRange", "getElementsWithinRange");
 
     // Action functions
     lua_classfunction(luaVM, "create", "createElement");
-
+    lua_classfunction(luaVM, "destroy", "destroyElement");
     lua_classfunction(luaVM, "attach", "attachElements");
     lua_classfunction(luaVM, "detach", "detachElements");
-    lua_classfunction(luaVM, "destroy", "destroyElement");
 
-    // Get functions
-    lua_classfunction(luaVM, "getCollisionsEnabled", "getElementCollisionsEnabled");
+    // Is functions
     lua_classfunction(luaVM, "isWithinColShape", "isElementWithinColShape");
     lua_classfunction(luaVM, "isWithinMarker", "isElementWithinMarker");
     lua_classfunction(luaVM, "isInWater", "isElementInWater");
@@ -135,8 +140,11 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isStreamedIn", "isElementStreamedIn");
     lua_classfunction(luaVM, "isStreamable", "isElementStreamable");
     lua_classfunction(luaVM, "isLocal", "isElementLocal");
-    lua_classfunction(luaVM, "hasData", "hasElementData");
     lua_classfunction(luaVM, "isSyncer", "isElementSyncer");
+
+    // Get functions
+    lua_classfunction(luaVM, "getCollisionsEnabled", "getElementCollisionsEnabled");
+    lua_classfunction(luaVM, "hasData", "hasElementData");
     lua_classfunction(luaVM, "getChildren", "getElementChildren");
     lua_classfunction(luaVM, "getChild", "getElementChild");
     lua_classfunction(luaVM, "getChildrenCount", "getElementChildrenCount");
@@ -154,7 +162,6 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getType", "getElementType");
     lua_classfunction(luaVM, "getInterior", "getElementInterior");
     lua_classfunction(luaVM, "getWithinColShape", "getElementsWithinColShape");
-    lua_classfunction(luaVM, "getWithinRange", "getElementsWithinRange");
     lua_classfunction(luaVM, "getDimension", "getElementDimension");
     lua_classfunction(luaVM, "getColShape", "getElementColShape");
     lua_classfunction(luaVM, "getAlpha", "getElementAlpha");
@@ -168,6 +175,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getData", "getElementData");
     lua_classfunction(luaVM, "getAllData", "getAllElementData");
 
+    // Set functions
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setData", "setElementData");
     lua_classfunction(luaVM, "setID", "setElementID");
@@ -190,6 +198,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setCallPropagationEnabled", "setElementCallPropagationEnabled");
     lua_classfunction(luaVM, "setStreamable", "setElementStreamable");
 
+    // Class functions and variables
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
     lua_classvariable(luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad");
     lua_classvariable(luaVM, "onScreen", NULL, "isElementOnScreen");
@@ -230,6 +239,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
 
 int CLuaElementDefs::GetRootElement(lua_State* luaVM)
 {
+    //  element getRootElement ( )
     CClientEntity* pRoot = CStaticFunctionDefinitions::GetRootElement();
 
     // Return the root element
@@ -239,6 +249,7 @@ int CLuaElementDefs::GetRootElement(lua_State* luaVM)
 
 int CLuaElementDefs::IsElement(lua_State* luaVM)
 {
+    //  bool isElement ( var theValue )
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -256,6 +267,7 @@ int CLuaElementDefs::IsElement(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementID(lua_State* luaVM)
 {
+    //  string getElementID ( element theElement ) 
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -280,6 +292,7 @@ int CLuaElementDefs::GetElementID(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementByID(lua_State* luaVM)
 {
+    //  element getElementByID ( string id [, int index = 0 ] )  
     SString          strID = "";
     unsigned int     uiIndex = 0;
     CScriptArgReader argStream(luaVM);
@@ -306,6 +319,7 @@ int CLuaElementDefs::GetElementByID(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
 {
+    //  element getElementByIndex ( string theType, int index )  
     SString          strType = "";
     unsigned int     uiIndex = 0;
     CScriptArgReader argStream(luaVM);
@@ -332,6 +346,7 @@ int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementMatrix(lua_State* luaVM)
 {
+    //  table getElementMatrix ( element theElement [, bool legacy = true ] )
     CClientEntity* pEntity = NULL;
     bool           bBadSyntax;
 
@@ -435,6 +450,8 @@ int CLuaElementDefs::OOP_GetElementMatrix(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementPosition(lua_State* luaVM)
 {
+    //  float, float, float getElementPosition ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -485,7 +502,7 @@ int CLuaElementDefs::OOP_GetElementPosition(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementRotation(lua_State* luaVM)
 {
-    //  float float float getElementRotation ( element theElement [, string rotOrder = "default" ] )
+    //  float, float, float getElementRotation ( element theElement [, string rotOrder = "default" ] )
     CClientEntity*      pEntity = NULL;
     eEulerRotationOrder rotationOrder;
 
@@ -542,6 +559,8 @@ int CLuaElementDefs::OOP_GetElementRotation(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementVelocity(lua_State* luaVM)
 {
+    //  float float float getElementVelocity ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -592,6 +611,8 @@ int CLuaElementDefs::OOP_GetElementVelocity(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementTurnVelocity(lua_State* luaVM)
 {
+    //  float float float getElementAngularVelocity ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -642,6 +663,8 @@ int CLuaElementDefs::OOP_GetElementTurnVelocity(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementType(lua_State* luaVM)
 {
+    //  string getElementType ( element theElement )  
+
     // Check the arg type
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -667,6 +690,8 @@ int CLuaElementDefs::GetElementType(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementChildren(lua_State* luaVM)
 {
+    //  table getElementChildren ( element parent [, string theType = nil ] ) 
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -712,6 +737,8 @@ int CLuaElementDefs::GetElementChildren(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementChild(lua_State* luaVM)
 {
+    //  element getElementChild ( element parent, int index ) 
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     unsigned int     uiIndex = 0;
@@ -739,6 +766,8 @@ int CLuaElementDefs::GetElementChild(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementChildrenCount(lua_State* luaVM)
 {
+    //  int getElementChildrenCount ( element parent )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -761,6 +790,8 @@ int CLuaElementDefs::GetElementChildrenCount(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementParent(lua_State* luaVM)
 {
+    //  element getElementParent ( element theElement )  
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -786,6 +817,8 @@ int CLuaElementDefs::GetElementParent(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
 {
+    //  table getElementsByType ( string theType, [ element startat=getRootElement(), bool streamedIn=false ] ) 
+
     // Verify the argument
     SString          strType = "";
     CScriptArgReader argStream(luaVM);
@@ -838,6 +871,8 @@ int CLuaElementDefs::GetElementsByType(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementInterior(lua_State* luaVM)
 {
+    //  int getElementInterior ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -863,6 +898,8 @@ int CLuaElementDefs::GetElementInterior(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementWithinColShape(lua_State* luaVM)
 {
+    //  bool isElementWithinColShape ( element theElement, colshape theShape )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CClientColShape* pColShape = NULL;
@@ -887,6 +924,8 @@ int CLuaElementDefs::IsElementWithinColShape(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementWithinMarker(lua_State* luaVM)
 {
+    //  bool isElementWithinMarker ( element theElement, marker theMarker )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CClientMarker*   pMarker = NULL;
@@ -911,6 +950,8 @@ int CLuaElementDefs::IsElementWithinMarker(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
 {
+    //  table getElementsWithinColShape ( colshape theShape [, string elemType = nil ] ) 
+
     // Verify the arguments
     CClientColShape* pColShape = NULL;
     SString          strType = "";
@@ -961,6 +1002,7 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
 CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
                                                             std::optional<unsigned short> dimension)
 {
+    //  table getElementsWithinRange ( float x, float y, float z, float range [, string elemType = "", int interior, int dimension ] )
     const auto typeHash = (type.has_value() && !type.value().empty()) ? CClientEntity::GetTypeHashFromString(type.value()) : 0;
 
     CClientEntityResult result;
@@ -996,6 +1038,8 @@ CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float r
 
 int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
 {
+    //  int getElementDimension ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1067,6 +1111,8 @@ int CLuaElementDefs::OOP_GetElementBoundingBox(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementBoundingBox(lua_State* luaVM)
 {
+    //  float, float, float, float, float, float getElementBoundingBox ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1097,6 +1143,8 @@ int CLuaElementDefs::GetElementBoundingBox(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementRadius(lua_State* luaVM)
 {
+    //  float getElementRadius ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1122,6 +1170,8 @@ int CLuaElementDefs::GetElementRadius(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementAttached(lua_State* luaVM)
 {
+    //  bool isElementAttached ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity;
     CScriptArgReader argStream(luaVM);
@@ -1147,6 +1197,8 @@ int CLuaElementDefs::IsElementAttached(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementAttachedTo(lua_State* luaVM)
 {
+    //  element getElementAttachedTo ( element theElement )  
+
     // Verify the argument
     CClientEntity* pEntity;
 
@@ -1178,6 +1230,8 @@ int CLuaElementDefs::GetElementAttachedTo(lua_State* luaVM)
 
 int CLuaElementDefs::GetAttachedElements(lua_State* luaVM)
 {
+    //  table getAttachedElements ( element theElement )
+
     // Verify the argument
     CClientEntity* pEntity;
 
@@ -1218,6 +1272,8 @@ int CLuaElementDefs::GetAttachedElements(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementDistanceFromCentreOfMassToBaseOfModel(lua_State* luaVM)
 {
+    //  float getElementDistanceFromCentreOfMassToBaseOfModel ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1243,6 +1299,8 @@ int CLuaElementDefs::GetElementDistanceFromCentreOfMassToBaseOfModel(lua_State* 
 
 int CLuaElementDefs::IsElementLocal(lua_State* luaVM)
 {
+    //  bool isElementLocal ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1265,6 +1323,8 @@ int CLuaElementDefs::IsElementLocal(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementAttachedOffsets(lua_State* luaVM)
 {
+    //  float, float, float, float, float, float getElementAttachedOffsets ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1295,6 +1355,8 @@ int CLuaElementDefs::GetElementAttachedOffsets(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementAlpha(lua_State* luaVM)
 {
+    //  int getElementAlpha ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1320,6 +1382,7 @@ int CLuaElementDefs::GetElementAlpha(lua_State* luaVM)
 
 std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* entity)
 {
+    //  float getElementLighting ( element theElement )
     switch (entity->GetType())
     {
         case CCLIENTPED:
@@ -1352,6 +1415,8 @@ std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* ent
 
 int CLuaElementDefs::GetElementHealth(lua_State* luaVM)
 {
+    //  float getElementHealth ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1377,6 +1442,8 @@ int CLuaElementDefs::GetElementHealth(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementModel(lua_State* luaVM)
 {
+    //  int getElementModel ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1401,6 +1468,8 @@ int CLuaElementDefs::GetElementModel(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementColShape(lua_State* luaVM)
 {
+    //  colshape getElementColShape ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1425,6 +1494,8 @@ int CLuaElementDefs::GetElementColShape(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementInWater(lua_State* luaVM)
 {
+    //  bool isElementInWater ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1448,6 +1519,8 @@ int CLuaElementDefs::IsElementInWater(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementSyncer(lua_State* luaVM)
 {
+    //  bool isElementSyncer ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1471,6 +1544,8 @@ int CLuaElementDefs::IsElementSyncer(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementCollidableWith(lua_State* luaVM)
 {
+    //  bool isElementCollidableWith ( element theElement, element withElement ) 
+
     // Verify the arguments
     CClientEntity*   pEntity = NULL;
     CClientEntity*   pWithEntity = NULL;
@@ -1496,6 +1571,8 @@ int CLuaElementDefs::IsElementCollidableWith(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementDoubleSided(lua_State* luaVM)
 {
+    //  bool isElementDoubleSided ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1515,6 +1592,8 @@ int CLuaElementDefs::IsElementDoubleSided(lua_State* luaVM)
 
 int CLuaElementDefs::GetElementCollisionsEnabled(lua_State* luaVM)
 {
+    //  bool getElementCollisionsEnabled ( element theElement ) 
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1537,6 +1616,8 @@ int CLuaElementDefs::GetElementCollisionsEnabled(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementFrozen(lua_State* luaVM)
 {
+    //  bool isElementFrozen ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1560,6 +1641,8 @@ int CLuaElementDefs::IsElementFrozen(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementStreamedIn(lua_State* luaVM)
 {
+    //  bool isElementStreamedIn ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1595,6 +1678,8 @@ int CLuaElementDefs::IsElementStreamedIn(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementStreamable(lua_State* luaVM)
 {
+    //  bool isElementStreamable ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1629,6 +1714,8 @@ int CLuaElementDefs::IsElementStreamable(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementOnScreen(lua_State* luaVM)
 {
+    //  bool isElementOnScreen ( element theElement )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1653,6 +1740,8 @@ int CLuaElementDefs::IsElementOnScreen(lua_State* luaVM)
 
 int CLuaElementDefs::CreateElement(lua_State* luaVM)
 {
+    //  element createElement ( string elementType, [ string elementID = nil ] )
+
     // Verify the argument
     SString          strTypeName = "";
     CScriptArgReader argStream(luaVM);
@@ -1706,6 +1795,8 @@ int CLuaElementDefs::CreateElement(lua_State* luaVM)
 
 int CLuaElementDefs::DestroyElement(lua_State* luaVM)
 {
+    //  bool destroyElement ( element elementToDestroy )
+
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     CScriptArgReader argStream(luaVM);
@@ -1754,6 +1845,8 @@ int CLuaElementDefs::SetElementID(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementData(lua_State* luaVM)
 {
+    //  bool setElementID ( element theElement, string name ) 
+
     //  bool setElementData ( element theElement, string key, var value, [bool synchronize = true] )
     CClientEntity* pEntity;
     SString        strKey;
@@ -1780,44 +1873,6 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
             }
 
             if (CStaticFunctionDefinitions::SetElementData(*pEntity, strKey, value, bSynchronize))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaElementDefs::RemoveElementData(lua_State* luaVM)
-{
-    //  bool removeElementData ( element theElement, string key )
-    CClientEntity* pEntity;
-    SString        strKey;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadString(strKey);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            if (strKey.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-            {
-                // Warn and truncate if key is too long
-                m_pScriptDebugging->LogCustom(luaVM, SString("Truncated argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)),
-                                                             *SString("string length reduced to %d characters at argument 2", MAX_CUSTOMDATA_NAME_LENGTH)));
-                strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
-            }
-
-            if (CStaticFunctionDefinitions::RemoveElementData(*pEntity, strKey))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1872,6 +1927,7 @@ int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementPosition(lua_State* luaVM)
 {
+    //  bool setElementPosition ( element theElement, float x, float y, float z [, bool warp = true ] )
     CClientEntity*   pEntity;
     CVector          vecPosition;
     bool             bWarp = true;
@@ -1970,6 +2026,7 @@ int CLuaElementDefs::OOP_SetElementRotation(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 {
+    //  bool setElementVelocity ( element theElement, float speedX, float speedY, float speedZ )
     CClientEntity* pEntity;
     CVector        vecVelocity;
 
@@ -2000,6 +2057,7 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
 {
+    //  bool setElementAngularVelocity ( element theElement, float rx, float ry, float rz )
     CClientEntity* pEntity;
     CVector        vecTurnVelocity;
 
@@ -2027,6 +2085,7 @@ int CLuaElementDefs::SetElementAngularVelocity(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementParent(lua_State* luaVM)
 {
+    //  bool setElementParent ( element theElement, element parent )
     CClientEntity* pEntity = NULL;
     CClientEntity* pParent = NULL;
 
@@ -2056,6 +2115,7 @@ int CLuaElementDefs::SetElementParent(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementInterior(lua_State* luaVM)
 {
+    //  bool setElementInterior ( element theElement, int interior [, float x, float y, float z] )
     CClientEntity* pEntity;
     unsigned int   uiInterior = 0;
 
@@ -2108,6 +2168,7 @@ int CLuaElementDefs::SetElementInterior(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementDimension(lua_State* luaVM)
 {
+    //  bool setElementDimension ( element theElement, int dimension )
     CClientEntity* pEntity;
     int            iDimension = 0;
     bool           bMakeVisibleInAllDimensions = false;
@@ -2171,6 +2232,7 @@ int CLuaElementDefs::SetElementDimension(lua_State* luaVM)
 
 int CLuaElementDefs::AttachElements(lua_State* luaVM)
 {
+    //  bool attachElements ( element theElement, element theAttachToElement, [ float xPosOffset = 0, float yPosOffset = 0, float zPosOffset = 0, float xRotOffset = 0, float yRotOffset = 0, float zRotOffset = 0 ] )
     CClientEntity* pEntity = NULL;
     CClientEntity* pAttachedToEntity = NULL;
     CVector        vecPosition, vecRotation;
@@ -2201,6 +2263,7 @@ int CLuaElementDefs::AttachElements(lua_State* luaVM)
 
 int CLuaElementDefs::DetachElements(lua_State* luaVM)
 {
+    //  bool detachElements ( element theElement, [ element theAttachToElement ] )
     CClientEntity*   pEntity;
     CClientEntity*   pAttachedToEntity = NULL;
     unsigned short   usDimension = 0;
@@ -2228,6 +2291,7 @@ int CLuaElementDefs::DetachElements(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementAttachedOffsets(lua_State* luaVM)
 {
+    //  bool setElementAttachedOffsets ( element theElement, [ float xPosOffset, float yPosOffset, float zPosOffset, float xRotOffset, float yRotOffset, float zRotOffset ])
     CClientEntity* pEntity;
     CClientEntity* pAttachedToEntity = NULL;
     unsigned short usDimension = 0;
@@ -2257,6 +2321,7 @@ int CLuaElementDefs::SetElementAttachedOffsets(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementCollisionsEnabled(lua_State* luaVM)
 {
+    //  bool setElementCollisionsEnabled ( element theElement, bool enabled ) 
     CClientEntity*   pEntity;
     bool             bEnabled = true;
     CScriptArgReader argStream(luaVM);
@@ -2281,6 +2346,7 @@ int CLuaElementDefs::SetElementCollisionsEnabled(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementCollidableWith(lua_State* luaVM)
 {
+    //  bool setElementCollidableWith ( element theElement, element withElement, bool enabled ) 
     CClientEntity*   pEntity = NULL;
     CClientEntity*   pWithEntity = NULL;
     bool             bCanCollide = true;
@@ -2307,6 +2373,7 @@ int CLuaElementDefs::SetElementCollidableWith(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementDoubleSided(lua_State* luaVM)
 {
+    //  bool setElementDoubleSided ( element theElement, bool enable )
     CClientEntity*   pEntity;
     bool             bDoubleSided = true;
     CScriptArgReader argStream(luaVM);
@@ -2331,6 +2398,7 @@ int CLuaElementDefs::SetElementDoubleSided(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementFrozen(lua_State* luaVM)
 {
+    //  bool setElementFrozen ( element theElement, bool freezeStatus )
     CClientEntity*   pEntity;
     bool             bFrozen = true;
     CScriptArgReader argStream(luaVM);
@@ -2356,6 +2424,7 @@ int CLuaElementDefs::SetElementFrozen(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementAlpha(lua_State* luaVM)
 {
+    //  bool setElementAlpha ( element theElement, int alpha )
     CClientEntity*   pEntity;
     unsigned char    ucAlpha = 0;
     CScriptArgReader argStream(luaVM);
@@ -2381,6 +2450,7 @@ int CLuaElementDefs::SetElementAlpha(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementHealth(lua_State* luaVM)
 {
+    //  bool setElementHealth ( element theElement, float newHealth )
     CClientEntity*   pEntity;
     float            fHealth = 0.0f;
     CScriptArgReader argStream(luaVM);
@@ -2406,6 +2476,7 @@ int CLuaElementDefs::SetElementHealth(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementModel(lua_State* luaVM)
 {
+    //  bool setElementModel ( element theElement, int model )
     CClientEntity*   pEntity;
     unsigned short   usModel = 0;
     CScriptArgReader argStream(luaVM);
@@ -2431,6 +2502,7 @@ int CLuaElementDefs::SetElementModel(lua_State* luaVM)
 
 int CLuaElementDefs::SetElementStreamable(lua_State* luaVM)
 {
+    //  bool setElementStreamable ( element theElement, bool streamable ) 
     CClientEntity*   pEntity;
     bool             bStreamable = true;
     CScriptArgReader argStream(luaVM);
@@ -2597,6 +2669,7 @@ int CLuaElementDefs::IsElementCallPropagationEnabled(lua_State* luaVM)
 
 int CLuaElementDefs::IsElementWaitingForGroundToLoad(lua_State* luaVM)
 {
+    //  bool isElementWaitingForGroundToLoad ( element theElement )
     CClientEntity* pEntity;
 
     CScriptArgReader argStream(luaVM);

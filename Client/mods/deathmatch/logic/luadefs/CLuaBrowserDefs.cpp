@@ -16,38 +16,45 @@ void CLuaBrowserDefs::LoadFunctions()
 {
     // Define browser functions
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Browser Create/destroy
         {"createBrowser", CreateBrowser},
-        {"requestBrowserDomains", RequestBrowserDomains},
+        {"guiCreateBrowser", GUICreateBrowser},
+
+        // Browser set funcs
+        {"reloadBrowserPage", ReloadBrowserPage},
         {"loadBrowserURL", LoadBrowserURL},
-        {"isBrowserLoading", IsBrowserLoading},
+        {"requestBrowserDomains", RequestBrowserDomains},
+        {"executeBrowserJavascript", ExecuteBrowserJavascript},
         {"injectBrowserMouseMove", InjectBrowserMouseMove},
         {"injectBrowserMouseDown", InjectBrowserMouseDown},
         {"injectBrowserMouseUp", InjectBrowserMouseUp},
         {"injectBrowserMouseWheel", InjectBrowserMouseWheel},
-        {"getBrowserTitle", GetBrowserTitle},
-        {"getBrowserURL", GetBrowserURL},
-        {"setBrowserRenderingPaused", SetBrowserRenderingPaused},
-        {"isBrowserRenderingPaused", ArgumentParser<IsBrowserRenderingPaused>},
-        {"executeBrowserJavascript", ExecuteBrowserJavascript},
-        {"getBrowserVolume", GetBrowserVolume},
-        {"setBrowserVolume", SetBrowserVolume},
-        {"isBrowserDomainBlocked", IsBrowserDomainBlocked},
-        {"focusBrowser", FocusBrowser},
-        {"isBrowserFocused", IsBrowserFocused},
-        {"setBrowserProperty", SetBrowserProperty},
-        {"getBrowserProperty", GetBrowserProperty},
-        {"getBrowserSettings", GetBrowserSettings},
-        {"getBrowserSource", GetBrowserSource},
-        {"setBrowserAjaxHandler", SetBrowserAjaxHandler},
         {"canBrowserNavigateBack", CanBrowserNavigateBack},
         {"canBrowserNavigateForward", CanBrowserNavigateForward},
         {"navigateBrowserBack", NavigateBrowserBack},
         {"navigateBrowserForward", NavigateBrowserForward},
-        {"reloadBrowserPage", ReloadBrowserPage},
-        {"toggleBrowserDevTools", ToggleBrowserDevTools},
+        {"setBrowserVolume", SetBrowserVolume},
+        {"setBrowserRenderingPaused", SetBrowserRenderingPaused},
+        {"setBrowserProperty", SetBrowserProperty},
+        {"setBrowserAjaxHandler", SetBrowserAjaxHandler},
         {"resizeBrowser", ResizeBrowser},
-        {"guiCreateBrowser", GUICreateBrowser},
+        {"focusBrowser", FocusBrowser},
+
+        // Browser get funcs
+        {"isBrowserLoading", IsBrowserLoading},
+        {"isBrowserRenderingPaused", ArgumentParser<IsBrowserRenderingPaused>},
+        {"isBrowserDomainBlocked", IsBrowserDomainBlocked},
+        {"isBrowserFocused", IsBrowserFocused},
         {"guiGetBrowser", GUIGetBrowser},
+        {"getBrowserTitle", GetBrowserTitle},
+        {"getBrowserURL", GetBrowserURL},
+        {"getBrowserVolume", GetBrowserVolume},
+        {"getBrowserProperty", GetBrowserProperty},
+        {"getBrowserSettings", GetBrowserSettings},
+        {"getBrowserSource", GetBrowserSource},
+
+        // Browser dev funcs
+        {"toggleBrowserDevTools", ToggleBrowserDevTools},
     };
 
     // Add browser functions
@@ -61,40 +68,43 @@ void CLuaBrowserDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "createBrowser");
     lua_classfunction(luaVM, "loadURL", "loadBrowserURL");
-    lua_classfunction(luaVM, "isLoading", "isBrowserLoading");
+
+    lua_classfunction(luaVM, "requestDomains", "requestBrowserDomains");
     lua_classfunction(luaVM, "injectMouseMove", "injectBrowserMouseMove");
     lua_classfunction(luaVM, "injectMouseDown", "injectBrowserMouseDown");
     lua_classfunction(luaVM, "injectMouseUp", "injectBrowserMouseUp");
     lua_classfunction(luaVM, "injectMouseWheel", "injectBrowserMouseWheel");
-    lua_classfunction(luaVM, "getTitle", "getBrowserTitle");
-    lua_classfunction(luaVM, "getURL", "getBrowserURL");
-    lua_classfunction(luaVM, "setRenderingPaused", "setBrowserRenderingPaused");
-    lua_classfunction(luaVM, "isRenderingPaused", "isBrowserRenderingPaused");
-    lua_classfunction(luaVM, "executeJavascript", "executeBrowserJavascript");
-    lua_classfunction(luaVM, "getVolume", "getBrowserVolume");
-    lua_classfunction(luaVM, "setVolume", "setBrowserVolume");
-    lua_classfunction(luaVM, "focus", "focusBrowser");
-    lua_classfunction(luaVM, "isFocused", "isBrowserFocused");
-    lua_classfunction(luaVM, "setProperty", "setBrowserProperty");
-    lua_classfunction(luaVM, "getProperty", "getBrowserProperty");
-    lua_classfunction(luaVM, "getSource", "getBrowserSource");
-    lua_classfunction(luaVM, "setAjaxHandler", "setBrowserAjaxHandler");
     lua_classfunction(luaVM, "canNavigateBack", "canBrowserNavigateBack");
     lua_classfunction(luaVM, "canNavigateForward", "canBrowserNavigateForward");
     lua_classfunction(luaVM, "navigateBack", "navigateBrowserBack");
     lua_classfunction(luaVM, "navigateForward", "navigateBrowserForward");
     lua_classfunction(luaVM, "reloadPage", "reloadBrowserPage");
-    lua_classfunction(luaVM, "toggleDevTools", "toggleBrowserDevTools");
+    lua_classfunction(luaVM, "executeJavascript", "executeBrowserJavascript");
+    lua_classfunction(luaVM, "setAjaxHandler", "setBrowserAjaxHandler");
+    lua_classfunction(luaVM, "setRenderingPaused", "setBrowserRenderingPaused");
+    lua_classfunction(luaVM, "setProperty", "setBrowserProperty");
+    lua_classfunction(luaVM, "setVolume", "setBrowserVolume");
     lua_classfunction(luaVM, "resize", "resizeBrowser");
+    lua_classfunction(luaVM, "focus", "focusBrowser");
 
-    lua_classfunction(luaVM, "requestDomains", "requestBrowserDomains");
+    lua_classfunction(luaVM, "isLoading", "isBrowserLoading");
+    lua_classfunction(luaVM, "isFocused", "isBrowserFocused");
     lua_classfunction(luaVM, "isDomainBlocked", "isBrowserDomainBlocked");
-
-    lua_classvariable(luaVM, "url", "loadBrowserURL", "getBrowserURL");
+    lua_classfunction(luaVM, "isRenderingPaused", "isBrowserRenderingPaused");
     lua_classvariable(luaVM, "loading", nullptr, "isBrowserLoading");
     lua_classvariable(luaVM, "title", nullptr, "getBrowserTitle");
+
+    lua_classfunction(luaVM, "getSource", "getBrowserSource");
+    lua_classfunction(luaVM, "getURL", "getBrowserURL");
+    lua_classfunction(luaVM, "getProperty", "getBrowserProperty");
+    lua_classfunction(luaVM, "getTitle", "getBrowserTitle");
+    lua_classfunction(luaVM, "getVolume", "getBrowserVolume");
+
+    lua_classvariable(luaVM, "url", "loadBrowserURL", "getBrowserURL");
     lua_classvariable(luaVM, "renderingPaused", "setBrowserRenderingPaused", "isBrowserRenderingPaused");
     lua_classvariable(luaVM, "volume", "setBrowserVolume", "getBrowserVolume");
+
+    lua_classfunction(luaVM, "toggleDevTools", "toggleBrowserDevTools");
     lua_classvariable(luaVM, "devTools", "toggleBrowserDevTools", nullptr);
 
     lua_registerclass(luaVM, "Browser", "DxTexture");
@@ -446,6 +456,7 @@ int CLuaBrowserDefs::SetBrowserRenderingPaused(lua_State* luaVM)
 
 bool CLuaBrowserDefs::IsBrowserRenderingPaused(CClientWebBrowser* browser)
 {
+    //  bool isBrowserRenderingPaused ( browser webBrowser )
     return browser->GetRenderingPaused();
 }
 
