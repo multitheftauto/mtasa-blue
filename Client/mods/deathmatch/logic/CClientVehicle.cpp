@@ -1,10 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
- *               (Shared logic for modifications)
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/shared_logic/CClientVehicle.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CClientVehicle.cpp
  *  PURPOSE:     Vehicle entity class
+ *
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -19,9 +20,6 @@
 #include <game/CHandlingManager.h>
 #include <game/CStreaming.h>
 
-using std::list;
-
-extern CClientGame*            g_pClientGame;
 std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
 
 // To hide the ugly "pointer truncation from DWORD* to unsigned long warning
