@@ -247,24 +247,24 @@ CClientVehicle::~CClientVehicle()
     }
 
     // And the passenger models
-    for (size_t i = 0; i < (sizeof(m_pPassengers) / sizeof(CClientPed*)); i++)
+    for (const auto& pPassenger : m_pPassengers)
     {
-        if (m_pPassengers[i])
+        if (pPassenger)
         {
-            m_pPassengers[i]->m_uiOccupiedVehicleSeat = 0;
-            m_pPassengers[i]->SetVehicleInOutState(VEHICLE_INOUT_NONE);
-            UnpairPedAndVehicle(m_pPassengers[i], this);
+            pPassenger->m_uiOccupiedVehicleSeat = 0;
+            pPassenger->SetVehicleInOutState(VEHICLE_INOUT_NONE);
+            UnpairPedAndVehicle(pPassenger, this);
         }
     }
 
     // Occupying passenger models
-    for (size_t i = 0; i < (sizeof(m_pOccupyingPassengers) / sizeof(CClientPed*)); i++)
+    for (const auto& pOccupyingPassenger : m_pOccupyingPassengers)
     {
-        if (m_pOccupyingPassengers[i])
+        if (pOccupyingPassenger)
         {
-            m_pOccupyingPassengers[i]->m_uiOccupiedVehicleSeat = 0;
-            m_pOccupyingPassengers[i]->SetVehicleInOutState(VEHICLE_INOUT_NONE);
-            UnpairPedAndVehicle(m_pOccupyingPassengers[i], this);
+            pOccupyingPassenger->m_uiOccupiedVehicleSeat = 0;
+            pOccupyingPassenger->SetVehicleInOutState(VEHICLE_INOUT_NONE);
+            UnpairPedAndVehicle(pOccupyingPassenger, this);
         }
     }
 
@@ -2076,11 +2076,11 @@ void CClientVehicle::StreamedInPulse()
                 // Set the damage model doors
                 const auto pDamageManager = m_pVehicle->GetDamageManager();
 
-                for (size_t i = 0; i < MAX_DOORS; i++)
+                for (unsigned char i = 0; i < MAX_DOORS; i++)
                     pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], true);
-                for (size_t i = 0; i < MAX_PANELS; i++)
+                for (unsigned char i = 0; i < MAX_PANELS; i++)
                     pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i]);
-                for (size_t i = 0; i < MAX_LIGHTS; i++)
+                for (unsigned char i = 0; i < MAX_LIGHTS; i++)
                     pDamageManager->SetLightStatus(static_cast<eLights>(i), m_ucLightStates[i]);
             }
 
@@ -2690,33 +2690,30 @@ void CClientVehicle::Create()
         if (m_ComponentData.empty())
         {
             // grab our map of components
-            auto& componentMap = m_pVehicle->GetComponentMap();
+            const auto& componentMap = m_pVehicle->GetComponentMap();
             // loop through all the components.... we don't care about the RwFrame we just want the names.
-            for (const auto& iter : componentMap)
+            for (const auto& [name, frame] : componentMap)
             {
-                const SString&       strName = (&iter)->first;
-                const SVehicleFrame& frame = (&iter)->second;
-
                 SVehicleComponentData vehicleComponentData;
 
                 // Find parent component name
                 if (!frame.frameList.empty())
                 {
                     RwFrame* pParentRwFrame = frame.frameList.back();
-                    for (const auto& iter2 : componentMap)
+                    for (const auto& entry : componentMap)
                     {
-                        if ((&iter2)->second.pFrame == pParentRwFrame)
+                        if (entry.second.pFrame == pParentRwFrame)
                         {
-                            vehicleComponentData.m_strParentName = (&iter2)->first;
+                            vehicleComponentData.m_strParentName = entry.first;
                             break;
                         }
                     }
                 }
 
                 // Grab our start position
-                GetComponentPosition(iter.first, vehicleComponentData.m_vecComponentPosition);
-                GetComponentRotation(iter.first, vehicleComponentData.m_vecComponentRotation);
-                GetComponentScale(iter.first, vehicleComponentData.m_vecComponentScale);
+                GetComponentPosition(name, vehicleComponentData.m_vecComponentPosition);
+                GetComponentRotation(name, vehicleComponentData.m_vecComponentRotation);
+                GetComponentScale(name, vehicleComponentData.m_vecComponentScale);
 
                 // copy it into our original positions
                 vehicleComponentData.m_vecOriginalComponentPosition = vehicleComponentData.m_vecComponentPosition;
@@ -2724,12 +2721,12 @@ void CClientVehicle::Create()
                 vehicleComponentData.m_vecOriginalComponentScale = vehicleComponentData.m_vecComponentScale;
 
                 // insert it into our component data list
-                m_ComponentData.insert(std::pair<SString, SVehicleComponentData>(iter.first, vehicleComponentData));
+                m_ComponentData.insert(std::pair<SString, SVehicleComponentData>(name, vehicleComponentData));
 
                 // # prefix means hidden by default.
-                if (iter.first[0] == '#')
+                if (name[0] == '#')
                 {
-                    SetComponentVisible(iter.first, false);
+                    SetComponentVisible(name, false);
                 }
             }
         }
@@ -2853,9 +2850,9 @@ void CClientVehicle::Destroy()
 
             for (size_t i = 0; i < MAX_DOORS; i++)
                 m_ucDoorStates[i] = pDamageManager->GetDoorStatus(static_cast<eDoors>(i));
-            for (size_t i = 0; i < MAX_PANELS; i++)
+            for (unsigned char i = 0; i < MAX_PANELS; i++)
                 m_ucPanelStates[i] = pDamageManager->GetPanelStatus(static_cast<ePanels>(i));
-            for (size_t i = 0; i < MAX_LIGHTS; i++)
+            for (unsigned char i = 0; i < MAX_LIGHTS; i++)
                 m_ucLightStates[i] = pDamageManager->GetLightStatus(static_cast<eLights>(i));
         }
 

@@ -1604,6 +1604,12 @@ namespace SharedUtil
             return data[uiIndex];
         }
 
+        T* begin() { return data; }
+        T* end() { return data + SIZE; }
+
+        const T* begin() const { return data; }
+        const T* end() const { return data + SIZE; }
+
         T data[SIZE];
     };
 
