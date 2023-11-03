@@ -27,23 +27,30 @@ public:
     void UpdatePresence();
     void SetPresenceStartTimestamp(const unsigned long ulStart);
     void SetPresenceEndTimestamp(const unsigned long ulEnd);
-    void SetAsset(const char* szAsset, const char* szAssetText, bool bIsLarge = false);
+    void SetAsset(const char* szAsset, const char* szAssetText, bool bIsLarge);
     void SetAssetLargeData(const char* szAsset, const char* szAssetText);
     void SetAssetSmallData(const char* szAsset, const char* szAssetText);
 
     bool ResetDiscordData();
-    bool SetPresenceState(const char* szState, bool bCustom = false);
-    bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
+    bool SetPresenceState(const char* szState, bool bCustom);
+    bool SetPresenceDetails(const char* szDetails, bool bCustom);
     bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl);
-    void SetPresencePartySize(int iSize, int iMax);
+    void SetPresencePartySize(int iSize, int iMax, bool bCustom);
     bool SetDiscordRPCEnabled(bool bEnabled);
     bool IsDiscordCustomDetailsDisallowed() const;
     bool IsDiscordRPCEnabled() const;
     bool SetApplicationID(const char* szAppID);
+    void SetDiscordClientConnected(bool bConnected) { m_bConnected = bConnected; };
+    bool IsDiscordClientConnected() const;
 
-    // void SetPresenceTimestamp();
-    // void SetPresenceImage();
-    // void SetPresenceText();
+    // handlers
+    static void HandleDiscordReady(const struct DiscordUser* pDiscordUser);
+    static void HandleDiscordDisconnected(int iErrorCode, const char* szMessage);
+    static void HandleDiscordError(int iErrorCode, const char* szMessage);
+
+#ifdef DISCORD_DISABLE_IO_THREAD
+    void UpdatePresenceConnection();
+#endif
 
 private:
     std::string m_strDiscordAppId;
@@ -66,7 +73,11 @@ private:
     bool m_bDisallowCustomDetails;
     bool m_bDiscordRPCEnabled;
     bool m_bUpdateRichPresence;
+    bool m_bConnected;
 
     int m_iPartySize;
     int m_iPartyMax;
+
+    int m_iPlayersCount;
+    int m_iMaxPlayers;
 };

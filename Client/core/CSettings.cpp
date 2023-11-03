@@ -3454,15 +3454,15 @@ void CSettings::SaveData()
 
     if (bAllowDiscordRPC)
     {
-        auto discord = g_pCore->GetDiscord();
+        const auto discord = g_pCore->GetDiscord();
 
         if (discord)
         {
-            const char* state = "Main menu";
+            const char* state = _("Main menu");
 
             if (g_pCore->IsConnected())
             {                
-                state = "In-game";
+                state = _("In-game");
 
                 const SString& serverName = g_pCore->GetLastConnectedServerName();
                 discord->SetPresenceDetails(serverName.c_str(), false);
