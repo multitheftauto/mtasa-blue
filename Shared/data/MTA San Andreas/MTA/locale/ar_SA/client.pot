@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-03 03:40\n"
+"PO-Revision-Date: 2023-11-03 12:10\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -532,7 +532,7 @@ msgstr "جاري تشغيل خادم محلي ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr ""
+msgstr "منطقة 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
@@ -542,7 +542,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CResource.cpp:370
 #: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
 msgid "In-game"
-msgstr ""
+msgstr "داخل اللعبة"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
