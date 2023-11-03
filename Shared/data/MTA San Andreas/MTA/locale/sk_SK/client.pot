@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-03 17:31\n"
+"PO-Revision-Date: 2023-11-03 18:31\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -338,118 +338,118 @@ msgstr "Odpojené"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "Lieta s UFO v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "Pláva v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr ""
+msgstr "Ide na vlnách v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
-msgstr ""
+msgstr "Ide vlakom v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr ""
+msgstr "Lieta v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr ""
+msgstr "Jazdí v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "Jazdí s monster truckom v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr ""
+msgstr "Jazdí so štvorkolkou v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "Skáča v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "Robí divné veci v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr ""
+msgstr "Lezie v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "Robí drive-by v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
-msgstr ""
+msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr ""
+msgstr "Dýcha vodu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
-msgstr ""
+msgstr "Topí sa v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "Krčí sa v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
-msgstr ""
+msgstr "Bojuje v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
-msgstr ""
+msgstr "Bojuje päsťami v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "Strieľa v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr ""
+msgstr "Strieľa"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr ""
+msgstr "Lieta s jetpackom v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr ""
+msgstr "Horí v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
-msgstr ""
+msgstr "Horí v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Swimming in"
-msgstr ""
+msgstr "Pláva v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr ""
+msgstr "Vznáša sa v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "Je prenasledovaný žralokom"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr ""
+msgstr "Dusí sa v"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 #: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
 #: Client/core/CCore.cpp:674
 msgid "Main menu"
-msgstr ""
+msgstr "Hlavné menu"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -524,17 +524,17 @@ msgstr "Spúšťam lokálny server..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr ""
+msgstr "Area 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr ""
+msgstr "Chodí v "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 #: Client/mods/deathmatch/logic/CResource.cpp:370
 #: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
 msgid "In-game"
-msgstr ""
+msgstr "V hre"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
@@ -611,23 +611,23 @@ msgstr "Overenie MTA Klienta zlyhalo!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
-msgstr ""
+msgstr "V priekope"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
-msgstr ""
+msgstr "Ide do nemocnice"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr ""
+msgstr "Stretáva sa s jeho markerom"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "Ľutuje jeho rozhodnutie"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
-msgstr ""
+msgstr "Je mŕtvy"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
