@@ -4276,7 +4276,9 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVe
 
 std::unordered_map<std::string, float> CLuaVehicleDefs::GetVehicleModelAudioSetting(const uint uiModel)
 {
-    CVehicleAudioSettingsEntry* pEntry = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData((eVehicleTypes)uiModel);
+    auto rootModelId = CClientVehicleManager::GetRootModelId(uiModel);
+
+    CVehicleAudioSettingsEntry* pEntry = g_pGame->GetVehicleAudioSettingsManager()->GetVehicleModelAudioSettingsData((eVehicleTypes)rootModelId);
 
     std::unordered_map<std::string, float> output;
 
