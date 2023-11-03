@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-24 02:34+0000\n"
-"PO-Revision-Date: 2023-10-24 03:20\n"
+"POT-Creation-Date: 2023-11-03 03:38+0000\n"
+"PO-Revision-Date: 2023-11-03 03:41\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -17,26 +17,726 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#. Create buttons
-#. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CVersionUpdater.cpp:1607
-#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
-#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
-#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
-#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
-#: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4739 Client/loader/Dialogs.cpp:133
-msgid "OK"
-msgstr "ОК"
+#: Client/mods/deathmatch/CClient.cpp:36
+msgid "This version has expired."
+msgstr "Ця версія застаріла."
+
+#: Client/mods/deathmatch/CClient.cpp:56
+msgid "disconnect from the game"
+msgstr "від'єднання від гри"
+
+#: Client/mods/deathmatch/CClient.cpp:57
+msgid "shows the nametags"
+msgstr "показувати неймтеґи"
+
+#: Client/mods/deathmatch/CClient.cpp:58
+msgid "shows the chatbox"
+msgstr "показати чат"
+
+#: Client/mods/deathmatch/CClient.cpp:59
+msgid "shows the network statistics"
+msgstr "Відображати статистику з'єднання"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: Client/mods/deathmatch/CClient.cpp:63
+msgid "open the chat input"
+msgstr "Відкрити чат"
+
+#: Client/mods/deathmatch/CClient.cpp:64
+msgid "transmits voice to other players"
+msgstr "Передавати голос всім гравцям"
+
+#: Client/mods/deathmatch/CClient.cpp:65
+msgid "enters a car as passenger"
+msgstr "Транспорт: Пасажир"
+
+#: Client/mods/deathmatch/CClient.cpp:66
+msgid "next radio channel"
+msgstr "Наст. радіостанція"
+
+#: Client/mods/deathmatch/CClient.cpp:67
+msgid "previous radio channel"
+msgstr "Поп. радіостанція"
+
+#: Client/mods/deathmatch/CClient.cpp:68
+msgid "enables the radar view"
+msgstr "Радар: Відобразити/Приховати"
+
+#: Client/mods/deathmatch/CClient.cpp:69
+msgid "zooms the radar in"
+msgstr "Радар: Наблизити"
+
+#: Client/mods/deathmatch/CClient.cpp:70
+msgid "zooms the radar out"
+msgstr "Зменшити радар"
+
+#: Client/mods/deathmatch/CClient.cpp:71
+msgid "moves the radar north"
+msgstr "Радар: На північ"
+
+#: Client/mods/deathmatch/CClient.cpp:72
+msgid "moves the radar south"
+msgstr "Радар: На південь"
+
+#: Client/mods/deathmatch/CClient.cpp:73
+msgid "moves the radar east"
+msgstr "Радар: На схід"
+
+#: Client/mods/deathmatch/CClient.cpp:74
+msgid "moves the radar west"
+msgstr "Радар: На захід"
+
+#: Client/mods/deathmatch/CClient.cpp:75
+msgid "attaches the radar"
+msgstr "Радар: На себе"
+
+#: Client/mods/deathmatch/CClient.cpp:76
+msgid "reduces radar opacity"
+msgstr "Радар: Прозорість — "
+
+#: Client/mods/deathmatch/CClient.cpp:77
+msgid "increases radar opacity"
+msgstr "Радар: Прозорість +"
+
+#: Client/mods/deathmatch/CClient.cpp:78
+msgid "toggles radar help text"
+msgstr "Радар: Вкл/викл допомогу"
+
+#: Client/mods/deathmatch/CClient.cpp:79
+msgid "sends a message to the targetted player"
+msgstr "Повідомлення заданому гравцеві"
+
+#: Client/mods/deathmatch/CClient.cpp:80
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "Транспорт: Наст. зброя"
+
+#: Client/mods/deathmatch/CClient.cpp:81
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "Транспорт: Поп. зброя"
+
+#: Client/mods/deathmatch/CClient.cpp:82
+msgid "outputs info about the current server"
+msgstr "Відобразити відомості про сервер"
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: Client/mods/deathmatch/CClient.cpp:85
+msgid "defines the scale multiplier of all text-displays"
+msgstr "Визначення масштабу відображення тексту"
+
+#. Development mode
+#: Client/mods/deathmatch/CClient.cpp:92
+msgid "(Development mode) shows the colshapes"
+msgstr "(Режим розробки) показувати colshapes"
+
+#: Client/mods/deathmatch/CClient.cpp:93
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(Режим розробки) писати ідентифікатори ігрових звуків в вікно налагоджувача"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:505
+msgid "Disconnected: Invalid nickname"
+msgstr "Від'єднання: невірний нікнейм."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
+msgid "Disconnect from server"
+msgstr "Від'єднання від сервера"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "Від'єднання: Серійний номер заблокований. \n"
+"Причина: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "Від'єднання: Ви забанені. \n"
+"Причина: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "Від'єднання: Обліківка заблокована. \n"
+"Причина: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
+msgid "Disconnected: Version mismatch"
+msgstr "Від'єднання: Версії не збігаються"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:534
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "Від'єднання: Флуд підключеннями. Зачекайте хвилину перед новою спробою."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:538
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "Від'єднання: Сервер іншою версією.\n"
+"Інформація: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:543
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "Від'єднання: Невідповідна версія.\n"
+"Інформація: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "Від'єднання: Сервер працює на більш новій версії.\n"
+"Інформація: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "Від'єднання: Сервер працює на більш старій версії.\n"
+"Інформація: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:558
+msgid "Disconnected: Nick already in use"
+msgstr "Від'єднання: Такий нікнейм вже використовується"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
+msgid "Disconnected: Player element could not be created."
+msgstr "Відключено: не вдалося створити елемент гравця."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Від'єднання: Сервер скинув під'єднання: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
+msgid "Disconnected: Serial verification failed"
+msgstr "Від'єднання: не вдалася перевірка серійного ключа."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "Від'єднання: під'єднання десинхронізовано %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:584
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "Від'єднання: %s кікнув вас"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "Від'єднання: %s заблокував вас"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "Від'єднання: Сервер вимкнений або перезапущений"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
+msgid "You were kicked from the game"
+msgstr "Вас кікнулі з сервера"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr "Для цього сервера потрібен немодифікований gta_sa.exe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
+msgid "Please replace gta_sa.exe"
+msgstr "Будь ласка, замініть gta_sa.exe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "Цей сервер не дозволяє користувацькі файли D3D9.DLL"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "Видаліть D3D9.DLL з каталогу встановлення GTA та перезапустіть MTA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
+msgid "This server does not allow virtual machines"
+msgstr "Цей сервер не підтримує віртуальні машини"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
+msgid "This server requires driver signing to be enabled"
+msgstr "Для цього сервера потрібно ввімкнути підпис драйвера"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
+msgid "Please restart your PC"
+msgstr "Перезавантажте ПК"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+msgid "This server has detected missing anti-cheat components"
+msgstr "На цьому сервері виявлено відсутність компонентів захисту від читів"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
+msgid "Try restarting MTA"
+msgstr "Спробуйте перезапустити MTA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "Для цього сервера потрібні немодифіковані gta3.img та gta_int.img"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "Замініть gta3.img або gta_int.img"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
+msgid "This server does not allow Wine"
+msgstr "Цей сервер не дозволяє використовувати Wine"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr "Переконайтеся, що жодна інша програма не змінює MTA:SA"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
+msgid "Time Remaining: "
+msgstr "Залишилося часу: "
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d день"
+msgstr[1] "%d дня"
+msgstr[2] "%d днів"
+msgstr[3] ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d година"
+msgstr[1] "%d годин"
+msgstr[2] "%d години"
+msgstr[3] ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d хвилина"
+msgstr[1] "%d хвилин"
+msgstr[2] "%d хвилини"
+msgstr[3] ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d секунда"
+msgstr[1] "%d секунд"
+msgstr[2] "%d секунди"
+msgstr[3] ""
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
+msgid "Disconnected"
+msgstr "Від'єднання"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:370
+msgid "Flying a UFO around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:370
+msgid "Cruising around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:370
+msgid "Riding the waves of"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:371
+msgid "Riding the train in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:371
+msgid "Flying around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:372
+msgid "Riding around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:372
+msgid "Monster truckin' around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:372
+msgid "Quaddin' around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:373
+msgid "Bunny hopping around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:373
+msgid "Doing weird stuff in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+msgid "Climbing around in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:378
+#: Client/mods/deathmatch/logic/CClientGame.cpp:379
+msgid "Doing a drive-by in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:380
+msgid "Blub blub..."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:381
+msgid "Breathing water"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:382
+msgid "Drowning in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:383
+msgid "Ducking for cover in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+msgid "Fighting in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+msgid "Throwing fists in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+msgid "Blastin' fools in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:387
+msgid "Shooting up"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:388
+msgid "Jetpacking in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:389
+msgid "Literally on fire in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:390
+msgid "Burning up in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+msgid "Swimming in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:392
+msgid "Floating around in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:393
+msgid "Being chased by a shark"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+msgid "Choking to death in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:527
+#: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
+#: Client/core/CCore.cpp:674
+msgid "Main menu"
+msgstr ""
+
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/mods/deathmatch/logic/CClientGame.cpp:635
+#: Client/mods/deathmatch/logic/CClientGame.cpp:709
+#: Client/mods/deathmatch/logic/CClientGame.cpp:733
+#: Client/mods/deathmatch/logic/CClientGame.cpp:755
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1171
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1330
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1367
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1416
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1428
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+#: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
+#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
+#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2929
+#: Client/core/CSettings.cpp:4148 Client/core/CSettings.cpp:4176
+#: Client/core/CSettings.cpp:4718 Client/core/CCore.cpp:1275
+#: Client/core/CCore.cpp:1288 Client/core/DXHook/CDirect3DHook9.cpp:127
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "Помилка"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:635
+#: Client/mods/deathmatch/logic/CClientGame.cpp:733
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Невірний нікнейм! Будь ласка, відкрийте налаштування і змініть їх!"
+
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:651
+#: Client/core/CConnectManager.cpp:148
+msgid "CONNECTING"
+msgstr "ПІД'ЄДНАННЯ"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:651
+msgid "Entering the game ..."
+msgstr "Під'єднання до сервера ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:709
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Немає під'єднання; будь ласка, використовуйте ПІД'ЄДНАННЯ або команду 'connect', щоб зайти на сервер."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:755
+msgid "The server is not installed"
+msgstr "Сервер не встановлено"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:765
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+msgid "Local Server"
+msgstr "Локальний Сервер"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:765
+msgid "Starting local server ..."
+msgstr "Запуск локального сервера ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1013
+msgid "Area 51"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1022
+msgid "Walking around "
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1083
+#: Client/mods/deathmatch/logic/CResource.cpp:370
+#: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
+msgid "In-game"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1171
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "Вас кікнулі з сервера ( %s )"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
+msgid "Connecting to local server..."
+msgstr "З'єднання з локальним сервером..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
+msgid "Error connecting to server."
+msgstr "Помилка під'єднання до сервера."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
+msgid "Connecting to local server timed out. See console for details."
+msgstr "Час під'єднання до локального серверу минув. Відкрийте консоль, щоб дізнатися подробиці."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1330
+#: Client/core/CConnectManager.cpp:263
+msgid "Connection timed out"
+msgstr "Час під'єднання минув"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1367
+msgid "Connection with the server was lost"
+msgstr "З'єднання з сервером втрачено"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+msgid "Disconnected: unknown protocol error"
+msgstr "Від'єднано: невідома помилка протоколу"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1382
+#: Client/core/CConnectManager.cpp:285
+msgid "Disconnected: disconnected remotely"
+msgstr "Від'єднано: віддалене від'єднання"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1386
+#: Client/core/CConnectManager.cpp:289
+msgid "Disconnected: connection lost remotely"
+msgstr "Від'єднано: втрачено віддалене з'єднання"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1390
+#: Client/core/CConnectManager.cpp:293
+msgid "Disconnected: you are banned from this server"
+msgstr "Від'єднано: ви забанені на цьому сервері"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1394
+msgid "Disconnected: the server is currently full"
+msgstr "Від'єднання: сервер переповнений."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
+#: Client/core/CConnectManager.cpp:300
+msgid "Disconnected: disconnected from the server"
+msgstr "Від'єднано: від'єднаний від сервера"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1402
+#: Client/core/CConnectManager.cpp:304
+msgid "Disconnected: connection to the server was lost"
+msgstr "Від'єднано: зв'язок з сервером було втрачено"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1406
+msgid "Disconnected: invalid password specified"
+msgstr "Від'єднання: невірний пароль"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1410
+#: Client/core/CConnectManager.cpp:311
+msgid "Disconnected: connection was refused"
+msgstr "Від'єднано: з'єднання було скинуто"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1428
+msgid "MTA Client verification failed!"
+msgstr "Перевірка клієнта MTA не вдалася!"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
+msgid "In a ditch"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
+msgid "En-route to hospital"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
+msgid "Meeting their maker"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
+msgid "Regretting their decisions"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
+msgid "Wasted"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Прогрес завантаження карти:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Прогрес завантаження:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s з %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Від'єднайтеся, щоб зупинити завантаження"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Помилка завантаження: %s"
+
+#: Client/mods/deathmatch/logic/CServer.cpp:181
+msgid "Could not start the local server. See console for details."
+msgstr "Неможливо запустити локальний сервер. Перевірте вікно консолі на наявність інформації."
+
+#: Client/mods/deathmatch/logic/CServer.cpp:182
+#, c-format
+msgid "Error: Could not start local server. [%s]"
+msgstr "Помилка: Неможливо запустити локальний сервер. [%s]"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "СТВОРИТИ СЕРВЕР"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:430 Client/core/CSettings.cpp:618
+#: Client/core/CSettings.cpp:892 Client/core/CSettings.cpp:2006
+msgid "General"
+msgstr "Загальні"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "Ресурси"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Ім'я сервера:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Пароль:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Макс. кількість гравців:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "Видимість в:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "Локальна мережа"
+
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr "Інтернет"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Вибрано"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Усе"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Запустити"
 
 #. Cancel button
-#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/core/CVersionUpdater.cpp:1790
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/loader/Dialogs.cpp:136 Client/core/CVersionUpdater.cpp:1790
 #: Client/core/CVersionUpdater.cpp:1806 Client/core/CVersionUpdater.cpp:1841
 #: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4738
-#: Client/loader/Dialogs.cpp:136
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/gui/CGUIMessageBox_Impl.cpp:68
 msgid "Cancel"
 msgstr "Відміна"
+
+#. Couldn't create render target for CPostEffects
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1360
+msgid "Problem with graphics driver"
+msgstr "Проблема з графічним драйвером"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -44,265 +744,593 @@ msgstr "Відміна"
 #.
 #.
 #. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CQuestionBox.cpp:195
-#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
-#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
-#: Client/core/CSettings.cpp:1377 Client/core/CSettings.cpp:1401
-#: Client/core/CSettings.cpp:4471 Client/core/CSettings.cpp:4547
-#: Client/core/CSettings.cpp:4596 Client/core/CMainMenu.cpp:1188
-#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
+#: Client/loader/Dialogs.cpp:131 Client/core/CVersionUpdater.cpp:1572
+#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
+#: Client/core/CVersionUpdater.cpp:1878 Client/core/CQuestionBox.cpp:195
+#: Client/core/CMainMenu.cpp:1188 Client/core/CSettings.cpp:1377
+#: Client/core/CSettings.cpp:1401 Client/core/CSettings.cpp:4471
+#: Client/core/CSettings.cpp:4547 Client/core/CSettings.cpp:4596
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
+#: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
 msgstr "Так"
 
-#: Client/cefweb/CWebsiteRequests.cpp:19
-msgid "Website requests"
-msgstr "Запит до сайту"
-
-#: Client/cefweb/CWebsiteRequests.cpp:27
-msgid "The server requests the following websites in order to load them (later):"
-msgstr "Сервер робить запити до наступних сайтів, для того щоб завантажити їх пізніше:"
-
-#: Client/cefweb/CWebsiteRequests.cpp:33
-msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "НІКОЛИ НЕ ВВОДЬТЕ КОНФІДЕНЦІЙНІ ДАНІ, ЩОБ ЗАХИСТИТИ ЇХ ВІД КРАДІЖКИ"
-
-#: Client/cefweb/CWebsiteRequests.cpp:46
-msgid "Remember decision"
-msgstr "Запам'ятати рішення"
-
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:962
-msgid "Allow"
-msgstr "Дозволити"
-
-#: Client/cefweb/CWebsiteRequests.cpp:57
-msgid "Deny"
-msgstr "Заперечення"
-
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Не вдалося виконати з'єднання. Хибне ім'я користувача!"
-
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CGUI.cpp:87 Client/core/CSettings.cpp:2929
-#: Client/core/CSettings.cpp:4148 Client/core/CSettings.cpp:4176
-#: Client/core/CSettings.cpp:4718 Client/core/CCore.cpp:1273
-#: Client/core/CCore.cpp:1286 Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
-#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
-#: Client/mods/deathmatch/logic/CClientGame.cpp:680
-#: Client/mods/deathmatch/logic/CClientGame.cpp:704
-#: Client/mods/deathmatch/logic/CClientGame.cpp:726
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1141
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1386
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "Помилка"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Не вдалося під'єднатися. Неприпустима адреса серверу!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Під'єднання на %s з портом %u не вдалося!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Під'єднатися до %s:%u ..."
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:622
-msgid "CONNECTING"
-msgstr "ПІД'ЄДНАННЯ"
-
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1300
-msgid "Connection timed out"
-msgstr "Час під'єднання минув"
-
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1348
-msgid "Disconnected: unknown protocol error"
-msgstr "Від'єднано: невідома помилка протоколу"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1352
-msgid "Disconnected: disconnected remotely"
-msgstr "Від'єднано: віддалене від'єднання"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1356
-msgid "Disconnected: connection lost remotely"
-msgstr "Від'єднано: втрачено віддалене з'єднання"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1360
-msgid "Disconnected: you are banned from this server"
-msgstr "Від'єднано: ви забанені на цьому сервері"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1368
-msgid "Disconnected: disconnected from the server"
-msgstr "Від'єднано: від'єднаний від сервера"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1372
-msgid "Disconnected: connection to the server was lost"
-msgstr "Від'єднано: зв'язок з сервером було втрачено"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
-msgid "Disconnected: connection was refused"
-msgstr "Від'єднано: з'єднання було скинуто"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Не встановлений модуль (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Хибна відповідь сервера (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Хибна відповідь сервера (1)"
-
-#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
-msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Ви хочете переглянути онлайн допомогу з цього питання?"
-
-#: Client/core/CQuestionBox.cpp:194 Client/core/CVersionUpdater.cpp:1571
+#: Client/loader/Dialogs.cpp:132 Client/core/CVersionUpdater.cpp:1571
 #: Client/core/CVersionUpdater.cpp:1589 Client/core/CVersionUpdater.cpp:1858
-#: Client/core/CVersionUpdater.cpp:1877 Client/core/CSettings.cpp:1376
+#: Client/core/CVersionUpdater.cpp:1877 Client/core/CQuestionBox.cpp:194
+#: Client/core/CMainMenu.cpp:1187 Client/core/CSettings.cpp:1376
 #: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4470
 #: Client/core/CSettings.cpp:4546 Client/core/CSettings.cpp:4595
-#: Client/core/CMainMenu.cpp:1187 Client/core/ServerBrowser/CServerInfo.cpp:479
-#: Client/loader/Dialogs.cpp:132
+#: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "No"
 msgstr "Ні"
 
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "КОНСОЛЬ"
+#. Create buttons
+#. OK button
+#: Client/loader/Dialogs.cpp:133 Client/core/CVersionUpdater.cpp:1607
+#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
+#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
+#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
+#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
+#: Client/core/CVersionUpdater.cpp:2152 Client/core/CSettings.cpp:127
+#: Client/core/CSettings.cpp:4739 Client/gui/CGUIMessageBox_Impl.cpp:64
+msgid "OK"
+msgstr "ОК"
 
-#: Client/core/CCommandFuncs.cpp:24
-msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ ДОПОМОГА ПО КОМАНДАМ ]***\n"
+#: Client/loader/Dialogs.cpp:134
+msgid "Quit"
+msgstr "Вийти"
 
-#: Client/core/CCommandFuncs.cpp:158
-#, c-format
-msgid "* The time is %d:%02d:%02d"
-msgstr "* Час: %d:%02d:%02d"
+#: Client/loader/Dialogs.cpp:135
+#: Client/core/ServerBrowser/CServerBrowser.cpp:556
+msgid "Help"
+msgstr "Допомога"
 
-#: Client/core/CCommandFuncs.cpp:242
-msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "під'єднатися: Використовуйте 'connect <адреса> [<порт> <нік> <пароль>]'"
+#: Client/loader/Dialogs.cpp:151
+msgid "MTA: San Andreas has encountered a problem"
+msgstr "MTA: San Andreas виявив помилку"
 
-#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
-msgid "connect: Bad port number"
-msgstr "під'єднання: Невірний номер порту"
+#: Client/loader/Dialogs.cpp:152
+msgid "Crash information"
+msgstr "Інформація про аварійне завершення програми"
 
-#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
-#, c-format
-msgid "connect: Connecting to %s:%u..."
-msgstr "під'єднання: Під'єднання до %s:%u..."
+#: Client/loader/Dialogs.cpp:153
+msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
+msgstr "Установіть прапорець, щоб надсилати інформацію розробникам через Інтернет про падіння MTA."
 
-#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
-#, c-format
-msgid "connect: could not connect to %s:%u!"
-msgstr "під'єднання: не вдалося під'єднатися до %s:%u!"
+#: Client/loader/Dialogs.cpp:154
+msgid "Doing so will increase the chance of this crash being fixed."
+msgstr "Це підвищить шанси на усунення даної помилки"
 
-#: Client/core/CCommandFuncs.cpp:281
-msgid "connect: Failed to unload current mod"
-msgstr "під'єднання: Не вдалося вивантажити поточний мод"
+#: Client/loader/Dialogs.cpp:155
+msgid "Do you want to restart MTA: San Andreas ?"
+msgstr "Ви хочете перезапустити MTA: San Andreas ?"
 
-#: Client/core/CCommandFuncs.cpp:371
-msgid "Bound all controls from GTA"
-msgstr "Скопіювати управління з GTA"
+#: Client/loader/Dialogs.cpp:162
+msgid "MTA: San Andreas - Warning"
+msgstr "MTA: San Andreas - Попередження"
 
-#: Client/core/CCommandFuncs.cpp:385
-msgid "Saved configuration file"
-msgstr "Файл конфігурації збережений"
+#: Client/loader/Dialogs.cpp:163
+msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
+msgstr "Ваш каталог встановлення Grand Theft Auto: San Andreas містить такі файли:"
 
-#. Print it
-#: Client/core/CCommandFuncs.cpp:451
-#, c-format
-msgid "* Your serial is: %s"
-msgstr "* Ваш серійний номер: %s"
+#: Client/loader/Dialogs.cpp:165
+msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
+"It is recommended that you remove or rename these files."
+msgstr "Ці файли не є обов’язковими та можуть заважати графічним функціям у цій версії MTA:SA.\n\n"
+"Рекомендується видалити або перейменувати ці файли."
 
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Обрана вами графічна тема не може бути завантажена, тема за замовчуванням також не може бути завантажена, перевстановіть MTA для вирішення проблеми."
+#: Client/loader/Dialogs.cpp:167
+msgid "Keep these files, but also show this warning on next start"
+msgstr "Зберегти ці файли, але також показувати це попередження під час наступного запуску"
 
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Вісь прискорення"
+#: Client/loader/Dialogs.cpp:168
+msgid "Do not remind me about these files again"
+msgstr "Більше не нагадувати мені про ці файли"
 
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Вісь гальмування"
+#: Client/loader/Dialogs.cpp:169
+msgid "Rename these files from *.dll to *.dll.bak"
+msgstr "Перейменувати ці файли з *.dll на *.dll.bak"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Українська"
+#: Client/loader/Dialogs.cpp:170
+msgid "Show me these files"
+msgstr "Показати мені ці файли"
 
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "Програмування"
+#: Client/loader/Dialogs.cpp:171
+msgid "Play MTA:SA"
+msgstr "Грати в MTA:SA"
 
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "Учасники"
+#: Client/loader/Dialogs.cpp:177
+msgid "MTA: San Andreas - Confusing options"
+msgstr "MTA: San Andreas - Збиті налаштування"
 
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "Ігровий дизайн / Скриптинґ"
+#: Client/loader/Dialogs.cpp:178
+msgid "NVidia Optimus detected!"
+msgstr "Виявлено NVidia Optimus!"
 
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "Мова"
+#: Client/loader/Dialogs.cpp:179
+msgid "Try each option and see what works:"
+msgstr "Спробуйте кожну опцію і подивіться, що працює:"
 
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "Автори виправлень"
+#: Client/loader/Dialogs.cpp:180
+msgid "A - Standard NVidia"
+msgstr "A - Стандартний NVidia"
 
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "Особлива подяка"
+#: Client/loader/Dialogs.cpp:181
+msgid "B - Alternate NVidia"
+msgstr "B - Альтернативна NVidia"
 
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
+#: Client/loader/Dialogs.cpp:182
+msgid "C - Standard Intel"
 msgstr ""
+
+#: Client/loader/Dialogs.cpp:183
+msgid "D - Alternate Intel"
+msgstr ""
+
+#: Client/loader/Dialogs.cpp:184
+msgid "If you get desperate, this might help:"
+msgstr "Якщо ви зневірилися, то це може допомогти: "
+
+#: Client/loader/Dialogs.cpp:185
+msgid "If you have already selected an option that works, this might help:"
+msgstr "Якщо ви вже вибрали варіант, який працює, це може допомогти:"
+
+#: Client/loader/Dialogs.cpp:186
+msgid "Force windowed mode"
+msgstr "Примусовий віконний режим"
+
+#: Client/loader/Dialogs.cpp:187
+msgid "Don't show again"
+msgstr "Більше не показувати"
+
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+msgid "MTA: San Andreas"
+msgstr "MTA: San Andreas"
+
+#: Client/loader/Dialogs.cpp:195
+msgid "Warning: Could not detect anti-virus product"
+msgstr "Увага: Я не можу знайти антивірус"
+
+#: Client/loader/Dialogs.cpp:197
+msgid "MTA could not detect an anti-virus on your PC.\n\n"
+"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
+"Press 'Help' for more information."
+msgstr "MTA не може виявити антивірус на вашому ПК.\n\n"
+"Віруси можуть втручатися в роботу MTA і псувати вам гру.\n\n"
+"Натисніть 'Допомога' для отримання докладнішої інформації."
+
+#: Client/loader/Dialogs.cpp:200
+msgid "I have already installed an anti-virus"
+msgstr "Я вже інсталював антивірус"
+
+#: Client/loader/Dialogs.cpp:202
+msgid "I will not install an anti-virus.\n"
+"I want my PC to lag and be part of a botnet."
+msgstr "Я не буду інсталювати антивірус.\n"
+"Я готовий до ризику стати частиною ботнету та лагів."
+
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:534
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Пошук Grand Theft Auto San Andreas"
+
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:536
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Запустіть Grand Theft Auto San Andreas"
+
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+msgid "Installing update..."
+msgstr "Інсталяція оновлення..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+msgid "Extracting files..."
+msgstr "Вилучення файлів..."
+
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1394
+msgid "Copying files..."
+msgstr "Копіювання файлів..."
+
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1454
+msgid "Copy finished early. Everything OK."
+msgstr "Копіювання завершено. Все в порядку."
+
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1460
+msgid "Finishing..."
+msgstr "Завершення..."
+
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1462
+msgid "Done!"
+msgstr "Готово!"
+
+#: Client/loader/MainFunctions.cpp:248
+msgid "Trouble restarting MTA:SA\n\n"
+"If the problem persists, open Task Manager and\n"
+"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
+"Try to launch MTA:SA again?"
+msgstr "Проблема перезапуску MTA:SA\n\n"
+"Якщо проблема збереглася, то відкрийте диспетчер завдань і зупиніть процеси 'gta_sa.exe' і 'Multi Theft Auto.exe' \n\n\n"
+"Спробувати запустити MTA:SA знову?"
+
+#: Client/loader/MainFunctions.cpp:266
+msgid "Another instance of MTA is already running.\n\n"
+"If this problem persists, please restart your computer"
+msgstr "Інший процес з MTA вже запущений.\n\n"
+"Якщо проблема не вирішена, спробуйте перезавантажити комп'ютер"
+
+#: Client/loader/MainFunctions.cpp:269
+msgid "Another instance of MTA is already running.\n\n"
+"Do you want to terminate it?"
+msgstr "Інший процес MTA вже запущений.\n\n"
+"Ви хочете завершити цей процес?"
+
+#: Client/loader/MainFunctions.cpp:294
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to revert to an earlier version?"
+msgstr "У вас є проблеми з запуском MTA:SA?.\n\n"
+"Спробувати повернутися до попередньої версії?"
+
+#: Client/loader/MainFunctions.cpp:324
+msgid "There seems to be a problem launching MTA:SA.\n"
+"Resetting GTA settings can sometimes fix this problem.\n\n"
+"Do you want to reset GTA settings now?"
+msgstr "Виникли проблеми з запуском MTA:SA. \n"
+"Скидання налаштувань GTA, цілком можливо, усуне цю проблему.\n\n"
+"Ви хочете скинути налаштування GTA?"
+
+#: Client/loader/MainFunctions.cpp:339
+msgid "GTA settings have been reset.\n\n"
+"Press OK to continue."
+msgstr "Налаштування GTA скинуті.\n\n"
+"Натисніть OK, щоб продовжити."
+
+#: Client/loader/MainFunctions.cpp:344
+#, c-format
+msgid "File could not be deleted: '%s'"
+msgstr "Файл не може бути видалений. '%s'"
+
+#. No settings to delete, or can't find them
+#: Client/loader/MainFunctions.cpp:352
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to see some online help?"
+msgstr "Виникли проблеми з запуском MTA:SA? .\n\n"
+"Хочете побачити онлайн-довідку?"
+
+#. Inform user
+#: Client/loader/MainFunctions.cpp:388
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Do you want to change the following setting?"
+msgstr "У вас виникли труднощі під час завантаження MTA:SA?\n\n"
+"Ви хочете змінити поточні налаштування?"
+
+#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:650
+#: Client/core/CSettings.cpp:992
+msgid "Fullscreen mode:"
+msgstr "Повноекранний режим:"
+
+#: Client/loader/MainFunctions.cpp:389 Client/core/CSettings.cpp:658
+#: Client/core/CSettings.cpp:1603
+msgid "Borderless window"
+msgstr "Вікно в рамці"
+
+#: Client/loader/MainFunctions.cpp:431
+msgid "Are you having problems running MTA:SA?.\n\n"
+"Try disabling the following products for GTA and MTA:"
+msgstr "У вас виникли проблеми з запуском MTA:SA?\n\n"
+"Спробуйте вимкнути наступні продукти для MTA та GTA:"
+
+#: Client/loader/MainFunctions.cpp:465
+msgid "WARNING\n\n"
+"MTA:SA has detected unusual activity.\n"
+"Please run a virus scan to ensure your system is secure.\n\n"
+msgstr "УВАГА\n\n"
+"MTA:SA виявив підозрілу активність.\n"
+"Перевірте вашу систему на наявність вірусів, щоб переконатися в безпеці.\n\n"
+
+#: Client/loader/MainFunctions.cpp:468
+#, c-format
+msgid "The detected file was:  %s\n"
+msgstr "Був виявлений файл:       %s\n"
+
+#: Client/loader/MainFunctions.cpp:602
+msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
+msgstr "Необхідно завершити процес GTA: San Andreas перед запуском MTA:SA. Зробити це зараз?"
+
+#: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
+#: Client/loader/MainFunctions.cpp:1218
+#: Client/core/ServerBrowser/CServerInfo.cpp:319
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
+msgid "Information"
+msgstr "Інформація"
+
+#: Client/loader/MainFunctions.cpp:609
+msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
+msgstr "Не вдається завершити процес GTA: San Andreas. Якщо проблема збереглася, то спробуйте перезавантажити ваш комп'ютер."
+
+#: Client/loader/MainFunctions.cpp:632
+msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
+msgstr "Відсутні необхідні записи в реєстрі. Переінсталюйте Multi Theft Auto: San Andreas."
+
+#: Client/loader/MainFunctions.cpp:638
+msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
+msgstr "Шлях до теки з вашим GTA: San Andreas має непідтримувані символи (юнікод). Змінити шлях до Grand Theft Auto: San Andreas, щоб в ньому були тільки ASCII символи і переінсталюйте Multi Theft Auto: San Andreas."
+
+#: Client/loader/MainFunctions.cpp:648
+msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
+"contains a ';' (semicolon).\n\n"
+" If you experience problems when running MTA:SA,\n"
+" move your installation(s) to a path that does not contain a semicolon."
+msgstr "Шлях в теку MTA:SA або GTA: San Andreas\n"
+"має символ ';' (крапку з комою).\n\n"
+"Переінсталюйте MTA:SA и GTA: San Andreas, так, щоб в \n"
+"шляху до тек не було крапки з комою."
+
+#: Client/loader/MainFunctions.cpp:810
+msgid "Load failed. Please ensure that the latest data files have been installed correctly."
+msgstr "Помилка запуску, перевірте правильність інсталювання останніх data-файлів."
+
+#: Client/loader/MainFunctions.cpp:819
+#, c-format
+msgid "Load failed. Please ensure that %s is installed correctly."
+msgstr "Завантаження не вдалася. Впевніться, що %s встановлено правильно."
+
+#: Client/loader/MainFunctions.cpp:826
+#, c-format
+msgid "Load failed. Could not find gta_sa.exe in %s."
+msgstr "Не вдалося завантажити, оскільки gta_sa.exe не був знайдений в %s"
+
+#: Client/loader/MainFunctions.cpp:836
+#, c-format
+msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
+msgstr "Завантаження не вдалася. Видаліть файл %s в теці GTA перед запуском."
+
+#: Client/loader/MainFunctions.cpp:845
+#, c-format
+msgid "Main file has an incorrect name (%s)"
+msgstr "Основний файл має неправильне ім'я (%s)"
+
+#: Client/loader/MainFunctions.cpp:856
+msgid "Main file is unsigned. Possible virus activity.\n\n"
+"See online help if MTA does not work correctly."
+msgstr "Основний файл не підписаний. Можлива вірусна загроза.\n\n"
+"Використовуйте онлайн-довідку, якщо MTA працює неправильно"
+
+#: Client/loader/MainFunctions.cpp:882
+#, c-format
+msgid "Data file %s is missing. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:893
+#, c-format
+msgid "Data file %s is modified. Possible virus activity.\n\n"
+"Consider reinstalling Multi Theft Auto for your security.\n"
+"See online help if MTA does not work correctly."
+msgstr ""
+
+#: Client/loader/MainFunctions.cpp:907
+msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
+"Remove these .asi files if you experience problems with MTA:SA."
+msgstr "Файли з розширенням .asi інстальовано в теку з GTA San Andreas або MTA SA.\n\n"
+"Видаліть файли з розширенням .asi щоб уникнути проблем з MTA SA."
+
+#: Client/loader/MainFunctions.cpp:1009
+msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Помилка версій файлів. Переінсталюйте MTA:SA для вирішення проблеми.\n"
+
+#: Client/loader/MainFunctions.cpp:1018
+msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
+msgstr "Деякі файли пошкоджені. Переінсталюйте MTA щоб уникнути проблеми.\n"
+
+#: Client/loader/MainFunctions.cpp:1030
+msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
+"Please restart your PC.\n"
+msgstr "MTA:SA не працює в 'Безпечному режимі'.\n\n"
+"Перезапустіть ваш комп'ютер.\n"
+
+#: Client/loader/MainFunctions.cpp:1122
+msgid "Fix configuration issue"
+msgstr "Виправте проблему конфігурації"
+
+#. Try to relaunch as admin if not done so already
+#: Client/loader/MainFunctions.cpp:1156
+msgid "Fix elevation required error"
+msgstr "Виправте помилку необхідної висоти"
+
+#: Client/loader/MainFunctions.cpp:1163
+#, c-format
+msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
+"[%s]"
+msgstr "Не вдалося запустити Grand Theft Auto: San Andreas.   Спробуйте перезапустити. Якщо проблема не вирішена, то зверніться за допомогою на сайті www.multitheftauto.com. \n\n"
+"[%s]"
+
+#: Client/loader/MainFunctions.cpp:1218
+msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
+msgstr "Процес GTA: San Andreas не може бути запущений правильно. Ви хочете завершити його?"
+
+#: Client/loader/Utils.cpp:600
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Виберіть директорію з Grand Theft Auto: San Andreas"
+
+#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA потрібні права адміністратора для наступної задачі:\n\n"
+"'%s'\n\n"
+"Будь ласка, підтвердіть в наступному вікні."
+
+#: Client/loader/Utils.cpp:1069
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "Помилка завантаження %s модуля! (%s)"
+
+#: Client/loader/Utils.cpp:1502
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Нова версія клієнта %s виявлена.\n\n"
+"Ви хочете скопіювати ваші налаштування з %s ?"
+
+#: Client/loader/Utils.cpp:1541
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA не зміг відкрити файл '%s'"
+
+#: Client/loader/Utils.cpp:1563
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA не знайшов файл '%s'"
+
+#: Client/loader/Utils.cpp:1588
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA не зміг завантажити модель."
+
+#: Client/loader/Utils.cpp:1590
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Якщо ви недавно модифікували gta3.img, спробуйте переінсталювати GTA:SA."
+
+#: Client/loader/Utils.cpp:1615
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA не зміг додати апґрейд транспортному засобу."
+
+#: Client/loader/Utils.cpp:1634
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA знайшов помилки в файлі '%s"
+
+#: Client/loader/Utils.cpp:1716
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Ваш комп'ютер перезавантажився під час гри в MTA:SA?"
+
+#: Client/loader/Utils.cpp:1781
+msgid "Please terminate the following programs before continuing:"
+msgstr "Завершіть наступні програми для продовження:"
+
+#: Client/loader/CInstallManager.cpp:376
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA не може виконати наступну задачу:\n\n"
+"  '%s'\n"
+
+#: Client/loader/CInstallManager.cpp:426
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** Виліт був викликаний помилкою графічного драйвера **\n\n"
+"** Оновіть драйвера вашої відеокарти **"
+
+#: Client/loader/CInstallManager.cpp:532
+msgid "Install updated MTA:SA files"
+msgstr "Інсталяція оновлених MTA:SA файлів"
+
+#: Client/loader/CInstallManager.cpp:552
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Неможливо оновитися, так як файли зайняті іншими додатками, закрийте їх і спробуйте знову"
+
+#: Client/loader/CInstallManager.cpp:561
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto інстальовано неправильно, переінсталюйте. %s"
+
+#: Client/loader/CInstallManager.cpp:613
+msgid "Create GTA:SA junctions"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:657
+msgid "MTA:SA cannot launch because copying a file failed:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:672
+msgid "Copy MTA:SA files"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:780
+msgid "Patch GTA:SA dependency"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:828
+msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:832
+msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:838
+msgid "Generate GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:853
+msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
+msgid "Patch GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:876
+msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:811
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "Для інсталяції MTA:SA бракує вільного місця на диску %s."
+
+#: Client/loader/CInstallManager.cpp:1113
+msgid "Missing file:"
+msgstr "Не знайдено файл:"
+
+#: Client/loader/CInstallManager.cpp:1117
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Переінсталюйте GTA:SA, якщо MTA не запускається"
+
+#: Client/loader/CInstallManager.cpp:1152
+msgid "Update install settings"
+msgstr "Оновлення налаштувань інсталювань"
+
+#: Client/loader/CInstallManager.cpp:1291
+msgid "Update compatibility settings"
+msgstr "Оновити налаштування сумісності"
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
+
+#. Create the window
+#: Client/core/CNewsBrowser.cpp:153
+msgid "NEWS"
+msgstr "НОВИНИ"
+
+#. News link
+#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
+msgid "Visit latest news article"
+msgstr "Перегляньте останню статтю новин"
 
 #: Client/core/CScreenShot.cpp:104
 #, c-format
@@ -317,6 +1345,11 @@ msgstr "Не вдалося зробити знімок екрана"
 #, c-format
 msgid "Screenshot taken: '%s'"
 msgstr "Знімок зроблено: '%s'"
+
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "КОНСОЛЬ"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -462,6 +1495,34 @@ msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
 " Очікування відповіді - %-3d"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "Програмування"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "Учасники"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "Ігровий дизайн / Скриптинґ"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "Мова"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "Автори виправлень"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "Особлива подяка"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr ""
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -644,6 +1705,131 @@ msgstr "Спільнота: вперед"
 #: Client/core/CKeyBinds.cpp:229
 msgid "Group control backwards"
 msgstr "Спільнота: назад"
+
+#: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
+msgid "Do you want to see some on-line help about this problem ?"
+msgstr "Ви хочете переглянути онлайн допомогу з цього питання?"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Не вдалося виконати з'єднання. Хибне ім'я користувача!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Не вдалося під'єднатися. Неприпустима адреса серверу!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Під'єднання на %s з портом %u не вдалося!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Під'єднатися до %s:%u ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Не встановлений модуль (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Хибна відповідь сервера (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Хибна відповідь сервера (1)"
+
+#. Unknown command
+#: Client/core/CCommands.cpp:216
+msgid "Unknown command or cvar: "
+msgstr "Невідома команда або змінна: "
+
+#: Client/core/CCommandFuncs.cpp:24
+msgid "***[ COMMAND HELP ]***\n"
+msgstr "***[ ДОПОМОГА ПО КОМАНДАМ ]***\n"
+
+#: Client/core/CCommandFuncs.cpp:158
+#, c-format
+msgid "* The time is %d:%02d:%02d"
+msgstr "* Час: %d:%02d:%02d"
+
+#: Client/core/CCommandFuncs.cpp:242
+msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
+msgstr "під'єднатися: Використовуйте 'connect <адреса> [<порт> <нік> <пароль>]'"
+
+#: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
+msgid "connect: Bad port number"
+msgstr "під'єднання: Невірний номер порту"
+
+#: Client/core/CCommandFuncs.cpp:272 Client/core/CCommandFuncs.cpp:333
+#, c-format
+msgid "connect: Connecting to %s:%u..."
+msgstr "під'єднання: Під'єднання до %s:%u..."
+
+#: Client/core/CCommandFuncs.cpp:276 Client/core/CCommandFuncs.cpp:337
+#, c-format
+msgid "connect: could not connect to %s:%u!"
+msgstr "під'єднання: не вдалося під'єднатися до %s:%u!"
+
+#: Client/core/CCommandFuncs.cpp:281
+msgid "connect: Failed to unload current mod"
+msgstr "під'єднання: Не вдалося вивантажити поточний мод"
+
+#: Client/core/CCommandFuncs.cpp:371
+msgid "Bound all controls from GTA"
+msgstr "Скопіювати управління з GTA"
+
+#: Client/core/CCommandFuncs.cpp:385
+msgid "Saved configuration file"
+msgstr "Файл конфігурації збережений"
+
+#. Print it
+#: Client/core/CCommandFuncs.cpp:451
+#, c-format
+msgid "* Your serial is: %s"
+msgstr "* Ваш серійний номер: %s"
+
+#: Client/core/CMainMenu.cpp:334
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Ви використовуєте функціональну структуру! Це лише тестова побудова, яка не може бути використана для підключення до загальнодоступних серверів!"
+
+#: Client/core/CMainMenu.cpp:353
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA не отримуватиме оновлення для XP/Vista після липня 2019 року.\n\n"
+"Оновіть Windows, щоб грати на найновіших серверах."
+
+#: Client/core/CMainMenu.cpp:1181
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Ця дія призведе до від'єднання від поточного сервера.\n\n"
+"Ви дійсно бажаєте від'єднатися?"
+
+#: Client/core/CMainMenu.cpp:1185
+msgid "DISCONNECT WARNING"
+msgstr "ПОПЕРЕДЖЕННЯ ВІД'ЄДНАННЯ"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Українська"
+
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Обрана вами графічна тема не може бути завантажена, тема за замовчуванням також не може бути завантажена, перевстановіть MTA для вирішення проблеми."
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Вісь прискорення"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Вісь гальмування"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -831,15 +2017,6 @@ msgstr "Гучність мовлення:"
 msgid "Play mode:"
 msgstr "Режим відтворення:"
 
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/core/CSettings.cpp:430 Client/core/CSettings.cpp:618
-#: Client/core/CSettings.cpp:892 Client/core/CSettings.cpp:2006
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-msgid "General"
-msgstr "Загальні"
-
 #: Client/core/CSettings.cpp:531
 msgid "Radio options"
 msgstr "Параметри радіо"
@@ -939,19 +2116,9 @@ msgstr "Віконний режим"
 msgid "DPI aware"
 msgstr "DPI aware"
 
-#: Client/core/CSettings.cpp:650 Client/core/CSettings.cpp:992
-#: Client/loader/MainFunctions.cpp:389
-msgid "Fullscreen mode:"
-msgstr "Повноекранний режим:"
-
 #: Client/core/CSettings.cpp:657 Client/core/CSettings.cpp:1601
 msgid "Standard"
 msgstr "Стандарт"
-
-#: Client/core/CSettings.cpp:658 Client/core/CSettings.cpp:1603
-#: Client/loader/MainFunctions.cpp:389
-msgid "Borderless window"
-msgstr "Вікно в рамці"
 
 #: Client/core/CSettings.cpp:659 Client/core/CSettings.cpp:1605
 msgid "Borderless keep res"
@@ -1099,6 +2266,10 @@ msgstr "Видалити адресу"
 #: Client/core/CSettings.cpp:943
 msgid "Custom whitelist"
 msgstr "Дозволений список"
+
+#: Client/core/CSettings.cpp:962 Client/cefweb/CWebsiteRequests.cpp:51
+msgid "Allow"
+msgstr "Дозволити"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:985
@@ -1604,155 +2775,115 @@ msgstr "Виправлення миші:"
 msgid "Mouse movement fix - May need PC restart"
 msgstr "Виправити рух миші - Необхідний перезапуск ПК"
 
-#. Create the window
-#: Client/core/CNewsBrowser.cpp:153
-msgid "NEWS"
-msgstr "НОВИНИ"
-
-#. News link
-#: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
-msgid "Visit latest news article"
-msgstr "Перегляньте останню статтю новин"
-
-#: Client/core/CMainMenu.cpp:334
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Ви використовуєте функціональну структуру! Це лише тестова побудова, яка не може бути використана для підключення до загальнодоступних серверів!"
-
-#: Client/core/CMainMenu.cpp:353
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA не отримуватиме оновлення для XP/Vista після липня 2019 року.\n\n"
-"Оновіть Windows, щоб грати на найновіших серверах."
-
-#: Client/core/CMainMenu.cpp:1181
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Ця дія призведе до від'єднання від поточного сервера.\n\n"
-"Ви дійсно бажаєте від'єднатися?"
-
-#: Client/core/CMainMenu.cpp:1185
-msgid "DISCONNECT WARNING"
-msgstr "ПОПЕРЕДЖЕННЯ ВІД'ЄДНАННЯ"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Невідома команда або змінна: "
-
-#: Client/core/CCore.cpp:809 Client/loader/CInstallManager.cpp:1057
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "Для інсталяції MTA:SA бракує вільного місця на диску %s."
-
-#: Client/core/CCore.cpp:811 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
 msgstr "Фатальна помилка"
 
-#: Client/core/CCore.cpp:936
+#: Client/core/CCore.cpp:938
 msgid "TO FIX, REMOVE THIS FILE:"
 msgstr "ЩОБ ВИПРАВИТИ, ВИЛУЧІТЬ ЦЕЙ ФАЙЛ:"
 
-#: Client/core/CCore.cpp:968
+#: Client/core/CCore.cpp:970
 #, c-format
 msgid "%s module is incorrect!"
 msgstr "Модуль %s хибний!"
 
-#: Client/core/CCore.cpp:1273
+#: Client/core/CCore.cpp:1275
 msgid "Error executing URL"
 msgstr "Помилка виконання URL"
 
-#: Client/core/CCore.cpp:1285
+#: Client/core/CCore.cpp:1287
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
 msgstr "Помилка запуску мода, визначеного в командному рядку ('%s')"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1377
+#: Client/core/CCore.cpp:1389
 msgid "this help screen"
 msgstr "ця сторінка допомоги"
 
-#: Client/core/CCore.cpp:1378 Client/core/CCore.cpp:1379
+#: Client/core/CCore.cpp:1390 Client/core/CCore.cpp:1391
 msgid "exits the application"
 msgstr "вийти із застосунку"
 
-#: Client/core/CCore.cpp:1380
+#: Client/core/CCore.cpp:1392
 msgid "shows the version"
 msgstr "показати версію MTA"
 
-#: Client/core/CCore.cpp:1381
+#: Client/core/CCore.cpp:1393
 msgid "shows the time"
 msgstr "показати поточний час"
 
-#: Client/core/CCore.cpp:1382
+#: Client/core/CCore.cpp:1394
 msgid "shows the hud"
 msgstr "показати інтерфейс гравця"
 
-#: Client/core/CCore.cpp:1383
+#: Client/core/CCore.cpp:1395
 msgid "shows all the binds"
 msgstr "показати всі налаштування клавіш"
 
-#: Client/core/CCore.cpp:1384
+#: Client/core/CCore.cpp:1396
 msgid "shows your serial"
 msgstr "показати ваш серійний номер"
 
-#: Client/core/CCore.cpp:1393
+#: Client/core/CCore.cpp:1405
 msgid "connects to a server (host port nick pass)"
 msgstr "під'єднатися до сервера (адрес, порт, нік, пароль)"
 
-#: Client/core/CCore.cpp:1394
+#: Client/core/CCore.cpp:1406
 msgid "connects to a previous server"
 msgstr "під'єднатися до останнього відвіданого сервера"
 
-#: Client/core/CCore.cpp:1395
+#: Client/core/CCore.cpp:1407
 msgid "binds a key (key control)"
 msgstr "призначити клавішу управління"
 
-#: Client/core/CCore.cpp:1396
+#: Client/core/CCore.cpp:1408
 msgid "unbinds a key (key)"
 msgstr "видалити задачу з клавіші"
 
-#: Client/core/CCore.cpp:1397
+#: Client/core/CCore.cpp:1409
 msgid "copies the default gta controls"
 msgstr "скопіювати налаштування з GTA:SA"
 
-#: Client/core/CCore.cpp:1398
+#: Client/core/CCore.cpp:1410
 msgid "outputs a screenshot"
 msgstr "зробити знімок екрана"
 
-#: Client/core/CCore.cpp:1399
+#: Client/core/CCore.cpp:1411
 msgid "immediately saves the config"
 msgstr "зберегти налаштування"
 
-#: Client/core/CCore.cpp:1401
+#: Client/core/CCore.cpp:1413
 msgid "clears the debug view"
 msgstr "почистити вікно зневадження (debug)"
 
-#: Client/core/CCore.cpp:1402
+#: Client/core/CCore.cpp:1414
 msgid "scrolls the chatbox upwards"
 msgstr "прокрутити чат вгору"
 
-#: Client/core/CCore.cpp:1403
+#: Client/core/CCore.cpp:1415
 msgid "scrolls the chatbox downwards"
 msgstr "прокрутити чат вниз"
 
-#: Client/core/CCore.cpp:1404
+#: Client/core/CCore.cpp:1416
 msgid "scrolls the debug view upwards"
 msgstr "прокрутити вікно зневадження вгору"
 
-#: Client/core/CCore.cpp:1405
+#: Client/core/CCore.cpp:1417
 msgid "scrolls the debug view downwards"
 msgstr "прокрутити вікно зневадження вниз"
 
-#: Client/core/CCore.cpp:1408
+#: Client/core/CCore.cpp:1420
 msgid "shows the memory statistics"
 msgstr "показати статистику використання пам'яті"
 
-#: Client/core/CCore.cpp:1409
+#: Client/core/CCore.cpp:1421
 msgid "shows the frame timing graph"
 msgstr "показати графік продуктивності"
 
-#: Client/core/CCore.cpp:1413
+#: Client/core/CCore.cpp:1425
 msgid "for developers: reload news"
 msgstr ""
 
@@ -1764,16 +2895,100 @@ msgstr "Не вдалося ініціалізувати Direct3D9.\n\n"
 "Інсталюйте DirectX End-User Runtime\n"
 "і найсвіжішу версію Windows Service Packs."
 
+#. Create queue window
+#: Client/core/ServerBrowser/CServerInfo.cpp:32
+#: Client/core/ServerBrowser/CServerInfo.cpp:302
+msgid "SERVER IS FULL"
+msgstr "СЕРВЕР ЗАПОВНЕНИЙ"
+
+#. Determine our label draw position for L10n
+#. Start position
+#. Server Name
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:53
+msgid "Name:"
+msgstr "Назва:"
+
+#. Server IP
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:64
+msgid "Server Address:"
+msgstr "Адреса сервера:"
+
+#. Gamemode
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:75
+msgid "Gamemode:"
+msgstr "Ігровий режим:"
+
+#. Map
+#: Client/core/ServerBrowser/CServerInfo.cpp:44
+#: Client/core/ServerBrowser/CServerInfo.cpp:86
+msgid "Map:"
+msgstr "Карта:"
+
+#. Players
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:97
+msgid "Players:"
+msgstr "Гравці:"
+
+#. Passworded
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:108
+msgid "Passworded:"
+msgstr "Пароль:"
+
+#. Latency
+#: Client/core/ServerBrowser/CServerInfo.cpp:45
+#: Client/core/ServerBrowser/CServerInfo.cpp:119
+msgid "Latency:"
+msgstr "Затримка:"
+
+#. Column for player names
+#. Player List Columns
+#: Client/core/ServerBrowser/CServerInfo.cpp:138
+#: Client/core/ServerBrowser/CServerBrowser.cpp:478
+msgid "Player list"
+msgstr "Список гравців"
+
+#. Close button
+#: Client/core/ServerBrowser/CServerInfo.cpp:144
+msgid "Close"
+msgstr "Закрити"
+
+#. Join Game button
+#: Client/core/ServerBrowser/CServerInfo.cpp:152
+msgid "Join Game"
+msgstr "Під'єднатися"
+
+#. Please enter password label
+#: Client/core/ServerBrowser/CServerInfo.cpp:166
+msgid "Please enter the password to the server:"
+msgstr "Введіть пароль для входу на сервер:"
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:177
+msgid "Join the server as soon as a player slot is available."
+msgstr "Під'єднатися, як звільниться місце."
+
+#: Client/core/ServerBrowser/CServerInfo.cpp:310
+msgid "PLEASE ENTER SERVER PASSWORD"
+msgstr "ВВЕДІТЬ ПАРОЛЬ СЕРВЕРА:"
+
+#. The server has timed out
+#: Client/core/ServerBrowser/CServerInfo.cpp:402
+msgid "Timed Out"
+msgstr "Час очікування вийшов"
+
+#. Set every GUI elements text to blank
+#: Client/core/ServerBrowser/CServerInfo.cpp:431
+msgid "Querying..."
+msgstr "Йде запит..."
+
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
 msgid "SERVER BROWSER"
 msgstr "СПИСОК СЕРВЕРІВ"
-
-#. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-msgid "Internet"
-msgstr "Інтернет"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
@@ -1862,13 +3077,6 @@ msgstr "Пінг"
 msgid "Gamemode"
 msgstr "Ігровий режим"
 
-#. Player List Columns
-#. Column for player names
-#: Client/core/ServerBrowser/CServerBrowser.cpp:478
-#: Client/core/ServerBrowser/CServerInfo.cpp:138
-msgid "Player list"
-msgstr "Список гравців"
-
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
@@ -1898,11 +3106,6 @@ msgstr "Інші версії"
 msgid "Back"
 msgstr "Назад"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:556
-#: Client/loader/Dialogs.cpp:135
-msgid "Help"
-msgstr "Допомога"
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:741
 msgid "Loading..."
 msgstr "Завантаження..."
@@ -1925,106 +3128,9 @@ msgstr "Невідомий протокол"
 msgid "Please use the mtasa:// protocol!"
 msgstr "Будь ласка, використовуйте протокол mtasa://"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:606
-#: Client/mods/deathmatch/logic/CClientGame.cpp:704
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Невірний нікнейм! Будь ласка, відкрийте налаштування і змініть їх!"
-
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1380
-#: Client/core/ServerBrowser/CServerInfo.cpp:319
-#: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
-#: Client/loader/MainFunctions.cpp:1218
-msgid "Information"
-msgstr "Інформація"
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Виберіть сервер для під'єднання."
-
-#. Create queue window
-#: Client/core/ServerBrowser/CServerInfo.cpp:32
-#: Client/core/ServerBrowser/CServerInfo.cpp:302
-msgid "SERVER IS FULL"
-msgstr "СЕРВЕР ЗАПОВНЕНИЙ"
-
-#. Determine our label draw position for L10n
-#. Start position
-#. Server Name
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:53
-msgid "Name:"
-msgstr "Назва:"
-
-#. Server IP
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:64
-msgid "Server Address:"
-msgstr "Адреса сервера:"
-
-#. Gamemode
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:75
-msgid "Gamemode:"
-msgstr "Ігровий режим:"
-
-#. Map
-#: Client/core/ServerBrowser/CServerInfo.cpp:44
-#: Client/core/ServerBrowser/CServerInfo.cpp:86
-msgid "Map:"
-msgstr "Карта:"
-
-#. Players
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:97
-msgid "Players:"
-msgstr "Гравці:"
-
-#. Passworded
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:108
-msgid "Passworded:"
-msgstr "Пароль:"
-
-#. Latency
-#: Client/core/ServerBrowser/CServerInfo.cpp:45
-#: Client/core/ServerBrowser/CServerInfo.cpp:119
-msgid "Latency:"
-msgstr "Затримка:"
-
-#. Close button
-#: Client/core/ServerBrowser/CServerInfo.cpp:144
-msgid "Close"
-msgstr "Закрити"
-
-#. Join Game button
-#: Client/core/ServerBrowser/CServerInfo.cpp:152
-msgid "Join Game"
-msgstr "Під'єднатися"
-
-#. Please enter password label
-#: Client/core/ServerBrowser/CServerInfo.cpp:166
-msgid "Please enter the password to the server:"
-msgstr "Введіть пароль для входу на сервер:"
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:177
-msgid "Join the server as soon as a player slot is available."
-msgstr "Під'єднатися, як звільниться місце."
-
-#: Client/core/ServerBrowser/CServerInfo.cpp:310
-msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "ВВЕДІТЬ ПАРОЛЬ СЕРВЕРА:"
-
-#. The server has timed out
-#: Client/core/ServerBrowser/CServerInfo.cpp:402
-msgid "Timed Out"
-msgstr "Час очікування вийшов"
-
-#. Set every GUI elements text to blank
-#: Client/core/ServerBrowser/CServerInfo.cpp:431
-msgid "Querying..."
-msgstr "Йде запит..."
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 msgid "Idle"
@@ -2078,982 +3184,6 @@ msgstr "Не вдалося прив'язати локальний сокет"
 msgid "Attempting to discover LAN servers"
 msgstr "Спроба виявлення локальних серверів"
 
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr ""
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr ""
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Інсталяція оновлення..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Вилучення файлів..."
-
-#: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:968
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA потрібні права адміністратора для наступної задачі:\n\n"
-"'%s'\n\n"
-"Будь ласка, підтвердіть в наступному вікні."
-
-#: Client/loader/CInstallManager.cpp:376
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA не може виконати наступну задачу:\n\n"
-"  '%s'\n"
-
-#: Client/loader/CInstallManager.cpp:426
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** Виліт був викликаний помилкою графічного драйвера **\n\n"
-"** Оновіть драйвера вашої відеокарти **"
-
-#: Client/loader/CInstallManager.cpp:532
-msgid "Install updated MTA:SA files"
-msgstr "Інсталяція оновлених MTA:SA файлів"
-
-#: Client/loader/CInstallManager.cpp:552
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Неможливо оновитися, так як файли зайняті іншими додатками, закрийте їх і спробуйте знову"
-
-#: Client/loader/CInstallManager.cpp:561
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto інстальовано неправильно, переінсталюйте. %s"
-
-#: Client/loader/CInstallManager.cpp:613
-msgid "Create GTA:SA junctions"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:657
-msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
-msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:672
-msgid "Copy MTA:SA files"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
-msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:780
-msgid "Patch GTA:SA dependency"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:828
-msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:832
-msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:838
-msgid "Generate GTA:SA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:853
-msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
-msgid "Patch GTA:SA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:876
-msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1113
-msgid "Missing file:"
-msgstr "Не знайдено файл:"
-
-#: Client/loader/CInstallManager.cpp:1117
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Переінсталюйте GTA:SA, якщо MTA не запускається"
-
-#: Client/loader/CInstallManager.cpp:1152
-msgid "Update install settings"
-msgstr "Оновлення налаштувань інсталювань"
-
-#: Client/loader/CInstallManager.cpp:1291
-msgid "Update compatibility settings"
-msgstr "Оновити налаштування сумісності"
-
-#: Client/loader/MainFunctions.cpp:248
-msgid "Trouble restarting MTA:SA\n\n"
-"If the problem persists, open Task Manager and\n"
-"stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
-"Try to launch MTA:SA again?"
-msgstr "Проблема перезапуску MTA:SA\n\n"
-"Якщо проблема збереглася, то відкрийте диспетчер завдань і зупиніть процеси 'gta_sa.exe' і 'Multi Theft Auto.exe' \n\n\n"
-"Спробувати запустити MTA:SA знову?"
-
-#: Client/loader/MainFunctions.cpp:266
-msgid "Another instance of MTA is already running.\n\n"
-"If this problem persists, please restart your computer"
-msgstr "Інший процес з MTA вже запущений.\n\n"
-"Якщо проблема не вирішена, спробуйте перезавантажити комп'ютер"
-
-#: Client/loader/MainFunctions.cpp:269
-msgid "Another instance of MTA is already running.\n\n"
-"Do you want to terminate it?"
-msgstr "Інший процес MTA вже запущений.\n\n"
-"Ви хочете завершити цей процес?"
-
-#: Client/loader/MainFunctions.cpp:294
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to revert to an earlier version?"
-msgstr "У вас є проблеми з запуском MTA:SA?.\n\n"
-"Спробувати повернутися до попередньої версії?"
-
-#: Client/loader/MainFunctions.cpp:324
-msgid "There seems to be a problem launching MTA:SA.\n"
-"Resetting GTA settings can sometimes fix this problem.\n\n"
-"Do you want to reset GTA settings now?"
-msgstr "Виникли проблеми з запуском MTA:SA. \n"
-"Скидання налаштувань GTA, цілком можливо, усуне цю проблему.\n\n"
-"Ви хочете скинути налаштування GTA?"
-
-#: Client/loader/MainFunctions.cpp:339
-msgid "GTA settings have been reset.\n\n"
-"Press OK to continue."
-msgstr "Налаштування GTA скинуті.\n\n"
-"Натисніть OK, щоб продовжити."
-
-#: Client/loader/MainFunctions.cpp:344
-#, c-format
-msgid "File could not be deleted: '%s'"
-msgstr "Файл не може бути видалений. '%s'"
-
-#. No settings to delete, or can't find them
-#: Client/loader/MainFunctions.cpp:352
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to see some online help?"
-msgstr "Виникли проблеми з запуском MTA:SA? .\n\n"
-"Хочете побачити онлайн-довідку?"
-
-#. Inform user
-#: Client/loader/MainFunctions.cpp:388
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Do you want to change the following setting?"
-msgstr "У вас виникли труднощі під час завантаження MTA:SA?\n\n"
-"Ви хочете змінити поточні налаштування?"
-
-#: Client/loader/MainFunctions.cpp:431
-msgid "Are you having problems running MTA:SA?.\n\n"
-"Try disabling the following products for GTA and MTA:"
-msgstr "У вас виникли проблеми з запуском MTA:SA?\n\n"
-"Спробуйте вимкнути наступні продукти для MTA та GTA:"
-
-#: Client/loader/MainFunctions.cpp:465
-msgid "WARNING\n\n"
-"MTA:SA has detected unusual activity.\n"
-"Please run a virus scan to ensure your system is secure.\n\n"
-msgstr "УВАГА\n\n"
-"MTA:SA виявив підозрілу активність.\n"
-"Перевірте вашу систему на наявність вірусів, щоб переконатися в безпеці.\n\n"
-
-#: Client/loader/MainFunctions.cpp:468
-#, c-format
-msgid "The detected file was:  %s\n"
-msgstr "Був виявлений файл:       %s\n"
-
-#: Client/loader/MainFunctions.cpp:602
-msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "Необхідно завершити процес GTA: San Andreas перед запуском MTA:SA. Зробити це зараз?"
-
-#: Client/loader/MainFunctions.cpp:609
-msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "Не вдається завершити процес GTA: San Andreas. Якщо проблема збереглася, то спробуйте перезавантажити ваш комп'ютер."
-
-#: Client/loader/MainFunctions.cpp:632
-msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "Відсутні необхідні записи в реєстрі. Переінсталюйте Multi Theft Auto: San Andreas."
-
-#: Client/loader/MainFunctions.cpp:638
-msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "Шлях до теки з вашим GTA: San Andreas має непідтримувані символи (юнікод). Змінити шлях до Grand Theft Auto: San Andreas, щоб в ньому були тільки ASCII символи і переінсталюйте Multi Theft Auto: San Andreas."
-
-#: Client/loader/MainFunctions.cpp:648
-msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
-"contains a ';' (semicolon).\n\n"
-" If you experience problems when running MTA:SA,\n"
-" move your installation(s) to a path that does not contain a semicolon."
-msgstr "Шлях в теку MTA:SA або GTA: San Andreas\n"
-"має символ ';' (крапку з комою).\n\n"
-"Переінсталюйте MTA:SA и GTA: San Andreas, так, щоб в \n"
-"шляху до тек не було крапки з комою."
-
-#: Client/loader/MainFunctions.cpp:810
-msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Помилка запуску, перевірте правильність інсталювання останніх data-файлів."
-
-#: Client/loader/MainFunctions.cpp:819
-#, c-format
-msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Завантаження не вдалася. Впевніться, що %s встановлено правильно."
-
-#: Client/loader/MainFunctions.cpp:826
-#, c-format
-msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "Не вдалося завантажити, оскільки gta_sa.exe не був знайдений в %s"
-
-#: Client/loader/MainFunctions.cpp:836
-#, c-format
-msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "Завантаження не вдалася. Видаліть файл %s в теці GTA перед запуском."
-
-#: Client/loader/MainFunctions.cpp:845
-#, c-format
-msgid "Main file has an incorrect name (%s)"
-msgstr "Основний файл має неправильне ім'я (%s)"
-
-#: Client/loader/MainFunctions.cpp:856
-msgid "Main file is unsigned. Possible virus activity.\n\n"
-"See online help if MTA does not work correctly."
-msgstr "Основний файл не підписаний. Можлива вірусна загроза.\n\n"
-"Використовуйте онлайн-довідку, якщо MTA працює неправильно"
-
-#: Client/loader/MainFunctions.cpp:882
-#, c-format
-msgid "Data file %s is missing. Possible virus activity.\n\n"
-"Consider reinstalling Multi Theft Auto for your security.\n"
-"See online help if MTA does not work correctly."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:893
-#, c-format
-msgid "Data file %s is modified. Possible virus activity.\n\n"
-"Consider reinstalling Multi Theft Auto for your security.\n"
-"See online help if MTA does not work correctly."
-msgstr ""
-
-#: Client/loader/MainFunctions.cpp:907
-msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
-"Remove these .asi files if you experience problems with MTA:SA."
-msgstr "Файли з розширенням .asi інстальовано в теку з GTA San Andreas або MTA SA.\n\n"
-"Видаліть файли з розширенням .asi щоб уникнути проблем з MTA SA."
-
-#: Client/loader/MainFunctions.cpp:1009
-msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Помилка версій файлів. Переінсталюйте MTA:SA для вирішення проблеми.\n"
-
-#: Client/loader/MainFunctions.cpp:1018
-msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Деякі файли пошкоджені. Переінсталюйте MTA щоб уникнути проблеми.\n"
-
-#: Client/loader/MainFunctions.cpp:1030
-msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
-"Please restart your PC.\n"
-msgstr "MTA:SA не працює в 'Безпечному режимі'.\n\n"
-"Перезапустіть ваш комп'ютер.\n"
-
-#: Client/loader/MainFunctions.cpp:1122
-msgid "Fix configuration issue"
-msgstr "Виправте проблему конфігурації"
-
-#. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1156
-msgid "Fix elevation required error"
-msgstr "Виправте помилку необхідної висоти"
-
-#: Client/loader/MainFunctions.cpp:1163
-#, c-format
-msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
-"[%s]"
-msgstr "Не вдалося запустити Grand Theft Auto: San Andreas.   Спробуйте перезапустити. Якщо проблема не вирішена, то зверніться за допомогою на сайті www.multitheftauto.com. \n\n"
-"[%s]"
-
-#: Client/loader/MainFunctions.cpp:1218
-msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "Процес GTA: San Andreas не може бути запущений правильно. Ви хочете завершити його?"
-
-#: Client/loader/Utils.cpp:534 Client/loader/Dialogs.cpp:890
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Пошук Grand Theft Auto San Andreas"
-
-#: Client/loader/Utils.cpp:536 Client/loader/Dialogs.cpp:893
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Запустіть Grand Theft Auto San Andreas"
-
-#: Client/loader/Utils.cpp:600
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Виберіть директорію з Grand Theft Auto: San Andreas"
-
-#: Client/loader/Utils.cpp:1069
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Помилка завантаження %s модуля! (%s)"
-
-#: Client/loader/Utils.cpp:1394 Client/loader/Dialogs.cpp:914
-msgid "Copying files..."
-msgstr "Копіювання файлів..."
-
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:919
-msgid "Copy finished early. Everything OK."
-msgstr "Копіювання завершено. Все в порядку."
-
-#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:924
-msgid "Finishing..."
-msgstr "Завершення..."
-
-#: Client/loader/Utils.cpp:1462 Client/loader/Dialogs.cpp:928
-msgid "Done!"
-msgstr "Готово!"
-
-#: Client/loader/Utils.cpp:1502
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Нова версія клієнта %s виявлена.\n\n"
-"Ви хочете скопіювати ваші налаштування з %s ?"
-
-#: Client/loader/Utils.cpp:1541
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA не зміг відкрити файл '%s'"
-
-#: Client/loader/Utils.cpp:1563
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA не знайшов файл '%s'"
-
-#: Client/loader/Utils.cpp:1588
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA не зміг завантажити модель."
-
-#: Client/loader/Utils.cpp:1590
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Якщо ви недавно модифікували gta3.img, спробуйте переінсталювати GTA:SA."
-
-#: Client/loader/Utils.cpp:1615
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA не зміг додати апґрейд транспортному засобу."
-
-#: Client/loader/Utils.cpp:1634
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA знайшов помилки в файлі '%s"
-
-#: Client/loader/Utils.cpp:1716
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Ваш комп'ютер перезавантажився під час гри в MTA:SA?"
-
-#: Client/loader/Utils.cpp:1781
-msgid "Please terminate the following programs before continuing:"
-msgstr "Завершіть наступні програми для продовження:"
-
-#: Client/loader/Dialogs.cpp:134
-msgid "Quit"
-msgstr "Вийти"
-
-#: Client/loader/Dialogs.cpp:151
-msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas виявив помилку"
-
-#: Client/loader/Dialogs.cpp:152
-msgid "Crash information"
-msgstr "Інформація про аварійне завершення програми"
-
-#: Client/loader/Dialogs.cpp:153
-msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Установіть прапорець, щоб надсилати інформацію розробникам через Інтернет про падіння MTA."
-
-#: Client/loader/Dialogs.cpp:154
-msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Це підвищить шанси на усунення даної помилки"
-
-#: Client/loader/Dialogs.cpp:155
-msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Ви хочете перезапустити MTA: San Andreas ?"
-
-#: Client/loader/Dialogs.cpp:162
-msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Попередження"
-
-#: Client/loader/Dialogs.cpp:163
-msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Ваш каталог встановлення Grand Theft Auto: San Andreas містить такі файли:"
-
-#: Client/loader/Dialogs.cpp:165
-msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
-"It is recommended that you remove or rename these files."
-msgstr "Ці файли не є обов’язковими та можуть заважати графічним функціям у цій версії MTA:SA.\n\n"
-"Рекомендується видалити або перейменувати ці файли."
-
-#: Client/loader/Dialogs.cpp:167
-msgid "Keep these files, but also show this warning on next start"
-msgstr "Зберегти ці файли, але також показувати це попередження під час наступного запуску"
-
-#: Client/loader/Dialogs.cpp:168
-msgid "Do not remind me about these files again"
-msgstr "Більше не нагадувати мені про ці файли"
-
-#: Client/loader/Dialogs.cpp:169
-msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Перейменувати ці файли з *.dll на *.dll.bak"
-
-#: Client/loader/Dialogs.cpp:170
-msgid "Show me these files"
-msgstr "Показати мені ці файли"
-
-#: Client/loader/Dialogs.cpp:171
-msgid "Play MTA:SA"
-msgstr "Грати в MTA:SA"
-
-#: Client/loader/Dialogs.cpp:177
-msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Збиті налаштування"
-
-#: Client/loader/Dialogs.cpp:178
-msgid "NVidia Optimus detected!"
-msgstr "Виявлено NVidia Optimus!"
-
-#: Client/loader/Dialogs.cpp:179
-msgid "Try each option and see what works:"
-msgstr "Спробуйте кожну опцію і подивіться, що працює:"
-
-#: Client/loader/Dialogs.cpp:180
-msgid "A - Standard NVidia"
-msgstr "A - Стандартний NVidia"
-
-#: Client/loader/Dialogs.cpp:181
-msgid "B - Alternate NVidia"
-msgstr "B - Альтернативна NVidia"
-
-#: Client/loader/Dialogs.cpp:182
-msgid "C - Standard Intel"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:183
-msgid "D - Alternate Intel"
-msgstr ""
-
-#: Client/loader/Dialogs.cpp:184
-msgid "If you get desperate, this might help:"
-msgstr "Якщо ви зневірилися, то це може допомогти: "
-
-#: Client/loader/Dialogs.cpp:185
-msgid "If you have already selected an option that works, this might help:"
-msgstr "Якщо ви вже вибрали варіант, який працює, це може допомогти:"
-
-#: Client/loader/Dialogs.cpp:186
-msgid "Force windowed mode"
-msgstr "Примусовий віконний режим"
-
-#: Client/loader/Dialogs.cpp:187
-msgid "Don't show again"
-msgstr "Більше не показувати"
-
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
-msgid "MTA: San Andreas"
-msgstr "MTA: San Andreas"
-
-#: Client/loader/Dialogs.cpp:195
-msgid "Warning: Could not detect anti-virus product"
-msgstr "Увага: Я не можу знайти антивірус"
-
-#: Client/loader/Dialogs.cpp:197
-msgid "MTA could not detect an anti-virus on your PC.\n\n"
-"Viruses interfere with MTA and degrade your gameplay experience.\n\n"
-"Press 'Help' for more information."
-msgstr "MTA не може виявити антивірус на вашому ПК.\n\n"
-"Віруси можуть втручатися в роботу MTA і псувати вам гру.\n\n"
-"Натисніть 'Допомога' для отримання докладнішої інформації."
-
-#: Client/loader/Dialogs.cpp:200
-msgid "I have already installed an anti-virus"
-msgstr "Я вже інсталював антивірус"
-
-#: Client/loader/Dialogs.cpp:202
-msgid "I will not install an anti-virus.\n"
-"I want my PC to lag and be part of a botnet."
-msgstr "Я не буду інсталювати антивірус.\n"
-"Я готовий до ризику стати частиною ботнету та лагів."
-
-#. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1360
-msgid "Problem with graphics driver"
-msgstr "Проблема з графічним драйвером"
-
-#: Client/mods/deathmatch/CClient.cpp:36
-msgid "This version has expired."
-msgstr "Ця версія застаріла."
-
-#: Client/mods/deathmatch/CClient.cpp:56
-msgid "disconnect from the game"
-msgstr "від'єднання від гри"
-
-#: Client/mods/deathmatch/CClient.cpp:57
-msgid "shows the nametags"
-msgstr "показувати неймтеґи"
-
-#: Client/mods/deathmatch/CClient.cpp:58
-msgid "shows the chatbox"
-msgstr "показати чат"
-
-#: Client/mods/deathmatch/CClient.cpp:59
-msgid "shows the network statistics"
-msgstr "Відображати статистику з'єднання"
-
-#. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
-msgid "open the chat input"
-msgstr "Відкрити чат"
-
-#: Client/mods/deathmatch/CClient.cpp:64
-msgid "transmits voice to other players"
-msgstr "Передавати голос всім гравцям"
-
-#: Client/mods/deathmatch/CClient.cpp:65
-msgid "enters a car as passenger"
-msgstr "Транспорт: Пасажир"
-
-#: Client/mods/deathmatch/CClient.cpp:66
-msgid "next radio channel"
-msgstr "Наст. радіостанція"
-
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "previous radio channel"
-msgstr "Поп. радіостанція"
-
-#: Client/mods/deathmatch/CClient.cpp:68
-msgid "enables the radar view"
-msgstr "Радар: Відобразити/Приховати"
-
-#: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the radar in"
-msgstr "Радар: Наблизити"
-
-#: Client/mods/deathmatch/CClient.cpp:70
-msgid "zooms the radar out"
-msgstr "Зменшити радар"
-
-#: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the radar north"
-msgstr "Радар: На північ"
-
-#: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the radar south"
-msgstr "Радар: На південь"
-
-#: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the radar east"
-msgstr "Радар: На схід"
-
-#: Client/mods/deathmatch/CClient.cpp:74
-msgid "moves the radar west"
-msgstr "Радар: На захід"
-
-#: Client/mods/deathmatch/CClient.cpp:75
-msgid "attaches the radar"
-msgstr "Радар: На себе"
-
-#: Client/mods/deathmatch/CClient.cpp:76
-msgid "reduces radar opacity"
-msgstr "Радар: Прозорість — "
-
-#: Client/mods/deathmatch/CClient.cpp:77
-msgid "increases radar opacity"
-msgstr "Радар: Прозорість +"
-
-#: Client/mods/deathmatch/CClient.cpp:78
-msgid "toggles radar help text"
-msgstr "Радар: Вкл/викл допомогу"
-
-#: Client/mods/deathmatch/CClient.cpp:79
-msgid "sends a message to the targetted player"
-msgstr "Повідомлення заданому гравцеві"
-
-#: Client/mods/deathmatch/CClient.cpp:80
-msgid "changes to the next weapon whilst in a vehicle"
-msgstr "Транспорт: Наст. зброя"
-
-#: Client/mods/deathmatch/CClient.cpp:81
-msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "Транспорт: Поп. зброя"
-
-#: Client/mods/deathmatch/CClient.cpp:82
-msgid "outputs info about the current server"
-msgstr "Відобразити відомості про сервер"
-
-#. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
-msgid "defines the scale multiplier of all text-displays"
-msgstr "Визначення масштабу відображення тексту"
-
-#. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
-msgid "(Development mode) shows the colshapes"
-msgstr "(Режим розробки) показувати colshapes"
-
-#: Client/mods/deathmatch/CClient.cpp:93
-msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Режим розробки) писати ідентифікатори ігрових звуків в вікно налагоджувача"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "СТВОРИТИ СЕРВЕР"
-
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "Ресурси"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Ім'я сервера:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Пароль:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Макс. кількість гравців:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "Видимість в:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "Локальна мережа"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Вибрано"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Усе"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Запустити"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:622
-msgid "Entering the game ..."
-msgstr "Під'єднання до сервера ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:680
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Немає під'єднання; будь ласка, використовуйте ПІД'ЄДНАННЯ або команду 'connect', щоб зайти на сервер."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:726
-msgid "The server is not installed"
-msgstr "Сервер не встановлено"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:736
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1210
-msgid "Local Server"
-msgstr "Локальний Сервер"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:736
-msgid "Starting local server ..."
-msgstr "Запуск локального сервера ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1141
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "Вас кікнулі з сервера ( %s )"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1210
-msgid "Connecting to local server..."
-msgstr "З'єднання з локальним сервером..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1221
-msgid "Error connecting to server."
-msgstr "Помилка під'єднання до сервера."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1231
-msgid "Connecting to local server timed out. See console for details."
-msgstr "Час під'єднання до локального серверу минув. Відкрийте консоль, щоб дізнатися подробиці."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1337
-msgid "Connection with the server was lost"
-msgstr "З'єднання з сервером втрачено"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1364
-msgid "Disconnected: the server is currently full"
-msgstr "Від'єднання: сервер переповнений."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1376
-msgid "Disconnected: invalid password specified"
-msgstr "Від'єднання: невірний пароль"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
-msgid "MTA Client verification failed!"
-msgstr "Перевірка клієнта MTA не вдалася!"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:505
-msgid "Disconnected: Invalid nickname"
-msgstr "Від'єднання: невірний нікнейм."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
-msgid "Disconnect from server"
-msgstr "Від'єднання від сервера"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
-#, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "Від'єднання: Серійний номер заблокований. \n"
-"Причина: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
-#, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "Від'єднання: Ви забанені. \n"
-"Причина: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
-#, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "Від'єднання: Обліківка заблокована. \n"
-"Причина: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
-msgid "Disconnected: Version mismatch"
-msgstr "Від'єднання: Версії не збігаються"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:534
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Від'єднання: Флуд підключеннями. Зачекайте хвилину перед новою спробою."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:538
-#, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "Від'єднання: Сервер іншою версією.\n"
-"Інформація: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:543
-#, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "Від'єднання: Невідповідна версія.\n"
-"Інформація: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "Від'єднання: Сервер працює на більш новій версії.\n"
-"Інформація: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "Від'єднання: Сервер працює на більш старій версії.\n"
-"Інформація: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:558
-msgid "Disconnected: Nick already in use"
-msgstr "Від'єднання: Такий нікнейм вже використовується"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
-msgid "Disconnected: Player element could not be created."
-msgstr "Відключено: не вдалося створити елемент гравця."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
-#, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "Від'єднання: Сервер скинув під'єднання: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
-msgid "Disconnected: Serial verification failed"
-msgstr "Від'єднання: не вдалася перевірка серійного ключа."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
-#, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "Від'єднання: під'єднання десинхронізовано %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:584
-#, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "Від'єднання: %s кікнув вас"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "Від'єднання: %s заблокував вас"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "Від'єднання: Сервер вимкнений або перезапущений"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
-msgid "You were kicked from the game"
-msgstr "Вас кікнулі з сервера"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
-msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Для цього сервера потрібен немодифікований gta_sa.exe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
-msgid "Please replace gta_sa.exe"
-msgstr "Будь ласка, замініть gta_sa.exe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Цей сервер не дозволяє користувацькі файли D3D9.DLL"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "Видаліть D3D9.DLL з каталогу встановлення GTA та перезапустіть MTA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
-msgid "This server does not allow virtual machines"
-msgstr "Цей сервер не підтримує віртуальні машини"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
-msgid "This server requires driver signing to be enabled"
-msgstr "Для цього сервера потрібно ввімкнути підпис драйвера"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
-msgid "Please restart your PC"
-msgstr "Перезавантажте ПК"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
-msgid "This server has detected missing anti-cheat components"
-msgstr "На цьому сервері виявлено відсутність компонентів захисту від читів"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
-msgid "Try restarting MTA"
-msgstr "Спробуйте перезапустити MTA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Для цього сервера потрібні немодифіковані gta3.img та gta_int.img"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
-msgid "Please replace gta3.img or gta_int.img"
-msgstr "Замініть gta3.img або gta_int.img"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
-msgid "This server does not allow Wine"
-msgstr "Цей сервер не дозволяє використовувати Wine"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
-msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Переконайтеся, що жодна інша програма не змінює MTA:SA"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
-msgid "Time Remaining: "
-msgstr "Залишилося часу: "
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d день"
-msgstr[1] "%d дня"
-msgstr[2] "%d днів"
-msgstr[3] ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d година"
-msgstr[1] "%d годин"
-msgstr[2] "%d години"
-msgstr[3] ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d хвилина"
-msgstr[1] "%d хвилин"
-msgstr[2] "%d хвилини"
-msgstr[3] ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d секунда"
-msgstr[1] "%d секунд"
-msgstr[2] "%d секунди"
-msgstr[3] ""
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
-msgid "Disconnected"
-msgstr "Від'єднання"
-
-#: Client/mods/deathmatch/logic/CServer.cpp:181
-msgid "Could not start the local server. See console for details."
-msgstr "Неможливо запустити локальний сервер. Перевірте вікно консолі на наявність інформації."
-
-#: Client/mods/deathmatch/logic/CServer.cpp:182
-#, c-format
-msgid "Error: Could not start local server. [%s]"
-msgstr "Помилка: Неможливо запустити локальний сервер. [%s]"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Прогрес завантаження карти:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Прогрес завантаження:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s з %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Від'єднайтеся, щоб зупинити завантаження"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Помилка завантаження: %s"
-
 #: Client/game_sa/CSettingsSA.cpp:804
 msgid "Can't find valid screen resolution."
 msgstr "Неможливо підібрати відповідну роздільність дисплея."
@@ -3062,6 +3192,26 @@ msgstr "Неможливо підібрати відповідну розділ�
 #: Client/game_sa/CSettingsSA.cpp:880
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Ви впевнені, що хочете використовувати цю роздільність дисплея?"
+
+#: Client/cefweb/CWebsiteRequests.cpp:19
+msgid "Website requests"
+msgstr "Запит до сайту"
+
+#: Client/cefweb/CWebsiteRequests.cpp:27
+msgid "The server requests the following websites in order to load them (later):"
+msgstr "Сервер робить запити до наступних сайтів, для того щоб завантажити їх пізніше:"
+
+#: Client/cefweb/CWebsiteRequests.cpp:33
+msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
+msgstr "НІКОЛИ НЕ ВВОДЬТЕ КОНФІДЕНЦІЙНІ ДАНІ, ЩОБ ЗАХИСТИТИ ЇХ ВІД КРАДІЖКИ"
+
+#: Client/cefweb/CWebsiteRequests.cpp:46
+msgid "Remember decision"
+msgstr "Запам'ятати рішення"
+
+#: Client/cefweb/CWebsiteRequests.cpp:57
+msgid "Deny"
+msgstr "Заперечення"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
