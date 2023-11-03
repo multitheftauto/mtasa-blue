@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-03 03:41\n"
+"PO-Revision-Date: 2023-11-03 14:20\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Traditional\n"
 "Language: zh_TW\n"
@@ -1249,11 +1249,11 @@ msgstr "修補 GTA:SA 的依賴項"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "MTA:SA 無法順利啟動，因為 GTA:SA 主程式執行檔(.exe)有錯誤或是遺失："
+msgstr "MTA:SA 無法順利啟動，因為 GTA:SA 主程式.exe執行檔 有錯誤或是遺失："
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "請檢查您的防毒軟體是否有誤判的情形，可嘗試將GTA:SA執行檔(.exe)加入白名單，然後重新啟動MTA:SA。"
+msgstr "請檢查您的防毒軟體是否有誤判的情形，可嘗試將GTA:SA主程式.exe執行檔加入白名單，然後重新啟動MTA:SA。"
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -1261,7 +1261,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "MTA:SA 無法順利啟動，因為 GTA:SA 主程式執行檔(.exe)無法被讀取："
+msgstr "MTA:SA 無法順利啟動，因為 GTA:SA 主程式.exe執行檔無法被讀取："
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
