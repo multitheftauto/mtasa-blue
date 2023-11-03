@@ -24,6 +24,7 @@ CDiscordRichPresence::CDiscordRichPresence() : m_uiDiscordAppStart(0), m_uiDisco
     SetDefaultData();
 
     m_strDiscordAppState.clear();
+    m_bConnected = false;
 }
 
 CDiscordRichPresence::~CDiscordRichPresence()
@@ -37,15 +38,22 @@ void CDiscordRichPresence::InitializeDiscord()
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
 
-    // Handlers .ready .disconnected .errored maybe use in future?
+    handlers.ready = HandleDiscordReady;
+    handlers.errored = HandleDiscordError;
+    handlers.disconnected = HandleDiscordDisconnected;
+
     Discord_Initialize((m_strDiscordAppCurrentId.empty()) ? DEFAULT_APP_ID : m_strDiscordAppCurrentId.c_str(), &handlers, 1, nullptr);
 
     m_bDisallowCustomDetails = (m_strDiscordAppCurrentId == DEFAULT_APP_ID) ? true : false;
+    m_bConnected = true;
 }
 
 void CDiscordRichPresence::ShutdownDiscord()
 {
+    Discord_ClearPresence();
     Discord_Shutdown();
+
+    m_bConnected = false;
 }
 
 void CDiscordRichPresence::RestartDiscord()
@@ -76,13 +84,19 @@ void CDiscordRichPresence::SetDefaultData()
 
     m_iPartySize = 0;
     m_iPartyMax = 0;
+
+    m_iPlayersCount = 0;
+    m_iMaxPlayers = 0;
 }
 
 void CDiscordRichPresence::UpdatePresence()
 {
+    // run callbacks
+    Discord_RunCallbacks();
+
     if (!m_bUpdateRichPresence)
         return;
-
+    
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
 
@@ -97,6 +111,7 @@ void CDiscordRichPresence::UpdatePresence()
         (!m_strDiscordAppCustomDetails.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomDetails.c_str() : m_strDiscordAppDetails.c_str();
     discordPresence.startTimestamp = m_uiDiscordAppStart;
     discordPresence.endTimestamp = m_uiDiscordAppEnd;
+    discordPresence.instance = 0;
 
     DiscordButton buttons[2];
     if (m_aButtons)
@@ -109,8 +124,8 @@ void CDiscordRichPresence::UpdatePresence()
         discordPresence.buttons = buttons;
     }
 
-    discordPresence.partySize = (m_bDisallowCustomDetails) ? 0 : m_iPartySize;
-    discordPresence.partyMax = (m_bDisallowCustomDetails) ? 0 : m_iPartyMax;
+    discordPresence.partySize = (m_bDisallowCustomDetails) ? m_iPlayersCount : m_iPartySize;
+    discordPresence.partyMax = (m_bDisallowCustomDetails) ? m_iMaxPlayers : m_iPartyMax;
 
     Discord_UpdatePresence(&discordPresence);
     m_bUpdateRichPresence = false;
@@ -127,7 +142,6 @@ void CDiscordRichPresence::SetPresenceEndTimestamp(const unsigned long ulEnd)
     m_uiDiscordAppEnd = ulEnd;
     m_bUpdateRichPresence = true;
 }
-
 
 void CDiscordRichPresence::SetAssetLargeData(const char* szAsset, const char* szAssetText)
 {
@@ -248,8 +262,47 @@ bool CDiscordRichPresence::IsDiscordCustomDetailsDisallowed() const
     return m_bDisallowCustomDetails;
 }
 
-void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax)
+void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax, bool bCustom)
 {
-    m_iPartySize = iSize;
-    m_iPartyMax = iMax;
+    if (bCustom)
+    {
+        m_iPartySize = iSize;
+        m_iPartyMax = iMax;
+    }
+    else
+    {
+        m_iPlayersCount = iSize;
+        m_iMaxPlayers = iMax;
+    }
+}
+
+#ifdef DISCORD_DISABLE_IO_THREAD
+void CDiscordRichPresence::UpdatePresenceConnection()
+{
+    Discord_UpdateConnection();
+}
+#endif
+
+void CDiscordRichPresence::HandleDiscordReady(const DiscordUser* pDiscordUser)
+{
+    if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        discord->SetDiscordClientConnected(true);
+}
+
+void CDiscordRichPresence::HandleDiscordDisconnected(int iErrorCode, const char* szMessage)
+{
+    WriteDebugEvent(SString("[DISCORD] Disconnected %s (error #%d)", szMessage, iErrorCode));
+
+    if (const auto discord = g_pCore->GetDiscord(); discord)
+        discord->SetDiscordClientConnected(false);
+}
+
+void CDiscordRichPresence::HandleDiscordError(int iErrorCode, const char* szMessage)
+{
+    WriteDebugEvent(SString("[DISCORD] Error: %s (error #%d)", szMessage, iErrorCode));
+}
+
+bool CDiscordRichPresence::IsDiscordClientConnected() const
+{
+    return m_bConnected;
 }

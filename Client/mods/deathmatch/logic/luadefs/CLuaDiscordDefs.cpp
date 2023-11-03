@@ -181,7 +181,7 @@ bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
     if (discord->IsDiscordCustomDetailsDisallowed())
         return false;
 
-    discord->SetPresencePartySize(iSize, iMax);
+    discord->SetPresencePartySize(iSize, iMax, true);
     return true;
 }
 
@@ -258,8 +258,8 @@ bool CLuaDiscordDefs::IsDiscordRPCConnected()
     //  bool isDiscordRichPresenceConnected ( )
     auto discord = g_pCore->GetDiscord();
 
-    if (!discord)
+    if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
 
-    return discord->IsDiscordRPCEnabled();
+    return discord->IsDiscordClientConnected();
 }
