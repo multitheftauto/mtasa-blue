@@ -20,6 +20,7 @@ public:
 
     DECLARE_ELEMENT_RPC(SetElementParent);
     DECLARE_ELEMENT_RPC(SetElementData);
+    // DECLARE_ELEMENT_RPC(RemoveElementData);
     DECLARE_ELEMENT_RPC(SetElementPosition);
     DECLARE_ELEMENT_RPC(SetElementVelocity);
     DECLARE_ELEMENT_RPC(SetElementAngularVelocity);

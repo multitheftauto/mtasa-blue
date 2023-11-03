@@ -77,6 +77,7 @@ public:
     LUA_DECLARE(DestroyElement);
     LUA_DECLARE(SetElementID);
     LUA_DECLARE(SetElementData);
+    // LUA_DECLARE(RemoveElementData);
     LUA_DECLARE(SetElementMatrix);
     LUA_DECLARE(SetElementPosition);
     LUA_DECLARE_OOP(SetElementRotation);

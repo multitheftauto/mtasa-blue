@@ -82,6 +82,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementData", GetElementData},
         {"hasElementData", HasElementData},
         {"setElementData", SetElementData},
+        // {"removeElementData", RemoveElementData}, TODO Clientside
 
         // Element set funcs
         {"setElementID", SetElementID},
@@ -1886,6 +1887,12 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+/* int CLuaElementDefs::RemoveElementData(lua_State* luaVM) 
+{
+    lua_pushboolean(luaVM, false);
+    return 1;
+} */
 
 int CLuaElementDefs::SetElementMatrix(lua_State* luaVM)
 {

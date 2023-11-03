@@ -264,3 +264,13 @@ bool CLuaVectorGraphicDefs::SVGSetUpdateCallback(CClientVectorGraphic* vectorGra
 
     return false;
 }
+
+/* std::variant<CLuaFunctionRef, bool> CLuaVectorGraphicDefs::SVGGetUpdateCallback(CClientVectorGraphic* vectorGraphic)
+{
+    auto func = vectorGraphic->GetUpdateCallback();
+
+    if (std::holds_alternative<CLuaFunctionRef>(func))
+        return func;
+
+    return false;
+} */

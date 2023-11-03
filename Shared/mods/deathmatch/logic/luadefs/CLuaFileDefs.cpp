@@ -52,7 +52,7 @@ void CLuaFileDefs::LoadFunctions()
         {"fileGetSize", fileGetSize},
         {"fileGetPath", fileGetPath},
         {"fileIsEOF", fileIsEOF},
-        {"fileSetPos", fileSetPos
+        {"fileSetPos", fileSetPos},
         {"fileGetContents", ArgumentParser<fileGetContents>},
     };
 

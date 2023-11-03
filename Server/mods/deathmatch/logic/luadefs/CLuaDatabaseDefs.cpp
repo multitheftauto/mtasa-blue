@@ -28,7 +28,7 @@ void CLuaDatabaseDefs::LoadFunctions()
         {"dbPoll", DbPoll},
         {"dbPrepareString", DbPrepareString},
 
-        // ExecuteSQL
+        // SQLite
         // {"executeSQLCreateTable", ExecuteSQLCreateTable},
         // {"executeSQLDropTable", ExecuteSQLDropTable},
         // {"executeSQLDelete", ExecuteSQLDelete},

@@ -269,6 +269,7 @@ void CLuaManager::LoadCFunctions()
     CLuaResourceDefs::LoadFunctions();
     CLuaSearchLightDefs::LoadFunctions();
     CLuaShared::LoadFunctions();
+    // CLuaTaskDefs::LoadFunctions();
     CLuaTeamDefs::LoadFunctions();
     CLuaTimerDefs::LoadFunctions();
     CLuaVectorGraphicDefs::LoadFunctions();
