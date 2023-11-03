@@ -396,4 +396,6 @@ private:
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
+
+    long long m_timeDiscordAppLastUpdate;
 };

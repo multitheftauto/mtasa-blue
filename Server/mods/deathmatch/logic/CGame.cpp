@@ -58,6 +58,7 @@
 #include "packets/CPlayerNetworkStatusPacket.h"
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
+#include "packets/CServerInfoSyncPacket.h"
 #include "../utils/COpenPortsTester.h"
 #include "../utils/CMasterServerAnnouncer.h"
 #include "../utils/CHqComms.h"
@@ -1808,6 +1809,8 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
 
+                            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
+
                             // Check if client must update
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                             {
@@ -2287,6 +2290,11 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         // Only every 4 packets.
         if ((pPlayer->GetPuresyncCount() % 4) == 0)
             pPlayer->Send(CReturnSyncPacket(pPlayer));
+
+        // Send a server info sync packet to the player
+        // Only every 512 packets
+        if ((pPlayer->GetPuresyncCount() % 512) == 0)
+            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
 
         CLOCK("PlayerPuresync", "RelayPlayerPuresync");
         // Relay to other players
