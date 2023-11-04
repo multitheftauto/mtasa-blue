@@ -432,6 +432,14 @@ bool CClientVehicleManager::IsStandardModel(unsigned long ulModel)
     return ulModel >= 400 && ulModel <= 611;
 }
 
+unsigned long CClientVehicleManager::GetRootModelId(unsigned long ulModel)
+{
+    if (IsStandardModel(ulModel))
+        return ulModel;
+
+    return g_pGame->GetModelInfo(ulModel)->GetParentID();
+}
+
 eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned long ulModel)
 {
     // Valid vehicle id?
