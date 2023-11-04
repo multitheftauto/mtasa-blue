@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-03 06:40\n"
+"PO-Revision-Date: 2023-11-04 19:20\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -1981,7 +1981,7 @@ msgstr "Mindig mutassa a letöltési ablakot"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "Engedélyezze a csatlakozást a Discord Gazdag Játékadataival"
+msgstr "Csatlakozás engedélyezése a Discord Rich Presence szolgáltatással"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
