@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-03 03:41\n"
+"PO-Revision-Date: 2023-11-05 13:10\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -19,15 +19,15 @@ msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:36
 msgid "This version has expired."
-msgstr ""
+msgstr "यह संस्करण समाप्त हो चुका है."
 
 #: Client/mods/deathmatch/CClient.cpp:56
 msgid "disconnect from the game"
-msgstr ""
+msgstr "खेल से डिस्कनेक्ट करें"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
-msgstr ""
+msgstr "नेमटैग दिखाता है"
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the chatbox"
