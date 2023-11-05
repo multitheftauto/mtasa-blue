@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-05 13:10\n"
+"PO-Revision-Date: 2023-11-05 14:10\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -31,40 +31,40 @@ msgstr "नेमटैग दिखाता है"
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the chatbox"
-msgstr ""
+msgstr "चैटबॉक्स दिखाता है"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
-msgstr ""
+msgstr "नेटवर्क आँकड़े दिखाता है"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:63
 msgid "open the chat input"
-msgstr ""
+msgstr "चैट इनपुट खोलें"
 
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
-msgstr ""
+msgstr "अन्य खिलाड़ियों तक आवाज पहुंचाता है"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "enters a car as passenger"
-msgstr ""
+msgstr "यात्री के रूप में कार में प्रवेश करता है"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
-msgstr ""
+msgstr "अगला रेडियो चैनल"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
-msgstr ""
+msgstr "पिछला रेडियो चैनल"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
-msgstr ""
+msgstr "रडार दृश्य को इनेबल करता है"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar in"
-msgstr ""
+msgstr "रडार को ज़ूम इन करता है"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the radar out"
