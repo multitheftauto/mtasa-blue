@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-07 19:11\n"
+"PO-Revision-Date: 2023-11-07 20:11\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese, Brazilian\n"
 "Language: pt_BR\n"
@@ -330,118 +330,118 @@ msgstr "Desconectado"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr "Voando um OVNI por aí"
+msgstr "Voando um OVNI por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "Passando por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr ""
+msgstr "Pegando as ondas de"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
-msgstr ""
+msgstr "Andando de trem em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr ""
+msgstr "Voando por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr ""
+msgstr "Andando por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "Andando de caminhão monstro por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr ""
+msgstr "Rolê por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "Bunando por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "Fazendo esquisitice em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr ""
+msgstr "Escalando por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "Atirando de um veículo em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
-msgstr ""
+msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr ""
+msgstr "Respirando água"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
-msgstr ""
+msgstr "Se afogando em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "Agachado para cobertura em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
-msgstr ""
+msgstr "Brigando em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
-msgstr ""
+msgstr "Trocando soco em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "Deitando tanso em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr ""
+msgstr "Atirando"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr ""
+msgstr "Voando de mochila a jato em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr ""
+msgstr "Literalmente pegando fogo em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
-msgstr ""
+msgstr "Se queimando em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Swimming in"
-msgstr ""
+msgstr "Nadando em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr ""
+msgstr "Flutuando por"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "Sendo perseguido por um tubarão"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr ""
+msgstr "Se afogando em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 #: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
 #: Client/core/CCore.cpp:674
 msgid "Main menu"
-msgstr ""
+msgstr "Tela principal"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -516,17 +516,17 @@ msgstr "Iniciando servidor local ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr ""
+msgstr "Área 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr ""
+msgstr "Andando por "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 #: Client/mods/deathmatch/logic/CResource.cpp:370
 #: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
 msgid "In-game"
-msgstr ""
+msgstr "In-game"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
@@ -603,23 +603,23 @@ msgstr "Verificação ao cliente do MTA falhou!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
-msgstr ""
+msgstr "Ta na vala"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
-msgstr ""
+msgstr "À caminho do hospital"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr ""
+msgstr "Se encontrando com seu criador"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "Arrependendo de suas decisões"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
-msgstr ""
+msgstr "Morreu"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
