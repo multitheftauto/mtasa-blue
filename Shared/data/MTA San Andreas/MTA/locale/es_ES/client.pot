@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-03 06:40\n"
+"PO-Revision-Date: 2023-11-10 16:02\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
@@ -375,7 +375,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "Tiroteando desde el vehículo en"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
