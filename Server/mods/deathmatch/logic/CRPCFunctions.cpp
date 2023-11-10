@@ -180,15 +180,14 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
 
             m_pSourcePlayer->CallEvent("onPlayerWeaponSwitch", Arguments);
 
-            SViewerMapType&              nearList = m_pSourcePlayer->GetNearPlayerList();
-            static std::vector<CPlayer*> playersInNearList;
+            SViewerMapType&                 nearList = m_pSourcePlayer->GetNearPlayerList();
+            static std::vector<CPlayer*>    playersInNearList;
+            playersInNearList.reserve(nearList.size());
             playersInNearList.clear();
 
-            for (auto it = nearList.begin(); it != nearList.end(); ++it)
-            {
-                playersInNearList.push_back(it->first);
-            }
-
+            for (const auto& player : nearList)
+                playersInNearList.push_back(player.first);
+        
             if (!playersInNearList.empty())
             {
                 CBitStream BitStream;
