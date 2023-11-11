@@ -39,9 +39,10 @@ public:
     bool SetDiscordRPCEnabled(bool bEnabled);
     bool IsDiscordCustomDetailsDisallowed() const;
     bool IsDiscordRPCEnabled() const;
-    bool SetApplicationID(const char* szAppID);
+    bool SetApplicationID(const char* resourceName, const char* szAppID);
     void SetDiscordClientConnected(bool bConnected) { m_bConnected = bConnected; };
     bool IsDiscordClientConnected() const;
+    std::string GetDiscordResourceName() const { return m_strDiscordCustomResourceName; };
 
     // handlers
     static void HandleDiscordReady(const struct DiscordUser* pDiscordUser);
@@ -59,6 +60,7 @@ private:
     std::string m_strDiscordAppAssetSmall;
     std::string m_strDiscordAppAssetSmallText;
 
+    std::string m_strDiscordCustomResourceName;
     std::string m_strDiscordAppCurrentId;
     std::string m_strDiscordAppState;
     std::string m_strDiscordAppDetails;

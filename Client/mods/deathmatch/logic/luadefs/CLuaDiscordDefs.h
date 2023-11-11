@@ -19,7 +19,7 @@ public:
 private:
     static bool ResetData();
     static bool SetState(std::string strState);
-    static bool SetAppID(std::string strAppID);
+    static bool SetAppID(lua_State* luaVM, std::string strAppID);
     static bool SetDetails(std::string strDetails);
     static bool SetAsset(std::string szAsset, std::string szAssetText, bool bIsLarge = false);
     static bool SetButtons(unsigned short int iIndex, std::string szName, std::string szUrl);
