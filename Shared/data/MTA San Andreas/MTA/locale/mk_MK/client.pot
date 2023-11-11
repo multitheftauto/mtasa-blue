@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-03 03:41\n"
+"POT-Creation-Date: 2023-11-11 12:22+0000\n"
+"PO-Revision-Date: 2023-11-11 12:23\n"
 "Last-Translator: \n"
 "Language-Team: Macedonian\n"
 "Language: mk_MK\n"
@@ -523,7 +523,7 @@ msgid "Walking around "
 msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
-#: Client/mods/deathmatch/logic/CResource.cpp:370
+#: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
 msgid "In-game"
 msgstr ""
