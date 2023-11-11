@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-11 12:22+0000\n"
-"PO-Revision-Date: 2023-11-11 12:23\n"
+"PO-Revision-Date: 2023-11-11 15:40\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -423,15 +423,15 @@ msgstr "تفجير الحمقى في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr "التصويب لأعلى"
+msgstr "الإطلاق لأعلي"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr "Jetpacking في"
+msgstr "ركوب الجت باك في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr "حرفيا على النار في"
+msgstr "حرفياً يحترق في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
@@ -443,15 +443,15 @@ msgstr "يسبح في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr "تطفو في"
+msgstr "تطفو حولًا في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
-msgstr "يتم مطادرته من قبل سمك قرش"
+msgstr "تتم مطاردته من قبل سمك القرش"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr "اختنق حتى الموت في"
+msgstr "اختناق حتى الموت في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 #: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
@@ -532,11 +532,11 @@ msgstr "جاري تشغيل خادم محلي ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr "منطقة 51"
+msgstr "المنطقة 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr "يتجول في "
+msgstr "التجول حول "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 #: Client/mods/deathmatch/logic/CResource.cpp:372
@@ -619,7 +619,7 @@ msgstr "فشل التحقق من العميل MTA!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
-msgstr "في خندق"
+msgstr "داخل خندق"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
@@ -627,7 +627,7 @@ msgstr "في الطريق إلى المستشفى"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr "تعرف على صانعهم"
+msgstr "التعرف على صانعهم"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
@@ -1992,7 +1992,7 @@ msgstr "إظهار نافذة التنزيل دائمًا"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "السماح بالاتصال باستخدام Discord Rich Presence"
+msgstr "السماح بالاتصال بإستخدام Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
