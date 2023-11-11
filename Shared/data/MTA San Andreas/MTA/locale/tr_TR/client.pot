@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-03 03:38+0000\n"
-"PO-Revision-Date: 2023-11-03 03:41\n"
+"PO-Revision-Date: 2023-11-11 09:40\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -330,11 +330,11 @@ msgstr "Bağlantı kesildi"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "Etrafta bir UFO uçurmak"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "Etrafta gezinmek"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
@@ -346,11 +346,11 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr ""
+msgstr "Etrafta uçmak"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr ""
+msgstr "Etrafta dolaşmak"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
@@ -379,7 +379,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
-msgstr ""
+msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
@@ -407,7 +407,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr ""
+msgstr "Ateş etmek"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
@@ -441,7 +441,7 @@ msgstr ""
 #: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
 #: Client/core/CCore.cpp:674
 msgid "Main menu"
-msgstr ""
+msgstr "Ana menü"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -516,17 +516,17 @@ msgstr "Yerel sunucu başlatılıyor ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr ""
+msgstr "Area 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr ""
+msgstr "Etrafta dolaşmak"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 #: Client/mods/deathmatch/logic/CResource.cpp:370
 #: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
 msgid "In-game"
-msgstr ""
+msgstr "Oyunda"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
