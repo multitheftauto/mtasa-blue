@@ -180,21 +180,24 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
 
             m_pSourcePlayer->CallEvent("onPlayerWeaponSwitch", Arguments);
 
-            SViewerMapType&                 nearList = m_pSourcePlayer->GetNearPlayerList();
-            static std::vector<CPlayer*>    playersInNearList;
-            playersInNearList.reserve(nearList.size());
-            playersInNearList.clear();
-
-            for (const auto& player : nearList)
-                playersInNearList.push_back(player.first);
-        
-            if (!playersInNearList.empty())
+            SViewerMapType& nearList = m_pSourcePlayer->GetNearPlayerList();
+            if (!nearList.empty())
             {
-                CBitStream BitStream;
-                BitStream.pBitStream->Write((unsigned int)ucPrevSlot);
-                BitStream.pBitStream->Write(uiSlot);
+                static std::vector<CPlayer*> playersInNearList;
+                playersInNearList.reserve(nearList.size());
+                playersInNearList.clear();
 
-                m_pPlayerManager->Broadcast(CElementRPCPacket(m_pSourcePlayer, REMOTE_PLAYER_WEAPON_SWITCH, *BitStream.pBitStream), playersInNearList);
+                for (const auto& player : nearList)
+                    playersInNearList.push_back(player.first);
+
+                if (!playersInNearList.empty())
+                {
+                    CBitStream BitStream;
+                    BitStream.pBitStream->Write((unsigned int)ucPrevSlot);
+                    BitStream.pBitStream->Write(uiSlot);
+
+                    m_pPlayerManager->Broadcast(CElementRPCPacket(m_pSourcePlayer, REMOTE_PLAYER_WEAPON_SWITCH, *BitStream.pBitStream), playersInNearList);
+                }
             }
         }
 
