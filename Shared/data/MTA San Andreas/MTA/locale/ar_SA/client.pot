@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-11 12:22+0000\n"
-"PO-Revision-Date: 2023-11-11 15:40\n"
+"PO-Revision-Date: 2023-11-11 16:40\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -346,11 +346,11 @@ msgstr "قطع الاتصال"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr "القيادة في"
+msgstr "قيادة جسم طائر مجهول حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr "تجوب"
+msgstr "يتجول حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
@@ -362,23 +362,23 @@ msgstr "ركوب القطار في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr "تحلق حولها"
+msgstr "التحليق حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr "ركوب حولها"
+msgstr "القيادة حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
-msgstr "شاحنة الوحش تدور حولها"
+msgstr "قيادة شاحنة الوحش حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr "رباعية حولها"
+msgstr "قيادة دراجة رباعية حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr "الأرنب يقفز حولها"
+msgstr "القفز كالأرنب حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
@@ -391,27 +391,27 @@ msgstr "التسلق في"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr "القيام بالقيادة في"
+msgstr "إطلاق نار من مركبة متحركة في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
-msgstr "ببل..."
+msgstr "بلوب بلوب..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr "تنفس الماء"
+msgstr "يتنفس الماء"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
-msgstr "الغرق في"
+msgstr "يغرق في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr "الانحناء للتغطية في"
+msgstr "ينحني للتغطية في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
-msgstr "القتال في"
+msgstr "يقاتل في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
@@ -423,7 +423,7 @@ msgstr "تفجير الحمقى في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr "الإطلاق لأعلي"
+msgstr "يطلق على"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
@@ -536,7 +536,7 @@ msgstr "المنطقة 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr "التجول حول "
+msgstr "يتمشى حول "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 #: Client/mods/deathmatch/logic/CResource.cpp:372
@@ -1992,7 +1992,7 @@ msgstr "إظهار نافذة التنزيل دائمًا"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "السماح بالاتصال بإستخدام Discord Rich Presence"
+msgstr "سماح الاتصال بـ Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
