@@ -24,6 +24,7 @@ CDiscordRichPresence::CDiscordRichPresence() : m_uiDiscordAppStart(0), m_uiDisco
     SetDefaultData();
 
     m_strDiscordAppState.clear();
+    m_strDiscordCustomResourceName.clear();
     m_bConnected = false;
 }
 
@@ -50,6 +51,9 @@ void CDiscordRichPresence::InitializeDiscord()
 
 void CDiscordRichPresence::ShutdownDiscord()
 {
+    if (!m_bDiscordRPCEnabled)
+        return;
+
     Discord_ClearPresence();
     Discord_Shutdown();
 
@@ -58,6 +62,9 @@ void CDiscordRichPresence::ShutdownDiscord()
 
 void CDiscordRichPresence::RestartDiscord()
 {
+    if (!m_bDiscordRPCEnabled)
+        return;
+
     ShutdownDiscord();
     InitializeDiscord();
 }
@@ -72,6 +79,7 @@ void CDiscordRichPresence::SetDefaultData()
     m_strDiscordAppAssetSmallText = DEFAULT_APP_ASSET_SMALL_TEXT;
 
     m_strDiscordAppCurrentId = DEFAULT_APP_ID;
+    m_strDiscordCustomResourceName.clear();
     m_strDiscordAppCustomDetails.clear();
     m_strDiscordAppCustomState.clear();
 
@@ -225,7 +233,7 @@ bool CDiscordRichPresence::ResetDiscordData()
     return true;
 }
 
-bool CDiscordRichPresence::SetApplicationID(const char* szAppID)
+bool CDiscordRichPresence::SetApplicationID(const char* szResourceName, const char* szAppID)
 {
     m_strDiscordAppCurrentId = (szAppID && *szAppID) ? szAppID : DEFAULT_APP_ID;
 
@@ -234,6 +242,10 @@ bool CDiscordRichPresence::SetApplicationID(const char* szAppID)
         RestartDiscord();
         m_bUpdateRichPresence = true;
     }
+
+    if (*szResourceName)
+        m_strDiscordCustomResourceName = szResourceName;
+
     return true;
 }
 
