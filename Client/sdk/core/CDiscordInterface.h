@@ -19,7 +19,7 @@ public:
     virtual ~CDiscordInterface() = default;
     virtual void UpdatePresence() = 0;
     virtual bool SetPresenceDetails(const char* szDetails, bool bCustom) = 0;
-    virtual bool SetApplicationID(const char* szAppID) = 0;
+    virtual bool SetApplicationID(const char* szResourceName, const char* szAppID) = 0;
     virtual bool ResetDiscordData() = 0;
     virtual bool SetPresenceState(const char* szState, bool bCustom) = 0;
     virtual void SetAssetLargeData(const char* szAsset, const char* szAssetText) = 0;
@@ -28,6 +28,7 @@ public:
     virtual void SetPresenceEndTimestamp(const unsigned long ulEnd) = 0;
     virtual bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl) = 0;
     virtual void SetPresencePartySize(int iSize, int iMax, bool bCustom) = 0;
+    virtual std::string GetDiscordResourceName() const = 0;
 
     virtual bool SetDiscordRPCEnabled(bool bEnabled) = 0;
     virtual void SetDiscordClientConnected(bool bConnected) = 0;
