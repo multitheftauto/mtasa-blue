@@ -54,11 +54,14 @@ size_t EngineStreamingGetMemorySize() {
 bool EngineStreamingSetBufferSize(size_t sizeBytes) {
     const auto sizeBlocks = sizeBytes / 2048;
     if (sizeBlocks > g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks()) { // Can't allow it to be less than the largest file
-        g_pGame->GetStreaming()->SetStreamingBufferSize(sizeBlocks);
-        return true;
+        return g_pGame->GetStreaming()->SetStreamingBufferSize(sizeBlocks);
     } else {
         return false;
     }
+}
+
+void EngineStreamingRestoreBufferSize() {
+    g_pGame->GetStreaming()->SetStreamingBufferSize(g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks());
 }
 
 // Get current streaming buffer size
@@ -127,10 +130,11 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
         {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
         {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
+        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
         {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
-        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+        {"engineStreamingRestoreBufferSize", ArgumentParser<EngineStreamingRestoreBufferSize>},
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
@@ -192,13 +196,14 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
         lua_classfunction(luaVM, "getUsedMemory", "engineStreamingGetUsedMemory");
         lua_classfunction(luaVM, "setMemorySize", "engineStreamingSetMemorySize");
         lua_classfunction(luaVM, "getMemorySize", "engineStreamingGetMemorySize");
+        lua_classfunction(luaVM, "setModelCacheLimits", "engineStreamingSetModelCacheLimits");
         lua_classfunction(luaVM, "restoreMemorySize", "engineStreamingRestoreMemorySize");
         lua_classfunction(luaVM, "getBufferSize", "engineStreamingGetBufferSize");
         lua_classfunction(luaVM, "setBufferSize", "engineStreamingSetBufferSize");
-        lua_classfunction(luaVM, "setModelCacheLimits", "engineStreamingSetModelCacheLimits");
+        lua_classfunction(luaVM, "restoreBufferSize", "engineStreamingRestoreBufferSize");
 
         lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
-        lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetMemorySize");
+        lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetBufferSize");
         lua_classvariable(luaVM, "usedMemory", NULL, "engineStreamingGetUsedMemory");
     }
     lua_registerstaticclass(luaVM, "EngineStreaming");
@@ -653,8 +658,11 @@ CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string st
         // Create the img handle
         CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
 
+        // Fix path encoding for sdt::filesystem
+        std::wstring utf8Path = SharedUtil::MbUTF8ToUTF16(strFullPath);
+
         // Attempt loading the file
-        if (pImg->Load(std::move(strFullPath)))
+        if (pImg->Load(std::move(utf8Path)))
         {
             // Success. Make it a child of the resource img root
             pImg->SetParent(pRoot);
@@ -854,6 +862,7 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID) {
                     std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
+                    m_pManager->GetModelManager()->Add(pModel);
 
                     ushort usParentID = -1;
 

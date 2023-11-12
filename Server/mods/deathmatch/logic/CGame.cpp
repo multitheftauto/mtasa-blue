@@ -58,6 +58,7 @@
 #include "packets/CPlayerNetworkStatusPacket.h"
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
+#include "packets/CServerInfoSyncPacket.h"
 #include "../utils/COpenPortsTester.h"
 #include "../utils/CMasterServerAnnouncer.h"
 #include "../utils/CHqComms.h"
@@ -75,6 +76,7 @@
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
 #define RELEASE_MIN_CLIENT_VERSION              "1.6.0-0.00000"
+#define FIREBALLDESTRUCT_MIN_CLIENT_VERSION     "1.6.0-9.22199"
 
 #ifndef WIN32
     #include <limits.h>
@@ -229,6 +231,21 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
+
+    // Setup world special properties
+    m_WorldSpecialProps[WorldSpecialProperty::HOVERCARS] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::AIRCARS] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRABUNNY] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRAJUMP] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::RANDOMFOLIAGE] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::SNIPERMOON] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRAAIRRESISTANCE] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::UNDERWORLDWARP] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLESUNGLARE] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::CORONAZTEST] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::WATERCREATURES] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::BURNFLIPPEDCARS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::FIREBALLDESTRUCT] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -1292,7 +1309,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     Player.Send(CPlayerJoinCompletePacket(
         Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(), m_pMainConfig->GetHTTPPort(),
         m_pMainConfig->GetHTTPDownloadURL().c_str(), m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
-        m_pMainConfig->IsVoiceEnabled(), m_pMainConfig->GetVoiceSampleRate(), m_pMainConfig->GetVoiceQuality(), m_pMainConfig->GetVoiceBitrate()));
+        m_pMainConfig->IsVoiceEnabled(), m_pMainConfig->GetVoiceSampleRate(), m_pMainConfig->GetVoiceQuality(), m_pMainConfig->GetVoiceBitrate(), m_pMainConfig->GetServerName().c_str()));
 
     marker.Set("CPlayerJoinCompletePacket");
 
@@ -1792,6 +1809,8 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
 
+                            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
+
                             // Check if client must update
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
                             {
@@ -2271,6 +2290,11 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         // Only every 4 packets.
         if ((pPlayer->GetPuresyncCount() % 4) == 0)
             pPlayer->Send(CReturnSyncPacket(pPlayer));
+
+        // Send a server info sync packet to the player
+        // Only every 512 packets
+        if ((pPlayer->GetPuresyncCount() % 512) == 0)
+            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
 
         CLOCK("PlayerPuresync", "RelayPlayerPuresync");
         // Relay to other players
@@ -4548,13 +4572,11 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < strMinClientRequirementFromResources)
         strNewMin = strMinClientRequirementFromResources;
 
-#if 0
-    if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+    if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
     {
-        if (strNewMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
-            strNewMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
+        if (strNewMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
+            strNewMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
     }
-#endif
 
     // Log effective min client version
     if (strNewMin != m_strPrevMinClientConnectRequirement)
@@ -4573,15 +4595,14 @@ CMtaVersion CGame::CalculateMinClientRequirement()
         SendSyncSettings();
     }
 
-#if 0
     // Do version based kick check as well
     {
         CMtaVersion strKickMin;
 
-        if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+        if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
         {
-            if (strKickMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
-                strKickMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
+            if (strKickMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
+                strKickMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
         }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)
@@ -4604,7 +4625,6 @@ CMtaVersion CGame::CalculateMinClientRequirement()
                 CLogger::LogPrintf(SString("Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin));
         }
     }
-#endif
 
     // Also seems a good place to keep this setting synchronized
     g_pBandwidthSettings->NotifyBulletSyncEnabled(g_pGame->IsBulletSyncActive());

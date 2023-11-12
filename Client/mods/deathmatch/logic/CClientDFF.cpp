@@ -164,6 +164,16 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
         {
             return ReplacePedModel(pClump, usModel, bAlphaTransparency);
         }
+        else if (CClientMarkerManager::IsMarkerModel(usModel))
+        {
+            bool wasReplaced = ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
+
+            // 'Restream' 3D markers
+            if (wasReplaced)
+                g_pClientGame->ReinitMarkers();
+
+            return wasReplaced;
+        }
         else if (CClientObjectManager::IsValidModel(usModel))
         {
             if (CVehicleUpgrades::IsUpgrade(usModel))
@@ -271,6 +281,10 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
     if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
+
+    // 'Restream' 3D markers
+    if (CClientMarkerManager::IsMarkerModel(usModel))
+        g_pClientGame->ReinitMarkers();
 
     // Force dff reload if this model id is used again
     SLoadedClumpInfo* pInfo = MapFind(m_LoadedClumpInfoMap, usModel);
