@@ -25,8 +25,6 @@
 #include "CGame.h"
 #include "CMainConfig.h"
 
-extern CGame* g_pGame;
-
 // Helper functions
 static std::string GetAdminNameForLog(CClient* pClient)
 {
@@ -825,7 +823,6 @@ bool CConsoleCommands::Nick(CConsole* pConsole, const char* szArguments, CClient
 
 // HACKED IN FOR NOW
 #include "CGame.h"
-extern CGame* g_pGame;
 
 bool CConsoleCommands::LogIn(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {

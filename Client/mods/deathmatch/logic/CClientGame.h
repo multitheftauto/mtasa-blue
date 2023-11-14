@@ -854,3 +854,4 @@ private:
 };
 
 extern CClientGame* g_pClientGame;
+extern CClientGame* g_pSharedGame;

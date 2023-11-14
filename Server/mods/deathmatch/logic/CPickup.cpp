@@ -18,8 +18,6 @@
 #include "packets/CPickupHitConfirmPacket.h"
 #include "CStaticFunctionDefinitions.h"
 
-extern CGame* g_pGame;
-
 CPickup::CPickup(CElement* pParent, CPickupManager* pPickupManager, CColManager* pColManager) : CElement(pParent)
 {
     // Init

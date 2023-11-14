@@ -13,8 +13,6 @@
 
 using std::list;
 
-extern CClientGame* g_pClientGame;
-
 #ifdef WITH_OBJECT_SYNC
 CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, CObjectSync* pObjectSync, ElementID ID,
                                      unsigned short usModel)

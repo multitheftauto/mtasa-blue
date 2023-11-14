@@ -35,8 +35,6 @@
 using std::list;
 using std::vector;
 
-extern CClientGame* g_pClientGame;
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -3333,7 +3331,6 @@ void CClientPed::SetTargetRotation(unsigned long ulDelay, float fRotation, float
 
 // Temporary
 #include "../mods/deathmatch/logic/CClientGame.h"
-extern CClientGame* g_pClientGame;
 
 void CClientPed::Interpolate()
 {

@@ -15,7 +15,6 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 
-extern CClientGame* g_pClientGame;
 CTickRateSettings   g_TickRateSettings;
 
 CNetAPI::CNetAPI(CClientManager* pManager)

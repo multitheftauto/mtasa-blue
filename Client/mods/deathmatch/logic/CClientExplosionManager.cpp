@@ -11,8 +11,6 @@
 #include <StdInc.h>
 #include <game/CExplosionManager.h>
 
-extern CClientGame* g_pClientGame;
-
 CClientExplosionManager* g_pExplosionManager = NULL;
 
 CClientExplosionManager::CClientExplosionManager(CClientManager* pManager)

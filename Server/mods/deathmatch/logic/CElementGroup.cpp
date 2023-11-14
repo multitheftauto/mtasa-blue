@@ -23,8 +23,6 @@
 #include "CMapManager.h"
 #include "CPerPlayerEntity.h"
 
-extern CGame* g_pGame;
-
 CElementGroup::~CElementGroup()
 {
     // Delete all the elements

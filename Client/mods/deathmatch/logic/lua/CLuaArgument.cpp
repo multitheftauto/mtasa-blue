@@ -22,8 +22,6 @@
 #define VERIFY_RESOURCE(resource) (g_pClientGame->GetResourceManager()->Exists(resource))
 #endif
 
-extern CClientGame* g_pClientGame;
-
 using namespace std;
 
 // Prevent the warning issued when doing unsigned short -> void*

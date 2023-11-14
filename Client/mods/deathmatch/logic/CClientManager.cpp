@@ -12,8 +12,6 @@
 
 using SharedUtil::CalcMTASAPath;
 
-extern CClientGame* g_pClientGame;
-
 CClientManager::CClientManager()
 {
     m_pMarkerStreamer = new CClientStreamer(CClientMarker::IsLimitReached, 600.0f, 300, 300);

@@ -18,8 +18,6 @@
 #include "CScriptDebugging.h"
 #include <zlib.h>
 
-extern CGame* g_pGame;
-
 CResourceClientScriptItem::CResourceClientScriptItem(CResource* resource, const char* szShortName, const char* szResourceFileName,
                                                      CXMLAttributes* xmlAttributes)
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)

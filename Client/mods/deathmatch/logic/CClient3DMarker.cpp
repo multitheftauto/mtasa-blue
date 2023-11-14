@@ -12,8 +12,6 @@
 #include <game/C3DMarkers.h>
 #include <game/CVisibilityPlugins.h>
 
-extern CClientGame* g_pClientGame;
-
 CClient3DMarker::CClient3DMarker(CClientMarker* pThis)
 {
     // Init

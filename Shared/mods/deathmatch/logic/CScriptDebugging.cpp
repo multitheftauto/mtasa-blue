@@ -235,6 +235,7 @@ void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& lua
         notCancelled = g_pClientGame->GetRootEntity()->CallEvent("onClientDebugMessage", Arguments, false);
 #else
         notCancelled = g_pGame->GetMapManager()->GetRootElement()->CallEvent("onDebugMessage", Arguments);
+
 #endif
 
         // Reset trigger state, so onDebugMessage can be called again at a later moment

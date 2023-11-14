@@ -24,8 +24,6 @@
 
 #define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
 
-extern CGame* g_pGame;
-
 CBandwidthSettings* g_pBandwidthSettings = new CBandwidthSettings();
 CTickRateSettings   g_TickRateSettings;
 

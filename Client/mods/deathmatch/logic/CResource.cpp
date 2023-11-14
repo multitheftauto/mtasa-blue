@@ -16,8 +16,6 @@
 
 using namespace std;
 
-extern CClientGame* g_pClientGame;
-
 int CResource::m_iShowingCursor = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,

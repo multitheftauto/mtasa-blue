@@ -19,8 +19,6 @@
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "net/SyncStructures.h"
 
-extern CGame* g_pGame;
-
 CVehiclePuresyncPacket::CVehiclePuresyncPacket(CPlayer* pPlayer)
 {
     m_pSourceElement = pPlayer;
