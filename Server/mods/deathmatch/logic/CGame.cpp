@@ -1583,6 +1583,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
+    m_Events.AddEvent("onPlayerProjectileCreation", "weaponType, posX, posY, posZ, force, target, rotX, rotY, rotZ, velX, velY, velZ", nullptr, false);
+    m_Events.AddEvent("onPlayerDetonateSatchels", "", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -2624,6 +2626,11 @@ void CGame::Packet_DetonateSatchels(CDetonateSatchelsPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        // Trigger Lua event and see if we are allowed to continue
+        CLuaArguments arguments;
+        if (!pPlayer->CallEvent("onPlayerDetonateSatchels", arguments))
+            return;
+
         // Tell everyone to blow up this guy's satchels
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
@@ -2776,6 +2783,29 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
             if (pOriginSource)
                 vecPosition += pOriginSource->GetPosition();
         }
+
+        CLuaArguments arguments;
+        arguments.PushNumber(Packet.m_ucWeaponType); // "weaponType"
+        arguments.PushNumber(vecPosition.fX); // "posX"
+        arguments.PushNumber(vecPosition.fY); // "posY"
+        arguments.PushNumber(vecPosition.fZ); // "posZ"
+        arguments.PushNumber(Packet.m_fForce); // "force"
+
+        CElement* pTarget = nullptr;
+        if (Packet.m_bHasTarget && Packet.m_TargetID != INVALID_ELEMENT_ID)
+            pTarget = CElementIDs::GetElement(Packet.m_TargetID);
+
+        arguments.PushElement(pTarget); // "target"
+        arguments.PushNumber(Packet.m_vecRotation.fX); // "rotX"
+        arguments.PushNumber(Packet.m_vecRotation.fY); // "rotY"
+        arguments.PushNumber(Packet.m_vecRotation.fZ); // "rotZ"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fX); // "velX"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fY); // "velY"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fZ); // "velZ"
+
+        // Trigger Lua event and see if we are allowed to continue
+        if (!pPlayer->CallEvent("onPlayerProjectileCreation", arguments))
+            return;
 
         // Make a list of players to send this packet to
         CSendList sendList;
