@@ -41,7 +41,7 @@ public:
             if (!node)
                 return;
 
-            if (node->GetType() == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && node->GetFormControlElementType() != CefDOMNode::FormControlType::DOM_FORM_CONTROL_TYPE_UNSUPPORTED)
+            if (node->GetType() == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && !node->GetFormControlElementType().empty())
             {
                 auto message = CefProcessMessage::Create("InputFocus");
                 message->GetArgumentList()->SetBool(0, true);
