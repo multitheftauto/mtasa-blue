@@ -1735,7 +1735,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
         pPlayer->SetBitStreamVersion(Packet.GetBitStreamVersion());
         g_pNetServer->SetClientBitStreamVersion(Packet.GetSourceSocket(), Packet.GetBitStreamVersion());
 
-        pPlayer->SetProtocolConnectArgs(Packet.GetProtocolConnectArgs());
+        pPlayer->SetProtocolConnectArgs(std::move(Packet.GetProtocolConnectArgs()));
 
         // Get the serial number from the packet source
         NetServerPlayerID p = Packet.GetSourceSocket();

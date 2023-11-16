@@ -190,8 +190,8 @@ public:
     virtual bool   IsUsingCustomStreamingMemorySize() = 0;
     virtual size_t GetStreamingMemory() = 0;
 
-    virtual void        SetProtocolConnectArgs(std::string args) = 0;
-    virtual const SString& GetProtocolConnectArgs() const = 0;
+    virtual void        SetProtocolConnectArgs(const std::string&& args) = 0;
+    virtual const std::string& GetProtocolConnectArgs() const = 0;
 
     virtual const SString& GetLastConnectedServerName() const = 0;
     virtual void           SetLastConnectedServerName(const SString& strServerName) = 0;

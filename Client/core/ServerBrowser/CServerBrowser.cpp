@@ -1294,7 +1294,7 @@ bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
 
     std::string strQueryParams;
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword, strQueryParams);
-    g_pCore->SetProtocolConnectArgs(strQueryParams);
+    g_pCore->SetProtocolConnectArgs(std::move(strQueryParams));
 
     // Valid nick?
     if (!CCore::GetSingleton().IsValidNick(strNick.c_str()))
@@ -1411,7 +1411,7 @@ bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 
     std::string strQueryParams;
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword, strQueryParams);
-    g_pCore->SetProtocolConnectArgs(strQueryParams);
+    g_pCore->SetProtocolConnectArgs(std::move(strQueryParams));
 
     CServerInfo::GetSingletonPtr()->Show(eWindowTypes::SERVER_INFO_RAW, strHost.c_str(), usPort, strPassword.c_str());
     return true;
@@ -1424,7 +1424,7 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
     std::string    strURI = m_pEditAddress[GetCurrentServerBrowserType()]->GetText();
     std::string    strQueryParams;
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword, strQueryParams);
-    g_pCore->SetProtocolConnectArgs(strQueryParams);
+    g_pCore->SetProtocolConnectArgs(std::move(strQueryParams));
 
     // If there are more than 0 items selected in the browser
     if (strHost.size() > 0 && usPort)
@@ -1471,7 +1471,7 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
     std::string       strURI = m_pEditAddress[Type]->GetText();
     std::string       strQueryParams;
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword, strQueryParams);
-    g_pCore->SetProtocolConnectArgs(strQueryParams);
+    g_pCore->SetProtocolConnectArgs(std::move(strQueryParams));
 
     // Adjust our other address bars to be consistent
     for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)

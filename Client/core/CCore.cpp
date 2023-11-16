@@ -1272,7 +1272,7 @@ void CCore::DoPostFramePulse()
                     std::string strQueryParams;
 
                     SString strArguments = GetConnectCommandFromURI(m_szCommandLineArgs, strQueryParams);
-                    g_pCore->SetProtocolConnectArgs(strQueryParams);
+                    g_pCore->SetProtocolConnectArgs(std::move(strQueryParams));
 
                     // Run the connect command
                     if (strArguments.length() > 0 && !m_pCommands->Execute(strArguments))

@@ -335,8 +335,8 @@ public:
     const SString& GetQuitReasonForLog() { return m_strQuitReasonForLog; }
     void           SetQuitReasonForLog(const SString& strReason) { m_strQuitReasonForLog = strReason; }
 
-    void SetProtocolConnectArgs(SString args)  { m_strProtocolConnectArgs = args; }
-    SString GetProtocolConnectArgs() const { return m_strProtocolConnectArgs; }
+    void SetProtocolConnectArgs(const SString&& args)  { m_strProtocolConnectArgs = args; }
+    const SString& GetProtocolConnectArgs() const { return m_strProtocolConnectArgs; }
 
     CFastHashSet<CPlayer*> m_PureSyncSimSendList;
     bool                   m_bPureSyncSimSendListDirty;

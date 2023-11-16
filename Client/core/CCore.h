@@ -288,9 +288,9 @@ public:
     bool   IsUsingCustomStreamingMemorySize();
     size_t GetStreamingMemory();
 
-    void        SetProtocolConnectArgs(std::string args) { m_strProtocolConnectArgs = args; }
-    std::string GetProtocolConnectArgs() const { return m_strProtocolConnectArgs; }
-    
+    void               SetProtocolConnectArgs(const std::string&& args) { m_strProtocolConnectArgs = args; }
+    const std::string& GetProtocolConnectArgs() const { return m_strProtocolConnectArgs; }
+
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
@@ -404,6 +404,6 @@ private:
 
     std::vector<std::pair<std::string, std::string>> m_vecProtocolConnectArgs{};
     std::string                                      m_strProtocolConnectArgs;
-    
+
     long long m_timeDiscordAppLastUpdate;
 };

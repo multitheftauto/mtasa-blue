@@ -220,7 +220,7 @@ void CCommandFuncs::Connect(const char* szParameters)
         std::string strQueryParams;
 
         SString strArguments = g_pCore->GetConnectCommandFromURI(szBuffer, strQueryParams);
-        g_pCore->SetProtocolConnectArgs(strQueryParams);
+        g_pCore->SetProtocolConnectArgs(std::move(strQueryParams));
 
         if (strArguments.length() > 0 && g_pCore->GetCommands()->Execute(strArguments))
         {
