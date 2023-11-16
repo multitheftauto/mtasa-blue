@@ -191,7 +191,10 @@ public:
     virtual size_t GetStreamingMemory() = 0;
 
     virtual void        SetProtocolConnectArgs(std::string args) = 0;
-    virtual std::string GetProtocolConnectArgs() const = 0;
+    virtual const SString& GetProtocolConnectArgs() const = 0;
+
+    virtual const SString& GetLastConnectedServerName() const = 0;
+    virtual void           SetLastConnectedServerName(const SString& strServerName) = 0;
 };
 
 class CClientTime

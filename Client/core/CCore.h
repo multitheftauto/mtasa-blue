@@ -290,6 +290,9 @@ public:
 
     void        SetProtocolConnectArgs(std::string args) { m_strProtocolConnectArgs = args; }
     std::string GetProtocolConnectArgs() const { return m_strProtocolConnectArgs; }
+    
+    const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
+    void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
 private:
     void ApplyCoreInitSettings();
@@ -392,6 +395,8 @@ private:
     bool    m_bIsRenderingGrass;
     bool    m_bFakeLagCommandEnabled;
 
+    SString m_strLastConnectedServerName{};
+
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
@@ -399,4 +404,6 @@ private:
 
     std::vector<std::pair<std::string, std::string>> m_vecProtocolConnectArgs{};
     std::string                                      m_strProtocolConnectArgs;
+    
+    long long m_timeDiscordAppLastUpdate;
 };

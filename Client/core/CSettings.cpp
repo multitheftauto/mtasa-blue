@@ -3452,6 +3452,26 @@ void CSettings::SaveData()
     CVARS_SET("allow_discord_rpc", bAllowDiscordRPC);
     g_pCore->GetDiscord()->SetDiscordRPCEnabled(bAllowDiscordRPC);
 
+    if (bAllowDiscordRPC)
+    {
+        const auto discord = g_pCore->GetDiscord();
+
+        if (discord)
+        {
+            const char* state = _("Main menu");
+
+            if (g_pCore->IsConnected())
+            {                
+                state = _("In-game");
+
+                const SString& serverName = g_pCore->GetLastConnectedServerName();
+                discord->SetPresenceDetails(serverName.c_str(), false);
+            }
+
+            discord->SetPresenceState(state, false);
+        }
+    }
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);

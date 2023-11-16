@@ -45,6 +45,7 @@ template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
 static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
@@ -159,6 +160,7 @@ CCore::CCore()
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+    m_timeDiscordAppLastUpdate = 0;
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
@@ -666,13 +668,13 @@ void CCore::SetConnected(bool bConnected)
 
     if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
     {
-        auto discord = g_pCore->GetDiscord();
+        const auto discord = g_pCore->GetDiscord();
         if (!discord->IsDiscordRPCEnabled())
             discord->SetDiscordRPCEnabled(true);
 
-        discord->SetPresenceState(bConnected ? "In-game" : "Main menu", false);
+        discord->SetPresenceState(bConnected ? _("In-game") : _("Main menu"), false);
         discord->SetPresenceStartTimestamp(0);
-        discord->SetPresenceDetails("");
+        discord->SetPresenceDetails("", false);
 
         if (bConnected)
             discord->SetPresenceStartTimestamp(time(nullptr));
@@ -1342,9 +1344,19 @@ void CCore::DoPostFramePulse()
     GetGraphStats()->Draw();
     m_pConnectManager->DoPulse();
 
-    static auto discord = g_pCore->GetDiscord();
-    if (discord && discord->IsDiscordRPCEnabled())
-        discord->UpdatePresence();
+    // Update Discord Rich Presence status
+    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    {
+        if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        {
+            discord->UpdatePresence();
+            m_timeDiscordAppLastUpdate = ticks;
+#ifdef DISCORD_DISABLE_IO_THREAD
+            // Update manually if we're not using the IO thread
+            discord->UpdatePresenceConnection();
+#endif
+        }
+    }
 
     TIMING_CHECKPOINT("-CorePostFrame2");
 }

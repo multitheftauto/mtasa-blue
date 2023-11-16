@@ -69,6 +69,8 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
+static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
+
 CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
     // Init the global var with ourself
@@ -106,6 +108,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_fGameSpeed = 1.0f;
     m_lMoney = 0;
     m_dwWanted = 0;
+    m_timeLastDiscordStateUpdate = 0;
     m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
@@ -361,6 +364,35 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Setup builtin Lua events
     SetupGlobalLuaEvents();
+
+    // Setup default states for Rich Presence
+    g_vehicleTypePrefixes = {
+        _("Flying a UFO around"),      _("Cruising around"),            _("Riding the waves of"),
+        _("Riding the train in"),      _("Flying around"),              _("Flying around"),
+        _("Riding around"),            _("Monster truckin' around"),    _("Quaddin' around"),
+        _("Bunny hopping around"),     _("Doing weird stuff in")
+    };
+
+    g_playerTaskStates = {
+        {TASK_COMPLEX_JUMP, {true, _("Climbing around in"), TASK_SIMPLE_CLIMB}},
+        {TASK_SIMPLE_GANG_DRIVEBY, {true, _("Doing a drive-by in")}},
+        {TASK_SIMPLE_DRIVEBY_SHOOT, {true, _("Doing a drive-by in")}},
+        {TASK_SIMPLE_DIE, {false, _("Blub blub..."), TASK_SIMPLE_DROWN}},
+        {TASK_SIMPLE_DIE, {false, _("Breathing water"), TASK_SIMPLE_DROWN}},
+        {TASK_SIMPLE_DIE, {true, _("Drowning in"), TASK_SIMPLE_DROWN}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Ducking for cover in"), {}, TASK_SIMPLE_DUCK, TASK_SECONDARY_DUCK}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Fighting in"), {}, TASK_SIMPLE_FIGHT, TASK_SECONDARY_ATTACK}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Throwing fists in"), {}, TASK_SIMPLE_FIGHT, TASK_SECONDARY_ATTACK}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Blastin' fools in"), {}, TASK_SIMPLE_USE_GUN, TASK_SECONDARY_ATTACK}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Shooting up"), {}, TASK_SIMPLE_USE_GUN, TASK_SECONDARY_ATTACK}},
+        {TASK_SIMPLE_JETPACK, {true, _("Jetpacking in")}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Literally on fire in"), {}, TASK_SIMPLE_PLAYER_ON_FIRE, TASK_SECONDARY_PARTIAL_ANIM}},
+        {TASK_SIMPLE_PLAYER_ON_FOOT, {true, _("Burning up in"), {}, TASK_SIMPLE_PLAYER_ON_FIRE, TASK_SECONDARY_PARTIAL_ANIM}},
+        {TASK_COMPLEX_IN_WATER, {true, _("Swimming in"), TASK_SIMPLE_SWIM}},
+        {TASK_COMPLEX_IN_WATER, {true, _("Floating around in"), TASK_SIMPLE_SWIM}},
+        {TASK_COMPLEX_IN_WATER, {false, _("Being chased by a shark"), TASK_SIMPLE_SWIM}},
+        {TASK_SIMPLE_CHOKING, {true, _("Choking to death in")}},
+    };
 }
 
 CClientGame::~CClientGame()
@@ -488,10 +520,11 @@ CClientGame::~CClientGame()
     SetCursorEventsEnabled(false);
 
     // Reset discord stuff
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
     if (discord && discord->IsDiscordRPCEnabled())
     {
         discord->ResetDiscordData();
+        discord->SetPresenceState(_("Main menu"), false);
         discord->UpdatePresence();
     }
 
@@ -961,6 +994,101 @@ void CClientGame::DoPulsePostFrame()
             // Clear our list now
             m_HeliCollisionsMap.clear();
             m_LastClearTime.Reset();
+        }
+
+        // Check if we need to update the Discord Rich Presence state
+        if (const long long ticks = GetTickCount64_(); ticks > m_timeLastDiscordStateUpdate + TIME_DISCORD_UPDATE_RATE)
+        {
+            const auto discord = g_pCore->GetDiscord();
+
+            if (discord && discord->IsDiscordRPCEnabled() && discord->IsDiscordCustomDetailsDisallowed())
+            {
+                if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
+                {
+                    CVector position;
+                    SString zoneName;
+
+                    pLocalPlayer->GetPosition(position);
+                    CStaticFunctionDefinitions::GetZoneName(position, zoneName, true);
+
+                    if (zoneName == "Unknown")
+                    {
+                        zoneName = _("Area 51");
+                    }
+
+                    auto taskManager = pLocalPlayer->GetTaskManager();
+                    auto task = taskManager->GetActiveTask();                    
+                    auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
+                    bool useZoneName = true;
+
+                    const eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
+                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : _("Walking around ");
+
+                    if (task && task->IsValid())
+                    {
+                        const auto taskSub = task->GetSubTask();
+                        const auto taskType = task->GetTaskType();
+
+                        // Check for states which match our primary task
+                        std::vector<STaskState> taskStates;
+                        for (const auto& [task, state] : g_playerTaskStates)
+                        {
+                            if (task == taskType)
+                                taskStates.push_back(state);
+                        }
+
+                        // Check for non-matching sub/secondary tasks and remove them
+                        for (auto it = taskStates.begin(); it != taskStates.end(); )
+                        {
+                            const STaskState& taskState = (*it);
+
+                            const auto taskSecondary =
+                                (!taskState.eSecondaryType.has_value()) ? nullptr : taskManager->GetTaskSecondary(taskState.eSecondaryType.value());
+                            bool useState = (!taskState.eSubTask.has_value() && !taskState.eSecondaryTask.has_value());
+
+                            if (!useState)
+                            {
+                                if (taskSub != nullptr && taskState.eSubTask.has_value() && taskState.eSubTask.value() == taskSub->GetTaskType())
+                                    useState = true;
+                                else if (taskSecondary != nullptr && taskState.eSecondaryTask.has_value() &&
+                                         taskState.eSecondaryTask.value() == taskSecondary->GetTaskType())
+                                    useState = true;
+                            }
+
+                            if (!useState)
+                                it = taskStates.erase(it);
+                            else
+                                ++it;
+                        }
+
+                        // Choose a random task state (if we have any)
+                        const int stateCount = taskStates.size();
+                        if (stateCount > 0)
+                        {
+                            std::srand(GetTickCount64_());
+                            const int  index = (std::rand() % stateCount);
+                            const auto& taskState = taskStates[index];
+
+                            discordState = taskState.strState;
+                            useZoneName = taskState.bUseZone;
+                        }                                       
+
+                        if (useZoneName)
+                        {
+                            discordState.append(" " + zoneName);
+                        }
+
+                        discord->SetPresenceState(discordState.c_str(), false);
+                    }
+                }
+                else
+                {
+                    discord->SetPresenceState(_("In-game"), false);
+                }
+
+                discord->SetPresencePartySize(m_pPlayerManager->Count(), g_pClientGame->GetServerInfo()->GetMaxPlayers(), false);
+                m_timeLastDiscordStateUpdate = ticks;
+            }
         }
 
         CClientPerfStatManager::GetSingleton()->DoPulse();
@@ -5560,6 +5688,18 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             // Send the packet
             g_pNet->SendPacket(PACKET_ID_PLAYER_WASTED, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
+
+            const auto discord = g_pCore->GetDiscord();
+            if (discord && discord->IsDiscordRPCEnabled() && discord->IsDiscordCustomDetailsDisallowed())
+            {
+                static const std::vector<std::string> states{
+                    _("In a ditch"), _("En-route to hospital"), _("Meeting their maker"),
+                    _("Regretting their decisions"), _("Wasted")
+                };
+
+                const std::string& state = states[rand() % states.size()];
+                discord->SetPresenceState(state.c_str(), false);
+            }
         }
     }
 }

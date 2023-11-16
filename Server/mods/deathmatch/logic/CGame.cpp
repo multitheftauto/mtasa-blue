@@ -58,6 +58,7 @@
 #include "packets/CPlayerNetworkStatusPacket.h"
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
+#include "packets/CServerInfoSyncPacket.h"
 #include "../utils/COpenPortsTester.h"
 #include "../utils/CMasterServerAnnouncer.h"
 #include "../utils/CHqComms.h"
@@ -1308,7 +1309,7 @@ void CGame::JoinPlayer(CPlayer& Player)
     Player.Send(CPlayerJoinCompletePacket(
         Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(), m_pMainConfig->GetHTTPPort(),
         m_pMainConfig->GetHTTPDownloadURL().c_str(), m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
-        m_pMainConfig->IsVoiceEnabled(), m_pMainConfig->GetVoiceSampleRate(), m_pMainConfig->GetVoiceQuality(), m_pMainConfig->GetVoiceBitrate()));
+        m_pMainConfig->IsVoiceEnabled(), m_pMainConfig->GetVoiceSampleRate(), m_pMainConfig->GetVoiceQuality(), m_pMainConfig->GetVoiceBitrate(), m_pMainConfig->GetServerName().c_str()));
 
     marker.Set("CPlayerJoinCompletePacket");
 
@@ -1582,6 +1583,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
+    m_Events.AddEvent("onPlayerProjectileCreation", "weaponType, posX, posY, posZ, force, target, rotX, rotY, rotZ, velX, velY, velZ", nullptr, false);
+    m_Events.AddEvent("onPlayerDetonateSatchels", "", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -1809,6 +1812,8 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetSerial(strSerial, 0);
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
+
+                            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
 
                             // Check if client must update
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
@@ -2290,6 +2295,11 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         if ((pPlayer->GetPuresyncCount() % 4) == 0)
             pPlayer->Send(CReturnSyncPacket(pPlayer));
 
+        // Send a server info sync packet to the player
+        // Only every 512 packets
+        if ((pPlayer->GetPuresyncCount() % 512) == 0)
+            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
+
         CLOCK("PlayerPuresync", "RelayPlayerPuresync");
         // Relay to other players
         RelayPlayerPuresync(Packet);
@@ -2618,6 +2628,11 @@ void CGame::Packet_DetonateSatchels(CDetonateSatchelsPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        // Trigger Lua event and see if we are allowed to continue
+        CLuaArguments arguments;
+        if (!pPlayer->CallEvent("onPlayerDetonateSatchels", arguments))
+            return;
+
         // Tell everyone to blow up this guy's satchels
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
@@ -2770,6 +2785,29 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
             if (pOriginSource)
                 vecPosition += pOriginSource->GetPosition();
         }
+
+        CLuaArguments arguments;
+        arguments.PushNumber(Packet.m_ucWeaponType); // "weaponType"
+        arguments.PushNumber(vecPosition.fX); // "posX"
+        arguments.PushNumber(vecPosition.fY); // "posY"
+        arguments.PushNumber(vecPosition.fZ); // "posZ"
+        arguments.PushNumber(Packet.m_fForce); // "force"
+
+        CElement* pTarget = nullptr;
+        if (Packet.m_bHasTarget && Packet.m_TargetID != INVALID_ELEMENT_ID)
+            pTarget = CElementIDs::GetElement(Packet.m_TargetID);
+
+        arguments.PushElement(pTarget); // "target"
+        arguments.PushNumber(Packet.m_vecRotation.fX); // "rotX"
+        arguments.PushNumber(Packet.m_vecRotation.fY); // "rotY"
+        arguments.PushNumber(Packet.m_vecRotation.fZ); // "rotZ"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fX); // "velX"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fY); // "velY"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fZ); // "velZ"
+
+        // Trigger Lua event and see if we are allowed to continue
+        if (!pPlayer->CallEvent("onPlayerProjectileCreation", arguments))
+            return;
 
         // Make a list of players to send this packet to
         CSendList sendList;

@@ -536,6 +536,10 @@ enum class eBitStreamVersion : unsigned short
     // 2023-09-09
     WorldSpecialProperty_FireballDestruct,
 
+    // Send server name to player in CPlayerJoinCompletePacket
+    // 2023-10-12
+    CPlayerJoinCompletePacket_ServerName,
+
     // Add support for query args on mtasa:// protocol
     // 2023-10-15
     CPlayerJoinDataPacket_ProtocolConnectArgs,
