@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-11 12:22+0000\n"
-"PO-Revision-Date: 2023-11-16 22:21\n"
+"PO-Revision-Date: 2023-11-16 23:23\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -346,7 +346,7 @@ msgstr "قطع الاتصال"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr "قيادة جسم طائر مجهول حول"
+msgstr "يقود جسم طائر مجهول حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
@@ -374,15 +374,15 @@ msgstr "يقود شاحنة الوحش حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr "قيادة دراجة رباعية حول"
+msgstr "يقود دراجة رباعية حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr "القفز كالأرنب حول"
+msgstr "يقفز كالأرنب حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr "القيام بأشياء غريبة في"
+msgstr "يقوم بأشياء غريبة في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
@@ -391,7 +391,7 @@ msgstr "التسلق في"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr "إطلاق نار من مركبة متحركة في"
+msgstr "يطلق نار من مركبة متحركة في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
@@ -427,7 +427,7 @@ msgstr "يطلق على"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr "ركوب الجت باك في"
+msgstr "يركب الجت باك في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
@@ -451,7 +451,7 @@ msgstr "تتم مطاردته من قبل سمك القرش"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr "اختناق حتى الموت في"
+msgstr "يختنق حتى الموت في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 #: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
@@ -627,7 +627,7 @@ msgstr "في الطريق إلى المستشفى"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr "التعرف على صانعهم"
+msgstr "يتعرف على صانعهم"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
