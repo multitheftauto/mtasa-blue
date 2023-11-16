@@ -3446,7 +3446,7 @@ bool CStaticFunctionDefinitions::SetPlayerBlurLevel(CElement* pElement, unsigned
     return false;
 }
 
-bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword)
+bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* szHost, unsigned short usPort, const char* szPassword, const char* szArgs)
 {
     if (IS_PLAYER(pElement))
     {
@@ -3457,10 +3457,19 @@ bool CStaticFunctionDefinitions::RedirectPlayer(CElement* pElement, const char* 
 
         unsigned char ucHostLength = static_cast<unsigned char>(strlen(szHost));
 
+        if (strlen(szPassword) == 0)
+            szPassword = nullptr;
+
         CBitStream BitStream;
         BitStream.pBitStream->Write(ucHostLength);
         BitStream.pBitStream->Write(szHost, ucHostLength);
         BitStream.pBitStream->Write(usPort);
+        if (pPlayer->CanBitStream(eBitStreamVersion::CPlayerJoinDataPacket_ProtocolConnectArgs))
+        {
+            unsigned char ucArgsLength = static_cast<unsigned char>(strlen(szArgs));
+            BitStream.pBitStream->Write(ucArgsLength);
+            BitStream.pBitStream->Write(szArgs, ucArgsLength);
+        }
         if (szPassword)
         {
             unsigned char ucPasswordLength = static_cast<unsigned char>(strlen(szPassword));

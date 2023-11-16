@@ -61,7 +61,6 @@ public:
     LUA_DECLARE(SetPlayerNametagShowing);
     LUA_DECLARE(SetPlayerMuted);
     LUA_DECLARE(SetPlayerBlurLevel);
-    LUA_DECLARE(RedirectPlayer);
     LUA_DECLARE(SetPlayerName);
     LUA_DECLARE(DetonateSatchels);
     LUA_DECLARE(TakePlayerScreenShot);
@@ -101,4 +100,7 @@ public:
     // Admin funcs
     LUA_DECLARE(KickPlayer);
     LUA_DECLARE(BanPlayer);
+
+    static bool RedirectPlayer(CPlayer* pElement, std::string strHost, unsigned short usPort, std::optional<std::string> strPassword,
+                               std::optional<std::unordered_map<std::string, std::string>> mArgs);
 };

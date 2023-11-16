@@ -1735,7 +1735,10 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
         pPlayer->SetBitStreamVersion(Packet.GetBitStreamVersion());
         g_pNetServer->SetClientBitStreamVersion(Packet.GetSourceSocket(), Packet.GetBitStreamVersion());
 
-        pPlayer->SetProtocolConnectArgs(std::move(Packet.GetProtocolConnectArgs()));
+        const char* connectArgs = Packet.GetConnectArgs();
+
+        if (std::strlen(connectArgs) > 0)
+            pPlayer->SetConnectArgs(std::move(Packet.GetConnectArgs()));
 
         // Get the serial number from the packet source
         NetServerPlayerID p = Packet.GetSourceSocket();
@@ -4252,7 +4255,7 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     Arguments.PushNumber(pPlayer->GetMTAVersion());
     Arguments.PushString(pPlayer->GetPlayerVersion());
 
-    auto vecArgs = SharedUtil::Explode(pPlayer->GetProtocolConnectArgs(), '/');
+    auto vecArgs = SharedUtil::Explode(pPlayer->GetConnectArgs(), '/');
 
     if (vecArgs.size() > 1)
     {
@@ -4264,6 +4267,7 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     }
 
     Arguments.PushTable(&ProtocolConnectArgs);
+    pPlayer->SetConnectArgs("");
 
     if (!g_pGame->GetMapManager()->GetRootElement()->CallEvent("onPlayerConnect", Arguments))
     {

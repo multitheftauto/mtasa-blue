@@ -72,7 +72,10 @@
 #define MAX_BAN_RESPONSIBLE_LENGTH 30
 
 // Max args length when connecting via mtasa:// protocol
-#define MAX_PROTOCOL_CONNECT_ARGS_LENGTH 1024
+#define MAX_CONNECT_ARGS_LENGTH 1024
+
+// Max length of details via redirectPlayer
+#define MAX_REDIRECT_DETAILS_LENGTH 1024
 
 // Couple of defines to ensure proper configuration
 #if MAX_CHAT_LENGTH > 255

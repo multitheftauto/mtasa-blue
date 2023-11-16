@@ -27,12 +27,12 @@ bool CPlayerJoinDataPacket::Read(NetBitStreamInterface& BitStream)
 
     if (BitStream.Read(m_ucGameVersion) && BitStream.ReadStringCharacters(m_strNick, MAX_PLAYER_NICK_LENGTH) &&
         BitStream.Read(reinterpret_cast<char*>(&m_Password), 16) && BitStream.ReadStringCharacters(m_strSerialUser, MAX_SERIAL_LENGTH) &&
-        BitStream.ReadStringCharacters(m_strProtocolConnectArgs, MAX_PROTOCOL_CONNECT_ARGS_LENGTH))
+        BitStream.ReadStringCharacters(m_strConnectArgs, MAX_CONNECT_ARGS_LENGTH))
     {
         // Shrink string sizes to fit
         m_strNick = *m_strNick;
         m_strSerialUser = *m_strSerialUser;
-        m_strProtocolConnectArgs = *m_strProtocolConnectArgs;
+        m_strConnectArgs = *m_strConnectArgs;
 
         return true;
     }

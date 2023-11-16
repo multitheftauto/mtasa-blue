@@ -15,6 +15,7 @@
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
 #include "CKeyBinds.h"
+#include <numeric>
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -65,7 +66,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerNametagShowing", SetPlayerNametagShowing},
         {"setPlayerMuted", SetPlayerMuted},
         {"setPlayerBlurLevel", SetPlayerBlurLevel},
-        {"redirectPlayer", RedirectPlayer},
+        {"redirectPlayer", ArgumentParserWarn<false, RedirectPlayer>},
         {"setPlayerName", SetPlayerName},
         {"detonateSatchels", DetonateSatchels},
         {"takePlayerScreenShot", TakePlayerScreenShot},
@@ -1162,32 +1163,30 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::RedirectPlayer(lua_State* luaVM)
+bool CLuaPlayerDefs::RedirectPlayer(CPlayer* pElement, std::string strHost, unsigned short usPort, std::optional<std::string> strPassword,
+                                    std::optional<std::unordered_map<std::string, std::string>> mArgs)
 {
-    CPlayer*       pElement;
-    SString        strHost;
-    unsigned short usPort;
-    SString        strPassword;
+    std::string strDetails;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strHost);
-    argStream.ReadNumber(usPort);
-    argStream.ReadString(strPassword, "");
-
-    if (!argStream.HasErrors())
+    if (mArgs.has_value())
     {
-        if (CStaticFunctionDefinitions::RedirectPlayer(pElement, strHost, usPort, strPassword.empty() ? nullptr : *strPassword))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        auto args = mArgs.value();
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        // Convert table of strings ({["a"] = "1", ["b"] = "2"}) to string ("a/1/b/2")
+        const std::string delimiter = "/";
+        strDetails = std::accumulate(args.begin(), args.end(), std::string(),
+                                     [delimiter](const std::string& s, const std::pair<const std::string, std::string>& p)
+                                     { return s + (s.empty() ? std::string() : delimiter) + p.first + delimiter + p.second; });
+    }
+
+    if (strDetails.length() > MAX_REDIRECT_DETAILS_LENGTH)
+        throw std::invalid_argument("Details must be " + std::to_string(MAX_REDIRECT_DETAILS_LENGTH) + " characters or less");
+
+    if (CStaticFunctionDefinitions::RedirectPlayer(pElement, strHost.c_str(), usPort, strPassword.has_value() ? strPassword.value().c_str() : nullptr,
+                                                   strDetails.c_str()))
+        return true;
+
+    return false;
 }
 
 int CLuaPlayerDefs::TakePlayerMoney(lua_State* luaVM)

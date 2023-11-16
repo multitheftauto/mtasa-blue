@@ -228,7 +228,7 @@ void CInputRPCs::SetControlState(NetBitStreamInterface& bitStream)
 
 void CInputRPCs::ForceReconnect(NetBitStreamInterface& bitStream)
 {
-    unsigned char  ucHost, ucPassword;
+    unsigned char  ucHost, ucPassword, ucArgs;
     unsigned short usPort;
 
     if (bitStream.Read(ucHost))
@@ -240,6 +240,20 @@ void CInputRPCs::ForceReconnect(NetBitStreamInterface& bitStream)
 
         if (bitStream.Read(usPort))
         {
+            char* szArgs = new char[MAX_PROTOCOL_CONNECT_ARGS_LENGTH + 1];
+
+            if (g_pNet->CanServerBitStream(eBitStreamVersion::CPlayerJoinDataPacket_ProtocolConnectArgs))
+            {
+                if (bitStream.Read(ucArgs))
+                {
+                    szArgs[ucArgs] = NULL;
+                    bitStream.Read(szArgs, ucArgs);
+
+                    if (std::strlen(szArgs) > 0)
+                        g_pCore->SetProtocolConnectArgs(szArgs);
+                }
+            }
+
             if (bitStream.Read(ucPassword))
             {
                 char* szPassword = new char[ucPassword + 1];
