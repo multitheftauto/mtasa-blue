@@ -21,6 +21,21 @@ void SharedUtil_Collection_Tests();
 void SharedUtil_String_Tests();
 void SharedUtil_Hash_Tests();
 
+#ifdef MTA_CLIENT
+static const char* tempFilepath = SString("%s\\%s", GetMTATempPath().c_str(),
+                                          "hash_"
+                                          "\xD0"
+                                          "\x98"
+                                          "_test")
+                                      .c_str();
+#else
+static const char* tempFilepath =
+    "hash_"
+    "\xD0"
+    "\x98"
+    "_test";
+#endif
+
 ///////////////////////////////////////////////////////////////
 //
 // Run tests entry point
@@ -47,20 +62,21 @@ void SharedUtil_Tests()
 //
 ///////////////////////////////////////////////////////////////
 #define TEST_FUNCTION \
-        struct testStruct { \
-            void Test(int testIndex) \
-            { \
-                testStruct dataCopy = *this;    // Info when debugging
+    struct testStruct \
+    { \
+        void Test(int testIndex) \
+        { \
+            testStruct dataCopy = *this;            // Info when debugging
 
-#define TEST_VARS \
-            }
+#define TEST_VARS }
 
 #define TEST_DATA \
-        } testData[]
+    } \
+    testData[]
 
 #define TEST_END \
-        for (uint i = 0 ; i < NUMELMS(testData) ; i++) \
-            testData[i].Test(i);
+    for (uint i = 0; i < NUMELMS(testData); i++) \
+        testData[i].Test(i);
 
 ///////////////////////////////////////////////////////////////
 //
@@ -316,7 +332,7 @@ void SharedUtil_File_Tests()
         TEST_END
     }
 
-#endif  // WIN32
+#endif            // WIN32
 }
 
 ///////////////////////////////////////////////////////////////
@@ -946,8 +962,6 @@ void SharedUtil_Hash_Tests()
         TEST_END
     }
 
-    #define szTempFilename "hash_""\xD0""\x98""_test"
-
     // MD5
     {
         TEST_FUNCTION
@@ -957,8 +971,8 @@ void SharedUtil_Hash_Tests()
         strResult = GenerateHashHexString(EHashFunction::MD5, a);
         assert(strResult == result);
 
-        FileSave(szTempFilename, a);
-        strResult = GenerateHashHexStringFromFile(EHashFunction::MD5, szTempFilename);
+        FileSave(tempFilepath, a);
+        strResult = GenerateHashHexStringFromFile(EHashFunction::MD5, tempFilepath);
         assert(strResult == result);
         TEST_VARS
         const SString a;
@@ -977,8 +991,8 @@ void SharedUtil_Hash_Tests()
         SString strResult = GenerateSha256HexString(a);
         assert(strResult == result);
 
-        FileSave(szTempFilename, a);
-        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA256, szTempFilename);
+        FileSave(tempFilepath, a);
+        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA256, tempFilepath);
         assert(strResult == result);
         TEST_VARS
         const SString a;
@@ -997,8 +1011,8 @@ void SharedUtil_Hash_Tests()
         SString strResult = GenerateHashHexString(EHashFunction::SHA1, a);
         assert(strResult == result);
 
-        FileSave(szTempFilename, a);
-        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA1, szTempFilename);
+        FileSave(tempFilepath, a);
+        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA1, tempFilepath);
         assert(strResult == result);
         TEST_VARS
         const SString a;
@@ -1017,8 +1031,8 @@ void SharedUtil_Hash_Tests()
         SString strResult = GenerateHashHexString(EHashFunction::SHA224, a);
         assert(strResult == result);
 
-        FileSave(szTempFilename, a);
-        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA224, szTempFilename);
+        FileSave(tempFilepath, a);
+        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA224, tempFilepath);
         assert(strResult == result);
         TEST_VARS
         const SString a;
@@ -1037,8 +1051,8 @@ void SharedUtil_Hash_Tests()
         SString strResult = GenerateHashHexString(EHashFunction::SHA384, a);
         assert(strResult == result);
 
-        FileSave(szTempFilename, a);
-        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA384, szTempFilename);
+        FileSave(tempFilepath, a);
+        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA384, tempFilepath);
         assert(strResult == result);
         TEST_VARS
         const SString a;
@@ -1057,8 +1071,8 @@ void SharedUtil_Hash_Tests()
         SString strResult = GenerateHashHexString(EHashFunction::SHA512, a);
         assert(strResult == result);
 
-        FileSave(szTempFilename, a);
-        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA512, szTempFilename);
+        FileSave(tempFilepath, a);
+        strResult = GenerateHashHexStringFromFile(EHashFunction::SHA512, tempFilepath);
         assert(strResult == result);
         TEST_VARS
         const SString a;
@@ -1071,5 +1085,5 @@ void SharedUtil_Hash_Tests()
         TEST_END
     }
 
-    FileDelete(szTempFilename);
+    FileDelete(tempFilepath);
 }
