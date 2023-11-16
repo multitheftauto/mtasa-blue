@@ -22,18 +22,9 @@ void SharedUtil_String_Tests();
 void SharedUtil_Hash_Tests();
 
 #ifdef MTA_CLIENT
-static const char* tempFilepath = SString("%s\\%s", GetMTATempPath().c_str(),
-                                          "hash_"
-                                          "\xD0"
-                                          "\x98"
-                                          "_test")
-                                      .c_str();
+static const std::string tempFilepath = {std::string(GetMTATempPath()) + std::string("\\") + std::string("hash_\xD0\x98_test")};
 #else
-static const char* tempFilepath =
-    "hash_"
-    "\xD0"
-    "\x98"
-    "_test";
+static const std::string tempFilepath = {"hash_\xD0\x98_test"};
 #endif
 
 ///////////////////////////////////////////////////////////////
@@ -970,7 +961,17 @@ void SharedUtil_Hash_Tests()
 
         strResult = GenerateHashHexString(EHashFunction::MD5, a);
         assert(strResult == result);
-
+#ifdef MTA_CLIENT
+        auto        mta_temp_path = GetMTATempPath();
+        const char* filename =
+            "hash_"
+            "\xD0"
+            "\x98"
+            "_test";
+        std::string filenamestr = std::string("hash_\xD0\x98_test");
+        SString     filenamesstr = SString("%s\\%s", mta_temp_path, filenamestr);
+        std::string filepath = std::string(mta_temp_path) + std::string("\\") + filenamestr;
+#endif
         FileSave(tempFilepath, a);
         strResult = GenerateHashHexStringFromFile(EHashFunction::MD5, tempFilepath);
         assert(strResult == result);
