@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-11 12:22+0000\n"
-"PO-Revision-Date: 2023-11-16 23:23\n"
+"PO-Revision-Date: 2023-11-17 00:21\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -354,7 +354,7 @@ msgstr "يتجول حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr "ركوب الأمواج"
+msgstr "يركب أمواج"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
@@ -386,7 +386,7 @@ msgstr "يقوم بأشياء غريبة في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr "التسلق في"
+msgstr "يتسلق في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
@@ -415,11 +415,11 @@ msgstr "يقاتل في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
-msgstr "رمي القبضات في"
+msgstr "يرمي القبضات في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
-msgstr "تفجير الحمقى في"
+msgstr "يفجر الحمقى في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
@@ -431,7 +431,7 @@ msgstr "يركب الجت باك في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr "حرفياً يحترق في"
+msgstr "حرفيًا يحترق في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
@@ -443,7 +443,7 @@ msgstr "يسبح في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr "تطفو حولًا في"
+msgstr "يطفو في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
@@ -623,11 +623,11 @@ msgstr "داخل خندق"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
-msgstr "في الطريق إلى المستشفى"
+msgstr "في طريقه إلى المستشفى"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr "يتعرف على صانعهم"
+msgstr "يتعرف على صانعه"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
@@ -635,7 +635,7 @@ msgstr "يندم على قراراته"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
-msgstr "مات"
+msgstr "ميت"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
