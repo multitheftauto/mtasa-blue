@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-11 12:22+0000\n"
-"PO-Revision-Date: 2023-11-11 12:24\n"
+"PO-Revision-Date: 2023-11-18 13:10\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -302,7 +302,7 @@ msgid_plural "%d days"
 msgstr[0] "%d день"
 msgstr[1] "%d дня"
 msgstr[2] "%d днів"
-msgstr[3] ""
+msgstr[3] "%d днів"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
@@ -311,7 +311,7 @@ msgid_plural "%d hours"
 msgstr[0] "%d година"
 msgstr[1] "%d годин"
 msgstr[2] "%d години"
-msgstr[3] ""
+msgstr[3] "%d годин"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
@@ -320,7 +320,7 @@ msgid_plural "%d minutes"
 msgstr[0] "%d хвилина"
 msgstr[1] "%d хвилин"
 msgstr[2] "%d хвилини"
-msgstr[3] ""
+msgstr[3] "%d хвилин"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
@@ -329,7 +329,7 @@ msgid_plural "%d seconds"
 msgstr[0] "%d секунда"
 msgstr[1] "%d секунд"
 msgstr[2] "%d секунди"
-msgstr[3] ""
+msgstr[3] "%d секунд"
 
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
@@ -3142,7 +3142,7 @@ msgid_plural "players"
 msgstr[0] "гравець"
 msgstr[1] "гравців"
 msgstr[2] "гравців"
-msgstr[3] ""
+msgstr[3] "гравців"
 
 #: Client/core/ServerBrowser/CServerList.cpp:151
 msgid "on"
