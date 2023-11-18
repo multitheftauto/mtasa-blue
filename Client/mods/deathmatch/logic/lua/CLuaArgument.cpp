@@ -371,6 +371,42 @@ CClientEntity* CLuaArgument::GetElement() const
     return CElementIDs::GetElement(ID);
 }
 
+bool CLuaArgument::GetAsString(SString& strBuffer) const
+{
+    switch (m_iType)
+    {
+        case LUA_TNIL:
+            strBuffer = "nil";
+            break;
+        case LUA_TBOOLEAN:
+            if (m_bBoolean)
+                strBuffer = "true";
+            else
+                strBuffer = "false";
+            break;
+        case LUA_TTABLE:
+            return false;
+            break;
+        case LUA_TSTRING:
+            strBuffer = m_strString;
+            break;
+        case LUA_TUSERDATA:
+            return false;
+            break;
+        case LUA_TNUMBER:
+            if (m_Number == static_cast<int>(m_Number))
+                strBuffer = SString("%d", static_cast<int>(m_Number));
+            else
+                strBuffer = SString("%f", m_Number);
+
+            break;
+        default:
+            return false;
+            break;
+    }
+    return true;
+}
+
 void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
 {
     // WARNING:
