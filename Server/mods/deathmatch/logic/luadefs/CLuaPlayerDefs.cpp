@@ -1171,9 +1171,11 @@ bool CLuaPlayerDefs::RedirectPlayer(CPlayer* pElement, std::string strHost, unsi
 
     if (mArgs.has_value())
     {
-        auto& mapArgs = mArgs.value();
-        auto& strArgs = ArgMapToStringMap(mapArgs);
-        strDetails = StringMapToArgString(strArgs);
+        const auto argMap = mArgs.value(); // we have to make a copy
+        mArgs.reset();
+
+        auto strMap = ArgMapToStringMap(argMap);
+        strDetails = StringMapToArgString(strMap);
     }
 
     if (strDetails.length() > MAX_REDIRECT_DETAILS_LENGTH)
