@@ -69,7 +69,7 @@ private:
 
     std::optional<std::tuple<std::pair<std::string, std::string>, std::pair<std::string, std::string>>> m_aButtons;
 
-    std::mutex    m_mutexThread;
+    std::mutex m_threadSafetyMutex;
 
     unsigned long m_uiDiscordAppStart;
     unsigned long m_uiDiscordAppEnd;

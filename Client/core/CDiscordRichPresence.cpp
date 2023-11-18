@@ -36,7 +36,7 @@ CDiscordRichPresence::~CDiscordRichPresence()
 
 void CDiscordRichPresence::InitializeDiscord()
 {
-    std::lock_guard<std::mutex> lock(m_mutexThread);
+    std::lock_guard<std::mutex> lock(m_threadSafetyMutex);
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
 
@@ -106,7 +106,7 @@ void CDiscordRichPresence::UpdatePresence()
     if (!m_bUpdateRichPresence)
         return;
 
-    std::lock_guard<std::mutex> lock(m_mutexThread);
+    std::lock_guard<std::mutex> lock(m_threadSafetyMutex);
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
 
