@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-11 12:22+0000\n"
-"PO-Revision-Date: 2023-11-11 12:24\n"
+"PO-Revision-Date: 2023-11-18 19:11\n"
 "Last-Translator: \n"
 "Language-Team: Azerbaijani\n"
 "Language: az_AZ\n"
@@ -330,15 +330,15 @@ msgstr "Bağlantı kəsildi"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "Yaxınlıqda NUO uçurdur"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "Yaxınlıqda sülənir"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr ""
+msgstr "dalğalarında üzür"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
@@ -441,7 +441,7 @@ msgstr ""
 #: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
 #: Client/core/CCore.cpp:674
 msgid "Main menu"
-msgstr ""
+msgstr "Əsas menyu"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -526,7 +526,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
 msgid "In-game"
-msgstr ""
+msgstr "Oyunda"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
@@ -619,7 +619,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
-msgstr ""
+msgstr "Qəbərdi"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -1979,7 +1979,7 @@ msgstr "Həmişə yükləmə pəncərəsini göstər"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Discord Rich Presence ilə əlaqə yaratmağa icazə verin"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
