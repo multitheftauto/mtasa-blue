@@ -586,3 +586,7 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
 //
 bool IsWeaponPropertyFlag(eWeaponProperty weaponProperty);
 uint GetWeaponPropertyFlagBit(eWeaponProperty weaponProperty);
+
+
+std::unordered_map<std::string, std::string> ArgMapToStringMap(const std::unordered_map<CLuaArgument, CLuaArgument, CLuaArgument::Hash>& argMap);
+std::string                                  StringMapToArgString(const std::unordered_map<std::string, std::string>& strMap);

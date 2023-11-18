@@ -586,9 +586,9 @@ void MinServerReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         {
             if (pResource->GetMinServerRequirement() < szVersionReq)
             {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
                 argStream.SetVersionWarning(szVersionReq, "server", szReason);
-                #endif
+#endif
             }
         }
     }
@@ -812,4 +812,40 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
         argStream.SetCustomError(
             SString("Database credentials protection denied resource %s to access %s", *pThisResource->GetName(), *pOtherResource->GetName()), "Access denied");
     }
+}
+
+std::unordered_map<std::string, std::string> ArgMapToStringMap(const std::unordered_map<CLuaArgument, CLuaArgument, CLuaArgument::Hash>& argMap)
+{
+    std::unordered_map<std::string, std::string> stringMap;
+
+    for (auto& [k, value] : argMap)
+    {
+        CLuaArgument key = k;            // make a copy due to GetAsString not working with const
+
+        SString keystr, valuestr;
+        if (!key.GetAsString(keystr) || !value.GetAsString(valuestr))
+            continue;
+
+        stringMap.emplace(keystr, valuestr);
+    }
+
+    return stringMap;
+}
+
+std::string StringMapToArgString(const std::unordered_map<std::string, std::string>& strMap)
+{
+    std::string path;
+
+    for (auto& [k, v] : strMap)
+    {
+        std::string key = k;
+        std::string value = v;
+
+        key.erase(std::remove(key.begin(), key.end(), '/'), key.end());
+        value.erase(std::remove(value.begin(), value.end(), '/'), value.end());
+
+        path += (path.empty() ? std::string{} : "/") + key + "/" + value;
+    }
+
+    return path;
 }

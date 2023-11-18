@@ -285,7 +285,7 @@ IMPLEMENT_ENUM_BEGIN(ERenderFormat)
 ADD_ENUM(RFORMAT_UNKNOWN, "unknown")
 ADD_ENUM(RFORMAT_ARGB, "argb")
 ADD_ENUM(RFORMAT_XRGB, "xrgb")
-ADD_ENUM(RFORMAT_RGB,  "rgb")
+ADD_ENUM(RFORMAT_RGB, "rgb")
 ADD_ENUM(RFORMAT_DXT1, "dxt1")
 ADD_ENUM(RFORMAT_DXT2, "dxt2")
 ADD_ENUM(RFORMAT_DXT3, "dxt3")
@@ -456,11 +456,11 @@ IMPLEMENT_ENUM_BEGIN(eFontQuality)
 ADD_ENUM(FONT_QUALITY_DEFAULT, "default")
 ADD_ENUM(FONT_QUALITY_DRAFT, "draft")
 ADD_ENUM(FONT_QUALITY_PROOF, "proof")
-#if( WINVER >= 0x0400 )
+#if (WINVER >= 0x0400)
 ADD_ENUM(FONT_QUALITY_NONANTIALIASED, "nonantialiased")
 ADD_ENUM(FONT_QUALITY_ANTIALIASED, "antialiased")
 #endif
-#if( _WIN32_WINNT >= _WIN32_WINNT_WINXP )
+#if (_WIN32_WINNT >= _WIN32_WINNT_WINXP)
 ADD_ENUM(FONT_QUALITY_CLEARTYPE, "cleartype")
 ADD_ENUM(FONT_QUALITY_CLEARTYPE_NATURAL, "cleartype_natural")
 #endif
@@ -1082,10 +1082,10 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         {
             if (pResource->GetMinClientReq() < szVersionReq)
             {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+#if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
                 if (szReason)
                     argStream.SetVersionWarning(szVersionReq, "client", szReason);
-                #endif
+#endif
                 return false;
             }
         }
@@ -1186,4 +1186,40 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
                                      bool* pbReadOnly)
 {
     // No operation on the client
+}
+
+std::unordered_map<std::string, std::string> ArgMapToStringMap(const std::unordered_map<CLuaArgument, CLuaArgument, CLuaArgument::Hash>& argMap)
+{
+    std::unordered_map<std::string, std::string> stringMap;
+
+    for (auto& [k, value] : argMap)
+    {
+        CLuaArgument key = k;            // make a copy due to GetAsString not working with const
+
+        SString keystr, valuestr;
+        if (!key.GetAsString(keystr) || !value.GetAsString(valuestr))
+            continue;
+
+        stringMap.emplace(keystr, valuestr);
+    }
+
+    return stringMap;
+}
+
+std::string StringMapToArgString(const std::unordered_map<std::string, std::string>& strMap)
+{
+    std::string path;
+
+    for (auto& [k, v] : strMap)
+    {
+        std::string key = k;
+        std::string value = v;
+
+        key.erase(std::remove(key.begin(), key.end(), '/'), key.end());
+        value.erase(std::remove(value.begin(), value.end(), '/'), value.end());
+
+        path += (path.empty() ? std::string{} : "/") + key + "/" + value;
+    }
+
+    return path;
 }
