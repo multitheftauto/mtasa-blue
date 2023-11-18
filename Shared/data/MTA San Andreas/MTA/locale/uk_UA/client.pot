@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-11 12:22+0000\n"
-"PO-Revision-Date: 2023-11-18 13:10\n"
+"PO-Revision-Date: 2023-11-18 14:10\n"
 "Last-Translator: \n"
 "Language-Team: Ukrainian\n"
 "Language: uk_UA\n"
@@ -449,7 +449,7 @@ msgstr ""
 #: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
 #: Client/core/CCore.cpp:674
 msgid "Main menu"
-msgstr ""
+msgstr "Головне меню"
 
 #. Show timeout message and disconnect
 #. Display an error, reset the error status and exit
@@ -524,7 +524,7 @@ msgstr "Запуск локального сервера ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr ""
+msgstr "Зона 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
@@ -534,7 +534,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
 msgid "In-game"
-msgstr ""
+msgstr "У грі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
@@ -611,7 +611,7 @@ msgstr "Перевірка клієнта MTA не вдалася!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
-msgstr ""
+msgstr "У кюветі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
@@ -862,11 +862,11 @@ msgstr "B - Альтернативна NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C — Стандартний Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D — Альтернативний Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -1248,7 +1248,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Копіювати файли MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
@@ -1305,7 +1305,7 @@ msgstr "Оновити налаштування сумісності"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "Невідомо"
 
 #: Client/loader/Install.cpp:272
 #, c-format
@@ -2204,11 +2204,11 @@ msgstr "Дим шин, тощо"
 
 #: Client/core/CSettings.cpp:816
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Динамічні тіні персонажів"
 
 #: Client/core/CSettings.cpp:820
 msgid "Motion blur"
-msgstr ""
+msgstr "Розмиття при русі"
 
 #: Client/core/CSettings.cpp:825
 msgid "Full Screen Minimize"
@@ -2885,7 +2885,7 @@ msgstr "показати графік продуктивності"
 
 #: Client/core/CCore.cpp:1425
 msgid "for developers: reload news"
-msgstr ""
+msgstr "для розробників: перезавантажити новини"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:124
 msgid "Could not initialize Direct3D9.\n\n"
@@ -3154,7 +3154,7 @@ msgid_plural "servers"
 msgstr[0] "сервері"
 msgstr[1] "серверах"
 msgstr[2] "серверах"
-msgstr[3] ""
+msgstr[3] "серверах"
 
 #. We are polling for the master server list (first pass)
 #: Client/core/ServerBrowser/CServerList.cpp:238
