@@ -36,6 +36,7 @@ CDiscordRichPresence::~CDiscordRichPresence()
 
 void CDiscordRichPresence::InitializeDiscord()
 {
+    std::lock_guard<std::mutex> lock(m_mutexThread);
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
 
@@ -93,12 +94,19 @@ void CDiscordRichPresence::SetDefaultData()
 
 void CDiscordRichPresence::UpdatePresence()
 {
+    if (!m_bDiscordRPCEnabled)
+        return;
+
     // run callbacks
     Discord_RunCallbacks();
 
+    if (!m_bConnected)
+        return;
+
     if (!m_bUpdateRichPresence)
         return;
-    
+
+    std::lock_guard<std::mutex> lock(m_mutexThread);
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
 
@@ -115,7 +123,7 @@ void CDiscordRichPresence::UpdatePresence()
     discordPresence.endTimestamp = m_uiDiscordAppEnd;
     discordPresence.instance = 0;
 
-    DiscordButton buttons[2];
+    DiscordButton buttons[2]{0};
     if (m_aButtons)
     {
         buttons[0].label = std::get<0>(*m_aButtons).first.c_str();
@@ -258,16 +266,6 @@ bool CDiscordRichPresence::SetDiscordRPCEnabled(bool bEnabled)
     return true;
 }
 
-bool CDiscordRichPresence::IsDiscordRPCEnabled() const
-{
-    return m_bDiscordRPCEnabled;
-}
-
-bool CDiscordRichPresence::IsDiscordCustomDetailsDisallowed() const
-{
-    return m_bDisallowCustomDetails;
-}
-
 void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax, bool bCustom)
 {
     if (bCustom)
@@ -306,9 +304,4 @@ void CDiscordRichPresence::HandleDiscordDisconnected(int iErrorCode, const char*
 void CDiscordRichPresence::HandleDiscordError(int iErrorCode, const char* szMessage)
 {
     WriteDebugEvent(SString("[DISCORD] Error: %s (error #%d)", szMessage, iErrorCode));
-}
-
-bool CDiscordRichPresence::IsDiscordClientConnected() const
-{
-    return m_bConnected;
 }
