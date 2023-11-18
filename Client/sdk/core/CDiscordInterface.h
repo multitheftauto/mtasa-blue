@@ -9,7 +9,7 @@
  *****************************************************************************/
 
 #pragma once
-//#define DISCORD_DISABLE_IO_THREAD
+#define DISCORD_DISABLE_IO_THREAD
 // Uncomment to use manuall refresh of discord connection
 // (important) Don't forget to write same in discord-rpc.h
 
