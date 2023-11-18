@@ -818,10 +818,8 @@ std::unordered_map<std::string, std::string> ArgMapToStringMap(const std::unorde
 {
     std::unordered_map<std::string, std::string> stringMap;
 
-    for (auto& [k, value] : argMap)
+    for (auto& [key, value] : argMap)
     {
-        CLuaArgument key = k;            // make a copy due to GetAsString not working with const
-
         SString keystr, valuestr;
         if (!key.GetAsString(keystr) || !value.GetAsString(valuestr))
             continue;
