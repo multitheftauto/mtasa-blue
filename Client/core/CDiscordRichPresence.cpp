@@ -51,9 +51,6 @@ void CDiscordRichPresence::InitializeDiscord()
 
 void CDiscordRichPresence::ShutdownDiscord()
 {
-    if (!m_bDiscordRPCEnabled)
-        return;
-
     Discord_ClearPresence();
     Discord_Shutdown();
 
@@ -62,9 +59,6 @@ void CDiscordRichPresence::ShutdownDiscord()
 
 void CDiscordRichPresence::RestartDiscord()
 {
-    if (!m_bDiscordRPCEnabled)
-        return;
-
     ShutdownDiscord();
     InitializeDiscord();
 }
