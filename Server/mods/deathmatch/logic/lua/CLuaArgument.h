@@ -15,7 +15,7 @@
 
 extern "C"
 {
-#include "lua.h"
+    #include "lua.h"
 }
 #include "../common/CBitStream.h"
 #include "json.h"
@@ -23,7 +23,7 @@ extern "C"
 class CElement;
 class CLuaArguments;
 
-#define LUA_TTABLEREF    9
+#define LUA_TTABLEREF 9
 #define LUA_TSTRING_LONG 10
 
 class CLuaArgument
@@ -56,7 +56,7 @@ public:
     const std::string& GetString() { return m_strString; };
     void*              GetUserData() const { return m_pUserData; };
     CElement*          GetElement() const;
-    bool               GetAsString(SString& strBuffer) const;
+    bool               GetAsString(SString& strBuffer);
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
@@ -65,19 +65,6 @@ public:
     char*        WriteToString(char* szBuffer, int length);
 
     bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
-
-    // Enables usage of std::unordered_map<CLuaArgument, CLuaArgument, CLuaArgument::Hash>
-    struct Hash
-    {
-        size_t operator()(const CLuaArgument& a) const
-        {
-            SString str;
-            if (!a.GetAsString(str))            // If we can't convert to a string, then use pointer address instead
-                str = std::to_string((unsigned long long)(void**)&a);
-
-            return std::hash<int>{}(a.GetType()) ^ (std::hash<std::string>{}(str) << 1);
-        }
-    };
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;

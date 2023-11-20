@@ -367,7 +367,7 @@ CElement* CLuaArgument::GetElement() const
     return CElementIDs::GetElement(ID);
 }
 
-bool CLuaArgument::GetAsString(SString& strBuffer) const
+bool CLuaArgument::GetAsString(SString& strBuffer)
 {
     switch (m_iType)
     {
