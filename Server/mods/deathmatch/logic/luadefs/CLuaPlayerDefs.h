@@ -102,5 +102,5 @@ public:
     LUA_DECLARE(BanPlayer);
 
     static bool RedirectPlayer(CPlayer* pElement, std::string strHost, unsigned short usPort, std::optional<std::string> strPassword,
-                               std::optional<std::unordered_map<CLuaArgument, CLuaArgument, CLuaArgument::Hash>> mArgs);
+                               std::optional<std::unordered_map<std::string, std::string>> mArgs);
 };

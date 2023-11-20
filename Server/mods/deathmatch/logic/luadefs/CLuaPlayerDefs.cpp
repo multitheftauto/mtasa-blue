@@ -16,7 +16,6 @@
 #include "CScriptArgReader.h"
 #include "CKeyBinds.h"
 #include <numeric>
-#include <algorithm>
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -1165,17 +1164,19 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
 }
 
 bool CLuaPlayerDefs::RedirectPlayer(CPlayer* pElement, std::string strHost, unsigned short usPort, std::optional<std::string> strPassword,
-                                    std::optional<std::unordered_map<CLuaArgument, CLuaArgument, CLuaArgument::Hash>> mArgs)
+                                    std::optional<std::unordered_map<std::string, std::string>> mArgs)
 {
     std::string strDetails;
 
     if (mArgs.has_value())
     {
-        const auto argMap = mArgs.value(); // we have to make a copy
-        mArgs.reset();
+        auto args = mArgs.value();
 
-        auto strMap = ArgMapToStringMap(argMap);
-        strDetails = StringMapToArgString(strMap);
+        // Convert table of strings ({["a"] = "1", ["b"] = "2"}) to string ("a/1/b/2")
+        const std::string delimiter = "/";
+        strDetails = std::accumulate(args.begin(), args.end(), std::string(),
+                                     [delimiter](const std::string& s, const std::pair<const std::string, std::string>& p)
+                                     { return s + (s.empty() ? std::string() : delimiter) + p.first + delimiter + p.second; });
     }
 
     if (strDetails.length() > MAX_REDIRECT_DETAILS_LENGTH)
