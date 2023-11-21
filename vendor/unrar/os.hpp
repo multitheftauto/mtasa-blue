@@ -4,10 +4,6 @@
 #define FALSE 0
 #define TRUE  1
 
-#ifdef __EMX__
-  #define INCL_BASE
-#endif
-
 #if defined(RARDLL) && !defined(SILENT)
 #define SILENT
 #endif
@@ -15,14 +11,12 @@
 #include <new>
 #include <string>
 #include <vector>
+#include <memory> // For automatic pointers.
 
-
-#if defined(_WIN_ALL) || defined(_EMX)
-
-#define LITTLE_ENDIAN
-#define NM  2048
 
 #ifdef _WIN_ALL
+
+#define LITTLE_ENDIAN
 
 
 // We got a report that just "#define STRICT" is incompatible with
@@ -70,28 +64,23 @@
 #include <wchar.h>
 #include <wctype.h>
 
+// For WMI requests.
+#include <comdef.h>
+#include <Wbemidl.h>
+#pragma comment(lib, "wbemuuid.lib")
 
-#endif // _WIN_ALL
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dos.h>
+#include <direct.h>
+#include <intrin.h>
 
-#if !defined(_EMX) && !defined(_MSC_VER)
-  #include <dir.h>
+// Use SSE only for x86/x64, not ARM Windows.
+#if defined(_M_IX86) || defined(_M_X64)
+  #define USE_SSE
+  #define SSE_ALIGNMENT 16
 #endif
-#ifdef _MSC_VER
-  #include <direct.h>
-  #include <intrin.h>
-
-  // Use SSE only for x86/x64, not ARM Windows.
-  #if defined(_M_IX86) || defined(_M_X64)
-    #define USE_SSE
-    #define SSE_ALIGNMENT 16
-  #endif
-#else
-  #include <dirent.h>
-#endif // _MSC_VER
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -113,7 +102,7 @@
 
 
 #define SPATHDIVIDER L"\\"
-#define CPATHDIVIDER '\\'
+#define CPATHDIVIDER L'\\'
 #define MASKALL      L"*"
 
 #define READBINARY   "rb"
@@ -123,24 +112,12 @@
 #define WRITEBINARY  "wb"
 #define APPENDTEXT   "at"
 
-#if defined(_WIN_ALL)
-  #ifdef _MSC_VER
-    #define _stdfunction __cdecl
-    #define _forceinline __forceinline
-  #else
-    #define _stdfunction _USERENTRY
-    #define _forceinline inline
-  #endif
-#else
-  #define _stdfunction
-  #define _forceinline inline
-#endif
+#define _stdfunction __cdecl
+#define _forceinline __forceinline
 
-#endif // defined(_WIN_ALL) || defined(_EMX)
+#endif // _WIN_ALL
 
 #ifdef _UNIX
-
-#define NM  2048
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -149,7 +126,7 @@
 #if defined(__QNXNTO__)
   #include <sys/param.h>
 #endif
-#if defined(RAR_SMP) && defined(__APPLE__)
+#ifdef _APPLE
   #include <sys/sysctl.h>
 #endif
 #ifndef SFX_MODULE
@@ -172,6 +149,23 @@
 #include <utime.h>
 #include <locale.h>
 
+#ifdef __GNUC__
+  #if defined(__i386__) || defined(__x86_64__)
+    #include <x86intrin.h>
+    
+    #define USE_SSE
+    #define SSE_ALIGNMENT 16
+  #endif
+#endif
+
+#if defined(__aarch64__) && defined(__ARM_FEATURE_CRYPTO)
+#include <arm_neon.h>
+#ifndef _APPLE
+#include <sys/auxv.h>
+#include <asm/hwcap.h>
+#endif
+#define USE_NEON // Neon SIMD instructions for AArch64 version.
+#endif
 
 #ifdef  S_IFLNK
 #define SAVE_LINKS
@@ -189,7 +183,7 @@
 
 
 #define SPATHDIVIDER L"/"
-#define CPATHDIVIDER '/'
+#define CPATHDIVIDER L'/'
 #define MASKALL      L"*"
 
 #define READBINARY   "r"
@@ -237,8 +231,6 @@
   #define SSE_ALIGNMENT 1
 #endif
 
-#define safebuf static
-
 // Solaris defines _LITTLE_ENDIAN or _BIG_ENDIAN.
 #if defined(_LITTLE_ENDIAN) && !defined(LITTLE_ENDIAN)
   #define LITTLE_ENDIAN
@@ -269,8 +261,8 @@
   #endif
 #endif
 
-#if !defined(BIG_ENDIAN) && defined(_WIN_ALL) || defined(__i386__) || defined(__x86_64__)
-// Allow not aligned integer access, increases speed in some operations.
+#if !defined(BIG_ENDIAN) && defined(_WIN_ALL) || defined(__i386__) || defined(__x86_64__) || defined(__aarch64__)
+// Allow unaligned integer access, increases speed in some operations.
 #define ALLOW_MISALIGNED
 #endif
 
