@@ -6,6 +6,2432 @@
 
                                   Changelog
 
+Version 8.4.0 (11 Oct 2023)
+
+Daniel Stenberg (11 Oct 2023)
+
+- RELEASE-NOTES: synced
+
+- THANKS: add contributors from 8.4.0
+
+Jay Satiro (11 Oct 2023)
+
+- socks: return error if hostname too long for remote resolve
+
+  Prior to this change the state machine attempted to change the remote
+  resolve to a local resolve if the hostname was longer than 255
+  characters. Unfortunately that did not work as intended and caused a
+  security issue.
+
+  Bug: https://curl.se/docs/CVE-2023-38545.html
+
+Stefan Eissing (10 Oct 2023)
+
+- CI: remove slowed-network tests
+
+  - remove these tests as they are currently not reliable in our CI
+    setups.
+
+  curl handles the test cases, but CI sometimes fails on these due to
+  additional conditions. Rather than mix them in, an additional CI job
+  will be added in the future that is specific to them.
+
+  Closes https://github.com/curl/curl/pull/12075
+
+Jay Satiro (10 Oct 2023)
+
+- libcurl-env-dbg.3: move debug variables from libcurl-env.3
+
+  - Move documentation of libcurl environment variables used only in debug
+    builds from libcurl-env into a separate document libcurl-env-dbg.
+
+  - Document more debug environment variables.
+
+  Previously undocumented or missing a description:
+
+  CURL_ALTSVC_HTTP, CURL_DBG_SOCK_WBLOCK, CURL_DBG_SOCK_WPARTIAL,
+  CURL_DBG_QUIC_WBLOCK, CURL_DEBUG, CURL_DEBUG_SIZE, CURL_GETHOSTNAME,
+  CURL_HSTS_HTTP, CURL_FORCETIME, CURL_SMALLREQSEND, CURL_SMALLSENDS,
+  CURL_TIME.
+
+  Closes https://github.com/curl/curl/pull/11811
+
+Dan Fandrich (9 Oct 2023)
+
+- test670: increase the test timeout
+
+  This should make it more immune to loaded servers.
+
+  Ref: #11328
+
+Stefan Eissing (9 Oct 2023)
+
+- MQTT: improve receive of ACKs
+
+  - add `mq->recvbuf` to provide buffering of incomplete
+    ACK responses
+  - continue ACK reading until sufficient bytes available
+  - fixes test failures on low network receives
+
+  Closes #12071
+
+Viktor Szakats (9 Oct 2023)
+
+- quic: fix BoringSSL build
+
+  Add guard around `SSL_CTX_set_ciphersuites()` use.
+
+  Bug: https://github.com/curl/curl/pull/12065#issuecomment-1752171885
+
+  Follow-up to aa9a6a177017e4b74d33cdf85a3594900f4a7f81
+
+  Co-authored-by: Jay Satiro
+  Reviewed-by: Daniel Stenberg
+  Closes #12067
+
+Stefan Eissing (9 Oct 2023)
+
+- test1540: improve reliability
+
+  - print that bytes have been received on pausing, but not how many
+
+  Closes #12069
+
+- test2302: improve reliability
+
+  - make result print collected write data, unless
+    change in meta flags is detected
+  - will show same result even when data arrives via
+    several writecb invocations
+
+  Closes #12068
+
+Daniel Stenberg (9 Oct 2023)
+
+- curl_easy_pause: set "in callback" true on exit if true
+
+  Because it might have called another callback in the mean time that then
+  set the bit FALSE on exit.
+
+  Reported-by: Jay Satiro
+  Fixes #12059
+  Closes #12061
+
+Viktor Szakats (8 Oct 2023)
+
+- h3: add support for ngtcp2 with AWS-LC builds
+
+  ```
+  curl 8.4.0-DEV (x86_64-apple-darwin) libcurl/8.4.0-DEV (SecureTransport) AWS-
+  LC/1.15.0 nghttp2/1.56.0 ngtcp2/0.19.1 nghttp3/0.15.0
+  Release-Date: [unreleased]
+  Protocols: dict file ftp ftps gopher gophers http https imap imaps ldap ldaps
+   mqtt pop3 pop3s rtsp smb smbs smtp smtps telnet tftp ws wss
+  Features: alt-svc AsynchDNS HSTS HTTP2 HTTP3 HTTPS-proxy IPv6 Largefile Multi
+  SSL NTLM SSL threadsafe UnixSockets
+  ```
+
+  Also delete an obsolete GnuTLS TODO and update the header comment in
+  `FindNGTCP2.cmake`.
+
+  Reviewed-by: Daniel Stenberg
+  Closes #12066
+
+- build: do not publish `HAVE_BORINGSSL`, `HAVE_AWSLC` macros
+
+  Syncing this up with CMake.
+
+  Source code uses the built-in `OPENSSL_IS_AWSLC` and
+  `OPENSSL_IS_BORINSSL` macros to detect BoringSSL and AWS-LC. No help is
+  necessary from the build tools.
+
+  The one use of `HAVE_BORINGSSL` in the source turned out to be no longer
+  necessary for warning-free BoringSSL + Schannel builds. Ref: #1610 #2634
+
+  autotools detects this anyway for display purposes.
+  CMake detects this to decide whether to use the BoringSSL-specific
+  crypto lib with ngtcp2. It detects AWS-LC, but doesn't use the detection
+  result just yet (planned in #12066).
+
+  Ref: #11964
+
+  Reviewed-by: Daniel Stenberg
+  Reviewed-by: Jay Satiro
+  Closes #12065
+
+Marc Hoersken (8 Oct 2023)
+
+- CI: move distcheck job from Azure Pipelines to GitHub Actions
+
+  This will allow for more trigger excludes within Azure Pipelines.
+
+  Also fixes seemingly broken check with scripts/installcheck.sh.
+  Ref: 190374c74ec4e5247d9066544c86e8d095e1d7b5
+
+  Assisted-by: Philip Heiduck
+  Closes #9532
+
+Daniel Stenberg (8 Oct 2023)
+
+- url: fall back to http/https proxy env-variable if ws/wss not set
+
+  Reported-by: Craig Andrews
+  Fixes #12031
+  Closes #12058
+
+Stefan Eissing (8 Oct 2023)
+
+- cf-socket: simulate slow/blocked receives in debug
+
+  add 2 env variables for non-UDP sockets:
+  1. CURL_DBG_SOCK_RBLOCK: percentage of receive calls that randomly
+     should return EAGAIN
+  2. CURL_DBG_SOCK_RMAX: max amount of bytes read from socket
+
+  Closes #12035
+
+- http2: refused stream handling for retry
+
+  - answer HTTP/2 streams refused via a GOAWAY from the server to
+    respond with CURLE_RECV_ERROR in order to trigger a retry
+    on another connection
+
+  Reported-by: black-desk on github
+  Ref #11859
+  Closes #12054
+
+Jay Satiro (8 Oct 2023)
+
+- CURLOPT_DEBUGFUNCTION.3: warn about internal handles
+
+  - Warn that the user's debug callback may be called with the handle
+    parameter set to an internal handle.
+
+  Without this warning the user may assume that the only handles their
+  debug callback receives are the easy handles on which they set
+  CURLOPT_DEBUGFUNCTION.
+
+  This is a follow-up to f8cee8cc which changed DoH handles to inherit
+  the debug callback function set in the user's easy handle. As a result
+  those handles are now passed to the user's debug callback function.
+
+  Closes https://github.com/curl/curl/pull/12034
+
+- url: fix typo
+
+Daniel Stenberg (8 Oct 2023)
+
+- test458: verify --expand-output, expanding a file name accepting option
+
+  Verifies the fix in #12055 (commit f2c8086ff15e6e995e1)
+
+- tool_getparam: accept variable expansion on file names too
+
+  Reported-by: PBudmark on github
+  Fixes #12048
+  Closes #12055
+
+- RELEASE-NOTES: synced
+
+- multi: do CURLM_CALL_MULTI_PERFORM at two more places
+
+  ... when it does a state transition but there is no particular socket or
+  timer activity. This was made apparent when commit b5bb84c removed a
+  superfluous timer expiry.
+
+  Reported-by: Dan Fandrich.
+  Fixes #12033
+  Closes #12056
+
+Viktor Szakats (7 Oct 2023)
+
+- GHA/linux: mbedtls 3.5.0 + minor dep bumps
+
+  Closes #12057
+
+Dan Fandrich (7 Oct 2023)
+
+- CI: bump OpenLDAP package version on FreeBSD
+
+  The old one is no longer available.
+
+Marc Hoersken (7 Oct 2023)
+
+- docs/libcurl/opts/Makefile.inc: add missing manpage files
+
+  Detected with #9532
+
+Dan Fandrich (7 Oct 2023)
+
+- tests: fix a race condition in ftp server disconnect
+
+  If a client disconnected and reconnected quickly, before the ftp server
+  had a chance to respond, the protocol message/ack (ping/pong) sequence
+  got out of sync, causing messages sent to the old client to be delivered
+  to the new.  A disconnect must now be acknowledged and intermediate
+  requests thrown out until it is, which ensures that such synchronization
+  problems can't occur. This problem could affect ftp, pop3, imap and smtp
+  tests.
+
+  Fixes #12002
+  Closes #12049
+
+Viktor Szakats (7 Oct 2023)
+
+- appveyor: bump mingw-w64 job to gcc 13 (was: 8)
+
+  This sets gcc 6, 7, 9, 13 in our test mix (was: 6, 7, 8, 9).
+  Adding a modern gcc version to the tests.
+
+  (The gcc 8 job used to take around 50 minutes. The new image with gcc 13
+  finished in 32, 35, 34 minutes in the 3 test runs so far.)
+
+  It also adds a modern CMake version and OS env to our mingw-w64 builds.
+
+  Closes #12051
+
+David Benjamin (6 Oct 2023)
+
+- openssl: use X509_ALGOR_get0 instead of reaching into X509_ALGOR
+
+  While the struct is still public in OpenSSL, there is a (somewhat
+  inconvenient) accessor. Use it to remain compatible if it becomes opaque
+  in the future.
+
+  Closes #12038
+
+Daniel Stenberg (6 Oct 2023)
+
+- curl_easy_pause.3: mention it works within callbacks
+
+  Reported-by: Maxim Dzhura
+  Bug: https://curl.se/mail/lib-2023-10/0010.html
+  Closes #12046
+
+- curl_easy_pause.3: mention h2/h3 buffering
+
+  Asked-by: Maxim Dzhura
+  Ref: https://curl.se/mail/lib-2023-10/0011.html
+
+  Closes #12045
+
+Viktor Szakats (6 Oct 2023)
+
+- cmake: re-add missed C89 headers for specific detections
+
+  We removed C89 `setjmp.h` and `signal.h` detections and excluded them
+  from the global header list we use when detecting functions [1]. Then
+  missed to re-add these headers to the specific functions which need
+  them to be detected [2]. Fix this omission in this patch.
+
+  [1] Follow-up to 3795fcde995d96db641ddbcc8a04f9f0f03bef9f #11951
+  [2] Follow-up to 96c29900bcec32dd6bc8e9857c8871ff4b8b8ed9 #11940
+
+  Closes #12043
+
+Daniel Stenberg (6 Oct 2023)
+
+- multi: set CURLM_CALL_MULTI_PERFORM after switch to DOING_MORE
+
+  Since there is nothing to wait for there. Avoids the test 1233 hang
+  reported in #12033.
+
+  Reported-by: Dan Fandrich
+  Closes #12042
+
+Dan Fandrich (5 Oct 2023)
+
+- test1903: actually verify the cookies after the test
+
+  The test otherwise could do just about anything (except leak memory in
+  debug mode) and its bad behaviour wouldn't be detected. Now, check the
+  resulting cookie file to ensure the cookies are still there.
+
+  Closes #12041
+
+- test: add missing <feature>s
+
+  The tests will otherwise fail if curl has them disabled.
+
+- test1906: set a lower timeout since it's hit on Windows
+
+  msys2 builds actually hit the connect timeout in normal operation, so
+  lower the timeout from 5 minutes to 5 seconds to reduce test time.
+
+  Ref: #11328
+  Closes #12036
+
+Daniel Stenberg (5 Oct 2023)
+
+- RELEASE-NOTES: synced
+
+Jay Satiro (5 Oct 2023)
+
+- idn: fix WinIDN null ptr deref on bad host
+
+  - Return CURLE_URL_MALFORMAT if IDN hostname cannot be converted from
+    UTF-8 to UTF-16.
+
+  Prior to this change a failed conversion erroneously returned CURLE_OK
+  which meant 'decoded' pointer (what would normally point to the
+  punycode) would not be written to, remain NULL and be dereferenced
+  causing an access violation.
+
+  Closes https://github.com/curl/curl/pull/11983
+
+Dan Fandrich (4 Oct 2023)
+
+- tests: close the shell used to start sshd
+
+  This shell isn't needed once sshd starts, so use "exec" so it doesn't
+  stick around.
+
+  Closes #12032
+
+Daniel Stenberg (4 Oct 2023)
+
+- base64: also build for curl
+
+  Since the tool itself now uses the base64 code using the curlx way, it
+  needs to build also when the tool needs it. Starting now, the tool build
+  defines BULDING_CURL to allow lib-side code to use it.
+
+  Follow-up to 2e160c9c6525
+
+  Closes #12010
+
+Eduard Strehlau (4 Oct 2023)
+
+- tests: Fix zombie processes left behind by FTP tests.
+
+  ftpserver.pl correctly cleans up spawned server processes,
+  but forgets to wait for the shell used to spawn them.
+  This is barely noticeable during a normal testrun,
+  but causes process exhaustion and test failure
+  during a complete torture run of the FTP tests.
+
+  Fixes #12018
+  Closes #12020
+
+Dan Fandrich (4 Oct 2023)
+
+- github/labeler: improve labeler matches
+
+- test574: add a timeout to the test
+
+  This one hangs occasionally, so this will speed up a test run and allow
+  logs to be seen when it does.
+
+  Closes #12025
+
+- tests: propagate errors in libtests
+
+  Use the test macros to automatically propagate some errors, and check
+  and log others while running the tests. This can help in debugging
+  exactly why a test has failed.
+
+- tests: set --expect100-timeout to improve test reliability
+
+  On an overloaded server, the default 1 second timeout can go by without
+  the test server having a chance to respond with the expected headers,
+  causing tests to fail. Increase the 1 second timeout to 99 seconds so
+  this failure mode is no longer a problem on test 1129. Some other tests
+  already set a high value, but make them consistently 99 seconds so if
+  something goes wrong the test is stalled for less time.
+
+  Ref: #11328
+
+- CI: ignore the "flaky" and "timing-dependent" test results in CMake
+
+  This was already done for automake builds but CMake builds were missed.
+  Test 1086 actually causes the test harness to crash with:
+
+  Warning: unable to close filehandle DWRITE properly: Broken pipe at C:/projec
+  ts/curl/tests/ftpserver.pl line 527
+
+  Rather than fix it now, this change leaves test 1086 entirely skipped on
+  those builds that show this problem.
+
+  Follow-up to 589dca761
+
+  Ref: #11865
+
+Viktor Szakats (4 Oct 2023)
+
+- cmake: improve OpenLDAP builds
+
+  - cmake: detect OpenLDAP based on function `ldap_init_fd`.
+    autotools does this. autotools also publishes this detection result
+    in `HAVE_LDAP_INIT_FD`. We don't mimic that with CMake as the source
+    doesn't use this value. (it might need to be remove-listed in
+    `scripts/cmp-config.pl` for future OpenLDAP test builds.)
+    This also deletes existing self-declaration method via the
+    CMake-specific `CURL_USE_OPENLDAP` configuration.
+
+  - cmake: define `LDAP_DEPRECATED=1` for OpenLDAP.
+    Like autotools does. This fixes a long list of these warnings:
+    ```
+    /usr/local/opt/openldap/include/ldap.h:1049:5: warning: 'LDAP_DEPRECATED' i
+  s not defined, evaluates to 0 [-Wundef]
+    ```
+
+  - cmake: delete LDAP TODO comment no longer relevant.
+
+  Also:
+
+  - autotools: replace domain name `dummy` with `0.0.0.0` in LDAP feature
+    detection functions.
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #12024
+
+- cmake: fix unity builds for more build combinations
+
+  By using unique static function/variable names in source files
+  implementing these interfaces.
+
+  - OpenLDAP combined with any SSH backend.
+
+  - MultiSSL with mbedTLS, OpenSSL, wolfSSL, SecureTransport.
+
+  Closes #12027
+
+Daniel Stenberg (4 Oct 2023)
+
+- tests: remove leading spaces from some tags
+
+  The threee tags `<name>`, `</name>` and `<command>` were frequently used
+  with a leading space that this removes. The reason this habbit is so
+  widespread in testcases is probably that they have been copy and pasted.
+
+  Hence, fixing them all now might curb this practice from now on.
+
+  Closes #12028
+
+Viktor Szakats (4 Oct 2023)
+
+- GHA: bump actions/checkout
+
+  Follow-up to 2e0fa50fc16b9339f51e0a7bfff0352829323acb #11964
+  Follow-up to c39585d9b7ef3cbfc1380812dec60e7b275b6af3 #12000
+
+  Closes #12023
+
+- spelling: fix codespell 2.2.6 typos
+
+  Closes #12019
+
+Daniel Stenberg (3 Oct 2023)
+
+- GHA: add workflow to compare configure vs cmake outputs
+
+  Uses scripts/cmp-config.pl two compare two curl_config.h files,
+  presumbly generated with configure and cmake. It displays the
+  differences and filters out a lot of known lines we ignore.
+
+  The script also shows the matches that were *not* used. Possibly
+  subjects for removal.
+
+  Closes #11964
+
+- appveyor: enable test 571
+
+  Follow-up from 8a940fd55c175f7 / #12013
+
+  Closes #12017
+
+Viktor Szakats (3 Oct 2023)
+
+- build: alpha-sort source files for lib and src
+
+  Closes #12014
+
+- cmake: delete old `HAVE_LDAP_URL_PARSE` logic
+
+  Left there by accident after adding proper detection for this.
+
+  Follow-up to 772f0d8edf1c3c2745543f42388ccec5a16ee2c0 #12006
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #12015
+
+Stefan Eissing (3 Oct 2023)
+
+- tests: increase lib571 timeout from 3s to 30s
+
+  - 3s is too short for our CI, making this test fail occasionally
+  - test usually experiences no delay run locally, so 30s wont hurt
+
+  Closes #12013
+
+Viktor Szakats (3 Oct 2023)
+
+- cmake: fix unity with Windows Unicode + TrackMemory
+
+  Found the root cause of the startup crash in unity builds with Unicode
+  and TrackMemory enabled at the same time.
+
+  We must make sure that the `memdebug.h` header doesn't apply to
+  `lib/curl_multibyte.c` (as even noted in a comment there.) In unity
+  builds all headers apply to all sources, including `curl_multibyte.c`.
+  This probably resulted in an infinite loop on startup.
+
+  Exclude this source from unity compilation with TrackMemory enabled,
+  in both libcurl and curl tool. Enable unity mode for a debug Unicode
+  CI job to keep it tested. Also delete the earlier workaround that
+  fully disabled unity for affected builds.
+
+  Follow-up to d82b080f6374433ce7c98241329189ad2d3976f8 #12005
+  Follow-up to 3f8fc25720900b14b7432f4bd93407ca15311719 #11095
+
+  Closes #11928
+
+- cmake: disable unity mode with Windows Unicode + TrackMemory
+
+  "TrackMemory" is `ENABLE_DEBUG=ON` (aka `ENABLE_CURLDEBUG=ON`,
+  aka `-DCURLDEBUG`).
+
+  There is an issue with memory tracking and Unicode when built in "unity"
+  mode, which results in the curl tool crashing right on startup, even
+  without any command-line option. Interestingly this doesn't happen under
+  WINE (at least on the system I tested this on), but consistenly happens
+  on real Windows machines. Crash is 0xC0000374 heap corruption. Both
+  shared and static curl executables are affected.
+
+  This limitation probably won't hit too many people, but it remains
+  a TODO to find and fix the root cause and drop this workaround.
+
+  Example builds and runs:
+  https://ci.appveyor.com/project/curlorg/curl/builds/48169111/job/17cptxhtpubd
+  7iwj#L313 (static)
+  https://ci.appveyor.com/project/curlorg/curl/builds/48169111/job/76e1ge758tby
+  qu9c#L317 (shared)
+
+  Follow-up to 3f8fc25720900b14b7432f4bd93407ca15311719 #11095
+
+  Ref: #11928
+  Closes #12005
+
+- cmake: tidy-up `NOT_NEED_LBER_H` detection
+
+  Follow-up to 772f0d8edf1c3c2745543f42388ccec5a16ee2c0 #12006
+
+- appveyor: rewrite batch in PowerShell + CI improvements
+
+  1. Rewrite in PowerShell:
+
+  - rewrite MS-DOS batch build script in PowerShell.
+  - move some bash operations into native PowerShell.
+  - fixups for PowerShell insisting on failure when a command outputs
+    something to stderr.
+  - fix to actually run `curl -V` after every build.
+    (and exclude ARM64 builds.)
+  - also say why we skipped `curl -V` if we had to skip.
+  - fix CMake warnings about unused configuration variables, by adapting
+    these dynamically for build cases.
+  - dedupe OpenSSL path into a variable.
+  - disable `test1451` failing with a warning anyway due to missing python
+    impacket. (after trying and failing to install impacket)
+    PowerShell promotes these warnings to errors by PowerShell. We can also
+    suppress they wholesale if they start causing issues in the future,
+    like we already to with `autoreconf` and `./configure`.
+
+  PowerShell is better than MS-DOS batches, so the hope is this makes it
+  easier to extend and maintain the AppVeyor build logic. POSIX/bash isn't
+  supported inline by AppVeyor on Windows build machines, but we are okay
+  to keep it in an external script, so it's also an option.
+
+  2. CI improvements:
+
+  - enable tests for a "unity" build job.
+  - speed-up CI initialization by using shallow clones of the curl repo.
+  - speed-up CMake MSVC jobs with `TrackFileAccess=false`.
+  - enable parallelism in `VisualStudioSolution` builds.
+  - display CMake version before builds.
+  - always show the CPU in job names.
+  - tell which jobs are build-only in job names.
+  - move `TESTING:` value next to `DISABLED_TESTS:` in two jobs.
+  - add `config.log` (autotools) to dumped logs (need to enable manually).
+
+  3. Style:
+
+  - use single-quotes in YAML like we do in other CI YAML files.
+    It also allows to drop quoting characters and lighter to write/read.
+    (keep double quotes for PowerShell strings needing expansion.)
+
+  Closes #11999
+
+- cmake: fix `HAVE_LDAP_SSL`, `HAVE_LDAP_URL_PARSE` on non-Windows
+
+  - set `HAVE_LDAP_URL_PARSE` if `ldap_url_parse` function exists.
+    Before this patch we set it based it on the presence of `stricmp`,
+    which correctly enabled it on e.g. Windows, but was inaccurate for
+    other platforms.
+
+  - always set `HAVE_LDAP_SSL` if an LDAP backend is detected and
+    LDAPS is not explicitly disabled. This mimics autotools behaviour.
+    Previously we set it only for Windows LDAP. After this fix, LDAPS is
+    correctly enabled in default macOS builds.
+
+  - enable LDAP[S] for a CMake macOS CI job. Target OS X 10.9 (Mavericks)
+    to avoid deprecation warnings for LDAP API.
+
+  - always detect `HAVE_LDAP_SSL_H`, even with LDAPS explicitly disabled.
+    This doesn't make much sense, but let's do it to sync behaviour with
+    autotools.
+
+  - fix benign typo in variable name.
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #12006
+
+- autotools: restore `HAVE_IOCTL_*` detections
+
+  This restores `CURL_CHECK_FUNC_IOCTL` detection. I deleted it in
+  4d73854462f30948acab12984b611e9e33ee41e6 and
+  c3456652a0c72d1845d08df9769667db7e159949 (2022-08), because the
+  `HAVE_IOCTL` result it generated was unused in the source. But,
+  I did miss the fact that this had two dependent checks:
+  `CURL_CHECK_FUNC_IOCTL_FIONBIO`,
+  `CURL_CHECK_FUNC_IOCTL_SIOCGIFADDR` that we do actually need:
+  `HAVE_IOCTL_FIONBIO`, `HAVE_IOCTL_SIOCGIFADDR`.
+
+  Regression from 4d73854462f30948acab12984b611e9e33ee41e6
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #12008
+
+Daniel Stenberg (2 Oct 2023)
+
+- RELEASE-PROCEDURE.md: updated coming release dates
+
+- RELEASE-NOTES: synced
+
+Viktor Szakats (1 Oct 2023)
+
+- cmake: pre-cache `HAVE_POLL_FINE` on Windows
+
+  Windows doesn't support `poll()`, so we can safely skip checking for
+  fine poll.
+
+  Closes #12003
+
+- gha: bump actions to latest versions
+
+  - actions@checkout@v4 (from v3 and v2)
+
+  - fsfe/reuse-action@v2 (from v1)
+
+  Closes #12000
+
+Stefan Eissing (30 Sep 2023)
+
+- h2: testcase and fix for pausing h2 streams
+
+  - refs #11982 where it was noted that paused transfers may
+    close successfully without delivering the complete data
+  - made sample poc into tests/http/client/h2-pausing.c and
+    added test_02_27 to reproduce
+
+  Closes #11989
+  Fixes #11982
+  Reported-by: Harry Sintonen
+
+Viktor Szakats (30 Sep 2023)
+
+- cmake: validate `CURL_DEFAULT_SSL_BACKEND` config value
+
+  Before this patch CMake builds accepted any value and it was used at
+  runtime as-is. This patch make sure that the selected default backend
+  is also enabled in the build. It also enforces a full lowercase value.
+
+  This improves reproducibility and brings CMake in sync with autotools
+  which already worked like described above.
+
+  Follow-up to 26c7feb8b9d51a57fab3325571b4bbfa03b11af0 #11774
+
+  Closes #11998
+
+- autotools: adjust `CURL_CA_PATH` value to CMake
+
+  autotools was using the same value as CMake, but with an ending
+  slash. Delete the ending slash to match configurations.
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #11997
+
+- cmake: detect `sys/wait.h` and `netinet/udp.h`
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #11996
+
+Daniel Stenberg (30 Sep 2023)
+
+- lib: provide and use Curl_hexencode
+
+  Generates a lower case ASCII hex output from a binary input.
+
+  Closes #11990
+
+- configure: check for the capath by default
+
+  ... if the chosen TLS backend supports it: OpenSSL, GnuTLS, mbedTLS or wolfSS
+  L
+
+  cmake: synced
+
+  Assisted-by: Viktor Szakats
+  Closes #11987
+
+- wolfssl: ignore errors in CA path
+
+  The default wolfSSL_CTX_load_verify_locations() function is quite picky
+  with the certificates it loads and will for example return error if just
+  one of the certs has expired.
+
+  With the *_ex() function and its WOLFSSL_LOAD_FLAG_IGNORE_ERR flag, it
+  behaves more similar to what OpenSSL does by default.
+
+  Even the set of default certs on my Debian unstable has several expired
+  ones.
+
+  Assisted-by: Juliusz Sosinowicz
+  Assisted-by: Michael Osipov
+
+  Closes #11987
+
+- create-dirs.d: clarify it also uses --output-dirs
+
+  Reported-by: Robert Simpson
+  Fixes #11991
+  Closes #11995
+
+Viktor Szakats (30 Sep 2023)
+
+- appveyor: fix yamlint issues, indent
+
+  Also:
+  - use double quotes in all batch if statements.
+
+  Closes #11994
+
+- cmake: detect `HAVE_CLOCK_GETTIME_MONOTONIC_RAW`
+
+  Based on existing autotools logic.
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #11981
+
+- cmake: detect `HAVE_GETADDRINFO_THREADSAFE`
+
+  Based on existing autotools logic.
+
+  autotools checks for old versions of the allowlisted target OSes and
+  disables this feature when seeing them. In CMake we assume we're running
+  on newer systems and enable regardless of OS version.
+
+  autotools always runs all 3 probes for non-fast-tracked systems and
+  enables this feature if any one of them was successful. To save
+  configuration time,  CMake stops at the first successful check.
+
+  OpenBSD is not fast-tracked and then gets blocklisted as a generic BSD
+  system. I haven't double-checked if this is correct, but looks odd.
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #11979
+
+- cmake: fix `HAVE_WRITABLE_ARGV` detection
+
+  Move detection before the creation of detection results in
+  `curl_config.h`.
+
+  Ref: #11964 (effort to sync cmake detections with autotools)
+
+  Closes #11978
+
+- appveyor: minor improvements
+
+  - run `curl -V` after builds to see if they run and with what features.
+    Except for one job where a CRT DLL is missing. And ARM64 which should
+    fail, but is silently not launched instead.
+
+  - copy libcurl DLL next to curl tool and tests binaries in shared mode.
+    This makes it possible to run the tests. (We don't run tests after
+    these builds yet.)
+
+  - list the DLLs and EXEs present after the builds.
+
+  - add `DEBUG` variable for CMake builds to allow disabling it, for
+    testing non-debug builds. (currently enabled for all)
+
+  - add commented lines that dump CMake configuration logs for debugging
+    build/auto-detection issues.
+
+  - add gcc version to jobs where missing.
+
+  - switch a job to the native MSYS2 mingw-w64 toolchain. This adds gcc 9
+    to the build mix.
+
+  - make `SHARED=OFF` and `OPENSSL=OFF` defaults global.
+
+  - delete a duplicate backslash.
+
+  Closes #11976
+
+- configure: replace adhoc domain with `localhost` in tests
+
+  Reviewed-by: Daniel Stenberg
+  Closes #11988
+
+- tidy-up: use more example domains
+
+  Also make use of the example TLD:
+  https://en.wikipedia.org/wiki/.example
+
+  Reviewed-by: Daniel Stenberg
+  Closes #11992
+
+Dan Fandrich (29 Sep 2023)
+
+- runtests: display the test status if tests appear hung
+
+  It sometimes happens that a test hangs during a test run and never
+  returns. The test harness will wait indefinitely for the results and on
+  CI servers the CI job will eventually be killed after an hour or two.
+  At the end of a test run, if results haven't come in within a couple of
+  minutes, display the status of all test runners and what tests they're
+  running to help in debugging the problem.
+
+  This feature is really only kick in with parallel testing enabled, which
+  is fine because without parallel testing it's usually easy to tell what
+  test has hung.
+
+  Closes #11980
+
+- github/labeler: remove workaround for labeler
+
+  This was added due to what seemed to be a bug regarding the sync-labels:
+  config option, but it looks like it wasn't necessary.
+
+  Follow-up to b2b0534e7
+
+Viktor Szakats (29 Sep 2023)
+
+- docs: upgrade an URL to HTTPS in `BINDINGS.md` [ci skip]
+
+Daniel Stenberg (29 Sep 2023)
+
+- docs: replace made up domains with example.com
+
+  in FAQ and MANUAL.md
+
+  - example.com was made for this purpose.
+
+  - reduces the risk that one of those domains suddenly start hosting
+    something nasty and we provide links to them
+
+  Closes #11986
+
+Michael Osipov (29 Sep 2023)
+
+- acinclude.m4: Document proper system truststore on FreeBSD
+
+  The default system truststore on FreeBSD has been /etc/ssl/certs for many
+  years now. It is managed canonically through certctl(8) and contains hashed
+  symlinks for OpenSSL and other TLS providers.
+  The previous ones require security/ca_root_nss which might not be installed o
+  r
+  will not contain any custom CA certificates.
+
+  Closes #11985
+
+Daniel Stenberg (29 Sep 2023)
+
+- FAQ: How do I upgrade curl.exe in Windows?
+
+  This is a growing question, better answer it here to get somewhere to
+  point users to.
+
+  Closes #11984
+
+Viktor Szakats (28 Sep 2023)
+
+- cmake: pre-cache `HAVE_BASENAME` for mingw-w64 and MSVC
+
+  `basename` is present in mingw-w64, missing from MSVC. Pre-cache
+  accordingly to make configure faster.
+
+  Notice that `basename` has a bug so we later disable it even with
+  mingw-w64:
+  https://github.com/curl/curl/blob/781242ffa44a9f9b95b6da5ac5a1bf6372ec6257/li
+  b/curl_setup.h#L820-L825
+
+  Closes #11974
+
+Daniel Stenberg (28 Sep 2023)
+
+- cmake: add missing checks
+
+  - check for arc4random. To make rand.c use it accordingly.
+  - check for fcntl
+  - fix fseek detection
+  - add SIZEOF_CURL_SOCKET_T
+  - fix USE_UNIX_SOCKETS
+  - define HAVE_SNPRINTF to 1
+  - check for fnmatch
+  - check for sched_yield
+  - remove HAVE_GETPPID duplicate from curl_config.h
+  - add HAVE_SENDMSG
+
+  Ref: #11964
+
+  Co-authored-by: Viktor Szakats
+  Closes #11973
+
+- configure: remove unused checks
+
+  - for sys/uio.h
+  - for fork
+  - for connect
+
+  Ref: #11964
+
+  Closes #11973
+
+- lib: remove TIME_WITH_SYS_TIME
+
+  It is not used in any code anywhere.
+
+  Ref: #11964
+  Closes #11975
+
+- docs: update curl man page references
+
+  Detected by the manpage-syntax update
+
+  Closes #11963
+
+- manpage-syntax: verify curl man page references
+
+  1. References to curl symbols are now checked that they indeed exist as
+     man pages. This for \f references as well as the names referenced in the
+     SEE ALSO section.
+
+     Allowlist curl.1 since it is not always built in builds
+
+  2. References to curl symbols that lack section now causes warning, since tha
+  t
+     will prevent them from getting linked properly
+
+  3. Check for "bare" references to curl functions and warn, they should be
+     references
+
+  Closes #11963
+
+- cmake: add check for suseconds_t
+
+  And fix the HAVE_LONGLONG define
+
+  Ref: #11964
+  Closes #11977
+
+Viktor Szakats (28 Sep 2023)
+
+- tidy-up: whitespace fixes
+
+  Closes #11972
+
+- cmake: detect TLS-SRP in OpenSSL/wolfSSL/GnuTLS
+
+  With new option `CURL_DISABLE_SRP=ON` to force-disable it.
+  To match existing option and detection logic in autotools.
+
+  Also:
+  - fix detecting GnuTLS.
+    We assume `nettle` as a GnuTLS dependency.
+  - add CMake GnuTLS CI job.
+  - bump AppVeyor CMake OpenSSL MSVC job to OpenSSL 1.1.1 (from 1.0.2)
+    TLS-SRP fails to detect with 1.0.2 due to an OpenSSL header bug.
+  - fix compiler warning when building with GnuTLS and disabled TLS-SRP.
+  - fix comment typos, whitespace.
+
+  Ref: #11964
+
+  Closes #11967
+
+- tool: use our own stderr variable
+
+  Earlier this year we changed our own stderr variable to use the standard
+  name `stderr` (to avoid bugs where someone is using `stderr` instead of
+  the curl-tool specific variable). This solution needed to override the
+  standard `stderr` symbol via the preprocessor. This in turn didn't play
+  well with unity builds and caused curl tool to crash or stay silent due
+  to an uninitialized stderr. This was a hard to find issue, fixed by
+  manually breaking out one file from the unity sources.
+
+  To avoid two these two tricks, this patch implements a different
+  solution: Restore using our own local variable for our stderr output and
+  leave `stderr` as-is. To avoid using `stderr` by mistake, add a
+  `checksrc` rule (based on logic we already used in lib for `strerror`)
+  that detects any `stderr` use in `src` and points to using our own
+  variable instead: `tool_stderr`.
+
+  Follow-up to 06133d3e9b8aeb9e9ca0b3370c246bdfbfc8619e
+  Follow-up to 2f17a9b654121dd1ecf4fc043c6d08a9da3522db
+
+  Closes #11958
+
+Loïc Yhuel (28 Sep 2023)
+
+- connect: only start the happy eyeballs timer when needed
+
+  The timeout is only used when there is a second address family, for the
+  delayed eyeballer.
+
+  Closes #11939
+
+Daniel Stenberg (28 Sep 2023)
+
+- tool_operate: free 'gateway' correctly
+
+  Pointed out by Coverity. The fix in 93885cf3a8d4e was incomplete.
+
+  Also removed repeated wording in IPFS related error messages.
+
+  Closes #11969
+
+Stefan Eissing (28 Sep 2023)
+
+- lib: move handling of `data->req.writer_stack` into Curl_client_write()
+
+  - move definitions from content_encoding.h to sendf.h
+  - move create/cleanup/add code into sendf.c
+  - installed content_encoding writers will always be called
+    on Curl_client_write(CLIENTWRITE_BODY)
+  - Curl_client_cleanup() frees writers and tempbuffers from
+    paused transfers, irregardless of protocol
+
+  Closes #11908
+
+Loïc Yhuel (28 Sep 2023)
+
+- multi: round the timeout up to prevent early wakeups
+
+  Curl_timediff rounds down to the millisecond, so curl_multi_perform can
+  be called too early, then we get a timeout of 0 and call it again.
+
+  The code already handled the case of timeouts which expired less than
+  1ms in the future.  By rounding up, we make sure we will never ask the
+  platform to wake up too early.
+
+  Closes #11938
+
+Daniel Stenberg (28 Sep 2023)
+
+- RELEASE-NOTES: spell out that IPFS is via gateway
+
+- RELEASE-NOTES: synced
+
+- tool_operate: avoid strlen() -1 on zero length content from file
+
+  Follow-up to 65b563a96a226649ba12cb1e
+
+  Closes #11959
+
+- tool_operate: fix memory mixups
+
+  Switch to plain getenv() from curl_getenv() to avoid the allocation and
+  having to keep track of which free() or curl_free() that need to be
+  used.
+
+  Coverity found issues and a memory leak.
+
+  Follow-up to 65b563a96a226649ba12cb1e
+
+  Closes #11959
+
+Viktor Szakats (27 Sep 2023)
+
+- curl-functions.m4: fixup recent bad edits
+
+  Follow-up to 96c29900bcec32dd6bc8e9857c8871ff4b8b8ed9 #11940
+
+  Closes #11966
+
+Daniel Stenberg (27 Sep 2023)
+
+- curl-functions.m4: fix include line
+
+  This made the getaddrinfo detection fail, but we did not spot it in the
+  CI because it graciously falled back to using legacy functions instead!
+
+  Follow-up to 96c29900bcec (#11940)
+
+  Closes #11965
+
+- inet_ntop: add typecast to silence Coverity
+
+  CID 1024653:  Integer handling issues  (SIGN_EXTENSION)
+
+  Suspicious implicit sign extension: "src[i]" with type "unsigned char
+  const" (8 bits, unsigned) is promoted in "src[i] << (1 - i % 2 << 3)" to
+  type "int" (32 bits, signed), then sign-extended to type "unsigned long"
+  (64 bits, unsigned).  If "src[i] << (1 - i % 2 << 3)" is greater than
+  0x7FFFFFFF, the upper bits of the result will all be 1.
+
+  111         words[i/2] |= (src[i] << ((1 - (i % 2)) << 3));
+
+  The value will not be greater than 0x7FFFFFFF so this still cannot
+  happen.
+
+  Also, switch to ints here instead of longs. The values stored are 16 bit
+  so at least no need to use 64 bit variables. Also, longs are 32 bit on
+  some platforms so this logic still needs to work with 32 bits.
+
+  Closes #11960
+
+- docs: adapt SEE ALSO sections to new requirements
+
+  To please manpage-syntax.pl used by test 1173
+
+  Closes #11957
+
+- manpage-syntax.pl: verify SEE ALSO syntax
+
+  - Enforce a single reference per .BR line
+  - Skip the quotes around the section number for example (3)
+  - Insist on trailing commas on all lines except the last
+  - Error on comma on the last SEE ALSO entry
+
+  - List the entries alpha-sorted, not enforced just recommended
+
+  Closes #11957
+
+- connect: expire the timeout when trying next
+
+  ... so that it gets called again immediately and can continue trying
+  addresses to connect to. Otherwise it might unnecessarily wait for a
+  while there.
+
+  Fixes #11920
+  Reported-by: Loïc Yhuel
+  Closes #11935
+
+- http: remove wrong comment for http_should_fail
+
+  Reported-by: Christian Schmitz
+  Ref: #11936
+  Closes #11941
+
+Dan Fandrich (26 Sep 2023)
+
+- tool_setopt: remove unused function tool_setopt_flags
+
+  This function is identical to tool_setopt_bitmask except that it treats
+  the argument as unsigned.
+
+  Closes #11943
+
+Viktor Szakats (26 Sep 2023)
+
+- cmake: add feature checks for `memrchr` and `getifaddrs`
+
+  - `HAVE_MEMRCHR` for `memrchr`.
+  - `HAVE_GETIFADDRS` for `getifaddrs`.
+    This was present in `lib/curl_config.h.cmake` but missed the detection
+    logic.
+
+  To match existing autotools feature checks.
+
+  Closes #11954
+
+- cmake: move global headers to specific checks
+
+  Before this patch we added standard headers unconditionally to the
+  global list of headers used for feature checks. This is unnecessary
+  and also doesn't help CMake 'Generate' performance. This patch moves
+  these headers to each feature check where they are actually needed.
+  Stop using `stddef.h`, as it seems unnecessary.
+
+  I've used autotools' `m4/curl-functions.m4` to figure out these
+  dependencies.
+
+  Also delete checking for the C89 standard header `time.h`, that I
+  missed in the earlier commit.
+
+  Ref: 96c29900bcec32dd6bc8e9857c8871ff4b8b8ed9 #11940
+
+  Closes #11951
+
+- src/mkhelp: make generated code pass `checksrc`
+
+  Closes #11955
+
+- tests: show which curl tool `runtests.pl` is using
+
+  To help debugging when there is issue finding or running it.
+
+  Closes #11953
+
+- CI/azure: make `MAKEFLAGS` global to parallelize all jobs
+
+  https://dev.azure.com/daniel0244/curl/_build/results?buildId=17528 (before)
+  https://dev.azure.com/daniel0244/curl/_build/results?buildId=17545 (after, wi
+  th -j3)
+
+  Closes #11952
+
+- CI/azure: migrate old mingw MSYS1 jobs to MSYS2
+
+  Also delete an accidental variable reference.
+
+  Follow-up to 38029101e2d78ba125732b3bab6ec267b80a0e72
+
+  Closes #11945
+
+Daniel Stenberg (26 Sep 2023)
+
+- docs: add see also curl_multi_get_handles to some man pages
+
+  Assisted-by: Jay Satiro
+
+  Closes #11942
+
+Viktor Szakats (26 Sep 2023)
+
+- cmake: assume `_fseeki64` and no `fseeko` on Windows
+
+  `_fseeki64` is present in mingw-w64 1.0 (2011-09-26) headers, and
+  at least Watcom C 1.9 (2010) headers and MSVS 2008 [1].
+
+  `fseeko` is not present in any of these.
+
+  (mingw-w64 1.0 also offers `fseeko64`.)
+
+  [1] https://github.com/curl/curl/pull/11944#issuecomment-1734995004
+
+  Follow-up to 9c7165e96a3a9a2d0b7059c87c699b5ca8cdae93 #11918
+
+  Closes #11950
+
+- build: delete checks for C89 standard headers
+
+  Delete checks and guards for standard C89 headers and assume these are
+  available: `stdio.h`, `string.h`, `time.h`, `setjmp.h`, `stdlib.h`,
+  `stddef.h`, `signal.h`.
+
+  Some of these we already used unconditionally, some others we only used
+  for feature checks.
+
+  Follow-up to 9c7165e96a3a9a2d0b7059c87c699b5ca8cdae93 #11918 (for `stdio.h` i
+  n CMake)
+
+  Closes #11940
+
+Stefan Eissing (26 Sep 2023)
+
+- multiif.h: remove Curl_multi_dump declaration
+
+  Follow-up to d850eea2 which removed the Curl_multi_dump definition.
+
+  Closes https://github.com/curl/curl/pull/11946
+
+Jay Satiro (26 Sep 2023)
+
+- config-win32: define HAVE__FSEEKI64
+
+  Follow-up to 9c7165e9 which added an fseeko wrapper to the lib that
+  calls _fseeki64 if it is available.
+
+  Closes https://github.com/curl/curl/pull/11944
+
+- docs: explain how PINNEDPUBLICKEY is independent of VERIFYPEER
+
+  - Explain that peer verification via CURLOPT_PINNEDPUBLICKEY takes place
+    even if peer verification via CURLOPT_SSL_VERIFYPEER is turned off.
+
+  The behavior is verified by test2048.
+
+  Bug: https://github.com/curl/curl/issues/2935#issuecomment-418371872
+  Reported-by: claudiusaiz@users.noreply.github.com
+
+  Bug: https://github.com/curl/curl/discussions/11910
+  Reported-by: Hakan Sunay Halil
+
+  Closes https://github.com/curl/curl/pull/11930
+
+Stefan Eissing (26 Sep 2023)
+
+- openssl: improve ssl shutdown handling
+
+  - If SSL shutdown is not finished then make an additional call to
+    SSL_read to gather additional tracing.
+
+  - Fix http2 and h2-proxy filters to forward do_close() calls to the next
+    filter.
+
+  For example h2 and SSL shutdown before and after this change:
+
+  Before:
+
+  Curl_conn_close -> cf_hc_close -> Curl_conn_cf_discard_chain ->
+  ssl_cf_destroy
+
+  After:
+
+  Curl_conn_close -> cf_hc_close -> cf_h2_close -> cf_setup_close ->
+  ssl_cf_close
+
+  Note that currently the tracing does not show output on the connection
+  closure handle. Refer to discussion in #11878.
+
+  Ref: https://github.com/curl/curl/discussions/11878
+
+  Closes https://github.com/curl/curl/pull/11858
+
+Loïc Yhuel (26 Sep 2023)
+
+- multi: fix small timeouts
+
+  Since Curl_timediff rounds down to the millisecond, timeouts which
+  expire in less than 1ms are considered as outdated and removed from the
+  list. We can use Curl_timediff_us instead, big timeouts could saturate
+  but this is not an issue.
+
+  Closes #11937
+
+Viktor Szakats (25 Sep 2023)
+
+- cmake: fix stderr initialization in unity builds
+
+  Before this patch, in certain build configurations the curl tool may
+  not have displayed anything (debug, macOS), or crashed at startup
+  (debug, Windows).
+
+  Follow-up to 3f8fc25720900b14b7432f4bd93407ca15311719
+  Necessary after 2f17a9b654121dd1ecf4fc043c6d08a9da3522db
+
+  Closes #11929
+
+- cmake: fix missing `zlib.h` when compiling `libcurltool`
+
+  Came up while testing debug/testing build for Windows. I'm not sure why
+  it didn't come up in earlier tests with similar config.
+  `tool_hugehelp.c` might indeed require `zlib.h` and without linking
+  `CURL_LIBS` to the `curltool` target, CMake doesn't seem to add detected
+  dependency headers to the compiler command.
+
+  ```
+  [ 25%] Building C object src/CMakeFiles/curltool.dir/tool_hugehelp.c.obj
+  cd .../curl/bld-cmake-llvm-x64/src && /usr/local/opt/llvm/bin/clang
+    --target=x86_64-w64-mingw32 --sysroot=/usr/local/opt/mingw-w64/toolchain-x8
+  6_64
+    -DCURLDEBUG -DCURL_STATICLIB -DHAVE_CONFIG_H -DUNICODE -DUNITTESTS -D_UNICO
+  DE
+    -I.../curl/include -I.../curl/lib -I.../curl/bld-cmake-llvm-x64/lib
+    -I.../curl/bld-cmake-llvm-x64/include -I.../curl/src -Wno-unused-command-li
+  ne-argument
+    -D_UCRT -DDEBUGBUILD -DHAS_ALPN -DUSE_MANUAL=1  -fuse-ld=lld -Wl,-s -static
+  -libgcc
+    -lucrt [...] -O3 -DNDEBUG -municode -MD
+    -MT src/CMakeFiles/curltool.dir/tool_hugehelp.c.obj
+    -MF CMakeFiles/curltool.dir/tool_hugehelp.c.obj.d
+    -o CMakeFiles/curltool.dir/tool_hugehelp.c.obj -c .../curl/bld-cmake-llvm-x
+  64/src/tool_hugehelp.c
+  .../curl/bld-cmake-llvm-x64/src/tool_hugehelp.c:6:10: fatal error: 'zlib.h' f
+  ile not found
+      6 | #include <zlib.h>
+        |          ^~~~~~~~
+  ```
+
+  Follow-up to 39e7c22bb459c2e818f079984989a26a09741860
+
+  Closes #11927
+
+- cmake: fix duplicate symbols when linking tests
+
+  The linker resolves this automatically in non-unity builds. In unity
+  builds the linker cannot drop a single object with the duplicates,
+  resulting in these errors. The root issue is that we started including
+  certain objects both via both libcurlu and libcurltool libs.
+
+  Regression from 39e7c22bb459c2e818f079984989a26a09741860
+
+  Windows errors:
+  ```
+  [  3%] Linking C executable unit1303.exe
+  [  3%] Building C object tests/server/CMakeFiles/rtspd.dir/__/__/lib/curl_mul
+  tibyte.c.obj
+  ../../lib/libcurlu-d.a(unity_0.c.obj): In function `curlx_convert_UTF8_to_wch
+  ar':
+  C:/projects/curl/lib/curl_multibyte.c:44: multiple definition of `curlx_conve
+  rt_UTF8_to_wchar'
+  ../../src/libcurltool-d.a(unity_0.c.obj):C:/projects/curl/lib/curl_multibyte.
+  c:44: first defined here
+  ../../lib/libcurlu-d.a(unity_0.c.obj): In function `curlx_convert_wchar_to_UT
+  F8':
+  C:/projects/curl/lib/curl_multibyte.c:66: multiple definition of `curlx_conve
+  rt_wchar_to_UTF8'
+  ../../src/libcurltool-d.a(unity_0.c.obj):C:/projects/curl/lib/curl_multibyte.
+  c:66: first defined here
+  ../../lib/libcurlu-d.a(unity_0.c.obj): In function `curlx_win32_open':
+  C:/projects/curl/lib/curl_multibyte.c:92: multiple definition of `curlx_win32
+  _open'
+  ../../src/libcurltool-d.a(unity_0.c.obj):C:/projects/curl/lib/curl_multibyte.
+  c:92: first defined here
+  ../../lib/libcurlu-d.a(unity_0.c.obj): In function `curlx_win32_fopen':
+  C:/projects/curl/lib/curl_multibyte.c:120: multiple definition of `curlx_win3
+  2_fopen'
+  ../../src/libcurltool-d.a(unity_0.c.obj):C:/projects/curl/lib/curl_multibyte.
+  c:120: first defined here
+  ../../lib/libcurlu-d.a(unity_0.c.obj): In function `curlx_win32_stat':
+  [...]
+  ```
+  Ref: https://ci.appveyor.com/project/curlorg/curl/builds/48110107/job/nvlhpt9
+  aa4ehny5q#L247
+
+  macOS errors:
+  ```
+  [ 56%] Linking C executable unit1302
+  duplicate symbol '_curlx_sotouz' in:
+      ../../lib/libcurlu.a(unity_0_c.c.o)
+      ../../src/libcurltool.a(unity_0_c.c.o)
+  duplicate symbol '_curlx_sitouz' in:
+      ../../lib/libcurlu.a(unity_0_c.c.o)
+      ../../src/libcurltool.a(unity_0_c.c.o)
+  duplicate symbol '_curlx_uztosz' in:
+      ../../lib/libcurlu.a(unity_0_c.c.o)
+      ../../src/libcurltool.a(unity_0_c.c.o)
+  [...]
+  ```
+  with config:
+  ```
+    -DCMAKE_UNITY_BUILD=ON \
+    -DENABLE_DEBUG=ON -DBUILD_TESTING=ON -DCMAKE_C_FLAGS=-DDEBUGBUILD \
+    -DBUILD_SHARED_LIBS=ON \
+    -DBUILD_STATIC_LIBS=OFF
+  ```
+
+  Closes #11926
+
+- cmake: lib `CURL_STATICLIB` fixes (Windows)
+
+  - always define `CURL_STATICLIB` when building libcurl for Windows.
+
+    This disables `__declspec(dllexport)` for exported libcurl symbols.
+    In normal mode (hide symbols) these exported symbols are specified
+    via `libcurl.def`. When not hiding symbols, all symbols are exported
+    by default.
+
+    Regression from 1199308dbc902c52be67fc805c72dd2582520d30
+
+    Fixes #11844
+
+  - fix to omit `libcurl.def` when not hiding private symbols.
+
+    Regression from 2ebc74c36a19a1700af394c16855ce144d9878e3
+
+  - fix `ENABLED_DEBUG=ON` + shared curl tool Windows builds by also
+    omitting `libcurl.def` in this case, and exporting all symbols
+    instead. This ensures that a shared curl tool can access all debug
+    functions which are not normally exported from libcurl DLL.
+
+  - delete `INTERFACE_COMPILE_DEFINITIONS "CURL_STATICLIB"` for "objects"
+    target.
+
+    Follow-up to 2ebc74c36a19a1700af394c16855ce144d9878e3
+
+  - delete duplicate `BUILDING_LIBCURL` definitions.
+
+  - fix `HIDES_CURL_PRIVATE_SYMBOLS` to not overwrite earlier build settings.
+
+    Follow-up to 1199308dbc902c52be67fc805c72dd2582520d30
+
+  Closes #11914
+
+Daniel Stenberg (25 Sep 2023)
+
+- RELEASE-NOTES: synced
+
+Dan Fandrich (25 Sep 2023)
+
+- tests: fix log directory path in IPFS tests
+
+  Hard-coding the log directory name fails with parallel tests.
+
+  Follow-up to 65b563a96
+
+  Ref: #8805
+
+Daniel Stenberg (25 Sep 2023)
+
+- curl_multi_get_handles: get easy handles from a multi handle
+
+  Closes #11750
+
+Stefan Eissing (25 Sep 2023)
+
+- http: h1/h2 proxy unification
+
+  - use shared code for setting up the CONNECT request
+    when tunneling, used in HTTP/1.x and HTTP/2 proxying
+  - eliminate use of Curl_buffer_send() and other manipulations
+    of `data->req` or `data->state.ulbuf`
+
+  Closes #11808
+
+Natanael Copa (25 Sep 2023)
+
+- lib: use wrapper for curl_mime_data fseek callback
+
+  fseek uses long offset which does not match with curl_off_t. This leads
+  to undefined behavior when calling the callback and caused failure on
+  arm 32 bit.
+
+  Use a wrapper to solve this and use fseeko which uses off_t instead of
+  long.
+
+  Thanks to the nice people at Libera IRC #musl for helping finding this
+  out.
+
+  Fixes #11882
+  Fixes #11900
+  Closes #11918
+
+- configure: sort AC_CHECK_FUNCS
+
+  No functional changes.
+
+Daniel Stenberg (25 Sep 2023)
+
+- warnless: remove unused functions
+
+  Previously put there for use with the intel compiler
+
+  Closes #11932
+
+- GHA/linux: run singleuse to detect single-use global functions
+
+  Use --unit for configure --enable-debug builds
+
+  Closes #11932
+
+- singleuse: add scan for use in other source codes
+
+  This should reduce false-positive to almost zero. Checks for presence in
+  unit tests if --unit is specified, which is intended for debug builds
+  where unit testing is enabled.
+
+  Closes #11932
+
+- multi: remove Curl_multi_dump
+
+  A debug-only function that is basically never used. Removed to ease the
+  use of the singleuse script to detect non-static functions not used
+  outside the file where it is defined.
+
+  Closes #11931
+
+Viktor Szakats (24 Sep 2023)
+
+- tests: fix compiler warnings
+
+  Seen with llvm 17 on Windows x64.
+
+  ```
+  .../curl/tests/server/rtspd.c:136:13: warning: no previous extern declaration
+   for non-static variable 'logdir' [-Wmissing-variable-declarations]
+    136 | const char *logdir = "log";
+        |             ^
+  .../curl/tests/server/rtspd.c:136:7: note: declare 'static' if the variable i
+  s not intended to be used outside of this translation unit
+    136 | const char *logdir = "log";
+        |       ^
+  .../curl/tests/server/rtspd.c:137:6: warning: no previous extern declaration 
+  for non-static variable 'loglockfile' [-Wmissing-variable-declarations]
+    137 | char loglockfile[256];
+        |      ^
+  .../curl/tests/server/rtspd.c:137:1: note: declare 'static' if the variable i
+  s not intended to be used outside of this translation unit
+    137 | char loglockfile[256];
+        | ^
+  .../curl/tests/server/fake_ntlm.c:43:13: warning: no previous extern declarat
+  ion for non-static variable 'logdir' [-Wmissing-variable-declarations]
+     43 | const char *logdir = "log";
+        |             ^
+  .../curl/tests/server/fake_ntlm.c:43:7: note: declare 'static' if the variabl
+  e is not intended to be used outside of this translation unit
+     43 | const char *logdir = "log";
+        |       ^
+  .../curl/src/tool_doswin.c:350:8: warning: possible misuse of comma operator 
+  here [-Wcomma]
+    350 |     ++d, ++s;
+        |        ^
+  .../curl/src/tool_doswin.c:350:5: note: cast expression to void to silence wa
+  rning
+    350 |     ++d, ++s;
+        |     ^~~
+        |     (void)( )
+  ```
+
+  ```
+  .../curl/tests/libtest/lib540.c:146:27: warning: result of comparison 'long' 
+  > 2147483647 is always false [-Wtautological-type-limit-compare]
+    146 |         int itimeout = (L > (long)INT_MAX) ? INT_MAX : (int)L;
+        |                         ~ ^ ~~~~~~~~~~~~~
+  1 warning generated.
+
+  .../curl/tests/libtest/libntlmconnect.c:195:31: warning: result of comparison
+   'long' > 2147483647 is always false [-Wtautological-type-limit-compare]
+    195 |       int itimeout = (timeout > (long)INT_MAX) ? INT_MAX : (int)timeo
+  ut;
+        |                       ~~~~~~~ ^ ~~~~~~~~~~~~~
+  1 warning generated.
+
+  .../curl/tests/libtest/lib591.c:117:31: warning: result of comparison 'long' 
+  > 2147483647 is always false [-Wtautological-type-limit-compare]
+    117 |       int itimeout = (timeout > (long)INT_MAX) ? INT_MAX : (int)timeo
+  ut;
+        |                       ~~~~~~~ ^ ~~~~~~~~~~~~~
+  1 warning generated.
+  .../curl/tests/libtest/lib597.c:99:31: warning: result of comparison 'long' >
+   2147483647 is always false [-Wtautological-type-limit-compare]
+     99 |       int itimeout = (timeout > (long)INT_MAX) ? INT_MAX : (int)timeo
+  ut;
+        |                       ~~~~~~~ ^ ~~~~~~~~~~~~~
+  1 warning generated.
+  ```
+
+  Seen on macOS Intel:
+  ```
+  .../curl/tests/server/sws.c:440:64: warning: field precision should have type
+   'int', but argument has type 'size_t' (aka 'unsigned long') [-Wformat]
+            msnprintf(logbuf, sizeof(logbuf), "Got request: %s %.*s HTTP/%d.%d"
+  ,
+                                                               ~~^~
+  1 warning generated.
+  ```
+
+  Closes #11925
+
+Jay Satiro (24 Sep 2023)
+
+- url: fix netrc info message
+
+  - Fix netrc info message to use the generic ".netrc" filename if the
+    user did not specify a netrc location.
+
+  - Update --netrc doc to add that recent versions of curl on Windows
+    prefer .netrc over _netrc.
+
+  Before:
+  * Couldn't find host google.com in the (nil) file; using defaults
+
+  After:
+  * Couldn't find host google.com in the .netrc file; using defaults
+
+  Closes https://github.com/curl/curl/pull/11904
+
+Dan Fandrich (23 Sep 2023)
+
+- wolfssh: do cleanup in Curl_ssh_cleanup
+
+  Closes: #11921
+
+Daniel Stenberg (24 Sep 2023)
+
+- tool_listhelp: regenerated
+
+  Polished the --ipfs-gateway description
+
+  Fixed the --trace-config description
+
+  The script also fixed some other small mistakes
+
+  Closes #11923
+
+Viktor Szakats (23 Sep 2023)
+
+- Makefile.mk: always set `CURL_STATICLIB` for lib (Windows)
+
+  Also fix to export all symbols in Windows debug builds, making
+  `-debug-dyn` builds work with `-DCURL_STATICLIB` set.
+
+  Ref: https://github.com/curl/curl/pull/11914 (same for CMake)
+
+  Closes #11924
+
+Daniel Stenberg (23 Sep 2023)
+
+- quic: set ciphers/curves the same way regular TLS does
+
+  for OpenSSL/BoringSSL
+
+  Fixes #11796
+  Reported-by: Karthikdasari0423 on github
+  Assisted-by: Jay Satiro
+  Closes #11836
+
+- test457: verify --max-filesize with chunked encoding
+
+- lib: let the max filesize option stop too big transfers too
+
+  Previously it would only stop them from getting started if the size is
+  known to be too big then.
+
+  Update the libcurl and curl docs accordingly.
+
+  Fixes #11810
+  Reported-by: Elliot Killick
+  Assisted-by: Jay Satiro
+  Closes #11820
+
+Viktor Szakats (23 Sep 2023)
+
+- mingw: delete support for legacy mingw.org toolchain
+
+  Drop support for "old" / "legacy" / "classic" / "v1" / "mingw32" MinGW:
+    https://en.wikipedia.org/wiki/MinGW, https://osdn.net/projects/mingw/
+  Its homepage used to be http://mingw.org/ [no HTTPS], and broken now.
+  It supported the x86 CPU only and used a old Windows API header and
+  implib set, often causing issues. It also misses most modern Windows
+  features, offering old versions of both binutils and gcc (no llvm/clang
+  support). It was last updated 2 years ago.
+
+  curl now relies on toolchains based on the mingw-w64 project:
+  https://www.mingw-w64.org/  https://sourceforge.net/projects/mingw-w64/
+  https://www.msys2.org/  https://github.com/msys2/msys2
+  https://github.com/mstorsjo/llvm-mingw
+  (Also available via Linux and macOS package managers.)
+
+  Closes #11625
+
+Mark Gaiser (23 Sep 2023)
+
+- curl: add support for the IPFS protocols:
+
+  - ipfs://<cid>
+  - ipns://<cid>
+
+  This allows you tu use ipfs in curl like:
+  curl ipfs://<cid>
+  and
+  curl ipns://<cid>
+
+  For more information consult the readme at:
+  https://curl.se/docs/ipfs.html
+
+  Closes #8805
+
+Daniel Stenberg (23 Sep 2023)
+
+- bufq: remove Curl_bufq_skip_and_shift (unused)
+
+  Closes #11915
+
+- scripts/singleuse.pl: add curl_global_trace
+
+Viktor Szakats (22 Sep 2023)
+
+- cmake: fix unity symbol collisions in h2 builds
+
+  Regression from 331b89a319d0067fa1e6441719307cfef9c7960f
+
+  Reviewed-by: Daniel Stenberg
+  Reviewed-by: Jay Satiro
+  Closes #11912
+
+Daniel Stenberg (22 Sep 2023)
+
+- RELEASE-NOTES: synced
+
+Dan Fandrich (21 Sep 2023)
+
+- github/labeler: improve the match patterns
+
+  This includes new rules for setting the appleOS and logging labels and
+  matches on some example files. Also, enable dot mode for wildcard
+  matches in the .github directory.
+
+Daniel Stenberg (21 Sep 2023)
+
+- upload-file.d: describe the file name slash/backslash handling
+
+  Closes #11911
+
+Jakub Jelen (21 Sep 2023)
+
+- libssh: cap SFTP packet size sent
+
+  Due to libssh limitations
+
+  Signed-off-by: Jakub Jelen <jjelen@redhat.com>
+
+  Closes #11804
+
+Daniel Stenberg (21 Sep 2023)
+
+- curl.h: mark CURLSSLBACKEND_NSS as deprecated since 8.3.0
+
+  Closes #11905
+
+- mailmap: unify Michael Osipov under a single email
+
+Ted Lyngmo (21 Sep 2023)
+
+- docs: use CURLSSLBACKEND_NONE
+
+  [ssl] use CURLSSLBACKEND_NONE instead of (curl_sslbackend)-1 in
+  documentation and examples.
+
+  Signed-off-by: Ted Lyngmo <ted@lyncon.se>
+
+  Closes #11909
+
+Dan Fandrich (21 Sep 2023)
+
+- github/labeler: give the sync-labels config item a default value
+
+  This shouldn't be necessary and is likely a bug with this beta version
+  of the labeller.
+
+  Also, fix the negative matches for the documentation label.
+
+  Follow-up to dd12b452a
+  Closes #11907
+
+- github/labeler: fix up more the labeler config format
+
+  The new version didn't like the workaround we had for a bug in the
+  previous labeler version, and it should no longer be needed.
+
+  Follow-up to dd12b452a
+  Closes #11906
+
+- github/labeler: fix indenting to try to appease labeller
+
+  Follow-up to dd12b452a
+
+Jay Satiro (21 Sep 2023)
+
+- libssh2: fix error message on failed pubkey-from-file
+
+  - If libssh2_userauth_publickey_fromfile_ex returns -1 then show error
+    message "SSH public key authentication failed: Reason unknown (-1)".
+
+  When libssh2_userauth_publickey_fromfile_ex returns -1 it does so as a
+  generic error and therefore doesn't set an error message. AFAICT that is
+  not documented behavior.
+
+  Prior to this change libcurl retrieved the last set error message which
+  would be from a previous function failing. That resulted in misleading
+  auth failed error messages in verbose mode.
+
+  Bug: https://github.com/curl/curl/issues/11837#issue-1891827355
+  Reported-by: consulion@users.noreply.github.com
+
+  Closes https://github.com/curl/curl/pull/11881
+
+Stefan Eissing (21 Sep 2023)
+
+- pytest: exclude test_03_goaway in CI runs due to timing dependency
+
+  Closes #11860
+
+- lib: disambiguate Curl_client_write flag semantics
+
+  - use CLIENTWRITE_BODY *only* when data is actually body data
+  - add CLIENTWRITE_INFO for meta data that is *not* a HEADER
+  - debug assertions that BODY/INFO/HEADER is not used mixed
+  - move `data->set.include_header` check into Curl_client_write
+    so protocol handlers no longer have to care
+  - add special in FTP for `data->set.include_header` for historic,
+    backward compatible reasons
+  - move unpausing of client writes from easy.c to sendf.c, so that
+    code is in one place and can forward flags correctly
+
+  Closes #11885
+
+Patrick Monnerat (21 Sep 2023)
+
+- tftpd: always use curl's own tftp.h
+
+  Using the system's provided arpa/tftp.h and optimizing, GCC 12 detects
+  and reports a stringop-overread warning:
+
+  tftpd.c: In function ‘write_behind.isra’:
+  tftpd.c:485:12: warning: ‘write’ reading between 1 and 2147483647 bytes f
+  rom a region of size 0 [-Wstringop-overread]
+    485 |     return write(test->ofile, writebuf, count);
+        |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  In file included from tftpd.c:71:
+  /usr/include/arpa/tftp.h:58:30: note: source object ‘tu_data’ of size 0
+     58 |                         char tu_data[0];        /* data or error stri
+  ng */
+        |                              ^~~~~~~
+
+  This occurs because writebuf points to this field and the latter
+  cannot be considered as being of dynamic length because it is not
+  the last field in the structure. Thus it is bound to its declared
+  size.
+
+  This commit always uses curl's own version of tftp.h where the
+  target field is last in its structure, effectively avoiding the
+  warning.
+
+  As HAVE_ARPA_TFTP_H is not used anymore, cmake/configure checks for
+  arpa/tftp.h are removed.
+
+  Closes #11897
+
+Dan Fandrich (20 Sep 2023)
+
+- test1474: make precheck more robust on non-Solaris systems
+
+  If uname -r returns something odd, perl could return an error code and
+  the test would be erroneously skipped. The qx// syntax avoid this.
+
+  Followup to 08f9b2148
+
+- github/labeler: switch to the 5 beta version
+
+  This version adds an important feature that will allow more PRs to be
+  labelled. Rather than being limited to labeling PRs with files that
+  match a single glob, it can now label them if multiple changed files
+  match any one of a number of globs.
+
+Daniel Stenberg (20 Sep 2023)
+
+- lib: enable hmac for digest as well
+
+  Previously a build that disabled NTLM and aws-sigv4 would fail to build
+  since the hmac was disabled, but it is also needed for digest auth.
+
+  Follow-up to e92edfbef64448ef
+
+  Fixes #11890
+  Reported-by: Aleksander Mazur
+  Closes #11896
+
+- idn: if idn2_check_version returns NULL, return error
+
+  ... this avoids a NULL dereference for this unusual case.
+
+  Reported-by: s0urc3_ on hackerone
+  Closes #11898
+
+- http: fix CURL_DISABLE_BEARER_AUTH breakage
+
+  When bearer auth was disabled, the if/else logic got wrong and caused
+  problems.
+
+  Follow-up to e92edfbef64448ef461
+  Fixes #11892
+  Reported-by: Aleksander Mazur
+  Closes #11895
+
+Michael Osipov (20 Sep 2023)
+
+- wolfssl: allow capath with CURLOPT_CAINFO_BLOB
+
+  Remain consistent with OpenSSL. While CAfile is nulled as documented
+  with CURLOPT_CAINFO_BLOB, CApath remains intact.
+
+  Closes #11886
+
+- wolfssl: use ssl_cafile/ssl_capath variables consistent with openssl.c
+
+  Closes #11886
+
+Dan Fandrich (19 Sep 2023)
+
+- test1474: disable test on NetBSD, OpenBSD and Solaris 10
+
+  These kernels only send a fraction of the requested amount of the first
+  large block, invalidating the assumptions of the test and causing it to
+  fail.
+
+  Assisted-by: Christian Weisgerber
+  Ref: https://curl.se/mail/lib-2023-09/0021.html
+  Closes #11888
+
+Ryan Schmidt (20 Sep 2023)
+
+- cmake, configure: also link with CoreServices
+
+  When linking with CoreFoundation, also link with CoreServices which is
+  apparently required to avoid an NSInvalidArgumentException in software
+  linking with libcurl on macOS Sonoma 14 and later.
+
+  Fixes #11893
+  Closes #11894
+
+Marc Hoersken (19 Sep 2023)
+
+- CI/azure: remove pip, wheel, cryptography, pyopenssl and impacket
+
+  These dependencies are now already included in the Docker image.
+
+  Ref: https://github.com/mback2k/curl-docker-winbuildenv/commit/2607a31bcab544
+  b41d15606e97f38cf312c1ce56
+
+  Closes #11889
+
+Daniel Stenberg (19 Sep 2023)
+
+- wolfssl: if CURLOPT_CAINFO_BLOB is set, ignore the CA files
+
+  Ref: #11883
+  Reported-by: Michael Osipov
+  Closes #11884
+
+- RELEASE-NOTES: synced
+
+- test3103: CURLOPT_COOKIELIST test
+
+- cookie: set ->running in cookie_init even if data is NULL
+
+  This is a regression introduced in b1b326ec500 (shipped in curl 8.1.0)
+
+  Test 3103 verifies.
+
+  Fixes #11875
+  Reported-by: wangp on github
+  Closes #11876
+
+- test498: total header size for all redirects is larger than accepted
+
+- http: use per-request counter to check too large headers
+
+  Not the counter that accumulates all headers over all redirects.
+
+  Follow-up to 3ee79c1674fd6
+
+  Do a second check for 20 times the limit for the accumulated size for
+  all headers.
+
+  Fixes #11871
+  Reported-by: Joshix-1 on github
+  Closes #11872
+
+Jay Satiro (18 Sep 2023)
+
+- THANKS: add Eric Murphy
+
+  He reported #11850 (quiche build error) but I forgot to add a
+  'reported-by' entry in the fix 267e14f1.
+
+Daniel Stenberg (18 Sep 2023)
+
+- h2-proxy: remove left-over mistake in drain_tunnel()
+
+  Left-over from 331b89a319
+
+  Reported-by: 南宫雪珊
+
+  Closes https://github.com/curl/curl/pull/11877
+
+vvb2060 (18 Sep 2023)
+
+- lib: failf/infof compiler warnings
+
+  Closes #11874
+
+Daniel Stenberg (17 Sep 2023)
+
+- rand: fix 'alnum': array is too small to include a terminating null character
+
+  It was that small on purpose, but this change now adds the null byte to
+  avoid the error.
+
+  Follow-up to 3aa3cc9b052353b1
+
+  Reported-by: Dan Fandrich
+  Ref: #11838
+  Closes #11870
+
+Mathias Fuchs (16 Sep 2023)
+
+- cmake: fix the help text to the static build option in CMakeLists.txt
+
+  Closes #11843
+
+John Haugabook (16 Sep 2023)
+
+- MANUAL.md: change domain to example.com
+
+  Closes #11866
+
+Daniel Stenberg (16 Sep 2023)
+
+- doh: inherit DEBUGFUNCTION/DATA
+
+  When creating new transfers for doing DoH, they now inherit the debug
+  settings from the initiating transfer, so that the application can
+  redirect and handle the verbose output correctly even for the DoH
+  transfers.
+
+  Reported-by: calvin2021y on github
+  Fixes #11864
+  Closes #11869
+
+Dan Fandrich (16 Sep 2023)
+
+- http_aws_sigv4: fix sorting with empty parts
+
+  When comparing with an empty part, the non-empty one is always
+  considered greater-than. Previously, the two would be considered equal
+  which would randomly place empty parts amongst non-empty ones. This
+  showed as a test 439 failure on Solaris as it uses a different
+  implementation of qsort() that compares parts differently.
+
+  Fixes #11855
+  Closes #11868
+
+- CI: ignore the "flaky" and "timing-dependent" test results
+
+  CI builds will now run these tests, but will ignore the results if they
+  fail. The relevant tests are ones that are sensitive to timing or
+  have edge conditions that make them more likely to fail on CI servers,
+  which are often heavily overloaded and slow.
+
+  This change only adds two additional tests to be ignored, since the
+  others already had the flaky keyword.
+
+  Closes #11865
+
+- runtests: eliminate a warning on old perl versions
+
+  The warning "Use of implicit split to @_ is deprecated" showed between
+  perl versions about 5.8 through 5.11.
+
+- tests: log the test result code after each libtest
+
+  This makes it easier to determine the test status. Also, capitalize
+  FAILURE and ABORT messages in log lines to make them easier to spot.
+
+Harry Sintonen (16 Sep 2023)
+
+- misc: better random strings
+
+  Generate alphanumerical random strings.
+
+  Prior this change curl used to create random hex strings. This was
+  mostly okay, but having alphanumerical random strings is better: The
+  strings have more entropy in the same space.
+
+  The MIME multipart boundary used to be mere 64-bits of randomness due
+  to being 16 hex chars. With these changes the boundary is 22
+  alphanumerical chars, or little over 130 bits of randomness.
+
+  Closes #11838
+
+Daniel Stenberg (15 Sep 2023)
+
+- cookie: reduce variable scope, add const
+
+- cookie: do not store the expire or max-age strings
+
+  Convert it to an expire time at once and save memory.
+
+  Closes #11862
+
+- cookie: remove unnecessary struct fields
+
+  Plus: reduce the hash table size from 256 to 63. It seems unlikely to
+  make much of a speed difference for most use cases but saves 1.5KB of
+  data per instance.
+
+  Closes #11862
+
+- RELEASE-NOTES: synced
+
+  Bumped to 8.4.0, the next presumed version
+
+Dan Fandrich (14 Sep 2023)
+
+- test2600: remove special case handling for USE_ALARM_TIMEOUT
+
+  This was originally added to handle platforms that supported only 1
+  second granularity in connect timeouts, but after some recent changes
+  the test currently permafails on several Windows platforms.
+
+  The need for this special-case was removed in commit 8627416, which
+  increased the connect timeout in all cases to well above 1 second.
+
+  Fixes #11767
+  Closes #11849
+
+Daniel Stenberg (14 Sep 2023)
+
+- SECURITY-PROCESS.md. call it vulnerability disclosure policy
+
+  SECURITY-PROCESS.md -> VULN-DISCLOSURE-POLICY.md
+
+  This a name commonly used for a document like this. This name helps
+  users find it.
+
+  Closes #11852
+
+Junho Choi (14 Sep 2023)
+
+- quiche: fix build error with --with-ca-fallback
+
+  - Fix build error when curl is built with --with-quiche
+    and --with-ca-fallback.
+
+  - Add --with-ca-fallback to the quiche CI job.
+
+  Fixes https://github.com/curl/curl/issues/11850
+  Closes https://github.com/curl/curl/pull/11847
+
+Jay Satiro (14 Sep 2023)
+
+- escape: replace Curl_isunreserved with ISUNRESERVED
+
+  - Use the ALLCAPS version of the macro so that it is clear a macro is
+    being called that evaluates the variable multiple times.
+
+  - Also capitalize macro isurlpuntcs => ISURLPUNTCS since it evaluates
+    a variable multiple times.
+
+  This is a follow-up to 291d225a which changed Curl_isunreserved into an
+  alias macro for ISUNRESERVED. The problem is the former is not easily
+  identified as a macro by the caller, which could lead to a bug.
+
+  For example, ISUNRESERVED(*foo++) is easily identifiable as wrong but
+  Curl_isunreserved(*foo++) is not even though they both are the same.
+
+  Closes https://github.com/curl/curl/pull/11846
+
+Dan Fandrich (13 Sep 2023)
+
+- tests: increase the default server logs lock timeout
+
+  This timeout is used to wait for the server to finish writing its logs
+  before checking them against the expected values. An overloaded machine
+  could take more than the two seconds previously allocated, so increase
+  the timeout to 5 seconds.
+
+  Ref: #11328
+  Closes #11834
+
+- tests: increase TEST_HANG_TIMEOUT in two tests
+
+  These tests had a 5 second timeout compared to 60 seconds for all other
+  tests. Make these consistent with the others for more reliability on
+  heavily-loaded machines.
+
+  Ref: #11328
+
+- test1056: disable on Windows
+
+  This test relies on the IPv6 scope field being ignored when connecting to
+  ipv6-localhost (i.e. [::1%259999] is treated as [::1]). Maybe this is a bit
+  dodgy, but it works on all our test platforms except Windows. This
+  test was disabled manually on all Windows CI builds already, so instead
+  add an incompatible feature and precheck so it's skipped on Windows
+  everywhere automatically.
+
+- test587: add a slight delay after test
+
+  This test is designed to connect to the server, then immediately send a
+  few bytes and disconnect. In some situations, such as on a loaded
+  server, this doesn't give the server enough time to write its lock file
+  before its existence is checked. The test harness then fails to find the
+  server's input log file (because it hasn't been written yet) and fails
+  the test. By adding a short delay after the test, the HTTP server has
+  enough time to write its lock file which gives itself more time to write
+  its remaining files.
+
+  Ref: #11328
+
+- tests: stop overriding the lock timeout
+
+  These tests reduce the server lock wait timeout which can increase
+  flakiness on loaded machines. Since this is merely an optimization,
+  eliminate them in favour of reliability.
+
+  Ref: #11328
+
+- tests: add some --expect100-timeout to reduce timing dependencies
+
+  These tests can fail when the test machine is so slow that the test HTTP
+  server didn't get a chance to complete before the client's one second
+  100-continue timeout triggered. Increase that 1 second to 999 seconds so
+  this situation doesn't happen.
+
+  Ref: #11328
+
+- test661: return from test early in case of curl error
+
+- tests: add the timing-dependent keyword on several tests
+
+  These are ones likely to fail on heavily-loaded machines that alter the
+  normal test timing. Most of these tests already had the flaky keyword
+  since this condition makes them more likely to fail on CI.
+
+- test1592: greatly increase the maximum test timeout
+
+  It was too short to be reliable on heavily loaded CI machines, and
+  as a fail-safe only, it didn't need to be short.
+
+  Ref: #11328
+
+- test: minor test cleanups
+
+  Remove an obsolete block of code in tests 2032 & 576.
+  Add a comment in test 1474.
+
+- tests: quadruple the %FTPTIME2 and %FTPTIME3 timeouts
+
+  This gives more of a margin for error when running on overloaded CI
+  servers.
+
+  Ref: #11328
+
+- tests: improve SLOWDOWN test reliability by reducing sent data
+
+  These tests are run in SLOWDOWN mode which adds a 10 msec delay after
+  each character output, which means it takes at least 1.6 seconds (and
+  320 kernel calls) just to get through the long welcome banner. On an
+  overloaded system, this can end up taking much more than 1.6 seconds,
+  and even more than the 7 or 16 second curl timeout that the tests rely
+  on, causing them to fail. Reducing the size of the welcome banner drops
+  the total number of characters sent before the transfer starts by more
+  than half, which reduces the opportunity for test-breaking slowdowns by
+  the same amount.
+
+  Ref: #11328
+
+- test650: fix an end tag typo
+
+Jay Satiro (13 Sep 2023)
+
+- tool_cb_wrt: fix debug assertion
+
+  - Fix off-by-one out-of-bounds array index in Windows debug assertion.
+
+  Bug: https://github.com/curl/curl/commit/af3f4e41#r127212213
+  Reported-by: Gisle Vanem
+
+Daniel Stenberg (13 Sep 2023)
+
+- ctype: add ISUNRESERVED()
+
+  ... and make Curl_isunreserved() use that macro instead of providing a
+  separate funtion for the purpose.
+
+  Closes #11840
+
 Version 8.3.0 (13 Sep 2023)
 
 Daniel Stenberg (13 Sep 2023)
@@ -7117,1867 +9543,3 @@ Daniel Stenberg (7 Apr 2023)
   Pointed out by Coverity
 
   Closes #10906
-
-- http_proxy: provide missing arg to infof() call
-
-  Pointed out by Coverity
-
-  Closes #10904
-
-- content_encoding: only do tranfer-encoding compression if asked to
-
-  To reduce surprises. Update test 387 and 418 accordingly.
-
-  Closes #10899
-
-- sws: comparison of unsigned expression < 0 is always false
-
-  Follow-up to 356dd0b73a75ed6d5
-
-  Closes #10903
-
-- lib/cmake: add HAVE_WRITABLE_ARGV check
-
-  Assisted-by: Jakub Zakrzewski
-  Closes #10896
-
-- configure: don't set HAVE_WRITABLE_ARGV on Windows
-
-  Ref: #10888
-  Closes #10896
-
-- vtls: fix build error when proxy-disabled
-
-  Closes #10901
-
-Stefan Eissing (6 Apr 2023)
-
-- tests: increase sws timeout for more robust testing
-
-  - for https CONNECT forwarding, this was fixed at 5 seconds
-    which led to spurious CI test failures
-  - add --keepalive parameter to sws to control this
-  - let httpserver use 30 seconds
-
-  Closes #10898
-
-- http2: move HTTP/2 stream vars into local context
-
-  - remove NGHTTP2 members of `struct HTTP`
-  - add `void *h2_ctx` to `struct HTTP`
-  - add `void *h3_ctx` to `struct HTTP`
-  - separate h2/h3 pointers are needed for eyeballing
-  - manage local stream_ctx in http implementations
-
-  Closes #10877
-
-- proxy: http2 proxy tunnel implementation
-
-  - currently only on debug build and when env variable
-    CURL_PROXY_TUNNEL_H2 is present.
-  - will ALPN negotiate with the proxy server and switch
-    tunnel filter based on the protocol negotiated.
-  - http/1.1 tunnel code moved into cf-h1-proxy.[ch]
-  - http/2 tunnel code implemented in cf-h2-proxy.[ch]
-  - tunnel start and ALPN set remains in http_proxy.c
-  - moving all haproxy related code into cf-haproxy.[ch]
-
-  VTLS changes
-  - SSL filters rely solely on the "alpn" specification they
-    are created with and no longer check conn->bits.tls_enable_alpn.
-  - checks on which ALPN specification to use (or none at all) are
-    done in vtls.c when creating the filter.
-
-  Testing
-  - added a nghttpx forward proxy to the pytest setup that
-    speaks HTTP/2 and forwards all requests to the Apache httpd
-    forward proxy server.
-  - extending test coverage in test_10 cases
-  - adding proxy tests for direct/tunnel h1/h2 use of basic auth.
-  - adding test for http/1.1 and h2 proxy tunneling to pytest
-
-  Closes #10780
-
-- vtls and h2 improvements
-
-  - eliminate receive loop in vtls to fill buffer. This may
-    lead to partial reads of data which is counter productive
-  - let http2 instead loop smarter to process pending network
-    data without transfer switches
-
-  scorecard improvements
-  - do not start caddy when only httpd is requested
-  - allow curl -v to stderr file on --curl-verbose
-
-  Closes #10891
-
-Daniel Stenberg (6 Apr 2023)
-
-- tests: 1078 1288 1297 use valid IPv4 addresses
-
-  With the enhanced URL parser, these tests failed because of their bad
-  IPv4 use.
-
-- urlapi: detect and error on illegal IPv4 addresses
-
-  Using bad numbers in an IPv4 numerical address now returns
-  CURLUE_BAD_HOSTNAME.
-
-  I noticed while working on trurl and it was originally reported here:
-  https://github.com/curl/trurl/issues/78
-
-  Updated test 1560 accordingly.
-
-  Closes #10894
-
-- RELEASE-NOTES: synced
-
-- urlapi: URL encoding for the URL missed the fragment
-
-  Meaning that it would wrongly still store the fragment using spaces
-  instead of %20 if allowing space while also asking for URL encoding.
-
-  Discovered when playing with trurl.
-
-  Added test to lib1560 to verify the fix.
-
-  Closes #10887
-
-- rtsp: convert mallocs to dynbuf for RTP buffering
-
-  Closes #10786
-
-- tool_writeout: add URL component variables
-
-  Output specific components from the used URL. The following variables
-  are added for this purpose:
-
-    url.scheme, url.user, url.password, url.options, url.host, url.port,
-    url.path, url.query, url.fragment, url.zoneid
-
-  Add the following for outputting parts of the "effective URL":
-
-   urle.scheme, urle.user, urle.password, urle.options, urle.host, urle.port,
-   urle.path, urle.query, urle.fragment, urle.zoneid
-
-  Added test 423 and 424 to verify.
-
-  Closes #10853
-
-Stefan Eissing (4 Apr 2023)
-
-- tests/http: improved httpd detection
-
-  - better error messages when not found/complete
-  - handling of `--without-test-httpd`
-
-  Reported-by: kwind on github
-  Fixes #10879
-  Closes #10883
-
-Daniel Stenberg (4 Apr 2023)
-
-- configure: make quiche require quiche_conn_send_ack_eliciting
-
-  curl now requires quiche version >= 1.17.1 to be used and this function
-  was added in this version and makes a convenient check.
-
-  This requirement is because this is the lowest quiche version that
-  supports peer-initiated key updates correctly.
-
-  Closes #10886
-
-Dan Fandrich (1 Apr 2023)
-
-- unit tests: use the unit test infrastructure better
-
-  Allow UNITTEST_STOP to return the error code, use the fail & abort
-  macros to indicate test failure and return success instead of fail if
-  the unit test can't test anything because of missing features at
-  compile-time.  A couple of tests could never fail because they were
-  overriding the failure return code.
-
-- runtests: strip EOL on precheck output on Windows, too
-
-  Precheck failures would show on two lines in the test summary output
-  otherwise.
-
-- tests: move server config files under the pid dir
-
-  These files are generated by the test servers and must therefore be
-  found in the log directory to make them available to only those servers
-  once multiple test runners are executing in parallel. They must also not
-  be deleted with the log files, so they are stored in the pidfile
-  directory.
-
-  Ref: #10818
-  Closes #10875
-
-- runtests: use the ssh key filenames from the sshhelp package
-
-- tests: move pidfiles and portfiles under the log directory
-
-  This is to segregate all files written by a test process into a single
-  root to allow for future parallel testing.
-
-  Ref: #10818
-  Closes #10874
-
-- runtests: minor code cleanups
-
-- runtests: call processexists() and pidfromfile()
-
-  rather than duplicating the logic in several places.
-
-Viktor Szakats (31 Mar 2023)
-
-- cmake: do not add zlib headers for openssl
-
-  Logic copied earlier from wolfSSL. wolfSSL requires zlib headers for its
-  public headers. OpenSSL does not, so stop adding zlib headers for it.
-
-  Follow-up to 1e3319a167d2f32d295603167486e9e88af9bb4e
-
-  Closes #10878
-
-Stefan Eissing (31 Mar 2023)
-
-- rustls: fix error in recv handling
-
-  - when rustls is told to recieve more TLS data and its internal
-    plaintext buffers are full, it returns an IOERROR
-  - avoid receiving TLS data while plaintext is not read empty
-
-  pytest:
-  - increase curl run timeout when invoking pytest with higher verbosity
-
-  Closes #10876
-
-- http3: improvements across backends
-
-  - ngtcp2: using bufq for recv stream data
-  - internal stream_ctx instead of `struct HTTP` members
-    for quiche, ngtcp2 and msh3
-  - no more QUIC related members in `struct HTTP`
-  - experimental use of recvmmsg(), disabled by default
-    - testing on my old debian box shows no throughput improvements.
-    - leaving it in, but disabled, for future revisit
-  - vquic: common UDP receive code for ngtcp2 and quiche
-  - vquic: common UDP send code for ngtcp2 and quiche
-  - added pytest skips for known msh3 failures
-  - fix unit2601 to survive torture testing
-  - quiche: using latest `master` from quiche and enabling large download
-    tests, now that key change is supported
-  - fixing test_07_21 where retry handling of starting a stream
-    was faulty
-  - msh3: use bufq for recv buffering headers and data
-  - msh3: replace fprintf debug logging with LOG_CF where possible
-  - msh3: force QUIC expire timers on recv/send to have more than
-    1 request per second served
-
-  Closes #10772
-
-Dan Fandrich (30 Mar 2023)
-
-- test1471/2: add http as a required feature
-
-  curl bails out early with a different error message if http support is
-  compiled out.
-
-  Ref: #10705
-
-- tests: limit return code of unit tests and lib tests
-
-  Values greater than 125 have special meanings, so cap it there.  Unit
-  tests and lib tests use the number of failures as the return code, so a
-  large number of failures (such as test 2601 as a torture test) can
-  exceed this causing the test to be erroneously reported as having
-  failed.
-
-  Ref: #10720
-
-- test1960: point to the correct path for the precheck tool
-
-  Otherwise, it might find the binary in .libs which can cause it to use
-  the system libcurl which can fail. This error is only visible by
-  noticing that the test is skipped.
-
-  Follow-up to e4dfe6fc
-
-  Ref: #10651
-
-- tests: use the proper %LOGDIR path on two tests
-
-  Follow-up to e7a021e1
-
-  Ref: #10818
-
-Daniel Stenberg (30 Mar 2023)
-
-- rtsp: fix Value stored to 'skip_size' is never read
-
-  Pointed out by scan-build
-
-  Follow-up to 6c6306f3008f2c9b20a64
-
-  Closes #10872
-
-Stefan Eissing (30 Mar 2023)
-
-- tests/http: relax connection check in test_07_02
-
-  Only 1 connection will be used when curl is slow, happens when
-  address-sanitized in CI, for example
-
-  Closes #10865
-
-- http2: flow control and buffer improvements
-
-  - use bufq for send/receive of network data
-  - usd bufq for send/receive of stream data
-  - use HTTP/2 flow control with no-auto updates to control the
-    amount of data we are buffering for a stream
-    HTTP/2 stream window set to 128K after local tests, defined
-    code constant for now
-  - elminiating PAUSEing nghttp2 processing when receiving data
-    since a stream can now take in all DATA nghttp2 forwards
-
-  Improved scorecard and adjuste http2 stream window sizes
-  - scorecard improved output formatting and options default
-  - scorecard now also benchmarks small requests / second
-
-  Closes #10771
-
-Dan Fandrich (30 Mar 2023)
-
-- runtests: show error message if file can't be written
-
-- tests: fix remaining servers to run with a dynamic log directory
-
-  This final commit in the series is sufficient to allow the tests succeed
-  if $LOGDIR is changed in runtests.pl.
-
-  Ref: #10818
-  Closes #10866
-
-- tests: fix fake_ntlm to run with a dynamic log directory
-
-  Ref: #10818
-
-- tests: fix http servers to run with a dynamic log directory
-
-  Ref: #10818
-
-- tests: fix ftpserver to run with a dynamic log directory
-
-  Ref: #10818
-
-- tests: fix C servers to run with a dynamic log directory
-
-  Ref: #10818
-
-- tests: fix lib tests to run with a dynamic log directory
-
-  Ref: #10818
-
-- tests: fix unit tests to run with a dynamic log directory
-
-  Ref: #10818
-
-- tests: use %LOGDIR to refer to the log directory
-
-  This will allow it be set dynamically.
-
-  Ref: #10818
-
-- runtests: track verification time even if no files to compare
-
-- getpart: better handle case of file not found
-
-- testcurl: bump version date
-
-  It hadn't been updated in 9 years; it's time.
-
-- tests: switch to 3-argument open in test suite
-
-  The perl 2-argument open has been considered not-quite-deprecated since
-  the 3-argument form was introduced almost a quarter century ago.
-
-- tests: silence some Perl::Critic warnings in test suite
-
-  Not all warnings are fixed; many are as much stylistic suggestions than
-  anything and IMHO don't do much to actually improve the code.
-
-  Ref: #10818
-  Closes #10861
-
-- docs: bump the minimum perl version to 5.6
-
-  It's actually been this way since at least 2012 (when a 3-argument open
-  was added to runtests.pl). Given the lack of complaints in the interim,
-  it's safe to call this 23 year old perl version the minimum.
-
-- runtests: memoize the getpart* subroutines to speed up access
-
-  The refactored code calls these functions with the same arguments more
-  often, so this prevents redundant test case file parsing.
-
-  Approved-by: Daniel Stenberg
-  Ref: #10818
-  Closes #10833
-
-- runtests: remove duplicated feature variables
-
-  Use the feature map stored in the hash table instead. Most of the
-  variables were only used only once, to set the value in the hash table.
-
-  Ref: #10818
-
-- runtests: also ignore test file problems when ignoring results
-
-  This simplifies error handling in the test verification code and makes
-  it more consistent.
-
-  Ref: #10818
-
-- runtests: more refactoring for clarity
-
-  Ref: #10818
-
-- runtests: don't start servers if -l is given
-
-- runtests: fix typos
-
-- runtests: refactor singletest() into separate functions
-
-  This takes it from a 1200 line behemoth into something more manageable.
-  The content and order of the functions is taken almost directly from
-  singletest() so the diff sans whitespace is quite short.
-
-  Ref: #10818
-
-- runtests: refactor singletest() into distinct sections
-
-  Namely:
-  - Verify that this test case should be run
-  - Start the servers needed to run this test case
-  - Check that test environment is fine to run this test case
-  - Prepare the test environment to run this test case
-  - Run the test command
-  - Clean up after test command
-  - Verify test succeeded
-
-  Ref: #10818
-
-- runtests: stop copying a few arrays where not needed
-
-  Unlike some other languages that just copy a pointer, perl copies the
-  entire array contents which takes time for a large array.
-
-  Ref: #10818
-
-- runtests: reduce redundant calls to getpart/getpartattr
-
-  These functions scan through the entire test file every time to find the
-  right section, so they can be slow for large test files.
-
-  Ref: #10818
-
-- tests: document that the unittest keyword is special
-
-  Also, add other features that were missing.
-
-Stefan Eissing (30 Mar 2023)
-
-- docs: add documentation for bufq
-
-  Closes #10869
-
-Daniel Stenberg (30 Mar 2023)
-
-- RELEASE-NOTES: synced
-
-Matt Jolly (30 Mar 2023)
-
-- hostip: refuse to resolve the .onion TLD
-
-  RFC 7686 states that:
-
-  > Applications that do not implement the Tor
-  > protocol SHOULD generate an error upon the use of .onion and
-  > SHOULD NOT perform a DNS lookup.
-
-  Let's do that.
-
-  https://www.rfc-editor.org/rfc/rfc7686#section-2
-
-  Add test 1471 and 1472 to verify
-
-  Fixes #543
-  Closes #10705
-
-Philip Heiduck (30 Mar 2023)
-
-- GHA: update ngtcp2-*.yml to v0.10.0
-
-  Closes #10612
-
-Stefan Eissing (30 Mar 2023)
-
-- tests/http: fix log formatting on wrong exit code
-
-  Closes #10868
-
-Daniel Stenberg (30 Mar 2023)
-
-- spellcheck.words: unify the AWS-LC spelling
-
-  Follow-up to 34ef4fab22d93
-
-  Closes #10867
-
-Jim King (30 Mar 2023)
-
-- openssl: interop with AWS-LC
-
-  * Configure changes to detect AWS-LC
-  * CMakeLists.txt changes to detect AWS-LC
-  * Compile-time branches needed to support AWS-LC
-  * Correctly set OSSL_VERSION and report AWS-LC release number
-  * GitHub Actions script to build with autoconf and cmake against AWS-LC
-
-  AWS-LC is a BoringSSL/OpenSSL derivative
-  For more information see https://github.com/awslabs/aws-lc/
-
-  Closes #10320
-
-Viktor Szakats (30 Mar 2023)
-
-- cmake: picky-linker fixes for openssl, ZLIB, H3 and more
-
-  - fix HTTP/3 support detection with OpenSSL/quictls built with ZLIB.
-    (Requires curl be built with ZLIB option also.)
-
-  - fix HTTP/3 support detection with OpenSSL/quictls/LibreSSL and `ld`
-    linker on Windows.
-
-  - fix HTTP/3 support detection with wolfSSL to automatically add
-    `ws2_32` to the lib list on Windows. For all linkers.
-
-  - reposition ZLIB (and other compression) detection _after_ TLS
-    detection, but before calling HTTP/3-support detection via
-    `CheckQuicSupportInOpenSSL`.
-
-    May be a regression from ebef55a61df0094b9790710a42f63c48e7de3c13
-    May fix #10832 (Reported-by: Micah Snyder)
-
-    This also seems to fix an odd case, where OpenSSL/quictls is correctly
-    detected, but its header path is not set while compiling, breaking
-    build at `src/curl_ntlm_core.c`. Reason for this remains undiscovered.
-
-  - satisfy "picky" linkers such as `ld` with MinGW, that are highly
-    sensitive to lib order, by also adding brotli to the beginning of the
-    lib list.
-
-  - satisfy "picky" linkers by adding certain Windows systems libs to
-    the lib list for OpenSSL/LibreSSL. (Might need additional ones for
-    other forks, such as `pthread` for BoringSSL.)
-
-  Note: It'd make sense to _always_ add `ws2_32`, `crypt32` (except
-  Windows App targets perhaps?), `bcrypt` (except old-mingw!) on Windows
-  at this point. They are almost always required, and if some aren't,
-  they are ignored by the linker with no effect on final binaries.
-
-  Closes #10857
-
-Stefan Eissing (30 Mar 2023)
-
-- vlts: use full buffer size when receiving data if possible
-
-  SSL backends like OpenSSL/wolfSSL and other return the content of one
-  TLS record on read, but usually there are more available.
-
-  Change the vtls cfilter recv() function to fill the given buffer until a
-  read would block.
-
-  Closes #10736
-
-dengjfzh on github (30 Mar 2023)
-
-- rtsp: skip malformed RTSP interleaved frame data
-
-  Some IP cameras send malformed RTSP interleaved frames sometimes, which
-  can cause curl_easy_perform return 1 (CURLE_UNSUPPORTED_PROTOCOL).  This
-  change attempts to skip clearly incorrect RTSP interleaving frame data.
-
-  Closes #10808
-
-Stefan Eissing (30 Mar 2023)
-
-- lib: add `bufq` and `dynhds`
-
-  Adding `bufq`:
-  - at init() time configured to hold up to `n` chunks of `m` bytes each.
-  - various methods for reading from and writing to it.
-  - `peek` support to get access to buffered data without copy
-  - `pass` support to allow buffer flushing on write if it becomes full
-  - use case: IO buffers for dynamic reads and writes that do not blow up
-  - distinct from `dynbuf` in that:
-    - it maintains a read position
-    - writes on a full bufq return CURLE_AGAIN instead of nuking itself
-  - Init options:
-    - SOFT_LIMIT: allow writes into a full bufq
-    - NO_SPARES: free empty chunks right away
-  - a `bufc_pool` that can keep a number of spare chunks to
-    be shared between different `bufq` instances
-
-  Adding `dynhds`:
-  - a straightforward list of name+value pairs as used for HTTP headers
-  - headers can be appended dynamically
-  - headers can be removed again
-  - headers can be replaced
-  - headers can be looked up
-  - http/1.1 formatting into a `dynbuf`
-  - configured at init() with limits on header counts and total string
-    sizes
-  - use case: pass a HTTP request or response around without being version
-    specific
-  - express a HTTP request without a curl easy handle (used in h2 proxy
-    tunnels)
-  - future extension possibilities:
-    - conversions of `dynhds` to nghttp2/nghttp3 name+value arrays
-
-  Closes #10720
-
-- pytest: improvements for suitable curl and error output
-
-  - will check built curl for http and https support and
-    skip all tests if not there
-  - will dump stdout/stderr/trace output on errored responses
-
-  Closes #10829
-
-Daniel Stenberg (29 Mar 2023)
-
-- lib: use correct printf flags for sockets and timediffs
-
-  Introduces CURL_FORMAT_SOCKET_T for outputting socket numbers.
-
-  Fixes #10737
-  Reported-by: Gisle Vanem
-  Closes #10855
-
-- telnet: make MSVC ignore warning for assignment within conditional
-
-  Follow-up to d92a5007b60e0af7d
-
-  Closes #10859
-
-- ws: handle reads before EAGAIN better
-
-  Reported-by: simplerobot on github
-  Fixes #10831
-  Closes #10856
-
-- test1592: add flaky keyword
-
-  Closes #10860
-
-Frank Gevaerts (28 Mar 2023)
-
-- lib/sha256.c: typo fix in comment (duplicated "is available")
-
-  Closes #10851
-
-Arne Soete (28 Mar 2023)
-
-- tests: update tests/httpd references to tests/http
-
-  tests/httpd was renamed to tests/http in #10654. This patch updates some
-  references in the README
-
-  Closes #10854
-
-Kamil Dudka (28 Mar 2023)
-
-- telnet: simplify the implementation of str_is_nonascii()
-
-  There is no need to traverse the string twice.
-
-  Closes #10852
-
-Frank Gevaerts (28 Mar 2023)
-
-- curl_easy_getinfo.3: typo fix (duplicated "from the")
-
-  Closes #10850
-
-Philip Heiduck (28 Mar 2023)
-
-- wolfssl.yml: bump to version 5.6.0
-
-  Closes #10843
-
-Daniel Stenberg (28 Mar 2023)
-
-- RELEASE-NOTES: synced
-
-Ronan Pigott (28 Mar 2023)
-
-- docs/cmdline-opts: document the dotless config path
-
-  The real xdg config path is $XDG_CONFIG_HOME/curlrc, without the dot.
-  The dotless name seems preferable, so let's match the documentation to
-  the behavior.
-
-  Closes #10849
-
-Daniel Stenberg (28 Mar 2023)
-
-- HTTP-COOKIES.md: mention the #HttpOnly_ prefix
-
-  Fixes #10847
-  Reported-by: Harry Sintonen
-  Closes #10848
-
-- dynbuf: never allocate larger than "toobig"
-
-  As dynbufs always have a fixed maximum size which they are not allowed
-  to grow larger than, making sure that it never allocates a larger buffer
-  makes sure the buffer does not allocate memory that will never be used.
-
-  Closes #10845
-
-- ftplistparser: replace realloc with dynbuf
-
-  Closes #10844
-
-- ftplistparser: use ISDIGIT()
-
-  Closes #10844
-
-- ftplistparser: move out private data from public struct
-
-  The public 'curl_fileinfo' struct contained three fields that are for
-  internal purposes only. This change makes them unused in the public
-  struct.
-
-  The new private struct fields are also renamed to make this separation
-  more obvious internally.
-
-  Closes #10844
-
-- openssl: fix indents - white space edits only
-
-  Closes #10840
-
-- url: remove call to Curl_llist_destroy in Curl_close
-
-  A list that is created with a NULL "destructor" does not need to be
-  destroyed. Not calling it is faster than calling it.
-
-  Closes #10846
-
-- multi: remove PENDING + MSGSENT handles from the main linked list
-
-  As they are not driving transfers or any socket activity, the main loop
-  does not need to iterate over these handles. A performance improvement.
-
-  They are instead only held in their own separate lists.
-
-  'data->multi' is kept a pointer to the multi handle as long as the easy
-  handle is actually part of it even when the handle is moved to the
-  pending/msgsent lists. It needs to know which multi handle it belongs
-  to, if for example curl_easy_cleanup() is called before the handle is
-  removed from the multi handle.
-
-  Alll 'data->multi' pointers of handles still part of the multi handle
-  gets cleared by curl_multi_cleanup() which "orphans" all previously
-  attached easy handles.
-
-  This is take 2. The first version was reverted for the 8.0.1 release.
-
-  Assisted-by: Stefan Eissing
-  Closes #10801
-
-Stefan Eissing (26 Mar 2023)
-
-- tests/http: add timeout to running curl in test cases
-
-  - we had a CI case once where `curl` seemingly did not
-    return and it was hard to guess what happened.
-  - make curl execution in test cases time out after 60 seconds
-
-  Closes #10783
-
-Daniel Stenberg (26 Mar 2023)
-
-- RELEASE-PROCEDURE: update to new schedule
-
-  Ref: https://curl.se/mail/lib-2023-03/0062.html
-
-  Assisted-by: Andy Alt
-  Assisted-by: Dan Frandrich
-
-  Closes #10827
-
-Patrick Monnerat (26 Mar 2023)
-
-- doc: curl_mime_init() strong easy handle binding has been relaxed in 7.87.0
-
-  Reported-by: Chloe Kudryavtsev
-  Fixes #10834
-  Closes #10835
-
-Jay Satiro (25 Mar 2023)
-
-- CURLOPT_WRITEFUNCTION.3: fix typo
-
-  Reported-by: Osaila@users.noreply.github.com
-
-  Fixes https://github.com/curl/curl/issues/10839
-
-Dan Fandrich (24 Mar 2023)
-
-- CI: skip some more builds when possible
-
-  When a commit only contains tests, documentation, or cmake files, skip
-  those builds that aren't affected by those.
-
-  The file filters available on the CI services don't seem to allow
-  skipping individual jobs, only the entire workflow, so we can't get any
-  more fine-grained than this.
-
-- CI: add and adjust labeler match patterns
-
-  Allow cmdline tool alongside other labels.
-
-Kai Pastor (25 Mar 2023)
-
-- CMake: make config version 8 compatible with 7
-
-  Reviewed-by: Jakub Zakrzewski
-  Closes #10819
-
-Daniel Stenberg (24 Mar 2023)
-
-- RELEASE-NOTES: synced
-
-  Bumped version-in-progress to 8.1.0
-
-- GHA: add a memory-sanitizer job
-
-  Closes #10815
-
-Dan Fandrich (23 Mar 2023)
-
-- CI: fix brew retries on GHA
-
-  The fix in the previous commit was complete for Cirrus but accidentally
-  left off a part for GHA.
-
-  Follow-up to c2b7249d
-
-- CI: skip Azure for more commits which change only GHA
-
-Daniel Stenberg (23 Mar 2023)
-
-- cmake: set SONAME for SunOS too
-
-  Provided-by: Brian Lund
-
-  Closes #10816
-
-Stefan Eissing (23 Mar 2023)
-
-- ngtcp2: adjust config and code checks for ngtcp2 without nghttp3
-
-  - make configure show on HTTP3 feature that both ngtcp2 and nghttp3
-    are in play
-  - define ENABLE_QUIC only when USE_NGTCP2 and USE_NGHTTP3 are defined
-  - add USE_NGHTTP3 in the ngtcp2 implementation
-
-  Fixes #10793
-  Closes #10821
-
-Daniel Stenberg (23 Mar 2023)
-
-- data.d: emphasize no conversion
-
-  When asking curl to send a POST, curl does not encode or change the data.
-
-  Ref: #10820
-  Closes #10823
-
-- server/getpart: clear the buffer before load
-
-  Fixes msan warnings:
-
-  ==54195==WARNING: MemorySanitizer: use-of-uninitialized-value
-      #0 0x55ece35e57cb in line_length /home/runner/work/curl/curl/tests/server
-  /getpart.c:111:25
-      #1 0x55ece35e3b83 in readline /home/runner/work/curl/curl/tests/server/ge
-  tpart.c:164:24
-      #2 0x55ece35e0269 in getpart /home/runner/work/curl/curl/tests/server/get
-  part.c:347:18
-      #3 0x55ece36180b6 in parse_servercmd /home/runner/work/curl/curl/tests/se
-  rver/sws.c:283:13
-
-  Closes #10822
-
-- ntlm: clear lm and nt response buffers before use
-
-  To avoid the risk of MemorySanitizer: use-of-uninitialized-value
-
-  Closes #10814
-
-- digest: clear target buffer
-
-  Closes #10814
-
-Douglas R. Reno (22 Mar 2023)
-
-- cmake: bring in the network library on Haiku.
-
-  When cross-compiling for Haiku, the networking library needs to be
-  brought in. Without this, an unknown type of "Error" is reported in
-  lib/curl_setup_once.h.
-
-  This is also needed when using CMake natively on Haiku to build libcurl.
-
-  Fixes #10296
-  Closes #10792
-
-Daniel Stenberg (22 Mar 2023)
-
-- runtests: die if curl version can be found
-
-  Closes #10813
-
-Stefan Eissing (22 Mar 2023)
-
-- multi: add handle asserts in DEBUG builds
-
-  For GOOD_EASY_HANDLE and GOOD_MULTI_HANDLE checks
-
-  - allow NULL pointers to "just" return an error as before
-  - fail hard on nun-NULL pointers that no longer show the MAGICs
-
-  Closes #10812
-
-Jon Rumsey (22 Mar 2023)
-
-- gskit: various compile errors in OS400
-
-  Various compile failures in gskit.c;
-
-  - pipe_ssloverssl() needs Curl_easy data parameter for
-    Curl_conn_cf_get_socket(cf, data)
-  - key_passwd is in ssl_config, not conn_config
-  - close_on() has 2 parameters, not 4
-  - getsockopt() needs to call Curl_conn_cf_get_socket(), not
-    cxn->sock[FIRSTSOCKET]
-
-  Fixes #10799
-  Closes #10800
-
-Daniel Stenberg (22 Mar 2023)
-
-- tool_operate: pass a long as CURLOPT_HEADEROPT argument
-
-  Closes #10798
-
-- GHA: run all linux test jobs with valgrind
-
-  Closes #10798
-
-- GHA-linux: add an address-sanitizer build
-
-  Closes #10810
-
-Version 8.0.1 (20 Mar 2023)
-
-Daniel Stenberg (20 Mar 2023)
-
-- RELEASE-NOTES: synced
-
-  curl 8.0.1
-
-- Revert "multi: remove PENDING + MSGSENT handles from the main linked list"
-
-  This reverts commit f6d6f3ce01e377932f1ce7c24ee34d45a36950b8.
-
-  The commits caused issues in the 8.0.0 release. Needs a retake.
-
-  Reported-by: Kamil Dudka
-  Closes #10795
-
-- include/curl/curlver.h: bump to 8.0.1
-
-Version 8.0.0 (20 Mar 2023)
-
-Daniel Stenberg (20 Mar 2023)
-
-- RELEASE-NOTES: synced
-
-  The curl 8.0.0 release
-
-- THANKS: from the 8.0.0 release
-
-- scripts/delta: fix "ambiguous argument" when used in branches
-
-- SECURITY-PROCESS.md: Busy-loops are not security problems
-
-  Closes #10790
-
-Stefan Eissing (17 Mar 2023)
-
-- tests/http: do not save files for downloads in scorecard testing
-
-  Closes #10788
-
-Daniel Stenberg (17 Mar 2023)
-
-- cf-socket: use port 80 when resolving name for local bind
-
-  It turns out c-ares returns an error when asked to resolve a host name with
-  ares_getaddrinfo using port number 0.
-
-  Reported as a c-ares bug here: https://github.com/c-ares/c-ares/issues/517
-
-  The work-around is to simply use port 80 instead, as the number typically doe
-  s
-  not make a difference and a non-zero number works for c-ares.
-
-  Fixes #10759
-  Reported-by: Matt Jolly
-  Closes #10789
-
-- curl.h: require gcc 12.1 for the deprecation magic
-
-  Reported-by: kchow-FTNT on github
-  Fixes #10726
-  Closes #10784
-
-- Revert "rtsp: use dynbuf instead of custom reallocs"
-
-  This reverts commit 1b9ea3239d22147e00d8 because of OSS-fuzz reports.
-  I'll do another take after the pending release.
-
-  Closes #10785
-
-- test422: verify --next used without a prior URL
-
-  Closes #10782
-
-- tool_getparam: error if --next is used without a prior URL
-
-  Reported-by: 積丹尼 Dan Jacobson
-  Ref: https://github.com/curl/curl/pull/10769#discussion_r1137895629
-
-  Closes #10782
-
-- libssh: use dynbuf instead of realloc
-
-  When building lines to show for SFTP directory listings.
-
-  Closes #10778
-
-- lib2305: deal with CURLE_AGAIN
-
-  The test does a slightly ugly busy-loop for this case but should be
-  managable due to it likely being a very short moment.
-
-  Mention CURLE_AGAIN in curl_ws_recv.3
-
-  Fixes #10760
-  Reported-by: Jay Satiro
-  Closes #10781
-
-- rtsp: use dynbuf instead of custom reallocs
-
-  For the RTP buffering.
-
-  Closes #10776
-
-- libssh2: remove unused variable from libssh2's struct
-
-  Closes #10777
-
-- RELEASE-NOTES: synced
-
-- multi: remove PENDING + MSGSENT handles from the main linked list
-
-  As they are not driving transfers or any socket activity, the main loop
-  does not need to iterate over these handles. A performance improvement.
-
-  They are instead only held in their own separate lists.
-
-  Assisted-by: Stefan Eissing
-  Ref: #10743
-  Closes #10762
-
-- multi: turn link/unlinking easy handles into dedicated functions
-
-- http_aws_sigv4: fix scan-build "value stored to 'ret' is never read"
-
-  Follow-up to 495d09810aa9a
-
-  Closes #10766
-
-- lib: skip Curl_llist_destroy calls
-
-  Linked lists themselves do not carry any allocations, so for the lists
-  that do not have have a set destructor we can just skip the
-  Curl_llist_destroy() call and save CPU time.
-
-  Closes #10764
-
-- lib643: LIB644 is never defined, this is dead code
-
-  Closes #10765
-
-- libtest/Makefile.inc: remove superfluous variables
-
-  Rely on the defaults when possible.
-
-  Closes #10765
-
-- tests/http: remove year ranges from copyrights
-
-  Closes #10763
-
-Casey Bodley (14 Mar 2023)
-
-- aws_sigv4: fall back to UNSIGNED-PAYLOAD for sign_as_s3
-
-  all s3 requests default to UNSIGNED-PAYLOAD and add the required
-  x-amz-content-sha256 header. this allows CURLAUTH_AWS_SIGV4 to correctly
-  sign s3 requests to amazon with no additional configuration
-
-  Signed-off-by: Casey Bodley <cbodley@redhat.com>
-
-  Closes #9995
-
-Viktor Szakats (14 Mar 2023)
-
-- wolfssl: add quic/ngtcp2 detection in cmake, and fix builds
-
-  - add QUIC/ngtcp2 detection in CMake with wolfSSL.
-
-    Because wolfSSL uses zlib if available, move compression detection
-    before TLS detection. (OpenSSL might also need this in the future.)
-
-  - wolfSSL 5.5.0 started using C99 types in its `quic.h` header, but it
-    doesn't #include the necessary C99 header itself, breaking builds
-    (unless another dependency pulled it by chance.) Add local workaround
-    for it. For this to work with all build tools, we had to fix our
-    header detection first. Ref: #10745
-
-    Ref: https://github.com/curl/curl-for-win/commit/6ad5f6ecc15620c15625fc4434
-  76b3a1ecef4f3f
-
-  Closes #10739
-
-Stefan Eissing (14 Mar 2023)
-
-- secure-transport: fix recv return code handling
-
-  Return code handling of recv calls were not always correct when an error
-  occured or the connection was closed.
-
-  Closes #10717
-
-- http2: Use KEEP_SEND_HOLD for flow control in HTTP/2
-
-  - use the defined, but so far not used, KEEP_SEND_HOLD bit for flow
-    control based suspend of sending in transfers.
-
-  Prior to this change KEEP_SEND_PAUSE bit was used instead, but that can
-  interfere with pausing streams from the user side via curl_easy_pause.
-
-  Fixes https://github.com/curl/curl/issues/10751
-  Closes https://github.com/curl/curl/pull/10753
-
-Dan Fandrich (13 Mar 2023)
-
-- tests: fix control code that hid some text in runtests.1
-
-- tests: sync option lists in runtests.pl & its man page
-
-Daniel Stenberg (13 Mar 2023)
-
-- multi: make multi_perform ignore/unignore signals less often
-
-  For improved performance
-
-  Reported-by: Jerome St-Louis
-  Ref: #10743
-  Closes #10750
-
-Viktor Szakats (13 Mar 2023)
-
-- cmake: delete unused HAVE__STRTOI64
-
-  Also delete obsolete surrounding comments.
-
-  Reviewed-by: Daniel Stenberg
-  Closes #10756
-
-- CI: fix copyright header
-
-  Follow-up to 395b9175b7422d699fa93643973295c106cdf147
-
-Daniel Stenberg (13 Mar 2023)
-
-- RELEASE-PROCEDURE.md: update coming release dates
-
-Stefan Eissing (13 Mar 2023)
-
-- tests/http: add pytest to GHA and improve tests
-
-  - added to: ngtcp2-quictls, ngtcp2-gnutls and the linux varians
-    quiche, bearssl, libressl, mbedtls, openssl3, rustls
-  - added disabled in ngtcp2-wolfssl due to weird SSL_connect() errors
-    not reproducable locally
-
-  Improvements on pytest:
-
-  -  handling of systems with nghttpx in $PATH
-     - configure will seach $PATH got nghttpx used in pytest
-     - pytest fixes for managing nghttpx without h3 support
-     - ngtcp2-wolfssl: use a fully enabled wolfssl build
-
-  - lower parallel count for http/1.1 tests, since we do not
-     want to test excessive connections.
-  - check built curl for HTTPS-proxy support in proxy tests
-  - bearssl does not like one of our critical cert extensions, making
-    it non-critical now
-  - bearssl is too slow for test_12, skipping
-  - making sure we do h3 tests only when curl and server support is there
-
-  Closes #10699
-
-Marcel Raad (13 Mar 2023)
-
-- tool_operate: silence unused parameter warning
-
-  `global` is only used in the `my_setopt` macro version without
-  `CURL_DISABLE_LIBCURL_OPTION` since commit 4774decf10a.
-
-  Closes https://github.com/curl/curl/pull/10752
-
-Viktor Szakats (13 Mar 2023)
-
-- build: fix stdint/inttypes detection with non-autotools
-
-  Fix `stdint.h` and `inttypes.h` detection with non-autotools builds on
-  Windows. (autotools already auto-detected them accurately.)
-
-  `lib/config-win32.h` builds (e.g. `Makefile.mk`):
-  - set `HAVE_STDINT_H` where supported.
-  - set `HAVE_INTTYPES_H` for MinGW.
-
-  CMake:
-  - auto-detect them on Windows. (They were both force-disabled.)
-  - delete unused `CURL_PULL_STDINT_H`.
-  - delete unused `CURL_PULL_INTTYPES_H`.
-  - stop detecting `HAVE_STDINT_H` twice.
-    Present since the initial CMake commit: 4c5307b45655ba75ab066564afdc0c111a8
-  b9291
-
-  curl doesn't use these C99 headers, we need them now to workaround
-  broken wolfSSL builds. Ref: #10739
-
-  Once that clears up, we can delete these detections and macros (unless
-  we want to keep them for future us.)
-
-  Reviewed-by: Daniel Stenberg
-  Closes #10745
-
-Daniel Stenberg (13 Mar 2023)
-
-- RELEASE-NOTES: synced
-
-- ftp: add more conditions for connection reuse
-
-  Reported-by: Harry Sintonen
-  Closes #10730
-
-Dan Fandrich (12 Mar 2023)
-
-- tests: make first.c the same for both lib tests and unit tests
-
-  The only difference used to be global variable used in unittest tests.
-  After cb7ed5a removed individual flag overrides for the unittests, first.c
-  was no longer recompiled for unit tests to include the flag, so whether it
-  worked or gave a link error depended on whether it was compiled in
-  libtest or unittest first. This way also speeds up the build by
-  eliminating 40 identical compile invocations.
-
-  Fixes #10749
-
-- tests: use AM_CPPFILES to modify flags in unit tests
-
-  Using CPPFLAGS sometimes caused odd compile issues when building tests
-  with parallel make and AM_CPPFILES is the right flag, anyway.
-
-  Follow-up to cb7ed5a
-
-  Ref #10749
-
-Viktor Szakats (13 Mar 2023)
-
-- Makefile.mk: fix -g option in debug mode [ci skip]
-
-  Add it to `CFLAGS` (was: `LDFLAGS`).
-
-  Closes #10747
-
-Jay Satiro (12 Mar 2023)
-
-- tool: improve --stderr handling
-
-  - freopen stderr with the user-specified file (--stderr file) instead of
-    using a separate 'errors' stream.
-
-  - In tool_setup.h override stdio.h's stderr macro as global variable
-    tool_stderr.
-
-  Both freopen and overriding the stderr macro are necessary because if
-  the user-specified filename is "-" then stdout is assigned to
-  tool_stderr and no freopen takes place. See the PR for more information.
-
-  Ref: https://github.com/curl/curl/issues/10491
-
-  Closes https://github.com/curl/curl/pull/10673
-
-Dan Fandrich (11 Mar 2023)
-
-- CI: don't run CI jobs if only another CI was changed
-
-  Also skip builds on non-Windows platforms when only Windows build files
-  have changed.
-
-  This should reduce the number of useless builds and the associated
-  waiting time and chance of spurious failures, freeing resources for
-  new PRs.
-
-  Closes #10742
-
-- http: don't send 100-continue for short PUT requests
-
-  This is already how curl is documented to behave in Everything curl, but
-  in actuality only short POSTs skip this. This should knock 30 seconds
-  off a full run of the test suite since the 100-continue timeout will no
-  longer be hit.
-
-  Closes #10740
-
-- tests: add DELAY keyword to more tests using waits
-
-- tests: hack to build most unit tests under cmake
-
-  These are only built when a libcurl static library is available, since
-  we're not building a special libcurlu library yet and these tests rely
-  on private symbols that aren't available in the shared library. A few
-  unit tests do require libcurlu, so those are not built.
-
-  Closes #10722
-
-- tests: fix MSVC unreachable code warnings in unit tests
-
-  Switch unit1654 to use the proper test macros as well.
-
-- tests: make CPPFLAGS common to all unit tests
-
-  There's no need to specify them individually.
-
-- tests: keep cmake unit tests names in sync
-
-  Put only the test names into Makefile.inc so they can be used by both
-  cmake and automake. This will prevent the list of tests from becoming
-  out of date when they are also built under cmake.
-
-Viktor Szakats (11 Mar 2023)
-
-- src: silence wmain() warning for all build methods
-
-  llvm/clang and gcc doesn't recognize the wmain() function in Unicode
-  Windows builds:
-
-  llvm/clang:
-  ```
-  ../../src/tool_main.c:239:5: warning: no previous prototype for function 'wma
-  in' [-Wmissing-prototypes]
-  int wmain(int argc, wchar_t *argv[])
-      ^
-  1 warning generated.
-  ```
-
-  gcc:
-  ```
-  ../../src/tool_main.c:239:5: warning: no previous prototype for 'wmain' [-Wmi
-  ssing-prototypes]
-    239 | int wmain(int argc, wchar_t *argv[])
-        |     ^~~~~
-  ```
-
-  Before this patch, we already silenced it with CMake. This patch moves
-  the silencing to the source, so that it applies to all build tools.
-
-  Bug: https://github.com/curl/curl/issues/7229#issuecomment-1464806651
-
-  Reviewed-by: Marcel Raad
-  Closes #10744
-
-Dan Fandrich (10 Mar 2023)
-
-- CI: fix retrying on brew failures
-
-  The previous attempt didn't consider that the shell would exit
-  immediately after the false statement in the retry case.
-
-  Follow-up to dc141a37
-
-Stefan Eissing (10 Mar 2023)
-
-- http2: fix error handling during parallel operations
-
-  RST and connection close were not handled correctly during parallel
-  transfers, leading to aborted response bodies being reported complete.
-
-  Closes #10715
-
-Daniel Stenberg (10 Mar 2023)
-
-- url: only reuse connections with same GSS delegation
-
-  Reported-by: Harry Sintonen
-  Closes #10731
-
-Viktor Szakats (10 Mar 2023)
-
-- lib: silence clang/gcc -Wvla warnings in brotli headers
-
-  brotli v1.0.0 throughout current latest v1.0.9 and latest master [1]
-  trigger this warning.
-
-  It happened with CMake and GNU Make. autotools builds avoid it with
-  the `convert -I options to -isystem` macro.
-
-  llvm/clang:
-  ```
-  In file included from ./curl/lib/content_encoding.c:36:
-  ./brotli/x64-ucrt/usr/include/brotli/decode.h:204:34: warning: variable lengt
-  h array used [-Wvla]
-      const uint8_t encoded_buffer[BROTLI_ARRAY_PARAM(encoded_size)],
-                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  ./brotli/x64-ucrt/usr/include/brotli/port.h:253:34: note: expanded from macro
-   'BROTLI_ARRAY_PARAM'
-                                   ^~~~~~
-  In file included from ./curl/lib/content_encoding.c:36:
-  ./brotli/x64-ucrt/usr/include/brotli/decode.h:206:48: warning: variable lengt
-  h array used [-Wvla]
-      uint8_t decoded_buffer[BROTLI_ARRAY_PARAM(*decoded_size)]);
-                             ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
-  ./brotli/x64-ucrt/usr/include/brotli/port.h:253:35: note: expanded from macro
-   'BROTLI_ARRAY_PARAM'
-                                   ~^~~~~
-  ```
-
-  gcc:
-  ```
-  In file included from ./curl/lib/content_encoding.c:36:
-  ./brotli/x64-ucrt/usr/include/brotli/decode.h:204:5: warning: ISO C90 forbids
-   variable length array 'encoded_buffer' [-Wvla]
-    204 |     const uint8_t encoded_buffer[BROTLI_ARRAY_PARAM(encoded_size)],
-        |     ^~~~~
-  ./brotli/x64-ucrt/usr/include/brotli/decode.h:206:5: warning: ISO C90 forbids
-   variable length array 'decoded_buffer' [-Wvla]
-    206 |     uint8_t decoded_buffer[BROTLI_ARRAY_PARAM(*decoded_size)]);
-        |     ^~~~~~~
-  ```
-
-  [1] https://github.com/google/brotli/commit/ed1995b6bda19244070ab5d331111f16f
-  67c8054
-
-  Reviewed-by: Daniel Stenberg
-  Reviewed-by: Marcel Raad
-  Closes #10738
-
-Daniel Stenberg (10 Mar 2023)
-
-- curl_path: create the new path with dynbuf
-
-  Closes #10729
-
-- url: remove dummy protocol handler
-
-  Just two added checks were needed saves a whole handler struct.
-
-  Closes #10727
-
-Dan Fandrich (10 Mar 2023)
-
-- CI: retry a failed brew update too, not just brew install
-
-  Also, make sure an eventual failure ends up returning a failure code so
-  the job stops.
-
-Daniel Stenberg (10 Mar 2023)
-
-- url: fix the SSH connection reuse check
-
-  Reported-by: Harry Sintonen
-  Closes #10735
-
-- CURLOPT_PROXY.3: curl+NSS does not handle HTTPS over unix domain socket
-
-  It results in error "NSS error -5985 (PR_ADDRESS_NOT_SUPPORTED_ERROR)"
-
-  Disabled test 1470 for NSS builds and documented the restriction.
-
-  Reported-by: Dan Fandrich
-  Fixes #10723
-  Closes #10734
-
-- CURLSHOPT_SHARE.3: HSTS sharing is not thread-safe
-
-  Reported-by: Hiroki Kurosawa
-  Closes #10732
-
-- telnet: only accept option arguments in ascii
-
-  To avoid embedded telnet negotiation commands etc.
-
-  Reported-by: Harry Sintonen
-  Closes #10728
-
-- test1903: test use of COOKIEFILE - reset - COOKIEFILE
-
-  This also tests for the memory leak bug fixed by parent commit b559ef6f.
-
-  Ref: #10694
-
-  Closes https://github.com/curl/curl/pull/10712
-
-Jay Satiro (10 Mar 2023)
-
-- url: fix cookielist memleak when curl_easy_reset
-
-  - Free set.cookelist in Curl_freeset instead of Curl_close.
-
-  Prior to this change the cookielist linked list wasn't freed by
-  curl_easy_reset which calls Curl_freeset to free all set.
-
-  Bug: https://github.com/curl/curl/issues/10694#issuecomment-1458619157
-  Reported-by: Sergey Ryabinin
-
-  Closes https://github.com/curl/curl/pull/10709
-
-Dan Fandrich (10 Mar 2023)
-
-- tests: fix some keywords and unused sections
-
-- tests: fix test1301 to call the right binary
-
-  It was refactored in commit 480ac6e5 but this step was missed.
-
-- tests: add timeout, SLOWDOWN and DELAY keywords to tests
-
-  These are tests that are testing timing and end up being quite slow.
-
-Daniel Stenberg (10 Mar 2023)
-
-- RELEASE-NOTES: synced
-
-Stefan Eissing (10 Mar 2023)
-
-- wolfSSL: ressurect the BIO `io_result`
-
-  In pytest'ing the situation occored that wolfSSL reported an
-  IO error when the underlying BIO operation was returning an
-  CURLE_AGAIN condition.
-
-  Readding the `io_result` filter context member to detect such
-  situations.
-
-  Also, making sure that the returned CURLcode is initialized
-  on all recv operations outcome.
-
-  Closes #10716
-
-- gssapi: align global `gss_OID_desc` vars to silence ld warnings on macOS vent
-  ura
-
-  Refs #9975 which first reported this.
-
-  Closes #10718
-
-Daniel Stenberg (10 Mar 2023)
-
-- libssh2: only set the memory callbacks when debugging
-
-  This makes us debug libssh2 less and libcurl more when for example
-  running torture tests that otherwise will spend a lot of time in libssh2
-  functions.
-
-  We leave libssh2 to test libssh2.
-
-  Closes #10721
-
-- docs/SECURITY-PROCESS.md: updates
-
-  - allow Low+Medium issues to be managed through plain PRs
-  - update the bug-bounty part to reflect current reality
-
-  Closes #10719
-
-Dan Fandrich (9 Mar 2023)
-
-- tests: fix tag markup issues in some tests
-
-Marcel Raad (9 Mar 2023)
-
-- tests: add `cookies` features
-
-  These tests don't work with `--disable-cookies`.
-
-  Closes https://github.com/curl/curl/pull/10713
-
-- test420: add cookies keyword
-
-  It fails with `--disable-cookies`.
-
-  Closes https://github.com/curl/curl/pull/10713
-
-Dan Fandrich (8 Mar 2023)
-
-- CI: Add more labeler match patterns
-
-  Also, add the  CI, tests or libcurl API tags in conjunction with any
-  others that might also apply.
-
-Andy Alt (9 Mar 2023)
-
-- GHA: minor improvements to spellcheck
-
-  Closes #10640
-
-Daniel Stenberg (9 Mar 2023)
-
-- test1671: fix after fix
-
-- test421: -w %{header_json} test with multiple same header names
-
-  To reproduce the issue in #10704
-
-- tool_writeout_json. fix the output for duplicate header names
-
-  Header entries with index != 0 are handled at the index 0 level so they
-  should then be skipped when iterated over.
-
-  Reported-by: Boris Okunskiy
-  Fixes #10704
-  Closes #10707
-
-- headers: make curl_easy_header and nextheader return different buffers
-
-  By letting curl_easy_header() and curl_easy_nextheader() store the
-  header data in their own struct storage when they return a pointer to
-  it, it makes it possible for applications to use them both in a loop.
-  Like the curl tool does.
-
-  Reported-by: Boris Okunskiy
-  Fixes #10704
-  Closes #10707
-
-rcombs (8 Mar 2023)
-
-- urlapi: take const args in _dup and _get functions
-
-  Closes #10708
-
-- urlapi: avoid mutating internals in getter routine
-
-  This was not intended.
-
-  Closes #10708
-
-Daniel Stenberg (8 Mar 2023)
-
-- urlapi: '%' is illegal in host names
-
-  Update test 1560 to verify
-
-  Ref: #10708
-  Closes #10711
-
-- ftp: make the 'ftpauth' a more normal 'char *'-array
-
-  Closes #10703
-
-Evgeny Grin (Karlson2k) (8 Mar 2023)
-
-- doc: fix compiler warning in libcurl.m4
-
-  Current test for curl_free() may produce warnings with strict compiler
-  flags or even with default compiler flags with upcoming versions.
-  These warning could turned into errors by -Werror or similar flags.
-  Such warnings/errors are avoided by this patch.
-
-  Closes #10710
-
-Viktor Szakats (8 Mar 2023)
-
-- misc: fix typos
-
-  Closes #10706
-
-Stefan Eissing (7 Mar 2023)
-
-- ftp: active mode with SSL, add the damn filter
-
-  - since 7.87.0 we lost adding the SSL filter for an active
-    FTP connection that uses SSL. This leads to hangers and timeouts
-    as reported in #10666.
-
-  Reported-by: SandakovMM on github
-  Fixes #10666
-  Closes #10669
-
-Daniel Stenberg (7 Mar 2023)
-
-- docs: extend the URL API descriptions
-
-  Closes #10701
-
-Stefan Eissing (7 Mar 2023)
-
-- url: fix logic in connection reuse to deny reuse on "unclean" connections
-
-  - add parameter to `conn_is_alive()` cfilter method that returns
-    if there is input data waiting on the connection
-  - refrain from re-using connnection from the cache that have
-    input pending
-  - adapt http/2 and http/3 alive checks to digest pending input
-    to check the connection state
-  - remove check_cxn method from openssl as that was just doing
-    what the socket filter now does.
-  - add tests for connection reuse with special server configs
-
-  Closes #10690
-
-Daniel Stenberg (6 Mar 2023)
-
-- x509asn1: use plain %x, not %lx, when the arg is an int
-
-  Pointed out by Coverity.
-
-  Closes #10689
-
-Stefan Eissing (6 Mar 2023)
-
-- http2: fix handling of RST and GOAWAY to recognize partial transfers
-
-  - a reset transfer (HTTP/2 RST) did not always lead to the proper
-    error message on receiving its response, leading to wrong reports
-    of a successful transfer
-  - test_05_02 was able to trigger this condition with increased transfer
-    count. The simulated response errors did not carry a 'Content-Length'
-    so only proper RST handling could detect the abort
-  - When doing such transfers in parallel, a connection could enter the
-    state where
-    a) it had been closed (GOAWAY received)
-    b) the RST had not been "seen" for the transfer yet
-    or c) the GOAWAY announced an error and the last successful
-    stream id was not checked against ongoing transfers
-
-  Closes #10693
-
-- tests: use dynamic ports numbers in pytest suite
-
-  - necessary ports are bound at start of test suite and then
-    given to server fixtures for use.
-  - this make parallel use of pytest (in separate directories),
-    practically safe for use as OS tend to not reuse such port numbers
-    for a while
-
-  Closes #10692
-
-- connect: fix time_connect and time_appconnect timer statistics
-
-  - time_connect was not updated when the overall connection failed,
-    e.g. when SSL verification was unsuccessful, refs #10670
-  - rework gather those values to interrogate involved filters,
-    also from all eyeballing attempts, to report the maximum of
-    those values.
-  - added 3 test cases in test_06 to check reported values on
-    successful, partially failed and totally failed connections.
-
-  Reported-by: Master Inspire
-  Fixes #10670
-  Closes #10671
-
-Daniel Stenberg (6 Mar 2023)
-
-- test1905: update output cookie order
-
-  After the #10685 update
-
-- test420: verify expiring cookies
-
-  Cookies that are loaded fine from a jar but then are expired in headers.
-
-- cookie: don't load cookies again when flushing
-
-  Reported-by: Sergio Mijatovic
-  Fixes #10677
-  Closes #10685
-
-- RELEASE-NOTES: synced
-
-Andy Alt (6 Mar 2023)
-
-- docs: note '--data-urlencode' option
-
-  Closes #10687
-
-Daniel Stenberg (6 Mar 2023)
-
-- DEPRECATE: the original legacy mingw version 1
-
-  Remove completely in September 2023
-
-  Closes #10667
-
-Harry Sintonen (6 Mar 2023)
-
-- rand: use arc4random as fallback when available
-
-  Normally curl uses cryptographically strong random provided by the
-  selected SSL backend. If compiled without SSL support, a naive built-in
-  function was used instead.
-
-  Generally this was okay, but it will result in some downsides for non-
-  SSL builds, such as predictable temporary file names.
-
-  This change ensures that arc4random will be used instead, if available.
-
-  Closes #10672
-
-Grisha Levit (6 Mar 2023)
-
-- tool: dump headers even if file is write-only
-
-  The fixes in #10079 brought a (seemingly unrelated) change of open mode
-  from `wb`/`ab` to `wb+`/`ab+` for the headerfile. This makes it no
-  longer possible to write the header file to e.g. a pipe, like:
-
-      curl -D >(grep ...) file:///dev/null
-
-  Which presently results in `Warning: Failed to open /dev/fd/63`
-
-  See #10079
-  Closes #10675
