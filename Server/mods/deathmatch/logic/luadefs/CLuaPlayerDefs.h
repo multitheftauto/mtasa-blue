@@ -103,4 +103,5 @@ public:
 
     static bool RedirectPlayer(CPlayer* pElement, std::string strHost, unsigned short usPort, std::optional<std::string> strPassword,
                                std::optional<std::unordered_map<std::string, std::string>> mArgs);
+    static std::string CLuaPlayerDefs::ArgsToString(const std::string& str, const ::pair<const std::string, std::string>& pair);
 };

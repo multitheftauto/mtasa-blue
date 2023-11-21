@@ -1163,6 +1163,19 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
     return 1;
 }
 
+std::string CLuaPlayerDefs::ArgsToString(const std::string& str, const std::pair<const std::string, std::string>& args)
+{
+    static const std::string delimiter = "/";
+
+    SString key = args.first;
+    SString value = args.second;
+
+    // Remove delimiter from values
+    key.Replace(delimiter.c_str(), "");
+
+    return str + (str.empty() ? std::string() : delimiter) + key + delimiter + value;
+}
+
 bool CLuaPlayerDefs::RedirectPlayer(CPlayer* pElement, std::string strHost, unsigned short usPort, std::optional<std::string> strPassword,
                                     std::optional<std::unordered_map<std::string, std::string>> mArgs)
 {
@@ -1173,10 +1186,7 @@ bool CLuaPlayerDefs::RedirectPlayer(CPlayer* pElement, std::string strHost, unsi
         auto args = mArgs.value();
 
         // Convert table of strings ({["a"] = "1", ["b"] = "2"}) to string ("a/1/b/2")
-        const std::string delimiter = "/";
-        strDetails = std::accumulate(args.begin(), args.end(), std::string(),
-                                     [delimiter](const std::string& s, const std::pair<const std::string, std::string>& p)
-                                     { return s + (s.empty() ? std::string() : delimiter) + p.first + delimiter + p.second; });
+        strDetails = std::accumulate(args.begin(), args.end(), std::string(), &ArgsToString);
     }
 
     if (strDetails.length() > MAX_REDIRECT_DETAILS_LENGTH)
