@@ -1,5 +1,3 @@
-extern uint CRCTab[256];
-
 void CryptData::SetKey13(const char *Password)
 {
   Key13[0]=Key13[1]=Key13[2]=0;
@@ -27,17 +25,6 @@ void CryptData::SetKey15(const char *Password)
     Key15[2]^=P^CRCTab[P];
     Key15[3]+=P+(CRCTab[P]>>16);
   }
-}
-
-
-void CryptData::SetAV15Encryption()
-{
-  InitCRC32(CRCTab);
-  Method=CRYPT_RAR15;
-  Key15[0]=0x4765;
-  Key15[1]=0x9021;
-  Key15[2]=0x7382;
-  Key15[3]=0x5215;
 }
 
 
