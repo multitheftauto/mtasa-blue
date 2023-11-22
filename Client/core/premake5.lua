@@ -21,6 +21,7 @@ project "Client Core"
 			"../../vendor/sparsehash/src/",
 			"../../vendor/detours/4.0.1/src",
 			"../../vendor/discord-rpc/discord/include",
+			"../../vendor/curl/include",
 		}
 
 	pchheader "StdInc.h"

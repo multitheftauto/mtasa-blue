@@ -26,7 +26,7 @@
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordRichPresence.h"
-#include <curl/include/curl/curl.h>
+#include <curl/curl.h>
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
