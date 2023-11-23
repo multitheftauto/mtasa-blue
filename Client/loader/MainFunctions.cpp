@@ -863,7 +863,7 @@ void CheckDataFiles()
     {
         const char* expected;
         const char* fileName;
-    } integrityCheckList[] = {{"E88E3CB422166AC910AFF6FF0FC4A816", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
+    } integrityCheckList[] = {{"83BA751B80BB79133A861B06E82052AD", "bass.dll"},           {"285A668CB793F5A5CA134DE9682A6064", "bass_aac.dll"},
                               {"0752692DA87EBF6595AFAC9BC3D3B1BF", "bass_ac3.dll"},       {"DF3BE351F8EDE366FBE542FEBE114508", "bass_fx.dll"},
                               {"9F48DD702AB5BE002F9223E3B45A2261", "bassflac.dll"},       {"4E89426025D1E1F524495D910B60C709", "bassmidi.dll"},
                               {"D31DA7583083C1370F3C6B9C15F363CC", "bassmix.dll"},        {"2F87C5E0A1B7B28C8FC0D7E74116DDFC", "bassopus.dll"},
