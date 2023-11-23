@@ -1706,7 +1706,7 @@ namespace SharedUtil
         const T* operator->() const { return pPointer->GetData(); }
     };
 
-    std::vector<std::string> Explode(std::string const& s, char delim);
+    std::vector<std::string> Split(std::string const& s, char delim);
 };            // namespace SharedUtil
 
 using namespace SharedUtil;

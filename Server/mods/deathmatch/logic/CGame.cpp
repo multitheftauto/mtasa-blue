@@ -4255,7 +4255,7 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     Arguments.PushNumber(pPlayer->GetMTAVersion());
     Arguments.PushString(pPlayer->GetPlayerVersion());
 
-    auto vecArgs = SharedUtil::Explode(pPlayer->GetConnectArgs(), '/');
+    auto vecArgs = SharedUtil::Split(pPlayer->GetConnectArgs(), '/');
 
     if (vecArgs.size() > 1)
     {
