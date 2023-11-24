@@ -16,7 +16,6 @@
 #include "CScriptArgReader.h"
 #include "CKeyBinds.h"
 #include <numeric>
-#include <algorithm>
 
 void CLuaPlayerDefs::LoadFunctions()
 {
