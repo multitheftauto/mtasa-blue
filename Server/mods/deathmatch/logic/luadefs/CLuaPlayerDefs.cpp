@@ -16,6 +16,7 @@
 #include "CScriptArgReader.h"
 #include "CKeyBinds.h"
 #include <numeric>
+#include <algorithm>
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -1167,12 +1168,12 @@ std::string CLuaPlayerDefs::ArgsToString(const std::string& str, const std::pair
 {
     static const std::string delimiter = "/";
 
-    SString key = args.first;
-    SString value = args.second;
+    std::string key;
+    std::string value;
 
-    // Remove delimiter from values
-    key.Replace(delimiter.c_str(), "");
-    value.Replace(delimiter.c_str(), "");
+    // Remove delimiter from key & value
+    std::copy_if(args.first.begin(), args.first.end(), std::back_inserter(key), [](char c) { return delimiter.find(c) == std::string::npos; });
+    std::copy_if(args.second.begin(), args.second.end(), std::back_inserter(value), [](char c) { return delimiter.find(c) == std::string::npos; });
 
     return str + (str.empty() ? std::string() : delimiter) + key + delimiter + value;
 }
