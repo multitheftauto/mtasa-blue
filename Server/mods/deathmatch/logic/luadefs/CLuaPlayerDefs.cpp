@@ -1172,6 +1172,7 @@ std::string CLuaPlayerDefs::ArgsToString(const std::string& str, const std::pair
 
     // Remove delimiter from values
     key.Replace(delimiter.c_str(), "");
+    value.Replace(delimiter.c_str(), "");
 
     return str + (str.empty() ? std::string() : delimiter) + key + delimiter + value;
 }
