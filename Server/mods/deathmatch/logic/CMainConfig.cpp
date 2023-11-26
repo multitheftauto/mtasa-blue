@@ -847,12 +847,7 @@ bool CMainConfig::AddMissingSettings()
     if (!g_pGame->IsUsingMtaServerConf())
         return false;
 
-    // Load template
-    const char* szTemplateText =
-        #include MTA_SERVER_CONF_TEMPLATE
-        ;
-    SString strTemplateFilename = PathJoin(g_pServerInterface->GetServerModPath(), "resource-cache", "conf.template");
-    FileSave(strTemplateFilename, szTemplateText);
+    SString strTemplateFilename = PathJoin(g_pServerInterface->GetServerModPath(), "mtaserver.conf.template");
     CXMLFile* pFileTemplate = g_pServerInterface->GetXML()->CreateXML(strTemplateFilename);
     CXMLNode* pRootNodeTemplate = pFileTemplate && pFileTemplate->Parse() ? pFileTemplate->GetRootNode() : nullptr;
     if (!pRootNodeTemplate)
@@ -1463,6 +1458,8 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 0, 1, 1, "filter_duplicate_log_lines", &m_bFilterDuplicateLogLinesEnabled, NULL},
         {false, false, 0, 1, 1, "database_credentials_protection", &m_bDatabaseCredentialsProtectionEnabled, NULL},
         {false, false, 0, 0, 1, "fakelag", &m_bFakeLagCommandEnabled, NULL},
+        {true, true, 50, 1000, 5000, "player_triggered_event_interval", &m_iPlayerTriggeredEventIntervalMs, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
+        {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
     };
 
     static std::vector<SIntSetting> settingsList;
@@ -1505,4 +1502,15 @@ void CGame::ApplyAseSetting()
         if (!m_pLanBroadcast)
             m_pLanBroadcast = m_pASE->InitLan();
     }
+}
+
+void CMainConfig::OnPlayerTriggeredEventIntervalChange()
+{
+    g_pGame->ApplyPlayerTriggeredEventIntervalChange();
+}
+
+void CGame::ApplyPlayerTriggeredEventIntervalChange()
+{
+    m_iClientTriggeredEventsIntervalMs = m_pMainConfig->GetPlayerTriggeredEventInterval();
+    m_iMaxClientTriggeredEventsPerInterval = m_pMainConfig->GetMaxPlayerTriggeredEventsPerInterval();
 }

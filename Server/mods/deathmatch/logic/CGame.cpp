@@ -551,6 +551,9 @@ void CGame::DoPulse()
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
 
+    if (GetTickCount64_() + m_iClientTriggeredEventsIntervalMs > m_lClientTriggeredEventsLastCheck)
+        ProcessClientTriggeredEventSpam();
+
     // Unlock the critical section again
     Unlock();
 }
@@ -1585,6 +1588,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
     m_Events.AddEvent("onPlayerProjectileCreation", "weaponType, posX, posY, posZ, force, target, rotX, rotY, rotZ, velX, velY, velZ", nullptr, false);
     m_Events.AddEvent("onPlayerDetonateSatchels", "", nullptr, false);
+    m_Events.AddEvent("onPlayerTriggerEventThreshold", "", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -2568,6 +2572,8 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
         }
         else
             m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName);
+
+        RegisterClientTriggeredEventUsage(pCaller);
     }
 }
 
@@ -4698,4 +4704,32 @@ void CGame::HandleCrashDumpEncryption()
         }
     }
 #endif
+}
+
+void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
+{
+    if (!pPlayer)
+        return;
+
+    auto iter = m_mapClientTriggeredEvents.find(pPlayer);
+
+    if (iter == m_mapClientTriggeredEvents.end())
+        iter = m_mapClientTriggeredEvents.insert({pPlayer, 0}).first;
+
+    iter->second++;
+}
+
+void CGame::ProcessClientTriggeredEventSpam()
+{
+    for (const auto& pair : m_mapClientTriggeredEvents)
+    {
+        CPlayer* player = pair.first;
+        int      count = pair.second;
+
+        if (player && count > m_iMaxClientTriggeredEventsPerInterval)
+            player->CallEvent("onPlayerTriggerEventThreshold", {});
+    }
+
+    m_mapClientTriggeredEvents.clear();
+    m_lClientTriggeredEventsLastCheck = GetTickCount64_();
 }
