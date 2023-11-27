@@ -4708,7 +4708,7 @@ void CGame::HandleCrashDumpEncryption()
 
 void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
 {
-    if (!pPlayer && pPlayer->IsPlayer() && !pPlayer->IsBeingDeleted())
+    if (!pPlayer || !pPlayer->IsPlayer() || pPlayer->IsBeingDeleted())
         return;
 
     m_mapClientTriggeredEvents[pPlayer]++;
