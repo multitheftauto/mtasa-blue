@@ -528,6 +528,9 @@ void CGame::DoPulse()
     // Process our resource stop/restart queue
     CLOCK_CALL1(m_pResourceManager->ProcessQueue(););
 
+    if (GetTickCount64_() + m_iClientTriggeredEventsIntervalMs > m_lClientTriggeredEventsLastCheck)
+        ProcessClientTriggeredEventSpam();
+
     // Delete all items requested
     CLOCK_CALL1(m_ElementDeleter.DoDeleteAll(););
 
@@ -550,9 +553,6 @@ void CGame::DoPulse()
 
     PrintLogOutputFromNetModule();
     m_pScriptDebugging->UpdateLogOutput();
-
-    if (GetTickCount64_() + m_iClientTriggeredEventsIntervalMs > m_lClientTriggeredEventsLastCheck)
-        ProcessClientTriggeredEventSpam();
 
     // Unlock the critical section again
     Unlock();
@@ -4708,7 +4708,7 @@ void CGame::HandleCrashDumpEncryption()
 
 void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
 {
-    if (!pPlayer)
+    if (!pPlayer && pPlayer->IsPlayer() && !pPlayer->IsBeingDeleted())
         return;
 
     m_mapClientTriggeredEvents[pPlayer]++;
