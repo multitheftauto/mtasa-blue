@@ -4711,11 +4711,6 @@ void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
     if (!pPlayer)
         return;
 
-    auto iter = m_mapClientTriggeredEvents.find(pPlayer);
-
-    if (iter == m_mapClientTriggeredEvents.end())
-        m_mapClientTriggeredEvents.insert({pPlayer, 0});
-
     m_mapClientTriggeredEvents[pPlayer]++;
 }
 
