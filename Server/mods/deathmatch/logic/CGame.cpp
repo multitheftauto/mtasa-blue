@@ -528,8 +528,7 @@ void CGame::DoPulse()
     // Process our resource stop/restart queue
     CLOCK_CALL1(m_pResourceManager->ProcessQueue(););
 
-    if (GetTickCount64_() + m_iClientTriggeredEventsIntervalMs > m_lClientTriggeredEventsLastCheck)
-        ProcessClientTriggeredEventSpam();
+    ProcessClientTriggeredEventSpam();
 
     // Delete all items requested
     CLOCK_CALL1(m_ElementDeleter.DoDeleteAll(););
@@ -4731,10 +4730,7 @@ void CGame::ProcessClientTriggeredEventSpam()
             if (GetTickCount64_() - pair.second >= m_iClientTriggeredEventsIntervalMs)
             {
                 if (pair.first > m_iMaxClientTriggeredEventsPerInterval)
-                {
                     player->CallEvent("onPlayerTriggerEventThreshold", {});
-                    m_mapClientTriggeredEvents.erase(player);
-                }
 
                 m_mapClientTriggeredEvents.erase(player);
             }
@@ -4744,6 +4740,4 @@ void CGame::ProcessClientTriggeredEventSpam()
             m_mapClientTriggeredEvents.erase(player);
         }
     }
-
-    m_lClientTriggeredEventsLastCheck = GetTickCount64_();
 }
