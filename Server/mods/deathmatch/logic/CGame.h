@@ -667,5 +667,5 @@ private:
     int m_iClientTriggeredEventsIntervalMs = 1000;
     long long m_lClientTriggeredEventsLastCheck = 0;
 
-    std::map<CPlayer*, int> m_mapClientTriggeredEvents;
+    std::map<CPlayer*, std::pair<int, int>> m_mapClientTriggeredEvents;
 };

@@ -4711,17 +4711,35 @@ void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
     if (!pPlayer || !pPlayer->IsPlayer() || pPlayer->IsBeingDeleted())
         return;
 
-    m_mapClientTriggeredEvents[pPlayer]++;
+    // If key/player doesn't exist in map, store time of entry
+    if (m_mapClientTriggeredEvents.find(pPlayer) == m_mapClientTriggeredEvents.end())
+        m_mapClientTriggeredEvents[pPlayer].second = GetTickCount64_();
+
+    m_mapClientTriggeredEvents[pPlayer].first++;
 }
 
 void CGame::ProcessClientTriggeredEventSpam()
 {
-    for (const auto& [player, count]: m_mapClientTriggeredEvents)
+    for (const auto& [player, pair]: m_mapClientTriggeredEvents)
     {
-        if (player && player->IsPlayer() && !player->IsBeingDeleted() && count > m_iMaxClientTriggeredEventsPerInterval)
-            player->CallEvent("onPlayerTriggerEventThreshold", {});
+        if (player && player->IsPlayer() && !player->IsBeingDeleted())
+        {
+            if (GetTickCount64_() - pair.second >= m_iClientTriggeredEventsIntervalMs)
+            {
+                if (pair.first > m_iMaxClientTriggeredEventsPerInterval)
+                {
+                    player->CallEvent("onPlayerTriggerEventThreshold", {});
+                    m_mapClientTriggeredEvents.erase(player);
+                }
+
+                m_mapClientTriggeredEvents.erase(player);
+            }
+        }
+        else
+        {
+            m_mapClientTriggeredEvents.erase(player);
+        }
     }
 
-    m_mapClientTriggeredEvents.clear();
     m_lClientTriggeredEventsLastCheck = GetTickCount64_();
 }
