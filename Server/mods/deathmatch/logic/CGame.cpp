@@ -4714,19 +4714,16 @@ void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
     auto iter = m_mapClientTriggeredEvents.find(pPlayer);
 
     if (iter == m_mapClientTriggeredEvents.end())
-        iter = m_mapClientTriggeredEvents.insert({pPlayer, 0}).first;
+        m_mapClientTriggeredEvents.insert({pPlayer, 0});
 
-    iter->second++;
+    m_mapClientTriggeredEvents[pPlayer]++;
 }
 
 void CGame::ProcessClientTriggeredEventSpam()
 {
-    for (const auto& pair : m_mapClientTriggeredEvents)
+    for (const auto& [player, count]: m_mapClientTriggeredEvents)
     {
-        CPlayer* player = pair.first;
-        int      count = pair.second;
-
-        if (player && count > m_iMaxClientTriggeredEventsPerInterval)
+        if (player && player->IsPlayer() && !player->IsBeingDeleted() && count > m_iMaxClientTriggeredEventsPerInterval)
             player->CallEvent("onPlayerTriggerEventThreshold", {});
     }
 
