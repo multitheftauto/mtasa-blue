@@ -4711,11 +4711,15 @@ void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
     if (!pPlayer || !pPlayer->IsPlayer() || pPlayer->IsBeingDeleted())
         return;
 
+    int now = GetTickCount64_();
+
     // If key/player doesn't exist in map, store time of entry
     if (m_mapClientTriggeredEvents.find(pPlayer) == m_mapClientTriggeredEvents.end())
-        m_mapClientTriggeredEvents[pPlayer].second = GetTickCount64_();
+        m_mapClientTriggeredEvents[pPlayer].second = now;
 
-    m_mapClientTriggeredEvents[pPlayer].first++;
+    // Only increment if we haven't reached the interval time already
+    if (now - m_mapClientTriggeredEvents[pPlayer].second < m_iClientTriggeredEventsIntervalMs)
+        m_mapClientTriggeredEvents[pPlayer].first++;
 }
 
 void CGame::ProcessClientTriggeredEventSpam()
