@@ -668,8 +668,8 @@ private:
 
     struct ClientTriggeredEventsInfo
     {
-        long long m_llTicks;
-        uint32_t  m_uiCounter;
+        long long m_llTicks = 0;
+        uint32_t  m_uiCounter = 0;
     };
 
     std::map<CPlayer*, ClientTriggeredEventsInfo> m_mapClientTriggeredEvents;
