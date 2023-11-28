@@ -4717,7 +4717,7 @@ void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
         m_mapClientTriggeredEvents[pPlayer].second = now;
 
     // Only increment if we haven't reached the interval time already
-    if (now - m_mapClientTriggeredEvents[pPlayer].second < m_iClientTriggeredEventsIntervalMs)
+    if (now - m_mapClientTriggeredEvents[pPlayer].second <= m_iClientTriggeredEventsIntervalMs)
         m_mapClientTriggeredEvents[pPlayer].first++;
 }
 
