@@ -4726,9 +4726,8 @@ void CGame::ProcessClientTriggeredEventSpam()
 {
     for (auto it = m_mapClientTriggeredEvents.begin(); it != m_mapClientTriggeredEvents.end();)
     {
-        CPlayer* player = it->first;
-        auto     data = it->second;
-        bool     remove = false;
+        const auto& [player, data] = *it;
+        bool remove = false;
 
         if (player && player->IsPlayer() && !player->IsBeingDeleted())
         {
