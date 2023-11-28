@@ -4710,26 +4710,26 @@ void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
     if (!pPlayer || !pPlayer->IsPlayer() || pPlayer->IsBeingDeleted())
         return;
 
-    int now = GetTickCount64_();
+    auto now = GetTickCount64_();
 
     // If key/player doesn't exist in map, store time of entry
     if (m_mapClientTriggeredEvents.find(pPlayer) == m_mapClientTriggeredEvents.end())
-        m_mapClientTriggeredEvents[pPlayer].second = now;
+        m_mapClientTriggeredEvents[pPlayer].m_llTicks = now;
 
     // Only increment if we haven't reached the interval time already
-    if (now - m_mapClientTriggeredEvents[pPlayer].second <= m_iClientTriggeredEventsIntervalMs)
-        m_mapClientTriggeredEvents[pPlayer].first++;
+    if (now - m_mapClientTriggeredEvents[pPlayer].m_llTicks <= m_iClientTriggeredEventsIntervalMs)
+        m_mapClientTriggeredEvents[pPlayer].m_uiCounter++;
 }
 
 void CGame::ProcessClientTriggeredEventSpam()
 {
-    for (const auto& [player, pair]: m_mapClientTriggeredEvents)
+    for (const auto& [player, data]: m_mapClientTriggeredEvents)
     {
         if (player && player->IsPlayer() && !player->IsBeingDeleted())
         {
-            if (GetTickCount64_() - pair.second >= m_iClientTriggeredEventsIntervalMs)
+            if (GetTickCount64_() - data.m_llTicks >= m_iClientTriggeredEventsIntervalMs)
             {
-                if (pair.first > m_iMaxClientTriggeredEventsPerInterval)
+                if (data.m_uiCounter > m_iMaxClientTriggeredEventsPerInterval)
                     player->CallEvent("onPlayerTriggerEventThreshold", {});
 
                 m_mapClientTriggeredEvents.erase(player);
