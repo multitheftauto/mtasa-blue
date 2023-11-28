@@ -4724,8 +4724,12 @@ void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
 
 void CGame::ProcessClientTriggeredEventSpam()
 {
-    for (const auto& [player, data] : m_mapClientTriggeredEvents)
+    for (auto it = m_mapClientTriggeredEvents.begin(); it != m_mapClientTriggeredEvents.end();)
     {
+        CPlayer* player = it->first;
+        auto     data = it->second;
+        bool     remove = false;
+
         if (player && player->IsPlayer() && !player->IsBeingDeleted())
         {
             if (GetTickCount64_() - data.m_llTicks >= m_iClientTriggeredEventsIntervalMs)
@@ -4733,12 +4737,17 @@ void CGame::ProcessClientTriggeredEventSpam()
                 if (data.m_uiCounter > m_iMaxClientTriggeredEventsPerInterval)
                     player->CallEvent("onPlayerTriggerEventThreshold", {});
 
-                m_mapClientTriggeredEvents.erase(player);
+                remove = true;
             }
         }
         else
         {
-            m_mapClientTriggeredEvents.erase(player);
+            remove = true;
         }
+
+        if (remove)
+            it = m_mapClientTriggeredEvents.erase(it);
+        else
+            it++;
     }
 }
