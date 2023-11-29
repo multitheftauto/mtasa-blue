@@ -665,7 +665,12 @@ private:
 
     int m_iMaxClientTriggeredEventsPerInterval = 100;
     int m_iClientTriggeredEventsIntervalMs = 1000;
-    long long m_lClientTriggeredEventsLastCheck = 0;
 
-    std::map<CPlayer*, int> m_mapClientTriggeredEvents;
+    struct ClientTriggeredEventsInfo
+    {
+        long long m_llTicks = 0;
+        uint32_t  m_uiCounter = 0;
+    };
+
+    std::map<CPlayer*, ClientTriggeredEventsInfo> m_mapClientTriggeredEvents;
 };
