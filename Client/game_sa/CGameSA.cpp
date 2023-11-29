@@ -726,6 +726,9 @@ void CGameSA::SetBurnFlippedCarsEnabled(bool isEnabled)
 
 void CGameSA::SetFireballDestructEnabled(bool isEnabled)
 {
+    if (isEnabled == m_isFireballDestructEnabled)
+        return;
+
     if (isEnabled)
     {
         BYTE originalCodes[7] = {0x81, 0x66, 0x1C, 0x7E, 0xFF, 0xFF, 0xFF};
@@ -737,6 +740,8 @@ void CGameSA::SetFireballDestructEnabled(bool isEnabled)
         MemSet((void*)0x6CCE45, 0x90, 7); // CPlane::BlowUpCar
         MemSet((void*)0x6C6E01, 0x90, 7); // CHeli::BlowUpCar
     }
+
+    m_isFireballDestructEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()
