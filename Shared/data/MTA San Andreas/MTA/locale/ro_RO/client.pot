@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-20 23:48+0000\n"
-"PO-Revision-Date: 2023-11-20 23:50\n"
+"PO-Revision-Date: 2023-12-02 19:30\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -413,7 +413,7 @@ msgstr "Deconectează-te pentru a anula descărcarea"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr "Pilotează un UFO prin jur"
+msgstr "Pilotează un UFO prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
@@ -453,7 +453,7 @@ msgstr "Face lucruri ciudate prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr "Se cațără prin"
+msgstr "Se cațără în jurul"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
@@ -466,7 +466,7 @@ msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr "Inspiră apă"
+msgstr "Respiră apă"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
