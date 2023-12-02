@@ -496,29 +496,86 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     return true;
 }
 
+static auto CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+
+static void CVisibilityPlugins_SetAtomicId(RpAtomic* pRpAtomic, int id)
+{
+    return ((void(__cdecl*)(RpAtomic*, int))0x732230)(pRpAtomic, id);
+}
+
+#define rwObjectGetParent(object)    (((const RwObject*)(object))->parent)
+#define RpClumpGetFrameMacro(_clump) ((RwFrame*)rwObjectGetParent(_clump))
+#define RpClumpGetFrame(_clump)      RpClumpGetFrameMacro(_clump)
+
+struct SAtomicsAppend
+{
+    RpClump* pClump;
+    ushort   usModelId;
+};
+
+bool AppendAtomics(RpAtomic* atomic, void* data)
+{
+    RpAtomic*       pClonedAtomic = RpAtomicClone(atomic);
+    SAtomicsAppend* pData = reinterpret_cast<SAtomicsAppend*>(data);
+    RwFrame*        pFrame = RpGetFrame(atomic);
+    RpAtomicSetFrame(pClonedAtomic, pFrame);
+    RpClumpAddAtomic(pData->pClump, pClonedAtomic);
+
+    RwFrame* oldFrame = RpGetFrame(atomic);
+    RwFrame* newFrame = RwFrameCreate();
+    RpAtomicSetFrame(pClonedAtomic, newFrame);
+    RwFrameCopyMatrix(RpGetFrame(pClonedAtomic), oldFrame);
+    RwFrame* pRootFrame = RpClumpGetFrame(pData->pClump);
+    RwFrameAddChild(pRootFrame, newFrame);
+    CVisibilityPlugins_SetAtomicId(pClonedAtomic, pData->usModelId);
+    return false;
+}
+
 bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
 
     if (pModelInfo)
     {
-        RpAtomic* pOldAtomic = (RpAtomic*)pModelInfo->GetRwObject();
+        RwObject*                  pRwObject = pModelInfo->GetRwObject();
+        CBaseModelInfoSAInterface* pBaseModelInfo = g_pCore->GetGame()->GetModelInfo(usModelID)->GetInterface();
 
-        if (reinterpret_cast<RpClump*>(pOldAtomic) != pNew && !DoContainTheSameGeometry(pNew, NULL, pOldAtomic))
+        // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
+        RpClump*                   pCopy = RpClumpClone(pNew);
+
+        if (pRwObject->type == RP_TYPE_ATOMIC)
         {
-            // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
-            RpClump* pCopy = RpClumpClone(pNew);
+            RpAtomic* pOldAtomic = (RpAtomic*)pRwObject;
+            if (reinterpret_cast<RpClump*>(pOldAtomic) != pNew && !DoContainTheSameGeometry(pNew, NULL, pOldAtomic))
+            {
+                // Replace the atomics
+                SAtomicsReplacer data;
+                data.usTxdID = pBaseModelInfo->usTextureDictionary;
+                data.pClump = pCopy;
 
-            // Replace the atomics
-            SAtomicsReplacer data;
-            data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-            data.pClump = pCopy;
+                MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
+                RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
 
-            MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
-            RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
+                // Get rid of the now empty copied clump
+                RpClumpDestroy(pCopy);
+            }
+        }
+        else if (pRwObject->type == RP_TYPE_CLUMP)
+        {
+            RpClump* pOldClump = reinterpret_cast<RpClump*>(pRwObject);
+            if (pOldClump != pNew)
+            {
+                SAtomicsAppend data = {};
+                data.pClump = (RpClump*)pBaseModelInfo->pRwObject;
+                data.usModelId = usModelID;
 
-            // Get rid of the now empty copied clump
-            RpClumpDestroy(pCopy);
+                std::vector<RpAtomic*> oldAtomics;
+                GetClumpAtomicList(data.pClump, oldAtomics);
+                for (auto const& atomic : oldAtomics)
+                    RpClumpRemoveAtomic(data.pClump, atomic);
+
+                RpClumpForAllAtomics(pCopy, AppendAtomics, &data);
+            }
         }
     }
 
