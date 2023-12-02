@@ -10,8 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/Common.h"
+#include "game/RenderWare.h"
+#include "CVector2D.h"
 #include "CFxSA.h"
 #include "CEntitySA.h"
+;
+using StoreShadowToBeRendered_t = int(__cdecl*)(eShadowType, struct RwTexture*, const CVector*, float, float, float, float, short, unsigned char,
+                                                unsigned char, unsigned char, float, bool, float, class CRealTimeShadow*, bool);
+auto            StoreShadowToBeRendered = reinterpret_cast<StoreShadowToBeRendered_t>(0x707390);
+unsigned short& CShadows_ShadowsStoredToBeRendered = *(unsigned short*)0xC403DC;
 
 void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
@@ -238,4 +246,23 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
         push    pvecPosition
         call    dwFunc
     }
+}
+
+bool CFxSA::IsShadowsLimitReached()
+{
+    constexpr int shadowsLimit = 48;
+    return CShadows_ShadowsStoredToBeRendered >= shadowsLimit;
+}
+
+bool CFxSA::AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color, eShadowType shadowType, float fZDistance,
+                      bool bDrawOnWater, bool bDrawOnBuildings)
+{
+    if (IsShadowsLimitReached())
+        return false;
+
+    void*      textureAddress = *(void**)(SHADOW_BASE_TEXTURE_OFFSET + (int)shadowTextureType * 4);
+    RwTexture* pRwTexture = reinterpret_cast<RwTexture*>(textureAddress);
+
+    
+    return StoreShadowToBeRendered(shadowType, pRwTexture, &vecPosition, vecOffset1.fX, vecOffset1.fY, vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B, fZDistance, bDrawOnWater, 1, 0, bDrawOnBuildings);
 }

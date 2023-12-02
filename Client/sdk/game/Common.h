@@ -1442,6 +1442,32 @@ enum eObjectProperty
     OBJECT_PROPERTY_MAX,
 };
 
+enum class eShadowTextureType
+{
+    // use only color instead of texture
+    PLANE = -1,
+    CAR,
+    PED,
+    HELI,
+    BIKE,
+    RCBARON,
+    EXPLOSION,
+    HEADLIGHT1,
+    HEADLIGHT2,
+    BLOOD,
+    HANDMAN,
+    WINCRACK,
+    LAMP,
+};
+
+enum class eShadowType
+{
+    NONE,
+    DEFAULT,
+    ADDITIVE,
+    INVCOLOR,
+};
+
 namespace eObjectGroup
 {
     enum Modifiable

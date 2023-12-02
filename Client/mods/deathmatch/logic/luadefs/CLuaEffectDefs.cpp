@@ -10,6 +10,27 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
+
+bool FxAddShadow(eShadowTextureType shadowTextureType, CVector vecPosition, CVector2D vecOffset1, CVector2D vecOffset2, SColor color, eShadowType shadowType, float zDistance,
+                 bool bDrawOnWater, bool bDrawOnBuildings)
+{
+    if (vecOffset1.Length() > 32)
+    {
+        throw std::invalid_argument("First offset can not be longer than 32 units");
+    }
+    else if (vecOffset2.Length() > 32)            // bigger and close to limit shadows size can be partially invisible
+    {
+        throw std::invalid_argument("Second offset can not be longer than 32 units");
+    }
+    else if (zDistance < 0 || zDistance > 3000)            // negative distance not working
+    {
+        throw std::invalid_argument("Z Distance must be between 0.0 and 3000.0");
+    }
+    return CStaticFunctionDefinitions::FxAddShadow(shadowTextureType, vecPosition, vecOffset1, vecOffset2, color, shadowType, zDistance, bDrawOnWater,
+                                                   bDrawOnBuildings);
+
+}
 
 void CLuaEffectDefs::LoadFunctions()
 {
@@ -28,6 +49,7 @@ void CLuaEffectDefs::LoadFunctions()
         {"fxAddWaterSplash", fxAddWaterSplash},
         {"fxAddBulletSplash", fxAddBulletSplash},
         {"fxAddFootSplash", fxAddFootSplash},
+        {"fxAddShadow", ArgumentParser<FxAddShadow>},
         {"createEffect", CreateEffect},
         {"setEffectSpeed", SetEffectSpeed},
         {"getEffectSpeed", GetEffectSpeed},

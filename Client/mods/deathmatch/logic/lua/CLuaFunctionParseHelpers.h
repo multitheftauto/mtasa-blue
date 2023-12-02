@@ -81,6 +81,8 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
+DECLARE_ENUM_CLASS(eShadowTextureType);
+DECLARE_ENUM_CLASS(eShadowType);
 
 class CRemoteCall;
 
@@ -489,6 +491,14 @@ inline SString GetClassTypeName(eSoundEffectParams::ParamEq*)
 inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
 {
     return "soundeffect-params-reverb";
+}
+inline SString GetClassTypeName(eShadowTextureType*)
+{
+    return "shadow-texture-type";
+}
+inline SString GetClassTypeName(eShadowType*)
+{
+    return "shadow-type";
 }
 
 inline SString GetClassTypeName(CClientVectorGraphic*)
