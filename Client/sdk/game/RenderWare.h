@@ -29,9 +29,6 @@
 
 /* Type IDs */
 
-#define RP_TYPE_ATOMIC 1
-#define RP_TYPE_CLUMP  2
-
 typedef struct RwV2d                RwV2d;
 typedef struct RwV3d                RwV3d;
 typedef struct RwPlane              RwPlane;
@@ -200,10 +197,16 @@ enum RpLightFlags
     LIGHT_FLAGS_LAST = RW_STRUCT_ALIGN
 };
 
+enum class RwObjectType : unsigned char
+{
+    Atomic = 1,
+    Clump = 2,
+};
+
 // RenderWare/plugin base types
 struct RwObject
 {
-    unsigned char type;
+    RwObjectType  type;
     unsigned char subtype;
     unsigned char flags;
     unsigned char privateFlags;

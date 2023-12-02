@@ -496,6 +496,51 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     return true;
 }
 
+#define rwObjectGetParent(object) (((const RwObject*)(object))->parent)
+#define RpClumpGetFrameMacro(_clump) ((RwFrame*)rwObjectGetParent(_clump))
+#define RpClumpGetFrame(_clump)      RpClumpGetFrameMacro(_clump)
+
+static auto CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+
+static void CVisibilityPlugins_SetAtomicId(RpAtomic* pRpAtomic, int id)
+{
+    return ((void(__cdecl*)(RpAtomic*, int))0x732230)(pRpAtomic, id);
+}
+
+struct SAtomicsAppend
+{
+    RpClump* pClump;
+    ushort   usModelId;
+};
+
+bool AppendAtomic(RpAtomic* atomic, void* data)
+{
+    RpAtomic*       pClonedAtomic = RpAtomicClone(atomic);
+    SAtomicsAppend* pData = reinterpret_cast<SAtomicsAppend*>(data);
+    RwFrame* pFrame = RpGetFrame(atomic);
+    RpAtomicSetFrame(pClonedAtomic, pFrame);
+    RpClumpAddAtomic(pData->pClump, pClonedAtomic);
+
+    RwFrame* oldFrame = RpGetFrame(atomic);
+    RwFrame*  newFrame = RwFrameCreate();
+    RpAtomicSetFrame(pClonedAtomic, newFrame);
+    RwFrameCopyMatrix(RpGetFrame(pClonedAtomic), oldFrame);
+    RwFrame* pRootFrame = RpClumpGetFrame(pData->pClump);
+    RwFrameAddChild(pRootFrame, newFrame);
+    CVisibilityPlugins_SetAtomicId(pClonedAtomic, pData->usModelId);
+    return false;
+}
+
+bool RetrieveFirstAtomic(RpAtomic* atomic, void* data)
+{
+    RpAtomic** firstAtomicPtr = (RpAtomic**)data;
+
+    if (*firstAtomicPtr == nullptr)
+        *firstAtomicPtr = atomic;
+
+    return false;
+}
+
 bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
@@ -509,14 +554,31 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
             // Clone the clump that's to be replaced (FUNC_AtomicsReplacer removes the atomics from the source clump)
             RpClump* pCopy = RpClumpClone(pNew);
 
-            // Replace the atomics
-            SAtomicsReplacer data;
-            data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
-            data.pClump = pCopy;
+            static auto                CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+            CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[usModelID];
 
-            MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
-            RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
+            eModelInfoType modelInfoType = ((eModelInfoType(*)())pBaseModelInfo->VFTBL->GetModelType)();
+            if (modelInfoType == eModelInfoType::CLUMP)
+            {
+                SAtomicsAppend data = {};
+                data.pClump = (RpClump*)pBaseModelInfo->pRwObject;
+                data.usModelId = usModelID;
 
+                RpAtomic* firstAtomic = nullptr;
+                RpClumpForAllAtomics(data.pClump, RetrieveFirstAtomic, &firstAtomic);
+                RpClumpRemoveAtomic(data.pClump, firstAtomic);
+                RpClumpForAllAtomics(pCopy, AppendAtomic, &data);
+            }
+            else
+            {
+                // Replace the atomics
+                SAtomicsReplacer data;
+                data.usTxdID = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+                data.pClump = pCopy;
+
+                MemPutFast<DWORD>((DWORD*)DWORD_AtomicsReplacerModelID, usModelID);
+                RpClumpForAllAtomics(pCopy, AtomicsReplacer, &data);
+            }
             // Get rid of the now empty copied clump
             RpClumpDestroy(pCopy);
         }
@@ -925,6 +987,32 @@ CD3DDUMMY* GetDeletedMapKey(CD3DDUMMY**)
 RwFrame* CRenderWareSA::GetFrameFromName(RpClump* pRoot, SString strName)
 {
     return RwFrameFindFrame(RpGetFrame(pRoot), strName);
+}
+
+CVector CRenderWareSA::GetFramePosition(RwFrame* pFrame)
+{
+    CVector position;
+    RwMatrixGetPosition(pFrame->modelling, position);
+    return position;
+}
+
+void CRenderWareSA::SetFramePosition(RwFrame* pFrame, CVector position)
+{
+    RwMatrixSetPosition(pFrame->modelling, position);
+    RwFrameUpdateObjects(pFrame);
+}
+
+CVector CRenderWareSA::GetFrameRotation(RwFrame* pFrame)
+{
+    CVector rotation;
+    RwMatrixGetRotation(pFrame->modelling, rotation);
+    return rotation;
+}
+
+void CRenderWareSA::SetFrameRotation(RwFrame* pFrame, CVector rotation)
+{
+    RwMatrixSetRotation(pFrame->modelling, rotation);
+    RwFrameUpdateObjects(pFrame);
 }
 
 void CRenderWareSA::CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix)

@@ -39,6 +39,8 @@ public:
     eClientModelType GetModelType(void) const { return m_eModelType; };
     bool             Allocate(ushort usParentID);
     bool             AllocateTXD(std::string& strTxdName);
+    bool             MakeClumpModel();
+    bool             MakeAtomicModel();
     bool             Deallocate(void);
     void             SetParentResource(CResource* pResource) { m_pParentResource = pResource; }
     CResource*       GetParentResource(void) const { return m_pParentResource; }
@@ -55,4 +57,5 @@ protected:
     eClientModelType m_eModelType;
     bool             m_bAllocatedByUs = false;
     CResource*       m_pParentResource = nullptr;            // Resource that allocated model
+    bool             m_bWasConvertedToClump = false;
 };

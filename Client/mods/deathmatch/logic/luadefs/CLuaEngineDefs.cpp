@@ -69,6 +69,55 @@ size_t EngineStreamingGetBufferSize() {
     return g_pGame->GetStreaming()->GetStreamingBufferSize();
 }
 
+bool EngineModelSetFramePosition(uint16_t modelId, std::string frameName, CVector vecPosition)
+{
+    g_pClientGame->GetManager()->GetModelManager()->SetModelFramePosition(modelId, frameName, vecPosition);
+    return true;
+}
+
+bool EngineModelSetFrameRotation(uint16_t modelId, std::string frameName, CVector vecRotation)
+{
+    g_pClientGame->GetManager()->GetModelManager()->SetModelFrameRotation(modelId, frameName, vecRotation);
+    return true;
+}
+
+bool EngineModelSetFrameScale(uint16_t modelId, std::string frameName, CVector vecScale)
+{
+    g_pClientGame->GetManager()->GetModelManager()->SetModelFrameScale(modelId, frameName, vecScale);
+    return true;
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> EngineModelGetFramePosition(uint16_t modelId, std::string frameName)
+{
+    CVector position;
+    if (g_pClientGame->GetManager()->GetModelManager()->GetModelFramePosition(modelId, frameName, position))
+        return std::make_tuple(position.fX, position.fY, position.fZ);
+    return false;
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> EngineModelGetFrameRotation(uint16_t modelId, std::string frameName)
+{
+    CVector rotation;
+    if (g_pClientGame->GetManager()->GetModelManager()->GetModelFramePosition(modelId, frameName, rotation))
+        return std::make_tuple(rotation.fX, rotation.fY, rotation.fZ);
+    return false;
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> EngineModelGetFrameScale(uint16_t modelId, std::string frameName)
+{
+    CVector scale;
+    if (g_pClientGame->GetManager()->GetModelManager()->GetModelFramePosition(modelId, frameName, scale))
+        return std::make_tuple(scale.fX, scale.fY, scale.fZ);
+    return false;
+}
+
+bool EngineModelResetFramePositionRotationScale(uint16_t modelId, std::optional<std::string> frameName)
+{
+    if (frameName.has_value())
+        return g_pClientGame->GetManager()->GetModelManager()->ResetModelFrame(modelId, frameName.value());
+    return g_pClientGame->GetManager()->GetModelManager()->ResetModelFrame(modelId);
+}
+
 void CLuaEngineDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -138,7 +187,14 @@ void CLuaEngineDefs::LoadFunctions()
         
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
-        
+        {"engineModelSetFramePosition", ArgumentParser<EngineModelSetFramePosition>},
+        {"engineModelSetFrameRotation", ArgumentParser<EngineModelSetFrameRotation>},
+        {"engineModelSetFrameScale", ArgumentParser<EngineModelSetFrameScale>},
+        {"engineModelGetFramePosition", ArgumentParser<EngineModelGetFramePosition>},
+        {"engineModelGetFrameRotation", ArgumentParser<EngineModelGetFrameRotation>},
+        {"engineModelGetFrameScale", ArgumentParser<EngineModelGetFrameScale>},
+        {"engineModelResetFramePositionRotationScale", ArgumentParser<EngineModelResetFramePositionRotationScale>},
+
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
         // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );

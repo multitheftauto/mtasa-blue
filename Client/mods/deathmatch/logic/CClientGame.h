@@ -546,6 +546,7 @@ private:
 
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     static void        StaticAudioZoneRadioSwitchHandler(DWORD dwStationID);
+    static bool        StaticCustomObjectPreprocessorHandler(CObjectSAInterface* pObjectSAInterface);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);

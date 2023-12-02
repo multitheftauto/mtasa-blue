@@ -233,6 +233,8 @@ public:
     virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
     virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
     virtual void      MakeTimedObjectModel(unsigned short usBaseID) = 0;
+    virtual bool      MakeClumpModel2() = 0;
+    virtual bool      MakeAtomicModel() = 0;
     virtual void      MakeClumpModel(unsigned short usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;

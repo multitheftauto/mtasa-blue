@@ -31,6 +31,7 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
+#include "game/CObject.h"
 #include <game/Task.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
@@ -297,6 +298,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
     g_pMultiplayer->SetVehicleWeaponHitHandler(CClientGame::StaticVehicleWeaponHitHandler);
     g_pMultiplayer->SetAudioZoneRadioSwitchHandler(CClientGame::StaticAudioZoneRadioSwitchHandler);
+    g_pMultiplayer->SetCustomObjectPreprocessorHandler(CClientGame::StaticCustomObjectPreprocessorHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -500,6 +502,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
     g_pMultiplayer->SetAudioZoneRadioSwitchHandler(nullptr);
+    g_pMultiplayer->SetCustomObjectPreprocessorHandler(nullptr);
     g_pGame->SetPreWeaponFireHandler(NULL);
     g_pGame->SetPostWeaponFireHandler(NULL);
     g_pGame->SetTaskSimpleBeHitHandler(NULL);
@@ -3755,6 +3758,44 @@ void CClientGame::StaticVehicleWeaponHitHandler(SVehicleWeaponHitEvent& event)
 void CClientGame::StaticAudioZoneRadioSwitchHandler(DWORD dwStationID)
 {
     g_pClientGame->AudioZoneRadioSwitchHandler(dwStationID);
+}
+
+#include "../game_sa/CObjectSA.h"
+bool CClientGame::StaticCustomObjectPreprocessorHandler(CObjectSAInterface* pObjectSAInterface)
+{
+    if (!pObjectSAInterface)
+        return false;
+
+    CClientModelManager* pModelManager = g_pClientGame->GetManager()->GetModelManager();
+
+    std::unordered_map<std::string, SModelFrameInfo> modelFrameInfos;
+    if (pModelManager->TryGetModelFrameInfos(static_cast<uint16_t>(pObjectSAInterface->m_nModelIndex), modelFrameInfos))
+    {
+        CRenderWare* pRenderWare = g_pGame->GetRenderWare();
+        for (auto& pair : modelFrameInfos)
+        {
+            RwFrame* pFrame = pRenderWare->GetFrameFromName(pObjectSAInterface->m_pRwObject, pair.first);
+            if (pFrame)
+            {
+                //pRenderWare->RwMatrixToCMatrix(pFrame->modelling, pair.second.matrix);
+                pRenderWare->RwMatrixSetPosition(pFrame->modelling, pair.second.matrix.GetPosition());
+                pRenderWare->RwMatrixSetRotation(pFrame->modelling, pair.second.matrix.GetRotation());
+                pRenderWare->RwMatrixSetScale(pFrame->modelling, pair.second.matrix.GetScale());
+            }
+        }
+        return true;
+    }
+    //CPools*                   pPools = g_pGame->GetPools();
+    //SClientEntity<CObjectSA>* pObjectEntity = pPools->GetObject((DWORD*)pObjectSAInterface);
+    //if (!pObjectEntity)
+    //    return;
+
+    //CClientObject* pClientObject = reinterpret_cast<CClientObject*>(pObjectEntity->pClientEntity);
+    //if (!pClientObject)
+    //{
+    //    int a = 5;
+    //}
+    return false;
 }
 
 void CClientGame::DrawRadarAreasHandler()

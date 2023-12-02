@@ -21,6 +21,11 @@ class CClientModelManager;
 #define MAX_MODEL_TXD_ID 25000
 #define MAX_MODEL_ID     25000
 
+struct SModelFrameInfo
+{
+    CMatrix matrix;
+};
+
 class CClientModelManager
 {
     friend class CClientModel;
@@ -44,7 +49,20 @@ public:
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
+    void SetModelFramePosition(uint16_t modelId, std::string& frameName, CVector vecPosition);
+    void SetModelFrameRotation(uint16_t modelId, std::string& frameName, CVector vecRotation);
+    void SetModelFrameScale(uint16_t modelId, std::string& frameName, CVector vecScale);
+    bool GetModelFrameMatrix(uint16_t modelId, std::string& frameName, CMatrix& matrix);
+    bool GetModelFramePosition(uint16_t modelId, std::string& frameName, CVector& vecPosition);
+    bool GetModelFrameRotation(uint16_t modelId, std::string& frameName, CVector& vecRotation);
+    bool GetModelFrameScale(uint16_t modelId, std::string& frameName, CVector& vecScale);
+    bool ResetModelFrame(uint16_t modelId, std::string& frameName);
+    bool ResetModelFrame(uint16_t modelId);
+    bool TryGetModelFrameInfos(uint16_t modelId, std::unordered_map<std::string, SModelFrameInfo>& infos);
+
 private:
-    std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
-    unsigned int                                     m_modelCount = 0;
+    void InitializeModelFrameInfo(uint16_t modelId, std::string& frameName);
+    std::unique_ptr<std::shared_ptr<CClientModel>[]>                               m_Models;
+    std::unordered_map<uint16_t, std::unordered_map<std::string, SModelFrameInfo>> m_modelFramesInfo;
+    unsigned int                                                                   m_modelCount = 0;
 };

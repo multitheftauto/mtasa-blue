@@ -384,6 +384,7 @@ ObjectBreakHandler*                        m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler*                m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*                   m_pDrivebyAnimationHandler = NULL;
 AudioZoneRadioSwitchHandler*               m_pAudioZoneRadioSwitchHandler = NULL;
+CustomObjectPreprocessorHandler*           m_pCustomObjectPreprocessorHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -2317,6 +2318,11 @@ void CMultiplayerSA::SetPreFxRenderHandler(PreFxRenderHandler* pHandler)
 void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
 {
     m_pPreHudRenderHandler = pHandler;
+}
+
+void CMultiplayerSA::SetCustomObjectPreprocessorHandler(CustomObjectPreprocessorHandler* pHandler)
+{
+    m_pCustomObjectPreprocessorHandler = pHandler;
 }
 
 void CMultiplayerSA::SetProcessCollisionHandler(ProcessCollisionHandler* pHandler)
@@ -6855,6 +6861,7 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
     }
 }
 
+int  asd = 0;
 void PostCWorld_ProcessPedsAfterPreRender()
 {
     if (m_postWorldProcessPedsAfterPreRenderHandler)
@@ -6876,8 +6883,22 @@ void PostCWorld_ProcessPedsAfterPreRender()
                 objectInterface->bUpdateScale = false;
             }
             RpClump* clump = objectInterface->m_pRwObject;
-            if (clump && clump->object.type == RP_TYPE_CLUMP)
-                objectEntity->UpdateRpHAnim();
+            if (clump && clump->object.type == RwObjectType::Clump)
+            {
+                //CRenderWare* pRenderWare =  g_pCore->GetGame()->GetRenderWare();
+                //RwFrame* pFrame = pRenderWare->GetFrameFromName(clump, "des_windfan_");
+                //if (pFrame != nullptr)
+                //{
+                //    pRenderWare->SetFrameRotation(pFrame, CVector(asd++, 44, 55));
+                //}
+                if (m_pCustomObjectPreprocessorHandler)
+                {
+                    if(!m_pCustomObjectPreprocessorHandler(objectInterface))
+                        objectEntity->UpdateRpHAnim();
+                }
+                else
+                    objectEntity->UpdateRpHAnim();
+            }
             objectEntity->SetPreRenderRequired(false);
         }
     }

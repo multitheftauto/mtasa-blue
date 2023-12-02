@@ -76,6 +76,7 @@ typedef float(__cdecl* RwV3dNormalize_t)(RwV3d* out, const RwV3d* in);
 typedef RwV3d*(__cdecl* RwV3dTransformVector_t)(RwV3d* out, const RwV3d* in, const RwMatrix* matrix);
 typedef void(__cdecl* _rwObjectHasFrameSetFrame_t)(void* object, RwFrame* frame);
 typedef RwCamera*(__cdecl* RwCameraClone_t)(RwCamera* camera);
+typedef RpClump*(__cdecl* RpClumpCreate_t)();
 typedef RpClump*(__cdecl* RpClumpClone_t)(RpClump* clone);
 typedef int(__cdecl* RwTexDictionaryDestroy_t)(RwTexDictionary* txd);
 typedef int(__cdecl* RwTextureDestroy_t)(RwTexture* texture);
@@ -178,6 +179,7 @@ RWFUNC(RpLightSetRadius_t RpLightSetRadius, (RpLightSetRadius_t)0xDEAD)
 RWFUNC(RpWorldAddLight_t RpWorldAddLight, (RpWorldAddLight_t)0xDEAD)
 RWFUNC(RpLightSetColor_t RpLightSetColor, (RpLightSetColor_t)0xDEAD)
 RWFUNC(RwCameraClone_t RwCameraClone, (RwCameraClone_t)0xDEAD)
+RWFUNC(RpClumpCreate_t RpClumpCreate, (RpClumpCreate_t)0xDEAD)
 RWFUNC(RpClumpClone_t RpClumpClone, (RpClumpClone_t)0xDEAD)
 RWFUNC(RwTexDictionaryDestroy_t RwTexDictionaryDestroy, (RwTexDictionaryDestroy_t)0xDEAD)
 RWFUNC(RwTextureDestroy_t RwTextureDestroy, (RwTextureDestroy_t)0xDEAD)

@@ -78,6 +78,43 @@ bool CClientModel::Allocate(ushort usParentID)
     return false;
 }
 
+bool CClientModel::MakeAtomicModel()
+{
+    if (!m_bWasConvertedToClump)
+        return false;
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
+
+    if (pModelInfo != nullptr && !pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
+        return false;
+
+    eModelInfoType modelInfoType = pModelInfo->GetModelType();
+    if (modelInfoType == eModelInfoType::ATOMIC)
+        return true;
+
+    pModelInfo->Request(BLOCKING, "CClientModel::MakeAtomicModel");
+    if (pModelInfo->MakeAtomicModel())
+        m_bWasConvertedToClump = false;
+    return true;
+}
+
+bool CClientModel::MakeClumpModel()
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
+
+    if (pModelInfo != nullptr && !pModelInfo->IsValid() || m_eModelType != eClientModelType::OBJECT)
+        return false;
+
+    eModelInfoType modelInfoType = pModelInfo->GetModelType();
+    if (modelInfoType == eModelInfoType::CLUMP)
+        return true;
+
+    pModelInfo->Request(BLOCKING, "CClientModel::MakeClumpModel");
+    if (pModelInfo->MakeClumpModel2())
+        m_bWasConvertedToClump = true;
+    return true;
+}
+
 // You can call it only in destructor for DFF.
 bool CClientModel::Deallocate()
 {

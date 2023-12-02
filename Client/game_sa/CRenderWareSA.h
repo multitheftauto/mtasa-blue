@@ -122,6 +122,10 @@ public:
     CModelTexturesInfo* GetModelTexturesInfo(ushort usModelId);
 
     RwFrame* GetFrameFromName(RpClump* pRoot, SString strName);
+    CVector  GetFramePosition(RwFrame* pFrame);
+    void     SetFramePosition(RwFrame* pFrame, CVector position);
+    CVector  GetFrameRotation(RwFrame* pFrame);
+    void     SetFrameRotation(RwFrame* pFrame, CVector rotation);
 
     static void  StaticSetHooks();
     static void  StaticSetClothesReplacingHooks();
