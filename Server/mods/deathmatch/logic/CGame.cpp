@@ -1589,6 +1589,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerProjectileCreation", "weaponType, posX, posY, posZ, force, target, rotX, rotY, rotZ, velX, velY, velZ", nullptr, false);
     m_Events.AddEvent("onPlayerDetonateSatchels", "", nullptr, false);
     m_Events.AddEvent("onPlayerTriggerEventThreshold", "", nullptr, false);
+    m_Events.AddEvent("onPlayerTriggerInvalidEvent", "name", nullptr, false);
+    m_Events.AddEvent("onPlayerTriggerServerOnlyEvent", "name", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -2567,11 +2569,23 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
                 pElement->CallEvent(szName, *pArguments, pCaller);
             }
             else
+            {
+                CLuaArguments args;
+                args.PushString(szName);
+                pCaller->CallEvent("onPlayerTriggerServerOnlyEvent", args);
                 m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not marked as remotely triggerable",
                                              pCaller->GetNick(), szName);
+            }
+                
         }
         else
+        {
+            CLuaArguments args;
+            args.PushString(szName);
+            pCaller->CallEvent("onPlayerTriggerInvalidEvent", args);
             m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName);
+        } 
+           
 
         RegisterClientTriggeredEventUsage(pCaller);
     }
