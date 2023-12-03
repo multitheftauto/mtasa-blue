@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-11-20 23:48+0000\n"
-"PO-Revision-Date: 2023-12-02 19:30\n"
+"PO-Revision-Date: 2023-12-03 13:10\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -445,7 +445,7 @@ msgstr "Quaddin' prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr "Face bunny hop prin"
+msgstr "Bunny hopping prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
