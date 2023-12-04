@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-20 23:48+0000\n"
-"PO-Revision-Date: 2023-11-20 23:50\n"
+"POT-Creation-Date: 2023-12-04 11:18+0000\n"
+"PO-Revision-Date: 2023-12-04 11:51\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Language: ko_KR\n"
@@ -1290,7 +1290,7 @@ msgstr "강제 창 모드"
 msgid "Don't show again"
 msgstr "다시 표시하지 않음"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:831
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -3199,12 +3199,12 @@ msgstr "기억하기"
 msgid "Deny"
 msgstr "거부"
 
-#: Client/game_sa/CSettingsSA.cpp:804
+#: Client/game_sa/CSettingsSA.cpp:753
 msgid "Can't find valid screen resolution."
 msgstr "올바른 화면 해상도를 찾을 수 없습니다."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
+#: Client/game_sa/CSettingsSA.cpp:829
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "이 화면 해상도를 사용하시겠습니까?"
 
