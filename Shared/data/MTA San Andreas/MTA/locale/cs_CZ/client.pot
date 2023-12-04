@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-20 23:48+0000\n"
-"PO-Revision-Date: 2023-11-20 23:50\n"
+"POT-Creation-Date: 2023-12-04 11:18+0000\n"
+"PO-Revision-Date: 2023-12-04 11:51\n"
 "Last-Translator: \n"
 "Language-Team: Czech\n"
 "Language: cs_CZ\n"
@@ -1302,7 +1302,7 @@ msgstr "Vynutit režim v okně"
 msgid "Don't show again"
 msgstr "Znovu nezobrazovat"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:831
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -3217,12 +3217,12 @@ msgstr "Pamatovat výběr"
 msgid "Deny"
 msgstr "Odmítnout"
 
-#: Client/game_sa/CSettingsSA.cpp:804
+#: Client/game_sa/CSettingsSA.cpp:753
 msgid "Can't find valid screen resolution."
 msgstr "Nelze nalézt platné rozlišení obrazovky."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
+#: Client/game_sa/CSettingsSA.cpp:829
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Opravdu chcete použít toto rozlišení obrazovky?"
 
