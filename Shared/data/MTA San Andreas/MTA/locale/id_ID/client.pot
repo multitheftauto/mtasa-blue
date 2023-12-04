@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-11-20 23:48+0000\n"
-"PO-Revision-Date: 2023-11-20 23:51\n"
+"POT-Creation-Date: 2023-12-04 11:18+0000\n"
+"PO-Revision-Date: 2023-12-04 11:51\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -1290,7 +1290,7 @@ msgstr "Paksa jadi mode jendela"
 msgid "Don't show again"
 msgstr "Jangan lihatkan lagi"
 
-#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:882
+#: Client/loader/Dialogs.cpp:194 Client/game_sa/CSettingsSA.cpp:831
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
 
@@ -3197,12 +3197,12 @@ msgstr "Ingat keputusan"
 msgid "Deny"
 msgstr "Tolak"
 
-#: Client/game_sa/CSettingsSA.cpp:804
+#: Client/game_sa/CSettingsSA.cpp:753
 msgid "Can't find valid screen resolution."
 msgstr "Tidak dapat menemukan resolusi layar yang valid."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:880
+#: Client/game_sa/CSettingsSA.cpp:829
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Apa anda yakin ingin menggunakan resolusi layar ini?"
 
