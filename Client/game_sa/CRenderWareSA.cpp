@@ -190,9 +190,9 @@ static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
 //
 //
 /////////////////////////////////////////////////////////////////////////////
-CRenderWareSA::CRenderWareSA(eGameVersion version)
+CRenderWareSA::CRenderWareSA()
 {
-    InitRwFunctions(version);
+    InitRwFunctions();
 
     InitTextureWatchHooks();
     m_pMatchChannelManager = new CMatchChannelManager();
