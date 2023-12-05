@@ -848,6 +848,10 @@ bool CMainConfig::AddMissingSettings()
         return false;
 
     SString strTemplateFilename = PathJoin(g_pServerInterface->GetServerModPath(), "mtaserver.conf.template");
+
+    if (!FileExists(strTemplateFilename))
+        return false;
+
     CXMLFile* pFileTemplate = g_pServerInterface->GetXML()->CreateXML(strTemplateFilename);
     CXMLNode* pRootNodeTemplate = pFileTemplate && pFileTemplate->Parse() ? pFileTemplate->GetRootNode() : nullptr;
     if (!pRootNodeTemplate)
