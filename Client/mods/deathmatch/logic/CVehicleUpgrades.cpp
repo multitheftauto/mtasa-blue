@@ -64,6 +64,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
         return false;
 
     unsigned short usModel = m_pVehicle->GetModel();
+    
     // Wheels should be compatible with any vehicle which have wheels, except
     // bike/bmx (they're buggy). Vortex is technically a car, but it has no
     // wheels.
@@ -80,7 +81,15 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
         return true;
 
     bool bReturn = false;
-    switch (usModel)
+    int model = NULL;
+    int modelRequestIDParent = g_pGame->GetModelInfo(usModel)->GetParentID();
+    if (modelRequestIDParent == 0){
+        model = usModel;
+    }else{
+        model = modelRequestIDParent;
+    }
+
+    switch (model)
     {
         case 400:
             bReturn = (us == 1020 || us == 1021 || us == 1019 || us == 1018 || us == 1013 || us == 1024 || us == 1008 || us == 1009 || us == 1010);
