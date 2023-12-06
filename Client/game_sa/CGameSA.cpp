@@ -69,6 +69,10 @@ unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint
 CGameSA::CGameSA()
 {
     pGame = this;
+
+    // Find the game version and initialize m_eGameVersion so GetGameVersion() will return the correct value
+    FindGameVersion();
+
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
