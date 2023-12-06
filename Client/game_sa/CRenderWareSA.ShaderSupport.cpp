@@ -643,8 +643,6 @@ void CRenderWareSA::SetGTAVertexShadersEnabled(bool bEnable)
     m_bGTAVertexShadersEnabled = bEnable;
 
     DWORD pSkinAtomic = 0x07C7CD0;
-    if (pGame->GetGameVersion() != VERSION_US_10)
-        pSkinAtomic = 0x07C7D10;
 
     if (bEnable)
     {
