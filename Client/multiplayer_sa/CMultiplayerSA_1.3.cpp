@@ -1435,7 +1435,7 @@ void                       CVehicleModelInterface_SetClump()
 {
     // Loop through all vehicles and find the vehicle id that this interface belongs to
     CModelInfo* pModelInfo = NULL;
-    for (int i = 400; i < 80000000; i++)
+    for (int i = 400; i < 612; i++)
     {
         pModelInfo = pGameInterface->GetModelInfo(i);
         if (pModelInfo && (DWORD)pModelInfo->GetInterface() == (DWORD)pLoadingModelInfo)
