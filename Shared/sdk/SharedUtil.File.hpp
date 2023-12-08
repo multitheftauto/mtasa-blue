@@ -35,11 +35,12 @@
 //
 // Returns true if the file exists
 //
-bool SharedUtil::FileExists(const SString& strFilename)
+bool SharedUtil::FileExists(const SString& strFilename) noexcept
 {
-#if _HAS_CXX17
+#if __cplusplus >= 201703L
     namespace fs = std::filesystem;
-    return fs::is_regular_file(static_cast<const std::string&>(strFilename));
+    std::error_code errorCode;
+    return fs::is_regular_file(strFilename.c_str(), errorCode);
 #else
     #ifdef _WIN32
     DWORD dwAtr = GetFileAttributes(strFilename);
@@ -58,11 +59,12 @@ bool SharedUtil::FileExists(const SString& strFilename)
 //
 // Returns true if the directory exists
 //
-bool SharedUtil::DirectoryExists(const SString& strPath)
+bool SharedUtil::DirectoryExists(const SString& strPath) noexcept
 {
-#if _HAS_CXX17
+#if __cplusplus >= 201703L
     namespace fs = std::filesystem;
-    return fs::is_directory(static_cast<const std::string&>(strPath));
+    std::error_code errorCode;
+    return fs::is_directory(strPath.c_str(), errorCode);
 #else
     #ifdef _WIN32
     DWORD dwAtr = GetFileAttributes(strPath);
@@ -1076,7 +1078,7 @@ int SharedUtil::File::Rename(const char* szOldFilename, const char* szNewFilenam
 std::vector<std::string> SharedUtil::ListDir(const char* szPath) noexcept
 {
     std::vector<std::string> entries;
-#if _HAS_CXX17
+#if __cplusplus >= 201703L
     namespace fs = std::filesystem;
     if (!DirectoryExists(szPath))
         return {};
@@ -1089,10 +1091,13 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath) noexcept
                 entries.push_back(entry.path().filename().string());
         }
     }
-    catch (const fs::filesystem_error& exc) {}
+    catch (...) {} // catch all possible errors and ignore them
 #else
     #ifdef _WIN32
     std::string search_path = szPath;
+    if (search_path.empty())
+        return {};
+
     if (search_path.back() != '/')
         search_path += "/*";
 
