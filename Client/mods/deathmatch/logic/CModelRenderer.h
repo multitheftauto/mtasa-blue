@@ -1,3 +1,14 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/CModelRenderer.h
+ *  PURPOSE:     3D models renderer
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #pragma once
 
 enum class EModelLoadingScheme : uint8_t
