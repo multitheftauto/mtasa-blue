@@ -135,6 +135,14 @@ PolynomialMod2 PolynomialMod2::Monomial(size_t i)
 
 PolynomialMod2 PolynomialMod2::Trinomial(size_t t0, size_t t1, size_t t2)
 {
+	// Asserts and checks due to Bing Shi
+	CRYPTOPP_ASSERT(t0 > t1);
+	CRYPTOPP_ASSERT(t1 > t2);
+
+	// The test is relaxed because of ECIES<EC2N>. The high order exponent is t0, but the other exponents are not in descending order.
+	if (t1 > t0 || t2 > t0)
+		throw InvalidArgument("PolynomialMod2: exponents must be in descending order");
+
 	PolynomialMod2 r((word)0, t0+1);
 	r.SetBit(t0);
 	r.SetBit(t1);
@@ -144,6 +152,16 @@ PolynomialMod2 PolynomialMod2::Trinomial(size_t t0, size_t t1, size_t t2)
 
 PolynomialMod2 PolynomialMod2::Pentanomial(size_t t0, size_t t1, size_t t2, size_t t3, size_t t4)
 {
+	// Asserts and checks due to Bing Shi
+	CRYPTOPP_ASSERT(t0 > t1);
+	CRYPTOPP_ASSERT(t1 > t2);
+	CRYPTOPP_ASSERT(t2 > t3);
+	CRYPTOPP_ASSERT(t3 > t4);
+
+	// The test is relaxed because of ECIES<EC2N>. The high order exponent is t0, but the other exponents are not in descending order.
+	if (t1 > t0 || t2 > t0 || t3 > t0 || t4 > t0)
+		throw InvalidArgument("PolynomialMod2: exponents must be in descending order");
+
 	PolynomialMod2 r((word)0, t0+1);
 	r.SetBit(t0);
 	r.SetBit(t1);
@@ -655,7 +673,12 @@ GF2NT::GF2NT(unsigned int c0, unsigned int c1, unsigned int c2)
 	, t0(c0), t1(c1)
 	, result((word)0, m)
 {
+	// Asserts and checks due to Bing Shi
 	CRYPTOPP_ASSERT(c0 > c1 && c1 > c2 && c2==0);
+
+	// The test is relaxed because of ECIES<EC2N>. The high order exponent is t0, but the other exponents are not in descending order.
+	if (c1 > c0 || c2 > c0)
+		throw InvalidArgument("GF2NT: exponents must be in descending order");
 }
 
 const GF2NT::Element& GF2NT::MultiplicativeInverse(const Element &a) const
@@ -964,7 +987,12 @@ GF2NP * BERDecodeGF2NP(BufferedTransformation &bt)
 GF2NT233::GF2NT233(unsigned int c0, unsigned int c1, unsigned int c2)
 	: GF2NT(c0, c1, c2)
 {
+	// Asserts and checks due to Bing Shi
 	CRYPTOPP_ASSERT(c0 > c1 && c1 > c2 && c2==0);
+
+	// The test is relaxed because of ECIES<EC2N>. The high order exponent is t0, but the other exponents are not in descending order.
+	if (c1 > c0 || c2 > c0)
+		throw InvalidArgument("GF2NT233: exponents must be in descending order");
 }
 
 const GF2NT::Element& GF2NT233::Multiply(const Element &a, const Element &b) const

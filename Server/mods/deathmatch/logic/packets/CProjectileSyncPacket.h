@@ -29,7 +29,7 @@ public:
     ElementID      m_OriginID;
     CVector        m_vecOrigin;
     float          m_fForce;
-    unsigned char  m_ucHasTarget;
+    bool           m_bHasTarget;
     ElementID      m_TargetID;
     CVector        m_vecTarget;
     CVector        m_vecRotation;

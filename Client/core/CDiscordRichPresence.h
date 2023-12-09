@@ -23,25 +23,35 @@ public:
     void ShutdownDiscord();
     void RestartDiscord();
     void SetDefaultData();
-
     void UpdatePresence();
+#ifdef DISCORD_DISABLE_IO_THREAD
+    void UpdatePresenceConnection();
+#endif
+
     void SetPresenceStartTimestamp(const unsigned long ulStart);
-    void SetAsset(const char* szAsset, const char* szAssetText, bool bIsLarge = false);
+    void SetPresenceEndTimestamp(const unsigned long ulEnd);
+    void SetAsset(const char* szAsset, const char* szAssetText, bool bIsLarge);
     void SetAssetLargeData(const char* szAsset, const char* szAssetText);
     void SetAssetSmallData(const char* szAsset, const char* szAssetText);
+    void SetDiscordClientConnected(bool bConnected) { m_bConnected = bConnected; };
+    void SetPresencePartySize(int iSize, int iMax, bool bCustom);
 
     bool ResetDiscordData();
-    bool SetPresenceState(const char* szState, bool bCustom = false);
-    bool SetPresenceDetails(const char* szDetails, bool bCustom = false);
+    bool SetPresenceState(const char* szState, bool bCustom);
+    bool SetPresenceDetails(const char* szDetails, bool bCustom);
     bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl);
     bool SetDiscordRPCEnabled(bool bEnabled);
-    bool IsDiscordCustomDetailsDisallowed() const;
-    bool IsDiscordRPCEnabled() const;
-    bool SetApplicationID(const char* szAppID);
+    bool SetApplicationID(const char* resourceName, const char* szAppID);
+    bool IsDiscordCustomDetailsDisallowed() const { return m_bDisallowCustomDetails; };
+    bool IsDiscordRPCEnabled() const { return m_bDiscordRPCEnabled; };
+    bool IsDiscordClientConnected() const { return m_bConnected; };
 
-    // void SetPresenceTimestamp();
-    // void SetPresenceImage();
-    // void SetPresenceText();
+    std::string GetDiscordResourceName() const { return m_strDiscordCustomResourceName; };
+
+    // static handlers
+    static void HandleDiscordReady(const struct DiscordUser* pDiscordUser);
+    static void HandleDiscordDisconnected(int iErrorCode, const char* szMessage);
+    static void HandleDiscordError(int iErrorCode, const char* szMessage);
 
 private:
     std::string m_strDiscordAppId;
@@ -50,12 +60,16 @@ private:
     std::string m_strDiscordAppAssetSmall;
     std::string m_strDiscordAppAssetSmallText;
 
+    std::string m_strDiscordCustomResourceName;
     std::string m_strDiscordAppCurrentId;
     std::string m_strDiscordAppState;
     std::string m_strDiscordAppDetails;
     std::string m_strDiscordAppCustomState;
+    std::string m_strDiscordAppCustomDetails;
 
     std::optional<std::tuple<std::pair<std::string, std::string>, std::pair<std::string, std::string>>> m_aButtons;
+
+    std::mutex m_threadSafetyMutex;
 
     unsigned long m_uiDiscordAppStart;
     unsigned long m_uiDiscordAppEnd;
@@ -63,4 +77,11 @@ private:
     bool m_bDisallowCustomDetails;
     bool m_bDiscordRPCEnabled;
     bool m_bUpdateRichPresence;
+    bool m_bConnected;
+
+    int m_iPartySize;
+    int m_iPartyMax;
+
+    int m_iPlayersCount;
+    int m_iMaxPlayers;
 };

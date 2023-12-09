@@ -146,3 +146,13 @@ void sha256_done(sha256_context *ctx, byte *Digest)
 
   sha256_init(ctx);
 }
+
+
+void sha256_get(const void *Data, size_t Size, byte *Digest)
+{
+  sha256_context ctx;
+  sha256_init(&ctx);
+  sha256_process(&ctx, Data, Size);
+  sha256_done(&ctx, Digest);
+}
+
