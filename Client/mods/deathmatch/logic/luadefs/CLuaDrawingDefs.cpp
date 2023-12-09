@@ -2137,9 +2137,7 @@ bool CLuaDrawingDefs::DxDrawModel3D(uint32_t modelID, CVector position, CVector 
 
     ConvertDegreesToRadians(rotation);
 
-    SModelToRender& modelDesc = g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo);
-    modelDesc.matrix = {position, rotation, scale.value_or(CVector(1.0f, 1.0f, 1.0f))};
-    modelDesc.scheme = loadingScheme.value_or(EModelLoadingScheme::Async);
-
-    return true;
+    return g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo,
+        CMatrix{position, rotation, scale.value_or(CVector{1.0f, 1.0f, 1.0f})},
+        loadingScheme.value_or(EModelLoadingScheme::Async));
 }

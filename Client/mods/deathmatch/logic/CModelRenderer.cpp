@@ -12,16 +12,13 @@
 #include "StdInc.h"
 #include "game\CRenderer.h"
 
-SModelToRender& CModelRenderer::EnqueueModel(CModelInfo* pModelInfo)
+bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, EModelLoadingScheme scheme)
 {
-    static SModelToRender DEFAULT_MODEL_TO_RENDER{};
-
     if (!pModelInfo || g_pCore->IsWindowMinimized())
-        return DEFAULT_MODEL_TO_RENDER;
+        return false;
 
-    SModelToRender& entry = m_Queue.emplace_back();
-    entry.pModelInfo = pModelInfo;
-    return entry;
+    m_Queue.emplace_back(pModelInfo, matrix, scheme);
+    return true;
 }
 
 void CModelRenderer::Update()
