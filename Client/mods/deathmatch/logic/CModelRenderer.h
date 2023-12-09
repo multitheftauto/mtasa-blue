@@ -18,27 +18,31 @@ enum class EModelLoadingScheme : uint8_t
     Blocking
 };
 
-struct SModelToRender final
-{
-    EModelLoadingScheme scheme{EModelLoadingScheme::Loaded};    
-    CMatrix matrix;
-
-    // Invariants
-private:
-    friend class CModelRenderer;
-    CModelInfo* pModelInfo{};
-    bool bLoaded{};
-};
-
 class CModelRenderer final
 {
 public:
-    SModelToRender& EnqueueModel(CModelInfo* pModelInfo);
+    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, EModelLoadingScheme scheme);
 
     void Update();
 
     void Render();
 
 private:
+    struct SModelToRender final
+    {
+        CModelInfo* pModelInfo;
+        CMatrix matrix;
+        EModelLoadingScheme scheme;
+        bool bLoaded;
+
+        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, EModelLoadingScheme scheme) :
+            pModelInfo(pModelInfo),
+            matrix(matrix),
+            scheme(scheme),
+            bLoaded(false)
+        {
+        }
+    };
+
     std::vector<SModelToRender> m_Queue;
 };
