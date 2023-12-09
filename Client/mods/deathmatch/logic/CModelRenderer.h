@@ -28,5 +28,6 @@ public:
 
     void Render();
 
+private:
     std::vector<SModelToRender> m_Queue;
 };
