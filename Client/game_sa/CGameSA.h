@@ -15,6 +15,7 @@
 #include "CFxManagerSA.h"
 #include "CModelInfoSA.h"
 #include "CStreamingSA.h"
+#include "CRendererSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -152,6 +153,7 @@ public:
     CColStore*                GetCollisionStore() override { return m_collisionStore; }
     CRenderWareSA*            GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
+    CRenderer*                GetRenderer() const override { return m_pRenderer.get(); }
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -307,6 +309,8 @@ private:
     CPointLights*                   m_pPointLights;
     CColStore*                      m_collisionStore;
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
+
+    std::unique_ptr<CRendererSA>    m_pRenderer;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
