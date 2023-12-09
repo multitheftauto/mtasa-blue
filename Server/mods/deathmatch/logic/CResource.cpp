@@ -1317,15 +1317,15 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
 std::vector<std::string> CResource::GetFilePaths(const char* szFilename)
 {
     std::vector<std::string>    vecFiles;
-    std::string&                strDirectory = IsResourceZip() ? m_strResourceCachePath : m_strResourceDirectoryPath;
-    std::string                 strFilePath = strDirectory + szFilename;
+    const std::string&          strDirectory = IsResourceZip() ? m_strResourceCachePath : m_strResourceDirectoryPath;
+    const std::string           strFilePath = strDirectory + szFilename;
 
     for (const std::filesystem::path& path : glob::rglob(strFilePath))
     {
         std::string strPath = std::filesystem::relative(path, strDirectory).string();
         ReplaceSlashes(strPath);
 
-        vecFiles.push_back(strPath);
+        vecFiles.push_back(std::move(strPath));
     }
 
     return vecFiles;
@@ -1594,6 +1594,17 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
                     return false;
                 }
 
+                bool           bDownload = true;
+                CXMLAttribute* pDownload = Attributes.Find("download");
+
+                if (pDownload)
+                {
+                    const std::string strDownload = pDownload->GetValue();
+
+                    if (strDownload == "no" || strDownload == "false")
+                        bDownload = false;
+                }
+
                 for (const std::string& strFilePath : vecFiles)
                 {
                     std::string strFullFilename;
@@ -1602,17 +1613,6 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
                     {
                         CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilePath.c_str());
                         continue;
-                    }
-
-                    bool           bDownload = true;
-                    CXMLAttribute* pDownload = Attributes.Find("download");
-
-                    if (pDownload)
-                    {
-                        const char* szDownload = pDownload->GetValue().c_str();
-
-                        if (!stricmp(szDownload, "no") || !stricmp(szDownload, "false"))
-                            bDownload = false;
                     }
 
                     if (GetFilePath(strFilePath.c_str(), strFullFilename))
