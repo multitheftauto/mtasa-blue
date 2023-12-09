@@ -593,6 +593,12 @@ ADD_ENUM(eGrainMultiplierType::OVERLAY, "overlay")
 ADD_ENUM(eGrainMultiplierType::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("grain-multiplier-type")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(EModelLoadingScheme)
+ADD_ENUM(EModelLoadingScheme::Loaded, "loaded")
+ADD_ENUM(EModelLoadingScheme::Async, "async")
+ADD_ENUM(EModelLoadingScheme::Blocking, "blocking")
+IMPLEMENT_ENUM_CLASS_END("model-loading-scheme")
+
 IMPLEMENT_ENUM_CLASS_BEGIN(eResizableVehicleWheelGroup)
 ADD_ENUM(eResizableVehicleWheelGroup::FRONT_AXLE, "front_axle")
 ADD_ENUM(eResizableVehicleWheelGroup::REAR_AXLE, "rear_axle")

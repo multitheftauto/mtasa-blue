@@ -83,6 +83,7 @@ DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
 DECLARE_ENUM_CLASS(eRenderStage);
 DECLARE_ENUM(ePools);
+DECLARE_ENUM_CLASS(EModelLoadingScheme);
 
 class CRemoteCall;
 

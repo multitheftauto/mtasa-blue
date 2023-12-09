@@ -142,6 +142,8 @@ CGameSA::CGameSA()
     m_pCoverManager = new CCoverManagerSA();
     m_pPlantManager = new CPlantManagerSA();
 
+    m_pRenderer = std::make_unique<CRendererSA>();
+
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
     {

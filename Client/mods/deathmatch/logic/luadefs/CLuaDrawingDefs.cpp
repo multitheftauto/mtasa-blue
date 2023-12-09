@@ -36,6 +36,7 @@ void CLuaDrawingDefs::LoadFunctions()
         {"dxDrawMaterialPrimitive", DxDrawMaterialPrimitive},
         {"dxDrawMaterialPrimitive3D", DxDrawMaterialPrimitive3D},
         {"dxDrawWiredSphere", ArgumentParser<DxDrawWiredSphere>},
+        {"dxDrawModel3D", ArgumentParser<DxDrawModel3D>},
         {"dxGetTextWidth", DxGetTextWidth},
         {"dxGetTextSize", ArgumentParser<DxGetTextSize>},
         {"dxGetFontHeight", DxGetFontHeight},
@@ -2119,5 +2120,26 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
         color = SColorARGB(64, 255, 0, 0);
 
     g_pCore->GetGraphics()->DrawWiredSphere(position, radius, color.value(), lineWidth.value_or(1), iterations.value_or(1));
+    return true;
+}
+
+bool CLuaDrawingDefs::DxDrawModel3D(uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale, const std::optional<EModelLoadingScheme> loadingScheme)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelID);
+    if (!pModelInfo)
+        throw std::invalid_argument("Invalid model ID");
+
+    if (auto modelType = pModelInfo->GetModelType();
+        modelType == eModelInfoType::UNKNOWN || modelType == eModelInfoType::VEHICLE || modelType == eModelInfoType::PED)
+    {
+        throw std::invalid_argument("Invalid model type");
+    }
+
+    ConvertDegreesToRadians(rotation);
+
+    SModelToRender& modelDesc = g_pClientGame->GetModelRenderer()->EnqueueModel(pModelInfo);
+    modelDesc.matrix = {position, rotation, scale.value_or(CVector(1.0f, 1.0f, 1.0f))};
+    modelDesc.scheme = loadingScheme.value_or(EModelLoadingScheme::Async);
+
     return true;
 }

@@ -214,6 +214,7 @@ public:
     void SetRender3DStuffHandler(Render3DStuffHandler* pHandler);
     void SetPreRenderSkyHandler(PreRenderSkyHandler* pHandler);
     void SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler);
+    void SetRenderEverythingBarRoadsHandler(RenderEverythingBarRoadsHandler* pHandler) override;
 
     void Reset();
 

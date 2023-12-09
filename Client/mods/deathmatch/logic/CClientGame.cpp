@@ -249,6 +249,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Singular file download manager
     m_pSingularFileDownloadManager = new CSingularFileDownloadManager();
 
+    // 3D model renderer
+    m_pModelRenderer = std::make_unique<CModelRenderer>();
+
     // Register the message and the net packet handler
     g_pMultiplayer->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pMultiplayer->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
@@ -265,6 +268,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetRender3DStuffHandler(CClientGame::StaticRender3DStuffHandler);
     g_pMultiplayer->SetPreRenderSkyHandler(CClientGame::StaticPreRenderSkyHandler);
     g_pMultiplayer->SetRenderHeliLightHandler(CClientGame::StaticRenderHeliLightHandler);
+    g_pMultiplayer->SetRenderEverythingBarRoadsHandler(CClientGame::StaticRenderEverythingBarRoadsHandler);
     g_pMultiplayer->SetChokingHandler(CClientGame::StaticChokingHandler);
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
@@ -470,6 +474,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetRender3DStuffHandler(NULL);
     g_pMultiplayer->SetPreRenderSkyHandler(NULL);
     g_pMultiplayer->SetRenderHeliLightHandler(nullptr);
+    g_pMultiplayer->SetRenderEverythingBarRoadsHandler(nullptr);
     g_pMultiplayer->SetChokingHandler(NULL);
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
@@ -3559,6 +3564,11 @@ void CClientGame::StaticRenderHeliLightHandler()
     g_pClientGame->GetManager()->GetPointLightsManager()->RenderHeliLightHandler();
 }
 
+void CClientGame::StaticRenderEverythingBarRoadsHandler()
+{
+    g_pClientGame->GetModelRenderer()->Render();
+}
+
 bool CClientGame::StaticChokingHandler(unsigned char ucWeaponType)
 {
     return g_pClientGame->ChokingHandler(ucWeaponType);
@@ -3861,6 +3871,8 @@ void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
+
+    g_pClientGame->GetModelRenderer()->Update();
 }
 
 void CClientGame::IdleHandler()
