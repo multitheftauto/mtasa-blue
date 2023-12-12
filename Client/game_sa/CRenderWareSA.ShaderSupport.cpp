@@ -643,8 +643,6 @@ void CRenderWareSA::SetGTAVertexShadersEnabled(bool bEnable)
     m_bGTAVertexShadersEnabled = bEnable;
 
     DWORD pSkinAtomic = 0x07C7CD0;
-    if (pGame->GetGameVersion() != VERSION_US_10)
-        pSkinAtomic = 0x07C7D10;
 
     if (bEnable)
     {
@@ -689,13 +687,9 @@ __declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTextur
 }
 
 // Hook info
-#define HOOKPOS_RwTextureSetName_US     0x7F38A0
-#define HOOKSIZE_RwTextureSetName_US    9
-#define HOOKPOS_RwTextureSetName_EU     0x7F38E0
-#define HOOKSIZE_RwTextureSetName_EU    9
-DWORD RETURN_RwTextureSetName_US = 0x7F38A9;
-DWORD RETURN_RwTextureSetName_EU = 0x7F38E9;
-DWORD RETURN_RwTextureSetName_BOTH = 0;
+#define HOOKPOS_RwTextureSetName     0x7F38A0
+#define HOOKSIZE_RwTextureSetName    9
+DWORD RETURN_RwTextureSetName = 0x7F38A9;
 void _declspec(naked) HOOK_RwTextureSetName()
 {
     _asm
@@ -710,7 +704,7 @@ void _declspec(naked) HOOK_RwTextureSetName()
 
         sub     esp, 8
         mov     ecx, ds:0x0C97B24
-        jmp     RETURN_RwTextureSetName_BOTH
+        jmp     RETURN_RwTextureSetName
     }
 }
 
@@ -727,13 +721,9 @@ __declspec(noinline) void OnMY_RwTextureDestroy_Mid(RwTexture* pTexture)
 }
 
 // Hook info
-#define HOOKPOS_RwTextureDestroy_Mid_US     0x07F3834
-#define HOOKSIZE_RwTextureDestroy_Mid_US    5
-#define HOOKPOS_RwTextureDestroy_Mid_EU     0x07F3874
-#define HOOKSIZE_RwTextureDestroy_Mid_EU    5
-DWORD RETURN_RwTextureDestroy_Mid_US = 0x07F3839;
-DWORD RETURN_RwTextureDestroy_Mid_EU = 0x07F3879;
-DWORD RETURN_RwTextureDestroy_Mid_BOTH = 0;
+#define HOOKPOS_RwTextureDestroy_Mid     0x07F3834
+#define HOOKSIZE_RwTextureDestroy_Mid    5
+DWORD RETURN_RwTextureDestroy_Mid = 0x07F3839;
 void _declspec(naked) HOOK_RwTextureDestroy_Mid()
 {
     _asm
@@ -745,7 +735,7 @@ void _declspec(naked) HOOK_RwTextureDestroy_Mid()
         popad
 
         push    0x08E23CC
-        jmp     RETURN_RwTextureDestroy_Mid_BOTH
+        jmp     RETURN_RwTextureDestroy_Mid
     }
 }
 
@@ -775,13 +765,9 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 }
 
 // Hook info
-#define HOOKPOS_RwIm3DRenderIndexedPrimitive_US     0x07EF550
-#define HOOKSIZE_RwIm3DRenderIndexedPrimitive_US    5
-#define HOOKPOS_RwIm3DRenderIndexedPrimitive_EU     0x07EF590
-#define HOOKSIZE_RwIm3DRenderIndexedPrimitive_EU    5
-DWORD RETURN_RwIm3DRenderIndexedPrimitive_US = 0x07EF555;
-DWORD RETURN_RwIm3DRenderIndexedPrimitive_EU = 0x07EF595;
-DWORD RETURN_RwIm3DRenderIndexedPrimitive_BOTH = 0;
+#define HOOKPOS_RwIm3DRenderIndexedPrimitive     0x07EF550
+#define HOOKSIZE_RwIm3DRenderIndexedPrimitive    5
+DWORD RETURN_RwIm3DRenderIndexedPrimitive = 0x07EF555;
 void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
 {
     _asm
@@ -806,7 +792,7 @@ void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
         retn
 inner:
         mov     eax, ds:0x0C9C078
-        jmp     RETURN_RwIm3DRenderIndexedPrimitive_BOTH
+        jmp     RETURN_RwIm3DRenderIndexedPrimitive
     }
 }
 
@@ -828,13 +814,9 @@ __declspec(noinline) void OnMY_RwIm3DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 }
 
 // Hook info
-#define HOOKPOS_RwIm3DRenderPrimitive_US    0x07EF6B0
-#define HOOKSIZE_RwIm3DRenderPrimitive_US   6
-#define HOOKPOS_RwIm3DRenderPrimitive_EU    0x07EF6F0
-#define HOOKSIZE_RwIm3DRenderPrimitive_EU   6
-DWORD RETURN_RwIm3DRenderPrimitive_US = 0x07EF6B6;
-DWORD RETURN_RwIm3DRenderPrimitive_EU = 0x07EF6F6;
-DWORD RETURN_RwIm3DRenderPrimitive_BOTH = 0;
+#define HOOKPOS_RwIm3DRenderPrimitive    0x07EF6B0
+#define HOOKSIZE_RwIm3DRenderPrimitive   6
+DWORD RETURN_RwIm3DRenderPrimitive = 0x07EF6B6;
 void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
 {
     _asm
@@ -859,7 +841,7 @@ void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
         retn
 inner:
         mov     ecx, ds:0x0C97B24
-        jmp     RETURN_RwIm3DRenderPrimitive_BOTH
+        jmp     RETURN_RwIm3DRenderPrimitive
     }
 }
 
@@ -881,13 +863,9 @@ __declspec(noinline) void OnMY_RwIm2DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 }
 
 // Hook info
-#define HOOKPOS_RwIm2DRenderIndexedPrimitive_US     0x0734EA1
-#define HOOKSIZE_RwIm2DRenderIndexedPrimitive_US    5
-#define HOOKPOS_RwIm2DRenderIndexedPrimitive_EU     0x0734EA1
-#define HOOKSIZE_RwIm2DRenderIndexedPrimitive_EU    5
-DWORD RETURN_RwIm2DRenderIndexedPrimitive_US = 0x0403927;
-DWORD RETURN_RwIm2DRenderIndexedPrimitive_EU = 0x0403937;
-DWORD RETURN_RwIm2DRenderIndexedPrimitive_BOTH = 0;
+#define HOOKPOS_RwIm2DRenderIndexedPrimitive     0x0734EA1
+#define HOOKSIZE_RwIm2DRenderIndexedPrimitive    5
+DWORD RETURN_RwIm2DRenderIndexedPrimitive = 0x0403927;
 void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 {
     _asm
@@ -914,7 +892,7 @@ void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
         retn
 
 inner:
-        jmp     RETURN_RwIm2DRenderIndexedPrimitive_BOTH
+        jmp     RETURN_RwIm2DRenderIndexedPrimitive
     }
 }
 

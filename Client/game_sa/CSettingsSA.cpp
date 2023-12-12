@@ -24,15 +24,6 @@ static const float MOUSE_SENSITIVITY_MIN = 0.000312f;
 static const float MOUSE_SENSITIVITY_DEFAULT = 0.0025f;
 static const float MOUSE_SENSITIVITY_MAX = MOUSE_SENSITIVITY_DEFAULT * 2 - MOUSE_SENSITIVITY_MIN;
 
-unsigned long CSettingsSA::FUNC_GetNumVideoModes;
-unsigned long CSettingsSA::FUNC_GetVideoModeInfo;
-unsigned long CSettingsSA::FUNC_GetCurrentVideoMode;
-unsigned long CSettingsSA::FUNC_SetCurrentVideoMode;
-unsigned long CSettingsSA::FUNC_SetDrawDistance;
-unsigned long CSettingsSA::FUNC_GetNumSubSystems;
-unsigned long CSettingsSA::FUNC_GetCurrentSubSystem;
-unsigned long CSettingsSA::FUNC_SetSubSystem;
-
 #define VAR_CurVideoMode (*((uint*)(0x08D6220)))
 #define VAR_SavedVideoMode (*((uint*)(0x0BA6820)))
 #define VAR_CurAdapter (*((uint*)(0x0C920F4)))
@@ -82,50 +73,27 @@ void CSettingsSA::SetWideScreenEnabled(bool bEnabled)
 
 unsigned int CSettingsSA::GetNumVideoModes()
 {
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        call    FUNC_GetNumVideoModes
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // RwEngineGetNumVideoModes
+    return ((unsigned int(__cdecl*)())0x7F2CC0)();
 }
 
 VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex)
 {
-    VideoMode* pReturn = NULL;
-    _asm
-    {
-        push    modeIndex
-        push    modeInfo
-        call    FUNC_GetVideoModeInfo
-        mov     pReturn, eax
-        add     esp, 8
-    }
-    return pReturn;
+    // RwEngineGetVideoModeInfo
+    return ((VideoMode*(__cdecl*)(VideoMode*, unsigned int))0x7F2CF0)(modeInfo, modeIndex);
 }
 
 unsigned int CSettingsSA::GetCurrentVideoMode()
 {
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        call    FUNC_GetCurrentVideoMode
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // RwEngineGetCurrentVideoMode
+    return ((unsigned int(__cdecl*)())0x7F2D20)();
 }
 
 void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
 {
     if (!bOnRestart)
     {
-        _asm
-        {
-            push    modeIndex
-            call    FUNC_SetCurrentVideoMode
-            add     esp, 4
-        }
+        ((void(__cdecl*)(unsigned int))0x745C70)(modeIndex);
     }
     // Only update settings variables for fullscreen modes
     if (modeIndex)
@@ -134,34 +102,20 @@ void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
 
 uint CSettingsSA::GetNumAdapters()
 {
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        call    FUNC_GetNumSubSystems
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // RwEngineGetNumSubSystems
+    return ((unsigned int(__cdecl*)())0x7F2C00)();
 }
 
 void CSettingsSA::SetAdapter(unsigned int uiAdapterIndex)
 {
-    _asm
-    {
-        push    uiAdapterIndex
-        call    FUNC_SetSubSystem
-        add     esp, 4
-    }
+    // RwEngineSetSubSystem
+    ((void(__cdecl*)(unsigned int))0x7F2C90)(uiAdapterIndex);
 }
 
 unsigned int CSettingsSA::GetCurrentAdapter()
 {
-    unsigned int uiReturn = 0;
-    _asm
-    {
-        call    FUNC_GetCurrentSubSystem
-        mov     uiReturn, eax
-    }
-    return uiReturn;
+    // RwEngineGetCurrentSubSystem
+    return ((unsigned int(__cdecl*)())0x7F2C60)();
 }
 
 unsigned char CSettingsSA::GetRadioVolume()
@@ -238,12 +192,7 @@ float CSettingsSA::GetDrawDistance()
 
 void CSettingsSA::SetDrawDistance(float fDistance)
 {
-    _asm
-    {
-        push    fDistance
-        call    FUNC_SetDrawDistance
-        add     esp, 4
-    }
+    MemPutFast<float>(0x8CD800, fDistance);            // CRenderer::ms_lodDistScale
     m_pInterface->fDrawDistance = fDistance;
 }
 

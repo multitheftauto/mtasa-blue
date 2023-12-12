@@ -142,6 +142,10 @@ public:
     const std::vector<SIntSetting>& GetIntSettingList();
     void                            OnTickRateChange();
     void                            OnAseSettingChange();
+    void                            OnPlayerTriggeredEventIntervalChange();
+
+    int GetPlayerTriggeredEventInterval() const { return m_iPlayerTriggeredEventIntervalMs; }
+    int GetMaxPlayerTriggeredEventsPerInterval() const { return m_iMaxPlayerTriggeredEventsPerInterval; }
 
 private:
     void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, const char* szConsoleHelpText);
@@ -221,4 +225,6 @@ private:
     int                        m_bFilterDuplicateLogLinesEnabled;
     int                        m_bDatabaseCredentialsProtectionEnabled;
     int                        m_bFakeLagCommandEnabled;
+    int                        m_iPlayerTriggeredEventIntervalMs;
+    int                        m_iMaxPlayerTriggeredEventsPerInterval;
 };

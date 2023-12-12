@@ -23,6 +23,7 @@ public:
     unsigned int          Count() { return static_cast<unsigned int>(m_Markers.size()); };
     static CClientMarker* Get(ElementID ID);
     void                  DeleteAll();
+    static bool           IsMarkerModel(unsigned short usModel);
 
 private:
     CClientMarkerManager(class CClientManager* pManager);

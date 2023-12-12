@@ -11,7 +11,8 @@ project "curl"
 	files {
 		"premake5.lua",
 		"include/**.h",
-		"lib/**.c"
+		"lib/**.c",
+		"lib/**.h"
 	}
 	removefiles {
 		"lib/amigaos.c",

@@ -167,9 +167,9 @@ public:
     int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
     int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
-    DWORD GetSystemTime() { return *VAR_SystemTime; }
+    DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
 
-    bool IsAtMenu() { return *VAR_IsAtMenu != 0; }
+    bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
     void         StartGame();
     void         SetSystemState(eSystemState State);
@@ -206,14 +206,17 @@ public:
     void SetVehicleSunGlareEnabled(bool bEnabled);
     bool IsVehicleSunGlareEnabled();
 
-    void SetCoronaZTestEnabled(bool isEnabled);
-    bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
+    void SetCoronaZTestEnabled(bool isEnabled) override;
+    bool IsCoronaZTestEnabled() const noexcept override { return m_isCoronaZTestEnabled; }
 
-    bool IsWaterCreaturesEnabled() const noexcept { return m_areWaterCreaturesEnabled; }
-    void SetWaterCreaturesEnabled(bool isEnabled);
+    bool IsWaterCreaturesEnabled() const noexcept override { return m_areWaterCreaturesEnabled; }
+    void SetWaterCreaturesEnabled(bool isEnabled) override;
 
-    bool IsBurnFlippedCarsEnabled() const noexcept { return m_isBurnFlippedCarsEnabled; }
-    void SetBurnFlippedCarsEnabled(bool isEnabled);
+    bool IsBurnFlippedCarsEnabled() const noexcept override { return m_isBurnFlippedCarsEnabled; }
+    void SetBurnFlippedCarsEnabled(bool isEnabled) override;
+
+    bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
+    void SetFireballDestructEnabled(bool isEnabled) override;
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -327,17 +330,9 @@ private:
     bool         m_isCoronaZTestEnabled{true};
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
+    bool         m_isFireballDestructEnabled{true};
 
     static unsigned int&  ClumpOffset;
-    static unsigned long* VAR_SystemTime;
-    static unsigned long* VAR_IsAtMenu;
-    static bool*          VAR_IsForegroundWindow;
-    static unsigned long* VAR_SystemState;
-    static float*         VAR_TimeScale;
-    static float*         VAR_FPS;
-    static float*         VAR_OldTimeStep;
-    static float*         VAR_TimeStep;
-    static unsigned long* VAR_Framelimiter;
 
     std::map<std::string, SCheatSA*> m_Cheats;
 

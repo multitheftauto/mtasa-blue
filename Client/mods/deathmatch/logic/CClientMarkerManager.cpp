@@ -62,3 +62,8 @@ void CClientMarkerManager::DoPulse()
     }
     m_Markers.ResumeModifyOperations();
 }
+
+bool CClientMarkerManager::IsMarkerModel(unsigned short usModel)
+{
+    return (usModel == 1316 || usModel == 1317 || usModel == 1559);
+}

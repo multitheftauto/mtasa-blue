@@ -188,6 +188,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         wsProps.data.coronaztest = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::CORONAZTEST);
         wsProps.data.watercreatures = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::WATERCREATURES);
         wsProps.data.burnflippedcars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::BURNFLIPPEDCARS);
+        wsProps.data2.fireballdestruct = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT);
         BitStream.Write(&wsProps);
     }
 

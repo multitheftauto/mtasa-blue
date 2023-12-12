@@ -27,12 +27,13 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
     m_ucSampleRate = 1;
     m_ucQuality = 4;
     m_uiBitrate = 0;
+    m_szServerName = "";
 }
 
 CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType,
                                                      unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient,
                                                      int iEnableClientChecks, bool bVoiceEnabled, unsigned char ucSampleRate, unsigned char ucVoiceQuality,
-                                                     unsigned int uiBitrate)
+                                                     unsigned int uiBitrate, const char* szServerName)
 {
     m_PlayerID = PlayerID;
     m_RootElementID = RootElementID;
@@ -43,6 +44,7 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, Element
     m_ucSampleRate = ucSampleRate;
     m_ucQuality = ucVoiceQuality;
     m_uiBitrate = uiBitrate;
+    m_szServerName = szServerName;
 
     switch (m_ucHTTPDownloadType)
     {
@@ -119,6 +121,9 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
         default:
             break;
     }
+
+    if (BitStream.Can(eBitStreamVersion::CPlayerJoinCompletePacket_ServerName))
+        BitStream.WriteString(m_szServerName);
 
     return true;
 }

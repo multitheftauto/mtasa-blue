@@ -3,7 +3,7 @@
 /// \file cryptlib.h
 /// \brief Abstract base classes that provide a uniform interface to this library.
 
-/*!	\mainpage Crypto++ Library 8.8 API Reference
+/*!	\mainpage Crypto++ Library 8.9 API Reference
 <dl>
 <dt>Abstract Base Classes<dd>
 	cryptlib.h
@@ -1026,7 +1026,7 @@ public:
 	virtual unsigned int MinLastBlockSize() const {return 0;}
 
 	/// \brief Determines if the last block receives special processing
-	/// \return true if the last block reveives special processing, false otherwise.
+	/// \return true if the last block receives special processing, false otherwise.
 	/// \details Some authenticated encryption modes are not expressed well with
 	///  MandatoryBlockSize() and MinLastBlockSize(). For example, AES/OCB uses
 	///  16-byte blocks (MandatoryBlockSize = 16) and the last block requires special processing

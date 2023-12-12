@@ -2079,6 +2079,11 @@ bool CStaticFunctionDefinitions::DetonateSatchels(CElement* pElement)
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         if (pPlayer->IsJoined())
         {
+            // Trigger Lua event and see if we are allowed to continue
+            CLuaArguments arguments;
+            if (!pPlayer->CallEvent("onPlayerDetonateSatchels", arguments))
+                return false;
+
             CDetonateSatchelsPacket Packet;
             Packet.SetSourceElement(pPlayer);
             m_pPlayerManager->BroadcastOnlyJoined(Packet);
