@@ -27,7 +27,7 @@ public:
     virtual void SetPresenceEndTimestamp(const unsigned long ulEnd) = 0;
     virtual void SetPresencePartySize(int iSize, int iMax, bool bCustom) = 0;
     virtual void SetDiscordClientConnected(bool bConnected) = 0;
-    virtual void SetDiscordUserID(const char* strUserID) = 0;
+    virtual void SetDiscordUserID(const std::string& strUserID) = 0;
 
     virtual bool SetPresenceDetails(const char* szDetails, bool bCustom) = 0;
     virtual bool SetApplicationID(const char* szResourceName, const char* szAppID) = 0;

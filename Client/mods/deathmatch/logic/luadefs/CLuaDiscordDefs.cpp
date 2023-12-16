@@ -272,7 +272,7 @@ std::string CLuaDiscordDefs::GetDiscordUserID()
     auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
-        return "";
+        return {};
 
     return discord->GetDiscordUserID();
 }

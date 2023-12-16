@@ -35,7 +35,7 @@ public:
     void SetAssetSmallData(const char* szAsset, const char* szAssetText);
     void SetDiscordClientConnected(bool bConnected) { m_bConnected = bConnected; };
     void SetPresencePartySize(int iSize, int iMax, bool bCustom);
-    void SetDiscordUserID(const char* strUserID);
+    void SetDiscordUserID(const std::string& strUserID);
 
     bool ResetDiscordData();
     bool SetPresenceState(const char* szState, bool bCustom);

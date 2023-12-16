@@ -280,7 +280,7 @@ void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax, bool bCusto
     }
 }
 
-void CDiscordRichPresence::SetDiscordUserID(const char* strUserID)
+void CDiscordRichPresence::SetDiscordUserID(const std::string& strUserID)
 {
     if (CVARS_GET_VALUE<bool>("discord_rpc_share_data"))
         m_strDiscordUserID = strUserID;
@@ -291,7 +291,7 @@ std::string CDiscordRichPresence::GetDiscordUserID() const
     if (CVARS_GET_VALUE<bool>("discord_rpc_share_data"))
         return m_strDiscordUserID;
 
-    return "";
+    return {};
 };
 
 #ifdef DISCORD_DISABLE_IO_THREAD
