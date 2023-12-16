@@ -2443,6 +2443,10 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        // Early return when the player attempts to fire a weapon they do not have
+        if (!pPlayer->HasWeaponType(Packet.m_WeaponType))
+            return;
+
         // Relay to other players
         RelayNearbyPacket(Packet);
 
