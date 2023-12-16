@@ -38,7 +38,6 @@
 #include "CHudSA.h"
 #include "CKeyGenSA.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
-#include "COffsets.h"
 #include "CPadSA.h"
 #include "CPickupsSA.h"
 #include "CPlayerInfoSA.h"
@@ -61,15 +60,6 @@
 extern CGameSA* pGame;
 
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
-unsigned long* CGameSA::VAR_SystemTime;
-unsigned long* CGameSA::VAR_IsAtMenu;
-bool*          CGameSA::VAR_IsForegroundWindow;
-unsigned long* CGameSA::VAR_SystemState;
-float*         CGameSA::VAR_TimeScale;
-float*         CGameSA::VAR_FPS;
-float*         CGameSA::VAR_OldTimeStep;
-float*         CGameSA::VAR_TimeStep;
-unsigned long* CGameSA::VAR_Framelimiter;
 
 unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
 
@@ -79,6 +69,10 @@ unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint
 CGameSA::CGameSA()
 {
     pGame = this;
+
+    // Find the game version and initialize m_eGameVersion so GetGameVersion() will return the correct value
+    FindGameVersion();
+
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
@@ -89,21 +83,6 @@ CGameSA::CGameSA()
     ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
     SetInitialVirtualProtect();
-
-    // Initialize the offsets
-    eGameVersion version = FindGameVersion();
-    switch (version)
-    {
-        case VERSION_EU_10:
-            COffsets::Initialize10EU();
-            break;
-        case VERSION_US_10:
-            COffsets::Initialize10US();
-            break;
-        case VERSION_11:
-            COffsets::Initialize11();
-            break;
-    }
 
     // Set the model ids for all the CModelInfoSA instances
     for (unsigned int i = 0; i < modelInfoMax; i++)
@@ -142,7 +121,7 @@ CGameSA::CGameSA()
     m_pCarEnterExit = new CCarEnterExitSA();
     m_pControllerConfigManager = new CControllerConfigManagerSA();
     m_pProjectileInfo = new CProjectileInfoSA();
-    m_pRenderWare = new CRenderWareSA(version);
+    m_pRenderWare = new CRenderWareSA();
     m_pHandlingManager = new CHandlingManagerSA();
     m_pEventList = new CEventListSA();
     m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
@@ -363,12 +342,12 @@ void CGameSA::StartGame()
  */
 void CGameSA::SetSystemState(eSystemState State)
 {
-    *VAR_SystemState = (DWORD)State;
+    MemPutFast<DWORD>(0xC8D4C0, State); // gGameState
 }
 
 eSystemState CGameSA::GetSystemState()
 {
-    return (eSystemState)*VAR_SystemState;
+    return *(eSystemState*)0xC8D4C0; // gGameState
 }
 
 /**
@@ -503,27 +482,27 @@ eGameVersion CGameSA::FindGameVersion()
 
 float CGameSA::GetFPS()
 {
-    return *VAR_FPS;
+    return *(float*)0xB7CB50; // CTimer::game_FPS
 }
 
 float CGameSA::GetTimeStep()
 {
-    return *VAR_TimeStep;
+    return *(float*)0xB7CB5C; // CTimer::ms_fTimeStep
 }
 
 float CGameSA::GetOldTimeStep()
 {
-    return *VAR_OldTimeStep;
+    return *(float*)0xB7CB54; // CTimer::ms_fOldTimeStep
 }
 
 float CGameSA::GetTimeScale()
 {
-    return *VAR_TimeScale;
+    return *(float*)0xB7CB64; // CTimer::ms_fTimeScale
 }
 
 void CGameSA::SetTimeScale(float fTimeScale)
 {
-    *VAR_TimeScale = fTimeScale;
+    MemPutFast<float>(0xB7CB64, fTimeScale); // CTimer::ms_fTimeScale
 }
 
 unsigned char CGameSA::GetBlurLevel()
@@ -726,6 +705,9 @@ void CGameSA::SetBurnFlippedCarsEnabled(bool isEnabled)
 
 void CGameSA::SetFireballDestructEnabled(bool isEnabled)
 {
+    if (isEnabled == m_isFireballDestructEnabled)
+        return;
+
     if (isEnabled)
     {
         BYTE originalCodes[7] = {0x81, 0x66, 0x1C, 0x7E, 0xFF, 0xFF, 0xFF};
@@ -737,6 +719,8 @@ void CGameSA::SetFireballDestructEnabled(bool isEnabled)
         MemSet((void*)0x6CCE45, 0x90, 7); // CPlane::BlowUpCar
         MemSet((void*)0x6C6E01, 0x90, 7); // CHeli::BlowUpCar
     }
+
+    m_isFireballDestructEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()

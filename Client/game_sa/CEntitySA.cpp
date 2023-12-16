@@ -23,9 +23,6 @@
 
 extern CGameSA* pGame;
 
-unsigned long CEntitySA::FUNC_CClumpModelInfo__GetFrameFromId;
-unsigned long CEntitySA::FUNC_RwFrameGetLTM;
-
 void CEntitySAInterface::TransformFromObjectSpace(CVector& outPosn, CVector const& offset)
 {
     ((void(__thiscall*)(CEntitySAInterface*, CVector&, CVector const&))0x533560)(this, outPosn, offset);
@@ -439,17 +436,8 @@ eEntityStatus CEntitySA::GetEntityStatus()
 
 RwFrame* CEntitySA::GetFrameFromId(int id)
 {
-    DWORD dwClump = (DWORD)m_pInterface->m_pRwObject;
-    DWORD dwReturn;
-    _asm
-    {
-        push    id
-        push    dwClump
-        call    FUNC_CClumpModelInfo__GetFrameFromId
-        add     esp, 8
-        mov     dwReturn, eax
-    }
-    return (RwFrame*)dwReturn;
+    // CClumpModelInfo::GetFrameFromId
+    return ((RwFrame*(_cdecl*)(RpClump*, int))0x4C53C0)(m_pInterface->m_pRwObject, id);
 }
 
 RpClump* CEntitySA::GetRpClump()
@@ -459,16 +447,8 @@ RpClump* CEntitySA::GetRpClump()
 
 RwMatrix* CEntitySA::GetLTMFromId(int id)
 {
-    DWORD    dwReturn;
-    RwFrame* frame = GetFrameFromId(id);
-    _asm
-    {
-        push    frame
-        call    FUNC_RwFrameGetLTM
-        add     esp, 4
-        mov     dwReturn, eax
-    }
-    return (RwMatrix*)dwReturn;
+    // RwFrameGetLTM
+    return ((RwMatrix*(_cdecl*)(RwFrame*))0x7F0990)(GetFrameFromId(id));
 }
 
 void CEntitySA::SetAlpha(DWORD dwAlpha)
