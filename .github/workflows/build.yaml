@@ -45,7 +45,7 @@ jobs:
       - name: Create build artifacts
         run: utils\premake5 compose_files
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v3
         with:
           name: InstallFiles
           path: InstallFiles/
