@@ -21,7 +21,7 @@ public:
     CPlayerJoinCompletePacket();
     CPlayerJoinCompletePacket(ElementID PlayerID, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType, unsigned short usHTTPDownloadPort,
                               const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient, int iEnableClientChecks, bool bVoiceEnabled,
-                              unsigned char ucSampleRate, unsigned char ucVoiceQuality, unsigned int uiBitrate);
+                              unsigned char ucSampleRate, unsigned char ucVoiceQuality, unsigned int uiBitrate, const char* szServerName);
 
     ePacketID     GetPacketID() const { return PACKET_ID_SERVER_JOINEDGAME; };
     unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -40,4 +40,5 @@ private:
     unsigned char     m_ucSampleRate;
     unsigned char     m_ucQuality;
     unsigned int      m_uiBitrate;
+    const char*       m_szServerName;
 };

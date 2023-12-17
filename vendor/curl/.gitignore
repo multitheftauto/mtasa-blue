@@ -1,5 +1,8 @@
 *
+!**/
 !.gitignore
 !premake5.lua
 !include/
 !lib/
+!**.c
+!**.h

@@ -23,7 +23,7 @@ enum
     TASK_PRIORITY_MAX
 };
 
-enum
+enum eSecondaryTaskType
 {
     TASK_SECONDARY_ATTACK = 0,            // want duck to be after attack
     TASK_SECONDARY_DUCK,                  // because attack controls ducking movement

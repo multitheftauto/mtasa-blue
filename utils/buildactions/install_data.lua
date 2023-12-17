@@ -49,6 +49,13 @@ newaction {
 			return
 		end
 
+		local success, message = os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "mtaserver.conf.template", false, true)
+		if not success then
+			errormsg("ERROR: Couldn't copy server config files", "\n"..message)
+			os.exit(1)
+			return
+		end
+
 		local success, message = os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.xml", false, true)
 		if not success then
 			errormsg("ERROR: Couldn't copy server xml files", "\n"..message)
