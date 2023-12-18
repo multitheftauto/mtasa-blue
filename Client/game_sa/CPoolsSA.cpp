@@ -362,15 +362,18 @@ inline bool CPoolsSA::AddBuildingToPool(CClientBuilding* pClientBuilding, CBuild
     return true;
 }
 
-CBuilding* CPoolsSA::AddBuilding(class CClientBuilding* pClientBuilding, uint16_t modelId, CVector vPos, CVector4D vRot, uint8_t interior)
+CBuilding* CPoolsSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior)
 {
     // Load building
     SFileObjectInstance instance;
     instance.modelID = modelId;
     instance.lod = -1;
     instance.interiorID = interior;
-    instance.position = vPos;
-    instance.rotation = vRot;
+    instance.position = *vPos;
+    instance.rotation = *vRot;
+
+    // Fix strange SA rotation 
+    instance.rotation.fW = -instance.rotation.fW;
 
     CFileLoaderSA loader{};
     auto pBuilding = loader.LoadFileObjectInstance(&instance);

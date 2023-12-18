@@ -176,7 +176,7 @@ private:
     bool       AddBuildingToPool(CClientBuilding* pClientBuilding, CBuildingSA* pBuilding);
 
 public:
-    CBuilding* AddBuilding(class CClientBuilding*, uint16_t modelId, CVector vPos, CVector4D vRot, uint8_t interior);
+    CBuilding* AddBuilding(CClientBuilding*, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior);
     void       RemoveBuilding(CBuilding* pBuilding);
 
     // Peds pool

@@ -42,7 +42,8 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
 
     // Grab the resource root entity
     CClientEntity* pRoot = pResource->GetResourceDynamicEntity();
-    // Create the img handle
+
+    // Create the building handle
     CClientBuilding* pBuilding = new CClientBuilding(m_pManager, INVALID_ELEMENT_ID, modelId, pos, rot, interior);
 
     pBuilding->SetParent(pRoot);

@@ -20,12 +20,17 @@ class CClientBuilding : public CClientEntity
     friend class CClientBuildingManager;
 
 public:
-    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector pos, CVector4D rot, uint8_t interior);
+    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector pos, CVector rot, uint8_t interior);
     ~CClientBuilding();
 
     void Unlink(){};
-    void GetPosition(CVector& vecPosition) const { vecPosition = m_vPos; };
-    void SetPosition(const CVector& vecPosition) { m_vPos = vecPosition; };
+    void GetPosition(CVector& vecPosition) const override { vecPosition = m_vPos; };
+    void SetPosition(const CVector& vecPosition) override;
+
+    void GetRotationRadians(CVector& vecOutRadians) const override { vecOutRadians = m_vPos; };
+    void SetRotationRadians(const CVector& vecRadians) override;
+
+    void SetInterior(uint8_t ucInterior) override;
 
     eClientEntityType GetType() const { return CCLIENTBUILDING; }
 
@@ -33,12 +38,18 @@ private:
     void Create();
     void Destroy();
 
+    void Recreate()
+    {
+        Destroy();
+        Create();
+    };
+
 private:
     CClientBuildingManager* m_pBuildingManager;
 
     CBuilding* m_pBuilding;
     uint16_t   m_usModelId;
     CVector    m_vPos;
-    CVector4D  m_vRot;
+    CVector    m_vRot;
     uint8_t    m_interior;
 };

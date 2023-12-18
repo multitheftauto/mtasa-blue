@@ -85,7 +85,7 @@ public:
     virtual unsigned long          GetPedCount() = 0;
 
     // Buildings pool
-    virtual CBuilding* AddBuilding(class CClientBuilding*, uint16_t modelId, CVector vPos, CVector4D vRot, uint8_t interior) = 0;
+    virtual CBuilding* AddBuilding(class CClientBuilding*, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior) = 0;
     virtual void       RemoveBuilding(CBuilding* pObject) = 0;
 
     // Others

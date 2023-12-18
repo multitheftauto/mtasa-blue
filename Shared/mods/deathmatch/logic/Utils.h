@@ -246,6 +246,21 @@ inline float GetSmallestWrapUnsigned(float fValue, float fHigh)
 
 void RotateVector(CVector& vecLine, const CVector& vecRotation);
 
+inline void ConvertEulersToQuaternion(const CVector& vecFrom, CVector4D vecTo)
+{
+    double cy = cos(vecFrom.fZ * 0.5);
+    double sy = sin(vecFrom.fZ * 0.5);
+    double cr = cos(vecFrom.fX * 0.5);
+    double sr = sin(vecFrom.fX * 0.5);
+    double cp = cos(vecFrom.fY * 0.5);
+    double sp = sin(vecFrom.fY * 0.5);
+
+    vecTo.fW = cy * cr * cp + sy * sr * sp;
+    vecTo.fX = cy * sr * cp - sy * cr * sp;
+    vecTo.fY = cy * cr * sp + sy * sr * cp;
+    vecTo.fY = sy * cr * cp - cy * sr * sp;
+}
+
 #ifdef MTA_CLIENT
 // Misc utility functions
 unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace = ' ');

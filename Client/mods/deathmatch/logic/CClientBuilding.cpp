@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector pos, CVector4D rot, uint8_t interior)
+CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector pos, CVector rot, uint8_t interior)
     : ClassInit(this),
       CClientEntity(ID),
       m_pBuildingManager(pManager->GetBuildingManager()),
@@ -35,12 +35,33 @@ CClientBuilding::~CClientBuilding()
     }
 }
 
+void CClientBuilding::SetPosition(const CVector& vecPosition)
+{
+    m_vPos = vecPosition;
+    Recreate();
+}
+
+void CClientBuilding::SetRotationRadians(const CVector& vecRadians)
+{
+    m_vRot = vecRadians;
+    Recreate();
+}
+
+void CClientBuilding::SetInterior(uint8_t ucInterior)
+{
+    m_interior = ucInterior;
+    Recreate();
+}
+
 void CClientBuilding::Create()
 {
     if (m_pBuilding)
         return;
 
-    m_pBuilding = g_pGame->GetPools()->AddBuilding(this, m_usModelId, m_vPos, m_vRot, m_interior);
+    CVector4D vRot4D;
+    ConvertEulersToQuaternion(m_vRot, vRot4D);
+
+    m_pBuilding = g_pGame->GetPools()->AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
 }
 
 void CClientBuilding::Destroy()
