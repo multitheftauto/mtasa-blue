@@ -1,0 +1,53 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *               (Shared logic for modifications)
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/shared_logic/CClientBuilding.cpp
+ *  PURPOSE:     Buildings handling class
+ *
+ *****************************************************************************/
+
+#include "StdInc.h"
+
+CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector pos, CVector4D rot, uint8_t interior)
+    : ClassInit(this),
+      CClientEntity(ID),
+      m_pBuildingManager(pManager->GetBuildingManager()),
+      m_usModelId(usModelId),
+      m_vPos(pos),
+      m_vRot(rot),
+      m_interior(interior)
+{
+    m_pBuilding = nullptr;
+    m_pManager = pManager;
+    SetTypeName("building");
+    m_pBuildingManager->AddToList(this);
+    Create();
+}
+
+CClientBuilding::~CClientBuilding()
+{
+    m_pBuildingManager->RemoveFromList(this);
+    if (m_pBuilding)
+    {
+        Destroy();
+    }
+}
+
+void CClientBuilding::Create()
+{
+    if (m_pBuilding)
+        return;
+
+    m_pBuilding = g_pGame->GetPools()->AddBuilding(this, m_usModelId, m_vPos, m_vRot, m_interior);
+}
+
+void CClientBuilding::Destroy()
+{
+    if (m_pBuilding)
+    {
+        g_pGame->GetPools()->RemoveBuilding(m_pBuilding);
+        m_pBuilding = nullptr;
+    }
+}

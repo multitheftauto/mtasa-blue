@@ -14,6 +14,7 @@
 #include "CPedSA.h"
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
+#include "CBuildingSA.h"
 #include "CTextureDictonarySA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
@@ -170,6 +171,14 @@ public:
     unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
     void                      DeleteAllObjects();
 
+    // Buildings pool
+private:
+    bool       AddBuildingToPool(CClientBuilding* pClientBuilding, CBuildingSA* pBuilding);
+
+public:
+    CBuilding* AddBuilding(class CClientBuilding*, uint16_t modelId, CVector vPos, CVector4D vRot, uint8_t interior);
+    void       RemoveBuilding(CBuilding* pBuilding);
+
     // Peds pool
     CPed* AddPed(CClientPed* pClientPed, unsigned int nModelIndex);
     CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
@@ -195,6 +204,7 @@ public:
     DWORD GetPedPoolIndex(std::uint8_t* pInterface);
     DWORD GetVehiclePoolIndex(std::uint8_t* pInterfacee);
     DWORD GetObjectPoolIndex(std::uint8_t* pInterface);
+    DWORD GetBuildingPoolIndex(std::uint8_t* pInterface);
 
     int  GetNumberOfUsedSpaces(ePools pools);
     int  GetPoolDefaultCapacity(ePools pool);
@@ -231,16 +241,16 @@ private:
     };
 
     // Pools
-    typedef SPoolData<CVehicleSA, CVehicleSAInterface, MAX_VEHICLES> vehiclePool_t;
-    typedef SPoolData<CPedSA, CPedSAInterface, MAX_PEDS>             pedPool_t;
-    typedef SPoolData<CObjectSA, CObjectSAInterface, MAX_OBJECTS>    objectPool_t;
-    vehiclePool_t                                                    m_vehiclePool;
-    pedPool_t                                                        m_pedPool;
-    objectPool_t                                                     m_objectPool;
-    CPoolSAInterface<CPedSAInterface>**                              m_ppPedPoolInterface;
-    CPoolSAInterface<CObjectSAInterface>**                           m_ppObjectPoolInterface;
-    CPoolSAInterface<CVehicleSAInterface>**                          m_ppVehiclePoolInterface;
-    CPoolSAInterface<CTextureDictonarySAInterface>**                 m_ppTxdPoolInterface;
+    SPoolData<CVehicleSA, CVehicleSAInterface, MAX_VEHICLES>    m_vehiclePool;
+    SPoolData<CPedSA, CPedSAInterface, MAX_PEDS>                m_pedPool;
+    SPoolData<CObjectSA, CObjectSAInterface, MAX_OBJECTS>       m_objectPool;
+    SPoolData<CBuildingSA, CBuildingSAInterface, MAX_BUILDINGS> m_buildingPool;
+
+    CPoolSAInterface<CPedSAInterface>**              m_ppPedPoolInterface;
+    CPoolSAInterface<CObjectSAInterface>**           m_ppObjectPoolInterface;
+    CPoolSAInterface<CVehicleSAInterface>**          m_ppVehiclePoolInterface;
+    CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;
+    CPoolSAInterface<CBuildingSAInterface>**         m_ppBuildingPoolInterface;
 
     bool m_bGetVehicleEnabled;
 };

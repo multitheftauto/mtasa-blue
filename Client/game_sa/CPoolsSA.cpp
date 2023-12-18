@@ -13,6 +13,7 @@
 #include "CBikeSA.h"
 #include "CBmxSA.h"
 #include "CBoatSA.h"
+#include "CBuildingSA.h"
 #include "CGameSA.h"
 #include "CHeliSA.h"
 #include "CMonsterTruckSA.h"
@@ -24,6 +25,7 @@
 #include "CTrainSA.h"
 #include "CWorldSA.h"
 #include "CKeyGenSA.h"
+#include "CFileLoaderSA.h"
 
 extern CGameSA* pGame;
 
@@ -33,6 +35,7 @@ CPoolsSA::CPoolsSA()
     m_ppObjectPoolInterface = (CPoolSAInterface<CObjectSAInterface>**)0xB7449C;
     m_ppVehiclePoolInterface = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
     m_ppTxdPoolInterface = (CPoolSAInterface<CTextureDictonarySAInterface>**)0xC8800C;
+    m_ppBuildingPoolInterface = (CPoolSAInterface<CBuildingSAInterface>**)0xB74498;
 
     m_bGetVehicleEnabled = true;
 }
@@ -327,6 +330,83 @@ void CPoolsSA::DeleteAllObjects()
 
         RemoveObject(pObject);
     }
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//                                     BUILDINGS POOL                                   //
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline bool CPoolsSA::AddBuildingToPool(CClientBuilding* pClientBuilding, CBuildingSA* pBuilding)
+{
+    // Grab the new object interface
+    CBuildingSAInterface* pInterface = pBuilding->GetBuildingInterface();
+
+    if (!pInterface)
+    {
+        return false;
+    }
+    else
+    {
+        DWORD dwElementIndexInPool = GetBuildingPoolIndex((std::uint8_t*)pInterface);
+        if (dwElementIndexInPool >= MAX_BUILDINGS)
+        {
+            return false;
+        }
+
+        m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
+
+        // Increase the count of objects
+        ++m_buildingPool.ulCount;
+    }
+
+    return true;
+}
+
+CBuilding* CPoolsSA::AddBuilding(class CClientBuilding* pClientBuilding, uint16_t modelId, CVector vPos, CVector4D vRot, uint8_t interior)
+{
+    CFileLoaderSA loader{};
+
+    SFileObjectInstance instance;
+    instance.modelID = modelId;
+    instance.lod = -1;
+    instance.interiorID = interior;
+    instance.position = vPos;
+    instance.rotation = vRot;
+
+    auto pBuilding = loader.LoadFileObjectInstance(&instance);
+
+    pBuilding->m_pLod = nullptr;
+    pBuilding->m_iplIndex = 0;
+
+    pBuilding->AddRect();
+
+    auto pBuildingSA = new CBuildingSA(pBuilding);
+
+    AddBuildingToPool(pClientBuilding, pBuildingSA);
+
+    return pBuildingSA;
+}
+
+void CPoolsSA::RemoveBuilding(CBuilding* pBuilding)
+{
+    assert(NULL != pBuilding);
+
+    CBuildingSAInterface* pInterface = pBuilding->GetBuildingInterface();
+
+    DWORD dwElementIndexInPool = GetBuildingPoolIndex((std::uint8_t*)pInterface);
+    if (dwElementIndexInPool >= MAX_BUILDINGS)
+    {
+        return;
+    }
+
+    auto* pBuildingSA = m_buildingPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
+    m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
+
+    // Delete it from memory
+    delete pBuildingSA;
+
+    // Decrease the count of elements in the pool
+    --m_buildingPool.ulCount;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -676,7 +756,7 @@ DWORD CPoolsSA::GetPedPoolIndex(std::uint8_t* pInterface)
     {
         return MAX_PEDS;
     }
-    return ((pInterface - pTheObjects) / dwAlignedSize);
+    return ((pInterface - pTheObjects) / dwAlignedSize); 
 }
 
 DWORD CPoolsSA::GetVehiclePoolIndex(std::uint8_t* pInterface)
@@ -699,6 +779,18 @@ DWORD CPoolsSA::GetObjectPoolIndex(std::uint8_t* pInterface)
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
     {
         return MAX_OBJECTS;
+    }
+    return ((pInterface - pTheObjects) / dwAlignedSize);
+}
+
+DWORD CPoolsSA::GetBuildingPoolIndex(std::uint8_t* pInterface)
+{
+    DWORD         dwAlignedSize = 412;
+    std::uint8_t* pTheObjects = (std::uint8_t*)(*m_ppBuildingPoolInterface)->m_pObjects;
+    DWORD         dwMaxIndex = MAX_BUILDINGS - 1;
+    if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
+    {
+        return MAX_BUILDINGS;
     }
     return ((pInterface - pTheObjects) / dwAlignedSize);
 }
