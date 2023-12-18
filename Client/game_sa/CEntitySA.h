@@ -191,7 +191,6 @@ public:
 
     uint8 m_pad0;            // 55
 
-    void        AddRect();
     CRect*      GetBoundRect_(CRect* pRect);
     void        TransformFromObjectSpace(CVector& outPosn, CVector const& offset);
     CVector*    GetBoundCentre(CVector* pOutCentre);

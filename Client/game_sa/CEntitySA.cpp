@@ -43,12 +43,6 @@ void CEntitySAInterface::UpdateRpHAnim()
     ((void(__thiscall*)(CEntitySAInterface*))0x532B20)(this);
 }
 
-void CEntitySAInterface::AddRect()
-{
-    typedef void(__thiscall * add_rect_t)(CEntitySAInterface*);
-    ((add_rect_t)(this->vtbl->Add))(this);
-}
-
 CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
 {
     CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
