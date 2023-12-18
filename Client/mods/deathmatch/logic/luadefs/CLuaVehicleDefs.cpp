@@ -1297,21 +1297,13 @@ int CLuaVehicleDefs::GetHelicopterRotorSpeed(lua_State* luaVM)
 
 std::variant<bool, float> CLuaVehicleDefs::GetVehicleRotorSpeed(CClientVehicle* pVehicle)
 {
-    switch (pVehicle->GetVehicleType())
+    float fSpeed;
+    if (pVehicle->GetRotorSpeed(fSpeed))
     {
-        case CLIENTVEHICLE_PLANE:
-        {
-            return pVehicle->GetPlaneRotorSpeed();
-        }
-        case CLIENTVEHICLE_HELI:
-        {
-            return pVehicle->GetHeliRotorSpeed();
-        }
-        default:
-        {
-            return false;
-        }
+        return fSpeed;
     }
+    else
+        return false;
 }
 
 int CLuaVehicleDefs::IsTrainDerailed(lua_State* luaVM)
@@ -2227,25 +2219,12 @@ int CLuaVehicleDefs::SetHelicopterRotorSpeed(lua_State* luaVM)
 
 bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed)
 {
-    switch (pVehicle->GetVehicleType())
+    if (pVehicle == nullptr)
     {
-        case CLIENTVEHICLE_HELI:
-        {
-            pVehicle->SetHeliRotorSpeed(fSpeed);
-            break;
-        }
-        case CLIENTVEHICLE_PLANE:
-        {
-            pVehicle->SetPlaneRotorSpeed(fSpeed);
-            break;
-        }
-        default:
-        {
-            return false;
-        }
+        return false; 
     }
 
-    return true;
+    return pVehicle->SetRotorSpeed(fSpeed);
 }
 
 int CLuaVehicleDefs::SetTrainDerailed(lua_State* luaVM)

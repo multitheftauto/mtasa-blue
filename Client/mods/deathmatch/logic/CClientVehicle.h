@@ -299,6 +299,9 @@ public:
     float GetHeliRotorSpeed();
     float GetPlaneRotorSpeed();
 
+    bool GetRotorSpeed(float&);
+    bool SetRotorSpeed(float);
+
     void SetHeliRotorSpeed(float fSpeed);
     void SetPlaneRotorSpeed(float fSpeed);
     bool IsHeliSearchLightVisible();

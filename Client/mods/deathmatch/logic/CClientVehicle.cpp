@@ -1562,6 +1562,37 @@ void CClientVehicle::SetPlaneRotorSpeed(float fSpeed)
     m_fPlaneRotorSpeed = fSpeed;
 }
 
+bool CClientVehicle::GetRotorSpeed(float& speed)
+{
+    if (m_eVehicleType == CLIENTVEHICLE_PLANE)
+    {
+        speed = GetPlaneRotorSpeed();
+        return true;
+    }
+    else if (m_eVehicleType == CLIENTVEHICLE_HELI)
+    {
+        speed = GetHeliRotorSpeed();
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientVehicle::SetRotorSpeed(float fSpeed)
+{
+    switch (m_eVehicleType)
+    {
+        case CLIENTVEHICLE_HELI:
+            SetHeliRotorSpeed(fSpeed);
+            return true;
+        case CLIENTVEHICLE_PLANE:
+            SetPlaneRotorSpeed(fSpeed);
+            return true;
+        default:
+            return false;
+    }
+}
+
 bool CClientVehicle::IsHeliSearchLightVisible()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
