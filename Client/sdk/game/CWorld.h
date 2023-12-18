@@ -154,6 +154,8 @@ enum eDebugCaller
     CCivPed_Constructor,
     CCivPed_Destructor,
     CBuilding_Destructor,
+    CBuildingPool_Constructor,
+    CBuildingPool_Destructor,
 
 };
 

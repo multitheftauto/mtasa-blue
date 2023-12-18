@@ -364,8 +364,7 @@ inline bool CPoolsSA::AddBuildingToPool(CClientBuilding* pClientBuilding, CBuild
 
 CBuilding* CPoolsSA::AddBuilding(class CClientBuilding* pClientBuilding, uint16_t modelId, CVector vPos, CVector4D vRot, uint8_t interior)
 {
-    CFileLoaderSA loader{};
-
+    // Load building
     SFileObjectInstance instance;
     instance.modelID = modelId;
     instance.lod = -1;
@@ -373,15 +372,23 @@ CBuilding* CPoolsSA::AddBuilding(class CClientBuilding* pClientBuilding, uint16_
     instance.position = vPos;
     instance.rotation = vRot;
 
+    CFileLoaderSA loader{};
     auto pBuilding = loader.LoadFileObjectInstance(&instance);
 
+    // Disable lod and ipl
     pBuilding->m_pLod = nullptr;
     pBuilding->m_iplIndex = 0;
 
-    pBuilding->AddRect();
+    // Always stream model collosion
+    // TODO We can setup collison bounding box and use GTA streamer for it
+    auto modelInfo = pGame->GetModelInfo(modelId);
+    modelInfo->AddColRef();
 
+    // Add building in world
     auto pBuildingSA = new CBuildingSA(pBuilding);
+    pGame->GetWorld()->Add(pBuildingSA, CBuildingPool_Constructor);
 
+    // Add CBuildingSA object in pool
     AddBuildingToPool(pClientBuilding, pBuildingSA);
 
     return pBuildingSA;
@@ -399,6 +406,14 @@ void CPoolsSA::RemoveBuilding(CBuilding* pBuilding)
         return;
     }
 
+    // Remove building from world
+    pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
+
+    // Remove col reference
+    auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
+    modelInfo->RemoveColRef();
+
+    // Remove from BuildingSA pool
     auto* pBuildingSA = m_buildingPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
     m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
 
