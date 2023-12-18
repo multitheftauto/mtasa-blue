@@ -1562,8 +1562,6 @@ void CClientVehicle::SetPlaneRotorSpeed(float fSpeed)
     m_fPlaneRotorSpeed = fSpeed;
 }
 
-
-
 bool CClientVehicle::IsHeliSearchLightVisible()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
