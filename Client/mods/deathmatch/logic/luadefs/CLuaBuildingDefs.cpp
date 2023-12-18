@@ -40,6 +40,9 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (!pResource)
         return false;
 
+    if (!CClientObjectManager::IsValidModel(modelId))
+        throw std::invalid_argument("Invalid model id");
+
     // Grab the resource root entity
     CClientEntity* pRoot = pResource->GetResourceDynamicEntity();
 

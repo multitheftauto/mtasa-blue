@@ -51,6 +51,15 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
 {
     m_interior = ucInterior;
     Recreate();
+} 
+
+void CClientBuilding::SetModel(uint16_t model)
+{
+    if (CClientObjectManager::IsValidModel(model))
+    {
+        m_usModelId = model;
+        Recreate();
+    }
 }
 
 void CClientBuilding::Create()

@@ -32,6 +32,9 @@ public:
 
     void SetInterior(uint8_t ucInterior) override;
 
+    uint16_t GetModel() { return m_usModelId; };
+    void     SetModel(uint16_t ulModel);
+
     eClientEntityType GetType() const { return CCLIENTBUILDING; }
 
 private:
