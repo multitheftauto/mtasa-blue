@@ -258,7 +258,7 @@ inline void ConvertEulersToQuaternion(const CVector& vecFrom, CVector4D vecTo)
     vecTo.fW = cy * cr * cp + sy * sr * sp;
     vecTo.fX = cy * sr * cp - sy * cr * sp;
     vecTo.fY = cy * cr * sp + sy * sr * cp;
-    vecTo.fY = sy * cr * cp - cy * sr * sp;
+    vecTo.fZ = sy * cr * cp - cy * sr * sp;
 }
 
 #ifdef MTA_CLIENT

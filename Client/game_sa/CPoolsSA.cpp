@@ -342,22 +342,18 @@ inline bool CPoolsSA::AddBuildingToPool(CClientBuilding* pClientBuilding, CBuild
     CBuildingSAInterface* pInterface = pBuilding->GetBuildingInterface();
 
     if (!pInterface)
+        return false;
+
+    DWORD dwElementIndexInPool = GetBuildingPoolIndex((std::uint8_t*)pInterface);
+    if (dwElementIndexInPool >= MAX_BUILDINGS)
     {
         return false;
     }
-    else
-    {
-        DWORD dwElementIndexInPool = GetBuildingPoolIndex((std::uint8_t*)pInterface);
-        if (dwElementIndexInPool >= MAX_BUILDINGS)
-        {
-            return false;
-        }
 
-        m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
+    m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
 
-        // Increase the count of objects
-        ++m_buildingPool.ulCount;
-    }
+    // Increase the count of objects
+    ++m_buildingPool.ulCount;
 
     return true;
 }
