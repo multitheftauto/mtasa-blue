@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector pos, CVector rot, uint8_t interior)
+CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector &pos, CVector &rot, uint8_t interior)
     : ClassInit(this),
       CClientEntity(ID),
       m_pBuildingManager(pManager->GetBuildingManager()),

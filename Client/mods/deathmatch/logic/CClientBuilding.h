@@ -20,7 +20,7 @@ class CClientBuilding : public CClientEntity
     friend class CClientBuildingManager;
 
 public:
-    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector pos, CVector rot, uint8_t interior);
+    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector &pos, CVector &rot, uint8_t interior);
     ~CClientBuilding();
 
     void Unlink(){};
@@ -32,10 +32,10 @@ public:
 
     void SetInterior(uint8_t ucInterior) override;
 
-    uint16_t GetModel() { return m_usModelId; };
+    uint16_t GetModel() const noexcept { return m_usModelId; };
     void     SetModel(uint16_t ulModel);
 
-    eClientEntityType GetType() const { return CCLIENTBUILDING; }
+    eClientEntityType GetType() const noexcept { return CCLIENTBUILDING; }
 
 private:
     void Create();

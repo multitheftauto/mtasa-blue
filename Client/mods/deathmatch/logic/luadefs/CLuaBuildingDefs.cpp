@@ -31,7 +31,7 @@ void CLuaBuildingDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Building");
 }
 
-CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16_t modelId, CVector pos, CVector4D rot, uint8_t interior)
+CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16_t modelId, CVector pos, CVector rot, uint8_t interior)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
