@@ -178,6 +178,7 @@ private:
 public:
     CBuilding* AddBuilding(CClientBuilding*, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior);
     void       RemoveBuilding(CBuilding* pBuilding);
+    bool       HasFreeBuildingSlot();
 
     // Peds pool
     CPed* AddPed(CClientPed* pClientPed, unsigned int nModelIndex);

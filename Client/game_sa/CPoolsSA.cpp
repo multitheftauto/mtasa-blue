@@ -360,6 +360,9 @@ inline bool CPoolsSA::AddBuildingToPool(CClientBuilding* pClientBuilding, CBuild
 
 CBuilding* CPoolsSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior)
 {
+    if (!HasFreeBuildingSlot())
+        return nullptr;
+
     // Load building
     SFileObjectInstance instance;
     instance.modelID = modelId;
@@ -421,6 +424,11 @@ void CPoolsSA::RemoveBuilding(CBuilding* pBuilding)
 
     // Decrease the count of elements in the pool
     --m_buildingPool.ulCount;
+}
+
+bool CPoolsSA::HasFreeBuildingSlot()
+{
+    return (*m_ppBuildingPoolInterface)->GetFreeSlot() != -1;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

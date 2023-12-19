@@ -87,6 +87,7 @@ public:
     // Buildings pool
     virtual CBuilding* AddBuilding(class CClientBuilding*, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior) = 0;
     virtual void       RemoveBuilding(CBuilding* pObject) = 0;
+    virtual bool       HasFreeBuildingSlot() = 0;
 
     // Others
     virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,

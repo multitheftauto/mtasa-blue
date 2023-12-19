@@ -43,6 +43,12 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (!CClientObjectManager::IsValidModel(modelId))
         throw std::invalid_argument("Invalid model id");
 
+    if (!g_pGame->GetPools()->HasFreeBuildingSlot())
+        throw std::invalid_argument("No free slot in buildings pool");
+
+    if (pos.fX < -3000.0f || pos.fX > 3000.0f || pos.fY < -3000.0f || pos.fY > 3000.0f)
+        throw std::invalid_argument("Position is outside of game world");
+
     // Grab the resource root entity
     CClientEntity* pRoot = pResource->GetResourceDynamicEntity();
 
