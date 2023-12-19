@@ -14,7 +14,7 @@
 #include <game/CPlane.h>
 #include "CAutomobileSA.h"
 
-enum ePlaneNodes
+enum class ePlaneNodes
 {
     PLANE_NODE_NONE = 0,
     PLANE_CHASSIS = 1,
@@ -63,19 +63,19 @@ public:
     float        m_planeHeading;
     float        m_planeHeadingPrev;
     float        m_forwardZ;
-    uint32       m_nStartedFlyingTime;
+    uint32_t     m_nStartedFlyingTime;
     float        m_fPropSpeed;            // Rotor speed 0x09C4
     float        field_9C8;
     float        m_fLandingGearStatus;
-    int32        m_planeDamageWave;
+    int32_t      m_planeDamageWave;
     FxSystem_c** m_pGunParticles;
-    uint8        m_nFiringMultiplier;
-    int32        field_9DC;
-    int32        field_9E0;
-    int32        field_9E4;
+    uint8_t      m_nFiringMultiplier;
+    int32_t      field_9DC;
+    int32_t      field_9E0;
+    int32_t      field_9E4;
     FxSystem_c*  m_apJettrusParticles[4];
     FxSystem_c*  m_pSmokeParticle;
-    uint32       m_nSmokeTimer;
+    uint32_t     m_nSmokeTimer;
     bool         m_bSmokeEjectorEnabled;
 };
 static_assert(sizeof(CPlaneSAInterface) == 0xA04, "Invalid size for CPlaneSAInterface");

@@ -2219,11 +2219,6 @@ int CLuaVehicleDefs::SetHelicopterRotorSpeed(lua_State* luaVM)
 
 bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed)
 {
-    if (pVehicle == nullptr)
-    {
-        return false; 
-    }
-
     return pVehicle->SetRotorSpeed(fSpeed);
 }
 
