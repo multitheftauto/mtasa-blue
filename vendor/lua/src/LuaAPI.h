@@ -116,6 +116,8 @@ VLUA_API int   (Vlua_getstackgap) (struct lua_State *L);         // MTA addition
 
 VLUA_API int   (Vlua_next) (struct lua_State *L, int idx);
 
+VLUA_API void  (Vlua_concat) (struct lua_State *L, int n);
+
 VLUA_API void  (Vlua_call) (struct lua_State *L, int nargs, int nresults);
 VLUA_API int   (Vlua_pcall) (struct lua_State *L, int nargs, int nresults, int errfunc);
 
@@ -129,8 +131,6 @@ VLUA_API int   (Vlua_pcall) (struct lua_State *L, int nargs, int nresults, int e
 VLUA_API int (Vlua_ncallresult) (struct lua_State* L);
 
 VLUA_API int   (Vlua_error) (struct lua_State *L);
-
-VLUA_API void (Vlua_concat) (lua_State *L, int n);
 
 VLUA_API int (Vlua_gc) (struct lua_State *L, int what, int data);
 
@@ -183,11 +183,11 @@ VLUALIB_API void (VluaL_unref) (struct lua_State *L, int t, int ref);
 VLUALIB_API int (VluaL_loadbuffer) (struct lua_State *L, const char *buff, size_t sz,
                                   const char *name);
 
+VLUALIB_API void (VluaL_where) (lua_State *L, int level);
+
 VLUALIB_API int (VluaL_error) (struct lua_State *L, const char *fmt, ...);
 
 VLUALIB_API int (VluaL_callmeta) (struct lua_State *L, int obj, const char *e);
-
-VLUALIB_API void (VluaL_where) (lua_State *L, int lvl);
 
 #if defined(LUA_USE_APICHECK)
 VLUA_API int VluaX_is_apicheck_enabled();
@@ -270,8 +270,8 @@ struct Vlua_StateFns
     int (*VluaL_error) (struct lua_State *L, const char *fmt, ...);
     int (*VluaL_callmeta) (struct lua_State *L, int obj, const char *e);
 
-    void (*VluaL_where) (lua_State *L, int lvl);
-    void (*Vlua_concat) (lua_State *L, int n);
+    void (*VluaL_where) (struct lua_State *L, int level);
+    void (*Vlua_concat) (struct lua_State *L, int n);
 
     // Debug
 #if defined(LUA_USE_APICHECK)

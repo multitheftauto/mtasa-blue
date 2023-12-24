@@ -91,6 +91,8 @@
 
 #define lua_next(L,idx) Vlua_next((L), (idx))
 
+#define lua_concat(L,n) Vlua_concat((L), (n))
+
 #define lua_call(L,nargs,nresults) Vlua_call((L), (nargs), (nresults))
 #define lua_pcall(L,nargs,nresults,errfunc) Vlua_pcall((L), (nargs), (nresults), (errfunc))
 
@@ -104,8 +106,6 @@
 #define lua_ncallresult(L) Vlua_ncallresult((L))
 
 #define lua_error(L) Vlua_error((L))
-
-#define lua_concat(L,n) Vlua_concat((L), (n))
 
 /*
 ** garbage-collection function and options

@@ -91,8 +91,8 @@ static struct
     VLUA_IMPORT_FN(int, luaL_error) (struct lua_State *L, const char *fmt, ...);
     VLUA_IMPORT_FN(int, luaL_callmeta) (struct lua_State *L, int obj, const char *e);
 
-    VLUA_IMPORT_FN(void, luaL_where) (lua_State* L, int lvl);
-    VLUA_IMPORT_FN(void, lua_concat) (lua_State *L, int n);
+    VLUA_IMPORT_FN(void, luaL_where) (struct lua_State *L, int level);
+    VLUA_IMPORT_FN(void, lua_concat) (struct lua_State *L, int n);
 
     // Debug
 #if defined(LUA_USE_APICHECK)

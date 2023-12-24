@@ -80,12 +80,12 @@ static struct
     VLUA_IMPORT_FN(int, luaL_callmeta) (struct lua_State *L, int obj, const char *e);
     VLUA_IMPORT_FN(void*, lua_touserdata) (lua_State* L, int idx);
 
-    VLUA_IMPORT_FN(void, luaL_where) (lua_State* L, int lvl);
-    VLUA_IMPORT_FN(void, lua_concat) (lua_State *L, int n);
-
     VLUA_IMPORT_FN(int, luaL_checkoption) (lua_State* L, int narg, const char* def, const char* const lst[]);
     VLUA_IMPORT_FN(int, luaL_optinteger) (lua_State* L, int nArg, int def);
     VLUA_IMPORT_FN(lua_Callbacks*, lua_callbacks) (lua_State* L);
+
+    VLUA_IMPORT_FN(void, luaL_where) (struct lua_State *L, int level);
+    VLUA_IMPORT_FN(void, lua_concat) (struct lua_State *L, int n);
 
     // Custom function
     VLUA_IMPORT_FN(int, lua_nresults) (lua_State* L);
