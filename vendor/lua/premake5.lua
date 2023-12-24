@@ -140,6 +140,12 @@ project "Lua_Server"
 	filter {"platforms:x86"}
 		defines "VLUA_PLATFORM="
 
+	filter {"system:windows", "platforms:arm"}
+		targetdir(buildpath("server/arm"))
+
+	filter {"system:windows", "platforms:arm64"}
+		targetdir(buildpath("server/arm64"))
+
 
 --[[
 	Lua_Client
