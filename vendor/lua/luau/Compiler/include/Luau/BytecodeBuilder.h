@@ -15,7 +15,7 @@ class BytecodeEncoder
 public:
     virtual ~BytecodeEncoder() {}
 
-    virtual uint8_t encodeOp(uint8_t op) = 0;
+    virtual void encode(uint32_t* data, size_t count) = 0;
 };
 
 class BytecodeBuilder
@@ -47,7 +47,7 @@ public:
     BytecodeBuilder(BytecodeEncoder* encoder = 0);
 
     uint32_t beginFunction(uint8_t numparams, bool isvararg = false);
-    void endFunction(uint8_t maxstacksize, uint8_t numupvalues);
+    void endFunction(uint8_t maxstacksize, uint8_t numupvalues, uint8_t flags = 0);
 
     void setMainFunction(uint32_t fid);
 
@@ -74,11 +74,15 @@ public:
     void foldJumps();
     void expandJumps();
 
+    void setFunctionTypeInfo(std::string value);
+
     void setDebugFunctionName(StringRef name);
     void setDebugFunctionLineDefined(int line);
     void setDebugLine(int line);
     void pushDebugLocal(StringRef name, uint8_t reg, uint32_t startpc, uint32_t endpc);
     void pushDebugUpval(StringRef name);
+
+    size_t getInstructionCount() const;
     uint32_t getDebugPC() const;
 
     void addDebugRemark(const char* format, ...) LUAU_PRINTF_ATTR(2, 3);
@@ -116,6 +120,7 @@ public:
     std::string dumpFunction(uint32_t id) const;
     std::string dumpEverything() const;
     std::string dumpSourceRemarks() const;
+    std::string dumpTypeInfo() const;
 
     void annotateInstruction(std::string& result, uint32_t fid, uint32_t instpos) const;
 
@@ -123,11 +128,14 @@ public:
     static uint32_t getImportId(int32_t id0, int32_t id1);
     static uint32_t getImportId(int32_t id0, int32_t id1, int32_t id2);
 
+    static int decomposeImportId(uint32_t ids, int32_t& id0, int32_t& id1, int32_t& id2);
+
     static uint32_t getStringHash(StringRef key);
 
     static std::string getError(const std::string& message);
 
     static uint8_t getVersion();
+    static uint8_t getTypeEncodingVersion();
 
 private:
     struct Constant
@@ -182,6 +190,7 @@ private:
         std::string dump;
         std::string dumpname;
         std::vector<int> dumpinstoffs;
+        std::string typeinfo;
     };
 
     struct DebugLocal
@@ -243,6 +252,7 @@ private:
     std::vector<DebugUpval> debugUpvals;
 
     DenseHashMap<StringRef, unsigned int, StringRefHash> stringTable;
+    std::vector<StringRef> debugStrings;
 
     std::vector<std::pair<uint32_t, uint32_t>> debugRemarks;
     std::string debugRemarkBuffer;
@@ -261,9 +271,10 @@ private:
     void validateVariadic() const;
 
     std::string dumpCurrentFunction(std::vector<int>& dumpinstoffs) const;
+    void dumpConstant(std::string& result, int k) const;
     void dumpInstruction(const uint32_t* opcode, std::string& output, int targetLabel) const;
 
-    void writeFunction(std::string& ss, uint32_t id) const;
+    void writeFunction(std::string& ss, uint32_t id, uint8_t flags) const;
     void writeLineInfo(std::string& ss) const;
     void writeStringTable(std::string& ss) const;
 

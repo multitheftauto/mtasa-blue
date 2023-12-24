@@ -17,9 +17,9 @@
 /*
 ** pseudo-indices
 */
-#define LUA_REGISTRYINDEX (-10000)
-#define LUA_ENVIRONINDEX (-10001)
-#define LUA_GLOBALSINDEX (-10002)
+#define LUA_REGISTRYINDEX (-LUAI_MAXCSTACK - 2000)
+#define LUA_ENVIRONINDEX (-LUAI_MAXCSTACK - 2001)
+#define LUA_GLOBALSINDEX (-LUAI_MAXCSTACK - 2002)
 #define lua_upvalueindex(i) (LUA_GLOBALSINDEX - (i))
 #define lua_ispseudo(i) ((i) <= LUA_REGISTRYINDEX)
 
@@ -29,7 +29,7 @@ enum lua_Status
     LUA_OK = 0,
     LUA_YIELD,
     LUA_ERRRUN,
-    LUA_ERRSYNTAX,
+    LUA_ERRSYNTAX, // legacy error code, preserved for compatibility
     LUA_ERRMEM,
     LUA_ERRERR,
     LUA_BREAK, // yielded for a debug breakpoint
@@ -313,7 +313,11 @@ LUA_API uintptr_t lua_encodepointer(lua_State* L, uintptr_t p);
 LUA_API double lua_clock();
 
 LUA_API void lua_setuserdatatag(lua_State* L, int idx, int tag);
-LUA_API void lua_setuserdatadtor(lua_State* L, int tag, void (*dtor)(lua_State*, void*));
+
+typedef void (*lua_Destructor)(lua_State* L, void* userdata);
+
+LUA_API void lua_setuserdatadtor(lua_State* L, int tag, lua_Destructor dtor);
+LUA_API lua_Destructor lua_getuserdatadtor(lua_State* L, int tag);
 
 LUA_API void lua_clonefunction(lua_State* L, int idx);
 
@@ -439,7 +443,7 @@ typedef struct lua_Callbacks lua_Callbacks;
 LUA_API lua_Callbacks* lua_callbacks(lua_State* L);
 
 /******************************************************************************
- * Copyright (c) 2019-2022 Roblox Corporation
+ * Copyright (c) 2019-2023 Roblox Corporation
  * Copyright (C) 1994-2008 Lua.org, PUC-Rio.  All rights reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining

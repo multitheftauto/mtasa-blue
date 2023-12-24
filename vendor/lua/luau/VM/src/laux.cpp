@@ -336,7 +336,7 @@ const char* luaL_findtable(lua_State* L, int idx, const char* fname, int szhint)
 const char* luaL_typename(lua_State* L, int idx)
 {
     const TValue* obj = luaA_toobject(L, idx);
-    return luaT_objtypename(L, obj);
+    return obj ? luaT_objtypename(L, obj) : "no value";
 }
 
 /*
@@ -414,10 +414,10 @@ void luaL_reservebuffer(luaL_Buffer* B, size_t size, int boxloc)
         luaL_extendbuffer(B, size - (B->end - B->p), boxloc);
 }
 
-void luaL_addlstring(luaL_Buffer* B, const char* s, size_t len)
+void luaL_addlstring(luaL_Buffer* B, const char* s, size_t len, int boxloc)
 {
     if (size_t(B->end - B->p) < len)
-        luaL_extendbuffer(B, len - (B->end - B->p), -1);
+        luaL_extendbuffer(B, len - (B->end - B->p), boxloc);
 
     memcpy(B->p, s, len);
     B->p += len;
@@ -437,6 +437,52 @@ void luaL_addvalue(luaL_Buffer* B)
         B->p += vl;
 
         lua_pop(L, 1);
+    }
+}
+
+void luaL_addvalueany(luaL_Buffer* B, int idx)
+{
+    lua_State* L = B->L;
+
+    switch (lua_type(L, idx))
+    {
+    case LUA_TNONE:
+    {
+        LUAU_ASSERT(!"expected value");
+        break;
+    }
+    case LUA_TNIL:
+        luaL_addstring(B, "nil");
+        break;
+    case LUA_TBOOLEAN:
+        if (lua_toboolean(L, idx))
+            luaL_addstring(B, "true");
+        else
+            luaL_addstring(B, "false");
+        break;
+    case LUA_TNUMBER:
+    {
+        double n = lua_tonumber(L, idx);
+        char s[LUAI_MAXNUM2STR];
+        char* e = luai_num2str(s, n);
+        luaL_addlstring(B, s, e - s, -1);
+        break;
+    }
+    case LUA_TSTRING:
+    {
+        size_t len;
+        const char* s = lua_tolstring(L, idx, &len);
+        luaL_addlstring(B, s, len, -1);
+        break;
+    }
+    default:
+    {
+        size_t len;
+        const char* s = luaL_tolstring(L, idx, &len);
+
+        luaL_addlstring(B, s, len, -2);
+        lua_pop(L, 1);
+    }
     }
 }
 
@@ -476,13 +522,20 @@ const char* luaL_tolstring(lua_State* L, int idx, size_t* len)
 {
     if (luaL_callmeta(L, idx, "__tostring")) // is there a metafield?
     {
-        if (!lua_isstring(L, -1))
+        const char* s = lua_tolstring(L, -1, len);
+        if (!s)
             luaL_error(L, "'__tostring' must return a string");
-        return lua_tolstring(L, -1, len);
+        return s;
     }
 
     switch (lua_type(L, idx))
     {
+    case LUA_TNIL:
+        lua_pushliteral(L, "nil");
+        break;
+    case LUA_TBOOLEAN:
+        lua_pushstring(L, (lua_toboolean(L, idx) ? "true" : "false"));
+        break;
     case LUA_TNUMBER:
     {
         double n = lua_tonumber(L, idx);
@@ -491,15 +544,6 @@ const char* luaL_tolstring(lua_State* L, int idx, size_t* len)
         lua_pushlstring(L, s, e - s);
         break;
     }
-    case LUA_TSTRING:
-        lua_pushvalue(L, idx);
-        break;
-    case LUA_TBOOLEAN:
-        lua_pushstring(L, (lua_toboolean(L, idx) ? "true" : "false"));
-        break;
-    case LUA_TNIL:
-        lua_pushliteral(L, "nil");
-        break;
     case LUA_TVECTOR:
     {
         const float* v = lua_tovector(L, idx);
@@ -518,6 +562,9 @@ const char* luaL_tolstring(lua_State* L, int idx, size_t* len)
         lua_pushlstring(L, s, e - s);
         break;
     }
+    case LUA_TSTRING:
+        lua_pushvalue(L, idx);
+        break;
     default:
     {
         const void* ptr = lua_topointer(L, idx);

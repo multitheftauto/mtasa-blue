@@ -69,6 +69,7 @@ typedef struct CallInfo
 
 #define LUA_CALLINFO_RETURN (1 << 0) // should the interpreter return after returning from this callinfo? first frame must have this set
 #define LUA_CALLINFO_HANDLE (1 << 1) // should the error thrown during execution get handled by continuation from this callinfo? func must be C
+#define LUA_CALLINFO_NATIVE (1 << 2) // should this function be executed using execution callback for native code
 
 #define curr_func(L) (clvalue(L->ci->func))
 #define ci_func(ci) (clvalue((ci)->func))
@@ -153,7 +154,6 @@ struct lua_ExecutionCallbacks
     void (*close)(lua_State* L);                 // called when global VM state is closed
     void (*destroy)(lua_State* L, Proto* proto); // called when function is destroyed
     int (*enter)(lua_State* L, Proto* proto);    // called when function is about to start/resume (when execdata is present), return 0 to exit VM
-    void (*setbreakpoint)(lua_State* L, Proto* proto, int line); // called when a breakpoint is set in a function
 };
 
 /*
@@ -208,13 +208,11 @@ typedef struct global_State
     uint64_t rngstate; // PCG random number generator state
     uint64_t ptrenckey[4]; // pointer encoding key for display
 
-    void (*udatagc[LUA_UTAG_LIMIT])(lua_State*, void*); // for each userdata tag, a gc callback to be called immediately before freeing memory
-
     lua_Callbacks cb;
 
-#if LUA_CUSTOM_EXECUTION
     lua_ExecutionCallbacks ecb;
-#endif
+
+    void (*udatagc[LUA_UTAG_LIMIT])(lua_State*, void*); // for each userdata tag, a gc callback to be called immediately before freeing memory
 
     GCStats gcstats;
 

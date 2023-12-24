@@ -20,6 +20,18 @@
 #define LUAU_FASTMATH_END
 #endif
 
+// Some functions like floor/ceil have SSE4.1 equivalents but we currently support systems without SSE4.1
+// Note that we only need to do this when SSE4.1 support is not guaranteed by compiler settings, as otherwise compiler will optimize these for us.
+#if (defined(__x86_64__) || defined(_M_X64)) && !defined(__SSE4_1__) && !defined(__AVX__)
+#if defined(_MSC_VER) && !defined(__clang__)
+#define LUAU_TARGET_SSE41
+#elif defined(__GNUC__) && defined(__has_attribute)
+#if __has_attribute(target)
+#define LUAU_TARGET_SSE41 __attribute__((target("sse4.1")))
+#endif
+#endif
+#endif
+
 // Used on functions that have a printf-like interface to validate them statically
 #if defined(__GNUC__)
 #define LUA_PRINTF_ATTR(fmt, arg) __attribute__((format(printf, fmt, arg)))
@@ -61,7 +73,7 @@
 
 // LUA_MINSTACK is the guaranteed number of Lua stack slots available to a C function
 #ifndef LUA_MINSTACK
-#define LUA_MINSTACK 20
+#define LUA_MINSTACK 50 // MTA change. Was 20
 #endif
 
 // LUAI_MAXCSTACK limits the number of Lua stack slots that a C function can use
@@ -109,11 +121,6 @@
 #define LUA_MAXCAPTURES 32
 #endif
 
-// enables callbacks to redirect code execution from Luau VM to a custom implementation
-#ifndef LUA_CUSTOM_EXECUTION
-#define LUA_CUSTOM_EXECUTION 0
-#endif
-
 // }==================================================================
 
 /*
@@ -131,6 +138,8 @@
         long l; \
     }
 
+#ifndef LUA_VECTOR_SIZE
 #define LUA_VECTOR_SIZE 3 // must be 3 or 4
+#endif
 
 #define LUA_EXTRA_SIZE (LUA_VECTOR_SIZE - 2)

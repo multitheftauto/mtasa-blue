@@ -15,6 +15,14 @@
 #include <intrin.h>
 #endif
 
+#ifdef LUAU_TARGET_SSE41
+#include <smmintrin.h>
+
+#ifndef _MSC_VER
+#include <cpuid.h> // on MSVC this comes from intrin.h
+#endif
+#endif
+
 // luauF functions implement FASTCALL instruction that performs a direct execution of some builtin functions from the VM
 // The rule of thumb is that FASTCALL functions can not call user code, yield, fail, or reallocate stack.
 // If types of the arguments mismatch, luauF_* needs to return -1 and the execution will fall back to the usual call path
@@ -822,6 +830,8 @@ static int luauF_char(lua_State* L, StkId res, TValue* arg0, int nresults, StkId
 
     if (nparams < int(sizeof(buffer)) && nresults <= 1)
     {
+        if (luaC_needsGC(L))
+            return -1; // we can't call luaC_checkGC so fall back to C implementation
 
         if (nparams >= 1)
         {
@@ -891,6 +901,9 @@ static int luauF_sub(lua_State* L, StkId res, TValue* arg0, int nresults, StkId 
         TString* ts = tsvalue(arg0);
         int i = int(nvalue(args));
         int j = int(nvalue(args + 1));
+
+        if (luaC_needsGC(L))
+            return -1; // we can't call luaC_checkGC so fall back to C implementation
 
         if (i >= 1 && j >= i && unsigned(j - 1) < unsigned(ts->len))
         {
@@ -1239,10 +1252,140 @@ static int luauF_setmetatable(lua_State* L, StkId res, TValue* arg0, int nresult
     return -1;
 }
 
+static int luauF_tonumber(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if (nparams == 1 && nresults <= 1)
+    {
+        double num;
+
+        if (ttisnumber(arg0))
+        {
+            setnvalue(res, nvalue(arg0));
+            return 1;
+        }
+        else if (ttisstring(arg0) && luaO_str2d(svalue(arg0), &num))
+        {
+            setnvalue(res, num);
+            return 1;
+        }
+        else
+        {
+            setnilvalue(res);
+            return 1;
+        }
+    }
+
+    return -1;
+}
+
+static int luauF_tostring(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if (nparams >= 1 && nresults <= 1)
+    {
+        switch (ttype(arg0))
+        {
+        case LUA_TNIL:
+        {
+            TString* s = L->global->ttname[LUA_TNIL];
+            setsvalue(L, res, s);
+            return 1;
+        }
+        case LUA_TBOOLEAN:
+        {
+            TString* s = bvalue(arg0) ? luaS_newliteral(L, "true") : luaS_newliteral(L, "false");
+            setsvalue(L, res, s);
+            return 1;
+        }
+        case LUA_TNUMBER:
+        {
+            if (luaC_needsGC(L))
+                return -1; // we can't call luaC_checkGC so fall back to C implementation
+
+            char s[LUAI_MAXNUM2STR];
+            char* e = luai_num2str(s, nvalue(arg0));
+            setsvalue(L, res, luaS_newlstr(L, s, e - s));
+            return 1;
+        }
+        case LUA_TSTRING:
+        {
+            setsvalue(L, res, tsvalue(arg0));
+            return 1;
+        }
+        }
+
+        // fall back to generic C implementation
+    }
+
+    return -1;
+}
+
 static int luauF_missing(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
 {
     return -1;
 }
+
+#ifdef LUAU_TARGET_SSE41
+template<int Rounding>
+LUAU_TARGET_SSE41 inline double roundsd_sse41(double v)
+{
+    __m128d av = _mm_set_sd(v);
+    __m128d rv = _mm_round_sd(av, av, Rounding | _MM_FROUND_NO_EXC);
+    return _mm_cvtsd_f64(rv);
+}
+
+LUAU_TARGET_SSE41 static int luauF_floor_sse41(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if (nparams >= 1 && nresults <= 1 && ttisnumber(arg0))
+    {
+        double a1 = nvalue(arg0);
+        setnvalue(res, roundsd_sse41<_MM_FROUND_TO_NEG_INF>(a1));
+        return 1;
+    }
+
+    return -1;
+}
+
+LUAU_TARGET_SSE41 static int luauF_ceil_sse41(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if (nparams >= 1 && nresults <= 1 && ttisnumber(arg0))
+    {
+        double a1 = nvalue(arg0);
+        setnvalue(res, roundsd_sse41<_MM_FROUND_TO_POS_INF>(a1));
+        return 1;
+    }
+
+    return -1;
+}
+
+LUAU_TARGET_SSE41 static int luauF_round_sse41(lua_State* L, StkId res, TValue* arg0, int nresults, StkId args, int nparams)
+{
+    if (nparams >= 1 && nresults <= 1 && ttisnumber(arg0))
+    {
+        double a1 = nvalue(arg0);
+        // roundsd only supports bankers rounding natively, so we need to emulate rounding by using truncation
+        // offset is prevfloat(0.5), which is important so that we round prevfloat(0.5) to 0.
+        const double offset = 0.49999999999999994;
+        setnvalue(res, roundsd_sse41<_MM_FROUND_TO_ZERO>(a1 + (a1 < 0 ? -offset : offset)));
+        return 1;
+    }
+
+    return -1;
+}
+
+static bool luau_hassse41()
+{
+    int cpuinfo[4] = {};
+#ifdef _MSC_VER
+    __cpuid(cpuinfo, 1);
+#else
+    __cpuid(1, cpuinfo[0], cpuinfo[1], cpuinfo[2], cpuinfo[3]);
+#endif
+
+    // We requre SSE4.1 support for ROUNDSD
+    // https://en.wikipedia.org/wiki/CPUID#EAX=1:_Processor_Info_and_Feature_Bits
+    return (cpuinfo[2] & (1 << 19)) != 0;
+}
+#endif
 
 const luau_FastFunction luauF_table[256] = {
     NULL,
@@ -1253,12 +1396,24 @@ const luau_FastFunction luauF_table[256] = {
     luauF_asin,
     luauF_atan2,
     luauF_atan,
+
+#ifdef LUAU_TARGET_SSE41
+    luau_hassse41() ? luauF_ceil_sse41 : luauF_ceil,
+#else
     luauF_ceil,
+#endif
+
     luauF_cosh,
     luauF_cos,
     luauF_deg,
     luauF_exp,
+
+#ifdef LUAU_TARGET_SSE41
+    luau_hassse41() ? luauF_floor_sse41 : luauF_floor,
+#else
     luauF_floor,
+#endif
+
     luauF_fmod,
     luauF_frexp,
     luauF_ldexp,
@@ -1300,7 +1455,12 @@ const luau_FastFunction luauF_table[256] = {
 
     luauF_clamp,
     luauF_sign,
+
+#ifdef LUAU_TARGET_SSE41
+    luau_hassse41() ? luauF_round_sse41 : luauF_round,
+#else
     luauF_round,
+#endif
 
     luauF_rawset,
     luauF_rawget,
@@ -1322,6 +1482,9 @@ const luau_FastFunction luauF_table[256] = {
 
     luauF_getmetatable,
     luauF_setmetatable,
+
+    luauF_tonumber,
+    luauF_tostring,
 
 // When adding builtins, add them above this line; what follows is 64 "dummy" entries with luauF_missing fallback.
 // This is important so that older versions of the runtime that don't support newer builtins automatically fall back via luauF_missing.
