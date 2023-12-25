@@ -10,16 +10,16 @@
 
 #include "StdInc.h"
 
-CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector &pos, CVector &rot, uint8_t interior)
+CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector &pos, const CVector &rot, uint8_t interior)
     : ClassInit(this),
       CClientEntity(ID),
       m_pBuildingManager(pManager->GetBuildingManager()),
       m_usModelId(usModelId),
       m_vPos(pos),
       m_vRot(rot),
-      m_interior(interior)
+      m_interior(interior),
+      m_pBuilding(nullptr)
 {
-    m_pBuilding = nullptr;
     m_pManager = pManager;
     SetTypeName("building");
     m_pBuildingManager->AddToList(this);
@@ -29,26 +29,29 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
 CClientBuilding::~CClientBuilding()
 {
     m_pBuildingManager->RemoveFromList(this);
-    if (m_pBuilding)
-    {
-        Destroy();
-    }
+    Destroy();
 }
 
 void CClientBuilding::SetPosition(const CVector& vecPosition)
 {
+    if (m_vPos == vecPosition)
+        return;
     m_vPos = vecPosition;
     Recreate();
 }
 
 void CClientBuilding::SetRotationRadians(const CVector& vecRadians)
 {
+    if (m_vRot == vecRadians)
+        return;
     m_vRot = vecRadians;
     Recreate();
 }
 
 void CClientBuilding::SetInterior(uint8_t ucInterior)
 {
+    if (m_interior == ucInterior)
+        return;
     m_interior = ucInterior;
     Recreate();
 } 

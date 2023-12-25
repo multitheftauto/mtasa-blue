@@ -3,7 +3,7 @@
 #include "CVector.h"
 #include "CVector4D.h"
 
-class CBuildingSAInterface;
+class CEntitySAInterface;
 struct RpAtomic;
 struct RpClump;
 struct RwStream;
@@ -29,11 +29,11 @@ public:
     CFileLoaderSA();
     ~CFileLoaderSA();
 
-    CBuildingSAInterface* LoadFileObjectInstance(SFileObjectInstance*);
+    CEntitySAInterface* LoadFileObjectInstance(SFileObjectInstance*);
 
     static void StaticSetHooks();
 };
 
 bool                CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId);
 RpAtomic*           CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo);
-CBuildingSAInterface* CFileLoader_LoadObjectInstance(const char* szLine);
+CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine);

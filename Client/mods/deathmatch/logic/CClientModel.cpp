@@ -186,8 +186,8 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 
             // Restore buildings
             CClientBuildingManager* pBuildingsManager = g_pClientGame->GetManager()->GetBuildingManager();
-
-            unloadModelsAndCallEventsNonStreamed(pBuildingsManager->IterBegin(), pBuildingsManager->IterEnd(), usParentID,
+            auto&                   buildingsList = pBuildingsManager->GetBuildings();
+            unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID,
                                       [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore COL

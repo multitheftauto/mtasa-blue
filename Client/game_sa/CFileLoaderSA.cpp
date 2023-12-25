@@ -28,9 +28,9 @@ void CFileLoaderSA::StaticSetHooks()
     HookInstall(0x538690, (DWORD)CFileLoader_LoadObjectInstance, 5);
 }
 
-CBuildingSAInterface* CFileLoaderSA::LoadFileObjectInstance(SFileObjectInstance* obj)
+CEntitySAInterface* CFileLoaderSA::LoadFileObjectInstance(SFileObjectInstance* obj)
 {
-    return ((CBuildingSAInterface * (__cdecl*)(SFileObjectInstance*))0x538090)(obj);
+    return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*))0x538090)(obj);
 }
 
 class CAtomicModelInfo
@@ -206,7 +206,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     return atomic;
 }
 
-CBuildingSAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
+CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
 {
     char                szModelName[24];
     SFileObjectInstance inst;
@@ -222,5 +222,5 @@ CBuildingSAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
     if (fLenSq > 0.0f && std::fabs(fLenSq - 1.0f) > std::numeric_limits<float>::epsilon())
         inst.rotation /= std::sqrt(fLenSq);
 
-    return ((CBuildingSAInterface * (__cdecl*)(SFileObjectInstance*))0x538090)(&inst);
+    return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*))0x538090)(&inst);
 }

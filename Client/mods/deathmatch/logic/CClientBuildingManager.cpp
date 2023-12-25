@@ -28,11 +28,12 @@ void CClientBuildingManager::RemoveAll()
     m_bRemoveFromList = false;
 
     // Run through our list deleting the buildings
-    auto iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+    for (CClientBuilding* building : m_List)
     {
-        delete *iter;
+        delete building;
     }
+
+    m_List.clear();
 
     // Allow list removal again
     m_bRemoveFromList = true;
@@ -40,20 +41,7 @@ void CClientBuildingManager::RemoveAll()
 
 bool CClientBuildingManager::Exists(CClientBuilding* pBuilding)
 {
-    // Matches given DFF?
-    auto iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
-    {
-        // Match?
-        if (pBuilding == *iter)
-        {
-            // It exists
-            return true;
-        }
-    }
-
-    // It doesn't
-    return false;
+    return std::find(m_List.begin(), m_List.end(), pBuilding) != m_List.end();
 }
 
 void CClientBuildingManager::RemoveFromList(CClientBuilding* pBuilding)

@@ -375,7 +375,7 @@ CBuilding* CPoolsSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t mode
     instance.rotation.fW = -instance.rotation.fW;
 
     CFileLoaderSA loader{};
-    auto pBuilding = loader.LoadFileObjectInstance(&instance);
+    auto pBuilding = static_cast<CBuildingSAInterface*>(loader.LoadFileObjectInstance(&instance));
 
     // Disable lod and ipl
     pBuilding->m_pLod = nullptr;
@@ -807,7 +807,7 @@ DWORD CPoolsSA::GetObjectPoolIndex(std::uint8_t* pInterface)
 
 DWORD CPoolsSA::GetBuildingPoolIndex(std::uint8_t* pInterface)
 {
-    DWORD         dwAlignedSize = 412;
+    DWORD         dwAlignedSize = sizeof(CBuildingSAInterface);
     std::uint8_t* pTheObjects = (std::uint8_t*)(*m_ppBuildingPoolInterface)->m_pObjects;
     DWORD         dwMaxIndex = MAX_BUILDINGS - 1;
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))

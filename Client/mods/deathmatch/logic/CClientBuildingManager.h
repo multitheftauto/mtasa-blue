@@ -26,15 +26,11 @@ public:
     void RemoveAll();
     bool Exists(CClientBuilding* pBuilding);
 
-    std::list<CClientBuilding*>::const_iterator IterBegin() { return m_List.begin(); }
-    std::list<CClientBuilding*>::const_iterator IterEnd() { return m_List.end(); }
+    const std::list<CClientBuilding*>& GetBuildings() { return m_List; };
 
 private:
     void AddToList(CClientBuilding* pBuilding) { m_List.push_back(pBuilding); }
     void RemoveFromList(CClientBuilding* pBuilding);
-
-    class CClientObjectManager*  m_pObjectManager;
-    class CClientVehicleManager* m_pVehicleManager;
 
     std::list<CClientBuilding*> m_List;
     bool                        m_bRemoveFromList;

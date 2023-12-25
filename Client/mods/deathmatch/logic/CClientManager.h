@@ -97,7 +97,7 @@ public:
     CClientEffectManager*        GetEffectManager() { return m_pEffectManager; }
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
     CClientIMGManager*           GetIMGManager() { return m_pImgManager; }
-    CClientBuildingManager*      GetBuildingManager() { return m_pBuildingManager; }
+    CClientBuildingManager*      GetBuildingManager() const noexcept { return m_pBuildingManager; }
 
     bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
     bool IsBeingDeleted() { return m_bBeingDeleted; }

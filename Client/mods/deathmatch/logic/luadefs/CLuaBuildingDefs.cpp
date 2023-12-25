@@ -49,12 +49,11 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (pos.fX < -3000.0f || pos.fX > 3000.0f || pos.fY < -3000.0f || pos.fY > 3000.0f)
         throw std::invalid_argument("Position is outside of game world");
 
-    // Grab the resource root entity
-    CClientEntity* pRoot = pResource->GetResourceDynamicEntity();
+    ConvertDegreesToRadians(rot);
 
-    // Create the building handle
     CClientBuilding* pBuilding = new CClientBuilding(m_pManager, INVALID_ELEMENT_ID, modelId, pos, rot, interior);
 
+    CClientEntity* pRoot = pResource->GetResourceDynamicEntity();
     pBuilding->SetParent(pRoot);
 
     return pBuilding;

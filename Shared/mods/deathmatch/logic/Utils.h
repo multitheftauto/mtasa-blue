@@ -246,7 +246,7 @@ inline float GetSmallestWrapUnsigned(float fValue, float fHigh)
 
 void RotateVector(CVector& vecLine, const CVector& vecRotation);
 
-inline void ConvertEulersToQuaternion(const CVector& vecFrom, CVector4D vecTo)
+inline void ConvertEulersToQuaternion(const CVector& vecFrom, CVector4D &vecTo)
 {
     double cy = cos(vecFrom.fZ * 0.5);
     double sy = sin(vecFrom.fZ * 0.5);

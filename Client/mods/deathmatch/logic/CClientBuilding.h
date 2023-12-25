@@ -20,7 +20,7 @@ class CClientBuilding : public CClientEntity
     friend class CClientBuildingManager;
 
 public:
-    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, CVector &pos, CVector &rot, uint8_t interior);
+    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector &pos, const CVector &rot, uint8_t interior);
     ~CClientBuilding();
 
     void Unlink(){};
