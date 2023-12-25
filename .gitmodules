@@ -1,0 +1,3 @@
+[submodule "Effekseer"]
+	path = vendor/effekseer/effekseer-submodule
+	url = git@github.com:effekseer/Effekseer.git
