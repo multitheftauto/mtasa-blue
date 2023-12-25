@@ -28,7 +28,7 @@ void CFileLoaderSA::StaticSetHooks()
     HookInstall(0x538690, (DWORD)CFileLoader_LoadObjectInstance, 5);
 }
 
-CEntitySAInterface* CFileLoaderSA::LoadFileObjectInstance(SFileObjectInstance* obj)
+CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(SFileObjectInstance* obj)
 {
     return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*))0x538090)(obj);
 }

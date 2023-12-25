@@ -375,7 +375,7 @@ CBuilding* CPoolsSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t mode
     instance.rotation.fW = -instance.rotation.fW;
 
     CFileLoaderSA loader{};
-    auto pBuilding = static_cast<CBuildingSAInterface*>(loader.LoadFileObjectInstance(&instance));
+    auto pBuilding = static_cast<CBuildingSAInterface*>(loader.LoadObjectInstance(&instance));
 
     // Disable lod and ipl
     pBuilding->m_pLod = nullptr;
