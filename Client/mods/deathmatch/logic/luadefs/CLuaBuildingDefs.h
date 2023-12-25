@@ -19,5 +19,5 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Buiding create funcs
-    static CClientBuilding* CreateBuilding(lua_State* const luaVM, uint16_t modelId, CVector pos, CVector rot, uint8_t interior = 0);
+    static CClientBuilding* CreateBuilding(lua_State* const luaVM, uint16_t modelId, CVector pos, CVector rot, std::optional<uint8_t> interior);
 };
