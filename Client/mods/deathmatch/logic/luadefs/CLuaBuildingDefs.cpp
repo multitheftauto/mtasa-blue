@@ -40,8 +40,8 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (!pResource)
         return false;
 
-    if (!CClientObjectManager::IsValidModel(modelId))
-        throw std::invalid_argument("Invalid model id");
+    if (!CClientBuildingManager::IsValidModel(modelId))
+        throw std::invalid_argument("Invalid building model id");
 
     if (!g_pGame->GetPools()->HasFreeBuildingSlot())
         throw std::invalid_argument("No free slot in buildings pool");

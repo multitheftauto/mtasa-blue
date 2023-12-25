@@ -28,6 +28,8 @@ public:
 
     const std::list<CClientBuilding*>& GetBuildings() { return m_List; };
 
+    static bool IsValidModel(uint16_t modelId);
+
 private:
     void AddToList(CClientBuilding* pBuilding) { m_List.push_back(pBuilding); }
     void RemoveFromList(CClientBuilding* pBuilding);

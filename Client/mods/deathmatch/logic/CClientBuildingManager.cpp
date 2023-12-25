@@ -52,3 +52,28 @@ void CClientBuildingManager::RemoveFromList(CClientBuilding* pBuilding)
         m_List.remove(pBuilding);
     }
 }
+
+bool CClientBuildingManager::IsValidModel(uint16_t modelId)
+{
+    if (modelId >= static_cast<uint16_t>(g_pGame->GetBaseIDforTXD()))
+        return false;
+
+     // Clothes and hands cause artefacts
+     if (384 <= modelId && modelId <= 397)
+        return false;
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+    if (!pModelInfo || !pModelInfo->GetInterface())
+        return false;
+
+    if (!pModelInfo->IsAllocatedInArchive())
+        return false;
+
+    if (pModelInfo->IsDynamic())
+    {
+        return false;
+    }
+
+    eModelInfoType eType = pModelInfo->GetModelType();
+    return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
+}
