@@ -77,6 +77,8 @@ enum eClientEntityType
     CCLIENTSEARCHLIGHT,
     CCLIENTIFP,
     CCLIENTVECTORGRAPHIC,
+    CCLIENTEFFEKSEERFX,
+    CCLIENTEFFEKSEERFXHANDLER,
     CCLIENTUNKNOWN,
     CCLIENTIMG,
 };
@@ -143,6 +145,8 @@ enum eCClientEntityClassTypes
     CLASS_CClientPointLights,
     CLASS_CClientSearchLight,
     CLASS_CClientIMG,
+    CLASS_CClientEffekseerEffect,
+    CLASS_CClientEffekseerEffectHandler,
 };
 
 class CClientEntity : public CClientEntityBase

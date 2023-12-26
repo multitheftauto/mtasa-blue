@@ -199,6 +199,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_pGUIManager = m_pManager->GetGUIManager();
     m_pResourceManager = m_pManager->GetResourceManager();
     m_pProjectileManager = m_pManager->GetProjectileManager();
+    m_pEffekseerManager = m_pManager->GetEffekseerManager();
     m_pLocalServer = NULL;
 
     m_pLatentTransferManager = new CLatentTransferManager();

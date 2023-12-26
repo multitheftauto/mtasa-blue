@@ -669,6 +669,7 @@ private:
     CClientPedManager*         m_pPedManager;
     CClientPointLightsManager* m_pPointLightsManager;
     CClientProjectileManager*  m_pProjectileManager;
+    CClientEffekseerManager*   m_pEffekseerManager;
     CRPCFunctions*             m_pRPCFunctions;
     CUnoccupiedVehicleSync*    m_pUnoccupiedVehicleSync;
     CPedSync*                  m_pPedSync;

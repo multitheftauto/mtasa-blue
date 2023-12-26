@@ -14,7 +14,6 @@ class EffekseerManager;
 #pragma once
 
 #include <effekseer/CEffekseerManager.h>
-//#include "Effekseer.h"
 #include "EffekseerRendererDX9.h"
 
 class EffekseerManager : public CEffekseerManagerInterface

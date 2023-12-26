@@ -54,6 +54,7 @@ CClientManager::CClientManager()
     m_pModelManager = new CClientModelManager();
     m_pPacketRecorder = new CClientPacketRecorder(this);
     m_pImgManager = new CClientIMGManager(this);
+    m_pEffekseerManager = new CClientEffekseerManager(this);
 
     m_bBeingDeleted = false;
     m_bGameUnloadedFlag = false;
@@ -177,6 +178,9 @@ CClientManager::~CClientManager()
 
     delete m_pImgManager;
     m_pImgManager = nullptr;
+    
+    delete m_pEffekseerManager;
+    m_pEffekseerManager = nullptr;
 }
 
 //

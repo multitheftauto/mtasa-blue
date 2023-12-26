@@ -77,6 +77,7 @@ public:
     CClientEntity*       GetResourceTXDRoot() { return m_pResourceTXDRoot; };
     CClientEntity*       GetResourceIFPRoot() { return m_pResourceIFPRoot; };
     CClientEntity*       GetResourceIMGRoot() { return m_pResourceIMGRoot; };
+    CClientEntity*       GetResourceEffekseerRoot() { return m_pResourceEffekseerRoot; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void DeleteClientChildren();
@@ -124,6 +125,7 @@ private:
     class CClientEntity* m_pResourceTXDRoot;
     class CClientEntity* m_pResourceIFPRoot;
     class CClientEntity* m_pResourceIMGRoot;
+    class CClientEntity* m_pResourceEffekseerRoot;
     unsigned short       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
     CMtaVersion          m_strMinServerReq;
