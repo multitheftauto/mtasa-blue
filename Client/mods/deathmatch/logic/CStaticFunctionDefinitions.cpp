@@ -762,6 +762,12 @@ bool CStaticFunctionDefinitions::GetElementModel(CClientEntity& Entity, unsigned
             usModel = pPickup.GetModel();
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            usModel = pBuilding.GetModel();
+            break;
+        }
         case CCLIENTPROJECTILE:
         {
             CClientProjectile& pProjectile = static_cast<CClientProjectile&>(Entity);
