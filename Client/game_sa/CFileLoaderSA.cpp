@@ -30,7 +30,8 @@ void CFileLoaderSA::StaticSetHooks()
 
 CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(SFileObjectInstance* obj)
 {
-    return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*))0x538090)(obj);
+    // Second argument is model name. It's unused in the function
+    return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*, const char*))0x538090)(obj, nullptr);
 }
 
 class CAtomicModelInfo

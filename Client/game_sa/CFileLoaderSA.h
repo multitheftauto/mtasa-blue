@@ -29,7 +29,7 @@ public:
     CFileLoaderSA();
     ~CFileLoaderSA();
 
-    CEntitySAInterface* LoadObjectInstance(SFileObjectInstance*);
+    static CEntitySAInterface* LoadObjectInstance(SFileObjectInstance*);
 
     static void StaticSetHooks();
 };
