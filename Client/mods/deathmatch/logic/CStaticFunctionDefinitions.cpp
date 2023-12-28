@@ -426,6 +426,16 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
             }
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            pBuilding.GetRotationDegrees(vecRotation);
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
+            break;
+        }
         case CCLIENTPROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
@@ -1111,6 +1121,19 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
                 Object.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY));
             }
 
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
+            {
+                pBuilding.SetRotationDegrees(vecRotation);
+            }
+            else
+            {
+                pBuilding.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY));
+            }
             break;
         }
         case CCLIENTPROJECTILE:
