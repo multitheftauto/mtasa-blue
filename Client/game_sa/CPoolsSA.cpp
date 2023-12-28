@@ -421,6 +421,9 @@ void CPoolsSA::RemoveBuilding(CBuilding* pBuilding)
     // Delete it from memory
     delete pBuildingSA;
 
+    // Remove building from SA pool
+    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
+
     // Decrease the count of elements in the pool
     --m_buildingPool.ulCount;
 }
