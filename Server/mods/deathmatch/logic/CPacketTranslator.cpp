@@ -37,6 +37,7 @@
 #include "packets/CPedSyncPacket.h"
 #include "packets/CLuaEventPacket.h"
 #include "packets/CCustomDataPacket.h"
+#include "packets/CHealthPacket.h"
 #include "packets/CCameraSyncPacket.h"
 #include "packets/CObjectSyncPacket.h"
 #include "packets/CPlayerTransgressionPacket.h"
@@ -166,6 +167,10 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
 
         case PACKET_ID_CUSTOM_DATA:
             pTemp = new CCustomDataPacket;
+            break;
+
+        case PACKET_ID_HEALTH_UPDATE:
+            pTemp = new CHealthPacket;
             break;
 
         case PACKET_ID_CAMERA_SYNC:

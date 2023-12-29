@@ -1416,46 +1416,27 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CClientEntity& Entity, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float fHealth)
+bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float fNewHealth)
 {
-    RUN_CHILDREN(SetElementHealth(**iter, fHealth))
+    float fHealth;
+    float mainHealth = CStaticFunctionDefinitions::GetElementHealth(Entity, fHealth);
+    CLuaArguments Arguments;
+    Arguments.PushNumber(fHealth);
+    Arguments.PushNumber(fNewHealth);
 
-    switch (Entity.GetType())
-    {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
-        {
-            // Grab the model
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+    bool bContinue = Entity.CallEvent("onClientElementHealthChange", Arguments, true);
+    if (bContinue){
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+        pBitStream->Write(Entity.GetID());
+        pBitStream->Write(fNewHealth);
 
-            // Limit to max health
-            float fMaxHealth = Ped.GetMaxHealth();
-            if (fHealth > fMaxHealth)
-                fHealth = fMaxHealth;
-
-            // Set the new health
-            Ped.SetHealth(fHealth);
-            return true;
-            break;
-        }
-        case CCLIENTVEHICLE:
-        {
-            CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-            Vehicle.SetHealth(fHealth);
-            break;
-        }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
-        {
-            CClientObject& Object = static_cast<CClientObject&>(Entity);
-            Object.SetHealth(fHealth);
-            break;
-        }
-        default:
-            return false;
+        g_pNet->SendPacket(PACKET_ID_HEALTH_UPDATE, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(pBitStream);
+        return true;
     }
-    return true;
+    return false; // return false because of event cancelled
 }
+
 
 bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned short usModel)
 {
