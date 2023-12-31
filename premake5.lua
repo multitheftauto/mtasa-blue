@@ -6,6 +6,7 @@ require "install_resources"
 require "install_cef"
 require "install_unifont"
 require "install_discord"
+require "install_nlohmannjson"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
