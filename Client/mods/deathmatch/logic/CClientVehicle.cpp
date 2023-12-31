@@ -161,6 +161,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_HeadLightColor = SColorRGBA(255, 255, 255, 255);
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
+    m_fPlaneRotorSpeed = 0.0f;
     m_bHasCustomHandling = false;
     m_ucVariation = ucVariation;
     m_ucVariation2 = ucVariation2;
@@ -1537,12 +1538,59 @@ float CClientVehicle::GetHeliRotorSpeed()
     return m_fHeliRotorSpeed;
 }
 
+float CClientVehicle::GetPlaneRotorSpeed()
+{
+    if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
+        return m_pVehicle->GetPlaneRotorSpeed();
+
+    return m_fPlaneRotorSpeed;
+}
+
 void CClientVehicle::SetHeliRotorSpeed(float fSpeed)
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
         m_pVehicle->SetHeliRotorSpeed(fSpeed);
 
     m_fHeliRotorSpeed = fSpeed;
+}
+
+void CClientVehicle::SetPlaneRotorSpeed(float fSpeed)
+{
+    if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
+        m_pVehicle->SetPlaneRotorSpeed(fSpeed);
+
+    m_fPlaneRotorSpeed = fSpeed;
+}
+
+bool CClientVehicle::GetRotorSpeed(float& speed)
+{
+    if (m_eVehicleType == CLIENTVEHICLE_PLANE)
+    {
+        speed = GetPlaneRotorSpeed();
+        return true;
+    }
+    else if (m_eVehicleType == CLIENTVEHICLE_HELI)
+    {
+        speed = GetHeliRotorSpeed();
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientVehicle::SetRotorSpeed(float fSpeed)
+{
+    switch (m_eVehicleType)
+    {
+        case CLIENTVEHICLE_HELI:
+            SetHeliRotorSpeed(fSpeed);
+            return true;
+        case CLIENTVEHICLE_PLANE:
+            SetPlaneRotorSpeed(fSpeed);
+            return true;
+        default:
+            return false;
+    }
 }
 
 bool CClientVehicle::IsHeliSearchLightVisible()

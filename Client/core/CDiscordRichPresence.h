@@ -35,6 +35,7 @@ public:
     void SetAssetSmallData(const char* szAsset, const char* szAssetText);
     void SetDiscordClientConnected(bool bConnected) { m_bConnected = bConnected; };
     void SetPresencePartySize(int iSize, int iMax, bool bCustom);
+    void SetDiscordUserID(const std::string& strUserID);
 
     bool ResetDiscordData();
     bool SetPresenceState(const char* szState, bool bCustom);
@@ -47,6 +48,7 @@ public:
     bool IsDiscordClientConnected() const { return m_bConnected; };
 
     std::string GetDiscordResourceName() const { return m_strDiscordCustomResourceName; };
+    std::string GetDiscordUserID() const;
 
     // static handlers
     static void HandleDiscordReady(const struct DiscordUser* pDiscordUser);
@@ -54,6 +56,7 @@ public:
     static void HandleDiscordError(int iErrorCode, const char* szMessage);
 
 private:
+    std::string m_strDiscordUserID;
     std::string m_strDiscordAppId;
     std::string m_strDiscordAppAsset;
     std::string m_strDiscordAppAssetText;
