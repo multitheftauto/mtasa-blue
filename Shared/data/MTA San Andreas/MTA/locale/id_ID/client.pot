@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-17 16:30+0000\n"
-"PO-Revision-Date: 2023-12-17 16:31\n"
+"PO-Revision-Date: 2024-01-01 20:20\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -897,7 +897,10 @@ msgstr "* Serial anda adalah: %s"
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 msgid "In-game"
-msgstr ""
+msgstr "Kunci: Dalam permainan\n"
+"#: Client/core/CCore.cpp:674 Client/core/CSettings.cpp:3465\n"
+"#: Client/mods/deathmatch/logic/CResource.cpp:372\n"
+"#: Client/mods/deathmatch/logic/CClientGame.cpp:1083"
 
 #: Client/core/CCore.cpp:674 Client/core/CMainMenu.cpp:304
 #: Client/core/CSettings.cpp:3461
