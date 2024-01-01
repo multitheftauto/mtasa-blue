@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-17 16:30+0000\n"
-"PO-Revision-Date: 2024-01-01 20:20\n"
+"PO-Revision-Date: 2024-01-01 21:20\n"
 "Last-Translator: \n"
 "Language-Team: Indonesian\n"
 "Language: id_ID\n"
@@ -897,16 +897,13 @@ msgstr "* Serial anda adalah: %s"
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 msgid "In-game"
-msgstr "Kunci: Dalam permainan\n"
-"#: Client/core/CCore.cpp:674 Client/core/CSettings.cpp:3465\n"
-"#: Client/mods/deathmatch/logic/CResource.cpp:372\n"
-"#: Client/mods/deathmatch/logic/CClientGame.cpp:1083"
+msgstr "Dalam permainan"
 
 #: Client/core/CCore.cpp:674 Client/core/CMainMenu.cpp:304
 #: Client/core/CSettings.cpp:3461
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 msgid "Main menu"
-msgstr ""
+msgstr "Menu utama"
 
 #: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
@@ -1339,7 +1336,7 @@ msgstr "Selalu perlihatkan jendela unduhan"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Perbolehkan penyambungan dengan Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
@@ -2058,11 +2055,13 @@ msgstr "SUARA LUAR"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr ""
+msgstr "Sepertinya Anda telah menyalakan opsi koneksi Rich Presence.\n"
+"Apakah Anda ingin memperbolehkan server untuk membagikan datanya?\n\n"
+"Ini termasuk ID unik identifikasi Anda."
 
 #: Client/core/CSettings.cpp:4542
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
+msgstr "MENGIZINKAN UNTUK MEMBAGIKAN DATA"
 
 #: Client/core/CSettings.cpp:4566
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -3010,11 +3009,11 @@ msgstr "Putuskan untuk membatalkan pengunduhan"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "Menerbangkan sebuah UFO keliling"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "Berkeliling sekitar"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
