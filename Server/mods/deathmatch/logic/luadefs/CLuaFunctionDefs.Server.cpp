@@ -187,7 +187,7 @@ int CLuaFunctionDefs::Set(lua_State* luaVM)
         {
             std::string strResourceName = pResource->GetName();
             std::string strJSON;
-            Args.WriteToJSONString(strJSON);
+            Args.nljson_WriteToJSONString(strJSON); // Args.WriteToJSONString(strJSON);
 
             if (g_pGame->GetSettings()->Set(strResourceName.c_str(), strSetting.c_str(), strJSON.c_str()))
             {

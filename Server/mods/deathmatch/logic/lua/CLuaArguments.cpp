@@ -568,7 +568,269 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
     return bSuccess;
 }
 
-bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int flags)
+///////////////////////////////////////////////////////////
+bool CLuaArguments::nljson_WriteToJSONString(std::string& strJSON, bool bSerialize, int indent, uchar indentChar)
+{
+    nljson my_array = nljson_WriteToJSONArray(bSerialize);
+    if (my_array)
+    {
+        strJSON = my_array.dump(indent, indentChar, false, nlohmann::detail::error_handler_t::replace);
+        return true;
+    }
+    return false;
+}
+
+nljson CLuaArguments::nljson_WriteToJSONArray(bool bSerialize)
+{
+    nljson my_array = nljson::array();
+
+    for (const auto& pArgument : m_Arguments)
+    {
+        nljson* object = pArgument->nljson_WriteToJSONObject(bSerialize);
+        if (!object->is_null())
+            my_array.push_back(*object);
+        else
+            break;
+    }
+
+    return my_array;
+}
+
+nljson CLuaArguments::nljson_WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+{
+    bool bKnownTablesCreated = false;
+    if (!pKnownTables)
+    {
+        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        bKnownTablesCreated = true;
+    }
+
+    pKnownTables->insert({this, pKnownTables->size()});
+
+    bool         bIsArray = true;
+    unsigned int iArrayPos = 1;            // lua arrays are 1 based
+    auto         iter = m_Arguments.begin();
+    for (; iter != m_Arguments.end(); iter += 2)
+    {
+        CLuaArgument* pArgument = *iter;
+        if (pArgument->GetType() == LUA_TNUMBER)
+        {
+            double       num = pArgument->GetNumber();
+            unsigned int iNum = static_cast<unsigned int>(num);
+            if (num == iNum)
+            {
+                if (iArrayPos != iNum)
+                {
+                    bIsArray = false;
+                    break;
+                }
+            }
+            else
+            {
+                bIsArray = false;
+                break;
+            }
+        }
+        else
+        {
+            bIsArray = false;
+            break;
+        }
+        iArrayPos++;
+    }
+
+    if (bIsArray)
+    {
+        nljson my_array = nljson::array();
+        iter = m_Arguments.begin();
+        for (; iter != m_Arguments.end(); ++iter)
+        {
+            iter++;            // skip the key values
+            CLuaArgument* pArgument = *iter;
+            nljson*          object = pArgument->nljson_WriteToJSONObject(bSerialize, pKnownTables);
+            if (!object->is_null())
+            {
+                my_array.push_back(*object);
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (bKnownTablesCreated)
+            delete pKnownTables;
+        return my_array;
+    }
+    else
+    {
+        nljson my_object = nljson::object();
+        iter = m_Arguments.begin();
+        for (; iter != m_Arguments.end(); ++iter)
+        {
+            char szKey[1024];
+            szKey[0] = '\0';
+            CLuaArgument* pArgument = *iter;
+            if (!pArgument->WriteToString(szKey, sizeof(szKey)))
+                break;
+            ++iter;
+            pArgument = *iter;
+            nljson* object = pArgument->nljson_WriteToJSONObject(bSerialize, pKnownTables);
+
+            if (!object->is_null())
+            {
+                my_object[szKey] = *object;
+            }
+            else
+            {
+                break;
+            }
+        }
+        if (bKnownTablesCreated)
+            delete pKnownTables;
+        return my_object;
+    }
+}
+
+//bool CLuaArguments::ReadFromJSONString(const char* szJSON)
+bool CLuaArguments::nljson_ReadFromJSONString(const char* szJSON)
+{
+    // Fast isJSON check: Check first non-white space character is '[' or '{'
+    for (const char* ptr = szJSON; true;)
+    {
+        char c = *ptr++;
+        if (c == '[' || c == '{')
+            break;
+        if (isspace((uchar)c))
+            continue;
+        return false;
+    }
+
+    try
+    {
+        nljson json_object = nljson::parse(szJSON);
+
+        if (json_object.is_array())
+        {
+            bool bSuccess = true;
+
+            std::vector<CLuaArguments*> knownTables;
+
+            for (const auto& arrayObject : json_object)
+            {
+                CLuaArgument* pArgument = new CLuaArgument();
+                nljson*       copyArray = new nljson(arrayObject);
+                bSuccess = pArgument->nljson_ReadFromJSONObject(copyArray, &knownTables);
+                m_Arguments.push_back(pArgument);
+
+                delete copyArray;
+                if (!bSuccess)
+                    break;
+            }
+            return bSuccess;
+        }
+        else if (json_object.is_object())
+        {
+            std::vector<CLuaArguments*> knownTables;
+            CLuaArgument*               pArgument = new CLuaArgument();
+            bool                        bSuccess = pArgument->nljson_ReadFromJSONObject(&(json_object), &knownTables);
+            m_Arguments.push_back(pArgument);
+            return bSuccess;
+        }
+    }
+    catch (const nljson::parse_error& at)
+    {
+        // Handle parsing error as needed
+        g_pGame->GetScriptDebugging()->LogError(NULL, "Error in parser json: %s (at %d)", at.what(), at.byte);
+    }
+
+    return false;
+}
+
+//bool CLuaArguments::nljson_ReadFromJSONObject(nljson* object, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::nljson_ReadFromJSONObject(nljson* object, std::vector<CLuaArguments*>* pKnownTables)
+{
+    if (object)
+    {
+        if (object->is_object())
+        {
+            bool bKnownTablesCreated = false;
+            if (!pKnownTables)
+            {
+                pKnownTables = new std::vector<CLuaArguments*>();
+                bKnownTablesCreated = true;
+            }
+
+            pKnownTables->push_back(this);
+
+            bool bSuccess = true;
+            for (auto it = object->begin(); it != object->end(); ++it)
+            {
+                const std::string& key = it.key();
+                nljson&      val = it.value();
+
+                CLuaArgument* pArgumentKey = new CLuaArgument();
+                pArgumentKey->ReadString(key);
+                m_Arguments.push_back(pArgumentKey);            // push the key first
+
+                CLuaArgument* pArgumentValue = new CLuaArgument();
+                bSuccess = pArgumentValue->nljson_ReadFromJSONObject(&val, pKnownTables);            // then the value
+                m_Arguments.push_back(pArgumentValue);
+
+                if (!bSuccess)
+                    break;
+            }
+
+            if (bKnownTablesCreated)
+                delete pKnownTables;
+
+            return bSuccess;
+        }
+    }
+    // Handle error or log as needed
+    return false;
+}
+
+//bool CLuaArguments::nljson_ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::nljson_ReadFromJSONArray(nljson* arrayObject, std::vector<CLuaArguments*>* pKnownTables)
+{
+    if (arrayObject)
+    {
+        if (arrayObject->is_array())
+        {
+            bool bKnownTablesCreated = false;
+            if (!pKnownTables)
+            {
+                pKnownTables = new std::vector<CLuaArguments*>();
+                bKnownTablesCreated = true;
+            }
+
+            pKnownTables->push_back(this);
+
+            bool bSuccess = true;
+            for (uint i = 0; i < arrayObject->size(); i++)
+            {
+                CLuaArgument* pArgumentKey = new CLuaArgument();
+                pArgumentKey->ReadNumber(i + 1);            // push the key
+                m_Arguments.push_back(pArgumentKey);
+
+                CLuaArgument* pArgumentValue = new CLuaArgument();
+                bSuccess = pArgumentValue->nljson_ReadFromJSONObject(&(*arrayObject)[i], pKnownTables);
+                m_Arguments.push_back(pArgumentValue);            // then the value
+                if (!bSuccess)
+                    break;
+            }
+
+            if (bKnownTablesCreated)
+                delete pKnownTables;
+
+            return bSuccess;
+        }
+    }
+    return false;
+}
+
+///////////////////////////////////////////////////////////
+bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int flags) // to mam
 {
     json_object* my_array = WriteToJSONArray(bSerialize);
     if (my_array)
@@ -580,7 +842,7 @@ bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int
     return false;
 }
 
-json_object* CLuaArguments::WriteToJSONArray(bool bSerialize)
+json_object* CLuaArguments::WriteToJSONArray(bool bSerialize) // to mam
 {
     json_object*                          my_array = json_object_new_array();
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
@@ -600,7 +862,7 @@ json_object* CLuaArguments::WriteToJSONArray(bool bSerialize)
     return my_array;
 }
 
-json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) // to mam
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
@@ -695,7 +957,7 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
     }
 }
 
-bool CLuaArguments::ReadFromJSONString(const char* szJSON)
+bool CLuaArguments::ReadFromJSONString(const char* szJSON) // to mam
 {
     // Fast isJSON check: Check first non-white space character is '[' or '{'
     for (const char* ptr = szJSON; true;)
@@ -748,7 +1010,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
     return false;
 }
 
-bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables) // to mam 
 {
     if (object)
     {
@@ -786,7 +1048,7 @@ bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArgu
     return false;
 }
 
-bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables) // to mam
 {
     if (object)
     {

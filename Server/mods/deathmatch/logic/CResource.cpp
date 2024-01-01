@@ -2565,7 +2565,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         else if (ipoHttpRequest->nRequestMethod == REQUESTMETHOD_POST)
         {
             const char* szRequestBody = ipoHttpRequest->sBody.c_str();
-            Arguments.ReadFromJSONString(szRequestBody);
+            Arguments.nljson_ReadFromJSONString(szRequestBody);
         }
 
         CLuaArguments FormData;
@@ -2662,7 +2662,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(SLuaDebugInfo(m_strResourceName, INVALID_LINE_NUMBER, SString("[HTTP:%s]", strFuncName.c_str())));
 
         std::string strJSON;
-        Returns.WriteToJSONString(strJSON, true);
+        Returns.nljson_WriteToJSONString(strJSON, true);
 
         g_pGame->GetScriptDebugging()->SaveLuaDebugInfo(SLuaDebugInfo());
 

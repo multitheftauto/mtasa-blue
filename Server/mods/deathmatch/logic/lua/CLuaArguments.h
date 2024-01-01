@@ -22,6 +22,11 @@ extern "C"
 #include "json.h"
 #include "CLuaFunctionRef.h"
 
+#undef snprintf // prevent error #2039 _snprinft
+#include "nlohmann/json.hpp"
+
+using nljson = nlohmann::json;
+
 inline void LUA_CHECKSTACK(lua_State* L, int size)
 {
     if (lua_getstackgap(L) < size + 5)
@@ -100,6 +105,14 @@ public:
     std::vector<CLuaArgument*>::const_iterator IterEnd() const { return m_Arguments.end(); };
 
     bool IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
+
+    // nlohmann-json
+    bool CLuaArguments::nljson_WriteToJSONString(std::string& strJSON, bool bSerialize = false, int indent = 0, uchar indentChar = 32);
+    nljson CLuaArguments::nljson_WriteToJSONArray(bool bSerialize);
+    nljson CLuaArguments::nljson_WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables);
+    bool   CLuaArguments::nljson_ReadFromJSONString(const char* szJSON);
+    bool   CLuaArguments::nljson_ReadFromJSONArray(nljson* arrayObject, std::vector<CLuaArguments*>* pKnownTables);
+    bool   CLuaArguments::nljson_ReadFromJSONObject(nljson* object, std::vector<CLuaArguments*>* pKnownTables);
 
 private:
     std::vector<CLuaArgument*> m_Arguments;

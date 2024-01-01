@@ -20,6 +20,11 @@ extern "C"
 #include "../common/CBitStream.h"
 #include "json.h"
 
+#undef snprintf // prevent error #2039 _snprinft
+#include "nlohmann/json.hpp"
+
+using nljson = nlohmann::json;
+
 class CElement;
 class CLuaArguments;
 
@@ -65,6 +70,9 @@ public:
     char*        WriteToString(char* szBuffer, int length);
 
     bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
+
+    bool CLuaArgument::nljson_ReadFromJSONObject(nljson* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    nljson* CLuaArgument::nljson_WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;
