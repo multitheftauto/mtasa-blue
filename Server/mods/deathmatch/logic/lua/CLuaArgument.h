@@ -20,7 +20,9 @@ extern "C"
 #include "../common/CBitStream.h"
 #include "json.h"
 
-#undef snprintf // prevent error #2039 _snprinft
+#if defined(_MSC_VER) && (_MSC_VER >= 1430 && _MSC_VER < 2000)
+    #define _snprintf snprintf
+#endif
 #include "nlohmann/json.hpp"
 
 using nljson = nlohmann::json;

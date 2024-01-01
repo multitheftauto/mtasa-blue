@@ -18,6 +18,12 @@ extern "C"
 #include <string>
 #include "json.h"
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1430 && _MSC_VER < 2000)
+    #define _snprintf snprintf
+#endif
+
+#include "nlohmann/json.hpp"
+
 class CClientEntity;
 class CLuaArguments;
 

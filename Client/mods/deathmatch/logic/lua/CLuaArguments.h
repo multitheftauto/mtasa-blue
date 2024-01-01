@@ -21,6 +21,12 @@ extern "C"
 #include <vector>
 #include "CLuaFunctionRef.h"
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1430 && _MSC_VER < 2000)
+    #define _snprintf snprintf
+#endif
+
+#include "nlohmann/json.hpp"
+
 inline void LUA_CHECKSTACK(lua_State* L, int size)
 {
     if (lua_getstackgap(L) < size + 5)
