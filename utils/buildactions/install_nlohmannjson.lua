@@ -3,7 +3,7 @@ require 'utils'
 premake.modules.install_nlohmannjson = {}
 
 -- Config variables
-local NLOHMANN_PATH = "vendor/nlohmann-json/"
+local NLOHMANN_PATH = "vendor/nlohmann-json/nlohmann/"
 local NLOHMANN_TEMP = "vendor/nlohmann-json/tmp.zip"
 local NLOHMANN_UPDATE = "https://api.github.com/repos/znvjder/nlohmann-json/releases/latest"
 local NLOHMANN_URL = "https://github.com/znvjder/nlohmann-json/archive/refs/tags/"
