@@ -11,6 +11,9 @@ project "Effekseer"
 
 	links { "Effekseer-vendor", "d3dx9" }
 
+	pchheader "StdInc.h"
+	pchsource "StdInc.cpp"
+
 	includedirs {
 		"../../vendor/effekseer/effekseer-submodule/Dev/Cpp/Effekseer",
 		"../../vendor/effekseer/effekseer-submodule/Dev/Cpp/EffekseerRendererDX9",

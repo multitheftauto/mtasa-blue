@@ -9,9 +9,10 @@
  *
  *****************************************************************************/
 
-//#include <StdInc.h>
+#include "StdInc.h"
 
 #include "CEffekseerManager.h"
+#include <codecvt>
 
 #define EFK_MAX_PARTICLES 8000
 
@@ -24,6 +25,16 @@ EffekseerManager::EffekseerManager()
 
 EffekseerManager::~EffekseerManager()
 {
+}
+
+CEffekseerEffect* EffekseerManager::Create(const char* path)
+{
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> utf16conv;
+    std::u16string                                                    wstr = utf16conv.from_bytes(path);
+
+    auto pEffect = Effekseer::Effect::Create(m_pInterface, wstr.c_str());
+
+    return nullptr;
 }
 
 void EffekseerManager::Init(IDirect3DDevice9* pDevice)

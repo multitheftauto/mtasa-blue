@@ -10,13 +10,11 @@
 
 #include "StdInc.h"
 
-CClientEffekseerEffectHandler::CClientEffekseerEffectHandler(CClientManager* pManager, ElementID ID, Effekseer::Handle handle) : ClassInit(this), CClientEntity(ID)
+CClientEffekseerEffectHandler::CClientEffekseerEffectHandler(CClientManager* pManager, ElementID ID, CEffekseerEffectHandler *handle)
+    : ClassInit(this), CClientEntity(ID), m_pHandle(handle)
 {
     SetTypeName("effekseer-handler");
-
-    m_Handle = handle;
     m_pManager = pManager;
-    m_pInternalInterface = g_pCore->GetGraphics()->GetEffekseerManager()->GetInterface();
 }
 
 CClientEffekseerEffectHandler::~CClientEffekseerEffectHandler()
@@ -27,45 +25,45 @@ CClientEffekseerEffectHandler::~CClientEffekseerEffectHandler()
 void CClientEffekseerEffectHandler::SetPosition(const CVector& vecPosition)
 {
     m_vecPosition = vecPosition;
-    m_pInternalInterface->SetLocation(m_Handle, ::Effekseer::Vector3D(vecPosition.fX, vecPosition.fY, vecPosition.fZ));
+    m_pHandle->SetPosition(vecPosition);
 }
 
 void CClientEffekseerEffectHandler::SetRotation(const CVector& vecRotation)
 {
-    m_pInternalInterface->SetRotation(m_Handle, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
+    m_pHandle->SetRotation(vecRotation);
 }
 
 void CClientEffekseerEffectHandler::SetScale(const CVector& vecScale)
 {
-    m_pInternalInterface->SetScale(m_Handle, vecScale.fX, vecScale.fY, vecScale.fZ);
+    m_pHandle->SetScale(vecScale);
 }
 
 void CClientEffekseerEffectHandler::Stop()
 {
-    m_pInternalInterface->StopEffect(m_Handle);
+    m_pHandle->StopEffect();
 }
 
 void CClientEffekseerEffectHandler::StopRoot()
 {
-    m_pInternalInterface->StopRoot(m_Handle);
+    m_pHandle->StopRoot();
 }
 
 void CClientEffekseerEffectHandler::SetSpeed(float fSpeed)
 {
-    m_pInternalInterface->SetSpeed(m_Handle, fSpeed);
+    m_pHandle->SetSpeed(fSpeed);
 }
 
 float CClientEffekseerEffectHandler::GetSpeed()
 {
-    return m_pInternalInterface->GetSpeed(m_Handle);
+    return m_pHandle->GetSpeed();
 }
 
 void CClientEffekseerEffectHandler::SetDynamicInput(int32_t index, float fValue)
 {
-    m_pInternalInterface->SetDynamicInput(m_Handle, index, fValue);
+    m_pHandle->SetDynamicInput(index, fValue);
 }
 
 float CClientEffekseerEffectHandler::GetDynamicInput(int32_t index)
 {
-    return m_pInternalInterface->GetDynamicInput(m_Handle, index);
+    return m_pHandle->GetDynamicInput(index);
 }

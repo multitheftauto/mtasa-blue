@@ -11,13 +11,13 @@
 #pragma once
 
 #include "CClientEntity.h"
-#include "Effekseer.h"
+#include <effekseer/CEffekseerEffectHandler.h>
 
 class CClientEffekseerEffectHandler final : public CClientEntity
 {
     DECLARE_CLASS(CClientEffekseerEffectHandler, CClientEntity)
 public:
-    CClientEffekseerEffectHandler(class CClientManager* pManager, ElementID ID, Effekseer::Handle handle);
+    CClientEffekseerEffectHandler(class CClientManager* pManager, ElementID ID, CEffekseerEffectHandler* handle);
     ~CClientEffekseerEffectHandler();
 
     void Unlink(){};
@@ -37,6 +37,5 @@ public:
 
 private:
     CVector               m_vecPosition;
-    Effekseer::ManagerRef m_pInternalInterface;
-    Effekseer::Handle     m_Handle;
+    CEffekseerEffectHandler* m_pHandle;
 };

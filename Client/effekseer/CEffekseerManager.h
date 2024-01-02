@@ -26,6 +26,7 @@ private:
 public:
     static EffekseerManager* GetManager();
 
+    CEffekseerEffect* Create(const char* path);
     void Init(IDirect3DDevice9* pDevice);
 
     Effekseer::ManagerRef GetInterface() { return m_pInterface; };

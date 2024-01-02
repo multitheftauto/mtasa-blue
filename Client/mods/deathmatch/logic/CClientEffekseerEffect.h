@@ -12,7 +12,7 @@
 
 #include "CClientEntity.h"
 #include "CClientEffekseerEffectHandler.h"
-#include "Effekseer.h"
+#include <effekseer/CEffekseerEffect.h>
 
 class CClientEffekseerEffect final : public CClientEntity
 {
@@ -35,7 +35,5 @@ private:
     CVector               m_vecPosition;
 
     std::list<CClientEffekseerEffectHandler*> m_Handles;
-
-    Effekseer::ManagerRef m_pInternalInterface;
-    Effekseer::EffectRef  m_pEffect;
+    CEffekseerEffect*                         m_pEffect;
 };
