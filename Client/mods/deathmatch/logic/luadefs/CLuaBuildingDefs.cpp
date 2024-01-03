@@ -46,7 +46,7 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (!g_pGame->GetPools()->HasFreeBuildingSlot())
         throw std::invalid_argument("No free slot in buildings pool");
 
-    if (pos.fX < -3000.0f || pos.fX > 3000.0f || pos.fY < -3000.0f || pos.fY > 3000.0f)
+    if (!CClientBuildingManager::IsValidPosition(pos))
         throw std::invalid_argument("Position is outside of game world");
 
     ConvertDegreesToRadians(rot);

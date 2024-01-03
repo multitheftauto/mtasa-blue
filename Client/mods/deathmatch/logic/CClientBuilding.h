@@ -30,6 +30,11 @@ public:
     void GetRotationRadians(CVector& vecOutRadians) const override { vecOutRadians = m_vPos; };
     void SetRotationRadians(const CVector& vecRadians) override;
 
+    CEntity*       GetGameEntity() override { return m_pBuilding; };
+    const CEntity* GetGameEntity() const override { return m_pBuilding; };
+
+    bool SetMatrix(const CMatrix& matrix) override;
+
     void SetInterior(uint8_t ucInterior) override;
 
     uint16_t GetModel() const noexcept { return m_usModelId; };

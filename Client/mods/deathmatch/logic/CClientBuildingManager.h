@@ -29,6 +29,7 @@ public:
     const std::list<CClientBuilding*>& GetBuildings() { return m_List; };
 
     static bool IsValidModel(uint16_t modelId);
+    static bool IsValidPosition(const CVector& pos) noexcept;
 
 private:
     void AddToList(CClientBuilding* pBuilding) { m_List.push_back(pBuilding); }

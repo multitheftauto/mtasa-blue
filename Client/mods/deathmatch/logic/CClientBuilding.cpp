@@ -34,6 +34,9 @@ CClientBuilding::~CClientBuilding()
 
 void CClientBuilding::SetPosition(const CVector& vecPosition)
 {
+    if (!CClientBuildingManager::IsValidPosition(vecPosition))
+        return;
+
     if (m_vPos == vecPosition)
         return;
     m_vPos = vecPosition;
@@ -46,6 +49,26 @@ void CClientBuilding::SetRotationRadians(const CVector& vecRadians)
         return;
     m_vRot = vecRadians;
     Recreate();
+}
+
+bool CClientBuilding::SetMatrix(const CMatrix& matrix)
+{
+    if (!CClientBuildingManager::IsValidPosition(matrix.vPos))
+        return false;
+
+    m_vPos = matrix.vPos;
+
+    CVector vecRotation;
+    g_pMultiplayer->ConvertMatrixToEulerAngles(matrix, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
+
+    ConvertRadiansToDegreesNoWrap(vecRotation);
+    vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_MINUS_ZYX, EULER_ZXY);
+    ConvertDegreesToRadiansNoWrap(vecRotation);
+
+    m_vRot = vecRotation;
+
+    Recreate();
+    return true;
 }
 
 void CClientBuilding::SetInterior(uint8_t ucInterior)

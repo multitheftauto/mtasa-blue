@@ -77,3 +77,8 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
     eModelInfoType eType = pModelInfo->GetModelType();
     return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
 }
+
+bool CClientBuildingManager::IsValidPosition(const CVector& pos) noexcept
+{
+    return (pos.fX >- -3000.0f && pos.fX <= 3000.0f && pos.fY >= -3000.0f && pos.fY <= 3000.0f);
+}
