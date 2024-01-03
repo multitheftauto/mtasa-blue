@@ -246,19 +246,20 @@ inline float GetSmallestWrapUnsigned(float fValue, float fHigh)
 
 void RotateVector(CVector& vecLine, const CVector& vecRotation);
 
-inline void ConvertEulersToQuaternion(const CVector& vecFrom, CVector4D &vecTo)
+inline void ConvertZXYEulersToQuaternion(const CVector& vecFrom, CVector4D &vecTo)
 {
-    double cy = cos(vecFrom.fZ * 0.5);
-    double sy = sin(vecFrom.fZ * 0.5);
-    double cr = cos(vecFrom.fX * 0.5);
-    double sr = sin(vecFrom.fX * 0.5);
-    double cp = cos(vecFrom.fY * 0.5);
-    double sp = sin(vecFrom.fY * 0.5);
+    const float c1 = cos(vecFrom.fX / 2.0f);
+    const float c2 = cos(vecFrom.fY / 2.0f);
+    const float c3 = cos(vecFrom.fZ / 2.0f);
 
-    vecTo.fW = cy * cr * cp + sy * sr * sp;
-    vecTo.fX = cy * sr * cp - sy * cr * sp;
-    vecTo.fY = cy * cr * sp + sy * sr * cp;
-    vecTo.fZ = sy * cr * cp - cy * sr * sp;
+    const float s1 = sin(vecFrom.fX / 2.0f);
+    const float s2 = sin(vecFrom.fY / 2.0f);
+    const float s3 = sin(vecFrom.fZ / 2.0f);
+
+    vecTo.fX = s1 * c2 * c3 - c1 * s2 * s3;
+    vecTo.fY = c1 * s2 * c3 + s1 * c2 * s3;
+    vecTo.fZ = c1 * c2 * s3 + s1 * s2 * c3;
+    vecTo.fW = c1 * c2 * c3 - s1 * s2 * s3;
 }
 
 #ifdef MTA_CLIENT

@@ -71,7 +71,7 @@ void CClientBuilding::Create()
         return;
 
     CVector4D vRot4D;
-    ConvertEulersToQuaternion(m_vRot, vRot4D);
+    ConvertZXYEulersToQuaternion(m_vRot, vRot4D);
 
     m_pBuilding = g_pGame->GetPools()->AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
 }
