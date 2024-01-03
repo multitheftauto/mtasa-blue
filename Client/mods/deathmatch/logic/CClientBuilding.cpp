@@ -58,7 +58,7 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
 
 void CClientBuilding::SetModel(uint16_t model)
 {
-    if (CClientObjectManager::IsValidModel(model))
+    if (CClientBuildingManager::IsValidModel(model))
     {
         m_usModelId = model;
         Recreate();
