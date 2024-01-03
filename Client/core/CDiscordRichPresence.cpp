@@ -280,6 +280,20 @@ void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax, bool bCusto
     }
 }
 
+void CDiscordRichPresence::SetDiscordUserID(const std::string& strUserID)
+{
+    if (CVARS_GET_VALUE<bool>("discord_rpc_share_data"))
+        m_strDiscordUserID = strUserID;
+}
+
+std::string CDiscordRichPresence::GetDiscordUserID() const
+{
+    if (CVARS_GET_VALUE<bool>("discord_rpc_share_data"))
+        return m_strDiscordUserID;
+
+    return {};
+};
+
 #ifdef DISCORD_DISABLE_IO_THREAD
 void CDiscordRichPresence::UpdatePresenceConnection()
 {
@@ -290,7 +304,10 @@ void CDiscordRichPresence::UpdatePresenceConnection()
 void CDiscordRichPresence::HandleDiscordReady(const DiscordUser* pDiscordUser)
 {
     if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+    {
         discord->SetDiscordClientConnected(true);
+        discord->SetDiscordUserID(pDiscordUser->userId);
+    }
 }
 
 void CDiscordRichPresence::HandleDiscordDisconnected(int iErrorCode, const char* szMessage)
@@ -298,7 +315,10 @@ void CDiscordRichPresence::HandleDiscordDisconnected(int iErrorCode, const char*
     WriteDebugEvent(SString("[DISCORD] Disconnected %s (error #%d)", szMessage, iErrorCode));
 
     if (const auto discord = g_pCore->GetDiscord(); discord)
+    {
+        discord->SetDiscordUserID("");
         discord->SetDiscordClientConnected(false);
+    }
 }
 
 void CDiscordRichPresence::HandleDiscordError(int iErrorCode, const char* szMessage)

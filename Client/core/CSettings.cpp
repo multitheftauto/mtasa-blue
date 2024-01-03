@@ -4515,8 +4515,36 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
 //
 bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
 {
-    g_pCore->GetDiscord()->SetDiscordRPCEnabled(m_pCheckBoxAllowDiscordRPC->GetSelected());
+    bool isEnabled = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(isEnabled);
+
+    if (isEnabled)
+        ShowRichPresenceShareDataQuestionBox(); // show question box
+
     return true;
+}
+
+static void ShowRichPresenceShareDataCallback(void* ptr, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    CVARS_SET("discord_rpc_share_data", static_cast<bool>(uiButton));
+}
+
+void CSettings::ShowRichPresenceShareDataQuestionBox() const
+{
+    SStringX strMessage(
+        _("It seems that you have the Rich Presence connection option enabled."
+          "\nDo you want to allow servers to share their data?"
+          "\n\nThis includes yours unique ID identifier."));
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("CONSENT TO ALLOW DATA SHARING"));
+    pQuestionBox->SetMessage(strMessage);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(ShowRichPresenceShareDataCallback);
+    pQuestionBox->Show();
 }
 
 //
