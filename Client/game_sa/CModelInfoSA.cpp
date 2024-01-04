@@ -518,10 +518,10 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
     tIdeFlags ideFlags;
     ideFlags.uiFlags = uiFlags;
 
-    // Default value is 0xC0 (bIsColLoaded + bIsBackfaceCulled)
+    // Default value is 0xC0 (bIsColLoaded + bIsBackfaceCullingDisabled)
     // But bIsColLoaded should not be changed
     m_pInterface->usFlags &= 0x80;            // Reset all flags except bIsColLoaded
-    m_pInterface->bIsBackfaceCulled = true;
+    m_pInterface->bIsBackfaceCullingDisabled = true;
 
     // setBaseModelInfoFlags
     if (ideFlags.bDrawLast)
@@ -533,7 +533,7 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
     m_pInterface->bAdditiveRender = ideFlags.bAdditive;
     m_pInterface->bDontWriteZBuffer = ideFlags.bNoZBufferWrite;
     m_pInterface->bDontCastShadowsOn = ideFlags.bDontReceiveShadows;
-    m_pInterface->bIsBackfaceCulled = !ideFlags.bDisableBackfaceCulling;
+    m_pInterface->bIsBackfaceCullingDisabled = ideFlags.bDisableBackfaceCulling;
 
     switch (GetModelType())
     {
@@ -634,7 +634,7 @@ void CModelInfoSA::SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState)
             m_pInterface->bDontCollideWithFlyer = bState;
             break;
         case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
-            m_pInterface->bIsBackfaceCulled = !bState;
+            m_pInterface->bIsBackfaceCullingDisabled = bState;
             break;
         default:
             break;
@@ -682,7 +682,7 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
         case eModelIdeFlag::DOES_NOT_COLLIDE_WITH_FLYER:
             return m_pInterface->bDontCollideWithFlyer;
         case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
-            return !m_pInterface->bIsBackfaceCulled;
+            return m_pInterface->bIsBackfaceCullingDisabled;
         default:
             return false;
     }

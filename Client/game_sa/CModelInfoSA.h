@@ -173,7 +173,7 @@ public:
             unsigned char     bDontWriteZBuffer : 1;
             unsigned char     bDontCastShadowsOn : 1;
             unsigned char     bDoWeOwnTheColModel : 1;
-            unsigned char     bIsBackfaceCulled : 1;
+            unsigned char     bIsBackfaceCullingDisabled : 1;
             unsigned char     bIsColLoaded : 1;
             unsigned char     bIsRoad : 1;
             unsigned char     bHasComplexHierarchy : 1;
