@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        effekseer/EffekseerManager.cpp
+ *  FILE:        effekseer/CEffekseerManager.cpp
  *  PURPOSE:     Effekseer manager file
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
@@ -12,32 +12,41 @@
 #include "StdInc.h"
 
 #include "CEffekseerManager.h"
+#include "CEffekseerEffectImpl.h"
 #include <codecvt>
 
 #define EFK_MAX_PARTICLES 8000
 
-static EffekseerManager* pCurrentManager;
-
-EffekseerManager::EffekseerManager()
+CEffekseerManager::CEffekseerManager()
 {
     m_pDevice = nullptr;
 }
 
-EffekseerManager::~EffekseerManager()
+CEffekseerManager::~CEffekseerManager()
 {
 }
 
-CEffekseerEffect* EffekseerManager::Create(const char* path)
+CEffekseerEffect* CEffekseerManager::Create(const char* path)
 {
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> utf16conv;
     std::u16string                                                    wstr = utf16conv.from_bytes(path);
 
-    auto pEffect = Effekseer::Effect::Create(m_pInterface, wstr.c_str());
+    auto pEfkEffect = Effekseer::Effect::Create(m_pInterface, wstr.c_str());
 
-    return nullptr;
+    if (pEfkEffect == nullptr)
+        return nullptr;
+
+    auto pEffect = new CEffekseerEffectImpl(m_pInterface, pEfkEffect);
+
+    return pEffect;
 }
 
-void EffekseerManager::Init(IDirect3DDevice9* pDevice)
+void CEffekseerManager::Remove(CEffekseerEffect* effect)
+{
+    delete static_cast<CEffekseerEffectImpl*>(effect);
+}
+
+void CEffekseerManager::Init(IDirect3DDevice9* pDevice)
 {
     m_pDevice = pDevice;
 
@@ -59,30 +68,20 @@ void EffekseerManager::Init(IDirect3DDevice9* pDevice)
     m_pInterface->SetCurveLoader(Effekseer::MakeRefPtr<Effekseer::CurveLoader>());
 }
 
-EffekseerManager* EffekseerManager::GetManager()
-{
-    if (pCurrentManager)
-        return pCurrentManager;
-
-    pCurrentManager = new EffekseerManager();
-
-    return pCurrentManager;
-}
-
-void EffekseerManager::OnLostDevice()
+void CEffekseerManager::OnLostDevice()
 {
     m_pRenderer->OnLostDevice();
 }
 
-void EffekseerManager::OnResetDevice()
+void CEffekseerManager::OnResetDevice()
 {
     m_pRenderer->OnResetDevice();
 }
 
-void EffekseerManager::DrawEffects(D3DMATRIX matrixProj, D3DMATRIX matrixView)
+void CEffekseerManager::DrawEffects(D3DMATRIX &matrixProj, D3DMATRIX &matrixView)
 {
-    m_pRenderer->SetProjectionMatrix(ConvertD3DMatrix(matrixProj));
-    m_pRenderer->SetCameraMatrix(ConvertD3DMatrix(matrixView));
+    m_pRenderer->SetProjectionMatrix(reinterpret_cast<::Effekseer::Matrix44&>(matrixProj));
+    m_pRenderer->SetCameraMatrix(reinterpret_cast<::Effekseer::Matrix44&>(matrixView));
 
     m_pInterface->Update();
 
@@ -95,20 +94,4 @@ void EffekseerManager::DrawEffects(D3DMATRIX matrixProj, D3DMATRIX matrixView)
 
     m_pInterface->Draw();
     m_pRenderer->EndRendering();
-}
-
-// TODO use cast?
-::Effekseer::Matrix44 EffekseerManager::ConvertD3DMatrix(D3DMATRIX matrix)
-{
-    ::Effekseer::Matrix44 effMatrix;
-
-    for (int a = 0; a < 4; a++)
-    {
-        for (int b = 0; b < 4; b++)
-        {
-            effMatrix.Values[a][b] = matrix.m[a][b];
-        }
-    }
-
-    return effMatrix;
 }

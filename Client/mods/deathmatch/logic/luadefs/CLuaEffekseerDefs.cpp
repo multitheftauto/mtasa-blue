@@ -46,7 +46,7 @@ CClientEffekseerEffect* CLuaEffekseerDefs::loadEffekseerFx(lua_State* const luaV
 
         CClientEffekseerEffect* pEffect = new CClientEffekseerEffect(m_pManager, INVALID_ELEMENT_ID);
 
-        if (pEffect->Load(std::move(strFullPath)))
+        if (pEffect->Load(strFullPath))
         {
             // Success loading the file. Set parent to effekseer root
             pEffect->SetParent(pRoot);

@@ -24,6 +24,7 @@
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
 #include "CDiscordInterface.h"
+#include "effekseer/CEffekseerManager.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -81,6 +82,7 @@ public:
     virtual CWebCoreInterface*                 GetWebCore() = 0;
     virtual CTrayIconInterface*                GetTrayIcon() = 0;
     virtual std::shared_ptr<CDiscordInterface> GetDiscord() = 0;
+    virtual CEffekseerManagerInterface*        GetEffekseer() = 0;
 
     // Temporary functions for r1
     virtual void DebugEcho(const char* szText) = 0;

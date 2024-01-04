@@ -104,6 +104,7 @@ public:
     CWebCoreInterface*                 GetWebCore();
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
+    CEffekseerManagerInterface*        GetEffekseer() override { return m_pEffekseer; };
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -170,12 +171,15 @@ public:
     bool        CheckDiskSpace(uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10);
 
     // Subsystems
+    void CreateEffekseer();
     void CreateGame();
     void CreateMultiplayer();
     void CreateNetwork();
     void CreateXML();
     void InitGUI(IDirect3DDevice9* pDevice);
+    void InitEffekseer(IDirect3DDevice9* pDevice);
     void CreateGUI();
+    void DestroyEffekseer();
     void DestroyGame();
     void DestroyMultiplayer();
     void DestroyNetwork();
@@ -328,6 +332,7 @@ private:
     CModuleLoader m_XMLModule;
     CModuleLoader m_GUIModule;
     CModuleLoader m_WebCoreModule;
+    CModuleLoader m_EffekseerModule;
 
     // Mod manager
     CModManager* m_pModManager;
@@ -337,6 +342,7 @@ private:
     CNet*         m_pNet;
     CMultiplayer* m_pMultiplayer;
     CGUI*         m_pGUI;
+    CEffekseerManagerInterface* m_pEffekseer;
 
     // Logger utility interface.
     CConsoleLogger* m_pConsoleLogger;

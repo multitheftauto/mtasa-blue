@@ -1,4 +1,7 @@
-﻿#include "EffekseerRendererDX9.MaterialLoader.h"
+﻿
+#include "StdInc.h"
+
+#include "EffekseerRendererDX9.MaterialLoader.h"
 #include <EffekseerRendererDX9/EffekseerRendererDX9.ModelRenderer.h>
 #include <EffekseerRendererDX9/EffekseerRendererDX9.Shader.h>
 #include <iostream>

@@ -19,7 +19,10 @@ CClientEffekseerEffectHandler::CClientEffekseerEffectHandler(CClientManager* pMa
 
 CClientEffekseerEffectHandler::~CClientEffekseerEffectHandler()
 {
-    Stop();
+    if (m_pHandle)
+    {
+        Stop();
+    }
 }
 
 void CClientEffekseerEffectHandler::SetPosition(const CVector& vecPosition)

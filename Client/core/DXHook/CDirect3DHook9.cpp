@@ -85,6 +85,7 @@ IDirect3D9* CDirect3DHook9::API_Direct3DCreate9(UINT SDKVersion)
         CCore::GetSingleton().CreateMultiplayer();
         CCore::GetSingleton().CreateXML();
         CCore::GetSingleton().CreateGUI();
+        CCore::GetSingleton().CreateEffekseer();
     }
 
     // D3DX_SDK_VERSION checks

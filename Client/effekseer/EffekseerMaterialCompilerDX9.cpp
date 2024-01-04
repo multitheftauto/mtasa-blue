@@ -1,3 +1,5 @@
+
+#include "StdInc.h"
 #include "EffekseerMaterialCompilerDX9.h"
 
 //#include <d3d11.h>

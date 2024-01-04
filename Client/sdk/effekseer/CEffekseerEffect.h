@@ -8,5 +8,5 @@
 class CEffekseerEffect
 {
 public:
-    virtual CEffekseerEffectHandler* Play(const CVector pos) = 0;
+    virtual CEffekseerEffectHandler* Play(const CVector &pos) = 0;
 };

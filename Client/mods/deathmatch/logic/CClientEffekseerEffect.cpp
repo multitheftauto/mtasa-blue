@@ -17,13 +17,19 @@ CClientEffekseerEffect::CClientEffekseerEffect(CClientManager* pManager, Element
 
     m_pManager = pManager;
     m_pEffect = nullptr;
+    m_pManager->GetEffekseerManager()->AddToList(this);
 }
 
 CClientEffekseerEffect::~CClientEffekseerEffect()
 {
+    m_pManager->GetEffekseerManager()->RemoveFromList(this);
+    if (m_pEffect)
+    {
+        g_pCore->GetEffekseer()->Remove(m_pEffect);
+    }
 }
 
-bool CClientEffekseerEffect::Load(std::string strPath)
+bool CClientEffekseerEffect::Load(const std::string &strPath)
 {
     if (!FileExists(strPath))
         return false;
@@ -31,7 +37,7 @@ bool CClientEffekseerEffect::Load(std::string strPath)
     if (m_pEffect)
         return false;
 
-    m_pEffect = m_pManager->GetEffekseerManagerImpl()->Create(strPath.c_str());
+    m_pEffect = g_pCore->GetEffekseer()->Create(strPath.c_str());
 
     return (m_pEffect != nullptr) ? true : false;
 }

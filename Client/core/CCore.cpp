@@ -107,7 +107,7 @@ CCore::CCore()
     m_pLocalGUI = new CLocalGUI;
     m_pGraphics = new CGraphics(m_pLocalGUI);
     g_pGraphics = m_pGraphics;
-    m_pGUI = NULL;
+    m_pGUI = nullptr;
 
     // Create the mod manager
     m_pModManager = new CModManager;
@@ -166,6 +166,8 @@ CCore::CCore()
 
     // Create discord rich presence
     m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
+
+    m_pEffekseer = nullptr;
 }
 
 CCore::~CCore()
@@ -224,6 +226,7 @@ CCore::~CCore()
     // Delete lazy subsystems
     DestroyGUI();
     DestroyXML();
+    DestroyEffekseer();
 
     // Delete keybinds
     delete m_pKeyBinds;
@@ -874,6 +877,7 @@ void CCore::ApplyHooks2()
             CCore::GetSingleton().CreateMultiplayer();
             CCore::GetSingleton().CreateXML();
             CCore::GetSingleton().CreateGUI();
+            CCore::GetSingleton().CreateEffekseer();
         }
     }
 }
@@ -996,6 +1000,11 @@ T* CreateModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
     return InitModule<T>(m_Loader, strName, strInitializer, pObj);
 }
 
+void CCore::CreateEffekseer()
+{
+    LoadModule(m_EffekseerModule, "Effekseer", "effekseer");
+}
+
 void CCore::CreateGame()
 {
     m_pGame = CreateModule<CGame>(m_GameModule, "Game", "game_sa", "GetGameInterface", this);
@@ -1022,9 +1031,24 @@ void CCore::InitGUI(IDirect3DDevice9* pDevice)
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
 }
 
+void CCore::InitEffekseer(IDirect3DDevice9* pDevice)
+{
+    m_pEffekseer = InitModule<CEffekseerManagerInterface>(m_EffekseerModule, "Effekseer", "InitInterface", pDevice);
+}
+
 void CCore::CreateGUI()
 {
     LoadModule(m_GUIModule, "GUI", "cgui");
+}
+
+void CCore::DestroyEffekseer()
+{
+    WriteDebugEvent("CCore::DestroyEffekseer");
+    if (m_pEffekseer)
+    {
+        m_pEffekseer = nullptr;
+    }
+    m_EffekseerModule.UnloadModule();
 }
 
 void CCore::DestroyGUI()
@@ -1032,7 +1056,7 @@ void CCore::DestroyGUI()
     WriteDebugEvent("CCore::DestroyGUI");
     if (m_pGUI)
     {
-        m_pGUI = NULL;
+        m_pGUI = nullptr;
     }
     m_GUIModule.UnloadModule();
 }
@@ -1994,6 +2018,8 @@ void CCore::OnDeviceRestore()
 //
 void CCore::OnPreFxRender()
 {
+    CGraphics::GetSingleton().DrawEffekseerEffects();
+
     if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
         return;    
 

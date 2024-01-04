@@ -1,3 +1,5 @@
+
+#include "StdInc.h"
 #include "CEffekseerEffectHandlerImpl.h"
 
 void CEffekseerEffectHandlerImpl::GetPosition(CVector& vecPosition)
@@ -26,7 +28,10 @@ void CEffekseerEffectHandlerImpl::SetScale(const CVector& vecScale)
 
 void CEffekseerEffectHandlerImpl::StopEffect()
 {
+    // Effect will be removed here
     m_pInterface->StopEffect(m_Handle);
+    // Free handler too
+    delete this;
 }
 
 void CEffekseerEffectHandlerImpl::StopRoot()

@@ -23,6 +23,11 @@ CClientEffekseerManager::~CClientEffekseerManager()
     DeleteAll();
 }
 
+void CClientEffekseerManager::RemoveFromList(CClientEffekseerEffect* pEffekseerFX)
+{
+    m_List.remove(pEffekseerFX);
+}
+
 CClientEffekseerEffect* CClientEffekseerManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
@@ -32,17 +37,17 @@ CClientEffekseerEffect* CClientEffekseerManager::Get(ElementID ID)
         return static_cast<CClientEffekseerEffect*>(pEntity);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void CClientEffekseerManager::DeleteAll()
 {
     // Delete each effect
     m_bCanRemoveFromList = false;
-    auto iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+
+    for (CClientEffekseerEffect* fx : m_List)
     {
-        delete *iter;
+        delete fx;
     }
 
     m_bCanRemoveFromList = true;

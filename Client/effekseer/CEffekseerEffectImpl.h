@@ -7,7 +7,11 @@
 
 class CEffekseerEffectImpl : public CEffekseerEffect
 {
-    CEffekseerEffectHandler* Play(const CVector &pos);
+public:
+    CEffekseerEffectImpl(Effekseer::ManagerRef effMager, Effekseer::EffectRef effRef) : m_pInternalInterface(effMager), m_pEffect(effRef){};
+    ~CEffekseerEffectImpl() = default;
+
+    CEffekseerEffectHandler* Play(const CVector &pos) override;
 
 private:
     Effekseer::ManagerRef m_pInternalInterface;

@@ -1544,6 +1544,8 @@ void CGraphics::OnDeviceInvalidate(IDirect3DDevice9* pDevice)
             m_pBigDXFonts[i]->OnLostDevice();
     }
 
+    g_pCore->GetEffekseer()->OnLostDevice();
+
     for (std::map<SString, SCustomScaleFontInfo>::iterator iter = m_CustomScaleFontMap.begin(); iter != m_CustomScaleFontMap.end(); ++iter)
         if (iter->second.pFont)
             iter->second.pFont->OnLostDevice();
@@ -1569,6 +1571,8 @@ void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
         if (m_pBigDXFonts[i])
             m_pBigDXFonts[i]->OnResetDevice();
     }
+
+    g_pCore->GetEffekseer()->OnResetDevice();
 
     for (std::map<SString, SCustomScaleFontInfo>::iterator iter = m_CustomScaleFontMap.begin(); iter != m_CustomScaleFontMap.end(); ++iter)
         if (iter->second.pFont)
@@ -2391,6 +2395,21 @@ bool CGraphics::CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuf
         return false;
 
     return true;
+}
+
+void CGraphics::DrawEffekseerEffects()
+{
+    EnteringMTARenderZone();
+
+    D3DMATRIX matrixProj, matrixView;
+    auto      pDevice = g_pCore->GetGraphics()->GetDevice();
+
+    pDevice->GetTransform(D3DTS_PROJECTION, &matrixProj);
+    pDevice->GetTransform(D3DTS_VIEW, &matrixView);
+
+    g_pCore->GetEffekseer()->DrawEffects(matrixProj, matrixView);
+
+    LeavingMTARenderZone();
 }
 
 namespace

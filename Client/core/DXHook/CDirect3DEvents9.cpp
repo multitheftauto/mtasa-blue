@@ -36,6 +36,7 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice)
 
     // Create the GUI manager
     CCore::GetSingleton().InitGUI(pDevice);
+    CCore::GetSingleton().InitEffekseer(pDevice);
 
     CAdditionalVertexStreamManager::GetSingleton()->OnDeviceCreate(pDevice);
     CVertexStreamBoundingBoxManager::GetSingleton()->OnDeviceCreate(pDevice);

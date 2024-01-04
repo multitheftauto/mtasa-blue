@@ -99,7 +99,6 @@ public:
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
     CClientIMGManager*           GetIMGManager() { return m_pImgManager; }
     CClientEffekseerManager*     GetEffekseerManager() { return m_pEffekseerManager; }
-    CEffekseerManagerInterface*  GetEffekseerManagerImpl() { return nullptr; };            // TEMP            
 
     bool IsGameLoaded() { return g_pGame->GetSystemState() == 9 && !m_bGameUnloadedFlag && g_pCore->GetNetwork()->GetServerBitStreamVersion(); }
     bool IsBeingDeleted() { return m_bBeingDeleted; }

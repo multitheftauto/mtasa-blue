@@ -27,7 +27,7 @@ public:
     const CVector&    GetPosition() { return m_vecPosition; };
     void              GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
     void              SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
-    bool Load(std::string strPath);
+    bool              Load(const std::string& strPat);
 
     CClientEffekseerEffectHandler* Play(const CVector& vecPosition);
 

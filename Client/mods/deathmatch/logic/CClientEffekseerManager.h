@@ -19,6 +19,7 @@ class CEntity;
 class CClientEffekseerManager
 {
     friend class CClientManager;
+    friend class CClientEffekseerEffect;
 
 public:
     void DeleteAll();
@@ -30,8 +31,10 @@ protected:
     ~CClientEffekseerManager();
 
     void AddToList(CClientEffekseerEffect* pEffekseerFX) { m_List.push_back(pEffekseerFX); }
+    void RemoveFromList(CClientEffekseerEffect* pEffekseerFX);
 
+private:
     CClientManager*                      m_pManager;
-    std::vector<CClientEffekseerEffect*> m_List;
+    std::list<CClientEffekseerEffect*>   m_List;
     bool                                 m_bCanRemoveFromList;
 };

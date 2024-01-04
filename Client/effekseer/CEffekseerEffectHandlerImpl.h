@@ -8,6 +8,9 @@
 class CEffekseerEffectHandlerImpl : public CEffekseerEffectHandler
 {
 public:
+    CEffekseerEffectHandlerImpl(Effekseer::ManagerRef manager, Effekseer::Handle handle) : m_pInterface(manager), m_Handle(handle){};
+    ~CEffekseerEffectHandlerImpl() = default;
+
     // Inherited via CEffekseerEffectHandler
     void  GetPosition(CVector& vecPosition) override;
     void  GetRotation(CVector& vecPosition) override;
