@@ -32,6 +32,8 @@ project "Effekseer-vendor"
 		"effekseer-submodule/Dev/Cpp/EffekseerRendererDX9/**.h",
 		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/Common/**.cpp",
 		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/Common/**.h",
+		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/HLSLGenerator/**.cpp",
+		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/HLSLGenerator/**.h",
 	}
 
 	filter "architecture:x64"

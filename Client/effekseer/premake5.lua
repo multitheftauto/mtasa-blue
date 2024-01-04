@@ -18,6 +18,8 @@ project "Effekseer"
 		"../../vendor/effekseer/effekseer-submodule/Dev/Cpp/Effekseer",
 		"../../vendor/effekseer/effekseer-submodule/Dev/Cpp/EffekseerRendererDX9",
 		"../../vendor/effekseer/effekseer-submodule/Dev/Cpp/EffekseerRendererCommon",
+		"../../vendor/effekseer/effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/Common",
+		"../../vendor/effekseer/effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/HLSLGenerator",
 		"../../Shared/sdk",
 		"../sdk",
 	}
