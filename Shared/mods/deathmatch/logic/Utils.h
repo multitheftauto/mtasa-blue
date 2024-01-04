@@ -248,13 +248,13 @@ void RotateVector(CVector& vecLine, const CVector& vecRotation);
 
 inline void ConvertZXYEulersToQuaternion(const CVector& vecFrom, CVector4D &vecTo)
 {
-    const float c1 = cos(vecFrom.fX / 2.0f);
-    const float c2 = cos(vecFrom.fY / 2.0f);
-    const float c3 = cos(vecFrom.fZ / 2.0f);
+    const float c1 = cos(vecFrom.fX * 0.5f);
+    const float c2 = cos(vecFrom.fY * 0.5f);
+    const float c3 = cos(vecFrom.fZ * 0.5f);
 
-    const float s1 = sin(vecFrom.fX / 2.0f);
-    const float s2 = sin(vecFrom.fY / 2.0f);
-    const float s3 = sin(vecFrom.fZ / 2.0f);
+    const float s1 = sin(vecFrom.fX * 0.5f);
+    const float s2 = sin(vecFrom.fY * 0.5f);
+    const float s3 = sin(vecFrom.fZ * 0.5f);
 
     vecTo.fX = s1 * c2 * c3 - c1 * s2 * s3;
     vecTo.fY = c1 * s2 * c3 + s1 * c2 * s3;
