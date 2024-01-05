@@ -27,6 +27,7 @@ project "Deathmatch"
 			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
       "../../../vendor/simdjson/singleheader",
+      "../../../vendor/rapidjson/include",
 			"logic",
 			"utils",
 			"."
@@ -34,7 +35,7 @@ project "Deathmatch"
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "simdjson", "json-c", "zip", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "simdjson", "rapidjson", "json-c", "zip", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {
