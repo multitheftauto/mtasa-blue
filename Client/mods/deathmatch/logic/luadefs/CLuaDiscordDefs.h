@@ -29,6 +29,6 @@ private:
     static bool SetEndTime(unsigned long ulTime);
     static bool SetPartySize(int iMin, int iMax);
     static bool IsDiscordRPCConnected();
-
+    static std::string GetDiscordUserID();
 };
 
