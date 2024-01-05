@@ -7,6 +7,7 @@ require "install_cef"
 require "install_unifont"
 require "install_discord"
 require "install_simdjson"
+require "install_rapidjson"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -196,3 +197,4 @@ workspace "MTASA"
 		include "vendor/zip"
 		include "vendor/zlib"
     include "vendor/simdjson"
+    include "vendor/rapidjson"
