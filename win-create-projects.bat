@@ -9,8 +9,8 @@ utils\premake5.exe install_unifont
 rem Update discord-rpc
 utils\premake5.exe install_discord
 
-rem Update nlohmann-json
-utils\premake5.exe install_nlohmannjson
+rem Update simdjson
+utils\premake5.exe install_simdjson
 
 rem Generate solutions
 utils\premake5.exe vs2022

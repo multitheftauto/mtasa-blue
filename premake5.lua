@@ -6,7 +6,7 @@ require "install_resources"
 require "install_cef"
 require "install_unifont"
 require "install_discord"
-require "install_nlohmannjson"
+require "install_simdjson"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -195,4 +195,4 @@ workspace "MTASA"
 		include "vendor/unrar"
 		include "vendor/zip"
 		include "vendor/zlib"
-    include "vendor/nlohmann-json"
+    include "vendor/simdjson"

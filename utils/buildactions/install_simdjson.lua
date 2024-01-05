@@ -1,24 +1,24 @@
 require 'utils'
 
-premake.modules.install_nlohmannjson = {}
+premake.modules.install_simdjson = {}
 
 -- Config variables
-local NLOHMANN_PATH = "vendor/nlohmann-json/nlohmann/"
-local NLOHMANN_TEMP = "vendor/nlohmann-json/tmp.zip"
-local NLOHMANN_UPDATE = "https://api.github.com/repos/znvjder/nlohmann-json/releases/latest"
-local NLOHMANN_URL = "https://github.com/znvjder/nlohmann-json/archive/refs/tags/"
-local NLOHMANN_EXT = ".zip"
+local SIMDJSON_PATH = "vendor/simdjson/"
+local SIMDJSON_TEMP = "vendor/simdjson/tmp.zip"
+local SIMDJSON_UPDATE = "https://api.github.com/repos/simdjson/simdjson/releases/latest"
+local SIMDJSON_URL = "https://github.com/simdjson/simdjson/archive/refs/tags/"
+local SIMDJSON_EXT = ".zip"
 
 -- Auto-update variables
-local NLOHMANN_VERSION = "v3.11.3"
-local NLOHMANN_HASH = "28e4fcbdff3b07e4e3b32ba5a954af5c20f2563c818ad62f9294b9da5fdd6603"
+local SIMDJSON_VERSION = "v3.6.3"
+local SIMDJSON_HASH = "0b9f866c577f78c1f422e59c7ecf446cef6bfe95e4e1448350c9cbb4c7e6fe3e"
 
 function make_download_url(url, version, ext)
 	return url..http.escapeUrlParam(version)..ext
 end
 
-function update_install_nlohmann_json(variable, version, hash)
-	local filename = "utils/buildactions/install_nlohmannjson.lua"
+function update_install_SIMDJSON_json(variable, version, hash)
+	local filename = "utils/buildactions/install_simdjson.lua"
 	local f = io.open(filename)
 	local text = f:read("*all")
 	f:close()
@@ -65,20 +65,20 @@ local function check_github_update(name, url, version)
 end
 
 local function check_nlohmann(should_upgrade)
-	local has_NLOHMANN_dir = os.isdir(NLOHMANN_PATH)
+	local has_SIMDJSON_dir = os.isdir(SIMDJSON_PATH)
 
 	-- Check file hash
-	local archive_path = NLOHMANN_TEMP
-	local hash_passed = os.isfile(archive_path) and os.sha256_file(archive_path) == NLOHMANN_HASH
+	local archive_path = SIMDJSON_TEMP
+	local hash_passed = os.isfile(archive_path) and os.sha256_file(archive_path) == SIMDJSON_HASH
 	if hash_passed then
-		print("nlohmann-json consistency checks succeeded")
-		if has_NLOHMANN_dir then
+		print("simdjson consistency checks succeeded")
+		if has_SIMDJSON_dir then
 			return
 		end
 	else
-		-- Download nlohmannjson
-		print("Downloading nlohmann-json " .. NLOHMANN_VERSION ..  "...")
-		if not http.download_print_errors(make_download_url(NLOHMANN_URL, NLOHMANN_VERSION, NLOHMANN_EXT), archive_path) then
+		-- Download simdjson
+		print("Downloading simdjson " .. SIMDJSON_VERSION ..  "...")
+		if not http.download_print_errors(make_download_url(SIMDJSON_URL, SIMDJSON_VERSION, SIMDJSON_EXT), archive_path) then
 			os.exit(1)
 			return
 		end
@@ -86,20 +86,20 @@ local function check_nlohmann(should_upgrade)
 
 	local downloaded_hash = os.sha256_file(archive_path)
 	if should_upgrade then
-		print("New nlohmann-json hash is:", downloaded_hash)
-		NLOHMANN_HASH = downloaded_hash
+		print("New simdjson hash is:", downloaded_hash)
+		SIMDJSON_HASH = downloaded_hash
 
-		io.write(("Update `install_nlohmannjson.lua` file? (Y/n) "):format(version))
+		io.write(("Update `install_simdjson.lua` file? (Y/n) "):format(version))
 		local input = io.read():lower()
 		if (input == "y" or input == "yes") then
-			update_install_nlohmann_json("NLOHMANNJSON", NLOHMANN_VERSION, downloaded_hash)
+			update_install_SIMDJSON_json("simdjson", SIMDJSON_VERSION, downloaded_hash)
 		end
 	end
 
-	if downloaded_hash == NLOHMANN_HASH then
-		print("nlohmann-json consistency checks succeeded")
+	if downloaded_hash == SIMDJSON_HASH then
+		print("simdjson consistency checks succeeded")
 	else
-		errormsg("nlohmann-json consistency checks failed.", ("Expected %s, got %s"):format(NLOHMANN_HASH, downloaded_hash))
+		errormsg("simdjson consistency checks failed.", ("Expected %s, got %s"):format(SIMDJSON_HASH, downloaded_hash))
 		os.exit(1)
 		return
 	end
@@ -109,44 +109,44 @@ local function check_nlohmann(should_upgrade)
 		return
 	end
 
-	-- Delete old nlohmann-json files
+	-- Delete old simdjson files
 	if has_discord_dir then
-		if not os.rmdir(NLOHMANN_PATH) then
-			errormsg("ERROR: Could not delete nlohmann-json folder")
+		if not os.rmdir(SIMDJSON_PATH) then
+			errormsg("ERROR: Could not delete simdjson folder")
 			os.exit(1)
 			return
 		end
 	end
 
-	if not os.mkdir(NLOHMANN_PATH) then
-		errormsg("ERROR: Could not create nlohmann-json folder (2)")
+	if not os.mkdir(SIMDJSON_PATH) then
+		errormsg("ERROR: Could not create simdjson folder (2)")
 		os.exit(1)
 		return
 	end
 
 	-- Extract zip
-	if not os.extract_archive(archive_path, NLOHMANN_PATH, true) then
+	if not os.extract_archive(archive_path, SIMDJSON_PATH, true) then
 		errormsg("ERROR: Could not extract .zip")
 		os.exit(1)
 		return
 	end
 
-	-- Move all files from nlohmann-json*/* to ./
-	os.expanddir_wildcard(NLOHMANN_PATH.."nlohmann-json*", NLOHMANN_PATH)
+	-- Move all files from simdjson*/* to ./
+	os.expanddir_wildcard(SIMDJSON_PATH.."simdjson*", SIMDJSON_PATH)
 end
 
 newaction {
-	trigger = "install_nlohmannjson",
-	description = "Downloads and installs nlohmann-json",
+	trigger = "install_simdjson",
+	description = "Downloads and installs simdjson",
 
 	execute = function(...)
 		local should_upgrade = _ARGS[1] == "upgrade"
 		if should_upgrade then
-			-- nlohmann-json
-			local str_version = check_github_update("nlohmann-json", NLOHMANN_UPDATE, NLOHMANN_VERSION)
+			-- simdjson
+			local str_version = check_github_update("simdjson", SIMDJSON_UPDATE, SIMDJSON_VERSION)
 			if str_version then
-				NLOHMANN_VERSION = str_version
-				NLOHMANN_HASH = ""
+				SIMDJSON_VERSION = str_version
+				SIMDJSON_HASH = ""
 			end
 		end
 
@@ -158,4 +158,4 @@ newaction {
 	end
 }
 
-return premake.modules.install_nlohmannjson
+return premake.modules.install_simdjson
