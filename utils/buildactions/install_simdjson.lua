@@ -64,7 +64,7 @@ local function check_github_update(name, url, version)
 	return meta["tag_name"]
 end
 
-local function check_nlohmann(should_upgrade)
+local function check_simdjson(should_upgrade)
 	local has_SIMDJSON_dir = os.isdir(SIMDJSON_PATH)
 
 	-- Check file hash
@@ -154,7 +154,7 @@ newaction {
 		if os.host() ~= "windows" and not should_upgrade then
 			return
 		end
-		check_nlohmann(should_upgrade)
+		check_simdjson(should_upgrade)
 	end
 }
 
