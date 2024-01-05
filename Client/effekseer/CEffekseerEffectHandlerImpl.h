@@ -16,6 +16,8 @@ public:
     void  GetRotation(CVector& vecPosition) override;
     void  SetPosition(const CVector& vecPosition) override;
     void  SetRotation(const CVector& vecRotation) override;
+    void  GetMatrix(CMatrix& matrix) override;
+    void  SetMatrix(const CMatrix& matrix) override;
     void  SetScale(const CVector& vecScale) override;
     void  StopEffect() override;
     void  StopRoot() override;

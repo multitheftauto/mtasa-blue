@@ -11,8 +11,9 @@ project "Effekseer-vendor"
 		"effekseer-submodule/Dev/Cpp/Effekseer",
 		"effekseer-submodule/Dev/Cpp/EffekseerRendererCommon",
 		"effekseer-submodule/Dev/Cpp/EffekseerRendererDX9",
+		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler",
 		"effekseer-submodule/Dev/Cpp/",
-		"../libpng"
+		"../libpng",
 	}
 
 	vpaths {
@@ -34,6 +35,8 @@ project "Effekseer-vendor"
 		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/Common/**.h",
 		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/HLSLGenerator/**.cpp",
 		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/HLSLGenerator/**.h",
+		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/DirectX9/**.cpp",
+		"effekseer-submodule/Dev/Cpp/EffekseerMaterialCompiler/DirectX9/**.h",
 	}
 
 	filter "architecture:x64"

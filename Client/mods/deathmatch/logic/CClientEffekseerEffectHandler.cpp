@@ -25,15 +25,37 @@ CClientEffekseerEffectHandler::~CClientEffekseerEffectHandler()
     }
 }
 
+void CClientEffekseerEffectHandler::GetPosition(CVector& vecPosition) const
+{
+    m_pHandle->GetPosition(vecPosition);
+}
+
 void CClientEffekseerEffectHandler::SetPosition(const CVector& vecPosition)
 {
-    m_vecPosition = vecPosition;
     m_pHandle->SetPosition(vecPosition);
 }
 
-void CClientEffekseerEffectHandler::SetRotation(const CVector& vecRotation)
+void CClientEffekseerEffectHandler::GetRotationRadians(CVector& vecRotation) const
+{
+    vecRotation = m_vecRotation;
+}
+
+void CClientEffekseerEffectHandler::SetRotationRadians(const CVector& vecRotation)
 {
     m_pHandle->SetRotation(vecRotation);
+    m_vecRotation = vecRotation;
+}
+
+bool CClientEffekseerEffectHandler::GetMatrix(CMatrix& matrix) const
+{
+    m_pHandle->GetMatrix(matrix);
+    return true;
+}
+
+bool CClientEffekseerEffectHandler::SetMatrix(const CMatrix& matrix)
+{
+    m_pHandle->SetMatrix(matrix);
+    return true;
 }
 
 void CClientEffekseerEffectHandler::SetScale(const CVector& vecScale)

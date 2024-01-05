@@ -4,11 +4,13 @@
 
 void CEffekseerEffectHandlerImpl::GetPosition(CVector& vecPosition)
 {
+    auto pos = m_pInterface->GetLocation(m_Handle);
+    vecPosition = CVector(pos.X, pos.Y, pos.Z);
 }
 
-void CEffekseerEffectHandlerImpl::GetRotation(CVector& vecPosition)
+void CEffekseerEffectHandlerImpl::GetRotation(CVector& vecRotation)
 {
-
+    // TODO
 }
 
 void CEffekseerEffectHandlerImpl::SetPosition(const CVector& vecPosition)
@@ -16,9 +18,20 @@ void CEffekseerEffectHandlerImpl::SetPosition(const CVector& vecPosition)
     m_pInterface->SetLocation(m_Handle, ::Effekseer::Vector3D(vecPosition.fX, vecPosition.fY, vecPosition.fZ));
 }
 
+// ZXY rotation is used
 void CEffekseerEffectHandlerImpl::SetRotation(const CVector& vecRotation)
 {
     m_pInterface->SetRotation(m_Handle, vecRotation.fX, vecRotation.fY, vecRotation.fZ);
+}
+
+void CEffekseerEffectHandlerImpl::GetMatrix(CMatrix& matrix)
+{
+    matrix = reinterpret_cast<CMatrix&>(m_pInterface->GetMatrix(m_Handle));
+}
+
+void CEffekseerEffectHandlerImpl::SetMatrix(const CMatrix& matrix)
+{
+    m_pInterface->SetMatrix(m_Handle, reinterpret_cast<const Effekseer::Matrix43&>(matrix));
 }
 
 void CEffekseerEffectHandlerImpl::SetScale(const CVector& vecScale)
