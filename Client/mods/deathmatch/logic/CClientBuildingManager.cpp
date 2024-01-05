@@ -10,6 +10,8 @@
 
 #include "StdInc.h"
 
+constexpr float WORLD_DISTANCE_FROM_CENTER = 3000.0f;
+
 CClientBuildingManager::CClientBuildingManager(CClientManager* pManager)
 {
     // Init
@@ -80,5 +82,6 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
 
 bool CClientBuildingManager::IsValidPosition(const CVector& pos) noexcept
 {
-    return (pos.fX >- -3000.0f && pos.fX <= 3000.0f && pos.fY >= -3000.0f && pos.fY <= 3000.0f);
+    return (pos.fX >= -WORLD_DISTANCE_FROM_CENTER && pos.fX <= WORLD_DISTANCE_FROM_CENTER && pos.fY >= -WORLD_DISTANCE_FROM_CENTER &&
+            pos.fY <= WORLD_DISTANCE_FROM_CENTER);
 }
