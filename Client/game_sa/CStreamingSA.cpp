@@ -431,7 +431,7 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 
 bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
-    numBlocks &= ~1; // Make it be even [Otherwise it can't be split in half properly]
+    numBlocks += numBlocks % 2; // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
     
     // Check if the size is the same already
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
