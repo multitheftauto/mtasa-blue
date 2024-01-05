@@ -3,9 +3,13 @@ project "discord-rpc"
 	language "C++"
 	kind "StaticLib"
 
+	links {
+		"rapidjson"
+	}
+  
 	includedirs { 
 		"discord/include",
-		"discord/thirdparty/rapidjson/include"
+		"../rapidjson/include"
 	}
 
 	defines {
@@ -14,11 +18,14 @@ project "discord-rpc"
 
 	files {
 		"premake5.lua",
-		"discord/src/discord_rpc.cpp",
-		"discord/src/rpc_connection.cpp",
-		"discord/src/serialization.cpp",
-		"discord/src/connection_win.cpp",
-		"discord/src/discord_register_win.cpp",
+		"discord/src/*.h",
+    
+    "discord/src/connection_win.cpp",
+    "discord/src/discord_register_win.cpp",
+    "discord/src/rpc_connection.cpp",
+    "discord/src/serialization.cpp",
+    "discord/src/dllmain.cpp",
+    "discord/src/discord_rpc.cpp",
 	}
 
 	filter "architecture:not x86"
