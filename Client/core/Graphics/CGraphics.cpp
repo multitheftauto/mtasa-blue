@@ -2399,8 +2399,6 @@ bool CGraphics::CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuf
 
 void CGraphics::DrawEffekseerEffects()
 {
-    EnteringMTARenderZone();
-
     D3DMATRIX matrixProj, matrixView;
     auto      pDevice = g_pCore->GetGraphics()->GetDevice();
 
@@ -2408,8 +2406,6 @@ void CGraphics::DrawEffekseerEffects()
     pDevice->GetTransform(D3DTS_VIEW, &matrixView);
 
     g_pCore->GetEffekseer()->DrawEffects(matrixProj, matrixView);
-
-    LeavingMTARenderZone();
 }
 
 namespace

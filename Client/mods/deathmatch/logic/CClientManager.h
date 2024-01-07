@@ -44,7 +44,6 @@ class CClientManager;
 #include "CClientModelManager.h"
 #include "CClientIMGManager.h"
 #include "CClientEffekseerManager.h"
-#include <effekseer/CEffekseerManager.h>
 
 class CClientProjectileManager;
 class CClientExplosionManager;

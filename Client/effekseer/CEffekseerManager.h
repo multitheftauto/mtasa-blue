@@ -13,10 +13,10 @@ class CEffekseerManager;
 
 #pragma once
 
-#include <effekseer/CEffekseerManager.h>
+#include <effekseer/CEffekseer.h>
 #include "EffekseerRendererDX9.h"
 
-class CEffekseerManager : public CEffekseerManagerInterface
+class CEffekseerManager : public CEffekseer
 {
 public:
     CEffekseerManager();

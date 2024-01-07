@@ -39,7 +39,7 @@ bool CClientEffekseerEffect::Load(const std::string &strPath)
 
     m_pEffect = g_pCore->GetEffekseer()->Create(strPath.c_str());
 
-    return (m_pEffect != nullptr) ? true : false;
+    return m_pEffect != nullptr;
 }
 
 CClientEffekseerEffectHandler* CClientEffekseerEffect::Play(const CVector& pos)
@@ -48,7 +48,6 @@ CClientEffekseerEffectHandler* CClientEffekseerEffect::Play(const CVector& pos)
 
     CClientEffekseerEffectHandler* pEffect = new CClientEffekseerEffectHandler(m_pManager, INVALID_ELEMENT_ID, handle);
     pEffect->SetParent(this);
-    m_Handles.push_back(pEffect);
 
     return pEffect;
 }

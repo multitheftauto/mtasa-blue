@@ -1033,7 +1033,7 @@ void CCore::InitGUI(IDirect3DDevice9* pDevice)
 
 void CCore::InitEffekseer(IDirect3DDevice9* pDevice)
 {
-    m_pEffekseer = InitModule<CEffekseerManagerInterface>(m_EffekseerModule, "Effekseer", "InitInterface", pDevice);
+    m_pEffekseer = InitModule<CEffekseer>(m_EffekseerModule, "Effekseer", "InitInterface", pDevice);
 }
 
 void CCore::CreateGUI()
@@ -2018,15 +2018,16 @@ void CCore::OnDeviceRestore()
 //
 void CCore::OnPreFxRender()
 {
-    CGraphics::GetSingleton().DrawEffekseerEffects();
-
-    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        return;    
-
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
-    CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
-    CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
+    // HasEffekseerEffects ???
+    CGraphics::GetSingleton().DrawEffekseerEffects();
+
+    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
+        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
+
+    if (CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
+        CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
 }

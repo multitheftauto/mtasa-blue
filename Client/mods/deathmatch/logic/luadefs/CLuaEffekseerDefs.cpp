@@ -2,11 +2,12 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Client/mods/deathmatch/logic/luadefs/CLuaFireDefs.cpp
+ *  FILE:        Client/mods/deathmatch/logic/luadefs/CLuaEffekseerDefs.cpp
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
+
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 

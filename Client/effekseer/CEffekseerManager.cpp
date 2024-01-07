@@ -14,6 +14,7 @@
 #include "CEffekseerManager.h"
 #include "CEffekseerEffectImpl.h"
 #include <codecvt>
+#include <chrono>
 
 #define EFK_MAX_PARTICLES 8000
 
@@ -43,6 +44,8 @@ CEffekseerEffect* CEffekseerManager::Create(const char* path)
 
 void CEffekseerManager::Remove(CEffekseerEffect* effect)
 {
+    // Effekseer types with Ref, such as Effekseer::ManagerRef and Effekseer::EffectRef, are managed by smart pointers.
+    // These are automatically released when there are no more variables using the object.
     delete static_cast<CEffekseerEffectImpl*>(effect);
 }
 
@@ -78,12 +81,22 @@ void CEffekseerManager::OnResetDevice()
     m_pRenderer->OnResetDevice();
 }
 
+constexpr float NANO = 1.0e-9f;
+static auto     lastFrame = std::chrono::steady_clock::now();
+
 void CEffekseerManager::DrawEffects(D3DMATRIX &matrixProj, D3DMATRIX &matrixView)
 {
     m_pRenderer->SetProjectionMatrix(reinterpret_cast<::Effekseer::Matrix44&>(matrixProj));
     m_pRenderer->SetCameraMatrix(reinterpret_cast<::Effekseer::Matrix44&>(matrixView));
 
-    m_pInterface->Update();
+    auto now = std::chrono::steady_clock::now();
+    float dt = ((now - lastFrame).count() * 60) * NANO;
+
+    lastFrame = now;
+
+    m_pRenderer->SetTime(now.time_since_epoch().count() * NANO);
+
+    m_pInterface->Update(dt);
 
     m_pRenderer->BeginRendering();
 

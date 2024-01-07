@@ -21,19 +21,16 @@ public:
     CClientEffekseerEffect(class CClientManager* pManager, ElementID ID);
     ~CClientEffekseerEffect();
 
-    void Unlink(){};
+    // CClientEntity interface
+    void              Unlink() override {};
+    eClientEntityType GetType() const override { return CCLIENTEFFEKSEERFX; }
+    void              GetPosition(CVector& vecPosition) const override {};
+    void              SetPosition(const CVector& vecPosition) override {};
+    //
 
-    eClientEntityType GetType() const { return CCLIENTEFFEKSEERFX; }
-    const CVector&    GetPosition() { return m_vecPosition; };
-    void              GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
-    void              SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
-    bool              Load(const std::string& strPat);
-
+    bool                           Load(const std::string& strPath);
     CClientEffekseerEffectHandler* Play(const CVector& vecPosition);
 
 private:
-    CVector               m_vecPosition;
-
-    std::list<CClientEffekseerEffectHandler*> m_Handles;
-    CEffekseerEffect*                         m_pEffect;
+    CEffekseerEffect* m_pEffect;
 };

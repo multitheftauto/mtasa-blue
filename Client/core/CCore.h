@@ -104,7 +104,7 @@ public:
     CWebCoreInterface*                 GetWebCore();
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
-    CEffekseerManagerInterface*        GetEffekseer() override { return m_pEffekseer; };
+    CEffekseer*                        GetEffekseer() override { return m_pEffekseer; };
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -342,7 +342,7 @@ private:
     CNet*         m_pNet;
     CMultiplayer* m_pMultiplayer;
     CGUI*         m_pGUI;
-    CEffekseerManagerInterface* m_pEffekseer;
+    CEffekseer*   m_pEffekseer;
 
     // Logger utility interface.
     CConsoleLogger* m_pConsoleLogger;
