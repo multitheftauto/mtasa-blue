@@ -24,6 +24,7 @@ CDiscordRichPresence::CDiscordRichPresence() : m_uiDiscordAppStart(0), m_uiDisco
     SetDefaultData();
 
     m_strDiscordAppState.clear();
+    m_strDiscordCustomResourceName.clear();
     m_bConnected = false;
 }
 
@@ -35,6 +36,7 @@ CDiscordRichPresence::~CDiscordRichPresence()
 
 void CDiscordRichPresence::InitializeDiscord()
 {
+    std::lock_guard<std::mutex> lock(m_threadSafetyMutex);
     DiscordEventHandlers handlers;
     memset(&handlers, 0, sizeof(handlers));
 
@@ -72,6 +74,7 @@ void CDiscordRichPresence::SetDefaultData()
     m_strDiscordAppAssetSmallText = DEFAULT_APP_ASSET_SMALL_TEXT;
 
     m_strDiscordAppCurrentId = DEFAULT_APP_ID;
+    m_strDiscordCustomResourceName.clear();
     m_strDiscordAppCustomDetails.clear();
     m_strDiscordAppCustomState.clear();
 
@@ -91,12 +94,19 @@ void CDiscordRichPresence::SetDefaultData()
 
 void CDiscordRichPresence::UpdatePresence()
 {
+    if (!m_bDiscordRPCEnabled)
+        return;
+
     // run callbacks
     Discord_RunCallbacks();
 
+    if (!m_bConnected)
+        return;
+
     if (!m_bUpdateRichPresence)
         return;
-    
+
+    std::lock_guard<std::mutex> lock(m_threadSafetyMutex);
     DiscordRichPresence discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
 
@@ -113,7 +123,7 @@ void CDiscordRichPresence::UpdatePresence()
     discordPresence.endTimestamp = m_uiDiscordAppEnd;
     discordPresence.instance = 0;
 
-    DiscordButton buttons[2];
+    DiscordButton buttons[2]{0};
     if (m_aButtons)
     {
         buttons[0].label = std::get<0>(*m_aButtons).first.c_str();
@@ -225,7 +235,7 @@ bool CDiscordRichPresence::ResetDiscordData()
     return true;
 }
 
-bool CDiscordRichPresence::SetApplicationID(const char* szAppID)
+bool CDiscordRichPresence::SetApplicationID(const char* szResourceName, const char* szAppID)
 {
     m_strDiscordAppCurrentId = (szAppID && *szAppID) ? szAppID : DEFAULT_APP_ID;
 
@@ -234,6 +244,10 @@ bool CDiscordRichPresence::SetApplicationID(const char* szAppID)
         RestartDiscord();
         m_bUpdateRichPresence = true;
     }
+
+    if (*szResourceName)
+        m_strDiscordCustomResourceName = szResourceName;
+
     return true;
 }
 
@@ -252,16 +266,6 @@ bool CDiscordRichPresence::SetDiscordRPCEnabled(bool bEnabled)
     return true;
 }
 
-bool CDiscordRichPresence::IsDiscordRPCEnabled() const
-{
-    return m_bDiscordRPCEnabled;
-}
-
-bool CDiscordRichPresence::IsDiscordCustomDetailsDisallowed() const
-{
-    return m_bDisallowCustomDetails;
-}
-
 void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax, bool bCustom)
 {
     if (bCustom)
@@ -276,6 +280,20 @@ void CDiscordRichPresence::SetPresencePartySize(int iSize, int iMax, bool bCusto
     }
 }
 
+void CDiscordRichPresence::SetDiscordUserID(const std::string& strUserID)
+{
+    if (CVARS_GET_VALUE<bool>("discord_rpc_share_data"))
+        m_strDiscordUserID = strUserID;
+}
+
+std::string CDiscordRichPresence::GetDiscordUserID() const
+{
+    if (CVARS_GET_VALUE<bool>("discord_rpc_share_data"))
+        return m_strDiscordUserID;
+
+    return {};
+};
+
 #ifdef DISCORD_DISABLE_IO_THREAD
 void CDiscordRichPresence::UpdatePresenceConnection()
 {
@@ -286,7 +304,10 @@ void CDiscordRichPresence::UpdatePresenceConnection()
 void CDiscordRichPresence::HandleDiscordReady(const DiscordUser* pDiscordUser)
 {
     if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+    {
         discord->SetDiscordClientConnected(true);
+        discord->SetDiscordUserID(pDiscordUser->userId);
+    }
 }
 
 void CDiscordRichPresence::HandleDiscordDisconnected(int iErrorCode, const char* szMessage)
@@ -294,15 +315,13 @@ void CDiscordRichPresence::HandleDiscordDisconnected(int iErrorCode, const char*
     WriteDebugEvent(SString("[DISCORD] Disconnected %s (error #%d)", szMessage, iErrorCode));
 
     if (const auto discord = g_pCore->GetDiscord(); discord)
+    {
+        discord->SetDiscordUserID("");
         discord->SetDiscordClientConnected(false);
+    }
 }
 
 void CDiscordRichPresence::HandleDiscordError(int iErrorCode, const char* szMessage)
 {
     WriteDebugEvent(SString("[DISCORD] Error: %s (error #%d)", szMessage, iErrorCode));
-}
-
-bool CDiscordRichPresence::IsDiscordClientConnected() const
-{
-    return m_bConnected;
 }

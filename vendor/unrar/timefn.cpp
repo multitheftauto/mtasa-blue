@@ -183,8 +183,7 @@ void RarTime::SetUnix(time_t ut)
 // Get the high precision Unix time in nanoseconds since 01-01-1970.
 uint64 RarTime::GetUnixNS()
 {
-  // 11644473600000000000 - number of ns between 01-01-1601 and 01-01-1970.
-  uint64 ushift=INT32TO64(0xA1997B0B,0x4C6A0000);
+  const uint64 ushift=11644473600000000000ULL; // ns between 01-01-1601 and 01-01-1970.
   return itime*(1000000000/TICKS_PER_SECOND)-ushift;
 }
 
@@ -192,8 +191,7 @@ uint64 RarTime::GetUnixNS()
 // Set the high precision Unix time in nanoseconds since 01-01-1970.
 void RarTime::SetUnixNS(uint64 ns)
 {
-  // 11644473600000000000 - number of ns between 01-01-1601 and 01-01-1970.
-  uint64 ushift=INT32TO64(0xA1997B0B,0x4C6A0000);
+  const uint64 ushift=11644473600000000000ULL; // ns between 01-01-1601 and 01-01-1970.
   itime=(ns+ushift)/(1000000000/TICKS_PER_SECOND);
 }
 

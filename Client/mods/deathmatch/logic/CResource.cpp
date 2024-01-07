@@ -364,12 +364,15 @@ void CResource::Stop()
 
     // When a custom application is used - reset discord stuff
     const auto discord = g_pCore->GetDiscord();
-    if (discord && discord->IsDiscordRPCEnabled() && !discord->IsDiscordCustomDetailsDisallowed())
+    if (discord && !discord->IsDiscordCustomDetailsDisallowed() && discord->GetDiscordResourceName() == m_strResourceName)
     {
-        discord->ResetDiscordData();
-        discord->SetPresenceState(_("In-game"), false);
-        discord->SetPresenceStartTimestamp(time(nullptr));
-        discord->UpdatePresence();
+        if (discord->IsDiscordRPCEnabled())
+        {
+            discord->ResetDiscordData();
+            discord->SetPresenceState(_("In-game"), false);
+            discord->SetPresenceStartTimestamp(time(nullptr));
+            discord->UpdatePresence();
+        }
     }
 }
 

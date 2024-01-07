@@ -25,7 +25,7 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresencePartySize", ArgumentParser<SetPartySize>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
         {"isDiscordRichPresenceConnected", ArgumentParser <IsDiscordRPCConnected>},
-
+        {"getDiscordRichPresenceUserID", ArgumentParser<GetDiscordUserID>},
     };
 
     // Add functions
@@ -91,7 +91,7 @@ bool CLuaDiscordDefs::SetState(std::string strState)
     return true;
 }
 
-bool CLuaDiscordDefs::SetAppID(std::string strAppID)
+bool CLuaDiscordDefs::SetAppID(lua_State* luaVM, std::string strAppID)
 {
     int appIDLength = strAppID.length();
 
@@ -100,7 +100,16 @@ bool CLuaDiscordDefs::SetAppID(std::string strAppID)
 
     auto discord = g_pCore->GetDiscord();
 
-    if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetApplicationID(strAppID.c_str()))
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    const char* resourceName = "";
+    if (pLuaMain)
+    {
+        CResource* pResource = pLuaMain->GetResource();
+        if (pResource)
+            resourceName = pResource->GetName();
+    }
+
+    if (!discord || !discord->IsDiscordRPCEnabled() || !discord->SetApplicationID(resourceName, strAppID.c_str()))
         return false;
 
     return true;
@@ -256,4 +265,14 @@ bool CLuaDiscordDefs::IsDiscordRPCConnected()
         return false;
 
     return discord->IsDiscordClientConnected();
+}
+
+std::string CLuaDiscordDefs::GetDiscordUserID()
+{
+    auto discord = g_pCore->GetDiscord();
+
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return {};
+
+    return discord->GetDiscordUserID();
 }
