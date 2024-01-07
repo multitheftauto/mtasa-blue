@@ -19,16 +19,18 @@ extern "C"
 #include "CLuaArgument.h"
 #include <vector>
 #include "../common/CBitStream.h"
-#include "json.h"
 #include "CLuaFunctionRef.h"
 
-// prevent error #2039 _snprinft
-#if defined(_MSC_VER) && (_MSC_VER >= 1430 && _MSC_VER < 2000)
-    #define _snprintf snprintf
-#endif
-#include "nlohmann/json.hpp"
+// temp fix #c2039
+#define _snprintf snprintf
 
-using nljson = nlohmann::json;
+// json parser
+#include "simdjson.h"
+
+// json writer
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 inline void LUA_CHECKSTACK(lua_State* L, int size)
 {
@@ -46,6 +48,7 @@ class CResource;
 class CTextDisplay;
 class CTextItem;
 class CDbJobData;
+class CLuaArgument;
 
 class CLuaArguments;
 
@@ -95,13 +98,7 @@ public:
     void Pop();
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    bool         ReadFromJSONString(const char* szJSON);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
-    bool         WriteToJSONString(std::string& strJSON, bool bSerialize = false, int flags = JSON_C_TO_STRING_PLAIN);
-    json_object* WriteTableToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
-    json_object* WriteToJSONArray(bool bSerialize);
-    bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    bool         ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
     unsigned int                               Count() const { return static_cast<unsigned int>(m_Arguments.size()); };
     std::vector<CLuaArgument*>::const_iterator IterBegin() const { return m_Arguments.begin(); };
@@ -109,13 +106,23 @@ public:
 
     bool IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
 
-    // nlohmann-json
-    bool CLuaArguments::nljson_WriteToJSONString(std::string& strJSON, bool bSerialize = false, int indent = 0, uchar indentChar = 32);
-    nljson CLuaArguments::nljson_WriteToJSONArray(bool bSerialize);
-    nljson CLuaArguments::nljson_WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables);
-    bool   CLuaArguments::nljson_ReadFromJSONString(const char* szJSON);
-    bool   CLuaArguments::nljson_ReadFromJSONArray(nljson* arrayObject, std::vector<CLuaArguments*>* pKnownTables);
-    bool   CLuaArguments::nljson_ReadFromJSONObject(nljson* object, std::vector<CLuaArguments*>* pKnownTables);
+    // json parse
+    bool        ReadJSONString(const char* szJSON);
+    bool        ReadJSONArray(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool        ReadJSONObject(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables = NULL);
+
+    // json writer
+    bool        SerializeToJSONString(rapidjson::StringBuffer* buffer, bool bSerialize = false, int flags = JSON_PRETTIFY_SPACES, bool bBackwardsCompatibility = false);
+
+    template    <typename Writer>
+    void        SerializeAsJSONObject(Writer* writer, bool bSerialize = false);
+
+    template    <typename Writer>
+    void        SerializeAsJSONArray(Writer* writer, bool bSerialize = false);
+
+    template    <typename Writer>
+    void        ConvertTableToJSON(Writer* writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
+
 
 private:
     std::vector<CLuaArgument*> m_Arguments;
