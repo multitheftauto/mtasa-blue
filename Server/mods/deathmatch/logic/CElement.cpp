@@ -499,7 +499,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
 
         // Make a lua argument from it and set the content
         CLuaArguments args;
-        if (!args.ReadFromJSONString(pAttribute->GetValue().c_str()))
+        if (!args.ReadJSONString(pAttribute->GetValue().c_str()))
             args.PushString(pAttribute->GetValue().c_str());
 
         // Don't trigger onElementDataChanged event

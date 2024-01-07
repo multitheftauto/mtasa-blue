@@ -156,7 +156,10 @@ CRemoteCall::CRemoteCall(const char* szServerHost, const char* szResourceName, c
     m_VM = luaMain;
     m_iFunction = iFunction;
 
-    arguments->WriteToJSONString(m_options.strPostData, true);
+    rapidjson::StringBuffer buffer;
+    arguments->SerializeToJSONString(&buffer, true, JSON_PRETTIFY_NONE);
+
+    m_options.strPostData = buffer.GetString();
     m_options.bPostBinary = false;
     m_options.bIsLegacy = true;
     m_options.requestHeaders["Content-Type"] = "application/json";
@@ -175,7 +178,10 @@ CRemoteCall::CRemoteCall(const char* szURL, CLuaArguments* arguments, CLuaMain* 
     m_VM = luaMain;
     m_iFunction = iFunction;
 
-    arguments->WriteToJSONString(m_options.strPostData, true);
+    rapidjson::StringBuffer buffer;
+    arguments->SerializeToJSONString(&buffer, true, JSON_PRETTIFY_NONE);
+
+    m_options.strPostData = buffer.GetString();
     m_options.bPostBinary = false;
     m_options.bIsLegacy = true;
     m_options.requestHeaders["Content-Type"] = "application/json";
@@ -233,8 +239,12 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
             if (pCall->IsFetch())
                 arguments.PushString(std::string(result.pData, result.dataSize));
             else
-                arguments.ReadFromJSONString(result.pData);
-            arguments.PushNumber(0);
+            {
+                // @todo: test
+                arguments.ReadJSONString(result.pData);
+
+                arguments.PushNumber(0);
+            }
         }
         else
         {

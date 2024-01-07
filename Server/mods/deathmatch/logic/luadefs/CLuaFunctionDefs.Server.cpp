@@ -186,10 +186,11 @@ int CLuaFunctionDefs::Set(lua_State* luaVM)
         if (pResource)
         {
             std::string strResourceName = pResource->GetName();
-            std::string strJSON;
-            Args.nljson_WriteToJSONString(strJSON); // Args.WriteToJSONString(strJSON);
+            rapidjson::StringBuffer buffer;
 
-            if (g_pGame->GetSettings()->Set(strResourceName.c_str(), strSetting.c_str(), strJSON.c_str()))
+            Args.SerializeToJSONString(&buffer, false, JSON_PRETTIFY_NONE);
+
+            if (g_pGame->GetSettings()->Set(strResourceName.c_str(), strSetting.c_str(), buffer.GetString()))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -260,7 +261,7 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
                     }
                     // We only have a single entry for a specific setting, so output a string
                     const std::string& strDataValue = pAttribute->GetValue();
-                    if (!Args.ReadFromJSONString(strDataValue.c_str()))
+                    if (!Args.ReadJSONString(strDataValue.c_str()))
                     {
                         // No valid JSON? Parse as plain text
                         Args.PushString(strDataValue);
@@ -285,13 +286,15 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
                         CXMLAttributes& attributes = pSubNode->GetAttributes();
                         Args.PushString(attributes.Find("name")->GetValue());
                         const std::string& strDataValue = attributes.Find("value")->GetValue();
-                        if (!Args.ReadFromJSONString(strDataValue.c_str()))
+                        if (!Args.ReadJSONString(strDataValue.c_str()))
                         {
                             Args.PushString(strDataValue);
                         }
                     }
                     // Push a table and return
-                    Args.PushAsTable(luaVM);
+                    // @todo: test that
+                    Args.PushArguments(luaVM); // Args.PushAsTable(luaVM);
+                    uiArgCount = Args.Count();
                 }
 
                 // Check if we have to delete the node
