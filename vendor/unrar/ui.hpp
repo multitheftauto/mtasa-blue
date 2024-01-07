@@ -19,8 +19,8 @@ enum UIMESSAGE_CODE {
   UIERROR_SUBHEADERBROKEN, UIERROR_SUBHEADERUNKNOWN,
   UIERROR_SUBHEADERDATABROKEN, UIERROR_RRDAMAGED, UIERROR_UNKNOWNMETHOD,
   UIERROR_UNKNOWNENCMETHOD, UIERROR_RENAMING, UIERROR_NEWERRAR,
-  UIERROR_NOTSFX, UIERROR_OLDTOSFX,
-  UIERROR_WRONGSFXVER, UIERROR_HEADENCMISMATCH, UIERROR_DICTOUTMEM,
+  UIERROR_NOTSFX, UIERROR_OLDTOSFX,UIERROR_WRONGSFXVER, 
+  UIERROR_HEADENCMISMATCH, UIERROR_DICTOUTMEM,UIERROR_EXTRDICTOUTMEM,
   UIERROR_USESMALLERDICT, UIERROR_MODIFYUNKNOWN, UIERROR_MODIFYOLD,
   UIERROR_MODIFYLOCKED, UIERROR_MODIFYVOLUME, UIERROR_NOTVOLUME,
   UIERROR_NOTFIRSTVOLUME, UIERROR_RECVOLLIMIT, UIERROR_RECVOLDIFFSETS,
@@ -76,19 +76,25 @@ enum UIASKREP_RESULT {
   UIASKREP_R_RENAME,UIASKREP_R_RENAMEAUTO,UIASKREP_R_CANCEL,UIASKREP_R_UNUSED
 };
 
-UIASKREP_RESULT uiAskReplace(wchar *Name,size_t MaxNameSize,int64 FileSize,RarTime *FileTime,uint Flags);
-UIASKREP_RESULT uiAskReplaceEx(CommandData *Cmd,wchar *Name,size_t MaxNameSize,int64 FileSize,RarTime *FileTime,uint Flags);
+UIASKREP_RESULT uiAskReplace(std::wstring &Name,int64 FileSize,RarTime *FileTime,uint Flags);
+UIASKREP_RESULT uiAskReplaceEx(CommandData *Cmd,std::wstring &Name,int64 FileSize,RarTime *FileTime,uint Flags);
 
 void uiInit(SOUND_NOTIFY_MODE Sound);
 
 
-void uiStartArchiveExtract(bool Extract,const wchar *ArcName);
-bool uiStartFileExtract(const wchar *FileName,bool Extract,bool Test,bool Skip);
+void uiStartArchiveExtract(bool Extract,const std::wstring &ArcName);
+bool uiStartFileExtract(const std::wstring &FileName,bool Extract,bool Test,bool Skip);
 void uiExtractProgress(int64 CurFileSize,int64 TotalFileSize,int64 CurSize,int64 TotalSize);
 void uiProcessProgress(const char *Command,int64 CurSize,int64 TotalSize);
 
-enum UIPASSWORD_TYPE {UIPASSWORD_GLOBAL,UIPASSWORD_FILE,UIPASSWORD_ARCHIVE};
-bool uiGetPassword(UIPASSWORD_TYPE Type,const wchar *FileName,SecPassword *Password,CheckPassword *CheckPwd);
+enum UIPASSWORD_TYPE
+{
+  UIPASSWORD_GLOBAL,  // For -p, -hp without parameter or Ctrl+P in WinRAR.
+  UIPASSWORD_FILE,    // Extracting an encrypted file.
+  UIPASSWORD_ARCHIVE, // Extracting or opening an encrypted header archive.
+};
+
+bool uiGetPassword(UIPASSWORD_TYPE Type,const std::wstring &FileName,SecPassword *Password,CheckPassword *CheckPwd);
 bool uiIsGlobalPasswordSet();
 
 enum UIALARM_TYPE {UIALARM_ERROR, UIALARM_INFO, UIALARM_QUESTION};
@@ -96,11 +102,13 @@ void uiAlarm(UIALARM_TYPE Type);
 
 void uiEolAfterMsg();
 
-bool uiAskNextVolume(wchar *VolName,size_t MaxSize);
+bool uiAskNextVolume(std::wstring &VolName);
 #if !defined(SILENT) && !defined(SFX_MODULE)
-void uiAskRepeatRead(const wchar *FileName,bool &Ignore,bool &All,bool &Retry,bool &Quit);
+void uiAskRepeatRead(const std::wstring &FileName,bool &Ignore,bool &All,bool &Retry,bool &Quit);
 #endif
-bool uiAskRepeatWrite(const wchar *FileName,bool DiskFull);
+bool uiAskRepeatWrite(const std::wstring &FileName,bool DiskFull);
+
+bool uiDictLimit(CommandData *Cmd,const std::wstring &FileName,uint64 DictSize,uint64 MaxDictSize);
 
 #ifndef SFX_MODULE
 const wchar *uiGetMonthName(int Month);
@@ -131,6 +139,12 @@ class uiMsgStore
         Str[StrSize++]=s;
       return *this;
     }
+    uiMsgStore& operator << (const std::wstring &s)
+    {
+      if (StrSize<MAX_MSG)
+        Str[StrSize++]=s.c_str();
+      return *this;
+    }
     uiMsgStore& operator << (uint n)
     {
       if (NumSize<MAX_MSG)
@@ -141,9 +155,6 @@ class uiMsgStore
     void Msg();
 };
 
-
-// Templates recognize usual NULL as integer, not wchar*.
-#define UINULL ((wchar *)NULL)
 
 inline void uiMsgBase(uiMsgStore &Store)
 {
