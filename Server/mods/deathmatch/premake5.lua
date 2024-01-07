@@ -26,8 +26,8 @@ project "Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
-      "../../../vendor/simdjson/singleheader",
-      "../../../vendor/rapidjson/include",
+			"../../../vendor/simdjson/singleheader",
+			"../../../vendor/rapidjson/include",
 			"logic",
 			"utils",
 			"."
