@@ -1123,7 +1123,7 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
         case CCLIENTEFFEKSEERFXHANDLER:
         {
             CClientEffekseerEffectHandler& Effect = static_cast<CClientEffekseerEffectHandler&>(Entity);
-            Effect.SetRotation(vecRotation/360 * 2 * PI);
+            Effect.SetRotationDegrees(vecRotation);
             break;
         }
         default:
