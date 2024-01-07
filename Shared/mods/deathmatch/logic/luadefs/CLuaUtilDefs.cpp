@@ -80,6 +80,21 @@ void CLuaUtilDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
+int CLuaUtilDefs::InitJsonTableAsFunction(lua_State* luaVM)
+{
+    // this allows to use
+    // json.decode(), json.encode()
+    constexpr static const luaL_reg methods[]{
+        {"decode", fromJSON},
+        {"encode", jsonEncode},
+        {NULL, NULL}
+    };
+
+    lua_newtable(luaVM);
+    luaL_register(luaVM, "json", methods);
+    return 1;
+}
+
 int CLuaUtilDefs::DisabledFunction(lua_State* luaVM)
 {
     m_pScriptDebugging->LogError(luaVM, "Unsafe function was called.");
@@ -440,76 +455,6 @@ int CLuaUtilDefs::InterpolateBetween(lua_State* luaVM)
     return 3;
 }
 
-int CLuaUtilDefs::toJSON(lua_State* luaVM)
-{
-    // Got a string argument?
-    CScriptArgReader argStream(luaVM);
-
-    if (!argStream.NextIsNil())
-    {
-        int jsonFlags = 0;
-        // Read the argument
-        CLuaArguments JSON;
-        JSON.ReadArgument(luaVM, 1);
-        argStream.Skip(1);
-
-        bool bCompact;
-        argStream.ReadBool(bCompact, false);
-        jsonFlags |= bCompact ? JSON_C_TO_STRING_PLAIN : JSON_C_TO_STRING_SPACED;
-
-        eJSONPrettyType jsonPrettyType;
-        argStream.ReadEnumString(jsonPrettyType, JSONPRETTY_NONE);
-        if (jsonPrettyType != JSONPRETTY_NONE)
-            jsonFlags |= jsonPrettyType;
-
-        if (!argStream.HasErrors())
-        {
-            // Convert it to a JSON string
-            std::string strJSON;
-            if (JSON.WriteToJSONString(strJSON, false, jsonFlags))
-            {
-                // Return the JSON string
-                lua_pushstring(luaVM, strJSON.c_str());
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    }
-    else
-        m_pScriptDebugging->LogBadType(luaVM);
-
-    // Failed
-    lua_pushnil(luaVM);
-    return 1;
-}
-
-int CLuaUtilDefs::fromJSON(lua_State* luaVM)
-{
-    // Got a string argument?
-    SString          strJson = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strJson);
-
-    if (!argStream.HasErrors())
-    {
-        // Read it into lua arguments
-        CLuaArguments Converted;
-        if (Converted.ReadFromJSONString(strJson))
-        {
-            // Return it as data
-            Converted.PushArguments(luaVM);
-            return Converted.Count();
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushnil(luaVM);
-    return 1;
-}
-
 int CLuaUtilDefs::PregFind(lua_State* luaVM)
 {
     //  bool pregFind ( string base, string pattern, uint/string flags = 0 )
@@ -736,5 +681,114 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     // Make it black so funcs dont break
     unsigned long ulColor = COLOR_RGBA(0, 0, 0, 255);
     lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
+    return 1;
+}
+
+int CLuaUtilDefs::jsonEncode(lua_State* luaVM)
+{
+    // Got a string argument?
+    CScriptArgReader argStream(luaVM);
+
+    if (!argStream.NextIsNil())
+    {
+        // Read the argument
+        CLuaArguments writer;
+        writer.ReadArgument(luaVM, 1);
+        argStream.Skip(1);
+
+        bool bPretty;
+        argStream.ReadBool(bPretty, false);
+
+        if (!argStream.HasErrors())
+        {
+            // Convert it to a JSON string
+            rapidjson::StringBuffer buffer;
+            if (writer.SerializeToJSONString(&buffer, false, bPretty ? JSON_PRETTIFY_SPACES : JSON_PRETTIFY_NONE))
+            {
+                // Return the JSON string
+                lua_pushlstring(luaVM, buffer.GetString(), buffer.GetSize());
+                return 1;
+            }
+            else
+                lua_pushnil(luaVM);
+        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+    else
+        m_pScriptDebugging->LogBadType(luaVM);
+
+    return 1;
+}
+
+int CLuaUtilDefs::toJSON(lua_State* luaVM) // this func has backwards compatibility
+{
+    // Got a string argument?
+    CScriptArgReader argStream(luaVM);
+
+    if (!argStream.NextIsNil())
+    {
+        // Read the argument
+        CLuaArguments writer;
+        writer.ReadArgument(luaVM, 1);
+        argStream.Skip(1);
+
+        int jsonFlags = JSON_PRETTIFY_SPACES;
+
+        bool bCompact;
+        argStream.ReadBool(bCompact, false);
+
+        jsonFlags = bCompact ? JSON_PRETTIFY_NONE : JSON_PRETTIFY_SPACES;
+
+        eJSONPrettifyType prettifyType;
+        argStream.ReadEnumString(prettifyType, JSON_PRETTIFY_NONE);
+
+        if (prettifyType != JSON_PRETTIFY_NONE)
+            jsonFlags = prettifyType;
+        
+        if (!argStream.HasErrors())
+        {
+            // Convert it to a JSON string
+            rapidjson::StringBuffer buffer;
+            if (writer.SerializeToJSONString(&buffer, false, jsonFlags, true))
+            {
+                // Return the JSON string
+                lua_pushlstring(luaVM, buffer.GetString(), buffer.GetSize());
+                return 1;
+            }
+            else
+                lua_pushnil(luaVM);
+        }
+        else
+            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    }
+    else
+        m_pScriptDebugging->LogBadType(luaVM);
+
+    return 1;
+}
+
+int CLuaUtilDefs::fromJSON(lua_State* luaVM)
+{
+    // Got a string argument?
+    SString          strJson = "";
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strJson);
+
+    if (!argStream.HasErrors())
+    {
+        // Read it into lua arguments, otherwise push nil
+        CLuaArguments parser;
+        if (!parser.ReadJSONString(strJson))
+            lua_pushnil(luaVM);
+        else
+        {
+            parser.PushArguments(luaVM);
+            return parser.Count();
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     return 1;
 }
