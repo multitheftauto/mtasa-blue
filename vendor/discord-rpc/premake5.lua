@@ -8,6 +8,10 @@ project "discord-rpc"
 		"discord/thirdparty/rapidjson/include"
 	}
 
+	defines {
+		"DISCORD_DISABLE_IO_THREAD"
+	}
+
 	files {
 		"premake5.lua",
 		"discord/src/discord_rpc.cpp",

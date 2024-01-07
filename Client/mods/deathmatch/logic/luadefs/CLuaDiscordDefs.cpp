@@ -25,7 +25,7 @@ void CLuaDiscordDefs::LoadFunctions()
         {"setDiscordRichPresencePartySize", ArgumentParser<SetPartySize>},
         {"resetDiscordRichPresenceData", ArgumentParser<ResetData>},
         {"isDiscordRichPresenceConnected", ArgumentParser <IsDiscordRPCConnected>},
-
+        {"getDiscordRichPresenceUserID", ArgumentParser<GetDiscordUserID>},
     };
 
     // Add functions
@@ -265,4 +265,14 @@ bool CLuaDiscordDefs::IsDiscordRPCConnected()
         return false;
 
     return discord->IsDiscordClientConnected();
+}
+
+std::string CLuaDiscordDefs::GetDiscordUserID()
+{
+    auto discord = g_pCore->GetDiscord();
+
+    if (!discord || !discord->IsDiscordRPCEnabled())
+        return {};
+
+    return discord->GetDiscordUserID();
 }

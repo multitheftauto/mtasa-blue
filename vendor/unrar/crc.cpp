@@ -64,7 +64,8 @@ uint CRC32(uint StartCRC,const void *Addr,size_t Size)
   byte *Data=(byte *)Addr;
 
 #ifdef USE_SLICING
-  // Align Data to 8 for better performance.
+  // Align Data to 8 for better performance and to avoid ALLOW_MISALIGNED
+  // check below.
   for (;Size>0 && ((size_t)Data & 7);Size--,Data++)
     StartCRC=crc_tables[0][(byte)(StartCRC^Data[0])]^(StartCRC>>8);
 
