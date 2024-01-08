@@ -16,7 +16,7 @@
 #include <codecvt>
 #include <chrono>
 
-#define EFK_MAX_PARTICLES 8000
+constexpr int32_t EFK_MAX_PARTICLES = 8000;
 
 CEffekseerManager::CEffekseerManager()
 {
