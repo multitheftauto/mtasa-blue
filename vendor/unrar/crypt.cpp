@@ -111,7 +111,7 @@ void GetRnd(byte *RndBuf,size_t BufSize)
   HCRYPTPROV hProvider = 0;
   if (CryptAcquireContext(&hProvider, 0, 0, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT | CRYPT_SILENT))
   {
-    Success=CryptGenRandom(hProvider, (DWORD)BufSize, RndBuf) == TRUE;
+    Success=CryptGenRandom(hProvider, (DWORD)BufSize, RndBuf) != FALSE;
     CryptReleaseContext(hProvider, 0);
   }
 #elif defined(_UNIX)

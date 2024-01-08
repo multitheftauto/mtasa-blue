@@ -2156,7 +2156,7 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
             // Save backbuffer pixels
             if (!m_pTempBackBufferData)
                 m_pTempBackBufferData =
-                    CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget(BackBufferDesc.Width, BackBufferDesc.Height, true, true);
+                    CGraphics::GetSingleton().GetRenderItemManager()->CreateRenderTarget(BackBufferDesc.Width, BackBufferDesc.Height, false, true, 0, true);
             if (!m_pTempBackBufferData)
                 break;
             hr = m_pDevice->StretchRect(pD3DBackBufferSurface, NULL, m_pTempBackBufferData->m_pD3DRenderTargetSurface, NULL, D3DTEXF_POINT);

@@ -21,6 +21,7 @@ project "Client Core"
 			"../../vendor/sparsehash/src/",
 			"../../vendor/detours/4.0.1/src",
 			"../../vendor/tracy/public/"
+			"../../vendor/discord-rpc/discord/include",
 		}
 
 	pchheader "StdInc.h"
@@ -57,7 +58,7 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext",
+		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "discord-rpc",
 	}
 
 	defines {

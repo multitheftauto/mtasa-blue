@@ -2,8 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/COffsets.h
- *  PURPOSE:     Header file for game variable offsets class
+ *  FILE:        game_sa/CCollisionSA.h
+ *  PURPOSE:     Header file for `CCollision` - collision detection related functions
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -11,13 +11,9 @@
 
 #pragma once
 
-class COffsets
-{
-public:
-    static void Initialize10EU();
-    static void Initialize10US();
-    static void Initialize11();
+#include "game/CCollision.h"
 
-private:
-    static void InitializeCommon10();
+class CCollisionSA : CCollision {
+public:
+    bool TestLineSphere(const CColLineSA& line, const CColSphereSA& sphere) const override;
 };

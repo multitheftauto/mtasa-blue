@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 class CCore;
+class CDiscordRichPresence;
+class CDiscordInterface;
 
 #pragma once
 
@@ -43,30 +45,30 @@ class CCore;
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
-#define BLUE_VERSION_STRING     "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG
-#define BLUE_COPYRIGHT_STRING   "Copyright (C) 2003 - %BUILD_YEAR% Multi Theft Auto"
+#define BLUE_VERSION_STRING   "Multi Theft Auto v" MTA_DM_BUILDTAG_LONG
+#define BLUE_COPYRIGHT_STRING "Copyright (C) 2003 - %BUILD_YEAR% Multi Theft Auto"
 
 // Configuration file path (relative to MTA install directory)
-#define MTA_CONFIG_PATH             "mta/config/coreconfig.xml"
-#define MTA_SERVER_CACHE_PATH       "mta/config/servercache.xml"
-#define MTA_CONSOLE_LOG_PATH        "mta/logs/console.log"
-#define MTA_CONSOLE_INPUT_LOG_PATH  "mta/logs/console-input.log"
-#define CONFIG_ROOT                 "mainconfig"
-#define CONFIG_NODE_CVARS           "settings"                  // cvars node
-#define CONFIG_NODE_KEYBINDS        "binds"                     // keybinds node
-#define CONFIG_NODE_JOYPAD          "joypad"
-#define CONFIG_NODE_UPDATER         "updater"
-#define CONFIG_NODE_SERVER_INT      "internet_servers"          // backup of last successful master server list query
-#define CONFIG_NODE_SERVER_FAV      "favourite_servers"         // favourite servers list node
-#define CONFIG_NODE_SERVER_REC      "recently_played_servers"   // recently played servers list node
-#define CONFIG_NODE_SERVER_OPTIONS  "serverbrowser_options"     // saved options for the server browser
-#define CONFIG_NODE_SERVER_SAVED    "server_passwords"    // This contains saved passwords (as appose to save_server_passwords which is a setting)
-#define CONFIG_NODE_SERVER_HISTORY  "connect_history"
-#define CONFIG_INTERNET_LIST_TAG    "internet_server"
-#define CONFIG_FAVOURITE_LIST_TAG   "favourite_server"
-#define CONFIG_RECENT_LIST_TAG      "recently_played_server"
-#define CONFIG_HISTORY_LIST_TAG     "connected_server"
-#define IDT_TIMER1 1234
+#define MTA_CONFIG_PATH            "mta/config/coreconfig.xml"
+#define MTA_SERVER_CACHE_PATH      "mta/config/servercache.xml"
+#define MTA_CONSOLE_LOG_PATH       "mta/logs/console.log"
+#define MTA_CONSOLE_INPUT_LOG_PATH "mta/logs/console-input.log"
+#define CONFIG_ROOT                "mainconfig"
+#define CONFIG_NODE_CVARS          "settings"            // cvars node
+#define CONFIG_NODE_KEYBINDS       "binds"               // keybinds node
+#define CONFIG_NODE_JOYPAD         "joypad"
+#define CONFIG_NODE_UPDATER        "updater"
+#define CONFIG_NODE_SERVER_INT     "internet_servers"                   // backup of last successful master server list query
+#define CONFIG_NODE_SERVER_FAV     "favourite_servers"                  // favourite servers list node
+#define CONFIG_NODE_SERVER_REC     "recently_played_servers"            // recently played servers list node
+#define CONFIG_NODE_SERVER_OPTIONS "serverbrowser_options"              // saved options for the server browser
+#define CONFIG_NODE_SERVER_SAVED   "server_passwords"                   // This contains saved passwords (as appose to save_server_passwords which is a setting)
+#define CONFIG_NODE_SERVER_HISTORY "connect_history"
+#define CONFIG_INTERNET_LIST_TAG   "internet_server"
+#define CONFIG_FAVOURITE_LIST_TAG  "favourite_server"
+#define CONFIG_RECENT_LIST_TAG     "recently_played_server"
+#define CONFIG_HISTORY_LIST_TAG    "connected_server"
+#define IDT_TIMER1                 1234
 
 extern class CCore*         g_pCore;
 extern class CGraphics*     g_pGraphics;
@@ -82,25 +84,26 @@ public:
     ~CCore();
 
     // Subsystems (query)
-    eCoreVersion            GetVersion();
-    CConsoleInterface*      GetConsole();
-    CCommandsInterface*     GetCommands();
-    CConnectManager*        GetConnectManager() { return m_pConnectManager; };
-    CGame*                  GetGame();
-    CGUI*                   GetGUI();
-    CGraphicsInterface*     GetGraphics();
-    CModManagerInterface*   GetModManager();
-    CMultiplayer*           GetMultiplayer();
-    CNet*                   GetNetwork();
-    CXML*                   GetXML() { return m_pXML; };
-    CXMLNode*               GetConfig();
-    CClientVariables*       GetCVars() { return &m_ClientVariables; };
-    CKeyBindsInterface*     GetKeyBinds();
-    CMouseControl*          GetMouseControl() { return m_pMouseControl; };
-    CLocalGUI*              GetLocalGUI();
-    CLocalizationInterface* GetLocalization() { return g_pLocalization; };
-    CWebCoreInterface*      GetWebCore();
-    CTrayIconInterface*     GetTrayIcon() { return m_pTrayIcon; };
+    eCoreVersion                       GetVersion();
+    CConsoleInterface*                 GetConsole();
+    CCommandsInterface*                GetCommands();
+    CConnectManager*                   GetConnectManager() { return m_pConnectManager; };
+    CGame*                             GetGame();
+    CGUI*                              GetGUI();
+    CGraphicsInterface*                GetGraphics();
+    CModManagerInterface*              GetModManager();
+    CMultiplayer*                      GetMultiplayer();
+    CNet*                              GetNetwork();
+    CXML*                              GetXML() { return m_pXML; };
+    CXMLNode*                          GetConfig();
+    CClientVariables*                  GetCVars() { return &m_ClientVariables; };
+    CKeyBindsInterface*                GetKeyBinds();
+    CMouseControl*                     GetMouseControl() { return m_pMouseControl; };
+    CLocalGUI*                         GetLocalGUI();
+    CLocalizationInterface*            GetLocalization() { return g_pLocalization; };
+    CWebCoreInterface*                 GetWebCore();
+    CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
+    std::shared_ptr<CDiscordInterface> GetDiscord();
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -282,6 +285,10 @@ public:
     void   SetCustomStreamingMemory(size_t szMB);
     bool   IsUsingCustomStreamingMemorySize();
     size_t GetStreamingMemory();
+
+    const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
+    void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
+
 private:
     void ApplyCoreInitSettings();
 
@@ -296,10 +303,11 @@ private:
     CModelCacheManager* m_pModelCacheManager;
 
     // Instances (put new classes here!)
-    CXMLFile*          m_pConfigFile;
-    CClientVariables   m_ClientVariables;
-    CWebCoreInterface* m_pWebCore = nullptr;
-    CTrayIcon*         m_pTrayIcon;
+    CXMLFile*                             m_pConfigFile;
+    CClientVariables                      m_ClientVariables;
+    CWebCoreInterface*                    m_pWebCore = nullptr;
+    CTrayIcon*                            m_pTrayIcon;
+    std::shared_ptr<CDiscordRichPresence> m_pDiscordRichPresence;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;
@@ -365,25 +373,29 @@ private:
     EDiagnosticDebugType m_DiagnosticDebug;
 
     // Below 2 are used for the UI only
-    float                m_fMinStreamingMemory{};
-    float                m_fMaxStreamingMemory{};
+    float m_fMinStreamingMemory{};
+    float m_fMaxStreamingMemory{};
 
     // Custom streaming memory limit set by `engineStreamingSetMemorySize` - Reset on server connects (= set to 0), or by the scripter
     // `0` means "not set" [so the value should be ignored]
-    size_t               m_CustomStreamingMemoryLimitBytes{};
+    size_t m_CustomStreamingMemoryLimitBytes{};
 
-    bool                 m_bGettingIdleCallsFromMultiplayer;
-    bool                 m_bWindowsTimerEnabled;
-    bool                 m_bModulesLoaded;
-    int                  m_iDummyProgressValue;
-    HANDLE               m_DummyProgressTimerHandle;
-    SString              m_strDummyProgressType;
-    bool                 m_bDummyProgressUpdateAlways;
-    bool                 m_bIsRenderingGrass;
-    bool                 m_bFakeLagCommandEnabled;
+    bool    m_bGettingIdleCallsFromMultiplayer;
+    bool    m_bWindowsTimerEnabled;
+    bool    m_bModulesLoaded;
+    int     m_iDummyProgressValue;
+    HANDLE  m_DummyProgressTimerHandle;
+    SString m_strDummyProgressType;
+    bool    m_bDummyProgressUpdateAlways;
+    bool    m_bIsRenderingGrass;
+    bool    m_bFakeLagCommandEnabled;
+
+    SString m_strLastConnectedServerName{};
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
+
+    long long m_timeDiscordAppLastUpdate;
 };

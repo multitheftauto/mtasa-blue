@@ -561,7 +561,7 @@ public:
     static bool GetTime(unsigned char& ucHour, unsigned char& ucMin);
     static bool ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint, CClientEntity** pColEntity,
                                    const SLineOfSightFlags& flags = SLineOfSightFlags(), CEntity* pIgnoredEntity = NULL,
-                                   SLineOfSightBuildingResult* pBuildingResult = NULL);
+                                   SLineOfSightBuildingResult* pBuildingResult = NULL, SProcessLineOfSightMaterialInfoResult* outMatInfo = nullptr);
     static bool IsLineOfSightClear(const CVector& vecStart, const CVector& vecEnd, bool& bIsClear, const SLineOfSightFlags& flags = SLineOfSightFlags(),
                                    CEntity* pIgnoredEntity = NULL);
     static bool TestLineAgainstWater(CVector& vecStart, CVector& vecEnd, CVector& vecCollision);
@@ -589,7 +589,6 @@ public:
     static bool          GetGaragePosition(unsigned char ucGarageID, CVector& vecPosition);
     static bool          GetGarageSize(unsigned char ucGarageID, float& fHeight, float& fWidth, float& fDepth);
     static bool          GetGarageBoundingBox(unsigned char ucGarageID, float& fLeft, float& fRight, float& fFront, float& fBack);
-    static bool          IsWorldSpecialPropertyEnabled(const char* szPropName);
     static bool          SetCloudsEnabled(bool bEnabled);
     static bool          GetCloudsEnabled();
     static bool          GetTrafficLightState(unsigned char& ucState);
@@ -617,7 +616,6 @@ public:
     static bool SetWaveHeight(float fHeight);
     static bool SetMinuteDuration(unsigned long ulDelay);
     static bool SetGarageOpen(unsigned char ucGarageID, bool bIsOpen);
-    static bool SetWorldSpecialPropertyEnabled(const char* szPropName, bool bEnabled);
     static bool SetBlurLevel(unsigned char ucLevel);
     static bool SetJetpackMaxHeight(float fHeight);
     static bool SetTrafficLightState(unsigned char ucState);
