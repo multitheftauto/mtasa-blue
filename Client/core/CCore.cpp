@@ -1356,8 +1356,6 @@ void CCore::DoPostFramePulse()
 #endif
         }
     }
-
-    TIMING_CHECKPOINT("-CorePostFrame2");
 }
 
 // Called after MOD is unloaded
