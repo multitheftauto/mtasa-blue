@@ -20,7 +20,6 @@ project "Client Core"
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
 			"../../vendor/detours/4.0.1/src",
-			"../../vendor/tracy/public/"
 			"../../vendor/discord-rpc/discord/include",
 		}
 
@@ -36,15 +35,9 @@ project "Client Core"
 
 	links { 
 		"detours", 
-		"tracy"
 	}
 	
-	defines {
-        "TRACY_ENABLE",
-        --"TRACY_CALLSTACK",
-        "TRACY_ON_DEMAND",
-        "TRACY_IMPORTS"
-    }
+	add_tracy("../../")
 
 	files {
 		"premake5.lua",

@@ -10,15 +10,12 @@ project "Client Deathmatch"
 	defines { 
 		"LUA_USE_APICHECK", 
 		"SDK_WITH_BCRYPT",
-
-		"TRACY_ENABLE",
-		--"TRACY_CALLSTACK",
-		"TRACY_ON_DEMAND",
-		"TRACY_IMPORTS"
 	}
+
+	add_tracy("../../../")
 	
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg", "tracy",
+		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg",
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
@@ -53,7 +50,6 @@ project "Client Deathmatch"
 			"../../../Shared/animation",
 			"../../../vendor/sparsehash/src/",
 			"../../../vendor/lunasvg/include",
-			"../../../vendor/tracy/public/"
 	}
 
 	files {

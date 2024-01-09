@@ -22,6 +22,34 @@ newoption {
 	description = "Prefix to be prepended to commands used by the GCC toolchain (for cross-building)",
 }
 
+newoption {
+	trigger 	= "with-tracy",
+	description = "Enable the Tracy profiler"
+}
+
+TRACY_DEFINES = {
+	"TRACY_ENABLE",
+	--"TRACY_CALLSTACK",
+	"TRACY_ON_DEMAND",
+
+	"TRACY_DELAYED_INIT",
+	"TRACY_MANUAL_LIFETIME"
+}
+function add_tracy(rel_path) 
+	-- The include dir has to be present even if not enabled (otherwise we get build erorrs)
+	includedirs {
+		rel_path .. "vendor/tracy/public/"
+	}
+	filter {"options:with-tracy"}
+		defines(TRACY_DEFINES)
+		defines "TRACY_IMPORTS"
+		links {
+			"tracy"
+		}
+
+	filter {}
+end
+
 workspace "MTASA"
 	configurations {"Debug", "Release", "Nightly"}
 

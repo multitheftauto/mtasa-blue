@@ -1208,6 +1208,8 @@ void CCore::DoPreFramePulse()
 
 void CCore::DoPostFramePulse()
 {
+    ZoneScoped;
+
     {
         ZoneScopedN("CorePostFrame1");
         if (m_bQuitOnPulse)

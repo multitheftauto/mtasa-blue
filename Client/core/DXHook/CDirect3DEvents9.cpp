@@ -103,6 +103,8 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
 
 void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 {
+    FrameMark;
+
     {
         ZoneScopedN("OnPresent1");
         

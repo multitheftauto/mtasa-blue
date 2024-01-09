@@ -22,22 +22,12 @@ project "Game SA"
 
 	filter {}
 
-	links {
-		"tracy"
-	}
-
-	defines {
-        "TRACY_ENABLE",
-        --"TRACY_CALLSTACK",
-        "TRACY_ON_DEMAND",
-        "TRACY_IMPORTS"
-    }
+	add_tracy("../../")
 
 	includedirs {
 		"../../Shared/sdk",
 		"../sdk/",
 		"../../vendor/sparsehash/src/",
-		"../../vendor/tracy/public/"
 	}
 
 	files {

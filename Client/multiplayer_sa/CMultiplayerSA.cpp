@@ -754,7 +754,7 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
 
-    HookInstall(0x53E923, (DWORD)HOOK_Idle_Beginning, 5); 
+    //HookInstall(0x53E956 - 5, (DWORD)HOOK_Idle_Beginning, 5); 
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, 10);
@@ -7051,9 +7051,9 @@ void _declspec(naked) HOOK_Idle_Beginning() {
     // The hook itself replaces a few unused functions calls, so no need to care about restoring them
 
     _asm pushad
-    FrameMark;
+    //FrameMark;
     _asm popad
-
+    
     // Jump back to before the frame limiter
     _asm jmp RETURN_Idle_Beginning
 }

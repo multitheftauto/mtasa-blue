@@ -22,7 +22,6 @@
 #include <cstring>
 #include <variant>
 #include <optional>
-
 #include <zlib.h>
 #include <tracy/Tracy.hpp>
 

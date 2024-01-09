@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <tracy/Tracy.hpp>
 #include <filesystem>
 #define DECLARE_PROFILER_SECTION_Core
 #include "profiler/SharedUtil.Profiler.h"
@@ -36,6 +37,7 @@ BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID)
         g_hModule = dll;
         DisableThreadLibraryCalls(dll);
         AddUtf8FileHooks();
+        tracy::StartupProfiler();
     }
     else if (reason == DLL_PROCESS_DETACH)
     {
@@ -54,6 +56,8 @@ BOOL WINAPI DllMain(HINSTANCE dll, DWORD reason, LPVOID)
                 g_pCore = nullptr;
             }
         }
+
+        tracy::ShutdownProfiler();
     }
 
     return TRUE;

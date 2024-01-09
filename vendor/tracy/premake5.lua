@@ -14,13 +14,9 @@ project "tracy"
     includedirs {
         "./public/",
     }
-
-    defines {
-        "TRACY_ENABLE",
-        --"TRACY_CALLSTACK",
-        "TRACY_ON_DEMAND",
-        "TRACY_EXPORTS"
-    }
+    
+    defines(TRACY_DEFINES)
+    defines "TRACY_EXPORTS"
 
     files {
         "public/TracyClient.cpp",

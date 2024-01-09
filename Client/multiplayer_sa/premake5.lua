@@ -20,19 +20,9 @@ project "Multiplayer SA"
 			"../../Shared/sdk",
 			"../sdk",
 			"../../vendor/sparsehash/src/",
-			"../../vendor/tracy/public/"
 		}
 
-	links {
-		"tracy"
-	}
-
-	defines {
-        "TRACY_ENABLE",
-        --"TRACY_CALLSTACK",
-        "TRACY_ON_DEMAND",
-        "TRACY_EXPORTS"
-    }
+	add_tracy("../../")
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

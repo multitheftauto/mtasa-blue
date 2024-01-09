@@ -33,7 +33,7 @@ namespace
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_CallIdle_Pre(DWORD calledFrom)
-{   
+{
 }
 
 void OnMY_CallIdle_Post(RwGeometry* pGeometry, DWORD calledFrom)
