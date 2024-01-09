@@ -398,7 +398,7 @@ class Unpack:PackDef
 
     bool ExtraDist; // Allow distances up to 1 TB.
 
-    uint GetChar()
+    byte GetChar()
     {
       if (Inp.InAddr>BitInput::MAX_SIZE-30)
       {
