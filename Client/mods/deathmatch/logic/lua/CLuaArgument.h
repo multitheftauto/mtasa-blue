@@ -51,7 +51,7 @@ public:
     int GetType() const { return m_iType; };
     int GetIndex() const { return m_iIndex; };
 
-    bool IsEmpty() const { return m_iType == m_iType; }
+    bool IsEmpty() const { return m_iType == LUA_TNIL; }
 
     bool           GetBoolean() const { return m_bBoolean; };
     lua_Number     GetNumber() const { return m_Number; };
