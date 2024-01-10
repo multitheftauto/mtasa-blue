@@ -43,9 +43,9 @@ public:
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
 
     // CPerfStatEventPacketUsage
-    virtual void UpdateElementDataUsageOut(const char* szName, uint uiNumPlayers, uint uiSize);
-    virtual void UpdateElementDataUsageRelayed(const char* szName, uint uiNumPlayers, uint uiSize);
-    virtual void UpdateEventUsageOut(const char* szName, uint uiNumPlayers);
+    virtual void UpdateElementDataUsageOut(const SString& strName, uint uiNumPlayers, uint uiSize);
+    virtual void UpdateElementDataUsageRelayed(const SString& strName, uint uiNumPlayers, uint uiSize);
+    virtual void UpdateEventUsageOut(const SString& strName, uint uiNumPlayers);
 
     // CPerfStatEventPacketUsageImpl
     void MaybeRecordStats();
@@ -128,12 +128,12 @@ void CPerfStatEventPacketUsageImpl::DoPulse()
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageOut(const char* szName, uint uiNumPlayers, uint uiSize)
+void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageOut(const SString& strName, uint uiNumPlayers, uint uiSize)
 {
     if (!m_bEnabled)
         return;
 
-    SEventUsage& usage = MapGet(m_EventUsageLiveMap, szName);
+    SEventUsage& usage = MapGet(m_EventUsageLiveMap, strName);
     usage.iTotal += uiNumPlayers;
     usage.iElementDataOut += uiNumPlayers;
 }
@@ -145,12 +145,12 @@ void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageOut(const char* szName
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageRelayed(const char* szName, uint uiNumPlayers, uint uiSize)
+void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageRelayed(const SString& strName, uint uiNumPlayers, uint uiSize)
 {
     if (!m_bEnabled)
         return;
 
-    SEventUsage& usage = MapGet(m_EventUsageLiveMap, szName);
+    SEventUsage& usage = MapGet(m_EventUsageLiveMap, strName);
     usage.iTotal += uiNumPlayers;
     usage.iElementDataRelay += uiNumPlayers;
 }
@@ -162,12 +162,12 @@ void CPerfStatEventPacketUsageImpl::UpdateElementDataUsageRelayed(const char* sz
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatEventPacketUsageImpl::UpdateEventUsageOut(const char* szName, uint uiNumPlayers)
+void CPerfStatEventPacketUsageImpl::UpdateEventUsageOut(const SString& strName, uint uiNumPlayers)
 {
     if (!m_bEnabled)
         return;
 
-    SEventUsage& usage = MapGet(m_EventUsageLiveMap, szName);
+    SEventUsage& usage = MapGet(m_EventUsageLiveMap, strName);
     usage.iTotal += uiNumPlayers;
     usage.iEventOut += uiNumPlayers;
 }

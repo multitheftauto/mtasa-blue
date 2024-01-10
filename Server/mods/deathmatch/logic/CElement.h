@@ -136,15 +136,16 @@ public:
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
     CCustomData&   GetCustomDataManager() { return m_CustomData; }
-    CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = NULL);
+    CLuaArgument*  GetCustomData(const SString& strName, bool bInheritData, ESyncType* pSyncType = NULL);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData);
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
-    void           SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = NULL,
+    // Note that returned SCustomData* cannot be used with recursive algorithms!
+    const SCustomData* SetCustomData(const SString& strName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = {},
                                  bool bTriggerEvent = true);
-    void           DeleteCustomData(const char* szName);
+    bool           DeleteCustomData(const SString& strName);
     void           SendAllCustomData(CPlayer* pPlayer);
 
     CXMLNode* OutputToXML(CXMLNode* pNode);

@@ -14,52 +14,58 @@
 
 void CCustomData::Copy(CCustomData* pCustomData)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
-    for (; iter != pCustomData->IterEnd(); iter++)
-    {
-        Set(iter->first.c_str(), iter->second.Variable);
-    }
+    for (const auto& [key, data] : pCustomData->GetData())
+        Set(key, data.Variable);    
 }
 
-SCustomData* CCustomData::Get(const char* szName)
+SCustomData* CCustomData::Get(const SString& strName, bool bCreate)
 {
-    assert(szName);
-
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
-    if (it != m_Data.end())
+    if (auto it = m_Data.find(strName); it != m_Data.end())
         return &it->second;
 
-    return NULL;
+    if (bCreate)
+        return &m_Data[strName];
+
+    return {};
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+bool CCustomData::Set(const SString& strName, const CLuaArgument& Variable, bool bSynchronized, SCustomData* pOldData)
 {
-    assert(szName);
+    if (strName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+    {
+        // Don't allow it to be set if the name is too long
+        CLogger::ErrorPrintf("Custom data name too long (%s)", *strName.Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+        return false;
+    }
 
-    // Grab the item with the given name
-    SCustomData* pData = Get(szName);
-    if (pData)
+    SCustomData* pCurrentVariable = Get(strName, true);
+    assert(pCurrentVariable);
+
+    if (pCurrentVariable->Variable.IsEmpty() || pCurrentVariable->Variable != Variable || pCurrentVariable->bSynchronized != bSynchronized)
     {
-        // Update existing
-        pData->Variable = Variable;
-        pData->bSynchronized = bSynchronized;
-    }
-    else
-    {
-        // Add new
-        SCustomData newData;
-        newData.Variable = Variable;
-        newData.bSynchronized = bSynchronized;
-        m_Data[szName] = newData;
-    }
+        // Save the old variable
+        if (pOldData)
+            *pOldData = *pCurrentVariable;
+
+        // Set the new data
+        pCurrentVariable->Variable = Variable;
+        pCurrentVariable->bSynchronized = bSynchronized;  
+
+        return true;
+    }   
+
+    return false;  
 }
 
-bool CCustomData::Delete(const char* szName)
+bool CCustomData::Delete(const SString& strName, SCustomData* pOldData)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    auto it = m_Data.find(strName);
     if (it != m_Data.end())
     {
+        if (pOldData)
+            *pOldData = it->second;
+
         m_Data.erase(it);
         return true;
     }

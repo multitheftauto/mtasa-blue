@@ -503,17 +503,15 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
             args.PushString(pAttribute->GetValue().c_str());
 
         // Don't trigger onElementDataChanged event
-        ESyncType syncType = g_pGame->GetConfig()->GetSyncMapElementData() ? ESyncType::BROADCAST : ESyncType::LOCAL;
-        SetCustomData(pAttribute->GetName().c_str(), *args[0], syncType, NULL, false);
+        const ESyncType syncType = g_pGame->GetConfig()->GetSyncMapElementData() ? ESyncType::BROADCAST : ESyncType::LOCAL;
+        SetCustomData(pAttribute->GetName(), *args[0], syncType, {}, false);
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType)
+CLuaArgument* CElement::GetCustomData(const SString& strName, bool bInheritData, ESyncType* pSyncType)
 {
-    assert(szName);
-
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_CustomData.Get(szName);
+    SCustomData* pData = m_CustomData.Get(strName);
     if (pData)
     {
         if (pSyncType)
@@ -524,11 +522,11 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESy
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pSyncType);
+        return m_pParent->GetCustomData(strName, true, pSyncType);
     }
 
     // None available
-    return NULL;
+    return {};
 }
 
 CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
@@ -536,12 +534,11 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
     assert(table);
 
     // Grab it and return a pointer to the variable
-    map<string, SCustomData>::const_iterator iter = m_CustomData.IterBegin();
-    for (; iter != m_CustomData.IterEnd(); iter++)
+    for (const auto& [key, data] : m_CustomData.GetData())
     {
-        table->PushString(iter->first.c_str());                // key
-        table->PushArgument(iter->second.Variable);            // value
-    }
+        table->PushString(key);                // key
+        table->PushArgument(data.Variable);            // value
+    }   
 
     return table;
 }
@@ -705,67 +702,60 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
+const SCustomData* CElement::SetCustomData(const SString& strName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
 {
-    assert(szName);
-    if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
+    if (strName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
-        CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return;
+        CLogger::ErrorPrintf("Custom data name too long (%s)\n", *strName.Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+        return {};
     }
 
-    // Grab the old variable
-    CLuaArgument       oldVariable;
-    const SCustomData* pData = m_CustomData.Get(szName);
-    if (pData)
-    {
-        oldVariable = pData->Variable;
-    }
+    // SCustomData is 64(88 in debug) bytes long. A static storage can be more efficient.
+    static SCustomData oldData;
 
-    // Set the new data
-    m_CustomData.Set(szName, Variable, syncType);
+    if (m_CustomData.Set(strName, Variable, syncType, &oldData) != true)
+        return {};
 
     if (bTriggerEvent)
     {
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
-        Arguments.PushArgument(oldVariable);
+        Arguments.PushString(strName);
+        Arguments.PushArgument(oldData.Variable);
         Arguments.PushArgument(Variable);
         CallEvent("onElementDataChange", Arguments, pClient);
-    }
+    }         
+
+    return &oldData;
 }
 
-void CElement::DeleteCustomData(const char* szName)
+bool CElement::DeleteCustomData(const SString& strName)
 {
-    // Grab the old variable
-    SCustomData* pData = m_CustomData.Get(szName);
-    if (pData)
+    // SCustomData is 64(88 in debug) bytes long. A static storage can be more efficient.
+    static SCustomData oldData;
+
+    // Delete the custom data
+    if (m_CustomData.Delete(strName, &oldData))
     {
-        CLuaArgument oldVariable;
-        oldVariable = pData->Variable;
-
-        // Delete the custom data
-        m_CustomData.Delete(szName);
-
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
-        Arguments.PushArgument(oldVariable);
-        Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
+        Arguments.PushString(strName);
+        Arguments.PushArgument(oldData.Variable);
+        Arguments.PushArgument(CLuaArgument{});            // Use nil as the new value to indicate the data has been removed
         CallEvent("onElementDataChange", Arguments);
+
+        return true;
     }
+
+    return false;   
 }
 
 // Used to send the root element data when a player joins
 void CElement::SendAllCustomData(CPlayer* pPlayer)
 {
-    for (map<std::string, SCustomData>::const_iterator iter = m_CustomData.SyncedIterBegin(); iter != m_CustomData.SyncedIterEnd(); ++iter)
+    for (const auto& [strName, customData] : m_CustomData.GetSyncedData())
     {
-        const std::string& strName = iter->first;
-        const SCustomData& customData = iter->second;
-
         if (customData.syncType == ESyncType::LOCAL)
             continue;
 
@@ -778,7 +768,7 @@ void CElement::SendAllCustomData(CPlayer* pPlayer)
 
         if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, strName))
             pPlayer->Send(CElementRPCPacket(this, SET_ELEMENT_DATA, *BitStream.pBitStream));
-    }
+    }    
 }
 
 CXMLNode* CElement::OutputToXML(CXMLNode* pNodeParent)

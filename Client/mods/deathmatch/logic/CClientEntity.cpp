@@ -279,12 +279,10 @@ void CClientEntity::SetID(ElementID ID)
     }
 }
 
-CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData, bool* pbIsSynced)
+CLuaArgument* CClientEntity::GetCustomData(const SString& strName, bool bInheritData, bool* pbIsSynced)
 {
-    assert(szName);
-
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_pCustomData->Get(szName);
+    SCustomData* pData = m_pCustomData->Get(strName);
     if (pData)
     {
         if (pbIsSynced)
@@ -295,22 +293,22 @@ CLuaArgument* CClientEntity::GetCustomData(const char* szName, bool bInheritData
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pbIsSynced);
+        return m_pParent->GetCustomData(strName, true, pbIsSynced);
     }
 
     // None available
-    return NULL;
+    return {};
 }
 
 CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
 {
     assert(table);
 
-    for (auto it = m_pCustomData->IterBegin(); it != m_pCustomData->IterEnd(); it++)
+    for (const auto& [key, data] : m_pCustomData->GetData())
     {
-        table->PushString(it->first);                        // key
-        table->PushArgument(it->second.Variable);            // value
-    }
+        table->PushString(key);                        // key
+        table->PushArgument(data.Variable);            // value
+    }    
 
     return table;
 }
@@ -470,54 +468,41 @@ bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInhe
     return false;
 }
 
-void CClientEntity::SetCustomData(const char* szName, const CLuaArgument& Variable, bool bSynchronized)
+bool CClientEntity::SetCustomData(const SString& strName, const CLuaArgument& Variable, bool bSynchronized)
 {
-    assert(szName);
-    if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
+    // SCustomData is 64(88 in debug) bytes long. A static storage can be more efficient.
+    static SCustomData oldData;
+
+    if (m_pCustomData->Set(strName, Variable, bSynchronized, &oldData))
     {
-        // Don't allow it to be set if the name is too long
-        CLogger::ErrorPrintf("Custom data name too long (%s)", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return;
-    }
-
-    // Grab the old variable
-    CLuaArgument oldVariable;
-    SCustomData* pData = m_pCustomData->Get(szName);
-    if (pData)
-    {
-        oldVariable = pData->Variable;
-    }
-
-    // Set the new data
-    m_pCustomData->Set(szName, Variable, bSynchronized);
-
-    // Trigger the onClientElementDataChange event on us
-    CLuaArguments Arguments;
-    Arguments.PushString(szName);
-    Arguments.PushArgument(oldVariable);
-    Arguments.PushArgument(Variable);
-    CallEvent("onClientElementDataChange", Arguments, true);
-}
-
-void CClientEntity::DeleteCustomData(const char* szName)
-{
-    // Grab the old variable
-    SCustomData* pData = m_pCustomData->Get(szName);
-    if (pData)
-    {
-        CLuaArgument oldVariable;
-        oldVariable = pData->Variable;
-
-        // Delete the custom data
-        m_pCustomData->Delete(szName);
-
         // Trigger the onClientElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
-        Arguments.PushArgument(oldVariable);
-        Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
+        Arguments.PushString(strName);
+        Arguments.PushArgument(oldData.Variable);
+        Arguments.PushArgument(Variable);
         CallEvent("onClientElementDataChange", Arguments, true);
+
+        return true;
     }
+   
+    return false;
+}
+
+void CClientEntity::DeleteCustomData(const SString& strName)
+{
+    // SCustomData is 64(88 in debug) bytes long. A static storage can be more efficient.
+    static SCustomData oldData;
+
+    // Delete the custom data
+    if (m_pCustomData->Delete(strName, &oldData))
+    {
+        // Trigger the onClientElementDataChange event on us
+        CLuaArguments Arguments;
+        Arguments.PushString(strName);
+        Arguments.PushArgument(oldData.Variable);
+        Arguments.PushArgument(CLuaArgument{});            // Use nil as the new value to indicate the data has been removed
+        CallEvent("onClientElementDataChange", Arguments, true);
+    }   
 }
 
 bool CClientEntity::GetMatrix(CMatrix& matrix) const

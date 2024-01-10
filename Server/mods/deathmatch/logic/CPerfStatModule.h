@@ -223,9 +223,9 @@ public:
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
 
     // CPerfStatRPCPacketUsage
-    virtual void UpdateElementDataUsageOut(const char* szName, uint uiNumPlayers, uint uiSize) = 0;
-    virtual void UpdateElementDataUsageRelayed(const char* szName, uint uiNumPlayers, uint uiSize) = 0;
-    virtual void UpdateEventUsageOut(const char* szName, uint uiNumPlayers) = 0;
+    virtual void UpdateElementDataUsageOut(const SString& strName, uint uiNumPlayers, uint uiSize) = 0;
+    virtual void UpdateElementDataUsageRelayed(const SString& strName, uint uiNumPlayers, uint uiSize) = 0;
+    virtual void UpdateEventUsageOut(const SString& strName, uint uiNumPlayers) = 0;
 
     static CPerfStatEventPacketUsage* GetSingleton();
 };

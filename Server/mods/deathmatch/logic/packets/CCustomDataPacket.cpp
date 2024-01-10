@@ -15,13 +15,10 @@
 
 CCustomDataPacket::CCustomDataPacket()
 {
-    m_szName = NULL;
 }
 
 CCustomDataPacket::~CCustomDataPacket()
 {
-    delete[] m_szName;
-    m_szName = NULL;
 }
 
 bool CCustomDataPacket::Read(NetBitStreamInterface& BitStream)
@@ -29,10 +26,10 @@ bool CCustomDataPacket::Read(NetBitStreamInterface& BitStream)
     unsigned short usNameLength;
     if (BitStream.Read(m_ElementID) && BitStream.ReadCompressed(usNameLength) && usNameLength > 0 && usNameLength <= MAX_CUSTOMDATA_NAME_LENGTH)
     {
-        m_szName = new char[usNameLength + 1];
-        if (BitStream.Read(m_szName, usNameLength))
+        m_strName.resize(usNameLength);
+
+        if (BitStream.Read(m_strName.data(), usNameLength))
         {
-            m_szName[usNameLength] = 0;
             if (m_Value.ReadFromBitStream(BitStream))
             {
                 return true;

@@ -51,9 +51,11 @@ public:
 
     int GetType() const { return m_iType; };
 
+    bool IsEmpty() const { return m_iType == LUA_TNIL; }
+
     bool               GetBoolean() const { return m_bBoolean; };
     lua_Number         GetNumber() const { return m_Number; };
-    const std::string& GetString() { return m_strString; };
+    const std::string& GetString() const { return m_strString; };
     void*              GetUserData() const { return m_pUserData; };
     CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);

@@ -17,7 +17,7 @@
 struct SCustomData
 {
     CLuaArgument Variable;
-    bool         bSynchronized;
+    bool         bSynchronized{true};
 };
 
 class CCustomData
@@ -25,14 +25,13 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
+    SCustomData* Get(const SString& strName, bool bCreate = false);
+    bool         Set(const SString& strName, const CLuaArgument& Variable, bool bSynchronized = true, SCustomData* pOldData = {});
 
-    bool Delete(const char* szName);
+    bool Delete(const SString& strName, SCustomData* pOldData = {});
 
-    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
+    const std::unordered_map<SString, SCustomData>& GetData() const { return m_Data; }
 
 private:
-    std::map<std::string, SCustomData> m_Data;
+    std::unordered_map<SString, SCustomData> m_Data;
 };

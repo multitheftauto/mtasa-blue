@@ -993,23 +993,18 @@ bool CStaticFunctionDefinitions::SetElementID(CClientEntity& Entity, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const char* szName, CLuaArgument& Variable, bool bSynchronize)
+bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const SString& strName, CLuaArgument& Variable, bool bSynchronize)
 {
-    assert(szName);
-    assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
-
-    bool          bIsSynced;
-    CLuaArgument* pCurrentVariable = Entity.GetCustomData(szName, false, &bIsSynced);
-    if (!pCurrentVariable || Variable != *pCurrentVariable || bIsSynced != bSynchronize)
+    if (Entity.SetCustomData(strName, Variable, bSynchronize))
     {
         if (bSynchronize && !Entity.IsLocalEntity())
         {
             NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
             // Write element ID, name length and the name. Also write the variable.
             pBitStream->Write(Entity.GetID());
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+            const unsigned short usNameLength = static_cast<unsigned short>(strName.length());
             pBitStream->WriteCompressed(usNameLength);
-            pBitStream->Write(szName, usNameLength);
+            pBitStream->Write(strName.c_str(), usNameLength);
             Variable.WriteToBitStream(*pBitStream);
 
             // Send the packet and deallocate
@@ -1017,10 +1012,8 @@ bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const cha
             g_pNet->DeallocateNetBitStream(pBitStream);
         }
 
-        // Set its custom data
-        Entity.SetCustomData(szName, Variable, bSynchronize);
         return true;
-    }
+    }   
 
     return false;
 }

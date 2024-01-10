@@ -188,7 +188,7 @@ size_t CPlayerManager::BroadcastDimensionOnlyJoined(const CPacket& Packet, ushor
     return sendList.size();
 }
 
-size_t CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip)
+size_t CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const SString& strName, CPlayer* pSkip)
 {
     // Make a list of players to send this packet to
     CSendList sendList;
@@ -198,7 +198,7 @@ size_t CPlayerManager::BroadcastOnlySubscribed(const CPacket& Packet, CElement* 
     for (; iter != m_Players.end(); iter++)
     {
         CPlayer* pPlayer = *iter;
-        if (pPlayer != pSkip && pPlayer->IsJoined() && pPlayer->IsSubscribed(pElement, szName))
+        if (pPlayer != pSkip && pPlayer->IsJoined() && pPlayer->IsSubscribed(pElement, strName))
         {
             sendList.push_back(pPlayer);
         }
@@ -347,20 +347,14 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short model)
 
 void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
 {
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
-    {
-        CPlayer* pPlayer = *iter;
-        pPlayer->UnsubscribeElementData(pElement, name);
-    }
+    for (auto* pPlayer : m_Players)
+        pPlayer->UnsubscribeElementData(pElement, name); 
 }
 
 void CPlayerManager::ClearElementData(CElement* pElement)
 {
-    for (auto pPlayer : m_Players)
-    {
+    for (auto* pPlayer : m_Players)
         pPlayer->UnsubscribeElementData(pElement);
-    }
 }
 
 void CPlayerManager::ResetAll()
