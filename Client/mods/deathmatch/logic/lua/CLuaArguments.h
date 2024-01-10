@@ -20,13 +20,10 @@ extern "C"
 #include <vector>
 #include "CLuaFunctionRef.h"
 
-// temp fix #c2039
-#define _snprintf snprintf
-
-// json parser
-#include "simdjson.h"
-
-// json writer
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/error/error.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -83,9 +80,9 @@ public:
     std::vector<CLuaArgument*>::const_iterator IterEnd() const { return m_Arguments.end(); };
 
     // json parse
-    bool        ReadJSONString(const char* szJSON);
-    bool        ReadJSONArray(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    bool        ReadJSONObject(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool ReadJSONString(const char* szJSON);
+    bool ReadJSONArray(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool ReadJSONObject(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
     // json writer
     bool        SerializeToJSONString(rapidjson::StringBuffer* buffer, bool bSerialize = false, int flags = 1, bool bBackwardsCompatibility = false);

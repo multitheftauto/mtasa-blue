@@ -17,13 +17,10 @@ extern "C"
 #include <net/bitstream.h>
 #include <string>
 
-// temp fix #c2039
-#define _snprintf snprintf
-
-// json parser
-#include "simdjson.h"
-
-// json writer
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/error/error.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -71,14 +68,14 @@ public:
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     char*        WriteToString(char* szBuffer, int length);
 
-    // simdjson parser
-    bool DeserializeValueFromJSON(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    // raipdjson parser
+    bool DeserializeValueFromJSON(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
     // raipdjson serializer
     bool GetResourceNameFromUserData(std::string& result) const;
 
     template <class Writer>
-    void SerializeToJSON(Writer* writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = false)
+    void SerializeToJSON(Writer* writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL)
     {
         switch (GetType())
         {

@@ -875,44 +875,41 @@ bool CLuaArgument::IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaA
     return false;
 }
 
-bool CLuaArgument::DeserializeValueFromJSON(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArgument::DeserializeValueFromJSON(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables)
 {
     DeleteTableData();
 
-    switch (element.type())
+    switch (obj.GetType())
     {
-        case simdjson::dom::element_type::NULL_VALUE:
+        case rapidjson::Type::kNullType:
             m_iType = LUA_TNIL;
             break;
-        case simdjson::dom::element_type::BOOL:
-            ReadBool(bool(element));
+        case rapidjson::Type::kTrueType:
+        case rapidjson::Type::kFalseType:
+            ReadBool(obj.GetBool());
             break;
-        case simdjson::dom::element_type::ARRAY:
+        case rapidjson::Type::kArrayType:
         {
             m_pTableData = new CLuaArguments();
-            m_pTableData->ReadJSONArray(element, pKnownTables);
+            m_pTableData->ReadJSONArray(obj, pKnownTables);
             m_bWeakTableRef = false;
             m_iType = LUA_TTABLE;
             break;
         }
-        case simdjson::dom::element_type::OBJECT:
+        case rapidjson::Type::kObjectType:
         {
             m_pTableData = new CLuaArguments();
-            m_pTableData->ReadJSONObject(element, pKnownTables);
+            m_pTableData->ReadJSONObject(obj, pKnownTables);
             m_bWeakTableRef = false;
             m_iType = LUA_TTABLE;
             break;
         }
-        case simdjson::dom::element_type::INT64:
-        case simdjson::dom::element_type::UINT64:
-            ReadNumber(int64_t(element));
+        case rapidjson::Type::kNumberType:
+            ReadNumber(obj.IsInt() ? obj.GetInt() : obj.GetDouble());
             break;
-        case simdjson::dom::element_type::DOUBLE:
-            ReadNumber(double(element));
-            break;
-        case simdjson::dom::element_type::STRING:
+        case rapidjson::Type::kStringType:
         {
-            std::string_view view(element);
+            std::string_view view(obj.GetString());
             if (view.length() > 3 && view[0] == '^' && view[2] == '^' && view[1] != '^')
             {
                 switch (view[1])

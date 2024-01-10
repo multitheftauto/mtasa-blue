@@ -19,13 +19,10 @@ extern "C"
 }
 #include "../common/CBitStream.h"
 
-// temp fix #c2039
-#define _snprintf snprintf
-
-// json parser
-#include "simdjson.h"
-
-// json writer
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/error/error.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
@@ -37,6 +34,8 @@ class CResourceManager;
 
 #define LUA_TTABLEREF 9
 #define LUA_TSTRING_LONG 10
+
+extern class CGame* g_pGame;
 
 class CLuaArgument
 {
@@ -76,14 +75,14 @@ public:
 
     bool         IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
 
-    // simdjson parser
-    bool         DeserializeValueFromJSON(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    // raipdjson parser
+    bool         DeserializeValueFromJSON(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
     // raipdjson serializer
     bool GetResourceNameFromUserData(std::string& result) const;
 
     template <class Writer>
-    void         SerializeToJSON(Writer* writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = false)
+    void         SerializeToJSON(Writer* writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL)
     {
         switch (GetType())
         {

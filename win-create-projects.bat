@@ -6,8 +6,7 @@ utils\premake5.exe install_cef
 rem Update Unifont
 utils\premake5.exe install_unifont
 
-rem Update simdjson and rapidjson
-utils\premake5.exe install_simdjson
+rem Update rapidjson
 utils\premake5.exe install_rapidjson
 
 rem Update discord-rpc

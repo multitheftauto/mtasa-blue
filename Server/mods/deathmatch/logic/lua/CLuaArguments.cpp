@@ -570,15 +570,14 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
 
 bool CLuaArguments::ReadJSONString(const char* szJSON)
 {
-    simdjson::dom::parser   parser;
-    simdjson::dom::element  element;
-    simdjson::error_code    error;
+    // allow comments? <rapidjson::ParseComments>
 
-    parser.parse(szJSON, strlen(szJSON)).tie(element, error);
-
-    if (error)
+    rapidjson::Document doc;
+    rapidjson::ParseResult result = doc.Parse(szJSON);
+    
+    if (!result)
     {
-        g_pGame->GetScriptDebugging()->LogError(nullptr, "JSON Parser Error: %s", simdjson::error_message(error));
+        g_pGame->GetScriptDebugging()->LogError(nullptr, "JSON Parser Error: %s (%u)", rapidjson::GetParseError_En(result.Code()), result.Offset());
         return false;
     }
 
@@ -586,7 +585,7 @@ bool CLuaArguments::ReadJSONString(const char* szJSON)
     bool bSuccess = true;
 
     CLuaArgument* pArg = new CLuaArgument();
-    bSuccess = pArg->DeserializeValueFromJSON(element, &knownTables);
+    bSuccess = pArg->DeserializeValueFromJSON(doc, &knownTables);
     m_Arguments.push_back(pArg);
 
     //PushArguments(*this);
@@ -594,8 +593,11 @@ bool CLuaArguments::ReadJSONString(const char* szJSON)
     return bSuccess;
 }
 
-bool CLuaArguments::ReadJSONArray(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadJSONArray(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables)
 {
+    if (!obj.IsArray())
+        return false;
+
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
@@ -608,7 +610,7 @@ bool CLuaArguments::ReadJSONArray(simdjson::dom::element& element, std::vector<C
     bool bSuccess = true;
     int  count = 1;
 
-    for (auto& child : simdjson::dom::array(element))
+    for (const auto& field : obj.GetArray())
     {
         // push key
         CLuaArgument* pArg = new CLuaArgument();
@@ -617,7 +619,7 @@ bool CLuaArguments::ReadJSONArray(simdjson::dom::element& element, std::vector<C
 
         // push value
         pArg = new CLuaArgument();
-        bSuccess = pArg->DeserializeValueFromJSON(child, pKnownTables);
+        bSuccess = pArg->DeserializeValueFromJSON(field, pKnownTables);
         m_Arguments.push_back(pArg);
 
         if (!bSuccess)
@@ -633,8 +635,11 @@ bool CLuaArguments::ReadJSONArray(simdjson::dom::element& element, std::vector<C
     return bSuccess;
 }
 
-bool CLuaArguments::ReadJSONObject(simdjson::dom::element& element, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadJSONObject(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables)
 {
+    if (!obj.IsObject())
+        return false;
+
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
@@ -645,9 +650,10 @@ bool CLuaArguments::ReadJSONObject(simdjson::dom::element& element, std::vector<
     pKnownTables->push_back(this);
 
     bool bSuccess = true;
-    for (auto field : simdjson::dom::object(element))
+
+    for (rapidjson::Value::ConstMemberIterator itr = obj.MemberBegin(); itr != obj.MemberEnd(); ++itr)
     {
-        std::string_view view(field.key);
+        std::string_view view(itr->name.GetString());
 
         // push key
         CLuaArgument* pArg = new CLuaArgument();
@@ -656,7 +662,7 @@ bool CLuaArguments::ReadJSONObject(simdjson::dom::element& element, std::vector<
 
         // push value
         pArg = new CLuaArgument();
-        bSuccess = pArg->DeserializeValueFromJSON(field.value, pKnownTables);
+        bSuccess = pArg->DeserializeValueFromJSON(itr->value, pKnownTables);
         m_Arguments.push_back(pArg);
 
         if (!bSuccess)
