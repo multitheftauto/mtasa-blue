@@ -15,25 +15,25 @@ class CExceptionInformation
 {
 public:
     virtual ~CExceptionInformation() {}
-    virtual unsigned int GetCode() = 0;
+    virtual std::uint32_t GetCode() = 0;
     virtual const char*  GetModulePathName() = 0;
     virtual const char*  GetModuleBaseName() = 0;
     virtual uint         GetAddressModuleOffset() = 0;
 
-    virtual unsigned long GetEAX() = 0;
-    virtual unsigned long GetEBX() = 0;
-    virtual unsigned long GetECX() = 0;
-    virtual unsigned long GetEDX() = 0;
-    virtual unsigned long GetESI() = 0;
-    virtual unsigned long GetEDI() = 0;
-    virtual unsigned long GetEBP() = 0;
-    virtual unsigned long GetESP() = 0;
-    virtual unsigned long GetEIP() = 0;
-    virtual unsigned long GetCS() = 0;
-    virtual unsigned long GetDS() = 0;
-    virtual unsigned long GetES() = 0;
-    virtual unsigned long GetFS() = 0;
-    virtual unsigned long GetGS() = 0;
-    virtual unsigned long GetSS() = 0;
-    virtual unsigned long GetEFlags() = 0;
+    virtual std::uint32_t GetEAX() const noexcept = 0;
+    virtual std::uint32_t GetEBX() const noexcept = 0;
+    virtual std::uint32_t GetECX() const noexcept = 0;
+    virtual std::uint32_t GetEDX() const noexcept = 0;
+    virtual std::uint32_t GetESI() const noexcept = 0;
+    virtual std::uint32_t GetEDI() const noexcept = 0;
+    virtual std::uint32_t GetEBP() const noexcept = 0;
+    virtual std::uint32_t GetESP() const noexcept = 0;
+    virtual std::uint32_t GetEIP() const noexcept = 0;
+    virtual std::uint32_t GetCS() const noexcept = 0;
+    virtual std::uint32_t GetDS() const noexcept = 0;
+    virtual std::uint32_t GetES() const noexcept = 0;
+    virtual std::uint32_t GetFS() const noexcept = 0;
+    virtual std::uint32_t GetGS() const noexcept = 0;
+    virtual std::uint32_t GetSS() const noexcept = 0;
+    virtual std::uint32_t GetEFlags() const noexcept = 0;
 };

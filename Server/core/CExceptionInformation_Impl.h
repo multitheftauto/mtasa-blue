@@ -20,52 +20,52 @@ public:
     CExceptionInformation_Impl();
     ~CExceptionInformation_Impl();            //            {};
 
-    unsigned int        GetCode() { return m_uiCode; };
-    void*               GetAddress() { return m_pAddress; };
-    bool                GetModule(char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress);
-    virtual const char* GetModulePathName() { return m_szModulePathName; };
-    virtual const char* GetModuleBaseName() { return m_szModuleBaseName; };
-    virtual uint        GetAddressModuleOffset() { return m_uiAddressModuleOffset; };
+    std::uint32_t           GetCode() const noexcept { return m_uiCode; };
+    void*                   GetAddress() const noexcept { return m_pAddress; };
+    bool                    GetModule(char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress);
+    virtual const char*     GetModulePathName() const noexcept { return m_szModulePathName; };
+    virtual const char*     GetModuleBaseName() const noexcept { return m_szModuleBaseName; };
+    virtual std::uint32_t   GetAddressModuleOffset() const noexcept { return m_uiAddressModuleOffset; };
 
-    unsigned long GetEAX() { return m_ulEAX; };
-    unsigned long GetEBX() { return m_ulEBX; };
-    unsigned long GetECX() { return m_ulECX; };
-    unsigned long GetEDX() { return m_ulEDX; };
-    unsigned long GetESI() { return m_ulESI; };
-    unsigned long GetEDI() { return m_ulEDI; };
-    unsigned long GetEBP() { return m_ulEBP; };
-    unsigned long GetESP() { return m_ulESP; };
-    unsigned long GetEIP() { return m_ulEIP; };
-    unsigned long GetCS() { return m_ulCS; };
-    unsigned long GetDS() { return m_ulDS; };
-    unsigned long GetES() { return m_ulES; };
-    unsigned long GetFS() { return m_ulFS; };
-    unsigned long GetGS() { return m_ulGS; };
-    unsigned long GetSS() { return m_ulSS; };
-    unsigned long GetEFlags() { return m_ulEFlags; };
+    std::uint32_t GetEAX() const noexcept { return m_ulEAX; }
+    std::uint32_t GetEBX() const noexcept { return m_ulEBX; }
+    std::uint32_t GetECX() const noexcept { return m_ulECX; }
+    std::uint32_t GetEDX() const noexcept { return m_ulEDX; }
+    std::uint32_t GetESI() const noexcept { return m_ulESI; }
+    std::uint32_t GetEDI() const noexcept { return m_ulEDI; }
+    std::uint32_t GetEBP() const noexcept { return m_ulEBP; }
+    std::uint32_t GetESP() const noexcept { return m_ulESP; }
+    std::uint32_t GetEIP() const noexcept { return m_ulEIP; }
+    std::uint32_t GetCS() const noexcept { return m_ulCS; }
+    std::uint32_t GetDS() const noexcept { return m_ulDS; }
+    std::uint32_t GetES() const noexcept { return m_ulES; }
+    std::uint32_t GetFS() const noexcept { return m_ulFS; }
+    std::uint32_t GetGS() const noexcept { return m_ulGS; }
+    std::uint32_t GetSS() const noexcept { return m_ulSS; }
+    std::uint32_t GetEFlags() const noexcept { return m_ulEFlags; }
 
-    void Set(unsigned int iCode, _EXCEPTION_POINTERS* pException);
+    void Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException);
 
 private:
-    unsigned int  m_uiCode;
+    std::uint32_t  m_uiCode;
     void*         m_pAddress;
     char*         m_szModulePathName;
     const char*   m_szModuleBaseName;
     uint          m_uiAddressModuleOffset;
-    unsigned long m_ulEAX;
-    unsigned long m_ulEBX;
-    unsigned long m_ulECX;
-    unsigned long m_ulEDX;
-    unsigned long m_ulESI;
-    unsigned long m_ulEDI;
-    unsigned long m_ulEBP;
-    unsigned long m_ulESP;
-    unsigned long m_ulEIP;
-    unsigned long m_ulCS;
-    unsigned long m_ulDS;
-    unsigned long m_ulES;
-    unsigned long m_ulFS;
-    unsigned long m_ulGS;
-    unsigned long m_ulSS;
-    unsigned long m_ulEFlags;
+    std::uint32_t m_ulEAX;
+    std::uint32_t m_ulEBX;
+    std::uint32_t m_ulECX;
+    std::uint32_t m_ulEDX;
+    std::uint32_t m_ulESI;
+    std::uint32_t m_ulEDI;
+    std::uint32_t m_ulEBP;
+    std::uint32_t m_ulESP;
+    std::uint32_t m_ulEIP;
+    std::uint32_t m_ulCS;
+    std::uint32_t m_ulDS;
+    std::uint32_t m_ulES;
+    std::uint32_t m_ulFS;
+    std::uint32_t m_ulGS;
+    std::uint32_t m_ulSS;
+    std::uint32_t m_ulEFlags;
 };

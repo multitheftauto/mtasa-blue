@@ -26,7 +26,7 @@ public:
     void DoPulse();
 
     void GetTag(char* szInfoTag, int iInfoTag);
-    void HandleInput(char* szCommand);
+    void HandleInput(const char* szCommand);
 
     bool IsFinished();
     bool PendingWorkToDo();

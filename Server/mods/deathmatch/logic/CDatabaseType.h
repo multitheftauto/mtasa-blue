@@ -49,14 +49,14 @@ public:
     virtual ~CDatabaseConnection() {}
 
     // CDatabaseConnection
-    virtual bool           IsValid() = 0;
+    virtual bool           IsValid() const noexcept = 0;
     virtual const SString& GetLastErrorMessage() = 0;
-    virtual uint           GetLastErrorCode() = 0;
+    virtual uint           GetLastErrorCode() const noexcept = 0;
     virtual void           AddRef() = 0;
     virtual void           Release() = 0;
     virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult) = 0;
     virtual void           Flush() = 0;
-    virtual int            GetShareCount() = 0;
+    virtual int            GetShareCount() const noexcept = 0;
 
     bool          m_bLoggingEnabled;
     SString       m_strLogTag;

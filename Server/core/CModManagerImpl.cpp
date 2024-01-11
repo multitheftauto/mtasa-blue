@@ -14,8 +14,6 @@
 #include "MTAPlatform.h"
 #include <cstdio>
 
-using namespace std;
-
 void WaitForKey(int iKey);
 void Print(const char* szFormat, ...);
 
@@ -23,7 +21,7 @@ CModManagerImpl::CModManagerImpl(CServerImpl* pServer)
 {
     // Init
     m_pServer = pServer;
-    m_pBase = NULL;
+    m_pBase = nullptr;
 }
 
 CModManagerImpl::~CModManagerImpl()
@@ -43,9 +41,9 @@ SString CModManagerImpl::GetAbsolutePath(const char* szRelative)
     return SString("%s/%s", m_strModPath.c_str(), szRelative);
 }
 
-bool CModManagerImpl::IsModLoaded()
+bool CModManagerImpl::IsModLoaded() const noexcept
 {
-    return m_pBase != NULL;
+    return m_pBase != nullptr;
 }
 
 CServerBase* CModManagerImpl::GetCurrentMod()
@@ -115,57 +113,47 @@ bool CModManagerImpl::Load(const char* szModName, int iArgumentCount, char* szAr
 void CModManagerImpl::Unload(bool bKeyPressBeforeTerm)
 {
     // Got a mod loaded?
-    if (m_pBase)
-    {
-        // Call the mod's shutdown procedure
-        m_pBase->ServerShutdown();
-        m_pBase = NULL;
+    if (!m_pBase)
+        return;
 
-#ifdef WIN32
-        // Exit crash test
-        if (m_pServer->HasConsole())
+    // Call the mod's shutdown procedure
+    m_pBase->ServerShutdown();
+    m_pBase = nullptr;
+
+#ifdef _WIN32
+    // Exit crash test
+    if (m_pServer->HasConsole())
+    {
+        if (bKeyPressBeforeTerm)
         {
-            if (bKeyPressBeforeTerm)
-            {
-                Print("Press Q to shut down the server!\n");
-                WaitForKey('q');
-            }
-            TerminateProcess(GetCurrentProcess(), GetExitCode());
+            Print("Press Q to shut down the server!\n");
+            WaitForKey('q');
         }
-#endif
-        // Unload the library
-        m_Library.Unload();
+        TerminateProcess(GetCurrentProcess(), GetExitCode());
     }
+#endif
+    // Unload the library
+    m_Library.Unload();
 }
 
 void CModManagerImpl::DoPulse()
 {
     // Got a mod loaded?
-    if (m_pBase)
-    {
-        // Pulse the mod
-        m_pBase->DoPulse();
-    }
+    if (!m_pBase)
+        return;
+
+    // Pulse the mod
+    m_pBase->DoPulse();
 }
 
-bool CModManagerImpl::IsFinished()
+bool CModManagerImpl::IsFinished() const noexcept
 {
-    if (m_pBase)
-    {
-        return m_pBase->IsFinished();
-    }
-
-    return true;
+    return m_pBase ? m_pBase->IsFinished() : true;
 }
 
 bool CModManagerImpl::PendingWorkToDo()
 {
-    if (m_pBase)
-    {
-        return m_pBase->PendingWorkToDo();
-    }
-
-    return false;
+    return m_pBase ? m_pBase->PendingWorkToDo() : false;
 }
 
 bool CModManagerImpl::GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit)
@@ -174,12 +162,10 @@ bool CModManagerImpl::GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, in
     iSleepIdleMs = 40;
     iLogicFpsLimit = 0;
 
-    if (m_pBase)
-    {
-        return m_pBase->GetSleepIntervals(iSleepBusyMs, iSleepIdleMs, iLogicFpsLimit);
-    }
+    if (!m_pBase)
+        return false;
 
-    return false;
+    return m_pBase->GetSleepIntervals(iSleepBusyMs, iSleepIdleMs, iLogicFpsLimit);
 }
 
 void CModManagerImpl::SetExitCode(int exitCode)
@@ -194,16 +180,16 @@ int CModManagerImpl::GetExitCode() const
 
 void CModManagerImpl::GetTag(char* szInfoTag, int iInfoTag)
 {
-    if (m_pBase)
-    {
-        m_pBase->GetTag(szInfoTag, iInfoTag);
-    }
+    if (!m_pBase)
+        return;
+
+    m_pBase->GetTag(szInfoTag, iInfoTag);
 }
 
 void CModManagerImpl::HandleInput(const char* szCommand)
 {
-    if (m_pBase)
-    {
-        m_pBase->HandleInput((char*)szCommand);
-    }
+    if (!m_pBase)
+        return;
+
+    m_pBase->HandleInput(szCommand);
 }

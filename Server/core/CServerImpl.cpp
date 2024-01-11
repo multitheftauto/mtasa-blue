@@ -18,7 +18,7 @@
 #include <clocale>
 #include <cstdio>
 #include <signal.h>
-#ifdef WIN32
+#ifdef _WIN32
     #include <Mmsystem.h>
     #include <io.h>
 #else
@@ -39,7 +39,7 @@ bool g_bSilent = false;
 bool g_bNoCurses = false;
 bool g_bNoTopBar = false;
 bool g_bNoCrashHandler = false;
-#ifndef WIN32
+#ifndef _WIN32
 bool    g_bDaemonized = false;
 WINDOW* m_wndMenu = NULL;
 WINDOW* m_wndInput = NULL;
@@ -49,13 +49,13 @@ bool    IsCursesActive()
 }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 CServerImpl::CServerImpl(CThreadCommandQueue* pThreadCommandQueue)
 #else
 CServerImpl::CServerImpl()
 #endif
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     m_pThreadCommandQueue = pThreadCommandQueue;
     m_fClientFeedback = NULL;
     m_hConsole = NULL;
@@ -112,7 +112,7 @@ void CServerImpl::Printf(const char* szFormat, ...)
 
     if (!g_bSilent)
     {
-#ifdef WIN32
+#ifdef _WIN32
         vprintf(szFormat, ap);
 #else
         if (IsCursesActive())
@@ -123,7 +123,7 @@ void CServerImpl::Printf(const char* szFormat, ...)
     }
 
     // Eventually feed stuff back to our client if we run inside GTA
-    #ifdef WIN32
+    #ifdef _WIN32
     if (m_fClientFeedback)
     {
         char szOutput[512];
@@ -138,13 +138,13 @@ void CServerImpl::Printf(const char* szFormat, ...)
 
 bool CServerImpl::IsRequestingExit()
 {
-#ifdef WIN32
+#ifdef _WIN32
     m_pThreadCommandQueue->Process(m_bRequestedQuit, NULL);
 #endif
     return m_bRequestedQuit;
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 void CServerImpl::Daemonize() const
 {
     if (fork())
@@ -162,7 +162,7 @@ void CServerImpl::Daemonize() const
 
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 bool CServerImpl::HasConsole()
 {
     // Getting it a single time is sufficient
@@ -177,7 +177,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     if (!ParseArguments(iArgumentCount, szArguments))
         return 1;
 
-#ifdef WIN32
+#ifdef _WIN32
     if (!m_fClientFeedback)
 #else
     if (!g_bNoCrashHandler)
@@ -188,7 +188,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
         CCrashHandler::Init(m_strServerPath);
     }
 
-#ifndef WIN32
+#ifndef _WIN32
     // Daemonize?
     if (g_bDaemonized)
         Daemonize();
@@ -197,7 +197,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     if (!g_bSilent)
     {
         // Initialize the console handlers
-#ifdef WIN32
+#ifdef _WIN32
         // Set our locale to the C locale, as Unicode output only functions in this locale
         std::setlocale(LC_ALL, "C");
         assert(strcoll("a", "B") > 0);
@@ -442,14 +442,14 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
 void CServerImpl::MainLoop()
 {
-#ifdef WIN32
+#ifdef _WIN32
     timeBeginPeriod(1);            // Change sleep resolution to 1ms
 #endif
 
     // Loop until a termination is requested
     while (!m_bRequestedQuit)
     {
-#ifndef WIN32
+#ifndef _WIN32
         if (!g_bSilent && !g_bNoCurses)
         {
             // Update all the windows, and the physical screen in one burst
@@ -472,7 +472,7 @@ void CServerImpl::MainLoop()
         HandleInput();
 
         // Handle input from the secondary thread
-        #ifdef WIN32
+        #ifdef _WIN32
         m_pThreadCommandQueue->Process(m_bRequestedQuit, m_pModManager);
         #endif
 
@@ -485,7 +485,7 @@ void CServerImpl::MainLoop()
         HandlePulseSleep();
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     timeEndPeriod(1);            // Restore previous sleep resolution
 #endif
 
@@ -589,7 +589,7 @@ void CServerImpl::ShowInfoTag(char* szTag)
 {
     if (g_bSilent || g_bNoTopBar || g_bNoCurses)
         return;
-#ifdef WIN32
+#ifdef _WIN32
     // Windows console code
     // Get the console's width
     CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
@@ -724,7 +724,7 @@ void CServerImpl::HandleInput()
     wint_t iStdIn = 0;
 
     // Get the STDIN input
-#ifdef WIN32
+#ifdef _WIN32
     if (!HasConsole())
     {
         // Read from pipe instead of tty
@@ -757,7 +757,7 @@ void CServerImpl::HandleInput()
     {
         case '\n':            // Newlines and carriage returns
         case '\r':
-#ifdef WIN32
+#ifdef _WIN32
             // Echo a newline
             Printf(" \n");
 #else
@@ -775,7 +775,7 @@ void CServerImpl::HandleInput()
             if (m_uiInputCount > 0)
             {
                 // Check for the most important command: quit
-#ifdef WIN32
+#ifdef _WIN32
                 if (!_wcsicmp(m_szInputBuffer, L"quit") || !_wcsicmp(m_szInputBuffer, L"exit"))
 #else
                 if (!wcscasecmp(m_szInputBuffer, L"quit") || !wcscasecmp(m_szInputBuffer, L"exit"))
@@ -783,7 +783,7 @@ void CServerImpl::HandleInput()
                 {
                     m_bRequestedQuit = true;
                 }
-#ifdef WIN32
+#ifdef _WIN32
                 else if (!_wcsicmp(m_szInputBuffer, L"reset"))
 #else
                 else if (!wcscasecmp(m_szInputBuffer, L"reset"))
@@ -822,7 +822,7 @@ void CServerImpl::HandleInput()
                 break;
 
                 // Insert a blank space + backspace
-#ifdef WIN32
+#ifdef _WIN32
             Printf("%c %c", 0x08, 0x08);
 #else
             if (!g_bSilent && !g_bNoCurses)
@@ -832,7 +832,7 @@ void CServerImpl::HandleInput()
             m_szInputBuffer[m_uiInputCount] = 0;
             break;
 
-#ifdef WIN32    // WIN32: we have to use a prefix code, this routine opens an extra switch
+#ifdef _WIN32    // _WIN32: we have to use a prefix code, this routine opens an extra switch
         case KEY_EXTENDED:
             // Color the text
             if (!g_bSilent && HasConsole())
@@ -848,7 +848,7 @@ void CServerImpl::HandleInput()
                     if (m_uiInputCount <= 0)
                         break;
 
-#ifdef WIN32
+#ifdef _WIN32
                     wchar_t szBuffer[255];
                     memset(szBuffer, 0, sizeof(szBuffer));
 
@@ -869,7 +869,7 @@ void CServerImpl::HandleInput()
                     if (m_uiInputCount == wcslen(m_szInputBuffer))
                         break;
 
-#ifdef WIN32
+#ifdef _WIN32
                     wchar_t szBuffer[255];
                     memset(szBuffer, 0, sizeof(szBuffer));
 
@@ -914,7 +914,7 @@ void CServerImpl::HandleInput()
 
                     break;
                 }
-#ifdef WIN32    // WIN32: Close the switch again
+#ifdef _WIN32    // _WIN32: Close the switch again
             }
             // Restore the color
             if (!g_bSilent && HasConsole())
@@ -928,7 +928,7 @@ void CServerImpl::HandleInput()
                 // entered 254 characters, wait for user to confirm/remove
                 break;
 
-#ifdef WIN32
+#ifdef _WIN32
             // Color the text
             if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute(m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED);
@@ -944,7 +944,7 @@ void CServerImpl::HandleInput()
 
             m_szInputBuffer[m_uiInputCount++] = iStdIn;
 
-#ifdef WIN32
+#ifdef _WIN32
             // Restore the color
             if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
@@ -982,7 +982,7 @@ void CServerImpl::SelectCommandHistoryEntry(uint uiEntry)
     // Let's print it out
     wchar_t szBuffer[255] = {};
     wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
-#ifdef WIN32
+#ifdef _WIN32
     Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
 #else
     if (!g_bSilent && !g_bNoCurses)
@@ -998,7 +998,7 @@ bool CServerImpl::ClearInput()
         memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
 
         // Couldn't get anything else working, so this is a way to clear the line
-#ifdef WIN32
+#ifdef _WIN32
         for (uint i = 0; i < 80; i++)
             Printf("%c %c", 0x08, 0x08);
 #else
@@ -1019,7 +1019,7 @@ bool CServerImpl::ResetInput()
     if (m_uiInputCount > 0)
     {
         // Let's print our current input buffer
-#ifdef WIN32
+#ifdef _WIN32
         // Echo a newline
         Printf(" \n");
 #else
@@ -1047,7 +1047,7 @@ bool CServerImpl::ResetInput()
 
 bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
 {
-#ifndef WIN32
+#ifndef _WIN32
     // Default to a simple console if stdout is not a TTY (e.g. running under 'nohup')
     if (!isatty(STDOUT_FILENO))
     {
@@ -1072,7 +1072,7 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
             }
 
             // Client feedback pointer?
-            #ifdef WIN32
+            #ifdef _WIN32
             case 'c':
             {
                 m_fClientFeedback = reinterpret_cast<FClientFeedback*>(szArguments[i]);
@@ -1092,7 +1092,7 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
                 {
                     g_bSilent = true;
                 }
-#ifndef WIN32
+#ifndef _WIN32
                 else if (strcmp(szArguments[i], "-d") == 0)
                 {
                     g_bDaemonized = true;
@@ -1110,7 +1110,7 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
                 else if (strcmp(szArguments[i], "-f") == 0)
                 {
                     g_bNoTopBar = false;
-#ifndef WIN32
+#ifndef _WIN32
                     g_bNoCurses = false;
 #endif
                 }
@@ -1124,7 +1124,7 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
                     g_bNoCrashHandler = true;
                 }
 
-                #ifdef WIN32
+                #ifdef _WIN32
                 else if (strcmp(szArguments[i], "--clientfeedback") == 0)
                 {
                     ucNext = 'c';
@@ -1140,7 +1140,7 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
 bool IsKeyPressed(int iKey)
 {
     // Is the key pressed?
-#ifdef WIN32
+#ifdef _WIN32
     if (kbhit())
         return getch() == iKey;
 #else
@@ -1154,7 +1154,7 @@ bool IsKeyPressed(int iKey)
 
 void CServerImpl::DestroyWindow()
 {
-#ifndef WIN32
+#ifndef _WIN32
     if (!g_bSilent && !g_bNoCurses && m_wndInput)
     {
         if (m_wndMenu)
@@ -1194,7 +1194,7 @@ void Print(const char* szFormat, ...)
     SString str;
     str.vFormat(szFormat, ap);
 
-#ifdef WIN32
+#ifdef _WIN32
     printf("%s", *str);
 #else
     if (IsCursesActive())

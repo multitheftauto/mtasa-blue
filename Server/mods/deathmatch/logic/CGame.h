@@ -30,13 +30,11 @@ class CGame;
 #include "packets/CPlayerTimeoutPacket.h"
 #include "packets/CPlayerPuresyncPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
-#include "packets/CLightsyncPacket.h"
 #include "packets/CVehicleResyncPacket.h"
 #include "packets/CKeysyncPacket.h"
 #include "packets/CBulletsyncPacket.h"
 #include "packets/CPedTaskPacket.h"
 #include "packets/CCustomWeaponBulletSyncPacket.h"
-#include "packets/CSyncSettingsPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
@@ -132,7 +130,7 @@ class CVehicleTrailerPacket;
 class CVoiceDataPacket;
 class CWeaponDamageCheckPacket;
 
-typedef SFixedArray<bool, MAX_GARAGES> SGarageStates;
+using SGarageStates = SFixedArray<bool, MAX_GARAGES>;
 
 // CSendList - Can be used like a std::list of players for sending packets.
 //             Used to construct an optimized list of players for CGame::Broadcast
@@ -146,17 +144,18 @@ class CGame
 {
 public:
     ZERO_ON_NEW            // To be sure everything is cleared
-        enum {
-            VEHICLE_REQUEST_IN,
-            VEHICLE_NOTIFY_IN,
-            VEHICLE_NOTIFY_IN_ABORT,
-            VEHICLE_REQUEST_OUT,
-            VEHICLE_NOTIFY_OUT,
-            VEHICLE_NOTIFY_OUT_ABORT,
-            VEHICLE_NOTIFY_JACK,
-            VEHICLE_NOTIFY_JACK_ABORT,
-            VEHICLE_NOTIFY_FELL_OFF,
-        };
+    enum
+    {
+        VEHICLE_REQUEST_IN,
+        VEHICLE_NOTIFY_IN,
+        VEHICLE_NOTIFY_IN_ABORT,
+        VEHICLE_REQUEST_OUT,
+        VEHICLE_NOTIFY_OUT,
+        VEHICLE_NOTIFY_OUT_ABORT,
+        VEHICLE_NOTIFY_JACK,
+        VEHICLE_NOTIFY_JACK_ABORT,
+        VEHICLE_NOTIFY_FELL_OFF,
+    };
 
     enum
     {
@@ -191,97 +190,123 @@ public:
     ~CGame();
 
     void GetTag(char* szInfoTag, int iInfoTag);
-    void HandleInput(char* szCommand);
+    void HandleInput(const char* szCommand);
 
     void DoPulse();
 
     bool Start(int iArgumentCount, char* szArguments[]);
     void Stop();
 
-    static bool StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
+    static bool StaticProcessPacket(std::uint8_t ucPacketID,
+        const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream,
+        SNetExtraInfo* pNetExtraInfo
+    );
     bool        ProcessPacket(CPacket& Packet);
 
-    void SetIsFinished(bool bFinished) { m_bIsFinished = bFinished; };
-    bool IsFinished() { return m_bIsFinished; };
+    constexpr bool IsFinished() const noexcept { return m_bIsFinished; };
+    constexpr void SetIsFinished(bool bFinished) noexcept { m_bIsFinished = bFinished; };
 
-    CMainConfig*            GetConfig() { return m_pMainConfig; }
-    CHandlingManager*       GetHandlingManager() { return m_pHandlingManager; }
-    CMapManager*            GetMapManager() { return m_pMapManager; }
-    CPlayerManager*         GetPlayerManager() { return m_pPlayerManager; }
-    CObjectManager*         GetObjectManager() { return m_pObjectManager; }
-    CVehicleManager*        GetVehicleManager() { return m_pVehicleManager; }
-    CTeamManager*           GetTeamManager() { return m_pTeamManager; }
-    CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync() { return m_pUnoccupiedVehicleSync; }
-    CPedSync*               GetPedSync() { return m_pPedSync; }
-    CRegisteredCommands*    GetRegisteredCommands() { return m_pRegisteredCommands; }
+    
+    constexpr CAccountManager*           GetAccountManager() const noexcept { return m_pAccountManager; }
+    constexpr CAccessControlListManager* GetACLManager() const noexcept { return m_pACLManager; }
+    constexpr ASE*                       GetASE() const noexcept { return m_pASE; }
+    constexpr SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() const noexcept { return m_pAsyncTaskScheduler; }
+    constexpr CBanManager*               GetBanManager() const noexcept { return m_pBanManager; }
+    constexpr CBlipManager*              GetBlipManager() const noexcept { return m_pBlipManager; }
+    constexpr CBuildingRemovalManager*   GetBuildingRemovalManager() const noexcept { return m_pBuildingRemovalManager; }
+    constexpr CClock*                    GetClock() const noexcept { return m_pClock; }
+    constexpr CColManager*               GetColManager() const noexcept { return m_pColManager; }
+    constexpr CMainConfig*               GetConfig() const noexcept { return m_pMainConfig; }
+    constexpr CConsole*                  GetConsole() const noexcept { return m_pConsole; }
+    constexpr CConsoleClient*            GetConsoleClient() const noexcept { return m_pConsoleClient; }
+    constexpr CCustomWeaponManager*      GetCustomWeaponManager() const noexcept { return m_pCustomWeaponManager; }
+    constexpr CDatabaseManager*          GetDatabaseManager() const noexcept { return m_pDatabaseManager; }
+    constexpr CDebugHookManager*         GetDebugHookManager() const noexcept { return m_pDebugHookManager; }
+    constexpr CFunctionUseLogger*        GetFunctionUseLogger() const noexcept { return m_pFunctionUseLogger; }
+    constexpr CGroups*                   GetGroups() const noexcept { return m_pGroups; }
+    constexpr CHTTPD*                    GetHTTPD() const noexcept { return m_pHTTPD; }
+    constexpr CHandlingManager*          GetHandlingManager() const noexcept { return m_pHandlingManager; }
+    constexpr CLanBroadcast*             GetLanBroadcast() const noexcept { return m_pLanBroadcast; }
+    constexpr CLatentTransferManager*    GetLatentTransferManager() const noexcept { return m_pLatentTransferManager; }
+    constexpr CLuaCallbackManager*       GetLuaCallbackManager() const noexcept { return m_pLuaCallbackManager; }
+    constexpr CLuaManager*               GetLuaManager() const noexcept { return m_pLuaManager; }
+    constexpr CMapManager*               GetMapManager() const noexcept { return m_pMapManager; }
+    constexpr CMarkerManager*            GetMarkerManager() const noexcept { return m_pMarkerManager; }
+    constexpr CMasterServerAnnouncer*    GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
+    constexpr CObjectManager*            GetObjectManager() const noexcept { return m_pObjectManager; }
 #ifdef WITH_OBJECT_SYNC
-    CObjectSync* GetObjectSync() { return m_pObjectSync; }
+    constexpr CObjectSync* GetObjectSync() const noexcept { return m_pObjectSync; }
 #endif
-    CConsole*                        GetConsole() { return m_pConsole; }
-    CDatabaseManager*                GetDatabaseManager() { return m_pDatabaseManager; }
-    CLuaCallbackManager*             GetLuaCallbackManager() { return m_pLuaCallbackManager; }
-    CRegistryManager*                GetRegistryManager() { return m_pRegistryManager; }
-    CRegistry*                       GetRegistry() { return m_pRegistry; }
-    CAccountManager*                 GetAccountManager() { return m_pAccountManager; }
-    CScriptDebugging*                GetScriptDebugging() { return m_pScriptDebugging; }
-    CEvents*                         GetEvents() { return &m_Events; }
-    CColManager*                     GetColManager() { return m_pColManager; }
-    CLatentTransferManager*          GetLatentTransferManager() { return m_pLatentTransferManager; }
-    CDebugHookManager*               GetDebugHookManager() { return m_pDebugHookManager; }
-    CPedManager*                     GetPedManager() { return m_pPedManager; }
-    CResourceManager*                GetResourceManager() { return m_pResourceManager; }
-    CMarkerManager*                  GetMarkerManager() { return m_pMarkerManager; }
-    CBlipManager*                    GetBlipManager() { return m_pBlipManager; }
-    CPickupManager*                  GetPickupManager() { return m_pPickupManager; }
-    CRadarAreaManager*               GetRadarAreaManager() { return m_pRadarAreaManager; }
-    CGroups*                         GetGroups() { return m_pGroups; }
-    CElementDeleter*                 GetElementDeleter() { return &m_ElementDeleter; }
-    CConnectHistory*                 GetJoinFloodProtector() { return &m_FloodProtect; }
-    CHTTPD*                          GetHTTPD() { return m_pHTTPD; }
-    CSettings*                       GetSettings() { return m_pSettings; }
-    CAccessControlListManager*       GetACLManager() { return m_pACLManager; }
-    CBanManager*                     GetBanManager() { return m_pBanManager; }
-    CRemoteCalls*                    GetRemoteCalls() { return m_pRemoteCalls; }
-    CZoneNames*                      GetZoneNames() { return m_pZoneNames; }
-    CClock*                          GetClock() { return m_pClock; }
-    CWaterManager*                   GetWaterManager() { return m_pWaterManager; }
-    CLightsyncManager*               GetLightSyncManager() { return &m_lightsyncManager; }
-    CWeaponStatManager*              GetWeaponStatManager() { return m_pWeaponStatsManager; }
-    CBuildingRemovalManager*         GetBuildingRemovalManager() { return m_pBuildingRemovalManager; }
-    CCustomWeaponManager*            GetCustomWeaponManager() { return m_pCustomWeaponManager; }
-    CFunctionUseLogger*              GetFunctionUseLogger() { return m_pFunctionUseLogger; }
-    CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
-    SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
+    constexpr CPacketTranslator*      GetPacketTranslator() const noexcept { return m_pPacketTranslator; }
+    constexpr CPedManager*            GetPedManager() const noexcept { return m_pPedManager; }
+    constexpr CPedSync*               GetPedSync() const noexcept { return m_pPedSync; }
+    constexpr CPickupManager*         GetPickupManager() const noexcept { return m_pPickupManager; }
+    constexpr CPlayerManager*         GetPlayerManager() const noexcept { return m_pPlayerManager; }
+    constexpr CRPCFunctions*          GetRPCFunctions() const noexcept { return m_pRPCFunctions; }
+    constexpr CRadarAreaManager*      GetRadarAreaManager() const noexcept { return m_pRadarAreaManager; }
+    constexpr CRegisteredCommands*    GetRegisteredCommands() const noexcept { return m_pRegisteredCommands; }
+    constexpr CRegistry*              GetRegistry() const noexcept { return m_pRegistry; }
+    constexpr CRegistryManager*       GetRegistryManager() const noexcept { return m_pRegistryManager; }
+    constexpr CRemoteCalls*           GetRemoteCalls() const noexcept { return m_pRemoteCalls; }
+    constexpr CResourceManager*       GetResourceManager() const noexcept { return m_pResourceManager; }
+    constexpr CScriptDebugging*       GetScriptDebugging() const noexcept { return m_pScriptDebugging; }
+    constexpr CSettings*              GetSettings() const noexcept { return m_pSettings; }
+    constexpr CTeamManager*           GetTeamManager() const noexcept { return m_pTeamManager; }
+    constexpr CUnoccupiedVehicleSync* GetUnoccupiedVehicleSync() const noexcept { return m_pUnoccupiedVehicleSync; }
+    constexpr CVehicleManager*        GetVehicleManager() const noexcept { return m_pVehicleManager; }
+    constexpr CWaterManager*          GetWaterManager() const noexcept { return m_pWaterManager; }
+    constexpr CWeaponStatManager*     GetWeaponStatManager() const noexcept { return m_pWeaponStatsManager; }
+    constexpr CZoneNames*             GetZoneNames() const noexcept { return m_pZoneNames; }
 
-    std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
+    constexpr CEvents*           GetEvents() noexcept { return &m_Events; }
+    constexpr CElementDeleter*   GetElementDeleter() noexcept { return &m_ElementDeleter; }
+    constexpr CConnectHistory*   GetJoinFloodProtector() noexcept { return &m_FloodProtect; }
+    constexpr CLightsyncManager* GetLightSyncManager() noexcept { return &m_lightsyncManager; }
+
+    std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() const noexcept { return m_pTrainTrackManager; }
 
     void JoinPlayer(CPlayer& Player);
     void InitialDataStream(CPlayer& Player);
-    void QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, const char* szKickReason = "None",
-                    const char* szResponsiblePlayer = "None");
+    void QuitPlayer(CPlayer& Player,
+        CClient::eQuitReasons Reason = CClient::QUIT_QUIT,
+        bool bSayInConsole = true,
+        const char* szKickReason = "None",
+        const char* szResponsiblePlayer = "None");
 
-    class CLuaManager* GetLuaManager() { return m_pLuaManager; };
+    constexpr float GetGravity() const noexcept { return m_fGravity; }
+    constexpr void  SetGravity(float fGravity) noexcept { m_fGravity = fGravity; }
 
-    float GetGravity() { return m_fGravity; }
-    void  SetGravity(float fGravity) { m_fGravity = fGravity; }
+    constexpr std::uint8_t GetTrafficLightState() const noexcept {
+        return m_ucTrafficLightState;
+    }
+    constexpr void         SetTrafficLightState(const std::uint8_t ucState) noexcept {
+        m_ucTrafficLightState = ucState;
+    }
 
-    unsigned char GetTrafficLightState() { return m_ucTrafficLightState; }
-    void          SetTrafficLightState(unsigned char ucState) { m_ucTrafficLightState = ucState; }
+    constexpr bool GetTrafficLightsLocked() const noexcept { return m_bTrafficLightsLocked; }
+    constexpr void SetTrafficLightsLocked(bool bLocked) noexcept {
+        m_bTrafficLightsLocked = bLocked;
+    }
 
-    bool GetTrafficLightsLocked() { return m_bTrafficLightsLocked; }
-    void SetTrafficLightsLocked(bool bLocked) { m_bTrafficLightsLocked = bLocked; }
+    constexpr float GetJetpackMaxHeight() const noexcept { return m_fJetpackMaxHeight; }
+    constexpr void  SetJetpackMaxHeight(float fMaxHeight) noexcept {
+        m_fJetpackMaxHeight = fMaxHeight;
+    }
 
-    float GetJetpackMaxHeight() { return m_fJetpackMaxHeight; }
-    void  SetJetpackMaxHeight(float fMaxHeight) { m_fJetpackMaxHeight = fMaxHeight; }
+    constexpr float GetGameSpeed() const noexcept { return m_fGameSpeed; }
+    constexpr void  SetGameSpeed(float fGameSpeed) noexcept {
+        m_fGameSpeed = fGameSpeed;
+    }
 
-    float GetGameSpeed() { return m_fGameSpeed; }
-    void  SetGameSpeed(float fGameSpeed) { m_fGameSpeed = fGameSpeed; }
+    constexpr bool HasSkyGradient() const noexcept { return m_bHasSkyGradient; }
+    constexpr void SetHasSkyGradient(bool bHasSkyGradient) noexcept {
+        m_bHasSkyGradient = bHasSkyGradient;
+    }
 
-    bool HasSkyGradient() { return m_bHasSkyGradient; }
-    void SetHasSkyGradient(bool bHasSkyGradient) { m_bHasSkyGradient = bHasSkyGradient; }
-
-    void GetSkyGradient(unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB)
-    {
+    constexpr void GetSkyGradient(
+        std::uint8_t& ucTR, std::uint8_t& ucTG, std::uint8_t& ucTB,
+        std::uint8_t& ucBR, std::uint8_t& ucBG, std::uint8_t& ucBB
+    ) const noexcept {
         ucTR = m_ucSkyGradientTR;
         ucTG = m_ucSkyGradientTG;
         ucTB = m_ucSkyGradientTB;
@@ -289,8 +314,10 @@ public:
         ucBG = m_ucSkyGradientBG;
         ucBB = m_ucSkyGradientBB;
     }
-    void SetSkyGradient(unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB)
-    {
+    constexpr void SetSkyGradient(
+        std::uint8_t& ucTR, std::uint8_t& ucTG, std::uint8_t& ucTB,
+        std::uint8_t& ucBR, std::uint8_t& ucBG, std::uint8_t& ucBB
+    ) noexcept {
         m_ucSkyGradientTR = ucTR;
         m_ucSkyGradientTG = ucTG;
         m_ucSkyGradientTB = ucTB;
@@ -299,51 +326,75 @@ public:
         m_ucSkyGradientBB = ucBB;
     }
 
-    bool HasHeatHaze() { return m_bHasHeatHaze; }
-    void SetHasHeatHaze(bool bHasHeatHaze) { m_bHasHeatHaze = bHasHeatHaze; }
+    constexpr bool HasHeatHaze() const noexcept { return m_bHasHeatHaze; }
+    constexpr void SetHasHeatHaze(bool bHasHeatHaze) noexcept {
+        m_bHasHeatHaze = bHasHeatHaze;
+    }
 
-    void GetHeatHaze(SHeatHazeSettings& heatHazeSettings) { heatHazeSettings = m_HeatHazeSettings; }
-    void SetHeatHaze(const SHeatHazeSettings& heatHazeSettings) { m_HeatHazeSettings = heatHazeSettings; }
+    constexpr void GetHeatHaze(SHeatHazeSettings& heatHazeSettings) const noexcept {
+        // wouldn't "return m_HeatHazeSettings" be better here?
+        heatHazeSettings = m_HeatHazeSettings;
+    }
+    constexpr void SetHeatHaze(const SHeatHazeSettings& heatHazeSettings) noexcept {
+        m_HeatHazeSettings = heatHazeSettings;
+    }
 
-    bool GetInteriorSoundsEnabled() { return m_bInteriorSoundsEnabled; }
-    void SetInteriorSoundsEnabled(bool bEnable) { m_bInteriorSoundsEnabled = bEnable; }
+    constexpr bool GetInteriorSoundsEnabled() const noexcept { return m_bInteriorSoundsEnabled; }
+    constexpr void SetInteriorSoundsEnabled(bool bEnable) noexcept {
+        m_bInteriorSoundsEnabled = bEnable;
+    }
 
-    bool HasWaterColor() { return m_bOverrideWaterColor; }
-    void SetHasWaterColor(bool bOverrideWaterColor) { m_bOverrideWaterColor = bOverrideWaterColor; }
+    constexpr bool HasWaterColor() const noexcept { return m_bOverrideWaterColor; }
+    constexpr void SetHasWaterColor(bool bOverrideWaterColor) noexcept {
+        m_bOverrideWaterColor = bOverrideWaterColor;
+    }
 
-    void GetWaterColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
-    {
+    constexpr void GetWaterColor(std::uint8_t& ucRed, std::uint8_t& ucGreen,
+        std::uint8_t& ucBlue, std::uint8_t& ucAlpha
+    ) noexcept {
         ucRed = m_ucWaterRed;
         ucGreen = m_ucWaterGreen;
         ucBlue = m_ucWaterBlue;
         ucAlpha = m_ucWaterAlpha;
     }
-    void SetWaterColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
-    {
+    constexpr void SetWaterColor(std::uint8_t& ucRed, std::uint8_t& ucGreen,
+        std::uint8_t& ucBlue, std::uint8_t& ucAlpha
+    ) noexcept {
         m_ucWaterRed = ucRed;
         m_ucWaterGreen = ucGreen;
         m_ucWaterBlue = ucBlue;
         m_ucWaterAlpha = ucAlpha;
     }
 
-    bool HasRainLevel() { return m_bOverrideRainLevel; }
-    void SetHasRainLevel(bool bOverrideRainLevel) { m_bOverrideRainLevel = bOverrideRainLevel; }
+    constexpr bool HasRainLevel() const noexcept { return m_bOverrideRainLevel; }
+    constexpr void SetHasRainLevel(bool bOverrideRainLevel) noexcept {
+        m_bOverrideRainLevel = bOverrideRainLevel;
+    }
 
-    float GetRainLevel() { return m_fRainLevel; }
-    void  SetRainLevel(float& fRainLevel) { m_fRainLevel = fRainLevel; }
+    constexpr float GetRainLevel() const noexcept { return m_fRainLevel; }
+    constexpr void  SetRainLevel(float& fRainLevel) noexcept {
+        m_fRainLevel = fRainLevel;
+    }
 
-    bool HasSunSize() { return m_bOverrideSunSize; }
-    void SetHasSunSize(bool bOverrideSunSize) { m_bOverrideSunSize = bOverrideSunSize; }
+    constexpr bool HasSunSize() const noexcept { return m_bOverrideSunSize; }
+    constexpr void SetHasSunSize(bool bOverrideSunSize) noexcept {
+        m_bOverrideSunSize = bOverrideSunSize;
+    }
 
-    float GetSunSize() { return m_fSunSize; }
-    void  SetSunSize(float& fSunSize) { m_fSunSize = fSunSize; }
+    constexpr float GetSunSize() const noexcept { return m_fSunSize; }
+    constexpr void  SetSunSize(float& fSunSize) noexcept {
+        m_fSunSize = fSunSize;
+    }
 
-    bool HasSunColor() { return m_bOverrideSunColor; }
-    void SetHasSunColor(bool bOverrideSunColor) { m_bOverrideSunColor = bOverrideSunColor; }
+    constexpr bool HasSunColor() const noexcept { return m_bOverrideSunColor; }
+    constexpr void SetHasSunColor(bool bOverrideSunColor) noexcept {
+        m_bOverrideSunColor = bOverrideSunColor;
+    }
 
-    void GetSunColor(unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG,
-                     unsigned char& ucCoronaB)
-    {
+    constexpr void GetSunColor(
+        std::uint8_t& ucCoreR, std::uint8_t& ucCoreG, std::uint8_t& ucCoreB,
+        std::uint8_t& ucCoronaR, std::uint8_t& ucCoronaG, std::uint8_t& ucCoronaB
+    ) const noexcept {
         ucCoreR = m_ucSunCoreR;
         ucCoreG = m_ucSunCoreG;
         ucCoreB = m_ucSunCoreB;
@@ -351,9 +402,10 @@ public:
         ucCoronaG = m_ucSunCoronaG;
         ucCoronaB = m_ucSunCoronaB;
     }
-    void SetSunColor(unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG,
-                     unsigned char& ucCoronaB)
-    {
+    constexpr void SetSunColor(
+        std::uint8_t& ucCoreR, std::uint8_t& ucCoreG, std::uint8_t& ucCoreB,
+        std::uint8_t& ucCoronaR, std::uint8_t& ucCoronaG, std::uint8_t& ucCoronaB
+    ) noexcept {
         m_ucSunCoreR = ucCoreR;
         m_ucSunCoreG = ucCoreG;
         m_ucSunCoreB = ucCoreB;
@@ -362,63 +414,83 @@ public:
         m_ucSunCoronaB = ucCoronaB;
     }
 
-    bool HasWindVelocity() { return m_bOverrideWindVelocity; }
-    void SetHasWindVelocity(bool bOverrideWindVelocity) { m_bOverrideWindVelocity = bOverrideWindVelocity; }
+    constexpr bool HasWindVelocity() const noexcept { return m_bOverrideWindVelocity; }
+    constexpr void SetHasWindVelocity(bool bOverrideWindVelocity) noexcept {
+        m_bOverrideWindVelocity = bOverrideWindVelocity;
+    }
 
-    void GetWindVelocity(float& fVelX, float& fVelY, float& fVelZ)
+    constexpr void GetWindVelocity(float& fVelX, float& fVelY, float& fVelZ) noexcept
     {
         fVelX = m_fWindVelX;
         fVelY = m_fWindVelY;
         fVelZ = m_fWindVelZ;
     }
-    void SetWindVelocity(float& fVelX, float& fVelY, float& fVelZ)
+    constexpr void SetWindVelocity(float& fVelX, float& fVelY, float& fVelZ) noexcept
     {
         m_fWindVelX = fVelX;
         m_fWindVelY = fVelY;
         m_fWindVelZ = fVelZ;
     }
 
-    bool HasFarClipDistance() { return m_bOverrideFarClip; }
-    void SetHasFarClipDistance(bool bOverrideFarClip) { m_bOverrideFarClip = bOverrideFarClip; }
+    constexpr bool HasFarClipDistance() const noexcept { return m_bOverrideFarClip; }
+    constexpr void SetHasFarClipDistance(bool bOverrideFarClip) noexcept {
+        m_bOverrideFarClip = bOverrideFarClip;
+    }
 
-    float GetFarClipDistance() { return m_fFarClipDistance; }
-    void  SetFarClipDistance(float& fFarClipDistance) { m_fFarClipDistance = fFarClipDistance; }
+    constexpr float GetFarClipDistance() const noexcept { return m_fFarClipDistance; }
+    constexpr void  SetFarClipDistance(float& fFarClipDistance) noexcept {
+        m_fFarClipDistance = fFarClipDistance;
+    }
 
-    bool HasFogDistance() { return m_bOverrideFogDistance; }
-    void SetHasFogDistance(bool bOverrideFogDistance) { m_bOverrideFogDistance = bOverrideFogDistance; }
+    constexpr bool HasFogDistance() const noexcept { return m_bOverrideFogDistance; }
+    constexpr void SetHasFogDistance(bool bOverrideFogDistance) noexcept {
+        m_bOverrideFogDistance = bOverrideFogDistance;
+    }
 
-    float GetFogDistance() { return m_fFogDistance; }
-    void  SetFogDistance(float& fFogDistance) { m_fFogDistance = fFogDistance; }
+    constexpr float GetFogDistance() const noexcept { return m_fFogDistance; }
+    constexpr void  SetFogDistance(float& fFogDistance) noexcept {
+        m_fFogDistance = fFogDistance;
+    }
 
-    float GetAircraftMaxHeight() { return m_fAircraftMaxHeight; }
-    void  SetAircraftMaxHeight(float fMaxHeight) { m_fAircraftMaxHeight = fMaxHeight; }
+    constexpr float GetAircraftMaxHeight() const noexcept { return m_fAircraftMaxHeight; }
+    constexpr void  SetAircraftMaxHeight(float fMaxHeight) noexcept {
+        m_fAircraftMaxHeight = fMaxHeight;
+    }
 
-    float GetAircraftMaxVelocity() { return m_fAircraftMaxVelocity; }
-    void  SetAircraftMaxVelocity(float fVelocity)
+    constexpr float GetAircraftMaxVelocity() const noexcept {
+        return m_fAircraftMaxVelocity;
+    }
+    constexpr void  SetAircraftMaxVelocity(float fVelocity) noexcept
     {
         m_fAircraftMaxVelocity = fVelocity;
         m_fAircraftMaxVelocity_Sq = fVelocity * fVelocity;
     }
 
-    bool GetOcclusionsEnabled() { return m_bOcclusionsEnabled; }
-    void SetOcclusionsEnabled(bool bOcclusionsEnabled) { m_bOcclusionsEnabled = bOcclusionsEnabled; }
+    constexpr bool GetOcclusionsEnabled() const noexcept { return m_bOcclusionsEnabled; }
+    constexpr void SetOcclusionsEnabled(bool bOcclusionsEnabled) noexcept {
+        m_bOcclusionsEnabled = bOcclusionsEnabled;
+    }
 
-    SGarageStates& GetGarageStates() { return m_bGarageStates; }
+    constexpr SGarageStates& GetGarageStates() noexcept { return m_bGarageStates; }
 
     void Lock();
     void Unlock();
 
-    bool IsBeingDeleted() { return m_bBeingDeleted; }
+    constexpr bool IsBeingDeleted() const noexcept { return m_bBeingDeleted; }
     void ResetMapInfo();
 
     void        SetGlitchEnabled(const std::string& strGlitch, bool bEnabled);
     bool        IsGlitchEnabled(const std::string& strGlitch);
     bool        IsGlitchEnabled(eGlitchType cGlitch);
     eGlitchType GetGlitchIndex(const std::string& strGlitch) { return m_GlitchNames[strGlitch]; }
-    bool        IsGlitch(const std::string& strGlitch) { return m_GlitchNames.count(strGlitch) > 0; }
+    bool        IsGlitch(const std::string& strGlitch) const { return m_GlitchNames.count(strGlitch) > 0; }
 
-    bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property) { return m_WorldSpecialProps[property]; }
-    void SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled) { m_WorldSpecialProps[property] = isEnabled; }
+    bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property) {
+        return m_WorldSpecialProps[property];
+    }
+    void SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled) {
+        m_WorldSpecialProps[property] = isEnabled;
+    }
 
     void SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
@@ -426,26 +498,28 @@ public:
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
 
-    bool HasMoonSize() { return m_bOverrideMoonSize; }
-    void SetHasMoonSize(bool bOverrideMoonSize) { m_bOverrideMoonSize = bOverrideMoonSize; }
+    constexpr bool HasMoonSize() const noexcept { return m_bOverrideMoonSize; }
+    constexpr void SetHasMoonSize(bool bOverrideMoonSize) noexcept {
+        m_bOverrideMoonSize = bOverrideMoonSize;
+    }
 
-    int  GetMoonSize() { return m_iMoonSize; }
-    void SetMoonSize(int iMoonSize) { m_iMoonSize = iMoonSize; }
+    constexpr int  GetMoonSize() const noexcept { return m_iMoonSize; }
+    constexpr void SetMoonSize(int iMoonSize) noexcept { m_iMoonSize = iMoonSize; }
 
     void PrintLogOutputFromNetModule();
     void StartOpenPortsTest();
 
-    bool IsServerFullyUp() { return m_bServerFullyUp; }
+    constexpr bool IsServerFullyUp() const noexcept { return m_bServerFullyUp; }
 
-    ushort GetServerFPS() { return m_usFPS; }
-    int    GetSyncFPS() { return m_iSyncFPS; }
-    void   SetSyncFPS(int iSyncFPS) { m_iSyncFPS = iSyncFPS; }
+    constexpr ushort GetServerFPS() const noexcept { return m_usFPS; }
+    constexpr int    GetSyncFPS() const noexcept { return m_iSyncFPS; }
+    constexpr void   SetSyncFPS(int iSyncFPS) noexcept { m_iSyncFPS = iSyncFPS; }
 
     void HandleBackup();
     void HandleCrashDumpEncryption();
     void EnableLatentSends(bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL, ushort usResourceNetId = 0xFFFF);
-    void SendPacketBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream);
-    bool SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
+    void SendPacketBatchBegin(std::uint8_t ucPacketId, NetBitStreamInterface* pBitStream);
+    bool SendPacket(std::uint8_t ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
                     NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability,
                     ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT);
     void SendPacketBatchEnd();
@@ -516,65 +590,62 @@ private:
     // which the voice server library will call to send out data.
 
     CEvents                 m_Events;
-    CRemoteCalls*           m_pRemoteCalls;
-    CHTTPD*                 m_pHTTPD;
-    CMainConfig*            m_pMainConfig;
-    CBlipManager*           m_pBlipManager;
-    CGroups*                m_pGroups;
-    CColManager*            m_pColManager;
-    CObjectManager*         m_pObjectManager;
-    CPickupManager*         m_pPickupManager;
-    CPlayerManager*         m_pPlayerManager;
-    CRadarAreaManager*      m_pRadarAreaManager;
-    CVehicleManager*        m_pVehicleManager;
-    CPacketTranslator*      m_pPacketTranslator;
-    CMapManager*            m_pMapManager;
     CElementDeleter         m_ElementDeleter;
     CConnectHistory         m_FloodProtect;
-    CLuaManager*            m_pLuaManager;
-    CScriptDebugging*       m_pScriptDebugging;
-    CConsole*               m_pConsole;
-    CUnoccupiedVehicleSync* m_pUnoccupiedVehicleSync;
-    CPedSync*               m_pPedSync;
-#ifdef WITH_OBJECT_SYNC
-    CObjectSync* m_pObjectSync;
-#endif
-    CMarkerManager*            m_pMarkerManager;
-    CClock*                    m_pClock;
-    CBanManager*               m_pBanManager;
-    CTeamManager*              m_pTeamManager;
-    CCommandLineParser         m_CommandLineParser;
-    CRegisteredCommands*       m_pRegisteredCommands;
-    CDatabaseManager*          m_pDatabaseManager;
-    CLuaCallbackManager*       m_pLuaCallbackManager;
-    CRegistryManager*          m_pRegistryManager;
-    CRegistry*                 m_pRegistry;
-    CAccountManager*           m_pAccountManager;
-    CLatentTransferManager*    m_pLatentTransferManager;
-    CDebugHookManager*         m_pDebugHookManager;
-    CPedManager*               m_pPedManager;
-    CResourceManager*          m_pResourceManager;
-    CAccessControlListManager* m_pACLManager;
-    CSettings*                 m_pSettings;
-    CZoneNames*                m_pZoneNames;
-    ASE*                       m_pASE;
-    CHandlingManager*          m_pHandlingManager;
-    CRPCFunctions*             m_pRPCFunctions;
-    CLanBroadcast*             m_pLanBroadcast;
-    CWaterManager*             m_pWaterManager;
+    CCommandLineParser      m_CommandLineParser;
 
-    CWeaponStatManager*      m_pWeaponStatsManager;
-    CBuildingRemovalManager* m_pBuildingRemovalManager;
+    ASE*                       m_pASE{nullptr};
+    CAccessControlListManager* m_pACLManager{nullptr};
+    CAccountManager*           m_pAccountManager{nullptr};
+    CBanManager*               m_pBanManager{nullptr};
+    CBlipManager*              m_pBlipManager{nullptr};
+    CBuildingRemovalManager*   m_pBuildingRemovalManager{nullptr};
+    CClock*                    m_pClock{nullptr};
+    CColManager*               m_pColManager{nullptr};
+    CConsole*                  m_pConsole{nullptr};
+    CConsoleClient*            m_pConsoleClient{nullptr};
+    CCustomWeaponManager*      m_pCustomWeaponManager{nullptr};
+    CDatabaseManager*          m_pDatabaseManager{nullptr};
+    CDebugHookManager*         m_pDebugHookManager{nullptr};
+    CFunctionUseLogger*        m_pFunctionUseLogger{nullptr};
+    CGroups*                   m_pGroups{nullptr};
+    CHTTPD*                    m_pHTTPD{nullptr};
+    CHandlingManager*          m_pHandlingManager{nullptr};
+    CLanBroadcast*             m_pLanBroadcast{nullptr};
+    CLatentTransferManager*    m_pLatentTransferManager{nullptr};
+    CLuaCallbackManager*       m_pLuaCallbackManager{nullptr};
+    CLuaManager*               m_pLuaManager{nullptr};
+    CMainConfig*               m_pMainConfig{nullptr};
+    CMapManager*               m_pMapManager{nullptr};
+    CMarkerManager*            m_pMarkerManager{nullptr};
+    CObjectManager*            m_pObjectManager{nullptr};
+#ifdef WITH_OBJECT_SYNC
+    CObjectSync* m_pObjectSync{nullptr};
+#endif
+    CPacketTranslator*         m_pPacketTranslator{nullptr};
+    CPedManager*               m_pPedManager{nullptr};
+    CPedSync*                  m_pPedSync{nullptr};
+    CPickupManager*            m_pPickupManager{nullptr};
+    CPlayerManager*            m_pPlayerManager{nullptr};
+    CRPCFunctions*             m_pRPCFunctions{nullptr};
+    CRadarAreaManager*         m_pRadarAreaManager{nullptr};
+    CRegisteredCommands*       m_pRegisteredCommands{nullptr};
+    CRegistry*                 m_pRegistry{nullptr};
+    CRegistryManager*          m_pRegistryManager{nullptr};
+    CRemoteCalls*              m_pRemoteCalls{nullptr};
+    CResourceManager*          m_pResourceManager{nullptr};
+    CScriptDebugging*          m_pScriptDebugging{nullptr};
+    CSettings*                 m_pSettings{nullptr};
+    CTeamManager*              m_pTeamManager{nullptr};
+    CUnoccupiedVehicleSync*    m_pUnoccupiedVehicleSync{nullptr};
+    CVehicleManager*           m_pVehicleManager{nullptr};
+    CWaterManager*             m_pWaterManager{nullptr};
+    CWeaponStatManager*        m_pWeaponStatsManager{nullptr};
+    CZoneNames*                m_pZoneNames{nullptr};
 
     std::shared_ptr<CTrainTrackManager> m_pTrainTrackManager;
 
-    CCustomWeaponManager* m_pCustomWeaponManager;
-    CFunctionUseLogger*   m_pFunctionUseLogger;
-
     char* m_szCurrentFileName;
-
-    // This client represents the console input
-    CConsoleClient* m_pConsoleClient;
 
     float m_fGravity;
     float m_fGameSpeed;
@@ -585,19 +656,19 @@ private:
     bool  m_bOcclusionsEnabled;
     bool  m_bUsingMtaServerConf;
 
-    unsigned char m_ucTrafficLightState;
+    std::uint8_t m_ucTrafficLightState;
     bool          m_bTrafficLightsLocked;
     long long     m_llLastTrafficUpdate;
 
-    unsigned char m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
-    unsigned char m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
+    std::uint8_t m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
+    std::uint8_t m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
     bool          m_bHasSkyGradient;
 
     SHeatHazeSettings m_HeatHazeSettings;
     bool              m_bHasHeatHaze;
 
     bool          m_bOverrideWaterColor;
-    unsigned char m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
+    std::uint8_t m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
 
     bool m_bInteriorSoundsEnabled;
 
@@ -611,7 +682,7 @@ private:
     int  m_iMoonSize;
 
     bool          m_bOverrideSunColor;
-    unsigned char m_ucSunCoreR, m_ucSunCoreG, m_ucSunCoreB, m_ucSunCoronaR, m_ucSunCoronaG, m_ucSunCoronaB;
+    std::uint8_t m_ucSunCoreR, m_ucSunCoreG, m_ucSunCoreB, m_ucSunCoronaR, m_ucSunCoronaG, m_ucSunCoronaB;
 
     bool  m_bOverrideWindVelocity;
     float m_fWindVelX, m_fWindVelY, m_fWindVelZ;

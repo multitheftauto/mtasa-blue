@@ -9,14 +9,10 @@
  *
  *****************************************************************************/
 
-class CPlayerManager;
-
 #pragma once
 
-#include "CCommon.h"
 #include "packets/CPacket.h"
 #include "CPlayer.h"
-#include "../Config.h"
 
 class CPlayerManager
 {
@@ -29,7 +25,9 @@ public:
     void DoPulse();
     void PulseZombieCheck();
 
-    void SetScriptDebugging(class CScriptDebugging* pScriptDebugging) { m_pScriptDebugging = pScriptDebugging; };
+    constexpr void SetScriptDebugging(class CScriptDebugging* pScriptDebugging) noexcept {
+        m_pScriptDebugging = pScriptDebugging;
+    }
 
     CPlayer* Create(const NetServerPlayerID& PlayerSocket);
     void     DeleteAll();
@@ -41,12 +39,15 @@ public:
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false);
 
-    std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
-    std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
+    std::list<CPlayer*>::iterator begin() noexcept { return m_Players.begin(); };
+    std::list<CPlayer*>::iterator end() noexcept { return m_Players.end(); };
 
-    size_t BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
-    size_t BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
-    size_t BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip = NULL);
+    std::list<CPlayer*>::const_iterator begin() const noexcept { return m_Players.begin(); };
+    std::list<CPlayer*>::const_iterator end() const noexcept { return m_Players.end(); };
+
+    size_t BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = nullptr);
+    size_t BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = nullptr);
+    size_t BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip = nullptr);
 
     static void Broadcast(const CPacket& Packet, const std::set<CPlayer*>& sendList);
     static void Broadcast(const CPacket& Packet, const std::list<CPlayer*>& sendList);
@@ -60,7 +61,9 @@ public:
 
     void               ResetAll();
     void               OnPlayerJoin(CPlayer* pPlayer);
-    const CMtaVersion& GetLowestConnectedPlayerVersion() { return m_strLowestConnectedPlayerVersion; }
+    constexpr const CMtaVersion& GetLowestConnectedPlayerVersion() const noexcept {
+        return m_strLowestConnectedPlayerVersion;
+    }
 
 private:
     void AddToList(CPlayer* pPlayer);

@@ -12,11 +12,7 @@
 #pragma once
 
 #include <list>
-
-#ifndef _MSC_VER
-#include <stdint.h>
-typedef int64_t __int64;
-#endif
+#include <cstdint>
 
 #define LIGHTSYNC_HEALTH_THRESHOLD          2.0f
 #define LIGHTSYNC_VEHICLE_HEALTH_THRESHOLD  50.0f
@@ -43,10 +39,10 @@ private:
 
     struct SEntry
     {
-        __int64      ullTime;
-        CPlayer*     pPlayer;
-        EEntryType   eType;
-        unsigned int uiContext;
+        std::int64_t  ullTime;
+        CPlayer*      pPlayer;
+        EEntryType    eType;
+        std::uint32_t uiContext;
     };
 
     std::list<SEntry> m_Queue;

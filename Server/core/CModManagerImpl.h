@@ -31,11 +31,11 @@ public:
 
     bool RequestLoad(const char* szModName);
 
-    const char*     GetServerPath() { return m_strServerPath; };
-    const char*     GetModPath() { return m_strModPath; };
+    const char* GetServerPath() const noexcept { return m_strServerPath; };
+    const char* GetModPath() const noexcept { return m_strModPath; };
     virtual SString GetAbsolutePath(const char* szRelative);
 
-    bool         IsModLoaded();
+    bool         IsModLoaded() const noexcept;
     CServerBase* GetCurrentMod();
 
     bool Load(const char* szModName, int iArgumentCount, char* szArguments[]);
@@ -46,11 +46,11 @@ public:
 
     void DoPulse();
 
-    bool IsFinished();
+    bool IsFinished() const noexcept;
 
     bool             PendingWorkToDo();
     bool             GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit);
-    CDynamicLibrary& GetDynamicLibrary() { return m_Library; };
+    CDynamicLibrary& GetDynamicLibrary() noexcept { return m_Library; };
 
     void SetExitCode(int exitCode) override;
     int  GetExitCode() const override;

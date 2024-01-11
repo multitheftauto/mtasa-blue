@@ -96,7 +96,7 @@ namespace SharedUtil
 
     // Find value in const collection
     template <class T, class V, class T2>
-    const V* MapFind(const CFastHashMap<T, V>& collection, const T2& key)
+    const V* MapFind(const CFastHashMap<T, V>& collection, const T2& key) noexcept
     {
         typename CFastHashMap<T, V>::const_iterator it = collection.find(key);
         if (it == collection.end())

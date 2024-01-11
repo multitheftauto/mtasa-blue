@@ -240,54 +240,54 @@ std::string ASE::QueryFull()
 
     reply << "EYE1";
     // game
-    reply << (unsigned char)4;
+    reply << (std::uint8_t)4;
     reply << "mta";
     // port
-    reply << (unsigned char)(m_strPort.length() + 1);
+    reply << static_cast<std::uint8_t>(m_strPort.length() + 1);
     reply << m_strPort;
     // server name
-    reply << (unsigned char)(m_pMainConfig->GetServerName().length() + 1);
+    reply << static_cast<std::uint8_t>(m_pMainConfig->GetServerName().length() + 1);
     reply << m_pMainConfig->GetServerName();
     // game type
-    reply << (unsigned char)(m_strGameType.length() + 1);
+    reply << static_cast<std::uint8_t>(m_strGameType.length() + 1);
     reply << m_strGameType;
     // map name
-    reply << (unsigned char)(m_strMapName.length() + 1);
+    reply << static_cast<std::uint8_t>(m_strMapName.length() + 1);
     reply << m_strMapName;
     // version
     temp << MTA_DM_ASE_VERSION;
-    reply << (unsigned char)(temp.str().length() + 1);
+    reply << static_cast<std::uint8_t>(temp.str().length() + 1);
     reply << temp.str();
     // passworded
-    reply << (unsigned char)2;
+    reply << (std::uint8_t)2;
     reply << ((m_pMainConfig->HasPassword()) ? 1 : 0);
     // players count
     temp.str("");
     temp << m_pPlayerManager->CountJoined();
-    reply << (unsigned char)(temp.str().length() + 1);
+    reply << static_cast<std::uint8_t>(temp.str().length() + 1);
     reply << temp.str();
     // players max
     temp.str("");
     temp << m_pMainConfig->GetMaxPlayers();
-    reply << (unsigned char)(temp.str().length() + 1);
+    reply << static_cast<std::uint8_t>(temp.str().length() + 1);
     reply << temp.str();
 
     // rules
-    list<CASERule*>::iterator rIter = IterBegin();
-    for (; rIter != IterEnd(); rIter++)
+    for (const auto& pRule : m_Rules)
     {
         // maybe use a map and std strings for rules?
-        reply << (unsigned char)(strlen((*rIter)->GetKey()) + 1);
-        reply << (*rIter)->GetKey();
-        reply << (unsigned char)(strlen((*rIter)->GetValue()) + 1);
-        reply << (*rIter)->GetValue();
+        reply << static_cast<std::uint8_t>(strlen(pRule->GetKey()) + 1);
+        reply << pRule->GetKey();
+        reply << static_cast<std::uint8_t>(strlen(pRule->GetValue()) + 1);
+        reply << pRule->GetValue();
     }
-    reply << (unsigned char)1;
+
+    reply << static_cast<std::uint8_t>(1);
 
     // players
 
     // the flags that tell what data we carry per player ( apparently we need all set cause of GM atm )
-    unsigned char ucFlags = 0;
+    std::uint8_t ucFlags = 0;
     ucFlags |= 0x01;            // nick
     ucFlags |= 0x02;            // team
     ucFlags |= 0x04;            // skin
@@ -295,37 +295,34 @@ std::string ASE::QueryFull()
     ucFlags |= 0x16;            // ping
     ucFlags |= 0x32;            // time
 
-    char     szTemp[256] = {'\0'};
-    CPlayer* pPlayer = NULL;
+    CPlayer* pPlayer = nullptr;
 
-    list<CPlayer*>::const_iterator pIter = m_pPlayerManager->IterBegin();
-    for (; pIter != m_pPlayerManager->IterEnd(); pIter++)
+    for (const auto& pPlayer : *m_pPlayerManager)
     {
-        pPlayer = *pIter;
-        if (pPlayer->IsJoined())
-        {
-            reply << ucFlags;
-            // nick
-            std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
-            if (strPlayerName.length() == 0)
-                strPlayerName = pPlayer->GetNick();
-            reply << (unsigned char)(strPlayerName.length() + 1);
-            reply << strPlayerName.c_str();
-            // team (skip)
-            reply << (unsigned char)1;
-            // skin (skip)
-            reply << (unsigned char)1;
-            // score
-            const std::string& strScore = pPlayer->GetAnnounceValue("score");
-            reply << (unsigned char)(strScore.length() + 1);
-            reply << strScore.c_str();
-            // ping
-            snprintf(szTemp, 255, "%u", pPlayer->GetPing());
-            reply << (unsigned char)(strlen(szTemp) + 1);
-            reply << szTemp;
-            // time (skip)
-            reply << (unsigned char)1;
-        }
+        if (!pPlayer->IsJoined())
+            continue;
+
+        reply << ucFlags;
+        // nick
+        std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
+        if (strPlayerName.length() == 0)
+            strPlayerName = pPlayer->GetNick();
+        reply << static_cast<std::uint8_t>(strPlayerName.length() + 1);
+        reply << strPlayerName.c_str();
+        // team (skip)
+        reply << static_cast<std::uint8_t>(1);
+        // skin (skip)
+        reply << static_cast<std::uint8_t>(1);
+        // score
+        const std::string& strScore = pPlayer->GetAnnounceValue("score");
+        reply << static_cast<std::uint8_t>(strScore.length() + 1);
+        reply << strScore.c_str();
+        // ping
+        const std::string pPlayerPing = std::to_string(pPlayer->GetPing());
+        reply << static_cast<std::uint8_t>(pPlayerPing.size() + 1);
+        reply << pPlayerPing.c_str();
+        // time (skip)
+        reply << static_cast<std::uint8_t>(1);
     }
 
     return reply.str();
@@ -355,29 +352,29 @@ std::string ASE::QueryXfireLight()
 
     reply << "EYE3";
     // game
-    reply << (unsigned char)4;
+    reply << static_cast<std::uint8_t>(4);
     reply << "mta";
     // server name
-    reply << (unsigned char)(m_pMainConfig->GetServerName().length() + 1);
+    reply << static_cast<std::uint8_t>(m_pMainConfig->GetServerName().length() + 1);
     reply << m_pMainConfig->GetServerName();
     // game type
-    reply << (unsigned char)(m_strGameType.length() + 1);
+    reply << static_cast<std::uint8_t>(m_strGameType.length() + 1);
     reply << m_strGameType;
     // map name with backwardly compatible large player count
-    reply << (unsigned char)(m_strMapName.length() + 1 + strPlayerCount.length() + 1);
+    reply << static_cast<std::uint8_t>(m_strMapName.length() + 1 + strPlayerCount.length() + 1);
     reply << m_strMapName;
-    reply << (unsigned char)0;
+    reply << static_cast<std::uint8_t>(0);
     reply << strPlayerCount;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
-    reply << (unsigned char)(temp.length() + 1);
+    reply << static_cast<std::uint8_t>(temp.length() + 1);
     reply << temp;
     // passworded
-    reply << (unsigned char)((m_pMainConfig->HasPassword()) ? 1 : 0);
+    reply << static_cast<std::uint8_t>((m_pMainConfig->HasPassword()) ? 1 : 0);
     // players count
-    reply << (unsigned char)std::min(iJoinedPlayers, 255);
+    reply << static_cast<std::uint8_t>(std::min(iJoinedPlayers, 255));
     // players max
-    reply << (unsigned char)std::min(iMaxPlayers, 255);
+    reply << static_cast<std::uint8_t>(std::min(iMaxPlayers, 255));
 
     return reply.str();
 }
@@ -410,7 +407,7 @@ std::string ASE::QueryLight()
     g_pNetServer->GetNetRoute(&strNetRouteFixed);
     SString strPingStatus = (const char*)strPingStatusFixed;
     SString strNetRoute = (const char*)strNetRouteFixed;
-    SString strUpTime("%d", (uint)(time(NULL) - m_tStartTime));
+    SString strUpTime("%d", (uint)(time(nullptr) - m_tStartTime));
     SString strHttpPort("%d", m_pMainConfig->GetHTTPPort());
 
     uint uiExtraDataLength = (strPlayerCount.length() + 1 + strBuildType.length() + 1 + strBuildNumber.length() + 1 + strPingStatus.length() + 1 +
@@ -420,46 +417,46 @@ std::string ASE::QueryLight()
 
     reply << "EYE2";
     // game
-    reply << (unsigned char)4;
+    reply << (std::uint8_t)4;
     reply << "mta";
     // port
-    reply << (unsigned char)(m_strPort.length() + 1);
+    reply << static_cast<std::uint8_t>(m_strPort.length() + 1);
     reply << m_strPort;
     // server name
-    reply << (unsigned char)(m_pMainConfig->GetServerName().length() + 1);
+    reply << static_cast<std::uint8_t>(m_pMainConfig->GetServerName().length() + 1);
     reply << m_pMainConfig->GetServerName();
     // game type
-    reply << (unsigned char)(m_strGameType.length() + 1);
+    reply << static_cast<std::uint8_t>(m_strGameType.length() + 1);
     reply << m_strGameType;
     // map name with backwardly compatible large player count, build type and build number
-    reply << (unsigned char)(m_strMapName.length() + 1 + uiExtraDataLength);
+    reply << static_cast<std::uint8_t>(m_strMapName.length() + 1 + uiExtraDataLength);
     reply << m_strMapName;
-    reply << (unsigned char)0;
+    reply << static_cast<std::uint8_t>(0);
     reply << strPlayerCount;
-    reply << (unsigned char)0;
+    reply << static_cast<std::uint8_t>(0);
     reply << strBuildType;
-    reply << (unsigned char)0;
+    reply << static_cast<std::uint8_t>(0);
     reply << strBuildNumber;
-    reply << (unsigned char)0;
+    reply << static_cast<std::uint8_t>(0);
     reply << strPingStatus;
-    reply << (unsigned char)0;
+    reply << static_cast<std::uint8_t>(0);
     reply << strNetRoute;
-    reply << (unsigned char)0;
+    reply << static_cast<std::uint8_t>(0);
     reply << strUpTime;
-    reply << (unsigned char)0;
+    reply << static_cast<std::uint8_t>(0);
     reply << strHttpPort;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
-    reply << (unsigned char)(temp.length() + 1);
+    reply << static_cast<std::uint8_t>(temp.length() + 1);
     reply << temp;
     // passworded
-    reply << (unsigned char)((m_pMainConfig->HasPassword()) ? 1 : 0);
+    reply << static_cast<std::uint8_t>((m_pMainConfig->HasPassword()) ? 1 : 0);
     // serial verification?
-    reply << (unsigned char)((m_pMainConfig->GetSerialVerificationEnabled()) ? 1 : 0);
+    reply << static_cast<std::uint8_t>((m_pMainConfig->GetSerialVerificationEnabled()) ? 1 : 0);
     // players count
-    reply << (unsigned char)std::min(iJoinedPlayers, 255);
+    reply << static_cast<std::uint8_t>(std::min(iJoinedPlayers, 255));
     // players max
-    reply << (unsigned char)std::min(iMaxPlayers, 255);
+    reply << static_cast<std::uint8_t>(std::min(iMaxPlayers, 255));
 
     // players
     CPlayer* pPlayer = NULL;
@@ -468,25 +465,23 @@ std::string ASE::QueryLight()
     int iBytesLeft = 1340 - (int)reply.tellp();
     int iPlayersLeft = iJoinedPlayers;
 
-    list<CPlayer*>::const_iterator pIter = m_pPlayerManager->IterBegin();
-    for (; pIter != m_pPlayerManager->IterEnd(); pIter++)
+    for (const auto& pPlayer : *m_pPlayerManager)
     {
-        pPlayer = *pIter;
-        if (pPlayer->IsJoined())
-        {
-            // nick
-            std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
-            if (strPlayerName.length() == 0)
-                strPlayerName = pPlayer->GetNick();
+        if (!pPlayer->IsJoined())
+            continue;
 
-            // Check if we can fit more names
-            iBytesLeft -= strPlayerName.length() + 1;
-            if (iBytesLeft < iPlayersLeft--)
-                strPlayerName = "";
+        // nick
+        std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
+        if (strPlayerName.length() == 0)
+            strPlayerName = pPlayer->GetNick();
 
-            reply << (unsigned char)(strPlayerName.length() + 1);
-            reply << strPlayerName.c_str();
-        }
+        // Check if we can fit more names
+        iBytesLeft -= strPlayerName.length() + 1;
+        if (iBytesLeft < iPlayersLeft--)
+            strPlayerName = "";
+
+        reply << static_cast<std::uint8_t>(strPlayerName.length() + 1);
+        reply << strPlayerName.c_str();
     }
 
     return reply.str();
@@ -509,6 +504,9 @@ void ASE::SetMapName(const char* szMapName)
 
 const char* ASE::GetRuleValue(const char* szKey)
 {
+    if (!szKey)
+        return nullptr;
+
     // Limit szKey length
     SString strKeyTemp;
     if (szKey && strlen(szKey) > MAX_RULE_KEY_LENGTH)
@@ -517,15 +515,15 @@ const char* ASE::GetRuleValue(const char* szKey)
         szKey = *strKeyTemp;
     }
 
-    list<CASERule*>::iterator iter = m_Rules.begin();
-    for (; iter != m_Rules.end(); iter++)
+    for (const auto& pRule : m_Rules)
     {
-        if (strcmp((*iter)->GetKey(), szKey) == 0)
-        {
-            return (*iter)->GetValue();
-        }
+        if (strcmp(pRule->GetKey(), szKey))
+            continue;
+
+        return pRule->GetValue();
     }
-    return NULL;
+
+    return nullptr;
 }
 
 void ASE::SetRuleValue(const char* szKey, const char* szValue)
@@ -538,42 +536,42 @@ void ASE::SetRuleValue(const char* szKey, const char* szValue)
         szKey = *strKeyTemp;
     }
 
-    if (szKey && szKey[0])
+    if (!szKey || !szKey[0])
+        return;
+
+    // Limit szValue to 200 characters
+    SString strValueTemp;
+    if (szValue && strlen(szValue) > MAX_RULE_VALUE_LENGTH)
     {
-        // Limit szValue to 200 characters
-        SString strValueTemp;
-        if (szValue && strlen(szValue) > MAX_RULE_VALUE_LENGTH)
+        strValueTemp = SStringX(szValue).Left(MAX_RULE_VALUE_LENGTH);
+        szValue = *strValueTemp;
+    }
+
+    for (const auto& pRule : m_Rules)
+    {
+        if (strcmp(pRule->GetKey(), szKey))
+            continue;
+
+        if (szValue && szValue[0])
+            pRule->SetValue(szValue);
+        else
         {
-            strValueTemp = SStringX(szValue).Left(MAX_RULE_VALUE_LENGTH);
-            szValue = *strValueTemp;
+            // Remove from the list
+            delete pRule;
+            m_Rules.remove(pRule);
         }
 
-        list<CASERule*>::iterator iter = m_Rules.begin();
-        for (; iter != m_Rules.end(); iter++)
-        {
-            CASERule* pRule = *iter;
-            if (strcmp((*iter)->GetKey(), szKey) == 0)
-            {
-                if (szValue && szValue[0])
-                {
-                    (*iter)->SetValue(szValue);
-                }
-                else
-                {
-                    // Remove from the list
-                    delete pRule;
-                    m_Rules.erase(iter);
-                }
-                // And return
-                return;
-            }
-        }
-        m_Rules.push_back(new CASERule(szKey, szValue));
+        return;
     }
+
+    m_Rules.push_back(new CASERule(szKey, szValue));
 }
 
 bool ASE::RemoveRuleValue(const char* szKey)
 {
+    if (!szKey)
+        return false;
+
     // Limit szKey length
     SString strKeyTemp;
     if (szKey && strlen(szKey) > MAX_RULE_KEY_LENGTH)
@@ -582,26 +580,21 @@ bool ASE::RemoveRuleValue(const char* szKey)
         szKey = *strKeyTemp;
     }
 
-    list<CASERule*>::iterator iter = m_Rules.begin();
-    for (; iter != m_Rules.end(); iter++)
-    {
-        CASERule* pRule = *iter;
-        if (strcmp(pRule->GetKey(), szKey) == 0)
-        {
-            delete pRule;
-            m_Rules.erase(iter);
-            return true;
-        }
+    for (const auto& pRule : m_Rules) {
+        if (strcmp(pRule->GetKey(), szKey))
+            continue;
+
+        delete pRule;
+        m_Rules.remove(pRule);
+        return true;
     }
+
     return false;
 }
 
 void ASE::ClearRules()
 {
-    list<CASERule*>::iterator iter = m_Rules.begin();
-    for (; iter != m_Rules.end(); iter++)
-    {
-        delete *iter;
-    }
+    for (const auto& pRule : m_Rules)
+        delete pRule;
     m_Rules.clear();
 }

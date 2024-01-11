@@ -13,7 +13,7 @@
 
 #include "CCrashHandlerAPI.h"
 
-#ifdef WIN32
+#ifdef _WIN32
     #include <windows.h>
 #else
     #include <signal.h>
@@ -27,7 +27,7 @@ public:
     static void Init(const SString& strServerPath);
 
 private:
-    #ifdef WIN32
+    #ifdef _WIN32
 
     static long WINAPI HandleExceptionGlobal(_EXCEPTION_POINTERS* pException);
     static void        DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation);

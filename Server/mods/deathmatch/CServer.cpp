@@ -76,12 +76,12 @@ void CServer::GetTag(char* szInfoTag, int iInfoTag)
     }
 }
 
-void CServer::HandleInput(char* szCommand)
+void CServer::HandleInput(const char* szCommand)
 {
-    if (m_pGame)
-    {
-        m_pGame->HandleInput(szCommand);
-    }
+    if (!m_pGame)
+        return;
+
+    m_pGame->HandleInput(szCommand);
 }
 
 void CServer::DoPulse()

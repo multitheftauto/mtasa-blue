@@ -21,7 +21,7 @@ public:
     virtual void ServerShutdown() = 0;
 
     virtual void DoPulse() = 0;
-    virtual void HandleInput(char* szCommand) = 0;
+    virtual void HandleInput(const char* szCommand) = 0;
     virtual void GetTag(char* szInfoTag, int iInfoTag) = 0;
 
     virtual bool IsFinished() = 0;

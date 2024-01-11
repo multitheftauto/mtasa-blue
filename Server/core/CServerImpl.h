@@ -29,7 +29,7 @@ class CServerImpl;
 typedef CXML* (*InitXMLInterface)(const char* szSaveFlagDirectory);
 typedef CNetServer* (*InitNetServerInterface)();
 
-#ifdef WIN32
+#ifdef _WIN32
 typedef void(FClientFeedback)(const char* szText);
 constexpr SHORT SCREEN_BUFFER_SIZE = 256;
 #endif
@@ -37,7 +37,7 @@ constexpr SHORT SCREEN_BUFFER_SIZE = 256;
 class CServerImpl : public CServerInterface
 {
 public:
-    #ifdef WIN32
+    #ifdef _WIN32
     CServerImpl(CThreadCommandQueue* pThreadCommandQueue);
     #else
     CServerImpl();
@@ -61,14 +61,14 @@ public:
     bool ResetInput();
 
     int Run(int iArgumentCount, char* szArguments[]);
-#ifndef WIN32
+#ifndef _WIN32
     void Daemonize() const;
 #else
     bool HasConsole();
 #endif
 
-    void SetExitCode(int exitCode) { m_exitCode = exitCode; }
-    int  GetExitCode() const { return m_exitCode; }
+    constexpr void SetExitCode(int exitCode) noexcept { m_exitCode = exitCode; }
+    constexpr int  GetExitCode() const noexcept { return m_exitCode; }
 
 private:
     void MainLoop();
@@ -89,7 +89,7 @@ private:
     CModManagerImpl* m_pModManager;
     CXML*            m_pXML;
 
-#ifdef WIN32
+#ifdef _WIN32
     FClientFeedback* m_fClientFeedback;
 #endif
 
@@ -112,7 +112,7 @@ private:
     std::vector<std::vector<std::wstring>> m_vecCommandHistory = {{L"", L""}};
     uint                                   m_uiSelectedCommandHistoryEntry = 0;
 
-#ifdef WIN32
+#ifdef _WIN32
     HANDLE    m_hConsole;
     HANDLE    m_hConsoleInput;
     CHAR_INFO m_ScrnBuffer[SCREEN_BUFFER_SIZE];

@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-using namespace std;
 #include "../mods/deathmatch/logic/CRegistry.h"
 #include "../mods/deathmatch/logic/CDatabaseType.h"
 #include <mysql.h>
@@ -25,26 +24,26 @@ class CDatabaseConnectionMySql : public CDatabaseConnection
 {
 public:
     ZERO_ON_NEW
-    CDatabaseConnectionMySql(CDatabaseType* pManager, const SString& strHost, const SString& strUsername, const SString& strPassword,
-                             const SString& strOptions);
+    CDatabaseConnectionMySql(CDatabaseType* pManager, const SString& strHost,
+        const SString& strUsername, const SString& strPassword, const SString& strOptions);
     virtual ~CDatabaseConnectionMySql();
 
     // CDatabaseConnection
-    virtual bool           IsValid();
+    virtual bool           IsValid() const noexcept;
     virtual const SString& GetLastErrorMessage();
-    virtual uint           GetLastErrorCode();
+    virtual uint           GetLastErrorCode() const noexcept;
     virtual void           AddRef();
     virtual void           Release();
     virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult);
     virtual void           Flush();
-    virtual int            GetShareCount() { return m_iRefCount; }
+    virtual int            GetShareCount() const noexcept { return m_iRefCount; }
 
     // CDatabaseConnectionMySql
     void SetLastError(uint uiCode, const SString& strMessage);
     bool QueryInternal(const SString& strQuery, CRegistryResult& registryResult);
     void BeginAutomaticTransaction();
     void EndAutomaticTransaction();
-    int  ConvertToSqliteType(enum_field_types type);
+    int  ConvertToSqliteType(enum_field_types type) const noexcept;
 
     int            m_iRefCount;
     CDatabaseType* m_pManager;
@@ -180,7 +179,7 @@ void CDatabaseConnectionMySql::Release()
 // Returns false if connection created all wrong
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseConnectionMySql::IsValid()
+bool CDatabaseConnectionMySql::IsValid() const noexcept
 {
     return m_bOpened;
 }
@@ -204,7 +203,7 @@ const SString& CDatabaseConnectionMySql::GetLastErrorMessage()
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-uint CDatabaseConnectionMySql::GetLastErrorCode()
+uint CDatabaseConnectionMySql::GetLastErrorCode() const noexcept
 {
     return m_uiLastErrorCode;
 }
@@ -281,8 +280,8 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
             {
                 ulong* inLengths = mysql_fetch_lengths(res);
 
-                pResult->Data.push_back(vector<CRegistryResultCell>(pResult->nColumns));
-                vector<CRegistryResultCell>& outRow = pResult->Data.back();
+                pResult->Data.push_back(std::vector<CRegistryResultCell>(pResult->nColumns));
+                std::vector<CRegistryResultCell>& outRow = pResult->Data.back();
                 for (int i = 0; i < pResult->nColumns; i++)
                 {
                     CRegistryResultCell& cell = outRow[i];
@@ -314,13 +313,13 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
                             }
                             else
                             {
-                                cell.pVal = new unsigned char[cell.nLength];
+                                cell.pVal = new std::uint8_t[cell.nLength];
                                 memcpy(cell.pVal, inData, cell.nLength);
                             }
                             break;
                         default:
                             cell.nLength = inLength + 1;
-                            cell.pVal = new unsigned char[cell.nLength];
+                            cell.pVal = new std::uint8_t[cell.nLength];
                             memcpy(cell.pVal, inData, cell.nLength);
                             break;
                     }
@@ -381,12 +380,12 @@ void CDatabaseConnectionMySql::BeginAutomaticTransaction()
 ///////////////////////////////////////////////////////////////
 void CDatabaseConnectionMySql::EndAutomaticTransaction()
 {
-    if (m_bInAutomaticTransaction)
-    {
-        m_bInAutomaticTransaction = false;
-        CRegistryResult dummy;
-        QueryInternal("SET autocommit = 1", dummy);
-    }
+    if (!m_bInAutomaticTransaction)
+        return;
+
+    m_bInAutomaticTransaction = false;
+    CRegistryResult dummy;
+    QueryInternal("SET autocommit = 1", dummy);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -408,7 +407,7 @@ void CDatabaseConnectionMySql::Flush()
 // Convert MYSQL_TYPE into SQLITE equivalent
 //
 ///////////////////////////////////////////////////////////////
-int CDatabaseConnectionMySql::ConvertToSqliteType(enum_field_types type)
+int CDatabaseConnectionMySql::ConvertToSqliteType(enum_field_types type) const noexcept
 {
     switch (type)
     {
