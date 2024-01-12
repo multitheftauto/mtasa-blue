@@ -936,39 +936,6 @@ bool CStaticFunctionDefinitions::SetElementID(CElement* pElement, const char* sz
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CElement* pElement, const SString& strName, const CLuaArgument& Variable, ESyncType syncType)
-{
-    assert(pElement);
-    assert(strName.length() <= MAX_CUSTOMDATA_NAME_LENGTH);
-
-    if (const SCustomData* pOldData = pElement->SetCustomData(strName, Variable, syncType))
-    {
-        if (syncType != ESyncType::LOCAL)
-        {
-            // Tell our clients to update their data
-            const unsigned short usNameLength = static_cast<unsigned short>(strName.length());
-            CBitStream     BitStream;
-            BitStream.pBitStream->WriteCompressed(usNameLength);
-            BitStream.pBitStream->Write(strName.c_str(), usNameLength);
-            Variable.WriteToBitStream(*BitStream.pBitStream);
-
-            const CElementRPCPacket packet(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream);
-            const size_t            numPlayers = syncType == ESyncType::BROADCAST ? m_pPlayerManager->BroadcastOnlyJoined(packet)
-                                                                                  : m_pPlayerManager->BroadcastOnlySubscribed(packet, pElement, strName);
-
-            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(strName, numPlayers, BitStream.pBitStream->GetNumberOfBytesUsed());
-        }
-
-        // Unsubscribe all the players
-        if (pOldData->syncType == ESyncType::SUBSCRIBE && syncType != ESyncType::SUBSCRIBE)
-            m_pPlayerManager->ClearElementData(pElement, strName);
-
-        return true;
-    }
-  
-    return false;
-}
-
 bool CStaticFunctionDefinitions::RemoveElementData(CElement* pElement, const SString& strName)
 {
     assert(pElement);

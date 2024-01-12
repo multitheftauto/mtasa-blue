@@ -199,13 +199,13 @@ public:
     void      SetID(ElementID ID);
 
     CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
-    CLuaArgument*  GetCustomData(const SString& strName, bool bInheritData, bool* pbIsSynced = nullptr);
+    const CLuaArgument*  GetCustomData(const SString& strName, bool bInheritData, bool* pbIsSynced = nullptr);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szKey, SString& strOut, bool bInheritData);
     bool           GetCustomDataFloat(const char* szKey, float& fOut, bool bInheritData);
     bool           GetCustomDataInt(const char* szKey, int& iOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szKey, bool& bOut, bool bInheritData);
-    bool           SetCustomData(const SString& strName, const CLuaArgument& Variable, bool bSynchronized = true);
+    bool           SetCustomData(SString&& strName, CLuaArgument&& Variable, bool bSynchronized = true, bool bSendPacket = false);
     void           DeleteCustomData(const SString& strName);
 
     virtual bool GetMatrix(CMatrix& matrix) const;

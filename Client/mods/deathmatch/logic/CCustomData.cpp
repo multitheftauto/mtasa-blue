@@ -15,46 +15,43 @@
 void CCustomData::Copy(CCustomData* pCustomData)
 {
     for (const auto& [key, data] : pCustomData->GetData())
-        Set(key, data.Variable);    
+        Set(SString(key), CLuaArgument(data.Variable));    
 }
 
-SCustomData* CCustomData::Get(const SString& strName, bool bCreate)
+const SCustomData* CCustomData::Get(const SString& strName)
 {
     if (auto it = m_Data.find(strName); it != m_Data.end())
         return &it->second;
 
-    if (bCreate)
-        return &m_Data[strName];
-
     return {};
 }
 
-bool CCustomData::Set(const SString& strName, const CLuaArgument& Variable, bool bSynchronized, SCustomData* pOldData)
+SCustomDataResult CCustomData::Set(SString&& strName, CLuaArgument&& Variable, bool bSynchronized, SCustomData* oldValue)
 {
     if (strName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
         CLogger::ErrorPrintf("Custom data name too long (%s)", *strName.Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return false;
+        return {};
     }
 
-    SCustomData* pCurrentVariable = Get(strName, true);
-    assert(pCurrentVariable);
+    auto iter = m_Data.try_emplace(std::move(strName)).first;
+    SCustomData& pCurrentVariable = iter->second;
 
-    if (pCurrentVariable->Variable.IsEmpty() || pCurrentVariable->Variable != Variable || pCurrentVariable->bSynchronized != bSynchronized)
-    {
+    if (pCurrentVariable.Variable.IsEmpty() || pCurrentVariable.bSynchronized != bSynchronized || pCurrentVariable.Variable != Variable )
+    {      
         // Save the old variable
-        if (pOldData)
-            *pOldData = *pCurrentVariable;
+        if (oldValue)
+            *oldValue = std::move(pCurrentVariable);
 
         // Set the new data
-        pCurrentVariable->Variable = Variable;
-        pCurrentVariable->bSynchronized = bSynchronized;  
+        pCurrentVariable.Variable = std::move(Variable);
+        pCurrentVariable.bSynchronized = bSynchronized;
 
-        return true;
+        return SCustomDataResult(iter);
     }   
 
-    return false;  
+    return {};  
 }
 
 bool CCustomData::Delete(const SString& strName, SCustomData* pOldData)

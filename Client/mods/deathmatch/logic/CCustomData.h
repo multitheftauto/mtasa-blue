@@ -20,13 +20,34 @@ struct SCustomData
     bool         bSynchronized{true};
 };
 
+struct SCustomDataResult
+{
+    using iterator = std::unordered_map<SString, SCustomData>::iterator;
+
+    SCustomDataResult() = default;
+
+    SCustomDataResult(const iterator& iter) :
+        Iter(iter),
+        bValid(true)
+    {
+    }
+
+    const SString& GetName() const { return Iter->first; }
+    const SCustomData& GetData() const { return Iter->second; }
+
+    operator bool() const { return bValid; }
+
+    iterator Iter;
+    bool bValid{};
+};
+
 class CCustomData
 {
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(const SString& strName, bool bCreate = false);
-    bool         Set(const SString& strName, const CLuaArgument& Variable, bool bSynchronized = true, SCustomData* pOldData = {});
+    const SCustomData* Get(const SString& strName);
+    SCustomDataResult Set(SString&& strName, CLuaArgument&& Variable, bool bSynchronized = true, SCustomData* oldValue = {});
 
     bool Delete(const SString& strName, SCustomData* pOldData = {});
 

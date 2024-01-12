@@ -23,6 +23,7 @@
 #include "CElementRefManager.h"
 #include "CLogger.h"
 #include "CSpatialDatabase.h"
+#include "CPerfStatModule.h"
 #include "packets/CElementRPCPacket.h"
 #include "Utils.h"
 #include "lua/CLuaFunctionParseHelpers.h"
@@ -504,7 +505,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
 
         // Don't trigger onElementDataChanged event
         const ESyncType syncType = g_pGame->GetConfig()->GetSyncMapElementData() ? ESyncType::BROADCAST : ESyncType::LOCAL;
-        SetCustomData(pAttribute->GetName(), *args[0], syncType, {}, false);
+        SetCustomData(pAttribute->GetName(), std::move(*args[0]), syncType, {}, false);
     }
 }
 
@@ -702,32 +703,61 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-const SCustomData* CElement::SetCustomData(const SString& strName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
+bool CElement::SetCustomData(SString&& strName, CLuaArgument&& Variable, ESyncType syncType, CPlayer* pClient,
+    bool bTriggerEvent, EElementDataPacketType packetType)
 {
     if (strName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
         CLogger::ErrorPrintf("Custom data name too long (%s)\n", *strName.Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return {};
+        return false;
     }
 
     // SCustomData is 64(88 in debug) bytes long. A static storage can be more efficient.
     static SCustomData oldData;
 
-    if (m_CustomData.Set(strName, Variable, syncType, &oldData) != true)
-        return {};
+    const SCustomDataResult result = m_CustomData.Set(std::move(strName), std::move(Variable), syncType, &oldData);
+    if (!result)
+        return false;
+
+    const auto& strNewName = result.GetName();
+    const auto& newData = result.GetData();
 
     if (bTriggerEvent)
     {
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(strName);
-        Arguments.PushArgument(oldData.Variable);
-        Arguments.PushArgument(Variable);
+        Arguments.PushString(strNewName);
+        Arguments.PushArgumentWeak(&oldData.Variable);
+        Arguments.PushArgumentWeak(&newData.Variable);
         CallEvent("onElementDataChange", Arguments, pClient);
-    }         
+    }
 
-    return &oldData;
+    CPlayerManager* pPlayerManager = g_pGame->GetPlayerManager();
+
+    if (packetType != EElementDataPacketType::DoNotSend && newData.syncType != ESyncType::LOCAL)
+    {
+        // Tell our clients to update their data
+        const unsigned short usNameLength = static_cast<unsigned short>(strNewName.length());
+        CBitStream     BitStream;
+        BitStream.pBitStream->WriteCompressed(usNameLength);
+        BitStream.pBitStream->Write(strNewName.c_str(), usNameLength);
+        newData.Variable.WriteToBitStream(*BitStream.pBitStream);
+
+        const CElementRPCPacket packet(this, SET_ELEMENT_DATA, *BitStream.pBitStream);
+        const size_t            numPlayers = syncType == ESyncType::BROADCAST ? pPlayerManager->BroadcastOnlyJoined(packet, pClient)
+                                                                              : pPlayerManager->BroadcastOnlySubscribed(packet, this, strNewName, pClient);
+        if (packetType == EElementDataPacketType::Broadcast)
+            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageOut(strNewName, numPlayers, BitStream.pBitStream->GetNumberOfBytesUsed());
+        else
+            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(strNewName, numPlayers, BitStream.pBitStream->GetNumberOfBytesUsed());
+    }
+
+    // Unsubscribe all the players
+    if (oldData.syncType == ESyncType::SUBSCRIBE && newData.syncType != ESyncType::SUBSCRIBE)
+        pPlayerManager->ClearElementData(this, strNewName);
+
+    return true;
 }
 
 bool CElement::DeleteCustomData(const SString& strName)

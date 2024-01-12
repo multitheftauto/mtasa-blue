@@ -49,6 +49,13 @@ typedef CFastList<CElement*> CElementListType;
 typedef std::vector<CElement*>                CElementListSnapshot;
 typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
+enum class EElementDataPacketType
+{
+    DoNotSend = 0,
+    Broadcast,
+    Relay
+};
+
 class CElement
 {
     friend class CPerPlayerEntity;
@@ -143,8 +150,8 @@ public:
     bool           GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData);
     bool           GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData);
     // Note that returned SCustomData* cannot be used with recursive algorithms!
-    const SCustomData* SetCustomData(const SString& strName, const CLuaArgument& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = {},
-                                 bool bTriggerEvent = true);
+    bool           SetCustomData(SString&& strName, CLuaArgument&& Variable, ESyncType syncType = ESyncType::BROADCAST, CPlayer* pClient = {},
+                                 bool bTriggerEvent = true, EElementDataPacketType packetType = EElementDataPacketType::DoNotSend);
     bool           DeleteCustomData(const SString& strName);
     void           SendAllCustomData(CPlayer* pPlayer);
 
