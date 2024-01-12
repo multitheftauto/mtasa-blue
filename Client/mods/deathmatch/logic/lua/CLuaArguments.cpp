@@ -621,18 +621,18 @@ bool CLuaArguments::SerializeToJSONString(rapidjson::StringBuffer* buffer, bool 
             }
 
             if (bBackwardsCompatibility)
-                SerializeAsJSONArray(&writer, bSerialize);
+                SerializeAsJSONArray(writer, bSerialize);
             else
-                SerializeAsJSONObject(&writer, bSerialize);
+                SerializeAsJSONObject(writer, bSerialize);
         }
         else
         {
             rapidjson::Writer<rapidjson::StringBuffer> writer(*buffer);
 
             if (bBackwardsCompatibility)
-                SerializeAsJSONArray(&writer, bSerialize);
+                SerializeAsJSONArray(writer, bSerialize);
             else
-                SerializeAsJSONObject(&writer, bSerialize);
+                SerializeAsJSONObject(writer, bSerialize);
         }
 
         return true;
@@ -649,7 +649,7 @@ bool CLuaArguments::SerializeToJSONString(rapidjson::StringBuffer* buffer, bool 
 }
 
 template <typename Writer>
-void CLuaArguments::SerializeAsJSONObject(Writer* writer, bool bSerialize)
+void CLuaArguments::SerializeAsJSONObject(Writer& writer, bool bSerialize)
 {
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); ++iter)
@@ -660,9 +660,9 @@ void CLuaArguments::SerializeAsJSONObject(Writer* writer, bool bSerialize)
 }
 
 template <typename Writer>
-void CLuaArguments::SerializeAsJSONArray(Writer* writer, bool bSerialize)
+void CLuaArguments::SerializeAsJSONArray(Writer& writer, bool bSerialize)
 {
-    writer->StartArray();
+    writer.StartArray();
 
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); ++iter)
@@ -671,11 +671,11 @@ void CLuaArguments::SerializeAsJSONArray(Writer* writer, bool bSerialize)
         pArgument->SerializeToJSON(writer, bSerialize);
     }
 
-    writer->EndArray();
+    writer.EndArray();
 }
 
 template <typename Writer>
-void CLuaArguments::ConvertTableToJSON(Writer* writer, bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+void CLuaArguments::ConvertTableToJSON(Writer& writer, bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
@@ -720,7 +720,7 @@ void CLuaArguments::ConvertTableToJSON(Writer* writer, bool bSerialize, CFastHas
 
     if (bIsArray)
     {
-        writer->StartArray();
+        writer.StartArray();
 
         vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
         for (; iter != m_Arguments.end(); ++iter)
@@ -730,14 +730,14 @@ void CLuaArguments::ConvertTableToJSON(Writer* writer, bool bSerialize, CFastHas
             pArgument->SerializeToJSON(writer, bSerialize, pKnownTables);
         }
 
-        writer->EndArray();
+        writer.EndArray();
 
         if (bKnownTablesCreated)
             delete pKnownTables;
     }
     else
     {
-        writer->StartObject();
+        writer.StartObject();
 
         iter = m_Arguments.begin();
         for (; iter != m_Arguments.end(); ++iter)
@@ -749,16 +749,23 @@ void CLuaArguments::ConvertTableToJSON(Writer* writer, bool bSerialize, CFastHas
             if (!pArgument->WriteToString(key, 512))            // index
                 break;
 
-            writer->Key(key, static_cast<rapidjson::SizeType>(strlen(key)));
+            writer.Key(key, static_cast<rapidjson::SizeType>(strlen(key)));
 
             ++iter;
             pArgument = *iter;
             pArgument->SerializeToJSON(writer, bSerialize, pKnownTables);
         }
 
-        writer->EndObject();
+        writer.EndObject();
 
         if (bKnownTablesCreated)
             delete pKnownTables;
     }
 }
+
+template void CLuaArguments::ConvertTableToJSON<rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>>(
+    rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>& writer, bool bSerialize,
+    CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables);
+template void CLuaArguments::ConvertTableToJSON<rapidjson::PrettyWriter<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>>(
+    rapidjson::PrettyWriter<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>& writer, bool bSerialize,
+    CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables);

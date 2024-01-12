@@ -88,13 +88,13 @@ public:
     bool        SerializeToJSONString(rapidjson::StringBuffer* buffer, bool bSerialize = false, int flags = 1, bool bBackwardsCompatibility = false);
 
     template    <typename Writer>
-    void        SerializeAsJSONObject(Writer* writer, bool bSerialize = false);
+    void        SerializeAsJSONObject(Writer& writer, bool bSerialize = false);
 
     template    <typename Writer>
-    void        SerializeAsJSONArray(Writer* writer, bool bSerialize = false);
+    void        SerializeAsJSONArray(Writer& writer, bool bSerialize = false);
 
     template    <typename Writer>
-    void        ConvertTableToJSON(Writer* writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
+    void        ConvertTableToJSON(Writer& writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
 
 private:
     std::vector<CLuaArgument*> m_Arguments;
