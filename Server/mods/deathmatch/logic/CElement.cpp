@@ -771,7 +771,7 @@ bool CElement::DeleteCustomData(const SString& strName)
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
         Arguments.PushString(strName);
-        Arguments.PushArgument(oldData.Variable);
+        Arguments.PushArgumentWeak(&oldData.Variable);
         Arguments.PushArgument(CLuaArgument{});            // Use nil as the new value to indicate the data has been removed
         CallEvent("onElementDataChange", Arguments);
 
