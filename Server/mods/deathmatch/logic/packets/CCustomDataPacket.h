@@ -27,8 +27,8 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const;
 
     const ElementID     GetElementID() const { return m_ElementID; }
-    const SString&      GetName() const { return m_strName; }
-    const CLuaArgument& GetValue() const { return m_Value; }
+    SString&      GetName() { return m_strName; }
+    CLuaArgument& GetValue() { return m_Value; }
 
 private:
     ElementID    m_ElementID;

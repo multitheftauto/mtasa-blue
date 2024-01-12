@@ -993,31 +993,6 @@ bool CStaticFunctionDefinitions::SetElementID(CClientEntity& Entity, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const SString& strName, CLuaArgument& Variable, bool bSynchronize)
-{
-    if (Entity.SetCustomData(strName, Variable, bSynchronize))
-    {
-        if (bSynchronize && !Entity.IsLocalEntity())
-        {
-            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-            // Write element ID, name length and the name. Also write the variable.
-            pBitStream->Write(Entity.GetID());
-            const unsigned short usNameLength = static_cast<unsigned short>(strName.length());
-            pBitStream->WriteCompressed(usNameLength);
-            pBitStream->Write(strName.c_str(), usNameLength);
-            Variable.WriteToBitStream(*pBitStream);
-
-            // Send the packet and deallocate
-            g_pNet->SendPacket(PACKET_ID_CUSTOM_DATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-            g_pNet->DeallocateNetBitStream(pBitStream);
-        }
-
-        return true;
-    }   
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, const char* szName)
 {
     // TODO

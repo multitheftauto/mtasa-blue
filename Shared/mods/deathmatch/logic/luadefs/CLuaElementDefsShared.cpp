@@ -41,7 +41,7 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
             }
 
 #ifdef MTA_CLIENT
-            CLuaArgument* pVariable = pElement->GetCustomData(strKey, bInherit);
+            const CLuaArgument* pVariable = pElement->GetCustomData(strKey, bInherit);
 #else
             CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, strKey, bInherit);
 #endif

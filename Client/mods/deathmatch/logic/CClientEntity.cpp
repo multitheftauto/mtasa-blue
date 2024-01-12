@@ -279,10 +279,10 @@ void CClientEntity::SetID(ElementID ID)
     }
 }
 
-CLuaArgument* CClientEntity::GetCustomData(const SString& strName, bool bInheritData, bool* pbIsSynced)
+const CLuaArgument* CClientEntity::GetCustomData(const SString& strName, bool bInheritData, bool* pbIsSynced)
 {
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_pCustomData->Get(strName);
+    const SCustomData* pData = m_pCustomData->Get(strName);
     if (pData)
     {
         if (pbIsSynced)
@@ -316,7 +316,7 @@ CLuaArguments* CClientEntity::GetAllCustomData(CLuaArguments* table)
 bool CClientEntity::GetCustomDataString(const char* szName, SString& strOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    const CLuaArgument* pData = GetCustomData(szName, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -351,7 +351,7 @@ bool CClientEntity::GetCustomDataString(const char* szName, SString& strOut, boo
 bool CClientEntity::GetCustomDataInt(const char* szName, int& iOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    const CLuaArgument* pData = GetCustomData(szName, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -389,7 +389,7 @@ bool CClientEntity::GetCustomDataInt(const char* szName, int& iOut, bool bInheri
 bool CClientEntity::GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    const CLuaArgument* pData = GetCustomData(szName, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -416,7 +416,7 @@ bool CClientEntity::GetCustomDataFloat(const char* szName, float& fOut, bool bIn
 bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    const CLuaArgument* pData = GetCustomData(szName, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -468,19 +468,37 @@ bool CClientEntity::GetCustomDataBool(const char* szName, bool& bOut, bool bInhe
     return false;
 }
 
-bool CClientEntity::SetCustomData(const SString& strName, const CLuaArgument& Variable, bool bSynchronized)
+bool CClientEntity::SetCustomData(SString&& strName, CLuaArgument&& Variable, bool bSynchronized, bool bSendPacket)
 {
     // SCustomData is 64(88 in debug) bytes long. A static storage can be more efficient.
-    static SCustomData oldData;
+    static SCustomData oldValue;
 
-    if (m_pCustomData->Set(strName, Variable, bSynchronized, &oldData))
+    if (const auto result = m_pCustomData->Set(std::move(strName), std::move(Variable), bSynchronized, &oldValue))
     {
+        const auto& newName = result.GetName();
+        const auto& newValue = result.GetData();
+
         // Trigger the onClientElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(strName);
-        Arguments.PushArgument(oldData.Variable);
-        Arguments.PushArgument(Variable);
+        Arguments.PushString(newName);
+        Arguments.PushArgumentWeak(&oldValue.Variable);
+        Arguments.PushArgumentWeak(&newValue.Variable);
         CallEvent("onClientElementDataChange", Arguments, true);
+
+        if (bSendPacket && bSynchronized && !IsLocalEntity())
+        {
+            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+            // Write element ID, name length and the name. Also write the variable.
+            pBitStream->Write(GetID());
+            const unsigned short usNameLength = static_cast<unsigned short>(newName.length());
+            pBitStream->WriteCompressed(usNameLength);
+            pBitStream->Write(newName.c_str(), usNameLength);
+            newValue.Variable.WriteToBitStream(*pBitStream);
+
+            // Send the packet and deallocate
+            g_pNet->SendPacket(PACKET_ID_CUSTOM_DATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+            g_pNet->DeallocateNetBitStream(pBitStream);
+        }
 
         return true;
     }

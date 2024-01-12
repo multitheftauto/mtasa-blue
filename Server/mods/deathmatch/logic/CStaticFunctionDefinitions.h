@@ -83,7 +83,6 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const SString& strName, const CLuaArgument& Variable, ESyncType syncType);
     static bool RemoveElementData(CElement* pElement, const SString& strName);
     static bool AddElementDataSubscriber(CElement* pElement, const SString& strName, CPlayer* pPlayer);
     static bool RemoveElementDataSubscriber(CElement* pElement, const SString& strName, CPlayer* pPlayer);

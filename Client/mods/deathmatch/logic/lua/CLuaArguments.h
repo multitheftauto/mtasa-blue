@@ -58,6 +58,8 @@ public:
     CLuaArgument* PushString(const std::string& strString);
     CLuaArgument* PushElement(CClientEntity* pElement);
     CLuaArgument* PushArgument(const CLuaArgument& argument);
+    CLuaArgument* PushArgument(CLuaArgument&& argument);
+    void PushArgumentWeak(const CLuaArgument* pArgument);
     CLuaArgument* PushResource(CResource* pResource);
     CLuaArgument* PushTable(CLuaArguments* table);
 

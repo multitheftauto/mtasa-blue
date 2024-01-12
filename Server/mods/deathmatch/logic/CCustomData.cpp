@@ -15,7 +15,7 @@
 void CCustomData::Copy(CCustomData* pCustomData)
 {
     for (const auto& [key, data] : pCustomData->GetData())
-        Set(key, data.Variable);
+        Set(SString(key), CLuaArgument(data.Variable));
 }
 
 SCustomData* CCustomData::Get(const SString& strName, bool bCreate)
@@ -77,32 +77,32 @@ void CCustomData::UpdateSynced(const SString& strName, const CLuaArgument& Varia
     }
 }
 
-bool CCustomData::Set(const SString& strName, const CLuaArgument& Variable, ESyncType syncType, SCustomData* pOldData)
+SCustomDataResult CCustomData::Set(SString&& strName, CLuaArgument&& Variable, ESyncType syncType, SCustomData* pOldData)
 {
     if (strName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-        return false;
+        return {};
 
-    SCustomData* pCurrentVariable = Get(strName, true);
-    assert(pCurrentVariable);
+    auto iter = m_Data.try_emplace(std::move(strName)).first;
+    SCustomData& pCurrentVariable = iter->second;
 
-    if (pCurrentVariable->Variable.IsEmpty() || pCurrentVariable->Variable != Variable || pCurrentVariable->syncType != syncType)
+    if (pCurrentVariable.Variable.IsEmpty() || pCurrentVariable.syncType != syncType || pCurrentVariable.Variable != Variable)
     {
         if (syncType == ESyncType::PERSISTENT)
-            syncType = pCurrentVariable->syncType;
+            syncType = pCurrentVariable.syncType;
 
         // Save the old variable
         if (pOldData)
-            *pOldData = *pCurrentVariable;        
+            *pOldData = std::move(pCurrentVariable);        
 
         // Set the new data
-        pCurrentVariable->Variable = Variable;        
-        pCurrentVariable->syncType = syncType;
+        pCurrentVariable.Variable = std::move(Variable);        
+        pCurrentVariable.syncType = syncType;
         UpdateSynced(strName, Variable, syncType);
 
-        return true;
+        return SCustomDataResult(iter);
     }   
 
-    return false;    
+    return {};    
 }
 
 bool CCustomData::Delete(const SString& strName, SCustomData* pOldData)
