@@ -509,7 +509,7 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const SString& strName, bool bInheritData, ESyncType* pSyncType)
+const CLuaArgument* CElement::GetCustomData(const SString& strName, bool bInheritData, ESyncType* pSyncType)
 {
     // Grab it and return a pointer to the variable
     SCustomData* pData = m_CustomData.Get(strName);
@@ -547,7 +547,7 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
 bool CElement::GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    const CLuaArgument* pData = GetCustomData(szName, bInheritData);
     if (pData)
     {
         // Make sure it gets 0 terminated
@@ -586,7 +586,7 @@ bool CElement::GetCustomDataString(const char* szName, char* pOut, size_t sizeBu
 bool CElement::GetCustomDataInt(const char* szName, int& iOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    const CLuaArgument* pData = GetCustomData(szName, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -624,7 +624,7 @@ bool CElement::GetCustomDataInt(const char* szName, int& iOut, bool bInheritData
 bool CElement::GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    const CLuaArgument* pData = GetCustomData(szName, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -651,7 +651,7 @@ bool CElement::GetCustomDataFloat(const char* szName, float& fOut, bool bInherit
 bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    const CLuaArgument* pData = GetCustomData(szName, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is

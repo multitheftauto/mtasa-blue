@@ -40,11 +40,7 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
                 strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-#ifdef MTA_CLIENT
             const CLuaArgument* pVariable = pElement->GetCustomData(strKey, bInherit);
-#else
-            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, strKey, bInherit);
-#endif
             if (pVariable)
             {
                 pVariable->Push(luaVM);

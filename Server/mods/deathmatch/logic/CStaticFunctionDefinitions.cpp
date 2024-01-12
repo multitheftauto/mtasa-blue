@@ -458,14 +458,6 @@ CElement* CStaticFunctionDefinitions::GetElementByIndex(const char* szType, unsi
     return m_pMapManager->GetRootElement()->FindChildByType(szType, uiIndex, true);
 }
 
-CLuaArgument* CStaticFunctionDefinitions::GetElementData(CElement* pElement, const SString& strName, bool bInherit)
-{
-    assert(pElement);
-
-    // Return its custom data
-    return pElement->GetCustomData(strName, bInherit);
-}
-
 CLuaArguments* CStaticFunctionDefinitions::GetAllElementData(CElement* pElement, CLuaArguments* table)
 {
     assert(pElement);
@@ -967,7 +959,7 @@ bool CStaticFunctionDefinitions::AddElementDataSubscriber(CElement* pElement, co
     assert(pPlayer);
 
     ESyncType     lastSyncType = ESyncType::LOCAL;
-    CLuaArgument* pCurrentVariable = pElement->GetCustomData(strName, false, &lastSyncType);
+    const CLuaArgument* pCurrentVariable = pElement->GetCustomData(strName, false, &lastSyncType);
 
     if (pCurrentVariable != nullptr && lastSyncType == ESyncType::SUBSCRIBE)
     {

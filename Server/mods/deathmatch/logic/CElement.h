@@ -143,7 +143,7 @@ public:
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
     CCustomData&   GetCustomDataManager() { return m_CustomData; }
-    CLuaArgument*  GetCustomData(const SString& strName, bool bInheritData, ESyncType* pSyncType = NULL);
+    const CLuaArgument*  GetCustomData(const SString& strName, bool bInheritData, ESyncType* pSyncType = {});
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData);
     bool           GetCustomDataInt(const char* szName, int& iOut, bool bInheritData);
