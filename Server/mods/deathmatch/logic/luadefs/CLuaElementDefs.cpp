@@ -1566,7 +1566,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
             strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
         }
 
-        if (pElement->SetCustomData(std::move(strKey), std::move(value), syncType, {}, true, EElementDataPacketType::Broadcast))
+        if (CStaticFunctionDefinitions::SetElementData(pElement, strKey, value, syncType))
         {
             lua_pushboolean(luaVM, true);
             return 1;

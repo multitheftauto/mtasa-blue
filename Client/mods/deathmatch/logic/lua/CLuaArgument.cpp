@@ -29,8 +29,7 @@ using namespace std;
 // Prevent the warning issued when doing unsigned short -> void*
 #pragma warning(disable:4312)
 
-CLuaArgument::CLuaArgument(CLuaArguments* pOwner) :
-    m_pOwner(pOwner)
+CLuaArgument::CLuaArgument()
 {
     m_iType = LUA_TNIL;
     m_iIndex = -1;
@@ -38,31 +37,20 @@ CLuaArgument::CLuaArgument(CLuaArguments* pOwner) :
     m_pUserData = NULL;
 }
 
-CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables, CLuaArguments* pOwner) :
-    m_pOwner(pOwner)
+CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
     // Initialize and call our = on the argument
     m_pTableData = NULL;
     CopyRecursive(Argument, pKnownTables);
 }
 
-CLuaArgument::CLuaArgument(CLuaArgument&& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables, CLuaArguments* pOwner) :
-     m_pOwner(pOwner)
-{
-    // Initialize and call our = on the argument
-    m_pTableData = NULL;
-    MoveRecursive(std::move(Argument));
-}
-
-CLuaArgument::CLuaArgument(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables, CLuaArguments* pOwner) :
-     m_pOwner(pOwner)
+CLuaArgument::CLuaArgument(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
 {
     m_pTableData = NULL;
     ReadFromBitStream(bitStream, pKnownTables);
 }
 
-CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables, CLuaArguments* pOwner) :
-     m_pOwner(pOwner)
+CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
 {
     // Read the argument out of the lua VM
     m_pTableData = NULL;
@@ -79,7 +67,7 @@ CLuaArgument::~CLuaArgument()
 void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
     // Clear the string
-    m_strString.clear();
+    m_strString = "";
 
     // Destroy our old tabledata if neccessary
     DeleteTableData();
@@ -138,84 +126,11 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
     }
 }
 
-void CLuaArgument::MoveRecursive(CLuaArgument&& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
-{
-    // Clear the string
-    m_strString.clear();
-
-    // Destroy our old tabledata if neccessary
-    DeleteTableData();
-
-#ifdef MTA_DEBUG
-    // Copy over line and filename too
-    m_strFilename = std::move(Argument.m_strFilename);
-    m_iLine = std::exchange(Argument.m_iLine, 0);
-#endif
-
-    // Set our variable equally to the copy class
-    m_iType = Argument.m_iType;
-    switch (m_iType)
-    {
-        case LUA_TBOOLEAN:
-        {
-            m_bBoolean = std::exchange(Argument.m_bBoolean, false);
-            break;
-        }
-
-        case LUA_TUSERDATA:
-        case LUA_TLIGHTUSERDATA:
-        {
-            m_pUserData = std::exchange(Argument.m_pUserData, nullptr);
-            break;
-        }
-
-        case LUA_TNUMBER:
-        {
-            m_Number = std::exchange(Argument.m_Number, 0);
-            break;
-        }
-
-        case LUA_TTABLE:
-        {
-            if (pKnownTables && (m_pTableData = MapFindRef(*pKnownTables, Argument.m_pTableData)))
-            {
-                m_bWeakTableRef = true;
-            }
-            else
-            {
-                m_pTableData = std::exchange(Argument.m_pTableData, nullptr);
-                m_bWeakTableRef = false;
-            }
-            break;
-        }
-
-        case LUA_TSTRING:
-        {
-            m_strString = std::move(Argument.m_strString);
-            break;
-        }
-
-        default:
-            break;
-    }
-
-    Argument.m_iType = LUA_TNIL;
-    Argument.m_iIndex = -1;
-}
-
 const CLuaArgument& CLuaArgument::operator=(const CLuaArgument& Argument)
 {
     CopyRecursive(Argument);
 
     // Return the given class allowing for chaining
-    return Argument;
-}
-
-const CLuaArgument& CLuaArgument::operator=(CLuaArgument&& Argument)
-{
-    MoveRecursive(std::move(Argument));
-
-     // Return the given class allowing for chaining
     return Argument;
 }
 

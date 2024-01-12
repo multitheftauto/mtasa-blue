@@ -2591,7 +2591,32 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
         ElementID ID = Packet.GetElementID();
         CElement* pElement = CElementIDs::GetElement(ID);
         if (pElement)
-            pElement->SetCustomData(std::move(Packet.GetName()), std::move(Packet.GetValue()), ESyncType::PERSISTENT, pSourcePlayer, true, EElementDataPacketType::Relay);            
+        {
+            // Change the data
+            const SString&   strName =  Packet.GetName();
+            const CLuaArgument& Value = Packet.GetValue();
+
+            if (const SCustomData* pOldData = pElement->SetCustomData(strName, Value, ESyncType::PERSISTENT, pSourcePlayer))
+            {
+                if (pOldData->syncType != ESyncType::LOCAL)
+                {
+                    // Tell our clients to update their data. Send to everyone but the one we got this packet from.
+                    unsigned short usNameLength = static_cast<unsigned short>(strName.length());
+                    CBitStream     BitStream;
+                    BitStream.pBitStream->WriteCompressed(usNameLength);
+                    BitStream.pBitStream->Write(strName.c_str(), usNameLength);
+                    Value.WriteToBitStream(*BitStream.pBitStream);
+                    if (pOldData->syncType == ESyncType::BROADCAST)
+                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
+                    else
+                        m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, strName,
+                                                                  pSourcePlayer);
+
+                    CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(strName, m_pPlayerManager->Count(),
+                                                                                             BitStream.pBitStream->GetNumberOfBytesUsed());
+                }
+            }            
+        }
     }
 }
 
