@@ -821,14 +821,14 @@ void CLuaArguments::ConvertTableToJSON(Writer& writer, bool bSerialize, CFastHas
         iter = m_Arguments.begin();
         for (; iter != m_Arguments.end(); ++iter)
         {
-            char key[512]{};
+            // key
+            CLuaArgument*      pArgument = *iter;
+            const std::string& key = pArgument->GetString();
 
-            // could we get the key direct from lua?
-            CLuaArgument* pArgument = *iter;
-            if (!pArgument->WriteToString(key, 512))            // index
-                break;
-
-            writer.Key(key, static_cast<rapidjson::SizeType>(strlen(key)));
+            if (!key.empty())
+                writer.Key(key.c_str(), static_cast<rapidjson::SizeType>(key.length()));
+            else
+                writer.Null();
 
             // value 
             ++iter;
