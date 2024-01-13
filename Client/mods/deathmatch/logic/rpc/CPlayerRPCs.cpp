@@ -172,6 +172,9 @@ void CPlayerRPCs::TakePlayerScreenShot(NetBitStreamInterface& bitStream)
 
 void CPlayerRPCs::RemotePlayerSwitchWeapon(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
+    if (!bitStream.Can(eBitStreamVersion::OnPlayerWeaponSwitch_Remote))
+        return;
+
     uint lastSlot, currentSlot;
     if (bitStream.Read(lastSlot) && bitStream.Read(currentSlot))
     {

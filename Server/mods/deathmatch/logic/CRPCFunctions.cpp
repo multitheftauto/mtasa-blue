@@ -181,6 +181,7 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
             m_pSourcePlayer->CallEvent("onPlayerWeaponSwitch", Arguments);
 
             SViewerMapType& nearList = m_pSourcePlayer->GetNearPlayerList();
+
             if (!nearList.empty())
             {
                 static std::vector<CPlayer*> playersInNearList;
@@ -188,7 +189,8 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
                 playersInNearList.clear();
 
                 for (const auto& player : nearList)
-                    playersInNearList.push_back(player.first);
+                    if (player.first->CanBitStream(eBitStreamVersion::OnPlayerWeaponSwitch_Remote))
+                        playersInNearList.push_back(player.first);
 
                 if (!playersInNearList.empty())
                 {
