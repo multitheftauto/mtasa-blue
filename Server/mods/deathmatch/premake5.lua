@@ -33,7 +33,7 @@ project "Deathmatch"
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "rapidjson", "zip", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "zip", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {

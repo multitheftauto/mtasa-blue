@@ -63,11 +63,8 @@ jobs:
       - name: Link MySQL
         run: brew link --overwrite mysql
 
-      - name: Install RapidJSON
-        run: brew install rapidjson
-
       - name: Run Build
-        run: ./linux-build.sh --os=macosx -L/usr/local/lib -lrapidjson
+        run: ./linux-build.sh --os=macosx
 
   linux:
     strategy:
@@ -85,10 +82,5 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install RapidJSON
-        run: |
-          apt-get update
-          apt-get install -y rapidjson-dev
-
       - name: Run Build
-        run: ./linux-build.sh --arch=${{ matrix.architecture }} -L/usr/lib -lrapidjson
+        run: ./linux-build.sh --arch=${{ matrix.architecture }}
