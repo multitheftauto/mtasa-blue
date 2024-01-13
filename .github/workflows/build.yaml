@@ -63,6 +63,9 @@ jobs:
       - name: Link MySQL
         run: brew link --overwrite mysql
 
+      - name: Install RapidJSON
+        run: brew install rapidjson
+
       - name: Run Build
         run: ./linux-build.sh --os=macosx
 
@@ -81,6 +84,11 @@ jobs:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
     steps:
       - uses: actions/checkout@v3
+
+      - name: Install RapidJSON
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rapidjson-dev
 
       - name: Run Build
         run: ./linux-build.sh --arch=${{ matrix.architecture }}
