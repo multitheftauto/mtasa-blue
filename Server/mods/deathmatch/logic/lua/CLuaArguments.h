@@ -102,7 +102,7 @@ public:
     bool IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
 
     // json parse
-    bool        ReadJSONString(const char* szJSON);
+    bool        ReadJSONString(const char* szJSON, bool bBackwardsCompatibility = false);
     bool        ReadJSONArray(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool        ReadJSONObject(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
 

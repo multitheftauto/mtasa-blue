@@ -2565,7 +2565,9 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         else if (ipoHttpRequest->nRequestMethod == REQUESTMETHOD_POST)
         {
             const char* szRequestBody = ipoHttpRequest->sBody.c_str();
-            Arguments.ReadJSONString(szRequestBody);
+            if (Arguments.ReadJSONString(szRequestBody))
+                Arguments.PushArguments(Arguments);
+
         }
 
         CLuaArguments FormData;

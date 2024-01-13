@@ -237,13 +237,14 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
         if (result.bSuccess)
         {
             if (pCall->IsFetch())
+            {
                 arguments.PushString(std::string(result.pData, result.dataSize));
+                arguments.PushNumber(0);
+            }
             else
             {
-                // @todo: test
-                arguments.ReadJSONString(result.pData);
-
-                arguments.PushNumber(0);
+                if (arguments.ReadJSONString(result.pData))
+                    arguments.PushArguments(arguments);
             }
         }
         else

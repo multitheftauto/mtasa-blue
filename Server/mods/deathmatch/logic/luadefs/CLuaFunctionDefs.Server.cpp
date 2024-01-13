@@ -261,13 +261,14 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
                     }
                     // We only have a single entry for a specific setting, so output a string
                     const std::string& strDataValue = pAttribute->GetValue();
-                    if (!Args.ReadJSONString(strDataValue.c_str()))
+                    if (!Args.ReadJSONString(strDataValue.c_str(), true))
                     {
                         // No valid JSON? Parse as plain text
                         Args.PushString(strDataValue);
                     }
+                    else
+                        Args.PushArguments(luaVM);
 
-                    Args.PushArguments(luaVM);
                     uiArgCount = Args.Count();
 
                     /* Don't output a table because although it is more consistent with the multiple values output below,
@@ -286,14 +287,14 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
                         CXMLAttributes& attributes = pSubNode->GetAttributes();
                         Args.PushString(attributes.Find("name")->GetValue());
                         const std::string& strDataValue = attributes.Find("value")->GetValue();
-                        if (!Args.ReadJSONString(strDataValue.c_str()))
+                        if (!Args.ReadJSONString(strDataValue.c_str(), true))
                         {
                             Args.PushString(strDataValue);
                         }
                     }
+
                     // Push a table and return
-                    // @todo: test that
-                    Args.PushArguments(luaVM); // Args.PushAsTable(luaVM);
+                    Args.PushAsTable(luaVM);
                     uiArgCount = Args.Count();
                 }
 

@@ -492,8 +492,23 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
     return bSuccess;
 }
 
-bool CLuaArguments::ReadJSONString(const char* szJSON)
+bool CLuaArguments::ReadJSONString(const char* szJSON, bool bBackwardsCompatibility)
 {
+    if (bBackwardsCompatibility)
+    {
+        // Backwards compatibility with old resources using function get()
+        // Fast isJSON check: Check first non-white space character is '[' or '{'
+        for (const char* ptr = szJSON; true;)
+        {
+            char c = *ptr++;
+            if (c == '[' || c == '{')
+                break;
+            if (isspace((uchar)c))
+                continue;
+            return false;
+        }
+    }
+
     rapidjson::Document    doc;
     rapidjson::ParseResult result = doc.Parse(szJSON);
 

@@ -80,9 +80,9 @@ public:
     std::vector<CLuaArgument*>::const_iterator IterEnd() const { return m_Arguments.end(); };
 
     // json parse
-    bool ReadJSONString(const char* szJSON);
-    bool ReadJSONArray(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    bool ReadJSONObject(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool        ReadJSONString(const char* szJSON, bool bBackwardsCompatibility = false);
+    bool        ReadJSONArray(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool        ReadJSONObject(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
     // json writer
     bool        SerializeToJSONString(rapidjson::StringBuffer* buffer, bool bSerialize = false, int flags = 1, bool bBackwardsCompatibility = false);

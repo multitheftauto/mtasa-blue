@@ -180,8 +180,10 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
                 arguments.PushNumber(0);
             }
             else
-                // @todo: test 
-                arguments.ReadJSONString(result.pData);
+            {
+                if (arguments.ReadJSONString(result.pData))
+                    arguments.PushArguments(arguments);
+            } 
         }
         else
         {
