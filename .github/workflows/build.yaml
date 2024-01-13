@@ -87,8 +87,8 @@ jobs:
 
       - name: Install RapidJSON
         run: |
-          sudo apt-get update
-          sudo apt-get install -y rapidjson-dev
+          apt-get update
+          apt-get install -y rapidjson-dev
 
       - name: Run Build
         run: ./linux-build.sh --arch=${{ matrix.architecture }}
