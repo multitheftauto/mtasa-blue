@@ -67,7 +67,7 @@ jobs:
         run: brew install rapidjson
 
       - name: Run Build
-        run: ./linux-build.sh --os=macosx -I/usr/local/include/rapidjson -L/usr/local/lib -lrapidjson
+        run: ./linux-build.sh --os=macosx -L/usr/local/lib -lrapidjson
 
   linux:
     strategy:
@@ -91,4 +91,4 @@ jobs:
           apt-get install -y rapidjson-dev
 
       - name: Run Build
-        run: ./linux-build.sh --arch=${{ matrix.architecture }} -I/usr/include/rapidjson -L/usr/lib -lrapidjson
+        run: ./linux-build.sh --arch=${{ matrix.architecture }} -L/usr/lib -lrapidjson
