@@ -68,14 +68,14 @@ public:
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     char*        WriteToString(char* szBuffer, int length);
 
-    // raipdjson parser
-    bool DeserializeValueFromJSON(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    // json parser
+    bool        DeserializeValueFromJSON(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
-    // raipdjson serializer
-    bool GetResourceNameFromUserData(std::string& result) const;
+    // json serializer
+    bool        GetResourceNameFromUserData(std::string& result) const;
 
-    template <typename Writer>
-    void SerializeToJSON(Writer& writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
+    template    <typename Writer>
+    void        SerializeToJSON(Writer& writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;

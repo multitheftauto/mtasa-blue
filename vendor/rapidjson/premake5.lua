@@ -23,14 +23,14 @@ project "rapidjson"
     }
     
     filter "system:linux"
-		    defines { "RAPIDJSON_SSE42" }
+	    defines { "RAPIDJSON_SSE42" }
 
-	  filter "platforms:x64"
-		    defines { "RAPIDJSON_SSE42" }
+    filter "platforms:x64"
+	    defines { "RAPIDJSON_SSE42" }
 
-	  filter "platforms:arm"
-		    defines { "RAPIDJSON_NEON" }
+    filter "platforms:arm"
+        defines { "RAPIDJSON_NEON" }
 
-	  filter "platforms:arm64"
+    filter "platforms:arm64"
         defines { "RAPIDJSON_NEON" }
     
