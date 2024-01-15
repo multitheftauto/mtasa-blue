@@ -167,9 +167,9 @@ public:
     int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
     int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
-    DWORD GetSystemTime() { return *VAR_SystemTime; }
+    DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
 
-    bool IsAtMenu() { return *VAR_IsAtMenu != 0; }
+    bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
     void         StartGame();
     void         SetSystemState(eSystemState State);
@@ -333,15 +333,6 @@ private:
     bool         m_isFireballDestructEnabled{true};
 
     static unsigned int&  ClumpOffset;
-    static unsigned long* VAR_SystemTime;
-    static unsigned long* VAR_IsAtMenu;
-    static bool*          VAR_IsForegroundWindow;
-    static unsigned long* VAR_SystemState;
-    static float*         VAR_TimeScale;
-    static float*         VAR_FPS;
-    static float*         VAR_OldTimeStep;
-    static float*         VAR_TimeStep;
-    static unsigned long* VAR_Framelimiter;
 
     std::map<std::string, SCheatSA*> m_Cheats;
 

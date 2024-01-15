@@ -314,9 +314,6 @@ public:
     virtual void OnChangingPosition(const CVector& vecNewPosition) {}
 
 private:
-    static unsigned long FUNC_CClumpModelInfo__GetFrameFromId;
-    static unsigned long FUNC_RwFrameGetLTM;
-
     void*   m_pStoredPointer;
     CVector m_LastGoodPosition;
 };

@@ -31,7 +31,8 @@
   !defined(CURL_DISABLE_SMTP) || \
   !defined(CURL_DISABLE_POP3) || \
   !defined(CURL_DISABLE_IMAP) || \
-  !defined(CURL_DISABLE_DOH) || defined(USE_SSL)
+  !defined(CURL_DISABLE_DIGEST_AUTH) || \
+  !defined(CURL_DISABLE_DOH) || defined(USE_SSL) || defined(BUILDING_CURL)
 #include "curl/curl.h"
 #include "warnless.h"
 #include "curl_base64.h"

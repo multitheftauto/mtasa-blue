@@ -34,6 +34,7 @@
 #include "transfer.h"
 #include "parsedate.h"
 #include "sendf.h"
+#include "escape.h"
 
 #include <time.h>
 
@@ -63,11 +64,8 @@
 
 static void sha256_to_hex(char *dst, unsigned char *sha)
 {
-  int i;
-
-  for(i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
-    msnprintf(dst + (i * 2), SHA256_HEX_LENGTH - (i * 2), "%02x", sha[i]);
-  }
+  Curl_hexencode(sha, SHA256_DIGEST_LENGTH,
+                 (unsigned char *)dst, SHA256_HEX_LENGTH);
 }
 
 static char *find_date_hdr(struct Curl_easy *data, const char *sig_hdr)
@@ -409,6 +407,11 @@ static int compare_func(const void *a, const void *b)
 {
   const struct pair *aa = a;
   const struct pair *bb = b;
+  /* If one element is empty, the other is always sorted higher */
+  if(aa->len == 0)
+    return -1;
+  if(bb->len == 0)
+    return 1;
   return strncmp(aa->p, bb->p, aa->len < bb->len ? aa->len : bb->len);
 }
 
@@ -453,6 +456,7 @@ static CURLcode canon_query(struct Curl_easy *data,
   for(i = 0; !result && (i < entry); i++, ap++) {
     size_t len;
     const char *q = ap->p;
+    bool found_equals = false;
     if(!ap->len)
       continue;
     for(len = ap->len; len && !result; q++, len--) {
@@ -464,9 +468,13 @@ static CURLcode canon_query(struct Curl_easy *data,
         case '.':
         case '_':
         case '~':
+          /* allowed as-is */
+          result = Curl_dyn_addn(dq, q, 1);
+          break;
         case '=':
           /* allowed as-is */
           result = Curl_dyn_addn(dq, q, 1);
+          found_equals = true;
           break;
         case '%':
           /* uppercase the following if hexadecimal */
@@ -494,7 +502,11 @@ static CURLcode canon_query(struct Curl_easy *data,
         }
       }
     }
-    if(i < entry - 1) {
+    if(!result && !found_equals) {
+      /* queries without value still need an equals */
+      result = Curl_dyn_addn(dq, "=", 1);
+    }
+    if(!result && i < entry - 1) {
       /* insert ampersands between query pairs */
       result = Curl_dyn_addn(dq, "&", 1);
     }

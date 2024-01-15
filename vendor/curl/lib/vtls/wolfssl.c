@@ -229,7 +229,7 @@ static const struct group_name_map gnm[] = {
 
 #ifdef USE_BIO_CHAIN
 
-static int bio_cf_create(WOLFSSL_BIO *bio)
+static int wolfssl_bio_cf_create(WOLFSSL_BIO *bio)
 {
   wolfSSL_BIO_set_shutdown(bio, 1);
   wolfSSL_BIO_set_init(bio, 1);
@@ -237,14 +237,14 @@ static int bio_cf_create(WOLFSSL_BIO *bio)
   return 1;
 }
 
-static int bio_cf_destroy(WOLFSSL_BIO *bio)
+static int wolfssl_bio_cf_destroy(WOLFSSL_BIO *bio)
 {
   if(!bio)
     return 0;
   return 1;
 }
 
-static long bio_cf_ctrl(WOLFSSL_BIO *bio, int cmd, long num, void *ptr)
+static long wolfssl_bio_cf_ctrl(WOLFSSL_BIO *bio, int cmd, long num, void *ptr)
 {
   struct Curl_cfilter *cf = BIO_get_data(bio);
   long ret = 1;
@@ -278,7 +278,8 @@ static long bio_cf_ctrl(WOLFSSL_BIO *bio, int cmd, long num, void *ptr)
   return ret;
 }
 
-static int bio_cf_out_write(WOLFSSL_BIO *bio, const char *buf, int blen)
+static int wolfssl_bio_cf_out_write(WOLFSSL_BIO *bio,
+                                    const char *buf, int blen)
 {
   struct Curl_cfilter *cf = wolfSSL_BIO_get_data(bio);
   struct ssl_connect_data *connssl = cf->ctx;
@@ -299,7 +300,7 @@ static int bio_cf_out_write(WOLFSSL_BIO *bio, const char *buf, int blen)
   return (int)nwritten;
 }
 
-static int bio_cf_in_read(WOLFSSL_BIO *bio, char *buf, int blen)
+static int wolfssl_bio_cf_in_read(WOLFSSL_BIO *bio, char *buf, int blen)
 {
   struct Curl_cfilter *cf = wolfSSL_BIO_get_data(bio);
   struct ssl_connect_data *connssl = cf->ctx;
@@ -323,27 +324,27 @@ static int bio_cf_in_read(WOLFSSL_BIO *bio, char *buf, int blen)
   return (int)nread;
 }
 
-static WOLFSSL_BIO_METHOD *bio_cf_method = NULL;
+static WOLFSSL_BIO_METHOD *wolfssl_bio_cf_method = NULL;
 
-static void bio_cf_init_methods(void)
+static void wolfssl_bio_cf_init_methods(void)
 {
-  bio_cf_method = wolfSSL_BIO_meth_new(BIO_TYPE_MEM, "wolfSSL CF BIO");
-  wolfSSL_BIO_meth_set_write(bio_cf_method, &bio_cf_out_write);
-  wolfSSL_BIO_meth_set_read(bio_cf_method, &bio_cf_in_read);
-  wolfSSL_BIO_meth_set_ctrl(bio_cf_method, &bio_cf_ctrl);
-  wolfSSL_BIO_meth_set_create(bio_cf_method, &bio_cf_create);
-  wolfSSL_BIO_meth_set_destroy(bio_cf_method, &bio_cf_destroy);
+  wolfssl_bio_cf_method = wolfSSL_BIO_meth_new(BIO_TYPE_MEM, "wolfSSL CF BIO");
+  wolfSSL_BIO_meth_set_write(wolfssl_bio_cf_method, &wolfssl_bio_cf_out_write);
+  wolfSSL_BIO_meth_set_read(wolfssl_bio_cf_method, &wolfssl_bio_cf_in_read);
+  wolfSSL_BIO_meth_set_ctrl(wolfssl_bio_cf_method, &wolfssl_bio_cf_ctrl);
+  wolfSSL_BIO_meth_set_create(wolfssl_bio_cf_method, &wolfssl_bio_cf_create);
+  wolfSSL_BIO_meth_set_destroy(wolfssl_bio_cf_method, &wolfssl_bio_cf_destroy);
 }
 
-static void bio_cf_free_methods(void)
+static void wolfssl_bio_cf_free_methods(void)
 {
-  wolfSSL_BIO_meth_free(bio_cf_method);
+  wolfSSL_BIO_meth_free(wolfssl_bio_cf_method);
 }
 
 #else /* USE_BIO_CHAIN */
 
-#define bio_cf_init_methods() Curl_nop_stmt
-#define bio_cf_free_methods() Curl_nop_stmt
+#define wolfssl_bio_cf_init_methods() Curl_nop_stmt
+#define wolfssl_bio_cf_free_methods() Curl_nop_stmt
 
 #endif /* !USE_BIO_CHAIN */
 
@@ -361,6 +362,10 @@ wolfssl_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
   struct ssl_primary_config *conn_config = Curl_ssl_cf_get_primary_config(cf);
   const struct curl_blob *ca_info_blob = conn_config->ca_info_blob;
   const struct ssl_config_data *ssl_config = Curl_ssl_cf_get_config(cf, data);
+  const char * const ssl_cafile =
+    /* CURLOPT_CAINFO_BLOB overrides CURLOPT_CAINFO */
+    (ca_info_blob ? NULL : conn_config->CAfile);
+  const char * const ssl_capath = conn_config->CApath;
   WOLFSSL_METHOD* req_method = NULL;
 #ifdef HAVE_LIBOQS
   word16 oqsAlg = 0;
@@ -475,6 +480,7 @@ wolfssl_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
       return CURLE_SSL_CONNECT_ERROR;
     }
 #endif
+  default:
     break;
   }
 
@@ -508,7 +514,7 @@ wolfssl_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
     }
   }
 
-#ifndef NO_FILESYSTEM
+#if !defined(NO_FILESYSTEM) && defined(WOLFSSL_SYS_CA_CERTS)
   /* load native CA certificates */
   if(ssl_config->native_ca_store) {
     if(wolfSSL_CTX_load_system_CA_certs(backend->ctx) != WOLFSSL_SUCCESS) {
@@ -541,20 +547,21 @@ wolfssl_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
   }
 
 #ifndef NO_FILESYSTEM
-  /* load trusted cacert */
-  if(conn_config->CAfile) {
-    if(1 != wolfSSL_CTX_load_verify_locations(backend->ctx,
-                                              conn_config->CAfile,
-                                              conn_config->CApath)) {
+  /* load trusted cacert from file if not blob */
+  if(ssl_cafile || ssl_capath) {
+    int rc =
+      wolfSSL_CTX_load_verify_locations_ex(backend->ctx,
+                                           ssl_cafile,
+                                           ssl_capath,
+                                           WOLFSSL_LOAD_FLAG_IGNORE_ERR);
+    if(SSL_SUCCESS != rc) {
       if(conn_config->verifypeer && !imported_ca_info_blob &&
          !imported_native_ca) {
         /* Fail if we insist on successfully verifying the server. */
         failf(data, "error setting certificate verify locations:"
               " CAfile: %s CApath: %s",
-              conn_config->CAfile?
-              conn_config->CAfile: "none",
-              conn_config->CApath?
-              conn_config->CApath : "none");
+              ssl_cafile ? ssl_cafile : "none",
+              ssl_capath ? ssl_capath : "none");
         return CURLE_SSL_CACERT_BADFILE;
       }
       else {
@@ -568,10 +575,8 @@ wolfssl_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
       /* Everything is fine. */
       infof(data, "successfully set certificate verify locations:");
     }
-    infof(data, " CAfile: %s",
-          conn_config->CAfile ? conn_config->CAfile : "none");
-    infof(data, " CApath: %s",
-          conn_config->CApath ? conn_config->CApath : "none");
+    infof(data, " CAfile: %s", ssl_cafile ? ssl_cafile : "none");
+    infof(data, " CApath: %s", ssl_capath ? ssl_capath : "none");
   }
 
   /* Load the client certificate, and private key */
@@ -604,24 +609,12 @@ wolfssl_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
                          SSL_VERIFY_NONE, NULL);
 
 #ifdef HAVE_SNI
-  if(sni) {
-    struct in_addr addr4;
-#ifdef ENABLE_IPV6
-    struct in6_addr addr6;
-#endif
-    size_t hostname_len = strlen(connssl->hostname);
-
-    if((hostname_len < USHRT_MAX) &&
-       !Curl_inet_pton(AF_INET, connssl->hostname, &addr4)
-#ifdef ENABLE_IPV6
-       && !Curl_inet_pton(AF_INET6, connssl->hostname, &addr6)
-#endif
-      ) {
-      size_t snilen;
-      char *snihost = Curl_ssl_snihost(data, connssl->hostname, &snilen);
-      if(!snihost ||
-         wolfSSL_CTX_UseSNI(backend->ctx, WOLFSSL_SNI_HOST_NAME, snihost,
-                            (unsigned short)snilen) != 1) {
+  if(sni && connssl->peer.sni) {
+    size_t sni_len = strlen(connssl->peer.sni);
+    if((sni_len < USHRT_MAX)) {
+      if(wolfSSL_CTX_UseSNI(backend->ctx, WOLFSSL_SNI_HOST_NAME,
+                            connssl->peer.sni,
+                            (unsigned short)sni_len) != 1) {
         failf(data, "Failed to set SNI");
         return CURLE_SSL_CONNECT_ERROR;
       }
@@ -720,7 +713,7 @@ wolfssl_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
   {
     WOLFSSL_BIO *bio;
 
-    bio = BIO_new(bio_cf_method);
+    bio = BIO_new(wolfssl_bio_cf_method);
     if(!bio)
       return CURLE_OUT_OF_MEMORY;
 
@@ -759,9 +752,9 @@ wolfssl_connect_step2(struct Curl_cfilter *cf, struct Curl_easy *data)
 
   /* Enable RFC2818 checks */
   if(conn_config->verifyhost) {
-    char *snihost = Curl_ssl_snihost(data, connssl->hostname, NULL);
-    if(!snihost ||
-       (wolfSSL_check_domain_name(backend->handle, snihost) == SSL_FAILURE))
+    char *snihost = connssl->peer.sni?
+                    connssl->peer.sni : connssl->peer.hostname;
+    if(wolfSSL_check_domain_name(backend->handle, snihost) == SSL_FAILURE)
       return CURLE_SSL_CONNECT_ERROR;
   }
 
@@ -809,7 +802,7 @@ wolfssl_connect_step2(struct Curl_cfilter *cf, struct Curl_easy *data)
     else if(DOMAIN_NAME_MISMATCH == detail) {
 #if 1
       failf(data, " subject alt name(s) or common name do not match \"%s\"",
-            connssl->dispname);
+            connssl->peer.dispname);
       return CURLE_PEER_FAILED_VERIFICATION;
 #else
       /* When the wolfssl_check_domain_name() is used and you desire to
@@ -1140,14 +1133,14 @@ static int wolfssl_init(void)
   Curl_tls_keylog_open();
 #endif
   ret = (wolfSSL_Init() == SSL_SUCCESS);
-  bio_cf_init_methods();
+  wolfssl_bio_cf_init_methods();
   return ret;
 }
 
 
 static void wolfssl_cleanup(void)
 {
-  bio_cf_free_methods();
+  wolfssl_bio_cf_free_methods();
   wolfSSL_Cleanup();
 #ifdef OPENSSL_EXTRA
   Curl_tls_keylog_close();
@@ -1378,6 +1371,7 @@ const struct Curl_ssl Curl_ssl_wolfssl = {
 #ifdef USE_BIO_CHAIN
   SSLSUPP_HTTPS_PROXY |
 #endif
+  SSLSUPP_CA_PATH |
   SSLSUPP_CAINFO_BLOB |
   SSLSUPP_SSL_CTX,
 
@@ -1393,7 +1387,7 @@ const struct Curl_ssl Curl_ssl_wolfssl = {
   Curl_none_cert_status_request,   /* cert_status_request */
   wolfssl_connect,                 /* connect */
   wolfssl_connect_nonblocking,     /* connect_nonblocking */
-  Curl_ssl_get_select_socks,                /* getsock */
+  Curl_ssl_adjust_pollset,         /* adjust_pollset */
   wolfssl_get_internals,           /* get_internals */
   wolfssl_close,                   /* close_one */
   Curl_none_close_all,             /* close_all */

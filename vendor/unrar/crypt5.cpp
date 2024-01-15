@@ -208,6 +208,7 @@ void ConvertHashToMAC(HashValue *Value,byte *Key)
     Value->CRC32=0;
     for (uint I=0;I<ASIZE(Digest);I++)
       Value->CRC32^=Digest[I] << ((I & 3) * 8);
+    Value->CRC32&=0xffffffff; // In case the variable size is larger than 32-bit.
   }
   if (Value->Type==HASH_BLAKE2)
   {

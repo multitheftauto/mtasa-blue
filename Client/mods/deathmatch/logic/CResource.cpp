@@ -361,6 +361,19 @@ void CResource::Stop()
     CLuaArguments Arguments;
     Arguments.PushResource(this);
     m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);
+
+    // When a custom application is used - reset discord stuff
+    const auto discord = g_pCore->GetDiscord();
+    if (discord && !discord->IsDiscordCustomDetailsDisallowed() && discord->GetDiscordResourceName() == m_strResourceName)
+    {
+        if (discord->IsDiscordRPCEnabled())
+        {
+            discord->ResetDiscordData();
+            discord->SetPresenceState(_("In-game"), false);
+            discord->SetPresenceStartTimestamp(time(nullptr));
+            discord->UpdatePresence();
+        }
+    }
 }
 
 SString CResource::GetState()

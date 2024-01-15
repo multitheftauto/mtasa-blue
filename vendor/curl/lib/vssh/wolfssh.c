@@ -343,9 +343,6 @@ static CURLcode wssh_setup_connection(struct Curl_easy *data,
   return CURLE_OK;
 }
 
-static Curl_recv wscp_recv, wsftp_recv;
-static Curl_send wscp_send, wsftp_send;
-
 static int userauth(byte authtype,
                     WS_UserAuthData* authdata,
                     void *ctx)
@@ -1168,6 +1165,7 @@ CURLcode Curl_ssh_init(void)
 }
 void Curl_ssh_cleanup(void)
 {
+  (void)wolfSSH_Cleanup();
 }
 
 #endif /* USE_WOLFSSH */

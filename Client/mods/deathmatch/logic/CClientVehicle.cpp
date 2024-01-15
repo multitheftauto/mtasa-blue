@@ -161,6 +161,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_HeadLightColor = SColorRGBA(255, 255, 255, 255);
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
+    m_fPlaneRotorSpeed = 0.0f;
     m_bHasCustomHandling = false;
     m_ucVariation = ucVariation;
     m_ucVariation2 = ucVariation2;
@@ -1463,12 +1464,33 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus);
 
                 // Update the wheel's visibility
-                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING));
+                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, ucStatus != DT_WHEEL_MISSING &&
+                    (m_ComponentData.empty() || m_ComponentData[GetComponentNameForWheel(ucWheel)].m_bVisible));
             }
             else if (m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2)
                 m_pVehicle->SetBikeWheelStatus(ucWheel, ucGTAStatus);
         }
         m_ucWheelStates[ucWheel] = ucStatus;
+    }
+}
+
+//
+// Returns component name for eWheelPosition enum
+//
+SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) const noexcept
+{
+    switch (ucWheel)
+    {
+        case FRONT_LEFT_WHEEL:
+            return "wheel_lf_dummy";
+        case FRONT_RIGHT_WHEEL:
+            return "wheel_rf_dummy";
+        case REAR_LEFT_WHEEL:
+            return "wheel_lb_dummy";
+        case REAR_RIGHT_WHEEL:
+            return "wheel_rb_dummy";
+        default:
+            return "";
     }
 }
 
@@ -1537,12 +1559,59 @@ float CClientVehicle::GetHeliRotorSpeed()
     return m_fHeliRotorSpeed;
 }
 
+float CClientVehicle::GetPlaneRotorSpeed()
+{
+    if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
+        return m_pVehicle->GetPlaneRotorSpeed();
+
+    return m_fPlaneRotorSpeed;
+}
+
 void CClientVehicle::SetHeliRotorSpeed(float fSpeed)
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
         m_pVehicle->SetHeliRotorSpeed(fSpeed);
 
     m_fHeliRotorSpeed = fSpeed;
+}
+
+void CClientVehicle::SetPlaneRotorSpeed(float fSpeed)
+{
+    if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_PLANE)
+        m_pVehicle->SetPlaneRotorSpeed(fSpeed);
+
+    m_fPlaneRotorSpeed = fSpeed;
+}
+
+bool CClientVehicle::GetRotorSpeed(float& speed)
+{
+    if (m_eVehicleType == CLIENTVEHICLE_PLANE)
+    {
+        speed = GetPlaneRotorSpeed();
+        return true;
+    }
+    else if (m_eVehicleType == CLIENTVEHICLE_HELI)
+    {
+        speed = GetHeliRotorSpeed();
+        return true;
+    }
+
+    return false;
+}
+
+bool CClientVehicle::SetRotorSpeed(float fSpeed)
+{
+    switch (m_eVehicleType)
+    {
+        case CLIENTVEHICLE_HELI:
+            SetHeliRotorSpeed(fSpeed);
+            return true;
+        case CLIENTVEHICLE_PLANE:
+            SetPlaneRotorSpeed(fSpeed);
+            return true;
+        default:
+            return false;
+    }
 }
 
 bool CClientVehicle::IsHeliSearchLightVisible()
