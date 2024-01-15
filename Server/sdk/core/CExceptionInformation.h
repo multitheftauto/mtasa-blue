@@ -15,10 +15,10 @@ class CExceptionInformation
 {
 public:
     virtual ~CExceptionInformation() {}
-    virtual std::uint32_t GetCode() = 0;
-    virtual const char*  GetModulePathName() = 0;
-    virtual const char*  GetModuleBaseName() = 0;
-    virtual uint         GetAddressModuleOffset() = 0;
+    virtual std::uint32_t GetCode() const noexcept = 0;
+    virtual const char*   GetModulePathName() const noexcept = 0;
+    virtual const char*   GetModuleBaseName() const noexcept = 0;
+    virtual uint          GetAddressModuleOffset() const noexcept = 0;
 
     virtual std::uint32_t GetEAX() const noexcept = 0;
     virtual std::uint32_t GetEBX() const noexcept = 0;

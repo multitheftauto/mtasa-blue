@@ -49,8 +49,8 @@ public:
     CModManager* GetModManager();
     CXML*        GetXML();
 
-    const char* GetServerModPath() { return m_strServerModPath; };
-    SString     GetAbsolutePath(const char* szRelative);
+    const char* GetServerModPath() const noexcept { return m_strServerModPath; };
+    SString     GetAbsolutePath(const char* szRelative) const noexcept;
 
     void Printf(const char* szText, ...);
     bool IsRequestingExit();

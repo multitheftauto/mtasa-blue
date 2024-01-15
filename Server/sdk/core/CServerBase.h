@@ -16,15 +16,15 @@
 class CServerBase
 {
 public:
-    virtual void ServerInitialize(CServerInterface* pServer) = 0;
-    virtual bool ServerStartup(int iArgumentCount, char* szArguments[]) = 0;
-    virtual void ServerShutdown() = 0;
+    virtual void ServerInitialize(CServerInterface* pServer) noexcept = 0;
+    virtual bool ServerStartup(int iArgumentCount, char* szArguments[]) noexcept = 0;
+    virtual void ServerShutdown() noexcept = 0;
 
-    virtual void DoPulse() = 0;
-    virtual void HandleInput(const char* szCommand) = 0;
-    virtual void GetTag(char* szInfoTag, int iInfoTag) = 0;
+    virtual void DoPulse() noexcept = 0;
+    virtual void HandleInput(const char* szCommand) noexcept = 0;
+    virtual void GetTag(char* szInfoTag, int iInfoTag) const noexcept = 0;
 
-    virtual bool IsFinished() = 0;
-    virtual bool PendingWorkToDo() = 0;
-    virtual bool GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit) = 0;
+    virtual bool IsFinished() const noexcept = 0;
+    virtual bool PendingWorkToDo() noexcept = 0;
+    virtual bool GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit) const noexcept = 0;
 };

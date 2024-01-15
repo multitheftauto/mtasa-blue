@@ -181,9 +181,8 @@ CPlayer* CPedSync::FindPlayerCloseToPed(CPed* pPed, float fMaxDistance)
     // See if any players are close enough
     CPlayer* pLastPlayerSyncing = nullptr;
     CPlayer* pPlayer = nullptr;
-    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+    for (const auto& pPlayer : *m_pPlayerManager)
     {
-        pPlayer = *iter;
         // Is he joined?
         if (!pPlayer->IsJoined())
             continue;
@@ -316,9 +315,8 @@ void CPedSync::UpdateNearPlayersList()
         pPed->ClearNearPlayersList();
     }
 
-    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); iter++)
+    for (const auto& pPlayer : *m_pPlayerManager)
     {
-        CPlayer* pPlayer = *iter;
         if (!pPlayer->IsJoined() || pPlayer->IsBeingDeleted())
             continue;
 
@@ -330,7 +328,7 @@ void CPedSync::UpdateNearPlayersList()
         CElementResult resultNearCamera;
         GetSpatialDatabase()->SphereQuery(resultNearCamera, CSphere(vecCameraPosition, DISTANCE_FOR_NEAR_VIEWER));
 
-        for (CElement* pElement : resultNearCamera)
+        for (const auto& pElement : resultNearCamera)
         {
             // Make sure it's a ped
             if (pElement->GetType() != CElement::PED)

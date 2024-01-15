@@ -16,23 +16,23 @@
 class CServer : public CServerBase
 {
 public:
-    CServer();
-    virtual ~CServer();
+    CServer() noexcept;
+    virtual ~CServer() noexcept;
 
-    void ServerInitialize(CServerInterface* pServerInterface);
-    bool ServerStartup(int iArgumentCount, char* szArguments[]);
-    void ServerShutdown();
+    void ServerInitialize(CServerInterface* pServerInterface) noexcept;
+    bool ServerStartup(int iArgumentCount, char* szArguments[]) noexcept;
+    void ServerShutdown() noexcept;
 
-    void DoPulse();
+    void DoPulse() noexcept;
 
-    void GetTag(char* szInfoTag, int iInfoTag);
-    void HandleInput(const char* szCommand);
+    void GetTag(char* szInfoTag, int iInfoTag) const noexcept;
+    void HandleInput(const char* szCommand) noexcept;
 
-    bool IsFinished();
-    bool PendingWorkToDo();
-    bool GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit);
+    bool IsFinished() const noexcept;
+    bool PendingWorkToDo() noexcept;
+    bool GetSleepIntervals(int& iSleepBusyMs, int& iSleepIdleMs, int& iLogicFpsLimit) const noexcept;
 
 private:
-    CServerInterface* m_pServerInterface;
-    class CGame*      m_pGame;
+    CServerInterface* m_pServerInterface = nullptr;
+    class CGame*      m_pGame = nullptr;
 };

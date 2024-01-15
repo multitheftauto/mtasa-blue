@@ -22,27 +22,30 @@ class CClientPickupManager
     friend class CClientPickup;
 
 public:
-    unsigned int          Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::size_t           Count() const noexcept { return m_List.size(); };
     static CClientPickup* Get(ElementID ID);
 
     void DeleteAll();
     bool Exists(CClientPickup* pPickup);
 
-    std::list<CClientPickup*>::const_iterator IterBegin() { return m_List.begin(); };
-    std::list<CClientPickup*>::const_iterator IterEnd() { return m_List.end(); };
+    std::list<CClientPickup*>::iterator begin() noexcept { return m_List.begin(); };
+    std::list<CClientPickup*>::iterator end() noexcept { return m_List.end(); };
 
-    bool IsPickupProcessingDisabled() { return m_bPickupProcessingDisabled; };
+    std::list<CClientPickup*>::const_iterator begin() const noexcept { return m_List.cbegin(); };
+    std::list<CClientPickup*>::const_iterator end() const noexcept { return m_List.cend(); };
+
+    bool IsPickupProcessingDisabled() const noexcept { return m_bPickupProcessingDisabled; };
     void SetPickupProcessingDisabled(bool bDisabled);
 
-    static bool IsValidPickupID(unsigned short usPickupID);
-    static bool IsValidWeaponID(unsigned short usWeaponID);
+    static bool IsValidPickupID(std::uint16_t usPickupID);
+    static bool IsValidWeaponID(std::uint16_t usWeaponID);
 
-    static unsigned short GetWeaponModel(unsigned int uiWeaponID);
-    static unsigned short GetHealthModel() { return 1240; };
-    static unsigned short GetArmorModel() { return 1242; };
+    static std::uint16_t GetWeaponModel(std::uint32_t uiWeaponID) noexcept;
+    constexpr static std::uint16_t GetHealthModel() noexcept { return 1240; };
+    constexpr static std::uint16_t GetArmorModel() noexcept { return 1242; };
 
     static bool IsPickupLimitReached();
-    void        RestreamPickups(unsigned short usModel);
+    void        RestreamPickups(std::uint16_t usModel);
     void        RestreamAllPickups();
 
 private:
@@ -57,5 +60,5 @@ private:
     bool                      m_bDontRemoveFromList;
 
     bool                m_bPickupProcessingDisabled;
-    static unsigned int m_uiPickupCount;
+    static std::uint32_t m_uiPickupCount;
 };

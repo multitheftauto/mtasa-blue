@@ -33,7 +33,7 @@ public:
 
     const char* GetServerPath() const noexcept { return m_strServerPath; };
     const char* GetModPath() const noexcept { return m_strModPath; };
-    virtual SString GetAbsolutePath(const char* szRelative);
+    virtual SString GetAbsolutePath(const char* szRelative) const noexcept;
 
     bool         IsModLoaded() const noexcept;
     CServerBase* GetCurrentMod();

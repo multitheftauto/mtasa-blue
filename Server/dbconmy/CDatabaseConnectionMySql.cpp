@@ -30,8 +30,8 @@ public:
 
     // CDatabaseConnection
     virtual bool           IsValid() const noexcept;
-    virtual const SString& GetLastErrorMessage();
-    virtual uint           GetLastErrorCode() const noexcept;
+    virtual const SString& GetLastErrorMessage() const noexcept;
+    virtual std::uint32_t           GetLastErrorCode() const noexcept;
     virtual void           AddRef();
     virtual void           Release();
     virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult);
@@ -39,7 +39,7 @@ public:
     virtual int            GetShareCount() const noexcept { return m_iRefCount; }
 
     // CDatabaseConnectionMySql
-    void SetLastError(uint uiCode, const SString& strMessage);
+    void SetLastError(std::uint32_t uiCode, const SString& strMessage);
     bool QueryInternal(const SString& strQuery, CRegistryResult& registryResult);
     void BeginAutomaticTransaction();
     void EndAutomaticTransaction();
@@ -50,7 +50,7 @@ public:
     MYSQL*         m_handle;
     bool           m_bOpened;
     SString        m_strLastErrorMessage;
-    uint           m_uiLastErrorCode;
+    std::uint32_t           m_uiLastErrorCode;
     int            m_bAutomaticReconnect;
     int            m_bAutomaticTransactionsEnabled;
     bool           m_bInAutomaticTransaction;
@@ -191,7 +191,7 @@ bool CDatabaseConnectionMySql::IsValid() const noexcept
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-const SString& CDatabaseConnectionMySql::GetLastErrorMessage()
+const SString& CDatabaseConnectionMySql::GetLastErrorMessage() const noexcept
 {
     return m_strLastErrorMessage;
 }
@@ -203,7 +203,7 @@ const SString& CDatabaseConnectionMySql::GetLastErrorMessage()
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-uint CDatabaseConnectionMySql::GetLastErrorCode() const noexcept
+std::uint32_t CDatabaseConnectionMySql::GetLastErrorCode() const noexcept
 {
     return m_uiLastErrorCode;
 }
@@ -215,7 +215,7 @@ uint CDatabaseConnectionMySql::GetLastErrorCode() const noexcept
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionMySql::SetLastError(uint uiCode, const SString& strMessage)
+void CDatabaseConnectionMySql::SetLastError(std::uint32_t uiCode, const SString& strMessage)
 {
     m_uiLastErrorCode = uiCode;
     m_strLastErrorMessage = strMessage;
@@ -257,7 +257,7 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
     {
         MYSQL_RES* res = mysql_store_result(m_handle);
 
-        pResult->uiNumAffectedRows = static_cast<uint>(mysql_affected_rows(m_handle));
+        pResult->uiNumAffectedRows = static_cast<std::uint32_t>(mysql_affected_rows(m_handle));
         pResult->ullLastInsertId = mysql_insert_id(m_handle);
 
         if (res)

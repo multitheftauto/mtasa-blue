@@ -100,7 +100,7 @@ CXML* CServerImpl::GetXML()
     return m_pXML;
 }
 
-SString CServerImpl::GetAbsolutePath(const char* szRelative)
+SString CServerImpl::GetAbsolutePath(const char* szRelative) const noexcept
 {
     return PathJoin(m_strServerPath, szRelative);
 }

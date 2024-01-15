@@ -36,7 +36,7 @@ bool CModManagerImpl::RequestLoad(const char* szModName)
     return false;
 }
 
-SString CModManagerImpl::GetAbsolutePath(const char* szRelative)
+SString CModManagerImpl::GetAbsolutePath(const char* szRelative) const noexcept
 {
     return SString("%s/%s", m_strModPath.c_str(), szRelative);
 }

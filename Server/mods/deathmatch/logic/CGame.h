@@ -186,22 +186,22 @@ public:
     };
 
 public:
-    CGame();
-    ~CGame();
+    CGame() noexcept;
+    ~CGame() noexcept;
 
-    void GetTag(char* szInfoTag, int iInfoTag);
-    void HandleInput(const char* szCommand);
+    void GetTag(char* szInfoTag, int iInfoTag) const noexcept;
+    void HandleInput(const char* szCommand) noexcept;
 
-    void DoPulse();
+    void DoPulse() noexcept;
 
-    bool Start(int iArgumentCount, char* szArguments[]);
-    void Stop();
+    bool Start(int iArgumentCount, char* szArguments[]) noexcept;
+    void Stop() noexcept;
 
     static bool StaticProcessPacket(std::uint8_t ucPacketID,
         const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream,
         SNetExtraInfo* pNetExtraInfo
     );
-    bool        ProcessPacket(CPacket& Packet);
+    bool        ProcessPacket(CPacket& Packet) noexcept;
 
     constexpr bool IsFinished() const noexcept { return m_bIsFinished; };
     constexpr void SetIsFinished(bool bFinished) noexcept { m_bIsFinished = bFinished; };
@@ -473,30 +473,30 @@ public:
 
     constexpr SGarageStates& GetGarageStates() noexcept { return m_bGarageStates; }
 
-    void Lock();
-    void Unlock();
+    void Lock() noexcept;
+    void Unlock() noexcept;
 
     constexpr bool IsBeingDeleted() const noexcept { return m_bBeingDeleted; }
-    void ResetMapInfo();
+    void ResetMapInfo() noexcept;
 
-    void        SetGlitchEnabled(const std::string& strGlitch, bool bEnabled);
-    bool        IsGlitchEnabled(const std::string& strGlitch);
-    bool        IsGlitchEnabled(eGlitchType cGlitch);
-    eGlitchType GetGlitchIndex(const std::string& strGlitch) { return m_GlitchNames[strGlitch]; }
-    bool        IsGlitch(const std::string& strGlitch) const { return m_GlitchNames.count(strGlitch) > 0; }
+    void        SetGlitchEnabled(const std::string& strGlitch, bool bEnabled) noexcept;
+    bool        IsGlitchEnabled(const std::string& strGlitch) const noexcept;
+    bool        IsGlitchEnabled(eGlitchType cGlitch) const noexcept;
+    eGlitchType GetGlitchIndex(const std::string& strGlitch) noexcept { return m_GlitchNames[strGlitch]; }
+    bool        IsGlitch(const std::string& strGlitch) const noexcept { return m_GlitchNames.count(strGlitch) > 0; }
 
-    bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property) {
+    bool IsWorldSpecialPropertyEnabled(WorldSpecialProperty property) const noexcept {
         return m_WorldSpecialProps[property];
     }
-    void SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled) {
+    void SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled) noexcept {
         m_WorldSpecialProps[property] = isEnabled;
     }
 
-    void SetCloudsEnabled(bool bEnabled);
-    bool GetCloudsEnabled();
+    void SetCloudsEnabled(bool bEnabled) noexcept;
+    bool GetCloudsEnabled() const noexcept;
 
-    void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
-    bool GetJetpackWeaponEnabled(eWeaponType weaponType);
+    void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled) noexcept;
+    bool GetJetpackWeaponEnabled(eWeaponType weaponType) const noexcept;
 
     constexpr bool HasMoonSize() const noexcept { return m_bOverrideMoonSize; }
     constexpr void SetHasMoonSize(bool bOverrideMoonSize) noexcept {
@@ -506,8 +506,8 @@ public:
     constexpr int  GetMoonSize() const noexcept { return m_iMoonSize; }
     constexpr void SetMoonSize(int iMoonSize) noexcept { m_iMoonSize = iMoonSize; }
 
-    void PrintLogOutputFromNetModule();
-    void StartOpenPortsTest();
+    void PrintLogOutputFromNetModule() noexcept;
+    void StartOpenPortsTest() noexcept;
 
     constexpr bool IsServerFullyUp() const noexcept { return m_bServerFullyUp; }
 

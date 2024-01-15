@@ -22,7 +22,7 @@ public:
 
     std::uint32_t           GetCode() const noexcept { return m_uiCode; };
     void*                   GetAddress() const noexcept { return m_pAddress; };
-    bool                    GetModule(char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress);
+    bool                    GetModule(char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress) const noexcept;
     virtual const char*     GetModulePathName() const noexcept { return m_szModulePathName; };
     virtual const char*     GetModuleBaseName() const noexcept { return m_szModuleBaseName; };
     virtual std::uint32_t   GetAddressModuleOffset() const noexcept { return m_uiAddressModuleOffset; };

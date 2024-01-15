@@ -1003,7 +1003,7 @@ public:
                 int iArgument = lua_type(m_luaVM, -1);
                 if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
                 {
-                    uint uiLength = lua_strlen(m_luaVM, -1);
+                    std::size_t uiLength = lua_strlen(m_luaVM, -1);
                     outList.push_back(SStringX(lua_tostring(m_luaVM, -1), uiLength));
                 }
             }
@@ -1095,7 +1095,7 @@ protected:
             SString value;
             if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
             {
-                uint uiLength = lua_strlen(m_luaVM, -1);
+                std::size_t uiLength = lua_strlen(m_luaVM, -1);
                 value.assign(lua_tostring(m_luaVM, -1), uiLength);
             }
             else if (valueType == LUA_TBOOLEAN)
@@ -1183,7 +1183,7 @@ protected:
                 SStringMapValue value;
                 if (valueType == LUA_TSTRING || valueType == LUA_TNUMBER)
                 {
-                    uint uiLength = lua_strlen(m_luaVM, -1);
+                    std::size_t uiLength = lua_strlen(m_luaVM, -1);
                     value.assign(lua_tostring(m_luaVM, -1), uiLength);
                 }
                 else if (valueType == LUA_TBOOLEAN)

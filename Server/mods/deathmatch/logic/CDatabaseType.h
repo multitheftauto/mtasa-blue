@@ -50,8 +50,8 @@ public:
 
     // CDatabaseConnection
     virtual bool           IsValid() const noexcept = 0;
-    virtual const SString& GetLastErrorMessage() = 0;
-    virtual uint           GetLastErrorCode() const noexcept = 0;
+    virtual const SString& GetLastErrorMessage() const noexcept = 0;
+    virtual std::uint32_t  GetLastErrorCode() const noexcept = 0;
     virtual void           AddRef() = 0;
     virtual void           Release() = 0;
     virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult) = 0;

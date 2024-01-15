@@ -1184,53 +1184,49 @@ bool CConsoleCommands::AExec(CConsole* pConsole, const char* szArguments, CClien
 bool CConsoleCommands::WhoIs(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
     // Got any arguments?
-    if (szArguments && strlen(szArguments) > 0)
+    if (!szArguments || strlen(szArguments) <= 0)
     {
-        // Any player requested?
-        if (strcmp(szArguments, "*") == 0)
+        pClient->SendEcho("whois: Syntax is 'whois <nick>'");
+        return false;
+    }
+    // Any player requested?
+    if (strcmp(szArguments, "*") == 0)
+    {
+        // Iterate the players and echo their IPs and ports if anyone was requested
+        std::uint32_t   uiCount = 0;
+        CPlayerManager* pPlayerManager = pConsole->GetPlayerManager();
+        CPlayer*        pPlayer;
+        for (const auto& pPlayer : *pPlayerManager)
         {
-            // Iterate the players and echo their IPs and ports if anyone was requested
-            unsigned int                   uiCount = 0;
-            CPlayerManager*                pPlayerManager = pConsole->GetPlayerManager();
-            CPlayer*                       pPlayer;
-            list<CPlayer*>::const_iterator iter = pPlayerManager->IterBegin();
-            for (; iter != pPlayerManager->IterEnd(); iter++)
-            {
-                // Is he joined?
-                pPlayer = *iter;
-                if (pPlayer->IsJoined())
-                {
-                    // Echo him
-                    pClient->SendEcho(SString("%s - %s:%u", pPlayer->GetNick(), pPlayer->GetSourceIP(), pPlayer->GetSourcePort()));
+            // Is he joined?
+            if (!pPlayer->IsJoined())
+                continue;
 
-                    ++uiCount;
-                }
-            }
+            // Echo him
+            pClient->SendEcho(SString("%s - %s:%u", pPlayer->GetNick(), pPlayer->GetSourceIP(), pPlayer->GetSourcePort()));
 
-            // No players?
-            if (uiCount == 0)
-            {
-                pClient->SendEcho("whois: No players connected");
-            }
+            ++uiCount;
         }
-        else
+
+        // No players?
+        if (uiCount == 0)
         {
-            // Grab the requested nick
-            CPlayer* pPlayer = pConsole->GetPlayerManager()->Get(szArguments, false);
-            if (pPlayer && pPlayer->IsJoined())
-            {
-                // Echo him
-                pClient->SendEcho(SString("%s - %s:%u", pPlayer->GetNick(), pPlayer->GetSourceIP(), pPlayer->GetSourcePort()));
-            }
-            else
-            {
-                pClient->SendEcho("whois: No such player");
-            }
+            pClient->SendEcho("whois: No players connected");
         }
     }
     else
     {
-        pClient->SendEcho("whois: Syntax is 'whois <nick>'");
+        // Grab the requested nick
+        CPlayer* pPlayer = pConsole->GetPlayerManager()->Get(szArguments, false);
+        if (pPlayer && pPlayer->IsJoined())
+        {
+            // Echo him
+            pClient->SendEcho(SString("%s - %s:%u", pPlayer->GetNick(), pPlayer->GetSourceIP(), pPlayer->GetSourcePort()));
+        }
+        else
+        {
+            pClient->SendEcho("whois: No such player");
+        }
     }
 
     return false;
@@ -1239,59 +1235,52 @@ bool CConsoleCommands::WhoIs(CConsole* pConsole, const char* szArguments, CClien
 bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
     // Valid parameter?
-    if (szArguments && szArguments[0] != 0 && szArguments[1] == 0)
-    {
-        // Player?
-        if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
-        {
-            CPlayer* pPlayer = static_cast<CPlayer*>(pClient);
-
-            // Convert to number
-            int iLevel = atoi(szArguments);
-            if (iLevel == 0 && strcmp(szArguments, "0") != 0)
-            {
-                pEchoClient->SendEcho("debugscript: Syntax is 'debugscript <mode>'");
-                return false;
-            }
-            if (iLevel != (int)pPlayer->GetScriptDebugLevel())
-            {
-                // Between 0 and 3?
-                if (iLevel >= 0 && iLevel <= 3)
-                {
-                    // Set the new level
-                    pPlayer->SetScriptDebugLevel(iLevel);
-
-                    // Tell the player and the console
-                    pEchoClient->SendEcho(SString("debugscript: Your debug mode was set to %i", iLevel));
-                    CLogger::LogPrintf("SCRIPT: %s set their script debug mode to %i\n", GetAdminNameForLog(pClient).c_str(), iLevel);
-
-                    // Enable/Disable their debugger
-                    if (iLevel == 0)
-                        CStaticFunctionDefinitions::SetPlayerDebuggerVisible(pPlayer, false);
-                    else
-                        CStaticFunctionDefinitions::SetPlayerDebuggerVisible(pPlayer, true);
-                }
-                else
-                {
-                    pEchoClient->SendEcho("debugscript: Modes available are 0 (None), 1 (Errors), 2 (Errors + Warnings), 3 (All)");
-                }
-            }
-            else
-            {
-                pEchoClient->SendEcho("debugscript: Your debug mode is already that");
-            }
-        }
-        else
-        {
-            pEchoClient->SendConsole("debugscript: Incorrect client type for this command");
-        }
-    }
-    else
+    if (!szArguments || !szArguments[0] || szArguments[1])
     {
         pEchoClient->SendEcho("debugscript: Syntax is 'debugscript <mode>'");
+        return false;
     }
 
-    return false;
+    // Player?
+    if (pClient->GetClientType() != CClient::CLIENT_PLAYER)
+    {
+        pEchoClient->SendConsole("debugscript: Incorrect client type for this command");
+        return false;
+    }
+
+    CPlayer* pPlayer = static_cast<CPlayer*>(pClient);
+
+    // Convert to number
+    int iLevel = atoi(szArguments);
+    if (iLevel == 0 && strcmp(szArguments, "0") != 0)
+    {
+        pEchoClient->SendEcho("debugscript: Syntax is 'debugscript <mode>'");
+        return false;
+    }
+    if (iLevel == (int)pPlayer->GetScriptDebugLevel())
+    {
+        pEchoClient->SendEcho("debugscript: Your debug mode is already that");
+        return false;
+    }
+
+    // Between 0 and 3?
+    if (iLevel < 0 || iLevel > 3)
+    {
+        pEchoClient->SendEcho("debugscript: Modes available are 0 (None), 1 (Errors), 2 (Errors + Warnings), 3 (All)");
+        return false;
+    }
+
+    // Set the new level
+    pPlayer->SetScriptDebugLevel(iLevel);
+
+    // Tell the player and the console
+    pEchoClient->SendEcho(SString("debugscript: Your debug mode was set to %i", iLevel));
+    CLogger::LogPrintf("SCRIPT: %s set their script debug mode to %i\n", GetAdminNameForLog(pClient).c_str(), iLevel);
+
+    // Enable/Disable their debugger
+    CStaticFunctionDefinitions::SetPlayerDebuggerVisible(pPlayer, iLevel != 0);
+
+    return true;
 }
 
 bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
@@ -1326,20 +1315,18 @@ bool CConsoleCommands::Help(CConsole* pConsole, const char* szArguments, CClient
         pEchoClient->SendConsole(strHelpText.c_str());
         return true;
     }
-    else
+
+    // help [command]
+    if (szArguments && strcmp(szArguments, "help") == 0)
     {
-        // help [command]
-        if (szArguments && !strcmp(szArguments, "help") == 0)
+        CConsoleCommand* pConsoleCommand = pConsole->GetCommand(szArguments);
+        if (!pConsoleCommand)
         {
-            CConsoleCommand* pConsoleCommand = pConsole->GetCommand(szArguments);
-            if (pConsoleCommand)
-            {
-                pEchoClient->SendConsole(pConsoleCommand->GetHelp());
-                return true;
-            }
-            else
-                pEchoClient->SendConsole("Couldn't find the command.");
+            pEchoClient->SendConsole("Couldn't find the command.");
+            return false;
         }
+        pEchoClient->SendConsole(pConsoleCommand->GetHelp());
+        return true;
     }
     return false;
 }
@@ -1357,164 +1344,167 @@ bool CConsoleCommands::ReloadBans(CConsole* pConsole, const char* szArguments, C
 
 bool CConsoleCommands::LoadModule(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    if (szArguments && szArguments[0])
+    if (!szArguments || !szArguments[0])
     {
-        if (pClient->GetNick())
-            CLogger::LogPrintf("loadmodule: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
-
-        if (!IsValidFilePath(szArguments))
-        {
-            pEchoClient->SendConsole("loadmodule: Invalid module path");
-            return false;
-        }
-        SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments);
-
-        // These modules are late loaded
-        int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->LoadModule(szArguments, strFilename, true);
-        switch (iSuccess)
-        {
-            case 1:
-            {
-                pEchoClient->SendConsole("loadmodule: Module failed to load");
-                pEchoClient->SendConsole("loadmodule: Couldn't find module file");
-                return true;
-            }
-            case 2:
-            {
-                pEchoClient->SendConsole("loadmodule: Module failed to load");
-                pEchoClient->SendConsole("loadmodule: Couldn't find InitModule function in module");
-                return true;
-            }
-            case 3:
-            {
-                pEchoClient->SendConsole("loadmodule: Module failed to load");
-                pEchoClient->SendConsole("loadmodule: Couldn't find DoPulse function in module");
-                return true;
-            }
-            case 4:
-            {
-                pEchoClient->SendConsole("loadmodule: Module failed to load");
-                pEchoClient->SendConsole("loadmodule: Couldn't find ShutdownModule function in module");
-                return true;
-            }
-            case 5:
-            {
-                pEchoClient->SendConsole("loadmodule: Module failed to load");
-                pEchoClient->SendConsole("loadmodule: Couldn't find RegisterFunctions function in module");
-                return true;
-            }
-            case 6:
-            {
-                pEchoClient->SendConsole("loadmodule: Module failed to load");
-                pEchoClient->SendConsole("loadmodule: Couldn't find ResourceStopping function in module");
-                return true;
-            }
-            case 7:
-            {
-                pEchoClient->SendConsole("loadmodule: Module failed to load");
-                pEchoClient->SendConsole("loadmodule: Couldn't find ResourceStopped function in module");
-                return true;
-            }
-            case 8:
-            {
-                pEchoClient->SendConsole("loadmodule: Module already loaded");
-                return true;
-            }
-            default:
-                break;
-        }
-    }
-    else
         pEchoClient->SendConsole("* Syntax: loadmodule <module-name-with-extension>");
+        return false;
+    }
+
+    if (pClient->GetNick())
+        CLogger::LogPrintf("loadmodule: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
+
+    if (!IsValidFilePath(szArguments))
+    {
+        pEchoClient->SendConsole("loadmodule: Invalid module path");
+        return false;
+    }
+    SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments);
+
+    // These modules are late loaded
+    int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->LoadModule(szArguments, strFilename, true);
+    switch (iSuccess)
+    {
+        case 1:
+        {
+            pEchoClient->SendConsole("loadmodule: Module failed to load");
+            pEchoClient->SendConsole("loadmodule: Couldn't find module file");
+            return true;
+        }
+        case 2:
+        {
+            pEchoClient->SendConsole("loadmodule: Module failed to load");
+            pEchoClient->SendConsole("loadmodule: Couldn't find InitModule function in module");
+            return true;
+        }
+        case 3:
+        {
+            pEchoClient->SendConsole("loadmodule: Module failed to load");
+            pEchoClient->SendConsole("loadmodule: Couldn't find DoPulse function in module");
+            return true;
+        }
+        case 4:
+        {
+            pEchoClient->SendConsole("loadmodule: Module failed to load");
+            pEchoClient->SendConsole("loadmodule: Couldn't find ShutdownModule function in module");
+            return true;
+        }
+        case 5:
+        {
+            pEchoClient->SendConsole("loadmodule: Module failed to load");
+            pEchoClient->SendConsole("loadmodule: Couldn't find RegisterFunctions function in module");
+            return true;
+        }
+        case 6:
+        {
+            pEchoClient->SendConsole("loadmodule: Module failed to load");
+            pEchoClient->SendConsole("loadmodule: Couldn't find ResourceStopping function in module");
+            return true;
+        }
+        case 7:
+        {
+            pEchoClient->SendConsole("loadmodule: Module failed to load");
+            pEchoClient->SendConsole("loadmodule: Couldn't find ResourceStopped function in module");
+            return true;
+        }
+        case 8:
+        {
+            pEchoClient->SendConsole("loadmodule: Module already loaded");
+            return true;
+        }
+        default:
+            break;
+    }
 
     return false;
 }
 
 bool CConsoleCommands::UnloadModule(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    if (szArguments && szArguments[0])
+    if (!szArguments || !szArguments[0])
     {
-        if (pClient->GetNick())
-            CLogger::LogPrintf("unloadmodule: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
-
-        if (g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule(szArguments) != 0)
-        {
-            pEchoClient->SendConsole("unloadmodule: Module failed to unload");
-            pEchoClient->SendConsole("unloadmodule: Couldn't find a module by that name");
-            return true;
-        }
-    }
-    else
         pEchoClient->SendConsole("* Syntax: unloadmodule <module-name-with-extension>");
+        return false;
+    }
+
+    if (pClient->GetNick())
+        CLogger::LogPrintf("unloadmodule: Requested by %s\n", GetAdminNameForLog(pClient).c_str());
+
+    if (g_pGame->GetLuaManager()->GetLuaModuleManager()->UnloadModule(szArguments))
+    {
+        pEchoClient->SendConsole("unloadmodule: Module failed to unload");
+        pEchoClient->SendConsole("unloadmodule: Couldn't find a module by that name");
+        return true;
+    }
 
     return false;
 }
 
 bool CConsoleCommands::ReloadModule(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    if (szArguments && szArguments[0])
+    if (!szArguments || !szArguments[0])
     {
-        if (pClient->GetNick())
-            CLogger::LogPrintf("reloadmodule: Requested by %s\n", pClient->GetNick());
-
-        SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments);
-
-        int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule(szArguments, strFilename, true);
-        switch (iSuccess)
-        {
-            case 1:
-            {
-                pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
-                pEchoClient->SendConsole("reloadmodule: Couldn't find module file");
-                return true;
-            }
-            case 2:
-            {
-                pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
-                pEchoClient->SendConsole("reloadmodule: Couldn't find InitModule function in module");
-                return true;
-            }
-            case 3:
-            {
-                pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
-                pEchoClient->SendConsole("reloadmodule: Couldn't find DoPulse function in module");
-                return true;
-            }
-            case 4:
-            {
-                pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
-                pEchoClient->SendConsole("reloadmodule: Couldn't find ShutdownModule function in module");
-                return true;
-            }
-            case 5:
-            {
-                pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
-                pEchoClient->SendConsole("reloadmodule: Couldn't find RegisterFunctions function in module");
-                return true;
-            }
-            case 6:
-            {
-                pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
-                pEchoClient->SendConsole("reloadmodule: Couldn't find ResourceStopping function in module");
-                return true;
-            }
-            case 7:
-            {
-                pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
-                pEchoClient->SendConsole("reloadmodule: Couldn't find ResourceStopped function in module");
-                return true;
-            }
-            case 9:
-            {
-                pEchoClient->SendConsole("reloadmodule: Module failed to unload");
-                pEchoClient->SendConsole("reloadmodule: Couldn't find a module by that name");
-                return true;
-            }
-            default:;
-        }
-    }
-    else
         pEchoClient->SendConsole("* Syntax: reloadmodule <module-name-with-extension>");
+        return false;
+    }
+    if (pClient->GetNick())
+        CLogger::LogPrintf("reloadmodule: Requested by %s\n", pClient->GetNick());
+
+    SString strFilename = PathJoin(g_pServerInterface->GetModManager()->GetServerPath(), SERVER_BIN_PATH_MOD, "modules", szArguments);
+
+    int iSuccess = g_pGame->GetLuaManager()->GetLuaModuleManager()->ReloadModule(szArguments, strFilename, true);
+    switch (iSuccess)
+    {
+        case 1:
+        {
+            pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
+            pEchoClient->SendConsole("reloadmodule: Couldn't find module file");
+            return true;
+        }
+        case 2:
+        {
+            pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
+            pEchoClient->SendConsole("reloadmodule: Couldn't find InitModule function in module");
+            return true;
+        }
+        case 3:
+        {
+            pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
+            pEchoClient->SendConsole("reloadmodule: Couldn't find DoPulse function in module");
+            return true;
+        }
+        case 4:
+        {
+            pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
+            pEchoClient->SendConsole("reloadmodule: Couldn't find ShutdownModule function in module");
+            return true;
+        }
+        case 5:
+        {
+            pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
+            pEchoClient->SendConsole("reloadmodule: Couldn't find RegisterFunctions function in module");
+            return true;
+        }
+        case 6:
+        {
+            pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
+            pEchoClient->SendConsole("reloadmodule: Couldn't find ResourceStopping function in module");
+            return true;
+        }
+        case 7:
+        {
+            pEchoClient->SendConsole("reloadmodule: Module unloaded but failed on load");
+            pEchoClient->SendConsole("reloadmodule: Couldn't find ResourceStopped function in module");
+            return true;
+        }
+        case 9:
+        {
+            pEchoClient->SendConsole("reloadmodule: Module failed to unload");
+            pEchoClient->SendConsole("reloadmodule: Couldn't find a module by that name");
+            return true;
+        }
+        default:
+            break;
+    }
 
     return false;
 }
@@ -1527,32 +1517,31 @@ bool CConsoleCommands::Ver(CConsole* pConsole, const char* szArguments, CClient*
 
 bool CConsoleCommands::Ase(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    if (pClient->GetClientType() == CClient::CLIENT_CONSOLE)
-    {
-        ASE* ase = ASE::GetInstance();
-        if (ase)
-            pEchoClient->SendConsole(SString("Master server list queries: %d", ase->GetMasterServerQueryCount()));
-        return true;
-    }
-    return false;
+    if (pClient->GetClientType() != CClient::CLIENT_CONSOLE)
+        return false;
+
+    ASE* ase = ASE::GetInstance();
+    if (ase)
+        pEchoClient->SendConsole(SString("Master server list queries: %d", ase->GetMasterServerQueryCount()));
+    return true;
 }
 
 bool CConsoleCommands::OpenPortsTest(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    if (pClient->GetClientType() == CClient::CLIENT_CONSOLE)
-    {
+    if (pClient->GetClientType() != CClient::CLIENT_CONSOLE)
+        return false;
+
 #if MTASA_VERSION_TYPE < VERSION_TYPE_RELEASE
-        if (SStringX(szArguments) == "crashme")
-        {
-            // For testing crash handling
-            int* pData = NULL;
-            *pData = 0;
-        }
-#endif
-        g_pGame->StartOpenPortsTest();
-        return true;
+    if (SStringX(szArguments) == "crashme")
+    {
+        // For testing crash handling
+        // - is it still necessary?
+        int* pData = NULL;
+        *pData = 0;
     }
-    return false;
+#endif
+    g_pGame->StartOpenPortsTest();
+    return true;
 }
 
 bool CConsoleCommands::SetDbLogLevel(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
@@ -1606,18 +1595,17 @@ bool DoAclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient,
 
     if (bList && strResourceName.empty())
     {
-        bool                                  bAnyOutput = false;
-        std::list<CResource*>::const_iterator iter = g_pGame->GetResourceManager()->IterBegin();
-        for (; iter != g_pGame->GetResourceManager()->IterEnd(); iter++)
+        bool bAnyOutput = false;
+        for (const auto& pRes : *g_pGame->GetResourceManager())
         {
-            bAnyOutput |= (*iter)->HandleAclRequestListCommand(false);
+            bAnyOutput |= pRes->HandleAclRequestListCommand(false);
         }
 
         if (!bAnyOutput)
             pEchoClient->SendConsole("aclrequest: No loaded resources have any requests");
         return true;
     }
-    else if (bList | bAllow | bDeny)
+    else if (bList || bAllow || bDeny)
     {
         CResource* pResource = g_pGame->GetResourceManager()->GetResource(strResourceName);
         if (!pResource)

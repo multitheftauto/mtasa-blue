@@ -30,17 +30,17 @@ public:
     virtual ~CDatabaseConnectionSqlite();
 
     // CDatabaseConnection
-    virtual bool           IsValid();
-    virtual const SString& GetLastErrorMessage();
-    virtual uint           GetLastErrorCode();
+    virtual bool           IsValid() const noexcept;
+    virtual const SString& GetLastErrorMessage() const noexcept;
+    virtual std::uint32_t  GetLastErrorCode() const noexcept;
     virtual void           AddRef();
     virtual void           Release();
     virtual bool           Query(const SString& strQuery, CRegistryResult& registryResult);
     virtual void           Flush();
-    virtual int            GetShareCount() { return m_iRefCount; }
+    virtual int            GetShareCount() const noexcept { return m_iRefCount; }
 
     // CDatabaseConnectionSqlite
-    void SetLastError(uint uiCode, const SString& strMessage);
+    void SetLastError(std::uint32_t uiCode, const SString& strMessage);
     bool QueryInternal(const SString& strQuery, CRegistryResult& registryResult);
     void BeginAutomaticTransaction();
     void EndAutomaticTransaction();
@@ -50,7 +50,7 @@ public:
     sqlite3*       m_handle;
     bool           m_bOpened;
     SString        m_strLastErrorMessage;
-    uint           m_uiLastErrorCode;
+    std::uint32_t           m_uiLastErrorCode;
     bool           m_bAutomaticTransactionsEnabled;
     bool           m_bInAutomaticTransaction;
     CTickCount     m_AutomaticTransactionStartTime;
@@ -148,7 +148,7 @@ void CDatabaseConnectionSqlite::Release()
 // Returns false if connection created all wrong
 //
 ///////////////////////////////////////////////////////////////
-bool CDatabaseConnectionSqlite::IsValid()
+bool CDatabaseConnectionSqlite::IsValid() const noexcept
 {
     return m_bOpened;
 }
@@ -160,7 +160,7 @@ bool CDatabaseConnectionSqlite::IsValid()
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-const SString& CDatabaseConnectionSqlite::GetLastErrorMessage()
+const SString& CDatabaseConnectionSqlite::GetLastErrorMessage() const noexcept
 {
     return m_strLastErrorMessage;
 }
@@ -172,7 +172,7 @@ const SString& CDatabaseConnectionSqlite::GetLastErrorMessage()
 // Only valid when IsValid() or Query() returns false
 //
 ///////////////////////////////////////////////////////////////
-uint CDatabaseConnectionSqlite::GetLastErrorCode()
+std::uint32_t CDatabaseConnectionSqlite::GetLastErrorCode() const noexcept
 {
     return m_uiLastErrorCode;
 }
@@ -184,7 +184,7 @@ uint CDatabaseConnectionSqlite::GetLastErrorCode()
 //
 //
 ///////////////////////////////////////////////////////////////
-void CDatabaseConnectionSqlite::SetLastError(uint uiCode, const SString& strMessage)
+void CDatabaseConnectionSqlite::SetLastError(std::uint32_t uiCode, const SString& strMessage)
 {
     m_uiLastErrorCode = uiCode;
     m_strLastErrorMessage = strMessage;
@@ -370,9 +370,9 @@ void CDatabaseConnectionSqlite::Flush()
 // Apply Sqlite escapement to a string
 //
 ///////////////////////////////////////////////////////////////
-static void SqliteEscape(SString& strOutput, const char* szContent, uint uiLength)
+static void SqliteEscape(SString& strOutput, const char* szContent, std::uint32_t uiLength)
 {
-    for (uint i = 0; i < uiLength; i++)
+    for (std::uint32_t i = 0; i < uiLength; i++)
     {
         const char c = szContent[i];
         if (c == '\'')
@@ -413,7 +413,7 @@ SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs
             CLuaArgument* pArgument = (*pArgs)[a++];
 
             // Check the type of the argument and convert it to a string we can process
-            uint type = pArgument ? pArgument->GetType() : LUA_TNONE;
+            std::uint32_t type = pArgument ? pArgument->GetType() : LUA_TNONE;
             if (type == LUA_TBOOLEAN)
             {
                 strParsedQuery += (pArgument->GetBoolean()) ? "1" : "0";

@@ -11,28 +11,25 @@
 
 #pragma once
 
-#ifdef WIN32
-#include <windows.h>
+#ifdef _WIN32
+#   include <windows.h>
 #else
-#include <dlfcn.h>
+#   include <dlfcn.h>
+using HMODULE = void*;
 #endif
 
 class CDynamicLibrary
 {
 public:
-    CDynamicLibrary();
-    ~CDynamicLibrary();
+    CDynamicLibrary() noexcept;
+    ~CDynamicLibrary() noexcept;
 
-    bool Load(const char* szFilename);
-    void Unload();
-    bool IsLoaded();
+    bool Load(const char* szFilename) noexcept;
+    void Unload() noexcept;
+    bool IsLoaded() const noexcept;
 
-    void* GetProcedureAddress(const char* szProcName);
+    void* GetProcedureAddress(const char* szProcName) noexcept;
 
 private:
-    #ifdef WIN32
-    HMODULE m_hModule;
-    #else
-    void* m_hModule;
-    #endif
+    HMODULE m_hModule = nullptr;
 };

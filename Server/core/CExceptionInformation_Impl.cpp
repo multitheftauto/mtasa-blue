@@ -82,8 +82,11 @@ void CExceptionInformation_Impl::Set(unsigned int iCode, _EXCEPTION_POINTERS* pE
  *
  * @return <code>true</code> if successful, <code>false</code> otherwise.
  */
-bool CExceptionInformation_Impl::GetModule(char* szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress)
-{
+bool CExceptionInformation_Impl::GetModule(
+    char* szOutputBuffer,
+    int nOutputNameLength,
+    void** ppModuleBaseAddress
+) const noexcept {
     HMODULE hModule;
 
     if (!szOutputBuffer)

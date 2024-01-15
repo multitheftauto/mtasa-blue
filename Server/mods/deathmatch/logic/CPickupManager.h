@@ -29,16 +29,19 @@ public:
     CPickup* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void     DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
-    bool         Exists(CPickup* pPickup);
+    std::size_t Count() const noexcept { return m_List.size(); };
+    bool        Exists(CPickup* pPickup) const noexcept;
 
-    std::list<CPickup*>::const_iterator IterBegin() { return m_List.begin(); };
-    std::list<CPickup*>::const_iterator IterEnd() { return m_List.end(); };
+    std::list<CPickup*>::iterator begin() { return m_List.begin(); };
+    std::list<CPickup*>::iterator end() { return m_List.end(); };
 
-    static bool           IsValidWeaponID(unsigned int uiWeaponID);
-    static unsigned short GetWeaponModel(unsigned int uiWeaponID);
-    static unsigned short GetHealthModel() { return 1240; };
-    static unsigned short GetArmorModel() { return 1242; };
+    std::list<CPickup*>::const_iterator begin() const noexcept { return m_List.cbegin(); };
+    std::list<CPickup*>::const_iterator end() const noexcept { return m_List.cend(); };
+
+    static bool          IsValidWeaponID(std::uint32_t uiWeaponID) noexcept;
+    static std::uint16_t GetWeaponModel(std::uint32_t uiWeaponID) noexcept;
+    constexpr static std::uint16_t GetHealthModel() noexcept { return 1240; };
+    constexpr static std::uint16_t GetArmorModel() noexcept { return 1242; };
 
 private:
     void AddToList(CPickup* pPickup) { m_List.push_back(pPickup); };

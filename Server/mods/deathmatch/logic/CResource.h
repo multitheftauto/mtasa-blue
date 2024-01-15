@@ -38,9 +38,9 @@ class CChecksum;
 
 struct SVersion
 {
-    unsigned int m_uiMajor = 0;
-    unsigned int m_uiMinor = 0;
-    unsigned int m_uiRevision = 0;
+    std::uint32_t m_uiMajor = 0;
+    std::uint32_t m_uiMinor = 0;
+    std::uint32_t m_uiRevision = 0;
 };
 
 class CExportedFunction
@@ -78,8 +78,8 @@ class CIncludedResources
 {
 private:
     SString           m_strResourceName;
-    unsigned int      m_uiMinimumVersion;
-    unsigned int      m_uiMaximumVersion;
+    std::uint32_t      m_uiMinimumVersion;
+    std::uint32_t      m_uiMaximumVersion;
     SVersion          m_MinVersion;
     SVersion          m_MaxVersion;
     bool              m_bExists;
@@ -154,7 +154,7 @@ public:
     void Reload();
 
     // Get a resource default setting
-    bool GetDefaultSetting(const char* szName, char* szValue, size_t sizeBuffer);
+    bool GetDefaultSetting(const char* szName, char* szValue, std::size_t sizeBuffer);
 
     // Set a resource default setting
     bool SetDefaultSetting(const char* szName, const char* szValue);
@@ -183,21 +183,22 @@ public:
 
     bool                 GenerateChecksums();
     std::future<SString> GenerateChecksumForFile(CResourceFile* pResourceFile);
-    const CChecksum&     GetLastMetaChecksum() { return m_metaChecksum; }
+    const CChecksum&     GetLastMetaChecksum() const noexcept { return m_metaChecksum; }
     bool                 HasResourceChanged();
     void                 ApplyUpgradeModifications();
     void                 LogUpgradeWarnings();
     bool                 GetCompatibilityStatus(SString& strOutStatus);
 
     void      AddTemporaryInclude(CResource* resource);
-    SString   GetFailureReason() { return m_strFailureReason.TrimEnd("\n"); }
-    CXMLNode* GetSettingsNode() { return m_pNodeSettings; }
-    CXMLNode* GetStorageNode() { return m_pNodeStorage; }
+    SString   GetFailureReason() const noexcept { return m_strFailureReason.TrimEnd("\n"); }
+    CXMLNode* GetSettingsNode() const noexcept { return m_pNodeSettings; }
+    CXMLNode* GetStorageNode() const noexcept { return m_pNodeStorage; }
 
     bool CallExportedFunction(const char* szFunctionName, CLuaArguments& Arguments, CLuaArguments& Returns, CResource& Caller);
 
-    std::list<CResource*>& GetDependents() { return m_Dependents; }
-    int                    GetDependentCount() const noexcept { return m_Dependents.size(); }
+    std::list<CResource*>&       GetDependents() noexcept { return m_Dependents; }
+    const std::list<CResource*>& GetDependents() const noexcept { return m_Dependents; }
+    std::size_t                  GetDependentCount() const noexcept { return m_Dependents.size(); }
 
     std::list<CIncludedResources*>::iterator       GetIncludedResourcesBegin() { return m_IncludedResources.begin(); }
     std::list<CIncludedResources*>::const_iterator GetIncludedResourcesBegin() const noexcept { return m_IncludedResources.begin(); }
@@ -205,15 +206,15 @@ public:
     std::list<CIncludedResources*>::iterator       GetIncludedResourcesEnd() { return m_IncludedResources.end(); }
     std::list<CIncludedResources*>::const_iterator GetIncludedResourcesEnd() const noexcept { return m_IncludedResources.end(); }
 
-    size_t GetIncludedResourcesCount() const noexcept { return m_IncludedResources.size(); }
+    std::size_t GetIncludedResourcesCount() const noexcept { return m_IncludedResources.size(); }
 
     bool GetInfoValue(const char* szKey, std::string& strValue) const;
     void SetInfoValue(const char* szKey, const char* szValue, bool bSave = true);
 
-    unsigned int GetVersionMajor() const noexcept { return m_uiVersionMajor; }
-    unsigned int GetVersionMinor() const noexcept { return m_uiVersionMinor; }
-    unsigned int GetVersionRevision() const noexcept { return m_uiVersionRevision; }
-    unsigned int GetVersionState() const noexcept { return m_uiVersionState; }
+    std::uint32_t GetVersionMajor() const noexcept { return m_uiVersionMajor; }
+    std::uint32_t GetVersionMinor() const noexcept { return m_uiVersionMinor; }
+    std::uint32_t GetVersionRevision() const noexcept { return m_uiVersionRevision; }
+    std::uint32_t GetVersionState() const noexcept { return m_uiVersionState; }
 
     bool IsLoaded() const noexcept { return m_eState != EResourceState::None; }
     bool IsActive() const noexcept
@@ -254,8 +255,8 @@ public:
     const std::string& GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
     const std::string& GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
 
-    std::list<CResourceFile*>& GetFiles() { return m_ResourceFiles; }
-    size_t                     GetFileCount() const noexcept { return m_ResourceFiles.size(); }
+    std::list<CResourceFile*>& GetFiles() noexcept { return m_ResourceFiles; }
+    std::size_t                GetFileCount() const noexcept { return m_ResourceFiles.size(); }
 
     time_t GetTimeStarted() const noexcept { return m_timeStarted; }
     time_t GetTimeLoaded() const noexcept { return m_timeLoaded; }
@@ -263,38 +264,41 @@ public:
     void           SetNetID(unsigned short usNetID) { m_usNetID = usNetID; }
     unsigned short GetNetID() const noexcept { return m_usNetID; }
 
-    uint GetScriptID() const noexcept { return m_uiScriptID; }
+    std::uint32_t GetScriptID() const noexcept { return m_uiScriptID; }
 
     void OnPlayerJoin(CPlayer& Player);
     void SendNoClientCacheScripts(CPlayer* pPlayer = nullptr);
 
-    CDummy*       GetResourceRootElement() { return m_pResourceElement; }
+    CDummy*       GetResourceRootElement() noexcept { return m_pResourceElement; }
     const CDummy* GetResourceRootElement() const noexcept { return m_pResourceElement; }
 
-    CDummy*       GetDynamicElementRoot() { return m_pResourceDynamicElementRoot; }
+    CDummy*       GetDynamicElementRoot() noexcept { return m_pResourceDynamicElementRoot; }
     const CDummy* GetDynamicElementRoot() const noexcept { return m_pResourceDynamicElementRoot; }
 
-    CElementGroup*       GetElementGroup() { return m_pDefaultElementGroup; }
+    CElementGroup*       GetElementGroup() noexcept { return m_pDefaultElementGroup; }
     const CElementGroup* GetElementGroup() const noexcept { return m_pDefaultElementGroup; }
 
-    void SetProtected(bool bProtected) { m_bProtected = bProtected; }
-    bool IsProtected() const noexcept { return m_bProtected; }
+    constexpr void SetProtected(bool bProtected) noexcept { m_bProtected = bProtected; }
+    constexpr bool IsProtected() const noexcept { return m_bProtected; }
 
     bool IsResourceZip() const noexcept { return m_bResourceIsZip; }
     bool UnzipResource();
 
     ResponseCode HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
-    std::list<CResourceFile*>::iterator       IterBegin() { return m_ResourceFiles.begin(); }
-    std::list<CResourceFile*>::const_iterator IterBegin() const noexcept { return m_ResourceFiles.begin(); }
+    std::list<CResourceFile*>::iterator       begin() noexcept { return m_ResourceFiles.begin(); }
+    std::list<CResourceFile*>::const_iterator begin() const noexcept { return m_ResourceFiles.begin(); }
 
-    std::list<CResourceFile*>::iterator       IterEnd() { return m_ResourceFiles.end(); }
-    std::list<CResourceFile*>::const_iterator IterEnd() const noexcept { return m_ResourceFiles.end(); }
+    std::list<CResourceFile*>::iterator       end() noexcept { return m_ResourceFiles.end(); }
+    std::list<CResourceFile*>::const_iterator end() const noexcept { return m_ResourceFiles.end(); }
 
-    size_t IterCount() const noexcept { return m_ResourceFiles.size(); }
+    std::size_t count() const noexcept { return m_ResourceFiles.size(); }
 
-    std::list<CExportedFunction>::iterator IterBeginExportedFunctions() { return m_ExportedFunctions.begin(); }
-    std::list<CExportedFunction>::iterator IterEndExportedFunctions() { return m_ExportedFunctions.end(); }
+    std::list<CExportedFunction>::iterator IterBeginExportedFunctions() noexcept { return m_ExportedFunctions.begin(); }
+    std::list<CExportedFunction>::iterator IterEndExportedFunctions() noexcept { return m_ExportedFunctions.end(); }
+
+    std::list<CExportedFunction>::const_iterator IterBeginExportedFunctions() const noexcept { return m_ExportedFunctions.begin(); }
+    std::list<CExportedFunction>::const_iterator IterEndExportedFunctions() const noexcept { return m_ExportedFunctions.end(); }
 
     void GetAclRequests(std::vector<SAclRequest>& outResultList);
     bool HandleAclRequestListCommand(bool bDetail);
@@ -364,7 +368,7 @@ private:
     bool           m_bClientSync = false;
 
     unsigned short m_usNetID = -1;
-    uint           m_uiScriptID = -1;
+    std::uint32_t           m_uiScriptID = -1;
 
     CResourceManager* m_pResourceManager;
 
@@ -374,10 +378,10 @@ private:
     std::string m_strResourceDirectoryPath;            // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
     std::string m_strResourceCachePath;            // Absolute path to unzipped cache (if a zip)   i.e. /server/mods/deathmatch/resources/cache/resource_name
 
-    unsigned int m_uiVersionMajor = 0;
-    unsigned int m_uiVersionMinor = 0;
-    unsigned int m_uiVersionRevision = 0;
-    unsigned int m_uiVersionState = 2;            // 2 = release
+    std::uint32_t m_uiVersionMajor = 0;
+    std::uint32_t m_uiVersionMinor = 0;
+    std::uint32_t m_uiVersionRevision = 0;
+    std::uint32_t m_uiVersionState = 2;            // 2 = release
 
     int m_iDownloadPriorityGroup = 0;
 
@@ -436,6 +440,6 @@ private:
 
     CChecksum m_metaChecksum;            // Checksum of meta.xml last time this was loaded, generated in GenerateChecksums()
 
-    uint                              m_uiFunctionRightCacheRevision = 0;
+    std::uint32_t                              m_uiFunctionRightCacheRevision = 0;
     CFastHashMap<lua_CFunction, bool> m_FunctionRightCacheMap;
 };
