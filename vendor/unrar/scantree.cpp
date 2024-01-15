@@ -65,7 +65,7 @@ SCAN_CODE ScanTree::GetNext(FindData *FD)
     if (FindCode==SCAN_DONE && GetNextMask())
       continue;
     if (FilterList.ItemsCount()>0 && FindCode==SCAN_SUCCESS)
-      if (!CommandData::CheckArgs(&FilterList,FD->IsDir,FD->Name.c_str(),false,MATCH_WILDSUBPATH))
+      if (!CommandData::CheckArgs(&FilterList,FD->IsDir,FD->Name,false,MATCH_WILDSUBPATH))
         continue;
     break;
   }

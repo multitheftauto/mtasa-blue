@@ -1464,12 +1464,33 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->GetDamageManager()->SetWheelStatus((eWheelPosition)(ucWheel), ucGTAStatus);
 
                 // Update the wheel's visibility
-                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, (ucStatus != DT_WHEEL_MISSING));
+                m_pVehicle->SetWheelVisibility((eWheelPosition)ucWheel, ucStatus != DT_WHEEL_MISSING &&
+                    (m_ComponentData.empty() || m_ComponentData[GetComponentNameForWheel(ucWheel)].m_bVisible));
             }
             else if (m_eVehicleType == CLIENTVEHICLE_BIKE && ucWheel < 2)
                 m_pVehicle->SetBikeWheelStatus(ucWheel, ucGTAStatus);
         }
         m_ucWheelStates[ucWheel] = ucStatus;
+    }
+}
+
+//
+// Returns component name for eWheelPosition enum
+//
+SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) const noexcept
+{
+    switch (ucWheel)
+    {
+        case FRONT_LEFT_WHEEL:
+            return "wheel_lf_dummy";
+        case FRONT_RIGHT_WHEEL:
+            return "wheel_rf_dummy";
+        case REAR_LEFT_WHEEL:
+            return "wheel_lb_dummy";
+        case REAR_RIGHT_WHEEL:
+            return "wheel_rb_dummy";
+        default:
+            return "";
     }
 }
 
