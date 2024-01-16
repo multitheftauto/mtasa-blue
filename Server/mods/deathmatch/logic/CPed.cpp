@@ -68,6 +68,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_fGravity = 0.008f;
     m_bDoingGangDriveby = false;
     m_bStealthAiming = false;
+    m_bReloadingWeapon = false;
 
     m_pVehicle = NULL;
     m_uiVehicleSeat = INVALID_VEHICLE_SEAT;

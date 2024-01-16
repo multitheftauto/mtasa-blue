@@ -79,4 +79,6 @@ public:
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);
     LUA_DECLARE(reloadPedWeapon);
+
+    static bool IsPedReloadingWeapon(CPed* const ped);
 };
