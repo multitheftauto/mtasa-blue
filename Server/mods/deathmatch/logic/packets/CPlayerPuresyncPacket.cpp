@@ -61,6 +61,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         pSourcePlayer->SetOnFire(flags.data.bIsOnFire);
         pSourcePlayer->SetStealthAiming(flags.data.bStealthAiming);
 
+        pSourcePlayer->SetReloadingWeapon(flags.data2.bIsReloadingWeapon);
+
         // Contact element
         CElement* pContactElement = NULL;
         if (flags.data.bHasContact)
@@ -313,6 +315,8 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         flags.data.bHasAWeapon = (ucWeaponSlot != 0);
         flags.data.bSyncingVelocity = (!flags.data.bIsOnGround || pSourcePlayer->IsSyncingVelocity());
         flags.data.bStealthAiming = (pSourcePlayer->IsStealthAiming() == true);
+
+        flags.data2.bIsReloadingWeapon = (pSourcePlayer->IsReloadingWeapon() == true);
 
         CVector vecPosition = pSourcePlayer->GetPosition();
         if (pContactElement)
