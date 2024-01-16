@@ -15,17 +15,19 @@ namespace lua
     template <>
     std::string PopPrimitive<std::string>(lua_State* L, int& index)
     {
-        uint        uiLength = lua_strlen(L, index);
+        size_t      uiLength;
+        const char* str = lua_tolstring(L, index++, &uiLength);
         std::string outValue;
-        outValue.assign(lua_tostring(L, index++), uiLength);
+        outValue.assign(str, uiLength);
         return outValue;
     }
 
     template <>
     std::string_view PopPrimitive<std::string_view>(lua_State* L, int& index)
     {
-        uint             uiLength = lua_strlen(L, index);
-        std::string_view outValue(lua_tostring(L, index++), uiLength);
+        size_t           uiLength;
+        const char*      str = lua_tolstring(L, index++, &uiLength);
+        std::string_view outValue(str, uiLength);
         return outValue;
     }
 
