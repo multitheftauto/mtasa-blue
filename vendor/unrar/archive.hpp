@@ -85,9 +85,6 @@ class Archive:public File
     HEADER_TYPE GetHeaderType() {return CurHeaderType;}
     CommandData* GetCommandData() {return Cmd;}
     void SetSilentOpen(bool Mode) {SilentOpen=Mode;}
-#if 0
-    void GetRecoveryInfo(bool Required,int64 *Size,int *Percent);
-#endif
 #ifdef USE_QOPEN
     bool Open(const std::wstring &Name,uint Mode=FMF_READ) override;
     int Read(void *Data,size_t Size) override;
