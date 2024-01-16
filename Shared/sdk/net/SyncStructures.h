@@ -547,8 +547,29 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         BITCOUNT = 12
     };
 
-    bool Read(NetBitStreamInterface& bitStream) { return bitStream.ReadBits((char*)&data, BITCOUNT); }
-    void Write(NetBitStreamInterface& bitStream) const { bitStream.WriteBits((const char*)&data, BITCOUNT); }
+    enum
+    {
+        BITCOUNT2 = 1
+    };
+
+    bool Read(NetBitStreamInterface& bitStream)
+    {
+        bool bOk = bitStream.ReadBits((char*)&data, BITCOUNT);
+
+        if (bitStream.Can(eBitStreamVersion::CPed_isReloadingWeapon))
+            bOk &= bitStream.ReadBits((char*)&data2, BITCOUNT2);
+        else
+            data2.bIsReloadingWeapon = 0;
+
+        return bOk;
+    }
+    void Write(NetBitStreamInterface& bitStream) const
+    {
+        bitStream.WriteBits((const char*)&data, BITCOUNT);
+
+        if (bitStream.Can(eBitStreamVersion::CPed_isReloadingWeapon))
+            bitStream.WriteBits((const char*)&data2, BITCOUNT2);
+    }
 
     struct
     {
@@ -565,6 +586,12 @@ struct SPlayerPuresyncFlags : public ISyncStructure
         bool bSyncingVelocity : 1;
         bool bStealthAiming : 1;
     } data;
+
+    // Add new ones in separate structs
+    struct
+    {
+        bool bIsReloadingWeapon : 1;
+    } data2;
 };
 
 struct SPedRotationSync : public ISyncStructure
