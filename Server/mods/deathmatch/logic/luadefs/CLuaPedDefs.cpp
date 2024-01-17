@@ -178,7 +178,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Ped", "Element");
 }
 
-int CLuaPedDefs::GetValidPedModels(lua_State * luaVM)
+int CLuaPedDefs::GetValidPedModels(lua_State* luaVM)
 {
     int iIndex = 0;
     lua_newtable(luaVM);
@@ -1623,8 +1623,5 @@ int CLuaPedDefs::TakeAllWeapons(lua_State* luaVM)
 
 bool CLuaPedDefs::IsPedReloadingWeapon(CPed* const ped)
 {
-    if (ped)
-        return ped->IsReloadingWeapon();
-
-    return false;
+    return ped->IsReloadingWeapon();
 }
