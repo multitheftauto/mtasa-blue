@@ -96,8 +96,7 @@ uint RawRead::Get4()
 {
   if (ReadPos+3<DataSize)
   {
-    uint Result=Data[ReadPos]+(Data[ReadPos+1]<<8)+(Data[ReadPos+2]<<16)+
-                (Data[ReadPos+3]<<24);
+    uint Result=RawGet4(&Data[ReadPos]);
     ReadPos+=4;
     return Result;
   }
