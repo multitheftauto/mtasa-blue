@@ -26,7 +26,7 @@ class Rijndael
     bool AES_NI;
 #endif
 
-#ifdef USE_NEON
+#ifdef USE_NEON_AES
     // In Android we must specify -march=armv8-a+crypto compiler switch
     // to support Neon AES commands, "crypto" attribute seems to be optional.
     __attribute__((target("+crypto")))
