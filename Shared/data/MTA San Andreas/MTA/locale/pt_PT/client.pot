@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-17 16:30+0000\n"
-"PO-Revision-Date: 2024-01-18 18:41\n"
+"PO-Revision-Date: 2024-01-18 19:41\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -1335,7 +1335,7 @@ msgstr "Mostrar janela de descarregamento"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "Permitir conexão com o Status de Atividade do Discord"
+msgstr "Permitir conexão ao Discord Rich Presence (mostrar atividade personalizada)"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
@@ -2054,13 +2054,13 @@ msgstr "SONS EXTERNOS"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr "Parece que você tem a opção de conexão Rich Presence habilitada.\n"
-"Deseja permitir que os servidores compartilhem seus dados?\n\n"
-"Isso inclui o seu identificador de ID exclusivo."
+msgstr "Tem a opção de conexão Rich Presence ativa.\n"
+"Deseja partilhar alguns dos seus dados do Discord com servidores?\n\n"
+"Isto inclui atualmente o seu ID único do Discord."
 
 #: Client/core/CSettings.cpp:4542
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr "CONSENTIMENTO PARA PERMITIR O COMPARTILHAMENTO DE DADOS"
+msgstr "CONSENTIMENTO PARA PERMITIR A PARTILHA DE DADOS"
 
 #: Client/core/CSettings.cpp:4566
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -3015,112 +3015,112 @@ msgstr "Desconecte-se para cancelar o descarregamento"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr "A voar com um OVNI"
+msgstr "A voar com um OVNI em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "A conduzir em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr ""
+msgstr "A navegar em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
-msgstr ""
+msgstr "A bordo de um comboio em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr ""
+msgstr "A voar em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr ""
+msgstr "A conduzir em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "A andar de Monster Truck em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr ""
+msgstr "A andar de Quad em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "A saltitar em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "A fazer coisas duvidosas em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr ""
+msgstr "A fazer parkour em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "A fazer drive-by em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
-msgstr ""
+msgstr "A afogar-se..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr ""
+msgstr "A respirar água"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
-msgstr ""
+msgstr "A afogar-se em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "A abrigar-se em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
-msgstr ""
+msgstr "A lutar em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
-msgstr ""
+msgstr "A andar à pancada em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "A andar aos tiros em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr ""
+msgstr "A disparar em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr ""
+msgstr "A voar de Jetpack em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr ""
+msgstr "A pegar fogo em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
-msgstr ""
+msgstr "A arder em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Swimming in"
-msgstr ""
+msgstr "A nadar em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr ""
+msgstr "A flutuar na água em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "A ser perseguido por um tubarão"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr ""
+msgstr "A ser estrangulado em"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:651
 msgid "Entering the game ..."
@@ -3145,11 +3145,11 @@ msgstr "Iniciando o servidor local ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr ""
+msgstr "Área 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr ""
+msgstr "A passear em "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
@@ -3186,23 +3186,23 @@ msgstr "A verificação do cliente do MTA falhou!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
-msgstr ""
+msgstr "Numa fossa"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
-msgstr ""
+msgstr "A caminho do hospital"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr ""
+msgstr "A ir ter com Deus"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "Em vias de falecer"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
-msgstr ""
+msgstr "Morto"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
