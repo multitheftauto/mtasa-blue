@@ -1073,6 +1073,7 @@ BOOL StartGtaProcess(const SString& lpApplicationName, const SString& lpCommandL
             }
             lpProcessInformation->dwProcessId = pid;
             lpProcessInformation->hProcess = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_LIMITED_INFORMATION | SYNCHRONIZE, FALSE, pid);
+            wasProcessCreated = true;
             break;
         }
         if (lpProcessInformation->dwProcessId)
