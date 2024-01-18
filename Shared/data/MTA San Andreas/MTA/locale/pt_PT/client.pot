@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-17 16:30+0000\n"
-"PO-Revision-Date: 2023-12-17 20:30\n"
+"PO-Revision-Date: 2024-01-18 18:41\n"
 "Last-Translator: \n"
 "Language-Team: Portuguese\n"
 "Language: pt_PT\n"
@@ -896,13 +896,13 @@ msgstr "* O seu serial é: %s"
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 msgid "In-game"
-msgstr ""
+msgstr "Em jogo"
 
 #: Client/core/CCore.cpp:674 Client/core/CMainMenu.cpp:304
 #: Client/core/CSettings.cpp:3461
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 msgid "Main menu"
-msgstr ""
+msgstr "Menu principal"
 
 #: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
@@ -3015,7 +3015,7 @@ msgstr "Desconecte-se para cancelar o descarregamento"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "A voar com um OVNI"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
