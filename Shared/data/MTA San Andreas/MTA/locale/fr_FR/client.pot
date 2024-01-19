@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-18 20:38+0000\n"
-"PO-Revision-Date: 2024-01-19 22:50\n"
+"PO-Revision-Date: 2024-01-19 23:50\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -3017,15 +3017,15 @@ msgstr "Déconnectez pour annuler le téléchargement"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr "Au volant d'un OVNI à"
+msgstr "Aux commandes d'un OVNI au-dessus de"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr "En train de me balader à"
+msgstr "Se balade à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr "En surfant sur les vagues de"
+msgstr "Surfe sur les vagues de"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
@@ -3041,28 +3041,28 @@ msgstr "En train de rouler à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
-msgstr "Dans un Monster Truck à"
+msgstr "Conduit un Monster Truck à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr "Sur un Quad à"
+msgstr "Conduit un Quad à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr "En train de sauter à"
+msgstr "Fait du Bunny Hopping non loin de"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr "En train de faire des choses bizarres à"
+msgstr "En train de faire des choses suspectes à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr "En train de faire du parkour à"
+msgstr "Fait de l'escalade à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr "En train de faire un drive-by à"
+msgstr "Fait un drive-by à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
@@ -3070,11 +3070,11 @@ msgstr "Glou glou..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr "En train de respirer de l'eau"
+msgstr "En train de se noyer"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
-msgstr "En train de me noyer à"
+msgstr "Se noie à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
@@ -3082,11 +3082,11 @@ msgstr "A l'abri à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
-msgstr "En train de me battre à"
+msgstr "Se bat à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
-msgstr "En train de me bagarrer à"
+msgstr "Se bagarre à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
@@ -3094,11 +3094,11 @@ msgstr "En train de tirer à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr "En train de fusiller"
+msgstr "En pleine fusillade"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr "Survolant en Jetpack à"
+msgstr "Vole en Jetpack au-dessus de"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
@@ -3106,7 +3106,7 @@ msgstr "En feu à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
-msgstr "En train de brûler à"
+msgstr "En train de brûler vivant à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Swimming in"
@@ -3114,7 +3114,7 @@ msgstr "En train de nager à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr "Sous l'eau à"
+msgstr "Erre autour de"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
@@ -3122,7 +3122,7 @@ msgstr "Pris en chasse par un requin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr "En train d'être étouffé à mort"
+msgstr "En train d'être étouffé à mort à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:651
 msgid "Entering the game ..."
@@ -3151,7 +3151,7 @@ msgstr "Zone 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr "En train de me promener à "
+msgstr "En train de se promener à "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
