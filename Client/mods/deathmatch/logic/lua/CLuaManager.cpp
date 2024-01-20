@@ -100,6 +100,8 @@ void CLuaManager::OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM)
 
 void CLuaManager::ProcessPendingDeleteList()
 {
+    ZoneScoped;
+
     while (!m_PendingDeleteList.empty())
     {
         lua_State* luaVM = m_PendingDeleteList.front();
@@ -111,6 +113,8 @@ void CLuaManager::ProcessPendingDeleteList()
 
 void CLuaManager::DoPulse()
 {
+    ZoneScoped;
+
     list<CLuaMain*>::iterator iter = m_virtualMachines.begin();
     for (; iter != m_virtualMachines.end(); ++iter)
     {

@@ -116,6 +116,8 @@ CRadarMap::~CRadarMap()
 
 void CRadarMap::DoPulse()
 {
+    ZoneScoped;
+
     // If our radar image exists
     if (IsRadarShowing())
     {

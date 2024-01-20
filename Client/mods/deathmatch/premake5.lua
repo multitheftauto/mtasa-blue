@@ -7,7 +7,13 @@ project "Client Deathmatch"
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
-	defines { "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
+	defines { 
+		"LUA_USE_APICHECK", 
+		"SDK_WITH_BCRYPT",
+	}
+
+	add_tracy("../../../")
+	
 	links {
 		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg",
 		"../../../vendor/bass/lib/bass",
@@ -43,7 +49,7 @@ project "Client Deathmatch"
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
 			"../../../vendor/sparsehash/src/",
-			"../../../vendor/lunasvg/include"
+			"../../../vendor/lunasvg/include",
 	}
 
 	files {

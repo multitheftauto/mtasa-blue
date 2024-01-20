@@ -22,6 +22,8 @@ project "Multiplayer SA"
 			"../../vendor/sparsehash/src/",
 		}
 
+	add_tracy("../../")
+
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 

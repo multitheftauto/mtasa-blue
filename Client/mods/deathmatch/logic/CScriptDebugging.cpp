@@ -119,6 +119,8 @@ bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
 
 void CScriptDebugging::UpdateLogOutput()
 {
+    ZoneScoped;
+
     SLogLine line;
     while (m_DuplicateLineFilter.PopOutputLine(line))
     {

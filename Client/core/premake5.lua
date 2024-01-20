@@ -33,7 +33,11 @@ project "Client Core"
 		["*"] = "premake5.lua"
 	}
 
-	links { "detours" }
+	links { 
+		"detours", 
+	}
+	
+	add_tracy("../../")
 
 	files {
 		"premake5.lua",

@@ -6720,6 +6720,8 @@ void CClientPed::ResetVehicleInOut()
 //////////////////////////////////////////////////////////////////
 void CClientPed::UpdateVehicleInOut()
 {
+    ZoneScoped;
+
     // We got told by the server to animate into a certain vehicle?
     if (m_VehicleInOutID != INVALID_ELEMENT_ID)
     {

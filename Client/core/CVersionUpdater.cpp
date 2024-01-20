@@ -452,10 +452,10 @@ CReportWrap* CVersionUpdater::GetReportWrap()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::DoPulse()
 {
+    ZoneScopedN("VersionUpdaterPulse");
+
     if (!m_bEnabled)
         return;
-
-    TIMING_CHECKPOINT("+VersionUpdaterPulse");
 
     EnsureLoadedConfigFromXML();
 
@@ -550,8 +550,6 @@ void CVersionUpdater::DoPulse()
     {
         MainStep();
     }
-
-    TIMING_CHECKPOINT("-VersionUpdaterPulse");
 }
 
 ///////////////////////////////////////////////////////////////

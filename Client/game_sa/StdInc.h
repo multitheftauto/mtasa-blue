@@ -24,6 +24,8 @@
 #include <string>
 #include <vector>
 
+#include <tracy/Tracy.hpp>
+
 // Game includes
 #include "HookSystem.h"
 #include "gamesa_init.h"

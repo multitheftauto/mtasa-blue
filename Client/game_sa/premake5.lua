@@ -22,10 +22,12 @@ project "Game SA"
 
 	filter {}
 
+	add_tracy("../../")
+
 	includedirs {
 		"../../Shared/sdk",
 		"../sdk/",
-		"../../vendor/sparsehash/src/"
+		"../../vendor/sparsehash/src/",
 	}
 
 	files {

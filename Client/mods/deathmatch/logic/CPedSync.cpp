@@ -55,6 +55,8 @@ bool CPedSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& Bi
 
 void CPedSync::DoPulse()
 {
+    ZoneScoped;
+
     // Got any items?
     if (m_List.size() > 0)
     {

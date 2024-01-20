@@ -34,6 +34,8 @@ void CObjectRespawner::Respawn(CClientObject* pObject)
 
 void CObjectRespawner::DoRespawnAll()
 {
+    ZoneScoped;
+
     for (uint i = 0; i < m_List.size(); i++)
     {
         CClientObject* pObject = m_List[i];

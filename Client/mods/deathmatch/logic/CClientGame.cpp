@@ -831,7 +831,8 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 
 void CClientGame::DoPulsePostFrame()
 {
-    TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
+    ZoneScoped;
+
 #ifdef DEBUG_KEYSTATES
     // Get the controller state
     CControllerState cs;
@@ -1104,11 +1105,9 @@ void CClientGame::DoPulsePostFrame()
 
 void CClientGame::DoPulses()
 {
-    TIMING_CHECKPOINT("-CClientGame::DoPulsePostFrame");
+    ZoneScoped;
 
     g_pCore->ApplyFrameRateLimit();
-
-    TIMING_CHECKPOINT("+CClientGame::DoPulses");
 
     m_BuiltCollisionMapThisFrame = false;
 
@@ -1127,6 +1126,8 @@ void CClientGame::DoPulses()
 
     if (m_pManager->IsGameLoaded() && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_() - m_llLastTransgressionTime > 60000)
     {
+        ZoneScopedN("AC checks");
+
         uint    uiLevel = 0;
         uint    uiInform = 0;
         SString strMessage;
@@ -1179,6 +1180,8 @@ void CClientGame::DoPulses()
     // Send diagnostic info
     if (m_pManager->IsGameLoaded() && m_Status == CClientGame::STATUS_JOINED)
     {
+        ZoneScopedN("Send Diagnostic Info");
+
         // Retrieve data
         SString strMessage = g_pNet->GetDiagnosticStatus();
 
@@ -1219,6 +1222,8 @@ void CClientGame::DoPulses()
     // Waiting for a connect?
     if (m_bWaitingForLocalConnect)
     {
+        ZoneScopedN("Local Network Connect");
+
         // Connected?
         if (g_pNet->IsConnected())
         {
@@ -1477,13 +1482,13 @@ void CClientGame::DoPulses()
 
     // Collect async task scheduler results
     m_pAsyncTaskScheduler->CollectResults();
-
-    TIMING_CHECKPOINT("-CClientGame::DoPulses");
 }
 
 // Extrapolation test
 void CClientGame::DoPulses2(bool bCalledFromIdle)
 {
+    ZoneScoped;
+
     bool bIsUsingAlternatePulseOrder = IsUsingAlternatePulseOrder(!bCalledFromIdle);
 
     // Figure out which pulses to do
@@ -1515,10 +1520,11 @@ void CClientGame::DoPulses2(bool bCalledFromIdle)
         ChangeFloatPrecision(true);
 
         // Pulse the network interface
-        TIMING_CHECKPOINT("+NetPulse");
-        g_pNet->DoPulse();
-        TIMING_CHECKPOINT("-NetPulse");
-
+        {
+            ZoneScopedN("NetPulse");
+            g_pNet->DoPulse();
+        }
+        
         // Change precision back, and check we are in low precision mode 4 sure
         ChangeFloatPrecision(false);
         assert(!IsHighFloatPrecision());
@@ -1687,6 +1693,8 @@ void CClientGame::SetMimic(unsigned int uiMimicCount)
 
 void CClientGame::DoVehicleInKeyCheck()
 {
+    ZoneScoped;
+
     // Grab the controller state
     CControllerState cs;
     g_pGame->GetPad()->GetCurrentControllerState(&cs);
@@ -1727,6 +1735,8 @@ void CClientGame::DoVehicleInKeyCheck()
 
 void CClientGame::UpdatePlayerTarget()
 {
+    ZoneScoped;
+
     CControllerState ControllerState;
     m_pLocalPlayer->GetControllerState(ControllerState);
     CVector vecOrigin, vecTarget;
@@ -1790,6 +1800,8 @@ void CClientGame::UpdatePlayerTarget()
 
 void CClientGame::UpdatePlayerWeapons()
 {
+    ZoneScoped;
+
     // Check whether we changed weapon slots
     eWeaponSlot currentSlot = m_pLocalPlayer->GetCurrentWeaponSlot();
     if (currentSlot != m_lastWeaponSlot)
@@ -1863,6 +1875,8 @@ void CClientGame::UpdatePlayerWeapons()
 
 void CClientGame::UpdateTrailers()
 {
+    ZoneScoped;
+
     // This function is here to re-attach trailers if they fall off
 
     unsigned long ulCurrentTime = GetTickCount32();
@@ -2026,6 +2040,8 @@ void CClientGame::UpdateFireKey()
 
 void CClientGame::UpdateStunts()
 {
+    ZoneScoped;
+
     // * Two wheeler *
     static unsigned long ulLastCarTwoWheelCounter = 0;
     static float         fLastCarTwoWheelDist = 0.0f;
@@ -3046,6 +3062,8 @@ void CClientGame::DrawWeaponsyncData(CClientPlayer* pPlayer)
 
 void CClientGame::UpdateMimics()
 {
+    ZoneScoped;
+
     // Got a local player?
     if (m_pLocalPlayer)
     {
@@ -3865,6 +3883,8 @@ void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 
 void CClientGame::IdleHandler()
 {
+    ZoneScoped;
+
     // If we are minimized we do the pulsing here
     if (g_pCore->IsWindowMinimized())
     {
@@ -5628,6 +5648,8 @@ void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsi
 
 void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID)
 {
+    ZoneScoped;
+
     // Are we not already marked as dead? and have we run out of health?
     if (!m_pLocalPlayer->IsDeadOnNetwork() && m_pLocalPlayer->GetHealth() == 0.0f)
     {
@@ -6387,6 +6409,8 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
 //
 void CClientGame::ProcessDelayedSendList()
 {
+    ZoneScoped;
+
     CTickCount tickCount = CTickCount::Now();
 
     while (!m_DelayedSendList.empty())

@@ -1630,6 +1630,8 @@ bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)
 {
+    ZoneScoped;
+
     BeginDrawBatch();
     // Items to draw?
     if (Queue.size() > 0)

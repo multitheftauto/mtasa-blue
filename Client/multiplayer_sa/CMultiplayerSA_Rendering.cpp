@@ -34,12 +34,10 @@ namespace
 //////////////////////////////////////////////////////////////////////////////////////////
 void OnMY_CallIdle_Pre(DWORD calledFrom)
 {
-    TIMING_CHECKPOINT("+CallIdle1");
 }
 
 void OnMY_CallIdle_Post(RwGeometry* pGeometry, DWORD calledFrom)
 {
-    TIMING_CHECKPOINT("-CallIdle2");
 }
 
 // Hook info

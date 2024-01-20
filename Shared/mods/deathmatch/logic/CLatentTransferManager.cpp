@@ -55,6 +55,10 @@ CLatentTransferManager::~CLatentTransferManager()
 ///////////////////////////////////////////////////////////////
 void CLatentTransferManager::DoPulse()
 {
+#ifdef MTA_CLIENT
+    ZoneScoped;
+#endif
+
     // Update timing info
     CTickCount tickCountNow = CTickCount::Now();
 

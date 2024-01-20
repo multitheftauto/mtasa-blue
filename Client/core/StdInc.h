@@ -32,6 +32,8 @@
 #include <iomanip>
 #include <functional>
 
+#include <tracy/Tracy.hpp>
+
 // Localization
 #include "../../vendor/tinygettext/tinygettext.hpp"
 #include "CLocalization.h"

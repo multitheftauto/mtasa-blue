@@ -11,6 +11,8 @@
 #include "SharedUtil.MemAccess.h"
 #include <stdio.h>
 
+#include <tracy/Tracy.hpp>
+
 // SDK includes
 #include <core/CCoreInterface.h>
 #include <version.h>
