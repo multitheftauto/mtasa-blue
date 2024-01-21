@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-08 01:17\n"
-"PO-Revision-Date: 2024-01-21 02:20\n"
+"PO-Revision-Date: 2024-01-21 03:20\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -25,12 +25,12 @@ msgstr "您下载的MTA:SA并不支持 Windows XP or Vista. 请在www.mtasa.com�
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "您下载的 MTA:SA 版本不支持 Windows 7、8 或 8.1，请从 www.mtasa.com 下载其它版本。"
+msgstr "您下载的MTA:SA版本不支持Windows 7、8或8.1，请从www.mtasa.com下载其他版本。"
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr "您下载的 MTA:SA 版本仅支持旧版Windows，请从 www.mtasa.com 下载其它版本。"
+msgstr "您下载的MTA:SA版本仅适用于旧版Windows，请从www.mtasa.com下载其他版本。"
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
