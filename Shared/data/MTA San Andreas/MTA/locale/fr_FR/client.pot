@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-18 20:38+0000\n"
-"PO-Revision-Date: 2024-01-22 19:22\n"
+"PO-Revision-Date: 2024-01-22 20:22\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -3049,11 +3049,11 @@ msgstr "Conduit un Quad à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr "Fait du Bunny Hopping non loin de"
+msgstr "Saute partout à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr "En train de faire des choses suspectes à"
+msgstr "Fait des trucs bizarres à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
@@ -3062,7 +3062,7 @@ msgstr "Fait de l'escalade à"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr "Fait un drive-by à"
+msgstr "En plein drive-by à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
@@ -3114,11 +3114,11 @@ msgstr "En train de nager à"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr "Erre autour de"
+msgstr "Nage autour de"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
-msgstr "Pris en chasse par un requin"
+msgstr "Poursuivi par un requin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
