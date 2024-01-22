@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-17 16:30+0000\n"
-"PO-Revision-Date: 2023-12-17 16:31\n"
+"POT-Creation-Date: 2024-01-18 20:38+0000\n"
+"PO-Revision-Date: 2024-01-22 15:51\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -447,7 +447,7 @@ msgid "An instance of GTA: San Andreas is already running. It needs to be termin
 msgstr "Kāda no GTA: San Andreas instancēm šobrīd darbojās. Tām ir jābūt aizvērtām, pirms startējat MTA:SA. Vai vēlaties to darīt tagad?"
 
 #: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
-#: Client/loader/MainFunctions.cpp:1218
+#: Client/loader/MainFunctions.cpp:1219
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 #: Client/core/ServerBrowser/CServerInfo.cpp:319
 msgid "Information"
@@ -543,23 +543,23 @@ msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 msgstr "MTA:SA nav saderīgs ar Windows 'Safe Mode'.\n\n"
 "Lūdzu restartējiet jūsu datoru.\n"
 
-#: Client/loader/MainFunctions.cpp:1122
+#: Client/loader/MainFunctions.cpp:1123
 msgid "Fix configuration issue"
 msgstr "Labot konfigurācijas kļūdu"
 
 #. Try to relaunch as admin if not done so already
-#: Client/loader/MainFunctions.cpp:1156
+#: Client/loader/MainFunctions.cpp:1157
 msgid "Fix elevation required error"
 msgstr "Labot nepieciešamo pacēluma kļūdu"
 
-#: Client/loader/MainFunctions.cpp:1163
+#: Client/loader/MainFunctions.cpp:1164
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
 msgstr "Nespēj palaist Grand Theft Auto: San Andreas.  Lūdzu mēģiniet restartēt, ja problēma turpinās,kontaktējiet MTA iekš www.multitheftauto.com. \n\n"
 "[%s]"
 
-#: Client/loader/MainFunctions.cpp:1218
+#: Client/loader/MainFunctions.cpp:1219
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas varētu būt palaists nepareizi. Vai vēlaties to izslēgt?"
 
@@ -897,7 +897,7 @@ msgstr "* Jūsu sērijas kods ir: %s"
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 msgid "In-game"
-msgstr ""
+msgstr "Iekš spēles"
 
 #: Client/core/CCore.cpp:674 Client/core/CMainMenu.cpp:304
 #: Client/core/CSettings.cpp:3461
@@ -1335,7 +1335,7 @@ msgstr "Atļaut redzēt lejupielādes logu"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Atļaut savienojumu ar Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
@@ -2055,11 +2055,13 @@ msgstr "ĀRĒJĀS SKAŅAS"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr ""
+msgstr "Izrādās ka jums ir Rich Presence savienojuma opcija ieslēgta.\n"
+"Vai atļauj spēles serveriem parsūtit savus datus?\n\n"
+"Iekļauj arī jūsu īpašo ID identifikātoru."
 
 #: Client/core/CSettings.cpp:4542
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
+msgstr "Piekrišana datu dalīšanai"
 
 #: Client/core/CSettings.cpp:4566
 msgid "Some files in your GTA:SA data directory are customized.\n"
