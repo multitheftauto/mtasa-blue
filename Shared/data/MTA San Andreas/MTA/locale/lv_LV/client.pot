@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-18 20:38+0000\n"
-"PO-Revision-Date: 2024-01-22 15:51\n"
+"PO-Revision-Date: 2024-01-22 16:51\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -142,7 +142,7 @@ msgstr "Šie faili nav vajadzīgi un var traucēt grafisko līdzekļu darbību �
 
 #: Client/loader/Dialogs.cpp:167
 msgid "Keep these files, but also show this warning on next start"
-msgstr "Saglabāt šos failus un parādiet šo brīdinājumu arī nākamajā starta reizē"
+msgstr "Saglabāt šos failus un parādiet šo brīdinājumu arī nākamajā palaišanas reizē"
 
 #: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
@@ -903,7 +903,7 @@ msgstr "Iekš spēles"
 #: Client/core/CSettings.cpp:3461
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 msgid "Main menu"
-msgstr ""
+msgstr "Galvenā izvēlne"
 
 #: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
@@ -1576,7 +1576,7 @@ msgstr "Dinamiskas ped ēnas"
 
 #: Client/core/CSettings.cpp:820
 msgid "Motion blur"
-msgstr "Dzēst nesaderīgus failus"
+msgstr "Kustību miglošana"
 
 #: Client/core/CSettings.cpp:825
 msgid "Full Screen Minimize"
@@ -1732,7 +1732,7 @@ msgstr "Normāls"
 
 #: Client/core/CSettings.cpp:1073 Client/core/CSettings.cpp:3125
 msgid "Above normal"
-msgstr "Zem normāla"
+msgstr "Virs normāla"
 
 #: Client/core/CSettings.cpp:1109
 msgid "Min"
@@ -1957,7 +1957,7 @@ msgstr "Atļaut paziņojumus Windows vidē"
 
 #: Client/core/CSettings.cpp:2349
 msgid "Chat text black/white outline"
-msgstr "Čata teksta melns/balts rāmis"
+msgstr "Čata teksta melnais/baltais rāmis"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -2043,7 +2043,7 @@ msgstr "EKRĀNA AUGŠUPIELĀDES INFORMĀCIJA"
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
-msgstr "Daži skripti atskaņo skaņas, piemēram radio un internets.\n\n"
+msgstr "Daži skripti atskaņo skaņas, piemēram radio no interneta.\n\n"
 "Atspējojot šo opciju, var samazināties \n"
 "tīkla noslogojums.\n"
 
@@ -3022,112 +3022,112 @@ msgstr "Atslēdzieties, lai atceltu lejupielādi"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "Lido ar kosmosa kuği"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "Braukā apkārt"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr ""
+msgstr "Kuğo pa vilņiem"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
-msgstr ""
+msgstr "Braukā ar vilcienu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr ""
+msgstr "Lidinās apkārt"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr ""
+msgstr "Braukā apkārt"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "Braukā ar monster kravu automašinu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr ""
+msgstr "Kvadraciklē apkārt"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "Lēka apkart"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "Dara savādakas lietas iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr ""
+msgstr "Kāpj apkārt iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "Tēme ieroci pa logu no automašīnas iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
-msgstr ""
+msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr ""
+msgstr "Elpo ūdeni"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
-msgstr ""
+msgstr "Slīkst iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "Pietupies priekš seguma iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
-msgstr ""
+msgstr "Kaujās iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
-msgstr ""
+msgstr "Sit apkārt iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "Spridzina muļķus iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr ""
+msgstr "Apšauda"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr ""
+msgstr "Lidinās ar raķešu somu iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr ""
+msgstr "Deg iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
-msgstr ""
+msgstr "Deg iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Swimming in"
-msgstr ""
+msgstr "Peld iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr ""
+msgstr "Lidinās apkārt iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "Vajā haizivs"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr ""
+msgstr "Aizrijies līdz nāvei iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:651
 msgid "Entering the game ..."
@@ -3152,11 +3152,11 @@ msgstr "Startē lokālo serveri ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr ""
+msgstr "Arena 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr ""
+msgstr "Staigā apkārt "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
@@ -3193,23 +3193,23 @@ msgstr "MTA Klineta pārbaude neizdevās!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
-msgstr ""
+msgstr "Iekš grāvja"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
-msgstr ""
+msgstr "Ceļā uz slimnīcu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr ""
+msgstr "Sasniedz savu marķieri"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "Noželo savas izvēles"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
-msgstr ""
+msgstr "Miris"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
