@@ -510,71 +510,70 @@ bool CConsole::OnWindowSize(CGUIElement* pElement)
 // Send saved console adds to the actual gui window
 void CConsole::FlushPendingAdd()
 {
-    if (!m_strPendingAdd.empty())
+    if (m_strPendingAdd.empty())
+        return;
+    // Grab the scroll and the max scroll
+    float fScroll = m_pHistory->GetVerticalScrollPosition();
+    float fMaxScroll = m_pHistory->GetScrollbarDocumentSize() - m_pHistory->GetScrollbarPageSize();
+
+    // Grab selection
+    std::uint32_t uiSelectionStart = m_pHistory->GetSelectionStart();
+    std::uint32_t uiSelectionEnd = m_pHistory->GetSelectionEnd();
+    std::uint32_t uiSelectionLength = m_pHistory->GetSelectionLength();
+
+    // Make new buffer
+    SString strBuffer = m_pHistory->GetText();
+    strBuffer += m_strPendingAdd;
+    m_strPendingAdd.clear();
+
+    // Trim new buffer
+    std::uint32_t uiBufferLength = strBuffer.length();
+
+    if (uiBufferLength > CONSOLE_SIZE)
     {
-        // Grab the scroll and the max scroll
-        float fScroll = m_pHistory->GetVerticalScrollPosition();
-        float fMaxScroll = m_pHistory->GetScrollbarDocumentSize() - m_pHistory->GetScrollbarPageSize();
+        strBuffer = strBuffer.Right(CONSOLE_SIZE);
+        strBuffer = strBuffer.SplitRight("\n");
 
-        // Grab selection
-        uint uiSelectionStart = m_pHistory->GetSelectionStart();
-        uint uiSelectionEnd = m_pHistory->GetSelectionEnd();
-        uint uiSelectionLength = m_pHistory->GetSelectionLength();
-
-        // Make new buffer
-        SString strBuffer = m_pHistory->GetText();
-        strBuffer += m_strPendingAdd;
-        m_strPendingAdd.clear();
-
-        // Trim new buffer
-        uint uiBufferLength = strBuffer.length();
-
-        if (uiBufferLength > CONSOLE_SIZE)
+        // Fix text selection coords after trimming
+        if (uiSelectionLength > 0)
         {
-            strBuffer = strBuffer.Right(CONSOLE_SIZE);
-            strBuffer = strBuffer.SplitRight("\n");
+            std::uint32_t uiBufferLengthDiff = uiBufferLength - strBuffer.length();
 
-            // Fix text selection coords after trimming
-            if (uiSelectionLength > 0)
+            // Beware of underflows, all cases must be properly handled
+            if (uiSelectionEnd < uiBufferLengthDiff)
             {
-                uint uiBufferLengthDiff = uiBufferLength - strBuffer.length();
-
-                // Beware of underflows, all cases must be properly handled
-                if (uiSelectionEnd < uiBufferLengthDiff)
-                {
-                    // Whole selection would be out of the screen now, so technically
-                    // it does not exist anymore
-                    uiSelectionStart = 0;
-                    uiSelectionEnd = 0;
-                    uiSelectionLength = 0;
-                }
-                else if (uiSelectionStart < uiBufferLengthDiff)
-                {
-                    // Start of selection would be out of the screen now,
-                    // so it must be shortened
-                    uiSelectionLength -= uiBufferLengthDiff - uiSelectionStart;
-                    uiSelectionStart = 0;
-                    uiSelectionEnd -= uiBufferLengthDiff;
-                }
-                else            // Both start and end of selection are greater than length difference
-                {
-                    // Whole selection would still be visible on the screen,
-                    // just a simple movement is needed
-                    uiSelectionStart -= uiBufferLengthDiff;
-                    uiSelectionEnd -= uiBufferLengthDiff;
-                }
+                // Whole selection would be out of the screen now, so technically
+                // it does not exist anymore
+                uiSelectionStart = 0;
+                uiSelectionEnd = 0;
+                uiSelectionLength = 0;
+            }
+            else if (uiSelectionStart < uiBufferLengthDiff)
+            {
+                // Start of selection would be out of the screen now,
+                // so it must be shortened
+                uiSelectionLength -= uiBufferLengthDiff - uiSelectionStart;
+                uiSelectionStart = 0;
+                uiSelectionEnd -= uiBufferLengthDiff;
+            }
+            else            // Both start and end of selection are greater than length difference
+            {
+                // Whole selection would still be visible on the screen,
+                // just a simple movement is needed
+                uiSelectionStart -= uiBufferLengthDiff;
+                uiSelectionEnd -= uiBufferLengthDiff;
             }
         }
-
-        // Set new buffer
-        m_pHistory->SetText(strBuffer);
-
-        // If not at the end, keep the scrollbar position
-        if (fScroll < fMaxScroll)
-            m_pHistory->SetVerticalScrollPosition(fScroll);
-
-        // Restore text selection if any
-        if (uiSelectionLength > 0)
-            m_pHistory->SetSelection(uiSelectionStart, uiSelectionEnd);
     }
+
+    // Set new buffer
+    m_pHistory->SetText(strBuffer);
+
+    // If not at the end, keep the scrollbar position
+    if (fScroll < fMaxScroll)
+        m_pHistory->SetVerticalScrollPosition(fScroll);
+
+    // Restore text selection if any
+    if (uiSelectionLength > 0)
+        m_pHistory->SetSelection(uiSelectionStart, uiSelectionEnd);
 }
