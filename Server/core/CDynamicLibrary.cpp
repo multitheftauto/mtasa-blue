@@ -14,7 +14,7 @@
 #include "MTAPlatform.h"
 #include "version.h"
 
-#ifdef WIN32
+#ifdef _WIN32
     #include <stdio.h>
 #endif
 

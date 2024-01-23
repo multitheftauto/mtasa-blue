@@ -22,8 +22,8 @@ public:
     virtual CModManager* GetModManager() = 0;
     virtual CXML*        GetXML() = 0;
 
-    virtual const char* GetServerModPath() = 0;
-    virtual SString     GetAbsolutePath(const char* szRelative) = 0;
+    virtual const char* GetServerModPath() const noexcept = 0;
+    virtual SString     GetAbsolutePath(const char* szRelative) const noexcept = 0;
 
     virtual void Printf(const char* szFormat, ...) = 0;
     virtual bool IsRequestingExit() = 0;

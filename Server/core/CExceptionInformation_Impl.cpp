@@ -82,11 +82,14 @@ void CExceptionInformation_Impl::Set(unsigned int iCode, _EXCEPTION_POINTERS* pE
  *
  * @return <code>true</code> if successful, <code>false</code> otherwise.
  */
-bool CExceptionInformation_Impl::GetModule(char* szOutputBuffer, int nOutputNameLength, void** ppModuleBaseAddress)
-{
+bool CExceptionInformation_Impl::GetModule(
+    char* szOutputBuffer,
+    int nOutputNameLength,
+    void** ppModuleBaseAddress
+) const noexcept {
     HMODULE hModule;
 
-    if (szOutputBuffer == NULL)
+    if (!szOutputBuffer)
         return false;
 
     /*
@@ -100,13 +103,13 @@ bool CExceptionInformation_Impl::GetModule(char* szOutputBuffer, int nOutputName
     /*
      * GetModuleHandleExA isn't supported under Windows 2000.
      */
-    typedef BOOL(WINAPI * _pfnGetModuleHandleExA)(DWORD, LPCSTR, HMODULE*);
+    typedef BOOL(WINAPI* _pfnGetModuleHandleExA)(DWORD, LPCSTR, HMODULE*);
 
     /*
      * Get kernel32.dll's HMODULE.
      */
     HMODULE hKern32 = GetModuleHandle("kernel32.dll");
-    if (NULL == hKern32)
+    if (!hKern32)
         return false;
 
     /*
@@ -121,17 +124,15 @@ bool CExceptionInformation_Impl::GetModule(char* szOutputBuffer, int nOutputName
      * offsets, so it would just be a simple comparison of addresses to
      * do this...
      */
-    if (NULL == pfnGetModuleHandleExA)
+    if (!pfnGetModuleHandleExA)
         return false;
 
-    if (0 == pfnGetModuleHandleExA(0x00000004 /*GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS*/, (LPCSTR)m_pAddress, &hModule))
-    {
+    if (!pfnGetModuleHandleExA(0x00000004 /*GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS*/, (LPCSTR)m_pAddress, &hModule))
         return false;
-    }
 
     *ppModuleBaseAddress = hModule;
 
-    if (0 != GetModuleFileNameA(hModule, szOutputBuffer, nOutputNameLength))
+    if (GetModuleFileNameA(hModule, szOutputBuffer, nOutputNameLength) != 0)
     {
         /*
          * GetModuleFileNameA will return nOutputNameLength to us

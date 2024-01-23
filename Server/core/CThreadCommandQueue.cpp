@@ -14,8 +14,6 @@
 #include "CThreadCommandQueue.h"
 #include "CModManagerImpl.h"
 
-using std::string;
-
 void CThreadCommandQueue::Add(const char* szCommand)
 {
     // Lock the critical section, add it, then unlock
@@ -33,7 +31,7 @@ void CThreadCommandQueue::Process(bool& bRequestedQuit, CModManagerImpl* pModMan
     while (m_Commands.size() > 0)
     {
         // Grab the string
-        const string& str = m_Commands.front();
+        const std::string& str = m_Commands.front();
 
         // Check for the most important command: quit and exit.
         if (str == "quit" || str == "exit")

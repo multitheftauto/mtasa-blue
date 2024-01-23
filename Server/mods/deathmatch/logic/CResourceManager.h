@@ -16,7 +16,6 @@
 
 #include "SResourceStartOptions.h"
 #include "CElement.h"
-#include "ehs/ehs.h"
 #include <list>
 
 #define INVALID_RESOURCE_NET_ID     0xFFFF
@@ -46,26 +45,29 @@ private:
     };
 
 public:
-    ZERO_ON_NEW
+    ZERO_ON_NEW;
     CResourceManager();
     ~CResourceManager();
 
-    CResource*                            Load(bool bIsZipped, const char* szAbsPath, const char* szResourceName);
-    void                                  UnloadAndDelete(CResource* pResource);
-    CResource*                            GetResource(const char* szResourceName);
-    CResource*                            GetResourceFromScriptID(uint uiScriptID);
-    void                                  UnloadRemovedResources();
-    void                                  CheckResourceDependencies();
-    void                                  ListResourcesLoaded(const SString& strListType);
-    std::list<CResource*>::const_iterator IterBegin() { return m_resources.begin(); };
-    std::list<CResource*>::const_iterator IterEnd() { return m_resources.end(); };
+    CResource* Load(bool bIsZipped, const char* szAbsPath, const char* szResourceName);
+    void       UnloadAndDelete(CResource* pResource);
+    CResource* GetResource(const char* szResourceName);
+    CResource* GetResourceFromScriptID(uint uiScriptID);
+    void       UnloadRemovedResources();
+    void       CheckResourceDependencies();
+    void       ListResourcesLoaded(const SString& strListType);
+
+    std::list<CResource*>::iterator begin() noexcept { return m_resources.begin(); };
+    std::list<CResource*>::iterator end() noexcept { return m_resources.end(); };
+    std::list<CResource*>::const_iterator begin() const noexcept { return m_resources.begin(); };
+    std::list<CResource*>::const_iterator end() const noexcept { return m_resources.end(); };
 
     bool         Refresh(bool bRefreshAll = false, const SString strJustThisResource = "", bool bShowTiming = false);
-    void         UpgradeResources(CResource* pResource = NULL);
-    void         CheckResources(CResource* pResource = NULL);
+    void         UpgradeResources(CResource* pResource = nullptr);
+    void         CheckResources(CResource* pResource = nullptr);
     void         OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState) const;
-    unsigned int GetResourceLoadedCount() { return m_uiResourceLoadedCount; }
-    unsigned int GetResourceFailedCount() { return m_uiResourceFailedCount; }
+    constexpr std::uint32_t GetResourceLoadedCount() const noexcept { return m_uiResourceLoadedCount; }
+    constexpr std::uint32_t GetResourceFailedCount() const noexcept { return m_uiResourceFailedCount; }
     void         OnPlayerJoin(CPlayer& Player);
 
     const char* GetResourceDirectory();
@@ -82,8 +84,8 @@ public:
 
     bool IsAResourceElement(CElement* pElement);
 
-    unsigned short GenerateID();
-    CResource*     GetResourceFromNetID(unsigned short usNetID);
+    std::uint16_t GenerateID();
+    CResource*    GetResourceFromNetID(std::uint16_t usNetID);
 
     CResource* GetResourceFromLuaState(struct lua_State* luaVM);
     SString    GetResourceName(struct lua_State* luaVM);
@@ -108,7 +110,7 @@ public:
     void        ApplyMinClientRequirement(CResource* pResource, const CMtaVersion& strMinClientRequirement);
     void        RemoveMinClientRequirement(CResource* pResource);
     void        ReevaluateMinClientRequirement();
-    CMtaVersion GetMinClientRequirement() { return m_strMinClientRequirement; }
+    CMtaVersion GetMinClientRequirement() const noexcept { return m_strMinClientRequirement; }
 
     void ApplySyncMapElementDataOption(CResource* pResource, bool bSyncMapElementData);
     void RemoveSyncMapElementDataOption(CResource* pResource);
@@ -123,8 +125,8 @@ public:
 private:
     SString                 m_strResourceDirectory;
     CMappedList<CResource*> m_resources;
-    unsigned int            m_uiResourceLoadedCount;
-    unsigned int            m_uiResourceFailedCount;
+    std::uint32_t           m_uiResourceLoadedCount;
+    std::uint32_t           m_uiResourceFailedCount;
     bool                    m_bResourceListChanged;
     std::list<CResource*>   m_resourcesToStartAfterRefresh;
 
@@ -132,14 +134,14 @@ private:
     CFastHashMap<CResource*, lua_State*> m_ResourceLuaStateMap;
     CFastHashMap<lua_State*, CResource*> m_LuaStateResourceMap;
     CFastHashMap<SString, CResource*>    m_NameResourceMap;
-    std::map<ushort, CResource*>         m_NetIdResourceMap;
+    std::map<std::uint16_t, CResource*>  m_NetIdResourceMap;
 
-    list<sResourceQueue> m_resourceQueue;
+    std::list<sResourceQueue> m_resourceQueue;
 
     CMtaVersion                           m_strMinClientRequirement;
     CFastHashMap<CResource*, CMtaVersion> m_MinClientRequirementMap;
     CFastHashMap<CResource*, bool>        m_SyncMapElementDataOptionMap;
 
-    ushort                     m_usNextNetId;
+    std::uint16_t                     m_usNextNetId;
     std::map<SString, SString> m_BlockedFileReasonMap;
 };

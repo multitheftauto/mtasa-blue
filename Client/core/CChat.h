@@ -114,12 +114,18 @@ public:
 //
 struct SDrawListLineItem
 {
-    uint      uiLine;
-    CVector2D vecPosition;
-    uchar     ucAlpha;
+    std::uint32_t uiLine;
+    CVector2D     vecPosition;
+    std::uint8_t  ucAlpha;
 
-    bool operator!=(const SDrawListLineItem& other) const { return !operator==(other); }
-    bool operator==(const SDrawListLineItem& other) const { return uiLine == other.uiLine && vecPosition == other.vecPosition && ucAlpha == other.ucAlpha; }
+    constexpr bool operator!=(const SDrawListLineItem& other) const noexcept {
+        return !operator==(other);
+    }
+    constexpr bool operator==(const SDrawListLineItem& other) const noexcept {
+        return uiLine == other.uiLine
+            && vecPosition == other.vecPosition
+            && ucAlpha == other.ucAlpha;
+    }
 };
 
 //
@@ -132,13 +138,16 @@ struct SDrawList
     bool                           bOutline;
     std::vector<SDrawListLineItem> lineItemList;
 
-    bool operator!=(const SDrawList& other) const { return !operator==(other); }
-    bool operator==(const SDrawList& other) const
+    constexpr bool operator!=(const SDrawList& other) const noexcept
+    {
+        return !operator==(other);
+    }
+    constexpr bool operator==(const SDrawList& other) const noexcept
     {
         if (lineItemList.size() != other.lineItemList.size() || bShadow != other.bShadow || bOutline != other.bOutline || renderBounds != other.renderBounds)
             return false;
 
-        for (uint i = 0; i < lineItemList.size(); i++)
+        for (auto i = 0; i < lineItemList.size(); i++)
             if (lineItemList[i] != other.lineItemList[i])
                 return false;
 

@@ -15,81 +15,71 @@
 #include <stdio.h>
 #include "CDynamicLibrary.h"
 
-CDynamicLibrary::CDynamicLibrary()
-{
-    // Init
-    m_hModule = 0;
-}
+CDynamicLibrary::CDynamicLibrary() noexcept {}
 
-CDynamicLibrary::~CDynamicLibrary()
+CDynamicLibrary::~CDynamicLibrary() noexcept
 {
     // Make sure we unload
     Unload();
 }
 
-bool CDynamicLibrary::Load(const char* szFilename)
+bool CDynamicLibrary::Load(const char* szFilename) noexcept
 {
     // Unload the previous library
     Unload();
 
     // Load the new library
-    #ifdef WIN32
+    #ifdef _WIN32
     m_hModule = LoadLibrary(szFilename);
     #else
     m_hModule = dlopen(szFilename, RTLD_NOW);
 
     // Output error if needed
     if (!m_hModule)
-    {
         printf("%s\n", dlerror());
-    }
     #endif
 
     // Return whether we succeeded or not
     return m_hModule != 0;
 }
 
-void CDynamicLibrary::Unload()
+void CDynamicLibrary::Unload() noexcept
 {
     // Got a module?
-    if (m_hModule != 0)
-    {
-        #ifdef WIN32
-        FreeLibrary(m_hModule);
-        #else
-        dlclose(m_hModule);
-        #endif
+    if (!m_hModule)
+        return;
 
-        // Zero out our library as it's no longer valid
-        m_hModule = 0;
-    }
+    #ifdef _WIN32
+    FreeLibrary(m_hModule);
+    #else
+    dlclose(m_hModule);
+    #endif
+
+    // Zero out our library as it's no longer valid
+    m_hModule = nullptr;
 }
 
-bool CDynamicLibrary::IsLoaded()
+bool CDynamicLibrary::IsLoaded() const noexcept
 {
-    return m_hModule != 0;
+    return m_hModule != nullptr;
 }
 
-void* CDynamicLibrary::GetProcedureAddress(const char* szProcName)
+void* CDynamicLibrary::GetProcedureAddress(const char* szProcName) noexcept
 {
     // Got a module?
-    if (m_hModule != 0)
-    {
-        #ifdef WIN32
-        return GetProcAddress(m_hModule, szProcName);
-        #else
-        char* szError = NULL;
-        dlerror();
+    if (!m_hModule)
+        return nullptr;
 
-        void* pFunc = dlsym(m_hModule, szProcName);
-        if ((szError = dlerror()) != NULL)
-        {
-            return NULL;
-        }
+    #ifdef _WIN32
+    return GetProcAddress(m_hModule, szProcName);
+    #else
+    char* szError;
+    dlerror();
 
-        return pFunc;
-        #endif
-    }
+    void* pFunc = dlsym(m_hModule, szProcName);
+    if ((szError = dlerror()) != nullptr)
+        return nullptr;
 
-    return NULL;
+    return pFunc;
+    #endif
 }

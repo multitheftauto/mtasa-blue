@@ -32,22 +32,22 @@ void CTeamManager::RemoveAll()
     DeletePointersAndClearList(m_List);
 }
 
-CTeam* CTeamManager::GetTeam(const char* szName)
+CTeam* CTeamManager::GetTeam(const char* szName) const noexcept
 {
-    if (szName == NULL)
-        return NULL;
+    if (!szName)
+        return nullptr;
 
-    list<CTeam*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
+    for (const auto& pTeam : m_List)
     {
-        if (strcmp((*iter)->GetTeamName(), szName) == 0)
-            return *iter;
+        if (strcmp(pTeam->GetTeamName(), szName))
+            continue;
+        return pTeam;
     }
 
-    return NULL;
+    return nullptr;
 }
 
-bool CTeamManager::Exists(CTeam* pTeam)
+bool CTeamManager::Exists(CTeam* pTeam) const noexcept
 {
     return ListContains(m_List, pTeam);
 }

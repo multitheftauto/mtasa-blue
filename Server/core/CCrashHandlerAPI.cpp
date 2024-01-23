@@ -25,7 +25,7 @@ CONDITIONAL COMPILATION :
 
 #include "StdInc.h"
 #include "CCrashHandlerAPI.h"
-#ifdef WIN32
+#ifdef _WIN32
 
 #ifdef _M_IX86
     #include <SharedUtil.Detours.h>
@@ -50,8 +50,6 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs);
                             Destructor Class
 //////////////////////////////////////////////////////////////////////*/
 // See the note in MEMDUMPVALIDATOR.CPP about automatic classes.
-// Turn off warning : initializers put in library initialization area
-#pragma warning (disable : 4073)
 #pragma init_seg(lib)
 class CleanUpCrashHandler
 {
@@ -59,11 +57,11 @@ public:
     CleanUpCrashHandler() {}
     ~CleanUpCrashHandler()
     {
-        if (NULL != g_pfnOrigFilt)
-        {
-            // Restore the original unhandled exception filter.
-            SetUnhandledExceptionFilter(g_pfnOrigFilt);
-        }
+        if (!g_pfnOrigFilt)
+            return;
+
+        // Restore the original unhandled exception filter.
+        SetUnhandledExceptionFilter(g_pfnOrigFilt);
     }
 };
 
@@ -77,48 +75,47 @@ static CleanUpCrashHandler g_cBeforeAndAfter;
 BOOL __stdcall SetCrashHandlerFilter(PFNCHFILTFN pFn)
 {
     // A NULL parameter unhooks the callback.
-    if (NULL == pFn)
+    if (!pFn)
     {
-        if (NULL != g_pfnOrigFilt)
+        if (g_pfnOrigFilt)
         {
             // Restore the original unhandled exception filter.
             SetUnhandledExceptionFilter(g_pfnOrigFilt);
-            g_pfnOrigFilt = NULL;
-            g_pfnCallBack = NULL;
+            g_pfnOrigFilt = nullptr;
+            g_pfnCallBack = nullptr;
         }
+        return true;
     }
-    else
-    {
-        if (TRUE == IsBadCodePtr((FARPROC)pFn))
-        {
-            return (FALSE);
-        }
-        g_pfnCallBack = pFn;
 
-        // If a custom crash handler isn't already in use, enable
-        // CrashHandlerExceptionFilter and save the original unhandled
-        // exception filter.
-        if (NULL == g_pfnOrigFilt)
-        {
-            g_pfnOrigFilt = SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
+    if (IsBadCodePtr((FARPROC)pFn))
+        return false;
+
+    g_pfnCallBack = pFn;
+
+    // If a custom crash handler isn't already in use, enable
+    // CrashHandlerExceptionFilter and save the original unhandled
+    // exception filter.
+    if (g_pfnOrigFilt)
+        return true;
+
+    g_pfnOrigFilt = SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
 
 #ifdef _M_IX86
-            // Stop the OS from turning off our handler
-            // Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
-            LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI * RedirectedSetUnhandledExceptionFilter)
-            (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER {
-                // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
-                // our handler will not get removed.
-                return 0;
-            };
-            static_assert(std::is_same_v<decltype(RedirectedSetUnhandledExceptionFilter), decltype(&SetUnhandledExceptionFilter)>,
-                          "invalid type of RedirectedSetUnhandledExceptionFilter");
+    // Stop the OS from turning off our handler
+    // Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
+    LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI * RedirectedSetUnhandledExceptionFilter)
+    (LPTOP_LEVEL_EXCEPTION_FILTER) = [](LPTOP_LEVEL_EXCEPTION_FILTER /*ExceptionInfo*/) -> LPTOP_LEVEL_EXCEPTION_FILTER {
+        // When the CRT calls SetUnhandledExceptionFilter with NULL parameter
+        // our handler will not get removed.
+        return 0;
+    };
+    static_assert(std::is_same_v<decltype(RedirectedSetUnhandledExceptionFilter), decltype(&SetUnhandledExceptionFilter)>,
+                    "invalid type of RedirectedSetUnhandledExceptionFilter");
 
-            DetourLibraryFunction("kernel32.dll", "SetUnhandledExceptionFilter", RedirectedSetUnhandledExceptionFilter);
+    DetourLibraryFunction("kernel32.dll", "SetUnhandledExceptionFilter", RedirectedSetUnhandledExceptionFilter);
 #endif
-        }
-    }
-    return (TRUE);
+
+    return true;
 }
 
 LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
@@ -154,7 +151,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
 
     __try
     {
-        if (NULL != g_pfnCallBack)
+        if (g_pfnCallBack)
         {
             // Check that the crash handler still exists in memory
             // before I call it. The user might have forgotten to
@@ -162,7 +159,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
             // it got unloaded. If some other function loaded
             // back into the same address, however, there isn't much
             // I can do.
-            if (FALSE == IsBadCodePtr((FARPROC)g_pfnCallBack))
+            if (!IsBadCodePtr((FARPROC)g_pfnCallBack))
             {
                 lRet = g_pfnCallBack(pExPtrs);
             }

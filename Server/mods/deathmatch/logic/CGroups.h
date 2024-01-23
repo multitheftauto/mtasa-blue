@@ -29,8 +29,11 @@ public:
     void Delete(CDummy* pDummy);
     void DeleteAll();
 
-    std::list<CDummy*>::const_iterator IterBegin() { return m_List.begin(); }
-    std::list<CDummy*>::const_iterator IterEnd() { return m_List.end(); }
+    std::list<CDummy*>::iterator begin() noexcept { return m_List.begin(); }
+    std::list<CDummy*>::iterator end() noexcept { return m_List.end(); }
+
+    std::list<CDummy*>::const_iterator begin() const noexcept { return m_List.cbegin(); }
+    std::list<CDummy*>::const_iterator end() const noexcept { return m_List.cend(); }
 
 private:
     void AddToList(CDummy* pDummy) { m_List.push_back(pDummy); };

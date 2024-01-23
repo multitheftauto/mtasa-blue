@@ -30,8 +30,8 @@ public:
 
     void Unlink();
 
-    const char* GetTeamName() { return m_strTeamName; }
-    void        SetTeamName(const char* szName);
+    constexpr const char* GetTeamName() const noexcept { return m_strTeamName; }
+    void                  SetTeamName(const char* szName);
 
     void AddPlayer(CPlayer* pPlayer, bool bChangePlayer = false);
     void RemovePlayer(CPlayer* pPlayer, bool bChangePlayer = false);
@@ -41,13 +41,16 @@ public:
     void GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
     void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
 
-    bool GetFriendlyFire() { return m_bFriendlyFire; }
-    void SetFriendlyFire(bool bFriendlyFire) { m_bFriendlyFire = bFriendlyFire; }
+    constexpr bool GetFriendlyFire() const noexcept { return m_bFriendlyFire; }
+    constexpr void SetFriendlyFire(bool bFriendlyFire) noexcept { m_bFriendlyFire = bFriendlyFire; }
 
-    unsigned int CountPlayers() { return static_cast<unsigned int>(m_Players.size()); }
+    std::size_t CountPlayers() const noexcept { return m_Players.size(); }
 
-    std::list<CPlayer*>::const_iterator PlayersBegin() { return m_Players.begin(); }
-    std::list<CPlayer*>::const_iterator PlayersEnd() { return m_Players.end(); }
+    std::list<CPlayer*>::iterator begin() noexcept { return m_Players.begin(); }
+    std::list<CPlayer*>::iterator end() noexcept { return m_Players.end(); }
+    
+    std::list<CPlayer*>::const_iterator begin() const noexcept { return m_Players.cbegin(); }
+    std::list<CPlayer*>::const_iterator end() const noexcept { return m_Players.cend(); }
 
 protected:
     bool ReadSpecialData(const int iLine) override;

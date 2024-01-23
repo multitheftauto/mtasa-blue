@@ -554,26 +554,26 @@ bool CWebCore::UpdateListsFromMaster()
 
     // Get last update timestamp and compare with current time
     CXMLNode* pLastUpdateNode = pRootNode->FindSubNode("lastupdate");
-    if (pLastUpdateNode)
-    {
-        SString lastUpdateTime = pLastUpdateNode->GetTagContent();
+    if (!pLastUpdateNode)
+        return true;
+    
+    SString lastUpdateTime = pLastUpdateNode->GetTagContent();
 
-        time_t currentTime;
-        time(&currentTime);
+    time_t currentTime;
+    time(&currentTime);
 
-        if (lastUpdateTime < SString("%d", (long long)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
-        {
-            OutputDebugLine("Updating white- and blacklist...");
-            SHttpRequestOptions options;
-            options.uiConnectionAttempts = 3;
-            g_pCore->GetNetwork()
-                ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
-                ->QueueFile(SString("%s?type=getrev", BROWSER_UPDATE_URL), NULL, this, &CWebCore::StaticFetchRevisionFinished, options);
+    if (lastUpdateTime >= SString("%d", (std::int64_t)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
+        return true;
+    
+    OutputDebugLine("Updating white- and blacklist...");
+    SHttpRequestOptions options;
+    options.uiConnectionAttempts = 3;
+    g_pCore->GetNetwork()
+        ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
+        ->QueueFile(SString("%s?type=getrev", BROWSER_UPDATE_URL), NULL, this, &CWebCore::StaticFetchRevisionFinished, options);
 
-            pLastUpdateNode->SetTagContent(SString("%d", (long long)currentTime));
-            m_pXmlConfig->Write();
-        }
-    }
+    pLastUpdateNode->SetTagContent(SString("%d", (std::int64_t)currentTime));
+    m_pXmlConfig->Write();
 
     return true;
 }

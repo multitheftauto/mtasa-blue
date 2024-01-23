@@ -29,9 +29,10 @@ public:
 
     // Main thread functions
     virtual void              DoPulse();
-    virtual CCompressJobData* AddCommand(uint uiSizeX, uint uiSizeY, uint uiQuality, uint uiTimeSpentInQueue, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback,
-                                         const CBuffer& buffer);
-    virtual bool              PollCommand(CCompressJobData* pJobData, uint uiTimeout);
+    virtual CCompressJobData* AddCommand(std::uint32_t uiSizeX, std::uint32_t uiSizeY,
+        std::uint32_t uiQuality, std::uint32_t uiTimeSpentInQueue,
+        PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, const CBuffer& buffer);
+    virtual bool              PollCommand(CCompressJobData* pJobData, std::uint32_t uiTimeout);
     virtual bool              FreeCommand(CCompressJobData* pJobData);
 
 protected:
@@ -43,7 +44,8 @@ protected:
     static void* StaticThreadProc(void* pContext);
     void*        ThreadProc();
     void         ProcessCommand(CCompressJobData* pJobData);
-    void         ProcessCompress(uint uiSizeX, uint uiSizeY, uint uiQuality, const CBuffer& inBuffer, CBuffer& outBuffer);
+    void         ProcessCompress(std::uint32_t uiSizeX, std::uint32_t uiSizeY,
+        std::uint32_t uiQuality, const CBuffer& inBuffer, CBuffer& outBuffer);
 
     // Main thread variables
     CThreadHandle*              m_pServiceThreadHandle;
@@ -116,7 +118,7 @@ void CCompressorJobQueueImpl::StopThread()
     shared.m_Mutex.Signal();
     shared.m_Mutex.Unlock();
 
-    for (uint i = 0; i < 5000; i += 15)
+    for (auto i = 0; i < 5000; i += 15)
     {
         if (shared.m_bThreadTerminated)
             return;
@@ -136,9 +138,10 @@ void CCompressorJobQueueImpl::StopThread()
 // Can't fail
 //
 ///////////////////////////////////////////////////////////////
-CCompressJobData* CCompressorJobQueueImpl::AddCommand(uint uiSizeX, uint uiSizeY, uint uiQuality, uint uiTimeSpentInQueue,
-                                                      PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, const CBuffer& buffer)
-{
+CCompressJobData* CCompressorJobQueueImpl::AddCommand(
+    std::uint32_t uiSizeX, std::uint32_t uiSizeY, std::uint32_t uiQuality,
+    std::uint32_t uiTimeSpentInQueue, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, const CBuffer& buffer
+) {
     // Create command
     CCompressJobData* pJobData = new CCompressJobData();
     pJobData->command.uiSizeX = uiSizeX;
@@ -171,7 +174,7 @@ void CCompressorJobQueueImpl::DoPulse()
 
 again:
     // Delete finished
-    for (std::set<CCompressJobData*>::iterator iter = m_FinishedList.begin(); iter != m_FinishedList.end();)
+    for (auto iter = m_FinishedList.begin(); iter != m_FinishedList.end();)
     {
         CCompressJobData* pJobData = *iter;
         m_FinishedList.erase(iter++);
@@ -189,19 +192,17 @@ again:
     RemoveUnwantedResults();
 
     // Do pending callbacks
-    for (std::list<CCompressJobData*>::iterator iter = shared.m_ResultQueue.begin(); iter != shared.m_ResultQueue.end(); ++iter)
+    for (const auto& pJobData : shared.m_ResultQueue)
     {
-        CCompressJobData* pJobData = *iter;
+        if (!pJobData->HasCallback())
+            continue;
+        
+        shared.m_Mutex.Unlock();
+        pJobData->ProcessCallback();
+        shared.m_Mutex.Lock();
 
-        if (pJobData->HasCallback())
-        {
-            shared.m_Mutex.Unlock();
-            pJobData->ProcessCallback();
-            shared.m_Mutex.Lock();
-
-            // Redo from the top to ensure everything is consistent
-            goto again;
-        }
+        // Redo from the top to ensure everything is consistent
+        goto again;
     }
 
     shared.m_Mutex.Unlock();
@@ -221,28 +222,28 @@ void CCompressorJobQueueImpl::RemoveUnwantedResults()
         return;
 
 again:
-    for (std::list<CCompressJobData*>::iterator iter = shared.m_ResultQueue.begin(); iter != shared.m_ResultQueue.end();)
+    for (auto iter = shared.m_ResultQueue.begin(); iter != shared.m_ResultQueue.end();)
     {
         CCompressJobData* pJobData = *iter;
-        if (MapContains(m_IgnoreResultList, pJobData))
-        {
-            // Found result to ignore, remove from result and ignore lists, add to finished list
-            iter = shared.m_ResultQueue.erase(iter);
-            MapRemove(m_IgnoreResultList, pJobData);
-            pJobData->stage = EJobStage::FINISHED;
-            MapInsert(m_FinishedList, pJobData);
-
-            // Do callback incase any cleanup is needed
-            if (pJobData->HasCallback())
-            {
-                shared.m_Mutex.Unlock();
-                pJobData->ProcessCallback();
-                shared.m_Mutex.Lock();
-                goto again;
-            }
-        }
-        else
+        if (!MapContains(m_IgnoreResultList, pJobData)) {
             ++iter;
+            continue;
+        }
+        
+        // Found result to ignore, remove from result and ignore lists, add to finished list
+        iter = shared.m_ResultQueue.erase(iter);
+        MapRemove(m_IgnoreResultList, pJobData);
+        pJobData->stage = EJobStage::FINISHED;
+        MapInsert(m_FinishedList, pJobData);
+
+        // Do callback incase any cleanup is needed
+        if (pJobData->HasCallback())
+        {
+            shared.m_Mutex.Unlock();
+            pJobData->ProcessCallback();
+            shared.m_Mutex.Lock();
+            goto again;
+        }
     }
 }
 
@@ -254,7 +255,7 @@ again:
 // Returns false if result not ready.
 //
 ///////////////////////////////////////////////////////////////
-bool CCompressorJobQueueImpl::PollCommand(CCompressJobData* pJobData, uint uiTimeout)
+bool CCompressorJobQueueImpl::PollCommand(CCompressJobData* pJobData, std::uint32_t uiTimeout)
 {
     bool bFound = false;
 
@@ -265,26 +266,26 @@ bool CCompressorJobQueueImpl::PollCommand(CCompressJobData* pJobData, uint uiTim
         RemoveUnwantedResults();
 
         // Find result with the required job handle
-        for (std::list<CCompressJobData*>::iterator iter = shared.m_ResultQueue.begin(); iter != shared.m_ResultQueue.end(); ++iter)
+        for (auto iter = shared.m_ResultQueue.begin(); iter != shared.m_ResultQueue.end(); ++iter)
         {
-            if (pJobData == *iter)
+            if (pJobData != *iter)
+                continue;
+            
+            // Found result. Remove from the result queue and flag return value
+            shared.m_ResultQueue.erase(iter);
+            pJobData->stage = EJobStage::FINISHED;
+            MapInsert(m_FinishedList, pJobData);
+
+            // Do callback incase any cleanup is needed
+            if (pJobData->HasCallback())
             {
-                // Found result. Remove from the result queue and flag return value
-                shared.m_ResultQueue.erase(iter);
-                pJobData->stage = EJobStage::FINISHED;
-                MapInsert(m_FinishedList, pJobData);
-
-                // Do callback incase any cleanup is needed
-                if (pJobData->HasCallback())
-                {
-                    shared.m_Mutex.Unlock();
-                    pJobData->ProcessCallback();
-                    shared.m_Mutex.Lock();
-                }
-
-                bFound = true;
-                break;
+                shared.m_Mutex.Unlock();
+                pJobData->ProcessCallback();
+                shared.m_Mutex.Lock();
             }
+
+            bFound = true;
+            break;
         }
 
         if (bFound || uiTimeout == 0)
@@ -296,12 +297,12 @@ bool CCompressorJobQueueImpl::PollCommand(CCompressJobData* pJobData, uint uiTim
         shared.m_Mutex.Wait(uiTimeout);
 
         // If not infinite, break after next check
-        if (uiTimeout != (uint)-1)
+        if (uiTimeout != (std::uint32_t)-1)
             uiTimeout = 0;
     }
 
     // Make sure if wait was infinite, we have a result
-    assert(uiTimeout != (uint)-1 || bFound);
+    assert(uiTimeout != (std::uint32_t)-1 || bFound);
 
     return bFound;
 }
@@ -405,7 +406,7 @@ void* CCompressorJobQueueImpl::ThreadProc()
             if (bHoldingCtrlL && bHoldingCtrlR)
             {
                 // Cause crash dump generation
-                int* ptr = NULL;
+                int* ptr = nullptr;
                 *ptr = 0;
             }
         }
@@ -446,7 +447,7 @@ void* CCompressorJobQueueImpl::ThreadProc()
     shared.m_bThreadTerminated = true;
     shared.m_Mutex.Unlock();
 
-    return NULL;
+    return nullptr;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -458,9 +459,9 @@ void* CCompressorJobQueueImpl::ThreadProc()
 ///////////////////////////////////////////////////////////////
 void CCompressorJobQueueImpl::ProcessCommand(CCompressJobData* pJobData)
 {
-    uint           uiSizeX = pJobData->command.uiSizeX;
-    uint           uiSizeY = pJobData->command.uiSizeY;
-    uint           uiQuality = pJobData->command.uiQuality;
+    std::uint32_t  uiSizeX = pJobData->command.uiSizeX;
+    std::uint32_t  uiSizeY = pJobData->command.uiSizeY;
+    std::uint32_t  uiQuality = pJobData->command.uiQuality;
     const CBuffer& inBuffer = pJobData->command.buffer;
     CBuffer&       outBuffer = pJobData->result.buffer;
 
@@ -485,7 +486,7 @@ void CCompressorJobQueueImpl::ProcessCommand(CCompressJobData* pJobData)
 // Returns false if callback could not be set
 //
 ///////////////////////////////////////////////////////////////
-bool CCompressJobData::SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, uint uiTimeSpentInQueue)
+bool CCompressJobData::SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, std::uint32_t uiTimeSpentInQueue)
 {
     if (callback.bSet)
         return false;            // One has already been set
@@ -507,7 +508,7 @@ bool CCompressJobData::SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback
 // Returns true if callback has been set and has not been called yet
 //
 ///////////////////////////////////////////////////////////////
-bool CCompressJobData::HasCallback()
+bool CCompressJobData::HasCallback() const noexcept
 {
     return callback.bSet && !callback.bDone;
 }
@@ -519,7 +520,7 @@ bool CCompressJobData::HasCallback()
 // Do callback
 //
 ///////////////////////////////////////////////////////////////
-void CCompressJobData::ProcessCallback()
+void CCompressJobData::ProcessCallback() noexcept
 {
     assert(HasCallback());
     callback.bDone = true;

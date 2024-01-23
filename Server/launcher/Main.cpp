@@ -25,7 +25,7 @@
 #include "MTAPlatform.h"
 #include "SharedUtil.h"
 
-#ifdef WIN32
+#ifdef _WIN32
 // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
     #include "SharedUtil.hpp"
 #else
@@ -37,7 +37,7 @@ FILE* SharedUtil::File::Fopen(const char* szFilename, const char* szMode)
 }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
     #define LIB_CORE SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
 #else
     #define LIB_CORE "./" SERVER_BIN_PATH "core" MTA_LIB_SUFFIX MTA_LIB_EXTENSION
@@ -75,14 +75,14 @@ int main(int argc, char* argv[])
             printf("Usage: %s [OPTION]\n\n", *strLaunchFile);
             printf("  -v                   Shows the program version\n");
             printf("  -s                   Run server in silent mode\n");
-#ifndef WIN32
+#ifndef _WIN32
             printf("  -d                   Run server daemonized\n");
 #endif
             printf("  -t                   Run server with a simple console\n");
             printf("  -f                   Run server with a standard console (Default)\n");
             printf("  -n                   Disable the usage of ncurses (For screenlog)\n");
             printf("  -u                   Disable output buffering and flush instantly (useful for screenlog)\n");
-#ifndef WIN32
+#ifndef _WIN32
             printf("  -x                   Disable simplified crash reports (To allow core dumps)\n");
 #endif
             printf("  -D [PATH]            Use as base directory\n");
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
         }
     }
 
-#ifdef WIN32
+#ifdef _WIN32
     if (!IsWindowsXPSP3OrGreater())
     {
         printf("This version of MTA requires Windows XP SP3 or later\n");
@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
     FILE* fh = File::Fopen(LIB_CORE, "r");
     if (!fh)
     {
-        #ifdef WIN32
+        #ifdef _WIN32
         wchar_t szBuffer[64000];
         GetModuleFileNameW(NULL, szBuffer, 64000);
         PathRemoveFileSpecW(szBuffer);
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
     {
         printf("ERROR: Could not load %s\n", LIB_CORE);
         printf("* Check installed data files.\n");
-#ifdef WIN32
+#ifdef _WIN32
         printf("* Check installed Microsoft Visual C++ Redistributable Package (x86).\n");
 #endif
     }

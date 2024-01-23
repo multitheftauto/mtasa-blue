@@ -81,15 +81,15 @@ public:
                                         UINT primCount);
     void MaybeUnsetAdditionalVertexStream();
     void OnVertexBufferDestroy(IDirect3DVertexBuffer9* pStreamData1);
-    void OnVertexBufferRangeInvalidated(IDirect3DVertexBuffer9* pStreamData, uint Offset, uint Size);
+    void OnVertexBufferRangeInvalidated(IDirect3DVertexBuffer9* pStreamData, std::uint32_t Offset, std::uint32_t Size);
 
     static CAdditionalVertexStreamManager* GetSingleton();
 
 protected:
     void SetAdditionalVertexStream(SCurrentStateInfo& renderState);
     bool UpdateCurrentStateInfo(SCurrentStateInfo& state);
-    bool UpdateAdditionalStreamContent(SCurrentStateInfo& state, SAdditionalStreamInfo* pAdditionalStreamInfo, uint ReadOffsetStart, uint ReadSize,
-                                       uint WriteOffsetStart, uint WriteSize);
+    bool UpdateAdditionalStreamContent(SCurrentStateInfo& state, SAdditionalStreamInfo* pAdditionalStreamInfo,
+        std::uint32_t ReadOffsetStart, std::uint32_t ReadSize, std::uint32_t WriteOffsetStart, std::uint32_t WriteSize);
     bool CheckCanDoThis(const SCurrentStateInfo& state);
     SAdditionalStreamInfo* GetAdditionalStreamInfo(IDirect3DVertexBuffer9* pStreamData1);
     SAdditionalStreamInfo* CreateAdditionalStreamInfo(const SCurrentStateInfo& state);

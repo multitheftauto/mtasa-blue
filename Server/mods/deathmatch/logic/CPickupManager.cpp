@@ -13,7 +13,7 @@
 #include "CPickupManager.h"
 #include "Utils.h"
 
-static SFixedArray<unsigned short, 47> g_usWeaponModels = {{
+static SFixedArray<std::uint16_t, 47> g_usWeaponModels = {{
     0,   331, 333, 334, 335, 336, 337, 338, 339, 341,            // 9
     321, 322, 323, 0,   325, 326, 342, 343, 344, 0,              // 19
     0,   0,   346, 347, 348, 349, 350, 351, 352, 353,            // 29
@@ -58,22 +58,17 @@ void CPickupManager::DeleteAll()
     DeletePointersAndClearList(m_List);
 }
 
-bool CPickupManager::Exists(CPickup* pPickup)
+bool CPickupManager::Exists(CPickup* pPickup) const noexcept
 {
     return ListContains(m_List, pPickup);
 }
 
-bool CPickupManager::IsValidWeaponID(unsigned int uiWeaponID)
+bool CPickupManager::IsValidWeaponID(std::uint32_t uiWeaponID) noexcept
 {
     return (uiWeaponID > 0 && uiWeaponID != 13 && uiWeaponID != 19 && uiWeaponID != 20 && uiWeaponID != 21 && uiWeaponID <= 46);
 }
 
-unsigned short CPickupManager::GetWeaponModel(unsigned int uiWeaponID)
+std::uint16_t CPickupManager::GetWeaponModel(std::uint32_t uiWeaponID) const noexcept
 {
-    if (uiWeaponID <= 46)
-    {
-        return g_usWeaponModels[uiWeaponID];
-    }
-
-    return 0;
+    return uiWeaponID <= 46 ? g_usWeaponModels[uiWeaponID] : 0;
 }

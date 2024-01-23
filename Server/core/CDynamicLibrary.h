@@ -13,9 +13,11 @@
 
 #ifdef WIN32
 #include <windows.h>
+#else
+using HMODULE = void*;
 #endif
 
-typedef void (*FuncPtr_t)();
+using FuncPtr_t = void(*)();
 
 class CDynamicLibrary
 {
@@ -31,9 +33,5 @@ public:
     bool      CheckMtaVersion(const char* szLibName);
 
 private:
-    #ifdef WIN32
     HMODULE m_hModule;
-    #else
-    void* m_hModule;
-    #endif
 };

@@ -97,27 +97,19 @@ void CEvents::RemoveAllEvents(class CLuaMain* pMain)
     }
 }
 
-SEvent* CEvents::Get(const char* szName)
+SEvent* CEvents::Get(const char* szName) noexcept
 {
     assert(szName);
 
     SEvent** pEvent = MapFind(m_EventHashMap, szName);
-    if (pEvent != NULL)
-    {
-        return *pEvent;
-    }
-    return NULL;
+    return pEvent ? *pEvent : nullptr;
 }
 
 void CEvents::RemoveAllEvents()
 {
     // Delete all items
-    CFastHashMap<SString, SEvent*>::const_iterator iter = m_EventHashMap.begin();
-    for (; iter != m_EventHashMap.end(); iter++)
-    {
-        SEvent* pEvent = (*iter).second;
-        delete pEvent;
-    }
+    for (const auto& entry : m_EventHashMap)
+        delete entry.second;
 
     // Clear the list
     m_EventHashMap.clear();
@@ -149,12 +141,12 @@ void CEvents::CancelEvent(bool bCancelled, const char* szReason)
     m_strLastError = SStringX(szReason);
 }
 
-bool CEvents::WasEventCancelled()
+bool CEvents::WasEventCancelled() const noexcept
 {
     return m_bWasEventCancelled;
 }
 
-const char* CEvents::GetLastError()
+const char* CEvents::GetLastError() const noexcept
 {
     return m_strLastError;
 }

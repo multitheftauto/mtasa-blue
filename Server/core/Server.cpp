@@ -17,10 +17,10 @@
 #include "ErrorCodes.h"
 #ifdef WIN_x86
 // TODO - 64 bit file hooks
-    #include "SharedUtil.Win32Utf8FileHooks.hpp"
+    #include "SharedUtil. _WIN32Utf8FileHooks.hpp"
 #endif
 
-#ifdef WIN32
+#ifdef  _WIN32
 CThreadCommandQueue g_CommandQueue;
 #endif
 
@@ -35,7 +35,7 @@ MTAEXPORT int Run(int iArgumentCount, char* szArguments[])
         }
     }
 
-    #ifdef WIN32
+    #ifdef  _WIN32
     // Disable critical error message boxes
     SetErrorMode(SEM_FAILCRITICALERRORS);
     #endif
@@ -50,7 +50,7 @@ MTAEXPORT int Run(int iArgumentCount, char* szArguments[])
     #endif
 
         // Create the server
-    #ifdef WIN32
+    #ifdef  _WIN32
     CServerImpl Server(&g_CommandQueue);
     #else
     CServerImpl Server;
@@ -76,7 +76,7 @@ MTAEXPORT int Run(int iArgumentCount, char* szArguments[])
 }
 
 // Threadsafe way to tell the server to run a command (like the GUI would run)
-#ifdef WIN32
+#ifdef  _WIN32
 
 MTAEXPORT bool SendServerCommand(const char* szString)
 {

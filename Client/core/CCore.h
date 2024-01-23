@@ -164,10 +164,10 @@ public:
     void        RemoveMessageBox(bool bNextFrame = false);
     void        ShowErrorMessageBox(const SString& strTitle, SString strMessage, const SString& strTroubleLink = "");
     void        ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false);
-    static void ErrorMessageBoxCallBack(void* pData, uint uiButton);
+    static void ErrorMessageBoxCallBack(void* pData, std::uint32_t uiButton);
     bool        IsOfflineMod() { return m_bIsOfflineMod; }
     const char* GetModInstallRoot(const char* szModName);
-    bool        CheckDiskSpace(uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10);
+    bool        CheckDiskSpace(std::uint32_t uiResourcesPathMinMB = 10, std::int32_t uiDataPathMinMB = 10);
 
     // Subsystems
     void CreateGame();
@@ -217,12 +217,12 @@ public:
     bool IsOptionalUpdateInfoRequired(const char* szHost) { return m_pLocalGUI->IsOptionalUpdateInfoRequired(szHost); }
     void InitiateDataFilesFix() { m_pLocalGUI->InitiateDataFilesFix(); }
 
-    uint GetFrameRateLimit() { return m_uiFrameRateLimit; }
-    void RecalculateFrameRateLimit(uint uiServerFrameRateLimit = -1, bool bLogToConsole = true);
-    void ApplyFrameRateLimit(uint uiOverrideRate = -1);
+    std::uint32_t GetFrameRateLimit() const noexcept { return m_uiFrameRateLimit; }
+    void RecalculateFrameRateLimit(std::uint32_t uiServerFrameRateLimit = -1, bool bLogToConsole = true);
+    void ApplyFrameRateLimit(std::uint32_t uiOverrideRate = -1);
     void ApplyQueuedFrameRateLimit();
     void EnsureFrameRateLimitApplied();
-    void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit);
+    void SetClientScriptFrameRateLimit(std::uint32_t uiClientScriptFrameRateLimit);
     void DoReliablePulse();
 
     bool IsTimingCheckpoints();
@@ -230,8 +230,8 @@ public:
     void OnTimingDetail(const char* szTag);
 
     void CalculateStreamingMemoryRange();
-    uint GetMinStreamingMemory();
-    uint GetMaxStreamingMemory();
+    std::uint32_t GetMinStreamingMemory();
+    std::uint32_t GetMaxStreamingMemory();
 
     SString GetConnectCommandFromURI(const char* szURI);
     void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
@@ -246,14 +246,15 @@ public:
     void                 OnPreFxRender();
     void                 OnPreHUDRender();
     void                 OnDeviceRestore();
-    void                 OnCrashAverted(uint uiId);
-    void                 OnEnterCrashZone(uint uiId);
-    void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
-    bool                 GetDebugIdEnabled(uint uiDebugId);
+    void                 OnCrashAverted(std::uint32_t uiId);
+    void                 OnEnterCrashZone(std::uint32_t uiId);
+    void                 LogEvent(std::uint32_t uiDebugId, const char* szType,
+        const char* szContext, const char* szBody, std::uint32_t uiAddReportLogId = 0);
+    bool                 GetDebugIdEnabled(std::uint32_t uiDebugId);
     EDiagnosticDebugType GetDiagnosticDebug();
     void                 SetDiagnosticDebug(EDiagnosticDebugType value);
     CModelCacheManager*  GetModelCacheManager();
-    void                 AddModelToPersistentCache(ushort usModelId);
+    void                 AddModelToPersistentCache(std::uint16_t usModelId);
 
     static void StaticIdleHandler();
     void        IdleHandler();
@@ -362,14 +363,14 @@ private:
     bool m_bDestroyMessageBox;
 
     bool                 m_bDoneFrameRateLimit;
-    uint                 m_uiServerFrameRateLimit;
-    uint                 m_uiClientScriptFrameRateLimit;
-    uint                 m_uiFrameRateLimit;
+    std::uint32_t        m_uiServerFrameRateLimit;
+    std::uint32_t        m_uiClientScriptFrameRateLimit;
+    std::uint32_t        m_uiFrameRateLimit;
     CElapsedTimeHD       m_FrameRateTimer;
-    uint                 m_uiQueuedFrameRate;
+    std::uint32_t        m_uiQueuedFrameRate;
     bool                 m_bQueuedFrameRateValid;
     bool                 m_bWaitToSetNick;
-    uint                 m_uiNewNickWaitFrames;
+    std::int32_t         m_uiNewNickWaitFrames;
     EDiagnosticDebugType m_DiagnosticDebug;
 
     // Below 2 are used for the UI only
@@ -378,7 +379,7 @@ private:
 
     // Custom streaming memory limit set by `engineStreamingSetMemorySize` - Reset on server connects (= set to 0), or by the scripter
     // `0` means "not set" [so the value should be ignored]
-    size_t m_CustomStreamingMemoryLimitBytes{};
+    std::size_t m_CustomStreamingMemoryLimitBytes{};
 
     bool    m_bGettingIdleCallsFromMultiplayer;
     bool    m_bWindowsTimerEnabled;
@@ -397,5 +398,5 @@ private:
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
 
-    long long m_timeDiscordAppLastUpdate;
+    std::int64_t m_timeDiscordAppLastUpdate;
 };

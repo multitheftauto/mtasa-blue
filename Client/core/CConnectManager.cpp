@@ -457,7 +457,7 @@ void CConnectManager::OnServerExists()
 //
 void CConnectManager::OpenServerFirewall(in_addr Address, ushort usHttpPort, bool bHighPriority)
 {
-    uint uiTimeOut;
+    std::uint32_t uiTimeOut;
     if (bHighPriority)
     {
         // Clear previously queued requests if this is high priority

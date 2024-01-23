@@ -41,7 +41,7 @@ class CCompressJobData
 {
 public:
     ZERO_ON_NEW
-    bool SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, uint uiTimeSpentInQueue);
+    bool SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, std::uint32_t uiTimeSpentInQueue);
     bool HasCallback();
     void ProcessCallback();
 
@@ -52,9 +52,9 @@ public:
 
     struct
     {
-        uint    uiSizeX;
-        uint    uiSizeY;
-        uint    uiQuality;
+        std::uint32_t    uiSizeX;
+        std::uint32_t    uiSizeY;
+        std::uint32_t    uiQuality;
         CBuffer buffer;
     } command;
 
@@ -67,7 +67,7 @@ public:
     struct
     {
         PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback;
-        uint                    uiTimeSpentInQueue;
+        std::uint32_t           uiTimeSpentInQueue;
         bool                    bSet;
         bool                    bDone;
     } callback;
@@ -86,9 +86,10 @@ public:
     virtual ~CCompressorJobQueue() {}
 
     virtual void              DoPulse() = 0;
-    virtual CCompressJobData* AddCommand(uint uiSizeX, uint uiSizeY, uint uiQuality, uint uiTimeSpentInQueue, PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback,
-                                         const CBuffer& buffer) = 0;
-    virtual bool              PollCommand(CCompressJobData* pJobData, uint uiTimeout) = 0;
+    virtual CCompressJobData* AddCommand(std::uint32_t uiSizeX, std::uint32_t uiSizeY,
+        std::uint32_t uiQuality, std::uint32_t uiTimeSpentInQueue,
+        PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback,const CBuffer& buffer) = 0;
+    virtual bool              PollCommand(CCompressJobData* pJobData, std::int32_t uiTimeout) = 0;
     virtual bool              FreeCommand(CCompressJobData* pJobData) = 0;
 };
 

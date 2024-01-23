@@ -44,7 +44,7 @@ template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
 static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
-static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
+static constexpr std::int64_t TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
@@ -685,7 +685,7 @@ bool CCore::IsConnected()
     return m_pLocalGUI->GetMainMenu() && m_pLocalGUI->GetMainMenu()->GetIsIngame();
 }
 
-bool CCore::Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave)
+bool CCore::Reconnect(const char* szHost, std::uint16_t usPort, const char* szPassword, bool bSave)
 {
     return m_pConnectManager->Reconnect(szHost, usPort, szPassword, bSave);
 }
@@ -712,7 +712,7 @@ void CCore::SetMessageProcessor(pfnProcessMessage pfnMessageProcessor)
     m_pfnMessageProcessor = pfnMessageProcessor;
 }
 
-void CCore::ShowMessageBox(const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK* ResponseHandler)
+void CCore::ShowMessageBox(const char* szTitle, const char* szText, std::uint32_t uiFlags, GUI_CALLBACK* ResponseHandler)
 {
     RemoveMessageBox();
 
@@ -767,7 +767,7 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
 //
 void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode)
 {
-    uint uiErrorCode = CCore::GetSingleton().GetNetwork()->GetExtendedErrorCode();
+    std::uint32_t uiErrorCode = CCore::GetSingleton().GetNetwork()->GetExtendedErrorCode();
     if (uiErrorCode != 0)
     {
         // Do anti-virus check soon
@@ -786,14 +786,13 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
 //
 // Callback used in CCore::ShowErrorMessageBox
 //
-void CCore::ErrorMessageBoxCallBack(void* pData, uint uiButton)
+void CCore::ErrorMessageBoxCallBack(void* pData, std::uint32_t uiButton)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
     SString* pstrTroubleLink = (SString*)pData;
     if (uiButton == 1)
     {
-        uint uiErrorCode = (uint)pData;
         BrowseToSolution(*pstrTroubleLink, EXIT_GAME_FIRST);
     }
     delete pstrTroubleLink;
@@ -803,30 +802,29 @@ void CCore::ErrorMessageBoxCallBack(void* pData, uint uiButton)
 // Check for disk space problems
 // Returns false if low disk space, and dialog is being shown
 //
-bool CCore::CheckDiskSpace(uint uiResourcesPathMinMB, uint uiDataPathMinMB)
+bool CCore::CheckDiskSpace(std::uint32_t uiResourcesPathMinMB, std::uint32_t uiDataPathMinMB)
 {
     SString strDriveWithNoSpace = GetDriveNameWithNotEnoughSpace(uiResourcesPathMinMB, uiDataPathMinMB);
-    if (!strDriveWithNoSpace.empty())
-    {
-        SString strMessage(_("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace);
-        SString strTroubleLink(SString("low-disk-space&drive=%s", *strDriveWithNoSpace.Left(1)));
-        g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CC43"), strMessage, strTroubleLink);
-        return false;
-    }
-    return true;
+    if (strDriveWithNoSpace.empty())
+        return true;
+    
+    SString strMessage(_("MTA:SA cannot continue because drive %s does not have enough space."), *strDriveWithNoSpace);
+    SString strTroubleLink(SString("low-disk-space&drive=%s", *strDriveWithNoSpace.Left(1)));
+    g_pCore->ShowErrorMessageBox(_("Fatal error") + _E("CC43"), strMessage, strTroubleLink);
+    return false;
 }
 
-HWND CCore::GetHookedWindow()
+HWND CCore::GetHookedWindow() const noexcept
 {
     return CMessageLoopHook::GetSingleton().GetHookedWindowHandle();
 }
 
-void CCore::HideMainMenu()
+void CCore::HideMainMenu() noexcept
 {
     m_pLocalGUI->GetMainMenu()->SetVisible(false);
 }
 
-void CCore::ShowServerInfo(unsigned int WindowType)
+void CCore::ShowServerInfo(std::uint32_t WindowType) noexcept
 {
     RemoveMessageBox();
     CServerInfo::GetSingletonPtr()->Show((eWindowType)WindowType);
@@ -1340,7 +1338,7 @@ void CCore::DoPostFramePulse()
     m_pConnectManager->DoPulse();
 
     // Update Discord Rich Presence status
-    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    if (const auto ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
     {
         if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
         {
@@ -1461,8 +1459,8 @@ bool CCore::IsValidNick(const char* szNick)
     }
 
     // Check that each character is valid (visible characters exluding space)
-    unsigned char ucTemp;
-    for (size_t i = 0; i < sizeNick; i++)
+    std::uint8_t ucTemp;
+    for (auto i = 0; i < sizeNick; i++)
     {
         ucTemp = szNick[i];
         if (ucTemp < 33 || ucTemp > 126)
@@ -1477,30 +1475,28 @@ bool CCore::IsValidNick(const char* szNick)
 
 void CCore::Quit(bool bInstantly)
 {
-    if (bInstantly)
-    {
-        AddReportLog(7101, "Core - Quit");
-        // Show that we are quiting (for the crash dump filename)
-        SetApplicationSettingInt("last-server-ip", 1);
-
-        WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
-
-        // Destroy the client
-        CModManager::GetSingleton().Unload();
-
-        // Destroy ourself
-        delete CCore::GetSingletonPtr();
-
-        WatchDogCompletedSection("Q0");
-
-        // Use TerminateProcess for now as exiting the normal way crashes
-        TerminateProcess(GetCurrentProcess(), 0);
-        // PostQuitMessage ( 0 );
-    }
-    else
+    if (!bInstantly)
     {
         m_bQuitOnPulse = true;
+        return;
     }
+    AddReportLog(7101, "Core - Quit");
+    // Show that we are quiting (for the crash dump filename)
+    SetApplicationSettingInt("last-server-ip", 1);
+
+    WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
+
+    // Destroy the client
+    CModManager::GetSingleton().Unload();
+
+    // Destroy ourself
+    delete CCore::GetSingletonPtr();
+
+    WatchDogCompletedSection("Q0");
+
+    // Use TerminateProcess for now as exiting the normal way crashes
+    TerminateProcess(GetCurrentProcess(), 0);
+    // PostQuitMessage ( 0 );
 }
 
 bool CCore::WasLaunchedWithConnectURI()
@@ -1558,80 +1554,73 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
         else if (*pStart == '"')
             bInQuoted = true;
 
-        if (!bInQuoted)
+        if (bInQuoted)
+            continue;
+        
+        *pEnd = 0;
+        if (strKey.empty())
         {
-            *pEnd = 0;
-            if (strKey.empty())
+            if (*pStart != '-')
             {
-                if (*pStart == '-')
-                {
-                    strKey = pStart + 1;
-                    if (noValOptions.find(strKey) != noValOptions.end())
-                    {
-                        options[strKey] = "";
-                        strKey.clear();
-                    }
-                }
-                else
-                {
-                    szArgs = pStart - szCmdLineCopy + szCmdLine;
-                    break;
-                }
+                szArgs = pStart - szCmdLineCopy + szCmdLine;
+                break;
+            }
+            strKey = pStart + 1;
+            if (noValOptions.find(strKey) != noValOptions.end())
+            {
+                options[strKey] = "";
+                strKey.clear();
+            }
+        }
+        else
+        {
+            if (*pStart == '-')
+            {
+                options[strKey] = "";
+                strKey = pStart + 1;
             }
             else
             {
-                if (*pStart == '-')
-                {
-                    options[strKey] = "";
-                    strKey = pStart + 1;
-                }
-                else
-                {
-                    if (*pStart == '"')
-                        pStart++;
-                    if (*(pEnd - 1) == '"')
-                        *(pEnd - 1) = 0;
-                    options[strKey] = pStart;
-                    strKey.clear();
-                }
+                if (*pStart == '"')
+                    pStart++;
+                if (*(pEnd - 1) == '"')
+                    *(pEnd - 1) = 0;
+                options[strKey] = pStart;
+                strKey.clear();
             }
-            pStart = pEnd;
-            while (pStart != pCmdLineEnd && *(++pStart) == ' ')
-                ;
-            pEnd = pStart;
         }
+        pStart = pEnd;
+        while (pStart != pCmdLineEnd && *(++pStart) == ' ');
+        pEnd = pStart;
     }
 }
 
 const char* CCore::GetCommandLineOption(const char* szOption)
 {
-    std::map<std::string, std::string>::iterator it = m_CommandLineOptions.find(szOption);
-    if (it != m_CommandLineOptions.end())
-        return it->second.c_str();
-    else
-        return NULL;
+    auto it = m_CommandLineOptions.find(szOption);
+    return it == m_CommandLineOptions.end() ? nullptr : it->second.c_str();
 }
 
 SString CCore::GetConnectCommandFromURI(const char* szURI)
 {
-    unsigned short usPort;
-    std::string    strHost, strNick, strPassword;
+    std::uint16_t usPort;
+    std::string   strHost, strNick, strPassword;
     GetConnectParametersFromURI(szURI, strHost, usPort, strNick, strPassword);
 
     // Generate a string with the arguments to send to the mod IF we got a host
     SString strDest;
-    if (strHost.size() > 0)
-    {
-        if (strPassword.size() > 0)
-            strDest.Format("connect %s %u %s %s", strHost.c_str(), usPort, strNick.c_str(), strPassword.c_str());
-        else
-            strDest.Format("connect %s %u %s", strHost.c_str(), usPort, strNick.c_str());
-    }
+    if (strHost.size() <= 0)
+        return strDest;
+    
+    if (strPassword.size() > 0)
+        strDest.Format("connect %s %u %s %s", strHost.c_str(), usPort, strNick.c_str(), strPassword.c_str());
+    else
+        strDest.Format("connect %s %u %s", strHost.c_str(), usPort, strNick.c_str());
 
     return strDest;
 }
 
-void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword)
+void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost, std::uint16_t& usPort, std::string& strNick, std::string& strPassword)
 {
     // Grab the length of the string
     size_t sizeURI = strlen(szURI);
@@ -1653,23 +1642,22 @@ void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost,
         if (!bHitAt && *szIterator == '@')
         {
             bHitAt = true;
+            continue;
         }
-        else
+        
+        
+        if (bHitAt)
         {
-            if (bHitAt)
+            if (szLeftIter > szLeft)
             {
-                if (szLeftIter > szLeft)
-                {
-                    *(--szLeftIter) = *szIterator;
-                }
+                *(--szLeftIter) = *szIterator;
             }
-            else
-            {
-                if (szRightIter > szRight)
-                {
-                    *(--szRightIter) = *szIterator;
-                }
-            }
+            continue;
+        }
+        
+        if (szRightIter > szRight)
+        {
+            *(--szRightIter) = *szIterator;
         }
     }
 
@@ -1683,28 +1671,26 @@ void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost,
 
     bool   bIsInPort = false;
     size_t sizeRight = strlen(szRightIter);
-    for (size_t i = 0; i < sizeRight; i++)
+    for (auto i = 0; i < sizeRight; i++)
     {
         if (!bIsInPort && szRightIter[i] == ':')
         {
             bIsInPort = true;
+            continue;
         }
-        else
+        
+        if (bIsInPort)
         {
-            if (bIsInPort)
+            if (szPortIter < szPort + 11)
             {
-                if (szPortIter < szPort + 11)
-                {
-                    *(szPortIter++) = szRightIter[i];
-                }
+                *(szPortIter++) = szRightIter[i];
             }
-            else
-            {
-                if (szHostIter < szHost + 63)
-                {
-                    *(szHostIter++) = szRightIter[i];
-                }
-            }
+            continue;
+        }
+        
+        if (szHostIter < szHost + 63)
+        {
+            *(szHostIter++) = szRightIter[i];
         }
     }
 
@@ -1718,28 +1704,26 @@ void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost,
 
     bool   bIsInPassword = false;
     size_t sizeLeft = strlen(szLeftIter);
-    for (size_t i = 0; i < sizeLeft; i++)
+    for (auto i = 0; i < sizeLeft; i++)
     {
         if (!bIsInPassword && szLeftIter[i] == ':')
         {
             bIsInPassword = true;
+            continue;
         }
-        else
+        
+        if (bIsInPassword)
         {
-            if (bIsInPassword)
+            if (szPasswordIter < szPassword + 63)
             {
-                if (szPasswordIter < szPassword + 63)
-                {
-                    *(szPasswordIter++) = szLeftIter[i];
-                }
+                *(szPasswordIter++) = szLeftIter[i];
             }
-            else
-            {
-                if (szNicknameIter < szNickname + 63)
-                {
-                    *(szNicknameIter++) = szLeftIter[i];
-                }
-            }
+            continue;
+        }
+        
+        if (szNicknameIter < szNickname + 63)
+        {
+            *(szNicknameIter++) = szLeftIter[i];
         }
     }
 
@@ -1747,7 +1731,7 @@ void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost,
     usPort = 22003;
     if (strlen(szPort) > 0)
     {
-        usPort = static_cast<unsigned short>(atoi(szPort));
+        usPort = static_cast<std::uint16_t>(atoi(szPort));
     }
 
     // Grab the nickname
@@ -1766,8 +1750,8 @@ void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost,
 void CCore::UpdateRecentlyPlayed()
 {
     // Get the current host and port
-    unsigned int uiPort;
-    std::string  strHost;
+    std::uint32_t uiPort;
+    std::string   strHost;
     CVARS_GET("host", strHost);
     CVARS_GET("port", uiPort);
     // Save the connection details into the recently played servers list
@@ -1801,20 +1785,21 @@ void CCore::ApplyCoreInitSettings()
     }
 #endif
 
-    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
+    int revision = GetApplicationSettingInt("reset-settings-revision");
+    if (revision >= 21486)
+        return;
+    
+    // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
+    // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+    std::string currentSkinName;
+    CVARS_GET("current_skin", currentSkinName);
+
+    if (currentSkinName == "Default")
     {
-        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
-        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
-        std::string currentSkinName;
-        CVARS_GET("current_skin", currentSkinName);
-
-        if (currentSkinName == "Default")
-        {
-            CVARS_SET("current_skin", "Default 2023");
-        }
-
-        SetApplicationSettingInt("reset-settings-revision", 21486);
+        CVARS_SET("current_skin", "Default 2023");
     }
+
+    SetApplicationSettingInt("reset-settings-revision", 21486);
 }
 
 //
@@ -1832,7 +1817,7 @@ void CCore::OnGameTimerUpdate()
 // Uses client rate from script
 // Uses server rate from argument, or last time if not supplied
 //
-void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToConsole)
+void CCore::RecalculateFrameRateLimit(std::uint32_t uiServerFrameRateLimit, bool bLogToConsole)
 {
     // Save rate from server if valid
     if (uiServerFrameRateLimit != -1)
@@ -1842,7 +1827,7 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
     m_uiFrameRateLimit = m_uiServerFrameRateLimit;
 
     // Apply client config setting
-    uint uiClientConfigRate;
+    std::uint32_t uiClientConfigRate;
     g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
     if (uiClientConfigRate > 0)
         uiClientConfigRate = std::max(45U, uiClientConfigRate);
@@ -1851,25 +1836,25 @@ void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToCo
         m_uiFrameRateLimit = uiClientConfigRate;
 
     // Apply client script setting
-    uint uiClientScriptRate = m_uiClientScriptFrameRateLimit;
+    std::uint32_t uiClientScriptRate = m_uiClientScriptFrameRateLimit;
     // Lowest wins (Although zero is highest)
     if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
         m_uiFrameRateLimit = uiClientScriptRate;
 
     // Print new limits to the console
-    if (bLogToConsole)
-    {
-        SString strStatus("Server FPS limit: %d", m_uiServerFrameRateLimit);
-        if (m_uiFrameRateLimit != m_uiServerFrameRateLimit)
-            strStatus += SString(" (Using %d)", m_uiFrameRateLimit);
-        CCore::GetSingleton().GetConsole()->Print(strStatus);
-    }
+    if (!bLogToConsole)
+        return;
+    
+    SString strStatus("Server FPS limit: %d", m_uiServerFrameRateLimit);
+    if (m_uiFrameRateLimit != m_uiServerFrameRateLimit)
+        strStatus += SString(" (Using %d)", m_uiFrameRateLimit);
+    CCore::GetSingleton().GetConsole()->Print(strStatus);
 }
 
 //
 // Change client rate as set by script
 //
-void CCore::SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit)
+void CCore::SetClientScriptFrameRateLimit(std::uint32_t uiClientScriptFrameRateLimit)
 {
     m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
     RecalculateFrameRateLimit(-1, false);
@@ -1892,7 +1877,7 @@ void CCore::EnsureFrameRateLimitApplied()
 //
 // This is called once a frame even if minimized
 //
-void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
+void CCore::ApplyFrameRateLimit(std::uint32_t uiOverrideRate)
 {
     TIMING_CHECKPOINT("-CallIdle1");
     ms_TimingCheckpoints.EndTimingCheckpoints();
@@ -1900,7 +1885,7 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
     // Frame rate limit stuff starts here
     m_bDoneFrameRateLimit = true;
 
-    uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
+    std::uint32_t uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
 
     if (uiUseRate > 0)
     {
@@ -1923,24 +1908,24 @@ void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
 //
 void CCore::ApplyQueuedFrameRateLimit()
 {
-    if (m_bQueuedFrameRateValid)
-    {
-        m_bQueuedFrameRateValid = false;
-        // Calc required time in ms between frames
-        const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
+    if (!m_bQueuedFrameRateValid)
+        return;
+    
+    m_bQueuedFrameRateValid = false;
+    // Calc required time in ms between frames
+    const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
 
-        while (true)
-        {
-            // See if we need to wait
-            double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
-            if (dSpare <= 0.0)
-                break;
-            if (dSpare >= 2.0)
-                Sleep(1);
-        }
-        m_FrameRateTimer.Reset();
-        TIMING_GRAPH("Limiter");
+    while (true)
+    {
+        // See if we need to wait
+        double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
+        if (dSpare <= 0.0)
+            break;
+        if (dSpare >= 2.0)
+            Sleep(1);
     }
+    m_FrameRateTimer.Reset();
+    TIMING_GRAPH("Limiter");
 }
 
 //
@@ -2073,7 +2058,7 @@ void CCore::CalculateStreamingMemoryRange()
 
     // Scale max if gta3.img is over 1GB
     SString strGta3imgFilename = PathJoin(GetLaunchPath(), "models", "gta3.img");
-    uint    uiFileSizeMB = FileSize(strGta3imgFilename) / 0x100000LL;
+    std::uint32_t    uiFileSizeMB = FileSize(strGta3imgFilename) / 0x100000LL;
     float   fSizeScale = UnlerpClamped(1024, uiFileSizeMB, 2048);
     fMaxAmount += fMaxAmount * fSizeScale;
 
@@ -2094,7 +2079,7 @@ void CCore::CalculateStreamingMemoryRange()
 //
 // GetMinStreamingMemory
 //
-uint CCore::GetMinStreamingMemory()
+std::uint32_t CCore::GetMinStreamingMemory()
 {
     CalculateStreamingMemoryRange();
 
@@ -2107,7 +2092,7 @@ uint CCore::GetMinStreamingMemory()
 //
 // GetMaxStreamingMemory
 //
-uint CCore::GetMaxStreamingMemory()
+std::uint32_t CCore::GetMaxStreamingMemory()
 {
     CalculateStreamingMemoryRange();
     return m_fMaxStreamingMemory;
@@ -2116,7 +2101,7 @@ uint CCore::GetMaxStreamingMemory()
 //
 // OnCrashAverted
 //
-void CCore::OnCrashAverted(uint uiId)
+void CCore::OnCrashAverted(std::uint32_t uiId)
 {
     CCrashDumpWriter::OnCrashAverted(uiId);
 }
@@ -2124,7 +2109,7 @@ void CCore::OnCrashAverted(uint uiId)
 //
 // OnEnterCrashZone
 //
-void CCore::OnEnterCrashZone(uint uiId)
+void CCore::OnEnterCrashZone(std::uint32_t uiId)
 {
     CCrashDumpWriter::OnEnterCrashZone(uiId);
 }
@@ -2132,7 +2117,7 @@ void CCore::OnEnterCrashZone(uint uiId)
 //
 // LogEvent
 //
-void CCore::LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId)
+void CCore::LogEvent(std::uint32_t uiDebugId, const char* szType, const char* szContext, const char* szBody, std::uint32_t uiAddReportLogId)
 {
     if (uiAddReportLogId)
         AddReportLog(uiAddReportLogId, SString("%s - %s", szContext, szBody));
@@ -2147,7 +2132,7 @@ void CCore::LogEvent(uint uiDebugId, const char* szType, const char* szContext, 
 //
 // GetDebugIdEnabled
 //
-bool CCore::GetDebugIdEnabled(uint uiDebugId)
+bool CCore::GetDebugIdEnabled(std::uint32_t uiDebugId)
 {
     static CFilterMap debugIdFilterMap(GetVersionUpdater()->GetDebugFilterString());
     return (uiDebugId == 0) || !debugIdFilterMap.IsFiltered(uiDebugId);
@@ -2233,16 +2218,15 @@ void CCore::HandleCrashDumpEncryption()
     // Copy and encrypt private files to public if they don't already exist
     {
         std::vector<SString> privateList = FindFiles(PathJoin(strDumpDirPrivatePath, "*.dmp"), true, false);
-        for (uint i = 0; i < privateList.size(); i++)
+        for (const auto& strPrivateFilename : privateList)
         {
-            const SString& strPrivateFilename = privateList[i];
-            SString        strPublicFilename = ExtractBeforeExtension(strPrivateFilename) + ".rsa." + ExtractExtension(strPrivateFilename);
-            SString        strPrivatePathFilename = PathJoin(strDumpDirPrivatePath, strPrivateFilename);
-            SString        strPublicPathFilename = PathJoin(strDumpDirPublicPath, strPublicFilename);
-            if (!FileExists(strPublicPathFilename))
-            {
-                GetNetwork()->EncryptDumpfile(strPrivatePathFilename, strPublicPathFilename);
-            }
+            SString strPublicFilename = ExtractBeforeExtension(strPrivateFilename) + ".rsa." + ExtractExtension(strPrivateFilename);
+            SString strPrivatePathFilename = PathJoin(strDumpDirPrivatePath, strPrivateFilename);
+            SString strPublicPathFilename = PathJoin(strDumpDirPublicPath, strPublicFilename);
+            if (FileExists(strPublicPathFilename))
+                continue;
+            
+            GetNetwork()->EncryptDumpfile(strPrivatePathFilename, strPublicPathFilename);
         }
     }
 

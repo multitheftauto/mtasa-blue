@@ -12,14 +12,14 @@
 #include "StdInc.h"
 #include "CCrashHandler.h"
 #include "version.h"
-#ifdef WIN32
+#ifdef _WIN32
     #include "CExceptionInformation_Impl.h"
 #else
     #include <execinfo.h>
 #endif
 
 // clang-format off
-#ifndef WIN32
+#ifndef _WIN32
     #if __has_include(<ncursesw/curses.h>)
         #include <ncursesw/curses.h>
     #else
@@ -45,7 +45,7 @@ static SString ms_strDumpPathFilename;
 
 static SString ms_strDumpPath;
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <ctime>
 #include <tchar.h>
 #include <dbghelp.h>
@@ -64,7 +64,7 @@ void CCrashHandler::Init(const SString& strInServerPath)
     ms_strDumpPath = PathJoin(strServerPath, SERVER_DUMP_PATH);
 
     // Set a global filter
-    #ifdef WIN32
+    #ifdef _WIN32
     SetCrashHandlerFilter(HandleExceptionGlobal);
     #else
 
@@ -88,7 +88,7 @@ void CCrashHandler::Init(const SString& strInServerPath)
     #endif
 }
 
-#ifndef WIN32
+#ifndef _WIN32
 
 // Save basic backtrace info into a file. Forced inline to avoid backtrace pollution
 inline __attribute__((always_inline)) static void SaveBacktraceSummary()
@@ -212,103 +212,108 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
     }
 
     // We could load a dll?
-    if (hDll)
+    if (!hDll)
+        return;
+
+    // Grab the MiniDumpWriteDump proc address
+    MINIDUMPWRITEDUMP pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(hDll, "MiniDumpWriteDump"));
+    if (!pDump)
     {
-        // Grab the MiniDumpWriteDump proc address
-        MINIDUMPWRITEDUMP pDump = reinterpret_cast<MINIDUMPWRITEDUMP>(GetProcAddress(hDll, "MiniDumpWriteDump"));
-        if (pDump)
-        {
-            // Grab the current time
-            // Ask windows for the system time.
-            SYSTEMTIME SystemTime;
-            GetLocalTime(&SystemTime);
-
-            // Create the dump directory
-            CreateDirectory(ms_strDumpPath, 0);
-            CreateDirectory(PathJoin(ms_strDumpPath, "private"), 0);
-
-            SString strModuleName = pExceptionInformation->GetModuleBaseName();
-            strModuleName = strModuleName.ReplaceI(".dll", "").Replace(".exe", "").Replace("_", "").Replace(".", "").Replace("-", "");
-            if (strModuleName.length() == 0)
-                strModuleName = "unknown";
-
-            #ifdef _WIN64
-            strModuleName += "64";
-            #endif
-
-            SString strFilename("server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, strModuleName.c_str(),
-                                pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetCode() & 0xffff, SystemTime.wYear, SystemTime.wMonth,
-                                SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute);
-
-            SString strFinalDumpPathFilename = PathJoin(ms_strDumpPath, "private", strFilename);
-
-            // Create the file
-            HANDLE hFile = CreateFile(strFinalDumpPathFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-            if (hFile != INVALID_HANDLE_VALUE)
-            {
-                // Create an exception information struct
-                _MINIDUMP_EXCEPTION_INFORMATION ExInfo;
-                ExInfo.ThreadId = GetCurrentThreadId();
-                ExInfo.ExceptionPointers = pException;
-                ExInfo.ClientPointers = FALSE;
-
-                // Write the dump
-                pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, (MINIDUMP_TYPE)(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo,
-                      NULL, NULL);
-
-                // Close the dumpfile
-                CloseHandle(hFile);
-
-                FileSave(PathJoin(ms_strDumpPath, "server_pending_upload_filename"), strFinalDumpPathFilename);
-            }
-
-            // Write a log with the generic exception information
-            FILE* pFile = File::Fopen(PathJoin(ms_strDumpPath, "server_pending_upload.log"), "a+");
-            if (pFile)
-            {
-                // Header
-                fprintf(pFile, "%s", "** -- Unhandled exception -- **\n\n");
-
-                // Write the time
-                time_t timeTemp;
-                time(&timeTemp);
-
-                SString strMTAVersionFull = SString("%s", MTA_DM_BUILDTAG_LONG);
-
-                SString strInfo;
-                strInfo += SString("Version = %s\n", strMTAVersionFull.c_str());
-                strInfo += SString("Time = %s", ctime(&timeTemp));
-
-                strInfo += SString("Module = %s\n", pExceptionInformation->GetModulePathName());
-
-                // Write the basic exception information
-                strInfo += SString("Code = 0x%08X\n", pExceptionInformation->GetCode());
-                strInfo += SString("Offset = 0x%08X\n\n", pExceptionInformation->GetAddressModuleOffset());
-
-                // Write the register info
-                strInfo += SString(
-                    "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n"
-                    "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n"
-                    "CS=%04X   DS=%04X  SS=%04X  ES=%04X   "
-                    "FS=%04X  GS=%04X\n\n",
-                    pExceptionInformation->GetEAX(), pExceptionInformation->GetEBX(), pExceptionInformation->GetECX(), pExceptionInformation->GetEDX(),
-                    pExceptionInformation->GetESI(), pExceptionInformation->GetEDI(), pExceptionInformation->GetEBP(), pExceptionInformation->GetESP(),
-                    pExceptionInformation->GetEIP(), pExceptionInformation->GetEFlags(), pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
-                    pExceptionInformation->GetSS(), pExceptionInformation->GetES(), pExceptionInformation->GetFS(), pExceptionInformation->GetGS());
-
-                fprintf(pFile, "%s", strInfo.c_str());
-
-                // End of unhandled exception
-                fprintf(pFile, "%s", "** -- End of unhandled exception -- **\n\n\n");
-
-                // Close the file
-                fclose(pFile);
-            }
-        }
-
         // Free the DLL again
         FreeLibrary(hDll);
+        return;
     }
+
+    // Grab the current time
+    // Ask windows for the system time.
+    SYSTEMTIME SystemTime;
+    GetLocalTime(&SystemTime);
+
+    // Create the dump directory
+    CreateDirectory(ms_strDumpPath, 0);
+    CreateDirectory(PathJoin(ms_strDumpPath, "private"), 0);
+
+    SString strModuleName = pExceptionInformation->GetModuleBaseName();
+    strModuleName = strModuleName.ReplaceI(".dll", "").Replace(".exe", "").Replace("_", "").Replace(".", "").Replace("-", "");
+    if (strModuleName.length() == 0)
+        strModuleName = "unknown";
+
+    #ifdef _WIN64
+    strModuleName += "64";
+    #endif
+
+    SString strFilename("server_%s_%s_%08x_%x_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, strModuleName.c_str(),
+                        pExceptionInformation->GetAddressModuleOffset(), pExceptionInformation->GetCode() & 0xffff, SystemTime.wYear, SystemTime.wMonth,
+                        SystemTime.wDay, SystemTime.wHour, SystemTime.wMinute);
+
+    SString strFinalDumpPathFilename = PathJoin(ms_strDumpPath, "private", strFilename);
+
+    // Create the file
+    HANDLE hFile = CreateFile(strFinalDumpPathFilename, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hFile != INVALID_HANDLE_VALUE)
+    {
+        // Create an exception information struct
+        _MINIDUMP_EXCEPTION_INFORMATION ExInfo;
+        ExInfo.ThreadId = GetCurrentThreadId();
+        ExInfo.ExceptionPointers = pException;
+        ExInfo.ClientPointers = FALSE;
+
+        // Write the dump
+        pDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, (MINIDUMP_TYPE)(MiniDumpNormal | MiniDumpWithIndirectlyReferencedMemory), &ExInfo,
+                NULL, NULL);
+
+        // Close the dumpfile
+        CloseHandle(hFile);
+
+        FileSave(PathJoin(ms_strDumpPath, "server_pending_upload_filename"), strFinalDumpPathFilename);
+    }
+
+    // Write a log with the generic exception information
+    FILE* pFile = File::Fopen(PathJoin(ms_strDumpPath, "server_pending_upload.log"), "a+");
+    if (!pFile)
+    {
+        // Free the DLL again
+        FreeLibrary(hDll);
+        return;
+    }
+
+    // Header
+    fprintf(pFile, "%s", "** -- Unhandled exception -- **\n\n");
+
+    // Write the time
+    time_t timeTemp;
+    time(&timeTemp);
+
+    SString strMTAVersionFull = SString("%s", MTA_DM_BUILDTAG_LONG);
+
+    SString strInfo;
+    strInfo += SString("Version = %s\n", strMTAVersionFull.c_str());
+    strInfo += SString("Time = %s", ctime(&timeTemp));
+
+    strInfo += SString("Module = %s\n", pExceptionInformation->GetModulePathName());
+
+    // Write the basic exception information
+    strInfo += SString("Code = 0x%08X\n", pExceptionInformation->GetCode());
+    strInfo += SString("Offset = 0x%08X\n\n", pExceptionInformation->GetAddressModuleOffset());
+
+    // Write the register info
+    strInfo += SString(
+        "EAX=%08X  EBX=%08X  ECX=%08X  EDX=%08X  ESI=%08X\n"
+        "EDI=%08X  EBP=%08X  ESP=%08X  EIP=%08X  FLG=%08X\n"
+        "CS=%04X   DS=%04X  SS=%04X  ES=%04X   "
+        "FS=%04X  GS=%04X\n\n",
+        pExceptionInformation->GetEAX(), pExceptionInformation->GetEBX(), pExceptionInformation->GetECX(), pExceptionInformation->GetEDX(),
+        pExceptionInformation->GetESI(), pExceptionInformation->GetEDI(), pExceptionInformation->GetEBP(), pExceptionInformation->GetESP(),
+        pExceptionInformation->GetEIP(), pExceptionInformation->GetEFlags(), pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
+        pExceptionInformation->GetSS(), pExceptionInformation->GetES(), pExceptionInformation->GetFS(), pExceptionInformation->GetGS());
+
+    fprintf(pFile, "%s", strInfo.c_str());
+
+    // End of unhandled exception
+    fprintf(pFile, "%s", "** -- End of unhandled exception -- **\n\n\n");
+
+    // Close the file
+    fclose(pFile);
 }
 
 void CCrashHandler::RunErrorTool()

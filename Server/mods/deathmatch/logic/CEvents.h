@@ -34,19 +34,22 @@ public:
     void RemoveEvent(const char* szName);
     void RemoveAllEvents(class CLuaMain* pMain);
 
-    bool    Exists(const char* szName) { return Get(szName) != NULL; };
-    SEvent* Get(const char* szName);
+    bool    Exists(const char* szName) noexcept { return Get(szName) != nullptr; };
+    SEvent* Get(const char* szName) noexcept;
 
-    CFastHashMap<SString, SEvent*>::const_iterator IterBegin() { return m_EventHashMap.begin(); };
-    CFastHashMap<SString, SEvent*>::const_iterator IterEnd() { return m_EventHashMap.end(); };
+    CFastHashMap<SString, SEvent*>::iterator begin() noexcept { return m_EventHashMap.begin(); };
+    CFastHashMap<SString, SEvent*>::iterator end() noexcept { return m_EventHashMap.end(); };
+
+    CFastHashMap<SString, SEvent*>::const_iterator begin() const noexcept { return m_EventHashMap.begin(); };
+    CFastHashMap<SString, SEvent*>::const_iterator end() const noexcept { return m_EventHashMap.end(); };
 
     void PreEventPulse();
     void PostEventPulse();
 
     void        CancelEvent(bool bCancelled = true);
     void        CancelEvent(bool bCancelled, const char* szReason);
-    bool        WasEventCancelled();
-    const char* GetLastError();
+    bool        WasEventCancelled() const noexcept;
+    const char* GetLastError() const noexcept;
 
 private:
     void RemoveAllEvents();
