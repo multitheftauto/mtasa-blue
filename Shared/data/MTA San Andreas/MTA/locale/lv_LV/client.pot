@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-18 20:38+0000\n"
-"PO-Revision-Date: 2024-01-23 05:10\n"
+"PO-Revision-Date: 2024-01-23 06:10\n"
 "Last-Translator: \n"
 "Language-Team: Latvian\n"
 "Language: lv_LV\n"
@@ -3054,11 +3054,11 @@ msgstr "Kvadraciklē apkārt"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr "Lēka apkart"
+msgstr "Lēka apkārt"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr "Dara savādakas lietas iekš"
+msgstr "Dara savādas lietas iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
@@ -3067,7 +3067,7 @@ msgstr "Kāpj apkārt iekš"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr "Tēme ieroci pa logu no automašīnas iekš"
+msgstr "Tēmē ieroci pa logu no automašīnas iekš"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
