@@ -96,6 +96,11 @@ void CServer::DoPulse()
     CLOCK(" Top", " Idle");
 }
 
+bool CServer::IsReadyToAcceptConnections() const noexcept
+{
+    return (m_pGame != nullptr) && m_pGame->IsServerFullyUp();
+}
+
 bool CServer::IsFinished()
 {
     if (m_pGame)
