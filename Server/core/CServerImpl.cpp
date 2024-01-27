@@ -480,12 +480,14 @@ void CServerImpl::MainLoop()
         if (m_pModManager->IsFinished())
             m_bRequestedQuit = true;
 
+#ifdef WIN32
         if (g_readyEvent != nullptr && m_pModManager->IsReadyToAcceptConnections())
         {
             SetEvent(g_readyEvent);
             CloseHandle(g_readyEvent);
             g_readyEvent = nullptr;
         }
+#endif
 
         HandlePulseSleep();
     }
