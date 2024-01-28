@@ -36,7 +36,7 @@
 #ifdef USE_LIBIDN2
 #include <idn2.h>
 
-#if defined(WIN32) && defined(UNICODE)
+#if defined(_WIN32) && defined(UNICODE)
 #define IDN2_LOOKUP(name, host, flags)                                  \
   idn2_lookup_u8((const uint8_t *)name, (uint8_t **)host, flags)
 #else
@@ -91,6 +91,8 @@ static CURLcode win32_idn_to_ascii(const char *in, char **out)
     else
       return CURLE_URL_MALFORMAT;
   }
+  else
+    return CURLE_URL_MALFORMAT;
 
   return CURLE_OK;
 }
@@ -174,6 +176,9 @@ static CURLcode idn_decode(const char *input, char **output)
     if(rc != IDN2_OK)
       result = CURLE_URL_MALFORMAT;
   }
+  else
+    /* a too old libidn2 version */
+    result = CURLE_NOT_BUILT_IN;
 #elif defined(USE_WIN32_IDN)
   result = win32_idn_to_ascii(input, &decoded);
 #endif

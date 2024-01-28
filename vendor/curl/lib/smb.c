@@ -27,7 +27,7 @@
 
 #if !defined(CURL_DISABLE_SMB) && defined(USE_CURL_NTLM_CORE)
 
-#ifdef WIN32
+#ifdef _WIN32
 #define getpid GetCurrentProcessId
 #endif
 
@@ -1047,9 +1047,7 @@ static CURLcode smb_request_state(struct Curl_easy *data, bool *done)
         break;
       }
     }
-    data->req.bytecount += len;
     data->req.offset += len;
-    Curl_pgrsSetDownloadCounter(data, data->req.bytecount);
     next_state = (len < MAX_PAYLOAD_SIZE) ? SMB_CLOSE : SMB_DOWNLOAD;
     break;
 

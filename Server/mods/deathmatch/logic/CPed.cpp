@@ -356,6 +356,17 @@ void CPed::SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot)
     }
 }
 
+bool CPed::HasWeaponType(unsigned char ucWeaponType)
+{
+    for (unsigned char slot = 0; slot < WEAPON_SLOTS; slot++)
+    {
+        if (GetWeaponType(slot) == ucWeaponType)
+            return true;
+    }
+
+    return false;
+}
+
 float CPed::GetMaxHealth()
 {
     // TODO: Verify this formula

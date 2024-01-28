@@ -156,7 +156,8 @@ static void mbed_debug(void *context, int level, const char *f_name,
 #else
 #endif
 
-static int bio_cf_write(void *bio, const unsigned char *buf, size_t blen)
+static int mbedtls_bio_cf_write(void *bio,
+                                const unsigned char *buf, size_t blen)
 {
   struct Curl_cfilter *cf = bio;
   struct Curl_easy *data = CF_DATA_CURRENT(cf);
@@ -165,7 +166,7 @@ static int bio_cf_write(void *bio, const unsigned char *buf, size_t blen)
 
   DEBUGASSERT(data);
   nwritten = Curl_conn_cf_send(cf->next, data, (char *)buf, blen, &result);
-  CURL_TRC_CF(data, cf, "bio_cf_out_write(len=%zu) -> %zd, err=%d",
+  CURL_TRC_CF(data, cf, "mbedtls_bio_cf_out_write(len=%zu) -> %zd, err=%d",
               blen, nwritten, result);
   if(nwritten < 0 && CURLE_AGAIN == result) {
     nwritten = MBEDTLS_ERR_SSL_WANT_WRITE;
@@ -173,7 +174,7 @@ static int bio_cf_write(void *bio, const unsigned char *buf, size_t blen)
   return (int)nwritten;
 }
 
-static int bio_cf_read(void *bio, unsigned char *buf, size_t blen)
+static int mbedtls_bio_cf_read(void *bio, unsigned char *buf, size_t blen)
 {
   struct Curl_cfilter *cf = bio;
   struct Curl_easy *data = CF_DATA_CURRENT(cf);
@@ -186,7 +187,7 @@ static int bio_cf_read(void *bio, unsigned char *buf, size_t blen)
     return 0;
 
   nread = Curl_conn_cf_recv(cf->next, data, (char *)buf, blen, &result);
-  CURL_TRC_CF(data, cf, "bio_cf_in_read(len=%zu) -> %zd, err=%d",
+  CURL_TRC_CF(data, cf, "mbedtls_bio_cf_in_read(len=%zu) -> %zd, err=%d",
               blen, nread, result);
   if(nread < 0 && CURLE_AGAIN == result) {
     nread = MBEDTLS_ERR_SSL_WANT_READ;
@@ -321,7 +322,7 @@ mbed_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
   char * const ssl_cert = ssl_config->primary.clientcert;
   const struct curl_blob *ssl_cert_blob = ssl_config->primary.cert_blob;
   const char * const ssl_crlfile = ssl_config->primary.CRLfile;
-  const char *hostname = connssl->hostname;
+  const char *hostname = connssl->peer.hostname;
   int ret = -1;
   char errorbuf[128];
 
@@ -591,7 +592,9 @@ mbed_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
 
   mbedtls_ssl_conf_rng(&backend->config, mbedtls_ctr_drbg_random,
                        &backend->ctr_drbg);
-  mbedtls_ssl_set_bio(&backend->ssl, cf, bio_cf_write, bio_cf_read,
+  mbedtls_ssl_set_bio(&backend->ssl, cf,
+                      mbedtls_bio_cf_write,
+                      mbedtls_bio_cf_read,
                       NULL /*  rev_timeout() */);
 
   mbedtls_ssl_conf_ciphersuites(&backend->config,
@@ -636,9 +639,9 @@ mbed_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
     mbedtls_ssl_conf_own_cert(&backend->config,
                               &backend->clicert, &backend->pk);
   }
-  {
-    char *snihost = Curl_ssl_snihost(data, hostname, NULL);
-    if(!snihost || mbedtls_ssl_set_hostname(&backend->ssl, snihost)) {
+
+  if(connssl->peer.sni) {
+    if(mbedtls_ssl_set_hostname(&backend->ssl, connssl->peer.sni)) {
       /* mbedtls_ssl_set_hostname() sets the name to use in CN/SAN checks and
          the name to set in the SNI extension. So even if curl connects to a
          host specified as an IP address, this function must be used. */
@@ -1271,7 +1274,7 @@ const struct Curl_ssl Curl_ssl_mbedtls = {
   Curl_none_cert_status_request,    /* cert_status_request */
   mbedtls_connect,                  /* connect */
   mbedtls_connect_nonblocking,      /* connect_nonblocking */
-  Curl_ssl_get_select_socks,                 /* getsock */
+  Curl_ssl_adjust_pollset,          /* adjust_pollset */
   mbedtls_get_internals,            /* get_internals */
   mbedtls_close,                    /* close_one */
   mbedtls_close_all,                /* close_all */
