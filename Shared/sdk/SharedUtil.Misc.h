@@ -344,8 +344,6 @@ namespace SharedUtil
     template <class TL, class T>
     bool ListContains(const TL& itemList, const T& item)
     {
-        if (itemList == nullptr)
-            return false;
         if (itemList.empty())
             return false;
         typename TL ::const_iterator it = itemList.begin();
