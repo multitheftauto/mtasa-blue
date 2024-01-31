@@ -14,7 +14,7 @@
 #include <list>
 
 typedef void (*PFNCOMMANDHANDLER)(const char*);
-typedef bool (*pfnExecuteCommandHandler)(const char*, const char*, bool, bool, bool);
+typedef bool (*pfnExecuteCommandHandler)(const char*, const char*, bool, bool, bool, bool);
 
 typedef void (*PFNCOMMAND)(const char*);
 
