@@ -47,7 +47,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: InstallFiles
+          name: InstallFiles-${{ matrix.platform }}
           path: InstallFiles/
 
   macOS:
