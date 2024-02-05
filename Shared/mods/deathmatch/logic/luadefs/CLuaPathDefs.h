@@ -11,7 +11,7 @@
 #pragma once
 #include "luadefs/CLuaDefs.h"
 
-class CLuaFileDefs : public CLuaDefs
+class CLuaPathDefs : public CLuaDefs
 {
 public:
     static void LoadFunctions();

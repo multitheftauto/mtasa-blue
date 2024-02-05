@@ -37,13 +37,9 @@ void CLuaPathDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
-#ifdef MTA_CLIENT
-    lua_classfunction(luaVM, "listDir", CLuaPathDefs::pathListDir);
-#else
-    lua_classfunction(luaVM, "listDir", "pathListDir", CLuaPathDefs::pathListDir);
-#endif
-    lua_classfunction(luaVM, "isFile", CLuaPathDefs::pathIsFile);
-    lua_classfunction(luaVM, "isDirectory", CLuaPathDefs::pathIsDirectory);
+    lua_classfunction(luaVM, "listDir", "pathListDir");
+    lua_classfunction(luaVM, "isFile", "pathIsFile");
+    lua_classfunction(luaVM, "isDirectory", "pathIsDirectory");
 
     lua_registerclass(luaVM, "path");
 }
@@ -66,7 +62,7 @@ std::optional<std::vector<std::string>> CLuaPathDefs::pathListDir(lua_State* lua
     return SharedUtil::ListDir(strAbsPath);
 }
 
-bool CLuaPathDefs::isFile(lua_State* luaVM, std::string path)
+bool CLuaPathDefs::pathIsFile(lua_State* luaVM, std::string path)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
@@ -81,7 +77,7 @@ bool CLuaPathDefs::isFile(lua_State* luaVM, std::string path)
     return SharedUtil::FileExists(strAbsPath);
 }
 
-bool CLuaPathDefs::isDirectory(lua_State* luaVM, std::string path)
+bool CLuaPathDefs::pathIsDirectory(lua_State* luaVM, std::string path)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
