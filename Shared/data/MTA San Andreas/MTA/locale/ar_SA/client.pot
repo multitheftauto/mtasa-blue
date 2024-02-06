@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-30 02:05+0000\n"
-"PO-Revision-Date: 2024-02-06 18:20\n"
+"PO-Revision-Date: 2024-02-06 19:23\n"
 "Last-Translator: \n"
 "Language-Team: Arabic\n"
 "Language: ar_SA\n"
@@ -512,7 +512,7 @@ msgstr "يركب القطار في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr "يحلق حول"
+msgstr "يطير حول"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
@@ -581,7 +581,7 @@ msgstr "يركب الجت باك في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr "حرفيًا يحترق في"
+msgstr "حرفياً يحترق في"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
@@ -645,11 +645,11 @@ msgstr "جاري تشغيل خادم محلي ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr "المنطقة 51"
+msgstr "منطقة 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr "يتمشى حول "
+msgstr "يتجول في "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
