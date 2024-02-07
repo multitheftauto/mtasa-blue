@@ -849,6 +849,8 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
+            File "${SERVER_FILES_ROOT}\mods\deathmatch\libcrypto-3.dll"
+            File "${SERVER_FILES_ROOT}\mods\deathmatch\libssl-3.dll"
         !endif
 
         ;Only overwrite the following files if previous versions were bugged and explicitly need replacing
@@ -1083,6 +1085,8 @@ Section Uninstall
         Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
         Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
         Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\libcrypto-3.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\libssl-3.dll"
         Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
         Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
 
@@ -1097,6 +1101,8 @@ Section Uninstall
         Delete "$INSTDIR\server\x64\dbconmy.dll"
         Delete "$INSTDIR\server\x64\deathmatch.dll"
         Delete "$INSTDIR\server\x64\libmysql.dll"
+        Delete "$INSTDIR\server\x64\libcrypto-3-x64.dll"
+        Delete "$INSTDIR\server\x64\libssl-3-x64.dll"
         Delete "$INSTDIR\server\x64\lua5.1.dll"
         Delete "$INSTDIR\server\x64\pcre3.dll"
         RmDir "$INSTDIR\server\x64"
