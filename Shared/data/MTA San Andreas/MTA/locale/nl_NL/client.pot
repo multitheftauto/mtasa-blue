@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-30 02:05+0000\n"
-"PO-Revision-Date: 2024-02-09 18:56\n"
+"PO-Revision-Date: 2024-02-09 19:52\n"
 "Last-Translator: \n"
 "Language-Team: Dutch\n"
 "Language: nl_NL\n"
@@ -480,118 +480,118 @@ msgstr "Fout"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "Een UFO rondvliegen"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "Rondtoeren"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr ""
+msgstr "De golven berijden van"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
-msgstr ""
+msgstr "Met de trein reizen in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr ""
+msgstr "Rondvliegen"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr ""
+msgstr "Rondrijden"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "Met een monstertruck rondrijden"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr ""
+msgstr "Met een quad rondrijden"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "Rond bunny hoppen"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "Rare dingen doen"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr ""
+msgstr "Rondklimmen"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "Een drive-by uitvoeren in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
-msgstr ""
+msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr ""
+msgstr "Water inademen"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
-msgstr ""
+msgstr "Verdrinken in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "Dekking zoeken in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
-msgstr ""
+msgstr "Vechten in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
-msgstr ""
+msgstr "Met vuisten slaan in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "Dwazen neerknallen in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr ""
+msgstr "Spuiten"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr ""
+msgstr "Met een jetpack rondvliegen"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr ""
+msgstr "Letterlijk in brand in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
-msgstr ""
+msgstr "In vuur en vlam staan in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Swimming in"
-msgstr ""
+msgstr "Zwemmen in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr ""
+msgstr "Rondzweven in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "Achtervolgd worden door een haai"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr ""
+msgstr "Stikken tot de dood in"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 #: Client/core/CMainMenu.cpp:304 Client/core/CCore.cpp:674
 #: Client/core/CSettings.cpp:3461
 msgid "Main menu"
-msgstr ""
+msgstr "Hoofdmenu"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:635
 #: Client/mods/deathmatch/logic/CClientGame.cpp:733
@@ -629,11 +629,11 @@ msgstr "Lokale server aan het starten ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
-msgstr ""
+msgstr "Area 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr ""
+msgstr "Rondlopen "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
@@ -710,23 +710,23 @@ msgstr "MTA Client verificatie mislukt!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
-msgstr ""
+msgstr "In een greppel"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
-msgstr ""
+msgstr "Onderweg naar het ziekenhuis"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr ""
+msgstr "Hun maker ontmoeten"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "Spijt hebben van hun keuzes"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
-msgstr ""
+msgstr "Overleden"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -979,7 +979,7 @@ msgstr "toont de frame tijdsgrafiek"
 
 #: Client/core/CCore.cpp:1425
 msgid "for developers: reload news"
-msgstr ""
+msgstr "voor programmeurs: nieuws verversen"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -1191,7 +1191,7 @@ msgstr "CONSOLE"
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "Nieuws"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
@@ -1347,7 +1347,7 @@ msgstr "Downloadvenster altijd weergeven"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "Toestaan verbinding te maken met Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
@@ -1585,11 +1585,11 @@ msgstr "Rokende banden enz."
 
 #: Client/core/CSettings.cpp:816
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "Dynamische voetgangersschaduwen"
 
 #: Client/core/CSettings.cpp:820
 msgid "Motion blur"
-msgstr ""
+msgstr "Motion blur"
 
 #: Client/core/CSettings.cpp:825
 msgid "Full Screen Minimize"
@@ -1613,7 +1613,7 @@ msgstr "Peds altijd met hoge kwaliteit renderen"
 
 #: Client/core/CSettings.cpp:869
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "Corona regenreflecties"
 
 #: Client/core/CSettings.cpp:898
 msgid "Enable remote websites"
@@ -2072,11 +2072,12 @@ msgstr "EXTERNE GELUIDEN"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr ""
+msgstr "Het lijkt erop dat je de Rich Presence verbindingsmogelijkheid hebt ingeschakeld. Wil je toestaan dat servers hun gegevens delen?\n\n"
+"Dit omvat jouw unieke ID-identificatie."
 
 #: Client/core/CSettings.cpp:4542
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
+msgstr "GEEF TOESTEMMING VOOR HET DELEN VAN GEGEVENS"
 
 #: Client/core/CSettings.cpp:4566
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -2368,7 +2369,7 @@ msgstr "Met bijzondere dank aan"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+msgstr "Deze software en dit project maken gebruik van de volgende bibliotheken en software:"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
@@ -2710,28 +2711,29 @@ msgstr "MTA: San Andreas - Waarschuwing"
 
 #: Client/loader/Dialogs.cpp:163
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr ""
+msgstr "Uw Grand Theft Auto: San Andreas installatiemap bevat deze bestanden:"
 
 #: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr ""
+msgstr "Deze bestanden zijn niet vereist en kunnen het goed functioneren van de grafische functies verhinderen in deze versie van MTA:SA.\n\n"
+"Het wordt aanbevolen om deze bestanden te verwijderen of te hernoemen."
 
 #: Client/loader/Dialogs.cpp:167
 msgid "Keep these files, but also show this warning on next start"
-msgstr ""
+msgstr "Houd deze bestanden, maar toon ook deze waarschuwing bij de volgende start"
 
 #: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
-msgstr ""
+msgstr "Herinner me niet opnieuw aan deze bestanden"
 
 #: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr ""
+msgstr "Hernoem deze bestanden van *.dll naar *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
-msgstr ""
+msgstr "Toon mij deze bestanden"
 
 #: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
@@ -2759,11 +2761,11 @@ msgstr "B - Alternatief NVidia"
 
 #: Client/loader/Dialogs.cpp:182
 msgid "C - Standard Intel"
-msgstr ""
+msgstr "C - Standaard Intel"
 
 #: Client/loader/Dialogs.cpp:183
 msgid "D - Alternate Intel"
-msgstr ""
+msgstr "D - Alternatief Intel"
 
 #: Client/loader/Dialogs.cpp:184
 msgid "If you get desperate, this might help:"
@@ -2951,47 +2953,47 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
+msgstr "MTA:SA kan niet worden gestart omdat het kopiëren van een bestand is mislukt:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA kan niet worden gestart omdat een MTA:SA-bestand onjuist of ontbreekt is:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Kopieer MTA:SA-bestanden"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA kan niet worden gestart omdat een GTA:SA-bestand onjuist is of ontbreekt:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
-msgstr ""
+msgstr "Patch GTA:SA afhankelijkheid"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
+msgstr "MTA:SA kan niet worden gestart omdat het GTA:SA-uitvoerbaar bestand onjuist is of ontbreekt:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
+msgstr "Controleer alsjeblieft je antivirus op een vals-positieve detectie, probeer een uitzondering toe te voegen voor het GTA:SA-uitvoerbaar bestand en herstart MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr ""
+msgstr "Genereer GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
+msgstr "MTA:SA kan niet worden gestart omdat het GTA:SA-uitvoerbaar bestand niet laadbaar is:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
-msgstr ""
+msgstr "Patch GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
+msgstr "MTA:SA kan niet worden gestart omdat het patchen van GTA:SA is mislukt:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -3150,14 +3152,18 @@ msgstr "Hoofdbestand is niet ondertekend. Mogelijke virusactiviteit.\n\n"
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Data-bestand %s ontbreekt. Mogelijke virusactiviteit.\n\n"
+"Overweeg Multi Theft Auto opnieuw te installeren voor je veiligheid.\n"
+"Raadpleeg de online hulp als MTA niet correct werkt."
 
 #: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr ""
+msgstr "Data-bestand %s is gewijzigd. Mogelijke virusactiviteit.\n\n"
+"Overweeg Multi Theft Auto opnieuw te installeren voor je veiligheid.\n"
+"Raadpleeg de online hulp als MTA niet correct werkt."
 
 #: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
