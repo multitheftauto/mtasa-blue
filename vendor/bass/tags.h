@@ -22,18 +22,15 @@
 extern "C" {
 #endif
 
-// Current version. Just increments each release.
-#define TAGS_VERSION 18
-
 // get the loaded version
 DWORD WINAPI TAGS_GetVersion();
 
 // enable UTF-8 encoding
-BOOL WINAPI TAGS_SetUTF8( BOOL enable );
+BOOL WINAPI TAGS_SetUTF8(BOOL enable);
 
 // main purpose of this library
-const char* WINAPI TAGS_Read( DWORD dwHandle, const char* fmt );
-const char* WINAPI TAGS_ReadEx( DWORD dwHandle, const char* fmt, DWORD tagtype, int codepage );
+const char* WINAPI TAGS_Read(DWORD dwHandle, const char* fmt);
+const char* WINAPI TAGS_ReadEx(DWORD dwHandle, const char* fmt, DWORD tagtype, int codepage);
 
 // returns description of the last error.
 const char* WINAPI TAGS_GetLastErrorDesc();
