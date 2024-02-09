@@ -388,6 +388,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
     m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
 
+    m_pCheckBoxAllowDiscordRPC = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), false));
+    m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
@@ -1252,6 +1257,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
     m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
+    m_pCheckBoxAllowDiscordRPC->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowDiscordRPC, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
@@ -3010,6 +3016,11 @@ void CSettings::LoadData()
     CVARS_GET("always_show_transferbox", alwaysShowTransferBox);
     m_pCheckBoxAlwaysShowTransferBox->SetSelected(alwaysShowTransferBox);
 
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC;
+    CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
+    m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
+
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
     m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
@@ -3435,6 +3446,31 @@ void CSettings::SaveData()
     bool alwaysShowTransferBox = m_pCheckBoxAlwaysShowTransferBox->GetSelected();
     CVARS_SET("always_show_transferbox", alwaysShowTransferBox);
     g_pCore->GetModManager()->TriggerCommand(mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX, alwaysShowTransferBox);
+
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    CVARS_SET("allow_discord_rpc", bAllowDiscordRPC);
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(bAllowDiscordRPC);
+
+    if (bAllowDiscordRPC)
+    {
+        const auto discord = g_pCore->GetDiscord();
+
+        if (discord)
+        {
+            const char* state = _("Main menu");
+
+            if (g_pCore->IsConnected())
+            {                
+                state = _("In-game");
+
+                const SString& serverName = g_pCore->GetLastConnectedServerName();
+                discord->SetPresenceDetails(serverName.c_str(), false);
+            }
+
+            discord->SetPresenceState(state, false);
+        }
+    }
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
@@ -4472,6 +4508,43 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
         CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
+}
+
+//
+// DiscordRPC
+//
+bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
+{
+    bool isEnabled = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(isEnabled);
+
+    if (isEnabled)
+        ShowRichPresenceShareDataQuestionBox(); // show question box
+
+    return true;
+}
+
+static void ShowRichPresenceShareDataCallback(void* ptr, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    CVARS_SET("discord_rpc_share_data", static_cast<bool>(uiButton));
+}
+
+void CSettings::ShowRichPresenceShareDataQuestionBox() const
+{
+    SStringX strMessage(
+        _("It seems that you have the Rich Presence connection option enabled."
+          "\nDo you want to allow servers to share their data?"
+          "\n\nThis includes yours unique ID identifier."));
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("CONSENT TO ALLOW DATA SHARING"));
+    pQuestionBox->SetMessage(strMessage);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(ShowRichPresenceShareDataCallback);
+    pQuestionBox->Show();
 }
 
 //

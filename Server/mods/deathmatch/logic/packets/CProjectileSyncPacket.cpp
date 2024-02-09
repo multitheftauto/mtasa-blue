@@ -39,11 +39,8 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
         return false;
     m_ucWeaponType = weaponType.data.ucWeaponType;
 
-    if (BitStream.Version() >= 0x4F)
-    {
-        if (!BitStream.Read(m_usModel))
-            return false;
-    }
+    if (!BitStream.Read(m_usModel))
+        return false;
 
     switch (m_ucWeaponType)
     {
@@ -67,12 +64,11 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
         case 19:            // WEAPONTYPE_ROCKET
         case 20:            // WEAPONTYPE_ROCKET_HS
         {
-            bool bHasTarget;
-            if (!BitStream.ReadBit(bHasTarget))
+            if (!BitStream.ReadBit(m_bHasTarget))
                 return false;
 
             m_TargetID = INVALID_ELEMENT_ID;
-            if (bHasTarget && !BitStream.Read(m_TargetID))
+            if (m_bHasTarget && !BitStream.Read(m_TargetID))
                 return false;
 
             SVelocitySync velocity;
@@ -127,10 +123,7 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
     weaponType.data.ucWeaponType = m_ucWeaponType;
     BitStream.Write(&weaponType);
 
-    if (BitStream.Version() >= 0x4F)
-    {
-        BitStream.Write(m_usModel);
-    }
+    BitStream.Write(m_usModel);
 
     switch (m_ucWeaponType)
     {

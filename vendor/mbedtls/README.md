@@ -48,7 +48,7 @@ You need the following tools to build the library with the provided makefiles:
 
 * GNU Make or a build tool that CMake supports.
 * A C99 toolchain (compiler, linker, archiver). We actively test with GCC 5.4, Clang 3.8, IAR8 and Visual Studio 2013. More recent versions should work. Slightly older versions may work.
-* Python 3 to generate the test code.
+* Python 3.6 or later to generate the test code.
 * Perl to run the tests.
 
 ### Make
@@ -249,7 +249,7 @@ Future releases of this library will include:
 License
 -------
 
-Unless specifically indicated otherwise in a file, Mbed TLS files are provided under the [Apache-2.0](https://spdx.org/licenses/Apache-2.0.html) license. See the [LICENSE](LICENSE) file for the full text of this license. Contributors must accept that their contributions are made under both the Apache-2.0 AND [GPL-2.0-or-later](https://spdx.org/licenses/GPL-2.0-or-later.html) licenses. This enables LTS (Long Term Support) branches of the software to be provided under either the Apache-2.0 OR GPL-2.0-or-later licenses.
+Unless specifically indicated otherwise in a file, Mbed TLS files are provided under the [Apache-2.0](https://spdx.org/licenses/Apache-2.0.html) license. See the [LICENSE](LICENSE) file for the full text of this license, and [the 'License and Copyright' section in the contributing guidelines](CONTRIBUTING.md#License-and-Copyright) for more information.
 
 Contributing
 ------------

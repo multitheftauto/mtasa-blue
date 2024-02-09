@@ -25,6 +25,7 @@
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordRichPresence.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
@@ -43,6 +44,7 @@ template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
 static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
@@ -157,14 +159,22 @@ CCore::CCore()
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+    m_timeDiscordAppLastUpdate = 0;
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    // Create discord rich presence
+    m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    // Reset Discord rich presence
+    if (m_pDiscordRichPresence)
+        m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -654,6 +664,20 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
+    {
+        const auto discord = g_pCore->GetDiscord();
+        if (!discord->IsDiscordRPCEnabled())
+            discord->SetDiscordRPCEnabled(true);
+
+        discord->SetPresenceState(bConnected ? _("In-game") : _("Main menu"), false);
+        discord->SetPresenceStartTimestamp(0);
+        discord->SetPresenceDetails("", false);
+
+        if (bConnected)
+            discord->SetPresenceStartTimestamp(time(nullptr));
+    }
 }
 
 bool CCore::IsConnected()
@@ -1315,6 +1339,20 @@ void CCore::DoPostFramePulse()
     GetGraphStats()->Draw();
     m_pConnectManager->DoPulse();
 
+    // Update Discord Rich Presence status
+    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    {
+        if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        {
+            discord->UpdatePresence();
+            m_timeDiscordAppLastUpdate = ticks;
+#ifdef DISCORD_DISABLE_IO_THREAD
+            // Update manually if we're not using the IO thread
+            discord->UpdatePresenceConnection();
+#endif
+        }
+    }
+
     TIMING_CHECKPOINT("-CorePostFrame2");
 }
 
@@ -1956,16 +1994,12 @@ void CCore::OnDeviceRestore()
 //
 void CCore::OnPreFxRender()
 {
-    // Don't do nothing if nothing won't be drawn
-
-    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
-
-    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
-        return;
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
+        return;    
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
+    CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
     CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
@@ -2360,4 +2394,10 @@ size_t CCore::GetStreamingMemory()
     return IsUsingCustomStreamingMemorySize()
         ? m_CustomStreamingMemoryLimitBytes
         : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+}
+
+// Discord rich presence
+std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
+{
+    return m_pDiscordRichPresence;
 }

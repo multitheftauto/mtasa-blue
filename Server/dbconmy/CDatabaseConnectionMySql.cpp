@@ -57,6 +57,7 @@ public:
     bool           m_bInAutomaticTransaction;
     CTickCount     m_AutomaticTransactionStartTime;
     int            m_bMultipleStatements;
+    int            m_bUseSSL;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -85,6 +86,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     optionsMap.Get("autoreconnect", m_bAutomaticReconnect, 1);
     optionsMap.Get("batch", m_bAutomaticTransactionsEnabled, 1);
     optionsMap.Get("multi_statements", m_bMultipleStatements, 0);
+    optionsMap.Get("use_ssl", m_bUseSSL, 0);
 
     SString strHostname;
     SString strDatabaseName;
@@ -106,7 +108,9 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     if (m_handle)
     {
         bool reconnect = m_bAutomaticReconnect;
+        uint const ssl_mode = m_bUseSSL ? SSL_MODE_REQUIRED : SSL_MODE_DISABLED;
         mysql_options(m_handle, MYSQL_OPT_RECONNECT, &reconnect);
+        mysql_options(m_handle, MYSQL_OPT_SSL_MODE, &ssl_mode);
         if (!strCharset.empty())
             mysql_options(m_handle, MYSQL_SET_CHARSET_NAME, strCharset);
         if (m_bMultipleStatements)

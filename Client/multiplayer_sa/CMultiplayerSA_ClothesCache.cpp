@@ -412,5 +412,5 @@ void CMultiplayerSA::GetClothesCacheStats(SClothesCacheStats& outStats)
 void CMultiplayerSA::InitHooks_ClothesCache()
 {
     EZHookInstall(CClothesBuilderCreateSkinnedClump);
-    InitRwFunctions(pGameInterface->GetGameVersion());
+    InitRwFunctions();
 }

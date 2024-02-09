@@ -308,7 +308,7 @@ public:
     float   m_fAttachedCamAngle;            // for giving the attached camera a tilt.
 
     // RenderWare camera pointer
-    DWORD* m_pRwCamera;            // was RwCamera *
+    RwCamera* m_pRwCamera;
     /// stuff for cut scenes
     CEntitySAInterface* pTargetEntity;
     CEntitySAInterface* pAttachedEntity;
@@ -426,7 +426,4 @@ public:
     void      RestoreLastGoodState();
     void      SetShakeForce(float fShakeForce);
     float     GetShakeForce();
-
-private:
-    static unsigned long FUNC_RwFrameGetLTM;
 };

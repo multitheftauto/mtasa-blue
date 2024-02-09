@@ -175,6 +175,12 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             // Set weapon slot
             if (bWeaponCorrect)
                 pSourcePlayer->SetWeaponSlot(uiSlot);
+            else
+            {
+                // remove invalid weapon data to prevent this from being relayed to other players
+                ucClientWeaponType = 0;
+                slot.data.uiSlot = 0;
+            }
 
             if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
             {

@@ -307,6 +307,8 @@ public:
 template <class T, class U>
 bool ListContains(const CFastList<T*>& itemList, const U& item)
 {
+    if (itemList.empty())
+        return false;
     return itemList.contains(item);
 }
 

@@ -12,35 +12,30 @@
 #include "StdInc.h"
 #include "CWeatherSA.h"
 
-unsigned char* CWeatherSA::VAR_CWeather__ForcedWeatherType;
-unsigned char* CWeatherSA::VAR_CWeather__OldWeatherType;
-unsigned char* CWeatherSA::VAR_CWeather__NewWeatherType;
-float*         CWeatherSA::VAR_CWeather__Rain;
-
 unsigned char CWeatherSA::Get()
 {
-    return (unsigned char)*VAR_CWeather__ForcedWeatherType;
+    return *(unsigned char*)0xC81318; // CWeather::ForcedWeatherType
 }
 
 void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
 {
-    *VAR_CWeather__OldWeatherType = static_cast<unsigned char>(primary);
-    *VAR_CWeather__NewWeatherType = static_cast<unsigned char>(secondary);
+    MemPutFast<unsigned char>(0xC81320, primary); // CWeather::OldWeatherType
+    MemPutFast<unsigned char>(0xC8131C, secondary); // CWeather::NewWeatherType
 }
 
 void CWeatherSA::Release()
 {
-    *VAR_CWeather__ForcedWeatherType = 0xFF;
+    MemPutFast<unsigned char>(0xC81318, 0xFF); // CWeather::ForcedWeatherType
 }
 
 float CWeatherSA::GetAmountOfRain()
 {
-    return *VAR_CWeather__Rain;
+    return *(float*)0xC81324; // CWeather::Rain
 }
 
 void CWeatherSA::SetAmountOfRain(float fAmount)
 {
-    // Nop the functions which don't like us take care of the rain
+    // Patch all the places inside of CWeather::Update that would overwrite CWeather::Rain
     MemPut<BYTE>(0x72C686, 0xDD);
     MemPut<BYTE>(0x72C687, 0xD8);
 
@@ -54,7 +49,7 @@ void CWeatherSA::SetAmountOfRain(float fAmount)
     MemSet((void*)0x72BC72, 0x90, 5);
 
     // Set the amount of rain
-    *VAR_CWeather__Rain = fAmount;
+    MemPutFast<float>(0xC81324, fAmount); // CWeather::Rain
 }
 
 void CWeatherSA::ResetAmountOfRain()

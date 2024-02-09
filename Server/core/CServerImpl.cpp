@@ -47,6 +47,9 @@ bool    IsCursesActive()
 {
     return m_wndInput != NULL;
 }
+#else
+bool g_isChildProcess = false;
+HANDLE g_readyEvent = nullptr;
 #endif
 
 #ifdef WIN32
@@ -57,7 +60,6 @@ CServerImpl::CServerImpl()
 {
     #ifdef WIN32
     m_pThreadCommandQueue = pThreadCommandQueue;
-    m_fClientFeedback = NULL;
     m_hConsole = NULL;
     #else
     m_wndMenu = NULL;
@@ -122,17 +124,6 @@ void CServerImpl::Printf(const char* szFormat, ...)
 #endif
     }
 
-    // Eventually feed stuff back to our client if we run inside GTA
-    #ifdef WIN32
-    if (m_fClientFeedback)
-    {
-        char szOutput[512];
-        szOutput[511] = 0;
-        VSNPRINTF(szOutput, 511, szFormat, ap);
-        m_fClientFeedback(szOutput);
-    }
-    #endif
-
     va_end(ap);
 }
 
@@ -177,9 +168,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     if (!ParseArguments(iArgumentCount, szArguments))
         return 1;
 
-#ifdef WIN32
-    if (!m_fClientFeedback)
-#else
+#ifndef WIN32
     if (!g_bNoCrashHandler)
 #endif
     {
@@ -206,9 +195,7 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
         m_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         m_hConsoleInput = GetStdHandle(STD_INPUT_HANDLE);
 
-        // If stdout is piped GetConsoleScreenBufferInfo will fail
-        // ==> check if stdin is piped
-        if (HasConsole())
+        if (!g_isChildProcess && HasConsole())
         {
             // Disable QuickEdit mode to prevent text selection causing server freeze
             DWORD dwConInMode;
@@ -241,7 +228,18 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
         {
             // Enable non-blocking read mode
             DWORD pipeState = PIPE_NOWAIT;
-            SetNamedPipeHandleState(GetStdHandle(STD_INPUT_HANDLE), &pipeState, nullptr, nullptr);
+            SetNamedPipeHandleState(m_hConsoleInput, &pipeState, nullptr, nullptr);
+        }
+
+        if (g_isChildProcess)
+        {
+            DWORD bytesRead{};
+
+            if (!ReadFile(m_hConsoleInput, &g_readyEvent, sizeof(HANDLE), &bytesRead, nullptr) || bytesRead != sizeof(HANDLE))
+            {
+                Print("ERROR: Failed to read ready-event handle from input (%08x)\n", GetLastError());
+                return ERROR_OTHER;
+            }
         }
 #else
         // support user locales
@@ -481,6 +479,15 @@ void CServerImpl::MainLoop()
 
         if (m_pModManager->IsFinished())
             m_bRequestedQuit = true;
+
+#ifdef WIN32
+        if (g_readyEvent != nullptr && m_pModManager->IsReadyToAcceptConnections())
+        {
+            SetEvent(g_readyEvent);
+            CloseHandle(g_readyEvent);
+            g_readyEvent = nullptr;
+        }
+#endif
 
         HandlePulseSleep();
     }
@@ -1071,16 +1078,6 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
                 break;
             }
 
-            // Client feedback pointer?
-            #ifdef WIN32
-            case 'c':
-            {
-                m_fClientFeedback = reinterpret_cast<FClientFeedback*>(szArguments[i]);
-                ucNext = 0;
-                break;
-            }
-            #endif
-
             // Nothing we know, proceed
             default:
             {
@@ -1123,13 +1120,16 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
                 {
                     g_bNoCrashHandler = true;
                 }
-
-                #ifdef WIN32
-                else if (strcmp(szArguments[i], "--clientfeedback") == 0)
+#ifdef WIN32
+                else if (!strcmp(szArguments[i], "--child-process"))
                 {
-                    ucNext = 'c';
+                    g_isChildProcess = true;
+                    g_bNoTopBar = true;
+                    g_bNoCurses = true;
+                    std::setbuf(stdout, nullptr);
+                    std::setbuf(stderr, nullptr);
                 }
-                #endif
+#endif
             }
         }
     }

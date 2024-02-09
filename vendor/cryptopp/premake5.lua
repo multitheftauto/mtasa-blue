@@ -126,6 +126,7 @@ project "cryptopp"
 		"oaep.cpp",
 		"osrng.cpp",
 		"padlkrng.cpp",
+		"primetab.cpp",
 		"panama.cpp",
 		"pch.cpp",
 		"pkcspad.cpp",
