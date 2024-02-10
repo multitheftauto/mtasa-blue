@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-30 02:05+0000\n"
-"PO-Revision-Date: 2024-02-10 13:02\n"
+"PO-Revision-Date: 2024-02-10 14:02\n"
 "Last-Translator: \n"
 "Language-Team: Turkish\n"
 "Language: tr_TR\n"
@@ -512,7 +512,7 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "Etrafta Zıplamak"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
@@ -520,7 +520,7 @@ msgstr "Garip şeyler yapmak"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr ""
+msgstr "Etrafta Tırmanmak"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
