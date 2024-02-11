@@ -176,15 +176,15 @@ void CPlayerRPCs::RemotePlayerSwitchWeapon(CClientEntity* pSource, NetBitStreamI
         return;
 
     uint lastSlot, currentSlot;
-    if (bitStream.Read(lastSlot) && bitStream.Read(currentSlot))
-    {
-        CClientPlayer* pPlayer = m_pPlayerManager->Get(pSource->GetID());
-        if (IS_REMOTE_PLAYER(pPlayer))
-        {
-            CLuaArguments Arguments;
-            Arguments.PushNumber(lastSlot);
-            Arguments.PushNumber(currentSlot);
-            pPlayer->CallEvent("onClientPlayerWeaponSwitch", Arguments, true);
-        }
-    }
+    if (!(bitStream.Read(lastSlot) && bitStream.Read(currentSlot)))
+        return;
+
+    CClientPlayer* pPlayer = m_pPlayerManager->Get(pSource->GetID());
+    if (!IS_REMOTE_PLAYER(pPlayer))
+        return;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(lastSlot);
+    Arguments.PushNumber(currentSlot);
+    pPlayer->CallEvent("onClientPlayerWeaponSwitch", Arguments, true);
 }

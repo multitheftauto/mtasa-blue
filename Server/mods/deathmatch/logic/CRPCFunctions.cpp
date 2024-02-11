@@ -189,8 +189,12 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
                 playersInNearList.clear();
 
                 for (const auto& player : nearList)
+                {
                     if (player.first->CanBitStream(eBitStreamVersion::OnPlayerWeaponSwitch_Remote))
+                    {
                         playersInNearList.push_back(player.first);
+                    }
+                }
 
                 if (!playersInNearList.empty())
                 {
