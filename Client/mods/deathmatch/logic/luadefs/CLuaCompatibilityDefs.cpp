@@ -71,6 +71,8 @@ void CLuaCompatibilityDefs::LoadFunctions()
         {"getControlState", CLuaPedDefs::GetPedControlState},
         {"setCameraShakeLevel", ArgumentParserWarn<false, CLuaCameraDefs::SetCameraDrunkLevel>},
         {"getCameraShakeLevel", ArgumentParserWarn<false, CLuaCameraDefs::GetCameraDrunkLevel>},
+        {"base64Encode", CLuaCryptDefs::EncodeString},
+        {"base64Decode", CLuaCryptDefs::DecodeString},
     };
 
     // Add functions

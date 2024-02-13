@@ -13,6 +13,7 @@
 #include "CLuaVehicleDefs.h"
 #include "CLuaPedDefs.h"
 #include "CLuaPlayerDefs.h"
+#include "luadefs/CLuaCryptDefs.h"
 #include "luadefs/CLuaXMLDefs.h"
 #include <lua/CLuaFunctionParser.h>
 
@@ -88,6 +89,10 @@ void CLuaCompatibilityDefs::LoadFunctions()
              lua_pushboolean(luaVM, false);
              return 1;
          }},
+
+        // Base Encoding & Decoding
+        {"base64Encode", CLuaCryptDefs::EncodeString},
+        {"base64Decode", CLuaCryptDefs::DecodeString},
     };
 
     // Add functions
