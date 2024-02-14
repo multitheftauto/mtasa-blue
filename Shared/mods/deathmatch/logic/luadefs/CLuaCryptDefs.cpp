@@ -598,18 +598,13 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
             }
             case StringEncodeFunction::BASE64:
             {
-                SString& variant = options["variant"];
+                const SString variant = options["variant"].ToUpper();
 
-                if (!variant.empty())
+                if (!variant.empty() && variant != "URL")
                 {
-                    variant = variant.ToUpper();
-
-                    if (variant != "URL")
-                    {
-                        m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
-                        lua::Push(luaVM, false);
-                        return 1;
-                    }
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
+                    lua::Push(luaVM, false);
+                    return 1;
                 }
 
                 // Async
@@ -670,18 +665,13 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
             }
             case StringEncodeFunction::BASE32:
             {
-                SString& variant = options["variant"];
+                const SString variant = options["variant"].ToUpper();
 
-                if (!variant.empty())
+                if (!variant.empty() && variant != "HEX")
                 {
-                    variant = variant.ToUpper();
-
-                    if (variant != "HEX")
-                    {
-                        m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
-                        lua::Push(luaVM, false);
-                        return 1;
-                    }
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
+                    lua::Push(luaVM, false);
+                    return 1;
                 }
 
                 // Async
@@ -968,18 +958,13 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
             }
             case StringEncodeFunction::BASE64:
             {
-                SString& variant = options["variant"];
+                const SString variant = options["variant"].ToUpper();
 
-                if (!variant.empty())
+                if (!variant.empty() && variant != "URL")
                 {
-                    variant = variant.ToUpper();
-
-                    if (variant != "URL")
-                    {
-                        m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
-                        lua::Push(luaVM, false);
-                        return 1;
-                    }
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
+                    lua::Push(luaVM, false);
+                    return 1;
                 }
 
                 // Async
@@ -1040,18 +1025,13 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
             }
             case StringEncodeFunction::BASE32:
             {
-                SString& variant = options["variant"];
+                const SString variant = options["variant"].ToUpper();
 
-                if (!variant.empty())
+                if (!variant.empty() && variant != "HEX")
                 {
-                    variant = variant.ToUpper();
-
-                    if (variant != "HEX")
-                    {
-                        m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
-                        lua::Push(luaVM, false);
-                        return 1;
-                    } 
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
+                    lua::Push(luaVM, false);
+                    return 1;
                 }
 
                 // Async
