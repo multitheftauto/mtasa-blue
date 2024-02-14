@@ -408,11 +408,8 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
         argStream.ReadStringMap(options);
     }
 
-    if ((algorithm != StringEncodeFunction::BASE64 && algorithm != StringEncodeFunction::BASE32) || argStream.NextIsFunction())
-    {
-        argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
-        argStream.ReadFunctionComplete();
-    }
+    argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+    argStream.ReadFunctionComplete();
 
     if (!argStream.HasErrors())
     {
@@ -761,11 +758,8 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
         argStream.ReadStringMap(options);
     }
 
-    if ((algorithm != StringEncodeFunction::BASE64 && algorithm != StringEncodeFunction::BASE32) || argStream.NextIsFunction())
-    {
-        argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
-        argStream.ReadFunctionComplete();
-    }
+    argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
+    argStream.ReadFunctionComplete();
 
     if (!argStream.HasErrors())
     {
