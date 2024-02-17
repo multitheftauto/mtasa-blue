@@ -44,7 +44,7 @@ namespace SharedUtil
 
     inline SString Base64decode(const SString& data, const SString& variant = SString())
     {
-        std::string result;
+        SString result;
 
         if (variant == "URL")
         {
@@ -60,7 +60,7 @@ namespace SharedUtil
 
     inline SString Base32encode(const SString& data, const SString& variant = SString())
     {
-        std::string result;
+        SString result;
 
         if (variant == "HEX")
         {
@@ -76,7 +76,7 @@ namespace SharedUtil
 
     inline SString Base32decode(const SString& data, const SString& variant = SString())
     {
-        std::string result;
+        SString result;
 
         if (variant == "HEX")
         {
