@@ -89,10 +89,6 @@ void CLuaCompatibilityDefs::LoadFunctions()
              lua_pushboolean(luaVM, false);
              return 1;
          }},
-
-        // Base Encoding & Decoding
-        {"base64Encode", CLuaCryptDefs::EncodeString},
-        {"base64Decode", CLuaCryptDefs::DecodeString},
     };
 
     // Add functions
