@@ -19,6 +19,12 @@
 #include <cryptopp/md5.h>
 #include "SString.h"
 
+namespace
+{
+    const SString baseURLVariant = "URL";
+    const SString baseHexVariant = "HEX";
+}
+
 namespace SharedUtil
 {
     struct KeyPair
@@ -30,7 +36,7 @@ namespace SharedUtil
     {
         SString result;
 
-        if (variant == "URL")
+        if (variant == baseURLVariant)
         {
             CryptoPP::StringSource ss(data, true, new CryptoPP::Base64URLEncoder(new CryptoPP::StringSink(result), false));
         }
@@ -46,7 +52,7 @@ namespace SharedUtil
     {
         SString result;
 
-        if (variant == "URL")
+        if (variant == baseURLVariant)
         {
             CryptoPP::StringSource ss(data, true, new CryptoPP::Base64URLDecoder(new CryptoPP::StringSink(result)));
         }
@@ -62,7 +68,7 @@ namespace SharedUtil
     {
         SString result;
 
-        if (variant == "HEX")
+        if (variant == baseHexVariant)
         {
             CryptoPP::StringSource ss(data, true, new CryptoPP::Base32HexEncoder(new CryptoPP::StringSink(result), false));
         }
@@ -78,7 +84,7 @@ namespace SharedUtil
     {
         SString result;
 
-        if (variant == "HEX")
+        if (variant == baseHexVariant)
         {
             CryptoPP::StringSource ss(data, true, new CryptoPP::Base32HexDecoder(new CryptoPP::StringSink(result)));
         }
