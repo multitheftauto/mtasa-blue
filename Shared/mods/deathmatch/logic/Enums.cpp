@@ -67,6 +67,8 @@ IMPLEMENT_ENUM_CLASS_BEGIN(StringEncodeFunction)
 ADD_ENUM(StringEncodeFunction::TEA, "tea")
 ADD_ENUM(StringEncodeFunction::AES128, "aes128")
 ADD_ENUM(StringEncodeFunction::RSA, "rsa")
+ADD_ENUM(StringEncodeFunction::BASE64, "base64")
+ADD_ENUM(StringEncodeFunction::BASE32, "base32")
 IMPLEMENT_ENUM_CLASS_END("string-encode-function")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(KeyPairAlgorithm)
