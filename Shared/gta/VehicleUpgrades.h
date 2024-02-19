@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  PURPOSE:     Data file containing nodes positions for default train tracks
+ *  PURPOSE:     Data file containing vehicle upgrades
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
