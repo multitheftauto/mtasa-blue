@@ -381,7 +381,7 @@ unsigned char CStreamingSA::GetUnusedStreamHandle()
     return INVALID_STREAM_ID;
 }
 
-unsigned char CStreamingSA::AddArchive(const char* szFilePath)
+unsigned char CStreamingSA::AddArchive(const wchar_t* szFilePath)
 {
     auto ucArchiveId = GetUnusedArchive();
     if (ucArchiveId == INVALID_ARCHIVE_ID)
@@ -402,7 +402,7 @@ unsigned char CStreamingSA::AddArchive(const char* szFilePath)
 
     // Create new stream handler
     const auto streamCreateFlags = *(DWORD*)0x8E3FE0;
-    HANDLE     hFile = CreateFileA(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+    HANDLE     hFile = CreateFileW(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
                                streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS, NULL);
 
     if (hFile == INVALID_HANDLE_VALUE)
@@ -431,9 +431,14 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 
 bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
+    numBlocks += numBlocks % 2; // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
+    
     // Check if the size is the same already
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
         return true;
+
+    if (ms_pStreamingBuffer[0] == nullptr || ms_pStreamingBuffer[1] == nullptr)
+        return false;
 
     // First of all, allocate the new buffer
     // NOTE: Due to a bug in the `MallocAlign` code the function will just *crash* instead of returning nullptr on alloc. failure :D
@@ -450,10 +455,6 @@ bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 
     // Suspend streaming thread [otherwise data might become corrupted]
     SuspendThread(*phStreamingThread);
-    
-    // Create new buffer
-    if (numBlocks & 1) // Make it be even [Otherwise it can't be split in half properly]
-        numBlocks++;
 
     // Calculate new buffer pointers
     void* const pNewBuff0 = pNewBuffer;

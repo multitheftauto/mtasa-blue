@@ -532,6 +532,14 @@ enum class eBitStreamVersion : unsigned short
     // 2023-08-17
     WorldSpecialProperties,
 
+    // Add "fireballdestruct" to setWorldSpecialPropertyEnabled
+    // 2023-09-09
+    WorldSpecialProperty_FireballDestruct,
+
+    // Send server name to player in CPlayerJoinCompletePacket
+    // 2023-10-12
+    CPlayerJoinCompletePacket_ServerName,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

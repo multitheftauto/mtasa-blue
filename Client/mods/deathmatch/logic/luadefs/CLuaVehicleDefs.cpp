@@ -54,6 +54,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleNameFromModel", GetVehicleNameFromModel},
         {"getVehicleAdjustableProperty", GetVehicleAdjustableProperty},
         {"getHelicopterRotorSpeed", GetHelicopterRotorSpeed},
+        {"getVehicleRotorSpeed", ArgumentParser<GetVehicleRotorSpeed>},
         {"getVehicleEngineState", GetVehicleEngineState},
         {"isTrainDerailed", IsTrainDerailed},
         {"isTrainDerailable", IsTrainDerailable},
@@ -118,6 +119,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleFrozen", SetVehicleFrozen},
         {"setVehicleAdjustableProperty", SetVehicleAdjustableProperty},
         {"setHelicopterRotorSpeed", SetHelicopterRotorSpeed},
+        {"setVehicleRotorSpeed", ArgumentParser<SetVehicleRotorSpeed>},
         {"setTrainDerailed", SetTrainDerailed},
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
@@ -1293,6 +1295,17 @@ int CLuaVehicleDefs::GetHelicopterRotorSpeed(lua_State* luaVM)
     return 1;
 }
 
+std::variant<bool, float> CLuaVehicleDefs::GetVehicleRotorSpeed(CClientVehicle* pVehicle)
+{
+    float fSpeed;
+    if (pVehicle->GetRotorSpeed(fSpeed))
+    {
+        return fSpeed;
+    }
+    else
+        return false;
+}
+
 int CLuaVehicleDefs::IsTrainDerailed(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
@@ -2202,6 +2215,11 @@ int CLuaVehicleDefs::SetHelicopterRotorSpeed(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed)
+{
+    return pVehicle->SetRotorSpeed(fSpeed);
 }
 
 int CLuaVehicleDefs::SetTrainDerailed(lua_State* luaVM)
