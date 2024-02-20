@@ -212,7 +212,7 @@ static const std::unordered_map<unsigned short, UpgradeList> g_upgradesCompatibl
     {609, {1025, 1073, 1074, 1075, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1096, 1097, 1098, 1008, 1009, 1010, 1086, 1087}},
 };
 
-bool isUpgradeCompatibleWithModel(unsigned short model, unsigned short upgrade)
+inline bool IsUpgradeCompatibleWithModel(unsigned short model, unsigned short upgrade)
 {
     if (const auto it = g_upgradesCompatiblityList.find(model); it != g_upgradesCompatiblityList.end())
     {
