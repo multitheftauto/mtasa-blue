@@ -9,8 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-
-#include "VehicleUpgrades.h"
+#include "VehicleUpgrades.hpp"
 
 char szUpgradeNameEmpty[] = "";
 
@@ -51,8 +50,6 @@ bool CVehicleUpgrades::IsUpgrade(unsigned short usModel)
 
 bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 {
-    unsigned short     us = usUpgrade;
-
     eClientVehicleType vehicleType = m_pVehicle->GetVehicleType();
 
     // No upgrades for trains/boats/bike/bmx/heli/plane
@@ -60,12 +57,12 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
         vehicleType == CLIENTVEHICLE_BMX || vehicleType == CLIENTVEHICLE_HELI || vehicleType == CLIENTVEHICLE_PLANE)
         return false;
 
-    bool bReturn = isUpgradeCompatibleWithModel(m_pVehicle->GetModel(), us);
+    bool bReturn = IsUpgradeCompatibleWithModel(m_pVehicle->GetModel(), usUpgrade);
     
     unsigned char ucSlot = 0;
 
     // Allow slot 2 to be upgraded regardless of ID and then check it has the required part
-    if (GetSlotFromUpgrade(us, ucSlot) && (bReturn || ucSlot == 2))
+    if (GetSlotFromUpgrade(usUpgrade, ucSlot) && (bReturn || ucSlot == 2))
     {
         // Get our model supported upgrades
         SVehicleSupportedUpgrades supportedUpgrades = m_pVehicle->GetModelInfo()->GetVehicleSupportedUpgrades();
@@ -77,7 +74,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
             {
                 if (supportedUpgrades.m_bBonnet == true)
                 {
-                    if (us == 1142 || us == 1144)
+                    if (usUpgrade == 1142 || usUpgrade == 1144)
                     {
                         // We add both left and right for some reason seems to be SA doing it
                         bReturn &= supportedUpgrades.m_bBonnet_Left;
@@ -86,7 +83,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
                         bReturn &= supportedUpgrades.m_bBonnet_Right;
                         bReturn &= supportedUpgrades.m_bBonnet_Right_dam;
                     }
-                    else if (us == 1004 || us == 1005 || us == 1011 || us == 1012)
+                    else if (usUpgrade == 1004 || usUpgrade == 1005 || usUpgrade == 1011 || usUpgrade == 1012)
                     {
                         // Just needs m_bBonnet
                         bReturn = true;

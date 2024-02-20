@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 #include "CVehicleUpgrades.h"
-#include "VehicleUpgrades.h"
+#include "VehicleUpgrades.hpp"
 
 char szUpgradeNameEmpty[] = "";
 
@@ -63,7 +63,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
         vehicleType == VEHICLE_BMX || vehicleType == VEHICLE_HELI || vehicleType == VEHICLE_PLANE)
         return false;
 
-    return isUpgradeCompatibleWithModel(m_pVehicle->GetModel(), usUpgrade);
+    return IsUpgradeCompatibleWithModel(m_pVehicle->GetModel(), usUpgrade);
 }
 
 bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSlot)
