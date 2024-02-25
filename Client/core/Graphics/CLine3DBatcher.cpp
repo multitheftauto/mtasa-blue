@@ -79,16 +79,8 @@ void CLine3DBatcher::Flush()
     for (std::vector<SLine3DItem>::iterator iter = m_LineList.begin(); iter != m_LineList.end(); ++iter)
     {
         const SLine3DItem& item = *iter;
-        SColor color = item.ulColor;
 
-        if (m_bPreGUI)
-        {
-            color.R /= 2;
-            color.G /= 2;
-            color.B /= 2;
-        }
-
-        const ulong    ulColor = color;
+        const ulong    ulColor = item.ulColor;
         const float    fWidth = item.fWidth;
         const CVector& vecA = item.vecFrom;
         const CVector& vecB = item.vecTo;
