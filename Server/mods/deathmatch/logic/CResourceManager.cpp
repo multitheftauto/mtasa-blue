@@ -79,18 +79,15 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
     resourcesPathList.push_back("resources");
 
     SString strModPath = g_pServerInterface->GetModManager()->GetModPath();
-    for (uint i = 0; i < resourcesPathList.size(); i++)
+    for (const auto& strResourcesRelPath : resourcesPathList)
     {
         // Enumerate all files and directories
-        SString              strResourcesRelPath = resourcesPathList[i];
         SString              strResourcesAbsPath = PathJoin(strModPath, strResourcesRelPath, "/");
         std::vector<SString> itemList = FindFiles(strResourcesAbsPath, true, true);
 
         // Check each item
-        for (uint i = 0; i < itemList.size(); i++)
+        for (auto& strName : itemList)
         {
-            SString strName = itemList[i];
-
             // Ignore items that start with a dot
             if (strName[0] == '.')
                 continue;
@@ -143,19 +140,17 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
                         assert(!pDup->bIsDir);
                         *pDup = newInfo;
                     }
+                    continue;
                 }
-                else
-                {
-                    // Don't load resource if there are duplicates on different paths
-                    pDup->bPathIssue = true;
-                    pDup->strAbsPathDup = newInfo.strAbsPath;
-                }
+
+                // Don't load resource if there are duplicates on different paths
+                pDup->bPathIssue = true;
+                pDup->strAbsPathDup = newInfo.strAbsPath;
+                continue;
             }
-            else
-            {
-                // No duplicate found
-                MapSet(resInfoMap, strName, newInfo);
-            }
+
+            // No duplicate found
+            MapSet(resInfoMap, strName, newInfo);
         }
     }
 
@@ -166,25 +161,24 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
     marker.Set("UnloadRemoved");
 
     // Process potential resource list
-    for (std::map<SString, SResInfo>::const_iterator iter = resInfoMap.begin(); iter != resInfoMap.end(); ++iter)
+    for (const auto& [first, info] : resInfoMap)
     {
-        const SResInfo& info = iter->second;
         if (!strJustThisResource.empty() && strJustThisResource != info.strName)
             continue;
 
-        if (!info.bPathIssue)
-        {
-            CResource* pResource = GetResource(info.strName);
+        if (info.bPathIssue)
+            continue;
 
-            if (bRefreshAll || !pResource || !pResource->CheckIfStartable())
-            {
-                if (g_pServerInterface->IsRequestingExit())
-                    return false;
+        CResource* pResource = GetResource(info.strName);
 
-                // Add the resource
-                Load(!info.bIsDir, info.strAbsPath, info.strName);
-            }
-        }
+        if (!bRefreshAll && pResource && pResource->CheckIfStartable())
+            continue;
+
+        if (g_pServerInterface->IsRequestingExit())
+            return false;
+
+        // Add the resource
+        Load(!info.bIsDir, info.strAbsPath, info.strName);
     }
 
     marker.Set("AddNew");
@@ -194,9 +188,8 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
     marker.Set("CheckDep");
 
     // Print important errors
-    for (std::map<SString, SResInfo>::const_iterator iter = resInfoMap.begin(); iter != resInfoMap.end(); ++iter)
+    for (const auto& [first,info] : resInfoMap)
     {
-        const SResInfo& info = iter->second;
         if (!strJustThisResource.empty() && strJustThisResource != info.strName)
             continue;
 
@@ -205,15 +198,14 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
             CLogger::ErrorPrintf("Not processing resource '%s' as it has duplicates on different paths:\n", *info.strName);
             CLogger::LogPrintfNoStamp("                  Path #1: \"%s\"\n", *PathJoin(PathMakeRelative(strModPath, info.strAbsPath), info.strName));
             CLogger::LogPrintfNoStamp("                  Path #2: \"%s\"\n", *PathJoin(PathMakeRelative(strModPath, info.strAbsPathDup), info.strName));
+            continue;
         }
-        else
-        {
-            CResource* pResource = GetResource(info.strName);
-            if (pResource && !pResource->CheckIfStartable())
-            {
-                CLogger::ErrorPrintf("Problem with resource: %s; %s\n", *info.strName, pResource->GetFailureReason().c_str());
-            }
-        }
+
+        CResource* pResource = GetResource(info.strName);
+        if (!pResource || pResource->CheckIfStartable())
+            continue;
+
+        CLogger::ErrorPrintf("Problem with resource: %s; %s\n", *info.strName, pResource->GetFailureReason().c_str());
     }
 
     marker.Set("CheckErrors");
@@ -246,12 +238,11 @@ void CResourceManager::UpgradeResources(CResource* pResource)
     if (pResource)
     {
         pResource->ApplyUpgradeModifications();
+        return;
     }
-    else
-    {
-        for (list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); iter++)
-            (*iter)->ApplyUpgradeModifications();
-    }
+
+    for (const auto& pResource : m_resources)
+        pResource->ApplyUpgradeModifications();
 }
 
 void CResourceManager::CheckResources(CResource* pResource)
@@ -260,12 +251,11 @@ void CResourceManager::CheckResources(CResource* pResource)
     if (pResource)
     {
         pResource->LogUpgradeWarnings();
+        return;
     }
-    else
-    {
-        for (list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); iter++)
-            (*iter)->LogUpgradeWarnings();
-    }
+
+    for (const auto& pResource : m_resources)
+        pResource->LogUpgradeWarnings();
 }
 
 void CResourceManager::OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState) const
@@ -300,16 +290,11 @@ void CResourceManager::CheckResourceDependencies()
 {
     m_uiResourceLoadedCount = 0;
     m_uiResourceFailedCount = 0;
-    list<CResource*>::const_iterator iter = m_resources.begin();
-    for (; iter != m_resources.end(); iter++)
+    for (const auto& pResource : m_resources)
     {
-        (*iter)->LinkToIncludedResources();
-    }
+        pResource->LinkToIncludedResources();
 
-    iter = m_resources.begin();
-    for (; iter != m_resources.end(); iter++)
-    {
-        if ((*iter)->CheckIfStartable())
+        if (pResource->CheckIfStartable())
             m_uiResourceLoadedCount++;
         else
             m_uiResourceFailedCount++;
@@ -318,37 +303,34 @@ void CResourceManager::CheckResourceDependencies()
 
 void CResourceManager::ListResourcesLoaded(const SString& strListType)
 {
-    unsigned int uiCount = 0;
-    unsigned int uiFailedCount = 0;
-    unsigned int uiRunningCount = 0;
+    std::uint32_t uiCount = 0;
+    std::uint32_t uiFailedCount = 0;
+    std::uint32_t uiRunningCount = 0;
     CLogger::LogPrintf("== Resource list ==\n");
-    list<CResource*>::const_iterator iter = m_resources.begin();
-    for (; iter != m_resources.end(); iter++)
-    {
-        CResource* res = (*iter);
-        if (res->IsLoaded())
-        {
-            if (res->IsActive())
-            {
-                if (strListType == "running" || strListType == "all")
-                    CLogger::LogPrintf("%-20.20s   RUNNING   (%d dependents)\n", res->GetName().c_str(), res->GetDependentCount());
 
-                uiRunningCount++;
-            }
-            else
-            {
-                if (strListType == "stopped" || strListType == "all")
-                    CLogger::LogPrintf("%-20.20s   STOPPED   (%d files)\n", res->GetName().c_str(), res->GetFileCount());
-            }
-            uiCount++;
-        }
-        else
+    for (const auto& res : m_resources)
+    {
+        if (!res->IsLoaded())
         {
             if (strListType == "failed" || strListType == "all")
                 CLogger::LogPrintf("%-20.20s   FAILED    (see info command for reason)\n", res->GetName().c_str());
 
             uiFailedCount++;
+            continue;
         }
+        if (res->IsActive())
+        {
+            if (strListType == "running" || strListType == "all")
+                CLogger::LogPrintf("%-20.20s   RUNNING   (%d dependents)\n", res->GetName().c_str(), res->GetDependentCount());
+
+            uiRunningCount++;
+        }
+        else
+        {
+            if (strListType == "stopped" || strListType == "all")
+                CLogger::LogPrintf("%-20.20s   STOPPED   (%d files)\n", res->GetName().c_str(), res->GetFileCount());
+        }
+        uiCount++;
     }
     CLogger::LogPrintf("Resources: %d loaded, %d failed, %d running\n", uiCount, uiFailedCount, uiRunningCount);
 }
@@ -360,7 +342,7 @@ void CResourceManager::UnloadRemovedResources()
     // the 'm_resources' member variable while we iterate over it
     std::list<CResource*> resourcesToDelete;
 
-    for (CResource* pResource : m_resources)
+    for (const auto& pResource : m_resources)
     {
         if (!pResource->HasGoneAway())
             continue;
@@ -438,19 +420,18 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
     if (!pLoadedResource->IsLoaded())
     {
         CLogger::LogPrintf("Loading of resource '%s' failed\n", szResourceName);
+        return pLoadedResource;
     }
-    else
-    {
-        // Don't log new resources during server startup
-        if (g_pGame->IsServerFullyUp())
-        {
-            if (!bPreviouslyLoaded)
-                OnResourceLoadStateChange(pLoadedResource, nullptr, "loaded");
-            else
-                OnResourceLoadStateChange(pLoadedResource, "loaded", "loaded");
 
-            CLogger::LogPrintf("New resource '%s' loaded\n", pLoadedResource->GetName().c_str());
-        }
+    // Don't log new resources during server startup
+    if (g_pGame->IsServerFullyUp())
+    {
+        if (!bPreviouslyLoaded)
+            OnResourceLoadStateChange(pLoadedResource, nullptr, "loaded");
+        else
+            OnResourceLoadStateChange(pLoadedResource, "loaded", "loaded");
+
+        CLogger::LogPrintf("New resource '%s' loaded\n", pLoadedResource->GetName().c_str());
     }
 
     return pLoadedResource;
@@ -458,15 +439,13 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
 
 CResource* CResourceManager::GetResource(const char* szResourceName)
 {
-    CResource** ppResource = MapFind(m_NameResourceMap, SStringX(szResourceName).ToUpper());
-    if (ppResource)
-        return *ppResource;
-    return NULL;
+    auto pResource = MapFind(m_NameResourceMap, SStringX(szResourceName).ToUpper());
+    return pResource ? *pResource : nullptr;
 }
 
 CResource* CResourceManager::GetResourceFromScriptID(uint uiScriptID)
 {
-    CResource* pResource = (CResource*)CIdArray::FindEntry(uiScriptID, EIdClass::RESOURCE);
+    auto pResource = (CResource*)CIdArray::FindEntry(uiScriptID, EIdClass::RESOURCE);
     dassert(!pResource || ListContains(m_resources, pResource));
     return pResource;
 }
@@ -488,12 +467,12 @@ unsigned short CResourceManager::GenerateID()
         return m_usNextNetId;
 
     // Find an unused ID
-    for (unsigned short i = 0; i < 0xFFFE; i++)
+    for (auto i = 0; i < 0xFFFE; i++)
     {
         bool bFound = false;
-        for (list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); iter++)
+        for (const auto& pResource : m_resources)
         {
-            if ((*iter)->GetNetID() == m_usNextNetId)
+            if (pResource->GetNetID() == m_usNextNetId)
             {
                 bFound = true;
                 break;
@@ -514,32 +493,30 @@ unsigned short CResourceManager::GenerateID()
 
 CResource* CResourceManager::GetResourceFromNetID(unsigned short usNetID)
 {
-    CResource* pResource = MapFindRef(m_NetIdResourceMap, usNetID);
+    auto pResource = MapFindRef(m_NetIdResourceMap, usNetID);
     if (pResource)
     {
         assert(pResource->GetNetID() == usNetID);
         return pResource;
     }
 
-    list<CResource*>::const_iterator iter = m_resources.begin();
-    for (; iter != m_resources.end(); iter++)
+    for (const auto& pResource : m_resources)
     {
-        if ((*iter)->GetNetID() == usNetID)
+        if (pResource->GetNetID() == usNetID)
         {
             assert(0);            // Should be in map
-            return (*iter);
+            return pResource;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void CResourceManager::OnPlayerJoin(CPlayer& Player)
 {
     // Loop through our started resources so they start in the correct order clientside
-    list<CResource*>::iterator iter = CResource::m_StartedResources.begin();
-    for (; iter != CResource::m_StartedResources.end(); iter++)
+    for (const auto& pResource : CResource::m_StartedResources)
     {
-        (*iter)->OnPlayerJoin(Player);
+        pResource->OnPlayerJoin(Player);
     }
 }
 
@@ -611,51 +588,44 @@ CResource* CResourceManager::GetResourceFromLuaState(lua_State* luaVM)
     luaVM = lua_getmainstate(luaVM);
 
     // Use lookup map
-    CResource** ppResource = MapFind(m_LuaStateResourceMap, luaVM);
-    if (ppResource)
-    {
-        CResource* pResource = *ppResource;
-        CLuaMain*  pLuaMain = pResource->GetVirtualMachine();
-        if (pLuaMain)
-        {
-            assert(luaVM == pLuaMain->GetVirtualMachine());
-            return pResource;
-        }
-    }
-    return NULL;
+    auto ppResource = MapFind(m_LuaStateResourceMap, luaVM);
+    if (!ppResource)
+        return nullptr;
+
+    CResource* pResource = *ppResource;
+    CLuaMain*  pLuaMain = pResource->GetVirtualMachine();
+    if (!pLuaMain)
+        return nullptr;
+
+    assert(luaVM == pLuaMain->GetVirtualMachine());
+    return pResource;
 }
 
 SString CResourceManager::GetResourceName(lua_State* luaVM)
 {
     CResource* pResource = GetResourceFromLuaState(luaVM);
-    if (pResource)
-        return pResource->GetName();
-    return "";
+    return pResource ? pResource->GetName() : "";
 }
 
 bool CResourceManager::IsAResourceElement(CElement* pElement)
 {
-    list<CResource*>::const_iterator iter = m_resources.begin();
-    for (; iter != m_resources.end(); iter++)
+    for (const auto& pResource : m_resources)
     {
-        CResource* pResource = *iter;
-        if (pResource->IsActive())
+        if (!pResource->IsActive())
+            continue;
+
+        if (pResource->GetResourceRootElement() == pElement || pResource->GetDynamicElementRoot() == pElement)
+            return true;
+
+        std::list<CResourceFile*>::iterator fiter = pResource->IterBegin();
+        for (; fiter != pResource->IterEnd(); fiter++)
         {
-            if (pResource->GetResourceRootElement() == pElement || pResource->GetDynamicElementRoot() == pElement)
+            if ((*fiter)->GetType() != CResourceFile::RESOURCE_FILE_TYPE_MAP)
+                continue;
+
+            CResourceMapItem* pMap = static_cast<CResourceMapItem*>(*fiter);
+            if (pMap->GetMapRootElement() == pElement)
                 return true;
-            else
-            {
-                list<CResourceFile*>::iterator fiter = pResource->IterBegin();
-                for (; fiter != pResource->IterEnd(); fiter++)
-                {
-                    if ((*fiter)->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP)
-                    {
-                        CResourceMapItem* pMap = static_cast<CResourceMapItem*>(*fiter);
-                        if (pMap->GetMapRootElement() == pElement)
-                            return true;
-                    }
-                }
-            }
         }
     }
     return false;
@@ -704,7 +674,7 @@ bool CResourceManager::Reload(CResource* pResource)
         return false;
     }
 
-    // Call the onResourceStateChange event
+    // Call the onResourceLoadStateChange event
     OnResourceLoadStateChange(pResource, "loaded", "loaded");
 
     // Success
@@ -717,19 +687,17 @@ bool CResourceManager::StopAllResources()
     CLogger::LogPrint("Stopping resources...");
     CLogger::ProgressDotsBegin();
 
-    list<CResource*>::const_iterator iter = m_resources.begin();
-    for (; iter != m_resources.end(); iter++)
+    for (const auto& pResource : m_resources)
     {
-        CResource* pResource = *iter;
-        if (pResource->IsActive())
-        {
-            if (pResource->IsPersistent())
-                pResource->SetPersistent(false);
+        if (!pResource->IsActive())
+            continue;
 
-            pResource->Stop(true);
+        if (pResource->IsPersistent())
+            pResource->SetPersistent(false);
 
-            CLogger::ProgressDotsUpdate();
-        }
+        pResource->Stop(true);
+
+        CLogger::ProgressDotsUpdate();
     }
 
     CLogger::ProgressDotsEnd();
@@ -878,17 +846,17 @@ CResource* CResourceManager::CreateResource(const SString& strNewResourceName, c
     SString strRelResourceLocation = PathJoin(strNewOrganizationalPath, strNewResourceName);
 
     // Does the resource name already exist?
-    if (GetResource(strNewResourceName) != NULL)
+    if (GetResource(strNewResourceName))
     {
         strOutStatus = SString("CreateResource - Could not create '%s' as the resource already exists\n", *strNewResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Is it a valid path?
     if (!IsValidFilePath(strRelResourceLocation) || !IsValidOrganizationPath(strNewOrganizationalPath))
     {
         strOutStatus = SString("CreateResource - Could not create '%s' as the provided path is invalid", *strNewResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Create destination folder
@@ -900,23 +868,20 @@ CResource* CResourceManager::CreateResource(const SString& strNewResourceName, c
     if (!pXML)
     {
         strOutStatus = SString("CreateResource - Could not create '%s'\n", *strMetaPath);
-        return NULL;
+        return nullptr;
     }
-    else
+    // If we got the rootnode created, write the XML
+    pXML->CreateRootNode("meta");
+    if (!pXML->Write())
     {
-        // If we got the rootnode created, write the XML
-        pXML->CreateRootNode("meta");
-        if (!pXML->Write())
-        {
-            delete pXML;
-            strOutStatus = SString("CreateResource - Could not save '%s'\n", *strMetaPath);
-            return NULL;
-        }
-
-        // Delete the XML
         delete pXML;
-        pXML = NULL;
+        strOutStatus = SString("CreateResource - Could not save '%s'\n", *strMetaPath);
+        return nullptr;
     }
+
+    // Delete the XML
+    delete pXML;
+    pXML = nullptr;
 
     // Add the resource and load it
     CResource* pResource = new CResource(this, false, strDstAbsPath, strNewResourceName);
@@ -950,28 +915,28 @@ CResource* CResourceManager::CopyResource(CResource* pSourceResource, const SStr
     if (!pSourceResource->IsLoaded())
     {
         strOutStatus = SString("Could not copy '%s' as the resource is not loaded\n", *strSrcResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Does the resource name already exist?
-    if (GetResource(strNewResourceName) != NULL)
+    if (GetResource(strNewResourceName))
     {
         strOutStatus = SString("Could not copy '%s' as the resource '%s' already exists\n", *strSrcResourceName, *strNewResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Does the destination directory already exist?
     if (FileExists(strDstResourceLocation) || DirectoryExists(strDstResourceLocation))
     {
         strOutStatus = SString("Could not copy '%s' as the file/directory '%s' already exists\n", *strSrcResourceName, *strNewResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Is it a valid path?
     if (!IsValidFilePath(strRelResourceLocation) || !IsValidOrganizationPath(strDstOrganizationalPath))
     {
         strOutStatus = SString("Could not copy '%s' as the provided path is invalid", *strSrcResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Clear temp directory
@@ -995,7 +960,7 @@ CResource* CResourceManager::CopyResource(CResource* pSourceResource, const SStr
         if (!FileCopy(strSrcFileName, strDstFileName))
         {
             strOutStatus = SString("Could not copy '%s' to '%s'\n", *strSrcFileName, *strDstFileName);
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -1013,7 +978,7 @@ CResource* CResourceManager::CopyResource(CResource* pSourceResource, const SStr
         if (!FileCopy(strSrcFileName, strDstFileName))
         {
             strOutStatus = SString("Could not copy '%s' to '%s'\n", *strSrcFileName, *strDstFileName);
-            return NULL;
+            return nullptr;
         }
     }
 
@@ -1022,7 +987,7 @@ CResource* CResourceManager::CopyResource(CResource* pSourceResource, const SStr
     if (!FileRename(strDstTemp, strDstResourceLocation))
     {
         strOutStatus = SString("Could not rename '%s' to '%s'\n", *strDstTemp, *strDstResourceLocation);
-        return NULL;
+        return nullptr;
     }
 
     // Add the resource and load it
@@ -1062,28 +1027,28 @@ CResource* CResourceManager::RenameResource(CResource* pSourceResource, const SS
     if (pSourceResource->IsActive())
     {
         strOutStatus = SString("Could not rename '%s' as the resource is running\n", *strSrcResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Is the source resource loaded
     if (!pSourceResource->IsLoaded())
     {
         strOutStatus = SString("Could not rename '%s' as the resource is not loaded\n", *strSrcResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Does the destination already exist?
     if (FileExists(strDstResourceLocation) || DirectoryExists(strDstResourceLocation))
     {
         strOutStatus = SString("Could not rename to '%s' as the file/directory name already exists\n", *strNewResourceName);
-        return NULL;
+        return nullptr;
     }
 
     // Is it a valid path?
     if (!IsValidFilePath(strRelResourceLocation) || !IsValidOrganizationPath(strDstOrganizationalPath))
     {
         strOutStatus = SString("Could not rename to '%s' as the provided path is invalid", *strNewResourceName);
-        return NULL;
+        return nullptr;
     }
 
     UnloadAndDelete(pSourceResource);
@@ -1277,9 +1242,9 @@ void CResourceManager::ReevaluateMinClientRequirement()
 {
     // Calc highest requirement
     m_strMinClientRequirement = "";
-    for (auto iter = m_MinClientRequirementMap.begin(); iter != m_MinClientRequirementMap.end(); ++iter)
-        if (iter->second > m_strMinClientRequirement)
-            m_strMinClientRequirement = iter->second;
+    for (const auto& [first,requirement] : m_MinClientRequirementMap)
+        if (requirement > m_strMinClientRequirement)
+            m_strMinClientRequirement = requirement;
 
     g_pGame->CalculateMinClientRequirement();
 }
@@ -1324,15 +1289,15 @@ void CResourceManager::RemoveSyncMapElementDataOption(CResource* pResource)
 void CResourceManager::ReevaluateSyncMapElementDataOption()
 {
     bool bSyncMapElementData = true;
-    for (CFastHashMap<CResource*, bool>::iterator iter = m_SyncMapElementDataOptionMap.begin(); iter != m_SyncMapElementDataOptionMap.end(); ++iter)
+    for (const auto& pDataOption : m_SyncMapElementDataOptionMap)
     {
-        if (iter->second)
+        if (pDataOption.second)
         {
             bSyncMapElementData = true;            // Any 'true' will stop the set
             break;
         }
-        else
-            bSyncMapElementData = false;            // Need at least one 'false' to set
+
+        bSyncMapElementData = false;            // Need at least one 'false' to set
     }
 
     // Apply
@@ -1365,11 +1330,10 @@ void CResourceManager::LoadBlockedFileReasons()
     if (result->nRows > 0 && result->nColumns >= 2)
     {
         m_BlockedFileReasonMap.clear();
-        for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+        for (const auto& row : *result.operator->()) // thank CAutoRefedPointer for that
         {
-            const CRegistryResultRow& row = *iter;
-            SString                   strFileHash = (const char*)row[0].pVal;
-            SString                   strReason = (const char*)row[1].pVal;
+            SString strFileHash = (const char*)row[0].pVal;
+            SString strReason = (const char*)row[1].pVal;
             MapSet(m_BlockedFileReasonMap, strFileHash, strReason);
         }
     }
@@ -1395,10 +1359,11 @@ void CResourceManager::SaveBlockedFileReasons()
     pDatabaseManager->Execf(hDbConnection, "DROP TABLE " BLOCKED_DB_TABLE_NAME);
     pDatabaseManager->Execf(hDbConnection, "CREATE TABLE IF NOT EXISTS " BLOCKED_DB_TABLE_NAME " (`hash` TEXT,`reason` TEXT)");
 
-    for (std::map<SString, SString>::iterator iter = m_BlockedFileReasonMap.begin(); iter != m_BlockedFileReasonMap.end(); iter++)
+    for (const auto& [hash,reason] : m_BlockedFileReasonMap)
     {
-        pDatabaseManager->Execf(hDbConnection, "INSERT INTO " BLOCKED_DB_TABLE_NAME " (`hash`,`reason`) VALUES (?,?)", SQLITE_TEXT, *iter->first, SQLITE_TEXT,
-                                *iter->second);
+        pDatabaseManager->Execf(hDbConnection,
+            "INSERT INTO " BLOCKED_DB_TABLE_NAME " (`hash`,`reason`) VALUES (?,?)",
+            SQLITE_TEXT, *hash, SQLITE_TEXT, *reason);
     }
     pDatabaseManager->Disconnect(hDbConnection);
 }
@@ -1442,8 +1407,5 @@ void CResourceManager::AddBlockedFileReason(const SString& strFileHash, const SS
 SString CResourceManager::GetBlockedFileReason(const SString& strFileHash)
 {
     SString* pstrReason = MapFind(m_BlockedFileReasonMap, strFileHash);
-    if (pstrReason)
-        return *pstrReason;
-
-    return "";
+    return pstrReason ? *pstrReason : "";
 }
