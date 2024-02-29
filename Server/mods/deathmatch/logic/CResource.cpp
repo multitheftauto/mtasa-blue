@@ -1025,6 +1025,9 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
 void CResource::OnResourceStateChange(const char* state) noexcept
 {
+    if (!m_pResourceElement)
+        return;
+
     CLuaArguments stateArgs;
     stateArgs.PushResource(this);
     switch (m_eState)
@@ -1047,6 +1050,7 @@ void CResource::OnResourceStateChange(const char* state) noexcept
             break;
     }
     stateArgs.PushString(state);
+
     m_pResourceElement->CallEvent("onResourceStateChange", stateArgs);
 }
 
