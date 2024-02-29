@@ -146,6 +146,10 @@ namespace
 
         // Ped jetpacks
         //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+
+        // Base Encoding & Decoding
+        {false, "base64Encode", "encodeString"},
+        {false, "base64Decode", "decodeString"}
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -244,5 +248,9 @@ namespace
 
         // Old Discord implementation (see #2499)
         {true, "setPlayerDiscordJoinParams", "See GitHub PR #2499 for more details"},
+
+        // Base Encoding & Decoding
+        {false, "base64Encode", "encodeString"},
+        {false, "base64Decode", "decodeString"}
     };
 }            // namespace
