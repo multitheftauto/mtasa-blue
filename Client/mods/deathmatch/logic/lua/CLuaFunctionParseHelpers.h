@@ -270,6 +270,10 @@ inline SString GetClassTypeName(CClientIMG*)
 {
     return "img";
 }
+inline SString GetClassTypeName(CClientBuilding*)
+{
+    return "building";
+}
 inline SString GetClassTypeName(CClientSound*)
 {
     return "sound";

@@ -66,8 +66,6 @@ project "Dbconmy"
 		links { "../../vendor/mysql/lib/x64/libmysql.lib" }
 	filter { "system:windows", "platforms:x86" }
 		links { "../../vendor/mysql/lib/x86/libmysql.lib" }
-	filter { "system:windows", "platforms:arm" }
-		links { "../../vendor/mysql/lib/arm/libmysql.lib" }
 	filter { "system:windows", "platforms:arm64" }
 		links { "../../vendor/mysql/lib/arm64/libmysql.lib" }
 

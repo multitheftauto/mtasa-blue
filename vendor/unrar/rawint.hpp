@@ -43,7 +43,7 @@ inline void RawPut2(uint Field,void *Data)
 }
 
 
-inline void RawPut4(uint32 Field,void *Data)
+inline void RawPut4(uint Field,void *Data)
 {
 #if defined(BIG_ENDIAN) || !defined(ALLOW_MISALIGNED)
   byte *D=(byte *)Data;
@@ -52,7 +52,7 @@ inline void RawPut4(uint32 Field,void *Data)
   D[2]=(byte)(Field>>16);
   D[3]=(byte)(Field>>24);
 #else
-  *(uint32 *)Data=Field;
+  *(uint32 *)Data=(uint32)Field;
 #endif
 }
 
@@ -107,12 +107,12 @@ inline uint64 RawGetBE8(const byte *m)
 
 
 // Save integer to memory as big endian.
-inline void RawPutBE4(uint32 i,byte *mem)
+inline void RawPutBE4(uint i,byte *mem)
 {
 #if defined(USE_MEM_BYTESWAP) && defined(_MSC_VER)
-  *(uint32*)mem = _byteswap_ulong(i);
+  *(uint32*)mem = _byteswap_ulong((uint32)i);
 #elif defined(USE_MEM_BYTESWAP) && (defined(__clang__) || defined(__GNUC__))
-  *(uint32*)mem = __builtin_bswap32(i);
+  *(uint32*)mem = __builtin_bswap32((uint32)i);
 #else
   mem[0]=byte(i>>24);
   mem[1]=byte(i>>16);

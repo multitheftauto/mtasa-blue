@@ -71,12 +71,12 @@ void RarTime::SetLocal(RarLocalTime *lt)
 {
 #ifdef _WIN_ALL
   SYSTEMTIME st;
-  st.wYear=lt->Year;
-  st.wMonth=lt->Month;
-  st.wDay=lt->Day;
-  st.wHour=lt->Hour;
-  st.wMinute=lt->Minute;
-  st.wSecond=lt->Second;
+  st.wYear=(WORD)lt->Year;
+  st.wMonth=(WORD)lt->Month;
+  st.wDay=(WORD)lt->Day;
+  st.wHour=(WORD)lt->Hour;
+  st.wMinute=(WORD)lt->Minute;
+  st.wSecond=(WORD)lt->Second;
   st.wMilliseconds=0;
   st.wDayOfWeek=0;
   FILETIME lft;
@@ -325,14 +325,14 @@ void RarTime::Adjust(int64 ns)
 
 
 #ifndef SFX_MODULE
-const wchar *GetMonthName(int Month)
+const wchar *GetMonthName(uint Month)
 {
   return uiGetMonthName(Month);
 }
 #endif
 
 
-bool IsLeapYear(int Year)
+bool IsLeapYear(uint Year)
 {
   return (Year&3)==0 && (Year%100!=0 || Year%400==0);
 }

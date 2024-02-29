@@ -1,59 +1,43 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CServer.h
  *  PURPOSE:     Header for server class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #pragma once
 
-#include "CDynamicLibrary.h"
-#include <list>
-#include <string>
-
-class CServer
+class CServer final
 {
 public:
-    CServer();
-    ~CServer();
+    ~CServer() { Stop(); }
 
-    void DoPulse();
+    bool Start(const char* configFileName);
 
-    bool Start(const char* szConfig);
-    bool Stop();
-    bool IsStarted();
-    bool IsRunning() { return m_pLibrary != NULL; };
-    bool IsReady() { return m_bIsReady; };
+    void Stop(bool graceful = true);
 
-    int GetLastError() { return m_iLastError; };
+    void Pulse();
 
-    bool Send(const char* szString);
+    bool IsRunning() const noexcept { return m_isRunning; }
 
-    const std::string& GetPassword() { return m_strPassword; };
-    void               SetPassword(const char* szPassword) { m_strPassword = szPassword; };
+    bool IsReady() const noexcept { return m_isRunning && m_isAcceptingConnections; }
+
+    void SetPassword(const char* password) { m_password = password; }
+
+    const std::string& GetPassword() const noexcept { return m_password; }
 
 private:
-    static DWORD WINAPI Thread_EntryPoint(LPVOID pThis);
-    unsigned long       Thread_Run();
-
-    bool   m_bIsReady;
-    HANDLE m_hThread;
-    CDynamicLibrary* volatile m_pLibrary;
-    CCriticalSection m_CriticalSection;
-    SString          m_strServerRoot;
-    SString          m_strDLLFile;
-    SString          m_strConfig;
-
-    int m_iLastError;
-
-    std::string m_strPassword;
-
-    static CCriticalSection       m_OutputCC;
-    static std::list<std::string> m_OutputQueue;
-
-    static void AddServerOutput(const char* szOutput);
+    bool        m_isRunning{};
+    bool        m_isAcceptingConnections{};
+    HANDLE      m_job{};
+    HANDLE      m_readyEvent{};
+    HANDLE      m_process{};
+    DWORD       m_processId{};
+    HANDLE      m_stdout{};
+    HANDLE      m_stdin{};
+    std::string m_password;
 };
