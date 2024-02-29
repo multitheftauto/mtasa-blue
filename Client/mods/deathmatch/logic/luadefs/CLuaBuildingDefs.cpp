@@ -15,6 +15,8 @@ void CLuaBuildingDefs::LoadFunctions()
     // Backwards compatibility functions
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createBuilding", ArgumentParser<CreateBuilding>},
+        {"removeAllGameBuildings", ArgumentParser<RemoveAllGameBuildings>},
+        {"restoreAllGameBuildings", ArgumentParser<RestoreGameBuildings>},
     };
 
     // Add functions
@@ -43,7 +45,7 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (!CClientBuildingManager::IsValidModel(modelId))
         throw std::invalid_argument("Invalid building model id");
 
-    if (!g_pGame->GetPools()->HasFreeBuildingSlot())
+    if (!g_pGame->GetPools()->GetBuildingsPool().HasFreeBuildingSlot())
         throw std::invalid_argument("No free slot in buildings pool");
 
     if (!CClientBuildingManager::IsValidPosition(pos))
@@ -57,4 +59,14 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     pBuilding->SetParent(pRoot);
 
     return pBuilding;
+}
+
+void CLuaBuildingDefs::RemoveAllGameBuildings()
+{
+    g_pGame->RemoveAllBuildings();
+}
+
+void CLuaBuildingDefs::RestoreGameBuildings()
+{
+    g_pGame->RestoreGameBuildings();
 }

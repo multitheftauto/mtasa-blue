@@ -1,0 +1,33 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CIplStore.h
+ *  PURPOSE:     IPL store class
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#pragma once
+
+#include "CIplSA.h"
+#include "CPoolsSA.h"
+#include <game/CIplStore.h>
+
+class CIplStoreSA : public CIplStore
+{
+public:
+    CIplStoreSA();
+    ~CIplStoreSA() = default;
+
+    void SetDynamicIplStreamingEnabled(bool state);
+
+private:
+    void UnloadAndDisableStreaming(int iplId);
+
+private:
+    CPoolSAInterface<CIplSAInterface>** m_ppIplPoolInterface;
+
+    bool m_isStreamingEnbabled;
+};
