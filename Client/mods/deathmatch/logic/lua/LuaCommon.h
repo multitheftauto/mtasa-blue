@@ -38,6 +38,7 @@ class CClientRadarMarker;
 class CClientTeam;
 class CClientTXD;
 class CClientIMG;
+class CClientBuilding;
 class CClientVehicle;
 class CClientWater;
 class CClientWeapon;
