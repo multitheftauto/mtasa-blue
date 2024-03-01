@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-15 22:30+0000\n"
-"PO-Revision-Date: 2024-03-01 02:50\n"
+"PO-Revision-Date: 2024-03-01 03:50\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -1208,7 +1208,7 @@ msgstr "控制台"
 #: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
 #: Client/core/CCore.cpp:674 Client/mods/deathmatch/logic/CClientGame.cpp:527
 msgid "Main menu"
-msgstr ""
+msgstr "主菜单"
 
 #: Client/core/CMainMenu.cpp:333
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
@@ -1217,8 +1217,8 @@ msgstr "您当前正在使用一个分支版本的客户端！测试版本的客
 #: Client/core/CMainMenu.cpp:352
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr "MTA 在2019年7月份之后 不再更新XP/Vista版本\n"
-"更新Windows 来玩服务器"
+msgstr "MTA将在2019年7月之后不再支持XP/Vista。\n\n"
+"升级Windows以在最新服务器上进入游戏。"
 
 #: Client/core/CMainMenu.cpp:1193
 msgid "This will disconnect you from the current server.\n\n"
@@ -1371,11 +1371,11 @@ msgstr "允许外部声音"
 
 #: Client/core/CSettings.cpp:386
 msgid "Always show download window"
-msgstr "总是显示下载窗口"
+msgstr "始终显示下载窗口"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "允许通过Discord Rich Presence连接"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
@@ -1463,7 +1463,7 @@ msgstr "静音选项"
 
 #: Client/core/CSettings.cpp:579
 msgid "Mute All sounds when minimized"
-msgstr "当MTA最小化时关闭声音"
+msgstr "最小化时静音所有声音"
 
 #: Client/core/CSettings.cpp:584
 msgid "Mute Radio sounds when minimized"
@@ -1522,7 +1522,7 @@ msgstr "窗口模式"
 
 #: Client/core/CSettings.cpp:642
 msgid "DPI aware"
-msgstr "DPI 感知"
+msgstr "DPI感知"
 
 #: Client/core/CSettings.cpp:657 Client/core/CSettings.cpp:1601
 msgid "Standard"
@@ -1612,11 +1612,11 @@ msgstr "轮胎烟雾等"
 
 #: Client/core/CSettings.cpp:816
 msgid "Dynamic ped shadows"
-msgstr ""
+msgstr "动态行人阴影"
 
 #: Client/core/CSettings.cpp:820
 msgid "Motion blur"
-msgstr ""
+msgstr "动态模糊"
 
 #: Client/core/CSettings.cpp:825
 msgid "Full Screen Minimize"
@@ -1640,7 +1640,7 @@ msgstr "总是以高细节渲染人物"
 
 #: Client/core/CSettings.cpp:869
 msgid "Corona rain reflections"
-msgstr ""
+msgstr "光晕雨反射"
 
 #: Client/core/CSettings.cpp:898
 msgid "Enable remote websites"
@@ -1832,7 +1832,7 @@ msgstr "当你退出本服务器时有些设置将会改变"
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
-"要断开服务器连接？"
+"现在想要断开连接吗？"
 
 #: Client/core/CSettings.cpp:1398
 msgid "DISCONNECT REQUIRED"
@@ -2027,7 +2027,7 @@ msgstr "你的昵称包含非法字符!"
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 msgid "In-game"
-msgstr ""
+msgstr "游戏中"
 
 #: Client/core/CSettings.cpp:3760
 msgid "Red:"
@@ -2085,8 +2085,8 @@ msgstr "屏幕上传信息"
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
-msgstr "某些脚本可能会播放来自 网络上 的声音，例如电台。\n\n"
-"禁用此设置会减少相应的网络流量消耗。\n"
+msgstr "某些脚本可能会从互联网播放声音，如电台等。\n\n"
+"禁用此设置可能会减少网络占用。\n"
 
 #: Client/core/CSettings.cpp:4508
 msgid "EXTERNAL SOUNDS"
@@ -2096,11 +2096,13 @@ msgstr "外部声音"
 msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
-msgstr ""
+msgstr "你似乎已启用了Rich Presence连接选项。\n"
+"你想允许服务器共享它们的数据吗？\n\n"
+"这包括你的唯一ID标识符。"
 
 #: Client/core/CSettings.cpp:4542
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
+msgstr "同意数据共享"
 
 #: Client/core/CSettings.cpp:4566
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -2117,14 +2119,14 @@ msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr "启用 DPI 感知是一项实验性功能，并且\n"
-"我们只推荐您在缩放显示器上玩 MTA:SA 时使用它。\n"
-"如果启用此选项，可能将会遇到图形问题。\n\n"
+msgstr "启用DPI感知是一个实验性功能，\n"
+"我们只建议在缩放的显示器上播放MTA:SA时使用。\n"
+"如果启用此选项，你可能会遇到图形问题。\n\n"
 "你确定要启用此选项吗？"
 
 #: Client/core/CSettings.cpp:4621
 msgid "EXPERIMENTAL FEATURE"
-msgstr "实验室特性"
+msgstr "实验性功能"
 
 #: Client/core/CSettings.cpp:4764
 msgid "Please enter a nickname"
@@ -2306,17 +2308,17 @@ msgstr "显示帧数图表"
 
 #: Client/core/CCore.cpp:1425
 msgid "for developers: reload news"
-msgstr ""
+msgstr "开发者功能：重新加载最新消息"
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr ""
+msgstr "最新消息"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
 msgid "Visit latest news article"
-msgstr "查看目前新闻文章"
+msgstr "查看最新消息"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2798,31 +2800,31 @@ msgstr "开启"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
-msgstr ""
+msgstr "驾驶UFO四处游荡"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Cruising around"
-msgstr ""
+msgstr "四处巡游"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr ""
+msgstr "在风浪中骑行"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
-msgstr ""
+msgstr "在火车上骑行"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Flying around"
-msgstr ""
+msgstr "飞来飞去"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr ""
+msgstr "四处骑行"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
-msgstr ""
+msgstr "开着怪兽卡车到处跑"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
