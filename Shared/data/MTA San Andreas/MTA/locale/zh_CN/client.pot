@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-15 22:30+0000\n"
-"PO-Revision-Date: 2024-03-01 03:50\n"
+"PO-Revision-Date: 2024-03-01 04:50\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -2308,17 +2308,17 @@ msgstr "显示帧数图表"
 
 #: Client/core/CCore.cpp:1425
 msgid "for developers: reload news"
-msgstr "开发者功能：重新加载最新消息"
+msgstr "开发者功能：重新加载最新动态"
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
 msgid "NEWS"
-msgstr "最新消息"
+msgstr "最新动态"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
 msgid "Visit latest news article"
-msgstr "查看最新消息"
+msgstr "查看最新动态"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
@@ -2828,84 +2828,84 @@ msgstr "开着怪兽卡车到处跑"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr ""
+msgstr "骑四轮摩托车到处跑"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
-msgstr ""
+msgstr "兔子跳"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Doing weird stuff in"
-msgstr ""
+msgstr "做奇怪的事"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr ""
+msgstr "爬山"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
 msgid "Doing a drive-by in"
-msgstr ""
+msgstr "开枪"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:380
 msgid "Blub blub..."
-msgstr ""
+msgstr "开枪"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:381
 msgid "Breathing water"
-msgstr ""
+msgstr "呼吸水"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:382
 msgid "Drowning in"
-msgstr ""
+msgstr "淹死在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "寻找掩护在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
-msgstr ""
+msgstr "战斗在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:385
 msgid "Throwing fists in"
-msgstr ""
+msgstr "扔拳头在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "爆破在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
-msgstr ""
+msgstr "射击"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Jetpacking in"
-msgstr ""
+msgstr "喷射背包飞行在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr ""
+msgstr "在火中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
-msgstr ""
+msgstr "燃烧在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:391
 msgid "Swimming in"
-msgstr ""
+msgstr "游泳在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr ""
+msgstr "漂浮在"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
-msgstr ""
+msgstr "被鲨鱼追赶"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:394
 msgid "Choking to death in"
-msgstr ""
+msgstr "窒息死"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:651
 msgid "Entering the game ..."
@@ -2934,7 +2934,7 @@ msgstr "51区"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1022
 msgid "Walking around "
-msgstr ""
+msgstr "四处走走 "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
@@ -2971,23 +2971,23 @@ msgstr "MTA客户端验证失败!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
-msgstr ""
+msgstr "在沟壑中"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "En-route to hospital"
-msgstr ""
+msgstr "前往医院的路上"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr ""
+msgstr "与上帝见面"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
-msgstr ""
+msgstr "后悔自己的决定"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
-msgstr ""
+msgstr "已死亡"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -3112,15 +3112,15 @@ msgstr "请替换 gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr "此服务器不允许使用 自定义的D3D9.DLLs"
+msgstr "此服务器不允许自定义D3D9.DLL"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "从 GTA 目录中删除 D3D9.DLL 并 重新启动 MTA"
+msgstr "请从你的GTA安装目录中移除D3D9.DLL并重启MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow virtual machines"
-msgstr "此服务器不允许使用 虚拟机"
+msgstr "此服务器不允许使用虚拟机"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "This server requires driver signing to be enabled"
@@ -3128,7 +3128,7 @@ msgstr "此服务器要求启用驱动程序签名"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "Please restart your PC"
-msgstr "重启你的电脑"
+msgstr "请重启你的电脑"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server has detected missing anti-cheat components"
@@ -3140,11 +3140,11 @@ msgstr "尝试重启MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "此服务器要求 原版的 gta3.img 和 gta_int.img"
+msgstr "此服务器要求未修改的gta3.img和gta_int.img"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Please replace gta3.img or gta_int.img"
-msgstr "请替换 gta3.img 或 gta_int.img"
+msgstr "请替换gta3.img或gta_int.img"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server does not allow Wine"
@@ -3152,7 +3152,7 @@ msgstr "此服务器不允许使用 Linux Wine"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "确保没有其他程序正在修改 MTA:SA"
+msgstr "确保没有其他程序修改MTA:SA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
 msgid "Time Remaining: "
