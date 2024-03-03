@@ -416,8 +416,8 @@ void CPoolsSA::RemoveBuilding(CBuilding* pBuilding)
     coverList->RemoveItem(pInterface);
 
     // Remove plant
-    typedef CEntitySAInterface*(__cdecl * CPlantColEntEntry_Remove)(CEntitySAInterface * item);
-    ((CPlantColEntEntry_Remove)0x5DBEF0)(pInterface);
+    using CPlantColEntry_Remove = CEntitySAInterface* (*)(CEntitySAInterface*);
+    ((CPlantColEntry_Remove)0x5DBEF0)(pInterface);
 
     // Remove col reference
     auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
