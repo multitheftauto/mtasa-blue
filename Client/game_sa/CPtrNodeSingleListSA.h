@@ -10,14 +10,14 @@
 
 #pragma once
 
-template<class T>
+template <class T>
 struct CPtrNodeSingleLink
 {
     T*                  pItem;
     CPtrNodeSingleLink* pNext;
 };
 
-template<class T>
+template <class T>
 class CPtrNodeSingleListSAInterface
 {
 public:
@@ -31,7 +31,7 @@ private:
 template <class T>
 void CPtrNodeSingleListSAInterface<T>::RemoveItem(T* item)
 {
-    typedef void(__thiscall * CPtrNodeSingleList_RemoveItem_t)(CPtrNodeSingleListSAInterface<T> * pLinkList, void* item);
+    using CPtrNodeSingleList_RemoveItem_t = void(__thiscall*)(CPtrNodeSingleListSAInterface<T> * pLinkList, void* item);
     ((CPtrNodeSingleList_RemoveItem_t)0x533610)(this, item);
 }
 
