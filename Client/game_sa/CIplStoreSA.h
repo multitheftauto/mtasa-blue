@@ -13,7 +13,8 @@
 
 #include "CIplSA.h"
 #include "CPoolsSA.h"
-#include <game/CIplStore.h>
+#include <game/CIplStore.h>=
+#include <functional>
 
 class CIplStoreSA : public CIplStore
 {
@@ -22,9 +23,11 @@ public:
     ~CIplStoreSA() = default;
 
     void SetDynamicIplStreamingEnabled(bool state);
+    void SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface *ipl)> filer);
 
 private:
     void UnloadAndDisableStreaming(int iplId);
+    void EnableStreaming(int iplId);
 
 private:
     CPoolSAInterface<CIplSAInterface>** m_ppIplPoolInterface;

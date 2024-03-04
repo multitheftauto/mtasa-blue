@@ -15,4 +15,5 @@ class CIplStore
 {
 public:
     virtual void SetDynamicIplStreamingEnabled(bool state) = 0;
+    virtual void SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface* ipl)> filer) = 0;
 };

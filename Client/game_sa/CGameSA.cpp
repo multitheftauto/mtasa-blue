@@ -899,7 +899,7 @@ void CGameSA::RestoreGameBuildings()
 {
     m_pPools->GetBuildingsPool().RestoreAllBuildings();
 
-    m_pIplStore->SetDynamicIplStreamingEnabled(true);
+    m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
 }
 
 // Ensure models have the default lod distances

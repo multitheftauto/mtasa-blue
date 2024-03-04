@@ -26,6 +26,14 @@ void CIplStoreSA::UnloadAndDisableStreaming(int iplId)
     ((Function_EnableStreaming)(0x405890))(iplId);
 }
 
+void CIplStoreSA::EnableStreaming(int iplId)
+{
+    auto ipl = (*m_ppIplPoolInterface)->GetObject(iplId);
+    ipl->bDisabledStreaming = false;
+
+    (*gIplQuadTree)->AddItem(ipl, &ipl->rect);
+}
+
 void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state)
 {
     if (m_isStreamingEnbabled == state)
@@ -52,10 +60,41 @@ void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state)
         {
             if (pPool->IsContains(i))
             {
-                auto ipl = pPool->GetObject(i);
-                ipl->bDisabledStreaming = false;
+                EnableStreaming(i);
+            }
+        }
+    }
 
-                (*gIplQuadTree)->AddItem(ipl, &ipl->rect);
+    m_isStreamingEnbabled = state;
+}
+
+void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface* ipl)> filer)
+{
+    if (m_isStreamingEnbabled == state)
+        return;
+
+    // Ipl with 0 index is generic
+    // We don't unload this IPL
+
+    auto pPool = *m_ppIplPoolInterface;
+    if (!state)
+    {
+        for (int i = 1; i < pPool->m_nSize; i++)
+        {
+            if (pPool->IsContains(i) && filer(pPool->GetObject(i)))
+            {
+                UnloadAndDisableStreaming(i);
+            }
+        }
+        (*gIplQuadTree)->RemoveAllItems();
+    }
+    else
+    {
+        for (int i = 1; i < pPool->m_nSize; i++)
+        {
+            if (pPool->IsContains(i) && filer(pPool->GetObject(i)))
+            {
+                EnableStreaming(i);
             }
         }
     }
