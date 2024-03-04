@@ -16,7 +16,7 @@
 
 static auto gIplQuadTree = (CQuadTreeNodesSAInterface<CIplSAInterface>**)0x8E3FAC;
 
-CIplStoreSA::CIplStoreSA(): m_isStreamingEnbabled(true), m_ppIplPoolInterface((CPoolSAInterface<CIplSAInterface>**)0x8E3FB0)
+CIplStoreSA::CIplStoreSA() : m_isStreamingEnbabled(true), m_ppIplPoolInterface((CPoolSAInterface<CIplSAInterface>**)0x8E3FB0)
 {
 }
 
