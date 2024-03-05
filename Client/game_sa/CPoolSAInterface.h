@@ -129,7 +129,7 @@ public:
     uint32_t GetObjectIndexSafe(B* pObject)
     {
         uint32_t index = GetObjectIndex(pObject);
-        return index > m_nSize ? -1 : index;
+        return index > m_nSize ? UINT_MAX : index;
     }
 };
 

@@ -35,7 +35,7 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
         return false;
 
     uint32_t dwElementIndexInPool = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pInterface);
-    if (dwElementIndexInPool >= -1)
+    if (dwElementIndexInPool == UINT_MAX)
         return false;
 
     m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
@@ -90,7 +90,7 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     CBuildingSAInterface* pInterface = pBuilding->GetBuildingInterface();
 
     uint32_t dwElementIndexInPool = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pInterface);
-    if (dwElementIndexInPool == -1)
+    if (dwElementIndexInPool == UINT_MAX)
         return;
 
     // Remove building from world

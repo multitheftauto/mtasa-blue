@@ -16,7 +16,7 @@
 
 static auto gIplQuadTree = (CQuadTreeNodesSAInterface<CIplSAInterface>**)0x8E3FAC;
 
-CIplStoreSA::CIplStoreSA() : m_isStreamingEnbabled(true), m_ppIplPoolInterface((CPoolSAInterface<CIplSAInterface>**)0x8E3FB0)
+CIplStoreSA::CIplStoreSA() : m_isStreamingEnabled(true), m_ppIplPoolInterface((CPoolSAInterface<CIplSAInterface>**)0x8E3FB0)
 {
 }
 
@@ -36,7 +36,7 @@ void CIplStoreSA::EnableStreaming(int iplId)
 
 void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state)
 {
-    if (m_isStreamingEnbabled == state)
+    if (m_isStreamingEnabled == state)
         return;
 
     // Ipl with 0 index is generic
@@ -65,12 +65,12 @@ void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state)
         }
     }
 
-    m_isStreamingEnbabled = state;
+    m_isStreamingEnabled = state;
 }
 
-void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface* ipl)> filer)
+void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface* ipl)> filter)
 {
-    if (m_isStreamingEnbabled == state)
+    if (m_isStreamingEnabled == state)
         return;
 
     // Ipl with 0 index is generic
@@ -81,7 +81,7 @@ void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state, std::function<bool(C
     {
         for (int i = 1; i < pPool->m_nSize; i++)
         {
-            if (pPool->IsContains(i) && filer(pPool->GetObject(i)))
+            if (pPool->IsContains(i) && filter(pPool->GetObject(i)))
             {
                 UnloadAndDisableStreaming(i);
             }
@@ -92,12 +92,12 @@ void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state, std::function<bool(C
     {
         for (int i = 1; i < pPool->m_nSize; i++)
         {
-            if (pPool->IsContains(i) && filer(pPool->GetObject(i)))
+            if (pPool->IsContains(i) && filter(pPool->GetObject(i)))
             {
                 EnableStreaming(i);
             }
         }
     }
 
-    m_isStreamingEnbabled = state;
+    m_isStreamingEnabled = state;
 }
