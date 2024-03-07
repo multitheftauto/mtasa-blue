@@ -96,6 +96,18 @@ CTask* CTaskSA::GetSubTask()
     return s_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
 }
 
+bool CTaskSA::HasSubTask(eTaskType eTaskType)
+{
+    CTask* pTask = this;
+    while (pTask)
+    {
+        pTask = pTask->GetSubTask();
+        if (pTask && pTask->GetTaskType() == eTaskType)
+            return true;
+    }
+    return false;
+}
+
 bool CTaskSA::IsSimpleTask()
 {
     DWORD dwThisInterface = (DWORD)GetInterface();

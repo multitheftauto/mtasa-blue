@@ -4361,6 +4361,22 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
         //
         ///////////////////////////////////////////////////////////////////////////
 
+        // Workaround fix for "Climbing over certain objects kills you, when you have high FPS"
+        // Do not apply fall damage if ped has climb task
+        if (!pInflictingEntity && weaponUsed == WEAPONTYPE_FALL && hitZone == PED_PIECE_TORSO)
+        {
+            CTask* pTask = pDamagedPed->GetCurrentPrimaryTask();
+            if (pTask && pTask->GetTaskType() == TASK_COMPLEX_JUMP)
+            {
+                if (pTask->HasSubTask(TASK_SIMPLE_CLIMB))
+                {
+                    // Restore ped health
+                    pDamagedPed->GetGamePlayer()->SetHealth(fPreviousHealth);
+                    return false;
+                }
+            }
+        }
+
         g_fApplyDamageLastAmount = fDamage;
         g_ucApplyDamageLastHitZone = hitZone;
         g_pApplyDamageLastDamagedPed = pDamagedPed;
