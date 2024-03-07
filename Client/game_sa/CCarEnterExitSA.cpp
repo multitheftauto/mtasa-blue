@@ -78,6 +78,19 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle,
     return bReturn;
 }
 
+void CCarEnterExitSA::GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, unsigned int door)
+{
+    CVehicleSA* vehicleSA = dynamic_cast<CVehicleSA*>(vehicle);
+
+    if (vehicleSA)
+    {
+        CVehicleSAInterface* vehicleInterface = vehicleSA->GetVehicleInterface();
+
+        auto CCarEnterExit_GetPositionToOpenCarDoor = (void(__cdecl*)(CVector&, CVehicleSAInterface*, int))FUNC_GetPositionToOpenCarDoor;
+        CCarEnterExit_GetPositionToOpenCarDoor(position, vehicleInterface, door);
+    }
+}
+
 int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
 {
     DWORD dwFunc = FUNC_ComputeTargetDoorToExit;
