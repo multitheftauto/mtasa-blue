@@ -27,7 +27,7 @@ public:
     void GetPosition(CVector& vecPosition) const override { vecPosition = m_vPos; };
     void SetPosition(const CVector& vecPosition) override;
 
-    void GetRotationRadians(CVector& vecOutRadians) const override { vecOutRadians = m_vPos; };
+    void GetRotationRadians(CVector& vecOutRadians) const override { vecOutRadians = m_vRot; };
     void SetRotationRadians(const CVector& vecRadians) override;
 
     CEntity*       GetGameEntity() override { return m_pBuilding; };
