@@ -23,6 +23,7 @@ void CPlayerRPCs::LoadFunctions()
     AddHandler(SET_PLAYER_NAMETAG_SHOWING, SetPlayerNametagShowing, "SetPlayerNametagShowing");
     AddHandler(SET_PLAYER_TEAM, SetPlayerTeam, "SetPlayerTeam");
     AddHandler(TAKE_PLAYER_SCREEN_SHOT, TakePlayerScreenShot, "TakePlayerScreenShot");
+    AddHandler(REMOTE_PLAYER_WEAPON_SWITCH, RemotePlayerSwitchWeapon, "RemotePlayerSwitchWeapon");
 }
 
 void CPlayerRPCs::SetPlayerMoney(NetBitStreamInterface& bitStream)
@@ -167,4 +168,23 @@ void CPlayerRPCs::TakePlayerScreenShot(NetBitStreamInterface& bitStream)
         return;
 
     m_pClientGame->TakePlayerScreenShot(usSizeX, usSizeY, strTag, ucQuality, uiMaxBandwidth, usMaxPacketSize, pResource, uiServerSentTime);
+}
+
+void CPlayerRPCs::RemotePlayerSwitchWeapon(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    if (!bitStream.Can(eBitStreamVersion::OnPlayerWeaponSwitch_Remote))
+        return;
+
+    uint lastSlot, currentSlot;
+    if (!(bitStream.Read(lastSlot) && bitStream.Read(currentSlot)))
+        return;
+
+    CClientPlayer* pPlayer = m_pPlayerManager->Get(pSource->GetID());
+    if (!IS_REMOTE_PLAYER(pPlayer))
+        return;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(lastSlot);
+    Arguments.PushNumber(currentSlot);
+    pPlayer->CallEvent("onClientPlayerWeaponSwitch", Arguments, true);
 }
