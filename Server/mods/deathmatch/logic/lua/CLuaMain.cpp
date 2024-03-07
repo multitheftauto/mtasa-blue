@@ -194,12 +194,12 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaShared::AddClasses(luaVM);
 }
 
-void CLuaMain::Initialize()
+void CLuaMain::Initialize(ELuaVersion version)
 {
     assert(!m_luaVM);
 
     // Create a new VM
-    m_luaVM = lua_open(this);
+    m_luaVM = VluaL_newstate(this, version);
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook

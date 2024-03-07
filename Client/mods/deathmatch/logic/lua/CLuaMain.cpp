@@ -27,7 +27,8 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
 
-CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
+CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP, ELuaVersion luaVersion) :
+    m_LuaVersion(luaVersion)
 {
     // Initialise everything to be setup in the Start function
     m_pLuaManager = pLuaManager;
@@ -136,7 +137,7 @@ void CLuaMain::InitVM()
     assert(!m_luaVM);
 
     // Create a new VM
-    m_luaVM = lua_open(this);
+    m_luaVM = VluaL_newstate(this, m_LuaVersion);
     m_pLuaManager->OnLuaMainOpenVM(this, m_luaVM);
 
     // Set the instruction count hook

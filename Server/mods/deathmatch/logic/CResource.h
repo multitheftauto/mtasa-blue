@@ -325,6 +325,9 @@ public:
      * @return A pointer to CResourceFile on success, null otherwise
      */
     CResourceFile* GetResourceFile(const SString& relativePath) const;
+    
+    ELuaVersion GetLuaVersion() const { return m_LuaVersion; }
+    ELuaVersion GetClientLuaVersion() const { return m_ClientLuaVersion; }
 
 public:
     static std::list<CResource*> m_StartedResources;
@@ -421,6 +424,9 @@ private:
     bool m_bLinked = false;                  // if true, the included resources are already linked to this resource
     bool m_bIsPersistent = false;            // if true, the resource will remain even if it has no Dependents, mainly if started by the user or the startup
     bool m_bDestroyed = false;
+
+    ELuaVersion m_LuaVersion = ELuaVersion::VLUA_5_1;
+    ELuaVersion m_ClientLuaVersion = ELuaVersion::VLUA_5_1;
 
     CXMLNode* m_pNodeSettings = nullptr;            // Settings XML node, read from meta.xml and copied into it's own instance
     CXMLNode* m_pNodeStorage = nullptr;             // Dummy XML node used for temporary storage of stuff returned by CSettings::Get

@@ -36,7 +36,7 @@ public:
                 CRadarAreaManager* pRadarAreaManager, CRegisteredCommands* pRegisteredCommands, CMapManager* pMapManager, CEvents* pEvents);
     ~CLuaManager();
 
-    CLuaMain*  CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP);
+    CLuaMain*  CreateVirtualMachine(CResource* pResourceOwner, bool bEnableOOP, ELuaVersion version);
     bool       RemoveVirtualMachine(CLuaMain* vm);
     CLuaMain*  GetVirtualMachine(lua_State* luaVM);
     CResource* GetVirtualMachineResource(lua_State* luaVM);

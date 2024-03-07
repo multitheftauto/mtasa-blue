@@ -21,7 +21,7 @@ extern CClientGame* g_pClientGame;
 int CResource::m_iShowingCursor = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
-                     const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
+                     const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP, ELuaVersion luaVersion)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
     m_usNetID = usNetID;
@@ -33,6 +33,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_bLoadAfterReceivingNoClientCacheScripts = false;
     m_strMinServerReq = strMinServerReq;
     m_strMinClientReq = strMinClientReq;
+    m_LuaVersion = luaVersion;
 
     if (szResourceName)
         m_strResourceName.AssignLeft(szResourceName, MAX_RESOURCE_NAME_LENGTH);
@@ -84,7 +85,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_bOOPEnabled = bEnableOOP;
     m_iDownloadPriorityGroup = 0;
 
-    m_pLuaVM = m_pLuaManager->CreateVirtualMachine(this, bEnableOOP);
+    m_pLuaVM = m_pLuaManager->CreateVirtualMachine(this, bEnableOOP, m_LuaVersion);
     if (m_pLuaVM)
     {
         m_pLuaVM->SetScriptName(szResourceName);

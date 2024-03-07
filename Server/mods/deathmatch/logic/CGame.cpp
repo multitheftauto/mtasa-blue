@@ -659,7 +659,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 // Check Windows server is using correctly compiled Lua dll
 #ifndef MTA_DEBUG
     #ifdef WIN32
-    HMODULE hModule = LoadLibrary("lua5.1.dll");
+    HMODULE hModule = LoadLibrary("vlua.dll");
     // Release server should not have this function
     PVOID pFunc = static_cast<PVOID>(GetProcAddress(hModule, "luaX_is_apicheck_enabled"));
     FreeLibrary(hModule);

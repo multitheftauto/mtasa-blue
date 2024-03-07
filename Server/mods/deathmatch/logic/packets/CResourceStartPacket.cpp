@@ -72,6 +72,11 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.WriteBit(m_pResource->IsOOPEnabledInMetaXml());
         }
 
+        if (BitStream.Can(eBitStreamVersion::ResourceLuaVersion))        
+        {
+            BitStream.Write(static_cast<unsigned char>(m_pResource->GetClientLuaVersion()));
+        }
+
         if (BitStream.Version() >= 0x62)
         {
             BitStream.Write(m_pResource->GetDownloadPriorityGroup());

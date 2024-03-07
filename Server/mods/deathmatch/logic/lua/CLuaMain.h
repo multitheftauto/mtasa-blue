@@ -100,7 +100,7 @@ public:
 
     void RegisterHTMLDFunctions();
 
-    void           Initialize();
+    void           Initialize(ELuaVersion version);
     void           LoadEmbeddedScripts();
     void           RegisterModuleFunctions();
     const SString& GetFunctionTag(int iFunctionNumber);
