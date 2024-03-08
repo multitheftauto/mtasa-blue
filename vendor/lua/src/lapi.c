@@ -28,7 +28,7 @@
 #include "ltm.h"
 #include "lundump.h"
 #include "lvm.h"
-
+#include "lvector.h" /*LUA-VEC*/
 
 
 const char lua_ident[] =
@@ -110,7 +110,7 @@ LUA_API int lua_checkstack (lua_State *L, int size) {
 LUA_API int lua_getstackgap (lua_State *L) {
   int res, gap1, gap2; 
   lua_lock(L);
-  gap1 = ( (char *)L->stack_last - (char *)L->top ) / (int)sizeof(TValue);
+  gap1 = ( (char *)L->stack_last - (char *)L->top ) / sizeof(TValue);
   gap2 = L->ci->top - L->top;
   res = gap1 < gap2 ? gap1 : gap2;
   lua_unlock(L);
@@ -437,7 +437,11 @@ LUA_API const void *lua_topointer (lua_State *L, int idx) {
   }
 }
 
-
+/* LUA-VEC */
+LUA_API const float* lua_tovec(lua_State* L, int idx) {
+    StkId o = index2adr(L, idx);
+    return (!ttisvec(o)) ? NULL : vvalue(o)->vec;
+}
 
 /*
 ** push functions (C -> stack)
@@ -550,6 +554,14 @@ LUA_API int lua_pushthread (lua_State *L) {
   return (G(L)->mainthread == L);
 }
 
+/* LUA-VEC */
+LUA_API void lua_pushvec(lua_State* L, float x, float y, float z, float w) {
+  lua_lock(L);
+  luaC_checkGC(L);
+  setvvalue(L, L->top, luaVec_new(L, x, y, z, w));
+  api_incr_top(L);
+  lua_unlock(L);
+}
 
 /*
 ** get functions (Lua -> stack)
@@ -796,7 +808,7 @@ LUA_API int lua_setfenv (lua_State *L, int idx) {
 
 #define checkresults(L,na,nr) \
      api_check(L, (nr) == LUA_MULTRET || (L->ci->top - L->top >= (nr) - (na)))
-	
+    
 
 LUA_API void lua_call (lua_State *L, int nargs, int nresults) {
   StkId func;
