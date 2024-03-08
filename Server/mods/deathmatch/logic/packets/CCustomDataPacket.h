@@ -26,12 +26,12 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    ElementID     GetElementID() { return m_ElementID; }
-    char*         GetName() { return m_szName; }
+    const ElementID     GetElementID() const { return m_ElementID; }
+    SString&      GetName() { return m_strName; }
     CLuaArgument& GetValue() { return m_Value; }
 
 private:
     ElementID    m_ElementID;
-    char*        m_szName;
+    SString      m_strName;
     CLuaArgument m_Value;
 };

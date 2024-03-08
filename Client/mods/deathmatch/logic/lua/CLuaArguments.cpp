@@ -65,7 +65,7 @@ void CLuaArguments::CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<C
     vector<CLuaArgument*>::const_iterator iter = Arguments.m_Arguments.begin();
     for (; iter != Arguments.m_Arguments.end(); iter++)
     {
-        CLuaArgument* pArgument = new CLuaArgument(**iter, pKnownTables);
+        CLuaArgument* pArgument = new CLuaArgument(**iter, pKnownTables, this);
         m_Arguments.push_back(pArgument);
     }
 
@@ -84,7 +84,7 @@ void CLuaArguments::ReadArguments(lua_State* luaVM, signed int uiIndexBegin)
     while (lua_type(luaVM, uiIndexBegin) != LUA_TNONE)
     {
         // Create an argument, let it read out the argument and add it to our vector
-        CLuaArgument* pArgument = new CLuaArgument(luaVM, uiIndexBegin++, &knownTables);
+        CLuaArgument* pArgument = new CLuaArgument(luaVM, uiIndexBegin++, &knownTables, this);
         m_Arguments.push_back(pArgument);
 
         knownTables.clear();
@@ -113,10 +113,10 @@ void CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<co
     while (lua_next(luaVM, iIndexBegin) != 0)
     {
         /* uses 'key' (at index -2) and 'value' (at index -1) */
-        CLuaArgument* pArgument = new CLuaArgument(luaVM, -2, pKnownTables);
+        CLuaArgument* pArgument = new CLuaArgument(luaVM, -2, pKnownTables, this);
         m_Arguments.push_back(pArgument);            // push the key first
 
-        pArgument = new CLuaArgument(luaVM, -1, pKnownTables);
+        pArgument = new CLuaArgument(luaVM, -1, pKnownTables, this);
         m_Arguments.push_back(pArgument);            // then the value
 
         /* removes 'value'; keeps 'key' for next iteration */
@@ -129,7 +129,7 @@ void CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<co
 
 void CLuaArguments::ReadArgument(lua_State* luaVM, int iIndex)
 {
-    CLuaArgument* pArgument = new CLuaArgument(luaVM, iIndex);
+    CLuaArgument* pArgument = new CLuaArgument(luaVM, iIndex, {}, this);
     m_Arguments.push_back(pArgument);
 }
 
@@ -194,7 +194,7 @@ void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
     vector<CLuaArgument*>::const_iterator iter = Arguments.IterBegin();
     for (; iter != Arguments.IterEnd(); iter++)
     {
-        CLuaArgument* pArgument = new CLuaArgument(**iter);
+        CLuaArgument* pArgument = new CLuaArgument(**iter, {}, this);
         m_Arguments.push_back(pArgument);
     }
 }
@@ -316,14 +316,14 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
 
 CLuaArgument* CLuaArguments::PushNil()
 {
-    CLuaArgument* pArgument = new CLuaArgument;
+    CLuaArgument* pArgument = new CLuaArgument(this);
     m_Arguments.push_back(pArgument);
     return pArgument;
 }
 
 CLuaArgument* CLuaArguments::PushBoolean(bool bBool)
 {
-    CLuaArgument* pArgument = new CLuaArgument();
+    CLuaArgument* pArgument = new CLuaArgument(this);
     pArgument->ReadBool(bBool);
     m_Arguments.push_back(pArgument);
     return pArgument;
@@ -331,7 +331,7 @@ CLuaArgument* CLuaArguments::PushBoolean(bool bBool)
 
 CLuaArgument* CLuaArguments::PushNumber(double dNumber)
 {
-    CLuaArgument* pArgument = new CLuaArgument();
+    CLuaArgument* pArgument = new CLuaArgument(this);
     pArgument->ReadNumber(dNumber);
     m_Arguments.push_back(pArgument);
     return pArgument;
@@ -339,7 +339,7 @@ CLuaArgument* CLuaArguments::PushNumber(double dNumber)
 
 CLuaArgument* CLuaArguments::PushString(const std::string& strString)
 {
-    CLuaArgument* pArgument = new CLuaArgument();
+    CLuaArgument* pArgument = new CLuaArgument(this);
     pArgument->ReadString(strString);
     m_Arguments.push_back(pArgument);
     return pArgument;
@@ -347,7 +347,7 @@ CLuaArgument* CLuaArguments::PushString(const std::string& strString)
 
 CLuaArgument* CLuaArguments::PushResource(CResource* pResource)
 {
-    CLuaArgument* pArgument = new CLuaArgument;
+    CLuaArgument* pArgument = new CLuaArgument(this);
     pArgument->ReadScriptID(pResource->GetScriptID());
     m_Arguments.push_back(pArgument);
     return pArgument;
@@ -355,7 +355,7 @@ CLuaArgument* CLuaArguments::PushResource(CResource* pResource)
 
 CLuaArgument* CLuaArguments::PushElement(CClientEntity* pElement)
 {
-    CLuaArgument* pArgument = new CLuaArgument;
+    CLuaArgument* pArgument = new CLuaArgument(this);
     pArgument->ReadElement(pElement);
     m_Arguments.push_back(pArgument);
     return pArgument;
@@ -363,14 +363,26 @@ CLuaArgument* CLuaArguments::PushElement(CClientEntity* pElement)
 
 CLuaArgument* CLuaArguments::PushArgument(const CLuaArgument& Argument)
 {
-    CLuaArgument* pArgument = new CLuaArgument(Argument);
+    CLuaArgument* pArgument = new CLuaArgument(Argument, {}, this);
     m_Arguments.push_back(pArgument);
     return pArgument;
 }
 
+CLuaArgument* CLuaArguments::PushArgument(CLuaArgument&& argument)
+{
+    CLuaArgument* pArgument = new CLuaArgument(std::move(argument), {}, this);
+    m_Arguments.push_back(pArgument);
+    return pArgument;
+}
+
+void CLuaArguments::PushArgumentWeak(const CLuaArgument* pArgument)
+{
+    m_Arguments.push_back(const_cast<CLuaArgument*>(pArgument));
+}
+
 CLuaArgument* CLuaArguments::PushTable(CLuaArguments* table)
 {
-    CLuaArgument* pArgument = new CLuaArgument();
+    CLuaArgument* pArgument = new CLuaArgument(this);
     pArgument->ReadTable(table);
     m_Arguments.push_back(pArgument);
     return pArgument;
@@ -383,7 +395,8 @@ void CLuaArguments::DeleteArguments()
     vector<CLuaArgument*>::iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); iter++)
     {
-        delete *iter;
+        if ((*iter)->m_pOwner == this)
+            delete *iter;
     }
 
     // Clear the vector
@@ -394,8 +407,9 @@ void CLuaArguments::DeleteArguments()
 void CLuaArguments::Pop()
 {
     // Delete the last element
-    CLuaArgument* item = m_Arguments.back();
-    delete item;
+    auto item = m_Arguments.back();
+    if (item->m_pOwner == this)
+        delete item;
 
     // Pop it out of the vector
     m_Arguments.pop_back();
@@ -413,11 +427,13 @@ void CLuaArguments::ValidateTableKeys()
         {
             // TODO - Handle ref in KnownTables
             // Remove pair
-            delete *iter;
+            if ((*iter)->m_pOwner == this)
+                delete *iter;
             iter = m_Arguments.erase(iter);
             if (iter != m_Arguments.end())
             {
-                delete *iter;
+                if ((*iter)->m_pOwner == this)
+                    delete *iter;
                 iter = m_Arguments.erase(iter);
             }
             // Check if end
@@ -452,7 +468,7 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
-            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables);
+            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables, this);
             m_Arguments.push_back(pArgument);
         }
     }
@@ -644,7 +660,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
             for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument* pArgument = new CLuaArgument();
+                CLuaArgument* pArgument = new CLuaArgument(this);
                 bSuccess = pArgument->ReadFromJSONObject(arrayObject, &knownTables);
                 m_Arguments.push_back(pArgument);            // then the value
                 if (!bSuccess)
@@ -656,7 +672,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
         else if (json_object_get_type(object) == json_type_object)
         {
             std::vector<CLuaArguments*> knownTables;
-            CLuaArgument*               pArgument = new CLuaArgument();
+            CLuaArgument*               pArgument = new CLuaArgument(this);
             bool                        bSuccess = pArgument->ReadFromJSONObject(object, &knownTables);
             m_Arguments.push_back(pArgument);            // value
             json_object_put(object);
@@ -690,7 +706,7 @@ bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArgu
             bool bSuccess = true;
             json_object_object_foreach(object, key, val)
             {
-                CLuaArgument* pArgument = new CLuaArgument();
+                CLuaArgument* pArgument = new CLuaArgument(this);
                 pArgument->ReadString(key);
                 m_Arguments.push_back(pArgument);            // push the key first
                 pArgument = new CLuaArgument();
@@ -729,11 +745,11 @@ bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArgum
             for (uint i = 0; i < json_object_array_length(object); i++)
             {
                 json_object*  arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument* pArgument = new CLuaArgument();
+                CLuaArgument* pArgument = new CLuaArgument(this);
                 pArgument->ReadNumber(i + 1);            // push the key
                 m_Arguments.push_back(pArgument);
 
-                pArgument = new CLuaArgument();
+                pArgument = new CLuaArgument(this);
                 bSuccess = pArgument->ReadFromJSONObject(arrayObject, pKnownTables);
                 m_Arguments.push_back(pArgument);            // then the valoue
                 if (!bSuccess)

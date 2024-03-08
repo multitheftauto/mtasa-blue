@@ -28,13 +28,16 @@ class CLuaArguments;
 
 class CLuaArgument
 {
+    friend class CLuaArguments;
 public:
-    CLuaArgument();
-    CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
-    CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
+    CLuaArgument(CLuaArguments* pOwner = {});
+    CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL, CLuaArguments* pOwner = {});
+    CLuaArgument(CLuaArgument&& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL, CLuaArguments* pOwner = {});
+    CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL, CLuaArguments* pOwner = {});
     ~CLuaArgument();
 
     const CLuaArgument& operator=(const CLuaArgument& Argument);
+    const CLuaArgument& operator=(CLuaArgument&& Argument);
     bool                operator==(const CLuaArgument& Argument) const;
     bool                operator!=(const CLuaArgument& Argument) const;
 
@@ -51,9 +54,11 @@ public:
 
     int GetType() const { return m_iType; };
 
+    bool IsEmpty() const { return m_iType == LUA_TNIL; }
+
     bool               GetBoolean() const { return m_bBoolean; };
     lua_Number         GetNumber() const { return m_Number; };
-    const std::string& GetString() { return m_strString; };
+    const std::string& GetString() const { return m_strString; };
     void*              GetUserData() const { return m_pUserData; };
     CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
@@ -69,19 +74,22 @@ public:
 private:
     void LogUnableToPacketize(const char* szMessage) const;
 
+    CLuaArguments* m_pOwner{};
+
     int            m_iType;
     bool           m_bBoolean;
+    bool           m_bWeakTableRef;
     lua_Number     m_Number;
     std::string    m_strString;
     void*          m_pUserData;
-    CLuaArguments* m_pTableData;
-    bool           m_bWeakTableRef;
+    CLuaArguments* m_pTableData;    
 
 #ifdef MTA_DEBUG
     std::string m_strFilename;
     int         m_iLine;
 #endif
 
-    void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
+    void MoveRecursive(CLuaArgument&& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = {});
+    void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = {});
     void DeleteTableData();
 };

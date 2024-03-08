@@ -2871,7 +2871,7 @@ retry:
                         CLuaArgument Argument;
                         Argument.ReadFromBitStream(bitStream);
 
-                        pCustomData->Set(strName, Argument);
+                        pCustomData->Set(std::move(strName), std::move(Argument));
                     }
                     else
                     {

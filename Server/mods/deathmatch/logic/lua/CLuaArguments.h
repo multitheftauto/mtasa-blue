@@ -80,6 +80,7 @@ public:
     CLuaArgument* PushDbQuery(CDbJobData* pJobData);
 
     CLuaArgument* PushArgument(const CLuaArgument& argument);
+    void          PushArgumentWeak(const CLuaArgument* argument);
     CLuaArgument* PushTable(CLuaArguments* table);
 
     void DeleteArguments();

@@ -97,7 +97,7 @@ void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface&
         CLuaArgument Argument;
         if (bitStream.ReadStringCharacters(strName, usNameLength) && Argument.ReadFromBitStream(bitStream))
         {
-            pSource->SetCustomData(strName, Argument);
+            pSource->SetCustomData(std::move(strName), std::move(Argument));
         }
     }
 }
