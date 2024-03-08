@@ -222,7 +222,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                         lua_pushresource(pState, pSourceResource);
                         lua_setglobal(pState, "sourceResource");
 
-                        lua_pushelement(pState, pSourceResource->GetResourceDynamicEntity());
+                        lua_pushelement(pState, pSourceResource->GetResourceEntity());
                         lua_setglobal(pState, "sourceResourceRoot");
                     }
                     else
