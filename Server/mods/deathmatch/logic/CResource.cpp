@@ -338,10 +338,13 @@ bool CResource::Unload()
         m_pNodeSettings = nullptr;
     }
 
+    OnResourceStateChange("unloaded");
+
     m_strResourceZip = "";
     m_strResourceCachePath = "";
     m_strResourceDirectoryPath = "";
     m_eState = EResourceState::None;
+
     return true;
 }
 
@@ -741,6 +744,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     if (m_bDestroyed)
         return false;
 
+    OnResourceStateChange("starting");
+
     m_eState = EResourceState::Starting;
 
     CLuaArguments PreStartArguments;
@@ -974,6 +979,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             AddDependent(pDependent);
     }
 
+    OnResourceStateChange("running");
+
     m_eState = EResourceState::Running;
 
     // Call the onResourceStart event. If it returns false, cancel this script again
@@ -1016,6 +1023,37 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     return true;
 }
 
+void CResource::OnResourceStateChange(const char* state) noexcept
+{
+    if (!m_pResourceElement)
+        return;
+
+    CLuaArguments stateArgs;
+    stateArgs.PushResource(this);
+    switch (m_eState)
+    {
+        case EResourceState::Loaded: // When resource is stopped
+            stateArgs.PushString("loaded");
+            break;
+        case EResourceState::Running: // When resource is running
+            stateArgs.PushString("running");
+            break;
+        case EResourceState::Starting: // When resource is starting
+            stateArgs.PushString("starting");
+            break;
+        case EResourceState::Stopping: // When resource is stopping
+            stateArgs.PushString("stopping");
+            break;
+        case EResourceState::None: // When resource is not loaded
+        default:
+            stateArgs.PushString("unloaded");
+            break;
+    }
+    stateArgs.PushString(state);
+
+    m_pResourceElement->CallEvent("onResourceStateChange", stateArgs);
+}
+
 bool CResource::Stop(bool bManualStop)
 {
     if (m_eState == EResourceState::Loaded)
@@ -1026,6 +1064,8 @@ bool CResource::Stop(bool bManualStop)
 
     if (m_bStartedManually && !bManualStop)
         return false;
+
+    OnResourceStateChange("stopping");
 
     m_eState = EResourceState::Stopping;
     m_pResourceManager->RemoveMinClientRequirement(this);
@@ -1113,6 +1153,7 @@ bool CResource::Stop(bool bManualStop)
     // Broadcast the packet to joined players
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
 
+    OnResourceStateChange("loaded");
     m_eState = EResourceState::Loaded;
     return true;
 }
