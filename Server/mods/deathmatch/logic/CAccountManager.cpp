@@ -18,6 +18,7 @@
 #include "CIdArray.h"
 #include "CAccessControlListManager.h"
 #include "Utils.h"
+#include "CMapManager.h"
 
 CAccountManager::CAccountManager(const SString& strDbPathFilename)
     : m_AccountProtect(6, 30000, 60000 * 1)            // Max of 6 attempts per 30 seconds, then 1 minute ignore
@@ -778,10 +779,9 @@ bool CAccountManager::CopyAccountData(CAccount* pFromAccount, CAccount* pToAccou
 
     if (!pFromAccount->IsRegistered())            // is not registered account, retrieve data from memory
     {
-        std::map<SString, CAccountData>::iterator iter = pFromAccount->DataBegin();
-        for (; iter != pFromAccount->DataEnd(); iter++)
+        for (const auto& iter : *pFromAccount)
         {
-            MapSet(copiedData, iter->second.GetKey(), CAccountData(iter->second.GetKey(), iter->second.GetStrValue(), iter->second.GetType()));
+            MapSet(copiedData, iter.second.GetKey(), CAccountData(iter.second.GetKey(), iter.second.GetStrValue(), iter.second.GetType()));
         }
     }
     else            // is registered account, retrieve from database
@@ -850,31 +850,30 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
 {
     if (!pAccount->IsRegistered())
     {
-        std::map<SString, CAccountData>::iterator iter = pAccount->DataBegin();
-        for (; iter != pAccount->DataEnd(); iter++)
+        for (const auto& iter : *pAccount)
         {
-            if (iter->second.GetType() == LUA_TNIL)
+            if (iter.second.GetType() == LUA_TNIL)
             {
-                lua_pushstring(pLua, iter->second.GetKey().c_str());
+                lua_pushstring(pLua, iter.second.GetKey().c_str());
                 lua_pushnil(pLua);
                 lua_settable(pLua, -3);
             }
-            if (iter->second.GetType() == LUA_TBOOLEAN)
+            if (iter.second.GetType() == LUA_TBOOLEAN)
             {
-                lua_pushstring(pLua, iter->second.GetKey().c_str());
-                lua_pushboolean(pLua, iter->second.GetStrValue() == "true" ? true : false);
+                lua_pushstring(pLua, iter.second.GetKey().c_str());
+                lua_pushboolean(pLua, iter.second.GetStrValue() == "true");
                 lua_settable(pLua, -3);
             }
-            if (iter->second.GetType() == LUA_TNUMBER)
+            if (iter.second.GetType() == LUA_TNUMBER)
             {
-                lua_pushstring(pLua, iter->second.GetKey().c_str());
-                lua_pushnumber(pLua, strtod(iter->second.GetStrValue().c_str(), NULL));
+                lua_pushstring(pLua, iter.second.GetKey().c_str());
+                lua_pushnumber(pLua, strtod(iter.second.GetStrValue().c_str(), NULL));
                 lua_settable(pLua, -3);
             }
             else
             {
-                lua_pushstring(pLua, iter->second.GetKey().c_str());
-                lua_pushstring(pLua, iter->second.GetStrValue().c_str());
+                lua_pushstring(pLua, iter.second.GetKey().c_str());
+                lua_pushstring(pLua, iter.second.GetStrValue().c_str());
                 lua_settable(pLua, -3);
             }
         }
@@ -891,46 +890,44 @@ bool CAccountManager::GetAllAccountData(CAccount* pAccount, lua_State* pLua)
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT key,value,type from userdata where userid=?", SQLITE_INTEGER, iUserID);
 
     // Do we have any results?
-    if (result->nRows > 0)
+    if (result->nRows <= 0)
+        return false;
+
+    // Loop through until i is the same as the number of rows
+    for (const auto& row : result->Data)
     {
-        // Loop through until i is the same as the number of rows
-        for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+        // Get our key
+        strKey = reinterpret_cast<const char*>(row[0].pVal);
+        // Get our type
+        int iType = static_cast<int>(row[2].nVal);
+        // Account data is stored as text so we don't need to check what type it is just return it
+        if (iType == LUA_TNIL)
         {
-            const CRegistryResultRow& row = *iter;
-            // Get our key
-            strKey = (const char*)row[0].pVal;
-            // Get our type
-            int iType = static_cast<int>(row[2].nVal);
-            // Account data is stored as text so we don't need to check what type it is just return it
-            if (iType == LUA_TNIL)
-            {
-                lua_pushstring(pLua, strKey);
-                lua_pushnil(pLua);
-                lua_settable(pLua, -3);
-            }
-            if (iType == LUA_TBOOLEAN)
-            {
-                SString strResult = (const char*)row[1].pVal;
-                lua_pushstring(pLua, strKey);
-                lua_pushboolean(pLua, strResult == "true" ? true : false);
-                lua_settable(pLua, -3);
-            }
-            if (iType == LUA_TNUMBER)
-            {
-                lua_pushstring(pLua, strKey);
-                lua_pushnumber(pLua, strtod((const char*)row[1].pVal, NULL));
-                lua_settable(pLua, -3);
-            }
-            else
-            {
-                lua_pushstring(pLua, strKey);
-                lua_pushstring(pLua, ((const char*)row[1].pVal));
-                lua_settable(pLua, -3);
-            }
+            lua_pushstring(pLua, strKey);
+            lua_pushnil(pLua);
+            lua_settable(pLua, -3);
         }
-        return true;
+        if (iType == LUA_TBOOLEAN)
+        {
+            SString strResult = (const char*)row[1].pVal;
+            lua_pushstring(pLua, strKey);
+            lua_pushboolean(pLua, strResult == "true");
+            lua_settable(pLua, -3);
+        }
+        if (iType == LUA_TNUMBER)
+        {
+            lua_pushstring(pLua, strKey);
+            lua_pushnumber(pLua, strtod((const char*)row[1].pVal, NULL));
+            lua_settable(pLua, -3);
+        }
+        else
+        {
+            lua_pushstring(pLua, strKey);
+            lua_pushstring(pLua, ((const char*)row[1].pVal));
+            lua_settable(pLua, -3);
+        }
     }
-    return false;
+    return true;
 }
 
 void CAccountManager::GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts)
@@ -939,10 +936,8 @@ void CAccountManager::GetAccountsBySerial(const SString& strSerial, std::vector<
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE serial = ?", SQLITE_TEXT, strSerial.c_str());
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (const auto& row : result->Data)
     {
-        const CRegistryResultRow& row = *iter;
-
         CAccount* pAccount = Get((const char*)row[0].pVal);
         if (pAccount)
             outAccounts.push_back(pAccount);
@@ -955,10 +950,8 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE ip = ?", SQLITE_TEXT, strIP.c_str());
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (const auto& row : result->Data)
     {
-        const CRegistryResultRow& row = *iter;
-
         CAccount* pAccount = Get((const char*)row[0].pVal);
         if (pAccount)
             outAccounts.push_back(pAccount);
@@ -970,10 +963,8 @@ CAccount* CAccountManager::GetAccountByID(int ID)
     CRegistryResult result;
     m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE id = ?", SQLITE_INTEGER, ID);
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (const auto& row : result->Data)
     {
-        const auto& row = *iter;
-
         return Get(reinterpret_cast<const char*>(row[0].pVal));
     }
 
@@ -988,39 +979,53 @@ void CAccountManager::GetAccountsByData(const SString& dataName, const SString& 
                                          "SELECT acc.name FROM accounts acc, userdata dat WHERE dat.key = ? AND dat.value = ? AND dat.userid = acc.id",
                                          SQLITE_TEXT, dataName.c_str(), SQLITE_TEXT, value.c_str());
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (const auto& row : result->Data)
     {
-        const CRegistryResultRow& row = *iter;
-
         CAccount* pAccount = Get((const char*)row[0].pVal);
         if (pAccount)
             outAccounts.push_back(pAccount);
     }
 }
 
+// Fires for all joining players
 CAccount* CAccountManager::AddGuestAccount(const SString& strName)
 {
-    CAccount* pAccount = new CAccount(this, EAccountType::Guest, strName);
+    CAccount*     pAccount = new CAccount(this, EAccountType::Guest, strName);
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
     return pAccount;
 }
 
+// Fires only when console is created
 CAccount* CAccountManager::AddConsoleAccount(const SString& strName)
 {
-    CAccount* pAccount = new CAccount(this, EAccountType::Console, strName);
+    CAccount*     pAccount = new CAccount(this, EAccountType::Console, strName);
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
     return pAccount;
 }
 
+// Fires for all created player accounts
 CAccount* CAccountManager::AddPlayerAccount(const SString& strName, const SString& strPassword, int iUserID, const SString& strIP, const SString& strSerial,
                                             const SString& strHttpPassAppend)
 {
     CAccount* pAccount = new CAccount(this, EAccountType::Player, strName, strPassword, iUserID, strIP, strSerial, strHttpPassAppend);
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
     return pAccount;
 }
 
+// Fires whenever "addaccount" or "addAccount" was executed
 CAccount* CAccountManager::AddNewPlayerAccount(const SString& strName, const SString& strPassword)
 {
     CAccount* pAccount = new CAccount(this, EAccountType::Player, strName, strPassword, ++m_iAccounts);
     Save(pAccount);
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountCreate", Arguments);
     return pAccount;
 }
 
@@ -1035,6 +1040,9 @@ bool CAccountManager::RemoveAccount(CAccount* pAccount)
         m_pDatabaseManager->Execf(m_hDbConnection, "DELETE FROM userdata WHERE userid=?", SQLITE_INTEGER, iUserID);
         m_pDatabaseManager->Execf(m_hDbConnection, "DELETE FROM serialusage WHERE userid=?", SQLITE_INTEGER, iUserID);
     }
+    CLuaArguments Arguments;
+    Arguments.PushAccount(pAccount);
+    g_pGame->GetMapManager()->GetRootElement()->CallEvent("onAccountRemove", Arguments);
     delete pAccount;
     return true;
 }
@@ -1055,22 +1063,21 @@ void CAccountManager::StaticDbCallback(CDbJobData* pJobData, void* pContext)
 
 void CAccountManager::DbCallback(CDbJobData* pJobData)
 {
-    if (m_pDatabaseManager->QueryPoll(pJobData, 0))
-    {
-        if (pJobData->result.status == EJobResult::FAIL)
-        {
-            CLogger::LogPrintf("ERROR: While updating account with '%s': %s.\n", *pJobData->GetCommandStringForLog(), *pJobData->result.strReason);
-            if (pJobData->result.strReason.ContainsI("missing database"))
-            {
-                // Try reconnection
-                CLogger::LogPrintf("INFO: Reconnecting to accounts database\n");
-                ReconnectToDatabase();
-            }
-        }
-    }
-    else
+    if (!m_pDatabaseManager->QueryPoll(pJobData, 0))
     {
         CLogger::LogPrintf("ERROR: Something worrying happened in DbCallback '%s': %s.\n", *pJobData->GetCommandStringForLog(), *pJobData->result.strReason);
+        return;
+    }
+
+    if (pJobData->result.status != EJobResult::FAIL)
+        return;
+
+    CLogger::LogPrintf("ERROR: While updating account with '%s': %s.\n", *pJobData->GetCommandStringForLog(), *pJobData->result.strReason);
+    if (pJobData->result.strReason.ContainsI("missing database"))
+    {
+        // Try reconnection
+        CLogger::LogPrintf("INFO: Reconnecting to accounts database\n");
+        ReconnectToDatabase();
     }
 }
 
@@ -1079,9 +1086,7 @@ void CAccountManager::DbCallback(CDbJobData* pJobData)
 //
 bool CAccountManager::IsValidAccountName(const SString& strName)
 {
-    if (strName.length() < MIN_USERNAME_LENGTH)
-        return false;
-    return true;
+    return strName.length() >= MIN_USERNAME_LENGTH;
 }
 
 //
@@ -1089,9 +1094,7 @@ bool CAccountManager::IsValidAccountName(const SString& strName)
 //
 bool CAccountManager::IsValidPassword(const SString& strPassword)
 {
-    if (strPassword.length() < MIN_PASSWORD_LENGTH)
-        return false;
-    return true;
+    return strPassword.length() >= MIN_PASSWORD_LENGTH;
 }
 
 //
@@ -1142,12 +1145,8 @@ bool CAccountManager::IsAuthorizedSerialRequired(CAccount* pAccount)
 //
 bool CAccountManager::IsHttpLoginAllowed(CAccount* pAccount, const SString& strIp)
 {
-    if (!g_pGame->GetConfig()->GetAuthSerialHttpEnabled() || g_pGame->GetConfig()->IsAuthSerialHttpIpException(strIp) ||
-        !IsAuthorizedSerialRequired(pAccount) || pAccount->IsIpAuthorized(strIp))
-    {
-        return true;
-    }
-    return false;
+    return !g_pGame->GetConfig()->GetAuthSerialHttpEnabled() || g_pGame->GetConfig()->IsAuthSerialHttpIpException(strIp) ||
+        !IsAuthorizedSerialRequired(pAccount) || pAccount->IsIpAuthorized(strIp);
 }
 
 //
@@ -1173,9 +1172,8 @@ void CAccountManager::LoadAccountSerialUsage(CAccount* pAccount)
                                          " WHERE userid=?",
                                          SQLITE_INTEGER, pAccount->GetID());
 
-    for (CRegistryResultIterator iter = result->begin(); iter != result->end(); ++iter)
+    for (const auto& row : result->Data)
     {
-        const CRegistryResultRow& row = *iter;
         outSerialUsageList.push_back(CAccount::SSerialUsage());
         CAccount::SSerialUsage& info = outSerialUsageList.back();
         info.strSerial = (const char*)row[0].pVal;
