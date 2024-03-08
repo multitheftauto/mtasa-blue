@@ -17,11 +17,17 @@
 #include "CElementIDs.h"
 #include "CScriptDebugging.h"
 #include "CResourceManager.h"
+#include "CScriptArgReader.h"
 
 extern CGame* g_pGame;
 
 #ifndef VERIFY_ELEMENT
 #define VERIFY_ELEMENT(element) (g_pGame->GetMapManager()->GetRootElement ()->IsMyChild(element,true)&&!element->IsBeingDeleted())
+#endif
+
+#ifndef lua_toresource
+    #define lua_toresource(luaVM, index) \
+        (g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>((CResource*)lua_touserdata(luaVM, index))))
 #endif
 
 using namespace std;
@@ -31,12 +37,16 @@ CLuaArgument::CLuaArgument()
     m_iType = LUA_TNIL;
     m_pTableData = NULL;
     m_pUserData = NULL;
+    m_pResource = nullptr;
+    m_iFunctionRef = -1;
 }
 
 CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
     // Initialize and call our = on the argument
     m_pTableData = NULL;
+    m_pResource = nullptr;
+    m_iFunctionRef = -1;
     CopyRecursive(Argument, pKnownTables);
 }
 
@@ -44,6 +54,8 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const v
 {
     // Read the argument out of the lua VM
     m_pTableData = NULL;
+    m_pResource = nullptr;
+    m_iFunctionRef = -1;
     Read(luaVM, iArgument, pKnownTables);
 }
 
@@ -107,6 +119,13 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
         case LUA_TSTRING:
         {
             m_strString = Argument.m_strString;
+            break;
+        }
+
+        case LUA_TFUNCTION:
+        {
+            m_iFunctionRef = Argument.m_iFunctionRef;
+            m_pResource = Argument.m_pResource;
             break;
         }
 
@@ -174,15 +193,62 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
 
             case LUA_TTABLE:
             {
-                if (pKnownTables && (m_pTableData = MapFindRef(*pKnownTables, lua_topointer(luaVM, iArgument))))
+                bool isFunctionReference = false;
+                
+                if (lua_getmetatable(luaVM, iArgument))
                 {
-                    m_bWeakTableRef = true;
+                    if (lua_type(luaVM, -1) == LUA_TTABLE)
+                    {
+                        lua_getfield(luaVM, -1, "__call");
+                        if (lua_type(luaVM, -1) == LUA_TFUNCTION)
+                        {
+                            lua_CFunction caller = lua_tocfunction(luaVM, -1);
+                            if (caller == CallFunction)
+                            {
+                                isFunctionReference = true;
+                            }
+                        }
+                        lua_pop(luaVM, 1);
+                    }
+                    lua_pop(luaVM, 1);
+                }
+
+                if (isFunctionReference)
+                {
+                    bool isNil = true;
+
+                    lua_getfield(luaVM, iArgument, "resource");
+                    lua_getfield(luaVM, iArgument, "reference");
+                    if (lua_type(luaVM, -2) == LUA_TLIGHTUSERDATA)
+                    {
+                        if (lua_type(luaVM, -1) == LUA_TNUMBER)
+                        {
+                            m_pResource = lua_toresource(luaVM, -2);
+                            m_iFunctionRef = lua_tonumber(luaVM, -1);
+
+                            isNil = false;
+                            m_iType = LUA_TFUNCTION;
+                        }
+                    }
+                    lua_pop(luaVM, 2);
+
+                    if (isNil)
+                    {
+                        m_iType = LUA_TNIL;
+                    } 
                 }
                 else
                 {
-                    m_pTableData = new CLuaArguments();
-                    m_pTableData->ReadTable(luaVM, iArgument, pKnownTables);
-                    m_bWeakTableRef = false;
+                    if (pKnownTables && (m_pTableData = MapFindRef(*pKnownTables, lua_topointer(luaVM, iArgument))))
+                    {
+                        m_bWeakTableRef = true;
+                    }
+                    else
+                    {
+                        m_pTableData = new CLuaArguments();
+                        m_pTableData->ReadTable(luaVM, iArgument, pKnownTables);
+                        m_bWeakTableRef = false;
+                    }
                 }
                 break;
             }
@@ -218,8 +284,11 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
 
             case LUA_TFUNCTION:
             {
-                // TODO: add function reading (has to work inside tables too)
-                m_iType = LUA_TNIL;
+                lua_pushvalue(luaVM, iArgument);
+                m_iFunctionRef = luaL_ref(luaVM, LUA_REGISTRYINDEX);
+
+                CLuaMain& luaMain = lua_getownercluamain(luaVM);
+                m_pResource = luaMain.GetResource();
                 break;
             }
 
@@ -294,6 +363,29 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
             case LUA_TSTRING:
             {
                 lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
+                break;
+            }
+
+            case LUA_TFUNCTION:
+            {
+                if (m_pResource)
+                {
+                    lua_newtable(luaVM); // create callable
+
+                    lua_pushresource(luaVM, m_pResource); // push function inside callable
+                    lua_setfield(luaVM, -2, "resource");
+
+                    lua_pushnumber(luaVM, m_iFunctionRef); // push function ref inside callable
+                    lua_setfield(luaVM, -2, "reference");
+
+                    lua_pushcfunction(luaVM, CleanupFunction); // push cleanup function
+                    lua_setfield(luaVM, -2, "free");
+
+                    lua_newtable(luaVM); // create metatable
+                    lua_pushcfunction(luaVM, CallFunction);
+                    lua_setfield(luaVM, -2, "__call");
+                    lua_setmetatable(luaVM, -2);
+                }
                 break;
             }
         }
@@ -963,6 +1055,10 @@ bool CLuaArgument::IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaA
         {
             return m_strString == compareTo.m_strString;
         }
+        case LUA_TFUNCTION:
+        {
+            return m_pResource == compareTo.m_pResource && m_iFunctionRef == compareTo.m_iFunctionRef;
+        }
     }
 
     return false;
@@ -1071,4 +1167,139 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
         }
     }
     return true;
+}
+
+int CLuaArgument::CallFunction(lua_State* luaVM)
+{
+    if (lua_type(luaVM, 1) == LUA_TTABLE)
+    {
+        lua_getfield(luaVM, 1, "resource");
+        CResource* resource = nullptr;
+        if (lua_type(luaVM, -1) == LUA_TLIGHTUSERDATA)
+        {
+            resource = lua_toresource(luaVM, -1);
+        }
+        lua_pop(luaVM, 1);
+        if (resource)
+        {
+            const char* resourceName = resource->GetName().c_str();
+            if (resource->IsActive())
+            {
+                lua_getfield(luaVM, 1, "reference");
+                int reference = 0;
+                if (lua_type(luaVM, -1) == LUA_TNUMBER)
+                {
+                    reference = (int)lua_tonumber(luaVM, -1);
+                }
+                lua_pop(luaVM, 1);
+                if (reference != 0)
+                {
+                    lua_State* resourceVM = resource->GetVirtualMachine()->GetVM();
+                    if (resourceVM)
+                    {
+                        lua_getref(resourceVM, reference);
+                        if (lua_type(resourceVM, -1) == LUA_TFUNCTION)
+                        {
+                            lua_pop(resourceVM, 1); // pop function after type checked
+
+                            CLuaArguments arguments;
+
+                            CScriptArgReader argReader(luaVM);
+                            argReader.Skip(1);
+                            argReader.ReadLuaArguments(arguments);
+
+                            int top = lua_gettop(resourceVM);
+                            argReader.m_luaVM = resourceVM;
+                            argReader.m_iIndex = top + 1;
+
+                            lua_getref(resourceVM, reference);
+                            arguments.PushArguments(resourceVM);
+                            lua_call(resourceVM, arguments.Count(), LUA_MULTRET);
+
+                            arguments.DeleteArguments();
+
+                            int returnCount = lua_gettop(resourceVM) - top;
+                            if (returnCount > 0)
+                            {
+                                argReader.ReadLuaArguments(arguments);
+                                arguments.PushArguments(luaVM);
+                            }
+
+                            return returnCount;
+                        }
+                        else
+                        {
+                            g_pGame->GetScriptDebugging()->LogError(NULL, "calling to a none function value on resource[%s]", resourceName);
+                        }
+                        lua_pop(resourceVM, 1); // pop function
+                    }
+                    else
+                    {
+                        g_pGame->GetScriptDebugging()->LogError(NULL, "couldn't find resource virutal machine");
+                    }
+                }
+                else
+                {
+                    g_pGame->GetScriptDebugging()->LogError(NULL, "invalid reference id while calling to resource[%s]", resourceName);
+                }
+            }
+            else
+            {
+                g_pGame->GetScriptDebugging()->LogError(NULL, "calling to a none running resource[%s]", resourceName);
+            }
+        }
+        else
+        {
+            g_pGame->GetScriptDebugging()->LogError(NULL, "couldn't find the resource of function");
+        }
+        return 0;
+    }
+}
+
+int CLuaArgument::CleanupFunction(lua_State* luaVM)
+{
+    if (lua_type(luaVM, 1) == LUA_TTABLE)
+    {
+        lua_getfield(luaVM, 1, "resource");
+        CResource* resource = nullptr;
+        if (lua_type(luaVM, -1) == LUA_TLIGHTUSERDATA)
+        {
+            resource = lua_toresource(luaVM, -1);
+        }
+        lua_pop(luaVM, 1);
+        if (resource)
+        {
+            const char* resourceName = resource->GetName().c_str();
+            if (resource->IsActive())
+            {
+                lua_getfield(luaVM, 1, "reference");
+                int reference = 0;
+                if (lua_type(luaVM, -1) == LUA_TNUMBER)
+                {
+                    reference = (int)lua_tonumber(luaVM, -1);
+                }
+                lua_pop(luaVM, 1);
+                if (reference != 0)
+                {
+                    lua_State* resourceVM = resource->GetVirtualMachine()->GetVM();
+                    if (resourceVM)
+                    {
+                        lua_getref(resourceVM, reference);
+                        if (lua_type(resourceVM, -1) != LUA_TNIL)
+                        {
+                            lua_pop(resourceVM, 1);
+
+                            lua_unref(resourceVM, reference);
+
+                            lua_pushboolean(luaVM, true);
+                            return 1;
+                        }
+                        lua_pop(resourceVM, 1);
+                    }
+                }
+            }
+        }
+    }
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
