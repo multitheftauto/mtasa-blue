@@ -269,6 +269,9 @@ public:
     bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
+    bool    IsReloadingWeapon() const { return m_bReloadingWeapon; }
+    void    SetReloadingWeapon(bool bState) { m_bReloadingWeapon = bState; }
+
     long long GetLastFarSyncTick() { return m_llLastFarSyncTick; }
     void      SetLastFarSyncTick(long long llLastSyncTick) { m_llLastFarSyncTick = llLastSyncTick; }
 
@@ -316,6 +319,7 @@ protected:
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
     CVehicle*                            m_pJackingVehicle;
+    bool                                 m_bReloadingWeapon;
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;
