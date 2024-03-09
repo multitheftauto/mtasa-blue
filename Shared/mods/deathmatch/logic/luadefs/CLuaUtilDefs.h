@@ -18,6 +18,7 @@ public:
 
     // Reserved functions
     LUA_DECLARE(DisabledFunction);
+    LUA_DECLARE(InitJsonTableAsFunction);
 
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
@@ -40,6 +41,7 @@ public:
     // JSON funcs
     LUA_DECLARE(toJSON);
     LUA_DECLARE(fromJSON);
+    LUA_DECLARE(jsonEncode);
 
     // PCRE functions
     LUA_DECLARE(PregFind);

@@ -234,6 +234,9 @@ void CLuaMain::Initialize()
 
     lua_pushelement(m_luaVM, m_pResource->GetResourceRootElement());
     lua_setglobal(m_luaVM, "resourceRoot");
+
+    // load json "module"
+    CLuaUtilDefs::InitJsonTableAsFunction(m_luaVM);
 }
 
 void CLuaMain::LoadEmbeddedScripts()

@@ -620,15 +620,6 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         return false;
     }
 
-    // Check json has precision mod - #8853 (toJSON passes wrong floats)
-    json_object* pJsonObject = json_object_new_double(5.12345678901234);
-    SString      strJsonResult = json_object_to_json_string_ext(pJsonObject, JSON_C_TO_STRING_PLAIN);
-    json_object_put(pJsonObject);
-    if (strJsonResult != "5.12345678901234")
-    {
-        CLogger::ErrorPrintf("JSON built without precision modification\n");
-    }
-
     // Grab the path to the main config
     SString     strBuffer;
     const char* szMainConfig;

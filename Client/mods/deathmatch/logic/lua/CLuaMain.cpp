@@ -175,6 +175,9 @@ void CLuaMain::InitVM()
 
     lua_pushelement(m_luaVM, g_pClientGame->GetLocalPlayer());
     lua_setglobal(m_luaVM, "localPlayer");
+
+    // Load json "module"
+    CLuaUtilDefs::InitJsonTableAsFunction(m_luaVM);
 }
 
 void CLuaMain::LoadEmbeddedScripts()

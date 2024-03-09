@@ -18,10 +18,19 @@ extern "C"
     #include "lua.h"
 }
 #include "../common/CBitStream.h"
-#include "json.h"
+
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/error/error.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 class CElement;
+class CResource;
 class CLuaArguments;
+class CResourceManager;
 
 #define LUA_TTABLEREF 9
 #define LUA_TSTRING_LONG 10
@@ -58,13 +67,20 @@ public:
     CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
 
-    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
-    json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
-    bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    char*        WriteToString(char* szBuffer, int length);
+    bool            ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool            WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
+    char*           WriteToString(char* szBuffer, int length);
 
-    bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
+    bool            IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
+
+    // json parser
+    bool            DeserializeValueFromJSON(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
+
+    // json serializer
+    bool            GetResourceNameFromUserData(std::string& result) const;
+
+    template        <typename Writer>
+    void            SerializeToJSON(Writer& writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;

@@ -499,8 +499,10 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
 
         // Make a lua argument from it and set the content
         CLuaArguments args;
-        if (!args.ReadFromJSONString(pAttribute->GetValue().c_str()))
+        if (!args.ReadJSONString(pAttribute->GetValue().c_str(), true))
             args.PushString(pAttribute->GetValue().c_str());
+        else
+            args.PushArguments(args);
 
         // Don't trigger onElementDataChanged event
         ESyncType syncType = g_pGame->GetConfig()->GetSyncMapElementData() ? ESyncType::BROADCAST : ESyncType::LOCAL;
