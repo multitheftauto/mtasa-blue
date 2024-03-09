@@ -26,6 +26,7 @@
 #include "CWorldSA.h"
 #include "CKeyGenSA.h"
 #include "CFileLoaderSA.h"
+#include "CPtrNodeSingleListSA.h"
 
 extern CGameSA* pGame;
 
@@ -409,6 +410,14 @@ void CPoolsSA::RemoveBuilding(CBuilding* pBuilding)
 
     // Remove building from world
     pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
+
+    // Remove building from cover list
+    CPtrNodeSingleListSAInterface<CBuildingSAInterface>* coverList = reinterpret_cast<CPtrNodeSingleListSAInterface<CBuildingSAInterface>*>(0xC1A2B8);
+    coverList->RemoveItem(pInterface);
+
+    // Remove plant
+    using CPlantColEntry_Remove = CEntitySAInterface* (*)(CEntitySAInterface*);
+    ((CPlantColEntry_Remove)0x5DBEF0)(pInterface);
 
     // Remove col reference
     auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
