@@ -290,6 +290,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
     SString strNumberPlate;
     uchar   ucVariant;
     uchar   ucVariant2;
+    bool    bSynced;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -303,6 +304,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
     }
     argStream.ReadNumber(ucVariant, 254);
     argStream.ReadNumber(ucVariant2, 254);
+    argStream.ReadBool(bSynced, true);
 
     if (!argStream.HasErrors())
     {
@@ -316,7 +318,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
                 {
                     // Create the vehicle and return its handle
                     CVehicle* pVehicle =
-                        CStaticFunctionDefinitions::CreateVehicle(pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2);
+                        CStaticFunctionDefinitions::CreateVehicle(pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2, bSynced);
                     if (pVehicle)
                     {
                         CElementGroup* pGroup = pResource->GetElementGroup();
