@@ -15,6 +15,7 @@
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
 #include "CKeyBinds.h"
+#include <numeric>
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -65,7 +66,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerNametagShowing", SetPlayerNametagShowing},
         {"setPlayerMuted", SetPlayerMuted},
         {"setPlayerBlurLevel", SetPlayerBlurLevel},
-        {"redirectPlayer", RedirectPlayer},
+        {"redirectPlayer", ArgumentParserWarn<false, RedirectPlayer>},
         {"setPlayerName", SetPlayerName},
         {"detonateSatchels", DetonateSatchels},
         {"takePlayerScreenShot", TakePlayerScreenShot},
@@ -1162,32 +1163,41 @@ int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::RedirectPlayer(lua_State* luaVM)
+std::string CLuaPlayerDefs::ArgsToString(const std::string& str, const std::pair<const std::string, std::string>& args)
 {
-    CPlayer*       pElement;
-    SString        strHost;
-    unsigned short usPort;
-    SString        strPassword;
+    static const std::string delimiter = "/";
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strHost);
-    argStream.ReadNumber(usPort);
-    argStream.ReadString(strPassword, "");
+    std::string key;
+    std::string value;
 
-    if (!argStream.HasErrors())
+    // Remove delimiter from key & value
+    std::copy_if(args.first.begin(), args.first.end(), std::back_inserter(key), [](char c) { return delimiter.find(c) == std::string::npos; });
+    std::copy_if(args.second.begin(), args.second.end(), std::back_inserter(value), [](char c) { return delimiter.find(c) == std::string::npos; });
+
+    return str + (str.empty() ? std::string() : delimiter) + key + delimiter + value;
+}
+
+bool CLuaPlayerDefs::RedirectPlayer(CPlayer* pElement, std::string strHost, unsigned short usPort, std::optional<std::string> strPassword,
+                                    std::optional<std::unordered_map<std::string, std::string>> mArgs)
+{
+    std::string strDetails;
+
+    if (mArgs.has_value())
     {
-        if (CStaticFunctionDefinitions::RedirectPlayer(pElement, strHost, usPort, strPassword.empty() ? nullptr : *strPassword))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        auto args = mArgs.value();
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        // Convert table of strings ({["a"] = "1", ["b"] = "2"}) to string ("a/1/b/2")
+        strDetails = std::accumulate(args.begin(), args.end(), std::string(), &ArgsToString);
+    }
+
+    if (strDetails.length() > MAX_REDIRECT_DETAILS_LENGTH)
+        throw std::invalid_argument("Details must be " + std::to_string(MAX_REDIRECT_DETAILS_LENGTH) + " characters or less");
+
+    if (CStaticFunctionDefinitions::RedirectPlayer(pElement, strHost.c_str(), usPort, strPassword.has_value() ? strPassword.value().c_str() : nullptr,
+                                                   strDetails.c_str()))
+        return true;
+
+    return false;
 }
 
 int CLuaPlayerDefs::TakePlayerMoney(lua_State* luaVM)

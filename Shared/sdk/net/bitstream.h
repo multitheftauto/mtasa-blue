@@ -540,6 +540,10 @@ enum class eBitStreamVersion : unsigned short
     // 2023-10-12
     CPlayerJoinCompletePacket_ServerName,
 
+    // Add support for query args on mtasa:// protocol
+    // 2023-10-15
+    CPlayerJoinDataPacket_ProtocolConnectArgs,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

@@ -34,7 +34,7 @@ enum eVoiceState
     VOICESTATE_TRANSMITTING_IGNORED,
 };
 
-#define MOVEMENT_UPDATE_THRESH (5)
+#define MOVEMENT_UPDATE_THRESH   (5)
 #define DISTANCE_FOR_NEAR_VIEWER (310)
 
 struct SViewerInfo
@@ -335,6 +335,9 @@ public:
     const SString& GetQuitReasonForLog() { return m_strQuitReasonForLog; }
     void           SetQuitReasonForLog(const SString& strReason) { m_strQuitReasonForLog = strReason; }
 
+    void           SetConnectArgs(const SString&& args) { m_strConnectArgs = args; }
+    const SString& GetConnectArgs() const { return m_strConnectArgs; }
+
     CFastHashSet<CPlayer*> m_PureSyncSimSendList;
     bool                   m_bPureSyncSimSendListDirty;
     class CSimPlayer*      m_pSimPlayer;
@@ -465,4 +468,5 @@ private:
 
     ushort  m_usPrevDimension;
     SString m_strQuitReasonForLog;
+    SString m_strConnectArgs;
 };

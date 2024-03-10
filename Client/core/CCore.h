@@ -41,6 +41,7 @@ class CDiscordInterface;
 #include <ijsify.h>
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
+#include <any>
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -233,8 +234,9 @@ public:
     uint GetMinStreamingMemory();
     uint GetMaxStreamingMemory();
 
-    SString GetConnectCommandFromURI(const char* szURI);
-    void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
+    SString GetConnectCommandFromURI(const char* szURI, std::string& strQueryParams);
+    void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword,
+                                        std::string& strQueryParams);
     std::map<std::string, std::string>& GetCommandLineOptions() { return m_CommandLineOptions; }
     const char*                         GetCommandLineOption(const char* szOption);
     const char*                         GetCommandLineArgs() { return m_szCommandLineArgs; }
@@ -285,6 +287,9 @@ public:
     void   SetCustomStreamingMemory(size_t szMB);
     bool   IsUsingCustomStreamingMemorySize();
     size_t GetStreamingMemory();
+
+    void               SetProtocolConnectArgs(const std::string&& args) { m_strProtocolConnectArgs = args; }
+    const std::string& GetProtocolConnectArgs() const { return m_strProtocolConnectArgs; }
 
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
@@ -396,6 +401,9 @@ private:
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
+
+    std::vector<std::pair<std::string, std::string>> m_vecProtocolConnectArgs{};
+    std::string                                      m_strProtocolConnectArgs;
 
     long long m_timeDiscordAppLastUpdate;
 };
