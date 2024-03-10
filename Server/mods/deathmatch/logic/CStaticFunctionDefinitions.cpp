@@ -1626,10 +1626,10 @@ bool CStaticFunctionDefinitions::SetElementDoubleSided(CElement* pElement, bool 
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHealth)
+bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHealth, CPlayer* pClient)
 {
     assert(pElement);
-    RUN_CHILDREN(SetElementHealth(*iter, fHealth))
+    RUN_CHILDREN(SetElementHealth(*iter, fHealth, pClient))
 
     switch (pElement->GetType())
     {
@@ -1641,6 +1641,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
             {
                 // Limit their max health to what the stat says
                 float fMaxHealth = pPed->GetMaxHealth();
+                float mhealth = pPed->GetHealth();
+                float newHealth = fHealth; // send the newHealth.. to know if someone is cheating or editing his health to be 999+
                 if (fHealth > fMaxHealth)
                     fHealth = fMaxHealth;
 
@@ -1652,6 +1654,15 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
                 pPed->SetHealth(fHealth);
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber(mhealth);
+                Arguments.PushNumber(newHealth);
+                bool bContinue = pPed->CallEvent("onElementHealthChange", Arguments, pClient);
+                if (!bContinue){
+                    pPed->SetHealth(mhealth); // cancelled? re set old health
+                    return false;
+                }
             }
             else
                 return false;
@@ -1661,12 +1672,34 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetHealth(fHealth);
+
+            float mhealth = pVehicle->GetHealth();
+            float newHealth = fHealth;
+            CLuaArguments Arguments;
+            Arguments.PushNumber(mhealth);
+            Arguments.PushNumber(newHealth);
+            bool bContinue = pVehicle->CallEvent("onElementHealthChange", Arguments, pClient);
+            if (!bContinue){
+                pVehicle->SetHealth(mhealth); // cancelled? re set old health
+                return false;
+            }
             break;
         }
         case CElement::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetHealth(fHealth);
+
+            float mhealth = pObject->GetHealth();
+            float newHealth = fHealth;
+            CLuaArguments Arguments;
+            Arguments.PushNumber(mhealth);
+            Arguments.PushNumber(newHealth);
+            bool bContinue = pObject->CallEvent("onElementHealthChange", Arguments, pClient);
+            if (!bContinue){
+                pObject->SetHealth(mhealth); // cancelled? re set old health
+                return false;
+            }
             break;
         }
         default:

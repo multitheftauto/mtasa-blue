@@ -117,6 +117,9 @@ enum ePacketID
     // Custom data related packets
     PACKET_ID_CUSTOM_DATA,
 
+    // HEALTH
+    PACKET_ID_HEALTH_UPDATE,
+
     // Camera related packets
     PACKET_ID_CAMERA_SYNC,
 

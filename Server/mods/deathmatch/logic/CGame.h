@@ -45,6 +45,7 @@ class CGame;
 #include "packets/CDestroySatchelsPacket.h"
 #include "packets/CDetonateSatchelsPacket.h"
 #include "packets/CCustomDataPacket.h"
+#include "packets/CHealthPacket.h"
 #include "packets/CCameraSyncPacket.h"
 #include "packets/CPlayerTransgressionPacket.h"
 #include "packets/CPlayerDiagnosticPacket.h"
@@ -115,6 +116,7 @@ class CFunctionUseLogger;
 // Packet forward declarations
 class CCommandPacket;
 class CCustomDataPacket;
+class CHealthPacket;
 class CDetonateSatchelsPacket;
 class CExplosionSyncPacket;
 class CKeysyncPacket;
@@ -495,6 +497,7 @@ private:
     void Packet_VehicleTrailer(class CVehicleTrailerPacket& Packet);
     void Packet_LuaEvent(class CLuaEventPacket& Packet);
     void Packet_CustomData(class CCustomDataPacket& Packet);
+    void Packet_changeHealth(class CHealthPacket& Packet);
     void Packet_Voice_Data(class CVoiceDataPacket& Packet);
     void Packet_Voice_End(class CVoiceEndPacket& Packet);
     void Packet_CameraSync(class CCameraSyncPacket& Packet);
