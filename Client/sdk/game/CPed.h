@@ -175,7 +175,7 @@ class CPed : public virtual CPhysical
 public:
     virtual ~CPed(){};
 
-    virtual class CPedSAInterface* GetPedInterface() = 0;
+    virtual class CPedSAInterface* GetPedInterface() const = 0;
 
     virtual void DetachPedFromEntity() = 0;
 

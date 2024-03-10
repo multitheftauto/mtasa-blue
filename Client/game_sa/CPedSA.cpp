@@ -27,14 +27,8 @@ extern CGameSA* pGame;
 
 int g_bOnlyUpdateRotations = false;
 
-CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL),
-m_pDefaultPedSound(NULL), m_iCustomMoveAnim(0)
-{
-    MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
-}
-
-CPedSA::CPedSA(CPedSAInterface* pPedInterface) : m_pPedIntelligence(NULL), m_pPedInterface(pPedInterface),
-m_pPedSound(NULL), m_pDefaultPedSound(NULL), m_iCustomMoveAnim(0)
+CPedSA::CPedSA(CPedSAInterface* pPedInterface)
+    : m_pPedInterface(pPedInterface)
 {
     MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
@@ -94,7 +88,7 @@ void CPedSA::Init()
     CPedIntelligenceSAInterface* m_pPedIntelligenceInterface = (CPedIntelligenceSAInterface*)(dwPedIntelligence);
     m_pPedIntelligence = new CPedIntelligenceSA(m_pPedIntelligenceInterface, this);
     m_pPedSound = new CPedSoundSA(&pedInterface->pedSound);
-    m_pDefaultPedSound = new CPedSoundSA(&pedInterface->pedSound);
+    m_pDefaultPedSound = new CPedSoundSA(std::move(pedInterface->pedSound));
 
     for (int i = 0; i < WEAPONSLOT_MAX; i++)
         m_pWeapons[i] = new CWeaponSA(&(pedInterface->Weapons[i]), this, (eWeaponSlot)i);
