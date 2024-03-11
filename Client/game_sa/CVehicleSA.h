@@ -17,6 +17,7 @@
 #include "CPhysicalSA.h"
 #include "CPoolsSA.h"
 #include "CHandlingManagerSA.h"
+#include "CVehicleAudioSettingsManagerSA.h"
 #include "CDamageManagerSA.h"
 #include "CDoorSA.h"
 #include "CColPointSA.h"
@@ -34,6 +35,7 @@ struct RwTexture;
 #define FUNC_CVehicle_GetBaseVehicleType        0x411D50
 #define FUNC_CVehicle_IsUpsideDown              0x6D1D90
 #define FUNC_CVehicle_SetEngineOn               0x41BDD0
+#define FUNC_CVehicle_IsPassenger               0x6D1BD0
 #define FUNC_CTrain_FindPositionOnTrackFromCoors           0x6F6CC0
 
 #define FUNC_CVehicle_QueryPickedUpEntityWithWinch              0x6d3cf0
@@ -453,6 +455,7 @@ public:
     void  SetRailTrack(BYTE ucTrackID);
     float GetTrainPosition();
     void  SetTrainPosition(float fPosition, bool bRecalcOnRailDistance = true);
+    bool  IsPassenger(CPed* pPed);
 
     void AddVehicleUpgrade(DWORD dwModelID);
     void RemoveVehicleUpgrade(DWORD dwModelID);
@@ -664,6 +667,7 @@ public:
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
+    void                              ReinitAudio();
 
     void UpdateLandingGearPosition();
 

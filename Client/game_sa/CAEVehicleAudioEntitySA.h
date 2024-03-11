@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "CVehicleAudioSettingsEntrySA.h"
 #include <game/CAEVehicleAudioEntity.h>
 #include "CAudioEngineSA.h"
 
@@ -19,29 +20,6 @@
 #define FUNC_CAEVehicleAudioEntity__JustGotOutOfVehicleAsDriver                        0x4FCF40
 #define FUNC_CAEVehicleAudioEntity__ProcessAIProp                                      0x4FDFD0
 #define FUNC_CAEVehicleAudioEntity__ProcessAIHeli                                      0x4FEE20
-
-struct tVehicleAudioSettings
-{
-    char  m_nVehicleSoundType;
-    char  unk1;
-    short m_wEngineOnSoundBankId;
-    short m_wEngineOffSoundBankId;
-    char  m_nStereo;
-    char  unk2;
-    int   unk3;
-    int   unk4;
-    char  m_bHornTon;
-    char  unk5[3];
-    float m_fHornHigh;
-    char  m_nDoorSound;
-    char  unk6;
-    char  m_nRadioNum;
-    char  m_nRadioType;
-    char  unk7;
-    char  unk8[3];
-    float m_fHornVolumeDelta;
-};
-static_assert(sizeof(tVehicleAudioSettings) == 0x24, "Invalid size for tVehicleAudioSettings");
 
 struct tVehicleSound
 {
@@ -152,6 +130,7 @@ public:
     void JustGotOutOfVehicleAsDriver();
     void TurnOnRadioForVehicle();
     void StopVehicleEngineSound(unsigned char ucSlot);
+    CAEVehicleAudioEntitySAInterface* GetInterface() { return m_pInterface; };
 
 private:
     CAEVehicleAudioEntitySAInterface* m_pInterface;

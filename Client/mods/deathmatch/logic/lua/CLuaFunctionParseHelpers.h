@@ -81,6 +81,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
 DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
+DECLARE_ENUM_CLASS(eVehicleAudioSettingProperty);
 
 class CRemoteCall;
 
@@ -498,6 +499,11 @@ inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
 inline SString GetClassTypeName(CClientVectorGraphic*)
 {
     return "svg";
+}
+
+inline SString GetClassByTypeName(eVehicleAudioSettingProperty)
+{
+    return "vehicle-audio-setting";
 }
 
 //

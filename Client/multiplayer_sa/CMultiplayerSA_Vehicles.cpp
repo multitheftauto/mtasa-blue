@@ -60,55 +60,6 @@ static void _declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
-// CAEVehicleAudioEntity::Initialise
-//
-// This hook setup a audio interfeace for custom vehicles
-//
-//////////////////////////////////////////////////////////////////////////////////////////
-//     0x4F77C1 | 8D 34 C0              | lea esi, [eax + eax * 8]
-//     0x4F77C4 | 8D BD 80 00 00 00     | lea edi, [ebp + 80h]
-//     0x4F77CA | 8D 34 B5 F0 0A 86 00  | lea esi, _VehicleAudioProperties.m_eVehicleSoundType[esi * 4]
-//     0x4F77D1 | B9 09 00 00 00        | mov ecx,9
-//     0x4F77D6 | F3 A5                 | rep movsd
-//     0x4F77D8 | 8B CA                 | mov ecx, edx;
-
-static CVehicleSAInterface* pRequestSoundSettingsVehicle = 0;
-tVehicleAudioSettings*      pVehicleAudioSettings = nullptr;
-
-static tVehicleAudioSettings* __fastcall getVehicleSoundSettings()
-{
-    ushort usModel = pRequestSoundSettingsVehicle->m_nModelIndex;
-    // Check if it is a custom model
-    if (usModel < VT_LANDSTAL || usModel >= VT_MAX)
-        usModel = pGameInterface->GetModelInfo(usModel)->GetParentID();
-    return (tVehicleAudioSettings*)0x860AF0 + (usModel - VT_LANDSTAL);
-}
-
-#define HOOKPOS_CAEVehicleAudioEntity__Initialise  0x4F77C1
-#define HOOKSIZE_CAEVehicleAudioEntity__Initialise 0x10
-static DWORD CONTINUE_CAEVehicleAudioEntity__Initialise = 0x4F77D1;
-
-static void _declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise()
-{
-    _asm
-    {
-        pushad
-        mov     pRequestSoundSettingsVehicle, edx
-    }
-
-    pVehicleAudioSettings = getVehicleSoundSettings();
-
-    _asm
-    {
-        popad
-        lea    edi, [ebp + 80h]
-        mov    esi, pVehicleAudioSettings
-        jmp CONTINUE_CAEVehicleAudioEntity__Initialise
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//
 // CMultiplayerSA::InitHooks_Vehicles
 //
 // Setup hooks
@@ -117,5 +68,4 @@ static void _declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise()
 void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
-    EZHookInstall(CAEVehicleAudioEntity__Initialise);
 }

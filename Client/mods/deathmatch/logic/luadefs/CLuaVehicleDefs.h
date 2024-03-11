@@ -162,6 +162,11 @@ public:
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
+    static bool SetVehicleModelAudioSetting(const uint uiModel, const eVehicleAudioSettingProperty eProperty, float varValue);
+    static bool SetVehicleAudioSetting(CClientVehicle* pVehicle, const eVehicleAudioSettingProperty eProperty, float varValue);
+    static std::unordered_map<std::string, float> GetVehicleModelAudioSetting(const uint uiModel);
+    static std::unordered_map<std::string, float> GetVehicleAudioSetting(CClientVehicle* pVehicle);
+
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);
     LUA_DECLARE_OOP(GetVehicleComponentPosition);

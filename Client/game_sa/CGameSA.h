@@ -152,6 +152,7 @@ public:
     CColStore*                GetCollisionStore() override { return m_collisionStore; }
     CRenderWareSA*            GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
+    CVehicleAudioSettingsManager* GetVehicleAudioSettingsManager() { return m_pVehicleAudioSettingsManager; }
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -319,7 +320,8 @@ private:
     CTasks*                   m_pTasks;
     CGameSettings*            m_pSettings;
     CCarEnterExit*            m_pCarEnterExit;
-    CControllerConfigManager* m_pControllerConfigManager;
+    CControllerConfigManager*     m_pControllerConfigManager;
+    CVehicleAudioSettingsManager* m_pVehicleAudioSettingsManager;
 
     eGameVersion m_eGameVersion;
     bool         m_bAsyncScriptEnabled;

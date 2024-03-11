@@ -824,6 +824,24 @@ ADD_ENUM(_D3DFORMAT::D3DFMT_G32R32F, "g32r32f")
 ADD_ENUM(_D3DFORMAT::D3DFMT_A32B32G32R32F, "a32b32g32r32f")
 IMPLEMENT_ENUM_CLASS_END("surface-format")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eVehicleAudioSettingProperty)
+ADD_ENUM(eVehicleAudioSettingProperty::DOOR_SOUND, "door-sound")
+ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID, "engine-off-soundbank-id")
+ADD_ENUM(eVehicleAudioSettingProperty::ENGINE_ON_SOUND_BANK_ID, "engine-on-soundbank-id")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_HIGH, "horn-high")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_TON, "horn-ton")
+ADD_ENUM(eVehicleAudioSettingProperty::HORN_VOLUME_DELTA, "horn-volume-delta")
+ADD_ENUM(eVehicleAudioSettingProperty::RADIO_NUM, "radion-num")
+ADD_ENUM(eVehicleAudioSettingProperty::RADIO_TYPE, "radio-type")
+ADD_ENUM(eVehicleAudioSettingProperty::SOUND_TYPE, "sound-type")
+ADD_ENUM(eVehicleAudioSettingProperty::STEREO, "stereo")
+ADD_ENUM(eVehicleAudioSettingProperty::UNK3, "unk3")
+ADD_ENUM(eVehicleAudioSettingProperty::UNK4, "unk4")
+ADD_ENUM(eVehicleAudioSettingProperty::UNK6, "unk6")
+ADD_ENUM(eVehicleAudioSettingProperty::VEHICLE_TYPE_FOR_AUDIO, "vehicle-type-for-audio")
+IMPLEMENT_ENUM_CLASS_END("vehicle-audio-setting")
+
+
 //
 // CResource from userdata
 //
