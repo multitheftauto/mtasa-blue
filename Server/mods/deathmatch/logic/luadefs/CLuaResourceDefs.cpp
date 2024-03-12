@@ -49,6 +49,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResources", getResources},
 
         {"getResourceState", getResourceState},
+        {"getIsResourceRunningForPlayer", getIsResourceRunningForPlayer},
         {"getResourceInfo", getResourceInfo},
         {"getResourceConfig", getResourceConfig},
         {"getResourceLoadFailureReason", getResourceLoadFailureReason},
@@ -699,6 +700,27 @@ int CLuaResourceDefs::getResourceState(lua_State* luaVM)
             lua_pushstring(luaVM, "loaded");
         else
             lua_pushstring(luaVM, "failed to load");
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaResourceDefs::getIsResourceRunningForPlayer(lua_State* luaVM)
+{
+    CResource* pResource;
+    CPlayer*   pPlayer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pResource);
+    argStream.ReadUserData(pPlayer);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, g_pGame->GetIsResourceRunningForPlayer(pResource, pPlayer));
         return 1;
     }
     else
