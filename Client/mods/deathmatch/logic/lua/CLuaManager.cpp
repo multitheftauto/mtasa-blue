@@ -175,6 +175,8 @@ void CLuaManager::LoadCFunctions()
         {"setClipboard", CLuaFunctionDefs::SetClipboard},
         {"setWindowFlashing", CLuaFunctionDefs::SetWindowFlashing},
         {"clearChatBox", CLuaFunctionDefs::ClearChatBox},
+        {"registerChatColor", CLuaFunctionDefs::RegisterChatColor},
+        {"unregisterChatColor", CLuaFunctionDefs::UnregisterChatColor},
 
         // Notification funcs
         {"createTrayNotification", CLuaFunctionDefs::CreateTrayNotification},

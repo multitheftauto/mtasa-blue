@@ -74,6 +74,64 @@ int CLuaFunctionDefs::ClearChatBox(lua_State* luaVM)
     return 1;
 }
 
+int CLuaFunctionDefs::RegisterChatColor(lua_State* luaVM)
+{
+    SString strColorName = "";
+    SString strHexCode = "";
+
+    unsigned char ucRed = 255;
+    unsigned char ucGreen = 0;
+    unsigned char ucBlue = 0;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strColorName);
+
+    if (argStream.NextIsNumber())
+    {
+        argStream.ReadNumber(ucRed, 255);
+        argStream.ReadNumber(ucGreen, 0);
+        argStream.ReadNumber(ucBlue, 0);
+
+        strHexCode.Format("#%.2X%.2X%.2X", ucRed, ucGreen, ucBlue);
+    }
+    else
+        argStream.ReadString(strHexCode);
+
+    if (!argStream.HasErrors())
+    {
+        // Register the color
+        lua_pushboolean(luaVM, g_pCore->RegisterChatColor(strColorName, strHexCode, g_pClientGame->GetResourceManager()->GetResourceName(luaVM)));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaFunctionDefs::UnregisterChatColor(lua_State* luaVM)
+{
+    SString strColorName = "";
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadString(strColorName);
+
+    if (!argStream.HasErrors())
+    {
+        // Register the color
+        lua_pushboolean(luaVM, g_pCore->UnregisterChatColor(strColorName));
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // Failed
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaFunctionDefs::SetClipboard(lua_State* luaVM)
 {
     SString          strText = "";
