@@ -1577,28 +1577,69 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CElement* pElement, unsigned ch
         case CElement::PED:
         case CElement::PLAYER:
         {
-            CPed* pPed = static_cast<CPed*>(pElement);
+            CPed*         pPed = static_cast<CPed*>(pElement);
+            unsigned char ucOldAlpha = pPed->GetAlpha();
             pPed->SetAlpha(ucAlpha);
+
+            if (ucAlpha == ucOldAlpha)
+                break;
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(ucOldAlpha);
+            Arguments.PushNumber(ucAlpha);
+            pPed->CallEvent("onElementAlphaChange", Arguments);
+
             break;
         }
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+
+            unsigned char ucOldAlpha = pVehicle->GetAlpha();
             pVehicle->SetAlpha(ucAlpha);
+
+            if (ucAlpha == ucOldAlpha)
+                break;
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(ucOldAlpha);
+            Arguments.PushNumber(ucAlpha);
+            pVehicle->CallEvent("onElementAlphaChange", Arguments);
+
             break;
         }
         case CElement::OBJECT:
         {
-            CObject* pObject = static_cast<CObject*>(pElement);
+            CObject*      pObject = static_cast<CObject*>(pElement);
+            unsigned char ucOldAlpha = pObject->GetAlpha();
             pObject->SetAlpha(ucAlpha);
+
+            if (ucAlpha == ucOldAlpha)
+                break;
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(ucOldAlpha);
+            Arguments.PushNumber(ucAlpha);
+            pObject->CallEvent("onElementAlphaChange", Arguments);
+
             break;
         }
         case CElement::MARKER:
         {
             CMarker* pMarker = static_cast<CMarker*>(pElement);
             SColor   color = pMarker->GetColor();
+            bool     bAlphaChanged = color.A == ucAlpha;
             color.A = ucAlpha;
             pMarker->SetColor(color);
+
+            if (!bAlphaChanged)
+                break;
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(color.A);
+            Arguments.PushNumber(ucAlpha);
+            pMarker->CallEvent("onElementAlphaChange", Arguments);
+
             break;
         }
         default:

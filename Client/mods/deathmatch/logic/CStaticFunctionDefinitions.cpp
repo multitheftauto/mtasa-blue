@@ -1413,29 +1413,69 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CClientEntity& Entity, unsigned
         case CCLIENTPED:
         case CCLIENTPLAYER:
         {
-            CClientPed& Ped = static_cast<CClientPed&>(Entity);
+            CClientPed&   Ped = static_cast<CClientPed&>(Entity);
+            unsigned char ucOldAlpha = Ped.GetAlpha();
             Ped.SetAlpha(ucAlpha);
+
+            if (ucAlpha == ucOldAlpha)
+                break;
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(ucOldAlpha);
+            Arguments.PushNumber(ucAlpha);
+            Ped.CallEvent("onClientElementAlphaChange", Arguments, true);
+
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+            unsigned char   ucOldAlpha = Vehicle.GetAlpha();
             Vehicle.SetAlpha(ucAlpha);
+
+            if (ucAlpha == ucOldAlpha)
+                break;
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(ucOldAlpha);
+            Arguments.PushNumber(ucAlpha);
+            Vehicle.CallEvent("onClientElementAlphaChange", Arguments, true);
+
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
+            unsigned char  ucOldAlpha = Object.GetAlpha();
             Object.SetAlpha(ucAlpha);
+
+            if (ucAlpha == ucOldAlpha)
+                break;
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(ucOldAlpha);
+            Arguments.PushNumber(ucAlpha);
+            Object.CallEvent("onClientElementAlphaChange", Arguments, true);
+
             break;
         }
         case CCLIENTMARKER:
         {
             CClientMarker& Marker = static_cast<CClientMarker&>(Entity);
             SColor         color = Marker.GetColor();
+            bool           bAlphaChanged = color.A == ucAlpha;
             color.A = ucAlpha;
             Marker.SetColor(color);
+
+            if (!bAlphaChanged)
+                break;
+
+            CLuaArguments Arguments;
+            Arguments.PushNumber(color.A);
+            Arguments.PushNumber(ucAlpha);
+            Marker.CallEvent("onClientElementAlphaChange", Arguments, true);
+
             break;
         }
 
