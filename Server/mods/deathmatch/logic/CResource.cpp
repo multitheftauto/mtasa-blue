@@ -1050,6 +1050,9 @@ bool CResource::Stop(bool bManualStop)
     Arguments.PushBoolean(m_bDestroyed);
     m_pResourceElement->CallEvent("onResourceStop", Arguments);
 
+    // Erase client resource start entry
+    g_pGame->RemoveResourceFromClientStartedResources(this);
+
     // Remove us from the resources we depend on (they might unload too first)
     for (CIncludedResources* pIncludedResources : m_IncludedResources)
     {
