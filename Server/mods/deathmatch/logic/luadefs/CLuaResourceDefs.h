@@ -42,6 +42,7 @@ public:
     LUA_DECLARE(getResources);
 
     LUA_DECLARE(getResourceState);
+    LUA_DECLARE(getIsResourceRunningForPlayer);
     LUA_DECLARE(getResourceInfo);
     LUA_DECLARE(getResourceConfig);
     LUA_DECLARE(getResourceLoadFailureReason);
