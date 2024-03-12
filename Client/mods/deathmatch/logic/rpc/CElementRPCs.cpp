@@ -353,21 +353,69 @@ void CElementRPCs::SetElementAlpha(CClientEntity* pSource, NetBitStreamInterface
             case CCLIENTPED:
             case CCLIENTPLAYER:
             {
-                CClientPed* pPed = static_cast<CClientPed*>(pSource);
+                CClientPed*   pPed = static_cast<CClientPed*>(pSource);
+                unsigned char ucOldAlpha = pPed->GetAlpha();
                 pPed->SetAlpha(ucAlpha);
+
+                if (ucAlpha == ucOldAlpha)
+                    break;
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber(ucOldAlpha);
+                Arguments.PushNumber(ucAlpha);
+                pPed->CallEvent("onClientElementAlphaChange", Arguments, true);
+
                 break;
             }
             case CCLIENTVEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
+
+                unsigned char ucOldAlpha = pVehicle->GetAlpha();
                 pVehicle->SetAlpha(ucAlpha);
+
+                if (ucAlpha == ucOldAlpha)
+                    break;
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber(ucOldAlpha);
+                Arguments.PushNumber(ucAlpha);
+                pVehicle->CallEvent("onClientElementAlphaChange", Arguments, true);
+
                 break;
             }
             case CCLIENTOBJECT:
             case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
+
+                unsigned char ucOldAlpha = pObject->GetAlpha();
                 pObject->SetAlpha(ucAlpha);
+
+                if (ucAlpha == ucOldAlpha)
+                    break;
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber(ucOldAlpha);
+                Arguments.PushNumber(ucAlpha);
+                pObject->CallEvent("onClientElementAlphaChange", Arguments, true);
+
+                break;
+            }
+            case CCLIENTMARKER:
+            {
+                CClientMarker* pMarker = static_cast<CClientMarker*>(pSource);
+                SColor         color = pMarker->GetColor();
+                bool           bAlphaChanged = color.A == ucAlpha;
+
+                if (!bAlphaChanged)
+                    break;
+
+                CLuaArguments Arguments;
+                Arguments.PushNumber(color.A);
+                Arguments.PushNumber(ucAlpha);
+                pMarker->CallEvent("onClientElementAlphaChange", Arguments, true);
+
                 break;
             }
             default:
