@@ -1464,7 +1464,6 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
 
             // Set the new health
             Ped.SetHealth(fHealth);
-            return true;
             break;
         }
         case CCLIENTVEHICLE:

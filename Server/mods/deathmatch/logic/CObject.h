@@ -63,7 +63,7 @@ public:
     void SetFrozen(bool bFrozen) { m_bIsFrozen = bFrozen; }
 
     float GetHealth() { return m_fHealth; }
-    void  SetHealth(float fHealth) { m_fHealth = fHealth; }
+    void  SetHealth(float fHealth);
 
     bool IsSyncable() { return m_bSyncable; }
     void SetSyncable(bool bSyncable) { m_bSyncable = bSyncable; }
