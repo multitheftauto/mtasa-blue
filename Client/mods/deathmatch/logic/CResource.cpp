@@ -374,6 +374,8 @@ void CResource::Stop()
             discord->UpdatePresence();
         }
     }
+
+    g_pCore->UnregisterColorCodesByResource(m_strResourceName);
 }
 
 SString CResource::GetState()
