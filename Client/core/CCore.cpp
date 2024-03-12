@@ -19,6 +19,7 @@
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
+#include <regex>
 #include "DXHook/CDirect3DHook9.h"
 #include "DXHook/CDirect3DHookManager.h"
 #include "CTimingCheckpoints.hpp"
@@ -417,6 +418,8 @@ void CCore::DebugClear()
 
 void CCore::ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded)
 {
+    SString strText = szText;
+
     // Set the color
     CChat* pChat = m_pLocalGUI->GetChat();
     if (pChat)
@@ -425,14 +428,26 @@ void CCore::ChatEchoColor(const char* szText, unsigned char R, unsigned char G, 
         pChat->SetTextColor(color);
     }
 
+    // Replace registered color codes
+    for (auto& colorData : m_vecRegisteredColorCodes)
+    {
+        if (strText.find(colorData.strColorName) != std::string::npos)
+        {
+            strText = strText.Replace(colorData.strColorName.c_str(), colorData.strHexColorCode.c_str());
+
+            if (!bColorCoded)
+                bColorCoded = true;
+        }
+    }
+
     // Echo it to the console and chat
-    m_pLocalGUI->EchoChat(szText, bColorCoded);
+    m_pLocalGUI->EchoChat(strText, bColorCoded);
     if (bColorCoded)
     {
-        m_pLocalGUI->EchoConsole(RemoveColorCodes(szText));
+        m_pLocalGUI->EchoConsole(RemoveColorCodes(strText));
     }
     else
-        m_pLocalGUI->EchoConsole(szText);
+        m_pLocalGUI->EchoConsole(strText);
 }
 
 void CCore::ChatPrintf(const char* szFormat, bool bColorCoded, ...)
@@ -2400,4 +2415,61 @@ size_t CCore::GetStreamingMemory()
 std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
 {
     return m_pDiscordRichPresence;
+}
+
+bool CCore::RegisterChatColor(std::string &strColorName, std::string& strHexColorCode, std::string& strRequesterResource)
+{
+    std::regex hexRegex("#[0-9a-fA-F]{6}");
+
+    if (!std::regex_match(strHexColorCode, hexRegex))
+        return false;
+
+    for (auto& colorData : m_vecRegisteredColorCodes)
+    {
+        if (colorData.strColorName == strColorName)
+            return false;
+    }
+
+    SRegisteredColorCode newColorCode = {};
+
+    newColorCode.strColorName = strColorName;
+    newColorCode.strHexColorCode = strHexColorCode;
+    newColorCode.strRequesterResource = strRequesterResource;
+
+    m_vecRegisteredColorCodes.push_back(newColorCode);
+
+    return true;
+}
+
+bool CCore::UnregisterChatColor(std::string& strColorName)
+{
+    bool bFound = false;
+
+    m_vecRegisteredColorCodes.erase(
+        std::remove_if(m_vecRegisteredColorCodes.begin(), m_vecRegisteredColorCodes.end(),
+            [strColorName, &bFound](auto& colorData)
+            {
+                bool bSame = colorData.strColorName == strColorName;
+
+                if (bSame && !bFound)
+                    bFound = true;
+
+                return bSame;
+            }
+        ), m_vecRegisteredColorCodes.end()
+    );
+
+    return bFound;
+}
+
+void CCore::UnregisterColorCodesByResource(std::string& strRequesterResource)
+{
+    m_vecRegisteredColorCodes.erase(
+        std::remove_if(m_vecRegisteredColorCodes.begin(), m_vecRegisteredColorCodes.end(),
+            [strRequesterResource](auto& colorData)
+            {
+                return colorData.strRequesterResource == strRequesterResource;
+            }
+        ), m_vecRegisteredColorCodes.end()
+    );
 }

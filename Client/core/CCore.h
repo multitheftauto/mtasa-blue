@@ -76,6 +76,13 @@ extern class CLocalization* g_pLocalization;
 bool                        UsingAltD3DSetup();
 extern SString              g_strJingleBells;
 
+struct SRegisteredColorCode
+{
+    std::string strColorName;
+    std::string strHexColorCode;
+    std::string strRequesterResource;
+};
+
 class CCore : public CCoreInterface, public CSingleton<CCore>
 {
 public:
@@ -289,6 +296,11 @@ public:
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
+    bool RegisterChatColor(std::string& strColorName, std::string& strHexColorCode, std::string& strRequesterResource);
+    bool UnregisterChatColor(std::string& strColorName);
+
+    void UnregisterColorCodesByResource(std::string& strRequesterResource);
+
 private:
     void ApplyCoreInitSettings();
 
@@ -398,4 +410,6 @@ private:
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
 
     long long m_timeDiscordAppLastUpdate;
+
+    std::vector<SRegisteredColorCode> m_vecRegisteredColorCodes{};
 };

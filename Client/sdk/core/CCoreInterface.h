@@ -192,6 +192,10 @@ public:
 
     virtual const SString& GetLastConnectedServerName() const = 0;
     virtual void           SetLastConnectedServerName(const SString& strServerName) = 0;
+
+    virtual bool RegisterChatColor(std::string& strColorName, std::string& strHexColorCode, std::string& strRequesterResource) = 0;
+    virtual bool UnregisterChatColor(std::string& strColorName);
+    virtual void UnregisterColorCodesByResource(std::string& strRequesterResource) = 0;
 };
 
 class CClientTime
