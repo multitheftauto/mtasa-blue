@@ -1431,6 +1431,10 @@ void CGame::InitialDataStream(CPlayer& Player)
 
     marker.Set("onPlayerJoin");
 
+    // Initialize the started resources vector
+
+    m_mapClientStartedResources[&Player] = {};
+
     // Register them on the lightweight sync manager.
     m_lightsyncManager.RegisterPlayer(&Player);
 
@@ -1504,6 +1508,9 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
         // Tell the map manager
         m_pMapManager->OnPlayerQuit(Player);
 
+        // Erase started resource entry
+        m_mapClientStartedResources.erase(&Player);
+
         if (!m_bBeingDeleted)
         {
             // Tell all the players except the parting one (we don't tell them if he hadn't joined because the players don't know about him)
@@ -1532,6 +1539,7 @@ void CGame::AddBuiltInEvents()
     // Resource events
     m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStart", "resource", NULL, false);
+    m_Events.AddEvent("onResourceStartForPlayer", "player", NULL, false);
     m_Events.AddEvent("onResourceStop", "resource, deleted", NULL, false);
     m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", NULL, false);
 
@@ -4146,6 +4154,12 @@ void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
             CLuaArguments Arguments;
             Arguments.PushResource(pResource);
             pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
+
+            CLuaArguments Arguments2;
+            Arguments2.PushElement(pPlayer);
+            pResource->GetResourceRootElement()->CallEvent("onResourceStartForPlayer", Arguments2, NULL);
+
+            m_mapClientStartedResources[pPlayer].push_back(pResource);
         }
     }
 }
@@ -4753,4 +4767,30 @@ void CGame::ProcessClientTriggeredEventSpam()
         else
             it++;
     }
+}
+
+void CGame::RemoveResourceFromClientStartedResources(CResource* pResource)
+{
+    for (auto& entry : m_mapClientStartedResources)
+    {
+        auto& resources = entry.second;
+        resources.erase(std::remove(resources.begin(), resources.end(), pResource), resources.end());
+    }
+}
+
+bool CGame::GetIsResourceRunningForPlayer(CResource* pResource, CPlayer* pPlayer)
+{
+    auto it = m_mapClientStartedResources.find(pPlayer);
+    if (it != m_mapClientStartedResources.end())
+    {
+        auto& resources = it->second;
+
+        for (auto& resource : resources)
+        {
+            if (resource == pResource)
+                return true;
+        }
+    }
+
+    return false;
 }

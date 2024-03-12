@@ -466,6 +466,9 @@ public:
     bool IsClientTransferBoxVisible() const { return m_showClientTransferBox; }
     void SetClientTransferBoxVisible(bool visible) { m_showClientTransferBox = visible; }
 
+    void RemoveResourceFromClientStartedResources(CResource* pResource);
+    bool GetIsResourceRunningForPlayer(CResource* pResource, CPlayer* pPlayer);
+
 private:
     void AddBuiltInEvents();
     void RelayPlayerPuresync(class CPacket& Packet);
@@ -673,4 +676,5 @@ private:
     };
 
     std::map<CPlayer*, ClientTriggeredEventsInfo> m_mapClientTriggeredEvents;
+    std::map<CPlayer*, std::vector<CResource*>>   m_mapClientStartedResources;
 };
