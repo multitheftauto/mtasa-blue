@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-13 17:23\n"
+"PO-Revision-Date: 2024-03-13 21:52\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -46,7 +46,7 @@ msgstr "A telepítő segítségedre lesz a $(^Name) ${REVISION_TAG} telepítés�
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:212
 msgid "Grand Theft Auto: San Andreas location"
-msgstr "Grand Theft Auto: San Andreas főkönyvtára"
+msgstr "Grand Theft Auto: San Andreas útvonala"
 
 #. DIRECTORY_Text_Dest
 #: Shared/installer/nightly.nsi:213
