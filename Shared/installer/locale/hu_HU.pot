@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-13 21:52\n"
+"PO-Revision-Date: 2024-03-13 22:52\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -60,21 +60,21 @@ msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
 "$\n"
 "Click Install to begin installing."
-msgstr "Kérlek válaszd ki a Grand Theft Auto: San Andreas mappáját.$\n"
+msgstr "Válaszd ki a Grand Theft Auto: San Andreas mappáját.$\n"
 "$\n"
-"Az MTA:SA kizárólag a Grand Theft Auto: San Andreas 1.0 verzióját támogatja.$\n"
+"Szükséged van a Grand Theft Auto: San Andreas játékhoz a Multi Theft Auto használatához.$\n"
 "$\n"
-"Kattints a Telepítés gombra a telepítés megkezdéséhez."
+"Kattins a Telepítés gombra a telepítési folyamat megkezdéséhez."
 
 #. DESC_Section10
 #: Shared/installer/nightly.nsi:217
 msgid "Create a Start Menu group for installed applications"
-msgstr "Start Menü ikon létrehozása a telepített alkalmazásoknak."
+msgstr "Start menü csoport létrehozása a telepített alkalmazásoknak"
 
 #. DESC_Section11
 #: Shared/installer/nightly.nsi:218
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "Ikon létrehozása az asztalon az MTA:SA Kliensnek."
+msgstr "Parancsikon létrehozása az asztalon."
 
 #. DESC_Section12
 #: Shared/installer/nightly.nsi:219
@@ -84,17 +84,17 @@ msgstr "mtasa:// protokoll hozzáadása a böngésződhöz."
 #. DESC_Section13
 #: Shared/installer/nightly.nsi:220
 msgid "Add to Windows Games Explorer (if present)."
-msgstr "MTA:SA hozzáadása a Windows Játékböngészőhöz (ha elérhető)."
+msgstr "Hozzáadás a Windows-Játékokhoz (amennyiben elérhető)."
 
 #. DESC_DirectX
 #: Shared/installer/nightly.nsi:221
 msgid "Install or update DirectX (if required)."
-msgstr "Telepítse vagy frissítse a DirectX-et (ha szükséges)."
+msgstr "Telepítse, vagy frissítse a DirectX-et (amennyiben szükséges)."
 
 #. DESC_Section1
 #: Shared/installer/nightly.nsi:222
 msgid "The core components required to run Multi Theft Auto."
-msgstr "Az alapvető összetevők szükségesek a Multi Theft Auto futtatásához."
+msgstr "Az alapvető komponensek szükségesek a Multi Theft Auto futtatásához."
 
 #. DESC_Section2
 #: Shared/installer/nightly.nsi:223
@@ -104,27 +104,27 @@ msgstr "Az MTA:SA módosításai lehetővé teszik az online játékot."
 #. DESC_SectionGroupServer
 #: Shared/installer/nightly.nsi:226
 msgid "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
-msgstr "A Multi Theft Auto Szerver lehetővé teszi, hogy szervert indíts a saját gépedről. Ehhez gyors internetkapcsolat szükséges."
+msgstr "Az MTA: SA Szerver lehetővé teszi, hogy szervert indíts a saját gépedről. Ehhez gyors internetkapcsolat szükséges."
 
 #. DESC_Section4
 #: Shared/installer/nightly.nsi:227
 msgid "The Multi Theft Auto server. This is a required component."
-msgstr "Multi Theft Auto szerver. Ez egy szükséges összetevő."
+msgstr "A Multi Theft Auto Szerver. Ez egy nélkülözhetetlen komponens."
 
 #. DESC_Section5
 #: Shared/installer/nightly.nsi:228
 msgid "The MTA:SA modification for the server."
-msgstr "Az MTA:SA módosításai a szerverhez."
+msgstr "Az MTA:SA Szerver módosításai."
 
 #. DESC_Section6
 #: Shared/installer/nightly.nsi:229
 msgid "This is a set of required resources for your server."
-msgstr "Ez egy beállítás a szükséges erőforrásokhoz a szerveredhez."
+msgstr "Szükséges erőforrások a szerveredhez."
 
 #. DESC_Section7
 #: Shared/installer/nightly.nsi:230
 msgid "This is an optional set of gamemodes and maps for your server."
-msgstr "Ez egy opcionális beállítás a játékmódokhoz és pályákhoz a szerveredhez."
+msgstr "Opcionális erőforrások a szerveredhez."
 
 #. DESC_Section8
 #: Shared/installer/nightly.nsi:231
