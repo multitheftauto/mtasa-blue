@@ -16,6 +16,8 @@ class CAccountManager;
 #include "CAccount.h"
 #include "CConnectHistory.h"
 
+#include <IAccountManager.hpp>
+
 class CDbJobData;
 class CDatabaseManager;
 
@@ -66,7 +68,7 @@ public:
     size_t size() const { return Super::size(); }
 
     // Account functions
-    void FindAccountMatches(std::vector<CAccount*>* pOutResults, const SString& strName, bool bCaseSensitive)
+    void FindAccountMatches(std::vector<CAccount*>* pOutResults, const SString& strName, bool bCaseSensitive) const
     {
         MultiFind(m_NameAccountMap, strName, pOutResults);
 
@@ -114,7 +116,7 @@ bool ListContains(const CMappedAccountList& itemList, const T& item)
 //
 // CAccountManager
 //
-class CAccountManager
+class CAccountManager : public IAccountManager
 {
     friend class CAccount;
 
@@ -134,7 +136,7 @@ public:
     bool SaveSettings();
     bool IntegrityCheck();
 
-    CAccount* Get(const char* szName, const char* szPassword = nullptr, bool caseSensitive = true);
+    CAccount* Get(const char* szName, const char* szPassword = nullptr, bool caseSensitive = true) const noexcept;
     CAccount* GetAccountFromScriptID(uint uiScriptID);
     SString   GetActiveCaseVariation(const SString& strName);
 
@@ -146,10 +148,14 @@ public:
     bool                          CopyAccountData(CAccount* pFromAccount, CAccount* pToAccount);
     bool                          GetAllAccountData(CAccount* pAccount, lua_State* pLua);
 
-    void      GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts);
-    void      GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts);
-    CAccount* GetAccountByID(int ID);
-    void      GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts);
+    DynamicArray<IAccount*> GetAllAccounts() const noexcept override;
+    void                    GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts) const noexcept;
+    DynamicArray<IAccount*> GetAccountsBySerial(const SString& strSerial) const noexcept override;
+    void                    GetAccountsByIP(const SString& strIP, std::vector<CAccount*>& outAccounts) const noexcept;
+    DynamicArray<IAccount*> GetAccountsByIP(const SString& strIP) const noexcept override;
+    CAccount*               GetAccountByID(const int ID) const noexcept;
+    void                    GetAccountsByData(const SString& dataName, const SString& value, std::vector<CAccount*>& outAccounts) const noexcept;
+    DynamicArray<IAccount*> GetAccountsByData(const SString& dataName, const SString& value) const noexcept override;
 
     CAccount* AddGuestAccount(const SString& strName);
     CAccount* AddConsoleAccount(const SString& strName);
@@ -179,8 +185,8 @@ public:
     static bool IsValidNewAccountName(const SString& strName);
     static bool IsValidNewPassword(const SString& strPassword);
 
-    CMappedAccountList::const_iterator IterBegin() { return m_List.begin(); };
-    CMappedAccountList::const_iterator IterEnd() { return m_List.end(); };
+    CMappedAccountList::const_iterator begin() { return m_List.begin(); };
+    CMappedAccountList::const_iterator end() { return m_List.end(); };
 
 protected:
     CMappedAccountList m_List;

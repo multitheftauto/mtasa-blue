@@ -12,23 +12,23 @@
 // IMPLEMENTATION of Lua dynamic modules
 
 #ifndef WIN32
-typedef void* HMODULE;
+using HMODULE = void*;
 #endif
 
 class CLuaModule;
 
 #pragma once
 
-#include "ILuaModuleManager.h"
+#include <ILuaModule.hpp>
 
 class CScriptDebugging;
 class CLuaModuleManager;
 
 struct lua_State;
 
-typedef bool (*DefaultModuleFunc)();
-typedef void (*RegisterModuleFunc)(lua_State*);
-typedef bool (*InitModuleFunc)(ILuaModuleManager*, char*, char*, float*);
+using DefaultModuleFunc = bool (*)();
+using RegisterModuleFunc = void (*)(lua_State*);
+using InitModuleFunc = bool (*)(ILuaModule*, char*, char*, float*);
 
 struct FunctionInfo
 {
@@ -47,32 +47,33 @@ struct FunctionInfo
     RegisterModuleFunc ResourceStopped;
 };
 
-class CLuaModule : public ILuaModuleManager10
+class CLuaModule : public ILuaModule
 {
 public:
     CLuaModule(CLuaModuleManager* pLuaModuleManager, CScriptDebugging* pScriptDebugging, const char* szFileName, const char* szShortFileName);
     virtual ~CLuaModule();
 
-    // functions for external modules until DP2.3
-    void      Printf(const char* szFormat, ...);
-    void      ErrorPrintf(const char* szFormat, ...);
-    void      DebugPrintf(lua_State* luaVM, const char* szFormat, ...);
-    bool      RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func);
-    bool      GetResourceName(lua_State*   luaVM,
-                              std::string& strName);            // This function might not work if module and MTA were compiled with different compiler versions
-    CChecksum GetResourceMetaChecksum(lua_State* luaVM);
-    CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile);
+    void Printf(const char* szFormat, ...) const noexcept;
+    void ErrorPrintf(const char* szFormat, ...) const noexcept;
+    void DebugPrintf(lua_State* luaVM, const char* szFormat, ...) const noexcept;
+
+    bool        RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func);
+    std::optional<std::string> GetResourceName(lua_State* luaVM) const noexcept;
+
+    std::optional<CChecksum> GetResourceMetaChecksum(lua_State* luaVM) const noexcept;
+    std::optional<CChecksum> GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept;
 
     // functions for external modules until 1.0
-    unsigned long GetVersion();
-    const char*   GetVersionString();
-    const char*   GetVersionName();
-    unsigned long GetNetcodeVersion();
-    const char*   GetOperatingSystemName();
-    lua_State*    GetResourceFromName(const char* szResourceName);
-    // GetResourceName above might not work if module and MTA were compiled with different compiler versions
-    bool GetResourceName(lua_State* luaVM, char* szName, size_t length) override;
-    bool GetResourceFilePath(lua_State* luaVM, const char* fileName, char* path, size_t length) override;
+    ulong       GetVersion() const noexcept;
+    const char* GetVersionString() const noexcept;
+    const char* GetVersionName() const noexcept;
+    ulong       GetNetcodeVersion() const noexcept;
+    const char* GetOperatingSystemName() const noexcept;
+    lua_State*  GetResourceFromName(const char* szResourceName) const noexcept;
+
+    std::optional<std::string> GetResourceFilePath(lua_State* luaVM, const char* fileName) const noexcept override;
+
+    IAccountManager* GetAccountManager() const noexcept;
 
     // functions for deathmatch
     int  _LoadModule();

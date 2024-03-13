@@ -15,12 +15,10 @@
 
 #define MAX_INFO_LENGTH 128
 
-extern "C"
-{
-    #include <lua.h>
-    #include <lualib.h>
-    #include <lauxlib.h>
-}
+#include <lua.hpp>
+
+#include "IAccountManager.hpp"
+
 #include <string>
 #include <optional>
 
@@ -33,13 +31,8 @@ struct CChecksum
 };
 #endif
 
-#include <CVehicleManager.h>
-#include <CMainConfig.h>
-#include <CTeamManager.h>
-
-class ILuaModuleManager
+struct ILuaModule
 {
-public:
     virtual unsigned long GetVersion() const noexcept = 0;
     virtual const char*   GetVersionString() const noexcept = 0;
     virtual const char*   GetVersionName() const noexcept = 0;
@@ -60,7 +53,5 @@ public:
     virtual std::optional<CChecksum>   GetResourceMetaChecksum(lua_State* luaVM) const noexcept = 0;
     virtual std::optional<CChecksum>   GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept = 0;
 
-    virtual CVehicleManager* GetVehicleManager() const noexcept = 0;
-    virtual CMainConfig*     GetConfigManager() const noexcept = 0;
-    virtual CTeamManager*    GetTeamManager() const noexcept = 0;
+    virtual IAccountManager* GetAccountManager() const noexcept = 0;
 };

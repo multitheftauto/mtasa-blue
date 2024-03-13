@@ -11403,17 +11403,15 @@ CAccount* CStaticFunctionDefinitions::GetAccount(const char* szName, const char*
 
 void CStaticFunctionDefinitions::GetAccounts(lua_State* pLua)
 {
-    CMappedAccountList::const_iterator iter = m_pAccountManager->IterBegin();
-    unsigned int                       uiIndex = 0;
-    for (; iter != m_pAccountManager->IterEnd(); iter++)
+    uint uiIndex = 0;
+    for (const auto& pAccount : *m_pAccountManager)
     {
-        CAccount* pAccount = *iter;
-        if (pAccount->IsRegistered() && !pAccount->IsConsoleAccount())
-        {
-            lua_pushnumber(pLua, ++uiIndex);
-            lua_pushaccount(pLua, pAccount);
-            lua_settable(pLua, -3);
-        }
+        if (!pAccount->IsRegistered() || pAccount->IsConsoleAccount())
+            continue;
+
+        lua_pushnumber(pLua, ++uiIndex);
+        lua_pushaccount(pLua, pAccount);
+        lua_settable(pLua, -3);
     }
 }
 
@@ -11421,52 +11419,50 @@ bool CStaticFunctionDefinitions::RemoveAccount(CAccount* pAccount)
 {
     assert(pAccount);
 
-    if (pAccount->IsRegistered())
+    if (!pAccount->IsRegistered())
+        return false;
+
+    CClient* pClient = pAccount->GetClient();
+    if (pClient)
     {
-        CClient* pClient = pAccount->GetClient();
-        if (pClient)
-        {
-            if (!g_pGame->GetAccountManager()->LogOut(pClient, NULL))
-                return false;
+        if (!g_pGame->GetAccountManager()->LogOut(pClient, NULL))
+            return false;
 
-            pClient->SendEcho("You were logged out of your account due to it being deleted");
-        }
-        return g_pGame->GetAccountManager()->RemoveAccount(pAccount);
+        pClient->SendEcho("You were logged out of your account due to it being deleted");
     }
-
-    return false;
+    return g_pGame->GetAccountManager()->RemoveAccount(pAccount);
 }
 
 bool CStaticFunctionDefinitions::SetAccountName(CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError)
 {
     assert(pAccount);
 
-    if (!strNewName.empty() && pAccount->IsRegistered())
-    {
-        // Check for case variations if not allowed
-        if (!bAllowCaseVariations)
-        {
-            SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation(strNewName);
-            if (!strCaseVariation.empty())
-            {
-                strOutError = SString("Already an account using a case variation of that name ('%s')", *strCaseVariation);
-                return false;
-            }
-        }
+    if (strNewName.empty() || !pAccount->IsRegistered())
+        return false;
 
-        if (m_pAccountManager->Get(strNewName) != NULL)
+    // Check for case variations if not allowed
+    if (!bAllowCaseVariations)
+    {
+        SString strCaseVariation = m_pAccountManager->GetActiveCaseVariation(strNewName);
+        if (!strCaseVariation.empty())
         {
-            strOutError = "Account already exists";
+            strOutError = SString("Already an account using a case variation of that name ('%s')", *strCaseVariation);
+            return false;
         }
-        else if (!CAccountManager::IsValidNewAccountName(strNewName))
-        {
-            strOutError = "Name invalid";
-        }
-        else
-        {
-            pAccount->SetName(strNewName);
-            return true;
-        }
+    }
+
+    if (m_pAccountManager->Get(strNewName) != NULL)
+    {
+        strOutError = "Account already exists";
+    }
+    else if (!CAccountManager::IsValidNewAccountName(strNewName))
+    {
+        strOutError = "Name invalid";
+    }
+    else
+    {
+        pAccount->SetName(strNewName);
+        return true;
     }
     return false;
 }
@@ -11475,17 +11471,16 @@ bool CStaticFunctionDefinitions::SetAccountPassword(CAccount* pAccount, SString 
 {
     assert(pAccount);
 
-    if (!strPassword.empty() && pAccount->IsRegistered())
-    {
-        if ((ePasswordType == CAccountPassword::PLAINTEXT && CAccountManager::IsValidNewPassword(strPassword)) ||
-            (ePasswordType == CAccountPassword::MD5 && strPassword.length() == 32) ||
-            (ePasswordType == CAccountPassword::SHA256 && strPassword.length() == 64 + 32 + 1))
-        {
-            pAccount->SetPassword(strPassword);
-            return true;
-        }
-    }
+    if (strPassword.empty() || !pAccount->IsRegistered())
+        return false;
 
+    if ((ePasswordType == CAccountPassword::PLAINTEXT && CAccountManager::IsValidNewPassword(strPassword)) ||
+        (ePasswordType == CAccountPassword::MD5 && strPassword.length() == 32) ||
+        (ePasswordType == CAccountPassword::SHA256 && strPassword.length() == 64 + 32 + 1))
+    {
+        pAccount->SetPassword(strPassword);
+        return true;
+    }
     return false;
 }
 

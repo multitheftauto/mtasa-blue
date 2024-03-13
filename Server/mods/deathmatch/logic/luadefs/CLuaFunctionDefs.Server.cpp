@@ -693,9 +693,10 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        std::list<CLuaModule*> modules = m_pLuaModuleManager->GetLoadedModules();
-        for (const auto mod : modules)
+        auto modules = m_pLuaModuleManager->GetLoadedModules();
+        for (const auto& _mod : modules)
         {
+            const auto mod = static_cast<CLuaModule*>(_mod);
             if (mod->_GetName() == strModuleName)
             {
                 lua_newtable(luaVM);
@@ -727,13 +728,12 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 int CLuaFunctionDefs::GetModules(lua_State* luaVM)
 {
     lua_newtable(luaVM);
-    list<CLuaModule*>           lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-    list<CLuaModule*>::iterator iter = lua_LoadedModules.begin();
-    unsigned int                uiIndex = 1;
-    for (; iter != lua_LoadedModules.end(); ++iter)
+    auto lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
+    uint uiIndex = 1;
+    for (const auto& mod : lua_LoadedModules)
     {
         lua_pushnumber(luaVM, uiIndex++);
-        lua_pushstring(luaVM, (*iter)->_GetFunctions().szFileName);
+        lua_pushstring(luaVM, static_cast<CLuaModule*>(mod)->_GetFunctions().szFileName);
         lua_settable(luaVM, -3);
     }
     return 1;

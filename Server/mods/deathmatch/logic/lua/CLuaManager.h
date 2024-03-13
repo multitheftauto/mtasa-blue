@@ -45,8 +45,11 @@ public:
 
     CLuaModuleManager* GetLuaModuleManager() const { return m_pLuaModuleManager; }
 
-    std::list<CLuaMain*>::const_iterator IterBegin() { return m_virtualMachines.begin(); };
-    std::list<CLuaMain*>::const_iterator IterEnd() { return m_virtualMachines.end(); };
+    std::list<CLuaMain*>::iterator begin() { return m_virtualMachines.begin(); };
+    std::list<CLuaMain*>::iterator end() { return m_virtualMachines.end(); };
+
+    std::list<CLuaMain*>::const_iterator cbegin() const { return m_virtualMachines.cbegin(); };
+    std::list<CLuaMain*>::const_iterator cend() const { return m_virtualMachines.cend(); };
 
     void DoPulse();
 
