@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-12 15:04\n"
+"PO-Revision-Date: 2024-03-13 17:23\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -20,17 +20,17 @@ msgstr ""
 #. GET_XPVISTA_PLEASE
 #: Shared/installer/nightly.nsi:205
 msgid "The version of MTA:SA you've downloaded does not support Windows XP or Vista.  Please download an alternative version from www.mtasa.com."
-msgstr "Jelen verzió Windows XP-vel és Vista-val inkompatibilis. Kérlek, töltsd le a megfelelő verziót a www.mtasa.com oldalról!"
+msgstr "A letöltött verzió nem támogatja a Windows XP és Windows Vista operációs rendszereket. Telepítsd a megfelelő verziót a www.mtasa.com weboldalról."
 
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "Az MTA:SA letöltött verziója nem támogatja a Windows 7, 8 vagy 8.1 operációs rendszert. Kérjük, töltsön le egy alternatív verziót a www.mtasa.com webhelyről."
+msgstr "A letöltött verzió nem támogatja a Windows 7-es, 8-as és 8.1-es operációs rendszereket. Telepítsd a megfelelő verziót a www.mtasa.com weboldalról."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr "Az MTA:SA letöltött verziója a Windows régi verzióihoz készült. Kérjük, töltsön le egy alternatív verziót a www.mtasa.com webhelyről."
+msgstr "A letöltött verzió nem támogatja a modern Windows alapú operációs rendszereket. Telepítsd a megfelelő verziót a www.mtasa.com weboldalról."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
@@ -38,10 +38,10 @@ msgid "This wizard will guide you through the installation or update of $(^Name)
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
 "Click Next to continue."
-msgstr "Ez a varázsló segítségedre lesz, hogy telepítsd vagy frissítsd a(z) $(^Name) ${REVISION_TAG}\n\n"
-"Ajánlott, hogy zárj be minden más alkalmazást a telepítés indítása előtt.\n\n"
-"[Vista és annál újabb rendszereken rendszergazdai jogosultság szükséges.]\n\n"
-"Kattints a Tovább gombra a folytatáshoz!"
+msgstr "A telepítő segítségedre lesz a $(^Name) ${REVISION_TAG} telepítésében, vagy frissítésében.\n"
+"Ajánlott minden más alkalmazást bezárni a telepítési folyamat megkezdése előtt.\n\n"
+"[Adminisztrátori jogosultságra lehet szükség a Windows Vista és újabb rendszereken]\n\n"
+"Kattints a Tovább gombra a folytatáshoz."
 
 #. HEADER_Text
 #: Shared/installer/nightly.nsi:212
