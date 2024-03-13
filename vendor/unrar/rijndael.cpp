@@ -88,7 +88,7 @@ Rijndael::Rijndael()
 #ifdef USE_SSE
   AES_NI=false;
 #endif
-#ifdef USE_NEON
+#ifdef USE_NEON_AES
   AES_Neon=false;
 #endif
 }
@@ -114,7 +114,7 @@ void Rijndael::Init(bool Encrypt,const byte *key,uint keyLen,const byte * initVe
   AES_NI=__builtin_cpu_supports("aes");
 #endif
 
-#elif defined(USE_NEON)
+#elif defined(USE_NEON_AES)
   #ifdef _APPLE
     // getauxval isn't available in OS X
     uint Value=0;
@@ -180,7 +180,7 @@ void Rijndael::blockEncrypt(const byte *input,size_t inputLen,byte *outBuffer)
     blockEncryptSSE(input,numBlocks,outBuffer);
     return;
   }
-#elif defined(USE_NEON)
+#elif defined(USE_NEON_AES)
   if (AES_Neon)
   {
     blockEncryptNeon(input,numBlocks,outBuffer);
@@ -273,7 +273,7 @@ void Rijndael::blockEncryptSSE(const byte *input,size_t numBlocks,byte *outBuffe
 #endif
 
 
-#ifdef USE_NEON
+#ifdef USE_NEON_AES
 void Rijndael::blockEncryptNeon(const byte *input,size_t numBlocks,byte *outBuffer)
 {
   byte *prevBlock = m_initVector;
@@ -319,7 +319,7 @@ void Rijndael::blockDecrypt(const byte *input, size_t inputLen, byte *outBuffer)
     blockDecryptSSE(input,numBlocks,outBuffer);
     return;
   }
-#elif defined(USE_NEON)
+#elif defined(USE_NEON_AES)
   if (AES_Neon)
   {
     blockDecryptNeon(input,numBlocks,outBuffer);
@@ -416,7 +416,7 @@ void Rijndael::blockDecryptSSE(const byte *input, size_t numBlocks, byte *outBuf
 #endif
 
 
-#ifdef USE_NEON
+#ifdef USE_NEON_AES
 void Rijndael::blockDecryptNeon(const byte *input, size_t numBlocks, byte *outBuffer)
 {
   byte iv[16];

@@ -18,6 +18,8 @@ class CObject;
 class CObjectSA;
 class CPed;
 class CPedSA;
+class CBuilding;
+class CBuildingSA;
 class CVector;
 class CVehicle;
 class CVehicleSA;
@@ -81,6 +83,11 @@ public:
     virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
     virtual CPed*                  GetPedFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long          GetPedCount() = 0;
+
+    // Buildings pool
+    virtual CBuilding* AddBuilding(class CClientBuilding*, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior) = 0;
+    virtual void       RemoveBuilding(CBuilding* pObject) = 0;
+    virtual bool       HasFreeBuildingSlot() = 0;
 
     // Others
     virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,

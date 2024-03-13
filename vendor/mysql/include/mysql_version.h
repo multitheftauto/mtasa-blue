@@ -7,22 +7,23 @@
 
 #ifndef _mysql_version_h
 #define _mysql_version_h
-#ifdef _CUSTOMCONFIG_
-#include <custom_conf.h>
-#else
+
 #define PROTOCOL_VERSION            10
-#define MYSQL_SERVER_VERSION       "5.7.16"
-#define MYSQL_VERSION_ID            50716
+#define MYSQL_SERVER_VERSION       "8.3.0"
+#define MYSQL_BASE_VERSION         "mysqld-8.3"
+#define MYSQL_SERVER_SUFFIX_DEF    ""
+#define MYSQL_VERSION_ID            80300
+#define MYSQL_VERSION_STABILITY     "INNOVATION"
 #define MYSQL_PORT                  3306
+#define MYSQL_ADMIN_PORT            33062
 #define MYSQL_PORT_DEFAULT          0
 #define MYSQL_UNIX_ADDR            "/tmp/mysql.sock"
 #define MYSQL_CONFIG_NAME          "my"
-#define MYSQL_COMPILATION_COMMENT  "MySQL Connector/C (GPL)"
-#define LIBMYSQL_VERSION           "6.1.11"
-#define LIBMYSQL_VERSION_ID         60111
-
-/* mysqld compile time options */
-#endif /* _CUSTOMCONFIG_ */
+#define MYSQL_PERSIST_CONFIG_NAME  "mysqld-auto"
+#define MYSQL_COMPILATION_COMMENT  "Source distribution"
+#define MYSQL_COMPILATION_COMMENT_SERVER  "Source distribution"
+#define LIBMYSQL_VERSION           "8.3.0"
+#define LIBMYSQL_VERSION_ID         80300
 
 #ifndef LICENSE
 #define LICENSE                     GPL

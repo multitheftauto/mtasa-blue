@@ -23,7 +23,7 @@ void CryptData::SetKey15(const char *Password)
   {
     byte P=Password[I];
     Key15[2]^=P^CRCTab[P];
-    Key15[3]+=P+(CRCTab[P]>>16);
+    Key15[3]+=ushort(P+(CRCTab[P]>>16));
   }
 }
 
@@ -55,7 +55,7 @@ void CryptData::Crypt15(byte *Data,size_t Count)
   {
     Key15[0]+=0x1234;
     Key15[1]^=CRCTab[(Key15[0] & 0x1fe)>>1];
-    Key15[2]-=CRCTab[(Key15[0] & 0x1fe)>>1]>>16;
+    Key15[2]-=ushort(CRCTab[(Key15[0] & 0x1fe)>>1]>>16);
     Key15[0]^=Key15[2];
     Key15[3]=rotrs(Key15[3]&0xffff,1,16)^Key15[1];
     Key15[3]=rotrs(Key15[3]&0xffff,1,16);

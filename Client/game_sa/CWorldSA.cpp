@@ -1069,7 +1069,7 @@ bool CWorldSA::IsRemovedModelInRadius(SIPLInst* pInst)
 
             float fDistance = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
             // is it in the removal spheres radius if so return else keep looking
-            if (fDistance <= pFind->m_fRadius && (pFind->m_cInterior == -1 || pFind->m_cInterior == pInst->m_nInterior))
+            if (fDistance <= pFind->m_fRadius && (pFind->m_cInterior == -1 || pFind->m_cInterior == pInst->m_nAreaCode))
             {
                 return true;
             }

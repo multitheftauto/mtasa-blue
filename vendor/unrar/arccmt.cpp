@@ -174,7 +174,8 @@ void Archive::ViewComment()
     auto EndPos=CmtBuf.find(0x1A);
     if (EndPos!=std::wstring::npos)
       CmtSize=EndPos;
-    mprintf(L"\n");
+    mprintf(St(MArcComment));
+    mprintf(L":\n");
     OutComment(CmtBuf);
   }
 }

@@ -35,15 +35,8 @@
 #define _UNICODE // Set _T() macro to convert from narrow to wide strings.
 #endif
 
-#if 0
-// 2021.09.05: Allow newer Vista+ APIs like IFileOpenDialog for WinRAR,
-// but still keep SFX modules XP compatible.
-#define WINVER _WIN32_WINNT_VISTA
-#define _WIN32_WINNT _WIN32_WINNT_VISTA
-#else
 #define WINVER _WIN32_WINNT_WINXP
 #define _WIN32_WINNT _WIN32_WINNT_WINXP
-#endif
 
 #if !defined(ZIPSFX)
 #define RAR_SMP
@@ -158,13 +151,18 @@
   #endif
 #endif
 
-#if defined(__aarch64__) && defined(__ARM_FEATURE_CRYPTO)
+#if defined(__aarch64__) && (defined(__ARM_FEATURE_CRYPTO) || defined(__ARM_FEATURE_CRC32))
 #include <arm_neon.h>
 #ifndef _APPLE
 #include <sys/auxv.h>
 #include <asm/hwcap.h>
 #endif
-#define USE_NEON // Neon SIMD instructions for AArch64 version.
+#ifdef __ARM_FEATURE_CRYPTO
+#define USE_NEON_AES
+#endif
+#ifdef __ARM_FEATURE_CRC32
+#define USE_NEON_CRC32
+#endif
 #endif
 
 #ifdef  S_IFLNK
@@ -220,12 +218,7 @@
 
 #endif // _UNIX
 
-#if 0
-  #define MSGID_INT
-  typedef int MSGID;
-#else
   typedef const wchar* MSGID;
-#endif
 
 #ifndef SSE_ALIGNMENT // No SSE use and no special data alignment is required.
   #define SSE_ALIGNMENT 1

@@ -426,6 +426,16 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
             }
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            pBuilding.GetRotationDegrees(vecRotation);
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
+            break;
+        }
         case CCLIENTPROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
@@ -760,6 +770,12 @@ bool CStaticFunctionDefinitions::GetElementModel(CClientEntity& Entity, unsigned
         {
             CClientPickup& pPickup = static_cast<CClientPickup&>(Entity);
             usModel = pPickup.GetModel();
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            usModel = pBuilding.GetModel();
             break;
         }
         case CCLIENTPROJECTILE:
@@ -1105,6 +1121,19 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
                 Object.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY));
             }
 
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
+            {
+                pBuilding.SetRotationDegrees(vecRotation);
+            }
+            else
+            {
+                pBuilding.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY));
+            }
             break;
         }
         case CCLIENTPROJECTILE:
@@ -1461,6 +1490,26 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 {
     RUN_CHILDREN(SetElementModel(**iter, usModel))
 
+    auto callOnChangeEvent = [](auto &element, uint16_t usCurrentModel, uint16_t usModel) {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(usCurrentModel);
+        Arguments.PushNumber(usModel);
+        bool bContinue = element.CallEvent("onClientElementModelChange", Arguments, true);
+
+        // Check for another call to setElementModel
+        if (usModel != element.GetModel())
+            return false;
+
+        if (!bContinue)
+        {
+            // Change canceled
+            element.SetModel(usCurrentModel);
+            return false;
+        }
+
+        return true;
+    };
+
     switch (Entity.GetType())
     {
         case CCLIENTPED:
@@ -1476,23 +1525,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             if (!Ped.SetModel(usModel))
                 return false;
 
-            CLuaArguments Arguments;
-            Arguments.PushNumber(usCurrentModel);
-            Arguments.PushNumber(usModel);
-            bool bContinue = Ped.CallEvent("onClientElementModelChange", Arguments, true);
-
-            // Check for another call to setElementModel
-            if (usModel != Ped.GetModel())
-                return false;
-
-            if (!bContinue)
-            {
-                // Change canceled
-                Ped.SetModel(usCurrentModel);
-                return false;
-            }
-
-            break;
+            return callOnChangeEvent(Ped, usCurrentModel, usModel);
         }
         case CCLIENTVEHICLE:
         {
@@ -1539,23 +1572,22 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
             Object.SetModel(usModel);
 
-            CLuaArguments Arguments;
-            Arguments.PushNumber(usCurrentModel);
-            Arguments.PushNumber(usModel);
-            bool bContinue = Object.CallEvent("onClientElementModelChange", Arguments, true);
+            return callOnChangeEvent(Object, usCurrentModel, usModel);
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding&     Object = static_cast<CClientBuilding&>(Entity);
+            const unsigned short usCurrentModel = Object.GetModel();
 
-            // Check for another call to setElementModel
-            if (usModel != Object.GetModel())
+            if (usCurrentModel == usModel)
                 return false;
 
-            if (!bContinue)
-            {
-                // Change canceled
-                Object.SetModel(usCurrentModel);
+            if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
-            }
 
-            break;
+            Object.SetModel(usModel);
+
+            return callOnChangeEvent(Object, usCurrentModel, usModel);
         }
         case CCLIENTPROJECTILE:
         {
@@ -1570,11 +1602,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
             Projectile.SetModel(usModel);
 
-            CLuaArguments Arguments;
-            Arguments.PushNumber(usCurrentModel);
-            Arguments.PushNumber(usModel);
-            Projectile.CallEvent("onClientElementModelChange", Arguments, true);
-            break;
+            return callOnChangeEvent(Projectile, usCurrentModel, usModel);
         }
         default:
             return false;

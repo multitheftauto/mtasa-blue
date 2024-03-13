@@ -101,10 +101,16 @@ bool CLuaVectorGraphicDefs::SetSize(CClientVectorGraphic* vectorGraphic, CVector
     if (!vectorGraphicItem)
         return false;
 
-    vectorGraphicItem->Resize(size);
+    if (size.fX <= 0 || size.fY <= 0)
+        throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
 
-    if ((int)vectorGraphicItem->m_uiSizeX != size.fX || (int)vectorGraphicItem->m_uiSizeY != size.fY)
-        return false;            // failed to resize
+    if (size.fX > 4096 || size.fY > 4096)
+        throw std::invalid_argument("A vector graphic cannot exceed 4096x4096 in size.");
+
+    int intSizeX = static_cast<int>(size.fX);
+    int intSizeY = static_cast<int>(size.fY);
+
+    vectorGraphicItem->Resize(CVector2D(intSizeX, intSizeY));
 
     vectorGraphic->GetDisplay()->Update();
     return true;

@@ -6,10 +6,6 @@ class CmdAdd;
 class Unpack;
 class ArcFileSearch;
 
-#if 0
-// We use external i/o calls for Benchmark command.
-#define COMPRDATAIO_EXTIO
-#endif
 
 class ComprDataIO
 {

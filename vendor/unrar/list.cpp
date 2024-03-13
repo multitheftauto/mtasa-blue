@@ -431,7 +431,7 @@ void ListFileHeader(Archive &Arc,FileHeader &hd,bool &TitleShown,bool Verbose,bo
         mprintf(L"%02x%02x..%02x  ",S[0],S[1],S[31]);
       }
       else
-        mprintf(L"????????  ");
+        mprintf(hd.Dir ? L"          ":L"????????  "); // Missing checksum is ok for folder, not for file.
   }
   mprintf(L"%ls",Name);
 }

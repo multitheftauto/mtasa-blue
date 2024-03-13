@@ -286,6 +286,7 @@ public:
     int           GetWheelFrictionState(unsigned char ucWheel);
     unsigned char GetPanelStatus(unsigned char ucPanel);
     unsigned char GetLightStatus(unsigned char ucLight);
+    SString GetComponentNameForWheel(unsigned char ucWheel) const noexcept;
 
     bool AreLightsOn();
 
@@ -297,8 +298,13 @@ public:
 
     // TODO: Make the class remember on virtualization
     float GetHeliRotorSpeed();
-    void  SetHeliRotorSpeed(float fSpeed);
+    float GetPlaneRotorSpeed();
 
+    bool GetRotorSpeed(float&);
+    bool SetRotorSpeed(float);
+
+    void SetHeliRotorSpeed(float fSpeed);
+    void SetPlaneRotorSpeed(float fSpeed);
     bool IsHeliSearchLightVisible();
     void SetHeliSearchLightVisible(bool bVisible);
 
@@ -641,6 +647,7 @@ protected:
     bool                                   m_bIsOnGround;
     bool                                   m_bHeliSearchLightVisible;
     float                                  m_fHeliRotorSpeed;
+    float                                  m_fPlaneRotorSpeed;
     const CHandlingEntry*                  m_pOriginalHandlingEntry = nullptr;
     CHandlingEntry*                        m_pHandlingEntry = nullptr;
     const CFlyingHandlingEntry*            m_pOriginalFlyingHandlingEntry = nullptr;

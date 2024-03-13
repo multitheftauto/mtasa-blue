@@ -30,7 +30,6 @@ typedef CXML* (*InitXMLInterface)(const char* szSaveFlagDirectory);
 typedef CNetServer* (*InitNetServerInterface)();
 
 #ifdef WIN32
-typedef void(FClientFeedback)(const char* szText);
 constexpr SHORT SCREEN_BUFFER_SIZE = 256;
 #endif
 
@@ -88,10 +87,6 @@ private:
     CNetServer*      m_pNetwork;
     CModManagerImpl* m_pModManager;
     CXML*            m_pXML;
-
-#ifdef WIN32
-    FClientFeedback* m_fClientFeedback;
-#endif
 
     SString m_strServerPath;
     SString m_strServerModPath;

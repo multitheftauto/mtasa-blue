@@ -424,7 +424,7 @@ size_t Archive::ReadHeader15()
         NextBlockPos=SafeAdd(NextBlockPos,hd->PackSize,0);
 
         bool CRCProcessedOnly=hd->CommentInHeader;
-        ushort HeaderCRC=Raw.GetCRC15(CRCProcessedOnly);
+        uint HeaderCRC=Raw.GetCRC15(CRCProcessedOnly);
         if (hd->HeadCRC!=HeaderCRC)
         {
           BrokenHeader=true;
@@ -507,7 +507,7 @@ size_t Archive::ReadHeader15()
       break;
   }
 
-  ushort HeaderCRC=Raw.GetCRC15(false);
+  uint HeaderCRC=Raw.GetCRC15(false);
 
   // Old AV header does not have header CRC properly set.
   // Old Unix owners header didn't include string fields into header size,
@@ -649,7 +649,7 @@ size_t Archive::ReadHeader50()
   }
 
   int SizeToRead=int(BlockSize);
-  SizeToRead-=FirstReadSize-SizeBytes-4; // Adjust overread size bytes if any.
+  SizeToRead-=int(FirstReadSize-SizeBytes-4); // Adjust overread size bytes if any.
   uint HeaderSize=4+SizeBytes+(uint)BlockSize;
 
   if (SizeToRead<0 || HeaderSize<SIZEOF_SHORTBLOCKHEAD5)

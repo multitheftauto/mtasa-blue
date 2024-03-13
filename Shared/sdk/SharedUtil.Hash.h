@@ -48,6 +48,8 @@ enum class StringEncodeFunction
     TEA,
     AES128,
     RSA,
+    BASE64,
+    BASE32
 };
 
 enum class KeyPairAlgorithm

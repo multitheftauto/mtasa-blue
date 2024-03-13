@@ -465,6 +465,8 @@ public:
     // Vehicle towing functions
     bool IsTowableBy(CModelInfo* towingModel) override;
 
+    bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != 0xffff : false; };
+
 private:
     void CopyStreamingInfoFromModel(ushort usCopyFromModelID);
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
