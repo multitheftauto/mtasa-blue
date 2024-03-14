@@ -1056,7 +1056,7 @@ bool CMainMenu::OnNewsButtonClick(CGUIElement* pElement)
     return true;
 }
 
-sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition)
+sMenuItem* CMainMenu::CreateItem(std::uint8_t menuType, const char* szFilename, CVector2D vecRelPosition)
 {
     CGUIStaticImage* pImage = reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage());
 

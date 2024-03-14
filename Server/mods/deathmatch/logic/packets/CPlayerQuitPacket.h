@@ -27,10 +27,10 @@ public:
     ElementID GetPlayer() { return m_PlayerID; };
     void      SetPlayer(ElementID PlayerID) { m_PlayerID = PlayerID; };
 
-    unsigned char GetQuitReason() { return m_ucQuitReason; }
-    void          SetQuitReason(unsigned char ucQuitReason) { m_ucQuitReason = ucQuitReason; }
+    std::uint8_t GetQuitReason() { return m_ucQuitReason; }
+    void          SetQuitReason(std::uint8_t ucQuitReason) { m_ucQuitReason = ucQuitReason; }
 
 private:
     ElementID     m_PlayerID;
-    unsigned char m_ucQuitReason;
+    std::uint8_t m_ucQuitReason;
 };

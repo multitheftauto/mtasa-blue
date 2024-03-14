@@ -17,7 +17,7 @@
 #define MESSAGEBOX_SPACER       20
 #define MESSAGEBOX_ICON_SIZE    42
 
-CGUIMessageBox_Impl::CGUIMessageBox_Impl(CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, unsigned int uiFlags)
+CGUIMessageBox_Impl::CGUIMessageBox_Impl(CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, std::uint32_t uiFlags)
 {
     // Initialize
     m_bAutoDestroy = true;            // TODO: If any buttons..

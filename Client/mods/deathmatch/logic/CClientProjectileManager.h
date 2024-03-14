@@ -29,7 +29,7 @@ public:
     bool               Exists(CClientProjectile* pProjectile);
     CClientProjectile* Get(CEntitySAInterface* pProjectile);
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); }
 
     // * Game-layer wrapping *
     static bool Hook_StaticProjectileAllow(CEntity* pGameCreator, eWeaponType weaponType, CVector* origin, float fForce, CVector* target,

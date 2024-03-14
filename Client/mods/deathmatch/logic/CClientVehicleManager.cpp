@@ -15,7 +15,7 @@ using std::list;
 using std::vector;
 
 // List over all vehicles with their passenger max counts
-const SFixedArray<unsigned char, 212> g_ucMaxPassengers = {3, 1,   1,   1,   3,   3, 0,   1,  1, 3, 1, 1,   1, 3, 1, 1,            // 400->415
+const SFixedArray<std::uint8_t, 212> g_ucMaxPassengers = {3, 1,   1,   1,   3,   3, 0,   1,  1, 3, 1, 1,   1, 3, 1, 1,            // 400->415
                                                            3, 1,   3,   1,   3,   3, 1,   1,  1, 0, 3, 3,   3, 1, 0, 8,            // 416->431
                                                            0, 1,   1,   255, 1,   8, 3,   1,  3, 0, 1, 1,   1, 3, 0, 1,            // 432->447
                                                            0, 1,   255, 1,   0,   0, 0,   1,  1, 1, 3, 3,   1, 1, 1,               // 448->462
@@ -51,7 +51,7 @@ static const SFixedArray<unsigned long, 212> g_ulVehicleAttributes = {
     0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0, 0, 0, 12, 0, 0, 0,  2, 2,  2, 2,            // 575-599
     0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-static SFixedArray<unsigned char, 212> g_ucVariants;
+static SFixedArray<std::uint8_t, 212> g_ucVariants;
 
 CClientVehicleManager::CClientVehicleManager(CClientManager* pManager)
 {
@@ -469,7 +469,7 @@ eClientVehicleType CClientVehicleManager::GetVehicleType(unsigned long ulModel)
     return CLIENTVEHICLE_NONE;
 }
 
-unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
+std::uint8_t CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 {
     // Use parent model ID for non-standard vehicle model IDs.
     if ((ulModel < 400 || ulModel > 611) && IsValidModel(ulModel))
@@ -485,7 +485,7 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
     return 0xFF;
 }
 
-void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
+void CClientVehicleManager::GetRandomVariation(std::uint16_t usModel, std::uint8_t& ucVariant, std::uint8_t& ucVariant2)
 {
     RandomizeRandomSeed();
     ucVariant = 255;
@@ -533,12 +533,12 @@ void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned 
     }
 }
 
-unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex)
+std::uint8_t CClientVehicleManager::ConvertIndexToGameSeat(unsigned long ulModel, std::uint8_t ucIndex)
 {
     eClientVehicleType vehicleType = GetVehicleType(ulModel);
 
     // Grab the max passenger count for the given ID
-    unsigned char ucMaxPassengerCount = GetMaxPassengerCount(ulModel);
+    std::uint8_t ucMaxPassengerCount = GetMaxPassengerCount(ulModel);
     switch (ucMaxPassengerCount)
     {
         // Not passenger seats in this vehicle?
@@ -742,7 +742,7 @@ void CClientVehicleManager::OnDestruction(CClientVehicle* pVehicle)
     ListRemove(m_StreamedIn, pVehicle);
 }
 
-void CClientVehicleManager::RestreamVehicles(unsigned short usModel)
+void CClientVehicleManager::RestreamVehicles(std::uint16_t usModel)
 {
     g_pClientGame->GetModelCacheManager()->OnRestreamModel(usModel);
 
@@ -782,7 +782,7 @@ void CClientVehicleManager::RestreamAllVehicles()
     }
 }
 
-void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
+void CClientVehicleManager::RestreamVehicleUpgrades(std::uint16_t usModel)
 {
     for (uint i = 0; i < m_List.size(); i++)
     {

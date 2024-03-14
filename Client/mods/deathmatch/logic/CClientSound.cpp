@@ -236,7 +236,7 @@ bool CClientSound::Play(const SString& strPath, bool bLoop)
     return Create();
 }
 
-bool CClientSound::Play(void* pMemory, unsigned int uiLength, bool bLoop)
+bool CClientSound::Play(void* pMemory, std::uint32_t uiLength, bool bLoop)
 {
     assert(pMemory);
 
@@ -265,7 +265,7 @@ bool CClientSound::Play3D(const SString& strPath, bool bLoop)
     return true;
 }
 
-bool CClientSound::Play3D(void* pMemory, unsigned int uiLength, bool bLoop)
+bool CClientSound::Play3D(void* pMemory, std::uint32_t uiLength, bool bLoop)
 {
     m_bStream = false;
     m_b3D = true;

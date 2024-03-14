@@ -213,7 +213,7 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
                 SERVER_BIN_PATH "xmll",
             };
 
-            for (unsigned int i = 0; i < NUMELMS(libs); i++)
+            for (std::uint32_t i = 0; i < NUMELMS(libs); i++)
             {
                 CLibraryInfo info;
                 info.strName = libs[i];
@@ -244,7 +244,7 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
             }
         }
 
-        for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+        for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
         {
             CLibraryInfo& info = m_LibraryList[i];
             unsigned long stats[9];
@@ -336,7 +336,7 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
 
         if (bMoreInfo)
         {
-            for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+            for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
             {
                 CLibraryInfo& info = m_LibraryList[i];
                 if (strName == info.strName)
@@ -359,7 +359,7 @@ void CPerfStatLibMemoryImpl::GetLibMemoryStats(CPerfStatResult* pResult, const s
         }
         else if (bTopTags)
         {
-            for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+            for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
             {
                 CLibraryInfo& info = m_LibraryList[i];
                 if (strName == info.strName)

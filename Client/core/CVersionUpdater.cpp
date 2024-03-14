@@ -2338,8 +2338,8 @@ void CVersionUpdater::_ProcessPatchFileQuery()
 
         if (GetRevisionFromFileName(m_JobInfo.strFilename, revision) && revision < MTASA_VERSION_BUILD)
         {
-            unsigned short netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-            unsigned short netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+            std::uint16_t netRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
+            std::uint16_t netRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
 
             SString playerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
                                   MTASA_VERSION_BUILD, netRev, netRel);
@@ -2563,7 +2563,7 @@ void CVersionUpdater::_ProcessPatchFileDownload()
     if (m_JobInfo.downloadBuffer.size() == 0)
         return;
 
-    unsigned int uiSize = m_JobInfo.downloadBuffer.size();
+    std::uint32_t uiSize = m_JobInfo.downloadBuffer.size();
     char*        pData = &m_JobInfo.downloadBuffer[0];
 
     // Check MD5
@@ -3111,8 +3111,8 @@ int CVersionUpdater::DoSendDownloadRequestToNextServer()
     CCore::GetSingleton().GetNetwork()->GetStatus(szStatus, sizeof(szStatus));
 
     // Compose version string
-    unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-    unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+    std::uint16_t usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
+    std::uint16_t usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
     SString        strPlayerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
                              MTASA_VERSION_BUILD, usNetRev, usNetRel);
 
@@ -3314,7 +3314,7 @@ int CVersionUpdater::DoPollDownload()
     GetHTTP()->ProcessQueuedFiles();
 
     // Update progress
-    unsigned int uiBytesDownloaded = GetHTTP()->GetDownloadSizeNow();
+    std::uint32_t uiBytesDownloaded = GetHTTP()->GetDownloadSizeNow();
     if (m_JobInfo.uiBytesDownloaded != uiBytesDownloaded)
     {
         m_llTimeStart = GetTickCount64_();
@@ -3390,8 +3390,8 @@ int CVersionUpdater::DoSendPostToNextServer()
     CCore::GetSingleton().GetNetwork()->GetStatus(szStatus, sizeof(szStatus));
 
     // Compose version string
-    unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-    unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+    std::uint16_t usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
+    std::uint16_t usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
     SString        strPlayerVersion("%d.%d.%d-%d.%05d.%d.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
                              MTASA_VERSION_BUILD, usNetRev, usNetRel);
 

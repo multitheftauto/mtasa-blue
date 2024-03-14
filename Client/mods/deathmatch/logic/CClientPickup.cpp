@@ -14,7 +14,7 @@
 
 extern CClientGame* g_pClientGame;
 
-CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition)
+CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, std::uint16_t usModel, CVector vecPosition)
     : ClassInit(this), CClientStreamElement(pManager->GetPickupStreamer(), ID)
 {
     // Initialize
@@ -82,7 +82,7 @@ void CClientPickup::SetPosition(const CVector& vecPosition)
     }
 }
 
-void CClientPickup::SetModel(unsigned short usModel)
+void CClientPickup::SetModel(std::uint16_t usModel)
 {
     // Different from our current id?
     if (m_usModel != usModel)
@@ -145,8 +145,8 @@ void CClientPickup::Create()
         if (m_pPickup)
         {
             // Grab the attributes from the MTA interface for this pickup
-            unsigned char  ucAreaCode = GetInterior();
-            unsigned short usDimension = GetDimension();
+            std::uint8_t  ucAreaCode = GetInterior();
+            std::uint16_t usDimension = GetDimension();
 
             // Make sure we have an object
             if (!m_pPickup->GetObject())

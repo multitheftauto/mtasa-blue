@@ -82,7 +82,7 @@ private:
     SString               m_strAbsPath;             // Absolute
     unsigned long         m_ulMaxSize;
     bool                  m_bDoneResourceFileCheck;
-    unsigned int          m_uiScriptId;
+    std::uint32_t          m_uiScriptId;
     CResource*            m_pResource;
     eAccessType           m_accessType;
     SLuaDebugInfo         m_LuaDebugInfo;

@@ -59,9 +59,9 @@
 
 extern CGameSA* pGame;
 
-unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
+std::uint32_t&  CGameSA::ClumpOffset = *(std::uint32_t*)0xB5F878;
 
-unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
+std::uint32_t OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
 
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
@@ -78,20 +78,20 @@ CGameSA::CGameSA()
     m_bASyncLoadingSuspended = false;
     m_iCheckStatus = 0;
 
-    const unsigned int modelInfoMax = GetCountOfAllFileIDs();
+    const std::uint32_t modelInfoMax = GetCountOfAllFileIDs();
     ModelInfo = new CModelInfoSA[modelInfoMax];
     ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
     SetInitialVirtualProtect();
 
     // Set the model ids for all the CModelInfoSA instances
-    for (unsigned int i = 0; i < modelInfoMax; i++)
+    for (std::uint32_t i = 0; i < modelInfoMax; i++)
     {
         ModelInfo[i].SetModelID(i);
     }
 
     // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
-    for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
+    for (std::uint32_t i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
     {
         ObjectGroupsInfo[i].SetGroup(i);
     }
@@ -458,8 +458,8 @@ eGameVersion CGameSA::GetGameVersion()
 
 eGameVersion CGameSA::FindGameVersion()
 {
-    unsigned char ucA = *reinterpret_cast<unsigned char*>(0x748ADD);
-    unsigned char ucB = *reinterpret_cast<unsigned char*>(0x748ADE);
+    std::uint8_t ucA = *reinterpret_cast<std::uint8_t*>(0x748ADD);
+    std::uint8_t ucB = *reinterpret_cast<std::uint8_t*>(0x748ADE);
     if (ucA == 0xFF && ucB == 0x53)
     {
         m_eGameVersion = VERSION_US_10;
@@ -505,14 +505,14 @@ void CGameSA::SetTimeScale(float fTimeScale)
     MemPutFast<float>(0xB7CB64, fTimeScale); // CTimer::ms_fTimeScale
 }
 
-unsigned char CGameSA::GetBlurLevel()
+std::uint8_t CGameSA::GetBlurLevel()
 {
-    return *(unsigned char*)0x8D5104;            // CPostEffects::m_SpeedFXAlpha
+    return *(std::uint8_t*)0x8D5104;            // CPostEffects::m_SpeedFXAlpha
 }
 
-void CGameSA::SetBlurLevel(unsigned char ucLevel)
+void CGameSA::SetBlurLevel(std::uint8_t ucLevel)
 {
-    MemPutFast<unsigned char>(0x8D5104, ucLevel);            // CPostEffects::m_SpeedFXAlpha
+    MemPutFast<std::uint8_t>(0x8D5104, ucLevel);            // CPostEffects::m_SpeedFXAlpha
 }
 
 unsigned long CGameSA::GetMinuteDuration()
@@ -560,7 +560,7 @@ void CGameSA::ResetCheats()
 
 bool CGameSA::IsRandomFoliageEnabled()
 {
-    return *(unsigned char*)0x5DD01B == 0x74;
+    return *(std::uint8_t*)0x5DD01B == 0x74;
 }
 
 void CGameSA::SetRandomFoliageEnabled(bool bEnabled)
@@ -573,7 +573,7 @@ void CGameSA::SetRandomFoliageEnabled(bool bEnabled)
 
 bool CGameSA::IsMoonEasterEggEnabled()
 {
-    return *(unsigned char*)0x73ABCF == 0x75;
+    return *(std::uint8_t*)0x73ABCF == 0x75;
 }
 
 void CGameSA::SetMoonEasterEggEnabled(bool bEnable)
@@ -584,7 +584,7 @@ void CGameSA::SetMoonEasterEggEnabled(bool bEnable)
 
 bool CGameSA::IsExtraAirResistanceEnabled()
 {
-    return *(unsigned char*)0x72DDD9 == 0x01;
+    return *(std::uint8_t*)0x72DDD9 == 0x01;
 }
 
 void CGameSA::SetExtraAirResistanceEnabled(bool bEnable)
@@ -659,7 +659,7 @@ void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
     const auto manager = reinterpret_cast<class WaterCreatureManager_c*>(0xC1DF30);
     if (isEnabled)
     {
-        unsigned char(__thiscall * Init)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Init)>(0x6E3F90);
+        std::uint8_t(__thiscall * Init)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Init)>(0x6E3F90);
         Init(manager);
     }
     else
@@ -932,7 +932,7 @@ CPed* CGameSA::GetPedContext()
     return m_pPedContext;
 }
 
-CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup)
+CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(std::uint8_t ucObjectGroup)
 {
     if (ucObjectGroup < OBJECTDYNAMICINFO_MAX && ObjectGroupsInfo[ucObjectGroup].IsValid())
         return &ObjectGroupsInfo[ucObjectGroup];

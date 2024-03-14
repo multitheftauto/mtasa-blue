@@ -1755,7 +1755,7 @@ static void _declspec(naked) HOOK_CPlaceName__Process()
     }
 }
 
-static void LOG_CWorld__FindObjectsKindaCollidingSectorList(unsigned int modelId)
+static void LOG_CWorld__FindObjectsKindaCollidingSectorList(std::uint32_t modelId)
 {
     CBaseModelInfoSAInterface* pModelInfo = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[modelId];
     if (!pModelInfo)
@@ -1772,8 +1772,8 @@ static void LOG_CWorld__FindObjectsKindaCollidingSectorList(unsigned int modelId
 
 #define HOOKPOS_CWorld__FindObjectsKindaCollidingSectorList 0x56508C
 #define HOOKSIZE_CWorld__FindObjectsKindaCollidingSectorList 0xA
-static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0x565096;
-static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
+static const std::uint32_t RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0x565096;
+static const std::uint32_t RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
 static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 {
     _asm {

@@ -78,7 +78,7 @@ public:
     const wchar_t* operator*() const { return c_str(); }
 
     // Functions
-    void           Split(const WString& strDelim, std::vector<WString>& outResult, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0) const;
+    void           Split(const WString& strDelim, std::vector<WString>& outResult, std::uint32_t uiMaxAmount = 0, std::uint32_t uiMinAmount = 0) const;
     bool           Split(const WString& strDelim, WString* pstrLeft, WString* pstrRight, int iIndex = 1) const;
     WString        SplitLeft(const WString& strDelim, WString* pstrRight = NULL, int iIndex = 1) const;
     WString        SplitRight(const WString& strDelim, WString* pstrLeft = NULL, int iIndex = 1) const;

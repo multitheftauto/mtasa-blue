@@ -96,7 +96,7 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
 void CCameraRPCs::SetCameraInterior(NetBitStreamInterface& bitStream)
 {
     // Read out the camera mode
-    unsigned char ucInterior;
+    std::uint8_t ucInterior;
     if (bitStream.Read(ucInterior))
     {
         g_pGame->GetWorld()->SetCurrentArea(ucInterior);
@@ -105,7 +105,7 @@ void CCameraRPCs::SetCameraInterior(NetBitStreamInterface& bitStream)
 
 void CCameraRPCs::FadeCamera(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucFadeIn;
+    std::uint8_t ucFadeIn;
     float         fFadeTime = 1.0f;
     if (bitStream.Read(ucFadeIn) && bitStream.Read(fFadeTime))
     {
@@ -118,9 +118,9 @@ void CCameraRPCs::FadeCamera(NetBitStreamInterface& bitStream)
         }
         else
         {
-            unsigned char ucRed = 0;
-            unsigned char ucGreen = 0;
-            unsigned char ucBlue = 0;
+            std::uint8_t ucRed = 0;
+            std::uint8_t ucGreen = 0;
+            std::uint8_t ucBlue = 0;
 
             if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue))
             {

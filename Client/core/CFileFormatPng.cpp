@@ -234,14 +234,14 @@ bool PngEncode(uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize, 
     // Create the screen data buffer
     BYTE** ppScreenData = NULL;
     ppScreenData = new BYTE*[uiHeight];
-    for (unsigned short y = 0; y < uiHeight; y++)
+    for (std::uint16_t y = 0; y < uiHeight; y++)
     {
         ppScreenData[y] = new BYTE[uiWidth * 4];
     }
 
     // Copy the surface data into a row-based buffer for libpng
     unsigned long ulLineWidth = uiWidth * 4;
-    for (unsigned int i = 0; i < uiHeight; i++)
+    for (std::uint32_t i = 0; i < uiHeight; i++)
     {
         memcpy(ppScreenData[i], (BYTE*)pData + i * ulLineWidth, ulLineWidth);
     }
@@ -262,7 +262,7 @@ bool PngEncode(uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize, 
     // Clean up the screen data buffer
     if (ppScreenData)
     {
-        for (unsigned short y = 0; y < uiHeight; y++)
+        for (std::uint16_t y = 0; y < uiHeight; y++)
         {
             delete[] ppScreenData[y];
         }

@@ -112,15 +112,15 @@ public:
     void DebugPrintf(const char* szFormat, ...);
     void SetDebugVisible(bool bVisible);
     bool IsDebugVisible();
-    void DebugEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B);
-    void DebugPrintfColor(const char* szFormat, unsigned char R, unsigned char G, unsigned char B, ...);
+    void DebugEchoColor(const char* szText, std::uint8_t R, std::uint8_t G, std::uint8_t B);
+    void DebugPrintfColor(const char* szFormat, std::uint8_t R, std::uint8_t G, std::uint8_t B, ...);
     void DebugClear();
 
     // Chat
     void ChatEcho(const char* szText, bool bColorCoded = false);
-    void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false);
+    void ChatEchoColor(const char* szText, std::uint8_t R, std::uint8_t G, std::uint8_t B, bool bColorCoded = false);
     void ChatPrintf(const char* szFormat, bool bColorCoded, ...);
-    void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...);
+    void ChatPrintfColor(const char* szFormat, bool bColorCoded, std::uint8_t R, std::uint8_t G, std::uint8_t B, ...);
     void SetChatVisible(bool bVisible, bool bInputBlocked);
     bool IsChatVisible();
     bool IsChatInputBlocked();
@@ -144,7 +144,7 @@ public:
     void HideMainMenu();
     void SetCenterCursor(bool bEnabled);
 
-    void ShowServerInfo(unsigned int WindowType);
+    void ShowServerInfo(std::uint32_t WindowType);
 
     // Configuration
     void ApplyConsoleSettings();
@@ -154,13 +154,13 @@ public:
     // Net
     void SetConnected(bool bConnected);
     bool IsConnected();
-    bool Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true);
+    bool Reconnect(const char* szHost, std::uint16_t usPort, const char* szPassword, bool bSave = true);
 
     // Mod
     void        SetOfflineMod(bool bOffline);
     void        ForceCursorVisible(bool bVisible, bool bToggleControls = true);
     void        SetMessageProcessor(pfnProcessMessage pfnMessageProcessor);
-    void        ShowMessageBox(const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK* ResponseHandler = NULL);
+    void        ShowMessageBox(const char* szTitle, const char* szText, std::uint32_t uiFlags, GUI_CALLBACK* ResponseHandler = NULL);
     void        RemoveMessageBox(bool bNextFrame = false);
     void        ShowErrorMessageBox(const SString& strTitle, SString strMessage, const SString& strTroubleLink = "");
     void        ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false);
@@ -234,7 +234,7 @@ public:
     uint GetMaxStreamingMemory();
 
     SString GetConnectCommandFromURI(const char* szURI);
-    void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword);
+    void    GetConnectParametersFromURI(const char* szURI, std::string& strHost, std::uint16_t& usPort, std::string& strNick, std::string& strPassword);
     std::map<std::string, std::string>& GetCommandLineOptions() { return m_CommandLineOptions; }
     const char*                         GetCommandLineOption(const char* szOption);
     const char*                         GetCommandLineArgs() { return m_szCommandLineArgs; }

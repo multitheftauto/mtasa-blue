@@ -92,7 +92,7 @@ void CGUILabel_Impl::SetTextColor(CGUIColor Color)
     reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->setTextColours(CEGUI::colour(1.0f / 255.0f * Color.R, 1.0f / 255.0f * Color.G, 1.0f / 255.0f * Color.B));
 }
 
-void CGUILabel_Impl::SetTextColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+void CGUILabel_Impl::SetTextColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
 {
     reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->setTextColours(CEGUI::colour(1.0f / 255.0f * ucRed, 1.0f / 255.0f * ucGreen, 1.0f / 255.0f * ucBlue));
 }
@@ -104,13 +104,13 @@ CGUIColor CGUILabel_Impl::GetTextColor()
     return temp;
 }
 
-void CGUILabel_Impl::GetTextColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue)
+void CGUILabel_Impl::GetTextColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue)
 {
     CEGUI::colour r = (reinterpret_cast<CEGUI::StaticText*>(m_pWindow)->getTextColours()).getColourAtPoint(0, 0);
 
-    ucRed = (unsigned char)(r.getRed() * 255);
-    ucGreen = (unsigned char)(r.getGreen() * 255);
-    ucBlue = (unsigned char)(r.getBlue() * 255);
+    ucRed = (std::uint8_t)(r.getRed() * 255);
+    ucGreen = (std::uint8_t)(r.getGreen() * 255);
+    ucBlue = (std::uint8_t)(r.getBlue() * 255);
 }
 
 void CGUILabel_Impl::SetFrameEnabled(bool bFrameEnabled)

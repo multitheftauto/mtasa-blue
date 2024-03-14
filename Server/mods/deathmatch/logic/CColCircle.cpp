@@ -42,7 +42,7 @@ bool CColCircle::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     GetCustomDataFloat("radius", m_fRadius, true);
 

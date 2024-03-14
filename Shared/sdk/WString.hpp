@@ -119,7 +119,7 @@ WString& WString::vFormat(const wchar_t* szFormat, va_list vl)
 //
 // Split into parts
 //
-void WString::Split(const WString& strDelim, std::vector<WString>& outResult, unsigned int uiMaxAmount, unsigned int uiMinAmount) const
+void WString::Split(const WString& strDelim, std::vector<WString>& outResult, std::uint32_t uiMaxAmount, std::uint32_t uiMinAmount) const
 {
     outResult.clear();
     unsigned long ulStartPoint = 0;

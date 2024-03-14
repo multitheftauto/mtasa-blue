@@ -102,7 +102,7 @@ static int pre_count = -1;
 static int no_stuff = 0;            // No tracking when tracker is allocating
 #define INVALID_THREAD_ID (-2)
 
-typedef unsigned char BYTE;
+typedef std::uint8_t BYTE;
 
 struct STagString
 {
@@ -336,7 +336,7 @@ static CAllocStats* GetAllocStats()
     return pAllocStats;
 }
 
-typedef unsigned char BYTE;
+typedef std::uint8_t BYTE;
 
 void* myMalloc(size_t Count, const char* Tag, int ElementSize)
 {

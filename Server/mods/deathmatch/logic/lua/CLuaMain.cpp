@@ -275,7 +275,7 @@ void CLuaMain::InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug)
     }
 }
 
-bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSize, const char* szFileName)
+bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, std::uint32_t uiInSize, const char* szFileName)
 {
     SString strNiceFilename = ConformResourcePath(szFileName);
 
@@ -529,8 +529,8 @@ void CLuaMain::DestroyDisplay(CTextDisplay* pDisplay)
     delete pDisplay;
 }
 
-CTextItem* CLuaMain::CreateTextItem(const char* szText, float fX, float fY, eTextPriority priority, const SColor color, float fScale, unsigned char format,
-                                    unsigned char ucShadowAlpha)
+CTextItem* CLuaMain::CreateTextItem(const char* szText, float fX, float fY, eTextPriority priority, const SColor color, float fScale, std::uint8_t format,
+                                    std::uint8_t ucShadowAlpha)
 {
     CTextItem* pTextItem = new CTextItem(szText, CVector2D(fX, fY), priority, color, fScale, format, ucShadowAlpha);
     m_TextItems.push_back(pTextItem);

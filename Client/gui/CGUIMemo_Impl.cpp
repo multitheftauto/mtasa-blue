@@ -81,12 +81,12 @@ void CGUIMemo_Impl::EnsureCaratIsVisible()
     wndMemo->setCaratIndex((wndMemo->getText()).length());
 }
 
-unsigned int CGUIMemo_Impl::GetCaretIndex()
+std::uint32_t CGUIMemo_Impl::GetCaretIndex()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getCaratIndex());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getCaratIndex());
 }
 
-void CGUIMemo_Impl::SetCaretIndex(unsigned int uiIndex)
+void CGUIMemo_Impl::SetCaretIndex(std::uint32_t uiIndex)
 {
     reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->setCaratIndex(uiIndex);
 }
@@ -138,24 +138,24 @@ float CGUIMemo_Impl::GetScrollbarPageSize()
     return 1.0f;
 }
 
-void CGUIMemo_Impl::SetSelection(unsigned int uiStart, unsigned int uiEnd)
+void CGUIMemo_Impl::SetSelection(std::uint32_t uiStart, std::uint32_t uiEnd)
 {
     reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->setSelection(uiStart, uiEnd);
 }
 
-unsigned int CGUIMemo_Impl::GetSelectionStart()
+std::uint32_t CGUIMemo_Impl::GetSelectionStart()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionStartIndex());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionStartIndex());
 }
 
-unsigned int CGUIMemo_Impl::GetSelectionEnd()
+std::uint32_t CGUIMemo_Impl::GetSelectionEnd()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionEndIndex());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionEndIndex());
 }
 
-unsigned int CGUIMemo_Impl::GetSelectionLength()
+std::uint32_t CGUIMemo_Impl::GetSelectionLength()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionLength());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->getSelectionLength());
 }
 
 bool CGUIMemo_Impl::ActivateOnTab()

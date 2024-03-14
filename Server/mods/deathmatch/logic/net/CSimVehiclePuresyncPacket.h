@@ -18,7 +18,7 @@ struct STrailerInfo
     CVector   m_TrailerRotationDeg;
 };
 
-enum class eVehicleAimDirection : unsigned char;
+enum class eVehicleAimDirection : std::uint8_t;
 
 class CSimVehiclePuresyncPacket : public CSimPacket
 {
@@ -38,7 +38,7 @@ private:
     void ReadVehicleSpecific(NetBitStreamInterface& BitStream);
     void WriteVehicleSpecific(NetBitStreamInterface& BitStream) const;
 
-    bool CanUpdateSync(unsigned char ucRemote)
+    bool CanUpdateSync(std::uint8_t ucRemote)
     {
         // We can update this element's sync only if the sync time
         // matches or either of them are 0 (ignore).

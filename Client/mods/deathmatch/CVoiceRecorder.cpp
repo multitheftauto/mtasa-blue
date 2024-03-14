@@ -52,7 +52,7 @@ int CVoiceRecorder::PACallback(const void* inputBuffer, void* outputBuffer, unsi
     return 0;
 }
 
-void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate)
+void CVoiceRecorder::Init(bool bEnabled, std::uint32_t uiServerSampleRate, std::uint8_t ucQuality, std::uint32_t uiBitrate)
 {
     m_bEnabled = bEnabled;
 
@@ -69,7 +69,7 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     m_VoiceState = VOICESTATE_AWAITING_INPUT;
 
     // Calculate how many frames we are storing and then the buffer size in bytes
-    unsigned int iFramesPerBuffer = (2048 / (32000 / m_SampleRate));
+    std::uint32_t iFramesPerBuffer = (2048 / (32000 / m_SampleRate));
     m_uiBufferSizeBytes = iFramesPerBuffer * sizeof(short);
 
     // Time of last send, this is used to limit sending
@@ -176,7 +176,7 @@ const SpeexMode* CVoiceRecorder::getSpeexModeFromSampleRate()
     return &speex_wb_mode;
 }
 
-eSampleRate CVoiceRecorder::convertServerSampleRate(unsigned int uiServerSampleRate)
+eSampleRate CVoiceRecorder::convertServerSampleRate(std::uint32_t uiServerSampleRate)
 {
     switch (uiServerSampleRate)
     {
@@ -249,22 +249,22 @@ void CVoiceRecorder::DoPulse()
 
     char*        pInputBuffer;
     char         bufTempOutput[2048];
-    unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
+    std::uint32_t uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
 
     // Only send every 100 ms
     if (CClientTime::GetTime() - m_ulTimeOfLastSend > 100 && m_VoiceState != VOICESTATE_AWAITING_INPUT)
     {
         m_bIsSendingVoiceData = false;
-        unsigned int uiBytesAvailable = 0;
+        std::uint32_t uiBytesAvailable = 0;
 
         if (m_uiOutgoingWriteIndex >= m_uiOutgoingReadIndex)
             uiBytesAvailable = m_uiOutgoingWriteIndex - m_uiOutgoingReadIndex;
         else
             uiBytesAvailable = m_uiOutgoingWriteIndex + (uiTotalBufferSize - m_uiOutgoingReadIndex);
 
-        unsigned int uiSpeexBlockSize = m_iSpeexOutgoingFrameSampleCount * VOICE_SAMPLE_SIZE;
+        std::uint32_t uiSpeexBlockSize = m_iSpeexOutgoingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
-        unsigned int uiSpeexFramesAvailable = uiBytesAvailable / uiSpeexBlockSize;
+        std::uint32_t uiSpeexFramesAvailable = uiBytesAvailable / uiSpeexBlockSize;
 
         if (uiSpeexFramesAvailable > 0)
         {
@@ -296,7 +296,7 @@ void CVoiceRecorder::DoPulse()
 
                 m_bIsSendingVoiceData = true;
 
-                unsigned int uiBytesWritten = speex_bits_write(&speexBits, bufTempOutput, 2048);
+                std::uint32_t uiBytesWritten = speex_bits_write(&speexBits, bufTempOutput, 2048);
 
                 g_pClientGame->GetLocalPlayer()->GetVoice()->DecodeAndBuffer(bufTempOutput, uiBytesWritten);
 
@@ -307,7 +307,7 @@ void CVoiceRecorder::DoPulse()
 
                     if (pLocalPlayer)
                     {
-                        pBitStream->Write((unsigned short)uiBytesWritten);                  // size of buffer / voice data
+                        pBitStream->Write((std::uint16_t)uiBytesWritten);                  // size of buffer / voice data
                         pBitStream->Write((char*)bufTempOutput, uiBytesWritten);            // voice data
 
                         g_pNet->SendPacket(PACKET_ID_VOICE_DATA, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED,
@@ -346,8 +346,8 @@ void CVoiceRecorder::SendFrame(const void* inputBuffer)
     if (m_VoiceState == VOICESTATE_AWAITING_INPUT || !m_bEnabled || !inputBuffer)
         return;
 
-    unsigned int remainingBufferSize = 0;
-    unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
+    std::uint32_t remainingBufferSize = 0;
+    std::uint32_t uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
 
     // Calculate how much of our buffer is remaining
     if (m_uiOutgoingWriteIndex >= m_uiOutgoingReadIndex)

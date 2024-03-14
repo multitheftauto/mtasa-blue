@@ -56,7 +56,7 @@ public:
     void  AttachTo(CClientEntity* pElement);
 
     void FadeIn(float fTime);
-    void FadeOut(float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
+    void FadeOut(float fTime, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue);
 
     CClientPlayer* GetFocusedPlayer() { return m_pFocusedPlayer; };
     void           SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoothTransition = false);

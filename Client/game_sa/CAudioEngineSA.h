@@ -61,7 +61,7 @@ public:
     ushort              usIndex;                        // +2
     CAEAudioEntity*     pAudioEntity;                   // +4
     CEntitySAInterface* pGameEntity;                    // +8    Either a player or NULL
-    unsigned int        m_dwEvent;                      // +12
+    std::uint32_t        m_dwEvent;                      // +12
     float               m_fMaxVolume;                   // +16
     float               m_fVolume;                      // +20
     float               m_fSoundDistance;               // +24
@@ -79,25 +79,25 @@ public:
     char                unk3;                           // +85 = 1005
     union
     {
-        unsigned short m_wEnvironmentFlags;
+        std::uint16_t m_wEnvironmentFlags;
         struct
         {
-            unsigned short m_bFrontEnd : 1;
-            unsigned short m_bUncancellable : 1;
-            unsigned short m_bRequestUpdates : 1;
-            unsigned short m_bPlayPhysically : 1;
-            unsigned short m_bUnpausable : 1;
-            unsigned short m_bStartPercentage : 1;
-            unsigned short m_bMusicMastered : 1;
-            unsigned short m_bLifespanTiedToPhysicalEntity : 1;
-            unsigned short m_bUndackable : 1;
-            unsigned short m_bUncompressable : 1;
-            unsigned short m_bRolledOff : 1;
-            unsigned short m_bSmoothDucking : 1;
-            unsigned short m_bForcedFront : 1;
+            std::uint16_t m_bFrontEnd : 1;
+            std::uint16_t m_bUncancellable : 1;
+            std::uint16_t m_bRequestUpdates : 1;
+            std::uint16_t m_bPlayPhysically : 1;
+            std::uint16_t m_bUnpausable : 1;
+            std::uint16_t m_bStartPercentage : 1;
+            std::uint16_t m_bMusicMastered : 1;
+            std::uint16_t m_bLifespanTiedToPhysicalEntity : 1;
+            std::uint16_t m_bUndackable : 1;
+            std::uint16_t m_bUncompressable : 1;
+            std::uint16_t m_bRolledOff : 1;
+            std::uint16_t m_bSmoothDucking : 1;
+            std::uint16_t m_bForcedFront : 1;
         };
     };
-    unsigned short m_wIsUsed;                         // +88
+    std::uint16_t m_wIsUsed;                         // +88
     short          unk4;                              // +90 = 1005
     short          m_wCurrentPlayPosition;            // +92
     short          unk5;                              // +94 = 0
@@ -121,15 +121,15 @@ public:
     void          SetEffectsMasterVolume(BYTE bVolume);            // 64 = max volume
     void          SetMusicMasterVolume(BYTE bVolume);
     void          ClearMissionAudio(int slot = 1);
-    void          PreloadMissionAudio(unsigned short usAudioEvent, int slot = 1);
-    unsigned char GetMissionAudioLoadingStatus(int slot = 1);
+    void          PreloadMissionAudio(std::uint16_t usAudioEvent, int slot = 1);
+    std::uint8_t GetMissionAudioLoadingStatus(int slot = 1);
     bool          IsMissionAudioSampleFinished(int slot = 1);
     void          AttachMissionAudioToPhysical(CPhysical* physical, int slot = 1);
     void          SetMissionAudioPosition(CVector* position, int slot = 1);
     bool          PlayLoadedMissionAudio(int slot = 1);
     void          PauseAllSound(bool bPaused);
     void          StopRadio();
-    void          StartRadio(unsigned int station);
+    void          StartRadio(std::uint32_t station);
     void          PauseAmbientSounds(bool bPaused);
     void          SetAmbientSoundEnabled(eAmbientSoundType eType, bool bEnabled);
     bool          IsAmbientSoundEnabled(eAmbientSoundType eType);
@@ -138,7 +138,7 @@ public:
     bool          IsWorldSoundEnabled(uint uiGroup, uint uiIndex);
     void          ResetWorldSounds();
     void          SetWorldSoundHandler(WorldSoundHandler* pHandler);
-    void          ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2);
+    void          ReportBulletHit(CEntity* pEntity, std::uint8_t ucSurfaceType, CVector* pvecPosition, float f_2);
     void          ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical);
 
     void UpdateAmbientSoundSettings();
@@ -147,7 +147,7 @@ public:
 private:
     bool               m_bRadioOn;
     bool               m_bRadioMuted;
-    unsigned char      m_ucRadioChannel;
+    std::uint8_t      m_ucRadioChannel;
     bool               m_bAmbientSoundsPaused;
     bool               m_bAmbientGeneralEnabled;
     bool               m_bAmbientGunfireEnabled;

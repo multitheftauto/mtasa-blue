@@ -36,7 +36,7 @@ CTaskSimpleGangDriveBySA::CTaskSimpleGangDriveBySA(CEntity* pTargetEntity, const
     }
 }
 
-CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate)
+CTaskSimpleUseGunSA::CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, std::uint8_t bAimImmediate)
 {
     CreateTaskInterface(sizeof(CTaskSimpleUseGunSAInterface));
     if (!IsValid())
@@ -422,7 +422,7 @@ void CTaskSimpleUseGunSA::StartAnim(class CPed* pPed)
     }
 }
 
-void CTaskSimpleUseGunSA::StartCountDown(unsigned char a, bool b)
+void CTaskSimpleUseGunSA::StartCountDown(std::uint8_t a, bool b)
 {
     DWORD dwFunc = FUNC_CTaskSimpleUseGun_StartCountDown;
     DWORD dwThisInterface = (DWORD)GetInterface();
@@ -435,7 +435,7 @@ void CTaskSimpleUseGunSA::StartCountDown(unsigned char a, bool b)
     }
 }
 
-CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod)
+CTaskSimpleFightSA::CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, std::uint32_t nIdlePeriod)
 {
     CreateTaskInterface(sizeof(CTaskSimpleFightSAInterface));
     if (!IsValid())

@@ -187,8 +187,8 @@ bool CRemoteMasterServer::CheckParsable()
     CBufferReadStream stream(m_Data, true);
 
     // Figure out which type of list it is
-    unsigned short usVersion = 0;
-    unsigned short usCount = 0;
+    std::uint16_t usVersion = 0;
+    std::uint16_t usCount = 0;
     stream.Read(usCount);
     if (usCount == 0)
         stream.Read(usVersion);
@@ -216,7 +216,7 @@ bool CRemoteMasterServer::CheckParsableVer0()
     if (stream.GetSize() < 2)
         return false;
 
-    unsigned short usCount = 0;
+    std::uint16_t usCount = 0;
     stream.Read(usCount);
 
     int iMinSize = 2 + usCount * 6;
@@ -262,8 +262,8 @@ bool CRemoteMasterServer::ParseList(CServerListItemList& itemList)
     CBufferReadStream stream(m_Data, true);
 
     // Figure out which type of list it is
-    unsigned short usVersion = 0;
-    unsigned short usCount = 0;
+    std::uint16_t usVersion = 0;
+    std::uint16_t usCount = 0;
     stream.Read(usCount);
     if (usCount == 0)
         stream.Read(usVersion);
@@ -290,7 +290,7 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
     if (stream.GetSize() < 2)
         return false;
 
-    unsigned short usCount = 0;
+    std::uint16_t usCount = 0;
     stream.Read(usCount);
 
 #if MTA_DEBUG
@@ -302,7 +302,7 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
     while (!stream.AtEnd(6) && usCount--)
     {
         in_addr        Address;                // IP-address
-        unsigned short usQueryPort;            // Query port
+        std::uint16_t usQueryPort;            // Query port
 
         stream.Read(Address.S_un.S_un_b.s_b1);
         stream.Read(Address.S_un.S_un_b.s_b2);
@@ -403,7 +403,7 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
         uint uiSkipPos = stream.Tell() + usLength - 2;
 
         in_addr        Address;               // IP-address
-        unsigned short usGamePort;            // Game port
+        std::uint16_t usGamePort;            // Game port
 
         stream.Read(Address.S_un.S_addr);
         stream.Read(usGamePort);

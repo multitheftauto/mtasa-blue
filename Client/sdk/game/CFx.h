@@ -21,7 +21,7 @@ class CFx
 public:
     virtual void AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness) = 0;
     virtual void AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness) = 0;
-    virtual void AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, unsigned char ucBlurIf0, float fSpread,
+    virtual void AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, std::uint8_t ucBlurIf0, float fSpread,
                            float fLife) = 0;
     virtual void AddTyreBurst(CVector& vecPosition, CVector& vecDirection) = 0;
     virtual void AddBulletImpact(CVector& vecPosition, CVector& vecDirection, int iSmokeSize, int iSparkCount, float fSmokeIntensity) = 0;

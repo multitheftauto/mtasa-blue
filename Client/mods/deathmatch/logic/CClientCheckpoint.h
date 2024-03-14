@@ -38,7 +38,7 @@ public:
     CClientCheckpoint(CClientMarker* pThis);
     ~CClientCheckpoint();
 
-    unsigned int GetMarkerType() const { return CClientMarkerCommon::CLASS_CHECKPOINT; };
+    std::uint32_t GetMarkerType() const { return CClientMarkerCommon::CLASS_CHECKPOINT; };
 
     unsigned long GetCheckpointType() const;
     void          SetCheckpointType(unsigned long ulType);
@@ -56,8 +56,8 @@ public:
     bool IsVisible() const { return m_bVisible; }
     void SetVisible(bool bVisible);
 
-    unsigned int GetIcon() const { return m_uiIcon; }
-    void         SetIcon(unsigned int uiIcon);
+    std::uint32_t GetIcon() const { return m_uiIcon; }
+    void         SetIcon(std::uint32_t uiIcon);
 
     SColor GetColor() const { return m_Color; }
     void   SetColor(const SColor& color);
@@ -70,8 +70,8 @@ public:
     void GetTarget(CVector& vecTarget) { vecTarget = m_vecTarget; }
     void SetTarget(const CVector& vecTarget) { m_vecTarget = vecTarget; }
 
-    static unsigned char StringToIcon(const char* szString);
-    static bool          IconToString(unsigned char ucIcon, SString& strOutString);
+    static std::uint8_t StringToIcon(const char* szString);
+    static bool          IconToString(std::uint8_t ucIcon, SString& strOutString);
     void                 ReCreateWithSameIdentifier();
 
 protected:
@@ -90,7 +90,7 @@ private:
     CVector          m_vecDirection;
     CVector          m_vecTargetPosition;
     bool             m_bVisible;
-    unsigned int     m_uiIcon;
+    std::uint32_t     m_uiIcon;
     DWORD            m_dwType;
     float            m_fSize;
     SColor           m_Color;

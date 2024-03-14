@@ -193,7 +193,7 @@ void CNametags::DoPulse()
 
     // Draw each player's nametag
     float                          fAlphaModifier;
-    unsigned char                  ucAlpha;
+    std::uint8_t                  ucAlpha;
     float                          fDistance;
     list<CClientPlayer*>::iterator iterTags = playerTags.begin();
     for (; iterTags != playerTags.end(); ++iterTags)
@@ -213,14 +213,14 @@ void CNametags::DoPulse()
         }
 
         // Calculate the alpha for the nametag
-        ucAlpha = static_cast<unsigned char>(180.0f * fAlphaModifier);
+        ucAlpha = static_cast<std::uint8_t>(180.0f * fAlphaModifier);
 
         // Draw the tag
         DrawTagForPlayer(pPlayer, ucAlpha);
     }
 }
 
-void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha)
+void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, std::uint8_t ucAlpha)
 {
     // If nametag is hidden, don't draw
     if (!pPlayer->IsNametagShowing())
@@ -271,7 +271,7 @@ void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha)
             szNick = pPlayer->GetNick();
 
         // Draw his name
-        unsigned char ucR, ucG, ucB;
+        std::uint8_t ucR, ucG, ucB;
         pPlayer->GetNametagColor(ucR, ucG, ucB);
         // Draw shadow first
         int iScreenPosX = static_cast<int>(vecScreenPosition.fX);
@@ -312,7 +312,7 @@ void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha)
             float fMaxArmor = 100.0f;
             float fArmorAlpha = (fArmor / fMaxArmor) * (ucAlpha / 255.0f);            // 0->1
 
-            unsigned char ucArmorAlpha = (unsigned char)(255.0f * fArmorAlpha);
+            std::uint8_t ucArmorAlpha = (std::uint8_t)(255.0f * fArmorAlpha);
 
             #define ARMOR_BORDER_COLOR COLOR_ABGR(ucArmorAlpha,167,177,179)
 
@@ -357,13 +357,13 @@ void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha)
             vecTopLeft = vecTopLeftBase + CVector(+0, +0, 0);
             vecBotRight = vecBotRightBase + CVector(-fRemovedWidth, +0, 0);
             pGraphics->DrawRectangle(vecTopLeft.fX, vecTopLeft.fY, vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                                     COLOR_ABGR(ucAlpha, 0, static_cast<unsigned char>(lGreen), static_cast<unsigned char>(lRed)), true);
+                                     COLOR_ABGR(ucAlpha, 0, static_cast<std::uint8_t>(lGreen), static_cast<std::uint8_t>(lRed)), true);
 
             // the black bit
             vecTopLeft = vecTopLeftBase + CVector(+fWidth - fRemovedWidth, +0, 0);
             vecBotRight = vecBotRightBase + CVector(+0, +0, 0);
             pGraphics->DrawRectangle(vecTopLeft.fX, vecTopLeft.fY, vecBotRight.fX - vecTopLeft.fX, vecBotRight.fY - vecTopLeft.fY,
-                                     COLOR_ABGR(ucAlpha, 0, static_cast<unsigned char>(lGreenBlack), static_cast<unsigned char>(lRedBlack)), true);
+                                     COLOR_ABGR(ucAlpha, 0, static_cast<std::uint8_t>(lGreenBlack), static_cast<std::uint8_t>(lRedBlack)), true);
 
             // Draw the player status icon
             if (pPlayer->HasConnectionTrouble())

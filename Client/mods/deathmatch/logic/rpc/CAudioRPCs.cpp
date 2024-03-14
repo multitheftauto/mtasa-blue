@@ -21,8 +21,8 @@ void CAudioRPCs::LoadFunctions()
 void CAudioRPCs::PlaySound(NetBitStreamInterface& bitStream)
 {
     // Read out sound type
-    //  unsigned char ucType;
-    //  unsigned short usSound, usSlot;
+    //  std::uint8_t ucType;
+    //  std::uint16_t usSound, usSlot;
     //  CVector vecPosition;
 
     //  if ( bitStream.Read ( ucType ) )
@@ -30,7 +30,7 @@ void CAudioRPCs::PlaySound(NetBitStreamInterface& bitStream)
     //      switch ( ucType )
     //      {
     //          case AUDIO_FRONTEND:
-    SIntegerSync<unsigned char, 7> sound;
+    SIntegerSync<std::uint8_t, 7> sound;
     if (bitStream.Read(&sound))
     {
         g_pGame->GetAudioEngine()->PlayFrontEndSound(sound);

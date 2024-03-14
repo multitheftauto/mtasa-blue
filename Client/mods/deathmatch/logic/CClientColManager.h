@@ -29,7 +29,7 @@ public:
     bool Exists(CClientColShape* pShape);
     void DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); }
 
 protected:
     void AddToList(CClientColShape* pShape) { m_List.push_back(pShape); };

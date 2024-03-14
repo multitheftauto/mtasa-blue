@@ -26,14 +26,14 @@ public:
     ~CGUITexture_Impl();
 
     bool LoadFromFile(const char* szFilename);
-    void LoadFromMemory(const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight);
+    void LoadFromMemory(const void* pBuffer, std::uint32_t uiWidth, std::uint32_t uiHeight);
     void Clear();
 
     CEGUI::Texture*    GetTexture();
     void               SetTexture(CEGUI::Texture* pTexture);
     LPDIRECT3DTEXTURE9 GetD3DTexture();
 
-    void CreateTexture(unsigned int width, unsigned int height);
+    void CreateTexture(std::uint32_t width, std::uint32_t height);
 
 private:
     CEGUI::Renderer* m_pRenderer;

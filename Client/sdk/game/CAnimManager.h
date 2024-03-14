@@ -59,7 +59,7 @@ public:
 
     virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(int ID) = 0;
     virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, std::unique_ptr<CAnimBlock>& pBlock) = 0;
-    virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(unsigned int uiIndex, std::unique_ptr<CAnimBlock>& pBlock) = 0;
+    virtual std::unique_ptr<CAnimBlendHierarchy> GetAnimation(std::uint32_t uiIndex, std::unique_ptr<CAnimBlock>& pBlock) = 0;
 
     virtual std::unique_ptr<CAnimBlock> GetAnimationBlock(int ID) = 0;
     virtual std::unique_ptr<CAnimBlock> GetAnimationBlock(const char* szName) = 0;

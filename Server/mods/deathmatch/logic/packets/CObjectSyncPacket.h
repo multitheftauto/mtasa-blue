@@ -24,8 +24,8 @@ public:
         CVector       vecPosition;
         CVector       vecRotation;
         float         fHealth;
-        unsigned char ucSyncTimeContext;
-        unsigned char ucFlags;
+        std::uint8_t ucSyncTimeContext;
+        std::uint8_t ucFlags;
         bool          bSend;
     };
 

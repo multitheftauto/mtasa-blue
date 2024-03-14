@@ -42,11 +42,11 @@ public:
     virtual void ResetReadPointer() = 0;
 
     // Don't use this, it screws up randomly in certain conditions causing packet misalign
-    virtual void Write(const unsigned char& input) = 0;
+    virtual void Write(const std::uint8_t& input) = 0;
     virtual void Write(const char& input) = 0;
-    virtual void Write(const unsigned short& input) = 0;
+    virtual void Write(const std::uint16_t& input) = 0;
     virtual void Write(const short& input) = 0;
-    virtual void Write(const unsigned int& input) = 0;
+    virtual void Write(const std::uint32_t& input) = 0;
     virtual void Write(const int& input) = 0;
     virtual void Write(const float& input) = 0;
     virtual void Write(const double& input) = 0;
@@ -54,13 +54,13 @@ public:
     virtual void Write(const ISyncStructure* syncStruct) = 0;
 
 public:            // Use char functions only when they will be 0 most times
-    virtual void WriteCompressed(const unsigned char& input) = 0;
+    virtual void WriteCompressed(const std::uint8_t& input) = 0;
     virtual void WriteCompressed(const char& input) = 0;
 
 public:
-    virtual void WriteCompressed(const unsigned short& input) = 0;
+    virtual void WriteCompressed(const std::uint16_t& input) = 0;
     virtual void WriteCompressed(const short& input) = 0;
-    virtual void WriteCompressed(const unsigned int& input) = 0;
+    virtual void WriteCompressed(const std::uint32_t& input) = 0;
     virtual void WriteCompressed(const int& input) = 0;
 
 private:            // Float functions not used because they only cover -1 to +1 and are lossy
@@ -68,7 +68,7 @@ private:            // Float functions not used because they only cover -1 to +1
     virtual void WriteCompressed(const double& input) = 0;
 
 public:
-    virtual void WriteBits(const char* input, unsigned int numbits) = 0;
+    virtual void WriteBits(const char* input, std::uint32_t numbits) = 0;
     virtual void WriteBit(bool input) = 0;
 
     // Write a normalized 3D vector, using (at most) 4 bytes + 3 bits instead of 12 bytes.  Will further compress y or z axis aligned vectors. Accurate to
@@ -84,11 +84,11 @@ public:
     // Write an orthogonal matrix by creating a quaternion, and writing 3 components of the quaternion in 2 bytes each for 6 bytes instead of 36
     virtual void WriteOrthMatrix(float m00, float m01, float m02, float m10, float m11, float m12, float m20, float m21, float m22) = 0;
 
-    virtual bool Read(unsigned char& output) = 0;
+    virtual bool Read(std::uint8_t& output) = 0;
     virtual bool Read(char& output) = 0;
-    virtual bool Read(unsigned short& output) = 0;
+    virtual bool Read(std::uint16_t& output) = 0;
     virtual bool Read(short& output) = 0;
-    virtual bool Read(unsigned int& output) = 0;
+    virtual bool Read(std::uint32_t& output) = 0;
     virtual bool Read(int& output) = 0;
     virtual bool Read(float& output) = 0;
     virtual bool Read(double& output) = 0;
@@ -96,13 +96,13 @@ public:
     virtual bool Read(ISyncStructure* syncStruct) = 0;
 
 public:            // Use char functions only when they will be 0 most times
-    virtual bool ReadCompressed(unsigned char& output) = 0;
+    virtual bool ReadCompressed(std::uint8_t& output) = 0;
     virtual bool ReadCompressed(char& output) = 0;
 
 public:
-    virtual bool ReadCompressed(unsigned short& output) = 0;
+    virtual bool ReadCompressed(std::uint16_t& output) = 0;
     virtual bool ReadCompressed(short& output) = 0;
-    virtual bool ReadCompressed(unsigned int& output) = 0;
+    virtual bool ReadCompressed(std::uint32_t& output) = 0;
     virtual bool ReadCompressed(int& output) = 0;
 
 private:            // Float functions not used because they only cover -1 to +1 and are lossy
@@ -110,7 +110,7 @@ private:            // Float functions not used because they only cover -1 to +1
     virtual bool ReadCompressed(double& output) = 0;
 
 public:
-    virtual bool ReadBits(char* output, unsigned int numbits) = 0;
+    virtual bool ReadBits(char* output, std::uint32_t numbits) = 0;
     virtual bool ReadBit() = 0;
 
     virtual bool ReadNormVector(float& x, float& y, float& z) = 0;
@@ -126,7 +126,7 @@ public:
     virtual void AlignWriteToByteBoundary() const = 0;
     virtual void AlignReadToByteBoundary() const = 0;
 
-    virtual unsigned char* GetData() const = 0;
+    virtual std::uint8_t* GetData() const = 0;
 
     // Force long types to use 4 bytes
     bool Read(unsigned long& e)
@@ -174,13 +174,13 @@ public:
     // of the interface but get inline compiled.
 
     template <typename T>
-    void WriteBits(T* input, unsigned int numbits)
+    void WriteBits(T* input, std::uint32_t numbits)
     {
         WriteBits(reinterpret_cast<const char*>(input), numbits);
     }
 
     template <typename T>
-    bool ReadBits(T* output, unsigned int numbits)
+    bool ReadBits(T* output, std::uint32_t numbits)
     {
         return ReadBits(reinterpret_cast<char*>(output), numbits);
     }
@@ -188,7 +188,7 @@ public:
     // Read a single bit
     bool ReadBit(bool& output)
     {
-        unsigned char ucTemp = 0;
+        std::uint8_t ucTemp = 0;
         if (ReadBits(&ucTemp, 1))
         {
             output = ucTemp & 1;
@@ -219,7 +219,7 @@ public:
     }
 
     // Write all characters in `value` (incl. length as `SizeType`)
-    template <typename SizeType = unsigned short>
+    template <typename SizeType = std::uint16_t>
     void WriteString(std::string_view value)
     {
         // Write the length
@@ -246,7 +246,7 @@ public:
     }
 
     // Write a string (incl. ushort size header)
-    template <typename SizeType = unsigned short>
+    template <typename SizeType = std::uint16_t>
     void WriteString(const std::string& value)
     {
         // Write the length
@@ -285,7 +285,7 @@ public:
     }
 
     // Read a string (incl. ushort size header)
-    template <typename SizeType = unsigned short>
+    template <typename SizeType = std::uint16_t>
     bool ReadString(std::string& result)
     {
         result = "";
@@ -363,30 +363,30 @@ public:
     // Write an element ID
     void Write(const ElementID& ID)
     {
-        static const unsigned int bitcount = NumberOfSignificantBits<(MAX_ELEMENTS - 1)>::COUNT;
-        const unsigned int&       IDref = ID.Value();
+        static const std::uint32_t bitcount = NumberOfSignificantBits<(MAX_ELEMENTS - 1)>::COUNT;
+        const std::uint32_t&       IDref = ID.Value();
         #ifdef MTA_CLIENT
         if (IDref != INVALID_ELEMENT_ID && IDref >= MAX_SERVER_ELEMENTS)
         {
             dassert("Sending client side element id to server" && 0);
             uint uiInvalidId = INVALID_ELEMENT_ID;
-            WriteBits(reinterpret_cast<const unsigned char*>(&uiInvalidId), bitcount);
+            WriteBits(reinterpret_cast<const std::uint8_t*>(&uiInvalidId), bitcount);
             return;
         }
         #endif
-        WriteBits(reinterpret_cast<const unsigned char*>(&IDref), bitcount);
+        WriteBits(reinterpret_cast<const std::uint8_t*>(&IDref), bitcount);
     }
 
     // Read an element ID
     bool Read(ElementID& ID)
     {
-        static const unsigned int bitcount = NumberOfSignificantBits<(MAX_ELEMENTS - 1)>::COUNT;
-        unsigned int&             IDref = ID.Value();
+        static const std::uint32_t bitcount = NumberOfSignificantBits<(MAX_ELEMENTS - 1)>::COUNT;
+        std::uint32_t&             IDref = ID.Value();
         IDref = 0;
-        bool bResult = ReadBits(reinterpret_cast<unsigned char*>(&IDref), bitcount);
+        bool bResult = ReadBits(reinterpret_cast<std::uint8_t*>(&IDref), bitcount);
 
         // If max value, change to INVALID_ELEMENT_ID
-        static const unsigned int maxValue = (1 << bitcount) - 1;
+        static const std::uint32_t maxValue = (1 << bitcount) - 1;
         if (IDref == maxValue)
             IDref = INVALID_ELEMENT_ID;
 
@@ -397,7 +397,7 @@ public:
 // eBitStreamVersion allows us to track what BitStream version is being used without placing magic numbers everywhere.
 // It also helps us know what code branches can be removed when we increment a major version of MTA.
 // Make sure you only add new items to the end of the list, above the "Latest" entry.
-enum class eBitStreamVersion : unsigned short
+enum class eBitStreamVersion : std::uint16_t
 {
     Unk = 0x062,
 
@@ -557,7 +557,7 @@ protected:
 
 public:
     virtual                operator NetBitStreamInterface&() { return *this; }
-    virtual unsigned short Version() const = 0;
+    virtual std::uint16_t Version() const = 0;
 
     bool Can(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(Version()) >= query; }
 };

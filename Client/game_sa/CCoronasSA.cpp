@@ -111,7 +111,7 @@ void CCoronasSA::DisableSunAndMoon(bool bDisabled)
      1 - enabled
      2 - force enabled (render even if there is no rain)
 */
-void CCoronasSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
+void CCoronasSA::SetCoronaReflectionsEnabled(std::uint8_t ucEnabled)
 {
     m_ucCoronaReflectionsEnabled = ucEnabled;
 
@@ -145,7 +145,7 @@ void CCoronasSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
     }
 }
 
-unsigned char CCoronasSA::GetCoronaReflectionsEnabled()
+std::uint8_t CCoronasSA::GetCoronaReflectionsEnabled()
 {
     return m_ucCoronaReflectionsEnabled;
 }

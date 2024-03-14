@@ -47,11 +47,11 @@ public:
     void                              StopMoving();
     const CPositionRotationAnimation* GetMoveAnimation();
 
-    unsigned char GetAlpha() { return m_ucAlpha; }
-    void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
+    std::uint8_t GetAlpha() { return m_ucAlpha; }
+    void          SetAlpha(std::uint8_t ucAlpha) { m_ucAlpha = ucAlpha; }
 
-    unsigned short GetModel() { return m_usModel; }
-    void           SetModel(unsigned short usModel) { m_usModel = usModel; }
+    std::uint16_t GetModel() { return m_usModel; }
+    void           SetModel(std::uint16_t usModel) { m_usModel = usModel; }
 
     const CVector& GetScale() { return m_vecScale; }
     void           SetScale(const CVector& vecScale) { m_vecScale = vecScale; }
@@ -87,8 +87,8 @@ protected:
 private:
     CObjectManager* m_pObjectManager;
     CVector         m_vecRotation;
-    unsigned char   m_ucAlpha;
-    unsigned short  m_usModel;
+    std::uint8_t   m_ucAlpha;
+    std::uint16_t  m_usModel;
     CVector         m_vecScale;
     bool            m_bIsFrozen;
     float           m_fHealth;

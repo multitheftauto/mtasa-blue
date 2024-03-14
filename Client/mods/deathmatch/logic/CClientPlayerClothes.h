@@ -51,25 +51,25 @@ public:
     CClientPlayerClothes(CClientPed* pPed);
     ~CClientPlayerClothes();
 
-    const SPlayerClothing* GetClothing(unsigned char ucType);
-    void                   AddClothes(const char* szTexture, const char* szModel, unsigned char ucType, bool bAddToModel = true);
-    void                   InternalAddClothes(const SPlayerClothing* pClothing, unsigned char ucType);
-    bool                   RemoveClothes(unsigned char ucType, bool bRemoveFromModel = true);
+    const SPlayerClothing* GetClothing(std::uint8_t ucType);
+    void                   AddClothes(const char* szTexture, const char* szModel, std::uint8_t ucType, bool bAddToModel = true);
+    void                   InternalAddClothes(const SPlayerClothing* pClothing, std::uint8_t ucType);
+    bool                   RemoveClothes(std::uint8_t ucType, bool bRemoveFromModel = true);
 
     void AddAllToModel();
     void RemoveAll(bool bRemoveFromModel = true);
 
     void DefaultClothes(bool bAddToModel = true);
 
-    static bool        HasEmptyClothing(unsigned char ucType);
-    static bool        IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType);
-    static const char* GetClothingName(unsigned char ucType);
+    static bool        HasEmptyClothing(std::uint8_t ucType);
+    static bool        IsEmptyClothing(const SPlayerClothing* pClothing, std::uint8_t ucType);
+    static const char* GetClothingName(std::uint8_t ucType);
 
-    static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
-    static const int              GetClothingGroupMax(unsigned char ucType);
+    static const SPlayerClothing* GetClothingGroup(std::uint8_t ucType);
+    static const int              GetClothingGroupMax(std::uint8_t ucType);
 
 private:
-    static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
+    static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, std::uint8_t ucType);
 
     CClientPed* m_pPlayerModel;
 

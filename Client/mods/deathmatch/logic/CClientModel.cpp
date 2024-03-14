@@ -122,14 +122,14 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 
 void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 {
-    auto callElementChangeEvent = [](auto &element, unsigned short usParentID, auto modelId) {
+    auto callElementChangeEvent = [](auto &element, std::uint16_t usParentID, auto modelId) {
         CLuaArguments Arguments;
         Arguments.PushNumber(modelId);
         Arguments.PushNumber(usParentID);
         element.CallEvent("onClientElementModelChange", Arguments, true);
     };
 
-    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
+    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, std::uint16_t usParentID, auto setElementModelLambda) {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
             auto& element = **iter;
@@ -146,7 +146,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         }
     };
 
-    auto unloadModelsAndCallEventsNonStreamed = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    auto unloadModelsAndCallEventsNonStreamed = [&](auto iterBegin, auto iterEnd, std::uint16_t usParentID, auto setElementModelLambda)
     {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
@@ -175,7 +175,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         case eClientModelType::TIMED_OBJECT:
         {
             const auto&    objects = &g_pClientGame->GetManager()->GetObjectManager()->GetObjects();
-            unsigned short usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
+            std::uint16_t usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
             unloadModelsAndCallEvents(objects->begin(), objects->end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
@@ -197,7 +197,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         case eClientModelType::VEHICLE:
         {
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
-            unsigned short         usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
+            std::uint16_t         usParentID = g_pGame->GetModelInfo(m_iModelID)->GetParentID();
 
             unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
                                       [=](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });

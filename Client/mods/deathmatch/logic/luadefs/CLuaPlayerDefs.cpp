@@ -198,7 +198,7 @@ int CLuaPlayerDefs::GetPlayerNametagColor(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Grab his nametag color and return it
-        unsigned char ucR, ucG, ucB;
+        std::uint8_t ucR, ucG, ucB;
         pPlayer->GetNametagColor(ucR, ucG, ucB);
 
         lua_pushnumber(luaVM, ucR);
@@ -246,7 +246,7 @@ int CLuaPlayerDefs::GetPlayerPing(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Grab his ping
-        unsigned int uiPing = pPlayer->GetPing();
+        std::uint32_t uiPing = pPlayer->GetPing();
         lua_pushnumber(luaVM, uiPing);
         return 1;
     }
@@ -623,8 +623,8 @@ int CLuaPlayerDefs::GetPlayerMapBoundingBox(lua_State* luaVM)
     return 1;
 }
 
-unsigned char CLuaPlayerDefs::GetPlayerMapOpacity()
+std::uint8_t CLuaPlayerDefs::GetPlayerMapOpacity()
 {
     int iMapOpacity = g_pCore->GetCVars()->GetValue<int>("mapalpha");
-    return static_cast<unsigned char>(Clamp(0, iMapOpacity, 255));
+    return static_cast<std::uint8_t>(Clamp(0, iMapOpacity, 255));
 }

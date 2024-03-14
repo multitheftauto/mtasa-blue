@@ -86,37 +86,37 @@ bool CGUIEdit_Impl::IsMasked()
     return reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->isTextMasked();
 }
 
-void CGUIEdit_Impl::SetMaxLength(unsigned int uiMaxLength)
+void CGUIEdit_Impl::SetMaxLength(std::uint32_t uiMaxLength)
 {
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setMaxTextLength(uiMaxLength);
 }
 
-unsigned int CGUIEdit_Impl::GetMaxLength()
+std::uint32_t CGUIEdit_Impl::GetMaxLength()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getMaxTextLength());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getMaxTextLength());
 }
 
-void CGUIEdit_Impl::SetSelection(unsigned int uiStart, unsigned int uiEnd)
+void CGUIEdit_Impl::SetSelection(std::uint32_t uiStart, std::uint32_t uiEnd)
 {
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setSelection(uiStart, uiEnd);
 }
 
-unsigned int CGUIEdit_Impl::GetSelectionStart()
+std::uint32_t CGUIEdit_Impl::GetSelectionStart()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionStartIndex());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionStartIndex());
 }
 
-unsigned int CGUIEdit_Impl::GetSelectionEnd()
+std::uint32_t CGUIEdit_Impl::GetSelectionEnd()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionEndIndex());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionEndIndex());
 }
 
-unsigned int CGUIEdit_Impl::GetSelectionLength()
+std::uint32_t CGUIEdit_Impl::GetSelectionLength()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionLength());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getSelectionLength());
 }
 
-void CGUIEdit_Impl::SetCaretIndex(unsigned int uiIndex)
+void CGUIEdit_Impl::SetCaretIndex(std::uint32_t uiIndex)
 {
     return reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setCaratIndex(uiIndex);
 }
@@ -131,9 +131,9 @@ void CGUIEdit_Impl::SetCaretAtEnd()
     reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->setCaratIndex(GetText().length());
 }
 
-unsigned int CGUIEdit_Impl::GetCaretIndex()
+std::uint32_t CGUIEdit_Impl::GetCaretIndex()
 {
-    return static_cast<unsigned int>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getCaratIndex());
+    return static_cast<std::uint32_t>(reinterpret_cast<CEGUI::Editbox*>(m_pWindow)->getCaratIndex());
 }
 
 void CGUIEdit_Impl::SetTextAcceptedHandler(GUI_CALLBACK Callback)

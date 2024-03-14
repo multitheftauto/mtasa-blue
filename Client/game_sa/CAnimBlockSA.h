@@ -23,7 +23,7 @@ public:
     char           szName[16];
     bool           bLoaded;            // ?
     BYTE           pad[1];
-    unsigned short usRefs;
+    std::uint16_t usRefs;
     int            idOffset;
     size_t         nAnimations;
     DWORD          dwAssocGroup;
@@ -40,7 +40,7 @@ public:
     char*                           GetName() { return m_pInterface->szName; }
     int                             GetIndex() { return m_pInterface->GetIndex(); }
     void                            AddRef() { m_pInterface->usRefs++; }
-    unsigned short                  GetRefs() { return m_pInterface->usRefs; }
+    std::uint16_t                  GetRefs() { return m_pInterface->usRefs; }
     bool                            IsLoaded() { return m_pInterface->bLoaded; }
     int                             GetIDOffset() { return m_pInterface->idOffset; }
     size_t                          GetAnimationCount() { return m_pInterface->nAnimations; }

@@ -125,7 +125,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
 
 int CLuaMarkerDefs::GetMarkerCount(lua_State* luaVM)
 {
-    unsigned int uiCount = 0;
+    std::uint32_t uiCount = 0;
     if (CStaticFunctionDefinitions::GetMarkerCount(uiCount))
     {
         lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));

@@ -82,7 +82,7 @@ extern DWORD* g_TableSize;
 extern DWORD  g_dwTable;
 
 /*
-inline void* __cdecl operator new ( unsigned int uiSize )
+inline void* __cdecl operator new ( std::uint32_t uiSize )
 {
     DWORD dwOld, dwData;
 

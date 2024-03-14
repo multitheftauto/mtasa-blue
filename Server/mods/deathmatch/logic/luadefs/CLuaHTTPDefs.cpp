@@ -140,7 +140,7 @@ int CLuaHTTPDefs::httpSetResponseCookie(lua_State* luaVM)
 int CLuaHTTPDefs::httpSetResponseCode(lua_State* luaVM)
 {
     //  bool httpSetResponseCode ( int code )
-    unsigned int uiResponseCode;
+    std::uint32_t uiResponseCode;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(uiResponseCode);

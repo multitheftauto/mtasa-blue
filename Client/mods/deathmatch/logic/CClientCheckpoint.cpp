@@ -200,7 +200,7 @@ void CClientCheckpoint::SetVisible(bool bVisible)
     m_bVisible = bVisible;
 }
 
-void CClientCheckpoint::SetIcon(unsigned int uiIcon)
+void CClientCheckpoint::SetIcon(std::uint32_t uiIcon)
 {
     // Different from our current icon?
     if (m_uiIcon != uiIcon)
@@ -265,7 +265,7 @@ void CClientCheckpoint::SetSize(float fSize)
     }
 }
 
-unsigned char CClientCheckpoint::StringToIcon(const char* szString)
+std::uint8_t CClientCheckpoint::StringToIcon(const char* szString)
 {
     if (stricmp(szString, "none") == 0)
     {
@@ -285,7 +285,7 @@ unsigned char CClientCheckpoint::StringToIcon(const char* szString)
     }
 }
 
-bool CClientCheckpoint::IconToString(unsigned char ucIcon, SString& strOutString)
+bool CClientCheckpoint::IconToString(std::uint8_t ucIcon, SString& strOutString)
 {
     switch (ucIcon)
     {

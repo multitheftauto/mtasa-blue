@@ -81,7 +81,7 @@ std::variant<std::nullptr_t, std::string_view> CLuaGenericDefs::GetServerPasswor
     return nullptr;
 }
 
-unsigned int CLuaGenericDefs::GetServerHttpPort()
+std::uint32_t CLuaGenericDefs::GetServerHttpPort()
 {
     return g_pGame->GetConfig()->GetHTTPPort();
 }
@@ -98,17 +98,17 @@ bool CLuaGenericDefs::OutputServerLog(std::string_view message)
     return true;
 }
 
-bool CLuaGenericDefs::OutputScriptDebugLog(lua_State* luaVM, std::string message, std::optional<unsigned char> rawLevel, std::optional<unsigned char> rawColorR,
-                                           std::optional<unsigned char> rawColorG, std::optional<unsigned char> rawColorB)
+bool CLuaGenericDefs::OutputScriptDebugLog(lua_State* luaVM, std::string message, std::optional<std::uint8_t> rawLevel, std::optional<std::uint8_t> rawColorR,
+                                           std::optional<std::uint8_t> rawColorG, std::optional<std::uint8_t> rawColorB)
 {
-    unsigned char level = rawLevel.value_or(3);
+    std::uint8_t level = rawLevel.value_or(3);
 
     if (level > 4)
         throw std::invalid_argument("level must be between 0 and 4");
 
-    unsigned char colorR = rawColorR.value_or(255);
-    unsigned char colorG = rawColorG.value_or(255);
-    unsigned char colorB = rawColorB.value_or(255);
+    std::uint8_t colorR = rawColorR.value_or(255);
+    std::uint8_t colorG = rawColorG.value_or(255);
+    std::uint8_t colorB = rawColorB.value_or(255);
 
     switch (level)
     {
@@ -139,10 +139,10 @@ bool CLuaGenericDefs::OutputConsole(std::string message, std::optional<CElement*
 }
 
 bool CLuaGenericDefs::OutputChatBox(lua_State* luaVM, std::string message, std::optional<std::variant<CElement*, std::vector<CPlayer*>>> rawVisibleTo,
-                                    std::optional<unsigned char> rawColorR, std::optional<unsigned char> rawColorG, std::optional<unsigned char> rawColorB,
+                                    std::optional<std::uint8_t> rawColorR, std::optional<std::uint8_t> rawColorG, std::optional<std::uint8_t> rawColorB,
                                     std::optional<bool> rawColorCoded)
 {
-    unsigned char colorR = 231, colorG = 217, colorB = 176;
+    std::uint8_t colorR = 231, colorG = 217, colorB = 176;
     bool          colorCoded = rawColorCoded.value_or(false);
 
     if (rawColorR.has_value() && rawColorG.has_value() && rawColorB.has_value())
@@ -183,8 +183,8 @@ bool CLuaGenericDefs::OutputChatBox(lua_State* luaVM, std::string message, std::
     return true;
 }
 
-bool CLuaGenericDefs::OOP_OutputChatBox(lua_State* luaVM, CElement* element, std::string message, std::optional<unsigned char> rawColorR,
-                                        std::optional<unsigned char> rawColorG, std::optional<unsigned char> rawColorB, std::optional<bool> rawColorCoded)
+bool CLuaGenericDefs::OOP_OutputChatBox(lua_State* luaVM, CElement* element, std::string message, std::optional<std::uint8_t> rawColorR,
+                                        std::optional<std::uint8_t> rawColorG, std::optional<std::uint8_t> rawColorB, std::optional<bool> rawColorCoded)
 {
     return OutputChatBox(luaVM, std::move(message), element, rawColorR, rawColorG, rawColorB, rawColorCoded);
 }

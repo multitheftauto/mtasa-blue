@@ -59,8 +59,8 @@ struct SCustomScaleFontInfo
 struct sFontInfo
 {
     const char*  szName;
-    unsigned int uiHeight;
-    unsigned int uiWeight;
+    std::uint32_t uiHeight;
+    std::uint32_t uiWeight;
 };
 
 class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
@@ -96,8 +96,8 @@ public:
     void           EndDrawBatch();
     void           SetBlendModeRenderStates(EBlendModeType blendMode);
 
-    unsigned int GetViewportWidth();
-    unsigned int GetViewportHeight();
+    std::uint32_t GetViewportWidth();
+    std::uint32_t GetViewportHeight();
 
     void  SetAspectRatioAdjustmentEnabled(bool bEnabled, float fSourceRatio = 4 / 3.f);
     bool  IsAspectRatioAdjustmentEnabled();
@@ -113,8 +113,8 @@ public:
     bool DestroyStandardDXFonts();
     bool CreateStandardDXFontWithCustomScale(eFontType fontType, float fScale, ID3DXFont** ppD3DXFont);
 
-    bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont);
-    bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality, ID3DXFont** ppD3DXFont);
+    bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, std::uint32_t uiHeight, bool bBold, ID3DXFont** ppD3DXFont);
+    bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, std::uint32_t uiHeight, bool bBold, DWORD ulQuality, ID3DXFont** ppD3DXFont);
     bool DestroyAdditionalDXFont(std::string strFontPath, ID3DXFont* pD3DXFont);
 
     float GetDXFontHeight(float fScale = 1.0f, ID3DXFont* pDXFont = NULL);

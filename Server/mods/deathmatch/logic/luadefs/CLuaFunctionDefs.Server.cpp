@@ -225,7 +225,7 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
         CResource* pResource = m_pLuaManager->GetVirtualMachineResource(luaVM);
         if (pResource)
         {
-            unsigned int uiIndex = 0;
+            std::uint32_t uiIndex = 0;
             bool         bDeleteNode;
 
             // Extract attribute name if setting to be gotten has three parts i.e. resname.settingname.attributename
@@ -244,7 +244,7 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
             if (pNode)
             {
                 // Argument count
-                unsigned int uiArgCount = 1;
+                std::uint32_t uiArgCount = 1;
 
                 // See if we need to return a table with single or multiple entries
                 if (pNode->GetSubNodeCount() == 0)
@@ -527,7 +527,7 @@ int CLuaFunctionDefs::GetNetworkUsageData(lua_State* luaVM)
     {
         lua_pushstring(luaVM, "bits");
         lua_createtable(luaVM, 255, 1);
-        for (unsigned int i = 0; i < 256; ++i)
+        for (std::uint32_t i = 0; i < 256; ++i)
         {
             const SPacketStat& statIn = m_PacketStats[CNetServer::STATS_INCOMING_TRAFFIC][i];
             lua_pushnumber(luaVM, statIn.iTotalBytes * 8);
@@ -537,7 +537,7 @@ int CLuaFunctionDefs::GetNetworkUsageData(lua_State* luaVM)
 
         lua_pushstring(luaVM, "count");
         lua_createtable(luaVM, 255, 1);
-        for (unsigned int i = 0; i < 256; ++i)
+        for (std::uint32_t i = 0; i < 256; ++i)
         {
             const SPacketStat& statIn = m_PacketStats[CNetServer::STATS_INCOMING_TRAFFIC][i];
             lua_pushnumber(luaVM, statIn.iCount);
@@ -552,7 +552,7 @@ int CLuaFunctionDefs::GetNetworkUsageData(lua_State* luaVM)
     {
         lua_pushstring(luaVM, "bits");
         lua_createtable(luaVM, 255, 1);
-        for (unsigned int i = 0; i < 256; ++i)
+        for (std::uint32_t i = 0; i < 256; ++i)
         {
             const SPacketStat& statOut = m_PacketStats[CNetServer::STATS_OUTGOING_TRAFFIC][i];
             lua_pushnumber(luaVM, statOut.iTotalBytes * 8);
@@ -562,7 +562,7 @@ int CLuaFunctionDefs::GetNetworkUsageData(lua_State* luaVM)
 
         lua_pushstring(luaVM, "count");
         lua_createtable(luaVM, 255, 1);
-        for (unsigned int i = 0; i < 256; ++i)
+        for (std::uint32_t i = 0; i < 256; ++i)
         {
             const SPacketStat& statOut = m_PacketStats[CNetServer::STATS_OUTGOING_TRAFFIC][i];
             lua_pushnumber(luaVM, statOut.iCount);
@@ -729,7 +729,7 @@ int CLuaFunctionDefs::GetModules(lua_State* luaVM)
     lua_newtable(luaVM);
     list<CLuaModule*>           lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
     list<CLuaModule*>::iterator iter = lua_LoadedModules.begin();
-    unsigned int                uiIndex = 1;
+    std::uint32_t                uiIndex = 1;
     for (; iter != lua_LoadedModules.end(); ++iter)
     {
         lua_pushnumber(luaVM, uiIndex++);

@@ -20,7 +20,7 @@ struct RwMatrix;
 class CFxManager
 {
 public:
-    virtual CFxSystem* CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
+    virtual CFxSystem* CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, std::uint8_t bSkipCameraFrustumCheck,
                                       bool bSoundEnable) = 0;
     virtual void       DestroyFxSystem(CFxSystem* pFxSystem) = 0;
     virtual void       OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSystemSAInterface) = 0;

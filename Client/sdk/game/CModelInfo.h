@@ -51,7 +51,7 @@ enum class eModelIdeFlag
     IS_CRANE,
 };
 
-enum class eModelInfoType : unsigned char
+enum class eModelInfoType : std::uint8_t
 {
     ATOMIC = 1,
     TIME = 3,
@@ -156,17 +156,17 @@ public:
     virtual BYTE           GetVehicleType() = 0;
     virtual void           Request(EModelRequestType requestType, const char* szTag /* = NULL*/) = 0;
     virtual bool           IsLoaded() = 0;
-    virtual unsigned short GetFlags() = 0;
-    virtual unsigned short GetOriginalFlags() = 0;
-    virtual void           SetFlags(unsigned short usFlags) = 0;
-    virtual void           SetIdeFlags(unsigned int uiFlags) = 0;
+    virtual std::uint16_t GetFlags() = 0;
+    virtual std::uint16_t GetOriginalFlags() = 0;
+    virtual void           SetFlags(std::uint16_t usFlags) = 0;
+    virtual void           SetIdeFlags(std::uint32_t uiFlags) = 0;
     virtual bool           GetIdeFlag(eModelIdeFlag eFlag) = 0;
     virtual void           SetIdeFlag(eModelIdeFlag eFlag, bool bState) = 0;
     virtual CBoundingBox*  GetBoundingBox() = 0;
     virtual bool           IsValid() = 0;
     virtual bool           IsAllocatedInArchive() = 0;
-    virtual unsigned short GetTextureDictionaryID() = 0;
-    virtual void           SetTextureDictionaryID(unsigned short usTxdId) = 0;
+    virtual std::uint16_t GetTextureDictionaryID() = 0;
+    virtual void           SetTextureDictionaryID(std::uint16_t usTxdId) = 0;
     virtual void           ResetTextureDictionaryID() = 0;
     virtual float          GetLODDistance() = 0;
     virtual float          GetOriginalLODDistance() = 0;
@@ -188,10 +188,10 @@ public:
     virtual void ResetAlphaTransparency() = 0;
 
     // ONLY use for CVehicleModelInfos
-    virtual short        GetAvailableVehicleMod(unsigned short usSlot) = 0;
+    virtual short        GetAvailableVehicleMod(std::uint16_t usSlot) = 0;
     virtual bool         IsUpgradeAvailable(eVehicleUpgradePosn posn) = 0;
     virtual void         SetCustomCarPlateText(const char* szText) = 0;
-    virtual unsigned int GetNumRemaps() = 0;
+    virtual std::uint32_t GetNumRemaps() = 0;
     virtual void*        GetVehicleSuspensionData() = 0;
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
@@ -230,21 +230,21 @@ public:
     virtual void      MakeCustomModel() = 0;
     virtual RwObject* GetRwObject() = 0;
     virtual void      MakePedModel(char* szTexture) = 0;
-    virtual void      MakeObjectModel(unsigned short usBaseID) = 0;
-    virtual void      MakeVehicleAutomobile(unsigned short usBaseID) = 0;
-    virtual void      MakeTimedObjectModel(unsigned short usBaseID) = 0;
-    virtual void      MakeClumpModel(unsigned short usBaseID) = 0;
+    virtual void      MakeObjectModel(std::uint16_t usBaseID) = 0;
+    virtual void      MakeVehicleAutomobile(std::uint16_t usBaseID) = 0;
+    virtual void      MakeTimedObjectModel(std::uint16_t usBaseID) = 0;
+    virtual void      MakeClumpModel(std::uint16_t usBaseID) = 0;
 
     virtual SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() = 0;
     virtual void                      ResetSupportedUpgrades() = 0;
 
-    virtual void           SetObjectPropertiesGroup(unsigned short usObjectGroup) = 0;
-    virtual unsigned short GetObjectPropertiesGroup() = 0;
+    virtual void           SetObjectPropertiesGroup(std::uint16_t usObjectGroup) = 0;
+    virtual std::uint16_t GetObjectPropertiesGroup() = 0;
     virtual void           RestoreObjectPropertiesGroup() = 0;
 
     // Vehicle towing functions
     virtual bool IsTowableBy(CModelInfo* towingModel) = 0;
 
-    virtual unsigned int GetParentID() = 0;
+    virtual std::uint32_t GetParentID() = 0;
     virtual bool         IsDynamic() = 0;
 };

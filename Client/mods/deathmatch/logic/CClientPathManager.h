@@ -29,7 +29,7 @@ public:
     void ReverseNodes(CClientPathNode* pPathNode);
     bool DetachEntity(CClientEntity* pEntity);
 
-    unsigned int            Count() { return static_cast<unsigned int>(m_PathNodeList.size()); }
+    std::uint32_t            Count() { return static_cast<std::uint32_t>(m_PathNodeList.size()); }
     static CClientPathNode* Get(ElementID ID);
 
     std::list<CClientPathNode*>::iterator IterBegin() { return m_PathNodeList.begin(); }

@@ -1597,7 +1597,7 @@ bool CWeaponStatManager::LoadDefault(CWeaponStat* pDest, eWeaponType weaponType,
     return true;
 }
 
-unsigned short CWeaponStatManager::GetSkillStatIndex(eWeaponType eWeapon)
+std::uint16_t CWeaponStatManager::GetSkillStatIndex(eWeaponType eWeapon)
 {
     switch (eWeapon)
     {

@@ -31,7 +31,7 @@ struct SKeyBindSection
         this->szTitle = new char[strlen(szTitle) + 1];
         this->szOriginalTitle = new char[strlen(szTitle) + 1];
         // convert to upper case
-        for (unsigned int i = 0; i < strlen(szTitle); i++)
+        for (std::uint32_t i = 0; i < strlen(szTitle); i++)
         {
             if (isalpha((uchar)szTitle[i]))
                 this->szTitle[i] = toupper(szTitle[i]);
@@ -118,7 +118,7 @@ public:
 
     bool IsActive();
 
-    void SetSelectedIndex(unsigned int uiIndex);
+    void SetSelectedIndex(std::uint32_t uiIndex);
     void ShowRichPresenceShareDataQuestionBox() const;
 
 protected:
@@ -426,7 +426,7 @@ private:
     void SetRadioVolume(float fVolume);
     void SetSFXVolume(float fVolume);
 
-    unsigned int m_uiCaptureKey;
+    std::uint32_t m_uiCaptureKey;
     bool         m_bCaptureKey;
     bool         m_bCaptureAxis;
 

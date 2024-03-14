@@ -44,14 +44,14 @@ public:
     CBan* GetBanFromSerial(const char* szSerial);
     CBan* GetBanFromIP(const char* szIP);
 
-    unsigned int GetBansWithNick(const char* szNick);
-    unsigned int GetBansWithBanner(const char* szBanner);
+    std::uint32_t GetBansWithNick(const char* szNick);
+    std::uint32_t GetBansWithBanner(const char* szBanner);
 
     bool        LoadBanList();
     bool        ReloadBanList();
     void        SaveBanList();
     void        SafeSetValue(CXMLNode* pNode, const char* szKey, const std::string& strValue);
-    void        SafeSetValue(CXMLNode* pNode, const char* szKey, unsigned int);
+    void        SafeSetValue(CXMLNode* pNode, const char* szKey, std::uint32_t);
     std::string SafeGetValue(CXMLNode* pNode, const char* szKey);
     bool        IsValidIP(const char* szIP);
     static void SetBansModified() { ms_bSaveRequired = true; }

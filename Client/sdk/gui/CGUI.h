@@ -69,7 +69,7 @@ public:
     virtual eInputMode GetGUIInputMode() = 0;
 
     //
-    virtual CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags) = 0;
+    virtual CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, std::uint32_t uiFlags) = 0;
     virtual CGUIButton*     CreateButton(CGUIElement* pParent = NULL, const char* szCaption = "") = 0;
     virtual CGUIButton*     CreateButton(CGUITab* pParent = NULL, const char* szCaption = "") = 0;
 
@@ -120,7 +120,7 @@ public:
     //
 
     virtual CGUIWindow* CreateWnd(CGUIElement* pParent = NULL, const char* szCaption = "") = 0;
-    virtual CGUIFont*   CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false) = 0;
+    virtual CGUIFont*   CreateFnt(const char* szFontName, const char* szFontFile, std::uint32_t uSize = 8, std::uint32_t uFlags = 0, bool bAutoScale = false) = 0;
     virtual CGUITexture* CreateTexture() = 0;
 
     virtual void        SetCursorEnabled(bool bEnabled) = 0;

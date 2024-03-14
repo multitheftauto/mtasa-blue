@@ -670,9 +670,9 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             }
 
             // Append version information
-            pBitStream->Write(static_cast<unsigned short>(MTA_DM_NETCODE_VERSION));
-            pBitStream->Write(static_cast<unsigned short>(MTA_DM_VERSION));
-            pBitStream->Write(static_cast<unsigned short>(MTA_DM_BITSTREAM_VERSION));
+            pBitStream->Write(static_cast<std::uint16_t>(MTA_DM_NETCODE_VERSION));
+            pBitStream->Write(static_cast<std::uint16_t>(MTA_DM_VERSION));
+            pBitStream->Write(static_cast<std::uint16_t>(MTA_DM_BITSTREAM_VERSION));
 
             SString strPlayerVersion("%d.%d.%d-%d.%05d.%d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE,
                                      MTASA_VERSION_BUILD, g_pNet->GetNetRev());
@@ -680,7 +680,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
 
             pBitStream->WriteBit(g_pCore->IsOptionalUpdateInfoRequired(g_pNet->GetConnectedServer(true)));
 
-            pBitStream->Write(static_cast<unsigned char>(g_pGame->GetGameVersion()));
+            pBitStream->Write(static_cast<std::uint8_t>(g_pGame->GetGameVersion()));
 
             // Append user details
             SString strTemp = StringZeroPadout(m_strLocalNick, MAX_PLAYER_NICK_LENGTH);
@@ -893,20 +893,20 @@ void CClientGame::DoPulsePostFrame()
         }
 
         CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
-        unsigned int        uiHeight = pGraphics->GetViewportHeight();
-        unsigned int        uiWidth = pGraphics->GetViewportWidth();
+        std::uint32_t        uiHeight = pGraphics->GetViewportHeight();
+        std::uint32_t        uiWidth = pGraphics->GetViewportWidth();
 
         // Draw a little star in the corner if async is on
         if (g_pGame->IsASyncLoadingEnabled(true))
         {
-            unsigned int uiPosY = g_pGame->IsASyncLoadingEnabled() ? uiHeight - 7 : uiHeight - 12;
+            std::uint32_t uiPosY = g_pGame->IsASyncLoadingEnabled() ? uiHeight - 7 : uiHeight - 12;
             pGraphics->DrawString(uiWidth - 5, uiPosY, 0x80ffffff, 1, "*");
         }
 
         // Draw notice text if dx test mode is enabled
         if (g_pCore->GetGraphics()->GetRenderItemManager()->GetTestMode())
         {
-            unsigned int uiPosY = uiHeight - 30;
+            std::uint32_t uiPosY = uiHeight - 30;
             pGraphics->DrawString(uiWidth - 155, uiPosY, 0x40ffffff, 1, "dx test mode enabled");
         }
 
@@ -914,7 +914,7 @@ void CClientGame::DoPulsePostFrame()
         EDiagnosticDebugType diagnosticDebug = g_pCore->GetDiagnosticDebug();
         if (diagnosticDebug == EDiagnosticDebug::LOG_TIMING_0000)
         {
-            unsigned int uiPosY = uiHeight - 30;
+            std::uint32_t uiPosY = uiHeight - 30;
             pGraphics->DrawString(uiWidth - 185, uiPosY, 0xffffff00, 1, "Debug setting: #0000 Log timing");
         }
 
@@ -930,7 +930,7 @@ void CClientGame::DoPulsePostFrame()
         // Adjust the streaming memory size cvar [if needed]
         if (!g_pCore->IsUsingCustomStreamingMemorySize())
         {
-            unsigned int uiStreamingMemoryPrev;
+            std::uint32_t uiStreamingMemoryPrev;
             g_pCore->GetCVars()->Get("streaming_memory", uiStreamingMemoryPrev);
             uint uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemoryPrev, g_pCore->GetMaxStreamingMemory());
             if (uiStreamingMemory != uiStreamingMemoryPrev)
@@ -1226,7 +1226,7 @@ void CClientGame::DoPulses()
             m_bWaitingForLocalConnect = false;
 
             // Assume local server has the same bitstream version
-            g_pNet->SetServerBitStreamVersion(static_cast<unsigned short>(MTA_DM_BITSTREAM_VERSION));
+            g_pNet->SetServerBitStreamVersion(static_cast<std::uint16_t>(MTA_DM_BITSTREAM_VERSION));
 
             // Run the game normally.
             StartGame(m_strLocalNick, m_Server.GetPassword().c_str(), m_ServerType);
@@ -1356,7 +1356,7 @@ void CClientGame::DoPulses()
             m_pManager->GetIMGManager()->InitDefaultBufferSize();
         }
 
-        unsigned char ucError = g_pNet->GetConnectionError();
+        std::uint8_t ucError = g_pNet->GetConnectionError();
 
         // Lost connection?
         if (!g_pNet->IsConnected() && !m_bGracefulDisconnect && !m_bIsPlayingBack)
@@ -1569,7 +1569,7 @@ bool CClientGame::IsNametagValid(const char* szNick)
     }
 
     // Check that each character is valid (Anything above 32)
-    unsigned char ucTemp;
+    std::uint8_t ucTemp;
     for (size_t i = 0; i < sizeNick; i++)
     {
         ucTemp = szNick[i];
@@ -1593,7 +1593,7 @@ bool CClientGame::IsNickValid(const char* szNick)
     }
 
     // Check that each character is valid (visible characters exluding space)
-    unsigned char ucTemp;
+    std::uint8_t ucTemp;
     for (size_t i = 0; i < sizeNick; i++)
     {
         ucTemp = szNick[i];
@@ -1656,7 +1656,7 @@ void CClientGame::ShowTasks(const char* szNick)
     m_pShowPlayerTasks = m_pPlayerManager->Get(szNick);
 }
 
-void CClientGame::SetMimic(unsigned int uiMimicCount)
+void CClientGame::SetMimic(std::uint32_t uiMimicCount)
 {
     // Check if we're within the max mimics boundary
     if (uiMimicCount > MAX_MIMICS)
@@ -1802,10 +1802,10 @@ void CClientGame::UpdatePlayerWeapons()
         if (bCancelled)
         {
             // Save the current ammo in clip
-            unsigned short usAmmoInClip = 0;
+            std::uint16_t usAmmoInClip = 0;
             CWeapon*       pWeapon = m_pLocalPlayer->GetWeapon(m_lastWeaponSlot);
             if (pWeapon)
-                usAmmoInClip = static_cast<unsigned short>(pWeapon->GetAmmoInClip());
+                usAmmoInClip = static_cast<std::uint16_t>(pWeapon->GetAmmoInClip());
 
             // Force it back to the old slot
             m_pLocalPlayer->SetCurrentWeaponSlot(m_lastWeaponSlot);
@@ -1837,15 +1837,15 @@ void CClientGame::UpdatePlayerWeapons()
             {
                 /* Send a packet to the server with info about the new weapon,
                    so the server stays in sync reliably */
-                unsigned int uiSlot = static_cast<unsigned int>(pWeapon->GetSlot());
+                std::uint32_t uiSlot = static_cast<std::uint32_t>(pWeapon->GetSlot());
                 slot.data.uiSlot = uiSlot;
                 BitStream.Write(&slot);
 
                 if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
                 {
                     SWeaponAmmoSync ammo(pWeapon->GetType(), true, true);
-                    ammo.data.usAmmoInClip = static_cast<unsigned short>(pWeapon->GetAmmoInClip());
-                    ammo.data.usTotalAmmo = static_cast<unsigned short>(pWeapon->GetAmmoTotal());
+                    ammo.data.usAmmoInClip = static_cast<std::uint16_t>(pWeapon->GetAmmoInClip());
+                    ammo.data.usTotalAmmo = static_cast<std::uint16_t>(pWeapon->GetAmmoTotal());
                     BitStream.Write(&ammo);
                 }
             }
@@ -2161,7 +2161,7 @@ void CClientGame::ChangeVehicleWeapon(bool bNext)
     }
 }
 
-void CClientGame::SetAllDimensions(unsigned short usDimension)
+void CClientGame::SetAllDimensions(std::uint16_t usDimension)
 {
     m_pManager->GetMarkerStreamer()->SetDimension(usDimension);
     m_pManager->GetObjectStreamer()->SetDimension(usDimension);
@@ -2178,7 +2178,7 @@ void CClientGame::SetAllDimensions(unsigned short usDimension)
     m_pCamera->SetDimension(usDimension);
 }
 
-void CClientGame::SetAllInteriors(unsigned char ucInterior)
+void CClientGame::SetAllInteriors(std::uint8_t ucInterior)
 {
     m_pNametags->m_ucInterior = ucInterior;
 }
@@ -2308,7 +2308,7 @@ void CClientGame::StaticProcessServerKeyBind(CKeyFunctionBind* pBind)
 void CClientGame::ProcessServerKeyBind(CKeyFunctionBind* pBind)
 {
     const char*   szName = pBind->boundKey->szKey;
-    unsigned char ucNameLength = (unsigned char)strlen(szName);
+    std::uint8_t ucNameLength = (std::uint8_t)strlen(szName);
     CBitStream    bitStream;
     bitStream.pBitStream->WriteBit(false);
     bitStream.pBitStream->WriteBit(pBind->triggerState);
@@ -2324,7 +2324,7 @@ void CClientGame::StaticProcessServerControlBind(CControlFunctionBind* pBind)
 void CClientGame::ProcessServerControlBind(CControlFunctionBind* pBind)
 {
     const char*   szName = pBind->control->szControl;
-    unsigned char ucNameLength = (unsigned char)strlen(szName);
+    std::uint8_t ucNameLength = (std::uint8_t)strlen(szName);
     CBitStream    bitStream;
     bitStream.pBitStream->WriteBit(true);
     bitStream.pBitStream->WriteBit(pBind->triggerState);
@@ -2344,7 +2344,7 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
         {
             if (m_bCursorEventsEnabled)
             {
-                unsigned char ucButtonHit = 0xFF;
+                std::uint8_t ucButtonHit = 0xFF;
                 switch (uMsg)
                 {
                     case WM_LBUTTONDOWN:
@@ -2486,8 +2486,8 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
                         button.data.ucButton = ucButtonHit;
                         bitStream.pBitStream->Write(&button);
 
-                        bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fX));
-                        bitStream.pBitStream->WriteCompressed(static_cast<unsigned short>(vecCursorPosition.fY));
+                        bitStream.pBitStream->WriteCompressed(static_cast<std::uint16_t>(vecCursorPosition.fX));
+                        bitStream.pBitStream->WriteCompressed(static_cast<std::uint16_t>(vecCursorPosition.fY));
 
                         SPositionSync position(false);
                         position.data.vecPosition = vecCollision;
@@ -2912,15 +2912,15 @@ void CClientGame::DrawPlayerDetails(CClientPlayer* pPlayer)
     bool  bInVehicle = pPlayer->GetOccupiedVehicle() != NULL;
     float fWeaponRange = 0.0f;
 
-    unsigned char  ucWeapon = 0;
-    unsigned char  ucWeaponState = 0;
-    unsigned short usWeaponAmmo = 0;
+    std::uint8_t  ucWeapon = 0;
+    std::uint8_t  ucWeaponState = 0;
+    std::uint16_t usWeaponAmmo = 0;
     CWeapon*       pWeapon = pPlayer->GetWeapon(pPlayer->GetCurrentWeaponSlot());
     if (pWeapon)
     {
-        ucWeapon = static_cast<unsigned char>(pWeapon->GetType());
-        ucWeaponState = static_cast<unsigned char>(pWeapon->GetState());
-        usWeaponAmmo = static_cast<unsigned short>(pWeapon->GetAmmoInClip());
+        ucWeapon = static_cast<std::uint8_t>(pWeapon->GetType());
+        ucWeaponState = static_cast<std::uint8_t>(pWeapon->GetState());
+        usWeaponAmmo = static_cast<std::uint16_t>(pWeapon->GetAmmoInClip());
         float        fSkill = pPlayer->GetStat(g_pGame->GetStats()->GetSkillStatIndex(pWeapon->GetType()));
         CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(pWeapon->GetType(), fSkill);
         fWeaponRange = pWeaponInfo->GetWeaponRange();
@@ -3049,16 +3049,16 @@ void CClientGame::UpdateMimics()
     // Got a local player?
     if (m_pLocalPlayer)
     {
-        unsigned char ucWeaponType = 0;
-        unsigned char ucWeaponState = 0;
+        std::uint8_t ucWeaponType = 0;
+        std::uint8_t ucWeaponState = 0;
         unsigned long ulWeaponAmmoInClip = 0;
         eWeaponSlot   weaponSlot = WEAPONSLOT_TYPE_UNARMED;
 
         CWeapon* pPlayerWeapon = m_pLocalPlayer->GetWeapon(m_pLocalPlayer->GetCurrentWeaponSlot());
         if (pPlayerWeapon)
         {
-            ucWeaponType = static_cast<unsigned char>(pPlayerWeapon->GetType());
-            ucWeaponState = static_cast<unsigned char>(pPlayerWeapon->GetState());
+            ucWeaponType = static_cast<std::uint8_t>(pPlayerWeapon->GetType());
+            ucWeaponState = static_cast<std::uint8_t>(pPlayerWeapon->GetState());
             weaponSlot = pPlayerWeapon->GetSlot();
             ulWeaponAmmoInClip = pPlayerWeapon->GetAmmoInClip();
         }
@@ -3092,7 +3092,7 @@ void CClientGame::UpdateMimics()
                 Controller.ButtonCircle = 0;
 
             CClientVehicle* pVehicle = m_pLocalPlayer->GetOccupiedVehicle();
-            unsigned int    uiSeat = m_pLocalPlayer->GetOccupiedVehicleSeat();
+            std::uint32_t    uiSeat = m_pLocalPlayer->GetOccupiedVehicleSeat();
 
             CShotSyncData* pShotSync = g_pMultiplayer->GetLocalShotSyncData();
             CVector        vecOrigin, vecTarget;
@@ -3123,7 +3123,7 @@ void CClientGame::UpdateMimics()
                 pTargetCorona->SetPosition ( vecTarget );*/
 
             // Apply this to each of our mimic players
-            unsigned int                         uiMimicIndex = 0;
+            std::uint32_t                         uiMimicIndex = 0;
             list<CClientPlayer*>::const_iterator iterMimics = m_Mimics.begin();
             for (; iterMimics != m_Mimics.end(); ++iterMimics, ++uiMimicIndex)
             {
@@ -3177,7 +3177,7 @@ void CClientGame::UpdateMimics()
                         pMimic->SetAimInterpolated(TICK_RATE, fAimX, fAimY, bAkimboUp, cVehicleAimDirection);
                         pMimic->SetTargetTarget(TICK_RATE, vecOrigin, vecTarget);
 
-                        pMimic->AddChangeWeapon(TICK_RATE, weaponSlot, (unsigned char)ulWeaponAmmoInClip);
+                        pMimic->AddChangeWeapon(TICK_RATE, weaponSlot, (std::uint8_t)ulWeaponAmmoInClip);
                     }
                     else
                     {
@@ -3210,7 +3210,7 @@ void CClientGame::UpdateMimics()
                 CClientVehicle* pMimicVehicle = pMimic->GetOccupiedVehicle();
                 if (pVehicle)
                 {
-                    unsigned int uiModel;
+                    std::uint32_t uiModel;
                     CVector      vecPosition, vecRotationDegrees;
                     CVector      vecMoveSpeed, vecMoveSpeedMeters, vecTurnSpeed, vecVelocity;
                     float        fHealth;
@@ -3236,7 +3236,7 @@ void CClientGame::UpdateMimics()
                         pMimicVehicle->SetPosition(vecPosition);
 
                         const SSlotStates& usUpgrades = pVehicle->GetUpgrades()->GetSlotStates();
-                        for (unsigned char uc = 0; uc < VEHICLE_UPGRADE_SLOTS; uc++)
+                        for (std::uint8_t uc = 0; uc < VEHICLE_UPGRADE_SLOTS; uc++)
                         {
                             if (usUpgrades[uc])
                             {
@@ -3265,7 +3265,7 @@ void CClientGame::UpdateMimics()
                     if (pMimic->GetOccupiedVehicle() != pMimicVehicle)
                         pMimic->WarpIntoVehicle(pMimicVehicle, uiSeat);
 
-                    unsigned int    uiTrailerLoop = 0;
+                    std::uint32_t    uiTrailerLoop = 0;
                     CClientVehicle* pTrailer = pVehicle->GetTowedVehicle();
                     CClientVehicle* pMimicTrailer = NULL;
                     while (pTrailer)
@@ -3534,7 +3534,7 @@ bool CClientGame::StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
     return g_pClientGame->DamageHandler(pDamagePed, pEvent);
 }
 
-void CClientGame::StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart)
+void CClientGame::StaticDeathHandler(CPed* pKilledPed, std::uint8_t ucDeathReason, std::uint8_t ucBodyPart)
 {
     g_pClientGame->DeathHandler(pKilledPed, ucDeathReason, ucBodyPart);
 }
@@ -3559,7 +3559,7 @@ void CClientGame::StaticRenderHeliLightHandler()
     g_pClientGame->GetManager()->GetPointLightsManager()->RenderHeliLightHandler();
 }
 
-bool CClientGame::StaticChokingHandler(unsigned char ucWeaponType)
+bool CClientGame::StaticChokingHandler(std::uint8_t ucWeaponType)
 {
     return g_pClientGame->ChokingHandler(ucWeaponType);
 }
@@ -3898,7 +3898,7 @@ void CClientGame::IdleHandler()
     g_pCore->SetDummyProgressUpdateAlways(false);
 }
 
-bool CClientGame::ChokingHandler(unsigned char ucWeaponType)
+bool CClientGame::ChokingHandler(std::uint8_t ucWeaponType)
 {
     if (!m_pLocalPlayer)
         return true;
@@ -4370,8 +4370,8 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             Arguments.PushElement(pInflictingEntity);
         else
             Arguments.PushBoolean(false);
-        Arguments.PushNumber(static_cast<unsigned char>(weaponUsed));
-        Arguments.PushNumber(static_cast<unsigned char>(hitZone));
+        Arguments.PushNumber(static_cast<std::uint8_t>(weaponUsed));
+        Arguments.PushNumber(static_cast<std::uint8_t>(hitZone));
         Arguments.PushNumber(fDamage);
 
         // Call our event
@@ -4442,8 +4442,8 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
         if (pDamagedPed->IsLocalPlayer())
         {
             // Update our stored damage stuff
-            m_ucDamageWeapon = static_cast<unsigned char>(weaponUsed);
-            m_ucDamageBodyPiece = static_cast<unsigned char>(hitZone);
+            m_ucDamageWeapon = static_cast<std::uint8_t>(weaponUsed);
+            m_ucDamageBodyPiece = static_cast<std::uint8_t>(hitZone);
             m_pDamageEntity = pInflictingEntity;
             m_ulDamageTime = CClientTime::GetTime();
             m_DamagerID = damagerID;
@@ -4519,7 +4519,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
     return true;
 }
 
-void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, unsigned char ucBodyPart)
+void CClientGame::DeathHandler(CPed* pKilledPedSA, std::uint8_t ucDeathReason, std::uint8_t ucBodyPart)
 {
     CPools*                pPools = g_pGame->GetPools();
     SClientEntity<CPedSA>* pPedEntity = pPools->GetPed((DWORD*)pKilledPedSA->GetInterface());
@@ -5015,7 +5015,7 @@ bool CClientGame::PreWeaponFire(CPlayerPed* pPlayerPed, bool bStopIfUsingBulletS
                     // ** Changed ajustment to +125ms as the position of this clients player on the firers screen
                     // has been changed. See CClientPed::UpdateTargetPosition() **
                     CVector        vecPosition;
-                    unsigned short usLatency = (pPlayer->GetLatency() + 125);
+                    std::uint16_t usLatency = (pPlayer->GetLatency() + 125);
                     g_pClientGame->m_pNetAPI->GetInterpolation(vecPosition, usLatency);
 
                     // Move the entity back
@@ -5225,7 +5225,7 @@ void CClientGame::BulletFire(CPed* pInitiator, const CVector* pStartPosition, co
     }
 }
 
-bool CClientGame::StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
+bool CClientGame::StaticProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream)
 {
     if (g_pClientGame)
     {
@@ -5334,7 +5334,7 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
 
         // Write the creator weapon type
         SWeaponTypeSync weaponTypeSync;
-        weaponTypeSync.data.ucWeaponType = static_cast<unsigned char>(weaponType);
+        weaponTypeSync.data.ucWeaponType = static_cast<std::uint8_t>(weaponType);
         pBitStream->Write(&weaponTypeSync);
 
         // Write the projectile's model
@@ -5539,7 +5539,7 @@ void CClientGame::ResetMapInfo()
     CGarage*  pGarage = NULL;
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();
 
-    for (unsigned char i = 0; (pGarage = pGarages->GetGarage(i)) != NULL; i++)
+    for (std::uint8_t i = 0; (pGarage = pGarages->GetGarage(i)) != NULL; i++)
     {
         pGarage->SetOpen(false);
     }
@@ -5582,7 +5582,7 @@ void CClientGame::ResetMapInfo()
     ReinitMarkers();
 }
 
-void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,
+void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, std::uint8_t ucWeapon, std::uint8_t ucBodyPiece, AssocGroupId animGroup,
                                       AnimationId animID)
 {
     if (Ped && Ped->GetHealth() == 0.0f)
@@ -5616,7 +5616,7 @@ void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsi
             SWeaponAmmoSync ammo(ucWeapon, true, false);
             ammo.data.usTotalAmmo = 0;
             if (pPlayerWeapon)
-                ammo.data.usTotalAmmo = static_cast<unsigned short>(pPlayerWeapon->GetAmmoTotal());
+                ammo.data.usTotalAmmo = static_cast<std::uint16_t>(pPlayerWeapon->GetAmmoTotal());
             pBitStream->Write(&ammo);
 
             // Send the packet
@@ -5626,7 +5626,7 @@ void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsi
     }
 }
 
-void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup, AnimationId animID)
+void CClientGame::DoWastedCheck(ElementID damagerID, std::uint8_t ucWeapon, std::uint8_t ucBodyPiece, AssocGroupId animGroup, AnimationId animID)
 {
     // Are we not already marked as dead? and have we run out of health?
     if (!m_pLocalPlayer->IsDeadOnNetwork() && m_pLocalPlayer->GetHealth() == 0.0f)
@@ -5679,7 +5679,7 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             SWeaponAmmoSync ammo(ucWeapon, true, false);
             ammo.data.usTotalAmmo = 0;
             if (pPlayerWeapon)
-                ammo.data.usTotalAmmo = static_cast<unsigned short>(pPlayerWeapon->GetAmmoTotal());
+                ammo.data.usTotalAmmo = static_cast<std::uint16_t>(pPlayerWeapon->GetAmmoTotal());
             pBitStream->Write(&ammo);
 
             // Send the packet
@@ -6036,7 +6036,7 @@ void CClientGame::NotifyBigPacketProgress(unsigned long ulBytesReceived, unsigne
     m_pBigPacketTransferBox->SetDownloadProgress(std::min(ulTotalSize, ulBytesReceived));
 }
 
-bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
+bool CClientGame::SetGlitchEnabled(std::uint8_t ucGlitch, bool bEnabled)
 {
     if (ucGlitch < NUM_GLITCHES && bEnabled != m_Glitches[ucGlitch])
     {
@@ -6050,7 +6050,7 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
     return false;
 }
 
-bool CClientGame::IsGlitchEnabled(unsigned char ucGlitch)
+bool CClientGame::IsGlitchEnabled(std::uint8_t ucGlitch)
 {
     return ucGlitch < NUM_GLITCHES && m_Glitches[ucGlitch];
 }
@@ -6187,7 +6187,7 @@ bool CClientGame::VerifySADataFiles(int iEnableClientChecks)
     return true;
 }
 
-void CClientGame::InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate)
+void CClientGame::InitVoice(bool bEnabled, std::uint32_t uiServerSampleRate, std::uint8_t ucQuality, std::uint32_t uiBitrate)
 {
     if (m_pVoiceRecorder)
     {
@@ -6741,7 +6741,7 @@ bool CClientGame::TriggerBrowserRequestResultEvent(const std::unordered_set<SStr
     return GetRootEntity()->CallEvent("onClientBrowserWhitelistChange", Arguments, false);
 }
 
-void CClientGame::RestreamModel(unsigned short usModel)
+void CClientGame::RestreamModel(std::uint16_t usModel)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -6786,9 +6786,9 @@ void CClientGame::RestreamModel(unsigned short usModel)
 
 void CClientGame::RestreamWorld(bool removeBigBuildings)
 {
-    unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
+    std::uint32_t numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
-    for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
+    for (std::uint32_t uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
     {
         g_pClientGame->GetModelCacheManager()->OnRestreamModel(uiModelID);
     }
@@ -6820,12 +6820,12 @@ void CClientGame::OnWindowFocusChange(bool state)
     m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
 }
 
-void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
+void CClientGame::InsertIFPPointerToMap(const std::uint32_t u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;
 }
 
-std::shared_ptr<CClientIFP> CClientGame::GetIFPPointerFromMap(const unsigned int u32BlockNameHash)
+std::shared_ptr<CClientIFP> CClientGame::GetIFPPointerFromMap(const std::uint32_t u32BlockNameHash)
 {
     auto it = m_mapOfIfpPointers.find(u32BlockNameHash);
     if (it != m_mapOfIfpPointers.end())
@@ -6835,7 +6835,7 @@ std::shared_ptr<CClientIFP> CClientGame::GetIFPPointerFromMap(const unsigned int
     return nullptr;
 }
 
-void CClientGame::RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash)
+void CClientGame::RemoveIFPPointerFromMap(const std::uint32_t u32BlockNameHash)
 {
     m_mapOfIfpPointers.erase(u32BlockNameHash);
 }

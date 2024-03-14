@@ -50,18 +50,18 @@ public:
 
     bool           HasTarget() { return m_bHasTarget; };
     const CVector& GetTarget() { return m_vecTarget; };
-    unsigned char  GetMarkerType() { return m_ucType; };
+    std::uint8_t  GetMarkerType() { return m_ucType; };
     float          GetSize() { return m_fSize; };
     SColor         GetColor() const { return m_Color; };
-    unsigned char  GetIcon() { return m_ucIcon; }
+    std::uint8_t  GetIcon() { return m_ucIcon; }
 
     void SetPosition(const CVector& vecPosition);
     void SetTarget(const CVector* pTargetVector);
-    void SetMarkerType(unsigned char ucType);
+    void SetMarkerType(std::uint8_t ucType);
     void SetSize(float fSize);
     void SetColor(const SColor color);
 
-    void SetIcon(unsigned char ucIcon);
+    void SetIcon(std::uint8_t ucIcon);
 
     CColShape* GetColShape() { return m_pCollision; }
 
@@ -75,16 +75,16 @@ private:
     void Callback_OnLeave(CColShape& Shape, CElement& Element);
     void Callback_OnCollisionDestroy(CColShape* pShape);
 
-    void UpdateCollisionObject(unsigned char ucOldType);
+    void UpdateCollisionObject(std::uint8_t ucOldType);
 
     class CMarkerManager* m_pMarkerManager;
     CColManager*          m_pColManager;
     bool                  m_bHasTarget;
     CVector               m_vecTarget;
-    unsigned char         m_ucType;
+    std::uint8_t         m_ucType;
     float                 m_fSize;
     SColor                m_Color;
-    unsigned char         m_ucIcon;
+    std::uint8_t         m_ucIcon;
 
     CColShape* m_pCollision;
 };

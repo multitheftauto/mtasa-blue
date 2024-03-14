@@ -51,7 +51,7 @@ void CScriptDebugging::LogPCallError(lua_State* luaVM, const SString& strRes, bo
     }
 }
 
-void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...)
+void CScriptDebugging::LogCustom(lua_State* luaVM, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue, const char* szFormat, ...)
 {
     assert(szFormat);
 
@@ -66,7 +66,7 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned
     LogString("", luaDebugInfo, szBuffer, 0, ucRed, ucGreen, ucBlue);
 }
 
-void CScriptDebugging::LogDebug(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...)
+void CScriptDebugging::LogDebug(lua_State* luaVM, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue, const char* szFormat, ...)
 {
     assert(szFormat);
 
@@ -156,7 +156,7 @@ void CScriptDebugging::LogError(const SLuaDebugInfo& luaDebugInfo, const char* s
     LogString("ERROR: ", luaDebugInfo, szBuffer, 1);
 }
 
-void CScriptDebugging::LogBadPointer(lua_State* luaVM, const char* szArgumentType, unsigned int uiArgument)
+void CScriptDebugging::LogBadPointer(lua_State* luaVM, const char* szArgumentType, std::uint32_t uiArgument)
 {
     assert(szArgumentType);
 
@@ -178,8 +178,8 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, const char* szMessage)
     LogWarning(luaVM, "%s", szMessage);
 }
 
-void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel,
-                                 unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, std::uint32_t uiMinimumDebugLevel,
+                                 std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
 {
     SString strText = SString("%s%s", szPrePend, szMessage);
 

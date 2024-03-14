@@ -31,7 +31,7 @@ namespace SharedUtil
         };
     }            // namespace TrafficLight
 
-    unsigned char GetTrafficLightStateFromColors(TrafficLight::EColor eColorNS, TrafficLight::EColor eColorEW);
+    std::uint8_t GetTrafficLightStateFromColors(TrafficLight::EColor eColorNS, TrafficLight::EColor eColorEW);
 
     class CVehicleColor
     {

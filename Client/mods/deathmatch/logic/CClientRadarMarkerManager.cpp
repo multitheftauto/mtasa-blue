@@ -78,7 +78,7 @@ void CClientRadarMarkerManager::RemoveFromList(CClientRadarMarker* pMarker)
     }
 }
 
-void CClientRadarMarkerManager::SetDimension(unsigned short usDimension)
+void CClientRadarMarkerManager::SetDimension(std::uint16_t usDimension)
 {
     m_usDimension = usDimension;
     m_bOrderOnPulse = true;

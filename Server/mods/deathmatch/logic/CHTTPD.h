@@ -32,7 +32,7 @@ public:
     bool          ShouldAllowConnection(const char* szAddress);
 
     // CHTTPD methods
-    bool            StartHTTPD(const char* szIP, unsigned int port);
+    bool            StartHTTPD(const char* szIP, std::uint32_t port);
     bool            StopHTTPD();
     void            SetResource(CResource* resource) { m_resource = resource; }
     CResource*      GetResource() { return m_resource; }

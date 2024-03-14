@@ -756,12 +756,12 @@ void FindFilesRecursive(const SString& strPathMatch, std::vector<SString>& outFi
         std::vector<SString> fileListHere = FindFiles(strPathHere + "\\" + strMatch, true, false);
         std::vector<SString> dirListHere = FindFiles(strPathHere + "\\" + strMatch, false, true);
 
-        for (unsigned int i = 0; i < fileListHere.size(); i++)
+        for (std::uint32_t i = 0; i < fileListHere.size(); i++)
         {
             SString filePathName = strPathHere + "\\" + fileListHere[i];
             outFileList.push_back(filePathName);
         }
-        for (unsigned int i = 0; i < dirListHere.size(); i++)
+        for (std::uint32_t i = 0; i < dirListHere.size(); i++)
         {
             SString dirPathName = strPathHere + "\\" + dirListHere[i];
             toDoList.push_back(dirPathName);
@@ -777,7 +777,7 @@ void FindFilesRecursive(const SString& strPathMatch, std::vector<SString>& outFi
 //
 ///////////////////////////////////////////////////////////////
 void FindRelevantFiles(const SString& strPath, std::vector<SString>& outFilePathList, std::vector<SString>& outDirPathList,
-                       const std::vector<SString>& stopList, unsigned int MaxFiles, unsigned int MaxDirs)
+                       const std::vector<SString>& stopList, std::uint32_t MaxFiles, std::uint32_t MaxDirs)
 {
     std::list<SString> toDoList;
     toDoList.push_back(strPath);
@@ -798,18 +798,18 @@ void FindRelevantFiles(const SString& strPath, std::vector<SString>& outFilePath
         std::vector<SString> fileListHere = FindFiles(strPathHere + "\\*", true, false);
         std::vector<SString> dirListHere = FindFiles(strPathHere + "\\*", false, true);
 
-        for (unsigned int i = 0; i < fileListHere.size(); i++)
+        for (std::uint32_t i = 0; i < fileListHere.size(); i++)
         {
             SString filePathName = strPathHere + "\\" + fileListHere[i];
             outFilePathList.push_back(filePathName);
         }
-        for (unsigned int i = 0; i < dirListHere.size(); i++)
+        for (std::uint32_t i = 0; i < dirListHere.size(); i++)
         {
             SString dirPathName = strPathHere + "\\" + dirListHere[i];
             outDirPathList.push_back(dirPathName);
 
             bool bTraverse = true;
-            for (unsigned int k = 0; k < stopList.size(); k++)
+            for (std::uint32_t k = 0; k < stopList.size(); k++)
                 if (dirListHere[i].length() >= stopList[k].length())
                     if (dirListHere[i].ToLower().substr(0, stopList[k].length()) == stopList[k])
                         bTraverse = false;
@@ -1037,14 +1037,14 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     //
 
     // Get saved status
-    unsigned short       usNetRev = 65535;
-    unsigned short       usNetRel = 0;
+    std::uint16_t       usNetRev = 65535;
+    std::uint16_t       usNetRel = 0;
     std::vector<SString> parts;
     GetApplicationSetting("mta-version-ext").Split(".", parts);
     if (parts.size() == 6)
     {
-        usNetRev = static_cast<unsigned short>(atoi(parts[4]));
-        usNetRel = static_cast<unsigned short>(atoi(parts[5]));
+        usNetRev = static_cast<std::uint16_t>(atoi(parts[4]));
+        usNetRel = static_cast<std::uint16_t>(atoi(parts[5]));
     }
 
     DWORD   dwLastError = 0;
@@ -1055,7 +1055,7 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
         PFNINITNETREV pfnInitNetRev = static_cast<PFNINITNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "InitNetRev")));
         if (pfnInitNetRev)
             pfnInitNetRev(GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion());
-        typedef unsigned short (*PFNGETNETREV)();
+        typedef std::uint16_t (*PFNGETNETREV)();
         PFNGETNETREV pfnGetNetRev = static_cast<PFNGETNETREV>(static_cast<PVOID>(GetProcAddress(hModule, "GetNetRev")));
         if (pfnGetNetRev)
             usNetRev = pfnGetNetRev();
@@ -1417,7 +1417,7 @@ void DirectoryCopy(SString strSrcBase, SString strDestBase, bool bShowProgressDi
         std::vector<SString> dirListHere = FindFiles(PathJoin(strPathHereSrc, "*"), false, true);
 
         // Copy the files at this level
-        for (unsigned int i = 0; i < fileListHere.size(); i++)
+        for (std::uint32_t i = 0; i < fileListHere.size(); i++)
         {
             SString filePathNameSrc = PathJoin(strPathHereSrc, fileListHere[i]);
             SString filePathNameDest = PathJoin(strPathHereDest, fileListHere[i]);
@@ -1437,7 +1437,7 @@ void DirectoryCopy(SString strSrcBase, SString strDestBase, bool bShowProgressDi
         }
 
         // Add the directories at this level
-        for (unsigned int i = 0; i < dirListHere.size(); i++)
+        for (std::uint32_t i = 0; i < dirListHere.size(); i++)
         {
             SString dirPathNameBaseRel = PathJoin(strPathHereBaseRel, dirListHere[i]);
             toDoList.push_back(dirPathNameBaseRel);

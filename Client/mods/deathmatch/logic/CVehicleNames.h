@@ -17,7 +17,7 @@ public:
     static bool IsModelTrailer(unsigned long ulModel);
 
     static const char*  GetVehicleName(unsigned long ulModel);
-    static unsigned int GetVehicleModel(const char* szName);
+    static std::uint32_t GetVehicleModel(const char* szName);
 
     static const char* GetVehicleTypeName(unsigned long ulModel);
 };

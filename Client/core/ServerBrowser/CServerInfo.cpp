@@ -41,14 +41,14 @@ CServerInfo::CServerInfo()
     m_pWindow->SetMinimumSize(CVector2D(INFO_WINDOW_DEFAULTWIDTH, INFO_WINDOW_DEFAULTHEIGHT));
 
     // Determine our label draw position for L10n
-    unsigned int LabelTitleSizeX = pManager->CGUI_GetMaxTextExtent("default-bold-small", _("Name:"), _("Server Address:"), _("Gamemode:"), _("Map:"),
+    std::uint32_t LabelTitleSizeX = pManager->CGUI_GetMaxTextExtent("default-bold-small", _("Name:"), _("Server Address:"), _("Gamemode:"), _("Map:"),
                                                                    _("Players:"), _("Passworded:"), _("Latency:")) +
                                    10;
-    unsigned int LabelTitlePosX = 9;
-    unsigned int LabelPosX = LabelTitlePosX + LabelTitleSizeX + 2;
-    unsigned int LabelSizeX = INFO_WINDOW_DEFAULTWIDTH;
-    unsigned int LabelSizeY = 15;
-    unsigned int DrawPosY = 10;            // Start position
+    std::uint32_t LabelTitlePosX = 9;
+    std::uint32_t LabelPosX = LabelTitlePosX + LabelTitleSizeX + 2;
+    std::uint32_t LabelSizeX = INFO_WINDOW_DEFAULTWIDTH;
+    std::uint32_t LabelSizeY = 15;
+    std::uint32_t DrawPosY = 10;            // Start position
     // Server Name
     m_pServerNameLabelTitle = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, _("Name:")));
     m_pServerNameLabelTitle->SetPosition(CVector2D(LabelTitlePosX, DrawPosY += INFO_LABEL_VSPACING + LabelSizeY), false);
@@ -129,7 +129,7 @@ CServerInfo::CServerInfo()
     // Player list
     m_pServerPlayerList = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pWindow));
     m_pServerPlayerList->SetPosition(CVector2D(INFO_WINDOW_HSPACING * 2, DrawPosY += (INFO_WINDOW_VSPACING + LabelSizeY)), false);
-    unsigned int PlayerListHeight =
+    std::uint32_t PlayerListHeight =
         (INFO_WINDOW_DEFAULTHEIGHT - INFO_WINDOW_VSPACING - INFO_BUTTON_HEIGHT - INFO_WINDOW_VSPACING - LabelSizeY - INFO_WINDOW_VSPACING) - DrawPosY;
     m_pServerPlayerList->SetSize(CVector2D(INFO_WINDOW_DEFAULTWIDTH - INFO_WINDOW_HSPACING * 4, PlayerListHeight), false);
     m_pServerPlayerList->SetIgnoreTextSpacer(true);
@@ -277,7 +277,7 @@ void CServerInfo::Show(eWindowType WindowType)
     Show(WindowType, g_pCore->GetConnectManager()->m_strLastHost.c_str(), g_pCore->GetConnectManager()->m_usLastPort, "");
 }
 
-void CServerInfo::Show(eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem)
+void CServerInfo::Show(eWindowType WindowType, const char* szHost, std::uint16_t usPort, const char* szPassword, CServerListItem* pInitialServerListItem)
 {
     m_pWindow->SetZOrderingEnabled(true);
     m_pWindow->SetVisible(true);
@@ -331,7 +331,7 @@ void CServerInfo::Show(eWindowType WindowType, const char* szHost, unsigned shor
     SetServerInformation(szHost, usPort, szPassword, pInitialServerListItem);
 }
 
-void CServerInfo::SetServerInformation(const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem)
+void CServerInfo::SetServerInformation(const char* szHost, std::uint16_t usPort, const char* szPassword, CServerListItem* pInitialServerListItem)
 {
     // Store the parameters in our class instance for later use
     m_usPort = usPort;
@@ -483,7 +483,7 @@ void CServerInfo::ResetServerGUI(CServerListItem* pServer)
     m_pServerPlayerList->Clear();
 
     // Iterate the list of players and add their names to the player list
-    for (unsigned int i = 0; i < pServer->vecPlayers.size(); i++)
+    for (std::uint32_t i = 0; i < pServer->vecPlayers.size(); i++)
     {
         std::string strPlayerName = pServer->vecPlayers[i].c_str();
 

@@ -24,12 +24,12 @@ public:
 
     void DoPulse();
 
-    void SetDimension(unsigned short usDimension);
+    void SetDimension(std::uint16_t usDimension);
 
     CClientSound* PlaySound2D(const SString& strSound, bool bIsURL, bool bIsRawData, bool bLoop, bool bThrottle);
-    CClientSound* PlaySound2D(void* pMemory, unsigned int uiLength, bool bLoop);
+    CClientSound* PlaySound2D(void* pMemory, std::uint32_t uiLength, bool bLoop);
     CClientSound* PlaySound3D(const SString& strSound, bool bIsURL, bool bIsRawData, const CVector& vecPosition, bool bLoop, bool bThrottle);
-    CClientSound* PlaySound3D(void* pMemory, unsigned int uiLength, const CVector& vecPosition, bool bLoop);
+    CClientSound* PlaySound3D(void* pMemory, std::uint32_t uiLength, const CVector& vecPosition, bool bLoop);
 
     CClientSound* PlayGTASFX(eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop = false);
     CClientSound* PlayGTASFX3D(eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop = false);
@@ -62,7 +62,7 @@ public:
 private:
     CClientManager* m_pClientManager;
 
-    unsigned short m_usDimension;
+    std::uint16_t m_usDimension;
 
     std::list<CClientSound*> m_Sounds;
     std::set<CClientSound*>  m_DistanceStreamedInMap;

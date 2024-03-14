@@ -48,7 +48,7 @@ class ASE
 {
 public:
     ZERO_ON_NEW
-    ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList);
+    ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, std::uint16_t usPort, const SString& strServerIPList);
     ~ASE();
 
     void DoPulse();
@@ -105,23 +105,23 @@ private:
 
     std::vector<SOCKET> m_SocketList;
 
-    unsigned short m_usPortBase;
-    unsigned short m_usPort;
+    std::uint16_t m_usPortBase;
+    std::uint16_t m_usPort;
 
     // Full query cache
-    unsigned int m_uiFullLastPlayerCount;
+    std::uint32_t m_uiFullLastPlayerCount;
     long long    m_llFullLastTime;
     long         m_lFullMinInterval;
     std::string  m_strFullCached;
 
     // Light query cache
-    unsigned int m_uiLightLastPlayerCount;
+    std::uint32_t m_uiLightLastPlayerCount;
     long long    m_llLightLastTime;
     long         m_lLightMinInterval;
     std::string  m_strLightCached;
 
     // XFire Light query cache
-    unsigned int m_uiXfireLightLastPlayerCount;
+    std::uint32_t m_uiXfireLightLastPlayerCount;
     long long    m_llXfireLightLastTime;
     long         m_lXfireLightMinInterval;
     std::string  m_strXfireLightCached;

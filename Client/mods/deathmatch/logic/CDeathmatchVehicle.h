@@ -17,8 +17,8 @@ class CDeathmatchVehicle final : public CClientVehicle
 {
     DECLARE_CLASS(CDeathmatchVehicle, CClientVehicle)
 public:
-    CDeathmatchVehicle(CClientManager* pManager, class CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel,
-                       unsigned char ucVariant, unsigned char ucVariant2);
+    CDeathmatchVehicle(CClientManager* pManager, class CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, std::uint16_t usVehicleModel,
+                       std::uint8_t ucVariant, std::uint8_t ucVariant2);
     ~CDeathmatchVehicle();
 
     bool IsSyncing() { return m_bIsSyncing; };
@@ -31,8 +31,8 @@ private:
     class CUnoccupiedVehicleSync* m_pUnoccupiedVehicleSync;
     bool                          m_bIsSyncing;
 
-    SFixedArray<unsigned char, MAX_DOORS>  m_ucLastDoorStates;
-    SFixedArray<unsigned char, MAX_WHEELS> m_ucLastWheelStates;
-    SFixedArray<unsigned char, MAX_PANELS> m_ucLastPanelStates;
-    SFixedArray<unsigned char, MAX_LIGHTS> m_ucLastLightStates;
+    SFixedArray<std::uint8_t, MAX_DOORS>  m_ucLastDoorStates;
+    SFixedArray<std::uint8_t, MAX_WHEELS> m_ucLastWheelStates;
+    SFixedArray<std::uint8_t, MAX_PANELS> m_ucLastPanelStates;
+    SFixedArray<std::uint8_t, MAX_LIGHTS> m_ucLastLightStates;
 };

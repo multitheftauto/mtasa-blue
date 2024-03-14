@@ -141,7 +141,7 @@ bool CObject::ReadSpecialData(const int iLine)
         if (CObjectManager::IsValidModel(iTemp))
         {
             // Set the object id
-            m_usModel = static_cast<unsigned short>(iTemp);
+            m_usModel = static_cast<std::uint16_t>(iTemp);
         }
         else
         {
@@ -156,14 +156,14 @@ bool CObject::ReadSpecialData(const int iLine)
     }
 
     if (GetCustomDataInt("interior", iTemp, true))
-        m_ucInterior = static_cast<unsigned char>(iTemp);
+        m_ucInterior = static_cast<std::uint8_t>(iTemp);
 
     if (GetCustomDataInt("dimension", iTemp, true))
     {
         if (iTemp == -1)
             m_bVisibleInAllDimensions = true;
         else
-            m_usDimension = static_cast<unsigned short>(iTemp);
+            m_usDimension = static_cast<std::uint16_t>(iTemp);
     }
 
     GetCustomDataBool("doublesided", m_bDoubleSided, true);
@@ -180,7 +180,7 @@ bool CObject::ReadSpecialData(const int iLine)
         m_bCollisionsEnabled = true;
 
     if (GetCustomDataInt("alpha", iTemp, true))
-        m_ucAlpha = static_cast<unsigned char>(iTemp);
+        m_ucAlpha = static_cast<std::uint8_t>(iTemp);
 
     GetCustomDataBool("frozen", m_bIsFrozen, true);
 

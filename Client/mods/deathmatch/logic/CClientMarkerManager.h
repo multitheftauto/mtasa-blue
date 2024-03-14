@@ -20,10 +20,10 @@ class CClientMarkerManager
     friend class CClientGame;
 
 public:
-    unsigned int          Count() { return static_cast<unsigned int>(m_Markers.size()); };
+    std::uint32_t          Count() { return static_cast<std::uint32_t>(m_Markers.size()); };
     static CClientMarker* Get(ElementID ID);
     void                  DeleteAll();
-    static bool           IsMarkerModel(unsigned short usModel);
+    static bool           IsMarkerModel(std::uint16_t usModel);
 
 private:
     CClientMarkerManager(class CClientManager* pManager);

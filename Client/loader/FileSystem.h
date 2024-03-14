@@ -33,7 +33,7 @@ auto GetTempFilePath(size_t attempts, std::error_code& ec) -> std::filesystem::p
  * @param buffer Buffer for the file content
  * @param ec Parameter for error reporting
  */
-bool GetFileContent(const std::filesystem::path& path, std::vector<unsigned char>& buffer, std::error_code& ec);
+bool GetFileContent(const std::filesystem::path& path, std::vector<std::uint8_t>& buffer, std::error_code& ec);
 
 /**
  * @brief Writes the content of the buffer to the provided file.
@@ -41,7 +41,7 @@ bool GetFileContent(const std::filesystem::path& path, std::vector<unsigned char
  * @param buffer Buffer for the file content
  * @param ec Parameter for error reporting
  */
-bool SetFileContent(const std::filesystem::path& path, const std::vector<unsigned char>& buffer, std::error_code& ec);
+bool SetFileContent(const std::filesystem::path& path, const std::vector<std::uint8_t>& buffer, std::error_code& ec);
 
 /**
  * @brief Copies a file from a source location to a target location and verifies the contents.
@@ -72,7 +72,7 @@ bool GetFileHash(const std::filesystem::path& path, FileHash& hash, std::error_c
  * @param buffer Buffer to generate a hash for
  * @return Result of the hash
  */
-auto GetFileBufferHash(const std::vector<unsigned char>& buffer) -> FileHash;
+auto GetFileBufferHash(const std::vector<std::uint8_t>& buffer) -> FileHash;
 
 /**
  * @brief Creates a directory junction. Usually requires administrator privilege on Windows.

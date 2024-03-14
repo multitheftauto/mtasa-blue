@@ -1737,14 +1737,14 @@ void CKeyBinds::SetAllBindStates(bool bState, KeyBindType onlyType)
     }
 }
 
-unsigned int CKeyBinds::Count(KeyBindType bindType)
+std::uint32_t CKeyBinds::Count(KeyBindType bindType)
 {
     if (bindType == KeyBindType::UNDEFINED)
-        return static_cast<unsigned int>(m_binds.size());
+        return static_cast<std::uint32_t>(m_binds.size());
 
     const auto predicate = [bindType](const KeyBindPtr& bind) { return bind->type == bindType; };
     ptrdiff_t  count = std::count_if(m_binds.begin(), m_binds.end(), predicate);
-    return static_cast<unsigned int>(count);
+    return static_cast<std::uint32_t>(count);
 }
 
 void CKeyBinds::DoPreFramePulse()
@@ -2056,12 +2056,12 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
     if (pMainNode)
     {
         CXMLNode*    pNode = NULL;
-        unsigned int uiCount = pMainNode->GetSubNodeCount();
+        std::uint32_t uiCount = pMainNode->GetSubNodeCount();
 
         if (uiCount == 0)
             bLoadDefaults = true;
 
-        for (unsigned int i = 0; i < uiCount; i++)
+        for (std::uint32_t i = 0; i < uiCount; i++)
         {
             pNode = pMainNode->GetSubNode(i);
 

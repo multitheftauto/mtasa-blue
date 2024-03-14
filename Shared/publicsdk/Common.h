@@ -43,8 +43,8 @@ using namespace std;
 struct FunctionArguments
 {
     lua_State*    luaVM;
-    unsigned char nArguments;
-    unsigned char Type[10];
+    std::uint8_t nArguments;
+    std::uint8_t Type[10];
     void*         Arguments[10];
 };
 

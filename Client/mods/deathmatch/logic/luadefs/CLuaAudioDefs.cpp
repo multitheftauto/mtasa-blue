@@ -2119,7 +2119,7 @@ int CLuaAudioDefs::PlaySoundFrontEnd(lua_State* luaVM)
 {
     CClientSound*    pSound = NULL;
     CVector          vecPosition;
-    unsigned char    ucSound = 0;
+    std::uint8_t    ucSound = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucSound);
 
@@ -2479,7 +2479,7 @@ int CLuaAudioDefs::GetSoundPan(lua_State* luaVM)
 // Radio
 int CLuaAudioDefs::SetRadioChannel(lua_State* luaVM)
 {
-    unsigned char    ucChannel = 0;
+    std::uint8_t    ucChannel = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucChannel);
 
@@ -2500,7 +2500,7 @@ int CLuaAudioDefs::SetRadioChannel(lua_State* luaVM)
 
 int CLuaAudioDefs::GetRadioChannel(lua_State* luaVM)
 {
-    unsigned char ucChannel = 0;
+    std::uint8_t ucChannel = 0;
     if (CStaticFunctionDefinitions::GetRadioChannel(ucChannel))
     {
         lua_pushnumber(luaVM, ucChannel);

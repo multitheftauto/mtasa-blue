@@ -31,7 +31,7 @@ public:
     CObject* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod);
     void     DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); };
     bool         Exists(CObject* pObject);
 
     CObjectListType::const_iterator IterBegin() const { return m_List.begin(); };

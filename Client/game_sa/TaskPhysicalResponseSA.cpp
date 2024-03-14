@@ -55,13 +55,13 @@ CPed* CTaskSimpleChokingSA::GetAttacker()
     return pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
 }
 
-unsigned int CTaskSimpleChokingSA::GetTimeRemaining()
+std::uint32_t CTaskSimpleChokingSA::GetTimeRemaining()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     return internalInterface->m_nTimeRemaining;
 }
 
-unsigned int CTaskSimpleChokingSA::GetTimeStarted()
+std::uint32_t CTaskSimpleChokingSA::GetTimeStarted()
 {
     CTaskSimpleChokingSAInterface* internalInterface = (CTaskSimpleChokingSAInterface*)GetInterface();
     return internalInterface->m_nTimeStarted;

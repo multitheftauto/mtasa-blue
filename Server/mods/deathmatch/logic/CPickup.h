@@ -99,16 +99,16 @@ public:
 
     void SetPosition(const CVector& vecPosition);
 
-    unsigned char GetPickupType() { return m_ucType; };
-    void          SetPickupType(unsigned char ucType);
+    std::uint8_t GetPickupType() { return m_ucType; };
+    void          SetPickupType(std::uint8_t ucType);
     bool          IsTypeRandom() { return m_bIsTypeRandom; };
 
-    unsigned char GetWeaponType() { return m_ucWeaponType; };
-    void          SetWeaponType(unsigned char ucWeaponType);
+    std::uint8_t GetWeaponType() { return m_ucWeaponType; };
+    void          SetWeaponType(std::uint8_t ucWeaponType);
     bool          IsWeaponTypeRandom() { return m_bIsWeaponTypeRandom; };
 
-    unsigned short GetAmmo() { return m_usAmmo; };
-    void           SetAmmo(unsigned short usAmmo) { m_usAmmo = usAmmo; };
+    std::uint16_t GetAmmo() { return m_usAmmo; };
+    void           SetAmmo(std::uint16_t usAmmo) { m_usAmmo = usAmmo; };
 
     float GetAmount() { return m_fAmount; }
     void  SetAmount(float fAmount) { m_fAmount = fAmount; }
@@ -120,8 +120,8 @@ public:
     CTickCount GetLastUsedTime() { return m_LastUsedTime; }
     CTickCount GetCreationTime() { return m_CreationTime; }
 
-    unsigned short GetModel() { return m_usModel; };
-    void           SetModel(unsigned short usModel) { m_usModel = usModel; };
+    std::uint16_t GetModel() { return m_usModel; };
+    void           SetModel(std::uint16_t usModel) { m_usModel = usModel; };
 
     bool IsVisible() { return m_bVisible; };
     void SetVisible(bool bVisible);
@@ -155,14 +155,14 @@ private:
 
     class CPickupManager* m_pPickupManager;
 
-    unsigned char  m_ucType;
-    unsigned char  m_ucWeaponType;
-    unsigned short m_usAmmo;
+    std::uint8_t  m_ucType;
+    std::uint8_t  m_ucWeaponType;
+    std::uint16_t m_usAmmo;
     float          m_fAmount;
     unsigned long  m_ulRespawnIntervals;
     CTickCount     m_LastUsedTime;
     CTickCount     m_CreationTime;
-    unsigned short m_usModel;
+    std::uint16_t m_usModel;
     bool           m_bVisible;
 
     bool m_bIsTypeRandom;

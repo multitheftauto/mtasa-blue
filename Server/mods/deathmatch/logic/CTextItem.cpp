@@ -15,8 +15,8 @@
 
 static unsigned long ulUniqueId = 0;
 
-CTextItem::CTextItem(const char* szText, const CVector2D& vecPosition, eTextPriority Priority, const SColor color, float fScale, unsigned char ucFormat,
-                     unsigned char ucShadowAlpha)
+CTextItem::CTextItem(const char* szText, const CVector2D& vecPosition, eTextPriority Priority, const SColor color, float fScale, std::uint8_t ucFormat,
+                     std::uint8_t ucShadowAlpha)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::TEXT_ITEM);
     // Assign us an unique ID

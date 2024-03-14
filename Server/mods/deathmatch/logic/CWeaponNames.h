@@ -16,14 +16,14 @@
 class CWeaponNames
 {
 public:
-    static bool IsWeaponIDAkimbo(unsigned char ucID);
-    static bool IsDriveByWeapon(unsigned char ucID);
+    static bool IsWeaponIDAkimbo(std::uint8_t ucID);
+    static bool IsDriveByWeapon(std::uint8_t ucID);
 
-    static unsigned char GetWeaponID(const char* szName);
-    static const char*   GetWeaponName(unsigned char ucID);
-    static char          GetSlotFromWeapon(unsigned char ucID);
+    static std::uint8_t GetWeaponID(const char* szName);
+    static const char*   GetWeaponName(std::uint8_t ucID);
+    static char          GetSlotFromWeapon(std::uint8_t ucID);
 
-    static bool DoesSlotHaveAmmo(unsigned int uiSlot)
+    static bool DoesSlotHaveAmmo(std::uint32_t uiSlot)
     {
         switch (uiSlot)
         {

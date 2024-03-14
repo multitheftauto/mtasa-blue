@@ -54,7 +54,7 @@ enum
 /// };
 /// \endcode
 ///
-/// \note All these enumerations should be casted to (unsigned char) before writing them to RakNet::BitStream
+/// \note All these enumerations should be casted to (std::uint8_t) before writing them to RakNet::BitStream
 enum
 {
     //
@@ -118,7 +118,7 @@ enum
     RID_INVALID_PASSWORD,
     /// RakPeer - A packet has been tampered with in transit.  The sender is contained in Packet::systemAddress.
     RID_MODIFIED_PACKET,
-    /// RakPeer - The four bytes following this byte represent an unsigned int which is automatically modified by the difference in system times between the
+    /// RakPeer - The four bytes following this byte represent an std::uint32_t which is automatically modified by the difference in system times between the
     /// sender and the recipient. Requires that you call SetOccasionalPing.
     RID_TIMESTAMP,
     /// RakPeer - Pong from an unconnected system.  First byte is ID_PONG, second sizeof(RakNetTime) bytes is the ping, following bytes is system specific
@@ -136,8 +136,8 @@ enum
     /// systemAddress of the client that is not connected directly to us. The packet encoding is SystemAddress 1, ConnectionGraphGroupID 1, SystemAddress 2,
     /// ConnectionGraphGroupID 2 ConnectionGraph2 plugin: Bytes 1-4 = count. for (count items) contains {SystemAddress, RakNetGUID}
     RID_REMOTE_NEW_INCOMING_CONNECTION,
-    // RakPeer - Downloading a large message. Format is ID_DOWNLOAD_PROGRESS (MessageID), partCount (unsigned int), partTotal (unsigned int), partLength
-    // (unsigned int), first part data (length <= MAX_MTU_SIZE). See the three parameters partCount, partTotal and partLength in OnFileProgress in
+    // RakPeer - Downloading a large message. Format is ID_DOWNLOAD_PROGRESS (MessageID), partCount (std::uint32_t), partTotal (std::uint32_t), partLength
+    // (std::uint32_t), first part data (length <= MAX_MTU_SIZE). See the three parameters partCount, partTotal and partLength in OnFileProgress in
     // FileListTransferCBInterface.h
     RID_DOWNLOAD_PROGRESS,
 

@@ -40,7 +40,7 @@ public:
     bool ResetDiscordData();
     bool SetPresenceState(const char* szState, bool bCustom);
     bool SetPresenceDetails(const char* szDetails, bool bCustom);
-    bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl);
+    bool SetPresenceButtons(std::uint16_t int iIndex, const char* szName, const char* szUrl);
     bool SetDiscordRPCEnabled(bool bEnabled);
     bool SetApplicationID(const char* resourceName, const char* szAppID);
     bool IsDiscordCustomDetailsDisallowed() const { return m_bDisallowCustomDetails; };

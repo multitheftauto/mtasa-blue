@@ -444,7 +444,7 @@ int CLuaFunctionDefs::GetFunctionsBoundToKey(lua_State* luaVM)
             lua_newtable(luaVM);
 
             // Add all the bound functions to it
-            unsigned int                          uiIndex = 0;
+            std::uint32_t                          uiIndex = 0;
             list<CScriptKeyBind*>::const_iterator iter = m_pClientGame->GetScriptKeyBinds()->IterBegin();
             for (; iter != m_pClientGame->GetScriptKeyBinds()->IterEnd(); iter++)
             {

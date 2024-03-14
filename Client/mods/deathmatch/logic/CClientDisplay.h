@@ -41,7 +41,7 @@ public:
 
     virtual SColor GetColor() const { return m_Color; }
     virtual void   SetColor(const SColor& color) { m_Color = color; }
-    virtual void   SetColorAlpha(unsigned char ucAlpha);
+    virtual void   SetColorAlpha(std::uint8_t ucAlpha);
 
     virtual bool IsVisible() { return m_bVisible; };
     virtual void SetVisible(bool bVisible) { m_bVisible = bVisible; };

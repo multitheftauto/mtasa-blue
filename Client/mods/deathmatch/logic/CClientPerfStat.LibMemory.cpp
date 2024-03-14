@@ -110,7 +110,7 @@ CClientPerfStatLibMemoryImpl::CClientPerfStatLibMemoryImpl()
 ///////////////////////////////////////////////////////////////
 CClientPerfStatLibMemoryImpl::~CClientPerfStatLibMemoryImpl()
 {
-    for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+    for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
     {
         CLibraryInfo& info = m_LibraryList[i];
         SAFE_DELETE(info.pLibrary);
@@ -214,7 +214,7 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
                 {false, "cgui"}, {false, "core"}, {true, "client"}, {false, "game_sa"}, {false, "multiplayer_sa"}, {false, "netc"}, {false, "xmll"},
             };
 
-            for (unsigned int i = 0; i < NUMELMS(libs); i++)
+            for (std::uint32_t i = 0; i < NUMELMS(libs); i++)
             {
                 CLibraryInfo info;
                 bool         bModDir = libs[i].bModDir;
@@ -248,7 +248,7 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
             }
         }
 
-        for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+        for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
         {
             CLibraryInfo& info = m_LibraryList[i];
             unsigned long stats[9];
@@ -340,7 +340,7 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
 
         if (bMoreInfo)
         {
-            for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+            for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
             {
                 CLibraryInfo& info = m_LibraryList[i];
                 if (strName == info.strName)
@@ -363,7 +363,7 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
         }
         else if (bTopTags)
         {
-            for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+            for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
             {
                 CLibraryInfo& info = m_LibraryList[i];
                 if (strName == info.strName)

@@ -18,7 +18,7 @@ class CObjectGroupPhysicalProperties
 {
 public:
     virtual class CObjectGroupPhysicalPropertiesSAInterface* GetInterface() const = 0;
-    virtual unsigned char                                    GetGroup() const = 0;
+    virtual std::uint8_t                                    GetGroup() const = 0;
     virtual void                                             RestoreDefault() = 0;
 
     virtual void                            SetMass(float fMass) = 0;

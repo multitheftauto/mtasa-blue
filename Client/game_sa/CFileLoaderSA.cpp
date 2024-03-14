@@ -116,9 +116,9 @@ static void CVehicleModelInfo_StopUsingCommonVehicleTexDicationary()
 }
 
 static auto          CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-static unsigned int& gAtomicModelId = *reinterpret_cast<unsigned int*>(DWORD_AtomicsReplacerModelID);
+static std::uint32_t& gAtomicModelId = *reinterpret_cast<std::uint32_t*>(DWORD_AtomicsReplacerModelID);
 
-bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
+bool CFileLoader_LoadAtomicFile(RwStream* stream, std::uint32_t modelId)
 {
     CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[modelId];
     auto                       pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(pBaseModelInfo);
@@ -130,7 +130,7 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         CVehicleModelInfo_UseCommonVehicleTexDicationary();
     }
 
-    const unsigned int rwID_CLUMP = 16;
+    const std::uint32_t rwID_CLUMP = 16;
     if (RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
     {
         RpClump* pReadClump = RpClumpStreamRead(stream);

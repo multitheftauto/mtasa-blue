@@ -127,7 +127,7 @@ void DisconnectPlayer(class CGame* pGame, class CPlayer& Player, const char* szM
 void DisconnectPlayer(class CGame* pGame, class CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, const char* szMessage = "");
 void DisconnectPlayer(class CGame* pGame, class CPlayer& Player, CPlayerDisconnectedPacket::ePlayerDisconnectType eDisconnectType, time_t BanDuration,
                       const char* szMessage = "");
-void DisconnectConnectionDesync(class CGame* pGame, class CPlayer& Player, unsigned int uiCode);
+void DisconnectConnectionDesync(class CGame* pGame, class CPlayer& Player, std::uint32_t uiCode);
 
 bool InitializeSockets();
 bool CleanupSockets();
@@ -264,21 +264,21 @@ inline void ConvertZXYEulersToQuaternion(const CVector& vecFrom, CVector4D &vecT
 
 #ifdef MTA_CLIENT
 // Misc utility functions
-unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace = ' ');
-unsigned int StripControlCodes(char* szText, unsigned char cReplace = ' ');
-bool         IsControlCode(unsigned char c);
+std::uint32_t StripUnwantedCharacters(char* szText, std::uint8_t cReplace = ' ');
+std::uint32_t StripControlCodes(char* szText, std::uint8_t cReplace = ' ');
+bool         IsControlCode(std::uint8_t c);
 bool         IsValidFilePath(const char* szDir);
 void         ReplaceOccurrencesInString(std::string& s, const char* a, const char* b);
 
-void RaiseFatalError(unsigned int uiCode);
-void RaiseProtocolError(unsigned int uiCode);
+void RaiseFatalError(std::uint32_t uiCode);
+void RaiseProtocolError(std::uint32_t uiCode);
 
 void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector& vecPosition, const CVector& vecRotation);
 
-unsigned int GetRandom(unsigned int uiLow, unsigned int uiHigh);
+std::uint32_t GetRandom(std::uint32_t uiLow, std::uint32_t uiHigh);
 double       GetRandomDouble();
 
-SString GetDataUnit(unsigned long long ullInput);
+SString GetDataUnit(std::uint64_t ullInput);
 
 // Utility network functions
 void LongToDottedIP(unsigned long ulIP, char* szDottedIP);
@@ -302,7 +302,7 @@ SString LongToDottedIP(unsigned long ulIP);
 inline SString SQLEscape(const SString& strEscapeString, bool bSingleQuotes, bool bDoubleQuotes)
 {
     SString strParsedQuery = "";
-    for (unsigned int k = 0; k < strEscapeString.length(); k++)
+    for (std::uint32_t k = 0; k < strEscapeString.length(); k++)
     {
         if (bSingleQuotes && strEscapeString[k] == '\'')
             strParsedQuery += '\'';
@@ -315,15 +315,15 @@ inline SString SQLEscape(const SString& strEscapeString, bool bSingleQuotes, boo
 }
 #endif
 
-inline bool IsVisibleCharacter(unsigned char c)
+inline bool IsVisibleCharacter(std::uint8_t c)
 {
     // 32..126 are visible characters
     return c >= 32 && c <= 126;
 }
 
-unsigned int HexToInt(const char* szHex);
+std::uint32_t HexToInt(const char* szHex);
 bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
-bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
+bool         XMLColorToInt(const char* szColor, std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha);
 
 // Maths utility functions
 CVector ConvertEulerRotationOrder(const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder);

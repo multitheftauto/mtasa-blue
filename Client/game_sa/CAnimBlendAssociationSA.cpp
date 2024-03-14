@@ -17,7 +17,7 @@
 
 extern CGameSA* pGame;
 
-AnimBlendFrameData* CAnimBlendClumpDataSAInterface::GetFrameDataByNodeId(unsigned int nodeId)
+AnimBlendFrameData* CAnimBlendClumpDataSAInterface::GetFrameDataByNodeId(std::uint32_t nodeId)
 {
     for (int i = 0; i < m_dwNumBones; i++)
     {

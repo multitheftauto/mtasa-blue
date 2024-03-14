@@ -67,10 +67,10 @@ public:
 
     CTaskComplexLeaveCar* CreateTaskComplexLeaveCar(CVehicle* pVehicle, const int iTargetDoor = 0xFF, const int iDelayTime = 0,
                                                     const bool bSensibleLeaveCar = true, const bool bForceGetOut = false);
-    CTaskSimpleDuck*      CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck = 0, unsigned short nUseShotsWhizzingEvents = -1);
+    CTaskSimpleDuck*      CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, std::uint16_t nLengthOfDuck = 0, std::uint16_t nUseShotsWhizzingEvents = -1);
     CTaskSimpleChoking*   CreateTaskSimpleChoking(CPed* pAttacker, bool bIsTearGas);
 
-    CTaskSimpleClimb* CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight = CLIMB_GRAB,
+    CTaskSimpleClimb* CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, std::uint8_t nSurfaceType, char nHeight = CLIMB_GRAB,
                                             const bool bForceClimb = false);
     CTaskSimpleJetPack* CreateTaskSimpleJetpack(const CVector* pVecTargetPos = NULL, float fCruiseHeight = 10.0f, int nHoverTime = 0);
 
@@ -85,7 +85,7 @@ public:
                                                  const bool bBeingKilledByStealth = false, const bool bFallingToDeath = false, const int iFallToDeathDir = 0,
                                                  const bool bFallToDeathOverRailing = false);
     CTaskSimpleStealthKill* CreateTaskSimpleStealthKill(bool bAttacker, class CPed* pPed, const AnimationId anim);
-    CTaskSimpleDead*        CreateTaskSimpleDead(unsigned int uiDeathTimeMS, bool bUnk2);
+    CTaskSimpleDead*        CreateTaskSimpleDead(std::uint32_t uiDeathTimeMS, bool bUnk2);
     CTaskSimpleBeHit*       CreateTaskSimpleBeHit(CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
     CTaskComplexSunbathe* CreateTaskComplexSunbathe(class CObject* pTowel, const bool bStartStanding);
@@ -94,16 +94,16 @@ public:
     CTaskSimpleIKChain* CreateTaskSimpleIKChain(char* idString, int effectorBoneTag, CVector effectorVec, int pivotBoneTag, CEntity* pEntity, int offsetBoneTag,
                                                 CVector offsetPos, float speed, int time = 99999999, int blendTime = 1000);
     CTaskSimpleIKLookAt*      CreateTaskSimpleIKLookAt(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos,
-                                                       unsigned char useTorso = false, float speed = 0.25f, int blendTime = 1000, int m_priority = 3);
-    CTaskSimpleTriggerLookAt* CreateTaskSimpleTriggerLookAt(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso = false,
+                                                       std::uint8_t useTorso = false, float speed = 0.25f, int blendTime = 1000, int m_priority = 3);
+    CTaskSimpleTriggerLookAt* CreateTaskSimpleTriggerLookAt(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, std::uint8_t useTorso = false,
                                                             float speed = 0.25f, int blendTime = 1000, int priority = 3);
 
     // Attack
     CTaskSimpleGangDriveBy* CreateTaskSimpleGangDriveBy(CEntity* pTargetEntity, const CVector* pVecTarget, float fAbortRange, char FrequencyPercentage,
                                                         char nDrivebyStyle, bool bSeatRHS);
     CTaskSimpleUseGun*      CreateTaskSimpleUseGun(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1,
-                                                   unsigned char bAimImmediate = false);
-    CTaskSimpleFight*       CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
+                                                   std::uint8_t bAimImmediate = false);
+    CTaskSimpleFight*       CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, std::uint32_t nIdlePeriod = 10000);
 
     static void StaticSetHooks();
 };

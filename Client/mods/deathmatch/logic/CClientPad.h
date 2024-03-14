@@ -19,10 +19,10 @@ class CControllerState;
 class CClientPad
 {
 public:
-    static bool        GetControlIndex(const char* szName, unsigned int& uiIndex);
-    static const char* GetControlName(unsigned int uiIndex);
+    static bool        GetControlIndex(const char* szName, std::uint32_t& uiIndex);
+    static const char* GetControlName(std::uint32_t uiIndex);
 
-    static bool GetAnalogControlIndex(const char* szName, unsigned int& uiIndex);
+    static bool GetAnalogControlIndex(const char* szName, std::uint32_t& uiIndex);
 
     CClientPad();
 
@@ -39,7 +39,7 @@ public:
     static void RemoveSetAnalogControlState(const char* szName);
 
     static void ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot);
-    static void ProcessControl(short& usControlValue, unsigned int uiIndex);
+    static void ProcessControl(short& usControlValue, std::uint32_t uiIndex);
 
     static void ProcessAllToggledControls(CControllerState& cs, bool bOnFoot);
     static bool ProcessToggledControl(const char* szName, CControllerState& cs, bool bOnFoot, bool bEnabled);

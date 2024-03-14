@@ -204,9 +204,9 @@ public:
             usAmmo = 0;
             usAmmoInClip = 0;
         }
-        unsigned char  ucType;
-        unsigned short usAmmo;
-        unsigned short usAmmoInClip;
+        std::uint8_t  ucType;
+        std::uint16_t usAmmo;
+        std::uint16_t usAmmoInClip;
     };
     struct SScreenShotArgs
     {
@@ -219,7 +219,7 @@ public:
     struct SDelayedPacketInfo
     {
         CTickCount             useTickCount;
-        unsigned char          ucPacketID;
+        std::uint8_t          ucPacketID;
         NetBitStreamInterface* pBitStream;
         NetPacketPriority      packetPriority;
         NetPacketReliability   packetReliability;
@@ -255,7 +255,7 @@ public:
 
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
-    void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
+    void InitVoice(bool bEnabled, std::uint32_t uiServerSampleRate, std::uint8_t ucQuality, std::uint32_t uiBitrate);
 
     bool IsWindowFocused() const { return m_bFocused; }
 
@@ -328,7 +328,7 @@ public:
     void ShowWepdata(const char* szNick);
     void ShowTasks(const char* szNick);
     void ShowPlayer(const char* szNick);
-    void SetMimic(unsigned int uiMimicCount);
+    void SetMimic(std::uint32_t uiMimicCount);
     void SetMimicLag(bool bMimicLag) { m_bMimicLag = bMimicLag; };
     void SetDoPaintballs(bool bDoPaintballs) { m_bDoPaintballs = bDoPaintballs; }
     void ShowInterpolation(bool bShow) { m_bShowInterpolation = bShow; }
@@ -342,13 +342,13 @@ public:
 
     CClientEntity* GetDamageEntity() { return m_pDamageEntity; }
     ElementID      GetDamagerID() { return m_DamagerID; }
-    unsigned char  GetDamageWeapon() { return m_ucDamageWeapon; }
-    unsigned char  GetDamageBodyPiece() { return m_ucDamageBodyPiece; }
+    std::uint8_t  GetDamageWeapon() { return m_ucDamageWeapon; }
+    std::uint8_t  GetDamageBodyPiece() { return m_ucDamageBodyPiece; }
     bool           GetDamageSent() { return m_bDamageSent; }
     void           SetDamageSent(bool b) { m_bDamageSent = b; }
 
-    void SetAllDimensions(unsigned short usDimension);
-    void SetAllInteriors(unsigned char ucInterior);
+    void SetAllDimensions(std::uint16_t usDimension);
+    void SetAllInteriors(std::uint8_t ucInterior);
 
     static bool StaticKeyStrokeHandler(const SString& strKey, bool bState, bool bIsConsoleInputKey);
     bool        KeyStrokeHandler(const SString& strKey, bool bState, bool bIsConsoleInputKey);
@@ -385,9 +385,9 @@ public:
 
     void ResetMapInfo();
 
-    void DoWastedCheck(ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF, AssocGroupId animGroup = 0,
+    void DoWastedCheck(ElementID damagerID = INVALID_ELEMENT_ID, std::uint8_t ucWeapon = 0xFF, std::uint8_t ucBodyPiece = 0xFF, AssocGroupId animGroup = 0,
                        AnimationId animId = 15);
-    void SendPedWastedPacket(CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF,
+    void SendPedWastedPacket(CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, std::uint8_t ucWeapon = 0xFF, std::uint8_t ucBodyPiece = 0xFF,
                              AssocGroupId animGroup = 0, AnimationId animID = 15);
 
     CClientGUIElement* GetClickedGUIElement() { return m_pClickedGUIElement; }
@@ -398,8 +398,8 @@ public:
     bool GetHudAreaNameDisabled() { return m_bHudAreaNameDisabled; };
     void SetHudAreaNameDisabled(bool bDisabled) { m_bHudAreaNameDisabled = bDisabled; };
 
-    bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
-    bool IsGlitchEnabled(unsigned char cGlitch);
+    bool SetGlitchEnabled(std::uint8_t cGlitch, bool bEnabled);
+    bool IsGlitchEnabled(std::uint8_t cGlitch);
 
     bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled);
     bool IsWorldSpecialProperty(WorldSpecialProperty property);
@@ -442,7 +442,7 @@ public:
     bool    IsHighFloatPrecision() const;
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
-    void RestreamModel(unsigned short usModel);
+    void RestreamModel(std::uint16_t usModel);
     void RestreamWorld(bool removeBigBuildings);
     void ReinitMarkers();
 
@@ -499,14 +499,14 @@ private:
     void SetupGlobalLuaEvents();
 
     static bool                              StaticDamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
-    static void                              StaticDeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
+    static void                              StaticDeathHandler(CPed* pKilledPed, std::uint8_t ucDeathReason, std::uint8_t ucBodyPart);
     static void                              StaticFireHandler(CFire* pFire);
     static bool                              StaticBreakTowLinkHandler(CVehicle* pTowedVehicle);
     static void                              StaticDrawRadarAreasHandler();
     static void                              StaticRender3DStuffHandler();
     static void                              StaticPreRenderSkyHandler();
     static void                              StaticRenderHeliLightHandler();
-    static bool                              StaticChokingHandler(unsigned char ucWeaponType);
+    static bool                              StaticChokingHandler(std::uint8_t ucWeaponType);
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
     static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
@@ -548,13 +548,13 @@ private:
     static void        StaticAudioZoneRadioSwitchHandler(DWORD dwStationID);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
-    void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
+    void                              DeathHandler(CPed* pKilledPed, std::uint8_t ucDeathReason, std::uint8_t ucBodyPart);
     void                              FireHandler(CFire* pFire);
     bool                              BreakTowLinkHandler(CVehicle* pTowedVehicle);
     void                              DrawRadarAreasHandler();
     void                              Render3DStuffHandler();
     void                              PreRenderSkyHandler();
-    bool                              ChokingHandler(unsigned char ucWeaponType);
+    bool                              ChokingHandler(std::uint8_t ucWeaponType);
     void                              PreWorldProcessHandler();
     void                              PostWorldProcessHandler();
     void                              PostWorldProcessPedsAfterPreRenderHandler();
@@ -596,7 +596,7 @@ private:
     static void BulletFire(CPed* pInitiator, const CVector* pStartPosition, const CVector* pEndPosition);
 
 public:
-    static bool StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
+    static bool StaticProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream);
 
     bool ApplyPedDamageFromGame(eWeaponType weaponType, float fDamage, uchar ucHitZone, CClientPed* pDamagedPed, CClientEntity* pInflictingEntity,
                                 CEventDamage* pEvent);
@@ -622,9 +622,9 @@ public:
     void                           SetFileCacheRoot();
     const char*                    GetFileCacheRoot() { return m_strFileCacheRoot; }
 
-    void                        InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP);
-    void                        RemoveIFPPointerFromMap(const unsigned int u32BlockNameHash);
-    std::shared_ptr<CClientIFP> GetIFPPointerFromMap(const unsigned int u32BlockNameHash);
+    void                        InsertIFPPointerToMap(const std::uint32_t u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP);
+    void                        RemoveIFPPointerFromMap(const std::uint32_t u32BlockNameHash);
+    std::shared_ptr<CClientIFP> GetIFPPointerFromMap(const std::uint32_t u32BlockNameHash);
 
     void        InsertPedPointerToSet(CClientPed* pPed);
     void        RemovePedPointerFromSet(CClientPed* pPed);
@@ -735,8 +735,8 @@ private:
 
     CClientEntity* m_pDamageEntity;
     ElementID      m_DamagerID;
-    unsigned char  m_ucDamageWeapon;
-    unsigned char  m_ucDamageBodyPiece;
+    std::uint8_t  m_ucDamageWeapon;
+    std::uint8_t  m_ucDamageBodyPiece;
     unsigned long  m_ulDamageTime;
     bool           m_bDamageSent;
 
@@ -843,8 +843,8 @@ private:
 
     ksignals::Delegate m_Delegate;
 
-    // (unsigned int) Key is the hash of custom block name that is supplied to engineLoadIFP
-    std::map<unsigned int, std::shared_ptr<CClientIFP> > m_mapOfIfpPointers;
+    // (std::uint32_t) Key is the hash of custom block name that is supplied to engineLoadIFP
+    std::map<std::uint32_t, std::shared_ptr<CClientIFP> > m_mapOfIfpPointers;
     std::set<CClientPed*>                                m_setOfPedPointers;
     AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
     // Key is the task and value is the CClientPed*

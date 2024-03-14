@@ -22,9 +22,9 @@ public:
     CGUIGridList_Impl(class CGUI_Impl* pGUI, CGUIElement* pParent = NULL, bool bFrame = true);
     ~CGUIGridList_Impl();
 
-    unsigned int AddColumn(const char* szTitle, float fWidth);
-    void         RemoveColumn(unsigned int uiColumn);
-    void         AutoSizeColumn(unsigned int hColumn);
+    std::uint32_t AddColumn(const char* szTitle, float fWidth);
+    void         RemoveColumn(std::uint32_t uiColumn);
+    void         AutoSizeColumn(std::uint32_t hColumn);
     void         SetColumnWidth(int hColumn, float fWidth, bool bRelative = true);
     bool         GetColumnWidth(int hColumn, float& fOutWidth, bool bRelative = true);
     void         SetColumnTitle(int hColumn, const char* szTitle);
@@ -45,8 +45,8 @@ public:
     void SetItemData(int iRow, int hColumn, void* pData, CGUICallback<void, void*> deleteDataCallback = NULL);
     void SetItemData(int iRow, int hColumn, const char* pszData);
     void* GetItemData(int iRow, int hColumn);
-    void  SetItemColor(int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha);
-    bool  GetItemColor(int iRow, int hColumn, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
+    void  SetItemColor(int iRow, int hColumn, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue, std::uint8_t ucAlpha);
+    bool  GetItemColor(int iRow, int hColumn, std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha);
 
     void SetHorizontalScrollBar(bool bEnabled);
     void SetVerticalScrollBar(bool bEnabled);
@@ -74,8 +74,8 @@ public:
     bool IsColumnSegmentSizingEnabled(int hColumn);
     void SetColumnSegmentSizingEnabled(int hColumn, bool bEnabled);
 
-    void Sort(unsigned int uiColumn, SortDirection direction);
-    void GetSort(unsigned int& uiColumn, SortDirection& direction);
+    void Sort(std::uint32_t uiColumn, SortDirection direction);
+    void GetSort(std::uint32_t& uiColumn, SortDirection& direction);
 
     void SetSelectedItem(int iRow, int hColumn, bool bReset);
 
@@ -91,9 +91,9 @@ private:
 
     int m_iIndex;
 
-    unsigned int       GetUniqueHandle();
+    std::uint32_t       GetUniqueHandle();
     CGUIListItem_Impl* GetListItem(CEGUI::ListboxItem* pItem);
-    unsigned int       m_hUniqueHandle;
+    std::uint32_t       m_hUniqueHandle;
 
     CFastHashMap<CEGUI::ListboxItem*, CGUIListItem_Impl*> m_Items;
 

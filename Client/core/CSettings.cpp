@@ -1103,8 +1103,8 @@ void CSettings::CreateGUI()
     m_pStreamingMemoryLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 0.0f));
     m_pStreamingMemoryLabel->AutoSize();
 
-    unsigned int uiMinMemory = g_pCore->GetMinStreamingMemory();
-    unsigned int uiMaxMemory = g_pCore->GetMaxStreamingMemory();
+    std::uint32_t uiMinMemory = g_pCore->GetMinStreamingMemory();
+    std::uint32_t uiMaxMemory = g_pCore->GetMaxStreamingMemory();
 
     m_pStreamingMemoryMinLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Min")));
     m_pStreamingMemoryMinLabel->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
@@ -1354,7 +1354,7 @@ void CSettings::DestroyGUI()
     m_pWindow = NULL;
 }
 
-void RestartCallBack(void* ptr, unsigned int uiButton)
+void RestartCallBack(void* ptr, std::uint32_t uiButton)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
@@ -1379,7 +1379,7 @@ void CSettings::ShowRestartQuestion()
     pQuestionBox->Show();
 }
 
-void DisconnectCallback(void* ptr, unsigned int uiButton)
+void DisconnectCallback(void* ptr, std::uint32_t uiButton)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
@@ -1607,7 +1607,7 @@ void CSettings::UpdateVideoTab()
     UpdateFullScreenComboBoxEnabled();
 
     // Streaming memory
-    unsigned int uiStreamingMemory = 0;
+    std::uint32_t uiStreamingMemory = 0;
     CVARS_GET("streaming_memory", uiStreamingMemory);
     uiStreamingMemory = SharedUtil::Clamp(g_pCore->GetMinStreamingMemory(), uiStreamingMemory, g_pCore->GetMaxStreamingMemory());
     float fPos = SharedUtil::Unlerp(g_pCore->GetMinStreamingMemory(), uiStreamingMemory, g_pCore->GetMaxStreamingMemory());
@@ -2764,11 +2764,11 @@ void CSettings::Initialize()
     {
         int           iIndex;
         CCommandBind* pBind;
-        unsigned int  uiMatchCount;
+        std::uint32_t  uiMatchCount;
     };
 
     auto         listedCommands = std::make_unique<SListedCommand[]>(pKeyBinds->Count(KeyBindType::COMMAND) + pKeyBinds->Count(KeyBindType::FUNCTION));
-    unsigned int uiNumListedCommands = 0;
+    std::uint32_t uiNumListedCommands = 0;
 
     std::map<std::string, int> iResourceItems;
 
@@ -2787,7 +2787,7 @@ void CSettings::Initialize()
         bool foundMatches = false;
 
         // Loop through the already listed array of commands for matches
-        for (unsigned int i = 0; i < uiNumListedCommands; i++)
+        for (std::uint32_t i = 0; i < uiNumListedCommands; i++)
         {
             SListedCommand* pListedCommand = &listedCommands[i];
             CCommandBind*   pListedBind = pListedCommand->pBind;
@@ -2816,7 +2816,7 @@ void CSettings::Initialize()
         // If there weren't any matches
         if (!foundMatches)
         {
-            unsigned int row = iGameRowCount + 1;
+            std::uint32_t row = iGameRowCount + 1;
 
             // Combine command and arguments
             SString strDescription;
@@ -3064,7 +3064,7 @@ void CSettings::LoadData()
     m_pCheckBoxMuteMTA->SetEnabled(!m_bOldMuteMaster);
     m_pCheckBoxMuteVoice->SetEnabled(!m_bOldMuteMaster);
 
-    unsigned int uiUsertrackMode = gameSettings->GetUsertrackMode();
+    std::uint32_t uiUsertrackMode = gameSettings->GetUsertrackMode();
     if (uiUsertrackMode == 0)
         m_pComboUsertrackMode->SetText(_("Radio"));
     else if (uiUsertrackMode == 1)
@@ -3091,7 +3091,7 @@ void CSettings::LoadData()
     // Locale
     SString strLocale;
     CVARS_GET("locale", strLocale);
-    unsigned int uiIndex = 0;
+    std::uint32_t uiIndex = 0;
     while (uiIndex != m_pInterfaceLanguageSelector->GetItemCount())
     {
         CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetItemByIndex(uiIndex);
@@ -3195,7 +3195,7 @@ void CSettings::LoadData()
     LoadChatColorFromCVar(Chat::ColorType::INPUT_BG, "chat_input_color");
     LoadChatColorFromCVar(Chat::ColorType::INPUT_TEXT, "chat_input_text_color");
 
-    unsigned int uiFont;
+    std::uint32_t uiFont;
     CVARS_GET("chat_font", uiFont);
     if (uiFont >= Chat::Font::MAX)
         uiFont = Chat::Font::DEFAULT;
@@ -3656,7 +3656,7 @@ void CSettings::SaveData()
     float        fPos = m_pStreamingMemory->GetScrollPosition();
     int          min = g_pCore->GetMinStreamingMemory();
     int          max = g_pCore->GetMaxStreamingMemory();
-    unsigned int value = SharedUtil::Lerp(min, fPos, max);
+    std::uint32_t value = SharedUtil::Lerp(min, fPos, max);
     CVARS_SET("streaming_memory", value);
 
     // Webbrowser settings
@@ -4134,7 +4134,7 @@ bool CSettings::OnLanguageChanged(CGUIElement* pElement)
         // Reset our item
         SString strLocale;
         CVARS_GET("locale", strLocale);
-        unsigned int uiIndex = 0;
+        std::uint32_t uiIndex = 0;
         while (uiIndex != m_pInterfaceLanguageSelector->GetItemCount())
         {
             CGUIListItem* pItem = m_pInterfaceLanguageSelector->GetItemByIndex(uiIndex);
@@ -4166,7 +4166,7 @@ bool CSettings::OnSkinChanged(CGUIElement* pElement)
     if (m_bIsModLoaded)
     {
         // Reset our item
-        unsigned int uiIndex = 0;
+        std::uint32_t uiIndex = 0;
         std::string  strItemText = m_pInterfaceSkinSelector->GetItemText(uiIndex);
         while (strItemText != currentSkin)
         {
@@ -4448,7 +4448,7 @@ bool CSettings::OnFxQualityChanged(CGUIElement* pElement)
     return true;
 }
 
-void VolumetricShadowsCallBack(void* ptr, unsigned int uiButton)
+void VolumetricShadowsCallBack(void* ptr, std::uint32_t uiButton)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
     if (uiButton == 0)
@@ -4524,7 +4524,7 @@ bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
     return true;
 }
 
-static void ShowRichPresenceShareDataCallback(void* ptr, unsigned int uiButton)
+static void ShowRichPresenceShareDataCallback(void* ptr, std::uint32_t uiButton)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
@@ -4550,7 +4550,7 @@ void CSettings::ShowRichPresenceShareDataQuestionBox() const
 //
 // CustomizedSAFiles
 //
-void CustomizedSAFilesCallBack(void* ptr, unsigned int uiButton)
+void CustomizedSAFilesCallBack(void* ptr, std::uint32_t uiButton)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
     if (uiButton == 0)
@@ -4601,7 +4601,7 @@ bool CSettings::OnWindowedClick(CGUIElement* pElement)
 //
 // OnDPIAwareClick
 //
-static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton);
+static void DPIAwareQuestionCallBack(void* userdata, std::uint32_t uiButton);
 
 bool CSettings::OnDPIAwareClick(CGUIElement* pElement)
 {
@@ -4629,7 +4629,7 @@ bool CSettings::OnDPIAwareClick(CGUIElement* pElement)
     return true;
 }
 
-static void DPIAwareQuestionCallBack(void* userdata, unsigned int uiButton)
+static void DPIAwareQuestionCallBack(void* userdata, std::uint32_t uiButton)
 {
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
 
@@ -4738,7 +4738,7 @@ bool CSettings::OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement)
     return true;
 }
 
-void NewNicknameCallback(void* ptr, unsigned int uiButton, std::string strNick)
+void NewNicknameCallback(void* ptr, std::uint32_t uiButton, std::string strNick)
 {
     if (uiButton == 1)            // We hit OK
     {
@@ -4817,9 +4817,9 @@ bool CSettings::OnHideAdvancedSettingDescription(CGUIElement* pElement)
     return true;
 }
 
-void CSettings::SetSelectedIndex(unsigned int uiIndex)
+void CSettings::SetSelectedIndex(std::uint32_t uiIndex)
 {
-    unsigned int uiTabCount = m_pTabs->GetTabCount();
+    std::uint32_t uiTabCount = m_pTabs->GetTabCount();
 
     if (uiIndex < uiTabCount)
     {
@@ -4829,11 +4829,11 @@ void CSettings::SetSelectedIndex(unsigned int uiIndex)
 
 void CSettings::TabSkip(bool bBackwards)
 {
-    unsigned int uiTabCount = m_pTabs->GetTabCount();
+    std::uint32_t uiTabCount = m_pTabs->GetTabCount();
 
     if (bBackwards)
     {
-        unsigned int uiIndex = m_pTabs->GetSelectedIndex() - 1;
+        std::uint32_t uiIndex = m_pTabs->GetSelectedIndex() - 1;
 
         if (m_pTabs->GetSelectedIndex() == 0)
         {
@@ -4844,8 +4844,8 @@ void CSettings::TabSkip(bool bBackwards)
     }
     else
     {
-        unsigned int uiIndex = m_pTabs->GetSelectedIndex() + 1;
-        unsigned int uiNewIndex = uiIndex % uiTabCount;
+        std::uint32_t uiIndex = m_pTabs->GetSelectedIndex() + 1;
+        std::uint32_t uiNewIndex = uiIndex % uiTabCount;
 
         SetSelectedIndex(uiNewIndex);
     }

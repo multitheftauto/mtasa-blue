@@ -31,7 +31,7 @@ void CBlipRPCs::DestroyAllBlips(NetBitStreamInterface& bitStream)
 void CBlipRPCs::SetBlipIcon(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the blip ID and the icon id
-    SIntegerSync<unsigned char, 6> icon;
+    SIntegerSync<std::uint8_t, 6> icon;
     if (bitStream.Read(&icon))
     {
         // Valid range?
@@ -51,7 +51,7 @@ void CBlipRPCs::SetBlipIcon(CClientEntity* pSource, NetBitStreamInterface& bitSt
 void CBlipRPCs::SetBlipSize(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the blip ID and the size
-    SIntegerSync<unsigned char, 5> size;
+    SIntegerSync<std::uint8_t, 5> size;
     if (bitStream.Read(&size))
     {
         // Grab the blip
@@ -99,7 +99,7 @@ void CBlipRPCs::SetBlipOrdering(CClientEntity* pSource, NetBitStreamInterface& b
 void CBlipRPCs::SetBlipVisibleDistance(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the blip ID and the distance
-    SIntegerSync<unsigned short, 14> visibleDistance;
+    SIntegerSync<std::uint16_t, 14> visibleDistance;
     if (bitStream.Read(&visibleDistance))
     {
         // Grab the blip

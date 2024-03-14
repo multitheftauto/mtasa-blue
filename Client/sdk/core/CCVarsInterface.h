@@ -23,14 +23,14 @@ public:
     virtual bool Get(const std::string& strVariable, bool& val) = 0;
     virtual bool Get(const std::string& strVariable, std::string& val) = 0;
     virtual bool Get(const std::string& strVariable, int& val) = 0;
-    virtual bool Get(const std::string& strVariable, unsigned int& val) = 0;
+    virtual bool Get(const std::string& strVariable, std::uint32_t& val) = 0;
     virtual bool Get(const std::string& strVariable, float& val) = 0;
 
     // Set queries
     virtual void Set(const std::string& strVariable, bool val) = 0;
     virtual void Set(const std::string& strVariable, const std::string& val) = 0;
     virtual void Set(const std::string& strVariable, int val) = 0;
-    virtual void Set(const std::string& strVariable, unsigned int val) = 0;
+    virtual void Set(const std::string& strVariable, std::uint32_t val) = 0;
     virtual void Set(const std::string& strVariable, float val) = 0;
 
     // Get without needing caller temp variable

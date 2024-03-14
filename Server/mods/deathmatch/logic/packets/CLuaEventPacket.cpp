@@ -27,7 +27,7 @@ CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments
 
 bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
 {
-    unsigned short usNameLength;
+    std::uint16_t usNameLength;
     if (BitStream.ReadCompressed(usNameLength))
     {
         if (usNameLength < (MAX_EVENT_NAME_LENGTH - 1) && BitStream.ReadStringCharacters(m_strName, usNameLength) && BitStream.Read(m_ElementID))
@@ -47,7 +47,7 @@ bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
 
 bool CLuaEventPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    BitStream.WriteCompressed(static_cast<unsigned short>(m_strName.length()));
+    BitStream.WriteCompressed(static_cast<std::uint16_t>(m_strName.length()));
     BitStream.WriteStringCharacters(m_strName);
     BitStream.Write(m_ElementID);
     m_pArguments->WriteToBitStream(BitStream);

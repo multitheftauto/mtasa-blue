@@ -803,7 +803,7 @@ namespace
         int             iRetryCount;
         int             iIdleTime;
         int             iIdleTimeLeft;
-        unsigned int    uiBytesDownloaded;
+        std::uint32_t    uiBytesDownloaded;
         EDownloadStatus downloadStatus;
         int             iDownloadResultCode;
         SString         strResumableSaveLocation;

@@ -117,12 +117,12 @@ void CWeaponSA::Remove()
     }
 }
 
-void CWeaponSA::Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed)
+void CWeaponSA::Initialize(eWeaponType type, std::uint32_t uiAmmo, CPed* pPed)
 {
     DWORD dwPedInterface = 0;
     if (pPed)
         dwPedInterface = (DWORD)pPed->GetInterface();
-    unsigned int uiType = (unsigned int)type;
+    std::uint32_t uiType = (std::uint32_t)type;
     DWORD        dwThis = (DWORD)m_pInterface;
     DWORD        dwFunc = FUNC_CWeapon_Initialize;
     _asm
@@ -218,9 +218,9 @@ void CWeaponSA::DoBulletImpact(CEntity* pFiringEntity, CEntitySAInterface* pEnti
     }
 }
 
-unsigned char CWeaponSA::GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone, int i_2)
+std::uint8_t CWeaponSA::GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone, int i_2)
 {
-    unsigned int ucReturn;
+    std::uint32_t ucReturn;
     DWORD        dwPedInterface = (DWORD)pPed->GetInterface();
     DWORD        dwResponsibleInterface = 0;
     if (pResponsible)
@@ -238,7 +238,7 @@ unsigned char CWeaponSA::GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, 
         add     esp, 24
         mov     ucReturn, eax
     }
-    return (unsigned char)ucReturn;
+    return (std::uint8_t)ucReturn;
 }
 
 bool CWeaponSA::FireBullet(CEntity* pFiringEntity, const CVector& vecOrigin, const CVector& vecTarget)

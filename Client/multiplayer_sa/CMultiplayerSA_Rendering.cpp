@@ -667,7 +667,7 @@ bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
     unsigned __int32 count = pSkinPluginData->numNodes;
     RwMatrix* pMatrixArray = pSkinPluginData->pMatrixArray;
 
-    for (unsigned int i = 0; i < count; i++)
+    for (std::uint32_t i = 0; i < count; i++)
     {
         if (!IsMatrixValid(pMatrixArray + i))
             return false;

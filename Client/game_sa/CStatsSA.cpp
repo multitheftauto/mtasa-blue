@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CStatsSA.h"
 
-float CStatsSA::GetStatValue(unsigned short usIndex)
+float CStatsSA::GetStatValue(std::uint16_t usIndex)
 {
     DWORD dwFunc = FUNC_GetStatValue;
     float fReturn = 0.0f;
@@ -28,7 +28,7 @@ float CStatsSA::GetStatValue(unsigned short usIndex)
     return fReturn;
 }
 
-void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
+void CStatsSA::ModifyStat(std::uint16_t usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_ModifyStat;
     DWORD dwStatIndex = usIndex;
@@ -42,7 +42,7 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
     }
 }
 
-void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
+void CStatsSA::SetStatValue(std::uint16_t usIndex, float fAmmount)
 {
     DWORD dwFunc = FUNC_SetStatValue;
     DWORD dwStatIndex = usIndex;
@@ -56,7 +56,7 @@ void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
     }
 }
 
-unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)
+std::uint16_t CStatsSA::GetSkillStatIndex(eWeaponType type)
 {
     int   weaponType = (int)type;
     int   iIndex;
@@ -68,5 +68,5 @@ unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)
         add     esp, 0x4
         mov     iIndex, eax
     }
-    return (unsigned short)iIndex;
+    return (std::uint16_t)iIndex;
 }

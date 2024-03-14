@@ -15,7 +15,7 @@
 std::shared_ptr<CClientIFP> CIFPEngine::LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input)
 {
     // Grab the resource root entity
-    const unsigned int u32BlockNameHash = HashString(blockName.ToLower());
+    const std::uint32_t u32BlockNameHash = HashString(blockName.ToLower());
 
     // Check whether the IFP blockname exists or not
     if (g_pClientGame->GetIFPPointerFromMap(u32BlockNameHash) == nullptr)
@@ -45,7 +45,7 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
     {
         CClientPed& Ped = static_cast<CClientPed&>(*pEntity);
 
-        const unsigned int          u32BlockNameHash = HashString(strCustomBlockName.ToLower());
+        const std::uint32_t          u32BlockNameHash = HashString(strCustomBlockName.ToLower());
         std::unique_ptr<CAnimBlock> pInternalBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strInternalBlockName);
         std::shared_ptr<CClientIFP> pCustomIFP = g_pClientGame->GetIFPPointerFromMap(u32BlockNameHash);
         if (pInternalBlock && pCustomIFP)

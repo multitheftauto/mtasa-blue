@@ -115,7 +115,7 @@ namespace SharedUtil
         return result;
     }
 
-    inline KeyPair GenerateRsaKeyPair(const unsigned int size)
+    inline KeyPair GenerateRsaKeyPair(const std::uint32_t size)
     {
         KeyPair rsaKeyPair;
 

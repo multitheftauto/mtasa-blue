@@ -13,7 +13,7 @@
 #include <cef3/cef/include/cef_parser.h>
 #include "CAjaxResourceHandler.h"
 
-CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, unsigned int uiError)
+CefRefPtr<CefResourceHandler> CWebApp::HandleError(const SString& strError, std::uint32_t uiError)
 {
     auto stream = CefStreamReader::CreateForData((void*)strError.c_str(), strError.length());
     return new CefStreamResourceHandler(uiError, strError, "text/plain", CefResponse::HeaderMap(), stream);

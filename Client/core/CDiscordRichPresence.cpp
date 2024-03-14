@@ -189,7 +189,7 @@ bool CDiscordRichPresence::SetPresenceState(const char* szState, bool bCustom)
     return true;
 }
 
-bool CDiscordRichPresence::SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl)
+bool CDiscordRichPresence::SetPresenceButtons(std::uint16_t int iIndex, const char* szName, const char* szUrl)
 {
     // Should it always return true?
     if (iIndex <= 2)

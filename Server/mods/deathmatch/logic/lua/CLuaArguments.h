@@ -52,7 +52,7 @@ public:
     void CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
 
     const CLuaArguments& operator=(const CLuaArguments& Arguments);
-    CLuaArgument*        operator[](const unsigned int uiPosition) const;
+    CLuaArgument*        operator[](const std::uint32_t uiPosition) const;
 
     void ReadArgument(lua_State* luaVM, signed int uiIndex);
     void ReadArguments(lua_State* luaVM, signed int uiIndexBegin = 1);
@@ -95,7 +95,7 @@ public:
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
-    unsigned int                               Count() const { return static_cast<unsigned int>(m_Arguments.size()); };
+    std::uint32_t                               Count() const { return static_cast<std::uint32_t>(m_Arguments.size()); };
     std::vector<CLuaArgument*>::const_iterator IterBegin() const { return m_Arguments.begin(); };
     std::vector<CLuaArgument*>::const_iterator IterEnd() const { return m_Arguments.end(); };
 

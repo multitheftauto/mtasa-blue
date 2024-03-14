@@ -155,13 +155,13 @@ void CClientWater::Unlink()
     m_pWaterManager->RemoveFromList(this);
 }
 
-void CClientWater::SetDimension(unsigned short usDimension)
+void CClientWater::SetDimension(std::uint16_t usDimension)
 {
     m_usDimension = usDimension;
     RelateDimension(m_pManager->GetWaterManager()->GetDimension());
 }
 
-void CClientWater::RelateDimension(unsigned short usWorldDimension)
+void CClientWater::RelateDimension(std::uint16_t usWorldDimension)
 {
     if (usWorldDimension == m_usDimension)
         Create();

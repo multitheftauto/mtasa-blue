@@ -61,7 +61,7 @@ class CAETwinLoopSoundEntity : CAEAudioEntity
     short           m_wPlayTimeMin;
     short           m_wPlayTimeMax;
     char            pad2[2];
-    unsigned int    m_dwTimeToSwapSounds;
+    std::uint32_t    m_dwTimeToSwapSounds;
     bool            m_bPlayingFirstSound;
     char            pad3;
     short           m_wStartingPlayPercentage[2];
@@ -100,9 +100,9 @@ public:
     float                  m_fSirenVolume;                            // +196
     bool                   m_bModelWithSiren;                         // +200
     char                   pad3[3];                                   // +201
-    unsigned int           m_dwBoatHitWaveLastPlayedTime;             // +204
-    unsigned int           m_dwTimeToInhibitAcc;                      // +208
-    unsigned int           m_dwTimeToInhibitCrz;                      // +212
+    std::uint32_t           m_dwBoatHitWaveLastPlayedTime;             // +204
+    std::uint32_t           m_dwTimeToInhibitAcc;                      // +208
+    std::uint32_t           m_dwTimeToInhibitCrz;                      // +212
     float                  m_fGeneralVehicleSoundVolume;              // +216
     short                  m_wEngineDecelerateSoundBankId;            // +220
     short                  m_wEngineAccelerateSoundBankId;            // +222
@@ -151,7 +151,7 @@ public:
     void JustGotInVehicleAsDriver();
     void JustGotOutOfVehicleAsDriver();
     void TurnOnRadioForVehicle();
-    void StopVehicleEngineSound(unsigned char ucSlot);
+    void StopVehicleEngineSound(std::uint8_t ucSlot);
 
 private:
     CAEVehicleAudioEntitySAInterface* m_pInterface;

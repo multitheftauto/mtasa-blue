@@ -42,7 +42,7 @@ void CPlayerRPCs::SetPlayerMoney(NetBitStreamInterface& bitStream)
 
 void CPlayerRPCs::ShowPlayerHudComponent(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucComponent, ucShow;
+    std::uint8_t ucComponent, ucShow;
     if (bitStream.Read(ucComponent) && bitStream.Read(ucShow))
     {
         bool bShow = (ucShow != 0);
@@ -55,7 +55,7 @@ void CPlayerRPCs::ShowPlayerHudComponent(NetBitStreamInterface& bitStream)
 
 void CPlayerRPCs::ForcePlayerMap(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucVisible;
+    std::uint8_t ucVisible;
     if (bitStream.Read(ucVisible))
     {
         bool bVisible = (ucVisible == 1);
@@ -65,7 +65,7 @@ void CPlayerRPCs::ForcePlayerMap(NetBitStreamInterface& bitStream)
 
 void CPlayerRPCs::SetPlayerNametagText(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned short usTextLength;
+    std::uint16_t usTextLength;
     if (bitStream.Read(usTextLength))
     {
         CClientPlayer* pPlayer = m_pPlayerManager->Get(pSource->GetID());
@@ -90,7 +90,7 @@ void CPlayerRPCs::SetPlayerNametagText(CClientEntity* pSource, NetBitStreamInter
 
 void CPlayerRPCs::SetPlayerNametagColor(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucR, ucG, ucB;
+    std::uint8_t ucR, ucG, ucB;
     if (bitStream.Read(ucR) && bitStream.Read(ucG) && bitStream.Read(ucB))
     {
         CClientPlayer* pPlayer = m_pPlayerManager->Get(pSource->GetID());
@@ -108,7 +108,7 @@ void CPlayerRPCs::RemovePlayerNametagColor(CClientEntity* pSource, NetBitStreamI
 
 void CPlayerRPCs::SetPlayerNametagShowing(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucShowing;
+    std::uint8_t ucShowing;
     if (bitStream.Read(ucShowing))
     {
         CClientPlayer* pPlayer = m_pPlayerManager->Get(pSource->GetID());

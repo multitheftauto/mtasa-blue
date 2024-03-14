@@ -29,7 +29,7 @@ public:
 
     void         Add(class CPickup* pPickup) { m_List.push_back(pPickup); };
     void         Clear() { m_List.clear(); };
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); };
 
 private:
     bool                        m_bShow;

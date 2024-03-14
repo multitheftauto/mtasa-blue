@@ -88,7 +88,7 @@ struct SBuildingRemoval
         m_pDataRemoveList->push_back(pInterface);
     }
 
-    unsigned short                  m_usModel;
+    std::uint16_t                  m_usModel;
     CVector                         m_vecPos;
     float                           m_fRadius;
     char                            m_cInterior;
@@ -350,17 +350,17 @@ public:
     virtual void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition) = 0;
     virtual int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance) = 0;
 
-    virtual void RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
+    virtual void RemoveBuilding(std::uint16_t usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
     virtual bool IsRemovedModelInRadius(SIPLInst* pInst) = 0;
-    virtual bool IsModelRemoved(unsigned short usModelID) = 0;
+    virtual bool IsModelRemoved(std::uint16_t usModelID) = 0;
     virtual void ClearRemovedBuildingLists(uint* pOutAmount = NULL) = 0;
-    virtual bool RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
+    virtual bool RestoreBuilding(std::uint16_t usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
     virtual SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface) = 0;
     virtual void              AddDataBuilding(CEntitySAInterface* pInterface) = 0;
     virtual void              AddBinaryBuilding(CEntitySAInterface* pInterface) = 0;
     virtual void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface) = 0;
     virtual bool              IsObjectRemoved(CEntitySAInterface* pInterface) = 0;
-    virtual bool              IsDataModelRemoved(unsigned short usModelID) = 0;
+    virtual bool              IsDataModelRemoved(std::uint16_t usModelID) = 0;
     virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
     virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
 

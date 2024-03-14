@@ -38,11 +38,11 @@ protected:
     int  GetBoolean(class CXMLNode* pParent, const char* szKey, bool& bResult);
     int  GetInteger(class CXMLNode* pParent, const char* szKey, int& iResult, int iMin = -1, int iMax = -1);
     int  GetString(class CXMLNode* pParent, const char* szKey, std::string& strValue, int iMinLength = -1, int iMaxLength = -1);
-    int  GetRGBA(class CXMLNode* pParent, const char* szKey, unsigned char& R, unsigned char& G, unsigned char& B, unsigned char& A);
+    int  GetRGBA(class CXMLNode* pParent, const char* szKey, std::uint8_t& R, std::uint8_t& G, std::uint8_t& B, std::uint8_t& A);
     void SetBoolean(class CXMLNode* pParent, const char* szKey, bool bValue);
     void SetInteger(class CXMLNode* pParent, const char* szKey, int iValue);
     void SetString(class CXMLNode* pParent, const char* szKey, const std::string& strValue);
-    void SetRGBA(class CXMLNode* pParent, const char* szKey, unsigned char R, unsigned char G, unsigned char B, unsigned char A);
+    void SetRGBA(class CXMLNode* pParent, const char* szKey, std::uint8_t R, std::uint8_t G, std::uint8_t B, std::uint8_t A);
 
     CXMLNode* GetNodeForSave(CXMLNode* pParent, const char* szKey);
 

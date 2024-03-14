@@ -25,7 +25,7 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    unsigned char  m_ucWeaponType;
+    std::uint8_t  m_ucWeaponType;
     ElementID      m_OriginID;
     CVector        m_vecOrigin;
     float          m_fForce;
@@ -34,5 +34,5 @@ public:
     CVector        m_vecTarget;
     CVector        m_vecRotation;
     CVector        m_vecMoveSpeed;
-    unsigned short m_usModel;
+    std::uint16_t m_usModel;
 };

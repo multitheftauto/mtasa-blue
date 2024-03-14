@@ -14,8 +14,8 @@
 class CKeyGen
 {
 public:
-    virtual unsigned int GetKey(const char* szString, int iLength) = 0;
-    virtual unsigned int GetKey(const char* szString) = 0;
-    virtual unsigned int GetUppercaseKey(const char* szString) = 0;
-    virtual unsigned int AppendStringToKey(unsigned int uiKey, const char* szString) = 0;
+    virtual std::uint32_t GetKey(const char* szString, int iLength) = 0;
+    virtual std::uint32_t GetKey(const char* szString) = 0;
+    virtual std::uint32_t GetUppercaseKey(const char* szString) = 0;
+    virtual std::uint32_t AppendStringToKey(std::uint32_t uiKey, const char* szString) = 0;
 };

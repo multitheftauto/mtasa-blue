@@ -137,7 +137,7 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
     jpeg_create_compress(&cinfo);
 
     size_t         memlen = 0;
-    unsigned char* membuffer = NULL;
+    std::uint8_t* membuffer = NULL;
     jpeg_mem_dest(&cinfo, &membuffer, &memlen);
 
     cinfo.image_width = uiWidth; /* image width and height, in pixels */

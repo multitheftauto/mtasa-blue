@@ -34,8 +34,8 @@ public:
 
     static CClientPointLights* Get(ElementID ID);
 
-    unsigned short GetDimension() { return m_usDimension; };
-    void           SetDimension(unsigned short usDimension);
+    std::uint16_t GetDimension() { return m_usDimension; };
+    void           SetDimension(std::uint16_t usDimension);
 
     void DoPulse();
     void RenderHeliLightHandler();
@@ -55,5 +55,5 @@ private:
     std::list<CClientPointLights*> m_List;
     std::list<CClientSearchLight*> m_SearchLightList;
     bool                           m_bDontRemoveFromList;
-    unsigned short                 m_usDimension;
+    std::uint16_t                 m_usDimension;
 };

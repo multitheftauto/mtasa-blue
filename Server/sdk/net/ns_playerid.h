@@ -32,7 +32,7 @@ class NetServerPlayerID
 {
 protected:
     unsigned long  m_uiBinaryAddress;
-    unsigned short m_usPort;
+    std::uint16_t m_usPort;
 
 public:
     NetServerPlayerID()
@@ -41,7 +41,7 @@ public:
         m_usPort = 0xFFFF;
     };
 
-    NetServerPlayerID(unsigned long uiBinaryAddress, unsigned short usPort)
+    NetServerPlayerID(unsigned long uiBinaryAddress, std::uint16_t usPort)
     {
         m_uiBinaryAddress = uiBinaryAddress;
         m_usPort = usPort;
@@ -65,5 +65,5 @@ public:
     }
 
     unsigned long  GetBinaryAddress() const { return m_uiBinaryAddress; };
-    unsigned short GetPort() const { return m_usPort; };
+    std::uint16_t GetPort() const { return m_usPort; };
 };

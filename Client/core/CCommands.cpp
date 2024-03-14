@@ -61,9 +61,9 @@ void CCommands::Add(const char* szCommand, const char* szDescription, PFNCOMMAND
     m_CommandList.push_back(pCommand);
 }
 
-unsigned int CCommands::Count()
+std::uint32_t CCommands::Count()
 {
-    return static_cast<unsigned int>(m_CommandList.size());
+    return static_cast<std::uint32_t>(m_CommandList.size());
 }
 
 bool CCommands::Exists(const char* szCommand)
@@ -143,7 +143,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     // Is it a cvar? (syntax: cvar[ = value])
     {
         // Check to see if '=' exists
-        unsigned int nOpIndex = val.find('=');
+        std::uint32_t nOpIndex = val.find('=');
         std::string  key = val.substr(0, nOpIndex);
 
         // Check to see if ' =' exists

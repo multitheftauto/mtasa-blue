@@ -1060,7 +1060,7 @@ bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_
 bool CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, cef_cursor_type_t type, const CefCursorInfo& cursorInfo)
 {
     // Find the cursor index by the cursor handle
-    unsigned char cursorIndex = static_cast<unsigned char>(type);
+    std::uint8_t cursorIndex = static_cast<std::uint8_t>(type);
 
     // Queue event to run on the main thread
     auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);

@@ -32,8 +32,8 @@ public:
 
     virtual void          SetPreRenderRequired(bool required) = 0;
     virtual bool          GetPreRenderRequired() = 0;
-    virtual void          SetAlpha(unsigned char ucAlpha) = 0;
-    virtual unsigned char GetAlpha() = 0;
+    virtual void          SetAlpha(std::uint8_t ucAlpha) = 0;
+    virtual std::uint8_t GetAlpha() = 0;
 
     virtual bool IsAGangTag() const = 0;
     virtual bool IsGlass() = 0;

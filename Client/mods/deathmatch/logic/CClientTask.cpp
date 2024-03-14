@@ -108,8 +108,8 @@ bool CClientTask::ReadElements(lua_State* luaVM, int iTableIndex, bool bClear)
     while (lua_next(luaVM, iNewTableIndex) != 0)
     {
         // Get the index and the element ID
-        unsigned int uiIndex = static_cast<unsigned int>(lua_tonumber(luaVM, -2));
-        ElementID    ID = static_cast<ElementID>(static_cast<unsigned int>(lua_tonumber(luaVM, -1)));
+        std::uint32_t uiIndex = static_cast<std::uint32_t>(lua_tonumber(luaVM, -2));
+        ElementID    ID = static_cast<ElementID>(static_cast<std::uint32_t>(lua_tonumber(luaVM, -1)));
 
         // Grab the element and check he's a player/ped
         CClientEntity* pEntity = CElementIDs::GetElement(ID);
@@ -272,7 +272,7 @@ bool CClientTask::WriteElements(lua_State* luaVM, int iTableIndex)
     }
 
     // Push the values to it.
-    unsigned int              uiIndex = 1;
+    std::uint32_t              uiIndex = 1;
     list<ElementID>::iterator iterElements = m_Elements.begin();
     while (iterElements != m_Elements.end())
     {
@@ -617,7 +617,7 @@ CTask* CClientTask::CreateTask(bool& bTaskPrimary, int& iTaskPriority)
         iTaskPriority = TASK_PRIORITY_PRIMARY;
 
         // Create the task
-        return g_pGame->GetTasks()->CreateTaskSimpleClimb(NULL, vecTarget, fHeading, static_cast<unsigned char>(fSurfaceType), static_cast<char>(fClimbStage),
+        return g_pGame->GetTasks()->CreateTaskSimpleClimb(NULL, vecTarget, fHeading, static_cast<std::uint8_t>(fSurfaceType), static_cast<char>(fClimbStage),
                                                           bForceClimb);
     }
 

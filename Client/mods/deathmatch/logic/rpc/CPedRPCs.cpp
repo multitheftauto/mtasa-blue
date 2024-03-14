@@ -41,8 +41,8 @@ void CPedRPCs::LoadFunctions()
 
 void CPedRPCs::SetPedArmor(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucArmor;
-    unsigned char ucTimeContext;
+    std::uint8_t ucArmor;
+    std::uint8_t ucTimeContext;
     if (bitStream.Read(ucArmor) && bitStream.Read(ucTimeContext))
     {
         float fArmor = static_cast<float>(ucArmor) / 1.25f;
@@ -62,7 +62,7 @@ void CPedRPCs::SetPedArmor(CClientEntity* pSource, NetBitStreamInterface& bitStr
 void CPedRPCs::SetPedRotation(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     SPedRotationSync rotation;
-    unsigned char    ucTimeContext;
+    std::uint8_t    ucTimeContext;
     if (bitStream.Read(&rotation) && bitStream.Read(ucTimeContext))
     {
         uchar ucNewWay = 0;
@@ -104,7 +104,7 @@ void CPedRPCs::RemovePedJetPack(CClientEntity* pSource, NetBitStreamInterface& b
 
 void CPedRPCs::RemovePedClothes(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucType;
+    std::uint8_t ucType;
     if (bitStream.Read(ucType))
     {
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
@@ -158,7 +158,7 @@ void CPedRPCs::SetPedChoking(CClientEntity* pSource, NetBitStreamInterface& bitS
 
 void CPedRPCs::SetPedFightingStyle(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucStyle;
+    std::uint8_t ucStyle;
     if (bitStream.Read(ucStyle))
     {
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
@@ -171,7 +171,7 @@ void CPedRPCs::SetPedFightingStyle(CClientEntity* pSource, NetBitStreamInterface
 
 void CPedRPCs::SetPedMoveAnim(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned int uiMoveAnim;
+    std::uint32_t uiMoveAnim;
     if (bitStream.ReadCompressed(uiMoveAnim))
     {
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
@@ -186,8 +186,8 @@ void CPedRPCs::WarpPedIntoVehicle(CClientEntity* pSource, NetBitStreamInterface&
 {
     // Read out the player and vehicle id
     ElementID     VehicleID;
-    unsigned char ucSeat;
-    unsigned char ucTimeContext;
+    std::uint8_t ucSeat;
+    std::uint8_t ucTimeContext;
     if (bitStream.Read(VehicleID) && bitStream.Read(ucSeat) && bitStream.Read(ucTimeContext))
     {
         // Grab the ped
@@ -209,7 +209,7 @@ void CPedRPCs::WarpPedIntoVehicle(CClientEntity* pSource, NetBitStreamInterface&
 void CPedRPCs::RemovePedFromVehicle(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the player and vehicle id
-    unsigned char ucTimeContext;
+    std::uint8_t ucTimeContext;
     if (bitStream.Read(ucTimeContext))
     {
         // Grab the ped
@@ -226,7 +226,7 @@ void CPedRPCs::SetPedDoingGangDriveby(CClientEntity* pSource, NetBitStreamInterf
 {
     // Read out the player and vehicle id
     bool          bDriveby;
-    unsigned char ucTimeContext;
+    std::uint8_t ucTimeContext;
     if (bitStream.ReadBit(bDriveby) && bitStream.Read(ucTimeContext))
     {
         // Grab the ped
@@ -244,7 +244,7 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
 {
     std::string blockName;
 
-    if (bitStream.ReadString<unsigned char>(blockName))
+    if (bitStream.ReadString<std::uint8_t>(blockName))
     {
         // Grab the ped
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
@@ -257,7 +257,7 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                 int         iBlend = 250;
                 bool        bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd;
 
-                if (bitStream.ReadString<unsigned char>(animName) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
+                if (bitStream.ReadString<std::uint8_t>(animName) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
                     bitStream.ReadBit(bInterruptable) && bitStream.ReadBit(bFreezeLastFrame))
                 {
                     if (bitStream.Can(eBitStreamVersion::SetPedAnimation_Blend))
@@ -293,7 +293,7 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
     std::string animName;
     float       fProgress;
 
-    if (bitStream.ReadString<unsigned char>(animName))
+    if (bitStream.ReadString<std::uint8_t>(animName))
     {
         // Grab the ped
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
@@ -323,7 +323,7 @@ void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterfac
     std::string animName;
     float       fSpeed;
 
-    if (bitStream.ReadString<unsigned char>(animName))
+    if (bitStream.ReadString<std::uint8_t>(animName))
     {
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
         if (pPed && !animName.empty())

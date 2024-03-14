@@ -71,10 +71,10 @@ struct SSirenInfo
     bool m_bSirenSilent{false};
     // End of flags
     bool                             m_bOverrideSirens{false};
-    unsigned char                    m_ucSirenType;
-    unsigned char                    m_ucSirenCount;
-    unsigned char                    m_ucCurrentSirenID;
-    unsigned char                    m_ucCurrentSirenRandomiser;
+    std::uint8_t                    m_ucSirenType;
+    std::uint8_t                    m_ucSirenCount;
+    std::uint8_t                    m_ucCurrentSirenID;
+    std::uint8_t                    m_ucCurrentSirenRandomiser;
     SFixedArray<SSirenBeaconInfo, 8> m_tSirenInfo;
     SharedUtil::SColor               m_tPointLightColour;
 };
@@ -96,7 +96,7 @@ public:
     virtual bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
 
     virtual CPed* GetDriver() = 0;
-    virtual CPed* GetPassenger(unsigned char ucSlot) = 0;
+    virtual CPed* GetPassenger(std::uint8_t ucSlot) = 0;
     virtual bool  IsBeingDriven() = 0;
 
     virtual CVehicle* GetNextTrainCarriage() = 0;
@@ -126,8 +126,8 @@ public:
     virtual void RemoveVehicleUpgrade(DWORD dwModelID) = 0;
     virtual bool DoesSupportUpgrade(const SString& strFrameName) = 0;
 
-    virtual CDoor* GetDoor(unsigned char ucDoor) = 0;
-    virtual void   OpenDoor(unsigned char ucDoor, float fRatio, bool bMakeNoise = false) = 0;
+    virtual CDoor* GetDoor(std::uint8_t ucDoor) = 0;
+    virtual void   OpenDoor(std::uint8_t ucDoor, float fRatio, bool bMakeNoise = false) = 0;
     virtual void   SetSwingingDoorsAllowed(bool bAllowed) = 0;
     virtual bool   AreSwingingDoorsAllowed() const = 0;
     virtual bool   AreDoorsLocked() = 0;
@@ -140,7 +140,7 @@ public:
     virtual void  SetBodyDirtLevel(float fDirtLevel) = 0;
     virtual float GetBodyDirtLevel() = 0;
 
-    virtual unsigned char GetCurrentGear() = 0;
+    virtual std::uint8_t GetCurrentGear() = 0;
     virtual float         GetGasPedal() = 0;
     virtual bool          GetTowBarPos(CVector* pVector, CVehicle* pTrailer) = 0;
     virtual bool          GetTowHitchPos(CVector* pVector) = 0;
@@ -157,8 +157,8 @@ public:
     virtual void          Fix() = 0;
     virtual bool          IsSirenOrAlarmActive() = 0;
     virtual void          SetSirenOrAlarmActive(bool bActive) = 0;
-    virtual void          SetAlpha(unsigned char ucAlpha) = 0;
-    virtual unsigned char GetAlpha() = 0;
+    virtual void          SetAlpha(std::uint8_t ucAlpha) = 0;
+    virtual std::uint8_t GetAlpha() = 0;
 
     virtual void BlowUp(CEntity* pCreator, unsigned long ulUnknown) = 0;
 
@@ -194,10 +194,10 @@ public:
     virtual bool           GetComedyControls() = 0;
     virtual bool           GetGunSwitchedOff() = 0;
     virtual bool           GetLightsOn() = 0;
-    virtual unsigned int   GetOverrideLights() = 0;
+    virtual std::uint32_t   GetOverrideLights() = 0;
     virtual bool           GetTakeLessDamage() = 0;
     virtual bool           GetTyresDontBurst() = 0;
-    virtual unsigned short GetAdjustablePropertyValue() = 0;
+    virtual std::uint16_t GetAdjustablePropertyValue() = 0;
     virtual float          GetHeliRotorSpeed() = 0;
     virtual float          GetPlaneRotorSpeed() = 0;
     virtual unsigned long  GetExplodeTime() = 0;
@@ -215,10 +215,10 @@ public:
     virtual void SetGunSwitchedOff(bool bGunsOff) = 0;
     virtual void SetHandbrakeOn(bool bHandbrakeOn) = 0;
     virtual void SetLightsOn(bool bLightsOn) = 0;
-    virtual void SetOverrideLights(unsigned int uiOverrideLights) = 0;
+    virtual void SetOverrideLights(std::uint32_t uiOverrideLights) = 0;
     virtual void SetTakeLessDamage(bool bTakeLessDamage) = 0;
     virtual void SetTyresDontBurst(bool bTyresDontBurst) = 0;
-    virtual void SetAdjustablePropertyValue(unsigned short usAdjustableProperty) = 0;
+    virtual void SetAdjustablePropertyValue(std::uint16_t usAdjustableProperty) = 0;
     virtual void SetHeliRotorSpeed(float fSpeed) = 0;
     virtual void SetPlaneRotorSpeed(float fSpeed) = 0;
     virtual void SetTaxiLightOn(bool bLightState) = 0;
@@ -263,7 +263,7 @@ public:
     virtual SColor GetHeadLightColor() = 0;
     virtual void   SetHeadLightColor(const SColor color) = 0;
 
-    virtual CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2) = 0;
+    virtual CObject* SpawnFlyingComponent(int i_1, std::uint32_t ui_2) = 0;
     virtual void     SetWheelVisibility(eWheelPosition wheel, bool bVisible) = 0;
     virtual CVector  GetWheelPosition(eWheelPosition wheel) = 0;
 
@@ -280,19 +280,19 @@ public:
     virtual bool DoesVehicleHaveSirens() = 0;
 
     virtual void                              RemoveVehicleSirens() = 0;
-    virtual void                              GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount) = 0;
-    virtual void                              SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage) = 0;
-    virtual void                              SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos) = 0;
-    virtual void                              GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos) = 0;
-    virtual unsigned char                     GetVehicleSirenCount() = 0;
-    virtual unsigned char                     GetVehicleSirenType() = 0;
-    virtual DWORD                             GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) = 0;
-    virtual SharedUtil::SColor                GetVehicleSirenColour(unsigned char ucSirenCount) = 0;
-    virtual void                              SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour) = 0;
-    virtual void                              SetVehicleCurrentSirenID(unsigned char ucCurrentSirenID) = 0;
-    virtual unsigned char                     GetVehicleCurrentSirenID() = 0;
-    virtual unsigned char                     GetSirenRandomiser() = 0;
-    virtual void                              SetSirenRandomiser(unsigned char ucSirenRandomiser) = 0;
+    virtual void                              GiveVehicleSirens(std::uint8_t ucSirenType, std::uint8_t ucSirenCount) = 0;
+    virtual void                              SetVehicleSirenMinimumAlpha(std::uint8_t ucSirenID, DWORD dwPercentage) = 0;
+    virtual void                              SetVehicleSirenPosition(std::uint8_t ucSirenID, CVector vecPos) = 0;
+    virtual void                              GetVehicleSirenPosition(std::uint8_t ucSirenID, CVector& vecPos) = 0;
+    virtual std::uint8_t                     GetVehicleSirenCount() = 0;
+    virtual std::uint8_t                     GetVehicleSirenType() = 0;
+    virtual DWORD                             GetVehicleSirenMinimumAlpha(std::uint8_t ucSirenID) = 0;
+    virtual SharedUtil::SColor                GetVehicleSirenColour(std::uint8_t ucSirenCount) = 0;
+    virtual void                              SetVehicleSirenColour(std::uint8_t ucSirenID, SharedUtil::SColor tVehicleSirenColour) = 0;
+    virtual void                              SetVehicleCurrentSirenID(std::uint8_t ucCurrentSirenID) = 0;
+    virtual std::uint8_t                     GetVehicleCurrentSirenID() = 0;
+    virtual std::uint8_t                     GetSirenRandomiser() = 0;
+    virtual void                              SetSirenRandomiser(std::uint8_t ucSirenRandomiser) = 0;
     virtual void                              SetPointLightColour(SharedUtil::SColor tPointLightColour) = 0;
     virtual SharedUtil::SColor                GetPointLightColour() = 0;
     virtual bool                              IsSiren360EffectEnabled() = 0;
@@ -315,7 +315,7 @@ public:
     virtual std::map<SString, SVehicleFrame>& GetComponentMap() = 0;
     virtual void                              UpdateLandingGearPosition() = 0;
     virtual bool                              SetPlateText(const SString& strText) = 0;
-    virtual bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState) = 0;
+    virtual bool                              SetWindowOpenFlagState(std::uint8_t ucWindow, bool bState) = 0;
     virtual float                             GetWheelScale() = 0;
     virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;

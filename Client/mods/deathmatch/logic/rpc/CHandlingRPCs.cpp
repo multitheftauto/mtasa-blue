@@ -82,7 +82,7 @@ void CHandlingRPCs::SetVehicleHandling(CClientEntity* pSource, NetBitStreamInter
 void CHandlingRPCs::SetVehicleHandlingProperty(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the property id
-    unsigned char ucProperty;
+    std::uint8_t ucProperty;
     if (bitStream.Read(ucProperty))
     {
         // Check its type
@@ -100,8 +100,8 @@ void CHandlingRPCs::SetVehicleHandlingProperty(CClientEntity* pSource, NetBitStr
             // Temporary storage for reading out data
             union
             {
-                unsigned char ucChar;
-                unsigned int  uiInt;
+                std::uint8_t ucChar;
+                std::uint32_t  uiInt;
                 float         fFloat;
             };
 
@@ -354,7 +354,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty(CClientEntity* pSource, NetBitStr
 void CHandlingRPCs::RestoreVehicleHandlingProperty(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the property id
-    unsigned char ucProperty;
+    std::uint8_t ucProperty;
     if (bitStream.Read(ucProperty))
     {
         // Check its type

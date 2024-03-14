@@ -94,9 +94,9 @@ int CLuaTeamDefs::SetPlayerTeam(lua_State* luaVM)
 int CLuaTeamDefs::CreateTeam(lua_State* luaVM)
 {
     SString       strName;
-    unsigned char ucRed;
-    unsigned char ucGreen;
-    unsigned char ucBlue;
+    std::uint8_t ucRed;
+    std::uint8_t ucGreen;
+    std::uint8_t ucBlue;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strName);
@@ -209,7 +209,7 @@ int CLuaTeamDefs::GetTeamColor(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucRed, ucGreen, ucBlue;
+        std::uint8_t ucRed, ucGreen, ucBlue;
         if (CStaticFunctionDefinitions::GetTeamColor(pTeam, ucRed, ucGreen, ucBlue))
         {
             lua_pushnumber(luaVM, ucRed);
@@ -257,7 +257,7 @@ int CLuaTeamDefs::CountPlayersInTeam(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiCount;
+        std::uint32_t uiCount;
         if (CStaticFunctionDefinitions::CountPlayersInTeam(pTeam, uiCount))
         {
             lua_pushnumber(luaVM, uiCount);
@@ -298,9 +298,9 @@ int CLuaTeamDefs::SetTeamName(lua_State* luaVM)
 int CLuaTeamDefs::SetTeamColor(lua_State* luaVM)
 {
     CTeam*        pElement;
-    unsigned char ucRed;
-    unsigned char ucGreen;
-    unsigned char ucBlue;
+    std::uint8_t ucRed;
+    std::uint8_t ucGreen;
+    std::uint8_t ucBlue;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

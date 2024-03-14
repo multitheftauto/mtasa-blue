@@ -1100,7 +1100,7 @@ SString CClientIFP::GetCorrectBoneNameFromName(const SString& strBoneName)
 
 CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString& strAnimationName)
 {
-    const unsigned int uiAnimationNameHash = HashString(strAnimationName.ToLower());
+    const std::uint32_t uiAnimationNameHash = HashString(strAnimationName.ToLower());
     auto               it = std::find_if(m_pVecAnimations->begin(), m_pVecAnimations->end(),
                            [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
     if (it != m_pVecAnimations->end())

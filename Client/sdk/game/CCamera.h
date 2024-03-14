@@ -131,7 +131,7 @@ public:
     virtual bool      IsFading() = 0;
     virtual int       GetFadingDirection() = 0;
     virtual void      Fade(float fFadeOutTime, int iOutOrIn) = 0;
-    virtual void      SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue) = 0;
+    virtual void      SetFadeColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue) = 0;
     virtual float     GetCameraRotation() = 0;
     virtual RwMatrix* GetLTM() = 0;
     virtual CEntity*  GetTargetEntity() = 0;

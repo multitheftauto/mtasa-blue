@@ -62,7 +62,7 @@ void CVehicleRPCs::DestroyAllVehicles(NetBitStreamInterface& bitStream)
 void CVehicleRPCs::FixVehicle(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the vehicle id
-    unsigned char ucTimeContext;
+    std::uint8_t ucTimeContext;
     if (bitStream.Read(ucTimeContext))
     {
         // Grab the vehicle
@@ -78,7 +78,7 @@ void CVehicleRPCs::FixVehicle(CClientEntity* pSource, NetBitStreamInterface& bit
 
 void CVehicleRPCs::BlowVehicle(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char syncTimeContext;
+    std::uint8_t syncTimeContext;
     bool          withExplosion = true;
 
     if (bitStream.Read(syncTimeContext))
@@ -109,7 +109,7 @@ void CVehicleRPCs::SetVehicleRotation(CClientEntity* pSource, NetBitStreamInterf
     {
         // Read out the rotation
         CVector       vecRotation;
-        unsigned char ucTimeContext;
+        std::uint8_t ucTimeContext;
         if (bitStream.Read(vecRotation.fX) && bitStream.Read(vecRotation.fY) && bitStream.Read(vecRotation.fZ) && bitStream.Read(ucTimeContext))
         {
             // Set the new rotation
@@ -159,7 +159,7 @@ void CVehicleRPCs::SetVehicleColor(CClientEntity* pSource, NetBitStreamInterface
 void CVehicleRPCs::SetVehicleLocked(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the stuff
-    unsigned char ucLocked;
+    std::uint8_t ucLocked;
     if (bitStream.Read(ucLocked))
     {
         // Grab the vehicle
@@ -175,7 +175,7 @@ void CVehicleRPCs::SetVehicleLocked(CClientEntity* pSource, NetBitStreamInterfac
 void CVehicleRPCs::SetVehicleDoorsUndamageable(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the stuff
-    unsigned char ucDoorsUndamageable;
+    std::uint8_t ucDoorsUndamageable;
     if (bitStream.Read(ucDoorsUndamageable))
     {
         // Grab the vehicle
@@ -193,7 +193,7 @@ void CVehicleRPCs::SetVehicleSireneOn(CClientEntity* pSource, NetBitStreamInterf
     CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
     if (pVehicle)
     {
-        unsigned char ucSirenesOn;
+        std::uint8_t ucSirenesOn;
         if (bitStream.Read(ucSirenesOn))
         {
             bool bSirenesOn = false;
@@ -207,7 +207,7 @@ void CVehicleRPCs::SetVehicleSireneOn(CClientEntity* pSource, NetBitStreamInterf
 
 void CVehicleRPCs::SetVehicleTaxiLightOn(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucTaxiLightOn;
+    std::uint8_t ucTaxiLightOn;
     if (bitStream.Read(ucTaxiLightOn))
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
@@ -223,7 +223,7 @@ void CVehicleRPCs::SetVehicleLandingGearDown(CClientEntity* pSource, NetBitStrea
     CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
     if (pVehicle)
     {
-        unsigned char ucLandingGearDown;
+        std::uint8_t ucLandingGearDown;
         if (bitStream.Read(ucLandingGearDown))
         {
             bool bLandingGearDown = false;
@@ -240,7 +240,7 @@ void CVehicleRPCs::SetHelicopterRotorSpeed(CClientEntity* pSource, NetBitStreamI
     CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
     if (pVehicle)
     {
-        unsigned char ucRotorSpeed;
+        std::uint8_t ucRotorSpeed;
         if (bitStream.Read(ucRotorSpeed))
         {
             // Convert the given rotor speed from between 0-100 to 0-0.22
@@ -255,7 +255,7 @@ void CVehicleRPCs::AddVehicleUpgrade(CClientEntity* pSource, NetBitStreamInterfa
     CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
     if (pVehicle)
     {
-        unsigned short usUpgrade;
+        std::uint16_t usUpgrade;
         if (bitStream.Read(usUpgrade))
         {
             CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
@@ -285,11 +285,11 @@ void CVehicleRPCs::RemoveVehicleUpgrade(CClientEntity* pSource, NetBitStreamInte
     CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
     if (pVehicle)
     {
-        unsigned char ucUpgrade;
+        std::uint8_t ucUpgrade;
         if (bitStream.Read(ucUpgrade))
         {
             // Convert back and add
-            unsigned short usUpgrade = (ucUpgrade + 1000);
+            std::uint16_t usUpgrade = (ucUpgrade + 1000);
 
             CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
             if (pUpgrades)
@@ -305,14 +305,14 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
     CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
     if (pVehicle)
     {
-        unsigned char ucObject;
+        std::uint8_t ucObject;
         if (bitStream.Read(ucObject))
         {
             switch (ucObject)
             {
                 case 0:            // Door
                 {
-                    unsigned char ucDoor, ucState;
+                    std::uint8_t ucDoor, ucState;
                     if (bitStream.Read(ucDoor) && bitStream.Read(ucState))
                     {
                         bool spawnFlyingComponent = true;
@@ -329,7 +329,7 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                 }
                 case 1:            // Wheel
                 {
-                    unsigned char ucWheel, ucState;
+                    std::uint8_t ucWheel, ucState;
                     if (bitStream.Read(ucWheel) && bitStream.Read(ucState))
                     {
                         pVehicle->SetWheelStatus(ucWheel, ucState, false);
@@ -338,7 +338,7 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                 }
                 case 2:            // Light
                 {
-                    unsigned char ucLight, ucState;
+                    std::uint8_t ucLight, ucState;
                     if (bitStream.Read(ucLight) && bitStream.Read(ucState))
                     {
                         pVehicle->SetLightStatus(ucLight, ucState);
@@ -347,7 +347,7 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                 }
                 case 3:            // Panel
                 {
-                    unsigned char ucPanel, ucState;
+                    std::uint8_t ucPanel, ucState;
                     if (bitStream.Read(ucPanel) && bitStream.Read(ucState))
                     {
                         pVehicle->SetPanelStatus(ucPanel, ucState);
@@ -362,7 +362,7 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
 
 void CVehicleRPCs::SetVehicleOverrideLights(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucLights;
+    std::uint8_t ucLights;
     if (bitStream.Read(ucLights))
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
@@ -401,7 +401,7 @@ void CVehicleRPCs::SetVehicleDirtLevel(CClientEntity* pSource, NetBitStreamInter
 
 void CVehicleRPCs::SetVehicleDamageProof(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucDamageProof;
+    std::uint8_t ucDamageProof;
     if (bitStream.Read(ucDamageProof))
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
@@ -414,7 +414,7 @@ void CVehicleRPCs::SetVehicleDamageProof(CClientEntity* pSource, NetBitStreamInt
 
 void CVehicleRPCs::SetVehiclePaintjob(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucPaintjob;
+    std::uint8_t ucPaintjob;
     if (bitStream.Read(ucPaintjob))
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
@@ -440,7 +440,7 @@ void CVehicleRPCs::SetVehicleFuelTankExplodable(CClientEntity* pSource, NetBitSt
 
 void CVehicleRPCs::SetVehicleWheelStates(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucWheelStates[MAX_WHEELS];
+    std::uint8_t ucWheelStates[MAX_WHEELS];
     if (bitStream.Read((char*)ucWheelStates, MAX_WHEELS))
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
@@ -574,9 +574,9 @@ void CVehicleRPCs::SetVehicleTurretPosition(CClientEntity* pSource, NetBitStream
 
 void CVehicleRPCs::SetVehicleDoorOpenRatio(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    SIntegerSync<unsigned char, 3> ucDoor;
+    SIntegerSync<std::uint8_t, 3> ucDoor;
     SDoorOpenRatioSync             angle;
-    unsigned int                   uiTime;
+    std::uint32_t                   uiTime;
 
     if (bitStream.Read(&ucDoor) && bitStream.Read(&angle) && bitStream.ReadCompressed(uiTime))
     {
@@ -590,8 +590,8 @@ void CVehicleRPCs::SetVehicleDoorOpenRatio(CClientEntity* pSource, NetBitStreamI
 
 void CVehicleRPCs::SetVehicleVariant(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucVariant = 0;
-    unsigned char ucVariant2 = 0;
+    std::uint8_t ucVariant = 0;
+    std::uint8_t ucVariant2 = 0;
     if (bitStream.Read(ucVariant) && bitStream.Read(ucVariant2))
     {
         CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());

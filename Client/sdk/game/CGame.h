@@ -177,8 +177,8 @@ public:
     virtual unsigned long GetMinuteDuration() = 0;
     virtual void          SetMinuteDuration(unsigned long ulDelay) = 0;
 
-    virtual unsigned char GetBlurLevel() = 0;
-    virtual void          SetBlurLevel(unsigned char ucLevel) = 0;
+    virtual std::uint8_t GetBlurLevel() = 0;
+    virtual void          SetBlurLevel(std::uint8_t ucLevel) = 0;
 
     virtual void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     virtual bool GetJetpackWeaponEnabled(eWeaponType weaponType);
@@ -244,7 +244,7 @@ public:
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
 
-    virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
+    virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(std::uint8_t ucObjectGroup) = 0;
 
     virtual int32_t GetBaseIDforDFF() = 0;
     virtual int32_t GetBaseIDforTXD() = 0;

@@ -551,7 +551,7 @@ int CLuaEngineDefs::EngineLoadIFP(lua_State* luaVM)
 int CLuaEngineDefs::EngineReplaceCOL(lua_State* luaVM)
 {
     CClientColModel* pCol = NULL;
-    unsigned short   usModel = 0;
+    std::uint16_t   usModel = 0;
     CScriptArgReader argStream(luaVM);
     // Grab the COL and model ID
     argStream.ReadUserData(pCol);
@@ -588,7 +588,7 @@ int CLuaEngineDefs::EngineRestoreCOL(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModelID = CModelNames::ResolveModelID(strModelName);
+        std::uint16_t usModelID = CModelNames::ResolveModelID(strModelName);
 
         if (m_pColModelManager->RestoreModel(usModelID))
         {
@@ -821,7 +821,7 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 {
     // Grab the model ID
-    unsigned short usModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
+    std::uint16_t usModelID = CModelNames::ResolveModelID(lua_tostring(luaVM, 1));
 
     // Valid client DFF and model?
     if (CClientDFFManager::IsReplacableModel(usModelID))
@@ -1084,7 +1084,7 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
     if (argStream.HasErrors())
         return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
-    unsigned short usModelID = CModelNames::ResolveModelID(strModel);
+    std::uint16_t usModelID = CModelNames::ResolveModelID(strModel);
     CModelInfo*    pModelInfo = g_pGame->GetModelInfo(usModelID);
     if (pModelInfo)
     {
@@ -1130,7 +1130,7 @@ int CLuaEngineDefs::EngineReplaceMatchingAtomics(lua_State* luaVM)
     CClientEntity* pEntity = ( lua_istype ( 2, LUA_TLIGHTUSERDATA ) ? reinterpret_cast < CClientEntity* > ( lua_touserdata ( luaVM, 2 ) ) : NULL );
     RpAtomicContainer Atomics[MAX_ATOMICS_PER_CLUMP];
     RpClump * pEntityClump = NULL;
-    unsigned int uiAtomics = 0;
+    std::uint32_t uiAtomics = 0;
 
     if ( pEntity ) {
     if ( IS_VEHICLE ( pEntity ) )
@@ -1168,7 +1168,7 @@ int CLuaEngineDefs::EngineReplaceWheelAtomics(lua_State* luaVM)
 
     RpAtomicContainer Atomics[MAX_ATOMICS_PER_CLUMP];
     RpClump * pEntityClump = NULL;
-    unsigned int uiAtomics = 0;
+    std::uint32_t uiAtomics = 0;
 
     if ( pEntity ) {
     if ( IS_VEHICLE ( pEntity ) )
@@ -1293,7 +1293,7 @@ uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
     return pModelInfo->GetTextureDictionaryID();
 }
 
-bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
+bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, std::uint16_t usTxdId)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
 
@@ -1957,7 +1957,7 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
     int          iModelID;
-    unsigned int iNewGroup;
+    std::uint32_t iNewGroup;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(iModelID);

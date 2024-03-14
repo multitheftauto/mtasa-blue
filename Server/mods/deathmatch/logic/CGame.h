@@ -198,7 +198,7 @@ public:
     bool Start(int iArgumentCount, char* szArguments[]);
     void Stop();
 
-    static bool StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
+    static bool StaticProcessPacket(std::uint8_t ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
     bool        ProcessPacket(CPacket& Packet);
 
     void SetIsFinished(bool bFinished) { m_bIsFinished = bFinished; };
@@ -265,8 +265,8 @@ public:
     float GetGravity() { return m_fGravity; }
     void  SetGravity(float fGravity) { m_fGravity = fGravity; }
 
-    unsigned char GetTrafficLightState() { return m_ucTrafficLightState; }
-    void          SetTrafficLightState(unsigned char ucState) { m_ucTrafficLightState = ucState; }
+    std::uint8_t GetTrafficLightState() { return m_ucTrafficLightState; }
+    void          SetTrafficLightState(std::uint8_t ucState) { m_ucTrafficLightState = ucState; }
 
     bool GetTrafficLightsLocked() { return m_bTrafficLightsLocked; }
     void SetTrafficLightsLocked(bool bLocked) { m_bTrafficLightsLocked = bLocked; }
@@ -280,7 +280,7 @@ public:
     bool HasSkyGradient() { return m_bHasSkyGradient; }
     void SetHasSkyGradient(bool bHasSkyGradient) { m_bHasSkyGradient = bHasSkyGradient; }
 
-    void GetSkyGradient(unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB)
+    void GetSkyGradient(std::uint8_t& ucTR, std::uint8_t& ucTG, std::uint8_t& ucTB, std::uint8_t& ucBR, std::uint8_t& ucBG, std::uint8_t& ucBB)
     {
         ucTR = m_ucSkyGradientTR;
         ucTG = m_ucSkyGradientTG;
@@ -289,7 +289,7 @@ public:
         ucBG = m_ucSkyGradientBG;
         ucBB = m_ucSkyGradientBB;
     }
-    void SetSkyGradient(unsigned char& ucTR, unsigned char& ucTG, unsigned char& ucTB, unsigned char& ucBR, unsigned char& ucBG, unsigned char& ucBB)
+    void SetSkyGradient(std::uint8_t& ucTR, std::uint8_t& ucTG, std::uint8_t& ucTB, std::uint8_t& ucBR, std::uint8_t& ucBG, std::uint8_t& ucBB)
     {
         m_ucSkyGradientTR = ucTR;
         m_ucSkyGradientTG = ucTG;
@@ -311,14 +311,14 @@ public:
     bool HasWaterColor() { return m_bOverrideWaterColor; }
     void SetHasWaterColor(bool bOverrideWaterColor) { m_bOverrideWaterColor = bOverrideWaterColor; }
 
-    void GetWaterColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
+    void GetWaterColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha)
     {
         ucRed = m_ucWaterRed;
         ucGreen = m_ucWaterGreen;
         ucBlue = m_ucWaterBlue;
         ucAlpha = m_ucWaterAlpha;
     }
-    void SetWaterColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
+    void SetWaterColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha)
     {
         m_ucWaterRed = ucRed;
         m_ucWaterGreen = ucGreen;
@@ -341,8 +341,8 @@ public:
     bool HasSunColor() { return m_bOverrideSunColor; }
     void SetHasSunColor(bool bOverrideSunColor) { m_bOverrideSunColor = bOverrideSunColor; }
 
-    void GetSunColor(unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG,
-                     unsigned char& ucCoronaB)
+    void GetSunColor(std::uint8_t& ucCoreR, std::uint8_t& ucCoreG, std::uint8_t& ucCoreB, std::uint8_t& ucCoronaR, std::uint8_t& ucCoronaG,
+                     std::uint8_t& ucCoronaB)
     {
         ucCoreR = m_ucSunCoreR;
         ucCoreG = m_ucSunCoreG;
@@ -351,8 +351,8 @@ public:
         ucCoronaG = m_ucSunCoronaG;
         ucCoronaB = m_ucSunCoronaB;
     }
-    void SetSunColor(unsigned char& ucCoreR, unsigned char& ucCoreG, unsigned char& ucCoreB, unsigned char& ucCoronaR, unsigned char& ucCoronaG,
-                     unsigned char& ucCoronaB)
+    void SetSunColor(std::uint8_t& ucCoreR, std::uint8_t& ucCoreG, std::uint8_t& ucCoreB, std::uint8_t& ucCoronaR, std::uint8_t& ucCoronaG,
+                     std::uint8_t& ucCoronaB)
     {
         m_ucSunCoreR = ucCoreR;
         m_ucSunCoreG = ucCoreG;
@@ -444,8 +444,8 @@ public:
     void HandleBackup();
     void HandleCrashDumpEncryption();
     void EnableLatentSends(bool bEnabled, int iBandwidth = 0, CLuaMain* pLuaMain = NULL, ushort usResourceNetId = 0xFFFF);
-    void SendPacketBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream);
-    bool SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
+    void SendPacketBatchBegin(std::uint8_t ucPacketId, NetBitStreamInterface* pBitStream);
+    bool SendPacket(std::uint8_t ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
                     NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability,
                     ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT);
     void SendPacketBatchEnd();
@@ -585,19 +585,19 @@ private:
     bool  m_bOcclusionsEnabled;
     bool  m_bUsingMtaServerConf;
 
-    unsigned char m_ucTrafficLightState;
+    std::uint8_t m_ucTrafficLightState;
     bool          m_bTrafficLightsLocked;
     long long     m_llLastTrafficUpdate;
 
-    unsigned char m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
-    unsigned char m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
+    std::uint8_t m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
+    std::uint8_t m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
     bool          m_bHasSkyGradient;
 
     SHeatHazeSettings m_HeatHazeSettings;
     bool              m_bHasHeatHaze;
 
     bool          m_bOverrideWaterColor;
-    unsigned char m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
+    std::uint8_t m_ucWaterRed, m_ucWaterGreen, m_ucWaterBlue, m_ucWaterAlpha;
 
     bool m_bInteriorSoundsEnabled;
 
@@ -611,7 +611,7 @@ private:
     int  m_iMoonSize;
 
     bool          m_bOverrideSunColor;
-    unsigned char m_ucSunCoreR, m_ucSunCoreG, m_ucSunCoreB, m_ucSunCoronaR, m_ucSunCoronaG, m_ucSunCoronaB;
+    std::uint8_t m_ucSunCoreR, m_ucSunCoreG, m_ucSunCoreB, m_ucSunCoronaR, m_ucSunCoronaG, m_ucSunCoronaB;
 
     bool  m_bOverrideWindVelocity;
     float m_fWindVelX, m_fWindVelY, m_fWindVelZ;
@@ -626,8 +626,8 @@ private:
 
     // FPS statistics
     long long                                     m_llLastFPSTime;
-    unsigned short                                m_usFrames;
-    unsigned short                                m_usFPS;
+    std::uint16_t                                m_usFrames;
+    std::uint16_t                                m_usFPS;
     int                                           m_iSyncFPS;
     std::map<std::string, eGlitchType>            m_GlitchNames;
     SFixedArray<bool, NUM_GLITCHES>               m_Glitches;

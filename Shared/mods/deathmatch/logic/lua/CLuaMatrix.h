@@ -19,10 +19,10 @@ public:
 
     ~CLuaMatrix();
 
-    unsigned int GetScriptID() const { return m_uiScriptID; }
+    std::uint32_t GetScriptID() const { return m_uiScriptID; }
 
-    static CLuaMatrix* GetFromScriptID(unsigned int uiScriptID);
+    static CLuaMatrix* GetFromScriptID(std::uint32_t uiScriptID);
 
 private:
-    unsigned int m_uiScriptID;
+    std::uint32_t m_uiScriptID;
 };

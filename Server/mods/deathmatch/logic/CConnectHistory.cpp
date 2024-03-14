@@ -79,7 +79,7 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem(const std::string& strIP)
     if ( !historyItem.joinTimes.empty () )
     {
         SString strInfo ( "IP:%s  ", strIP.c_str () );
-        for ( unsigned int i = 0 ; i < historyItem.joinTimes.size () ; i++ )
+        for ( std::uint32_t i = 0 ; i < historyItem.joinTimes.size () ; i++ )
         {
             strInfo += SString ( "%u  ", GetModuleTickCount64 () - historyItem.joinTimes[i] );
         }
@@ -180,7 +180,7 @@ SString CConnectHistory::DebugDump(long long llTickCountAdd)
         if (!historyItem.joinTimes.empty())
         {
             SString strInfo("IP:%s  ", strIP.c_str());
-            for (unsigned int i = 0; i < historyItem.joinTimes.size(); i++)
+            for (std::uint32_t i = 0; i < historyItem.joinTimes.size(); i++)
             {
                 long long llTime = historyItem.joinTimes[i];
                 long long llAge = llCurrentTime - historyItem.joinTimes[i];

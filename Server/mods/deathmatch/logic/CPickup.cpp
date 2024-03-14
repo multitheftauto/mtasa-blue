@@ -86,7 +86,7 @@ void CPickup::Unlink()
 
 bool CPickup::ReadSpecialData(const int iLine)
 {
-    unsigned short usBuffer = 0;
+    std::uint16_t usBuffer = 0;
     // Grab the "posX" data
     if (!GetCustomDataFloat("posX", m_vecPosition.fX, true))
     {
@@ -167,7 +167,7 @@ bool CPickup::ReadSpecialData(const int iLine)
     if (m_ucType == CPickup::WEAPON || m_bIsTypeRandom)
     {
         // Remember the weapon type
-        m_ucWeaponType = static_cast<unsigned char>(usBuffer);
+        m_ucWeaponType = static_cast<std::uint8_t>(usBuffer);
         m_usModel = CPickupManager::GetWeaponModel(m_ucWeaponType);
         m_bIsWeaponTypeRandom = false;
     }
@@ -213,7 +213,7 @@ bool CPickup::ReadSpecialData(const int iLine)
                 iTemp = 0;
 
             // Remember it
-            m_usAmmo = static_cast<unsigned short>(iTemp);
+            m_usAmmo = static_cast<std::uint16_t>(iTemp);
         }
         else
         {
@@ -246,7 +246,7 @@ bool CPickup::ReadSpecialData(const int iLine)
             if (CObjectManager::IsValidModel(iTemp) || iTemp == 370)            // 370 = jetpack - sort of a hack
             {
                 // Set the object id
-                m_usModel = static_cast<unsigned short>(iTemp);
+                m_usModel = static_cast<std::uint16_t>(iTemp);
             }
             else
             {
@@ -263,10 +263,10 @@ bool CPickup::ReadSpecialData(const int iLine)
     }
 
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     if (GetCustomDataInt("interior", iTemp, true))
-        m_ucInterior = static_cast<unsigned char>(iTemp);
+        m_ucInterior = static_cast<std::uint8_t>(iTemp);
 
     // Success
     return true;
@@ -280,7 +280,7 @@ void CPickup::SetPosition(const CVector& vecPosition)
     UpdateSpatialData();
 }
 
-void CPickup::SetPickupType(unsigned char ucType)
+void CPickup::SetPickupType(std::uint8_t ucType)
 {
     m_ucType = ucType;
 
@@ -308,7 +308,7 @@ void CPickup::SetPickupType(unsigned char ucType)
     }
 }
 
-void CPickup::SetWeaponType(unsigned char ucWeaponType)
+void CPickup::SetWeaponType(std::uint8_t ucWeaponType)
 {
     m_ucWeaponType = ucWeaponType;
 
@@ -330,7 +330,7 @@ void CPickup::Randomize()
     // Randomize type
     if (m_bIsTypeRandom)
     {
-        m_ucType = static_cast<unsigned char>(GetRandom(0, CPickup::CUSTOM - 1));
+        m_ucType = static_cast<std::uint8_t>(GetRandom(0, CPickup::CUSTOM - 1));
         switch (m_ucType)
         {
             case CPickup::HEALTH:
@@ -347,7 +347,7 @@ void CPickup::Randomize()
     if (m_bIsWeaponTypeRandom && m_ucType == CPickup::WEAPON)
     {
         // There are 42 different weapons
-        m_ucWeaponType = static_cast<unsigned char>(GetRandom(1, 42));
+        m_ucWeaponType = static_cast<std::uint8_t>(GetRandom(1, 42));
 
         // Eventually skip the "rocket" weapons (skip 13, 19 and 20)
         if (m_ucWeaponType > 12)

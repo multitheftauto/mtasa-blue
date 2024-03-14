@@ -59,7 +59,7 @@ void CRPCFunctions::AddHandlers()
     AddHandler(REQUEST_STEALTH_KILL, RequestStealthKill);
 }
 
-void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback)
+void CRPCFunctions::AddHandler(std::uint8_t ucID, pfnRPCHandler Callback)
 {
     SRPCHandler* pHandler = new SRPCHandler;
     pHandler->ID = ucID;
@@ -72,7 +72,7 @@ void CRPCFunctions::ProcessPacket(const NetServerPlayerID& Socket, NetBitStreamI
     m_pSourcePlayer = m_pPlayerManager->Get(Socket);
     if (m_pSourcePlayer && !m_pSourcePlayer->IsBeingDeleted())
     {
-        unsigned char ucFunctionID = 255;
+        std::uint8_t ucFunctionID = 255;
         bitStream.Read(ucFunctionID);
 
         CPerfStatRPCPacketUsage::GetSingleton()->UpdatePacketUsageIn(ucFunctionID, bitStream.GetNumberOfBytesUsed());
@@ -153,7 +153,7 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
     CLOCK("NetServerPulse::RPC", "PlayerWeapon");
     if (m_pSourcePlayer->IsJoined() && m_pSourcePlayer->IsSpawned())
     {
-        unsigned char ucPrevSlot = m_pSourcePlayer->GetWeaponSlot();
+        std::uint8_t ucPrevSlot = m_pSourcePlayer->GetWeaponSlot();
 
         // We don't get the puresync packet containing totalAmmo = 0 for slot 8 (THROWN), slot 7 (HEAVY) and slot 9 (SPECIAL)
         if ((bitStream.Version() >= 0x44 && ucPrevSlot == WEAPONSLOT_TYPE_THROWN) || bitStream.Version() >= 0x4D)
@@ -169,7 +169,7 @@ void CRPCFunctions::PlayerWeapon(NetBitStreamInterface& bitStream)
 
         SWeaponSlotSync slot;
         bitStream.Read(&slot);
-        unsigned int uiSlot = slot.data.uiSlot;
+        std::uint32_t uiSlot = slot.data.uiSlot;
 
         if (uiSlot != ucPrevSlot)
         {
@@ -211,7 +211,7 @@ void CRPCFunctions::KeyBind(NetBitStreamInterface& bitStream)
 {
     CLOCK("NetServerPulse::RPC", "KeyBind");
 
-    unsigned char ucType;
+    std::uint8_t ucType;
     bool          bHitState = false;
     if (bitStream.ReadBit() == true)
         ucType = 1;
@@ -219,7 +219,7 @@ void CRPCFunctions::KeyBind(NetBitStreamInterface& bitStream)
         ucType = 0;
     bitStream.ReadBit(bHitState);
 
-    unsigned char ucKeyLength = bitStream.GetNumberOfUnreadBits() >> 3;
+    std::uint8_t ucKeyLength = bitStream.GetNumberOfUnreadBits() >> 3;
 
     char szKey[256];
     bitStream.Read(szKey, ucKeyLength);
@@ -235,8 +235,8 @@ void CRPCFunctions::CursorEvent(NetBitStreamInterface& bitStream)
     CLOCK("NetServerPulse::RPC", "CursorEvent");
 
     SMouseButtonSync button;
-    unsigned short   usX;
-    unsigned short   usY;
+    std::uint16_t   usX;
+    std::uint16_t   usY;
     SPositionSync    position(false);
     bool             bHasCollisionElement;
     ElementID        elementID;
@@ -244,7 +244,7 @@ void CRPCFunctions::CursorEvent(NetBitStreamInterface& bitStream)
     if (bitStream.Read(&button) && bitStream.ReadCompressed(usX) && bitStream.ReadCompressed(usY) && bitStream.Read(&position) &&
         bitStream.ReadBit(bHasCollisionElement) && (!bHasCollisionElement || bitStream.Read(elementID)))
     {
-        unsigned char ucButton = button.data.ucButton;
+        std::uint8_t ucButton = button.data.ucButton;
         CVector2D     vecCursorPosition(static_cast<float>(usX), static_cast<float>(usY));
         CVector       vecPosition = position.data.vecPosition;
         if (!bHasCollisionElement)

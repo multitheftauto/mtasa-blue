@@ -134,7 +134,7 @@ namespace SharedUtil
             m_ullElapsedTime = 0;
         }
 
-        unsigned long long Get()
+        std::uint64_t Get()
         {
             long long llTime = DoGetTickCount();
             m_ullElapsedTime += Clamp(0LL, llTime - m_llUpdateTime, m_llMaxIncrement);
@@ -146,7 +146,7 @@ namespace SharedUtil
         long long DoGetTickCount() { return m_bUseModuleTickCount ? GetModuleTickCount64() : GetTickCount64_(); }
 
         long long          m_llUpdateTime;
-        unsigned long long m_ullElapsedTime;
+        std::uint64_t m_ullElapsedTime;
         long long          m_llMaxIncrement;
         bool               m_bUseModuleTickCount;
     };

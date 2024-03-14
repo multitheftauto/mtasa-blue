@@ -139,7 +139,7 @@ void CClientPlayer::SetNick(const char* szNick)
     }
 }
 
-void CClientPlayer::GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB)
+void CClientPlayer::GetNametagColor(std::uint8_t& ucR, std::uint8_t& ucG, std::uint8_t& ucB)
 {
     // If the nametag color is overridden, use the override color
     if (m_bNametagColorOverridden)
@@ -165,7 +165,7 @@ void CClientPlayer::GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsi
     }
 }
 
-void CClientPlayer::SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsigned char ucB)
+void CClientPlayer::SetNametagOverrideColor(std::uint8_t ucR, std::uint8_t ucG, std::uint8_t ucB)
 {
     m_ucNametagColorR = ucR;
     m_ucNametagColorG = ucG;
@@ -208,7 +208,7 @@ bool CClientPlayer::IsOnMyTeam(CClientPlayer* pPlayer)
 void CClientPlayer::Reset()
 {
     // stats
-    for (unsigned short us = 0; us <= NUM_PLAYER_STATS; us++)
+    for (std::uint16_t us = 0; us <= NUM_PLAYER_STATS; us++)
     {
         if (us == MAX_HEALTH)
         {

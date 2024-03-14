@@ -68,7 +68,7 @@ int CLuaPickupDefs::createPickup(lua_State* luaVM)
 {
     //  pickup createPickup ( float x, float y, float z, int theType, int amount/weapon/model, [ int respawnTime = 30000, int ammo = 50 ] )
     CVector       vecPosition;
-    unsigned char ucType;
+    std::uint8_t ucType;
     double        dValue;
     unsigned long ulRespawnInterval;
     double        dAmmo;
@@ -120,7 +120,7 @@ int CLuaPickupDefs::getPickupType(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucType;
+        std::uint8_t ucType;
         if (CStaticFunctionDefinitions::GetPickupType(pPickup, ucType))
         {
             lua_pushnumber(luaVM, static_cast<lua_Number>(ucType));
@@ -144,7 +144,7 @@ int CLuaPickupDefs::getPickupWeapon(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucWeapon;
+        std::uint8_t ucWeapon;
         if (CStaticFunctionDefinitions::GetPickupWeapon(pPickup, ucWeapon))
         {
             lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeapon));
@@ -192,7 +192,7 @@ int CLuaPickupDefs::getPickupAmmo(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usAmmo;
+        std::uint16_t usAmmo;
         if (CStaticFunctionDefinitions::GetPickupAmmo(pPickup, usAmmo))
         {
             lua_pushnumber(luaVM, static_cast<lua_Number>(usAmmo));
@@ -258,7 +258,7 @@ int CLuaPickupDefs::setPickupType(lua_State* luaVM)
 {
     //  bool setPickupType ( pickup thePickup, int theType, int amount/weapon/model, [ int ammo ] )
     CElement*     pElement;
-    unsigned char ucType;
+    std::uint8_t ucType;
     double        dValue;
     double        dAmmo;
 

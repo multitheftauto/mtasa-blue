@@ -45,11 +45,11 @@ public:
     const char* GetNick() const { return m_strNick; }
     void        SetNick(const char* szNick);
 
-    unsigned int GetPing() { return (m_bIsLocalPlayer) ? g_pNet->GetPing() : m_uiPing; }
-    void         SetPing(unsigned int uiPing) { m_uiPing = uiPing; }
+    std::uint32_t GetPing() { return (m_bIsLocalPlayer) ? g_pNet->GetPing() : m_uiPing; }
+    void         SetPing(std::uint32_t uiPing) { m_uiPing = uiPing; }
 
-    void GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB);
-    void SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsigned char ucB);
+    void GetNametagColor(std::uint8_t& ucR, std::uint8_t& ucG, std::uint8_t& ucB);
+    void SetNametagOverrideColor(std::uint8_t ucR, std::uint8_t ucG, std::uint8_t ucB);
     void RemoveNametagOverrideColor();
     bool IsNametagColorOverridden() { return m_bNametagColorOverridden; }
 
@@ -64,8 +64,8 @@ public:
     bool IsExtrapolatingAim() { return m_bDoExtrapolatingAim; }
     void UpdateAimPosition(const CVector& vecAim);
 
-    unsigned short GetLatency() { return m_usLatency; }
-    void           SetLatency(unsigned short usLatency) { m_usLatency = (m_usLatency + usLatency) / 2; }
+    std::uint16_t GetLatency() { return m_usLatency; }
+    void           SetLatency(std::uint16_t usLatency) { m_usLatency = (m_usLatency + usLatency) / 2; }
 
     unsigned long  GetLastPuresyncTime() { return m_ulLastPuresyncTime; }
     void           SetLastPuresyncTime(unsigned long ulLastPuresyncTime) { m_ulLastPuresyncTime = ulLastPuresyncTime; }
@@ -81,9 +81,9 @@ public:
     void           IncrementKeySync() { ++m_uiKeySyncCount; }
     void           IncrementVehicleSync() { ++m_uiVehicleSyncCount; }
 
-    unsigned int GetPlayerSyncCount() { return m_uiPlayerSyncCount; }
-    unsigned int GetKeySyncCount() { return m_uiKeySyncCount; }
-    unsigned int GetVehicleSyncCount() { return m_uiVehicleSyncCount; }
+    std::uint32_t GetPlayerSyncCount() { return m_uiPlayerSyncCount; }
+    std::uint32_t GetKeySyncCount() { return m_uiKeySyncCount; }
+    std::uint32_t GetVehicleSyncCount() { return m_uiVehicleSyncCount; }
 
     CClientTeam* GetTeam() { return m_pTeam; }
     void         SetTeam(CClientTeam* pTeam, bool bChangeTeam);
@@ -119,15 +119,15 @@ private:
     bool    m_bIsLocalPlayer;
     SString m_strNick;
 
-    unsigned int m_uiPing;
+    std::uint32_t m_uiPing;
 
     CVector      m_vecTargetPosition;
     CVector      m_vecTargetMoveSpeed;
     CVector      m_vecTargetTurnSpeed;
     CVector      m_vecTargetIncrements;
-    unsigned int m_uiFramesSincePositionUpdate;
+    std::uint32_t m_uiFramesSincePositionUpdate;
 
-    unsigned short m_usLatency;
+    std::uint16_t m_usLatency;
     CVector        m_vecAimSpeed;
     CVector        m_vecOldAim;
     CVector        m_vecCurrentAim;
@@ -148,13 +148,13 @@ private:
 
     bool          m_bNametagShowing;
     unsigned long m_ulLastNametagShow;
-    unsigned char m_ucNametagColorR, m_ucNametagColorG, m_ucNametagColorB;
+    std::uint8_t m_ucNametagColorR, m_ucNametagColorG, m_ucNametagColorB;
     bool          m_bNametagColorOverridden;
     std::string   m_strNametag;
 
-    unsigned int m_uiPlayerSyncCount;
-    unsigned int m_uiKeySyncCount;
-    unsigned int m_uiVehicleSyncCount;
+    std::uint32_t m_uiPlayerSyncCount;
+    std::uint32_t m_uiKeySyncCount;
+    std::uint32_t m_uiVehicleSyncCount;
 
     float m_fNametagDistance;
 

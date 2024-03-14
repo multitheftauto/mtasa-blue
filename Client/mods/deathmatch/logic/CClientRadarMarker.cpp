@@ -13,7 +13,7 @@
 
 using SharedUtil::CalcMTASAPath;
 
-CClientRadarMarker::CClientRadarMarker(CClientManager* pManager, ElementID ID, short sOrdering, unsigned short usVisibleDistance)
+CClientRadarMarker::CClientRadarMarker(CClientManager* pManager, ElementID ID, short sOrdering, std::uint16_t usVisibleDistance)
     : ClassInit(this), CClientEntity(ID)
 {
     // Init
@@ -115,7 +115,7 @@ void CClientRadarMarker::GetPosition(CVector& vecPosition) const
     }
 }
 
-void CClientRadarMarker::SetScale(unsigned short usScale)
+void CClientRadarMarker::SetScale(std::uint16_t usScale)
 {
     m_usScale = usScale;
 
@@ -241,13 +241,13 @@ void CClientRadarMarker::DestroyMarker()
     }
 }
 
-void CClientRadarMarker::SetDimension(unsigned short usDimension)
+void CClientRadarMarker::SetDimension(std::uint16_t usDimension)
 {
     CClientEntity::SetDimension(usDimension);
     RelateDimension(m_pManager->GetRadarMarkerManager()->GetDimension());
 }
 
-void CClientRadarMarker::RelateDimension(unsigned short usDimension)
+void CClientRadarMarker::RelateDimension(std::uint16_t usDimension)
 {
     // Are we visible?
     if (m_bIsVisible)

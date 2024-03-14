@@ -1327,7 +1327,7 @@ void HandleRemoteInstantHit()
 
 void _cdecl DoFireInstantHitPokes()
 {
-    MemPutFast<unsigned char>(VAR_CWorld_IncludeCarTyres, 1);
+    MemPutFast<std::uint8_t>(VAR_CWorld_IncludeCarTyres, 1);
 }
 
 DWORD dwFunc_CWeapon_FireInstantHit_ret = 0x740B6E;

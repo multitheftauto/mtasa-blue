@@ -23,7 +23,7 @@ public:
     void PreHUDRenderExecutionHandler(bool bDidUnminimize, bool bDidRecreateRenderTargets);
     void PostFrameExecutionHandler();
     void IdleHandler();
-    void RestreamModel(unsigned short usModel);
+    void RestreamModel(std::uint16_t usModel);
 
     bool WebsiteRequestResultHandler(const std::unordered_set<SString>& newPages);
 

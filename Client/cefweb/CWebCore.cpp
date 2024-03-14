@@ -92,7 +92,7 @@ bool CWebCore::Initialise()
     return state;
 }
 
-CWebViewInterface* CWebCore::CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
+CWebViewInterface* CWebCore::CreateWebView(std::uint32_t uiWidth, std::uint32_t uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
                                            bool bTransparent)
 {
     // Create our webview implementation
@@ -337,11 +337,11 @@ void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
         static SString blacklist[] = {"nobrain.dk"};
 
         // Blacklist or whitelist URLs now
-        for (unsigned int i = 0; i < sizeof(whitelist) / sizeof(SString); ++i)
+        for (std::uint32_t i = 0; i < sizeof(whitelist) / sizeof(SString); ++i)
         {
             AddAllowedPage(whitelist[i], eWebFilterType::WEBFILTER_HARDCODED);
         }
-        for (unsigned int i = 0; i < sizeof(blacklist) / sizeof(SString); ++i)
+        for (std::uint32_t i = 0; i < sizeof(blacklist) / sizeof(SString); ++i)
         {
             AddBlockedPage(blacklist[i], eWebFilterType::WEBFILTER_HARDCODED);
         }
@@ -443,7 +443,7 @@ bool CWebCore::IsRequestsGUIVisible()
     return m_pRequestsGUI && m_pRequestsGUI->IsVisible();
 }
 
-void CWebCore::DebugOutputThreadsafe(const SString& message, unsigned char R, unsigned char G, unsigned char B)
+void CWebCore::DebugOutputThreadsafe(const SString& message, std::uint8_t R, std::uint8_t G, std::uint8_t B)
 {
     AddEventToEventQueue([message, R, G, B]() { g_pCore->DebugEchoColor(message, R, G, B); }, nullptr, "DebugOutputThreadsafe");
 }

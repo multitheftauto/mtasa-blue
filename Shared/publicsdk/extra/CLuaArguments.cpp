@@ -47,7 +47,7 @@ const CLuaArguments& CLuaArguments::operator=(const CLuaArguments& Arguments)
     return Arguments;
 }
 
-void CLuaArguments::ReadArguments(lua_State* luaVM, unsigned int uiIndexBegin)
+void CLuaArguments::ReadArguments(lua_State* luaVM, std::uint32_t uiIndexBegin)
 {
     // Delete the previous arguments if any
     DeleteArguments();

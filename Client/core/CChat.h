@@ -26,7 +26,7 @@ class CColor
 {
 public:
     CColor() { R = G = B = A = 255; }
-    CColor(unsigned char _R, unsigned char _G, unsigned char _B, unsigned char _A = 255)
+    CColor(std::uint8_t _R, std::uint8_t _G, std::uint8_t _B, std::uint8_t _A = 255)
     {
         R = _R;
         G = _G;
@@ -52,7 +52,7 @@ public:
     }
     bool operator==(const CColor& other) const { return R == other.R && G == other.G && B == other.B && A == other.A; }
 
-    unsigned char R, G, B, A;
+    std::uint8_t R, G, B, A;
 };
 
 class CChatLineSection
@@ -65,7 +65,7 @@ public:
 
     CChatLineSection& operator=(const CChatLineSection& other);
 
-    void        Draw(const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline, const CRect2D& RenderBounds);
+    void        Draw(const CVector2D& vecPosition, std::uint8_t ucAlpha, bool bShadow, bool bOutline, const CRect2D& RenderBounds);
     float       GetWidth();
     const char* GetText() { return m_strText.c_str(); }
     void        SetText(const char* szText) { m_strText = szText; }
@@ -76,7 +76,7 @@ protected:
     std::string  m_strText;
     CColor       m_Color;
     float        m_fCachedWidth;
-    unsigned int m_uiCachedLength;
+    std::uint32_t m_uiCachedLength;
 };
 
 class CChatLine
@@ -85,7 +85,7 @@ public:
     CChatLine();
 
     virtual const char* Format(const char* szText, float fWidth, CColor& color, bool bColorCoded);
-    virtual void        Draw(const CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline, const CRect2D& RenderBounds);
+    virtual void        Draw(const CVector2D& vecPosition, std::uint8_t ucAlpha, bool bShadow, bool bOutline, const CRect2D& RenderBounds);
     virtual float       GetWidth();
     bool                IsActive() { return m_bActive; }
     void                SetActive(bool bActive) { m_bActive = bActive; }
@@ -102,7 +102,7 @@ protected:
 class CChatInputLine : public CChatLine
 {
 public:
-    void Draw(CVector2D& vecPosition, unsigned char ucAlpha, bool bShadow, bool bOutline);
+    void Draw(CVector2D& vecPosition, std::uint8_t ucAlpha, bool bShadow, bool bOutline);
     void Clear();
 
     CChatLineSection       m_Prefix;
@@ -193,7 +193,7 @@ public:
     void SetColor(const CColor& Color);
     void SetInputColor(const CColor& Color);
     void SetTextColor(const CColor& Color) { m_TextColor = Color; };
-    void SetNumLines(unsigned int uiNumLines);
+    void SetNumLines(std::uint32_t uiNumLines);
 
     void Scroll(int iState) { m_iScrollState = iState; };
     void ScrollUp();
@@ -221,8 +221,8 @@ protected:
 
     CChatLine      m_Lines[CHAT_MAX_LINES];            // Circular buffer
     int            m_iScrollState;                     // 1 up, 0 stop, -1 down
-    unsigned int   m_uiMostRecentLine;
-    unsigned int   m_uiScrollOffset;
+    std::uint32_t   m_uiMostRecentLine;
+    std::uint32_t   m_uiScrollOffset;
     float          m_fSmoothScroll;
     float          m_fSmoothLastTimeSeconds;
     float          m_fSmoothAllowAfter;
@@ -269,7 +269,7 @@ protected:
     float m_fBackgroundAlpha;
     float m_fInputBackgroundAlpha;
 
-    unsigned int  m_uiNumLines;
+    std::uint32_t  m_uiNumLines;
     CColor        m_Color;
     CColor        m_TextColor;
     CColor        m_InputColor;

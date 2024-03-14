@@ -62,7 +62,7 @@ void CPositionRotationAnimation::ToBitStream(NetBitStreamInterface& a_rBitStream
     a_rBitStream.WriteBit(a_bResumeMode);
     if (a_bResumeMode)
     {
-        unsigned long long ullNow = _GetTime();
+        std::uint64_t ullNow = _GetTime();
         unsigned long      ulElaspedTime = static_cast<unsigned long>(ullNow - m_ullStartTime);
         unsigned long      ulTimeLeft = 0;
         if (m_ullEndTime > ullNow)

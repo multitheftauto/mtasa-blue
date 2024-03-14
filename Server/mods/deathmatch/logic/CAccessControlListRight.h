@@ -33,7 +33,7 @@ public:
     void WriteToXMLNode(CXMLNode* pNode);
 
     const char*  GetRightName() { return m_strRightName; };
-    unsigned int GetRightNameHash() { return m_uiNameHash; };
+    std::uint32_t GetRightNameHash() { return m_uiNameHash; };
     ERightType   GetRightType() { return m_eRightType; };
 
     bool GetRightAccess() { return m_bAccess; };
@@ -50,7 +50,7 @@ private:
     void OnChange();
 
     SString                          m_strRightName;
-    unsigned int                     m_uiNameHash;
+    std::uint32_t                     m_uiNameHash;
     ERightType                       m_eRightType;
     bool                             m_bAccess;
     class CAccessControlListManager* m_pACLManager;

@@ -20,7 +20,7 @@ public:
     CUnoccupiedVehicleSync(CClientVehicleManager* pVehicleManager);
     ~CUnoccupiedVehicleSync();
 
-    bool ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
+    bool ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream);
     void DoPulse();
 
     void AddVehicle(CDeathmatchVehicle* pVehicle);

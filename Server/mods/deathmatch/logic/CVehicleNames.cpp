@@ -251,7 +251,7 @@ const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
     return szVehicleNameEmpty;
 }
 
-unsigned int CVehicleNames::GetVehicleModel(const char* szName)
+std::uint32_t CVehicleNames::GetVehicleModel(const char* szName)
 {
     // If the specified string was empty, return 0
     if (szName[0] == 0)
@@ -260,7 +260,7 @@ unsigned int CVehicleNames::GetVehicleModel(const char* szName)
     assert(NUMELMS(VehicleNames) == 212);
 
     // Look for it in our table
-    for (unsigned int i = 0; i <= 211; i++)
+    for (std::uint32_t i = 0; i <= 211; i++)
     {
         if (stricmp(szName, VehicleNames[i].szName) == 0 || (VehicleNames[i].szName_replaced && stricmp(szName, VehicleNames[i].szName_replaced) == 0))
         {
@@ -273,7 +273,7 @@ unsigned int CVehicleNames::GetVehicleModel(const char* szName)
 const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
 {
     const char* pVehicleName = "";
-    switch (CVehicleManager::GetVehicleType(static_cast<unsigned short>(ulModel)))
+    switch (CVehicleManager::GetVehicleType(static_cast<std::uint16_t>(ulModel)))
     {
         case VEHICLE_NONE:
             pVehicleName = "Unknown";

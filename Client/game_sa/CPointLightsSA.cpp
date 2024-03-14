@@ -18,7 +18,7 @@ using CHeli_SearchLightCone_t = void(__cdecl*)(int handleId, CVector startPos, C
 using CHeli_PreSearchLightCone_t = int(__cdecl*)();
 using CHeli_PostSearchLightCone_t = int(__cdecl*)();
 
-void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SharedUtil::SColor color, unsigned char uc_8,
+void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SharedUtil::SColor color, std::uint8_t uc_8,
                               bool bCreatesShadow, CEntity* pAffected)
 {
     DWORD dwEntityInterface = 0;

@@ -745,7 +745,7 @@ int CLuaDatabaseDefs::ExecuteSQLSelect(lua_State* luaVM)
     SString      strColumns;
     SString      strWhere;
     SString      strError;
-    unsigned int uiLimit;
+    std::uint32_t uiLimit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strTable);

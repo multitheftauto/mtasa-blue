@@ -13,16 +13,16 @@
 class CBuildingRemoval
 {
 public:
-    CBuildingRemoval(unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior);
+    CBuildingRemoval(std::uint16_t usModel, float fRadius, const CVector& vecPos, char cInterior);
     ~CBuildingRemoval();
 
     float          GetRadius() { return m_fRadius; }
     const CVector& GetPosition() { return m_vecPos; }
-    unsigned short GetModel() { return m_usModel; }
+    std::uint16_t GetModel() { return m_usModel; }
     char           GetInterior() { return m_cInterior; }
 
 private:
-    unsigned short m_usModel;
+    std::uint16_t m_usModel;
     CVector        m_vecPos;
     float          m_fRadius;
     char           m_cInterior;

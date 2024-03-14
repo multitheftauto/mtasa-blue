@@ -164,7 +164,7 @@ void SString::OnInvalidParameter(const char* szFormat)
 //
 // Split into parts
 //
-void SString::Split(const SString& strDelim, std::vector<SString>& outResult, unsigned int uiMaxAmount, unsigned int uiMinAmount) const
+void SString::Split(const SString& strDelim, std::vector<SString>& outResult, std::uint32_t uiMaxAmount, std::uint32_t uiMinAmount) const
 {
     outResult.clear();
     size_t ulStartPoint = 0;

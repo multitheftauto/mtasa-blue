@@ -22,23 +22,23 @@ namespace fs = std::filesystem;
 
 struct tImgFileInfo
 {
-    unsigned int   uiOffset;
-    unsigned short usSize;
-    unsigned short usUnpackedSize;
+    std::uint32_t   uiOffset;
+    std::uint16_t usSize;
+    std::uint16_t usUnpackedSize;
     char           szFileName[24];
 };
 
 struct tLinkedModelRestoreInfo
 {
-    constexpr tLinkedModelRestoreInfo(unsigned int uiModelID, unsigned int uiOffset, unsigned short usSize, unsigned char ucStreamID)
+    constexpr tLinkedModelRestoreInfo(std::uint32_t uiModelID, std::uint32_t uiOffset, std::uint16_t usSize, std::uint8_t ucStreamID)
         : uiModelID(uiModelID), uiOffset(uiOffset), usSize(usSize), ucStreamID(ucStreamID)
     {
     }
 
-    unsigned int   uiModelID;
-    unsigned int   uiOffset;
-    unsigned short usSize;
-    unsigned char  ucStreamID;
+    std::uint32_t   uiModelID;
+    std::uint32_t   uiOffset;
+    std::uint16_t usSize;
+    std::uint8_t  ucStreamID;
 };
 
 class CClientIMG : public CClientEntity
@@ -55,8 +55,8 @@ public:
     void SetPosition(const CVector& vecPosition){};
 
     eClientEntityType GetType() const { return CCLIENTIMG; }
-    unsigned char     GetArchiveID() const { return m_ucArchiveID; }
-    unsigned int      GetFilesCount() const { return m_fileInfos.size(); }
+    std::uint8_t     GetArchiveID() const { return m_ucArchiveID; }
+    std::uint32_t      GetFilesCount() const { return m_fileInfos.size(); }
     const auto&       GetFileInfos() const noexcept { return m_fileInfos; }
     auto              GetLargestFileSizeBlocks() const { return m_LargestFileSizeBlocks; }
 
@@ -71,15 +71,15 @@ public:
     bool StreamDisable();
     bool IsStreamed();
 
-    bool LinkModel(unsigned int usModelID, size_t fileID);
-    bool UnlinkModel(unsigned int usModelID);
+    bool LinkModel(std::uint32_t usModelID, size_t fileID);
+    bool UnlinkModel(std::uint32_t usModelID);
 
 private:
     class CClientIMGManager* m_pImgManager;
 
     std::ifstream             m_ifs;
     fs::path                  m_filePath;
-    unsigned char             m_ucArchiveID;
+    std::uint8_t             m_ucArchiveID;
     std::vector<tImgFileInfo> m_fileInfos;
     size_t                    m_LargestFileSizeBlocks; // The size of the largest file [in streaming blocks/sectors]
 

@@ -17,7 +17,7 @@
 class CGUIFont_Impl : public CGUIFont
 {
 public:
-    CGUIFont_Impl(class CGUI_Impl* pManager, const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0,
+    CGUIFont_Impl(class CGUI_Impl* pManager, const char* szFontName, const char* szFontFile, std::uint32_t uSize = 8, std::uint32_t uFlags = 0,
                   bool bAutoScale = false);
     ~CGUIFont_Impl();
 

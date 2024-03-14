@@ -151,7 +151,7 @@ void CCrashDumpWriter::UpdateCounters()
 // Can be caused by problems with localized strings.
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved)
+void CCrashDumpWriter::HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, std::uint32_t line, uintptr_t pReserved)
 {
     ms_uiInvalidParameterCount++;
 }
@@ -965,8 +965,8 @@ void CCrashDumpWriter::GetMiscInfo(CBuffer& buffer)
     stream.Write(2);
 
     // US/Euro gta_sa.exe
-    unsigned char ucA = *reinterpret_cast<unsigned char*>(0x748ADD);
-    unsigned char ucB = *reinterpret_cast<unsigned char*>(0x748ADE);
+    std::uint8_t ucA = *reinterpret_cast<std::uint8_t*>(0x748ADD);
+    std::uint8_t ucB = *reinterpret_cast<std::uint8_t*>(0x748ADE);
     stream.Write(ucA);
     stream.Write(ucB);
 

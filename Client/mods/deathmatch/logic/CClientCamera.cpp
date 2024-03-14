@@ -307,7 +307,7 @@ void CClientCamera::FadeIn(float fTime)
     m_pCamera->Fade(fTime, FADE_IN);
 }
 
-void CClientCamera::FadeOut(float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+void CClientCamera::FadeOut(float fTime, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
 {
     m_pCamera->SetFadeColor(ucRed, ucGreen, ucBlue);
     m_pCamera->Fade(fTime, FADE_OUT);

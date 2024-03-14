@@ -251,13 +251,13 @@ bool CRegistry::QueryInternal(const char* szQuery, CRegistryResult* ppResult)
                     }
                     else
                     {
-                        cell.pVal = new unsigned char[cell.nLength];
+                        cell.pVal = new std::uint8_t[cell.nLength];
                         memcpy(cell.pVal, sqlite3_column_blob(pStmt, i), cell.nLength);
                     }
                     break;
                 default:
                     cell.nLength = sqlite3_column_bytes(pStmt, i) + 1;
-                    cell.pVal = new unsigned char[cell.nLength];
+                    cell.pVal = new std::uint8_t[cell.nLength];
                     memcpy(cell.pVal, sqlite3_column_text(pStmt, i), cell.nLength);
                     break;
             }
@@ -291,11 +291,11 @@ bool CRegistry::Query(const std::string& strQuery, CLuaArguments* pArgs, CRegist
     }
 
     // Walk through the query and replace the variable placeholders with the actual variables
-    unsigned int uiLen = strQuery.length();
-    unsigned int a = 0, type = 0;
+    std::uint32_t uiLen = strQuery.length();
+    std::uint32_t a = 0, type = 0;
     const char*  szContent = NULL;
     char         szBuffer[32] = {0};
-    for (unsigned int i = 0; i < uiLen; i++)
+    for (std::uint32_t i = 0; i < uiLen; i++)
     {
         if (strQuery.at(i) == SQL_VARIABLE_PLACEHOLDER)
         {
@@ -327,7 +327,7 @@ bool CRegistry::Query(const std::string& strQuery, CLuaArguments* pArgs, CRegist
             // Copy the string into the query, and escape the single quotes as well
             if (szContent)
             {
-                for (unsigned int k = 0; szContent[k] != '\0'; k++)
+                for (std::uint32_t k = 0; szContent[k] != '\0'; k++)
                 {
                     if (szContent[k] == '\'')
                         strParsedQuery += '\'';
@@ -365,7 +365,7 @@ bool CRegistry::Query(const std::string& strQuery, CLuaArguments* pArgs, CRegist
     return QueryInternal(strParsedQuery.c_str(), pResult);
 }
 
-bool CRegistry::Select(const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult)
+bool CRegistry::Select(const std::string& strColumns, const std::string& strTable, const std::string& strWhere, std::uint32_t uiLimit, CRegistryResult* pResult)
 {
     std::string strQuery = "SELECT " + strColumns + " FROM " + strTable;
     if (!strWhere.empty())
@@ -438,7 +438,7 @@ bool CRegistry::Query(CRegistryResult* pResult, const char* szQuery, va_list vl)
     }
 
     SString strParsedQuery;
-    for (unsigned int i = 0; szQuery[i] != '\0'; i++)
+    for (std::uint32_t i = 0; szQuery[i] != '\0'; i++)
     {
         if (szQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {

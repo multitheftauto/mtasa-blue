@@ -53,5 +53,5 @@ public:
     CPedIntelligenceSAInterface* GetInterface() { return internalInterface; }
     CTaskManager*                GetTaskManager();
     bool                         TestForStealthKill(CPed* pPed, bool bUnk);
-    CTaskSAInterface*            SetTaskDuckSecondary(unsigned short nLengthOfDuck);
+    CTaskSAInterface*            SetTaskDuckSecondary(std::uint16_t nLengthOfDuck);
 };

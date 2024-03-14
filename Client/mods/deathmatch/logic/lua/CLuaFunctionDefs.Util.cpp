@@ -50,7 +50,7 @@ int CLuaFunctionDefs::GetNetworkUsageData(lua_State* luaVM)
     {
         lua_pushstring(luaVM, "bits");
         lua_createtable(luaVM, 255, 1);
-        for (unsigned int i = 0; i < 256; ++i)
+        for (std::uint32_t i = 0; i < 256; ++i)
         {
             const SPacketStat& statIn = m_PacketStats[CNet::STATS_INCOMING_TRAFFIC][i];
             lua_pushnumber(luaVM, statIn.iTotalBytes * 8);
@@ -60,7 +60,7 @@ int CLuaFunctionDefs::GetNetworkUsageData(lua_State* luaVM)
 
         lua_pushstring(luaVM, "count");
         lua_createtable(luaVM, 255, 1);
-        for (unsigned int i = 0; i < 256; ++i)
+        for (std::uint32_t i = 0; i < 256; ++i)
         {
             const SPacketStat& statIn = m_PacketStats[CNet::STATS_INCOMING_TRAFFIC][i];
             lua_pushnumber(luaVM, statIn.iCount);
@@ -75,7 +75,7 @@ int CLuaFunctionDefs::GetNetworkUsageData(lua_State* luaVM)
     {
         lua_pushstring(luaVM, "bits");
         lua_createtable(luaVM, 255, 1);
-        for (unsigned int i = 0; i < 256; ++i)
+        for (std::uint32_t i = 0; i < 256; ++i)
         {
             const SPacketStat& statOut = m_PacketStats[CNet::STATS_OUTGOING_TRAFFIC][i];
             lua_pushnumber(luaVM, statOut.iTotalBytes * 8);
@@ -85,7 +85,7 @@ int CLuaFunctionDefs::GetNetworkUsageData(lua_State* luaVM)
 
         lua_pushstring(luaVM, "count");
         lua_createtable(luaVM, 255, 1);
-        for (unsigned int i = 0; i < 256; ++i)
+        for (std::uint32_t i = 0; i < 256; ++i)
         {
             const SPacketStat& statOut = m_PacketStats[CNet::STATS_OUTGOING_TRAFFIC][i];
             lua_pushnumber(luaVM, statOut.iCount);

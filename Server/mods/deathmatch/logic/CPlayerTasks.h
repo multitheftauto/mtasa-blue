@@ -45,11 +45,11 @@ public:
     CPlayerTasks();
     ~CPlayerTasks();
 
-    CPlayerTask* GetPriorityTask(unsigned int uiTaskType);
-    bool         SetPriorityTask(unsigned int uiTaskType, CPlayerTask* pTask);
+    CPlayerTask* GetPriorityTask(std::uint32_t uiTaskType);
+    bool         SetPriorityTask(std::uint32_t uiTaskType, CPlayerTask* pTask);
 
-    CPlayerTask* GetSecondaryTask(unsigned int uiTaskType);
-    bool         SetSecondaryTask(unsigned int uiTaskType, CPlayerTask* pTask);
+    CPlayerTask* GetSecondaryTask(std::uint32_t uiTaskType);
+    bool         SetSecondaryTask(std::uint32_t uiTaskType, CPlayerTask* pTask);
 
 protected:
     SFixedArray<CPlayerTask*, TASK_PRIORITY_MAX>  m_PriorityTasks;
@@ -64,19 +64,19 @@ public:
         m_usID = 0xFFFF;
         m_pSubTask = NULL;
     }
-    CPlayerTask(unsigned short usID)
+    CPlayerTask(std::uint16_t usID)
     {
         m_usID = usID;
         m_pSubTask = NULL;
     }
     ~CPlayerTask() { delete m_pSubTask; }
 
-    unsigned short GetID() { return m_usID; }
+    std::uint16_t GetID() { return m_usID; }
     char*          GetName() { return (m_usID < 1802) ? TaskNames[m_usID].szName : sNoTaskName; }
     CPlayerTask*   GetSubTask() { return m_pSubTask; }
     void           SetSubTask(CPlayerTask* pTask) { m_pSubTask = pTask; }
 
 protected:
-    unsigned short m_usID;
+    std::uint16_t m_usID;
     CPlayerTask*   m_pSubTask;
 };

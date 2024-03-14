@@ -90,7 +90,7 @@ public:
     float        GetWeaponRangeFromSkillLevel(eWeaponType eWeapon, float fSkillLevel);
 
     // Static Methods
-    static unsigned short GetSkillStatIndex(eWeaponType eWeapon);
+    static std::uint16_t GetSkillStatIndex(eWeaponType eWeapon);
 
 private:
     std::list<CWeaponStat*>                             m_OriginalWeaponData;

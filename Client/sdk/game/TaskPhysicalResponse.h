@@ -19,8 +19,8 @@ public:
     virtual ~CTaskSimpleChoking(){};
 
     virtual CPed*        GetAttacker() = 0;
-    virtual unsigned int GetTimeRemaining() = 0;
-    virtual unsigned int GetTimeStarted() = 0;
+    virtual std::uint32_t GetTimeRemaining() = 0;
+    virtual std::uint32_t GetTimeStarted() = 0;
     virtual bool         IsTeargas() = 0;
     virtual bool         IsFinished() = 0;
 

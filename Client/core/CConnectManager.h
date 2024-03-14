@@ -21,8 +21,8 @@ public:
     CConnectManager();
     ~CConnectManager();
 
-    bool Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false);
-    bool Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true);
+    bool Connect(const char* szHost, std::uint16_t usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser = false);
+    bool Reconnect(const char* szHost, std::uint16_t usPort, const char* szPassword, bool bSave = true);
 
     bool Abort();
 
@@ -32,10 +32,10 @@ public:
 
     static void OpenServerFirewall(in_addr Address, ushort usHttpPort = 80, bool bHighPriority = false);
 
-    static bool StaticProcessPacket(unsigned char ucPacketID, class NetBitStreamInterface& bitStream);
+    static bool StaticProcessPacket(std::uint8_t ucPacketID, class NetBitStreamInterface& bitStream);
 
     std::string    m_strLastHost;
-    unsigned short m_usLastPort;
+    std::uint16_t m_usLastPort;
     std::string    m_strLastPassword;
 
 private:
@@ -43,7 +43,7 @@ private:
 
     in_addr        m_Address;
     std::string    m_strHost;
-    unsigned short m_usPort;
+    std::uint16_t m_usPort;
     std::string    m_strNick;
     std::string    m_strPassword;
     bool           m_bIsDetectingVersion;

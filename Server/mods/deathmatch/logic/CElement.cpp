@@ -199,12 +199,12 @@ void CElement::SetTypeName(const std::string& strTypeName)
         CElement::AddEntityFromRoot(m_uiTypeHash, this);
 }
 
-CElement* CElement::FindChild(const char* szName, unsigned int uiIndex, bool bRecursive)
+CElement* CElement::FindChild(const char* szName, std::uint32_t uiIndex, bool bRecursive)
 {
     assert(szName);
 
     // Is it our name?
-    unsigned int uiCurrentIndex = 0;
+    std::uint32_t uiCurrentIndex = 0;
     if (strcmp(szName, m_strName.c_str()) == 0)
     {
         if (uiIndex == 0)
@@ -221,12 +221,12 @@ CElement* CElement::FindChild(const char* szName, unsigned int uiIndex, bool bRe
     return FindChildIndex(szName, uiIndex, uiCurrentIndex, bRecursive);
 }
 
-CElement* CElement::FindChildByType(const char* szType, unsigned int uiIndex, bool bRecursive)
+CElement* CElement::FindChildByType(const char* szType, std::uint32_t uiIndex, bool bRecursive)
 {
     assert(szType);
 
     // Is it our type?
-    unsigned int uiCurrentIndex = 0;
+    std::uint32_t uiCurrentIndex = 0;
     if (strcmp(szType, GetTypeName().c_str()) == 0)
     {
         if (uiIndex == 0)
@@ -240,7 +240,7 @@ CElement* CElement::FindChildByType(const char* szType, unsigned int uiIndex, bo
     }
 
     // Find it among our children
-    unsigned int uiTypeHash = GetTypeHashFromString(szType);
+    std::uint32_t uiTypeHash = GetTypeHashFromString(szType);
     return FindChildByTypeIndex(uiTypeHash, uiIndex, uiCurrentIndex, bRecursive);
 }
 
@@ -250,8 +250,8 @@ void CElement::FindAllChildrenByType(const char* szType, lua_State* pLua)
     assert(pLua);
 
     // Add all children of the given type to the table
-    unsigned int uiIndex = 0;
-    unsigned int uiTypeHash = GetTypeHashFromString(szType);
+    std::uint32_t uiIndex = 0;
+    std::uint32_t uiTypeHash = GetTypeHashFromString(szType);
 
     if (this == g_pGame->GetMapManager()->GetRootElement())
     {
@@ -268,7 +268,7 @@ void CElement::FindAllChildrenByType(const char* szType, lua_State* pLua)
 void CElement::GetDescendantsByType(std::vector<CElement*>& outResult, EElementType elementType)
 {
     // Type hash is the same as element type up to EElementType::UNKNOWN
-    unsigned int uiTypeHash = elementType;
+    std::uint32_t uiTypeHash = elementType;
     if (this == g_pGame->GetMapManager()->GetRootElement())
     {
         GetEntitiesFromRoot(uiTypeHash, outResult);
@@ -298,7 +298,7 @@ void CElement::GetChildren(lua_State* pLua)
     assert(pLua);
 
     // Add all our children to the table on top of the given lua main's stack
-    unsigned int                    uiIndex = 0;
+    std::uint32_t                    uiIndex = 0;
     CChildListType ::const_iterator iter = m_Children.begin();
     for (; iter != m_Children.end(); iter++)
     {
@@ -315,8 +315,8 @@ void CElement::GetChildrenByType(const char* szType, lua_State* pLua)
     assert(pLua);
 
     // Add all our children to the table on top of the given lua main's stack
-    unsigned int                    uiIndex = 0;
-    unsigned int                    uiTypeHash = GetTypeHashFromString(szType);
+    std::uint32_t                    uiIndex = 0;
+    std::uint32_t                    uiTypeHash = GetTypeHashFromString(szType);
     CChildListType ::const_iterator iter = m_Children.begin();
     for (; iter != m_Children.end(); iter++)
     {
@@ -490,9 +490,9 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
 
     // Iterate the attributes of our XML node
     CXMLAttributes* pAttributes = &(Node.GetAttributes());
-    unsigned int    uiAttributeCount = pAttributes->Count();
+    std::uint32_t    uiAttributeCount = pAttributes->Count();
 
-    for (unsigned int uiIndex = 0; uiIndex < uiAttributeCount; uiIndex++)
+    for (std::uint32_t uiIndex = 0; uiIndex < uiAttributeCount; uiIndex++)
     {
         // Grab the node (we can assume it exists here)
         CXMLAttribute* pAttribute = pAttributes->Get(uiIndex);
@@ -770,7 +770,7 @@ void CElement::SendAllCustomData(CPlayer* pPlayer)
             continue;
 
         // Tell our clients to update their data
-        unsigned short usNameLength = static_cast<unsigned short>(strName.length());
+        std::uint16_t usNameLength = static_cast<std::uint16_t>(strName.length());
         CBitStream     BitStream;
         BitStream.pBitStream->WriteCompressed(usNameLength);
         BitStream.pBitStream->Write(strName.c_str(), usNameLength);
@@ -901,7 +901,7 @@ CElement* CElement::GetRootElement()
     return this;
 }
 
-CElement* CElement::FindChildIndex(const char* szName, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive)
+CElement* CElement::FindChildIndex(const char* szName, std::uint32_t uiIndex, std::uint32_t& uiCurrentIndex, bool bRecursive)
 {
     assert(szName);
 
@@ -944,7 +944,7 @@ CElement* CElement::FindChildIndex(const char* szName, unsigned int uiIndex, uns
     return NULL;
 }
 
-CElement* CElement::FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive)
+CElement* CElement::FindChildByTypeIndex(std::uint32_t uiTypeHash, std::uint32_t uiIndex, std::uint32_t& uiCurrentIndex, bool bRecursive)
 {
     // Look among our children
     CChildListType ::const_iterator iter = m_Children.begin();
@@ -985,7 +985,7 @@ CElement* CElement::FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int u
     return NULL;
 }
 
-void CElement::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* pLua, unsigned int& uiIndex)
+void CElement::FindAllChildrenByTypeIndex(std::uint32_t uiTypeHash, lua_State* pLua, std::uint32_t& uiIndex)
 {
     assert(pLua);
 
@@ -1067,12 +1067,12 @@ void CElement::RemoveAllCollisions()
     m_Collisions.clear();
 }
 
-void CElement::SetDimension(unsigned short usDimension)
+void CElement::SetDimension(std::uint16_t usDimension)
 {
     if (m_usDimension == usDimension)
         return;
 
-    unsigned short usOldDimension = m_usDimension;
+    std::uint16_t usOldDimension = m_usDimension;
     m_usDimension = usDimension;
 
     CLuaArguments Arguments;
@@ -1081,12 +1081,12 @@ void CElement::SetDimension(unsigned short usDimension)
     CallEvent("onElementDimensionChange", Arguments);
 }
 
-void CElement::SetInterior(unsigned char ucInterior)
+void CElement::SetInterior(std::uint8_t ucInterior)
 {
     if (m_ucInterior == ucInterior)
         return;
 
-    unsigned char ucOldInterior = m_ucInterior;
+    std::uint8_t ucOldInterior = m_ucInterior;
     m_ucInterior = ucInterior;
 
     CLuaArguments Arguments;
@@ -1252,7 +1252,7 @@ void CElement::GetAttachedRotation(CVector& vecRotation)
     }
 }
 
-unsigned char CElement::GenerateSyncTimeContext()
+std::uint8_t CElement::GenerateSyncTimeContext()
 {
     // Increment the sync time index
     ++m_ucSyncTimeContext;
@@ -1271,7 +1271,7 @@ unsigned char CElement::GenerateSyncTimeContext()
     return m_ucSyncTimeContext;
 }
 
-bool CElement::CanUpdateSync(unsigned char ucRemote)
+bool CElement::CanUpdateSync(std::uint8_t ucRemote)
 {
     // We can update this element's sync only if the sync time
     // matches or either of them are 0 (ignore).
@@ -1280,18 +1280,18 @@ bool CElement::CanUpdateSync(unsigned char ucRemote)
 
 // Entities from root optimization for getElementsByType
 typedef CFastList<CElement*>                          CFromRootListType;
-typedef CFastHashMap<unsigned int, CFromRootListType> t_mapEntitiesFromRoot;
+typedef CFastHashMap<std::uint32_t, CFromRootListType> t_mapEntitiesFromRoot;
 static t_mapEntitiesFromRoot                          ms_mapEntitiesFromRoot;
 static bool                                           ms_bEntitiesFromRootInitialized = false;
 
 // CFastHashMap helpers
-unsigned int GetEmptyMapKey(unsigned int*)
+std::uint32_t GetEmptyMapKey(std::uint32_t*)
 {
-    return (unsigned int)0xFFFFFFFF;
+    return (std::uint32_t)0xFFFFFFFF;
 }
-unsigned int GetDeletedMapKey(unsigned int*)
+std::uint32_t GetDeletedMapKey(std::uint32_t*)
 {
-    return (unsigned int)0xFFFFFFFE;
+    return (std::uint32_t)0xFFFFFFFE;
 }
 
 void CElement::StartupEntitiesFromRoot()
@@ -1320,7 +1320,7 @@ bool CElement::IsFromRoot(CElement* pEntity)
     return CElement::IsFromRoot(pEntity->GetParentEntity());
 }
 
-void CElement::AddEntityFromRoot(unsigned int uiTypeHash, CElement* pEntity, bool bDebugCheck)
+void CElement::AddEntityFromRoot(std::uint32_t uiTypeHash, CElement* pEntity, bool bDebugCheck)
 {
     // Check
     assert(CElement::IsFromRoot(pEntity));
@@ -1341,7 +1341,7 @@ void CElement::AddEntityFromRoot(unsigned int uiTypeHash, CElement* pEntity, boo
 #endif
 }
 
-void CElement::RemoveEntityFromRoot(unsigned int uiTypeHash, CElement* pEntity)
+void CElement::RemoveEntityFromRoot(std::uint32_t uiTypeHash, CElement* pEntity)
 {
     // Remove from list
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find(uiTypeHash);
@@ -1359,7 +1359,7 @@ void CElement::RemoveEntityFromRoot(unsigned int uiTypeHash, CElement* pEntity)
         CElement::RemoveEntityFromRoot((*iter)->GetTypeHash(), *iter);
 }
 
-void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* pLua)
+void CElement::GetEntitiesFromRoot(std::uint32_t uiTypeHash, lua_State* pLua)
 {
 #if CHECK_ENTITIES_FROM_ROOT
     _CheckEntitiesFromRoot(uiTypeHash);
@@ -1370,7 +1370,7 @@ void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* pLua)
     {
         CFromRootListType& listEntities = find->second;
         CElement*          pEntity;
-        unsigned int       uiIndex = 0;
+        std::uint32_t       uiIndex = 0;
 
         for (CChildListType::const_reverse_iterator i = listEntities.rbegin(); i != listEntities.rend(); ++i)
         {
@@ -1384,7 +1384,7 @@ void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* pLua)
     }
 }
 
-void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, std::vector<CElement*>& outResult)
+void CElement::GetEntitiesFromRoot(std::uint32_t uiTypeHash, std::vector<CElement*>& outResult)
 {
 #if CHECK_ENTITIES_FROM_ROOT
     _CheckEntitiesFromRoot(uiTypeHash);
@@ -1411,7 +1411,7 @@ void CElement::GetEntitiesFromRoot(unsigned int uiTypeHash, std::vector<CElement
 //
 // Check that GetEntitiesFromRoot produces the same results as FindAllChildrenByTypeIndex on the root element
 //
-void CElement::_CheckEntitiesFromRoot(unsigned int uiTypeHash)
+void CElement::_CheckEntitiesFromRoot(std::uint32_t uiTypeHash)
 {
     std::map<CElement*, int> mapResults1;
     g_pGame->GetMapManager()->GetRootElement()->_FindAllChildrenByTypeIndex(uiTypeHash, mapResults1);
@@ -1445,7 +1445,7 @@ void CElement::_CheckEntitiesFromRoot(unsigned int uiTypeHash)
     assert(mapResults1 == mapResults2);
 }
 
-void CElement::_FindAllChildrenByTypeIndex(unsigned int uiTypeHash, std::map<CElement*, int>& mapResults)
+void CElement::_FindAllChildrenByTypeIndex(std::uint32_t uiTypeHash, std::map<CElement*, int>& mapResults)
 {
     // Our type matches?
     if (uiTypeHash == m_uiTypeHash)
@@ -1470,14 +1470,14 @@ void CElement::_FindAllChildrenByTypeIndex(unsigned int uiTypeHash, std::map<CEl
     }
 }
 
-void CElement::_GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CElement*, int>& mapResults)
+void CElement::_GetEntitiesFromRoot(std::uint32_t uiTypeHash, std::map<CElement*, int>& mapResults)
 {
     t_mapEntitiesFromRoot::iterator find = ms_mapEntitiesFromRoot.find(uiTypeHash);
     if (find != ms_mapEntitiesFromRoot.end())
     {
         CChildListType& listEntities = find->second;
         CElement*       pEntity;
-        unsigned int    uiIndex = 0;
+        std::uint32_t    uiIndex = 0;
 
         for (CChildListType::const_reverse_iterator i = listEntities.rbegin(); i != listEntities.rend(); ++i)
         {

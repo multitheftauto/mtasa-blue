@@ -361,7 +361,7 @@ bool CConsoleCommands::Say(CConsole* pConsole, const char* szInArguments, CClien
                                 // Log it in the console
                                 CLogger::LogPrintf("CHAT: %s: %s\n", szNick, szArguments);
 
-                                unsigned char ucR = 0xFF, ucG = 0xFF, ucB = 0xFF;
+                                std::uint8_t ucR = 0xFF, ucG = 0xFF, ucB = 0xFF;
                                 CPlayer*      pPlayer = static_cast<CPlayer*>(pClient);
                                 CTeam*        pTeam = pPlayer->GetTeam();
                                 if (pTeam)
@@ -496,7 +496,7 @@ bool CConsoleCommands::TeamSay(CConsole* pConsole, const char* szInArguments, CC
                                 // Log it in the console
                                 CLogger::LogPrintf("TEAMCHAT: %s: %s\n", szNick, szArguments);
 
-                                unsigned char ucRed = 0xFF, ucGreen = 0xFF, ucBlue = 0xFF;
+                                std::uint8_t ucRed = 0xFF, ucGreen = 0xFF, ucBlue = 0xFF;
                                 pTeam->GetColor(ucRed, ucGreen, ucBlue);
                                 // Broadcast to all the team members
                                 list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
@@ -1190,7 +1190,7 @@ bool CConsoleCommands::WhoIs(CConsole* pConsole, const char* szArguments, CClien
         if (strcmp(szArguments, "*") == 0)
         {
             // Iterate the players and echo their IPs and ports if anyone was requested
-            unsigned int                   uiCount = 0;
+            std::uint32_t                   uiCount = 0;
             CPlayerManager*                pPlayerManager = pConsole->GetPlayerManager();
             CPlayer*                       pPlayer;
             list<CPlayer*>::const_iterator iter = pPlayerManager->IterBegin();

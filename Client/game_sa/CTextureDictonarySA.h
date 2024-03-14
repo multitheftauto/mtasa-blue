@@ -17,7 +17,7 @@ class CTextureDictonarySAInterface
 {
 public:
     RwTexDictionary* rwTexDictonary;
-    unsigned short   usUsagesCount;
-    unsigned short   usParentIndex;
-    unsigned int     hash;
+    std::uint16_t   usUsagesCount;
+    std::uint16_t   usParentIndex;
+    std::uint32_t     hash;
 };

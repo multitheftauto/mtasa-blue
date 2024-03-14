@@ -45,12 +45,12 @@ void CTaskSimpleCarSetPedInAsDriverSA::SetIsWarpingPedIntoCar()
     ((CTaskSimpleCarSetPedInAsDriverSAInterface*)GetInterface())->m_bWarpingInToCar = true;
 }
 
-void CTaskSimpleCarSetPedInAsDriverSA::SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear)
+void CTaskSimpleCarSetPedInAsDriverSA::SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear)
 {
     ((CTaskSimpleCarSetPedInAsDriverSAInterface*)GetInterface())->m_nDoorFlagsToClear = nDoorFlagsToClear;
 }
 
-void CTaskSimpleCarSetPedInAsDriverSA::SetNumGettingInToClear(const unsigned char nNumGettingInToClear)
+void CTaskSimpleCarSetPedInAsDriverSA::SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear)
 {
     ((CTaskSimpleCarSetPedInAsDriverSAInterface*)GetInterface())->m_nNumGettingInToClear = nNumGettingInToClear;
 }
@@ -88,12 +88,12 @@ void CTaskSimpleCarSetPedInAsPassengerSA::SetIsWarpingPedIntoCar()
     ((CTaskSimpleCarSetPedInAsPassengerSAInterface*)GetInterface())->m_bWarpingInToCar = true;
 }
 
-void CTaskSimpleCarSetPedInAsPassengerSA::SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear)
+void CTaskSimpleCarSetPedInAsPassengerSA::SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear)
 {
     ((CTaskSimpleCarSetPedInAsPassengerSAInterface*)GetInterface())->m_nDoorFlagsToClear = nDoorFlagsToClear;
 }
 
-void CTaskSimpleCarSetPedInAsPassengerSA::SetNumGettingInToClear(const unsigned char nNumGettingInToClear)
+void CTaskSimpleCarSetPedInAsPassengerSA::SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear)
 {
     ((CTaskSimpleCarSetPedInAsPassengerSAInterface*)GetInterface())->m_nNumGettingInToClear = nNumGettingInToClear;
 }
@@ -139,12 +139,12 @@ void CTaskSimpleCarSetPedOutSA::SetKnockedOffBike()
     ((CTaskSimpleCarSetPedOutSAInterface*)GetInterface())->m_bSwitchOffEngine = false;
 }
 
-void CTaskSimpleCarSetPedOutSA::SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear)
+void CTaskSimpleCarSetPedOutSA::SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear)
 {
     ((CTaskSimpleCarSetPedOutSAInterface*)GetInterface())->m_nDoorFlagsToClear = nDoorFlagsToClear;
 }
 
-void CTaskSimpleCarSetPedOutSA::SetNumGettingInToClear(const unsigned char nNumGettingInToClear)
+void CTaskSimpleCarSetPedOutSA::SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear)
 {
     ((CTaskSimpleCarSetPedOutSAInterface*)GetInterface())->m_nNumGettingInToClear = nNumGettingInToClear;
 }

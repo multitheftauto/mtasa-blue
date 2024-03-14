@@ -80,7 +80,7 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
 {
     outBuffer.clear();
 
-    constexpr unsigned int GIBIBYTE = 1 * 1024 * 1024 * 1024;
+    constexpr std::uint32_t GIBIBYTE = 1 * 1024 * 1024 * 1024;
 
     if (offset > GIBIBYTE)
         return false;

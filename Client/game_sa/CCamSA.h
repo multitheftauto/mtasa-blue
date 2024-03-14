@@ -36,7 +36,7 @@ public:
     bool Rotating;
 
     short        Mode;                      // CameraMode  // 12
-    unsigned int m_uiFinishTime;            // 14
+    std::uint32_t m_uiFinishTime;            // 14
 
     int m_iDoCollisionChecksOnFrameNum;            // 18
     int m_iDoCollisionCheckEveryNumOfFrames;
@@ -168,7 +168,7 @@ public:
     CVector*     GetFront() const { return &m_pInterface->Front; }
     CVector*     GetUp() const { return &m_pInterface->Up; }
     CVector*     GetSource() const { return &m_pInterface->Source; }
-    unsigned int GetMode() const { return m_pInterface->Mode; }
+    std::uint32_t GetMode() const { return m_pInterface->Mode; }
     float        GetFOV() const { return m_pInterface->FOV; }
     void         SetFOV(float fFOV) { m_pInterface->FOV = fFOV; }
     void         GetDirection(float& fHorizontal, float& fVertical);

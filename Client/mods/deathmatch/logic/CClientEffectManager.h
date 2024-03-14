@@ -24,7 +24,7 @@ public:
     void           SAEffectDestroyed(void* pFxSAInterface);
     void           DeleteAll();
 
-    unsigned int          Count() { return m_Effects.size(); };
+    std::uint32_t          Count() { return m_Effects.size(); };
     static CClientEffect* Get(ElementID ID);
     void                  AddToList(CClientEffect* pEffect) { m_Effects.push_back(pEffect); }
     void                  RemoveFromList(CClientEffect* pEffect);

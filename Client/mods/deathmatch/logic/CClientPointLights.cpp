@@ -56,13 +56,13 @@ void CClientPointLights::DoPulse()
     }
 }
 
-void CClientPointLights::SetDimension(unsigned short usDimension)
+void CClientPointLights::SetDimension(std::uint16_t usDimension)
 {
     CClientEntity::SetDimension(usDimension);
     RelateDimension(m_pPointLightsManager->GetDimension());
 }
 
-void CClientPointLights::RelateDimension(unsigned short usDimension)
+void CClientPointLights::RelateDimension(std::uint16_t usDimension)
 {
     m_bStreamedIn = (usDimension == m_usDimension);
 }

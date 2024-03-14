@@ -17,7 +17,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod)
+CClientObject::CClientObject(CClientManager* pManager, ElementID ID, std::uint16_t usModel, bool bLowLod)
     : ClassInit(this), CClientStreamElement(bLowLod ? pManager->GetObjectLodStreamer() : pManager->GetObjectStreamer(), ID), m_bIsLowLod(bLowLod)
 {
     // Init
@@ -253,7 +253,7 @@ void CClientObject::UpdateVisibility()
     }
 }
 
-void CClientObject::SetModel(unsigned short usModel)
+void CClientObject::SetModel(std::uint16_t usModel)
 {
     // Valid model ID?
     if (CClientObjectManager::IsValidModel(usModel))
@@ -367,7 +367,7 @@ void CClientObject::SetFrozen(bool bFrozen)
     }
 }
 
-void CClientObject::SetAlpha(unsigned char ucAlpha)
+void CClientObject::SetAlpha(std::uint8_t ucAlpha)
 {
     if (m_pObject)
     {
@@ -838,7 +838,7 @@ void CClientObject::SetCenterOfMass(const CVector& vecCenterOfMass)
     m_vecCenterOfMass = vecCenterOfMass;
 }
 
-void CClientObject::SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension)
+void CClientObject::SetVisibleInAllDimensions(bool bVisible, std::uint16_t usNewDimension)
 {
     m_bVisibleInAllDimensions = bVisible;
 

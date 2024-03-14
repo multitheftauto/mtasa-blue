@@ -376,7 +376,7 @@ bool CCore::IsDebugVisible()
         return false;
 }
 
-void CCore::DebugEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B)
+void CCore::DebugEchoColor(const char* szText, std::uint8_t R, std::uint8_t G, std::uint8_t B)
 {
     // Set the color
     CDebugView* pDebugView = m_pLocalGUI->GetDebugView();
@@ -389,7 +389,7 @@ void CCore::DebugEchoColor(const char* szText, unsigned char R, unsigned char G,
     m_pLocalGUI->EchoDebug(szText);
 }
 
-void CCore::DebugPrintfColor(const char* szFormat, unsigned char R, unsigned char G, unsigned char B, ...)
+void CCore::DebugPrintfColor(const char* szFormat, std::uint8_t R, std::uint8_t G, std::uint8_t B, ...)
 {
     // Set the color
     if (szFormat)
@@ -415,7 +415,7 @@ void CCore::DebugClear()
     }
 }
 
-void CCore::ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded)
+void CCore::ChatEchoColor(const char* szText, std::uint8_t R, std::uint8_t G, std::uint8_t B, bool bColorCoded)
 {
     // Set the color
     CChat* pChat = m_pLocalGUI->GetChat();
@@ -448,7 +448,7 @@ void CCore::ChatPrintf(const char* szFormat, bool bColorCoded, ...)
     ChatEcho(szBuffer, bColorCoded);
 }
 
-void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...)
+void CCore::ChatPrintfColor(const char* szFormat, bool bColorCoded, std::uint8_t R, std::uint8_t G, std::uint8_t B, ...)
 {
     // Set the color
     if (szFormat)
@@ -685,7 +685,7 @@ bool CCore::IsConnected()
     return m_pLocalGUI->GetMainMenu() && m_pLocalGUI->GetMainMenu()->GetIsIngame();
 }
 
-bool CCore::Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave)
+bool CCore::Reconnect(const char* szHost, std::uint16_t usPort, const char* szPassword, bool bSave)
 {
     return m_pConnectManager->Reconnect(szHost, usPort, szPassword, bSave);
 }
@@ -712,7 +712,7 @@ void CCore::SetMessageProcessor(pfnProcessMessage pfnMessageProcessor)
     m_pfnMessageProcessor = pfnMessageProcessor;
 }
 
-void CCore::ShowMessageBox(const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK* ResponseHandler)
+void CCore::ShowMessageBox(const char* szTitle, const char* szText, std::uint32_t uiFlags, GUI_CALLBACK* ResponseHandler)
 {
     RemoveMessageBox();
 
@@ -826,7 +826,7 @@ void CCore::HideMainMenu()
     m_pLocalGUI->GetMainMenu()->SetVisible(false);
 }
 
-void CCore::ShowServerInfo(unsigned int WindowType)
+void CCore::ShowServerInfo(std::uint32_t WindowType)
 {
     RemoveMessageBox();
     CServerInfo::GetSingletonPtr()->Show((eWindowType)WindowType);
@@ -1461,7 +1461,7 @@ bool CCore::IsValidNick(const char* szNick)
     }
 
     // Check that each character is valid (visible characters exluding space)
-    unsigned char ucTemp;
+    std::uint8_t ucTemp;
     for (size_t i = 0; i < sizeNick; i++)
     {
         ucTemp = szNick[i];
@@ -1614,7 +1614,7 @@ const char* CCore::GetCommandLineOption(const char* szOption)
 
 SString CCore::GetConnectCommandFromURI(const char* szURI)
 {
-    unsigned short usPort;
+    std::uint16_t usPort;
     std::string    strHost, strNick, strPassword;
     GetConnectParametersFromURI(szURI, strHost, usPort, strNick, strPassword);
 
@@ -1631,7 +1631,7 @@ SString CCore::GetConnectCommandFromURI(const char* szURI)
     return strDest;
 }
 
-void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost, unsigned short& usPort, std::string& strNick, std::string& strPassword)
+void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost, std::uint16_t& usPort, std::string& strNick, std::string& strPassword)
 {
     // Grab the length of the string
     size_t sizeURI = strlen(szURI);
@@ -1747,7 +1747,7 @@ void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost,
     usPort = 22003;
     if (strlen(szPort) > 0)
     {
-        usPort = static_cast<unsigned short>(atoi(szPort));
+        usPort = static_cast<std::uint16_t>(atoi(szPort));
     }
 
     // Grab the nickname
@@ -1766,7 +1766,7 @@ void CCore::GetConnectParametersFromURI(const char* szURI, std::string& strHost,
 void CCore::UpdateRecentlyPlayed()
 {
     // Get the current host and port
-    unsigned int uiPort;
+    std::uint32_t uiPort;
     std::string  strHost;
     CVARS_GET("host", strHost);
     CVARS_GET("port", uiPort);

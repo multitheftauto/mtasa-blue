@@ -28,7 +28,7 @@ public:
     ZERO_ON_NEW
     CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* pVoiceRecorder);
     ~CClientPlayerVoice();
-    void DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten);
+    void DecodeAndBuffer(char* pBuffer, std::uint32_t bytesWritten);
     void DoPulse();
 
     bool m_bVoiceActive;
@@ -83,7 +83,7 @@ private:
 
     CClientPlayer*  m_pPlayer;
     CVoiceRecorder* m_pVoiceRecorder;
-    unsigned int    m_SampleRate;
+    std::uint32_t    m_SampleRate;
     HSTREAM         m_pBassPlaybackStream;
     void*           m_pSpeexDecoderState;
     int             m_iSpeexIncomingFrameSampleCount;

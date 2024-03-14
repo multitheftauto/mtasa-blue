@@ -27,10 +27,10 @@ private:
     CClientDisplayManager* m_pDisplayManager;
 
     unsigned long      m_ulLastUpdateTime;
-    unsigned int       m_uiLastPacketsReceived;
-    unsigned int       m_uiLastPacketsSent;
-    unsigned long long m_ullLastBytesSent;
-    unsigned long long m_ullLastBytesReceived;
+    std::uint32_t       m_uiLastPacketsReceived;
+    std::uint32_t       m_uiLastPacketsSent;
+    std::uint64_t m_ullLastBytesSent;
+    std::uint64_t m_ullLastBytesReceived;
 
     float m_fPacketSendRate;
     float m_fPacketReceiveRate;

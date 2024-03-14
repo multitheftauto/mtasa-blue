@@ -43,9 +43,9 @@ bool CLightsyncPacket::Write(NetBitStreamInterface& BitStream) const
         bSyncPosition = (!pVehicle || pPlayer->GetOccupiedVehicleSeat() == 0) && llTicksDifference <= g_TickRateSettings.iLightSync + 100;
 
         BitStream.Write(pPlayer->GetID());
-        BitStream.Write((unsigned char)pPlayer->GetSyncTimeContext());
+        BitStream.Write((std::uint8_t)pPlayer->GetSyncTimeContext());
 
-        unsigned short usLatency = pPlayer->GetPing();
+        std::uint16_t usLatency = pPlayer->GetPing();
         BitStream.WriteCompressed(usLatency);
 
         BitStream.WriteBit(data.health.bSync);

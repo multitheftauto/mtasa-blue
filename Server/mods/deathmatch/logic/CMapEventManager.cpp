@@ -365,7 +365,7 @@ void CMapEventManager::AddInternal(CMapEvent* pEvent)
 
 void CMapEventManager::GetHandles(CLuaMain* pLuaMain, const char* szName, lua_State* luaVM)
 {
-    unsigned int   uiIndex = 0;
+    std::uint32_t   uiIndex = 0;
     EventsIterPair itPair = m_EventsMap.equal_range(szName);
     for (EventsIter iter = itPair.first; iter != itPair.second; ++iter)
     {

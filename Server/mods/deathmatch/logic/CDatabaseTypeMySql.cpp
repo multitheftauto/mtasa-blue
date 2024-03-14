@@ -283,9 +283,9 @@ SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs)
     SString strParsedQuery;
 
     // Walk through the query and replace the variable placeholders with the actual variables
-    unsigned int uiLen = strQuery.length();
-    unsigned int a = 0;
-    for (unsigned int i = 0; i < uiLen; i++)
+    std::uint32_t uiLen = strQuery.length();
+    std::uint32_t a = 0;
+    for (std::uint32_t i = 0; i < uiLen; i++)
     {
         if (strQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {
@@ -351,7 +351,7 @@ SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs)
 SString InsertQueryArgumentsMySql(const char* szQuery, va_list vl)
 {
     SString strParsedQuery;
-    for (unsigned int i = 0; szQuery[i] != '\0'; i++)
+    for (std::uint32_t i = 0; szQuery[i] != '\0'; i++)
     {
         if (szQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {

@@ -272,7 +272,7 @@ void CAccountManager::Save(CAccount* pAccount, bool bCheckForErrors)
     SString      strHttpPassAppend = pAccount->GetHttpPassAppend();
     SString      strIP = pAccount->GetIP();
     SString      strSerial = pAccount->GetSerial();
-    unsigned int iID = pAccount->GetID();
+    std::uint32_t iID = pAccount->GetID();
 
     m_pDatabaseManager->Execf(m_hDbConnection, "INSERT OR IGNORE INTO accounts (id, name, ip, serial, password) VALUES(?,?,?,?,?)", SQLITE_INTEGER, iID,
                               SQLITE_TEXT, strName.c_str(), SQLITE_TEXT, strIP.c_str(), SQLITE_TEXT, strSerial.c_str(), SQLITE_TEXT, strPassword.c_str());

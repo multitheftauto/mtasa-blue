@@ -51,7 +51,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         {
             pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
             CTxdStore_AddRef(usTxdId);
-            ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+            ((void(__cdecl*)(std::uint16_t))FUNC_RemoveModel)(usModelId);
             pTxd = CTxdStore_GetTxd(usTxdId);
         }
         else
@@ -61,7 +61,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
             {
                 // Mystery fix for #9336: (MTA sometimes fails at loading custom textures)
                 // Possibly forces the ped model to be reloaded in some way
-                ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+                ((void(__cdecl*)(std::uint16_t))FUNC_RemoveModel)(usModelId);
             }
         }
 

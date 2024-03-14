@@ -38,10 +38,10 @@ CAudioContainerSA::~CAudioContainerSA()
     }
 }
 
-bool CAudioContainerSA::GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length)
+bool CAudioContainerSA::GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, std::uint32_t& length)
 {
     uint8*       rawAudioData = NULL;
-    unsigned int rawAudioLength;
+    std::uint32_t rawAudioLength;
     int          iSampleRate;
 
     if (!GetRawAudioData(lookupIndex, bankIndex, audioIndex, rawAudioData, rawAudioLength, iSampleRate))
@@ -87,7 +87,7 @@ bool CAudioContainerSA::GetAudioData(eAudioLookupIndex lookupIndex, int bankInde
     return true;
 }
 
-bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, uint8*& dataOut, unsigned int& lengthOut,
+bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, uint8*& dataOut, std::uint32_t& lengthOut,
                                         int& iSampleRateOut)
 {
     int numBanks = m_pLookupTable->CountIndex(lookupIndex);
@@ -114,7 +114,7 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
     if (!audioEntry)
         return false;
 
-    unsigned int rawLength;
+    std::uint32_t rawLength;
     if (audioIndex + 1 < bankHeader.numSounds)            // hacky fix: audioIndex starts at 0
     {
         SAudioEntrySA* nextAudioEntry = &bankHeader.sounds[audioIndex + 1];
@@ -205,10 +205,10 @@ bool CAudioContainerSA::ValidateContainer(eAudioLookupIndex lookupIndex)
 
     // Count the zeros -> if more than 80% we assume that it has been cut (read 4KB blocks at once)
     uint8              buffer[VALIDATE_BUFFER_SIZE];
-    unsigned long long numZeros = 0;
+    std::uint64_t numZeros = 0;
     while (archive.read(reinterpret_cast<char*>(buffer), VALIDATE_BUFFER_SIZE))
     {
-        for (unsigned int i = 0; i < VALIDATE_BUFFER_SIZE; i++)
+        for (std::uint32_t i = 0; i < VALIDATE_BUFFER_SIZE; i++)
         {
             if (buffer[i] == 0)
                 numZeros++;
@@ -246,7 +246,7 @@ bool CAudioContainerSA::GetAudioSizeFromHeader(const SRadioTrackHeader& header, 
     return true;
 }
 
-bool CAudioContainerSA::GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length)
+bool CAudioContainerSA::GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, std::uint32_t& length)
 {
     std::ifstream archive(FromUTF8(GetRadioStreamArchiveName(streamIndex)), std::ios::binary);
 

@@ -42,7 +42,7 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    bool CanUpdateSync(unsigned char ucRemote)
+    bool CanUpdateSync(std::uint8_t ucRemote)
     {
         // We can update this element's sync only if the sync time
         // matches or either of them are 0 (ignore).

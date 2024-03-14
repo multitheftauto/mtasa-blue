@@ -45,7 +45,7 @@ DWORD m_dwStore_Calculate = 0;
 
 __declspec(noinline) void DumpHandlingData(tHandlingDataSA* pData)
 {
-    unsigned int iCounter = pData->iVehicleID;
+    std::uint32_t iCounter = pData->iVehicleID;
 
     FILE* pFile = fopen("C:/dumped.txt", "a+");
 

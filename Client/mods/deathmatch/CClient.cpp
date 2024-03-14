@@ -270,7 +270,7 @@ bool CClient::ProcessCommand(const char* commandName, size_t commandNameLength, 
     return false;
 }
 
-void CClient::RestreamModel(unsigned short usModel)
+void CClient::RestreamModel(std::uint16_t usModel)
 {
     if (g_pClientGame)
     {

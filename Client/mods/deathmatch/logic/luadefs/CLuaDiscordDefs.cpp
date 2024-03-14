@@ -227,7 +227,7 @@ bool CLuaDiscordDefs::SetSmallAsset(std::string szAsset, std::string szAssetText
     return SetAsset(szAsset, szAssetText, false);
 }
 
-bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, std::string szUrl)
+bool CLuaDiscordDefs::SetButtons(std::uint16_t int iIndex, std::string szName, std::string szUrl)
 {
     if (iIndex < 1 || iIndex > 2)
         return false;

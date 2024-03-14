@@ -35,7 +35,7 @@ void CTrainTrackManager::DestroyTrainTrack(CTrainTrack* pTrainTrack)
     m_Tracks.erase(std::remove(m_Tracks.begin(), m_Tracks.end(), pTrainTrack));
 }
 
-CTrainTrack* CTrainTrackManager::GetTrainTrackByIndex(unsigned int index)
+CTrainTrack* CTrainTrackManager::GetTrainTrackByIndex(std::uint32_t index)
 {
     if (index >= m_Tracks.size())
         return nullptr;

@@ -398,7 +398,7 @@ CClientPed::~CClientPed()
     m_clientModel = nullptr;
 }
 
-void CClientPed::SetStat(unsigned short usStat, float fValue)
+void CClientPed::SetStat(std::uint16_t usStat, float fValue)
 {
     if (m_bIsLocalPlayer)
     {
@@ -415,7 +415,7 @@ void CClientPed::SetStat(unsigned short usStat, float fValue)
     }
 }
 
-float CClientPed::GetStat(unsigned short usStat)
+float CClientPed::GetStat(std::uint16_t usStat)
 {
     if (m_bIsLocalPlayer)
     {
@@ -442,7 +442,7 @@ float CClientPed::GetStat(unsigned short usStat)
 void CClientPed::ResetStats()
 {
     // stats
-    for (unsigned short us = 0; us <= NUM_PLAYER_STATS; us++)
+    for (std::uint16_t us = 0; us <= NUM_PLAYER_STATS; us++)
     {
         if (us == MAX_HEALTH)
         {
@@ -566,7 +566,7 @@ void CClientPed::SetPosition(const CVector& vecPosition, bool bResetInterpolatio
         RemoveTargetPosition();
 }
 
-void CClientPed::SetInterior(unsigned char ucInterior)
+void CClientPed::SetInterior(std::uint8_t ucInterior)
 {
     CEntity* pEntity = GetGameEntity();
     if (pEntity)
@@ -720,7 +720,7 @@ void CClientPed::SetCurrentRotationNew(float fRotation)
     SetRotationRadiansNew(CVector(0, 0, fRotation));
 }
 
-void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
+void CClientPed::Spawn(const CVector& vecPosition, float fRotation, std::uint16_t usModel, std::uint8_t ucInterior)
 {
     // Remove us from our car
     RemoveFromVehicle();
@@ -959,7 +959,7 @@ void CClientPed::AddKeysync(unsigned long ulDelay, const CControllerState& Contr
     }
 }
 
-void CClientPed::AddChangeWeapon(unsigned long ulDelay, eWeaponSlot slot, unsigned short usWeaponAmmo)
+void CClientPed::AddChangeWeapon(unsigned long ulDelay, eWeaponSlot slot, std::uint16_t usWeaponAmmo)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -1059,7 +1059,7 @@ bool CClientPed::SetModel(unsigned long ulModel, bool bTemp)
             if (m_pPlayerPed)
             {
                 // Request the model
-                if (m_pRequester->Request(static_cast<unsigned short>(ulModel), this))
+                if (m_pRequester->Request(static_cast<std::uint16_t>(ulModel), this))
                 {
                     m_pModelInfo->MakeCustomModel();
                     // Change the model immediately if it was loaded
@@ -1130,7 +1130,7 @@ CClientVehicle* CClientPed::GetRealOccupiedVehicle()
 }
 
 CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
-                                                       bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition,
+                                                       bool bCheckStreamedOutVehicles, std::uint32_t* uiClosestDoor, CVector* pClosestDoorPosition,
                                                        float fWithinRange)
 {
     if (bGetPositionFromClosestDoor)
@@ -1241,7 +1241,7 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
                             iClosestDoor = 3;
                             break;
                     }
-                    *uiClosestDoor = static_cast<unsigned int>(iClosestDoor);
+                    *uiClosestDoor = static_cast<std::uint32_t>(iClosestDoor);
                 }
                 if (pClosestDoorPosition)
                     *pClosestDoorPosition = vecClosestDoorPosition;
@@ -1252,7 +1252,7 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
     return pVehicle;
 }
 
-bool CClientPed::GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
+bool CClientPed::GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, std::uint32_t& uiClosestDoor,
                                 CVector* pClosestDoorPosition)
 {
     if (!bCheckDriverDoor && !bCheckPassengerDoors)
@@ -1328,7 +1328,7 @@ bool CClientPed::GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor,
     return false;
 }
 
-void CClientPed::GetOutOfVehicle(unsigned char ucDoor)
+void CClientPed::GetOutOfVehicle(std::uint8_t ucDoor)
 {
     if (ucDoor != 0xFF)
         m_ucLeavingDoor = ucDoor + 2;
@@ -1369,7 +1369,7 @@ void CClientPed::GetOutOfVehicle(unsigned char ucDoor)
     ResetToOutOfVehicleWeapon();
 }
 
-void CClientPed::GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor)
+void CClientPed::GetIntoVehicle(CClientVehicle* pVehicle, std::uint32_t uiSeat, std::uint8_t ucDoor)
 {
     // TODO: add checks to ensure we don't try to use the wrong seats for bikes etc
     // Eventually remove us from a previous vehicle
@@ -1382,7 +1382,7 @@ void CClientPed::GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, u
     m_bForceGettingIn = true;
 }
 
-void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
+void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, std::uint32_t uiSeat)
 {
     // Ensure vehicle model is loaded
     CModelInfo* pModelInfo = pVehicle->GetModelInfo();
@@ -1451,7 +1451,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
 
     // Store our current seat
     if (m_pPlayerPed)
-        m_pPlayerPed->SetOccupiedSeat((unsigned char)uiSeat);
+        m_pPlayerPed->SetOccupiedSeat((std::uint8_t)uiSeat);
 
     // Driverseat
     if (uiSeat == 0)
@@ -1489,7 +1489,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     else
     {
         // Passenger seat
-        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
+        std::uint8_t ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
         if (ucSeat != 0 && ucSeat != 0xFF)
         {
             if (m_pPlayerPed)
@@ -1751,7 +1751,7 @@ void CClientPed::InternalSetHealth(float fHealth)
         {
             // Grab the vehicle and eventually warp out of it
             CClientVehicle* pVehicle = GetOccupiedVehicle();
-            unsigned int    uiVehicleSeat = m_uiOccupiedVehicleSeat;
+            std::uint32_t    uiVehicleSeat = m_uiOccupiedVehicleSeat;
             RemoveFromVehicle();
 
             // If it's the local player, call respawn
@@ -1878,7 +1878,7 @@ void CClientPed::BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPar
     }
 }
 
-void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, bool bSetDirectlyDead, AssocGroupId animGroup, AnimationId animID)
+void CClientPed::Kill(eWeaponType weaponType, std::uint8_t ucBodypart, bool bStealth, bool bSetDirectlyDead, AssocGroupId animGroup, AnimationId animID)
 {
     // Don't change task if already dead or dying
     if (m_pPlayerPed && !IsDead() && !IsDying())
@@ -2051,14 +2051,14 @@ void CClientPed::SetFrozenWaitingForGroundToLoad(bool bFrozen)
     }
 }
 
-CWeapon* CClientPed::GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent)
+CWeapon* CClientPed::GiveWeapon(eWeaponType weaponType, std::uint32_t uiAmmo, bool bSetAsCurrent)
 {
     CWeapon* pWeapon = NULL;
     if (m_pPlayerPed)
     {
         // Grab our current ammo in clip
         pWeapon = GetWeapon(weaponType);
-        unsigned int uiPreviousAmmoTotal = 0, uiPreviousAmmoInClip = 0;
+        std::uint32_t uiPreviousAmmoTotal = 0, uiPreviousAmmoInClip = 0;
         eWeaponSkill weaponSkill = WEAPONSKILL_STD;
         eWeaponType  previousWeaponType = eWeaponType::WEAPONTYPE_ANYWEAPON;
         if (pWeapon)
@@ -2079,7 +2079,7 @@ CWeapon* CClientPed::GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, boo
         // Restore clip ammo?
         if (uiPreviousAmmoInClip)
         {
-            unsigned int uiTotalAmmo;
+            std::uint32_t uiTotalAmmo;
             eWeaponSlot  slot = pWeapon->GetSlot();
             if (pWeapon->GetType() != previousWeaponType)
             {
@@ -2426,7 +2426,7 @@ eMovementState CClientPed::GetMovementState()
         // Is he standing up?
         if (!IsDucked())
         {
-            unsigned int iRunState = m_pPlayerPed->GetRunState();
+            std::uint32_t iRunState = m_pPlayerPed->GetRunState();
 
             // Is he moving the contoller at all?
             if (iRunState == 1 && cs.LeftStickX == 0 && cs.LeftStickY == 0)
@@ -2877,7 +2877,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         }
 
         // Update our alpha
-        unsigned char ucAlpha = m_ucAlpha;
+        std::uint8_t ucAlpha = m_ucAlpha;
         // Are we in a different interior to the camera? set our alpha to 0
         if (m_ucInterior != g_pGame->GetWorld()->GetCurrentArea())
             ucAlpha = 0;
@@ -3874,7 +3874,7 @@ void CClientPed::_ChangeModel()
 
             // Save the vehicle he's in
             CClientVehicle* pVehicle = GetOccupiedVehicle();
-            unsigned int    uiSeat = GetOccupiedVehicleSeat();
+            std::uint32_t    uiSeat = GetOccupiedVehicleSeat();
             CVector         vecVehicleVelocity, vecVehicleTurnVelocity;
             float           fVehicleTrainSpeed;
 
@@ -4086,7 +4086,7 @@ void CClientPed::StreamIn(bool bInstantly)
     if ( bInstantly )
     {
         // Request its model blocking
-        if ( !m_pPlayerPed && m_pRequester->RequestBlocking ( static_cast < unsigned short > ( m_ulModel ), "CClientVehicle::StreamIn - bInstantly" ) )
+        if ( !m_pPlayerPed && m_pRequester->RequestBlocking ( static_cast < std::uint16_t > ( m_ulModel ), "CClientVehicle::StreamIn - bInstantly" ) )
         {
             m_pModelInfo->MakeCustomModel ( );
             // If it was loaded, create it immediately.
@@ -4098,7 +4098,7 @@ void CClientPed::StreamIn(bool bInstantly)
 #endif
     {
         // Request it
-        if (!m_pPlayerPed && m_pRequester->Request(static_cast<unsigned short>(m_ulModel), this))
+        if (!m_pPlayerPed && m_pRequester->Request(static_cast<std::uint16_t>(m_ulModel), this))
         {
             m_pModelInfo->MakeCustomModel();
             // If it was loaded, create it immediately.
@@ -4420,7 +4420,7 @@ bool CClientPed::IsMovingGoggles(bool& bPuttingOn)
     return false;
 }
 
-void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor)
+void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, std::uint32_t uiSeat, std::uint8_t ucDoor)
 {
     assert(m_pOccupiedVehicle == NULL);
     assert(m_pOccupyingVehicle == NULL || m_pOccupyingVehicle == pVehicle);
@@ -4429,12 +4429,12 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
     CTask* pTask = 0;
     if (m_pTaskManager)
         pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-    unsigned short usVehicleModel = pVehicle->GetModel();
+    std::uint16_t usVehicleModel = pVehicle->GetModel();
     if (((pTask && pTask->GetTaskType() == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) &&
         (usVehicleModel == VT_SKIMMER || usVehicleModel == VT_SEASPAR || usVehicleModel == VT_LEVIATHN || usVehicleModel == VT_VORTEX))
     {
         CVector      vecDoorPos;
-        unsigned int uiDoor;
+        std::uint32_t uiDoor;
         GetClosestDoor(pVehicle, uiSeat == 0, uiSeat != 0, uiDoor, &vecDoorPos);
         Teleport(vecDoorPos);
     }
@@ -4471,14 +4471,14 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
         eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(pVehicle->m_usModel);
         if (vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_QUADBIKE)
         {
-            unsigned int uiTemp;
+            std::uint32_t uiTemp;
             if (GetClosestDoor(pVehicle, false, true, uiTemp))
             {
                 uiSeat = uiTemp;
             }
         }
 
-        unsigned char ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
+        std::uint8_t ucSeat = CClientVehicleManager::ConvertIndexToGameSeat(pVehicle->m_usModel, uiSeat);
         if (ucSeat != 0 && ucSeat != 0xFF)
         {
             if (m_pPlayerPed)
@@ -4653,7 +4653,7 @@ void CClientPed::PreviousRadioChannel()
     }
 }
 
-bool CClientPed::SetCurrentRadioChannel(unsigned char ucChannel)
+bool CClientPed::SetCurrentRadioChannel(std::uint8_t ucChannel)
 {
     // Local player?
     if (m_bIsLocalPlayer && ucChannel <= 12)
@@ -4690,7 +4690,7 @@ bool CClientPed::GetShotData(CVector* pvecOrigin, CVector* pvecTarget, CVector* 
     if (!pWeapon)
         return false;
 
-    unsigned char    ucWeaponType = pWeapon->GetType();
+    std::uint8_t    ucWeaponType = pWeapon->GetType();
     CClientVehicle*  pVehicle = GetRealOccupiedVehicle();
     CControllerState Controller;
     GetControllerState(Controller);
@@ -4872,12 +4872,12 @@ void CClientPed::SetMoveAnim(eMoveAnim iAnim)
     m_MoveAnim = iAnim;
 }
 
-unsigned int CClientPed::CountProjectiles(eWeaponType weaponType)
+std::uint32_t CClientPed::CountProjectiles(eWeaponType weaponType)
 {
     if (weaponType == WEAPONTYPE_UNARMED)
-        return static_cast<unsigned int>(m_Projectiles.size());
+        return static_cast<std::uint32_t>(m_Projectiles.size());
 
-    unsigned int                       uiCount = 0;
+    std::uint32_t                       uiCount = 0;
     list<CClientProjectile*>::iterator iter = m_Projectiles.begin();
     for (; iter != m_Projectiles.end(); iter++)
     {
@@ -5126,7 +5126,7 @@ bool CClientPed::HasAkimboPointingUpwards()
                 CWeapon* pWeapon = GetWeapon(GetCurrentWeaponSlot());
                 if (pWeapon)
                 {
-                    unsigned char ucWeaponType = pWeapon->GetType();
+                    std::uint8_t ucWeaponType = pWeapon->GetType();
                     if (ucWeaponType == 22 || ucWeaponType == 26 || ucWeaponType == 28 || ucWeaponType == 32)
                     {
                         if (!IsDucked() && pWeapon->GetState() != WEAPONSTATE_RELOADING)
@@ -5155,7 +5155,7 @@ float CClientPed::GetDistanceFromCentreOfMassToBaseOfModel()
     return 0.0f;
 }
 
-void CClientPed::SetAlpha(unsigned char ucAlpha)
+void CClientPed::SetAlpha(std::uint8_t ucAlpha)
 {
     /* Handled in ::StreamedInPulse
     if ( m_pPlayerPed )
@@ -5202,8 +5202,8 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             eWeaponSlot   weaponSlot = GetCurrentWeaponSlot();
             float         fCurrentRotation = GetCurrentRotation();
             float         fTargetRotation = m_pPlayerPed->GetTargetRotation();
-            unsigned char ucInterior = GetInterior();
-            unsigned char ucCameraInterior = static_cast<unsigned char>(g_pGame->GetWorld()->GetCurrentArea());
+            std::uint8_t ucInterior = GetInterior();
+            std::uint8_t ucCameraInterior = static_cast<std::uint8_t>(g_pGame->GetWorld()->GetCurrentArea());
 
             // Don't allow any camera movement if we're in fixed mode
             if (m_pManager->GetCamera()->IsInFixedMode())
@@ -5243,7 +5243,7 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
     }
 }
 
-const char* CClientPed::GetBodyPartName(unsigned char ucID)
+const char* CClientPed::GetBodyPartName(std::uint8_t ucID)
 {
     if (ucID <= 10)
     {
@@ -5607,7 +5607,7 @@ void CClientPed::SetDoingGangDriveby(bool bDriveby)
     }
     else if (bDriveby)
     {
-        unsigned int seat = GetOccupiedVehicleSeat();
+        std::uint32_t seat = GetOccupiedVehicleSeat();
         bool         bRight = (seat % 2 != 0);
 
         if (CTask* task = g_pGame->GetTasks()->CreateTaskSimpleGangDriveBy(NULL, NULL, 0.0f, 0, 0, bRight); task != nullptr)
@@ -6365,7 +6365,7 @@ void CClientPed::HandleWaitingForGroundToLoad()
 
     std::vector<SString> lineList;
     strAround.Split("\n", lineList);
-    for (unsigned int i = 0; i < lineList.size(); i++)
+    for (std::uint32_t i = 0; i < lineList.size(); i++)
         g_pCore->GetGraphics()->DrawString(10, 230 + i * 10, -1, 1, lineList[i]);
     #endif
 }
@@ -6452,7 +6452,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    unsigned int uiDoor = 0;
+    std::uint32_t uiDoor = 0;
     // Do we want to enter a specific vehicle?
     if (!pVehicle)
     {
@@ -6486,7 +6486,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     }
 
     // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
-    unsigned short vehicleModel = pVehicle->GetModel();
+    std::uint16_t vehicleModel = pVehicle->GetModel();
 
     if (IsInWater() && !(vehicleModel == VT_SKIMMER || vehicleModel == VT_SEASPAR || vehicleModel == VT_LEVIATHN || vehicleModel == VT_VORTEX))
     {
@@ -6522,7 +6522,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    unsigned int uiSeat = uiDoor;
+    std::uint32_t uiSeat = uiDoor;
     if (bPassenger && uiDoor == 0)
     {
         // We're trying to enter as a passenger, yet our closest door
@@ -6569,10 +6569,10 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 
     // Write the vehicle id to it and that we're requesting to get into it
     pBitStream->Write(pVehicle->GetID());
-    unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_REQUEST_IN);
-    unsigned char ucSeat = static_cast<unsigned char>(uiSeat);
+    std::uint8_t ucAction = static_cast<std::uint8_t>(CClientGame::VEHICLE_REQUEST_IN);
+    std::uint8_t ucSeat = static_cast<std::uint8_t>(uiSeat);
     bool          bIsOnWater = pVehicle->IsOnWater();
-    unsigned char ucDoor = static_cast<unsigned char>(uiDoor);
+    std::uint8_t ucDoor = static_cast<std::uint8_t>(uiDoor);
     pBitStream->WriteBits(&ucAction, 4);
     pBitStream->WriteBits(&ucSeat, 4);
     pBitStream->WriteBit(bIsOnWater);
@@ -6671,10 +6671,10 @@ bool CClientPed::ExitVehicle()
 
     // Write the vehicle id to it and that we're requesting to get out of it
     pBitStream->Write(pOccupiedVehicle->GetID());
-    unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_REQUEST_OUT);
+    std::uint8_t ucAction = static_cast<std::uint8_t>(CClientGame::VEHICLE_REQUEST_OUT);
     pBitStream->WriteBits(&ucAction, 4);
 
-    unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+    std::uint8_t ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
     if (ucDoor >= 2 && ucDoor <= 5)
     {
         ucDoor -= 2;
@@ -6748,7 +6748,7 @@ void CClientPed::UpdateVehicleInOut()
 
                         // Write the car id and the action id (enter complete)
                         pBitStream->Write(m_VehicleInOutID);
-                        unsigned char ucAction = CClientGame::VEHICLE_NOTIFY_OUT;
+                        std::uint8_t ucAction = CClientGame::VEHICLE_NOTIFY_OUT;
                         pBitStream->WriteBits(&ucAction, 4);
 
                         // Send it and destroy the packet
@@ -6808,18 +6808,18 @@ void CClientPed::UpdateVehicleInOut()
 
                         // Write the car id and the action id (enter complete)
                         pBitStream->Write(m_VehicleInOutID);
-                        unsigned char ucAction;
+                        std::uint8_t ucAction;
 
                         if (m_bIsJackingVehicle)
                         {
-                            ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_JACK);
+                            ucAction = static_cast<std::uint8_t>(CClientGame::VEHICLE_NOTIFY_JACK);
 #ifdef MTA_DEBUG
                             g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_jack");
 #endif
                         }
                         else
                         {
-                            ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_IN);
+                            ucAction = static_cast<std::uint8_t>(CClientGame::VEHICLE_NOTIFY_IN);
 #ifdef MTA_DEBUG
                             g_pCore->GetConsole()->Printf("* Sent_InOut: vehicle_notify_in");
 #endif
@@ -6855,10 +6855,10 @@ void CClientPed::UpdateVehicleInOut()
 
                         // Write the car id and the action id (enter complete)
                         pBitStream->Write(m_VehicleInOutID);
-                        unsigned char ucAction;
+                        std::uint8_t ucAction;
                         if (m_bIsJackingVehicle)
                         {
-                            ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_JACK_ABORT);
+                            ucAction = static_cast<std::uint8_t>(CClientGame::VEHICLE_NOTIFY_JACK_ABORT);
                             pBitStream->WriteBits(&ucAction, 4);
 
                             // Did we start jacking them?
@@ -6875,7 +6875,7 @@ void CClientPed::UpdateVehicleInOut()
                                         bAlreadyStartedJacking = true;
                                     }
                                 }
-                                unsigned char ucDoor = m_ucEnteringDoor - 2;
+                                std::uint8_t ucDoor = m_ucEnteringDoor - 2;
                                 pBitStream->WriteBits(&ucDoor, 3);
                                 SDoorOpenRatioSync door;
                                 door.data.fRatio = pVehicle->GetDoorOpenRatio(m_ucEnteringDoor);
@@ -6889,12 +6889,12 @@ void CClientPed::UpdateVehicleInOut()
                         }
                         else
                         {
-                            ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_IN_ABORT);
+                            ucAction = static_cast<std::uint8_t>(CClientGame::VEHICLE_NOTIFY_IN_ABORT);
                             pBitStream->WriteBits(&ucAction, 4);
                             CClientVehicle* pVehicle = DynamicCast<CClientVehicle>(CElementIDs::GetElement(m_VehicleInOutID));
                             if (pVehicle)
                             {
-                                unsigned char ucDoor = m_ucEnteringDoor - 2;
+                                std::uint8_t ucDoor = m_ucEnteringDoor - 2;
                                 pBitStream->WriteBits(&ucDoor, 3);
                                 SDoorOpenRatioSync door;
                                 door.data.fRatio = pVehicle->GetDoorOpenRatio(m_ucEnteringDoor);
@@ -6968,7 +6968,7 @@ void CClientPed::UpdateVehicleInOut()
 
                     // Vehicle id
                     pBitStream->Write(pOccupiedVehicle->GetID());
-                    unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_NOTIFY_FELL_OFF);
+                    std::uint8_t ucAction = static_cast<std::uint8_t>(CClientGame::VEHICLE_NOTIFY_FELL_OFF);
                     pBitStream->WriteBits(&ucAction, 4);
 
                     // Send it and destroy the packet

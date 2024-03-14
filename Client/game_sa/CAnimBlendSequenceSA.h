@@ -25,8 +25,8 @@ public:
         uint16_t m_boneId;            // m_boneId is set if ( sFlags & 0x10u ) is true
         uint32_t m_hash;              // otherwise m_hash is set
     };
-    unsigned short sFlags;
-    unsigned short sNumKeyFrames;
+    std::uint16_t sFlags;
+    std::uint16_t sNumKeyFrames;
     BYTE*          pKeyFrames;
 };
 
@@ -42,7 +42,7 @@ public:
     uint32_t                       GetHash() { return m_pInterface->m_hash; }
     uint16_t                       GetBoneTag() { return m_pInterface->m_boneId; }
     BYTE*                          GetKeyFrames() { return m_pInterface->pKeyFrames; }
-    unsigned short                 GetKeyFramesCount() { return m_pInterface->sNumKeyFrames; }
+    std::uint16_t                 GetKeyFramesCount() { return m_pInterface->sNumKeyFrames; }
     bool                           IsBigChunkForAllSequences() { return ((m_pInterface->sFlags >> 3) & 1); }
     void                           CopySequenceProperties(CAnimBlendSequenceSAInterface* pAnimSequenceInterface);
     CAnimBlendSequenceSAInterface* GetInterface() { return m_pInterface; }

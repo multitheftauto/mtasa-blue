@@ -14,7 +14,7 @@
 #include "Utils.h"
 #include "lua/LuaCommon.h"
 
-static const SFixedArray<unsigned char, 212> g_ucMaxPassengers = {{3, 1,   1,   1,   3,   3, 0,   1,  1, 3, 1, 1,   1, 3, 1, 1,            // 400->415
+static const SFixedArray<std::uint8_t, 212> g_ucMaxPassengers = {{3, 1,   1,   1,   3,   3, 0,   1,  1, 3, 1, 1,   1, 3, 1, 1,            // 400->415
                                                                    3, 1,   3,   1,   3,   3, 1,   1,  1, 0, 3, 3,   3, 1, 0, 8,            // 416->431
                                                                    0, 1,   1,   255, 1,   8, 3,   1,  3, 0, 1, 1,   1, 3, 0, 1,            // 432->447
                                                                    0, 1,   255, 1,   0,   0, 0,   1,  1, 1, 3, 3,   1, 1, 1,               // 448->462
@@ -79,7 +79,7 @@ static const SFixedArray<eVehicleType, 212> gs_vehicleTypes = {
      VEHICLE_CAR,     VEHICLE_CAR,   VEHICLE_CAR,     VEHICLE_CAR,     VEHICLE_CAR,          VEHICLE_CAR,          VEHICLE_TRAILER,      VEHICLE_TRAILER,
      VEHICLE_TRAILER, VEHICLE_CAR,   VEHICLE_TRAILER, VEHICLE_TRAILER}};
 
-static SFixedArray<unsigned char, 212> g_ucVariants;
+static SFixedArray<std::uint8_t, 212> g_ucVariants;
 
 CVehicleManager::CVehicleManager()
 {
@@ -378,7 +378,7 @@ CVehicleManager::~CVehicleManager()
     DeleteAll();
 }
 
-CVehicle* CVehicleManager::Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
+CVehicle* CVehicleManager::Create(CElement* pParent, std::uint16_t usModel, std::uint8_t ucVariant, std::uint8_t ucVariant2)
 {
     CVehicle* const pVehicle = new CVehicle(this, pParent, usModel, ucVariant, ucVariant2);
 
@@ -421,12 +421,12 @@ bool CVehicleManager::Exists(CVehicle* pVehicle)
     return ListContains(m_List, pVehicle);
 }
 
-bool CVehicleManager::IsValidModel(unsigned int ulVehicleModel)
+bool CVehicleManager::IsValidModel(std::uint32_t ulVehicleModel)
 {
     return ulVehicleModel >= 400 && ulVehicleModel <= 611;
 }
 
-eVehicleType CVehicleManager::GetVehicleType(unsigned short usModel)
+eVehicleType CVehicleManager::GetVehicleType(std::uint16_t usModel)
 {
     if (!IsValidModel(usModel))
         return VEHICLE_NONE;
@@ -434,12 +434,12 @@ eVehicleType CVehicleManager::GetVehicleType(unsigned short usModel)
     return gs_vehicleTypes[usModel - 400];
 }
 
-bool CVehicleManager::IsValidUpgrade(unsigned short usUpgrade)
+bool CVehicleManager::IsValidUpgrade(std::uint16_t usUpgrade)
 {
     return (usUpgrade >= 1000 && usUpgrade <= 1193);
 }
 
-unsigned int CVehicleManager::GetMaxPassengers(unsigned int uiVehicleModel)
+std::uint32_t CVehicleManager::GetMaxPassengers(std::uint32_t uiVehicleModel)
 {
     if (IsValidModel(uiVehicleModel))
     {
@@ -449,7 +449,7 @@ unsigned int CVehicleManager::GetMaxPassengers(unsigned int uiVehicleModel)
     return 0xFF;
 }
 
-void CVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2)
+void CVehicleManager::GetRandomVariation(std::uint16_t usModel, std::uint8_t& ucVariant, std::uint8_t& ucVariant2)
 {
     RandomizeRandomSeed();
     ucVariant = 255;
@@ -497,42 +497,42 @@ void CVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& 
     }
 }
 
-bool CVehicleManager::HasTurret(unsigned int uiModel)
+bool CVehicleManager::HasTurret(std::uint32_t uiModel)
 {
     return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_TURRENT));
 }
 
-bool CVehicleManager::HasSirens(unsigned int uiModel)
+bool CVehicleManager::HasSirens(std::uint32_t uiModel)
 {
     return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_SIRENS));
 }
 
-bool CVehicleManager::HasTaxiLight(unsigned int uiModel)
+bool CVehicleManager::HasTaxiLight(std::uint32_t uiModel)
 {
     return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
 }
 
-bool CVehicleManager::HasLandingGears(unsigned int uiModel)
+bool CVehicleManager::HasLandingGears(std::uint32_t uiModel)
 {
     return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_LANDING_GEARS));
 }
 
-bool CVehicleManager::HasAdjustableProperty(unsigned int uiModel)
+bool CVehicleManager::HasAdjustableProperty(std::uint32_t uiModel)
 {
     return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
 }
 
-bool CVehicleManager::HasSmokeTrail(unsigned int uiModel)
+bool CVehicleManager::HasSmokeTrail(std::uint32_t uiModel)
 {
     return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
 }
 
-bool CVehicleManager::IsTrailer(unsigned int uiVehicleModel)
+bool CVehicleManager::IsTrailer(std::uint32_t uiVehicleModel)
 {
     return (IsValidModel(uiVehicleModel) && (gs_vehicleTypes[uiVehicleModel - 400] == VEHICLE_TRAILER));
 }
 
-bool CVehicleManager::HasDamageModel(unsigned short usModel)
+bool CVehicleManager::HasDamageModel(std::uint16_t usModel)
 {
     return HasDamageModel(GetVehicleType(usModel));
 }
@@ -553,7 +553,7 @@ bool CVehicleManager::HasDamageModel(eVehicleType Type)
     }
 }
 
-bool CVehicleManager::HasDoors(unsigned short usModel)
+bool CVehicleManager::HasDoors(std::uint16_t usModel)
 {
     bool bHasDoors = false;
 
@@ -585,17 +585,17 @@ bool CVehicleManager::HasDoors(unsigned short usModel)
     return bHasDoors;
 }
 
-CVehicleColor CVehicleManager::GetRandomColor(unsigned short usModel)
+CVehicleColor CVehicleManager::GetRandomColor(std::uint16_t usModel)
 {
     return m_ColorManager.GetRandomColor(usModel);
 }
 
-void CVehicleManager::GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM)
+void CVehicleManager::GetVehiclesOfType(std::uint32_t uiModel, lua_State* luaVM)
 {
     assert(luaVM);
 
     // Add all the matching vehicles to the table
-    unsigned int                   uiIndex = 0;
+    std::uint32_t                   uiIndex = 0;
     std::list<CVehicle*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); ++iter)
     {

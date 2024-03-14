@@ -40,7 +40,7 @@ public:
     RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);
 
     // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
-    RpClump* ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions);
+    RpClump* ReadDFF(const SString& strFilename, const SString& buffer, std::uint16_t usModelID, bool bLoadEmbeddedCollisions);
 
     // Destroys a DFF instance
     void DestroyDFF(RpClump* pClump);
@@ -55,19 +55,19 @@ public:
     CColModel* ReadCOL(const SString& buffer);
 
     // Replaces a CColModel for a specific object identified by the object id (usModelID)
-    void ReplaceCollisions(CColModel* pColModel, unsigned short usModelID);
+    void ReplaceCollisions(CColModel* pColModel, std::uint16_t usModelID);
 
     // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
-    unsigned int LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics);
+    std::uint32_t LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics);
 
     // Replaces all atomics for a specific model
-    bool ReplaceAllAtomicsInModel(RpClump* pSrc, unsigned short usModelID) override;
+    bool ReplaceAllAtomicsInModel(RpClump* pSrc, std::uint16_t usModelID) override;
 
     // Replaces all atomics in a clump
-    void ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics);
+    void ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, std::uint32_t uiAtomics);
 
     // Replaces the wheels in a vehicle
-    void ReplaceWheels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szWheel = "wheel");
+    void ReplaceWheels(RpClump* pClump, RpAtomicContainer* pAtomics, std::uint32_t uiAtomics, const char* szWheel = "wheel");
 
     // Repositions an atomic
     void RepositionAtomic(RpClump* pDst, RpClump* pSrc, const char* szName);
@@ -76,18 +76,18 @@ public:
     void AddAllAtomics(RpClump* pDst, RpClump* pSrc);
 
     // Replaces a CClumpModelInfo (or CVehicleModelInfo, since its just for vehicles) clump with a new clump
-    bool ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID) override;
+    bool ReplaceVehicleModel(RpClump* pNew, std::uint16_t usModelID) override;
 
     // Replaces a CClumpModelInfo clump with a new clump
-    bool ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID) override;
+    bool ReplaceWeaponModel(RpClump* pNew, std::uint16_t usModelID) override;
 
-    bool ReplacePedModel(RpClump* pNew, unsigned short usModelID) override;
+    bool ReplacePedModel(RpClump* pNew, std::uint16_t usModelID) override;
 
-    bool ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction);
+    bool ReplaceModel(RpClump* pNew, std::uint16_t usModelID, DWORD dwSetClumpFunction);
 
     // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
     // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
-    bool ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName);
+    bool ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, std::uint32_t uiAtomics, const char* szName);
 
     ushort             GetTXDIDForModelID(ushort usModelID);
     void               PulseWorldTextureWatch();
@@ -127,7 +127,7 @@ public:
     static void  StaticSetClothesReplacingHooks();
     static void  RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
-    static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
+    static short CTxdStore_GetTxdRefcount(std::uint16_t usTxdID);
     static bool  StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList);
 
     void      InitTextureWatchHooks();

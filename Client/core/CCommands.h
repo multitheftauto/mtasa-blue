@@ -23,7 +23,7 @@ public:
 
     void Add(const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false, bool bAllowScriptedBind = false);
 
-    unsigned int Count();
+    std::uint32_t Count();
     bool         Exists(const char* szCommand);
 
     bool Execute(const char* szCommandLine);

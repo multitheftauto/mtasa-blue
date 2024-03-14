@@ -17,7 +17,7 @@
 int CLuaFunctionDefs::CreateExplosion(lua_State* luaVM)
 {
     CVector       vecPosition;
-    unsigned char ucType;
+    std::uint8_t ucType;
     CElement*     pCreator;
 
     CScriptArgReader argStream(luaVM);

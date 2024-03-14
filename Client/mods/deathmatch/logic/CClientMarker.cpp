@@ -16,7 +16,7 @@ extern CClientGame* g_pClientGame;
 #define M_PI 3.14159265358979323846
 #endif
 
-unsigned int CClientMarker::m_uiStreamedInMarkers = 0;
+std::uint32_t CClientMarker::m_uiStreamedInMarkers = 0;
 
 CClientMarker::CClientMarker(CClientManager* pManager, ElementID ID, int iMarkerType) : ClassInit(this), CClientStreamElement(pManager->GetMarkerStreamer(), ID)
 {
@@ -138,7 +138,7 @@ void CClientMarker::DoPulse()
 CClientMarker::eMarkerType CClientMarker::GetMarkerType() const
 {
     // Grab the marker class type
-    unsigned int uiMarkerType = m_pMarker->GetMarkerType();
+    std::uint32_t uiMarkerType = m_pMarker->GetMarkerType();
     switch (uiMarkerType)
     {
         // If it's a checkpoint, it can be either a checkpoint or a ring
@@ -346,7 +346,7 @@ int CClientMarker::StringToType(const char* szString)
     }
 }
 
-bool CClientMarker::TypeToString(unsigned int uiType, SString& strOutString)
+bool CClientMarker::TypeToString(std::uint32_t uiType, SString& strOutString)
 {
     switch (uiType)
     {

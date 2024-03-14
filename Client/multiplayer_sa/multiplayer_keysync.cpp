@@ -108,16 +108,16 @@ void         PostContextSwitch()
     MemPutFast<bool>(0xC402B8, bNightVisionEnabled);
 
     // Make players cough on fire extinguisher and teargas again
-    MemPutFast<unsigned char>(0x4C03F0, 0x83);
-    MemPutFast<unsigned char>(0x4C03F1, 0xF8);
-    MemPutFast<unsigned char>(0x4C03F2, 0x29);
-    MemPutFast<unsigned char>(0x4C03F8, 0x74);
-    MemPutFast<unsigned char>(0x4C03F9, 0x09);
-    MemPutFast<unsigned char>(0x4C03FA, 0x83);
-    MemPutFast<unsigned char>(0x4C03FB, 0xF8);
-    MemPutFast<unsigned char>(0x4C03FC, 0x2A);
-    MemPutFast<unsigned char>(0x4C03FD, 0x74);
-    MemPutFast<unsigned char>(0x4C03FE, 0x04);
+    MemPutFast<std::uint8_t>(0x4C03F0, 0x83);
+    MemPutFast<std::uint8_t>(0x4C03F1, 0xF8);
+    MemPutFast<std::uint8_t>(0x4C03F2, 0x29);
+    MemPutFast<std::uint8_t>(0x4C03F8, 0x74);
+    MemPutFast<std::uint8_t>(0x4C03F9, 0x09);
+    MemPutFast<std::uint8_t>(0x4C03FA, 0x83);
+    MemPutFast<std::uint8_t>(0x4C03FB, 0xF8);
+    MemPutFast<std::uint8_t>(0x4C03FC, 0x2A);
+    MemPutFast<std::uint8_t>(0x4C03FD, 0x74);
+    MemPutFast<std::uint8_t>(0x4C03FE, 0x04);
 
     // make the CCamera::Using1stPersonWeaponMode function return true
     if (b1stPersonWeaponModeHackInPlace)

@@ -130,7 +130,7 @@ private:
     eWeaponState         m_PreviousState;
     CElapsedTime         m_fireTimer;
     CElapsedTime         m_reloadTimer;
-    unsigned char        m_ucCounter;
+    std::uint8_t        m_ucCounter;
     int                  m_iWeaponFireRate;
     CVector              m_vecFireRotationNoTarget;            // Rotation adjustment when firing directly forward
 };

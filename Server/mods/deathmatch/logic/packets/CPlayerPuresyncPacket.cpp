@@ -30,7 +30,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
 
         // Read out the time context
-        unsigned char ucTimeContext = 0;
+        std::uint8_t ucTimeContext = 0;
         if (!BitStream.Read(ucTimeContext))
             return false;
 
@@ -153,7 +153,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             bool  bWeaponCorrect = true;
 
             // Check client has the weapon we think he has
-            unsigned char ucClientWeaponType;
+            std::uint8_t ucClientWeaponType;
             if (!BitStream.Read(ucClientWeaponType))
                 return false;
 
@@ -170,7 +170,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             SWeaponSlotSync slot;
             if (!BitStream.Read(&slot))
                 return false;
-            unsigned int uiSlot = slot.data.uiSlot;
+            std::uint32_t uiSlot = slot.data.uiSlot;
 
             // Set weapon slot
             if (bWeaponCorrect)
@@ -292,12 +292,12 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
 
         ElementID               PlayerID = pSourcePlayer->GetID();
-        unsigned short          usLatency = pSourcePlayer->GetPing();
+        std::uint16_t          usLatency = pSourcePlayer->GetPing();
         const CControllerState& ControllerState = pSourcePlayer->GetPad()->GetCurrentControllerState();
         CElement*               pContactElement = pSourcePlayer->GetContactElement();
 
         // Get current weapon slot
-        unsigned char ucWeaponSlot = pSourcePlayer->GetWeaponSlot();
+        std::uint8_t ucWeaponSlot = pSourcePlayer->GetWeaponSlot();
 
         // Flags
         SPlayerPuresyncFlags flags;
@@ -361,14 +361,14 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 
         if (flags.data.bHasAWeapon)
         {
-            unsigned int    uiSlot = ucWeaponSlot;
+            std::uint32_t    uiSlot = ucWeaponSlot;
             SWeaponSlotSync slot;
             slot.data.uiSlot = uiSlot;
             BitStream.Write(&slot);
 
             if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
             {
-                unsigned short usWeaponAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip();
+                std::uint16_t usWeaponAmmoInClip = pSourcePlayer->GetWeaponAmmoInClip();
 
                 SWeaponAmmoSync ammo(pSourcePlayer->GetWeaponType(), false, true);
                 ammo.data.usAmmoInClip = usWeaponAmmoInClip;

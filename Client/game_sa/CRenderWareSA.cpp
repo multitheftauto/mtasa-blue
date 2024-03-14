@@ -31,9 +31,9 @@ extern CGameSA*        pGame;
 struct SReplaceParts
 {
     const char*        szName;                    // name of the part you want to replace (e.g. 'door_lf' or 'door_rf')
-    unsigned char      ucIndex;                   // index counter for internal usage (0 is the 'ok' part model, 1 is the 'dam' part model)
+    std::uint8_t      ucIndex;                   // index counter for internal usage (0 is the 'ok' part model, 1 is the 'dam' part model)
     RpAtomicContainer* pReplacements;             // replacement atomics
-    unsigned int       uiReplacements;            // number of replacements
+    std::uint32_t       uiReplacements;            // number of replacements
 };
 static RwObject* ReplacePartsCB(RwObject* object, SReplaceParts* data)
 {
@@ -41,7 +41,7 @@ static RwObject* ReplacePartsCB(RwObject* object, SReplaceParts* data)
     char      szAtomicName[16] = {0};
 
     // iterate through our loaded atomics
-    for (unsigned int i = 0; i < data->uiReplacements; i++)
+    for (std::uint32_t i = 0; i < data->uiReplacements; i++)
     {
         // get the correct atomic name based on the object # in our parent frame
         if (data->ucIndex == 0)
@@ -85,7 +85,7 @@ struct SReplaceWheels
     const char*        szName;                    // name of the new wheel model
     RpClump*           pClump;                    // the vehicle's clump
     RpAtomicContainer* pReplacements;             // replacement atomics
-    unsigned int       uiReplacements;            // number of replacements
+    std::uint32_t       uiReplacements;            // number of replacements
 };
 static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
 {
@@ -98,7 +98,7 @@ static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
         strncmp(&Frame->szName[0], "wheel_lb_dummy", 16) == 0 || strncmp(&Frame->szName[0], "wheel_rb_dummy", 16) == 0)
     {
         // find a replacement atomic
-        for (unsigned int i = 0; i < data->uiReplacements; i++)
+        for (std::uint32_t i = 0; i < data->uiReplacements; i++)
         {
             // see if it's name is equal to the specified wheel
             if (strncmp(&data->pReplacements[i].szName[0], data->szName, 16) == 0)
@@ -124,7 +124,7 @@ struct SReplaceAll
 {
     RpClump*           pClump;                    // the vehicle's clump
     RpAtomicContainer* pReplacements;             // replacement atomics
-    unsigned int       uiReplacements;            // number of replacements
+    std::uint32_t       uiReplacements;            // number of replacements
 };
 static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
 {
@@ -134,7 +134,7 @@ static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
         return true;
 
     // find a replacement atomic
-    for (unsigned int i = 0; i < data->uiReplacements; i++)
+    for (std::uint32_t i = 0; i < data->uiReplacements; i++)
     {
         // see if we can find an atomic with the same name
         if (strncmp(&data->pReplacements[i].szName[0], &Frame->szName[0], 16) == 0)
@@ -167,7 +167,7 @@ static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
 struct SLoadAtomics
 {
     RpAtomicContainer* pReplacements;             // replacement atomics
-    unsigned int       uiReplacements;            // number of replacements
+    std::uint32_t       uiReplacements;            // number of replacements
 };
 static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
 {
@@ -247,12 +247,12 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
-RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions)
+RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffer, std::uint16_t usModelID, bool bLoadEmbeddedCollisions)
 {
     // Set correct TXD as materials are processed at the same time
     if (usModelID != 0)
     {
-        unsigned short usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
+        std::uint16_t usTxdId = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
         SetTextureDict(usTxdId);
     }
 
@@ -356,7 +356,7 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
 }
 
 // Replaces a vehicle/weapon/ped model
-bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD dwSetClumpFunction)
+bool CRenderWareSA::ReplaceModel(RpClump* pNew, std::uint16_t usModelID, DWORD dwSetClumpFunction)
 {
     auto CVehicleModelInfo_CVehicleStructure_Destructor = (void(__thiscall*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C7410;
     auto CVehicleModelInfo_CVehicleStructure_release = (void(__cdecl*)(CVehicleModelVisualInfoSAInterface * pThis))0x4C9580;
@@ -403,19 +403,19 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
 }
 
 // Replaces a vehicle model
-bool CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, std::uint16_t usModelID)
 {
     return ReplaceModel(pNew, usModelID, FUNC_LoadVehicleModel);
 }
 
 // Replaces a weapon model
-bool CRenderWareSA::ReplaceWeaponModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplaceWeaponModel(RpClump* pNew, std::uint16_t usModelID)
 {
     return ReplaceModel(pNew, usModelID, FUNC_LoadWeaponModel);
 }
 
 // Replaces a ped model
-bool CRenderWareSA::ReplacePedModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplacePedModel(RpClump* pNew, std::uint16_t usModelID)
 {
     // NOTE(botder): The game logic requires the animation hierarchy to be present (read: it's not a corrupt model),
     // otherwise it will crash (offset 0x3c51a8).
@@ -439,7 +439,7 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
     // Load the col model
     if (header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L')
     {
-        unsigned char* pModelData = (unsigned char*)buffer.data() + sizeof(ColModelFileHeader);
+        std::uint8_t* pModelData = (std::uint8_t*)buffer.data() + sizeof(ColModelFileHeader);
 
         // Create a new CColModel
         CColModelSA* pColModel = new CColModelSA();
@@ -465,7 +465,7 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
 }
 
 // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded
-unsigned int CRenderWareSA::LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics)
+std::uint32_t CRenderWareSA::LoadAtomics(RpClump* pClump, RpAtomicContainer* pAtomics)
 {
     // iterate through all atomics in the clump
     SLoadAtomics data = {0};
@@ -479,7 +479,7 @@ unsigned int CRenderWareSA::LoadAtomics(RpClump* pClump, RpAtomicContainer* pAto
 // Replaces all atomics for a specific model
 typedef struct
 {
-    unsigned short usTxdID;
+    std::uint16_t usTxdID;
     RpClump*       pClump;
 } SAtomicsReplacer;
 bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
@@ -496,7 +496,7 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     return true;
 }
 
-bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usModelID)
+bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, std::uint16_t usModelID)
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
 
@@ -526,7 +526,7 @@ bool CRenderWareSA::ReplaceAllAtomicsInModel(RpClump* pNew, unsigned short usMod
 }
 
 // Replaces all atomics in a vehicle
-void CRenderWareSA::ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, unsigned int uiAtomics)
+void CRenderWareSA::ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* pAtomics, std::uint32_t uiAtomics)
 {
     SReplaceAll data;
     data.pClump = pDst;
@@ -536,7 +536,7 @@ void CRenderWareSA::ReplaceAllAtomicsInClump(RpClump* pDst, RpAtomicContainer* p
 }
 
 // Replaces the wheels in a vehicle
-void CRenderWareSA::ReplaceWheels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szWheel)
+void CRenderWareSA::ReplaceWheels(RpClump* pClump, RpAtomicContainer* pAtomics, std::uint32_t uiAtomics, const char* szWheel)
 {
     // get the clump's frame
     RwFrame* pFrame = RpGetFrame(pClump);
@@ -565,7 +565,7 @@ void CRenderWareSA::AddAllAtomics(RpClump* pDst, RpClump* pSrc)
 
 // Replaces dynamic parts of the vehicle (models that have two different versions: 'ok' and 'dam'), such as doors
 // szName should be without the part suffix (e.g. 'door_lf' or 'door_rf', and not 'door_lf_dummy')
-bool CRenderWareSA::ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, unsigned int uiAtomics, const char* szName)
+bool CRenderWareSA::ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomics, std::uint32_t uiAtomics, const char* szName)
 {
     // get the part's dummy name
     char szDummyName[16] = {0};
@@ -590,7 +590,7 @@ bool CRenderWareSA::ReplacePartModels(RpClump* pClump, RpAtomicContainer* pAtomi
 }
 
 // Replaces a CColModel for a specific object identified by the object id (usModelID)
-void CRenderWareSA::ReplaceCollisions(CColModel* pCol, unsigned short usModelID)
+void CRenderWareSA::ReplaceCollisions(CColModel* pCol, std::uint16_t usModelID)
 {
     DWORD*        pPool = (DWORD*)ARRAY_ModelInfo;
     CColModelSA*  pColModel = (CColModelSA*)pCol;
@@ -641,7 +641,7 @@ void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTextur
     pTex->txd = NULL;
 }
 
-short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
+short CRenderWareSA::CTxdStore_GetTxdRefcount(std::uint16_t usTxdID)
 {
     return *(short*)(*(*(DWORD**)0xC8800C) + 0xC * usTxdID + 4);
 }
@@ -769,7 +769,7 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
     }
 
     if (bLoadedModel)
-        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+        ((void(__cdecl*)(std::uint16_t))FUNC_RemoveModel)(usModelId);
 }
 
 ////////////////////////////////////////////////////////////////
@@ -838,7 +838,7 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     }
 
     if (bLoadedModel)
-        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+        ((void(__cdecl*)(std::uint16_t))FUNC_RemoveModel)(usModelId);
 
     return true;
 }

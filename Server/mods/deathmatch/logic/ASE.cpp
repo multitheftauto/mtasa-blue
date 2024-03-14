@@ -23,7 +23,7 @@ extern "C"
 
 ASE* ASE::_instance = NULL;
 
-ASE::ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList /*, bool bLan*/)
+ASE::ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, std::uint16_t usPort, const SString& strServerIPList /*, bool bLan*/)
     : m_QueryDosProtect(5, 6000, 7000)            // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
@@ -240,36 +240,36 @@ std::string ASE::QueryFull()
 
     reply << "EYE1";
     // game
-    reply << (unsigned char)4;
+    reply << (std::uint8_t)4;
     reply << "mta";
     // port
-    reply << (unsigned char)(m_strPort.length() + 1);
+    reply << (std::uint8_t)(m_strPort.length() + 1);
     reply << m_strPort;
     // server name
-    reply << (unsigned char)(m_pMainConfig->GetServerName().length() + 1);
+    reply << (std::uint8_t)(m_pMainConfig->GetServerName().length() + 1);
     reply << m_pMainConfig->GetServerName();
     // game type
-    reply << (unsigned char)(m_strGameType.length() + 1);
+    reply << (std::uint8_t)(m_strGameType.length() + 1);
     reply << m_strGameType;
     // map name
-    reply << (unsigned char)(m_strMapName.length() + 1);
+    reply << (std::uint8_t)(m_strMapName.length() + 1);
     reply << m_strMapName;
     // version
     temp << MTA_DM_ASE_VERSION;
-    reply << (unsigned char)(temp.str().length() + 1);
+    reply << (std::uint8_t)(temp.str().length() + 1);
     reply << temp.str();
     // passworded
-    reply << (unsigned char)2;
+    reply << (std::uint8_t)2;
     reply << ((m_pMainConfig->HasPassword()) ? 1 : 0);
     // players count
     temp.str("");
     temp << m_pPlayerManager->CountJoined();
-    reply << (unsigned char)(temp.str().length() + 1);
+    reply << (std::uint8_t)(temp.str().length() + 1);
     reply << temp.str();
     // players max
     temp.str("");
     temp << m_pMainConfig->GetMaxPlayers();
-    reply << (unsigned char)(temp.str().length() + 1);
+    reply << (std::uint8_t)(temp.str().length() + 1);
     reply << temp.str();
 
     // rules
@@ -277,17 +277,17 @@ std::string ASE::QueryFull()
     for (; rIter != IterEnd(); rIter++)
     {
         // maybe use a map and std strings for rules?
-        reply << (unsigned char)(strlen((*rIter)->GetKey()) + 1);
+        reply << (std::uint8_t)(strlen((*rIter)->GetKey()) + 1);
         reply << (*rIter)->GetKey();
-        reply << (unsigned char)(strlen((*rIter)->GetValue()) + 1);
+        reply << (std::uint8_t)(strlen((*rIter)->GetValue()) + 1);
         reply << (*rIter)->GetValue();
     }
-    reply << (unsigned char)1;
+    reply << (std::uint8_t)1;
 
     // players
 
     // the flags that tell what data we carry per player ( apparently we need all set cause of GM atm )
-    unsigned char ucFlags = 0;
+    std::uint8_t ucFlags = 0;
     ucFlags |= 0x01;            // nick
     ucFlags |= 0x02;            // team
     ucFlags |= 0x04;            // skin
@@ -309,22 +309,22 @@ std::string ASE::QueryFull()
             std::string strPlayerName = RemoveColorCodes(pPlayer->GetNick());
             if (strPlayerName.length() == 0)
                 strPlayerName = pPlayer->GetNick();
-            reply << (unsigned char)(strPlayerName.length() + 1);
+            reply << (std::uint8_t)(strPlayerName.length() + 1);
             reply << strPlayerName.c_str();
             // team (skip)
-            reply << (unsigned char)1;
+            reply << (std::uint8_t)1;
             // skin (skip)
-            reply << (unsigned char)1;
+            reply << (std::uint8_t)1;
             // score
             const std::string& strScore = pPlayer->GetAnnounceValue("score");
-            reply << (unsigned char)(strScore.length() + 1);
+            reply << (std::uint8_t)(strScore.length() + 1);
             reply << strScore.c_str();
             // ping
             snprintf(szTemp, 255, "%u", pPlayer->GetPing());
-            reply << (unsigned char)(strlen(szTemp) + 1);
+            reply << (std::uint8_t)(strlen(szTemp) + 1);
             reply << szTemp;
             // time (skip)
-            reply << (unsigned char)1;
+            reply << (std::uint8_t)1;
         }
     }
 
@@ -355,29 +355,29 @@ std::string ASE::QueryXfireLight()
 
     reply << "EYE3";
     // game
-    reply << (unsigned char)4;
+    reply << (std::uint8_t)4;
     reply << "mta";
     // server name
-    reply << (unsigned char)(m_pMainConfig->GetServerName().length() + 1);
+    reply << (std::uint8_t)(m_pMainConfig->GetServerName().length() + 1);
     reply << m_pMainConfig->GetServerName();
     // game type
-    reply << (unsigned char)(m_strGameType.length() + 1);
+    reply << (std::uint8_t)(m_strGameType.length() + 1);
     reply << m_strGameType;
     // map name with backwardly compatible large player count
-    reply << (unsigned char)(m_strMapName.length() + 1 + strPlayerCount.length() + 1);
+    reply << (std::uint8_t)(m_strMapName.length() + 1 + strPlayerCount.length() + 1);
     reply << m_strMapName;
-    reply << (unsigned char)0;
+    reply << (std::uint8_t)0;
     reply << strPlayerCount;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
-    reply << (unsigned char)(temp.length() + 1);
+    reply << (std::uint8_t)(temp.length() + 1);
     reply << temp;
     // passworded
-    reply << (unsigned char)((m_pMainConfig->HasPassword()) ? 1 : 0);
+    reply << (std::uint8_t)((m_pMainConfig->HasPassword()) ? 1 : 0);
     // players count
-    reply << (unsigned char)std::min(iJoinedPlayers, 255);
+    reply << (std::uint8_t)std::min(iJoinedPlayers, 255);
     // players max
-    reply << (unsigned char)std::min(iMaxPlayers, 255);
+    reply << (std::uint8_t)std::min(iMaxPlayers, 255);
 
     return reply.str();
 }
@@ -420,46 +420,46 @@ std::string ASE::QueryLight()
 
     reply << "EYE2";
     // game
-    reply << (unsigned char)4;
+    reply << (std::uint8_t)4;
     reply << "mta";
     // port
-    reply << (unsigned char)(m_strPort.length() + 1);
+    reply << (std::uint8_t)(m_strPort.length() + 1);
     reply << m_strPort;
     // server name
-    reply << (unsigned char)(m_pMainConfig->GetServerName().length() + 1);
+    reply << (std::uint8_t)(m_pMainConfig->GetServerName().length() + 1);
     reply << m_pMainConfig->GetServerName();
     // game type
-    reply << (unsigned char)(m_strGameType.length() + 1);
+    reply << (std::uint8_t)(m_strGameType.length() + 1);
     reply << m_strGameType;
     // map name with backwardly compatible large player count, build type and build number
-    reply << (unsigned char)(m_strMapName.length() + 1 + uiExtraDataLength);
+    reply << (std::uint8_t)(m_strMapName.length() + 1 + uiExtraDataLength);
     reply << m_strMapName;
-    reply << (unsigned char)0;
+    reply << (std::uint8_t)0;
     reply << strPlayerCount;
-    reply << (unsigned char)0;
+    reply << (std::uint8_t)0;
     reply << strBuildType;
-    reply << (unsigned char)0;
+    reply << (std::uint8_t)0;
     reply << strBuildNumber;
-    reply << (unsigned char)0;
+    reply << (std::uint8_t)0;
     reply << strPingStatus;
-    reply << (unsigned char)0;
+    reply << (std::uint8_t)0;
     reply << strNetRoute;
-    reply << (unsigned char)0;
+    reply << (std::uint8_t)0;
     reply << strUpTime;
-    reply << (unsigned char)0;
+    reply << (std::uint8_t)0;
     reply << strHttpPort;
     // version
     std::string temp = MTA_DM_ASE_VERSION;
-    reply << (unsigned char)(temp.length() + 1);
+    reply << (std::uint8_t)(temp.length() + 1);
     reply << temp;
     // passworded
-    reply << (unsigned char)((m_pMainConfig->HasPassword()) ? 1 : 0);
+    reply << (std::uint8_t)((m_pMainConfig->HasPassword()) ? 1 : 0);
     // serial verification?
-    reply << (unsigned char)((m_pMainConfig->GetSerialVerificationEnabled()) ? 1 : 0);
+    reply << (std::uint8_t)((m_pMainConfig->GetSerialVerificationEnabled()) ? 1 : 0);
     // players count
-    reply << (unsigned char)std::min(iJoinedPlayers, 255);
+    reply << (std::uint8_t)std::min(iJoinedPlayers, 255);
     // players max
-    reply << (unsigned char)std::min(iMaxPlayers, 255);
+    reply << (std::uint8_t)std::min(iMaxPlayers, 255);
 
     // players
     CPlayer* pPlayer = NULL;
@@ -484,7 +484,7 @@ std::string ASE::QueryLight()
             if (iBytesLeft < iPlayersLeft--)
                 strPlayerName = "";
 
-            reply << (unsigned char)(strPlayerName.length() + 1);
+            reply << (std::uint8_t)(strPlayerName.length() + 1);
             reply << strPlayerName.c_str();
         }
     }

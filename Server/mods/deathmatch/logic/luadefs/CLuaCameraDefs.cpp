@@ -126,7 +126,7 @@ int CLuaCameraDefs::getCameraInterior(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucInterior;
+        std::uint8_t ucInterior;
         if (CStaticFunctionDefinitions::GetCameraInterior(pPlayer, ucInterior))
         {
             lua_pushnumber(luaVM, ucInterior);
@@ -220,7 +220,7 @@ int CLuaCameraDefs::setCameraInterior(lua_State* luaVM)
 {
     //  bool setCameraInterior ( player thePlayer, int interior )
     CElement*     pElement;
-    unsigned char ucInterior;
+    std::uint8_t ucInterior;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -247,9 +247,9 @@ int CLuaCameraDefs::fadeCamera(lua_State* luaVM)
     CElement*     pPlayer;
     bool          bFadeIn;
     float         fFadeTime;
-    unsigned char ucRed;
-    unsigned char ucGreen;
-    unsigned char ucBlue;
+    std::uint8_t ucRed;
+    std::uint8_t ucGreen;
+    std::uint8_t ucBlue;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);

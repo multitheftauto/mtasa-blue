@@ -36,15 +36,15 @@ class CLanBroadcastDLL;
 class CLanBroadcast
 {
 public:
-    CLanBroadcast(unsigned short usServerPort);
+    CLanBroadcast(std::uint16_t usServerPort);
     ~CLanBroadcast();
 
     void DoPulse();
 
-    unsigned short GetPort() { return SERVER_LIST_BROADCAST_PORT; };
+    std::uint16_t GetPort() { return SERVER_LIST_BROADCAST_PORT; };
 
 private:
-    unsigned int m_Socket;
+    std::uint32_t m_Socket;
     sockaddr_in  m_SockAddr;
 
     std::string m_strClientMessage;

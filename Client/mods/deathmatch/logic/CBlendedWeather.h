@@ -18,22 +18,22 @@ public:
 
     void DoPulse();
 
-    void SetWeather(unsigned char ucWeather);
-    void SetWeatherBlended(unsigned char ucWeather, unsigned char ucHour);
+    void SetWeather(std::uint8_t ucWeather);
+    void SetWeatherBlended(std::uint8_t ucWeather, std::uint8_t ucHour);
 
-    unsigned char GetWeather();
-    unsigned char GetWeatherBlendingTo() { return m_ucSecondaryBlendedWeather; };
-    unsigned char GetBlendedStartHour() { return m_ucBlendStartHour; };
-    unsigned char GetBlendedStopHour() { return m_ucBlendStopHour; };
+    std::uint8_t GetWeather();
+    std::uint8_t GetWeatherBlendingTo() { return m_ucSecondaryBlendedWeather; };
+    std::uint8_t GetBlendedStartHour() { return m_ucBlendStartHour; };
+    std::uint8_t GetBlendedStopHour() { return m_ucBlendStopHour; };
 
 private:
-    unsigned char m_ucPrimaryWeather;
-    unsigned char m_ucSecondaryWeather;
-    unsigned char m_ucPrimaryBlendedWeather;
-    unsigned char m_ucSecondaryBlendedWeather;
+    std::uint8_t m_ucPrimaryWeather;
+    std::uint8_t m_ucSecondaryWeather;
+    std::uint8_t m_ucPrimaryBlendedWeather;
+    std::uint8_t m_ucSecondaryBlendedWeather;
 
-    unsigned char m_ucBlendStartHour;
-    unsigned char m_ucBlendStopHour;
+    std::uint8_t m_ucBlendStartHour;
+    std::uint8_t m_ucBlendStopHour;
 
     CClock*   m_pClock;
     CWeather* m_pWeather;

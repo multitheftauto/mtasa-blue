@@ -102,7 +102,7 @@ public:
     bool          m_bPlayerWasOnBike;
     bool          m_bJustCameOutOfGarage;
     bool          m_bJustInitalised;            // Just so the speed thingy doesn't go mad right at the start
-    unsigned char m_bJust_Switched;             // Variable to indicate that we have jumped somewhere, Raymond needs this for the audio engine
+    std::uint8_t m_bJust_Switched;             // Variable to indicate that we have jumped somewhere, Raymond needs this for the audio engine
     bool          m_bLookingAtPlayer;
     bool          m_bLookingAtVector;
     bool          m_bMoveCamToAvoidGeom;
@@ -111,7 +111,7 @@ public:
     bool          m_bRestoreByJumpCut;
     bool          m_bUseNearClipScript;
     bool          m_bStartInterScript;
-    unsigned char m_bStartingSpline;
+    std::uint8_t m_bStartingSpline;
     bool          m_bTargetJustBeenOnTrain;            // this variable is needed to be able to restore the camera
     bool          m_bTargetJustCameOffTrain;
     bool          m_bUseSpecialFovTrain;
@@ -137,7 +137,7 @@ public:
 
     // for debug keyboard stuff
 #ifndef MASTER
-    unsigned char display_kbd_debug;
+    std::uint8_t display_kbd_debug;
     float         kbd_fov_value;
 #endif // MASTER
 
@@ -159,21 +159,21 @@ public:
     bool m_FadeTargetIsSplashScreen;            // used as hack for fading
     bool WorldViewerBeingUsed;                  // To indicate if the world viewer is being used.
 
-    unsigned char m_uiTransitionJUSTStarted;            // This is the first frame of a transition.
-    unsigned char m_uiTransitionState;                  // 0:one mode 1:transition
-    unsigned char ActiveCam;                            // Which one at the moment (0 or 1)
+    std::uint8_t m_uiTransitionJUSTStarted;            // This is the first frame of a transition.
+    std::uint8_t m_uiTransitionState;                  // 0:one mode 1:transition
+    std::uint8_t ActiveCam;                            // Which one at the moment (0 or 1)
                                                         // Their is a fudge at the end when the renderware matrix will receive either
                                                         // the active camera or the worldviewer camera
-    unsigned int m_uiCamShakeStart;                     // When did the camera shake start.
-    unsigned int m_uiFirstPersonCamLastInputTime;
-    unsigned int m_uiLongestTimeInMill;
-    unsigned int m_uiNumberOfTrainCamNodes;
-    unsigned int m_uiTimeLastChange;
-    unsigned int m_uiTimeWeLeftIdle_StillNoInput;
-    unsigned int m_uiTimeWeEnteredIdle;
-    unsigned int m_uiTimeTransitionStart;            // When was the transition started ?
-    unsigned int m_uiTransitionDuration;             // How long does the transition take ?
-    unsigned int m_uiTransitionDurationTargetCoors;
+    std::uint32_t m_uiCamShakeStart;                     // When did the camera shake start.
+    std::uint32_t m_uiFirstPersonCamLastInputTime;
+    std::uint32_t m_uiLongestTimeInMill;
+    std::uint32_t m_uiNumberOfTrainCamNodes;
+    std::uint32_t m_uiTimeLastChange;
+    std::uint32_t m_uiTimeWeLeftIdle_StillNoInput;
+    std::uint32_t m_uiTimeWeEnteredIdle;
+    std::uint32_t m_uiTimeTransitionStart;            // When was the transition started ?
+    std::uint32_t m_uiTransitionDuration;             // How long does the transition take ?
+    std::uint32_t m_uiTransitionDurationTargetCoors;
     int          m_BlurBlue;
     int          m_BlurGreen;
     int          m_BlurRed;
@@ -413,7 +413,7 @@ public:
     bool      IsFading();
     int       GetFadingDirection();
     void      Fade(float fFadeOutTime, int iOutOrIn);
-    void      SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
+    void      SetFadeColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue);
     float     GetCameraRotation();
     RwMatrix* GetLTM();
     CEntity*  GetTargetEntity();

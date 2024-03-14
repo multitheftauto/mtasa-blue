@@ -13,7 +13,7 @@
 
 using std::list;
 
-static const SFixedArray<unsigned short, 47> g_usWeaponModels = {{
+static const SFixedArray<std::uint16_t, 47> g_usWeaponModels = {{
     0,   331, 333, 334, 335, 336, 337, 338, 339, 341,            // 9
     321, 322, 323, 0,   325, 326, 342, 343, 344, 0,              // 19
     0,   0,   346, 347, 348, 349, 350, 351, 352, 353,            // 29
@@ -21,7 +21,7 @@ static const SFixedArray<unsigned short, 47> g_usWeaponModels = {{
     364, 365, 366, 367, 368, 369, 371                            // 46
 }};
 
-unsigned int CClientPickupManager::m_uiPickupCount = 0;
+std::uint32_t CClientPickupManager::m_uiPickupCount = 0;
 
 CClientPickupManager::CClientPickupManager(CClientManager* pManager)
 {
@@ -84,13 +84,13 @@ void CClientPickupManager::SetPickupProcessingDisabled(bool bDisabled)
     m_bPickupProcessingDisabled = bDisabled;
 }
 
-bool CClientPickupManager::IsValidPickupID(unsigned short usPickupID)
+bool CClientPickupManager::IsValidPickupID(std::uint16_t usPickupID)
 {
     return (usPickupID > 0 && usPickupID != 13 && usPickupID != 19 && usPickupID != 20 && usPickupID != 21 && usPickupID <= 46 || usPickupID == 1240 ||
             usPickupID == 1242);
 }
 
-bool CClientPickupManager::IsValidWeaponID(unsigned short usWeaponID)
+bool CClientPickupManager::IsValidWeaponID(std::uint16_t usWeaponID)
 {
     return (usWeaponID > 0 && usWeaponID != 13 && usWeaponID != 19 && usWeaponID != 20 && usWeaponID != 21 && usWeaponID <= 46);
 }
@@ -101,7 +101,7 @@ bool CClientPickupManager::IsPickupLimitReached()
     return (m_uiPickupCount >= 64);
 }
 
-unsigned short CClientPickupManager::GetWeaponModel(unsigned int uiWeaponID)
+std::uint16_t CClientPickupManager::GetWeaponModel(std::uint32_t uiWeaponID)
 {
     if (uiWeaponID <= 46)
     {
@@ -120,7 +120,7 @@ void CClientPickupManager::RemoveFromList(CClientPickup* pPickup)
     }
 }
 
-void CClientPickupManager::RestreamPickups(unsigned short usModel)
+void CClientPickupManager::RestreamPickups(std::uint16_t usModel)
 {
     for (std::list<CClientPickup*>::const_iterator iter = IterBegin(); iter != IterEnd(); iter++)
     {

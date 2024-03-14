@@ -32,7 +32,7 @@ CExplosionManagerSA::~CExplosionManagerSA()
  * \todo Test this, replace with CExplosion::AddExplosion code if possible in order to ensure correct pointer
  */
 CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition,
-                                              unsigned int uiActivationDelay, bool bMakeSound, float fCamShake, bool bNoDamage)
+                                              std::uint32_t uiActivationDelay, bool bMakeSound, float fCamShake, bool bNoDamage)
 {
     DWORD       dwExplodingEntityInterface = (pExplodingEntity) ? (DWORD)pExplodingEntity->GetInterface() : 0;
     DWORD       dwOwnerInterface = (pOwner) ? (DWORD)pOwner->GetInterface() : 0;

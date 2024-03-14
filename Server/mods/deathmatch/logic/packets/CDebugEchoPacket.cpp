@@ -15,7 +15,7 @@
 bool CDebugEchoPacket::Write(NetBitStreamInterface& BitStream) const
 {
     // Write the level
-    BitStream.Write(static_cast<unsigned char>(m_uiLevel));
+    BitStream.Write(static_cast<std::uint8_t>(m_uiLevel));
     if (m_uiLevel == 0)
     {
         // Write the color

@@ -13,7 +13,7 @@
 #include "CFxManagerSA.h"
 #include "CFxSystemSA.h"
 
-CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
+CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, std::uint8_t bSkipCameraFrustumCheck,
                                         bool bSoundEnable)
 {
     const CVector*        pvecPosition = &vecPosition;

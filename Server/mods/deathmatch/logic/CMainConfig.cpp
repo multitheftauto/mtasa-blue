@@ -144,7 +144,7 @@ bool CMainConfig::Load()
     iResult = GetInteger(m_pRootNode, "serverport", iTemp, 1, 65535);
     if (iResult == IS_SUCCESS)
     {
-        m_usServerPort = static_cast<unsigned short>(iTemp);
+        m_usServerPort = static_cast<std::uint16_t>(iTemp);
     }
     else
     {
@@ -189,7 +189,7 @@ bool CMainConfig::Load()
     iResult = GetInteger(m_pRootNode, "httpport", iTemp, 1, 65535);
     if (iResult == IS_SUCCESS)
     {
-        m_usHTTPPort = static_cast<unsigned short>(iTemp);
+        m_usHTTPPort = static_cast<std::uint16_t>(iTemp);
     }
     else
     {
@@ -233,7 +233,7 @@ bool CMainConfig::Load()
 
     // Handle the <client_file> nodes
     CXMLNode*    pNode = NULL;
-    unsigned int uiCurrentIndex = 0;
+    std::uint32_t uiCurrentIndex = 0;
     do
     {
         // Grab the current script node
@@ -354,7 +354,7 @@ bool CMainConfig::Load()
     {
         if (iFPSTemp == 0 || iFPSTemp >= 25)
         {
-            m_usFPSLimit = (unsigned short)iFPSTemp;
+            m_usFPSLimit = (std::uint16_t)iFPSTemp;
             SetInteger(m_pRootNode, "fpslimit", (int)m_usFPSLimit);
         }
     }
@@ -374,7 +374,7 @@ bool CMainConfig::Load()
     // Grab the Quality for Voice
     iTemp = m_ucVoiceQuality;
     iResult = GetInteger(m_pRootNode, "voice_quality", iTemp, 0, 10);
-    m_ucVoiceQuality = static_cast<unsigned char>(Clamp(0, iTemp, 10));
+    m_ucVoiceQuality = static_cast<std::uint8_t>(Clamp(0, iTemp, 10));
 
     // Grab the bitrate for Voice [optional]
     iResult = GetInteger(m_pRootNode, "voice_bitrate", iTemp);
@@ -640,7 +640,7 @@ bool CMainConfig::LoadExtended()
 
     // Handle the <module> nodes
     CXMLNode*    pNode = NULL;
-    unsigned int uiCurrentIndex = 0;
+    std::uint32_t uiCurrentIndex = 0;
     do
     {
         pNode = m_pRootNode->FindSubNode("module", uiCurrentIndex++);
@@ -926,7 +926,7 @@ bool CMainConfig::SetPassword(const char* szPassword, bool bSave)
     return true;
 }
 
-bool CMainConfig::SetFPSLimit(unsigned short usFPS, bool bSave)
+bool CMainConfig::SetFPSLimit(std::uint16_t usFPS, bool bSave)
 {
     if (usFPS == 0 || (usFPS >= 25 && usFPS <= std::numeric_limits<short>::max()))
     {
@@ -976,27 +976,27 @@ SString CMainConfig::GetServerIPList()
     return m_strServerIP;
 }
 
-unsigned short CMainConfig::GetServerPort()
+std::uint16_t CMainConfig::GetServerPort()
 {
-    unsigned short usPort;
+    std::uint16_t usPort;
     if (m_pCommandLineParser && m_pCommandLineParser->GetPort(usPort))
         return usPort;
     return m_usServerPort;
 }
 
-unsigned int CMainConfig::GetHardMaxPlayers()
+std::uint32_t CMainConfig::GetHardMaxPlayers()
 {
     return m_uiHardMaxPlayers;
 }
 
-unsigned int CMainConfig::GetMaxPlayers()
+std::uint32_t CMainConfig::GetMaxPlayers()
 {
     return std::min(GetHardMaxPlayers(), m_uiSoftMaxPlayers);
 }
 
-unsigned short CMainConfig::GetHTTPPort()
+std::uint16_t CMainConfig::GetHTTPPort()
 {
-    unsigned short usHTTPPort;
+    std::uint16_t usHTTPPort;
     if (m_pCommandLineParser && m_pCommandLineParser->GetHTTPPort(usHTTPPort))
         return usHTTPPort;
     return m_usHTTPPort;

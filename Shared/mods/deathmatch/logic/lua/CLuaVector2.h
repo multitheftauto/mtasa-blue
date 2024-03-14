@@ -22,10 +22,10 @@ public:
 
     ~CLuaVector2D();
 
-    unsigned int GetScriptID() const { return m_uiScriptID; }
+    std::uint32_t GetScriptID() const { return m_uiScriptID; }
 
-    static CLuaVector2D* GetFromScriptID(unsigned int uiScriptID);
+    static CLuaVector2D* GetFromScriptID(std::uint32_t uiScriptID);
 
 private:
-    unsigned int m_uiScriptID;
+    std::uint32_t m_uiScriptID;
 };

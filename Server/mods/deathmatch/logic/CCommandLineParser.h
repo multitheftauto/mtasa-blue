@@ -30,17 +30,17 @@ public:
         strIP = m_strIP;
         return m_bIP;
     }
-    bool GetPort(unsigned short& usPort)
+    bool GetPort(std::uint16_t& usPort)
     {
         usPort = m_usPort;
         return m_bPort;
     }
-    bool GetHTTPPort(unsigned short& usHTTPPort)
+    bool GetHTTPPort(std::uint16_t& usHTTPPort)
     {
         usHTTPPort = m_usHTTPPort;
         return m_bHTTPPort;
     }
-    bool GetMaxPlayers(unsigned int& uiMaxPlayers)
+    bool GetMaxPlayers(std::uint32_t& uiMaxPlayers)
     {
         uiMaxPlayers = m_uiMaxPlayers;
         return m_bMaxPlayers;
@@ -61,8 +61,8 @@ private:
 
     std::string    m_strMainConfig;
     std::string    m_strIP;
-    unsigned short m_usPort;
-    unsigned short m_usHTTPPort;
-    unsigned int   m_uiMaxPlayers;
+    std::uint16_t m_usPort;
+    std::uint16_t m_usHTTPPort;
+    std::uint32_t   m_uiMaxPlayers;
     bool           m_bDisableVoice;
 };

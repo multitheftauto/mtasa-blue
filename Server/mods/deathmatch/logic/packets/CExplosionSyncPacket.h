@@ -35,7 +35,7 @@ public:
     };
 
     CExplosionSyncPacket();
-    CExplosionSyncPacket(const CVector& vecPosition, unsigned char ucType);
+    CExplosionSyncPacket(const CVector& vecPosition, std::uint8_t ucType);
 
     ePacketID     GetPacketID() const { return PACKET_ID_EXPLOSION; };
     unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -45,7 +45,7 @@ public:
 
     ElementID     m_OriginID;
     CVector       m_vecPosition;
-    unsigned char m_ucType;
+    std::uint8_t m_ucType;
 
     bool m_isVehicleResponsible = false;
     bool m_blowVehicleWithoutExplosion = false;

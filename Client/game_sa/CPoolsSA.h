@@ -26,12 +26,12 @@ union tPoolObjectFlags
 {
     struct
     {
-        unsigned char nId : 7;
+        std::uint8_t nId : 7;
         bool          bEmpty : 1;
     };
 
 private:
-    unsigned char nValue;
+    std::uint8_t nValue;
 };
 
 template <class A, class B = A>
@@ -143,7 +143,7 @@ public:
     ~CPoolsSA();
 
     // Vehicles pool
-    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
+    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, std::uint8_t ucVariation, std::uint8_t ucVariation2);
 
 private:
     bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
@@ -181,7 +181,7 @@ public:
     bool       HasFreeBuildingSlot();
 
     // Peds pool
-    CPed* AddPed(CClientPed* pClientPed, unsigned int nModelIndex);
+    CPed* AddPed(CClientPed* pClientPed, std::uint32_t nModelIndex);
     CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
 
 private:
@@ -234,7 +234,7 @@ private:
 
         SPoolData() : ulCount(0UL)
         {
-            for (unsigned int i = 0; i < MAX; ++i)
+            for (std::uint32_t i = 0; i < MAX; ++i)
             {
                 arrayOfClientEntities[i] = {nullptr, nullptr};
             }

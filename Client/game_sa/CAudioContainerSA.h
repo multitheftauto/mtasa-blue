@@ -88,16 +88,16 @@ public:
     CAudioContainerSA();
     ~CAudioContainerSA();
 
-    bool GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length);
+    bool GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, std::uint32_t& length);
     bool ValidateContainer(eAudioLookupIndex lookupIndex);
 
-    bool GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length);
+    bool GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, std::uint32_t& length);
 
 private:
     CAudioContainerLookupTableSA* m_pLookupTable;
 
 protected:
-    bool          GetRawAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, uint8*& dataOut, unsigned int& lengthOut, int& iSampleRateOut);
+    bool          GetRawAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, uint8*& dataOut, std::uint32_t& lengthOut, int& iSampleRateOut);
     const SString GetAudioArchiveName(eAudioLookupIndex);
 
     const SString GetRadioStreamArchiveName(eRadioStreamIndex streamIndex);
@@ -114,7 +114,7 @@ protected:
 
         // for some reason R* decided to xor the radio streams
         // see gta_sa.exe @ 0x4F17D0
-        for (unsigned int i = 0; i < sizeof(T) * len; ++i)
+        for (std::uint32_t i = 0; i < sizeof(T) * len; ++i)
         {
             ((char*)&value)[i] ^= xorkey[xorPosition];
 

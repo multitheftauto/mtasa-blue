@@ -29,7 +29,7 @@ CLuaMatrix::~CLuaMatrix()
     m_uiScriptID = INVALID_ARRAY_ID;
 }
 
-CLuaMatrix* CLuaMatrix::GetFromScriptID(unsigned int uiScriptID)
+CLuaMatrix* CLuaMatrix::GetFromScriptID(std::uint32_t uiScriptID)
 {
     CLuaMatrix* pLuaMatrix = (CLuaMatrix*)CIdArray::FindEntry(uiScriptID, EIdClass::MATRIX);
     return pLuaMatrix;

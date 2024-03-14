@@ -477,7 +477,7 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
 
     char*        pFileInfoArray = *(char**)(0x5B8B08 + 6);
     CGame*       pGame = g_pCore->GetGame();
-    unsigned int RRR_BASE_ID = pGame->GetBaseIDforRRR();
+    std::uint32_t RRR_BASE_ID = pGame->GetBaseIDforRRR();
 
     for (uint i = 0; i < RRR_BASE_ID; i++)
     {

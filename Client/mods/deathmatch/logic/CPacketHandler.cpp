@@ -31,7 +31,7 @@ std::string  utf8_wcstombs(const std::wstring& wstr);
 
 // TODO: Make this independant of g_pClientGame. Just moved it here to get it out of the
 //       horribly big CClientGame file.
-bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
+bool CPacketHandler::ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream)
 {
     // Can the net api handle it?
     if (g_pClientGame->m_pNetAPI->ProcessPacket(ucPacketID, bitStream))
@@ -240,7 +240,7 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
 
 void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
 {
-    // unsigned char [x]    - server version string
+    // std::uint8_t [x]    - server version string
 
     // If we're not "connecting", we shouldn't have received this packet. Unload.
     if (g_pClientGame->m_Status != CClientGame::STATUS_CONNECTING)
@@ -258,7 +258,7 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
     char szVersionString[128];
     szVersionString[0] = '\0';
 
-    unsigned short ucSize = 0;
+    std::uint16_t ucSize = 0;
     if (!bitStream.Read(ucSize))
     {
         dassert(false);
@@ -314,17 +314,17 @@ void CPacketHandler::Packet_ServerConnected(NetBitStreamInterface& bitStream)
 void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 {
     // ElementID        (2)     - assigned player id
-    // unsigned char    (1)     - number of players in the server (including local)
+    // std::uint8_t    (1)     - number of players in the server (including local)
     // ElementID        (2)     - root element id
-    // unsigned char    (1)     - HTTP Download Type
+    // std::uint8_t    (1)     - HTTP Download Type
     // HTTP Download Type
     // 0 - Disabled     (0)
     // 1 - Port
-    // unsigned short   (2)     - HTTP Download Port
+    // std::uint16_t   (2)     - HTTP Download Port
     // 2 - URL
-    // unsigned short   (2)     - HTTP Download URL Size
-    // unsigned char    (X)     - HTTP Download URL
-    // unsigned char    (X)     - Server name
+    // std::uint16_t   (2)     - HTTP Download URL Size
+    // std::uint8_t    (X)     - HTTP Download URL
+    // std::uint8_t    (X)     - Server name
 
     // Make sure any existing messageboxes are hided
     g_pCore->RemoveMessageBox();
@@ -386,17 +386,17 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     bitStream.ReadBit(bVoiceEnabled);
 
     // Get the current sample rate for the voice module
-    SIntegerSync<unsigned char, 2> sampleRate;
+    SIntegerSync<std::uint8_t, 2> sampleRate;
     bitStream.Read(&sampleRate);
 
     // Get the current voice for the voice module
-    SIntegerSync<unsigned char, 4> quality;
+    SIntegerSync<std::uint8_t, 4> quality;
     bitStream.Read(&quality);
 
-    unsigned int iBitrate;
+    std::uint32_t iBitrate;
     bitStream.ReadCompressed(iBitrate);
 
-    g_pClientGame->InitVoice(bVoiceEnabled, (unsigned int)sampleRate, quality, iBitrate);
+    g_pClientGame->InitVoice(bVoiceEnabled, (std::uint32_t)sampleRate, quality, iBitrate);
 
     // Get fakelag command enabled
     if (bitStream.Can(eBitStreamVersion::FakeLagCommand))
@@ -410,7 +410,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     bitStream.Read(iHTTPMaxConnectionsPerClient);
 
     // HTTP Download Type
-    unsigned char ucHTTPDownloadType;
+    std::uint8_t ucHTTPDownloadType;
     bitStream.Read(ucHTTPDownloadType);
 
     ushort usHTTPDownloadPort;
@@ -486,7 +486,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
 {
-    // unsigned char [x]    - disconnect reason
+    // std::uint8_t [x]    - disconnect reason
 
     char ucType;
 
@@ -687,16 +687,16 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
     //
     // [ following repeats <number of players joined> times ]
     //
-    // unsigned char   (1)   - assigned player id
+    // std::uint8_t   (1)   - assigned player id
     //                       x ProtocolError(8)
-    // unsigned char   (1)   - time sync context
-    // unsigned char   (1)   - player nick length
+    // std::uint8_t   (1)   - time sync context
+    // std::uint8_t   (1)   - player nick length
     //                       x ProtocolError(9)
-    // unsigned char   (X)   - player nick (X = player nick length)
+    // std::uint8_t   (X)   - player nick (X = player nick length)
     //
     // if bitStream version >= 0x34
-    // | unsigned short(2)  - bitStream version
-    // | unsigned int  (1)  - build number
+    // | std::uint16_t(2)  - bitStream version
+    // | std::uint32_t  (1)  - build number
     //
     // bool            (1)   - is he dead?
     // bool            (1)   - spawned? (*)
@@ -706,21 +706,21 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
     // bool            (1)   - nametag color overridden (***)
     // bool            (1)   - headless?
     // bool            (1)   - frozen?
-    // unsigned char   (1)   - nametag text length
-    // unsigned char   (X)   - nametag text (X = nametag text length)
+    // std::uint8_t   (1)   - nametag text length
+    // std::uint8_t   (X)   - nametag text (X = nametag text length)
     //
     // if (***) nametag color overridden TRUE
-    // | unsigned char (3)   - nametag color (RGB)
+    // | std::uint8_t (3)   - nametag color (RGB)
     //
     // if bitStream version > 0x4B
-    // | unsigned char (1)   - movement anim (default = MOVE_DEFAULT)
+    // | std::uint8_t (1)   - movement anim (default = MOVE_DEFAULT)
     //
     // --------------------------------------
     // (*) ALL following data only if SPAWNED
     //     Always true for new server builds
     // --------------------------------------
     //
-    // unsigned char   (1)   - model id
+    // std::uint8_t   (1)   - model id
     //                       x ProtocolError(10)
     // bool            (1)   - has team
     // if has team
@@ -729,23 +729,23 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
     //
     // if (**) inside vehicle
     // | ElementID     (2)    - vehicle id
-    // | unsigned char (4)    - vehicle seat
+    // | std::uint8_t (4)    - vehicle seat
     // |                      x ProtocolError(11)
     // else (on foot)
     // | CVector       (12)   - position
     // | float         (4)    - rotation
 
-    // unsigned short  (2)    - dimension
-    // unsigned char   (1)    - fighting style
-    // unsigned char   (1)    - alpha
-    // unsigned char   (1)    - interior
+    // std::uint16_t  (2)    - dimension
+    // std::uint8_t   (1)    - fighting style
+    // std::uint8_t   (1)    - alpha
+    // std::uint8_t   (1)    - interior
     //
     // ---------------------------------
     // 16 reads of the following (0..15)
     // ---------------------------------
     // bool            (1)    - if player has this weapon id
     // if player has this weapon
-    // | unsigned char   (6)  - weapon type of this id
+    // | std::uint8_t   (6)  - weapon type of this id
     //
     // Thank the old gods and the new that issue #7376 is fixed
 
@@ -788,11 +788,11 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             return;
         }
 
-        unsigned char ucTimeContext = 255;
+        std::uint8_t ucTimeContext = 255;
         bitStream.Read(ucTimeContext);
 
         // Player nick length
-        unsigned char ucPlayerNickLength = 255;
+        std::uint8_t ucPlayerNickLength = 255;
         if (!bitStream.Read(ucPlayerNickLength) || ucPlayerNickLength < MIN_PLAYER_NICK_LENGTH || ucPlayerNickLength > MAX_PLAYER_NICK_LENGTH)
         {
             /*
@@ -838,7 +838,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
         bitStream.ReadStringCharacters(strNametagText, ucNametagTextLength);
 
         // Read out the nametag override color if it's overridden
-        unsigned char ucNametagR, ucNametagG, ucNametagB;
+        std::uint8_t ucNametagR, ucNametagG, ucNametagB;
         if (bHasNametagColorOverridden)
         {
             bitStream.Read(ucNametagR);
@@ -852,16 +852,16 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             bitStream.Read(ucMoveAnim);
 
         // Read out the spawndata if he has spawned
-        unsigned short   usPlayerModelID;
+        std::uint16_t   usPlayerModelID;
         ElementID        TeamID = INVALID_ELEMENT_ID;
         ElementID        ID = INVALID_ELEMENT_ID;
-        unsigned char    ucVehicleSeat = 0xFF;
+        std::uint8_t    ucVehicleSeat = 0xFF;
         SPositionSync    position(false);
         SPedRotationSync rotation;
-        unsigned short   usDimension = 0;
-        unsigned char    ucFightingStyle = 0;
+        std::uint16_t   usDimension = 0;
+        std::uint8_t    ucFightingStyle = 0;
         SEntityAlphaSync alpha;
-        unsigned char    ucInterior = 0;
+        std::uint8_t    ucInterior = 0;
         if (bIsSpawned)            // Always true for newer server builds.
         {
             // Read out the player model id
@@ -997,7 +997,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             pPlayer->SetInterior(ucInterior);
 
             // Read the weapon slots
-            for (unsigned int i = 0; i < 16; ++i)
+            for (std::uint32_t i = 0; i < 16; ++i)
             {
                 if (bitStream.ReadBit() == true)
                 {
@@ -1059,7 +1059,7 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
     bitStream.Read(PlayerID);
 
     // Flags
-    unsigned char ucFlags;
+    std::uint8_t ucFlags;
     bitStream.Read(ucFlags);            // Unused
 
     // Position vector
@@ -1073,7 +1073,7 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
     bitStream.Read(fRotation);
 
     // Player model id
-    unsigned short usPlayerModelID;
+    std::uint16_t usPlayerModelID;
     bitStream.Read(usPlayerModelID);
     if (!CClientPlayerManager::IsValidModel(usPlayerModelID))
     {
@@ -1082,11 +1082,11 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
     }
 
     // Interior
-    unsigned char ucInterior = 0;
+    std::uint8_t ucInterior = 0;
     bitStream.Read(ucInterior);
 
     // Dimension
-    unsigned short usDimension = 0;
+    std::uint16_t usDimension = 0;
     bitStream.Read(usDimension);
 
     // Team id
@@ -1097,7 +1097,7 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
         pTeam = g_pClientGame->m_pTeamManager->GetTeam(TeamID);
 
     // Time context
-    unsigned char ucTimeContext = 0;
+    std::uint8_t ucTimeContext = 0;
     bitStream.Read(ucTimeContext);
 
     // Grab the player this is about
@@ -1163,7 +1163,7 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
     SWeaponTypeSync weapon;
     SBodypartSync   bodyPart;
     bool            bStealth;
-    unsigned char   ucTimeContext;
+    std::uint8_t   ucTimeContext;
     AssocGroupId    animGroup;
     AnimationId     animID;
 
@@ -1241,7 +1241,7 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
 void CPacketHandler::Packet_PlayerChangeNick(NetBitStreamInterface& bitStream)
 {
     // ElementID        (2)     - player id
-    // unsigned char    (1)     - new nick length
+    // std::uint8_t    (1)     - new nick length
     // char             (x)     - new nick
 
     // We should be joined
@@ -1260,7 +1260,7 @@ void CPacketHandler::Packet_PlayerChangeNick(NetBitStreamInterface& bitStream)
     }
 
     // Check how many bytes with nick we got to read
-    unsigned int uiNickLength = bitStream.GetNumberOfUnreadBits() >> 3;
+    std::uint32_t uiNickLength = bitStream.GetNumberOfUnreadBits() >> 3;
     if (uiNickLength < MIN_PLAYER_NICK_LENGTH || uiNickLength > MAX_PLAYER_NICK_LENGTH)
     {
         RaiseProtocolError(24);
@@ -1346,17 +1346,17 @@ void CPacketHandler::Packet_PlayerChangeNick(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
 {
-    // unsigned char    (1)     - red
-    // unsigned char    (1)     - green
-    // unsigned char    (1)     - blue
-    // unsigned char    (1)     - color-coded
+    // std::uint8_t    (1)     - red
+    // std::uint8_t    (1)     - green
+    // std::uint8_t    (1)     - blue
+    // std::uint8_t    (1)     - color-coded
     // ElementID        (2)     - client (if typed by a player)
-    // unsigned char    (x)     - message
+    // std::uint8_t    (x)     - message
 
     // Read out the color
-    unsigned char ucRed;
-    unsigned char ucGreen;
-    unsigned char ucBlue;
+    std::uint8_t ucRed;
+    std::uint8_t ucGreen;
+    std::uint8_t ucBlue;
     bool          bColorCoded;
 
     CClientEntity* pClient = nullptr;
@@ -1365,7 +1365,7 @@ void CPacketHandler::Packet_ChatEcho(NetBitStreamInterface& bitStream)
     {
         // Read the client's ID
         int           iNumberOfBytesUsed;
-        unsigned char ucMessageType;
+        std::uint8_t ucMessageType;
 
         if (bitStream.Can(eBitStreamVersion::OnClientChatMessage_PlayerSource))
         {
@@ -1434,7 +1434,7 @@ void CPacketHandler::Packet_ChatClear(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_ConsoleEcho(NetBitStreamInterface& bitStream)
 {
-    // unsigned char    (x)     - message
+    // std::uint8_t    (x)     - message
 
     // Valid length?
     int iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed();
@@ -1455,16 +1455,16 @@ void CPacketHandler::Packet_ConsoleEcho(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_DebugEcho(NetBitStreamInterface& bitStream)
 {
-    // unsigned char    (1)     - level
-    // unsigned char    (1)     - red
-    // unsigned char    (1)     - green
-    // unsigned char    (1)     - blue
-    // unsigned char    (x)     - message
+    // std::uint8_t    (1)     - level
+    // std::uint8_t    (1)     - red
+    // std::uint8_t    (1)     - green
+    // std::uint8_t    (1)     - blue
+    // std::uint8_t    (x)     - message
 
-    unsigned char ucLevel;
-    unsigned char ucRed;
-    unsigned char ucGreen;
-    unsigned char ucBlue;
+    std::uint8_t ucLevel;
+    std::uint8_t ucRed;
+    std::uint8_t ucGreen;
+    std::uint8_t ucBlue;
 
     // Read out the level
     if (!bitStream.Read(ucLevel))
@@ -1531,10 +1531,10 @@ void CPacketHandler::Packet_VehicleSpawn(NetBitStreamInterface& bitStream)
     // ElementID        (2)     - vehicle id
     // CVector          (12)    - position
     // CVector          (12)    - rotation in degrees
-    // unsigned char    (1)     - color 1
-    // unsigned char    (1)     - color 2
-    // unsigned char    (1)     - color 3
-    // unsigned char    (1)     - color 4
+    // std::uint8_t    (1)     - color 1
+    // std::uint8_t    (1)     - color 2
+    // std::uint8_t    (1)     - color 3
+    // std::uint8_t    (1)     - color 4
     // Repeats ...
 
     // While there are bytes left in the packet
@@ -1552,7 +1552,7 @@ void CPacketHandler::Packet_VehicleSpawn(NetBitStreamInterface& bitStream)
         }
 
         // Read out the time context
-        unsigned char ucTimeContext;
+        std::uint8_t ucTimeContext;
         bitStream.Read(ucTimeContext);
         pVehicle->SetSyncTimeContext(ucTimeContext);
 
@@ -1621,22 +1621,22 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
         CDeathmatchVehicle* pVehicle = static_cast<CDeathmatchVehicle*>(g_pClientGame->m_pVehicleManager->Get(ID));
         if (pVehicle)
         {
-            for (unsigned int i = 0; i < MAX_DOORS; ++i)
+            for (std::uint32_t i = 0; i < MAX_DOORS; ++i)
             {
                 if (damage.data.bDoorStatesChanged[i])
                     pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
             }
-            for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+            for (std::uint32_t i = 0; i < MAX_WHEELS; ++i)
             {
                 if (damage.data.bWheelStatesChanged[i])
                     pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
             }
-            for (unsigned int i = 0; i < MAX_PANELS; ++i)
+            for (std::uint32_t i = 0; i < MAX_PANELS; ++i)
             {
                 if (damage.data.bPanelStatesChanged[i])
                     pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i]);
             }
-            for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+            for (std::uint32_t i = 0; i < MAX_LIGHTS; ++i)
             {
                 if (damage.data.bLightStatesChanged[i])
                     pVehicle->SetLightStatus(i, damage.data.ucLightStates[i]);
@@ -1649,9 +1649,9 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
 {
-    // unsigned char  (1)   - ped id
+    // std::uint8_t  (1)   - ped id
     // ElementID      (2)   - vehicle id
-    // unsigned char  (1)   - action
+    // std::uint8_t  (1)   - action
 
     // Read out the ped id
     ElementID PedID = INVALID_ELEMENT_ID;
@@ -1677,7 +1677,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
             if (pVehicle)
             {
                 // Read out the seat id
-                unsigned char ucSeat = 0xFF;
+                std::uint8_t ucSeat = 0xFF;
                 bitStream.ReadBits(&ucSeat, 4);
                 if (ucSeat == 0xFF)
                 {
@@ -1686,7 +1686,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                 }
 
                 // Read out the action
-                unsigned char ucAction = 0xFF;
+                std::uint8_t ucAction = 0xFF;
                 bitStream.ReadBits(&ucAction, 4);
 
 #ifdef MTA_DEBUG
@@ -1703,7 +1703,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                 {
                     case CClientGame::VEHICLE_REQUEST_IN_CONFIRMED:
                     {
-                        unsigned char ucDoor = 0xFF;
+                        std::uint8_t ucDoor = 0xFF;
                         bitStream.ReadBits(&ucDoor, 3);
                         // If it's the local player or syncing ped, set some stuff
                         if (pPed->IsLocalPlayer() || pPed->IsSyncing())
@@ -1776,7 +1776,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
 
                     case CClientGame::VEHICLE_NOTIFY_IN_ABORT_RETURN:
                     {
-                        unsigned char      ucDoor = 0;
+                        std::uint8_t      ucDoor = 0;
                         SDoorOpenRatioSync door;
 
                         bitStream.ReadBits(&ucDoor, 3);
@@ -1838,7 +1838,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
 
                     case CClientGame::VEHICLE_REQUEST_OUT_CONFIRMED:
                     {
-                        unsigned char ucDoor = 0;
+                        std::uint8_t ucDoor = 0;
 
                         if (!bitStream.ReadBits(&ucDoor, 2))
                             ucDoor = 0xFF;
@@ -1948,7 +1948,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
 
                     case CClientGame::VEHICLE_REQUEST_JACK_CONFIRMED:
                     {
-                        unsigned char ucDoor = 0xFF;
+                        std::uint8_t ucDoor = 0xFF;
                         bitStream.ReadBits(&ucDoor, 3);
                         // Grab the ped model getting jacked
                         CClientPed* pJacked = pVehicle->GetOccupant(ucSeat);
@@ -2099,7 +2099,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                         // Reset vehicle in out state
                         pPed->SetVehicleInOutState(VEHICLE_INOUT_NONE);
 
-                        unsigned char ucReason;
+                        std::uint8_t ucReason;
                         bitStream.Read(ucReason);
                         // Is the vehicle too far away?
                         if (ucReason == 5 /*FAIL_DISTANCE*/)
@@ -2136,7 +2136,7 @@ void CPacketHandler::Packet_VehicleTrailer(NetBitStreamInterface& bitStream)
 {
     // ElementID      (2)   - vehicle id
     // ElementID      (2)   - trailer id
-    // unsigned char  (1)   - attached?
+    // std::uint8_t  (1)   - attached?
     // CVector (12)         - Position
     // CVector (12)         - Rotation in degrees
     // CVector (12)         - TurnSpeed
@@ -2199,7 +2199,7 @@ void CPacketHandler::Packet_VehicleTrailer(NetBitStreamInterface& bitStream)
 void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
 {
     // Read out the map weather
-    unsigned char ucWeather, ucWeatherBlendingTo, ucBlendedWeatherHour;
+    std::uint8_t ucWeather, ucWeatherBlendingTo, ucBlendedWeatherHour;
     bitStream.Read(ucWeather);
     bitStream.Read(ucWeatherBlendingTo);
     bitStream.Read(ucBlendedWeatherHour);
@@ -2229,8 +2229,8 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         return;
     if (bHasSkyGradient)
     {
-        unsigned char ucTopRed, ucTopGreen, ucTopBlue = 0;
-        unsigned char ucBottomRed, ucBottomGreen, ucBottomBlue = 0;
+        std::uint8_t ucTopRed, ucTopGreen, ucTopBlue = 0;
+        std::uint8_t ucBottomRed, ucBottomGreen, ucBottomBlue = 0;
         bitStream.Read(ucTopRed);
         bitStream.Read(ucTopGreen);
         bitStream.Read(ucTopBlue);
@@ -2256,8 +2256,8 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         g_pMultiplayer->ResetHeatHaze();
 
     // Read out the map time
-    unsigned char ucClockHour;
-    unsigned char ucClockMinute;
+    std::uint8_t ucClockHour;
+    std::uint8_t ucClockMinute;
     bitStream.Read(ucClockHour);
     bitStream.Read(ucClockMinute);
 
@@ -2337,13 +2337,13 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     // Apply world sea level (to world sea level water only)
     g_pClientGame->GetManager()->GetWaterManager()->SetWorldWaterLevel(fSeaLevel, nullptr, false, true, false);
 
-    unsigned short usFPSLimit = 36;
+    std::uint16_t usFPSLimit = 36;
     bitStream.ReadCompressed(usFPSLimit);
     g_pCore->RecalculateFrameRateLimit(usFPSLimit);
 
     // Read out the garage door states
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();
-    for (unsigned char i = 0; i < MAX_GARAGES; i++)
+    for (std::uint8_t i = 0; i < MAX_GARAGES; i++)
     {
         bool     bGarageState;
         CGarage* pGarage = pGarages->GetGarage(i);
@@ -2395,7 +2395,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pGame->GetWorld()->SetJetpackMaxHeight(fJetpackMaxHeight);
 
     bool          bOverrideWaterColor = false;
-    unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
+    std::uint8_t ucRed, ucGreen, ucBlue, ucAlpha;
 
     if (!bitStream.ReadBit(bOverrideWaterColor))
     {
@@ -2463,7 +2463,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
 
     // Sun color
     bool          bOverrideSunColor = false;
-    unsigned char ucSunCoreR, ucSunCoreG, ucSunCoreB, ucSunCoronaR, ucSunCoronaG, ucSunCoronaB;
+    std::uint8_t ucSunCoreR, ucSunCoreG, ucSunCoreB, ucSunCoronaR, ucSunCoronaG, ucSunCoronaB;
     if (!bitStream.ReadBit(bOverrideSunColor))
         return;
     if (bOverrideSunColor)
@@ -2625,7 +2625,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         }
     }
 
-    unsigned short usModel = 0;
+    std::uint16_t usModel = 0;
     float          fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
     char           cInterior = -1;
     while (bitStream.ReadBit() == true)
@@ -2701,10 +2701,10 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
 
         // Common:
         // ElementID            (2)     - entity id
-        // unsigned char        (1)     - entity type id
+        // std::uint8_t        (1)     - entity type id
         // ElementID            (2)     - parent entity id
-        // unsigned char        (1)     - entity interior
-        // unsigned short       (2)     - entity dimension
+        // std::uint8_t        (1)     - entity interior
+        // std::uint16_t       (2)     - entity dimension
         // ElementID            (2)     - attached to entity id
         // bool                 (1)     - collisions enabled
         // ???                  (?)     - custom data
@@ -2712,31 +2712,31 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // Objects:
         // CVector              (12)    - position
         // CVector              (12)    - rotation
-        // unsigned short       (2)     - object model id
-        // unsigned char        (1)     - alpha
+        // std::uint16_t       (2)     - object model id
+        // std::uint8_t        (1)     - alpha
         // CVector              (12)    - scale
         // bool                 (1)     - static
         // SObjectHealthSync    (?)     - health
 
         // Pickups:
         // CVector              (12)    - position
-        // unsigned char        (1)     - type
+        // std::uint8_t        (1)     - type
         // bool                         - visible?
-        // unsigned char        (1)     - weapon type (if type is weapon)
+        // std::uint8_t        (1)     - weapon type (if type is weapon)
 
         // Vehicles:
         // CMatrix              (48)    - matrix
-        // unsigned char        (1)     - vehicle id
+        // std::uint8_t        (1)     - vehicle id
         // float                (4)     - health
-        // unsigned char        (1)     - blow state (if supported)
-        // unsigned char        (1)     - color 1
-        // unsigned char        (1)     - color 2
-        // unsigned char        (1)     - color 3
-        // unsigned char        (1)     - color 4
-        // unsigned char        (1)     - paintjob
+        // std::uint8_t        (1)     - blow state (if supported)
+        // std::uint8_t        (1)     - color 1
+        // std::uint8_t        (1)     - color 2
+        // std::uint8_t        (1)     - color 3
+        // std::uint8_t        (1)     - color 4
+        // std::uint8_t        (1)     - paintjob
         // float                (4)     - turret position x (if applies)
         // float                (4)     - turret position y (if applies)
-        // unsigned short       (2)     - adjustable property (if applies)
+        // std::uint16_t       (2)     - adjustable property (if applies)
         // SDoorAngleSync       (?)     - Door #0 angle ratio.
         // SDoorAngleSync       (?)     - Door #1 angle ratio.
         // SDoorAngleSync       (?)     - Door #2 angle ratio.
@@ -2745,11 +2745,11 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // SDoorAngleSync       (?)     - Door #5 angle ratio.
         // bool                         - landing gear down?  (if applies)
         // bool                         - sirenes on?  (if applies)
-        // unsigned char        (1)     - no. of upgrades
-        // unsigned char        (1++)   - list of upgrades
-        // unsigned char        (1)     - reg-plate length
+        // std::uint8_t        (1)     - no. of upgrades
+        // std::uint8_t        (1++)   - list of upgrades
+        // std::uint8_t        (1)     - reg-plate length
         // char[]               (?)     - reg-plate
-        // unsigned char        (1)     - light override
+        // std::uint8_t        (1)     - light override
         // bool                         - can shoot petrol tank
         // bool                         - engine on
         // bool                         - locked
@@ -2758,14 +2758,14 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // Blips:
         // bool                         - attached to an entity?
         // -- following if attached:
-        // unsigned char        (1)     - attached entity type
-        // unsigned char/short  (1/2)   - attached entity id (char if player, otherwize short)
+        // std::uint8_t        (1)     - attached entity type
+        // std::uint8_t/short  (1/2)   - attached entity id (char if player, otherwize short)
         // -- following if not attached:
         // CVector              (12)    - position
         // -- end
-        // unsigned char        (1)     - icon
+        // std::uint8_t        (1)     - icon
         // -- if icon is 0
-        // unsigned char        (1)     - size
+        // std::uint8_t        (1)     - size
         // unsigned long        (4)     - color
 
         // Radar areas:
@@ -2778,20 +2778,20 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // CVector              (12)    - position
         // CVector              (12)    - rotation
         // int                  (4)     - time
-        // unsigned char        (1)     - style
+        // std::uint8_t        (1)     - style
         // ElementID            (2)     - next-node id
 
         // World meshes
-        // unsigned short       (2)     - name length
+        // std::uint16_t       (2)     - name length
         // char[]               (?)     - name
         // CVector              (12)    - position
         // CVector              (12)    - rotation
 
         // Teams
-        // unsigned short       (2)     - name length
+        // std::uint16_t       (2)     - name length
         // char[]               (?)     - name
-        // unsigned char[3]     (3)     - cols
-        // unsigned char        (1)     - friendly-fire
+        // std::uint8_t[3]     (3)     - cols
+        // std::uint8_t        (1)     - friendly-fire
 
 #if MTA_DEBUG
 retry:
@@ -2811,7 +2811,7 @@ retry:
     // HACK: store new entities and link up anything depending on other entities after
     list<SEntityDependantStuff*> newEntitiesStuff;
 
-    unsigned int NumEntities = 0;
+    std::uint32_t NumEntities = 0;
     if (!bitStream.ReadCompressed(NumEntities) || NumEntities == 0)
     {
         return;
@@ -2826,10 +2826,10 @@ retry:
 
         // Read out the entity type id and the entity id
         ElementID      EntityID;
-        unsigned char  ucEntityTypeID;
+        std::uint8_t  ucEntityTypeID;
         ElementID      ParentID;
-        unsigned char  ucInterior;
-        unsigned short usDimension;
+        std::uint8_t  ucInterior;
+        std::uint16_t usDimension;
         bool           bCollisonsEnabled;
         bool           bCallPropagationEnabled;
 
@@ -2853,11 +2853,11 @@ retry:
 
             // Read custom data
             CCustomData*   pCustomData = new CCustomData;
-            unsigned short usNumData = 0;
+            std::uint16_t usNumData = 0;
             bitStream.ReadCompressed(usNumData);
-            for (unsigned short us = 0; us < usNumData; us++)
+            for (std::uint16_t us = 0; us < usNumData; us++)
             {
-                unsigned char ucNameLength = 0;
+                std::uint8_t ucNameLength = 0;
 
                 // Read the custom data name length
                 if (bitStream.Read(ucNameLength))
@@ -2909,7 +2909,7 @@ retry:
             }
 
             // Read out the name length
-            unsigned short usNameLength;
+            std::uint16_t usNameLength;
             bitStream.ReadCompressed(usNameLength);
 
             // Create the name string and 0 terminate it
@@ -2923,7 +2923,7 @@ retry:
             }
 
             // Read out the sync time context
-            unsigned char ucSyncTimeContext = 0;
+            std::uint8_t ucSyncTimeContext = 0;
             bitStream.Read(ucSyncTimeContext);
 
             CClientEntity* pEntity = CElementIDs::GetElement(EntityID);
@@ -2967,7 +2967,7 @@ retry:
                 case CClientGame::OBJECT:
                 case CClientGame::WEAPON:
                 {
-                    unsigned short       usObjectID;
+                    std::uint16_t       usObjectID;
                     SEntityAlphaSync     alpha;
                     SRotationRadiansSync rotationRadians(false);
 
@@ -3081,7 +3081,7 @@ retry:
                         if (ucEntityTypeID == CClientGame::WEAPON)
                         {
                             CClientWeapon* pWeapon = (CClientWeapon*)pObject;
-                            unsigned char  ucTargetType = eTargetType::TARGET_TYPE_FIXED;
+                            std::uint8_t  ucTargetType = eTargetType::TARGET_TYPE_FIXED;
                             bitStream.ReadBits(&ucTargetType, 3);            // 3 bits = 4 possible values.
                             switch (ucTargetType)
                             {
@@ -3093,7 +3093,7 @@ retry:
                                 {
                                     CClientEntity* pTarget = NULL;
                                     ElementID      targetID = 0;
-                                    unsigned char  ucSubTarget = 0;
+                                    std::uint8_t  ucSubTarget = 0;
 
                                     bitStream.Read(targetID);
                                     pTarget = CElementIDs::GetElement(targetID);
@@ -3101,7 +3101,7 @@ retry:
                                     {
                                         if (IS_PED(pTarget))
                                         {
-                                            bitStream.Read(ucSubTarget);            // Send the entire unsigned char as there are a lot of bones.
+                                            bitStream.Read(ucSubTarget);            // Send the entire std::uint8_t as there are a lot of bones.
                                         }
                                         else if (IS_VEHICLE(pTarget))
                                         {
@@ -3124,7 +3124,7 @@ retry:
                             if (bChanged)
                             {
                                 float          fAccuracy, fTargetRange, fWeaponRange;
-                                unsigned short usDamagePerHit;
+                                std::uint16_t usDamagePerHit;
                                 bitStream.ReadBits(&usDamagePerHit, 12);            // 12 bits = 2048 values... plenty.
                                 bitStream.Read(fAccuracy);
                                 bitStream.Read(fTargetRange);
@@ -3150,8 +3150,8 @@ retry:
                             bitStream.ReadBit(weaponConfig.flags.bSeeThroughStuff);
                             bitStream.ReadBit(weaponConfig.flags.bShootThroughStuff);
 
-                            unsigned short usAmmo, usClipAmmo;
-                            unsigned char  ucWeaponState;
+                            std::uint16_t usAmmo, usClipAmmo;
+                            std::uint8_t  ucWeaponState;
                             bitStream.ReadBits(&ucWeaponState, 4);            // 4 bits = 8 possible values for weapon state
                             bitStream.Read(usAmmo);
                             bitStream.Read(usClipAmmo);
@@ -3184,7 +3184,7 @@ retry:
                 case CClientGame::PICKUP:
                 {
                     // Read out the pickup data
-                    unsigned short  usModel;
+                    std::uint16_t  usModel;
                     bool            bIsVisible;
                     SPickupTypeSync pickupType;
 
@@ -3256,7 +3256,7 @@ retry:
                     bitStream.Read(&rotationDegrees);
 
                     // Read out the vehicle value as a char, then convert
-                    unsigned char ucModel = 0xFF;
+                    std::uint8_t ucModel = 0xFF;
                     bitStream.Read(ucModel);
 
                     // The server appears to subtract 400 from the vehicle id before
@@ -3266,7 +3266,7 @@ retry:
                     // Too bad this was never documented.
                     //
                     // --slush
-                    unsigned short usModel = ucModel + 400;
+                    std::uint16_t usModel = ucModel + 400;
                     if (!CClientVehicleManager::IsValidModel(usModel))
                     {
                         RaiseEntityAddError(39);
@@ -3283,7 +3283,7 @@ retry:
 
                     // Read out blow state
                     VehicleBlowState blowState = VehicleBlowState::INTACT;
-                    unsigned char    rawBlowState = 0;
+                    std::uint8_t    rawBlowState = 0;
 
                     if (bitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
                     {
@@ -3339,14 +3339,14 @@ retry:
                         return;
                     }
 
-                    unsigned char ucVariant = 5;
+                    std::uint8_t ucVariant = 5;
                     if (!bitStream.Read(ucVariant))
                     {
                         RaiseEntityAddError(42);
                         return;
                     }
 
-                    unsigned char ucVariant2 = 5;
+                    std::uint8_t ucVariant2 = 5;
                     if (!bitStream.Read(ucVariant2))
                     {
                         RaiseEntityAddError(42);
@@ -3391,7 +3391,7 @@ retry:
                     // If the vehicle has an adjustable property, read out its value
                     if (CClientVehicleManager::HasAdjustableProperty(usModel))
                     {
-                        unsigned short usAdjustableProperty;
+                        std::uint16_t usAdjustableProperty;
                         bitStream.ReadCompressed(usAdjustableProperty);
                         pVehicle->SetAdjustablePropertyValue(usAdjustableProperty);
                     }
@@ -3400,7 +3400,7 @@ retry:
                     if (CClientVehicleManager::HasDoors(usModel))
                     {
                         SDoorOpenRatioSync door;
-                        for (unsigned char i = 0; i < 6; ++i)
+                        for (std::uint8_t i = 0; i < 6; ++i)
                         {
                             bitStream.Read(&door);
                             pVehicle->SetDoorOpenRatio(i, door.data.fRatio, 0, true);
@@ -3409,15 +3409,15 @@ retry:
 
                     // Read out the upgrades
                     CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
-                    unsigned char     ucNumUpgrades;
+                    std::uint8_t     ucNumUpgrades;
                     bitStream.Read(ucNumUpgrades);
 
                     if (ucNumUpgrades > 0)
                     {
-                        unsigned char uc = 0;
+                        std::uint8_t uc = 0;
                         for (; uc < ucNumUpgrades; uc++)
                         {
-                            unsigned char ucUpgrade;
+                            std::uint8_t ucUpgrade;
                             bitStream.Read(ucUpgrade);
 
                             /*
@@ -3561,8 +3561,8 @@ retry:
                     }
                     if (bitStream.Version() >= 0x02A)
                     {
-                        unsigned char ucSirenCount = 0;
-                        unsigned char ucSirenType = 0;
+                        std::uint8_t ucSirenCount = 0;
+                        std::uint8_t ucSirenType = 0;
                         bool          bSync = false;
                         bitStream.ReadBit(bSync);
                         if (bSync)
@@ -3610,7 +3610,7 @@ retry:
                     bitStream.Read(&position);
                     if (bitStream.Read(&markerType) && bitStream.Read(fSize) && bitStream.Read(&color))
                     {
-                        unsigned char ucType = markerType.data.ucType;
+                        std::uint8_t ucType = markerType.data.ucType;
 
                         // Valid type?
                         if (ucType < CClientMarker::MARKER_INVALID)
@@ -3667,7 +3667,7 @@ retry:
                     bitStream.ReadCompressed(sOrdering);
 
                     // Read out the visible distance
-                    SIntegerSync<unsigned short, 14> visibleDistance;
+                    SIntegerSync<std::uint16_t, 14> visibleDistance;
                     bitStream.Read(&visibleDistance);
 
                     // Make a blip with the given ID
@@ -3677,7 +3677,7 @@ retry:
                     pBlip->SetPosition(position.data.vecPosition);
 
                     // Read out the icon
-                    SIntegerSync<unsigned char, 6> icon;
+                    SIntegerSync<std::uint8_t, 6> icon;
                     bitStream.Read(&icon);
 
                     // Set the icon if it's valid
@@ -3685,7 +3685,7 @@ retry:
                         pBlip->SetSprite(icon);
 
                     // Read out the size
-                    SIntegerSync<unsigned char, 5> size;
+                    SIntegerSync<std::uint8_t, 5> size;
                     bitStream.Read(&size);
 
                     // Read out the color
@@ -3733,7 +3733,7 @@ retry:
                 case CClientGame::PATH_NODE:
                 {
                     int           iTime;
-                    unsigned char ucStyle;
+                    std::uint8_t ucStyle;
                     ElementID     NextNodeID;
                     // Read out the nodes position, rotation, time, style and next node
                     if (bitStream.Read(vecPosition.fX) && bitStream.Read(vecPosition.fY) && bitStream.Read(vecPosition.fZ) && bitStream.Read(vecRotation.fX) &&
@@ -3762,7 +3762,7 @@ retry:
 
                 case CClientGame::TEAM:
                 {
-                    unsigned short usNameLength;
+                    std::uint16_t usNameLength;
                     bitStream.ReadCompressed(usNameLength);
                     if (usNameLength > MAX_TEAM_NAME_LENGTH)
                     {
@@ -3774,7 +3774,7 @@ retry:
                     bitStream.Read(szTeamName, usNameLength);
                     szTeamName[usNameLength] = 0;
 
-                    unsigned char ucRed, ucGreen, ucBlue;
+                    std::uint8_t ucRed, ucGreen, ucBlue;
                     bitStream.Read(ucRed);
                     bitStream.Read(ucGreen);
                     bitStream.Read(ucBlue);
@@ -3786,9 +3786,9 @@ retry:
                     bitStream.ReadBit(bFriendlyFire);
                     pTeam->SetFriendlyFire(bFriendlyFire);
 
-                    unsigned int uiPlayersCount;
+                    std::uint32_t uiPlayersCount;
                     bitStream.Read(uiPlayersCount);
-                    for (unsigned int i = 0; i < uiPlayersCount; i++)
+                    for (std::uint32_t i = 0; i < uiPlayersCount; i++)
                     {
                         ElementID PlayerId;
                         if (bitStream.Read(PlayerId))
@@ -3811,7 +3811,7 @@ retry:
                     bitStream.Read(&position);
 
                     // Read out the model
-                    unsigned short usModel;
+                    std::uint16_t usModel;
                     bitStream.ReadCompressed(usModel);
                     if (!CClientPlayerManager::IsValidModel(usModel))
                     {
@@ -3833,7 +3833,7 @@ retry:
 
                     // Read out the vehicle id
                     ElementID       VehicleID = INVALID_ELEMENT_ID;
-                    unsigned char   ucSeat = 0xFF;
+                    std::uint8_t   ucSeat = 0xFF;
                     CClientVehicle* pVehicle = NULL;
 
                     if (bitStream.ReadBit() == true)
@@ -3883,12 +3883,12 @@ retry:
                     pPed->SetMoveAnim((eMoveAnim)ucMoveAnim);
 
                     // clothes
-                    unsigned char ucNumClothes, ucTextureLength, ucModelLength, ucType;
+                    std::uint8_t ucNumClothes, ucTextureLength, ucModelLength, ucType;
                     if (bitStream.Read(ucNumClothes))
                     {
                         if (ucNumClothes > 0)
                         {
-                            for (unsigned short uc = 0; uc < ucNumClothes; uc++)
+                            for (std::uint16_t uc = 0; uc < ucNumClothes; uc++)
                             {
                                 // Read out the texture
                                 bitStream.Read(ucTextureLength);
@@ -3917,20 +3917,20 @@ retry:
                     // weapons
                     if (bitStream.Version() >= 0x61)
                     {
-                        unsigned char slot;
+                        std::uint8_t slot;
                         bitStream.Read(slot);
 
                         while (slot != 0xFF)
                         {
                             // Read info from bitstream
-                            unsigned char ucType;
+                            std::uint8_t ucType;
                             bitStream.Read(ucType);
 
-                            unsigned short usTotalAmmo;
+                            std::uint16_t usTotalAmmo;
                             bitStream.Read(usTotalAmmo);
 
                             // ammoInClip is not implemented generally
-                            // unsigned short usAmmoInClip;
+                            // std::uint16_t usAmmoInClip;
                             // bitStream.Read ( usAmmoInClip );
 
                             // Apply read info
@@ -3947,7 +3947,7 @@ retry:
                         }
 
                         // Read and set current slot
-                        unsigned char ucCurrentSlot;
+                        std::uint8_t ucCurrentSlot;
                         bitStream.Read(ucCurrentSlot);
                         pPed->SetCurrentWeaponSlot((eWeaponSlot)ucCurrentSlot);
                     }
@@ -3961,7 +3961,7 @@ retry:
                 case CClientGame::DUMMY:
                 {
                     // Type Name
-                    unsigned short usTypeNameLength;
+                    std::uint16_t usTypeNameLength;
                     bitStream.ReadCompressed(usTypeNameLength);
                     char* szTypeName = new char[usTypeNameLength + 1];
                     bitStream.Read(szTypeName, usTypeNameLength);
@@ -4058,11 +4058,11 @@ retry:
                         }
                         case COLSHAPE_POLYGON:
                         {
-                            unsigned int uiPoints;
+                            std::uint32_t uiPoints;
                             CVector2D    vecPoint;
                             bitStream.ReadCompressed(uiPoints);
                             CClientColPolygon* pPolygon = new CClientColPolygon(g_pClientGame->m_pManager, EntityID, position.data.vecPosition);
-                            for (unsigned int i = 0; i < uiPoints; i++)
+                            for (std::uint32_t i = 0; i < uiPoints; i++)
                             {
                                 SPosition2DSync vertex(false);
                                 bitStream.Read(&vertex);
@@ -4302,7 +4302,7 @@ void CPacketHandler::Packet_PickupHideShow(NetBitStreamInterface& bitStream)
 {
     // bool             - show it?
     // ElementID        - pickup ids (repeating)
-    // unsigned char    - pickup model id
+    // std::uint8_t    - pickup model id
 
     // We must be joined
     if (g_pClientGame->m_Status != CClientGame::STATUS_JOINED)
@@ -4319,7 +4319,7 @@ void CPacketHandler::Packet_PickupHideShow(NetBitStreamInterface& bitStream)
     {
         // Pickup id and model
         ElementID      PickupID;
-        unsigned short usPickupModel;
+        std::uint16_t usPickupModel;
         if (bitStream.Read(PickupID) && bitStream.ReadCompressed(usPickupModel))
         {
             // Try to grab the pickup
@@ -4373,7 +4373,7 @@ void CPacketHandler::Packet_PickupHitConfirm(NetBitStreamInterface& bitStream)
     }
 }
 
-void CPacketHandler::Packet_Lua(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
+void CPacketHandler::Packet_Lua(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream)
 {
     if (g_pClientGame->m_pRPCFunctions)
     {
@@ -4393,7 +4393,7 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
     // char             (1)     - green
     // char             (1)     - blue
     // char             (1)     - alpha
-    // unsigned short   (2)     - text string length
+    // std::uint16_t   (2)     - text string length
     // char[]           (*)     - text string of length specified above
 
     // We must be joined
@@ -4430,7 +4430,7 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
             float         fY = 0;
             float         fScale = 0;
             SColor        color;
-            unsigned char ucFormat = 0, ucShadowAlpha = 0;
+            std::uint8_t ucFormat = 0, ucShadowAlpha = 0;
 
             bitStream.Read(fX);
             bitStream.Read(fY);
@@ -4443,7 +4443,7 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
             bitStream.Read(ucShadowAlpha);
 
             // Read out the text size
-            unsigned short usTextLength = 0;
+            std::uint16_t usTextLength = 0;
             bitStream.ReadCompressed(usTextLength);
             if (usTextLength <= 1024)
             {
@@ -4491,7 +4491,7 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
         return;
 
     ElementID      CreatorID = INVALID_ELEMENT_ID;
-    unsigned short usLatency = 0;
+    std::uint16_t usLatency = 0;
     if (bHasCreator && (!bitStream.Read(CreatorID) || !bitStream.ReadCompressed(usLatency)))
         return;
 
@@ -4574,7 +4574,7 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
                 pMovedEntity = pLocalPlayer;
 
             // Warp back in time to where we were when this explosion happened
-            unsigned short usLatency = (unsigned short)g_pNet->GetPing();
+            std::uint16_t usLatency = (std::uint16_t)g_pNet->GetPing();
             if (pCreator && pCreator != g_pClientGame->GetLocalPlayer())
                 usLatency = pCreator->GetLatency();
             CVector vecWarpPosition;
@@ -4678,7 +4678,7 @@ void CPacketHandler::Packet_FireSync(NetBitStreamInterface& bitStream)
 {
     // Read out the creator, latency, position and size
     ElementID      Creator;
-    unsigned short usLatency;
+    std::uint16_t usLatency;
     CVector        vecPosition;
     float          fSize;
     if (bitStream.Read(Creator) && bitStream.ReadCompressed(usLatency) && bitStream.Read(vecPosition.fX) && bitStream.Read(vecPosition.fY) &&
@@ -4705,7 +4705,7 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
         return;
 
     ElementID      CreatorID = INVALID_ELEMENT_ID;
-    unsigned short usLatency = 0;
+    std::uint16_t usLatency = 0;
     if (bHasCreator && (!bitStream.Read(CreatorID) || !bitStream.ReadCompressed(usLatency)))
         return;
 
@@ -4729,7 +4729,7 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
         return;
 
     // Read the model
-    unsigned short usModel = 0;
+    std::uint16_t usModel = 0;
     if (bitStream.Version() >= 0x4F)
     {
         if (bitStream.Version() >= 0x52 || bHasCreator)            // Fix possible error from 0x51 server
@@ -4856,16 +4856,16 @@ void CPacketHandler::Packet_PlayerStats(NetBitStreamInterface& bitStream)
 {
     // Read out the player and stats
     ElementID      ID;
-    unsigned short usNumStats;
+    std::uint16_t usNumStats;
     if (bitStream.Read(ID) && bitStream.ReadCompressed(usNumStats))
     {
         CClientPed* pPed = g_pClientGame->GetPedManager()->Get(ID, true);
         if (pPed)
         {
             bool bRebuild = false;
-            for (unsigned short us = 0; us < usNumStats; us++)
+            for (std::uint16_t us = 0; us < usNumStats; us++)
             {
-                unsigned short usStat;
+                std::uint16_t usStat;
                 float          fValue;
                 if (bitStream.Read(usStat) && bitStream.Read(fValue))
                 {
@@ -4882,8 +4882,8 @@ void CPacketHandler::Packet_PlayerStats(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_PlayerClothes(NetBitStreamInterface& bitStream)
 {
-    unsigned char  ucTextureLength, ucModelLength, ucType;
-    unsigned short usNumClothes;
+    std::uint8_t  ucTextureLength, ucModelLength, ucType;
+    std::uint16_t usNumClothes;
     ElementID      ID;
 
     if (bitStream.Read(ID) && bitStream.Read(usNumClothes))
@@ -4891,7 +4891,7 @@ void CPacketHandler::Packet_PlayerClothes(NetBitStreamInterface& bitStream)
         CClientPed* pPed = g_pClientGame->GetPedManager()->Get(ID, true);
         if (pPed)
         {
-            for (unsigned short us = 0; us < usNumClothes; us++)
+            for (std::uint16_t us = 0; us < usNumClothes; us++)
             {
                 // Read out the texture
                 bitStream.Read(ucTextureLength);
@@ -4921,7 +4921,7 @@ void CPacketHandler::Packet_PlayerClothes(NetBitStreamInterface& bitStream)
 void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
 {
     // Read out the event name length
-    unsigned short usNameLength;
+    std::uint16_t usNameLength;
     if (bitStream.ReadCompressed(usNameLength))
     {
         // Error?
@@ -4977,29 +4977,29 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         uiTotalSizeProcessed = 0;
 
     /*
-     * unsigned char (1)   - resource name size
-     * unsigned char (x)    - resource name
-     * unsigned short (2)   - resource id
-     * unsigned short (2)   - resource entity id
-     * unsigned short (2)   - resource dynamic entity id
+     * std::uint8_t (1)   - resource name size
+     * std::uint8_t (x)    - resource name
+     * std::uint16_t (2)   - resource id
+     * std::uint16_t (2)   - resource entity id
+     * std::uint16_t (2)   - resource dynamic entity id
      * list of configs and scripts
-     * * unsigned char (1)    - type chunk (F - File, E - Exported Function)
-     * * unsigned char (1)    - file name size
-     * * unsigned char (x)    - file name
-     * * unsigned char (1)    - type
+     * * std::uint8_t (1)    - type chunk (F - File, E - Exported Function)
+     * * std::uint8_t (1)    - file name size
+     * * std::uint8_t (x)    - file name
+     * * std::uint8_t (1)    - type
      * * unsigned long        - CRC
      * * double               - size
      * list of exported functions
-     * * unsigned char (1)    - type chunk (F - File, E - Exported Function)
-     * * unsigned char (1)    - function name size
-     * * unsigned char (x)    - function name
+     * * std::uint8_t (1)    - type chunk (F - File, E - Exported Function)
+     * * std::uint8_t (1)    - function name size
+     * * std::uint8_t (x)    - function name
      */
 
     // Number of 'no client cache' scripts
-    unsigned short usNoClientCacheScriptCount = 0;
+    std::uint16_t usNoClientCacheScriptCount = 0;
 
     // Resource Name Size
-    unsigned char ucResourceNameSizeTemp;
+    std::uint8_t ucResourceNameSizeTemp;
     bitStream.Read(ucResourceNameSizeTemp);
 
     // ucResourceNameSizeTemp > 255 ??
@@ -5034,7 +5034,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
     }
 
     // Resource ID
-    unsigned short usResourceID;
+    std::uint16_t usResourceID;
     bitStream.Read(usResourceID);
 
     // Resource Entity ID
@@ -5088,13 +5088,13 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
 
         // Resource Chunk Type (F = Resource File, E = Exported Function)
-        unsigned char ucChunkType;
+        std::uint8_t ucChunkType;
         // Resource Chunk Size
-        unsigned char ucChunkSize;
+        std::uint8_t ucChunkSize;
         // Resource Chunk Data
         char* szChunkData = nullptr;
         // Resource Chunk Sub Type
-        unsigned char ucChunkSubType;
+        std::uint8_t ucChunkSubType;
         // Resource Chunk checksum
         CChecksum chunkChecksum;
         // Resource Chunk File Size
@@ -5268,8 +5268,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_ResourceStop(NetBitStreamInterface& bitStream)
 {
-    // unsigned short (2)    - resource id
-    unsigned short usNetID;
+    // std::uint16_t (2)    - resource id
+    std::uint16_t usNetID;
     if (bitStream.Read(usNetID))
     {
         // Delete the resource
@@ -5279,21 +5279,21 @@ void CPacketHandler::Packet_ResourceStop(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStream)
 {
-    unsigned short usNetID;
-    unsigned short usScriptCount = 0;
+    std::uint16_t usNetID;
+    std::uint16_t usScriptCount = 0;
     if (bitStream.Read(usNetID) && bitStream.Read(usScriptCount))
     {
         CResource* pResource = g_pClientGame->m_pResourceManager->GetResourceFromNetID(usNetID);
         if (pResource)
         {
-            for (unsigned int i = 0; i < usScriptCount; ++i)
+            for (std::uint32_t i = 0; i < usScriptCount; ++i)
             {
                 SString strFilename = "(unknown)";
                 if (bitStream.Version() >= 0x50)
                     bitStream.ReadString(strFilename);
 
                 // Read the script compressed chunk
-                unsigned int len;
+                std::uint32_t len;
                 if (!bitStream.Read(len) || len < 4)
                     return;
                 char* data = new char[len];
@@ -5305,7 +5305,7 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
                 }
 
                 // First grab the original length from the data chunk
-                const unsigned char* uData = (const unsigned char*)data;
+                const std::uint8_t* uData = (const std::uint8_t*)data;
                 unsigned long        originalLength = uData[0] << 24 | uData[1] << 16 | uData[2] << 8 | uData[3];
                 char*                uncompressedBuffer = new char[originalLength];
 
@@ -5329,7 +5329,7 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
 void CPacketHandler::Packet_DetonateSatchels(NetBitStreamInterface& bitStream)
 {
     ElementID      Player;
-    unsigned short usLatency;
+    std::uint16_t usLatency;
 
     if (bitStream.Read(Player) && bitStream.ReadCompressed(usLatency))
     {
@@ -5368,7 +5368,7 @@ void CPacketHandler::Packet_DestroySatchels(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
 {
-    unsigned short usPacketSize;
+    std::uint16_t usPacketSize;
     ElementID      PlayerID;
     if (bitStream.Read(PlayerID))
     {
@@ -5602,10 +5602,10 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
 
     // Read out the entity type id and the entity id
     ElementID      EntityID;
-    unsigned char  ucEntityTypeID;
+    std::uint8_t  ucEntityTypeID;
     ElementID      ParentID;
-    unsigned char  ucInterior;
-    unsigned short usDimension;
+    std::uint8_t  ucInterior;
+    std::uint16_t usDimension;
     bool           bCollisonsEnabled;
     bool           bCallPropagationEnabled;
 
@@ -5629,15 +5629,15 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
 
         // Read custom data
         // CCustomData* pCustomData = new CCustomData;
-        unsigned short usNumData = 0;
+        std::uint16_t usNumData = 0;
         bitStream.ReadCompressed(usNumData);
 
         SString strStatus("ID:%05x Type:%d ParID:%05x Int:%d Dim:%d Attach:%d NumData:%d ", EntityID, ucEntityTypeID, ParentID, ucInterior, usDimension,
                           bIsAttached, usNumData);
 
-        for (unsigned short us = 0; us < usNumData; us++)
+        for (std::uint16_t us = 0; us < usNumData; us++)
         {
-            unsigned char ucNameLength = 0;
+            std::uint8_t ucNameLength = 0;
 
             // Read the custom data name length
             if (bitStream.Read(ucNameLength))
@@ -5665,7 +5665,7 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
         }
 
         // Read out the name length
-        unsigned short usNameLength;
+        std::uint16_t usNameLength;
         bitStream.ReadCompressed(usNameLength);
 
         // Create the name string and 0 terminate it

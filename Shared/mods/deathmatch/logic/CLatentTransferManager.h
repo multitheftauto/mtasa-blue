@@ -180,7 +180,7 @@ public:
     void OnLuaMainDestroy(void* pLuaMain);
 
     // Send functions
-    void        AddSendBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream);
+    void        AddSendBatchBegin(std::uint8_t ucPacketId, NetBitStreamInterface* pBitStream);
     SSendHandle AddSend(NetPlayerID remoteId, ushort usBitStreamVersion, uint uiRate, void* pLuaMain, ushort usResourceNetId);
     void        AddSendBatchEnd();
 
@@ -216,7 +216,7 @@ protected:
 //
 NetBitStreamInterface* DoAllocateNetBitStream(NetPlayerID remoteId, ushort usBitStreamVersion);
 void                   DoDeallocateNetBitStream(NetBitStreamInterface* pBitStream);
-bool                   DoSendPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority,
+bool                   DoSendPacket(std::uint8_t ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority,
                                     NetPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT);
-bool                   DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId);
+bool                   DoStaticProcessPacket(std::uint8_t ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId);
 void                   DoDisconnectRemote(NetPlayerID remoteId, const SString& strReason);

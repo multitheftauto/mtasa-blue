@@ -27,7 +27,7 @@ public:
     CExplosionManagerSA();
     ~CExplosionManagerSA();
 
-    CExplosion* AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition, unsigned int uiActivationDelay = 0,
+    CExplosion* AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition, std::uint32_t uiActivationDelay = 0,
                              bool bMakeSound = true, float fCamShake = -1.0f, bool bNoDamage = false);
     void        RemoveAllExplosions();
     CExplosion* GetExplosion(DWORD ID);

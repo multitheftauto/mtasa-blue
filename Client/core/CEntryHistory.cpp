@@ -57,7 +57,7 @@ void CEntryHistory::Add(SString line)
 void CEntryHistory::CleanLine(SString& line)
 {
     const char* blankText = "";
-    for (unsigned int i = 0; i < NUMELMS(g_WordsToCheck); i++)
+    for (std::uint32_t i = 0; i < NUMELMS(g_WordsToCheck); i++)
     {
         int         numBlanks = g_WordsToCheck[i].numBlanks;
         const char* delim = g_WordsToCheck[i].delim;

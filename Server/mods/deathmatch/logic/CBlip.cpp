@@ -89,7 +89,7 @@ bool CBlip::ReadSpecialData(const int iLine)
     if (GetCustomDataInt("icon", iTemp, true))
     {
         if (CBlipManager::IsValidIcon(iTemp))
-            m_ucIcon = static_cast<unsigned char>(iTemp);
+            m_ucIcon = static_cast<std::uint8_t>(iTemp);
         else
         {
             CLogger::ErrorPrintf("Bad 'icon' (%d) id specified in <blip> (line %d)\n", iTemp, iLine);
@@ -104,7 +104,7 @@ bool CBlip::ReadSpecialData(const int iLine)
     {
         if (iTemp >= 0 && iTemp <= 25)
         {
-            m_ucSize = static_cast<unsigned char>(iTemp);
+            m_ucSize = static_cast<std::uint8_t>(iTemp);
         }
         else
         {
@@ -127,7 +127,7 @@ bool CBlip::ReadSpecialData(const int iLine)
 
     // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     // Grab the "ordering" data
     if (GetCustomDataInt("ordering", iTemp, true))
@@ -152,7 +152,7 @@ bool CBlip::ReadSpecialData(const int iLine)
     {
         if (iTemp >= 0 && iTemp <= 65535)
         {
-            m_usVisibleDistance = static_cast<unsigned short>(iTemp);
+            m_usVisibleDistance = static_cast<std::uint16_t>(iTemp);
         }
         else
         {

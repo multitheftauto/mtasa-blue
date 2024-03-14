@@ -33,7 +33,7 @@ public:
     virtual bool SetApplicationID(const char* szResourceName, const char* szAppID) = 0;
     virtual bool ResetDiscordData() = 0;
     virtual bool SetPresenceState(const char* szState, bool bCustom) = 0;
-    virtual bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl) = 0;
+    virtual bool SetPresenceButtons(std::uint16_t int iIndex, const char* szName, const char* szUrl) = 0;
     virtual bool SetDiscordRPCEnabled(bool bEnabled) = 0;
     virtual bool IsDiscordRPCEnabled() const = 0;
     virtual bool IsDiscordCustomDetailsDisallowed() const = 0;

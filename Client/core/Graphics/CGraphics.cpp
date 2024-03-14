@@ -118,10 +118,10 @@ void CGraphics::DrawString(int uiLeft, int uiTop, int uiRight, int uiBottom, uns
     if (pDXFont)
     {
         // Prevent the rect from getting scaled along with the size
-        uiLeft = unsigned int((float)uiLeft * (1.0f / fScaleX));
-        uiTop = unsigned int((float)uiTop * (1.0f / fScaleY));
-        uiRight = unsigned int((float)uiRight * (1.0f / fScaleX));
-        uiBottom = unsigned int((float)uiBottom * (1.0f / fScaleY));
+        uiLeft = std::uint32_t((float)uiLeft * (1.0f / fScaleX));
+        uiTop = std::uint32_t((float)uiTop * (1.0f / fScaleY));
+        uiRight = std::uint32_t((float)uiRight * (1.0f / fScaleX));
+        uiBottom = std::uint32_t((float)uiBottom * (1.0f / fScaleY));
 
         RECT rect;
         SetRect(&rect, uiLeft, uiTop, uiRight, uiBottom);
@@ -576,12 +576,12 @@ void CGraphics::CalcScreenCoors(CVector* vecWorld, CVector* vecScreen)
     vecScreen->fY *= fRecip * (*dwLenY);
 }
 
-unsigned int CGraphics::GetViewportWidth()
+std::uint32_t CGraphics::GetViewportWidth()
 {
     return CDirect3DData::GetSingleton().GetViewportWidth();
 }
 
-unsigned int CGraphics::GetViewportHeight()
+std::uint32_t CGraphics::GetViewportHeight()
 {
     return CDirect3DData::GetSingleton().GetViewportHeight();
 }
@@ -1222,7 +1222,7 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
     const wchar_t* wszSectionPos = wszText;
     do
     {
-        unsigned int   uiSeekPos = 0;
+        std::uint32_t   uiSeekPos = 0;
         const wchar_t* wszSectionStart = wszSectionPos;
         SColor         nextColor = currentColor;
         while (*wszSectionPos != '\0')            // find end of this section
@@ -1414,7 +1414,7 @@ bool CGraphics::CreateStandardDXFontWithCustomScale(eFontType fontType, float fS
     return true;
 }
 
-bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality,
+bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, std::uint32_t uiHeight, bool bBold, DWORD ulQuality,
                                      ID3DXFont** ppD3DXFont)
 {
     int iLoaded = AddFontResourceEx(strFontPath.c_str(), FR_PRIVATE, 0);
@@ -1434,7 +1434,7 @@ bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFon
     return bSuccess && (iLoaded == 1);
 }
 
-bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont)
+bool CGraphics::LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, std::uint32_t uiHeight, bool bBold, ID3DXFont** ppD3DXFont)
 {
     return this->LoadAdditionalDXFont(strFontPath, strFontName, uiHeight, bBold, PROOF_QUALITY, ppD3DXFont);
 }

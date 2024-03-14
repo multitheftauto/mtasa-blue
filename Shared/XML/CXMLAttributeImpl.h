@@ -31,7 +31,7 @@ public:
     void SetValue(const char* szValue);
     void SetValue(bool bValue);
     void SetValue(int iValue);
-    void SetValue(unsigned int uiValue);
+    void SetValue(std::uint32_t uiValue);
     void SetValue(float fValue);
 
     eXMLClass     GetClassType() { return CXML_ATTR; };

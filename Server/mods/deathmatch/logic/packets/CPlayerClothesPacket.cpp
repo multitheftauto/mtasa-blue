@@ -34,7 +34,7 @@ bool CPlayerClothesPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(ID);
 
         // Write the clothes
-        unsigned short usNumClothes = static_cast<unsigned short>(m_List.size());
+        std::uint16_t usNumClothes = static_cast<std::uint16_t>(m_List.size());
         BitStream.Write(usNumClothes);
 
         std::vector<SPlayerClothes*>::const_iterator iter = m_List.begin();
@@ -42,8 +42,8 @@ bool CPlayerClothesPacket::Write(NetBitStreamInterface& BitStream) const
         {
             char*         szTexture = (*iter)->szTexture;
             char*         szModel = (*iter)->szModel;
-            unsigned char ucTextureLength = static_cast<uchar>(strlen(szTexture));
-            unsigned char ucModelLength = static_cast<uchar>(strlen(szModel));
+            std::uint8_t ucTextureLength = static_cast<uchar>(strlen(szTexture));
+            std::uint8_t ucModelLength = static_cast<uchar>(strlen(szModel));
             BitStream.Write(ucTextureLength);
             BitStream.Write(szTexture, ucTextureLength);
             BitStream.Write(ucModelLength);
@@ -57,7 +57,7 @@ bool CPlayerClothesPacket::Write(NetBitStreamInterface& BitStream) const
     return false;
 }
 
-void CPlayerClothesPacket::Add(const char* szTexture, const char* szModel, unsigned char ucType)
+void CPlayerClothesPacket::Add(const char* szTexture, const char* szModel, std::uint8_t ucType)
 {
     SPlayerClothes* Clothes = new SPlayerClothes;
     Clothes->szTexture = new char[strlen(szTexture) + 1];
@@ -70,7 +70,7 @@ void CPlayerClothesPacket::Add(const char* szTexture, const char* szModel, unsig
 
 void CPlayerClothesPacket::Add(CPlayerClothes* pClothes)
 {
-    for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
+    for (std::uint8_t ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
     {
         const SPlayerClothing* pClothing = pClothes->GetClothing(ucType);
         if (pClothing)

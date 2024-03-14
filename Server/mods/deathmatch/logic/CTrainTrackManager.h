@@ -21,7 +21,7 @@ public:
 
     const std::vector<CTrainTrack*>& GetTracks() { return m_Tracks; }
 
-    CTrainTrack* GetTrainTrackByIndex(unsigned int index);
+    CTrainTrack* GetTrainTrackByIndex(std::uint32_t index);
 
 private:
     constexpr static std::size_t MaxTracks = 255;

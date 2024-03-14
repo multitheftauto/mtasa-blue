@@ -37,11 +37,11 @@ struct SPendingFileDownload
 class CResource
 {
 public:
-    CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
+    CResource(std::uint16_t usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
               const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
     ~CResource();
 
-    unsigned short GetNetID() { return m_usNetID; };
+    std::uint16_t GetNetID() { return m_usNetID; };
     uint           GetScriptID() const { return m_uiScriptID; };
     const char*    GetName() { return m_strResourceName; };
     CLuaMain*      GetVM() { return m_pLuaVM; };
@@ -96,8 +96,8 @@ public:
      */
     CResourceFile* GetResourceFile(const SString& relativePath) const;
 
-    void               SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
-    void               LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
+    void               SetRemainingNoClientCacheScripts(std::uint16_t usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
+    void               LoadNoClientCacheScript(const char* chunk, std::uint32_t length, const SString& strFilename);
     const CMtaVersion& GetMinServerReq() const { return m_strMinServerReq; }
     const CMtaVersion& GetMinClientReq() const { return m_strMinClientReq; }
     bool               IsOOPEnabled() { return m_bOOPEnabled; }
@@ -107,7 +107,7 @@ public:
     void               SetDownloadPriorityGroup(int iDownloadPriorityGroup) { m_iDownloadPriorityGroup = iDownloadPriorityGroup; }
 
 private:
-    unsigned short       m_usNetID;
+    std::uint16_t       m_usNetID;
     uint                 m_uiScriptID;
     SString              m_strResourceName;
     CLuaMain*            m_pLuaVM;
@@ -124,7 +124,7 @@ private:
     class CClientEntity* m_pResourceTXDRoot;
     class CClientEntity* m_pResourceIFPRoot;
     class CClientEntity* m_pResourceIMGRoot;
-    unsigned short       m_usRemainingNoClientCacheScripts;
+    std::uint16_t       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
     CMtaVersion          m_strMinServerReq;
     CMtaVersion          m_strMinClientReq;

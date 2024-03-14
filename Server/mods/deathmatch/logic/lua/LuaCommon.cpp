@@ -61,7 +61,7 @@ void lua_pushelement(lua_State* luaVM, CElement* pElement)
             if (pLuaMain && pLuaMain->IsOOPEnabled())
                 szClass = CLuaClassDefs::GetElementClass(pElement);
 
-            lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(ID.Value()));
+            lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(ID.Value()));
             return;
         }
     }
@@ -76,7 +76,7 @@ void lua_pushacl(lua_State* luaVM, CAccessControlList* pACL)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetACLClass(pACL);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pACL->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pACL->GetScriptID()));
 }
 
 void lua_pushaclgroup(lua_State* luaVM, CAccessControlListGroup* pGroup)
@@ -86,7 +86,7 @@ void lua_pushaclgroup(lua_State* luaVM, CAccessControlListGroup* pGroup)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetACLGroupClass(pGroup);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pGroup->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pGroup->GetScriptID()));
 }
 
 void lua_pushaccount(lua_State* luaVM, CAccount* pAccount)
@@ -96,7 +96,7 @@ void lua_pushaccount(lua_State* luaVM, CAccount* pAccount)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetAccountClass(pAccount);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pAccount->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pAccount->GetScriptID()));
 }
 
 void lua_pushresource(lua_State* luaVM, CResource* pResource)
@@ -106,7 +106,7 @@ void lua_pushresource(lua_State* luaVM, CResource* pResource)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetResourceClass(pResource);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pResource->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pResource->GetScriptID()));
 }
 
 void lua_pushtextdisplay(lua_State* luaVM, CTextDisplay* pDisplay)
@@ -116,7 +116,7 @@ void lua_pushtextdisplay(lua_State* luaVM, CTextDisplay* pDisplay)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetTextDisplayClass(pDisplay);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pDisplay->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pDisplay->GetScriptID()));
 }
 
 void lua_pushtextitem(lua_State* luaVM, CTextItem* pItem)
@@ -126,7 +126,7 @@ void lua_pushtextitem(lua_State* luaVM, CTextItem* pItem)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetTextItemClass(pItem);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pItem->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pItem->GetScriptID()));
 }
 
 void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer)
@@ -136,7 +136,7 @@ void lua_pushtimer(lua_State* luaVM, CLuaTimer* pTimer)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetTimerClass(pTimer);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pTimer->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pTimer->GetScriptID()));
 }
 
 void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
@@ -146,7 +146,7 @@ void lua_pushxmlnode(lua_State* luaVM, CXMLNode* pElement)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetXmlNodeClass(pElement);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pElement->GetID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pElement->GetID()));
 }
 
 void lua_pushban(lua_State* luaVM, CBan* pBan)
@@ -156,7 +156,7 @@ void lua_pushban(lua_State* luaVM, CBan* pBan)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetBanClass(pBan);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pBan->GetScriptID()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pBan->GetScriptID()));
 }
 
 void lua_pushquery(lua_State* luaVM, CDbJobData* pJobData)
@@ -166,7 +166,7 @@ void lua_pushquery(lua_State* luaVM, CDbJobData* pJobData)
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         szClass = CLuaClassDefs::GetQueryClass(pJobData);
 
-    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<unsigned int*>(pJobData->GetId()));
+    lua_pushobject(luaVM, szClass, (void*)reinterpret_cast<std::uint32_t*>(pJobData->GetId()));
 }
 
 void lua_pushuserdata(lua_State* luaVM, void* pData)
@@ -256,28 +256,28 @@ void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool b
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector)
 {
     CLuaVector4D* pVector = new CLuaVector4D(vector);
-    lua_pushobject(luaVM, "Vector4", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
+    lua_pushobject(luaVM, "Vector4", (void*)reinterpret_cast<std::uint32_t*>(pVector->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector& vector)
 {
     CLuaVector3D* pVector = new CLuaVector3D(vector);
-    lua_pushobject(luaVM, "Vector3", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
+    lua_pushobject(luaVM, "Vector3", (void*)reinterpret_cast<std::uint32_t*>(pVector->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector2D& vector)
 {
     CLuaVector2D* pVector = new CLuaVector2D(vector);
-    lua_pushobject(luaVM, "Vector2", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
+    lua_pushobject(luaVM, "Vector2", (void*)reinterpret_cast<std::uint32_t*>(pVector->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 
 void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
 {
     CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
-    lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()), true);
+    lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<std::uint32_t*>(pMatrix->GetScriptID()), true);
     lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
 }
 

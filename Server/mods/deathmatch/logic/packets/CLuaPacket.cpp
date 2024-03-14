@@ -18,7 +18,7 @@ bool CLuaPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_ucActionID);
 
     // Copy each byte from the bitstream we have to this one
-    unsigned char ucTemp;
+    std::uint8_t ucTemp;
     int           iLength = m_BitStream.GetNumberOfBitsUsed();
     while (iLength > 8)
     {

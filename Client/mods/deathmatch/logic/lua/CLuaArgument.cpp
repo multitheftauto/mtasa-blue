@@ -26,7 +26,7 @@ extern CClientGame* g_pClientGame;
 
 using namespace std;
 
-// Prevent the warning issued when doing unsigned short -> void*
+// Prevent the warning issued when doing std::uint16_t -> void*
 #pragma warning(disable:4312)
 
 CLuaArgument::CLuaArgument()
@@ -342,7 +342,7 @@ void CLuaArgument::ReadElement(CClientEntity* pElement)
     if (pElement)
     {
         m_iType = LUA_TUSERDATA;
-        m_pUserData = (void*)reinterpret_cast<unsigned int*>(pElement->GetID().Value());
+        m_pUserData = (void*)reinterpret_cast<std::uint32_t*>(pElement->GetID().Value());
     }
     else
         m_iType = LUA_TNIL;
@@ -353,7 +353,7 @@ void CLuaArgument::ReadElementID(ElementID ID)
     m_strString = "";
     DeleteTableData();
     m_iType = LUA_TUSERDATA;
-    m_pUserData = (void*)reinterpret_cast<unsigned int*>(ID.Value());
+    m_pUserData = (void*)reinterpret_cast<std::uint32_t*>(ID.Value());
 }
 
 void CLuaArgument::ReadTable(CLuaArguments* table)
@@ -523,7 +523,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             case LUA_TSTRING:
             {
                 // Read out the string length
-                unsigned short usLength;
+                std::uint16_t usLength;
                 if (bitStream.ReadCompressed(usLength) && usLength)
                 {
                     // Allocate a buffer and read the string into it
@@ -671,7 +671,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
             // Grab the string and its length. Is it short enough to be sendable?
             const char*    szTemp = m_strString.c_str();
             size_t         sizeTemp = m_strString.length();
-            unsigned short usLength = static_cast<unsigned short>(sizeTemp);
+            std::uint16_t usLength = static_cast<std::uint16_t>(sizeTemp);
             if (sizeTemp == usLength)
             {
                 // This is a string argument
@@ -924,7 +924,7 @@ char* CLuaArgument::WriteToString(char* szBuffer, int length)
         case LUA_TSTRING:
         {
             const char*    szTemp = GetString();
-            unsigned short usLength = static_cast<unsigned short>(strlen(szTemp));
+            std::uint16_t usLength = static_cast<std::uint16_t>(strlen(szTemp));
             if (strlen(szTemp) == usLength)
             {
                 snprintf(szBuffer, length, "%s", szTemp);

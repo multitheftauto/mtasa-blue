@@ -29,7 +29,7 @@ class CCoronasSA : public CCoronas
 {
 private:
     CRegisteredCoronaSA* Coronas[MAX_CORONAS];
-    unsigned char        m_ucCoronaReflectionsEnabled;
+    std::uint8_t        m_ucCoronaReflectionsEnabled;
 
 public:
     CCoronasSA();
@@ -43,6 +43,6 @@ public:
 
     void DisableSunAndMoon(bool bDisabled);
 
-    void          SetCoronaReflectionsEnabled(unsigned char ucEnabled);
-    unsigned char GetCoronaReflectionsEnabled();
+    void          SetCoronaReflectionsEnabled(std::uint8_t ucEnabled);
+    std::uint8_t GetCoronaReflectionsEnabled();
 };

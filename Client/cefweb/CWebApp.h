@@ -14,7 +14,7 @@ class CWebApp : public CefApp, public CefSchemeHandlerFactory
 {
 public:
     // Error Handler
-    static CefRefPtr<CefResourceHandler> HandleError(const SString& strError, unsigned int uiError);
+    static CefRefPtr<CefResourceHandler> HandleError(const SString& strError, std::uint32_t uiError);
 
     virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override;
 

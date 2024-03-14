@@ -24,7 +24,7 @@ public:
     unsigned long GetFlags() const { return PACKET_LOW_PRIORITY; };
 
     void         AddPlayer(CPlayer* pPlayer) { m_players.push_back(pPlayer); }
-    unsigned int Count() const { return m_players.size(); }
+    std::uint32_t Count() const { return m_players.size(); }
     void         Reset() { m_players.clear(); }
 
     bool Read(NetBitStreamInterface& BitStream);

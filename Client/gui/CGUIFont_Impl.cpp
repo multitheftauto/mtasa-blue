@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CGUIFont_Impl::CGUIFont_Impl(CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale)
+CGUIFont_Impl::CGUIFont_Impl(CGUI_Impl* pGUI, const char* szFontName, const char* szFontFile, std::uint32_t uSize, std::uint32_t uFlags, bool bAutoScale)
 {
     // Store the fontmanager and create a font with the given attributes
     m_pFontManager = pGUI->GetFontManager();

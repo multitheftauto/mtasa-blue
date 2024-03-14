@@ -75,7 +75,7 @@ CClientPointLights* CClientPointLightsManager::Get(ElementID ID)
     return NULL;
 }
 
-void CClientPointLightsManager::SetDimension(unsigned short usDimension)
+void CClientPointLightsManager::SetDimension(std::uint16_t usDimension)
 {
     list<CClientPointLights*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)

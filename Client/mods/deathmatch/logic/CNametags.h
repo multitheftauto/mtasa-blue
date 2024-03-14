@@ -29,15 +29,15 @@ public:
 
     void DoPulse();
 
-    void DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha);
+    void DrawTagForPlayer(CClientPlayer* pPlayer, std::uint8_t ucAlpha);
 
-    unsigned int GetDimension() { return m_usDimension; }
-    void         SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    std::uint32_t GetDimension() { return m_usDimension; }
+    void         SetDimension(std::uint16_t usDimension) { m_usDimension = usDimension; }
 
     bool IsVisible() { return m_bVisible; }
     void SetVisible(bool bVisible) { m_bVisible = bVisible; }
 
-    unsigned char m_ucInterior = 0;
+    std::uint8_t m_ucInterior = 0;
 
 private:
     static bool CompareNametagDistance(CClientPlayer* p1, CClientPlayer* p2);
@@ -46,7 +46,7 @@ private:
     CClientStreamer*      m_pPlayerStreamer;
     bool                  m_bDrawHealth;
     CHud*                 m_pHud;
-    unsigned short        m_usDimension;
+    std::uint16_t        m_usDimension;
     bool                  m_bVisible;
     CTextureItem*         m_pConnectionTroubleIcon;
 };

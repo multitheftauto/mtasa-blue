@@ -15,7 +15,7 @@ class CExceptionInformation
 {
 public:
     virtual ~CExceptionInformation() {}
-    virtual unsigned int GetCode() = 0;
+    virtual std::uint32_t GetCode() = 0;
     virtual const char*  GetModulePathName() = 0;
     virtual const char*  GetModuleBaseName() = 0;
     virtual uint         GetAddressModuleOffset() = 0;

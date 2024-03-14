@@ -333,7 +333,7 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
     }
 }
 
-void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+void CCameraSA::SetFadeColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
 {
     DWORD               dwFunc = FUNC_SetFadeColour;
     CCameraSAInterface* cameraInterface = GetInterface();

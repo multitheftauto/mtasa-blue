@@ -20,7 +20,7 @@ public:
     CExceptionInformation_Impl();
     ~CExceptionInformation_Impl();            //            {};
 
-    unsigned int        GetCode() { return m_uiCode; };
+    std::uint32_t        GetCode() { return m_uiCode; };
     void*               GetAddress() { return m_pAddress; };
     bool                GetModule(char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress);
     virtual const char* GetModulePathName() { return m_szModulePathName; };
@@ -44,10 +44,10 @@ public:
     unsigned long GetSS() { return m_ulSS; };
     unsigned long GetEFlags() { return m_ulEFlags; };
 
-    void Set(unsigned int iCode, _EXCEPTION_POINTERS* pException);
+    void Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException);
 
 private:
-    unsigned int  m_uiCode;
+    std::uint32_t  m_uiCode;
     void*         m_pAddress;
     char*         m_szModulePathName;
     const char*   m_szModuleBaseName;

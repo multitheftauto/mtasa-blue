@@ -254,17 +254,17 @@ bool CRenderTargetItem::ReadPixels(CBuffer& outBuffer, SString& strOutError)
     if (iBitsPerPixel == 32)
     {
         // 32 bit source
-        for (unsigned int i = 0; i < ulScreenHeight; i++)
+        for (std::uint32_t i = 0; i < ulScreenHeight; i++)
             memcpy(pDest + ulLineBytes * i, (BYTE*)ms_pBits + i * ms_ulPitch, ulLineBytes);
     }
     else
     {
         // 16 bit source
-        for (unsigned int i = 0; i < ulScreenHeight; i++)
+        for (std::uint32_t i = 0; i < ulScreenHeight; i++)
         {
             const WORD* pSrc16 = (WORD*)((BYTE*)ms_pBits + i * ms_ulPitch);
             DWORD*      pDest32 = (DWORD*)(pDest + ulLineBytes * i);
-            for (unsigned int x = 0; x < ulScreenWidth; x++)
+            for (std::uint32_t x = 0; x < ulScreenWidth; x++)
             {
                 WORD r5g6b5 = pSrc16[x];
                 BYTE r = (r5g6b5 & 0xF800) >> 11 << 3;

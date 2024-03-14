@@ -87,13 +87,13 @@ public:
     virtual void DebugPrintf(const char* szFormat, ...) = 0;
     virtual void SetDebugVisible(bool bVisible) = 0;
     virtual bool IsDebugVisible() = 0;
-    virtual void DebugEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B) = 0;
-    virtual void DebugPrintfColor(const char* szFormat, unsigned char R, unsigned char G, unsigned char B, ...) = 0;
+    virtual void DebugEchoColor(const char* szText, std::uint8_t R, std::uint8_t G, std::uint8_t B) = 0;
+    virtual void DebugPrintfColor(const char* szFormat, std::uint8_t R, std::uint8_t G, std::uint8_t B, ...) = 0;
     virtual void DebugClear() = 0;
     virtual void ChatEcho(const char* szText, bool bColorCoded = false) = 0;
-    virtual void ChatEchoColor(const char* szText, unsigned char R, unsigned char G, unsigned char B, bool bColorCoded = false) = 0;
+    virtual void ChatEchoColor(const char* szText, std::uint8_t R, std::uint8_t G, std::uint8_t B, bool bColorCoded = false) = 0;
     virtual void ChatPrintf(const char* szFormat, bool bColorCoded, ...) = 0;
-    virtual void ChatPrintfColor(const char* szFormat, bool bColorCoded, unsigned char R, unsigned char G, unsigned char B, ...) = 0;
+    virtual void ChatPrintfColor(const char* szFormat, bool bColorCoded, std::uint8_t R, std::uint8_t G, std::uint8_t B, ...) = 0;
     virtual void SetChatVisible(bool bVisible, bool bInputBlocked = true) = 0;
     virtual bool IsChatVisible() = 0;
     virtual void InitiateScreenShot(bool bCameraShot) = 0;
@@ -111,16 +111,16 @@ public:
     virtual bool IsWebCoreLoaded() = 0;
 
     virtual bool IsConnected() = 0;
-    virtual bool Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave = true) = 0;
+    virtual bool Reconnect(const char* szHost, std::uint16_t usPort, const char* szPassword, bool bSave = true) = 0;
 
     virtual const char* GetModInstallRoot(const char* szModName) = 0;
     virtual bool        CheckDiskSpace(uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10) = 0;
 
-    virtual void ShowServerInfo(unsigned int WindowType) = 0;
+    virtual void ShowServerInfo(std::uint32_t WindowType) = 0;
 
     virtual void ForceCursorVisible(bool bVisible, bool bToggleControls = true) = 0;
     virtual void SetMessageProcessor(pfnProcessMessage pfnMessageProcessor) = 0;
-    virtual void ShowMessageBox(const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK* ResponseHandler = NULL) = 0;
+    virtual void ShowMessageBox(const char* szTitle, const char* szText, std::uint32_t uiFlags, GUI_CALLBACK* ResponseHandler = NULL) = 0;
     virtual void RemoveMessageBox(bool bNextFrame = false) = 0;
     virtual void ShowErrorMessageBox(const SString& strTitle, SString strMessage, const SString& strTroubleLink = "") = 0;
     virtual void ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false) = 0;

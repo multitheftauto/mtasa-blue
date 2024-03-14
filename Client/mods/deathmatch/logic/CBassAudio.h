@@ -46,7 +46,7 @@ class CBassAudio
 public:
     ZERO_ON_NEW
     CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bThrottle, bool b3D);
-    CBassAudio(void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D);
+    CBassAudio(void* pBuffer, std::uint32_t uiBufferLength, bool bLoop, bool b3D);
     ~CBassAudio();
     void Destroy();
 
@@ -121,7 +121,7 @@ private:
     const bool    m_b3D;
     const bool    m_bThrottle;
     void*         m_pBuffer;
-    unsigned int  m_uiBufferLength;
+    std::uint32_t  m_uiBufferLength;
 
     bool  m_bPendingPlay;
     DWORD m_pSound;

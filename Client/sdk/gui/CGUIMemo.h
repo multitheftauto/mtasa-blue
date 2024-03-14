@@ -22,8 +22,8 @@ public:
     virtual void SetReadOnly(bool bReadOnly) = 0;
     virtual bool IsReadOnly() = 0;
 
-    virtual unsigned int GetCaretIndex() = 0;
-    virtual void         SetCaretIndex(unsigned int uiIndex) = 0;
+    virtual std::uint32_t GetCaretIndex() = 0;
+    virtual void         SetCaretIndex(std::uint32_t uiIndex) = 0;
 
     virtual float GetVerticalScrollPosition() = 0;
     virtual void  SetVerticalScrollPosition(float fPosition) = 0;
@@ -31,10 +31,10 @@ public:
     virtual float GetScrollbarDocumentSize() = 0;
     virtual float GetScrollbarPageSize() = 0;
 
-    virtual void         SetSelection(unsigned int uiStart, unsigned int uiEnd) = 0;
-    virtual unsigned int GetSelectionStart() = 0;
-    virtual unsigned int GetSelectionEnd() = 0;
-    virtual unsigned int GetSelectionLength() = 0;
+    virtual void         SetSelection(std::uint32_t uiStart, std::uint32_t uiEnd) = 0;
+    virtual std::uint32_t GetSelectionStart() = 0;
+    virtual std::uint32_t GetSelectionEnd() = 0;
+    virtual std::uint32_t GetSelectionLength() = 0;
 
     virtual void EnsureCaratIsVisible() = 0;
 

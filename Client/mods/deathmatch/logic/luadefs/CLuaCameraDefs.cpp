@@ -104,12 +104,12 @@ std::variant<CClientCamera*, bool> CLuaCameraDefs::GetCamera()
     return false;
 }
 
-CLuaMultiReturn<unsigned char, unsigned char> CLuaCameraDefs::GetCameraViewMode()
+CLuaMultiReturn<std::uint8_t, std::uint8_t> CLuaCameraDefs::GetCameraViewMode()
 {
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 
-    unsigned char ucVehicleMode = (unsigned char)pCamera->GetCameraVehicleViewMode();
-    unsigned char ucPedMode = (unsigned char)pCamera->GetCameraPedViewMode();
+    std::uint8_t ucVehicleMode = (std::uint8_t)pCamera->GetCameraVehicleViewMode();
+    std::uint8_t ucPedMode = (std::uint8_t)pCamera->GetCameraPedViewMode();
 
     return {ucVehicleMode, ucPedMode};
 }
@@ -137,9 +137,9 @@ std::variant<CClientEntity*, bool> CLuaCameraDefs::GetCameraTarget()
     return false;
 }
 
-unsigned char CLuaCameraDefs::GetCameraInterior()
+std::uint8_t CLuaCameraDefs::GetCameraInterior()
 {
-    unsigned char ucInterior;
+    std::uint8_t ucInterior;
     CStaticFunctionDefinitions::GetCameraInterior(ucInterior);
     return ucInterior;
 }
@@ -157,7 +157,7 @@ std::string CLuaCameraDefs::GetCameraGoggleEffect()
         return "normal";
 }
 
-unsigned char CLuaCameraDefs::GetCameraDrunkLevel()
+std::uint8_t CLuaCameraDefs::GetCameraDrunkLevel()
 {
     return g_pGame->GetPlayerInfo()->GetCamDrunkLevel();
 }
@@ -330,7 +330,7 @@ int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
 
 int CLuaCameraDefs::SetCameraInterior(lua_State* luaVM)
 {
-    unsigned char    ucInterior = 0;
+    std::uint8_t    ucInterior = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucInterior);
 
@@ -352,9 +352,9 @@ int CLuaCameraDefs::SetCameraInterior(lua_State* luaVM)
 int CLuaCameraDefs::FadeCamera(lua_State* luaVM)
 {
     bool          bFadeIn = false;
-    unsigned char ucRed = 0;
-    unsigned char ucGreen = 0;
-    unsigned char ucBlue = 0;
+    std::uint8_t ucRed = 0;
+    std::uint8_t ucGreen = 0;
+    std::uint8_t ucBlue = 0;
     float         fFadeTime = 1.0f;
 
     CScriptArgReader argStream(luaVM);
@@ -404,7 +404,7 @@ int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
     return 2;
 }
 
-bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleViewMode, std::optional<unsigned char> ucPedViewMode)
+bool CLuaCameraDefs::SetCameraViewMode(std::optional<std::uint8_t> ucVehicleViewMode, std::optional<std::uint8_t> ucPedViewMode)
 {
     CClientCamera* pCamera = g_pClientGame->GetManager()->GetCamera();
 

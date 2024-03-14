@@ -33,8 +33,8 @@ public:
     bool              SetLevel(float fWaterLevel, void* pChangeSource = nullptr);
     void              Unlink();
 
-    void SetDimension(unsigned short usDimension);
-    void RelateDimension(unsigned short usWorldDimension);
+    void SetDimension(std::uint16_t usDimension);
+    void RelateDimension(std::uint16_t usWorldDimension);
 
 private:
     CWaterPoly*          m_pPoly;

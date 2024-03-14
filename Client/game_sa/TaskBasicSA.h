@@ -145,7 +145,7 @@ public:
 class CTaskSimpleDeadSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    unsigned int uiDeathTimeMS;
+    std::uint32_t uiDeathTimeMS;
     bool         bUnk2;
 };
 
@@ -153,7 +153,7 @@ class CTaskSimpleDeadSA : public virtual CTaskSimpleSA, public virtual CTaskSimp
 {
 public:
     CTaskSimpleDeadSA(){};
-    CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2);
+    CTaskSimpleDeadSA(std::uint32_t uiDeathTimeMS, bool bUnk2);
 };
 
 class CTaskSimpleBeHitSAInterface : public CTaskSimpleSAInterface

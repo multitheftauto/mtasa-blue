@@ -21,7 +21,7 @@
 class CDebugEchoPacket final : public CPacket
 {
 public:
-    CDebugEchoPacket(const char* szMessage, unsigned int uiLevel = 0, unsigned char ucRed = 255, unsigned char ucGreen = 255, unsigned char ucBlue = 255)
+    CDebugEchoPacket(const char* szMessage, std::uint32_t uiLevel = 0, std::uint8_t ucRed = 255, std::uint8_t ucGreen = 255, std::uint8_t ucBlue = 255)
     {
         m_strMessage.AssignLeft(szMessage, MAX_DEBUGECHO_LENGTH);
         m_ucRed = ucRed;
@@ -37,9 +37,9 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const;
 
 private:
-    unsigned char m_ucRed;
-    unsigned char m_ucGreen;
-    unsigned char m_ucBlue;
-    unsigned int  m_uiLevel;
+    std::uint8_t m_ucRed;
+    std::uint8_t m_ucGreen;
+    std::uint8_t m_ucBlue;
+    std::uint32_t  m_uiLevel;
     SString       m_strMessage;
 };

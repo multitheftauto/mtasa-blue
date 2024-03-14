@@ -58,7 +58,7 @@ bool CSimKeysyncPacket::Read(NetBitStreamInterface& BitStream)
             bool  bWeaponCorrect = true;
 
             // Check client has the weapon we think he has
-            unsigned char ucClientWeaponType;
+            std::uint8_t ucClientWeaponType;
             if (!BitStream.Read(ucClientWeaponType))
                 return false;
 
@@ -74,7 +74,7 @@ bool CSimKeysyncPacket::Read(NetBitStreamInterface& BitStream)
             SWeaponSlotSync slot;
             if (!BitStream.Read(&slot))
                 return false;
-            unsigned int uiSlot = slot.data.uiSlot;
+            std::uint32_t uiSlot = slot.data.uiSlot;
 
             if (bWeaponCorrect)
                 m_Cache.ucWeaponSlot = uiSlot;
@@ -168,7 +168,7 @@ bool CSimKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
     if (m_sharedControllerState.ButtonCircle || (m_sharedControllerState.RightShoulder1))
     {
         // Write his current weapon slot
-        unsigned int    uiSlot = m_Cache.ucWeaponSlot;            // check m_Cache.bWeaponCorrect !
+        std::uint32_t    uiSlot = m_Cache.ucWeaponSlot;            // check m_Cache.bWeaponCorrect !
         SWeaponSlotSync slot;
         slot.data.uiSlot = uiSlot;
         BitStream.Write(&slot);

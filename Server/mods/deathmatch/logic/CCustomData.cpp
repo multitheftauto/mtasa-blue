@@ -152,7 +152,7 @@ CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
     return pNode;
 }
 
-unsigned short CCustomData::CountOnlySynchronized()
+std::uint16_t CCustomData::CountOnlySynchronized()
 {
-    return static_cast<unsigned short>(m_SyncedData.size());
+    return static_cast<std::uint16_t>(m_SyncedData.size());
 }

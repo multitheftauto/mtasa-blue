@@ -21,8 +21,8 @@ public:
     struct SyncData
     {
         ElementID     ID;
-        unsigned char ucFlags;
-        unsigned char ucSyncTimeContext;
+        std::uint8_t ucFlags;
+        std::uint8_t ucSyncTimeContext;
         CVector       vecPosition;
         float         fRotation;
         CVector       vecVelocity;

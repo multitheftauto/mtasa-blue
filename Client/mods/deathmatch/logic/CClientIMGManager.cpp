@@ -35,7 +35,7 @@ void CClientIMGManager::InitDefaultBufferSize()
 {
 }
 
-CClientIMG* CClientIMGManager::GetElementFromArchiveID(unsigned char ucArchiveID)
+CClientIMG* CClientIMGManager::GetElementFromArchiveID(std::uint8_t ucArchiveID)
 {
     // By default GTA has 5 IMG's
     if (ucArchiveID < 6)
@@ -75,18 +75,18 @@ bool CClientIMGManager::Exists(CClientIMG* pIMG)
     return std::find(m_List.begin(), m_List.end(), pIMG) != m_List.end();
 }
 
-CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
+CClientIMG* CClientIMGManager::GetElementThatLinked(std::uint32_t uiModel)
 {
     uchar ucArhiveID = g_pGame->GetStreaming()->GetStreamingInfo(uiModel)->archiveId;
     return GetElementFromArchiveID(ucArhiveID);
 }
 
-bool CClientIMGManager::IsLinkableModel(unsigned int uiModel)
+bool CClientIMGManager::IsLinkableModel(std::uint32_t uiModel)
 {
     return uiModel <= 26316;            // StreamModelInfoSize
 }
 
-bool CClientIMGManager::RestoreModel(unsigned int uiModel)
+bool CClientIMGManager::RestoreModel(std::uint32_t uiModel)
 {
     // Get the DFF file that replaced it
     CClientIMG* pIMG = GetElementThatLinked(uiModel);

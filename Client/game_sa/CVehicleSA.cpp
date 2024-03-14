@@ -176,7 +176,7 @@ void CVehicleSA::Init()
 
     if (dwOffset != 0)
     {
-        for (unsigned int i = 0; i < sizeof(m_doors) / sizeof(m_doors[0]); ++i)
+        for (std::uint32_t i = 0; i < sizeof(m_doors) / sizeof(m_doors[0]); ++i)
         {
             DWORD dwInterface = (DWORD)GetInterface();
             DWORD dwDoorAddress = dwInterface + 1464 + i * 24;
@@ -563,14 +563,14 @@ void CVehicleSA::SetTrainPosition(float fPosition, bool bRecalcOnRailDistance)
     }
 }
 
-CDoorSA* CVehicleSA::GetDoor(unsigned char ucDoor)
+CDoorSA* CVehicleSA::GetDoor(std::uint8_t ucDoor)
 {
     if (ucDoor <= 5)
         return &m_doors[ucDoor];
     return 0;
 }
 
-void CVehicleSA::OpenDoor(unsigned char ucDoor, float fRatio, bool bMakeNoise)
+void CVehicleSA::OpenDoor(std::uint8_t ucDoor, float fRatio, bool bMakeNoise)
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = ((CVehicleSAInterfaceVTBL*)GetVehicleInterface()->vtbl)->OpenDoor;
@@ -699,7 +699,7 @@ float CVehicleSA::GetBodyDirtLevel()
     return GetVehicleInterface()->nBodyDirtLevel;
 }
 
-unsigned char CVehicleSA::GetCurrentGear()
+std::uint8_t CVehicleSA::GetCurrentGear()
 {
     return GetVehicleInterface()->m_nCurrentGear;
 }
@@ -800,7 +800,7 @@ CPed* CVehicleSA::GetDriver()
     return nullptr;
 }
 
-CPed* CVehicleSA::GetPassenger(unsigned char ucSlot)
+CPed* CVehicleSA::GetPassenger(std::uint8_t ucSlot)
 {
     CPoolsSA* pPools = (CPoolsSA*)pGame->GetPools();
 
@@ -1249,12 +1249,12 @@ void CVehicleSA::SetRemapTexDictionary(int iRemapTextureDictionary)
 
 bool CVehicleSA::IsSmokeTrailEnabled()
 {
-    return (*(unsigned char*)((DWORD)GetInterface() + 2560) == 1);
+    return (*(std::uint8_t*)((DWORD)GetInterface() + 2560) == 1);
 }
 
 void CVehicleSA::SetSmokeTrailEnabled(bool bEnabled)
 {
-    MemPutFast<unsigned char>((DWORD)GetInterface() + 2560, (bEnabled) ? 1 : 0);
+    MemPutFast<std::uint8_t>((DWORD)GetInterface() + 2560, (bEnabled) ? 1 : 0);
 }
 
 CHandlingEntry* CVehicleSA::GetHandlingData()
@@ -1295,7 +1295,7 @@ void CVehicleSA::RecalculateHandling()
 
     // Put it in our interface
     CVehicleSAInterface* pInt = GetVehicleInterface();
-    unsigned int         uiHandlingFlags = m_pHandlingData->GetInterface()->uiHandlingFlags;
+    std::uint32_t         uiHandlingFlags = m_pHandlingData->GetInterface()->uiHandlingFlags;
     // user error correction - NOS_INST = NOS Installed t/f
     // if nos is installed we need the flag set
     if (pInt->m_upgrades[0] && pInt->m_upgrades[0] >= 1008 && pInt->m_upgrades[0] <= 1010)
@@ -1475,7 +1475,7 @@ void CVehicleSA::SetGravity(const CVector* pvecGravity)
     m_vecGravity = *pvecGravity;
 }
 
-CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
+CObject* CVehicleSA::SpawnFlyingComponent(int i_1, std::uint32_t ui_2)
 {
     DWORD dwReturn;
     DWORD dwThis = (DWORD)GetInterface();
@@ -1695,19 +1695,19 @@ void CVehicleSA::RecalculateSuspensionLines()
     }
 }
 
-void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
+void CVehicleSA::GiveVehicleSirens(std::uint8_t ucSirenType, std::uint8_t ucSirenCount)
 {
     m_tSirenInfo.m_bOverrideSirens = true;
     m_tSirenInfo.m_ucSirenType = ucSirenType;
     m_tSirenInfo.m_ucSirenCount = ucSirenCount;
 }
 
-void CVehicleSA::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
+void CVehicleSA::SetVehicleSirenPosition(std::uint8_t ucSirenID, CVector vecPos)
 {
     m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 }
 
-void CVehicleSA::GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos)
+void CVehicleSA::GetVehicleSirenPosition(std::uint8_t ucSirenID, CVector& vecPos)
 {
     vecPos = m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions;
 }
@@ -2209,11 +2209,11 @@ bool CVehicleSA::SetPlateText(const SString& strText)
     return bReturn;
 }
 
-bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
+bool CVehicleSA::SetWindowOpenFlagState(std::uint8_t ucWindow, bool bState)
 {
     if (ucWindow > 6)
         return false;
-    unsigned char ucWindows[7] = {0, 1, 8, 9, 10, 11, 18};
+    std::uint8_t ucWindows[7] = {0, 1, 8, 9, 10, 11, 18};
     ucWindow = ucWindows[ucWindow];
 
     DWORD dwThis = (DWORD)GetVehicleInterface();

@@ -116,7 +116,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
 
 int CLuaMarkerDefs::GetMarkerCount(lua_State* luaVM)
 {
-    unsigned int uiCount = m_pMarkerManager->Count();
+    std::uint32_t uiCount = m_pMarkerManager->Count();
     lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
     return 1;
 }
@@ -330,10 +330,10 @@ int CLuaMarkerDefs::SetMarkerColor(lua_State* luaVM)
         if (dRed >= 0 && dRed <= 255 && dGreen >= 0 && dGreen <= 255 && dBlue >= 0 && dBlue <= 255 && dAlpha >= 0 && dAlpha <= 255)
         {
             SColor color;
-            color.R = static_cast<unsigned char>(dRed);
-            color.G = static_cast<unsigned char>(dGreen);
-            color.B = static_cast<unsigned char>(dBlue);
-            color.A = static_cast<unsigned char>(dAlpha);
+            color.R = static_cast<std::uint8_t>(dRed);
+            color.G = static_cast<std::uint8_t>(dGreen);
+            color.B = static_cast<std::uint8_t>(dBlue);
+            color.A = static_cast<std::uint8_t>(dAlpha);
 
             // Set the new color
             if (CStaticFunctionDefinitions::SetMarkerColor(*pEntity, color))

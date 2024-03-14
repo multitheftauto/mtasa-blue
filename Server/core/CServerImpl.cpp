@@ -628,7 +628,7 @@ void CServerImpl::ShowInfoTag(char* szTag)
             else
             {
                 // The color interpreter
-                switch ((unsigned char)(szTag[i]))
+                switch ((std::uint8_t)(szTag[i]))
                 {
                     case 128:
                         m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
@@ -659,7 +659,7 @@ void CServerImpl::ShowInfoTag(char* szTag)
                         break;
                 }
 
-                if ((unsigned char)szTag[i] > 127)
+                if ((std::uint8_t)szTag[i] > 127)
                 {
                     // If this is a color code, skip to the next character, so we can color that one
                     i++;
@@ -691,7 +691,7 @@ void CServerImpl::ShowInfoTag(char* szTag)
             break;
 
         // Apply the attributes
-        switch ((unsigned char)(szTag[i]))
+        switch ((std::uint8_t)(szTag[i]))
         {
             case 128:
                 iAttr = COLOR_PAIR(3) | A_BOLD;
@@ -1064,7 +1064,7 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
 #endif
 
     // Iterate our arguments
-    unsigned char ucNext = 0;
+    std::uint8_t ucNext = 0;
     for (int i = 0; i < iArgumentCount; i++)
     {
         switch (ucNext)

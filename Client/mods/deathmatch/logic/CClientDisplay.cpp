@@ -28,7 +28,7 @@ CClientDisplay::~CClientDisplay()
     m_pDisplayManager->RemoveFromList(this);
 }
 
-void CClientDisplay::SetColorAlpha(unsigned char ucAlpha)
+void CClientDisplay::SetColorAlpha(std::uint8_t ucAlpha)
 {
     m_Color.A = ucAlpha;
 }

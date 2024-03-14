@@ -37,8 +37,8 @@ static_assert((MAX_SERVER_ELEMENTS & (MAX_SERVER_ELEMENTS - 1)) == 0, "MAX_SERVE
 struct ElementID
 {
 public:
-    ElementID(const unsigned int& value = INVALID_ELEMENT_ID) : m_value(value) {}
-    ElementID& operator=(const unsigned int& value)
+    ElementID(const std::uint32_t& value = INVALID_ELEMENT_ID) : m_value(value) {}
+    ElementID& operator=(const std::uint32_t& value)
     {
         m_value = value;
         return *this;
@@ -72,11 +72,11 @@ public:
         ++m_value;
         return *this;
     }
-    unsigned int&       Value() { return m_value; }
-    const unsigned int& Value() const { return m_value; }
+    std::uint32_t&       Value() { return m_value; }
+    const std::uint32_t& Value() const { return m_value; }
 
 private:
-    unsigned int m_value;
+    std::uint32_t m_value;
 };
 
 // Event name characteristics

@@ -30,7 +30,7 @@ public:
     CClientStreamSector*                      Front() { return m_Sectors.front(); }
     void                                      Add(CClientStreamSector* pSector);
     void                                      Remove(CClientStreamSector* pSector);
-    unsigned int                              CountSectors() { return m_Sectors.size(); }
+    std::uint32_t                              CountSectors() { return m_Sectors.size(); }
 
     bool DoesContain(CVector& vecPosition);
     bool DoesContain(float fY);

@@ -33,7 +33,7 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(Data.ucSyncTimeContext))
             return false;
 
-        unsigned char ucFlags = 0;
+        std::uint8_t ucFlags = 0;
         if (!BitStream.Read(ucFlags))
             return false;
         Data.ucFlags = ucFlags;

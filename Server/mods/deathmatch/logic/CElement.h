@@ -106,8 +106,8 @@ public:
 
     virtual bool IsPerPlayerEntity() { return false; };
 
-    CElement* FindChild(const char* szName, unsigned int uiIndex, bool bRecursive);
-    CElement* FindChildByType(const char* szType, unsigned int uiIndex, bool bRecursive);
+    CElement* FindChild(const char* szName, std::uint32_t uiIndex, bool bRecursive);
+    CElement* FindChildByType(const char* szType, std::uint32_t uiIndex, bool bRecursive);
     void      FindAllChildrenByType(const char* szType, lua_State* pLua);
     void      GetChildren(lua_State* pLua);
     void      GetChildrenByType(const char* szType, lua_State* pLua);
@@ -151,7 +151,7 @@ public:
 
     void CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive);
 
-    unsigned int                            CountChildren() { return static_cast<unsigned int>(m_Children.size()); };
+    std::uint32_t                            CountChildren() { return static_cast<std::uint32_t>(m_Children.size()); };
     CChildListType ::const_iterator         IterBegin() { return m_Children.begin(); };
     CChildListType ::const_iterator         IterEnd() { return m_Children.end(); };
     CChildListType ::const_reverse_iterator IterReverseBegin() { return m_Children.rbegin(); };
@@ -161,7 +161,7 @@ public:
     static uint        GetTypeHashFromString(const SString& strTypeName);
     EElementType       GetType() { return m_iType; };
     virtual bool       IsEntity() { return false; };
-    unsigned int       GetTypeHash() { return m_uiTypeHash; };
+    std::uint32_t       GetTypeHash() { return m_uiTypeHash; };
     const std::string& GetTypeName() { return m_strTypeName; };
     void               SetTypeName(const std::string& strTypeName);
 
@@ -183,8 +183,8 @@ public:
     std::list<class CColShape*>::iterator CollisionsBegin() { return m_Collisions.begin(); }
     std::list<class CColShape*>::iterator CollisionsEnd() { return m_Collisions.end(); }
 
-    unsigned short GetDimension() { return m_usDimension; }
-    virtual void   SetDimension(unsigned short usDimension);
+    std::uint16_t GetDimension() { return m_usDimension; }
+    virtual void   SetDimension(std::uint16_t usDimension);
 
     class CClient* GetClient();
 
@@ -213,15 +213,15 @@ public:
     // If this value doesn't match the value from the sync packet, the packet should be
     // ignored. Note that if this value is 0, all sync packets should be accepted. This is
     // so we don't need this byte when the element is created first.
-    unsigned char GetSyncTimeContext() { return m_ucSyncTimeContext; };
-    unsigned char GenerateSyncTimeContext();
-    bool          CanUpdateSync(unsigned char ucRemote);
+    std::uint8_t GetSyncTimeContext() { return m_ucSyncTimeContext; };
+    std::uint8_t GenerateSyncTimeContext();
+    bool          CanUpdateSync(std::uint8_t ucRemote);
 
     void AddOriginSourceUser(class CPed* pPed) { m_OriginSourceUsers.push_back(pPed); }
     void RemoveOriginSourceUser(class CPed* pPed) { m_OriginSourceUsers.remove(pPed); }
 
-    unsigned char GetInterior() { return m_ucInterior; }
-    void          SetInterior(unsigned char ucInterior);
+    std::uint8_t GetInterior() { return m_ucInterior; }
+    void          SetInterior(std::uint8_t ucInterior);
 
     bool IsDoubleSided() { return m_bDoubleSided; }
     void SetDoubleSided(bool bDoubleSided) { m_bDoubleSided = bDoubleSided; }
@@ -240,9 +240,9 @@ protected:
     CElement*    GetRootElement();
     virtual bool ReadSpecialData(const int iLine) = 0;
 
-    CElement* FindChildIndex(const char* szName, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
-    CElement* FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
-    void      FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* pLua, unsigned int& uiIndex);
+    CElement* FindChildIndex(const char* szName, std::uint32_t uiIndex, std::uint32_t& uiCurrentIndex, bool bRecursive);
+    CElement* FindChildByTypeIndex(std::uint32_t uiTypeHash, std::uint32_t uiIndex, std::uint32_t& uiCurrentIndex, bool bRecursive);
+    void      FindAllChildrenByTypeIndex(std::uint32_t uiTypeHash, lua_State* pLua, std::uint32_t& uiIndex);
 
     void CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL);
     void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL);
@@ -257,7 +257,7 @@ protected:
 
     CVector m_vecPosition;
 
-    unsigned int            m_uiTypeHash;
+    std::uint32_t            m_uiTypeHash;
     std::string             m_strTypeName;
     std::string             m_strName;
     CChildListType          m_Children;
@@ -276,11 +276,11 @@ protected:
 
     CElementGroup* m_pElementGroup;
 
-    unsigned short m_usDimension;
-    unsigned char  m_ucSyncTimeContext;
+    std::uint16_t m_usDimension;
+    std::uint8_t  m_ucSyncTimeContext;
 
     std::list<class CPed*> m_OriginSourceUsers;
-    unsigned char          m_ucInterior;
+    std::uint8_t          m_ucInterior;
     bool                   m_bDoubleSided;
     bool                   m_bUpdatingSpatialData;
     bool                   m_bCallPropagationEnabled;
@@ -292,15 +292,15 @@ public:
 
 private:
     static bool IsFromRoot(CElement* pEntity);
-    static void AddEntityFromRoot(unsigned int uiTypeHash, CElement* pEntity, bool bDebugCheck = true);
-    static void RemoveEntityFromRoot(unsigned int uiTypeHash, CElement* pEntity);
-    static void GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* pLua);
-    static void GetEntitiesFromRoot(unsigned int uiTypeHash, std::vector<CElement*>& outResult);
+    static void AddEntityFromRoot(std::uint32_t uiTypeHash, CElement* pEntity, bool bDebugCheck = true);
+    static void RemoveEntityFromRoot(std::uint32_t uiTypeHash, CElement* pEntity);
+    static void GetEntitiesFromRoot(std::uint32_t uiTypeHash, lua_State* pLua);
+    static void GetEntitiesFromRoot(std::uint32_t uiTypeHash, std::vector<CElement*>& outResult);
 
 #if CHECK_ENTITIES_FROM_ROOT
-    static void _CheckEntitiesFromRoot(unsigned int uiTypeHash);
-    void        _FindAllChildrenByTypeIndex(unsigned int uiTypeHash, std::map<CElement*, int>& mapResults);
-    static void _GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CElement*, int>& mapResults);
+    static void _CheckEntitiesFromRoot(std::uint32_t uiTypeHash);
+    void        _FindAllChildrenByTypeIndex(std::uint32_t uiTypeHash, std::map<CElement*, int>& mapResults);
+    static void _GetEntitiesFromRoot(std::uint32_t uiTypeHash, std::map<CElement*, int>& mapResults);
 #endif
 };
 

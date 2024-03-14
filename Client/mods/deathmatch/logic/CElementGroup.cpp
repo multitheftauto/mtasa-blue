@@ -46,7 +46,7 @@ void CElementGroup::Remove(class CClientEntity* element)
     m_elements.remove(element);
 }
 
-unsigned int CElementGroup::GetCount()
+std::uint32_t CElementGroup::GetCount()
 {
     return m_elements.size();
 }

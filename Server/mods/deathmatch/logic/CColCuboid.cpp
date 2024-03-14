@@ -40,7 +40,7 @@ bool CColCuboid::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     float fWidth = 1.0f, fDepth = 1.0f, fHeight = 1.0f;
     GetCustomDataFloat("width", fWidth, true);

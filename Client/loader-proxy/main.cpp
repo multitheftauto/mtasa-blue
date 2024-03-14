@@ -281,7 +281,7 @@ VOID OnGameLaunch()
         InitNetRev(GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion());
     }
 
-    bool (*CheckService)(unsigned int) = reinterpret_cast<decltype(CheckService)>(GetProcAddress(g_netc, "CheckService"));
+    bool (*CheckService)(std::uint32_t) = reinterpret_cast<decltype(CheckService)>(GetProcAddress(g_netc, "CheckService"));
 
     if (!CheckService)
     {

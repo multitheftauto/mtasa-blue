@@ -25,7 +25,7 @@ protected:
     void* vTable;
 
 public:
-    unsigned short                  nNumBlendNodes;
+    std::uint16_t                  nNumBlendNodes;
     short                           sAnimID;
     short                           sAnimGroup;
     short                           sFlags;
@@ -38,12 +38,12 @@ class CAnimBlendStaticAssociationSA : public CAnimBlendStaticAssociation
 public:
     CAnimBlendStaticAssociationSA(CAnimBlendStaticAssociationSAInterface* pInterface) { m_pInterface = pInterface; }
     void Initialize(RpClump* pClump, CAnimBlendHierarchySAInterface* pAnimBlendHierarchyInterface);
-    void SetNumBlendNodes(unsigned short nNumBlendNodes) { m_pInterface->nNumBlendNodes = nNumBlendNodes; };
+    void SetNumBlendNodes(std::uint16_t nNumBlendNodes) { m_pInterface->nNumBlendNodes = nNumBlendNodes; };
     void SetAnimID(short sAnimID) { m_pInterface->sAnimID = sAnimID; }
     void SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
     void SetFlags(short sFlags) { m_pInterface->sFlags = sFlags; }
 
-    unsigned short                          GetNumBlendNodes() { return m_pInterface->nNumBlendNodes; };
+    std::uint16_t                          GetNumBlendNodes() { return m_pInterface->nNumBlendNodes; };
     short                                   GetAnimID() { return m_pInterface->sAnimID; }
     short                                   GetAnimGroup() { return m_pInterface->sAnimGroup; }
     short                                   GetFlags() { return m_pInterface->sFlags; }

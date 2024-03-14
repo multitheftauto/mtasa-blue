@@ -42,8 +42,8 @@ T* GetDeletedMapKey(T**)
     return (T*)-4;
 }
 
-unsigned int GetEmptyMapKey(unsigned int*);
-unsigned int GetDeletedMapKey(unsigned int*);
+std::uint32_t GetEmptyMapKey(std::uint32_t*);
+std::uint32_t GetDeletedMapKey(std::uint32_t*);
 
 namespace SharedUtil
 {

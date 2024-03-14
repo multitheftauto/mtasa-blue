@@ -96,7 +96,7 @@ int CLuaTeamDefs::GetTeamColor(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucRed, ucGreen, ucBlue;
+        std::uint8_t ucRed, ucGreen, ucBlue;
         pTeam->GetColor(ucRed, ucGreen, ucBlue);
 
         lua_pushnumber(luaVM, ucRed);
@@ -140,7 +140,7 @@ int CLuaTeamDefs::GetPlayersInTeam(lua_State* luaVM)
     {
         lua_newtable(luaVM);
 
-        unsigned int uiIndex = 0;
+        std::uint32_t uiIndex = 0;
 
         list<CClientPlayer*>::const_iterator iter = pTeam->IterBegin();
         for (; iter != pTeam->IterEnd(); iter++)
@@ -171,7 +171,7 @@ int CLuaTeamDefs::CountPlayersInTeam(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiCount = pTeam->CountPlayers();
+        std::uint32_t uiCount = pTeam->CountPlayers();
         lua_pushnumber(luaVM, uiCount);
         return 1;
     }

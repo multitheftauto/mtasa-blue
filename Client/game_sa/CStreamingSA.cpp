@@ -330,7 +330,7 @@ void CStreamingSA::ReinitStreaming()
 // ReinitStreaming should be called after this.
 // Otherwise the model wont be restreamed
 // TODO: Somehow restream a single model instead of the whole world
-void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
+void CStreamingSA::SetStreamingInfo(uint modelid, std::uint8_t usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg)
 {
     CStreamingInfo* pItemInfo = GetStreamingInfo(modelid);
 
@@ -359,29 +359,29 @@ CStreamingInfo* CStreamingSA::GetStreamingInfo(uint modelid)
     return &ms_aInfoForModel[modelid];
 }
 
-unsigned char CStreamingSA::GetUnusedArchive()
+std::uint8_t CStreamingSA::GetUnusedArchive()
 {
     // Get internal IMG id
     // By default gta sa uses 6 of 8 IMG archives
     for (size_t i = 6; i < m_Imgs.size(); i++)
     {
         if (!m_Imgs[i].uiStreamHandleId)
-            return (unsigned char)i;
+            return (std::uint8_t)i;
     }
     return INVALID_ARCHIVE_ID;
 }
 
-unsigned char CStreamingSA::GetUnusedStreamHandle()
+std::uint8_t CStreamingSA::GetUnusedStreamHandle()
 {
     for (size_t i = 0; i < m_StreamHandles.size(); i++)
     {
         if (!m_StreamHandles[i])
-            return (unsigned char)i;
+            return (std::uint8_t)i;
     }
     return INVALID_STREAM_ID;
 }
 
-unsigned char CStreamingSA::AddArchive(const wchar_t* szFilePath)
+std::uint8_t CStreamingSA::AddArchive(const wchar_t* szFilePath)
 {
     auto ucArchiveId = GetUnusedArchive();
     if (ucArchiveId == INVALID_ARCHIVE_ID)
@@ -417,9 +417,9 @@ unsigned char CStreamingSA::AddArchive(const wchar_t* szFilePath)
     return ucArchiveId;
 }
 
-void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
+void CStreamingSA::RemoveArchive(std::uint8_t ucArchiveID)
 {
-    unsigned int uiStreamHandlerID = m_Imgs[ucArchiveID].uiStreamHandleId >> 24;
+    std::uint32_t uiStreamHandlerID = m_Imgs[ucArchiveID].uiStreamHandleId >> 24;
     if (!uiStreamHandlerID)
         return;
 

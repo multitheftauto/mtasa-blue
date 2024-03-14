@@ -16,7 +16,7 @@
 class CElementRPCPacket final : public CPacket
 {
 public:
-    CElementRPCPacket(CElement* pSourceElement, unsigned char ucActionID, NetBitStreamInterface& BitStream)
+    CElementRPCPacket(CElement* pSourceElement, std::uint8_t ucActionID, NetBitStreamInterface& BitStream)
         : m_ucActionID(ucActionID), m_BitStream(BitStream), m_pSourceElement(pSourceElement){};
 
     ePacketID     GetPacketID() const { return PACKET_ID_LUA_ELEMENT_RPC; };
@@ -25,7 +25,7 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const;
 
 private:
-    unsigned char          m_ucActionID;
+    std::uint8_t          m_ucActionID;
     NetBitStreamInterface& m_BitStream;
     CElement*              m_pSourceElement;
 };

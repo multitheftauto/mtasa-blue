@@ -76,13 +76,13 @@ public:
     void Events_OnLoadingFailed(const SString& strURL, int errorCode, const SString& errorDescription) override;
     void Events_OnNavigate(const SString& strURL, bool bIsBlocked, bool isMainFrame) override;
     void Events_OnPopup(const SString& strTargetURL, const SString& strOpenerURL) override;
-    void Events_OnChangeCursor(unsigned char ucCursor) override;
+    void Events_OnChangeCursor(std::uint8_t ucCursor) override;
     void Events_OnTriggerEvent(const SString& strEventName, const std::vector<std::string>& arguments) override;
     void Events_OnTooltip(const SString& strTooltip) override;
     void Events_OnInputFocusChanged(bool bGainedFocus) override;
     bool Events_OnResourcePathCheck(SString& strURL) override;
     bool Events_OnResourceFileCheck(const SString& strURL, CBuffer& outFileData) override;
-    void Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, unsigned char reason) override;
+    void Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, std::uint8_t reason) override;
     void Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHandler, const SString& strURL) override;
 
 private:

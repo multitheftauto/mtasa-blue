@@ -238,7 +238,7 @@ namespace SharedUtil
 
     std::wstring ANSIToUTF16(const SString& s);
 
-    int GetUTF8Confidence(const unsigned char* input, int len);
+    int GetUTF8Confidence(const std::uint8_t* input, int len);
 
     bool IsUTF8BOM(const void* pData, uint uiLength);
 
@@ -470,7 +470,7 @@ namespace SharedUtil
         {
             struct
             {
-                unsigned char B, G, R, A;
+                std::uint8_t B, G, R, A;
             };
             unsigned long ulARGB;
         };
@@ -490,7 +490,7 @@ namespace SharedUtil
     class SColorARGB : public SColor
     {
     public:
-        SColorARGB(unsigned char ucA, unsigned char ucR, unsigned char ucG, unsigned char ucB)
+        SColorARGB(std::uint8_t ucA, std::uint8_t ucR, std::uint8_t ucG, std::uint8_t ucB)
         {
             A = ucA;
             R = ucR;
@@ -501,10 +501,10 @@ namespace SharedUtil
         template <class T, class U, class V, class W>
         SColorARGB(T a, U r, V g, W b)
         {
-            A = Clamp<unsigned char>(0, static_cast<unsigned char>(a), 255);
-            R = Clamp<unsigned char>(0, static_cast<unsigned char>(r), 255);
-            G = Clamp<unsigned char>(0, static_cast<unsigned char>(g), 255);
-            B = Clamp<unsigned char>(0, static_cast<unsigned char>(b), 255);
+            A = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(a), 255);
+            R = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(r), 255);
+            G = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(g), 255);
+            B = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(b), 255);
         }
     };
 
@@ -516,7 +516,7 @@ namespace SharedUtil
     class SColorRGBA : public SColor
     {
     public:
-        SColorRGBA(unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA)
+        SColorRGBA(std::uint8_t ucR, std::uint8_t ucG, std::uint8_t ucB, std::uint8_t ucA)
         {
             A = ucA;
             R = ucR;
@@ -527,10 +527,10 @@ namespace SharedUtil
         template <class T, class U, class V, class W>
         SColorRGBA(T r, U g, V b, W a)
         {
-            A = Clamp<unsigned char>(0, static_cast<unsigned char>(a), 255);
-            R = Clamp<unsigned char>(0, static_cast<unsigned char>(r), 255);
-            G = Clamp<unsigned char>(0, static_cast<unsigned char>(g), 255);
-            B = Clamp<unsigned char>(0, static_cast<unsigned char>(b), 255);
+            A = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(a), 255);
+            R = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(r), 255);
+            G = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(g), 255);
+            B = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(b), 255);
         }
     };
 
@@ -539,15 +539,15 @@ namespace SharedUtil
     //
     typedef SColor RGBA;
 
-    inline unsigned char COLOR_RGBA_R(SColor color) { return color.R; }
-    inline unsigned char COLOR_RGBA_G(SColor color) { return color.G; }
-    inline unsigned char COLOR_RGBA_B(SColor color) { return color.B; }
-    inline unsigned char COLOR_RGBA_A(SColor color) { return color.A; }
-    inline unsigned char COLOR_ARGB_A(SColor color) { return color.A; }
+    inline std::uint8_t COLOR_RGBA_R(SColor color) { return color.R; }
+    inline std::uint8_t COLOR_RGBA_G(SColor color) { return color.G; }
+    inline std::uint8_t COLOR_RGBA_B(SColor color) { return color.B; }
+    inline std::uint8_t COLOR_RGBA_A(SColor color) { return color.A; }
+    inline std::uint8_t COLOR_ARGB_A(SColor color) { return color.A; }
 
-    inline SColor COLOR_RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A) { return SColorRGBA(R, G, B, A); }
-    inline SColor COLOR_ARGB(unsigned char A, unsigned char R, unsigned char G, unsigned char B) { return SColorRGBA(R, G, B, A); }
-    inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_RGBA(std::uint8_t R, std::uint8_t G, std::uint8_t B, std::uint8_t A) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_ARGB(std::uint8_t A, std::uint8_t R, std::uint8_t G, std::uint8_t B) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_ABGR(std::uint8_t A, std::uint8_t B, std::uint8_t G, std::uint8_t R) { return SColorRGBA(R, G, B, A); }
 
     //
     // Cross platform critical section
@@ -1240,12 +1240,12 @@ namespace SharedUtil
     template <typename T>
     inline T tolower(T c)
     {
-        return static_cast<T>(ms_ucTolowerTab[static_cast<unsigned char>(c)]);
+        return static_cast<T>(ms_ucTolowerTab[static_cast<std::uint8_t>(c)]);
     }
     template <typename T>
     inline T toupper(T c)
     {
-        return static_cast<T>(ms_ucToupperTab[static_cast<unsigned char>(c)]);
+        return static_cast<T>(ms_ucToupperTab[static_cast<std::uint8_t>(c)]);
     }
 
     //

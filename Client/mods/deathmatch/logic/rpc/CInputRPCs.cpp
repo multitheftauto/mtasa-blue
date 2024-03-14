@@ -30,13 +30,13 @@ void CInputRPCs::BindKey(NetBitStreamInterface& bitStream)
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     if (pKeyBinds)
     {
-        unsigned char ucKeyLength = 0;
+        std::uint8_t ucKeyLength = 0;
         if (bitStream.Read(ucKeyLength))
         {
             char* szKey = new char[ucKeyLength + 1];
             szKey[ucKeyLength] = NULL;
 
-            unsigned char ucKeyState;
+            std::uint8_t ucKeyState;
             if (bitStream.Read(szKey, ucKeyLength) && bitStream.Read(ucKeyState))
             {
                 bool                bState = (ucKeyState == 1);
@@ -72,7 +72,7 @@ void CInputRPCs::BindCommand(NetBitStreamInterface& bitStream)
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     if (pKeyBinds)
     {
-        unsigned char ucLength = 0;
+        std::uint8_t ucLength = 0;
         if (bitStream.Read(ucLength))
         {
             char* szKey = new char[ucLength + 1];
@@ -113,13 +113,13 @@ void CInputRPCs::UnbindKey(NetBitStreamInterface& bitStream)
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     if (pKeyBinds)
     {
-        unsigned char ucKeyLength = 0;
+        std::uint8_t ucKeyLength = 0;
         if (bitStream.Read(ucKeyLength))
         {
             char* szKey = new char[ucKeyLength + 1];
             szKey[ucKeyLength] = NULL;
 
-            unsigned char ucKeyState;
+            std::uint8_t ucKeyState;
             if (bitStream.Read(szKey, ucKeyLength) && bitStream.Read(ucKeyState))
             {
                 bool                bState = (ucKeyState == 1);
@@ -147,7 +147,7 @@ void CInputRPCs::UnbindCommand(NetBitStreamInterface& bitStream)
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     if (pKeyBinds)
     {
-        unsigned char ucLength = 0;
+        std::uint8_t ucLength = 0;
         if (bitStream.Read(ucLength))
         {
             char* szKey = new char[ucLength + 1];
@@ -179,13 +179,13 @@ void CInputRPCs::UnbindCommand(NetBitStreamInterface& bitStream)
 
 void CInputRPCs::ToggleControl(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucControlLength = 0;
+    std::uint8_t ucControlLength = 0;
     if (bitStream.Read(ucControlLength))
     {
         char* szControl = new char[ucControlLength + 1];
         szControl[ucControlLength] = NULL;
 
-        unsigned char ucEnabled;
+        std::uint8_t ucEnabled;
         if (bitStream.Read(szControl, ucControlLength) && bitStream.Read(ucEnabled))
         {
             if (szControl[0])
@@ -199,7 +199,7 @@ void CInputRPCs::ToggleControl(NetBitStreamInterface& bitStream)
 
 void CInputRPCs::ToggleAllControls(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucGTAControls, ucMTAControls, ucEnabled;
+    std::uint8_t ucGTAControls, ucMTAControls, ucEnabled;
     if (bitStream.Read(ucGTAControls) && bitStream.Read(ucMTAControls) && bitStream.Read(ucEnabled))
     {
         g_pCore->GetKeyBinds()->SetAllControlsEnabled(ucGTAControls == 1, ucMTAControls == 1, ucEnabled == 1);
@@ -208,13 +208,13 @@ void CInputRPCs::ToggleAllControls(NetBitStreamInterface& bitStream)
 
 void CInputRPCs::SetControlState(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucControlLength = 0;
+    std::uint8_t ucControlLength = 0;
     if (bitStream.Read(ucControlLength))
     {
         char* szControl = new char[ucControlLength + 1];
         szControl[ucControlLength] = NULL;
 
-        unsigned char ucState;
+        std::uint8_t ucState;
         if (bitStream.Read(szControl, ucControlLength) && bitStream.Read(ucState))
         {
             if (*szControl)
@@ -228,8 +228,8 @@ void CInputRPCs::SetControlState(NetBitStreamInterface& bitStream)
 
 void CInputRPCs::ForceReconnect(NetBitStreamInterface& bitStream)
 {
-    unsigned char  ucHost, ucPassword;
-    unsigned short usPort;
+    std::uint8_t  ucHost, ucPassword;
+    std::uint16_t usPort;
 
     if (bitStream.Read(ucHost))
     {
@@ -265,9 +265,9 @@ void CInputRPCs::ForceReconnect(NetBitStreamInterface& bitStream)
 
 void CInputRPCs::ShowCursor(NetBitStreamInterface& bitStream)
 {
-    unsigned char  ucShow;
-    unsigned short usResource;
-    unsigned char  ucToggleControls;
+    std::uint8_t  ucShow;
+    std::uint16_t usResource;
+    std::uint8_t  ucToggleControls;
     if (bitStream.Read(ucShow) && bitStream.Read(usResource) && bitStream.Read(ucToggleControls))
     {
         CResource* pResource = g_pClientGame->GetResourceManager()->GetResourceFromNetID(usResource);
@@ -280,8 +280,8 @@ void CInputRPCs::ShowCursor(NetBitStreamInterface& bitStream)
 
 void CInputRPCs::ShowChat(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucShow;
-    unsigned char ucInputBlocked;
+    std::uint8_t ucShow;
+    std::uint8_t ucInputBlocked;
     if (bitStream.Read(ucShow))
     {
         if (bitStream.Read(ucInputBlocked))

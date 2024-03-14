@@ -82,7 +82,7 @@ public:
     void SaveOptions();
 
     bool LoadServerList(CXMLNode* pNode, const std::string& strTagName, CServerList* pList);
-    bool SaveServerList(CXMLNode* pNode, const std::string& strTagName, CServerList* pList, unsigned int iLimit = 0);
+    bool SaveServerList(CXMLNode* pNode, const std::string& strTagName, CServerList* pList, std::uint32_t iLimit = 0);
 
     void        SetServerPassword(const std::string& strHost, const std::string& strPassword);
     std::string GetServerPassword(const std::string& strHost);
@@ -93,8 +93,8 @@ public:
 
     CServerListItem* FindSelectedServer(ServerBrowserType Type);
     CServerListItem* FindServerFromRow(ServerBrowserType Type, int iRow);
-    CServerListItem* FindServer(const std::string& strHost, unsigned short usPort);
-    unsigned short   FindServerHttpPort(const std::string& strHost, unsigned short usPort);
+    CServerListItem* FindServer(const std::string& strHost, std::uint16_t usPort);
+    std::uint16_t   FindServerHttpPort(const std::string& strHost, std::uint16_t usPort);
     void             UpdateRowIndexMembers(ServerBrowserType Type);
     void             UpdateSelectedServerPlayerList(ServerBrowserType Type);
     void             GetVisibleEndPointList(std::vector<SAddressPort>& outEndpointList);
@@ -109,7 +109,7 @@ public:
 
     bool IsActive();
 
-    void SetSelectedIndex(unsigned int uiIndex);
+    void SetSelectedIndex(std::uint32_t uiIndex);
 
 protected:
     bool OnMouseClick(CGUIMouseEventArgs Args);

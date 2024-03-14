@@ -26,9 +26,9 @@ CXMLAttributesImpl::~CXMLAttributesImpl()
     DeleteAttributes();
 }
 
-unsigned int CXMLAttributesImpl::Count()
+std::uint32_t CXMLAttributesImpl::Count()
 {
-    return static_cast<unsigned int>(m_Attributes.size());
+    return static_cast<std::uint32_t>(m_Attributes.size());
 }
 
 CXMLAttribute* CXMLAttributesImpl::Find(const char* szName)
@@ -48,10 +48,10 @@ CXMLAttribute* CXMLAttributesImpl::Find(const char* szName)
     return NULL;
 }
 
-CXMLAttribute* CXMLAttributesImpl::Get(unsigned int uiIndex)
+CXMLAttribute* CXMLAttributesImpl::Get(std::uint32_t uiIndex)
 {
     // Find the attribute in our attributelist
-    unsigned int                              uiCurrentIndex = 0;
+    std::uint32_t                              uiCurrentIndex = 0;
     std::list<CXMLAttribute*>::const_iterator iter = m_Attributes.begin();
     for (; iter != m_Attributes.end(); iter++)
     {

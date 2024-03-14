@@ -34,7 +34,7 @@ static void ParseManifestMeta(std::ifstream& manifest, std::unordered_map<std::s
         {
             // Transform key to lowercase.
             std::string key = line.substr(0, colon);
-            std::transform(key.begin(), key.end(), key.begin(), [](unsigned char c) { return std::tolower(c); });
+            std::transform(key.begin(), key.end(), key.begin(), [](std::uint8_t c) { return std::tolower(c); });
 
             // Discard key if value is empty.
             if (const size_t nonSpace = line.find_first_not_of(' ', colon + 1); nonSpace != std::string::npos)

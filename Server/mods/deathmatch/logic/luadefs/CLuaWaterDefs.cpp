@@ -229,7 +229,7 @@ int CLuaWaterDefs::SetWaterVertexPosition(lua_State* luaVM)
 
 int CLuaWaterDefs::GetWaterColor(lua_State* luaVM)
 {
-    unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
+    std::uint8_t ucRed, ucGreen, ucBlue, ucAlpha;
 
     bool bColorOverride = CStaticFunctionDefinitions::GetWaterColor(ucRed, ucGreen, ucBlue, ucAlpha);
 
@@ -249,10 +249,10 @@ int CLuaWaterDefs::GetWaterColor(lua_State* luaVM)
 
 int CLuaWaterDefs::SetWaterColor(lua_State* luaVM)
 {
-    unsigned char ucR;
-    unsigned char ucG;
-    unsigned char ucB;
-    unsigned char ucA;
+    std::uint8_t ucR;
+    std::uint8_t ucG;
+    std::uint8_t ucB;
+    std::uint8_t ucA;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucR);

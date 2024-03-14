@@ -180,7 +180,7 @@ void                CClientStreamer::DoPulse(CVector& vecPosition)
     Restream(bMovedFar);
 }
 
-void CClientStreamer::SetDimension(unsigned short usDimension)
+void CClientStreamer::SetDimension(std::uint16_t usDimension)
 {
     // Different dimension than before?
     if (usDimension != m_usDimension)
@@ -726,7 +726,7 @@ void CClientStreamer::OnElementForceStreamOut(CClientStreamElement* pElement)
 void CClientStreamer::OnElementDimension(CClientStreamElement* pElement)
 {
     // Grab its new dimenson
-    unsigned short usDimension = pElement->GetDimension();
+    std::uint16_t usDimension = pElement->GetDimension();
     // Is it streamed in?
     if (pElement->IsStreamedIn())
     {

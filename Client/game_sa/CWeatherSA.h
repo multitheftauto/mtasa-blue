@@ -18,8 +18,8 @@ class CWeatherSA : public CWeather
     friend class COffsets;
 
 public:
-    unsigned char Get();
-    void          Set(unsigned char primary, unsigned char secondary);
+    std::uint8_t Get();
+    void          Set(std::uint8_t primary, std::uint8_t secondary);
 
     void Release();
 

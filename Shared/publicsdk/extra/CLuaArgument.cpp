@@ -65,7 +65,7 @@ CLuaArgument::CLuaArgument(const CLuaArgument& Argument)
     operator=(Argument);
 }
 
-CLuaArgument::CLuaArgument(lua_State* luaVM, unsigned int uiArgument)
+CLuaArgument::CLuaArgument(lua_State* luaVM, std::uint32_t uiArgument)
 {
     // Read the argument out of the lua VM
     m_szString = NULL;
@@ -179,7 +179,7 @@ bool CLuaArgument::operator!=(const CLuaArgument& Argument)
     return !(operator==(Argument));
 }
 
-void CLuaArgument::Read(lua_State* luaVM, unsigned int uiArgument)
+void CLuaArgument::Read(lua_State* luaVM, std::uint32_t uiArgument)
 {
     // Eventually delete our previous string
     if (m_szString)

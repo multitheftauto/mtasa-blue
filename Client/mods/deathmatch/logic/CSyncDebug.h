@@ -53,17 +53,17 @@ private:
 
     unsigned long m_ulLastUpdateTime;
 
-    unsigned int m_uiPacketsSent;
-    unsigned int m_uiLastPacketsSent;
-    unsigned int m_uiLastPacketsReceived;
-    unsigned int m_uiPacketsReceived;
-    unsigned int m_uiBitsReceived;
-    unsigned int m_uiLastBitsReceived;
-    unsigned int m_uiBitsSent;
-    unsigned int m_uiLastBitsSent;
+    std::uint32_t m_uiPacketsSent;
+    std::uint32_t m_uiLastPacketsSent;
+    std::uint32_t m_uiLastPacketsReceived;
+    std::uint32_t m_uiPacketsReceived;
+    std::uint32_t m_uiBitsReceived;
+    std::uint32_t m_uiLastBitsReceived;
+    std::uint32_t m_uiBitsSent;
+    std::uint32_t m_uiLastBitsSent;
 
-    unsigned short m_usFakeLagVariance;
-    unsigned short m_usFakeLagPing;
+    std::uint16_t m_usFakeLagVariance;
+    std::uint16_t m_usFakeLagPing;
 
 #endif
 };

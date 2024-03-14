@@ -2092,7 +2092,7 @@ int CLuaDrawingDefs::DxSetTextureEdge(lua_State* luaVM)
 }
 
 bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector position, const float radius, std::optional<SColor> color,
-                                        const std::optional<float> lineWidth, const std::optional<unsigned int> iterations)
+                                        const std::optional<float> lineWidth, const std::optional<std::uint32_t> iterations)
 {
     // Greater than 4, crash the game
     if (iterations.has_value() && (*iterations == 0 || *iterations > 4))

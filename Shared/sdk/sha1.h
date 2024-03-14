@@ -54,10 +54,10 @@ extern "C"
     {
         uint32_t      total[2];   /*!< number of bytes processed  */
         uint32_t      state[5];   /*!< intermediate digest state  */
-        unsigned char buffer[64]; /*!< data block being processed */
+        std::uint8_t buffer[64]; /*!< data block being processed */
 
-        unsigned char ipad[64]; /*!< HMAC: inner padding        */
-        unsigned char opad[64]; /*!< HMAC: outer padding        */
+        std::uint8_t ipad[64]; /*!< HMAC: inner padding        */
+        std::uint8_t opad[64]; /*!< HMAC: outer padding        */
     } sha1_context;
 
     /**
@@ -88,7 +88,7 @@ extern "C"
      * \param input    buffer holding the  data
      * \param ilen     length of the input data
      */
-    void sha1_update(sha1_context* ctx, const unsigned char* input, size_t ilen);
+    void sha1_update(sha1_context* ctx, const std::uint8_t* input, size_t ilen);
 
     /**
      * \brief          SHA-1 final digest
@@ -96,10 +96,10 @@ extern "C"
      * \param ctx      SHA-1 context
      * \param output   SHA-1 checksum result
      */
-    void sha1_finish(sha1_context* ctx, unsigned char output[20]);
+    void sha1_finish(sha1_context* ctx, std::uint8_t output[20]);
 
     /* Internal use */
-    void sha1_process(sha1_context* ctx, const unsigned char data[64]);
+    void sha1_process(sha1_context* ctx, const std::uint8_t data[64]);
 
 #ifdef __cplusplus
 }
@@ -121,7 +121,7 @@ extern "C"
      * \param ilen     length of the input data
      * \param output   SHA-1 checksum result
      */
-    void sha1(const unsigned char* input, size_t ilen, unsigned char output[20]);
+    void sha1(const std::uint8_t* input, size_t ilen, std::uint8_t output[20]);
 
     /**
      * \brief          Output = SHA-1( file contents )
@@ -131,7 +131,7 @@ extern "C"
      *
      * \return         0 if successful, or POLARSSL_ERR_SHA1_FILE_IO_ERROR
      */
-    int sha1_file(const char* path, unsigned char output[20]);
+    int sha1_file(const char* path, std::uint8_t output[20]);
 
     /**
      * \brief          SHA-1 HMAC context setup
@@ -140,7 +140,7 @@ extern "C"
      * \param key      HMAC secret key
      * \param keylen   length of the HMAC key
      */
-    void sha1_hmac_starts(sha1_context* ctx, const unsigned char* key, size_t keylen);
+    void sha1_hmac_starts(sha1_context* ctx, const std::uint8_t* key, size_t keylen);
 
     /**
      * \brief          SHA-1 HMAC process buffer
@@ -149,7 +149,7 @@ extern "C"
      * \param input    buffer holding the  data
      * \param ilen     length of the input data
      */
-    void sha1_hmac_update(sha1_context* ctx, const unsigned char* input, size_t ilen);
+    void sha1_hmac_update(sha1_context* ctx, const std::uint8_t* input, size_t ilen);
 
     /**
      * \brief          SHA-1 HMAC final digest
@@ -157,7 +157,7 @@ extern "C"
      * \param ctx      HMAC context
      * \param output   SHA-1 HMAC checksum result
      */
-    void sha1_hmac_finish(sha1_context* ctx, unsigned char output[20]);
+    void sha1_hmac_finish(sha1_context* ctx, std::uint8_t output[20]);
 
     /**
      * \brief          SHA-1 HMAC context reset
@@ -175,7 +175,7 @@ extern "C"
      * \param ilen     length of the input data
      * \param output   HMAC-SHA-1 result
      */
-    void sha1_hmac(const unsigned char* key, size_t keylen, const unsigned char* input, size_t ilen, unsigned char output[20]);
+    void sha1_hmac(const std::uint8_t* key, size_t keylen, const std::uint8_t* input, size_t ilen, std::uint8_t output[20]);
 
     /**
      * \brief          Checkup routine

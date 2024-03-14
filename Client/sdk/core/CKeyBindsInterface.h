@@ -40,7 +40,7 @@ struct SBindableKey
     unsigned long ulCode;
     int           iGTARelative;
     eKeyData      data;
-    unsigned char ucNumpadRelative;
+    std::uint8_t ucNumpadRelative;
     bool          bIgnoredByGUI;
 };
 
@@ -230,7 +230,7 @@ public:
     virtual void SetAllVehicleControls(bool bState) = 0;
 
     virtual void         SetAllBindStates(bool bState, KeyBindType onlyType = KeyBindType::UNDEFINED) = 0;
-    virtual unsigned int Count(KeyBindType bindType = KeyBindType::UNDEFINED) = 0;
+    virtual std::uint32_t Count(KeyBindType bindType = KeyBindType::UNDEFINED) = 0;
 
     virtual void DoPreFramePulse() = 0;
     virtual void DoPostFramePulse() = 0;

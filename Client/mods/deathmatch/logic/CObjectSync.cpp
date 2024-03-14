@@ -24,7 +24,7 @@ CObjectSync::CObjectSync(CClientObjectManager* pObjectManager)
     m_ulLastSyncTime = 0;
 }
 
-bool CObjectSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& BitStream)
+bool CObjectSync::ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& BitStream)
 {
     switch (ucPacketID)
     {
@@ -142,12 +142,12 @@ void CObjectSync::Packet_ObjectSync(NetBitStreamInterface& BitStream)
             return;
 
         // Read out the sync time context. See CClientEntity for documentation on that.
-        unsigned char ucSyncTimeContext;
+        std::uint8_t ucSyncTimeContext;
         if (!BitStream.Read(ucSyncTimeContext))
             return;
 
         // Read out flags
-        SIntegerSync<unsigned char, 3> flags(0);
+        SIntegerSync<std::uint8_t, 3> flags(0);
         if (!BitStream.Read(&flags))
             return;
 
@@ -210,7 +210,7 @@ void CObjectSync::Sync()
 
 void CObjectSync::WriteObjectInformation(NetBitStreamInterface* pBitStream, CDeathmatchObject* pObject)
 {
-    unsigned char ucFlags = 0;
+    std::uint8_t ucFlags = 0;
 
     // What's changed?
     CVector vecPosition, vecRotation;
@@ -235,7 +235,7 @@ void CObjectSync::WriteObjectInformation(NetBitStreamInterface* pBitStream, CDea
     pBitStream->Write(pObject->GetSyncTimeContext());
 
     // Write flags
-    SIntegerSync<unsigned char, 3> flags(ucFlags);
+    SIntegerSync<std::uint8_t, 3> flags(ucFlags);
     pBitStream->Write(&flags);
 
     // Write changed stuff

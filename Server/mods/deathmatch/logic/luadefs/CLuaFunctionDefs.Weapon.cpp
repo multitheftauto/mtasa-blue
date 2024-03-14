@@ -74,7 +74,7 @@ int CLuaFunctionDefs::SetWeaponAmmo(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetWeaponNameFromID(lua_State* luaVM)
 {
-    unsigned char ucID;
+    std::uint8_t ucID;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucID);
@@ -103,7 +103,7 @@ int CLuaFunctionDefs::GetWeaponIDFromName(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucID;
+        std::uint8_t ucID;
 
         if (CStaticFunctionDefinitions::GetWeaponIDFromName(strName, ucID))
         {

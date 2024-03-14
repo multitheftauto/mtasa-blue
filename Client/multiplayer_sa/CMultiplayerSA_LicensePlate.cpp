@@ -139,7 +139,7 @@ void _declspec(naked) HOOK_CAutomobile_CustomCarPlate_AfterRenderingStop()
 // Save plate material for using later (in BeforeRenderingStart())
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-void OnMY_CCustomCarPlateMgr_SetupMaterialPlateTexture(struct RpMaterial* a, char* b, unsigned char c)
+void OnMY_CCustomCarPlateMgr_SetupMaterialPlateTexture(struct RpMaterial* a, char* b, std::uint8_t c)
 {
     if (ms_pProcessingVehicleModelInfo)
     {

@@ -52,10 +52,10 @@ public:
     const std::string& GetServerName() { return m_strServerName; };
     SString            GetServerIP();
     SString            GetServerIPList();
-    unsigned short     GetServerPort();
-    unsigned int       GetMaxPlayers();
-    unsigned int       GetHardMaxPlayers();
-    void               SetSoftMaxPlayers(unsigned int v) { m_uiSoftMaxPlayers = v; }
+    std::uint16_t     GetServerPort();
+    std::uint32_t       GetMaxPlayers();
+    std::uint32_t       GetHardMaxPlayers();
+    void               SetSoftMaxPlayers(std::uint32_t v) { m_uiSoftMaxPlayers = v; }
     bool               IsHTTPEnabled() { return m_bHTTPEnabled; };
 
     bool               IsValidPassword(const char* szPassword);
@@ -64,14 +64,14 @@ public:
     bool               SetPassword(const char* szPassword, bool bSave);
 
     bool         IsVoiceEnabled();
-    unsigned int GetVoiceSampleRate() { return m_uiVoiceSampleRate; };
-    unsigned int GetVoiceQuality() { return m_ucVoiceQuality; };
-    unsigned int GetVoiceBitrate() { return m_uiVoiceBitrate; };
+    std::uint32_t GetVoiceSampleRate() { return m_uiVoiceSampleRate; };
+    std::uint32_t GetVoiceQuality() { return m_ucVoiceQuality; };
+    std::uint32_t GetVoiceBitrate() { return m_uiVoiceBitrate; };
 
     bool                        GetAseInternetPushEnabled() { return m_iAseMode == 2 && !IsFakeLagCommandEnabled(); }
     bool                        GetAseInternetListenEnabled() { return m_iAseMode == 1 && !IsFakeLagCommandEnabled(); }
     bool                        GetAseLanListenEnabled() { return m_bDontBroadcastLan ? false : true; }
-    unsigned short              GetHTTPPort();
+    std::uint16_t              GetHTTPPort();
     eHTTPDownloadType           GetHTTPDownloadType() { return m_ucHTTPDownloadType; };
     const std::string&          GetHTTPDownloadURL() { return m_strHTTPDownloadURL; };
     int                         GetHTTPMaxConnectionsPerClient() { return m_iHTTPMaxConnectionsPerClient; };
@@ -84,7 +84,7 @@ public:
     bool                        GetJoinFloodProtectionEnabled() { return m_bJoinFloodProtectionEnabled; };
     bool                        GetScriptDebugLogEnabled() { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty(); };
     const std::string&          GetScriptDebugLogFile() { return m_strScriptDebugLogFile; };
-    unsigned int                GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
+    std::uint32_t                GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
     const std::string&          GetAccessControlListFile() { return m_strAccessControlListFile; };
     bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
     bool                        IsDisableAC(const char* szTagAC) { return MapContains(m_DisableComboACMap, szTagAC); };
@@ -101,8 +101,8 @@ public:
     int                         GetBackupAmount() { return m_iBackupAmount; }
     void                        NotifyDidBackup();
     bool                        ShouldCompactInternalDatabases();
-    unsigned short              GetFPSLimit() { return m_usFPSLimit; };
-    bool                        SetFPSLimit(unsigned short usFPS, bool bSave);
+    std::uint16_t              GetFPSLimit() { return m_usFPSLimit; };
+    bool                        SetFPSLimit(std::uint16_t usFPS, bool bSave);
     int                         GetPendingWorkToDoSleepTime();
     int                         GetNoWorkToDoSleepTime();
     int                         GetServerLogicFpsLimit() { return m_iServerLogicFpsLimit; };
@@ -156,22 +156,22 @@ private:
     CXMLNode*           m_pRootNode;
     CCommandLineParser* m_pCommandLineParser;
 
-    unsigned int  m_uiVoiceSampleRate;
-    unsigned char m_ucVoiceQuality;
-    unsigned int  m_uiVoiceBitrate;
+    std::uint32_t  m_uiVoiceSampleRate;
+    std::uint8_t m_ucVoiceQuality;
+    std::uint32_t  m_uiVoiceBitrate;
 
     bool                       m_bVoiceEnabled;
     std::string                m_strServerIP;
     std::string                m_strServerName;
-    unsigned short             m_usServerPort;
-    unsigned int               m_uiHardMaxPlayers;
-    unsigned int               m_uiSoftMaxPlayers;
+    std::uint16_t             m_usServerPort;
+    std::uint32_t               m_uiHardMaxPlayers;
+    std::uint32_t               m_uiSoftMaxPlayers;
     bool                       m_bHTTPEnabled;
     std::string                m_strPassword;
     int                        m_iAseMode;
     int                        m_iUpdateCycleDatagramsLimit;
     int                        m_iUpdateCycleMessagesLimit;
-    unsigned short             m_usHTTPPort;
+    std::uint16_t             m_usHTTPPort;
     eHTTPDownloadType          m_ucHTTPDownloadType;
     std::string                m_strHTTPDownloadURL;
     int                        m_iHTTPMaxConnectionsPerClient;
@@ -184,10 +184,10 @@ private:
     bool                       m_bJoinFloodProtectionEnabled;
     bool                       m_bScriptDebugLogEnabled;
     std::string                m_strScriptDebugLogFile;
-    unsigned int               m_uiScriptDebugLogLevel;
+    std::uint32_t               m_uiScriptDebugLogLevel;
     std::string                m_strAccessControlListFile;
     bool                       m_bVerifySerials;
-    unsigned short             m_usFPSLimit;
+    std::uint16_t             m_usFPSLimit;
     int                        m_bDontBroadcastLan;
     std::set<SString>          m_DisableComboACMap;
     std::set<SString>          m_EnableDiagnosticMap;

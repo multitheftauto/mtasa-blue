@@ -54,7 +54,7 @@ public:
         Node(strVariable)->GetTagContent(val);
         return true;
     };
-    bool Get(const std::string& strVariable, unsigned int& val)
+    bool Get(const std::string& strVariable, std::uint32_t& val)
     {
         SANGET;
         Node(strVariable)->GetTagContent(val);
@@ -95,7 +95,7 @@ public:
         m_iRevision++;
         Node(strVariable)->SetTagContent(val);
     };
-    void Set(const std::string& strVariable, unsigned int val)
+    void Set(const std::string& strVariable, std::uint32_t val)
     {
         SAN;
         m_iRevision++;

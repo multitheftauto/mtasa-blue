@@ -12,8 +12,8 @@
 #include "StdInc.h"
 #include "net/SyncStructures.h"
 
-CDeathmatchVehicle::CDeathmatchVehicle(CClientManager* pManager, CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, unsigned short usVehicleModel,
-                                       unsigned char ucVariant, unsigned char ucVariant2)
+CDeathmatchVehicle::CDeathmatchVehicle(CClientManager* pManager, CUnoccupiedVehicleSync* pUnoccupiedVehicleSync, ElementID ID, std::uint16_t usVehicleModel,
+                                       std::uint8_t ucVariant, std::uint8_t ucVariant2)
     : ClassInit(this), CClientVehicle(pManager, ID, usVehicleModel, ucVariant, ucVariant2)
 {
     m_pUnoccupiedVehicleSync = pUnoccupiedVehicleSync;
@@ -46,7 +46,7 @@ bool CDeathmatchVehicle::SyncDamageModel()
     bool               bChanges = false;
 
     // Copy current door states to the sync structure and mark those that changed
-    for (unsigned int i = 0; i < MAX_DOORS; ++i)
+    for (std::uint32_t i = 0; i < MAX_DOORS; ++i)
     {
         damage.data.ucDoorStates[i] = GetDoorStatus(i);
         if (damage.data.ucDoorStates[i] != m_ucLastDoorStates[i])
@@ -58,7 +58,7 @@ bool CDeathmatchVehicle::SyncDamageModel()
             damage.data.bDoorStatesChanged[i] = false;
     }
     // Copy current wheel states to the sync structure and mark those that changed
-    for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+    for (std::uint32_t i = 0; i < MAX_WHEELS; ++i)
     {
         damage.data.ucWheelStates[i] = GetWheelStatus(i);
         if (damage.data.ucWheelStates[i] != m_ucLastWheelStates[i])
@@ -70,7 +70,7 @@ bool CDeathmatchVehicle::SyncDamageModel()
             damage.data.bWheelStatesChanged[i] = false;
     }
     // Copy current panel states to the sync structure and mark those that changed
-    for (unsigned int i = 0; i < MAX_PANELS; ++i)
+    for (std::uint32_t i = 0; i < MAX_PANELS; ++i)
     {
         damage.data.ucPanelStates[i] = GetPanelStatus(i);
         if (damage.data.ucPanelStates[i] != m_ucLastPanelStates[i])
@@ -82,7 +82,7 @@ bool CDeathmatchVehicle::SyncDamageModel()
             damage.data.bPanelStatesChanged[i] = false;
     }
     // Copy current light states to the sync structure and mark those that changed
-    for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+    for (std::uint32_t i = 0; i < MAX_LIGHTS; ++i)
     {
         damage.data.ucLightStates[i] = GetLightStatus(i);
         if (damage.data.ucLightStates[i] != m_ucLastLightStates[i])

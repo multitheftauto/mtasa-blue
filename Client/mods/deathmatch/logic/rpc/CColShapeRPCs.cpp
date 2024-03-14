@@ -45,7 +45,7 @@ void CColShapeRPCs::SetColShapeSize(CClientEntity* pSource, NetBitStreamInterfac
 void CColShapeRPCs::UpdateColPolygonPoint(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     SPosition2DSync size(false);
-    unsigned int    uiPointIndex;
+    std::uint32_t    uiPointIndex;
     if (bitStream.Read(&size) && bitStream.Read(uiPointIndex))
     {
         CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
@@ -56,7 +56,7 @@ void CColShapeRPCs::UpdateColPolygonPoint(CClientEntity* pSource, NetBitStreamIn
 void CColShapeRPCs::AddColPolygonPoint(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     SPosition2DSync size(false);
-    unsigned int    uiPointIndex;
+    std::uint32_t    uiPointIndex;
     if (bitStream.Read(&size))
     {
         CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);
@@ -73,7 +73,7 @@ void CColShapeRPCs::AddColPolygonPoint(CClientEntity* pSource, NetBitStreamInter
 
 void CColShapeRPCs::RemoveColPolygonPoint(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned int uiPointIndex;
+    std::uint32_t uiPointIndex;
     if (bitStream.Read(uiPointIndex))
     {
         CClientColPolygon* pColShape = static_cast<CClientColPolygon*>(pSource);

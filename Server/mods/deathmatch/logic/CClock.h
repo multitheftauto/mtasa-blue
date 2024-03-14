@@ -16,13 +16,13 @@ class CClock
 public:
     CClock();
 
-    void Get(unsigned char& ucHour, unsigned char& ucMinute);
-    void Set(unsigned char ucHour, unsigned char ucMinute);
+    void Get(std::uint8_t& ucHour, std::uint8_t& ucMinute);
+    void Set(std::uint8_t ucHour, std::uint8_t ucMinute);
 
     void          SetMinuteDuration(unsigned long ulDuration);
     unsigned long GetMinuteDuration();
 
 private:
-    unsigned long long m_ullMidnightTime;
+    std::uint64_t m_ullMidnightTime;
     unsigned long      m_ulMinuteDuration;
 };

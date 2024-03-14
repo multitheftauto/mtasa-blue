@@ -22,7 +22,7 @@ CVoiceDataPacket::CVoiceDataPacket()
     AllocateBuffer(1024);
 }
 
-CVoiceDataPacket::CVoiceDataPacket(CPlayer* pPlayer, const unsigned char* pbSrcBuffer, unsigned short usLength)
+CVoiceDataPacket::CVoiceDataPacket(CPlayer* pPlayer, const std::uint8_t* pbSrcBuffer, std::uint16_t usLength)
 {
     m_pBuffer = NULL;
     m_usDataBufferSize = 0;
@@ -58,7 +58,7 @@ bool CVoiceDataPacket::Write(NetBitStreamInterface& BitStream) const
         // Write the source player
         ElementID ID = m_pSourceElement->GetID();
         BitStream.Write(ID);
-        // Write the length as an unsigned short and then write the string
+        // Write the length as an std::uint16_t and then write the string
         BitStream.Write(m_usActualDataLength);
         BitStream.Write(reinterpret_cast<const char*>(m_pBuffer), m_usActualDataLength);
         return true;
@@ -67,7 +67,7 @@ bool CVoiceDataPacket::Write(NetBitStreamInterface& BitStream) const
     return false;
 }
 
-void CVoiceDataPacket::AllocateBuffer(unsigned short usBufferSize)
+void CVoiceDataPacket::AllocateBuffer(std::uint16_t usBufferSize)
 {
     // Test to see if we already have an allocated buffer
     // that will hold the requested size.
@@ -81,7 +81,7 @@ void CVoiceDataPacket::AllocateBuffer(unsigned short usBufferSize)
         }
 
         // Allocate new buffer.
-        m_pBuffer = new unsigned char[usBufferSize];
+        m_pBuffer = new std::uint8_t[usBufferSize];
 
         // Clear buffer.
         memset(m_pBuffer, 0, usBufferSize);
@@ -102,7 +102,7 @@ void CVoiceDataPacket::DeallocateBuffer()
     }
 }
 
-void CVoiceDataPacket::SetData(const unsigned char* pbSrcBuffer, unsigned short usLength)
+void CVoiceDataPacket::SetData(const std::uint8_t* pbSrcBuffer, std::uint16_t usLength)
 {
     // Allocate new buffer.
     AllocateBuffer(usLength);
@@ -115,12 +115,12 @@ void CVoiceDataPacket::SetData(const unsigned char* pbSrcBuffer, unsigned short 
     }
 }
 
-const unsigned char* CVoiceDataPacket::GetData() const
+const std::uint8_t* CVoiceDataPacket::GetData() const
 {
     return m_pBuffer;
 }
 
-unsigned short CVoiceDataPacket::GetDataLength() const
+std::uint16_t CVoiceDataPacket::GetDataLength() const
 {
     return m_usActualDataLength;
 }

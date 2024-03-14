@@ -30,9 +30,9 @@ public:
     CGUIHorizontalAlign GetHorizontalAlign();
 
     void      SetTextColor(CGUIColor Color);
-    void      SetTextColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
+    void      SetTextColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue);
     CGUIColor GetTextColor();
-    void      GetTextColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
+    void      GetTextColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue);
 
     void SetFrameEnabled(bool bFrameEnabled);
     bool IsFrameEnabled();

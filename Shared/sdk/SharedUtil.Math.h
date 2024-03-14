@@ -16,7 +16,7 @@
 namespace SharedUtil
 {
     // Bitwise constant operations
-    template <unsigned int N>
+    template <std::uint32_t N>
     struct NumberOfSignificantBits
     {
         enum

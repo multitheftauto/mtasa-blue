@@ -36,10 +36,10 @@ class CTaskComplexEnterCarSAInterface : public CTaskComplexSAInterface
 {
 public:
     CVehicle*     m_pTargetVehicle;
-    unsigned char m_bAsDriver : 1;
-    unsigned char m_bQuitAfterOpeningDoor : 1;
-    unsigned char m_bQuitAfterDraggingPedOut : 1;
-    unsigned char m_bCarryOnAfterFallingOff : 1;
+    std::uint8_t m_bAsDriver : 1;
+    std::uint8_t m_bQuitAfterOpeningDoor : 1;
+    std::uint8_t m_bQuitAfterDraggingPedOut : 1;
+    std::uint8_t m_bCarryOnAfterFallingOff : 1;
 
     int m_iTargetDoor;
     int m_iTargetDoorOppositeToFlag;
@@ -47,14 +47,14 @@ public:
     int m_iDraggedPedDownTime;
     int m_iMoveState;
 
-    unsigned char m_nNumGettingInSet;
-    unsigned char m_nCamMovementChoice;
+    std::uint8_t m_nNumGettingInSet;
+    std::uint8_t m_nCamMovementChoice;
 
     CVector                       m_vTargetDoorPos;
     CTaskUtilityLineUpPedWithCar* m_pTaskUtilityLineUpPedWithCar;
     bool                          m_bIsAborting;
     CPed*                         m_pDraggedPed;
-    unsigned char                 m_nDoorFlagsSet;
+    std::uint8_t                 m_nDoorFlagsSet;
     float                         m_fCruiseSpeed;
     int                           m_iEnterCarStartTime;
 };
@@ -161,14 +161,14 @@ public:
 
     bool m_bDie;
 
-    unsigned char m_nDoorFlagsSet;
-    unsigned char m_nNumGettingInSet;
+    std::uint8_t m_nDoorFlagsSet;
+    std::uint8_t m_nNumGettingInSet;
 
     AnimationId m_dieAnim;
     float       m_fDieAnimBlendDelta;
     float       m_fDieAnimSpeed;
 
-    unsigned char m_bIsInAir;
+    std::uint8_t m_bIsInAir;
 };
 
 class CTaskComplexLeaveCarSA : public virtual CTaskComplexSA, public virtual CTaskComplexLeaveCar

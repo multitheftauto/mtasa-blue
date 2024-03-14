@@ -17,14 +17,14 @@
 CVehicleColor CVehicleColors::GetRandomColor()
 {
     // Grab a random index
-    unsigned int uiSize = CountColors();
+    std::uint32_t uiSize = CountColors();
     if (uiSize > 0)
     {
         // Create a random index
-        unsigned int uiRandomIndex = GetRandom(0, uiSize - 1);
+        std::uint32_t uiRandomIndex = GetRandom(0, uiSize - 1);
 
         // Grab the random color we got off the list
-        unsigned int                       uiIndex = 0;
+        std::uint32_t                       uiIndex = 0;
         std::list<CVehicleColor>::iterator iter = m_Colors.begin();
         for (; iter != m_Colors.end(); ++iter)
         {
@@ -68,30 +68,30 @@ bool CVehicleColorManager::Load(const char* szFilename)
                 char* szColor4 = strtok(NULL, " ");
 
                 // Set the colors that exist
-                unsigned short usModel = 0;
-                unsigned char  ucColor1 = 0;
-                unsigned char  ucColor2 = 0;
-                unsigned char  ucColor3 = 0;
-                unsigned char  ucColor4 = 0;
+                std::uint16_t usModel = 0;
+                std::uint8_t  ucColor1 = 0;
+                std::uint8_t  ucColor2 = 0;
+                std::uint8_t  ucColor3 = 0;
+                std::uint8_t  ucColor4 = 0;
                 if (szModel)
                 {
-                    usModel = static_cast<unsigned short>(atol(szModel));
+                    usModel = static_cast<std::uint16_t>(atol(szModel));
 
                     if (szColor1)
                     {
-                        ucColor1 = static_cast<unsigned char>(atol(szColor1));
+                        ucColor1 = static_cast<std::uint8_t>(atol(szColor1));
 
                         if (szColor2)
                         {
-                            ucColor2 = static_cast<unsigned char>(atol(szColor2));
+                            ucColor2 = static_cast<std::uint8_t>(atol(szColor2));
 
                             if (szColor3)
                             {
-                                ucColor3 = static_cast<unsigned char>(atol(szColor3));
+                                ucColor3 = static_cast<std::uint8_t>(atol(szColor3));
 
                                 if (szColor4)
                                 {
-                                    ucColor4 = static_cast<unsigned char>(atol(szColor4));
+                                    ucColor4 = static_cast<std::uint8_t>(atol(szColor4));
                                 }
                             }
                         }
@@ -141,7 +141,7 @@ void CVehicleColorManager::Reset()
     }
 }
 
-void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor& colVehicle)
+void CVehicleColorManager::AddColor(std::uint16_t usModel, const CVehicleColor& colVehicle)
 {
     if (usModel >= 400 && usModel <= 611)
     {
@@ -149,7 +149,7 @@ void CVehicleColorManager::AddColor(unsigned short usModel, const CVehicleColor&
     }
 }
 
-CVehicleColor CVehicleColorManager::GetRandomColor(unsigned short usModel)
+CVehicleColor CVehicleColorManager::GetRandomColor(std::uint16_t usModel)
 {
     if (usModel >= 400 && usModel <= 611)
     {

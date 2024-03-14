@@ -19,7 +19,7 @@ auto GetFileHashString(const FileHash& hash) -> std::string
 
     for (size_t i = 0; i < hash.size(); ++i)
     {
-        unsigned char value = hash[i];
+        std::uint8_t value = hash[i];
         buffer[(i * 2) + 0] = hexCharset[(value >> 4) & 0xF];
         buffer[(i * 2) + 1] = hexCharset[(value >> 0) & 0xF];
     }

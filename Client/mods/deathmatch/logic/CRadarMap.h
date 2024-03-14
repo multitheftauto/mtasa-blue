@@ -83,8 +83,8 @@ private:
     CTextureItem*              m_pLocalPlayerBlip;
     std::vector<CTextureItem*> m_MarkerTextureList;
 
-    unsigned int m_uiHeight;
-    unsigned int m_uiWidth;
+    std::uint32_t m_uiHeight;
+    std::uint32_t m_uiWidth;
 
     float m_fMapSize;
     int   m_iMapMinX;

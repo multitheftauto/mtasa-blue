@@ -48,9 +48,9 @@ private:
     CXMLNode*             CreateSetting(CXMLNode* pDst, const char* szSetting, const char* szContent);
     CSettings::AccessType GetAccessType(char cCharacter);
     bool                  HasPrefix(char cCharacter);
-    const char*           GetResourceName(const char* szSetting, char* szBuffer, unsigned int uiLength);
+    const char*           GetResourceName(const char* szSetting, char* szBuffer, std::uint32_t uiLength);
     bool                  HasResourceName(const char* szSetting);
-    const char*           GetName(const char* szSetting, unsigned int uiResourceLength = -1);
+    const char*           GetName(const char* szSetting, std::uint32_t uiResourceLength = -1);
 
     SString   m_strPath;
     CXMLFile* m_pFile;

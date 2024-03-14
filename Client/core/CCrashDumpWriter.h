@@ -58,5 +58,5 @@ public:
     static void        FreeMemoryForCrashDumpProcessing();
     static void        SetHandlers();
     static void        UpdateCounters();
-    static void        HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved);
+    static void        HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, std::uint32_t line, uintptr_t pReserved);
 };

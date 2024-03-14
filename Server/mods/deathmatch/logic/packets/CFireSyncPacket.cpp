@@ -38,13 +38,13 @@ bool CFireSyncPacket::Write(NetBitStreamInterface& BitStream) const
         ElementID ID = m_pSourceElement->GetID();
         BitStream.Write(ID);
 
-        unsigned short usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        std::uint16_t usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
         BitStream.WriteCompressed(usLatency);
     }
     else
     {
         BitStream.Write(static_cast<ElementID>(INVALID_ELEMENT_ID));
-        BitStream.WriteCompressed(static_cast<unsigned short>(0));
+        BitStream.WriteCompressed(static_cast<std::uint16_t>(0));
     }
 
     // Write position and size

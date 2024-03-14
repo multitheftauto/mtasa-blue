@@ -47,7 +47,7 @@ DWORD C3DMarkerSA::GetType()
 
 void C3DMarkerSA::SetType(DWORD dwType)
 {
-    GetInterface()->m_nType = (unsigned short)(dwType);
+    GetInterface()->m_nType = (std::uint16_t)(dwType);
 }
 
 bool C3DMarkerSA::IsActive()

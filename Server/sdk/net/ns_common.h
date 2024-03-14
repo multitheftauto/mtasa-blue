@@ -32,7 +32,7 @@ typedef struct __static_server_data_t
 {
 } static_server_data_t, *pstatic_server_data_t;
 
-typedef bool (*PPACKETHANDLER)(unsigned char, const NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo*);
+typedef bool (*PPACKETHANDLER)(std::uint8_t, const NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo*);
 
 enum NetServerPacketPriority
 {
@@ -96,8 +96,8 @@ struct NetRawStatistics
 struct NetStatistics
 {
     // Needed for getNetworkStats()
-    unsigned long long bytesReceived;
-    unsigned long long bytesSent;
+    std::uint64_t bytesReceived;
+    std::uint64_t bytesSent;
     uint               packetsReceived;
     uint               packetsSent;
     float              packetlossTotal;

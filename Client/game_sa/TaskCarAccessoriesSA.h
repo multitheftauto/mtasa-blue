@@ -40,8 +40,8 @@ public:
     CVehicleSAInterface*          m_pTargetVehicle;
     CTaskUtilityLineUpPedWithCar* m_pUtility;
     bool                          m_bWarpingInToCar;
-    unsigned char                 m_nDoorFlagsToClear;
-    unsigned char                 m_nNumGettingInToClear;
+    std::uint8_t                 m_nDoorFlagsToClear;
+    std::uint8_t                 m_nNumGettingInToClear;
 };
 
 class CTaskSimpleCarSetPedInAsDriverSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedInAsDriver
@@ -51,8 +51,8 @@ public:
     CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTargetVehicle, CTaskUtilityLineUpPedWithCar* pUtility);
 
     void SetIsWarpingPedIntoCar();
-    void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear);
-    void SetNumGettingInToClear(const unsigned char nNumGettingInToClear);
+    void SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear);
+    void SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear);
 };
 
 // ##############################################################################
@@ -69,8 +69,8 @@ public:
     int                           m_iTargetDoor;
     CTaskUtilityLineUpPedWithCar* m_pUtility;
     bool                          m_bWarpingInToCar;
-    unsigned char                 m_nDoorFlagsToClear;
-    unsigned char                 m_nNumGettingInToClear;
+    std::uint8_t                 m_nDoorFlagsToClear;
+    std::uint8_t                 m_nNumGettingInToClear;
 };
 
 class CTaskSimpleCarSetPedInAsPassengerSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedInAsPassenger
@@ -80,8 +80,8 @@ public:
     CTaskSimpleCarSetPedInAsPassengerSA(CVehicle* pTargetVehicle, int iTargetDoor, CTaskUtilityLineUpPedWithCar* pUtility);
 
     void SetIsWarpingPedIntoCar();
-    void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear);
-    void SetNumGettingInToClear(const unsigned char nNumGettingInToClear);
+    void SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear);
+    void SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear);
 };
 
 // ##############################################################################
@@ -98,8 +98,8 @@ public:
     bool                 m_bWarpingOutOfCar;
     bool                 m_bFallingOutOfCar;            // jumping or falling off car or bike
     bool                 m_bKnockedOffBike;
-    unsigned char        m_nDoorFlagsToClear;
-    unsigned char        m_nNumGettingInToClear;
+    std::uint8_t        m_nDoorFlagsToClear;
+    std::uint8_t        m_nNumGettingInToClear;
 };
 
 class CTaskSimpleCarSetPedOutSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedOut
@@ -110,7 +110,7 @@ public:
 
     void SetIsWarpingPedOutOfCar();
     void SetKnockedOffBike();
-    void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear);
-    void SetNumGettingInToClear(const unsigned char nNumGettingInToClear);
+    void SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear);
+    void SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear);
     void PositionPedOutOfCollision(CPed* ped, CVehicle* vehicle, int nDoor);
 };

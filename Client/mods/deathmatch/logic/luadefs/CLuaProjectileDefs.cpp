@@ -49,12 +49,12 @@ int CLuaProjectileDefs::CreateProjectile(lua_State* luaVM)
 {
     CVector          vecOrigin;
     CClientEntity*   pCreator = NULL;
-    unsigned char    ucWeaponType = 0;
+    std::uint8_t    ucWeaponType = 0;
     CScriptArgReader argStream(luaVM);
     float            fForce = 1.0f;
     CClientEntity*   pTarget = NULL;
     CVector          vecRotation, vecMoveSpeed;
-    unsigned short   usModel = 0;
+    std::uint16_t   usModel = 0;
     argStream.ReadUserData(pCreator);
     if (pCreator)
         pCreator->GetPosition(vecOrigin);
@@ -106,7 +106,7 @@ int CLuaProjectileDefs::GetProjectileType(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucWeapon = pProjectile->GetWeaponType();
+        std::uint8_t ucWeapon = pProjectile->GetWeaponType();
         lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeapon));
         return 1;
     }
@@ -125,7 +125,7 @@ int CLuaProjectileDefs::GetProjectileTarget(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucWeapon = pProjectile->GetWeaponType();
+        std::uint8_t ucWeapon = pProjectile->GetWeaponType();
         if (ucWeapon == WEAPONTYPE_ROCKET_HS)
         {
             lua_pushelement(luaVM, pProjectile->GetTargetEntity());

@@ -108,7 +108,7 @@ void CObjectRPCs::SetObjectVisibleInAllDimensions(CClientEntity* pSource, NetBit
     if (pObject)
     {
         bool           bVisible;
-        unsigned short usNewDimension;
+        std::uint16_t usNewDimension;
 
         bitStream.ReadBit(bVisible);
         bitStream.Read(usNewDimension);

@@ -87,7 +87,7 @@ public:
 
     std::unique_ptr<CAnimBlendHierarchy> GetAnimation(int ID);
     std::unique_ptr<CAnimBlendHierarchy> GetAnimation(const char* szName, std::unique_ptr<CAnimBlock>& pBlock);
-    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(unsigned int uiIndex, std::unique_ptr<CAnimBlock>& pBlock);
+    std::unique_ptr<CAnimBlendHierarchy> GetAnimation(std::uint32_t uiIndex, std::unique_ptr<CAnimBlock>& pBlock);
 
     std::unique_ptr<CAnimBlock> GetAnimationBlock(int ID);
     std::unique_ptr<CAnimBlock> GetAnimationBlock(const char* szName);

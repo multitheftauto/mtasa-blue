@@ -42,7 +42,7 @@ public:
 
     bool Delete(const char* szName);
 
-    unsigned short CountOnlySynchronized();
+    std::uint16_t CountOnlySynchronized();
 
     CXMLNode* OutputToXML(CXMLNode* pNode);
 

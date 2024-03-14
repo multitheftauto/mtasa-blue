@@ -37,11 +37,11 @@ public:
 
     bool Load(bool isRaw, SString input);
 
-    bool ReplaceModel(unsigned short usModel, bool bAlphaTransparency);
+    bool ReplaceModel(std::uint16_t usModel, bool bAlphaTransparency);
 
-    bool HasReplaced(unsigned short usModel);
+    bool HasReplaced(std::uint16_t usModel);
 
-    void RestoreModel(unsigned short usModel);
+    void RestoreModel(std::uint16_t usModel);
     void RestoreModels();
 
     static bool IsDFFData(const SString& strData);
@@ -55,9 +55,9 @@ private:
     bool LoadFromFile(SString filePath);
     bool LoadFromBuffer(SString buffer);
 
-    bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
+    bool DoReplaceModel(std::uint16_t usModel, bool bAlphaTransparency);
     void UnloadDFF();
-    void InternalRestoreModel(unsigned short usModel);
+    void InternalRestoreModel(std::uint16_t usModel);
 
     bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
     bool ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
@@ -73,5 +73,5 @@ private:
     bool                               m_bIsRawData = false;
     std::map<ushort, SLoadedClumpInfo> m_LoadedClumpInfoMap;
 
-    std::list<unsigned short> m_Replaced;
+    std::list<std::uint16_t> m_Replaced;
 };

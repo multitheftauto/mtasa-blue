@@ -24,7 +24,7 @@ class CFxSystemSA;
 class CFxMemoryPoolSAInterface
 {
     void*        pData;
-    unsigned int uiSize;
+    std::uint32_t uiSize;
     int          unk;
 };
 
@@ -34,18 +34,18 @@ public:
     // List_c<FxSystemBP_c>
     CFxSystemBPSAInterface* pFirstFxBlueprint;              // 0x00
     CFxSystemBPSAInterface* pUnknownFxBlueprint;            // 0x04
-    unsigned int            uiBlueprintCount;               // 0x08
+    std::uint32_t            uiBlueprintCount;               // 0x08
 
     // List_c<FxSystem_c>
     CFxSystemSAInterface* pFirstFxSystem;              // 0x0C
     CFxSystemSAInterface* pUnknownFxSystem;            // 0x10
-    unsigned int          uiFxSystemCount;             // 0x14
+    std::uint32_t          uiFxSystemCount;             // 0x14
 
     void* pUnk;
     // List_c<FxEmitter_c>
     CFxEmitterSAInterface* pFirstFxEmitter;              // 0x18
     CFxEmitterSAInterface* pUnknownFxEmitter;            // 0x1C
-    unsigned int           uiFxEmitterCount;             // 0x20
+    std::uint32_t           uiFxEmitterCount;             // 0x20
 
     int                      iTxdSlot;                     // 0x24
     CVector*                 pvecWindDirection;            // 0x28
@@ -62,7 +62,7 @@ class CFxManagerSA : public CFxManager
 public:
     CFxManagerSA(CFxManagerSAInterface* pInterface) { m_pInterface = pInterface; }
     // CFxManager interface
-    CFxSystem*              CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, unsigned char bSkipCameraFrustumCheck,
+    CFxSystem*              CreateFxSystem(const char* szBlueprint, const CVector& vecPosition, RwMatrix* pRwMatrixTag, std::uint8_t bSkipCameraFrustumCheck,
                                            bool bSoundEnable);
     void                    DestroyFxSystem(CFxSystem* pFxSystem);
     void                    OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSystemSAInterface);

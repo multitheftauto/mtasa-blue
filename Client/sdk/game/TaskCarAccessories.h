@@ -21,8 +21,8 @@ public:
     virtual ~CTaskSimpleCarSetPedInAsDriver(){};
 
     virtual void SetIsWarpingPedIntoCar() = 0;
-    virtual void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear) = 0;
-    virtual void SetNumGettingInToClear(const unsigned char nNumGettingInToClear) = 0;
+    virtual void SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear) = 0;
+    virtual void SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear) = 0;
 };
 
 class CTaskSimpleCarSetPedOut : public virtual CTaskSimple
@@ -32,8 +32,8 @@ public:
 
     virtual void SetIsWarpingPedOutOfCar() = 0;
     virtual void SetKnockedOffBike() = 0;
-    virtual void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear) = 0;
-    virtual void SetNumGettingInToClear(const unsigned char nNumGettingInToClear) = 0;
+    virtual void SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear) = 0;
+    virtual void SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear) = 0;
     virtual void PositionPedOutOfCollision(CPed* ped, CVehicle* vehicle, int nDoor) = 0;
 };
 
@@ -43,6 +43,6 @@ public:
     virtual ~CTaskSimpleCarSetPedInAsPassenger(){};
 
     virtual void SetIsWarpingPedIntoCar() = 0;
-    virtual void SetDoorFlagsToClear(const unsigned char nDoorFlagsToClear) = 0;
-    virtual void SetNumGettingInToClear(const unsigned char nNumGettingInToClear) = 0;
+    virtual void SetDoorFlagsToClear(const std::uint8_t nDoorFlagsToClear) = 0;
+    virtual void SetNumGettingInToClear(const std::uint8_t nNumGettingInToClear) = 0;
 };

@@ -52,7 +52,7 @@ public:
     void                     SetSourceSocket(const NetServerPlayerID& Source) { m_Source = Source; };
     const NetServerPlayerID& GetSourceSocket() const { return m_Source; };
     unsigned long            GetSourceIP() const { return m_Source.GetBinaryAddress(); };
-    unsigned short           GetSourcePort() const { return m_Source.GetPort(); };
+    std::uint16_t           GetSourcePort() const { return m_Source.GetPort(); };
 
 protected:
     CElement*         m_pSourceElement;

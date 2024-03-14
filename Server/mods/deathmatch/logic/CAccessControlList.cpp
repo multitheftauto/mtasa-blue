@@ -51,7 +51,7 @@ CAccessControlListRight* CAccessControlList::AddRight(const char* szRightName, C
 
 CAccessControlListRight* CAccessControlList::GetRight(const char* szRightName, CAccessControlListRight::ERightType eRightType)
 {
-    unsigned int uiHash = HashString(szRightName);
+    std::uint32_t uiHash = HashString(szRightName);
 
     std::list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
     for (; iter != m_Rights.end(); iter++)
@@ -71,7 +71,7 @@ CAccessControlListRight* CAccessControlList::GetRight(const char* szRightName, C
 
 bool CAccessControlList::RemoveRight(const char* szRightName, CAccessControlListRight::ERightType eRightType)
 {
-    unsigned int uiHash = HashString(szRightName);
+    std::uint32_t uiHash = HashString(szRightName);
 
     std::list<CAccessControlListRight*>::iterator iter = m_Rights.begin();
     for (; iter != m_Rights.end(); iter++)

@@ -154,7 +154,7 @@ void CClientVariables::Set(const std::string& strVariable, CColor val)
         return;
     m_iRevision++;
 
-    ss << (unsigned int)val.R << " " << (unsigned int)val.G << " " << (unsigned int)val.B << " " << (unsigned int)val.A;
+    ss << (std::uint32_t)val.R << " " << (std::uint32_t)val.G << " " << (std::uint32_t)val.B << " " << (std::uint32_t)val.A;
 
     std::string strVal = ss.str();
     const char* szVal = strVal.c_str();

@@ -35,7 +35,7 @@ public:
 
     bool Delete(const std::string& strTable, const std::string& strWhere);
     bool Insert(const std::string& strTable, const std::string& strValues, const std::string& strColumns);
-    bool Select(const std::string& strColumns, const std::string& strTable, const std::string& strWhere, unsigned int uiLimit, CRegistryResult* pResult);
+    bool Select(const std::string& strColumns, const std::string& strTable, const std::string& strWhere, std::uint32_t uiLimit, CRegistryResult* pResult);
     bool Update(const std::string& strTable, const std::string& strSet, const std::string& strWhere);
 
     bool Query(const std::string& strQuery, class CLuaArguments* pArgs, CRegistryResult* pResult);
@@ -82,7 +82,7 @@ struct CRegistryResultCell
         pVal = NULL;
         if ((nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.pVal && nLength > 0)
         {
-            pVal = new unsigned char[nLength];
+            pVal = new std::uint8_t[nLength];
             memcpy(pVal, cell.pVal, nLength);
         }
     };
@@ -104,7 +104,7 @@ struct CRegistryResultCell
         pVal = NULL;
         if ((nType == SQLITE_BLOB || nType == SQLITE_TEXT) && cell.pVal && nLength > 0)
         {
-            pVal = new unsigned char[nLength];
+            pVal = new std::uint8_t[nLength];
             memcpy(pVal, cell.pVal, nLength);
         }
         return *this;
@@ -131,7 +131,7 @@ struct CRegistryResultCell
                             //    (includes zero terminator if TEXT)
     long long int  nVal;
     float          fVal;
-    unsigned char* pVal;
+    std::uint8_t* pVal;
 };
 
 typedef std::vector<CRegistryResultCell>              CRegistryResultRow;

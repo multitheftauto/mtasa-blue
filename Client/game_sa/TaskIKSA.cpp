@@ -52,7 +52,7 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, 
     }
 }
 
-CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso,
+CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, std::uint8_t useTorso,
                                              float speed, int blendTime, int m_priority)
 {
     DWORD dwFunc = FUNC_CTaskSimpleIKLookAt__Constructor;
@@ -125,7 +125,7 @@ void CTaskSimpleIKManagerSA::BlendOut(int slotID, int blendOutTime)
     // TODO: fill me
 }
 
-unsigned char CTaskSimpleIKManagerSA::IsSlotEmpty(int slotID)
+std::uint8_t CTaskSimpleIKManagerSA::IsSlotEmpty(int slotID)
 {
     CTaskSimpleIKManagerSAInterface* pInterface = (CTaskSimpleIKManagerSAInterface*)GetInterface();
     return (!pInterface->m_pIKChainTasks[slotID]);
@@ -144,7 +144,7 @@ CTaskSimpleIKChain* CTaskSimpleIKManagerSA::GetTaskAtSlot(int slotID)
     return NULL;
 }
 
-CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso, float speed,
+CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, std::uint8_t useTorso, float speed,
                                                        int blendTime, int priority)
 {
     DWORD dwFunc = FUNC_CTaskSimpleTriggerLookAt__Constructor;

@@ -135,7 +135,7 @@ public:
 
     void SetAllBindStates(bool bState, KeyBindType onlyType = KeyBindType::UNDEFINED) override;
 
-    unsigned int Count(KeyBindType bindType = KeyBindType::UNDEFINED);
+    std::uint32_t Count(KeyBindType bindType = KeyBindType::UNDEFINED);
 
     bool ControlForwardsBackWards(CControllerState& cs);
     bool ControlLeftAndRight(CControllerState& cs);

@@ -12,7 +12,7 @@
 #include "D3DResourceSystemSA.h"
 
 static bool&               D3DResourceSystem_UseD3DResourceBuffering = *(bool*)0x8D6084;
-static unsigned int&       D3DResourceSystem_FreeTextureBufferIndex = *(unsigned int*)0xC87C60;
+static std::uint32_t&       D3DResourceSystem_FreeTextureBufferIndex = *(std::uint32_t*)0xC87C60;
 static D3DTextureBuffer&   D3DResourceSystem_TextureBuffer = *(D3DTextureBuffer*)0xC87C68;
 static D3DIndexDataBuffer& D3DResourceSystem_IndexDataBuffer = *(D3DIndexDataBuffer*)0xC87E48;
 

@@ -25,7 +25,7 @@
 
 #define NET_INVALID_PACKET_ID       255
 
-typedef bool (*PPACKETHANDLER)(unsigned char, NetBitStreamInterface&);
+typedef bool (*PPACKETHANDLER)(std::uint8_t, NetBitStreamInterface&);
 
 enum NetPacketPriority
 {
@@ -89,8 +89,8 @@ struct NetRawStatistics
 struct NetStatistics
 {
     // Needed for getNetworkStats()
-    unsigned long long bytesReceived;
-    unsigned long long bytesSent;
+    std::uint64_t bytesReceived;
+    std::uint64_t bytesSent;
     uint               packetsReceived;
     uint               packetsSent;
     float              packetlossTotal;

@@ -146,10 +146,10 @@ public:
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);
     bool  HasSkyColor();
-    void  GetSkyColor(unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen,
-                      unsigned char& BottomBlue);
-    void  SetSkyColor(unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen,
-                      unsigned char BottomBlue);
+    void  GetSkyColor(std::uint8_t& TopRed, std::uint8_t& TopGreen, std::uint8_t& TopBlue, std::uint8_t& BottomRed, std::uint8_t& BottomGreen,
+                      std::uint8_t& BottomBlue);
+    void  SetSkyColor(std::uint8_t TopRed, std::uint8_t TopGreen, std::uint8_t TopBlue, std::uint8_t BottomRed, std::uint8_t BottomGreen,
+                      std::uint8_t BottomBlue);
     void  SetHeatHaze(const SHeatHazeSettings& settings);
     void  GetHeatHaze(SHeatHazeSettings& settings);
     void  ResetColorFilter();
@@ -183,10 +183,10 @@ public:
     float GetFogDistance();
     void  SetFogDistance(float fDistance);
     void  RestoreFogDistance();
-    void  GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed, unsigned char& ucCoronaGreen,
-                      unsigned char& ucCoronaBlue);
-    void  SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed, unsigned char ucCoronaGreen,
-                      unsigned char ucCoronaBlue);
+    void  GetSunColor(std::uint8_t& ucCoreRed, std::uint8_t& ucCoreGreen, std::uint8_t& ucCoreBlue, std::uint8_t& ucCoronaRed, std::uint8_t& ucCoronaGreen,
+                      std::uint8_t& ucCoronaBlue);
+    void  SetSunColor(std::uint8_t ucCoreRed, std::uint8_t ucCoreGreen, std::uint8_t ucCoreBlue, std::uint8_t ucCoronaRed, std::uint8_t ucCoronaGreen,
+                      std::uint8_t ucCoronaBlue);
     void  ResetSunColor();
     float GetSunSize();
     void  SetSunSize(float fSize);
@@ -229,14 +229,14 @@ public:
     float GetLocalPlayerGravity();
     void  SetLocalPlayerGravity(float fGravity);
 
-    unsigned char GetTrafficLightState();
-    void          SetTrafficLightState(unsigned char ucState);
+    std::uint8_t GetTrafficLightState();
+    void          SetTrafficLightState(std::uint8_t ucState);
 
     bool GetTrafficLightsLocked();
     void SetTrafficLightsLocked(bool bLocked);
 
-    void  SetLocalStatValue(unsigned short usStat, float fValue);
-    float GetLocalStatValue(unsigned short usStat);
+    void  SetLocalStatValue(std::uint16_t usStat, float fValue);
+    float GetLocalStatValue(std::uint16_t usStat);
     void  SetLocalStatsStatic(bool bStatic);
 
     void SetLocalCameraRotation(float fRotation);
@@ -298,9 +298,9 @@ public:
     eAnimID    GetLastStaticAnimationID() { return m_dwLastStaticAnimID; }
     DWORD      GetLastAnimArrayAddress() { return m_dwLastAnimArrayAddress; }
 
-    unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
-    unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
-    unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
+    std::uint32_t EntryInfoNodePool_NoOfUsedSpaces() const noexcept override;
+    std::uint32_t PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept override;
+    std::uint32_t PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept override;
 
     CVector      m_vecAkimboTarget;
     bool         m_bAkimboTargetUp;

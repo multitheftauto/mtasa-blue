@@ -51,7 +51,7 @@ CNodeAddress* CTaskComplexWanderSA::GetLastNode()
 // ## Purpose: Standard class used for making normal peds wander around
 // ##############################################################################
 
-CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly)
+CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState, const std::uint8_t iDir, const bool bWanderSensibly)
 {
     CreateTaskInterface(sizeof(CTaskComplexWanderStandardSAInterface));
     if (!IsValid())

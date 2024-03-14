@@ -13,10 +13,10 @@
 
 struct SSimVehicleDamageInfo
 {
-    SFixedArray<unsigned char, MAX_DOORS>  m_ucDoorStates;
-    SFixedArray<unsigned char, MAX_WHEELS> m_ucWheelStates;
-    SFixedArray<unsigned char, MAX_PANELS> m_ucPanelStates;
-    SFixedArray<unsigned char, MAX_LIGHTS> m_ucLightStates;
+    SFixedArray<std::uint8_t, MAX_DOORS>  m_ucDoorStates;
+    SFixedArray<std::uint8_t, MAX_WHEELS> m_ucWheelStates;
+    SFixedArray<std::uint8_t, MAX_PANELS> m_ucPanelStates;
+    SFixedArray<std::uint8_t, MAX_LIGHTS> m_ucLightStates;
 };
 
 //
@@ -31,12 +31,12 @@ public:
 
     bool                                      IsJoined() { return m_bIsJoined; };
     const std::multimap<ushort, CSimPlayer*>& GetPuresyncSendList();
-    unsigned short                            GetBitStreamVersion() { return m_usBitStreamVersion; };
+    std::uint16_t                            GetBitStreamVersion() { return m_usBitStreamVersion; };
     NetServerPlayerID&                        GetSocket() { return m_PlayerSocket; };
 
     // General synced vars
     bool                               m_bIsJoined;
-    unsigned short                     m_usBitStreamVersion;
+    std::uint16_t                     m_usBitStreamVersion;
     NetServerPlayerID                  m_PlayerSocket;
     std::vector<CSimPlayer*>           m_PuresyncSendListFlat;
     std::multimap<ushort, CSimPlayer*> m_PuresyncSendListGrouped;            // Send list grouped by bitstream version

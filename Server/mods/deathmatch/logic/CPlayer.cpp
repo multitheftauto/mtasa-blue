@@ -257,7 +257,7 @@ const char* CPlayer::GetSourceIP()
     if (m_strIP.empty())
     {
         char           szIP[22];
-        unsigned short usPort;
+        std::uint16_t usPort;
         g_pNetServer->GetPlayerIP(m_PlayerSocket, szIP, &usPort);
         m_strIP = szIP;
     }
@@ -470,12 +470,12 @@ void CPlayer::RemoveAllSyncingObjects()
     }
 }
 
-bool CPlayer::SetScriptDebugLevel(unsigned int uiLevel)
+bool CPlayer::SetScriptDebugLevel(std::uint32_t uiLevel)
 {
     return m_pScriptDebugging->AddPlayer(*this, uiLevel);
 }
 
-void CPlayer::SetDamageInfo(ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart)
+void CPlayer::SetDamageInfo(ElementID ElementID, std::uint8_t ucWeapon, std::uint8_t ucBodyPart)
 {
     m_PlayerAttackerID = ElementID;
     m_ucAttackWeapon = ucWeapon;
@@ -500,13 +500,13 @@ ElementID CPlayer::GetPlayerAttacker()
     return m_PlayerAttackerID;
 }
 
-unsigned char CPlayer::GetAttackWeapon()
+std::uint8_t CPlayer::GetAttackWeapon()
 {
     ValidateDamageInfo();
     return m_ucAttackWeapon;
 }
 
-unsigned char CPlayer::GetAttackBodyPart()
+std::uint8_t CPlayer::GetAttackBodyPart()
 {
     ValidateDamageInfo();
     return m_ucAttackBodyPart;
@@ -571,7 +571,7 @@ void CPlayer::SetNametagText(const char* szText)
     }
 }
 
-void CPlayer::GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned char& ucB)
+void CPlayer::GetNametagColor(std::uint8_t& ucR, std::uint8_t& ucG, std::uint8_t& ucB)
 {
     // Is the nametag color overridden?
     if (m_bNametagColorOverridden)
@@ -598,7 +598,7 @@ void CPlayer::GetNametagColor(unsigned char& ucR, unsigned char& ucG, unsigned c
     }
 }
 
-void CPlayer::SetNametagOverrideColor(unsigned char ucR, unsigned char ucG, unsigned char ucB)
+void CPlayer::SetNametagOverrideColor(std::uint8_t ucR, std::uint8_t ucG, std::uint8_t ucB)
 {
     m_ucNametagR = ucR;
     m_ucNametagG = ucG;
@@ -1101,7 +1101,7 @@ void CPlayer::SetPosition(const CVector& vecPosition)
     CElement::SetPosition(vecPosition);
 }
 
-void CPlayer::SetPlayerStat(unsigned short usStat, float fValue)
+void CPlayer::SetPlayerStat(std::uint16_t usStat, float fValue)
 {
     m_pPlayerStatsPacket->Add(usStat, fValue);
     CPed::SetPlayerStat(usStat, fValue);

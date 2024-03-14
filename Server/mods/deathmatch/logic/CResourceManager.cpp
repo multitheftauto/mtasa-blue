@@ -318,9 +318,9 @@ void CResourceManager::CheckResourceDependencies()
 
 void CResourceManager::ListResourcesLoaded(const SString& strListType)
 {
-    unsigned int uiCount = 0;
-    unsigned int uiFailedCount = 0;
-    unsigned int uiRunningCount = 0;
+    std::uint32_t uiCount = 0;
+    std::uint32_t uiFailedCount = 0;
+    std::uint32_t uiRunningCount = 0;
     CLogger::LogPrintf("== Resource list ==\n");
     list<CResource*>::const_iterator iter = m_resources.begin();
     for (; iter != m_resources.end(); iter++)
@@ -472,7 +472,7 @@ CResource* CResourceManager::GetResourceFromScriptID(uint uiScriptID)
 }
 
 // Get net id for resource. (0xFFFF is never used)
-unsigned short CResourceManager::GenerateID()
+std::uint16_t CResourceManager::GenerateID()
 {
     static bool bHasWrapped = false;
 
@@ -488,7 +488,7 @@ unsigned short CResourceManager::GenerateID()
         return m_usNextNetId;
 
     // Find an unused ID
-    for (unsigned short i = 0; i < 0xFFFE; i++)
+    for (std::uint16_t i = 0; i < 0xFFFE; i++)
     {
         bool bFound = false;
         for (list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); iter++)
@@ -512,7 +512,7 @@ unsigned short CResourceManager::GenerateID()
     return 0xFFFE;
 }
 
-CResource* CResourceManager::GetResourceFromNetID(unsigned short usNetID)
+CResource* CResourceManager::GetResourceFromNetID(std::uint16_t usNetID)
 {
     CResource* pResource = MapFindRef(m_NetIdResourceMap, usNetID);
     if (pResource)
@@ -1203,7 +1203,7 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
 
     if (strInput[0] == ':')
     {
-        unsigned int iEnd = strInput.find_first_of("/");
+        std::uint32_t iEnd = strInput.find_first_of("/");
         if (iEnd)
         {
             std::string strResourceName = strInput.substr(1, iEnd - 1);

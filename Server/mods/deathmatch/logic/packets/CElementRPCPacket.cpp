@@ -22,7 +22,7 @@ bool CElementRPCPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_pSourceElement->GetID());
 
     // Copy each byte from the bitstream we have to this one
-    unsigned char ucTemp;
+    std::uint8_t ucTemp;
     int           iLength = m_BitStream.GetNumberOfBitsUsed();
     while (iLength > 8)
     {

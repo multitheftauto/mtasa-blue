@@ -98,12 +98,12 @@ int CLuaHandlingDefs::SetVehicleHandling(lua_State* luaVM)
                             }
                             break;
                         }
-                        case HANDLING_PERCENTSUBMERGED:            // unsigned int
+                        case HANDLING_PERCENTSUBMERGED:            // std::uint32_t
                         // case HANDLING_MONETARY:
                         case HANDLING_HANDLINGFLAGS:
                         case HANDLING_MODELFLAGS:
                         {
-                            unsigned int uiValue;
+                            std::uint32_t uiValue;
                             argStream.ReadNumber(uiValue);
                             if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, uiValue))
                             {
@@ -115,7 +115,7 @@ int CLuaHandlingDefs::SetVehicleHandling(lua_State* luaVM)
                         case HANDLING_NUMOFGEARS:
                         case HANDLING_ANIMGROUP:
                         {
-                            unsigned char ucValue;
+                            std::uint8_t ucValue;
                             argStream.ReadNumber(ucValue);
                             if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, ucValue))
                             {
@@ -213,7 +213,7 @@ int CLuaHandlingDefs::SetVehicleHandling(lua_State* luaVM)
 int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
 {
     //  bool setModelHandling ( int modelId, [ string property, var value ] )
-    unsigned short usModel;
+    std::uint16_t usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -276,12 +276,12 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                                     }
                                     break;
                                 }
-                                case HANDLING_PERCENTSUBMERGED:            // unsigned int
+                                case HANDLING_PERCENTSUBMERGED:            // std::uint32_t
                                 // case HANDLING_MONETARY:
                                 case HANDLING_HANDLINGFLAGS:
                                 case HANDLING_MODELFLAGS:
                                 {
-                                    unsigned int uiValue;
+                                    std::uint32_t uiValue;
                                     argStream.ReadNumber(uiValue);
                                     if (!argStream.HasErrors())
                                     {
@@ -300,7 +300,7 @@ int CLuaHandlingDefs::SetModelHandling(lua_State* luaVM)
                                 case HANDLING_NUMOFGEARS:
                                 case HANDLING_ANIMGROUP:
                                 {
-                                    unsigned char ucValue;
+                                    std::uint8_t ucValue;
                                     argStream.ReadNumber(ucValue);
                                     if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetModelHandling(eModel, eProperty, ucValue))
                                     {
@@ -555,7 +555,7 @@ int CLuaHandlingDefs::GetVehicleHandling(lua_State* luaVM)
 int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 {
     //  table getModelHandling ( int modelId )
-    unsigned short usModel;
+    std::uint16_t usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -728,7 +728,7 @@ int CLuaHandlingDefs::GetModelHandling(lua_State* luaVM)
 int CLuaHandlingDefs::GetOriginalHandling(lua_State* luaVM)
 {
     //  table getOriginalHandling ( int modelID )
-    unsigned short usModel;
+    std::uint16_t usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);

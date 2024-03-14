@@ -21,7 +21,7 @@ class CClientWaterManager
     friend class CClientWater;
 
 public:
-    unsigned int         Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t         Count() { return static_cast<std::uint32_t>(m_List.size()); };
     static CClientWater* Get(ElementID ID);
 
     void DeleteAll();
@@ -36,8 +36,8 @@ public:
     float GetWaveLevel();
     void  SetWaveLevel(float fWaveLevel);
 
-    unsigned short GetDimension() { return m_usDimension; };
-    void           SetDimension(unsigned short usDimension);
+    std::uint16_t GetDimension() { return m_usDimension; };
+    void           SetDimension(std::uint16_t usDimension);
 
     std::list<CClientWater*>::const_iterator IterBegin() { return m_List.begin(); };
     std::list<CClientWater*>::const_iterator IterEnd() { return m_List.end(); };
@@ -53,5 +53,5 @@ private:
 
     std::list<CClientWater*> m_List;
     bool                     m_bDontRemoveFromList;
-    unsigned short           m_usDimension;
+    std::uint16_t           m_usDimension;
 };

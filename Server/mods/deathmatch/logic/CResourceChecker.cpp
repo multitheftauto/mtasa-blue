@@ -202,12 +202,12 @@ void CResourceChecker::CheckPngFileForIssues(const string& strPath, const string
     if (FILE* pFile = File::Fopen(strPath.c_str(), "rb"))
     {
         // This is what the png header should look like
-        unsigned char pGoodHeaderPng[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+        std::uint8_t pGoodHeaderPng[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
         // Also allow jpg header as the client will load misnamed png files
-        unsigned char pGoodHeaderJpg[3] = {0xFF, 0xD8, 0xFF};
+        std::uint8_t pGoodHeaderJpg[3] = {0xFF, 0xD8, 0xFF};
 
         // Load the header
-        unsigned char pBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        std::uint8_t pBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         fread(pBuffer, 1, 8, pFile);
 
         // Check header integrity
@@ -502,7 +502,7 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
     bool bUTF8 = IsUTF8BOM(strLuaSource.c_str(), strLuaSource.length());
 
     // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
-    if (!bCompiledScript && !bUTF8 && GetUTF8Confidence((const unsigned char*)&strLuaSource.at(0), strLuaSource.length()) < 80)
+    if (!bCompiledScript && !bUTF8 && GetUTF8Confidence((const std::uint8_t*)&strLuaSource.at(0), strLuaSource.length()) < 80)
     {
         std::wstring strUTF16Script = ANSIToUTF16(strLuaSource);
 #ifdef WIN32
@@ -605,7 +605,7 @@ long CResourceChecker::FindLuaIdentifier(const char* szLuaSource, long* plOutLen
     for (long lPos = 0; szLuaSource[lPos]; lPos++)
     {
         const char*   pBufPos = szLuaSource + lPos;
-        unsigned char c = *pBufPos;
+        std::uint8_t c = *pBufPos;
 
         // Handle comments
         if (c == '-' && strncmp(pBufPos, "--[[", 4) == 0)
@@ -891,7 +891,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
             return 0;
         }
 
-        if ((unsigned int)unzGetGlobalComment(szip, glob_comment, glob_info.size_comment + 1) != glob_info.size_comment)
+        if ((std::uint32_t)unzGetGlobalComment(szip, glob_comment, glob_info.size_comment + 1) != glob_info.size_comment)
         {
             zipClose(dzip, NULL);
             unzClose(szip);
@@ -1061,7 +1061,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
 
             // read file
             int sz = unzReadCurrentFile(szip, buf, unzfi.compressed_size);
-            if ((unsigned int)sz != unzfi.compressed_size)
+            if ((std::uint32_t)sz != unzfi.compressed_size)
             {
                 free(extrafield);
                 free(commentary);

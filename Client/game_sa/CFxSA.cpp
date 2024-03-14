@@ -47,7 +47,7 @@ void CFxSA::AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, flo
     }
 }
 
-void CFxSA::AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, unsigned char ucBlurIf0, float fSpread,
+void CFxSA::AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, std::uint8_t ucBlurIf0, float fSpread,
                       float fLife)
 {
     CVector* pvecPosition = &vecPosition;

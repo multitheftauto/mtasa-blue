@@ -31,8 +31,8 @@ public:
     void SetPosition(const CVector& vecPosition);
 
     void SetColor(const SColor color);
-    void SetColorAlpha(unsigned char ucAlpha);
-    void SetShadowAlpha(unsigned char ucShadowAlpha);
+    void SetColorAlpha(std::uint8_t ucAlpha);
+    void SetShadowAlpha(std::uint8_t ucShadowAlpha);
 
     float GetScale() { return m_fScale; };
     void  SetScale(float fScale);
@@ -51,7 +51,7 @@ private:
     float   m_fScale;
 
     unsigned long m_ulFormat;
-    unsigned char m_ucShadowAlpha;
+    std::uint8_t m_ucShadowAlpha;
 
     static float m_fGlobalScale;
 };

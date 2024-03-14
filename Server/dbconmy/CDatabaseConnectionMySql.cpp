@@ -318,13 +318,13 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
                             }
                             else
                             {
-                                cell.pVal = new unsigned char[cell.nLength];
+                                cell.pVal = new std::uint8_t[cell.nLength];
                                 memcpy(cell.pVal, inData, cell.nLength);
                             }
                             break;
                         default:
                             cell.nLength = inLength + 1;
-                            cell.pVal = new unsigned char[cell.nLength];
+                            cell.pVal = new std::uint8_t[cell.nLength];
                             memcpy(cell.pVal, inData, cell.nLength);
                             break;
                     }

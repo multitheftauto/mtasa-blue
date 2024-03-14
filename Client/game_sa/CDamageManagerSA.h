@@ -54,9 +54,9 @@ public:
     void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);
     void          SetPanelStatus(unsigned long ulStatus);
     BYTE          GetLightStatus(BYTE bLight);
-    unsigned char GetLightStatus();
+    std::uint8_t GetLightStatus();
     void          SetLightStatus(BYTE bLight, BYTE bLightStatus);
-    void          SetLightStatus(unsigned char ucStatus);
+    void          SetLightStatus(std::uint8_t ucStatus);
     BYTE          GetAeroplaneCompStatus(BYTE CompID);
     void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status);
 

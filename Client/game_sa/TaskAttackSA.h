@@ -75,7 +75,7 @@ public:
     char  m_nFakeShootDirn;
     short m_nAttackTimer;
 
-    unsigned int m_nLOSCheckTime;
+    std::uint32_t m_nLOSCheckTime;
     bool         m_nLOSBlocked;
 
     float m_fAbortRange;            // range from target at which this task will be aborted
@@ -99,13 +99,13 @@ public:
 class CTaskSimpleUseGunSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    unsigned char m_bIsFinished;            // 0x08
-    unsigned char m_bIsInControl;
-    unsigned char m_bMoveControl;
-    unsigned char m_bFiredGun;
-    unsigned char m_bBlockedLOS;            // 0x0C
-    unsigned char m_nFireGunThisFrame;
-    unsigned char m_bSkipAim;            // 0x0E
+    std::uint8_t m_bIsFinished;            // 0x08
+    std::uint8_t m_bIsInControl;
+    std::uint8_t m_bMoveControl;
+    std::uint8_t m_bFiredGun;
+    std::uint8_t m_bBlockedLOS;            // 0x0C
+    std::uint8_t m_nFireGunThisFrame;
+    std::uint8_t m_bSkipAim;            // 0x0E
 
     char      m_nNextCommand;
     char      m_nLastCommand;            // active command       (2 or 3) == is firing
@@ -120,18 +120,18 @@ public:
     short        m_nBurstLength;            // 0x34
     short        m_nBurstShots;
 
-    unsigned char m_nCountDownFrames;
-    unsigned char m_armIkInUse;
-    unsigned char m_lookIkInUse;
+    std::uint8_t m_nCountDownFrames;
+    std::uint8_t m_armIkInUse;
+    std::uint8_t m_lookIkInUse;
 
-    unsigned char m_bAimImmediate;
+    std::uint8_t m_bAimImmediate;
 };
 
 class CTaskSimpleUseGunSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleUseGun
 {
 public:
     CTaskSimpleUseGunSA(){};
-    CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1, unsigned char bAimImmediate = false);
+    CTaskSimpleUseGunSA(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1, std::uint8_t bAimImmediate = false);
 
     bool ControlGun(CPed* pPed, CEntity* pTargetEntity, char nCommand);
     bool ControlGunMove(CVector2D* pMoveVec);
@@ -158,7 +158,7 @@ public:
     void        SetBurstLength(short);
     void        SetMoveAnim(CPed* pPed);
     void        StartAnim(CPed* pPed);
-    void        StartCountDown(unsigned char, bool);
+    void        StartCountDown(std::uint8_t, bool);
 };
 
 class CTaskSimpleFightSAInterface : public CTaskSimpleSAInterface
@@ -170,8 +170,8 @@ public:
     bool         m_bAnimsReferenced;
     AssocGroupId m_nRequiredAnimGroup;
 
-    unsigned short m_nIdlePeriod;
-    unsigned short m_nIdleCounter;
+    std::uint16_t m_nIdlePeriod;
+    std::uint16_t m_nIdleCounter;
     char           m_nContinueStrike;
     char           m_nChainCounter;
 
@@ -189,5 +189,5 @@ class CTaskSimpleFightSA : public virtual CTaskSimpleSA, public virtual CTaskSim
 {
 public:
     CTaskSimpleFightSA(){};
-    CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
+    CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, std::uint32_t nIdlePeriod = 10000);
 };

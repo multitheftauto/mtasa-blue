@@ -237,7 +237,7 @@ void CPerfStatManagerImpl::GetStats(CPerfStatResult* pResult, const SString& str
     {
         std::vector<SString> strParts;
         strOptions.Split(",", strParts);
-        for (unsigned int i = 0; i < strParts.size(); i++)
+        for (std::uint32_t i = 0; i < strParts.size(); i++)
             MapSet(strOptionMap, strParts[i], 1);
     }
 

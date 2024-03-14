@@ -20,14 +20,14 @@ CPlayerTasks::CPlayerTasks()
 
 CPlayerTasks::~CPlayerTasks()
 {
-    unsigned int i;
+    std::uint32_t i;
     for (i = 0; i < TASK_PRIORITY_MAX; i++)
         delete m_PriorityTasks[i];
     for (i = 0; i < TASK_SECONDARY_MAX; i++)
         delete m_SecondaryTasks[i];
 }
 
-CPlayerTask* CPlayerTasks::GetPriorityTask(unsigned int uiTaskType)
+CPlayerTask* CPlayerTasks::GetPriorityTask(std::uint32_t uiTaskType)
 {
     if (uiTaskType < TASK_PRIORITY_MAX)
     {
@@ -37,7 +37,7 @@ CPlayerTask* CPlayerTasks::GetPriorityTask(unsigned int uiTaskType)
     return NULL;
 }
 
-bool CPlayerTasks::SetPriorityTask(unsigned int uiTaskType, CPlayerTask* pTask)
+bool CPlayerTasks::SetPriorityTask(std::uint32_t uiTaskType, CPlayerTask* pTask)
 {
     if (uiTaskType < TASK_PRIORITY_MAX)
     {
@@ -55,7 +55,7 @@ bool CPlayerTasks::SetPriorityTask(unsigned int uiTaskType, CPlayerTask* pTask)
     return false;
 }
 
-CPlayerTask* CPlayerTasks::GetSecondaryTask(unsigned int uiTaskType)
+CPlayerTask* CPlayerTasks::GetSecondaryTask(std::uint32_t uiTaskType)
 {
     if (uiTaskType < TASK_SECONDARY_MAX)
     {
@@ -65,7 +65,7 @@ CPlayerTask* CPlayerTasks::GetSecondaryTask(unsigned int uiTaskType)
     return NULL;
 }
 
-bool CPlayerTasks::SetSecondaryTask(unsigned int uiTaskType, CPlayerTask* pTask)
+bool CPlayerTasks::SetSecondaryTask(std::uint32_t uiTaskType, CPlayerTask* pTask)
 {
     if (uiTaskType < TASK_SECONDARY_MAX)
     {

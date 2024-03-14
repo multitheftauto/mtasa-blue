@@ -274,7 +274,7 @@ int CLuaResourceDefs::addResourceMap(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, "addResourceMap may be using an outdated syntax. Please check and update.");
 
     SString        strMapName;
-    unsigned short usDimension;
+    std::uint16_t usDimension;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strMapName);
@@ -668,7 +668,7 @@ int CLuaResourceDefs::getResourceFromName(lua_State* luaVM)
 
 int CLuaResourceDefs::getResources(lua_State* luaVM)
 {
-    unsigned int uiIndex = 0;
+    std::uint32_t uiIndex = 0;
     lua_newtable(luaVM);
     list<CResource*>::const_iterator iter = m_pResourceManager->IterBegin();
     for (; iter != m_pResourceManager->IterEnd(); ++iter)
@@ -1062,7 +1062,7 @@ int CLuaResourceDefs::getResourceExportedFunctions(lua_State* luaVM)
         }
 
         lua_newtable(luaVM);
-        unsigned int                      uiIndex = 0;
+        std::uint32_t                      uiIndex = 0;
         list<CExportedFunction>::iterator iterd = pResource->IterBeginExportedFunctions();
         for (; iterd != pResource->IterEndExportedFunctions(); ++iterd)
         {

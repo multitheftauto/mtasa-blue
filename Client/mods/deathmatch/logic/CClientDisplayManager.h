@@ -28,7 +28,7 @@ public:
 
     void DoPulse();
 
-    unsigned int    Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t    Count() { return static_cast<std::uint32_t>(m_List.size()); };
     CClientDisplay* Get(unsigned long ulID);
 
     void DrawText2D(const char* szCaption, const CVector& vecPosition, float fScale = 1.0f, RGBA rgbaColor = 0xFFFFFFFF);

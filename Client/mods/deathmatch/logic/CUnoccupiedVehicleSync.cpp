@@ -28,7 +28,7 @@ CUnoccupiedVehicleSync::~CUnoccupiedVehicleSync()
 {
 }
 
-bool CUnoccupiedVehicleSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& BitStream)
+bool CUnoccupiedVehicleSync::ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& BitStream)
 {
     switch (ucPacketID)
     {

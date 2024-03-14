@@ -34,7 +34,7 @@ public:
     virtual ~CClientMarkerCommon();
 
     virtual void         DoPulse();
-    virtual unsigned int GetMarkerType() const = 0;
+    virtual std::uint32_t GetMarkerType() const = 0;
 
     virtual bool IsHit(const CVector& vecPosition) const = 0;
     bool         IsHit(CClientEntity* pEntity) const;

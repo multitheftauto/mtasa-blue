@@ -42,13 +42,13 @@ public:
     virtual CWeaponInfo* GetInfo(eWeaponSkill skill) = 0;
     virtual void         Remove() = 0;
     virtual void         Destroy() = 0;
-    virtual void         Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed) = 0;
+    virtual void         Initialize(eWeaponType type, std::uint32_t uiAmmo, CPed* pPed) = 0;
     virtual void         Update(CPed* pPed) = 0;
     virtual bool         Fire(CEntity* pFiringEntity, CVector* pvecOrigin, CVector* pvecOffset, CEntity* pTargetEntity, CVector* pvec_1, CVector* pvec2) = 0;
     virtual void         AddGunshell(CEntity* pFiringEntity, CVector* pvecOrigin, CVector2D* pvecDirection, float fSize) = 0;
     virtual void DoBulletImpact(CEntity* pFiringEntity, CEntitySAInterface* pEntityInterface, CVector* pvecOrigin, CVector* pvecTarget, CColPoint* pColPoint,
                                 int i_1) = 0;
-    virtual unsigned char GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone,
+    virtual std::uint8_t GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone,
                                               int i_2) = 0;
     virtual bool          ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
                                              const SLineOfSightFlags flags, SLineOfSightBuildingResult* pBuildingResult, eWeaponType weaponType,

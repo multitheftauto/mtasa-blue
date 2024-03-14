@@ -98,21 +98,21 @@ public:
 
     bool          IsWideScreenEnabled();
     void          SetWideScreenEnabled(bool bEnabled);
-    unsigned int  GetNumVideoModes();
-    VideoMode*    GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex);
-    unsigned int  GetCurrentVideoMode();
-    void          SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart);
-    unsigned int  GetNumAdapters();
-    unsigned int  GetCurrentAdapter();
-    void          SetAdapter(unsigned int uiAdapterIndex);
+    std::uint32_t  GetNumVideoModes();
+    VideoMode*    GetVideoModeInfo(VideoMode* modeInfo, std::uint32_t modeIndex);
+    std::uint32_t  GetCurrentVideoMode();
+    void          SetCurrentVideoMode(std::uint32_t modeIndex, bool bOnRestart);
+    std::uint32_t  GetNumAdapters();
+    std::uint32_t  GetCurrentAdapter();
+    void          SetAdapter(std::uint32_t uiAdapterIndex);
     bool          HasUnsafeResolutions();
     bool          IsUnsafeResolution(int iWidth, int iHeight);
-    unsigned char GetRadioVolume();
-    void          SetRadioVolume(unsigned char ucVolume);
-    unsigned char GetSFXVolume();
-    void          SetSFXVolume(unsigned char ucVolume);
-    unsigned int  GetUsertrackMode();
-    void          SetUsertrackMode(unsigned int uiMode);
+    std::uint8_t GetRadioVolume();
+    void          SetRadioVolume(std::uint8_t ucVolume);
+    std::uint8_t GetSFXVolume();
+    void          SetSFXVolume(std::uint8_t ucVolume);
+    std::uint32_t  GetUsertrackMode();
+    void          SetUsertrackMode(std::uint32_t uiMode);
     bool          IsUsertrackAutoScan();
     void          SetUsertrackAutoScan(bool bEnable);
     bool          IsRadioEqualizerEnabled();
@@ -123,17 +123,17 @@ public:
     float GetDrawDistance();
     void  SetDrawDistance(float fDrawDistance);
 
-    unsigned int GetBrightness();
-    void         SetBrightness(unsigned int uiBrightness);
+    std::uint32_t GetBrightness();
+    void         SetBrightness(std::uint32_t uiBrightness);
 
-    unsigned int GetFXQuality();
-    void         SetFXQuality(unsigned int fxQualityId);
+    std::uint32_t GetFXQuality();
+    void         SetFXQuality(std::uint32_t fxQualityId);
 
     float GetMouseSensitivity();
     void  SetMouseSensitivity(float fSensitivity);
 
-    unsigned int GetAntiAliasing();
-    void         SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart);
+    std::uint32_t GetAntiAliasing();
+    void         SetAntiAliasing(std::uint32_t uiAntiAliasing, bool bOnRestart);
 
     bool IsMipMappingEnabled();
     void SetMipMappingEnabled(bool bEnable);

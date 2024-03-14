@@ -10,7 +10,7 @@
 
 #include <StdInc.h>
 
-unsigned char m_ucNextPacketID = 0;
+std::uint8_t m_ucNextPacketID = 0;
 
 CClientPacketRecorder::CClientPacketRecorder(CClientManager* pManager)
 {
@@ -149,12 +149,12 @@ bool CClientPacketRecorder::IsFrameBased()
     return m_bFrameBased;
 }
 
-void CClientPacketRecorder::SetFrameSkip(unsigned int uiFrameSkip)
+void CClientPacketRecorder::SetFrameSkip(std::uint32_t uiFrameSkip)
 {
     m_uiFrameSkip = uiFrameSkip;
 }
 
-void CClientPacketRecorder::RecordPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
+void CClientPacketRecorder::RecordPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream)
 {
     if (m_bRecording && m_szFilename)
     {
@@ -368,7 +368,7 @@ void CClientPacketRecorder::DoPulse()
                 }
 
                 // Read out the packet id
-                unsigned char ucPacketID = fgetc(pFile);
+                std::uint8_t ucPacketID = fgetc(pFile);
 
                 // Is it 0xFE (local player data) or 0xFF (local keys)?
                 if (ucPacketID == 0xFE)

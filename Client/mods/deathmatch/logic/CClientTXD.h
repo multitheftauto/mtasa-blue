@@ -27,15 +27,15 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTTXD; }
     bool              Load(bool isRaw, SString input, bool enableFiltering);
-    bool              Import(unsigned short usModelID);
-    static bool       IsImportableModel(unsigned short usModelID);
+    bool              Import(std::uint16_t usModelID);
+    static bool       IsImportableModel(std::uint16_t usModelID);
     static bool       IsTXDData(const SString& strData);
 
 private:
     bool LoadFromFile(SString filePath);
     bool LoadFromBuffer(SString buffer);
 
-    void Restream(unsigned short usModel);
+    void Restream(std::uint16_t usModel);
     bool GetFilenameToUse(SString& strOutFilename);
 
     SString              m_strFilename;

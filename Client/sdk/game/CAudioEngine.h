@@ -22,8 +22,8 @@ class CVector;
 
 struct SWorldSoundEvent
 {
-    unsigned int        uiGroup;
-    unsigned int        uiIndex;
+    std::uint32_t        uiGroup;
+    std::uint32_t        uiIndex;
     CEntitySAInterface* pGameEntity;
     CVector             vecPosition;
 };
@@ -57,15 +57,15 @@ public:
     virtual void          SetEffectsMasterVolume(BYTE bVolume) = 0;            // 64 = max volume
     virtual void          SetMusicMasterVolume(BYTE bVolume) = 0;
     virtual void          ClearMissionAudio(int slot = 1) = 0;
-    virtual void          PreloadMissionAudio(unsigned short usAudioEvent, int slot = 1) = 0;
-    virtual unsigned char GetMissionAudioLoadingStatus(int slot = 1) = 0;
+    virtual void          PreloadMissionAudio(std::uint16_t usAudioEvent, int slot = 1) = 0;
+    virtual std::uint8_t GetMissionAudioLoadingStatus(int slot = 1) = 0;
     virtual bool          IsMissionAudioSampleFinished(int slot = 1) = 0;
     virtual void          AttachMissionAudioToPhysical(CPhysical* physical, int slot = 1) = 0;
     virtual void          SetMissionAudioPosition(CVector* position, int slot = 1) = 0;
     virtual bool          PlayLoadedMissionAudio(int slot = 1) = 0;
     virtual void          PauseAllSound(bool bPaused) = 0;
     virtual void          StopRadio() = 0;
-    virtual void          StartRadio(unsigned int station) = 0;
+    virtual void          StartRadio(std::uint32_t station) = 0;
     virtual void          PauseAmbientSounds(bool bPaused) = 0;
     virtual void          SetAmbientSoundEnabled(eAmbientSoundType eType, bool bEnabled) = 0;
     virtual bool          IsAmbientSoundEnabled(eAmbientSoundType eType) = 0;
@@ -74,6 +74,6 @@ public:
     virtual bool          IsWorldSoundEnabled(uint uiGroup, uint uiIndex) = 0;
     virtual void          ResetWorldSounds() = 0;
     virtual void          SetWorldSoundHandler(WorldSoundHandler* pHandler) = 0;
-    virtual void          ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2) = 0;
+    virtual void          ReportBulletHit(CEntity* pEntity, std::uint8_t ucSurfaceType, CVector* pvecPosition, float f_2) = 0;
     virtual void          ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical) = 0;
 };

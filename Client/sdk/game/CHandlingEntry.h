@@ -99,12 +99,12 @@ public:
     virtual float          GetDragCoeff() const = 0;
     virtual const CVector& GetCenterOfMass() const = 0;
 
-    virtual unsigned int GetPercentSubmerged() const = 0;
+    virtual std::uint32_t GetPercentSubmerged() const = 0;
     virtual float        GetTractionMultiplier() const = 0;
 
     virtual eDriveType    GetCarDriveType() const = 0;
     virtual eEngineType   GetCarEngineType() const = 0;
-    virtual unsigned char GetNumberOfGears() const = 0;
+    virtual std::uint8_t GetNumberOfGears() const = 0;
 
     virtual float GetEngineAcceleration() const = 0;
     virtual float GetEngineInertia() const = 0;
@@ -128,14 +128,14 @@ public:
 
     virtual float GetCollisionDamageMultiplier() const = 0;
 
-    virtual unsigned int GetHandlingFlags() const = 0;
-    virtual unsigned int GetModelFlags() const = 0;
+    virtual std::uint32_t GetHandlingFlags() const = 0;
+    virtual std::uint32_t GetModelFlags() const = 0;
     virtual float        GetSeatOffsetDistance() const = 0;
-    virtual unsigned int GetMonetary() const = 0;
+    virtual std::uint32_t GetMonetary() const = 0;
 
     virtual eLightType    GetHeadLight() const = 0;
     virtual eLightType    GetTailLight() const = 0;
-    virtual unsigned char GetAnimGroup() const = 0;
+    virtual std::uint8_t GetAnimGroup() const = 0;
 
     virtual eVehicleTypes GetModel() const = 0;
     virtual bool          HasSuspensionChanged() const = 0;
@@ -146,12 +146,12 @@ public:
     virtual void SetDragCoeff(float fDrag) = 0;
     virtual void SetCenterOfMass(const CVector& vecCenter) = 0;
 
-    virtual void SetPercentSubmerged(unsigned int uiPercent) = 0;
+    virtual void SetPercentSubmerged(std::uint32_t uiPercent) = 0;
     virtual void SetTractionMultiplier(float fTractionMultiplier) = 0;
 
     virtual void SetCarDriveType(eDriveType Type) = 0;
     virtual void SetCarEngineType(eEngineType Type) = 0;
-    virtual void SetNumberOfGears(unsigned char ucNumber) = 0;
+    virtual void SetNumberOfGears(std::uint8_t ucNumber) = 0;
 
     virtual void SetEngineAcceleration(float fAcceleration) = 0;
     virtual void SetEngineInertia(float fInertia) = 0;
@@ -175,18 +175,18 @@ public:
 
     virtual void SetCollisionDamageMultiplier(float fMultiplier) = 0;
 
-    virtual void SetHandlingFlags(unsigned int uiFlags) = 0;
-    virtual void SetModelFlags(unsigned int uiFlags) = 0;
+    virtual void SetHandlingFlags(std::uint32_t uiFlags) = 0;
+    virtual void SetModelFlags(std::uint32_t uiFlags) = 0;
     virtual void SetSeatOffsetDistance(float fDistance) = 0;
-    virtual void SetMonetary(unsigned int uiMonetary) = 0;
+    virtual void SetMonetary(std::uint32_t uiMonetary) = 0;
 
     virtual void SetHeadLight(eLightType Style) = 0;
     virtual void SetTailLight(eLightType Style) = 0;
-    virtual void SetAnimGroup(unsigned char ucGroup) = 0;
+    virtual void SetAnimGroup(std::uint8_t ucGroup) = 0;
 
     virtual void SetSuspensionChanged(bool bChanged) = 0;
 
     // Call this every time you're done changing something. This will recalculate
     // all transmission/handling values according to the new values.
-    virtual void Recalculate(unsigned short usModel) = 0;
+    virtual void Recalculate(std::uint16_t usModel) = 0;
 };

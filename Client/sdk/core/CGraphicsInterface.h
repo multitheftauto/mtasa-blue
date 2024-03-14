@@ -114,8 +114,8 @@ public:
     virtual void           SetBlendMode(EBlendModeType blendMode) = 0;
     virtual EBlendModeType GetBlendMode() = 0;
 
-    virtual unsigned int GetViewportWidth() = 0;
-    virtual unsigned int GetViewportHeight() = 0;
+    virtual std::uint32_t GetViewportWidth() = 0;
+    virtual std::uint32_t GetViewportHeight() = 0;
 
     virtual void  SetAspectRatioAdjustmentEnabled(bool bEnabled, float fSourceRatio = 4 / 3.f) = 0;
     virtual bool  IsAspectRatioAdjustmentEnabled() = 0;
@@ -130,8 +130,8 @@ public:
     virtual void  GetDXTextSize(CVector2D& vecSize, const char* szText, float fWidth = 0, float fScaleX = 1.0f, float fScaleY = 1.0f,
                                 ID3DXFont* pDXFont = nullptr, bool bWordBreak = false, bool bColorCoded = false) = 0;
 
-    virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont) = 0;
-    virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality,
+    virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, std::uint32_t uiHeight, bool bBold, ID3DXFont** ppD3DXFont) = 0;
+    virtual bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, std::uint32_t uiHeight, bool bBold, DWORD ulQuality,
                                       ID3DXFont** ppD3DXFont) = 0;
     virtual bool DestroyAdditionalDXFont(std::string strFontPath, ID3DXFont* pD3DXFont) = 0;
 

@@ -14,7 +14,7 @@
 struct tImgHeader
 {
     char         szMagic[4];
-    unsigned int uiFilesCount;
+    std::uint32_t uiFilesCount;
 };
 
 CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID)
@@ -190,7 +190,7 @@ bool CClientIMG::StreamDisable()
     return true;
 }
 
-bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
+bool CClientIMG::LinkModel(std::uint32_t uiModelID, size_t uiFileID)
 {
     if (!IsStreamed())
         return false;
@@ -211,7 +211,7 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
     return true;
 }
 
-bool CClientIMG::UnlinkModel(unsigned int uiModelID)
+bool CClientIMG::UnlinkModel(std::uint32_t uiModelID)
 {
     const auto it =
         std::find_if(m_restoreInfo.begin(), m_restoreInfo.end(), [uiModelID](const auto& restoreInfo) { return restoreInfo.uiModelID == uiModelID; });

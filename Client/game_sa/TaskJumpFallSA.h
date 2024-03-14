@@ -33,7 +33,7 @@ public:
     bool          m_bInvalidClimb;
     char          m_nHeightForAnim;
     char          m_nHeightForPos;
-    unsigned char m_nSurfaceType;
+    std::uint8_t m_nSurfaceType;
     char          m_nFallAfterVault;
     float         m_fHandholdHeading;
     CVector       m_vecHandholdPos;
@@ -47,7 +47,7 @@ class CTaskSimpleClimbSA : public virtual CTaskSimpleSA, public virtual CTaskSim
 {
 public:
     CTaskSimpleClimbSA(){};
-    CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight = CLIMB_GRAB,
+    CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, std::uint8_t nSurfaceType, char nHeight = CLIMB_GRAB,
                        const bool bForceClimb = false);
 };
 
@@ -59,11 +59,11 @@ public:
 class CTaskSimpleJetPackSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    unsigned char m_bIsFinished;
-    unsigned char m_bAddedIdleAnim;
-    unsigned char m_bAnimsReferenced;
-    unsigned char m_bAttackButtonPressed;
-    unsigned char m_bSwitchedWeapons;
+    std::uint8_t m_bIsFinished;
+    std::uint8_t m_bAddedIdleAnim;
+    std::uint8_t m_bAnimsReferenced;
+    std::uint8_t m_bAttackButtonPressed;
+    std::uint8_t m_bSwitchedWeapons;
 
     char  m_nThrustStop;
     char  m_nThrustFwd;
@@ -87,7 +87,7 @@ public:
     CVector      m_vecTargetPos;
     float        m_fCruiseHeight;
     int          m_nHoverTime;
-    unsigned int m_nStartHover;
+    std::uint32_t m_nStartHover;
     CEntity*     m_pTargetEnt;
 
     FxSystem_c* m_pFxSysL;

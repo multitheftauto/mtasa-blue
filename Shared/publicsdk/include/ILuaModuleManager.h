@@ -29,7 +29,7 @@ class CChecksum
 {
 public:
     unsigned long ulCRC;
-    unsigned char mD5[16];
+    std::uint8_t mD5[16];
 };
 #endif
 

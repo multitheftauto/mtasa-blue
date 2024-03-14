@@ -102,7 +102,7 @@ void CRPCFunctions::AddHandlers()
     CColShapeRPCs::LoadFunctions();
 }
 
-void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback, const char* szName)
+void CRPCFunctions::AddHandler(std::uint8_t ucID, pfnRPCHandler Callback, const char* szName)
 {
     if (ucID >= NUM_RPC_FUNCS)
         return;
@@ -111,7 +111,7 @@ void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback, const
     m_RPCHandlers[ucID].strName = szName;
 }
 
-void CRPCFunctions::AddHandler(unsigned char ucID, pfnElementRPCHandler Callback, const char* szName)
+void CRPCFunctions::AddHandler(std::uint8_t ucID, pfnElementRPCHandler Callback, const char* szName)
 {
     if (ucID >= NUM_RPC_FUNCS)
         return;
@@ -120,9 +120,9 @@ void CRPCFunctions::AddHandler(unsigned char ucID, pfnElementRPCHandler Callback
     m_ElementRPCHandlers[ucID].strName = szName;
 }
 
-void CRPCFunctions::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
+void CRPCFunctions::ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucFunctionID = 255;
+    std::uint8_t ucFunctionID = 255;
     if (!bitStream.Read(ucFunctionID) || ucFunctionID >= NUM_RPC_FUNCS)
         return;
 

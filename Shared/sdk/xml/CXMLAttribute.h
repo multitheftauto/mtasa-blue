@@ -25,7 +25,7 @@ public:
     virtual void SetValue(const char* szValue) = 0;
     virtual void SetValue(bool bValue) = 0;
     virtual void SetValue(int iValue) = 0;
-    virtual void SetValue(unsigned int uiValue) = 0;
+    virtual void SetValue(std::uint32_t uiValue) = 0;
     virtual void SetValue(float fValue) = 0;
 
     virtual void DeleteWrapper() = 0;

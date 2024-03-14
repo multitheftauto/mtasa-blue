@@ -13,7 +13,7 @@
 #include "CLanBroadcast.h"
 #include "version.h"
 
-CLanBroadcast::CLanBroadcast(unsigned short usServerPort)
+CLanBroadcast::CLanBroadcast(std::uint16_t usServerPort)
 {
     // Open the socket on the UDP broadcast port
     m_Socket = socket(AF_INET, SOCK_DGRAM, 0);

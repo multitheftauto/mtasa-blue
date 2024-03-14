@@ -89,8 +89,8 @@
 CGame* g_pGame = NULL;
 
 char          szProgress[4] = {'-', '\\', '|', '/'};
-unsigned char ucProgress = 0;
-unsigned char ucProgressSkip = 0;
+std::uint8_t ucProgress = 0;
+std::uint8_t ucProgressSkip = 0;
 
 pthread_mutex_t mutexhttp;
 
@@ -675,8 +675,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pACLManager->SetFileName(m_pMainConfig->GetAccessControlListFile().c_str());
     const SString  strServerIP = m_pMainConfig->GetServerIP();
     const SString  strServerIPList = m_pMainConfig->GetServerIPList();
-    unsigned short usServerPort = m_pMainConfig->GetServerPort();
-    unsigned int   uiMaxPlayers = m_pMainConfig->GetMaxPlayers();
+    std::uint16_t usServerPort = m_pMainConfig->GetServerPort();
+    std::uint32_t   uiMaxPlayers = m_pMainConfig->GetMaxPlayers();
 
     // Start async task scheduler
     m_pAsyncTaskScheduler = new SharedUtil::CAsyncTaskScheduler(2);
@@ -1053,7 +1053,7 @@ void CGame::StartOpenPortsTest()
         m_pOpenPortsTester->Start();
 }
 
-bool CGame::StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* pBitStream, SNetExtraInfo* pNetExtraInfo)
+bool CGame::StaticProcessPacket(std::uint8_t ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* pBitStream, SNetExtraInfo* pNetExtraInfo)
 {
     // Is it a join packet? Pass it to the handler immediately
     if (ucPacketID == PACKET_ID_PLAYER_JOIN)
@@ -1509,7 +1509,7 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
             // Tell all the players except the parting one (we don't tell them if he hadn't joined because the players don't know about him)
             CPlayerQuitPacket Packet;
             Packet.SetPlayer(Player.GetID());
-            Packet.SetQuitReason(static_cast<unsigned char>(Reason));
+            Packet.SetQuitReason(static_cast<std::uint8_t>(Reason));
             m_pPlayerManager->BroadcastOnlyJoined(Packet, &Player);
         }
     }
@@ -1652,7 +1652,7 @@ void CGame::AddBuiltInEvents()
 void CGame::ProcessTrafficLights(long long llCurrentTime)
 {
     long long     ulDiff = static_cast<long long>((llCurrentTime - m_llLastTrafficUpdate) * m_fGameSpeed);
-    unsigned char ucNewState = 0xFF;
+    std::uint8_t ucNewState = 0xFF;
 
     if (ulDiff >= 1000)
     {
@@ -1684,7 +1684,7 @@ void CGame::Packet_PlayerJoin(const NetServerPlayerID& Source)
     if (pBitStream)
     {
         // Write the mod name to the bitstream
-        pBitStream->Write(static_cast<unsigned short>(MTA_DM_BITSTREAM_VERSION));
+        pBitStream->Write(static_cast<std::uint16_t>(MTA_DM_BITSTREAM_VERSION));
         pBitStream->WriteString("deathmatch");
 
         // Send and destroy the bitstream
@@ -2038,7 +2038,7 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
         pPed->CallEvent("onPedWasted", Arguments);
 
         // Reset the weapons list, because a ped loses his weapons on death
-        for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+        for (std::uint32_t slot = 0; slot < WEAPON_SLOTS; ++slot)
         {
             pPed->SetWeaponType(0, slot);
             pPed->SetWeaponAmmoInClip(0, slot);
@@ -2098,7 +2098,7 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         pPlayer->CallEvent("onPlayerWasted", Arguments);
 
         // Reset the weapons list, because a player loses his weapons on death
-        for (unsigned int slot = 0; slot < WEAPON_SLOTS; ++slot)
+        for (std::uint32_t slot = 0; slot < WEAPON_SLOTS; ++slot)
         {
             pPlayer->SetWeaponType(0, slot);
             pPlayer->SetWeaponAmmoInClip(0, slot);
@@ -2341,22 +2341,22 @@ void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)
             if (pVehicle->GetSyncer() == pPlayer || pVehicle->GetOccupant(0) == pPlayer)
             {
                 // Set the new damage model
-                for (unsigned int i = 0; i < MAX_DOORS; ++i)
+                for (std::uint32_t i = 0; i < MAX_DOORS; ++i)
                 {
                     if (Packet.m_damage.data.bDoorStatesChanged[i])
                         pVehicle->m_ucDoorStates[i] = Packet.m_damage.data.ucDoorStates[i];
                 }
-                for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+                for (std::uint32_t i = 0; i < MAX_WHEELS; ++i)
                 {
                     if (Packet.m_damage.data.bWheelStatesChanged[i])
                         pVehicle->m_ucWheelStates[i] = Packet.m_damage.data.ucWheelStates[i];
                 }
-                for (unsigned int i = 0; i < MAX_PANELS; ++i)
+                for (std::uint32_t i = 0; i < MAX_PANELS; ++i)
                 {
                     if (Packet.m_damage.data.bPanelStatesChanged[i])
                         pVehicle->m_ucPanelStates[i] = Packet.m_damage.data.ucPanelStates[i];
                 }
-                for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+                for (std::uint32_t i = 0; i < MAX_LIGHTS; ++i)
                 {
                     if (Packet.m_damage.data.bLightStatesChanged[i])
                         pVehicle->m_ucLightStates[i] = Packet.m_damage.data.ucLightStates[i];
@@ -2610,7 +2610,7 @@ void CGame::Packet_CustomData(CCustomDataPacket& Packet)
             if (lastSyncType != ESyncType::LOCAL)
             {
                 // Tell our clients to update their data. Send to everyone but the one we got this packet from.
-                unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+                std::uint16_t usNameLength = static_cast<std::uint16_t>(strlen(szName));
                 CBitStream     BitStream;
                 BitStream.pBitStream->WriteCompressed(usNameLength);
                 BitStream.pBitStream->Write(szName, usNameLength);
@@ -2671,7 +2671,7 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
     bool          syncToPlayers = true;
     CVector       explosionPosition = Packet.m_vecPosition;
     CElement*     explosionSource = nullptr;
-    unsigned char explosionType = Packet.m_ucType;
+    std::uint8_t explosionType = Packet.m_ucType;
 
     if (ElementID originID = Packet.m_OriginID; originID != INVALID_ELEMENT_ID)
     {
@@ -2877,7 +2877,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                 CVehicle* pVehicle = static_cast<CVehicle*>(pVehicleElement);
 
                 // Grab the action
-                unsigned char ucAction = Packet.GetAction();
+                std::uint8_t ucAction = Packet.GetAction();
 
                 if (pPed)
                 {
@@ -2985,7 +2985,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             }
 
                             // Is this vehicle enterable? (not a trailer)
-                            unsigned short usVehicleModel = pVehicle->GetModel();
+                            std::uint16_t usVehicleModel = pVehicle->GetModel();
                             if (!CVehicleManager::IsTrailer(usVehicleModel))
                             {
                                 // He musn't already be doing something
@@ -3018,8 +3018,8 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         // Is he close enough to the vehicle?
                                         if (IsPointNearPoint3D(pPed->GetPosition(), pVehicle->GetPosition(), fCutoffDistance))
                                         {
-                                            unsigned char ucSeat = Packet.GetSeat();
-                                            unsigned char ucDoor = Packet.GetDoor();
+                                            std::uint8_t ucSeat = Packet.GetSeat();
+                                            std::uint8_t ucDoor = Packet.GetDoor();
 
                                             // Temp fix: Disable driver seat for train carriages since the whole vehicle sync logic is based on the the
                                             // player on the first seat being the vehicle syncer (Todo)
@@ -3258,7 +3258,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             {
                                 // He can't get in
                                 CVehicleInOutPacket Reply(PedID, VehicleID, 0, VEHICLE_ATTEMPT_FAILED);
-                                Reply.SetFailReason((unsigned char)failReason);
+                                Reply.SetFailReason((std::uint8_t)failReason);
                                 // Was he too far away from the vehicle?
                                 if (failReason == FAIL_DISTANCE)
                                 {
@@ -3278,7 +3278,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                             {
                                 // Is he the occupant? (he must unless the client has fucked up)
-                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                std::uint8_t ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
                                     // Mark him as successfully entered
@@ -3320,10 +3320,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                             {
                                 // Is he the occupant? (he must unless the client has fucked up)
-                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                std::uint8_t ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
-                                    unsigned char ucDoor = Packet.GetDoor();
+                                    std::uint8_t ucDoor = Packet.GetDoor();
                                     float         fDoorAngle = Packet.GetDoorAngle();
 
                                     // Mark that he's in no vehicle
@@ -3408,7 +3408,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
                             {
                                 // Does it have an occupant and is the occupant the requesting ped?
-                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                std::uint8_t ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
                                     // Mark the ped/vehicle as empty
@@ -3465,7 +3465,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
                             {
                                 // Is he the occupant?
-                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                                std::uint8_t ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 if (pPed == pVehicle->GetOccupant(ucOccupiedSeat))
                                 {
                                     // Mark that he's no longer exiting
@@ -3483,7 +3483,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                         case VEHICLE_NOTIFY_FELL_OFF:
                         {
                             // Check that the ped is in the given vehicle
-                            unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                            std::uint8_t ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                             if (pVehicle->GetOccupant(ucOccupiedSeat) == pPed)
                             {
                                 // Remove him from the vehicle
@@ -3624,7 +3624,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     // Warp the ped into the vehicle manually for incompatible players
                                     CBitStream BitStream;
                                     BitStream.pBitStream->Write(pVehicle->GetID());
-                                    BitStream.pBitStream->Write((unsigned char)0);
+                                    BitStream.pBitStream->Write((std::uint8_t)0);
                                     BitStream.pBitStream->Write(pPed->GetSyncTimeContext());
                                     m_pPlayerManager->Broadcast(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream),
                                                                 sendListIncompatiblePlayers);
@@ -3639,7 +3639,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             // Is the sender jacking?
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_JACKING)
                             {
-                                unsigned char ucDoor = Packet.GetDoor();
+                                std::uint8_t ucDoor = Packet.GetDoor();
                                 float         fAngle = Packet.GetDoorAngle();
                                 CPed*         pJacked = pVehicle->GetOccupant(0);
 
@@ -3815,7 +3815,7 @@ void CGame::Packet_VehicleTrailer(CVehicleTrailerPacket& Packet)
 
 void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
 {
-    unsigned short usDataLength = 0;
+    std::uint16_t usDataLength = 0;
 
     if (m_pMainConfig->IsVoiceEnabled())            // Shouldn't really be receiving voice packets at all if voice is disabled
     {
@@ -3850,7 +3850,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                 if (pPlayer->GetVoiceState() ==
                     VOICESTATE_TRANSMITTING)            // If we reach here, and we're still in idle state, then the event was cancelled
                 {
-                    const unsigned char* pBuffer = Packet.GetData();
+                    const std::uint8_t* pBuffer = Packet.GetData();
                     CVoiceDataPacket     VoicePacket(pPlayer, pBuffer, usDataLength);
 
                     // Make list of players to send the voice packet to
@@ -4466,7 +4466,7 @@ void CGame::EnableLatentSends(bool bEnabled, int iBandwidth, CLuaMain* pLuaMain,
 //
 // Optimization for latent sends
 //
-void CGame::SendPacketBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream)
+void CGame::SendPacketBatchBegin(std::uint8_t ucPacketId, NetBitStreamInterface* pBitStream)
 {
     if (m_bLatentSendsEnabled)
         GetLatentTransferManager()->AddSendBatchBegin(ucPacketId, pBitStream);
@@ -4475,7 +4475,7 @@ void CGame::SendPacketBatchBegin(unsigned char ucPacketId, NetBitStreamInterface
 //
 // Maybe route though LatentTransferManager
 //
-bool CGame::SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
+bool CGame::SendPacket(std::uint8_t ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* pBitStream, bool bBroadcast,
                        NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering)
 {
     if (!m_bLatentSendsEnabled)

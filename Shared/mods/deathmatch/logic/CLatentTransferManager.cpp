@@ -120,7 +120,7 @@ void CLatentTransferManager::OnLuaMainDestroy(void* pLuaMain)
 // Prepare data for possible multiple sends
 //
 ///////////////////////////////////////////////////////////////
-void CLatentTransferManager::AddSendBatchBegin(unsigned char ucPacketId, NetBitStreamInterface* pBitStream)
+void CLatentTransferManager::AddSendBatchBegin(std::uint8_t ucPacketId, NetBitStreamInterface* pBitStream)
 {
 #ifndef MTA_CLIENT
     markerLatentEvent.Set("BatchBegin");
@@ -355,13 +355,13 @@ void DoDeallocateNetBitStream(NetBitStreamInterface* pBitStream)
     return g_pNet->DeallocateNetBitStream(pBitStream);
 }
 
-bool DoSendPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority,
+bool DoSendPacket(std::uint8_t ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority,
                   NetPacketReliability packetReliability, ePacketOrdering packetOrdering)
 {
     return g_pNet->SendPacket(ucPacketID, bitStream, packetPriority, packetReliability, packetOrdering);
 }
 
-bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)
+bool DoStaticProcessPacket(std::uint8_t ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)
 {
     // Check if latent packet should be ignored
     if (usResourceNetId != 0xFFFF)
@@ -399,13 +399,13 @@ void DoDeallocateNetBitStream(NetBitStreamInterface* pBitStream)
     return g_pNetServer->DeallocateNetServerBitStream(pBitStream);
 }
 
-bool DoSendPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetServerPacketPriority packetPriority,
+bool DoSendPacket(std::uint8_t ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* bitStream, NetServerPacketPriority packetPriority,
                   NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering)
 {
     return g_pNetServer->SendPacket(ucPacketID, remoteId, bitStream, false, packetPriority, packetReliability, packetOrdering);
 }
 
-bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)
+bool DoStaticProcessPacket(std::uint8_t ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)
 {
     // Check if latent packet should be ignored
     if (usResourceNetId != 0xFFFF)

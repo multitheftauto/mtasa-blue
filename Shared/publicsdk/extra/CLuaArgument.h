@@ -32,14 +32,14 @@ public:
     CLuaArgument(const char* szString);
     CLuaArgument(void* pUserData);
     CLuaArgument(const CLuaArgument& Argument);
-    CLuaArgument(lua_State* luaVM, unsigned int uiArgument);
+    CLuaArgument(lua_State* luaVM, std::uint32_t uiArgument);
     ~CLuaArgument();
 
     const CLuaArgument& operator=(const CLuaArgument& Argument);
     bool                operator==(const CLuaArgument& Argument);
     bool                operator!=(const CLuaArgument& Argument);
 
-    void Read(lua_State* luaVM, unsigned int uiArgument);
+    void Read(lua_State* luaVM, std::uint32_t uiArgument);
     void Push(lua_State* luaVM) const;
 
     int GetType() const { return m_iType; };

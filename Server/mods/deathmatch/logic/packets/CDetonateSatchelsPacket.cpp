@@ -29,7 +29,7 @@ bool CDetonateSatchelsPacket::Write(NetBitStreamInterface& BitStream) const
     {
         BitStream.Write(m_pSourceElement->GetID());
 
-        unsigned short usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        std::uint16_t usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
         BitStream.WriteCompressed(usLatency);
     }
     else

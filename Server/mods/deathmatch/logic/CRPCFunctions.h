@@ -30,7 +30,7 @@ private:
     typedef void (*pfnRPCHandler)(NetBitStreamInterface& bitStream);
     struct SRPCHandler
     {
-        unsigned char ID;
+        std::uint8_t ID;
         pfnRPCHandler Callback;
     };
 
@@ -39,7 +39,7 @@ public:
     virtual ~CRPCFunctions();
 
     void        AddHandlers();
-    static void AddHandler(unsigned char ucID, pfnRPCHandler Callback);
+    static void AddHandler(std::uint8_t ucID, pfnRPCHandler Callback);
     void        ProcessPacket(const NetServerPlayerID& Socket, NetBitStreamInterface& bitStream);
 
 protected:

@@ -50,7 +50,7 @@ public:
     CVoiceRecorder();
     ~CVoiceRecorder();
 
-    void Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
+    void Init(bool bEnabled, std::uint32_t uiServerSampleRate, std::uint8_t ucQuality, std::uint32_t uiBitrate);
 
     bool IsEnabled() { return m_bEnabled; }
 
@@ -59,8 +59,8 @@ public:
     void SetPTTState(bool bState);
     bool GetPTTState();
 
-    unsigned int  GetSampleRate() { return m_SampleRate; }
-    unsigned char GetSampleQuality() { return m_ucQuality; }
+    std::uint32_t  GetSampleRate() { return m_SampleRate; }
+    std::uint8_t GetSampleQuality() { return m_ucQuality; }
 
     const SpeexMode* getSpeexModeFromSampleRate();
 
@@ -81,17 +81,17 @@ private:
 
     char*        m_pOutgoingBuffer;
     int          m_iSpeexOutgoingFrameSampleCount;
-    unsigned int m_uiOutgoingReadIndex;
-    unsigned int m_uiOutgoingWriteIndex;
+    std::uint32_t m_uiOutgoingReadIndex;
+    std::uint32_t m_uiOutgoingWriteIndex;
     bool         m_bIsSendingVoiceData;
 
     unsigned long m_ulTimeOfLastSend;
 
-    unsigned int m_uiBufferSizeBytes;
-    eSampleRate  convertServerSampleRate(unsigned int uiServerSampleRate);
+    std::uint32_t m_uiBufferSizeBytes;
+    eSampleRate  convertServerSampleRate(std::uint32_t uiServerSampleRate);
 
     eSampleRate   m_SampleRate;
-    unsigned char m_ucQuality;
+    std::uint8_t m_ucQuality;
 
     std::list<SString> m_EventQueue;
     std::mutex         m_Mutex;

@@ -23,7 +23,7 @@ CAnimBlendAssocGroupSA::CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* 
     SetupAnimBlock();
 }
 
-CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(unsigned int AnimID)
+CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(std::uint32_t AnimID)
 {
     CAnimBlendAssociationSAInterface* pAnimAssociationReturn = nullptr;
 
@@ -86,7 +86,7 @@ CAnimBlock* CAnimBlendAssocGroupSA::GetAnimBlock()
     return m_pAnimBlock;
 }
 
-CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int ID)
+CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(std::uint32_t ID)
 {
     // ppAssociations [ ID - this->iIDOffset ] ??
     CAnimBlendStaticAssociation* pReturn;

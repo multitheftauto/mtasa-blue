@@ -84,7 +84,7 @@ void CClientRadarArea::DoPulse(bool bRender)
             }
 
             // Multiply the alpha-factor with the alpha we're supposed to have to find what alpha to use and set it
-            color.A = static_cast<unsigned char>(m_fAlphaFactor * static_cast<float>(color.A));
+            color.A = static_cast<std::uint8_t>(m_fAlphaFactor * static_cast<float>(color.A));
         }
 
         // Only render the radar area if we are told to
@@ -108,13 +108,13 @@ void CClientRadarArea::DoPulse(bool bRender)
     }
 }
 
-void CClientRadarArea::SetDimension(unsigned short usDimension)
+void CClientRadarArea::SetDimension(std::uint16_t usDimension)
 {
     CClientEntity::SetDimension(usDimension);
     RelateDimension(m_pRadarAreaManager->GetDimension());
 }
 
-void CClientRadarArea::RelateDimension(unsigned short usDimension)
+void CClientRadarArea::RelateDimension(std::uint16_t usDimension)
 {
     m_bStreamedIn = (usDimension == m_usDimension);
 }

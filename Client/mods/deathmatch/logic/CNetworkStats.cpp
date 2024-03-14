@@ -88,7 +88,7 @@ void CNetworkStats::Draw()
             "Server: %s\n",
             g_pNet->GetPing(), stats.messagesInSendBuffer, stats.messagesInResendBuffer, stats.packetsReceived, stats.packetsSent, stats.packetlossTotal,
             stats.packetlossLastSecond, strBytesRecv.c_str(), strBytesSent.c_str(), strRecvRate.c_str(), strSendRate.c_str(),
-            (unsigned int)floor(m_fPacketReceiveRate + 0.5f), (unsigned int)floor(m_fPacketSendRate + 0.5f), stats.isLimitedByCongestionControl ? 1ULL : 0ULL,
+            (std::uint32_t)floor(m_fPacketReceiveRate + 0.5f), (std::uint32_t)floor(m_fPacketSendRate + 0.5f), stats.isLimitedByCongestionControl ? 1ULL : 0ULL,
             stats.isLimitedByOutgoingBandwidthLimit ? 1ULL : 0ULL, bBulletSync ? "On" : "Off", vehExtrapolateSettings.iScalePercent,
             vehExtrapolateSettings.iMaxMs, g_pClientGame->IsUsingAlternatePulseOrder() ? "Yes" : "No", *CStaticFunctionDefinitions::GetVersionSortable(),
             *g_pClientGame->GetServerVersionSortable());

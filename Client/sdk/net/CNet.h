@@ -69,10 +69,10 @@ public:
         STATS_OUTGOING_TRAFFIC = 1
     };
 
-    virtual bool StartNetwork(const char* szServerHost, unsigned short usServerPort, bool bPacketTag = false) = 0;
+    virtual bool StartNetwork(const char* szServerHost, std::uint16_t usServerPort, bool bPacketTag = false) = 0;
     virtual void StopNetwork() = 0;
 
-    virtual void SetFakeLag(unsigned short usPacketLoss, unsigned short usMinExtraPing, unsigned short usExtraPingVariance, int iKBPSLimit) = 0;
+    virtual void SetFakeLag(std::uint16_t usPacketLoss, std::uint16_t usMinExtraPing, std::uint16_t usExtraPingVariance, int iKBPSLimit) = 0;
 
     virtual bool IsConnected() = 0;
 
@@ -83,10 +83,10 @@ public:
 
     virtual NetBitStreamInterface* AllocateNetBitStream() = 0;
     virtual void                   DeallocateNetBitStream(NetBitStreamInterface* bitStream) = 0;
-    virtual bool                   SendPacket(unsigned char ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority,
+    virtual bool                   SendPacket(std::uint8_t ucPacketID, NetBitStreamInterface* bitStream, NetPacketPriority packetPriority,
                                               NetPacketReliability packetReliability, ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT) = 0;
 
-    virtual void        SetClientPort(unsigned short usClientPort) = 0;
+    virtual void        SetClientPort(std::uint16_t usClientPort) = 0;
     virtual const char* GetConnectedServer(bool bIncludePort = false) = 0;
 
     virtual bool               GetNetworkStatistics(NetStatistics* pDest) = 0;
@@ -98,20 +98,20 @@ public:
     virtual const char* GetLocalIP() = 0;
     virtual void        GetSerial(char* szSerial, size_t maxLength) = 0;
 
-    virtual unsigned char GetConnectionError() = 0;
-    virtual void          SetConnectionError(unsigned char ucConnectionError) = 0;
+    virtual std::uint8_t GetConnectionError() = 0;
+    virtual void          SetConnectionError(std::uint8_t ucConnectionError) = 0;
 
     virtual void Reset() = 0;
 
     virtual CNetHTTPDownloadManagerInterface* GetHTTPDownloadManager(EDownloadModeType iMode) = 0;
 
-    virtual void           SetServerBitStreamVersion(unsigned short usServerBitStreamVersion) = 0;
-    virtual unsigned short GetServerBitStreamVersion() = 0;
+    virtual void           SetServerBitStreamVersion(std::uint16_t usServerBitStreamVersion) = 0;
+    virtual std::uint16_t GetServerBitStreamVersion() = 0;
     bool                   CanServerBitStream(eBitStreamVersion query) { return static_cast<eBitStreamVersion>(GetServerBitStreamVersion()) >= query; }
 
     virtual void           GetStatus(char* szStatus, size_t maxLength) = 0;
-    virtual unsigned short GetNetRev() = 0;
-    virtual unsigned short GetNetRel() = 0;
+    virtual std::uint16_t GetNetRev() = 0;
+    virtual std::uint16_t GetNetRel() = 0;
 
     virtual const char* GetNextBuffer() = 0;
     virtual const char* GetDiagnosticStatus() = 0;

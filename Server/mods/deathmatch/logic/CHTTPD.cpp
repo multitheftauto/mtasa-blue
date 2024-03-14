@@ -63,7 +63,7 @@ bool CHTTPD::StopHTTPD()
     return false;
 }
 
-bool CHTTPD::StartHTTPD(const char* szIP, unsigned int port)
+bool CHTTPD::StartHTTPD(const char* szIP, std::uint32_t port)
 {
     bool bResult = false;
 

@@ -13,7 +13,7 @@
 #include "CServerTextItemPacket.h"
 
 CServerTextItemPacket::CServerTextItemPacket(unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color,
-                                             unsigned char format, unsigned char ucShadowAlpha, const char* szText)
+                                             std::uint8_t format, std::uint8_t ucShadowAlpha, const char* szText)
 {
     m_ulUniqueId = ulUniqueId;
     m_bDeletable = bDeleteable;
@@ -50,7 +50,7 @@ bool CServerTextItemPacket::Write(NetBitStreamInterface& BitStream) const
         size_t sizeText = std::min<size_t>(1024, m_strText.length());
 
         // Write the text
-        BitStream.WriteCompressed(static_cast<unsigned short>(sizeText));
+        BitStream.WriteCompressed(static_cast<std::uint16_t>(sizeText));
         if (sizeText)
         {
             BitStream.Write(m_strText, sizeText);

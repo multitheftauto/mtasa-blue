@@ -31,7 +31,7 @@ class CMapManager;
 
 struct CRefInfo
 {
-    unsigned long int ulUseCount;
+    std::uint32_t ulUseCount;
     int               iFunction;
 };
 
@@ -44,7 +44,7 @@ public:
 
     ~CLuaMain();
 
-    bool LoadScriptFromBuffer(const char* cpBuffer, unsigned int uiSize, const char* szFileName);
+    bool LoadScriptFromBuffer(const char* cpBuffer, std::uint32_t uiSize, const char* szFileName);
     bool LoadScript(const char* szLUAScript);
     void UnloadScript();
 
@@ -82,7 +82,7 @@ public:
     CTextDisplay* CreateDisplay();
     void          DestroyDisplay(CTextDisplay* pDisplay);
     CTextItem*    CreateTextItem(const char* szText, float fX, float fY, eTextPriority priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f,
-                                 unsigned char format = 0, unsigned char ucShadowAlpha = 0);
+                                 std::uint8_t format = 0, std::uint8_t ucShadowAlpha = 0);
     void          DestroyTextItem(CTextItem* pTextItem);
 
     CTextDisplay* GetTextDisplayFromScriptID(uint uiScriptID);

@@ -36,12 +36,12 @@
 #define BAD_WCHAR ((wchar_t) 0xfffd)
 #define BAD_CHAR '?'
 
-int utf8_mbtowc(wchar_t* pwc, const unsigned char* src, int src_len)
+int utf8_mbtowc(wchar_t* pwc, const std::uint8_t* src, int src_len)
 {
     if (!pwc)
         return 0;
 
-    unsigned char c = src[0];
+    std::uint8_t c = src[0];
 
     if (c < 0x80)
     {
@@ -104,7 +104,7 @@ int utf8_mbtowc(wchar_t* pwc, const unsigned char* src, int src_len)
         return RET_ILSEQ;
 }
 
-int utf8_wctomb(unsigned char* dest, wchar_t wc, int dest_size)
+int utf8_wctomb(std::uint8_t* dest, wchar_t wc, int dest_size)
 {
     if (!dest)
         return 0;
@@ -149,7 +149,7 @@ int utf8_wctomb(unsigned char* dest, wchar_t wc, int dest_size)
             wc = wc >> 6;
             wc |= 0xc0;
         case 1:
-            dest[0] = (unsigned char)wc;
+            dest[0] = (std::uint8_t)wc;
     }
     return count;
 }
@@ -163,10 +163,10 @@ std::wstring utf8_mbstowcs_orig(const std::string& str)
 {
     std::wstring wstr;
     wchar_t      wc;
-    unsigned int sn = 0;
+    std::uint32_t sn = 0;
     int          un = 0;
 
-    const unsigned char* s = (const unsigned char*)str.c_str();
+    const std::uint8_t* s = (const std::uint8_t*)str.c_str();
 
     while (sn < str.length() && *s != 0 && (un = utf8_mbtowc(&wc, s, str.length() - sn)) > 0)
     {
@@ -183,9 +183,9 @@ std::string utf8_wcstombs_orig(const std::wstring& wstr)
     char        utf8[6];
     int         un = 0;
 
-    for (unsigned int i = 0; i < wstr.size(); ++i)
+    for (std::uint32_t i = 0; i < wstr.size(); ++i)
     {
-        un = utf8_wctomb((unsigned char*)utf8, wstr[i], 6);
+        un = utf8_wctomb((std::uint8_t*)utf8, wstr[i], 6);
         if (un > 0)
             str.append(utf8, un);
     }
@@ -200,8 +200,8 @@ std::string utf8_wcstombs_orig(const std::wstring& wstr)
 
 std::wstring utf8_mbstowcs(const std::string& str)
 {
-    const unsigned char* s = (const unsigned char*)str.c_str();
-    const unsigned int   length = str.length();
+    const std::uint8_t* s = (const std::uint8_t*)str.c_str();
+    const std::uint32_t   length = str.length();
 
     if (length < SMALL_STRING_LIMIT)
     {
@@ -212,7 +212,7 @@ std::wstring utf8_mbstowcs(const std::string& str)
         wchar_t*     buffer = (wchar_t*)alloca(cBytes);
         wchar_t*     ptr = buffer;
         wchar_t      wc;
-        unsigned int sn = 0;
+        std::uint32_t sn = 0;
         int          un = 0;
 
         while (sn < length && *s != 0 && (un = utf8_mbtowc(&wc, s, length - sn)) > 0)
@@ -229,7 +229,7 @@ std::wstring utf8_mbstowcs(const std::string& str)
         // Slower but any size
         std::wstring wstr;
         wchar_t      wc;
-        unsigned int sn = 0;
+        std::uint32_t sn = 0;
         int          un = 0;
 
         while (sn < length && *s != 0 && (un = utf8_mbtowc(&wc, s, length - sn)) > 0)
@@ -245,7 +245,7 @@ std::wstring utf8_mbstowcs(const std::string& str)
 // Optimized
 std::string utf8_wcstombs(const std::wstring& wstr)
 {
-    const unsigned int size = wstr.length();
+    const std::uint32_t size = wstr.length();
 
     if (size < SMALL_STRING_LIMIT)
     {
@@ -253,9 +253,9 @@ std::string utf8_wcstombs(const std::wstring& wstr)
         uint  cBytes = (size + 1) * 6;
         char* buffer = (char*)alloca(cBytes);
         char* ptr = buffer;
-        for (unsigned int i = 0; i < size; ++i)
+        for (std::uint32_t i = 0; i < size; ++i)
         {
-            ptr += utf8_wctomb((unsigned char*)ptr, wstr[i], 6);
+            ptr += utf8_wctomb((std::uint8_t*)ptr, wstr[i], 6);
         }
         size_t usedsize = ptr - buffer;
         return std::string(buffer, usedsize);
@@ -266,9 +266,9 @@ std::string utf8_wcstombs(const std::wstring& wstr)
         char        utf8[6];
         std::string str;
 
-        for (unsigned int i = 0; i < size; ++i)
+        for (std::uint32_t i = 0; i < size; ++i)
         {
-            int un = utf8_wctomb((unsigned char*)utf8, wstr[i], 6);
+            int un = utf8_wctomb((std::uint8_t*)utf8, wstr[i], 6);
             if (un > 0)
                 str.append(utf8, un);
         }
