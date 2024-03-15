@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-13 22:52\n"
+"PO-Revision-Date: 2024-03-15 19:33\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -129,7 +129,7 @@ msgstr "Opcionális erőforrások a szerveredhez."
 #. DESC_Section8
 #: Shared/installer/nightly.nsi:231
 msgid "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-msgstr "MTA:SA 1.0 Pályakészítő. A saját pályáid megépítésére szolgál, melyeket különböző MTA-s játékmódokban használhatsz."
+msgstr "Pályaszerkesztő a szerveredhez. Ezzel elkészítheted a saját pályáidat, amelyeket felhasználhatsz az MTA:SA játékmódjaiban."
 
 #. DESC_Section9
 #: Shared/installer/nightly.nsi:232
