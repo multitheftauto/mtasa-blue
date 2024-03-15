@@ -63,6 +63,7 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
 
 void CLuaBuildingDefs::RemoveAllGameBuildings()
 {
+    m_pBuildingManager->RemoveAll();
     g_pGame->RemoveAllBuildings();
 }
 
