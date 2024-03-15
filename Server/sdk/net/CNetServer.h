@@ -102,7 +102,7 @@ public:
     };
 
     // szIP can be NULL if autochoosing is wanted.
-    virtual bool StartNetwork(const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName) = 0;
+    virtual bool StartNetwork(const char* szIP, std::uint16_t usServerPort, std::uint32_t uiAllowedPlayers, const char* szServerName) = 0;
     virtual void StopNetwork() = 0;
 
     virtual void DoPulse() = 0;
@@ -116,30 +116,30 @@ public:
     virtual void               GetPingStatus(SFixedString<32>* pstrStatus) = 0;
     virtual bool               GetSyncThreadStatistics(SSyncThreadStatistics* pDest, bool bResetCounters) = 0;
 
-    virtual NetBitStreamInterface* AllocateNetServerBitStream(unsigned short usBitStreamVersion, const void* pData = nullptr, uint uiDataSize = 0,
+    virtual NetBitStreamInterface* AllocateNetServerBitStream(std::uint16_t usBitStreamVersion, const void* pData = nullptr, uint uiDataSize = 0,
                                                               bool bCopyData = false) = 0;
     virtual void                   DeallocateNetServerBitStream(NetBitStreamInterface* bitStream) = 0;
-    virtual bool                   SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast,
+    virtual bool                   SendPacket(std::uint8_t ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast,
                                               NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability,
                                               ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT) = 0;
 
-    virtual void GetPlayerIP(const NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort) = 0;
+    virtual void GetPlayerIP(const NetServerPlayerID& playerID, char strIP[22], std::uint16_t* usPort) = 0;
 
     virtual void Kick(const NetServerPlayerID& PlayerID) = 0;
 
     virtual void SetPassword(const char* szPassword) = 0;
 
-    virtual void SetMaximumIncomingConnections(unsigned short numberAllowed) = 0;
+    virtual void SetMaximumIncomingConnections(std::uint16_t numberAllowed) = 0;
 
     virtual CNetHTTPDownloadManagerInterface* GetHTTPDownloadManager(EDownloadModeType iMode) = 0;
 
-    virtual void SetClientBitStreamVersion(const NetServerPlayerID& PlayerID, unsigned short usBitStreamVersion) = 0;
+    virtual void SetClientBitStreamVersion(const NetServerPlayerID& PlayerID, std::uint16_t usBitStreamVersion) = 0;
     virtual void ClearClientBitStreamVersion(const NetServerPlayerID& PlayerID) = 0;
 
     virtual void SetChecks(const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC,
                            const char* szImgMods) = 0;
 
-    virtual unsigned int GetPendingPacketCount() = 0;
+    virtual std::uint32_t GetPendingPacketCount() = 0;
     virtual void         GetNetRoute(SFixedString<32>* pstrRoute) = 0;
 
     virtual bool InitServerId(const char* szPath) = 0;

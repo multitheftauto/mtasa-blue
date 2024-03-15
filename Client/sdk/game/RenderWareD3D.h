@@ -19,11 +19,11 @@ struct RwD3D9Raster
         IDirect3DTexture9* texture;
         IDirect3DSurface9* surface;
     };
-    unsigned char*       palette;
-    unsigned char        alpha;
-    unsigned char        cubeTextureFlags; /* 0x01 IS_CUBEMAP_TEX */
-    unsigned char        textureFlags;     /* 0x10 IS_COMPRESSED */
-    unsigned char        lockedLevel;
+    std::uint8_t*       palette;
+    std::uint8_t        alpha;
+    std::uint8_t        cubeTextureFlags; /* 0x01 IS_CUBEMAP_TEX */
+    std::uint8_t        textureFlags;     /* 0x10 IS_COMPRESSED */
+    std::uint8_t        lockedLevel;
     IDirect3DSurface9*   lockedSurface;
     D3DLOCKED_RECT       lockedRect;
     D3DFORMAT            format;
@@ -36,28 +36,28 @@ struct NativeTexturePC_Header
 {
     struct
     {
-        unsigned int platformId;
-        unsigned int filterMode : 8;
-        unsigned int uAddressing : 4;
-        unsigned int vAddressing : 4;
-        unsigned int pad : 16;
+        std::uint32_t platformId;
+        std::uint32_t filterMode : 8;
+        std::uint32_t uAddressing : 4;
+        std::uint32_t vAddressing : 4;
+        std::uint32_t pad : 16;
         char         name[32];
         char         maskName[32];
     } TextureFormat;
 
     struct
     {
-        unsigned int   rasterFormat;
+        std::uint32_t   rasterFormat;
         D3DFORMAT      d3dFormat;
-        unsigned short width;
-        unsigned short height;
-        unsigned char  depth;
-        unsigned char  numLevels;
-        unsigned char  rasterType;
-        unsigned char  alpha : 1;
-        unsigned char  cubeTexture : 1;
-        unsigned char  autoMipMaps : 1;
-        unsigned char  compressed : 1;
-        unsigned char  pad : 4;
+        std::uint16_t width;
+        std::uint16_t height;
+        std::uint8_t  depth;
+        std::uint8_t  numLevels;
+        std::uint8_t  rasterType;
+        std::uint8_t  alpha : 1;
+        std::uint8_t  cubeTexture : 1;
+        std::uint8_t  autoMipMaps : 1;
+        std::uint8_t  compressed : 1;
+        std::uint8_t  pad : 4;
     } RasterFormat;
 };

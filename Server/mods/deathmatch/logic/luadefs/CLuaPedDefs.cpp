@@ -179,7 +179,7 @@ int CLuaPedDefs::GetValidPedModels(lua_State* luaVM)
 {
     int iIndex = 0;
     lua_newtable(luaVM);
-    for (unsigned short i = 0; i <= 312; i++)
+    for (std::uint16_t i = 0; i <= 312; i++)
     {
         if (CPlayerManager::IsValidPlayerModel(i))
         {
@@ -194,7 +194,7 @@ int CLuaPedDefs::GetValidPedModels(lua_State* luaVM)
 
 int CLuaPedDefs::CreatePed(lua_State* luaVM)
 {
-    unsigned short usModel;
+    std::uint16_t usModel;
     CVector        vecPosition;
     float          fRotation;
     bool           bSynced;
@@ -238,7 +238,7 @@ int CLuaPedDefs::CreatePed(lua_State* luaVM)
 int CLuaPedDefs::GetPedWeapon(lua_State* luaVM)
 {
     CPed*         pPed;
-    unsigned char ucSlot;
+    std::uint8_t ucSlot;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
@@ -252,7 +252,7 @@ int CLuaPedDefs::GetPedWeapon(lua_State* luaVM)
         CWeapon* pWeapon = pPed->GetWeapon(ucSlot);
         if (pWeapon)
         {
-            unsigned char ucWeapon = pWeapon->ucType;
+            std::uint8_t ucWeapon = pWeapon->ucType;
             lua_pushnumber(luaVM, ucWeapon);
             return 1;
         }
@@ -274,7 +274,7 @@ int CLuaPedDefs::GetPedWeaponSlot(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucSlot;
+        std::uint8_t ucSlot;
         if (CStaticFunctionDefinitions::GetPedWeaponSlot(pPed, ucSlot))
         {
             lua_pushnumber(luaVM, ucSlot);
@@ -517,7 +517,7 @@ int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)
 int CLuaPedDefs::SetPedWeaponSlot(lua_State* luaVM)
 {
     CElement*     pElement;
-    unsigned char ucSlot;
+    std::uint8_t ucSlot;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -619,7 +619,7 @@ int CLuaPedDefs::SetPedFrozen(lua_State* luaVM)
 int CLuaPedDefs::GetPedAmmoInClip(lua_State* luaVM)
 {
     CPed*         pPed;
-    unsigned char ucSlot = 0;
+    std::uint8_t ucSlot = 0;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
@@ -646,7 +646,7 @@ int CLuaPedDefs::GetPedAmmoInClip(lua_State* luaVM)
 int CLuaPedDefs::GetPedTotalAmmo(lua_State* luaVM)
 {
     CPed*         pPed;
-    unsigned char ucSlot = 0;
+    std::uint8_t ucSlot = 0;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
@@ -725,7 +725,7 @@ int CLuaPedDefs::GetPedOccupiedVehicleSeat(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiVehicleSeat;
+        std::uint32_t uiVehicleSeat;
         if (CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(pPed, uiVehicleSeat))
         {
             lua_pushnumber(luaVM, uiVehicleSeat);
@@ -841,7 +841,7 @@ int CLuaPedDefs::IsPedInVehicle(lua_State* luaVM)
 int CLuaPedDefs::GetPedStat(lua_State* luaVM)
 {
     CPed*          pPed;
-    unsigned short usStat;
+    std::uint16_t usStat;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
@@ -889,7 +889,7 @@ int CLuaPedDefs::GetPedTarget(lua_State* luaVM)
 int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
 {
     CPed*         pPed;
-    unsigned char ucType;
+    std::uint8_t ucType;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
@@ -967,7 +967,7 @@ int CLuaPedDefs::GetPedFightingStyle(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucStyle;
+        std::uint8_t ucStyle;
         if (CStaticFunctionDefinitions::GetPedFightingStyle(pPed, ucStyle))
         {
             lua_pushnumber(luaVM, ucStyle);
@@ -990,7 +990,7 @@ int CLuaPedDefs::GetPedMoveAnim(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiMoveAnim;
+        std::uint32_t uiMoveAnim;
         if (CStaticFunctionDefinitions::GetPedMoveAnim(pPed, uiMoveAnim))
         {
             lua_pushnumber(luaVM, uiMoveAnim);
@@ -1079,8 +1079,8 @@ int CLuaPedDefs::SetPedArmor(lua_State* luaVM)
 int CLuaPedDefs::KillPed(lua_State* luaVM)
 {
     CElement *    pElement, *pKiller;
-    unsigned char ucKillerWeapon;
-    unsigned char ucBodyPart;
+    std::uint8_t ucKillerWeapon;
+    std::uint8_t ucBodyPart;
     bool          bStealth;
 
     CScriptArgReader argStream(luaVM);
@@ -1140,7 +1140,7 @@ int CLuaPedDefs::SetPedRotation(lua_State* luaVM)
 int CLuaPedDefs::SetPedStat(lua_State* luaVM)
 {
     CElement*      pElement;
-    unsigned short usStat;
+    std::uint16_t usStat;
     float          fValue;
 
     CScriptArgReader argStream(luaVM);
@@ -1170,7 +1170,7 @@ int CLuaPedDefs::AddPedClothes(lua_State* luaVM)
     CElement*     pElement;
     SString       strTexture;
     SString       strModel;
-    unsigned char ucType;
+    std::uint8_t ucType;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1199,7 +1199,7 @@ int CLuaPedDefs::RemovePedClothes(lua_State* luaVM)
 {
     //  bool removePedClothes ( ped thePed, int clothesType, [ string clothesTexture, string clothesModel ] )
     CElement*     pElement;
-    unsigned char ucType;
+    std::uint8_t ucType;
     SString       strTexture;
     SString       strModel;
 
@@ -1304,7 +1304,7 @@ int CLuaPedDefs::SetPedWearingJetpack(lua_State* luaVM)
 int CLuaPedDefs::SetPedFightingStyle(lua_State* luaVM)
 {
     CElement*     pElement;
-    unsigned char ucStyle;
+    std::uint8_t ucStyle;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1409,7 +1409,7 @@ int CLuaPedDefs::WarpPedIntoVehicle(lua_State* luaVM)
 {
     CPed*        pPed;
     CVehicle*    pVehicle;
-    unsigned int uiSeat;
+    std::uint32_t uiSeat;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);

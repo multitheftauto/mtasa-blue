@@ -54,12 +54,12 @@ class CAnimBlendAssocGroupSA : public CAnimBlendAssocGroup
 public:
     CAnimBlendAssocGroupSA(CAnimBlendAssocGroupSAInterface* pInterface);
 
-    CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID);
+    CAnimBlendAssociationSAInterface* CopyAnimation(std::uint32_t AnimID);
     void                              InitEmptyAssociations(RpClump* pClump);
     bool                              IsCreated();
     int                               GetNumAnimations();
     CAnimBlock*                       GetAnimBlock();
-    CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID);
+    CAnimBlendStaticAssociation*      GetAnimation(std::uint32_t ID);
     eAnimGroup                        GetGroupID();
     void                              CreateAssociations(const char* szBlockName);
 

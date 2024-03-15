@@ -311,9 +311,9 @@ CBan* CBanManager::GetBanFromSerial(const char* szSerial)
     return NULL;
 }
 
-unsigned int CBanManager::GetBansWithNick(const char* szNick)
+std::uint32_t CBanManager::GetBansWithNick(const char* szNick)
 {
-    unsigned int                uiOccurrances = 0;
+    std::uint32_t                uiOccurrances = 0;
     list<CBan*>::const_iterator iter = m_BanManager.begin();
     for (; iter != m_BanManager.end(); iter++)
     {
@@ -326,9 +326,9 @@ unsigned int CBanManager::GetBansWithNick(const char* szNick)
     return uiOccurrances;
 }
 
-unsigned int CBanManager::GetBansWithBanner(const char* szBanner)
+std::uint32_t CBanManager::GetBansWithBanner(const char* szBanner)
 {
-    unsigned int                uiOccurrances = 0;
+    std::uint32_t                uiOccurrances = 0;
     list<CBan*>::const_iterator iter = m_BanManager.begin();
     for (; iter != m_BanManager.end(); iter++)
     {
@@ -377,9 +377,9 @@ bool CBanManager::LoadBanList()
 
     // Iterate the nodes
     CXMLNode*    pNode = NULL;
-    unsigned int uiCount = pRootNode->GetSubNodeCount();
+    std::uint32_t uiCount = pRootNode->GetSubNodeCount();
 
-    for (unsigned int i = 0; i < uiCount; i++)
+    for (std::uint32_t i = 0; i < uiCount; i++)
     {
         // Grab the node
         pNode = pRootNode->GetSubNode(i);
@@ -469,10 +469,10 @@ void CBanManager::SaveBanList()
                     SafeSetValue(pNode, "account", (*iter)->GetAccount());
                     SafeSetValue(pNode, "banner", (*iter)->GetBanner());
                     SafeSetValue(pNode, "reason", (*iter)->GetReason());
-                    SafeSetValue(pNode, "time", (unsigned int)(*iter)->GetTimeOfBan());
+                    SafeSetValue(pNode, "time", (std::uint32_t)(*iter)->GetTimeOfBan());
                     if ((*iter)->GetTimeOfUnban() > 0)
                     {
-                        SafeSetValue(pNode, "unban", (unsigned int)(*iter)->GetTimeOfUnban());
+                        SafeSetValue(pNode, "unban", (std::uint32_t)(*iter)->GetTimeOfUnban());
                     }
                 }
             }
@@ -500,7 +500,7 @@ void CBanManager::SafeSetValue(CXMLNode* pNode, const char* szKey, const std::st
     }
 }
 
-void CBanManager::SafeSetValue(CXMLNode* pNode, const char* szKey, unsigned int uiValue)
+void CBanManager::SafeSetValue(CXMLNode* pNode, const char* szKey, std::uint32_t uiValue)
 {
     if (uiValue)
     {

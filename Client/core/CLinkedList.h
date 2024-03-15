@@ -73,7 +73,7 @@ public:
         T& operator[](int j) const
         {
             CNode<T>* m_pTrans = m_pCurrent;
-            for (int i = 0; i < j; i++)
+            for (auto i = 0; i < j; i++)
             {
                 if (m_pTrans)
                     m_pTrans = m_pTrans->m_pNext;
@@ -107,7 +107,7 @@ public:
     };
 
 private:
-    unsigned int m_iNumElements;
+    std::uint32_t m_iNumElements;
     CNode<T>*    m_pHead;
     CNode<T>*    m_pTail;
 
@@ -156,7 +156,7 @@ public:
 
     CIterator getEnd() { return CIterator(NULL); };
 
-    unsigned int getNumElements() { return m_iNumElements; };
+    std::uint32_t getNumElements() { return m_iNumElements; };
 
     // the only case this would be needed is if they wanted to do a reverse iterate
     CIterator getTail() { return CIterator(m_pTail); };

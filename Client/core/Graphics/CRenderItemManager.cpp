@@ -974,7 +974,7 @@ int CRenderItemManager::CalcD3DTextureMemoryKBUsage(IDirect3DTexture9* pD3DTextu
 
     // Calc memory usage
     int iLevelCount = pD3DTexture->GetLevelCount();
-    for (int i = 0; i < iLevelCount; i++)
+    for (auto i = 0; i < iLevelCount; i++)
     {
         D3DSURFACE_DESC surfaceDesc;
         pD3DTexture->GetLevelDesc(i, &surfaceDesc);
@@ -999,7 +999,7 @@ int CRenderItemManager::CalcD3DVolumeTextureMemoryKBUsage(IDirect3DVolumeTexture
 
     // Calc memory usage
     int iLevelCount = pD3DVolumeTexture->GetLevelCount();
-    for (int i = 0; i < iLevelCount; i++)
+    for (auto i = 0; i < iLevelCount; i++)
     {
         D3DVOLUME_DESC volumeDesc;
         pD3DVolumeTexture->GetLevelDesc(i, &volumeDesc);
@@ -1024,7 +1024,7 @@ int CRenderItemManager::CalcD3DCubeTextureMemoryKBUsage(IDirect3DCubeTexture9* p
 
     // Calc memory usage
     int iLevelCount = pD3DCubeTexture->GetLevelCount();
-    for (int i = 0; i < iLevelCount; i++)
+    for (auto i = 0; i < iLevelCount; i++)
     {
         D3DSURFACE_DESC surfaceDesc;
         pD3DCubeTexture->GetLevelDesc(i, &surfaceDesc);

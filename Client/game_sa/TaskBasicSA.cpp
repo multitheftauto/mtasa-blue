@@ -126,7 +126,7 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, con
     }
 }
 
-CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
+CTaskSimpleDeadSA::CTaskSimpleDeadSA(std::uint32_t uiDeathTimeMS, bool bUnk2)
 {
     CreateTaskInterface(sizeof(CTaskSimpleDeadSAInterface));
     if (!IsValid())

@@ -28,12 +28,12 @@ public:
     virtual void  Break() = 0;
     virtual void  SetHealth(float fHealth) = 0;
     virtual float GetHealth() = 0;
-    virtual void  SetModelIndex(unsigned long ulModel) = 0;
+    virtual void  SetModelIndex(std::uint32_t ulModel) = 0;
 
     virtual void          SetPreRenderRequired(bool required) = 0;
     virtual bool          GetPreRenderRequired() = 0;
-    virtual void          SetAlpha(unsigned char ucAlpha) = 0;
-    virtual unsigned char GetAlpha() = 0;
+    virtual void          SetAlpha(std::uint8_t ucAlpha) = 0;
+    virtual std::uint8_t GetAlpha() = 0;
 
     virtual bool IsAGangTag() const = 0;
     virtual bool IsGlass() = 0;

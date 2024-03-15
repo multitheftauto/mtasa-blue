@@ -18,37 +18,37 @@ class CPlayerSpawnPacket final : public CPacket
 {
 public:
     CPlayerSpawnPacket();
-    CPlayerSpawnPacket(ElementID PlayerID, const CVector& vecSpawnPosition, float fSpawnRotation, unsigned short usPlayerSkin, unsigned char ucInterior,
-                       unsigned short usDimension, ElementID Team, unsigned char ucTimeContext);
+    CPlayerSpawnPacket(ElementID PlayerID, const CVector& vecSpawnPosition, float fSpawnRotation, std::uint16_t usPlayerSkin, std::uint8_t ucInterior,
+                       std::uint16_t usDimension, ElementID Team, std::uint8_t ucTimeContext);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_SPAWN; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
     ElementID      GetPlayer() { return m_PlayerID; };
     CVector&       GetSpawnPosition() { return m_vecSpawnPosition; };
     float          GetSpawnRotation() { return m_fSpawnRotation; };
-    unsigned short GetPlayerSkin() { return m_usPlayerSkin; };
+    std::uint16_t GetPlayerSkin() { return m_usPlayerSkin; };
     ElementID      GetTeam() { return m_Team; }
-    unsigned char  GetInterior() { return m_ucInterior; }
-    unsigned short GetDimension() { return m_usDimension; }
+    std::uint8_t  GetInterior() { return m_ucInterior; }
+    std::uint16_t GetDimension() { return m_usDimension; }
 
     void SetPlayer(ElementID PlayerID) { m_PlayerID = PlayerID; };
     void SetSpawnPosition(CVector& vecPosition) { m_vecSpawnPosition = vecPosition; };
     void SetSpawnRotation(float fRotation) { m_fSpawnRotation = fRotation; };
-    void SetPlayerSkin(unsigned short usPlayerSkin) { m_usPlayerSkin = usPlayerSkin; };
+    void SetPlayerSkin(std::uint16_t usPlayerSkin) { m_usPlayerSkin = usPlayerSkin; };
     void SetTeam(ElementID TeamID) { m_Team = TeamID; }
-    void SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
-    void SetDimension(unsigned short usDimension) { m_usDimension = usDimension; }
+    void SetInterior(std::uint8_t ucInterior) { m_ucInterior = ucInterior; }
+    void SetDimension(std::uint16_t usDimension) { m_usDimension = usDimension; }
 
 private:
     ElementID      m_PlayerID;
     CVector        m_vecSpawnPosition;
     float          m_fSpawnRotation;
-    unsigned short m_usPlayerSkin;
+    std::uint16_t m_usPlayerSkin;
     ElementID      m_Team;
-    unsigned char  m_ucInterior;
-    unsigned short m_usDimension;
-    unsigned char  m_ucTimeContext;
+    std::uint8_t  m_ucInterior;
+    std::uint16_t m_usDimension;
+    std::uint8_t  m_ucTimeContext;
 };

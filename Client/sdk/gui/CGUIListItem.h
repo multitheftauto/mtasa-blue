@@ -33,6 +33,6 @@ public:
     virtual bool GetSelectedState() = 0;
     virtual void SetSelectedState(bool bState) = 0;
 
-    virtual bool GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha) = 0;
-    virtual void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha) = 0;
+    virtual bool GetColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha) = 0;
+    virtual void SetColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue, std::uint8_t ucAlpha) = 0;
 };

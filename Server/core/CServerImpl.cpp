@@ -330,9 +330,9 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     if (m_NetworkLibrary.Load(PathJoin(m_strServerPath, SERVER_BIN_PATH, szNetworkLibName)))
     {
         // Network module compatibility check
-        typedef unsigned long (*PFNCHECKCOMPATIBILITY)(unsigned long, unsigned long*);
+        typedef std::uint32_t (*PFNCHECKCOMPATIBILITY)(std::uint32_t, std::uint32_t*);
         PFNCHECKCOMPATIBILITY pfnCheckCompatibility = reinterpret_cast<PFNCHECKCOMPATIBILITY>(m_NetworkLibrary.GetProcedureAddress("CheckCompatibility"));
-        if (!pfnCheckCompatibility || !pfnCheckCompatibility(MTA_DM_SERVER_NET_MODULE_VERSION, (unsigned long*)MTASA_VERSION_TYPE))
+        if (!pfnCheckCompatibility || !pfnCheckCompatibility(MTA_DM_SERVER_NET_MODULE_VERSION, (std::uint32_t*)MTASA_VERSION_TYPE))
         {
             // net.dll doesn't like our version number
             ulong ulNetModuleVersion = 0;
@@ -518,7 +518,7 @@ void CServerImpl::HandlePulseSleep()
         return;
     }
 
-    CTickCount sleepLimit = CTickCount::Now() + CTickCount((long long)iSleepIdleMs);
+    CTickCount sleepLimit = CTickCount::Now() + CTickCount((std::int64_t)iSleepIdleMs);
 
     // Initial sleep period
     int iInitialMs = std::min(iSleepIdleMs, iSleepBusyMs);
@@ -526,7 +526,7 @@ void CServerImpl::HandlePulseSleep()
 
     // Remaining idle sleep period
     int iFinalMs = Clamp(1, iSleepIdleMs - iInitialMs, 50);
-    for (int i = 0; i < iFinalMs; i++)
+    for (auto i = 0; i < iFinalMs; i++)
     {
         if (m_pModManager->PendingWorkToDo())
             break;
@@ -613,12 +613,12 @@ void CServerImpl::ShowInfoTag(char* szTag)
         strcpy(m_szTag, szTag);
 
         // Construct the screenbuffer
-        for (int i = 0; i < ScrnBufferInfo.dwSize.X; i++)
+        for (auto i = 0; i < ScrnBufferInfo.dwSize.X; i++)
         {
             if (szTag[i] == NULL)
             {
                 // No more tag data, so fill it up with spaces and break the loop
-                for (int j = ScrnBufferCount; j < ScrnBufferInfo.dwSize.X; j++)
+                for (auto j = ScrnBufferCount; j < ScrnBufferInfo.dwSize.X; j++)
                 {
                     m_ScrnBuffer[j].Char.UnicodeChar = L' ';
                     m_ScrnBuffer[j].Attributes = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;
@@ -628,7 +628,7 @@ void CServerImpl::ShowInfoTag(char* szTag)
             else
             {
                 // The color interpreter
-                switch ((unsigned char)(szTag[i]))
+                switch ((std::uint8_t)(szTag[i]))
                 {
                     case 128:
                         m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
@@ -659,7 +659,7 @@ void CServerImpl::ShowInfoTag(char* szTag)
                         break;
                 }
 
-                if ((unsigned char)szTag[i] > 127)
+                if ((std::uint8_t)szTag[i] > 127)
                 {
                     // If this is a color code, skip to the next character, so we can color that one
                     i++;
@@ -684,14 +684,14 @@ void CServerImpl::ShowInfoTag(char* szTag)
     // Position the cursor
     wmove(m_wndMenu, 0, 0);
 
-    for (int i = 0; i < COLS; i++)
+    for (auto i = 0; i < COLS; i++)
     {
         // Break if we reached szTag's end
         if (szTag[i] == '\0')
             break;
 
         // Apply the attributes
-        switch ((unsigned char)(szTag[i]))
+        switch ((std::uint8_t)(szTag[i]))
         {
             case 128:
                 iAttr = COLOR_PAIR(3) | A_BOLD;
@@ -1064,8 +1064,8 @@ bool CServerImpl::ParseArguments(int iArgumentCount, char* szArguments[])
 #endif
 
     // Iterate our arguments
-    unsigned char ucNext = 0;
-    for (int i = 0; i < iArgumentCount; i++)
+    std::uint8_t ucNext = 0;
+    for (auto i = 0; i < iArgumentCount; i++)
     {
         switch (ucNext)
         {

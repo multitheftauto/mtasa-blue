@@ -29,7 +29,7 @@ void  HOOK_Camera_CollisionDetection();
 CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
 {
     internalInterface = cameraInterface;
-    for (int i = 0; i < MAX_CAMS; i++)
+    for (auto i = 0; i < MAX_CAMS; i++)
         Cams[i] = new CCamSA(&internalInterface->Cams[i]);
     bCameraClipObjects = true;
     bCameraClipVehicles = true;
@@ -38,7 +38,7 @@ CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
 
 CCameraSA::~CCameraSA()
 {
-    for (int i = 0; i < MAX_CAMS; i++)
+    for (auto i = 0; i < MAX_CAMS; i++)
     {
         delete Cams[i];
     }
@@ -270,7 +270,7 @@ CCam* CCameraSA::GetCam(BYTE bCameraID)
 
 CCam* CCameraSA::GetCam(CCamSAInterface* camInterface)
 {
-    for (int i = 0; i < MAX_CAMS; i++)
+    for (auto i = 0; i < MAX_CAMS; i++)
     {
         if (Cams[i] && Cams[i]->GetInterface() == camInterface)
         {
@@ -333,7 +333,7 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
     }
 }
 
-void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+void CCameraSA::SetFadeColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
 {
     DWORD               dwFunc = FUNC_SetFadeColour;
     CCameraSAInterface* cameraInterface = GetInterface();

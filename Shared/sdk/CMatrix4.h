@@ -87,10 +87,10 @@ public:
     const CMatrix4& operator*=(const CMatrix4& m)
     {
         float        c[16];
-        unsigned int idx;
-        for (unsigned int i = 0; i < 4; i++)
+        std::uint32_t idx;
+        for (std::uint32_t i = 0; i < 4; i++)
         {
-            for (unsigned int j = 0; j < 4; j++)
+            for (std::uint32_t j = 0; j < 4; j++)
             {
                 idx = (i * 4) + j;
                 c[idx] = m_cell[(i * 4)] * m.m_cell[j];
@@ -121,9 +121,9 @@ public:
         return c;
     }
 
-    float& operator[](unsigned int i) { return m_cell[i]; }
+    float& operator[](std::uint32_t i) { return m_cell[i]; }
 
-    float operator[](unsigned int i) const { return m_cell[i]; }
+    float operator[](std::uint32_t i) const { return m_cell[i]; }
 
 private:
     float m_cell[16];

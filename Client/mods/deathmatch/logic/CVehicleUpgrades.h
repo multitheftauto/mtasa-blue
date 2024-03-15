@@ -22,30 +22,30 @@ enum eVehicleUpgrade
     VEHICLEUPGRADE_HYDRAULICS = 1087,
 };
 
-typedef SFixedArray<unsigned short, VEHICLE_UPGRADE_SLOTS> SSlotStates;
+typedef SFixedArray<std::uint16_t, VEHICLE_UPGRADE_SLOTS> SSlotStates;
 
 class CVehicleUpgrades
 {
 public:
     CVehicleUpgrades(CClientVehicle* pVehicle);
 
-    static bool IsUpgrade(unsigned short usModel);
-    bool        IsUpgradeCompatible(unsigned short usUpgrade);
-    static bool GetSlotFromUpgrade(unsigned short usUpgrade, unsigned char& ucSlot);
+    static bool IsUpgrade(std::uint16_t usModel);
+    bool        IsUpgradeCompatible(std::uint16_t usUpgrade);
+    static bool GetSlotFromUpgrade(std::uint16_t usUpgrade, std::uint8_t& ucSlot);
 
-    bool               AddUpgrade(unsigned short usUpgrade, bool bAddedLocally);
+    bool               AddUpgrade(std::uint16_t usUpgrade, bool bAddedLocally);
     void               AddAllUpgrades();
-    void               ForceAddUpgrade(unsigned short usUpgrade);
-    bool               HasUpgrade(unsigned short usUpgrade);
-    bool               RemoveUpgrade(unsigned short usUpgrade);
-    unsigned short     GetSlotState(unsigned char ucSlot);
+    void               ForceAddUpgrade(std::uint16_t usUpgrade);
+    bool               HasUpgrade(std::uint16_t usUpgrade);
+    bool               RemoveUpgrade(std::uint16_t usUpgrade);
+    std::uint16_t     GetSlotState(std::uint8_t ucSlot);
     const SSlotStates& GetSlotStates() { return m_SlotStates; }
-    static const char* GetSlotName(unsigned char ucSlot);
+    static const char* GetSlotName(std::uint8_t ucSlot);
 
     void ReAddAll();
     void RemoveAll(bool bRipFromVehicle);
 
-    void RestreamVehicleUpgrades(unsigned short usModel);
+    void RestreamVehicleUpgrades(std::uint16_t usModel);
 
 protected:
     SSlotStates     m_SlotStates;

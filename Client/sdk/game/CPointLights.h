@@ -24,7 +24,7 @@ enum ePointLightType
 class CPointLights
 {
 public:
-    virtual void AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SharedUtil::SColor color, unsigned char uc_8,
+    virtual void AddLight(int iMode, const CVector vecPosition, CVector vecDirection, float fRadius, SharedUtil::SColor color, std::uint8_t uc_8,
                           bool bCreatesShadow, CEntity* pAffected) = 0;
 
     virtual void PreRenderHeliLights() = 0;

@@ -32,10 +32,10 @@ public:
     float GetScrollbarDocumentSize();
     float GetScrollbarPageSize();
 
-    void         SetSelection(unsigned int uiStart, unsigned int uiEnd);
-    unsigned int GetSelectionStart();
-    unsigned int GetSelectionEnd();
-    unsigned int GetSelectionLength();
+    void         SetSelection(std::uint32_t uiStart, std::uint32_t uiEnd);
+    std::uint32_t GetSelectionStart();
+    std::uint32_t GetSelectionEnd();
+    std::uint32_t GetSelectionLength();
 
     void EnsureCaratIsVisible();
 

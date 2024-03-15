@@ -20,7 +20,7 @@ class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
 class CTaskManagementSystemSA;
 
-extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
+extern std::uint32_t OBJECTDYNAMICINFO_MAX;            // default: 160
 
 #define CLASS_CPlayerInfo               0xB7CD98
 #define CLASS_CCamera                   0xB6F028
@@ -155,7 +155,7 @@ public:
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
-    CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
+    CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(std::uint8_t ucObjectGroup);
 
     int32_t GetBaseIDforDFF() { return 0; }
     int32_t GetBaseIDforTXD() { return *(int32_t*)(0x407104 + 2); }
@@ -169,7 +169,7 @@ public:
 
     DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
 
-    bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
+    bool IsAtMenu() { return *(std::uint32_t*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
     void         StartGame();
     void         SetSystemState(eSystemState State);
@@ -197,8 +197,8 @@ public:
     float GetGameSpeed();
     void  SetGameSpeed(float fSpeed);
 
-    unsigned char GetBlurLevel();
-    void          SetBlurLevel(unsigned char ucLevel);
+    std::uint8_t GetBlurLevel();
+    void          SetBlurLevel(std::uint8_t ucLevel);
 
     void SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled);
     bool GetJetpackWeaponEnabled(eWeaponType weaponType);
@@ -218,8 +218,8 @@ public:
     bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
     void SetFireballDestructEnabled(bool isEnabled) override;
 
-    unsigned long GetMinuteDuration();
-    void          SetMinuteDuration(unsigned long ulTime);
+    std::uint32_t GetMinuteDuration();
+    void          SetMinuteDuration(std::uint32_t ulTime);
 
     bool IsCheatEnabled(const char* szCheatName);
     bool SetCheatEnabled(const char* szCheatName, bool bEnable);
@@ -332,7 +332,7 @@ private:
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
 
-    static unsigned int&  ClumpOffset;
+    static std::uint32_t&  ClumpOffset;
 
     std::map<std::string, SCheatSA*> m_Cheats;
 

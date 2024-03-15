@@ -52,9 +52,9 @@ public:
     bool IsVisible();
     void Hide();
     void Show(eWindowType WindowType);
-    void Show(eWindowType WindowType, const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL);
+    void Show(eWindowType WindowType, const char* szHost, std::uint16_t usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL);
 
-    void SetServerInformation(const char* szHost, unsigned short usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL);
+    void SetServerInformation(const char* szHost, std::uint16_t usPort, const char* szPassword, CServerListItem* pInitialServerListItem = NULL);
 
     void DoPulse();
 
@@ -88,13 +88,13 @@ protected:
     CGUIButton* m_pButtonClose;
 
 private:
-    unsigned long   m_ulLastUpdateTime;
+    std::uint32_t   m_ulLastUpdateTime;
     CServerListItem m_Server;
     eWindowType     m_pCurrentWindowType;
     bool            m_bWaitingToActivatePassword;
 
     SString        m_strHost;
-    unsigned short m_usPort;
+    std::uint16_t m_usPort;
     SString        m_strPassword;
 
     void Refresh();

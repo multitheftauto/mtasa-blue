@@ -54,7 +54,7 @@ eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimG
         {
             // Choose another animId
             int iNewAnimId = iUseAnimId;
-            for (int i = 0; i < pGroup->iNumAnimations; i++)
+            for (auto i = 0; i < pGroup->iNumAnimations; i++)
             {
                 pAssociation = pGroup->pAssociationsArray + i;
                 if (pAssociation->pAnimHeirarchy)

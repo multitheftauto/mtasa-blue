@@ -35,9 +35,9 @@ int CLuaFunctionDefs::OutputConsole(lua_State* luaVM)
 int CLuaFunctionDefs::OutputChatBox(lua_State* luaVM)
 {
     SString          strText = "";
-    unsigned char    ucRed = 231;
-    unsigned char    ucGreen = 217;
-    unsigned char    ucBlue = 176;
+    std::uint8_t    ucRed = 231;
+    std::uint8_t    ucGreen = 217;
+    std::uint8_t    ucBlue = 176;
     bool             bColorCoded = false;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strText);
@@ -100,10 +100,10 @@ int CLuaFunctionDefs::SetClipboard(lua_State* luaVM)
 int CLuaFunctionDefs::OutputClientDebugString(lua_State* luaVM)
 {
     SString          strText = "";
-    unsigned int     uiLevel = 3;
-    unsigned char    ucRed = 255;
-    unsigned char    ucGreen = 255;
-    unsigned char    ucBlue = 255;
+    std::uint32_t     uiLevel = 3;
+    std::uint8_t    ucRed = 255;
+    std::uint8_t    ucGreen = 255;
+    std::uint8_t    ucBlue = 255;
     CScriptArgReader argStream(luaVM);
     argStream.ReadAnyAsString(strText);
     argStream.ReadNumber(uiLevel, 3);

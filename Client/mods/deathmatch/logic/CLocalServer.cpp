@@ -358,7 +358,7 @@ bool CLocalServer::Save()
         }
 
         // Add new resources to the config
-        for (int i = 0; i < m_pResourcesCur->GetRowCount(); i++)
+        for (auto i = 0; i < m_pResourcesCur->GetRowCount(); i++)
         {
             CXMLNode* pResourceNode = pRoot->CreateSubNode("resource");
             pResourceNode->GetAttributes().Create("src")->SetValue(m_pResourcesCur->GetItemText(i, 1));
@@ -387,7 +387,7 @@ void CLocalServer::StoreConfigValue(const char* szNode, const char* szValue)
 
 void CLocalServer::HandleResource(const char* szResource)
 {
-    for (int i = 0; i < m_pResourcesCur->GetRowCount(); i++)
+    for (auto i = 0; i < m_pResourcesCur->GetRowCount(); i++)
     {
         if (strcmp(szResource, m_pResourcesCur->GetItemText(i, 1)) == 0)
             return;

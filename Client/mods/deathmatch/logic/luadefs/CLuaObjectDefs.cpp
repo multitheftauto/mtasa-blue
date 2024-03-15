@@ -186,7 +186,7 @@ int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)
 
     if (argStream.NextIsNumber())
     {
-        unsigned short usModel;
+        std::uint16_t usModel;
         argStream.ReadNumber(usModel);
 
         lua_pushboolean(luaVM, CClientObjectManager::IsBreakableModel(usModel));

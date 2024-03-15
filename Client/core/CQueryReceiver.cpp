@@ -70,7 +70,7 @@ bool CQueryReceiver::ReadString(std::string& strRead, const char* szBuffer, int&
 {
     if (i <= nLength)
     {
-        unsigned char len = szBuffer[i];
+        std::uint8_t len = szBuffer[i];
         if (i + len <= nLength && len > 0)
         {
             const char* ptr = &szBuffer[i + 1];
@@ -152,8 +152,8 @@ SQueryInfo CQueryReceiver::GetServerResponse()
 
         info.isPassworded = (szBuffer[i++] == 1);
         info.serials = (szBuffer[i++] == 1);
-        info.players = (unsigned char)szBuffer[i++];
-        info.playerSlot = (unsigned char)szBuffer[i++];
+        info.players = (std::uint8_t)szBuffer[i++];
+        info.playerSlot = (std::uint8_t)szBuffer[i++];
 
         // Recover large player count if present
         const SString strPlayerCount = strMapTemp.Right(strMapTemp.length() - strlen(strMapTemp) - 1);

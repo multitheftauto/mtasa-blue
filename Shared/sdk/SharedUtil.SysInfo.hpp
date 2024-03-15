@@ -231,7 +231,7 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
         outResult.back().reserve(vecKeys.size());
 
         // Fill each cell
-        for (unsigned int i = 0; i < vecKeys.size(); i++)
+        for (std::uint32_t i = 0; i < vecKeys.size(); i++)
         {
             std::string strKey = vecKeys[i];
             std::string strValue;
@@ -294,10 +294,10 @@ SString SharedUtil::GetWMIOSVersion()
 //
 //
 /////////////////////////////////////////////////////////////////////
-long long SharedUtil::GetWMITotalPhysicalMemory()
+std::int64_t SharedUtil::GetWMITotalPhysicalMemory()
 {
     // This won't change after the first call
-    static long long llResult = 0;
+    static std::int64_t llResult = 0;
 
     if (llResult == 0)
     {
@@ -326,9 +326,9 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 //
 //
 /////////////////////////////////////////////////////////////////////
-unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev)
+std::uint32_t SharedUtil::GetWMIVideoAdapterMemorySize(const std::uint32_t ulVen, const std::uint32_t ulDev)
 {
-    unsigned int uiResult = 0;
+    std::uint32_t uiResult = 0;
 
     SString DevVen;
     DevVen.Format("VEN_%04X&DEV_%04X", ulVen, ulDev);
@@ -344,7 +344,7 @@ unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen,
         const SString& AdapterRAM = result[i][1];
         const SString& Availability = result[i][2];
 
-        unsigned int uiAdapterRAM = atoi(AdapterRAM);
+        std::uint32_t uiAdapterRAM = atoi(AdapterRAM);
         int          iAvailability = atoi(Availability);
 
         if ((iAvailability == 8 || iAvailability == 3) && PNPDeviceID.Contains(DevVen))

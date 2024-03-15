@@ -281,7 +281,7 @@ VOID OnGameLaunch()
         InitNetRev(GetProductRegistryPath(), GetProductCommonDataDir(), GetProductVersion());
     }
 
-    bool (*CheckService)(unsigned int) = reinterpret_cast<decltype(CheckService)>(GetProcAddress(g_netc, "CheckService"));
+    bool (*CheckService)(std::uint32_t) = reinterpret_cast<decltype(CheckService)>(GetProcAddress(g_netc, "CheckService"));
 
     if (!CheckService)
     {
@@ -532,7 +532,7 @@ auto GetProcessPath(DWORD processId) -> fs::path
 
     HANDLE process{};
 
-    for (int i = 0; i < 2 && !process; ++i)
+    for (auto i = 0; i < 2 && !process; ++i)
     {
         DWORD access = (i == 0) ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION;
         process = OpenProcess(access, FALSE, processId);

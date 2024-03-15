@@ -42,7 +42,7 @@ int CLuaHTTPDefs::httpWrite(lua_State* luaVM)
             if (file && file->GetType() == CResourceHTMLItem::RESOURCE_FILE_TYPE_HTML)
             {
                 CResourceHTMLItem* html = (CResourceHTMLItem*)file;
-                unsigned long      ulLength;
+                std::uint32_t      ulLength;
                 if (argStream.NextIsNumber())
                     argStream.ReadNumber(ulLength);
                 else
@@ -140,7 +140,7 @@ int CLuaHTTPDefs::httpSetResponseCookie(lua_State* luaVM)
 int CLuaHTTPDefs::httpSetResponseCode(lua_State* luaVM)
 {
     //  bool httpSetResponseCode ( int code )
-    unsigned int uiResponseCode;
+    std::uint32_t uiResponseCode;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(uiResponseCode);

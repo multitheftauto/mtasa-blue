@@ -20,10 +20,10 @@
 #define DT_ENGINE_FUCKED                (250)
 
 /*
-const unsigned char DT_ENG_INOPERABLE = 0x01;
-const unsigned char DT_ENG_EXHAUST_SMOKE = 0x02;
-const unsigned char DT_ENG_RADIATOR_STEAM = 0x04;
-const unsigned char DT_ENG_ON_FIRE = 0x08;
+const std::uint8_t DT_ENG_INOPERABLE = 0x01;
+const std::uint8_t DT_ENG_EXHAUST_SMOKE = 0x02;
+const std::uint8_t DT_ENG_RADIATOR_STEAM = 0x04;
+const std::uint8_t DT_ENG_ON_FIRE = 0x08;
 */
 
 enum eWheelStatus
@@ -131,13 +131,13 @@ public:
     virtual BYTE          GetWheelStatus(eWheelPosition bTire) = 0;
     virtual void          SetWheelStatus(eWheelPosition bTire, BYTE bTireStatus) = 0;
     virtual BYTE          GetPanelStatus(BYTE bPanel) = 0;
-    virtual unsigned long GetPanelStatus() = 0;
+    virtual std::uint32_t GetPanelStatus() = 0;
     virtual void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus) = 0;
-    virtual void          SetPanelStatus(unsigned long ulStatus) = 0;
+    virtual void          SetPanelStatus(std::uint32_t ulStatus) = 0;
     virtual BYTE          GetLightStatus(BYTE bLight) = 0;
-    virtual unsigned char GetLightStatus() = 0;
+    virtual std::uint8_t GetLightStatus() = 0;
     virtual void          SetLightStatus(BYTE bLight, BYTE bLightStatus) = 0;
-    virtual void          SetLightStatus(unsigned char ucStatus) = 0;
+    virtual void          SetLightStatus(std::uint8_t ucStatus) = 0;
     virtual BYTE          GetAeroplaneCompStatus(BYTE CompID) = 0;
     virtual void          SetAeroplaneCompStatus(BYTE CompID, BYTE Status) = 0;            // component ids begin at 12 - probably
 

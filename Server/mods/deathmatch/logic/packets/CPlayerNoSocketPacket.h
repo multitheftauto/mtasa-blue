@@ -14,7 +14,7 @@ class CPlayerNoSocketPacket final : public CPacket
 public:
     virtual bool  RequiresSourcePlayer() const { return true; }
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_NO_SOCKET; };
-    unsigned long GetFlags() const
+    std::uint32_t GetFlags() const
     {
         assert(0);
         return 0;

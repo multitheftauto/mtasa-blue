@@ -46,7 +46,7 @@ public:
     CVector*       pvecPosition;
     CVector*       pvecRotation;
     CVector*       pvecVelocity;
-    unsigned short usModel;
+    std::uint16_t usModel;
 };
 
 class CClientProjectile final : public CClientEntity
@@ -67,7 +67,7 @@ public:
     void              Unlink();
 
     void DoPulse();
-    void Initiate(CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel);
+    void Initiate(CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, std::uint16_t usModel);
     void Destroy(bool bBlow = true);
 
     bool           IsActive();
@@ -81,8 +81,8 @@ public:
     void           SetRotationDegrees(const CVector& vecRotation);
     void           GetVelocity(CVector& vecVelocity);
     void           SetVelocity(CVector& vecVelocity);
-    unsigned short GetModel();
-    void           SetModel(unsigned short usModel);
+    std::uint16_t GetModel();
+    void           SetModel(std::uint16_t usModel);
     void           SetCounter(DWORD dwCounter);
     DWORD          GetCounter();
     CClientEntity* GetCreator() { return m_pCreator; }
@@ -108,7 +108,7 @@ protected:
     CVector*         m_pvecTarget;
     float            m_fForce;
     bool             m_bLocal;
-    long long        m_llCreationTime;
+    std::int64_t        m_llCreationTime;
 
     bool                     m_bInitiate;
     CProjectileInitiateData* m_pInitiateData;

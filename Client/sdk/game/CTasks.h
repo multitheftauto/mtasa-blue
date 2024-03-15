@@ -49,8 +49,8 @@ class CTaskSimpleUseGun;
 class CVector;
 class CVehicle;
 
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+typedef std::uint32_t AssocGroupId;
+typedef std::uint32_t AnimationId;
 
 enum eClimbHeights
 {
@@ -82,11 +82,11 @@ public:
                                                                        const bool bSensibleLeaveCar = true, const bool bForceGetOut = false) = 0;
     virtual CTaskComplexUseMobilePhone*      CreateTaskComplexUseMobilePhone(const int iDuration = -1) = 0;
 
-    virtual CTaskSimpleDuck*    CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck = 0,
-                                                     unsigned short nUseShotsWhizzingEvents = -1) = 0;
+    virtual CTaskSimpleDuck*    CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, std::uint16_t nLengthOfDuck = 0,
+                                                     std::uint16_t nUseShotsWhizzingEvents = -1) = 0;
     virtual CTaskSimpleChoking* CreateTaskSimpleChoking(CPed* pAttacker, bool bIsTearGas) = 0;
 
-    virtual CTaskSimpleClimb*   CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType,
+    virtual CTaskSimpleClimb*   CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, std::uint8_t nSurfaceType,
                                                       char nHeight = CLIMB_GRAB, const bool bForceClimb = false) = 0;
     virtual CTaskSimpleJetPack* CreateTaskSimpleJetpack(const CVector* pVecTargetPos = NULL, float fCruiseHeight = 10.0f, int nHoverTime = 0) = 0;
 
@@ -101,7 +101,7 @@ public:
                                                   const float fAnimSpeed = 0.0f, const bool bBeingKilledByStealth = false, const bool bFallingToDeath = false,
                                                   const int iFallToDeathDir = 0, const bool bFallToDeathOverRailing = false) = 0;
     virtual CTaskSimpleStealthKill* CreateTaskSimpleStealthKill(bool bAttacker, class CPed* pPed, const AnimationId anim) = 0;
-    virtual CTaskSimpleDead*        CreateTaskSimpleDead(unsigned int uiDeathTimeMS, bool bUnk2) = 0;
+    virtual CTaskSimpleDead*        CreateTaskSimpleDead(std::uint32_t uiDeathTimeMS, bool bUnk2) = 0;
     virtual CTaskSimpleBeHit*       CreateTaskSimpleBeHit(CPed* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId) = 0;
     virtual CTaskComplexSunbathe*   CreateTaskComplexSunbathe(class CObject* pTowel, const bool bStartStanding) = 0;
 
@@ -109,15 +109,15 @@ public:
     virtual CTaskSimpleIKChain*       CreateTaskSimpleIKChain(char* idString, int effectorBoneTag, CVector effectorVec, int pivotBoneTag, CEntity* pEntity,
                                                               int offsetBoneTag, CVector offsetPos, float speed, int time = 99999999, int blendTime = 1000) = 0;
     virtual CTaskSimpleIKLookAt*      CreateTaskSimpleIKLookAt(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos,
-                                                               unsigned char useTorso = false, float speed = 0.25f, int blendTime = 1000, int m_priority = 3) = 0;
+                                                               std::uint8_t useTorso = false, float speed = 0.25f, int blendTime = 1000, int m_priority = 3) = 0;
     virtual CTaskSimpleTriggerLookAt* CreateTaskSimpleTriggerLookAt(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos,
-                                                                    unsigned char useTorso = false, float speed = 0.25f, int blendTime = 1000,
+                                                                    std::uint8_t useTorso = false, float speed = 0.25f, int blendTime = 1000,
                                                                     int priority = 3) = 0;
 
     // Attack
     virtual CTaskSimpleGangDriveBy* CreateTaskSimpleGangDriveBy(CEntity* pTargetEntity, const CVector* pVecTarget, float fAbortRange, char FrequencyPercentage,
                                                                 char nDrivebyStyle, bool bSeatRHS) = 0;
     virtual CTaskSimpleUseGun*      CreateTaskSimpleUseGun(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength = 1,
-                                                           unsigned char bAimImmediate = false) = 0;
-    virtual CTaskSimpleFight*       CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000) = 0;
+                                                           std::uint8_t bAimImmediate = false) = 0;
+    virtual CTaskSimpleFight*       CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, std::uint32_t nIdlePeriod = 10000) = 0;
 };

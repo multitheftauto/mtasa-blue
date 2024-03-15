@@ -34,7 +34,7 @@ namespace
         CLibMemoryMap LibMemoryMap;
     };
 
-    typedef unsigned long (*PFNGETALLOCSTATS)(uint, void*, unsigned long);
+    typedef std::uint32_t (*PFNGETALLOCSTATS)(uint, void*, std::uint32_t);
 
     struct CLibraryInfo
     {
@@ -110,7 +110,7 @@ CClientPerfStatLibMemoryImpl::CClientPerfStatLibMemoryImpl()
 ///////////////////////////////////////////////////////////////
 CClientPerfStatLibMemoryImpl::~CClientPerfStatLibMemoryImpl()
 {
-    for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+    for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
     {
         CLibraryInfo& info = m_LibraryList[i];
         SAFE_DELETE(info.pLibrary);
@@ -214,7 +214,7 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
                 {false, "cgui"}, {false, "core"}, {true, "client"}, {false, "game_sa"}, {false, "multiplayer_sa"}, {false, "netc"}, {false, "xmll"},
             };
 
-            for (unsigned int i = 0; i < NUMELMS(libs); i++)
+            for (std::uint32_t i = 0; i < NUMELMS(libs); i++)
             {
                 CLibraryInfo info;
                 bool         bModDir = libs[i].bModDir;
@@ -248,11 +248,11 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
             }
         }
 
-        for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+        for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
         {
             CLibraryInfo& info = m_LibraryList[i];
-            unsigned long stats[9];
-            unsigned long numgot = info.pfnGetAllocStats(0, stats, NUMELMS(stats));
+            std::uint32_t stats[9];
+            std::uint32_t numgot = info.pfnGetAllocStats(0, stats, NUMELMS(stats));
             if (numgot >= 2)
                 UpdateLibMemory(info.strName, (stats[0] + 1023) / 1024, (stats[1] + 1023) / 1024);
         }
@@ -340,13 +340,13 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
 
         if (bMoreInfo)
         {
-            for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+            for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
             {
                 CLibraryInfo& info = m_LibraryList[i];
                 if (strName == info.strName)
                 {
-                    unsigned long stats[9];
-                    unsigned long numgot = info.pfnGetAllocStats(0, stats, NUMELMS(stats));
+                    std::uint32_t stats[9];
+                    std::uint32_t numgot = info.pfnGetAllocStats(0, stats, NUMELMS(stats));
                     if (numgot >= 9)
                     {
                         row[c++] = SString("%d", stats[2]);
@@ -363,13 +363,13 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
         }
         else if (bTopTags)
         {
-            for (unsigned int i = 0; i < m_LibraryList.size(); i++)
+            for (std::uint32_t i = 0; i < m_LibraryList.size(); i++)
             {
                 CLibraryInfo& info = m_LibraryList[i];
                 if (strName == info.strName)
                 {
                     SAllocTrackingTagInfo stats[5];
-                    unsigned long         numgot = info.pfnGetAllocStats(1, stats, NUMELMS(stats));
+                    std::uint32_t         numgot = info.pfnGetAllocStats(1, stats, NUMELMS(stats));
                     for (uint i = 0; i < numgot && i < 5; i++)
                     {
                         const SAllocTrackingTagInfo& info = stats[i];

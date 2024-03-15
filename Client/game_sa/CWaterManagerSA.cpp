@@ -351,7 +351,7 @@ void CWaterManagerSA::RelocatePools()
 
     DWORD** pXrefGroup = NULL;
     void*   pNewPool = NULL;
-    for (int i = 0; pXrefGroup = (DWORD**)pXrefGroups[i]; i++)
+    for (auto i = 0; pXrefGroup = (DWORD**)pXrefGroups[i]; i++)
     {
         pNewPool = pNewPools[i];
         DWORD dwDelta = (DWORD)pNewPool - *pXrefGroup[0];
@@ -509,10 +509,10 @@ void CWaterManagerSA::GetZonesContaining(const CVector& v1, const CVector& v2, c
 {
     out.clear();
     float fColumnLeft = -3000.0f;
-    for (int column = 0; column < 12; column++)
+    for (auto column = 0; column < 12; column++)
     {
         float fRowBottom = -3000.0f;
-        for (int row = 0; row < 12; row++)
+        for (auto row = 0; row < 12; row++)
         {
             if (v2.fX >= fColumnLeft && v1.fX < fColumnLeft + 500.0f && std::max<float>(v1.fY, v3.fY) >= fRowBottom &&
                 std::min<float>(v1.fY, v3.fY) < fRowBottom + 500.0f)
@@ -539,7 +539,7 @@ void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVecto
 
     if (lowXZone == highXZone)
     {
-        for (int i = lowYZone; i <= highYZone; i++)
+        for (auto i = lowYZone; i <= highYZone; i++)
         {
             vecOut.push_back(GetZone(lowXZone, i));
         }
@@ -547,7 +547,7 @@ void CWaterManagerSA::GetZonesIntersecting(const CVector& startPos, const CVecto
     }
     if (lowYZone == highYZone)
     {
-        for (int i = lowXZone; i <= highXZone; i++)
+        for (auto i = lowXZone; i <= highXZone; i++)
         {
             vecOut.push_back(GetZone(i, lowYZone));
         }
@@ -776,7 +776,7 @@ bool CWaterManagerSA::SetWorldWaterLevel(float fLevel, void* pChangeSource, bool
 bool CWaterManagerSA::SetPolyWaterLevel(CWaterPoly* pPoly, float fLevel, void* pChangeSource)
 {
     CVector vecVertexPos;
-    for (int i = 0; i < pPoly->GetNumVertices(); i++)
+    for (auto i = 0; i < pPoly->GetNumVertices(); i++)
     {
         pPoly->GetVertex(i)->GetPosition(vecVertexPos);
         vecVertexPos.fZ = fLevel;
@@ -913,7 +913,7 @@ bool CWaterManagerSA::TestLineAgainstWater(const CVector& vecStart, const CVecto
             if (iNumVertices < 4)
                 continue;
 
-            for (int i = 3; i < iNumVertices; i++)
+            for (auto i = 3; i < iNumVertices; i++)
             {
                 vecVertices.pop_front();
                 poly->GetVertex(i)->GetPosition(vecTemp);

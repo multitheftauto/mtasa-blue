@@ -31,7 +31,7 @@ class CMapManager;
 
 struct CRefInfo
 {
-    unsigned long int ulUseCount;
+    std::uint32_t ulUseCount;
     int               iFunction;
 };
 
@@ -44,7 +44,7 @@ public:
 
     ~CLuaMain();
 
-    bool LoadScriptFromBuffer(const char* cpBuffer, unsigned int uiSize, const char* szFileName);
+    bool LoadScriptFromBuffer(const char* cpBuffer, std::uint32_t uiSize, const char* szFileName);
     bool LoadScript(const char* szLUAScript);
     void UnloadScript();
 
@@ -70,19 +70,19 @@ public:
     bool          DestroyXML(CXMLNode* pRootNode);
     bool          SaveXML(CXMLNode* pRootNode);
     bool          XMLExists(CXMLFile* pFile);
-    unsigned long GetXMLFileCount() const { return m_XMLFiles.size(); };
-    unsigned long GetOpenFileCount() const { return m_OpenFilenameList.size(); };
-    unsigned long GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
-    unsigned long GetElementCount() const;
-    unsigned long GetTextDisplayCount() const { return m_Displays.size(); };
-    unsigned long GetTextItemCount() const { return m_TextItems.size(); };
+    std::uint32_t GetXMLFileCount() const { return m_XMLFiles.size(); };
+    std::uint32_t GetOpenFileCount() const { return m_OpenFilenameList.size(); };
+    std::uint32_t GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
+    std::uint32_t GetElementCount() const;
+    std::uint32_t GetTextDisplayCount() const { return m_Displays.size(); };
+    std::uint32_t GetTextItemCount() const { return m_TextItems.size(); };
     void          OnOpenFile(const SString& strFilename);
     void          OnCloseFile(const SString& strFilename);
 
     CTextDisplay* CreateDisplay();
     void          DestroyDisplay(CTextDisplay* pDisplay);
     CTextItem*    CreateTextItem(const char* szText, float fX, float fY, eTextPriority priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f,
-                                 unsigned char format = 0, unsigned char ucShadowAlpha = 0);
+                                 std::uint8_t format = 0, std::uint8_t ucShadowAlpha = 0);
     void          DestroyTextItem(CTextItem* pTextItem);
 
     CTextDisplay* GetTextDisplayFromScriptID(uint uiScriptID);

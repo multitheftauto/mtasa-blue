@@ -156,7 +156,7 @@ bool CWaterPolySA::ContainsPoint(float fX, float fY)
         next[1] = 2;
         next[2] = 0;
     }
-    for (int i = 0; i < numVertices; i++)
+    for (auto i = 0; i < numVertices; i++)
     {
         pFrom = &g_pWaterManager->m_Vertices[pwVertexIDs[i]];
         pTo = &g_pWaterManager->m_Vertices[pwVertexIDs[next[i]]];

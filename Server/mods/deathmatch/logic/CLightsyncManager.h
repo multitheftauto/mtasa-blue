@@ -46,7 +46,7 @@ private:
         __int64      ullTime;
         CPlayer*     pPlayer;
         EEntryType   eType;
-        unsigned int uiContext;
+        std::uint32_t uiContext;
     };
 
     std::list<SEntry> m_Queue;

@@ -17,16 +17,16 @@
 #include "CBuildingRemovalManager.h"
 #include <net/SyncStructures.h>
 
-CMapInfoPacket::CMapInfoPacket(unsigned char ucWeather, unsigned char ucWeatherBlendingTo, unsigned char ucBlendedWeatherHour, unsigned char ucClockHour,
-                               unsigned char ucClockMin, unsigned long ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
+CMapInfoPacket::CMapInfoPacket(std::uint8_t ucWeather, std::uint8_t ucWeatherBlendingTo, std::uint8_t ucBlendedWeatherHour, std::uint8_t ucClockHour,
+                               std::uint8_t ucClockMin, std::uint32_t ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
                                float fWaveHeight, const SWorldWaterLevelInfo& worldWaterLevelInfo, bool bHasSkyGradient, const SGarageStates& garageStates,
-                               unsigned char ucSkyGradientTR, unsigned char ucSkyGradientTG, unsigned char ucSkyGradientTB, unsigned char ucSkyGradientBR,
-                               unsigned char ucSkyGradientBG, unsigned char ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
-                               unsigned short usFPSLimit, bool bCloudsEnabled, float fJetpackMaxHeight, bool bOverrideWaterColor, unsigned char ucWaterRed,
-                               unsigned char ucWaterGreen, unsigned char ucWaterBlue, unsigned char ucWaterAlpha, bool bInteriorSoundsEnabled,
+                               std::uint8_t ucSkyGradientTR, std::uint8_t ucSkyGradientTG, std::uint8_t ucSkyGradientTB, std::uint8_t ucSkyGradientBR,
+                               std::uint8_t ucSkyGradientBG, std::uint8_t ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
+                               std::uint16_t usFPSLimit, bool bCloudsEnabled, float fJetpackMaxHeight, bool bOverrideWaterColor, std::uint8_t ucWaterRed,
+                               std::uint8_t ucWaterGreen, std::uint8_t ucWaterBlue, std::uint8_t ucWaterAlpha, bool bInteriorSoundsEnabled,
                                bool bOverrideRainLevel, float fRainLevel, bool bOverrideSunSize, float fSunSize, bool bOverrideSunColor,
-                               unsigned char ucSunCoreR, unsigned char ucSunCoreG, unsigned char ucSunCoreB, unsigned char ucSunCoronaR,
-                               unsigned char ucSunCoronaG, unsigned char ucSunCoronaB, bool bOverrideWindVelocity, float fWindVelX, float fWindVelY,
+                               std::uint8_t ucSunCoreR, std::uint8_t ucSunCoreG, std::uint8_t ucSunCoreB, std::uint8_t ucSunCoronaR,
+                               std::uint8_t ucSunCoronaG, std::uint8_t ucSunCoronaB, bool bOverrideWindVelocity, float fWindVelX, float fWindVelY,
                                float fWindVelZ, bool bOverrideFarClipDistance, float fFarClip, bool bOverrideFogDistance, float fFogDistance,
                                float fAircraftMaxHeight, float fAircraftMaxVelocity, bool bOverrideMoonSize, int iMoonSize)
 {
@@ -153,7 +153,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteCompressed(m_usFPSLimit);
 
     // Write the garage states
-    for (unsigned char i = 0; i < MAX_GARAGES; i++)
+    for (std::uint8_t i = 0; i < MAX_GARAGES; i++)
     {
         const SGarageStates& garageStates = *m_pGarageStates;
         BitStream.WriteBit(garageStates[i]);
@@ -272,14 +272,14 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
 
     if (BitStream.Version() >= 0x30)
     {
-        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
+        for (auto i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
         {
             bool bEnabled;
             bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
             BitStream.WriteBit(bEnabled);
         }
     }
-    for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
+    for (auto i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         sWeaponPropertySync WeaponProperty;
         CWeaponStat*        pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)i);
@@ -309,11 +309,11 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         }
     }
 
-    for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
+    for (auto i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
     {
         sWeaponPropertySync WeaponProperty;
         BitStream.WriteBit(true);
-        for (int j = 0; j <= 2; j++)
+        for (auto j = 0; j <= 2; j++)
         {
             CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)i, (eWeaponSkill)j);
             WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
@@ -343,7 +343,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     }
     if (BitStream.Version() >= 0x30)
     {
-        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
+        for (auto i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
         {
             bool bEnabled;
             bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
@@ -351,7 +351,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         }
     }
 
-    multimap<unsigned short, CBuildingRemoval*>::const_iterator iter = g_pGame->GetBuildingRemovalManager()->IterBegin();
+    multimap<std::uint16_t, CBuildingRemoval*>::const_iterator iter = g_pGame->GetBuildingRemovalManager()->IterBegin();
     for (; iter != g_pGame->GetBuildingRemovalManager()->IterEnd(); ++iter)
     {
         CBuildingRemoval* pBuildingRemoval = (*iter).second;

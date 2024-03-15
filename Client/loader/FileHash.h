@@ -16,7 +16,7 @@
 /**
  * @brief Represents the raw SHA-256 checksum of a file.
  */
-using FileHash = std::array<unsigned char, 32>;
+using FileHash = std::array<std::uint8_t, 32>;
 
 /**
  * @brief Generates the string representation of the hash in hexadecimal digits.

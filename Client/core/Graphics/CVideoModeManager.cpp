@@ -55,12 +55,12 @@ private:
 
     void UpdateMonitor();
 
-    unsigned long  m_ulForceBackBufferWidth;
-    unsigned long  m_ulForceBackBufferHeight;
-    unsigned long  m_ulForceBackBufferColorDepth;
+    std::uint32_t  m_ulForceBackBufferWidth;
+    std::uint32_t  m_ulForceBackBufferHeight;
+    std::uint32_t  m_ulForceBackBufferColorDepth;
     HWND           m_hDeviceWindow;
     CGameSettings* m_pGameSettings;
-    unsigned long  m_ulMonitorCount;
+    std::uint32_t  m_ulMonitorCount;
 
     int      m_iCurrentVideoMode;            // VideoMode this run
     int      m_iCurrentAdapter;
@@ -495,7 +495,7 @@ bool CVideoModeManager::IsMultiMonitor()
     if (m_ulMonitorCount == 0)
     {
         // Count attached monitors
-        for (int i = 0; true; i++)
+        for (auto i = 0; true; i++)
         {
             DISPLAY_DEVICE device;
             device.cb = sizeof(device);

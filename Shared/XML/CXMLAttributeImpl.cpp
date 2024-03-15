@@ -103,7 +103,7 @@ void CXMLAttributeImpl::SetValue(int iValue)
     SetValue(szBuffer);
 }
 
-void CXMLAttributeImpl::SetValue(unsigned int uiValue)
+void CXMLAttributeImpl::SetValue(std::uint32_t uiValue)
 {
     // Convert to string and set it
     char szBuffer[XML_ATTRIBUTE_VALUE_BUFFER];

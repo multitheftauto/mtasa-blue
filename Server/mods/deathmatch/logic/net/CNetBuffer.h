@@ -62,7 +62,7 @@ public:
     virtual ~CNetServerBuffer();
 
     // CNetServer interface
-    virtual bool StartNetwork(const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName);
+    virtual bool StartNetwork(const char* szIP, std::uint16_t usServerPort, std::uint32_t uiAllowedPlayers, const char* szServerName);
     virtual void StopNetwork();
 
     virtual void DoPulse();
@@ -76,30 +76,30 @@ public:
     virtual void               GetPingStatus(SFixedString<32>* pstrStatus);
     virtual bool               GetSyncThreadStatistics(SSyncThreadStatistics* pDest, bool bResetCounters);
 
-    virtual NetBitStreamInterface* AllocateNetServerBitStream(unsigned short usBitStreamVersion, const void* pData = nullptr, uint uiDataSize = 0,
+    virtual NetBitStreamInterface* AllocateNetServerBitStream(std::uint16_t usBitStreamVersion, const void* pData = nullptr, uint uiDataSize = 0,
                                                               bool bCopyData = false);
     virtual void                   DeallocateNetServerBitStream(NetBitStreamInterface* bitStream);
-    virtual bool                   SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast,
+    virtual bool                   SendPacket(std::uint8_t ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast,
                                               NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability,
                                               ePacketOrdering packetOrdering = PACKET_ORDERING_DEFAULT);
 
-    virtual void GetPlayerIP(const NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort);
+    virtual void GetPlayerIP(const NetServerPlayerID& playerID, char strIP[22], std::uint16_t* usPort);
 
     virtual void Kick(const NetServerPlayerID& PlayerID);
 
     virtual void SetPassword(const char* szPassword);
 
-    virtual void SetMaximumIncomingConnections(unsigned short numberAllowed);
+    virtual void SetMaximumIncomingConnections(std::uint16_t numberAllowed);
 
     virtual CNetHTTPDownloadManagerInterface* GetHTTPDownloadManager(EDownloadModeType iMode);
 
-    virtual void SetClientBitStreamVersion(const NetServerPlayerID& PlayerID, unsigned short usBitStreamVersion);
+    virtual void SetClientBitStreamVersion(const NetServerPlayerID& PlayerID, std::uint16_t usBitStreamVersion);
     virtual void ClearClientBitStreamVersion(const NetServerPlayerID& PlayerID);
 
     virtual void SetChecks(const char* szDisableComboACMap, const char* szDisableACMap, const char* szEnableSDMap, int iEnableClientChecks, bool bHideAC,
                            const char* szImgMods);
 
-    virtual unsigned int GetPendingPacketCount();
+    virtual std::uint32_t GetPendingPacketCount();
     virtual void         GetNetRoute(SFixedString<32>* pstrRoute);
 
     virtual bool InitServerId(const char* szPath);
@@ -134,7 +134,7 @@ public:
 
     typedef NetServerPlayerID NetServerPlayerIDRef;
 
-    DECLARE_FUNC_ARGS4R(bool, StartNetwork, const char*, szIP, unsigned short, usServerPort, unsigned int, uiAllowedPlayers, const char*, szServerName);
+    DECLARE_FUNC_ARGS4R(bool, StartNetwork, const char*, szIP, std::uint16_t, usServerPort, std::uint32_t, uiAllowedPlayers, const char*, szServerName);
     DECLARE_FUNC_ARGS0(StopNetwork);
     DECLARE_FUNC_ARGS0(DoPulse);
     DECLARE_FUNC_ARGS1(RegisterPacketHandler, PPACKETHANDLER, pfnPacketHandler);
@@ -144,17 +144,17 @@ public:
     DECLARE_FUNC_ARGS2R(bool, GetNetPerformanceStatistics, SNetPerformanceStatistics*, pDest, bool, bResetCounters);
     DECLARE_FUNC_ARGS2R(bool, GetSyncThreadStatistics, SSyncThreadStatistics*, pDest, bool, bResetCounters);
     DECLARE_FUNC_ARGS1(GetPingStatus, SFixedString<32>*, pstrStatus);
-    DECLARE_FUNC_ARGS7R(bool, SendPacket, unsigned char, ucPacketID, const NetServerPlayerIDRef, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast,
+    DECLARE_FUNC_ARGS7R(bool, SendPacket, std::uint8_t, ucPacketID, const NetServerPlayerIDRef, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast,
                         NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering);
-    DECLARE_FUNC_ARGS3(GetPlayerIP, const NetServerPlayerIDRef, playerID, char*, strIP, unsigned short*, usPort);
+    DECLARE_FUNC_ARGS3(GetPlayerIP, const NetServerPlayerIDRef, playerID, char*, strIP, std::uint16_t*, usPort);
     DECLARE_FUNC_ARGS1(Kick, const NetServerPlayerIDRef, PlayerID);
     DECLARE_FUNC_ARGS1(SetPassword, const char*, szPassword);
-    DECLARE_FUNC_ARGS1(SetMaximumIncomingConnections, unsigned short, numberAllowed);
-    DECLARE_FUNC_ARGS2(SetClientBitStreamVersion, const NetServerPlayerIDRef, PlayerID, unsigned short, usBitStreamVersion);
+    DECLARE_FUNC_ARGS1(SetMaximumIncomingConnections, std::uint16_t, numberAllowed);
+    DECLARE_FUNC_ARGS2(SetClientBitStreamVersion, const NetServerPlayerIDRef, PlayerID, std::uint16_t, usBitStreamVersion);
     DECLARE_FUNC_ARGS1(ClearClientBitStreamVersion, const NetServerPlayerIDRef, PlayerID);
     DECLARE_FUNC_ARGS6(SetChecks, const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool,
                        bHideAC, const char*, szImgMods);
-    DECLARE_FUNC_ARGS0R(unsigned int, GetPendingPacketCount);
+    DECLARE_FUNC_ARGS0R(std::uint32_t, GetPendingPacketCount);
     DECLARE_FUNC_ARGS1(GetNetRoute, SFixedString<32>*, pstrRoute);
     DECLARE_FUNC_ARGS1R(bool, InitServerId, const char*, szPath);
     DECLARE_FUNC_ARGS1(ResendModPackets, const NetServerPlayerIDRef, playerID);
@@ -163,7 +163,7 @@ public:
                        SFixedString<32>&, strVersion);
     DECLARE_FUNC_ARGS1(SetNetOptions, const SNetOptions, options);
     DECLARE_FUNC_ARGS2(GenerateRandomData, void*, pOutData, uint, uiLength);
-    DECLARE_FUNC_ARGS4R(bool, ProcessPacket, unsigned char, ucPacketID, const NetServerPlayerIDRef, Socket, NetBitStreamInterface*, BitStream, SNetExtraInfo*,
+    DECLARE_FUNC_ARGS4R(bool, ProcessPacket, std::uint8_t, ucPacketID, const NetServerPlayerIDRef, Socket, NetBitStreamInterface*, BitStream, SNetExtraInfo*,
                         pNetExtraInfo);
 
     // Main thread functions
@@ -182,8 +182,8 @@ public:
     static void* StaticThreadProc(void* pContext);
     void*        ThreadProc();
     void         ProcessCommand(CNetJobData* pJobData);
-    static bool  StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
-    void         ProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
+    static bool  StaticProcessPacket(std::uint8_t ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
+    void         ProcessPacket(std::uint8_t ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
 
     // Watchdog thread functions
     void GetQueueSizes(uint& uiFinishedList, uint& uiOutCommandQueue, uint& uiOutResultQueue, uint& uiInResultQueue, uint& uiGamePlayerCount);

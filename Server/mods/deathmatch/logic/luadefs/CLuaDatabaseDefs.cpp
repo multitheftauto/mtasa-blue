@@ -520,7 +520,7 @@ void PushRegistryResultTable(lua_State* luaVM, const CRegistryResultData* Result
         const CRegistryResultRow& row = *iter;
         lua_pushnumber(luaVM, i + 1);
         lua_newtable(luaVM);
-        for (int j = 0; j < Result->nColumns; j++)
+        for (auto j = 0; j < Result->nColumns; j++)
         {
             const CRegistryResultCell& cell = row[j];
 
@@ -604,7 +604,7 @@ int CLuaDatabaseDefs::DbPoll(lua_State* luaVM)
         {
             // One or more results (from multiple statements)
             lua_newtable(luaVM);
-            for (int i = 0; Result; Result = Result->pNextResult, i++)
+            for (auto i = 0; Result; Result = Result->pNextResult, i++)
             {
                 lua_pushnumber(luaVM, i + 1);
                 lua_newtable(luaVM);
@@ -691,7 +691,7 @@ int CLuaDatabaseDefs::ExecuteSQLQuery(lua_State* luaVM)
                 lua_pushnumber(luaVM, i + 1);            // row index number (starting at 1, not 0)
                 lua_pushvalue(luaVM, -2);                // value
                 lua_settable(luaVM, -4);                 // refer to the top level table
-                for (int j = 0; j < Result->nColumns; j++)
+                for (auto j = 0; j < Result->nColumns; j++)
                 {
                     const CRegistryResultCell& cell = row[j];
                     if (cell.nType == SQLITE_NULL)
@@ -745,7 +745,7 @@ int CLuaDatabaseDefs::ExecuteSQLSelect(lua_State* luaVM)
     SString      strColumns;
     SString      strWhere;
     SString      strError;
-    unsigned int uiLimit;
+    std::uint32_t uiLimit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strTable);
@@ -769,7 +769,7 @@ int CLuaDatabaseDefs::ExecuteSQLSelect(lua_State* luaVM)
                 lua_pushnumber(luaVM, i + 1);            // row index number (starting at 1, not 0)
                 lua_pushvalue(luaVM, -2);                // value
                 lua_settable(luaVM, -4);                 // refer to the top level table
-                for (int j = 0; j < Result->nColumns; j++)
+                for (auto j = 0; j < Result->nColumns; j++)
                 {
                     const CRegistryResultCell& cell = row[j];
                     if (cell.nType == SQLITE_NULL)

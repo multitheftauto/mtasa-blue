@@ -32,7 +32,7 @@ CScriptDebugging::~CScriptDebugging()
     ClearPlayers();
 }
 
-bool CScriptDebugging::AddPlayer(CPlayer& Player, unsigned int uiLevel)
+bool CScriptDebugging::AddPlayer(CPlayer& Player, std::uint32_t uiLevel)
 {
     // Want a level above 0?
     if (uiLevel > 0)
@@ -90,7 +90,7 @@ void CScriptDebugging::LogBadAccess(lua_State* luaVM)
     LogWarning(luaVM, "Access denied @ '%s'", lua_tostring(luaVM, lua_upvalueindex(1)));
 }
 
-bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
+bool CScriptDebugging::SetLogfile(const char* szFilename, std::uint32_t uiLevel)
 {
     assert(szFilename);
 
@@ -143,7 +143,7 @@ void CScriptDebugging::PrintLog(const char* szText)
     }
 }
 
-void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel)
+void CScriptDebugging::Broadcast(const CPacket& Packet, std::uint32_t uiMinimumDebugLevel)
 {
     // Tell everyone we log to about it
     list<CPlayer*>::const_iterator iter = m_Players.begin();

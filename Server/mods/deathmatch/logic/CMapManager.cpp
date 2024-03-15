@@ -436,11 +436,11 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
     marker.Set("Start");
 
     // Grab the time now
-    unsigned char ucClockHour, ucClockMin;
+    std::uint8_t ucClockHour, ucClockMin;
     m_pServerClock->Get(ucClockHour, ucClockMin);
 
     // Grab minute duration
-    unsigned long ulMinuteDuration = m_pServerClock->GetMinuteDuration();
+    std::uint32_t ulMinuteDuration = m_pServerClock->GetMinuteDuration();
 
     // Nametags and radar enabled
     bool bNametagsEnabled = true;
@@ -457,8 +457,8 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
 
     // Get the sky gradient
     bool          bHasSkyGradient = g_pGame->HasSkyGradient();
-    unsigned char ucTopRed, ucTopGreen, ucTopBlue;
-    unsigned char ucBottomRed, ucBottomGreen, ucBottomBlue;
+    std::uint8_t ucTopRed, ucTopGreen, ucTopBlue;
+    std::uint8_t ucBottomRed, ucBottomGreen, ucBottomBlue;
     g_pGame->GetSkyGradient(ucTopRed, ucTopGreen, ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue);
 
     // Get the heathaze
@@ -468,12 +468,12 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
 
     // Grab the current weather and the weather we're blending to if any
     // Also grab the time the blending starts/started
-    unsigned char ucCurrentWeather = m_pBlendedWeather->GetWeather();
-    unsigned char ucWeatherBlendingTo = m_pBlendedWeather->GetWeatherBlendingTo();
-    unsigned char ucBlendedWeatherHour = m_pBlendedWeather->GetBlendedStopHour();
+    std::uint8_t ucCurrentWeather = m_pBlendedWeather->GetWeather();
+    std::uint8_t ucWeatherBlendingTo = m_pBlendedWeather->GetWeatherBlendingTo();
+    std::uint8_t ucBlendedWeatherHour = m_pBlendedWeather->GetBlendedStopHour();
 
     // FPS Limit
-    unsigned short usFPSLimit = g_pGame->GetConfig()->GetFPSLimit();
+    std::uint16_t usFPSLimit = g_pGame->GetConfig()->GetFPSLimit();
 
     // Garage states
     const SGarageStates& garageStates = g_pGame->GetGarageStates();
@@ -481,7 +481,7 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
 
     // Water color
     bool          bOverrideWaterColor;
-    unsigned char ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha;
+    std::uint8_t ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha;
     bOverrideWaterColor = g_pGame->HasWaterColor();
     g_pGame->GetWaterColor(ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha);
 
@@ -502,8 +502,8 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
 
     // Sun color
     bool          bOverrideSunColor = g_pGame->HasSunColor();
-    unsigned char ucCoreR, ucCoreG, ucCoreB;
-    unsigned char ucCoronaR, ucCoronaG, ucCoronaB;
+    std::uint8_t ucCoreR, ucCoreG, ucCoreB;
+    std::uint8_t ucCoronaR, ucCoronaG, ucCoronaB;
     g_pGame->GetSunColor(ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB);
 
     // Wind velocity
@@ -546,8 +546,8 @@ void CMapManager::OnPlayerQuit(CPlayer& Player)
 {
 }
 
-void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior,
-                              unsigned short usDimension, CTeam* pTeam)
+void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, std::uint16_t usModel, std::uint8_t ucInterior,
+                              std::uint16_t usDimension, CTeam* pTeam)
 {
     // Don't force them off their team if the spawnpoint doesn't have one
     if (pTeam == NULL)
@@ -557,7 +557,7 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
 
     // Change the time context to avoid old sync packets arriving causing players
     // to slide from previous location to the new one.
-    unsigned char ucTimeContext = Player.GenerateSyncTimeContext();
+    std::uint8_t ucTimeContext = Player.GenerateSyncTimeContext();
 
     // Tell everyone where he spawns
     m_pPlayerManager->BroadcastOnlyJoined(CPlayerSpawnPacket(Player.GetID(), vecPosition, fRotation, usModel, ucInterior, usDimension, TeamID, ucTimeContext));
@@ -608,7 +608,7 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
     Player.SetFrozen(false);
 
     // Remove all previous weapons
-    for (unsigned char ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ucWeaponSlot)
+    for (std::uint8_t ucWeaponSlot = 0; ucWeaponSlot < WEAPON_SLOTS; ++ucWeaponSlot)
     {
         Player.SetWeaponType(0, ucWeaponSlot);
         Player.SetWeaponAmmoInClip(0, ucWeaponSlot);
@@ -670,7 +670,7 @@ void CMapManager::DoPickupRespawning()
             }
         }
 
-        if (!pPickup->IsSpawned() && lastUsedTime != CTickCount(0LL) && currentTime >= (lastUsedTime + CTickCount((long long)pPickup->GetRespawnIntervals())))
+        if (!pPickup->IsSpawned() && lastUsedTime != CTickCount(0LL) && currentTime >= (lastUsedTime + CTickCount((std::int64_t)pPickup->GetRespawnIntervals())))
         {
             // Set it as spawned
             pPickup->SetSpawned(true);
@@ -839,8 +839,8 @@ bool CMapManager::LoadSubNodes(CResource& Loader, CXMLNode& Node, CElement* pPar
 {
     // Iterate the nodes
     CXMLNode*    pNode = NULL;
-    unsigned int uiCount = Node.GetSubNodeCount();
-    for (unsigned int i = 0; i < uiCount; i++)
+    std::uint32_t uiCount = Node.GetSubNodeCount();
+    for (std::uint32_t i = 0; i < uiCount; i++)
     {
         // Grab the node
         pNode = Node.GetSubNode(i);

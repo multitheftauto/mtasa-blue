@@ -70,7 +70,7 @@ void CClientPlayerVoice::Init()
 {
     // Grab our sample rate and quality
     m_SampleRate = m_pVoiceRecorder->GetSampleRate();
-    unsigned char ucQuality = m_pVoiceRecorder->GetSampleQuality();
+    std::uint8_t ucQuality = m_pVoiceRecorder->GetSampleQuality();
 
     // Setup our BASS playback device
     m_pBassPlaybackStream = BASS_StreamCreate(m_SampleRate / VOICE_SAMPLE_SIZE, 2, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);
@@ -118,7 +118,7 @@ void CClientPlayerVoice::DoPulse()
     }
 }
 
-void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritten)
+void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, std::uint32_t bytesWritten)
 {
     m_Mutex.lock();
 
@@ -148,7 +148,7 @@ void CClientPlayerVoice::DecodeAndBuffer(char* pBuffer, unsigned int bytesWritte
 
     speex_bits_destroy(&speexBits);
 
-    unsigned int uiSpeexBlockSize = m_iSpeexIncomingFrameSampleCount * VOICE_SAMPLE_SIZE;
+    std::uint32_t uiSpeexBlockSize = m_iSpeexIncomingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
     BASS_StreamPutData(m_pBassPlaybackStream, (void*)pTempBuffer, uiSpeexBlockSize);
 }

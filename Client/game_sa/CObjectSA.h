@@ -121,7 +121,7 @@ static_assert(sizeof(CObjectSAInterface) == 0x17C, "Invalid size for CObjectSAIn
 class CObjectSA : public virtual CObject, public virtual CPhysicalSA
 {
 private:
-    unsigned char m_ucAlpha;
+    std::uint8_t m_ucAlpha;
     bool          m_bIsAGangTag;
     CVector       m_vecScale;
     bool          m_preRenderRequired = false;
@@ -139,12 +139,12 @@ public:
     void  Break();
     void  SetHealth(float fHealth);
     float GetHealth();
-    void  SetModelIndex(unsigned long ulModel);
+    void  SetModelIndex(std::uint32_t ulModel);
 
     void          SetPreRenderRequired(bool required) { m_preRenderRequired = required; }
     bool          GetPreRenderRequired() { return m_preRenderRequired; }
-    void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
-    unsigned char GetAlpha() { return m_ucAlpha; }
+    void          SetAlpha(std::uint8_t ucAlpha) { m_ucAlpha = ucAlpha; }
+    std::uint8_t GetAlpha() { return m_ucAlpha; }
 
     bool IsAGangTag() const { return m_bIsAGangTag; }
     bool IsGlass();

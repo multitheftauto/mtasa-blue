@@ -63,7 +63,7 @@ bool CHTTPD::StopHTTPD()
     return false;
 }
 
-bool CHTTPD::StartHTTPD(const char* szIP, unsigned int port)
+bool CHTTPD::StartHTTPD(const char* szIP, std::uint32_t port)
 {
     bool bResult = false;
 
@@ -307,9 +307,9 @@ void CHTTPD::HttpPulse()
 {
     std::lock_guard<std::mutex> guard(m_mutexLoggedInMap);
 
-    long long llExpireTime = GetTickCount64_() - 1000 * 60 * 5;            // 5 minute timeout
+    std::int64_t llExpireTime = GetTickCount64_() - 1000 * 60 * 5;            // 5 minute timeout
 
-    map<string, long long>::iterator iter = m_LoggedInMap.begin();
+    map<string, std::int64_t>::iterator iter = m_LoggedInMap.begin();
     while (iter != m_LoggedInMap.end())
     {
         // Remove if too long since last request

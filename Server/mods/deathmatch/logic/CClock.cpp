@@ -19,39 +19,39 @@ CClock::CClock()
     Set(12, 0);
 }
 
-void CClock::Get(unsigned char& ucHour, unsigned char& ucMinute)
+void CClock::Get(std::uint8_t& ucHour, std::uint8_t& ucMinute)
 {
     // Grab how many seconds midnight was from now
-    unsigned long long ullSecondsSinceMidnight = (GetTickCount64_() - m_ullMidnightTime) / m_ulMinuteDuration;
+    std::uint64_t ullSecondsSinceMidnight = (GetTickCount64_() - m_ullMidnightTime) / m_ulMinuteDuration;
 
     // Grab how many hours that is
-    ucMinute = static_cast<unsigned char>(ullSecondsSinceMidnight % 60);
+    ucMinute = static_cast<std::uint8_t>(ullSecondsSinceMidnight % 60);
     ullSecondsSinceMidnight /= 60;
 
     // What's left is the number of hours, limit it to 24 and return it
-    ucHour = static_cast<unsigned char>(ullSecondsSinceMidnight % 24);
+    ucHour = static_cast<std::uint8_t>(ullSecondsSinceMidnight % 24);
 }
 
-void CClock::Set(unsigned char ucHour, unsigned char ucMinute)
+void CClock::Set(std::uint8_t ucHour, std::uint8_t ucMinute)
 {
     // Calculate number of seconds from midnight
-    unsigned long ulSecondsFromMidnight = ucHour * 60 + ucMinute;
+    std::uint32_t ulSecondsFromMidnight = ucHour * 60 + ucMinute;
 
     // Set the midnight time to our current time minus number of seconds since midnight according to the time we were given
     m_ullMidnightTime = GetTickCount64_() - ulSecondsFromMidnight * m_ulMinuteDuration;
 }
 
-unsigned long CClock::GetMinuteDuration()
+std::uint32_t CClock::GetMinuteDuration()
 {
     return m_ulMinuteDuration;
 }
 
-void CClock::SetMinuteDuration(unsigned long ulDuration)
+void CClock::SetMinuteDuration(std::uint32_t ulDuration)
 {
     // We gotta reset the time with the new minute duration
     // so getTime returns the right values
-    unsigned char ucHour;
-    unsigned char ucMinute;
+    std::uint8_t ucHour;
+    std::uint8_t ucMinute;
     Get(ucHour, ucMinute);
     m_ulMinuteDuration = ulDuration;
     Set(ucHour, ucMinute);

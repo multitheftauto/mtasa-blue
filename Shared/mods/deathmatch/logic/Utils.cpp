@@ -28,10 +28,10 @@
 #endif
 
 #ifdef MTA_CLIENT
-unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace)
+std::uint32_t StripUnwantedCharacters(char* szText, std::uint8_t cReplace)
 {
     // Replace any unwanted character with a space
-    unsigned int uiReplaced = 0;
+    std::uint32_t uiReplaced = 0;
     char*        szTemp = szText;
     while (*szTemp != 0)
     {
@@ -48,10 +48,10 @@ unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace)
     return uiReplaced;
 }
 
-unsigned int StripControlCodes(char* szText, unsigned char cReplace)
+std::uint32_t StripControlCodes(char* szText, std::uint8_t cReplace)
 {
     // Replace any unwanted character with a space
-    unsigned int uiReplaced = 0;
+    std::uint32_t uiReplaced = 0;
     char*        szTemp = szText;
     while (*szTemp != 0)
     {
@@ -68,7 +68,7 @@ unsigned int StripControlCodes(char* szText, unsigned char cReplace)
     return uiReplaced;
 }
 
-bool IsControlCode(unsigned char c)
+bool IsControlCode(std::uint8_t c)
 {
     return c < 32;
 }
@@ -78,11 +78,11 @@ bool IsValidFilePath(const char* szDir)
     if (szDir == NULL)
         return false;
 
-    unsigned int  uiLen = strlen(szDir);
-    unsigned char c, c_d;
+    std::uint32_t  uiLen = strlen(szDir);
+    std::uint8_t c, c_d;
 
     // iterate through the char array
-    for (unsigned int i = 0; i < uiLen; i++)
+    for (std::uint32_t i = 0; i < uiLen; i++)
     {
         c = szDir[i];                                          // current character
         c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
@@ -99,7 +99,7 @@ void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
         s.replace(idx, 1, b);
 }
 
-void RaiseFatalError(unsigned int uiCode)
+void RaiseFatalError(std::uint32_t uiCode)
 {
 #ifdef MTA_DEBUG
     assert(0);
@@ -115,7 +115,7 @@ void RaiseFatalError(unsigned int uiCode)
     g_pCore->GetModManager()->RequestUnload();
 }
 
-void RaiseProtocolError(unsigned int uiCode)
+void RaiseProtocolError(std::uint32_t uiCode)
 {
     // #ifdef MTA_DEBUG
     //     assert ( 0 );
@@ -166,7 +166,7 @@ void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector&
     returnMatrix = CMatrix(vecPosition, vecRotation) * matrix;
 }
 
-void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
+void LongToDottedIP(std::uint32_t ulIP, char* szDottedIP)
 {
     in_addr in{};
     in.s_addr = ulIP;
@@ -230,7 +230,7 @@ void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
 
 char* uppercase(char* s)
 {
-    for (unsigned int i = 0; i < strlen(s); i++)
+    for (std::uint32_t i = 0; i < strlen(s); i++)
     {
         s[i] = toupper(s[i]);
     }
@@ -242,7 +242,7 @@ void stripString(char* szString)
     if (szString)
     {
         int          offset = 0;
-        unsigned int i = 0;
+        std::uint32_t i = 0;
         size_t       sizeString = strlen(szString);
         for (i = 0; i < sizeString; i++)
         {
@@ -263,8 +263,8 @@ void stripControlCodes(char* szString)
 {
     if (szString)
     {
-        unsigned char*       pWrite = reinterpret_cast<unsigned char*>(szString);
-        const unsigned char* pRead = pWrite;
+        std::uint8_t*       pWrite = reinterpret_cast<std::uint8_t*>(szString);
+        const std::uint8_t* pRead = pWrite;
 
         while (*pRead != '\0')
         {
@@ -283,15 +283,15 @@ bool StringBeginsWith(const char* szText, const char* szBegins)
 {
     if (szText && szBegins)
     {
-        unsigned int uiTextLength = strlen(szText);
-        unsigned int uiBeginsLength = strlen(szBegins);
+        std::uint32_t uiTextLength = strlen(szText);
+        std::uint32_t uiBeginsLength = strlen(szBegins);
 
         if (uiTextLength < uiBeginsLength)
         {
             return false;
         }
 
-        for (unsigned int ui = 0; ui < uiBeginsLength; ui++)
+        for (std::uint32_t ui = 0; ui < uiBeginsLength; ui++)
         {
             if (szText[ui] != szBegins[ui])
             {
@@ -344,7 +344,7 @@ void DisconnectPlayer(CGame* pGame, CPlayer& Player, CPlayerDisconnectedPacket::
     pGame->QuitPlayer(Player);
 }
 
-void DisconnectConnectionDesync(CGame* pGame, CPlayer& Player, unsigned int uiCode)
+void DisconnectConnectionDesync(CGame* pGame, CPlayer& Player, std::uint32_t uiCode)
 {
     if (Player.IsLeavingServer())
         return;
@@ -391,7 +391,7 @@ int GetRandom(int iLow, int iHigh)
     return static_cast<int>(floor((dHigh - dLow + 1.0) * GetRandomDouble())) + iLow;
 }
 #ifdef MTA_CLIENT
-SString GetDataUnit(unsigned long long ullInput)
+SString GetDataUnit(std::uint64_t ullInput)
 {
     // Convert it to a float
     float fInput = static_cast<float>(ullInput);
@@ -500,15 +500,15 @@ bool IsValidFilePath(const char* szDir)
     if (szDir == NULL)
         return false;
 
-    unsigned int uiLen = strlen(szDir);
+    std::uint32_t uiLen = strlen(szDir);
 
     if (uiLen > 0 && szDir[uiLen - 1] == '/')            // will return false if ending with an invalid character, mainly used for linux (#6871)
         return false;
 
-    unsigned char c, c_d;
+    std::uint8_t c, c_d;
 
     // iterate through the char array
-    for (unsigned int i = 0; i < uiLen; i++)
+    for (std::uint32_t i = 0; i < uiLen; i++)
     {
         c = szDir[i];                                          // current character
         c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
@@ -523,16 +523,16 @@ bool IsValidOrganizationPath(const char* szDir)
     if (szDir == NULL)
         return false;
 
-    unsigned int uiLen = strlen(szDir);
+    std::uint32_t uiLen = strlen(szDir);
 
     if (uiLen > 0 && szDir[uiLen - 1] == '/')            // will return false if ending with an invalid character, mainly used for linux (#6871)
         return false;
 
-    unsigned char c;
+    std::uint8_t c;
     bool          bInsideBraces = false;
 
     // iterate through the char array
-    for (unsigned int i = 0; i < uiLen; i++)
+    for (std::uint32_t i = 0; i < uiLen; i++)
     {
         c = szDir[i];            // current character
 
@@ -566,9 +566,9 @@ bool IsValidOrganizationPath(const char* szDir)
 }
 #endif
 
-unsigned int HexToInt(const char* szHex)
+std::uint32_t HexToInt(const char* szHex)
 {
-    unsigned int value = 0;
+    std::uint32_t value = 0;
 
     if (szHex[0] == '0' && (szHex[0] == 'x' || szHex[0] == 'X'))
     {
@@ -598,11 +598,11 @@ unsigned int HexToInt(const char* szHex)
     return value;
 }
 
-bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
+bool XMLColorToInt(const char* szColor, std::uint32_t& ulColor)
 {
     const char validHexChars[] = "0123456789ABCDEFabcdef";
 
-    unsigned int uiLength = strlen(szColor);
+    std::uint32_t uiLength = strlen(szColor);
     // Make sure it starts with #
     if (szColor[0] == '#')
     {
@@ -610,7 +610,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
         if (uiLength >= 4 && szColor[4] == 0)
         {
             // Make a RRGGBBAA string
-            unsigned char szTemp[12]{};
+            std::uint8_t szTemp[12]{};
             szTemp[0] = 'F';
             szTemp[1] = 'F';
             szTemp[2] = szColor[3];
@@ -631,7 +631,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
         else if (uiLength >= 5 && szColor[5] == 0)
         {
             // Make a RRGGBBAA string
-            unsigned char szTemp[12]{};
+            std::uint8_t szTemp[12]{};
             szTemp[0] = szColor[4];
             szTemp[1] = szColor[4];
             szTemp[2] = szColor[3];
@@ -652,7 +652,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
         else if (uiLength >= 7 && szColor[7] == 0)
         {
             // Make a RRGGBBAA string
-            unsigned char szTemp[12]{};
+            std::uint8_t szTemp[12]{};
             szTemp[0] = 'F';
             szTemp[1] = 'F';
             szTemp[2] = szColor[5];
@@ -673,7 +673,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
         else if (uiLength >= 9 && szColor[9] == 0)
         {
             // Copy the string without the pre-#
-            unsigned char szTemp[12]{};
+            std::uint8_t szTemp[12]{};
             szTemp[0] = szColor[7];
             szTemp[1] = szColor[8];
             szTemp[2] = szColor[5];
@@ -696,20 +696,20 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
     return false;
 }
 
-bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
+bool XMLColorToInt(const char* szColor, std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha)
 {
     // Convert it to an integer first
-    unsigned long ulColor;
+    std::uint32_t ulColor;
     if (!XMLColorToInt(szColor, ulColor))
     {
         return false;
     }
 
     // Convert it to red, green, blue and alpha
-    ucRed = static_cast<unsigned char>(ulColor);
-    ucGreen = static_cast<unsigned char>(ulColor >> 8);
-    ucBlue = static_cast<unsigned char>(ulColor >> 16);
-    ucAlpha = static_cast<unsigned char>(ulColor >> 24);
+    ucRed = static_cast<std::uint8_t>(ulColor);
+    ucGreen = static_cast<std::uint8_t>(ulColor >> 8);
+    ucBlue = static_cast<std::uint8_t>(ulColor >> 16);
+    ucAlpha = static_cast<std::uint8_t>(ulColor >> 24);
     return true;
 }
 
@@ -722,7 +722,7 @@ bool BitStreamReadUsString(class NetBitStreamInterface& bitStream, SString& strO
     bool bResult = false;
 
     // Read out the string length
-    unsigned short usLength;
+    std::uint16_t usLength;
     if (bitStream.Read(usLength))
     {
         // Allocate a buffer and read the string into it
@@ -792,8 +792,8 @@ void WriteSmallKeysync(const CControllerState& ControllerState, NetBitStreamInte
     keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);                 // Enter/Exit/Special-Attack / Enter/exit
     keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);                     // Crouch / Horn
     keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                            // Walk / -
-    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;            // Reverse
-    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;              // Accelerate
+    keys.data.ucButtonSquare = (std::uint8_t)ControllerState.ButtonSquare;            // Reverse
+    keys.data.ucButtonCross = (std::uint8_t)ControllerState.ButtonCross;              // Accelerate
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
@@ -845,8 +845,8 @@ void WriteFullKeysync(const CControllerState& ControllerState, NetBitStreamInter
     keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);
     keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);
     keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);
-    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;
-    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;
+    keys.data.ucButtonSquare = (std::uint8_t)ControllerState.ButtonSquare;
+    keys.data.ucButtonCross = (std::uint8_t)ControllerState.ButtonCross;
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
@@ -930,7 +930,7 @@ bool IsNametagValid(const char* szNick)
     }
 
     // Check that each character is valid (visible characters exluding space)
-    unsigned char ucTemp;
+    std::uint8_t ucTemp;
     for (size_t i = 0; i < sizeNick; i++)
     {
         ucTemp = szNick[i];
@@ -954,7 +954,7 @@ bool IsNickValid(const char* szNick)
     }
 
     // Check that each character is valid (visible characters exluding space)
-    unsigned char ucTemp;
+    std::uint8_t ucTemp;
     for (size_t i = 0; i < sizeNick; i++)
     {
         ucTemp = szNick[i];
@@ -998,7 +998,7 @@ void RotateVector(CVector& vecLine, const CVector& vecRotation)
     vecLine.fY = -sin(vecRotation.fZ) * fLineX + cos(vecRotation.fZ) * vecLine.fY;
 }
 
-SString LongToDottedIP(unsigned long ulIP)
+SString LongToDottedIP(std::uint32_t ulIP)
 {
     in_addr in;
     in.s_addr = ulIP;

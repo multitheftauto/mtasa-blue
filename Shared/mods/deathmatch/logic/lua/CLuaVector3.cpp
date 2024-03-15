@@ -35,7 +35,7 @@ CLuaVector3D::~CLuaVector3D()
     m_uiScriptID = INVALID_ARRAY_ID;
 }
 
-CLuaVector3D* CLuaVector3D::GetFromScriptID(unsigned int uiScriptID)
+CLuaVector3D* CLuaVector3D::GetFromScriptID(std::uint32_t uiScriptID)
 {
     CLuaVector3D* pLuaVector = (CLuaVector3D*)CIdArray::FindEntry(uiScriptID, EIdClass::VECTOR3);
     return pLuaVector;

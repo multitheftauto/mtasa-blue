@@ -47,7 +47,7 @@ bool CColPolygon::DoHitDetection(const CVector& vecNowPosition)
     float x = vecNowPosition.fX;
     float y = vecNowPosition.fY;
 
-    for (unsigned int i = 0; i < m_Points.size(); i++)
+    for (std::uint32_t i = 0; i < m_Points.size(); i++)
     {
         CVector2D vecPi = m_Points[i];
         CVector2D vecPj = m_Points[j];
@@ -70,7 +70,7 @@ bool CColPolygon::ReadSpecialData(const int iLine)
 {
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     return true;
 }
@@ -79,7 +79,7 @@ void CColPolygon::SetPosition(const CVector& vecPosition)
 {
     CVector vecDifference = m_vecPosition - vecPosition;
 
-    for (unsigned int i = 0; i < m_Points.size(); i++)
+    for (std::uint32_t i = 0; i < m_Points.size(); i++)
     {
         m_Points[i].fX -= vecDifference.fX;
         m_Points[i].fY -= vecDifference.fY;
@@ -98,7 +98,7 @@ bool CColPolygon::AddPoint(CVector2D vecPoint)
     return true;
 }
 
-bool CColPolygon::AddPoint(CVector2D vecPoint, unsigned int uiPointIndex)
+bool CColPolygon::AddPoint(CVector2D vecPoint, std::uint32_t uiPointIndex)
 {
     if (uiPointIndex > m_Points.size())
         return false;
@@ -109,7 +109,7 @@ bool CColPolygon::AddPoint(CVector2D vecPoint, unsigned int uiPointIndex)
     return true;
 }
 
-bool CColPolygon::RemovePoint(unsigned int uiPointIndex)
+bool CColPolygon::RemovePoint(std::uint32_t uiPointIndex)
 {
     if (m_Points.size() <= 3)
         return false;
@@ -120,7 +120,7 @@ bool CColPolygon::RemovePoint(unsigned int uiPointIndex)
     return true;
 }
 
-bool CColPolygon::SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint)
+bool CColPolygon::SetPointPosition(std::uint32_t uiPointIndex, const CVector2D& vecPoint)
 {
     if (uiPointIndex >= m_Points.size())
         return false;

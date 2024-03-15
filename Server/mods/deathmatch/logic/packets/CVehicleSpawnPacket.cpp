@@ -15,13 +15,13 @@
 
 bool CVehicleSpawnPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    // unsigned short   (2)     - vehicle id
+    // std::uint16_t   (2)     - vehicle id
     // CVector          (12)    - position
     // CVector          (12)    - rotation in degrees
-    // unsigned char    (1)     - color 1
-    // unsigned char    (1)     - color 2
-    // unsigned char    (1)     - color 3
-    // unsigned char    (1)     - color 4
+    // std::uint8_t    (1)     - color 1
+    // std::uint8_t    (1)     - color 2
+    // std::uint8_t    (1)     - color 3
+    // std::uint8_t    (1)     - color 4
     // Repeats ...
 
     // Got any vehicles to send?

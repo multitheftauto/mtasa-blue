@@ -281,7 +281,7 @@ int CLuaElementDefs::GetElementID(lua_State* luaVM)
 int CLuaElementDefs::GetElementByID(lua_State* luaVM)
 {
     SString          strID = "";
-    unsigned int     uiIndex = 0;
+    std::uint32_t     uiIndex = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strID);
     argStream.ReadNumber(uiIndex, 0);
@@ -307,7 +307,7 @@ int CLuaElementDefs::GetElementByID(lua_State* luaVM)
 int CLuaElementDefs::GetElementByIndex(lua_State* luaVM)
 {
     SString          strType = "";
-    unsigned int     uiIndex = 0;
+    std::uint32_t     uiIndex = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strType);
     argStream.ReadNumber(uiIndex, 0);
@@ -714,7 +714,7 @@ int CLuaElementDefs::GetElementChild(lua_State* luaVM)
 {
     // Verify the argument
     CClientEntity*   pEntity = NULL;
-    unsigned int     uiIndex = 0;
+    std::uint32_t     uiIndex = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(uiIndex);
@@ -747,7 +747,7 @@ int CLuaElementDefs::GetElementChildrenCount(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Grab the count
-        unsigned int uiCount = pEntity->CountChildren();
+        std::uint32_t uiCount = pEntity->CountChildren();
         lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
         return 1;
     }
@@ -846,7 +846,7 @@ int CLuaElementDefs::GetElementInterior(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Grab the interior and return it
-        unsigned char ucInterior;
+        std::uint8_t ucInterior;
         if (CStaticFunctionDefinitions::GetElementInterior(*pEntity, ucInterior))
         {
             lua_pushnumber(luaVM, ucInterior);
@@ -931,7 +931,7 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
             lua_newtable(luaVM);
 
             // Add all the elements within the shape to it
-            unsigned int                        uiIndex = 0;
+            std::uint32_t                        uiIndex = 0;
             CFastList<CClientEntity*>::iterator iter = pColShape->CollidersBegin();
             for (; iter != pColShape->CollidersEnd(); iter++)
             {
@@ -958,8 +958,8 @@ int CLuaElementDefs::GetElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
-CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
-                                                            std::optional<unsigned short> dimension)
+CClientEntityResult CLuaElementDefs::GetElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<std::uint16_t> interior,
+                                                            std::optional<std::uint16_t> dimension)
 {
     const auto typeHash = (type.has_value() && !type.value().empty()) ? CClientEntity::GetTypeHashFromString(type.value()) : 0;
 
@@ -1012,7 +1012,7 @@ int CLuaElementDefs::GetElementDimension(lua_State* luaVM)
         else
         {
             // Grab the dimension and return it
-            unsigned short usDimension = pEntity->GetDimension();
+            std::uint16_t usDimension = pEntity->GetDimension();
             lua_pushnumber(luaVM, usDimension);
             return 1;
         }
@@ -1303,7 +1303,7 @@ int CLuaElementDefs::GetElementAlpha(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Grab its alpha level and return it
-        unsigned char ucAlpha;
+        std::uint8_t ucAlpha;
         if (CStaticFunctionDefinitions::GetElementAlpha(*pEntity, ucAlpha))
         {
             lua_pushnumber(luaVM, ucAlpha);
@@ -1384,7 +1384,7 @@ int CLuaElementDefs::GetElementModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModel;
+        std::uint16_t usModel;
         if (CStaticFunctionDefinitions::GetElementModel(*pEntity, usModel))
         {
             lua_pushnumber(luaVM, usModel);
@@ -2057,7 +2057,7 @@ int CLuaElementDefs::SetElementParent(lua_State* luaVM)
 int CLuaElementDefs::SetElementInterior(lua_State* luaVM)
 {
     CClientEntity* pEntity;
-    unsigned int   uiInterior = 0;
+    std::uint32_t   uiInterior = 0;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -2144,7 +2144,7 @@ int CLuaElementDefs::SetElementDimension(lua_State* luaVM)
             if (IS_OBJECT(pEntity) && CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions(*pEntity))
             {
                 // Make it not visible in all dimensions and set its dimension
-                if (CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(*pEntity, false, (unsigned short)iDimension))
+                if (CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(*pEntity, false, (std::uint16_t)iDimension))
                 {
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -2153,7 +2153,7 @@ int CLuaElementDefs::SetElementDimension(lua_State* luaVM)
             else
             {
                 // Just change the dimension
-                if (CStaticFunctionDefinitions::SetElementDimension(*pEntity, (unsigned short)iDimension))
+                if (CStaticFunctionDefinitions::SetElementDimension(*pEntity, (std::uint16_t)iDimension))
                 {
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -2203,7 +2203,7 @@ int CLuaElementDefs::DetachElements(lua_State* luaVM)
 {
     CClientEntity*   pEntity;
     CClientEntity*   pAttachedToEntity = NULL;
-    unsigned short   usDimension = 0;
+    std::uint16_t   usDimension = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadUserData(pAttachedToEntity, NULL);
@@ -2230,7 +2230,7 @@ int CLuaElementDefs::SetElementAttachedOffsets(lua_State* luaVM)
 {
     CClientEntity* pEntity;
     CClientEntity* pAttachedToEntity = NULL;
-    unsigned short usDimension = 0;
+    std::uint16_t usDimension = 0;
     CVector        vecPosition, vecRotation;
 
     CScriptArgReader argStream(luaVM);
@@ -2357,7 +2357,7 @@ int CLuaElementDefs::SetElementFrozen(lua_State* luaVM)
 int CLuaElementDefs::SetElementAlpha(lua_State* luaVM)
 {
     CClientEntity*   pEntity;
-    unsigned char    ucAlpha = 0;
+    std::uint8_t    ucAlpha = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucAlpha);
@@ -2407,7 +2407,7 @@ int CLuaElementDefs::SetElementHealth(lua_State* luaVM)
 int CLuaElementDefs::SetElementModel(lua_State* luaVM)
 {
     CClientEntity*   pEntity;
-    unsigned short   usModel = 0;
+    std::uint16_t   usModel = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(usModel);

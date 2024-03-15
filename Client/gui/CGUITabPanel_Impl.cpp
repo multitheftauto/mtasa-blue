@@ -99,7 +99,7 @@ void CGUITabPanel_Impl::SetSelectedTab(CGUITab* pTab)
     };
 }
 
-void CGUITabPanel_Impl::SetSelectedIndex(unsigned int uiIndex)
+void CGUITabPanel_Impl::SetSelectedIndex(std::uint32_t uiIndex)
 {
     try
     {
@@ -110,9 +110,9 @@ void CGUITabPanel_Impl::SetSelectedIndex(unsigned int uiIndex)
     };
 }
 
-unsigned int CGUITabPanel_Impl::GetSelectedIndex()
+std::uint32_t CGUITabPanel_Impl::GetSelectedIndex()
 {
-    unsigned int uiIndex = 0;
+    std::uint32_t uiIndex = 0;
     try
     {
         uiIndex = reinterpret_cast<CEGUI::TabControl*>(m_pWindow)->getSelectedTabIndex();
@@ -123,9 +123,9 @@ unsigned int CGUITabPanel_Impl::GetSelectedIndex()
     return uiIndex;
 }
 
-unsigned int CGUITabPanel_Impl::GetTabCount()
+std::uint32_t CGUITabPanel_Impl::GetTabCount()
 {
-    unsigned int uiIndex = 0;
+    std::uint32_t uiIndex = 0;
     try
     {
         uiIndex = reinterpret_cast<CEGUI::TabControl*>(m_pWindow)->getTabCount();

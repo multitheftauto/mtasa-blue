@@ -269,7 +269,7 @@ int CLuaAccountDefs::GetAccountsByData(lua_State* luaVM)
         std::vector<CAccount*> accounts;
 
         CStaticFunctionDefinitions::GetAccountsByData(dataName, value, accounts);
-        for (unsigned int i = 0; i < accounts.size(); ++i)
+        for (std::uint32_t i = 0; i < accounts.size(); ++i)
         {
             lua_pushnumber(luaVM, i + 1);
             lua_pushaccount(luaVM, accounts[i]);
@@ -322,7 +322,7 @@ int CLuaAccountDefs::GetAccountsBySerial(lua_State* luaVM)
         std::vector<CAccount*> accounts;
 
         CStaticFunctionDefinitions::GetAccountsBySerial(strSerial, accounts);
-        for (unsigned int i = 0; i < accounts.size(); ++i)
+        for (std::uint32_t i = 0; i < accounts.size(); ++i)
         {
             lua_pushnumber(luaVM, i + 1);
             lua_pushaccount(luaVM, accounts[i]);
@@ -375,7 +375,7 @@ int CLuaAccountDefs::GetAccountsByIP(lua_State* luaVM)
         std::vector<CAccount*> accounts;
 
         CStaticFunctionDefinitions::GetAccountsByIP(strIP, accounts);
-        for (unsigned int i = 0; i < accounts.size(); ++i)
+        for (std::uint32_t i = 0; i < accounts.size(); ++i)
         {
             lua_pushnumber(luaVM, i + 1);
             lua_pushaccount(luaVM, accounts[i]);

@@ -262,7 +262,7 @@ void CRadarMap::DoRender()
         CalculateEntityOnScreenPosition(vecLocal, vecLocalPos);
 
         // Now loop our radar areas
-        unsigned short                          usDimension = m_pRadarAreaManager->GetDimension();
+        std::uint16_t                          usDimension = m_pRadarAreaManager->GetDimension();
         CClientRadarArea*                       pArea = NULL;
         list<CClientRadarArea*>::const_iterator areaIter = m_pRadarAreaManager->IterBegin();
         for (; areaIter != m_pRadarAreaManager->IterEnd(); ++areaIter)
@@ -288,7 +288,7 @@ void CRadarMap::DoRender()
                 SColor color = pArea->GetColor();
                 if (pArea->IsFlashing())
                 {
-                    color.A = static_cast<unsigned char>(color.A * pArea->GetAlphaFactor());
+                    color.A = static_cast<std::uint8_t>(color.A * pArea->GetAlphaFactor());
                 }
 
                 g_pCore->GetGraphics()->DrawRectangle(vecPos.fX, vecPos.fY, vecSize.fX, -vecSize.fY, color);

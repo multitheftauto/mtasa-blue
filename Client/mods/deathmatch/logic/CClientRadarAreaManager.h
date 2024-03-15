@@ -33,8 +33,8 @@ public:
 
     static CClientRadarArea* Get(ElementID ID);
 
-    unsigned short GetDimension() { return m_usDimension; };
-    void           SetDimension(unsigned short usDimension);
+    std::uint16_t GetDimension() { return m_usDimension; };
+    void           SetDimension(std::uint16_t usDimension);
 
 private:
     void DoPulse();
@@ -48,5 +48,5 @@ private:
 
     std::list<CClientRadarArea*> m_List;
     bool                         m_bDontRemoveFromList;
-    unsigned short               m_usDimension;
+    std::uint16_t               m_usDimension;
 };

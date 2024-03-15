@@ -29,13 +29,13 @@ public:
     CBlip* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void   DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); };
     bool         Exists(CBlip* pBlip);
 
     std::list<CBlip*>::const_iterator IterBegin() { return m_List.begin(); };
     std::list<CBlip*>::const_iterator IterEnd() { return m_List.end(); };
 
-    static bool IsValidIcon(unsigned long ulIcon) { return ulIcon <= 63; };
+    static bool IsValidIcon(std::uint32_t ulIcon) { return ulIcon <= 63; };
 
 private:
     std::list<CBlip*> m_List;

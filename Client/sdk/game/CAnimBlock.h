@@ -27,7 +27,7 @@ public:
     virtual char*                           GetName() = 0;
     virtual int                             GetIndex() = 0;
     virtual void                            AddRef() = 0;
-    virtual unsigned short                  GetRefs() = 0;
+    virtual std::uint16_t                  GetRefs() = 0;
     virtual bool                            IsLoaded() = 0;
     virtual int                             GetIDOffset() = 0;
     virtual size_t                          GetAnimationCount() = 0;

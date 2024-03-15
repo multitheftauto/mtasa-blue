@@ -11,7 +11,7 @@
 
 #pragma once
 
-typedef unsigned long AssocGroupId;
+typedef std::uint32_t AssocGroupId;
 
 class CPedModelInfo
 {

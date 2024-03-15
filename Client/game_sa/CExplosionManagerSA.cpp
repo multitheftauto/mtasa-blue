@@ -16,13 +16,13 @@
 
 CExplosionManagerSA::CExplosionManagerSA()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (auto i = 0; i < MAX_EXPLOSIONS; i++)
         Explosions[i] = new CExplosionSA((CExplosionSAInterface*)(ARRAY_Explosions + i * sizeof(CExplosionSAInterface)));
 }
 
 CExplosionManagerSA::~CExplosionManagerSA()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (auto i = 0; i < MAX_EXPLOSIONS; i++)
     {
         delete Explosions[i];
     }
@@ -32,7 +32,7 @@ CExplosionManagerSA::~CExplosionManagerSA()
  * \todo Test this, replace with CExplosion::AddExplosion code if possible in order to ensure correct pointer
  */
 CExplosion* CExplosionManagerSA::AddExplosion(CEntity* pExplodingEntity, CEntity* pOwner, eExplosionType explosionType, CVector& vecPosition,
-                                              unsigned int uiActivationDelay, bool bMakeSound, float fCamShake, bool bNoDamage)
+                                              std::uint32_t uiActivationDelay, bool bMakeSound, float fCamShake, bool bNoDamage)
 {
     DWORD       dwExplodingEntityInterface = (pExplodingEntity) ? (DWORD)pExplodingEntity->GetInterface() : 0;
     DWORD       dwOwnerInterface = (pOwner) ? (DWORD)pOwner->GetInterface() : 0;
@@ -75,7 +75,7 @@ returnhere:
 
 void CExplosionManagerSA::RemoveAllExplosions()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (auto i = 0; i < MAX_EXPLOSIONS; i++)
         if (Explosions[i]->IsActive())
             Explosions[i]->Remove();
 }
@@ -87,7 +87,7 @@ CExplosion* CExplosionManagerSA::GetExplosion(DWORD ID)
 
 CExplosion* CExplosionManagerSA::FindFreeExplosion()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (auto i = 0; i < MAX_EXPLOSIONS; i++)
         if (!Explosions[i]->IsActive())
             return Explosions[i];
     return NULL;

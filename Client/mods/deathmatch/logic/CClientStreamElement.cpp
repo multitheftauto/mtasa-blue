@@ -109,7 +109,7 @@ void CClientStreamElement::NotifyUnableToCreate()
 
 void CClientStreamElement::AddStreamReference(bool bScript)
 {
-    unsigned short* pRefs = (bScript) ? &m_usStreamReferencesScript : &m_usStreamReferences;
+    std::uint16_t* pRefs = (bScript) ? &m_usStreamReferencesScript : &m_usStreamReferences;
     if ((*pRefs) < 0xFFFF)
         (*pRefs)++;
 
@@ -122,7 +122,7 @@ void CClientStreamElement::AddStreamReference(bool bScript)
 
 void CClientStreamElement::RemoveStreamReference(bool bScript)
 {
-    unsigned short* pRefs = (bScript) ? &m_usStreamReferencesScript : &m_usStreamReferences;
+    std::uint16_t* pRefs = (bScript) ? &m_usStreamReferencesScript : &m_usStreamReferences;
     if ((*pRefs) > 0)
     {
         (*pRefs)--;
@@ -135,9 +135,9 @@ void CClientStreamElement::RemoveStreamReference(bool bScript)
     }
 }
 
-unsigned short CClientStreamElement::GetStreamReferences(bool bScript)
+std::uint16_t CClientStreamElement::GetStreamReferences(bool bScript)
 {
-    unsigned short* pRefs = (bScript) ? &m_usStreamReferencesScript : &m_usStreamReferences;
+    std::uint16_t* pRefs = (bScript) ? &m_usStreamReferencesScript : &m_usStreamReferences;
     return (*pRefs);
 }
 
@@ -148,7 +148,7 @@ void CClientStreamElement::StreamOutForABit()
     InternalStreamOut();
 }
 
-void CClientStreamElement::SetDimension(unsigned short usDimension)
+void CClientStreamElement::SetDimension(std::uint16_t usDimension)
 {
     // Different dimension than before?
     if (m_usDimension != usDimension)
@@ -174,7 +174,7 @@ static float GetBoxDistanceSq(const CVector& vecPosition, const CVector& vecBoxC
     float   fDistSq = 0.f;
 
     // For each axis
-    for (int i = 0; i < 3; i++)
+    for (auto i = 0; i < 3; i++)
     {
         // Project vecOffset on the axis
         float fDot = vecOffset.DotProduct(vecBoxAxes[i]);

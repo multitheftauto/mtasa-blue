@@ -18,7 +18,7 @@
 
 using std::list;
 
-unsigned long CClientTask::m_ulLastUniqueIdentifier = 0;
+std::uint32_t CClientTask::m_ulLastUniqueIdentifier = 0;
 
 // Temporary until we start using ids
 #define VERIFY_PLAYER(player) (m_pManager->GetPlayerManager ()->Exists(player)&&!player->IsBeingDeleted())
@@ -70,7 +70,7 @@ bool CClientTask::Read(lua_State* luaVM, int iTableIndex, bool bClear)
     // Grab the identifier
     lua_pushstring(luaVM, "identifier");
     lua_gettable(luaVM, iNewTableIndex);
-    m_ulUniqueIdentifier = static_cast<unsigned long>(lua_tonumber(luaVM, -1));
+    m_ulUniqueIdentifier = static_cast<std::uint32_t>(lua_tonumber(luaVM, -1));
 
     // Grab the parameter table
     lua_pushstring(luaVM, "parameters");
@@ -108,8 +108,8 @@ bool CClientTask::ReadElements(lua_State* luaVM, int iTableIndex, bool bClear)
     while (lua_next(luaVM, iNewTableIndex) != 0)
     {
         // Get the index and the element ID
-        unsigned int uiIndex = static_cast<unsigned int>(lua_tonumber(luaVM, -2));
-        ElementID    ID = static_cast<ElementID>(static_cast<unsigned int>(lua_tonumber(luaVM, -1)));
+        std::uint32_t uiIndex = static_cast<std::uint32_t>(lua_tonumber(luaVM, -2));
+        ElementID    ID = static_cast<ElementID>(static_cast<std::uint32_t>(lua_tonumber(luaVM, -1)));
 
         // Grab the element and check he's a player/ped
         CClientEntity* pEntity = CElementIDs::GetElement(ID);
@@ -272,7 +272,7 @@ bool CClientTask::WriteElements(lua_State* luaVM, int iTableIndex)
     }
 
     // Push the values to it.
-    unsigned int              uiIndex = 1;
+    std::uint32_t              uiIndex = 1;
     list<ElementID>::iterator iterElements = m_Elements.begin();
     while (iterElements != m_Elements.end())
     {
@@ -325,7 +325,7 @@ bool CClientTask::WriteParameters(lua_State* luaVM, int iTableIndex)
     return true;
 }
 
-unsigned long CClientTask::GenerateUniqueIdentifier()
+std::uint32_t CClientTask::GenerateUniqueIdentifier()
 {
     return ++m_ulLastUniqueIdentifier;
 }
@@ -617,7 +617,7 @@ CTask* CClientTask::CreateTask(bool& bTaskPrimary, int& iTaskPriority)
         iTaskPriority = TASK_PRIORITY_PRIMARY;
 
         // Create the task
-        return g_pGame->GetTasks()->CreateTaskSimpleClimb(NULL, vecTarget, fHeading, static_cast<unsigned char>(fSurfaceType), static_cast<char>(fClimbStage),
+        return g_pGame->GetTasks()->CreateTaskSimpleClimb(NULL, vecTarget, fHeading, static_cast<std::uint8_t>(fSurfaceType), static_cast<char>(fClimbStage),
                                                           bForceClimb);
     }
 

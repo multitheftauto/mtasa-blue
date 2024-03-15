@@ -28,14 +28,14 @@ public:
     void DeleteAll();
 
     const CMappedArray<CClientObject*>& GetObjects() const { return m_Objects; };
-    unsigned int                        Count() { return static_cast<unsigned int>(m_Objects.size()); };
-    unsigned int                        CountCreatedObjects() { return static_cast<unsigned int>(g_pGame->GetPools()->GetObjectCount()); };
+    std::uint32_t                        Count() { return static_cast<std::uint32_t>(m_Objects.size()); };
+    std::uint32_t                        CountCreatedObjects() { return static_cast<std::uint32_t>(g_pGame->GetPools()->GetObjectCount()); };
     static CClientObject*               Get(ElementID ID);
 
-    static bool IsValidModel(unsigned long ulObjectModel);
-    static bool IsBreakableModel(unsigned long ulObjectModel);
+    static bool IsValidModel(std::uint32_t ulObjectModel);
+    static bool IsBreakableModel(std::uint32_t ulObjectModel);
     bool        Exists(CClientObject* pObject);
-    bool        ObjectsAroundPointLoaded(const CVector& vecPosition, float fRadius, unsigned short usDimension, SString* pstrStatus = NULL);
+    bool        ObjectsAroundPointLoaded(const CVector& vecPosition, float fRadius, std::uint16_t usDimension, SString* pstrStatus = NULL);
 
     static bool StaticIsObjectLimitReached();
     static bool StaticIsLowLodObjectLimitReached();
@@ -43,7 +43,7 @@ public:
     bool        IsLowLodObjectLimitReached();
     bool        IsHardObjectLimitReached();
 
-    void RestreamObjects(unsigned short usModel);
+    void RestreamObjects(std::uint16_t usModel);
     void RestreamAllObjects();
 
     void AddToList(CClientObject* pObject) { m_Objects.push_back(pObject); }

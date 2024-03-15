@@ -12,7 +12,7 @@
 #pragma once
 
 #if (!defined(RWFORCEENUMSIZEINT))
-#define RWFORCEENUMSIZEINT ((int)((~((unsigned int)0))>>1))
+#define RWFORCEENUMSIZEINT ((int)((~((std::uint32_t)0))>>1))
 #endif /* (!defined(RWFORCEENUMSIZEINT)) */
 
 enum VideoModeFlag            // RwVideoModeFlag
@@ -92,21 +92,21 @@ class CGameSettings
 public:
     virtual bool          IsWideScreenEnabled() = 0;
     virtual void          SetWideScreenEnabled(bool bEnabled) = 0;
-    virtual unsigned int  GetNumVideoModes() = 0;
-    virtual VideoMode*    GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex) = 0;
-    virtual unsigned int  GetCurrentVideoMode() = 0;
-    virtual void          SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart) = 0;
-    virtual unsigned int  GetNumAdapters() = 0;
-    virtual unsigned int  GetCurrentAdapter() = 0;
+    virtual std::uint32_t  GetNumVideoModes() = 0;
+    virtual VideoMode*    GetVideoModeInfo(VideoMode* modeInfo, std::uint32_t modeIndex) = 0;
+    virtual std::uint32_t  GetCurrentVideoMode() = 0;
+    virtual void          SetCurrentVideoMode(std::uint32_t modeIndex, bool bOnRestart) = 0;
+    virtual std::uint32_t  GetNumAdapters() = 0;
+    virtual std::uint32_t  GetCurrentAdapter() = 0;
     virtual bool          HasUnsafeResolutions() = 0;
     virtual bool          IsUnsafeResolution(int iWidth, int iHeight) = 0;
-    virtual void          SetAdapter(unsigned int uiAdapterIndex) = 0;
-    virtual unsigned char GetRadioVolume() = 0;
-    virtual void          SetRadioVolume(unsigned char ucVolume) = 0;
-    virtual unsigned char GetSFXVolume() = 0;
-    virtual void          SetSFXVolume(unsigned char ucVolume) = 0;
-    virtual unsigned int  GetUsertrackMode() = 0;
-    virtual void          SetUsertrackMode(unsigned int uiMode) = 0;
+    virtual void          SetAdapter(std::uint32_t uiAdapterIndex) = 0;
+    virtual std::uint8_t GetRadioVolume() = 0;
+    virtual void          SetRadioVolume(std::uint8_t ucVolume) = 0;
+    virtual std::uint8_t GetSFXVolume() = 0;
+    virtual void          SetSFXVolume(std::uint8_t ucVolume) = 0;
+    virtual std::uint32_t  GetUsertrackMode() = 0;
+    virtual void          SetUsertrackMode(std::uint32_t uiMode) = 0;
     virtual bool          IsUsertrackAutoScan() = 0;
     virtual void          SetUsertrackAutoScan(bool bEnable) = 0;
     virtual bool          IsRadioEqualizerEnabled() = 0;
@@ -117,17 +117,17 @@ public:
     virtual float GetDrawDistance() = 0;
     virtual void  SetDrawDistance(float fDrawDistance) = 0;
 
-    virtual unsigned int GetBrightness() = 0;
-    virtual void         SetBrightness(unsigned int uiBrightness) = 0;
+    virtual std::uint32_t GetBrightness() = 0;
+    virtual void         SetBrightness(std::uint32_t uiBrightness) = 0;
 
-    virtual unsigned int GetFXQuality() = 0;
-    virtual void         SetFXQuality(unsigned int fxQualityId) = 0;
+    virtual std::uint32_t GetFXQuality() = 0;
+    virtual void         SetFXQuality(std::uint32_t fxQualityId) = 0;
 
     virtual float GetMouseSensitivity() = 0;
     virtual void  SetMouseSensitivity(float fSensitivity) = 0;
 
-    virtual unsigned int GetAntiAliasing() = 0;
-    virtual void         SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart) = 0;
+    virtual std::uint32_t GetAntiAliasing() = 0;
+    virtual void         SetAntiAliasing(std::uint32_t uiAntiAliasing, bool bOnRestart) = 0;
 
     virtual bool IsMipMappingEnabled() = 0;
     virtual void SetMipMappingEnabled(bool bEnable) = 0;

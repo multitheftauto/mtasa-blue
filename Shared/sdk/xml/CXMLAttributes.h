@@ -18,9 +18,9 @@ class CXMLAttribute;
 class CXMLAttributes
 {
 public:
-    virtual unsigned int   Count() = 0;
+    virtual std::uint32_t   Count() = 0;
     virtual CXMLAttribute* Find(const char* szName) = 0;
-    virtual CXMLAttribute* Get(unsigned int uiIndex) = 0;
+    virtual CXMLAttribute* Get(std::uint32_t uiIndex) = 0;
 
     virtual CXMLAttribute* Create(const char* szName) = 0;
     virtual CXMLAttribute* Create(const CXMLAttribute& Copy) = 0;

@@ -91,14 +91,14 @@ public:
         WEAPON_INVALID = 0xFF,
     };
 
-    CClientPickup(class CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition = CVector(0, 0, 0));
+    CClientPickup(class CClientManager* pManager, ElementID ID, std::uint16_t usModel, CVector vecPosition = CVector(0, 0, 0));
     ~CClientPickup();
 
     void Unlink();
 
     eClientEntityType GetType() const { return CCLIENTPICKUP; };
 
-    unsigned short GetModel() { return m_usModel; };
+    std::uint16_t GetModel() { return m_usModel; };
 
     CPickup*       GetGamePickup() { return m_pPickup; };
     CObject*       GetGameObject() { return m_pObject; }
@@ -107,7 +107,7 @@ public:
 
     void GetPosition(CVector& vecPosition) const override;
     void SetPosition(const CVector& vecPosition);
-    void SetModel(unsigned short usModel);
+    void SetModel(std::uint16_t usModel);
 
     void AttachTo(CClientEntity* pEntity) override;
 
@@ -130,7 +130,7 @@ private:
 
     CClientPickupManager* m_pPickupManager;
 
-    unsigned short m_usModel;
+    std::uint16_t m_usModel;
     CPickup*       m_pPickup;
     CObject*       m_pObject;
     CVector        m_vecPosition;
@@ -139,8 +139,8 @@ private:
     CClientColShape* m_pCollision;
 
 public:
-    unsigned char  m_ucType;
-    unsigned char  m_ucWeaponType;
+    std::uint8_t  m_ucType;
+    std::uint8_t  m_ucWeaponType;
     float          m_fAmount;
-    unsigned short m_usAmmo;
+    std::uint16_t m_usAmmo;
 };

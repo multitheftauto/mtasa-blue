@@ -119,7 +119,7 @@ void CClientWaterManager::SetWaveLevel(float fWaveLevel)
     g_pGame->GetWaterManager()->SetWaveLevel(fWaveLevel);
 }
 
-void CClientWaterManager::SetDimension(unsigned short usDimension)
+void CClientWaterManager::SetDimension(std::uint16_t usDimension)
 {
     m_usDimension = usDimension;
 

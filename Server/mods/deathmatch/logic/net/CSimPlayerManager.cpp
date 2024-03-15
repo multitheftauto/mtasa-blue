@@ -132,7 +132,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_bHasOccupiedVehicle = pVehicle != NULL;
     pSim->m_bIsExitingVehicle = pPlayer->GetVehicleAction() == CPed::VEHICLEACTION_EXITING;
     pSim->m_PlayerID = pPlayer->GetID();
-    pSim->m_usLatency = static_cast<unsigned short>(pPlayer->GetPing());
+    pSim->m_usLatency = static_cast<std::uint16_t>(pPlayer->GetPing());
     pSim->m_ucWeaponType = pPlayer->GetWeaponType();
     pSim->m_usVehicleModel = pVehicle ? pVehicle->GetModel() : 0;
     pSim->m_ucSyncTimeContext = pPlayer->GetSyncTimeContext();
@@ -441,7 +441,7 @@ void CSimPlayerManager::Broadcast(const CSimPacket& Packet, const std::multimap<
 
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
-    unsigned long              ulFlags = Packet.GetFlags();
+    std::uint32_t              ulFlags = Packet.GetFlags();
     if (ulFlags & PACKET_RELIABLE)
     {
         if (ulFlags & PACKET_SEQUENCED)

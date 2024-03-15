@@ -353,7 +353,7 @@ int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)
     CClientVehicle*  pVehicle = NULL;
     CScriptArgReader argStream(luaVM);
 
-    unsigned long ucModel = 0;
+    std::uint32_t ucModel = 0;
 
     if (argStream.NextIsUserData())
     {
@@ -437,8 +437,8 @@ int CLuaVehicleDefs::GetVehicleVariant(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucVariant = -1;
-        unsigned char ucVariant2 = -1;
+        std::uint8_t ucVariant = -1;
+        std::uint8_t ucVariant2 = -1;
         if (CStaticFunctionDefinitions::GetVehicleVariant(pVehicle, ucVariant, ucVariant2))
         {
             lua_pushnumber(luaVM, ucVariant);
@@ -504,7 +504,7 @@ int CLuaVehicleDefs::GetVehicleModelFromName(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModel;
+        std::uint16_t usModel;
         if (CStaticFunctionDefinitions::GetVehicleModelFromName(strName, usModel))
         {
             lua_pushnumber(luaVM, static_cast<lua_Number>(usModel));
@@ -545,7 +545,7 @@ int CLuaVehicleDefs::GetVehicleLandingGearDown(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleMaxPassengers(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
-    unsigned short   usModel = 0;
+    std::uint16_t   usModel = 0;
     CScriptArgReader argStream(luaVM);
 
     if (argStream.NextIsUserData())
@@ -564,7 +564,7 @@ int CLuaVehicleDefs::GetVehicleMaxPassengers(lua_State* luaVM)
     {
         if (CClientVehicleManager::IsValidModel(usModel))
         {
-            unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
+            std::uint32_t uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
             if (uiMaxPassengers != 0xFF)
             {
                 lua_pushnumber(luaVM, uiMaxPassengers);
@@ -581,7 +581,7 @@ int CLuaVehicleDefs::GetVehicleMaxPassengers(lua_State* luaVM)
 
 int CLuaVehicleDefs::GetVehicleOccupant(lua_State* luaVM)
 {
-    unsigned int     uiSeat = 0;
+    std::uint32_t     uiSeat = 0;
     CClientVehicle*  pVehicle = NULL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
@@ -615,7 +615,7 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Get the maximum amount of passengers
-        unsigned char ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
+        std::uint8_t ucMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(pVehicle->GetModel());
 
         // Make sure that if the vehicle doesn't have any seats, the function returns false
         if (ucMaxPassengers == 255)
@@ -625,7 +625,7 @@ int CLuaVehicleDefs::GetVehicleOccupants(lua_State* luaVM)
         }
 
         // Add All Occupants
-        for (unsigned char ucSeat = 0; ucSeat <= ucMaxPassengers; ++ucSeat)
+        for (std::uint8_t ucSeat = 0; ucSeat <= ucMaxPassengers; ++ucSeat)
         {
             CClientPed* pPed = pVehicle->GetOccupant(ucSeat);
             if (pPed)
@@ -779,7 +779,7 @@ int CLuaVehicleDefs::IsVehicleLocked(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleUpgradeOnSlot(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucSlot = 0;
+    std::uint8_t    ucSlot = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
     argStream.ReadNumber(ucSlot);
@@ -789,7 +789,7 @@ int CLuaVehicleDefs::GetVehicleUpgradeOnSlot(lua_State* luaVM)
         CVehicleUpgrades* pUpgrades = pVehicle->GetUpgrades();
         if (pUpgrades)
         {
-            unsigned short usUpgrade = pUpgrades->GetSlotState(ucSlot);
+            std::uint16_t usUpgrade = pUpgrades->GetSlotState(ucSlot);
             lua_pushnumber(luaVM, usUpgrade);
             return 1;
         }
@@ -818,8 +818,8 @@ int CLuaVehicleDefs::GetVehicleUpgrades(lua_State* luaVM)
             // Add all the upgrades to the table
             const SSlotStates& usSlotStates = pUpgrades->GetSlotStates();
 
-            unsigned int  uiIndex = 0;
-            unsigned char ucSlot = 0;
+            std::uint32_t  uiIndex = 0;
+            std::uint8_t ucSlot = 0;
             for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
             {
                 if (usSlotStates[ucSlot] != 0)
@@ -843,7 +843,7 @@ int CLuaVehicleDefs::GetVehicleUpgrades(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleUpgradeSlotName(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
-    unsigned short   usNumber = 0xFF;
+    std::uint16_t   usNumber = 0xFF;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usNumber);
 
@@ -852,7 +852,7 @@ int CLuaVehicleDefs::GetVehicleUpgradeSlotName(lua_State* luaVM)
         if (usNumber < 17)
         {
             SString strUpgradeName;
-            if (CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(static_cast<unsigned char>(usNumber), strUpgradeName))
+            if (CStaticFunctionDefinitions::GetVehicleUpgradeSlotName(static_cast<std::uint8_t>(usNumber), strUpgradeName))
             {
                 lua_pushstring(luaVM, strUpgradeName);
                 return 1;
@@ -880,7 +880,7 @@ int CLuaVehicleDefs::GetVehicleUpgradeSlotName(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleCompatibleUpgrades(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucSlot = 0xFF;
+    std::uint8_t    ucSlot = 0xFF;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
     argStream.ReadIfNextIsNumber(ucSlot, 0xFF);
@@ -893,14 +893,14 @@ int CLuaVehicleDefs::GetVehicleCompatibleUpgrades(lua_State* luaVM)
             // Create a new table
             lua_newtable(luaVM);
 
-            unsigned int uiIndex = 0;
-            for (unsigned short usUpgrade = 1000; usUpgrade <= 1193; usUpgrade++)
+            std::uint32_t uiIndex = 0;
+            for (std::uint16_t usUpgrade = 1000; usUpgrade <= 1193; usUpgrade++)
             {
                 if (pUpgrades->IsUpgradeCompatible(usUpgrade))
                 {
                     if (ucSlot != 0xFF)
                     {
-                        unsigned char ucUpgradeSlot;
+                        std::uint8_t ucUpgradeSlot;
                         if (!pUpgrades->GetSlotFromUpgrade(usUpgrade, ucUpgradeSlot))
                             continue;
 
@@ -932,10 +932,10 @@ int CLuaVehicleDefs::GetVehicleWheelStates(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucFrontLeft = pVehicle->GetWheelStatus(FRONT_LEFT_WHEEL);
-        unsigned char ucRearLeft = pVehicle->GetWheelStatus(REAR_LEFT_WHEEL);
-        unsigned char ucFrontRight = pVehicle->GetWheelStatus(FRONT_RIGHT_WHEEL);
-        unsigned char ucRearRight = pVehicle->GetWheelStatus(REAR_RIGHT_WHEEL);
+        std::uint8_t ucFrontLeft = pVehicle->GetWheelStatus(FRONT_LEFT_WHEEL);
+        std::uint8_t ucRearLeft = pVehicle->GetWheelStatus(REAR_LEFT_WHEEL);
+        std::uint8_t ucFrontRight = pVehicle->GetWheelStatus(FRONT_RIGHT_WHEEL);
+        std::uint8_t ucRearRight = pVehicle->GetWheelStatus(REAR_RIGHT_WHEEL);
 
         lua_pushnumber(luaVM, ucFrontLeft);
         lua_pushnumber(luaVM, ucRearLeft);
@@ -971,14 +971,14 @@ int CLuaVehicleDefs::IsVehicleWheelCollided(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleDoorState(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucDoor = 0;
+    std::uint8_t    ucDoor = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
     argStream.ReadNumber(ucDoor);
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucState = pVehicle->GetDoorStatus(ucDoor);
+        std::uint8_t ucState = pVehicle->GetDoorStatus(ucDoor);
         lua_pushnumber(luaVM, ucState);
         return 1;
     }
@@ -992,14 +992,14 @@ int CLuaVehicleDefs::GetVehicleDoorState(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleLightState(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucLight = 0;
+    std::uint8_t    ucLight = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
     argStream.ReadNumber(ucLight);
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucState = pVehicle->GetLightStatus(ucLight);
+        std::uint8_t ucState = pVehicle->GetLightStatus(ucLight);
         lua_pushnumber(luaVM, ucState);
         return 1;
     }
@@ -1013,14 +1013,14 @@ int CLuaVehicleDefs::GetVehicleLightState(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehiclePanelState(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucPanel = 0;
+    std::uint8_t    ucPanel = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
     argStream.ReadNumber(ucPanel);
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucState = pVehicle->GetPanelStatus(ucPanel);
+        std::uint8_t ucState = pVehicle->GetPanelStatus(ucPanel);
         lua_pushnumber(luaVM, ucState);
         return 1;
     }
@@ -1044,7 +1044,7 @@ int CLuaVehicleDefs::GetVehicleOverrideLights(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucLights = pVehicle->GetOverrideLights();
+        std::uint8_t ucLights = pVehicle->GetOverrideLights();
         lua_pushnumber(luaVM, ucLights);
         return 1;
     }
@@ -1117,7 +1117,7 @@ int CLuaVehicleDefs::GetVehiclePaintjob(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucPaintjob = pVehicle->GetPaintjob();
+        std::uint8_t ucPaintjob = pVehicle->GetPaintjob();
         lua_pushnumber(luaVM, ucPaintjob);
         return 1;
     }
@@ -1261,7 +1261,7 @@ int CLuaVehicleDefs::GetVehicleAdjustableProperty(lua_State* luaVM)
     {
         if (pVehicle->HasAdjustableProperty())
         {
-            unsigned short usAdjustableProperty = pVehicle->GetAdjustablePropertyValue();
+            std::uint16_t usAdjustableProperty = pVehicle->GetAdjustablePropertyValue();
             lua_pushnumber(luaVM, usAdjustableProperty);
             return 1;
         }
@@ -1472,7 +1472,7 @@ int CLuaVehicleDefs::GetVehicleEngineState(lua_State* luaVM)
 
 int CLuaVehicleDefs::GetVehicleNameFromModel(lua_State* luaVM)
 {
-    unsigned short   usModel = 0;
+    std::uint16_t   usModel = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
 
@@ -1496,11 +1496,11 @@ int CLuaVehicleDefs::GetVehicleNameFromModel(lua_State* luaVM)
 int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
 {
     CVector          vecPosition;
-    unsigned short   usModel = 0;
+    std::uint16_t   usModel = 0;
     CVector          vecRotation;
     const char*      szRegPlate = NULL;
-    unsigned char    ucVariant = 255;
-    unsigned char    ucVariant2 = 255;
+    std::uint8_t    ucVariant = 255;
+    std::uint8_t    ucVariant2 = 255;
     SString          strRegPlate = "";
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -1600,7 +1600,7 @@ int CLuaVehicleDefs::GetVehicleCurrentGear(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short currentGear;
+        std::uint16_t currentGear;
         if (CStaticFunctionDefinitions::GetVehicleCurrentGear(*pVehicle, currentGear))
         {
             lua_pushnumber(luaVM, currentGear);
@@ -1794,7 +1794,7 @@ int CLuaVehicleDefs::SetVehicleSirensOn(lua_State* luaVM)
 int CLuaVehicleDefs::AddVehicleUpgrade(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned short   usUpgrade = 0;
+    std::uint16_t   usUpgrade = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
 
@@ -1837,7 +1837,7 @@ int CLuaVehicleDefs::AddVehicleUpgrade(lua_State* luaVM)
 int CLuaVehicleDefs::RemoveVehicleUpgrade(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned short   usUpgrade = 0;
+    std::uint16_t   usUpgrade = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(usUpgrade);
@@ -1860,7 +1860,7 @@ int CLuaVehicleDefs::RemoveVehicleUpgrade(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleDoorState(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned char    ucDoor = 0, ucState = 0;
+    std::uint8_t    ucDoor = 0, ucState = 0;
     bool             spawnFlyingComponent;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -1913,7 +1913,7 @@ int CLuaVehicleDefs::SetVehicleWheelStates(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleLightState(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned char    ucLight = 0, ucState = 0;
+    std::uint8_t    ucLight = 0, ucState = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucLight);
@@ -1937,7 +1937,7 @@ int CLuaVehicleDefs::SetVehicleLightState(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehiclePanelState(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned char    ucPanel = 0, ucState = 0;
+    std::uint8_t    ucPanel = 0, ucState = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucPanel);
@@ -1961,7 +1961,7 @@ int CLuaVehicleDefs::SetVehiclePanelState(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleOverrideLights(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned char    ucLights = 0;
+    std::uint8_t    ucLights = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucLights);
@@ -2105,7 +2105,7 @@ int CLuaVehicleDefs::SetVehicleDamageProof(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehiclePaintjob(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned char    ucPaintjob = 0;
+    std::uint8_t    ucPaintjob = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucPaintjob);
@@ -2174,7 +2174,7 @@ int CLuaVehicleDefs::SetVehicleFrozen(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleAdjustableProperty(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned short   usAdjustableProperty = 0;
+    std::uint16_t   usAdjustableProperty = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(usAdjustableProperty);
@@ -2531,12 +2531,12 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                             }
                             break;
                         }
-                        case HANDLING_PERCENTSUBMERGED:            // unsigned int
+                        case HANDLING_PERCENTSUBMERGED:            // std::uint32_t
                                                                    // case HANDLING_MONETARY:
                         case HANDLING_HANDLINGFLAGS:
                         case HANDLING_MODELFLAGS:
                         {
-                            unsigned int uiValue;
+                            std::uint32_t uiValue;
                             argStream.ReadNumber(uiValue);
                             if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, uiValue))
                             {
@@ -2548,7 +2548,7 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
                         case HANDLING_NUMOFGEARS:
                         case HANDLING_ANIMGROUP:
                         {
-                            unsigned char ucValue;
+                            std::uint8_t ucValue;
                             argStream.ReadNumber(ucValue);
                             if (!argStream.HasErrors() && CStaticFunctionDefinitions::SetVehicleHandling(pVehicle, eProperty, ucValue))
                             {
@@ -2940,9 +2940,9 @@ int CLuaVehicleDefs::GetOriginalHandling(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleDoorOpenRatio(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
-    unsigned char    ucDoor = 0;
+    std::uint8_t    ucDoor = 0;
     float            fRatio = 0.0f;
-    unsigned long    ulTime = 0UL;
+    std::uint32_t    ulTime = 0UL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucDoor);
@@ -2968,7 +2968,7 @@ int CLuaVehicleDefs::GetVehicleSirenParams(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucSirenID = 0;
+    std::uint8_t    ucSirenID = 0;
     SSirenInfo       tSirenInfo;
 
     argStream.ReadUserData(pVehicle);
@@ -3019,7 +3019,7 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucSirenID = 0;
+    std::uint8_t    ucSirenID = 0;
     SSirenInfo       tSirenInfo;
 
     argStream.ReadUserData(pVehicle);
@@ -3028,7 +3028,7 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
         tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Grab the siren structure data
         lua_newtable(luaVM);
 
-        for (int i = 0; i < tSirenInfo.m_ucSirenCount; i++)
+        for (auto i = 0; i < tSirenInfo.m_ucSirenCount; i++)
         {
             lua_pushnumber(luaVM, i + 1);
             lua_newtable(luaVM);
@@ -3081,7 +3081,7 @@ int CLuaVehicleDefs::SetVehicleSirens(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucSirenID = 0;
+    std::uint8_t    ucSirenID = 0;
     SSirenInfo       tSirenInfo;
 
     argStream.ReadUserData(pVehicle);
@@ -3121,7 +3121,7 @@ int CLuaVehicleDefs::SetVehicleSirens(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleDoorOpenRatio(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucDoor = 0;
+    std::uint8_t    ucDoor = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
     argStream.ReadNumber(ucDoor);
@@ -3876,7 +3876,7 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // bool setVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy, float x, float y, float z )
-    unsigned short  usModel;
+    std::uint16_t  usModel;
     eVehicleDummies eDummy;
     CVector         vecPosition;
 
@@ -3903,7 +3903,7 @@ int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
-    unsigned short  usModel;
+    std::uint16_t  usModel;
     eVehicleDummies eDummy;
 
     CScriptArgReader argStream(luaVM);
@@ -3932,7 +3932,7 @@ int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
-    unsigned short  usModel;
+    std::uint16_t  usModel;
     eVehicleDummies eDummy;
 
     CScriptArgReader argStream(luaVM);
@@ -3959,7 +3959,7 @@ int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
     // bool setVehicleModelExhaustPosition ( int modelID, float x, float y, float z )
-    unsigned short usModel;
+    std::uint16_t usModel;
     CVector        vecPosition;
 
     CScriptArgReader argStream(luaVM);
@@ -3984,7 +3984,7 @@ int CLuaVehicleDefs::SetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelExhaustPosition ( int modelID )
-    unsigned short usModel;
+    std::uint16_t usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4011,7 +4011,7 @@ int CLuaVehicleDefs::GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelExhaustPosition ( int modelID )
-    unsigned short usModel;
+    std::uint16_t usModel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4033,10 +4033,10 @@ int CLuaVehicleDefs::OOP_GetVehicleModelExhaustFumesPosition(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, std::optional<unsigned char> optVariant, std::optional<unsigned char> optVariant2)
+bool CLuaVehicleDefs::SetVehicleVariant(CClientVehicle* pVehicle, std::optional<std::uint8_t> optVariant, std::optional<std::uint8_t> optVariant2)
 {
-    unsigned char ucVariant = optVariant.value_or(0xFE);
-    unsigned char ucVariant2 = optVariant2.value_or(0xFE);
+    std::uint8_t ucVariant = optVariant.value_or(0xFE);
+    std::uint8_t ucVariant2 = optVariant2.value_or(0xFE);
 
     if (ucVariant == 254 && ucVariant2 == 254)
         CClientVehicleManager::GetRandomVariation(pVehicle->GetModel(), ucVariant, ucVariant2);
@@ -4061,7 +4061,7 @@ bool CLuaVehicleDefs::SetVehicleWheelScale(CClientVehicle* const pVehicle, const
 }
 
 std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(
-    const unsigned short usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
+    const std::uint16_t usModel, const std::optional<eResizableVehicleWheelGroup> eWheelGroup)
 {
     CModelInfo* pModelInfo = nullptr;
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -4082,7 +4082,7 @@ std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::Get
     return pModelInfo->GetVehicleWheelSize(eActualWheelGroup);
 }
 
-bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
+bool CLuaVehicleDefs::SetVehicleModelWheelSize(const std::uint16_t usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
 {
     CModelInfo* pModelInfo = nullptr;
 
@@ -4102,7 +4102,7 @@ bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, con
     return true;
 }
 
-int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel)
+int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, std::uint8_t wheel)
 {
     if (wheel < 0 || wheel > 3)
         throw std::invalid_argument("Invalid wheel number");
@@ -4113,7 +4113,7 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
     return pVehicle->GetWheelFrictionState(wheel);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short  vehicleModel,
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(std::uint16_t  vehicleModel,
                                                                                                               eVehicleDummies dummy)
 {
     CVector position;
@@ -4124,7 +4124,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVeh
     return std::tuple(position.fX, position.fY, position.fZ);
 }
 
-std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, eVehicleDummies dummy)
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosition(std::uint16_t vehicleModel, eVehicleDummies dummy)
 {
     CVector position;
 

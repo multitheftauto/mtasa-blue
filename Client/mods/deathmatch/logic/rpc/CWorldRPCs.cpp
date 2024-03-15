@@ -75,8 +75,8 @@ void CWorldRPCs::LoadFunctions()
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
 {
     // Read out the time
-    unsigned char ucHour;
-    unsigned char ucMin;
+    std::uint8_t ucHour;
+    std::uint8_t ucMin;
     if (bitStream.Read(ucHour) && bitStream.Read(ucMin))
     {
         // Check that its within range
@@ -90,7 +90,7 @@ void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
 void CWorldRPCs::SetWeather(NetBitStreamInterface& bitStream)
 {
     // Read out the weather to apply
-    unsigned char ucWeather;
+    std::uint8_t ucWeather;
     if (bitStream.Read(ucWeather))
     {
         // Check that its within range
@@ -104,8 +104,8 @@ void CWorldRPCs::SetWeather(NetBitStreamInterface& bitStream)
 void CWorldRPCs::SetWeatherBlended(NetBitStreamInterface& bitStream)
 {
     // Read out the weather to apply and the hour it should begin applying at
-    unsigned char ucWeather;
-    unsigned char ucHour;
+    std::uint8_t ucWeather;
+    std::uint8_t ucHour;
     if (bitStream.Read(ucWeather) && bitStream.Read(ucHour))
     {
         // Check that its within range
@@ -118,7 +118,7 @@ void CWorldRPCs::SetWeatherBlended(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetMinuteDuration(NetBitStreamInterface& bitStream)
 {
-    unsigned long ulDuration;
+    std::uint32_t ulDuration;
     if (bitStream.Read(ulDuration))
     {
         m_pClientGame->SetMinuteDuration(ulDuration);
@@ -154,8 +154,8 @@ void CWorldRPCs::SetWaveHeight(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetSkyGradient(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucTopRed = 0, ucTopGreen = 0, ucTopBlue = 0;
-    unsigned char ucBottomRed = 0, ucBottomGreen = 0, ucBottomBlue = 0;
+    std::uint8_t ucTopRed = 0, ucTopGreen = 0, ucTopBlue = 0;
+    std::uint8_t ucBottomRed = 0, ucBottomGreen = 0, ucBottomBlue = 0;
     if (bitStream.Read(ucTopRed) && bitStream.Read(ucTopGreen) && bitStream.Read(ucTopBlue) && bitStream.Read(ucBottomRed) && bitStream.Read(ucBottomGreen) &&
         bitStream.Read(ucBottomBlue))
     {
@@ -184,7 +184,7 @@ void CWorldRPCs::ResetHeatHaze(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetBlurLevel(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucLevel;
+    std::uint8_t ucLevel;
     if (bitStream.Read(ucLevel))
     {
         g_pGame->GetSettings()->SetBlurControlledByScript(true);
@@ -194,7 +194,7 @@ void CWorldRPCs::SetBlurLevel(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetWantedLevel(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucWantedLevel;
+    std::uint8_t ucWantedLevel;
 
     if (bitStream.Read(ucWantedLevel))
     {
@@ -216,8 +216,8 @@ void CWorldRPCs::SetFPSLimit(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetGarageOpen(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucGarageID;
-    unsigned char ucIsOpen;
+    std::uint8_t ucGarageID;
+    std::uint8_t ucIsOpen;
 
     if (bitStream.Read(ucGarageID) && bitStream.Read(ucIsOpen))
     {
@@ -231,8 +231,8 @@ void CWorldRPCs::SetGarageOpen(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetGlitchEnabled(NetBitStreamInterface& bitStream)
 {
-    unsigned char eGlitch;
-    unsigned char ucIsEnabled;
+    std::uint8_t eGlitch;
+    std::uint8_t ucIsEnabled;
     bitStream.Read(eGlitch);
     bitStream.Read(ucIsEnabled);
     g_pClientGame->SetGlitchEnabled(eGlitch, (ucIsEnabled == 1));
@@ -240,7 +240,7 @@ void CWorldRPCs::SetGlitchEnabled(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetJetpackWeaponEnabled(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucWeaponID = 0;
+    std::uint8_t ucWeaponID = 0;
     bool          bEnabled;
     bitStream.Read(ucWeaponID);
     bitStream.ReadBit(bEnabled);
@@ -249,7 +249,7 @@ void CWorldRPCs::SetJetpackWeaponEnabled(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetCloudsEnabled(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucIsEnabled;
+    std::uint8_t ucIsEnabled;
     bitStream.Read(ucIsEnabled);
     bool bEnabled = (ucIsEnabled == 1);
     g_pMultiplayer->SetCloudsEnabled(bEnabled);
@@ -265,7 +265,7 @@ void CWorldRPCs::SetTrafficLightState(NetBitStreamInterface& bitStream)
         bool bForced = bitStream.ReadBit();
         // We ignore updating the serverside traffic light state if it's blocked, unless script forced it
         if (bForced || !g_pMultiplayer->GetTrafficLightsLocked())
-            g_pMultiplayer->SetTrafficLightState((unsigned char)*&ucTrafficLightState);
+            g_pMultiplayer->SetTrafficLightState((std::uint8_t)*&ucTrafficLightState);
     }
 }
 
@@ -311,8 +311,8 @@ void CWorldRPCs::SetSunSize(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetSunColor(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucCoreR, ucCoreG, ucCoreB;
-    unsigned char ucCoronaR, ucCoronaG, ucCoronaB;
+    std::uint8_t ucCoreR, ucCoreG, ucCoreB;
+    std::uint8_t ucCoronaR, ucCoronaG, ucCoronaB;
 
     if (bitStream.Read(ucCoreR) && bitStream.Read(ucCoreG) && bitStream.Read(ucCoreB) && bitStream.Read(ucCoronaR) && bitStream.Read(ucCoronaG) &&
         bitStream.Read(ucCoronaB))
@@ -416,9 +416,9 @@ void CWorldRPCs::ResetFogDistance(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetWeaponProperty(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucWeapon = 0;
-    unsigned char ucProperty = 0;
-    unsigned char ucWeaponSkill = 0;
+    std::uint8_t ucWeapon = 0;
+    std::uint8_t ucProperty = 0;
+    std::uint8_t ucWeaponSkill = 0;
     float         fData = 0.0f;
     short         sData = 0;
     if (bitStream.Read(ucWeapon) && bitStream.Read(ucProperty) && bitStream.Read(ucWeaponSkill))
@@ -573,7 +573,7 @@ void CWorldRPCs::SetWeaponProperty(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::RemoveWorldModel(NetBitStreamInterface& bitStream)
 {
-    unsigned short usModel = 0;
+    std::uint16_t usModel = 0;
     float          fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
     char           cInterior = -1;
     if (bitStream.Read(usModel) && bitStream.Read(fRadius) && bitStream.Read(fX) && bitStream.Read(fY) && bitStream.Read(fZ))
@@ -588,7 +588,7 @@ void CWorldRPCs::RemoveWorldModel(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::RestoreWorldModel(NetBitStreamInterface& bitStream)
 {
-    unsigned short usModel = 0;
+    std::uint16_t usModel = 0;
     float          fRadius = 0.0f, fX = 0.0f, fY = 0.0f, fZ = 0.0f;
     char           cInterior = -1;
     if (bitStream.Read(usModel) && bitStream.Read(fRadius) && bitStream.Read(fX) && bitStream.Read(fY) && bitStream.Read(fZ))

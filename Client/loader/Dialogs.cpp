@@ -22,7 +22,7 @@ static int           iOtherCode = 0;
 static WNDCLASS      splashWindowClass{};
 static HWND          splashWindow{};
 static HWND          hwndProgressDialog = NULL;
-static unsigned long ulProgressStartTime = 0;
+static std::uint32_t ulProgressStartTime = 0;
 static HWND          hwndCrashedDialog = NULL;
 static HWND          hwndGraphicsDllDialog = NULL;
 static HWND          hwndOptimusDialog = NULL;
@@ -422,7 +422,7 @@ void HideProgressDialog()
     if (hwndProgressDialog)
     {
         // Show progress for at least two seconds
-        unsigned long ulTimeElapsed = GetTickCount32() - ulProgressStartTime;
+        std::uint32_t ulTimeElapsed = GetTickCount32() - ulProgressStartTime;
         if (ulTimeElapsed < 2000)
         {
             UpdateProgress(100, 100);

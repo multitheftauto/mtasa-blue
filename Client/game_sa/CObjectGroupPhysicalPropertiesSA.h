@@ -26,12 +26,12 @@ public:
     float                   fBuoyancy;
     float                   fUprootLimit;
     float                   fColDamageMultiplier;
-    unsigned char           eColDamageEffect;
-    unsigned char           eSpecialColResponse;
+    std::uint8_t           eColDamageEffect;
+    std::uint8_t           eSpecialColResponse;
     bool                    bCameraAvoidObject;
     bool                    bCausesExplosion;
-    unsigned char           eFxType;
-    unsigned char           pad[3];
+    std::uint8_t           eFxType;
+    std::uint8_t           pad[3];
     CVector                 vecFxOffset;
     CFxSystemBPSAInterface* pFxSystemBlueprintPtr;
     float                   fSmashMultiplier;
@@ -45,17 +45,17 @@ class CObjectGroupPhysicalPropertiesSA : public CObjectGroupPhysicalProperties
 {
 protected:
     CObjectGroupPhysicalPropertiesSAInterface*                                                           m_pInterface;
-    unsigned char                                                                                        m_ucObjectGroup;
+    std::uint8_t                                                                                        m_ucObjectGroup;
     bool                                                                                                 m_bModified;
-    static std::unordered_map<unsigned char, std::unique_ptr<CObjectGroupPhysicalPropertiesSAInterface>> ms_OriginalGroupProperties;
+    static std::unordered_map<std::uint8_t, std::unique_ptr<CObjectGroupPhysicalPropertiesSAInterface>> ms_OriginalGroupProperties;
 
 public:
     CObjectGroupPhysicalPropertiesSA();
-    CObjectGroupPhysicalPropertiesSA(unsigned char ucObjectGroup);
+    CObjectGroupPhysicalPropertiesSA(std::uint8_t ucObjectGroup);
 
     CObjectGroupPhysicalPropertiesSAInterface* GetInterface() const;
-    void                                       SetGroup(unsigned char ucObjectGroup);
-    unsigned char                              GetGroup() const;
+    void                                       SetGroup(std::uint8_t ucObjectGroup);
+    std::uint8_t                              GetGroup() const;
     bool                                       IsValid() const;
     void                                       ChangeSafeguard();
     void                                       RestoreDefault();

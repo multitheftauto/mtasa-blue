@@ -16,7 +16,7 @@ CGaragesSA::CGaragesSA(CGaragesSAInterface* pInterface)
 {
     internalInterface = pInterface;
 
-    for (int i = 0; i < MAX_GARAGES; i++)
+    for (auto i = 0; i < MAX_GARAGES; i++)
     {
         Garages[i] = new CGarageSA((CGarageSAInterface*)(CLASS_CGarages + 216 * i));
     }
@@ -24,7 +24,7 @@ CGaragesSA::CGaragesSA(CGaragesSAInterface* pInterface)
 
 CGaragesSA::~CGaragesSA()
 {
-    for (int i = 0; i < MAX_GARAGES; i++)
+    for (auto i = 0; i < MAX_GARAGES; i++)
     {
         delete Garages[i];
         Garages[i] = NULL;
@@ -35,7 +35,7 @@ void CGaragesSA::Initialize()
 {
     // Disable pay and sprays and mod shops
     static const int iPayAndSprays[] = {7, 8, 10, 11, 12, 15, 18, 19, 24, 27, 32, 33, 36, 40, 41, 47};
-    for (unsigned int i = 0; i < sizeof(iPayAndSprays) / sizeof(int); ++i)
+    for (std::uint32_t i = 0; i < sizeof(iPayAndSprays) / sizeof(int); ++i)
     {
         Garages[iPayAndSprays[i]]->SetType(1);
     }

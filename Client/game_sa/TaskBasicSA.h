@@ -54,8 +54,8 @@ public:
 // temporary
 class CAnimBlendAssociation;
 class CAnimBlendHierarchy;
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+typedef std::uint32_t AssocGroupId;
+typedef std::uint32_t AnimationId;
 
 class CTaskSimpleAnimSAInterface : public CTaskSimpleSAInterface
 {
@@ -145,7 +145,7 @@ public:
 class CTaskSimpleDeadSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    unsigned int uiDeathTimeMS;
+    std::uint32_t uiDeathTimeMS;
     bool         bUnk2;
 };
 
@@ -153,7 +153,7 @@ class CTaskSimpleDeadSA : public virtual CTaskSimpleSA, public virtual CTaskSimp
 {
 public:
     CTaskSimpleDeadSA(){};
-    CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2);
+    CTaskSimpleDeadSA(std::uint32_t uiDeathTimeMS, bool bUnk2);
 };
 
 class CTaskSimpleBeHitSAInterface : public CTaskSimpleSAInterface

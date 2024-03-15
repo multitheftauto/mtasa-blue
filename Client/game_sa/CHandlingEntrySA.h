@@ -22,12 +22,12 @@ class CTransmissionSAInterface
 public:
     float fUnknown[18];            // +40
 
-    unsigned char ucDriveType : 8;                // +112
-    unsigned char ucEngineType : 8;               // +113
-    unsigned char ucNumberOfGears : 8;            // +114
-    unsigned char ucUnknown : 8;                  // +115
+    std::uint8_t ucDriveType : 8;                // +112
+    std::uint8_t ucEngineType : 8;               // +113
+    std::uint8_t ucNumberOfGears : 8;            // +114
+    std::uint8_t ucUnknown : 8;                  // +115
 
-    unsigned int uiHandlingFlags;            // +116
+    std::uint32_t uiHandlingFlags;            // +116
 
     float fEngineAcceleration;            // +120     (value in handling.cfg * 0x86A950)
     float fEngineInertia;                 // +124
@@ -47,7 +47,7 @@ struct tHandlingDataSA
     float        fTurnMass;                     // +12
     float        fDragCoeff;                    // +16
     CVector      vecCenterOfMass;               // +20
-    unsigned int uiPercentSubmerged;            // +32
+    std::uint32_t uiPercentSubmerged;            // +32
 
     float fUnknown2;            // +36  Automatically calculated
 
@@ -73,14 +73,14 @@ struct tHandlingDataSA
 
     float fCollisionDamageMultiplier;            // +200
 
-    unsigned int uiModelFlags;                   // +204
-    unsigned int uiHandlingFlags;                // +208
+    std::uint32_t uiModelFlags;                   // +204
+    std::uint32_t uiHandlingFlags;                // +208
     float        fSeatOffsetDistance;            // +212
-    unsigned int uiMonetary;                     // +216
+    std::uint32_t uiMonetary;                     // +216
 
-    unsigned char ucHeadLight : 8;            // +220
-    unsigned char ucTailLight : 8;            // +221
-    unsigned char ucAnimGroup : 8;            // +222
+    std::uint8_t ucHeadLight : 8;            // +220
+    std::uint8_t ucTailLight : 8;            // +221
+    std::uint8_t ucAnimGroup : 8;            // +222
 };
 
 class CHandlingEntrySA : public CHandlingEntry
@@ -103,12 +103,12 @@ public:
     float          GetDragCoeff() const { return m_Handling.fDragCoeff; };
     const CVector& GetCenterOfMass() const { return m_Handling.vecCenterOfMass; };
 
-    unsigned int GetPercentSubmerged() const { return m_Handling.uiPercentSubmerged; };
+    std::uint32_t GetPercentSubmerged() const { return m_Handling.uiPercentSubmerged; };
     float        GetTractionMultiplier() const { return m_Handling.fTractionMultiplier; };
 
     eDriveType    GetCarDriveType() const { return static_cast<eDriveType>(m_Handling.Transmission.ucDriveType); };
     eEngineType   GetCarEngineType() const { return static_cast<eEngineType>(m_Handling.Transmission.ucEngineType); };
-    unsigned char GetNumberOfGears() const { return m_Handling.Transmission.ucNumberOfGears; };
+    std::uint8_t GetNumberOfGears() const { return m_Handling.Transmission.ucNumberOfGears; };
 
     float GetEngineAcceleration() const { return m_Handling.Transmission.fEngineAcceleration; };
     float GetEngineInertia() const { return m_Handling.Transmission.fEngineInertia; };
@@ -132,14 +132,14 @@ public:
 
     float GetCollisionDamageMultiplier() const { return m_Handling.fCollisionDamageMultiplier; };
 
-    unsigned int GetHandlingFlags() const { return m_Handling.uiHandlingFlags; };
-    unsigned int GetModelFlags() const { return m_Handling.uiModelFlags; };
+    std::uint32_t GetHandlingFlags() const { return m_Handling.uiHandlingFlags; };
+    std::uint32_t GetModelFlags() const { return m_Handling.uiModelFlags; };
     float        GetSeatOffsetDistance() const { return m_Handling.fSeatOffsetDistance; };
-    unsigned int GetMonetary() const { return m_Handling.uiMonetary; };
+    std::uint32_t GetMonetary() const { return m_Handling.uiMonetary; };
 
     eLightType    GetHeadLight() const { return static_cast<eLightType>(m_Handling.ucHeadLight); };
     eLightType    GetTailLight() const { return static_cast<eLightType>(m_Handling.ucTailLight); };
-    unsigned char GetAnimGroup() const { return m_Handling.ucAnimGroup; };
+    std::uint8_t GetAnimGroup() const { return m_Handling.ucAnimGroup; };
 
     eVehicleTypes GetModel() const { return static_cast<eVehicleTypes>(m_Handling.iVehicleID); };
     bool          HasSuspensionChanged() const { return true; };
@@ -150,12 +150,12 @@ public:
     void SetDragCoeff(float fDrag) { m_Handling.fDragCoeff = fDrag; };
     void SetCenterOfMass(const CVector& vecCenter) { m_Handling.vecCenterOfMass = vecCenter; };
 
-    void SetPercentSubmerged(unsigned int uiPercent) { m_Handling.uiPercentSubmerged = uiPercent; };
+    void SetPercentSubmerged(std::uint32_t uiPercent) { m_Handling.uiPercentSubmerged = uiPercent; };
     void SetTractionMultiplier(float fTractionMultiplier) { m_Handling.fTractionMultiplier = fTractionMultiplier; };
 
     void SetCarDriveType(eDriveType Type) { m_Handling.Transmission.ucDriveType = Type; };
     void SetCarEngineType(eEngineType Type) { m_Handling.Transmission.ucEngineType = Type; };
-    void SetNumberOfGears(unsigned char ucNumber) { m_Handling.Transmission.ucNumberOfGears = ucNumber; };
+    void SetNumberOfGears(std::uint8_t ucNumber) { m_Handling.Transmission.ucNumberOfGears = ucNumber; };
 
     void SetEngineAcceleration(float fAcceleration) { m_Handling.Transmission.fEngineAcceleration = fAcceleration; };
     void SetEngineInertia(float fInertia) { m_Handling.Transmission.fEngineInertia = fInertia; };
@@ -179,16 +179,16 @@ public:
 
     void SetCollisionDamageMultiplier(float fMultiplier) { m_Handling.fCollisionDamageMultiplier = fMultiplier; };
 
-    void SetHandlingFlags(unsigned int uiFlags) { m_Handling.uiHandlingFlags = uiFlags; };
-    void SetModelFlags(unsigned int uiFlags) { m_Handling.uiModelFlags = uiFlags; };
+    void SetHandlingFlags(std::uint32_t uiFlags) { m_Handling.uiHandlingFlags = uiFlags; };
+    void SetModelFlags(std::uint32_t uiFlags) { m_Handling.uiModelFlags = uiFlags; };
     void SetSeatOffsetDistance(float fDistance) { m_Handling.fSeatOffsetDistance = fDistance; };
-    void SetMonetary(unsigned int uiMonetary) { m_Handling.uiMonetary = uiMonetary; };
+    void SetMonetary(std::uint32_t uiMonetary) { m_Handling.uiMonetary = uiMonetary; };
 
     void SetHeadLight(eLightType Style) { m_Handling.ucHeadLight = Style; };
     void SetTailLight(eLightType Style) { m_Handling.ucTailLight = Style; };
-    void SetAnimGroup(unsigned char ucGroup) { m_Handling.ucAnimGroup = ucGroup; };
+    void SetAnimGroup(std::uint8_t ucGroup) { m_Handling.ucAnimGroup = ucGroup; };
 
-    void Recalculate(unsigned short usModel);
+    void Recalculate(std::uint16_t usModel);
 
     tHandlingDataSA* GetInterface() { return m_pHandlingSA; };
 

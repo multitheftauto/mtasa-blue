@@ -10,9 +10,9 @@
 
 #include "StdInc.h"
 
-static unsigned int CEntryInfoNodePool_UsedSpaces = 0;
-static unsigned int CPtrNodeSingleLinkPool_UsedSpaces = 0;
-static unsigned int CPtrNodeDoubleLinkPool_UsedSpaces = 0;
+static std::uint32_t CEntryInfoNodePool_UsedSpaces = 0;
+static std::uint32_t CPtrNodeSingleLinkPool_UsedSpaces = 0;
+static std::uint32_t CPtrNodeDoubleLinkPool_UsedSpaces = 0;
 
 #define HOOKPOS_CEntryInfoNodePool__New 0x536D6E
 #define HOOKSIZE_CEntryInfoNodePool__New 0x5
@@ -29,7 +29,7 @@ static void _declspec(naked) HOOK_CEntryInfoNodePool__New()
 
 #define HOOKPOS_CEntryInfoNode__operator_delete 0x536DF1
 #define HOOKSIZE_CEntryInfoNode__operator_delete 0x6
-static const unsigned int RETURN_CEntryInfoNode__operator_delete = 0x536DF7;
+static const std::uint32_t RETURN_CEntryInfoNode__operator_delete = 0x536DF7;
 static void _declspec(naked) HOOK_CEntryInfoNode__operator_delete()
 {
     _asm {
@@ -43,7 +43,7 @@ static void _declspec(naked) HOOK_CEntryInfoNode__operator_delete()
 
 #define HOOKPOS_CEntryInfoList__Flush 0x536E6C
 #define HOOKSIZE_CEntryInfoList__Flush 0x5
-static const unsigned int RETURN_CEntryInfoList__Flush = 0x536E71;
+static const std::uint32_t RETURN_CEntryInfoList__Flush = 0x536E71;
 static void _declspec(naked) HOOK_CEntryInfoList__Flush()
 {
     _asm {
@@ -69,7 +69,7 @@ static void _declspec(naked) HOOK_CPtrNodeSingleLinkPool__New()
 }
 #define HOOKPOS_CPtrNodeSingleLink__operator_delete 0x5523AA
 #define HOOKSIZE_CPtrNodeSingleLink__operator_delete 0x5
-static const unsigned int RETURN_CPtrNodeSingleLink__operator_delete = 0x5523AF;
+static const std::uint32_t RETURN_CPtrNodeSingleLink__operator_delete = 0x5523AF;
 static void _declspec(naked) HOOK_CPtrNodeSingleLink__operator_delete()
 {
     _asm {
@@ -83,7 +83,7 @@ static void _declspec(naked) HOOK_CPtrNodeSingleLink__operator_delete()
 
 #define HOOKPOS_CPtrListSingleLink__Flush 0x55244D
 #define HOOKSIZE_CPtrListSingleLink__Flush 0x6
-static const unsigned int RETURN_CPtrListSingleLink__Flush = 0x552453;
+static const std::uint32_t RETURN_CPtrListSingleLink__Flush = 0x552453;
 static void _declspec(naked) HOOK_CPtrListSingleLink__Flush()
 {
     _asm {
@@ -110,7 +110,7 @@ static void _declspec(naked) HOOK_CPtrNodeDoubleLinkPool__New()
 
 #define HOOKPOS_CPtrNodeDoubleLink__operator_delete 0x5523F0
 #define HOOKSIZE_CPtrNodeDoubleLink__operator_delete 0x6
-static const unsigned int RETURN_CPtrNodeDoubleLink__operator_delete = 0x5523F6;
+static const std::uint32_t RETURN_CPtrNodeDoubleLink__operator_delete = 0x5523F6;
 static void _declspec(naked) HOOK_CPtrNodeDoubleLink__operator_delete()
 {
     _asm {
@@ -124,7 +124,7 @@ static void _declspec(naked) HOOK_CPtrNodeDoubleLink__operator_delete()
 
 #define HOOKPOS_CPtrListDoubleLink__Flush 0x5524CB
 #define HOOKSIZE_CPtrListDoubleLink__Flush 0x5
-static const unsigned int RETURN_CPtrListDoubleLink__Flush = 0x5524D0;
+static const std::uint32_t RETURN_CPtrListDoubleLink__Flush = 0x5524D0;
 static void _declspec(naked) HOOK_CPtrListDoubleLink__Flush()
 {
     _asm {
@@ -151,17 +151,17 @@ void CMultiplayerSA::InitHooks_ObjectStreamerOptimization()
     EZHookInstall(CPtrListDoubleLink__Flush);
 }
 
-unsigned int CMultiplayerSA::EntryInfoNodePool_NoOfUsedSpaces() const noexcept
+std::uint32_t CMultiplayerSA::EntryInfoNodePool_NoOfUsedSpaces() const noexcept
 {
     return CEntryInfoNodePool_UsedSpaces;
 }
 
-unsigned int CMultiplayerSA::PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept
+std::uint32_t CMultiplayerSA::PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept
 {
     return CPtrNodeSingleLinkPool_UsedSpaces;
 }
 
-unsigned int CMultiplayerSA::PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept
+std::uint32_t CMultiplayerSA::PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept
 {
     return CPtrNodeDoubleLinkPool_UsedSpaces;
 }

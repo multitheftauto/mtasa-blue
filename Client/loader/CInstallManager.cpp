@@ -260,7 +260,7 @@ SString CInstallManager::Continue()
                                GetMTASAPath().c_str()));
 
     // Run sequencer
-    for (int i = 0; !m_pSequencer->AtEnd() && i < 1000; i++)
+    for (auto i = 0; !m_pSequencer->AtEnd() && i < 1000; i++)
         m_pSequencer->ProcessNextLine();
 
     // Remove unwanted files
@@ -268,7 +268,7 @@ SString CInstallManager::Continue()
 
     // Extract command line launch args
     SString strCommandLineOut;
-    for (int i = 0; i < m_pSequencer->GetVariableInt("_argc"); i++)
+    for (auto i = 0; i < m_pSequencer->GetVariableInt("_argc"); i++)
         strCommandLineOut += m_pSequencer->GetVariable(SString("_arg_%d", i)) + " ";
 
     AddReportLog(1060, SString("CInstallManager::Continue - return %s", *strCommandLineOut));

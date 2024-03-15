@@ -251,7 +251,7 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
 {
     CRegistryResultData* pResult = registryResult->GetThis();
 
-    int status = mysql_real_query(m_handle, strQuery, static_cast<unsigned long>(strQuery.length()));
+    int status = mysql_real_query(m_handle, strQuery, static_cast<std::uint32_t>(strQuery.length()));
     if (status)
     {
         SetLastError(mysql_errno(m_handle), mysql_error(m_handle));
@@ -270,7 +270,7 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
             // Get column names
             pResult->nColumns = mysql_num_fields(res);
             pResult->ColNames.clear();
-            for (int i = 0; i < pResult->nColumns; i++)
+            for (auto i = 0; i < pResult->nColumns; i++)
             {
                 mysql_field_seek(res, i);
                 MYSQL_FIELD* field = mysql_fetch_field(res);
@@ -287,7 +287,7 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
 
                 pResult->Data.push_back(vector<CRegistryResultCell>(pResult->nColumns));
                 vector<CRegistryResultCell>& outRow = pResult->Data.back();
-                for (int i = 0; i < pResult->nColumns; i++)
+                for (auto i = 0; i < pResult->nColumns; i++)
                 {
                     CRegistryResultCell& cell = outRow[i];
                     mysql_field_seek(res, i);
@@ -318,13 +318,13 @@ bool CDatabaseConnectionMySql::QueryInternal(const SString& strQuery, CRegistryR
                             }
                             else
                             {
-                                cell.pVal = new unsigned char[cell.nLength];
+                                cell.pVal = new std::uint8_t[cell.nLength];
                                 memcpy(cell.pVal, inData, cell.nLength);
                             }
                             break;
                         default:
                             cell.nLength = inLength + 1;
-                            cell.pVal = new unsigned char[cell.nLength];
+                            cell.pVal = new std::uint8_t[cell.nLength];
                             memcpy(cell.pVal, inData, cell.nLength);
                             break;
                     }

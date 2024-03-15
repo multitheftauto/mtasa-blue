@@ -28,10 +28,10 @@ public:
     CClient3DMarker(CClientMarker* pThis);
     ~CClient3DMarker();
 
-    unsigned int GetMarkerType() const { return CClientMarkerCommon::CLASS_3DMARKER; };
+    std::uint32_t GetMarkerType() const { return CClientMarkerCommon::CLASS_3DMARKER; };
 
-    unsigned long Get3DMarkerType();
-    void          Set3DMarkerType(unsigned long ulType);
+    std::uint32_t Get3DMarkerType();
+    void          Set3DMarkerType(std::uint32_t ulType);
 
     bool IsHit(const CVector& vecPosition) const;
 
@@ -68,6 +68,6 @@ private:
     float        m_fSize;
     SColor       m_Color;
     C3DMarker*   m_pMarker;
-    unsigned int m_ulIdentifier;
+    std::uint32_t m_ulIdentifier;
     bool         m_bMarkerStreamedIn;
 };

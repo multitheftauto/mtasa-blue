@@ -323,7 +323,7 @@ int CLuaPedDefs::GetPedWeapon(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned char    ucSlot = 0xFF;
+    std::uint8_t    ucSlot = 0xFF;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadNumber(ucSlot, 0xFF);
@@ -333,7 +333,7 @@ int CLuaPedDefs::GetPedWeapon(lua_State* luaVM)
         if (ucSlot == 0xFF)
             ucSlot = pPed->GetCurrentWeaponSlot();
 
-        unsigned char ucWeapon = pPed->GetWeaponType((eWeaponSlot)ucSlot);
+        std::uint8_t ucWeapon = pPed->GetWeaponType((eWeaponSlot)ucSlot);
         lua_pushnumber(luaVM, ucWeapon);
         return 1;
     }
@@ -371,7 +371,7 @@ int CLuaPedDefs::GetPedAmmoInClip(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned char    ucSlot = 0xFF;
+    std::uint8_t    ucSlot = 0xFF;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadNumber(ucSlot, 0xFF);
@@ -384,7 +384,7 @@ int CLuaPedDefs::GetPedAmmoInClip(lua_State* luaVM)
         CWeapon* pWeapon = pPed->GetWeapon((eWeaponSlot)ucSlot);
         if (pWeapon)
         {
-            unsigned short usAmmo = static_cast<unsigned short>(pWeapon->GetAmmoInClip());
+            std::uint16_t usAmmo = static_cast<std::uint16_t>(pWeapon->GetAmmoInClip());
             lua_pushnumber(luaVM, usAmmo);
             return 1;
         }
@@ -401,7 +401,7 @@ int CLuaPedDefs::GetPedTotalAmmo(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned char    ucSlot = 0xFF;
+    std::uint8_t    ucSlot = 0xFF;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadNumber(ucSlot, 0xFF);
@@ -416,9 +416,9 @@ int CLuaPedDefs::GetPedTotalAmmo(lua_State* luaVM)
         if (pWeapon)
         {
             // Keep server and client synced
-            unsigned short usAmmo = 1;
+            std::uint16_t usAmmo = 1;
             if (CWeaponNames::DoesSlotHaveAmmo(ucSlot))
-                usAmmo = static_cast<unsigned short>(pWeapon->GetAmmoTotal());
+                usAmmo = static_cast<std::uint16_t>(pWeapon->GetAmmoTotal());
 
             lua_pushnumber(luaVM, usAmmo);
             return 1;
@@ -502,7 +502,7 @@ int CLuaPedDefs::GetPedOccupiedVehicleSeat(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiVehicleSeat;
+        std::uint32_t uiVehicleSeat;
         if (CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(*pPed, uiVehicleSeat))
         {
             lua_pushnumber(luaVM, uiVehicleSeat);
@@ -521,7 +521,7 @@ int CLuaPedDefs::GetPedTask(lua_State* luaVM)
     // Verify the argument
     CClientPed*      pPed = NULL;
     SString          strPriority = "";
-    unsigned int     uiTaskType = 0;
+    std::uint32_t     uiTaskType = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadString(strPriority);
@@ -799,7 +799,7 @@ int CLuaPedDefs::GetPedStat(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned short   usStat = 0;
+    std::uint16_t   usStat = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadNumber(usStat);
@@ -1074,7 +1074,7 @@ int CLuaPedDefs::GetPedBonePosition(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned char    ucBone = 0;
+    std::uint8_t    ucBone = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadNumber(ucBone);
@@ -1105,7 +1105,7 @@ int CLuaPedDefs::OOP_GetPedBonePosition(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned char    ucBone = 0;
+    std::uint8_t    ucBone = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadNumber(ucBone);
@@ -1211,7 +1211,7 @@ int CLuaPedDefs::GetPedClothes(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned char    ucType = 0;
+    std::uint8_t    ucType = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
     argStream.ReadNumber(ucType);
@@ -1320,7 +1320,7 @@ int CLuaPedDefs::GetPedFightingStyle(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucStyle;
+        std::uint8_t ucStyle;
         if (CStaticFunctionDefinitions::GetPedFightingStyle(*pPed, ucStyle))
         {
             lua_pushnumber(luaVM, ucStyle);
@@ -1431,7 +1431,7 @@ int CLuaPedDefs::GetPedMoveAnim(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int iMoveAnim;
+        std::uint32_t iMoveAnim;
         if (CStaticFunctionDefinitions::GetPedMoveAnim(*pPed, iMoveAnim))
         {
             lua_pushnumber(luaVM, iMoveAnim);
@@ -1762,7 +1762,7 @@ int CLuaPedDefs::AddPedClothes(lua_State* luaVM)
     // Verify the argument
     CClientEntity*   pEntity = NULL;
     SString          strTexture = "", strModel = "";
-    unsigned char    ucType = 0;
+    std::uint8_t    ucType = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadString(strTexture);
@@ -1788,7 +1788,7 @@ int CLuaPedDefs::RemovePedClothes(lua_State* luaVM)
 {
     // Verify the argument
     CClientEntity*   pEntity = NULL;
-    unsigned char    ucType = 0;
+    std::uint8_t    ucType = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucType);
@@ -1862,7 +1862,7 @@ int CLuaPedDefs::SetPedDoingGangDriveby(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetPedFightingStyle(CClientEntity* const entity, const unsigned int style)
+bool CLuaPedDefs::SetPedFightingStyle(CClientEntity* const entity, const std::uint32_t style)
 {
     // Is valid style?
     if (style < 4 || style > 16)
@@ -2039,7 +2039,7 @@ int CLuaPedDefs::SetPedStat(lua_State* luaVM)
 {
     // Verify the argument
     CClientEntity*   pEntity = NULL;
-    unsigned short   usStat = 0;
+    std::uint16_t   usStat = 0;
     float            fValue = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -2070,8 +2070,8 @@ int CLuaPedDefs::KillPed(lua_State* luaVM)
 {
     CClientEntity* pEntity = NULL;
     CClientEntity* pKiller = NULL;
-    unsigned char  ucKillerWeapon;
-    unsigned char  ucBodyPart;
+    std::uint8_t  ucKillerWeapon;
+    std::uint8_t  ucBodyPart;
     bool           bStealth;
 
     CScriptArgReader argStream(luaVM);
@@ -2277,7 +2277,7 @@ int CLuaPedDefs::SetPedMoveAnim(lua_State* luaVM)
 {
     // Verify the argument
     CClientEntity*   pEntity = NULL;
-    unsigned int     uiMoveAnim = 0;
+    std::uint32_t     uiMoveAnim = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(uiMoveAnim);
@@ -2332,7 +2332,7 @@ int CLuaPedDefs::CreatePed(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned long    ulModel = 0;
+    std::uint32_t    ulModel = 0;
     CVector          vecPosition;
     float            fRotation = 0.0f;
     CScriptArgReader argStream(luaVM);

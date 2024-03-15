@@ -134,15 +134,15 @@ void CXMLNodeImpl::DeleteAllSubNodes()
     m_Children.clear();
 }
 
-unsigned int CXMLNodeImpl::GetSubNodeCount()
+std::uint32_t CXMLNodeImpl::GetSubNodeCount()
 {
-    return static_cast<unsigned int>(m_Children.size());
+    return static_cast<std::uint32_t>(m_Children.size());
 }
 
-CXMLNode* CXMLNodeImpl::GetSubNode(unsigned int uiIndex)
+CXMLNode* CXMLNodeImpl::GetSubNode(std::uint32_t uiIndex)
 {
     // Find the given index in the list
-    unsigned int              uiTemp = 0;
+    std::uint32_t              uiTemp = 0;
     list<CXMLNode*>::iterator iter;
     for (iter = m_Children.begin(); iter != m_Children.end(); iter++)
     {
@@ -157,12 +157,12 @@ CXMLNode* CXMLNodeImpl::GetSubNode(unsigned int uiIndex)
     return NULL;
 }
 
-CXMLNode* CXMLNodeImpl::FindSubNode(const char* szTagName, unsigned int uiIndex)
+CXMLNode* CXMLNodeImpl::FindSubNode(const char* szTagName, std::uint32_t uiIndex)
 {
     std::string TagName(szTagName);
 
     // Find the item with the given name
-    unsigned int              uiTemp = 0;
+    std::uint32_t              uiTemp = 0;
     list<CXMLNode*>::iterator iter;
     for (iter = m_Children.begin(); iter != m_Children.end(); iter++)
     {
@@ -255,7 +255,7 @@ bool CXMLNodeImpl::GetTagContent(int& iContent)
     }
 }
 
-bool CXMLNodeImpl::GetTagContent(unsigned int& uiContent)
+bool CXMLNodeImpl::GetTagContent(std::uint32_t& uiContent)
 {
     long lValue;
 
@@ -271,7 +271,7 @@ bool CXMLNodeImpl::GetTagContent(unsigned int& uiContent)
         return false;
     else
     {
-        uiContent = static_cast<unsigned int>(lValue);
+        uiContent = static_cast<std::uint32_t>(lValue);
         return true;
     }
 }
@@ -316,7 +316,7 @@ void CXMLNodeImpl::SetTagContent(int iContent)
     SetTagContent(szBuffer);
 }
 
-void CXMLNodeImpl::SetTagContent(unsigned int uiContent)
+void CXMLNodeImpl::SetTagContent(std::uint32_t uiContent)
 {
     // Convert to string and set it
     char szBuffer[40];

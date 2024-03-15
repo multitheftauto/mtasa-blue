@@ -237,7 +237,7 @@ void CPerfStatManagerImpl::GetStats(CPerfStatResult* pResult, const SString& str
     {
         std::vector<SString> strParts;
         strOptions.Split(",", strParts);
-        for (unsigned int i = 0; i < strParts.size(); i++)
+        for (std::uint32_t i = 0; i < strParts.size(); i++)
             MapSet(strOptionMap, strParts[i], 1);
     }
 
@@ -261,7 +261,7 @@ void CPerfStatManagerImpl::GetStats(CPerfStatResult* pResult, const SString& str
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetScaledByteString(long long Amount)
+SString CPerfStatManager::GetScaledByteString(std::int64_t Amount)
 {
     if (Amount > 1024LL * 1024 * 1024 * 1024)
         return SString("%.2f TB", Amount / (1024.0 * 1024 * 1024 * 1024));
@@ -285,7 +285,7 @@ SString CPerfStatManager::GetScaledByteString(long long Amount)
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetScaledBitString(long long Amount)
+SString CPerfStatManager::GetScaledBitString(std::int64_t Amount)
 {
     if (Amount > 1024LL * 1024 * 1024 * 1024)
         return SString("%.2f Tbit", Amount / (1024.0 * 1024 * 1024 * 1024));
@@ -327,7 +327,7 @@ SString CPerfStatManager::GetScaledFloatString(float fValue)
 // Calculate per second rate
 //
 ///////////////////////////////////////////////////////////////
-long long CPerfStatManager::GetPerSecond(long long llValue, long long llDeltaTickCount)
+std::int64_t CPerfStatManager::GetPerSecond(std::int64_t llValue, std::int64_t llDeltaTickCount)
 {
     llDeltaTickCount = std::max(1LL, llDeltaTickCount);
     return (llValue * 1000LL + (llDeltaTickCount / 2)) / llDeltaTickCount;
@@ -340,7 +340,7 @@ long long CPerfStatManager::GetPerSecond(long long llValue, long long llDeltaTic
 // Calculate per second rate in-place
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatManager::ToPerSecond(long long& llValue, long long llDeltaTickCount)
+void CPerfStatManager::ToPerSecond(std::int64_t& llValue, std::int64_t llDeltaTickCount)
 {
     llDeltaTickCount = std::max(1LL, llDeltaTickCount);
     llValue = (llValue * 1000LL + (llDeltaTickCount / 2)) / llDeltaTickCount;
@@ -353,7 +353,7 @@ void CPerfStatManager::ToPerSecond(long long& llValue, long long llDeltaTickCoun
 // Calculate per second rate with slightly better precision
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetPerSecondString(long long llValue, double dDeltaTickCount)
+SString CPerfStatManager::GetPerSecondString(std::int64_t llValue, double dDeltaTickCount)
 {
     dDeltaTickCount = std::max(1.0, dDeltaTickCount);
     double dValue = llValue * 1000 / dDeltaTickCount;
@@ -367,7 +367,7 @@ SString CPerfStatManager::GetPerSecondString(long long llValue, double dDeltaTic
 //
 //
 ///////////////////////////////////////////////////////////////
-SString CPerfStatManager::GetPercentString(long long llValue, long long llTotal)
+SString CPerfStatManager::GetPercentString(std::int64_t llValue, std::int64_t llTotal)
 {
     llTotal = std::max(1LL, llTotal);
     double dValue = llValue * 100 / (double)llTotal;

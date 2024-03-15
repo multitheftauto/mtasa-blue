@@ -42,14 +42,14 @@ CVehicleUpgrades::CVehicleUpgrades(CClientVehicle* pVehicle)
     m_usLastLocalAddNitroType = 0;
 }
 
-bool CVehicleUpgrades::IsUpgrade(unsigned short usModel)
+bool CVehicleUpgrades::IsUpgrade(std::uint16_t usModel)
 {
     return (usModel >= 1000 && usModel <= 1193);
 }
 
-bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
+bool CVehicleUpgrades::IsUpgradeCompatible(std::uint16_t usUpgrade)
 {
-    unsigned short     us = usUpgrade;
+    std::uint16_t     us = usUpgrade;
     eClientVehicleType vehicleType = m_pVehicle->GetVehicleType();
 
     // No upgrades for trains/boats
@@ -63,7 +63,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     if (vehicleType == CLIENTVEHICLE_BIKE || vehicleType == CLIENTVEHICLE_BMX || vehicleType == CLIENTVEHICLE_HELI)
         return false;
 
-    unsigned short usModel = m_pVehicle->GetModel();
+    std::uint16_t usModel = m_pVehicle->GetModel();
     // Wheels should be compatible with any vehicle which have wheels, except
     // bike/bmx (they're buggy). Vortex is technically a car, but it has no
     // wheels.
@@ -357,7 +357,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
                        us == 1009 || us == 1010 || us == 1006 || us == 1001 || us == 1023 || us == 1017 || us == 1007);
             break;
     }
-    unsigned char ucSlot = 0;
+    std::uint8_t ucSlot = 0;
     // Allow slot 2 to be upgraded regardless of ID and then check it has the required part
     if (GetSlotFromUpgrade(us, ucSlot) && (bReturn || ucSlot == 2))
     {
@@ -434,7 +434,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     return bReturn;
 }
 
-bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSlot)
+bool CVehicleUpgrades::GetSlotFromUpgrade(std::uint16_t us, std::uint8_t& ucSlot)
 {
     if (us == 1011 || us == 1012 || us == 1111 || us == 1112 || us == 1142 || /* bonet */
         us == 1143 || us == 1144 || us == 1145)
@@ -539,7 +539,7 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
     return false;
 }
 
-bool CVehicleUpgrades::AddUpgrade(unsigned short usUpgrade, bool bAddedLocally)
+bool CVehicleUpgrades::AddUpgrade(std::uint16_t usUpgrade, bool bAddedLocally)
 {
     if (m_pVehicle)
     {
@@ -576,7 +576,7 @@ void CVehicleUpgrades::AddAllUpgrades()
 {
     if (m_pVehicle)
     {
-        unsigned short usUpgrade = 1000;
+        std::uint16_t usUpgrade = 1000;
         for (; usUpgrade <= 1193; usUpgrade++)
         {
             if (IsUpgradeCompatible(usUpgrade))
@@ -587,9 +587,9 @@ void CVehicleUpgrades::AddAllUpgrades()
     }
 }
 
-void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
+void CVehicleUpgrades::ForceAddUpgrade(std::uint16_t usUpgrade)
 {
-    unsigned char ucSlot;
+    std::uint8_t ucSlot;
     if (GetSlotFromUpgrade(usUpgrade, ucSlot))
     {
         CVehicle* pVehicle = m_pVehicle->GetGameVehicle();
@@ -620,9 +620,9 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
 
 // Not really a restream.
 // Call after changing from/to a custom model to see the result immediately
-void CVehicleUpgrades::RestreamVehicleUpgrades(unsigned short usUpgrade)
+void CVehicleUpgrades::RestreamVehicleUpgrades(std::uint16_t usUpgrade)
 {
-    unsigned char ucSlot;
+    std::uint8_t ucSlot;
     if (GetSlotFromUpgrade(usUpgrade, ucSlot))
     {
         if (m_SlotStates[ucSlot] == usUpgrade)
@@ -630,9 +630,9 @@ void CVehicleUpgrades::RestreamVehicleUpgrades(unsigned short usUpgrade)
     }
 }
 
-bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
+bool CVehicleUpgrades::HasUpgrade(std::uint16_t usUpgrade)
 {
-    unsigned char ucSlot = 0;
+    std::uint8_t ucSlot = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
     {
         if (m_SlotStates[ucSlot] == usUpgrade)
@@ -642,7 +642,7 @@ bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
     return false;
 }
 
-bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade)
+bool CVehicleUpgrades::RemoveUpgrade(std::uint16_t usUpgrade)
 {
     if (HasUpgrade(usUpgrade))
     {
@@ -654,7 +654,7 @@ bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade)
                 pVehicle->RemoveVehicleUpgrade(usUpgrade);
             }
 
-            unsigned char ucSlot;
+            std::uint8_t ucSlot;
             if (GetSlotFromUpgrade(usUpgrade, ucSlot))
             {
                 m_SlotStates[ucSlot] = 0;
@@ -671,7 +671,7 @@ bool CVehicleUpgrades::RemoveUpgrade(unsigned short usUpgrade)
     return false;
 }
 
-unsigned short CVehicleUpgrades::GetSlotState(unsigned char ucSlot)
+std::uint16_t CVehicleUpgrades::GetSlotState(std::uint8_t ucSlot)
 {
     if (ucSlot < VEHICLE_UPGRADE_SLOTS)
         return m_SlotStates[ucSlot];
@@ -681,7 +681,7 @@ unsigned short CVehicleUpgrades::GetSlotState(unsigned char ucSlot)
 
 void CVehicleUpgrades::ReAddAll()
 {
-    unsigned char ucSlot = 0;
+    std::uint8_t ucSlot = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
     {
         if (m_SlotStates[ucSlot])
@@ -701,7 +701,7 @@ void CVehicleUpgrades::ReAddAll()
 
 void CVehicleUpgrades::RemoveAll(bool bRipFromVehicle)
 {
-    unsigned char ucSlot = 0;
+    std::uint8_t ucSlot = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
     {
         if (m_SlotStates[ucSlot])
@@ -726,7 +726,7 @@ void CVehicleUpgrades::RemoveAll(bool bRipFromVehicle)
     }
 }
 
-const char* CVehicleUpgrades::GetSlotName(unsigned char ucSlot)
+const char* CVehicleUpgrades::GetSlotName(std::uint8_t ucSlot)
 {
     if (ucSlot < VEHICLE_UPGRADE_SLOTS)
         return UpgradeNames[ucSlot].szName;

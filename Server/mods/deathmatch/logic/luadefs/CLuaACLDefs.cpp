@@ -223,7 +223,7 @@ int CLuaACLDefs::aclList(lua_State* luaVM)
     lua_newtable(luaVM);
 
     // Loop through ACL stuff
-    unsigned int                              uiIndex = 0;
+    std::uint32_t                              uiIndex = 0;
     list<CAccessControlList*>::const_iterator iter = m_pACLManager->ACL_Begin();
     for (; iter != m_pACLManager->ACL_End(); ++iter)
     {
@@ -420,7 +420,7 @@ int CLuaACLDefs::aclListRights(lua_State* luaVM)
         // Loop through ACL
         char                                           szRightName[128];
         CAccessControlListRight::ERightType            eType;
-        unsigned int                                   uiIndex = 0;
+        std::uint32_t                                   uiIndex = 0;
         list<CAccessControlListRight*>::const_iterator iter = pACL->IterBegin();
         for (; iter != pACL->IterEnd(); ++iter)
         {
@@ -617,7 +617,7 @@ int CLuaACLDefs::aclGroupList(lua_State* luaVM)
     lua_newtable(luaVM);
 
     // Loop through ACL stuff
-    unsigned int                                   uiIndex = 0;
+    std::uint32_t                                   uiIndex = 0;
     list<CAccessControlListGroup*>::const_iterator iter = m_pACLManager->Groups_Begin();
     for (; iter != m_pACLManager->Groups_End(); ++iter)
     {
@@ -692,7 +692,7 @@ int CLuaACLDefs::aclGroupListACL(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Loop through ACL stuff
-        unsigned int                              uiIndex = 0;
+        std::uint32_t                              uiIndex = 0;
         list<CAccessControlList*>::const_iterator iter = pGroup->IterBeginACL();
         for (; iter != pGroup->IterEndACL(); ++iter)
         {
@@ -804,7 +804,7 @@ int CLuaACLDefs::aclGroupListObjects(lua_State* luaVM)
 
         // Loop through ACL stuff
         char                                                 szBuffer[255];
-        unsigned int                                         uiIndex = 0;
+        std::uint32_t                                         uiIndex = 0;
         list<CAccessControlListGroupObject*>::const_iterator iter = pGroup->IterBeginObjects();
         for (; iter != pGroup->IterEndObjects(); ++iter)
         {

@@ -20,7 +20,7 @@ void COutputRPCs::LoadFunctions()
 
 void COutputRPCs::ToggleDebugger(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucEnable;
+    std::uint8_t ucEnable;
     bitStream.Read(ucEnable);
 
     g_pCore->SetDebugVisible((ucEnable == 1));

@@ -19,7 +19,7 @@ class CPlayerScreenShotPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_SCREENSHOT; };
-    unsigned long GetFlags() const { return 0; };            // Not used
+    std::uint32_t GetFlags() const { return 0; };            // Not used
 
     bool Read(NetBitStreamInterface& BitStream);
 
@@ -31,7 +31,7 @@ public:
     CBuffer m_buffer;
 
     // When uiPartNumber is 0:
-    long long  m_llServerGrabTime;
+    std::int64_t  m_llServerGrabTime;
     uint       m_uiTotalBytes;
     ushort     m_usTotalParts;
     CResource* m_pResource;

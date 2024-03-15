@@ -48,7 +48,7 @@ class ASE
 {
 public:
     ZERO_ON_NEW
-    ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList);
+    ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, std::uint16_t usPort, const SString& strServerIPList);
     ~ASE();
 
     void DoPulse();
@@ -56,7 +56,7 @@ public:
 
     static ASE* GetInstance() { return _instance; }
 
-    unsigned long GetMasterServerQueryCount() { return m_ulMasterServerQueryCount; }
+    std::uint32_t GetMasterServerQueryCount() { return m_ulMasterServerQueryCount; }
     uint          GetTotalQueryCount() { return m_uiNumQueriesTotal; }
     uint          GetQueriesPerMinute() { return m_uiNumQueriesPerMinute; }
 
@@ -87,7 +87,7 @@ private:
     const std::string* QueryXfireLightCached();
     std::string        QueryXfireLight();
 
-    long long m_llCurrentTime;
+    std::int64_t m_llCurrentTime;
     uint      m_uiCurrentPlayerCount;
 
     CMainConfig*    m_pMainConfig;
@@ -105,31 +105,31 @@ private:
 
     std::vector<SOCKET> m_SocketList;
 
-    unsigned short m_usPortBase;
-    unsigned short m_usPort;
+    std::uint16_t m_usPortBase;
+    std::uint16_t m_usPort;
 
     // Full query cache
-    unsigned int m_uiFullLastPlayerCount;
-    long long    m_llFullLastTime;
+    std::uint32_t m_uiFullLastPlayerCount;
+    std::int64_t    m_llFullLastTime;
     long         m_lFullMinInterval;
     std::string  m_strFullCached;
 
     // Light query cache
-    unsigned int m_uiLightLastPlayerCount;
-    long long    m_llLightLastTime;
+    std::uint32_t m_uiLightLastPlayerCount;
+    std::int64_t    m_llLightLastTime;
     long         m_lLightMinInterval;
     std::string  m_strLightCached;
 
     // XFire Light query cache
-    unsigned int m_uiXfireLightLastPlayerCount;
-    long long    m_llXfireLightLastTime;
+    std::uint32_t m_uiXfireLightLastPlayerCount;
+    std::int64_t    m_llXfireLightLastTime;
     long         m_lXfireLightMinInterval;
     std::string  m_strXfireLightCached;
 
     std::string m_strMtaAseVersion;
 
     // Stats
-    unsigned long m_ulMasterServerQueryCount;
+    std::uint32_t m_ulMasterServerQueryCount;
     uint          m_uiNumQueriesTotal;
     uint          m_uiNumQueriesPerMinute;
     uint          m_uiTotalAtMinuteStart;

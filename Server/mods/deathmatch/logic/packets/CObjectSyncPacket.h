@@ -24,8 +24,8 @@ public:
         CVector       vecPosition;
         CVector       vecRotation;
         float         fHealth;
-        unsigned char ucSyncTimeContext;
-        unsigned char ucFlags;
+        std::uint8_t ucSyncTimeContext;
+        std::uint8_t ucFlags;
         bool          bSend;
     };
 
@@ -33,7 +33,7 @@ public:
     ~CObjectSyncPacket();
 
     ePacketID     GetPacketID() const { return PACKET_ID_OBJECT_SYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

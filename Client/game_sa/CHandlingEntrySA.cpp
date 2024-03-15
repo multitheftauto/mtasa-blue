@@ -63,7 +63,7 @@ void CHandlingEntrySA::Assign(const CHandlingEntry* pData)
     pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }
 
-void CHandlingEntrySA::Recalculate(unsigned short usModel)
+void CHandlingEntrySA::Recalculate(std::uint16_t usModel)
 {
     // Real GTA class?
     if (m_pHandlingSA)

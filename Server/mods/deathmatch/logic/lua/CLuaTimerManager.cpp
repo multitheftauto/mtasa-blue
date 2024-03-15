@@ -35,7 +35,7 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
 
         CTickCount   llStartTime = m_pProcessingTimer->GetStartTime();
         CTickCount   llDelay = m_pProcessingTimer->GetDelay();
-        unsigned int uiRepeats = m_pProcessingTimer->GetRepeats();
+        std::uint32_t uiRepeats = m_pProcessingTimer->GetRepeats();
 
         // Is the time up and is not being deleted
         if (llCurrentTime >= (llStartTime + llDelay))
@@ -132,7 +132,7 @@ CLuaTimer* CLuaTimerManager::GetTimerFromScriptID(uint uiScriptID)
     return pLuaTimer;
 }
 
-CLuaTimer* CLuaTimerManager::AddTimer(const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments)
+CLuaTimer* CLuaTimerManager::AddTimer(const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, std::uint32_t uiRepeats, const CLuaArguments& Arguments)
 {
     // Check for the minimum interval
     if (llTimeDelay.ToLongLong() < LUA_TIMER_MIN_INTERVAL)

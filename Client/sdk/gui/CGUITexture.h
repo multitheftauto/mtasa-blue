@@ -21,9 +21,9 @@ public:
     virtual ~CGUITexture(){};
 
     virtual bool LoadFromFile(const char* szFilename) = 0;
-    virtual void LoadFromMemory(const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight) = 0;
+    virtual void LoadFromMemory(const void* pBuffer, std::uint32_t uiWidth, std::uint32_t uiHeight) = 0;
     virtual void Clear() = 0;
 
     virtual IDirect3DTexture9* GetD3DTexture() = 0;
-    virtual void               CreateTexture(unsigned int width, unsigned int height) = 0;
+    virtual void               CreateTexture(std::uint32_t width, std::uint32_t height) = 0;
 };

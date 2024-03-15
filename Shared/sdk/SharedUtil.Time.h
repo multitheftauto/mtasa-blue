@@ -34,7 +34,7 @@ namespace SharedUtil
     // an __int64 and will effectively never wrap. This is an emulated version for XP and down.
     // Note: Wrap around issue is only defeated if the gap between calls is less than 24 days.
     //
-    long long GetTickCount64_();
+    std::int64_t GetTickCount64_();
 
     //
     // Retrieves the number of seconds that have elapsed since some arbitrary point in time.
@@ -55,24 +55,24 @@ namespace SharedUtil
     TIMEUS        GetTimeUs();
 
     // Get tick count cached per module
-    long long GetModuleTickCount64();
+    std::int64_t GetModuleTickCount64();
     void      UpdateModuleTickCount64();
 
     // Debugging
-    void AddTickCount(long long llTickCountAdd);
+    void AddTickCount(std::int64_t llTickCountAdd);
 
     //
     // Encapsulate a tick count value
     //
     class CTickCount
     {
-        long long m_llTicks;
+        std::int64_t m_llTicks;
 
     public:
         // Constructors
         CTickCount() : m_llTicks(0) {}
-        explicit CTickCount(long long llTicks) : m_llTicks(llTicks) {}
-        explicit CTickCount(double dTicks) : m_llTicks(static_cast<long long>(dTicks)) {}
+        explicit CTickCount(std::int64_t llTicks) : m_llTicks(llTicks) {}
+        explicit CTickCount(double dTicks) : m_llTicks(static_cast<std::int64_t>(dTicks)) {}
 
         // Operators
         CTickCount  operator+(const CTickCount& other) const { return CTickCount(m_llTicks + other.m_llTicks); }
@@ -98,7 +98,7 @@ namespace SharedUtil
 
         // Conversion
         double    ToDouble() const { return static_cast<double>(m_llTicks); }
-        long long ToLongLong() const { return m_llTicks; }
+        std::int64_t ToLongLong() const { return m_llTicks; }
         int       ToInt() const { return static_cast<int>(m_llTicks); }
 
         // Static functions
@@ -134,20 +134,20 @@ namespace SharedUtil
             m_ullElapsedTime = 0;
         }
 
-        unsigned long long Get()
+        std::uint64_t Get()
         {
-            long long llTime = DoGetTickCount();
+            std::int64_t llTime = DoGetTickCount();
             m_ullElapsedTime += Clamp(0LL, llTime - m_llUpdateTime, m_llMaxIncrement);
             m_llUpdateTime = llTime;
             return m_ullElapsedTime;
         }
 
     protected:
-        long long DoGetTickCount() { return m_bUseModuleTickCount ? GetModuleTickCount64() : GetTickCount64_(); }
+        std::int64_t DoGetTickCount() { return m_bUseModuleTickCount ? GetModuleTickCount64() : GetTickCount64_(); }
 
-        long long          m_llUpdateTime;
-        unsigned long long m_ullElapsedTime;
-        long long          m_llMaxIncrement;
+        std::int64_t          m_llUpdateTime;
+        std::uint64_t m_ullElapsedTime;
+        std::int64_t          m_llMaxIncrement;
         bool               m_bUseModuleTickCount;
     };
 

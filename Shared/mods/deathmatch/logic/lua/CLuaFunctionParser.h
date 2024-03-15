@@ -266,7 +266,7 @@ struct CLuaFunctionParserBase
         // CMatrix may either be represented by 3 CLuaVector or by 12 numbers
         if constexpr (std::is_same_v<T, CMatrix>)
         {
-            for (int i = 0; i < sizeof(CMatrix) / sizeof(float); i++)
+            for (auto i = 0; i < sizeof(CMatrix) / sizeof(float); i++)
             {
                 if (!lua_isnumber(L, index + i))
                     return iArgument == LUA_TUSERDATA || iArgument == LUA_TLIGHTUSERDATA;
@@ -649,7 +649,7 @@ struct CLuaFunctionParserBase
             return static_cast<T>(result);
         }
         else if constexpr (std::is_same_v<T, SColor>)
-            return static_cast<unsigned long>(static_cast<int64_t>(lua::PopPrimitive<lua_Number>(L, index)));
+            return static_cast<std::uint32_t>(static_cast<int64_t>(lua::PopPrimitive<lua_Number>(L, index)));
         else if constexpr (std::is_same_v<T, CLuaArgument>)
         {
             CLuaArgument argument;

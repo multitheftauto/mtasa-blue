@@ -51,7 +51,7 @@ bool CCommandLineParser::Parse(int iArgumentCount, char* szArguments[])
             if (++iIndex < iArgumentCount)
             {
                 m_bPort = true;
-                m_usPort = (unsigned short)atoi(szArguments[iIndex]);
+                m_usPort = (std::uint16_t)atoi(szArguments[iIndex]);
             }
         }
         else if (stricmp(szArguments[iIndex], "--httpport") == 0)
@@ -59,7 +59,7 @@ bool CCommandLineParser::Parse(int iArgumentCount, char* szArguments[])
             if (++iIndex < iArgumentCount)
             {
                 m_bHTTPPort = true;
-                m_usHTTPPort = (unsigned short)atoi(szArguments[iIndex]);
+                m_usHTTPPort = (std::uint16_t)atoi(szArguments[iIndex]);
             }
         }
         else if (stricmp(szArguments[iIndex], "--maxplayers") == 0)
@@ -67,7 +67,7 @@ bool CCommandLineParser::Parse(int iArgumentCount, char* szArguments[])
             if (++iIndex < iArgumentCount)
             {
                 m_bMaxPlayers = true;
-                m_uiMaxPlayers = (unsigned int)atoi(szArguments[iIndex]);
+                m_uiMaxPlayers = (std::uint32_t)atoi(szArguments[iIndex]);
             }
         }
         else if (stricmp(szArguments[iIndex], "--novoice") == 0)

@@ -23,9 +23,9 @@ struct CGUIKeyEventArgs
 {
     CGUIElement* pWindow;
 
-    unsigned int   codepoint;
+    std::uint32_t   codepoint;
     CGUIKeys::Scan scancode;
-    unsigned int   sysKeys;
+    std::uint32_t   sysKeys;
 };
 
 struct CGUIMouseEventArgs
@@ -35,9 +35,9 @@ struct CGUIMouseEventArgs
     CGUIPosition           position;
     CVector2D              moveDelta;
     CGUIMouse::MouseButton button;
-    unsigned int           sysKeys;
+    std::uint32_t           sysKeys;
     float                  wheelChange;
-    unsigned int           clickCount;
+    std::uint32_t           clickCount;
     CGUIElement*           pSwitchedWindow;
 };
 

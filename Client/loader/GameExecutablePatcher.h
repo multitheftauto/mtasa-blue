@@ -43,6 +43,6 @@ public:
 private:
     std::filesystem::path      m_path;
     FileHash                   m_onDiskHash{};
-    std::vector<unsigned char> m_executable{};
+    std::vector<std::uint8_t> m_executable{};
     bool                       m_isAlreadyPatched{false};
 };

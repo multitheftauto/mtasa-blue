@@ -71,7 +71,7 @@ enum eWindow
     MAX_WINDOWS
 };
 
-enum class VehicleBlowState : unsigned char
+enum class VehicleBlowState : std::uint8_t
 {
     INTACT,
     AWAITING_EXPLOSION_SYNC,
@@ -99,8 +99,8 @@ using EComponentBase::EComponentBaseType;
 
 struct SDelayedSyncVehicleData
 {
-    unsigned long    ulTime;
-    unsigned char    ucType;
+    std::uint32_t    ulTime;
+    std::uint8_t    ucType;
     CControllerState State;
     CVector          vecTarget;
     CVector          vecTarget2;
@@ -159,7 +159,7 @@ class CClientVehicle : public CClientStreamElement
 
 protected:            // Use CDeathmatchVehicle constructor for now. Will get removed later when this class is
                       // cleaned up.
-    CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2);
+    CClientVehicle(CClientManager* pManager, ElementID ID, std::uint16_t usModel, std::uint8_t ucVariation, std::uint8_t ucVariation2);
 
 public:
     ~CClientVehicle();
@@ -198,18 +198,18 @@ public:
     bool IsVisible();
     void SetVisible(bool bVisible);
 
-    void  SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsigned long ulDelay = 0, bool bForced = false);
-    float GetDoorOpenRatio(unsigned char ucDoor);
+    void  SetDoorOpenRatio(std::uint8_t ucDoor, float fRatio, std::uint32_t ulDelay = 0, bool bForced = false);
+    float GetDoorOpenRatio(std::uint8_t ucDoor);
     void  SetSwingingDoorsAllowed(bool bAllowed);
     bool  AreSwingingDoorsAllowed() const;
-    void  AllowDoorRatioSetting(unsigned char ucDoor, bool bAllow, bool bAutoReallowAfterDelay = true);
+    void  AllowDoorRatioSetting(std::uint8_t ucDoor, bool bAllow, bool bAutoReallowAfterDelay = true);
     bool  AreDoorsLocked();
     void  SetDoorsLocked(bool bLocked);
 
 private:
-    void SetDoorOpenRatioInterpolated(unsigned char ucDoor, float fRatio, unsigned long ulDelay);
+    void SetDoorOpenRatioInterpolated(std::uint8_t ucDoor, float fRatio, std::uint32_t ulDelay);
     void ResetDoorInterpolation();
-    void CancelDoorInterpolation(unsigned char ucDoor);
+    void CancelDoorInterpolation(std::uint8_t ucDoor);
     void ProcessDoorInterpolation();
 
 public:
@@ -231,13 +231,13 @@ public:
     void GetTurretRotation(float& fHorizontal, float& fVertical);
     void SetTurretRotation(float fHorizontal, float fVertical);
 
-    unsigned short GetModel() { return m_usModel; };
-    void           SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
+    std::uint16_t GetModel() { return m_usModel; };
+    void           SetModelBlocking(std::uint16_t usModel, std::uint8_t ucVariant, std::uint8_t ucVariant2);
 
-    unsigned char GetVariant() { return m_ucVariation; };
-    unsigned char GetVariant2() { return m_ucVariation2; };
+    std::uint8_t GetVariant() { return m_ucVariation; };
+    std::uint8_t GetVariant2() { return m_ucVariation2; };
 
-    void SetVariant(unsigned char ucVariant, unsigned char ucVariant2);
+    void SetVariant(std::uint8_t ucVariant, std::uint8_t ucVariant2);
 
     bool IsEngineBroken();
     void SetEngineBroken(bool bEngineBroken);
@@ -271,30 +271,30 @@ public:
     void  SetLandingGearDown(bool bLandingGearDown);
 
     bool           HasAdjustableProperty() { return m_bHasAdjustableProperty; };
-    unsigned short GetAdjustablePropertyValue();
-    void           SetAdjustablePropertyValue(unsigned short usValue);
+    std::uint16_t GetAdjustablePropertyValue();
+    void           SetAdjustablePropertyValue(std::uint16_t usValue);
     bool           HasMovingCollision();
 
 private:
-    void _SetAdjustablePropertyValue(unsigned short usValue);
+    void _SetAdjustablePropertyValue(std::uint16_t usValue);
 
 public:
     bool          HasDamageModel() { return m_bHasDamageModel; }
-    unsigned char GetDoorStatus(unsigned char ucDoor);
-    unsigned char GetWheelStatus(unsigned char ucWheel);
-    bool          IsWheelCollided(unsigned char ucWheel);
-    int           GetWheelFrictionState(unsigned char ucWheel);
-    unsigned char GetPanelStatus(unsigned char ucPanel);
-    unsigned char GetLightStatus(unsigned char ucLight);
-    SString GetComponentNameForWheel(unsigned char ucWheel) const noexcept;
+    std::uint8_t GetDoorStatus(std::uint8_t ucDoor);
+    std::uint8_t GetWheelStatus(std::uint8_t ucWheel);
+    bool          IsWheelCollided(std::uint8_t ucWheel);
+    int           GetWheelFrictionState(std::uint8_t ucWheel);
+    std::uint8_t GetPanelStatus(std::uint8_t ucPanel);
+    std::uint8_t GetLightStatus(std::uint8_t ucLight);
+    SString GetComponentNameForWheel(std::uint8_t ucWheel) const noexcept;
 
     bool AreLightsOn();
 
-    void SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent);
-    void SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent = true);
-    void SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus);
-    void SetLightStatus(unsigned char ucLight, unsigned char ucStatus);
-    bool GetWheelMissing(unsigned char ucWheel, const SString& strWheelName = "");
+    void SetDoorStatus(std::uint8_t ucDoor, std::uint8_t ucStatus, bool spawnFlyingComponent);
+    void SetWheelStatus(std::uint8_t ucWheel, std::uint8_t ucStatus, bool bSilent = true);
+    void SetPanelStatus(std::uint8_t ucPanel, std::uint8_t ucStatus);
+    void SetLightStatus(std::uint8_t ucLight, std::uint8_t ucStatus);
+    bool GetWheelMissing(std::uint8_t ucWheel, const SString& strWheelName = "");
 
     // TODO: Make the class remember on virtualization
     float GetHeliRotorSpeed();
@@ -308,7 +308,7 @@ public:
     bool IsHeliSearchLightVisible();
     void SetHeliSearchLightVisible(bool bVisible);
 
-    void ReportMissionAudioEvent(unsigned short usSound);
+    void ReportMissionAudioEvent(std::uint16_t usSound);
 
     bool IsCollisionEnabled() { return m_bIsCollisionEnabled; };
     void SetCollisionEnabled(bool bCollisionEnabled);
@@ -319,8 +319,8 @@ public:
     bool GetCanBeTargettedByHeatSeekingMissiles();
     void SetCanBeTargettedByHeatSeekingMissiles(bool bEnabled);
 
-    unsigned char GetAlpha() { return m_ucAlpha; }
-    void          SetAlpha(unsigned char ucAlpha);
+    std::uint8_t GetAlpha() { return m_ucAlpha; }
+    void          SetAlpha(std::uint8_t ucAlpha);
 
     CClientPed* GetOccupant(int iSeat = 0) const;
     CClientPed* GetControllingPlayer();
@@ -369,8 +369,8 @@ public:
     uchar GetTrainTrack();
     void  SetTrainTrack(uchar ucTrack);
 
-    unsigned char     GetOverrideLights() { return m_ucOverrideLights; }
-    void              SetOverrideLights(unsigned char ucOverrideLights);
+    std::uint8_t     GetOverrideLights() { return m_ucOverrideLights; }
+    void              SetOverrideLights(std::uint8_t ucOverrideLights);
     bool              SetTaxiLightOn(bool bLightOn);
     bool              IsTaxiLightOn() { return m_bTaxiLightOn; }
     CVehicle*         GetGameVehicle() { return m_pVehicle; }
@@ -396,8 +396,8 @@ public:
     const char* GetRegPlate() { return m_strRegPlate.empty() ? NULL : m_strRegPlate.c_str(); }
     bool        SetRegPlate(const char* szPlate);
 
-    unsigned char GetPaintjob();
-    void          SetPaintjob(unsigned char ucPaintjob);
+    std::uint8_t GetPaintjob();
+    void          SetPaintjob(std::uint8_t ucPaintjob);
 
     float GetDirtLevel();
     void  SetDirtLevel(float fDirtLevel);
@@ -428,16 +428,16 @@ public:
     void Interpolate();
     void UpdateKeysync();
 
-    void GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates);
+    void GetInitialDoorStates(SFixedArray<std::uint8_t, MAX_DOORS>& ucOutDoorStates);
 
     // Time dependent interpolation
     void GetTargetPosition(CVector& vecPosition) { vecPosition = m_interp.pos.vecTarget; }
-    void SetTargetPosition(const CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f);
+    void SetTargetPosition(const CVector& vecPosition, std::uint32_t ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f);
     void RemoveTargetPosition();
     bool HasTargetPosition() { return (m_interp.pos.ulFinishTime != 0); }
 
     void GetTargetRotation(CVector& vecRotation) { vecRotation = m_interp.rot.vecTarget; }
-    void SetTargetRotation(const CVector& vecRotation, unsigned long ulDelay);
+    void SetTargetRotation(const CVector& vecRotation, std::uint32_t ulDelay);
     void RemoveTargetRotation();
     bool HasTargetRotation() { return (m_interp.rot.ulFinishTime != 0); }
 
@@ -445,8 +445,8 @@ public:
     void UpdateTargetRotation();
     void UpdateUnderFloorFix(const CVector& vecTargetPosition, bool bValidVelocityZ, float fVelocityZ);
 
-    unsigned long GetIllegalTowBreakTime() { return m_ulIllegalTowBreakTime; }
-    void          SetIllegalTowBreakTime(unsigned long ulTime) { m_ulIllegalTowBreakTime = ulTime; }
+    std::uint32_t GetIllegalTowBreakTime() { return m_ulIllegalTowBreakTime; }
+    void          SetIllegalTowBreakTime(std::uint32_t ulTime) { m_ulIllegalTowBreakTime = ulTime; }
 
     void GetGravity(CVector& vecGravity) const { vecGravity = m_vecGravity; }
     void SetGravity(const CVector& vecGravity);
@@ -479,8 +479,8 @@ public:
 
     void RemoveAllProjectiles();
 
-    static void SetPedOccupiedVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
-    static void SetPedOccupyingVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
+    static void SetPedOccupiedVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle, std::uint32_t uiSeat, std::uint8_t ucDoor);
+    static void SetPedOccupyingVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle, std::uint32_t uiSeat, std::uint8_t ucDoor);
     static void ValidatePedAndVehiclePair(CClientPed* pClientPed, CClientVehicle* pVehicle);
     static void UnpairPedAndVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle);
     static void UnpairPedAndVehicle(CClientPed* pClientPed);
@@ -503,10 +503,10 @@ public:
 
     bool DoesVehicleHaveSirens() { return m_tSirenBeaconInfo.m_bOverrideSirens; }
 
-    bool GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount);
-    void SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
-    void SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage);
-    void SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour);
+    bool GiveVehicleSirens(std::uint8_t ucSirenType, std::uint8_t ucSirenCount);
+    void SetVehicleSirenPosition(std::uint8_t ucSirenID, CVector vecPos);
+    void SetVehicleSirenMinimumAlpha(std::uint8_t ucSirenID, DWORD dwPercentage);
+    void SetVehicleSirenColour(std::uint8_t ucSirenID, SColor tVehicleSirenColour);
     void SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEnableLOSCheck, bool bEnableSilent);
     void RemoveVehicleSirens();
 
@@ -565,10 +565,10 @@ protected:
     class CClientObjectManager* m_pObjectManager;
     CClientVehicleManager*      m_pVehicleManager;
     CClientModelRequestManager* m_pModelRequester;
-    unsigned short              m_usModel;
+    std::uint16_t              m_usModel;
     bool                        m_bHasLandingGear;
     eClientVehicleType          m_eVehicleType;
-    unsigned char               m_ucMaxPassengers;
+    std::uint8_t               m_ucMaxPassengers;
     bool                        m_bIsVirtualized;
     CVehicle*                   m_pVehicle;
     CClientPedPtr               m_pDriver;
@@ -594,7 +594,7 @@ protected:
     bool                         m_bSireneOrAlarmActive;
     bool                         m_bLandingGearDown;
     bool                         m_bHasAdjustableProperty;
-    unsigned short               m_usAdjustablePropertyValue;
+    std::uint16_t               m_usAdjustablePropertyValue;
     std::map<eDoors, CTickCount> m_AutoReallowDoorRatioMap;
     SFixedArray<bool, 6>         m_bAllowDoorRatioSetting;
     SFixedArray<float, 6>        m_fDoorOpenRatio;
@@ -602,8 +602,8 @@ protected:
     {
         SFixedArray<float, 6>         fStart;
         SFixedArray<float, 6>         fTarget;
-        SFixedArray<unsigned long, 6> ulStartTime;
-        SFixedArray<unsigned long, 6> ulTargetTime;
+        SFixedArray<std::uint32_t, 6> ulStartTime;
+        SFixedArray<std::uint32_t, 6> ulTargetTime;
     } m_doorInterp;
     bool                                   m_bSwingingDoorsAllowed;
     bool                                   m_bDoorsLocked;
@@ -614,10 +614,10 @@ protected:
     bool                                   m_bScriptCanBeDamaged;
     bool                                   m_bSyncUnoccupiedDamage;
     bool                                   m_bTyresCanBurst;
-    SFixedArray<unsigned char, MAX_DOORS>  m_ucDoorStates;
-    SFixedArray<unsigned char, MAX_WHEELS> m_ucWheelStates;
-    SFixedArray<unsigned char, MAX_PANELS> m_ucPanelStates;
-    SFixedArray<unsigned char, MAX_LIGHTS> m_ucLightStates;
+    SFixedArray<std::uint8_t, MAX_DOORS>  m_ucDoorStates;
+    SFixedArray<std::uint8_t, MAX_WHEELS> m_ucWheelStates;
+    SFixedArray<std::uint8_t, MAX_PANELS> m_ucPanelStates;
+    SFixedArray<std::uint8_t, MAX_LIGHTS> m_ucLightStates;
     bool                                   m_bJustBlewUp;
     eEntityStatus                          m_NormalStatus;
     bool                                   m_bColorSaved;
@@ -631,16 +631,16 @@ protected:
     CVector                                m_vecWaitingForGroundSavedTurnSpeed;
     CMatrix                                m_matFrozen;
     CVehicleUpgrades*                      m_pUpgrades;
-    unsigned char                          m_ucOverrideLights;
+    std::uint8_t                          m_ucOverrideLights;
     CClientVehiclePtr                      m_pTowedVehicle;
     CClientVehiclePtr                      m_pTowedByVehicle;
     eWinchType                             m_eWinchType;
     CClientEntityPtr                       m_pPickedUpWinchEntity;
     SString                                m_strRegPlate;
-    unsigned char                          m_ucPaintjob;
+    std::uint8_t                          m_ucPaintjob;
     float                                  m_fDirtLevel;
     bool                                   m_bSmokeTrail;
-    unsigned char                          m_ucAlpha;
+    std::uint8_t                          m_ucAlpha;
     bool                                   m_bAlphaChanged;
     double                                 m_dLastRotationTime;
     bool                                   m_blowAfterStreamIn;
@@ -681,8 +681,8 @@ protected:
             CVector       vecTarget;
             CVector       vecError;
             float         fLastAlpha;
-            unsigned long ulStartTime;
-            unsigned long ulFinishTime;
+            std::uint32_t ulStartTime;
+            std::uint32_t ulFinishTime;
         } pos;
 
         struct
@@ -693,12 +693,12 @@ protected:
             CVector       vecTarget;
             CVector       vecError;
             float         fLastAlpha;
-            unsigned long ulStartTime;
-            unsigned long ulFinishTime;
+            std::uint32_t ulStartTime;
+            std::uint32_t ulFinishTime;
         } rot;
     } m_interp;
 
-    unsigned long m_ulIllegalTowBreakTime;
+    std::uint32_t m_ulIllegalTowBreakTime;
 
     bool m_bHasDamageModel;
 
@@ -716,22 +716,22 @@ protected:
 
     bool m_bHasCustomHandling;
 
-    unsigned char m_ucVariation;
-    unsigned char m_ucVariation2;
+    std::uint8_t m_ucVariation;
+    std::uint8_t m_ucVariation2;
 
     CTickCount m_LastPushedTime;
     uint       m_uiForceLocalZCounter;
 
     bool                           m_bEnableHeliBladeCollisions;
     CMatrix                        m_matCreate;
-    unsigned char                  m_ucFellThroughMapCount;
+    std::uint8_t                  m_ucFellThroughMapCount;
     SFixedArray<bool, MAX_WINDOWS> m_bWindowOpen;
     std::shared_ptr<CClientModel>  m_clientModel;
 
 public:
 #ifdef MTA_DEBUG
     CClientPlayer* m_pLastSyncer;
-    unsigned long  m_ulLastSyncTime;
+    std::uint32_t  m_ulLastSyncTime;
     const char*    m_szLastSyncType;
 #endif
     SLastSyncedVehData*                      m_LastSyncedData;

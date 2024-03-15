@@ -17,13 +17,13 @@ CMarkerSA* Markers[MAX_MARKERS];
 
 CRadarSA::CRadarSA()
 {
-    for (int i = 0; i < MAX_MARKERS; i++)
+    for (auto i = 0; i < MAX_MARKERS; i++)
         Markers[i] = new CMarkerSA((CMarkerSAInterface*)(ARRAY_CMarker + i * sizeof(CMarkerSAInterface)));
 }
 
 CRadarSA::~CRadarSA()
 {
-    for (int i = 0; i < MAX_MARKERS; i++)
+    for (auto i = 0; i < MAX_MARKERS; i++)
     {
         if (Markers[i])
             delete Markers[i];
@@ -60,7 +60,7 @@ CMarker* CRadarSA::GetFreeMarker()
 void CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color)
 {
     // Convert color to required abgr at the last moment
-    unsigned long abgr = color.A << 24 | color.B << 16 | color.G << 8 | color.R;
+    std::uint32_t abgr = color.A << 24 | color.B << 16 | color.G << 8 | color.R;
     CRect         myRect(fX1, fY2, fX2, fY1);
     DWORD         dwFunc = FUNC_DrawAreaOnRadar;
     _asm

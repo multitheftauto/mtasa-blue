@@ -75,7 +75,7 @@ inline bool CPoolsSA::AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleS
     return true;
 }
 
-CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2)
+CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, std::uint8_t ucVariation, std::uint8_t ucVariation2)
 {
     CVehicleSA* pVehicle = nullptr;
 
@@ -86,7 +86,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
 
         // CCarCtrl::CreateCarForScript
         CVehicleSAInterface* pInterface =
-            ((CVehicleSAInterface * (__cdecl*)(int, CVector, unsigned char)) FUNC_CCarCtrlCreateCarForScript)(eVehicleType, CVector(0, 0, 0), 0);
+            ((CVehicleSAInterface * (__cdecl*)(int, CVector, std::uint8_t)) FUNC_CCarCtrlCreateCarForScript)(eVehicleType, CVector(0, 0, 0), 0);
 
         auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(eVehicleType)->GetVehicleType());
 
@@ -460,7 +460,7 @@ inline bool CPoolsSA::AddPedToPool(CClientPed* pClientPed, CPedSA* pPed)
     return true;
 }
 
-CPed* CPoolsSA::AddPed(CClientPed* pClientPed, unsigned int nModelIndex)
+CPed* CPoolsSA::AddPed(CClientPed* pClientPed, std::uint32_t nModelIndex)
 {
     CPedSA* pPed = NULL;
     if (m_pedPool.ulCount < MAX_PEDS)
@@ -673,7 +673,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
     MemSetFast((void*)VAR_TrainModelArray, 0, 32 * sizeof(DWORD));
 
     // now load the models we're going to use and add them to the array
-    for (int i = 0; i < iSize; i++)
+    for (auto i = 0; i < iSize; i++)
     {
         if (dwModels[i] == 449 || dwModels[i] == 537 || dwModels[i] == 538 || dwModels[i] == 569 || dwModels[i] == 590 || dwModels[i] == 570)
         {
@@ -861,7 +861,7 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
     // Finally search model info array
     CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-    unsigned int NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
+    std::uint32_t NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
 
     for (uint i = 1; i < NUMBER_OF_MODELS; i++)
     {
@@ -1172,7 +1172,7 @@ void CPoolsSA::InvalidateLocalPlayerClientEntity()
     m_pedPool.arrayOfClientEntities[0] = {m_pedPool.arrayOfClientEntities[0].pEntity, nullptr};
 }
 
-unsigned int CPoolsSA::AllocateTextureDictonarySlot(uint uiSlotId, std::string& strTxdName)
+std::uint32_t CPoolsSA::AllocateTextureDictonarySlot(uint uiSlotId, std::string& strTxdName)
 {
     CTextureDictonarySAInterface* pTxd = (*m_ppTxdPoolInterface)->AllocateAt(uiSlotId);
     if (!pTxd)

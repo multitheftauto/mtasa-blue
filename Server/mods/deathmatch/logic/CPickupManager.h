@@ -29,16 +29,16 @@ public:
     CPickup* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void     DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); };
     bool         Exists(CPickup* pPickup);
 
     std::list<CPickup*>::const_iterator IterBegin() { return m_List.begin(); };
     std::list<CPickup*>::const_iterator IterEnd() { return m_List.end(); };
 
-    static bool           IsValidWeaponID(unsigned int uiWeaponID);
-    static unsigned short GetWeaponModel(unsigned int uiWeaponID);
-    static unsigned short GetHealthModel() { return 1240; };
-    static unsigned short GetArmorModel() { return 1242; };
+    static bool           IsValidWeaponID(std::uint32_t uiWeaponID);
+    static std::uint16_t GetWeaponModel(std::uint32_t uiWeaponID);
+    static std::uint16_t GetHealthModel() { return 1240; };
+    static std::uint16_t GetArmorModel() { return 1242; };
 
 private:
     void AddToList(CPickup* pPickup) { m_List.push_back(pPickup); };

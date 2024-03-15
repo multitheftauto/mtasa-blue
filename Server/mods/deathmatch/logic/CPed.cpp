@@ -24,7 +24,7 @@ struct SBodyPartName
 SBodyPartName BodyPartNames[10] = {{"Unknown"},  {"Unknown"},   {"Unknown"},  {"Torso"},     {"Ass"},
                                    {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}};
 
-CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) : CElement(pParent)
+CPed::CPed(CPedManager* pPedManager, CElement* pParent, std::uint16_t usModel) : CElement(pParent)
 {
     // Init
     m_pPedManager = pPedManager;
@@ -207,7 +207,7 @@ bool CPed::ReadSpecialData(const int iLine)
     if (GetCustomDataInt("model", iTemp, true))
     {
         // Is it valid?
-        unsigned short usModel = static_cast<unsigned short>(iTemp);
+        std::uint16_t usModel = static_cast<std::uint16_t>(iTemp);
         if (CPedManager::IsValidModel(usModel))
         {
             // Remember it and generate a new random color
@@ -243,11 +243,11 @@ bool CPed::ReadSpecialData(const int iLine)
 
     // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
-        m_ucInterior = static_cast<unsigned char>(iTemp);
+        m_ucInterior = static_cast<std::uint8_t>(iTemp);
 
     // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     // Grab the "collisions" data
     if (!GetCustomDataBool("collisions", m_bCollisionsEnabled, true))
@@ -255,7 +255,7 @@ bool CPed::ReadSpecialData(const int iLine)
 
     // Grab the "alpha" data
     if (GetCustomDataInt("alpha", iTemp, true))
-        m_ucAlpha = static_cast<unsigned char>(iTemp);
+        m_ucAlpha = static_cast<std::uint8_t>(iTemp);
 
     // Grab the "frozen" data
     GetCustomDataBool("frozen", m_bFrozen, true);
@@ -274,7 +274,7 @@ bool CPed::HasValidModel()
     return CPedManager::IsValidModel(m_usModel);
 }
 
-void CPed::SetWeaponSlot(unsigned char ucSlot)
+void CPed::SetWeaponSlot(std::uint8_t ucSlot)
 {
     if (ucSlot < WEAPON_SLOTS)
     {
@@ -282,7 +282,7 @@ void CPed::SetWeaponSlot(unsigned char ucSlot)
     }
 }
 
-CWeapon* CPed::GetWeapon(unsigned char ucSlot)
+CWeapon* CPed::GetWeapon(std::uint8_t ucSlot)
 {
     if (ucSlot == 0xFF)
         ucSlot = m_ucWeaponSlot;
@@ -293,7 +293,7 @@ CWeapon* CPed::GetWeapon(unsigned char ucSlot)
     return NULL;
 }
 
-unsigned char CPed::GetWeaponType(unsigned char ucSlot)
+std::uint8_t CPed::GetWeaponType(std::uint8_t ucSlot)
 {
     if (ucSlot == 0xFF)
         ucSlot = m_ucWeaponSlot;
@@ -304,7 +304,7 @@ unsigned char CPed::GetWeaponType(unsigned char ucSlot)
     return 0;
 }
 
-void CPed::SetWeaponType(unsigned char ucType, unsigned char ucSlot)
+void CPed::SetWeaponType(std::uint8_t ucType, std::uint8_t ucSlot)
 {
     if (ucSlot == 0xFF)
         ucSlot = m_ucWeaponSlot;
@@ -314,7 +314,7 @@ void CPed::SetWeaponType(unsigned char ucType, unsigned char ucSlot)
     }
 }
 
-unsigned short CPed::GetWeaponAmmoInClip(unsigned char ucSlot)
+std::uint16_t CPed::GetWeaponAmmoInClip(std::uint8_t ucSlot)
 {
     if (ucSlot == 0xFF)
         ucSlot = m_ucWeaponSlot;
@@ -325,7 +325,7 @@ unsigned short CPed::GetWeaponAmmoInClip(unsigned char ucSlot)
     return 0;
 }
 
-void CPed::SetWeaponAmmoInClip(unsigned short usAmmoInClip, unsigned char ucSlot)
+void CPed::SetWeaponAmmoInClip(std::uint16_t usAmmoInClip, std::uint8_t ucSlot)
 {
     if (ucSlot == 0xFF)
         ucSlot = m_ucWeaponSlot;
@@ -335,7 +335,7 @@ void CPed::SetWeaponAmmoInClip(unsigned short usAmmoInClip, unsigned char ucSlot
     }
 }
 
-unsigned short CPed::GetWeaponTotalAmmo(unsigned char ucSlot)
+std::uint16_t CPed::GetWeaponTotalAmmo(std::uint8_t ucSlot)
 {
     if (ucSlot == 0xFF)
         ucSlot = m_ucWeaponSlot;
@@ -346,7 +346,7 @@ unsigned short CPed::GetWeaponTotalAmmo(unsigned char ucSlot)
     return 0;
 }
 
-void CPed::SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot)
+void CPed::SetWeaponTotalAmmo(std::uint16_t usTotalAmmo, std::uint8_t ucSlot)
 {
     if (ucSlot == 0xFF)
         ucSlot = m_ucWeaponSlot;
@@ -356,9 +356,9 @@ void CPed::SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot)
     }
 }
 
-bool CPed::HasWeaponType(unsigned char ucWeaponType)
+bool CPed::HasWeaponType(std::uint8_t ucWeaponType)
 {
-    for (unsigned char slot = 0; slot < WEAPON_SLOTS; slot++)
+    for (std::uint8_t slot = 0; slot < WEAPON_SLOTS; slot++)
     {
         if (GetWeaponType(slot) == ucWeaponType)
             return true;
@@ -384,7 +384,7 @@ float CPed::GetMaxHealth()
     return fMaxHealth;
 }
 
-const char* CPed::GetBodyPartName(unsigned char ucID)
+const char* CPed::GetBodyPartName(std::uint8_t ucID)
 {
     if (ucID <= NUMELMS(BodyPartNames))
     {
@@ -413,7 +413,7 @@ void CPed::SetIsDead(bool bDead)
     m_bIsDead = bDead;
 }
 
-CVehicle* CPed::SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat)
+CVehicle* CPed::SetOccupiedVehicle(CVehicle* pVehicle, std::uint32_t uiSeat)
 {
     static bool bAlreadyIn = false;
     if (!bAlreadyIn)
@@ -434,7 +434,7 @@ CVehicle* CPed::SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat)
     return m_pVehicle;
 }
 
-void CPed::SetVehicleAction(unsigned int uiAction)
+void CPed::SetVehicleAction(std::uint32_t uiAction)
 {
     m_uiVehicleAction = uiAction;
 }
@@ -474,13 +474,13 @@ void CPed::SetSyncer(CPlayer* pPlayer)
 
         // Check if we are in an enter/exit action
         // We need to complete the process by warping the ped in or out, because the syncer changed
-        unsigned int uiAction = GetVehicleAction();
+        std::uint32_t uiAction = GetVehicleAction();
         switch (uiAction)
         {
             case VEHICLEACTION_ENTERING:
             {
                 CVehicle*     pVehicle = GetOccupiedVehicle();
-                unsigned char ucOccupiedSeat = static_cast<unsigned char>(GetOccupiedVehicleSeat());
+                std::uint8_t ucOccupiedSeat = static_cast<std::uint8_t>(GetOccupiedVehicleSeat());
                 // Does it have an occupant and is the occupant us?
                 if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
                 {
@@ -492,7 +492,7 @@ void CPed::SetSyncer(CPlayer* pPlayer)
             case VEHICLEACTION_EXITING:
             {
                 CVehicle*     pVehicle = GetOccupiedVehicle();
-                unsigned char ucOccupiedSeat = GetOccupiedVehicleSeat();
+                std::uint8_t ucOccupiedSeat = GetOccupiedVehicleSeat();
                 // Does it have an occupant and is the occupant us?
                 if (pVehicle && (this == pVehicle->GetOccupant(ucOccupiedSeat)))
                 {

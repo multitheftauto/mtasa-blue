@@ -28,7 +28,7 @@ struct CColModelSAInterface;
 typedef RpAtomic*(__cdecl* RpAtomicCreate_t)();
 typedef RpAtomic*(__cdecl* RpAtomicClone_t)(RpAtomic* atomic);
 typedef int(__cdecl* RpAtomicDestroy_t)(RpAtomic* atomic);
-typedef RpAtomic*(__cdecl* RpAtomicSetGeometry_t)(RpAtomic* atomic, RpGeometry* geometry, unsigned int flags);
+typedef RpAtomic*(__cdecl* RpAtomicSetGeometry_t)(RpAtomic* atomic, RpGeometry* geometry, std::uint32_t flags);
 typedef RpAtomic*(__cdecl* RpAtomicSetFrame_t)(RpAtomic* atomic, RwFrame* frame);
 typedef RpClump*(__cdecl* RpClumpAddAtomic_t)(RpClump* clump, RpAtomic* atomic);
 typedef RpClump*(__cdecl* RpClumpAddLight_t)(RpClump* clump, RpLight* light);
@@ -43,16 +43,16 @@ typedef RwFrame*(__cdecl* RwFrameUpdateObjects_t)(RwFrame*);
 typedef RwFrame*(__cdecl* RwFrameCreate_t)();
 typedef int(__cdecl* RwFrameDestroy_t)(RwFrame* frame);
 typedef RwFrame*(__cdecl* RwFrameSetIdentity_t)(RwFrame* frame);
-typedef RpGeometry*(__cdecl* RpGeometryCreate_t)(int numverts, int numtriangles, unsigned int format);
-typedef const RpGeometry*(__cdecl* RpGeometryTriangleSetVertexIndices_t)(const RpGeometry* geo, RpTriangle* tri, unsigned short v1, unsigned short v2,
-                                                                         unsigned short v3);
+typedef RpGeometry*(__cdecl* RpGeometryCreate_t)(int numverts, int numtriangles, std::uint32_t format);
+typedef const RpGeometry*(__cdecl* RpGeometryTriangleSetVertexIndices_t)(const RpGeometry* geo, RpTriangle* tri, std::uint16_t v1, std::uint16_t v2,
+                                                                         std::uint16_t v3);
 typedef RpGeometry*(__cdecl* RpGeometryUnlock_t)(RpGeometry* geo);
 typedef RpGeometry*(__cdecl* RpGeometryLock_t)(RpGeometry* geo, int lockmode);
 typedef RpGeometry*(__cdecl* RpGeometryTransform_t)(RpGeometry* geo, const RwMatrix* matrix);
 typedef RpGeometry*(__cdecl* RpGeometryTriangleSetMaterial_t)(RpGeometry* geo, RpTriangle* tri, RpMaterial* mat);
 typedef int(__cdecl* RpGeometryDestroy_t)(RpGeometry* geo);
-typedef void*(__cdecl* RwIm3DTransform_t)(RwVertex* pVerts, unsigned int numVerts, RwMatrix* ltm, unsigned int flags);
-typedef int(__cdecl* RwIm3DRenderIndexedPrimitive_t)(RwPrimitiveType primType, unsigned short* indices, int numIndices);
+typedef void*(__cdecl* RwIm3DTransform_t)(RwVertex* pVerts, std::uint32_t numVerts, RwMatrix* ltm, std::uint32_t flags);
+typedef int(__cdecl* RwIm3DRenderIndexedPrimitive_t)(RwPrimitiveType primType, std::uint16_t* indices, int numIndices);
 typedef int(__cdecl* RwIm3DEnd_t)();
 typedef RpLight*(__cdecl* RpLightCreate_t)(int type);
 typedef RpLight*(__cdecl* RpLightSetRadius_t)(RpLight* light, float radius);
@@ -79,7 +79,7 @@ typedef RwCamera*(__cdecl* RwCameraClone_t)(RwCamera* camera);
 typedef RpClump*(__cdecl* RpClumpClone_t)(RpClump* clone);
 typedef int(__cdecl* RwTexDictionaryDestroy_t)(RwTexDictionary* txd);
 typedef int(__cdecl* RwTextureDestroy_t)(RwTexture* texture);
-typedef int(__cdecl* RwStreamFindChunk_t)(RwStream* stream, unsigned int type, unsigned int* lengthOut, unsigned int* versionOut);
+typedef int(__cdecl* RwStreamFindChunk_t)(RwStream* stream, std::uint32_t type, std::uint32_t* lengthOut, std::uint32_t* versionOut);
 typedef RpClump*(__cdecl* RpClumpStreamRead_t)(RwStream* stream);
 typedef RwError*(__cdecl* RwErrorGet_t)(RwError* code);
 typedef RwStream*(__cdecl* RwStreamOpen_t)(RwStreamType type, RwStreamMode mode, const void* pData);
@@ -94,7 +94,7 @@ typedef RwTexDictionary*(__cdecl* RwTexDictionaryGtaStreamRead_t)(RwStream* stre
 typedef int(__cdecl* RwTexDictionaryStreamWrite_t)(RwTexDictionary* txd, RwStream* stream);
 typedef int(__cdecl* rwD3D9NativeTextureRead_t)(RwStream* stream, RwTexture** textureOut);
 typedef RwRaster*(__cdecl* RwRasterUnlock_t)(RwRaster* raster);
-typedef RwRaster*(__cdecl* RwRasterLock_t)(RwRaster* raster, unsigned char level, int lockmode);
+typedef RwRaster*(__cdecl* RwRasterLock_t)(RwRaster* raster, std::uint8_t level, int lockmode);
 typedef RwRaster*(__cdecl* RwRasterCreate_t)(int width, int height, int depth, int flags);
 typedef RwTexture*(__cdecl* RwTextureCreate_t)(RwRaster* raster);
 typedef RpMaterial*(__cdecl* RpMaterialSetTexture_t)(RpMaterial* mat, RwTexture* tex);
@@ -196,19 +196,19 @@ RWFUNC(RtQuatRotate_t RtQuatRotate, (RtQuatRotate_t)0xDEAD)
 /** GTA function definitions and mappings                                   **/
 /*****************************************************************************/
 
-typedef bool(__cdecl* SetTextureDict_t)(unsigned short id);
-typedef bool(__cdecl* LoadClumpFile_t)(RwStream* stream, unsigned int id);            // (stream, model id)
-typedef bool(__cdecl* LoadModel_t)(RwBuffer* filename, unsigned int id);              // (memory chunk, model id)
-typedef void(__cdecl* LoadCollisionModel_t)(unsigned char*, CColModelSAInterface*, const char*);
-typedef void(__cdecl* LoadCollisionModelVer2_t)(unsigned char*, unsigned int, CColModelSAInterface*, const char*);
-typedef void(__cdecl* LoadCollisionModelVer3_t)(unsigned char*, unsigned int, CColModelSAInterface*,
+typedef bool(__cdecl* SetTextureDict_t)(std::uint16_t id);
+typedef bool(__cdecl* LoadClumpFile_t)(RwStream* stream, std::uint32_t id);            // (stream, model id)
+typedef bool(__cdecl* LoadModel_t)(RwBuffer* filename, std::uint32_t id);              // (memory chunk, model id)
+typedef void(__cdecl* LoadCollisionModel_t)(std::uint8_t*, CColModelSAInterface*, const char*);
+typedef void(__cdecl* LoadCollisionModelVer2_t)(std::uint8_t*, std::uint32_t, CColModelSAInterface*, const char*);
+typedef void(__cdecl* LoadCollisionModelVer3_t)(std::uint8_t*, std::uint32_t, CColModelSAInterface*,
                                                 const char*);            // buf, bufsize, ccolmodel&, keyname
-typedef bool(__cdecl* CTxdStore_LoadTxd_t)(unsigned int id, RwStream* filename);
-typedef void(__cdecl* CTxdStore_RemoveTxd_t)(unsigned int id);
-typedef void(__cdecl* CTxdStore_RemoveRef_t)(unsigned int id);
-typedef void(__cdecl* CTxdStore_AddRef_t)(unsigned int id);
-typedef int(__cdecl* CTxdStore_GetNumRefs_t)(unsigned int id);
-typedef RwTexDictionary*(__cdecl* CTxdStore_GetTxd_t)(unsigned int id);
+typedef bool(__cdecl* CTxdStore_LoadTxd_t)(std::uint32_t id, RwStream* filename);
+typedef void(__cdecl* CTxdStore_RemoveTxd_t)(std::uint32_t id);
+typedef void(__cdecl* CTxdStore_RemoveRef_t)(std::uint32_t id);
+typedef void(__cdecl* CTxdStore_AddRef_t)(std::uint32_t id);
+typedef int(__cdecl* CTxdStore_GetNumRefs_t)(std::uint32_t id);
+typedef RwTexDictionary*(__cdecl* CTxdStore_GetTxd_t)(std::uint32_t id);
 typedef RwTexture*(__cdecl* CClothesBuilder_CopyTexture_t)(RwTexture* texture);
 
 RWFUNC(SetTextureDict_t SetTextureDict, (SetTextureDict_t)0xDEAD)

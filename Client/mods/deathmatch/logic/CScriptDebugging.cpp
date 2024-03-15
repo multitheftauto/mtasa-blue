@@ -43,7 +43,7 @@ CScriptDebugging::~CScriptDebugging()
     }
 }
 
-void CScriptDebugging::LogBadLevel(lua_State* luaVM, unsigned int uiRequiredLevel)
+void CScriptDebugging::LogBadLevel(lua_State* luaVM, std::uint32_t uiRequiredLevel)
 {
     // Populate a message to print/send
     LogWarning(luaVM, "Requires level '%d' @ '%s", uiRequiredLevel, lua_tostring(luaVM, lua_upvalueindex(1)));
@@ -59,7 +59,7 @@ void CALLBACK TimerProc(void* lpParametar, BOOLEAN TimerOrWaitFired)
     }
 }
 
-bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
+bool CScriptDebugging::SetLogfile(const char* szFilename, std::uint32_t uiLevel)
 {
     assert(szFilename);
 

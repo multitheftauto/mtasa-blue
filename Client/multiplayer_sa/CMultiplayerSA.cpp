@@ -165,7 +165,7 @@ DWORD RETURN_CPed_AddGogglesModel = 0x5E3AD4;
 
 #define FUNC_CWorld_Remove                                  0x563280
 #define FUNC_CTagManager_ShutdownForRestart                 0x49CC60
-unsigned int* VAR_NumTags = (unsigned int*)0xA9AD70;
+std::uint32_t* VAR_NumTags = (std::uint32_t*)0xA9AD70;
 DWORD**       VAR_TagInfoArray = (DWORD**)0xA9A8C0;
 
 #define HOOKPOS_CPhysical_ProcessCollisionSectorList        0x54BB93
@@ -312,7 +312,7 @@ float         fGlobalGravity = 0.008f;
 float         fLocalPlayerGravity = 0.008f;
 float         fLocalPlayerCameraRotation = 0.0f;
 bool          bCustomCameraRotation = false;
-unsigned char ucTrafficLightState = 0;
+std::uint8_t ucTrafficLightState = 0;
 bool          bTrafficLightsBlocked = false;
 bool          bInteriorSoundsEnabled = true;
 bool          bInteriorFurnitureStates[5] = {true, true, true, true, true};
@@ -818,14 +818,14 @@ void CMultiplayerSA::InitHooks()
 
     // Hack to make the choke task use 0 time left remaining when he starts t
     // just stand there looking. So he won't do that.
-    MemPut<unsigned char>(0x620607, 0x33);
-    MemPut<unsigned char>(0x620608, 0xC0);
+    MemPut<std::uint8_t>(0x620607, 0x33);
+    MemPut<std::uint8_t>(0x620608, 0xC0);
 
-    MemPut<unsigned char>(0x620618, 0x33);
-    MemPut<unsigned char>(0x620619, 0xC0);
-    MemPut<unsigned char>(0x62061A, 0x90);
-    MemPut<unsigned char>(0x62061B, 0x90);
-    MemPut<unsigned char>(0x62061C, 0x90);
+    MemPut<std::uint8_t>(0x620618, 0x33);
+    MemPut<std::uint8_t>(0x620619, 0xC0);
+    MemPut<std::uint8_t>(0x62061A, 0x90);
+    MemPut<std::uint8_t>(0x62061B, 0x90);
+    MemPut<std::uint8_t>(0x62061C, 0x90);
 
     // Hack to make non-local players always update their aim on akimbo weapons using camera
     // so they don't freeze when local player doesn't aim.
@@ -1998,8 +1998,8 @@ void CMultiplayerSA::RestoreFogDistance()
     }
 }
 
-void CMultiplayerSA::GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed,
-                                 unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue)
+void CMultiplayerSA::GetSunColor(std::uint8_t& ucCoreRed, std::uint8_t& ucCoreGreen, std::uint8_t& ucCoreBlue, std::uint8_t& ucCoronaRed,
+                                 std::uint8_t& ucCoronaGreen, std::uint8_t& ucCoronaBlue)
 {
     ucCoreRed = *(BYTE*)0xB7C4D0;
     ucCoreGreen = *(BYTE*)0xB7C4D2;
@@ -2010,8 +2010,8 @@ void CMultiplayerSA::GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCore
     ucCoronaBlue = *(BYTE*)0xB7C4DA;
 }
 
-void CMultiplayerSA::SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed,
-                                 unsigned char ucCoronaGreen, unsigned char ucCoronaBlue)
+void CMultiplayerSA::SetSunColor(std::uint8_t ucCoreRed, std::uint8_t ucCoreGreen, std::uint8_t ucCoreBlue, std::uint8_t ucCoronaRed,
+                                 std::uint8_t ucCoronaGreen, std::uint8_t ucCoronaBlue)
 {
     MemSet((LPVOID)0x55F9B2, 0x90, 4);
     MemSet((LPVOID)0x55F9DD, 0x90, 4);
@@ -2116,8 +2116,8 @@ bool CMultiplayerSA::HasSkyColor()
     return bUsingCustomSkyGradient;
 }
 
-void CMultiplayerSA::GetSkyColor(unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen,
-                                 unsigned char& BottomBlue)
+void CMultiplayerSA::GetSkyColor(std::uint8_t& TopRed, std::uint8_t& TopGreen, std::uint8_t& TopBlue, std::uint8_t& BottomRed, std::uint8_t& BottomGreen,
+                                 std::uint8_t& BottomBlue)
 {
     if (HasSkyColor())
     {
@@ -2141,8 +2141,8 @@ void CMultiplayerSA::GetSkyColor(unsigned char& TopRed, unsigned char& TopGreen,
     }
 }
 
-void CMultiplayerSA::SetSkyColor(unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen,
-                                 unsigned char BottomBlue)
+void CMultiplayerSA::SetSkyColor(std::uint8_t TopRed, std::uint8_t TopGreen, std::uint8_t TopBlue, std::uint8_t BottomRed, std::uint8_t BottomGreen,
+                                 std::uint8_t BottomBlue)
 {
     bUsingCustomSkyGradient = true;
     ucSkyGradientTopR = TopRed;
@@ -3319,7 +3319,7 @@ train_would_derail:
  **/
 static DWORD         dwAlphaEntity = 0;
 static bool          bEntityHasAlpha = false;
-static unsigned char ucCurrentAlpha[1024];
+static std::uint8_t ucCurrentAlpha[1024];
 static uint          uiAlphaIdx = 0;
 
 static void SetEntityAlphaHooked(DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha)
@@ -3348,20 +3348,20 @@ static void SetEntityAlphaHooked(DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha
     }
 }
 
-static RpMaterial* HOOK_GetAlphaValues(RpMaterial* pMaterial, unsigned char ucAlpha)
+static RpMaterial* HOOK_GetAlphaValues(RpMaterial* pMaterial, std::uint8_t ucAlpha)
 {
     ucCurrentAlpha[uiAlphaIdx] = pMaterial->color.a;
     uiAlphaIdx = std::min(uiAlphaIdx + 1, NUMELMS(ucCurrentAlpha) - 1);
 
     return pMaterial;
 }
-static RpMaterial* HOOK_SetAlphaValues(RpMaterial* pMaterial, unsigned char ucAlpha)
+static RpMaterial* HOOK_SetAlphaValues(RpMaterial* pMaterial, std::uint8_t ucAlpha)
 {
-    pMaterial->color.a = static_cast<unsigned char>((float)(pMaterial->color.a) * (float)ucAlpha / 255.0f);
+    pMaterial->color.a = static_cast<std::uint8_t>((float)(pMaterial->color.a) * (float)ucAlpha / 255.0f);
 
     return pMaterial;
 }
-static RpMaterial* HOOK_RestoreAlphaValues(RpMaterial* pMaterial, unsigned char ucAlpha)
+static RpMaterial* HOOK_RestoreAlphaValues(RpMaterial* pMaterial, std::uint8_t ucAlpha)
 {
     pMaterial->color.a = ucCurrentAlpha[uiAlphaIdx];
     uiAlphaIdx = std::min(uiAlphaIdx + 1, NUMELMS(ucCurrentAlpha) - 1);
@@ -3369,7 +3369,7 @@ static RpMaterial* HOOK_RestoreAlphaValues(RpMaterial* pMaterial, unsigned char 
     return pMaterial;
 }
 
-static void GetAlphaAndSetNewValues(unsigned char ucAlpha)
+static void GetAlphaAndSetNewValues(std::uint8_t ucAlpha)
 {
     if (ucAlpha < 255)
     {
@@ -3422,7 +3422,7 @@ static RpAtomic* CVehicle_EAEG(RpAtomic* pAtomic, void*)
 static void SetVehicleAlpha()
 {
     CVehicleSAInterface* pInterface = ((CVehicleSAInterface*)dwAlphaEntity);
-    unsigned char        ucAlpha = pInterface->m_pVehicle->GetAlpha();
+    std::uint8_t        ucAlpha = pInterface->m_pVehicle->GetAlpha();
 
     if (ucAlpha < 255)
         GetAlphaAndSetNewValues(ucAlpha);
@@ -3498,7 +3498,7 @@ static void SetObjectAlpha()
                 // For some weird reason, gang tags don't appear unsprayed
                 // if we don't set their alpha to a value less than 255.
                 bObjectIsAGangTag = true;
-                GetAlphaAndSetNewValues(std::min(pObject->GetAlpha(), (unsigned char)254));
+                GetAlphaAndSetNewValues(std::min(pObject->GetAlpha(), (std::uint8_t)254));
             }
             else
                 GetAlphaAndSetNewValues(pObject->GetAlpha());
@@ -3641,7 +3641,7 @@ stop_looping:
 // Hook to detect when a player is choking
 static DWORD         dwChokingChoke = 0x4C05C1;
 static DWORD         dwChokingDontchoke = 0x4C0620;
-static unsigned char ucChokingWeaponType = 0;
+static std::uint8_t ucChokingWeaponType = 0;
 void _declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
 {
     _asm
@@ -3940,7 +3940,7 @@ void CMultiplayerSA::SetLocalPlayerGravity(float fGravity)
     fLocalPlayerGravity = fGravity;
 }
 
-void CMultiplayerSA::SetLocalStatValue(unsigned short usStat, float fValue)
+void CMultiplayerSA::SetLocalStatValue(std::uint16_t usStat, float fValue)
 {
     if (usStat < MAX_FLOAT_STATS)
         localStatsData.StatTypesFloat[usStat] = fValue;
@@ -3950,7 +3950,7 @@ void CMultiplayerSA::SetLocalStatValue(unsigned short usStat, float fValue)
         dwEAEG = !dwEAEG;
 }
 
-float CMultiplayerSA::GetLocalStatValue(unsigned short usStat)
+float CMultiplayerSA::GetLocalStatValue(std::uint16_t usStat)
 {
     if (usStat < MAX_FLOAT_STATS)
         return localStatsData.StatTypesFloat[usStat];
@@ -4002,7 +4002,7 @@ void _declspec(naked) HOOK_CollisionStreamRead()
     }
 }
 
-unsigned char ucDesignatedLightState = 0;
+std::uint8_t ucDesignatedLightState = 0;
 void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
 {
     _asm
@@ -4084,11 +4084,11 @@ void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
 }
 
 static CVehicleSAInterface* pHandlingDriveTypeVeh = NULL;
-unsigned char               ucDriveType = '4';
+std::uint8_t               ucDriveType = '4';
 void                        GetVehicleDriveType()
 {
     // Get the car drive type from the Vehicle interface
-    ucDriveType = static_cast<unsigned char>(pHandlingDriveTypeVeh->m_pVehicle->GetHandlingData()->GetCarDriveType());
+    ucDriveType = static_cast<std::uint8_t>(pHandlingDriveTypeVeh->m_pVehicle->GetHandlingData()->GetCarDriveType());
 }
 
 static CTransmission* pCurTransmission = nullptr;
@@ -4161,12 +4161,12 @@ void _declspec(naked) HOOK_isVehDriveTypeNotFWD()
     }
 }
 
-unsigned char CMultiplayerSA::GetTrafficLightState()
+std::uint8_t CMultiplayerSA::GetTrafficLightState()
 {
     return ucTrafficLightState;
 }
 
-void CMultiplayerSA::SetTrafficLightState(unsigned char ucState)
+void CMultiplayerSA::SetTrafficLightState(std::uint8_t ucState)
 {
     ucTrafficLightState = ucState;
 }
@@ -4868,7 +4868,7 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
     }
 }
 
-unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
+std::uint32_t ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
 {
     SColor                     color = SColorRGBA(255, 255, 255, 255);
@@ -4880,9 +4880,9 @@ void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float 
     }
 
     // Scale our color values to the defaults ..looks dodgy but its needed!
-    ulHeadLightR = (unsigned char)std::min(255.f, color.R * (1 / 255.0f) * fR);
-    ulHeadLightG = (unsigned char)std::min(255.f, color.G * (1 / 255.0f) * fG);
-    ulHeadLightB = (unsigned char)std::min(255.f, color.B * (1 / 255.0f) * fB);
+    ulHeadLightR = (std::uint8_t)std::min(255.f, color.R * (1 / 255.0f) * fR);
+    ulHeadLightG = (std::uint8_t)std::min(255.f, color.G * (1 / 255.0f) * fG);
+    ulHeadLightB = (std::uint8_t)std::min(255.f, color.B * (1 / 255.0f) * fB);
 }
 
 CVehicleSAInterface* pHeadLightBeamVehicleInterface = NULL;
@@ -4897,16 +4897,16 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_1()
 }
 
 RwVertex*    pHeadLightVerts = NULL;
-unsigned int uiHeadLightNumVerts = 0;
+std::uint32_t uiHeadLightNumVerts = 0;
 void         CVehicle_DoHeadLightBeam()
 {
     // 255, 255, 255
     CVehicle_GetHeadLightColor(pHeadLightBeamVehicleInterface, 255.0f, 255.0f, 255.0f);
 
-    for (unsigned int i = 0; i < uiHeadLightNumVerts; i++)
+    for (std::uint32_t i = 0; i < uiHeadLightNumVerts; i++)
     {
-        unsigned char alpha = COLOR_ARGB_A(pHeadLightVerts[i].color);
-        pHeadLightVerts[i].color = COLOR_ARGB(alpha, (unsigned char)ulHeadLightR, (unsigned char)ulHeadLightG, (unsigned char)ulHeadLightB);
+        std::uint8_t alpha = COLOR_ARGB_A(pHeadLightVerts[i].color);
+        pHeadLightVerts[i].color = COLOR_ARGB(alpha, (std::uint8_t)ulHeadLightR, (std::uint8_t)ulHeadLightG, (std::uint8_t)ulHeadLightB);
     }
 }
 
@@ -5458,7 +5458,7 @@ void CMultiplayerSA::DeleteAndDisableGangTags()
         // Destroy all the world tags
         DWORD dwFunc = FUNC_CWorld_Remove;
 
-        for (unsigned int i = 0; i < *VAR_NumTags; ++i)
+        for (std::uint32_t i = 0; i < *VAR_NumTags; ++i)
         {
             DWORD* pTagInterface = VAR_TagInfoArray[i << 1];
             if (pTagInterface)
@@ -5507,8 +5507,8 @@ void CMultiplayerSA::DeleteAndDisableGangTags()
         // CVisibilityPlugins::GetUserValue is a cdecl.
         MemSet((void*)0x49CE58, 0x90, 5);
         MemSet((void*)0x49CE5E, 0x90, 11);
-        MemPut<unsigned short>(0x49CE5E, 0xC033);
-        MemPut<unsigned short>(0x49CE60, 0xFF33);
+        MemPut<std::uint16_t>(0x49CE5E, 0xC033);
+        MemPut<std::uint16_t>(0x49CE60, 0xFF33);
     }
 }
 
@@ -6387,7 +6387,7 @@ void _declspec(naked) HOOK_CObject_ProcessDamage()
     }
 }
 
-unsigned char ucColDamageEffect = NULL;
+std::uint8_t ucColDamageEffect = NULL;
 bool          TriggerObjectBreakEvent()
 {
     if (m_pObjectBreakHandler && pDamagedObject)
@@ -6403,7 +6403,7 @@ void _declspec(naked) HOOK_CObject_ProcessBreak()
     {
         pushad
     }
-    ucColDamageEffect = *(unsigned char*)((DWORD)pDamagedObject + 324);
+    ucColDamageEffect = *(std::uint8_t*)((DWORD)pDamagedObject + 324);
 
     if (ucColDamageEffect != NULL)
     {

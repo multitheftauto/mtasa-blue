@@ -202,7 +202,7 @@ void CTaskManagerSA::ClearTaskEventResponse()
 
 void CTaskManagerSA::Flush(const int iPriority)
 {
-    for (int i = 0; i < TASK_PRIORITY_MAX; i++)
+    for (auto i = 0; i < TASK_PRIORITY_MAX; i++)
     {
         CTask* pTask = GetTask(i);
         if (pTask)
@@ -210,7 +210,7 @@ void CTaskManagerSA::Flush(const int iPriority)
             pTask->MakeAbortable(ped, iPriority, NULL);
         }
     }
-    for (int i = 0; i < TASK_SECONDARY_MAX; i++)
+    for (auto i = 0; i < TASK_SECONDARY_MAX; i++)
     {
         CTask* pTask = GetTaskSecondary(i);
         if (pTask)

@@ -27,22 +27,22 @@ private:
     static bool                                           SetServerPassword(std::optional<std::string> rawPassword);
     static std::variant<std::nullptr_t, std::string_view> GetServerPassword();
 
-    static unsigned int GetServerHttpPort();
+    static std::uint32_t GetServerHttpPort();
 
     static std::string_view GetServerName();
 
     static bool OutputServerLog(std::string_view message);
 
-    static bool OutputScriptDebugLog(lua_State* luaVM, std::string message, std::optional<unsigned char> rawLevel, std::optional<unsigned char> rawColorR,
-                                     std::optional<unsigned char> rawColorG, std::optional<unsigned char> rawColorB);
+    static bool OutputScriptDebugLog(lua_State* luaVM, std::string message, std::optional<std::uint8_t> rawLevel, std::optional<std::uint8_t> rawColorR,
+                                     std::optional<std::uint8_t> rawColorG, std::optional<std::uint8_t> rawColorB);
 
     static bool OutputConsole(std::string message, std::optional<CElement*> rawElement);
 
     static bool OutputChatBox(lua_State* luaVM, std::string message, std::optional<std::variant<CElement*, std::vector<CPlayer*>>> rawVisibleTo,
-                              std::optional<unsigned char> rawColorR, std::optional<unsigned char> rawColorG, std::optional<unsigned char> rawColorB,
+                              std::optional<std::uint8_t> rawColorR, std::optional<std::uint8_t> rawColorG, std::optional<std::uint8_t> rawColorB,
                               std::optional<bool> rawColorCoded);
 
 public:
-    static bool OOP_OutputChatBox(lua_State* luaVM, CElement* element, std::string message, std::optional<unsigned char> rawColorR,
-                                  std::optional<unsigned char> rawColorG, std::optional<unsigned char> rawColorB, std::optional<bool> rawColorCoded);
+    static bool OOP_OutputChatBox(lua_State* luaVM, CElement* element, std::string message, std::optional<std::uint8_t> rawColorR,
+                                  std::optional<std::uint8_t> rawColorG, std::optional<std::uint8_t> rawColorB, std::optional<bool> rawColorCoded);
 };

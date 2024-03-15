@@ -43,7 +43,7 @@ MTAEXPORT int Run(int iArgumentCount, char* szArguments[])
     #ifdef WIN_x86
     // Apply file hooks if not already done by the client
     bool bSkipFileHooks = false;
-    for (int i = 1; i < iArgumentCount; i++)
+    for (auto i = 1; i < iArgumentCount; i++)
         bSkipFileHooks |= SStringX(szArguments[i]).Contains("--clientfeedback");
     if (!bSkipFileHooks)
         AddUtf8FileHooks();

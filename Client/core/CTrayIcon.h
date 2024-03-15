@@ -28,5 +28,5 @@ public:
 private:
     NOTIFYICONDATAW* m_pNID;
     bool             m_bTrayIconExists;
-    long long        m_llLastBalloonTime;
+    std::int64_t        m_llLastBalloonTime;
 };

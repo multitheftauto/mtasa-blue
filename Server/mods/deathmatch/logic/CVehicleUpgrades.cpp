@@ -53,9 +53,9 @@ CVehicleUpgrades::CVehicleUpgrades(CVehicle* pVehicle, CVehicleUpgrades* pUpgrad
     }
 }
 
-bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
+bool CVehicleUpgrades::IsUpgradeCompatible(std::uint16_t usUpgrade)
 {
-    unsigned short us = usUpgrade;
+    std::uint16_t us = usUpgrade;
     eVehicleType   vehicleType = m_pVehicle->GetVehicleType();
 
     // No upgrades for trains/boats
@@ -69,7 +69,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     if (vehicleType == VEHICLE_BIKE || vehicleType == VEHICLE_BMX || vehicleType == VEHICLE_HELI)
         return false;
 
-    unsigned short usModel = m_pVehicle->GetModel();
+    std::uint16_t usModel = m_pVehicle->GetModel();
     // Wheels should be compatible with any vehicle which have wheels, except
     // bike/bmx (they're buggy). Vortex is technically a car, but it has no
     // wheels.
@@ -291,7 +291,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     return false;
 }
 
-bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSlot)
+bool CVehicleUpgrades::GetSlotFromUpgrade(std::uint16_t us, std::uint8_t& ucSlot)
 {
     if (us == 1011 || us == 1012 || us == 1111 || us == 1112 || us == 1142 || /* bonet */
         us == 1143 || us == 1144 || us == 1145)
@@ -396,7 +396,7 @@ bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSl
     return false;
 }
 
-unsigned short CVehicleUpgrades::GetSlotState(unsigned char ucSlot)
+std::uint16_t CVehicleUpgrades::GetSlotState(std::uint8_t ucSlot)
 {
     if (ucSlot < VEHICLE_UPGRADE_SLOTS)
         return m_SlotStates[ucSlot];
@@ -404,17 +404,17 @@ unsigned short CVehicleUpgrades::GetSlotState(unsigned char ucSlot)
     return 0;
 }
 
-void CVehicleUpgrades::SetSlotState(unsigned char ucSlot, unsigned short usUpgrade)
+void CVehicleUpgrades::SetSlotState(std::uint8_t ucSlot, std::uint16_t usUpgrade)
 {
     if (ucSlot < VEHICLE_UPGRADE_SLOTS)
         m_SlotStates[ucSlot] = usUpgrade;
 }
 
-bool CVehicleUpgrades::AddUpgrade(unsigned short usUpgrade)
+bool CVehicleUpgrades::AddUpgrade(std::uint16_t usUpgrade)
 {
     if (IsUpgradeCompatible(usUpgrade))
     {
-        unsigned char ucSlot;
+        std::uint8_t ucSlot;
         if (GetSlotFromUpgrade(usUpgrade, ucSlot))
         {
             m_SlotStates[ucSlot] = usUpgrade;
@@ -427,16 +427,16 @@ bool CVehicleUpgrades::AddUpgrade(unsigned short usUpgrade)
 
 void CVehicleUpgrades::AddAllUpgrades()
 {
-    unsigned short usUpgrade = 1000;
+    std::uint16_t usUpgrade = 1000;
     for (; usUpgrade <= 1193; usUpgrade++)
     {
         AddUpgrade(usUpgrade);
     }
 }
 
-bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
+bool CVehicleUpgrades::HasUpgrade(std::uint16_t usUpgrade)
 {
-    unsigned char ucSlot = 0;
+    std::uint8_t ucSlot = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
     {
         if (m_SlotStates[ucSlot] == usUpgrade)
@@ -446,9 +446,9 @@ bool CVehicleUpgrades::HasUpgrade(unsigned short usUpgrade)
     return false;
 }
 
-unsigned char CVehicleUpgrades::Count()
+std::uint8_t CVehicleUpgrades::Count()
 {
-    unsigned char ucSlot = 0, ucCount = 0;
+    std::uint8_t ucSlot = 0, ucCount = 0;
     for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
     {
         if (m_SlotStates[ucSlot])
@@ -458,7 +458,7 @@ unsigned char CVehicleUpgrades::Count()
     return ucCount;
 }
 
-const char* CVehicleUpgrades::GetSlotName(unsigned char ucSlot)
+const char* CVehicleUpgrades::GetSlotName(std::uint8_t ucSlot)
 {
     if (ucSlot < VEHICLE_UPGRADE_SLOTS)
         return UpgradeNames[ucSlot].szName;
@@ -466,7 +466,7 @@ const char* CVehicleUpgrades::GetSlotName(unsigned char ucSlot)
     return szUpgradeNameEmpty;
 }
 
-bool CVehicleUpgrades::IsValidUpgrade(unsigned short usUpgrade)
+bool CVehicleUpgrades::IsValidUpgrade(std::uint16_t usUpgrade)
 {
     return (usUpgrade >= 1000 && usUpgrade <= 1193);
 }

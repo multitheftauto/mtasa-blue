@@ -22,21 +22,21 @@ class CClientTeam final : public CClientEntity
     friend class CClientTeamManager;
 
 public:
-    CClientTeam(CClientManager* pManager, ElementID ID, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0,
-                unsigned char ucBlue = 0);
+    CClientTeam(CClientManager* pManager, ElementID ID, const char* szName = NULL, std::uint8_t ucRed = 0, std::uint8_t ucGreen = 0,
+                std::uint8_t ucBlue = 0);
     ~CClientTeam();
 
     eClientEntityType GetType() const { return CCLIENTTEAM; }
 
     void Unlink();
 
-    unsigned char GetID() { return m_ucID; }
+    std::uint8_t GetID() { return m_ucID; }
 
     const char* GetTeamName() { return m_strTeamName; }
     void        SetTeamName(const char* szName);
 
-    void GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
-    void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
+    void GetColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue);
+    void SetColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue);
 
     bool GetFriendlyFire() { return m_bFriendlyFire; }
     void SetFriendlyFire(bool bFriendlyFire) { m_bFriendlyFire = bFriendlyFire; }
@@ -53,17 +53,17 @@ public:
     void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; }
     void SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; }
 
-    unsigned int CountPlayers() { return static_cast<unsigned int>(m_List.size()); }
+    std::uint32_t CountPlayers() { return static_cast<std::uint32_t>(m_List.size()); }
 
 protected:
     CClientTeamManager* m_pTeamManager;
 
-    unsigned char m_ucID;
+    std::uint8_t m_ucID;
     SString       m_strTeamName;
 
-    unsigned char m_ucRed;
-    unsigned char m_ucGreen;
-    unsigned char m_ucBlue;
+    std::uint8_t m_ucRed;
+    std::uint8_t m_ucGreen;
+    std::uint8_t m_ucBlue;
 
     bool m_bFriendlyFire;
 

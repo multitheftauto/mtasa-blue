@@ -26,7 +26,7 @@ CClientCorona::CClientCorona(CClientMarker* pThis)
     m_bReflectionEnabled = false;
 
     // Pick an unique identifier
-    static unsigned long ulIdentifier = 0xFFFFFFFF;
+    static std::uint32_t ulIdentifier = 0xFFFFFFFF;
     m_ulIdentifier = --ulIdentifier;
 }
 

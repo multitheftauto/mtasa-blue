@@ -40,9 +40,9 @@ private:
     CVector             m_vecPosition;
 
 public:
-    unsigned char  m_ucSize;
-    unsigned char  m_ucIcon;
+    std::uint8_t  m_ucSize;
+    std::uint8_t  m_ucIcon;
     SColor         m_Color;
     short          m_sOrdering;
-    unsigned short m_usVisibleDistance;
+    std::uint16_t m_usVisibleDistance;
 };

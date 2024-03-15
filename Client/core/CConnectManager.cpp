@@ -46,7 +46,7 @@ CConnectManager::~CConnectManager()
     g_pConnectManager = NULL;
 }
 
-bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser)
+bool CConnectManager::Connect(const char* szHost, std::uint16_t usPort, const char* szNick, const char* szPassword, bool bNotifyServerBrowser)
 {
     assert(szHost);
     assert(szNick);
@@ -151,10 +151,10 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
     return true;
 }
 
-bool CConnectManager::Reconnect(const char* szHost, unsigned short usPort, const char* szPassword, bool bSave)
+bool CConnectManager::Reconnect(const char* szHost, std::uint16_t usPort, const char* szPassword, bool bSave)
 {
     // Use previous connection datum when function arguments are not set
-    unsigned int uiPort = 0;
+    std::uint32_t uiPort = 0;
     CVARS_GET("host", m_strHost);
     CVARS_GET("port", uiPort);
     m_usPort = uiPort;
@@ -266,7 +266,7 @@ void CConnectManager::DoPulse()
         else
         {
             // Some error?
-            unsigned char ucError = CCore::GetSingleton().GetNetwork()->GetConnectionError();
+            std::uint8_t ucError = CCore::GetSingleton().GetNetwork()->GetConnectionError();
             if (ucError != 0)
             {
                 SString strError;
@@ -342,7 +342,7 @@ void CConnectManager::DoPulse()
     }
 }
 
-bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& BitStream)
+bool CConnectManager::StaticProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& BitStream)
 {
     // We're working on connecting?
     if (g_pConnectManager->m_bIsConnecting)
@@ -353,7 +353,7 @@ bool CConnectManager::StaticProcessPacket(unsigned char ucPacketID, NetBitStream
         if (ucPacketID == PACKET_ID_MOD_NAME)
         {
             // Read packet data
-            unsigned short usServerBitStreamVersion = 0x01;
+            std::uint16_t usServerBitStreamVersion = 0x01;
             BitStream.Read(usServerBitStreamVersion);
 
             SString strModName;

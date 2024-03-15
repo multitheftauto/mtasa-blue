@@ -94,7 +94,7 @@ public:
     LUA_DECLARE(SetPedControlState);
     LUA_DECLARE(SetPedAnalogControlState);
     LUA_DECLARE(SetPedDoingGangDriveby);
-    static bool SetPedFightingStyle(CClientEntity* const entity, const unsigned int style);
+    static bool SetPedFightingStyle(CClientEntity* const entity, const std::uint32_t style);
     LUA_DECLARE(SetPedLookAt);
     LUA_DECLARE(SetPedHeadless);
     LUA_DECLARE(SetPedFrozen);

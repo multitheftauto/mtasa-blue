@@ -60,8 +60,8 @@ public:
     CClock* GetServerClock() { return m_pServerClock; }
 
     void SpawnPlayers();
-    void SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior = 0,
-                     unsigned short usDimension = 0, CTeam* pTeam = NULL);
+    void SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float fRotation, std::uint16_t usModel, std::uint8_t ucInterior = 0,
+                     std::uint16_t usDimension = 0, CTeam* pTeam = NULL);
 
     void DoRespawning();
     void DoPickupRespawning();
@@ -98,7 +98,7 @@ private:
 
     CDummy* m_pRootElement;
 
-    long long m_llLastRespawnTime;
+    std::int64_t m_llLastRespawnTime;
 
     CBlendedWeather* m_pBlendedWeather;
 };

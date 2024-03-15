@@ -23,7 +23,7 @@ CPedManager::~CPedManager()
     DeleteAll();
 }
 
-CPed* CPedManager::Create(unsigned short usModel, CElement* pParent)
+CPed* CPedManager::Create(std::uint16_t usModel, CElement* pParent)
 {
     CPed* const pPed = new CPed(this, pParent, usModel);
 
@@ -72,7 +72,7 @@ bool CPedManager::Exists(CPed* pPed)
     return ListContains(m_List, pPed);
 }
 
-bool CPedManager::IsValidModel(unsigned short usModel)
+bool CPedManager::IsValidModel(std::uint16_t usModel)
 {
     return true;
 }

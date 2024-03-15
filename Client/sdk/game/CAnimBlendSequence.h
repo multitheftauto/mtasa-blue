@@ -24,7 +24,7 @@ public:
     virtual uint32_t                       GetHash() = 0;
     virtual uint16_t                       GetBoneTag() = 0;
     virtual BYTE*                          GetKeyFrames() = 0;
-    virtual unsigned short                 GetKeyFramesCount() = 0;
+    virtual std::uint16_t                 GetKeyFramesCount() = 0;
     virtual bool                           IsBigChunkForAllSequences() = 0;
     virtual void                           CopySequenceProperties(CAnimBlendSequenceSAInterface* pAnimSequenceInterface) = 0;
     virtual CAnimBlendSequenceSAInterface* GetInterface() = 0;

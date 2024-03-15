@@ -36,7 +36,7 @@ CClientCheckpoint::~CClientCheckpoint()
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pThis, NULL);
 }
 
-unsigned long CClientCheckpoint::GetCheckpointType() const
+std::uint32_t CClientCheckpoint::GetCheckpointType() const
 {
     switch (m_dwType)
     {
@@ -53,10 +53,10 @@ unsigned long CClientCheckpoint::GetCheckpointType() const
     }
 }
 
-void CClientCheckpoint::SetCheckpointType(unsigned long ulType)
+void CClientCheckpoint::SetCheckpointType(std::uint32_t ulType)
 {
     // Set the type
-    unsigned long ulNewType;
+    std::uint32_t ulNewType;
     switch (ulType)
     {
         case CClientCheckpoint::TYPE_NORMAL:
@@ -106,7 +106,7 @@ void CClientCheckpoint::SetCheckpointType(unsigned long ulType)
 bool CClientCheckpoint::IsHit(const CVector& vecPosition) const
 {
     // Grab the type and do a 2D or 3D distance check depending on what type it is
-    unsigned long ulType = GetCheckpointType();
+    std::uint32_t ulType = GetCheckpointType();
     if (ulType == CClientCheckpoint::TYPE_NORMAL)
     {
         return IsPointNearPoint2D(m_Matrix.vPos, vecPosition, m_fSize + 4);
@@ -200,7 +200,7 @@ void CClientCheckpoint::SetVisible(bool bVisible)
     m_bVisible = bVisible;
 }
 
-void CClientCheckpoint::SetIcon(unsigned int uiIcon)
+void CClientCheckpoint::SetIcon(std::uint32_t uiIcon)
 {
     // Different from our current icon?
     if (m_uiIcon != uiIcon)
@@ -212,7 +212,7 @@ void CClientCheckpoint::SetIcon(unsigned int uiIcon)
         if (GetCheckpointType() == CClientCheckpoint::TYPE_NORMAL)
         {
             // Update the type
-            unsigned long ulNewType;
+            std::uint32_t ulNewType;
             switch (uiIcon)
             {
                 case CClientCheckpoint::ICON_NONE:
@@ -265,7 +265,7 @@ void CClientCheckpoint::SetSize(float fSize)
     }
 }
 
-unsigned char CClientCheckpoint::StringToIcon(const char* szString)
+std::uint8_t CClientCheckpoint::StringToIcon(const char* szString)
 {
     if (stricmp(szString, "none") == 0)
     {
@@ -285,7 +285,7 @@ unsigned char CClientCheckpoint::StringToIcon(const char* szString)
     }
 }
 
-bool CClientCheckpoint::IconToString(unsigned char ucIcon, SString& strOutString)
+bool CClientCheckpoint::IconToString(std::uint8_t ucIcon, SString& strOutString)
 {
     switch (ucIcon)
     {
@@ -328,13 +328,13 @@ void CClientCheckpoint::StreamOut()
     m_bStreamedIn = false;
 }
 
-void CClientCheckpoint::Create(unsigned long ulIdentifier)
+void CClientCheckpoint::Create(std::uint32_t ulIdentifier)
 {
     // If the item already exists, don't create it
     if (!m_pCheckpoint)
     {
         // Generate an identifier (TODO: Move identifier stuff to game layer)
-        static unsigned long s_ulIdentifier = 128;
+        static std::uint32_t s_ulIdentifier = 128;
         if (ulIdentifier == 0)
         {
             s_ulIdentifier++;

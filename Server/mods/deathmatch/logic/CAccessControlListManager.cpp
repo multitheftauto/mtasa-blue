@@ -85,8 +85,8 @@ bool CAccessControlListManager::Load()
 
     // load the acl's
     CXMLNode*    pSubNode = NULL;
-    unsigned int uiSubNodesCount = m_pRootNode->GetSubNodeCount();
-    for (unsigned int i = 0; i < uiSubNodesCount; i++)
+    std::uint32_t uiSubNodesCount = m_pRootNode->GetSubNodeCount();
+    for (std::uint32_t i = 0; i < uiSubNodesCount; i++)
     {
         pSubNode = m_pRootNode->GetSubNode(i);
         if (!pSubNode)
@@ -100,8 +100,8 @@ bool CAccessControlListManager::Load()
                 CAccessControlList* pACL = AddACL(pAttribute->GetValue().c_str());
 
                 CXMLNode*    pSubSubNode = NULL;
-                unsigned int uiSubSubNodesCount = pSubNode->GetSubNodeCount();
-                for (unsigned int j = 0; j < uiSubSubNodesCount; j++)
+                std::uint32_t uiSubSubNodesCount = pSubNode->GetSubNodeCount();
+                for (std::uint32_t j = 0; j < uiSubSubNodesCount; j++)
                 {
                     // If this subnode doesn't exist, return to the for loop and continue it
                     pSubSubNode = pSubNode->GetSubNode(j);
@@ -165,7 +165,7 @@ bool CAccessControlListManager::Load()
     // Load the groups
     pSubNode = NULL;
     uiSubNodesCount = m_pRootNode->GetSubNodeCount();
-    for (unsigned int i = 0; i < uiSubNodesCount; i++)
+    for (std::uint32_t i = 0; i < uiSubNodesCount; i++)
     {
         pSubNode = m_pRootNode->GetSubNode(i);
         if (!pSubNode)
@@ -179,8 +179,8 @@ bool CAccessControlListManager::Load()
                 CAccessControlListGroup* pGroup = AddGroup(pAttribute->GetValue().c_str());
 
                 CXMLNode*    pSubSubNode = NULL;
-                unsigned int uiSubSubNodesCount = pSubNode->GetSubNodeCount();
-                for (unsigned int j = 0; j < uiSubSubNodesCount; j++)
+                std::uint32_t uiSubSubNodesCount = pSubNode->GetSubNodeCount();
+                for (std::uint32_t j = 0; j < uiSubSubNodesCount; j++)
                 {
                     pSubSubNode = pSubNode->GetSubNode(j);
                     if (!pSubSubNode)

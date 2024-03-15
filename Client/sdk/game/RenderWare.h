@@ -22,7 +22,7 @@
     #define RWFORCEENUMSIZEINT ((std::int32_t)((~((std::uint32_t)0)) >> 1))
 #endif
 #define RWPLUGINOFFSET(_type, _base, _offset) ((_type*)((std::uint8_t*)(_base) + (_offset)))
-#define RW_STRUCT_ALIGN           ((int)((~((unsigned int)0))>>1))
+#define RW_STRUCT_ALIGN           ((int)((~((std::uint32_t)0))>>1))
 #define RW_TEXTURE_NAME_LENGTH    32
 #define RW_FRAME_NAME_LENGTH      23
 #define RW_MAX_TEXTURE_COORDS     8
@@ -203,17 +203,17 @@ enum RpLightFlags
 // RenderWare/plugin base types
 struct RwObject
 {
-    unsigned char type;
-    unsigned char subtype;
-    unsigned char flags;
-    unsigned char privateFlags;
+    std::uint8_t type;
+    std::uint8_t subtype;
+    std::uint8_t flags;
+    std::uint8_t privateFlags;
     void*         parent;            // should be RwFrame with RpClump
 };
 struct RwVertex
 {
     RwV3d        position;
     RwV3d        normal;
-    unsigned int color;
+    std::uint32_t color;
     float        u, v;
 };
 struct RwListEntry
@@ -236,7 +236,7 @@ struct RwFrame
     struct RwFrame* root;                   // 64
 
     // Rockstar Frame extension (0x253F2FE) (24 bytes)
-    unsigned char pluginData[8];                               // padding
+    std::uint8_t pluginData[8];                               // padding
     char          szName[RW_FRAME_NAME_LENGTH + 1];            // name (as stored in the frame extension)
 };
 struct RwTexDictionary
@@ -252,7 +252,7 @@ struct RwTexture
     RwListEntry      TXDList;
     char             name[RW_TEXTURE_NAME_LENGTH];
     char             mask[RW_TEXTURE_NAME_LENGTH];
-    unsigned int     flags;
+    std::uint32_t     flags;
     int              refs;
 };
 struct RwTextureCoordinates
@@ -262,16 +262,16 @@ struct RwTextureCoordinates
 struct RwRaster
 {
     RwRaster*      parent;                          // 0
-    unsigned char* pixels;                          // 4
-    unsigned char* palette;                         // 8
+    std::uint8_t* pixels;                          // 4
+    std::uint8_t* palette;                         // 8
     int            width, height, depth;            // 12, 16 / 0x10, 20
     int            numLevels;                       // 24 / 0x18
     short          u, v;
-    unsigned char  type;
-    unsigned char  flags;
-    unsigned char  privateFlags;
-    unsigned char  format;
-    unsigned char* origPixels;
+    std::uint8_t  type;
+    std::uint8_t  flags;
+    std::uint8_t  privateFlags;
+    std::uint8_t  format;
+    std::uint8_t* origPixels;
     int            origWidth, origHeight, origDepth;
     void*          renderResource;            // RwD3D9Raster continues from here
 };
@@ -281,7 +281,7 @@ struct RwColorFloat
 };
 struct RwColor
 {
-    unsigned char r, g, b, a;
+    std::uint8_t r, g, b, a;
 };
 struct RwObjectFrame
 {
@@ -292,8 +292,8 @@ struct RwObjectFrame
 struct RwCameraFrustum
 {
     RwPlane       plane;
-    unsigned char x, y, z;
-    unsigned char unknown1;
+    std::uint8_t x, y, z;
+    std::uint8_t unknown1;
 };
 struct RwCamera
 {
@@ -318,8 +318,8 @@ struct RwCamera
 };
 struct RwGeometry
 {
-    unsigned char  unknown1[14];
-    unsigned short refs;
+    std::uint8_t  unknown1[14];
+    std::uint16_t refs;
 };
 
 /* Interpolator flags */
@@ -350,8 +350,8 @@ struct RpAtomic
     RwListEntry      globalClumps;
     RpAtomicCallback renderCallback;
     RpInterpolator   interpolator;
-    unsigned short   frame;
-    unsigned short   unknown7;
+    std::uint16_t   frame;
+    std::uint16_t   unknown7;
     RwList           sectors;
     void*            render;
 };
@@ -368,8 +368,8 @@ struct RpLight
     float          unknown1;
     RwList         sectors;
     RwListEntry    globalLights;
-    unsigned short frame;
-    unsigned short unknown2;
+    std::uint16_t frame;
+    std::uint16_t unknown2;
 };
 struct RpClump
 {            // RenderWare (plugin) Clump (used by GTA)
@@ -401,8 +401,8 @@ struct RpMaterials
 };
 struct RpTriangle
 {
-    unsigned short verts[3];
-    unsigned short materialId;
+    std::uint16_t verts[3];
+    std::uint16_t materialId;
 };
 struct RpMorphTarget
 {
@@ -414,8 +414,8 @@ struct RpMorphTarget
 struct RpGeometry
 {
     RwObject       object;
-    unsigned int   flags;
-    unsigned short unknown1;
+    std::uint32_t   flags;
+    std::uint16_t unknown1;
     short          refs;
 
     int triangles_size;
@@ -464,9 +464,9 @@ inline void _rpAtomicResyncInterpolatedSphere(RpAtomic* atomic) {
 
 // RenderWare type definitions
 typedef int (*RwIOCallbackClose)(void* data);
-typedef unsigned int (*RwIOCallbackRead)(void* data, void* buffer, unsigned int length);
-typedef int (*RwIOCallbackWrite)(void* data, const void* buffer, unsigned int length);
-typedef int (*RwIOCallbackOther)(void* data, unsigned int offset);
+typedef std::uint32_t (*RwIOCallbackRead)(void* data, void* buffer, std::uint32_t length);
+typedef int (*RwIOCallbackWrite)(void* data, const void* buffer, std::uint32_t length);
+typedef int (*RwIOCallbackOther)(void* data, std::uint32_t offset);
 
 // RenderWare enumerations
 enum RwStreamType
@@ -491,14 +491,14 @@ enum RwStreamMode
 struct RwBuffer
 {
     void*        ptr;
-    unsigned int size;
+    std::uint32_t size;
 };
 union RwStreamTypeData
 {
     struct
     {
-        unsigned int position;
-        unsigned int size;
+        std::uint32_t position;
+        std::uint32_t size;
         void*        ptr_file;
     };
     struct

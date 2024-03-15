@@ -87,12 +87,12 @@ enum eDeathAnims
 
 struct SDelayedSyncData
 {
-    unsigned long    ulTime;
-    unsigned char    ucType;
+    std::uint32_t    ulTime;
+    std::uint8_t    ucType;
     CControllerState State;
     bool             bDucking;
     eWeaponSlot      slot;
-    unsigned short   usWeaponAmmo;
+    std::uint16_t   usWeaponAmmo;
     CVector          vecTarget;
     bool             bUseSource;
     CVector          vecSource;
@@ -148,7 +148,7 @@ struct SAnimationCache
 
 class CClientObject;
 
-// To hide the ugly "pointer truncation from DWORD* to unsigned long warning
+// To hide the ugly "pointer truncation from DWORD* to std::uint32_t warning
 #pragma warning(disable:4311)
 
 class CClientPed : public CClientStreamElement, public CAntiCheatModule
@@ -162,7 +162,7 @@ class CClientPed : public CClientStreamElement, public CAntiCheatModule
     friend class CClientPedManager;
 
 public:
-    CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID);
+    CClientPed(CClientManager* pManager, std::uint32_t ulModelID, ElementID ID);
     ~CClientPed();
 
     void Unlink(){};
@@ -185,7 +185,7 @@ public:
     void SetPosition(const CVector& vecPosition) { SetPosition(vecPosition, true, true); }
     void SetPosition(const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze = true);
 
-    void SetInterior(unsigned char ucInterior);
+    void SetInterior(std::uint8_t ucInterior);
 
     void GetRotationDegrees(CVector& vecRotation) const;
     void GetRotationRadians(CVector& vecRotation) const;
@@ -203,14 +203,14 @@ public:
     // This function spawns/respawns this ped in any location. This will force a recreation
     // and restoration of initial state. This will also remove all weapons, unfreeze,
     // remove jetpack, etc...
-    void Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior);
+    void Spawn(const CVector& vecPosition, float fRotation, std::uint16_t usModel, std::uint8_t ucInterior);
 
     void ResetInterpolation();
 
     float GetCurrentRotation();
     void  SetCurrentRotation(float fRotation, bool bIncludeTarget = true);
     void  SetTargetRotation(float fRotation);
-    void  SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation);
+    void  SetTargetRotation(std::uint32_t ulDelay, float fRotation, float fCameraRotation);
 
     float GetCameraRotation();
     void  SetCameraRotation(float fRotation);
@@ -225,37 +225,37 @@ public:
     void GetLastControllerState(CControllerState& ControllerState);
     void SetControllerState(const CControllerState& ControllerState);
 
-    void AddKeysync(unsigned long ulDelay, const CControllerState& ControllerState, bool bDucking);
-    void AddChangeWeapon(unsigned long ulDelay, eWeaponSlot slot, unsigned short usWeaponAmmo);
-    void AddMoveSpeed(unsigned long ulDelay, const CVector& vecMoveSpeed);
+    void AddKeysync(std::uint32_t ulDelay, const CControllerState& ControllerState, bool bDucking);
+    void AddChangeWeapon(std::uint32_t ulDelay, eWeaponSlot slot, std::uint16_t usWeaponAmmo);
+    void AddMoveSpeed(std::uint32_t ulDelay, const CVector& vecMoveSpeed);
 
-    void SetTargetTarget(unsigned long ulDelay, const CVector& vecSource, const CVector& vecTarget);
+    void SetTargetTarget(std::uint32_t ulDelay, const CVector& vecSource, const CVector& vecTarget);
 
     int  GetVehicleInOutState() { return m_iVehicleInOutState; };
     void SetVehicleInOutState(int iState) { m_iVehicleInOutState = iState; };
 
-    unsigned long GetModel() { return m_ulModel; };
-    bool          SetModel(unsigned long ulModel, bool bTemp = false);
+    std::uint32_t GetModel() { return m_ulModel; };
+    bool          SetModel(std::uint32_t ulModel, bool bTemp = false);
 
     bool GetCanBeKnockedOffBike();
     void SetCanBeKnockedOffBike(bool bCanBeKnockedOffBike);
 
     bool            IsInVehicle() { return GetOccupiedVehicle() != NULL; };
     CClientVehicle* GetOccupiedVehicle() { return m_pOccupiedVehicle; };
-    unsigned int    GetOccupiedVehicleSeat() { return m_uiOccupiedVehicleSeat; };
+    std::uint32_t    GetOccupiedVehicleSeat() { return m_uiOccupiedVehicleSeat; };
     CClientVehicle* GetOccupyingVehicle() { return m_pOccupyingVehicle; };
 
     CClientVehicle* GetRealOccupiedVehicle();
     CClientVehicle* GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
-                                               bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL,
+                                               bool bCheckStreamedOutVehicles, std::uint32_t* uiClosestDoor = NULL, CVector* pClosestDoorPosition = NULL,
                                                float fWithinRange = 6000.0f);
-    bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, unsigned int& uiClosestDoor,
+    bool            GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor, bool bCheckPassengerDoors, std::uint32_t& uiClosestDoor,
                                    CVector* pClosestDoorPosition = NULL);
 
-    void GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0, unsigned char ucDoor = 0);
-    void GetOutOfVehicle(unsigned char ucDoor);
+    void GetIntoVehicle(CClientVehicle* pVehicle, std::uint32_t uiSeat = 0, std::uint8_t ucDoor = 0);
+    void GetOutOfVehicle(std::uint8_t ucDoor);
 
-    void            WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0);
+    void            WarpIntoVehicle(CClientVehicle* pVehicle, std::uint32_t uiSeat = 0);
     CClientVehicle* RemoveFromVehicle(bool bIgnoreIfGettingOut = false);
 
     bool IsVisible();
@@ -282,7 +282,7 @@ public:
     bool IsDying();
     bool IsDead();
     void SetIsDead(bool bDead) { m_bDead = bDead; };
-    void Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0,
+    void Kill(eWeaponType weaponType, std::uint8_t ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0,
               AnimationId animID = 15);
     void StealthKill(CClientPed* pPed);
     void BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
@@ -290,7 +290,7 @@ public:
     int  GetRespawnState() { return m_pRespawnState; };
     void SetRespawnState(int iRespawnState) { m_pRespawnState = iRespawnState; };
 
-    CWeapon*    GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent = false);
+    CWeapon*    GiveWeapon(eWeaponType weaponType, std::uint32_t uiAmmo, bool bSetAsCurrent = false);
     bool        SetCurrentWeaponSlot(eWeaponSlot weaponSlot);
     eWeaponSlot GetCurrentWeaponSlot();
     eWeaponType GetCurrentWeaponType();
@@ -332,8 +332,8 @@ public:
     const CVector&       GetAimTarget() { return m_shotSyncData->m_vecShotTarget; };
     eVehicleAimDirection GetVehicleAimAnim() { return m_shotSyncData->m_cInVehicleAimDirection; };
     void                 SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimDirection cInVehicleAimAnim);
-    void SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim);
-    void SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY,
+    void SetAimInterpolated(std::uint32_t ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp, eVehicleAimDirection cInVehicleAimAnim);
+    void SetAimingData(std::uint32_t ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY,
                        eVehicleAimDirection cInVehicleAimAnim, CVector* pSource, bool bInterpolateAim);
 
     void Duck(bool bDuck);
@@ -352,8 +352,8 @@ public:
 
     void  RebuildModel(bool bDelayChange = false);
     void  ProcessRebuildPlayer(bool bNeedsClothesUpdate);
-    void  SetStat(unsigned short usStat, float fValue);
-    float GetStat(unsigned short usStat);
+    void  SetStat(std::uint16_t usStat, float fValue);
+    float GetStat(std::uint16_t usStat);
     void  ResetStats();
 
     CClientPlayerClothes* GetClothes() { return m_pClothes; }
@@ -378,8 +378,8 @@ public:
     bool          IsRadioOn() { return m_bRadioOn; };
     void          NextRadioChannel();
     void          PreviousRadioChannel();
-    bool          SetCurrentRadioChannel(unsigned char ucChannel);
-    unsigned char GetCurrentRadioChannel() { return m_ucRadioChannel; };
+    bool          SetCurrentRadioChannel(std::uint8_t ucChannel);
+    std::uint8_t GetCurrentRadioChannel() { return m_ucRadioChannel; };
 
     CTaskManager* GetTaskManager() { return m_pTaskManager; }
 
@@ -397,7 +397,7 @@ public:
     void                                    RemoveProjectile(CClientProjectile* pProjectile) { m_Projectiles.remove(pProjectile); }
     std::list<CClientProjectile*>::iterator ProjectilesBegin() { return m_Projectiles.begin(); }
     std::list<CClientProjectile*>::iterator ProjectilesEnd() { return m_Projectiles.end(); }
-    unsigned int                            CountProjectiles(eWeaponType weaponType = WEAPONTYPE_UNARMED);
+    std::uint32_t                            CountProjectiles(eWeaponType weaponType = WEAPONTYPE_UNARMED);
 
     void RemoveAllProjectiles();
     void DestroySatchelCharges(bool bBlow = true, bool bDestroy = true);
@@ -416,13 +416,13 @@ public:
 
     float GetDistanceFromCentreOfMassToBaseOfModel();
 
-    unsigned char GetAlpha() { return m_ucAlpha; }
-    void          SetAlpha(unsigned char ucAlpha);
+    std::uint8_t GetAlpha() { return m_ucAlpha; }
+    void          SetAlpha(std::uint8_t ucAlpha);
 
     bool           HasTargetPosition() { return (m_interp.pos.ulFinishTime != 0); }
     CClientEntity* GetTargetOriginSource() { return m_interp.pTargetOriginSource; }
     void           GetTargetPosition(CVector& vecPosition);
-    void           SetTargetPosition(const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource = NULL);
+    void           SetTargetPosition(const CVector& vecPosition, std::uint32_t ulDelay, CClientEntity* pTargetOriginSource = NULL);
     void           RemoveTargetPosition();
     void           UpdateTargetPosition();
     void           UpdateUnderFloorFix(const CVector& vecTargetPosition, const CVector& vecOrigin);
@@ -440,7 +440,7 @@ public:
     bool UseGun(CVector vecTarget, CClientEntity* pEntity);
 
     bool               IsAttachToable();
-    static const char* GetBodyPartName(unsigned char ucID);
+    static const char* GetBodyPartName(std::uint8_t ucID);
 
     bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
@@ -521,8 +521,8 @@ public:
     void                SetNextAnimationNormal() { m_bisNextAnimationCustom = false; }
     const SString&      GetNextAnimationCustomBlockName() { return m_strCustomIFPBlockName; }
     const SString&      GetNextAnimationCustomName() { return m_strCustomIFPAnimationName; }
-    const unsigned int& GetCustomAnimationBlockNameHash() { return m_u32CustomBlockNameHash; }
-    const unsigned int& GetCustomAnimationNameHash() { return m_u32CustomAnimationNameHash; }
+    const std::uint32_t& GetCustomAnimationBlockNameHash() { return m_u32CustomBlockNameHash; }
+    const std::uint32_t& GetCustomAnimationNameHash() { return m_u32CustomAnimationNameHash; }
 
     void                ReplaceAnimation(std::unique_ptr<CAnimBlendHierarchy>& pInternalAnimHierarchy, const std::shared_ptr<CClientIFP>& pIFP,
                                          CAnimBlendHierarchySAInterface* pCustomAnimHierarchy);
@@ -536,9 +536,9 @@ public:
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
-    CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer);
+    CClientPed(CClientManager* pManager, std::uint32_t ulModelID, ElementID ID, bool bIsLocalPlayer);
 
-    void Init(CClientManager* pManager, unsigned long ulModelID, bool bIsLocalPlayer);
+    void Init(CClientManager* pManager, std::uint32_t ulModelID, bool bIsLocalPlayer);
 
     void StreamedInPulse(bool bDoStandardPulses);
     void ApplyControllerStateFixes(CControllerState& Current);
@@ -570,7 +570,7 @@ protected:
     bool m_bDontChangeRadio;
 
 public:
-    void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
+    void _GetIntoVehicle(CClientVehicle* pVehicle, std::uint32_t uiSeat, std::uint8_t ucDoor);
     // Used to control and sync entering/exiting
     bool EnterVehicle(CClientVehicle* pVehicle, bool bPassenger);
     bool ExitVehicle();
@@ -596,17 +596,17 @@ public:
     CPad*                       m_pPad;
     bool                        m_bIsLocalPlayer;
     int                         m_pRespawnState;
-    unsigned long               m_ulModel;
+    std::uint32_t               m_ulModel;
     CMatrix                     m_matFrozen;
     bool                        m_bRadioOn;
-    unsigned char               m_ucRadioChannel;
+    std::uint8_t               m_ucRadioChannel;
     bool                        m_bHealthLocked;
     bool                        m_bArmorLocked;
-    unsigned long               m_ulLastOnScreenTime;
+    std::uint32_t               m_ulLastOnScreenTime;
     CClientVehiclePtr           m_pOccupiedVehicle;
     CClientVehiclePtr           m_pOccupyingVehicle;
-    // unsigned int                m_uiOccupyingSeat;
-    unsigned int      m_uiOccupiedVehicleSeat;
+    // std::uint32_t                m_uiOccupyingSeat;
+    std::uint32_t      m_uiOccupiedVehicleSeat;
     bool              m_bForceGettingIn;
     bool              m_bForceGettingOut;
     CShotSyncData*    m_shotSyncData;
@@ -616,16 +616,16 @@ public:
     CControllerState m_rawControllerState;            // copy of lastControllerState before CClientPed::ApplyControllerStateFixes is applied (modifies states to
                                                       // prevent stuff like rapid input glitch)
     CRemoteDataStorage*                      m_remoteDataStorage;
-    unsigned long                            m_ulLastTimeFired;
-    unsigned long                            m_ulLastTimeBeganAiming;
-    unsigned long                            m_ulLastTimeEndedAiming;
-    unsigned long                            m_ulLastTimeBeganCrouch;
-    unsigned long                            m_ulLastTimeBeganStand;
-    unsigned long                            m_ulLastTimeMovedWhileCrouched;
-    unsigned long                            m_ulLastTimePressedLeftOrRight;
-    unsigned long                            m_ulLastTimeUseGunCrouched;
-    unsigned long                            m_ulLastTimeSprintPressed;
-    unsigned long                            m_ulBlockSprintReleaseTime;
+    std::uint32_t                            m_ulLastTimeFired;
+    std::uint32_t                            m_ulLastTimeBeganAiming;
+    std::uint32_t                            m_ulLastTimeEndedAiming;
+    std::uint32_t                            m_ulLastTimeBeganCrouch;
+    std::uint32_t                            m_ulLastTimeBeganStand;
+    std::uint32_t                            m_ulLastTimeMovedWhileCrouched;
+    std::uint32_t                            m_ulLastTimePressedLeftOrRight;
+    std::uint32_t                            m_ulLastTimeUseGunCrouched;
+    std::uint32_t                            m_ulLastTimeSprintPressed;
+    std::uint32_t                            m_ulBlockSprintReleaseTime;
     bool                                     m_bWasSprintButtonDown;
     CModelInfo*                              m_pLoadedModelInfo;
     eWeaponSlot                              m_pOutOfVehicleWeaponSlot;
@@ -633,17 +633,17 @@ public:
     float                                    m_fBeginAimY;
     float                                    m_fTargetAimX;
     float                                    m_fTargetAimY;
-    unsigned long                            m_ulBeginAimTime;
-    unsigned long                            m_ulTargetAimTime;
+    std::uint32_t                            m_ulBeginAimTime;
+    std::uint32_t                            m_ulTargetAimTime;
     bool                                     m_bTargetAkimboUp;
-    unsigned long                            m_ulBeginRotationTime;
-    unsigned long                            m_ulEndRotationTime;
+    std::uint32_t                            m_ulBeginRotationTime;
+    std::uint32_t                            m_ulEndRotationTime;
     float                                    m_fBeginRotation;
     float                                    m_fTargetRotationA;
     float                                    m_fBeginCameraRotation;
     float                                    m_fTargetCameraRotation;
-    unsigned long                            m_ulBeginTarget;
-    unsigned long                            m_ulEndTarget;
+    std::uint32_t                            m_ulBeginTarget;
+    std::uint32_t                            m_ulEndTarget;
     CVector                                  m_vecBeginSource;
     CVector                                  m_vecBeginTarget;
     CVector                                  m_vecBeginTargetAngle;
@@ -678,7 +678,7 @@ public:
     eFightingStyle                           m_FightingStyle;
     eMoveAnim                                m_MoveAnim;
     std::list<CClientProjectile*>            m_Projectiles;
-    unsigned char                            m_ucAlpha;
+    std::uint8_t                            m_ucAlpha;
     float                                    m_fTargetRotation;
     int                                      m_iVehicleInOutState;
     bool                                     m_bRecreatingModel;
@@ -702,8 +702,8 @@ public:
     bool                                     m_bSpeechEnabled;
     bool                                     m_bStealthAiming;
     float                                    m_fLighting;
-    unsigned char                            m_ucEnteringDoor;
-    unsigned char                            m_ucLeavingDoor;
+    std::uint8_t                            m_ucEnteringDoor;
+    std::uint8_t                            m_ucLeavingDoor;
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
@@ -719,8 +719,8 @@ public:
         {
             CVector       vecTarget;
             CVector       vecError;
-            unsigned long ulStartTime;
-            unsigned long ulFinishTime;
+            std::uint32_t ulStartTime;
+            std::uint32_t ulFinishTime;
             float         fLastAlpha;
         } pos;
 
@@ -733,7 +733,7 @@ public:
     } m_interp;
 
     // Hacks for player model replacement and weapon model replacement respectively
-    unsigned long                 m_ulStoredModel;
+    std::uint32_t                 m_ulStoredModel;
     std::list<SRestoreWeaponItem> m_RestoreWeaponList;
 
     CVector m_vecPrevTargetPosition;
@@ -745,8 +745,8 @@ public:
     bool                        m_bisCurrentAnimationCustom;
     SString                     m_strCustomIFPBlockName;
     SString                     m_strCustomIFPAnimationName;
-    unsigned int                m_u32CustomBlockNameHash;
-    unsigned int                m_u32CustomAnimationNameHash;
+    std::uint32_t                m_u32CustomBlockNameHash;
+    std::uint32_t                m_u32CustomAnimationNameHash;
     CIFPAnimations*             m_pIFPAnimations;
     std::shared_ptr<CClientIFP> m_pCustomAnimationIFP;
 
@@ -757,13 +757,13 @@ public:
     bool              m_bWarpInToVehicleRequired = false;
 
     // Enter/exit variables
-    unsigned long m_ulLastVehicleInOutTime;            // Last tick where we sent an enter/exit request
+    std::uint32_t m_ulLastVehicleInOutTime;            // Last tick where we sent an enter/exit request
     bool          m_bIsGettingOutOfVehicle;            // Indicates we are exiting a vehicle
     bool          m_bIsGettingIntoVehicle;             // Indicates we are entering a vehicle
     bool          m_bIsJackingVehicle;                 // Indicates we are jacking a vehicle
     bool          m_bIsGettingJacked;                  // Indicates we are getting jacked
     ElementID     m_VehicleInOutID;                    // ElementID of vehicle received from server
-    unsigned char m_ucVehicleInOutSeat;                // Seat ID we are entering/exiting received from server
+    std::uint8_t m_ucVehicleInOutSeat;                // Seat ID we are entering/exiting received from server
     bool          m_bNoNewVehicleTask;                 // When set, we are not allowed to initiate a new enter/exit task because we are waiting for server reply
     ElementID     m_NoNewVehicleTaskReasonID;            // ElementID of the vehicle that we are waiting on
     CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us

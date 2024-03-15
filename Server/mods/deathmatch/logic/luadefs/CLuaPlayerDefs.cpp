@@ -447,7 +447,7 @@ int CLuaPlayerDefs::GetPlayerPing(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiPing;
+        std::uint32_t uiPing;
         if (CStaticFunctionDefinitions::GetPlayerPing(pPlayer, uiPing))
         {
             lua_pushnumber(luaVM, uiPing);
@@ -506,7 +506,7 @@ int CLuaPlayerDefs::GetPlayerWantedLevel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiWantedLevel;
+        std::uint32_t uiWantedLevel;
         if (CStaticFunctionDefinitions::GetPlayerWantedLevel(pPlayer, uiWantedLevel))
         {
             lua_pushnumber(luaVM, uiWantedLevel);
@@ -530,7 +530,7 @@ int CLuaPlayerDefs::GetAlivePlayers(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Add all alive players
-        unsigned int uiIndex = 0;
+        std::uint32_t uiIndex = 0;
 
         for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
         {
@@ -561,7 +561,7 @@ int CLuaPlayerDefs::GetDeadPlayers(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Add all dead players
-        unsigned int uiIndex = 0;
+        std::uint32_t uiIndex = 0;
 
         for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
         {
@@ -591,7 +591,7 @@ int CLuaPlayerDefs::GetPlayerIdleTime(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        long long llLastPositionChanged = pPlayer->GetPositionLastChanged();
+        std::int64_t llLastPositionChanged = pPlayer->GetPositionLastChanged();
         if (llLastPositionChanged == 0)
         {
             // DO NOT REMOVE THIS AND DEFAULT THE POSITION LAST CHANGED TO THE CURRENT TIME OR YOU WILL BREAK EVERYTHING.
@@ -688,7 +688,7 @@ int CLuaPlayerDefs::GetPlayerNametagColor(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucR, ucG, ucB;
+        std::uint8_t ucR, ucG, ucB;
         if (CStaticFunctionDefinitions::GetPlayerNametagColor(pPlayer, ucR, ucG, ucB))
         {
             lua_pushnumber(luaVM, ucR);
@@ -834,9 +834,9 @@ int CLuaPlayerDefs::SpawnPlayer(lua_State* luaVM)
     CPlayer*       pElement;
     CVector        vecPosition;
     float          fRotation;
-    unsigned long  ulModel;
-    unsigned char  ucInterior;
-    unsigned short usDimension;
+    std::uint32_t  ulModel;
+    std::uint8_t  ucInterior;
+    std::uint16_t usDimension;
     CTeam*         pTeam;
 
     CScriptArgReader argStream(luaVM);
@@ -945,9 +945,9 @@ int CLuaPlayerDefs::TakePlayerScreenShot(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPlayerDefs::SetPlayerScriptDebugLevel(CElement* const element, const std::variant<unsigned int, bool> variant)
+bool CLuaPlayerDefs::SetPlayerScriptDebugLevel(CElement* const element, const std::variant<std::uint32_t, bool> variant)
 {
-    unsigned int level;
+    std::uint32_t level;
     if (std::holds_alternative<bool>(variant))
     {
         // cant be a true bool
@@ -957,7 +957,7 @@ bool CLuaPlayerDefs::SetPlayerScriptDebugLevel(CElement* const element, const st
     }
     else
     {
-        level = std::get<unsigned int>(variant);
+        level = std::get<std::uint32_t>(variant);
         if (level > 3)
             throw std::invalid_argument("Invalid level (0-3)");
     }
@@ -967,7 +967,7 @@ bool CLuaPlayerDefs::SetPlayerScriptDebugLevel(CElement* const element, const st
 int CLuaPlayerDefs::SetPlayerWantedLevel(lua_State* luaVM)
 {
     CElement*    pElement;
-    unsigned int uiWantedLevel;
+    std::uint32_t uiWantedLevel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1047,9 +1047,9 @@ int CLuaPlayerDefs::SetPlayerNametagText(lua_State* luaVM)
 int CLuaPlayerDefs::SetPlayerNametagColor(lua_State* luaVM)
 {
     CElement*     pElement;
-    unsigned char ucR;
-    unsigned char ucG;
-    unsigned char ucB;
+    std::uint8_t ucR;
+    std::uint8_t ucG;
+    std::uint8_t ucB;
     bool          bRemoveOverride = false;
 
     CScriptArgReader argStream(luaVM);
@@ -1139,7 +1139,7 @@ int CLuaPlayerDefs::SetPlayerMuted(lua_State* luaVM)
 int CLuaPlayerDefs::SetPlayerBlurLevel(lua_State* luaVM)
 {
     CElement*     pElement;
-    unsigned char ucLevel;
+    std::uint8_t ucLevel;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1166,7 +1166,7 @@ int CLuaPlayerDefs::RedirectPlayer(lua_State* luaVM)
 {
     CPlayer*       pElement;
     SString        strHost;
-    unsigned short usPort;
+    std::uint16_t usPort;
     SString        strPassword;
 
     CScriptArgReader argStream(luaVM);
@@ -1225,7 +1225,7 @@ int CLuaPlayerDefs::GetPlayerBlurLevel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucLevel;
+        std::uint8_t ucLevel;
         if (CStaticFunctionDefinitions::GetPlayerBlurLevel(pPlayer, ucLevel))
         {
             lua_pushnumber(luaVM, ucLevel);
@@ -1323,7 +1323,7 @@ int CLuaPlayerDefs::GetRandomPlayer(lua_State* luaVM)
 
 int CLuaPlayerDefs::GetPlayerCount(lua_State* luaVM)
 {
-    unsigned int uiPlayerCount = CStaticFunctionDefinitions::GetPlayerCount();
+    std::uint32_t uiPlayerCount = CStaticFunctionDefinitions::GetPlayerCount();
 
     lua_pushnumber(luaVM, uiPlayerCount);
     return 1;
@@ -1333,8 +1333,8 @@ int CLuaPlayerDefs::GetPlayerCount(lua_State* luaVM)
 int CLuaPlayerDefs::SetPlayerAmmo(lua_State* luaVM)
 {
     CPlayer*       pElement;
-    unsigned char  ucSlot;
-    unsigned short usAmmo, usAmmoInClip;
+    std::uint8_t  ucSlot;
+    std::uint16_t usAmmo, usAmmoInClip;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -1454,7 +1454,7 @@ int CLuaPlayerDefs::ResendPlayerACInfo(lua_State* luaVM)
     return 1;
 }
 
-unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
+std::uint32_t CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
 {
     return player->GetScriptDebugLevel();
 }
@@ -1643,7 +1643,7 @@ int CLuaPlayerDefs::GetFunctionsBoundToKey(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Add all the bound functions to it
-        unsigned int                   uiIndex = 0;
+        std::uint32_t                   uiIndex = 0;
         std::list<CKeyBind*>::iterator iter = pPlayer->GetKeyBinds()->IterBegin();
         for (; iter != pPlayer->GetKeyBinds()->IterEnd(); ++iter)
         {
@@ -1894,7 +1894,7 @@ int CLuaPlayerDefs::ToggleAllControls(lua_State* luaVM)
 int CLuaPlayerDefs::PlaySoundFrontEnd(lua_State* luaVM)
 {
     CElement*     pElement;
-    unsigned char ucSound;
+    std::uint8_t ucSound;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -2104,7 +2104,7 @@ int CLuaPlayerDefs::PlayMissionAudio(lua_State* luaVM)
 {
     CElement*      pElement;
     CVector        vecPosition;
-    unsigned short usSlot;
+    std::uint16_t usSlot;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -2143,8 +2143,8 @@ int CLuaPlayerDefs::PlayMissionAudio(lua_State* luaVM)
 int CLuaPlayerDefs::PreloadMissionAudio(lua_State* luaVM)
 {
     CElement*      pElement;
-    unsigned short usSound;
-    unsigned short usSlot;
+    std::uint16_t usSound;
+    std::uint16_t usSlot;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

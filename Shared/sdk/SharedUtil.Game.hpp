@@ -12,10 +12,10 @@
 
 namespace SharedUtil
 {
-    unsigned char GetTrafficLightStateFromColors(TrafficLight::EColor eColorNS, TrafficLight::EColor eColorEW)
+    std::uint8_t GetTrafficLightStateFromColors(TrafficLight::EColor eColorNS, TrafficLight::EColor eColorEW)
     {
         // Get the state number
-        unsigned char ucState = 0;
+        std::uint8_t ucState = 0;
         switch (eColorEW)
         {
             case TrafficLight::RED:
@@ -101,7 +101,7 @@ namespace SharedUtil
         }
     }
 
-    void CVehicleColor::SetPaletteColors(unsigned char ucColor1, unsigned char ucColor2, unsigned char ucColor3, unsigned char ucColor4)
+    void CVehicleColor::SetPaletteColors(std::uint8_t ucColor1, std::uint8_t ucColor2, std::uint8_t ucColor3, std::uint8_t ucColor4)
     {
         if (m_ucPaletteColors[0] != ucColor1 || m_ucPaletteColors[1] != ucColor2 || m_ucPaletteColors[2] != ucColor3 || m_ucPaletteColors[3] != ucColor4)
         {

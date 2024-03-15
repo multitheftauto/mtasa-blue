@@ -60,7 +60,7 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
     m_FxEffectNames["reverb"] = BASS_FX_DX8_REVERB;
 
     // Validate audio container on startup
-    for (int i = 0; i < 9; i++)
+    for (auto i = 0; i < 9; i++)
     {
         m_aValidatedSFX[i] = g_pGame->GetAudioContainer()->ValidateContainer(static_cast<eAudioLookupIndex>(i));
     }
@@ -121,7 +121,7 @@ void CClientSoundManager::DoPulse()
     ProcessStopQueues();
 }
 
-void CClientSoundManager::SetDimension(unsigned short usDimension)
+void CClientSoundManager::SetDimension(std::uint16_t usDimension)
 {
     m_usDimension = usDimension;
 }
@@ -149,7 +149,7 @@ CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIs
     return NULL;
 }
 
-CClientSound* CClientSoundManager::PlaySound2D(void* pMemory, unsigned int uiLength, bool bLoop)
+CClientSound* CClientSoundManager::PlaySound2D(void* pMemory, std::uint32_t uiLength, bool bLoop)
 {
     CClientSound* pSound = new CClientSound(m_pClientManager, INVALID_ELEMENT_ID);
 
@@ -191,7 +191,7 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
     return NULL;
 }
 
-CClientSound* CClientSoundManager::PlaySound3D(void* pMemory, unsigned int uiLength, const CVector& vecPosition, bool bLoop)
+CClientSound* CClientSoundManager::PlaySound3D(void* pMemory, std::uint32_t uiLength, const CVector& vecPosition, bool bLoop)
 {
     CClientSound* pSound = new CClientSound(m_pClientManager, INVALID_ELEMENT_ID);
 
@@ -208,7 +208,7 @@ CClientSound* CClientSoundManager::PlaySound3D(void* pMemory, unsigned int uiLen
 CClientSound* CClientSoundManager::PlayGTASFX(eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop)
 {
     void*        pAudioData;
-    unsigned int uiAudioLength;
+    std::uint32_t uiAudioLength;
 
     if (containerIndex == AUDIO_LOOKUP_RADIO)
     {
@@ -236,7 +236,7 @@ CClientSound* CClientSoundManager::PlayGTASFX(eAudioLookupIndex containerIndex, 
 CClientSound* CClientSoundManager::PlayGTASFX3D(eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop)
 {
     void*        pAudioData;
-    unsigned int uiAudioLength;
+    std::uint32_t uiAudioLength;
 
     if (containerIndex == AUDIO_LOOKUP_RADIO)
     {
@@ -421,7 +421,7 @@ void CClientSoundManager::ProcessStopQueues(bool bFlush)
         std::vector<DWORD> channelStopList = m_ChannelStopQueue;
         m_ChannelStopQueue.clear();
         m_CS.Unlock();
-        for (unsigned int i = 0; i < channelStopList.size(); i++)
+        for (std::uint32_t i = 0; i < channelStopList.size(); i++)
         {
             BASS_ChannelStop(channelStopList[i]);
         }

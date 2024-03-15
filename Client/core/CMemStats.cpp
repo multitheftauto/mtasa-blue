@@ -477,7 +477,7 @@ void CMemStats::SampleState(SMemStatsInfo& memStatsInfo)
 
     char*        pFileInfoArray = *(char**)(0x5B8B08 + 6);
     CGame*       pGame = g_pCore->GetGame();
-    unsigned int RRR_BASE_ID = pGame->GetBaseIDforRRR();
+    std::uint32_t RRR_BASE_ID = pGame->GetBaseIDforRRR();
 
     for (uint i = 0; i < RRR_BASE_ID; i++)
     {
@@ -977,7 +977,7 @@ void CMemStats::CreateTables()
         table.SetColumnWidths("170,50:R,50:R,40:R");
         table.SetNumberColors("^1", strNumberColorsModels);
         table.AddRow(HEADER1("Pool sizes") "|" HEADER1("Capacity") "|" HEADER1("Used") "|" HEADER1(""));
-        for (int i = 0; i < MAX_POOLS; i++)
+        for (auto i = 0; i < MAX_POOLS; i++)
         {
             SString strName = EnumToString((ePools)i);
             int     iDefCapacity = g_pCore->GetGame()->GetPools()->GetPoolDefaultCapacity((ePools)i);

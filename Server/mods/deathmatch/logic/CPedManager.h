@@ -25,17 +25,17 @@ public:
     CPedManager();
     ~CPedManager();
 
-    class CPed* Create(unsigned short usModel, CElement* pParent);
+    class CPed* Create(std::uint16_t usModel, CElement* pParent);
     class CPed* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void        DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); };
     bool         Exists(class CPed* pPed);
 
     std::list<class CPed*>::const_iterator IterBegin() { return m_List.begin(); }
     std::list<class CPed*>::const_iterator IterEnd() { return m_List.end(); }
 
-    static bool IsValidModel(unsigned short usModel);
+    static bool IsValidModel(std::uint16_t usModel);
 
 protected:
     void AddToList(class CPed* pPed) { m_List.push_back(pPed); }

@@ -52,7 +52,7 @@ bool CTeamManager::Exists(CTeam* pTeam)
     return ListContains(m_List, pTeam);
 }
 
-CTeam* CTeamManager::Create(CElement* pParent, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+CTeam* CTeamManager::Create(CElement* pParent, char* szName, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
 {
     CTeam* const pTeam = new CTeam(this, pParent, szName, ucRed, ucGreen, ucBlue);
 

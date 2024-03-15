@@ -46,7 +46,7 @@
 #endif
 
 int           do_extract_currentfile(unzFile uf, const int* popt_extract_without_path, int* popt_overwrite, const char* password, const char* szFilePath);
-unsigned long get_current_file_crc(unzFile uf);
+std::uint32_t get_current_file_crc(unzFile uf);
 
 std::list<CResource*> CResource::m_StartedResources;
 
@@ -223,7 +223,7 @@ bool CResource::Load()
 
                 m_Info.clear();
 
-                for (unsigned int i = 0; i < Attributes.Count(); i++)
+                for (std::uint32_t i = 0; i < Attributes.Count(); i++)
                 {
                     CXMLAttribute* pAttribute = Attributes.Get(i);
                     MapSet(m_Info, pAttribute->GetName(), pAttribute->GetValue());
@@ -1836,8 +1836,8 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
 bool CResource::GetDefaultSetting(const char* szName, char* szValue, size_t sizeBuffer)
 {
     // Look through its subnodes for settings with a matching name
-    unsigned int uiCount = m_pNodeSettings->GetSubNodeCount();
-    unsigned int i = 0;
+    std::uint32_t uiCount = m_pNodeSettings->GetSubNodeCount();
+    std::uint32_t i = 0;
     std::string  strTagName;
 
     for (; i < uiCount; i++)
@@ -2984,8 +2984,8 @@ bool CResource::UnzipResource()
             if (FileExists(strPath))
             {
                 // We've already got a cached copy of this file, check its still the same
-                unsigned long ulFileInZipCRC = fileInfo.crc;
-                unsigned long ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
+                std::uint32_t ulFileInZipCRC = fileInfo.crc;
+                std::uint32_t ulFileOnDiskCRC = CRCGenerator::GetCRCFromFile(strPath.c_str());
 
                 if (ulFileInZipCRC == ulFileOnDiskCRC)
                     continue;            // we've already extracted EXACTLY this file before
@@ -3012,7 +3012,7 @@ bool CResource::UnzipResource()
     return true;
 }
 
-unsigned long get_current_file_crc(unzFile uf)
+std::uint32_t get_current_file_crc(unzFile uf)
 {
     char filename_inzip[256];
     int  err = UNZ_OK;
@@ -3274,7 +3274,7 @@ bool CIncludedResources::CreateLink()            // just a pointer to it
     if (m_pResource)
     {
         // Grab the version and check that it's in range
-        /*unsigned int uiVersion = m_pResource->GetVersion ();
+        /*std::uint32_t uiVersion = m_pResource->GetVersion ();
         if ( uiVersion < m_uiMinimumVersion || uiVersion > m_uiMaximumVersion )
         {
             CLogger::ErrorPrintf ( "Incompatible version of %s for resource %s\n", m_szResourceName, m_pOwner->GetName().c_str () );

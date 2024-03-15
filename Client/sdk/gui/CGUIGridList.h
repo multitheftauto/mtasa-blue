@@ -52,9 +52,9 @@ class CGUIGridList : public CGUIElement
 public:
     virtual ~CGUIGridList(){};
 
-    virtual unsigned int AddColumn(const char* szTitle, float fWidth) = 0;
-    virtual void         RemoveColumn(unsigned int uiColumn) = 0;
-    virtual void         AutoSizeColumn(unsigned int hColumn) = 0;
+    virtual std::uint32_t AddColumn(const char* szTitle, float fWidth) = 0;
+    virtual void         RemoveColumn(std::uint32_t uiColumn) = 0;
+    virtual void         AutoSizeColumn(std::uint32_t hColumn) = 0;
     virtual void         SetColumnWidth(int hColumn, float fWidth, bool bRelative = true) = 0;
     virtual bool         GetColumnWidth(int hColumn, float& fOutWidth, bool bRelative = true) = 0;
     virtual void         SetColumnTitle(int hColumn, const char* szTitle) = 0;
@@ -75,8 +75,8 @@ public:
     virtual void          SetItemData(int iRow, int hColumn, void* pData, CGUICallback<void, void*> deleteDataCallback = NULL) = 0;
     virtual void          SetItemData(int iRow, int hColumn, const char* pszData) = 0;
     virtual void*         GetItemData(int iRow, int hColumn) = 0;
-    virtual void          SetItemColor(int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha) = 0;
-    virtual bool          GetItemColor(int iRow, int hColumn, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha) = 0;
+    virtual void          SetItemColor(int iRow, int hColumn, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue, std::uint8_t ucAlpha) = 0;
+    virtual bool          GetItemColor(int iRow, int hColumn, std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha) = 0;
 
     virtual void SetHorizontalScrollBar(bool bEnabled) = 0;
     virtual void SetVerticalScrollBar(bool bEnabled) = 0;
@@ -101,8 +101,8 @@ public:
     virtual int           GetRowCount() = 0;
     virtual int           GetColumnCount() = 0;
 
-    virtual void Sort(unsigned int uiColumn, SortDirection direction) = 0;
-    virtual void GetSort(unsigned int& uiColumn, SortDirection& direction) = 0;
+    virtual void Sort(std::uint32_t uiColumn, SortDirection direction) = 0;
+    virtual void GetSort(std::uint32_t& uiColumn, SortDirection& direction) = 0;
 
     virtual bool IsColumnSegmentSizingEnabled(int hColumn) = 0;
     virtual void SetColumnSegmentSizingEnabled(int hColumn, bool bEnabled) = 0;

@@ -15,7 +15,7 @@
 #include "Utils.h"
 #include "lua/LuaCommon.h"
 
-CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
     : CElement(pParent)
 {
     m_pTeamManager = pTeamManager;
@@ -60,7 +60,7 @@ bool CTeam::ReadSpecialData(const int iLine)
     if (GetCustomDataString("color", szTemp, 64, true))
     {
         // Convert it to RGBA
-        unsigned char ucAlpha;
+        std::uint8_t ucAlpha;
         if (!XMLColorToInt(szTemp, m_ucRed, m_ucGreen, m_ucBlue, ucAlpha))
         {
             CLogger::ErrorPrintf("Bad 'color' value specified in <team> (line %d)\n", iLine);
@@ -70,18 +70,18 @@ bool CTeam::ReadSpecialData(const int iLine)
     else
     {
         if (GetCustomDataInt("colorR", iTemp, true))
-            m_ucRed = static_cast<unsigned char>(iTemp);
+            m_ucRed = static_cast<std::uint8_t>(iTemp);
         if (GetCustomDataInt("colorG", iTemp, true))
-            m_ucGreen = static_cast<unsigned char>(iTemp);
+            m_ucGreen = static_cast<std::uint8_t>(iTemp);
         if (GetCustomDataInt("colorB", iTemp, true))
-            m_ucBlue = static_cast<unsigned char>(iTemp);
+            m_ucBlue = static_cast<std::uint8_t>(iTemp);
     }
 
     if (!GetCustomDataBool("friendlyfire", m_bFriendlyFire, true))
         m_bFriendlyFire = true;
 
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     return true;
 }
@@ -120,7 +120,7 @@ void CTeam::RemoveAllPlayers()
 
 void CTeam::GetPlayers(lua_State* luaVM)
 {
-    unsigned int                   uiIndex = 0;
+    std::uint32_t                   uiIndex = 0;
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); ++iter)
     {
@@ -133,14 +133,14 @@ void CTeam::GetPlayers(lua_State* luaVM)
     }
 }
 
-void CTeam::GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue)
+void CTeam::GetColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue)
 {
     ucRed = m_ucRed;
     ucBlue = m_ucBlue;
     ucGreen = m_ucGreen;
 }
 
-void CTeam::SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+void CTeam::SetColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
 {
     m_ucRed = ucRed;
     m_ucBlue = ucBlue;

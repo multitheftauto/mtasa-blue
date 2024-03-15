@@ -82,7 +82,7 @@ void CLuaWeaponDefs::AddClass(lua_State* luaVM)
 
 int CLuaWeaponDefs::GetWeaponNameFromID(lua_State* luaVM)
 {
-    unsigned char    ucID = 0;
+    std::uint8_t    ucID = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucID);
 
@@ -127,7 +127,7 @@ int CLuaWeaponDefs::GetSlotFromWeapon(lua_State* luaVM)
 int CLuaWeaponDefs::GetWeaponIDFromName(lua_State* luaVM)
 {
     SString          strName = "";
-    unsigned char    ucID = 0;
+    std::uint8_t    ucID = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strName);
     if (!argStream.HasErrors())

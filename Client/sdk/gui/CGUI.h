@@ -59,9 +59,9 @@ public:
 
     virtual void DrawMouseCursor() = 0;
 
-    virtual void ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton) = 0;
-    virtual void ProcessKeyboardInput(unsigned long ulKey, bool bIsDown) = 0;
-    virtual void ProcessCharacter(unsigned long ulCharacter) = 0;
+    virtual void ProcessMouseInput(CGUIMouseInput eMouseInput, std::uint32_t ulX = 0, std::uint32_t ulY = 0, CGUIMouseButton eMouseButton = NoButton) = 0;
+    virtual void ProcessKeyboardInput(std::uint32_t ulKey, bool bIsDown) = 0;
+    virtual void ProcessCharacter(std::uint32_t ulCharacter) = 0;
 
     //
     virtual bool       GetGUIInputEnabled() = 0;
@@ -69,7 +69,7 @@ public:
     virtual eInputMode GetGUIInputMode() = 0;
 
     //
-    virtual CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags) = 0;
+    virtual CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, std::uint32_t uiFlags) = 0;
     virtual CGUIButton*     CreateButton(CGUIElement* pParent = NULL, const char* szCaption = "") = 0;
     virtual CGUIButton*     CreateButton(CGUITab* pParent = NULL, const char* szCaption = "") = 0;
 
@@ -120,7 +120,7 @@ public:
     //
 
     virtual CGUIWindow* CreateWnd(CGUIElement* pParent = NULL, const char* szCaption = "") = 0;
-    virtual CGUIFont*   CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false) = 0;
+    virtual CGUIFont*   CreateFnt(const char* szFontName, const char* szFontFile, std::uint32_t uSize = 8, std::uint32_t uFlags = 0, bool bAutoScale = false) = 0;
     virtual CGUITexture* CreateTexture() = 0;
 
     virtual void        SetCursorEnabled(bool bEnabled) = 0;

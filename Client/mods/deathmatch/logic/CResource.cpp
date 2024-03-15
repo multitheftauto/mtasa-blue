@@ -20,7 +20,7 @@ extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
 
-CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
+CResource::CResource(std::uint16_t usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
                      const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
 {
     m_uiScriptID = CIdArray::PopUniqueId(this, EIdClass::RESOURCE);
@@ -466,7 +466,7 @@ CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
     return nullptr;
 }
 
-void CResource::LoadNoClientCacheScript(const char* chunk, unsigned int len, const SString& strFilename)
+void CResource::LoadNoClientCacheScript(const char* chunk, std::uint32_t len, const SString& strFilename)
 {
     if (m_usRemainingNoClientCacheScripts > 0)
     {

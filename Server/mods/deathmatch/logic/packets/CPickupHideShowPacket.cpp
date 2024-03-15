@@ -23,7 +23,7 @@ bool CPickupHideShowPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.WriteBit(m_bShow);
 
         // Write the pickup ids
-        unsigned short                        usPickupModelID;
+        std::uint16_t                        usPickupModelID;
         CPickup*                              pPickup;
         std::vector<CPickup*>::const_iterator iter = m_List.begin();
         for (; iter != m_List.end(); ++iter)
@@ -32,7 +32,7 @@ bool CPickupHideShowPacket::Write(NetBitStreamInterface& BitStream) const
             usPickupModelID = 0;
 
             // Grab the pickup type and set the pickup model id using it
-            unsigned char ucPickupType = pPickup->GetPickupType();
+            std::uint8_t ucPickupType = pPickup->GetPickupType();
             switch (ucPickupType)
             {
                 case CPickup::HEALTH:

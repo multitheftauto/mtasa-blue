@@ -98,7 +98,7 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
         }
 
         // Read out the vehicle matrix only if he's the driver
-        const unsigned int uiSeat = m_ucPlayerGotOccupiedVehicleSeat;
+        const std::uint32_t uiSeat = m_ucPlayerGotOccupiedVehicleSeat;
         if (uiSeat == 0)
         {
             // Read out the vehicle rotation in degrees
@@ -284,7 +284,7 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 
         // Write the vehicle matrix only if he's the driver
         CVector      vecTemp;
-        unsigned int uiSeat = m_ucPlayerGotOccupiedVehicleSeat;
+        std::uint32_t uiSeat = m_ucPlayerGotOccupiedVehicleSeat;
         if (uiSeat == 0)
         {
             // Vehicle position
@@ -353,7 +353,7 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(&armor);
 
         // Weapon
-        unsigned char ucWeaponType = m_ucPlayerGotWeaponType;
+        std::uint8_t ucWeaponType = m_ucPlayerGotWeaponType;
 
         BitStream.Write(&m_Cache.flags);
 
@@ -442,7 +442,7 @@ void CSimVehiclePuresyncPacket::ReadVehicleSpecific(NetBitStreamInterface& BitSt
     // Adjustable property value
     if (CVehicleManager::HasAdjustableProperty(m_Cache.iModelID))
     {
-        unsigned short usAdjustableProperty;
+        std::uint16_t usAdjustableProperty;
         if (BitStream.Read(usAdjustableProperty))
         {
             m_Cache.usAdjustableProperty = usAdjustableProperty;
@@ -454,7 +454,7 @@ void CSimVehiclePuresyncPacket::ReadVehicleSpecific(NetBitStreamInterface& BitSt
     {
         SDoorOpenRatioSync door;
 
-        for (unsigned int i = 2; i < 6; ++i)
+        for (std::uint32_t i = 2; i < 6; ++i)
         {
             if (!BitStream.Read(&door))
                 return;
@@ -484,7 +484,7 @@ void CSimVehiclePuresyncPacket::WriteVehicleSpecific(NetBitStreamInterface& BitS
     if (CVehicleManager::HasDoors(m_Cache.iModelID))
     {
         SDoorOpenRatioSync door;
-        for (unsigned int i = 2; i < 6; ++i)
+        for (std::uint32_t i = 2; i < 6; ++i)
         {
             door.data.fRatio = m_Cache.fDoorOpenRatio[i - 2];
             BitStream.Write(&door);

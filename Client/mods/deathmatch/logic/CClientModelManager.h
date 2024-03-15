@@ -40,11 +40,11 @@ public:
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
     std::shared_ptr<CClientModel> Request(CClientManager* pManager, int iModelID, eClientModelType eType);
 
-    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const unsigned int minModelID = 0);
+    std::vector<std::shared_ptr<CClientModel>> GetModelsByType(eClientModelType type, const std::uint32_t minModelID = 0);
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
 private:
     std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
-    unsigned int                                     m_modelCount = 0;
+    std::uint32_t                                     m_modelCount = 0;
 };

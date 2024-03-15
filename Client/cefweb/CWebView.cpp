@@ -240,7 +240,7 @@ void CWebView::UpdateTexture()
                         memcpy(destData, sourceData, destPitch * m_RenderData.height);
                     else
                     {
-                        for (int y = 0; y < m_RenderData.height; ++y)
+                        for (auto y = 0; y < m_RenderData.height; ++y)
                         {
                             const int sourceIndex = y * sourcePitch;
                             const int destIndex = y * destPitch;
@@ -254,7 +254,7 @@ void CWebView::UpdateTexture()
                     // Update dirty rects
                     for (const auto& rect : m_RenderData.dirtyRects)
                     {
-                        for (int y = rect.y; y < rect.y + rect.height; ++y)
+                        for (auto y = rect.y; y < rect.y + rect.height; ++y)
                         {
                             // Note that D3D texture size can be hardware dependent(especially with dynamic texture)
                             // We cannot be sure that source and destination pitches are the same
@@ -274,7 +274,7 @@ void CWebView::UpdateTexture()
             if (m_RenderData.popupShown && !popupSizeMismatches)
             {
                 const auto popupPitch = m_RenderData.popupRect.width * CEF_PIXEL_STRIDE;
-                for (int y = 0; y < m_RenderData.popupRect.height; ++y)
+                for (auto y = 0; y < m_RenderData.popupRect.height; ++y)
                 {
                     const int sourceIndex = y * popupPitch;
                     const int destIndex = (y + m_RenderData.popupRect.y) * destPitch + m_RenderData.popupRect.x * CEF_PIXEL_STRIDE;
@@ -607,7 +607,7 @@ bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr
 
         // Get args
         std::vector<std::string> args;
-        for (int i = 2; i < numArgs + 2; ++i)
+        for (auto i = 2; i < numArgs + 2; ++i)
         {
             args.push_back(argList->GetString(i));
         }
@@ -1060,7 +1060,7 @@ bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_
 bool CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cursor, cef_cursor_type_t type, const CefCursorInfo& cursorInfo)
 {
     // Find the cursor index by the cursor handle
-    unsigned char cursorIndex = static_cast<unsigned char>(type);
+    std::uint8_t cursorIndex = static_cast<std::uint8_t>(type);
 
     // Queue event to run on the main thread
     auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);

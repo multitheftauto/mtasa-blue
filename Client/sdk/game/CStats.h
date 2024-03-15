@@ -546,9 +546,9 @@ enum
 class CStats
 {
 public:
-    virtual float GetStatValue(unsigned short usIndex) = 0;
-    virtual void  ModifyStat(unsigned short usIndex, float fAmmount) = 0;
-    virtual void  SetStatValue(unsigned short usIndex, float fAmmount) = 0;
+    virtual float GetStatValue(std::uint16_t usIndex) = 0;
+    virtual void  ModifyStat(std::uint16_t usIndex, float fAmmount) = 0;
+    virtual void  SetStatValue(std::uint16_t usIndex, float fAmmount) = 0;
 
-    virtual unsigned short GetSkillStatIndex(eWeaponType type) = 0;
+    virtual std::uint16_t GetSkillStatIndex(eWeaponType type) = 0;
 };

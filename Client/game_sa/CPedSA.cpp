@@ -53,7 +53,7 @@ CPedSA::~CPedSA()
     if (m_pDefaultPedSound)
         delete m_pDefaultPedSound;
 
-    for (int i = 0; i < WEAPONSLOT_MAX; i++)
+    for (auto i = 0; i < WEAPONSLOT_MAX; i++)
     {
         if (m_pWeapons[i])
             delete m_pWeapons[i];
@@ -96,7 +96,7 @@ void CPedSA::Init()
     m_pPedSound = new CPedSoundSA(&pedInterface->pedSound);
     m_pDefaultPedSound = new CPedSoundSA(&pedInterface->pedSound);
 
-    for (int i = 0; i < WEAPONSLOT_MAX; i++)
+    for (auto i = 0; i < WEAPONSLOT_MAX; i++)
         m_pWeapons[i] = new CWeaponSA(&(pedInterface->Weapons[i]), this, (eWeaponSlot)i);
 
     // this->m_pPedIK = new Cm_pPedIKSA(&(pedInterface->m_pPedIK));
@@ -160,7 +160,7 @@ bool CPedSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector
     return true;
 }
 
-void CPedSA::AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, float fRotationLimit, eWeaponType weaponType,
+void CPedSA::AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, std::uint16_t sDirection, float fRotationLimit, eWeaponType weaponType,
                                bool bChangeCamera)
 {
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
@@ -254,7 +254,7 @@ void CPedSA::Respawn(CVector* position, bool bCameraCut)
     if (!bCameraCut)
     {
         // B9 28 F0 B6 00 E8 4C 9A 0C 00 B9 28 F0 B6 00 E8 B2 97 0C 00
-        unsigned char szCode[] = {0xB9, 0x28, 0xF0, 0xB6, 0x00, 0xE8, 0x4C, 0x9A, 0x0C, 0x00, 0xB9, 0x28, 0xF0, 0xB6, 0x00, 0xE8, 0xB2, 0x97, 0x0C, 0x00};
+        std::uint8_t szCode[] = {0xB9, 0x28, 0xF0, 0xB6, 0x00, 0xE8, 0x4C, 0x9A, 0x0C, 0x00, 0xB9, 0x28, 0xF0, 0xB6, 0x00, 0xE8, 0xB2, 0x97, 0x0C, 0x00};
         // RE-ENABLE call to CCamera__RestoreWithJumpCut when respawning
         MemCpy((void*)0x4422EA, szCode, 20);
     }
@@ -337,7 +337,7 @@ void CPedSA::ClearWeapon(eWeaponType weaponType)
     }
 }
 
-CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill skill)
+CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, std::uint32_t uiAmmo, eWeaponSkill skill)
 {
     if (weaponType != WEAPONTYPE_UNARMED)
     {
@@ -415,7 +415,7 @@ CWeapon* CPedSA::GetWeapon(eWeaponSlot weaponSlot)
 void CPedSA::ClearWeapons()
 {
     // Remove all the weapons
-    for (unsigned int i = 0; i < WEAPONSLOT_MAX; i++)
+    for (std::uint32_t i = 0; i < WEAPONSLOT_MAX; i++)
     {
         if (m_pWeapons[i])
         {
@@ -524,8 +524,8 @@ CVector* CPedSA::GetBonePosition(eBone bone, CVector* vecPosition)
     // for a broken model.
     if (entity->m_pRwObject != nullptr)
     {
-        // void __thiscall CPed::GetBonePosition(struct RwV3d &, unsigned int, bool)
-        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, unsigned int, bool);
+        // void __thiscall CPed::GetBonePosition(struct RwV3d &, std::uint32_t, bool)
+        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, std::uint32_t, bool);
         const auto GameFunction = reinterpret_cast<Signature>(FUNC_GetBonePosition);
         GameFunction(entity, vecPosition, bone, true);
     }
@@ -549,8 +549,8 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* vecPosition)
     // for a broken model.
     if (entity->m_pRwObject != nullptr)
     {
-        // void __thiscall CPed::GetTransformedBonePosition(struct RwV3d &, unsigned int, bool)
-        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, unsigned int, bool);
+        // void __thiscall CPed::GetTransformedBonePosition(struct RwV3d &, std::uint32_t, bool)
+        using Signature = void(__thiscall*)(CEntitySAInterface*, CVector*, std::uint32_t, bool);
         const auto GameFunction = reinterpret_cast<Signature>(FUNC_GetTransformedBonePosition);
         GameFunction(entity, vecPosition, bone, true);
     }
@@ -760,9 +760,9 @@ CEntity* CPedSA::GetContactEntity()
     return nullptr;
 }
 
-unsigned char CPedSA::GetRunState()
+std::uint8_t CPedSA::GetRunState()
 {
-    return *(unsigned char*)(((DWORD)(GetInterface()) + 1332));
+    return *(std::uint8_t*)(((DWORD)(GetInterface()) + 1332));
 }
 
 CEntity* CPedSA::GetTargetedEntity()
@@ -822,32 +822,32 @@ void CPedSA::RemoveBodyPart(int i, char c)
     }
 }
 
-void CPedSA::SetFootBlood(unsigned int uiFootBlood)
+void CPedSA::SetFootBlood(std::uint32_t uiFootBlood)
 {
     DWORD dwThis = (DWORD)GetInterface();
     // Check if the ped is to have foot blood
     if (uiFootBlood > 0)
     {
         // Make sure the foot blood flag is activated
-        MemOrFast<unsigned short>(dwThis + 0x46F, 16);
+        MemOrFast<std::uint16_t>(dwThis + 0x46F, 16);
     }
-    else if (*(unsigned short*)(dwThis + 0x46F) & 16)
+    else if (*(std::uint16_t*)(dwThis + 0x46F) & 16)
     {
         // If the foot blood flag is activated, deactivate it
-        MemSubFast<unsigned short>(dwThis + 0x46F, 16);
+        MemSubFast<std::uint16_t>(dwThis + 0x46F, 16);
     }
     // Set the amount of foot blood
-    MemPutFast<unsigned int>(dwThis + 0x750, uiFootBlood);
+    MemPutFast<std::uint32_t>(dwThis + 0x750, uiFootBlood);
 }
 
-unsigned int CPedSA::GetFootBlood()
+std::uint32_t CPedSA::GetFootBlood()
 {
     DWORD dwThis = (DWORD)GetInterface();
     // Check if the ped has the foot blood flag
-    if (*(unsigned short*)(dwThis + 0x46F) & 16)
+    if (*(std::uint16_t*)(dwThis + 0x46F) & 16)
     {
         // If the foot blood flag is activated, return the amount of foot blood
-        return *(unsigned int*)(dwThis + 0x750);
+        return *(std::uint32_t*)(dwThis + 0x750);
     }
     // Otherwise, return zero as there is no foot blood
     return 0;

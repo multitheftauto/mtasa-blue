@@ -109,7 +109,7 @@ CTaskComplexUseMobilePhone* CTasksSA::CreateTaskComplexUseMobilePhone(const int 
     return pTask;
 }
 
-CTaskSimpleDuck* CTasksSA::CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck, unsigned short nUseShotsWhizzingEvents)
+CTaskSimpleDuck* CTasksSA::CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, std::uint16_t nLengthOfDuck, std::uint16_t nUseShotsWhizzingEvents)
 {
     CTaskSimpleDuckSA* pTask = NewTask<CTaskSimpleDuckSA>(nDuckControl, nLengthOfDuck, nUseShotsWhizzingEvents);
     m_pTaskManagementSystem->AddTask(pTask);
@@ -123,7 +123,7 @@ CTaskSimpleChoking* CTasksSA::CreateTaskSimpleChoking(CPed* pAttacker, bool bIsT
     return pTask;
 }
 
-CTaskSimpleClimb* CTasksSA::CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
+CTaskSimpleClimb* CTasksSA::CreateTaskSimpleClimb(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, std::uint8_t nSurfaceType, char nHeight,
                                                   const bool bForceClimb)
 {
     CTaskSimpleClimbSA* pTask = NewTask<CTaskSimpleClimbSA>(pClimbEnt, vecTarget, fHeading, nSurfaceType, nHeight, bForceClimb);
@@ -173,7 +173,7 @@ CTaskSimpleStealthKill* CTasksSA::CreateTaskSimpleStealthKill(bool bKiller, clas
     return pTask;
 }
 
-CTaskSimpleDead* CTasksSA::CreateTaskSimpleDead(unsigned int uiDeathTimeMS, bool bUnk)
+CTaskSimpleDead* CTasksSA::CreateTaskSimpleDead(std::uint32_t uiDeathTimeMS, bool bUnk)
 {
     CTaskSimpleDeadSA* pTask = NewTask<CTaskSimpleDeadSA>(uiDeathTimeMS, bUnk);
     m_pTaskManagementSystem->AddTask(pTask);
@@ -204,14 +204,14 @@ CTaskSimpleIKChain* CTasksSA::CreateTaskSimpleIKChain(char* idString, int effect
 }
 
 CTaskSimpleIKLookAt* CTasksSA::CreateTaskSimpleIKLookAt(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos,
-                                                        unsigned char useTorso, float speed, int blendTime, int m_priority)
+                                                        std::uint8_t useTorso, float speed, int blendTime, int m_priority)
 {
     CTaskSimpleIKLookAtSA* pTask = NewTask<CTaskSimpleIKLookAtSA>(idString, pEntity, time, offsetBoneTag, offsetPos, useTorso, speed, blendTime, m_priority);
     m_pTaskManagementSystem->AddTask(pTask);
     return pTask;
 }
 
-CTaskSimpleTriggerLookAt* CTasksSA::CreateTaskSimpleTriggerLookAt(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso,
+CTaskSimpleTriggerLookAt* CTasksSA::CreateTaskSimpleTriggerLookAt(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, std::uint8_t useTorso,
                                                                   float speed, int blendTime, int priority)
 {
     CTaskSimpleTriggerLookAtSA* pTask = NewTask<CTaskSimpleTriggerLookAtSA>(pEntity, time, offsetBoneTag, offsetPos, useTorso, speed, blendTime, priority);
@@ -227,14 +227,14 @@ CTaskSimpleGangDriveBy* CTasksSA::CreateTaskSimpleGangDriveBy(CEntity* pTargetEn
     return pTask;
 }
 
-CTaskSimpleUseGun* CTasksSA::CreateTaskSimpleUseGun(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, unsigned char bAimImmediate)
+CTaskSimpleUseGun* CTasksSA::CreateTaskSimpleUseGun(CEntity* pTargetEntity, CVector vecTarget, char nCommand, short nBurstLength, std::uint8_t bAimImmediate)
 {
     CTaskSimpleUseGunSA* pTask = NewTask<CTaskSimpleUseGunSA>(pTargetEntity, vecTarget, nCommand, nBurstLength, bAimImmediate);
     m_pTaskManagementSystem->AddTask(pTask);
     return pTask;
 }
 
-CTaskSimpleFight* CTasksSA::CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod)
+CTaskSimpleFight* CTasksSA::CreateTaskSimpleFight(CEntity* pTargetEntity, int nCommand, std::uint32_t nIdlePeriod)
 {
     CTaskSimpleFightSA* pTask = NewTask<CTaskSimpleFightSA>(pTargetEntity, nCommand, nIdlePeriod);
     m_pTaskManagementSystem->AddTask(pTask);

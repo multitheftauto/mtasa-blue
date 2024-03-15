@@ -23,7 +23,7 @@ public:
     virtual CVector*     GetFixedModeSource() const = 0;
     virtual CVector*     GetFixedModeVector() const = 0;
     virtual CVector*     GetTargetHistoryPos() const = 0;
-    virtual unsigned int GetMode() const = 0;
+    virtual std::uint32_t GetMode() const = 0;
     virtual float        GetFOV() const = 0;
     virtual void         SetFOV(float fFOV) = 0;
     virtual void         GetDirection(float& fHorizontal, float& fVertical) = 0;

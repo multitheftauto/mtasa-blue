@@ -207,7 +207,7 @@ bool CResourceHTMLItem::Start()
         std::string strScript;
         strScript += "function renderPage ( requestHeaders, form, cookies, hostname, url, querystring, user, requestBody, method )\n";
         strScript += "\nhttpWrite ( \"";            // bit hacky, possibly can be terminated straight away
-        unsigned char c;
+        std::uint8_t c;
         int           i = 0;
         while (!feof(pFile))
         {

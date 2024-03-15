@@ -21,9 +21,9 @@
 class CStatsSA : public CStats
 {
 public:
-    float GetStatValue(unsigned short usIndex);
-    void  ModifyStat(unsigned short usIndex, float fAmmount);
-    void  SetStatValue(unsigned short usIndex, float fAmmount);
+    float GetStatValue(std::uint16_t usIndex);
+    void  ModifyStat(std::uint16_t usIndex, float fAmmount);
+    void  SetStatValue(std::uint16_t usIndex, float fAmmount);
 
-    unsigned short GetSkillStatIndex(eWeaponType type);
+    std::uint16_t GetSkillStatIndex(eWeaponType type);
 };

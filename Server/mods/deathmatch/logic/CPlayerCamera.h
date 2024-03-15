@@ -51,8 +51,8 @@ public:
 
     void SetRotation(CVector& vecRotation);
 
-    unsigned char GetInterior() const { return m_ucInterior; }
-    void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
+    std::uint8_t GetInterior() const { return m_ucInterior; }
+    void          SetInterior(std::uint8_t ucInterior) { m_ucInterior = ucInterior; }
 
     CPlayer* GetPlayer() const { return m_pPlayer; }
 
@@ -63,7 +63,7 @@ private:
     CPlayer*      m_pPlayer;
     eCameraMode   m_Mode;
     float         m_fRotation;
-    unsigned char m_ucInterior;
+    std::uint8_t m_ucInterior;
     CVector       m_vecPosition;
     CVector       m_vecLookAt;
     CElement*     m_pTarget;

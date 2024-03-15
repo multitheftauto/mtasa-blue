@@ -28,7 +28,7 @@ static CPedClothesDesc*    pLocalClothes = 0;
 static CWantedSAInterface* pLocalWanted = 0;
 static std::set<SString>   ms_DoneAnimBlockRefMap;
 
-CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
+CPlayerPedSA::CPlayerPedSA(std::uint32_t nModelIndex)
 {
     // based on CPlayerPed::SetupPlayerPed (R*)
     DWORD CPedOperatorNew = FUNC_CPedOperatorNew;

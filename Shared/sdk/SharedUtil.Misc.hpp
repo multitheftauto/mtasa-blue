@@ -1427,10 +1427,10 @@ bool SharedUtil::IsColorCode(const char* szColorCode)
         return false;
 
     bool bValid = true;
-    for (int i = 0; i < 6; i++)
+    for (auto i = 0; i < 6; i++)
     {
         char c = szColorCode[1 + i];
-        if (!isdigit((unsigned char)c) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f'))
+        if (!isdigit((std::uint8_t)c) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f'))
         {
             bValid = false;
             break;
@@ -1463,7 +1463,7 @@ char* SharedUtil::Trim(char* szText)
     char*  szOriginal = szText;
     size_t uiLen = 0;
 
-    while (isspace((unsigned char)*szText))
+    while (isspace((std::uint8_t)*szText))
         szText++;
 
     if (*szText)
@@ -1471,7 +1471,7 @@ char* SharedUtil::Trim(char* szText)
         char* p = szText;
         while (*p)
             p++;
-        while (isspace((unsigned char)*(--p)))
+        while (isspace((std::uint8_t)*(--p)))
             ;
         p[1] = '\0';
         uiLen = (size_t)(p - szText + 1);
@@ -1508,7 +1508,7 @@ std::string SharedUtil::UTF16ToMbUTF8(const char16_t* input)
 }
 
 // Get UTF8 confidence
-int SharedUtil::GetUTF8Confidence(const unsigned char* input, int len)
+int SharedUtil::GetUTF8Confidence(const std::uint8_t* input, int len)
 {
     return icu_getUTF8Confidence(input, len);
 }
@@ -1560,7 +1560,7 @@ bool SharedUtil::IsValidVersionString(const SString& strVersion)
 {
     const SString strCheck = "0.0.0-0.00000.0.000";
     uint          uiLength = std::min(strCheck.length(), strVersion.length());
-    for (unsigned int i = 0; i < uiLength; i++)
+    for (std::uint32_t i = 0; i < uiLength; i++)
     {
         uchar c = strVersion[i];
         uchar d = strCheck[i];
@@ -1602,7 +1602,7 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
     if (!bConvertToUnixPathSep)
     {
         cPathSep = '\\';
-        for (unsigned int i = 0; i < NUMELMS(strDelimList); i++)
+        for (std::uint32_t i = 0; i < NUMELMS(strDelimList); i++)
             strDelimList[i] = strDelimList[i].Replace("/", "\\");
         strText = strText.Replace("/", "\\");
     }
@@ -1610,12 +1610,12 @@ SString SharedUtil::ConformResourcePath(const char* szRes, bool bConvertToUnixPa
 #endif
     {
         cPathSep = '/';
-        for (unsigned int i = 0; i < NUMELMS(strDelimList); i++)
+        for (std::uint32_t i = 0; i < NUMELMS(strDelimList); i++)
             strDelimList[i] = strDelimList[i].Replace("\\", "/");
         strText = strText.Replace("\\", "/");
     }
 
-    for (unsigned int i = 0; i < NUMELMS(strDelimList); i++)
+    for (std::uint32_t i = 0; i < NUMELMS(strDelimList); i++)
     {
         // Remove up to first occurrence
         int iPos = strText.find(strDelimList[i]);
@@ -1836,7 +1836,7 @@ namespace SharedUtil
         return _GetCurrentProcessorNumberXP();
 #elif defined(__APPLE__)
         // Hacked from https://stackoverflow.com/a/40398183/1517394
-        unsigned long cpu;
+        std::uint32_t cpu;
 
         uint32_t CPUInfo[4];
         __cpuid_count(1, 0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
@@ -1896,7 +1896,7 @@ namespace SharedUtil
     // Updates struct with datum
     //
     ///////////////////////////////////////////////////////////////////////////
-    void UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount)
+    void UpdateThreadCPUTimes(SThreadCPUTimesStore& store, std::int64_t* pllTickCount)
     {
         // Use supplied tick count if present
         uint64 ullCPUMeasureTimeMs;

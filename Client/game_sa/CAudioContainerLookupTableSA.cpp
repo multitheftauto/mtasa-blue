@@ -38,7 +38,7 @@ CAudioContainerLookupTableSA::CAudioContainerLookupTableSA(const SString& strPat
 
 CAudioContainerLookupTableSA::~CAudioContainerLookupTableSA()
 {
-    for (int i = 0; i < 9; i++)
+    for (auto i = 0; i < 9; i++)
     {
         for (std::vector<SAudioLookupEntrySA*>::iterator it = m_Entries[i].begin(); it != m_Entries[i].end(); it++)
         {
@@ -61,7 +61,7 @@ SAudioLookupEntrySA* CAudioContainerLookupTableSA::GetEntry(eAudioLookupIndex lo
     if (lookupIndex < 0 || lookupIndex > 8)
         return nullptr;
 
-    if (static_cast<unsigned int>(bankIndex + 1) > m_Entries[lookupIndex].size())
+    if (static_cast<std::uint32_t>(bankIndex + 1) > m_Entries[lookupIndex].size())
         return nullptr;
 
     return m_Entries[lookupIndex][bankIndex];

@@ -50,7 +50,7 @@ bool CClientTXD::Load(bool isRaw, SString input, bool enableFiltering)
     }
 }
 
-bool CClientTXD::Import(unsigned short usModelID)
+bool CClientTXD::Import(std::uint16_t usModelID)
 {
     if (usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST)
     {
@@ -119,7 +119,7 @@ bool CClientTXD::Import(unsigned short usModelID)
     return false;
 }
 
-bool CClientTXD::IsImportableModel(unsigned short usModelID)
+bool CClientTXD::IsImportableModel(std::uint16_t usModelID)
 {
     // Currently we work on vehicles and objects
     return CClientObjectManager::IsValidModel(usModelID) || CClientVehicleManager::IsValidModel(usModelID) || CClientPlayerManager::IsValidModel(usModelID) ||
@@ -148,7 +148,7 @@ bool CClientTXD::LoadFromBuffer(SString buffer)
     return g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled);
 }
 
-void CClientTXD::Restream(unsigned short usModelID)
+void CClientTXD::Restream(std::uint16_t usModelID)
 {
     if (CClientVehicleManager::IsValidModel(usModelID))
     {

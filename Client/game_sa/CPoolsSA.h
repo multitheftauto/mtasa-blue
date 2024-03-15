@@ -26,12 +26,12 @@ union tPoolObjectFlags
 {
     struct
     {
-        unsigned char nId : 7;
+        std::uint8_t nId : 7;
         bool          bEmpty : 1;
     };
 
 private:
-    unsigned char nValue;
+    std::uint8_t nValue;
 };
 
 template <class A, class B = A>
@@ -143,7 +143,7 @@ public:
     ~CPoolsSA();
 
     // Vehicles pool
-    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, unsigned char ucVariation, unsigned char ucVariation2);
+    CVehicle* AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVehicleType, std::uint8_t ucVariation, std::uint8_t ucVariation2);
 
 private:
     bool AddVehicleToPool(CClientVehicle* pClientVehicle, CVehicleSA* pVehicle);
@@ -151,7 +151,7 @@ private:
 public:
     void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
     SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface);
-    unsigned long              GetVehicleCount()
+    std::uint32_t              GetVehicleCount()
     {
         return m_vehiclePool.ulCount;
         ;
@@ -168,7 +168,7 @@ public:
     void                      RemoveObject(CObject* pObject, bool bDelete = true);
     SClientEntity<CObjectSA>* GetObject(DWORD* pGameInterface);
     CObject*                  GetObjectFromIndex(std::uint32_t elementIndexInPool);
-    unsigned long             GetObjectCount() { return m_objectPool.ulCount; }
+    std::uint32_t             GetObjectCount() { return m_objectPool.ulCount; }
     void                      DeleteAllObjects();
 
     // Buildings pool
@@ -181,7 +181,7 @@ public:
     bool       HasFreeBuildingSlot();
 
     // Peds pool
-    CPed* AddPed(CClientPed* pClientPed, unsigned int nModelIndex);
+    CPed* AddPed(CClientPed* pClientPed, std::uint32_t nModelIndex);
     CPed* AddPed(CClientPed* pClientPed, DWORD* pGameInterface);
 
 private:
@@ -192,7 +192,7 @@ public:
     SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
     CPed*                  GetPedFromRef(DWORD dwGameRef);
     CPedSAInterface*       GetPedInterface(DWORD dwGameRef);            // game_sa specific
-    unsigned long          GetPedCount() { return m_pedPool.ulCount; }
+    std::uint32_t          GetPedCount() { return m_pedPool.ulCount; }
     void                   DeleteAllPeds();
 
     CEntity*       GetEntity(DWORD* pGameInterface);
@@ -223,18 +223,18 @@ public:
 
 private:
     // Generic container for pools
-    template <class T, class I, unsigned long MAX>
+    template <class T, class I, std::uint32_t MAX>
     struct SPoolData
     {
         std::array<SClientEntity<T>, MAX> arrayOfClientEntities;
-        unsigned long                     ulCount;
+        std::uint32_t                     ulCount;
 
     private:
         friend class CPoolsSA;
 
         SPoolData() : ulCount(0UL)
         {
-            for (unsigned int i = 0; i < MAX; ++i)
+            for (std::uint32_t i = 0; i < MAX; ++i)
             {
                 arrayOfClientEntities[i] = {nullptr, nullptr};
             }

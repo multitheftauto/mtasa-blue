@@ -27,7 +27,7 @@ class CClientRadarMarker final : public CClientEntity
     friend class CClientRadarMarkerManager;
 
 public:
-    CClientRadarMarker(class CClientManager* pManager, ElementID ID, short usOrdering = 0, unsigned short usVisibleDistance = 16383);
+    CClientRadarMarker(class CClientManager* pManager, ElementID ID, short usOrdering = 0, std::uint16_t usVisibleDistance = 16383);
     ~CClientRadarMarker();
 
     void Unlink();
@@ -39,26 +39,26 @@ public:
     void SetPosition(const CVector& vecPosition);
     void GetPosition(CVector& vecPosition) const;
 
-    unsigned short GetScale() { return m_usScale; };
-    void           SetScale(unsigned short usScale);
+    std::uint16_t GetScale() { return m_usScale; };
+    void           SetScale(std::uint16_t usScale);
 
     SColor GetColor() const { return m_Color; }
     void   SetColor(const SColor color);
 
-    unsigned long GetSprite() const { return m_ulSprite; };
-    void          SetSprite(unsigned long ulSprite);
+    std::uint32_t GetSprite() const { return m_ulSprite; };
+    void          SetSprite(std::uint32_t ulSprite);
 
     bool IsVisible() const { return m_bIsVisible; };
     void SetVisible(bool bVisible);
 
-    void SetDimension(unsigned short usDimension) override;
-    void RelateDimension(unsigned short usDimension);
+    void SetDimension(std::uint16_t usDimension) override;
+    void RelateDimension(std::uint16_t usDimension);
 
     short GetOrdering() { return m_sOrdering; }
     void  SetOrdering(short sOrdering);
 
-    unsigned short GetVisibleDistance() { return m_usVisibleDistance; }
-    void           SetVisibleDistance(unsigned short usVisibleDistance) { m_usVisibleDistance = usVisibleDistance; }
+    std::uint16_t GetVisibleDistance() { return m_usVisibleDistance; }
+    void           SetVisibleDistance(std::uint16_t usVisibleDistance) { m_usVisibleDistance = usVisibleDistance; }
 
     bool IsInVisibleDistance();
 
@@ -74,11 +74,11 @@ private:
     CMarker*                         m_pMarker;
 
     CVector        m_vecPosition;
-    unsigned short m_usScale;
+    std::uint16_t m_usScale;
     SColor         m_Color;
-    unsigned long  m_ulSprite;
+    std::uint32_t  m_ulSprite;
 
     bool           m_bIsVisible;
     short          m_sOrdering;
-    unsigned short m_usVisibleDistance;
+    std::uint16_t m_usVisibleDistance;
 };

@@ -60,8 +60,8 @@ public:
     float          GetExplosionForce();
     void           SetExplosionForce(float fForce);
     void           SetSilent(bool bSilent);
-    unsigned long  GetActivationTimer();
-    void           SetActivationTimer(unsigned long ulActivationTime);
+    std::uint32_t  GetActivationTimer();
+    void           SetActivationTimer(std::uint32_t ulActivationTime);
     DWORD          GetExpiryTime();
     void           SetExpiryTime(DWORD dwExpiryTime);
     float          GetExplosionRadius();

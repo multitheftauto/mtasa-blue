@@ -72,7 +72,7 @@ public:
     {
         m_pOuter = pOuter;
         strSource.Split("\n", m_LineList);
-        for (int i = m_LineList.size() - 1; i >= 0; i--)
+        for (auto i = m_LineList.size() - 1; i >= 0; i--)
         {
             m_LineList[i] = m_LineList[i].Replace("\t", " ").Replace("  ", " ", true).TrimEnd(" ").TrimStart(" ");
             if (m_LineList[i].empty())

@@ -31,10 +31,10 @@ public:
     CGUITab* GetSelectedTab();
     void     SetSelectedTab(CGUITab* pTab);
 
-    void         SetSelectedIndex(unsigned int uiIndex);
-    unsigned int GetSelectedIndex();
+    void         SetSelectedIndex(std::uint32_t uiIndex);
+    std::uint32_t GetSelectedIndex();
 
-    unsigned int GetTabCount();
+    std::uint32_t GetTabCount();
 
     bool IsTabSelected(CGUITab* pTab);
 

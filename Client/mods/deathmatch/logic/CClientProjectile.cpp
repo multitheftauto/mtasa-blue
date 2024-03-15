@@ -157,7 +157,7 @@ void CClientProjectile::DoPulse()
     }
 }
 
-void CClientProjectile::Initiate(CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, unsigned short usModel)
+void CClientProjectile::Initiate(CVector& vecPosition, CVector& vecRotation, CVector& vecVelocity, std::uint16_t usModel)
 {
     dassert(!m_pInitiateData);
 
@@ -292,14 +292,14 @@ void CClientProjectile::SetVelocity(CVector& vecVelocity)
         m_pProjectile->SetMoveSpeed(&vecVelocity);
 }
 
-unsigned short CClientProjectile::GetModel()
+std::uint16_t CClientProjectile::GetModel()
 {
     if (m_pProjectile)
         return m_pProjectile->GetModelIndex();
     return 0;
 }
 
-void CClientProjectile::SetModel(unsigned short usModel)
+void CClientProjectile::SetModel(std::uint16_t usModel)
 {
     if (m_pProjectile)
         m_pProjectile->SetModelIndex(usModel);

@@ -64,8 +64,8 @@ public:
     void         UpgradeResources(CResource* pResource = NULL);
     void         CheckResources(CResource* pResource = NULL);
     void         OnResourceLoadStateChange(CResource* pResource, const char* szOldState, const char* szNewState) const;
-    unsigned int GetResourceLoadedCount() { return m_uiResourceLoadedCount; }
-    unsigned int GetResourceFailedCount() { return m_uiResourceFailedCount; }
+    std::uint32_t GetResourceLoadedCount() { return m_uiResourceLoadedCount; }
+    std::uint32_t GetResourceFailedCount() { return m_uiResourceFailedCount; }
     void         OnPlayerJoin(CPlayer& Player);
 
     const char* GetResourceDirectory();
@@ -82,8 +82,8 @@ public:
 
     bool IsAResourceElement(CElement* pElement);
 
-    unsigned short GenerateID();
-    CResource*     GetResourceFromNetID(unsigned short usNetID);
+    std::uint16_t GenerateID();
+    CResource*     GetResourceFromNetID(std::uint16_t usNetID);
 
     CResource* GetResourceFromLuaState(struct lua_State* luaVM);
     SString    GetResourceName(struct lua_State* luaVM);
@@ -123,8 +123,8 @@ public:
 private:
     SString                 m_strResourceDirectory;
     CMappedList<CResource*> m_resources;
-    unsigned int            m_uiResourceLoadedCount;
-    unsigned int            m_uiResourceFailedCount;
+    std::uint32_t            m_uiResourceLoadedCount;
+    std::uint32_t            m_uiResourceFailedCount;
     bool                    m_bResourceListChanged;
     std::list<CResource*>   m_resourcesToStartAfterRefresh;
 

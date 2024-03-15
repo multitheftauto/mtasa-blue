@@ -19,13 +19,13 @@ class CBuildingRemovalManager
 public:
     CBuildingRemovalManager();
     ~CBuildingRemovalManager();
-    void CreateBuildingRemoval(unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior);
+    void CreateBuildingRemoval(std::uint16_t usModel, float fRadius, const CVector& vecPos, char cInterior);
     void ClearBuildingRemovals();
-    void RestoreWorldModel(unsigned short usModel, float fRadius, const CVector& vecPos, char cInterior);
+    void RestoreWorldModel(std::uint16_t usModel, float fRadius, const CVector& vecPos, char cInterior);
 
-    std::multimap<unsigned short, CBuildingRemoval*>::const_iterator IterBegin() { return m_BuildingRemovals.begin(); };
-    std::multimap<unsigned short, CBuildingRemoval*>::const_iterator IterEnd() { return m_BuildingRemovals.end(); };
+    std::multimap<std::uint16_t, CBuildingRemoval*>::const_iterator IterBegin() { return m_BuildingRemovals.begin(); };
+    std::multimap<std::uint16_t, CBuildingRemoval*>::const_iterator IterEnd() { return m_BuildingRemovals.end(); };
 
 private:
-    std::multimap<unsigned short, CBuildingRemoval*> m_BuildingRemovals;
+    std::multimap<std::uint16_t, CBuildingRemoval*> m_BuildingRemovals;
 };

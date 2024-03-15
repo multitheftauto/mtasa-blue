@@ -36,7 +36,7 @@ bool CResourceScriptItem::Start()
     // Load the file
     std::vector<char> buffer;
     FileLoad(m_strResourceFileName, buffer);
-    unsigned int iSize = buffer.size();
+    std::uint32_t iSize = buffer.size();
 
     if (iSize > 0)
     {

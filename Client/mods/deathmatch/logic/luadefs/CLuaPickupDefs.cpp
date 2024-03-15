@@ -48,9 +48,9 @@ void CLuaPickupDefs::AddClass(lua_State* luaVM)
 int CLuaPickupDefs::CreatePickup(lua_State* luaVM)
 {
     CVector          vecPosition;
-    unsigned long    ulRespawnInterval = 30000;
+    std::uint32_t    ulRespawnInterval = 30000;
     double           dblAmmo = 50.0;
-    unsigned char    ucType = 0;
+    std::uint8_t    ucType = 0;
     double           dArgumentDependant = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
@@ -100,7 +100,7 @@ int CLuaPickupDefs::GetPickupType(lua_State* luaVM)
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        unsigned char ucType = pPickup->m_ucType;
+        std::uint8_t ucType = pPickup->m_ucType;
         lua_pushnumber(luaVM, ucType);
         return 1;
     }
@@ -120,7 +120,7 @@ int CLuaPickupDefs::GetPickupWeapon(lua_State* luaVM)
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        unsigned char ucWeapon = pPickup->m_ucWeaponType;
+        std::uint8_t ucWeapon = pPickup->m_ucWeaponType;
         lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeapon));
         return 1;
     }
@@ -160,7 +160,7 @@ int CLuaPickupDefs::GetPickupAmmo(lua_State* luaVM)
     // Verify the arguments
     if (!argStream.HasErrors())
     {
-        unsigned short usAmmo = pPickup->m_usAmmo;
+        std::uint16_t usAmmo = pPickup->m_usAmmo;
         lua_pushnumber(luaVM, static_cast<lua_Number>(usAmmo));
         return 1;
     }
@@ -175,7 +175,7 @@ int CLuaPickupDefs::SetPickupType(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
     double           dblAmmo = 50.0;
-    unsigned char    ucType = 0;
+    std::uint8_t    ucType = 0;
     double           dArgumentDependant = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);

@@ -200,7 +200,7 @@ const char* const CNickGen::m_szNouns[] = {
 
 SString CNickGen::GetRandomNickname()
 {
-    srand((unsigned int)time(NULL));
+    srand((std::uint32_t)time(NULL));
     int iAdjective = rand() % NICKGEN_NUM_ADJECTIVES;
     int iNoun = rand() % NICKGEN_NUM_NOUNS;
     return SString("%s%s%i", m_szAdjectives[iAdjective], m_szNouns[iNoun], rand() % 100);

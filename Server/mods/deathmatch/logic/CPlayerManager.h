@@ -34,8 +34,8 @@ public:
     CPlayer* Create(const NetServerPlayerID& PlayerSocket);
     void     DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_Players.size()); }
-    unsigned int CountJoined();
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_Players.size()); }
+    std::uint32_t CountJoined();
     bool         Exists(CPlayer* pPlayer);
 
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
@@ -53,7 +53,7 @@ public:
     static void Broadcast(const CPacket& Packet, const std::vector<CPlayer*>& sendList);
     static void Broadcast(const CPacket& Packet, const std::multimap<ushort, CPlayer*>& groupMap);
 
-    static bool IsValidPlayerModel(unsigned short model);
+    static bool IsValidPlayerModel(std::uint16_t model);
 
     void ClearElementData(CElement* pElement, const std::string& name);
     void ClearElementData(CElement* pElement);

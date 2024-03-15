@@ -28,7 +28,7 @@ public:
 
     CTeam* GetTeam(const char* szName);
     bool   Exists(CTeam* pTeam);
-    CTeam* Create(CElement* pParent, char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
+    CTeam* Create(CElement* pParent, char* szName, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue);
     CTeam* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
 
     std::list<CTeam*>::const_iterator IterBegin() { return m_List.begin(); }

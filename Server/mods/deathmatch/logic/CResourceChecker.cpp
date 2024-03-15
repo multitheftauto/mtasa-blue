@@ -115,7 +115,7 @@ void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string
 
             vector<string> pathInArchiveList;
 
-            for (unsigned long i = 0; i < m_upgradedFullPathList.size(); i++)
+            for (auto i = 0; i < m_upgradedFullPathList.size(); i++)
             {
                 string strFullPath = m_upgradedFullPathList[i];
                 string strPathInArchive = strFullPath.substr(strCacheDir.length());
@@ -202,12 +202,12 @@ void CResourceChecker::CheckPngFileForIssues(const string& strPath, const string
     if (FILE* pFile = File::Fopen(strPath.c_str(), "rb"))
     {
         // This is what the png header should look like
-        unsigned char pGoodHeaderPng[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+        std::uint8_t pGoodHeaderPng[8] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
         // Also allow jpg header as the client will load misnamed png files
-        unsigned char pGoodHeaderJpg[3] = {0xFF, 0xD8, 0xFF};
+        std::uint8_t pGoodHeaderJpg[3] = {0xFF, 0xD8, 0xFF};
 
         // Load the header
-        unsigned char pBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+        std::uint8_t pBuffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
         fread(pBuffer, 1, 8, pFile);
 
         // Check header integrity
@@ -502,7 +502,7 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
     bool bUTF8 = IsUTF8BOM(strLuaSource.c_str(), strLuaSource.length());
 
     // If it's not a UTF8 script, does it contain foreign language characters that should be upgraded?
-    if (!bCompiledScript && !bUTF8 && GetUTF8Confidence((const unsigned char*)&strLuaSource.at(0), strLuaSource.length()) < 80)
+    if (!bCompiledScript && !bUTF8 && GetUTF8Confidence((const std::uint8_t*)&strLuaSource.at(0), strLuaSource.length()) < 80)
     {
         std::wstring strUTF16Script = ANSIToUTF16(strLuaSource);
 #ifdef WIN32
@@ -534,7 +534,7 @@ void CResourceChecker::CheckLuaSourceForIssues(string strLuaSource, const string
     }
 
     // Step through each identifier in the file.
-    for (long lPos = 0; lPos < (long)strLuaSource.length(); lPos++)
+    for (auto lPos = 0; lPos < (long)strLuaSource.length(); lPos++)
     {
         long lNameLength;
         long lNameOffset = FindLuaIdentifier(strLuaSource.c_str() + lPos, &lNameLength, &lLineNumber);
@@ -602,10 +602,10 @@ long CResourceChecker::FindLuaIdentifier(const char* szLuaSource, long* plOutLen
     bool bPrevIsNonIdent = true;
 
     // Search the string for function names
-    for (long lPos = 0; szLuaSource[lPos]; lPos++)
+    for (auto lPos = 0; szLuaSource[lPos]; lPos++)
     {
         const char*   pBufPos = szLuaSource + lPos;
-        unsigned char c = *pBufPos;
+        std::uint8_t c = *pBufPos;
 
         // Handle comments
         if (c == '-' && strncmp(pBufPos, "--[[", 4) == 0)
@@ -700,7 +700,7 @@ bool CResourceChecker::UpgradeLuaFunctionName(const string& strFunctionName, boo
 //
 ///////////////////////////////////////////////////////////////
 void CResourceChecker::IssueLuaFunctionNameWarnings(const string& strFunctionName, const string& strFileName, const string& strResourceName, bool bClientScript,
-                                                    unsigned long ulLineNumber)
+                                                    std::uint32_t ulLineNumber)
 {
     string           strHow;
     CMtaVersion      strVersion;
@@ -828,7 +828,7 @@ void CResourceChecker::CheckVersionRequirements(const string& strIdentifierName,
 bool CResourceChecker::RenameBackupFile(const string& strOrigFilename, const string& strBakAppend)
 {
     string strBakFilename = strOrigFilename + strBakAppend;
-    for (int i = 0; File::Rename(strOrigFilename.c_str(), strBakFilename.c_str()); i++)
+    for (auto i = 0; File::Rename(strOrigFilename.c_str(), strBakFilename.c_str()); i++)
     {
         if (i > 1000)
         {
@@ -891,7 +891,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
             return 0;
         }
 
-        if ((unsigned int)unzGetGlobalComment(szip, glob_comment, glob_info.size_comment + 1) != glob_info.size_comment)
+        if ((std::uint32_t)unzGetGlobalComment(szip, glob_comment, glob_info.size_comment + 1) != glob_info.size_comment)
         {
             zipClose(dzip, NULL);
             unzClose(szip);
@@ -918,7 +918,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
 
         // See if file should be replaced
         string fullPathReplacement;
-        for (unsigned long i = 0; i < pathInArchiveList.size(); i++)
+        for (auto i = 0; i < pathInArchiveList.size(); i++)
             if (stricmp(fn, pathInArchiveList[i].c_str()) == 0)
                 fullPathReplacement = m_upgradedFullPathList[i];
 
@@ -926,7 +926,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
         if (fullPathReplacement.length())
         {
             void*         buf = NULL;
-            unsigned long ulLength = 0;
+            std::uint32_t ulLength = 0;
 
             // Get new file into a buffer
             if (FILE* pFile = File::Fopen(fullPathReplacement.c_str(), "rb"))
@@ -1061,7 +1061,7 @@ int CResourceChecker::ReplaceFilesInZIP(const string& strOrigZip, const string& 
 
             // read file
             int sz = unzReadCurrentFile(szip, buf, unzfi.compressed_size);
-            if ((unsigned int)sz != unzfi.compressed_size)
+            if ((std::uint32_t)sz != unzfi.compressed_size)
             {
                 free(extrafield);
                 free(commentary);

@@ -16,8 +16,8 @@
 class CWeather
 {
 public:
-    virtual unsigned char Get() = 0;
-    virtual void          Set(unsigned char primary, unsigned char secondary) = 0;
+    virtual std::uint8_t Get() = 0;
+    virtual void          Set(std::uint8_t primary, std::uint8_t secondary) = 0;
     virtual void          Release() = 0;
 
     virtual float GetAmountOfRain() = 0;

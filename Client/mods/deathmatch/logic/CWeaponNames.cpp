@@ -90,14 +90,14 @@ static const SWeaponSlot _WeaponIDs[] = {{0}, {0}, {1}, {1},  {1},  {1},  {1}, {
                                          {4}, {6}, {6}, {7},  {7},  {7},  {7}, {8}, {12}, {9}, {9},  {9},  {11}, {11}, {11}, {-1}};
 static const IMPLEMENT_FIXED_ARRAY(SWeaponSlot, WeaponIDs);
 
-unsigned char CWeaponNames::GetWeaponID(const char* szName)
+std::uint8_t CWeaponNames::GetWeaponID(const char* szName)
 {
     // If the specified string was empty, return 0
     if (szName[0] == 0)
         return 0xFF;
 
     // Look for it in our table
-    for (unsigned int i = 0; i < NUMELMS(WeaponNames); i++)
+    for (std::uint32_t i = 0; i < NUMELMS(WeaponNames); i++)
     {
         if (stricmp(szName, WeaponNames[i].szName) == 0)
         {
@@ -108,7 +108,7 @@ unsigned char CWeaponNames::GetWeaponID(const char* szName)
     return 0xFF;
 }
 
-const char* CWeaponNames::GetWeaponName(unsigned char ucID)
+const char* CWeaponNames::GetWeaponName(std::uint8_t ucID)
 {
     if (ucID < NUMELMS(WeaponNames))
     {
@@ -118,7 +118,7 @@ const char* CWeaponNames::GetWeaponName(unsigned char ucID)
     return szWeaponNameEmpty;
 }
 
-char CWeaponNames::GetSlotFromWeapon(unsigned char ucID)
+char CWeaponNames::GetSlotFromWeapon(std::uint8_t ucID)
 {
     if (ucID < NUMELMS(WeaponIDs))
     {

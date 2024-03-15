@@ -73,7 +73,7 @@ void CWaterRPCs::SetAllElementWaterLevel(NetBitStreamInterface& bitStream)
 
 void CWaterRPCs::SetWaterVertexPosition(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucVertexID;
+    std::uint8_t ucVertexID;
     short         sX;
     short         sY;
     float         fZ;
@@ -91,7 +91,7 @@ void CWaterRPCs::SetWaterVertexPosition(CClientEntity* pSource, NetBitStreamInte
 
 void CWaterRPCs::SetWaterColor(NetBitStreamInterface& bitStream)
 {
-    unsigned char ucRed, ucGreen, ucBlue, ucAlpha;
+    std::uint8_t ucRed, ucGreen, ucBlue, ucAlpha;
 
     if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue) && bitStream.Read(ucAlpha))
     {

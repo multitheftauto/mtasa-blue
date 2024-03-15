@@ -27,7 +27,7 @@ public:
         ImageItem = 2
     };
 
-    CGUIListItem_Impl(const char* szText = "", unsigned int uiType = 0, CGUIStaticImage_Impl* pImage = NULL);
+    CGUIListItem_Impl(const char* szText = "", std::uint32_t uiType = 0, CGUIStaticImage_Impl* pImage = NULL);
     ~CGUIListItem_Impl();
 
     std::string GetText() const;
@@ -48,12 +48,12 @@ public:
     bool GetSelectedState();
     void SetSelectedState(bool bState);
 
-    bool GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
-    void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha);
+    bool GetColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha);
+    void SetColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue, std::uint8_t ucAlpha);
 
     CEGUI::ListboxItem* GetListItem();
 
-    unsigned int ItemType;
+    std::uint32_t ItemType;
 
 private:
     CEGUI::ListboxItem*       m_pListItem;

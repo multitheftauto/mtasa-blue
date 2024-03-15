@@ -71,8 +71,8 @@ class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociationSAInterface;
 class CAnimBlendAssocGroupSAInterface;
 class CIFPAnimations;
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+typedef std::uint32_t AssocGroupId;
+typedef std::uint32_t AnimationId;
 enum class eAnimGroup;
 enum class eAnimID;
 
@@ -84,7 +84,7 @@ typedef void(PostWeaponFireHandler)();
 typedef void(BulletImpactHandler)(class CPed* pInitiator, class CEntity* pVictim, const CVector* pvecStartPosition, const CVector* pvecEndPosition);
 typedef void(BulletFireHandler)(class CPed* pInitiator, const CVector* pvecStartPosition, const CVector* pvecEndPosition);
 typedef bool(DamageHandler)(class CPed* pDamagePed, class CEventDamage* pEvent);
-typedef void(DeathHandler)(class CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
+typedef void(DeathHandler)(class CPed* pKilledPed, std::uint8_t ucDeathReason, std::uint8_t ucBodyPart);
 typedef void(FireHandler)(class CFire* pFire);
 typedef bool(ProjectileStopHandler)(class CEntity* owner, enum eWeaponType weaponType, class CVector* origin, float fForce, class CVector* target,
                                     class CEntity* targetEntity);
@@ -96,7 +96,7 @@ typedef void(DrawRadarAreasHandler)();
 typedef void(Render3DStuffHandler)();
 typedef void(PreRenderSkyHandler)();
 typedef void(RenderHeliLightHandler)();
-typedef bool(ChokingHandler)(unsigned char ucWeaponType);
+typedef bool(ChokingHandler)(std::uint8_t ucWeaponType);
 typedef void(PreWorldProcessHandler)();
 typedef void(PostWorldProcessHandler)();
 typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
@@ -136,7 +136,7 @@ typedef void(AudioZoneRadioSwitchHandler)(DWORD dwStationID);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
-enum class eVehicleAimDirection : unsigned char;
+enum class eVehicleAimDirection : std::uint8_t;
 
 /**
  * This class contains information used for shot syncing, one exists per player.
@@ -261,10 +261,10 @@ public:
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
     virtual bool  HasSkyColor() = 0;
-    virtual void  GetSkyColor(unsigned char& TopRed, unsigned char& TopGreen, unsigned char& TopBlue, unsigned char& BottomRed, unsigned char& BottomGreen,
-                              unsigned char& BottomBlue) = 0;
-    virtual void  SetSkyColor(unsigned char TopRed, unsigned char TopGreen, unsigned char TopBlue, unsigned char BottomRed, unsigned char BottomGreen,
-                              unsigned char BottomBlue) = 0;
+    virtual void  GetSkyColor(std::uint8_t& TopRed, std::uint8_t& TopGreen, std::uint8_t& TopBlue, std::uint8_t& BottomRed, std::uint8_t& BottomGreen,
+                              std::uint8_t& BottomBlue) = 0;
+    virtual void  SetSkyColor(std::uint8_t TopRed, std::uint8_t TopGreen, std::uint8_t TopBlue, std::uint8_t BottomRed, std::uint8_t BottomGreen,
+                              std::uint8_t BottomBlue) = 0;
     virtual void  ResetSky() = 0;
     virtual void  SetHeatHaze(const SHeatHazeSettings& settings) = 0;
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
@@ -296,10 +296,10 @@ public:
     virtual void  SetFogDistance(float fDistance) = 0;
     virtual float GetFogDistance() = 0;
     virtual void  RestoreFogDistance() = 0;
-    virtual void  GetSunColor(unsigned char& ucCoreRed, unsigned char& ucCoreGreen, unsigned char& ucCoreBlue, unsigned char& ucCoronaRed,
-                              unsigned char& ucCoronaGreen, unsigned char& ucCoronaBlue) = 0;
-    virtual void  SetSunColor(unsigned char ucCoreRed, unsigned char ucCoreGreen, unsigned char ucCoreBlue, unsigned char ucCoronaRed,
-                              unsigned char ucCoronaGreen, unsigned char ucCoronaBlue) = 0;
+    virtual void  GetSunColor(std::uint8_t& ucCoreRed, std::uint8_t& ucCoreGreen, std::uint8_t& ucCoreBlue, std::uint8_t& ucCoronaRed,
+                              std::uint8_t& ucCoronaGreen, std::uint8_t& ucCoronaBlue) = 0;
+    virtual void  SetSunColor(std::uint8_t ucCoreRed, std::uint8_t ucCoreGreen, std::uint8_t ucCoreBlue, std::uint8_t ucCoronaRed,
+                              std::uint8_t ucCoronaGreen, std::uint8_t ucCoronaBlue) = 0;
     virtual void  ResetSunColor() = 0;
     virtual float GetSunSize() = 0;
     virtual void  SetSunSize(float fSize) = 0;
@@ -346,14 +346,14 @@ public:
     virtual float GetLocalPlayerGravity() = 0;
     virtual void  SetLocalPlayerGravity(float fGravity) = 0;
 
-    virtual unsigned char GetTrafficLightState() = 0;
-    virtual void          SetTrafficLightState(unsigned char ucState) = 0;
+    virtual std::uint8_t GetTrafficLightState() = 0;
+    virtual void          SetTrafficLightState(std::uint8_t ucState) = 0;
 
     virtual bool GetTrafficLightsLocked() = 0;
     virtual void SetTrafficLightsLocked(bool bLocked) = 0;
 
-    virtual void  SetLocalStatValue(unsigned short usStat, float fValue) = 0;
-    virtual float GetLocalStatValue(unsigned short usStat) = 0;
+    virtual void  SetLocalStatValue(std::uint16_t usStat, float fValue) = 0;
+    virtual float GetLocalStatValue(std::uint16_t usStat) = 0;
     virtual void  SetLocalStatsStatic(bool bStatic) = 0;
 
     virtual void SetLocalCameraRotation(float fRotation) = 0;
@@ -404,7 +404,7 @@ public:
     virtual eAnimID    GetLastStaticAnimationID() = 0;
     virtual DWORD      GetLastAnimArrayAddress() = 0;
 
-    virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
-    virtual unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept = 0;
-    virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+    virtual std::uint32_t EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
+    virtual std::uint32_t PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+    virtual std::uint32_t PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
 };

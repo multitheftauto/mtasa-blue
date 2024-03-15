@@ -30,32 +30,32 @@ public:
     CVehicleManager();
     ~CVehicleManager();
 
-    CVehicle* Create(CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
+    CVehicle* Create(CElement* pParent, std::uint16_t usModel, std::uint8_t ucVariant, std::uint8_t ucVariant2);
     CVehicle* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void      DeleteAll();
 
     bool Exists(CVehicle* pVehicle);
 
-    static bool         IsValidModel(unsigned int uiVehicleModel);
-    static eVehicleType GetVehicleType(unsigned short usModel);
-    static bool         IsValidUpgrade(unsigned short usUpgrade);
-    static unsigned int GetMaxPassengers(unsigned int uiVehicleModel);
-    static bool         HasTurret(unsigned int uiVehicleModel);
-    static bool         HasSirens(unsigned int uiVehicleModel);
-    static bool         HasTaxiLight(unsigned int uiVehicleModel);
-    static bool         HasLandingGears(unsigned int uiVehicleModel);
-    static bool         HasAdjustableProperty(unsigned int uiVehicleModel);
-    static bool         HasSmokeTrail(unsigned int uiVehicleModel);
-    static bool         IsTrailer(unsigned int uiVehicleModel);
-    static bool         HasDamageModel(unsigned short usModel);
+    static bool         IsValidModel(std::uint32_t uiVehicleModel);
+    static eVehicleType GetVehicleType(std::uint16_t usModel);
+    static bool         IsValidUpgrade(std::uint16_t usUpgrade);
+    static std::uint32_t GetMaxPassengers(std::uint32_t uiVehicleModel);
+    static bool         HasTurret(std::uint32_t uiVehicleModel);
+    static bool         HasSirens(std::uint32_t uiVehicleModel);
+    static bool         HasTaxiLight(std::uint32_t uiVehicleModel);
+    static bool         HasLandingGears(std::uint32_t uiVehicleModel);
+    static bool         HasAdjustableProperty(std::uint32_t uiVehicleModel);
+    static bool         HasSmokeTrail(std::uint32_t uiVehicleModel);
+    static bool         IsTrailer(std::uint32_t uiVehicleModel);
+    static bool         HasDamageModel(std::uint16_t usModel);
     static bool         HasDamageModel(eVehicleType Type);
-    static bool         HasDoors(unsigned short usModel);
-    static void         GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static bool         HasDoors(std::uint16_t usModel);
+    static void         GetRandomVariation(std::uint16_t usModel, std::uint8_t& ucVariant, std::uint8_t& ucVariant2);
 
     CVehicleColorManager* GetColorManager() { return &m_ColorManager; }
-    CVehicleColor         GetRandomColor(unsigned short usModel);
+    CVehicleColor         GetRandomColor(std::uint16_t usModel);
 
-    void GetVehiclesOfType(unsigned int uiModel, lua_State* luaVM);
+    void GetVehiclesOfType(std::uint32_t uiModel, lua_State* luaVM);
 
     Container::size_type GetVehicleCount() { return m_List.size(); }
 

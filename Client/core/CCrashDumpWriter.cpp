@@ -151,7 +151,7 @@ void CCrashDumpWriter::UpdateCounters()
 // Can be caused by problems with localized strings.
 //
 ///////////////////////////////////////////////////////////////
-void CCrashDumpWriter::HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved)
+void CCrashDumpWriter::HandleInvalidParameter(const wchar_t* expression, const wchar_t* function, const wchar_t* file, std::uint32_t line, uintptr_t pReserved)
 {
     ms_uiInvalidParameterCount++;
 }
@@ -793,7 +793,7 @@ void CCrashDumpWriter::GetPoolInfo(CBuffer& buffer)
     stream.Write(MAX_POOLS);
 
     // For each pool
-    for (int i = 0; i < MAX_POOLS; i++)
+    for (auto i = 0; i < MAX_POOLS; i++)
     {
         int iCapacity = GetPoolCapacity((ePools)i);
         int iUsedSpaces = GetNumberOfUsedSpaces((ePools)i);
@@ -965,8 +965,8 @@ void CCrashDumpWriter::GetMiscInfo(CBuffer& buffer)
     stream.Write(2);
 
     // US/Euro gta_sa.exe
-    unsigned char ucA = *reinterpret_cast<unsigned char*>(0x748ADD);
-    unsigned char ucB = *reinterpret_cast<unsigned char*>(0x748ADE);
+    std::uint8_t ucA = *reinterpret_cast<std::uint8_t*>(0x748ADD);
+    std::uint8_t ucB = *reinterpret_cast<std::uint8_t*>(0x748ADE);
     stream.Write(ucA);
     stream.Write(ucB);
 
@@ -998,7 +998,7 @@ void CCrashDumpWriter::GetMemoryInfo(CBuffer& buffer)
         &memStatsNow.d3dMemory.DynamicIndexBuffer, &memStatsNow.d3dMemory.StaticTexture,       &memStatsNow.d3dMemory.DynamicTexture};
     int iNumLines = NUMELMS(nowList);
     stream.Write(iNumLines);
-    for (int i = 0; i < iNumLines; i++)
+    for (auto i = 0; i < iNumLines; i++)
     {
         stream.Write(nowList[i]->iLockedCount);
         stream.Write(nowList[i]->iCreatedCount);
@@ -1016,7 +1016,7 @@ void CCrashDumpWriter::GetMemoryInfo(CBuffer& buffer)
     // Model usage
     iNumLines = sizeof(memStatsNow.modelInfo) / sizeof(uint);
     stream.Write(iNumLines);
-    for (int i = 0; i < iNumLines; i++)
+    for (auto i = 0; i < iNumLines; i++)
     {
         stream.Write(memStatsNow.modelInfo.uiArray[i]);
     }

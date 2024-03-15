@@ -193,7 +193,7 @@ void CNetServerBuffer::StopThread()
 // BLOCKING
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CNetServerBuffer::StartNetwork(const char* szIP, unsigned short usServerPort, unsigned int uiAllowedPlayers, const char* szServerName)
+bool CNetServerBuffer::StartNetwork(const char* szIP, std::uint16_t usServerPort, std::uint32_t uiAllowedPlayers, const char* szServerName)
 {
     SStartNetworkArgs* pArgs = new SStartNetworkArgs(szIP, usServerPort, uiAllowedPlayers, szServerName);
     AddCommandAndWait(pArgs);
@@ -468,7 +468,7 @@ void CNetServerBuffer::GetPingStatus(SFixedString<32>* pstrStatus)
 // Thread safe
 //
 ///////////////////////////////////////////////////////////////////////////
-NetBitStreamInterface* CNetServerBuffer::AllocateNetServerBitStream(unsigned short usBitStreamVersion, const void* pData, uint uiDataSize, bool bCopyData)
+NetBitStreamInterface* CNetServerBuffer::AllocateNetServerBitStream(std::uint16_t usBitStreamVersion, const void* pData, uint uiDataSize, bool bCopyData)
 {
     return m_pRealNetServer->AllocateNetServerBitStream(usBitStreamVersion, pData, uiDataSize, bCopyData);
 }
@@ -492,7 +492,7 @@ void CNetServerBuffer::DeallocateNetServerBitStream(NetBitStreamInterface* bitSt
 // Non blocking
 //
 ///////////////////////////////////////////////////////////////////////////
-bool CNetServerBuffer::SendPacket(unsigned char ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast,
+bool CNetServerBuffer::SendPacket(std::uint8_t ucPacketID, const NetServerPlayerID& playerID, NetBitStreamInterface* bitStream, bool bBroadcast,
                                   NetServerPacketPriority packetPriority, NetServerPacketReliability packetReliability, ePacketOrdering packetOrdering)
 {
     AddPacketStat(STATS_OUTGOING_TRAFFIC, ucPacketID, bitStream->GetNumberOfBitsUsed() / 8, 0);
@@ -511,7 +511,7 @@ bool CNetServerBuffer::SendPacket(unsigned char ucPacketID, const NetServerPlaye
 // (To make non blocking, don't)
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::GetPlayerIP(const NetServerPlayerID& playerID, char strIP[22], unsigned short* usPort)
+void CNetServerBuffer::GetPlayerIP(const NetServerPlayerID& playerID, char strIP[22], std::uint16_t* usPort)
 {
     SGetPlayerIPArgs* pArgs = new SGetPlayerIPArgs(playerID, strIP, usPort);
     AddCommandAndWait(pArgs);
@@ -551,7 +551,7 @@ void CNetServerBuffer::SetPassword(const char* szPassword)
 // Non blocking
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::SetMaximumIncomingConnections(unsigned short numberAllowed)
+void CNetServerBuffer::SetMaximumIncomingConnections(std::uint16_t numberAllowed)
 {
     SSetMaximumIncomingConnectionsArgs* pArgs = new SSetMaximumIncomingConnectionsArgs(numberAllowed);
     AddCommandAndFree(pArgs);
@@ -576,7 +576,7 @@ CNetHTTPDownloadManagerInterface* CNetServerBuffer::GetHTTPDownloadManager(EDown
 // Non-blocking. Called once per player
 //
 ///////////////////////////////////////////////////////////////////////////
-void CNetServerBuffer::SetClientBitStreamVersion(const NetServerPlayerID& PlayerID, unsigned short usBitStreamVersion)
+void CNetServerBuffer::SetClientBitStreamVersion(const NetServerPlayerID& PlayerID, std::uint16_t usBitStreamVersion)
 {
     SSetClientBitStreamVersionArgs* pArgs = new SSetClientBitStreamVersionArgs(PlayerID, usBitStreamVersion);
     AddCommandAndFree(pArgs);
@@ -617,7 +617,7 @@ void CNetServerBuffer::SetChecks(const char* szDisableComboACMap, const char* sz
 //
 //
 ///////////////////////////////////////////////////////////////////////////
-unsigned int CNetServerBuffer::GetPendingPacketCount()
+std::uint32_t CNetServerBuffer::GetPendingPacketCount()
 {
     shared.m_Mutex.Lock();
     uint uiCount = shared.m_InResultQueue.size();
@@ -1116,7 +1116,7 @@ void CNetServerBuffer::ProcessCommand(CNetJobData* pJobData)
 
     switch (pJobData->pArgs->type)
     {
-        CALLREALNET4R(bool, StartNetwork, const char*, szIP, unsigned short, usServerPort, unsigned int, uiAllowedPlayers, const char*, szServerName)
+        CALLREALNET4R(bool, StartNetwork, const char*, szIP, std::uint16_t, usServerPort, std::uint32_t, uiAllowedPlayers, const char*, szServerName)
         CALLREALNET0(StopNetwork)
         CALLREALNET0(DoPulse)
         CALLREALNET1(RegisterPacketHandler, PPACKETHANDLER, pfnPacketHandler)
@@ -1126,17 +1126,17 @@ void CNetServerBuffer::ProcessCommand(CNetJobData* pJobData)
         CALLREALNET2R(bool, GetNetPerformanceStatistics, SNetPerformanceStatistics*, pDest, bool, bResetCounters)
         CALLREALNET2R(bool, GetSyncThreadStatistics, SSyncThreadStatistics*, pDest, bool, bResetCounters)
         CALLREALNET1(GetPingStatus, SFixedString<32>*, pstrStatus)
-        CALLREALNET7R(bool, SendPacket, unsigned char, ucPacketID, const NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast,
+        CALLREALNET7R(bool, SendPacket, std::uint8_t, ucPacketID, const NetServerPlayerID&, playerID, NetBitStreamInterface*, bitStream, bool, bBroadcast,
                       NetServerPacketPriority, packetPriority, NetServerPacketReliability, packetReliability, ePacketOrdering, packetOrdering)
-        CALLREALNET3(GetPlayerIP, const NetServerPlayerID&, playerID, char*, strIP, unsigned short*, usPort)
+        CALLREALNET3(GetPlayerIP, const NetServerPlayerID&, playerID, char*, strIP, std::uint16_t*, usPort)
         CALLREALNET1(Kick, const NetServerPlayerID&, PlayerID)
         CALLREALNET1(SetPassword, const char*, szPassword)
-        CALLREALNET1(SetMaximumIncomingConnections, unsigned short, numberAllowed)
-        CALLREALNET2(SetClientBitStreamVersion, const NetServerPlayerID&, PlayerID, unsigned short, usBitStreamVersion)
+        CALLREALNET1(SetMaximumIncomingConnections, std::uint16_t, numberAllowed)
+        CALLREALNET2(SetClientBitStreamVersion, const NetServerPlayerID&, PlayerID, std::uint16_t, usBitStreamVersion)
         CALLREALNET1(ClearClientBitStreamVersion, const NetServerPlayerID&, PlayerID)
         CALLREALNET6(SetChecks, const char*, szDisableComboACMap, const char*, szDisableACMap, const char*, szEnableSDMap, int, iEnableClientChecks, bool,
                      bHideAC, const char*, szImgMods);
-        CALLREALNET0R(unsigned int, GetPendingPacketCount)
+        CALLREALNET0R(std::uint32_t, GetPendingPacketCount)
         CALLREALNET1(GetNetRoute, SFixedString<32>*, pstrRoute)
         CALLREALNET1R(bool, InitServerId, const char*, szPath)
         CALLREALNET1(ResendModPackets, const NetServerPlayerID&, playerID)
@@ -1173,7 +1173,7 @@ void CNetServerBuffer::ProcessCommand(CNetJobData* pJobData)
 // Handle data pushed from netmodule during its pulse
 //
 ///////////////////////////////////////////////////////////////
-bool CNetServerBuffer::StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream,
+bool CNetServerBuffer::StaticProcessPacket(std::uint8_t ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream,
                                            SNetExtraInfo* pNetExtraInfo)
 {
     ms_pNetServerBuffer->ProcessPacket(ucPacketID, Socket, BitStream, pNetExtraInfo);
@@ -1187,7 +1187,7 @@ bool CNetServerBuffer::StaticProcessPacket(unsigned char ucPacketID, const NetSe
 // Handle data pushed from netmodule during its pulse
 //
 ///////////////////////////////////////////////////////////////
-void CNetServerBuffer::ProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo)
+void CNetServerBuffer::ProcessPacket(std::uint8_t ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo)
 {
     if (ucPacketID == PACKET_ID_PLAYER_PURESYNC)
     {

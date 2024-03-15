@@ -46,12 +46,12 @@ void CClientTextDisplay::Render()
     {
         // Render
         CVector2D    vecResolution = g_pCore->GetGUI()->GetResolution();
-        unsigned int uiX = unsigned int(m_vecPosition.fX * vecResolution.fX);
-        unsigned int uiY = unsigned int(m_vecPosition.fY * vecResolution.fY);
+        std::uint32_t uiX = std::uint32_t(m_vecPosition.fX * vecResolution.fX);
+        std::uint32_t uiY = std::uint32_t(m_vecPosition.fY * vecResolution.fY);
         if (m_ulFormat & DT_BOTTOM)
             m_ulFormat |= DT_SINGLELINE;
 
-        unsigned int uiShadowOffset = std::max(1, (int)(m_fScale * m_fGlobalScale));
+        std::uint32_t uiShadowOffset = std::max(1, (int)(m_fScale * m_fGlobalScale));
         SColorRGBA   rgbaShadowColor(0, 0, 0, m_Color.A * m_ucShadowAlpha / 255);
 
         if (rgbaShadowColor.A > 0)
@@ -67,12 +67,12 @@ void CClientTextDisplay::SetColor(const SColor color)
     m_Color = color;
 }
 
-void CClientTextDisplay::SetColorAlpha(unsigned char ucAlpha)
+void CClientTextDisplay::SetColorAlpha(std::uint8_t ucAlpha)
 {
     m_Color.A = ucAlpha;
 }
 
-void CClientTextDisplay::SetShadowAlpha(unsigned char ucShadowAlpha)
+void CClientTextDisplay::SetShadowAlpha(std::uint8_t ucShadowAlpha)
 {
     m_ucShadowAlpha = ucShadowAlpha;
 }
@@ -82,7 +82,7 @@ void CClientTextDisplay::SetScale(float fScale)
     m_fScale = fScale;
 }
 
-void CClientTextDisplay::SetFormat(unsigned long ulFormat)
+void CClientTextDisplay::SetFormat(std::uint32_t ulFormat)
 {
     m_ulFormat = ulFormat;
 }

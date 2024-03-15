@@ -40,7 +40,7 @@ public:
 
     void         AddElements(std::list<CClientStreamElement*>* pList);
     void         RemoveElements(std::list<CClientStreamElement*>* pList);
-    unsigned int CountElements() { return m_Elements.size(); }
+    std::uint32_t CountElements() { return m_Elements.size(); }
 
     CClientStreamSectorRow* GetRow() { return m_pRow; }
     void                    GetCorners(CVector2D& vecBottomLeft, CVector2D& vecTopRight)

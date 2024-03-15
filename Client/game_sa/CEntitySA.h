@@ -129,42 +129,42 @@ public:
 
     RpClump* m_pRwObject;            // 24
     /********** BEGIN CFLAGS **************/
-    unsigned long bUsesCollision : 1;                 // does entity use collision
-    unsigned long bCollisionProcessed : 1;            // has object been processed by a ProcessEntityCollision function
-    unsigned long bIsStatic : 1;                      // is entity static
-    unsigned long bHasContacted : 1;                  // has entity processed some contact forces
-    unsigned long bIsStuck : 1;                       // is entity stuck
-    unsigned long bIsInSafePosition : 1;              // is entity in a collision free safe position
-    unsigned long bWasPostponed : 1;                  // was entity control processing postponed
-    unsigned long bIsVisible : 1;                     // is the entity visible
+    std::uint32_t bUsesCollision : 1;                 // does entity use collision
+    std::uint32_t bCollisionProcessed : 1;            // has object been processed by a ProcessEntityCollision function
+    std::uint32_t bIsStatic : 1;                      // is entity static
+    std::uint32_t bHasContacted : 1;                  // has entity processed some contact forces
+    std::uint32_t bIsStuck : 1;                       // is entity stuck
+    std::uint32_t bIsInSafePosition : 1;              // is entity in a collision free safe position
+    std::uint32_t bWasPostponed : 1;                  // was entity control processing postponed
+    std::uint32_t bIsVisible : 1;                     // is the entity visible
 
-    unsigned long bIsBIGBuilding : 1;                  // Set if this entity is a big building
-    unsigned long bRenderDamaged : 1;                  // use damaged LOD models for objects with applicable damage
-    unsigned long bStreamingDontDelete : 1;            // Dont let the streaming remove this
-    unsigned long bRemoveFromWorld : 1;                // remove this entity next time it should be processed
-    unsigned long bHasHitWall : 1;                     // has collided with a building (changes subsequent collisions)
-    unsigned long bImBeingRendered : 1;                // don't delete me because I'm being rendered
-    unsigned long bDrawLast : 1;                       // draw object last
-    unsigned long bDistanceFade : 1;                   // Fade entity because it is far away
+    std::uint32_t bIsBIGBuilding : 1;                  // Set if this entity is a big building
+    std::uint32_t bRenderDamaged : 1;                  // use damaged LOD models for objects with applicable damage
+    std::uint32_t bStreamingDontDelete : 1;            // Dont let the streaming remove this
+    std::uint32_t bRemoveFromWorld : 1;                // remove this entity next time it should be processed
+    std::uint32_t bHasHitWall : 1;                     // has collided with a building (changes subsequent collisions)
+    std::uint32_t bImBeingRendered : 1;                // don't delete me because I'm being rendered
+    std::uint32_t bDrawLast : 1;                       // draw object last
+    std::uint32_t bDistanceFade : 1;                   // Fade entity because it is far away
 
-    unsigned long bDontCastShadowsOn : 1;            // Dont cast shadows on this object
-    unsigned long bOffscreen : 1;                    // offscreen flag. This can only be trusted when it is set to true
-    unsigned long
+    std::uint32_t bDontCastShadowsOn : 1;            // Dont cast shadows on this object
+    std::uint32_t bOffscreen : 1;                    // offscreen flag. This can only be trusted when it is set to true
+    std::uint32_t
         bIsStaticWaitingForCollision : 1;              // this is used by script created entities - they are static until the collision is loaded below them
-    unsigned long bDontStream : 1;                     // tell the streaming not to stream me
-    unsigned long bUnderwater : 1;                     // this object is underwater change drawing order
-    unsigned long bHasPreRenderEffects : 1;            // Object has a prerender effects attached to it
-    unsigned long bIsTempBuilding : 1;                 // whether or not the building is temporary (i.e. can be created and deleted more than once)
-    unsigned long bDontUpdateHierarchy : 1;            // Don't update the aniamtion hierarchy this frame
+    std::uint32_t bDontStream : 1;                     // tell the streaming not to stream me
+    std::uint32_t bUnderwater : 1;                     // this object is underwater change drawing order
+    std::uint32_t bHasPreRenderEffects : 1;            // Object has a prerender effects attached to it
+    std::uint32_t bIsTempBuilding : 1;                 // whether or not the building is temporary (i.e. can be created and deleted more than once)
+    std::uint32_t bDontUpdateHierarchy : 1;            // Don't update the aniamtion hierarchy this frame
 
-    unsigned long bHasRoadsignText : 1;            // entity is roadsign and has some 2deffect text stuff to be rendered
-    unsigned long bDisplayedSuperLowLOD : 1;
-    unsigned long bIsProcObject : 1;                 // set object has been generate by procedural object generator
-    unsigned long bBackfaceCulled : 1;               // has backface culling on
-    unsigned long bLightObject : 1;                  // light object with directional lights
-    unsigned long bUnimportantStream : 1;            // set that this object is unimportant, if streaming is having problems
-    unsigned long bTunnel : 1;                       // Is this model part of a tunnel
-    unsigned long bTunnelTransition : 1;             // This model should be rendered from within and outside of the tunnel
+    std::uint32_t bHasRoadsignText : 1;            // entity is roadsign and has some 2deffect text stuff to be rendered
+    std::uint32_t bDisplayedSuperLowLOD : 1;
+    std::uint32_t bIsProcObject : 1;                 // set object has been generate by procedural object generator
+    std::uint32_t bBackfaceCulled : 1;               // has backface culling on
+    std::uint32_t bLightObject : 1;                  // light object with directional lights
+    std::uint32_t bUnimportantStream : 1;            // set that this object is unimportant, if streaming is having problems
+    std::uint32_t bTunnel : 1;                       // Is this model part of a tunnel
+    std::uint32_t bTunnelTransition : 1;             // This model should be rendered from within and outside of the tunnel
     /********** END CFLAGS **************/
 
     WORD         RandomSeed;               // 32

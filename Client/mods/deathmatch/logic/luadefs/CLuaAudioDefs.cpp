@@ -811,7 +811,7 @@ int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
             {
                 // Create a new table
                 lua_newtable(luaVM);
-                for (int i = 0; i <= iLength / 2; i++)
+                for (auto i = 0; i <= iLength / 2; i++)
                 {
                     lua_pushnumber(luaVM, i);
                     lua_pushnumber(luaVM, pData[i]);
@@ -822,7 +822,7 @@ int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
             {
                 // Create a new table
                 lua_newtable(luaVM);
-                for (int i = 0; i <= iBands - 1; i++)
+                for (auto i = 0; i <= iBands - 1; i++)
                 {
                     lua_pushnumber(luaVM, i);
                     lua_pushnumber(luaVM, pData[i]);
@@ -884,7 +884,7 @@ int CLuaAudioDefs::GetSoundWaveData(lua_State* luaVM)
         {
             // Create a new table
             lua_newtable(luaVM);
-            for (int i = 0; i < iLength; i++)
+            for (auto i = 0; i < iLength; i++)
             {
                 lua_pushnumber(luaVM, i);
                 lua_pushnumber(luaVM, pData[i]);
@@ -2119,7 +2119,7 @@ int CLuaAudioDefs::PlaySoundFrontEnd(lua_State* luaVM)
 {
     CClientSound*    pSound = NULL;
     CVector          vecPosition;
-    unsigned char    ucSound = 0;
+    std::uint8_t    ucSound = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucSound);
 
@@ -2479,7 +2479,7 @@ int CLuaAudioDefs::GetSoundPan(lua_State* luaVM)
 // Radio
 int CLuaAudioDefs::SetRadioChannel(lua_State* luaVM)
 {
-    unsigned char    ucChannel = 0;
+    std::uint8_t    ucChannel = 0;
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucChannel);
 
@@ -2500,7 +2500,7 @@ int CLuaAudioDefs::SetRadioChannel(lua_State* luaVM)
 
 int CLuaAudioDefs::GetRadioChannel(lua_State* luaVM)
 {
-    unsigned char ucChannel = 0;
+    std::uint8_t ucChannel = 0;
     if (CStaticFunctionDefinitions::GetRadioChannel(ucChannel))
     {
         lua_pushnumber(luaVM, ucChannel);

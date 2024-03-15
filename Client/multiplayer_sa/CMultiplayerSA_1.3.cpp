@@ -243,8 +243,8 @@ void CMultiplayerSA::InitMemoryCopies_13()
 // Siren Stuff
 CVector* vecRelativeSirenPosition;
 
-unsigned char ucSirenCount = 0;
-unsigned char ucRandomiser = 0;
+std::uint8_t ucSirenCount = 0;
+std::uint8_t ucRandomiser = 0;
 
 CVehicleSAInterface* pVehicleWithTheSiren = NULL;
 
@@ -430,7 +430,7 @@ bool ProcessVehicleSirenPosition()
             if (pVehicle->DoesVehicleHaveSirens() && pVehicle->GetVehicleSirenCount() > 0)
             {
                 // Get our siren count
-                unsigned char ucVehicleSirenCount = pVehicle->GetVehicleSirenCount();
+                std::uint8_t ucVehicleSirenCount = pVehicle->GetVehicleSirenCount();
                 // Get our current Siren ID
                 ucSirenCount = pVehicle->GetVehicleCurrentSirenID();
 
@@ -1435,7 +1435,7 @@ void                       CVehicleModelInterface_SetClump()
 {
     // Loop through all vehicles and find the vehicle id that this interface belongs to
     CModelInfo* pModelInfo = NULL;
-    for (int i = 400; i < 612; i++)
+    for (auto i = 400; i < 612; i++)
     {
         pModelInfo = pGameInterface->GetModelInfo(i);
         if (pModelInfo && (DWORD)pModelInfo->GetInterface() == (DWORD)pLoadingModelInfo)

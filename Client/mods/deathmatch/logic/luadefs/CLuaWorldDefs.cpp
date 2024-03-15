@@ -169,7 +169,7 @@ int CLuaWorldDefs::CreateExplosion(lua_State* luaVM)
 int CLuaWorldDefs::GetTime(lua_State* luaVM)
 {
     // Get the time
-    unsigned char ucHour, ucMinute;
+    std::uint8_t ucHour, ucMinute;
     if (CStaticFunctionDefinitions::GetTime(ucHour, ucMinute))
     {
         // Return it
@@ -494,7 +494,7 @@ int CLuaWorldDefs::GetScreenFromWorldPosition(lua_State* luaVM)
 
 int CLuaWorldDefs::GetWeather(lua_State* luaVM)
 {
-    unsigned char ucWeather, ucWeatherBlendingTo;
+    std::uint8_t ucWeather, ucWeatherBlendingTo;
     if (CStaticFunctionDefinitions::GetWeather(ucWeather, ucWeatherBlendingTo))
     {
         lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeather));
@@ -565,7 +565,7 @@ int CLuaWorldDefs::GetGameSpeed(lua_State* luaVM)
 
 int CLuaWorldDefs::GetMinuteDuration(lua_State* luaVM)
 {
-    unsigned long ulDelay;
+    std::uint32_t ulDelay;
     if (CStaticFunctionDefinitions::GetMinuteDuration(ulDelay))
     {
         lua_pushnumber(luaVM, ulDelay);
@@ -729,7 +729,7 @@ int CLuaWorldDefs::SetBlurLevel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetBlurLevel(static_cast<unsigned char>(iLevel)))
+        if (CStaticFunctionDefinitions::SetBlurLevel(static_cast<std::uint8_t>(iLevel)))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -764,7 +764,7 @@ int CLuaWorldDefs::SetTime(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Set the new time
-        if (CStaticFunctionDefinitions::SetTime(static_cast<unsigned char>(iHour), static_cast<unsigned char>(iMinute)))
+        if (CStaticFunctionDefinitions::SetTime(static_cast<std::uint8_t>(iHour), static_cast<std::uint8_t>(iMinute)))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -780,7 +780,7 @@ int CLuaWorldDefs::SetTime(lua_State* luaVM)
 
 int CLuaWorldDefs::GetSkyGradient(lua_State* luaVM)
 {
-    unsigned char ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB;
+    std::uint8_t ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB;
     CStaticFunctionDefinitions::GetSkyGradient(ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB);
 
     lua_pushnumber(luaVM, ucTopR);
@@ -905,7 +905,7 @@ int CLuaWorldDefs::SetWeather(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Set the new time
-        if (CStaticFunctionDefinitions::SetWeather(static_cast<unsigned char>(iWeatherID)))
+        if (CStaticFunctionDefinitions::SetWeather(static_cast<std::uint8_t>(iWeatherID)))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -930,7 +930,7 @@ int CLuaWorldDefs::SetWeatherBlended(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Set the new time
-        if (CStaticFunctionDefinitions::SetWeatherBlended(static_cast<unsigned char>(iWeatherID)))
+        if (CStaticFunctionDefinitions::SetWeatherBlended(static_cast<std::uint8_t>(iWeatherID)))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1364,7 +1364,7 @@ int CLuaWorldDefs::SetTrafficLightState(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            unsigned char ucState = SharedUtil::GetTrafficLightStateFromColors(eColorNS, eColorEW);
+            std::uint8_t ucState = SharedUtil::GetTrafficLightStateFromColors(eColorNS, eColorEW);
 
             // Change it.
             bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked(true) && CStaticFunctionDefinitions::SetTrafficLightState(ucState);
@@ -1786,7 +1786,7 @@ int CLuaWorldDefs::ResetFogDistance(lua_State* luaVM)
 
 int CLuaWorldDefs::GetSunColor(lua_State* luaVM)
 {
-    unsigned char ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue;
+    std::uint8_t ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue;
 
     g_pMultiplayer->GetSunColor(ucCoreRed, ucCoreGreen, ucCoreBlue, ucCoronaRed, ucCoronaGreen, ucCoronaBlue);
 
@@ -2010,8 +2010,8 @@ bool CLuaWorldDefs::ResetColorFilter()
 bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha, uchar ucPass1Red, uchar ucPass1Green,
                                    uchar ucPass1Blue, uchar ucPass1Alpha)
 {
-    unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
-    unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
+    std::uint32_t ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
+    std::uint32_t ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
     g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
     return true;
 }

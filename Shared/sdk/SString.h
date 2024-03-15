@@ -72,7 +72,7 @@ public:
     const char* operator*() const { return c_str(); }
 
     // Functions
-    void           Split(const SString& strDelim, std::vector<SString>& outResult, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0) const;
+    void           Split(const SString& strDelim, std::vector<SString>& outResult, std::uint32_t uiMaxAmount = 0, std::uint32_t uiMinAmount = 0) const;
     bool           Split(const SString& strDelim, SString* pstrLeft, SString* pstrRight, int iIndex = 1) const;
     SString        SplitLeft(const SString& strDelim, SString* pstrRight = NULL, int iIndex = 1) const;
     SString        SplitRight(const SString& strDelim, SString* pstrLeft = NULL, int iIndex = 1) const;
@@ -126,12 +126,12 @@ class TSplitString : public std::vector<const CHAR_TYPE*>
 {
 public:
     TSplitString() {}
-    TSplitString(const STRING_TYPE& strInput, const STRING_TYPE& strDelim, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0)
+    TSplitString(const STRING_TYPE& strInput, const STRING_TYPE& strDelim, std::uint32_t uiMaxAmount = 0, std::uint32_t uiMinAmount = 0)
     {
         Split(strInput, strDelim, uiMaxAmount, uiMinAmount);
     }
 
-    void Split(const STRING_TYPE& strInput, const STRING_TYPE& strDelim, unsigned int uiMaxAmount = 0, unsigned int uiMinAmount = 0)
+    void Split(const STRING_TYPE& strInput, const STRING_TYPE& strDelim, std::uint32_t uiMaxAmount = 0, std::uint32_t uiMinAmount = 0)
     {
         // Copy string to buffer
         uint iInputLength = strInput.length();

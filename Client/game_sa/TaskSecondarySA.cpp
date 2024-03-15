@@ -17,7 +17,7 @@
 // ## Purpose: Make the ped duck
 // ##############################################################################
 
-CTaskSimpleDuckSA::CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck, short nUseShotsWhizzingEvents)
+CTaskSimpleDuckSA::CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, std::uint16_t nLengthOfDuck, short nUseShotsWhizzingEvents)
 {
     DWORD dwFunc = FUNC_CTaskSimpleDuck__Constructor;
     CreateTaskInterface(sizeof(CTaskSimpleDuckSAInterface));

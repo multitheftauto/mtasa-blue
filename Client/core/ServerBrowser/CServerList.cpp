@@ -61,7 +61,7 @@ void CServerList::Pulse()
     else if (iVar == 2)
         iQueriesPerSecond = 50;
 
-    long long llTickCount = GetTickCount64_();
+    std::int64_t llTickCount = GetTickCount64_();
     // Ensure m_llLastTickCount is initialized
     m_llLastTickCount = m_llLastTickCount ? m_llLastTickCount : llTickCount;
     // Ensure m_llLastTickCount is in range
@@ -75,13 +75,13 @@ void CServerList::Pulse()
     int iNumTicksUsed = iNumQueries * iTicksPerQuery;
     m_llLastTickCount += iNumTicksUsed;
 
-    unsigned int uiQueriesSent = 0;
-    unsigned int uiQueriesResent = 0;
-    unsigned int uiRepliesParsed = 0;
-    unsigned int uiNoReplies = 0;
-    unsigned int uiActiveServers = 0;
-    unsigned int uiTotalSlots = 0;
-    unsigned int uiOccupiedSlots = 0;
+    std::uint32_t uiQueriesSent = 0;
+    std::uint32_t uiQueriesResent = 0;
+    std::uint32_t uiRepliesParsed = 0;
+    std::uint32_t uiNoReplies = 0;
+    std::uint32_t uiActiveServers = 0;
+    std::uint32_t uiTotalSlots = 0;
+    std::uint32_t uiOccupiedSlots = 0;
     bool         bRemoveNonResponding = RemoveNonResponding();
 
     // If a query is going to be done this pass, try to find high priority items first
@@ -230,7 +230,7 @@ void CServerList::SortByASEVersion()
 
 void CServerListInternet::Pulse()
 {            // We also need to take care of the master server list here
-    unsigned long ulTime = m_ElapsedTime.Get();
+    std::uint32_t ulTime = m_ElapsedTime.Get();
 
     if (m_iPass == 1)
     {
@@ -302,7 +302,7 @@ void CServerListLAN::Pulse()
         if (recvfrom(m_Socket, szBuffer, sizeof(szBuffer), 0, (sockaddr*)&m_Remote, &len) > 10)
             if (strncmp(szBuffer, SERVER_LIST_SERVER_BROADCAST_STR, strlen(SERVER_LIST_SERVER_BROADCAST_STR)) == 0)
             {
-                unsigned short usPort = (unsigned short)atoi(&szBuffer[strlen(SERVER_LIST_SERVER_BROADCAST_STR) + 1]);
+                std::uint16_t usPort = (std::uint16_t)atoi(&szBuffer[strlen(SERVER_LIST_SERVER_BROADCAST_STR) + 1]);
                 // Add the server if doesn't already exist
                 AddUnique(m_Remote.sin_addr, usPort - SERVER_LIST_QUERY_PORT_OFFSET);
             }
@@ -457,7 +457,7 @@ std::string CServerListItem::Pulse(bool bCanSendQuery, bool bRemoveNonResponding
     }
 }
 
-unsigned short CServerListItem::GetQueryPort()
+std::uint16_t CServerListItem::GetQueryPort()
 {
     return usGamePort + SERVER_LIST_QUERY_PORT_OFFSET;
 }
@@ -655,7 +655,7 @@ void CServerListItemList::OnItemChangeAddress(CServerListItem* pItem, in_addr Ad
 //
 //////////////////////////////////////////////////////////////////////////////
 // Auto add to associated list
-CServerListItem::CServerListItem(in_addr _Address, unsigned short _usGamePort, CServerListItemList* pItemList, bool bAtFront)
+CServerListItem::CServerListItem(in_addr _Address, std::uint16_t _usGamePort, CServerListItemList* pItemList, bool bAtFront)
 {
     Address = _Address;
     usGamePort = _usGamePort;
@@ -697,7 +697,7 @@ void CServerListItem::ResetForRefresh()
     bMaybeOffline = false;
 }
 
-void CServerListItem::ChangeAddress(in_addr _Address, unsigned short _usGamePort)
+void CServerListItem::ChangeAddress(in_addr _Address, std::uint16_t _usGamePort)
 {
     if (m_pItemList)
     {

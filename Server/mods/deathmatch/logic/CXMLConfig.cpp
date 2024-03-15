@@ -77,8 +77,8 @@ int CXMLConfig::GetString(CXMLNode* pParent, const char* szKey, std::string& str
 
         // Check the lengths
         size_t sizeString = strValue.length();
-        if ((iMinLength == -1 || sizeString >= static_cast<unsigned int>(iMinLength)) &&
-            (iMaxLength == -1 || sizeString <= static_cast<unsigned int>(iMaxLength)))
+        if ((iMinLength == -1 || sizeString >= static_cast<std::uint32_t>(iMinLength)) &&
+            (iMaxLength == -1 || sizeString <= static_cast<std::uint32_t>(iMaxLength)))
         {
             return IS_SUCCESS;
         }
@@ -89,7 +89,7 @@ int CXMLConfig::GetString(CXMLNode* pParent, const char* szKey, std::string& str
     return DOESNT_EXIST;
 }
 
-int CXMLConfig::GetRGBA(CXMLNode* pParent, const char* szKey, unsigned char& R, unsigned char& G, unsigned char& B, unsigned char& A)
+int CXMLConfig::GetRGBA(CXMLNode* pParent, const char* szKey, std::uint8_t& R, std::uint8_t& G, std::uint8_t& B, std::uint8_t& A)
 {
     int Status = INVALID_VALUE;
     int iR, iG, iB, iA;
@@ -159,7 +159,7 @@ void CXMLConfig::SetString(CXMLNode* pParent, const char* szKey, const std::stri
     }
 }
 
-void CXMLConfig::SetRGBA(CXMLNode* pParent, const char* szKey, unsigned char R, unsigned char G, unsigned char B, unsigned char A)
+void CXMLConfig::SetRGBA(CXMLNode* pParent, const char* szKey, std::uint8_t R, std::uint8_t G, std::uint8_t B, std::uint8_t A)
 {
     // Create the XML node
     CXMLNode* pNode = pParent->FindSubNode(szKey);

@@ -84,7 +84,7 @@ void CElementRPCs::SetElementParent(CClientEntity* pSource, NetBitStreamInterfac
 
 void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned short usNameLength;
+    std::uint16_t usNameLength;
     if (bitStream.ReadCompressed(usNameLength))
     {
         // We should never receive an illegal name length from the server
@@ -105,7 +105,7 @@ void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface&
 void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the name length
-    unsigned short usNameLength;
+    std::uint16_t usNameLength;
     bool           bRecursive;            // Unused
     if (bitStream.ReadCompressed(usNameLength))
     {
@@ -124,7 +124,7 @@ void CElementRPCs::SetElementPosition(CClientEntity* pSource, NetBitStreamInterf
 {
     // Read out the entity id and the position
     CVector       vecPosition;
-    unsigned char ucTimeContext;
+    std::uint8_t ucTimeContext;
     if (bitStream.Read(vecPosition.fX) && bitStream.Read(vecPosition.fY) && bitStream.Read(vecPosition.fZ) && bitStream.Read(ucTimeContext))
     {
         // Update the sync context to the new one
@@ -133,7 +133,7 @@ void CElementRPCs::SetElementPosition(CClientEntity* pSource, NetBitStreamInterf
         // If it's a player, use Teleport
         if (pSource->GetType() == CCLIENTPLAYER)
         {
-            unsigned char ucWarp = 1;
+            std::uint8_t ucWarp = 1;
             bitStream.Read(ucWarp);
 
             CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pSource);
@@ -248,7 +248,7 @@ void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStrea
 
 void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucInterior, ucSetPosition;
+    std::uint8_t ucInterior, ucSetPosition;
     if (bitStream.Read(ucInterior) && bitStream.Read(ucSetPosition))
     {
         pSource->SetInterior(ucInterior);
@@ -275,7 +275,7 @@ void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterf
 
 void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned short usDimension;
+    std::uint16_t usDimension;
     if (bitStream.Read(usDimension))
     {
         if (pSource->GetType() == CCLIENTTEAM)
@@ -329,7 +329,7 @@ void CElementRPCs::AttachElements(CClientEntity* pSource, NetBitStreamInterface&
 
 void CElementRPCs::DetachElements(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucTimeContext;
+    std::uint8_t ucTimeContext;
     if (bitStream.Read(ucTimeContext))
     {
         pSource->SetSyncTimeContext(ucTimeContext);
@@ -345,7 +345,7 @@ void CElementRPCs::DetachElements(CClientEntity* pSource, NetBitStreamInterface&
 
 void CElementRPCs::SetElementAlpha(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucAlpha;
+    std::uint8_t ucAlpha;
     if (bitStream.Read(ucAlpha))
     {
         switch (pSource->GetType())
@@ -395,7 +395,7 @@ void CElementRPCs::SetElementName(CClientEntity* pSource, NetBitStreamInterface&
 void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     float         fHealth;
-    unsigned char ucTimeContext;
+    std::uint8_t ucTimeContext;
     if (bitStream.Read(fHealth) && bitStream.Read(ucTimeContext))
     {
         pSource->SetSyncTimeContext(ucTimeContext);
@@ -433,7 +433,7 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
 
 void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned short usModel;
+    std::uint16_t usModel;
 
     if (!bitStream.Read(usModel))
         return;
@@ -444,7 +444,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         case CCLIENTPLAYER:
         {
             CClientPed*          pPed = static_cast<CClientPed*>(pSource);
-            const unsigned short usCurrentModel = static_cast<ushort>(pPed->GetModel());
+            const std::uint16_t usCurrentModel = static_cast<ushort>(pPed->GetModel());
 
             if (usCurrentModel != usModel)
             {
@@ -470,7 +470,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
             }
 
             CClientVehicle*      pVehicle = static_cast<CClientVehicle*>(pSource);
-            const unsigned short usCurrentModel = pVehicle->GetModel();
+            const std::uint16_t usCurrentModel = pVehicle->GetModel();
 
             if (usCurrentModel != usModel)
             {
@@ -489,7 +489,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         case CCLIENTWEAPON:
         {
             CClientObject*       pObject = static_cast<CClientObject*>(pSource);
-            const unsigned short usCurrentModel = pObject->GetModel();
+            const std::uint16_t usCurrentModel = pObject->GetModel();
 
             if (usCurrentModel != usModel)
             {

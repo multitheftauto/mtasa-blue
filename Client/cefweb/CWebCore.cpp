@@ -92,7 +92,7 @@ bool CWebCore::Initialise()
     return state;
 }
 
-CWebViewInterface* CWebCore::CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
+CWebViewInterface* CWebCore::CreateWebView(std::uint32_t uiWidth, std::uint32_t uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
                                            bool bTransparent)
 {
     // Create our webview implementation
@@ -256,7 +256,7 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
     static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
                                           "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
-    for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
+    for (auto i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
     {
         if (WildcardMatch(wildcardWhitelist[i], strURL))
             return eURLState::WEBPAGE_ALLOWED;
@@ -337,11 +337,11 @@ void CWebCore::InitialiseWhiteAndBlacklist(bool bAddHardcoded, bool bAddDynamic)
         static SString blacklist[] = {"nobrain.dk"};
 
         // Blacklist or whitelist URLs now
-        for (unsigned int i = 0; i < sizeof(whitelist) / sizeof(SString); ++i)
+        for (std::uint32_t i = 0; i < sizeof(whitelist) / sizeof(SString); ++i)
         {
             AddAllowedPage(whitelist[i], eWebFilterType::WEBFILTER_HARDCODED);
         }
-        for (unsigned int i = 0; i < sizeof(blacklist) / sizeof(SString); ++i)
+        for (std::uint32_t i = 0; i < sizeof(blacklist) / sizeof(SString); ++i)
         {
             AddBlockedPage(blacklist[i], eWebFilterType::WEBFILTER_HARDCODED);
         }
@@ -443,7 +443,7 @@ bool CWebCore::IsRequestsGUIVisible()
     return m_pRequestsGUI && m_pRequestsGUI->IsVisible();
 }
 
-void CWebCore::DebugOutputThreadsafe(const SString& message, unsigned char R, unsigned char G, unsigned char B)
+void CWebCore::DebugOutputThreadsafe(const SString& message, std::uint8_t R, std::uint8_t G, std::uint8_t B)
 {
     AddEventToEventQueue([message, R, G, B]() { g_pCore->DebugEchoColor(message, R, G, B); }, nullptr, "DebugOutputThreadsafe");
 }
@@ -561,7 +561,7 @@ bool CWebCore::UpdateListsFromMaster()
         time_t currentTime;
         time(&currentTime);
 
-        if (lastUpdateTime < SString("%d", (long long)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
+        if (lastUpdateTime < SString("%d", (std::int64_t)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
         {
             OutputDebugLine("Updating white- and blacklist...");
             SHttpRequestOptions options;
@@ -570,7 +570,7 @@ bool CWebCore::UpdateListsFromMaster()
                 ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
                 ->QueueFile(SString("%s?type=getrev", BROWSER_UPDATE_URL), NULL, this, &CWebCore::StaticFetchRevisionFinished, options);
 
-            pLastUpdateNode->SetTagContent(SString("%d", (long long)currentTime));
+            pLastUpdateNode->SetTagContent(SString("%d", (std::int64_t)currentTime));
             m_pXmlConfig->Write();
         }
     }

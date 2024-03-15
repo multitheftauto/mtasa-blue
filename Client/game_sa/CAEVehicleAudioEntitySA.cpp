@@ -52,7 +52,7 @@ void CAEVehicleAudioEntitySA::TurnOnRadioForVehicle()
     }
 }
 
-void CAEVehicleAudioEntitySA::StopVehicleEngineSound(unsigned char ucSlot)
+void CAEVehicleAudioEntitySA::StopVehicleEngineSound(std::uint8_t ucSlot)
 {
     DWORD          dwFunc = FUNC_CAESound__Stop;
     tVehicleSound* pVehicleSound = &m_pInterface->m_aEngineSounds[ucSlot];

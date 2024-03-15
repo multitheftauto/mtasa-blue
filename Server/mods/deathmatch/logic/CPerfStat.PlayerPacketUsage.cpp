@@ -123,8 +123,8 @@ public:
 
     SString                  m_strCategoryName;
     CAllPlayerPacketUsage    m_AllPlayerPacketUsage;
-    long long                m_LastTickCount;
-    unsigned long            m_SecondCounter;
+    std::int64_t                m_LastTickCount;
+    std::uint32_t            m_SecondCounter;
     std::map<CLuaMain*, int> m_LuaMainMap;
 };
 
@@ -188,8 +188,8 @@ const SString& CPerfStatPlayerPacketUsageImpl::GetCategoryName()
 ///////////////////////////////////////////////////////////////
 void CPerfStatPlayerPacketUsageImpl::DoPulse()
 {
-    long long llTickCount = GetTickCount64_();
-    long long llDelta = llTickCount - m_LastTickCount;
+    std::int64_t llTickCount = GetTickCount64_();
+    std::int64_t llDelta = llTickCount - m_LastTickCount;
     if (llDelta >= 1000)
     {
         UpdatePlayerPacketUsage();
@@ -346,7 +346,7 @@ void CPerfStatPlayerPacketUsageImpl::GetPlayerPacketUsageStats(CPerfStatResult* 
 
     pResult->AddColumn("Packet type");
 
-    for (int i = 0; i < 4; i++)
+    for (auto i = 0; i < 4; i++)
     {
         if (flags & (1 << i))
         {
@@ -401,7 +401,7 @@ void CPerfStatPlayerPacketUsageImpl::OutputTimeSpanBlock(CPerfStatResult* pResul
     int c = 0;
     row[c++] = BlockName;
 
-    for (int i = 0; i < 4; i++)
+    for (auto i = 0; i < 4; i++)
     {
         if (flags & (1 << i))
         {

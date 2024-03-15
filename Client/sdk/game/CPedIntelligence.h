@@ -20,5 +20,5 @@ class CPedIntelligence
 public:
     virtual CTaskManager*     GetTaskManager() = 0;
     virtual bool              TestForStealthKill(CPed* pPed, bool bUnk) = 0;
-    virtual CTaskSAInterface* SetTaskDuckSecondary(unsigned short nLengthOfDuck) = 0;
+    virtual CTaskSAInterface* SetTaskDuckSecondary(std::uint16_t nLengthOfDuck) = 0;
 };

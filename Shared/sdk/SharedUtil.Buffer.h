@@ -291,7 +291,7 @@ namespace SharedUtil
 
 #if defined(ANY_x64) || defined(ANY_arm64)
         // Force all these types to use 4 bytes
-        bool Read(unsigned long& e)
+        bool Read(std::uint32_t& e)
         {
             uint temp;
             bool bResult = Read(temp);
@@ -387,7 +387,7 @@ namespace SharedUtil
 
 #if defined(ANY_x64) || defined(ANY_arm64)
         // Force all these types to use 4 bytes
-        void Write(unsigned long e) { Write((uint)e); }
+        void Write(std::uint32_t e) { Write((uint)e); }
         void Write(long e) { Write((int)e); }
     #ifdef WIN_x64
         void Write(size_t e) { Write((uint)e); }

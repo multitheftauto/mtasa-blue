@@ -41,7 +41,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (pVehicle)
         {
             // Read out the time context
-            unsigned char ucTimeContext = 0;
+            std::uint8_t ucTimeContext = 0;
             if (!BitStream.Read(ucTimeContext))
                 return false;
 
@@ -118,7 +118,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
 
             // Read out the vehicle matrix only if he's the driver
-            unsigned int uiSeat = pSourcePlayer->GetOccupiedVehicleSeat();
+            std::uint32_t uiSeat = pSourcePlayer->GetOccupiedVehicleSeat();
             if (uiSeat == 0)
             {
                 // Read out the vehicle rotation in degrees
@@ -481,7 +481,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(pSourcePlayer->GetSyncTimeContext());
 
             // Write his ping divided with 2 plus a small number so the client can find out when this packet was sent
-            unsigned short usLatency = pSourcePlayer->GetPing();
+            std::uint16_t usLatency = pSourcePlayer->GetPing();
             BitStream.WriteCompressed(usLatency);
 
             // Write the keysync data
@@ -494,7 +494,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 
             // Write the vehicle matrix only if he's the driver
             CVector      vecTemp;
-            unsigned int uiSeat = pSourcePlayer->GetOccupiedVehicleSeat();
+            std::uint32_t uiSeat = pSourcePlayer->GetOccupiedVehicleSeat();
             if (uiSeat == 0)
             {
                 // Vehicle position
@@ -598,7 +598,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(&armor);
 
             // Weapon
-            unsigned char ucWeaponType = pSourcePlayer->GetWeaponType();
+            std::uint8_t ucWeaponType = pSourcePlayer->GetWeaponType();
 
             // Flags
             SVehiclePuresyncFlags flags;
@@ -687,7 +687,7 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModel)
 {
     // Turret data
-    unsigned short usModel = pVehicle->GetModel();
+    std::uint16_t usModel = pVehicle->GetModel();
     if (CVehicleManager::HasTurret(iRemoteModel))
     {
         // Read out the turret position
@@ -703,7 +703,7 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStrea
     // Adjustable property value
     if (CVehicleManager::HasAdjustableProperty(iRemoteModel))
     {
-        unsigned short usAdjustableProperty;
+        std::uint16_t usAdjustableProperty;
         if (BitStream.Read(usAdjustableProperty) && CVehicleManager::HasAdjustableProperty(usModel))
         {
             pVehicle->SetAdjustableProperty(usAdjustableProperty);
@@ -715,7 +715,7 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStrea
     {
         SDoorOpenRatioSync door;
 
-        for (unsigned int i = 2; i < 6; ++i)
+        for (std::uint32_t i = 2; i < 6; ++i)
         {
             if (!BitStream.Read(&door))
                 return;
@@ -729,7 +729,7 @@ void CVehiclePuresyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStrea
 void CVehiclePuresyncPacket::WriteVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterface& BitStream) const
 {
     // Turret states
-    unsigned short usModel = pVehicle->GetModel();
+    std::uint16_t usModel = pVehicle->GetModel();
     if (CVehicleManager::HasTurret(usModel))
     {
         SVehicleTurretSync vehicle;
@@ -748,7 +748,7 @@ void CVehiclePuresyncPacket::WriteVehicleSpecific(CVehicle* pVehicle, NetBitStre
     if (CVehicleManager::HasDoors(usModel))
     {
         SDoorOpenRatioSync door;
-        for (unsigned int i = 2; i < 6; ++i)
+        for (std::uint32_t i = 2; i < 6; ++i)
         {
             door.data.fRatio = pVehicle->GetDoorOpenRatio(i);
             BitStream.Write(&door);

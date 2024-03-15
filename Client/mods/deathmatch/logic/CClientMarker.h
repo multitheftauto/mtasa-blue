@@ -73,7 +73,7 @@ public:
     void  SetSize(float fSize);
 
     static int  StringToType(const char* szString);
-    static bool TypeToString(unsigned int uiType, SString& strOutString);
+    static bool TypeToString(std::uint32_t uiType, SString& strOutString);
 
     static bool IsLimitReached();
 
@@ -95,7 +95,7 @@ private:
     CClientMarkerCommon*  m_pMarker;
 
     CVector             m_vecPosition;
-    static unsigned int m_uiStreamedInMarkers;
+    static std::uint32_t m_uiStreamedInMarkers;
 
     CClientColShape* m_pCollision;
 };

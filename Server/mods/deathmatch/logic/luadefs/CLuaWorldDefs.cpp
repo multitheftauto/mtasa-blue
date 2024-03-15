@@ -102,7 +102,7 @@ void CLuaWorldDefs::LoadFunctions()
 int CLuaWorldDefs::getTime(lua_State* luaVM)
 {
     // Get the time
-    unsigned char ucHour, ucMinute;
+    std::uint8_t ucHour, ucMinute;
     if (CStaticFunctionDefinitions::GetTime(ucHour, ucMinute))
     {
         // Return it
@@ -118,7 +118,7 @@ int CLuaWorldDefs::getTime(lua_State* luaVM)
 
 int CLuaWorldDefs::getWeather(lua_State* luaVM)
 {
-    unsigned char ucWeather, ucWeatherBlendingTo;
+    std::uint8_t ucWeather, ucWeatherBlendingTo;
     if (CStaticFunctionDefinitions::GetWeather(ucWeather, ucWeatherBlendingTo))
     {
         lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeather));
@@ -201,7 +201,7 @@ int CLuaWorldDefs::getWaveHeight(lua_State* luaVM)
 
 int CLuaWorldDefs::getFPSLimit(lua_State* luaVM)
 {
-    unsigned short usLimit;
+    std::uint16_t usLimit;
     if (CStaticFunctionDefinitions::GetFPSLimit(usLimit))
     {
         lua_pushnumber(luaVM, usLimit);
@@ -214,7 +214,7 @@ int CLuaWorldDefs::getFPSLimit(lua_State* luaVM)
 
 int CLuaWorldDefs::getMinuteDuration(lua_State* luaVM)
 {
-    unsigned long ulDuration;
+    std::uint32_t ulDuration;
     if (CStaticFunctionDefinitions::GetMinuteDuration(ulDuration))
     {
         lua_pushnumber(luaVM, ulDuration);
@@ -251,7 +251,7 @@ int CLuaWorldDefs::isGarageOpen(lua_State* luaVM)
 
 int CLuaWorldDefs::getTrafficLightState(lua_State* luaVM)
 {
-    unsigned char ucTrafficLightState;
+    std::uint8_t ucTrafficLightState;
     if (CStaticFunctionDefinitions::GetTrafficLightState(ucTrafficLightState))
     {
         lua_pushnumber(luaVM, ucTrafficLightState);
@@ -278,7 +278,7 @@ int CLuaWorldDefs::areTrafficLightsLocked(lua_State* luaVM)
 int CLuaWorldDefs::setTime(lua_State* luaVM)
 {
     //  bool setTimer ( int hour, int minute )
-    unsigned char ucHour, ucMinute;
+    std::uint8_t ucHour, ucMinute;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucHour);
@@ -357,7 +357,7 @@ int CLuaWorldDefs::setTrafficLightState(lua_State* luaVM)
 
         if (!argStream.HasErrors())
         {
-            unsigned char ucState = SharedUtil::GetTrafficLightStateFromColors(eColorNS, eColorEW);
+            std::uint8_t ucState = SharedUtil::GetTrafficLightStateFromColors(eColorNS, eColorEW);
 
             // Change it.
             bool bOk = CStaticFunctionDefinitions::SetTrafficLightsLocked(true) && CStaticFunctionDefinitions::SetTrafficLightState(ucState);
@@ -541,7 +541,7 @@ int CLuaWorldDefs::setWaveHeight(lua_State* luaVM)
 
 int CLuaWorldDefs::getSkyGradient(lua_State* luaVM)
 {
-    unsigned char ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB;
+    std::uint8_t ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB;
     bool          bSuccess = CStaticFunctionDefinitions::GetSkyGradient(ucTopR, ucTopG, ucTopB, ucBottomR, ucBottomG, ucBottomB);
 
     if (bSuccess)
@@ -730,7 +730,7 @@ int CLuaWorldDefs::getMoonSize(lua_State* luaVM)
 
 int CLuaWorldDefs::getSunColor(lua_State* luaVM)
 {
-    unsigned char ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB;
+    std::uint8_t ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB;
     bool          bSuccess = CStaticFunctionDefinitions::GetSunColor(ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB);
 
     if (bSuccess)
@@ -894,7 +894,7 @@ int CLuaWorldDefs::setSunColor(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
 
-    unsigned char ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB;
+    std::uint8_t ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB;
     argStream.ReadNumber(ucCoreR, 0);
     argStream.ReadNumber(ucCoreG, 0);
     argStream.ReadNumber(ucCoreB, 0);
@@ -1066,7 +1066,7 @@ int CLuaWorldDefs::RemoveWorldModel(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
 
-    unsigned short usModel = 0;
+    std::uint16_t usModel = 0;
     float          fRadius = 0.0f;
     char           cInterior = -1;
     CVector        vecPosition;
@@ -1093,7 +1093,7 @@ int CLuaWorldDefs::RestoreWorldModel(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
 
-    unsigned short usModel = 0;
+    std::uint16_t usModel = 0;
     float          fRadius = 0.0f;
     char           cInterior = -1;
     CVector        vecPosition;
@@ -1130,7 +1130,7 @@ int CLuaWorldDefs::RestoreAllWorldModels(lua_State* luaVM)
 int CLuaWorldDefs::setFPSLimit(lua_State* luaVM)
 {
     //  bool setFPSLimit ( int fpsLimit )
-    unsigned short usLimit;
+    std::uint16_t usLimit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usLimit);
@@ -1152,7 +1152,7 @@ int CLuaWorldDefs::setFPSLimit(lua_State* luaVM)
 
 int CLuaWorldDefs::setMinuteDuration(lua_State* luaVM)
 {
-    unsigned long ulDuration;
+    std::uint32_t ulDuration;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ulDuration);
@@ -1175,7 +1175,7 @@ int CLuaWorldDefs::setMinuteDuration(lua_State* luaVM)
 int CLuaWorldDefs::setGarageOpen(lua_State* luaVM)
 {
     //  bool setGarageOpen ( int garageID, bool open )
-    unsigned char ucGarage;
+    std::uint8_t ucGarage;
     bool          bOpen;
 
     CScriptArgReader argStream(luaVM);

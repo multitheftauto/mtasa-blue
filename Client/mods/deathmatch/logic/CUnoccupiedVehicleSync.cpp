@@ -28,7 +28,7 @@ CUnoccupiedVehicleSync::~CUnoccupiedVehicleSync()
 {
 }
 
-bool CUnoccupiedVehicleSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& BitStream)
+bool CUnoccupiedVehicleSync::ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& BitStream)
 {
     switch (ucPacketID)
     {
@@ -60,7 +60,7 @@ void CUnoccupiedVehicleSync::DoPulse()
     UpdateDamageModels();
 
     // Has it been long enough since our last state's sync?
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastSyncTime + UNOCCUPIED_VEHICLE_SYNC_RATE)
     {
         UpdateStates();

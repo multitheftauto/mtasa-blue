@@ -52,7 +52,7 @@ public:
     void CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
 
     const CLuaArguments& operator=(const CLuaArguments& Arguments);
-    CLuaArgument*        operator[](const unsigned int uiPosition) const;
+    CLuaArgument*        operator[](const std::uint32_t uiPosition) const;
 
     void ReadArgument(lua_State* luaVM, signed int uiIndex);
     void ReadArguments(lua_State* luaVM, signed int uiIndexBegin = 1);
@@ -88,14 +88,14 @@ public:
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         ReadFromJSONString(const char* szJSON);
-    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
+    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables = NULL) const;
     bool         WriteToJSONString(std::string& strJSON, bool bSerialize = false, int flags = JSON_C_TO_STRING_PLAIN);
-    json_object* WriteTableToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
+    json_object* WriteTableToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables = NULL);
     json_object* WriteToJSONArray(bool bSerialize);
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
 
-    unsigned int                               Count() const { return static_cast<unsigned int>(m_Arguments.size()); };
+    std::uint32_t                               Count() const { return static_cast<std::uint32_t>(m_Arguments.size()); };
     std::vector<CLuaArgument*>::const_iterator IterBegin() const { return m_Arguments.begin(); };
     std::vector<CLuaArgument*>::const_iterator IterEnd() const { return m_Arguments.end(); };
 

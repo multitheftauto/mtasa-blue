@@ -62,7 +62,7 @@ auto GetTempFilePath(size_t attempts, std::error_code& ec) -> fs::path
     return {};
 }
 
-bool GetFileContent(const fs::path& path, std::vector<unsigned char>& buffer, std::error_code& ec)
+bool GetFileContent(const fs::path& path, std::vector<std::uint8_t>& buffer, std::error_code& ec)
 {
     buffer.clear();
     ec.clear();
@@ -97,7 +97,7 @@ bool GetFileContent(const fs::path& path, std::vector<unsigned char>& buffer, st
         return false;
     }
 
-    std::vector<unsigned char> fileBuffer;
+    std::vector<std::uint8_t> fileBuffer;
 
     try
     {
@@ -113,7 +113,7 @@ bool GetFileContent(const fs::path& path, std::vector<unsigned char>& buffer, st
     {
         constexpr size_t maxReadSize = std::numeric_limits<DWORD>::max();
         size_t           remainingBytes = fileBuffer.size();
-        unsigned char*   bufferData = fileBuffer.data();
+        std::uint8_t*   bufferData = fileBuffer.data();
 
         while (remainingBytes)
         {
@@ -158,7 +158,7 @@ bool GetFileContent(const fs::path& path, std::vector<unsigned char>& buffer, st
     return true;
 }
 
-bool SetFileContent(const fs::path& path, const std::vector<unsigned char>& buffer, std::error_code& ec)
+bool SetFileContent(const fs::path& path, const std::vector<std::uint8_t>& buffer, std::error_code& ec)
 {
     ec.clear();
 
@@ -221,7 +221,7 @@ bool SetFileContent(const fs::path& path, const std::vector<unsigned char>& buff
     {
         constexpr size_t     maxWriteSize = std::numeric_limits<DWORD>::max();
         size_t               remainingBytes = buffer.size();
-        const unsigned char* bufferData = buffer.data();
+        const std::uint8_t* bufferData = buffer.data();
 
         while (remainingBytes)
         {
@@ -366,8 +366,8 @@ bool AreFilesEqual(const fs::path& base, const fs::path& other, std::error_code&
     if (baseSize.QuadPart != otherSize.QuadPart)
         return false;
 
-    std::array<unsigned char, 4096> baseBuffer{};
-    std::array<unsigned char, 4096> otherBuffer{};
+    std::array<std::uint8_t, 4096> baseBuffer{};
+    std::array<std::uint8_t, 4096> otherBuffer{};
 
     const auto bytesToRead = static_cast<DWORD>(baseBuffer.size());
     LONGLONG   remainingSize = baseSize.QuadPart;
@@ -423,7 +423,7 @@ bool GetFileHash(const fs::path& path, FileHash& hash, std::error_code& ec)
     sha256_ctx ctx{};
     sha256_init(&ctx);
 
-    std::array<unsigned char, 4096> buffer{};
+    std::array<std::uint8_t, 4096> buffer{};
 
     while (true)
     {
@@ -448,20 +448,20 @@ bool GetFileHash(const fs::path& path, FileHash& hash, std::error_code& ec)
     return true;
 }
 
-auto GetFileBufferHash(const std::vector<unsigned char>& buffer) -> FileHash
+auto GetFileBufferHash(const std::vector<std::uint8_t>& buffer) -> FileHash
 {
     sha256_ctx ctx{};
     sha256_init(&ctx);
 
 #ifdef _WIN64
     {
-        constexpr size_t     maxReadSize = std::numeric_limits<unsigned int>::max();
+        constexpr size_t     maxReadSize = std::numeric_limits<std::uint32_t>::max();
         size_t               remainingBytes = buffer.size();
-        const unsigned char* bufferData = buffer.data();
+        const std::uint8_t* bufferData = buffer.data();
 
         while (remainingBytes)
         {
-            unsigned int bytesToProcess = (remainingBytes > maxReadSize) ? maxReadSize : static_cast<DWORD>(remainingBytes);
+            std::uint32_t bytesToProcess = (remainingBytes > maxReadSize) ? maxReadSize : static_cast<DWORD>(remainingBytes);
 
             sha256_update(&ctx, bufferData, bytesToProcess);
 

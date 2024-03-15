@@ -374,7 +374,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
                         // ** Changed ajustment to +125ms as the position of this clients player on the firers screen
                         // has been changed. See CClientPed::UpdateTargetPosition() **
                         CVector        vecPosition;
-                        unsigned short usLatency = (pPlayer->GetLatency() + 125);
+                        std::uint16_t usLatency = (pPlayer->GetLatency() + 125);
                         g_pClientGame->GetNetAPI()->GetInterpolation(vecPosition, usLatency);
 
                         // Move the entity back

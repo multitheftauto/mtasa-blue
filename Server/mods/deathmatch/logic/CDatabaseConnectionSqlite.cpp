@@ -233,7 +233,7 @@ bool CDatabaseConnectionSqlite::QueryInternal(const SString& strQuery, CRegistry
         // Get column names
         pResult->nColumns = sqlite3_column_count(pStmt);
         pResult->ColNames.clear();
-        for (int i = 0; i < pResult->nColumns; i++)
+        for (auto i = 0; i < pResult->nColumns; i++)
         {
             pResult->ColNames.push_back(sqlite3_column_name(pStmt, i));
         }
@@ -246,7 +246,7 @@ bool CDatabaseConnectionSqlite::QueryInternal(const SString& strQuery, CRegistry
         {
             pResult->Data.push_back(std::vector<CRegistryResultCell>(pResult->nColumns));
             std::vector<CRegistryResultCell>& row = pResult->Data.back();
-            for (int i = 0; i < pResult->nColumns; i++)
+            for (auto i = 0; i < pResult->nColumns; i++)
             {
                 CRegistryResultCell& cell = row[i];
                 cell.nType = sqlite3_column_type(pStmt, i);
@@ -268,13 +268,13 @@ bool CDatabaseConnectionSqlite::QueryInternal(const SString& strQuery, CRegistry
                         }
                         else
                         {
-                            cell.pVal = new unsigned char[cell.nLength];
+                            cell.pVal = new std::uint8_t[cell.nLength];
                             memcpy(cell.pVal, sqlite3_column_blob(pStmt, i), cell.nLength);
                         }
                         break;
                     default:
                         cell.nLength = sqlite3_column_bytes(pStmt, i) + 1;
-                        cell.pVal = new unsigned char[cell.nLength];
+                        cell.pVal = new std::uint8_t[cell.nLength];
                         memcpy(cell.pVal, sqlite3_column_text(pStmt, i), cell.nLength);
                         break;
                 }
@@ -393,9 +393,9 @@ SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs
     SString strParsedQuery;
 
     // Walk through the query and replace the variable placeholders with the actual variables
-    unsigned int uiLen = strQuery.length();
-    unsigned int a = 0;
-    for (unsigned int i = 0; i < uiLen; i++)
+    std::uint32_t uiLen = strQuery.length();
+    std::uint32_t a = 0;
+    for (std::uint32_t i = 0; i < uiLen; i++)
     {
         if (strQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {
@@ -422,7 +422,7 @@ SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs
             {
                 double dNumber = pArgument->GetNumber();
                 if (dNumber == floor(dNumber))
-                    strParsedQuery += SString("%lld", (long long)dNumber);
+                    strParsedQuery += SString("%lld", (std::int64_t)dNumber);
                 else
                     strParsedQuery += SString("%f", dNumber);
             }
@@ -461,7 +461,7 @@ SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs
 SString InsertQueryArgumentsSqlite(const char* szQuery, va_list vl)
 {
     SString strParsedQuery;
-    for (unsigned int i = 0; szQuery[i] != '\0'; i++)
+    for (std::uint32_t i = 0; szQuery[i] != '\0'; i++)
     {
         if (szQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {
@@ -485,7 +485,7 @@ SString InsertQueryArgumentsSqlite(const char* szQuery, va_list vl)
 
                 case SQLITE_INTEGER64:
                 {
-                    long long int llValue = va_arg(vl, long long int);
+                    std::int64_t int llValue = va_arg(vl, std::int64_t int);
                     strParsedQuery += SString("%lld", llValue);
                 }
                 break;

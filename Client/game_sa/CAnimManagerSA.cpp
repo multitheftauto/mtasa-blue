@@ -31,10 +31,10 @@ CAnimManagerSA::CAnimManagerSA()
 
 CAnimManagerSA::~CAnimManagerSA()
 {
-    for (unsigned int i = 0; i < MAX_ANIM_GROUPS; i++)
+    for (std::uint32_t i = 0; i < MAX_ANIM_GROUPS; i++)
         if (m_pAnimAssocGroups[i])
             delete m_pAnimAssocGroups[i];
-    for (unsigned int i = 0; i < MAX_ANIM_BLOCKS; i++)
+    for (std::uint32_t i = 0; i < MAX_ANIM_BLOCKS; i++)
         if (m_pAnimBlocks[i])
             delete m_pAnimBlocks[i];
 }
@@ -110,7 +110,7 @@ std::unique_ptr<CAnimBlendHierarchy> CAnimManagerSA::GetAnimation(const char* sz
     return nullptr;
 }
 
-std::unique_ptr<CAnimBlendHierarchy> CAnimManagerSA::GetAnimation(unsigned int uiIndex, std::unique_ptr<CAnimBlock>& pBlock)
+std::unique_ptr<CAnimBlendHierarchy> CAnimManagerSA::GetAnimation(std::uint32_t uiIndex, std::unique_ptr<CAnimBlock>& pBlock)
 {
     CAnimBlendHierarchySAInterface* pInterface = nullptr;
     ;

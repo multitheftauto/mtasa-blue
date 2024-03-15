@@ -7,13 +7,13 @@ class CMatrixSAInterface
 private:
     // RwV3d-like:
     CVector      m_right;
-    unsigned int flags;
+    std::uint32_t flags;
     CVector      m_forward;
-    unsigned int pad1;
+    std::uint32_t pad1;
     CVector      m_up;
-    unsigned int pad2;
+    std::uint32_t pad2;
     CVector      m_pos;
-    unsigned int pad3;
+    std::uint32_t pad3;
 
 public:
     RwMatrix* m_pAttachMatrix = nullptr;

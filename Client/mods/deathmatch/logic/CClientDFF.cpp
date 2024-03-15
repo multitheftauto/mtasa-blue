@@ -99,7 +99,7 @@ void CClientDFF::UnloadDFF()
     m_LoadedClumpInfoMap.clear();
 }
 
-bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
+bool CClientDFF::ReplaceModel(std::uint16_t usModel, bool bAlphaTransparency)
 {
     // Record attempt in case it all goes wrong
     CArgMap argMap;
@@ -134,7 +134,7 @@ bool CClientDFF::LoadFromBuffer(SString buffer)
     return true;
 }
 
-bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
+bool CClientDFF::DoReplaceModel(std::uint16_t usModel, bool bAlphaTransparency)
 {
     if (!CClientDFFManager::IsReplacableModel(usModel))
         return false;
@@ -195,10 +195,10 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
     return false;
 }
 
-bool CClientDFF::HasReplaced(unsigned short usModel)
+bool CClientDFF::HasReplaced(std::uint16_t usModel)
 {
     // See if we have a match in our list
-    std::list<unsigned short>::iterator iter = m_Replaced.begin();
+    std::list<std::uint16_t>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
         // Compare the models
@@ -212,7 +212,7 @@ bool CClientDFF::HasReplaced(unsigned short usModel)
     return false;
 }
 
-void CClientDFF::RestoreModel(unsigned short usModel)
+void CClientDFF::RestoreModel(std::uint16_t usModel)
 {
     // Restore the model and remove it from the list
     InternalRestoreModel(usModel);
@@ -222,7 +222,7 @@ void CClientDFF::RestoreModel(unsigned short usModel)
 void CClientDFF::RestoreModels()
 {
     // Loop through our list over replaced models
-    std::list<unsigned short>::iterator iter = m_Replaced.begin();
+    std::list<std::uint16_t>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
         // Restore this model
@@ -233,7 +233,7 @@ void CClientDFF::RestoreModels()
     m_Replaced.clear();
 }
 
-void CClientDFF::InternalRestoreModel(unsigned short usModel)
+void CClientDFF::InternalRestoreModel(std::uint16_t usModel)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))

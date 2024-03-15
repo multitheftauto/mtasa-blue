@@ -119,10 +119,10 @@ WString& WString::vFormat(const wchar_t* szFormat, va_list vl)
 //
 // Split into parts
 //
-void WString::Split(const WString& strDelim, std::vector<WString>& outResult, unsigned int uiMaxAmount, unsigned int uiMinAmount) const
+void WString::Split(const WString& strDelim, std::vector<WString>& outResult, std::uint32_t uiMaxAmount, std::uint32_t uiMinAmount) const
 {
     outResult.clear();
-    unsigned long ulStartPoint = 0;
+    std::uint32_t ulStartPoint = 0;
 
     while (true)
     {
@@ -162,7 +162,7 @@ bool WString::Split(const WString& strDelim, WString* pstrLeft, WString* pstrRig
     if (!bFromEnd)
     {
         ulPos = 0;
-        for (int i = 0; i < iIndex && ulPos != npos; i++)
+        for (auto i = 0; i < iIndex && ulPos != npos; i++)
         {
             if (i)
                 ulPos += strDelim.length();
@@ -180,7 +180,7 @@ bool WString::Split(const WString& strDelim, WString* pstrLeft, WString* pstrRig
     else
     {
         ulPos = length();
-        for (int i = 0; i < -iIndex && ulPos != npos; i++)
+        for (auto i = 0; i < -iIndex && ulPos != npos; i++)
         {
             if (ulPos >= strDelim.length())
             {
@@ -415,7 +415,7 @@ WString WString::Join(const WString& strDelim, const std::vector<WString>& parts
     WString strResult;
     int     iLast = std::min<int>(iFirst + iCount, parts.size()) - 1;
     iFirst = std::min<int>(iFirst, 0);
-    for (int i = iFirst; i <= iLast; i++)
+    for (auto i = iFirst; i <= iLast; i++)
     {
         if (i != iFirst)
             strResult += strDelim;

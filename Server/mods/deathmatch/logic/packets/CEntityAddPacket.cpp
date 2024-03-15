@@ -89,7 +89,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
     if (m_Entities.size() > 0)
     {
         // Write the number of entities
-        unsigned int NumElements = m_Entities.size();
+        std::uint32_t NumElements = m_Entities.size();
         BitStream.WriteCompressed(NumElements);
 
         // For each entity ...
@@ -102,7 +102,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(pElement->GetID());
 
             // Entity type id
-            unsigned char ucEntityTypeID = static_cast<unsigned char>(pElement->GetType());
+            std::uint8_t ucEntityTypeID = static_cast<std::uint8_t>(pElement->GetType());
             BitStream.Write(ucEntityTypeID);
 
             // Entity parent
@@ -178,7 +178,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 const char*         szName = iter->first.c_str();
                 const CLuaArgument* pArgument = &iter->second.Variable;
 
-                unsigned char ucNameLength = static_cast<unsigned char>(strlen(szName));
+                std::uint8_t ucNameLength = static_cast<std::uint8_t>(strlen(szName));
                 BitStream.Write(ucNameLength);
                 BitStream.Write(szName, ucNameLength);
                 pArgument->WriteToBitStream(BitStream);
@@ -192,7 +192,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 szName = szEmpty;
 
             // Write the name. It can be empty.
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
+            std::uint16_t usNameLength = static_cast<std::uint16_t>(strlen(szName));
             BitStream.WriteCompressed(usNameLength);
             if (usNameLength > 0)
             {
@@ -300,7 +300,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
                         CCustomWeapon* pWeapon = static_cast<CCustomWeapon*>(pElement);
-                        unsigned char  targetType = pWeapon->GetTargetType();
+                        std::uint8_t  targetType = pWeapon->GetTargetType();
                         BitStream.WriteBits(&targetType, 3);            // 3 bits = 4 possible values.
 
                         switch (targetType)
@@ -317,13 +317,13 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                                 BitStream.Write(targetID);
                                 if (IS_PED(pTarget))
                                 {
-                                    // Send full unsigned char... bone documentation looks scarce.
-                                    unsigned char ucSubTarget = pWeapon->GetTargetBone();
-                                    BitStream.Write(ucSubTarget);            // Send the entire unsigned char as there are a lot of bones.
+                                    // Send full std::uint8_t... bone documentation looks scarce.
+                                    std::uint8_t ucSubTarget = pWeapon->GetTargetBone();
+                                    BitStream.Write(ucSubTarget);            // Send the entire std::uint8_t as there are a lot of bones.
                                 }
                                 else if (IS_VEHICLE(pTarget))
                                 {
-                                    unsigned char ucSubTarget = pWeapon->GetTargetWheel();
+                                    std::uint8_t ucSubTarget = pWeapon->GetTargetWheel();
                                     BitStream.WriteBits(&ucSubTarget, 4);            // 4 bits = 8 possible values.
                                 }
                                 break;
@@ -340,7 +340,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         if (bChanged)
                         {
                             CWeaponStat*   pWeaponStat = pWeapon->GetWeaponStat();
-                            unsigned short usDamage = pWeaponStat->GetDamagePerHit();
+                            std::uint16_t usDamage = pWeaponStat->GetDamagePerHit();
                             float          fAccuracy = pWeaponStat->GetAccuracy();
                             float          fTargetRange = pWeaponStat->GetTargetRange();
                             float          fWeaponRange = pWeaponStat->GetWeaponRange();
@@ -365,10 +365,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(weaponConfig.flags.bSeeThroughStuff);
                         BitStream.WriteBit(weaponConfig.flags.bShootThroughStuff);
 
-                        unsigned short usAmmo = pWeapon->GetAmmo();
-                        unsigned short usClipAmmo = pWeapon->GetAmmo();
+                        std::uint16_t usAmmo = pWeapon->GetAmmo();
+                        std::uint16_t usClipAmmo = pWeapon->GetAmmo();
                         ElementID      OwnerID = pWeapon->GetOwner() == NULL ? INVALID_ELEMENT_ID : pWeapon->GetOwner()->GetID();
-                        unsigned char  ucWeaponState = pWeapon->GetWeaponState();
+                        std::uint8_t  ucWeaponState = pWeapon->GetWeaponState();
                         BitStream.WriteBits(&ucWeaponState, 4);            // 4 bits = 8 possible values for weapon state
                         BitStream.Write(usAmmo);
                         BitStream.Write(usClipAmmo);
@@ -388,7 +388,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&position);
 
                     // Grab the model and write it
-                    unsigned short usModel = pPickup->GetModel();
+                    std::uint16_t usModel = pPickup->GetModel();
                     BitStream.WriteCompressed(usModel);
 
                     // Write if it's visible
@@ -452,7 +452,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // fit into a char?  Why doesn't someone document this?
                     //
                     // --slush
-                    BitStream.Write(static_cast<unsigned char>(pVehicle->GetModel() - 400));
+                    BitStream.Write(static_cast<std::uint8_t>(pVehicle->GetModel() - 400));
 
                     // Health
                     SVehicleHealthSync health;
@@ -462,7 +462,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Blow state
                     if (BitStream.Can(eBitStreamVersion::VehicleBlowStateSupport))
                     {
-                        unsigned char blowState = 0;
+                        std::uint8_t blowState = 0;
 
                         switch (pVehicle->GetBlowState())
                         {
@@ -502,14 +502,14 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     damage.data.ucLightStates = pVehicle->m_ucLightStates;
                     BitStream.Write(&damage);
 
-                    unsigned char ucVariant = pVehicle->GetVariant();
+                    std::uint8_t ucVariant = pVehicle->GetVariant();
                     BitStream.Write(ucVariant);
 
-                    unsigned char ucVariant2 = pVehicle->GetVariant2();
+                    std::uint8_t ucVariant2 = pVehicle->GetVariant2();
                     BitStream.Write(ucVariant2);
 
                     // If the vehicle has a turret, send its position too
-                    unsigned short usModel = pVehicle->GetModel();
+                    std::uint16_t usModel = pVehicle->GetModel();
                     if (CVehicleManager::HasTurret(usModel))
                     {
                         SVehicleTurretSync specific;
@@ -528,7 +528,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     if (CVehicleManager::HasDoors(usModel))
                     {
                         SDoorOpenRatioSync door;
-                        for (unsigned char i = 0; i < 6; ++i)
+                        for (std::uint8_t i = 0; i < 6; ++i)
                         {
                             door.data.fRatio = pVehicle->GetDoorOpenRatio(i);
                             BitStream.Write(&door);
@@ -537,16 +537,16 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     // Write all the upgrades
                     CVehicleUpgrades*  pUpgrades = pVehicle->GetUpgrades();
-                    unsigned char      ucNumUpgrades = pUpgrades->Count();
+                    std::uint8_t      ucNumUpgrades = pUpgrades->Count();
                     const SSlotStates& usSlotStates = pUpgrades->GetSlotStates();
                     BitStream.Write(ucNumUpgrades);
 
                     if (ucNumUpgrades > 0)
                     {
-                        unsigned char ucSlot = 0;
+                        std::uint8_t ucSlot = 0;
                         for (; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
                         {
-                            unsigned short usUpgrade = usSlotStates[ucSlot];
+                            std::uint16_t usUpgrade = usSlotStates[ucSlot];
 
                             /*
                              * This is another retarded modification in an attempt to save
@@ -558,7 +558,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                              * -- ChrML: Ehm, GTA only has 17 upgrade slots... This is a valid optimization.
                              */
                             if (usUpgrade)
-                                BitStream.Write(static_cast<unsigned char>(usSlotStates[ucSlot] - 1000));
+                                BitStream.Write(static_cast<std::uint8_t>(usSlotStates[ucSlot] - 1000));
                         }
                     }
 
@@ -664,8 +664,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     if (BitStream.Version() >= 0x02B)
                     {
-                        unsigned char ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
-                        unsigned char ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
+                        std::uint8_t ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
+                        std::uint8_t ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
                         bool          bSync = pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
                         BitStream.WriteBit(bSync);
                         if (bSync)
@@ -673,7 +673,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             BitStream.Write(ucSirenCount);
                             BitStream.Write(ucSirenType);
 
-                            for (int i = 0; i < ucSirenCount; i++)
+                            for (auto i = 0; i < ucSirenCount; i++)
                             {
                                 SVehicleSirenSync syncData;
                                 syncData.data.m_bOverrideSirens = true;
@@ -744,15 +744,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.WriteCompressed(pBlip->m_sOrdering);
 
                     // Write the visible distance - 14 bits allows 16383.
-                    SIntegerSync<unsigned short, 14> visibleDistance(std::min(pBlip->m_usVisibleDistance, (unsigned short)16383));
+                    SIntegerSync<std::uint16_t, 14> visibleDistance(std::min(pBlip->m_usVisibleDistance, (std::uint16_t)16383));
                     BitStream.Write(&visibleDistance);
 
                     // Write the icon
-                    SIntegerSync<unsigned char, 6> icon(pBlip->m_ucIcon);
+                    SIntegerSync<std::uint8_t, 6> icon(pBlip->m_ucIcon);
                     BitStream.Write(&icon);
 
                     // Write the size
-                    SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
+                    SIntegerSync<std::uint8_t, 5> size(pBlip->m_ucSize);
                     BitStream.Write(&size);
 
                     // Write the color
@@ -800,7 +800,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     // Write the name
                     char* szName = pMesh->GetName ();
-                    unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
+                    std::uint16_t usNameLength = static_cast < std::uint16_t > ( strlen ( szName ) );
                     BitStream.Write ( usNameLength );
                     BitStream.Write ( szName, static_cast < int > ( usNameLength ) );
 
@@ -825,8 +825,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     // Write the name
                     const char*    szTeamName = pTeam->GetTeamName();
-                    unsigned short usNameLength = static_cast<unsigned short>(strlen(szTeamName));
-                    unsigned char  ucRed, ucGreen, ucBlue;
+                    std::uint16_t usNameLength = static_cast<std::uint16_t>(strlen(szTeamName));
+                    std::uint8_t  ucRed, ucGreen, ucBlue;
                     pTeam->GetColor(ucRed, ucGreen, ucBlue);
                     bool bFriendlyFire = pTeam->GetFriendlyFire();
                     BitStream.WriteCompressed(usNameLength);
@@ -851,7 +851,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&position);
 
                     // model
-                    unsigned short usModel = pPed->GetModel();
+                    std::uint16_t usModel = pPed->GetModel();
                     BitStream.WriteCompressed(usModel);
 
                     // rotation
@@ -902,9 +902,9 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     }
 
                     // clothes
-                    unsigned char   ucNumClothes = 0;
+                    std::uint8_t   ucNumClothes = 0;
                     CPlayerClothes* pClothes = pPed->GetClothes();
-                    for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
+                    for (std::uint8_t ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
                     {
                         const SPlayerClothing* pClothing = pClothes->GetClothing(ucType);
                         if (pClothing)
@@ -913,13 +913,13 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         }
                     }
                     BitStream.Write(ucNumClothes);
-                    for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
+                    for (std::uint8_t ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
                     {
                         const SPlayerClothing* pClothing = pClothes->GetClothing(ucType);
                         if (pClothing)
                         {
-                            unsigned char ucTextureLength = static_cast<uchar>(strlen(pClothing->szTexture));
-                            unsigned char ucModelLength = static_cast<uchar>(strlen(pClothing->szModel));
+                            std::uint8_t ucTextureLength = static_cast<uchar>(strlen(pClothing->szTexture));
+                            std::uint8_t ucModelLength = static_cast<uchar>(strlen(pClothing->szModel));
 
                             BitStream.Write(ucTextureLength);
                             BitStream.Write(pClothing->szTexture, ucTextureLength);
@@ -933,7 +933,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     if (BitStream.Version() >= 0x61)
                     {
                         // Get a list of weapons
-                        for (unsigned char slot = 0; slot < WEAPONSLOT_MAX; ++slot)
+                        for (std::uint8_t slot = 0; slot < WEAPONSLOT_MAX; ++slot)
                         {
                             CWeapon* pWeapon = pPed->GetWeapon(slot);
                             if (pWeapon->ucType != 0)
@@ -948,10 +948,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         }
 
                         // Write end marker (slot)
-                        BitStream.Write((unsigned char)0xFF);
+                        BitStream.Write((std::uint8_t)0xFF);
 
                         // Send the current weapon spot
-                        unsigned char currentWeaponSlot = pPed->GetWeaponSlot();
+                        std::uint8_t currentWeaponSlot = pPed->GetWeaponSlot();
                         BitStream.Write(currentWeaponSlot);
                     }
 
@@ -964,7 +964,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     // Type Name
                     const char*    szTypeName = pDummy->GetTypeName().c_str();
-                    unsigned short usTypeNameLength = static_cast<unsigned short>(strlen(szTypeName));
+                    std::uint16_t usTypeNameLength = static_cast<std::uint16_t>(strlen(szTypeName));
                     BitStream.WriteCompressed(usTypeNameLength);
                     BitStream.Write(szTypeName, usTypeNameLength);
 
@@ -1004,7 +1004,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     // Type
                     SColshapeTypeSync colType;
-                    colType.data.ucType = static_cast<unsigned char>(pColShape->GetShapeType());
+                    colType.data.ucType = static_cast<std::uint8_t>(pColShape->GetShapeType());
                     BitStream.Write(&colType);
 
                     // Position
@@ -1080,10 +1080,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 case CElement::WATER:
                 {
                     CWater*       pWater = static_cast<CWater*>(pElement);
-                    unsigned char ucNumVertices = (unsigned char)pWater->GetNumVertices();
+                    std::uint8_t ucNumVertices = (std::uint8_t)pWater->GetNumVertices();
                     BitStream.Write(ucNumVertices);
                     CVector vecVertex;
-                    for (int i = 0; i < ucNumVertices; i++)
+                    for (auto i = 0; i < ucNumVertices; i++)
                     {
                         pWater->GetVertex(i, vecVertex);
                         BitStream.Write((short)vecVertex.fX);

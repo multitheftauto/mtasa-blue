@@ -26,11 +26,11 @@ namespace
     struct SNetStatHistoryItem
     {
         bool      bDirty;
-        long long llGameRecv;
-        long long llGameRecvBlocked;
-        long long llGameSent;
-        long long llGameResent;
-        long long llHttpSent;
+        std::int64_t llGameRecv;
+        std::int64_t llGameRecvBlocked;
+        std::int64_t llGameSent;
+        std::int64_t llGameResent;
+        std::int64_t llHttpSent;
     };
 
     struct SNetStatHistoryType
@@ -112,15 +112,15 @@ public:
 
     // CPerfStatBandwidthUsageImpl
     void RecordStats();
-    void AddSampleAtTime(time_t tTime, long long llGameRecv, long long llGameRecvBlocked, long long llGameSent, long long llGameResent, long long llHttpSent);
+    void AddSampleAtTime(time_t tTime, std::int64_t llGameRecv, std::int64_t llGameRecvBlocked, std::int64_t llGameSent, std::int64_t llGameResent, std::int64_t llHttpSent);
     void LoadStats();
     void SaveStats();
 
-    long long                        m_llNextRecordTime;
-    long long                        m_llNextSaveTime;
+    std::int64_t                        m_llNextRecordTime;
+    std::int64_t                        m_llNextSaveTime;
     SString                          m_strCategoryName;
     SBandwidthStatistics             m_PrevLiveStats;
-    long long                        m_llPrevHttpTotalBytesSent;
+    std::int64_t                        m_llPrevHttpTotalBytesSent;
     std::vector<SNetStatHistoryType> m_History;
     SDbConnectionId                  m_DatabaseConnection;
 };
@@ -284,11 +284,11 @@ void CPerfStatBandwidthUsageImpl::LoadStats()
 
                 if (uiIndex < type.itemList.size())
                 {
-                    type.itemList[uiIndex].llGameRecv = (long long)GameRecv;
-                    type.itemList[uiIndex].llGameRecvBlocked = (long long)GameRecvBlocked;
-                    type.itemList[uiIndex].llGameSent = (long long)GameSent;
-                    type.itemList[uiIndex].llGameResent = (long long)GameResent;
-                    type.itemList[uiIndex].llHttpSent = (long long)HttpSent;
+                    type.itemList[uiIndex].llGameRecv = (std::int64_t)GameRecv;
+                    type.itemList[uiIndex].llGameRecvBlocked = (std::int64_t)GameRecvBlocked;
+                    type.itemList[uiIndex].llGameSent = (std::int64_t)GameSent;
+                    type.itemList[uiIndex].llGameResent = (std::int64_t)GameResent;
+                    type.itemList[uiIndex].llHttpSent = (std::int64_t)HttpSent;
                 }
             }
         }
@@ -310,7 +310,7 @@ void CPerfStatBandwidthUsageImpl::LoadStats()
         iHoursElpased = std::min(iHoursElpased, 730 * 13);
 
         // Skip forward in time to clear out past data
-        for (int i = iHoursElpased - 1; i >= 0; i--)
+        for (auto i = iHoursElpased - 1; i >= 0; i--)
         {
             time_t tTime = StatsHoursToUnixTime(uiStatsHoursNow - i);
             AddSampleAtTime(tTime, 0, 0, 0, 0, 0);
@@ -383,7 +383,7 @@ void CPerfStatBandwidthUsageImpl::SaveStats()
 ///////////////////////////////////////////////////////////////
 void CPerfStatBandwidthUsageImpl::DoPulse()
 {
-    long long llTime = GetTickCount64_();
+    std::int64_t llTime = GetTickCount64_();
 
     // Record once every 5 seconds
     if (llTime >= m_llNextRecordTime)
@@ -418,14 +418,14 @@ void CPerfStatBandwidthUsageImpl::RecordStats()
     if (!g_pNetServer->GetBandwidthStatistics(&liveStats))
         return;
 
-    long long llDeltaGameBytesSent = std::max<long long>(0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount);
-    long long llDeltaGameBytesRecv = std::max<long long>(0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount);
-    long long llDeltaGameBytesRecvBlocked = std::max<long long>(0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked);
-    long long llDeltaUDPByteResentCount = std::max<long long>(0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount);
+    std::int64_t llDeltaGameBytesSent = std::max<std::int64_t>(0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount);
+    std::int64_t llDeltaGameBytesRecv = std::max<std::int64_t>(0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount);
+    std::int64_t llDeltaGameBytesRecvBlocked = std::max<std::int64_t>(0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked);
+    std::int64_t llDeltaUDPByteResentCount = std::max<std::int64_t>(0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount);
     m_PrevLiveStats = liveStats;
 
-    long long llHttpTotalBytesSent = EHS::StaticGetTotalBytesSent();
-    long long llDeltaHttpBytesSent = std::max(0LL, llHttpTotalBytesSent - m_llPrevHttpTotalBytesSent);
+    std::int64_t llHttpTotalBytesSent = EHS::StaticGetTotalBytesSent();
+    std::int64_t llDeltaHttpBytesSent = std::max(0LL, llHttpTotalBytesSent - m_llPrevHttpTotalBytesSent);
     m_llPrevHttpTotalBytesSent = llHttpTotalBytesSent;
 
     // Add to the history arrays
@@ -440,8 +440,8 @@ void CPerfStatBandwidthUsageImpl::RecordStats()
 //
 //
 ///////////////////////////////////////////////////////////////
-void CPerfStatBandwidthUsageImpl::AddSampleAtTime(time_t tTime, long long llGameRecv, long long llGameRecvBlocked, long long llGameSent, long long llGameResent,
-                                                  long long llHttpSent)
+void CPerfStatBandwidthUsageImpl::AddSampleAtTime(time_t tTime, std::int64_t llGameRecv, std::int64_t llGameRecvBlocked, std::int64_t llGameSent, std::int64_t llGameResent,
+                                                  std::int64_t llHttpSent)
 {
     tm* tmp = localtime(&tTime);
 
@@ -537,7 +537,7 @@ void CPerfStatBandwidthUsageImpl::GetStats(CPerfStatResult* pResult, const std::
 
         bShowSentLoss[t] = false;
         bShowBlocked[t] = false;
-        for (int i = type.itemList.size() - 1; i >= 0; i--)
+        for (auto i = type.itemList.size() - 1; i >= 0; i--)
         {
             if (type.itemList[i].llGameResent)
                 bShowSentLoss[t] = true;

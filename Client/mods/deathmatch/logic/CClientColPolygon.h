@@ -27,11 +27,11 @@ public:
     void SetPosition(const CVector& vecPosition);
 
     bool AddPoint(CVector2D vecPoint);
-    bool AddPoint(CVector2D vecPoint, unsigned int uiPointIndex);
-    bool SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint);
-    bool RemovePoint(unsigned int uiPointIndex);
+    bool AddPoint(CVector2D vecPoint, std::uint32_t uiPointIndex);
+    bool SetPointPosition(std::uint32_t uiPointIndex, const CVector2D& vecPoint);
+    bool RemovePoint(std::uint32_t uiPointIndex);
 
-    unsigned int                           CountPoints() const { return static_cast<unsigned int>(m_Points.size()); };
+    std::uint32_t                           CountPoints() const { return static_cast<std::uint32_t>(m_Points.size()); };
     std::vector<CVector2D>::const_iterator IterBegin() { return m_Points.begin(); };
     std::vector<CVector2D>::const_iterator IterEnd() { return m_Points.end(); };
 

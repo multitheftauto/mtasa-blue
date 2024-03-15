@@ -20,7 +20,7 @@ public:
     CConsoleEchoPacket(const char* szMessage) { m_strMessage.AssignLeft(szMessage, MAX_CONSOLEECHO_LENGTH); }
 
     ePacketID               GetPacketID() const { return PACKET_ID_CONSOLE_ECHO; };
-    unsigned long           GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t           GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
 
     bool Write(NetBitStreamInterface& BitStream) const;

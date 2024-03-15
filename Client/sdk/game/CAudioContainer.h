@@ -50,8 +50,8 @@ enum eRadioStreamIndex
 class CAudioContainer
 {
 public:
-    virtual bool GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, unsigned int& length) = 0;
+    virtual bool GetAudioData(eAudioLookupIndex lookupIndex, int bankIndex, int audioIndex, void*& pMemory, std::uint32_t& length) = 0;
     virtual bool ValidateContainer(eAudioLookupIndex lookupIndex) = 0;
 
-    virtual bool GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, unsigned int& length) = 0;
+    virtual bool GetRadioAudioData(eRadioStreamIndex streamIndex, int trackIndex, void*& pMemory, std::uint32_t& length) = 0;
 };

@@ -88,24 +88,24 @@ SWeaponName WeaponNames[] = {{"Fist"},
 SWeaponSlot WeaponIDs[] = {{0}, {0}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {1}, {10}, {10}, {10}, {-1}, {10}, {10}, {8},  {8}, {8}, {-1}, {-1}, {-1}, {2},  {2},
                            {2}, {3}, {3}, {3}, {4}, {4}, {5}, {5}, {4}, {6}, {6},  {7},  {7},  {7},  {7},  {8},  {12}, {9}, {9}, {9},  {11}, {11}, {11}, {-1}};
 
-bool CWeaponNames::IsWeaponIDAkimbo(unsigned char ucID)
+bool CWeaponNames::IsWeaponIDAkimbo(std::uint8_t ucID)
 {
     return (ucID == 22 || ucID == 26 || ucID == 28 || ucID == 32);
 }
 
-bool CWeaponNames::IsDriveByWeapon(unsigned char ucID)
+bool CWeaponNames::IsDriveByWeapon(std::uint8_t ucID)
 {
     return ((ucID >= 22 && ucID <= 33) || ucID == 38);
 }
 
-unsigned char CWeaponNames::GetWeaponID(const char* szName)
+std::uint8_t CWeaponNames::GetWeaponID(const char* szName)
 {
     // If the specified string was empty, return 0
     if (szName[0] == 0)
         return 0xFF;
 
     // Look for it in our table
-    for (unsigned int i = 0; i < NUMELMS(WeaponNames); i++)
+    for (std::uint32_t i = 0; i < NUMELMS(WeaponNames); i++)
     {
         if (stricmp(szName, WeaponNames[i].szName) == 0)
         {
@@ -116,7 +116,7 @@ unsigned char CWeaponNames::GetWeaponID(const char* szName)
     return 0xFF;
 }
 
-const char* CWeaponNames::GetWeaponName(unsigned char ucID)
+const char* CWeaponNames::GetWeaponName(std::uint8_t ucID)
 {
     if (ucID < NUMELMS(WeaponNames))
     {
@@ -126,7 +126,7 @@ const char* CWeaponNames::GetWeaponName(unsigned char ucID)
     return szWeaponNameEmpty;
 }
 
-char CWeaponNames::GetSlotFromWeapon(unsigned char ucID)
+char CWeaponNames::GetSlotFromWeapon(std::uint8_t ucID)
 {
     if (ucID < NUMELMS(WeaponIDs))
     {

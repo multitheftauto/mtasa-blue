@@ -350,7 +350,7 @@ void CLuaArgument::ReadElementID(ElementID ID)
     m_strString = "";
     DeleteTableData();
     m_iType = LUA_TUSERDATA;
-    m_pUserData = (void*)reinterpret_cast<unsigned int*>(ID.Value());
+    m_pUserData = (void*)reinterpret_cast<std::uint32_t*>(ID.Value());
 }
 
 void CLuaArgument::ReadScriptID(uint uiScriptID)
@@ -473,7 +473,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             // Table reference
             case LUA_TTABLEREF:
             {
-                unsigned long ulTableRef;
+                std::uint32_t ulTableRef;
                 if (bitStream.ReadCompressed(ulTableRef))
                 {
                     if (pKnownTables && ulTableRef < pKnownTables->size())
@@ -490,7 +490,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             case LUA_TSTRING:
             {
                 // Read out the string length
-                unsigned short usLength;
+                std::uint16_t usLength;
                 if (bitStream.ReadCompressed(usLength) && usLength > 0)
                 {
                     if (!bitStream.CanReadNumberOfBytes(usLength))
@@ -561,7 +561,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
 }
 
 // Can't use bitStream.Version() here as it is sometimes not set
-bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const
+bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) const
 {
     SLuaTypeSync type;
 
@@ -644,7 +644,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
             // Grab the string and its length. Is it short enough to be sendable?
             const char*    szTemp = m_strString.c_str();
             size_t         sizeTemp = m_strString.length();
-            unsigned short usLength = static_cast<unsigned short>(sizeTemp);
+            std::uint16_t usLength = static_cast<std::uint16_t>(sizeTemp);
             if (sizeTemp == usLength)
             {
                 // This is a string argument
@@ -748,7 +748,7 @@ void CLuaArgument::DeleteTableData()
     }
 }
 
-json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables)
 {
     switch (GetType())
     {
@@ -810,7 +810,7 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
         case LUA_TUSERDATA:
         {
             CElement*  pElement = GetElement();
-            CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(GetUserData()));
+            CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<std::uint32_t>(GetUserData()));
 
             // Elements are dynamic, so storing them is potentially unsafe
             if (pElement && bSerialize)
@@ -890,7 +890,7 @@ char* CLuaArgument::WriteToString(char* szBuffer, int length)
         case LUA_TSTRING:
         {
             const char*    szTemp = GetString().c_str();
-            unsigned short usLength = static_cast<unsigned short>(strlen(szTemp));
+            std::uint16_t usLength = static_cast<std::uint16_t>(strlen(szTemp));
             if (strlen(szTemp) == usLength)
             {
                 snprintf(szBuffer, length, "%s", szTemp);
@@ -907,7 +907,7 @@ char* CLuaArgument::WriteToString(char* szBuffer, int length)
         case LUA_TUSERDATA:
         {
             CElement*  pElement = GetElement();
-            CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(GetUserData()));
+            CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<std::uint32_t>(GetUserData()));
             if (pElement)
             {
                 snprintf(szBuffer, length, "#E#%d", (int)pElement->GetID().Value());
@@ -1046,7 +1046,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                         }
                         case 'T':            // Table reference
                         {
-                            unsigned long ulTableID = static_cast<unsigned long>(atol(strString.c_str() + 3));
+                            std::uint32_t ulTableID = static_cast<std::uint32_t>(atol(strString.c_str() + 3));
                             if (pKnownTables && ulTableID < pKnownTables->size())
                             {
                                 m_pTableData = pKnownTables->at(ulTableID);

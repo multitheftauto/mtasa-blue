@@ -75,7 +75,7 @@ CXMLNode* CXMLImpl::CreateDummyNode()
     return nullptr;
 }
 
-CXMLAttribute* CXMLImpl::GetAttrFromID(unsigned long ulID)
+CXMLAttribute* CXMLImpl::GetAttrFromID(std::uint32_t ulID)
 {
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
@@ -86,7 +86,7 @@ CXMLAttribute* CXMLImpl::GetAttrFromID(unsigned long ulID)
     return nullptr;
 }
 
-CXMLFile* CXMLImpl::GetFileFromID(unsigned long ulID)
+CXMLFile* CXMLImpl::GetFileFromID(std::uint32_t ulID)
 {
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);
@@ -97,7 +97,7 @@ CXMLFile* CXMLImpl::GetFileFromID(unsigned long ulID)
     return nullptr;
 }
 
-CXMLNode* CXMLImpl::GetNodeFromID(unsigned long ulID)
+CXMLNode* CXMLImpl::GetNodeFromID(std::uint32_t ulID)
 {
     // Grab it and verify the type
     CXMLCommon* pCommon = CXMLArray::GetEntry(ulID);

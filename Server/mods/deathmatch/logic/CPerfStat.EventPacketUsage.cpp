@@ -52,7 +52,7 @@ public:
 
     bool                           m_bEnabled;
     CElapsedTime                   m_TimeSinceGetStats;
-    long long                      m_llNextRecordTime;
+    std::int64_t                      m_llNextRecordTime;
     SString                        m_strCategoryName;
     std::map<SString, SEventUsage> m_EventUsageLiveMap;
     std::vector<SEventUsage>       m_EventUsageSortedList;
@@ -185,7 +185,7 @@ void CPerfStatEventPacketUsageImpl::MaybeRecordStats()
     if (m_TimeSinceGetStats.Get() < 10000)
     {
         // Time for record update?    // Copy and clear once every 5 seconds
-        long long llTime = GetTickCount64_();
+        std::int64_t llTime = GetTickCount64_();
         if (llTime >= m_llNextRecordTime)
         {
             m_llNextRecordTime = std::max(m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9);

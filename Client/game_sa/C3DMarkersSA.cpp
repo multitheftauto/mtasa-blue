@@ -14,7 +14,7 @@
 
 C3DMarkersSA::C3DMarkersSA()
 {
-    for (int i = 0; i < MAX_3D_MARKERS; i++)
+    for (auto i = 0; i < MAX_3D_MARKERS; i++)
     {
         Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface*)(ARRAY_3D_MARKERS + i * sizeof(C3DMarkerSAInterface)));
     }
@@ -22,7 +22,7 @@ C3DMarkersSA::C3DMarkersSA()
 
 C3DMarkersSA::~C3DMarkersSA()
 {
-    for (int i = 0; i < MAX_3D_MARKERS; i++)
+    for (auto i = 0; i < MAX_3D_MARKERS; i++)
     {
         delete Markers[i];
     }
@@ -32,9 +32,9 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
                                       BYTE a)
 {
     /*
-    static C3dMarker *PlaceMarker(unsigned int nIdentifier, unsigned short nType,
-    CVector &vecPosition, float fSize, unsigned char r, unsigned char g, unsigned char b, unsigned char a,
-    unsigned short nPeriod, float fPulseFrac, short nRotRate, float normalX = 0.0f,
+    static C3dMarker *PlaceMarker(std::uint32_t nIdentifier, std::uint16_t nType,
+    CVector &vecPosition, float fSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a,
+    std::uint16_t nPeriod, float fPulseFrac, short nRotRate, float normalX = 0.0f,
     float normalY = 0.0f, float normalZ = 0.0f, bool zCheck = FALSE);
     */
     WORD wType = dwType;
@@ -67,7 +67,7 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
 
     if (dwReturn)
     {
-        for (int i = 0; i < MAX_3D_MARKERS; i++)
+        for (auto i = 0; i < MAX_3D_MARKERS; i++)
         {
             if (Markers[i]->GetInterface() == (C3DMarkerSAInterface*)dwReturn)
             {
@@ -82,7 +82,7 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
 
 C3DMarker* C3DMarkersSA::FindFreeMarker()
 {
-    for (int i = 0; i < MAX_3D_MARKERS; i++)
+    for (auto i = 0; i < MAX_3D_MARKERS; i++)
     {
         if (!Markers[i]->IsActive())
             return Markers[i];
@@ -92,7 +92,7 @@ C3DMarker* C3DMarkersSA::FindFreeMarker()
 
 C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
 {
-    for (int i = 0; i < MAX_3D_MARKERS; i++)
+    for (auto i = 0; i < MAX_3D_MARKERS; i++)
     {
         if (Markers[i]->GetIdentifier() == Identifier)
             return Markers[i];

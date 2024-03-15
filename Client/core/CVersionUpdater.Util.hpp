@@ -635,7 +635,7 @@ namespace
             // Filter each line
             int                  iSize = 0;
             std::vector<SString> filteredLines;
-            for (int i = lines.size() - 1; i >= 0; i--)
+            for (auto i = lines.size() - 1; i >= 0; i--)
             {
                 const SString& strLine = lines[i];
                 if (!strLine.empty() && !filterMap.IsFiltered(atoi(strLine)))
@@ -649,7 +649,7 @@ namespace
 
             // Compose final output
             SString strResult;
-            for (int i = filteredLines.size() - 1; i >= 0; i--)
+            for (auto i = filteredLines.size() - 1; i >= 0; i--)
                 strResult += filteredLines[i] + "\n";
 
             return strResult;
@@ -803,7 +803,7 @@ namespace
         int             iRetryCount;
         int             iIdleTime;
         int             iIdleTimeLeft;
-        unsigned int    uiBytesDownloaded;
+        std::uint32_t    uiBytesDownloaded;
         EDownloadStatus downloadStatus;
         int             iDownloadResultCode;
         SString         strResumableSaveLocation;

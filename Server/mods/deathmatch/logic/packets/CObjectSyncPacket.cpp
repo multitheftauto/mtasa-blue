@@ -41,7 +41,7 @@ bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
 
         // Read out flags
-        SIntegerSync<unsigned char, 3> flags;
+        SIntegerSync<std::uint8_t, 3> flags;
         if (!BitStream.Read(&flags))
             return false;
         pData->ucFlags = flags;
@@ -98,7 +98,7 @@ bool CObjectSyncPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(pData->ucSyncTimeContext);
 
             // Write flags
-            SIntegerSync<unsigned char, 3> flags(pData->ucFlags);
+            SIntegerSync<std::uint8_t, 3> flags(pData->ucFlags);
             BitStream.Write(&flags);
 
             // Write position if we need

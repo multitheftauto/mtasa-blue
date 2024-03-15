@@ -37,7 +37,7 @@ public:
 
     const CLuaArguments& operator=(const CLuaArguments& Arguments);
 
-    void ReadArguments(lua_State* luaVM, unsigned int uiIndexBegin = 1);
+    void ReadArguments(lua_State* luaVM, std::uint32_t uiIndexBegin = 1);
     void PushArguments(lua_State* luaVM) const;
     void PushArguments(CLuaArguments& Arguments);
     bool Call(lua_State* luaVM, const char* szFunction) const;
@@ -50,7 +50,7 @@ public:
 
     void DeleteArguments();
 
-    unsigned int                          Count() const { return static_cast<unsigned int>(m_Arguments.size()); };
+    std::uint32_t                          Count() const { return static_cast<std::uint32_t>(m_Arguments.size()); };
     vector<CLuaArgument*>::const_iterator IterBegin() { return m_Arguments.begin(); };
     vector<CLuaArgument*>::const_iterator IterEnd() { return m_Arguments.end(); };
 

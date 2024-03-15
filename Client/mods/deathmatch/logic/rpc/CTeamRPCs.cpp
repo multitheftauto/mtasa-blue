@@ -34,7 +34,7 @@ void CTeamRPCs::SetTeamName(CClientEntity* pSource, NetBitStreamInterface& bitSt
 
 void CTeamRPCs::SetTeamColor(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    unsigned char ucRed, ucGreen, ucBlue;
+    std::uint8_t ucRed, ucGreen, ucBlue;
     if (bitStream.Read(ucRed) && bitStream.Read(ucGreen) && bitStream.Read(ucBlue))
     {
         CClientTeam* pTeam = m_pTeamManager->GetTeam(pSource->GetID());

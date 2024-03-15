@@ -59,8 +59,8 @@ struct SCustomScaleFontInfo
 struct sFontInfo
 {
     const char*  szName;
-    unsigned int uiHeight;
-    unsigned int uiWeight;
+    std::uint32_t uiHeight;
+    std::uint32_t uiWeight;
 };
 
 class CGraphics : public CGraphicsInterface, public CSingleton<CGraphics>
@@ -82,12 +82,12 @@ public:
     void CalcScreenCoors(CVector* vecWorld, CVector* vecScreen);
 
     // DirectX drawing functions
-    void DrawString(int iLeft, int iTop, int iRight, int iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY,
-                    unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bOutline = false);
-    void DrawString(int iX, int iY, unsigned long dwColor, float fScale, const char* szText, ...);
-    void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth = 1.0f);
-    void DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning = false);
-    void DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont);
+    void DrawString(int iLeft, int iTop, int iRight, int iBottom, std::uint32_t dwColor, const char* wszText, float fScaleX, float fScaleY,
+                    std::uint32_t ulFormat, ID3DXFont* pDXFont = NULL, bool bOutline = false);
+    void DrawString(int iX, int iY, std::uint32_t dwColor, float fScale, const char* szText, ...);
+    void DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, std::uint32_t ulColor, float fWidth = 1.0f);
+    void DrawRectangle(float fX, float fY, float fWidth, float fHeight, std::uint32_t ulColor, bool bSubPixelPositioning = false);
+    void DrawStringOutline(const RECT& rect, std::uint32_t ulColor, const wchar_t* szText, std::uint32_t ulFormat, LPD3DXFONT pDXFont);
 
     void           SetBlendMode(EBlendModeType blendMode);
     EBlendModeType GetBlendMode();
@@ -96,8 +96,8 @@ public:
     void           EndDrawBatch();
     void           SetBlendModeRenderStates(EBlendModeType blendMode);
 
-    unsigned int GetViewportWidth();
-    unsigned int GetViewportHeight();
+    std::uint32_t GetViewportWidth();
+    std::uint32_t GetViewportHeight();
 
     void  SetAspectRatioAdjustmentEnabled(bool bEnabled, float fSourceRatio = 4 / 3.f);
     bool  IsAspectRatioAdjustmentEnabled();
@@ -113,8 +113,8 @@ public:
     bool DestroyStandardDXFonts();
     bool CreateStandardDXFontWithCustomScale(eFontType fontType, float fScale, ID3DXFont** ppD3DXFont);
 
-    bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, ID3DXFont** ppD3DXFont);
-    bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, unsigned int uiHeight, bool bBold, DWORD ulQuality, ID3DXFont** ppD3DXFont);
+    bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, std::uint32_t uiHeight, bool bBold, ID3DXFont** ppD3DXFont);
+    bool LoadAdditionalDXFont(std::string strFontPath, std::string strFontName, std::uint32_t uiHeight, bool bBold, DWORD ulQuality, ID3DXFont** ppD3DXFont);
     bool DestroyAdditionalDXFont(std::string strFontPath, ID3DXFont* pD3DXFont);
 
     float GetDXFontHeight(float fScale = 1.0f, ID3DXFont* pDXFont = NULL);
@@ -133,21 +133,21 @@ public:
     void SetCursorPosition(int iX, int iY, DWORD Flags);
 
     // Queued up drawing funcs
-    void DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, unsigned long ulColor, bool bPostGUI);
+    void DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, std::uint32_t ulColor, bool bPostGUI);
 
-    void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI);
+    void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, std::uint32_t ulColor, bool bPostGUI);
 
-    void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial, float fU = 0,
+    void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, std::uint32_t ulColor, CMaterialItem* pMaterial, float fU = 0,
                                   float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bFlipUV = false, bool bUseFaceToward = false,
                                   const CVector& vecFaceToward = CVector(), bool bPostGUI = false) override;
 
-    void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false);
+    void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, std::uint32_t ulColor, bool bPostGUI, bool bSubPixelPositioning = false);
 
     void DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
-                           CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI);
+                           CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, std::uint32_t ulColor, bool bPostGUI);
 
-    void DrawStringQueued(float iLeft, float iTop, float iRight, float iBottom, unsigned long dwColor, const char* wszText, float fScaleX, float fScaleY,
-                          unsigned long ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
+    void DrawStringQueued(float iLeft, float iTop, float iRight, float iBottom, std::uint32_t dwColor, const char* wszText, float fScaleX, float fScaleY,
+                          std::uint32_t ulFormat, ID3DXFont* pDXFont = NULL, bool bPostGUI = false, bool bColorCoded = false, bool bSubPixelPositioning = false,
                           float fRotation = 0, float fRotationCenterX = 0, float fRotationCenterY = 0, float fLineHeight = 0);
 
     void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
@@ -156,7 +156,7 @@ public:
     void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI);
     void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI);
 
-    void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
+    void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, std::uint32_t ulColor, std::uint32_t ulColorCenter,
                           short siSegments, float fRatio, bool bPostGUI);
 
     void DrawWiredSphere(CVector vecPosition, float radius, SColor color, float fLineWidth, int iterations);
@@ -195,7 +195,7 @@ public:
     void DidRenderScene();
     void SetProgressMessage(const SString& strMessage);
     void DrawProgressMessage(bool bPreserveBackbuffer = true);
-    void DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning);
+    void DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, std::uint32_t ulColor, bool bSubPixelPositioning);
 
 private:
     void       OnDeviceCreate(IDirect3DDevice9* pDevice);
@@ -205,7 +205,7 @@ private:
     ID3DXFont* MaybeGetBigFont(ID3DXFont* pDXFont, float& fScaleX, float& fScaleY);
     void       CheckModes(EDrawModeType newDrawMode, EBlendModeType newBlendMode = EBlendMode::NONE);
     void       DrawColorCodedTextLine(float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText, float fScaleX, float fScaleY,
-                                      unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation, float fRotationCenterX,
+                                      std::uint32_t ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation, float fRotationCenterX,
                                       float fRotationCenterY);
     int        GetTrailingSpacesWidth(ID3DXFont* pDXFont, WString& strText);
 
@@ -265,7 +265,7 @@ private:
         float         fX2;
         float         fY2;
         float         fWidth;
-        unsigned long ulColor;
+        std::uint32_t ulColor;
     };
 
     struct sDrawQueueText
@@ -274,10 +274,10 @@ private:
         float         fTop;
         float         fRight;
         float         fBottom;
-        unsigned long ulColor;
+        std::uint32_t ulColor;
         float         fScaleX;
         float         fScaleY;
-        unsigned long ulFormat;
+        std::uint32_t ulFormat;
         ID3DXFont*    pDXFont;
         float         fRotation;
         float         fRotationCenterX;
@@ -290,7 +290,7 @@ private:
         float         fY;
         float         fWidth;
         float         fHeight;
-        unsigned long ulColor;
+        std::uint32_t ulColor;
         bool          bSubPixelPositioning;
     };
 
@@ -308,7 +308,7 @@ private:
         float          fRotation;
         float          fRotCenOffX;
         float          fRotCenOffY;
-        unsigned long  ulColor;
+        std::uint32_t  ulColor;
         bool           bRelativeUV;
     };
 

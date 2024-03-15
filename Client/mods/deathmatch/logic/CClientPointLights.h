@@ -48,8 +48,8 @@ public:
     CClientEntity* GetAffected() { return m_pAffected; };
     void           SetAffected(CClientEntity* pAffected) { m_pAffected = pAffected; };
 
-    void SetDimension(unsigned short usDimension);
-    void RelateDimension(unsigned short usDimension);
+    void SetDimension(std::uint16_t usDimension);
+    void RelateDimension(std::uint16_t usDimension);
 
 protected:
     void DoPulse();

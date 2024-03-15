@@ -31,7 +31,7 @@ class CTextItem
 
 public:
     CTextItem(const char* szText, const CVector2D& vecPosition, eTextPriority Priority = PRIORITY_LOW, const SColor color = -1, float fScale = 1.0f,
-              unsigned char ucFormat = 0, unsigned char ucShadowAlpha = 0);
+              std::uint8_t ucFormat = 0, std::uint8_t ucShadowAlpha = 0);
     CTextItem(const CTextItem& TextItem);
     ~CTextItem();
 
@@ -49,13 +49,13 @@ public:
     float GetScale() { return m_fScale; };
     void  SetScale(float fScale);
 
-    unsigned char GetFormat() { return m_ucFormat; }
-    void          SetFormat(unsigned char ucFormat) { m_ucFormat = ucFormat; }
+    std::uint8_t GetFormat() { return m_ucFormat; }
+    void          SetFormat(std::uint8_t ucFormat) { m_ucFormat = ucFormat; }
 
     void          SetPriority(eTextPriority Priority) { m_Priority = Priority; };
     eTextPriority GetPriority() { return m_Priority; };
 
-    unsigned long GetUniqueID() { return m_ulUniqueId; };
+    std::uint32_t GetUniqueID() { return m_ulUniqueId; };
     bool          IsBeingDeleted() { return m_bDeletable; };
     uint          GetScriptID() const { return m_uiScriptID; }
 
@@ -64,9 +64,9 @@ private:
     CVector2D     m_vecPosition;
     SColor        m_Color;
     float         m_fScale;
-    unsigned char m_ucFormat;
-    unsigned char m_ucShadowAlpha;
-    unsigned long m_ulUniqueId;
+    std::uint8_t m_ucFormat;
+    std::uint8_t m_ucShadowAlpha;
+    std::uint32_t m_ulUniqueId;
     eTextPriority m_Priority;
     bool          m_bDeletable;
     uint          m_uiScriptID;

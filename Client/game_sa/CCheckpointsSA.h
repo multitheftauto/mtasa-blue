@@ -16,8 +16,8 @@
 class CCheckpointSA;
 class CVector;
 
-// 00722c40      public: static class CCheckpoint * __cdecl CCheckpoints::PlaceMarker(unsigned int,unsigned short,class CVector &,class CVector &,float,unsigned
-// char,unsigned char,unsigned char,unsigned char,unsigned short,float,short)
+// 00722c40      public: static class CCheckpoint * __cdecl CCheckpoints::PlaceMarker(std::uint32_t,std::uint16_t,class CVector &,class CVector &,float,unsigned
+// char,std::uint8_t,std::uint8_t,std::uint8_t,std::uint16_t,float,short)
 #define FUNC_CCheckpoints__PlaceMarker  0x722c40
 
 #define MAX_CHECKPOINTS         32

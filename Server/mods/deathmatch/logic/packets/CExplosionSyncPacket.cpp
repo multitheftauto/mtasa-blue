@@ -20,7 +20,7 @@ CExplosionSyncPacket::CExplosionSyncPacket()
     m_ucType = EXPLOSION_SMALL;
 }
 
-CExplosionSyncPacket::CExplosionSyncPacket(const CVector& vecPosition, unsigned char ucType)
+CExplosionSyncPacket::CExplosionSyncPacket(const CVector& vecPosition, std::uint8_t ucType)
 {
     m_OriginID = INVALID_ELEMENT_ID;
     m_vecPosition = vecPosition;
@@ -70,7 +70,7 @@ bool CExplosionSyncPacket::Write(NetBitStreamInterface& BitStream) const
         ElementID ID = m_pSourceElement->GetID();
         BitStream.Write(ID);
 
-        unsigned short usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        std::uint16_t usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
         BitStream.WriteCompressed(usLatency);
     }
     else

@@ -20,16 +20,16 @@ public:
     ~CPlayerStatsPacket() = default;
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_STATS; }
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    void Add(unsigned short usID, float fValue);
-    void Remove(unsigned short usID, float fValue) { m_map.erase(usID); }
+    void Add(std::uint16_t usID, float fValue);
+    void Remove(std::uint16_t usID, float fValue) { m_map.erase(usID); }
 
     void   Clear() noexcept { m_map.clear(); }
     size_t GetSize() const noexcept { return m_map.size(); }
 
 private:
-    std::map<unsigned short, float> m_map;            // id - value pairs
+    std::map<std::uint16_t, float> m_map;            // id - value pairs
 };

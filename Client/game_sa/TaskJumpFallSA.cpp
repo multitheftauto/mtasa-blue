@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "TaskJumpFallSA.h"
 
-CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, char nHeight,
+CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntity* pClimbEnt, const CVector& vecTarget, float fHeading, std::uint8_t nSurfaceType, char nHeight,
                                        const bool bForceClimb)
 {
     CreateTaskInterface(sizeof(CTaskSimpleClimbSAInterface));

@@ -31,16 +31,16 @@ public:
     CMarker* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents);
     void     DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_Markers.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_Markers.size()); };
     bool         Exists(CMarker* pMarker);
 
     std::list<CMarker*>::const_iterator IterBegin() { return m_Markers.begin(); };
     std::list<CMarker*>::const_iterator IterEnd() { return m_Markers.end(); };
 
     static int           StringToType(const char* szString);
-    static bool          TypeToString(unsigned int uiType, char* szString);
-    static unsigned char StringToIcon(const char* szString);
-    static bool          IconToString(unsigned char ucIcon, char* szString);
+    static bool          TypeToString(std::uint32_t uiType, char* szString);
+    static std::uint8_t StringToIcon(const char* szString);
+    static bool          IconToString(std::uint8_t ucIcon, char* szString);
 
 private:
     void AddToList(CMarker* pMarker) { m_Markers.push_back(pMarker); };

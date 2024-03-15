@@ -696,7 +696,7 @@ int CLuaFileDefs::fileRead(lua_State* luaVM)
 {
     //  string fileRead ( file theFile, int count )
     CScriptFile*  pFile;
-    unsigned long ulCount = 0;
+    std::uint32_t ulCount = 0;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFile);
@@ -824,7 +824,7 @@ std::optional<std::string> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFi
 
     if (CResourceFile* resourceFile = scriptFile->GetResourceFile(); resourceFile != nullptr)
     {
-        const CChecksum current = CChecksum::GenerateChecksumFromBuffer(buffer.data(), static_cast<unsigned long>(buffer.size()));
+        const CChecksum current = CChecksum::GenerateChecksumFromBuffer(buffer.data(), static_cast<std::uint32_t>(buffer.size()));
 
 #ifdef MTA_CLIENT
         const CChecksum expected = resourceFile->GetServerChecksum();
@@ -959,7 +959,7 @@ int CLuaFileDefs::fileSetPos(lua_State* luaVM)
 {
     //  int fileSetPos ( file theFile, int offset )
     CScriptFile*  pFile;
-    unsigned long ulPosition;
+    std::uint32_t ulPosition;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pFile);

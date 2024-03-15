@@ -193,7 +193,7 @@ int CLuaUtilDefs::GetCTime(lua_State* luaVM)
 int CLuaUtilDefs::Split(lua_State* luaVM)
 {
     SString          strInput = "";
-    unsigned int     uiDelimiter = 0;
+    std::uint32_t     uiDelimiter = 0;
     SString          strDelimiter;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strInput);
@@ -213,7 +213,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         char* strText = new char[strInput.length() + 1];
         strcpy(strText, strInput);
 
-        unsigned int uiCount = 0;
+        std::uint32_t uiCount = 0;
         char*        szToken = strtok(strText, strDelimiter);
 
         // Create a new table
@@ -313,7 +313,7 @@ int CLuaUtilDefs::GetColorFromString(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucColorRed, ucColorGreen, ucColorBlue, ucColorAlpha;
+        std::uint8_t ucColorRed, ucColorGreen, ucColorBlue, ucColorAlpha;
         if (XMLColorToInt(strColor, ucColorRed, ucColorGreen, ucColorBlue, ucColorAlpha))
         {
             lua_pushnumber(luaVM, ucColorRed);
@@ -651,8 +651,8 @@ int CLuaUtilDefs::DebugSleep(lua_State* luaVM)
 int CLuaUtilDefs::GetTok(lua_State* luaVM)
 {
     SString          strInput = "";
-    unsigned int     uiToken = 0;
-    unsigned int     uiDelimiter = 0;
+    std::uint32_t     uiToken = 0;
+    std::uint32_t     uiDelimiter = 0;
     SString          strDelimiter;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strInput);
@@ -669,11 +669,11 @@ int CLuaUtilDefs::GetTok(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiCount = 0;
+        std::uint32_t uiCount = 0;
 
         if (uiToken > 0 && uiToken < 1024)
         {
-            unsigned int uiCount = 1;
+            std::uint32_t uiCount = 1;
             char*        szText = new char[strInput.length() + 1];
             strcpy(szText, strInput);
             char* szToken = strtok(szText, strDelimiter);
@@ -727,14 +727,14 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Make it into an unsigned long
-        unsigned long ulColor = COLOR_RGBA(iRed, iGreen, iBlue, iAlpha);
+        // Make it into an std::uint32_t
+        std::uint32_t ulColor = COLOR_RGBA(iRed, iGreen, iBlue, iAlpha);
         lua_pushinteger(luaVM, static_cast<lua_Integer>(ulColor));
         return 1;
     }
 
     // Make it black so funcs dont break
-    unsigned long ulColor = COLOR_RGBA(0, 0, 0, 255);
+    std::uint32_t ulColor = COLOR_RGBA(0, 0, 0, 255);
     lua_pushnumber(luaVM, static_cast<lua_Number>(ulColor));
     return 1;
 }

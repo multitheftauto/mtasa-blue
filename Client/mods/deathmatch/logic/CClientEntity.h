@@ -172,15 +172,15 @@ public:
     // If this value doesn't match the value from the sync packet, the packet should be
     // ignored. Note that if this value is 0, all sync packets should be accepted. This is
     // so we don't need this byte when the element is created first.
-    unsigned char GetSyncTimeContext() { return m_ucSyncTimeContext; };
-    void          SetSyncTimeContext(unsigned char ucContext) { m_ucSyncTimeContext = ucContext; }
-    bool          CanUpdateSync(unsigned char ucRemote);
+    std::uint8_t GetSyncTimeContext() { return m_ucSyncTimeContext; };
+    void          SetSyncTimeContext(std::uint8_t ucContext) { m_ucSyncTimeContext = ucContext; }
+    bool          CanUpdateSync(std::uint8_t ucRemote);
 
     const SString& GetName() const { return m_strName; }
     void           SetName(const char* szName) { m_strName.AssignLeft(szName, MAX_ELEMENT_NAME_LENGTH); }
 
     const SString& GetTypeName() { return m_strTypeName; }
-    unsigned int   GetTypeHash() { return m_uiTypeHash; }
+    std::uint32_t   GetTypeHash() { return m_uiTypeHash; }
     static auto    GetTypeHashFromString(std::string_view type) { return HashString(type.data(), type.length()); }
     void           SetTypeName(const SString& name);
 
@@ -225,8 +225,8 @@ public:
     virtual void SetRotationRadians(const CVector& vecRadians);
     virtual void SetRotationDegrees(const CVector& vecDegrees);
 
-    virtual inline unsigned short GetDimension() { return m_usDimension; }
-    virtual void                  SetDimension(unsigned short usDimension);
+    virtual inline std::uint16_t GetDimension() { return m_usDimension; }
+    virtual void                  SetDimension(std::uint16_t usDimension);
 
     virtual void ModelRequestCallback(CModelInfo* pModelInfo){};
 
@@ -257,14 +257,14 @@ public:
 
     void CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive);
 
-    CClientEntity* FindChild(const char* szName, unsigned int uiIndex, bool bRecursive);
-    CClientEntity* FindChildIndex(const char* szType, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
-    CClientEntity* FindChildByType(const char* szType, unsigned int uiIndex, bool bRecursive);
-    CClientEntity* FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
+    CClientEntity* FindChild(const char* szName, std::uint32_t uiIndex, bool bRecursive);
+    CClientEntity* FindChildIndex(const char* szType, std::uint32_t uiIndex, std::uint32_t& uiCurrentIndex, bool bRecursive);
+    CClientEntity* FindChildByType(const char* szType, std::uint32_t uiIndex, bool bRecursive);
+    CClientEntity* FindChildByTypeIndex(std::uint32_t uiTypeHash, std::uint32_t uiIndex, std::uint32_t& uiCurrentIndex, bool bRecursive);
     void           FindAllChildrenByType(const char* szType, struct lua_State* luaVM, bool bStreamedIn = false);
-    void           FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* luaVM, unsigned int& uiIndex, bool bStreamedIn = false);
+    void           FindAllChildrenByTypeIndex(std::uint32_t uiTypeHash, lua_State* luaVM, std::uint32_t& uiIndex, bool bStreamedIn = false);
 
-    unsigned int CountChildren() { return static_cast<unsigned int>(m_Children.size()); };
+    std::uint32_t CountChildren() { return static_cast<std::uint32_t>(m_Children.size()); };
 
     void GetChildren(lua_State* luaVM);
     void GetChildrenByType(const char* szType, lua_State* luaVM);
@@ -283,7 +283,7 @@ public:
     CElementGroup* GetElementGroup() { return m_pElementGroup; }
     void           SetElementGroup(CElementGroup* elementGroup) { m_pElementGroup = elementGroup; }
 
-    static unsigned int GetTypeID(const char* szTypeName);
+    static std::uint32_t GetTypeID(const char* szTypeName);
 
     CMapEventManager* GetEventManager() { return m_pEventManager; };
 
@@ -311,8 +311,8 @@ public:
     virtual void     InternalAttachTo(CClientEntity* pEntity);
     bool             IsStatic();
     void             SetStatic(bool bStatic);
-    unsigned char    GetInterior();
-    virtual void     SetInterior(unsigned char ucInterior);
+    std::uint8_t    GetInterior();
+    virtual void     SetInterior(std::uint8_t ucInterior);
     bool             IsOnScreen();
     virtual RpClump* GetClump();
     void             WorldIgnore(bool bIgnore);
@@ -342,16 +342,16 @@ protected:
 
     ElementID m_ID;
 
-    unsigned short m_usDimension;
+    std::uint16_t m_usDimension;
 
 private:
-    unsigned int m_uiTypeHash;
+    std::uint32_t m_uiTypeHash;
     SString      m_strTypeName;
     SString      m_strName;
     bool         m_bSmartPointer;
 
 protected:
-    unsigned char m_ucSyncTimeContext;
+    std::uint8_t m_ucSyncTimeContext;
 
     CClientEntity*              m_pAttachedToEntity;
     CVector                     m_vecAttachedPosition;
@@ -367,7 +367,7 @@ protected:
     CElementGroup*                    m_pElementGroup;
     std::list<CClientPed*>            m_OriginSourceUsers;
     std::vector<CClientPed*>          m_Contacts;
-    unsigned char                     m_ucInterior;
+    std::uint8_t                     m_ucInterior;
     std::map<CClientEntity*, bool>    m_DisabledCollisions;
     bool                              m_bDoubleSided;
     bool                              m_bDoubleSidedInit;
@@ -382,13 +382,13 @@ public:
 
 private:
     static bool IsFromRoot(CClientEntity* pEntity);
-    static void AddEntityFromRoot(unsigned int uiTypeHash, CClientEntity* pEntity, bool bDebugCheck = true);
-    static void RemoveEntityFromRoot(unsigned int uiTypeHash, CClientEntity* pEntity);
-    static void GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn);
+    static void AddEntityFromRoot(std::uint32_t uiTypeHash, CClientEntity* pEntity, bool bDebugCheck = true);
+    static void RemoveEntityFromRoot(std::uint32_t uiTypeHash, CClientEntity* pEntity);
+    static void GetEntitiesFromRoot(std::uint32_t uiTypeHash, lua_State* luaVM, bool bStreamedIn);
 
 #if CHECK_ENTITIES_FROM_ROOT
-    static void _CheckEntitiesFromRoot(unsigned int uiTypeHash);
-    void        _FindAllChildrenByTypeIndex(unsigned int uiTypeHash, std::map<CClientEntity*, int>& mapResults);
-    static void _GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CClientEntity*, int>& mapResults);
+    static void _CheckEntitiesFromRoot(std::uint32_t uiTypeHash);
+    void        _FindAllChildrenByTypeIndex(std::uint32_t uiTypeHash, std::map<CClientEntity*, int>& mapResults);
+    static void _GetEntitiesFromRoot(std::uint32_t uiTypeHash, std::map<CClientEntity*, int>& mapResults);
 #endif
 };

@@ -64,7 +64,7 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
                 bool  bWeaponCorrect = true;
 
                 // Check client has the weapon we think he has
-                unsigned char ucClientWeaponType;
+                std::uint8_t ucClientWeaponType;
                 if (!BitStream.Read(ucClientWeaponType))
                     return false;
 
@@ -78,7 +78,7 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
                 SWeaponSlotSync slot;
                 if (!BitStream.Read(&slot))
                     return false;
-                unsigned int uiSlot = slot.data.uiSlot;
+                std::uint32_t uiSlot = slot.data.uiSlot;
 
                 if (bWeaponCorrect)
                     pSourcePlayer->SetWeaponSlot(uiSlot);
@@ -201,7 +201,7 @@ bool CKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
         if (ControllerState.ButtonCircle || ControllerState.RightShoulder1)
         {
             // Write his current weapon slot
-            unsigned int    uiSlot = pSourcePlayer->GetWeaponSlot();
+            std::uint32_t    uiSlot = pSourcePlayer->GetWeaponSlot();
             SWeaponSlotSync slot;
             slot.data.uiSlot = uiSlot;
             BitStream.Write(&slot);
@@ -257,7 +257,7 @@ bool CKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
 void CKeysyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterface& BitStream)
 {
     // Turret states
-    unsigned short usModel = pVehicle->GetModel();
+    std::uint16_t usModel = pVehicle->GetModel();
     if (CVehicleManager::HasTurret(usModel))
     {
         // Read out the turret position
@@ -272,7 +272,7 @@ void CKeysyncPacket::ReadVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterfa
 void CKeysyncPacket::WriteVehicleSpecific(CVehicle* pVehicle, NetBitStreamInterface& BitStream) const
 {
     // Turret states
-    unsigned short usModel = pVehicle->GetModel();
+    std::uint16_t usModel = pVehicle->GetModel();
     if (CVehicleManager::HasTurret(usModel))
     {
         // Grab the turret position

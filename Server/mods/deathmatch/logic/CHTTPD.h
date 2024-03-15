@@ -32,7 +32,7 @@ public:
     bool          ShouldAllowConnection(const char* szAddress);
 
     // CHTTPD methods
-    bool            StartHTTPD(const char* szIP, unsigned int port);
+    bool            StartHTTPD(const char* szIP, std::uint32_t port);
     bool            StopHTTPD();
     void            SetResource(CResource* resource) { m_resource = resource; }
     CResource*      GetResource() { return m_resource; }
@@ -50,7 +50,7 @@ private:
     bool m_bStartedServer;
 
     class CAccount*             m_pGuestAccount;
-    std::map<string, long long> m_LoggedInMap;
+    std::map<string, std::int64_t> m_LoggedInMap;
     CConnectHistory             m_BruteForceProtect;
     CConnectHistory             m_HttpDosProtect;
     std::set<SString>           m_HttpDosExcludeMap;

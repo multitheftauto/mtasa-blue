@@ -43,19 +43,19 @@ public:
     CNetAPI(CClientManager* pManager);
 
     void DoPulse();
-    bool ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& bitStream);
+    bool ProcessPacket(std::uint8_t bytePacketID, NetBitStreamInterface& bitStream);
 
     void ResetReturnPosition();
 
     void AddInterpolation(const CVector& vecPosition);
-    bool GetInterpolation(CVector& vecPosition, unsigned short usLatency);
+    bool GetInterpolation(CVector& vecPosition, std::uint16_t usLatency);
     void SendBulletSyncFire(eWeaponType weaponType, const CVector& vecStart, const CVector& vecEnd, float fDamage, uchar ucHitZone,
                             CClientPlayer* pRemoteDamagedPlayer);
     void SendBulletSyncCustomWeaponFire(CClientWeapon* pWeapon, const CVector& vecStart, const CVector& vecEnd);
     bool IsNetworkTrouble() { return m_bIsNetworkTrouble; }
 
-    static bool IsWeaponIDAkimbo(unsigned char ucWeaponID);
-    static bool IsDriveByWeapon(unsigned char ucWeaponID);
+    static bool IsWeaponIDAkimbo(std::uint8_t ucWeaponID);
+    static bool IsDriveByWeapon(std::uint8_t ucWeaponID);
 
 private:
     bool IsSmallKeySyncNeeded(CClientPed* pPed);
@@ -103,8 +103,8 @@ private:
     CClientManager*        m_pManager;
     CClientPlayerManager*  m_pPlayerManager;
     CClientVehicleManager* m_pVehicleManager;
-    unsigned long          m_ulLastPuresyncTime;
-    unsigned long          m_ulLastSyncReturnTime;
+    std::uint32_t          m_ulLastPuresyncTime;
+    std::uint32_t          m_ulLastSyncReturnTime;
 
     bool    m_bStoredReturnSync;
     bool    m_bVehicleLastReturn;

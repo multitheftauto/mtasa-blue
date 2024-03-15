@@ -66,11 +66,11 @@ public:
     void RemoveBigBuildings() override;
 
     CStreamingInfo* GetStreamingInfo(uint32 id);
-    void            SetStreamingInfo(uint32 modelid, unsigned char usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
-    unsigned char   GetUnusedArchive();
-    unsigned char   GetUnusedStreamHandle();
-    unsigned char   AddArchive(const wchar_t* szFilePath);
-    void            RemoveArchive(unsigned char ucStreamHandler);
+    void            SetStreamingInfo(uint32 modelid, std::uint8_t usStreamID, uint uiOffset, ushort usSize, uint uiNextInImg = -1);
+    std::uint8_t   GetUnusedArchive();
+    std::uint8_t   GetUnusedStreamHandle();
+    std::uint8_t   AddArchive(const wchar_t* szFilePath);
+    void            RemoveArchive(std::uint8_t ucStreamHandler);
     bool            SetStreamingBufferSize(uint32 uiSize);
     uint32          GetStreamingBufferSize() { return ms_streamingHalfOfBufferSizeBlocks * 2048 * 2; }; // In bytes
 

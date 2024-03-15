@@ -53,7 +53,7 @@ void CConsoleLogger::LinePrintf(const char* szFormat, ...)
     va_end(marker);
 
     // Replace possible LF
-    for (int i = 0; i != MAX_STRING_LENGTH; i++)
+    for (auto i = 0; i != MAX_STRING_LENGTH; i++)
     {
         if (szBuffer[i] == 10)
         {

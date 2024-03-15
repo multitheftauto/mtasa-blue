@@ -28,9 +28,9 @@ public:
         iNumRows = 0;
     }
 
-    const SString& ColumnName(unsigned long c) const
+    const SString& ColumnName(std::uint32_t c) const
     {
-        unsigned long idx = c;
+        std::uint32_t idx = c;
         if (idx < colNames.size())
             return colNames[idx];
         static SString dummy;
@@ -54,9 +54,9 @@ public:
         return &cellList[cellList.size() - ColumnCount()];
     }
 
-    SString& Data(unsigned long c, unsigned long r)
+    SString& Data(std::uint32_t c, std::uint32_t r)
     {
-        unsigned long idx = c + r * ColumnCount();
+        std::uint32_t idx = c + r * ColumnCount();
         if (idx < cellList.size())
             return cellList[idx];
         static SString cellDummy;

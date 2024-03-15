@@ -17,8 +17,8 @@ class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociation;
 class CAnimBlock;
 struct RpClump;
-typedef unsigned char BYTE;
-typedef unsigned long AssocGroupId;
+typedef std::uint8_t BYTE;
+typedef std::uint32_t AssocGroupId;
 
 enum class eAnimGroup : int
 {
@@ -180,12 +180,12 @@ enum class eAnimID : int
 class CAnimBlendAssocGroup
 {
 public:
-    virtual CAnimBlendAssociationSAInterface* CopyAnimation(unsigned int AnimID) = 0;
+    virtual CAnimBlendAssociationSAInterface* CopyAnimation(std::uint32_t AnimID) = 0;
     virtual void                              InitEmptyAssociations(RpClump* pClump) = 0;
     virtual bool                              IsCreated() = 0;
     virtual int                               GetNumAnimations() = 0;
     virtual CAnimBlock*                       GetAnimBlock() = 0;
-    virtual CAnimBlendStaticAssociation*      GetAnimation(unsigned int ID) = 0;
+    virtual CAnimBlendStaticAssociation*      GetAnimation(std::uint32_t ID) = 0;
     virtual eAnimGroup                        GetGroupID() = 0;
     virtual void                              CreateAssociations(const char* szBlockName) = 0;
     virtual bool                              IsLoaded() = 0;

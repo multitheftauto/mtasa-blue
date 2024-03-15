@@ -71,29 +71,29 @@ void CSettingsSA::SetWideScreenEnabled(bool bEnabled)
     m_pInterface->bUseWideScreen = bEnabled;
 }
 
-unsigned int CSettingsSA::GetNumVideoModes()
+std::uint32_t CSettingsSA::GetNumVideoModes()
 {
     // RwEngineGetNumVideoModes
-    return ((unsigned int(__cdecl*)())0x7F2CC0)();
+    return ((std::uint32_t(__cdecl*)())0x7F2CC0)();
 }
 
-VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, unsigned int modeIndex)
+VideoMode* CSettingsSA::GetVideoModeInfo(VideoMode* modeInfo, std::uint32_t modeIndex)
 {
     // RwEngineGetVideoModeInfo
-    return ((VideoMode*(__cdecl*)(VideoMode*, unsigned int))0x7F2CF0)(modeInfo, modeIndex);
+    return ((VideoMode*(__cdecl*)(VideoMode*, std::uint32_t))0x7F2CF0)(modeInfo, modeIndex);
 }
 
-unsigned int CSettingsSA::GetCurrentVideoMode()
+std::uint32_t CSettingsSA::GetCurrentVideoMode()
 {
     // RwEngineGetCurrentVideoMode
-    return ((unsigned int(__cdecl*)())0x7F2D20)();
+    return ((std::uint32_t(__cdecl*)())0x7F2D20)();
 }
 
-void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
+void CSettingsSA::SetCurrentVideoMode(std::uint32_t modeIndex, bool bOnRestart)
 {
     if (!bOnRestart)
     {
-        ((void(__cdecl*)(unsigned int))0x745C70)(modeIndex);
+        ((void(__cdecl*)(std::uint32_t))0x745C70)(modeIndex);
     }
     // Only update settings variables for fullscreen modes
     if (modeIndex)
@@ -103,50 +103,50 @@ void CSettingsSA::SetCurrentVideoMode(unsigned int modeIndex, bool bOnRestart)
 uint CSettingsSA::GetNumAdapters()
 {
     // RwEngineGetNumSubSystems
-    return ((unsigned int(__cdecl*)())0x7F2C00)();
+    return ((std::uint32_t(__cdecl*)())0x7F2C00)();
 }
 
-void CSettingsSA::SetAdapter(unsigned int uiAdapterIndex)
+void CSettingsSA::SetAdapter(std::uint32_t uiAdapterIndex)
 {
     // RwEngineSetSubSystem
-    ((void(__cdecl*)(unsigned int))0x7F2C90)(uiAdapterIndex);
+    ((void(__cdecl*)(std::uint32_t))0x7F2C90)(uiAdapterIndex);
 }
 
-unsigned int CSettingsSA::GetCurrentAdapter()
+std::uint32_t CSettingsSA::GetCurrentAdapter()
 {
     // RwEngineGetCurrentSubSystem
-    return ((unsigned int(__cdecl*)())0x7F2C60)();
+    return ((std::uint32_t(__cdecl*)())0x7F2C60)();
 }
 
-unsigned char CSettingsSA::GetRadioVolume()
+std::uint8_t CSettingsSA::GetRadioVolume()
 {
     return m_pInterface->ucRadioVolume;
 }
 
-void CSettingsSA::SetRadioVolume(unsigned char ucVolume)
+void CSettingsSA::SetRadioVolume(std::uint8_t ucVolume)
 {
     m_pInterface->ucRadioVolume = ucVolume;
     pGame->GetAudioEngine()->SetMusicMasterVolume(ucVolume);
 }
 
-unsigned char CSettingsSA::GetSFXVolume()
+std::uint8_t CSettingsSA::GetSFXVolume()
 {
     return m_pInterface->ucSfxVolume;
 }
 
-void CSettingsSA::SetSFXVolume(unsigned char ucVolume)
+void CSettingsSA::SetSFXVolume(std::uint8_t ucVolume)
 {
     m_pInterface->ucSfxVolume = ucVolume;
     pGame->GetAudioEngine()->SetEffectsMasterVolume(ucVolume);
 }
 
-unsigned int CSettingsSA::GetUsertrackMode()
+std::uint32_t CSettingsSA::GetUsertrackMode()
 {
     // 0 = radio, 1 = random, 2 = sequential
     return m_pInterface->ucUsertrackMode;
 }
 
-void CSettingsSA::SetUsertrackMode(unsigned int uiMode)
+void CSettingsSA::SetUsertrackMode(std::uint32_t uiMode)
 {
     m_pInterface->ucUsertrackMode = uiMode;
 }
@@ -196,24 +196,24 @@ void CSettingsSA::SetDrawDistance(float fDistance)
     m_pInterface->fDrawDistance = fDistance;
 }
 
-unsigned int CSettingsSA::GetBrightness()
+std::uint32_t CSettingsSA::GetBrightness()
 {
     // up to 384
     return m_pInterface->dwBrightness;
 }
 
-void CSettingsSA::SetBrightness(unsigned int uiBrightness)
+void CSettingsSA::SetBrightness(std::uint32_t uiBrightness)
 {
     m_pInterface->dwBrightness = uiBrightness;
 }
 
-unsigned int CSettingsSA::GetFXQuality()
+std::uint32_t CSettingsSA::GetFXQuality()
 {
     // 0 = low, 1 = medium, 2 = high, 3 = very high
     return *(BYTE*)VAR_ucFxQuality;
 }
 
-void CSettingsSA::SetFXQuality(unsigned int fxQualityId)
+void CSettingsSA::SetFXQuality(std::uint32_t fxQualityId)
 {
     MemPutFast<BYTE>(VAR_ucFxQuality, fxQualityId);
 }
@@ -230,13 +230,13 @@ void CSettingsSA::SetMouseSensitivity(float fSensitivity)
     MemPutFast<float>(VAR_fMouseSensitivity, fRawValue);
 }
 
-unsigned int CSettingsSA::GetAntiAliasing()
+std::uint32_t CSettingsSA::GetAntiAliasing()
 {
     // 1 = disabled, 2 = 1x, 3 = 2x, 4 = 3x
     return m_pInterface->dwAntiAliasing;
 }
 
-void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
+void CSettingsSA::SetAntiAliasing(std::uint32_t uiAntiAliasing, bool bOnRestart)
 {
     if (!bOnRestart)
     {

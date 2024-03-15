@@ -38,9 +38,9 @@ class CChecksum;
 
 struct SVersion
 {
-    unsigned int m_uiMajor = 0;
-    unsigned int m_uiMinor = 0;
-    unsigned int m_uiRevision = 0;
+    std::uint32_t m_uiMajor = 0;
+    std::uint32_t m_uiMinor = 0;
+    std::uint32_t m_uiRevision = 0;
 };
 
 class CExportedFunction
@@ -78,8 +78,8 @@ class CIncludedResources
 {
 private:
     SString           m_strResourceName;
-    unsigned int      m_uiMinimumVersion;
-    unsigned int      m_uiMaximumVersion;
+    std::uint32_t      m_uiMinimumVersion;
+    std::uint32_t      m_uiMaximumVersion;
     SVersion          m_MinVersion;
     SVersion          m_MaxVersion;
     bool              m_bExists;
@@ -122,7 +122,7 @@ public:
     };
 };
 
-enum class EResourceState : unsigned char
+enum class EResourceState : std::uint8_t
 {
     None,
     Loaded,              // its been loaded successfully (i.e. meta parsed ok), included resources loaded ok
@@ -210,10 +210,10 @@ public:
     bool GetInfoValue(const char* szKey, std::string& strValue) const;
     void SetInfoValue(const char* szKey, const char* szValue, bool bSave = true);
 
-    unsigned int GetVersionMajor() const noexcept { return m_uiVersionMajor; }
-    unsigned int GetVersionMinor() const noexcept { return m_uiVersionMinor; }
-    unsigned int GetVersionRevision() const noexcept { return m_uiVersionRevision; }
-    unsigned int GetVersionState() const noexcept { return m_uiVersionState; }
+    std::uint32_t GetVersionMajor() const noexcept { return m_uiVersionMajor; }
+    std::uint32_t GetVersionMinor() const noexcept { return m_uiVersionMinor; }
+    std::uint32_t GetVersionRevision() const noexcept { return m_uiVersionRevision; }
+    std::uint32_t GetVersionState() const noexcept { return m_uiVersionState; }
 
     bool IsLoaded() const noexcept { return m_eState != EResourceState::None; }
     bool IsActive() const noexcept
@@ -260,8 +260,8 @@ public:
     time_t GetTimeStarted() const noexcept { return m_timeStarted; }
     time_t GetTimeLoaded() const noexcept { return m_timeLoaded; }
 
-    void           SetNetID(unsigned short usNetID) { m_usNetID = usNetID; }
-    unsigned short GetNetID() const noexcept { return m_usNetID; }
+    void           SetNetID(std::uint16_t usNetID) { m_usNetID = usNetID; }
+    std::uint16_t GetNetID() const noexcept { return m_usNetID; }
 
     uint GetScriptID() const noexcept { return m_uiScriptID; }
 
@@ -363,7 +363,7 @@ private:
     EResourceState m_eState = EResourceState::None;
     bool           m_bClientSync = false;
 
-    unsigned short m_usNetID = -1;
+    std::uint16_t m_usNetID = -1;
     uint           m_uiScriptID = -1;
 
     CResourceManager* m_pResourceManager;
@@ -374,10 +374,10 @@ private:
     std::string m_strResourceDirectoryPath;            // Absolute path to resource files (if a dir)   i.e. m_strAbsPath/resource_name
     std::string m_strResourceCachePath;            // Absolute path to unzipped cache (if a zip)   i.e. /server/mods/deathmatch/resources/cache/resource_name
 
-    unsigned int m_uiVersionMajor = 0;
-    unsigned int m_uiVersionMinor = 0;
-    unsigned int m_uiVersionRevision = 0;
-    unsigned int m_uiVersionState = 2;            // 2 = release
+    std::uint32_t m_uiVersionMajor = 0;
+    std::uint32_t m_uiVersionMinor = 0;
+    std::uint32_t m_uiVersionRevision = 0;
+    std::uint32_t m_uiVersionState = 2;            // 2 = release
 
     int m_iDownloadPriorityGroup = 0;
 

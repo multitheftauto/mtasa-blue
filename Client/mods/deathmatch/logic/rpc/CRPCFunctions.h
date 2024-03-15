@@ -39,9 +39,9 @@ public:
     virtual ~CRPCFunctions();
 
     void        AddHandlers();
-    static void AddHandler(unsigned char ucID, pfnRPCHandler Callback, const char* szName = "unknown");
-    static void AddHandler(unsigned char ucID, pfnElementRPCHandler Callback, const char* szName = "unknown");
-    void        ProcessPacket(unsigned char ucPacketID, class NetBitStreamInterface& bitStream);
+    static void AddHandler(std::uint8_t ucID, pfnRPCHandler Callback, const char* szName = "unknown");
+    static void AddHandler(std::uint8_t ucID, pfnElementRPCHandler Callback, const char* szName = "unknown");
+    void        ProcessPacket(std::uint8_t ucPacketID, class NetBitStreamInterface& bitStream);
 
     bool m_bShowRPCs;
 

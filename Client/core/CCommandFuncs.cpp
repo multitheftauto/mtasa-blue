@@ -42,8 +42,8 @@ void CCommandFuncs::Exit(const char* szParameters)
 void CCommandFuncs::Ver(const char* szParameters)
 {
     // Compose version string
-    unsigned short usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
-    unsigned short usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
+    std::uint16_t usNetRev = CCore::GetSingleton().GetNetwork()->GetNetRev();
+    std::uint16_t usNetRel = CCore::GetSingleton().GetNetwork()->GetNetRel();
     SString        strVersion = BLUE_VERSION_STRING;
     if (usNetRev > 0 || usNetRel > 0)
         strVersion += SString(".%d", usNetRev);
@@ -127,7 +127,7 @@ void CCommandFuncs::Window(const char* szParameters)
     if ( !CCore::GetSingleton ().GetModManager ()->IsLoaded () )
     {
         CGameSettings * gameSettings = CCore::GetSingleton ( ).GetGame ( )->GetSettings();
-        unsigned int currentMode = gameSettings->GetCurrentVideoMode();
+        std::uint32_t currentMode = gameSettings->GetCurrentVideoMode();
 
         if ( currentMode == 0 )
         {
@@ -251,7 +251,7 @@ void CCommandFuncs::Connect(const char* szParameters)
         return;
     }
 
-    unsigned short usPort = static_cast<unsigned short>(iPort);
+    std::uint16_t usPort = static_cast<std::uint16_t>(iPort);
 
     // Got a password?
     char emptyPass = 0;
@@ -299,7 +299,7 @@ void CCommandFuncs::Reconnect(const char* szParameters)
     CModManager::GetSingleton().Unload();
 
     std::string  strHost, strNick, strPassword;
-    unsigned int uiPort;
+    std::uint32_t uiPort;
 
     CVARS_GET("host", strHost);
     CVARS_GET("nick", strNick);
@@ -319,7 +319,7 @@ void CCommandFuncs::Reconnect(const char* szParameters)
             return;
         }
 
-        unsigned short usPort = static_cast<unsigned short>(uiPort);
+        std::uint16_t usPort = static_cast<std::uint16_t>(uiPort);
 
         // Got a password?
         if (!strPassword.c_str())

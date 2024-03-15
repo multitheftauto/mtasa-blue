@@ -24,10 +24,10 @@ CUpdateInfoPacket::CUpdateInfoPacket(const SString& strType, const SString& strD
 
 bool CUpdateInfoPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    BitStream.Write((unsigned short)m_strType.length());
+    BitStream.Write((std::uint16_t)m_strType.length());
     BitStream.Write(m_strType.c_str(), m_strType.length());
 
-    BitStream.Write((unsigned short)m_strData.length());
+    BitStream.Write((std::uint16_t)m_strData.length());
     BitStream.Write(m_strData.c_str(), m_strData.length());
 
     return true;

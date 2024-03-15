@@ -19,18 +19,18 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    static bool SetCameraViewMode(std::optional<unsigned char> usVehicleViewMode, std::optional<unsigned char> usPedViewMode);
-    static CLuaMultiReturn<unsigned char, unsigned char> GetCameraViewMode();
+    static bool SetCameraViewMode(std::optional<std::uint8_t> usVehicleViewMode, std::optional<std::uint8_t> usPedViewMode);
+    static CLuaMultiReturn<std::uint8_t, std::uint8_t> GetCameraViewMode();
 
     // Cam get funcs
     static std::variant<CClientCamera*, bool>                                      GetCamera();
     static CLuaMultiReturn<float, float, float, float, float, float, float, float> GetCameraMatrix();
     static CMatrix                                                                 OOP_GetCameraMatrix();
     static std::variant<CClientEntity*, bool>                                      GetCameraTarget();
-    static unsigned char                                                           GetCameraInterior();
+    static std::uint8_t                                                           GetCameraInterior();
     static std::string                                                             GetCameraGoggleEffect();
     LUA_DECLARE(GetCameraFieldOfView);
-    static unsigned char GetCameraDrunkLevel();
+    static std::uint8_t GetCameraDrunkLevel();
 
     // Cam set funcs
     LUA_DECLARE(SetCameraMatrix);

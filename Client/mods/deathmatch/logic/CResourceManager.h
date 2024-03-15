@@ -31,15 +31,15 @@ public:
     CResourceManager();
     ~CResourceManager();
 
-    CResource* Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
+    CResource* Add(std::uint16_t usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
                    const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP);
     CResource* GetResource(const char* szResourceName);
-    CResource* GetResourceFromNetID(unsigned short usNetID);
+    CResource* GetResourceFromNetID(std::uint16_t usNetID);
     CResource* GetResourceFromScriptID(uint uiScriptID);
     CResource* GetResourceFromLuaState(struct lua_State* luaVM);
     SString    GetResourceName(struct lua_State* luaVM);
 
-    bool RemoveResource(unsigned short usID);
+    bool RemoveResource(std::uint16_t usID);
     void Remove(CResource* pResource);
     bool Exists(CResource* pResource);
     void StopAll();

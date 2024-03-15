@@ -21,8 +21,8 @@ public:
     struct SyncData
     {
         ElementID     ID;
-        unsigned char ucFlags;
-        unsigned char ucSyncTimeContext;
+        std::uint8_t ucFlags;
+        std::uint8_t ucSyncTimeContext;
         CVector       vecPosition;
         float         fRotation;
         CVector       vecVelocity;
@@ -39,7 +39,7 @@ public:
     CPedSyncPacket(SyncData& pReadData);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PED_SYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

@@ -23,7 +23,7 @@ CPedWastedPacket::CPedWastedPacket()
     m_bStealth = false;
 }
 
-CPedWastedPacket::CPedWastedPacket(CPed* pPed, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth, AssocGroupId animGroup,
+CPedWastedPacket::CPedWastedPacket(CPed* pPed, CElement* pKiller, std::uint8_t ucKillerWeapon, std::uint8_t ucBodyPart, bool bStealth, AssocGroupId animGroup,
                                    AnimationId animID)
 {
     m_PedID = pPed->GetID();

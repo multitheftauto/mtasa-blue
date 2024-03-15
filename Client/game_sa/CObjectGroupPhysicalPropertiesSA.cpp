@@ -17,13 +17,13 @@
 extern CGameSA* pGame;
 
 CObjectGroupPhysicalPropertiesSAInterface* pObjectInfo = *(CObjectGroupPhysicalPropertiesSAInterface**)(0x59F857 + 6);
-std::unordered_map<unsigned char, std::unique_ptr<CObjectGroupPhysicalPropertiesSAInterface>> CObjectGroupPhysicalPropertiesSA::ms_OriginalGroupProperties;
+std::unordered_map<std::uint8_t, std::unique_ptr<CObjectGroupPhysicalPropertiesSAInterface>> CObjectGroupPhysicalPropertiesSA::ms_OriginalGroupProperties;
 
 CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA() : m_pInterface(nullptr)
 {
 }
 
-CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA(unsigned char ucObjectGroup) : m_ucObjectGroup(ucObjectGroup)
+CObjectGroupPhysicalPropertiesSA::CObjectGroupPhysicalPropertiesSA(std::uint8_t ucObjectGroup) : m_ucObjectGroup(ucObjectGroup)
 {
     m_pInterface = &pObjectInfo[ucObjectGroup];
     m_bModified = MapFind(ms_OriginalGroupProperties, ucObjectGroup);
@@ -34,14 +34,14 @@ CObjectGroupPhysicalPropertiesSAInterface* CObjectGroupPhysicalPropertiesSA::Get
     return m_pInterface;
 }
 
-void CObjectGroupPhysicalPropertiesSA::SetGroup(unsigned char ucObjectGroup)
+void CObjectGroupPhysicalPropertiesSA::SetGroup(std::uint8_t ucObjectGroup)
 {
     m_pInterface = &pObjectInfo[ucObjectGroup];
     m_ucObjectGroup = ucObjectGroup;
     m_bModified = MapFind(ms_OriginalGroupProperties, ucObjectGroup);
 }
 
-unsigned char CObjectGroupPhysicalPropertiesSA::GetGroup() const
+std::uint8_t CObjectGroupPhysicalPropertiesSA::GetGroup() const
 {
     return m_ucObjectGroup;
 }

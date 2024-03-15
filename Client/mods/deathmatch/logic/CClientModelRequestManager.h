@@ -31,14 +31,14 @@ public:
     CClientModelRequestManager();
     ~CClientModelRequestManager();
 
-    bool        IsLoaded(unsigned short usModelID);
+    bool        IsLoaded(std::uint16_t usModelID);
     bool        IsRequested(CModelInfo* pModelInfo);
     bool        HasRequested(CClientEntity* pRequester);
     CModelInfo* GetRequestedModelInfo(CClientEntity* pRequester);
 
-    bool RequestBlocking(unsigned short usModelID, const char* szTag);
+    bool RequestBlocking(std::uint16_t usModelID, const char* szTag);
 
-    bool Request(unsigned short usModelID, CClientEntity* pRequester);
+    bool Request(std::uint16_t usModelID, CClientEntity* pRequester);
     void Cancel(CClientEntity* pRequester, bool bAllowQueue);
 
 private:

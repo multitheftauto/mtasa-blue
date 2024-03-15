@@ -50,8 +50,8 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
     return bReturn;
 }
 
-CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(unsigned short nLengthOfDuck)
+CTaskSAInterface* CPedIntelligenceSA::SetTaskDuckSecondary(std::uint16_t nLengthOfDuck)
 {
-    auto SetTaskDuckSecondary = (CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, unsigned short))0x601230;
+    auto SetTaskDuckSecondary = (CTaskSAInterface * (__thiscall*)(CPedIntelligenceSAInterface*, std::uint16_t))0x601230;
     return SetTaskDuckSecondary(internalInterface, nLengthOfDuck);
 }

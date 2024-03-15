@@ -87,7 +87,7 @@ void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAc
 
 void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)
 {
-    MemPutFast<unsigned char>(VAR_InputType, bClassicControls ? 0 : 1);
+    MemPutFast<std::uint8_t>(VAR_InputType, bClassicControls ? 0 : 1);
 }
 
 void CControllerConfigManagerSA::SetMouseInverted(bool bInverted)

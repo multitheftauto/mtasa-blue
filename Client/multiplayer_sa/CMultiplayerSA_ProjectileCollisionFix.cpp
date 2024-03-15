@@ -28,13 +28,13 @@ static void InitializeGrenadeColModel()
     ((void(__thiscall*)(CColModelSAInterface*, int, int, int, int, int, int))(0x40F870))(&colModelGrenade, 1, 0, 0, 0, 0, 0);
 
     // CColSphere::Set
-    ((void(__thiscall*)(CColSphereSA*, float, CVector&, unsigned char, char, unsigned char))(0x40FD10))(
+    ((void(__thiscall*)(CColSphereSA*, float, CVector&, std::uint8_t, char, std::uint8_t))(0x40FD10))(
         &colModelGrenade.m_data->m_spheres[0], colModelGrenade.m_sphere.m_radius * 0.75f, colModelGrenade.m_sphere.m_center, 56, 0, 255);
 }
 
 #define HOOKPOS_CTempColModels__Initialise 0x5BB87D
 #define HOOKSIZE_CTempColModels__Initialise 0x6
-static const unsigned int RETURN_CTempColModels__Initialise = 0x5BB883;
+static const std::uint32_t RETURN_CTempColModels__Initialise = 0x5BB883;
 static void _declspec(naked) HOOK_CTempColModels__Initialise()
 {
     _asm {
@@ -48,7 +48,7 @@ static void _declspec(naked) HOOK_CTempColModels__Initialise()
 
 #define HOOKPOS_CFileLoader__LoadWeaponObject 0x5B401E
 #define HOOKSIZE_CFileLoader__LoadWeaponObject 0x5
-static const unsigned int RETURN_CFileLoader__LoadWeaponObject = 0x5B4023;
+static const std::uint32_t RETURN_CFileLoader__LoadWeaponObject = 0x5B4023;
 static void _declspec(naked) HOOK_CFileLoader__LoadWeaponObject()
 {
     _asm {

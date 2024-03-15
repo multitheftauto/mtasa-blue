@@ -18,7 +18,7 @@ struct SPlayerClothes
 {
     char*         szTexture;
     char*         szModel;
-    unsigned char ucType;
+    std::uint8_t ucType;
 };
 
 class CPlayerClothesPacket final : public CPacket
@@ -27,13 +27,13 @@ public:
     ~CPlayerClothesPacket();
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_CLOTHES; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    void         Add(const char* szTexture, const char* szModel, unsigned char ucType);
+    void         Add(const char* szTexture, const char* szModel, std::uint8_t ucType);
     void         Add(CPlayerClothes* pClothes);
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); }
 
 private:
     std::vector<SPlayerClothes*> m_List;

@@ -80,7 +80,7 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
 {
     outBuffer.clear();
 
-    constexpr unsigned int GIBIBYTE = 1 * 1024 * 1024 * 1024;
+    constexpr std::uint32_t GIBIBYTE = 1 * 1024 * 1024 * 1024;
 
     if (offset > GIBIBYTE)
         return false;
@@ -266,7 +266,7 @@ bool SharedUtil::FileLoad(const SString& strFilename, std::vector<char>& buffer,
 //
 // Save binary data to a file
 //
-bool SharedUtil::FileSave(const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce)
+bool SharedUtil::FileSave(const SString& strFilename, const void* pBuffer, std::uint32_t ulSize, bool bForce)
 {
 #ifdef WIN32
     if (bForce)
@@ -290,7 +290,7 @@ bool SharedUtil::FileSave(const SString& strFilename, const void* pBuffer, unsig
 //
 // Append binary data to a file
 //
-bool SharedUtil::FileAppend(const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce)
+bool SharedUtil::FileAppend(const SString& strFilename, const void* pBuffer, std::uint32_t ulSize, bool bForce)
 {
 #ifdef WIN32
     if (bForce)

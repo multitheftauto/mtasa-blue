@@ -19,8 +19,8 @@ CPlayerSpawnPacket::CPlayerSpawnPacket()
     m_usPlayerSkin = 0;
 }
 
-CPlayerSpawnPacket::CPlayerSpawnPacket(ElementID PlayerID, const CVector& vecSpawnPosition, float fSpawnRotation, unsigned short usPlayerSkin,
-                                       unsigned char ucInterior, unsigned short usDimension, ElementID Team, unsigned char ucTimeContext)
+CPlayerSpawnPacket::CPlayerSpawnPacket(ElementID PlayerID, const CVector& vecSpawnPosition, float fSpawnRotation, std::uint16_t usPlayerSkin,
+                                       std::uint8_t ucInterior, std::uint16_t usDimension, ElementID Team, std::uint8_t ucTimeContext)
 {
     m_PlayerID = PlayerID;
     m_vecSpawnPosition = vecSpawnPosition;
@@ -37,7 +37,7 @@ bool CPlayerSpawnPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_PlayerID);
 
     // No flags atm
-    BitStream.Write(static_cast<unsigned char>(0));
+    BitStream.Write(static_cast<std::uint8_t>(0));
 
     BitStream.Write(m_vecSpawnPosition.fX);
     BitStream.Write(m_vecSpawnPosition.fY);

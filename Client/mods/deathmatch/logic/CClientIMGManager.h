@@ -27,11 +27,11 @@ public:
     void RemoveAll();
     bool Exists(CClientIMG* pIMG);
 
-    CClientIMG* GetElementFromArchiveID(unsigned char ucStreamID);
-    CClientIMG* GetElementThatLinked(unsigned int uiModel);
+    CClientIMG* GetElementFromArchiveID(std::uint8_t ucStreamID);
+    CClientIMG* GetElementThatLinked(std::uint32_t uiModel);
 
-    bool        RestoreModel(unsigned int uiModel);
-    static bool IsLinkableModel(unsigned int uiModel);
+    bool        RestoreModel(std::uint32_t uiModel);
+    static bool IsLinkableModel(std::uint32_t uiModel);
     void        UpdateStreamerBufferSize();
     auto        GetLargestFileSizeBlocks() const { return m_LargestFileSizeBlocks; }
 

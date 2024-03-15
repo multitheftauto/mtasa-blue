@@ -86,9 +86,9 @@ static const SFixedArray<const char*, MAX_GTA_ANALOG_CONTROLS> g_AnalogGTAContro
     "special_control_down",
 }};
 
-bool CClientPad::GetControlIndex(const char* szName, unsigned int& uiIndex)
+bool CClientPad::GetControlIndex(const char* szName, std::uint32_t& uiIndex)
 {
-    for (unsigned int i = 0; i < MAX_GTA_CONTROLS; i++)
+    for (std::uint32_t i = 0; i < MAX_GTA_CONTROLS; i++)
     {
         if (!stricmp(g_GTAControls[i], szName))
         {
@@ -99,7 +99,7 @@ bool CClientPad::GetControlIndex(const char* szName, unsigned int& uiIndex)
     return false;
 }
 
-const char* CClientPad::GetControlName(unsigned int uiIndex)
+const char* CClientPad::GetControlName(std::uint32_t uiIndex)
 {
     if (uiIndex < MAX_GTA_CONTROLS)
     {
@@ -112,13 +112,13 @@ CClientPad::CClientPad()
 {
     memset(&m_fStates, 0, sizeof(m_fStates));
 
-    for (unsigned int i = 0; i < MAX_GTA_CONTROLS; i++)
+    for (std::uint32_t i = 0; i < MAX_GTA_CONTROLS; i++)
     {
         m_fStates[i] = 0.0f;
     }
 
     // Initialise our analog control states
-    for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
+    for (std::uint32_t i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
     {
         m_sScriptedStates[i] = CS_NAN;
         m_bScriptedStatesNextFrameOverride[i] = false;
@@ -127,7 +127,7 @@ CClientPad::CClientPad()
 
 bool CClientPad::GetControlState(const char* szName, bool& bState)
 {
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetControlIndex(szName, uiIndex))
     {
         bState = m_fStates[uiIndex] ? true : false;
@@ -139,7 +139,7 @@ bool CClientPad::GetControlState(const char* szName, bool& bState)
 // Sets the control state according to the custom ped state.  Use for peds.
 bool CClientPad::SetControlState(const char* szName, bool bState)
 {
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetControlIndex(szName, uiIndex))
     {
         m_fStates[uiIndex] = bState ? 1.0f : 0.0f;
@@ -151,7 +151,7 @@ bool CClientPad::SetControlState(const char* szName, bool bState)
 // Gets the analog control state according to custom pad state.  Use for peds.
 bool CClientPad::GetControlState(const char* szName, float& fState)
 {
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetControlIndex(szName, uiIndex))
     {
         fState = m_fStates[uiIndex];
@@ -164,7 +164,7 @@ bool CClientPad::GetControlState(const char* szName, float& fState)
 bool CClientPad::SetControlState(const char* szName, float fState)
 {
     fState = Clamp<float>(0, fState, 1);
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex) && GetControlIndex(szName, uiIndex))
     {
         m_fStates[uiIndex] = fState;
@@ -301,7 +301,7 @@ void CClientPad::DoPulse(CClientPed* pPed)
 // Get the control state directly from a pad state.  Use for players.
 bool CClientPad::GetControlState(const char* szName, CControllerState& State, bool bOnFoot)
 {
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetControlIndex(szName, uiIndex))
     {
         if (bOnFoot)
@@ -458,9 +458,9 @@ bool CClientPad::GetControlState(const char* szName, CControllerState& State, bo
     return false;
 }
 
-bool CClientPad::GetAnalogControlIndex(const char* szName, unsigned int& uiIndex)
+bool CClientPad::GetAnalogControlIndex(const char* szName, std::uint32_t& uiIndex)
 {
-    for (unsigned int i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
+    for (std::uint32_t i = 0; i < MAX_GTA_ANALOG_CONTROLS; i++)
     {
         if (!stricmp(g_AnalogGTAControls[i], szName))
         {
@@ -474,7 +474,7 @@ bool CClientPad::GetAnalogControlIndex(const char* szName, unsigned int& uiIndex
 // Get the analog control state directly from a pad state.  Use for players.
 bool CClientPad::GetAnalogControlState(const char* szName, CControllerState& cs, bool bOnFoot, float& fState, bool bIgnoreOverrides)
 {
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex))
     {
         // If we are not ignoring overrides and have a script override
@@ -596,7 +596,7 @@ bool CClientPad::SetAnalogControlState(const char* szName, float fState, bool bF
 {
     // Ensure values are between 0 and 1
     fState = Clamp<float>(0, fState, 1);
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex))
     {
         switch (uiIndex)
@@ -691,7 +691,7 @@ bool CClientPad::SetAnalogControlState(const char* szName, float fState, bool bF
 
 void CClientPad::RemoveSetAnalogControlState(const char* szName)
 {
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex))
         m_sScriptedStates[uiIndex] = CS_NAN;
 }
@@ -702,7 +702,7 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
     // When that happens, we wait for new input and then stop setting the control state and remove it.
     if (bOnFoot)
     {
-        unsigned int uiIndex = 0;
+        std::uint32_t uiIndex = 0;
 
         ProcessControl(cs.LeftStickX, uiIndex);            // Left
         uiIndex++;
@@ -714,7 +714,7 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
     }
     else
     {
-        unsigned int uiIndex = 4;
+        std::uint32_t uiIndex = 4;
 
         ProcessControl(cs.LeftStickX, uiIndex);            // Left
         uiIndex++;
@@ -738,7 +738,7 @@ void CClientPad::ProcessSetAnalogControlState(CControllerState& cs, bool bOnFoot
     }
 }
 
-void CClientPad::ProcessControl(short& usControlValue, unsigned int uiIndex)
+void CClientPad::ProcessControl(short& usControlValue, std::uint32_t uiIndex)
 {
     // Note:    control values can be 0, negative or positive
     //          that's why we check unequals != 0
@@ -805,7 +805,7 @@ bool CClientPad::ProcessToggledControl(const char* szName, CControllerState& cs,
     if (bEnabled)            // We don't need to disable anything if it the control is enabled.
         return false;
 
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
     if (GetAnalogControlIndex(szName, uiIndex))
     {
         if (bOnFoot)

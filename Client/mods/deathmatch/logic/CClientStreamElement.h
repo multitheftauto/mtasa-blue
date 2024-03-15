@@ -37,10 +37,10 @@ public:
     void                    NotifyUnableToCreate();
     void                    AddStreamReference(bool bScript = false);
     void                    RemoveStreamReference(bool bScript = false);
-    unsigned short          GetStreamReferences(bool bScript = false);
-    unsigned long           GetTotalStreamReferences() { return m_usStreamReferences + m_usStreamReferencesScript; }
+    std::uint16_t          GetStreamReferences(bool bScript = false);
+    std::uint32_t           GetTotalStreamReferences() { return m_usStreamReferences + m_usStreamReferencesScript; }
     void                    StreamOutForABit();
-    void                    SetDimension(unsigned short usDimension) override;
+    void                    SetDimension(std::uint16_t usDimension) override;
     float                   GetExpDistance() { return m_fExpDistance; }
     virtual CSphere         GetWorldBoundingSphere();
     float                   GetDistanceToBoundingBoxSquared(const CVector& vecPosition);
@@ -59,7 +59,7 @@ private:
     CClientStreamSector*    m_pStreamSector;
     CVector                 m_vecStreamPosition;
     float                   m_fExpDistance;
-    unsigned short          m_usStreamReferences, m_usStreamReferencesScript;
+    std::uint16_t          m_usStreamReferences, m_usStreamReferencesScript;
 
 protected:
     bool m_bStreamedIn;

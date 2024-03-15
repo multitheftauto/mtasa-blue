@@ -23,7 +23,7 @@ private:
     bool                m_bIsFetch;
     class CLuaMain*     m_VM;
     CLuaFunctionRef     m_iFunction;
-    long long           m_iStartTime;
+    std::int64_t           m_iStartTime;
     SString             m_strURL;
     SString             m_strQueueName;
     CLuaArguments       m_FetchArguments;
@@ -43,7 +43,7 @@ public:
     void                   OnLuaMainDestroy();
 
     CLuaMain*                  GetVM() { return m_VM; }
-    long long                  GetStartTime() { return m_iStartTime; }
+    std::int64_t                  GetStartTime() { return m_iStartTime; }
     const SString&             GetURL() { return m_strURL; }
     const SString&             GetQueueName() { return m_strQueueName; }
     bool                       IsFetch() { return m_bIsFetch; }

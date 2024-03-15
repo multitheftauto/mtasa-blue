@@ -10,7 +10,7 @@
 
 #include <StdInc.h>
 
-CClientDisplay::CClientDisplay(CClientDisplayManager* pDisplayManager, unsigned long ulID)
+CClientDisplay::CClientDisplay(CClientDisplayManager* pDisplayManager, std::uint32_t ulID)
 {
     m_pDisplayManager = pDisplayManager;
     m_ulID = ulID;
@@ -28,7 +28,7 @@ CClientDisplay::~CClientDisplay()
     m_pDisplayManager->RemoveFromList(this);
 }
 
-void CClientDisplay::SetColorAlpha(unsigned char ucAlpha)
+void CClientDisplay::SetColorAlpha(std::uint8_t ucAlpha)
 {
     m_Color.A = ucAlpha;
 }

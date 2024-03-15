@@ -28,8 +28,8 @@ typedef DWORD IKChain_c;
 class CTaskSimpleDuckSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    unsigned int   m_nStartTime;
-    unsigned short m_nLengthOfDuck;
+    std::uint32_t   m_nStartTime;
+    std::uint16_t m_nLengthOfDuck;
     short          m_nShotWhizzingCounter;
     int*           m_pDuckAnim;            // was CAnimBlendAssociation
     int*           m_pMoveAnim;            // was CAnimBlendAssociation
@@ -40,14 +40,14 @@ public:
     bool m_bIsInControl;                  // if duck task is being controlled by another task then it requires continuous control
 
     CVector2D     m_vecMoveCommand;
-    unsigned char m_nDuckControlType;
+    std::uint8_t m_nDuckControlType;
 
-    unsigned char m_nCountDownFrames;
+    std::uint8_t m_nCountDownFrames;
 };
 
 class CTaskSimpleDuckSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleDuck
 {
 public:
     CTaskSimpleDuckSA(){};
-    CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck = 0, short nUseShotsWhizzingEvents = -1);
+    CTaskSimpleDuckSA(eDuckControlTypes nDuckControl, std::uint16_t nLengthOfDuck = 0, short nUseShotsWhizzingEvents = -1);
 };

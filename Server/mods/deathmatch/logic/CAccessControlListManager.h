@@ -81,7 +81,7 @@ private:
     CXMLNode* m_pRootNode;
 
     bool                        m_bReadCacheDirty;
-    long long                   m_llLastTimeReadCacheCleared;
+    std::int64_t                   m_llLastTimeReadCacheCleared;
     CFastHashMap<SString, bool> m_ReadCacheMap;
 
     bool         m_bNeedsSave;

@@ -14,11 +14,11 @@
 
 #define MAX_OBJECT_ID 20000
 
-static inline void Allow(unsigned int* table, unsigned int pos, bool state)
+static inline void Allow(std::uint32_t* table, std::uint32_t pos, bool state)
 {
-    unsigned int chunk = pos / 32;
-    unsigned int shift = pos - (chunk * 32);
-    unsigned int bit = 1 << shift;
+    std::uint32_t chunk = pos / 32;
+    std::uint32_t shift = pos - (chunk * 32);
+    std::uint32_t bit = 1 << shift;
 
     if (state)
         table[chunk] |= bit;
@@ -26,9 +26,9 @@ static inline void Allow(unsigned int* table, unsigned int pos, bool state)
         table[chunk] &= ~bit;
 }
 
-static inline void AllowRange(unsigned int* table, unsigned int first, unsigned int last, bool state)
+static inline void AllowRange(std::uint32_t* table, std::uint32_t first, std::uint32_t last, bool state)
 {
-    for (unsigned int i = first; i <= last; i++)
+    for (std::uint32_t i = first; i <= last; i++)
     {
         Allow(table, i, state);
     }
@@ -36,10 +36,10 @@ static inline void AllowRange(unsigned int* table, unsigned int first, unsigned 
 
 int main()
 {
-    unsigned int table[MAX_OBJECT_ID / (sizeof(unsigned int) * 8) + 1];
+    std::uint32_t table[MAX_OBJECT_ID / (sizeof(std::uint32_t) * 8) + 1];
     memset(table, 0, sizeof(table));
 
-    size_t tableSize = sizeof(table) / sizeof(unsigned int);
+    size_t tableSize = sizeof(table) / sizeof(std::uint32_t);
 
     Allow(table, 1, true);
     AllowRange(table, 300, 328, true);
@@ -131,9 +131,9 @@ int main()
     AllowRange(table, 18200, 18630, true);
 
     printf(
-        "static unsigned int g_uiValidObjectModels[] = {\n"
+        "static std::uint32_t g_uiValidObjectModels[] = {\n"
         "    ");
-    for (unsigned int i = 0; i < tableSize; i++)
+    for (std::uint32_t i = 0; i < tableSize; i++)
     {
         if (!(i % 20) && i > 0)
         {

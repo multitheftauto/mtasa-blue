@@ -121,7 +121,7 @@ CServerBrowser::CServerBrowser()
     m_szSearchTypePath[SearchTypes::SERVERS] = "cgui\\images\\serverbrowser\\search-servers.png";
     m_szSearchTypePath[SearchTypes::PLAYERS] = "cgui\\images\\serverbrowser\\search-players.png";
 
-    for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
+    for (std::uint32_t i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
     {
         m_pSearchIcons[i] = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage());
         m_pSearchIcons[i]->SetVisible(false);
@@ -142,7 +142,7 @@ CServerBrowser::CServerBrowser()
     m_pPanel->SetSelectionHandler(GUI_CALLBACK(&CServerBrowser::OnTabChanged, this));
 
     // Attach some editbox handlers, also must be done after full creation
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
     {
         m_pEditAddress[i]->SetActivateHandler(GUI_CALLBACK(&CServerBrowser::OnAddressFocused, this));
         m_pEditAddress[i]->SetDeactivateHandler(GUI_CALLBACK(&CServerBrowser::OnAddressDefocused, this));
@@ -282,7 +282,7 @@ CServerBrowser::~CServerBrowser()
 
     // Unload the icon
     m_pLockedIcon->Clear();
-    for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
+    for (std::uint32_t i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
         m_pSearchIcons[i]->Clear();
 
     // Delete the GUI items
@@ -400,7 +400,7 @@ void CServerBrowser::CreateTab(ServerBrowserType type, const char* szName)
     m_pComboSearchType[type]->SetPosition(CVector2D(fX, fY + (SB_BUTTON_SIZE_Y - SB_SEARCHBAR_COMBOBOX_SIZE_Y) / 2), false);
     m_pComboSearchType[type]->SetSize(CVector2D(SB_SEARCHBAR_COMBOBOX_SIZE_X, 80), false);
 
-    for (unsigned int i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
+    for (std::uint32_t i = 0; i != SearchTypes::MAX_SEARCH_TYPES; i++)
         m_pComboSearchType[type]->AddItem(m_pSearchIcons[i]);
 
     m_pComboSearchType[type]->SetReadOnly(true);
@@ -733,7 +733,7 @@ void CServerBrowser::SetVisible(bool bVisible)
         CVARS_GET("auto_refresh_browser", bAutoRefresh);
 
         // Start loading all servers (if needed).
-        for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
         {
             // Don't refresh Internet unless it's activated or needed.
             if (i != ServerBrowserTypes::INTERNET || m_bFirstTimeBrowseServer || bAutoRefresh)
@@ -903,7 +903,7 @@ void CServerBrowser::UpdateServerList(ServerBrowserType Type, bool bClearServerL
 void CServerBrowser::CreateHistoryList()
 {
     // Clear our combo boxes first
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
     {
         m_pComboAddressHistory[i]->Clear();
     }
@@ -917,7 +917,7 @@ void CServerBrowser::CreateHistoryList()
         if (pServer->strEndpoint)
         {
             bEmpty = false;
-            for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+            for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
             {
                 m_pComboAddressHistory[i]->AddItem(("mtasa://" + pServer->strEndpoint).c_str())->SetData(pServer->strEndpoint.c_str());
             }
@@ -954,12 +954,12 @@ void CServerBrowser::CreateHistoryList()
 void CServerBrowser::UpdateHistoryList()
 {
     // Assume our type is 0, then update all fields when appropriate
-    unsigned int Type = 0;
+    std::uint32_t Type = 0;
 
     // Look through our combo box and process each item
     CGUIComboBox* pServerList = m_pComboAddressHistory[Type];
     int           iRowCount = pServerList->GetItemCount();
-    for (int i = 0; i < iRowCount; i++)
+    for (auto i = 0; i < iRowCount; i++)
     {
         CGUIListItem* item = pServerList->GetItemByIndex(i);
         const char*   szAddress = (const char*)item->GetData();
@@ -972,7 +972,7 @@ void CServerBrowser::UpdateHistoryList()
             {
                 if (pServer->strEndpoint != pServer->strName)            // Do we have a real name for the server?
                 {
-                    for (unsigned int index = 0; index < SERVER_BROWSER_TYPE_COUNT; index++)
+                    for (std::uint32_t index = 0; index < SERVER_BROWSER_TYPE_COUNT; index++)
                     {
                         m_pComboAddressHistory[index]->SetItemText(i, ("mtasa://" + pServer->strEndpoint + " | " + pServer->strName).c_str());
                     }
@@ -1009,7 +1009,7 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
             if (pServer->nPlayers > 0)
             {
                 // Search for the search text in the names of the players in the server
-                for (unsigned int i = 0; i < pServer->vecPlayers.size(); i++)
+                for (std::uint32_t i = 0; i < pServer->vecPlayers.size(); i++)
                 {
                     SString strPlayerName = pServer->vecPlayers[i];
 
@@ -1190,14 +1190,14 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
         {
             CServerListItem* pServer = *i;
 
-            for (unsigned int j = 0; j < pServer->vecPlayers.size(); j++)
+            for (std::uint32_t j = 0; j < pServer->vecPlayers.size(); j++)
             {
                 std::string strPlayerName = pServer->vecPlayers[j].c_str();
                 if (strPlayerName.compare(strSelectedPlayerName) == 0)
                 {
                     // We found the server on which the player is
                     // Walk the server gridlist looking for the server host to get the row index
-                    for (int k = 0; k < m_pServerList[Type]->GetRowCount(); k++)
+                    for (auto k = 0; k < m_pServerList[Type]->GetRowCount(); k++)
                     {
                         if (pServer == ((CServerListItem*)m_pServerList[Type]->GetItemData(k, DATA_PSERVER)))
                         {
@@ -1228,7 +1228,7 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
         if (pServer)
         {
             // We found the server, add all the players
-            for (unsigned int j = 0; j < pServer->vecPlayers.size(); j++)
+            for (std::uint32_t j = 0; j < pServer->vecPlayers.size(); j++)
             {
                 int k = m_pServerPlayerList[Type]->AddRow();
                 m_pServerPlayerList[Type]->SetItemText(k, m_hPlayerName[Type], pServer->vecPlayers[j].c_str());
@@ -1265,7 +1265,7 @@ bool CServerBrowser::OnDoubleClick(CGUIElement* pElement)
 
 bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
 {
-    unsigned short usPort;
+    std::uint16_t usPort;
     std::string    strHost, strNick, strPassword;
     SString        strURI = m_pEditAddress[GetCurrentServerBrowserType()]->GetText();
 
@@ -1393,7 +1393,7 @@ bool CServerBrowser::OnRefreshClick(CGUIElement* pElement)
 
 bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 {
-    unsigned short usPort;
+    std::uint16_t usPort;
     std::string    strHost, strNick, strPassword;
     SString        strURI = m_pEditAddress[GetCurrentServerBrowserType()]->GetText();
 
@@ -1415,7 +1415,7 @@ bool CServerBrowser::OnInfoClick(CGUIElement* pElement)
 
 bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
 {
-    unsigned short usPort;
+    std::uint16_t usPort;
     std::string    strHost, strNick, strPassword;
     std::string    strURI = m_pEditAddress[GetCurrentServerBrowserType()]->GetText();
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
@@ -1432,7 +1432,7 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
         {
             SaveFavouritesList();
             UpdateServerList(ServerBrowserTypes::FAVOURITES, true);
-            for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+            for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
             {
                 m_pAddressFavoriteIcon[i]->SetAlpha(0.3f);
             }
@@ -1443,7 +1443,7 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
         {
             SaveFavouritesList();
             UpdateServerList(ServerBrowserTypes::FAVOURITES, true);
-            for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+            for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
             {
                 m_pAddressFavoriteIcon[i]->SetAlpha(1.0f);
             }
@@ -1459,14 +1459,14 @@ bool CServerBrowser::OnRemoveFromRecentClick(CGUIElement* pElement)
 
 bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
 {
-    unsigned short    usPort;
+    std::uint16_t    usPort;
     std::string       strHost, strNick, strPassword;
     ServerBrowserType Type = GetCurrentServerBrowserType();
     std::string       strURI = m_pEditAddress[Type]->GetText();
     g_pCore->GetConnectParametersFromURI(strURI.c_str(), strHost, usPort, strNick, strPassword);
 
     // Adjust our other address bars to be consistent
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
     {
         if ((i != Type) && (strURI != m_pEditAddress[i]->GetText()))
             m_pEditAddress[i]->SetText(strURI.c_str());
@@ -1479,14 +1479,14 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
         CServerListItem* pServer = *i;
         if (pServer->strHost == strHost && pServer->usGamePort == usPort)
         {
-            for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+            for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
             {
                 m_pAddressFavoriteIcon[i]->SetAlpha(1.0f);
             }
             return true;
         }
     }
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
     {
         m_pAddressFavoriteIcon[i]->SetAlpha(0.3f);
     }
@@ -1726,8 +1726,8 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
         return false;
 
     // Loop through all subnodes looking for relevant nodes
-    unsigned int uiCount = pNode->GetSubNodeCount();
-    for (unsigned int i = 0; i < uiCount; i++)
+    std::uint32_t uiCount = pNode->GetSubNodeCount();
+    for (std::uint32_t i = 0; i < uiCount; i++)
     {
         pSubNode = pNode->GetSubNode(i);
         if (pSubNode && pSubNode->GetTagName().compare(strTagName) == 0)
@@ -1774,7 +1774,7 @@ void CServerBrowser::SaveFavouritesList()
     SaveServerList(pFavourites, CONFIG_FAVOURITE_LIST_TAG, GetFavouritesList());
 }
 
-bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagName, CServerList* pList, unsigned int iLimit)
+bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagName, CServerList* pList, std::uint32_t iLimit)
 {
     if (!pNode)
         return false;
@@ -1783,7 +1783,7 @@ bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagNa
     pNode->DeleteAllSubNodes();
 
     // Iterate through the list, adding any items to our node
-    unsigned int        iProcessed = 0;
+    std::uint32_t        iProcessed = 0;
     CServerListIterator i, i_b = pList->IteratorBegin(), i_e = pList->IteratorEnd();
     for (CServerListIterator i = i_b; i != i_e; i++)
     {
@@ -1819,8 +1819,8 @@ void CServerBrowser::LoadOptions(CXMLNode* pNode)
     }
 
     // loop through all subnodes
-    unsigned int uiCount = pNode->GetSubNodeCount();
-    for (unsigned int ui = 0; ui < uiCount; ui++)
+    std::uint32_t uiCount = pNode->GetSubNodeCount();
+    for (std::uint32_t ui = 0; ui < uiCount; ui++)
     {
         CXMLNode* pSubNode = pNode->GetSubNode(ui);
         if (pSubNode && pSubNode->GetTagName().compare("list") == 0)
@@ -1898,7 +1898,7 @@ void CServerBrowser::SaveOptions()
     int iCurrentType = GetCurrentServerBrowserTypeForSave();
 
     // Save the options for all four lists
-    for (unsigned int ui = 0; ui < SERVER_BROWSER_TYPE_COUNT; ui++)
+    for (std::uint32_t ui = 0; ui < SERVER_BROWSER_TYPE_COUNT; ui++)
     {
         CXMLNode* pSubNode = pOptions->CreateSubNode("list");
         if (pSubNode)
@@ -1965,7 +1965,7 @@ void CServerBrowser::SetServerPassword(const std::string& strHost, const std::st
         pServerPasswords = pConfig->CreateSubNode(CONFIG_NODE_SERVER_SAVED);
     }
     // Check if the server password already exists
-    for (unsigned int i = 0; i < pServerPasswords->GetSubNodeCount(); i++)
+    for (std::uint32_t i = 0; i < pServerPasswords->GetSubNodeCount(); i++)
     {
         CXMLAttributes* pAttributes = &(pServerPasswords->GetSubNode(i)->GetAttributes());
         if (pAttributes->Find("host"))
@@ -2006,7 +2006,7 @@ std::string CServerBrowser::GetServerPassword(const std::string& strHost)
         pServerPasswords = pConfig->CreateSubNode(CONFIG_NODE_SERVER_SAVED);
     }
     // Check if the server password already exists
-    for (unsigned int i = 0; i < pServerPasswords->GetSubNodeCount(); i++)
+    for (std::uint32_t i = 0; i < pServerPasswords->GetSubNodeCount(); i++)
     {
         CXMLAttributes* pAttributes = &(pServerPasswords->GetSubNode(i)->GetAttributes());
         if (pAttributes->Find("host"))
@@ -2091,7 +2091,7 @@ CServerListItem* CServerBrowser::FindServerFromRow(ServerBrowserType Type, int i
 // Finds a server at any point in the active list
 //
 /////////////////////////////////////////////////////////////////
-CServerListItem* CServerBrowser::FindServer(const std::string& strHost, unsigned short usPort)
+CServerListItem* CServerBrowser::FindServer(const std::string& strHost, std::uint16_t usPort)
 {
     ServerBrowserType Type = GetCurrentServerBrowserType();
     CServerList*      pList = GetServerList(Type);
@@ -2114,7 +2114,7 @@ CServerListItem* CServerBrowser::FindServer(const std::string& strHost, unsigned
 // Finds a server http port. Returns 0 if not found.
 //
 /////////////////////////////////////////////////////////////////
-unsigned short CServerBrowser::FindServerHttpPort(const std::string& strHost, unsigned short usPort)
+std::uint16_t CServerBrowser::FindServerHttpPort(const std::string& strHost, std::uint16_t usPort)
 {
     CServerList*        pList = GetServerList(ServerBrowserTypes::INTERNET);
     CServerListIterator i, i_b = pList->IteratorBegin(), i_e = pList->IteratorEnd();
@@ -2139,7 +2139,7 @@ void CServerBrowser::UpdateRowIndexMembers(ServerBrowserType Type)
     CGUIGridList* pServerList = m_pServerList[Type];
     int           iRowCount = pServerList->GetRowCount();
 
-    for (int iRowIndex = 0; iRowIndex < iRowCount; iRowIndex++)
+    for (auto iRowIndex = 0; iRowIndex < iRowCount; iRowIndex++)
     {
         CServerListItem* pServer = (CServerListItem*)pServerList->GetItemData(iRowIndex, DATA_PSERVER);
         pServer->iRowIndex = iRowIndex;
@@ -2187,7 +2187,7 @@ void CServerBrowser::UpdateSelectedServerPlayerList(ServerBrowserType Type)
                     m_pServerPlayerList[Type]->Clear();
 
                     // Add all the players
-                    for (unsigned int j = 0; j < pServer->vecPlayers.size(); j++)
+                    for (std::uint32_t j = 0; j < pServer->vecPlayers.size(); j++)
                     {
                         int k = m_pServerPlayerList[Type]->AddRow();
                         m_pServerPlayerList[Type]->SetItemText(k, m_hPlayerName[Type], pServer->vecPlayers[j].c_str());
@@ -2211,7 +2211,7 @@ void CServerBrowser::GetVisibleEndPointList(std::vector<SAddressPort>& outEndpoi
 
     int iFirst, iLast;
     m_pServerList[Type]->GetVisibleRowRange(iFirst, iLast);
-    for (int i = iFirst; i >= 0 && i <= iLast; i++)
+    for (auto i = iFirst; i >= 0 && i <= iLast; i++)
     {
         if (CServerListItem* pServer = (CServerListItem*)m_pServerList[Type]->GetItemData(i, DATA_PSERVER))
         {
@@ -2223,7 +2223,7 @@ void CServerBrowser::GetVisibleEndPointList(std::vector<SAddressPort>& outEndpoi
 
 void CServerBrowser::SetStatusText(std::string strStatus)
 {
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
     {
         m_pServerListStatus[i]->SetText(strStatus.c_str());
     }
@@ -2231,7 +2231,7 @@ void CServerBrowser::SetStatusText(std::string strStatus)
 
 void CServerBrowser::SetAddressBarText(std::string strText)
 {
-    for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+    for (std::uint32_t i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
     {
         m_pEditAddress[i]->SetText(strText.c_str());
     }
@@ -2249,7 +2249,7 @@ void CServerBrowser::SetNextHistoryText(bool bDown)
     ServerBrowserType Type = GetCurrentServerBrowserType();
     CGUIComboBox*     pServerList = m_pComboAddressHistory[Type];
     int               iRowCount = pServerList->GetItemCount();
-    for (int i = 0; i < iRowCount; i++)
+    for (auto i = 0; i < iRowCount; i++)
     {
         CGUIListItem* item = pServerList->GetItemByIndex(i);
         const char*   szAddress = (const char*)item->GetData();
@@ -2350,9 +2350,9 @@ bool CServerBrowser::OnServerListKeyDown(CGUIKeyEventArgs Args)
     return true;
 }
 
-void CServerBrowser::SetSelectedIndex(unsigned int uiIndex)
+void CServerBrowser::SetSelectedIndex(std::uint32_t uiIndex)
 {
-    unsigned int uiTabCount = m_pPanel->GetTabCount();
+    std::uint32_t uiTabCount = m_pPanel->GetTabCount();
 
     if (uiIndex < uiTabCount)
     {
@@ -2362,11 +2362,11 @@ void CServerBrowser::SetSelectedIndex(unsigned int uiIndex)
 
 void CServerBrowser::TabSkip(bool bBackwards)
 {
-    unsigned int uiTabCount = m_pPanel->GetTabCount();
+    std::uint32_t uiTabCount = m_pPanel->GetTabCount();
 
     if (bBackwards)
     {
-        unsigned int uiIndex = m_pPanel->GetSelectedIndex() - 1;
+        std::uint32_t uiIndex = m_pPanel->GetSelectedIndex() - 1;
 
         if (m_pPanel->GetSelectedIndex() == 0)
         {
@@ -2377,8 +2377,8 @@ void CServerBrowser::TabSkip(bool bBackwards)
     }
     else
     {
-        unsigned int uiIndex = m_pPanel->GetSelectedIndex() + 1;
-        unsigned int uiNewIndex = uiIndex % uiTabCount;
+        std::uint32_t uiIndex = m_pPanel->GetSelectedIndex() + 1;
+        std::uint32_t uiNewIndex = uiIndex % uiTabCount;
 
         SetSelectedIndex(uiNewIndex);
     }

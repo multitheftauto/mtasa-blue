@@ -68,7 +68,7 @@ CClientRadarArea* CClientRadarAreaManager::Get(ElementID ID)
     return NULL;
 }
 
-void CClientRadarAreaManager::SetDimension(unsigned short usDimension)
+void CClientRadarAreaManager::SetDimension(std::uint16_t usDimension)
 {
     list<CClientRadarArea*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)

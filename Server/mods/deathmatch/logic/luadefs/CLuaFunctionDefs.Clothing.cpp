@@ -16,7 +16,7 @@
 
 int CLuaFunctionDefs::GetBodyPartName(lua_State* luaVM)
 {
-    unsigned char ucID;
+    std::uint8_t ucID;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucID);
@@ -39,8 +39,8 @@ int CLuaFunctionDefs::GetBodyPartName(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetClothesByTypeIndex(lua_State* luaVM)
 {
-    unsigned char ucType;
-    unsigned char ucIndex;
+    std::uint8_t ucType;
+    std::uint8_t ucIndex;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucType);
@@ -74,7 +74,7 @@ int CLuaFunctionDefs::GetTypeIndexFromClothes(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucType, ucIndex;
+        std::uint8_t ucType, ucIndex;
         if (CStaticFunctionDefinitions::GetTypeIndexFromClothes(strTexture, strModel.empty() ? NULL : strModel.c_str(), ucType, ucIndex))
         {
             lua_pushnumber(luaVM, ucType);
@@ -91,7 +91,7 @@ int CLuaFunctionDefs::GetTypeIndexFromClothes(lua_State* luaVM)
 
 int CLuaFunctionDefs::GetClothesTypeName(lua_State* luaVM)
 {
-    unsigned char ucType;
+    std::uint8_t ucType;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ucType);

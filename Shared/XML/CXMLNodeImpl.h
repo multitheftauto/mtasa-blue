@@ -34,9 +34,9 @@ public:
     void      DeleteSubNode(CXMLNode* pNode) { delete pNode; };
     void      DeleteAllSubNodes();
 
-    unsigned int GetSubNodeCount();
-    CXMLNode*    GetSubNode(unsigned int uiIndex);
-    CXMLNode*    FindSubNode(const char* szTagName, unsigned int uiIndex = 0);
+    std::uint32_t GetSubNodeCount();
+    CXMLNode*    GetSubNode(std::uint32_t uiIndex);
+    CXMLNode*    FindSubNode(const char* szTagName, std::uint32_t uiIndex = 0);
 
     std::list<CXMLNode*>::iterator ChildrenBegin() { return m_Children.begin(); };
     std::list<CXMLNode*>::iterator ChildrenEnd() { return m_Children.end(); };
@@ -52,18 +52,18 @@ public:
     const std::string GetTagContent();
     bool              GetTagContent(bool& bContent);
     bool              GetTagContent(int& iContent);
-    bool              GetTagContent(unsigned int& uiContent);
+    bool              GetTagContent(std::uint32_t& uiContent);
     bool              GetTagContent(float& fContent);
 
     void SetTagContent(const char* szContent, bool bCDATA = false);
     void SetTagContent(bool bContent);
     void SetTagContent(int iContent);
-    void SetTagContent(unsigned int uiContent);
+    void SetTagContent(std::uint32_t uiContent);
     void SetTagContent(float fContent);
     void SetTagContentf(const char* szFormat, ...);
 
     eXMLClass     GetClassType() { return CXML_NODE; };
-    unsigned long GetID()
+    std::uint32_t GetID()
     {
         dassert((!m_pFile) || m_pFile && m_pFile->IsUsingIDs());
         return m_ulID;
@@ -91,7 +91,7 @@ public:
 private:
     bool StringToLong(const char* szString, long& lValue);
 
-    unsigned long m_ulID;
+    std::uint32_t m_ulID;
     const bool    m_bUsingIDs;
 
     class CXMLFileImpl* m_pFile;

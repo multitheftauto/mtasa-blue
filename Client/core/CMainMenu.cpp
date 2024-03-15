@@ -453,8 +453,8 @@ void CMainMenu::Update()
     m_Credits.Update();
     m_Settings.Update();
 
-    unsigned long ulCurrentTick = GetTickCount32();
-    unsigned long ulTimePassed = ulCurrentTick - ulPreviousTick;
+    std::uint32_t ulCurrentTick = GetTickCount32();
+    std::uint32_t ulTimePassed = ulCurrentTick - ulPreviousTick;
 
     if (m_bHideGame)
         m_pGraphics->DrawRectangle(0, 0, m_ScreenSize.fX, m_ScreenSize.fY, 0xFF000000);
@@ -1056,7 +1056,7 @@ bool CMainMenu::OnNewsButtonClick(CGUIElement* pElement)
     return true;
 }
 
-sMenuItem* CMainMenu::CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition)
+sMenuItem* CMainMenu::CreateItem(std::uint8_t menuType, const char* szFilename, CVector2D vecRelPosition)
 {
     CGUIStaticImage* pImage = reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage());
 
@@ -1149,7 +1149,7 @@ void CMainMenu::SetNewsHeadline(int iIndex, const SString& strHeadline, const SS
     if (pItem->GetSize(false).fX < pItem->GetTextExtent())
     {
         const char* szFontName = "default-bold-small";
-        for (char i = 0; i < CORE_MTA_NEWS_ITEMS; i++)
+        for (auto i = 0; i < CORE_MTA_NEWS_ITEMS; i++)
         {
             // Try default-bold-small first, if that's too big use default-small
             m_pNewsItemLabels[i]->SetFont(szFontName);

@@ -24,7 +24,7 @@ namespace
     {
         SString   strQuery;
         TIMEUS    timeUs;
-        long long timeStamp;
+        std::int64_t timeStamp;
         SString   databaseName;
         SString   resourceName;
     };
@@ -59,7 +59,7 @@ public:
     void GetSqliteTimingStats(CPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter);
 
     SString                       m_strCategoryName;
-    long long                     m_llRecordStatsEndTime;
+    std::int64_t                     m_llRecordStatsEndTime;
     bool                          m_bDisableBatching;
     std::map<CRegistry*, SString> m_RegistryMap;
     std::list<CTimingInfo>        m_TimingList;
@@ -196,7 +196,7 @@ void CPerfStatSqliteTimingImpl::SetCurrentResource(lua_State* luaVM)
 ///////////////////////////////////////////////////////////////
 void CPerfStatSqliteTimingImpl::DoPulse()
 {
-    long long llTime = GetTickCount64_();
+    std::int64_t llTime = GetTickCount64_();
     // Remove old stats
     while (m_TimingList.size())
     {
@@ -220,7 +220,7 @@ void CPerfStatSqliteTimingImpl::GetStats(CPerfStatResult* pResult, const std::ma
     GetSqliteTimingStats(pResult, optionMap, strFilter);
 
     uint      uiTicks = 1000 * 10;            // 10 seconds
-    long long llTime = GetTickCount64_();
+    std::int64_t llTime = GetTickCount64_();
 
     m_llRecordStatsEndTime = llTime + uiTicks;
 
@@ -299,7 +299,7 @@ void CPerfStatSqliteTimingImpl::GetSqliteTimingStats(CPerfStatResult* pResult, c
     pResult->AddColumn("cpu seconds");
     pResult->AddColumn(m_bDisableBatching ? "query . . *Note: Viewing this page may slow server" : "query");
 
-    long long llTime = GetTickCount64_();
+    std::int64_t llTime = GetTickCount64_();
     // Output
     for (std::list<CTimingInfo>::reverse_iterator iter = m_TimingList.rbegin(); iter != m_TimingList.rend(); ++iter)
     {

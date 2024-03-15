@@ -54,7 +54,7 @@ class CPacketHandler
     };
 
 public:
-    bool ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
+    bool ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream);
 
     void Packet_ServerConnected(NetBitStreamInterface& bitStream);
     void Packet_ServerJoined(NetBitStreamInterface& bitStream);
@@ -78,7 +78,7 @@ public:
     void Packet_EntityRemove(NetBitStreamInterface& bitStream);
     void Packet_PickupHideShow(NetBitStreamInterface& bitStream);
     void Packet_PickupHitConfirm(NetBitStreamInterface& bitStream);
-    void Packet_Lua(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
+    void Packet_Lua(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream);
     void Packet_TextItem(NetBitStreamInterface& bitStream);
     void Packet_MarkerHit(NetBitStreamInterface& bitStream);
     void Packet_ExplosionSync(NetBitStreamInterface& bitStream);

@@ -72,9 +72,9 @@ public:
 
     void DrawMouseCursor();
 
-    void ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton);
-    void ProcessKeyboardInput(unsigned long ulKey, bool bIsDown);
-    void ProcessCharacter(unsigned long ulCharacter);
+    void ProcessMouseInput(CGUIMouseInput eMouseInput, std::uint32_t ulX = 0, std::uint32_t ulY = 0, CGUIMouseButton eMouseButton = NoButton);
+    void ProcessKeyboardInput(std::uint32_t ulKey, bool bIsDown);
+    void ProcessCharacter(std::uint32_t ulCharacter);
 
     //
     bool                 GetGUIInputEnabled();
@@ -85,7 +85,7 @@ public:
     static CEGUI::String GetUTFString(const CEGUI::String& strInput);            // Not defined
 
     //
-    CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags);
+    CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, std::uint32_t uiFlags);
 
     CGUIButton* CreateButton(CGUIElement* pParent = NULL, const char* szCaption = "");
     CGUIButton* CreateButton(CGUITab* pParent = NULL, const char* szCaption = "");
@@ -138,7 +138,7 @@ public:
     //
 
     CGUITexture* CreateTexture();
-    CGUIFont*    CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize = 8, unsigned int uFlags = 0, bool bAutoScale = false);
+    CGUIFont*    CreateFnt(const char* szFontName, const char* szFontFile, std::uint32_t uSize = 8, std::uint32_t uFlags = 0, bool bAutoScale = false);
 
     void        SetCursorEnabled(bool bEnabled);
     bool        IsCursorEnabled();
@@ -296,7 +296,7 @@ private:
     CGUIWebBrowser*  _CreateWebBrowser(CGUIElement_Impl* pParent = nullptr);
 
     void      SubscribeToMouseEvents();
-    CGUIFont* CreateFntFromWinFont(const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize = 8, unsigned int uFlags = 0,
+    CGUIFont* CreateFntFromWinFont(const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, std::uint32_t uSize = 8, std::uint32_t uFlags = 0,
                                    bool bAutoScale = false);
     void      ApplyGuiWorkingDirectory();
 
@@ -324,7 +324,7 @@ private:
 
     std::list<CGUIElement*> m_RedrawQueue;
 
-    unsigned long m_ulPreviousUnique;
+    std::uint32_t m_ulPreviousUnique;
 
     eInputMode m_eInputMode;
 

@@ -182,7 +182,7 @@ public:
     virtual CVehicle* GetVehicle() = 0;
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
-    virtual void SetModelIndex(unsigned long ulModel) = 0;
+    virtual void SetModelIndex(std::uint32_t ulModel) = 0;
     virtual void RemoveGeometryRef() = 0;
 
     virtual float    GetHealth() = 0;
@@ -192,7 +192,7 @@ public:
     virtual float    GetOxygenLevel() = 0;
     virtual void     SetOxygenLevel(float fOxygen) = 0;
     virtual bool     AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
-    virtual CWeapon* GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill weaponSkill) = 0;
+    virtual CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t uiAmmo, eWeaponSkill weaponSkill) = 0;
     virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) = 0;
     virtual CWeapon* GetWeapon(eWeaponType weaponType) = 0;
     virtual void     ClearWeapons() = 0;
@@ -234,7 +234,7 @@ public:
 
     virtual CEntity* GetContactEntity() = 0;
 
-    virtual unsigned char GetRunState() = 0;
+    virtual std::uint8_t GetRunState() = 0;
 
     virtual CEntity* GetTargetedEntity() = 0;
     virtual void     SetTargetedEntity(CEntity* pEntity) = 0;
@@ -250,8 +250,8 @@ public:
 
     virtual void RemoveBodyPart(int i, char c) = 0;
 
-    virtual void         SetFootBlood(unsigned int uiFootBlood) = 0;
-    virtual unsigned int GetFootBlood() = 0;
+    virtual void         SetFootBlood(std::uint32_t uiFootBlood) = 0;
+    virtual std::uint32_t GetFootBlood() = 0;
 
     virtual bool IsOnFire() = 0;
     virtual void SetOnFire(bool bOnFire) = 0;

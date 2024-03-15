@@ -24,7 +24,7 @@ using std::list;
 extern CClientGame*            g_pClientGame;
 std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
 
-// To hide the ugly "pointer truncation from DWORD* to unsigned long warning
+// To hide the ugly "pointer truncation from DWORD* to std::uint32_t warning
 #pragma warning(disable:4311)
 
 // Maximum distance between current position and target position (for interpolation)
@@ -32,7 +32,7 @@ std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD            15
 #define VEHICLE_INTERPOLATION_WARP_THRESHOLD_FOR_SPEED  10
 
-CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned short usModel, unsigned char ucVariation, unsigned char ucVariation2)
+CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, std::uint16_t usModel, std::uint8_t ucVariation, std::uint8_t ucVariation2)
     : ClassInit(this), CClientStreamElement(pManager->GetVehicleStreamer(), ID)
 {
     CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientVehicle"), &m_pDriver, &m_pOccupyingDriver, &m_pPreviousLink, &m_pNextLink,
@@ -106,7 +106,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_bSireneOrAlarmActive = false;
     m_bLandingGearDown = true;
     m_usAdjustablePropertyValue = 0;
-    for (unsigned int i = 0; i < 6; ++i)
+    for (std::uint32_t i = 0; i < 6; ++i)
     {
         m_bAllowDoorRatioSetting[i] = true;
         m_fDoorOpenRatio[i] = 0.0f;
@@ -170,7 +170,7 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_cNitroCount = 0;
     m_fWheelScale = 1.0f;
 
-    for (unsigned int i = 0; i < MAX_WINDOWS; ++i)
+    for (std::uint32_t i = 0; i < MAX_WINDOWS; ++i)
     {
         m_bWindowOpen[i] = false;
     }
@@ -377,7 +377,7 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
 
     // If we have any occupants, update their positions
     // Make sure we dont update their position if they are getting out and have physically left the car
-    for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
+    for (auto i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
             if (pOccupant->GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT || pOccupant->GetRealOccupiedVehicle())
                 pOccupant->SetPosition(vecPosition);
@@ -410,7 +410,7 @@ void CClientVehicle::UpdatePedPositions(const CVector& vecPosition)
     }
 
     // If we have any occupants, update their positions
-    for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
+    for (auto i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
             pOccupant->SetPosition(vecPosition);
 }
@@ -463,7 +463,7 @@ void CClientVehicle::SetRotationRadians(const CVector& vecRotation, bool bResetI
         RemoveTargetRotation();
 }
 
-void CClientVehicle::ReportMissionAudioEvent(unsigned short usSound)
+void CClientVehicle::ReportMissionAudioEvent(std::uint16_t usSound)
 {
     if (m_pVehicle)
     {
@@ -531,7 +531,7 @@ bool CClientVehicle::SetMatrix(const CMatrix& Matrix)
 
     // If we have any occupants, update their positions
     // Make sure we dont update their position if they are getting out and have physically left the car
-    for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
+    for (auto i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
             if (pOccupant->GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT || pOccupant->GetRealOccupiedVehicle())
                 pOccupant->SetPosition(m_Matrix.vPos);
@@ -610,9 +610,9 @@ void CClientVehicle::SetVisible(bool bVisible)
     m_bVisible = bVisible;
 }
 
-void CClientVehicle::SetDoorOpenRatioInterpolated(unsigned char ucDoor, float fRatio, unsigned long ulDelay)
+void CClientVehicle::SetDoorOpenRatioInterpolated(std::uint8_t ucDoor, float fRatio, std::uint32_t ulDelay)
 {
-    unsigned long ulTime = CClientTime::GetTime();
+    std::uint32_t ulTime = CClientTime::GetTime();
     m_doorInterp.fStart[ucDoor] = m_fDoorOpenRatio[ucDoor];
     m_doorInterp.fTarget[ucDoor] = fRatio;
     m_doorInterp.ulStartTime[ucDoor] = ulTime;
@@ -621,7 +621,7 @@ void CClientVehicle::SetDoorOpenRatioInterpolated(unsigned char ucDoor, float fR
 
 void CClientVehicle::ResetDoorInterpolation()
 {
-    for (unsigned char i = 0; i < 6; ++i)
+    for (std::uint8_t i = 0; i < 6; ++i)
     {
         if (m_doorInterp.ulTargetTime[i] != 0)
             SetDoorOpenRatio(i, m_doorInterp.fTarget[i], 0, true);
@@ -629,16 +629,16 @@ void CClientVehicle::ResetDoorInterpolation()
     }
 }
 
-void CClientVehicle::CancelDoorInterpolation(unsigned char ucDoor)
+void CClientVehicle::CancelDoorInterpolation(std::uint8_t ucDoor)
 {
     m_doorInterp.ulTargetTime[ucDoor] = 0;
 }
 
 void CClientVehicle::ProcessDoorInterpolation()
 {
-    unsigned long ulTime = CClientTime::GetTime();
+    std::uint32_t ulTime = CClientTime::GetTime();
 
-    for (unsigned char i = 0; i < 6; ++i)
+    for (std::uint8_t i = 0; i < 6; ++i)
     {
         if (m_doorInterp.ulTargetTime[i] != 0)
         {
@@ -650,8 +650,8 @@ void CClientVehicle::ProcessDoorInterpolation()
             }
             else
             {
-                unsigned long ulElapsedTime = ulTime - m_doorInterp.ulStartTime[i];
-                unsigned long ulDelay = m_doorInterp.ulTargetTime[i] - m_doorInterp.ulStartTime[i];
+                std::uint32_t ulElapsedTime = ulTime - m_doorInterp.ulStartTime[i];
+                std::uint32_t ulDelay = m_doorInterp.ulTargetTime[i] - m_doorInterp.ulStartTime[i];
                 float         fStep = ulElapsedTime / (float)ulDelay;
                 float         fRatio = SharedUtil::Lerp(m_doorInterp.fStart[i], fStep, m_doorInterp.fTarget[i]);
                 SetDoorOpenRatio(i, fRatio, 0, true);
@@ -660,9 +660,9 @@ void CClientVehicle::ProcessDoorInterpolation()
     }
 }
 
-void CClientVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced)
+void CClientVehicle::SetDoorOpenRatio(std::uint8_t ucDoor, float fRatio, std::uint32_t ulDelay, bool bForced)
 {
-    unsigned char ucSeat;
+    std::uint8_t ucSeat;
 
     if (ucDoor <= 5)
     {
@@ -702,7 +702,7 @@ void CClientVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsign
     }
 }
 
-float CClientVehicle::GetDoorOpenRatio(unsigned char ucDoor)
+float CClientVehicle::GetDoorOpenRatio(std::uint8_t ucDoor)
 {
     if (ucDoor <= 5)
     {
@@ -731,7 +731,7 @@ bool CClientVehicle::AreSwingingDoorsAllowed() const
     return m_bSwingingDoorsAllowed;
 }
 
-void CClientVehicle::AllowDoorRatioSetting(unsigned char ucDoor, bool bAllow, bool bAutoReallowAfterDelay)
+void CClientVehicle::AllowDoorRatioSetting(std::uint8_t ucDoor, bool bAllow, bool bAutoReallowAfterDelay)
 {
     if (ucDoor < NUMELMS(m_bAllowDoorRatioSetting))
     {
@@ -809,15 +809,15 @@ void CClientVehicle::Fix()
 
     SetHealth(DEFAULT_VEHICLE_HEALTH);
 
-    SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
+    SFixedArray<std::uint8_t, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
-    for (int i = 0; i < MAX_DOORS; i++)
+    for (auto i = 0; i < MAX_DOORS; i++)
         SetDoorStatus(i, ucDoorStates[i], true);
-    for (int i = 0; i < MAX_PANELS; i++)
+    for (auto i = 0; i < MAX_PANELS; i++)
         SetPanelStatus(i, 0);
-    for (int i = 0; i < MAX_LIGHTS; i++)
+    for (auto i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
-    for (int i = 0; i < MAX_WHEELS; i++)
+    for (auto i = 0; i < MAX_WHEELS; i++)
         SetWheelStatus(i, 0);
 
     // These components get a funny rotation when calling Fix() (unknown reason)
@@ -991,7 +991,7 @@ void CClientVehicle::SetTurretRotation(float fHorizontal, float fVertical)
     m_fTurretVertical = fVertical;
 }
 
-void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
+void CClientVehicle::SetModelBlocking(std::uint16_t usModel, std::uint8_t ucVariant, std::uint8_t ucVariant2)
 {
     // Different vehicle ID than we have now?
     if (m_usModel != usModel)
@@ -1110,7 +1110,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
     }
 }
 
-void CClientVehicle::SetVariant(unsigned char ucVariant, unsigned char ucVariant2)
+void CClientVehicle::SetVariant(std::uint8_t ucVariant, std::uint8_t ucVariant2)
 {
     m_ucVariation = ucVariant;
     m_ucVariation2 = ucVariant2;
@@ -1306,9 +1306,9 @@ void CClientVehicle::SetLandingGearDown(bool bLandingGearDown)
     }
 }
 
-unsigned short CClientVehicle::GetAdjustablePropertyValue()
+std::uint16_t CClientVehicle::GetAdjustablePropertyValue()
 {
-    unsigned short usPropertyValue;
+    std::uint16_t usPropertyValue;
     if (m_pVehicle)
     {
         usPropertyValue = m_pVehicle->GetAdjustablePropertyValue();
@@ -1325,7 +1325,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
     return usPropertyValue;
 }
 
-void CClientVehicle::SetAdjustablePropertyValue(unsigned short usValue)
+void CClientVehicle::SetAdjustablePropertyValue(std::uint16_t usValue)
 {
     if (m_usModel == VT_HYDRA)
         usValue = 5000 - usValue;
@@ -1333,7 +1333,7 @@ void CClientVehicle::SetAdjustablePropertyValue(unsigned short usValue)
     _SetAdjustablePropertyValue(usValue);
 }
 
-void CClientVehicle::_SetAdjustablePropertyValue(unsigned short usValue)
+void CClientVehicle::_SetAdjustablePropertyValue(std::uint16_t usValue)
 {
     // Set it
     if (m_pVehicle)
@@ -1359,7 +1359,7 @@ bool CClientVehicle::HasMovingCollision()
             m_usModel == VT_PACKER);
 }
 
-unsigned char CClientVehicle::GetDoorStatus(unsigned char ucDoor)
+std::uint8_t CClientVehicle::GetDoorStatus(std::uint8_t ucDoor)
 {
     if (ucDoor < MAX_DOORS)
     {
@@ -1374,7 +1374,7 @@ unsigned char CClientVehicle::GetDoorStatus(unsigned char ucDoor)
     return 0;
 }
 
-unsigned char CClientVehicle::GetWheelStatus(unsigned char ucWheel)
+std::uint8_t CClientVehicle::GetWheelStatus(std::uint8_t ucWheel)
 {
     if (ucWheel < MAX_WHEELS)
     {
@@ -1396,17 +1396,17 @@ unsigned char CClientVehicle::GetWheelStatus(unsigned char ucWheel)
     return 0;
 }
 
-bool CClientVehicle::IsWheelCollided(unsigned char ucWheel)
+bool CClientVehicle::IsWheelCollided(std::uint8_t ucWheel)
 {
     return m_pVehicle ? m_pVehicle->IsWheelCollided(ucWheel) : true;
 }
 
-int CClientVehicle::GetWheelFrictionState(unsigned char ucWheel)
+int CClientVehicle::GetWheelFrictionState(std::uint8_t ucWheel)
 {
     return m_pVehicle ? m_pVehicle->GetWheelFrictionState(ucWheel) : 0;
 }
 
-unsigned char CClientVehicle::GetPanelStatus(unsigned char ucPanel)
+std::uint8_t CClientVehicle::GetPanelStatus(std::uint8_t ucPanel)
 {
     if (ucPanel < MAX_PANELS)
     {
@@ -1419,7 +1419,7 @@ unsigned char CClientVehicle::GetPanelStatus(unsigned char ucPanel)
     return 0;
 }
 
-unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
+std::uint8_t CClientVehicle::GetLightStatus(std::uint8_t ucLight)
 {
     if (ucLight < MAX_LIGHTS)
     {
@@ -1432,7 +1432,7 @@ unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
     return 0;
 }
 
-void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus, bool spawnFlyingComponent)
+void CClientVehicle::SetDoorStatus(std::uint8_t ucDoor, std::uint8_t ucStatus, bool spawnFlyingComponent)
 {
     if (ucDoor < MAX_DOORS)
     {
@@ -1443,7 +1443,7 @@ void CClientVehicle::SetDoorStatus(unsigned char ucDoor, unsigned char ucStatus,
     }
 }
 
-void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatus, bool bSilent)
+void CClientVehicle::SetWheelStatus(std::uint8_t ucWheel, std::uint8_t ucStatus, bool bSilent)
 {
     if (ucWheel < MAX_WHEELS)
     {
@@ -1454,7 +1454,7 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
                 m_pVehicle->BurstTyre(ucWheel);
 
             // Are we using our custom state?
-            unsigned char ucGTAStatus = ucStatus;
+            std::uint8_t ucGTAStatus = ucStatus;
             if (ucStatus == DT_WHEEL_INTACT_COLLISIONLESS)
                 ucGTAStatus = DT_WHEEL_MISSING;
 
@@ -1477,7 +1477,7 @@ void CClientVehicle::SetWheelStatus(unsigned char ucWheel, unsigned char ucStatu
 //
 // Returns component name for eWheelPosition enum
 //
-SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) const noexcept
+SString CClientVehicle::GetComponentNameForWheel(std::uint8_t ucWheel) const noexcept
 {
     switch (ucWheel)
     {
@@ -1497,7 +1497,7 @@ SString CClientVehicle::GetComponentNameForWheel(unsigned char ucWheel) const no
 //
 // Returns true if wheel should be invisible because of its state
 //
-bool CClientVehicle::GetWheelMissing(unsigned char ucWheel, const SString& strWheelName)
+bool CClientVehicle::GetWheelMissing(std::uint8_t ucWheel, const SString& strWheelName)
 {
     // Use name if supplied
     if (strWheelName.BeginsWith("wheel"))
@@ -1524,7 +1524,7 @@ bool CClientVehicle::GetWheelMissing(unsigned char ucWheel, const SString& strWh
     return false;
 }
 
-void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus)
+void CClientVehicle::SetPanelStatus(std::uint8_t ucPanel, std::uint8_t ucStatus)
 {
     if (ucPanel < MAX_PANELS)
     {
@@ -1535,7 +1535,7 @@ void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatu
     }
 }
 
-void CClientVehicle::SetLightStatus(unsigned char ucLight, unsigned char ucStatus)
+void CClientVehicle::SetLightStatus(std::uint8_t ucLight, std::uint8_t ucStatus)
 {
     if (ucLight < MAX_LIGHTS)
     {
@@ -1664,7 +1664,7 @@ void CClientVehicle::SetCanBeTargettedByHeatSeekingMissiles(bool bEnabled)
     m_bCanBeTargettedByHeatSeekingMissiles = bEnabled;
 }
 
-void CClientVehicle::SetAlpha(unsigned char ucAlpha)
+void CClientVehicle::SetAlpha(std::uint8_t ucAlpha)
 {
     if (ucAlpha != m_ucAlpha)
     {
@@ -2120,10 +2120,10 @@ void CClientVehicle::SetTrainTrack(uchar ucTrack)
     m_ucTrackID = ucTrack;
 }
 
-void CClientVehicle::SetOverrideLights(unsigned char ucOverrideLights)
+void CClientVehicle::SetOverrideLights(std::uint8_t ucOverrideLights)
 {
     if (m_pVehicle)
-        m_pVehicle->SetOverrideLights(static_cast<unsigned int>(ucOverrideLights));
+        m_pVehicle->SetOverrideLights(static_cast<std::uint32_t>(ucOverrideLights));
 
     m_ucOverrideLights = ucOverrideLights;
 }
@@ -2149,11 +2149,11 @@ void CClientVehicle::StreamedInPulse()
                 // Set the damage model doors
                 CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
 
-                for (int i = 0; i < MAX_DOORS; i++)
+                for (auto i = 0; i < MAX_DOORS; i++)
                     pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], true);
-                for (int i = 0; i < MAX_PANELS; i++)
+                for (auto i = 0; i < MAX_PANELS; i++)
                     pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i]);
-                for (int i = 0; i < MAX_LIGHTS; i++)
+                for (auto i = 0; i < MAX_LIGHTS; i++)
                     pDamageManager->SetLightStatus(static_cast<eLights>(i), m_ucLightStates[i]);
             }
 
@@ -2375,7 +2375,7 @@ void CClientVehicle::StreamedInPulse()
         // Update doors
         if (CClientVehicleManager::HasDoors(GetModel()))
         {
-            for (unsigned char i = 0; i < 6; ++i)
+            for (std::uint8_t i = 0; i < 6; ++i)
             {
                 CDoor* pDoor = m_pVehicle->GetDoor(i);
                 if (pDoor)
@@ -2521,7 +2521,7 @@ void CClientVehicle::Create()
         if (m_tSirenBeaconInfo.m_bOverrideSirens)
         {
             GiveVehicleSirens(m_tSirenBeaconInfo.m_ucSirenType, m_tSirenBeaconInfo.m_ucSirenCount);
-            for (unsigned char i = 0; i < m_tSirenBeaconInfo.m_ucSirenCount; i++)
+            for (std::uint8_t i = 0; i < m_tSirenBeaconInfo.m_ucSirenCount; i++)
             {
                 m_pVehicle->SetVehicleSirenPosition(i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_vecSirenPositions);
                 m_pVehicle->SetVehicleSirenMinimumAlpha(i, m_tSirenBeaconInfo.m_tSirenInfo[i].m_dwMinSirenAlpha);
@@ -2583,7 +2583,7 @@ void CClientVehicle::Create()
         }
 
         m_pVehicle->SetOverrideLights(m_ucOverrideLights);
-        m_pVehicle->SetRemap(static_cast<unsigned int>(m_ucPaintjob));
+        m_pVehicle->SetRemap(static_cast<std::uint32_t>(m_ucPaintjob));
         m_pVehicle->SetBodyDirtLevel(m_fDirtLevel);
         m_pVehicle->SetEngineOn(m_bEngineOn);
         m_pVehicle->SetAreaCode(m_ucInterior);
@@ -2631,7 +2631,7 @@ void CClientVehicle::Create()
             m_pVehicle->SetTurretRotation(m_fTurretHorizontal, m_fTurretVertical);
         }
 
-        for (int i = 0; i < MAX_WHEELS; i++)
+        for (auto i = 0; i < MAX_WHEELS; i++)
             SetWheelStatus(i, m_ucWheelStates[i], true);
 
         // Eventually warp driver back in
@@ -2639,7 +2639,7 @@ void CClientVehicle::Create()
             m_pDriver->WarpIntoVehicle(this, 0);
 
         // Warp the passengers back in
-        for (unsigned int i = 0; i < 8; i++)
+        for (std::uint32_t i = 0; i < 8; i++)
         {
             if (m_pPassengers[i])
             {
@@ -2717,10 +2717,10 @@ void CClientVehicle::Create()
         ResetInterpolation();
         ResetDoorInterpolation();
 
-        for (unsigned char i = 0; i < 6; ++i)
+        for (std::uint8_t i = 0; i < 6; ++i)
             SetDoorOpenRatio(i, m_fDoorOpenRatio[i], 0, true);
 
-        for (unsigned char i = 0; i < MAX_WINDOWS; ++i)
+        for (std::uint8_t i = 0; i < MAX_WINDOWS; ++i)
             SetWindowOpen(i, m_bWindowOpen[i]);
 
         // Re-apply handling entry
@@ -2928,14 +2928,14 @@ void CClientVehicle::Destroy()
             // Grab the damage model
             CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
 
-            for (int i = 0; i < MAX_DOORS; i++)
+            for (auto i = 0; i < MAX_DOORS; i++)
                 m_ucDoorStates[i] = pDamageManager->GetDoorStatus(static_cast<eDoors>(i));
-            for (int i = 0; i < MAX_PANELS; i++)
+            for (auto i = 0; i < MAX_PANELS; i++)
                 m_ucPanelStates[i] = pDamageManager->GetPanelStatus(static_cast<ePanels>(i));
-            for (int i = 0; i < MAX_LIGHTS; i++)
+            for (auto i = 0; i < MAX_LIGHTS; i++)
                 m_ucLightStates[i] = pDamageManager->GetLightStatus(static_cast<eLights>(i));
         }
-        for (int i = 0; i < MAX_WHEELS; i++)
+        for (auto i = 0; i < MAX_WHEELS; i++)
             m_ucWheelStates[i] = GetWheelStatus(i);
 
         // Remove the driver from the vehicle
@@ -2950,7 +2950,7 @@ void CClientVehicle::Destroy()
 
         // Remove all the passengers physically
         bool bWarpInToVehicleRequired = !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE);
-        for (unsigned int i = 0; i < 8; i++)
+        for (std::uint32_t i = 0; i < 8; i++)
         {
             CClientPed* pPassenger = m_pPassengers[i];
             if (pPassenger)
@@ -2968,7 +2968,7 @@ void CClientVehicle::Destroy()
                 m_pOccupyingDriver->RemoveFromVehicle();
             }
         }
-        for (unsigned int i = 0; i < 8; i++)
+        for (std::uint32_t i = 0; i < 8; i++)
         {
             if (m_pOccupyingPassengers[i] && m_pOccupyingPassengers[i]->m_pOccupyingVehicle == this)
             {
@@ -3379,7 +3379,7 @@ bool CClientVehicle::SetRegPlate(const char* szPlate)
     return false;
 }
 
-unsigned char CClientVehicle::GetPaintjob()
+std::uint8_t CClientVehicle::GetPaintjob()
 {
     if (m_pVehicle)
     {
@@ -3390,13 +3390,13 @@ unsigned char CClientVehicle::GetPaintjob()
     return m_ucPaintjob;
 }
 
-void CClientVehicle::SetPaintjob(unsigned char ucPaintjob)
+void CClientVehicle::SetPaintjob(std::uint8_t ucPaintjob)
 {
     if (ucPaintjob != m_ucPaintjob && ucPaintjob <= 4)
     {
         if (m_pVehicle)
         {
-            m_pVehicle->SetRemap(static_cast<unsigned int>(ucPaintjob));
+            m_pVehicle->SetRemap(static_cast<std::uint32_t>(ucPaintjob));
         }
         m_ucPaintjob = ucPaintjob;
     }
@@ -3551,7 +3551,7 @@ void CClientVehicle::Interpolate()
     }
 }
 
-void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
+void CClientVehicle::GetInitialDoorStates(SFixedArray<std::uint8_t, MAX_DOORS>& ucOutDoorStates)
 {
     switch (m_usModel)
     {
@@ -3582,7 +3582,7 @@ void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>&
     }
 }
 
-void CClientVehicle::SetTargetPosition(const CVector& vecTargetPosition, unsigned long ulDelay, bool bValidVelocityZ, float fVelocityZ)
+void CClientVehicle::SetTargetPosition(const CVector& vecTargetPosition, std::uint32_t ulDelay, bool bValidVelocityZ, float fVelocityZ)
 {
     // Are we streamed in?
     if (m_pVehicle)
@@ -3590,7 +3590,7 @@ void CClientVehicle::SetTargetPosition(const CVector& vecTargetPosition, unsigne
         UpdateTargetPosition();
         UpdateUnderFloorFix(vecTargetPosition, bValidVelocityZ, fVelocityZ);
 
-        unsigned long ulTime = CClientTime::GetTime();
+        std::uint32_t ulTime = CClientTime::GetTime();
         CVector       vecLocalPosition;
         GetPosition(vecLocalPosition);
 
@@ -3642,14 +3642,14 @@ void CClientVehicle::RemoveTargetPosition()
     m_interp.pos.ulFinishTime = 0;
 }
 
-void CClientVehicle::SetTargetRotation(const CVector& vecRotation, unsigned long ulDelay)
+void CClientVehicle::SetTargetRotation(const CVector& vecRotation, std::uint32_t ulDelay)
 {
     // Are we streamed in?
     if (m_pVehicle)
     {
         UpdateTargetRotation();
 
-        unsigned long ulTime = CClientTime::GetTime();
+        std::uint32_t ulTime = CClientTime::GetTime();
         CVector       vecLocalRotation;
         GetRotationDegrees(vecLocalRotation);
 
@@ -3694,7 +3694,7 @@ void CClientVehicle::UpdateTargetPosition()
 
         // Get the factor of time spent from the interpolation start
         // to the current time.
-        unsigned long ulCurrentTime = CClientTime::GetTime();
+        std::uint32_t ulCurrentTime = CClientTime::GetTime();
         float         fAlpha = SharedUtil::Unlerp(m_interp.pos.ulStartTime, ulCurrentTime, m_interp.pos.ulFinishTime);
 
         // Don't let it overcompensate the error too much
@@ -3794,7 +3794,7 @@ void CClientVehicle::UpdateTargetRotation()
 
         // Get the factor of time spent from the interpolation start
         // to the current time.
-        unsigned long ulCurrentTime = CClientTime::GetTime();
+        std::uint32_t ulCurrentTime = CClientTime::GetTime();
         float         fAlpha = SharedUtil::Unlerp(m_interp.rot.ulStartTime, ulCurrentTime, m_interp.rot.ulFinishTime);
 
         // Don't let it to overcompensate the error
@@ -3964,7 +3964,7 @@ std::string GetPlayerName(CClientPed* pClientPed)
 // Make a ped become an occupied driver/passenger
 // Static function
 //
-void CClientVehicle::SetPedOccupiedVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor)
+void CClientVehicle::SetPedOccupiedVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle, std::uint32_t uiSeat, std::uint8_t ucDoor)
 {
     INFO(("SetPedOccupiedVehicle:%s in vehicle:0x%08x  seat:%d  door:%u", GetPlayerName(pClientPed).c_str(), pVehicle, uiSeat, ucDoor));
 
@@ -3977,7 +3977,7 @@ void CClientVehicle::SetPedOccupiedVehicle(CClientPed* pClientPed, CClientVehicl
         if (pVehicle->m_pDriver == pClientPed)
             pVehicle->m_pDriver = NULL;
 
-        for (int i = 0; i < NUMELMS(pVehicle->m_pPassengers); i++)
+        for (auto i = 0; i < NUMELMS(pVehicle->m_pPassengers); i++)
             if (pVehicle->m_pPassengers[i] == pClientPed)
                 pVehicle->m_pPassengers[i] = NULL;
     }
@@ -4021,7 +4021,7 @@ void CClientVehicle::SetPedOccupiedVehicle(CClientPed* pClientPed, CClientVehicl
 // Make a ped become an occupying driver/passenger
 // Static function
 //
-void CClientVehicle::SetPedOccupyingVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor)
+void CClientVehicle::SetPedOccupyingVehicle(CClientPed* pClientPed, CClientVehicle* pVehicle, std::uint32_t uiSeat, std::uint8_t ucDoor)
 {
     INFO(("SetPedOccupyingVehicle:%s in vehicle:0x%08x  seat:%d  door:%u", GetPlayerName(pClientPed).c_str(), pVehicle, uiSeat, ucDoor));
 
@@ -4034,7 +4034,7 @@ void CClientVehicle::SetPedOccupyingVehicle(CClientPed* pClientPed, CClientVehic
         if (pVehicle->m_pOccupyingDriver == pClientPed)
             pVehicle->m_pOccupyingDriver = NULL;
 
-        for (int i = 0; i < NUMELMS(pVehicle->m_pOccupyingPassengers); i++)
+        for (auto i = 0; i < NUMELMS(pVehicle->m_pOccupyingPassengers); i++)
             if (pVehicle->m_pOccupyingPassengers[i] == pClientPed)
                 pVehicle->m_pOccupyingPassengers[i] = NULL;
     }
@@ -4085,7 +4085,7 @@ void CClientVehicle::ValidatePedAndVehiclePair(CClientPed* pClientPed, CClientVe
     if (pVehicle->m_pDriver)
         assert(pVehicle->m_pDriver->m_pOccupiedVehicle == pVehicle);
 
-    for (int i = 0; i < NUMELMS(pVehicle->m_pPassengers); i++)
+    for (auto i = 0; i < NUMELMS(pVehicle->m_pPassengers); i++)
         if (pVehicle->m_pPassengers[i])
             assert(pVehicle->m_pPassengers[i]->m_pOccupiedVehicle == pVehicle);
 
@@ -4097,7 +4097,7 @@ void CClientVehicle::ValidatePedAndVehiclePair(CClientPed* pClientPed, CClientVe
         if (pClientPed->m_pOccupiedVehicle->m_pDriver == pClientPed)
             iCount++;
 
-        for (int i = 0; i < NUMELMS(pClientPed->m_pOccupiedVehicle->m_pPassengers); i++)
+        for (auto i = 0; i < NUMELMS(pClientPed->m_pOccupiedVehicle->m_pPassengers); i++)
             if (pClientPed->m_pOccupiedVehicle->m_pPassengers[i] == pClientPed)
                 iCount++;
 
@@ -4109,7 +4109,7 @@ void CClientVehicle::ValidatePedAndVehiclePair(CClientPed* pClientPed, CClientVe
     if (pVehicle->m_pOccupyingDriver)
         assert(pVehicle->m_pOccupyingDriver->m_pOccupyingVehicle == pVehicle);
 
-    for (int i = 0; i < NUMELMS(pVehicle->m_pOccupyingPassengers); i++)
+    for (auto i = 0; i < NUMELMS(pVehicle->m_pOccupyingPassengers); i++)
         if (pVehicle->m_pOccupyingPassengers[i])
             assert(pVehicle->m_pOccupyingPassengers[i]->m_pOccupyingVehicle == pVehicle);
 
@@ -4121,7 +4121,7 @@ void CClientVehicle::ValidatePedAndVehiclePair(CClientPed* pClientPed, CClientVe
         if (pClientPed->m_pOccupyingVehicle->m_pOccupyingDriver == pClientPed)
             iCount++;
 
-        for (int i = 0; i < NUMELMS(pClientPed->m_pOccupyingVehicle->m_pOccupyingPassengers); i++)
+        for (auto i = 0; i < NUMELMS(pClientPed->m_pOccupyingVehicle->m_pOccupyingPassengers); i++)
             if (pClientPed->m_pOccupyingVehicle->m_pOccupyingPassengers[i] == pClientPed)
                 iCount++;
 
@@ -4150,7 +4150,7 @@ void CClientVehicle::UnpairPedAndVehicle(CClientPed* pClientPed, CClientVehicle*
         pVehicle->m_pDriver = NULL;
     }
 
-    for (int i = 0; i < NUMELMS(pVehicle->m_pPassengers); i++)
+    for (auto i = 0; i < NUMELMS(pVehicle->m_pPassengers); i++)
         if (pVehicle->m_pPassengers[i] == pClientPed)
         {
             INFO(("UnpairPedAndVehicle: m_pPassenger:%s seat:%d from vehicle:0x%08x", GetPlayerName(pClientPed).c_str(), i + 1, pVehicle));
@@ -4178,7 +4178,7 @@ void CClientVehicle::UnpairPedAndVehicle(CClientPed* pClientPed, CClientVehicle*
         pVehicle->m_pOccupyingDriver = NULL;
     }
 
-    for (int i = 0; i < NUMELMS(pVehicle->m_pOccupyingPassengers); i++)
+    for (auto i = 0; i < NUMELMS(pVehicle->m_pOccupyingPassengers); i++)
         if (pVehicle->m_pOccupyingPassengers[i] == pClientPed)
         {
             INFO(("UnpairPedAndVehicle: m_pOccupyingPassenger:%s seat:%d from vehicle:0x%08x", GetPlayerName(pClientPed).c_str(), i + 1, pVehicle));
@@ -4391,12 +4391,12 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
 
     std::vector<SString> lineList;
     strAround.Split("\n", lineList);
-    for (unsigned int i = 0; i < lineList.size(); i++)
+    for (std::uint32_t i = 0; i < lineList.size(); i++)
         g_pCore->GetGraphics()->DrawString(10, 230 + i * 10, -1, 1, lineList[i]);
     #endif
 }
 
-bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
+bool CClientVehicle::GiveVehicleSirens(std::uint8_t ucSirenType, std::uint8_t ucSirenCount)
 {
     m_tSirenBeaconInfo.m_bOverrideSirens = true;
     m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
@@ -4407,7 +4407,7 @@ bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char 
 
     return true;
 }
-void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
+void CClientVehicle::SetVehicleSirenPosition(std::uint8_t ucSirenID, CVector vecPos)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 
@@ -4415,7 +4415,7 @@ void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector ve
         m_pVehicle->SetVehicleSirenPosition(ucSirenID, vecPos);
 }
 
-void CClientVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
+void CClientVehicle::SetVehicleSirenMinimumAlpha(std::uint8_t ucSirenID, DWORD dwPercentage)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
 
@@ -4423,7 +4423,7 @@ void CClientVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD 
         m_pVehicle->SetVehicleSirenMinimumAlpha(ucSirenID, dwPercentage);
 }
 
-void CClientVehicle::SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour)
+void CClientVehicle::SetVehicleSirenColour(std::uint8_t ucSirenID, SColor tVehicleSirenColour)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
 
@@ -4450,7 +4450,7 @@ void CClientVehicle::RemoveVehicleSirens()
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
     SetSirenOrAlarmActive(false);
 
-    for (unsigned char i = 0; i < 7; i++)
+    for (std::uint8_t i = 0; i < 7; i++)
     {
         SetVehicleSirenPosition(i, CVector(0, 0, 0));
         SetVehicleSirenMinimumAlpha(i, 0);

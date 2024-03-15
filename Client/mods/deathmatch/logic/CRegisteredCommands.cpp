@@ -215,7 +215,7 @@ void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunct
 
 void CRegisteredCommands::GetCommands(lua_State* luaVM)
 {
-    unsigned int uiIndex = 0;
+    std::uint32_t uiIndex = 0;
 
     lua_newtable(luaVM);
 
@@ -237,7 +237,7 @@ void CRegisteredCommands::GetCommands(lua_State* luaVM)
 
 void CRegisteredCommands::GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain)
 {
-    unsigned int uiIndex = 0;
+    std::uint32_t uiIndex = 0;
 
     lua_newtable(luaVM);
 

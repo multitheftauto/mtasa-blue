@@ -23,7 +23,7 @@ void CIFPAnimations::DeleteAnimations()
     CAnimManager* pAnimManager = g_pGame->GetAnimManager();
     for (auto& Animation : vecAnimations)
     {
-        for (unsigned short SequenceIndex = 0; SequenceIndex < Animation.pHierarchy->GetNumSequences(); SequenceIndex++)
+        for (std::uint16_t SequenceIndex = 0; SequenceIndex < Animation.pHierarchy->GetNumSequences(); SequenceIndex++)
         {
             pAnimManager->RemoveFromUncompressedCache(Animation.pHierarchy->GetInterface());
             auto  pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence(Animation.pHierarchy->GetSequence(SequenceIndex));

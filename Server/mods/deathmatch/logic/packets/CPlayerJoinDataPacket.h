@@ -19,18 +19,18 @@ class CPlayerJoinDataPacket final : public CPacket
 public:
     virtual bool  RequiresSourcePlayer() const { return false; }
     ePacketID     GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_PLAYER_JOINDATA); };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
 
-    unsigned short GetNetVersion() { return m_usNetVersion; };
-    unsigned char  GetGameVersion() { return m_ucGameVersion; };
+    std::uint16_t GetNetVersion() { return m_usNetVersion; };
+    std::uint8_t  GetGameVersion() { return m_ucGameVersion; };
 
-    void SetNetVersion(unsigned short usNetVersion) { m_usNetVersion = usNetVersion; };
-    void SetGameVersion(unsigned char ucGameVersion) { m_ucGameVersion = ucGameVersion; };
+    void SetNetVersion(std::uint16_t usNetVersion) { m_usNetVersion = usNetVersion; };
+    void SetGameVersion(std::uint8_t ucGameVersion) { m_ucGameVersion = ucGameVersion; };
 
-    unsigned short     GetMTAVersion() { return m_usMTAVersion; };
-    unsigned short     GetBitStreamVersion() { return m_usBitStreamVersion; };
+    std::uint16_t     GetMTAVersion() { return m_usMTAVersion; };
+    std::uint16_t     GetBitStreamVersion() { return m_usBitStreamVersion; };
     const CMtaVersion& GetPlayerVersion() { return m_strPlayerVersion; };
 
     const char* GetNick() { return m_strNick; };
@@ -45,10 +45,10 @@ public:
     bool IsOptionalUpdateInfoRequired() { return m_bOptionalUpdateInfoRequired; }
 
 private:
-    unsigned short m_usNetVersion;
-    unsigned short m_usMTAVersion;
-    unsigned short m_usBitStreamVersion;
-    unsigned char  m_ucGameVersion;
+    std::uint16_t m_usNetVersion;
+    std::uint16_t m_usMTAVersion;
+    std::uint16_t m_usBitStreamVersion;
+    std::uint8_t  m_ucGameVersion;
     bool           m_bOptionalUpdateInfoRequired;
     SString        m_strNick;
     MD5            m_Password;

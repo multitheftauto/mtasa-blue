@@ -15,7 +15,7 @@ namespace
 {
     struct CTiming
     {
-        unsigned long calls;
+        std::uint32_t calls;
         TIMEUS        total_us;
         TIMEUS        max_us;
 
@@ -131,8 +131,8 @@ public:
 
     SString                  m_strCategoryName;
     CAllLuaTiming            AllLuaTiming;
-    long long                m_LastTickCount;
-    unsigned long            m_SecondCounter;
+    std::int64_t                m_LastTickCount;
+    std::uint32_t            m_SecondCounter;
     std::map<CLuaMain*, int> m_LuaMainMap;
 };
 
@@ -259,8 +259,8 @@ void CClientPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const cha
 ///////////////////////////////////////////////////////////////
 void CClientPerfStatLuaTimingImpl::DoPulse()
 {
-    long long llTickCount = GetTickCount64_();
-    long long llDelta = llTickCount - m_LastTickCount;
+    std::int64_t llTickCount = GetTickCount64_();
+    std::int64_t llDelta = llTickCount - m_LastTickCount;
     if (llDelta >= 1000)
     {
         m_LastTickCount = m_LastTickCount + 1000;
@@ -346,7 +346,7 @@ void CClientPerfStatLuaTimingImpl::GetLuaTimingStats(CClientPerfStatResult* pRes
 
     pResult->AddColumn("name");
 
-    for (int i = 0; i < 4; i++)
+    for (auto i = 0; i < 4; i++)
     {
         if (flags & (1 << i))
         {
@@ -397,7 +397,7 @@ void CClientPerfStatLuaTimingImpl::OutputTimingBlock(CClientPerfStatResult* pRes
 
     // See if any relavent data for this row
     bool bHasData = false;
-    for (int i = 0; i < 4; i++)
+    for (auto i = 0; i < 4; i++)
     {
         if (flags & (1 << i))
         {
@@ -418,7 +418,7 @@ void CClientPerfStatLuaTimingImpl::OutputTimingBlock(CClientPerfStatResult* pRes
     int c = 0;
     row[c++] = BlockName;
 
-    for (int i = 0; i < 4; i++)
+    for (auto i = 0; i < 4; i++)
     {
         if (flags & (1 << i))
         {

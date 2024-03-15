@@ -20,7 +20,7 @@ public:
     CUnoccupiedVehicleSync(CClientVehicleManager* pVehicleManager);
     ~CUnoccupiedVehicleSync();
 
-    bool ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
+    bool ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream);
     void DoPulse();
 
     void AddVehicle(CDeathmatchVehicle* pVehicle);
@@ -43,5 +43,5 @@ private:
 
     CClientVehicleManager*           m_pVehicleManager;
     CMappedList<CDeathmatchVehicle*> m_List;
-    unsigned long                    m_ulLastSyncTime;
+    std::uint32_t                    m_ulLastSyncTime;
 };

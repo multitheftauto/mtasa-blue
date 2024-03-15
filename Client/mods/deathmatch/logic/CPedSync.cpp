@@ -27,7 +27,7 @@ CPedSync::~CPedSync()
 {
 }
 
-bool CPedSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& BitStream)
+bool CPedSync::ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& BitStream)
 {
     switch (ucPacketID)
     {
@@ -67,7 +67,7 @@ void CPedSync::DoPulse()
     }
 
     // Has it been long enough since our last state's sync?
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastSyncTime + PED_SYNC_RATE)
     {
         Update();
@@ -173,10 +173,10 @@ void CPedSync::Packet_PedSync(NetBitStreamInterface& BitStream)
         if (BitStream.Read(ID))
         {
             // Read out the sync time context. See CClientEntity for documentation on that.
-            unsigned char ucSyncTimeContext = 0;
+            std::uint8_t ucSyncTimeContext = 0;
             BitStream.Read(ucSyncTimeContext);
 
-            unsigned char ucFlags = 0;
+            std::uint8_t ucFlags = 0;
             BitStream.Read(ucFlags);
 
             CVector vecPosition, vecMoveSpeed;
@@ -271,7 +271,7 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     CVector vecVelocity;
     pPed->GetMoveSpeed(vecVelocity);
 
-    unsigned char ucFlags = 0;
+    std::uint8_t ucFlags = 0;
     if (vecPosition != pPed->m_LastSyncedData->vPosition)
         ucFlags |= 0x01;
     if (pPed->GetCurrentRotation() != pPed->m_LastSyncedData->fRotation)

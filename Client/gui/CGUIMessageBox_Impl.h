@@ -20,7 +20,7 @@
 class CGUIMessageBox_Impl : public CGUIMessageBox
 {
 public:
-    CGUIMessageBox_Impl(class CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, unsigned int uiFlags);
+    CGUIMessageBox_Impl(class CGUI_Impl* pGUI, const char* szTitle, const char* szCaption, std::uint32_t uiFlags);
     ~CGUIMessageBox_Impl();
 
     void SetAutoDestroy(bool bAutoDestroy);

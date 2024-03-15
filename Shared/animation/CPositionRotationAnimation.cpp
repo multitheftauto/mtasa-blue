@@ -62,12 +62,12 @@ void CPositionRotationAnimation::ToBitStream(NetBitStreamInterface& a_rBitStream
     a_rBitStream.WriteBit(a_bResumeMode);
     if (a_bResumeMode)
     {
-        unsigned long long ullNow = _GetTime();
-        unsigned long      ulElaspedTime = static_cast<unsigned long>(ullNow - m_ullStartTime);
-        unsigned long      ulTimeLeft = 0;
+        std::uint64_t ullNow = _GetTime();
+        std::uint32_t      ulElaspedTime = static_cast<std::uint32_t>(ullNow - m_ullStartTime);
+        std::uint32_t      ulTimeLeft = 0;
         if (m_ullEndTime > ullNow)
         {
-            ulTimeLeft = static_cast<unsigned long>(m_ullEndTime - ullNow);
+            ulTimeLeft = static_cast<std::uint32_t>(m_ullEndTime - ullNow);
         }
         a_rBitStream.WriteCompressed(ulElaspedTime);
         a_rBitStream.WriteCompressed(ulTimeLeft);
@@ -120,7 +120,7 @@ CPositionRotationAnimation* CPositionRotationAnimation::FromBitStream(NetBitStre
 
     if (bResumeMode)
     {
-        unsigned long ulElaspedTime, ulTimeLeft;
+        std::uint32_t ulElaspedTime, ulTimeLeft;
         if (!a_rBitStream.ReadCompressed(ulElaspedTime) || !a_rBitStream.ReadCompressed(ulTimeLeft))
         {
             delete pAnimation;
@@ -130,7 +130,7 @@ CPositionRotationAnimation* CPositionRotationAnimation::FromBitStream(NetBitStre
     }
     else
     {
-        unsigned long ulDuration;
+        std::uint32_t ulDuration;
         if (!a_rBitStream.ReadCompressed(ulDuration))
         {
             delete pAnimation;

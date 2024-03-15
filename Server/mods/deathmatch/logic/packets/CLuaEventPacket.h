@@ -21,7 +21,7 @@ public:
     CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments);
 
     ePacketID     GetPacketID() const { return PACKET_ID_LUA_EVENT; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

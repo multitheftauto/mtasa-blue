@@ -44,7 +44,7 @@ public:
     TiXmlDocument* GetDocument();
 
     eXMLClass     GetClassType() { return CXML_FILE; };
-    unsigned long GetID()
+    std::uint32_t GetID()
     {
         dassert(m_bUsingIDs);
         return m_ulID;
@@ -70,7 +70,7 @@ private:
     TiXmlDocument* m_pDocument;
 
     class CXMLNodeImpl* m_pRootNode;
-    unsigned long       m_ulID;
+    std::uint32_t       m_ulID;
     const bool          m_bUsingIDs;
     const bool          m_bReadOnly;
 

@@ -109,7 +109,7 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         m_Cache.bIsAimFull = false;
 
         // Check client has the weapon we think he has
-        unsigned char ucClientWeaponType;
+        std::uint8_t ucClientWeaponType;
         if (!BitStream.Read(ucClientWeaponType))
             return false;
 
@@ -126,7 +126,7 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         SWeaponSlotSync slot;
         if (!BitStream.Read(&slot))
             return false;
-        unsigned int uiSlot = slot.data.uiSlot;
+        std::uint32_t uiSlot = slot.data.uiSlot;
 
         // Set weapon slot
         if (bWeaponCorrect)
@@ -231,14 +231,14 @@ bool CSimPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     if (m_Cache.flags.data.bHasAWeapon)
     {
-        unsigned int    uiSlot = m_Cache.ucWeaponSlot;            // check m_Cache.bWeaponCorrect !
+        std::uint32_t    uiSlot = m_Cache.ucWeaponSlot;            // check m_Cache.bWeaponCorrect !
         SWeaponSlotSync slot;
         slot.data.uiSlot = uiSlot;
         BitStream.Write(&slot);
 
         if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
         {
-            unsigned short usWeaponAmmoInClip = m_Cache.usAmmoInClip;
+            std::uint16_t usWeaponAmmoInClip = m_Cache.usAmmoInClip;
 
             SWeaponAmmoSync ammo(m_PlayerGotWeaponType, false, true);
             ammo.data.usAmmoInClip = usWeaponAmmoInClip;

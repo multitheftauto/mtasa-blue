@@ -29,7 +29,7 @@ void CMultiplayerSA::SetFastClothesLoading(EFastClothesLoading fastClothesLoadin
     if (fastClothesLoading == FAST_CLOTHES_AUTO)
     {
         // Disable if less than 512MB installed ram
-        long long llSystemRamKB = GetWMITotalPhysicalMemory() / 1024LL;
+        std::int64_t llSystemRamKB = GetWMITotalPhysicalMemory() / 1024LL;
         if (llSystemRamKB > 0 && llSystemRamKB < 512 * 1024)
             fastClothesLoading = FAST_CLOTHES_OFF;
     }

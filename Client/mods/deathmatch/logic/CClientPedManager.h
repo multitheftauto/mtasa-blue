@@ -35,12 +35,12 @@ public:
     std::vector<CClientPed*>::const_iterator StreamedBegin() { return m_StreamedIn.begin(); };
     std::vector<CClientPed*>::const_iterator StreamedEnd() { return m_StreamedIn.end(); };
 
-    static unsigned short GetWeaponSlotFromModel(DWORD dwModelID);
+    static std::uint16_t GetWeaponSlotFromModel(DWORD dwModelID);
     static bool           IsValidWeaponModel(DWORD dwModelID);
 
-    void RestreamPeds(unsigned short usModel);
+    void RestreamPeds(std::uint16_t usModel);
     void RestreamAllPeds();
-    void RestreamWeapon(unsigned short usModel);
+    void RestreamWeapon(std::uint16_t usModel);
 
 protected:
     CClientPedManager(class CClientManager* pManager);

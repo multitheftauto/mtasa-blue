@@ -29,7 +29,7 @@ static constexpr size_t SIZE_PATCH_DIFF{0x004b87ef};
 static constexpr FileHash HASH_PATCHER_DATA{0xe2, 0x4d, 0x05, 0x43, 0x35, 0xef, 0x80, 0xd2, 0x1a, 0xbf, 0x42, 0x73, 0x5e, 0x80, 0x24, 0xbc,
                                             0x7b, 0xc0, 0x50, 0x96, 0x37, 0x2d, 0x16, 0x93, 0x9d, 0x1d, 0x18, 0xa3, 0x33, 0xed, 0x37, 0x3c};
 
-static bool Extract(const char* fileName, const fs::path& destination, const std::vector<unsigned char>& buffer, std::error_code& ec)
+static bool Extract(const char* fileName, const fs::path& destination, const std::vector<std::uint8_t>& buffer, std::error_code& ec)
 {
     // Write the buffer to a temporary file.
     const fs::path archivePath = GetTempFilePath(10, ec);
@@ -117,7 +117,7 @@ bool FileGenerator::LoadPatcherData(std::error_code& ec)
         return true;
 
     // Load the patch base and verify its length.
-    std::vector<unsigned char> base{};
+    std::vector<std::uint8_t> base{};
 
     if (!GetFileContent(m_patchBasePath, base, ec))
         return false;
@@ -129,7 +129,7 @@ bool FileGenerator::LoadPatcherData(std::error_code& ec)
     }
 
     // Load the patch diff and verify its length.
-    std::vector<unsigned char> diff{};
+    std::vector<std::uint8_t> diff{};
 
     if (!GetFileContent(m_patchDiffPath, diff, ec))
         return false;
@@ -143,7 +143,7 @@ bool FileGenerator::LoadPatcherData(std::error_code& ec)
     // Reuncompression using future delta system.
     size_t index = 0;
 
-    for (unsigned char& c : diff)
+    for (std::uint8_t& c : diff)
     {
         c ^= base[index];
         index = (index + 1) % base.size();

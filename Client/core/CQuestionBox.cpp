@@ -40,7 +40,7 @@ CQuestionBox::CQuestionBox()
 
 CQuestionBox::~CQuestionBox()
 {
-    for (unsigned int i = 0; i < m_ButtonList.size(); i++)
+    for (std::uint32_t i = 0; i < m_ButtonList.size(); i++)
         delete m_ButtonList[i];
     delete m_pMessage;
     delete m_pWindow;
@@ -55,7 +55,7 @@ void CQuestionBox::Show()
 {
     // Layout - Calc how many lines of text
     SString      strMsg = m_pMessage->GetText();
-    unsigned int uiNumLines = std::count(strMsg.begin(), strMsg.end(), '\n') + 1;
+    std::uint32_t uiNumLines = std::count(strMsg.begin(), strMsg.end(), '\n') + 1;
 
     float fEditHeight = 29.0f;
     float fEditSpacer = 10.0f;
@@ -74,7 +74,7 @@ void CQuestionBox::Show()
     m_pMessage->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
 
     // One editbox takes the entire width, position them like so
-    for (unsigned int i = 0; i < m_EditList.size(); i++)
+    for (std::uint32_t i = 0; i < m_EditList.size(); i++)
     {
         if (i < m_uiActiveButtons)
         {
@@ -86,7 +86,7 @@ void CQuestionBox::Show()
     // Position the buttons evenly across the bottom
     float fSpaceBetween = (fWinWidth - (m_uiActiveButtons * 112)) / (m_uiActiveButtons + 1) + m_uiActiveEditboxes ? fEditSpacer : 0;
 
-    for (unsigned int i = 0; i < m_ButtonList.size(); i++)
+    for (std::uint32_t i = 0; i < m_ButtonList.size(); i++)
     {
         if (i < m_uiActiveButtons)
         {
@@ -116,10 +116,10 @@ void CQuestionBox::Reset()
     SetCallback(NULL);
     SetCallbackEdit(NULL);
     m_uiActiveButtons = 0;
-    for (unsigned int i = 0; i < m_ButtonList.size(); i++)
+    for (std::uint32_t i = 0; i < m_ButtonList.size(); i++)
         m_ButtonList[i]->SetVisible(false);
 
-    for (unsigned int i = 0; i < m_EditList.size(); i++)
+    for (std::uint32_t i = 0; i < m_EditList.size(); i++)
         m_EditList[i]->SetVisible(false);
 }
 
@@ -139,7 +139,7 @@ void CQuestionBox::AppendMessage(const SString& strMsg)
     m_pMessage->SetText(SString(m_strMsg + strMsg));
 }
 
-void CQuestionBox::SetButton(unsigned int uiButton, const SString& strText)
+void CQuestionBox::SetButton(std::uint32_t uiButton, const SString& strText)
 {
     m_uiActiveButtons = std::max(m_uiActiveButtons, uiButton + 1);
     while (m_ButtonList.size() < m_uiActiveButtons)
@@ -156,7 +156,7 @@ void CQuestionBox::SetButton(unsigned int uiButton, const SString& strText)
     m_ButtonList[uiButton]->SetVisible(true);
 }
 
-CGUIEdit* CQuestionBox::SetEditbox(unsigned int uiEditbox, const SString& strText)
+CGUIEdit* CQuestionBox::SetEditbox(std::uint32_t uiEditbox, const SString& strText)
 {
     m_uiActiveEditboxes = std::max(m_uiActiveEditboxes, uiEditbox + 1);
     while (m_EditList.size() < m_uiActiveEditboxes)
@@ -196,7 +196,7 @@ void CQuestionBox::SetOnLineHelpOption(const SString& strTroubleLink)
     SetCallback(CCore::ErrorMessageBoxCallBack, new SString(strTroubleLink));
 }
 
-unsigned int CQuestionBox::PollButtons()
+std::uint32_t CQuestionBox::PollButtons()
 {
     if (!m_pWindow->IsVisible())
         return -1;
@@ -213,7 +213,7 @@ bool CQuestionBox::OnButtonClick(CGUIElement* pElement)
     // For detecting startup problems
     WatchDogUserDidInteractWithMenu();
 
-    m_uiLastButton = reinterpret_cast<unsigned int>(pElement->GetUserData());
+    m_uiLastButton = reinterpret_cast<std::uint32_t>(pElement->GetUserData());
     if (m_Callback)
         m_Callback(m_CallbackParameter, m_uiLastButton);
 

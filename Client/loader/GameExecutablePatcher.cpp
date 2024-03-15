@@ -23,7 +23,7 @@ static constexpr size_t SIZE_GTA_EXE{0x00db7a00};
 /**
  * @brief Checks if the provided buffer resembles a runnable 32-bit portable executable format.
  */
-static bool Is32BitExecutable(const std::vector<unsigned char>& buffer)
+static bool Is32BitExecutable(const std::vector<std::uint8_t>& buffer)
 {
     if (buffer.size() < sizeof(IMAGE_DOS_HEADER))
         return false;
@@ -50,7 +50,7 @@ static bool Is32BitExecutable(const std::vector<unsigned char>& buffer)
 class PatchableExecutable
 {
 public:
-    explicit PatchableExecutable(std::vector<unsigned char>& buffer_) : buffer(buffer_)
+    explicit PatchableExecutable(std::vector<std::uint8_t>& buffer_) : buffer(buffer_)
     {
         auto dos = reinterpret_cast<IMAGE_DOS_HEADER*>(buffer.data());
         auto nt = reinterpret_cast<IMAGE_NT_HEADERS*>(buffer.data() + dos->e_lfanew);
@@ -66,7 +66,7 @@ public:
     /**
      * @brief Converts a virtual address to a pointer in the buffer.
      */
-    auto ResolveAddress(DWORD virtualAddress) -> unsigned char*
+    auto ResolveAddress(DWORD virtualAddress) -> std::uint8_t*
     {
         if (!numSections)
             return nullptr;
@@ -94,7 +94,7 @@ public:
     /**
      * @brief Converts a data directory index to a pointer in the buffer where the data directory points to.
      */
-    auto GetDataDirectory(DWORD index) -> unsigned char*
+    auto GetDataDirectory(DWORD index) -> std::uint8_t*
     {
         if (optHeader->NumberOfRvaAndSizes < index)
             return nullptr;
@@ -108,7 +108,7 @@ public:
     }
 
 public:
-    std::vector<unsigned char>& buffer;
+    std::vector<std::uint8_t>& buffer;
     IMAGE_FILE_HEADER*          fileHeader;
     IMAGE_OPTIONAL_HEADER32*    optHeader;
     IMAGE_SECTION_HEADER*       firstSection;
@@ -236,7 +236,7 @@ class HighPerformanceGraphicsPatch final
     */
     static void WriteExportValues(PatchableExecutable& pe, ExportItems& exports)
     {
-        unsigned char* base = &pe.buffer[EXPORT_VALUES_RA];
+        std::uint8_t* base = &pe.buffer[EXPORT_VALUES_RA];
         size_t         offset = 0;
 
         for (ExportItem& item : exports)
@@ -254,7 +254,7 @@ class HighPerformanceGraphicsPatch final
      */
     static auto WriteExportDirectory(PatchableExecutable& pe, ExportItems& exports) -> size_t
     {
-        unsigned char* base = &pe.buffer[EXPORT_DIRECTORY_RA];
+        std::uint8_t* base = &pe.buffer[EXPORT_DIRECTORY_RA];
 
         auto header = reinterpret_cast<IMAGE_EXPORT_DIRECTORY*>(base);
         header->TimeDateStamp = 0xffffffff;
@@ -394,7 +394,7 @@ bool GameExecutablePatcher::Load(std::error_code& ec)
 {
     ec.clear();
 
-    std::vector<unsigned char> buffer{};
+    std::vector<std::uint8_t> buffer{};
 
     if (!GetFileContent(m_path, buffer, ec))
         return false;

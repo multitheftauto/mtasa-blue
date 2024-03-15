@@ -32,7 +32,7 @@ typedef struct __static_server_data_t
 {
 } static_server_data_t, *pstatic_server_data_t;
 
-typedef bool (*PPACKETHANDLER)(unsigned char, const NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo*);
+typedef bool (*PPACKETHANDLER)(std::uint8_t, const NetServerPlayerID&, NetBitStreamInterface*, SNetExtraInfo*);
 
 enum NetServerPacketPriority
 {
@@ -56,31 +56,31 @@ struct NetRawStatistics
 {
     unsigned  messageSendBuffer[4];
     unsigned  messagesSent[4];
-    long long messageDataBitsSent[4];
-    long long messageTotalBitsSent[4];
+    std::int64_t messageDataBitsSent[4];
+    std::int64_t messageTotalBitsSent[4];
     unsigned  packetsContainingOnlyAcknowlegements;
     unsigned  acknowlegementsSent;
     unsigned  acknowlegementsPending;
-    long long acknowlegementBitsSent;
+    std::int64_t acknowlegementBitsSent;
     unsigned  packetsContainingOnlyAcknowlegementsAndResends;
     unsigned  messageResends;
-    long long messageDataBitsResent;
-    long long messagesTotalBitsResent;
+    std::int64_t messageDataBitsResent;
+    std::int64_t messagesTotalBitsResent;
     unsigned  messagesOnResendQueue;
     unsigned  numberOfUnsplitMessages;
     unsigned  numberOfSplitMessages;
     unsigned  totalSplits;
     unsigned  packetsSent;
-    long long encryptionBitsSent;
-    long long totalBitsSent;
+    std::int64_t encryptionBitsSent;
+    std::int64_t totalBitsSent;
     unsigned  sequencedMessagesOutOfOrder;
     unsigned  sequencedMessagesInOrder;
     unsigned  orderedMessagesOutOfOrder;
     unsigned  orderedMessagesInOrder;
     unsigned  packetsReceived;
     unsigned  packetsWithBadCRCReceived;
-    long long bitsReceived;
-    long long bitsWithBadCRCReceived;
+    std::int64_t bitsReceived;
+    std::int64_t bitsWithBadCRCReceived;
     unsigned  acknowlegementsReceived;
     unsigned  duplicateAcknowlegementsReceived;
     unsigned  messagesReceived;
@@ -89,15 +89,15 @@ struct NetRawStatistics
     unsigned  messagesWaitingForReassembly;
     unsigned  internalOutputQueueSize;
     double    bitsPerSecond;
-    long long connectionStartTime;
+    std::int64_t connectionStartTime;
     bool      bandwidthExceeded;
 };
 
 struct NetStatistics
 {
     // Needed for getNetworkStats()
-    unsigned long long bytesReceived;
-    unsigned long long bytesSent;
+    std::uint64_t bytesReceived;
+    std::uint64_t bytesSent;
     uint               packetsReceived;
     uint               packetsSent;
     float              packetlossTotal;
@@ -113,14 +113,14 @@ struct NetStatistics
 
 struct SBandwidthStatistics
 {
-    long long       llOutgoingUDPByteCount;
-    long long       llIncomingUDPByteCount;
-    long long       llIncomingUDPByteCountBlocked;
-    long long       llOutgoingUDPPacketCount;
-    long long       llIncomingUDPPacketCount;
-    long long       llIncomingUDPPacketCountBlocked;
-    long long       llOutgoingUDPByteResentCount;
-    long long       llOutgoingUDPMessageResentCount;
+    std::int64_t       llOutgoingUDPByteCount;
+    std::int64_t       llIncomingUDPByteCount;
+    std::int64_t       llIncomingUDPByteCountBlocked;
+    std::int64_t       llOutgoingUDPPacketCount;
+    std::int64_t       llIncomingUDPPacketCount;
+    std::int64_t       llIncomingUDPPacketCountBlocked;
+    std::int64_t       llOutgoingUDPByteResentCount;
+    std::int64_t       llOutgoingUDPMessageResentCount;
     SThreadCPUTimes threadCPUTimes;
 };
 

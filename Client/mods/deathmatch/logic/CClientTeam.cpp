@@ -12,7 +12,7 @@
 
 using std::list;
 
-CClientTeam::CClientTeam(CClientManager* pManager, ElementID ID, const char* szName, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+CClientTeam::CClientTeam(CClientManager* pManager, ElementID ID, const char* szName, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
     : ClassInit(this), CClientEntity(ID)
 {
     m_pManager = pManager;
@@ -84,14 +84,14 @@ void CClientTeam::SetTeamName(const char* szName)
         m_strTeamName.clear();
 }
 
-void CClientTeam::GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue)
+void CClientTeam::GetColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue)
 {
     ucRed = m_ucRed;
     ucGreen = m_ucGreen;
     ucBlue = m_ucBlue;
 }
 
-void CClientTeam::SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+void CClientTeam::SetColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue)
 {
     m_ucRed = ucRed;
     m_ucGreen = ucGreen;

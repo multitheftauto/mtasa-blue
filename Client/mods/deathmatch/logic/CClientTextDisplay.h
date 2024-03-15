@@ -31,14 +31,14 @@ public:
     void SetPosition(const CVector& vecPosition);
 
     void SetColor(const SColor color);
-    void SetColorAlpha(unsigned char ucAlpha);
-    void SetShadowAlpha(unsigned char ucShadowAlpha);
+    void SetColorAlpha(std::uint8_t ucAlpha);
+    void SetShadowAlpha(std::uint8_t ucShadowAlpha);
 
     float GetScale() { return m_fScale; };
     void  SetScale(float fScale);
 
-    unsigned long GetFormat() { return m_ulFormat; };
-    void          SetFormat(unsigned long ulFormat);
+    std::uint32_t GetFormat() { return m_ulFormat; };
+    void          SetFormat(std::uint32_t ulFormat);
 
     void SetVisible(bool bVisible);
 
@@ -50,8 +50,8 @@ private:
     SString m_strCaption;
     float   m_fScale;
 
-    unsigned long m_ulFormat;
-    unsigned char m_ucShadowAlpha;
+    std::uint32_t m_ulFormat;
+    std::uint8_t m_ucShadowAlpha;
 
     static float m_fGlobalScale;
 };

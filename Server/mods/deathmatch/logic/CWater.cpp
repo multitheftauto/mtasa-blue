@@ -48,7 +48,7 @@ void CWater::Unlink()
 const CVector& CWater::GetPosition()
 {
     m_vecPosition = CVector(0.0f, 0.0f, 0.0f);
-    for (int i = 0; i < GetNumVertices(); i++)
+    for (auto i = 0; i < GetNumVertices(); i++)
     {
         m_vecPosition += m_Vertices[i];
     }
@@ -59,7 +59,7 @@ const CVector& CWater::GetPosition()
 void CWater::SetPosition(const CVector& vecPosition)
 {
     CVector vecDelta = vecPosition - CWater::GetPosition();
-    for (int i = 0; i < GetNumVertices(); i++)
+    for (auto i = 0; i < GetNumVertices(); i++)
     {
         m_Vertices[i] += vecDelta;
     }
@@ -69,7 +69,7 @@ void CWater::SetPosition(const CVector& vecPosition)
 float CWater::GetLevel() const
 {
     float fLevel = 0.0f;
-    for (int i = 0; i < GetNumVertices(); i++)
+    for (auto i = 0; i < GetNumVertices(); i++)
     {
         fLevel += m_Vertices[i].fZ;
     }
@@ -78,7 +78,7 @@ float CWater::GetLevel() const
 
 void CWater::SetLevel(float fLevel)
 {
-    for (int i = 0; i < GetNumVertices(); i++)
+    for (auto i = 0; i < GetNumVertices(); i++)
     {
         m_Vertices[i].fZ = fLevel;
     }
@@ -88,7 +88,7 @@ bool CWater::ReadSpecialData(const int iLine)
 {
     char szPropName[10];
     m_WaterType = QUAD;
-    for (int i = 0; i < 4; i++)
+    for (auto i = 0; i < 4; i++)
     {
         snprintf(szPropName, sizeof(szPropName), "posX%d", i + 1);
         if (!GetCustomDataFloat(szPropName, m_Vertices[i].fX, true))
@@ -166,7 +166,7 @@ void CWater::SetVertex(int index, CVector& vecPosition)
 
 bool CWater::Valid()
 {
-    for (int i = 0; i < GetNumVertices(); i++)
+    for (auto i = 0; i < GetNumVertices(); i++)
     {
         if (!IsVertexWithinWorld(i))
             return false;
@@ -185,7 +185,7 @@ bool CWater::Valid()
 
 void CWater::RoundVertices()
 {
-    for (int i = 0; i < GetNumVertices(); i++)
+    for (auto i = 0; i < GetNumVertices(); i++)
     {
         RoundVertex(i);
     }

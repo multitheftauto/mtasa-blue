@@ -85,12 +85,12 @@ CPad::CPad(CPlayer* pPlayer)
 {
     m_pPlayer = pPlayer;
 
-    for (int i = 0; i < NUM_CONTROL_STATES; i++)
+    for (auto i = 0; i < NUM_CONTROL_STATES; i++)
     {
         m_ControlStates[i].bState = false;
         m_ControlStates[i].bEnabled = true;
     }
-    for (int i = 0; i < NUM_MTA_CONTROL_STATES; i++)
+    for (auto i = 0; i < NUM_MTA_CONTROL_STATES; i++)
     {
         m_MTAEnabledControls[i] = true;
     }
@@ -174,7 +174,7 @@ void CPad::UpdateKeys()
 
 bool CPad::GetControlState(const char* szControl, bool& bState)
 {
-    for (int i = 0; *g_gtaControls[i].szControl != '\0'; i++)
+    for (auto i = 0; *g_gtaControls[i].szControl != '\0'; i++)
     {
         const SGTAControl* temp = &g_gtaControls[i];
         if (stricmp(temp->szControl, szControl) == 0)
@@ -195,7 +195,7 @@ bool CPad::GetControlState(const char* szControl, bool& bState)
 
 bool CPad::SetControlState(const char* szControl, bool bState)
 {
-    for (int i = 0; *g_gtaControls[i].szControl != '\0'; i++)
+    for (auto i = 0; *g_gtaControls[i].szControl != '\0'; i++)
     {
         const SGTAControl* temp = &g_gtaControls[i];
         if (stricmp(temp->szControl, szControl) == 0)
@@ -210,7 +210,7 @@ bool CPad::SetControlState(const char* szControl, bool bState)
 
 bool CPad::IsControlEnabled(const char* szControl, bool& bEnabled)
 {
-    for (int i = 0; *g_gtaControls[i].szControl != '\0'; i++)
+    for (auto i = 0; *g_gtaControls[i].szControl != '\0'; i++)
     {
         const SGTAControl* temp = &g_gtaControls[i];
         if (stricmp(temp->szControl, szControl) == 0)
@@ -220,7 +220,7 @@ bool CPad::IsControlEnabled(const char* szControl, bool& bEnabled)
         }
     }
 
-    for (int i = 0; i < NUM_MTA_CONTROL_STATES; i++)
+    for (auto i = 0; i < NUM_MTA_CONTROL_STATES; i++)
     {
         if (g_mtaControls[i] == szControl)
         {
@@ -234,7 +234,7 @@ bool CPad::IsControlEnabled(const char* szControl, bool& bEnabled)
 
 bool CPad::SetControlEnabled(const char* szControl, bool bEnabled)
 {
-    for (int i = 0; *g_gtaControls[i].szControl != '\0'; i++)
+    for (auto i = 0; *g_gtaControls[i].szControl != '\0'; i++)
     {
         const SGTAControl* temp = &g_gtaControls[i];
         if (stricmp(temp->szControl, szControl) == 0)
@@ -245,7 +245,7 @@ bool CPad::SetControlEnabled(const char* szControl, bool bEnabled)
     }
 
     // Check if it is a MTA control
-    for (int i = 0; i < NUM_MTA_CONTROL_STATES; i++)
+    for (auto i = 0; i < NUM_MTA_CONTROL_STATES; i++)
     {
         if (g_mtaControls[i] == szControl)
         {
@@ -259,7 +259,7 @@ bool CPad::SetControlEnabled(const char* szControl, bool bEnabled)
 
 void CPad::SetAllGTAControlsEnabled(bool bEnabled)
 {
-    for (int i = 0; *g_gtaControls[i].szControl != '\0'; i++)
+    for (auto i = 0; *g_gtaControls[i].szControl != '\0'; i++)
     {
         m_ControlStates[i].bEnabled = bEnabled;
     }
@@ -267,7 +267,7 @@ void CPad::SetAllGTAControlsEnabled(bool bEnabled)
 
 void CPad::SetAllMTAControlsEnabled(bool bEnabled)
 {
-    for (int i = 0; i < NUM_MTA_CONTROL_STATES; i++)
+    for (auto i = 0; i < NUM_MTA_CONTROL_STATES; i++)
     {
         m_MTAEnabledControls[i] = bEnabled;
     }
@@ -275,7 +275,7 @@ void CPad::SetAllMTAControlsEnabled(bool bEnabled)
 
 const SGTAControl* CPad::GetControlFromString(const char* szControl)
 {
-    for (int i = 0; *g_gtaControls[i].szControl != '\0'; i++)
+    for (auto i = 0; *g_gtaControls[i].szControl != '\0'; i++)
     {
         const SGTAControl* temp = &g_gtaControls[i];
         if (stricmp(temp->szControl, szControl) == 0)

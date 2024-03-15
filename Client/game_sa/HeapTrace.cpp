@@ -19,15 +19,15 @@ using namespace std;
 struct ALLOC_INFO
 {
     void*        pAddress;
-    unsigned int uiSize;
+    std::uint32_t uiSize;
     char         szFile[64];
     int          iLine;
 };
 
 static bool               bHookEnabled = true;
 static list<ALLOC_INFO*>* pAllocList;
-static unsigned int       uiTotalNews = 0;
-static unsigned int       uiTotalFrees = 0;
+static std::uint32_t       uiTotalNews = 0;
+static std::uint32_t       uiTotalFrees = 0;
 
 void AddTrack(void* pAddress, size_t size, const char* szFile, int iLine)
 {
@@ -40,7 +40,7 @@ void AddTrack(void* pAddress, size_t size, const char* szFile, int iLine)
         // Create a struct and copy over the info
         ALLOC_INFO* pTemp = new ALLOC_INFO;
         pTemp->pAddress = pAddress;
-        pTemp->uiSize = static_cast<unsigned int>(size);
+        pTemp->uiSize = static_cast<std::uint32_t>(size);
         strncpy(pTemp->szFile, szFile, 63);
         pTemp->szFile[63] = 0;
         pTemp->iLine = iLine;
@@ -114,7 +114,7 @@ void DumpUnfreed()
         if (pAllocList->size() > 0)
         {
             // Dump each unfreed item to a file
-            unsigned int                uiTotalSize = 0;
+            std::uint32_t                uiTotalSize = 0;
             list<ALLOC_INFO*>::iterator iter = pAllocList->begin();
             for (; iter != pAllocList->end(); iter++)
             {

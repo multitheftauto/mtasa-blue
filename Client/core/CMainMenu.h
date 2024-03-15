@@ -27,7 +27,7 @@ class CLanguageSelector;
 
 struct sMenuItem
 {
-    unsigned char    menuType;
+    std::uint8_t    menuType;
     int              drawPositionX;
     int              drawPositionY;
     int              nativeSizeX;
@@ -76,7 +76,7 @@ public:
     void        AskUserIfHeWantsToDisconnect(uchar menuType);
 
 private:
-    sMenuItem* CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition);
+    sMenuItem* CreateItem(std::uint8_t menuType, const char* szFilename, CVector2D vecRelPosition);
     bool       SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHovering);
 
     bool OnMenuEnter(CGUIElement* pElement);
@@ -148,15 +148,15 @@ private:
     CVector2D  m_ScreenSize;
 
     // Fade variables
-    unsigned char m_ucFade;
+    std::uint8_t m_ucFade;
     float         m_fFader;
     bool          m_bCursorAlphaReset;
 
     // Animation variables
-    unsigned long ulPreviousTick;
+    std::uint32_t ulPreviousTick;
     int           m_iMoveStartPos;
     int           m_iMoveTargetPos;
-    unsigned long m_ulMoveStartTick;
+    std::uint32_t m_ulMoveStartTick;
 
     CGUILabel* m_pNewsItemLabels[CORE_MTA_NEWS_ITEMS];
     CGUILabel* m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];

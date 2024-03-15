@@ -15,7 +15,7 @@
 class CClientManager;
 class CClientVehicle;
 
-extern const SFixedArray<unsigned char, 212> g_ucMaxPassengers;
+extern const SFixedArray<std::uint8_t, 212> g_ucMaxPassengers;
 
 class CClientVehicleManager
 {
@@ -26,38 +26,38 @@ public:
 
     void DeleteAll();
 
-    unsigned int           Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t           Count() { return static_cast<std::uint32_t>(m_List.size()); };
     static CClientVehicle* Get(ElementID ID);
     CClientVehicle*        GetClosest(CVector& vecPosition, float fRadius);
 
     void DoPulse();
 
-    static bool               IsTrainModel(unsigned long ulModel);
-    static bool               IsValidModel(unsigned long ulModel);
-    static bool               IsStandardModel(unsigned long ulModel);
-    static eClientVehicleType GetVehicleType(unsigned long ulModel);
-    static unsigned char      GetMaxPassengerCount(unsigned long ulModel);
-    static unsigned char      ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex);
-    static void               GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static bool               IsTrainModel(std::uint32_t ulModel);
+    static bool               IsValidModel(std::uint32_t ulModel);
+    static bool               IsStandardModel(std::uint32_t ulModel);
+    static eClientVehicleType GetVehicleType(std::uint32_t ulModel);
+    static std::uint8_t      GetMaxPassengerCount(std::uint32_t ulModel);
+    static std::uint8_t      ConvertIndexToGameSeat(std::uint32_t ulModel, std::uint8_t ucIndex);
+    static void               GetRandomVariation(std::uint16_t usModel, std::uint8_t& ucVariant, std::uint8_t& ucVariant2);
 
-    static bool HasTurret(unsigned long ulModel);
-    static bool HasSirens(unsigned long ulModel);
-    static bool HasLandingGears(unsigned long ulModel);
-    static bool HasAdjustableProperty(unsigned long ulModel);
-    static bool HasSmokeTrail(unsigned long ulModel);
-    static bool HasTaxiLight(unsigned long ulModel);
-    static bool HasSearchLight(unsigned long ulModel);
-    static bool HasDamageModel(unsigned long ulModel);
+    static bool HasTurret(std::uint32_t ulModel);
+    static bool HasSirens(std::uint32_t ulModel);
+    static bool HasLandingGears(std::uint32_t ulModel);
+    static bool HasAdjustableProperty(std::uint32_t ulModel);
+    static bool HasSmokeTrail(std::uint32_t ulModel);
+    static bool HasTaxiLight(std::uint32_t ulModel);
+    static bool HasSearchLight(std::uint32_t ulModel);
+    static bool HasDamageModel(std::uint32_t ulModel);
     static bool HasDamageModel(enum eClientVehicleType Type);
-    static bool HasDoors(unsigned long ulModel);
+    static bool HasDoors(std::uint32_t ulModel);
 
     bool Exists(CClientVehicle* pVehicle);
 
     static bool IsVehicleLimitReached();
 
-    void RestreamVehicles(unsigned short usModel);
+    void RestreamVehicles(std::uint16_t usModel);
     void RestreamAllVehicles();
-    void RestreamVehicleUpgrades(unsigned short usModel);
+    void RestreamVehicleUpgrades(std::uint16_t usModel);
 
     std::vector<CClientVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
     std::vector<CClientVehicle*>::const_iterator IterEnd() { return m_List.end(); };

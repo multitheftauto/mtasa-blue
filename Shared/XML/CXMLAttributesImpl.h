@@ -22,9 +22,9 @@ public:
     CXMLAttributesImpl(TiXmlElement& Node, bool bUseIDs);
     ~CXMLAttributesImpl();
 
-    unsigned int         Count();
+    std::uint32_t         Count();
     class CXMLAttribute* Find(const char* szName);
-    class CXMLAttribute* Get(unsigned int uiIndex);
+    class CXMLAttribute* Get(std::uint32_t uiIndex);
 
     class CXMLAttribute* Create(const char* szName);
     class CXMLAttribute* Create(const class CXMLAttribute& Copy);

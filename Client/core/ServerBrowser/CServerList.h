@@ -108,9 +108,9 @@ public:
         m_ucSpecialFlags = 0;
         Init();
     }
-    CServerListItem(in_addr _Address, unsigned short _usGamePort, CServerListItemList* pItemList = NULL, bool bAtFront = false);
+    CServerListItem(in_addr _Address, std::uint16_t _usGamePort, CServerListItemList* pItemList = NULL, bool bAtFront = false);
     ~CServerListItem();
-    void ChangeAddress(in_addr _Address, unsigned short _usGamePort);
+    void ChangeAddress(in_addr _Address, std::uint16_t _usGamePort);
 
     static bool Parse(const char* szAddress, in_addr& Address)
     {
@@ -152,7 +152,7 @@ public:
         bMaybeOffline = false;
         bMasterServerSaysNoResponse = false;
         uiMasterServerSaysRestrictions = 0;
-        for (int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        for (auto i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
             revisionInList[i] = -1;
 
         strHost = inet_ntoa(Address);
@@ -173,15 +173,15 @@ public:
 
     std::string    Pulse(bool bCanSendQuery, bool bRemoveNonResponding = false);
     void           ResetForRefresh();
-    unsigned short GetQueryPort();
+    std::uint16_t GetQueryPort();
 
     in_addr        AddressCopy;            // Copy to ensure it doesn't get changed without us knowing
-    unsigned short usGamePortCopy;
+    std::uint16_t usGamePortCopy;
     in_addr        Address;                // IP-address
-    unsigned short usGamePort;             // Game port
-    unsigned short nPlayers;               // Current players
-    unsigned short nMaxPlayers;            // Maximum players
-    unsigned short nPing;                  // Ping time
+    std::uint16_t usGamePort;             // Game port
+    std::uint16_t nPlayers;               // Current players
+    std::uint16_t nMaxPlayers;            // Maximum players
+    std::uint16_t nPing;                  // Ping time
     bool           bPassworded;            // Password protected
     bool           bSerials;               // Serial verification on
     bool           bScanned;
@@ -368,7 +368,7 @@ public:
     CServerListIterator        IteratorEnd() { return m_Servers.end(); };
     CServerListReverseIterator ReverseIteratorBegin() { return m_Servers.rbegin(); };
     CServerListReverseIterator ReverseIteratorEnd() { return m_Servers.rend(); };
-    unsigned int               GetServerCount() { return m_Servers.size(); };
+    std::uint32_t               GetServerCount() { return m_Servers.size(); };
 
     bool AddUnique(in_addr Address, ushort usGamePort, bool addAtFront = false);
     void Clear();
@@ -383,13 +383,13 @@ public:
 protected:
     bool                m_bUpdated;
     int                 m_iPass;
-    unsigned int        m_nScanned;
-    unsigned int        m_nSkipped;
+    std::uint32_t        m_nScanned;
+    std::uint32_t        m_nSkipped;
     int                 m_iRevision;
     CServerListItemList m_Servers;
     std::string         m_strStatus;
     std::string         m_strStatus2;
-    long long           m_llLastTickCount;
+    std::int64_t           m_llLastTickCount;
 };
 
 // Internet list (grabs the master server list on refresh)
@@ -419,5 +419,5 @@ private:
 
     int           m_Socket;
     sockaddr_in   m_Remote;
-    unsigned long m_ulStartTime;
+    std::uint32_t m_ulStartTime;
 };

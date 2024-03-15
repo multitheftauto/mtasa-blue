@@ -24,18 +24,18 @@ public:
     virtual void SetMasked(bool bMasked) = 0;
     virtual bool IsMasked() = 0;
 
-    virtual void         SetMaxLength(unsigned int uiMaxLength) = 0;
-    virtual unsigned int GetMaxLength() = 0;
+    virtual void         SetMaxLength(std::uint32_t uiMaxLength) = 0;
+    virtual std::uint32_t GetMaxLength() = 0;
 
-    virtual void         SetSelection(unsigned int uiStart, unsigned int uiEnd) = 0;
-    virtual unsigned int GetSelectionStart() = 0;
-    virtual unsigned int GetSelectionEnd() = 0;
-    virtual unsigned int GetSelectionLength() = 0;
+    virtual void         SetSelection(std::uint32_t uiStart, std::uint32_t uiEnd) = 0;
+    virtual std::uint32_t GetSelectionStart() = 0;
+    virtual std::uint32_t GetSelectionEnd() = 0;
+    virtual std::uint32_t GetSelectionLength() = 0;
 
-    virtual void         SetCaretIndex(unsigned int uiIndex) = 0;
+    virtual void         SetCaretIndex(std::uint32_t uiIndex) = 0;
     virtual void         SetCaretAtStart() = 0;
     virtual void         SetCaretAtEnd() = 0;
-    virtual unsigned int GetCaretIndex() = 0;
+    virtual std::uint32_t GetCaretIndex() = 0;
 
     virtual void SetTextAcceptedHandler(GUI_CALLBACK Callback) = 0;
     virtual void SetTextChangedHandler(GUI_CALLBACK Callback) = 0;

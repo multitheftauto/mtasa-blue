@@ -14,7 +14,7 @@
 // Used for cleaning sensitive info from entries
 struct
 {
-    unsigned int numBlanks;
+    std::uint32_t numBlanks;
     const char*  delim;
     const char*  text;
 } const g_WordsToCheck[] = {{2, "", "login "}, {2, "", "register "}, {2, "", "addaccount "}, {2, "", "chgpass "}, {2, "", "chgmypass "}, {1, "'", "password"}};
@@ -46,7 +46,7 @@ public:
 class CEntryHistory
 {
 public:
-    CEntryHistory(unsigned int historyLength) : m_maxEntries(historyLength) {}
+    CEntryHistory(std::uint32_t historyLength) : m_maxEntries(historyLength) {}
 
     static void CleanLine(SString& line);
     static int  ReplaceNextWord(SString& line, int pos, const char* blanker);
@@ -64,7 +64,7 @@ public:
     bool Empty() const { return m_entries.empty(); }
 
     // Return a specific entry from history
-    CEntryHistoryItem* Get(unsigned int index)
+    CEntryHistoryItem* Get(std::uint32_t index)
     {
         auto& iter = std::next(m_entries.begin(), index);
         if (iter != m_entries.end())
@@ -90,7 +90,7 @@ private:
     std::list<CEntryHistoryItem> m_entries;
 
     // Maximum amount of entries before we start deleting from the end
-    unsigned int m_maxEntries;
+    std::uint32_t m_maxEntries;
 
     // Output filename to save history to
     SString m_outFilename;

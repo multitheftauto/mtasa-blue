@@ -13,13 +13,13 @@
 
 #include "Utils.h"
 
-template <class T, unsigned int uiMaxElements = 64>
+template <class T, std::uint32_t uiMaxElements = 64>
 class CInterpolator
 {
 protected:
     struct VecMap
     {
-        unsigned long m_ulTime;
+        std::uint32_t m_ulTime;
         T             data;
     };
 
@@ -28,9 +28,9 @@ public:
 
     ~CInterpolator() { Clear(); }
 
-    void Push(const T& newData, unsigned long ulTime)
+    void Push(const T& newData, std::uint32_t ulTime)
     {
-        unsigned int uiIndex = Index(m_uiEndIdx + 1);
+        std::uint32_t uiIndex = Index(m_uiEndIdx + 1);
         m_nodes[m_uiEndIdx].data = newData;
         m_nodes[m_uiEndIdx].m_ulTime = ulTime;
         m_uiEndIdx = uiIndex;
@@ -50,7 +50,7 @@ public:
         }
     }
 
-    bool Evaluate(unsigned long ulTime, T* output)
+    bool Evaluate(std::uint32_t ulTime, T* output)
     {
         if (Size() == 0)
             return false;
@@ -68,7 +68,7 @@ public:
         else
         {
             // Find the two points either side and interpolate
-            unsigned int uiCurrent = Index(m_uiStartIdx + 1);
+            std::uint32_t uiCurrent = Index(m_uiStartIdx + 1);
             for (; uiCurrent != m_uiEndIdx; uiCurrent = Index(uiCurrent + 1))
             {
                 if (ulTime < m_nodes[uiCurrent].m_ulTime)
@@ -79,7 +79,7 @@ public:
         return true;
     }
 
-    unsigned long GetOldestEntry(T* output)
+    std::uint32_t GetOldestEntry(T* output)
     {
         if (Size() > 0)
         {
@@ -90,7 +90,7 @@ public:
             return 0UL;
     }
 
-    unsigned int Size() const { return m_uiSize; }
+    std::uint32_t Size() const { return m_uiSize; }
 
     void Clear()
     {
@@ -100,7 +100,7 @@ public:
     }
 
 protected:
-    virtual bool Eval(const VecMap& Left, const VecMap& Right, unsigned long ulTimeEval, T* output)
+    virtual bool Eval(const VecMap& Left, const VecMap& Right, std::uint32_t ulTimeEval, T* output)
     {
         // Check for being the same or maybe wrap around
         if (Left.m_ulTime >= Right.m_ulTime)
@@ -118,11 +118,11 @@ protected:
     }
 
 private:
-    unsigned int Index(unsigned int uiIndex) const { return (uiIndex % uiMaxElements); }
+    std::uint32_t Index(std::uint32_t uiIndex) const { return (uiIndex % uiMaxElements); }
 
 private:
     SFixedArray<VecMap, uiMaxElements> m_nodes;
-    unsigned int                       m_uiStartIdx;
-    unsigned int                       m_uiEndIdx;
-    unsigned int                       m_uiSize;
+    std::uint32_t                       m_uiStartIdx;
+    std::uint32_t                       m_uiEndIdx;
+    std::uint32_t                       m_uiSize;
 };

@@ -15,7 +15,7 @@
 
 CCoronasSA::CCoronasSA()
 {
-    for (int i = 0; i < MAX_CORONAS; i++)
+    for (auto i = 0; i < MAX_CORONAS; i++)
     {
         Coronas[i] = new CRegisteredCoronaSA((CRegisteredCoronaSAInterface*)(ARRAY_CORONAS + i * sizeof(CRegisteredCoronaSAInterface)));
     }
@@ -23,7 +23,7 @@ CCoronasSA::CCoronasSA()
 
 CCoronasSA::~CCoronasSA()
 {
-    for (int i = 0; i < MAX_CORONAS; i++)
+    for (auto i = 0; i < MAX_CORONAS; i++)
     {
         delete Coronas[i];
     }
@@ -59,7 +59,7 @@ CRegisteredCorona* CCoronasSA::CreateCorona(DWORD Identifier, CVector* position)
 
 CRegisteredCorona* CCoronasSA::FindFreeCorona()
 {
-    for (int i = 2; i < MAX_CORONAS; i++)
+    for (auto i = 2; i < MAX_CORONAS; i++)
     {
         if (Coronas[i]->GetIdentifier() == 0)
         {
@@ -71,7 +71,7 @@ CRegisteredCorona* CCoronasSA::FindFreeCorona()
 
 CRegisteredCorona* CCoronasSA::FindCorona(DWORD Identifier)
 {
-    for (int i = 0; i < MAX_CORONAS; i++)
+    for (auto i = 0; i < MAX_CORONAS; i++)
     {
         if (Coronas[i]->GetIdentifier() == Identifier)
         {
@@ -111,7 +111,7 @@ void CCoronasSA::DisableSunAndMoon(bool bDisabled)
      1 - enabled
      2 - force enabled (render even if there is no rain)
 */
-void CCoronasSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
+void CCoronasSA::SetCoronaReflectionsEnabled(std::uint8_t ucEnabled)
 {
     m_ucCoronaReflectionsEnabled = ucEnabled;
 
@@ -145,7 +145,7 @@ void CCoronasSA::SetCoronaReflectionsEnabled(unsigned char ucEnabled)
     }
 }
 
-unsigned char CCoronasSA::GetCoronaReflectionsEnabled()
+std::uint8_t CCoronasSA::GetCoronaReflectionsEnabled()
 {
     return m_ucCoronaReflectionsEnabled;
 }

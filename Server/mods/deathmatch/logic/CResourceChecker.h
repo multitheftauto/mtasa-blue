@@ -68,7 +68,7 @@ protected:
     long FindLuaIdentifier(const char* szLuaSource, long* plOutLength, long* plLineNumber);
     bool UpgradeLuaFunctionName(const std::string& strFunctionName, bool bClientScript, std::string& strOutUpgraded);
     void IssueLuaFunctionNameWarnings(const std::string& strFunctionName, const std::string& strFileName, const std::string& strResourceName,
-                                      bool bClientScript, unsigned long ulLineNumber);
+                                      bool bClientScript, std::uint32_t ulLineNumber);
     ECheckerWhatType GetLuaFunctionNameUpgradeInfo(const std::string& strFunctionName, bool bClientScript, std::string& strOutHow, CMtaVersion& strOutVersion);
     int              ReplaceFilesInZIP(const std::string& strOrigZip, const std::string& strTempZip, const std::vector<std::string>& pathInArchiveList,
                                        const std::vector<std::string>& upgradedFullPathList);
@@ -76,7 +76,7 @@ protected:
     void             CheckVersionRequirements(const std::string& strIdentifierName, bool bClientScript);
 
     bool                     m_bUpgradeScripts;
-    unsigned long            m_ulDeprecatedWarningCount;
+    std::uint32_t            m_ulDeprecatedWarningCount;
     std::vector<std::string> m_upgradedFullPathList;
     CMtaVersion              m_strMinClientFromMetaXml;
     CMtaVersion              m_strMinServerFromMetaXml;

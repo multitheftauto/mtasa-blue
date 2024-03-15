@@ -88,10 +88,10 @@ CPlayer* CPlayerManager::Create(const NetServerPlayerID& PlayerSocket)
     return new CPlayer(this, m_pScriptDebugging, PlayerSocket);
 }
 
-unsigned int CPlayerManager::CountJoined()
+std::uint32_t CPlayerManager::CountJoined()
 {
     // Count each ingame player
-    unsigned int                   uiCount = 0;
+    std::uint32_t                   uiCount = 0;
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)
     {
@@ -217,7 +217,7 @@ static void DoBroadcast(const CPacket& Packet, const std::multimap<ushort, CPlay
 
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
-    unsigned long              ulFlags = Packet.GetFlags();
+    std::uint32_t              ulFlags = Packet.GetFlags();
     if (ulFlags & PACKET_RELIABLE)
     {
         if (ulFlags & PACKET_SEQUENCED)
@@ -329,7 +329,7 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort
     DoBroadcast(Packet, groupMap);
 }
 
-bool CPlayerManager::IsValidPlayerModel(unsigned short model)
+bool CPlayerManager::IsValidPlayerModel(std::uint16_t model)
 {
     if (model > 312)
         return false;            // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped

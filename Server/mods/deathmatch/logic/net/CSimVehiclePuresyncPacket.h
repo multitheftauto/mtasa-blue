@@ -18,7 +18,7 @@ struct STrailerInfo
     CVector   m_TrailerRotationDeg;
 };
 
-enum class eVehicleAimDirection : unsigned char;
+enum class eVehicleAimDirection : std::uint8_t;
 
 class CSimVehiclePuresyncPacket : public CSimPacket
 {
@@ -29,7 +29,7 @@ public:
                               CControllerState& sharedControllerState, uint m_uiDamageInfoSendPhase, const SSimVehicleDamageInfo& damageInfo);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
@@ -38,7 +38,7 @@ private:
     void ReadVehicleSpecific(NetBitStreamInterface& BitStream);
     void WriteVehicleSpecific(NetBitStreamInterface& BitStream) const;
 
-    bool CanUpdateSync(unsigned char ucRemote)
+    bool CanUpdateSync(std::uint8_t ucRemote)
     {
         // We can update this element's sync only if the sync time
         // matches or either of them are 0 (ignore).

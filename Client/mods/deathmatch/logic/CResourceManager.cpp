@@ -29,7 +29,7 @@ CResourceManager::~CResourceManager()
     }
 }
 
-CResource* CResourceManager::Add(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
+CResource* CResourceManager::Add(std::uint16_t usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
                                  const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
 {
     CResource* pResource = new CResource(usNetID, szResourceName, pResourceEntity, pResourceDynamicEntity, strMinServerReq, strMinClientReq, bEnableOOP);
@@ -43,7 +43,7 @@ CResource* CResourceManager::Add(unsigned short usNetID, const char* szResourceN
     return NULL;
 }
 
-CResource* CResourceManager::GetResourceFromNetID(unsigned short usNetID)
+CResource* CResourceManager::GetResourceFromNetID(std::uint16_t usNetID)
 {
     CResource* pResource = MapFindRef(m_NetIdResourceMap, usNetID);
     if (pResource)
@@ -113,7 +113,7 @@ void CResourceManager::OnDownloadGroupFinished()
     }
 }
 
-bool CResourceManager::RemoveResource(unsigned short usNetID)
+bool CResourceManager::RemoveResource(std::uint16_t usNetID)
 {
     CResource* pResource = GetResourceFromNetID(usNetID);
     if (pResource)
@@ -169,7 +169,7 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
 
     if (strInput[0] == ':')
     {
-        unsigned int iEnd = strInput.find_first_of("/");
+        std::uint32_t iEnd = strInput.find_first_of("/");
         if (iEnd)
         {
             std::string strResourceName = strInput.substr(1, iEnd - 1);

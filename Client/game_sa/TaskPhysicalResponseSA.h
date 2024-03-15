@@ -22,9 +22,9 @@ class CTaskSimpleChokingSAInterface : public CTaskSimpleSAInterface
 public:
     class CPedSAInterface* m_pAttacker;
     DWORD*                 m_pAnim;
-    unsigned int           m_nTimeRemaining;
-    unsigned int           m_nTimeStarted;
-    unsigned char          m_bIsTeargas;
+    std::uint32_t           m_nTimeRemaining;
+    std::uint32_t           m_nTimeStarted;
+    std::uint8_t          m_bIsTeargas;
     bool                   m_bIsFinished;
 };
 
@@ -35,8 +35,8 @@ public:
     CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas);
 
     CPed*        GetAttacker();
-    unsigned int GetTimeRemaining();
-    unsigned int GetTimeStarted();
+    std::uint32_t GetTimeRemaining();
+    std::uint32_t GetTimeStarted();
     bool         IsTeargas();
     bool         IsFinished();
 

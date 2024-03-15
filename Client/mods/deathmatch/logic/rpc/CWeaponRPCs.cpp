@@ -34,8 +34,8 @@ void CWeaponRPCs::GiveWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
         if (bitStream.Read(&ammo))
         {
             bool           bSetAsCurrent = bitStream.ReadBit();
-            unsigned char  ucWeaponID = weaponType.data.ucWeaponType;
-            unsigned short usAmmo = ammo.data.usTotalAmmo;
+            std::uint8_t  ucWeaponID = weaponType.data.ucWeaponType;
+            std::uint16_t usAmmo = ammo.data.usTotalAmmo;
 
             CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
             if (pPed)
@@ -122,7 +122,7 @@ void CWeaponRPCs::TakeWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
 
     if (bitStream.Read(&weaponType))
     {
-        unsigned char ucWeaponID = weaponType.data.ucWeaponType;
+        std::uint8_t ucWeaponID = weaponType.data.ucWeaponType;
 
         CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
         if (pPed)
@@ -134,7 +134,7 @@ void CWeaponRPCs::TakeWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
                 SWeaponAmmoSync ammo(ucWeaponID, true, false);
                 if (bitStream.Read(&ammo))
                 {
-                    unsigned short usAmmo = ammo.data.usTotalAmmo;
+                    std::uint16_t usAmmo = ammo.data.usTotalAmmo;
 
                     // Do we have the weapon?
                     CWeapon* pPlayerWeapon = pPed->GetWeapon((eWeaponType)ucWeaponID);
@@ -154,10 +154,10 @@ void CWeaponRPCs::TakeWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
                     if (pPlayerWeapon == NULL)
                         return;
 
-                    unsigned char ucAmmoInClip = static_cast<unsigned char>(pPlayerWeapon->GetAmmoInClip());
+                    std::uint8_t ucAmmoInClip = static_cast<std::uint8_t>(pPlayerWeapon->GetAmmoInClip());
                     pPlayerWeapon->SetAmmoInClip(0);
 
-                    unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal();
+                    std::uint32_t ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal();
                     if (usAmmo > ulWeaponAmmo)
                         ulWeaponAmmo = 0;
                     else
@@ -214,13 +214,13 @@ void CWeaponRPCs::SetWeaponAmmo(CClientEntity* pSource, NetBitStreamInterface& b
     SWeaponTypeSync weaponType;
     if (bitStream.Read(&weaponType))
     {
-        unsigned char   ucWeaponID = weaponType.data.ucWeaponType;
+        std::uint8_t   ucWeaponID = weaponType.data.ucWeaponType;
         SWeaponAmmoSync ammo(ucWeaponID, true, true);
 
         if (bitStream.Read(&ammo))
         {
-            unsigned short usAmmo = ammo.data.usTotalAmmo;
-            unsigned short usAmmoInClip = ammo.data.usAmmoInClip;
+            std::uint16_t usAmmo = ammo.data.usTotalAmmo;
+            std::uint16_t usAmmoInClip = ammo.data.usAmmoInClip;
 
             CClientPed* pPed = m_pPedManager->Get(pSource->GetID(), true);
             if (pPed)
@@ -244,7 +244,7 @@ void CWeaponRPCs::SetWeaponAmmo(CClientEntity* pSource, NetBitStreamInterface& b
                 if (pPlayerWeapon == NULL)
                     return;
 
-                unsigned char ucAmmoInClip = static_cast<unsigned char>(pPlayerWeapon->GetAmmoInClip());
+                std::uint8_t ucAmmoInClip = static_cast<std::uint8_t>(pPlayerWeapon->GetAmmoInClip());
                 pPlayerWeapon->SetAmmoInClip(usAmmoInClip);
                 pPlayerWeapon->SetAmmoTotal(usAmmo);
 

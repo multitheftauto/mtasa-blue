@@ -31,7 +31,7 @@ CBlendedWeather::CBlendedWeather()
 void CBlendedWeather::DoPulse()
 {
     // Grab the current time
-    unsigned char ucHour, ucMinute;
+    std::uint8_t ucHour, ucMinute;
     m_pClock->Get(&ucHour, &ucMinute);
 
     // Eventually get new weather values for blending
@@ -54,10 +54,10 @@ void CBlendedWeather::DoPulse()
     }
 
     // Force the weather
-    m_pWeather->Set(static_cast<unsigned char>(m_ucPrimaryWeather), static_cast<unsigned char>(m_ucSecondaryWeather));
+    m_pWeather->Set(static_cast<std::uint8_t>(m_ucPrimaryWeather), static_cast<std::uint8_t>(m_ucSecondaryWeather));
 }
 
-void CBlendedWeather::SetWeather(unsigned char ucWeather)
+void CBlendedWeather::SetWeather(std::uint8_t ucWeather)
 {
     // Set the primary and secondary weather instantly and stop any blending we might've been doing
     m_ucPrimaryWeather = ucWeather;
@@ -66,7 +66,7 @@ void CBlendedWeather::SetWeather(unsigned char ucWeather)
     m_ucBlendStopHour = 0xFF;
 }
 
-void CBlendedWeather::SetWeatherBlended(unsigned char ucWeather, unsigned char ucHour)
+void CBlendedWeather::SetWeatherBlended(std::uint8_t ucWeather, std::uint8_t ucHour)
 {
     // Store the weather we blend to for the timing
     m_ucPrimaryBlendedWeather = m_ucSecondaryWeather;
@@ -81,7 +81,7 @@ void CBlendedWeather::SetWeatherBlended(unsigned char ucWeather, unsigned char u
     }
 }
 
-unsigned char CBlendedWeather::GetWeather()
+std::uint8_t CBlendedWeather::GetWeather()
 {
     // If we're blending the weather, return the weather we started blending from
     if (m_ucBlendStopHour != 0xFF)

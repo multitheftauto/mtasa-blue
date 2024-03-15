@@ -40,7 +40,7 @@ public:
     bool IsRestricted() { return m_bRestricted; };
 
 private:
-    char ReadChar(FILE* pFile) { return (unsigned char)fgetc(pFile); }
+    char ReadChar(FILE* pFile) { return (std::uint8_t)fgetc(pFile); }
     void GetMimeType(const char* szFilename);
 
     bool        m_bIsBeingRequested;            // crude mutex

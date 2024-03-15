@@ -297,7 +297,7 @@ CPlayerClothes::CPlayerClothes()
     memset(&m_Clothes[0], 0, sizeof(m_Clothes));
 }
 
-const SPlayerClothing* CPlayerClothes::GetClothing(unsigned char ucType)
+const SPlayerClothing* CPlayerClothes::GetClothing(std::uint8_t ucType)
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
@@ -307,7 +307,7 @@ const SPlayerClothing* CPlayerClothes::GetClothing(unsigned char ucType)
     return NULL;
 }
 
-void CPlayerClothes::AddClothes(const char* szTexture, const char* szModel, unsigned char ucType)
+void CPlayerClothes::AddClothes(const char* szTexture, const char* szModel, std::uint8_t ucType)
 {
     if (ucType >= PLAYER_CLOTHING_SLOTS)
         return;
@@ -320,7 +320,7 @@ void CPlayerClothes::AddClothes(const char* szTexture, const char* szModel, unsi
     }
 }
 
-bool CPlayerClothes::RemoveClothes(unsigned char ucType)
+bool CPlayerClothes::RemoveClothes(std::uint8_t ucType)
 {
     if (ucType >= PLAYER_CLOTHING_SLOTS)
         return false;
@@ -345,7 +345,7 @@ bool CPlayerClothes::RemoveClothes(unsigned char ucType)
 
 void CPlayerClothes::RemoveAll()
 {
-    for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
+    for (std::uint8_t ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
     {
         RemoveClothes(ucType);
     }
@@ -361,12 +361,12 @@ void CPlayerClothes::DefaultClothes()
     AddClothes("PLAYER_FACE", "HEAD", 1);
 }
 
-bool CPlayerClothes::HasEmptyClothing(unsigned char ucType)
+bool CPlayerClothes::HasEmptyClothing(std::uint8_t ucType)
 {
     return (ucType == 0 || ucType == 1 || ucType == 2 || ucType == 3);
 }
 
-bool CPlayerClothes::IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType)
+bool CPlayerClothes::IsEmptyClothing(const SPlayerClothing* pClothing, std::uint8_t ucType)
 {
     if (pClothing)
     {
@@ -382,7 +382,7 @@ bool CPlayerClothes::IsEmptyClothing(const SPlayerClothing* pClothing, unsigned 
     return false;
 }
 
-const char* CPlayerClothes::GetClothingName(unsigned char ucType)
+const char* CPlayerClothes::GetClothingName(std::uint8_t ucType)
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
@@ -391,7 +391,7 @@ const char* CPlayerClothes::GetClothingName(unsigned char ucType)
     return NULL;
 }
 
-const SPlayerClothing* CPlayerClothes::GetClothingGroup(unsigned char ucType)
+const SPlayerClothing* CPlayerClothes::GetClothingGroup(std::uint8_t ucType)
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
@@ -439,13 +439,13 @@ const SPlayerClothing* CPlayerClothes::GetClothingGroup(unsigned char ucType)
     return NULL;
 }
 
-const SPlayerClothing* CPlayerClothes::GetClothing(const char* szTexture, const char* szModel, unsigned char ucType)
+const SPlayerClothing* CPlayerClothes::GetClothing(const char* szTexture, const char* szModel, std::uint8_t ucType)
 {
     if (szTexture && szModel && ucType < PLAYER_CLOTHING_SLOTS)
     {
         const SPlayerClothing* pGroup = GetClothingGroup(ucType);
         int                    iMax = GetClothingGroupMax(ucType);
-        for (int i = 0; i < iMax; i++)
+        for (auto i = 0; i < iMax; i++)
         {
             const SPlayerClothing* pClothing = &pGroup[i];
             if (!stricmp(szTexture, pClothing->szTexture) && !stricmp(szModel, pClothing->szModel))
@@ -457,7 +457,7 @@ const SPlayerClothing* CPlayerClothes::GetClothing(const char* szTexture, const 
     return NULL;
 }
 
-const int CPlayerClothes::GetClothingGroupMax(unsigned char ucType)
+const int CPlayerClothes::GetClothingGroupMax(std::uint8_t ucType)
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
@@ -505,14 +505,14 @@ const int CPlayerClothes::GetClothingGroupMax(unsigned char ucType)
     return 0;
 }
 
-bool CPlayerClothes::IsValidClothing(const char* szTexture, const char* szModel, unsigned char ucType)
+bool CPlayerClothes::IsValidClothing(const char* szTexture, const char* szModel, std::uint8_t ucType)
 {
     if (ucType < PLAYER_CLOTHING_SLOTS)
     {
         const SPlayerClothing* pPlayerClothing = GetClothingGroup(ucType);
         if (pPlayerClothing)
         {
-            for (int i = 0; pPlayerClothing[i].szTexture != NULL; i++)
+            for (auto i = 0; pPlayerClothing[i].szTexture != NULL; i++)
             {
                 if (!stricmp(pPlayerClothing[i].szTexture, szTexture) && !stricmp(pPlayerClothing[i].szModel, szModel))
                 {

@@ -12,20 +12,20 @@
 #include "StdInc.h"
 #include "CWeatherSA.h"
 
-unsigned char CWeatherSA::Get()
+std::uint8_t CWeatherSA::Get()
 {
-    return *(unsigned char*)0xC81318; // CWeather::ForcedWeatherType
+    return *(std::uint8_t*)0xC81318; // CWeather::ForcedWeatherType
 }
 
-void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
+void CWeatherSA::Set(std::uint8_t primary, std::uint8_t secondary)
 {
-    MemPutFast<unsigned char>(0xC81320, primary); // CWeather::OldWeatherType
-    MemPutFast<unsigned char>(0xC8131C, secondary); // CWeather::NewWeatherType
+    MemPutFast<std::uint8_t>(0xC81320, primary); // CWeather::OldWeatherType
+    MemPutFast<std::uint8_t>(0xC8131C, secondary); // CWeather::NewWeatherType
 }
 
 void CWeatherSA::Release()
 {
-    MemPutFast<unsigned char>(0xC81318, 0xFF); // CWeather::ForcedWeatherType
+    MemPutFast<std::uint8_t>(0xC81318, 0xFF); // CWeather::ForcedWeatherType
 }
 
 float CWeatherSA::GetAmountOfRain()

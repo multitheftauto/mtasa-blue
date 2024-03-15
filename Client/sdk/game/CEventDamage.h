@@ -18,8 +18,8 @@ class CPedDamageResponse;
 enum ePedPieceTypes;
 enum eWeaponType;
 
-typedef unsigned long AnimationId;
-typedef unsigned long AssocGroupId;
+typedef std::uint32_t AnimationId;
+typedef std::uint32_t AssocGroupId;
 
 namespace EDamageReason
 {

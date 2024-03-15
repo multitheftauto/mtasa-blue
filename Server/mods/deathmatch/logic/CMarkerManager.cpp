@@ -84,7 +84,7 @@ int CMarkerManager::StringToType(const char* szString)
     }
 }
 
-bool CMarkerManager::TypeToString(unsigned int uiType, char* szString)
+bool CMarkerManager::TypeToString(std::uint32_t uiType, char* szString)
 {
     switch (uiType)
     {
@@ -119,7 +119,7 @@ void CMarkerManager::RemoveFromList(CMarker* pMarker)
     m_Markers.remove(pMarker);
 }
 
-unsigned char CMarkerManager::StringToIcon(const char* szString)
+std::uint8_t CMarkerManager::StringToIcon(const char* szString)
 {
     if (strcmp(szString, "none") == 0)
     {
@@ -139,7 +139,7 @@ unsigned char CMarkerManager::StringToIcon(const char* szString)
     }
 }
 
-bool CMarkerManager::IconToString(unsigned char ucIcon, char* szString)
+bool CMarkerManager::IconToString(std::uint8_t ucIcon, char* szString)
 {
     switch (ucIcon)
     {

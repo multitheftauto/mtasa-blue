@@ -57,7 +57,7 @@ private:
     bool LoadPatcherData(std::error_code& ec);
 
 private:
-    std::vector<unsigned char> m_data;
+    std::vector<std::uint8_t> m_data;
     std::filesystem::path      m_patchBasePath;
     std::filesystem::path      m_patchDiffPath;
 };

@@ -93,7 +93,7 @@ void CAudioEngineSA::StopRadio()
     }
 }
 
-void CAudioEngineSA::StartRadio(unsigned int station)
+void CAudioEngineSA::StartRadio(std::uint32_t station)
 {
     m_ucRadioChannel = station;
     m_bRadioOn = true;
@@ -247,7 +247,7 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
 
 void CAudioEngineSA::ClearMissionAudio(int slot)
 {
-    DWORD dwFunc = 0x5072F0;            // CAudioEngine::ClearMissionAudio(unsigned char)
+    DWORD dwFunc = 0x5072F0;            // CAudioEngine::ClearMissionAudio(std::uint8_t)
     _asm
     {
         mov     ecx, CLASS_CAudioEngine
@@ -270,7 +270,7 @@ bool CAudioEngineSA::IsMissionAudioSampleFinished(int slot)
     return cret;
 }
 
-void CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
+void CAudioEngineSA::PreloadMissionAudio(std::uint16_t usAudioEvent, int slot)
 {
     DWORD dwFunc = 0x507290;            // CAudioEngine__PreloadMissionAudio
     DWORD AudioEvent = usAudioEvent;
@@ -283,10 +283,10 @@ void CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
     }
 }
 
-unsigned char CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
+std::uint8_t CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
 {
     DWORD         dwFunc = 0x5072A0;            // get load status
-    unsigned char cret = 0;
+    std::uint8_t cret = 0;
     _asm
     {
         mov     ecx, CLASS_CAudioEngine
@@ -333,7 +333,7 @@ bool CAudioEngineSA::PlayLoadedMissionAudio(int slot)
 {
     if (GetMissionAudioLoadingStatus(slot) == 1)
     {
-        DWORD dwFunc = 0x5072B0;            // CAudioEngine::PlayLoadedMissionAudio(unsigned char)
+        DWORD dwFunc = 0x5072B0;            // CAudioEngine::PlayLoadedMissionAudio(std::uint8_t)
         _asm
         {
             mov     ecx, CLASS_CAudioEngine
@@ -536,7 +536,7 @@ skip:   // Skip playing sound
     }
 }
 
-void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2)
+void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, std::uint8_t ucSurfaceType, CVector* pvecPosition, float f_2)
 {
     DWORD dwEntityInterface = 0;
     if (pEntity)

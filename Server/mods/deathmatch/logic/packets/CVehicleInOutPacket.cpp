@@ -25,7 +25,7 @@ CVehicleInOutPacket::CVehicleInOutPacket()
     m_ucDoor = 0;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, std::uint8_t ucSeat, std::uint8_t ucAction)
 {
     m_PedID = PedID;
     m_VehicleID = VehicleID;
@@ -37,7 +37,7 @@ CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, u
     m_ucDoor = 0;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction, unsigned char ucDoor)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, std::uint8_t ucSeat, std::uint8_t ucAction, std::uint8_t ucDoor)
 {
     m_PedID = PedID;
     m_VehicleID = VehicleID;
@@ -49,7 +49,7 @@ CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, u
     m_ucDoor = ucDoor;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction, ElementID PedIn, ElementID PedOut)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, std::uint8_t ucSeat, std::uint8_t ucAction, ElementID PedIn, ElementID PedOut)
 {
     m_PedID = PedID;
     m_VehicleID = VehicleID;

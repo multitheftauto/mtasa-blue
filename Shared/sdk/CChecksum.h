@@ -66,7 +66,7 @@ public:
         return std::get<CChecksum>(result);
     }
 
-    static CChecksum GenerateChecksumFromBuffer(const char* cpBuffer, unsigned long ulLength)
+    static CChecksum GenerateChecksumFromBuffer(const char* cpBuffer, std::uint32_t ulLength)
     {
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromBuffer(cpBuffer, ulLength);
@@ -74,7 +74,7 @@ public:
         return result;
     }
 
-    unsigned long ulCRC;
+    std::uint32_t ulCRC;
     MD5           md5;
 };
 

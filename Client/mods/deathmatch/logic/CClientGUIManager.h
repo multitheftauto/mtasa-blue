@@ -31,7 +31,7 @@ public:
 
     bool         Exists(CClientGUIElement* pGUIElement);
     bool         Exists(CGUIElement* pCGUIElement);
-    unsigned int Count() { return static_cast<unsigned int>(m_Elements.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_Elements.size()); };
 
     CClientGUIElement* Get(CGUIElement* pCGUIElement);
 

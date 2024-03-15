@@ -15,7 +15,7 @@
 
 bool CPickupHitConfirmPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    // unsigned short   (2)     - pickup id
+    // std::uint16_t   (2)     - pickup id
     // bool                     - hide it?
 
     // Got a pickup to send?

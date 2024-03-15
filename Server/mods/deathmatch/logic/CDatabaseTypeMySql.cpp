@@ -199,7 +199,7 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql(CDatabas
         SString strServerPath = g_pServerInterface->GetModManager()->GetServerPath();
         m_DbconmyLib.Load(PathJoin(strServerPath, SERVER_BIN_PATH_MOD, LIB_DBCONMY));
         m_pfnNewDatabaseConnection =
-            reinterpret_cast<NewDatabaseConnectionMySql_t*>((long long)(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql")));
+            reinterpret_cast<NewDatabaseConnectionMySql_t*>((std::int64_t)(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql")));
     }
 
     if (!m_pfnNewDatabaseConnection)
@@ -283,9 +283,9 @@ SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs)
     SString strParsedQuery;
 
     // Walk through the query and replace the variable placeholders with the actual variables
-    unsigned int uiLen = strQuery.length();
-    unsigned int a = 0;
-    for (unsigned int i = 0; i < uiLen; i++)
+    std::uint32_t uiLen = strQuery.length();
+    std::uint32_t a = 0;
+    for (std::uint32_t i = 0; i < uiLen; i++)
     {
         if (strQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {
@@ -312,7 +312,7 @@ SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs)
             {
                 double dNumber = pArgument->GetNumber();
                 if (dNumber == floor(dNumber))
-                    strParsedQuery += SString("%lld", (long long)dNumber);
+                    strParsedQuery += SString("%lld", (std::int64_t)dNumber);
                 else
                     strParsedQuery += SString("%f", dNumber);
             }
@@ -351,7 +351,7 @@ SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs)
 SString InsertQueryArgumentsMySql(const char* szQuery, va_list vl)
 {
     SString strParsedQuery;
-    for (unsigned int i = 0; szQuery[i] != '\0'; i++)
+    for (std::uint32_t i = 0; szQuery[i] != '\0'; i++)
     {
         if (szQuery[i] != SQL_VARIABLE_PLACEHOLDER)
         {
@@ -375,7 +375,7 @@ SString InsertQueryArgumentsMySql(const char* szQuery, va_list vl)
 
                 case SQLITE_INTEGER64:
                 {
-                    long long int llValue = va_arg(vl, long long int);
+                    std::int64_t int llValue = va_arg(vl, std::int64_t int);
                     strParsedQuery += SString("%lld", llValue);
                 }
                 break;

@@ -2053,7 +2053,7 @@ int CLuaGUIDefs::GUIGetProperties(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Add all our properties to the table on top of the given lua main's stack
-        unsigned int     uiIndex = 0;
+        std::uint32_t     uiIndex = 0;
         CGUIPropertyIter iter = guiElement->GetCGUIElement()->GetPropertiesBegin();
         CGUIPropertyIter iterEnd = guiElement->GetCGUIElement()->GetPropertiesEnd();
         for (; iter != iterEnd; iter++)
@@ -2598,7 +2598,7 @@ int CLuaGUIDefs::GUIGridListGetSelectedItems(lua_State* luaVM)
 
         lua_newtable(luaVM);
 
-        for (int i = 1; i <= pList->GetSelectedCount(); i++)
+        for (auto i = 1; i <= pList->GetSelectedCount(); i++)
         {
             pItem = pList->GetNextSelectedItem(pItem);
             if (!pItem)
@@ -2774,7 +2774,7 @@ int CLuaGUIDefs::GUIGridListGetItemColor(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucRed = 255, ucGreen = 255, ucBlue = 255, ucAlpha = 255;
+        std::uint8_t ucRed = 255, ucGreen = 255, ucBlue = 255, ucAlpha = 255;
         if (static_cast<CGUIGridList*>(guiGridlist->GetCGUIElement())->GetItemColor(rowIndex, columnIndex, ucRed, ucGreen, ucBlue, ucAlpha))
         {
             lua_pushnumber(luaVM, ucRed);
@@ -3564,7 +3564,7 @@ int CLuaGUIDefs::GUILabelGetColor(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucRed = 255, ucGreen = 255, ucBlue = 255;
+        std::uint8_t ucRed = 255, ucGreen = 255, ucBlue = 255;
         static_cast<CGUILabel*>(theElement->GetCGUIElement())->GetTextColor(ucRed, ucGreen, ucBlue);
         lua_pushnumber(luaVM, ucRed);
         lua_pushnumber(luaVM, ucGreen);
@@ -3673,7 +3673,7 @@ int CLuaGUIDefs::GUIGetChatboxLayout(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Loop through all CVars
-        for (unsigned int i = 0; i < MAX_CHATBOX_LAYOUT_CVARS; i++)
+        for (std::uint32_t i = 0; i < MAX_CHATBOX_LAYOUT_CVARS; i++)
         {
             // If we are asking for all CVars, or we can match the requested CVar with this CVar
             if (bAll || !stricmp(g_chatboxLayoutCVars[i], strCVarArg))

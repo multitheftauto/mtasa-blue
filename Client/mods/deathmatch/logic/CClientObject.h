@@ -30,7 +30,7 @@ class CClientObject : public CClientStreamElement
     friend class CClientPed;
 
 public:
-    CClientObject(class CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod);
+    CClientObject(class CClientManager* pManager, ElementID ID, std::uint16_t usModel, bool bLowLod);
     ~CClientObject();
 
     void Unlink();
@@ -68,8 +68,8 @@ public:
     bool IsVisible() { return m_bIsVisible; };
     void SetVisible(bool bVisible);
 
-    unsigned short GetModel() const { return m_usModel; };
-    void           SetModel(unsigned short usModel);
+    std::uint16_t GetModel() const { return m_usModel; };
+    void           SetModel(std::uint16_t usModel);
 
     bool           IsLowLod();
     bool           SetLowLodObject(CClientObject* pLowLodObject);
@@ -80,8 +80,8 @@ public:
     bool IsFrozen() { return m_bIsFrozen; }
     void SetFrozen(bool bFrozen);
 
-    unsigned char GetAlpha() { return m_ucAlpha; }
-    void          SetAlpha(unsigned char ucAlpha);
+    std::uint8_t GetAlpha() { return m_ucAlpha; }
+    void          SetAlpha(std::uint8_t ucAlpha);
     void          GetScale(CVector& vecScale) const;
     void          SetScale(const CVector& vecScale);
 
@@ -111,7 +111,7 @@ public:
     void  SetMass(float fMass);
 
     bool IsVisibleInAllDimensions() { return m_bVisibleInAllDimensions; };
-    void SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension = 0);
+    void SetVisibleInAllDimensions(bool bVisible, std::uint16_t usNewDimension = 0);
 
     void ReCreate();
     void UpdateVisibility();
@@ -134,14 +134,14 @@ protected:
     class CClientObjectManager*       m_pObjectManager;
     class CClientModelRequestManager* m_pModelRequester;
 
-    unsigned short m_usModel;
+    std::uint16_t m_usModel;
 
     CVector       m_vecPosition;
     CVector       m_vecRotation;
     bool          m_bIsVisible;
     bool          m_bIsFrozen;
     bool          m_bUsesCollision;
-    unsigned char m_ucAlpha;
+    std::uint8_t m_ucAlpha;
     CVector       m_vecScale;
     float         m_fHealth;
     bool          m_bBreakingDisabled;

@@ -20,7 +20,7 @@ public:
     CPickupHideShowPacket(bool bShow) { m_bShow = bShow; };
 
     ePacketID     GetPacketID() const { return PACKET_ID_PICKUP_HIDESHOW; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
@@ -29,7 +29,7 @@ public:
 
     void         Add(class CPickup* pPickup) { m_List.push_back(pPickup); };
     void         Clear() { m_List.clear(); };
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); };
 
 private:
     bool                        m_bShow;

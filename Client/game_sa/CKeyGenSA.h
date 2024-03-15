@@ -21,8 +21,8 @@
 class CKeyGenSA : public CKeyGen
 {
 public:
-    unsigned int GetKey(const char* szString, int iLength);
-    unsigned int GetKey(const char* szString);
-    unsigned int GetUppercaseKey(const char* szString);
-    unsigned int AppendStringToKey(unsigned int uiKey, const char* szString);
+    std::uint32_t GetKey(const char* szString, int iLength);
+    std::uint32_t GetKey(const char* szString);
+    std::uint32_t GetUppercaseKey(const char* szString);
+    std::uint32_t AppendStringToKey(std::uint32_t uiKey, const char* szString);
 };

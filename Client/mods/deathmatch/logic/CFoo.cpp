@@ -32,7 +32,7 @@ void CFoo::DoPulse()
         CClientVehicle* pVehicle = pLocal->GetOccupiedVehicle ();
         if ( pVehicle )
         {
-            unsigned char ucGear = pVehicle->GetGameVehicle ()->GetCurrentGear ();
+            std::uint8_t ucGear = pVehicle->GetGameVehicle ()->GetCurrentGear ();
             g_pCore->GetGraphics ()->DrawString ( 200, 200, 0xFFFFFFFF, 1.0f, "Gear = %u", ucGear );
         }
         */
@@ -51,7 +51,7 @@ void CFoo::DoPulse()
                 pPed->SetPosition(vecLocal);
             }
 
-            static unsigned long ulTestTime = 0;
+            static std::uint32_t ulTestTime = 0;
             if (ulTestTime == 0)
             {
                 ulTestTime = CClientTime::GetTime() + 50;
@@ -61,7 +61,7 @@ void CFoo::DoPulse()
             {
                 ulTestTime = CClientTime::GetTime() + 50;
 
-                static unsigned int uiIndex = 0;
+                static std::uint32_t uiIndex = 0;
                 ++uiIndex;
 
                 pPed->SetModel(uiIndex);
@@ -82,8 +82,8 @@ class CAnimGroup
 public:
     char          szGroupName[16];
     char          szSomething[16];
-    unsigned long ulUnknown;              // 0x07 or 0xFFFFFFFF on the first ones
-    unsigned long ulAnimCount;            // ??
+    std::uint32_t ulUnknown;              // 0x07 or 0xFFFFFFFF on the first ones
+    std::uint32_t ulAnimCount;            // ??
     const char**  pAnimNames;
     void*         pSomeArray;
 };
@@ -104,7 +104,7 @@ void CFoo::Test(const char* szString)
     {
         vecLocal = CVector(0.0f, 0.0f, 5.0f);
 
-        for (int i = 0; i < 20; i++)
+        for (auto i = 0; i < 20; i++)
         {
             vecLocal.fX += 5.0f;
             CClientPlayer* pPlayer = new CClientPlayer(pManager, i + 50);
@@ -265,7 +265,7 @@ void CFoo::Test(const char* szString)
         if ( poo )
         {
             tHandlingData* pHandling = (tHandlingData*) 0xC2B9E0;
-            unsigned int uiIndex = 0;
+            std::uint32_t uiIndex = 0;
             for ( ; uiIndex < 219; uiIndex++ )
             {
                 fprintf ( poo, "\n\n\n\n####### VEHICLE ID %u #######\n", uiIndex );
@@ -423,7 +423,7 @@ void CFoo::Test(const char* szString)
     {
         FILE* pFile = fopen("C:/dump.txt", "w+");
 
-        for (int i = 0; i < 400; i++)
+        for (auto i = 0; i < 400; i++)
         {
             int         iIndex = i;
             const char* szName = NULL;
@@ -447,7 +447,7 @@ void CFoo::Test(const char* szString)
         int   i = 600;
         FILE* p = fopen("C:/dump.txt", "w+");
 
-        for (int a = 0; a < 13; a++)
+        for (auto a = 0; a < 13; a++)
         {
             g_pGame->GetModelInfo(i)->ModelAddRef(BLOCKING, "CFoo::Test");
 
@@ -534,12 +534,12 @@ void CFoo::Test(const char* szString)
         DWORD oldProt, oldProt2;
         VirtualProtect((LPVOID)0x5E8FFB, 6, PAGE_EXECUTE_READWRITE, &oldProt);
 
-        *(unsigned char*)(0x5E8FFB) = 0x90;
-        *(unsigned char*)(0x5E8FFC) = 0x90;
-        *(unsigned char*)(0x5E8FFD) = 0x90;
-        *(unsigned char*)(0x5E8FFE) = 0x90;
-        *(unsigned char*)(0x5E8FFF) = 0x90;
-        *(unsigned char*)(0x5E9000) = 0x90;
+        *(std::uint8_t*)(0x5E8FFB) = 0x90;
+        *(std::uint8_t*)(0x5E8FFC) = 0x90;
+        *(std::uint8_t*)(0x5E8FFD) = 0x90;
+        *(std::uint8_t*)(0x5E8FFE) = 0x90;
+        *(std::uint8_t*)(0x5E8FFF) = 0x90;
+        *(std::uint8_t*)(0x5E9000) = 0x90;
 
         VirtualProtect((LPVOID)0x5E8FFB, 6, oldProt, &oldProt2);
     }

@@ -24,7 +24,7 @@ using std::vector;
 #include <Utils.h>
 #endif
 
-// Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
+// Hide the "conversion from 'std::uint32_t' to 'DWORD*' of greater size" warning
 #pragma warning(disable:4312)
 
 extern CClientGame* g_pClientGame;
@@ -113,16 +113,16 @@ void COMMAND_ChatBox(const char* szInCmdLine)
     char*         szRed = strtok(NULL, " ");
     char*         szGreen = strtok(NULL, " ");
     char*         szBlue = strtok(NULL, " ");
-    unsigned char ucRed = 0, ucGreen = 0, ucBlue = 0;
+    std::uint8_t ucRed = 0, ucGreen = 0, ucBlue = 0;
 
     if (!szCommand)
         return;
 
     if (szRed && szGreen && szBlue)
     {
-        ucRed = static_cast<unsigned char>(atoi(szRed));
-        ucGreen = static_cast<unsigned char>(atoi(szGreen));
-        ucBlue = static_cast<unsigned char>(atoi(szBlue));
+        ucRed = static_cast<std::uint8_t>(atoi(szRed));
+        ucGreen = static_cast<std::uint8_t>(atoi(szGreen));
+        ucBlue = static_cast<std::uint8_t>(atoi(szBlue));
     }
 
     // Open the chatbox input with command and color
@@ -425,7 +425,7 @@ void COMMAND_TextScale(const char* szCmdLine)
 
 void DumpPlayer(CClientPlayer* pPlayer, FILE* pFile)
 {
-    unsigned int uiIndex = 0;
+    std::uint32_t uiIndex = 0;
 
     // Player
     fprintf(pFile, "%s\n", "*** START OF PLAYER ***");
@@ -439,7 +439,7 @@ void DumpPlayer(CClientPlayer* pPlayer, FILE* pFile)
 
     fprintf(pFile, "Nametag text: %s\n", pPlayer->GetNametagText());
 
-    unsigned char ucR, ucG, ucB;
+    std::uint8_t ucR, ucG, ucB;
     pPlayer->GetNametagColor(ucR, ucG, ucB);
     fprintf(pFile, "Nametag color: %u %u %u\n", ucR, ucG, ucB);
 
@@ -898,10 +898,10 @@ void COMMAND_Watch(const char* szCmdLine)
     // adds a hook to a process and watches for WPMs to this one
     DWORD        dwProcessIDs[250];
     DWORD        pBytesReturned = 0;
-    unsigned int uiListSize = 50;
+    std::uint32_t uiListSize = 50;
     if (EnumProcesses(dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned))
     {
-        for (unsigned int i = 0; i < pBytesReturned / sizeof(DWORD); i++)
+        for (std::uint32_t i = 0; i < pBytesReturned / sizeof(DWORD); i++)
         {
             // Open the process
             HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);

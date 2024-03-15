@@ -24,7 +24,7 @@ void CMarkerRPCs::LoadFunctions()
 void CMarkerRPCs::SetMarkerType(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the ID and the type
-    unsigned char ucType;
+    std::uint8_t ucType;
     if (bitStream.Read(ucType))
     {
         // Grab the marker
@@ -72,7 +72,7 @@ void CMarkerRPCs::SetMarkerSize(CClientEntity* pSource, NetBitStreamInterface& b
 void CMarkerRPCs::SetMarkerTarget(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the marker id and if there's a new target
-    unsigned char ucTemp;
+    std::uint8_t ucTemp;
     if (bitStream.Read(ucTemp))
     {
         // Grab the marker
@@ -122,7 +122,7 @@ void CMarkerRPCs::SetMarkerTarget(CClientEntity* pSource, NetBitStreamInterface&
 void CMarkerRPCs::SetMarkerIcon(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the marker id and icon
-    unsigned char ucIcon;
+    std::uint8_t ucIcon;
     if (bitStream.Read(ucIcon))
     {
         // Grab the marker
@@ -133,7 +133,7 @@ void CMarkerRPCs::SetMarkerIcon(CClientEntity* pSource, NetBitStreamInterface& b
             CClientCheckpoint* pCheckpoint = pMarker->GetCheckpoint();
             if (pCheckpoint)
             {
-                pCheckpoint->SetIcon(static_cast<unsigned int>(ucIcon));
+                pCheckpoint->SetIcon(static_cast<std::uint32_t>(ucIcon));
             }
         }
     }

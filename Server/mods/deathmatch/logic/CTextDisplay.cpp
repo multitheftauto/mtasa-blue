@@ -66,7 +66,7 @@ void CTextDisplay::GetObservers(lua_State* pLua)
 {
     assert(pLua);
 
-    unsigned int                        uiIndex = 0;
+    std::uint32_t                        uiIndex = 0;
     list<CPlayerTextManager*>::iterator iter = m_observers.begin();
     for (; iter != m_observers.end(); iter++)
     {

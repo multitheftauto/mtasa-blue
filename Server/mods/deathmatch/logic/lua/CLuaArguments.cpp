@@ -37,7 +37,7 @@ CLuaArguments::CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaAr
     CopyRecursive(Arguments, pKnownTables);
 }
 
-CLuaArgument* CLuaArguments::operator[](const unsigned int uiPosition) const
+CLuaArgument* CLuaArguments::operator[](const std::uint32_t uiPosition) const
 {
     if (uiPosition < m_Arguments.size())
         return m_Arguments.at(uiPosition);
@@ -241,7 +241,7 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
 
         if (returnValues != NULL)
         {
-            for (int i = -iReturns; i <= -1; i++)
+            for (auto i = -iReturns; i <= -1; i++)
             {
                 returnValues->ReadArgument(luaVM, i);
             }
@@ -305,7 +305,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
 
         if (returnValues != NULL)
         {
-            for (int i = -iReturns; i <= -1; i++)
+            for (auto i = -iReturns; i <= -1; i++)
             {
                 returnValues->ReadArgument(luaVM, i);
             }
@@ -515,11 +515,11 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
         bKnownTablesCreated = true;
     }
 
-    unsigned int uiNumArgs;
+    std::uint32_t uiNumArgs;
     if (bitStream.ReadCompressed(uiNumArgs))
     {
         pKnownTables->push_back(this);
-        for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
+        for (std::uint32_t ui = 0; ui < uiNumArgs; ++ui)
         {
             CLuaArgument* pArgument = new CLuaArgument();
             if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
@@ -539,18 +539,18 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     return true;
 }
 
-bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const
+bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) const
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        pKnownTables = new CFastHashMap<CLuaArguments*, std::uint32_t>();
         bKnownTablesCreated = true;
     }
 
     bool bSuccess = true;
     pKnownTables->insert(make_pair((CLuaArguments*)this, pKnownTables->size()));
-    bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
+    bitStream.WriteCompressed(static_cast<std::uint32_t>(m_Arguments.size()));
 
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); ++iter)
@@ -600,19 +600,19 @@ json_object* CLuaArguments::WriteToJSONArray(bool bSerialize)
     return my_array;
 }
 
-json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables)
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        pKnownTables = new CFastHashMap<CLuaArguments*, std::uint32_t>();
         bKnownTablesCreated = true;
     }
 
     pKnownTables->insert(std::make_pair(this, pKnownTables->size()));
 
     bool                                  bIsArray = true;
-    unsigned int                          iArrayPos = 1;            // lua arrays are 1 based
+    std::uint32_t                          iArrayPos = 1;            // lua arrays are 1 based
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); iter += 2)
     {
@@ -620,7 +620,7 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
         if (pArgument->GetType() == LUA_TNUMBER)
         {
             double       num = pArgument->GetNumber();
-            unsigned int iNum = static_cast<unsigned int>(num);
+            std::uint32_t iNum = static_cast<std::uint32_t>(num);
             if (num == iNum)
             {
                 if (iArrayPos != iNum)            // check if the value matches its index in the table

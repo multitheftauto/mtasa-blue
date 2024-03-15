@@ -16,27 +16,27 @@
 class CVoiceDataPacket final : public CPacket
 {
 public:
-    CVoiceDataPacket(CPlayer* pPlayer, const unsigned char* pbSrcBuffer, unsigned short usLength);
+    CVoiceDataPacket(CPlayer* pPlayer, const std::uint8_t* pbSrcBuffer, std::uint16_t usLength);
     CVoiceDataPacket();
     ~CVoiceDataPacket();
 
     ePacketID               GetPacketID() const { return PACKET_ID_VOICE_DATA; }
-    unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+    std::uint32_t           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_VOICE; }
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    void SetData(const unsigned char* pbSrcBuffer, unsigned short usLength);
+    void SetData(const std::uint8_t* pbSrcBuffer, std::uint16_t usLength);
 
-    unsigned short       GetDataLength() const;
-    const unsigned char* GetData() const;
+    std::uint16_t       GetDataLength() const;
+    const std::uint8_t* GetData() const;
 
 private:
-    void AllocateBuffer(unsigned short usBufferSize);
+    void AllocateBuffer(std::uint16_t usBufferSize);
     void DeallocateBuffer();
 
-    unsigned char* m_pBuffer;
-    unsigned short m_usDataBufferSize;
-    unsigned short m_usActualDataLength;
+    std::uint8_t* m_pBuffer;
+    std::uint16_t m_usDataBufferSize;
+    std::uint16_t m_usActualDataLength;
 };

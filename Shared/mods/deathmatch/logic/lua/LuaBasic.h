@@ -36,7 +36,7 @@ namespace lua
     // Push should push a value of type T to the Lua Stack
     // This will always increase the stack size by 1
     inline void Push(lua_State* L, int value) { lua_pushnumber(L, value); }
-    inline void Push(lua_State* L, unsigned int value) { lua_pushnumber(L, value); }
+    inline void Push(lua_State* L, std::uint32_t value) { lua_pushnumber(L, value); }
     inline void Push(lua_State* L, float value) { lua_pushnumber(L, value); }
     inline void Push(lua_State* L, double value) { lua_pushnumber(L, value); }
 

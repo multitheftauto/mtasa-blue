@@ -40,7 +40,7 @@ bool CGUITexture_Impl::LoadFromFile(const char* szFilename)
     return true;
 }
 
-void CGUITexture_Impl::LoadFromMemory(const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight)
+void CGUITexture_Impl::LoadFromMemory(const void* pBuffer, std::uint32_t uiWidth, std::uint32_t uiHeight)
 {
     m_pTexture->loadFromMemory(pBuffer, uiWidth, uiHeight);
 }
@@ -67,7 +67,7 @@ LPDIRECT3DTEXTURE9 CGUITexture_Impl::GetD3DTexture()
     return reinterpret_cast<CEGUI::DirectX9Texture*>(m_pTexture)->getD3DTexture();
 }
 
-void CGUITexture_Impl::CreateTexture(unsigned int width, unsigned int height)
+void CGUITexture_Impl::CreateTexture(std::uint32_t width, std::uint32_t height)
 {
     return reinterpret_cast<CEGUI::DirectX9Texture*>(m_pTexture)->createRenderTarget(width, height);
 }

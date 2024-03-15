@@ -21,7 +21,7 @@
 
 extern CGame* g_pGame;
 
-CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
+CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, std::uint16_t usModel, std::uint8_t ucVariant, std::uint8_t ucVariant2)
     : CElement(pParent)
 {
     CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPed, NULL);
@@ -62,7 +62,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_ulIdleRespawnInterval = 60000;
 
     m_bEngineOn = false;
-    for (unsigned int i = 0; i < 6; ++i)
+    for (std::uint32_t i = 0; i < 6; ++i)
         m_fDoorOpenRatio[i] = 0.0f;
     m_bLocked = false;
     m_bDoorsUndamageable = false;
@@ -88,7 +88,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_ucVariant2 = ucVariant2;
 
     // Initialize the occupied Players
-    for (int i = 0; i < MAX_VEHICLE_SEATS; i++)
+    for (auto i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
         m_pOccupants[i] = NULL;
     }
@@ -122,7 +122,7 @@ CVehicle::~CVehicle()
     }
 
     // loop through peds and fix their in out state
-    for (int i = 0; i < MAX_VEHICLE_SEATS; i++)
+    for (auto i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
         CPed* pPed = m_pOccupants[i];
         if (pPed)
@@ -131,7 +131,7 @@ CVehicle::~CVehicle()
             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
             {
                 // Does it have an occupant and is the occupant the requesting ped?
-                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                std::uint8_t ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                 if (pPed == GetOccupant(ucOccupiedSeat))
                 {
                     // Mark the ped/vehicle as empty
@@ -158,7 +158,7 @@ CVehicle::~CVehicle()
     SetSyncer(NULL);
 
     // Unreference from our occupators
-    for (unsigned int i = 0; i < MAX_VEHICLE_SEATS; i++)
+    for (std::uint32_t i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
         if (m_pOccupants[i])
         {
@@ -252,7 +252,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
         if (CVehicleManager::IsValidModel(iTemp))
         {
             // Remember it and generate a new random color
-            SetModel(static_cast<unsigned short>(iTemp));
+            SetModel(static_cast<std::uint16_t>(iTemp));
 
             m_usAdjustableProperty = 0;
         }
@@ -270,9 +270,9 @@ bool CVehicle::ReadSpecialData(const int iLine)
 
     // Grab the variant data
     if (GetCustomDataInt("variant1", iTemp, true))
-        m_ucVariant = static_cast<unsigned char>(iTemp);
+        m_ucVariant = static_cast<std::uint8_t>(iTemp);
     if (GetCustomDataInt("variant2", iTemp, true))
-        m_ucVariant2 = static_cast<unsigned char>(iTemp);
+        m_ucVariant2 = static_cast<std::uint8_t>(iTemp);
     if (m_ucVariant == 254 && m_ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
 
@@ -301,7 +301,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
 
     // Grab the "specialState" data
     if (GetCustomDataInt("specialState", iTemp, true))
-        m_usAdjustableProperty = static_cast<unsigned short>(iTemp);
+        m_usAdjustableProperty = static_cast<std::uint16_t>(iTemp);
     else
         m_usAdjustableProperty = 0;
 
@@ -347,7 +347,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
 
     // Grab the "paintjob" data
     if (GetCustomDataInt("paintjob", iTemp, true))
-        m_ucPaintjob = static_cast<unsigned char>(iTemp);
+        m_ucPaintjob = static_cast<std::uint8_t>(iTemp);
 
     // Grab the "upgrades" data
     if (GetCustomDataString("upgrades", szTemp, 256, true))
@@ -362,7 +362,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
                 while (char* token = strtok((bTemp) ? szTemp : NULL, ", "))
                 {
                     bTemp = false;
-                    unsigned short usUpgrade = static_cast<unsigned short>(atoi(token));
+                    std::uint16_t usUpgrade = static_cast<std::uint16_t>(atoi(token));
                     if (CVehicleUpgrades::IsValidUpgrade(usUpgrade))
                         m_pUpgrades->AddUpgrade(usUpgrade);
                 }
@@ -376,11 +376,11 @@ bool CVehicle::ReadSpecialData(const int iLine)
 
     // Grab the "interior" data
     if (GetCustomDataInt("interior", iTemp, true))
-        m_ucInterior = static_cast<unsigned char>(iTemp);
+        m_ucInterior = static_cast<std::uint8_t>(iTemp);
 
     // Grab the "dimension" data
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     // Grab the "collisions" data
     if (!GetCustomDataBool("collisions", m_bCollisionsEnabled, true))
@@ -388,7 +388,7 @@ bool CVehicle::ReadSpecialData(const int iLine)
 
     // Grab the "alpha" data
     if (GetCustomDataInt("alpha", iTemp, true))
-        m_ucAlpha = static_cast<unsigned char>(iTemp);
+        m_ucAlpha = static_cast<std::uint8_t>(iTemp);
 
     // Grab the "frozen" data
     GetCustomDataBool("frozen", m_bIsFrozen, true);
@@ -500,7 +500,7 @@ void CVehicle::SetRotationDegrees(const CVector& vecRotation)
     m_vecRotationDegrees = vecRotation;
 }
 
-void CVehicle::SetModel(unsigned short usModel)
+void CVehicle::SetModel(std::uint16_t usModel)
 {
     if (usModel != m_usModel)
     {
@@ -520,7 +520,7 @@ bool CVehicle::HasValidModel()
     return CVehicleManager::IsValidModel(m_usModel);
 }
 
-void CVehicle::SetVariants(unsigned char ucVariant, unsigned char ucVariant2)
+void CVehicle::SetVariants(std::uint8_t ucVariant, std::uint8_t ucVariant2)
 {
     m_ucVariant = ucVariant;
     m_ucVariant2 = ucVariant2;
@@ -541,13 +541,13 @@ CVehicleColor& CVehicle::RandomizeColor()
     return m_Color;
 }
 
-void CVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio)
+void CVehicle::SetDoorOpenRatio(std::uint8_t ucDoor, float fRatio)
 {
     if (ucDoor <= 5)
         m_fDoorOpenRatio[ucDoor] = SharedUtil::Clamp(0.0f, fRatio, 1.0f);
 }
 
-float CVehicle::GetDoorOpenRatio(unsigned char ucDoor) const
+float CVehicle::GetDoorOpenRatio(std::uint8_t ucDoor) const
 {
     return (ucDoor <= 5) ? m_fDoorOpenRatio[ucDoor] : 0.0f;
 }
@@ -564,7 +564,7 @@ void CVehicle::SetTurretPosition(float fPositionX, float fPositionY)
     m_fTurretPositionY = fPositionY;
 }
 
-CPed* CVehicle::GetOccupant(unsigned int uiSeat)
+CPed* CVehicle::GetOccupant(std::uint32_t uiSeat)
 {
     if (uiSeat < MAX_VEHICLE_SEATS)
     {
@@ -577,7 +577,7 @@ CPed* CVehicle::GetOccupant(unsigned int uiSeat)
 CPed* CVehicle::GetFirstOccupant()
 {
     // Try finding a seat with a Player in it
-    unsigned int i = 0;
+    std::uint32_t i = 0;
     for (; i < MAX_VEHICLE_SEATS; i++)
     {
         if (m_pOccupants[i])
@@ -612,7 +612,7 @@ CPed* CVehicle::GetController()
     return pController;
 }
 
-bool CVehicle::SetOccupant(CPed* pPed, unsigned int uiSeat)
+bool CVehicle::SetOccupant(CPed* pPed, std::uint32_t uiSeat)
 {
     // CPlayer::SetOccupiedVehicle will also call this so we need to prevent an infinite recursive loop
     static bool bAlreadySetting = false;
@@ -675,23 +675,23 @@ void CVehicle::SetSyncer(CPlayer* pPlayer)
     }
 }
 
-unsigned char CVehicle::GetMaxPassengers()
+std::uint8_t CVehicle::GetMaxPassengers()
 {
     return ((m_ucMaxPassengersOverride == VEHICLE_PASSENGERS_UNDEFINED) ? CVehicleManager::GetMaxPassengers(m_usModel) : m_ucMaxPassengersOverride);
 }
 
-unsigned char CVehicle::GetFreePassengerSeat()
+std::uint8_t CVehicle::GetFreePassengerSeat()
 {
     // Grab the max passengers this vehicle can have and check the rage
-    unsigned char ucMaxPassengers = GetMaxPassengers();
+    std::uint8_t ucMaxPassengers = GetMaxPassengers();
     if (ucMaxPassengers < MAX_VEHICLE_SEATS)
     {
         // Check for free slots
-        for (int i = 1; i < ucMaxPassengers + 1; i++)
+        for (auto i = 1; i < ucMaxPassengers + 1; i++)
         {
             if (!m_pOccupants[i])
             {
-                return static_cast<unsigned char>(i);
+                return static_cast<std::uint8_t>(i);
             }
         }
     }
@@ -791,7 +791,7 @@ void CVehicle::SetRegPlate(const char* szRegPlate)
 void CVehicle::GenerateRegPlate()
 {
     // For all our 8 letters
-    for (int i = 0; i < 8; i++)
+    for (auto i = 0; i < 8; i++)
     {
         // Put a space in letter 5
         if (i != 4)
@@ -813,12 +813,12 @@ void CVehicle::GenerateRegPlate()
     m_szRegPlate[8] = 0;
 }
 
-void CVehicle::SetPaintjob(unsigned char ucPaintjob)
+void CVehicle::SetPaintjob(std::uint8_t ucPaintjob)
 {
     m_ucPaintjob = ucPaintjob;
 }
 
-void CVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
+void CVehicle::GetInitialDoorStates(SFixedArray<std::uint8_t, MAX_DOORS>& ucOutDoorStates)
 {
     switch (m_usModel)
     {
@@ -860,17 +860,17 @@ void CVehicle::GenerateHandlingData()
     m_bHandlingChanged = false;
 }
 
-void CVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
+void CVehicle::SetVehicleSirenPosition(std::uint8_t ucSirenID, CVector vecPos)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 }
 
-void CVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
+void CVehicle::SetVehicleSirenMinimumAlpha(std::uint8_t ucSirenID, DWORD dwPercentage)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
 }
 
-void CVehicle::SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour)
+void CVehicle::SetVehicleSirenColour(std::uint8_t ucSirenID, SColor tVehicleSirenColour)
 {
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
 }
@@ -884,7 +884,7 @@ void CVehicle::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEn
 }
 void CVehicle::RemoveVehicleSirens()
 {
-    for (int i = 0; i <= 7; i++)
+    for (auto i = 0; i <= 7; i++)
     {
         m_tSirenBeaconInfo.m_tSirenInfo[i] = SSirenBeaconInfo();
         SetVehicleSirenPosition(i, CVector(0, 0, 0));
@@ -898,7 +898,7 @@ void CVehicle::RemoveVehicleSirens()
 void CVehicle::ResetDoors()
 {
     GetInitialDoorStates(m_ucDoorStates);
-    for (unsigned int i = 0; i < 6; ++i)
+    for (std::uint32_t i = 0; i < 6; ++i)
         m_fDoorOpenRatio[i] = 0.0f;
 }
 
@@ -912,7 +912,7 @@ void CVehicle::ResetDoorsWheelsPanelsLights()
 
 bool CVehicle::IsBlowTimerFinished()
 {
-    return (m_blowState == VehicleBlowState::BLOWN) && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
+    return (m_blowState == VehicleBlowState::BLOWN) && CTickCount::Now() > m_llBlowTime + CTickCount((std::int64_t)m_ulBlowRespawnInterval);
 }
 
 void CVehicle::ResetExplosionTimer()
@@ -946,7 +946,7 @@ bool CVehicle::IsIdleTimerRunning()
 
 bool CVehicle::IsIdleTimerFinished()
 {
-    return IsIdleTimerRunning() && CTickCount::Now() > m_llIdleTime + CTickCount((long long)m_ulIdleRespawnInterval);
+    return IsIdleTimerRunning() && CTickCount::Now() > m_llIdleTime + CTickCount((std::int64_t)m_ulIdleRespawnInterval);
 }
 
 // Check if vehicle has not moved (much) since the last call

@@ -24,8 +24,8 @@ class CTeam final : public CElement
     friend class CTeamManager;
 
 public:
-    CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName = NULL, unsigned char ucRed = 0, unsigned char ucGreen = 0,
-          unsigned char ucBlue = 0);
+    CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName = NULL, std::uint8_t ucRed = 0, std::uint8_t ucGreen = 0,
+          std::uint8_t ucBlue = 0);
     ~CTeam();
 
     void Unlink();
@@ -38,13 +38,13 @@ public:
     void RemoveAllPlayers();
     void GetPlayers(lua_State* luaVM);
 
-    void GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue);
-    void SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
+    void GetColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue);
+    void SetColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue);
 
     bool GetFriendlyFire() { return m_bFriendlyFire; }
     void SetFriendlyFire(bool bFriendlyFire) { m_bFriendlyFire = bFriendlyFire; }
 
-    unsigned int CountPlayers() { return static_cast<unsigned int>(m_Players.size()); }
+    std::uint32_t CountPlayers() { return static_cast<std::uint32_t>(m_Players.size()); }
 
     std::list<CPlayer*>::const_iterator PlayersBegin() { return m_Players.begin(); }
     std::list<CPlayer*>::const_iterator PlayersEnd() { return m_Players.end(); }
@@ -58,9 +58,9 @@ private:
     SString             m_strTeamName;
     std::list<CPlayer*> m_Players;
 
-    unsigned char m_ucRed;
-    unsigned char m_ucGreen;
-    unsigned char m_ucBlue;
+    std::uint8_t m_ucRed;
+    std::uint8_t m_ucGreen;
+    std::uint8_t m_ucBlue;
 
     bool m_bFriendlyFire;
 };

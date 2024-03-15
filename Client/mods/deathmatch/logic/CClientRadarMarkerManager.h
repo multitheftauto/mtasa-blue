@@ -29,14 +29,14 @@ public:
 
     static CClientRadarMarker* Get(ElementID ID);
 
-    unsigned short GetDimension() { return m_usDimension; }
-    void           SetDimension(unsigned short usDimension);
+    std::uint16_t GetDimension() { return m_usDimension; }
+    void           SetDimension(std::uint16_t usDimension);
 
     std::list<CClientRadarMarker*>::const_iterator IterBegin() { return m_Markers.begin(); };
     std::list<CClientRadarMarker*>::const_iterator IterEnd() { return m_Markers.end(); };
 
     bool        Exists(CClientRadarMarker* pMarker);
-    static bool IsValidIcon(unsigned long ulIcon) { return ulIcon <= RADAR_MARKER_LIMIT; }
+    static bool IsValidIcon(std::uint32_t ulIcon) { return ulIcon <= RADAR_MARKER_LIMIT; }
 
 private:
     void AddToList(CClientRadarMarker* pMarker) { m_Markers.push_back(pMarker); };
@@ -49,7 +49,7 @@ private:
     bool                           m_bCanRemoveFromList;
     std::list<CClientRadarMarker*> m_Markers;
 
-    unsigned short m_usDimension;
+    std::uint16_t m_usDimension;
     bool           m_bOrderOnPulse;
     CVector        m_vecCameraPosition;
 };

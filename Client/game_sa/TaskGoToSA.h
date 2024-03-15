@@ -44,7 +44,7 @@ class CTaskComplexWanderSAInterface : public CTaskComplexSAInterface
 public:
     // protected
     int           m_iMoveState;
-    unsigned char m_iDir;
+    std::uint8_t m_iDir;
     float         m_targetRadius;
 
     CNodeAddress m_LastNode;
@@ -52,11 +52,11 @@ public:
 
     int m_lastUpdateDirFrameCount;
 
-    unsigned char m_bWanderSensibly : 1;
+    std::uint8_t m_bWanderSensibly : 1;
     // private
-    unsigned char m_bNewDir : 1;
-    unsigned char m_bNewNodes : 1;
-    unsigned char m_bAllNodesBlocked : 1;
+    std::uint8_t m_bNewDir : 1;
+    std::uint8_t m_bNewNodes : 1;
+    std::uint8_t m_bAllNodesBlocked : 1;
 };
 
 class CTaskComplexWanderSA : public virtual CTaskComplexSA, public virtual CTaskComplexWander
@@ -87,5 +87,5 @@ class CTaskComplexWanderStandardSA : public virtual CTaskComplexWanderSA, public
 {
 public:
     CTaskComplexWanderStandardSA(){};
-    CTaskComplexWanderStandardSA(const int iMoveState, const unsigned char iDir, const bool bWanderSensibly = true);
+    CTaskComplexWanderStandardSA(const int iMoveState, const std::uint8_t iDir, const bool bWanderSensibly = true);
 };

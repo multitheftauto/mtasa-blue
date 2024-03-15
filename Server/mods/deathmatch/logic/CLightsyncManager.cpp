@@ -91,7 +91,7 @@ void CLightsyncManager::DoPulse()
     // For limiting light sync processing
     long      iLimitCounter = std::max<uint>(10, g_pGame->GetPlayerManager()->Count() / 25);
     int       iLightsyncRate = g_TickRateSettings.iLightSync;
-    long long llTickCountNow = GetTickCount64_();
+    std::int64_t llTickCountNow = GetTickCount64_();
     while (m_Queue.size() > 0 && m_Queue.front().ullTime + iLightsyncRate <= llTickCountNow && iLimitCounter > 0)
     {
         SEntry entry = m_Queue.front();

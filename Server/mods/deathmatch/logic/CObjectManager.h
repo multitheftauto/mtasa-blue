@@ -31,14 +31,14 @@ public:
     CObject* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod);
     void     DeleteAll();
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+    std::uint32_t Count() { return static_cast<std::uint32_t>(m_List.size()); };
     bool         Exists(CObject* pObject);
 
     CObjectListType::const_iterator IterBegin() const { return m_List.begin(); };
     CObjectListType::const_iterator IterEnd() const { return m_List.end(); };
 
-    static bool IsValidModel(unsigned long ulObjectModel);
-    static bool IsBreakableModel(unsigned long ulObjectModel);
+    static bool IsValidModel(std::uint32_t ulObjectModel);
+    static bool IsBreakableModel(std::uint32_t ulObjectModel);
 
 private:
     void AddToList(CObject* pObject) { m_List.push_back(pObject); };

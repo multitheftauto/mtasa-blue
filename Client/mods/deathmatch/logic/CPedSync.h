@@ -20,7 +20,7 @@ public:
     CPedSync(CClientPedManager* pPedManager);
     ~CPedSync();
 
-    bool ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
+    bool ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream);
     void DoPulse();
 
     void AddPed(CClientPed* pPed);
@@ -42,5 +42,5 @@ private:
 
     CClientPedManager*       m_pPedManager;
     CMappedList<CClientPed*> m_List;
-    unsigned long            m_ulLastSyncTime;
+    std::uint32_t            m_ulLastSyncTime;
 };

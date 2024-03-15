@@ -17,7 +17,7 @@
 
 extern CGameSA* pGame;
 
-CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType weaponType, ePedPieceTypes hitZone, unsigned char uc_2, bool b_3, bool b_4)
+CEventDamageSA::CEventDamageSA(CEntity* pEntity, std::uint32_t i_1, eWeaponType weaponType, ePedPieceTypes hitZone, std::uint8_t uc_2, bool b_3, bool b_4)
 {
     m_pInterface = new CEventDamageSAInterface;
     m_pDamageResponse = new CPedDamageResponseSA(&m_pInterface->damageResponseData);

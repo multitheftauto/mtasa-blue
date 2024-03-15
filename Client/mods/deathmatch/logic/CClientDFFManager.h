@@ -26,10 +26,10 @@ public:
     void RemoveAll();
     bool Exists(CClientDFF* pDFF);
 
-    CClientDFF* GetElementThatReplaced(unsigned short usModel, CClientDFF* pDontSearch = NULL);
+    CClientDFF* GetElementThatReplaced(std::uint16_t usModel, CClientDFF* pDontSearch = NULL);
 
-    static bool IsReplacableModel(unsigned short usModel);
-    bool        RestoreModel(unsigned short usModel);
+    static bool IsReplacableModel(std::uint16_t usModel);
+    bool        RestoreModel(std::uint16_t usModel);
 
     std::list<CClientDFF*>::const_iterator IterBegin() { return m_List.begin(); }
     std::list<CClientDFF*>::const_iterator IterEnd() { return m_List.end(); }

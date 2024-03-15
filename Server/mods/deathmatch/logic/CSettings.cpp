@@ -73,7 +73,7 @@ CXMLNode* CSettings::Get(CXMLNode* pSource, CXMLNode* pStorage, const char* szSo
                          bool& bDeleteNode, SettingStatus& eStatus, CXMLNode* pMultiresultParentNode)
 {
     CXMLNode*    pNode = NULL;
-    unsigned int uiCurrentIndex = 0, uiResourceNameLength = 0;
+    std::uint32_t uiCurrentIndex = 0, uiResourceNameLength = 0;
     char         szQueryResource[MAX_RESOURCE_LENGTH] = {0}, szResource[MAX_RESOURCE_LENGTH] = {0};
     const char * szName, *szQueryName = NULL;
     eStatus = NoAccess;
@@ -116,7 +116,7 @@ CXMLNode* CSettings::Get(CXMLNode* pSource, CXMLNode* pStorage, const char* szSo
     while ((pNode = pSource->FindSubNode("setting", uiCurrentIndex++)))
     {
         std::string  strContent;
-        unsigned int uiResourceNameLength = 0;
+        std::uint32_t uiResourceNameLength = 0;
 
         CXMLAttribute* pName = pNode->GetAttributes().Find("name");
         CXMLAttribute* pValue = pNode->GetAttributes().Find(strAttribute);
@@ -420,7 +420,7 @@ CSettings::AccessType CSettings::GetAccessType(char cCharacter)
 }
 
 // Parses the name and returns the resource name associated with the setting
-inline const char* CSettings::GetResourceName(const char* szSetting, char* szBuffer, unsigned int uiLength)
+inline const char* CSettings::GetResourceName(const char* szSetting, char* szBuffer, std::uint32_t uiLength)
 {
     const char* szChr = strchr(szSetting, SETTINGS_DELIMITER);
     if (szChr == NULL)
@@ -431,7 +431,7 @@ inline const char* CSettings::GetResourceName(const char* szSetting, char* szBuf
         szSetting++;
 
     // Get the position of the delimiter
-    unsigned int uiPos = (unsigned int)(szChr - szSetting);
+    std::uint32_t uiPos = (std::uint32_t)(szChr - szSetting);
 
     // Locate the first occurence of the delimiter in the name and use it to substring the name
     strncpy(szBuffer, szSetting, (uiPos > uiLength) ? uiLength : uiPos);
@@ -447,7 +447,7 @@ inline bool CSettings::HasResourceName(const char* szSetting)
 }
 
 // Parses the name and returns the actual name of the variable
-inline const char* CSettings::GetName(const char* szSetting, unsigned int uiResourceLength)
+inline const char* CSettings::GetName(const char* szSetting, std::uint32_t uiResourceLength)
 {
     // Only calculate the resource length if it's not already specified
     if (HasPrefix(szSetting[0]))

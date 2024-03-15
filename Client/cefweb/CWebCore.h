@@ -56,7 +56,7 @@ public:
     ~CWebCore();
     bool Initialise() override;
 
-    CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent);
+    CWebViewInterface* CreateWebView(std::uint32_t uiWidth, std::uint32_t uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent);
     void               DestroyWebView(CWebViewInterface* pWebViewInterface);
     void               DoPulse();
     CWebView*          FindWebView(CefRefPtr<CefBrowser> browser);
@@ -83,7 +83,7 @@ public:
 
     bool IsTestModeEnabled() { return m_bTestmodeEnabled; };
     void SetTestModeEnabled(bool bEnabled) { m_bTestmodeEnabled = bEnabled; };
-    void DebugOutputThreadsafe(const SString& message, unsigned char R, unsigned char G, unsigned char B);
+    void DebugOutputThreadsafe(const SString& message, std::uint8_t R, std::uint8_t G, std::uint8_t B);
 
     CWebViewInterface* GetFocusedWebView() { return (CWebViewInterface*)m_pFocusedWebView; };
     void               SetFocusedWebView(CWebView* pWebView) { m_pFocusedWebView = pWebView; };

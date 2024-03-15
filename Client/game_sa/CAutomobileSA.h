@@ -57,8 +57,8 @@ namespace eCarNode
 class CBouncingPanelSAInterface
 {
 public:
-    unsigned short m_nFrameId;
-    unsigned short m_nAxis;
+    std::uint16_t m_nFrameId;
+    std::uint16_t m_nAxis;
     float          m_fAngleLimit;
     CVector        m_vecRotation;
     CVector        m_vecPos;
@@ -90,8 +90,8 @@ public:
     char                      taxiAvaliable;
     char                      field_869;
     short                     field_86A;
-    unsigned short            m_wMiscComponentAngle;
-    unsigned short            m_wVoodooSuspension;
+    std::uint16_t            m_wMiscComponentAngle;
+    std::uint16_t            m_wVoodooSuspension;
     int                       m_dwBusDoorTimerEnd;
     int                       m_dwBusDoorTimerStart;
     float                     field_878;
@@ -143,8 +143,8 @@ public:
     float                     m_fDoomHorizontalRotation;
     float                     m_fForcedOrientation;
     float                     m_fUpDownLightAngle[2];
-    unsigned char             m_nNumContactWheels;
-    unsigned char             m_nWheelsOnGround;
+    std::uint8_t             m_nNumContactWheels;
+    std::uint8_t             m_nWheelsOnGround;
     char                      field_962;
     char                      field_963;
     float                     field_964;

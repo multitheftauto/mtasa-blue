@@ -30,7 +30,7 @@ public:
     void DoPulse();
     void DeleteAll();
 
-    unsigned int          Count() { return static_cast<unsigned int>(m_Players.size()); };
+    std::uint32_t          Count() { return static_cast<std::uint32_t>(m_Players.size()); };
     static CClientPlayer* Get(ElementID ID);
     CClientPlayer*        Get(const char* szNick, bool bCaseSensitive = false);
     CClientPlayer*        Get(CPlayerPed* pPlayer, bool bValidatePointer);
@@ -42,7 +42,7 @@ public:
     std::vector<CClientPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
     std::vector<CClientPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
 
-    static bool IsValidModel(unsigned long ulModel);
+    static bool IsValidModel(std::uint32_t ulModel);
 
     void ResetAll();
 

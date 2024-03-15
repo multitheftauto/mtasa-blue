@@ -83,8 +83,8 @@ private:
     CTextureItem*              m_pLocalPlayerBlip;
     std::vector<CTextureItem*> m_MarkerTextureList;
 
-    unsigned int m_uiHeight;
-    unsigned int m_uiWidth;
+    std::uint32_t m_uiHeight;
+    std::uint32_t m_uiWidth;
 
     float m_fMapSize;
     int   m_iMapMinX;
@@ -106,7 +106,7 @@ private:
     bool m_bIsMovingEast;
     bool m_bIsMovingWest;
 
-    unsigned long m_ulUpdateTime;
+    std::uint32_t m_ulUpdateTime;
 
     std::vector<CClientTextDisplay*> m_HelpTextList;
     bool                             m_bHideHelpText;

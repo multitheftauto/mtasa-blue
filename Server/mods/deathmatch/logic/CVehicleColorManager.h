@@ -17,7 +17,7 @@ class CVehicleColors
 {
 public:
     void         AddColor(const CVehicleColor& colVehicle) { m_Colors.push_back(colVehicle); };
-    unsigned int CountColors() { return static_cast<unsigned int>(m_Colors.size()); };
+    std::uint32_t CountColors() { return static_cast<std::uint32_t>(m_Colors.size()); };
     void         RemoveAllColors() { m_Colors.clear(); };
 
     CVehicleColor GetRandomColor();
@@ -33,8 +33,8 @@ public:
     bool Generate(const char* szFilename);
     void Reset();
 
-    void          AddColor(unsigned short usModel, const CVehicleColor& colVehicle);
-    CVehicleColor GetRandomColor(unsigned short usModel);
+    void          AddColor(std::uint16_t usModel, const CVehicleColor& colVehicle);
+    CVehicleColor GetRandomColor(std::uint16_t usModel);
 
 private:
     SFixedArray<CVehicleColors, 212> m_Colors;

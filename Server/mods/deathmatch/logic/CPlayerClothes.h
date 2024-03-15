@@ -53,22 +53,22 @@ class CPlayerClothes
 public:
     CPlayerClothes();
 
-    const SPlayerClothing* GetClothing(unsigned char ucType);
-    void                   AddClothes(const char* szTexture, const char* szModel, unsigned char ucType);
-    bool                   RemoveClothes(unsigned char ucType);
+    const SPlayerClothing* GetClothing(std::uint8_t ucType);
+    void                   AddClothes(const char* szTexture, const char* szModel, std::uint8_t ucType);
+    bool                   RemoveClothes(std::uint8_t ucType);
 
     void RemoveAll();
 
     void DefaultClothes();
 
-    static bool        HasEmptyClothing(unsigned char ucType);
-    static bool        IsEmptyClothing(const SPlayerClothing* pClothing, unsigned char ucType);
-    static const char* GetClothingName(unsigned char ucType);
+    static bool        HasEmptyClothing(std::uint8_t ucType);
+    static bool        IsEmptyClothing(const SPlayerClothing* pClothing, std::uint8_t ucType);
+    static const char* GetClothingName(std::uint8_t ucType);
 
-    static const SPlayerClothing* GetClothingGroup(unsigned char ucType);
-    static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, unsigned char ucType);
-    static const int              GetClothingGroupMax(unsigned char ucType);
-    static bool                   IsValidClothing(const char* szTexture, const char* szModel, unsigned char ucType);
+    static const SPlayerClothing* GetClothingGroup(std::uint8_t ucType);
+    static const SPlayerClothing* GetClothing(const char* szTexture, const char* szModel, std::uint8_t ucType);
+    static const int              GetClothingGroupMax(std::uint8_t ucType);
+    static bool                   IsValidClothing(const char* szTexture, const char* szModel, std::uint8_t ucType);
 
     SFixedArray<const SPlayerClothing*, PLAYER_CLOTHING_SLOTS> m_Clothes;
 };

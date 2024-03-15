@@ -79,7 +79,7 @@ bool CGUIGridList_Impl::IsSortingEnabled()
     return reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->isUserSortControlEnabled();
 }
 
-void CGUIGridList_Impl::RemoveColumn(unsigned int uiColumn)
+void CGUIGridList_Impl::RemoveColumn(std::uint32_t uiColumn)
 {
     try
     {
@@ -90,7 +90,7 @@ void CGUIGridList_Impl::RemoveColumn(unsigned int uiColumn)
     }
 }
 
-unsigned int CGUIGridList_Impl::AddColumn(const char* szTitle, float fWidth)
+std::uint32_t CGUIGridList_Impl::AddColumn(const char* szTitle, float fWidth)
 {
     // Create a new column with an unique handle
     int hUniqueHandle = GetUniqueHandle();
@@ -245,7 +245,7 @@ int CGUIGridList_Impl::InsertRowAfter(int iRow, std::vector<std::pair<SString, b
     }
 }
 
-void CGUIGridList_Impl::AutoSizeColumn(unsigned int hColumn)
+void CGUIGridList_Impl::AutoSizeColumn(std::uint32_t hColumn)
 {
     try
     {
@@ -321,7 +321,7 @@ const char* CGUIGridList_Impl::GetItemText(int iRow, int hColumn)
 
             if (!m_bIgnoreTextSpacer)
             {
-                unsigned char ucSpacerSize = (unsigned char)(strlen(CGUIGRIDLIST_SPACER));
+                std::uint8_t ucSpacerSize = (std::uint8_t)(strlen(CGUIGRIDLIST_SPACER));
 
                 if (GetColumnIndex(hColumn) == 0)
                 {
@@ -473,7 +473,7 @@ int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bo
     return 0;
 }
 
-void CGUIGridList_Impl::SetItemColor(int iRow, int hColumn, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha)
+void CGUIGridList_Impl::SetItemColor(int iRow, int hColumn, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue, std::uint8_t ucAlpha)
 {
     try
     {
@@ -491,7 +491,7 @@ void CGUIGridList_Impl::SetItemColor(int iRow, int hColumn, unsigned char ucRed,
     }
 }
 
-bool CGUIGridList_Impl::GetItemColor(int iRow, int hColumn, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
+bool CGUIGridList_Impl::GetItemColor(int iRow, int hColumn, std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha)
 {
     try
     {
@@ -744,7 +744,7 @@ void CGUIGridList_Impl::SetSelectedItem(int iRow, int hColumn, bool bReset)
     }
 }
 
-void CGUIGridList_Impl::Sort(unsigned int uiColumn, SortDirection direction)
+void CGUIGridList_Impl::Sort(std::uint32_t uiColumn, SortDirection direction)
 {
     reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->setSortColumn(GetColumnIndex(uiColumn));
 
@@ -762,7 +762,7 @@ void CGUIGridList_Impl::Sort(unsigned int uiColumn, SortDirection direction)
     }
 }
 
-void CGUIGridList_Impl::GetSort(unsigned int& uiColumn, SortDirection& direction)
+void CGUIGridList_Impl::GetSort(std::uint32_t& uiColumn, SortDirection& direction)
 {
     uiColumn = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->getSortColumn() + 1;
 
@@ -794,7 +794,7 @@ bool CGUIGridList_Impl::Event_OnSortColumn(const CEGUI::EventArgs& e)
     return true;
 }
 
-unsigned int CGUIGridList_Impl::GetUniqueHandle()
+std::uint32_t CGUIGridList_Impl::GetUniqueHandle()
 {
     return ++m_hUniqueHandle;
 }

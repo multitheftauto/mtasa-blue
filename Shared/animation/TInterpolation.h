@@ -37,17 +37,17 @@ public:
         m_easingCurve.SetParams(a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot);
     }
 
-    void SetDuration(unsigned long a_ulDuration)
+    void SetDuration(std::uint32_t a_ulDuration)
     {
-        unsigned long long ullNow = _GetTime();
+        std::uint64_t ullNow = _GetTime();
         m_ullStartTime = ullNow;
         m_ullEndTime = ullNow + a_ulDuration;
         m_ulDuration = a_ulDuration;
     }
 
-    void SetDuration(unsigned long a_ulElapsedTime, unsigned long a_ulTimeLeft)
+    void SetDuration(std::uint32_t a_ulElapsedTime, std::uint32_t a_ulTimeLeft)
     {
-        unsigned long long ullNow = _GetTime();
+        std::uint64_t ullNow = _GetTime();
         m_ullStartTime = ullNow - a_ulElapsedTime;
         m_ullEndTime = ullNow + a_ulTimeLeft;
         m_ulDuration = a_ulElapsedTime + a_ulTimeLeft;
@@ -55,7 +55,7 @@ public:
 
     bool IsRunning() const
     {
-        unsigned long long ullNow = _GetTime();
+        std::uint64_t ullNow = _GetTime();
         return (ullNow < m_ullEndTime) && (m_ulDuration > 0);
     }
 
@@ -64,7 +64,7 @@ public:
     {
         if (IsRunning())
         {
-            unsigned long long ullNow = _GetTime();
+            std::uint64_t ullNow = _GetTime();
             float              fElapsedTime = static_cast<float>(ullNow - m_ullStartTime);
 
             float fAnimationTime = fElapsedTime / m_ulDuration;                         // Division by 0 is handled by IsRunning ()
@@ -119,7 +119,7 @@ public:
     }
 
 protected:
-    unsigned long long _GetTime() const { return GetTickCount64_(); }
+    std::uint64_t _GetTime() const { return GetTickCount64_(); }
 
     void _GetValue(T& a_rResult, float a_fAnimationTime) const
     {
@@ -134,7 +134,7 @@ protected:
 
     CEasingCurve m_easingCurve;
 
-    unsigned long long m_ullStartTime;
-    unsigned long long m_ullEndTime;
-    unsigned long      m_ulDuration;
+    std::uint64_t m_ullStartTime;
+    std::uint64_t m_ullEndTime;
+    std::uint32_t      m_ulDuration;
 };

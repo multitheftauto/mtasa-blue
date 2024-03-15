@@ -37,7 +37,7 @@ public:
     virtual void Add(const char* szCommand, const char* szDescription, PFNCOMMANDHANDLER pfnHandler, bool bModCommand = false,
                      bool bAllowScriptedBind = false) = 0;
 
-    virtual unsigned int Count() = 0;
+    virtual std::uint32_t Count() = 0;
     virtual bool         Exists(const char* szCommand) = 0;
 
     virtual bool Execute(const char* szCommandLine) = 0;

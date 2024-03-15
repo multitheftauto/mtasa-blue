@@ -43,7 +43,7 @@ public:
     int           m_offsetBoneTag;
     CVector       m_offsetPos;
     float         m_speed;
-    unsigned char m_nonNullEntity;
+    std::uint8_t m_nonNullEntity;
     // blending info
     float m_blend;
     int   m_endTime;
@@ -71,7 +71,7 @@ public:
 class CTaskSimpleIKLookAtSAInterface : public CTaskSimpleIKChainSAInterface
 {
 public:
-    unsigned char m_useTorso;
+    std::uint8_t m_useTorso;
     char          m_priority;
 };
 
@@ -79,7 +79,7 @@ class CTaskSimpleIKLookAtSA : public virtual CTaskSimpleIKChainSA, public virtua
 {
 public:
     CTaskSimpleIKLookAtSA(){};
-    CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso = false, float speed = 0.25f,
+    CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, std::uint8_t useTorso = false, float speed = 0.25f,
                           int blendTime = 1000, int m_priority = 3);
 };
 
@@ -92,7 +92,7 @@ class CTaskSimpleIKManagerSAInterface : public CTaskSimpleSAInterface
 {
 public:
     CTaskSimpleIKChainSAInterface* m_pIKChainTasks[NUM_IK_CHAIN_SLOTS];
-    unsigned char                  m_aborting;
+    std::uint8_t                  m_aborting;
 };
 
 class CTaskManagementSystemSA;
@@ -109,7 +109,7 @@ public:
     int                 AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int slotID = -1);
     void                RemoveIKChainTask(int slotID);
     void                BlendOut(int slotID, int blendOutTime);
-    unsigned char       IsSlotEmpty(int slotID);
+    std::uint8_t       IsSlotEmpty(int slotID);
     CTaskSimpleIKChain* GetTaskAtSlot(int slotID);
 
     /*
@@ -125,7 +125,7 @@ public:
     void RemoveIKChainTask(int slotID);
     void BlendOut(int slotID, int blendOutTime);
 
-    unsigned char IsSlotEmpty(int slotID);
+    std::uint8_t IsSlotEmpty(int slotID);
     CTaskSimpleIKChain* GetTaskAtSlot(int slotID);
 
 private:*/
@@ -143,11 +143,11 @@ public:
     int           m_time;
     int           m_offsetBoneTag;
     RwV3d         m_offsetPos;
-    unsigned char m_useTorso;
+    std::uint8_t m_useTorso;
     float         m_speed;
     int           m_blendTime;
 
-    unsigned char m_nonNullEntity;
+    std::uint8_t m_nonNullEntity;
     char          m_priority;
 };
 
@@ -155,6 +155,6 @@ class CTaskSimpleTriggerLookAtSA : public virtual CTaskSimpleSA, public virtual 
 {
 public:
     CTaskSimpleTriggerLookAtSA(){};
-    CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, unsigned char useTorso = false, float speed = 0.25f,
+    CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int time, int offsetBoneTag, CVector offsetPos, std::uint8_t useTorso = false, float speed = 0.25f,
                                int blendTime = 1000, int priority = 3);
 };

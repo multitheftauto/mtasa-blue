@@ -418,7 +418,7 @@ int CLuaElementDefs::getElementChildrenCount(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned int uiCount;
+        std::uint32_t uiCount;
         if (CStaticFunctionDefinitions::GetElementChildrenCount(pElement, uiCount))
         {
             lua_pushnumber(luaVM, static_cast<lua_Number>(uiCount));
@@ -892,7 +892,7 @@ int CLuaElementDefs::getElementInterior(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucInterior;
+        std::uint8_t ucInterior;
         if (CStaticFunctionDefinitions::GetElementInterior(pElement, ucInterior))
         {
             lua_pushnumber(luaVM, ucInterior);
@@ -974,7 +974,7 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Add all the elements within the shape to it
-        unsigned int              uiIndex = 0;
+        std::uint32_t              uiIndex = 0;
         list<CElement*>::iterator iter = pColShape->CollidersBegin();
         for (; iter != pColShape->CollidersEnd(); ++iter)
         {
@@ -994,8 +994,8 @@ int CLuaElementDefs::getElementsWithinColShape(lua_State* luaVM)
     return 1;
 }
 
-CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<unsigned short> interior,
-                                                       std::optional<unsigned short> dimension)
+CElementResult CLuaElementDefs::getElementsWithinRange(CVector pos, float radius, std::optional<std::string> type, std::optional<std::uint16_t> interior,
+                                                       std::optional<std::uint16_t> dimension)
 {
     const auto typeHash = (type.has_value() && !type.value().empty()) ? CElement::GetTypeHashFromString(type.value()) : 0;
 
@@ -1046,7 +1046,7 @@ int CLuaElementDefs::getElementDimension(lua_State* luaVM)
         }
         else
         {
-            unsigned short usDimension;
+            std::uint16_t usDimension;
             if (CStaticFunctionDefinitions::GetElementDimension(pElement, usDimension))
             {
                 lua_pushnumber(luaVM, usDimension);
@@ -1153,7 +1153,7 @@ int CLuaElementDefs::getAttachedElements(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Add All Attached Elements
-        unsigned int                    uiIndex = 0;
+        std::uint32_t                    uiIndex = 0;
         list<CElement*>::const_iterator iter = pElement->AttachedElementsBegin();
         for (; iter != pElement->AttachedElementsEnd(); ++iter)
         {
@@ -1268,7 +1268,7 @@ int CLuaElementDefs::getElementAlpha(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucAlpha;
+        std::uint8_t ucAlpha;
         if (CStaticFunctionDefinitions::GetElementAlpha(pElement, ucAlpha))
         {
             lua_pushnumber(luaVM, ucAlpha);
@@ -1340,7 +1340,7 @@ int CLuaElementDefs::getElementModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned short usModel;
+        std::uint16_t usModel;
         if (CStaticFunctionDefinitions::GetElementModel(pElement, usModel))
         {
             lua_pushnumber(luaVM, usModel);
@@ -1988,7 +1988,7 @@ int CLuaElementDefs::setElementInterior(lua_State* luaVM)
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
 
-        unsigned char ucInterior = static_cast<unsigned char>(uiInterior);
+        std::uint8_t ucInterior = static_cast<std::uint8_t>(uiInterior);
         if (CStaticFunctionDefinitions::SetElementInterior(pElement, ucInterior, bSetPosition, vecPosition))
         {
             lua_pushboolean(luaVM, true);
@@ -2042,7 +2042,7 @@ int CLuaElementDefs::setElementDimension(lua_State* luaVM)
             if (IS_OBJECT(pElement) && CStaticFunctionDefinitions::IsObjectVisibleInAllDimensions(pElement))
             {
                 // Make it not visible in all dimensions and set its dimension
-                if (CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(pElement, false, (unsigned short)iDimension))
+                if (CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(pElement, false, (std::uint16_t)iDimension))
                 {
                     lua_pushboolean(luaVM, true);
                     return 1;
@@ -2050,7 +2050,7 @@ int CLuaElementDefs::setElementDimension(lua_State* luaVM)
             }
             else
             {
-                if (CStaticFunctionDefinitions::SetElementDimension(pElement, (unsigned short)iDimension))
+                if (CStaticFunctionDefinitions::SetElementDimension(pElement, (std::uint16_t)iDimension))
                 {
                     lua_pushboolean(luaVM, true);
                     return 1;

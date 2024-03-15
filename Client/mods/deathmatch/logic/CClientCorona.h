@@ -19,7 +19,7 @@ public:
     CClientCorona(CClientMarker* pThis);
     ~CClientCorona();
 
-    unsigned int GetMarkerType() const { return CClientMarkerCommon::CLASS_CORONA; }
+    std::uint32_t GetMarkerType() const { return CClientMarkerCommon::CLASS_CORONA; }
 
     bool IsHit(const CVector& vecPosition) const;
 
@@ -51,7 +51,7 @@ protected:
 private:
     CClientMarkerPtr m_pThis;
     bool             m_bStreamedIn;
-    unsigned long    m_ulIdentifier;
+    std::uint32_t    m_ulIdentifier;
     CMatrix          m_Matrix;
     bool             m_bVisible;
     float            m_fSize;

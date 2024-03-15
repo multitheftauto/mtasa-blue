@@ -33,8 +33,8 @@ public:
     CTickCount GetDelay() const { return m_llDelay; };
     void       SetDelay(CTickCount llDelay) { m_llDelay = llDelay; };
 
-    unsigned int GetRepeats() const { return m_uiRepeats; };
-    void         SetRepeats(unsigned int uiRepeats) { m_uiRepeats = uiRepeats; }
+    std::uint32_t GetRepeats() const { return m_uiRepeats; };
+    void         SetRepeats(std::uint32_t uiRepeats) { m_uiRepeats = uiRepeats; }
 
     void ExecuteTimer(class CLuaMain* pLuaMain);
 
@@ -49,7 +49,7 @@ private:
     CLuaArguments   m_Arguments;
     CTickCount      m_llStartTime;
     CTickCount      m_llDelay;
-    unsigned int    m_uiRepeats;
+    std::uint32_t    m_uiRepeats;
     uint            m_uiScriptID;
     SLuaDebugInfo   m_LuaDebugInfo;
 };

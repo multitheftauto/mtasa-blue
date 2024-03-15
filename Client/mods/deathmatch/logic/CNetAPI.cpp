@@ -31,7 +31,7 @@ CNetAPI::CNetAPI(CClientManager* pManager)
     m_bIncreaseTimeoutTime = false;
 }
 
-bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& BitStream)
+bool CNetAPI::ProcessPacket(std::uint8_t bytePacketID, NetBitStreamInterface& BitStream)
 {
     switch (bytePacketID)
     {
@@ -259,22 +259,22 @@ void CNetAPI::ResetReturnPosition()
 void CNetAPI::AddInterpolation(const CVector& vecPosition)
 {
     // Store our current position for interpolation purposes
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     m_Interpolator.Push(vecPosition, ulCurrentTime);
 }
 
-bool CNetAPI::GetInterpolation(CVector& vecPosition, unsigned short usLatency)
+bool CNetAPI::GetInterpolation(CVector& vecPosition, std::uint16_t usLatency)
 {
-    unsigned long ulInterTime = CClientTime::GetTime() - usLatency;
+    std::uint32_t ulInterTime = CClientTime::GetTime() - usLatency;
     return m_Interpolator.Evaluate(ulInterTime, &vecPosition);
 }
 
-bool CNetAPI::IsWeaponIDAkimbo(unsigned char ucWeaponID)
+bool CNetAPI::IsWeaponIDAkimbo(std::uint8_t ucWeaponID)
 {
     return (ucWeaponID == 22 || ucWeaponID == 26 || ucWeaponID == 28 || ucWeaponID == 32);
 }
 
-bool CNetAPI::IsDriveByWeapon(unsigned char ucID)
+bool CNetAPI::IsDriveByWeapon(std::uint8_t ucID)
 {
     return ((ucID >= 22 && ucID <= 33) || ucID == 38);
 }
@@ -304,7 +304,7 @@ void CNetAPI::DoPulse()
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
         if (pPlayer && !pPlayer->IsDeadOnNetwork())
         {
-            unsigned long ulCurrentTime = CClientTime::GetTime();
+            std::uint32_t ulCurrentTime = CClientTime::GetTime();
 
             // Grab the player vehicle
             CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
@@ -535,7 +535,7 @@ bool CNetAPI::IsSmallKeySyncNeeded(CClientPed* pPlayerModel)
 
 bool CNetAPI::IsPureSyncNeeded()
 {
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastPuresyncTime + TICK_RATE)
     {
         m_ulLastPuresyncTime = ulCurrentTime;
@@ -582,7 +582,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
         // Read out his current weapon slot
         SWeaponSlotSync slot;
         BitStream.Read(&slot);
-        unsigned int uiSlot = slot.data.uiSlot;
+        std::uint32_t uiSlot = slot.data.uiSlot;
         CWeapon*     pWeapon = pPlayer->GetWeapon(static_cast<eWeaponSlot>(uiSlot));
 
         // Is the current weapon a goggle (44 or 45) or a camera (43), detonator (40), don't apply the fire key
@@ -591,7 +591,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
 
         if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
         {
-            unsigned char ucCurrentWeaponType = 0;
+            std::uint8_t ucCurrentWeaponType = 0;
             float         fWeaponRange = 1.6f;
 
             if (pWeapon)
@@ -605,7 +605,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
             // Read out the weapon ammo
             SWeaponAmmoSync ammo(ucCurrentWeaponType, false, true);
             BitStream.Read(&ammo);
-            unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
+            std::uint16_t usWeaponAmmo = ammo.data.usAmmoInClip;
 
             // Valid current weapon id? Add it to the change weapon queue
             if (CClientPickupManager::IsValidWeaponID(ucCurrentWeaponType))
@@ -749,11 +749,11 @@ void CNetAPI::WriteKeysync(CClientPed* pPlayerModel, NetBitStreamInterface& BitS
             BitStream.WriteBit(true);
 
             // To confirm weapon type at the other end
-            unsigned char ucWeaponType = pPlayerWeapon->GetType();
+            std::uint8_t ucWeaponType = pPlayerWeapon->GetType();
             BitStream.Write(ucWeaponType);
 
             // Write the type
-            unsigned int    uiSlot = pPlayerWeapon->GetSlot();
+            std::uint32_t    uiSlot = pPlayerWeapon->GetSlot();
             SWeaponSlotSync slot;
             slot.data.uiSlot = uiSlot;
             BitStream.Write(&slot);
@@ -763,7 +763,7 @@ void CNetAPI::WriteKeysync(CClientPed* pPlayerModel, NetBitStreamInterface& BitS
                 eWeaponType eWeapon = pPlayerWeapon->GetType();
                 // Write the clip ammo
                 SWeaponAmmoSync ammo(eWeapon, false, true);
-                ammo.data.usAmmoInClip = static_cast<unsigned short>(pPlayerWeapon->GetAmmoInClip());
+                ammo.data.usAmmoInClip = static_cast<std::uint16_t>(pPlayerWeapon->GetAmmoInClip());
                 BitStream.Write(&ammo);
 
                 // Write the aim data
@@ -817,7 +817,7 @@ void CNetAPI::WriteKeysync(CClientPed* pPlayerModel, NetBitStreamInterface& BitS
 void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStream)
 {
     // Read out the sync time context. See CClientEntity for documentation on that.
-    unsigned char ucSyncTimeContext = 0;
+    std::uint8_t ucSyncTimeContext = 0;
     BitStream.Read(ucSyncTimeContext);
 
     // Only update the sync if this packet is from the same context.
@@ -827,7 +827,7 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
     }
 
     // Read out the time it took for the packet to go from the remote client to the server and to us
-    unsigned short usLatency;
+    std::uint16_t usLatency;
     BitStream.ReadCompressed(usLatency);
     pPlayer->SetLatency(usLatency + g_pNet->GetPing());
     pPlayer->SetPing(usLatency);
@@ -900,7 +900,7 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
         SWeaponSlotSync slot;
         BitStream.Read(&slot);
 
-        unsigned int uiSlot = slot.data.uiSlot;
+        std::uint32_t uiSlot = slot.data.uiSlot;
         CWeapon*     pWeapon = pPlayer->GetWeapon(static_cast<eWeaponSlot>(uiSlot));
 
         // Is the current weapon goggles (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
@@ -909,7 +909,7 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
 
         if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
         {
-            unsigned char ucCurrentWeapon = 0;
+            std::uint8_t ucCurrentWeapon = 0;
             float         fWeaponRange = 0.01f;
             if (pWeapon)
             {
@@ -922,7 +922,7 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
             // Read out the weapon ammo
             SWeaponAmmoSync ammo(ucCurrentWeapon, false, true);
             BitStream.Read(&ammo);
-            unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
+            std::uint16_t usWeaponAmmo = ammo.data.usAmmoInClip;
 
             // Valid current weapon id?
             if (CClientPickupManager::IsValidWeaponID(ucCurrentWeapon))
@@ -1176,11 +1176,11 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
 
     if (flags.data.bHasAWeapon)
     {
-        unsigned char ucWeaponType = pPlayerWeapon->GetType();
+        std::uint8_t ucWeaponType = pPlayerWeapon->GetType();
         BitStream.Write(ucWeaponType);
 
         // Write the weapon slot
-        unsigned int    uiSlot = pPlayerWeapon->GetSlot();
+        std::uint32_t    uiSlot = pPlayerWeapon->GetSlot();
         SWeaponSlotSync slot;
         slot.data.uiSlot = uiSlot;
         BitStream.Write(&slot);
@@ -1189,8 +1189,8 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
         {
             // Write the ammo states
             SWeaponAmmoSync ammo(pPlayerWeapon->GetType(), true, true);
-            ammo.data.usAmmoInClip = static_cast<unsigned short>(pPlayerWeapon->GetAmmoInClip());
-            ammo.data.usTotalAmmo = static_cast<unsigned short>(pPlayerWeapon->GetAmmoTotal());
+            ammo.data.usAmmoInClip = static_cast<std::uint16_t>(pPlayerWeapon->GetAmmoInClip());
+            ammo.data.usTotalAmmo = static_cast<std::uint16_t>(pPlayerWeapon->GetAmmoTotal());
             BitStream.Write(&ammo);
 
             // Sync aim data
@@ -1244,7 +1244,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
 void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream)
 {
     // Read out the sync time context. See CClientEntity for documentation on that.
-    unsigned char ucSyncTimeContext = 0;
+    std::uint8_t ucSyncTimeContext = 0;
     BitStream.Read(ucSyncTimeContext);
 
     // Only update the sync if this packet is from the same context.
@@ -1257,7 +1257,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     }
 
     // Read out the time it took for the packet to go from the remote client to the server and to us
-    unsigned short usLatency;
+    std::uint16_t usLatency;
     BitStream.ReadCompressed(usLatency);
     pPlayer->SetLatency(usLatency + g_pNet->GetPing());
     pPlayer->SetPing(usLatency);
@@ -1274,7 +1274,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     pPlayer->SetControllerState(ControllerState);
 
     // Grab the vehicle seat the player is in. Only read out vehicle position stuff if he's the driver.
-    unsigned int uiSeat = pPlayer->GetOccupiedVehicleSeat();
+    std::uint32_t uiSeat = pPlayer->GetOccupiedVehicleSeat();
 
     // flags are read after the position so it needs to be up here
     SPositionSync        position(false);
@@ -1456,7 +1456,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
         SWeaponSlotSync slot;
         BitStream.Read(&slot);
 
-        unsigned int uiSlot = slot.data.uiSlot;
+        std::uint32_t uiSlot = slot.data.uiSlot;
         CWeapon*     pWeapon = pPlayer->GetWeapon(static_cast<eWeaponSlot>(uiSlot));
 
         // Is the current weapon a goggle (44 or 45) or a camera (43), or a detonator (40), don't apply the fire key
@@ -1465,7 +1465,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
 
         if (flags.data.bIsDoingGangDriveby && CWeaponNames::DoesSlotHaveAmmo(uiSlot))
         {
-            unsigned char ucCurrentWeapon = 0;
+            std::uint8_t ucCurrentWeapon = 0;
             float         fWeaponRange = 0.01f;
             if (pWeapon)
             {
@@ -1478,7 +1478,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
             // Read out the weapon ammo
             SWeaponAmmoSync ammo(ucCurrentWeapon, BitStream.Version() >= 0x44, true);
             BitStream.Read(&ammo);
-            unsigned short usWeaponAmmo = ammo.data.usAmmoInClip;
+            std::uint16_t usWeaponAmmo = ammo.data.usAmmoInClip;
 
             if (pWeapon)
             {
@@ -1597,7 +1597,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
 
     // Grab the occupied vehicle seat. Send this only if we're driver
     SOccupiedSeatSync seat;
-    unsigned int      uiSeat = pPlayerModel->GetOccupiedVehicleSeat();
+    std::uint32_t      uiSeat = pPlayerModel->GetOccupiedVehicleSeat();
     seat.data.ucSeat = uiSeat;
     BitStream.Write(&seat);
     if (uiSeat == 0)
@@ -1726,7 +1726,7 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
     if (flags.data.bHasAWeapon)
     {
         // Write the weapon slot
-        unsigned int    uiSlot = pPlayerWeapon->GetSlot();
+        std::uint32_t    uiSlot = pPlayerWeapon->GetSlot();
         SWeaponSlotSync slot;
         slot.data.uiSlot = uiSlot;
         BitStream.Write(&slot);
@@ -1735,8 +1735,8 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         {
             // Write the ammo states
             SWeaponAmmoSync ammo(pPlayerWeapon->GetType(), BitStream.Version() >= 0x44, true);
-            ammo.data.usAmmoInClip = static_cast<unsigned short>(pPlayerWeapon->GetAmmoInClip());
-            ammo.data.usTotalAmmo = static_cast<unsigned short>(pPlayerWeapon->GetAmmoTotal());
+            ammo.data.usAmmoInClip = static_cast<std::uint16_t>(pPlayerWeapon->GetAmmoInClip());
+            ammo.data.usTotalAmmo = static_cast<std::uint16_t>(pPlayerWeapon->GetAmmoTotal());
             BitStream.Write(&ammo);
 
             // Sync aim data
@@ -1811,8 +1811,8 @@ void CNetAPI::WriteSmallKeysync(const CControllerState& ControllerState, NetBitS
     keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);                 // Enter/Exit/Special-Attack / Enter/exit
     keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);                     // Crouch / Horn
     keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);                            // Walk / -
-    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;            // Jump / Reverse
-    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;              // Sprint / Accelerate
+    keys.data.ucButtonSquare = (std::uint8_t)ControllerState.ButtonSquare;            // Jump / Reverse
+    keys.data.ucButtonCross = (std::uint8_t)ControllerState.ButtonCross;              // Sprint / Accelerate
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
@@ -1865,8 +1865,8 @@ void CNetAPI::WriteFullKeysync(const CControllerState& ControllerState, NetBitSt
     keys.data.bButtonTriangle = (ControllerState.ButtonTriangle != 0);
     keys.data.bShockButtonL = (ControllerState.ShockButtonL != 0);
     keys.data.bPedWalk = (ControllerState.m_bPedWalk != 0);
-    keys.data.ucButtonSquare = (unsigned char)ControllerState.ButtonSquare;
-    keys.data.ucButtonCross = (unsigned char)ControllerState.ButtonCross;
+    keys.data.ucButtonSquare = (std::uint8_t)ControllerState.ButtonSquare;
+    keys.data.ucButtonCross = (std::uint8_t)ControllerState.ButtonCross;
     keys.data.sLeftStickX = ControllerState.LeftStickX;
     keys.data.sLeftStickY = ControllerState.LeftStickY;
 
@@ -1921,7 +1921,7 @@ void CNetAPI::ReadFullVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInte
     // Adjustable property
     if (CClientVehicleManager::HasAdjustableProperty(iRemoteModelID))
     {
-        unsigned short usAdjustableProperty;
+        std::uint16_t usAdjustableProperty;
         if (BitStream.Read(usAdjustableProperty) && CClientVehicleManager::HasAdjustableProperty(iModelID))
         {
             pVehicle->SetAdjustablePropertyValue(usAdjustableProperty);
@@ -1932,7 +1932,7 @@ void CNetAPI::ReadFullVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInte
     if (CClientVehicleManager::HasDoors(iRemoteModelID))
     {
         SDoorOpenRatioSync door;
-        for (unsigned char i = 2; i < 6; ++i)
+        for (std::uint8_t i = 2; i < 6; ++i)
         {
             BitStream.Read(&door);
             if (CClientVehicleManager::HasDoors(iModelID))
@@ -1966,7 +1966,7 @@ void CNetAPI::WriteFullVehicleSpecific(CClientVehicle* pVehicle, NetBitStreamInt
     if (CClientVehicleManager::HasDoors(iModelID))
     {
         SDoorOpenRatioSync door;
-        for (unsigned char i = 2; i < 6; ++i)
+        for (std::uint8_t i = 2; i < 6; ++i)
         {
             door.data.fRatio = pVehicle->GetDoorOpenRatio(i);
             BitStream.Write(&door);
@@ -2020,12 +2020,12 @@ void CNetAPI::RPC(eServerRPCFunctions ID, NetBitStreamInterface* pBitStream)
     if (pRPCBitStream)
     {
         // Write the rpc ID
-        pRPCBitStream->Write((unsigned char)ID);
+        pRPCBitStream->Write((std::uint8_t)ID);
 
         if (pBitStream)
         {
             // Copy each byte from the bitstream we have to this one
-            unsigned char ucTemp;
+            std::uint8_t ucTemp;
             int           iLength = pBitStream->GetNumberOfBitsUsed();
             while (iLength > 8)
             {
@@ -2048,8 +2048,8 @@ void CNetAPI::RPC(eServerRPCFunctions ID, NetBitStreamInterface* pBitStream)
 
 void CNetAPI::ReadLightweightSync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStream)
 {
-    unsigned char                  ucSyncTimeContext = 0;
-    unsigned short                 usLatency;
+    std::uint8_t                  ucSyncTimeContext = 0;
+    std::uint16_t                 usLatency;
     bool                           bReadHealth;
     bool                           bReadPosition;
     bool                           bReadVehicleHealth;
@@ -2159,7 +2159,7 @@ void CNetAPI::ReadLightweightSync(CClientPlayer* pPlayer, NetBitStreamInterface&
         {
             pVehicle->SetPosition(pos.data.vecPosition);
             // Update all the vehicle passengers
-            for (unsigned int i = 0; i < 8; ++i)
+            for (std::uint32_t i = 0; i < 8; ++i)
             {
                 CClientPed* pPassenger = pVehicle->GetOccupant(i);
                 if (pPassenger && pPassenger != pPlayer)
@@ -2236,19 +2236,19 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
     BitStream.Read(&damage);
 
     if (damage.data.bSyncDoors)
-        for (unsigned int i = 0; i < MAX_DOORS; ++i)
+        for (std::uint32_t i = 0; i < MAX_DOORS; ++i)
             pVehicle->SetDoorStatus(i, damage.data.doors.data.ucStates[i], true);
 
     if (damage.data.bSyncWheels)
-        for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+        for (std::uint32_t i = 0; i < MAX_WHEELS; ++i)
             pVehicle->SetWheelStatus(i, damage.data.wheels.data.ucStates[i]);
 
     if (damage.data.bSyncPanels)
-        for (unsigned int i = 0; i < MAX_PANELS; ++i)
+        for (std::uint32_t i = 0; i < MAX_PANELS; ++i)
             pVehicle->SetPanelStatus(i, damage.data.panels.data.ucStates[i]);
 
     if (damage.data.bSyncLights)
-        for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+        for (std::uint32_t i = 0; i < MAX_LIGHTS; ++i)
             pVehicle->SetLightStatus(i, damage.data.lights.data.ucStates[i]);
 
     static_cast<CDeathmatchVehicle*>(pVehicle)->ResetDamageModelSync();

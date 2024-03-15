@@ -11,7 +11,7 @@
 
 #include "StdInc.h"
 
-CGUIListItem_Impl::CGUIListItem_Impl(const char* szText, unsigned int uiType, CGUIStaticImage_Impl* pImage)
+CGUIListItem_Impl::CGUIListItem_Impl(const char* szText, std::uint32_t uiType, CGUIStaticImage_Impl* pImage)
 {
     ItemType = uiType;
 
@@ -104,7 +104,7 @@ void CGUIListItem_Impl::SetSelectedState(bool bState)
     m_pListItem->setSelected(bState);
 }
 
-void CGUIListItem_Impl::SetColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha)
+void CGUIListItem_Impl::SetColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue, std::uint8_t ucAlpha)
 {
     if (ItemType == TextItem)
     {
@@ -118,24 +118,24 @@ void CGUIListItem_Impl::SetColor(unsigned char ucRed, unsigned char ucGreen, uns
     }
 }
 
-bool CGUIListItem_Impl::GetColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha)
+bool CGUIListItem_Impl::GetColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha)
 {
     if (ItemType == TextItem)
     {
         CEGUI::colour color = reinterpret_cast<CEGUI::ListboxTextItem*>(m_pListItem)->getTextColours().d_top_left;
-        ucRed = static_cast<unsigned char>(color.getRed() * 255);
-        ucGreen = static_cast<unsigned char>(color.getGreen() * 255);
-        ucBlue = static_cast<unsigned char>(color.getBlue() * 255);
-        ucAlpha = static_cast<unsigned char>(color.getAlpha() * 255);
+        ucRed = static_cast<std::uint8_t>(color.getRed() * 255);
+        ucGreen = static_cast<std::uint8_t>(color.getGreen() * 255);
+        ucBlue = static_cast<std::uint8_t>(color.getBlue() * 255);
+        ucAlpha = static_cast<std::uint8_t>(color.getAlpha() * 255);
         return true;
     }
     else if (ItemType == NumberItem)
     {
         CEGUI::colour color = reinterpret_cast<CEGUI::ListboxNumberItem*>(m_pListItem)->getTextColours().d_top_left;
-        ucRed = static_cast<unsigned char>(color.getRed() * 255);
-        ucGreen = static_cast<unsigned char>(color.getGreen() * 255);
-        ucBlue = static_cast<unsigned char>(color.getBlue() * 255);
-        ucAlpha = static_cast<unsigned char>(color.getAlpha() * 255);
+        ucRed = static_cast<std::uint8_t>(color.getRed() * 255);
+        ucGreen = static_cast<std::uint8_t>(color.getGreen() * 255);
+        ucBlue = static_cast<std::uint8_t>(color.getBlue() * 255);
+        ucAlpha = static_cast<std::uint8_t>(color.getAlpha() * 255);
         return true;
     }
     return false;

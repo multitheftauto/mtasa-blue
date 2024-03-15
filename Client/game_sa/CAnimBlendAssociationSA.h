@@ -33,21 +33,21 @@ public:
     {
         struct
         {
-            unsigned char m_bf1 : 1;                                             // doesn't seem to be used
-            unsigned char m_IsIFrameOrientationToAffectedByNodes : 1;            // m_IFrame orientation will be affected
-            unsigned char m_IsIFrameTranslationToAffectedByNodes : 1;            // m_IFrame translation will be affected
-            unsigned char m_bIsInitialized : 1;
-            unsigned char m_bUpdateSkinnedWith3dVelocityExtraction : 1;
-            unsigned char m_bCheckBlendNodeClumpKeyFrames : 1;            // key frames of CAninBlendNode bones will be checked
-            unsigned char m_bIsCompressed : 1;
-            unsigned char m_bUpdatingFrame : 1;            // doesn't seem to be used
+            std::uint8_t m_bf1 : 1;                                             // doesn't seem to be used
+            std::uint8_t m_IsIFrameOrientationToAffectedByNodes : 1;            // m_IFrame orientation will be affected
+            std::uint8_t m_IsIFrameTranslationToAffectedByNodes : 1;            // m_IFrame translation will be affected
+            std::uint8_t m_bIsInitialized : 1;
+            std::uint8_t m_bUpdateSkinnedWith3dVelocityExtraction : 1;
+            std::uint8_t m_bCheckBlendNodeClumpKeyFrames : 1;            // key frames of CAninBlendNode bones will be checked
+            std::uint8_t m_bIsCompressed : 1;
+            std::uint8_t m_bUpdatingFrame : 1;            // doesn't seem to be used
         };
-        unsigned char m_nFlags;
+        std::uint8_t m_nFlags;
     };
     char                     pad[3];
     CVector                  m_vecOffset;
     RpHAnimBlendInterpFrame* m_pIFrame;
-    unsigned int             m_nNodeId;
+    std::uint32_t             m_nNodeId;
 };
 
 struct SClumpAnimAssocSAInterface
@@ -76,7 +76,7 @@ public:
     int                         field_C;
     AnimBlendFrameData*         m_frames;
 
-    AnimBlendFrameData* GetFrameDataByNodeId(unsigned int nodeId);
+    AnimBlendFrameData* GetFrameDataByNodeId(std::uint32_t nodeId);
 };
 
 class CAnimBlendAssociationSAInterface
@@ -84,7 +84,7 @@ class CAnimBlendAssociationSAInterface
 public:
     DWORD*                          vTable;
     RwListEntry                     listEntry;
-    unsigned short                  cNumBlendNodes;
+    std::uint16_t                  cNumBlendNodes;
     short                           sAnimGroup;                     // 14
     CAnimBlendNodeSAInterface*      pAnimBlendNodeArray;            // CAnimBlendNode pp?          // 16
     CAnimBlendHierarchySAInterface* pAnimHierarchy;                 // 20
@@ -98,46 +98,46 @@ public:
     {
         struct
         {
-            unsigned short m_bPlaying : 1;                    // Anim will stop playing if flag is not set
-            unsigned short m_bLooped : 1;                     // Anim will always restart when it completes
-            unsigned short m_bFreezeLastFrame : 1;            // Anim will freeze on last frame
+            std::uint16_t m_bPlaying : 1;                    // Anim will stop playing if flag is not set
+            std::uint16_t m_bLooped : 1;                     // Anim will always restart when it completes
+            std::uint16_t m_bFreezeLastFrame : 1;            // Anim will freeze on last frame
 
             // When this flag is Set, IF m_bLooped == false, m_bPlaying == true, and anim progress >= total anim time
             // THEN m_bFreezeLastFrame is set to TRUE and m_fBlendDelta is set to -4.0.
             // Result: https://i.imgur.com/idw0jsX.png
-            unsigned short m_bLockLastFrame : 1;
+            std::uint16_t m_bLockLastFrame : 1;
 
-            unsigned short m_bPartial : 1;                   // Partial anims run along other anims
-            unsigned short m_bEnableMovement : 1;            // blends all playing anims together if set
+            std::uint16_t m_bPartial : 1;                   // Partial anims run along other anims
+            std::uint16_t m_bEnableMovement : 1;            // blends all playing anims together if set
 
             // Camera will not move with ped, and ped will go back to the initial position when anim is over
-            unsigned short m_bLockLastX : 1;
-            unsigned short m_bLockLastY : 1;            // only applies if m_bLockLastX is set
+            std::uint16_t m_bLockLastX : 1;
+            std::uint16_t m_bLockLastY : 1;            // only applies if m_bLockLastX is set
 
-            unsigned short m_bf9 : 1;             // doesn't seem to be used
-            unsigned short m_bf10 : 1;            // doesn't seem to be used
+            std::uint16_t m_bf9 : 1;             // doesn't seem to be used
+            std::uint16_t m_bf10 : 1;            // doesn't seem to be used
 
             // If set to TRUE, then result:
             // Before = https://i.imgur.com/c8T7xNK.png | AFTER = https://i.imgur.com/4gqlA4n.png
-            unsigned short m_bAddAnimBlendToTotalBlend : 1;
+            std::uint16_t m_bAddAnimBlendToTotalBlend : 1;
 
-            unsigned short m_bf12 : 1;                          // doesn't seem to be used
-            unsigned short m_bSecondaryTaskAnim : 1;            // doesn't seem to be used
+            std::uint16_t m_bf12 : 1;                          // doesn't seem to be used
+            std::uint16_t m_bSecondaryTaskAnim : 1;            // doesn't seem to be used
 
             // Anim will play. Translation values will be ignored for anim (m_bEnableTranslation
             // is ignored if set), and it only applies to some anims though
-            unsigned short m_bFreezeTranslation : 1;
-            unsigned short m_bBlockReferenced : 1;            // anim block can't be unloaded if it's referenced by an anim.
+            std::uint16_t m_bFreezeTranslation : 1;
+            std::uint16_t m_bBlockReferenced : 1;            // anim block can't be unloaded if it's referenced by an anim.
 
             // Anim will not be destroyed. It will be played simultaneously with other anims
             // (multiple anims at once) if you set this flag while sitting in a car, you'll still be
             // seated even if you exit the vehicle or play other anims, like walking, running, crouching,
             // etc, like this: https://i.imgur.com/VgWn5fl.png
-            unsigned short m_bIndestructible : 1;
+            std::uint16_t m_bIndestructible : 1;
         };
-        unsigned short m_nFlags;
+        std::uint16_t m_nFlags;
     };
-    unsigned int uiCallbackType;            // 48:  1 means finished and 2 means delete
+    std::uint32_t uiCallbackType;            // 48:  1 means finished and 2 means delete
     DWORD*       pCallbackFunc;             // 52
     DWORD*       pCallbackData;             // 56
                                             // Total: 60 bytes

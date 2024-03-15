@@ -235,7 +235,7 @@ void CGUI_Impl::DrawMouseCursor()
     CEGUI::MouseCursor::getSingleton().draw();
 }
 
-void CGUI_Impl::ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX, unsigned long ulY, CGUIMouseButton eMouseButton)
+void CGUI_Impl::ProcessMouseInput(CGUIMouseInput eMouseInput, std::uint32_t ulX, std::uint32_t ulY, CGUIMouseButton eMouseButton)
 {
     switch (eMouseInput)
     {
@@ -264,7 +264,7 @@ void CGUI_Impl::ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX,
     }
 }
 
-void CGUI_Impl::ProcessKeyboardInput(unsigned long ulKey, bool bIsDown)
+void CGUI_Impl::ProcessKeyboardInput(std::uint32_t ulKey, bool bIsDown)
 {
     if (bIsDown)
     {
@@ -342,12 +342,12 @@ CEGUI::String CGUI_Impl::GetUTFString(const std::string& strInput)
     return strUTF;
 }
 
-void CGUI_Impl::ProcessCharacter(unsigned long ulCharacter)
+void CGUI_Impl::ProcessCharacter(std::uint32_t ulCharacter)
 {
     m_pSystem->injectChar(ulCharacter);
 }
 
-CGUIMessageBox* CGUI_Impl::CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags)
+CGUIMessageBox* CGUI_Impl::CreateMessageBox(const char* szTitle, const char* szMessage, std::uint32_t uiFlags)
 {
     return new CGUIMessageBox_Impl(this, szTitle, szMessage, uiFlags);
 }
@@ -372,12 +372,12 @@ CGUIEdit* CGUI_Impl::_CreateEdit(CGUIElement_Impl* pParent, const char* szText)
     return new CGUIEdit_Impl(this, pParent, szText);
 }
 
-CGUIFont* CGUI_Impl::CreateFnt(const char* szFontName, const char* szFontFile, unsigned int uSize, unsigned int uFlags, bool bAutoScale)
+CGUIFont* CGUI_Impl::CreateFnt(const char* szFontName, const char* szFontFile, std::uint32_t uSize, std::uint32_t uFlags, bool bAutoScale)
 {
     return new CGUIFont_Impl(this, szFontName, szFontFile, uSize, uFlags, bAutoScale);
 }
 
-CGUIFont* CGUI_Impl::CreateFntFromWinFont(const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, unsigned int uSize, unsigned int uFlags,
+CGUIFont* CGUI_Impl::CreateFntFromWinFont(const char* szFontName, const char* szFontWinReg, const char* szFontWinFile, std::uint32_t uSize, std::uint32_t uFlags,
                                           bool bAutoScale)
 {
     SString strFontWinRegName = GetSystemRegistryValue((uint)HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts", szFontWinReg);
@@ -1665,7 +1665,7 @@ void CGUI_Impl::ClearInputHandlers(eInputChannel channel)
 void CGUI_Impl::ClearSystemKeys()
 {
     // Unpress any held system keys
-    unsigned int uiSysKeys = CEGUI::System::getSingleton().getSystemKeys();
+    std::uint32_t uiSysKeys = CEGUI::System::getSingleton().getSystemKeys();
 
     if (uiSysKeys & CEGUI::Control)
         ProcessKeyboardInput(CGUIKeys::LeftControl, false);

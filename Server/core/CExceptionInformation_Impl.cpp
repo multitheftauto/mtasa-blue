@@ -45,7 +45,7 @@ CExceptionInformation_Impl::~CExceptionInformation_Impl()
         delete m_szModulePathName;
 }
 
-void CExceptionInformation_Impl::Set(unsigned int iCode, _EXCEPTION_POINTERS* pException)
+void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException)
 {
     m_uiCode = iCode;
     m_pAddress = pException->ExceptionRecord->ExceptionAddress;

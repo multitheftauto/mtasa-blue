@@ -20,7 +20,7 @@ extern "C"
 
 #include "CLuaFunctionRef.h"
 
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast<unsigned long>(x))
+#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast<std::uint32_t>(x))
 
 class CVector2D;
 

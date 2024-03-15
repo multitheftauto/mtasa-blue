@@ -28,7 +28,7 @@ void CPickupRPCs::DestroyAllPickups(NetBitStreamInterface& bitStream)
 void CPickupRPCs::SetPickupType(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the pickup id and the position vector
-    unsigned char ucType;
+    std::uint8_t ucType;
     if (bitStream.Read(ucType))
     {
         // Grab the pickup
@@ -49,8 +49,8 @@ void CPickupRPCs::SetPickupType(CClientEntity* pSource, NetBitStreamInterface& b
             else if (ucType == CClientPickup::WEAPON)
             {
                 // Get the weapon id
-                unsigned char  ucWeaponID;
-                unsigned short usAmmo;
+                std::uint8_t  ucWeaponID;
+                std::uint16_t usAmmo;
                 bitStream.Read(ucWeaponID);
                 bitStream.Read(usAmmo);
                 if (CClientPickupManager::IsValidWeaponID(ucWeaponID))
@@ -63,7 +63,7 @@ void CPickupRPCs::SetPickupType(CClientEntity* pSource, NetBitStreamInterface& b
             }
             else if (ucType == CClientPickup::CUSTOM)
             {
-                unsigned short usModel;
+                std::uint16_t usModel;
                 bitStream.Read(usModel);
                 if (CClientObjectManager::IsValidModel(usModel))
                 {
@@ -79,7 +79,7 @@ void CPickupRPCs::SetPickupType(CClientEntity* pSource, NetBitStreamInterface& b
 void CPickupRPCs::SetPickupVisible(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Read out the pickup id and the is visible flag
-    unsigned char ucVisible;
+    std::uint8_t ucVisible;
     if (bitStream.Read(ucVisible))
     {
         // Grab the pickup

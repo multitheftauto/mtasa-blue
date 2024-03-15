@@ -26,15 +26,15 @@ extern CGameSA*        pGame;
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<std::uint16_t, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
 std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
+std::map<DWORD, std::uint16_t>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
 std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<eVehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
 std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
-std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::uint16_t>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
-std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::map<std::uint16_t, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
 
 union tIdeFlags
 {
@@ -69,7 +69,7 @@ union tIdeFlags
 
         char cPad : 8;
     };
-    unsigned int uiFlags;
+    std::uint32_t uiFlags;
 };
 
 static constexpr uintptr_t vftable_CVehicleModelInfo = 0x85C5C8u;
@@ -475,12 +475,12 @@ bool CModelInfoSA::DoIsLoaded()
     return bLoaded;
 }
 
-unsigned short CModelInfoSA::GetFlags()
+std::uint16_t CModelInfoSA::GetFlags()
 {
     return ppModelInfo[m_dwModelID]->usFlags;
 }
 
-unsigned short CModelInfoSA::GetOriginalFlags()
+std::uint16_t CModelInfoSA::GetOriginalFlags()
 {
     if (MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
         return MapGet(ms_ModelDefaultFlagsMap, m_dwModelID);
@@ -488,7 +488,7 @@ unsigned short CModelInfoSA::GetOriginalFlags()
     return ppModelInfo[m_dwModelID]->usFlags;
 }
 
-void CModelInfoSA::SetFlags(unsigned short usFlags)
+void CModelInfoSA::SetFlags(std::uint16_t usFlags)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (!m_pInterface)
@@ -505,7 +505,7 @@ void CModelInfoSA::SetFlags(unsigned short usFlags)
     m_pInterface->usFlags = usFlags;
 }
 
-void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
+void CModelInfoSA::SetIdeFlags(std::uint32_t uiFlags)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (!m_pInterface)
@@ -699,7 +699,7 @@ void CModelInfoSA::SetModelSpecialType(eModelSpecialType eType, bool bState)
 void CModelInfoSA::StaticResetFlags()
 {
     // Restore default values
-    for (std::map<DWORD, unsigned short>::const_iterator iter = ms_ModelDefaultFlagsMap.begin(); iter != ms_ModelDefaultFlagsMap.end(); ++iter)
+    for (std::map<DWORD, std::uint16_t>::const_iterator iter = ms_ModelDefaultFlagsMap.begin(); iter != ms_ModelDefaultFlagsMap.end(); ++iter)
     {
         CBaseModelInfoSAInterface* pInterface = ppModelInfo[iter->first];
         if (pInterface)
@@ -773,7 +773,7 @@ skip:
     return fReturn;
 }
 
-unsigned short CModelInfoSA::GetTextureDictionaryID()
+std::uint16_t CModelInfoSA::GetTextureDictionaryID()
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (m_pInterface)
@@ -782,7 +782,7 @@ unsigned short CModelInfoSA::GetTextureDictionaryID()
     return 0;
 }
 
-void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
+void CModelInfoSA::SetTextureDictionaryID(std::uint16_t usID)
 {
     m_pInterface = ppModelInfo[m_dwModelID];
     if (!m_pInterface)
@@ -965,9 +965,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
 
     ((void (*)())FUNC_FlushRequestList)();
 
-    std::set<unsigned short> removedModels;
+    std::set<std::uint16_t> removedModels;
 
-    for (int i = 0; i < 2 * NUM_StreamSectorRows * NUM_StreamSectorCols; i++)
+    for (auto i = 0; i < 2 * NUM_StreamSectorRows * NUM_StreamSectorCols; i++)
     {
         DWORD* pSectorEntry = ((DWORD**)ARRAY_StreamSectors)[i];
         while (pSectorEntry)
@@ -1006,7 +1006,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
         }
     }
 
-    for (int i = 0; i < NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols; i++)
+    for (auto i = 0; i < NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols; i++)
     {
         DWORD* pSectorEntry = ((DWORD**)ARRAY_StreamRepeatSectors)[3 * i + 2];
         while (pSectorEntry)
@@ -1031,7 +1031,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
 
     ms_RestreamTxdIDMap.clear();
 
-    std::set<unsigned short>::iterator it;
+    std::set<std::uint16_t>::iterator it;
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
@@ -1159,7 +1159,7 @@ void CModelInfoSA::ResetAlphaTransparency()
     }
 }
 
-short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
+short CModelInfoSA::GetAvailableVehicleMod(std::uint16_t usUpgrade)
 {
     short sreturn = -1;
     if (usUpgrade >= 1000 && usUpgrade <= 1193)
@@ -1232,11 +1232,11 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
     else szStoredText[0] = 0;
 }
 
-unsigned int CModelInfoSA::GetNumRemaps()
+std::uint32_t CModelInfoSA::GetNumRemaps()
 {
     DWORD        dwFunc = FUNC_CVehicleModelInfo__GetNumRemaps;
     DWORD        ModelID = m_dwModelID;
-    unsigned int uiReturn = 0;
+    std::uint32_t uiReturn = 0;
     _asm
     {
         mov     ecx, ModelID
@@ -1488,18 +1488,18 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
     switch (GetModelType())
     {
         case eModelInfoType::PED:
-            success = pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            success = pGame->GetRenderWare()->ReplacePedModel(pClump, static_cast<std::uint16_t>(m_dwModelID));
             break;
         case eModelInfoType::WEAPON:
-            success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<std::uint16_t>(m_dwModelID));
             break;
         case eModelInfoType::VEHICLE:
-            success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<std::uint16_t>(m_dwModelID));
             break;
         case eModelInfoType::ATOMIC:
         case eModelInfoType::LOD_ATOMIC:
         case eModelInfoType::TIME:
-            success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+            success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<std::uint16_t>(m_dwModelID));
             break;
         default:
             break;
@@ -1978,9 +1978,9 @@ void CModelInfoSA::ResetSupportedUpgrades()
     m_ModelSupportedUpgrades.Reset();
 }
 
-void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
+void CModelInfoSA::SetObjectPropertiesGroup(std::uint16_t usNewGroup)
 {
-    unsigned short usOrgGroup = GetObjectPropertiesGroup();
+    std::uint16_t usOrgGroup = GetObjectPropertiesGroup();
     if (usOrgGroup == usNewGroup)
         return;
 
@@ -1990,9 +1990,9 @@ void CModelInfoSA::SetObjectPropertiesGroup(unsigned short usNewGroup)
     GetInterface()->usDynamicIndex = usNewGroup;
 }
 
-unsigned short CModelInfoSA::GetObjectPropertiesGroup()
+std::uint16_t CModelInfoSA::GetObjectPropertiesGroup()
 {
-    unsigned short usGroup = GetInterface()->usDynamicIndex;
+    std::uint16_t usGroup = GetInterface()->usDynamicIndex;
     if (usGroup == 0xFFFF)
         usGroup = 0;
 
@@ -2001,7 +2001,7 @@ unsigned short CModelInfoSA::GetObjectPropertiesGroup()
 
 void CModelInfoSA::RestoreObjectPropertiesGroup()
 {
-    unsigned short* usGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
+    std::uint16_t* usGroupInMap = MapFind(ms_OriginalObjectPropertiesGroups, m_dwModelID);
     if (usGroupInMap)
     {
         GetInterface()->usDynamicIndex = *usGroupInMap;

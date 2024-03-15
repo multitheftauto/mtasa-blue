@@ -76,7 +76,7 @@ CBassAudio::CBassAudio(bool bStream, const SString& strPath, bool bLoop, bool bT
     m_uiCallbackId = AddCallbackId(this);
 }
 
-CBassAudio::CBassAudio(void* pBuffer, unsigned int uiBufferLength, bool bLoop, bool b3D)
+CBassAudio::CBassAudio(void* pBuffer, std::uint32_t uiBufferLength, bool bLoop, bool b3D)
     : m_bStream(false), m_pBuffer(pBuffer), m_uiBufferLength(uiBufferLength), m_bLoop(bLoop), m_bThrottle(false), m_b3D(b3D)
 {
     m_fVolume = 1.0f;

@@ -42,7 +42,7 @@ public:
 
     void AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
     void AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
-    void AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, unsigned char ucBlurIf0, float fSpread,
+    void AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, std::uint8_t ucBlurIf0, float fSpread,
                    float fLife);
     void AddTyreBurst(CVector& vecPosition, CVector& vecDirection);
     void AddBulletImpact(CVector& vecPosition, CVector& vecDirection, int iSmokeSize, int iSparkCount, float fSmokeIntensity);

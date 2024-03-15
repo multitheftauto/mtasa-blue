@@ -440,7 +440,7 @@ int CLuaXMLDefs::xmlNodeFindChild(lua_State* luaVM)
 {
     CXMLNode*    pNode;
     SString      strTagName;
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pNode);
@@ -466,7 +466,7 @@ int CLuaXMLDefs::xmlNodeFindChild(lua_State* luaVM)
 int CLuaXMLDefs::xmlNodeGetChildren(lua_State* luaVM)
 {
     CXMLNode*    pNode;
-    unsigned int uiIndex;
+    std::uint32_t uiIndex;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pNode);

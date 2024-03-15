@@ -207,7 +207,7 @@ public:
     bool Load(SString blockName, bool isRawData, SString input);
 
     const SString&      GetBlockName() { return m_strBlockName; }
-    const unsigned int& GetBlockNameHash() { return m_u32Hashkey; }
+    const std::uint32_t& GetBlockNameHash() { return m_u32Hashkey; }
 
     CAnimBlendHierarchySAInterface* GetAnimationHierarchy(const SString& strAnimationName);
     std::shared_ptr<CIFPAnimations> GetIFPAnimationsPointer() { return m_pIFPAnimations; }
@@ -272,14 +272,14 @@ private:
 
     std::shared_ptr<CIFPAnimations> m_pIFPAnimations;
     SString                         m_strBlockName;
-    unsigned int                    m_u32Hashkey;
+    std::uint32_t                    m_u32Hashkey;
     std::vector<SAnimation>*        m_pVecAnimations;
     bool                            m_bVersion1;
     bool                            m_bUnloading;
     CAnimManager*                   m_pAnimManager;
 
     // 32 because there are 32 bones in a ped model
-    const unsigned short m_kcIFPSequences = 32;
+    const std::uint16_t m_kcIFPSequences = 32;
     // We'll keep all key frames compressed by default. GTA:SA will decompress
     // them, when it's going to play the animation. We don't need to worry about it.
     const bool m_kbAllKeyFramesCompressed = true;

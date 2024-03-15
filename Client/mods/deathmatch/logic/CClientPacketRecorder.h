@@ -34,9 +34,9 @@ public:
     bool IsPlayingOrRecording();
     bool IsFrameBased();
 
-    void SetFrameSkip(unsigned int uiFrameSkip);
+    void SetFrameSkip(std::uint32_t uiFrameSkip);
 
-    void RecordPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream);
+    void RecordPacket(std::uint8_t ucPacketID, NetBitStreamInterface& bitStream);
     void RecordLocalData(CClientPlayer* pLocalPlayer);
 
 private:
@@ -55,8 +55,8 @@ private:
     bool m_bRecording;
     bool m_bFrameBased;
 
-    unsigned long m_ulCurrentOffset;
+    std::uint32_t m_ulCurrentOffset;
     long          m_lNextPacketTime;
 
-    unsigned int m_uiFrameSkip;
+    std::uint32_t m_uiFrameSkip;
 };

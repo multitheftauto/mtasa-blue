@@ -78,16 +78,16 @@ public:
         B = 0;
     }
 
-    CGUIColor(unsigned char _R, unsigned char _G, unsigned char _B)
+    CGUIColor(std::uint8_t _R, std::uint8_t _G, std::uint8_t _B)
     {
         R = _R;
         G = _G;
         B = _B;
     }
 
-    unsigned char R;
-    unsigned char G;
-    unsigned char B;
+    std::uint8_t R;
+    std::uint8_t G;
+    std::uint8_t B;
 };
 
 struct CGUIMouse

@@ -58,8 +58,8 @@ namespace SharedUtil
             Init();
 
             // Hash it
-            unsigned char Buffer[65536];
-            while (unsigned int uiRead = static_cast<unsigned int>(fread(Buffer, 1, 65536, pFile)))
+            std::uint8_t Buffer[65536];
+            while (std::uint32_t uiRead = static_cast<std::uint32_t>(fread(Buffer, 1, 65536, pFile)))
             {
                 Update(Buffer, uiRead);
             }
@@ -85,7 +85,7 @@ namespace SharedUtil
         // CRYPT_START
         // Hash it
         Init();
-        Update((unsigned char*)pBuffer, (unsigned int)sizeLength);
+        Update((std::uint8_t*)pBuffer, (std::uint32_t)sizeLength);
         Finalize();
 
         // Copy out the MD5 and return success
@@ -96,7 +96,7 @@ namespace SharedUtil
 
     void CMD5Hasher::ConvertToHex(const MD5& Input, char* pBuffer)
     {
-        for (int i = 0; i < 16; i++)
+        for (auto i = 0; i < 16; i++)
         {
             sprintf(pBuffer + i * 2, "%02X", Input.data[i]);
         }
@@ -143,22 +143,22 @@ namespace SharedUtil
         m_state[3] = 0x10325476;
     }
 
-    void CMD5Hasher::Update(unsigned char* input, unsigned int input_length)
+    void CMD5Hasher::Update(std::uint8_t* input, std::uint32_t input_length)
     {
         // CRYPT_START
-        unsigned int input_index, buffer_index;
-        unsigned int buffer_space;            // how much space is left in buffer
+        std::uint32_t input_index, buffer_index;
+        std::uint32_t buffer_space;            // how much space is left in buffer
 
         // Compute number of bytes mod 64
-        buffer_index = (unsigned int)((m_count[0] >> 3) & 0x3F);
+        buffer_index = (std::uint32_t)((m_count[0] >> 3) & 0x3F);
 
         // Update number of bits
-        if ((m_count[0] += ((unsigned int)input_length << 3)) < ((unsigned int)input_length << 3))
+        if ((m_count[0] += ((std::uint32_t)input_length << 3)) < ((std::uint32_t)input_length << 3))
         {
             m_count[1]++;
         }
 
-        m_count[1] += ((unsigned int)input_length >> 29);
+        m_count[1] += ((std::uint32_t)input_length >> 29);
 
         buffer_space = 64 - buffer_index;            // how much space is left in buffer
 
@@ -189,16 +189,16 @@ namespace SharedUtil
 
     void CMD5Hasher::Finalize()
     {
-        unsigned char        bits[8];
-        unsigned int         index, padLen;
-        static unsigned char PADDING[64] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        std::uint8_t        bits[8];
+        std::uint32_t         index, padLen;
+        static std::uint8_t PADDING[64] = {0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                             0,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
         // Save number of bits
         Encode(bits, m_count, 8);
 
         // Pad out to 56 mod 64.
-        index = (unsigned int)((m_count[0] >> 3) & 0x3f);
+        index = (std::uint32_t)((m_count[0] >> 3) & 0x3f);
         padLen = (index < 56) ? (56 - index) : (120 - index);
         Update(PADDING, padLen);
 
@@ -212,11 +212,11 @@ namespace SharedUtil
         memset(m_buffer, 0, sizeof(m_buffer));
     }
 
-    const unsigned char* CMD5Hasher::GetResult() const { return m_digest; }
+    const std::uint8_t* CMD5Hasher::GetResult() const { return m_digest; }
 
-    void CMD5Hasher::Transform(unsigned char block[64])
+    void CMD5Hasher::Transform(std::uint8_t block[64])
     {
-        unsigned int a = m_state[0], b = m_state[1], c = m_state[2], d = m_state[3], x[16];
+        std::uint32_t a = m_state[0], b = m_state[1], c = m_state[2], d = m_state[3], x[16];
 
         Decode(x, block, 64);
 
@@ -298,60 +298,60 @@ namespace SharedUtil
         m_state[3] += d;
 
         // Zeroize sensitive information.
-        memset((unsigned char*)x, 0, sizeof(x));
+        memset((std::uint8_t*)x, 0, sizeof(x));
     }
 
-    void CMD5Hasher::Encode(unsigned char* output, unsigned int* input, unsigned long len)
+    void CMD5Hasher::Encode(std::uint8_t* output, std::uint32_t* input, std::uint32_t len)
     {
-        unsigned int i, j;
+        std::uint32_t i, j;
 
         for (i = 0, j = 0; j < len; i++, j += 4)
         {
-            output[j] = (unsigned char)(input[i] & 0xff);
-            output[j + 1] = (unsigned char)((input[i] >> 8) & 0xff);
-            output[j + 2] = (unsigned char)((input[i] >> 16) & 0xff);
-            output[j + 3] = (unsigned char)((input[i] >> 24) & 0xff);
+            output[j] = (std::uint8_t)(input[i] & 0xff);
+            output[j + 1] = (std::uint8_t)((input[i] >> 8) & 0xff);
+            output[j + 2] = (std::uint8_t)((input[i] >> 16) & 0xff);
+            output[j + 3] = (std::uint8_t)((input[i] >> 24) & 0xff);
         }
     }
 
-    void CMD5Hasher::Decode(unsigned int* output, unsigned char* input, unsigned long len)
+    void CMD5Hasher::Decode(std::uint32_t* output, std::uint8_t* input, std::uint32_t len)
     {
-        unsigned int i, j;
+        std::uint32_t i, j;
 
         for (i = 0, j = 0; j < len; i++, j += 4)
             output[i] =
-                ((unsigned int)input[j]) | (((unsigned int)input[j + 1]) << 8) | (((unsigned int)input[j + 2]) << 16) | (((unsigned int)input[j + 3]) << 24);
+                ((std::uint32_t)input[j]) | (((std::uint32_t)input[j + 1]) << 8) | (((std::uint32_t)input[j + 2]) << 16) | (((std::uint32_t)input[j + 3]) << 24);
     }
 
-    inline unsigned int CMD5Hasher::RotateLeft(unsigned int x, unsigned int n) { return (x << n) | (x >> (32 - n)); }
+    inline std::uint32_t CMD5Hasher::RotateLeft(std::uint32_t x, std::uint32_t n) { return (x << n) | (x >> (32 - n)); }
 
-    inline unsigned int CMD5Hasher::F(unsigned int x, unsigned int y, unsigned int z) { return (x & y) | (~x & z); }
+    inline std::uint32_t CMD5Hasher::F(std::uint32_t x, std::uint32_t y, std::uint32_t z) { return (x & y) | (~x & z); }
 
-    inline unsigned int CMD5Hasher::G(unsigned int x, unsigned int y, unsigned int z) { return (x & z) | (y & ~z); }
+    inline std::uint32_t CMD5Hasher::G(std::uint32_t x, std::uint32_t y, std::uint32_t z) { return (x & z) | (y & ~z); }
 
-    inline unsigned int CMD5Hasher::H(unsigned int x, unsigned int y, unsigned int z) { return x ^ y ^ z; }
+    inline std::uint32_t CMD5Hasher::H(std::uint32_t x, std::uint32_t y, std::uint32_t z) { return x ^ y ^ z; }
 
-    inline unsigned int CMD5Hasher::I(unsigned int x, unsigned int y, unsigned int z) { return y ^ (x | ~z); }
+    inline std::uint32_t CMD5Hasher::I(std::uint32_t x, std::uint32_t y, std::uint32_t z) { return y ^ (x | ~z); }
 
-    inline void CMD5Hasher::FF(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac)
+    inline void CMD5Hasher::FF(std::uint32_t& a, std::uint32_t b, std::uint32_t c, std::uint32_t d, std::uint32_t x, std::uint32_t s, std::uint32_t ac)
     {
         a += F(b, c, d) + x + ac;
         a = RotateLeft(a, s) + b;
     }
 
-    inline void CMD5Hasher::GG(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac)
+    inline void CMD5Hasher::GG(std::uint32_t& a, std::uint32_t b, std::uint32_t c, std::uint32_t d, std::uint32_t x, std::uint32_t s, std::uint32_t ac)
     {
         a += G(b, c, d) + x + ac;
         a = RotateLeft(a, s) + b;
     }
 
-    inline void CMD5Hasher::HH(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac)
+    inline void CMD5Hasher::HH(std::uint32_t& a, std::uint32_t b, std::uint32_t c, std::uint32_t d, std::uint32_t x, std::uint32_t s, std::uint32_t ac)
     {
         a += H(b, c, d) + x + ac;
         a = RotateLeft(a, s) + b;
     }
 
-    inline void CMD5Hasher::II(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac)
+    inline void CMD5Hasher::II(std::uint32_t& a, std::uint32_t b, std::uint32_t c, std::uint32_t d, std::uint32_t x, std::uint32_t s, std::uint32_t ac)
     {
         a += I(b, c, d) + x + ac;
         a = RotateLeft(a, s) + b;
@@ -361,13 +361,13 @@ namespace SharedUtil
     // Implementation of Bob Jenkin's awesome hash function
     // Ref: http://burtleburtle.net/bob/hash/doobs.html
     //
-    unsigned int HashString(const char* szString) { return HashString(szString, (unsigned int)strlen(szString)); }
+    std::uint32_t HashString(const char* szString) { return HashString(szString, (std::uint32_t)strlen(szString)); }
 
-    unsigned int HashString(const char* szString, unsigned int length)
+    std::uint32_t HashString(const char* szString, std::uint32_t length)
     {
         const char*  k;                  //< pointer to the string data to be hashed
-        unsigned int a, b, c;            //< temporary variables
-        unsigned int len;                //< length of the string left
+        std::uint32_t a, b, c;            //< temporary variables
+        std::uint32_t len;                //< length of the string left
 
         k = szString;
         len = length;
@@ -376,9 +376,9 @@ namespace SharedUtil
 
         while (len >= 12)
         {
-            a += (k[0] + ((unsigned int)k[1] << 8) + ((unsigned int)k[2] << 16) + ((unsigned int)k[3] << 24));
-            b += (k[4] + ((unsigned int)k[5] << 8) + ((unsigned int)k[6] << 16) + ((unsigned int)k[7] << 24));
-            c += (k[8] + ((unsigned int)k[9] << 8) + ((unsigned int)k[10] << 16) + ((unsigned int)k[11] << 24));
+            a += (k[0] + ((std::uint32_t)k[1] << 8) + ((std::uint32_t)k[2] << 16) + ((std::uint32_t)k[3] << 24));
+            b += (k[4] + ((std::uint32_t)k[5] << 8) + ((std::uint32_t)k[6] << 16) + ((std::uint32_t)k[7] << 24));
+            c += (k[8] + ((std::uint32_t)k[9] << 8) + ((std::uint32_t)k[10] << 16) + ((std::uint32_t)k[11] << 24));
 
             // Mix
             a -= b;
@@ -421,25 +421,25 @@ namespace SharedUtil
         switch (len)
         {
             case 11:
-                c += ((unsigned int)k[10] << 24);
+                c += ((std::uint32_t)k[10] << 24);
             case 10:
-                c += ((unsigned int)k[9] << 16);
+                c += ((std::uint32_t)k[9] << 16);
             case 9:
-                c += ((unsigned int)k[8] << 8);
+                c += ((std::uint32_t)k[8] << 8);
             case 8:
-                b += ((unsigned int)k[7] << 24);
+                b += ((std::uint32_t)k[7] << 24);
             case 7:
-                b += ((unsigned int)k[6] << 16);
+                b += ((std::uint32_t)k[6] << 16);
             case 6:
-                b += ((unsigned int)k[5] << 8);
+                b += ((std::uint32_t)k[5] << 8);
             case 5:
                 b += k[4];
             case 4:
-                a += ((unsigned int)k[3] << 24);
+                a += ((std::uint32_t)k[3] << 24);
             case 3:
-                a += ((unsigned int)k[2] << 16);
+                a += ((std::uint32_t)k[2] << 16);
             case 2:
-                a += ((unsigned int)k[1] << 8);
+                a += ((std::uint32_t)k[1] << 8);
             case 1:
                 a += k[0];
         }
@@ -611,7 +611,7 @@ namespace SharedUtil
 
     SString GenerateHashHexStringFromFile(EHashFunctionType hashFunction, FILE* fh, uint uiMaxSize, int iOffset)
     {
-        unsigned char buf[32768];
+        std::uint8_t buf[32768];
 
         // Set offset
         fseek(fh, iOffset, SEEK_SET);
@@ -698,10 +698,10 @@ namespace SharedUtil
             return GenerateHashHexString(hashFunction, NULL, 0);
     }
 
-    void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
+    void encodeXtea(std::uint32_t* v, std::uint32_t* w, std::uint32_t* k)
     {
-        unsigned int v0 = v[0], v1 = v[1], i, sum = 0;
-        unsigned int delta = 0x9E3779B9;
+        std::uint32_t v0 = v[0], v1 = v[1], i, sum = 0;
+        std::uint32_t delta = 0x9E3779B9;
         for (i = 0; i < 32; i++)
         {
             v0 += (((v1 << 4) ^ (v1 >> 5)) + v1) ^ (sum + k[sum & 3]);
@@ -712,10 +712,10 @@ namespace SharedUtil
         w[1] = v1;
     }
 
-    void decodeXtea(unsigned int* v, unsigned int* w, unsigned int* k)
+    void decodeXtea(std::uint32_t* v, std::uint32_t* w, std::uint32_t* k)
     {
-        unsigned int v0 = v[0], v1 = v[1], i, sum = 0xC6EF3720;
-        unsigned int delta = 0x9E3779B9;
+        std::uint32_t v0 = v[0], v1 = v[1], i, sum = 0xC6EF3720;
+        std::uint32_t delta = 0x9E3779B9;
         for (i = 0; i < 32; i++)
         {
             v1 -= (((v0 << 4) ^ (v0 >> 5)) + v0) ^ (sum + k[(sum >> 11) & 3]);
@@ -728,10 +728,10 @@ namespace SharedUtil
 
     void TeaEncode(const SString& str, const SString& key, SString* out)
     {
-        unsigned int v[2];
-        unsigned int w[2];
-        unsigned int k[4];
-        unsigned int keybuffer[4];
+        std::uint32_t v[2];
+        std::uint32_t w[2];
+        std::uint32_t k[4];
+        std::uint32_t keybuffer[4];
 
         // Clear buffers
         memset(v, 0, sizeof(v));
@@ -745,7 +745,7 @@ namespace SharedUtil
         if (len > 16)
             len = 16;
         memcpy(keybuffer, key.c_str(), len);
-        for (int i = 0; i < 4; ++i)
+        for (auto i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
         // Copy the input string to a buffer of size multiple of 4
@@ -754,15 +754,15 @@ namespace SharedUtil
             return;
         if ((strbuflen % 4) > 0)
             strbuflen += 4 - (strbuflen % 4);
-        unsigned char* strbuf = new unsigned char[strbuflen];
+        std::uint8_t* strbuf = new std::uint8_t[strbuflen];
         memset(strbuf, 0, strbuflen);
         memcpy(strbuf, str.c_str(), str.length());
 
         // Encode it!
         v[1] = 0;
-        for (int i = 0; i < strbuflen; i += 4)
+        for (auto i = 0; i < strbuflen; i += 4)
         {
-            v[0] = *(unsigned int*)&strbuf[i];
+            v[0] = *(std::uint32_t*)&strbuf[i];
 
             encodeXtea(&v[0], &w[0], &k[0]);
             out->append((char*)&w[0], 4);
@@ -776,10 +776,10 @@ namespace SharedUtil
 
     void TeaDecode(const SString& str, const SString& key, SString* out)
     {
-        unsigned int v[2];
-        unsigned int w[2];
-        unsigned int k[4];
-        unsigned int keybuffer[4];
+        std::uint32_t v[2];
+        std::uint32_t w[2];
+        std::uint32_t k[4];
+        std::uint32_t keybuffer[4];
 
         // Clear buffers
         memset(v, 0, sizeof(v));
@@ -800,21 +800,21 @@ namespace SharedUtil
         if (len > 16)
             len = 16;
         memcpy(keybuffer, key.c_str(), len);
-        for (int i = 0; i < 4; ++i)
+        for (auto i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
         // Create a temporary buffer to store the result
-        unsigned char* buffer = new unsigned char[numPasses * 4 + 4];
+        std::uint8_t* buffer = new std::uint8_t[numPasses * 4 + 4];
         memset(buffer, 0, numPasses * 4 + 4);
 
         // Decode it!
         const char* p = str.c_str();
-        v[1] = *(unsigned int*)&p[numPasses * 4];
-        for (int i = 0; i < numPasses; ++i)
+        v[1] = *(std::uint32_t*)&p[numPasses * 4];
+        for (auto i = 0; i < numPasses; ++i)
         {
-            v[0] = *(unsigned int*)&p[(numPasses - i - 1) * 4];
+            v[0] = *(std::uint32_t*)&p[(numPasses - i - 1) * 4];
             decodeXtea(&v[0], &w[0], &k[0]);
-            *(unsigned int*)&buffer[(numPasses - i - 1) * 4] = w[0];
+            *(std::uint32_t*)&buffer[(numPasses - i - 1) * 4] = w[0];
             v[1] = w[1];
         }
 

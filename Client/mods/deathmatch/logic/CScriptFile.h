@@ -27,7 +27,7 @@ public:
         MODE_CREATE,
     };
 
-    CScriptFile(uint uiScriptId, const char* szFilename, unsigned long ulMaxSize, eAccessType accessType);
+    CScriptFile(uint uiScriptId, const char* szFilename, std::uint32_t ulMaxSize, eAccessType accessType);
     ~CScriptFile();
 
     // Functions required for linking
@@ -62,11 +62,11 @@ public:
     long GetPointer();
     long GetSize();
 
-    long SetPointer(unsigned long ulPosition);
+    long SetPointer(std::uint32_t ulPosition);
 
     void Flush();
-    long Read(unsigned long ulSize, SString& outBuffer);
-    long Write(unsigned long ulSize, const char* pData);
+    long Read(std::uint32_t ulSize, SString& outBuffer);
+    long Write(std::uint32_t ulSize, const char* pData);
 
     long GetContents(std::string& buffer);
 
@@ -80,9 +80,9 @@ private:
     CBinaryFileInterface* m_pFile;
     SString               m_strFilename;            // Resource relative
     SString               m_strAbsPath;             // Absolute
-    unsigned long         m_ulMaxSize;
+    std::uint32_t         m_ulMaxSize;
     bool                  m_bDoneResourceFileCheck;
-    unsigned int          m_uiScriptId;
+    std::uint32_t          m_uiScriptId;
     CResource*            m_pResource;
     eAccessType           m_accessType;
     SLuaDebugInfo         m_LuaDebugInfo;

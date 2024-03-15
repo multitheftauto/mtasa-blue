@@ -39,7 +39,7 @@ namespace eTrainNode
     };
 };
 
-enum class eTrainPassengersGenerationState : unsigned char
+enum class eTrainPassengersGenerationState : std::uint8_t
 {
     QUERY_NUM_PASSENGERS_TO_LEAVE = 0,
     TELL_PASSENGERS_TO_LEAVE = 1,
@@ -66,18 +66,18 @@ public:
     {
         struct
         {
-            unsigned short b01 : 1;                          // initialised with 1
-            unsigned short bStoppedAtStation : 1;            // Only the first created train on the chain gets this set to true, others get it set to false.
-            unsigned short bPassengersCanEnterAndLeave : 1;
-            unsigned short bIsTheChainEngine : 1;            // front carriage
-            unsigned short bIsLastCarriage : 1;
-            unsigned short bMissionTrain : 1;
-            unsigned short bClockwiseDirection : 1;
-            unsigned short bStopsAtStations : 1;
+            std::uint16_t b01 : 1;                          // initialised with 1
+            std::uint16_t bStoppedAtStation : 1;            // Only the first created train on the chain gets this set to true, others get it set to false.
+            std::uint16_t bPassengersCanEnterAndLeave : 1;
+            std::uint16_t bIsTheChainEngine : 1;            // front carriage
+            std::uint16_t bIsLastCarriage : 1;
+            std::uint16_t bMissionTrain : 1;
+            std::uint16_t bClockwiseDirection : 1;
+            std::uint16_t bStopsAtStations : 1;
 
-            unsigned short bIsDerailed : 1;
-            unsigned short bForceSlowDown : 1;
-            unsigned short bIsStreakModel : 1;
+            std::uint16_t bIsDerailed : 1;
+            std::uint16_t bForceSlowDown : 1;
+            std::uint16_t bIsStreakModel : 1;
         } trainFlags;
     };
 
@@ -86,7 +86,7 @@ private:
 
 public:
     int           m_uiLastTimeUpdated;
-    unsigned char m_ucRailTrackID;
+    std::uint8_t m_ucRailTrackID;
 
 private:
     char _pad5C1[3];
@@ -95,8 +95,8 @@ public:
     int                             m_nTimeWhenCreated;
     short                           field_5C8;            // initialized with 0, not referenced
     eTrainPassengersGenerationState m_nPassengersGenerationState;
-    unsigned char                   m_nNumPassengersToLeave : 4;            // 0 to 4
-    unsigned char                   m_nNumPassengersToEnter : 4;            // 0 to 4
+    std::uint8_t                   m_nNumPassengersToLeave : 4;            // 0 to 4
+    std::uint8_t                   m_nNumPassengersToEnter : 4;            // 0 to 4
     CPedSAInterface*                m_pTemporaryPassenger;                  // we tell peds to enter train and then delete them
     CTrainSAInterface*              m_prevCarriage;
     CTrainSAInterface*              m_nextCarriage;

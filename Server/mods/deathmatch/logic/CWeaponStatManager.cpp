@@ -20,7 +20,7 @@ CWeaponStatManager::CWeaponStatManager()
     Init();
     CWeaponStat* pWeaponStat = NULL;
     // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
-    for (int i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
+    for (auto i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
         // Storage for Original weapon data ( for resetting )
@@ -36,9 +36,9 @@ CWeaponStatManager::CWeaponStatManager()
         LoadDefault(pWeaponStat, weaponType);
     }
 
-    for (int skill = 0; skill < 3; skill++)
+    for (auto skill = 0; skill < 3; skill++)
     {
-        for (int i = 0; i < NUM_WeaponInfosOtherSkill; i++)
+        for (auto i = 0; i < NUM_WeaponInfosOtherSkill; i++)
         {
             eWeaponSkill weaponSkill = (eWeaponSkill)skill;
             eWeaponType  weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
@@ -1597,7 +1597,7 @@ bool CWeaponStatManager::LoadDefault(CWeaponStat* pDest, eWeaponType weaponType,
     return true;
 }
 
-unsigned short CWeaponStatManager::GetSkillStatIndex(eWeaponType eWeapon)
+std::uint16_t CWeaponStatManager::GetSkillStatIndex(eWeaponType eWeapon)
 {
     switch (eWeapon)
     {

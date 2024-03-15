@@ -25,10 +25,10 @@ public:
     virtual CGUITab* GetSelectedTab() = 0;
     virtual void     SetSelectedTab(CGUITab* pTab) = 0;
 
-    virtual void         SetSelectedIndex(unsigned int uiIndex) = 0;
-    virtual unsigned int GetSelectedIndex() = 0;
+    virtual void         SetSelectedIndex(std::uint32_t uiIndex) = 0;
+    virtual std::uint32_t GetSelectedIndex() = 0;
 
-    virtual unsigned int GetTabCount() = 0;
+    virtual std::uint32_t GetTabCount() = 0;
 
     virtual void SetSelectionHandler(GUI_CALLBACK Callback) = 0;
 

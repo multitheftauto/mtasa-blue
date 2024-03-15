@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CResourceStopPacket.h"
 
-CResourceStopPacket::CResourceStopPacket(unsigned short usID)
+CResourceStopPacket::CResourceStopPacket(std::uint16_t usID)
 {
     m_usID = usID;
 }

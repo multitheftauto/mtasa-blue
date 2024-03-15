@@ -26,9 +26,9 @@ public:
     virtual CGUIHorizontalAlign GetHorizontalAlign() = 0;
 
     virtual void      SetTextColor(CGUIColor Color) = 0;
-    virtual void      SetTextColor(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue) = 0;
+    virtual void      SetTextColor(std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue) = 0;
     virtual CGUIColor GetTextColor() = 0;
-    virtual void      GetTextColor(unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue) = 0;
+    virtual void      GetTextColor(std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue) = 0;
 
     virtual void SetFrameEnabled(bool bFrameEnabled) = 0;
     virtual bool IsFrameEnabled() = 0;

@@ -35,7 +35,7 @@ bool CLightsyncPacket::Write(NetBitStreamInterface& BitStream) const
         CVehicle*                      pVehicle = pPlayer->GetOccupiedVehicle();
 
         // Find the difference between now and the time the position last changed for the player
-        long long llTicksDifference = GetTickCount64_() - pPlayer->GetPositionLastChanged();
+        std::int64_t llTicksDifference = GetTickCount64_() - pPlayer->GetPositionLastChanged();
 
         // Right we need to sync the position if there is no vehicle or he's in a vehicle and the difference between setPosition is less than or equal to the
         // slow sync rate i.e. make sure his position has been updated more than 0.001f in the last 1500ms plus a small margin for error (probably not needed).
@@ -43,9 +43,9 @@ bool CLightsyncPacket::Write(NetBitStreamInterface& BitStream) const
         bSyncPosition = (!pVehicle || pPlayer->GetOccupiedVehicleSeat() == 0) && llTicksDifference <= g_TickRateSettings.iLightSync + 100;
 
         BitStream.Write(pPlayer->GetID());
-        BitStream.Write((unsigned char)pPlayer->GetSyncTimeContext());
+        BitStream.Write((std::uint8_t)pPlayer->GetSyncTimeContext());
 
-        unsigned short usLatency = pPlayer->GetPing();
+        std::uint16_t usLatency = pPlayer->GetPing();
         BitStream.WriteCompressed(usLatency);
 
         BitStream.WriteBit(data.health.bSync);

@@ -46,8 +46,8 @@ public:
 
     float GetAlphaFactor() const { return m_fAlphaFactor; };
 
-    void SetDimension(unsigned short usDimension) override;
-    void RelateDimension(unsigned short usDimension);
+    void SetDimension(std::uint16_t usDimension) override;
+    void RelateDimension(std::uint16_t usDimension);
 
 protected:
     void DoPulse();
@@ -61,6 +61,6 @@ protected:
 
     bool          m_bStreamedIn;
     bool          m_bFlashing;
-    unsigned long m_ulFlashCycleStart;
+    std::uint32_t m_ulFlashCycleStart;
     float         m_fAlphaFactor;
 };

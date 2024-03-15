@@ -25,18 +25,18 @@ public:
     void SetMasked(bool bMasked);
     bool IsMasked();
 
-    void         SetMaxLength(unsigned int uiMaxLength);
-    unsigned int GetMaxLength();
+    void         SetMaxLength(std::uint32_t uiMaxLength);
+    std::uint32_t GetMaxLength();
 
-    void         SetSelection(unsigned int uiStart, unsigned int uiEnd);
-    unsigned int GetSelectionStart();
-    unsigned int GetSelectionEnd();
-    unsigned int GetSelectionLength();
+    void         SetSelection(std::uint32_t uiStart, std::uint32_t uiEnd);
+    std::uint32_t GetSelectionStart();
+    std::uint32_t GetSelectionEnd();
+    std::uint32_t GetSelectionLength();
 
-    void         SetCaretIndex(unsigned int uiIndex);
+    void         SetCaretIndex(std::uint32_t uiIndex);
     void         SetCaretAtStart();
     void         SetCaretAtEnd();
-    unsigned int GetCaretIndex();
+    std::uint32_t GetCaretIndex();
 
     void SetTextAcceptedHandler(GUI_CALLBACK Callback);
     void SetTextChangedHandler(GUI_CALLBACK Callback);

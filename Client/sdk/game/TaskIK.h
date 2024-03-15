@@ -35,7 +35,7 @@ public:
     virtual int                 AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int slotID = -1) = 0;
     virtual void                RemoveIKChainTask(int slotID) = 0;
     virtual void                BlendOut(int slotID, int blendOutTime) = 0;
-    virtual unsigned char       IsSlotEmpty(int slotID) = 0;
+    virtual std::uint8_t       IsSlotEmpty(int slotID) = 0;
     virtual CTaskSimpleIKChain* GetTaskAtSlot(int slotID) = 0;
 };
 

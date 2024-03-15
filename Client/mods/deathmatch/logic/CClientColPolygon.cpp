@@ -38,7 +38,7 @@ bool CClientColPolygon::DoHitDetection(const CVector& vecNowPosition, float fRad
     float x = vecNowPosition.fX;
     float y = vecNowPosition.fY;
 
-    for (unsigned int i = 0; i < m_Points.size(); i++)
+    for (std::uint32_t i = 0; i < m_Points.size(); i++)
     {
         CVector2D vecPi = m_Points[i];
         CVector2D vecPj = m_Points[j];
@@ -61,7 +61,7 @@ void CClientColPolygon::SetPosition(const CVector& vecPosition)
 {
     CVector vecDifference = m_vecPosition - vecPosition;
 
-    for (unsigned int i = 0; i < m_Points.size(); i++)
+    for (std::uint32_t i = 0; i < m_Points.size(); i++)
     {
         m_Points[i].fX -= vecDifference.fX;
         m_Points[i].fY -= vecDifference.fY;
@@ -79,7 +79,7 @@ bool CClientColPolygon::AddPoint(CVector2D vecPoint)
     return true;
 }
 
-bool CClientColPolygon::AddPoint(CVector2D vecPoint, unsigned int uiPointIndex)
+bool CClientColPolygon::AddPoint(CVector2D vecPoint, std::uint32_t uiPointIndex)
 {
     if (uiPointIndex > m_Points.size())
         return false;
@@ -90,7 +90,7 @@ bool CClientColPolygon::AddPoint(CVector2D vecPoint, unsigned int uiPointIndex)
     return true;
 }
 
-bool CClientColPolygon::RemovePoint(unsigned int uiPointIndex)
+bool CClientColPolygon::RemovePoint(std::uint32_t uiPointIndex)
 {
     if (m_Points.size() <= 3)
         return false;
@@ -104,7 +104,7 @@ bool CClientColPolygon::RemovePoint(unsigned int uiPointIndex)
     return true;
 }
 
-bool CClientColPolygon::SetPointPosition(unsigned int uiPointIndex, const CVector2D& vecPoint)
+bool CClientColPolygon::SetPointPosition(std::uint32_t uiPointIndex, const CVector2D& vecPoint)
 {
     if (uiPointIndex >= m_Points.size())
         return false;

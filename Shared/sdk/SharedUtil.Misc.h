@@ -209,7 +209,7 @@ namespace SharedUtil
     };
     DWORD _GetCurrentProcessorNumber();
     void  GetThreadCPUTimes(uint64& outUserTime, uint64& outKernelTime);
-    void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount = NULL);
+    void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, std::int64_t* pllTickCount = NULL);
 
     SString EscapeString(const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', uchar ucLowerLimit = 0, uchar ucUpperLimit = 255);
     SString UnescapeString(const SString& strText, char cSpecialChar = '#');
@@ -238,7 +238,7 @@ namespace SharedUtil
 
     std::wstring ANSIToUTF16(const SString& s);
 
-    int GetUTF8Confidence(const unsigned char* input, int len);
+    int GetUTF8Confidence(const std::uint8_t* input, int len);
 
     bool IsUTF8BOM(const void* pData, uint uiLength);
 
@@ -470,16 +470,16 @@ namespace SharedUtil
         {
             struct
             {
-                unsigned char B, G, R, A;
+                std::uint8_t B, G, R, A;
             };
-            unsigned long ulARGB;
+            std::uint32_t ulARGB;
         };
 
         SColor() : ulARGB(0) {}
 
-        SColor(unsigned long ulValue) { ulARGB = ulValue; }
+        SColor(std::uint32_t ulValue) { ulARGB = ulValue; }
 
-        operator unsigned long() const { return ulARGB; }
+        operator std::uint32_t() const { return ulARGB; }
     };
 
     //
@@ -490,7 +490,7 @@ namespace SharedUtil
     class SColorARGB : public SColor
     {
     public:
-        SColorARGB(unsigned char ucA, unsigned char ucR, unsigned char ucG, unsigned char ucB)
+        SColorARGB(std::uint8_t ucA, std::uint8_t ucR, std::uint8_t ucG, std::uint8_t ucB)
         {
             A = ucA;
             R = ucR;
@@ -501,10 +501,10 @@ namespace SharedUtil
         template <class T, class U, class V, class W>
         SColorARGB(T a, U r, V g, W b)
         {
-            A = Clamp<unsigned char>(0, static_cast<unsigned char>(a), 255);
-            R = Clamp<unsigned char>(0, static_cast<unsigned char>(r), 255);
-            G = Clamp<unsigned char>(0, static_cast<unsigned char>(g), 255);
-            B = Clamp<unsigned char>(0, static_cast<unsigned char>(b), 255);
+            A = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(a), 255);
+            R = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(r), 255);
+            G = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(g), 255);
+            B = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(b), 255);
         }
     };
 
@@ -516,7 +516,7 @@ namespace SharedUtil
     class SColorRGBA : public SColor
     {
     public:
-        SColorRGBA(unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA)
+        SColorRGBA(std::uint8_t ucR, std::uint8_t ucG, std::uint8_t ucB, std::uint8_t ucA)
         {
             A = ucA;
             R = ucR;
@@ -527,10 +527,10 @@ namespace SharedUtil
         template <class T, class U, class V, class W>
         SColorRGBA(T r, U g, V b, W a)
         {
-            A = Clamp<unsigned char>(0, static_cast<unsigned char>(a), 255);
-            R = Clamp<unsigned char>(0, static_cast<unsigned char>(r), 255);
-            G = Clamp<unsigned char>(0, static_cast<unsigned char>(g), 255);
-            B = Clamp<unsigned char>(0, static_cast<unsigned char>(b), 255);
+            A = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(a), 255);
+            R = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(r), 255);
+            G = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(g), 255);
+            B = Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(b), 255);
         }
     };
 
@@ -539,15 +539,15 @@ namespace SharedUtil
     //
     typedef SColor RGBA;
 
-    inline unsigned char COLOR_RGBA_R(SColor color) { return color.R; }
-    inline unsigned char COLOR_RGBA_G(SColor color) { return color.G; }
-    inline unsigned char COLOR_RGBA_B(SColor color) { return color.B; }
-    inline unsigned char COLOR_RGBA_A(SColor color) { return color.A; }
-    inline unsigned char COLOR_ARGB_A(SColor color) { return color.A; }
+    inline std::uint8_t COLOR_RGBA_R(SColor color) { return color.R; }
+    inline std::uint8_t COLOR_RGBA_G(SColor color) { return color.G; }
+    inline std::uint8_t COLOR_RGBA_B(SColor color) { return color.B; }
+    inline std::uint8_t COLOR_RGBA_A(SColor color) { return color.A; }
+    inline std::uint8_t COLOR_ARGB_A(SColor color) { return color.A; }
 
-    inline SColor COLOR_RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A) { return SColorRGBA(R, G, B, A); }
-    inline SColor COLOR_ARGB(unsigned char A, unsigned char R, unsigned char G, unsigned char B) { return SColorRGBA(R, G, B, A); }
-    inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_RGBA(std::uint8_t R, std::uint8_t G, std::uint8_t B, std::uint8_t A) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_ARGB(std::uint8_t A, std::uint8_t R, std::uint8_t G, std::uint8_t B) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_ABGR(std::uint8_t A, std::uint8_t B, std::uint8_t G, std::uint8_t R) { return SColorRGBA(R, G, B, A); }
 
     //
     // Cross platform critical section
@@ -604,7 +604,7 @@ namespace SharedUtil
     //
     // Note: IDs run from 1 to Capacity
     //
-    template <typename T, unsigned long INITIAL_MAX_STACK_SIZE>
+    template <typename T, std::uint32_t INITIAL_MAX_STACK_SIZE>
     class CStack
     {
     public:
@@ -614,14 +614,14 @@ namespace SharedUtil
             ExpandBy(INITIAL_MAX_STACK_SIZE - 1);
         }
 
-        unsigned long GetCapacity() const { return m_ulCapacity; }
+        std::uint32_t GetCapacity() const { return m_ulCapacity; }
 
-        unsigned long GetUnusedAmount() const { return m_Queue.size(); }
+        std::uint32_t GetUnusedAmount() const { return m_Queue.size(); }
 
-        void ExpandBy(unsigned long ulAmount)
+        void ExpandBy(std::uint32_t ulAmount)
         {
-            const unsigned long ulOldSize = m_ulCapacity;
-            const unsigned long ulNewSize = m_ulCapacity + ulAmount;
+            const std::uint32_t ulOldSize = m_ulCapacity;
+            const std::uint32_t ulNewSize = m_ulCapacity + ulAmount;
 
             // Add ID's for new items
             for (T ID = ulOldSize + 1; ID <= ulNewSize; ++ID)
@@ -654,7 +654,7 @@ namespace SharedUtil
         }
 
     private:
-        unsigned long m_ulCapacity;
+        std::uint32_t m_ulCapacity;
         std::deque<T> m_Queue;
     };
 
@@ -1090,7 +1090,7 @@ namespace SharedUtil
                 return;            // Not in list
 
             // Keep active iterators valid
-            for (int i = m_ActiveIterators.size() - 1; i >= 0; i--)
+            for (auto i = m_ActiveIterators.size() - 1; i >= 0; i--)
                 if (m_ActiveIterators[i]->m_pNode == pNode)
                     m_ActiveIterators[i]->NotifyRemovingNode(pNode);
 
@@ -1240,12 +1240,12 @@ namespace SharedUtil
     template <typename T>
     inline T tolower(T c)
     {
-        return static_cast<T>(ms_ucTolowerTab[static_cast<unsigned char>(c)]);
+        return static_cast<T>(ms_ucTolowerTab[static_cast<std::uint8_t>(c)]);
     }
     template <typename T>
     inline T toupper(T c)
     {
-        return static_cast<T>(ms_ucToupperTab[static_cast<unsigned char>(c)]);
+        return static_cast<T>(ms_ucToupperTab[static_cast<std::uint8_t>(c)]);
     }
 
     //
@@ -1514,7 +1514,7 @@ namespace SharedUtil
                 else
                 {
                     const int iTo = atoi(strTo);
-                    for (int i = atoi(strFrom); i <= iTo; i++)
+                    for (auto i = atoi(strFrom); i <= iTo; i++)
                         AddSingle(cType, i);
                 }
             }

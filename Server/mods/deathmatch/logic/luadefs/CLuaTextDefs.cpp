@@ -137,7 +137,7 @@ int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
     float         fX, fY, fScale;
     int           iPriority;
     SColorRGBA    color(255, 255, 255, 255);
-    unsigned char ucShadowAlpha;
+    std::uint8_t ucShadowAlpha;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strText, "");
@@ -172,7 +172,7 @@ int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned char ucFormat = 0;
+        std::uint8_t ucFormat = 0;
         if (strHorzAlign == "center")
             ucFormat |= 0x00000001;            // DT_CENTER
         else if (strHorzAlign == "right")

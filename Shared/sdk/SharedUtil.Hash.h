@@ -88,40 +88,40 @@ namespace SharedUtil
         static SString CalculateHexString(const void* pBuffer, size_t sizeLength);
 
         void                 Init();
-        void                 Update(unsigned char* input, unsigned int input_length);
+        void                 Update(std::uint8_t* input, std::uint32_t input_length);
         void                 Finalize();
-        const unsigned char* GetResult() const;
+        const std::uint8_t* GetResult() const;
 
     private:
-        void Transform(unsigned char* pBuffer);
+        void Transform(std::uint8_t* pBuffer);
 
-        static void Encode(unsigned char* dest, unsigned int* src, unsigned long length);
-        static void Decode(unsigned int* dest, unsigned char* src, unsigned long length);
+        static void Encode(std::uint8_t* dest, std::uint32_t* src, std::uint32_t length);
+        static void Decode(std::uint32_t* dest, std::uint8_t* src, std::uint32_t length);
 
-        static inline unsigned int RotateLeft(unsigned int x, unsigned int n);
-        static inline unsigned int F(unsigned int x, unsigned int y, unsigned int z);
-        static inline unsigned int G(unsigned int x, unsigned int y, unsigned int z);
-        static inline unsigned int H(unsigned int x, unsigned int y, unsigned int z);
-        static inline unsigned int I(unsigned int x, unsigned int y, unsigned int z);
-        static inline void         FF(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac);
-        static inline void         GG(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac);
-        static inline void         HH(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac);
-        static inline void         II(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac);
+        static inline std::uint32_t RotateLeft(std::uint32_t x, std::uint32_t n);
+        static inline std::uint32_t F(std::uint32_t x, std::uint32_t y, std::uint32_t z);
+        static inline std::uint32_t G(std::uint32_t x, std::uint32_t y, std::uint32_t z);
+        static inline std::uint32_t H(std::uint32_t x, std::uint32_t y, std::uint32_t z);
+        static inline std::uint32_t I(std::uint32_t x, std::uint32_t y, std::uint32_t z);
+        static inline void         FF(std::uint32_t& a, std::uint32_t b, std::uint32_t c, std::uint32_t d, std::uint32_t x, std::uint32_t s, std::uint32_t ac);
+        static inline void         GG(std::uint32_t& a, std::uint32_t b, std::uint32_t c, std::uint32_t d, std::uint32_t x, std::uint32_t s, std::uint32_t ac);
+        static inline void         HH(std::uint32_t& a, std::uint32_t b, std::uint32_t c, std::uint32_t d, std::uint32_t x, std::uint32_t s, std::uint32_t ac);
+        static inline void         II(std::uint32_t& a, std::uint32_t b, std::uint32_t c, std::uint32_t d, std::uint32_t x, std::uint32_t s, std::uint32_t ac);
 
-        unsigned int  m_state[4];
-        unsigned int  m_count[2];
-        unsigned char m_buffer[64];
-        unsigned char m_digest[16];
+        std::uint32_t  m_state[4];
+        std::uint32_t  m_count[2];
+        std::uint8_t m_buffer[64];
+        std::uint8_t m_digest[16];
     };
 
-    void encodeXtea(unsigned int* v, unsigned int* w, unsigned int* k);
-    void decodeXTea(unsigned int* v, unsigned int* w, unsigned int* k);
+    void encodeXtea(std::uint32_t* v, std::uint32_t* w, std::uint32_t* k);
+    void decodeXTea(std::uint32_t* v, std::uint32_t* w, std::uint32_t* k);
 
     void TeaEncode(const SString& str, const SString& key, SString* out);
     void TeaDecode(const SString& str, const SString& key, SString* out);
 
-    unsigned int HashString(const char* szString);
-    unsigned int HashString(const char* szString, unsigned int length);
+    std::uint32_t HashString(const char* szString);
+    std::uint32_t HashString(const char* szString, std::uint32_t length);
 
 #ifdef SDK_WITH_BCRYPT
     SString BcryptHash(const SString& password, SString salt = "", std::size_t cost = 10);

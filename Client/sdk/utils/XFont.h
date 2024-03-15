@@ -193,7 +193,7 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
     char szTemp[4096];
     memset(szTemp, 0, sizeof(szTemp));
 
-    for (int i = 0; i < uNumOfTables; i++)
+    for (auto i = 0; i < uNumOfTables; i++)
     {
         // f.Read(&tblDir, sizeof(TT_TABLE_DIRECTORY));
         memcpy(&tblDir, &lpMapAddress[index], sizeof(TT_TABLE_DIRECTORY));
@@ -226,7 +226,7 @@ BOOL GetFontProperties(LPCTSTR lpszFilePath, FONT_PROPERTIES* lpFontPropsX)
         TT_NAME_RECORD ttRecord;
         bFound = FALSE;
 
-        for (int i = 0; i < ttNTHeader.uNRCount &&
+        for (auto i = 0; i < ttNTHeader.uNRCount &&
                         (lpFontProps->csCopyright[0] == 0 || lpFontProps->csName[0] == 0 || lpFontProps->csTrademark[0] == 0 || lpFontProps->csFamily[0] == 0);
              i++)
         {

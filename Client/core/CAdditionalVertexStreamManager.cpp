@@ -22,7 +22,7 @@ namespace
     uint ConvertPTSize(uint SizePT) { return SizePT * 12 / 20; }
 
     // Get 64 bit key for a triangle by using the ordered vertex indices
-    long long getTriKey(WORD a, WORD b, WORD c)
+    std::int64_t getTriKey(WORD a, WORD b, WORD c)
     {
         WORD tmp;
         if (b < a)
@@ -43,7 +43,7 @@ namespace
             b = a;
             a = tmp;
         }
-        return (((long long)a) << 32) | (((long long)b) << 16) | ((long long)c);
+        return (((std::int64_t)a) << 32) | (((std::int64_t)b) << 16) | ((std::int64_t)c);
     }
 }            // namespace
 
@@ -270,7 +270,7 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
         std::vector<CVector> NormalList;
         NormalList.insert(NormalList.end(), NumVerts, CVector());
 
-        std::map<long long, CVector> doneTrisMap;
+        std::map<std::int64_t, CVector> doneTrisMap;
 
         // For each triangle
         for (uint i = 0; i < numIndices - 2; i += step)
@@ -304,7 +304,7 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
                 Normal = -Normal;
 
             // Try to improve results by ignoring duplicated triangles
-            long long key = getTriKey(v0, v1, v2);
+            std::int64_t key = getTriKey(v0, v1, v2);
             if (CVector* pDoneTriPrevNormal = MapFind(doneTrisMap, key))
             {
                 // Already done this tri - Keep prev tri if it has a better 'up' rating

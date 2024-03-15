@@ -1113,8 +1113,8 @@ CCredits::CCredits()
     float        fStartPosition = 1.0f;
     const char*  szCreditsIterator = m_strCredits.c_str();
     const char*  szCreditsBegin = m_strCredits.c_str();
-    unsigned int uiLineCount = 0;
-    unsigned int uiLabelIndex = 0;
+    std::uint32_t uiLineCount = 0;
+    std::uint32_t uiLabelIndex = 0;
     while (true)
     {
         // Count every new line

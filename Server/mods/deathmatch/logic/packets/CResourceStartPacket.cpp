@@ -29,7 +29,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
     if (!m_strResourceName.empty())
     {
         // Write the resource name
-        unsigned char sizeResourceName = static_cast<unsigned char>(m_strResourceName.size());
+        std::uint8_t sizeResourceName = static_cast<std::uint8_t>(m_strResourceName.size());
         BitStream.Write(sizeResourceName);
         if (sizeResourceName > 0)
         {
@@ -46,7 +46,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.Write(m_pResource->GetDynamicElementRoot()->GetID());
 
         // Count the amount of 'no client cache' scripts
-        unsigned short usNoClientCacheScriptCount = 0;
+        std::uint16_t usNoClientCacheScriptCount = 0;
         if (m_pResource->IsClientScriptsOn() == true)
         {
             std::list<CResourceFile*>::iterator iter = m_pResource->IterBegin();
@@ -87,7 +87,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
                 ((*iter)->GetType() == CResourceScriptItem::RESOURCE_FILE_TYPE_CLIENT_FILE && m_pResource->IsClientFilesOn()))
             {
                 // Write the Type of chunk to read (F - File, E - Exported Function)
-                BitStream.Write(static_cast<unsigned char>('F'));
+                BitStream.Write(static_cast<std::uint8_t>('F'));
 
                 // Write the map name
                 const char* szFileName = (*iter)->GetWindowsName();
@@ -96,13 +96,13 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
                 // Make sure we don't have any backslashes in the name
                 char* szCleanedFilename = new char[sizeFileName + 1];
                 strcpy(szCleanedFilename, szFileName);
-                for (unsigned int i = 0; i < sizeFileName; i++)
+                for (std::uint32_t i = 0; i < sizeFileName; i++)
                 {
                     if (szCleanedFilename[i] == '\\')
                         szCleanedFilename[i] = '/';
                 }
 
-                BitStream.Write(static_cast<unsigned char>(sizeFileName));
+                BitStream.Write(static_cast<std::uint8_t>(sizeFileName));
                 if (sizeFileName > 0)
                 {
                     BitStream.Write(szCleanedFilename, sizeFileName);
@@ -111,7 +111,7 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
                 // ChrML: Don't forget this...
                 delete[] szCleanedFilename;
 
-                BitStream.Write(static_cast<unsigned char>((*iter)->GetType()));
+                BitStream.Write(static_cast<std::uint8_t>((*iter)->GetType()));
                 CChecksum checksum = (*iter)->GetLastChecksum();
                 BitStream.Write(checksum.ulCRC);
                 BitStream.Write((const char*)checksum.md5.data, sizeof(checksum.md5.data));
@@ -133,13 +133,13 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
             if (iterExportedFunction->GetType() == CExportedFunction::EXPORTED_FUNCTION_TYPE_CLIENT)
             {
                 // Write the Type of chunk to read (F - File, E - Exported Function)
-                BitStream.Write(static_cast<unsigned char>('E'));
+                BitStream.Write(static_cast<std::uint8_t>('E'));
 
                 // Write the exported function
                 std::string strFunctionName = iterExportedFunction->GetFunctionName();
                 size_t      sizeFunctionName = strFunctionName.length();
 
-                BitStream.Write(static_cast<unsigned char>(sizeFunctionName));
+                BitStream.Write(static_cast<std::uint8_t>(sizeFunctionName));
                 if (sizeFunctionName > 0)
                 {
                     BitStream.Write(strFunctionName.c_str(), sizeFunctionName);

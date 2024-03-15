@@ -22,11 +22,11 @@ private:
     static bool SetAppID(lua_State* luaVM, std::string strAppID);
     static bool SetDetails(std::string strDetails);
     static bool SetAsset(std::string szAsset, std::string szAssetText, bool bIsLarge = false);
-    static bool SetButtons(unsigned short int iIndex, std::string szName, std::string szUrl);
+    static bool SetButtons(std::uint16_t int iIndex, std::string szName, std::string szUrl);
     static bool SetLargeAsset(std::string szAsset, std::string szAssetText);
     static bool SetSmallAsset(std::string szAsset, std::string szAssetText);
-    static bool SetStartTime(unsigned long ulTime);
-    static bool SetEndTime(unsigned long ulTime);
+    static bool SetStartTime(std::uint32_t ulTime);
+    static bool SetEndTime(std::uint32_t ulTime);
     static bool SetPartySize(int iMin, int iMax);
     static bool IsDiscordRPCConnected();
     static std::string GetDiscordUserID();

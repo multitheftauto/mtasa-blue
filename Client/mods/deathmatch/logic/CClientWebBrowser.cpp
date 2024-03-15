@@ -218,7 +218,7 @@ void CClientWebBrowser::Events_OnPopup(const SString& strTargetURL, const SStrin
     CallEvent("onClientBrowserPopup", Arguments, false);
 }
 
-void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
+void CClientWebBrowser::Events_OnChangeCursor(std::uint8_t ucCursor)
 {
     CLuaArguments Arguments;
     Arguments.PushNumber(ucCursor);
@@ -281,7 +281,7 @@ bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuff
     return pFile->DoesClientAndServerChecksumMatch();
 }
 
-void CClientWebBrowser::Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, unsigned char reason)
+void CClientWebBrowser::Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, std::uint8_t reason)
 {
     CLuaArguments Arguments;
     Arguments.PushString(strURL);

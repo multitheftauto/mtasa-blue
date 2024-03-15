@@ -16,7 +16,7 @@ extern CClientGame* g_pClientGame;
 #define M_PI 3.14159265358979323846
 #endif
 
-unsigned int CClientMarker::m_uiStreamedInMarkers = 0;
+std::uint32_t CClientMarker::m_uiStreamedInMarkers = 0;
 
 CClientMarker::CClientMarker(CClientManager* pManager, ElementID ID, int iMarkerType) : ClassInit(this), CClientStreamElement(pManager->GetMarkerStreamer(), ID)
 {
@@ -138,13 +138,13 @@ void CClientMarker::DoPulse()
 CClientMarker::eMarkerType CClientMarker::GetMarkerType() const
 {
     // Grab the marker class type
-    unsigned int uiMarkerType = m_pMarker->GetMarkerType();
+    std::uint32_t uiMarkerType = m_pMarker->GetMarkerType();
     switch (uiMarkerType)
     {
         // If it's a checkpoint, it can be either a checkpoint or a ring
         case CClientMarkerCommon::CLASS_CHECKPOINT:
         {
-            unsigned long ulCheckpointType = static_cast<CClientCheckpoint*>(m_pMarker)->GetCheckpointType();
+            std::uint32_t ulCheckpointType = static_cast<CClientCheckpoint*>(m_pMarker)->GetCheckpointType();
             if (ulCheckpointType == CClientCheckpoint::TYPE_NORMAL)
                 return MARKER_CHECKPOINT;
             else
@@ -154,7 +154,7 @@ CClientMarker::eMarkerType CClientMarker::GetMarkerType() const
         // If it's a 3d marker it can either be a cylinder or an arrow
         case CClientMarkerCommon::CLASS_3DMARKER:
         {
-            unsigned long ul3DType = static_cast<CClient3DMarker*>(m_pMarker)->Get3DMarkerType();
+            std::uint32_t ul3DType = static_cast<CClient3DMarker*>(m_pMarker)->Get3DMarkerType();
             if (ul3DType == CClient3DMarker::TYPE_CYLINDER)
                 return MARKER_CYLINDER;
             else
@@ -346,7 +346,7 @@ int CClientMarker::StringToType(const char* szString)
     }
 }
 
-bool CClientMarker::TypeToString(unsigned int uiType, SString& strOutString)
+bool CClientMarker::TypeToString(std::uint32_t uiType, SString& strOutString)
 {
     switch (uiType)
     {

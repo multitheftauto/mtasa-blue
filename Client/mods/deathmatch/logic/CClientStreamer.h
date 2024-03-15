@@ -26,11 +26,11 @@ public:
     ~CClientStreamer();
 
     void DoPulse(CVector& vecPosition);
-    void SetDimension(unsigned short usDimension);
+    void SetDimension(std::uint16_t usDimension);
 
     static bool CompareExpDistance(CClientStreamElement* p1, CClientStreamElement* p2);
 
-    unsigned int                               CountActiveElements() { return (unsigned int)m_ActiveElements.size(); }
+    std::uint32_t                               CountActiveElements() { return (std::uint32_t)m_ActiveElements.size(); }
     bool                                       IsActiveElement(CClientStreamElement* pElement);
     std::list<CClientStreamElement*>::iterator ActiveElementsBegin() { return m_ActiveElements.begin(); }
     std::list<CClientStreamElement*>::iterator ActiveElementsEnd() { return m_ActiveElements.end(); }
@@ -69,7 +69,7 @@ private:
     CClientStreamSectorRow*            m_pRow;
     CClientStreamSector*               m_pSector;
     CVector                            m_vecPosition;
-    unsigned short                     m_usDimension;
+    std::uint16_t                     m_usDimension;
     std::list<CClientStreamElement*>   m_ActiveElements;
     std::list<CClientStreamElement*>   m_ToStreamOut;
 

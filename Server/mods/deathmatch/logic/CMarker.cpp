@@ -105,11 +105,11 @@ bool CMarker::ReadSpecialData(const int iLine)
 
     // Grab the "type" data
     char          szBuffer[128];
-    unsigned char ucType;
+    std::uint8_t ucType;
     if (GetCustomDataString("type", szBuffer, 128, true))
     {
         // Convert it to a type
-        ucType = static_cast<unsigned char>(CMarkerManager::StringToType(szBuffer));
+        ucType = static_cast<std::uint8_t>(CMarkerManager::StringToType(szBuffer));
         if (ucType == CMarker::TYPE_INVALID)
         {
             CLogger::LogPrintf("WARNING: Unknown 'type' value specified in <marker>; defaulting to \"default\" (line %d)\n", iLine);
@@ -143,10 +143,10 @@ bool CMarker::ReadSpecialData(const int iLine)
 
     int iTemp;
     if (GetCustomDataInt("dimension", iTemp, true))
-        m_usDimension = static_cast<unsigned short>(iTemp);
+        m_usDimension = static_cast<std::uint16_t>(iTemp);
 
     if (GetCustomDataInt("interior", iTemp, true))
-        m_ucInterior = static_cast<unsigned char>(iTemp);
+        m_ucInterior = static_cast<std::uint8_t>(iTemp);
 
     // Success
     return true;
@@ -198,7 +198,7 @@ void CMarker::SetTarget(const CVector* pTargetVector)
 
                 // Tell everyone that knows about this marker
                 CBitStream BitStream;
-                BitStream.pBitStream->Write(static_cast<unsigned char>(1));
+                BitStream.pBitStream->Write(static_cast<std::uint8_t>(1));
                 BitStream.pBitStream->Write(m_vecTarget.fX);
                 BitStream.pBitStream->Write(m_vecTarget.fY);
                 BitStream.pBitStream->Write(m_vecTarget.fZ);
@@ -224,20 +224,20 @@ void CMarker::SetTarget(const CVector* pTargetVector)
             {
                 // Tell everyone that knows about this marker
                 CBitStream BitStream;
-                BitStream.pBitStream->Write(static_cast<unsigned char>(0));
+                BitStream.pBitStream->Write(static_cast<std::uint8_t>(0));
                 BroadcastOnlyVisible(CElementRPCPacket(this, SET_MARKER_TARGET, *BitStream.pBitStream));
             }
         }
     }
 }
 
-void CMarker::SetMarkerType(unsigned char ucType)
+void CMarker::SetMarkerType(std::uint8_t ucType)
 {
     // Different from our current type?
     if (ucType != m_ucType)
     {
         // Set the new type
-        unsigned char ucOldType = m_ucType;
+        std::uint8_t ucOldType = m_ucType;
         m_ucType = ucType;
         UpdateCollisionObject(ucOldType);
 
@@ -288,7 +288,7 @@ void CMarker::SetColor(const SColor color)
     }
 }
 
-void CMarker::SetIcon(unsigned char ucIcon)
+void CMarker::SetIcon(std::uint8_t ucIcon)
 {
     if (m_ucIcon != ucIcon)
     {
@@ -353,7 +353,7 @@ void CMarker::Callback_OnCollisionDestroy(CColShape* pCollision)
         m_pCollision = NULL;
 }
 
-void CMarker::UpdateCollisionObject(unsigned char ucOldType)
+void CMarker::UpdateCollisionObject(std::uint8_t ucOldType)
 {
     // Different type than before?
     if (m_ucType != ucOldType)

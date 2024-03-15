@@ -13,7 +13,7 @@
 #include "CLanBroadcast.h"
 #include "version.h"
 
-CLanBroadcast::CLanBroadcast(unsigned short usServerPort)
+CLanBroadcast::CLanBroadcast(std::uint16_t usServerPort)
 {
     // Open the socket on the UDP broadcast port
     m_Socket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -35,7 +35,7 @@ CLanBroadcast::CLanBroadcast(unsigned short usServerPort)
 
     // Set it to non blocking, so we dont have to wait for a packet
     #ifdef WIN32
-    unsigned long ulNonBlock = 1;
+    std::uint32_t ulNonBlock = 1;
     ioctlsocket(m_Socket, FIONBIO, &ulNonBlock);
     #else
     fcntl(m_Socket, F_SETFL, fcntl(m_Socket, F_GETFL) | O_NONBLOCK);
