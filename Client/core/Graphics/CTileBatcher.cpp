@@ -272,7 +272,7 @@ void CTileBatcher::SetCurrentMaterial(CMaterialItem* pMaterial)
 //
 ////////////////////////////////////////////////////////////////
 void CTileBatcher::AddTile(float fX1, float fY1, float fX2, float fY2, float fU1, float fV1, float fU2, float fV2, CMaterialItem* pMaterial, float fRotation,
-                           float fRotCenOffX, float fRotCenOffY, unsigned long ulColor)
+                           float fRotCenOffX, float fRotCenOffY, std::uint32_t ulColor)
 {
     // Flush previous if it was using a shader transform
     if (m_bUseCustomMatrices)

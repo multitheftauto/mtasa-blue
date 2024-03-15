@@ -33,13 +33,13 @@ namespace SharedUtil
     //
     // Save to a file
     //
-    bool FileSave(const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce = true);
+    bool FileSave(const SString& strFilename, const void* pBuffer, std::uint32_t ulSize, bool bForce = true);
     bool FileSave(const SString& strFilename, const SString& strBuffer, bool bForce = true);
 
     //
     // Append to a file
     //
-    bool FileAppend(const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce = true);
+    bool FileAppend(const SString& strFilename, const void* pBuffer, std::uint32_t ulSize, bool bForce = true);
     bool FileAppend(const SString& strFilename, const SString& strBuffer, bool bForce = true);
 
     //

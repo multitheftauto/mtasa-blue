@@ -32,7 +32,7 @@
         CLuaTimer               shared array
 */
 
-typedef unsigned long SArrayId;
+typedef std::uint32_t SArrayId;
 #define INVALID_ARRAY_ID    0xFFFFFFFF
 
 namespace EIdClass

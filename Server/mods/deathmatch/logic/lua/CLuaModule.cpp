@@ -354,7 +354,7 @@ CChecksum CLuaModule::GetResourceFileChecksum(lua_State* luaVM, const char* szFi
     return CChecksum();
 }
 
-unsigned long CLuaModule::GetVersion()
+std::uint32_t CLuaModule::GetVersion()
 {
     return CStaticFunctionDefinitions::GetVersion();
 }
@@ -369,7 +369,7 @@ const char* CLuaModule::GetVersionName()
     return CStaticFunctionDefinitions::GetVersionName();
 }
 
-unsigned long CLuaModule::GetNetcodeVersion()
+std::uint32_t CLuaModule::GetNetcodeVersion()
 {
     return CStaticFunctionDefinitions::GetNetcodeVersion();
 }

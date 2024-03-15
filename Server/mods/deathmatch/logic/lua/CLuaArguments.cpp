@@ -241,7 +241,7 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
 
         if (returnValues != NULL)
         {
-            for (int i = -iReturns; i <= -1; i++)
+            for (auto i = -iReturns; i <= -1; i++)
             {
                 returnValues->ReadArgument(luaVM, i);
             }
@@ -305,7 +305,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
 
         if (returnValues != NULL)
         {
-            for (int i = -iReturns; i <= -1; i++)
+            for (auto i = -iReturns; i <= -1; i++)
             {
                 returnValues->ReadArgument(luaVM, i);
             }
@@ -539,12 +539,12 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     return true;
 }
 
-bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const
+bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) const
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        pKnownTables = new CFastHashMap<CLuaArguments*, std::uint32_t>();
         bKnownTablesCreated = true;
     }
 
@@ -600,12 +600,12 @@ json_object* CLuaArguments::WriteToJSONArray(bool bSerialize)
     return my_array;
 }
 
-json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables)
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        pKnownTables = new CFastHashMap<CLuaArguments*, std::uint32_t>();
         bKnownTablesCreated = true;
     }
 

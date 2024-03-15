@@ -48,7 +48,7 @@ void CLuaPickupDefs::AddClass(lua_State* luaVM)
 int CLuaPickupDefs::CreatePickup(lua_State* luaVM)
 {
     CVector          vecPosition;
-    unsigned long    ulRespawnInterval = 30000;
+    std::uint32_t    ulRespawnInterval = 30000;
     double           dblAmmo = 50.0;
     std::uint8_t    ucType = 0;
     double           dArgumentDependant = 0;

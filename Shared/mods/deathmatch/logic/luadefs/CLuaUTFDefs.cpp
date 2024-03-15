@@ -85,7 +85,7 @@ auto UtfChar(const int code) -> std::string
 
 auto UtfCode(std::string input) -> int
 {
-    return static_cast<unsigned long>(MbUTF8ToUTF16(input).c_str()[0]);
+    return static_cast<std::uint32_t>(MbUTF8ToUTF16(input).c_str()[0]);
 }
 
 void CLuaUTFDefs::LoadFunctions()

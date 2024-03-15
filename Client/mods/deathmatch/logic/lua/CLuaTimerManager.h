@@ -34,7 +34,7 @@ public:
     CLuaTimer*    AddTimer(const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, std::uint32_t uiRepeats, const CLuaArguments& Arguments);
     void          RemoveTimer(CLuaTimer* pLuaTimer);
     void          RemoveAllTimers();
-    unsigned long GetTimerCount() const { return m_TimerList.size(); }
+    std::uint32_t GetTimerCount() const { return m_TimerList.size(); }
 
     void ResetTimer(CLuaTimer* pLuaTimer);
 

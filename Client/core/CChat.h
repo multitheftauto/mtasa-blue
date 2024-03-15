@@ -34,7 +34,7 @@ public:
         A = _A;
     }
     CColor(const CColor& other) { *this = other; }
-    CColor(unsigned long ulColor) { *this = ulColor; }
+    CColor(std::uint32_t ulColor) { *this = ulColor; }
     CColor& operator=(const CColor& color)
     {
         R = color.R;
@@ -43,7 +43,7 @@ public:
         A = color.A;
         return *this;
     }
-    CColor& operator=(unsigned long ulColor)
+    CColor& operator=(std::uint32_t ulColor)
     {
         R = (ulColor >> 16) & 0xFF;
         G = (ulColor >> 8) & 0xFF;
@@ -90,13 +90,13 @@ public:
     bool                IsActive() { return m_bActive; }
     void                SetActive(bool bActive) { m_bActive = bActive; }
 
-    unsigned long GetCreationTime() { return m_ulCreationTime; }
+    std::uint32_t GetCreationTime() { return m_ulCreationTime; }
     void          UpdateCreationTime();
 
 protected:
     bool                          m_bActive;
     std::vector<CChatLineSection> m_Sections;
-    unsigned long                 m_ulCreationTime;
+    std::uint32_t                 m_ulCreationTime;
 };
 
 class CChatInputLine : public CChatLine
@@ -187,7 +187,7 @@ public:
 
     static float GetFontHeight(float fScale = 1.0f);
     static float GetTextExtent(const char* szText, float fScale = 1.0f);
-    static void  DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
+    static void  DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, std::uint32_t ulFormat, std::uint32_t ulColor, float fScaleX,
                                 float fScaleY, bool bOutline, const CRect2D& RenderBounds);
 
     void SetColor(const CColor& Color);
@@ -277,8 +277,8 @@ protected:
     bool          m_bCssStyleText;
     bool          m_bCssStyleBackground;
     bool          m_bTextBlackOutline;
-    unsigned long m_ulChatLineLife;
-    unsigned long m_ulChatLineFadeOut;
+    std::uint32_t m_ulChatLineLife;
+    std::uint32_t m_ulChatLineFadeOut;
     bool          m_bUseCEGUI;
     CVector2D     m_vecScale;
     float         m_fNativeWidth;

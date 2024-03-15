@@ -16,7 +16,7 @@ CGaragesSA::CGaragesSA(CGaragesSAInterface* pInterface)
 {
     internalInterface = pInterface;
 
-    for (int i = 0; i < MAX_GARAGES; i++)
+    for (auto i = 0; i < MAX_GARAGES; i++)
     {
         Garages[i] = new CGarageSA((CGarageSAInterface*)(CLASS_CGarages + 216 * i));
     }
@@ -24,7 +24,7 @@ CGaragesSA::CGaragesSA(CGaragesSAInterface* pInterface)
 
 CGaragesSA::~CGaragesSA()
 {
-    for (int i = 0; i < MAX_GARAGES; i++)
+    for (auto i = 0; i < MAX_GARAGES; i++)
     {
         delete Garages[i];
         Garages[i] = NULL;

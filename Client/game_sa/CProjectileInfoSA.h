@@ -51,7 +51,7 @@ private:
 public:
     CProjectileInfoSA()
     {
-        for (int i = 0; i < PROJECTILE_INFO_COUNT; i++)
+        for (auto i = 0; i < PROJECTILE_INFO_COUNT; i++)
         {
             projectileInfo[i] = new CProjectileInfoSA((CProjectileInfoSAInterface*)(ARRAY_CProjectileInfo + i * sizeof(CProjectileInfoSAInterface)));
         }

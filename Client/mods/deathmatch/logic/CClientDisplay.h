@@ -25,16 +25,16 @@ class CClientDisplay
     friend class CClientDisplayManager;
 
 public:
-    CClientDisplay(class CClientDisplayManager* pDisplayManager, unsigned long ulID);
+    CClientDisplay(class CClientDisplayManager* pDisplayManager, std::uint32_t ulID);
     virtual ~CClientDisplay();
 
-    unsigned long        GetID() { return m_ulID; }
+    std::uint32_t        GetID() { return m_ulID; }
     virtual eDisplayType GetType() = 0;
 
-    unsigned long GetExpirationTime() { return m_ulExpirationTime; };
-    void          SetExpirationTime(unsigned long ulTime) { m_ulExpirationTime = ulTime; };
-    unsigned long GetTimeTillExpiration() { return m_ulExpirationTime - CClientTime::GetTime(); };
-    void          SetTimeTillExpiration(unsigned long ulMs) { m_ulExpirationTime = CClientTime::GetTime() + ulMs; };
+    std::uint32_t GetExpirationTime() { return m_ulExpirationTime; };
+    void          SetExpirationTime(std::uint32_t ulTime) { m_ulExpirationTime = ulTime; };
+    std::uint32_t GetTimeTillExpiration() { return m_ulExpirationTime - CClientTime::GetTime(); };
+    void          SetTimeTillExpiration(std::uint32_t ulMs) { m_ulExpirationTime = CClientTime::GetTime() + ulMs; };
 
     virtual const CVector& GetPosition() { return m_vecPosition; };
     virtual void           SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };
@@ -53,8 +53,8 @@ protected:
 
     CClientDisplayManager* m_pDisplayManager;
 
-    unsigned long m_ulID;
-    unsigned long m_ulExpirationTime;
+    std::uint32_t m_ulID;
+    std::uint32_t m_ulExpirationTime;
     bool          m_bVisible;
     CVector       m_vecPosition;
     SColor        m_Color;

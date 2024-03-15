@@ -59,7 +59,7 @@ void CClientRadarArea::DoPulse(bool bRender)
         if (m_bFlashing)
         {
             // Time to start a new cycle?
-            unsigned long ulCurrentTime = CClientTime::GetTime();
+            std::uint32_t ulCurrentTime = CClientTime::GetTime();
             if (m_ulFlashCycleStart == 0)
             {
                 m_ulFlashCycleStart = ulCurrentTime;

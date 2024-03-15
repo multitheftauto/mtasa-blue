@@ -673,7 +673,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             BitStream.Write(ucSirenCount);
                             BitStream.Write(ucSirenType);
 
-                            for (int i = 0; i < ucSirenCount; i++)
+                            for (auto i = 0; i < ucSirenCount; i++)
                             {
                                 SVehicleSirenSync syncData;
                                 syncData.data.m_bOverrideSirens = true;
@@ -1083,7 +1083,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     std::uint8_t ucNumVertices = (std::uint8_t)pWater->GetNumVertices();
                     BitStream.Write(ucNumVertices);
                     CVector vecVertex;
-                    for (int i = 0; i < ucNumVertices; i++)
+                    for (auto i = 0; i < ucNumVertices; i++)
                     {
                         pWater->GetVertex(i, vecVertex);
                         BitStream.Write((short)vecVertex.fX);

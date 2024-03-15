@@ -125,7 +125,7 @@ bool ASE::SetPortEnabled(bool bInternetEnabled, bool bLanEnabled)
 
         // Set it to non blocking, so we dont have to wait for a packet
         #ifdef WIN32
-        unsigned long ulNonBlock = 1;
+        std::uint32_t ulNonBlock = 1;
         ioctlsocket(newSocket, FIONBIO, &ulNonBlock);
         #else
         fcntl(newSocket, F_SETFL, fcntl(newSocket, F_GETFL) | O_NONBLOCK);

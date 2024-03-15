@@ -53,7 +53,7 @@ CPedSA::~CPedSA()
     if (m_pDefaultPedSound)
         delete m_pDefaultPedSound;
 
-    for (int i = 0; i < WEAPONSLOT_MAX; i++)
+    for (auto i = 0; i < WEAPONSLOT_MAX; i++)
     {
         if (m_pWeapons[i])
             delete m_pWeapons[i];
@@ -96,7 +96,7 @@ void CPedSA::Init()
     m_pPedSound = new CPedSoundSA(&pedInterface->pedSound);
     m_pDefaultPedSound = new CPedSoundSA(&pedInterface->pedSound);
 
-    for (int i = 0; i < WEAPONSLOT_MAX; i++)
+    for (auto i = 0; i < WEAPONSLOT_MAX; i++)
         m_pWeapons[i] = new CWeaponSA(&(pedInterface->Weapons[i]), this, (eWeaponSlot)i);
 
     // this->m_pPedIK = new Cm_pPedIKSA(&(pedInterface->m_pPedIK));

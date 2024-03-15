@@ -16,11 +16,11 @@
 class CServerTextItemPacket final : public CPacket
 {
 public:
-    CServerTextItemPacket(unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, std::uint8_t format,
+    CServerTextItemPacket(std::uint32_t ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, std::uint8_t format,
                           std::uint8_t ucShadowAlpha, const char* szText);
 
     ePacketID     GetPacketID() const { return PACKET_ID_TEXT_ITEM; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
@@ -32,6 +32,6 @@ private:
     float         m_fScale;
     std::uint8_t m_ucFormat;
     std::uint8_t m_ucShadowAlpha;
-    unsigned long m_ulUniqueId;
+    std::uint32_t m_ulUniqueId;
     bool          m_bDeletable;
 };

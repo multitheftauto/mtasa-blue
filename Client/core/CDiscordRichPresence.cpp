@@ -141,13 +141,13 @@ void CDiscordRichPresence::UpdatePresence()
     m_bUpdateRichPresence = false;
 }
 
-void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart)
+void CDiscordRichPresence::SetPresenceStartTimestamp(const std::uint32_t ulStart)
 {
     m_uiDiscordAppStart = ulStart;
     m_bUpdateRichPresence = true;
 }
 
-void CDiscordRichPresence::SetPresenceEndTimestamp(const unsigned long ulEnd)
+void CDiscordRichPresence::SetPresenceEndTimestamp(const std::uint32_t ulEnd)
 {
     m_uiDiscordAppEnd = ulEnd;
     m_bUpdateRichPresence = true;

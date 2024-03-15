@@ -19,7 +19,7 @@ public:
     CLuaPacket(std::uint8_t ucActionID, NetBitStreamInterface& BitStream) : m_ucActionID(ucActionID), m_BitStream(BitStream){};
 
     ePacketID     GetPacketID() const { return PACKET_ID_LUA; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

@@ -55,7 +55,7 @@ CDebugView::CDebugView(CGUI* pManager, const CVector2D& vecPosition) : CChat()
     m_iReportCount = 0;
     m_Color = CColor(0, 0, 0, 100);
     m_TextColor = DEBUGVIEW_TEXT_COLOR;
-    unsigned long ulBackgroundColor = COLOR_ARGB(m_Color.A, m_Color.R, m_Color.G, m_Color.B);
+    std::uint32_t ulBackgroundColor = COLOR_ARGB(m_Color.A, m_Color.R, m_Color.G, m_Color.B);
 
     m_pBackground = m_pManager->CreateStaticImage();
     m_pBackgroundTexture = m_pManager->CreateTexture();

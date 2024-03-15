@@ -18,7 +18,7 @@ class CPlayerJoinPacket final : public CPacket
 public:
     virtual bool  RequiresSourcePlayer() const { return false; }
     ePacketID     GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_PLAYER_JOIN); };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream) { return true; };
 };

@@ -518,7 +518,7 @@ const SPlayerClothing* CClientPlayerClothes::GetClothing(const char* szTexture, 
     {
         const SPlayerClothing* pGroup = GetClothingGroup(ucType);
         int                    iMax = GetClothingGroupMax(ucType);
-        for (int i = 0; i < iMax; i++)
+        for (auto i = 0; i < iMax; i++)
         {
             const SPlayerClothing* pClothing = &pGroup[i];
             if (!stricmp(szTexture, pClothing->szTexture) && !stricmp(szModel, pClothing->szModel))

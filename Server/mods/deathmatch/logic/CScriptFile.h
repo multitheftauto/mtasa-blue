@@ -28,7 +28,7 @@ public:
         MODE_CREATE,
     };
 
-    CScriptFile(uint uiScriptId, const char* szFilename, unsigned long ulMaxSize);
+    CScriptFile(uint uiScriptId, const char* szFilename, std::uint32_t ulMaxSize);
     ~CScriptFile();
 
     // Functions required by CElement
@@ -55,12 +55,12 @@ public:
     long GetPointer();
     long GetSize();
 
-    long SetPointer(unsigned long ulPosition);
-    void SetSize(unsigned long ulNewSize);
+    long SetPointer(std::uint32_t ulPosition);
+    void SetSize(std::uint32_t ulNewSize);
 
     void Flush();
-    long Read(unsigned long ulSize, SString& outBuffer);
-    long Write(unsigned long ulSize, const char* pData);
+    long Read(std::uint32_t ulSize, SString& outBuffer);
+    long Write(std::uint32_t ulSize, const char* pData);
 
     long GetContents(std::string& buffer);
 
@@ -76,6 +76,6 @@ private:
     FILE*         m_pFile;
     uint          m_uiScriptId;
     SString       m_strFilename;
-    unsigned long m_ulMaxSize;
+    std::uint32_t m_ulMaxSize;
     SLuaDebugInfo m_LuaDebugInfo;
 };

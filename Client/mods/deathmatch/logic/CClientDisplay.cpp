@@ -10,7 +10,7 @@
 
 #include <StdInc.h>
 
-CClientDisplay::CClientDisplay(CClientDisplayManager* pDisplayManager, unsigned long ulID)
+CClientDisplay::CClientDisplay(CClientDisplayManager* pDisplayManager, std::uint32_t ulID)
 {
     m_pDisplayManager = pDisplayManager;
     m_ulID = ulID;

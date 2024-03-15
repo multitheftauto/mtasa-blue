@@ -60,7 +60,7 @@ void CUnoccupiedVehicleSync::DoPulse()
     UpdateDamageModels();
 
     // Has it been long enough since our last state's sync?
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastSyncTime + UNOCCUPIED_VEHICLE_SYNC_RATE)
     {
         UpdateStates();

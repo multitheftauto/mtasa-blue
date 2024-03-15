@@ -96,7 +96,7 @@ namespace SharedUtil
 
     void CMD5Hasher::ConvertToHex(const MD5& Input, char* pBuffer)
     {
-        for (int i = 0; i < 16; i++)
+        for (auto i = 0; i < 16; i++)
         {
             sprintf(pBuffer + i * 2, "%02X", Input.data[i]);
         }
@@ -301,7 +301,7 @@ namespace SharedUtil
         memset((std::uint8_t*)x, 0, sizeof(x));
     }
 
-    void CMD5Hasher::Encode(std::uint8_t* output, std::uint32_t* input, unsigned long len)
+    void CMD5Hasher::Encode(std::uint8_t* output, std::uint32_t* input, std::uint32_t len)
     {
         std::uint32_t i, j;
 
@@ -314,7 +314,7 @@ namespace SharedUtil
         }
     }
 
-    void CMD5Hasher::Decode(std::uint32_t* output, std::uint8_t* input, unsigned long len)
+    void CMD5Hasher::Decode(std::uint32_t* output, std::uint8_t* input, std::uint32_t len)
     {
         std::uint32_t i, j;
 
@@ -745,7 +745,7 @@ namespace SharedUtil
         if (len > 16)
             len = 16;
         memcpy(keybuffer, key.c_str(), len);
-        for (int i = 0; i < 4; ++i)
+        for (auto i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
         // Copy the input string to a buffer of size multiple of 4
@@ -760,7 +760,7 @@ namespace SharedUtil
 
         // Encode it!
         v[1] = 0;
-        for (int i = 0; i < strbuflen; i += 4)
+        for (auto i = 0; i < strbuflen; i += 4)
         {
             v[0] = *(std::uint32_t*)&strbuf[i];
 
@@ -800,7 +800,7 @@ namespace SharedUtil
         if (len > 16)
             len = 16;
         memcpy(keybuffer, key.c_str(), len);
-        for (int i = 0; i < 4; ++i)
+        for (auto i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
         // Create a temporary buffer to store the result
@@ -810,7 +810,7 @@ namespace SharedUtil
         // Decode it!
         const char* p = str.c_str();
         v[1] = *(std::uint32_t*)&p[numPasses * 4];
-        for (int i = 0; i < numPasses; ++i)
+        for (auto i = 0; i < numPasses; ++i)
         {
             v[0] = *(std::uint32_t*)&p[(numPasses - i - 1) * 4];
             decodeXtea(&v[0], &w[0], &k[0]);

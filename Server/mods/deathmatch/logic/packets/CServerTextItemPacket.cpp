@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CServerTextItemPacket.h"
 
-CServerTextItemPacket::CServerTextItemPacket(unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color,
+CServerTextItemPacket::CServerTextItemPacket(std::uint32_t ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color,
                                              std::uint8_t format, std::uint8_t ucShadowAlpha, const char* szText)
 {
     m_ulUniqueId = ulUniqueId;

@@ -24,7 +24,7 @@ public:
                               std::uint8_t ucSampleRate, std::uint8_t ucVoiceQuality, std::uint32_t uiBitrate, const char* szServerName);
 
     ePacketID     GetPacketID() const { return PACKET_ID_SERVER_JOINEDGAME; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

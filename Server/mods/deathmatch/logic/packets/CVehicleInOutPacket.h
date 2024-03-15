@@ -24,7 +24,7 @@ public:
     virtual ~CVehicleInOutPacket();
 
     ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_INOUT; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

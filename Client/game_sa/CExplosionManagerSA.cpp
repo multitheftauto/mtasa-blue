@@ -16,13 +16,13 @@
 
 CExplosionManagerSA::CExplosionManagerSA()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (auto i = 0; i < MAX_EXPLOSIONS; i++)
         Explosions[i] = new CExplosionSA((CExplosionSAInterface*)(ARRAY_Explosions + i * sizeof(CExplosionSAInterface)));
 }
 
 CExplosionManagerSA::~CExplosionManagerSA()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (auto i = 0; i < MAX_EXPLOSIONS; i++)
     {
         delete Explosions[i];
     }
@@ -75,7 +75,7 @@ returnhere:
 
 void CExplosionManagerSA::RemoveAllExplosions()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (auto i = 0; i < MAX_EXPLOSIONS; i++)
         if (Explosions[i]->IsActive())
             Explosions[i]->Remove();
 }
@@ -87,7 +87,7 @@ CExplosion* CExplosionManagerSA::GetExplosion(DWORD ID)
 
 CExplosion* CExplosionManagerSA::FindFreeExplosion()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (auto i = 0; i < MAX_EXPLOSIONS; i++)
         if (!Explosions[i]->IsActive())
             return Explosions[i];
     return NULL;

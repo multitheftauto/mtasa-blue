@@ -123,22 +123,22 @@ CHandlingManagerSA::CHandlingManagerSA()
     InitializeDefaultHandlings();
 
     // Create a handling entry for every original handling data.
-    for (int i = 0; i < HT_MAX; i++)
+    for (auto i = 0; i < HT_MAX; i++)
     {
         m_pOriginalEntries[i] = new CHandlingEntrySA(&m_OriginalHandlingData[i]);
     }
 
-    for (int i = 0; i < 24; i++)
+    for (auto i = 0; i < 24; i++)
     {
         m_pOriginalFlyingEntries[i] = new CFlyingHandlingEntrySA(&m_OriginalFlyingHandlingData[i]);
     }
 
-    for (int i = 0; i < 12; i++)
+    for (auto i = 0; i < 12; i++)
     {
         m_pOriginalBoatEntries[i] = new CBoatHandlingEntrySA(&m_OriginalBoatHandlingData[i]);
     }
 
-    for (int i = 0; i < 14; i++)
+    for (auto i = 0; i < 14; i++)
     {
         m_pOriginalBikeEntries[i] = new CBikeHandlingEntrySA(&m_OriginalBikeHandlingData[i]);
     }
@@ -185,22 +185,22 @@ CHandlingManagerSA::CHandlingManagerSA()
 CHandlingManagerSA::~CHandlingManagerSA()
 {
     // Destroy all original handling entries
-    for (int i = 0; i < HT_MAX; i++)
+    for (auto i = 0; i < HT_MAX; i++)
     {
         delete m_pOriginalEntries[i];
     }
 
-    for (int i = 0; i < 24; i++)
+    for (auto i = 0; i < 24; i++)
     {
         delete m_pOriginalFlyingEntries[i];
     }
 
-    for (int i = 0; i < 12; i++)
+    for (auto i = 0; i < 12; i++)
     {
         delete m_pOriginalBoatEntries[i];
     }
 
-    for (int i = 0; i < 14; i++)
+    for (auto i = 0; i < 14; i++)
     {
         delete m_pOriginalBikeEntries[i];
     }

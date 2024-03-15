@@ -13,9 +13,9 @@
 #include "CAudioContainerSA.h"
 #include "CAudioContainerLookupTableSA.h"
 
-unsigned long EndianSwap32(unsigned long x)
+std::uint32_t EndianSwap32(std::uint32_t x)
 {
-    unsigned long y = 0;
+    std::uint32_t y = 0;
     y += (x & 0x000000FF) << 24;
     y += (x & 0xFF000000) >> 24;
     y += (x & 0x0000FF00) << 8;
@@ -229,7 +229,7 @@ bool CAudioContainerSA::GetAudioSizeFromHeader(const SRadioTrackHeader& header, 
 {
     // find our track length
     // each header contains 8 lengths
-    for (int i = 0; i < NUM_LENGTH_ENTRIES; i++)
+    for (auto i = 0; i < NUM_LENGTH_ENTRIES; i++)
     {
         // find the length that isn't "default"
         // default is 0xCDCDCDCD (ignoring this will result in a crash.)

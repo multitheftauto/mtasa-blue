@@ -35,13 +35,13 @@ public:
     void SetValue(float fValue);
 
     eXMLClass     GetClassType() { return CXML_ATTR; };
-    unsigned long GetID() { return m_ulID; };
+    std::uint32_t GetID() { return m_ulID; };
     bool          IsUsingIDs() { return m_bUsingIDs; };
 
     void DeleteWrapper();
 
 private:
-    unsigned long m_ulID;
+    std::uint32_t m_ulID;
     const bool    m_bUsingIDs;
     bool          m_bDeleteAttribute;
 

@@ -175,7 +175,7 @@ void CModelCacheManagerImpl::PreLoad()
     // PreLoad upgrades
     WatchDogBeginSection(WD_SECTION_PRELOAD_UPGRADES);
     {
-        for (int i = 1000; i < iLowestUnsafeUpgrade; i++)
+        for (auto i = 1000; i < iLowestUnsafeUpgrade; i++)
         {
             if (bSlowMethod)
                 SetApplicationSettingInt(DIAG_PRELOAD_UPGRADE_ATTEMPT_ID, i);

@@ -138,7 +138,7 @@ void CNetworkStats::Draw()
     }
 
     int iNumLines = 0;
-    for (int i = strBuffer.length() - 1; i >= 0; i--)
+    for (auto i = strBuffer.length() - 1; i >= 0; i--)
         if (strBuffer[i] == '\n')
             iNumLines++;
 

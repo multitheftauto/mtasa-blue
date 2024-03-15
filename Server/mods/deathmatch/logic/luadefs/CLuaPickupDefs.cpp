@@ -70,7 +70,7 @@ int CLuaPickupDefs::createPickup(lua_State* luaVM)
     CVector       vecPosition;
     std::uint8_t ucType;
     double        dValue;
-    unsigned long ulRespawnInterval;
+    std::uint32_t ulRespawnInterval;
     double        dAmmo;
 
     CScriptArgReader argStream(luaVM);
@@ -216,7 +216,7 @@ int CLuaPickupDefs::getPickupRespawnInterval(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        unsigned long ulInterval;
+        std::uint32_t ulInterval;
         if (CStaticFunctionDefinitions::GetPickupRespawnInterval(pPickup, ulInterval))
         {
             lua_pushnumber(luaVM, static_cast<lua_Number>(ulInterval));
@@ -288,7 +288,7 @@ int CLuaPickupDefs::setPickupRespawnInterval(lua_State* luaVM)
 {
     //  bool setPickupRespawnInterval ( pickup thePickup, int ms )
     CElement*     pElement;
-    unsigned long ulInterval;
+    std::uint32_t ulInterval;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

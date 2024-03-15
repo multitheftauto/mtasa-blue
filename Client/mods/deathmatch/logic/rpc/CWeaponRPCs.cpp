@@ -157,7 +157,7 @@ void CWeaponRPCs::TakeWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
                     std::uint8_t ucAmmoInClip = static_cast<std::uint8_t>(pPlayerWeapon->GetAmmoInClip());
                     pPlayerWeapon->SetAmmoInClip(0);
 
-                    unsigned long ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal();
+                    std::uint32_t ulWeaponAmmo = pPlayerWeapon->GetAmmoTotal();
                     if (usAmmo > ulWeaponAmmo)
                         ulWeaponAmmo = 0;
                     else

@@ -112,7 +112,7 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
     sContent += SString("Caught %d addresses ...\n\n", iAmount);
     sContent += "Backtrace:\n";
 
-    for (int i = 0; i < iAmount; i++)
+    for (auto i = 0; i < iAmount; i++)
     {
         if (symbols[i])
         {

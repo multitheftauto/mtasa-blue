@@ -23,7 +23,7 @@ CClientDisplayManager::~CClientDisplayManager()
     RemoveAll();
 }
 
-CClientDisplay* CClientDisplayManager::Get(unsigned long ulID)
+CClientDisplay* CClientDisplayManager::Get(std::uint32_t ulID)
 {
     // Find the display with the given id
     list<CClientDisplay*>::const_iterator iter = m_List.begin();

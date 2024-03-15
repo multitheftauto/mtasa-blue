@@ -591,7 +591,7 @@ int CLuaPlayerDefs::GetPlayerIdleTime(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        long long llLastPositionChanged = pPlayer->GetPositionLastChanged();
+        std::int64_t llLastPositionChanged = pPlayer->GetPositionLastChanged();
         if (llLastPositionChanged == 0)
         {
             // DO NOT REMOVE THIS AND DEFAULT THE POSITION LAST CHANGED TO THE CURRENT TIME OR YOU WILL BREAK EVERYTHING.
@@ -834,7 +834,7 @@ int CLuaPlayerDefs::SpawnPlayer(lua_State* luaVM)
     CPlayer*       pElement;
     CVector        vecPosition;
     float          fRotation;
-    unsigned long  ulModel;
+    std::uint32_t  ulModel;
     std::uint8_t  ucInterior;
     std::uint16_t usDimension;
     CTeam*         pTeam;

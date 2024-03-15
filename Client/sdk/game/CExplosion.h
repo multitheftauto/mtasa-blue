@@ -42,8 +42,8 @@ public:
     virtual float          GetExplosionForce() = 0;
     virtual void           SetExplosionForce(float fForce) = 0;
     virtual void           SetSilent(bool bSilent) = 0;
-    virtual unsigned long  GetActivationTimer() = 0;
-    virtual void           SetActivationTimer(unsigned long ulActivationTime) = 0;
+    virtual std::uint32_t  GetActivationTimer() = 0;
+    virtual void           SetActivationTimer(std::uint32_t ulActivationTime) = 0;
     virtual DWORD          GetExpiryTime() = 0;
     virtual void           SetExpiryTime(DWORD dwExpiryTime) = 0;
     virtual float          GetExplosionRadius() = 0;

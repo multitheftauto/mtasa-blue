@@ -95,8 +95,8 @@ namespace SharedUtil
     private:
         void Transform(std::uint8_t* pBuffer);
 
-        static void Encode(std::uint8_t* dest, std::uint32_t* src, unsigned long length);
-        static void Decode(std::uint32_t* dest, std::uint8_t* src, unsigned long length);
+        static void Encode(std::uint8_t* dest, std::uint32_t* src, std::uint32_t length);
+        static void Decode(std::uint32_t* dest, std::uint8_t* src, std::uint32_t length);
 
         static inline std::uint32_t RotateLeft(std::uint32_t x, std::uint32_t n);
         static inline std::uint32_t F(std::uint32_t x, std::uint32_t y, std::uint32_t z);

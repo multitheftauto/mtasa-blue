@@ -47,7 +47,7 @@ using SharedUtil::CalcMTASAPath;
 using std::list;
 using std::vector;
 
-// Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
+// Hide the "conversion from 'std::uint32_t' to 'DWORD*' of greater size" warning
 #pragma warning(disable : 4312)
 
 // Used within this file by the packet handler to grab the this pointer of CClientGame
@@ -69,7 +69,7 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
-static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
+static constexpr std::int64_t TIME_DISCORD_UPDATE_RATE = 15000;
 
 CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
@@ -994,7 +994,7 @@ void CClientGame::DoPulsePostFrame()
         }
 
         // Check if we need to update the Discord Rich Presence state
-        if (const long long ticks = GetTickCount64_(); ticks > m_timeLastDiscordStateUpdate + TIME_DISCORD_UPDATE_RATE)
+        if (const std::int64_t ticks = GetTickCount64_(); ticks > m_timeLastDiscordStateUpdate + TIME_DISCORD_UPDATE_RATE)
         {
             const auto discord = g_pCore->GetDiscord();
 
@@ -1214,7 +1214,7 @@ void CClientGame::DoPulses()
 #endif
 
     // Grab the current time
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
 
     // Waiting for a connect?
     if (m_bWaitingForLocalConnect)
@@ -1865,11 +1865,11 @@ void CClientGame::UpdateTrailers()
 {
     // This function is here to re-attach trailers if they fall off
 
-    unsigned long ulCurrentTime = GetTickCount32();
+    std::uint32_t ulCurrentTime = GetTickCount32();
 
     CClientVehicle *                        pVehicle = NULL, *pTrailer = NULL;
     CVehicle *                              pGameVehicle = NULL, *pGameTrailer = NULL;
-    unsigned long                           ulIllegalTowBreakTime;
+    std::uint32_t                           ulIllegalTowBreakTime;
     vector<CClientVehicle*>::const_iterator iterVehicles = m_pVehicleManager->StreamedBegin();
     for (; iterVehicles != m_pVehicleManager->StreamedEnd(); iterVehicles++)
     {
@@ -2027,9 +2027,9 @@ void CClientGame::UpdateFireKey()
 void CClientGame::UpdateStunts()
 {
     // * Two wheeler *
-    static unsigned long ulLastCarTwoWheelCounter = 0;
+    static std::uint32_t ulLastCarTwoWheelCounter = 0;
     static float         fLastCarTwoWheelDist = 0.0f;
-    unsigned long        ulTemp = g_pGame->GetPlayerInfo()->GetCarTwoWheelCounter();
+    std::uint32_t        ulTemp = g_pGame->GetPlayerInfo()->GetCarTwoWheelCounter();
     // Did we start a stunt?
     if (ulLastCarTwoWheelCounter == 0 && ulTemp != 0)
     {
@@ -2054,7 +2054,7 @@ void CClientGame::UpdateStunts()
     fLastCarTwoWheelDist = g_pGame->GetPlayerInfo()->GetCarTwoWheelDist();
 
     // * Wheelie *
-    static unsigned long ulLastBikeRearWheelCounter = 0;
+    static std::uint32_t ulLastBikeRearWheelCounter = 0;
     static float         fLastBikeRearWheelDist = 0.0f;
     ulTemp = g_pGame->GetPlayerInfo()->GetBikeRearWheelCounter();
     // Did we start a stunt?
@@ -2081,7 +2081,7 @@ void CClientGame::UpdateStunts()
     fLastBikeRearWheelDist = g_pGame->GetPlayerInfo()->GetBikeRearWheelDist();
 
     // * Stoppie *
-    static unsigned long ulLastBikeFrontWheelCounter = 0;
+    static std::uint32_t ulLastBikeFrontWheelCounter = 0;
     static float         fLastBikeFrontWheelDist = 0.0f;
     ulTemp = g_pGame->GetPlayerInfo()->GetBikeFrontWheelCounter();
     // Did we start a stunt?
@@ -2605,7 +2605,7 @@ void CClientGame::SetGameSpeed(float fSpeed)
     m_fGameSpeed = fSpeed;
 }
 
-void CClientGame::SetMinuteDuration(unsigned long ulDelay)
+void CClientGame::SetMinuteDuration(std::uint32_t ulDelay)
 {
     g_pGame->SetMinuteDuration(ulDelay);
     m_ulMinuteDuration = ulDelay;
@@ -2834,7 +2834,7 @@ void CClientGame::DrawTasks(CClientPlayer* pPlayer)
         CTaskManager* man = pPlayer->GetTaskManager();
         if (man == NULL)
             return;
-        if ((unsigned long)man == 0xDDDDDDDD)
+        if ((std::uint32_t)man == 0xDDDDDDDD)
         {
             m_pDisplayManager->DrawText2D("HELP! MANAGER FUCKED", CVector(0.05f, 0.5f, 0), 1.0f);
             return;
@@ -3051,7 +3051,7 @@ void CClientGame::UpdateMimics()
     {
         std::uint8_t ucWeaponType = 0;
         std::uint8_t ucWeaponState = 0;
-        unsigned long ulWeaponAmmoInClip = 0;
+        std::uint32_t ulWeaponAmmoInClip = 0;
         eWeaponSlot   weaponSlot = WEAPONSLOT_TYPE_UNARMED;
 
         CWeapon* pPlayerWeapon = m_pLocalPlayer->GetWeapon(m_pLocalPlayer->GetCurrentWeaponSlot());
@@ -5497,7 +5497,7 @@ void CClientGame::ResetMapInfo()
 
     // Re-enable interior sounds and furniture
     g_pMultiplayer->SetInteriorSoundsEnabled(true);
-    for (int i = 0; i <= 4; ++i)
+    for (auto i = 0; i <= 4; ++i)
         g_pMultiplayer->SetInteriorFurnitureEnabled(i, true);
 
     // Clouds
@@ -6008,7 +6008,7 @@ bool CClientGame::OnFocusLoss(CGUIFocusEventArgs Args)
 //
 // Display a progress dialog if a big packet is coming in
 //
-void CClientGame::NotifyBigPacketProgress(unsigned long ulBytesReceived, unsigned long ulTotalSize)
+void CClientGame::NotifyBigPacketProgress(std::uint32_t ulBytesReceived, std::uint32_t ulTotalSize)
 {
     // Should display progress box?
     if (ulBytesReceived >= ulTotalSize || ulTotalSize < 50000)
@@ -6168,7 +6168,7 @@ bool CClientGame::VerifySADataFiles(int iEnableClientChecks)
                                                                     "anim/ped.ifp",      "\x47\x36\xB2\xC9\x0B\x00\x98\x12\x55\xF9\x50\x73\x08\xEE\x91\x74"};
 
     CMD5Hasher hasher;
-    for (int i = 0; i < NUMELMS(szVerifyData); i += 2)
+    for (auto i = 0; i < NUMELMS(szVerifyData); i += 2)
     {
         MD5 md5;
         if (!hasher.Calculate(szVerifyData[i], md5) || memcmp(md5.data, szVerifyData[i + 1], 0x10))
@@ -6324,7 +6324,7 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
 
     // Calc constants stuff
     const uint      uiSendRate = Clamp<uint>(5, uiMaxBandwidth / uiMaxPacketSize, 20);
-    const long long llPacketInterval = 1000 / uiSendRate;
+    const std::int64_t llPacketInterval = 1000 / uiSendRate;
     const uint      uiTotalByteSize = pBuffer->GetSize();
     const char*     pData = pBuffer->GetData();
     const uint      uiBytesPerPart = std::min(std::min(std::max(100U, uiMaxBandwidth / uiSendRate), uiTotalByteSize), 30000U);

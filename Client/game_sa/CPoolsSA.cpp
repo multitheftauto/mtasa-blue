@@ -673,7 +673,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, CVector* vecPositio
     MemSetFast((void*)VAR_TrainModelArray, 0, 32 * sizeof(DWORD));
 
     // now load the models we're going to use and add them to the array
-    for (int i = 0; i < iSize; i++)
+    for (auto i = 0; i < iSize; i++)
     {
         if (dwModels[i] == 449 || dwModels[i] == 537 || dwModels[i] == 538 || dwModels[i] == 569 || dwModels[i] == 590 || dwModels[i] == 570)
         {

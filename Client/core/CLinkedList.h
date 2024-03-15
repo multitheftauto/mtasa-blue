@@ -73,7 +73,7 @@ public:
         T& operator[](int j) const
         {
             CNode<T>* m_pTrans = m_pCurrent;
-            for (int i = 0; i < j; i++)
+            for (auto i = 0; i < j; i++)
             {
                 if (m_pTrans)
                     m_pTrans = m_pTrans->m_pNext;

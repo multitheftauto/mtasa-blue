@@ -217,7 +217,7 @@ static void DoBroadcast(const CPacket& Packet, const std::multimap<ushort, CPlay
 
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
-    unsigned long              ulFlags = Packet.GetFlags();
+    std::uint32_t              ulFlags = Packet.GetFlags();
     if (ulFlags & PACKET_RELIABLE)
     {
         if (ulFlags & PACKET_SEQUENCED)

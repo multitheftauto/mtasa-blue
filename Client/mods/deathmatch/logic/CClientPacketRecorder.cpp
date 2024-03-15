@@ -173,18 +173,18 @@ void CClientPacketRecorder::RecordPacket(std::uint8_t ucPacketID, NetBitStreamIn
                 long lTimeStamp = CClientTime::GetTime() - m_lRelative;
                 fwrite(&lTimeStamp, sizeof(long), 1, pFile);
             }
-            //          fwrite ( &ulTimeStamp, sizeof ( unsigned long), 1, pFile );
+            //          fwrite ( &ulTimeStamp, sizeof ( std::uint32_t), 1, pFile );
 
             // Write the packet ID
             fputc(ucPacketID, pFile);
 
             // Write the size of the bitstream
-            unsigned long ulSize = static_cast<unsigned long>(bitStream.GetNumberOfBytesUsed());
-            fwrite(&ulSize, sizeof(unsigned long), 1, pFile);
+            std::uint32_t ulSize = static_cast<std::uint32_t>(bitStream.GetNumberOfBytesUsed());
+            fwrite(&ulSize, sizeof(std::uint32_t), 1, pFile);
 
             // Write the content of the bitstream to the file
             char c = 0;
-            for (unsigned long i = 0; i < ulSize; i++)
+            for (auto i = 0; i < ulSize; i++)
             {
                 bitStream.Read(c);
                 fputc(c, pFile);
@@ -218,7 +218,7 @@ void CClientPacketRecorder::RecordLocalData(CClientPlayer* pLocalPlayer)
                 long lTimeStamp = CClientTime::GetTime() - m_lRelative;
                 fwrite(&lTimeStamp, sizeof(long), 1, pFile);
             }
-            //          fwrite ( &ulTimeStamp, sizeof ( unsigned long ), 1, pFile );
+            //          fwrite ( &ulTimeStamp, sizeof ( std::uint32_t ), 1, pFile );
 
             // Write the packet ID
             fputc(0xFE, pFile);
@@ -356,8 +356,8 @@ void CClientPacketRecorder::DoPulse()
                 // Seek to our current offset + the bytes occupied by the time?
                 fseek(pFile, m_ulCurrentOffset, SEEK_SET);
 
-                unsigned long ulTimeStamp;
-                fread(&ulTimeStamp, sizeof(unsigned long), 1, pFile);
+                std::uint32_t ulTimeStamp;
+                fread(&ulTimeStamp, sizeof(std::uint32_t), 1, pFile);
 
                 // Reached end of file?
                 if (feof(pFile))
@@ -386,15 +386,15 @@ void CClientPacketRecorder::DoPulse()
                     }
 
                     // Read out number of bytes in the packet
-                    unsigned long ulSize = 0;
-                    fread(&ulSize, sizeof(unsigned long), 1, pFile);
+                    std::uint32_t ulSize = 0;
+                    fread(&ulSize, sizeof(std::uint32_t), 1, pFile);
 
                     // Create a bitstream
                     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
                     if (pBitStream)
                     {
                         // Write the filedata to the bitstream
-                        for (unsigned long i = 0; i < ulSize; i++)
+                        for (auto i = 0; i < ulSize; i++)
                         {
                             char c = fgetc(pFile);
                             pBitStream->Write(c);

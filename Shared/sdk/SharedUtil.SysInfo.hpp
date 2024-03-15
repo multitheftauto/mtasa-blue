@@ -294,10 +294,10 @@ SString SharedUtil::GetWMIOSVersion()
 //
 //
 /////////////////////////////////////////////////////////////////////
-long long SharedUtil::GetWMITotalPhysicalMemory()
+std::int64_t SharedUtil::GetWMITotalPhysicalMemory()
 {
     // This won't change after the first call
-    static long long llResult = 0;
+    static std::int64_t llResult = 0;
 
     if (llResult == 0)
     {
@@ -326,7 +326,7 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 //
 //
 /////////////////////////////////////////////////////////////////////
-std::uint32_t SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev)
+std::uint32_t SharedUtil::GetWMIVideoAdapterMemorySize(const std::uint32_t ulVen, const std::uint32_t ulDev)
 {
     std::uint32_t uiResult = 0;
 

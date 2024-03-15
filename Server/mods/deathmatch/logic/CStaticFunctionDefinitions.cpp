@@ -3136,7 +3136,7 @@ bool CStaticFunctionDefinitions::TakePlayerMoney(CElement* pElement, long lMoney
     return false;
 }
 
-bool CStaticFunctionDefinitions::SpawnPlayer(CPlayer* pPlayer, const CVector& vecPosition, float fRotation, unsigned long ulSkin, std::uint8_t ucInterior,
+bool CStaticFunctionDefinitions::SpawnPlayer(CPlayer* pPlayer, const CVector& vecPosition, float fRotation, std::uint32_t ulSkin, std::uint8_t ucInterior,
                                              std::uint16_t usDimension, CTeam* pTeam)
 {
     // Valid model?
@@ -5017,7 +5017,7 @@ bool CStaticFunctionDefinitions::GetVehicleModelFromName(const char* szName, std
 {
     assert(szName);
 
-    unsigned long ulID = CVehicleNames::GetVehicleModel(szName);
+    std::uint32_t ulID = CVehicleNames::GetVehicleModel(szName);
     if (ulID != 0)
     {
         usID = static_cast<std::uint16_t>(ulID);
@@ -6753,7 +6753,7 @@ bool CStaticFunctionDefinitions::ToggleVehicleRespawn(CElement* pElement, bool b
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime)
+bool CStaticFunctionDefinitions::SetVehicleRespawnDelay(CElement* pElement, std::uint32_t ulTime)
 {
     assert(pElement);
     RUN_CHILDREN(SetVehicleRespawnDelay(*iter, ulTime))
@@ -6769,7 +6769,7 @@ bool CStaticFunctionDefinitions::SetVehicleRespawnDelay(CElement* pElement, unsi
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime)
+bool CStaticFunctionDefinitions::SetVehicleIdleRespawnDelay(CElement* pElement, std::uint32_t ulTime)
 {
     assert(pElement);
     RUN_CHILDREN(SetVehicleIdleRespawnDelay(*iter, ulTime))
@@ -7612,7 +7612,7 @@ bool CStaticFunctionDefinitions::SetVehicleTurretPosition(CVehicle* pVehicle, fl
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CElement* pElement, std::uint8_t ucDoor, float fRatio, unsigned long ulTime)
+bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CElement* pElement, std::uint8_t ucDoor, float fRatio, std::uint32_t ulTime)
 {
     if (ucDoor <= 5)
     {
@@ -8155,7 +8155,7 @@ bool CStaticFunctionDefinitions::SetObjectScale(CElement* pElement, const CVecto
     return false;
 }
 
-bool CStaticFunctionDefinitions::MoveObject(CResource* pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition,
+bool CStaticFunctionDefinitions::MoveObject(CResource* pResource, CElement* pElement, std::uint32_t ulTime, const CVector& vecPosition,
                                             const CVector& vecRotation, CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude,
                                             double a_fEasingOvershoot)
 {
@@ -8423,7 +8423,7 @@ bool CStaticFunctionDefinitions::SetRadarAreaFlashing(CElement* pElement, bool b
 }
 
 CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CVector& vecPosition, std::uint8_t ucType, double dFive,
-                                                  unsigned long ulRespawnInterval, double dSix)
+                                                  std::uint32_t ulRespawnInterval, double dSix)
 {
     // Is the type armor or health?
     CPickup* pPickup = NULL;
@@ -8532,7 +8532,7 @@ bool CStaticFunctionDefinitions::GetPickupAmmo(CPickup* pPickup, std::uint16_t& 
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetPickupRespawnInterval(CPickup* pPickup, unsigned long& ulInterval)
+bool CStaticFunctionDefinitions::GetPickupRespawnInterval(CPickup* pPickup, std::uint32_t& ulInterval)
 {
     assert(pPickup);
     ulInterval = pPickup->GetRespawnIntervals();
@@ -8625,7 +8625,7 @@ bool CStaticFunctionDefinitions::SetPickupType(CElement* pElement, std::uint8_t 
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPickupRespawnInterval(CElement* pElement, unsigned long ulInterval)
+bool CStaticFunctionDefinitions::SetPickupRespawnInterval(CElement* pElement, std::uint32_t ulInterval)
 {
     assert(pElement);
     RUN_CHILDREN(SetPickupRespawnInterval(*iter, ulInterval))
@@ -10291,7 +10291,7 @@ bool CStaticFunctionDefinitions::GetFPSLimit(std::uint16_t& usLimit)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetMinuteDuration(unsigned long& ulDuration)
+bool CStaticFunctionDefinitions::GetMinuteDuration(std::uint32_t& ulDuration)
 {
     CClock* pClock = m_pMapManager->GetServerClock();
 
@@ -10896,7 +10896,7 @@ bool CStaticFunctionDefinitions::SetFPSLimit(std::uint16_t usLimit, bool bSave)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetMinuteDuration(unsigned long ulDuration)
+bool CStaticFunctionDefinitions::SetMinuteDuration(std::uint32_t ulDuration)
 {
     if (ulDuration > 0 && ulDuration <= ULONG_MAX)
     {
@@ -12327,7 +12327,7 @@ bool CStaticFunctionDefinitions::RemoveResourceFile(CResource* pResource, const 
 }
 
 /** Version functions **/
-unsigned long CStaticFunctionDefinitions::GetVersion()
+std::uint32_t CStaticFunctionDefinitions::GetVersion()
 {
     return MTA_DM_VERSION;
 }
@@ -12349,7 +12349,7 @@ SString CStaticFunctionDefinitions::GetVersionBuildType()
     return strResult;
 }
 
-unsigned long CStaticFunctionDefinitions::GetNetcodeVersion()
+std::uint32_t CStaticFunctionDefinitions::GetNetcodeVersion()
 {
     return MTA_DM_NETCODE_VERSION;
 }

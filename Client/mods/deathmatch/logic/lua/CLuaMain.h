@@ -66,9 +66,9 @@ public:
     bool          DestroyXML(CXMLFile* pFile);
     bool          DestroyXML(CXMLNode* pRootNode);
     bool          SaveXML(CXMLNode* pRootNode);
-    unsigned long GetXMLFileCount() const { return m_XMLFiles.size(); };
-    unsigned long GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
-    unsigned long GetElementCount() const;
+    std::uint32_t GetXMLFileCount() const { return m_XMLFiles.size(); };
+    std::uint32_t GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
+    std::uint32_t GetElementCount() const;
 
     void           InitClasses(lua_State* luaVM);
     void           InitVM();

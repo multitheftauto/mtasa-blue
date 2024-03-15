@@ -88,7 +88,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, std::uin
     m_ucVariant2 = ucVariant2;
 
     // Initialize the occupied Players
-    for (int i = 0; i < MAX_VEHICLE_SEATS; i++)
+    for (auto i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
         m_pOccupants[i] = NULL;
     }
@@ -122,7 +122,7 @@ CVehicle::~CVehicle()
     }
 
     // loop through peds and fix their in out state
-    for (int i = 0; i < MAX_VEHICLE_SEATS; i++)
+    for (auto i = 0; i < MAX_VEHICLE_SEATS; i++)
     {
         CPed* pPed = m_pOccupants[i];
         if (pPed)
@@ -687,7 +687,7 @@ std::uint8_t CVehicle::GetFreePassengerSeat()
     if (ucMaxPassengers < MAX_VEHICLE_SEATS)
     {
         // Check for free slots
-        for (int i = 1; i < ucMaxPassengers + 1; i++)
+        for (auto i = 1; i < ucMaxPassengers + 1; i++)
         {
             if (!m_pOccupants[i])
             {
@@ -791,7 +791,7 @@ void CVehicle::SetRegPlate(const char* szRegPlate)
 void CVehicle::GenerateRegPlate()
 {
     // For all our 8 letters
-    for (int i = 0; i < 8; i++)
+    for (auto i = 0; i < 8; i++)
     {
         // Put a space in letter 5
         if (i != 4)
@@ -884,7 +884,7 @@ void CVehicle::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEn
 }
 void CVehicle::RemoveVehicleSirens()
 {
-    for (int i = 0; i <= 7; i++)
+    for (auto i = 0; i <= 7; i++)
     {
         m_tSirenBeaconInfo.m_tSirenInfo[i] = SSirenBeaconInfo();
         SetVehicleSirenPosition(i, CVector(0, 0, 0));
@@ -912,7 +912,7 @@ void CVehicle::ResetDoorsWheelsPanelsLights()
 
 bool CVehicle::IsBlowTimerFinished()
 {
-    return (m_blowState == VehicleBlowState::BLOWN) && CTickCount::Now() > m_llBlowTime + CTickCount((long long)m_ulBlowRespawnInterval);
+    return (m_blowState == VehicleBlowState::BLOWN) && CTickCount::Now() > m_llBlowTime + CTickCount((std::int64_t)m_ulBlowRespawnInterval);
 }
 
 void CVehicle::ResetExplosionTimer()
@@ -946,7 +946,7 @@ bool CVehicle::IsIdleTimerRunning()
 
 bool CVehicle::IsIdleTimerFinished()
 {
-    return IsIdleTimerRunning() && CTickCount::Now() > m_llIdleTime + CTickCount((long long)m_ulIdleRespawnInterval);
+    return IsIdleTimerRunning() && CTickCount::Now() > m_llIdleTime + CTickCount((std::int64_t)m_ulIdleRespawnInterval);
 }
 
 // Check if vehicle has not moved (much) since the last call

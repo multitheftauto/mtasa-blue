@@ -259,13 +259,13 @@ void CNetAPI::ResetReturnPosition()
 void CNetAPI::AddInterpolation(const CVector& vecPosition)
 {
     // Store our current position for interpolation purposes
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     m_Interpolator.Push(vecPosition, ulCurrentTime);
 }
 
 bool CNetAPI::GetInterpolation(CVector& vecPosition, std::uint16_t usLatency)
 {
-    unsigned long ulInterTime = CClientTime::GetTime() - usLatency;
+    std::uint32_t ulInterTime = CClientTime::GetTime() - usLatency;
     return m_Interpolator.Evaluate(ulInterTime, &vecPosition);
 }
 
@@ -304,7 +304,7 @@ void CNetAPI::DoPulse()
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
         if (pPlayer && !pPlayer->IsDeadOnNetwork())
         {
-            unsigned long ulCurrentTime = CClientTime::GetTime();
+            std::uint32_t ulCurrentTime = CClientTime::GetTime();
 
             // Grab the player vehicle
             CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
@@ -535,7 +535,7 @@ bool CNetAPI::IsSmallKeySyncNeeded(CClientPed* pPlayerModel)
 
 bool CNetAPI::IsPureSyncNeeded()
 {
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastPuresyncTime + TICK_RATE)
     {
         m_ulLastPuresyncTime = ulCurrentTime;

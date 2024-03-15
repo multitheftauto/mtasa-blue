@@ -146,7 +146,7 @@ void CClientRadarMarker::SetColor(const SColor color)
     }
 }
 
-void CClientRadarMarker::SetSprite(unsigned long ulSprite)
+void CClientRadarMarker::SetSprite(std::uint32_t ulSprite)
 {
     m_ulSprite = ulSprite;
 

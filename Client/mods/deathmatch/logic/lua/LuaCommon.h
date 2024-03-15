@@ -20,7 +20,7 @@ extern "C"
 
 CLuaFunctionRef luaM_toref(lua_State* luaVM, int iArgument);
 
-#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < unsigned long > (x) )
+#define TO_ELEMENTID(x) ((ElementID) reinterpret_cast < std::uint32_t > (x) )
 
 // Predeclarations of our classes
 class CClientColModel;

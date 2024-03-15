@@ -18,18 +18,18 @@ class CXMLArray
 public:
     static void Initialize();
 
-    static unsigned long PopUniqueID(CXMLCommon* pEntry);
+    static std::uint32_t PopUniqueID(CXMLCommon* pEntry);
     static void          PushUniqueID(CXMLCommon* pEntry);
 
-    static CXMLCommon*   GetEntry(unsigned long ulID);
-    static unsigned long GetCapacity();
-    static unsigned long GetUnusedAmount();
+    static CXMLCommon*   GetEntry(std::uint32_t ulID);
+    static std::uint32_t GetCapacity();
+    static std::uint32_t GetUnusedAmount();
 
 private:
-    static void ExpandBy(unsigned long ulAmount);
-    static void PushUniqueID(unsigned long ulID);
+    static void ExpandBy(std::uint32_t ulAmount);
+    static void PushUniqueID(std::uint32_t ulID);
 
-    static CStack<unsigned long, 1> m_IDStack;
+    static CStack<std::uint32_t, 1> m_IDStack;
     static std::vector<CXMLCommon*> m_Elements;
-    static unsigned long            m_ulCapacity;
+    static std::uint32_t            m_ulCapacity;
 };

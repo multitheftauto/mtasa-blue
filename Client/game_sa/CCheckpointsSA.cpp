@@ -15,13 +15,13 @@
 
 CCheckpointsSA::CCheckpointsSA()
 {
-    for (int i = 0; i < MAX_CHECKPOINTS; i++)
+    for (auto i = 0; i < MAX_CHECKPOINTS; i++)
         Checkpoints[i] = new CCheckpointSA((CCheckpointSAInterface*)(ARRAY_CHECKPOINTS + i * sizeof(CCheckpointSAInterface)));
 }
 
 CCheckpointsSA::~CCheckpointsSA()
 {
-    for (int i = 0; i < MAX_CHECKPOINTS; i++)
+    for (auto i = 0; i < MAX_CHECKPOINTS; i++)
     {
         delete Checkpoints[i];
     }
@@ -59,7 +59,7 @@ CCheckpoint* CCheckpointsSA::CreateCheckpoint(DWORD Identifier, WORD wType, CVec
 
 CCheckpoint* CCheckpointsSA::FindFreeMarker()
 {
-    for (int i = 0; i < MAX_CHECKPOINTS; i++)
+    for (auto i = 0; i < MAX_CHECKPOINTS; i++)
     {
         if (!Checkpoints[i]->IsActive())
             return Checkpoints[i];

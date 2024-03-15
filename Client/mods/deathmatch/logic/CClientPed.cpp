@@ -73,7 +73,7 @@ struct SBodyPartName
 static const SFixedArray<SBodyPartName, 10> BodyPartNames = {
     {{"Unknown"}, {"Unknown"}, {"Unknown"}, {"Torso"}, {"Ass"}, {"Left Arm"}, {"Right Arm"}, {"Left Leg"}, {"Right Leg"}, {"Head"}}};
 
-CClientPed::CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID)
+CClientPed::CClientPed(CClientManager* pManager, std::uint32_t ulModelID, ElementID ID)
     : ClassInit(this), CClientStreamElement(pManager->GetPlayerStreamer(), ID), CAntiCheatModule(pManager->GetAntiCheat())
 {
     SetTypeName("ped");
@@ -85,7 +85,7 @@ CClientPed::CClientPed(CClientManager* pManager, unsigned long ulModelID, Elemen
     pManager->GetPedManager()->AddToList(this);
 }
 
-CClientPed::CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer)
+CClientPed::CClientPed(CClientManager* pManager, std::uint32_t ulModelID, ElementID ID, bool bIsLocalPlayer)
     : ClassInit(this), CClientStreamElement(pManager->GetPlayerStreamer(), ID), CAntiCheatModule(pManager->GetAntiCheat())
 {
     // Init
@@ -95,7 +95,7 @@ CClientPed::CClientPed(CClientManager* pManager, unsigned long ulModelID, Elemen
     pManager->GetPedManager()->AddToList(this);
 }
 
-void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bIsLocalPlayer)
+void CClientPed::Init(CClientManager* pManager, std::uint32_t ulModelID, bool bIsLocalPlayer)
 {
     CClientEntityRefManager::AddEntityRefs(ENTITY_REF_DEBUG(this, "CClientPed"), &m_pOccupiedVehicle, &m_pOccupyingVehicle, &m_pTargetedEntity,
                                            &m_pCurrentContactEntity, &m_pBulletImpactEntity, &m_interp.pTargetOriginSource, NULL);
@@ -942,7 +942,7 @@ void CClientPed::SetControllerState(const CControllerState& ControllerState)
     }
 }
 
-void CClientPed::AddKeysync(unsigned long ulDelay, const CControllerState& ControllerState, bool bDucking)
+void CClientPed::AddKeysync(std::uint32_t ulDelay, const CControllerState& ControllerState, bool bDucking)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -959,7 +959,7 @@ void CClientPed::AddKeysync(unsigned long ulDelay, const CControllerState& Contr
     }
 }
 
-void CClientPed::AddChangeWeapon(unsigned long ulDelay, eWeaponSlot slot, std::uint16_t usWeaponAmmo)
+void CClientPed::AddChangeWeapon(std::uint32_t ulDelay, eWeaponSlot slot, std::uint16_t usWeaponAmmo)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -976,7 +976,7 @@ void CClientPed::AddChangeWeapon(unsigned long ulDelay, eWeaponSlot slot, std::u
     }
 }
 
-void CClientPed::AddMoveSpeed(unsigned long ulDelay, const CVector& vecMoveSpeed)
+void CClientPed::AddMoveSpeed(std::uint32_t ulDelay, const CVector& vecMoveSpeed)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -992,7 +992,7 @@ void CClientPed::AddMoveSpeed(unsigned long ulDelay, const CVector& vecMoveSpeed
     }
 }
 
-void CClientPed::SetTargetTarget(unsigned long ulDelay, const CVector& vecSource, const CVector& vecTarget)
+void CClientPed::SetTargetTarget(std::uint32_t ulDelay, const CVector& vecSource, const CVector& vecTarget)
 {
     if (!m_bIsLocalPlayer)
     {
@@ -1034,7 +1034,7 @@ void CClientPed::SetTargetTarget(unsigned long ulDelay, const CVector& vecSource
     }
 }
 
-bool CClientPed::SetModel(unsigned long ulModel, bool bTemp)
+bool CClientPed::SetModel(std::uint32_t ulModel, bool bTemp)
 {
     // Valid model?
     if (CClientPlayerManager::IsValidModel(ulModel))
@@ -2270,7 +2270,7 @@ void CClientPed::RemoveWeapon(eWeaponType weaponType)
             pWeapon->Remove();
         }
     }
-    for (int i = 0; i < (int)WEAPONSLOT_MAX; i++)
+    for (auto i = 0; i < (int)WEAPONSLOT_MAX; i++)
     {
         if (m_WeaponTypes[i] == weaponType)
         {
@@ -2297,7 +2297,7 @@ void CClientPed::RemoveAllWeapons()
         m_pPlayerPed->ClearWeapons();
     }
 
-    for (int i = 0; i < (int)WEAPONSLOT_MAX; i++)
+    for (auto i = 0; i < (int)WEAPONSLOT_MAX; i++)
     {
         m_WeaponTypes[i] = WEAPONTYPE_UNARMED;
         m_usWeaponAmmo[i] = 0;
@@ -2339,7 +2339,7 @@ bool CClientPed::HasWeapon(eWeaponType weaponType)
     }
     else
     {
-        for (int i = 0; i < (int)WEAPONSLOT_MAX; i++)
+        for (auto i = 0; i < (int)WEAPONSLOT_MAX; i++)
         {
             if (m_WeaponTypes[i] == weaponType)
             {
@@ -2503,7 +2503,7 @@ bool CClientPed::HasTask(int iTaskType, int iTaskPriority, bool bPrimary)
         }
         else
         {
-            for (int i = 0; i < TASK_PRIORITY_MAX; i++)
+            for (auto i = 0; i < TASK_PRIORITY_MAX; i++)
             {
                 pTask = m_pTaskManager->GetTask(i);
                 if (pTask && pTask->GetTaskType() == iTaskType)
@@ -2511,7 +2511,7 @@ bool CClientPed::HasTask(int iTaskType, int iTaskPriority, bool bPrimary)
                     return true;
                 }
             }
-            for (int i = 0; i < TASK_SECONDARY_MAX; i++)
+            for (auto i = 0; i < TASK_SECONDARY_MAX; i++)
             {
                 pTask = m_pTaskManager->GetTaskSecondary(i);
                 if (pTask && pTask->GetTaskType() == iTaskType)
@@ -2603,7 +2603,7 @@ void CClientPed::SetAim(float fArmDirectionX, float fArmDirectionY, eVehicleAimD
     }
 }
 
-void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp,
+void CClientPed::SetAimInterpolated(std::uint32_t ulDelay, float fArmDirectionX, float fArmDirectionY, bool bAkimboAimUp,
                                     eVehicleAimDirection cInVehicleAimAnim)
 {
     if (!m_bIsLocalPlayer)
@@ -2623,7 +2623,7 @@ void CClientPed::SetAimInterpolated(unsigned long ulDelay, float fArmDirectionX,
     }
 }
 
-void CClientPed::SetAimingData(unsigned long ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY,
+void CClientPed::SetAimingData(std::uint32_t ulDelay, const CVector& vecTargetPosition, float fArmDirectionX, float fArmDirectionY,
                                eVehicleAimDirection cInVehicleAimAnim, CVector* pSource, bool bInterpolateAim)
 {
     if (!m_bIsLocalPlayer)
@@ -2986,7 +2986,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
         }
     }
 
-    unsigned long ulNow = CClientTime::GetTime();
+    std::uint32_t ulNow = CClientTime::GetTime();
     // MS checks must take into account the gamespeed
     float fSpeedRatio = (1.0f / g_pGame->GetGameSpeed());
 
@@ -3321,7 +3321,7 @@ void CClientPed::SetTargetRotation(float fRotation)
     SetCurrentRotation(fRotation);
 }
 
-void CClientPed::SetTargetRotation(unsigned long ulDelay, float fRotation, float fCameraRotation)
+void CClientPed::SetTargetRotation(std::uint32_t ulDelay, float fRotation, float fCameraRotation)
 {
     m_ulBeginRotationTime = CClientTime::GetTime();
     m_ulEndRotationTime = m_ulBeginRotationTime + ulDelay;
@@ -3338,7 +3338,7 @@ extern CClientGame* g_pClientGame;
 void CClientPed::Interpolate()
 {
     // Grab the current time
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
 
     // Do we have interpolation data for aiming?
     if (m_ulBeginAimTime != 0)
@@ -3471,7 +3471,7 @@ void CClientPed::UpdateKeysync(bool bCleanup)
     if (m_SyncBuffer.size() > 0)
     {
         // Time to apply it?
-        unsigned long ulCurrentTime = 0;
+        std::uint32_t ulCurrentTime = 0;
         if (!bCleanup)
             ulCurrentTime = CClientTime::GetTime();
 
@@ -3620,7 +3620,7 @@ void CClientPed::_CreateModel()
             SetCanBeKnockedOffBike(false);
 
         // Restore their weapons
-        for (int i = 0; i < (int)WEAPONSLOT_MAX; i++)
+        for (auto i = 0; i < (int)WEAPONSLOT_MAX; i++)
         {
             if (m_WeaponTypes[i] != WEAPONTYPE_UNARMED)
             {
@@ -5264,7 +5264,7 @@ void CClientPed::GetTargetPosition(CVector& vecPosition)
     }
 }
 
-void CClientPed::SetTargetPosition(const CVector& vecPosition, unsigned long ulDelay, CClientEntity* pTargetOriginSource)
+void CClientPed::SetTargetPosition(const CVector& vecPosition, std::uint32_t ulDelay, CClientEntity* pTargetOriginSource)
 {
     UpdateTargetPosition();
 
@@ -5300,7 +5300,7 @@ void CClientPed::SetTargetPosition(const CVector& vecPosition, unsigned long ulD
         m_interp.pos.vecError = vecPosition - vecCurrentPosition;
 
         // Get the interpolation interval
-        unsigned long ulTime = CClientTime::GetTime();
+        std::uint32_t ulTime = CClientTime::GetTime();
         m_interp.pos.ulStartTime = ulTime;
         m_interp.pos.ulFinishTime = ulTime + ulDelay;
 
@@ -5328,7 +5328,7 @@ void CClientPed::UpdateTargetPosition()
 {
     if (HasTargetPosition())
     {
-        unsigned long ulCurrentTime = CClientTime::GetTime();
+        std::uint32_t ulCurrentTime = CClientTime::GetTime();
 
         // Get the origin position if there is any contact
         CVector vecOrigin;
@@ -5973,7 +5973,7 @@ void CClientPed::SetSpeechEnabled(bool bEnabled)
 
 bool CClientPed::CanReloadWeapon()
 {
-    unsigned long    ulNow = CClientTime::GetTime();
+    std::uint32_t    ulNow = CClientTime::GetTime();
     CControllerState Current;
     GetControllerState(Current);
     int iWeaponType = GetWeapon()->GetType();

@@ -297,7 +297,7 @@ void CSettings::CreateGUI()
                                   CVector2D(410, 276),            // Acceleration/Brake
                                   CVector2D(221, 276)};
 
-        for (int i = 0; i < JoyMan->GetOutputCount() && i < 10; i++)
+        for (auto i = 0; i < JoyMan->GetOutputCount() && i < 10; i++)
         {
             CVector2D vecPos = vecPosList[i];
             vecPos.fY += vecTemp.fY - 231;
@@ -344,7 +344,7 @@ void CSettings::CreateGUI()
 
     m_hBind = m_pBindsList->AddColumn(_("DESCRIPTION"), 0.35f);
     m_hPriKey = m_pBindsList->AddColumn(_("KEY"), 0.24f);
-    for (int k = 0; k < SecKeyNum; k++)
+    for (auto k = 0; k < SecKeyNum; k++)
         m_hSecKeys[k] = m_pBindsList->AddColumn(_("ALT. KEY"), 0.24f);
 
     /**
@@ -1651,7 +1651,7 @@ void CSettings::PopulateResolutionComboBox()
 
         // Check resolution hasn't already been added
         bool bDuplicate = false;
-        for (int i = 1; i < vidMode; i++)
+        for (auto i = 1; i < vidMode; i++)
         {
             VideoMode info;
             gameSettings->GetVideoModeInfo(&info, i);
@@ -1732,7 +1732,7 @@ void CSettings::UpdateJoypadTab()
     // Joystick name underline
     string strUnderline = "";
     int    inumChars = m_pJoypadName->GetSize().fX / 7.f + 0.5f;
-    for (int i = 0; i < inumChars; i++)
+    for (auto i = 0; i < inumChars; i++)
         strUnderline = strUnderline + "_";
 
     m_pJoypadUnderline->SetPosition(CVector2D(270, m_pJoypadUnderline->GetPosition().fY));
@@ -1751,7 +1751,7 @@ void CSettings::UpdateJoypadTab()
     m_pEditSaturation->SetText(szSaturation);
 
     // Update axes labels and buttons
-    for (int i = 0; i < JoyMan->GetOutputCount() && i < (int)m_pJoypadButtons.size(); i++)
+    for (auto i = 0; i < JoyMan->GetOutputCount() && i < (int)m_pJoypadButtons.size(); i++)
     {
         string outputName = JoyMan->GetOutputName(i);                // LeftStickPosX etc
         string inputName = JoyMan->GetOutputInputName(i);            // X+ or RZ- etc
@@ -2385,14 +2385,14 @@ void CSettings::ProcessKeyBinds()
     SString strResource;
 
     // Loop through every row in the binds list
-    for (int i = 0; i < m_pBindsList->GetRowCount(); i++)
+    for (auto i = 0; i < m_pBindsList->GetRowCount(); i++)
     {
         // Get the type and keys
         auto                bindType = static_cast<KeyBindType>(reinterpret_cast<intptr_t>(m_pBindsList->GetItemData(i, m_hBind)));
         const char*         szPri = m_pBindsList->GetItemText(i, m_hPriKey);
         const SBindableKey* pPriKey = pKeyBinds->GetBindableFromKey(szPri);
         const SBindableKey* pSecKeys[SecKeyNum];
-        for (int k = 0; k < SecKeyNum; k++)
+        for (auto k = 0; k < SecKeyNum; k++)
         {
             const char* szSec = m_pBindsList->GetItemText(i, m_hSecKeys[k]);
             pSecKeys[k] = pKeyBinds->GetBindableFromKey(szSec);
@@ -2417,7 +2417,7 @@ void CSettings::ProcessKeyBinds()
                     pKeyBinds->Remove(pBind);
             }
 
-            for (int k = 0; k < SecKeyNum; k++)
+            for (auto k = 0; k < SecKeyNum; k++)
             {
                 CGTAControlBind* pSecBind = reinterpret_cast<CGTAControlBind*>(m_pBindsList->GetItemData(i, m_hSecKeys[k]));
                 if (pSecBind)
@@ -2460,7 +2460,7 @@ void CSettings::ProcessKeyBinds()
             if (pPriKey)
                 // If theres a new key for primary, add a new bind
                 pKeyBinds->AddGTAControl(pPriKey, pControl);
-            for (int k = 0; k < SecKeyNum; k++)
+            for (auto k = 0; k < SecKeyNum; k++)
                 if (pSecKeys[k])
                     // If theres a new key for secondary, add a new bind
                     pKeyBinds->AddGTAControl(pSecKeys[k], pControl);
@@ -2519,7 +2519,7 @@ void CSettings::ProcessKeyBinds()
             }
 
             /** Secondary keybinds **/
-            for (int k = 0; k < SecKeyNum; k++)
+            for (auto k = 0; k < SecKeyNum; k++)
             {
                 pBind = reinterpret_cast<CCommandBind*>(m_pBindsList->GetItemData(i, m_hSecKeys[k]));
                 // If this is a valid bind in the keybinds list
@@ -2725,7 +2725,7 @@ void CSettings::Initialize()
                 iBind = m_pBindsList->InsertRowAfter(iRowGame);
                 m_pBindsList->SetItemText(iBind, m_hBind, _(pControl->szDescription));
                 m_pBindsList->SetItemText(iBind, m_hPriKey, controlBind->boundKey->szKey);
-                for (int k = 0; k < SecKeyNum; k++)
+                for (auto k = 0; k < SecKeyNum; k++)
                     m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
                 m_pBindsList->SetItemData(iBind, m_hBind, reinterpret_cast<void*>(KeyBindType::GTA_CONTROL));
                 m_pBindsList->SetItemData(iBind, m_hPriKey, controlBind);
@@ -2752,7 +2752,7 @@ void CSettings::Initialize()
             iBind = m_pBindsList->InsertRowAfter(iRowGame);
             m_pBindsList->SetItemText(iBind, m_hBind, _(pControl->szDescription));
             m_pBindsList->SetItemText(iBind, m_hPriKey, CORE_SETTINGS_NO_KEY);
-            for (int k = 0; k < SecKeyNum; k++)
+            for (auto k = 0; k < SecKeyNum; k++)
                 m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
             m_pBindsList->SetItemData(iBind, m_hBind, reinterpret_cast<void*>(KeyBindType::UNDEFINED));
             m_pBindsList->SetItemData(iBind, m_hPriKey, pControl);
@@ -2799,7 +2799,7 @@ void CSettings::Initialize()
                     // If we found a 1st match, add it to the secondary section
                     foundMatches = true;
 
-                    for (int k = 0; k < SecKeyNum; k++)
+                    for (auto k = 0; k < SecKeyNum; k++)
                     {
                         if (pListedCommand->uiMatchCount == k)
                         {
@@ -2863,7 +2863,7 @@ void CSettings::Initialize()
                 iBind = m_pBindsList->AddRow(true);
                 m_pBindsList->SetItemText(iBind, m_hBind, strDescription);
                 m_pBindsList->SetItemText(iBind, m_hPriKey, commandBind->boundKey->szKey);
-                for (int k = 0; k < SecKeyNum; k++)
+                for (auto k = 0; k < SecKeyNum; k++)
                     m_pBindsList->SetItemText(iBind, m_hSecKeys[k], CORE_SETTINGS_NO_KEY);
                 m_pBindsList->SetItemData(iBind, m_hBind, reinterpret_cast<void*>(KeyBindType::COMMAND));
                 m_pBindsList->SetItemData(iBind, m_hPriKey, commandBind);
@@ -3605,7 +3605,7 @@ void CSettings::SaveData()
     SaveChatColor(Chat::ColorType::TEXT, "chat_text_color");
     SaveChatColor(Chat::ColorType::INPUT_BG, "chat_input_color");
     SaveChatColor(Chat::ColorType::INPUT_TEXT, "chat_input_text_color");
-    for (int iFont = 0; iFont < Chat::ColorType::MAX; iFont++)
+    for (auto iFont = 0; iFont < Chat::ColorType::MAX; iFont++)
     {
         if (m_pRadioChatFont[iFont]->GetSelected())
         {
@@ -3676,14 +3676,14 @@ void CSettings::SaveData()
     {
         auto                 pWebCore = g_pCore->GetWebCore();
         std::vector<SString> customBlacklist;
-        for (int i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
+        for (auto i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
         {
             customBlacklist.push_back(m_pGridBrowserBlacklist->GetItemText(i, 1));
         }
         pWebCore->WriteCustomList("customblacklist", customBlacklist);
 
         std::vector<SString> customWhitelist;
-        for (int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
+        for (auto i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
         {
             customWhitelist.push_back(m_pGridBrowserWhitelist->GetItemText(i, 1));
         }
@@ -4337,7 +4337,7 @@ bool CSettings::OnChatRedChanged(CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar*>(pElement);
     int            iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    for (int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType)
+    for (auto eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType)
     {
         if (pScrollBar == m_pChatRed[eType])
         {
@@ -4355,7 +4355,7 @@ bool CSettings::OnChatGreenChanged(CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar*>(pElement);
     int            iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    for (int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType)
+    for (auto eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType)
     {
         if (pScrollBar == m_pChatGreen[eType])
         {
@@ -4373,7 +4373,7 @@ bool CSettings::OnChatBlueChanged(CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar*>(pElement);
     int            iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    for (int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType)
+    for (auto eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType)
     {
         if (pScrollBar == m_pChatBlue[eType])
         {
@@ -4391,7 +4391,7 @@ bool CSettings::OnChatAlphaChanged(CGUIElement* pElement)
     CGUIScrollBar* pScrollBar = reinterpret_cast<CGUIScrollBar*>(pElement);
     int            iValue = static_cast<int>(pScrollBar->GetScrollPosition() * 255.0f + 0.5f);
 
-    for (int eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType)
+    for (auto eType = Chat::ColorType::BG; eType < Chat::ColorType::MAX; ++eType)
     {
         if (pScrollBar == m_pChatAlpha[eType])
         {
@@ -4646,7 +4646,7 @@ bool CSettings::OnBrowserBlacklistAdd(CGUIElement* pElement)
     if (!strDomain.empty())
     {
         bool bExists = false;
-        for (int i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
+        for (auto i = 0; i < m_pGridBrowserBlacklist->GetRowCount(); ++i)
         {
             if (m_pGridBrowserBlacklist->GetItemText(i, 1) == strDomain)
             {
@@ -4695,7 +4695,7 @@ bool CSettings::OnBrowserWhitelistAdd(CGUIElement* pElement)
     if (!strDomain.empty())
     {
         bool bExists = false;
-        for (int i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
+        for (auto i = 0; i < m_pGridBrowserWhitelist->GetRowCount(); ++i)
         {
             if (m_pGridBrowserWhitelist->GetItemText(i, 1) == strDomain)
             {

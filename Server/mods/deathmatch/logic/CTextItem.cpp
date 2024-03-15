@@ -13,7 +13,7 @@
 #include "CTextItem.h"
 #include "CIdArray.h"
 
-static unsigned long ulUniqueId = 0;
+static std::uint32_t ulUniqueId = 0;
 
 CTextItem::CTextItem(const char* szText, const CVector2D& vecPosition, eTextPriority Priority, const SColor color, float fScale, std::uint8_t ucFormat,
                      std::uint8_t ucShadowAlpha)

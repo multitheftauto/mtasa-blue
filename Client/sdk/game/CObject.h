@@ -28,7 +28,7 @@ public:
     virtual void  Break() = 0;
     virtual void  SetHealth(float fHealth) = 0;
     virtual float GetHealth() = 0;
-    virtual void  SetModelIndex(unsigned long ulModel) = 0;
+    virtual void  SetModelIndex(std::uint32_t ulModel) = 0;
 
     virtual void          SetPreRenderRequired(bool required) = 0;
     virtual bool          GetPreRenderRequired() = 0;

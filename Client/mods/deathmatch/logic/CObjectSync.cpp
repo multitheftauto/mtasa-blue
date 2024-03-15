@@ -53,7 +53,7 @@ bool CObjectSync::ProcessPacket(std::uint8_t ucPacketID, NetBitStreamInterface& 
 void CObjectSync::DoPulse()
 {
     // Has it been long enough since our last state's sync?
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastSyncTime + OBJECT_SYNC_RATE)
     {
         Sync();

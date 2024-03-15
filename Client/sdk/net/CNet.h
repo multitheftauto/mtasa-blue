@@ -93,7 +93,7 @@ public:
     virtual const SPacketStat* GetPacketStats() = 0;
 
     virtual int           GetPing() = 0;
-    virtual unsigned long GetTime() = 0;
+    virtual std::uint32_t GetTime() = 0;
 
     virtual const char* GetLocalIP() = 0;
     virtual void        GetSerial(char* szSerial, size_t maxLength) = 0;
@@ -117,7 +117,7 @@ public:
     virtual const char* GetDiagnosticStatus() = 0;
     virtual void        UpdatePingStatus(const char* szStatus, ushort& usDataRef) = 0;
 
-    virtual bool VerifySignature(const char* pData, unsigned long ulSize) = 0;
+    virtual bool VerifySignature(const char* pData, std::uint32_t ulSize) = 0;
 
     virtual void ResetStub(DWORD dwType, ...) = 0;
     virtual void ResetStub(DWORD dwType, va_list) = 0;

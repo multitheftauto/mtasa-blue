@@ -21,7 +21,7 @@ public:
     ~CVoiceDataPacket();
 
     ePacketID               GetPacketID() const { return PACKET_ID_VOICE_DATA; }
-    unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
+    std::uint32_t           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_VOICE; }
 
     bool Read(NetBitStreamInterface& BitStream);

@@ -160,7 +160,7 @@ public:
     virtual void          SetAlpha(std::uint8_t ucAlpha) = 0;
     virtual std::uint8_t GetAlpha() = 0;
 
-    virtual void BlowUp(CEntity* pCreator, unsigned long ulUnknown) = 0;
+    virtual void BlowUp(CEntity* pCreator, std::uint32_t ulUnknown) = 0;
 
     virtual CDamageManager* GetDamageManager() = 0;
     virtual void            FadeOut(bool bFadeOut) = 0;
@@ -200,7 +200,7 @@ public:
     virtual std::uint16_t GetAdjustablePropertyValue() = 0;
     virtual float          GetHeliRotorSpeed() = 0;
     virtual float          GetPlaneRotorSpeed() = 0;
-    virtual unsigned long  GetExplodeTime() = 0;
+    virtual std::uint32_t  GetExplodeTime() = 0;
 
     virtual char  GetNitroCount() = 0;
     virtual float GetNitroLevel() = 0;
@@ -222,7 +222,7 @@ public:
     virtual void SetHeliRotorSpeed(float fSpeed) = 0;
     virtual void SetPlaneRotorSpeed(float fSpeed) = 0;
     virtual void SetTaxiLightOn(bool bLightState) = 0;
-    virtual void SetExplodeTime(unsigned long ulTime) = 0;
+    virtual void SetExplodeTime(std::uint32_t ulTime) = 0;
     virtual void SetRadioStatus(bool bStatus) = 0;
 
     virtual void SetNitroCount(char cNitroCount) = 0;

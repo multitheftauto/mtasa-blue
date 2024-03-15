@@ -56,7 +56,7 @@ protected:
     sqlite3*  m_db;
     bool      m_bOpened;
     bool      m_bInAutomaticTransaction;
-    long long m_llSuspendBatchingEndTime;
+    std::int64_t m_llSuspendBatchingEndTime;
     SString   m_strLastErrorMessage;
     SString   m_strLastErrorQuery;
     SString   m_strFileName;
@@ -129,7 +129,7 @@ struct CRegistryResultCell
     int nType;              // Type identifier, SQLITE_*
     int nLength;            // Length in bytes if nType == SQLITE_BLOB or SQLITE_TEXT
                             //    (includes zero terminator if TEXT)
-    long long int  nVal;
+    std::int64_t int  nVal;
     float          fVal;
     std::uint8_t* pVal;
 };

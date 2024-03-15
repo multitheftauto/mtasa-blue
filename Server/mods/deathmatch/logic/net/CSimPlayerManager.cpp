@@ -441,7 +441,7 @@ void CSimPlayerManager::Broadcast(const CSimPacket& Packet, const std::multimap<
 
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
-    unsigned long              ulFlags = Packet.GetFlags();
+    std::uint32_t              ulFlags = Packet.GetFlags();
     if (ulFlags & PACKET_RELIABLE)
     {
         if (ulFlags & PACKET_SEQUENCED)

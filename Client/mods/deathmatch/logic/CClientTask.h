@@ -50,9 +50,9 @@ public:
     const char* GetTaskName() { return m_strTaskName.c_str(); };
     void        SetTaskName(const char* szName) { m_strTaskName = szName ? szName : ""; };
 
-    static unsigned long GenerateUniqueIdentifier();
-    unsigned long        GetUniqueIdentifier() { return m_ulUniqueIdentifier; };
-    void                 SetUniqueIdentifier(unsigned long ulID) { m_ulUniqueIdentifier = ulID; };
+    static std::uint32_t GenerateUniqueIdentifier();
+    std::uint32_t        GetUniqueIdentifier() { return m_ulUniqueIdentifier; };
+    void                 SetUniqueIdentifier(std::uint32_t ulID) { m_ulUniqueIdentifier = ulID; };
 
     void AddElement(CClientEntity* pElement);
     void RemoveElement(CClientEntity* pElement);
@@ -82,11 +82,11 @@ private:
     CClientManager* m_pManager;
 
     std::string   m_strTaskName;
-    unsigned long m_ulUniqueIdentifier;
+    std::uint32_t m_ulUniqueIdentifier;
 
     std::list<ElementID>    m_Elements;
     std::list<std::string>  m_Keys;
     std::list<CLuaArgument> m_Values;
 
-    static unsigned long m_ulLastUniqueIdentifier;
+    static std::uint32_t m_ulLastUniqueIdentifier;
 };

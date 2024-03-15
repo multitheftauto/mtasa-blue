@@ -229,7 +229,7 @@ float CObjectSA::GetHealth()
     return static_cast<CObjectSAInterface*>(GetInterface())->fHealth;
 }
 
-void CObjectSA::SetModelIndex(unsigned long ulModel)
+void CObjectSA::SetModelIndex(std::uint32_t ulModel)
 {
     // Delete any existing RwObject first
     DWORD dwFunc = GetInterface()->vtbl->DeleteRwObject;

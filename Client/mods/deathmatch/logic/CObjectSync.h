@@ -43,7 +43,7 @@ private:
 
     CClientObjectManager*           m_pObjectManager;
     CMappedList<CDeathmatchObject*> m_List;
-    unsigned long                   m_ulLastSyncTime;
+    std::uint32_t                   m_ulLastSyncTime;
 };
 
 #endif

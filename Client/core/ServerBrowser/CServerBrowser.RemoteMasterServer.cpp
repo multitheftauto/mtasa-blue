@@ -38,7 +38,7 @@ protected:
     static void                       StaticDownloadFinished(const SHttpDownloadResult& result);
     void                              DownloadFinished(const SHttpDownloadResult& result);
 
-    long long m_llLastRefreshTime;
+    std::int64_t m_llLastRefreshTime;
     SString   m_strStage;
     SString   m_strURL;
     CBuffer   m_Data;

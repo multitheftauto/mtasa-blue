@@ -266,7 +266,7 @@ bool SharedUtil::FileLoad(const SString& strFilename, std::vector<char>& buffer,
 //
 // Save binary data to a file
 //
-bool SharedUtil::FileSave(const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce)
+bool SharedUtil::FileSave(const SString& strFilename, const void* pBuffer, std::uint32_t ulSize, bool bForce)
 {
 #ifdef WIN32
     if (bForce)
@@ -290,7 +290,7 @@ bool SharedUtil::FileSave(const SString& strFilename, const void* pBuffer, unsig
 //
 // Append binary data to a file
 //
-bool SharedUtil::FileAppend(const SString& strFilename, const void* pBuffer, unsigned long ulSize, bool bForce)
+bool SharedUtil::FileAppend(const SString& strFilename, const void* pBuffer, std::uint32_t ulSize, bool bForce)
 {
 #ifdef WIN32
     if (bForce)

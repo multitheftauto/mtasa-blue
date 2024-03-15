@@ -89,9 +89,9 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
     return NULL;
 }
 
-bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
+bool CClientObjectManager::IsValidModel(std::uint32_t ulObjectModel)
 {
-    if (ulObjectModel >= static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
+    if (ulObjectModel >= static_cast<std::uint32_t>(g_pGame->GetBaseIDforTXD()))
         return false;
 
     // Clothes and hands cause crash (Github #424)
@@ -113,7 +113,7 @@ bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
     return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
 }
 
-bool CClientObjectManager::IsBreakableModel(unsigned long ulObjectModel)
+bool CClientObjectManager::IsBreakableModel(std::uint32_t ulObjectModel)
 {
     static std::map<std::uint16_t, short> breakableModelMap;
 

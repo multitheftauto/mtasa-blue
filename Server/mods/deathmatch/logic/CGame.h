@@ -471,7 +471,7 @@ private:
     void RelayPlayerPuresync(class CPacket& Packet);
     void RelayNearbyPacket(class CPacket& Packet);
 
-    void ProcessTrafficLights(long long llCurrentTime);
+    void ProcessTrafficLights(std::int64_t llCurrentTime);
 
     void Packet_PlayerJoin(const NetServerPlayerID& Source);
     void Packet_PlayerJoinData(class CPlayerJoinDataPacket& Packet);
@@ -587,7 +587,7 @@ private:
 
     std::uint8_t m_ucTrafficLightState;
     bool          m_bTrafficLightsLocked;
-    long long     m_llLastTrafficUpdate;
+    std::int64_t     m_llLastTrafficUpdate;
 
     std::uint8_t m_ucSkyGradientTR, m_ucSkyGradientTG, m_ucSkyGradientTB;
     std::uint8_t m_ucSkyGradientBR, m_ucSkyGradientBG, m_ucSkyGradientBB;
@@ -625,7 +625,7 @@ private:
     SGarageStates m_bGarageStates;
 
     // FPS statistics
-    long long                                     m_llLastFPSTime;
+    std::int64_t                                     m_llLastFPSTime;
     std::uint16_t                                m_usFrames;
     std::uint16_t                                m_usFPS;
     int                                           m_iSyncFPS;
@@ -668,7 +668,7 @@ private:
 
     struct ClientTriggeredEventsInfo
     {
-        long long m_llTicks = 0;
+        std::int64_t m_llTicks = 0;
         uint32_t  m_uiCounter = 0;
     };
 

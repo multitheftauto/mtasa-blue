@@ -149,7 +149,7 @@ public:
     static bool SetPlayerNametagText(CElement* pElement, const char* szText);
     static bool SetPlayerNametagColor(CElement* pElement, bool bRemoveOverride, std::uint8_t ucR, std::uint8_t ucG, std::uint8_t ucB);
     static bool SetPlayerNametagShowing(CElement* pElement, bool bShowing);
-    static bool SpawnPlayer(CPlayer* pPlayer, const CVector& vecPosition, float fRotation, unsigned long ulModel, std::uint8_t ucInterior,
+    static bool SpawnPlayer(CPlayer* pPlayer, const CVector& vecPosition, float fRotation, std::uint32_t ulModel, std::uint8_t ucInterior,
                             std::uint16_t usDimension, CTeam* pTeam = NULL);
     static bool SetPlayerMuted(CElement* pElement, bool bMuted);
     static bool SetPlayerBlurLevel(CElement* pElement, std::uint8_t ucLevel);
@@ -312,8 +312,8 @@ public:
     static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CElement* pElement, std::uint8_t ucLight, std::uint8_t ucState);
     static bool SetVehiclePanelState(CElement* pElement, std::uint8_t ucPanel, std::uint8_t ucState);
-    static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);
-    static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
+    static bool SetVehicleIdleRespawnDelay(CElement* pElement, std::uint32_t ulTime);
+    static bool SetVehicleRespawnDelay(CElement* pElement, std::uint32_t ulTime);
     static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);
     static bool GetVehicleRespawnRotation(CElement* pElement, CVector& vecRotation);
     static bool SetVehicleRespawnRotation(CElement* pElement, const CVector& vecRotation);
@@ -339,7 +339,7 @@ public:
     static bool SetTrainPosition(CVehicle* pVehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CVehicle* pVehicle, const SColor color);
     static bool SetVehicleTurretPosition(CVehicle* pVehicle, float fHorizontal, float fVertical);
-    static bool SetVehicleDoorOpenRatio(CElement* pElement, std::uint8_t ucDoor, float fRatio, unsigned long ulTime = 0);
+    static bool SetVehicleDoorOpenRatio(CElement* pElement, std::uint8_t ucDoor, float fRatio, std::uint32_t ulTime = 0);
     static bool SetVehiclePlateText(CElement* pElement, const SString& strPlateText);
 
     // static bool SetVehicleHandling(CVehicle* pVehicle, bool bValue);
@@ -416,7 +416,7 @@ public:
     // Object set functions
     static bool SetObjectRotation(CElement* pElement, const CVector& vecRotation);
     static bool SetObjectScale(CElement* pElement, const CVector& vecScale);
-    static bool MoveObject(CResource* pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition, const CVector& vecRotation,
+    static bool MoveObject(CResource* pResource, CElement* pElement, std::uint32_t ulTime, const CVector& vecPosition, const CVector& vecRotation,
                            CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot);
     static bool StopObject(CElement* pElement);
     static bool SetObjectVisibleInAllDimensions(CElement* pElement, bool bVisible, std::uint16_t usNewDimension = 0);
@@ -437,7 +437,7 @@ public:
     static bool SetRadarAreaFlashing(CElement* pElement, bool bFlashing);
 
     // Pickup create/destroy funcs
-    static CPickup* CreatePickup(CResource* pResource, const CVector& vecPosition, std::uint8_t ucType, double dFive, unsigned long ulRespawnInterval,
+    static CPickup* CreatePickup(CResource* pResource, const CVector& vecPosition, std::uint8_t ucType, double dFive, std::uint32_t ulRespawnInterval,
                                  double dSix);
 
     // Pickup get funcs
@@ -445,12 +445,12 @@ public:
     static bool GetPickupWeapon(CPickup* pPickup, std::uint8_t& ucWeapon);
     static bool GetPickupAmount(CPickup* pPickup, float& fAmount);
     static bool GetPickupAmmo(CPickup* pPickup, std::uint16_t& ucAmmo);
-    static bool GetPickupRespawnInterval(CPickup* pPickup, unsigned long& ulInterval);
+    static bool GetPickupRespawnInterval(CPickup* pPickup, std::uint32_t& ulInterval);
     static bool IsPickupSpawned(CPickup* pPickup, bool& bSpawned);
 
     // Pickup set funcs
     static bool SetPickupType(CElement* pElement, std::uint8_t ucType, double dThree, double dFour);
-    static bool SetPickupRespawnInterval(CElement* pElement, unsigned long ulInterval);
+    static bool SetPickupRespawnInterval(CElement* pElement, std::uint32_t ulInterval);
     static bool UsePickup(CElement* pElement, CPlayer* pPlayer);
 
     // Shape create funcs
@@ -583,7 +583,7 @@ public:
     static bool GetGameSpeed(float& fSpeed);
     static bool GetWaveHeight(float& fHeight);
     static bool GetFPSLimit(std::uint16_t& usLimit);
-    static bool GetMinuteDuration(unsigned long& ulDuration);
+    static bool GetMinuteDuration(std::uint32_t& ulDuration);
     static bool IsGarageOpen(std::uint8_t ucGarageID, bool& bIsOpen);
     static bool GetTrafficLightState(std::uint8_t& ucState);
     static bool GetTrafficLightsLocked(bool& bLocked);
@@ -617,7 +617,7 @@ public:
     static bool SetHeatHaze(const SHeatHazeSettings& heatHazeSettings);
     static bool ResetHeatHaze();
     static bool SetFPSLimit(std::uint16_t usLimit, bool bSave);
-    static bool SetMinuteDuration(unsigned long ulDuration);
+    static bool SetMinuteDuration(std::uint32_t ulDuration);
     static bool SetGarageOpen(std::uint8_t ucGarageID, bool bIsOpen);
     static bool SetGlitchEnabled(const std::string& strGlitchName, bool bEnabled);
     static bool IsGlitchEnabled(const std::string& strGlitchName, bool& bEnabled);
@@ -754,11 +754,11 @@ public:
     static bool      RemoveResourceFile(CResource* pResource, const char* szFilename);
 
     // Version funcs
-    static unsigned long GetVersion();
+    static std::uint32_t GetVersion();
     static const char*   GetVersionString();
     static const char*   GetVersionName();
     static SString       GetVersionBuildType();
-    static unsigned long GetNetcodeVersion();
+    static std::uint32_t GetNetcodeVersion();
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
     static CMtaVersion   GetVersionSortable();

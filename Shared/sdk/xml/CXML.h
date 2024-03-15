@@ -30,7 +30,7 @@ public:
     virtual void                        DeleteXML(CXMLFile* pFile) = 0;
     virtual CXMLNode*                   CreateDummyNode() = 0;
 
-    virtual CXMLAttribute* GetAttrFromID(unsigned long ulID) = 0;
-    virtual CXMLFile*      GetFileFromID(unsigned long ulID) = 0;
-    virtual CXMLNode*      GetNodeFromID(unsigned long ulID) = 0;
+    virtual CXMLAttribute* GetAttrFromID(std::uint32_t ulID) = 0;
+    virtual CXMLFile*      GetFileFromID(std::uint32_t ulID) = 0;
+    virtual CXMLNode*      GetNodeFromID(std::uint32_t ulID) = 0;
 };

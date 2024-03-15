@@ -123,7 +123,7 @@ struct SFloatAsBitsSyncBase : public ISyncStructure
 
     bool Read(NetBitStreamInterface& bitStream)
     {
-        unsigned long ulValue = 0;
+        std::uint32_t ulValue = 0;
         if (bitStream.ReadBits(&ulValue, m_uiBits))
         {
             // Convert bits to position in range
@@ -143,7 +143,7 @@ struct SFloatAsBitsSyncBase : public ISyncStructure
         // Find position in range
         float fAlpha = UnlerpClamped(m_fMin, fValue, m_fMax);
         // Convert to bits
-        unsigned long ulValue = Round(ulValueMax * fAlpha);
+        std::uint32_t ulValue = Round(ulValueMax * fAlpha);
 
         // If required, ensure ( fValue > m_fMin ) is preserved.
         if (m_bPreserveGreaterThanMin)

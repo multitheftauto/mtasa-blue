@@ -72,9 +72,9 @@ public:
 
     void DrawMouseCursor();
 
-    void ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton);
-    void ProcessKeyboardInput(unsigned long ulKey, bool bIsDown);
-    void ProcessCharacter(unsigned long ulCharacter);
+    void ProcessMouseInput(CGUIMouseInput eMouseInput, std::uint32_t ulX = 0, std::uint32_t ulY = 0, CGUIMouseButton eMouseButton = NoButton);
+    void ProcessKeyboardInput(std::uint32_t ulKey, bool bIsDown);
+    void ProcessCharacter(std::uint32_t ulCharacter);
 
     //
     bool                 GetGUIInputEnabled();
@@ -324,7 +324,7 @@ private:
 
     std::list<CGUIElement*> m_RedrawQueue;
 
-    unsigned long m_ulPreviousUnique;
+    std::uint32_t m_ulPreviousUnique;
 
     eInputMode m_eInputMode;
 

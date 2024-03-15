@@ -197,5 +197,5 @@ public:
 class CClientTime
 {
 public:
-    static unsigned long GetTime() { return GetTickCount32(); }
+    static std::uint32_t GetTime() { return GetTickCount32(); }
 };

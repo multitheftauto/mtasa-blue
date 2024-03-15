@@ -118,7 +118,7 @@ void CWorldRPCs::SetWeatherBlended(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetMinuteDuration(NetBitStreamInterface& bitStream)
 {
-    unsigned long ulDuration;
+    std::uint32_t ulDuration;
     if (bitStream.Read(ulDuration))
     {
         m_pClientGame->SetMinuteDuration(ulDuration);

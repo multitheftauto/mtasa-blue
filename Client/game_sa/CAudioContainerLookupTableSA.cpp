@@ -38,7 +38,7 @@ CAudioContainerLookupTableSA::CAudioContainerLookupTableSA(const SString& strPat
 
 CAudioContainerLookupTableSA::~CAudioContainerLookupTableSA()
 {
-    for (int i = 0; i < 9; i++)
+    for (auto i = 0; i < 9; i++)
     {
         for (std::vector<SAudioLookupEntrySA*>::iterator it = m_Entries[i].begin(); it != m_Entries[i].end(); it++)
         {

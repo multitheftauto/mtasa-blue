@@ -36,7 +36,7 @@ public:
     // CPerfStatBandwidthReductionImpl
     void RecordStats();
 
-    long long  m_llNextRecordTime;
+    std::int64_t  m_llNextRecordTime;
     SString    m_strCategoryName;
     CTickCount m_PrevTickCount;
     CTickCount m_DeltaTickCount;
@@ -105,7 +105,7 @@ const SString& CPerfStatBandwidthReductionImpl::GetCategoryName()
 ///////////////////////////////////////////////////////////////
 void CPerfStatBandwidthReductionImpl::DoPulse()
 {
-    long long llTime = GetTickCount64_();
+    std::int64_t llTime = GetTickCount64_();
 
     // Record once every 5 seconds
     if (llTime >= m_llNextRecordTime)
@@ -196,7 +196,7 @@ void CPerfStatBandwidthReductionImpl::GetStats(CPerfStatResult* pResult, const s
     pResult->AddColumn("Total - pure/light sync.Messages sent");
     pResult->AddColumn("Total - pure/light sync.Messages skipped");
 
-    SFixedArray<long long, 8>   llTotals = {{0, 0, 0, 0, 0, 0, 0, 0}};
+    SFixedArray<std::int64_t, 8>   llTotals = {{0, 0, 0, 0, 0, 0, 0, 0}};
     SFixedArray<const char*, 4> szDesc = {{"Very near/in FOV", "Near/close FOV", "Near/out FOV", "Far"}};
 
     // Add puresync skipping zones

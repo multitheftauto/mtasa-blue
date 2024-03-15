@@ -88,7 +88,7 @@ protected:
     CGUIButton* m_pButtonClose;
 
 private:
-    unsigned long   m_ulLastUpdateTime;
+    std::uint32_t   m_ulLastUpdateTime;
     CServerListItem m_Server;
     eWindowType     m_pCurrentWindowType;
     bool            m_bWaitingToActivatePassword;

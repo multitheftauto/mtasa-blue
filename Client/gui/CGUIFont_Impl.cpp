@@ -48,7 +48,7 @@ void CGUIFont_Impl::SetAntiAliasingEnabled(bool bAntialiased)
     m_pFont->setAntiAliased(bAntialiased);
 }
 
-void CGUIFont_Impl::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor,
+void CGUIFont_Impl::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, std::uint32_t ulFormat, std::uint32_t ulColor,
                                    float fScaleX, float fScaleY)
 {
     CEGUI::TextFormatting fmt;

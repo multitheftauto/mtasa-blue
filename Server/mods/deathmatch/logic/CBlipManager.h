@@ -35,7 +35,7 @@ public:
     std::list<CBlip*>::const_iterator IterBegin() { return m_List.begin(); };
     std::list<CBlip*>::const_iterator IterEnd() { return m_List.end(); };
 
-    static bool IsValidIcon(unsigned long ulIcon) { return ulIcon <= 63; };
+    static bool IsValidIcon(std::uint32_t ulIcon) { return ulIcon <= 63; };
 
 private:
     std::list<CBlip*> m_List;

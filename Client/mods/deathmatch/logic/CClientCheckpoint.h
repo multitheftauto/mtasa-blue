@@ -40,8 +40,8 @@ public:
 
     std::uint32_t GetMarkerType() const { return CClientMarkerCommon::CLASS_CHECKPOINT; };
 
-    unsigned long GetCheckpointType() const;
-    void          SetCheckpointType(unsigned long ulType);
+    std::uint32_t GetCheckpointType() const;
+    void          SetCheckpointType(std::uint32_t ulType);
 
     bool IsHit(const CVector& vecPosition) const;
 
@@ -80,7 +80,7 @@ protected:
     void StreamOut();
 
 private:
-    void Create(unsigned long ulIdentifier = 0);
+    void Create(std::uint32_t ulIdentifier = 0);
     void Destroy();
     void ReCreate();
 

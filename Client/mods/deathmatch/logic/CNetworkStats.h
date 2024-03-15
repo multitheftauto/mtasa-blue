@@ -26,7 +26,7 @@ private:
 
     CClientDisplayManager* m_pDisplayManager;
 
-    unsigned long      m_ulLastUpdateTime;
+    std::uint32_t      m_ulLastUpdateTime;
     std::uint32_t       m_uiLastPacketsReceived;
     std::uint32_t       m_uiLastPacketsSent;
     std::uint64_t m_ullLastBytesSent;

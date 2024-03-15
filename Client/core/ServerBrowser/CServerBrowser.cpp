@@ -959,7 +959,7 @@ void CServerBrowser::UpdateHistoryList()
     // Look through our combo box and process each item
     CGUIComboBox* pServerList = m_pComboAddressHistory[Type];
     int           iRowCount = pServerList->GetItemCount();
-    for (int i = 0; i < iRowCount; i++)
+    for (auto i = 0; i < iRowCount; i++)
     {
         CGUIListItem* item = pServerList->GetItemByIndex(i);
         const char*   szAddress = (const char*)item->GetData();
@@ -1197,7 +1197,7 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
                 {
                     // We found the server on which the player is
                     // Walk the server gridlist looking for the server host to get the row index
-                    for (int k = 0; k < m_pServerList[Type]->GetRowCount(); k++)
+                    for (auto k = 0; k < m_pServerList[Type]->GetRowCount(); k++)
                     {
                         if (pServer == ((CServerListItem*)m_pServerList[Type]->GetItemData(k, DATA_PSERVER)))
                         {
@@ -2139,7 +2139,7 @@ void CServerBrowser::UpdateRowIndexMembers(ServerBrowserType Type)
     CGUIGridList* pServerList = m_pServerList[Type];
     int           iRowCount = pServerList->GetRowCount();
 
-    for (int iRowIndex = 0; iRowIndex < iRowCount; iRowIndex++)
+    for (auto iRowIndex = 0; iRowIndex < iRowCount; iRowIndex++)
     {
         CServerListItem* pServer = (CServerListItem*)pServerList->GetItemData(iRowIndex, DATA_PSERVER);
         pServer->iRowIndex = iRowIndex;
@@ -2211,7 +2211,7 @@ void CServerBrowser::GetVisibleEndPointList(std::vector<SAddressPort>& outEndpoi
 
     int iFirst, iLast;
     m_pServerList[Type]->GetVisibleRowRange(iFirst, iLast);
-    for (int i = iFirst; i >= 0 && i <= iLast; i++)
+    for (auto i = iFirst; i >= 0 && i <= iLast; i++)
     {
         if (CServerListItem* pServer = (CServerListItem*)m_pServerList[Type]->GetItemData(i, DATA_PSERVER))
         {
@@ -2249,7 +2249,7 @@ void CServerBrowser::SetNextHistoryText(bool bDown)
     ServerBrowserType Type = GetCurrentServerBrowserType();
     CGUIComboBox*     pServerList = m_pComboAddressHistory[Type];
     int               iRowCount = pServerList->GetItemCount();
-    for (int i = 0; i < iRowCount; i++)
+    for (auto i = 0; i < iRowCount; i++)
     {
         CGUIListItem* item = pServerList->GetItemByIndex(i);
         const char*   szAddress = (const char*)item->GetData();

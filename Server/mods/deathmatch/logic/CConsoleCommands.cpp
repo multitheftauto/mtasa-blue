@@ -1855,7 +1855,7 @@ bool CConsoleCommands::DebugJoinFlood(CConsole* pConsole, const char* szArgument
         }
     }
 
-    long long llTickCountAdd = 0;
+    std::int64_t llTickCountAdd = 0;
     if (szArguments)
     {
         llTickCountAdd = atoi(szArguments);
@@ -1886,7 +1886,7 @@ bool CConsoleCommands::DebugUpTime(CConsole* pConsole, const char* szArguments, 
         iDaysAdd = Clamp(0, iDaysAdd, 10);
     }
 
-    long long llTickCountAdd = iDaysAdd * 1000 * 60 * 60 * 24;
+    std::int64_t llTickCountAdd = iDaysAdd * 1000 * 60 * 60 * 24;
     AddTickCount(llTickCountAdd);
     pEchoClient->SendConsole(SString("TickCount advanced by %d days", iDaysAdd));
     return true;

@@ -29,7 +29,7 @@ public:
                               CControllerState& sharedControllerState, uint m_uiDamageInfoSendPhase, const SSimVehicleDamageInfo& damageInfo);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

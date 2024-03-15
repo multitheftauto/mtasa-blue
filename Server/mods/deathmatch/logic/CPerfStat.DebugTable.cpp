@@ -196,7 +196,7 @@ void CPerfStatDebugTableImpl::UpdateLine(const SString& strKey, int iLifeTimeMs,
     // Update end time
     info.bHasEndTime = (iLifeTimeMs > 0);
     if (info.bHasEndTime)
-        info.endTickCount = CTickCount::Now(true) + CTickCount((long long)iLifeTimeMs);
+        info.endTickCount = CTickCount::Now(true) + CTickCount((std::int64_t)iLifeTimeMs);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -227,7 +227,7 @@ void CPerfStatDebugTableImpl::GetStats(CPerfStatResult* pResult, const std::map<
 
     // Add columns
     const int iNumColumns = 4;
-    for (int i = 0; i < iNumColumns; i++)
+    for (auto i = 0; i < iNumColumns; i++)
         pResult->AddColumn("");
 
     for (std::map<SString, SLineInfo>::iterator iter = m_LineMap.begin(); iter != m_LineMap.end(); ++iter)

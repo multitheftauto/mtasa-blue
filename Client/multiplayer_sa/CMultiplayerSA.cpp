@@ -4868,7 +4868,7 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
     }
 }
 
-unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
+std::uint32_t ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
 void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float fR, float fG, float fB)
 {
     SColor                     color = SColorRGBA(255, 255, 255, 255);

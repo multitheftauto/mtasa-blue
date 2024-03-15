@@ -139,7 +139,7 @@ public:
     void  Break();
     void  SetHealth(float fHealth);
     float GetHealth();
-    void  SetModelIndex(unsigned long ulModel);
+    void  SetModelIndex(std::uint32_t ulModel);
 
     void          SetPreRenderRequired(bool required) { m_preRenderRequired = required; }
     bool          GetPreRenderRequired() { return m_preRenderRequired; }

@@ -49,8 +49,8 @@ class CTaskSimpleUseGun;
 class CVector;
 class CVehicle;
 
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+typedef std::uint32_t AssocGroupId;
+typedef std::uint32_t AnimationId;
 
 enum eClimbHeights
 {

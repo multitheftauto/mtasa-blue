@@ -129,7 +129,7 @@ public:
     virtual std::uint8_t* GetData() const = 0;
 
     // Force long types to use 4 bytes
-    bool Read(unsigned long& e)
+    bool Read(std::uint32_t& e)
     {
         uint temp;
         bool bResult = Read(temp);
@@ -143,7 +143,7 @@ public:
         e = temp;
         return bResult;
     }
-    bool ReadCompressed(unsigned long& e)
+    bool ReadCompressed(std::uint32_t& e)
     {
         uint temp;
         bool bResult = ReadCompressed(temp);
@@ -158,9 +158,9 @@ public:
         return bResult;
     }
 
-    void Write(unsigned long e) { Write((uint)e); }
+    void Write(std::uint32_t e) { Write((uint)e); }
     void Write(long e) { Write((int)e); }
-    void WriteCompressed(unsigned long e) { WriteCompressed((uint)e); }
+    void WriteCompressed(std::uint32_t e) { WriteCompressed((uint)e); }
     void WriteCompressed(long e) { WriteCompressed((int)e); }
 
 #ifdef WIN_x64

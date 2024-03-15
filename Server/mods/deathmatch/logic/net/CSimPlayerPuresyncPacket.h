@@ -19,7 +19,7 @@ public:
 
     virtual ePacketID       GetPacketID() const = 0;
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
-    virtual unsigned long   GetFlags() const = 0;
+    virtual std::uint32_t   GetFlags() const = 0;
 
     virtual bool Read(NetBitStreamInterface& BitStream) { return false; };
     virtual bool Write(NetBitStreamInterface& BitStream) const { return false; };
@@ -37,7 +37,7 @@ public:
                              CControllerState& sharedControllerState);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_PURESYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

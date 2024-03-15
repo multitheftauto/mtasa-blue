@@ -41,11 +41,11 @@ public:
 
     int                         m_iStatsCleared;
     CElapsedTime                m_TimeSinceGetStats;
-    long long                   m_llNextRecordTime;
+    std::int64_t                   m_llNextRecordTime;
     SString                     m_strCategoryName;
     SPacketStat                 m_PrevPacketStats[2][256];
     SPacketStat                 m_PacketStats[2][256];
-    SFixedArray<long long, 256> m_ShownPacketStats;
+    SFixedArray<std::int64_t, 256> m_ShownPacketStats;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -124,7 +124,7 @@ void CPerfStatPacketUsageImpl::MaybeRecordStats()
     if (m_TimeSinceGetStats.Get() < 10000)
     {
         // Time for record update?    // Copy and clear once every 5 seconds
-        long long llTime = GetTickCount64_();
+        std::int64_t llTime = GetTickCount64_();
         if (llTime >= m_llNextRecordTime)
         {
             m_llNextRecordTime = std::max(m_llNextRecordTime + 5000, llTime + 5000 / 10 * 9);
@@ -205,7 +205,7 @@ void CPerfStatPacketUsageImpl::GetStats(CPerfStatResult* pResult, const std::map
         iOutDeltaCountTotal += statOutNow.iCount - statOutPrev.iCount;
     }
 
-    long long llTickCountNow = CTickCount::Now().ToLongLong();
+    std::int64_t llTickCountNow = CTickCount::Now().ToLongLong();
     // Fill rows
     for (uint i = 0; i < 256; i++)
     {

@@ -60,7 +60,7 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
     m_FxEffectNames["reverb"] = BASS_FX_DX8_REVERB;
 
     // Validate audio container on startup
-    for (int i = 0; i < 9; i++)
+    for (auto i = 0; i < 9; i++)
     {
         m_aValidatedSFX[i] = g_pGame->GetAudioContainer()->ValidateContainer(static_cast<eAudioLookupIndex>(i));
     }

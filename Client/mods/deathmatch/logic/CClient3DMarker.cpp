@@ -31,7 +31,7 @@ CClient3DMarker::~CClient3DMarker()
 {
 }
 
-unsigned long CClient3DMarker::Get3DMarkerType()
+std::uint32_t CClient3DMarker::Get3DMarkerType()
 {
     switch (m_dwType)
     {
@@ -46,7 +46,7 @@ unsigned long CClient3DMarker::Get3DMarkerType()
     }
 }
 
-void CClient3DMarker::Set3DMarkerType(unsigned long ulType)
+void CClient3DMarker::Set3DMarkerType(std::uint32_t ulType)
 {
     switch (ulType)
     {

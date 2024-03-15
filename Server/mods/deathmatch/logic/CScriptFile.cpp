@@ -14,7 +14,7 @@
 #include "CGame.h"
 #include "CResourceManager.h"
 
-CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, unsigned long ulMaxSize) : CElement(NULL)
+CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, std::uint32_t ulMaxSize) : CElement(NULL)
 {
     // Init
     m_iType = CElement::SCRIPTFILE;
@@ -128,7 +128,7 @@ long CScriptFile::GetSize()
     return lSize;
 }
 
-long CScriptFile::SetPointer(unsigned long ulPosition)
+long CScriptFile::SetPointer(std::uint32_t ulPosition)
 {
     if (!m_pFile)
         return -1;
@@ -148,16 +148,16 @@ long CScriptFile::SetPointer(unsigned long ulPosition)
 
     // Bigger than file size? Tell the script how far we were able to move it
     long lSize = GetSize();
-    if (ulPosition > static_cast<unsigned long>(lSize))
+    if (ulPosition > static_cast<std::uint32_t>(lSize))
     {
-        ulPosition = static_cast<unsigned long>(lSize);
+        ulPosition = static_cast<std::uint32_t>(lSize);
     }
 
     // Return the new position
     return ulPosition;
 }
 
-void CScriptFile::SetSize(unsigned long ulNewSize)
+void CScriptFile::SetSize(std::uint32_t ulNewSize)
 {
     // TODO: A way to truncate a file
     if (!m_pFile)
@@ -172,7 +172,7 @@ void CScriptFile::Flush()
     fflush(m_pFile);
 }
 
-long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
+long CScriptFile::Read(std::uint32_t ulSize, SString& outBuffer)
 {
     if (!m_pFile)
         return -1;
@@ -184,7 +184,7 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
         fseek(m_pFile, 0, SEEK_END);
         long lFileSize = ftell(m_pFile);
         fseek(m_pFile, lCurrentPos, SEEK_SET);
-        ulSize = std::min<unsigned long>(1 + lFileSize - lCurrentPos, ulSize);
+        ulSize = std::min<std::uint32_t>(1 + lFileSize - lCurrentPos, ulSize);
         // Note: Read extra byte at end so EOF indicator gets set
     }
 
@@ -200,7 +200,7 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
     return fread(outBuffer.data(), 1, ulSize, m_pFile);
 }
 
-long CScriptFile::Write(unsigned long ulSize, const char* pData)
+long CScriptFile::Write(std::uint32_t ulSize, const char* pData)
 {
     if (!m_pFile)
         return -1;

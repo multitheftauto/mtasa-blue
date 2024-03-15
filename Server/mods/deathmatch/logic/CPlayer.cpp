@@ -271,7 +271,7 @@ uint CPlayer::Send(const CPacket& Packet)
 
     // Use the flags to determine how to send it
     NetServerPacketReliability Reliability;
-    unsigned long              ulFlags = Packet.GetFlags();
+    std::uint32_t              ulFlags = Packet.GetFlags();
     if (ulFlags & PACKET_RELIABLE)
     {
         if (ulFlags & PACKET_SEQUENCED)
@@ -617,7 +617,7 @@ void CPlayer::RemoveNametagOverrideColor()
 // Is it time to send a pure sync to every other player ?
 bool CPlayer::IsTimeForPuresyncFar()
 {
-    long long llTime = GetModuleTickCount64();
+    std::int64_t llTime = GetModuleTickCount64();
     if (llTime > m_llNextFarPuresyncTime)
     {
         int iSlowSyncRate = g_pBandwidthSettings->ZoneUpdateIntervals[ZONE3];
@@ -1001,8 +1001,8 @@ bool CPlayer::IsTimeToReceivePuresyncNearFrom(CPlayer* pOther, SViewerInfo& near
     }
 #endif
 
-    long long llTimeNow = GetModuleTickCount64();
-    long long llNextUpdateTime = nearInfo.llLastUpdateTime + iUpdateInterval;
+    std::int64_t llTimeNow = GetModuleTickCount64();
+    std::int64_t llNextUpdateTime = nearInfo.llLastUpdateTime + iUpdateInterval;
 
     if (llNextUpdateTime > llTimeNow)
     {

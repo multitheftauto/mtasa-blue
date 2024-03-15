@@ -153,10 +153,10 @@ private:
     bool          m_bCursorAlphaReset;
 
     // Animation variables
-    unsigned long ulPreviousTick;
+    std::uint32_t ulPreviousTick;
     int           m_iMoveStartPos;
     int           m_iMoveTargetPos;
-    unsigned long m_ulMoveStartTick;
+    std::uint32_t m_ulMoveStartTick;
 
     CGUILabel* m_pNewsItemLabels[CORE_MTA_NEWS_ITEMS];
     CGUILabel* m_pNewsItemShadowLabels[CORE_MTA_NEWS_ITEMS];

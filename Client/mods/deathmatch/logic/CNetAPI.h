@@ -103,8 +103,8 @@ private:
     CClientManager*        m_pManager;
     CClientPlayerManager*  m_pPlayerManager;
     CClientVehicleManager* m_pVehicleManager;
-    unsigned long          m_ulLastPuresyncTime;
-    unsigned long          m_ulLastSyncReturnTime;
+    std::uint32_t          m_ulLastPuresyncTime;
+    std::uint32_t          m_ulLastSyncReturnTime;
 
     bool    m_bStoredReturnSync;
     bool    m_bVehicleLastReturn;

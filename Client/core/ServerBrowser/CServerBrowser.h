@@ -246,7 +246,7 @@ private:
     CServerList         m_ServersRecent;
     CServerList         m_ServersHistory;
 
-    unsigned long     m_ulLastUpdateTime;
+    std::uint32_t     m_ulLastUpdateTime;
     bool              m_bFirstTimeBrowseServer;
     bool              m_bOptionsLoaded;
     ServerBrowserType m_PrevServerBrowserType;
@@ -261,5 +261,5 @@ private:
     uint              m_uiIsUsingTempTab;
     ServerBrowserType m_BeforeTempServerBrowserType;
     CGUIWindow*       m_pGeneralHelpWindow;
-    long long         m_llLastGeneralHelpTime;
+    std::int64_t         m_llLastGeneralHelpTime;
 };

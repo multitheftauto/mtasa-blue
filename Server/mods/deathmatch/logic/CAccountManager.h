@@ -185,7 +185,7 @@ public:
 protected:
     CMappedAccountList m_List;
     bool               m_bChangedSinceSaved;
-    long long          m_llLastTimeSaved;
+    std::int64_t          m_llLastTimeSaved;
     CConnectHistory    m_AccountProtect;
     SDbConnectionId    m_hDbConnection;
     CDatabaseManager*  m_pDatabaseManager;

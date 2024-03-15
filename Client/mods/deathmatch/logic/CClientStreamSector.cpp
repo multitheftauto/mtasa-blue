@@ -98,7 +98,7 @@ bool CClientStreamSector::IsMySurroundingSector(CClientStreamSector* pSector)
 {
     CClientStreamSector* pSurrounding[8];
     GetSurroundingSectors(pSurrounding);
-    for (int i = 0; i < 8; i++)
+    for (auto i = 0; i < 8; i++)
     {
         if (pSurrounding[i] && pSurrounding[i] == pSector)
         {
@@ -117,7 +117,7 @@ void CClientStreamSector::CompareSurroundings(CClientStreamSector* pSector, list
 
     CClientStreamSector* pSurrounding[8];
     pSector->GetSurroundingSectors(pSurrounding);
-    for (int i = 0; i < 8; i++)
+    for (auto i = 0; i < 8; i++)
     {
         if (pSurrounding[i])
         {

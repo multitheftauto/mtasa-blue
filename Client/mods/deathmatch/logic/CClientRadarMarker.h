@@ -45,8 +45,8 @@ public:
     SColor GetColor() const { return m_Color; }
     void   SetColor(const SColor color);
 
-    unsigned long GetSprite() const { return m_ulSprite; };
-    void          SetSprite(unsigned long ulSprite);
+    std::uint32_t GetSprite() const { return m_ulSprite; };
+    void          SetSprite(std::uint32_t ulSprite);
 
     bool IsVisible() const { return m_bIsVisible; };
     void SetVisible(bool bVisible);
@@ -76,7 +76,7 @@ private:
     CVector        m_vecPosition;
     std::uint16_t m_usScale;
     SColor         m_Color;
-    unsigned long  m_ulSprite;
+    std::uint32_t  m_ulSprite;
 
     bool           m_bIsVisible;
     short          m_sOrdering;

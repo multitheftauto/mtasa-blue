@@ -55,7 +55,7 @@ private:
     bool m_bRecording;
     bool m_bFrameBased;
 
-    unsigned long m_ulCurrentOffset;
+    std::uint32_t m_ulCurrentOffset;
     long          m_lNextPacketTime;
 
     std::uint32_t m_uiFrameSkip;

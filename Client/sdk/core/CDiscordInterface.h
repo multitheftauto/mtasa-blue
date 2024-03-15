@@ -23,8 +23,8 @@ public:
 #endif
     virtual void SetAssetLargeData(const char* szAsset, const char* szAssetText) = 0;
     virtual void SetAssetSmallData(const char* szAsset, const char* szAssetText) = 0;
-    virtual void SetPresenceStartTimestamp(const unsigned long ulStart) = 0;
-    virtual void SetPresenceEndTimestamp(const unsigned long ulEnd) = 0;
+    virtual void SetPresenceStartTimestamp(const std::uint32_t ulStart) = 0;
+    virtual void SetPresenceEndTimestamp(const std::uint32_t ulEnd) = 0;
     virtual void SetPresencePartySize(int iSize, int iMax, bool bCustom) = 0;
     virtual void SetDiscordClientConnected(bool bConnected) = 0;
     virtual void SetDiscordUserID(const std::string& strUserID) = 0;

@@ -67,7 +67,7 @@ void CPedSync::DoPulse()
     }
 
     // Has it been long enough since our last state's sync?
-    unsigned long ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastSyncTime + PED_SYNC_RATE)
     {
         Update();

@@ -633,14 +633,14 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     int    iNumCharacters = numBytes / sizeof(ushort);
 
                     // Erase output from previous composition state
-                    for (int i = 0; i < m_uiActiveCompositionSize; i++)
+                    for (auto i = 0; i < m_uiActiveCompositionSize; i++)
                     {
                         pGUI->ProcessCharacter('\x08');
                         pGUI->ProcessKeyboardInput(14, true);
                     }
 
                     // Output composition result
-                    for (int i = 0; i < iNumCharacters; i++)
+                    for (auto i = 0; i < iNumCharacters; i++)
                         if (buffer[i])
                             pGUI->ProcessCharacter(buffer[i]);
 
@@ -658,14 +658,14 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                     int    iNumCharacters = numBytes / sizeof(ushort);
 
                     // Erase output from previous composition state
-                    for (int i = 0; i < m_uiActiveCompositionSize; i++)
+                    for (auto i = 0; i < m_uiActiveCompositionSize; i++)
                     {
                         pGUI->ProcessCharacter('\x08');
                         pGUI->ProcessKeyboardInput(14, true);
                     }
 
                     // Output new composition state
-                    for (int i = 0; i < iNumCharacters; i++)
+                    for (auto i = 0; i < iNumCharacters; i++)
                         if (buffer[i])
                             pGUI->ProcessCharacter(buffer[i]);
 

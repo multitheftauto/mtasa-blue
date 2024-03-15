@@ -98,7 +98,7 @@ private:
 
     CDummy* m_pRootElement;
 
-    long long m_llLastRespawnTime;
+    std::int64_t m_llLastRespawnTime;
 
     CBlendedWeather* m_pBlendedWeather;
 };

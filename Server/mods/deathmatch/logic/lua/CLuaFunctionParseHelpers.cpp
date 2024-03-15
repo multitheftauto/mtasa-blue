@@ -290,7 +290,7 @@ IMPLEMENT_ENUM_CLASS_END("sync-mode")
 //
 CResource* UserDataCast(CResource* ptr, lua_State* luaState)
 {
-    return g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -298,7 +298,7 @@ CResource* UserDataCast(CResource* ptr, lua_State* luaState)
 //
 CXMLNode* UserDataCast(CXMLNode* ptr, lua_State* luaState)
 {
-    return g_pServerInterface->GetXML()->GetNodeFromID(reinterpret_cast<unsigned long>(ptr));
+    return g_pServerInterface->GetXML()->GetNodeFromID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -308,7 +308,7 @@ CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
 {
     if (CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaState); luaMain != nullptr)
     {
-        return luaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return luaMain->GetTimerManager()->GetTimerFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
     }
 
     return nullptr;
@@ -319,7 +319,7 @@ CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
 //
 CAccount* UserDataCast(CAccount* ptr, lua_State* luaState)
 {
-    return g_pGame->GetAccountManager()->GetAccountFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return g_pGame->GetAccountManager()->GetAccountFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -335,7 +335,7 @@ CDbJobData* UserDataCast(CDbJobData* ptr, lua_State* luaState)
 //
 CAccessControlList* UserDataCast(CAccessControlList* ptr, lua_State* luaState)
 {
-    return g_pGame->GetACLManager()->GetACLFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return g_pGame->GetACLManager()->GetACLFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -343,7 +343,7 @@ CAccessControlList* UserDataCast(CAccessControlList* ptr, lua_State* luaState)
 //
 CAccessControlListGroup* UserDataCast(CAccessControlListGroup* ptr, lua_State* luaState)
 {
-    return g_pGame->GetACLManager()->GetGroupFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return g_pGame->GetACLManager()->GetGroupFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -353,7 +353,7 @@ CTextItem* UserDataCast(CTextItem* ptr, lua_State* luaState)
 {
     if (CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaState); luaMain != nullptr)
     {
-        return luaMain->GetTextItemFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return luaMain->GetTextItemFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
     }
 
     return nullptr;
@@ -366,7 +366,7 @@ CTextDisplay* UserDataCast(CTextDisplay* ptr, lua_State* luaState)
 {
     if (CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaState); luaMain != nullptr)
     {
-        return luaMain->GetTextDisplayFromScriptID(reinterpret_cast<unsigned long>(ptr));
+        return luaMain->GetTextDisplayFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
     }
 
     return nullptr;
@@ -377,7 +377,7 @@ CTextDisplay* UserDataCast(CTextDisplay* ptr, lua_State* luaState)
 //
 CBan* UserDataCast(CBan* ptr, lua_State* luaState)
 {
-    return g_pGame->GetBanManager()->GetBanFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return g_pGame->GetBanManager()->GetBanFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -385,7 +385,7 @@ CBan* UserDataCast(CBan* ptr, lua_State* luaState)
 //
 CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
 {
-    return CLuaVector2D::GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return CLuaVector2D::GetFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -393,7 +393,7 @@ CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
 //
 CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
 {
-    return CLuaVector3D::GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return CLuaVector3D::GetFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -401,7 +401,7 @@ CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
 //
 CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
 {
-    return CLuaVector4D::GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return CLuaVector4D::GetFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //
@@ -409,7 +409,7 @@ CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
 //
 CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
 {
-    return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned long>(ptr));
+    return CLuaMatrix::GetFromScriptID(reinterpret_cast<std::uint32_t>(ptr));
 }
 
 //

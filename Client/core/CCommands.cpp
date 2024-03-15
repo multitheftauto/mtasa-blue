@@ -15,8 +15,8 @@ using namespace std;
 
 void TrimWhiteSpace(std::string& str)
 {
-    unsigned long k = str.find_first_not_of(" \t");
-    unsigned long l = str.find_last_not_of(" \t");
+    std::uint32_t k = str.find_first_not_of(" \t");
+    std::uint32_t l = str.find_last_not_of(" \t");
 
     if ((k == std::string::npos) || (l == std::string::npos))
         str = "";

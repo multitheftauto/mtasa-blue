@@ -793,7 +793,7 @@ void CCrashDumpWriter::GetPoolInfo(CBuffer& buffer)
     stream.Write(MAX_POOLS);
 
     // For each pool
-    for (int i = 0; i < MAX_POOLS; i++)
+    for (auto i = 0; i < MAX_POOLS; i++)
     {
         int iCapacity = GetPoolCapacity((ePools)i);
         int iUsedSpaces = GetNumberOfUsedSpaces((ePools)i);
@@ -998,7 +998,7 @@ void CCrashDumpWriter::GetMemoryInfo(CBuffer& buffer)
         &memStatsNow.d3dMemory.DynamicIndexBuffer, &memStatsNow.d3dMemory.StaticTexture,       &memStatsNow.d3dMemory.DynamicTexture};
     int iNumLines = NUMELMS(nowList);
     stream.Write(iNumLines);
-    for (int i = 0; i < iNumLines; i++)
+    for (auto i = 0; i < iNumLines; i++)
     {
         stream.Write(nowList[i]->iLockedCount);
         stream.Write(nowList[i]->iCreatedCount);
@@ -1016,7 +1016,7 @@ void CCrashDumpWriter::GetMemoryInfo(CBuffer& buffer)
     // Model usage
     iNumLines = sizeof(memStatsNow.modelInfo) / sizeof(uint);
     stream.Write(iNumLines);
-    for (int i = 0; i < iNumLines; i++)
+    for (auto i = 0; i < iNumLines; i++)
     {
         stream.Write(memStatsNow.modelInfo.uiArray[i]);
     }

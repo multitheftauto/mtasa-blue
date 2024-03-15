@@ -126,15 +126,15 @@ public:
     #define SIZE_SORTED_TAG_THRESH 10000
     maptype<uint64, uint> sizeSortedTagMap;
 
-    unsigned long TotalMem;
-    unsigned long TotalMemMax;
-    unsigned long ActiveAllocs;
-    unsigned long DupeAllocs;
-    unsigned long UniqueAllocs;
-    unsigned long ReAllocs;
-    unsigned long Frees;
-    unsigned long UnmatchedFrees;
-    unsigned long DupeMem;
+    std::uint32_t TotalMem;
+    std::uint32_t TotalMemMax;
+    std::uint32_t ActiveAllocs;
+    std::uint32_t DupeAllocs;
+    std::uint32_t UniqueAllocs;
+    std::uint32_t ReAllocs;
+    std::uint32_t Frees;
+    std::uint32_t UnmatchedFrees;
+    std::uint32_t DupeMem;
 
     CAllocStats()
     {
@@ -410,12 +410,12 @@ void myDelete(void* ptr)
 //
 // Returns number of stats copied
 //
-MTAEXPORT unsigned long GetAllocStats(uint uiType, void* pOutData, unsigned long ulNumStats)
+MTAEXPORT std::uint32_t GetAllocStats(uint uiType, void* pOutData, std::uint32_t ulNumStats)
 {
     if (uiType == 0)
     {
         CAllocStats*   pAllocStats = GetAllocStats();
-        unsigned long* pOutStats = (unsigned long*)pOutData;
+        std::uint32_t* pOutStats = (std::uint32_t*)pOutData;
 
         if (ulNumStats > 0)
             pOutStats[0] = pAllocStats->TotalMem;
@@ -436,7 +436,7 @@ MTAEXPORT unsigned long GetAllocStats(uint uiType, void* pOutData, unsigned long
         if (ulNumStats > 8)
             pOutStats[8] = pAllocStats->DupeMem;
 
-        return Min<unsigned long>(ulNumStats, 9);
+        return Min<std::uint32_t>(ulNumStats, 9);
     }
     else if (uiType == 1)
     {

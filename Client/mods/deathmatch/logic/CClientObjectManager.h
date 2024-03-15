@@ -32,8 +32,8 @@ public:
     std::uint32_t                        CountCreatedObjects() { return static_cast<std::uint32_t>(g_pGame->GetPools()->GetObjectCount()); };
     static CClientObject*               Get(ElementID ID);
 
-    static bool IsValidModel(unsigned long ulObjectModel);
-    static bool IsBreakableModel(unsigned long ulObjectModel);
+    static bool IsValidModel(std::uint32_t ulObjectModel);
+    static bool IsBreakableModel(std::uint32_t ulObjectModel);
     bool        Exists(CClientObject* pObject);
     bool        ObjectsAroundPointLoaded(const CVector& vecPosition, float fRadius, std::uint16_t usDimension, SString* pstrStatus = NULL);
 

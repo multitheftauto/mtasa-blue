@@ -445,7 +445,7 @@ const SPlayerClothing* CPlayerClothes::GetClothing(const char* szTexture, const 
     {
         const SPlayerClothing* pGroup = GetClothingGroup(ucType);
         int                    iMax = GetClothingGroupMax(ucType);
-        for (int i = 0; i < iMax; i++)
+        for (auto i = 0; i < iMax; i++)
         {
             const SPlayerClothing* pClothing = &pGroup[i];
             if (!stricmp(szTexture, pClothing->szTexture) && !stricmp(szModel, pClothing->szModel))
@@ -512,7 +512,7 @@ bool CPlayerClothes::IsValidClothing(const char* szTexture, const char* szModel,
         const SPlayerClothing* pPlayerClothing = GetClothingGroup(ucType);
         if (pPlayerClothing)
         {
-            for (int i = 0; pPlayerClothing[i].szTexture != NULL; i++)
+            for (auto i = 0; pPlayerClothing[i].szTexture != NULL; i++)
             {
                 if (!stricmp(pPlayerClothing[i].szTexture, szTexture) && !stricmp(pPlayerClothing[i].szModel, szModel))
                 {

@@ -25,7 +25,7 @@ void CWeaponStatManagerSA::InitLists()
 {
     CWeaponStatSA* pWeaponStat = nullptr;
     // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
-    for (int i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
+    for (auto i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
         // Storage for Original weapon data ( for resetting )
@@ -35,9 +35,9 @@ void CWeaponStatManagerSA::InitLists()
         LoadDefaultInternal(pWeaponStat, weaponType);
     }
 
-    for (int skill = 0; skill < 3; skill++)
+    for (auto skill = 0; skill < 3; skill++)
     {
-        for (int i = 0; i < NUM_WeaponInfosOtherSkill; i++)
+        for (auto i = 0; i < NUM_WeaponInfosOtherSkill; i++)
         {
             eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
             // Storage for Original weapon data ( for resetting )

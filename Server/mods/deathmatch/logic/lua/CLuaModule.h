@@ -64,10 +64,10 @@ public:
     CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile);
 
     // functions for external modules until 1.0
-    unsigned long GetVersion();
+    std::uint32_t GetVersion();
     const char*   GetVersionString();
     const char*   GetVersionName();
-    unsigned long GetNetcodeVersion();
+    std::uint32_t GetNetcodeVersion();
     const char*   GetOperatingSystemName();
     lua_State*    GetResourceFromName(const char* szResourceName);
     // GetResourceName above might not work if module and MTA were compiled with different compiler versions

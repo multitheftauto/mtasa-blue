@@ -28,7 +28,7 @@ class CMapInfoPacket final : public CPacket
 {
 public:
     explicit CMapInfoPacket(std::uint8_t ucWeather, std::uint8_t ucWeatherBlendingTo, std::uint8_t ucBlendedWeatherHour, std::uint8_t ucClockHour,
-                            std::uint8_t ucClockMin, unsigned long ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
+                            std::uint8_t ucClockMin, std::uint32_t ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
                             float fWaveHeight, const SWorldWaterLevelInfo& worldWaterLevelInfo, bool bHasSkyGradient, const SGarageStates& garageStates,
                             std::uint8_t ucSkyGradientTR, std::uint8_t ucSkyGradientTG, std::uint8_t ucSkyGradientTB, std::uint8_t ucSkyGradientBR,
                             std::uint8_t ucSkyGradientBG, std::uint8_t ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
@@ -42,7 +42,7 @@ public:
                             float fAircraftMaxHeight = 800, float fAircraftMaxVelocity = 1.5f, bool bOverrideMoonSize = false, int iMoonSize = 3);
 
     ePacketID     GetPacketID() const { return PACKET_ID_MAP_INFO; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 
@@ -52,7 +52,7 @@ private:
     std::uint8_t        m_ucBlendedWeatherHour;
     std::uint8_t        m_ucClockHour;
     std::uint8_t        m_ucClockMin;
-    unsigned long        m_ulMinuteDuration;
+    std::uint32_t        m_ulMinuteDuration;
     bool                 m_bShowNametags;
     bool                 m_bShowRadar;
     float                m_fGravity;

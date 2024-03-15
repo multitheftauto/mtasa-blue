@@ -131,9 +131,9 @@ public:
     virtual BYTE          GetWheelStatus(eWheelPosition bTire) = 0;
     virtual void          SetWheelStatus(eWheelPosition bTire, BYTE bTireStatus) = 0;
     virtual BYTE          GetPanelStatus(BYTE bPanel) = 0;
-    virtual unsigned long GetPanelStatus() = 0;
+    virtual std::uint32_t GetPanelStatus() = 0;
     virtual void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus) = 0;
-    virtual void          SetPanelStatus(unsigned long ulStatus) = 0;
+    virtual void          SetPanelStatus(std::uint32_t ulStatus) = 0;
     virtual BYTE          GetLightStatus(BYTE bLight) = 0;
     virtual std::uint8_t GetLightStatus() = 0;
     virtual void          SetLightStatus(BYTE bLight, BYTE bLightStatus) = 0;

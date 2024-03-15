@@ -31,7 +31,7 @@ CClientPlayerManager::~CClientPlayerManager()
 
 void CClientPlayerManager::DoPulse()
 {
-    unsigned long                          ulCurrentTime = CClientTime::GetTime();
+    std::uint32_t                          ulCurrentTime = CClientTime::GetTime();
     CClientPlayer*                         pPlayer = NULL;
     vector<CClientPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); ++iter)
@@ -45,7 +45,7 @@ void CClientPlayerManager::DoPulse()
                 pPlayer->GetVoice()->DoPulse();
 
             // Flag him with connection error if its been too long since last puresync and force his position
-            unsigned long ulLastPuresyncTime = pPlayer->GetLastPuresyncTime();
+            std::uint32_t ulLastPuresyncTime = pPlayer->GetLastPuresyncTime();
             bool          bHasConnectionTrouble = (ulLastPuresyncTime != 0 && ulCurrentTime >= ulLastPuresyncTime + REMOTE_PLAYER_CONNECTION_TROUBLE_TIME);
             if (bHasConnectionTrouble && !g_pClientGame->IsDownloadingBigPacket() && !pPlayer->IsDeadOnNetwork())
             {
@@ -176,9 +176,9 @@ bool CClientPlayerManager::IsPlayerLimitReached()
     return true;
 }
 
-bool CClientPlayerManager::IsValidModel(unsigned long ulModel)
+bool CClientPlayerManager::IsValidModel(std::uint32_t ulModel)
 {
-    if (ulModel < static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
+    if (ulModel < static_cast<std::uint32_t>(g_pGame->GetBaseIDforTXD()))
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
         return pModelInfo && pModelInfo->IsPlayerModel();

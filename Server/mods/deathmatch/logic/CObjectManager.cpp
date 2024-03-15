@@ -131,7 +131,7 @@ bool CObjectManager::Exists(CObject* pObject)
     return ListContains(m_List, pObject);
 }
 
-bool CObjectManager::IsValidModel(unsigned long ulObjectModel)
+bool CObjectManager::IsValidModel(std::uint32_t ulObjectModel)
 {
     bool bIsValid = false;
 
@@ -146,7 +146,7 @@ bool CObjectManager::IsValidModel(unsigned long ulObjectModel)
     return bIsValid;
 }
 
-bool CObjectManager::IsBreakableModel(unsigned long ulObjectModel)
+bool CObjectManager::IsBreakableModel(std::uint32_t ulObjectModel)
 {
     static std::map<std::uint16_t, short> breakableModelMap;
 

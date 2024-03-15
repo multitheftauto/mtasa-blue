@@ -144,7 +144,7 @@ CClientMarker::eMarkerType CClientMarker::GetMarkerType() const
         // If it's a checkpoint, it can be either a checkpoint or a ring
         case CClientMarkerCommon::CLASS_CHECKPOINT:
         {
-            unsigned long ulCheckpointType = static_cast<CClientCheckpoint*>(m_pMarker)->GetCheckpointType();
+            std::uint32_t ulCheckpointType = static_cast<CClientCheckpoint*>(m_pMarker)->GetCheckpointType();
             if (ulCheckpointType == CClientCheckpoint::TYPE_NORMAL)
                 return MARKER_CHECKPOINT;
             else
@@ -154,7 +154,7 @@ CClientMarker::eMarkerType CClientMarker::GetMarkerType() const
         // If it's a 3d marker it can either be a cylinder or an arrow
         case CClientMarkerCommon::CLASS_3DMARKER:
         {
-            unsigned long ul3DType = static_cast<CClient3DMarker*>(m_pMarker)->Get3DMarkerType();
+            std::uint32_t ul3DType = static_cast<CClient3DMarker*>(m_pMarker)->Get3DMarkerType();
             if (ul3DType == CClient3DMarker::TYPE_CYLINDER)
                 return MARKER_CYLINDER;
             else

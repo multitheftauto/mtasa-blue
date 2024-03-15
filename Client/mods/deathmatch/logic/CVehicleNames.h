@@ -13,11 +13,11 @@
 class CVehicleNames
 {
 public:
-    static bool IsValidModel(unsigned long ulModel);
-    static bool IsModelTrailer(unsigned long ulModel);
+    static bool IsValidModel(std::uint32_t ulModel);
+    static bool IsModelTrailer(std::uint32_t ulModel);
 
-    static const char*  GetVehicleName(unsigned long ulModel);
+    static const char*  GetVehicleName(std::uint32_t ulModel);
     static std::uint32_t GetVehicleModel(const char* szName);
 
-    static const char* GetVehicleTypeName(unsigned long ulModel);
+    static const char* GetVehicleTypeName(std::uint32_t ulModel);
 };

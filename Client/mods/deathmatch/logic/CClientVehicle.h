@@ -99,7 +99,7 @@ using EComponentBase::EComponentBaseType;
 
 struct SDelayedSyncVehicleData
 {
-    unsigned long    ulTime;
+    std::uint32_t    ulTime;
     std::uint8_t    ucType;
     CControllerState State;
     CVector          vecTarget;
@@ -198,7 +198,7 @@ public:
     bool IsVisible();
     void SetVisible(bool bVisible);
 
-    void  SetDoorOpenRatio(std::uint8_t ucDoor, float fRatio, unsigned long ulDelay = 0, bool bForced = false);
+    void  SetDoorOpenRatio(std::uint8_t ucDoor, float fRatio, std::uint32_t ulDelay = 0, bool bForced = false);
     float GetDoorOpenRatio(std::uint8_t ucDoor);
     void  SetSwingingDoorsAllowed(bool bAllowed);
     bool  AreSwingingDoorsAllowed() const;
@@ -207,7 +207,7 @@ public:
     void  SetDoorsLocked(bool bLocked);
 
 private:
-    void SetDoorOpenRatioInterpolated(std::uint8_t ucDoor, float fRatio, unsigned long ulDelay);
+    void SetDoorOpenRatioInterpolated(std::uint8_t ucDoor, float fRatio, std::uint32_t ulDelay);
     void ResetDoorInterpolation();
     void CancelDoorInterpolation(std::uint8_t ucDoor);
     void ProcessDoorInterpolation();
@@ -432,12 +432,12 @@ public:
 
     // Time dependent interpolation
     void GetTargetPosition(CVector& vecPosition) { vecPosition = m_interp.pos.vecTarget; }
-    void SetTargetPosition(const CVector& vecPosition, unsigned long ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f);
+    void SetTargetPosition(const CVector& vecPosition, std::uint32_t ulDelay, bool bValidVelocityZ = false, float fVelocityZ = 0.f);
     void RemoveTargetPosition();
     bool HasTargetPosition() { return (m_interp.pos.ulFinishTime != 0); }
 
     void GetTargetRotation(CVector& vecRotation) { vecRotation = m_interp.rot.vecTarget; }
-    void SetTargetRotation(const CVector& vecRotation, unsigned long ulDelay);
+    void SetTargetRotation(const CVector& vecRotation, std::uint32_t ulDelay);
     void RemoveTargetRotation();
     bool HasTargetRotation() { return (m_interp.rot.ulFinishTime != 0); }
 
@@ -445,8 +445,8 @@ public:
     void UpdateTargetRotation();
     void UpdateUnderFloorFix(const CVector& vecTargetPosition, bool bValidVelocityZ, float fVelocityZ);
 
-    unsigned long GetIllegalTowBreakTime() { return m_ulIllegalTowBreakTime; }
-    void          SetIllegalTowBreakTime(unsigned long ulTime) { m_ulIllegalTowBreakTime = ulTime; }
+    std::uint32_t GetIllegalTowBreakTime() { return m_ulIllegalTowBreakTime; }
+    void          SetIllegalTowBreakTime(std::uint32_t ulTime) { m_ulIllegalTowBreakTime = ulTime; }
 
     void GetGravity(CVector& vecGravity) const { vecGravity = m_vecGravity; }
     void SetGravity(const CVector& vecGravity);
@@ -602,8 +602,8 @@ protected:
     {
         SFixedArray<float, 6>         fStart;
         SFixedArray<float, 6>         fTarget;
-        SFixedArray<unsigned long, 6> ulStartTime;
-        SFixedArray<unsigned long, 6> ulTargetTime;
+        SFixedArray<std::uint32_t, 6> ulStartTime;
+        SFixedArray<std::uint32_t, 6> ulTargetTime;
     } m_doorInterp;
     bool                                   m_bSwingingDoorsAllowed;
     bool                                   m_bDoorsLocked;
@@ -681,8 +681,8 @@ protected:
             CVector       vecTarget;
             CVector       vecError;
             float         fLastAlpha;
-            unsigned long ulStartTime;
-            unsigned long ulFinishTime;
+            std::uint32_t ulStartTime;
+            std::uint32_t ulFinishTime;
         } pos;
 
         struct
@@ -693,12 +693,12 @@ protected:
             CVector       vecTarget;
             CVector       vecError;
             float         fLastAlpha;
-            unsigned long ulStartTime;
-            unsigned long ulFinishTime;
+            std::uint32_t ulStartTime;
+            std::uint32_t ulFinishTime;
         } rot;
     } m_interp;
 
-    unsigned long m_ulIllegalTowBreakTime;
+    std::uint32_t m_ulIllegalTowBreakTime;
 
     bool m_bHasDamageModel;
 
@@ -731,7 +731,7 @@ protected:
 public:
 #ifdef MTA_DEBUG
     CClientPlayer* m_pLastSyncer;
-    unsigned long  m_ulLastSyncTime;
+    std::uint32_t  m_ulLastSyncTime;
     const char*    m_szLastSyncType;
 #endif
     SLastSyncedVehData*                      m_LastSyncedData;

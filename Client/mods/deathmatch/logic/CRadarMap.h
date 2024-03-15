@@ -106,7 +106,7 @@ private:
     bool m_bIsMovingEast;
     bool m_bIsMovingWest;
 
-    unsigned long m_ulUpdateTime;
+    std::uint32_t m_ulUpdateTime;
 
     std::vector<CClientTextDisplay*> m_HelpTextList;
     bool                             m_bHideHelpText;

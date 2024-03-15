@@ -69,7 +69,7 @@ bool CAntiCheat::PerformChecks()
     if (m_Entries.size() > 0)
     {
         // Do this a number of times
-        for (int i = 0; i < ANTICHEAT_CHECKS_PER_CYCLE; i++)
+        for (auto i = 0; i < ANTICHEAT_CHECKS_PER_CYCLE; i++)
         {
             // Is the current index at the end? Start over.
             if (m_LastEntry == m_Entries.end())

@@ -135,7 +135,7 @@ bool CVehicleColorManager::Generate(const char* szFilename)
 void CVehicleColorManager::Reset()
 {
     // Remove all colors from all vehicles
-    for (int i = 0; i < 212; i++)
+    for (auto i = 0; i < 212; i++)
     {
         m_Colors[i].RemoveAllColors();
     }

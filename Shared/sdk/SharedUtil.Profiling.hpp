@@ -108,7 +108,7 @@ namespace SharedUtil
             return;            // Error
 
         // remove recursive Clock/Unclocks
-        for (int i = 0; i < (int)eventList.size() - 1; i += 2)
+        for (auto i = 0; i < (int)eventList.size() - 1; i += 2)
         {
             SFrameEvent& startEvent = eventList[i];
             SFrameEvent& endEvent = eventList[i + 1];
@@ -160,7 +160,7 @@ namespace SharedUtil
 
         int iExtraClocks = std::max(0, iNumClocks - iNumUnclocks);
 
-        for (int i = 0; i < iExtraClocks; i++)
+        for (auto i = 0; i < iExtraClocks; i++)
         {
             eventList.push_back(SFrameEvent(STATS_UNCLOCK, GetTimeUs()));
             g_StatEvents.Add(szSection, szName, STATS_CLOCK);
@@ -245,7 +245,7 @@ namespace SharedUtil
 
         TIMEUS baseTimeStamp = 0;
         {
-            for (int i = 0; i < m_BufferPos; i++)
+            for (auto i = 0; i < m_BufferPos; i++)
             {
                 SItem&      item = m_ItemBufferArray[i];
                 const char* szSection = item.szSection;

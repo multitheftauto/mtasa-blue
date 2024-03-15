@@ -174,8 +174,8 @@ public:
     virtual float GetGameSpeed() = 0;
     virtual void  SetGameSpeed(float fSpeed) = 0;
 
-    virtual unsigned long GetMinuteDuration() = 0;
-    virtual void          SetMinuteDuration(unsigned long ulDelay) = 0;
+    virtual std::uint32_t GetMinuteDuration() = 0;
+    virtual void          SetMinuteDuration(std::uint32_t ulDelay) = 0;
 
     virtual std::uint8_t GetBlurLevel() = 0;
     virtual void          SetBlurLevel(std::uint8_t ucLevel) = 0;

@@ -501,7 +501,7 @@ public:
     bool  IsLandingGearDown();
     void  Fix();
 
-    void BlowUp(CEntity* pCreator, unsigned long ulUnknown);
+    void BlowUp(CEntity* pCreator, std::uint32_t ulUnknown);
 
     CDamageManager* GetDamageManager();
 
@@ -539,11 +539,11 @@ public:
     std::uint32_t   GetOverrideLights() { return GetVehicleInterface()->OverrideLights; }
     bool           GetTakeLessDamage() { return GetVehicleInterface()->m_nVehicleFlags.bTakeLessDamage; };
     bool           GetTyresDontBurst() { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
-    std::uint16_t GetAdjustablePropertyValue() { return *reinterpret_cast<std::uint16_t*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
+    std::uint16_t GetAdjustablePropertyValue() { return *reinterpret_cast<std::uint16_t*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 2156); };
     float          GetHeliRotorSpeed() { return *reinterpret_cast<float*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 2124); };
     float          GetPlaneRotorSpeed();
 
-    unsigned long  GetExplodeTime() { return *reinterpret_cast<unsigned long*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 1240); };
+    std::uint32_t  GetExplodeTime() { return *reinterpret_cast<std::uint32_t*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 1240); };
 
     char  GetNitroCount() { return GetVehicleInterface()->m_nNitroBoosts; }
     float GetNitroLevel();
@@ -568,7 +568,7 @@ public:
     };
     void SetHeliRotorSpeed(float fSpeed) { *reinterpret_cast<float*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 2124) = fSpeed; };
     void SetPlaneRotorSpeed(float fSpeed);
-    void SetExplodeTime(unsigned long ulTime) { *reinterpret_cast<unsigned long*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 1240) = ulTime; };
+    void SetExplodeTime(std::uint32_t ulTime) { *reinterpret_cast<std::uint32_t*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 1240) = ulTime; };
     void SetRadioStatus(bool bStatus) { *reinterpret_cast<std::uint8_t*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 0x1D3) = bStatus; };
 
     void SetNitroCount(char cNitroCount) { GetVehicleInterface()->m_nNitroBoosts = cNitroCount; }

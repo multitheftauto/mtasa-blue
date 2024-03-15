@@ -22,7 +22,7 @@ public:
     CUnoccupiedVehiclePushPacket(){};
 
     ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_PUSH_SYNC; };
-    unsigned long GetFlags() const { return 0; };            // Not used
+    std::uint32_t GetFlags() const { return 0; };            // Not used
 
     bool Read(NetBitStreamInterface& BitStream);
 

@@ -268,7 +268,7 @@ const SLuaDebugInfo& CScriptDebugging::GetLuaDebugInfo(lua_State* luaVM)
         luaVM = m_LuaMainStack.back()->GetVM();
 
     // Lua oop found at level 4 added one just in case it somehow ends up deeper due to nested calls
-    for (int level = 1; level <= 5; level++)
+    for (auto level = 1; level <= 5; level++)
     {
         lua_Debug debugInfo;
         if (luaVM && lua_getstack(luaVM, level, &debugInfo))

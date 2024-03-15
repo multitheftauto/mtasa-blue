@@ -24,13 +24,13 @@ public:
     virtual void Stop() = 0;
 
     // Utility
-    static SString   GetScaledByteString(long long Amount);
-    static SString   GetScaledBitString(long long Amount);
+    static SString   GetScaledByteString(std::int64_t Amount);
+    static SString   GetScaledBitString(std::int64_t Amount);
     static SString   GetScaledFloatString(float fValue);
-    static long long GetPerSecond(long long llValue, long long llDeltaTickCount);
-    static void      ToPerSecond(long long& llValue, long long llDeltaTickCount);
-    static SString   GetPerSecondString(long long llValue, double dDeltaTickCount);
-    static SString   GetPercentString(long long llValue, long long llTotal);
+    static std::int64_t GetPerSecond(std::int64_t llValue, std::int64_t llDeltaTickCount);
+    static void      ToPerSecond(std::int64_t& llValue, std::int64_t llDeltaTickCount);
+    static SString   GetPerSecondString(std::int64_t llValue, double dDeltaTickCount);
+    static SString   GetPercentString(std::int64_t llValue, std::int64_t llTotal);
 
     static CPerfStatManager* GetSingleton();
 };

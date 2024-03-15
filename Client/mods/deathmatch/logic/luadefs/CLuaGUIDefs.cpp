@@ -2598,7 +2598,7 @@ int CLuaGUIDefs::GUIGridListGetSelectedItems(lua_State* luaVM)
 
         lua_newtable(luaVM);
 
-        for (int i = 1; i <= pList->GetSelectedCount(); i++)
+        for (auto i = 1; i <= pList->GetSelectedCount(); i++)
         {
             pItem = pList->GetNextSelectedItem(pItem);
             if (!pItem)

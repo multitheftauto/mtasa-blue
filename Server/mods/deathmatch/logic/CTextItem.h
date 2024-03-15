@@ -55,7 +55,7 @@ public:
     void          SetPriority(eTextPriority Priority) { m_Priority = Priority; };
     eTextPriority GetPriority() { return m_Priority; };
 
-    unsigned long GetUniqueID() { return m_ulUniqueId; };
+    std::uint32_t GetUniqueID() { return m_ulUniqueId; };
     bool          IsBeingDeleted() { return m_bDeletable; };
     uint          GetScriptID() const { return m_uiScriptID; }
 
@@ -66,7 +66,7 @@ private:
     float         m_fScale;
     std::uint8_t m_ucFormat;
     std::uint8_t m_ucShadowAlpha;
-    unsigned long m_ulUniqueId;
+    std::uint32_t m_ulUniqueId;
     eTextPriority m_Priority;
     bool          m_bDeletable;
     uint          m_uiScriptID;

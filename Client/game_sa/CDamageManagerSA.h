@@ -50,9 +50,9 @@ public:
     BYTE          GetWheelStatus(eWheelPosition bWheel);
     void          SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus);
     BYTE          GetPanelStatus(BYTE bPanel);
-    unsigned long GetPanelStatus();
+    std::uint32_t GetPanelStatus();
     void          SetPanelStatus(BYTE bPanel, BYTE bPanelStatus);
-    void          SetPanelStatus(unsigned long ulStatus);
+    void          SetPanelStatus(std::uint32_t ulStatus);
     BYTE          GetLightStatus(BYTE bLight);
     std::uint8_t GetLightStatus();
     void          SetLightStatus(BYTE bLight, BYTE bLightStatus);

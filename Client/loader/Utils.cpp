@@ -99,7 +99,7 @@ WString devicePathToWin32Path(const WString& strDevicePath)
 ///////////////////////////////////////////////////////////////////////////
 SString GetProcessPathFilename(DWORD processID)
 {
-    for (int i = 0; i < 2; i++)
+    for (auto i = 0; i < 2; i++)
     {
         HANDLE hProcess = OpenProcess(i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID);
         if (hProcess)
@@ -138,7 +138,7 @@ SString GetProcessPathFilename(DWORD processID)
             }
         }
 
-        for (int i = 0; i < 2; i++)
+        for (auto i = 0; i < 2; i++)
         {
             HANDLE hProcess = OpenProcess(i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID);
             if (hProcess)
@@ -832,10 +832,10 @@ void FindRelevantFiles(const SString& strPath, std::vector<SString>& outFilePath
 ///////////////////////////////////////////////////////////////
 void MakeRandomIndexList(int Size, std::vector<int>& outList)
 {
-    for (int i = 0; i < Size; i++)
+    for (auto i = 0; i < Size; i++)
         outList.push_back(i);
 
-    for (int i = 0; i < Size; i++)
+    for (auto i = 0; i < Size; i++)
     {
         int otherIdx = rand() % Size;
         int Temp = outList[i];
@@ -1126,7 +1126,7 @@ bool Is32bitProcess(DWORD processID)
         return true;
 
     // Call 'IsWow64Process' on query process
-    for (int i = 0; i < 2; i++)
+    for (auto i = 0; i < 2; i++)
     {
         HANDLE hProcess = OpenProcess(i == 0 ? PROCESS_QUERY_INFORMATION : PROCESS_QUERY_LIMITED_INFORMATION, FALSE, processID);
 
@@ -1235,7 +1235,7 @@ uint WaitForObject(HANDLE hProcess, HANDLE hThread, DWORD dwMilliseconds, HANDLE
 
     if (hModule)
     {
-        typedef unsigned long (*PFNWaitForObject)(HANDLE, ...);
+        typedef std::uint32_t (*PFNWaitForObject)(HANDLE, ...);
         PFNWaitForObject pfnWaitForObject = static_cast<PFNWaitForObject>(static_cast<PVOID>(GetProcAddress(hModule, "WaitForObject")));
 
         if (!pfnWaitForObject || pfnWaitForObject(hProcess, hThread, dwMilliseconds, hMutex))
@@ -1361,7 +1361,7 @@ bool IsDirectoryEmpty(const SString& strSrcBase)
 // Get free disk space in bytes
 //
 //////////////////////////////////////////////////////////
-long long GetDiskFreeSpace(SString strSrcBase)
+std::int64_t GetDiskFreeSpace(SString strSrcBase)
 {
     for (uint i = 0; i < 100; i++)
     {
@@ -1386,7 +1386,7 @@ void DirectoryCopy(SString strSrcBase, SString strDestBase, bool bShowProgressDi
 {
     // Setup diskspace checking
     bool      bCheckFreeSpace = false;
-    long long llFreeBytesAvailable = GetDiskFreeSpace(strDestBase);
+    std::int64_t llFreeBytesAvailable = GetDiskFreeSpace(strDestBase);
     if (llFreeBytesAvailable != 0)
         bCheckFreeSpace = (llFreeBytesAvailable < (iMinFreeSpaceMB + 10000) * 0x100000LL);            // Only check if initial freespace is less than 10GB
 

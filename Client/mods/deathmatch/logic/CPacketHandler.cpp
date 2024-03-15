@@ -2265,7 +2265,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pGame->GetClock()->Set(ucClockHour, ucClockMinute);
 
     // Read and set minute duration
-    unsigned long ulMinuteDuration;
+    std::uint32_t ulMinuteDuration;
     bitStream.ReadCompressed(ulMinuteDuration);
 
     g_pClientGame->SetMinuteDuration(ulMinuteDuration);
@@ -2537,14 +2537,14 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
 
     if (bitStream.Version() >= 0x30)
     {
-        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
+        for (auto i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
         {
             bool bEnabled;
             bitStream.ReadBit(bEnabled);
             g_pGame->SetJetpackWeaponEnabled((eWeaponType)i, bEnabled);
         }
     }
-    for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
+    for (auto i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         bool                bReadWeaponInfo = true;
         sWeaponPropertySync weaponProperty;
@@ -2578,14 +2578,14 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
             g_pGame->SetJetpackWeaponEnabled((eWeaponType)weaponProperty.data.weaponType, bEnabled);
         }
     }
-    for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
+    for (auto i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
     {
         bool                bReadWeaponInfo = true;
         sWeaponPropertySync weaponProperty;
         bitStream.ReadBit(bReadWeaponInfo);
         if (bReadWeaponInfo)
         {
-            for (int j = 0; j <= 2; j++)
+            for (auto j = 0; j <= 2; j++)
             {
                 bitStream.Read(&weaponProperty);
                 CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)weaponProperty.data.weaponType, (eWeaponSkill)j);
@@ -2617,7 +2617,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     }
     if (bitStream.Version() >= 0x30)
     {
-        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
+        for (auto i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
         {
             bool bEnabled;
             bitStream.ReadBit(bEnabled);
@@ -2651,9 +2651,9 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::Packet_PartialPacketInfo(NetBitStreamInterface& bitStream)
 {
-    unsigned long partCount;
-    unsigned long partTotal;
-    unsigned long partLength;
+    std::uint32_t partCount;
+    std::uint32_t partTotal;
+    std::uint32_t partLength;
     BYTE          byteMTAPacketID;
 
     if (bitStream.Read(partCount) && bitStream.Read(partTotal) && bitStream.Read(partLength) && bitStream.Read(byteMTAPacketID))
@@ -2766,12 +2766,12 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // std::uint8_t        (1)     - icon
         // -- if icon is 0
         // std::uint8_t        (1)     - size
-        // unsigned long        (4)     - color
+        // std::uint32_t        (4)     - color
 
         // Radar areas:
         // CVector2D            (8)     - position
         // CVector2D            (8)     - size
-        // unsigned long        (4)     - color
+        // std::uint32_t        (4)     - color
         // bool                         - flashing?
 
         // Path Nodes:
@@ -3370,13 +3370,13 @@ retry:
                     pVehicle->SetColor(vehColor);
 
                     // Setup our damage model
-                    for (int i = 0; i < MAX_DOORS; i++)
+                    for (auto i = 0; i < MAX_DOORS; i++)
                         pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
-                    for (int i = 0; i < MAX_WHEELS; i++)
+                    for (auto i = 0; i < MAX_WHEELS; i++)
                         pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
-                    for (int i = 0; i < MAX_PANELS; i++)
+                    for (auto i = 0; i < MAX_PANELS; i++)
                         pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i]);
-                    for (int i = 0; i < MAX_LIGHTS; i++)
+                    for (auto i = 0; i < MAX_LIGHTS; i++)
                         pVehicle->SetLightStatus(i, damage.data.ucLightStates[i]);
                     pVehicle->ResetDamageModelSync();
 
@@ -3571,7 +3571,7 @@ retry:
                             bitStream.Read(ucSirenType);
 
                             pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
-                            for (int i = 0; i < ucSirenCount; i++)
+                            for (auto i = 0; i < ucSirenCount; i++)
                             {
                                 SVehicleSirenSync sirenData;
                                 bitStream.Read(&sirenData);
@@ -4107,7 +4107,7 @@ retry:
                     assert(ucNumVertices == 3 || ucNumVertices == 4);
 
                     CVector vecVertices[4];
-                    for (int i = 0; i < ucNumVertices; i++)
+                    for (auto i = 0; i < ucNumVertices; i++)
                     {
                         bitStream.Read(sX);
                         bitStream.Read(sY);
@@ -4383,7 +4383,7 @@ void CPacketHandler::Packet_Lua(std::uint8_t ucPacketID, NetBitStreamInterface& 
 
 void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
 {
-    // unsigned long    (4)     - text item id
+    // std::uint32_t    (4)     - text item id
     // bool                     - delete it? (can end here if true)
 
     // float            (4)     - X Position
@@ -4404,7 +4404,7 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
     }
 
     // Read out the text ID
-    unsigned long ulID;
+    std::uint32_t ulID;
     bitStream.ReadCompressed(ulID);
 
     // Flags
@@ -4474,7 +4474,7 @@ void CPacketHandler::Packet_TextItem(NetBitStreamInterface& bitStream)
                 pTextDisplay->SetPosition(CVector(fX, fY, 0));
                 pTextDisplay->SetColor(color);
                 pTextDisplay->SetScale(fScale);
-                pTextDisplay->SetFormat((unsigned long)ucFormat);
+                pTextDisplay->SetFormat((std::uint32_t)ucFormat);
                 pTextDisplay->SetShadowAlpha(ucShadowAlpha);
 
                 delete[] szText;
@@ -4987,7 +4987,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
      * * std::uint8_t (1)    - file name size
      * * std::uint8_t (x)    - file name
      * * std::uint8_t (1)    - type
-     * * unsigned long        - CRC
+     * * std::uint32_t        - CRC
      * * double               - size
      * list of exported functions
      * * std::uint8_t (1)    - type chunk (F - File, E - Exported Function)
@@ -5306,7 +5306,7 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
 
                 // First grab the original length from the data chunk
                 const std::uint8_t* uData = (const std::uint8_t*)data;
-                unsigned long        originalLength = uData[0] << 24 | uData[1] << 16 | uData[2] << 8 | uData[3];
+                std::uint32_t        originalLength = uData[0] << 24 | uData[1] << 16 | uData[2] << 8 | uData[3];
                 char*                uncompressedBuffer = new char[originalLength];
 
                 // Uncompress it

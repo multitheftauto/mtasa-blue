@@ -127,7 +127,7 @@ public:
     static bool SetPlayerNametagShowing(CClientEntity& Entity, bool bShowing);
 
     // Ped funcs
-    static CClientPed* CreatePed(CResource& Resource, unsigned long ulModel, const CVector& vecPosition, float fRotation);
+    static CClientPed* CreatePed(CResource& Resource, std::uint32_t ulModel, const CVector& vecPosition, float fRotation);
     static bool        KillPed(CClientEntity& Entity, CClientEntity* pKiller, std::uint8_t ucKillerWeapon, std::uint8_t ucBodyPart, bool bStealth);
 
     static CClientEntity* GetPedTarget(CClientPed& Ped);
@@ -259,7 +259,7 @@ public:
     static bool SetTrainSpeed(CClientVehicle& Vehicle, float fSpeed);
     static bool SetTrainPosition(CClientVehicle& Vehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CClientEntity& Vehicle, const SColor color);
-    static bool SetVehicleDoorOpenRatio(CClientEntity& Vehicle, std::uint8_t ucDoor, float fRatio, unsigned long ulTime = 0);
+    static bool SetVehicleDoorOpenRatio(CClientEntity& Vehicle, std::uint8_t ucDoor, float fRatio, std::uint32_t ulTime = 0);
     static bool SetVehicleSirens(CClientVehicle& pVehicle, std::uint8_t ucSirenID, SSirenInfo tSirenInfo);
     static bool SetVehicleNitroActivated(CClientEntity& Entity, bool bActivated);
     static bool SetVehicleNitroCount(CClientEntity& Entity, char cCount);
@@ -283,7 +283,7 @@ public:
 
     // Object set funcs
     static bool SetObjectRotation(CClientEntity& Entity, const CVector& vecRotation);
-    static bool MoveObject(CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation,
+    static bool MoveObject(CClientEntity& Entity, std::uint32_t ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation,
                            CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot);
     static bool StopObject(CClientEntity& Entity);
     static bool SetObjectScale(CClientEntity& Entity, const CVector& vecScale);
@@ -311,7 +311,7 @@ public:
     static bool              IsInsideRadarArea(CClientRadarArea* RadarArea, CVector2D vecPosition, bool& inside);
 
     // Pickup create/destroy funcs
-    static CClientPickup* CreatePickup(CResource& Resource, const CVector& vecPosition, std::uint8_t ucType, double dFive, unsigned long ulRespawnInterval,
+    static CClientPickup* CreatePickup(CResource& Resource, const CVector& vecPosition, std::uint8_t ucType, double dFive, std::uint32_t ulRespawnInterval,
                                        double dSix);
 
     // Pickup set funcs
@@ -583,7 +583,7 @@ public:
     static bool          GetGravity(float& fGravity);
     static bool          GetZoneName(CVector& vecPosition, SString& strOutName, bool bCitiesOnly = false);
     static bool          GetGameSpeed(float& fSpeed);
-    static bool          GetMinuteDuration(unsigned long& ulDelay);
+    static bool          GetMinuteDuration(std::uint32_t& ulDelay);
     static bool          GetWaveHeight(float& fHeight);
     static bool          IsGarageOpen(std::uint8_t ucGarageID, bool& bIsOpen);
     static bool          GetGaragePosition(std::uint8_t ucGarageID, CVector& vecPosition);
@@ -614,7 +614,7 @@ public:
     static bool SetGravity(float fGravity);
     static bool SetGameSpeed(float fSpeed);
     static bool SetWaveHeight(float fHeight);
-    static bool SetMinuteDuration(unsigned long ulDelay);
+    static bool SetMinuteDuration(std::uint32_t ulDelay);
     static bool SetGarageOpen(std::uint8_t ucGarageID, bool bIsOpen);
     static bool SetBlurLevel(std::uint8_t ucLevel);
     static bool SetJetpackMaxHeight(float fHeight);
@@ -807,11 +807,11 @@ public:
     static bool              SetEntryHandling(CHandlingEntry* pEntry, eHandlingProperty eProperty, std::uint8_t ucValue);
 
     // Version funcs
-    static unsigned long GetVersion();
+    static std::uint32_t GetVersion();
     static const char*   GetVersionString();
     static const char*   GetVersionName();
     static SString       GetVersionBuildType();
-    static unsigned long GetNetcodeVersion();
+    static std::uint32_t GetNetcodeVersion();
     static const char*   GetOperatingSystemName();
     static const char*   GetVersionBuildTag();
     static SString       GetVersionSortable();

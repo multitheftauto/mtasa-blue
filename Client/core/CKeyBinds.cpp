@@ -1215,7 +1215,7 @@ void CKeyBinds::SetAllControlsEnabled(bool bGameControls, bool bMTAControls, boo
 {
     if (bGameControls)
     {
-        for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
+        for (auto i = 0; *g_bcControls[i].szControl != NULL; i++)
         {
             SBindableGTAControl* temp = &g_bcControls[i];
 
@@ -1266,7 +1266,7 @@ void CKeyBinds::ResetGTAControlState(SBindableGTAControl* pControl)
 void CKeyBinds::ResetAllGTAControlStates()
 {
     // Set all our control states to false
-    for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
+    for (auto i = 0; *g_bcControls[i].szControl != NULL; i++)
         g_bcControls[i].bState = false;
 
     // Go through all our control binds, if they're state is true, turn their control on
@@ -1497,7 +1497,7 @@ bool CKeyBinds::ControlFunctionExists(SBindableGTAControl* pControl, ControlFunc
 
 const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey) const
 {
-    for (int i = 0; *g_bkKeys[i].szKey != 0; i++)
+    for (auto i = 0; *g_bkKeys[i].szKey != 0; i++)
     {
         const SBindableKey* temp = &g_bkKeys[i];
 
@@ -1510,7 +1510,7 @@ const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey) const
 
 SBindableGTAControl* CKeyBinds::GetBindableFromAction(eControllerAction action)
 {
-    for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
+    for (auto i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
 
@@ -1523,7 +1523,7 @@ SBindableGTAControl* CKeyBinds::GetBindableFromAction(eControllerAction action)
 
 bool CKeyBinds::IsKey(const char* szKey)
 {
-    for (int i = 0; *g_bkKeys[i].szKey != NULL; i++)
+    for (auto i = 0; *g_bkKeys[i].szKey != NULL; i++)
     {
         const SBindableKey* temp = &g_bkKeys[i];
 
@@ -1555,11 +1555,11 @@ const SBindableKey* CKeyBinds::GetBindableFromMessage(UINT uMsg, WPARAM wParam, 
     bState = (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN || uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN ||
               uMsg == WM_MOUSEWHEEL || uMsg == WM_XBUTTONDOWN);
 
-    for (int i = 0; *g_bkKeys[i].szKey != NULL; i++)
+    for (auto i = 0; *g_bkKeys[i].szKey != NULL; i++)
     {
         const SBindableKey* bindable = &g_bkKeys[i];
 
-        unsigned long ulCode = bindable->ulCode;
+        std::uint32_t ulCode = bindable->ulCode;
         eKeyData      keyData = bindable->data;
 
         bool bMouseWheel = false;
@@ -1639,7 +1639,7 @@ bool CKeyBinds::GetKeyStateByName(const char* keyName, bool& state) const
 
 SBindableGTAControl* CKeyBinds::GetBindableFromControl(const char* szControl)
 {
-    for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
+    for (auto i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
 
@@ -1652,7 +1652,7 @@ SBindableGTAControl* CKeyBinds::GetBindableFromControl(const char* szControl)
 
 const SBindableKey* CKeyBinds::GetBindableFromGTARelative(int iGTAKey)
 {
-    for (int i = 0; *g_bkKeys[i].szKey != NULL; i++)
+    for (auto i = 0; *g_bkKeys[i].szKey != NULL; i++)
     {
         const SBindableKey* temp = &g_bkKeys[i];
 
@@ -1665,7 +1665,7 @@ const SBindableKey* CKeyBinds::GetBindableFromGTARelative(int iGTAKey)
 
 bool CKeyBinds::IsControl(const char* szControl)
 {
-    for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
+    for (auto i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
 
@@ -1684,7 +1684,7 @@ void CKeyBinds::SetAllControls(bool bState)
 
 void CKeyBinds::SetAllFootControls(bool bState)
 {
-    for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
+    for (auto i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
 
@@ -1695,7 +1695,7 @@ void CKeyBinds::SetAllFootControls(bool bState)
 
 void CKeyBinds::SetAllVehicleControls(bool bState)
 {
-    for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
+    for (auto i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         SBindableGTAControl* temp = &g_bcControls[i];
 
@@ -2238,7 +2238,7 @@ void CKeyBinds::LoadDefaultBinds()
 
 void CKeyBinds::LoadDefaultCommands(bool bForce)
 {
-    for (int i = 0; *g_dcbDefaultCommands[i].szKey != NULL; i++)
+    for (auto i = 0; *g_dcbDefaultCommands[i].szKey != NULL; i++)
     {
         const SDefaultCommandBind* temp = &g_dcbDefaultCommands[i];
         if (bForce || !CommandExists(NULL, temp->szCommand, true, temp->bState, temp->szArguments))
@@ -2248,7 +2248,7 @@ void CKeyBinds::LoadDefaultCommands(bool bForce)
 
 void CKeyBinds::LoadControlsFromGTA()
 {
-    for (int i = FIRE; i <= GROUP_CONTROL_BACK; i++)
+    for (auto i = FIRE; i <= GROUP_CONTROL_BACK; i++)
     {
         CGame* pGame = m_pCore->GetGame();
         if (pGame)

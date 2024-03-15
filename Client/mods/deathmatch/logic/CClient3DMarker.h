@@ -30,8 +30,8 @@ public:
 
     std::uint32_t GetMarkerType() const { return CClientMarkerCommon::CLASS_3DMARKER; };
 
-    unsigned long Get3DMarkerType();
-    void          Set3DMarkerType(unsigned long ulType);
+    std::uint32_t Get3DMarkerType();
+    void          Set3DMarkerType(std::uint32_t ulType);
 
     bool IsHit(const CVector& vecPosition) const;
 

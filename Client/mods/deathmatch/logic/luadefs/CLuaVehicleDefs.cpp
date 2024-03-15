@@ -353,7 +353,7 @@ int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)
     CClientVehicle*  pVehicle = NULL;
     CScriptArgReader argStream(luaVM);
 
-    unsigned long ucModel = 0;
+    std::uint32_t ucModel = 0;
 
     if (argStream.NextIsUserData())
     {
@@ -2942,7 +2942,7 @@ int CLuaVehicleDefs::SetVehicleDoorOpenRatio(lua_State* luaVM)
     CClientEntity*   pEntity = NULL;
     std::uint8_t    ucDoor = 0;
     float            fRatio = 0.0f;
-    unsigned long    ulTime = 0UL;
+    std::uint32_t    ulTime = 0UL;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucDoor);
@@ -3028,7 +3028,7 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
         tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Grab the siren structure data
         lua_newtable(luaVM);
 
-        for (int i = 0; i < tSirenInfo.m_ucSirenCount; i++)
+        for (auto i = 0; i < tSirenInfo.m_ucSirenCount; i++)
         {
             lua_pushnumber(luaVM, i + 1);
             lua_newtable(luaVM);

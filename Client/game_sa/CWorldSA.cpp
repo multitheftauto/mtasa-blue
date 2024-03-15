@@ -385,7 +385,7 @@ auto CWorldSA::ProcessLineAgainstMesh(CEntitySAInterface* targetEntity, CVector 
         // Now, calculate texture UV, etc based on the hit [if we've hit anything at all]
         // Since we have the barycentric coords of the hit, calculating it is easy
         ret.uv = {};
-        for (int i = 0; i < 3; i++)
+        for (auto i = 0; i < 3; i++)
         {
             // UV set index - Usually models only use level 0 indices, so let's stick with that
             const int uvSetIdx = 0;
@@ -710,7 +710,7 @@ int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutT
     {
         if ((ucDesiredTrackId == 0xFF || ucTrackId == ucDesiredTrackId) && aNumTrackNodes[ucTrackId] > 0)
         {
-            for (int i = 0; i < aNumTrackNodes[ucTrackId]; ++i)
+            for (auto i = 0; i < aNumTrackNodes[ucTrackId]; ++i)
             {
                 SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
 

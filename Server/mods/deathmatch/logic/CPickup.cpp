@@ -229,7 +229,7 @@ bool CPickup::ReadSpecialData(const int iLine)
             iTemp = 3000;
 
         // Remember it
-        m_ulRespawnIntervals = static_cast<unsigned long>(iTemp);
+        m_ulRespawnIntervals = static_cast<std::uint32_t>(iTemp);
     }
     else
     {

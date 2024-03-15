@@ -207,7 +207,7 @@ bool SString::Split(const SString& strDelim, SString* pstrLeft, SString* pstrRig
     if (!bFromEnd)
     {
         ulPos = 0;
-        for (int i = 0; i < iIndex && ulPos != npos; i++)
+        for (auto i = 0; i < iIndex && ulPos != npos; i++)
         {
             if (i)
                 ulPos += strDelim.length();
@@ -225,7 +225,7 @@ bool SString::Split(const SString& strDelim, SString* pstrLeft, SString* pstrRig
     else
     {
         ulPos = length();
-        for (int i = 0; i < -iIndex && ulPos != npos; i++)
+        for (auto i = 0; i < -iIndex && ulPos != npos; i++)
         {
             if (ulPos >= strDelim.length())
             {
@@ -460,7 +460,7 @@ SString SString::Join(const SString& strDelim, const std::vector<SString>& parts
     SString strResult;
     int     iLast = std::min<int>(iFirst + iCount, parts.size()) - 1;
     iFirst = std::max<int>(iFirst, 0);
-    for (int i = iFirst; i <= iLast; i++)
+    for (auto i = iFirst; i <= iLast; i++)
     {
         if (i != iFirst)
             strResult += strDelim;

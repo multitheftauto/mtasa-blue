@@ -42,5 +42,5 @@ private:
 
     CClientPedManager*       m_pPedManager;
     CMappedList<CClientPed*> m_List;
-    unsigned long            m_ulLastSyncTime;
+    std::uint32_t            m_ulLastSyncTime;
 };

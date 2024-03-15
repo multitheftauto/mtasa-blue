@@ -25,13 +25,13 @@ CHandlingManager::CHandlingManager()
     InitializeDefaultHandlings();
 
     // Create a handling entry for every original handling data
-    for (int i = 0; i < HT_MAX; i++)
+    for (auto i = 0; i < HT_MAX; i++)
     {
         m_pOriginalEntries[i] = new CHandlingEntry(&m_OriginalHandlingData[i]);
     }
 
     // Create a handling entry for every model
-    for (int i = 0; i < HT_MAX; i++)
+    for (auto i = 0; i < HT_MAX; i++)
     {
         m_pModelEntries[i] = new CHandlingEntry(&m_OriginalHandlingData[i]);
         m_bModelHandlingChanged[i] = false;
@@ -79,13 +79,13 @@ CHandlingManager::CHandlingManager()
 CHandlingManager::~CHandlingManager()
 {
     // Destroy all original handling entries
-    for (int i = 0; i < HT_MAX; i++)
+    for (auto i = 0; i < HT_MAX; i++)
     {
         delete m_pOriginalEntries[i];
     }
 
     // Destroy all model handling entries
-    for (int i = 0; i < HT_MAX; i++)
+    for (auto i = 0; i < HT_MAX; i++)
     {
         delete m_pModelEntries[i];
     }

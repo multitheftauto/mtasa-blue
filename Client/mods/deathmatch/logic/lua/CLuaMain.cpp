@@ -440,7 +440,7 @@ bool CLuaMain::SaveXML(CXMLNode* pRootNode)
 //
 //
 ///////////////////////////////////////////////////////////////
-unsigned long CLuaMain::GetElementCount() const
+std::uint32_t CLuaMain::GetElementCount() const
 {
     if (m_pResource && m_pResource->GetElementGroup())
         return m_pResource->GetElementGroup()->GetCount();

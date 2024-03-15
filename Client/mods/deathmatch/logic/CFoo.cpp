@@ -51,7 +51,7 @@ void CFoo::DoPulse()
                 pPed->SetPosition(vecLocal);
             }
 
-            static unsigned long ulTestTime = 0;
+            static std::uint32_t ulTestTime = 0;
             if (ulTestTime == 0)
             {
                 ulTestTime = CClientTime::GetTime() + 50;
@@ -82,8 +82,8 @@ class CAnimGroup
 public:
     char          szGroupName[16];
     char          szSomething[16];
-    unsigned long ulUnknown;              // 0x07 or 0xFFFFFFFF on the first ones
-    unsigned long ulAnimCount;            // ??
+    std::uint32_t ulUnknown;              // 0x07 or 0xFFFFFFFF on the first ones
+    std::uint32_t ulAnimCount;            // ??
     const char**  pAnimNames;
     void*         pSomeArray;
 };
@@ -104,7 +104,7 @@ void CFoo::Test(const char* szString)
     {
         vecLocal = CVector(0.0f, 0.0f, 5.0f);
 
-        for (int i = 0; i < 20; i++)
+        for (auto i = 0; i < 20; i++)
         {
             vecLocal.fX += 5.0f;
             CClientPlayer* pPlayer = new CClientPlayer(pManager, i + 50);
@@ -423,7 +423,7 @@ void CFoo::Test(const char* szString)
     {
         FILE* pFile = fopen("C:/dump.txt", "w+");
 
-        for (int i = 0; i < 400; i++)
+        for (auto i = 0; i < 400; i++)
         {
             int         iIndex = i;
             const char* szName = NULL;
@@ -447,7 +447,7 @@ void CFoo::Test(const char* szString)
         int   i = 600;
         FILE* p = fopen("C:/dump.txt", "w+");
 
-        for (int a = 0; a < 13; a++)
+        for (auto a = 0; a < 13; a++)
         {
             g_pGame->GetModelInfo(i)->ModelAddRef(BLOCKING, "CFoo::Test");
 

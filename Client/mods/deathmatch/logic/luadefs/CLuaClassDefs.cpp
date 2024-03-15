@@ -213,7 +213,7 @@ int CLuaClassDefs::Call(lua_State* luaVM)
 
     if (lua_isfunction(luaVM, -1))
     {
-        for (int i = 2; i <= stack; i++)
+        for (auto i = 2; i <= stack; i++)
             lua_pushvalue(luaVM, i);
 
         int args = stack - 1;

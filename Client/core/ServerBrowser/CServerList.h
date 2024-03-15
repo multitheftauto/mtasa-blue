@@ -152,7 +152,7 @@ public:
         bMaybeOffline = false;
         bMasterServerSaysNoResponse = false;
         uiMasterServerSaysRestrictions = 0;
-        for (int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
+        for (auto i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
             revisionInList[i] = -1;
 
         strHost = inet_ntoa(Address);
@@ -389,7 +389,7 @@ protected:
     CServerListItemList m_Servers;
     std::string         m_strStatus;
     std::string         m_strStatus2;
-    long long           m_llLastTickCount;
+    std::int64_t           m_llLastTickCount;
 };
 
 // Internet list (grabs the master server list on refresh)
@@ -419,5 +419,5 @@ private:
 
     int           m_Socket;
     sockaddr_in   m_Remote;
-    unsigned long m_ulStartTime;
+    std::uint32_t m_ulStartTime;
 };

@@ -166,7 +166,7 @@ void AttachedMatrix(const CMatrix& matrix, CMatrix& returnMatrix, const CVector&
     returnMatrix = CMatrix(vecPosition, vecRotation) * matrix;
 }
 
-void LongToDottedIP(unsigned long ulIP, char* szDottedIP)
+void LongToDottedIP(std::uint32_t ulIP, char* szDottedIP)
 {
     in_addr in{};
     in.s_addr = ulIP;
@@ -598,7 +598,7 @@ std::uint32_t HexToInt(const char* szHex)
     return value;
 }
 
-bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
+bool XMLColorToInt(const char* szColor, std::uint32_t& ulColor)
 {
     const char validHexChars[] = "0123456789ABCDEFabcdef";
 
@@ -699,7 +699,7 @@ bool XMLColorToInt(const char* szColor, unsigned long& ulColor)
 bool XMLColorToInt(const char* szColor, std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha)
 {
     // Convert it to an integer first
-    unsigned long ulColor;
+    std::uint32_t ulColor;
     if (!XMLColorToInt(szColor, ulColor))
     {
         return false;
@@ -998,7 +998,7 @@ void RotateVector(CVector& vecLine, const CVector& vecRotation)
     vecLine.fY = -sin(vecRotation.fZ) * fLineX + cos(vecRotation.fZ) * vecLine.fY;
 }
 
-SString LongToDottedIP(unsigned long ulIP)
+SString LongToDottedIP(std::uint32_t ulIP)
 {
     in_addr in;
     in.s_addr = ulIP;

@@ -240,7 +240,7 @@ bool PngEncode(uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize, 
     }
 
     // Copy the surface data into a row-based buffer for libpng
-    unsigned long ulLineWidth = uiWidth * 4;
+    std::uint32_t ulLineWidth = uiWidth * 4;
     for (std::uint32_t i = 0; i < uiHeight; i++)
     {
         memcpy(ppScreenData[i], (BYTE*)pData + i * ulLineWidth, ulLineWidth);

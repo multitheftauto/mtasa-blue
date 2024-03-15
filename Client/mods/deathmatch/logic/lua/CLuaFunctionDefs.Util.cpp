@@ -16,7 +16,7 @@ int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
     lua_newtable(luaVM);
 
     // Gather GTASA default skins
-    for (int i = 0; i <= 312; i++)
+    for (auto i = 0; i <= 312; i++)
     {
         if (CClientPlayerManager::IsValidModel(i))
         {
@@ -277,7 +277,7 @@ int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
         CClientPerfStatManager::GetSingleton()->GetStats(&Result, strCategory, strOptions, strFilter);
 
         lua_newtable(luaVM);
-        for (int c = 0; c < Result.ColumnCount(); c++)
+        for (auto c = 0; c < Result.ColumnCount(); c++)
         {
             const SString& name = Result.ColumnName(c);
             lua_pushnumber(luaVM, c + 1);            // row index number (starting at 1, not 0)
@@ -286,14 +286,14 @@ int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
         }
 
         lua_newtable(luaVM);
-        for (int r = 0; r < Result.RowCount(); r++)
+        for (auto r = 0; r < Result.RowCount(); r++)
         {
             lua_newtable(luaVM);                     // new table
             lua_pushnumber(luaVM, r + 1);            // row index number (starting at 1, not 0)
             lua_pushvalue(luaVM, -2);                // value
             lua_settable(luaVM, -4);                 // refer to the top level table
 
-            for (int c = 0; c < Result.ColumnCount(); c++)
+            for (auto c = 0; c < Result.ColumnCount(); c++)
             {
                 SString& cell = Result.Data(c, r);
                 lua_pushnumber(luaVM, c + 1);

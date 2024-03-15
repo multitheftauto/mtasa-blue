@@ -10,7 +10,7 @@
 
 #include <StdInc.h>
 
-CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, unsigned long ulMaxSize, eAccessType accessType)
+CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, std::uint32_t ulMaxSize, eAccessType accessType)
     : ClassInit(this), CClientEntity(INVALID_ELEMENT_ID)
 {
     // Init
@@ -113,7 +113,7 @@ long CScriptFile::GetSize()
     return lSize;
 }
 
-long CScriptFile::SetPointer(unsigned long ulPosition)
+long CScriptFile::SetPointer(std::uint32_t ulPosition)
 {
     if (!m_pFile)
         return -1;
@@ -133,9 +133,9 @@ long CScriptFile::SetPointer(unsigned long ulPosition)
 
     // Bigger than file size? Tell the script how far we were able to move it
     long lSize = GetSize();
-    if (ulPosition > static_cast<unsigned long>(lSize))
+    if (ulPosition > static_cast<std::uint32_t>(lSize))
     {
-        ulPosition = static_cast<unsigned long>(lSize);
+        ulPosition = static_cast<std::uint32_t>(lSize);
     }
 
     // Return the new position
@@ -150,7 +150,7 @@ void CScriptFile::Flush()
     m_pFile->FFlush();
 }
 
-long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
+long CScriptFile::Read(std::uint32_t ulSize, SString& outBuffer)
 {
     if (!m_pFile)
         return -1;
@@ -164,7 +164,7 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
         m_pFile->FSeek(0, SEEK_END);
         long lFileSize = m_pFile->FTell();
         m_pFile->FSeek(lCurrentPos, SEEK_SET);
-        ulSize = std::min<unsigned long>(1 + lFileSize - lCurrentPos, ulSize);
+        ulSize = std::min<std::uint32_t>(1 + lFileSize - lCurrentPos, ulSize);
         // Note: Read extra byte at end so EOF indicator gets set
     }
 
@@ -180,7 +180,7 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
     return m_pFile->FRead(outBuffer.data(), ulSize);
 }
 
-long CScriptFile::Write(unsigned long ulSize, const char* pData)
+long CScriptFile::Write(std::uint32_t ulSize, const char* pData)
 {
     if (!m_pFile)
         return -1;

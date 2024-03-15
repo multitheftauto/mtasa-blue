@@ -342,7 +342,7 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
 
 int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)
 {
-    unsigned long ulModel;
+    std::uint32_t ulModel;
 
     CScriptArgReader argStream(luaVM);
 
@@ -679,7 +679,7 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
         tSirenInfo = pVehicle->m_tSirenBeaconInfo;            // Create a new table
         lua_newtable(luaVM);
 
-        for (int i = 0; i < tSirenInfo.m_ucSirenCount; i++)
+        for (auto i = 0; i < tSirenInfo.m_ucSirenCount; i++)
         {
             lua_pushnumber(luaVM, i + 1);
             lua_newtable(luaVM);
@@ -2161,7 +2161,7 @@ int CLuaVehicleDefs::ToggleVehicleRespawn(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleRespawnDelay(lua_State* luaVM)
 {
     CElement*     pElement;
-    unsigned long ulTime;
+    std::uint32_t ulTime;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -2352,7 +2352,7 @@ int CLuaVehicleDefs::SetVehicleRespawnRotation(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleIdleRespawnDelay(lua_State* luaVM)
 {
     CElement*     pElement;
-    unsigned long ulTime;
+    std::uint32_t ulTime;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -2885,7 +2885,7 @@ int CLuaVehicleDefs::SetVehicleDoorOpenRatio(lua_State* luaVM)
     CElement*     pElement;
     std::uint8_t ucDoor;
     float         fRatio;
-    unsigned long ulTime;
+    std::uint32_t ulTime;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

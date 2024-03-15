@@ -80,20 +80,20 @@ public:
 
     SString                   m_strCategoryName;
     time_t                    m_tStartTime;
-    long long                 m_llNextRecordTime;
+    std::int64_t                 m_llNextRecordTime;
     SBandwidthStatistics      m_PrevLiveStats;
     SNetPerformanceStatistics m_NetPerformanceStats;
     SSyncThreadStatistics     m_SyncThreadStats;
     CTickCount                m_PrevTickCount;
     CTickCount                m_DeltaTickCount;
-    long long                 m_llDeltaGameBytesSent;
-    long long                 m_llDeltaGameBytesRecv;
-    long long                 m_llDeltaGameBytesRecvBlocked;
-    long long                 m_llDeltaGamePacketsSent;
-    long long                 m_llDeltaGamePacketsRecv;
-    long long                 m_llDeltaGamePacketsRecvBlocked;
-    long long                 m_llDeltaGameBytesResent;
-    long long                 m_llDeltaGameMessagesResent;
+    std::int64_t                 m_llDeltaGameBytesSent;
+    std::int64_t                 m_llDeltaGameBytesRecv;
+    std::int64_t                 m_llDeltaGameBytesRecvBlocked;
+    std::int64_t                 m_llDeltaGamePacketsSent;
+    std::int64_t                 m_llDeltaGamePacketsRecv;
+    std::int64_t                 m_llDeltaGamePacketsRecvBlocked;
+    std::int64_t                 m_llDeltaGameBytesResent;
+    std::int64_t                 m_llDeltaGameMessagesResent;
     SThreadCPUTimesStore      m_MainThreadCPUTimes;
     std::vector<StringPair>   m_InfoList;
     std::vector<StringPair>   m_StatusList;
@@ -162,7 +162,7 @@ const SString& CPerfStatServerInfoImpl::GetCategoryName()
 ///////////////////////////////////////////////////////////////
 void CPerfStatServerInfoImpl::DoPulse()
 {
-    long long llTime = GetTickCount64_();
+    std::int64_t llTime = GetTickCount64_();
 
     UpdateThreadCPUTimes(m_MainThreadCPUTimes, &llTime);
 
@@ -189,14 +189,14 @@ void CPerfStatServerInfoImpl::RecordStats()
         return;
 
     // Save sample period deltas
-    m_llDeltaGameBytesSent = std::max<long long>(0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount);
-    m_llDeltaGameBytesRecv = std::max<long long>(0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount);
-    m_llDeltaGameBytesRecvBlocked = std::max<long long>(0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked);
-    m_llDeltaGamePacketsSent = std::max<long long>(0LL, liveStats.llOutgoingUDPPacketCount - m_PrevLiveStats.llOutgoingUDPPacketCount);
-    m_llDeltaGamePacketsRecv = std::max<long long>(0LL, liveStats.llIncomingUDPPacketCount - m_PrevLiveStats.llIncomingUDPPacketCount);
-    m_llDeltaGamePacketsRecvBlocked = std::max<long long>(0LL, liveStats.llIncomingUDPPacketCountBlocked - m_PrevLiveStats.llIncomingUDPPacketCountBlocked);
-    m_llDeltaGameBytesResent = std::max<long long>(0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount);
-    m_llDeltaGameMessagesResent = std::max<long long>(0LL, liveStats.llOutgoingUDPMessageResentCount - m_PrevLiveStats.llOutgoingUDPMessageResentCount);
+    m_llDeltaGameBytesSent = std::max<std::int64_t>(0LL, liveStats.llOutgoingUDPByteCount - m_PrevLiveStats.llOutgoingUDPByteCount);
+    m_llDeltaGameBytesRecv = std::max<std::int64_t>(0LL, liveStats.llIncomingUDPByteCount - m_PrevLiveStats.llIncomingUDPByteCount);
+    m_llDeltaGameBytesRecvBlocked = std::max<std::int64_t>(0LL, liveStats.llIncomingUDPByteCountBlocked - m_PrevLiveStats.llIncomingUDPByteCountBlocked);
+    m_llDeltaGamePacketsSent = std::max<std::int64_t>(0LL, liveStats.llOutgoingUDPPacketCount - m_PrevLiveStats.llOutgoingUDPPacketCount);
+    m_llDeltaGamePacketsRecv = std::max<std::int64_t>(0LL, liveStats.llIncomingUDPPacketCount - m_PrevLiveStats.llIncomingUDPPacketCount);
+    m_llDeltaGamePacketsRecvBlocked = std::max<std::int64_t>(0LL, liveStats.llIncomingUDPPacketCountBlocked - m_PrevLiveStats.llIncomingUDPPacketCountBlocked);
+    m_llDeltaGameBytesResent = std::max<std::int64_t>(0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount);
+    m_llDeltaGameMessagesResent = std::max<std::int64_t>(0LL, liveStats.llOutgoingUDPMessageResentCount - m_PrevLiveStats.llOutgoingUDPMessageResentCount);
     m_PrevLiveStats = liveStats;
 
     // Save sample period length
@@ -220,7 +220,7 @@ SString CPerfStatServerInfoImpl::GetProcessMemoryUsage()
     if (!bResult)
         return "";
 
-    uint uiMB = psmemCounter.WorkingSetSize / (long long)(1024 * 1024);
+    uint uiMB = psmemCounter.WorkingSetSize / (std::int64_t)(1024 * 1024);
     return SString("%d MB", uiMB);
 #else
     // 'file' stat seems to give the most reliable results
@@ -233,7 +233,7 @@ SString CPerfStatServerInfoImpl::GetProcessMemoryUsage()
     std::string O, itrealvalue, starttime;
 
     // the two fields we want
-    unsigned long vsize;
+    std::uint32_t vsize;
     long          rss;
 
     statStream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt >> utime >> stime >>
@@ -276,21 +276,21 @@ void CPerfStatServerInfoImpl::GetStats(CPerfStatResult* pResult, const std::map<
     }
 
     // Calculate current rates
-    long long llIncomingBytesPS = CPerfStatManager::GetPerSecond(m_llDeltaGameBytesRecv, m_DeltaTickCount.ToLongLong());
-    // long long llIncomingBytesPSBlocked = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesRecvBlocked, m_DeltaTickCount.ToLongLong () );
-    long long llOutgoingBytesPS = CPerfStatManager::GetPerSecond(m_llDeltaGameBytesSent, m_DeltaTickCount.ToLongLong());
-    long long llOutgoingBytesResentPS = CPerfStatManager::GetPerSecond(m_llDeltaGameBytesResent, m_DeltaTickCount.ToLongLong());
+    std::int64_t llIncomingBytesPS = CPerfStatManager::GetPerSecond(m_llDeltaGameBytesRecv, m_DeltaTickCount.ToLongLong());
+    // std::int64_t llIncomingBytesPSBlocked = CPerfStatManager::GetPerSecond ( m_llDeltaGameBytesRecvBlocked, m_DeltaTickCount.ToLongLong () );
+    std::int64_t llOutgoingBytesPS = CPerfStatManager::GetPerSecond(m_llDeltaGameBytesSent, m_DeltaTickCount.ToLongLong());
+    std::int64_t llOutgoingBytesResentPS = CPerfStatManager::GetPerSecond(m_llDeltaGameBytesResent, m_DeltaTickCount.ToLongLong());
     SString   strIncomingPacketsPS = CPerfStatManager::GetPerSecondString(m_llDeltaGamePacketsRecv, m_DeltaTickCount.ToDouble());
     SString   strIncomingPacketsPSBlocked = CPerfStatManager::GetPerSecondString(m_llDeltaGamePacketsRecvBlocked, m_DeltaTickCount.ToDouble());
     SString   strOutgoingPacketsPS = CPerfStatManager::GetPerSecondString(m_llDeltaGamePacketsSent, m_DeltaTickCount.ToDouble());
     SString   strOutgoingMessagesResentPS = CPerfStatManager::GetPerSecondString(m_llDeltaGameMessagesResent, m_DeltaTickCount.ToDouble());
 
     // Estimate total network usage
-    long long llIncomingPacketsPS = CPerfStatManager::GetPerSecond(m_llDeltaGamePacketsRecv, m_DeltaTickCount.ToLongLong());
-    // long long llIncomingPacketsPSBlocked = CPerfStatManager::GetPerSecond ( m_llDeltaGamePacketsRecvBlocked, m_DeltaTickCount.ToLongLong () );
-    long long llOutgoingPacketsPS = CPerfStatManager::GetPerSecond(m_llDeltaGamePacketsSent, m_DeltaTickCount.ToLongLong());
-    long long llNetworkUsageBytesPS = (llIncomingPacketsPS + llOutgoingPacketsPS) * UDP_PACKET_OVERHEAD + llIncomingBytesPS + llOutgoingBytesPS;
-    // long long llNetworkUsageBytesPSInclBlocked = ( llIncomingPacketsPS + llIncomingPacketsPSBlocked + llOutgoingPacketsPS ) * UDP_PACKET_OVERHEAD +
+    std::int64_t llIncomingPacketsPS = CPerfStatManager::GetPerSecond(m_llDeltaGamePacketsRecv, m_DeltaTickCount.ToLongLong());
+    // std::int64_t llIncomingPacketsPSBlocked = CPerfStatManager::GetPerSecond ( m_llDeltaGamePacketsRecvBlocked, m_DeltaTickCount.ToLongLong () );
+    std::int64_t llOutgoingPacketsPS = CPerfStatManager::GetPerSecond(m_llDeltaGamePacketsSent, m_DeltaTickCount.ToLongLong());
+    std::int64_t llNetworkUsageBytesPS = (llIncomingPacketsPS + llOutgoingPacketsPS) * UDP_PACKET_OVERHEAD + llIncomingBytesPS + llOutgoingBytesPS;
+    // std::int64_t llNetworkUsageBytesPSInclBlocked = ( llIncomingPacketsPS + llIncomingPacketsPSBlocked + llOutgoingPacketsPS ) * UDP_PACKET_OVERHEAD +
     // llIncomingBytesPS + llIncomingBytesPSBlocked + llOutgoingBytesPS;
 
     // Calculate uptime

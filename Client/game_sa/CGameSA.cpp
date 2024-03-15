@@ -139,7 +139,7 @@ CGameSA::CGameSA()
     m_collisionStore = new CColStoreSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
-    for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
+    for (auto i = 0; i < NUM_WeaponInfosStdSkill; i++)
     {
         eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
         WeaponInfos[i] = new CWeaponInfoSA((CWeaponInfoSAInterface*)(ARRAY_WeaponInfo + i * CLASSSIZE_WeaponInfo), weaponType);
@@ -149,7 +149,7 @@ CGameSA::CGameSA()
     // Extra weapon types for skills (WEAPONSKILL_POOR,WEAPONSKILL_PRO,WEAPONSKILL_SPECIAL)
     int          index;
     eWeaponSkill weaponSkill = eWeaponSkill::WEAPONSKILL_POOR;
-    for (int skill = 0; skill < 3; skill++)
+    for (auto skill = 0; skill < 3; skill++)
     {
         // STD is created first, then it creates "extra weapon types" (poor, pro, special?) but in the enum 1 = STD which meant the STD weapon skill contained
         // pro info
@@ -164,7 +164,7 @@ CGameSA::CGameSA()
                 weaponSkill = eWeaponSkill::WEAPONSKILL_SPECIAL;
             }
         }
-        for (int i = 0; i < NUM_WeaponInfosOtherSkill; i++)
+        for (auto i = 0; i < NUM_WeaponInfosOtherSkill; i++)
         {
             eWeaponType weaponType = (eWeaponType)(WEAPONTYPE_PISTOL + i);
             index = NUM_WeaponInfosStdSkill + skill * NUM_WeaponInfosOtherSkill + i;
@@ -238,7 +238,7 @@ CGameSA::~CGameSA()
 {
     delete reinterpret_cast<CPlayerInfoSA*>(m_pPlayerInfo);
 
-    for (int i = 0; i < NUM_WeaponInfosTotal; i++)
+    for (auto i = 0; i < NUM_WeaponInfosTotal; i++)
     {
         delete reinterpret_cast<CWeaponInfoSA*>(WeaponInfos[i]);
     }
@@ -515,14 +515,14 @@ void CGameSA::SetBlurLevel(std::uint8_t ucLevel)
     MemPutFast<std::uint8_t>(0x8D5104, ucLevel);            // CPostEffects::m_SpeedFXAlpha
 }
 
-unsigned long CGameSA::GetMinuteDuration()
+std::uint32_t CGameSA::GetMinuteDuration()
 {
-    return *(unsigned long*)0xB7015C;            // CClock::ms_nMillisecondsPerGameMinute
+    return *(std::uint32_t*)0xB7015C;            // CClock::ms_nMillisecondsPerGameMinute
 }
 
-void CGameSA::SetMinuteDuration(unsigned long ulTime)
+void CGameSA::SetMinuteDuration(std::uint32_t ulTime)
 {
-    MemPutFast<unsigned long>(0xB7015C, ulTime);            // CClock::ms_nMillisecondsPerGameMinute
+    MemPutFast<std::uint32_t>(0xB7015C, ulTime);            // CClock::ms_nMillisecondsPerGameMinute
 }
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
@@ -753,7 +753,7 @@ void CGameSA::SuspendASyncLoading(bool bSuspend, uint uiAutoUnsuspendDelay)
     m_bASyncLoadingSuspended = bSuspend;
     // Setup auto unsuspend time if required
     if (uiAutoUnsuspendDelay && bSuspend)
-        m_llASyncLoadingAutoUnsuspendTime = CTickCount::Now() + CTickCount((long long)uiAutoUnsuspendDelay);
+        m_llASyncLoadingAutoUnsuspendTime = CTickCount::Now() + CTickCount((std::int64_t)uiAutoUnsuspendDelay);
     else
         m_llASyncLoadingAutoUnsuspendTime = CTickCount();
 }

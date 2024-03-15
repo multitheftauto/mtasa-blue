@@ -243,19 +243,19 @@ static const SFixedArray<std::uint8_t, 212> ucVehicleTypes = {
     0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 0, 0, 8, 8, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 5, 5, 0,
     0, 8, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 6, 0, 2, 0, 0, 0, 5, 6, 1, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6, 6, 6, 0, 6, 6};
 
-bool CVehicleNames::IsValidModel(unsigned long ulModel)
+bool CVehicleNames::IsValidModel(std::uint32_t ulModel)
 {
     return ulModel >= 400 && ulModel <= 611;
 }
 
-bool CVehicleNames::IsModelTrailer(unsigned long ulModel)
+bool CVehicleNames::IsModelTrailer(std::uint32_t ulModel)
 {
     // IsValidModel excludes trailers, so we need the ability to check separately if it is a trailer
     return (ulModel == 435 || ulModel == 450 || ulModel == 591 || ulModel == 606 || ulModel == 607 || ulModel == 584 || ulModel == 608 || ulModel == 610 ||
             ulModel == 611);
 }
 
-const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
+const char* CVehicleNames::GetVehicleName(std::uint32_t ulModel)
 {
     // Valid?
     if (IsValidModel(ulModel))
@@ -285,7 +285,7 @@ std::uint32_t CVehicleNames::GetVehicleModel(const char* szName)
     return 0;
 }
 
-const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
+const char* CVehicleNames::GetVehicleTypeName(std::uint32_t ulModel)
 {
     // Use parent model ID for non-standard vehicle model IDs.
     if ((ulModel < 400 || ulModel > 611) && CClientVehicleManager::IsValidModel(ulModel))

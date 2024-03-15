@@ -63,7 +63,7 @@ public:
     void SetTagContentf(const char* szFormat, ...);
 
     eXMLClass     GetClassType() { return CXML_NODE; };
-    unsigned long GetID()
+    std::uint32_t GetID()
     {
         dassert((!m_pFile) || m_pFile && m_pFile->IsUsingIDs());
         return m_ulID;
@@ -91,7 +91,7 @@ public:
 private:
     bool StringToLong(const char* szString, long& lValue);
 
-    unsigned long m_ulID;
+    std::uint32_t m_ulID;
     const bool    m_bUsingIDs;
 
     class CXMLFileImpl* m_pFile;

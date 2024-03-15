@@ -269,8 +269,8 @@ public:
     bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
-    long long GetLastFarSyncTick() { return m_llLastFarSyncTick; }
-    void      SetLastFarSyncTick(long long llLastSyncTick) { m_llLastFarSyncTick = llLastSyncTick; }
+    std::int64_t GetLastFarSyncTick() { return m_llLastFarSyncTick; }
+    void      SetLastFarSyncTick(std::int64_t llLastSyncTick) { m_llLastFarSyncTick = llLastSyncTick; }
 
     void                                  ClearNearPlayersList() { m_nearPlayersList.clear(); }
     void                                  AddPlayerToNearList(CPlayer* pPlayer) { m_nearPlayersList.push_back(pPlayer); }
@@ -324,7 +324,7 @@ protected:
     bool m_bSyncable;
     bool m_bCollisionsEnabled;
 
-    long long             m_llLastFarSyncTick = 0;
+    std::int64_t             m_llLastFarSyncTick = 0;
     std::vector<CPlayer*> m_nearPlayersList;
 
 private:

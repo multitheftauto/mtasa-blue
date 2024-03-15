@@ -256,7 +256,7 @@ eURLState CWebCore::GetDomainState(const SString& strURL, bool bOutputDebug)
     static SString wildcardWhitelist[] = {"*.googlevideo.com", "*.google.com",  "*.youtube.com",    "*.ytimg.com",
                                           "*.vimeocdn.com",    "*.gstatic.com", "*.googleapis.com", "*.ggpht.com"};
 
-    for (int i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
+    for (auto i = 0; i < sizeof(wildcardWhitelist) / sizeof(SString); ++i)
     {
         if (WildcardMatch(wildcardWhitelist[i], strURL))
             return eURLState::WEBPAGE_ALLOWED;
@@ -561,7 +561,7 @@ bool CWebCore::UpdateListsFromMaster()
         time_t currentTime;
         time(&currentTime);
 
-        if (lastUpdateTime < SString("%d", (long long)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
+        if (lastUpdateTime < SString("%d", (std::int64_t)currentTime - BROWSER_LIST_UPDATE_INTERVAL))
         {
             OutputDebugLine("Updating white- and blacklist...");
             SHttpRequestOptions options;
@@ -570,7 +570,7 @@ bool CWebCore::UpdateListsFromMaster()
                 ->GetHTTPDownloadManager(EDownloadModeType::WEBBROWSER_LISTS)
                 ->QueueFile(SString("%s?type=getrev", BROWSER_UPDATE_URL), NULL, this, &CWebCore::StaticFetchRevisionFinished, options);
 
-            pLastUpdateNode->SetTagContent(SString("%d", (long long)currentTime));
+            pLastUpdateNode->SetTagContent(SString("%d", (std::int64_t)currentTime));
             m_pXmlConfig->Write();
         }
     }

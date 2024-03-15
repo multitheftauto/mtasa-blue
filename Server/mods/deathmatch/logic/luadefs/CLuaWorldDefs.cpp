@@ -214,7 +214,7 @@ int CLuaWorldDefs::getFPSLimit(lua_State* luaVM)
 
 int CLuaWorldDefs::getMinuteDuration(lua_State* luaVM)
 {
-    unsigned long ulDuration;
+    std::uint32_t ulDuration;
     if (CStaticFunctionDefinitions::GetMinuteDuration(ulDuration))
     {
         lua_pushnumber(luaVM, ulDuration);
@@ -1152,7 +1152,7 @@ int CLuaWorldDefs::setFPSLimit(lua_State* luaVM)
 
 int CLuaWorldDefs::setMinuteDuration(lua_State* luaVM)
 {
-    unsigned long ulDuration;
+    std::uint32_t ulDuration;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(ulDuration);

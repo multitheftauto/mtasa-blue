@@ -184,7 +184,7 @@ const SBindableKey* CKeyBinds::GetBindableFromKey(const char* szKey)
 
     // Init map if required
     if (bindableKeyMap.empty())
-        for (int i = 0; *g_bkKeys[i].szKey != 0; i++)
+        for (auto i = 0; *g_bkKeys[i].szKey != 0; i++)
             MapSet(bindableKeyMap, SStringX(g_bkKeys[i].szKey).ToLower(), &g_bkKeys[i]);
 
     return MapFindRef(bindableKeyMap, SStringX(szKey).ToLower());
@@ -197,7 +197,7 @@ const SBindableGTAControl* CKeyBinds::GetBindableFromControl(const char* szContr
 
     // Init map if required
     if (bindableControlMap.empty())
-        for (int i = 0; *g_bcControls[i].szControl != 0; i++)
+        for (auto i = 0; *g_bcControls[i].szControl != 0; i++)
             MapSet(bindableControlMap, SStringX(g_bcControls[i].szControl).ToLower(), &g_bcControls[i]);
 
     return MapFindRef(bindableControlMap, SStringX(szControl).ToLower());

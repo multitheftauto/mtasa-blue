@@ -217,7 +217,7 @@ void HandleDuplicateLaunching()
                 LPWSTR  szCommandLine = GetCommandLineW();
                 int     numArgs;
                 LPWSTR* aCommandLineArgs = CommandLineToArgvW(szCommandLine, &numArgs);
-                for (int i = 1; i < numArgs; ++i)
+                for (auto i = 1; i < numArgs; ++i)
                 {
                     if (WStringX(aCommandLineArgs[i]).BeginsWith(L"mtasa://"))
                     {
@@ -829,7 +829,7 @@ void CheckDataFiles()
 
     // Make sure important dll's do not exist in the wrong place
     const char* dllCheckList[] = {"xmll.dll", "cgui.dll", "netc.dll", "libcurl.dll", "pthread.dll"};
-    for (int i = 0; i < NUMELMS(dllCheckList); i++)
+    for (auto i = 0; i < NUMELMS(dllCheckList); i++)
     {
         if (FileExists(PathJoin(strGTAPath, dllCheckList[i])))
         {

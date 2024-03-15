@@ -42,7 +42,7 @@ public:
     std::vector<CClientPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
     std::vector<CClientPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
 
-    static bool IsValidModel(unsigned long ulModel);
+    static bool IsValidModel(std::uint32_t ulModel);
 
     void ResetAll();
 

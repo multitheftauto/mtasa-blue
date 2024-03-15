@@ -37,8 +37,8 @@ public:
     CObjectListType::const_iterator IterBegin() const { return m_List.begin(); };
     CObjectListType::const_iterator IterEnd() const { return m_List.end(); };
 
-    static bool IsValidModel(unsigned long ulObjectModel);
-    static bool IsBreakableModel(unsigned long ulObjectModel);
+    static bool IsValidModel(std::uint32_t ulObjectModel);
+    static bool IsBreakableModel(std::uint32_t ulObjectModel);
 
 private:
     void AddToList(CObject* pObject) { m_List.push_back(pObject); };

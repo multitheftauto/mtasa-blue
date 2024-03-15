@@ -51,7 +51,7 @@ private:
     CClientManager* m_pManager;
     CClientPlayer*  m_pPlayer;
 
-    unsigned long m_ulLastUpdateTime;
+    std::uint32_t m_ulLastUpdateTime;
 
     std::uint32_t m_uiPacketsSent;
     std::uint32_t m_uiLastPacketsSent;

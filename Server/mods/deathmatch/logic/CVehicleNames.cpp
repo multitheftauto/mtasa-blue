@@ -234,12 +234,12 @@ static const SFixedArray<SVehicleName, 212> VehicleNames = {{{"Landstalker"},
                                                              {"Farm Trailer"},
                                                              {"Street Clean Trailer"}}};
 
-bool CVehicleNames::IsValidModel(unsigned long ulModel)
+bool CVehicleNames::IsValidModel(std::uint32_t ulModel)
 {
     return ulModel >= 400 && ulModel <= 611;
 }
 
-const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
+const char* CVehicleNames::GetVehicleName(std::uint32_t ulModel)
 {
     // Valid?
     if (IsValidModel(ulModel) && ((ulModel - 400) < NUMELMS(VehicleNames)))
@@ -270,7 +270,7 @@ std::uint32_t CVehicleNames::GetVehicleModel(const char* szName)
     return 0;
 }
 
-const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
+const char* CVehicleNames::GetVehicleTypeName(std::uint32_t ulModel)
 {
     const char* pVehicleName = "";
     switch (CVehicleManager::GetVehicleType(static_cast<std::uint16_t>(ulModel)))

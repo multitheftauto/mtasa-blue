@@ -48,7 +48,7 @@ public:
     void OnZBufferModified();
     void Flush();
     void AddTile(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, CMaterialItem* pMaterial, float fRotation,
-                 float fRotCenOffX, float fRotCenOffY, unsigned long ulColor);
+                 float fRotCenOffX, float fRotCenOffY, std::uint32_t ulColor);
 
     void SetCurrentMaterial(CMaterialItem* pMaterial);
     void OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewportSizeY);

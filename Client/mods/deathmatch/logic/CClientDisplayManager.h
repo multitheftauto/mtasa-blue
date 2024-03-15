@@ -29,7 +29,7 @@ public:
     void DoPulse();
 
     std::uint32_t    Count() { return static_cast<std::uint32_t>(m_List.size()); };
-    CClientDisplay* Get(unsigned long ulID);
+    CClientDisplay* Get(std::uint32_t ulID);
 
     void DrawText2D(const char* szCaption, const CVector& vecPosition, float fScale = 1.0f, RGBA rgbaColor = 0xFFFFFFFF);
 

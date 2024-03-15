@@ -233,7 +233,7 @@ bool CDatabaseConnectionSqlite::QueryInternal(const SString& strQuery, CRegistry
         // Get column names
         pResult->nColumns = sqlite3_column_count(pStmt);
         pResult->ColNames.clear();
-        for (int i = 0; i < pResult->nColumns; i++)
+        for (auto i = 0; i < pResult->nColumns; i++)
         {
             pResult->ColNames.push_back(sqlite3_column_name(pStmt, i));
         }
@@ -246,7 +246,7 @@ bool CDatabaseConnectionSqlite::QueryInternal(const SString& strQuery, CRegistry
         {
             pResult->Data.push_back(std::vector<CRegistryResultCell>(pResult->nColumns));
             std::vector<CRegistryResultCell>& row = pResult->Data.back();
-            for (int i = 0; i < pResult->nColumns; i++)
+            for (auto i = 0; i < pResult->nColumns; i++)
             {
                 CRegistryResultCell& cell = row[i];
                 cell.nType = sqlite3_column_type(pStmt, i);
@@ -422,7 +422,7 @@ SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs
             {
                 double dNumber = pArgument->GetNumber();
                 if (dNumber == floor(dNumber))
-                    strParsedQuery += SString("%lld", (long long)dNumber);
+                    strParsedQuery += SString("%lld", (std::int64_t)dNumber);
                 else
                     strParsedQuery += SString("%f", dNumber);
             }
@@ -485,7 +485,7 @@ SString InsertQueryArgumentsSqlite(const char* szQuery, va_list vl)
 
                 case SQLITE_INTEGER64:
                 {
-                    long long int llValue = va_arg(vl, long long int);
+                    std::int64_t int llValue = va_arg(vl, std::int64_t int);
                     strParsedQuery += SString("%lld", llValue);
                 }
                 break;

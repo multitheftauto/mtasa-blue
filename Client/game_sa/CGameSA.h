@@ -169,7 +169,7 @@ public:
 
     DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
 
-    bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
+    bool IsAtMenu() { return *(std::uint32_t*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
     void         StartGame();
     void         SetSystemState(eSystemState State);
@@ -218,8 +218,8 @@ public:
     bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
     void SetFireballDestructEnabled(bool isEnabled) override;
 
-    unsigned long GetMinuteDuration();
-    void          SetMinuteDuration(unsigned long ulTime);
+    std::uint32_t GetMinuteDuration();
+    void          SetMinuteDuration(std::uint32_t ulTime);
 
     bool IsCheatEnabled(const char* szCheatName);
     bool SetCheatEnabled(const char* szCheatName, bool bEnable);

@@ -129,7 +129,7 @@ int Convert(CConfig* pInput, FILE* pOutput)
     // Write the spawnpoints
     char szBuffer[256];
     int  iCount = pInput->GetNumberOfSpecificEntries("Spawnpoint");
-    for (int i = 0; i < iCount; i++)
+    for (auto i = 0; i < iCount; i++)
     {
         if (pInput->GetEntry("Spawnpoint", szBuffer, i + 1))
         {
@@ -162,7 +162,7 @@ int Convert(CConfig* pInput, FILE* pOutput)
 
     // Write the checkpoints
     iCount = pInput->GetNumberOfSpecificEntries("Checkpoint");
-    for (int i = 0; i < iCount; i++)
+    for (auto i = 0; i < iCount; i++)
     {
         if (pInput->GetEntry("Checkpoint", szBuffer, i + 1))
         {
@@ -206,7 +206,7 @@ int Convert(CConfig* pInput, FILE* pOutput)
 
     // Objects
     iCount = pInput->GetNumberOfSpecificEntries("Object");
-    for (int i = 0; i < iCount; i++)
+    for (auto i = 0; i < iCount; i++)
     {
         if (pInput->GetEntry("Object", szBuffer, i + 1))
         {
@@ -236,7 +236,7 @@ int Convert(CConfig* pInput, FILE* pOutput)
 
     // Vehicle-change pickups
     iCount = pInput->GetNumberOfSpecificEntries("VehicleChange");
-    for (int i = 0; i < iCount; i++)
+    for (auto i = 0; i < iCount; i++)
     {
         if (pInput->GetEntry("VehicleChange", szBuffer, i + 1))
         {
@@ -269,7 +269,7 @@ int Convert(CConfig* pInput, FILE* pOutput)
 
     // Nitro pickups
     iCount = pInput->GetNumberOfSpecificEntries("NitroPickup");
-    for (int i = 0; i < iCount; i++)
+    for (auto i = 0; i < iCount; i++)
     {
         if (pInput->GetEntry("NitroPickup", szBuffer, i + 1))
         {
@@ -300,7 +300,7 @@ int Convert(CConfig* pInput, FILE* pOutput)
 
     // Repair pickups
     iCount = pInput->GetNumberOfSpecificEntries("RepairPickup");
-    for (int i = 0; i < iCount; i++)
+    for (auto i = 0; i < iCount; i++)
     {
         if (pInput->GetEntry("RepairPickup", szBuffer, i + 1))
         {

@@ -38,7 +38,7 @@ public:
     void                    AddStreamReference(bool bScript = false);
     void                    RemoveStreamReference(bool bScript = false);
     std::uint16_t          GetStreamReferences(bool bScript = false);
-    unsigned long           GetTotalStreamReferences() { return m_usStreamReferences + m_usStreamReferencesScript; }
+    std::uint32_t           GetTotalStreamReferences() { return m_usStreamReferences + m_usStreamReferencesScript; }
     void                    StreamOutForABit();
     void                    SetDimension(std::uint16_t usDimension) override;
     float                   GetExpDistance() { return m_fExpDistance; }

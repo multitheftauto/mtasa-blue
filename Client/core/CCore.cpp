@@ -44,7 +44,7 @@ template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
 static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
-static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
+static constexpr std::int64_t TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
@@ -1042,7 +1042,7 @@ void CCore::CreateNetwork()
     m_pNet = CreateModule<CNet>(m_NetModule, "Network", "netc", "InitNetInterface", this);
 
     // Network module compatibility check
-    typedef unsigned long (*PFNCHECKCOMPATIBILITY)(unsigned long, unsigned long*);
+    typedef std::uint32_t (*PFNCHECKCOMPATIBILITY)(std::uint32_t, std::uint32_t*);
     PFNCHECKCOMPATIBILITY pfnCheckCompatibility = static_cast<PFNCHECKCOMPATIBILITY>(m_NetModule.GetFunctionPointer("CheckCompatibility"));
     if (!pfnCheckCompatibility || !pfnCheckCompatibility(MTA_DM_CLIENT_NET_MODULE_VERSION, NULL))
     {
@@ -1340,7 +1340,7 @@ void CCore::DoPostFramePulse()
     m_pConnectManager->DoPulse();
 
     // Update Discord Rich Presence status
-    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    if (const std::int64_t ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
     {
         if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
         {
@@ -2226,7 +2226,7 @@ void CCore::HandleCrashDumpEncryption()
     // Limit number of files in the private folder
     {
         std::vector<SString> privateList = FindFiles(PathJoin(strDumpDirPrivatePath, "*.dmp"), true, false, true);
-        for (int i = 0; i < (int)privateList.size() - iMaxFiles; i++)
+        for (auto i = 0; i < (int)privateList.size() - iMaxFiles; i++)
             FileDelete(PathJoin(strDumpDirPrivatePath, privateList[i]));
     }
 
@@ -2249,7 +2249,7 @@ void CCore::HandleCrashDumpEncryption()
     // Limit number of files in the public folder
     {
         std::vector<SString> publicList = FindFiles(PathJoin(strDumpDirPublicPath, "*.dmp"), true, false, true);
-        for (int i = 0; i < (int)publicList.size() - iMaxFiles; i++)
+        for (auto i = 0; i < (int)publicList.size() - iMaxFiles; i++)
             FileDelete(PathJoin(strDumpDirPublicPath, publicList[i]));
     }
 

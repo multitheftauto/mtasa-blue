@@ -1788,7 +1788,7 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
             switch (eType)
             {
                 case SURFACE_PROPERTY_AUDIO:
-                    for (char cFlag = SURFACE_AUDIO_CONCRETE; cFlag <= SURFACE_AUDIO_METAL; cFlag++)
+                    for (auto cFlag = SURFACE_AUDIO_CONCRETE; cFlag <= SURFACE_AUDIO_METAL; cFlag++)
                     {
                         if (pSurface->getFlagEnabled(1, cFlag))
                         {
@@ -1858,7 +1858,7 @@ int CLuaEngineDefs::EngineGetSurfaceProperties(lua_State* luaVM)
                     lua_pushboolean(luaVM, pSurface->getFlagEnabled(1, 9));
                     return 1;
                 case SURFACE_PROPERTY_WHEELEFFECT:
-                    for (char cFlag = SURFACE_WHEEL_EFFECT_DISABLED; cFlag <= SURFACE_WHEEL_EFFECT_DUST; cFlag++)
+                    for (auto cFlag = SURFACE_WHEEL_EFFECT_DISABLED; cFlag <= SURFACE_WHEEL_EFFECT_DUST; cFlag++)
                     {
                         if (pSurface->getFlagEnabled(1, cFlag))
                         {

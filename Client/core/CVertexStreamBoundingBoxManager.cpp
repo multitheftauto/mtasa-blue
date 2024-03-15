@@ -23,7 +23,7 @@ namespace
         float   fDistSq = 0.f;
 
         // For each axis
-        for (int i = 0; i < 3; i++)
+        for (auto i = 0; i < 3; i++)
         {
             // Project vecOffset on the axis
             float fDot = vecOffset.DotProduct(vecBoxAxes[i]);

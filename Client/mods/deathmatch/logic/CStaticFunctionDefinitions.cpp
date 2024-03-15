@@ -1912,7 +1912,7 @@ bool CStaticFunctionDefinitions::IsPedDoingTask(CClientPed& Ped, const char* szT
     if (pTaskManager)
     {
         CTask* pTask = NULL;
-        for (int i = 0; i < TASK_PRIORITY_MAX; i++)
+        for (auto i = 0; i < TASK_PRIORITY_MAX; i++)
         {
             pTask = pTaskManager->GetTask(i);
             while (pTask)
@@ -1925,7 +1925,7 @@ bool CStaticFunctionDefinitions::IsPedDoingTask(CClientPed& Ped, const char* szT
                 pTask = pTask->GetSubTask();
             }
         }
-        for (int i = 0; i < TASK_SECONDARY_MAX; i++)
+        for (auto i = 0; i < TASK_SECONDARY_MAX; i++)
         {
             pTask = pTaskManager->GetTaskSecondary(i);
             while (pTask)
@@ -2676,7 +2676,7 @@ bool CStaticFunctionDefinitions::GetClothesTypeName(std::uint8_t ucType, SString
     return false;
 }
 
-CClientPed* CStaticFunctionDefinitions::CreatePed(CResource& Resource, unsigned long ulModel, const CVector& vecPosition, float fRotation)
+CClientPed* CStaticFunctionDefinitions::CreatePed(CResource& Resource, std::uint32_t ulModel, const CVector& vecPosition, float fRotation)
 {
     // Valid model?
     if (CClientPlayerManager::IsValidModel(ulModel))
@@ -2716,7 +2716,7 @@ bool CStaticFunctionDefinitions::GetVehicleModelFromName(const char* szName, std
 {
     assert(szName);
 
-    unsigned long ulID = CVehicleNames::GetVehicleModel(szName);
+    std::uint32_t ulID = CVehicleNames::GetVehicleModel(szName);
     if (ulID != 0)
     {
         usID = static_cast<std::uint16_t>(ulID);
@@ -3471,7 +3471,7 @@ bool CStaticFunctionDefinitions::GetVehicleEngineState(CClientVehicle& Vehicle, 
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CClientEntity& Entity, std::uint8_t ucDoor, float fRatio, unsigned long ulTime)
+bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CClientEntity& Entity, std::uint8_t ucDoor, float fRatio, std::uint32_t ulTime)
 {
     if (ucDoor <= 5)
     {
@@ -4021,7 +4021,7 @@ bool CStaticFunctionDefinitions::SetObjectRotation(CClientEntity& Entity, const 
     return false;
 }
 
-bool CStaticFunctionDefinitions::MoveObject(CClientEntity& Entity, unsigned long ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation,
+bool CStaticFunctionDefinitions::MoveObject(CClientEntity& Entity, std::uint32_t ulTime, const CVector& vecPosition, const CVector& vecDeltaRotation,
                                             CEasingCurve::eType a_eEasingType, double a_fEasingPeriod, double a_fEasingAmplitude, double a_fEasingOvershoot)
 {
     RUN_CHILDREN(MoveObject(**iter, ulTime, vecPosition, vecDeltaRotation, a_eEasingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot))
@@ -4368,7 +4368,7 @@ bool CStaticFunctionDefinitions::IsInsideRadarArea(CClientRadarArea* RadarArea, 
 }
 
 CClientPickup* CStaticFunctionDefinitions::CreatePickup(CResource& Resource, const CVector& vecPosition, std::uint8_t ucType, double dFive,
-                                                        unsigned long ulRespawnInterval, double dSix)
+                                                        std::uint32_t ulRespawnInterval, double dSix)
 {
     CClientPickup* pPickup = NULL;
     std::uint16_t usModel = 0;
@@ -6521,7 +6521,7 @@ bool CStaticFunctionDefinitions::GetGameSpeed(float& fSpeed)
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetMinuteDuration(unsigned long& ulDelay)
+bool CStaticFunctionDefinitions::GetMinuteDuration(std::uint32_t& ulDelay)
 {
     ulDelay = g_pGame->GetMinuteDuration();
     return true;
@@ -6817,7 +6817,7 @@ bool CStaticFunctionDefinitions::SetGameSpeed(float fSpeed)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetMinuteDuration(unsigned long ulDelay)
+bool CStaticFunctionDefinitions::SetMinuteDuration(std::uint32_t ulDelay)
 {
     if (ulDelay > 0 && ulDelay <= 4294967296)
     {
@@ -8110,7 +8110,7 @@ float* CStaticFunctionDefinitions::GetSoundFFTData(CClientSound& Sound, int iLen
         // Minus one from bands save us doing it every time iBands is used.
         iBands--;
         // while we are less than iBands
-        for (int x = 0; x <= iBands; x++)
+        for (auto x = 0; x <= iBands; x++)
         {
             // Peak = 0
             float fPeak = 0.0;
@@ -8168,7 +8168,7 @@ float* CStaticFunctionDefinitions::GetSoundFFTData(CClientPlayer& Player, int iL
             // Minus one from bands save us doing it every time iBands is used.
             iBands--;
             // while we are less than iBands
-            for (int x = 0; x <= iBands; x++)
+            for (auto x = 0; x <= iBands; x++)
             {
                 // Peak = 0
                 float fPeak = 0.0;
@@ -8352,7 +8352,7 @@ bool CStaticFunctionDefinitions::GetSoundPan(CClientPlayer& Player, float& fPan)
 }
 
 /** Version functions **/
-unsigned long CStaticFunctionDefinitions::GetVersion()
+std::uint32_t CStaticFunctionDefinitions::GetVersion()
 {
     return MTA_DM_VERSION;
 }
@@ -8374,7 +8374,7 @@ SString CStaticFunctionDefinitions::GetVersionBuildType()
     return strResult;
 }
 
-unsigned long CStaticFunctionDefinitions::GetNetcodeVersion()
+std::uint32_t CStaticFunctionDefinitions::GetNetcodeVersion()
 {
     return MTA_DM_NETCODE_VERSION;
 }

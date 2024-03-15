@@ -68,7 +68,7 @@ private:
     void DeInit();
     void SendFrame(const void* inputBuffer);
 
-    static int PACallback(const void* inputBuffer, void* outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,
+    static int PACallback(const void* inputBuffer, void* outputBuffer, std::uint32_t frameCount, const PaStreamCallbackTimeInfo* timeInfo,
                           PaStreamCallbackFlags statusFlags, void* userData);
 
     bool        m_bEnabled;
@@ -85,7 +85,7 @@ private:
     std::uint32_t m_uiOutgoingWriteIndex;
     bool         m_bIsSendingVoiceData;
 
-    unsigned long m_ulTimeOfLastSend;
+    std::uint32_t m_ulTimeOfLastSend;
 
     std::uint32_t m_uiBufferSizeBytes;
     eSampleRate  convertServerSampleRate(std::uint32_t uiServerSampleRate);

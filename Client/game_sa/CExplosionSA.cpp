@@ -98,12 +98,12 @@ void CExplosionSA::SetSilent(bool bSilent)
     GetInterface()->m_bMakeSound = !bSilent;
 }
 
-unsigned long CExplosionSA::GetActivationTimer()
+std::uint32_t CExplosionSA::GetActivationTimer()
 {
     return GetInterface()->m_ActivationTime;
 }
 
-void CExplosionSA::SetActivationTimer(unsigned long ulActivationTime)
+void CExplosionSA::SetActivationTimer(std::uint32_t ulActivationTime)
 {
     GetInterface()->m_ActivationTime = ulActivationTime;
 }

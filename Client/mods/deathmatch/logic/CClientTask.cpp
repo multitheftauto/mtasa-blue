@@ -18,7 +18,7 @@
 
 using std::list;
 
-unsigned long CClientTask::m_ulLastUniqueIdentifier = 0;
+std::uint32_t CClientTask::m_ulLastUniqueIdentifier = 0;
 
 // Temporary until we start using ids
 #define VERIFY_PLAYER(player) (m_pManager->GetPlayerManager ()->Exists(player)&&!player->IsBeingDeleted())
@@ -70,7 +70,7 @@ bool CClientTask::Read(lua_State* luaVM, int iTableIndex, bool bClear)
     // Grab the identifier
     lua_pushstring(luaVM, "identifier");
     lua_gettable(luaVM, iNewTableIndex);
-    m_ulUniqueIdentifier = static_cast<unsigned long>(lua_tonumber(luaVM, -1));
+    m_ulUniqueIdentifier = static_cast<std::uint32_t>(lua_tonumber(luaVM, -1));
 
     // Grab the parameter table
     lua_pushstring(luaVM, "parameters");
@@ -325,7 +325,7 @@ bool CClientTask::WriteParameters(lua_State* luaVM, int iTableIndex)
     return true;
 }
 
-unsigned long CClientTask::GenerateUniqueIdentifier()
+std::uint32_t CClientTask::GenerateUniqueIdentifier()
 {
     return ++m_ulLastUniqueIdentifier;
 }

@@ -60,7 +60,7 @@ public:
         if (m_bStatusBusy)
             return;
 
-        long long llTickCountNow = GetTickCount64_();
+        std::int64_t llTickCountNow = GetTickCount64_();
 
         // Do announce?
         if (g_pGame->GetConfig()->GetAseInternetListenEnabled())
@@ -189,8 +189,8 @@ protected:
     uint                          m_uiInitialAnnounceRetryAttempts;
     uint                          m_uiInitialAnnounceRetryInterval;
     uint                          m_uiPushInterval;
-    long long                     m_llLastAnnounceTime;
-    long long                     m_llLastPushTime;
+    std::int64_t                     m_llLastAnnounceTime;
+    std::int64_t                     m_llLastPushTime;
     const SMasterServerDefinition m_Definition;
 };
 

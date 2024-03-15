@@ -19,7 +19,7 @@ class CInterpolator
 protected:
     struct VecMap
     {
-        unsigned long m_ulTime;
+        std::uint32_t m_ulTime;
         T             data;
     };
 
@@ -28,7 +28,7 @@ public:
 
     ~CInterpolator() { Clear(); }
 
-    void Push(const T& newData, unsigned long ulTime)
+    void Push(const T& newData, std::uint32_t ulTime)
     {
         std::uint32_t uiIndex = Index(m_uiEndIdx + 1);
         m_nodes[m_uiEndIdx].data = newData;
@@ -50,7 +50,7 @@ public:
         }
     }
 
-    bool Evaluate(unsigned long ulTime, T* output)
+    bool Evaluate(std::uint32_t ulTime, T* output)
     {
         if (Size() == 0)
             return false;
@@ -79,7 +79,7 @@ public:
         return true;
     }
 
-    unsigned long GetOldestEntry(T* output)
+    std::uint32_t GetOldestEntry(T* output)
     {
         if (Size() > 0)
         {
@@ -100,7 +100,7 @@ public:
     }
 
 protected:
-    virtual bool Eval(const VecMap& Left, const VecMap& Right, unsigned long ulTimeEval, T* output)
+    virtual bool Eval(const VecMap& Left, const VecMap& Right, std::uint32_t ulTimeEval, T* output)
     {
         // Check for being the same or maybe wrap around
         if (Left.m_ulTime >= Right.m_ulTime)

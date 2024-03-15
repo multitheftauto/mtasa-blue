@@ -376,7 +376,7 @@ public:
     const char* GetModRoot() { return m_strModRoot; };
 
     void SetGameSpeed(float fSpeed);
-    void SetMinuteDuration(unsigned long ulDelay);
+    void SetMinuteDuration(std::uint32_t ulDelay);
     long GetMoney() { return m_lMoney; }
     void SetMoney(long lMoney, bool bInstant = false);
     void SetWanted(DWORD dwWanted);
@@ -413,7 +413,7 @@ public:
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
 
     void ChangeVehicleWeapon(bool bNext);
-    void NotifyBigPacketProgress(unsigned long ulBytesReceived, unsigned long ulTotalSize);
+    void NotifyBigPacketProgress(std::uint32_t ulBytesReceived, std::uint32_t ulTotalSize);
     bool IsDownloadingBigPacket() const { return m_bReceivingBigPacket; }
     bool IsBeingDeleted() { return m_bBeingDeleted; }
 
@@ -642,9 +642,9 @@ public:
 private:
     eStatus       m_Status;
     eServerType   m_ServerType;
-    unsigned long m_ulTimeStart;
-    unsigned long m_ulVerifyTimeStart;
-    unsigned long m_ulLastClickTick;
+    std::uint32_t m_ulTimeStart;
+    std::uint32_t m_ulVerifyTimeStart;
+    std::uint32_t m_ulLastClickTick;
     CVector2D     m_vecLastCursorPosition;
     bool          m_bWaitingForLocalConnect;
     bool          m_bErrorStartingLocal;
@@ -737,7 +737,7 @@ private:
     ElementID      m_DamagerID;
     std::uint8_t  m_ucDamageWeapon;
     std::uint8_t  m_ucDamageBodyPiece;
-    unsigned long  m_ulDamageTime;
+    std::uint32_t  m_ulDamageTime;
     bool           m_bDamageSent;
 
     eWeaponSlot                            m_lastWeaponSlot;
@@ -762,21 +762,21 @@ private:
     // Birds Enabled
     bool m_bBirdsEnabled;
 
-    unsigned long m_ulMinuteDuration;
+    std::uint32_t m_ulMinuteDuration;
 
     CClientGUIElement* m_pClickedGUIElement;
 
     SString m_strHTTPDownloadURL;
 
     bool          m_bReceivingBigPacket;
-    unsigned long m_ulBigPacketSize;
-    unsigned long m_ulBigPacketBytesReceivedBase;
+    std::uint32_t m_ulBigPacketSize;
+    std::uint32_t m_ulBigPacketBytesReceivedBase;
     CTransferBox* m_pBigPacketTransferBox;
 
     CElapsedTimeHD m_TimeSliceTimer;
     uint           m_uiFrameCount;
 
-    long long m_llLastTransgressionTime;
+    std::int64_t m_llLastTransgressionTime;
     SString   m_strLastDiagnosticStatus;
 
     bool m_bBeingDeleted;            // To enable speedy disconnect
@@ -801,7 +801,7 @@ private:
     CClientPlayer*            m_pShowPlayer;
     std::list<CClientPlayer*> m_Mimics;
     bool                      m_bMimicLag;
-    unsigned long             m_ulLastMimicLag;
+    std::uint32_t             m_ulLastMimicLag;
     CVector                   m_vecLastMimicPos;
     CVector                   m_vecLastMimicMove;
     CVector                   m_vecLastMimicTurn;
@@ -850,7 +850,7 @@ private:
     // Key is the task and value is the CClientPed*
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
     
-    long long m_timeLastDiscordStateUpdate;
+    std::int64_t m_timeLastDiscordStateUpdate;
 };
 
 extern CClientGame* g_pClientGame;

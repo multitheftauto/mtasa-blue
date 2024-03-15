@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 
     strncpy(szLaunchDirectory, argv[0], iLength + 1);
 
-    for (int i = 0; i < iLength; i++)
+    for (auto i = 0; i < iLength; i++)
         if (szLaunchDirectory[i] == '\\')
             szLaunchDirectory[i] = '/';
 
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
     {
         // Grab the entrypoint
         typedef int(Main_t)(int, char*[]);
-        Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>((long long)(Core.GetProcedureAddress("Run")));
+        Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>((std::int64_t)(Core.GetProcedureAddress("Run")));
         if (pfnEntryPoint)
         {
             // Call it and return what it returns

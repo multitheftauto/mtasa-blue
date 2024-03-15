@@ -61,7 +61,7 @@ bool CResourceClientScriptItem::Start()
 
         // Compress the source
         std::uint32_t  originalLength = m_sourceCode.length();
-        unsigned long bufferLength =
+        std::uint32_t bufferLength =
             m_sourceCode.length() + 12 + (std::uint32_t)(m_sourceCode.length() * 0.001f);            // Refer to the compress2() function documentation.
         char* compressedBuffer = new char[bufferLength];
         if (compress2((Bytef*)compressedBuffer, (uLongf*)&bufferLength, (const Bytef*)m_sourceCode.c_str(), m_sourceCode.length(), Z_BEST_COMPRESSION) != Z_OK)

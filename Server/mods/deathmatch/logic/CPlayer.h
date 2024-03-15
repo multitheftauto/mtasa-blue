@@ -45,7 +45,7 @@ struct SViewerInfo
 
     // Used in puresync
     int       iZone;
-    long long llLastUpdateTime;
+    std::int64_t llLastUpdateTime;
 
     bool bInPureSyncSimSendList;
 };
@@ -57,7 +57,7 @@ struct SScreenShotInfo
     bool      bInProgress;
     ushort    usNextPartNumber;
     ushort    usScreenShotId;
-    long long llTimeStamp;
+    std::int64_t llTimeStamp;
     uint      uiTotalBytes;
     ushort    usTotalParts;
     ushort    usResourceNetId;
@@ -304,7 +304,7 @@ public:
     SLightweightSyncData& GetLightweightSyncData() { return m_lightweightSyncData; }
 
     void      SetPosition(const CVector& vecPosition);
-    long long GetPositionLastChanged() { return m_llLastPositionHasChanged; }
+    std::int64_t GetPositionLastChanged() { return m_llLastPositionHasChanged; }
     void      MarkPositionAsChanged() { m_llLastPositionHasChanged = GetTickCount64_(); }
 
     //
@@ -392,7 +392,7 @@ private:
     ElementID     m_PlayerAttackerID;
     std::uint8_t m_ucAttackWeapon;
     std::uint8_t m_ucAttackBodyPart;
-    long long     m_llSetDamageInfoTime;
+    std::int64_t     m_llSetDamageInfoTime;
 
     CTeam* m_pTeam;
     CPad*  m_pPad;
@@ -422,7 +422,7 @@ private:
 
     std::uint8_t m_ucBlurLevel;
 
-    long long m_llNextFarPuresyncTime;
+    std::int64_t m_llNextFarPuresyncTime;
 
     // Voice
     eVoiceState          m_VoiceState;
@@ -450,7 +450,7 @@ private:
     CVector m_vecCamFwd;
     int     m_iLastPuresyncZoneDebug;
 
-    long long m_llLastPositionHasChanged;
+    std::int64_t m_llLastPositionHasChanged;
     SString   m_strIP;
 
     SScreenShotInfo m_ScreenShotInfo;

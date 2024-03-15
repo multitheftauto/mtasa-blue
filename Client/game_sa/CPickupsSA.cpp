@@ -19,13 +19,13 @@ extern CGameSA* pGame;
 
 CPickupsSA::CPickupsSA()
 {
-    for (int i = 0; i < MAX_PICKUPS; i++)
+    for (auto i = 0; i < MAX_PICKUPS; i++)
         Pickups[i] = new CPickupSA((CPickupSAInterface*)(ARRAY_PICKUPS + i * sizeof(CPickupSAInterface)));
 }
 
 CPickupsSA::~CPickupsSA()
 {
-    for (int i = 0; i < MAX_PICKUPS; i++)
+    for (auto i = 0; i < MAX_PICKUPS; i++)
     {
         delete Pickups[i];
     }

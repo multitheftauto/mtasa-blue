@@ -26,18 +26,18 @@ struct SStatData
 
     struct
     {
-        SFixedArray<long long, ZONE_MAX> llSentPacketsByZone;
-        SFixedArray<long long, ZONE_MAX> llSentBytesByZone;
-        SFixedArray<long long, ZONE_MAX> llSkippedPacketsByZone;
-        SFixedArray<long long, ZONE_MAX> llSkippedBytesByZone;
+        SFixedArray<std::int64_t, ZONE_MAX> llSentPacketsByZone;
+        SFixedArray<std::int64_t, ZONE_MAX> llSentBytesByZone;
+        SFixedArray<std::int64_t, ZONE_MAX> llSkippedPacketsByZone;
+        SFixedArray<std::int64_t, ZONE_MAX> llSkippedBytesByZone;
     } puresync;
 
     struct
     {
-        long long llSyncPacketsSkipped;
-        long long llSyncBytesSkipped;
-        long long llLightSyncPacketsSent;
-        long long llLightSyncBytesSent;
+        std::int64_t llSyncPacketsSkipped;
+        std::int64_t llSyncBytesSkipped;
+        std::int64_t llLightSyncPacketsSent;
+        std::int64_t llLightSyncBytesSent;
     } lightsync;
 
     bool bFunctionTimingActive;
@@ -66,9 +66,9 @@ public:
         iNumRows = 0;
     }
 
-    const SString& ColumnName(unsigned long c) const
+    const SString& ColumnName(std::uint32_t c) const
     {
-        unsigned long idx = c;
+        std::uint32_t idx = c;
         if (idx < colNames.size())
             return colNames[idx];
         static SString dummy;
@@ -92,9 +92,9 @@ public:
         return &cellList[cellList.size() - ColumnCount()];
     }
 
-    SString& Data(unsigned long c, unsigned long r)
+    SString& Data(std::uint32_t c, std::uint32_t r)
     {
-        unsigned long idx = c + r * ColumnCount();
+        std::uint32_t idx = c + r * ColumnCount();
         if (idx < cellList.size())
             return cellList[idx];
         static SString cellDummy;

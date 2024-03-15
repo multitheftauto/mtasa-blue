@@ -229,7 +229,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_BADDRIVEBYHITBOX] = false;
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
-    for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
+    for (auto i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
 
     // Setup world special properties
@@ -450,8 +450,8 @@ void CGame::DoPulse()
     UpdateModuleTickCount64();
 
     // Calculate FPS
-    long long llCurrentTime = SharedUtil::GetModuleTickCount64();
-    long long ulDiff = llCurrentTime - m_llLastFPSTime;
+    std::int64_t llCurrentTime = SharedUtil::GetModuleTickCount64();
+    std::int64_t ulDiff = llCurrentTime - m_llLastFPSTime;
 
     // Calculate the server-side fps
     if (ulDiff >= 1000)
@@ -1649,9 +1649,9 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerWeaponFire", "weapon, endX, endY, endZ, hitElement, startX, startY, startZ", NULL, false);
 }
 
-void CGame::ProcessTrafficLights(long long llCurrentTime)
+void CGame::ProcessTrafficLights(std::int64_t llCurrentTime)
 {
-    long long     ulDiff = static_cast<long long>((llCurrentTime - m_llLastTrafficUpdate) * m_fGameSpeed);
+    std::int64_t     ulDiff = static_cast<std::int64_t>((llCurrentTime - m_llLastTrafficUpdate) * m_fGameSpeed);
     std::uint8_t ucNewState = 0xFF;
 
     if (ulDiff >= 1000)
@@ -2148,7 +2148,7 @@ void CGame::RelayPlayerPuresync(CPacket& Packet)
     //
     if (pPlayer->IsTimeForPuresyncFar())
     {
-        long long llTickCountNow = GetModuleTickCount64();
+        std::int64_t llTickCountNow = GetModuleTickCount64();
 
         // Use this players far list
         SViewerMapType& farList = pPlayer->GetFarPlayerList();

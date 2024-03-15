@@ -172,7 +172,7 @@ void CClientWater::RelateDimension(std::uint16_t usWorldDimension)
 bool CClientWater::SetLevel(float fLevel, void* pChangeSource)
 {
     CVector vecVertexPos;
-    for (int i = 0; i < GetNumVertices(); i++)
+    for (auto i = 0; i < GetNumVertices(); i++)
     {
         GetVertexPosition(i, vecVertexPos);
         vecVertexPos.fZ = fLevel;

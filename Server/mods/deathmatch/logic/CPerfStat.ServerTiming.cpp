@@ -37,7 +37,7 @@ public:
     void SetActive(bool bActive);
 
     SString      m_strCategoryName;
-    long long    m_LastTickCount;
+    std::int64_t    m_LastTickCount;
     CStatResults m_StatResults;
     CElapsedTime m_TimeSinceLastViewed;
     bool         m_bIsActive;

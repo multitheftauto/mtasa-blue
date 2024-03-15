@@ -56,7 +56,7 @@ public:
 
     static ASE* GetInstance() { return _instance; }
 
-    unsigned long GetMasterServerQueryCount() { return m_ulMasterServerQueryCount; }
+    std::uint32_t GetMasterServerQueryCount() { return m_ulMasterServerQueryCount; }
     uint          GetTotalQueryCount() { return m_uiNumQueriesTotal; }
     uint          GetQueriesPerMinute() { return m_uiNumQueriesPerMinute; }
 
@@ -87,7 +87,7 @@ private:
     const std::string* QueryXfireLightCached();
     std::string        QueryXfireLight();
 
-    long long m_llCurrentTime;
+    std::int64_t m_llCurrentTime;
     uint      m_uiCurrentPlayerCount;
 
     CMainConfig*    m_pMainConfig;
@@ -110,26 +110,26 @@ private:
 
     // Full query cache
     std::uint32_t m_uiFullLastPlayerCount;
-    long long    m_llFullLastTime;
+    std::int64_t    m_llFullLastTime;
     long         m_lFullMinInterval;
     std::string  m_strFullCached;
 
     // Light query cache
     std::uint32_t m_uiLightLastPlayerCount;
-    long long    m_llLightLastTime;
+    std::int64_t    m_llLightLastTime;
     long         m_lLightMinInterval;
     std::string  m_strLightCached;
 
     // XFire Light query cache
     std::uint32_t m_uiXfireLightLastPlayerCount;
-    long long    m_llXfireLightLastTime;
+    std::int64_t    m_llXfireLightLastTime;
     long         m_lXfireLightMinInterval;
     std::string  m_strXfireLightCached;
 
     std::string m_strMtaAseVersion;
 
     // Stats
-    unsigned long m_ulMasterServerQueryCount;
+    std::uint32_t m_ulMasterServerQueryCount;
     uint          m_uiNumQueriesTotal;
     uint          m_uiNumQueriesPerMinute;
     uint          m_uiTotalAtMinuteStart;

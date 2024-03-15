@@ -213,7 +213,7 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
         return;
 
     // Grab the tick count
-    long long llTickCountNow = GetModuleTickCount64();
+    std::int64_t llTickCountNow = GetModuleTickCount64();
 
     // Apply the data for each ped in the packet
     for (auto& Data : Packet.m_Syncs)

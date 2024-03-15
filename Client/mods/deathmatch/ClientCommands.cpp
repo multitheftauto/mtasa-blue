@@ -24,7 +24,7 @@ using std::vector;
 #include <Utils.h>
 #endif
 
-// Hide the "conversion from 'unsigned long' to 'DWORD*' of greater size" warning
+// Hide the "conversion from 'std::uint32_t' to 'DWORD*' of greater size" warning
 #pragma warning(disable:4312)
 
 extern CClientGame* g_pClientGame;

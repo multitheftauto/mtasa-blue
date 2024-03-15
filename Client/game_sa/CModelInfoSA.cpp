@@ -967,7 +967,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
 
     std::set<std::uint16_t> removedModels;
 
-    for (int i = 0; i < 2 * NUM_StreamSectorRows * NUM_StreamSectorCols; i++)
+    for (auto i = 0; i < 2 * NUM_StreamSectorRows * NUM_StreamSectorCols; i++)
     {
         DWORD* pSectorEntry = ((DWORD**)ARRAY_StreamSectors)[i];
         while (pSectorEntry)
@@ -1006,7 +1006,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
         }
     }
 
-    for (int i = 0; i < NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols; i++)
+    for (auto i = 0; i < NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols; i++)
     {
         DWORD* pSectorEntry = ((DWORD**)ARRAY_StreamRepeatSectors)[3 * i + 2];
         while (pSectorEntry)

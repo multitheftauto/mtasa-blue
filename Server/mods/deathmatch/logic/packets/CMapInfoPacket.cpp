@@ -18,7 +18,7 @@
 #include <net/SyncStructures.h>
 
 CMapInfoPacket::CMapInfoPacket(std::uint8_t ucWeather, std::uint8_t ucWeatherBlendingTo, std::uint8_t ucBlendedWeatherHour, std::uint8_t ucClockHour,
-                               std::uint8_t ucClockMin, unsigned long ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
+                               std::uint8_t ucClockMin, std::uint32_t ulMinuteDuration, bool bShowNametags, bool bShowRadar, float fGravity, float fGameSpeed,
                                float fWaveHeight, const SWorldWaterLevelInfo& worldWaterLevelInfo, bool bHasSkyGradient, const SGarageStates& garageStates,
                                std::uint8_t ucSkyGradientTR, std::uint8_t ucSkyGradientTG, std::uint8_t ucSkyGradientTB, std::uint8_t ucSkyGradientBR,
                                std::uint8_t ucSkyGradientBG, std::uint8_t ucSkyGradientBB, bool bHasHeatHaze, const SHeatHazeSettings& heatHazeSettings,
@@ -272,14 +272,14 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
 
     if (BitStream.Version() >= 0x30)
     {
-        for (int i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
+        for (auto i = WEAPONTYPE_BRASSKNUCKLE; i < WEAPONTYPE_PISTOL; i++)
         {
             bool bEnabled;
             bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);
             BitStream.WriteBit(bEnabled);
         }
     }
-    for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
+    for (auto i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
         sWeaponPropertySync WeaponProperty;
         CWeaponStat*        pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)i);
@@ -309,11 +309,11 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         }
     }
 
-    for (int i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
+    for (auto i = WEAPONTYPE_PISTOL; i <= WEAPONTYPE_TEC9; i++)
     {
         sWeaponPropertySync WeaponProperty;
         BitStream.WriteBit(true);
-        for (int j = 0; j <= 2; j++)
+        for (auto j = 0; j <= 2; j++)
         {
             CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)i, (eWeaponSkill)j);
             WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
@@ -343,7 +343,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     }
     if (BitStream.Version() >= 0x30)
     {
-        for (int i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
+        for (auto i = WEAPONTYPE_CAMERA; i <= WEAPONTYPE_PARACHUTE; i++)
         {
             bool bEnabled;
             bEnabled = g_pGame->GetJetpackWeaponEnabled((eWeaponType)i);

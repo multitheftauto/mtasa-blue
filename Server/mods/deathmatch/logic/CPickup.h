@@ -114,8 +114,8 @@ public:
     void  SetAmount(float fAmount) { m_fAmount = fAmount; }
     bool  IsHealthRandom() { return m_bIsHealthRandom; };
 
-    unsigned long GetRespawnIntervals() { return m_ulRespawnIntervals; };
-    void          SetRespawnIntervals(unsigned long ulRespawnIntervals) { m_ulRespawnIntervals = ulRespawnIntervals; };
+    std::uint32_t GetRespawnIntervals() { return m_ulRespawnIntervals; };
+    void          SetRespawnIntervals(std::uint32_t ulRespawnIntervals) { m_ulRespawnIntervals = ulRespawnIntervals; };
 
     CTickCount GetLastUsedTime() { return m_LastUsedTime; }
     CTickCount GetCreationTime() { return m_CreationTime; }
@@ -159,7 +159,7 @@ private:
     std::uint8_t  m_ucWeaponType;
     std::uint16_t m_usAmmo;
     float          m_fAmount;
-    unsigned long  m_ulRespawnIntervals;
+    std::uint32_t  m_ulRespawnIntervals;
     CTickCount     m_LastUsedTime;
     CTickCount     m_CreationTime;
     std::uint16_t m_usModel;

@@ -43,5 +43,5 @@ private:
 
     CClientVehicleManager*           m_pVehicleManager;
     CMappedList<CDeathmatchVehicle*> m_List;
-    unsigned long                    m_ulLastSyncTime;
+    std::uint32_t                    m_ulLastSyncTime;
 };

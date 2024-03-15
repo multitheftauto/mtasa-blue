@@ -565,7 +565,7 @@ int CLuaWorldDefs::GetGameSpeed(lua_State* luaVM)
 
 int CLuaWorldDefs::GetMinuteDuration(lua_State* luaVM)
 {
-    unsigned long ulDelay;
+    std::uint32_t ulDelay;
     if (CStaticFunctionDefinitions::GetMinuteDuration(ulDelay))
     {
         lua_pushnumber(luaVM, ulDelay);
@@ -2010,8 +2010,8 @@ bool CLuaWorldDefs::ResetColorFilter()
 bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar ucPass0Blue, uchar ucPass0Alpha, uchar ucPass1Red, uchar ucPass1Green,
                                    uchar ucPass1Blue, uchar ucPass1Alpha)
 {
-    unsigned long ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
-    unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
+    std::uint32_t ulColor0 = COLOR_RGBA(ucPass0Red, ucPass0Green, ucPass0Blue, ucPass0Alpha);
+    std::uint32_t ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
     g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
     return true;
 }

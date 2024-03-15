@@ -209,7 +209,7 @@ namespace SharedUtil
     };
     DWORD _GetCurrentProcessorNumber();
     void  GetThreadCPUTimes(uint64& outUserTime, uint64& outKernelTime);
-    void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount = NULL);
+    void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, std::int64_t* pllTickCount = NULL);
 
     SString EscapeString(const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', uchar ucLowerLimit = 0, uchar ucUpperLimit = 255);
     SString UnescapeString(const SString& strText, char cSpecialChar = '#');
@@ -472,14 +472,14 @@ namespace SharedUtil
             {
                 std::uint8_t B, G, R, A;
             };
-            unsigned long ulARGB;
+            std::uint32_t ulARGB;
         };
 
         SColor() : ulARGB(0) {}
 
-        SColor(unsigned long ulValue) { ulARGB = ulValue; }
+        SColor(std::uint32_t ulValue) { ulARGB = ulValue; }
 
-        operator unsigned long() const { return ulARGB; }
+        operator std::uint32_t() const { return ulARGB; }
     };
 
     //
@@ -604,7 +604,7 @@ namespace SharedUtil
     //
     // Note: IDs run from 1 to Capacity
     //
-    template <typename T, unsigned long INITIAL_MAX_STACK_SIZE>
+    template <typename T, std::uint32_t INITIAL_MAX_STACK_SIZE>
     class CStack
     {
     public:
@@ -614,14 +614,14 @@ namespace SharedUtil
             ExpandBy(INITIAL_MAX_STACK_SIZE - 1);
         }
 
-        unsigned long GetCapacity() const { return m_ulCapacity; }
+        std::uint32_t GetCapacity() const { return m_ulCapacity; }
 
-        unsigned long GetUnusedAmount() const { return m_Queue.size(); }
+        std::uint32_t GetUnusedAmount() const { return m_Queue.size(); }
 
-        void ExpandBy(unsigned long ulAmount)
+        void ExpandBy(std::uint32_t ulAmount)
         {
-            const unsigned long ulOldSize = m_ulCapacity;
-            const unsigned long ulNewSize = m_ulCapacity + ulAmount;
+            const std::uint32_t ulOldSize = m_ulCapacity;
+            const std::uint32_t ulNewSize = m_ulCapacity + ulAmount;
 
             // Add ID's for new items
             for (T ID = ulOldSize + 1; ID <= ulNewSize; ++ID)
@@ -654,7 +654,7 @@ namespace SharedUtil
         }
 
     private:
-        unsigned long m_ulCapacity;
+        std::uint32_t m_ulCapacity;
         std::deque<T> m_Queue;
     };
 
@@ -1090,7 +1090,7 @@ namespace SharedUtil
                 return;            // Not in list
 
             // Keep active iterators valid
-            for (int i = m_ActiveIterators.size() - 1; i >= 0; i--)
+            for (auto i = m_ActiveIterators.size() - 1; i >= 0; i--)
                 if (m_ActiveIterators[i]->m_pNode == pNode)
                     m_ActiveIterators[i]->NotifyRemovingNode(pNode);
 
@@ -1514,7 +1514,7 @@ namespace SharedUtil
                 else
                 {
                     const int iTo = atoi(strTo);
-                    for (int i = atoi(strFrom); i <= iTo; i++)
+                    for (auto i = atoi(strFrom); i <= iTo; i++)
                         AddSingle(cType, i);
                 }
             }

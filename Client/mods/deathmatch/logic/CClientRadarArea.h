@@ -61,6 +61,6 @@ protected:
 
     bool          m_bStreamedIn;
     bool          m_bFlashing;
-    unsigned long m_ulFlashCycleStart;
+    std::uint32_t m_ulFlashCycleStart;
     float         m_fAlphaFactor;
 };

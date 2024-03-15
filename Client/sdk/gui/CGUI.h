@@ -59,9 +59,9 @@ public:
 
     virtual void DrawMouseCursor() = 0;
 
-    virtual void ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton) = 0;
-    virtual void ProcessKeyboardInput(unsigned long ulKey, bool bIsDown) = 0;
-    virtual void ProcessCharacter(unsigned long ulCharacter) = 0;
+    virtual void ProcessMouseInput(CGUIMouseInput eMouseInput, std::uint32_t ulX = 0, std::uint32_t ulY = 0, CGUIMouseButton eMouseButton = NoButton) = 0;
+    virtual void ProcessKeyboardInput(std::uint32_t ulKey, bool bIsDown) = 0;
+    virtual void ProcessCharacter(std::uint32_t ulCharacter) = 0;
 
     //
     virtual bool       GetGUIInputEnabled() = 0;

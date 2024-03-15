@@ -22,7 +22,7 @@ public:
                        std::uint16_t usDimension, ElementID Team, std::uint8_t ucTimeContext);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_SPAWN; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

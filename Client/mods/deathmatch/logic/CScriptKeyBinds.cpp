@@ -173,7 +173,7 @@ CScriptKeyBinds::~CScriptKeyBinds()
 
 const SScriptBindableKey* CScriptKeyBinds::GetBindableFromKey(const char* szKey)
 {
-    for (int i = 0; *g_bkKeys[i].szKey != NULL; i++)
+    for (auto i = 0; *g_bkKeys[i].szKey != NULL; i++)
     {
         const SScriptBindableKey* temp = &g_bkKeys[i];
         if (!stricmp(temp->szKey, szKey))
@@ -187,7 +187,7 @@ const SScriptBindableKey* CScriptKeyBinds::GetBindableFromKey(const char* szKey)
 
 const SScriptBindableGTAControl* CScriptKeyBinds::GetBindableFromControl(const char* szControl)
 {
-    for (int i = 0; *g_bcControls[i].szControl != NULL; i++)
+    for (auto i = 0; *g_bcControls[i].szControl != NULL; i++)
     {
         const SScriptBindableGTAControl* temp = &g_bcControls[i];
         if (!stricmp(temp->szControl, szControl))

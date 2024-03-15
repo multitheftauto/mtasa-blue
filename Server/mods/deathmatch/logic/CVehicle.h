@@ -323,8 +323,8 @@ public:
     void           SetRespawnHealth(float fHealth) { m_fRespawnHealth = fHealth; };
     bool           GetRespawnEnabled() { return m_bRespawnEnabled; }
     void           SetRespawnEnabled(bool bEnabled);
-    void           SetBlowRespawnInterval(unsigned long ulTime) { m_ulBlowRespawnInterval = ulTime; }
-    void           SetIdleRespawnInterval(unsigned long ulTime) { m_ulIdleRespawnInterval = ulTime; }
+    void           SetBlowRespawnInterval(std::uint32_t ulTime) { m_ulBlowRespawnInterval = ulTime; }
+    void           SetIdleRespawnInterval(std::uint32_t ulTime) { m_ulIdleRespawnInterval = ulTime; }
 
     void SpawnAt(const CVector& vecPosition, const CVector& vecRotation);
     void Respawn();
@@ -428,8 +428,8 @@ private:
     CVector       m_vecRespawnRotationDegrees;
     float         m_fRespawnHealth;
     bool          m_bRespawnEnabled;
-    unsigned long m_ulBlowRespawnInterval;
-    unsigned long m_ulIdleRespawnInterval;
+    std::uint32_t m_ulBlowRespawnInterval;
+    std::uint32_t m_ulIdleRespawnInterval;
 
     // Vehicle specific data
     float          m_fTurretPositionX;

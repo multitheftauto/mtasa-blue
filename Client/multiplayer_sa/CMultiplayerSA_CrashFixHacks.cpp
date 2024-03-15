@@ -1438,7 +1438,7 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
 
     bool                           bSequenceExistsInHierarchy = false;
     CAnimBlendSequenceSAInterface* pAnimHierSequence = pAnimHierarchy->pSequences;
-    for (int i = 0; i < pAnimHierarchy->usNumSequences; i++)
+    for (auto i = 0; i < pAnimHierarchy->usNumSequences; i++)
     {
         if (pAnimHierSequence == pAnimSequence)
         {
@@ -1913,7 +1913,7 @@ static void _cdecl POST_PROCESS_FxSystemBP_c__Load(CFxSystemBPSAInterface* bluep
     char count = blueprint->cNumOfPrims;
     char last = count - 1;
 
-    for (char i = last; i >= 0; i--)
+    for (auto i = last; i >= 0; i--)
     {
         if (blueprint->pPrims[i]->m_apTextures[0])
             continue;

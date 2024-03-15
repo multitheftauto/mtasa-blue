@@ -811,7 +811,7 @@ int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
             {
                 // Create a new table
                 lua_newtable(luaVM);
-                for (int i = 0; i <= iLength / 2; i++)
+                for (auto i = 0; i <= iLength / 2; i++)
                 {
                     lua_pushnumber(luaVM, i);
                     lua_pushnumber(luaVM, pData[i]);
@@ -822,7 +822,7 @@ int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
             {
                 // Create a new table
                 lua_newtable(luaVM);
-                for (int i = 0; i <= iBands - 1; i++)
+                for (auto i = 0; i <= iBands - 1; i++)
                 {
                     lua_pushnumber(luaVM, i);
                     lua_pushnumber(luaVM, pData[i]);
@@ -884,7 +884,7 @@ int CLuaAudioDefs::GetSoundWaveData(lua_State* luaVM)
         {
             // Create a new table
             lua_newtable(luaVM);
-            for (int i = 0; i < iLength; i++)
+            for (auto i = 0; i < iLength; i++)
             {
                 lua_pushnumber(luaVM, i);
                 lua_pushnumber(luaVM, pData[i]);

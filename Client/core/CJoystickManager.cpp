@@ -557,7 +557,7 @@ void CJoystickManager::DoPulse()
     HWND hWnd = CMessageLoopHook::GetSingleton().GetHookedWindowHandle();
 
     // Turn the button presses into messages
-    for (int i = 0; i < 32; i++)
+    for (auto i = 0; i < 32; i++)
     {
         const BYTE& NowPress = m_JoystickState.rgbButtons[i];
         BYTE&       WasPress = m_JoystickState.rgbButtonsWas[i];
@@ -594,7 +594,7 @@ void CJoystickManager::DoPulse()
                 povButtons[0] = 1;
         }
 
-        for (int i = 0; i < 4; i++)
+        for (auto i = 0; i < 4; i++)
         {
             const BYTE& NowPress = povButtons[i];
             BYTE&       WasPress = m_JoystickState.povButtonsWas[i];
@@ -647,7 +647,7 @@ void CJoystickManager::DoPulse()
     if (m_bCaptureAxis)
     {
         // See if any axes have changed to over 0.75
-        for (int i = 0; i < NUMELMS(m_JoystickState.rgfAxis); i++)
+        for (auto i = 0; i < NUMELMS(m_JoystickState.rgfAxis); i++)
         {
             // Half axis movement (0 to 1)
             if (fabs(m_JoystickState.rgfAxis[i]) > 0.75f)
@@ -686,11 +686,11 @@ void CJoystickManager::DoPulse()
 void CJoystickManager::ReadCurrentState()
 {
     // Clear current state
-    for (int i = 0; i < NUMELMS(m_JoystickState.rgfAxis); i++)
+    for (auto i = 0; i < NUMELMS(m_JoystickState.rgfAxis); i++)
         m_JoystickState.rgfAxis[i] = 0;
-    for (int i = 0; i < 4; i++)
+    for (auto i = 0; i < 4; i++)
         m_JoystickState.rgdwPOV[i] = -1;
-    for (int i = 0; i < 32; i++)
+    for (auto i = 0; i < 32; i++)
         m_JoystickState.rgbButtons[i] = 0;
 
     DIJOYSTATE2 js;            // DInput joystick state
@@ -708,7 +708,7 @@ void CJoystickManager::ReadCurrentState()
             m_iAutoDeadZoneCounter--;
 
         // Read axes
-        for (int a = 0; a < NUMELMS(m_DevInfo.axis) && a < NUMELMS(m_JoystickState.rgfAxis); a++)
+        for (auto a = 0; a < NUMELMS(m_DevInfo.axis) && a < NUMELMS(m_JoystickState.rgfAxis); a++)
         {
             if (m_DevInfo.axis[a].bEnabled)
             {
@@ -802,11 +802,11 @@ void CJoystickManager::ReadCurrentState()
         }
 
         // Read POV
-        for (int i = 0; i < 4; i++)
+        for (auto i = 0; i < 4; i++)
             m_JoystickState.rgdwPOV[i] = js.rgdwPOV[i];
 
         // Read buttons
-        for (int i = 0; i < 32; i++)
+        for (auto i = 0; i < 32; i++)
             m_JoystickState.rgbButtons[i] = js.rgbButtons[i];
 
         if (bOutputStatus)
@@ -1035,7 +1035,7 @@ void CJoystickManager::ApplyAxes(CControllerState& cs, bool bInVehicle)
         return;
 
     // Map each half axis
-    for (int i = 0; i < NUMELMS(m_currentMapping); i++)
+    for (auto i = 0; i < NUMELMS(m_currentMapping); i++)
     {
         const SMappingLine& line = m_currentMapping[i];
 
@@ -1246,7 +1246,7 @@ CXMLNode* CJoystickManager::GetConfigNode(bool bCreateIfRequired)
 
     CXMLNode* pItemNode = NULL;
     // Find existing node
-    for (int i = 0; true; i++)
+    for (auto i = 0; true; i++)
     {
         CXMLNode* pNode = pSectionNode->FindSubNode("product", i);
 
@@ -1327,7 +1327,7 @@ void CJoystickManager::SetDefaults()
     if (m_bUseXInput)
     {
         // If XInput device, then use default XInput mapping
-        for (int i = 0; i < NUMELMS(m_currentMapping); i++)
+        for (auto i = 0; i < NUMELMS(m_currentMapping); i++)
             m_currentMapping[i] = defaultMappingXInput[i];
 
         m_DevInfo.iDeadZone = 20;
@@ -1336,7 +1336,7 @@ void CJoystickManager::SetDefaults()
     else if (m_DevInfo.pDevice && m_DevInfo.iAxisCount == 5 && m_DevInfo.guidProduct == GUID_Xbox360Controller)
     {
         // If GUID matches published 360 controller GUID and device has 5 axes, then use 360 mapping
-        for (int i = 0; i < NUMELMS(m_currentMapping); i++)
+        for (auto i = 0; i < NUMELMS(m_currentMapping); i++)
             m_currentMapping[i] = defaultMapping360[i];
 
         m_DevInfo.iDeadZone = 18;
@@ -1345,7 +1345,7 @@ void CJoystickManager::SetDefaults()
     else
     {
         // Otherwise use generic dual axis mapping
-        for (int i = 0; i < NUMELMS(m_currentMapping); i++)
+        for (auto i = 0; i < NUMELMS(m_currentMapping); i++)
             m_currentMapping[i] = defaultMappingStd[i];
 
         m_DevInfo.iDeadZone = 12;
@@ -1397,7 +1397,7 @@ bool CJoystickManager::LoadFromXML()
     }
 
     // Iterate the binds reading them from the XML tree
-    for (int i = 0; i < NUMELMS(m_currentMapping); i++)
+    for (auto i = 0; i < NUMELMS(m_currentMapping); i++)
     {
         SMappingLine& line = m_currentMapping[i];
 
@@ -1495,7 +1495,7 @@ bool CJoystickManager::SaveToXML()
         }
 
         // Iterate the binds adding them to the XML tree
-        for (int i = 0; i < NUMELMS(m_currentMapping); i++)
+        for (auto i = 0; i < NUMELMS(m_currentMapping); i++)
         {
             const SMappingLine& line = m_currentMapping[i];
 

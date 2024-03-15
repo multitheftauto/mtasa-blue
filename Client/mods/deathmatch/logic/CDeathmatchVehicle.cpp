@@ -124,12 +124,12 @@ bool CDeathmatchVehicle::SyncDamageModel()
 
 void CDeathmatchVehicle::ResetDamageModelSync()
 {
-    for (int i = 0; i < MAX_DOORS; i++)
+    for (auto i = 0; i < MAX_DOORS; i++)
         m_ucLastDoorStates[i] = GetDoorStatus(i);
-    for (int i = 0; i < MAX_WHEELS; i++)
+    for (auto i = 0; i < MAX_WHEELS; i++)
         m_ucLastWheelStates[i] = GetWheelStatus(i);
-    for (int i = 0; i < MAX_PANELS; i++)
+    for (auto i = 0; i < MAX_PANELS; i++)
         m_ucLastPanelStates[i] = GetPanelStatus(i);
-    for (int i = 0; i < MAX_LIGHTS; i++)
+    for (auto i = 0; i < MAX_LIGHTS; i++)
         m_ucLastLightStates[i] = GetLightStatus(i);
 }

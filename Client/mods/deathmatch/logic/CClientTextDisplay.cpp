@@ -82,7 +82,7 @@ void CClientTextDisplay::SetScale(float fScale)
     m_fScale = fScale;
 }
 
-void CClientTextDisplay::SetFormat(unsigned long ulFormat)
+void CClientTextDisplay::SetFormat(std::uint32_t ulFormat)
 {
     m_ulFormat = ulFormat;
 }

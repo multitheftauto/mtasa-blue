@@ -142,7 +142,7 @@ public:
     void         UpdaterYield();
 
     SJobInfo      m_JobInfo;
-    long long     m_llTimeStart;
+    std::int64_t     m_llTimeStart;
     CConditionMap m_ConditionMap;
     SString       m_strServerSaysType;
     SString       m_strServerSaysData;
@@ -162,7 +162,7 @@ public:
     bool                   m_bSentReportLog;
     std::map<SString, int> m_DoneOptionalMap;
 
-    long long m_llTimeLastManualCheck;
+    std::int64_t m_llTimeLastManualCheck;
     SString   m_strLastManualCheckBuildType;
 
     CReportWrap* m_pReportWrap;
@@ -890,7 +890,7 @@ std::vector<SString> CVersionUpdater::MakeServerList(const CDataInfoSet& dataInf
     if (int iSize = dataInfoSet.size())
     {
         // randomize list
-        for (int i = 0; i < iSize * 10; i++)
+        for (auto i = 0; i < iSize * 10; i++)
         {
             int iThis = i % iSize;
             int iOther = (rand() + 1) % iSize;
@@ -898,7 +898,7 @@ std::vector<SString> CVersionUpdater::MakeServerList(const CDataInfoSet& dataInf
         }
 
         // bubble sort based on the priority attribute
-        for (int i = 0; i < iSize - 1; i++)
+        for (auto i = 0; i < iSize - 1; i++)
         {
             SDataInfoItem& a = dataInfoSet[i];
             SDataInfoItem& b = dataInfoSet[i + 1];
@@ -914,7 +914,7 @@ std::vector<SString> CVersionUpdater::MakeServerList(const CDataInfoSet& dataInf
         // If servers have the same priority, keep one and put the other(s) at the back of the list
         CDataInfoSet keepList;
         CDataInfoSet tailList;
-        for (int iFirst = 0; iFirst < iSize; iFirst++)
+        for (auto iFirst = 0; iFirst < iSize; iFirst++)
         {
             // First item in range
             const SDataInfoItem& a = dataInfoSet[iFirst];
@@ -934,7 +934,7 @@ std::vector<SString> CVersionUpdater::MakeServerList(const CDataInfoSet& dataInf
             int iRangeSize = iLast - iFirst + 1;
             int iKeepIdx = rand() % (iRangeSize);
 
-            for (int i = 0; i < iRangeSize; i++)
+            for (auto i = 0; i < iRangeSize; i++)
             {
                 if (i == iKeepIdx)
                     keepList.push_back(dataInfoSet[iFirst + i]);
@@ -2882,7 +2882,7 @@ void CVersionUpdater::_ShouldSendCrashDump()
             return;
 
         // Sort by date
-        for (int i = 0; i < (int)history.size() - 1; i++)
+        for (auto i = 0; i < (int)history.size() - 1; i++)
         {
             SDataInfoItem& a = history[i];
             SDataInfoItem& b = history[i + 1];

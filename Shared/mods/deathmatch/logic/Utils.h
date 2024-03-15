@@ -209,10 +209,10 @@ inline void ConvertDegreesToRadians(CVector& vecRotation)
     vecRotation.fY = ConvertDegreesToRadians(vecRotation.fY);
     vecRotation.fZ = ConvertDegreesToRadians(vecRotation.fZ);
 }
-inline CVector GetExtrapolatedSpeed(const CVector& vecOne, unsigned long ul_time_1, const CVector& vecTwo, unsigned long ul_time_2)
+inline CVector GetExtrapolatedSpeed(const CVector& vecOne, std::uint32_t ul_time_1, const CVector& vecTwo, std::uint32_t ul_time_2)
 {
     CVector       vecSpeed;
-    unsigned long dt = ul_time_2 - ul_time_1;
+    std::uint32_t dt = ul_time_2 - ul_time_1;
     vecSpeed.fX = (vecTwo.fX - vecOne.fX) / dt;
     vecSpeed.fY = (vecTwo.fY - vecOne.fY) / dt;
     vecSpeed.fZ = (vecTwo.fZ - vecOne.fZ) / dt;
@@ -281,7 +281,7 @@ double       GetRandomDouble();
 SString GetDataUnit(std::uint64_t ullInput);
 
 // Utility network functions
-void LongToDottedIP(unsigned long ulIP, char* szDottedIP);
+void LongToDottedIP(std::uint32_t ulIP, char* szDottedIP);
 
 bool BitStreamReadUsString(class NetBitStreamInterface& bitStream, SString& strOut);
 #else
@@ -297,7 +297,7 @@ bool IsNickValid(const char* szNick);
 bool IsNametagValid(const char* szNick);
 
 // Network funcs
-SString LongToDottedIP(unsigned long ulIP);
+SString LongToDottedIP(std::uint32_t ulIP);
 
 inline SString SQLEscape(const SString& strEscapeString, bool bSingleQuotes, bool bDoubleQuotes)
 {
@@ -322,7 +322,7 @@ inline bool IsVisibleCharacter(std::uint8_t c)
 }
 
 std::uint32_t HexToInt(const char* szHex);
-bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
+bool         XMLColorToInt(const char* szColor, std::uint32_t& ulColor);
 bool         XMLColorToInt(const char* szColor, std::uint8_t& ucRed, std::uint8_t& ucGreen, std::uint8_t& ucBlue, std::uint8_t& ucAlpha);
 
 // Maths utility functions

@@ -182,7 +182,7 @@ public:
     virtual CVehicle* GetVehicle() = 0;
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
-    virtual void SetModelIndex(unsigned long ulModel) = 0;
+    virtual void SetModelIndex(std::uint32_t ulModel) = 0;
     virtual void RemoveGeometryRef() = 0;
 
     virtual float    GetHealth() = 0;

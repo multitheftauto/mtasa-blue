@@ -18,8 +18,8 @@
 #define MAX_ANIMATIONS 500
 #define MAX_ANIM_BLOCKS 200
 
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+typedef std::uint32_t AssocGroupId;
+typedef std::uint32_t AnimationId;
 
 class CAnimBlendAssocGroup;
 class CAnimBlendAssocGroupSAInterface;

@@ -295,7 +295,7 @@ void CChat::GetDrawList(SDrawList& outDrawList, bool bUsingOutline)
     float     fLineDifference = CChat::GetFontHeight(m_vecScale.fY);
     CVector2D vecPosition(m_vecBackgroundPosition.fX + (5.0f * m_vecScale.fX), m_vecBackgroundPosition.fY + m_vecBackgroundSize.fY - (fLineDifference * 1.25f));
     float     fMaxLineWidth = m_vecBackgroundSize.fX - (10.0f * m_vecScale.fX);
-    unsigned long ulTime = GetTickCount32();
+    std::uint32_t ulTime = GetTickCount32();
     float         fRcpChatLineFadeOut = 1.0f / m_ulChatLineFadeOut;
     bool          bShadow = (m_Color.A * m_fBackgroundAlpha == 0.f) && !bUsingOutline;
 
@@ -506,7 +506,7 @@ void CChat::Output(const char* szText, bool bColorCoded)
 
 void CChat::Clear()
 {
-    for (int i = 0; i < CHAT_MAX_LINES; i++)
+    for (auto i = 0; i < CHAT_MAX_LINES; i++)
     {
         m_Lines[i].SetActive(false);
     }
@@ -961,7 +961,7 @@ void CChat::UpdatePosition()
 
 void CChat::SetColor(const CColor& Color)
 {
-    unsigned long ulBackgroundColor = COLOR_ARGB(Color.A, Color.R, Color.G, Color.B);
+    std::uint32_t ulBackgroundColor = COLOR_ARGB(Color.A, Color.R, Color.G, Color.B);
 
     m_pBackgroundTexture->LoadFromMemory(&ulBackgroundColor, 1, 1);
     m_pBackground->LoadFromTexture(m_pBackgroundTexture);
@@ -969,7 +969,7 @@ void CChat::SetColor(const CColor& Color)
 
 void CChat::SetInputColor(const CColor& Color)
 {
-    unsigned long ulInputColor = COLOR_ARGB(Color.A, Color.R, Color.G, Color.B);
+    std::uint32_t ulInputColor = COLOR_ARGB(Color.A, Color.R, Color.G, Color.B);
 
     if (m_pInputTexture)
         m_pInputTexture->LoadFromMemory(&ulInputColor, 1, 1);
@@ -1073,7 +1073,7 @@ float CChat::GetTextExtent(const char* szText, float fScale)
     return g_pCore->GetGraphics()->GetDXTextExtent(szText, fScale, g_pChat->m_pDXFont);
 }
 
-void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
+void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, std::uint32_t ulFormat, std::uint32_t ulColor, float fScaleX,
                            float fScaleY, bool bOutline, const CRect2D& RenderBounds)
 {
     if (!g_pChat)
@@ -1176,7 +1176,7 @@ const char* CChatLine::Format(const char* szStringAnsi, float fWidth, CColor& co
             }
             if (bColorCoded && IsColorCode(UTF16ToMbUTF8(szSectionEnd).c_str()))
             {
-                unsigned long ulColor = 0;
+                std::uint32_t ulColor = 0;
                 sscanf(UTF16ToMbUTF8(szSectionEnd).c_str() + 1, "%06x", &ulColor);
                 color = ulColor;
                 fPrevSectionsWidth += fSectionWidth;

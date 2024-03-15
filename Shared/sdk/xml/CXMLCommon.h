@@ -26,5 +26,5 @@ public:
     virtual ~CXMLCommon(){};
 
     virtual eXMLClass     GetClassType() = 0;
-    virtual unsigned long GetID() = 0;
+    virtual std::uint32_t GetID() = 0;
 };

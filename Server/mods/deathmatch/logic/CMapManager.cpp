@@ -440,7 +440,7 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
     m_pServerClock->Get(ucClockHour, ucClockMin);
 
     // Grab minute duration
-    unsigned long ulMinuteDuration = m_pServerClock->GetMinuteDuration();
+    std::uint32_t ulMinuteDuration = m_pServerClock->GetMinuteDuration();
 
     // Nametags and radar enabled
     bool bNametagsEnabled = true;
@@ -670,7 +670,7 @@ void CMapManager::DoPickupRespawning()
             }
         }
 
-        if (!pPickup->IsSpawned() && lastUsedTime != CTickCount(0LL) && currentTime >= (lastUsedTime + CTickCount((long long)pPickup->GetRespawnIntervals())))
+        if (!pPickup->IsSpawned() && lastUsedTime != CTickCount(0LL) && currentTime >= (lastUsedTime + CTickCount((std::int64_t)pPickup->GetRespawnIntervals())))
         {
             // Set it as spawned
             pPickup->SetSpawned(true);

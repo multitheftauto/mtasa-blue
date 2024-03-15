@@ -97,8 +97,8 @@ CGraphics::~CGraphics()
     SAFE_DELETE(m_pAspectRatioConverter);
 }
 
-void CGraphics::DrawString(int uiLeft, int uiTop, int uiRight, int uiBottom, unsigned long ulColor, const char* szText, float fScaleX, float fScaleY,
-                           unsigned long ulFormat, LPD3DXFONT pDXFont, bool bOutline)
+void CGraphics::DrawString(int uiLeft, int uiTop, int uiRight, int uiBottom, std::uint32_t ulColor, const char* szText, float fScaleX, float fScaleY,
+                           std::uint32_t ulFormat, LPD3DXFONT pDXFont, bool bOutline)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -145,7 +145,7 @@ void CGraphics::DrawString(int uiLeft, int uiTop, int uiRight, int uiBottom, uns
     }
 }
 
-void CGraphics::DrawString(int iX, int iY, unsigned long dwColor, float fScale, const char* szText, ...)
+void CGraphics::DrawString(int iX, int iY, std::uint32_t dwColor, float fScale, const char* szText, ...)
 {
     char    szBuffer[1024];
     va_list ap;
@@ -157,7 +157,7 @@ void CGraphics::DrawString(int iX, int iY, unsigned long dwColor, float fScale, 
 }
 
 // Slow
-void CGraphics::DrawStringOutline(const RECT& rect, unsigned long ulColor, const wchar_t* szText, unsigned long ulFormat, LPD3DXFONT pDXFont)
+void CGraphics::DrawStringOutline(const RECT& rect, std::uint32_t ulColor, const wchar_t* szText, std::uint32_t ulFormat, LPD3DXFONT pDXFont)
 {
     const uint   uiKernelSizeX = 5;
     const uint   uiKernelSizeY = 5;
@@ -205,12 +205,12 @@ void CGraphics::DrawStringOutline(const RECT& rect, unsigned long ulColor, const
     }
 }
 
-void CGraphics::DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, unsigned long ulColor, float fWidth)
+void CGraphics::DrawLine3D(const CVector& vecBegin, const CVector& vecEnd, std::uint32_t ulColor, float fWidth)
 {
     DrawLine3DQueued(vecBegin, vecEnd, fWidth, ulColor, true);
 }
 
-void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning)
+void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fHeight, std::uint32_t ulColor, bool bSubPixelPositioning)
 {
     if (!m_RectangleEdgeTexture)
         return;
@@ -267,7 +267,7 @@ void CGraphics::DrawRectangleInternal(float fX, float fY, float fWidth, float fH
     }
 }
 
-void CGraphics::DrawRectangle(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bSubPixelPositioning)
+void CGraphics::DrawRectangle(float fX, float fY, float fWidth, float fHeight, std::uint32_t ulColor, bool bSubPixelPositioning)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -671,7 +671,7 @@ float CGraphics::GetDXTextExtentW(const wchar_t* wszText, float fScale, LPD3DXFO
         size_t       spaceCount = 0;
         const size_t textLength = wcslen(wszText);
 
-        for (int i = textLength - 1; i >= 0; --i)
+        for (auto i = textLength - 1; i >= 0; --i)
         {
             const wchar_t c = wszText[i];
 
@@ -811,7 +811,7 @@ void CGraphics::SetCursorPosition(int iX, int iY, DWORD Flags)
     m_pDevice->SetCursorPosition(iX, iY, Flags);
 }
 
-void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, unsigned long ulColor, bool bPostGUI)
+void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, std::uint32_t ulColor, bool bPostGUI)
 {
     fY1 = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fY1);
     fY2 = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fY2);
@@ -831,7 +831,7 @@ void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI)
+void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, std::uint32_t ulColor, bool bPostGUI)
 {
     if (g_pCore->IsWindowMinimized())
         return;
@@ -843,7 +843,7 @@ void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd,
         m_pLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
 }
 
-void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
+void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, std::uint32_t ulColor, CMaterialItem* pMaterial,
                                          float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV, bool bFlipUV, bool bUseFaceToward,
                                          const CVector& vecFaceToward, bool bPostGUI)
 {
@@ -865,7 +865,7 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
                                                   vecFaceToward);
 }
 
-void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning)
+void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, std::uint32_t ulColor, bool bPostGUI, bool bSubPixelPositioning)
 {
     m_pAspectRatioConverter->ConvertSideForAspectRatio(&fY, &fHeight);
 
@@ -884,7 +884,7 @@ void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, 
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
+void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, std::uint32_t ulColor, std::uint32_t ulColorCenter,
                                  short siSegments, float fRatio, bool bPostGUI)
 {
     // Check if window is minimized so we don't calculate vertices for no reason.
@@ -901,7 +901,7 @@ void CGraphics::DrawCircleQueued(float fX, float fY, float fRadius, float fStart
     pVecVertices->push_back({fX, fY, 0.0f, ulColorCenter});
 
     // And calculate all other vertices
-    for (short siSeg = 0; siSeg <= siSegments; siSeg++)
+    for (auto siSeg = 0; siSeg <= siSegments; siSeg++)
     {
         PrimitiveVertice vert;
         float            curAngle = fStartAngle + siSeg * kfSegmentAngle;
@@ -1051,7 +1051,7 @@ bool CGraphics::IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType)
 }
 
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
-                                  CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI)
+                                  CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, std::uint32_t ulColor, bool bPostGUI)
 {
     m_pAspectRatioConverter->ConvertSideForAspectRatio(&fY, &fHeight);
 
@@ -1097,8 +1097,8 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
     AddQueueItem(Item, bPostGUI);
 }
 
-void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, unsigned long dwColor, const char* szText, float fScaleX, float fScaleY,
-                                 unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning, float fRotation,
+void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fBottom, std::uint32_t dwColor, const char* szText, float fScaleX, float fScaleY,
+                                 std::uint32_t ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bColorCoded, bool bSubPixelPositioning, float fRotation,
                                  float fRotationCenterX, float fRotationCenterY, float fLineHeight)
 {
     if (!szText || !m_pDXSprite)
@@ -1205,7 +1205,7 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
 }
 
 void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SColor& currentColor, const wchar_t* wszText, float fScaleX, float fScaleY,
-                                       unsigned long ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation,
+                                       std::uint32_t ulFormat, ID3DXFont* pDXFont, bool bPostGUI, bool bSubPixelPositioning, float fRotation,
                                        float fRotationCenterX, float fRotationCenterY)
 {
     struct STextSection
@@ -1229,7 +1229,7 @@ void CGraphics::DrawColorCodedTextLine(float fLeft, float fRight, float fY, SCol
         {
             if (IsColorCodeW(wszSectionPos))
             {
-                unsigned long ulColor = 0;
+                std::uint32_t ulColor = 0;
                 swscanf(wszSectionPos + 1, L"%06x", &ulColor);
                 nextColor = ulColor;
                 wszSectionPos += 7;
@@ -1369,7 +1369,7 @@ bool CGraphics::LoadStandardDXFonts()
     }
 
     // Create DirectX font and sprite objects
-    for (int i = 0; i < NUM_FONTS; i++)
+    for (auto i = 0; i < NUM_FONTS; i++)
     {
         m_pDXFonts[i] = m_pBigDXFonts[i] = NULL;
 
@@ -1455,7 +1455,7 @@ bool CGraphics::DestroyStandardDXFonts()
     }
 
     // Release
-    for (int i = 0; i < NUM_FONTS; i++)
+    for (auto i = 0; i < NUM_FONTS; i++)
     {
         SAFE_RELEASE(m_pDXFonts[i]);
         SAFE_RELEASE(m_pBigDXFonts[i]);
@@ -1536,7 +1536,7 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
 
 void CGraphics::OnDeviceInvalidate(IDirect3DDevice9* pDevice)
 {
-    for (int i = 0; i < NUM_FONTS; i++)
+    for (auto i = 0; i < NUM_FONTS; i++)
     {
         if (m_pDXFonts[i])
             m_pDXFonts[i]->OnLostDevice();
@@ -1562,7 +1562,7 @@ void CGraphics::OnDeviceInvalidate(IDirect3DDevice9* pDevice)
 
 void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
 {
-    for (int i = 0; i < NUM_FONTS; i++)
+    for (auto i = 0; i < NUM_FONTS; i++)
     {
         if (m_pDXFonts[i])
             m_pDXFonts[i]->OnResetDevice();
@@ -1805,7 +1805,7 @@ ID3DXFont* CGraphics::MaybeGetBigFont(ID3DXFont* pDXFont, float& fScaleX, float&
 {
     if (fScaleX > 1.1f || fScaleY > 1.1f)
     {
-        for (int i = 0; i < NUM_FONTS; i++)
+        for (auto i = 0; i < NUM_FONTS; i++)
         {
             if (m_pDXFonts[i] == pDXFont)
             {
@@ -2430,7 +2430,7 @@ namespace
         while (iIterations--)
         {
             // Divide each face into 4
-            for (int i = faceList.size() - 1; i >= 0; i--)
+            for (auto i = faceList.size() - 1; i >= 0; i--)
             {
                 // Get the three face points
                 CVector a = faceList[i].a;
@@ -2473,7 +2473,7 @@ namespace
                 return AddLine(to, from);
 
             // Find existing line
-            for (int i = 0; i < (int)vertexList.size() - 1; i += 2)
+            for (auto i = 0; i < (int)vertexList.size() - 1; i += 2)
                 if ((from - vertexList[i]).LengthSquared() < 0.00001f)
                     if ((to - vertexList[i + 1]).LengthSquared() < 0.00001f)
                         return;            // Duplicated

@@ -40,7 +40,7 @@ CVoiceRecorder::~CVoiceRecorder()
 }
 
 // TODO: Replace this with BASS
-int CVoiceRecorder::PACallback(const void* inputBuffer, void* outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,
+int CVoiceRecorder::PACallback(const void* inputBuffer, void* outputBuffer, std::uint32_t frameCount, const PaStreamCallbackTimeInfo* timeInfo,
                                PaStreamCallbackFlags statusFlags, void* userData)
 {
     // This assumes that PACallback will only be called when userData is a valid CVoiceRecorder pointer

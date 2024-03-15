@@ -37,7 +37,7 @@ enum eKeyData
 struct SBindableKey
 {
     const char    szKey[20];
-    unsigned long ulCode;
+    std::uint32_t ulCode;
     int           iGTARelative;
     eKeyData      data;
     std::uint8_t ucNumpadRelative;

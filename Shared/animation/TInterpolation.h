@@ -37,7 +37,7 @@ public:
         m_easingCurve.SetParams(a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot);
     }
 
-    void SetDuration(unsigned long a_ulDuration)
+    void SetDuration(std::uint32_t a_ulDuration)
     {
         std::uint64_t ullNow = _GetTime();
         m_ullStartTime = ullNow;
@@ -45,7 +45,7 @@ public:
         m_ulDuration = a_ulDuration;
     }
 
-    void SetDuration(unsigned long a_ulElapsedTime, unsigned long a_ulTimeLeft)
+    void SetDuration(std::uint32_t a_ulElapsedTime, std::uint32_t a_ulTimeLeft)
     {
         std::uint64_t ullNow = _GetTime();
         m_ullStartTime = ullNow - a_ulElapsedTime;
@@ -136,5 +136,5 @@ protected:
 
     std::uint64_t m_ullStartTime;
     std::uint64_t m_ullEndTime;
-    unsigned long      m_ulDuration;
+    std::uint32_t      m_ulDuration;
 };

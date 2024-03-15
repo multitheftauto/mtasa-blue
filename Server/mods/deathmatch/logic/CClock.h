@@ -19,10 +19,10 @@ public:
     void Get(std::uint8_t& ucHour, std::uint8_t& ucMinute);
     void Set(std::uint8_t ucHour, std::uint8_t ucMinute);
 
-    void          SetMinuteDuration(unsigned long ulDuration);
-    unsigned long GetMinuteDuration();
+    void          SetMinuteDuration(std::uint32_t ulDuration);
+    std::uint32_t GetMinuteDuration();
 
 private:
     std::uint64_t m_ullMidnightTime;
-    unsigned long      m_ulMinuteDuration;
+    std::uint32_t      m_ulMinuteDuration;
 };

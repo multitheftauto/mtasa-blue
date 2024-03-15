@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CConnectHistory.h"
 
-CConnectHistory::CConnectHistory(unsigned long ulMaxConnections, unsigned long ulSamplePeriod, unsigned long ulBanLength)
+CConnectHistory::CConnectHistory(std::uint32_t ulMaxConnections, std::uint32_t ulSamplePeriod, std::uint32_t ulBanLength)
 {
     m_ulMaxConnections = ulMaxConnections;
     m_ulSamplePeriod = ulSamplePeriod;
@@ -94,7 +94,7 @@ CConnectHistoryItem& CConnectHistory::GetHistoryItem(const std::string& strIP)
 
 void CConnectHistory::RemoveExpired()
 {
-    long long llCurrentTime = GetModuleTickCount64();
+    std::int64_t llCurrentTime = GetModuleTickCount64();
 
     if (llCurrentTime - m_llTimeLastRemoveExpired < 1000LL)
         return;
@@ -118,7 +118,7 @@ void CConnectHistory::RemoveExpired()
         JoinTimesMap ::iterator timesIt = historyItem.joinTimes.begin();
         for (; timesIt < historyItem.joinTimes.end(); ++timesIt)
         {
-            if (*timesIt > llCurrentTime - (long long)m_ulSamplePeriod)
+            if (*timesIt > llCurrentTime - (std::int64_t)m_ulSamplePeriod)
                 break;
         }
 
@@ -151,21 +151,21 @@ uint CConnectHistory::GetTotalFloodingCount()
 }
 
 // Internal function for debugging
-long long CConnectHistory::GetModuleTickCount64()
+std::int64_t CConnectHistory::GetModuleTickCount64()
 {
-    long long llValue = ::GetModuleTickCount64();
+    std::int64_t llValue = ::GetModuleTickCount64();
     llValue += m_llDebugTickCountOffset;
     return llValue;
 }
 
-SString CConnectHistory::DebugDump(long long llTickCountAdd)
+SString CConnectHistory::DebugDump(std::int64_t llTickCountAdd)
 {
     m_llDebugTickCountOffset += llTickCountAdd;
 
     // Dump info
     std::stringstream strOutput;
 
-    long long llCurrentTime = GetModuleTickCount64();
+    std::int64_t llCurrentTime = GetModuleTickCount64();
     strOutput << SString("CurrentTime: 0x%llx\n", llCurrentTime);
     strOutput << SString("TimeLastRemoveExpired: 0x%llx\n", m_llTimeLastRemoveExpired);
     strOutput << SString("HistoryItems: %d\n", m_HistoryItemMap.size());
@@ -182,8 +182,8 @@ SString CConnectHistory::DebugDump(long long llTickCountAdd)
             SString strInfo("IP:%s  ", strIP.c_str());
             for (std::uint32_t i = 0; i < historyItem.joinTimes.size(); i++)
             {
-                long long llTime = historyItem.joinTimes[i];
-                long long llAge = llCurrentTime - historyItem.joinTimes[i];
+                std::int64_t llTime = historyItem.joinTimes[i];
+                std::int64_t llAge = llCurrentTime - historyItem.joinTimes[i];
                 strInfo += SString("%lld(0x%llx)  ", llAge, llTime);
             }
             strInfo += "\n";

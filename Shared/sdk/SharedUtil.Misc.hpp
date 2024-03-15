@@ -1427,7 +1427,7 @@ bool SharedUtil::IsColorCode(const char* szColorCode)
         return false;
 
     bool bValid = true;
-    for (int i = 0; i < 6; i++)
+    for (auto i = 0; i < 6; i++)
     {
         char c = szColorCode[1 + i];
         if (!isdigit((std::uint8_t)c) && (c < 'A' || c > 'F') && (c < 'a' || c > 'f'))
@@ -1836,7 +1836,7 @@ namespace SharedUtil
         return _GetCurrentProcessorNumberXP();
 #elif defined(__APPLE__)
         // Hacked from https://stackoverflow.com/a/40398183/1517394
-        unsigned long cpu;
+        std::uint32_t cpu;
 
         uint32_t CPUInfo[4];
         __cpuid_count(1, 0, CPUInfo[0], CPUInfo[1], CPUInfo[2], CPUInfo[3]);
@@ -1896,7 +1896,7 @@ namespace SharedUtil
     // Updates struct with datum
     //
     ///////////////////////////////////////////////////////////////////////////
-    void UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount)
+    void UpdateThreadCPUTimes(SThreadCPUTimesStore& store, std::int64_t* pllTickCount)
     {
         // Use supplied tick count if present
         uint64 ullCPUMeasureTimeMs;

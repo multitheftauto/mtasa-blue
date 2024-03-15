@@ -506,7 +506,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             // Table reference (self-referencing tables)
             case LUA_TTABLEREF:
             {
-                unsigned long ulTableRef;
+                std::uint32_t ulTableRef;
                 if (bitStream.ReadCompressed(ulTableRef))
                 {
                     if (pKnownTables && ulTableRef < pKnownTables->size())
@@ -588,7 +588,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
 }
 
 // Can't use bitStream.Version() here as it is sometimes not set
-bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const
+bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) const
 {
     SLuaTypeSync type;
 
@@ -781,7 +781,7 @@ void CLuaArgument::DeleteTableData()
     }
 }
 
-json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables)
 {
     switch (GetType())
     {
@@ -844,7 +844,7 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
         case LUA_TLIGHTUSERDATA:
         {
             CClientEntity* pElement = GetElement();
-            CResource*     pResource = g_pClientGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(GetUserData()));
+            CResource*     pResource = g_pClientGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<std::uint32_t>(GetUserData()));
 
             // Elements are dynamic, so storing them is potentially unsafe
             if (pElement && bSerialize)
@@ -1046,7 +1046,7 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                         }
                         case 'T':            // Table reference
                         {
-                            unsigned long ulTableID = static_cast<unsigned long>(atol(strString.c_str() + 3));
+                            std::uint32_t ulTableID = static_cast<std::uint32_t>(atol(strString.c_str() + 3));
                             if (pKnownTables && ulTableID < pKnownTables->size())
                             {
                                 m_pTableData = pKnownTables->at(ulTableID);

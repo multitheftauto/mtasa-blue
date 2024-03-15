@@ -28,7 +28,7 @@ extern "C"
 class CChecksum
 {
 public:
-    unsigned long ulCRC;
+    std::uint32_t ulCRC;
     std::uint8_t mD5[16];
 };
 #endif
@@ -52,10 +52,10 @@ public:
 class ILuaModuleManager10 : public ILuaModuleManager
 {
 public:
-    virtual unsigned long GetVersion() = 0;
+    virtual std::uint32_t GetVersion() = 0;
     virtual const char*   GetVersionString() = 0;
     virtual const char*   GetVersionName() = 0;
-    virtual unsigned long GetNetcodeVersion() = 0;
+    virtual std::uint32_t GetNetcodeVersion() = 0;
     virtual const char*   GetOperatingSystemName() = 0;
 
     virtual lua_State* GetResourceFromName(const char* szResourceName) = 0;

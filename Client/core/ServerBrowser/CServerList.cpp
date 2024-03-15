@@ -61,7 +61,7 @@ void CServerList::Pulse()
     else if (iVar == 2)
         iQueriesPerSecond = 50;
 
-    long long llTickCount = GetTickCount64_();
+    std::int64_t llTickCount = GetTickCount64_();
     // Ensure m_llLastTickCount is initialized
     m_llLastTickCount = m_llLastTickCount ? m_llLastTickCount : llTickCount;
     // Ensure m_llLastTickCount is in range
@@ -230,7 +230,7 @@ void CServerList::SortByASEVersion()
 
 void CServerListInternet::Pulse()
 {            // We also need to take care of the master server list here
-    unsigned long ulTime = m_ElapsedTime.Get();
+    std::uint32_t ulTime = m_ElapsedTime.Get();
 
     if (m_iPass == 1)
     {

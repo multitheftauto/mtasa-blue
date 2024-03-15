@@ -20,11 +20,11 @@
 #endif
 
 static CCriticalSection ms_criticalSection;
-static long long        ms_llTickCountAdd = 0;
-unsigned long           GetTickCountInternal();
+static std::int64_t        ms_llTickCountAdd = 0;
+std::uint32_t           GetTickCountInternal();
 
 // Debugging
-void SharedUtil::AddTickCount(long long llTickCountAdd)
+void SharedUtil::AddTickCount(std::int64_t llTickCountAdd)
 {
     ms_criticalSection.Lock();
     ms_llTickCountAdd = llTickCountAdd;
@@ -48,11 +48,11 @@ uint SharedUtil::GetTickCount32()
 // an __int64 and will effectively never wrap. This is an emulated version for XP and down.
 // Note: Wrap around issue is only defeated if the gap between calls is less than 24 days.
 //
-long long SharedUtil::GetTickCount64_()
+std::int64_t SharedUtil::GetTickCount64_()
 {
     ms_criticalSection.Lock();
 
-    static long long llCurrent = (GetTickCountInternal() % 300000 + 200000);
+    static std::int64_t llCurrent = (GetTickCountInternal() % 300000 + 200000);
     static uint      uiWas = GetTickCountInternal();
     uint             uiNow = GetTickCountInternal();
     uint             uiDelta = uiNow - uiWas;
@@ -73,7 +73,7 @@ long long SharedUtil::GetTickCount64_()
     llCurrent += ms_llTickCountAdd;
     ms_llTickCountAdd = 0;
 
-    long long llResult = llCurrent;
+    std::int64_t llResult = llCurrent;
     ms_criticalSection.Unlock();
     return llResult;
 }
@@ -198,7 +198,7 @@ namespace SharedUtil
             m_ResultValue.Initialize(GetTickCount64_());
         }
 
-        long long Get()
+        std::int64_t Get()
         {
     #ifdef MTA_DEBUG
             if (m_TimeSinceUpdated.Get() > 10000)
@@ -219,7 +219,7 @@ namespace SharedUtil
         }
 
     protected:
-        CThreadResultValue<long long> m_ResultValue;
+        CThreadResultValue<std::int64_t> m_ResultValue;
     #ifdef MTA_DEBUG
         CElapsedTime m_TimeSinceUpdated;
     #endif
@@ -228,7 +228,7 @@ namespace SharedUtil
     CPerModuleTickCount ms_PerModuleTickCount;
 }            // namespace SharedUtil
 
-long long SharedUtil::GetModuleTickCount64()
+std::int64_t SharedUtil::GetModuleTickCount64()
 {
     return ms_PerModuleTickCount.Get();
 }
@@ -250,7 +250,7 @@ void SharedUtil::UpdateModuleTickCount64()
 
 // Apple / Darwin platforms with Mach monotonic clock support
 #include <mach/mach_time.h>
-unsigned long GetTickCountInternal()
+std::uint32_t GetTickCountInternal()
 {
     mach_timebase_info_data_t info;
 
@@ -268,7 +268,7 @@ unsigned long GetTickCountInternal()
 #elif !defined(WIN32)
 
 // BSD / Linux platforms with POSIX monotonic clock support
-unsigned long GetTickCountInternal()
+std::uint32_t GetTickCountInternal()
 {
     #if !defined(CLOCK_MONOTONIC)
     #error "This platform does not have monotonic clock support."
@@ -300,7 +300,7 @@ unsigned long GetTickCountInternal()
     // and thus not guaranteed to be monotonic. Ideally, this function should throw a fatal error
     // or assertion instead of using a fallback method.
 
-    long long llMilliseconds = ((long long)now.tv_sec) * 1000 + now.tv_usec / 1000;
+    std::int64_t llMilliseconds = ((std::int64_t)now.tv_sec) * 1000 + now.tv_usec / 1000;
     return llMilliseconds;
 }
 
@@ -309,7 +309,7 @@ unsigned long GetTickCountInternal()
 // Win32 platforms
 #include <Mmsystem.h>
 #pragma comment(lib, "Winmm.lib")
-unsigned long GetTickCountInternal()
+std::uint32_t GetTickCountInternal()
 {
     // Uses timeGetTime() as Win32 GetTickCount() has a resolution of 16ms.
     //   (timeGetTime() has a resolution is 1ms assuming timeBeginPeriod(1) has been called at startup).
@@ -342,7 +342,7 @@ TIMEUS SharedUtil::GetTimeUs()
 #else
 #include <sys/time.h>                // for gettimeofday()
 using namespace std;
-typedef long long LONGLONG;
+typedef std::int64_t LONGLONG;
 
 TIMEUS SharedUtil::GetTimeUs()
 {

@@ -130,7 +130,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
                 SGraphStatLine* pLine = &iter->second;
 
                 float Data = pLine->dataHistory[pLine->iDataPos];
-                for (int i = 0; i < Dups; i++)
+                for (auto i = 0; i < Dups; i++)
                 {
                     pLine->iDataPos++;
                     if (pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE - 1)
@@ -221,7 +221,7 @@ void CGraphStats::Draw()
         int                   iDataPos = line.iDataPos;
         int                   iDataPosPrev = iDataPos;
 
-        for (int i = uiSizeX - 1; i > 0; i--)
+        for (auto i = uiSizeX - 1; i > 0; i--)
         {
             float fY0 = line.dataHistory[iDataPos] * fLineScale;
             float fY1 = line.dataHistory[iDataPosPrev] * fLineScale;

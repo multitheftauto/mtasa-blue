@@ -18,14 +18,14 @@ extern CGameSA* pGame;
 
 CFireManagerSA::CFireManagerSA()
 {
-    for (int i = 0; i < MAX_FIRES; i++)
+    for (auto i = 0; i < MAX_FIRES; i++)
         Fires[i] = new CFireSA(
             (CFireSAInterface*)(CLASS_CFireManager + 40 * i));            // + 4 because thats the position of CFire array in CFireManager (see source)
 }
 
 CFireManagerSA::~CFireManagerSA()
 {
-    for (int i = 0; i < MAX_FIRES; i++)
+    for (auto i = 0; i < MAX_FIRES; i++)
     {
         delete Fires[i];
     }
@@ -84,7 +84,7 @@ CFire* CFireManagerSA::StartFire(CVector& vecPosition, float fSize = DEFAULT_FIR
 void CFireManagerSA::ExtinguishAllFires()
 {
     CFireSA* fire;
-    for (int i = 0; i < MAX_FIRES; i++)
+    for (auto i = 0; i < MAX_FIRES; i++)
     {
         fire = (CFireSA*)GetFire(i);
         if (fire && fire->IsIgnited())
@@ -108,7 +108,7 @@ DWORD CFireManagerSA::GetFireCount()
 CFire* CFireManagerSA::FindFreeFire()
 {
     CFireSA* fire;
-    for (int i = 0; i < MAX_FIRES; i++)
+    for (auto i = 0; i < MAX_FIRES; i++)
     {
         fire = (CFireSA*)GetFire(i);
         if (fire && !fire->IsIgnited())

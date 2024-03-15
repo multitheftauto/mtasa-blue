@@ -26,7 +26,7 @@ static SString ms_strScreenDirectoryPath;
 
 // Last save time, seperated per given type
 // (normal screenshot or camera weapon initiated)
-static long long ms_lLastSaveTime[2] = {0, 0};
+static std::int64_t ms_lLastSaveTime[2] = {0, 0};
 
 // Variables which are also used in save thread
 static CBuffer ms_ScreenShotBuffer;
@@ -130,7 +130,7 @@ DWORD CScreenShot::ThreadProc(LPVOID lpdwThreadParam)
 
     // Copy the surface data into a row-based buffer for libpng
     #define BYTESPERPIXEL 4
-    unsigned long ulLineWidth = ms_uiWidth * 4;
+    std::uint32_t ulLineWidth = ms_uiWidth * 4;
     for (std::uint32_t i = 0; i < ms_uiHeight; i++)
     {
         memcpy(ppScreenData[i], (BYTE*)pData + i * uiLinePitch, ulLineWidth);

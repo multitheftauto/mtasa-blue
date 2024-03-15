@@ -155,7 +155,7 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
     }
 }
 
-void CDamageManagerSA::SetPanelStatus(unsigned long ulStatus)
+void CDamageManagerSA::SetPanelStatus(std::uint32_t ulStatus)
 {
     std::uint32_t uiIndex;
 
@@ -188,7 +188,7 @@ BYTE CDamageManagerSA::GetPanelStatus(BYTE bPanel)
     return 0;
 }
 
-unsigned long CDamageManagerSA::GetPanelStatus()
+std::uint32_t CDamageManagerSA::GetPanelStatus()
 {
     return internalInterface->Panels;
 }
@@ -210,7 +210,7 @@ void CDamageManagerSA::SetLightStatus(BYTE bLight, BYTE bLightStatus)
 
 void CDamageManagerSA::SetLightStatus(std::uint8_t ucStatus)
 {
-    internalInterface->Lights = static_cast<unsigned long>(ucStatus);
+    internalInterface->Lights = static_cast<std::uint32_t>(ucStatus);
 }
 
 BYTE CDamageManagerSA::GetLightStatus(BYTE bLight)

@@ -35,18 +35,18 @@ void CClock::Get(std::uint8_t& ucHour, std::uint8_t& ucMinute)
 void CClock::Set(std::uint8_t ucHour, std::uint8_t ucMinute)
 {
     // Calculate number of seconds from midnight
-    unsigned long ulSecondsFromMidnight = ucHour * 60 + ucMinute;
+    std::uint32_t ulSecondsFromMidnight = ucHour * 60 + ucMinute;
 
     // Set the midnight time to our current time minus number of seconds since midnight according to the time we were given
     m_ullMidnightTime = GetTickCount64_() - ulSecondsFromMidnight * m_ulMinuteDuration;
 }
 
-unsigned long CClock::GetMinuteDuration()
+std::uint32_t CClock::GetMinuteDuration()
 {
     return m_ulMinuteDuration;
 }
 
-void CClock::SetMinuteDuration(unsigned long ulDuration)
+void CClock::SetMinuteDuration(std::uint32_t ulDuration)
 {
     // We gotta reset the time with the new minute duration
     // so getTime returns the right values

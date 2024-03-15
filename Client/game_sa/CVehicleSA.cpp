@@ -137,7 +137,7 @@ void CVehicleSA::Init()
     LockDoors(false);
 
     // Reset the car countss to 0 so that this vehicle doesn't affect the population vehicles
-    for (int i = 0; i < 5; i++)
+    for (auto i = 0; i < 5; i++)
     {
         MemPutFast<DWORD>(VARS_CarCounts + i * sizeof(DWORD), 0);
     }
@@ -1044,7 +1044,7 @@ CDamageManager* CVehicleSA::GetDamageManager()
     return m_pDamageManager;
 }
 
-void CVehicleSA::BlowUp(CEntity* pCreator, unsigned long ulUnknown)
+void CVehicleSA::BlowUp(CEntity* pCreator, std::uint32_t ulUnknown)
 {
     CVehicleSAInterfaceVTBL* vehicleVTBL = (CVehicleSAInterfaceVTBL*)(GetInterface()->vtbl);
     DWORD                    dwThis = (DWORD)m_pInterface;

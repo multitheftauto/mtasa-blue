@@ -397,5 +397,5 @@ private:
     std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
     const char*                        m_szCommandLineArgs;             // Everything that comes after the options
 
-    long long m_timeDiscordAppLastUpdate;
+    std::int64_t m_timeDiscordAppLastUpdate;
 };

@@ -199,7 +199,7 @@ CDatabaseConnection* CDatabaseTypeMySql::CallNewDatabaseConnectionMySql(CDatabas
         SString strServerPath = g_pServerInterface->GetModManager()->GetServerPath();
         m_DbconmyLib.Load(PathJoin(strServerPath, SERVER_BIN_PATH_MOD, LIB_DBCONMY));
         m_pfnNewDatabaseConnection =
-            reinterpret_cast<NewDatabaseConnectionMySql_t*>((long long)(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql")));
+            reinterpret_cast<NewDatabaseConnectionMySql_t*>((std::int64_t)(m_DbconmyLib.GetProcedureAddress("NewDatabaseConnectionMySql")));
     }
 
     if (!m_pfnNewDatabaseConnection)
@@ -312,7 +312,7 @@ SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs)
             {
                 double dNumber = pArgument->GetNumber();
                 if (dNumber == floor(dNumber))
-                    strParsedQuery += SString("%lld", (long long)dNumber);
+                    strParsedQuery += SString("%lld", (std::int64_t)dNumber);
                 else
                     strParsedQuery += SString("%f", dNumber);
             }
@@ -375,7 +375,7 @@ SString InsertQueryArgumentsMySql(const char* szQuery, va_list vl)
 
                 case SQLITE_INTEGER64:
                 {
-                    long long int llValue = va_arg(vl, long long int);
+                    std::int64_t int llValue = va_arg(vl, std::int64_t int);
                     strParsedQuery += SString("%lld", llValue);
                 }
                 break;

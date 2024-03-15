@@ -96,7 +96,7 @@ int CTaskSimpleIKManagerSA::AddIKChainTask(CTaskSimpleIKChain* pIKChainTask, int
         pInterface->m_pIKChainTasks[slotID] = (CTaskSimpleIKChainSAInterface*)(pIKChainTask->GetInterface());
         return slotID;
     }
-    for (int i = 0; i < slotID; i++)
+    for (auto i = 0; i < slotID; i++)
     {
         if (!pInterface->m_pIKChainTasks[i])
         {

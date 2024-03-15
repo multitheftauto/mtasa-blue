@@ -36,7 +36,7 @@ public:
 
     CXMLNode* CreateDummyNode();
 
-    CXMLAttribute* GetAttrFromID(unsigned long ulID);
-    CXMLFile*      GetFileFromID(unsigned long ulID);
-    CXMLNode*      GetNodeFromID(unsigned long ulID);
+    CXMLAttribute* GetAttrFromID(std::uint32_t ulID);
+    CXMLFile*      GetFileFromID(std::uint32_t ulID);
+    CXMLNode*      GetNodeFromID(std::uint32_t ulID);
 };

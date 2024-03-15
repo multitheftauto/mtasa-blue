@@ -493,7 +493,7 @@ public:
         ReadNumber(color);
 
         if (!m_bError)
-            outValue = static_cast<unsigned long>(static_cast<int64_t>(color));
+            outValue = static_cast<std::uint32_t>(static_cast<int64_t>(color));
     }
 
     //
@@ -505,7 +505,7 @@ public:
         ReadNumber(color, static_cast<lua_Number>(defaultValue));
 
         if (!m_bError)
-            outValue = static_cast<unsigned long>(static_cast<int64_t>(color));
+            outValue = static_cast<std::uint32_t>(static_cast<int64_t>(color));
     }
 
     //
@@ -912,7 +912,7 @@ public:
     void ReadLuaArguments(CLuaArguments& outValue)
     {
         outValue.ReadArguments(m_luaVM, m_iIndex);
-        for (int i = outValue.Count(); i > 0; i--)
+        for (auto i = outValue.Count(); i > 0; i--)
         {
             m_iIndex++;
         }
@@ -1130,7 +1130,7 @@ protected:
     {
         // lua_next has a bug after it calling findindex internally
         // But we have to iterate sequentially right now. So luaL_getn is the solution.
-        for (int i = 1; i <= luaL_getn(m_luaVM, iIndex); ++i)
+        for (auto i = 1; i <= luaL_getn(m_luaVM, iIndex); ++i)
         {
             lua_pushnumber(m_luaVM, i);
             lua_gettable(m_luaVM, iIndex);

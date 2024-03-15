@@ -15,8 +15,8 @@
 #include <CVector.h>
 
 class CPed;
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+typedef std::uint32_t AssocGroupId;
+typedef std::uint32_t AnimationId;
 
 class CPlayerWastedPacket final : public CPacket
 {
@@ -26,7 +26,7 @@ public:
                         AnimationId animID = 15);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_WASTED; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    std::uint32_t GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
@@ -39,5 +39,5 @@ public:
     std::uint16_t m_usAmmo;
     bool           m_bStealth;
     std::uint8_t  m_ucTimeContext;
-    unsigned long  m_AnimGroup, m_AnimID;
+    std::uint32_t  m_AnimGroup, m_AnimID;
 };

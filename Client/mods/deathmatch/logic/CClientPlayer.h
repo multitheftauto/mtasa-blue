@@ -57,8 +57,8 @@ public:
     void          SetNametagText(const char* szText);
     bool          IsNametagShowing() { return m_bNametagShowing; }
     void          SetNametagShowing(bool bShowing) { m_bNametagShowing = bShowing; }
-    unsigned long GetLastNametagShow() { return m_ulLastNametagShow; }
-    void          SetLastNametagShow(unsigned long ulTime) { m_ulLastNametagShow = ulTime; }
+    std::uint32_t GetLastNametagShow() { return m_ulLastNametagShow; }
+    void          SetLastNametagShow(std::uint32_t ulTime) { m_ulLastNametagShow = ulTime; }
 
     void SetIsExtrapolatingAim(bool m_bExtrap) { m_bDoExtrapolatingAim = m_bExtrap; }
     bool IsExtrapolatingAim() { return m_bDoExtrapolatingAim; }
@@ -67,8 +67,8 @@ public:
     std::uint16_t GetLatency() { return m_usLatency; }
     void           SetLatency(std::uint16_t usLatency) { m_usLatency = (m_usLatency + usLatency) / 2; }
 
-    unsigned long  GetLastPuresyncTime() { return m_ulLastPuresyncTime; }
-    void           SetLastPuresyncTime(unsigned long ulLastPuresyncTime) { m_ulLastPuresyncTime = ulLastPuresyncTime; }
+    std::uint32_t  GetLastPuresyncTime() { return m_ulLastPuresyncTime; }
+    void           SetLastPuresyncTime(std::uint32_t ulLastPuresyncTime) { m_ulLastPuresyncTime = ulLastPuresyncTime; }
     const CVector& GetLastPuresyncPosition() { return m_vecLastPuresyncPosition; }
     void           SetLastPuresyncPosition(const CVector& vecPosition) { m_vecLastPuresyncPosition = vecPosition; }
     bool           HasConnectionTrouble() { return m_bHasConnectionTrouble; }
@@ -131,23 +131,23 @@ private:
     CVector        m_vecAimSpeed;
     CVector        m_vecOldAim;
     CVector        m_vecCurrentAim;
-    unsigned long  m_ulOldAimTime;
-    unsigned long  m_ulCurrentAimTime;
-    unsigned long  m_ulTick;
+    std::uint32_t  m_ulOldAimTime;
+    std::uint32_t  m_ulCurrentAimTime;
+    std::uint32_t  m_ulTick;
     bool           m_bDoExtrapolatingAim;
 
     bool    m_bForce;
     CVector m_vecForcedMoveSpeed;
     CVector m_vecForcedTurnSpeed;
 
-    unsigned long m_ulLastPuresyncTime;
+    std::uint32_t m_ulLastPuresyncTime;
     CVector       m_vecLastPuresyncPosition;
     bool          m_bHasConnectionTrouble;
 
     CClientTeam* m_pTeam;
 
     bool          m_bNametagShowing;
-    unsigned long m_ulLastNametagShow;
+    std::uint32_t m_ulLastNametagShow;
     std::uint8_t m_ucNametagColorR, m_ucNametagColorG, m_ucNametagColorB;
     bool          m_bNametagColorOverridden;
     std::string   m_strNametag;

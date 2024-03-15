@@ -235,7 +235,7 @@ void CGUI_Impl::DrawMouseCursor()
     CEGUI::MouseCursor::getSingleton().draw();
 }
 
-void CGUI_Impl::ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX, unsigned long ulY, CGUIMouseButton eMouseButton)
+void CGUI_Impl::ProcessMouseInput(CGUIMouseInput eMouseInput, std::uint32_t ulX, std::uint32_t ulY, CGUIMouseButton eMouseButton)
 {
     switch (eMouseInput)
     {
@@ -264,7 +264,7 @@ void CGUI_Impl::ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX,
     }
 }
 
-void CGUI_Impl::ProcessKeyboardInput(unsigned long ulKey, bool bIsDown)
+void CGUI_Impl::ProcessKeyboardInput(std::uint32_t ulKey, bool bIsDown)
 {
     if (bIsDown)
     {
@@ -342,7 +342,7 @@ CEGUI::String CGUI_Impl::GetUTFString(const std::string& strInput)
     return strUTF;
 }
 
-void CGUI_Impl::ProcessCharacter(unsigned long ulCharacter)
+void CGUI_Impl::ProcessCharacter(std::uint32_t ulCharacter)
 {
     m_pSystem->injectChar(ulCharacter);
 }

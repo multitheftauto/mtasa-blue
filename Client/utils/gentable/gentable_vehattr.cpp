@@ -21,15 +21,15 @@ enum eVehicleAttribute
     VEHICLE_HAS_SMOKE_TRAIL = 0x0010
 };
 
-void SetAttribute(unsigned long* table, unsigned long ulModel, eVehicleAttribute attribute)
+void SetAttribute(std::uint32_t* table, std::uint32_t ulModel, eVehicleAttribute attribute)
 {
     table[ulModel - 400] |= attribute;
 }
 
 int main()
 {
-    unsigned long table[611 - 400];
-    unsigned long tableSize = sizeof(table) / sizeof(unsigned long);
+    std::uint32_t table[611 - 400];
+    std::uint32_t tableSize = sizeof(table) / sizeof(std::uint32_t);
 
     memset(table, 0, sizeof(table));
 
@@ -72,9 +72,9 @@ int main()
     SetAttribute(table, 513, VEHICLE_HAS_SMOKE_TRAIL);
 
     printf(
-        "unsigned long g_ulVehicleAttributes [] = {\n"
+        "std::uint32_t g_ulVehicleAttributes [] = {\n"
         "    ");
-    for (int i = 0; i < tableSize; i++)
+    for (auto i = 0; i < tableSize; i++)
     {
         if (!(i % 25) && i > 0)
         {

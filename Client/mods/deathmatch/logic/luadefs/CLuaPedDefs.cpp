@@ -2332,7 +2332,7 @@ int CLuaPedDefs::CreatePed(lua_State* luaVM)
 {
     // Verify the argument
     CClientPed*      pPed = NULL;
-    unsigned long    ulModel = 0;
+    std::uint32_t    ulModel = 0;
     CVector          vecPosition;
     float            fRotation = 0.0f;
     CScriptArgReader argStream(luaVM);
