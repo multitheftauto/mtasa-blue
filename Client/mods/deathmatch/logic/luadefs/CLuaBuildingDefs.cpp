@@ -63,11 +63,44 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
 
 void CLuaBuildingDefs::RemoveAllGameBuildings()
 {
-    m_pBuildingManager->RemoveAll();
+    // We do not want to remove scripted buildings
+    // But we need remove them from the buildings pool for a bit...
+    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
+    {
+        building->Destroy();
+    }
+
+    // This function makes buildings backup without scripted buildings
     g_pGame->RemoveAllBuildings();
+
+    // ... And restore here
+    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
+    {
+        building->Create();
+    }
 }
 
 void CLuaBuildingDefs::RestoreGameBuildings()
 {
+    // We want to restore the game buildings to the same positions as they were before the backup.
+    // Remove scripted buildings for a bit
+    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
+    {
+        building->Destroy();
+    }
+
     g_pGame->RestoreGameBuildings();
+
+    // Restore what we can
+    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
+    {
+        building->Create();
+
+        if (!building->IsValid())
+        {
+            // User creates too much buildings
+            // We can't restore them all
+            delete building;
+        }
+    }
 }
