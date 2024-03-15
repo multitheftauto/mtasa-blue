@@ -56,6 +56,7 @@
 #include "CWeatherSA.h"
 #include "CWorldSA.h"
 #include "D3DResourceSystemSA.h"
+#include "CIplStoreSA.h"
 
 extern CGameSA* pGame;
 
@@ -137,6 +138,7 @@ CGameSA::CGameSA()
     m_pWeaponStatsManager = new CWeaponStatManagerSA();
     m_pPointLights = new CPointLightsSA();
     m_collisionStore = new CColStoreSA();
+    m_pIplStore = new CIplStoreSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -273,6 +275,7 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
     delete static_cast<CColStoreSA*>(m_collisionStore);
+    delete static_cast<CIplStore*>(m_pIplStore);
 
     delete[] ModelInfo;
     delete[] ObjectGroupsInfo;
@@ -425,6 +428,9 @@ void CGameSA::Reset()
 
         // Restore changed TXD IDs
         CModelInfoSA::StaticResetTextureDictionaries();
+
+        // Restore default world state
+        RestoreGameBuildings();
     }
 }
 
@@ -880,6 +886,20 @@ void CGameSA::FlushPendingRestreamIPL()
 void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
 {
     m_pRenderWare->GetShaderReplacementStats(outStats);
+}
+
+void CGameSA::RemoveAllBuildings()
+{
+    m_pIplStore->SetDynamicIplStreamingEnabled(false);
+
+    m_pPools->GetBuildingsPool().RemoveAllBuildings();
+}
+
+void CGameSA::RestoreGameBuildings()
+{
+    m_pPools->GetBuildingsPool().RestoreAllBuildings();
+
+    m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
 }
 
 // Ensure models have the default lod distances

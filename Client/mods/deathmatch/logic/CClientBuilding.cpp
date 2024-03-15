@@ -96,14 +96,14 @@ void CClientBuilding::Create()
     CVector4D vRot4D;
     ConvertZXYEulersToQuaternion(m_vRot, vRot4D);
 
-    m_pBuilding = g_pGame->GetPools()->AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
+    m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
 }
 
 void CClientBuilding::Destroy()
 {
     if (m_pBuilding)
     {
-        g_pGame->GetPools()->RemoveBuilding(m_pBuilding);
+        g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
         m_pBuilding = nullptr;
     }
 }

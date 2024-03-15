@@ -66,6 +66,7 @@ class CWeaponStat;
 class CWeaponStatManager;
 class CWeather;
 class CWorld;
+class CIplStore;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -255,4 +256,7 @@ public:
     virtual int32_t GetBaseIDforRRR() = 0;
     virtual int32_t GetBaseIDforSCM() = 0;
     virtual int32_t GetCountOfAllFileIDs() = 0;
+
+    virtual void RemoveAllBuildings() = 0;
+    virtual void RestoreGameBuildings() = 0;
 };

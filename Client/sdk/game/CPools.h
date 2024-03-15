@@ -11,6 +11,9 @@
 
 #pragma once
 
+#include "Common.h"
+#include "CBuildingsPool.h"
+
 class CClientEntity;
 class CEntity;
 class CEntitySAInterface;
@@ -84,11 +87,6 @@ public:
     virtual CPed*                  GetPedFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long          GetPedCount() = 0;
 
-    // Buildings pool
-    virtual CBuilding* AddBuilding(class CClientBuilding*, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior) = 0;
-    virtual void       RemoveBuilding(CBuilding* pObject) = 0;
-    virtual bool       HasFreeBuildingSlot() = 0;
-
     // Others
     virtual CVehicle* AddTrain(class CClientVehicle* pClientVehicle, CVector* vecPosition, DWORD dwModels[], int iSize, bool iDirection,
                                uchar ucTrackId = 0xFF) = 0;
@@ -110,4 +108,6 @@ public:
     virtual bool IsFreeTextureDictonarySlot(uint uiTxdID) = 0;
 
     virtual ushort GetFreeTextureDictonarySlot() = 0;
+
+    virtual CBuildingsPool& GetBuildingsPool() noexcept = 0;
 };
