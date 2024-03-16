@@ -27,6 +27,8 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
 
+#include "../luadefs/CLuaGifDefs.h"
+
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
 {
     // Initialise everything to be setup in the Start function
@@ -127,6 +129,7 @@ void CLuaMain::InitClasses(lua_State* luaVM)
     CLuaVehicleDefs::AddClass(luaVM);
     CLuaWaterDefs::AddClass(luaVM);
     CLuaWeaponDefs::AddClass(luaVM);
+    CLuaGifDefs::AddClass(luaVM);
 
     CLuaShared::AddClasses(luaVM);
 }
