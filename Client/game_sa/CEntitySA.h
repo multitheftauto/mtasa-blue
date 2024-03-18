@@ -309,6 +309,8 @@ public:
     bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll);
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
+    
+    void DeleteRwObject();
 
     // CEntitySA interface
     virtual void OnChangingPosition(const CVector& vecNewPosition) {}

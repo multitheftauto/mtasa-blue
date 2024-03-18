@@ -25,6 +25,8 @@ public:
     virtual CBuilding* AddBuilding(class CClientBuilding*, uint16_t modelId, CVector* vPos, CVector4D* vRot, uint8_t interior) = 0;
     virtual void       RemoveBuilding(CBuilding* pObject) = 0;
     virtual bool       HasFreeBuildingSlot() = 0;
+    virtual bool       SetSize(int size) = 0;
+    virtual int        GetSize() const = 0;
 
     virtual void RemoveAllBuildings() = 0;
     virtual void RestoreAllBuildings() = 0;

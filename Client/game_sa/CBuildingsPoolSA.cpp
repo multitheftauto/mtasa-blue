@@ -16,6 +16,7 @@
 #include <game/CWorld.h>
 #include "CGameSA.h"
 #include "CPtrNodeSingleListSA.h"
+#include "MemSA.h"
 
 extern CGameSA* pGame;
 
@@ -93,16 +94,7 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     if (dwElementIndexInPool == UINT_MAX)
         return;
 
-    // Remove building from world
-    pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
-
-    // Remove building from cover list
-    CPtrNodeSingleListSAInterface<CBuildingSAInterface>* coverList = reinterpret_cast<CPtrNodeSingleListSAInterface<CBuildingSAInterface>*>(0xC1A2B8);
-    coverList->RemoveItem(pInterface);
-
-    // Remove plant
-    using CPlantColEntry_Remove = CEntitySAInterface* (*)(CEntitySAInterface*);
-    ((CPlantColEntry_Remove)0x5DBEF0)(pInterface);
+    RemoveBuildingFromWorld(pInterface);
 
     // Remove col reference
     auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
@@ -134,9 +126,9 @@ void CBuildingsPoolSA::RemoveAllBuildings()
     {
         if (pBuildsingsPool->IsContains(i))
         {
-            auto building = pBuildsingsPool->GetObject(i);
+            CBuildingSAInterface* building = pBuildsingsPool->GetObject(i);
 
-            pGame->GetWorld()->Remove(building, CBuildingPool_Destructor);
+            RemoveBuildingFromWorld(building);
 
             pBuildsingsPool->Release(i);
 
@@ -170,6 +162,107 @@ void CBuildingsPoolSA::RestoreAllBuildings()
     }
 
     m_pOriginalBuildingsBackup.release();
+}
+
+void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
+{
+    // Remove building from world
+    pGame->GetWorld()->Remove(pBuilding, CBuildingPool_Destructor);
+
+    // Remove building from cover list
+    CPtrNodeSingleListSAInterface<CBuildingSAInterface>* coverList = reinterpret_cast<CPtrNodeSingleListSAInterface<CBuildingSAInterface>*>(0xC1A2B8);
+    coverList->RemoveItem(pBuilding);
+
+    // Remove plant
+    using CPlantColEntry_Remove = CEntitySAInterface* (*)(CEntitySAInterface*);
+    ((CPlantColEntry_Remove)0x5DBEF0)(pBuilding);
+
+    if (pBuilding->m_pRwObject != nullptr)
+    {
+        CEntitySA entity{};
+        entity.SetInterface(pBuilding);
+        entity.DeleteRwObject();
+    }
+}
+
+bool CBuildingsPoolSA::SetSize(int size)
+{
+    auto*     pool = (*m_ppBuildingPoolInterface);
+    const int curretnSize = pool->m_nSize;
+
+    void* oldPool = pool->m_pObjects;
+
+    if (oldPool != nullptr)
+    {
+        //std::free((void*)pool->m_pObjects);
+        //free(pool->m_pObjects);
+        MemSA::free(pool->m_pObjects);
+        pool->m_pObjects = nullptr;
+    }
+
+    if (pool->m_byteMap != nullptr)
+    {
+        MemSA::free(pool->m_byteMap);
+        pool->m_byteMap = nullptr;
+    }
+
+    CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
+    if (newObjects == nullptr)
+    {
+        SetSize(curretnSize);
+        return false;
+    }
+
+    tPoolObjectFlags* newBytemap = MemSA::malloc_struct<tPoolObjectFlags>(size);
+    if (newBytemap == nullptr)
+    {
+        MemSA::free(newObjects);
+        SetSize(curretnSize);
+        return false;
+    }
+
+    pool->m_pObjects = newObjects;
+    pool->m_byteMap = newBytemap;
+    pool->m_nSize = size;
+    pool->m_nFirstFree = 0;
+
+    for (auto i = 0; i < size; i++)
+    {
+        newBytemap[i].bEmpty = true;
+    }
+
+    if (oldPool != nullptr)
+    {
+        UpdateIplEntrysPointers(oldPool, newObjects);
+    }
+
+    return true;
+}
+
+void CBuildingsPoolSA::UpdateIplEntrysPointers(void* oldPool, void* newObjects)
+{
+    uint32_t offset = (uint32_t)newObjects - (uint32_t)oldPool;
+
+    using buildings_array_t = CBuildingSAInterface* [1000];
+    using ipl_entry_array_t = buildings_array_t* [40];
+    ipl_entry_array_t* iplEntryArray = (ipl_entry_array_t*)0x8E3F08;
+
+    for (auto i = 0; i < 40; i++)
+    {
+        buildings_array_t* ppArray = (*iplEntryArray)[i];
+
+        if (ppArray == nullptr)
+        {
+            return;
+        }
+        size_t arraySize = MemSA::msize(*ppArray) / sizeof(CBuildingSAInterface*);
+        for (auto j = 0; j < arraySize; j++)
+        {
+            CBuildingSAInterface* object = (*ppArray)[j];
+
+            (*ppArray)[j] = (CBuildingSAInterface*)((uint32_t)object + offset);
+        }
+    }
 }
 
 bool CBuildingsPoolSA::HasFreeBuildingSlot()

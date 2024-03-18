@@ -42,11 +42,11 @@ public:
 
     eClientEntityType GetType() const noexcept { return CCLIENTBUILDING; }
 
-    void Create();
-    void Destroy();
     bool IsValid() const noexcept { return m_pBuilding != nullptr; };
 
 private:
+    void Create();
+    void Destroy();
 
     void Recreate()
     {

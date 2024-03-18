@@ -277,6 +277,8 @@ public:
     void RemoveAllBuildings();
     void RestoreGameBuildings();
 
+    bool SetBuildingPoolSize(size_t size);
+
 private:
     CPools*                         m_pPools;
     CPlayerInfo*                    m_pPlayerInfo;
