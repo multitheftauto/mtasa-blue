@@ -32,7 +32,8 @@ public:
 private:
     void RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding);
     bool AddBuildingToPool(CClientBuilding* pClientBuilding, CBuildingSA* pBuilding);
-    void UpdateIplEntrysPointers(void* oldPool, void* newObjects);
+    void UpdateIplEntrysPointers(uint32_t offset);
+    void UpdateBackupLodPointers(uint32_t offset);
 
 private:
     SPoolData<CBuildingSA, CBuildingSAInterface, MAX_BUILDINGS> m_buildingPool;

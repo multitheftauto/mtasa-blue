@@ -231,18 +231,22 @@ bool CBuildingsPoolSA::SetSize(int size)
         newBytemap[i].bEmpty = true;
     }
 
+    const uint32_t offset = (uint32_t)newObjects - (uint32_t)oldPool;
     if (oldPool != nullptr)
     {
-        UpdateIplEntrysPointers(oldPool, newObjects);
+        UpdateIplEntrysPointers(offset);
+    }
+
+    if (m_pOriginalBuildingsBackup)
+    {
+        UpdateBackupLodPointers(offset);
     }
 
     return true;
 }
 
-void CBuildingsPoolSA::UpdateIplEntrysPointers(void* oldPool, void* newObjects)
+void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
 {
-    uint32_t offset = (uint32_t)newObjects - (uint32_t)oldPool;
-
     using buildings_array_t = CBuildingSAInterface* [1000];
     using ipl_entry_array_t = buildings_array_t* [40];
     ipl_entry_array_t* iplEntryArray = (ipl_entry_array_t*)0x8E3F08;
@@ -261,6 +265,23 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(void* oldPool, void* newObjects)
             CBuildingSAInterface* object = (*ppArray)[j];
 
             (*ppArray)[j] = (CBuildingSAInterface*)((uint32_t)object + offset);
+        }
+    }
+}
+
+void CBuildingsPoolSA::UpdateBackupLodPointers(uint32_t offset)
+{
+    std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS> *arr = m_pOriginalBuildingsBackup.get();
+    for (auto i = 0; i < MAX_BUILDINGS; i++)
+    {
+        std::pair<bool, CBuildingSAInterface>* data = &(*arr)[i];
+        if (data->first)
+        {
+            CBuildingSAInterface* building = &data->second;
+            if (building->m_pLod != nullptr)
+            {
+                building->m_pLod = (CBuildingSAInterface*)((uint32_t)building->m_pLod + offset);
+            }
         }
     }
 }
