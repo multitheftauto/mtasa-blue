@@ -140,6 +140,9 @@ void CBuildingsPoolSA::RemoveAllBuildings()
             (*m_pOriginalBuildingsBackup)[i].first = false;
         }
     }
+
+    CPtrNodeSingleListSAInterface<CBuildingSAInterface>* coverList = reinterpret_cast<CPtrNodeSingleListSAInterface<CBuildingSAInterface>*>(0xC1A2B8);
+    coverList->RemoveAllItems();
 }
 
 void CBuildingsPoolSA::RestoreAllBuildings()
