@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-22 21:56\n"
+"PO-Revision-Date: 2024-03-22 22:54\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -283,7 +283,7 @@ msgstr "خطا در بارگذاری ماژول %s module! (%s)"
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "نسخه نصبی جدید %s شناسایی شد.\n\n"
-"آیا میخواهید تنظیمات خود را از %s بازیابی کنید ؟"
+"آیا میخواهید تنظیمات خود را از %s بازیابی کنید؟"
 
 #: Client/loader/Utils.cpp:1541
 #, c-format
@@ -417,7 +417,7 @@ msgstr "لطفاٌ مطمعاٌ شوید آنتی ویروس شما GTA:SA را 
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr "GTA:SA را ایجاد کنید."
+msgstr "GTA:SA را ایجاد کنید"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
@@ -429,7 +429,7 @@ msgstr "بسته تکمیلی GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "MTA:SA نمی تواند راه اندازی شود زیرا وصله GTA:SA ناموفق بوده است:"
+msgstr "MTA:SA نمی تواند راه‌اندازی شود زیرا وصله GTA:SA ناموفق بوده است:"
 
 #: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:811
 #, c-format
@@ -462,7 +462,7 @@ msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
 msgstr "فایل '%s' در حال حاضر توسط فرآیندهای %zu قفل شده است.\n\n"
-"آیا می خواهید فعالیت زیر را خاتمه دهید و به به روز رسانی ادامه دهید؟\n\n"
+"آیا می خواهید فعالیت زیر را خاتمه دهید و به بروزرسانی ادامه دهید؟\n\n"
 "%s"
 
 #: Client/loader/Install.cpp:479
@@ -816,7 +816,7 @@ msgstr "زمانبندی فریم را به صورت نمودار نشان می 
 
 #: Client/core/CCore.cpp:1425
 msgid "for developers: reload news"
-msgstr "برای توسعه دهندگان : بارگذاری مجدد خبر ها"
+msgstr "برای توسعه دهندگان: بارگذاری مجدد خبر ها"
 
 #: Client/core/CScreenShot.cpp:104
 #, c-format
@@ -2817,7 +2817,7 @@ msgstr "غرق شدن در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr ""
+msgstr "خشم شدن برای پناه گرفتن در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
