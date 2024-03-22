@@ -304,7 +304,6 @@ CMainMenu::CMainMenu(CGUI* pManager)
         discord->SetPresenceState(_("Main menu"), false);
         discord->SetPresenceStartTimestamp(0);
     }
-
     // Store the pointer to the graphics subsystem
     m_pGraphics = CGraphics::GetSingletonPtr();
 
@@ -682,6 +681,19 @@ void CMainMenu::Update()
             CCore::GetSingletonPtr()->ShowErrorMessageBox("", XP_VISTA_WARNING, "au-revoir-xp-vista");
         }
 #endif
+
+        if (WaitForMenu == 299)
+        {
+            if (!g_pCore->GetCVars()->GetValue("discord_rpc_share_data_firsttime", false)
+                && g_pCore->GetCVars()->GetValue("allow_discord_rpc", false)
+                && !g_pCore->GetCVars()->GetValue("discord_rpc_share_data", false))
+            {
+                m_Settings.ShowRichPresenceShareDataQuestionBox();
+                CVARS_SET("discord_rpc_share_data_firsttime", true);
+            }
+            else
+                CVARS_SET("discord_rpc_share_data_firsttime", true);
+        }
 
         if (WaitForMenu < 300)
             WaitForMenu++;

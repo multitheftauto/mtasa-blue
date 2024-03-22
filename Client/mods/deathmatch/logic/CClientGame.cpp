@@ -752,7 +752,7 @@ bool CClientGame::StartLocalGame(eServerType Type, const char* szPassword)
         {
             m_bWaitingForLocalConnect = true;
             m_bErrorStartingLocal = true;
-            g_pCore->ShowMessageBox(_("Error") + _E("CD04"), _("The server is not installed"), MB_ICON_ERROR | MB_BUTTON_OK);
+            g_pCore->ShowMessageBox(_("Error") + _E("CD60"), _("Could not start the local server. See console for details."), MB_BUTTON_OK | MB_ICON_ERROR);
             g_pCore->GetModManager()->RequestUnload();
             return false;
         }
@@ -1122,8 +1122,8 @@ void CClientGame::DoPulses()
     // Call debug code if debug mode
     m_Foo.DoPulse();
 
-    // Output stuff from our internal server eventually
-    m_Server.DoPulse();
+    // Output stuff from our server eventually
+    m_Server.Pulse();
 
     if (m_pManager->IsGameLoaded() && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_() - m_llLastTransgressionTime > 60000)
     {

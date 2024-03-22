@@ -565,7 +565,7 @@ bool Unpack::ReadBlockHeader(BitInput &Inp,UnpackBlockHeader &Header)
       return false;
   Inp.faddbits((8-Inp.InBit)&7);
 
-  byte BlockFlags=Inp.fgetbits()>>8;
+  byte BlockFlags=byte(Inp.fgetbits()>>8);
   Inp.faddbits(8);
   uint ByteCount=((BlockFlags>>3)&3)+1; // Block size byte count.
 

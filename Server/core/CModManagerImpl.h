@@ -46,6 +46,8 @@ public:
 
     void DoPulse();
 
+    bool IsReadyToAcceptConnections() const noexcept;
+
     bool IsFinished();
 
     bool             PendingWorkToDo();
