@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-23 14:00\n"
+"PO-Revision-Date: 2024-03-23 15:02\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -402,7 +402,7 @@ msgstr "کپی کردن فایل های MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "به دلیل مشکل در نقص یا کمبود فایل ها GTA:SA, لانچر MTA:SA نمی تواند اجرا شود:"
+msgstr "MTA:SA اجرا نشد زیرا برخی فایل های GTA:SA خراب یا وجود ندارند:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -410,19 +410,20 @@ msgstr "بسته تکمیلی پیشنیاز های GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "به دلیل مشکل در نقص یا کمبود فایل های اجرایی GTA:SA, لانچر MTA:SA نمی تواند اجرا شود:"
+msgstr "MTA:SA اجرا نشد زیرا فایل اجرایی GTA:SA وجود ندارد یا خراب است:\n"
+"به دلیل مشکل در نقص یا کمبود فایل های اجرایی GTA:SA, لانچر MTA:SA نمی تواند اجرا شود:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "لطفاٌ مطمعاٌ شوید آنتی ویروس شما GTA:SA را به عنوان ویروس تشخیص نداده باشد، سیعی کنید در تنظیمات آنتی ویروس خود فایل اجرایی GTA:SA استثنا قرار دهید و MTA:SA را راه‌اندازی مجدد کنید."
+msgstr "بررسی کنید که آنتی ویروس شما به اشتباه فایل اجرایی GTA:SA بعنوان ویروس شناسایی نکرده باشد سعی کنید فایل اجرایی GTA:SA را در لیست استثناها قراردهید و MTA:SA را راه‌اندازی مجدد کنید."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
-msgstr "GTA:SA را ایجاد کنید"
+msgstr "ساختن GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "MTA:SA نمی تواند راه‌اندازی شود زیرا فایل اجرایی GTA:SA قابل بارگیری نیست:"
+msgstr "MTA:SA اجرا نشد زیرا فایل اجرایی GTA:SA قابل بارگذاری نیست:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
@@ -430,7 +431,7 @@ msgstr "بسته تکمیلی GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "MTA:SA نمی تواند راه‌اندازی شود زیرا وصله GTA:SA ناموفق بوده است:"
+msgstr "MTA:SA اجرا نشد زیرا اعمال بسته تکمیلی GTA:SA با شکست مواجه شد:"
 
 #: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:811
 #, c-format
@@ -473,9 +474,9 @@ msgid "Your installation may be corrupt now.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
 msgstr "فرایند نصب شما ممکن است در حال حاضر خراب باشد.\n\n"
-"%zu از %zu فایل از نسخه پشتیبان نمی تواند بازیابی شود.\n\n"
-"باید Multi Theft Auto را از www.multitheftauto.com دوباره نصب کنید\n"
-"یا سعی کنید به روز رسانی را با حقوق سرپرست اجرا کنید."
+"فایل %zu از %zu از نسخه پشتیبان نمیتواند بازیابی شود.\n\n"
+"میبایست Multi Theft Auto را از www.multitheftauto.com دوباره نصب کنید\n"
+"یا سعی کنید به روز رسانی را با دسترسی administrator اجرا کنید."
 
 #: Client/loader/MainFunctions.cpp:248
 msgid "Trouble restarting MTA:SA\n\n"
@@ -600,7 +601,7 @@ msgstr "مکان نصب 'MTA:SA' یا 'GTA: San Andreas' شامل یک ';' (نق
 
 #: Client/loader/MainFunctions.cpp:810
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "مشکلی هنگام لود به وجود آمده است. لطفا اطمینان حاصل فرمایید که فایل های آخرین نسخه و به صورت سالم نصب شده‌اند."
+msgstr "خطا در بارگذاری. لطفا مطمئن شوید آخرین فایل های بروزرسانی به درستی نصب شده اند."
 
 #: Client/loader/MainFunctions.cpp:819
 #, c-format
