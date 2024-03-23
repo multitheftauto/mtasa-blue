@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-23 15:02\n"
+"PO-Revision-Date: 2024-03-23 16:02\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -606,66 +606,66 @@ msgstr "خطا در بارگذاری. لطفا مطمئن شوید آخرین ف
 #: Client/loader/MainFunctions.cpp:819
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "مشکلی در هنگام لود به وجود آمده است. لطفا اطمینان حاصل فرمایید که %s به صورت درست نصب شده است."
+msgstr "خطا در بارگذاری لطفا مطمئن شوید فایل %s به درستی نصب شده باشد."
 
 #: Client/loader/MainFunctions.cpp:826
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "مشکلی در هنگام لود به وجود آمده است. نمی توان فایل gta_sa.exe را در %s پیدا کرد."
+msgstr "خطا در بارگذاری. فایل gta_sa.exe در مسیر %s پیدا نشد."
 
 #: Client/loader/MainFunctions.cpp:836
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "مشکلی در هنگام لود به وجود آمده است. %s در محل نصب GTA وجود دارد. لطفا این فایل را قبل از ادامه حذف کنید."
+msgstr "خطا در بارگذاری. فایل %s در پوشه GTA وجود دارد. قبل از ادامه این فایل را حذف کنید."
 
 #: Client/loader/MainFunctions.cpp:845
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr "فایل اصلی دارای اسم اشتباهی می‌باشد (%s)"
+msgstr "فایل اصلی نام اشتباهی دارد (%s)"
 
 #: Client/loader/MainFunctions.cpp:856
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "فایل اصلی بدون امضا می‌باشد. احتمال وجود ویروس.\n\n"
-"لطفا در صورت درست نشدن به پشتیبانی آنلاین MTA مراجعه کنید."
+"اگر MTA به درستی کارنمیکند به پشتیبانی آنلاین مراجعه کنید."
 
 #: Client/loader/MainFunctions.cpp:882
 #, c-format
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "فایل داده %s وجود ندارد. فعالیت احتمالی ویروس\n\n"
-"برای امنیت خود، Multi Theft Auto را مجدداً نصب کنید.\n"
-"اگر MTA به درستی کار نمی کند، به راهنمای آنلاین مراجعه کنید."
+msgstr "فایل %s وجود ندارد. احتمال وجود ویروس.\n\n"
+"برای امنیت خود، Multi Theft Auto را دوباره نصب کنید.\n"
+"اگر MTA به درستی کار نمی کند، به پشتیبانی آنلاین مراجعه کنید."
 
 #: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "فایل داده %s اصلاح شده است. فعالیت احتمالی ویروس\n\n"
-"برای امنیت خود، Multi Theft Auto را مجدداً نصب کنید.\n"
-"اگر MTA به درستی کار نمی کند، به راهنمای آنلاین مراجعه کنید."
+msgstr "فایل داده %s دستکاری شده است. احتمال وجود ویروس\n\n"
+"برای امنیت خود، Multi Theft Auto را دوباره نصب کنید.\n"
+"اگر MTA به درستی کار نمی کند، به پشتیبانی آنلاین مراجعه کنید."
 
 #: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
 "Remove these .asi files if you experience problems with MTA:SA."
-msgstr "فایل های .asi در محل نصب 'GTA: San Andreas' و 'MTA:SA' وجود دارند. \n\n"
-"لطفا این فایل های .asi را در صورت وجود مشکل در اجرای MTA:SA حذف کنید."
+msgstr "فایل های .asi در محل نصب 'GTA: San Andreas' یا 'MTA:SA' وجود دارند. \n\n"
+"اگر مشکلاتی در MTA:SA دارید فایل های .asi را حذف کنید."
 
 #: Client/loader/MainFunctions.cpp:1009
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "خطای عدم تطابق نسخه فایل. در صورت بروز مشکل، MTA:SA را مجددا نصب کنید.\n"
+msgstr "عدم سازگاری نسخه فایل‌. اگر مشکلاتی دارید MTA:SA را دوباره نصب کنید.\n"
 
 #: Client/loader/MainFunctions.cpp:1018
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "برخی از فایل ها گم شده اند. در صورت بروز مشکل، MTA:SA را مجددا نصب کنید.\n"
+msgstr "برخی از فایل ها وجود ندارند. اگر مشکلاتی دارید MTA:SA را دوباره نصب کنید.\n"
 
 #: Client/loader/MainFunctions.cpp:1030
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr "MTA:SA با \"حالت ایمن\" ویندوز سازگار نیست.\n\n"
-"لطفا کامپیوتر خود را مجددا راه‌اندازی کنید.\n"
+msgstr "MTA:SA با 'Safe Mode' ویندوز سازگار نیست.\n\n"
+"لطفا کامپیوتر خود را دوباره راه‌اندازی کنید.\n"
 
 #: Client/loader/MainFunctions.cpp:1123
 msgid "Fix configuration issue"
