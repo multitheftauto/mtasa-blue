@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-22 22:54\n"
+"PO-Revision-Date: 2024-03-23 11:00\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -318,7 +318,7 @@ msgstr "آیا کامپیوتر شما هنگام اجرای MTA:SA ریستار
 
 #: Client/loader/Utils.cpp:1781
 msgid "Please terminate the following programs before continuing:"
-msgstr "لطفاً قبل از ادامه, برنامه های زیر را خاتمه دهید:"
+msgstr "لطفاً قبل از ادامه، برنامه های زیر را خاتمه دهید:"
 
 #: Client/loader/CInstallManager.cpp:376
 #, c-format
@@ -413,7 +413,7 @@ msgstr "به دلیل مشکل در نقص یا کمبود فایل های اج�
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "لطفاٌ مطمعاٌ شوید آنتی ویروس شما GTA:SA را به عنوان ویروس تشخیص نداده باشد, سیعی کنید در تنظیمات آنتی ویروس خود فایل اجرایی GTA:SA استثنا قرار دهید و MTA:SA را راه اندازی مجدد کنید."
+msgstr "لطفاٌ مطمعاٌ شوید آنتی ویروس شما GTA:SA را به عنوان ویروس تشخیص نداده باشد، سیعی کنید در تنظیمات آنتی ویروس خود فایل اجرایی GTA:SA استثنا قرار دهید و MTA:SA را راه‌اندازی مجدد کنید."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -421,7 +421,7 @@ msgstr "GTA:SA را ایجاد کنید"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "MTA:SA نمی تواند راه اندازی شود زیرا فایل اجرایی GTA:SA قابل بارگیری نیست:\n"
+msgstr "MTA:SA نمی تواند راه‌اندازی شود زیرا فایل اجرایی GTA:SA قابل بارگیری نیست:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
