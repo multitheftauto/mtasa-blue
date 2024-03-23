@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-23 13:00\n"
+"PO-Revision-Date: 2024-03-23 14:00\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -135,12 +135,12 @@ msgstr "محل نصب Grand Theft Auto: San Andreas شامل این فایل‌�
 #: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "این فایل ها نیاز نیست و شاید با فابلیت های گرافیکی این نسخه MTA:SA تداخل ایجاد کند.\n\n"
-"پیشنهاد داده میشود که شما این فایل ها را حذف یا تغییر نام دهید."
+msgstr "وجود این فایل ها الزامی نیست و ممکن است با عملکرد های گرافیکی این نسخه MTA:SA تداخل ایجاد کند.\n\n"
+"پیشنهاد میشود که این فایل ها را حذف یا تغییر نام دهید."
 
 #: Client/loader/Dialogs.cpp:167
 msgid "Keep these files, but also show this warning on next start"
-msgstr "این فایل ها را نگه دارید، اما در شروع بعدی این هشدار را نیز نشان دهید"
+msgstr "فایل ها را نگهدار اما همچنان در اجرای بعدی این هشدار را نشان بده"
 
 #: Client/loader/Dialogs.cpp:168
 msgid "Do not remind me about these files again"
@@ -148,7 +148,7 @@ msgstr "این فایل ها را به من یاداوری نکن"
 
 #: Client/loader/Dialogs.cpp:169
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "اسم این فایل ها را از.dll به.dll.bak تغییر بده"
+msgstr "نام این فایل ها را از.dll به.dll.bak تغییر بده"
 
 #: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
@@ -262,7 +262,7 @@ msgstr "تمام!"
 
 #: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "محل نصب بازی Grand Theft Auto: San Andreas را انتخاب کنید"
+msgstr "پوشه نصب Grand Theft Auto: San Andreas را انتخاب کنید"
 
 #: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
 #, c-format
@@ -297,15 +297,15 @@ msgstr "فایل '%s' در GTA:SA وجود ندارد."
 
 #: Client/loader/Utils.cpp:1588
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA در بارگذاری یک مدل مشکل داشت."
+msgstr "GTA:SA در بارگذاری این مدل مشکل داشت."
 
 #: Client/loader/Utils.cpp:1590
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "اگر اخیراً gta3.img را تغییر داده‌اید، GTA:SA را دوباره نصب کنید."
+msgstr "اگر به تازگی تغییراتی در gta3.img ایجاد کردید، GTA:SA را مجددا نصب کنید."
 
 #: Client/loader/Utils.cpp:1615
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA برای افزودن یک ارتقاء به یک وسیله نقلیه مشکل داشت."
+msgstr "GTA:SA مشکل در افزودن یک ارتقاء به یک وسیله نقلیه داشت."
 
 #: Client/loader/Utils.cpp:1634
 #, c-format
@@ -314,11 +314,11 @@ msgstr "GTA:SA خطاهایی را در فایل '%s' پیدا کرد"
 
 #: Client/loader/Utils.cpp:1716
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "آیا کامپیوتر شما هنگام اجرای MTA:SA ریستارت شد؟"
+msgstr "آیا رایانه شما هنگام بازی کردن در MTA:SA دوباره راه‌اندازی شد؟"
 
 #: Client/loader/Utils.cpp:1781
 msgid "Please terminate the following programs before continuing:"
-msgstr "لطفاً قبل از ادامه، برنامه های زیر را خاتمه دهید:"
+msgstr "لطفاً قبل از ادامه، از برنامه های زیر خارج شوید:"
 
 #: Client/loader/CInstallManager.cpp:376
 #, c-format
@@ -389,11 +389,12 @@ msgstr "اتصالات GTA:SA را بسازید"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "به دلیل مشکل در کپی فایل ها MTA:SA نمی تواند اجرا شود:"
+msgstr "MTA:SA اجرا نشد زیرا کپی یک فایل با شکست مواجه شد:\n"
+"به دلیل مشکل در کپی فایل ها MTA:SA نمی تواند اجرا شود:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "به دلیل مشکل در نقص یا کمبود فایل ها MTA:SA نمی تواند اجرا شود:"
+msgstr "MTA:SA اجرا نشد زیرا برخی فایل ها خراب یا وجود ندارند:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
