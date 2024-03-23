@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-23 16:02\n"
+"PO-Revision-Date: 2024-03-23 17:02\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -680,12 +680,12 @@ msgstr "رفع خطای دسترسی"
 #, c-format
 msgid "Could not start Grand Theft Auto: San Andreas.  Please try restarting, or if the problem persists,contact MTA at www.multitheftauto.com. \n\n"
 "[%s]"
-msgstr "نمی‌توان Grand Theft Auto: San Andreas را راه‌اندازی کرد. لطفاً راه‌اندازی مجدد را امتحان کنید، یا اگر مشکل همچنان ادامه داشت، با MTA در www.multitheftauto.com تماس بگیرید.\n\n"
+msgstr "خطا در اجرای Grand Theft Auto: San Andreas. لطفا MTA را دوباره راه‌ اندازی کنید، اگر همچنان با خطا مواجه شدید با MTA در www.multitheftauto.com تماس بگیرید.\n\n"
 "[%s]"
 
 #: Client/loader/MainFunctions.cpp:1219
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
-msgstr "GTA: San Andreas ممکن است به درستی راه‌اندازی نشده باشد. آیا می خواهید آن را ببندید کنید؟"
+msgstr "GTA: San Andreas ممکن است به درستی اجرا نشده باشد. آیا می خواهید آن را ببندید؟"
 
 #: Client/game_sa/CSettingsSA.cpp:753
 msgid "Can't find valid screen resolution."
@@ -818,7 +818,7 @@ msgstr "زمانبندی فریم را به صورت نمودار نشان می 
 
 #: Client/core/CCore.cpp:1425
 msgid "for developers: reload news"
-msgstr "برای توسعه دهندگان: بارگذاری مجدد خبر ها"
+msgstr "برای توسعه دهندگان: بروزرسانی اخبار"
 
 #: Client/core/CScreenShot.cpp:104
 #, c-format
@@ -1553,11 +1553,11 @@ msgstr "دود تایر و غیره"
 
 #: Client/core/CSettings.cpp:816
 msgid "Dynamic ped shadows"
-msgstr "سایه پویای کارکترها"
+msgstr "سایه متحرک کارکترها"
 
 #: Client/core/CSettings.cpp:820
 msgid "Motion blur"
-msgstr "کدری متحرک"
+msgstr "کِش آمدن تصویر"
 
 #: Client/core/CSettings.cpp:825
 msgid "Full Screen Minimize"
@@ -2684,31 +2684,31 @@ msgstr "کانال رادیویی قبلی"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "enables the radar view"
-msgstr "نمای رادار را فعال می کند"
+msgstr "نمایش رادار را فعال می کند"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "zooms the radar in"
-msgstr "رادار را زوم می کند"
+msgstr "رادار را بزرگ‌نمایی می کند"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the radar out"
-msgstr "رادار را کوچک می کند"
+msgstr "رادار را کوچک‌نمایی می کند"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "moves the radar north"
-msgstr "رادار را به سمت شمال حرکت می دهد"
+msgstr "رادار را به سمت شمال حرکت می‌دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the radar south"
-msgstr "نقشه را به سمت جنوب حرکت می دهد"
+msgstr "نقشه را به سمت جنوب حرکت می‌دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the radar east"
-msgstr "نقشه را به سمت شرق حرکت می دهد"
+msgstr "نقشه را به سمت شرق حرکت‌می دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the radar west"
-msgstr "نقشه را به سمت غرب حرکت می دهد"
+msgstr "نقشه را به سمت غرب حرکت می‌دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "attaches the radar"
@@ -2716,27 +2716,27 @@ msgstr "رادار را متصل می کند"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "reduces radar opacity"
-msgstr "تیرگی رادار را کاهش می دهد"
+msgstr "شفافیت رادار را افزایش می‌دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "increases radar opacity"
-msgstr "کدورت رادار را افزایش می دهد"
+msgstr "شفافیت رادار را کاهش می‌دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "toggles radar help text"
-msgstr "وضعیت نمایش متن راهنمای نقشه را تغییر می دهد"
+msgstr "وضعیت نمایش متن راهنمای نقشه را تغییر می‌دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "sends a message to the targetted player"
-msgstr "پیامی را به بازیکن مورد نظر ارسال می کند"
+msgstr "پیامی را به بازیکن مورد نظر ارسال می‌کند"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "در حالی که در یک وسیله نقلیه هستید، به سلاح بعدی تغییر می کند"
+msgstr "درون ماشین اسلحه را به بعدی تغییر میدهد"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "در حالی که در یک وسیله نقلیه هستید، به سلاح قبلی تغییر می کند"
+msgstr "درون ماشین اسلحه را به قبلی تغییر میدهد"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "outputs info about the current server"
@@ -2745,7 +2745,7 @@ msgstr "اطلاعات مربوط به سرور فعلی را خروجی می د
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:85
 msgid "defines the scale multiplier of all text-displays"
-msgstr "ضریب مقیاس تمام نمایشگرهای متنی را تعریف می کند"
+msgstr "مقیاس تمام نمایشگرهای متنی را تعریف می‌کند"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
