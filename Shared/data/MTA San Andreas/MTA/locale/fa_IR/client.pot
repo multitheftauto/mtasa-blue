@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-23 12:00\n"
+"PO-Revision-Date: 2024-03-23 13:00\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -130,7 +130,7 @@ msgstr "ام تی ای: سن آندریاس - اخطار"
 
 #: Client/loader/Dialogs.cpp:163
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "محل نصب بازی Grand Theft Auto: San Andreas شما شامل این فایل‌ها است:"
+msgstr "محل نصب Grand Theft Auto: San Andreas شامل این فایل‌ها است:"
 
 #: Client/loader/Dialogs.cpp:165
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
@@ -293,7 +293,7 @@ msgstr "GTA:SA مشکل در باز کردن فایل '%s' دارد"
 #: Client/loader/Utils.cpp:1563
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA فایل '%s' را ندارد."
+msgstr "فایل '%s' در GTA:SA وجود ندارد."
 
 #: Client/loader/Utils.cpp:1588
 msgid "GTA:SA had trouble loading a model."
