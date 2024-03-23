@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-23 17:02\n"
+"PO-Revision-Date: 2024-03-23 18:01\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -2750,11 +2750,11 @@ msgstr "مقیاس تمام نمایشگرهای متنی را تعریف می�
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:92
 msgid "(Development mode) shows the colshapes"
-msgstr "(حالت توسعه) colshape ها را نشان می دهد"
+msgstr "(حالت برنامه‌نویس) تمام colshape ها را قابل مشاهده میکند"
 
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(حالت توسعه) شناسه های صدای جهان را در پنجره اشکال زدایی چاپ می کند"
+msgstr "(حالت برنامه‌نویس) شناسه های صدای محیط را در پنجره اشکال زدایی چاپ می کند"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Flying a UFO around"
@@ -2766,7 +2766,7 @@ msgstr "گشت و گذار در اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:370
 msgid "Riding the waves of"
-msgstr "سوار بر امواج"
+msgstr "موج سواری"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:371
 msgid "Riding the train in"
@@ -2798,7 +2798,7 @@ msgstr "انجام کارهای عجیب و غریب در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:377
 msgid "Climbing around in"
-msgstr "کوهنوردی در اطراف"
+msgstr "بالا رفتن از اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:378
 #: Client/mods/deathmatch/logic/CClientGame.cpp:379
@@ -2819,7 +2819,7 @@ msgstr "غرق شدن در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:383
 msgid "Ducking for cover in"
-msgstr "خشم شدن برای پناه گرفتن در"
+msgstr "خم شدن برای پناه گرفتن در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:384
 msgid "Fighting in"
@@ -2871,11 +2871,11 @@ msgstr "در حال ورود به بازی ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:709
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "اتصالی برقرار نیست؛ لطفا از اتصال سریع یا فرمان 'connect' برای اتصال به سرور استفاده کنید."
+msgstr "اتصال برقرار نشد؛ لطفا از اتصال سریع یا فرمان 'connect' برای اتصال به سرور استفاده کنید."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:755
 msgid "Could not start the local server. See console for details."
-msgstr "سرور محلی راه‌اندازی نشد. برای جزئیات بیشتر به کنسول مراجعه کنید."
+msgstr "سرور خانگی راه‌اندازی نشد. جزئیات را در کنسول مشاهده کنید."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1240
@@ -2884,7 +2884,7 @@ msgstr "سرور محلی"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Starting local server ..."
-msgstr "در حال راه‌اندازی سرور محلی ..."
+msgstr "در حال راه‌اندازی سرور خانگی ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
@@ -2897,7 +2897,7 @@ msgstr "قدم زدن در اطراف "
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "شما از بازی اخراج شدید ( %s )"
+msgstr "شما از بازی اخراج شدید (%s )"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1240
 msgid "Connecting to local server..."
@@ -2925,7 +2925,7 @@ msgstr "اتصال قطع شد: رمز عبور اشتباه میباشد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1428
 msgid "MTA Client verification failed!"
-msgstr "مشکلی در تایید MTA وجود داشت!"
+msgstr "بررسی اصالت MTA Client با شکست مواجه شد!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
@@ -2949,7 +2949,7 @@ msgstr "از دست رفتن"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
-msgstr "میزبان بازی"
+msgstr "میزبانی بازی"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:53
@@ -2959,7 +2959,7 @@ msgstr "منابع"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
 msgid "Server name:"
-msgstr "اسم سرور:"
+msgstr "نام سرور:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
@@ -2974,15 +2974,15 @@ msgstr "حداکثر بازیکنان:"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr "پخش:"
+msgstr "ارائه:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
-msgstr "شبکه ی محلی"
+msgstr "شبکه خانگی"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
-msgstr "انتخاب شده"
+msgstr "گزینش شده"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:116
 msgid "All"
@@ -2990,7 +2990,7 @@ msgstr "همه"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr "شروع"
+msgstr "راه‌اندازی"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
