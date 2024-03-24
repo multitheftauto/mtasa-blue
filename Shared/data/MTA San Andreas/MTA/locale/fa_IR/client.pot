@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-24 00:20\n"
+"PO-Revision-Date: 2024-03-24 01:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -301,7 +301,7 @@ msgstr "GTA:SA در بارگذاری این مدل مشکل داشت."
 
 #: Client/loader/Utils.cpp:1590
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "اگر به تازگی تغییراتی در gta3.img ایجاد کردید، GTA:SA را مجددا نصب کنید."
+msgstr "اگر به تازگی gta3.img را دستکاری کردید، GTA:SA را مجددا نصب کنید."
 
 #: Client/loader/Utils.cpp:1615
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
@@ -3106,7 +3106,7 @@ msgstr "شما از بازی اخراج شدید"
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "این سرور به یک gta_sa.exe تغییر یافته نشده نیاز دارد"
+msgstr "این سرور به یک gta_sa.exe دستکاری نشده نیاز دارد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
@@ -3115,7 +3115,7 @@ msgstr "لطفا gta_sa.exe را جایگزین کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr "این سرور به D3D9.DLL های ویرایش شده اجازه ورود نمی دهد"
+msgstr "این سرور به D3D9.DLL های سفارشی اجازه ورود نمی دهد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
@@ -3127,7 +3127,7 @@ msgstr "این سرور به ماشین های مجازی اجازه ورود ن
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "This server requires driver signing to be enabled"
-msgstr "این سرور برای ورود نیاز به فعال بودن امضای درایور دارد"
+msgstr "برای ورود به این سرور نیاز به driver signing دارید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "Please restart your PC"
@@ -3135,15 +3135,15 @@ msgstr "لطفا کامپیوتر خود را مجددا راه‌اندازی �
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server has detected missing anti-cheat components"
-msgstr "این سرور اجزای گمشده ی آنتی چیت را شناسایی کرده است"
+msgstr "این سرور عدم وجود بخش هایی از آنتی چیت را شناسایی کرد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Try restarting MTA"
-msgstr "MTA را مجدداً راه‌اندازی کنید"
+msgstr "MTA را دوباره راه‌اندازی کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "این سرور به gta3.img و gta_int.img تغییر یافته نشده نیاز دارد"
+msgstr "برای ورود به این سرور به gta3.img و gta_int.img دستکاری نشده نیاز دارید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Please replace gta3.img or gta_int.img"
@@ -3200,7 +3200,7 @@ msgstr "پیشرفت دانلود نقشه:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr "پیشرفت دانلود:"
+msgstr "پیشروی دانلود:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
@@ -3218,7 +3218,7 @@ msgstr "برای لغو دانلود، اتصال را قطع کنید"
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "خطای مهم (%u). در صورت حل نشدن مشکل، لطفاً برای پشتیبانی، به وبسایت mtasa.com مراجعه کنید."
+msgstr "خطای مهم (%u). در صورت حل نشدن مشکل، لطفا برای پشتیبانی، به وبسایت mtasa.com مراجعه کنید."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3227,7 +3227,7 @@ msgstr "خطای مهم (%u). در صورت حل نشدن مشکل، لطفاً 
 #: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "خطای پروتکل (%u). در صورت حل نشدن مشکل، لطفاً برای پشتیبانی، به mtasa.com مراجعه کنید."
+msgstr "خطای پروتکل (%u). در صورت حل نشدن مشکل، لطفا برای پشتیبانی، به mtasa.com مراجعه کنید."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
@@ -3241,5 +3241,5 @@ msgstr "مولتی دفت آتو به درستی نصب نشده است, لطف�
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
 msgstr "مرورگر شما اکنون یک صفحه وب با برخی اطلاعات راهنما نمایش می دهد.\n\n"
-"(اگر صفحه بارگیری نشد، URL (CTRL-V) را در مرورگر وب خود جایگذاری کنید)"
+"(اگر صفحه بارگیری نشد، لینک را در مرورگر خود جایگذاری (CTRL-V) کنید)"
 
