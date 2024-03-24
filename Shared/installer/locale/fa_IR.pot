@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-24 01:20\n"
+"PO-Revision-Date: 2024-03-24 02:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -109,12 +109,12 @@ msgstr "سرور Multi Theft Auto. به شما این امکان را می ده�
 #. DESC_Section4
 #: Shared/installer/nightly.nsi:227
 msgid "The Multi Theft Auto server. This is a required component."
-msgstr "سرور Multi Theft Auto. این یک جزء ضروری است."
+msgstr "Multi Theft Auto server. یک جزء ضروری است."
 
 #. DESC_Section5
 #: Shared/installer/nightly.nsi:228
 msgid "The MTA:SA modification for the server."
-msgstr "اصلاح MTA:SA برای سرور."
+msgstr "برای دستکاری در MTA:SA سرور استفاده میشود."
 
 #. DESC_Section6
 #: Shared/installer/nightly.nsi:229
@@ -134,47 +134,47 @@ msgstr "ویرایشگر نقشه MTA:SA 1.0. این می تواند برای ا
 #. DESC_Section9
 #: Shared/installer/nightly.nsi:232
 msgid "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-msgstr "این SDK برای ایجاد ماژول های باینری برای سرور MTA است. فقط در صورتی نصب کنید که درک خوبی از C++ داشته باشید!"
+msgstr "این SDK برای ایجاد ماژول های باینری برای سرور MTA است. فقط در صورتی نصب کنید که درک خوبی از C++ دارید!"
 
 #. DESC_SectionGroupDev
 #: Shared/installer/nightly.nsi:234
 msgid "Development code and tools that aid in the creation of mods for Multi Theft Auto"
-msgstr "کد توسعه و ابزارهایی که به ایجاد حالت‌ها برای Multi Theft Auto کمک می‌کنند"
+msgstr "کد و ابزار های توسعه ای که به ایجاد حالت‌ها برای Multi Theft Auto کمک می‌کنند"
 
 #. DESC_SectionGroupClient
 #: Shared/installer/nightly.nsi:235
 msgid "The client is the program you run to play on a Multi Theft Auto server"
-msgstr "کلاینت برنامه ای است که برای اجرای آن روی سرور Multi Theft Auto اجرا می کنید"
+msgstr "Client برنامه ای است که برای بازی کردن روی Multi Theft Auto server اجرا می کنید"
 
 #. INST_CLIENTSERVER
 #: Shared/installer/nightly.nsi:441
 msgid "Client and Server"
-msgstr "سرور و کلاینت"
+msgstr "Client و Server"
 
 #. INST_SERVER
 #: Shared/installer/nightly.nsi:442
 msgid "Server only"
-msgstr "فقط سرور"
+msgstr "فقط Server"
 
 #. INST_STARTMENU_GROUP
 #: Shared/installer/nightly.nsi:456
 msgid "Start menu group"
-msgstr "منوی شروع"
+msgstr "فهرست start ویندوز"
 
 #. INST_DESKTOP_ICON
 #: Shared/installer/nightly.nsi:457
 msgid "Desktop icon"
-msgstr "آیکون دسکتاپ"
+msgstr "میانبر صفحه نمایش"
 
 #. INST_PROTOCOL
 #: Shared/installer/nightly.nsi:458
 msgid "Register mtasa:// protocol"
-msgstr "ثبت پروتکل //: mtasa"
+msgstr "ثبت پروتکل mtasa://‎"
 
 #. INST_GAMES_EXPLORER
 #: Shared/installer/nightly.nsi:459
 msgid "Add to Games Explorer"
-msgstr "اضافه کردن به بازی‌ها"
+msgstr "اضافه شدن به Games Explorer"
 
 #. INST_DIRECTX
 #: Shared/installer/nightly.nsi:460
@@ -184,12 +184,12 @@ msgstr "نصب DirectX"
 #. INST_SEC_CLIENT
 #: Shared/installer/nightly.nsi:494
 msgid "Game client"
-msgstr "نسخه بازیکن/پلیر"
+msgstr "Game client"
 
 #. INST_SEC_SERVER
 #: Shared/installer/nightly.nsi:495
 msgid "Dedicated server"
-msgstr "سرور اختصاصی"
+msgstr "Server سفارشی"
 
 #. INST_SEC_CORE
 #: Shared/installer/nightly.nsi:496
