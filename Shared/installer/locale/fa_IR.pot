@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-24 10:20\n"
+"PO-Revision-Date: 2024-03-24 11:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -346,7 +346,7 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 "$\n"
 " Click Next to continue."
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} در پوشه زیر نصب خواهد شد.$\n"
-"برای نصب در یک پوشه دیگر، روی Browse کلیک کنید و پوشه دیگری را انتخاب کنید.$\n"
+"برای نصب در یک پوشه دیگر، روی انتخاب کلیک کنید و پوشه دیگری را انتخاب کنید.$\n"
 "$\n"
 " برای ادامه بر روی بعدی کلیک کنید."
 
@@ -358,7 +358,7 @@ msgstr "پوشه مقصد"
 #. INST_CHOOSE_LOC_BROWSE
 #: Shared/installer/nightly.nsi:1967
 msgid "Browse..."
-msgstr "مرور کردن..."
+msgstr "انتخاب..."
 
 #. INST_CHOOSE_LOC_DEFAULT
 #: Shared/installer/nightly.nsi:1968
@@ -368,7 +368,7 @@ msgstr "پیش فرض"
 #. INST_CHOOSE_LOC_LAST_USED
 #: Shared/installer/nightly.nsi:1969
 msgid "Last used"
-msgstr "آخرین استفاده"
+msgstr "مسیر قبلی"
 
 #. INST_CHOOSE_LOC_CUSTOM
 #: Shared/installer/nightly.nsi:1970
