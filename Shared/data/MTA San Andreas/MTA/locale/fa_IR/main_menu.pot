@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2023-06-24 11:27\n"
+"PO-Revision-Date: 2024-03-24 01:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -19,19 +19,19 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr "اتصال سریع"
+msgstr "پیوستن با شتاب"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
-msgstr "قطع اتصال"
+msgstr "جدا شدن"
 
 #. Found in the main menu navigation
 msgid "Server browser"
-msgstr "لیست سرور ها"
+msgstr "فهرست سرور ها"
 
 #. Found in the main menu navigation
 msgid "Host game"
-msgstr "میزبانی کردن بازی"
+msgstr "میزبانی بازی"
 
 #. Found in the main menu navigation
 msgid "Map editor"
@@ -39,11 +39,11 @@ msgstr "ویرایشگر نقشه"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr "تنظیمات"
+msgstr "پیکربندی ها"
 
 #. Found in the main menu navigation
 msgid "About"
-msgstr "درباره"
+msgstr "درباره ما"
 
 #. Found in the main menu navigation
 msgid "Quit"
@@ -51,5 +51,5 @@ msgstr "خروج"
 
 #. Found in the main menu above the news listing
 msgid "The Latest News"
-msgstr "آخرین اخبار"
+msgstr "آخرین رویداد ها"
 
