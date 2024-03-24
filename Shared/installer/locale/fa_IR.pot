@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-24 02:20\n"
+"PO-Revision-Date: 2024-03-24 10:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -306,9 +306,9 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
-msgstr "MTA را نمی توان در دایرکتوری مشابه GTA:SA.$ نصب کرد\n"
+msgstr "MTA را نمی توان در مسیر GTA:SA.$ نصب کرد\n"
 "$\n"
-"آیا می خواهید از دایرکتوری نصب پیش فرض$ استفاده کنید\n"
+"آیا می خواهید از مسیر نصب پیش فرض$ استفاده کنید\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
@@ -316,9 +316,9 @@ msgstr "MTA را نمی توان در دایرکتوری مشابه GTA:SA.$ ن�
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
-msgstr "دایرکتوری انتخاب شده وجود ندارد.$\n"
+msgstr "مسیر انتخاب شده وجود ندارد.$\n"
 "$\n"
-"لطفاً دایرکتوری نصب GTA:SA را انتخاب کنید"
+"لطفاً مسیر نصب GTA:SA را انتخاب کنید"
 
 #. INST_GTA_ERROR2
 #: Shared/installer/nightly.nsi:1844
