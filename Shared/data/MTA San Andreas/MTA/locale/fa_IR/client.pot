@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-23 18:01\n"
+"PO-Revision-Date: 2024-03-24 00:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -3046,21 +3046,21 @@ msgstr "اتصال قطع شد: سرور از شاخه های مختلف.\n"
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr "اتصال قطع شد: نسخه بد.\n"
+msgstr "اتصال قطع شد: نسخه خراب.\n"
 "اطلاعات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr "اصتال قطع شد: سرور در حال اجرای یک نسخه جدیدتر است.\n"
+msgstr "اتصال قطع شد: سرور در حال اجرای یک نسخه جدیدتر است.\n"
 "اطلاعات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr "اتصال قطع شد: سرور در حال اجرای یک نسخه قدیمی است.\n"
+msgstr "اتصال قطع شد: سرور در حال اجرای یک نسخه قدیمی تر است.\n"
 "اطلاعات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:558
@@ -3078,7 +3078,7 @@ msgstr "اتصال قطع شد: سرور اتصال را رد کرد: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
 msgid "Disconnected: Serial verification failed"
-msgstr "اتصال قطع شد: تأیید سریال ناموفق بود"
+msgstr "اتصال قطع شد: اعتبار سنجی سریال با شکست مواجه شد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
 #, c-format
@@ -3093,11 +3093,11 @@ msgstr "اتصال قطع شد: شما توسط %s از بازی اخراج شد
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
 #, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr "اتصال قطع شد: شما توسط %s از بازی محروم شدید"
+msgstr "اتصال قطع شد: شما توسط %s محروم شدید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 msgid "Disconnected: Server shutdown or restarting"
-msgstr "اتصال قطع شد: سرور خاموش و یا ریستارت شد"
+msgstr "قطع شده: سرور خاموش یا راه‌اندازی مجدد شد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
 msgid "You were kicked from the game"
