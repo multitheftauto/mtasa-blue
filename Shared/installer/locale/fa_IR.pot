@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-22 22:54\n"
+"PO-Revision-Date: 2024-03-24 01:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -25,7 +25,7 @@ msgstr "این نسخه از MTA:SA که دانلود کرده اید از وی�
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr "این نسخه از MTA:SA که دانلود کرده اید برای ویندوز 7, 8 یا 8.1  پشتیبانی نمی شود. لطفا یک نسخه دیگر را از www.mtasa.com دانلود کنید."
+msgstr "این نسخه از MTA:SA که دانلود کرده اید از ویندوز 7, 8 یا 8.1  پشتیبانی نمی‌کند. لطفا یک نسخه دیگر را از www.mtasa.com دانلود کنید."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
@@ -38,9 +38,9 @@ msgid "This wizard will guide you through the installation or update of $(^Name)
 "It is recommended that you close all other applications before starting Setup.\n\n"
 "[Admin access may be requested for Vista and up]\n\n"
 "Click Next to continue."
-msgstr "این برنامه شما را برای نصب و یا آپدیت $(^Name) ${REVISION_TAG} کمک خواهد کرد\n\n"
-"پیشنهاد می‌شود که تمامی برنامه‌ها را قبل از ادامه ببندید.\n\n"
-"[ممکن است دسترسی ادمین برای ویندوز ویستا و یا بالاتر مورد نیازد باشد]\n\n"
+msgstr "این برنامه به شما برای نصب و یا آپدیت $(^Name) ${REVISION_TAG} کمک خواهد کرد\n\n"
+"پیشنهاد می‌شود که نرم‌افزار های دیگر را قبل از ادامه ببندید.\n\n"
+"[ممکن است دسترسی Administrator برای ویندوز ویستا و یا بالاتر مورد نیازد باشد]\n\n"
 "برای ادامه روی \"ادامه\" کلیک کنید."
 
 #. HEADER_Text
@@ -60,7 +60,7 @@ msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
 "$\n"
 "Click Install to begin installing."
-msgstr "لطفاً پوشه Grand Theft Auto: San Andreas را انتخاب کنید.$\n"
+msgstr "لطفا پوشه Grand Theft Auto: San Andreas را انتخاب کنید.$\n"
 "$\n"
 "برای استفاده از MTA:SA باید Grand Theft Auto: San Andreas 1.0 را نصب کرده باشید، نسخه های دیگر پشتیبانی نمی‌شوند.$\n"
 "$\n"
@@ -69,12 +69,12 @@ msgstr "لطفاً پوشه Grand Theft Auto: San Andreas را انتخاب کن
 #. DESC_Section10
 #: Shared/installer/nightly.nsi:217
 msgid "Create a Start Menu group for installed applications"
-msgstr "اضافه کردن یک منو در استارت ویندوز برای برنامه هایی که نصب می‌شوند"
+msgstr "افزودن در فهرست استارت ویندوز برای نرم‌افزار هایی که نصب می‌شوند"
 
 #. DESC_Section11
 #: Shared/installer/nightly.nsi:218
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "ایجاد کردن یک میانبر دسکتاپ برای MTA:SA Client."
+msgstr "ایجاد کردن یک میانبر بر روی صفحه نمایش برای MTA:SA Client."
 
 #. DESC_Section12
 #: Shared/installer/nightly.nsi:219
@@ -94,17 +94,17 @@ msgstr "نصب و یا بروزرسانی DirectX (در صورت نیاز)."
 #. DESC_Section1
 #: Shared/installer/nightly.nsi:222
 msgid "The core components required to run Multi Theft Auto."
-msgstr "Core Components نیاز به اجرای Multi Theft Auto دارد."
+msgstr "برای اجرای Multi Theft Auto نیاز Core Components است."
 
 #. DESC_Section2
 #: Shared/installer/nightly.nsi:223
 msgid "The MTA:SA modification, allowing you to play online."
-msgstr "اصلاح MTA:SA، به شما امکان بازی آنلاین را می دهد."
+msgstr "دستکاری های MTA:SA، به شما امکان بازی آنلاین را می دهد."
 
 #. DESC_SectionGroupServer
 #: Shared/installer/nightly.nsi:226
 msgid "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
-msgstr "سرور Multi Theft Auto. به شما این امکان را می دهد تا بازی ها را به صورت میزبان از روی کامپیوتر خودتان اجرا نمایید. این ویژگی نیازمند داشتن اتصالی پر سرعت است."
+msgstr "سرور Multi Theft Auto. به شما این امکان را می دهد تا با استفاده از کامپیوتر خود میزبانی یک بازی را به عهده بگیرید. این ویژگی نیازمند داشتن اتصالی پر سرعت است."
 
 #. DESC_Section4
 #: Shared/installer/nightly.nsi:227
