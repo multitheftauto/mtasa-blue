@@ -141,8 +141,8 @@ void CBuildingsPoolSA::RemoveAllBuildings()
         }
     }
 
-    CPtrNodeSingleListSAInterface<CBuildingSAInterface>* coverList = reinterpret_cast<CPtrNodeSingleListSAInterface<CBuildingSAInterface>*>(0xC1A2B8);
-    coverList->RemoveAllItems();
+    pGame->GetCoverManager()->RemoveAllCovers();
+    pGame->GetPlantManager()->RemoveAllPlants();
 }
 
 void CBuildingsPoolSA::RestoreAllBuildings()
@@ -173,12 +173,10 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
     pGame->GetWorld()->Remove(pBuilding, CBuildingPool_Destructor);
 
     // Remove building from cover list
-    CPtrNodeSingleListSAInterface<CBuildingSAInterface>* coverList = reinterpret_cast<CPtrNodeSingleListSAInterface<CBuildingSAInterface>*>(0xC1A2B8);
-    coverList->RemoveItem(pBuilding);
+    pGame->GetCoverManager()->RemoveCover(pBuilding);
 
     // Remove plant
-    using CPlantColEntry_Remove = CEntitySAInterface* (*)(CEntitySAInterface*);
-    ((CPlantColEntry_Remove)0x5DBEF0)(pBuilding);
+    pGame->GetPlantManager()->RemovePlant(pBuilding);
 
     if (pBuilding->m_pRwObject != nullptr)
     {

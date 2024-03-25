@@ -15,6 +15,8 @@
 #include "CFxManagerSA.h"
 #include "CModelInfoSA.h"
 #include "CStreamingSA.h"
+#include "CCoverManagerSA.h"
+#include "CPlantManagerSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -153,6 +155,8 @@ public:
     CRenderWareSA*            GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
     CIplStore*                GetIplStore() { return m_pIplStore; };
+    CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
+    CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -313,6 +317,8 @@ private:
     CPointLights*                   m_pPointLights;
     CColStore*                      m_collisionStore;
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
+    CCoverManagerSA*                m_pCoverManager;
+    CPlantManagerSA*                m_pPlantManager;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;

@@ -139,6 +139,8 @@ CGameSA::CGameSA()
     m_pPointLights = new CPointLightsSA();
     m_collisionStore = new CColStoreSA();
     m_pIplStore = new CIplStoreSA();
+    m_pCoverManager = new CCoverManagerSA();
+    m_pPlantManager = new CPlantManagerSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -276,6 +278,8 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
     delete static_cast<CColStoreSA*>(m_collisionStore);
     delete static_cast<CIplStore*>(m_pIplStore);
+    delete m_pCoverManager;
+    delete m_pPlantManager;
 
     delete[] ModelInfo;
     delete[] ObjectGroupsInfo;
