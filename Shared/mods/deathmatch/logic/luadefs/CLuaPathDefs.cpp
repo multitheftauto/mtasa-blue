@@ -44,22 +44,32 @@ void CLuaPathDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "path");
 }
 
-std::optional<std::vector<std::string>> CLuaPathDefs::pathListDir(lua_State* luaVM, std::string path)
-{
+std::optional<std::vector<std::string>> CLuaPathDefs::pathListDir(
+    lua_State* luaVM,
+    std::string path
+) {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
         return std::nullopt;
 
-    SString strAbsPath;
+    std::string strAbsPath;
 
     CResource* pResource = pLuaMain->GetResource();
     if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"",
+            path.c_str());
         return std::nullopt;
+    }
 
     if (!DirectoryExists(strAbsPath))
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Directory \"%s\" doesn't exist!",
+            path.c_str());
         return std::nullopt;
+    }
 
-    return SharedUtil::ListDir(strAbsPath);
+    return SharedUtil::ListDir(strAbsPath.c_str());
 }
 
 bool CLuaPathDefs::pathIsFile(lua_State* luaVM, std::string path)
@@ -68,11 +78,15 @@ bool CLuaPathDefs::pathIsFile(lua_State* luaVM, std::string path)
     if (!pLuaMain)
         return false;
 
-    SString strAbsPath;
+    std::string strAbsPath;
 
     CResource* pResource = pLuaMain->GetResource();
     if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"",
+            path.c_str());
         return false;
+    }
 
     return SharedUtil::FileExists(strAbsPath);
 }
@@ -83,11 +97,15 @@ bool CLuaPathDefs::pathIsDirectory(lua_State* luaVM, std::string path)
     if (!pLuaMain)
         return false;
 
-    SString strAbsPath;
+    std::string strAbsPath;
 
     CResource* pResource = pLuaMain->GetResource();
     if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"",
+            path.c_str());
         return false;
+    }
 
-    return SharedUtil::DirectoryExists(strAbsPath);
+    return SharedUtil::DirectoryExists(strAbsPath.c_str());
 }

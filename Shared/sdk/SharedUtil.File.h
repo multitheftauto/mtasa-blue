@@ -20,8 +20,8 @@ namespace SharedUtil
     //
     // Returns true if the file/directory exists
     //
-    bool FileExists(const SString& strFilename) noexcept;
-    bool DirectoryExists(const SString& strPath) noexcept;
+    bool FileExists(const std::string& strFilename) noexcept;
+    bool DirectoryExists(const std::string& strPath) noexcept;
 
     //
     // Load from a file

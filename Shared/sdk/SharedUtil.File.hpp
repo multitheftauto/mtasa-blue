@@ -35,7 +35,7 @@
 //
 // Returns true if the file exists
 //
-bool SharedUtil::FileExists(const SString& strFilename) noexcept
+bool SharedUtil::FileExists(const std::string& strFilename) noexcept
 {
 #if __cplusplus >= 201703L
     namespace fs = std::filesystem;
@@ -43,7 +43,7 @@ bool SharedUtil::FileExists(const SString& strFilename) noexcept
     return fs::is_regular_file(strFilename.c_str(), errorCode);
 #else
     #ifdef _WIN32
-    DWORD dwAtr = GetFileAttributes(strFilename);
+    DWORD dwAtr = GetFileAttributes(strFilename.c_str());
     if (dwAtr == INVALID_FILE_ATTRIBUTES)
         return false;
     return !(dwAtr & FILE_ATTRIBUTE_DIRECTORY);
@@ -59,7 +59,7 @@ bool SharedUtil::FileExists(const SString& strFilename) noexcept
 //
 // Returns true if the directory exists
 //
-bool SharedUtil::DirectoryExists(const SString& strPath) noexcept
+bool SharedUtil::DirectoryExists(const std::string& strPath) noexcept
 {
 #if __cplusplus >= 201703L
     namespace fs = std::filesystem;
@@ -67,7 +67,7 @@ bool SharedUtil::DirectoryExists(const SString& strPath) noexcept
     return fs::is_directory(strPath.c_str(), errorCode);
 #else
     #ifdef _WIN32
-    DWORD dwAtr = GetFileAttributes(strPath);
+    DWORD dwAtr = GetFileAttributes(strPath.c_str());
     if (dwAtr == INVALID_FILE_ATTRIBUTES)
         return false;
     return (dwAtr & FILE_ATTRIBUTE_DIRECTORY) != 0;
@@ -101,7 +101,7 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     if (offset > GIBIBYTE)
         return false;
 
-#if _WIN32
+#ifdef _WIN32
     WString wideFilePath;
 
     try
@@ -113,7 +113,7 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
         return false;
     }
 
-    _WIN32_FILE_ATTRIBUTE_DATA fileAttributeData;
+    WIN32_FILE_ATTRIBUTE_DATA fileAttributeData;
 
     if (!GetFileAttributesExW(wideFilePath, GetFileExInfoStandard, &fileAttributeData))
         return false;
@@ -375,7 +375,7 @@ void SharedUtil::MakeSureDirExists(const SString& strPath)
     }
 #else
     std::filesystem::path filePath = static_cast<std::string>(PathConform(strPath));
-    std::error_code       ec{};
+    std::error_code ec{};
     std::filesystem::create_directories(filePath.parent_path(), ec);
 #endif
 }
@@ -383,7 +383,7 @@ void SharedUtil::MakeSureDirExists(const SString& strPath)
 SString SharedUtil::PathConform(const SString& strPath)
 {
     // Make slashes the right way and remove duplicates, except for UNC type indicators
-#if _WIN32
+#ifdef _WIN32
     SString strTemp = strPath.Replace("/", PATH_SEPERATOR);
 #else
     SString strTemp = strPath.Replace("\\", PATH_SEPERATOR);
