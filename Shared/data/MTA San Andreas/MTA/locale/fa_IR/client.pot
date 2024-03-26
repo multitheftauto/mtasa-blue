@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-26 11:43\n"
+"PO-Revision-Date: 2024-03-26 12:45\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -314,7 +314,7 @@ msgstr "GTA:SA خطاهایی را در فایل '%s' پیدا کرد"
 
 #: Client/loader/Utils.cpp:1716
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "آیا رایانه شما هنگام بازی کردن در MTA:SA دوباره راه‌اندازی شد؟"
+msgstr "آیا کامپیوتر شما هنگام بازی کردن در MTA:SA دوباره راه‌اندازی شد؟"
 
 #: Client/loader/Utils.cpp:1781
 msgid "Please terminate the following programs before continuing:"
@@ -2244,7 +2244,7 @@ msgstr "تشکر ویژه"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
-msgstr "این برنامه از کتابخانه ها و نرم‌افزار های زیر استفاده می کند:"
+msgstr "این برنامه و پروژه از کتابخانه ها و نرم‌افزار های زیر استفاده می کند:"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:216
@@ -2675,7 +2675,7 @@ msgstr "به عنوان مسافر وارد ماشین می شود"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "next radio channel"
-msgstr "کانال بعدی رادیو"
+msgstr "کانال رادیویی بعدی"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "previous radio channel"
@@ -2896,7 +2896,7 @@ msgstr "قدم زدن در اطراف "
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1171
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "شما از بازی اخراج شدید (%s )"
+msgstr "شما از بازی اخراج شدید ( %s )"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1240
 msgid "Connecting to local server..."
