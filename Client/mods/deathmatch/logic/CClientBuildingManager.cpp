@@ -85,3 +85,26 @@ bool CClientBuildingManager::IsValidPosition(const CVector& pos) noexcept
     return (pos.fX >= -WORLD_DISTANCE_FROM_CENTER && pos.fX <= WORLD_DISTANCE_FROM_CENTER && pos.fY >= -WORLD_DISTANCE_FROM_CENTER &&
             pos.fY <= WORLD_DISTANCE_FROM_CENTER);
 }
+
+void CClientBuildingManager::DestroyAllForABit()
+{
+    for (CClientBuilding* building : GetBuildings())
+    {
+        building->Destroy();
+    }
+}
+
+void CClientBuildingManager::RestoreDestroyed()
+{
+    for (CClientBuilding* building : GetBuildings())
+    {
+        building->Create();
+
+        if (!building->IsValid())
+        {
+            // User creates too much buildings
+            // We can't restore them all
+            delete building;
+        }
+    }
+}

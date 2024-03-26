@@ -42,6 +42,8 @@ public:
 
     eClientEntityType GetType() const noexcept { return CCLIENTBUILDING; }
 
+    bool IsValid() const noexcept { return m_pBuilding != nullptr; };
+
 private:
     void Create();
     void Destroy();
