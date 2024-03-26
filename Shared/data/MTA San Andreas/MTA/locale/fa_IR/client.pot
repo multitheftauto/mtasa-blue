@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-26 21:10\n"
+"PO-Revision-Date: 2024-03-26 22:10\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -2526,7 +2526,7 @@ msgstr "روشن"
 #: Client/core/ServerBrowser/CServerList.cpp:154
 msgid "server"
 msgid_plural "servers"
-msgstr[0] "سرورسرورها"
+msgstr[0] "سرور"
 msgstr[1] "سرورها"
 
 #. We are polling for the master server list (first pass)
@@ -2874,7 +2874,7 @@ msgstr "اتصال برقرار نشد؛ لطفا از اتصال سریع یا 
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:755
 msgid "Could not start the local server. See console for details."
-msgstr "سرور خانگی راه‌اندازی نشد. جزئیات را در کنسول مشاهده کنید."
+msgstr "سرور محلی راه‌اندازی نشد. برای جزئیات بیشتر به کنسول مراجعه کنید."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1240
@@ -2936,11 +2936,11 @@ msgstr "در مسیر بیمارستان"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "Meeting their maker"
-msgstr "ملاقات با سازنده آنها"
+msgstr "ملاقات با خالقشان"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Regretting their decisions"
-msgstr "پشیمانی از پیکربندی"
+msgstr "پشیمانی از تصمیمات"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5694
 msgid "Wasted"
@@ -2989,7 +2989,7 @@ msgstr "همه"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr "راه‌اندازی"
+msgstr "شروع"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -3009,7 +3009,7 @@ msgstr "قطع ارتباط از سرور"
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr "اتصال قطع شد: سریال شما مسدود/محروم شده است.\n"
+msgstr "اتصال قطع شد: سریال شما محروم شده است.\n"
 "دلیل: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
@@ -3023,7 +3023,7 @@ msgstr "اتصال قطع شد: شما محروم شده اید.\n"
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr "اتصال قطع شد: حساب شما مسدود/محروم شده است.\n"
+msgstr "اتصال قطع شد: حساب شما محروم شده است.\n"
 "دلیل: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
@@ -3032,7 +3032,7 @@ msgstr "اتصال قطع شد: عدم تطابق نسخه"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:534
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "اتصال قطع شد: لطفاً یک دقیقه صبر کنید، سپس سعی کنید که متصل شوید."
+msgstr "اتصال قطع شد: لطفاً یک دقیقه صبر کنید، سپس سعی کنید که دوباره متصل شوید."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:538
 #, c-format
@@ -3045,7 +3045,7 @@ msgstr "اتصال قطع شد: سرور از شاخه های مختلف.\n"
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr "اتصال قطع شد: نسخه خراب.\n"
+msgstr "اتصال قطع شد: نسخه بد.\n"
 "اطلاعات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
@@ -3077,7 +3077,7 @@ msgstr "اتصال قطع شد: سرور اتصال را رد کرد: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
 msgid "Disconnected: Serial verification failed"
-msgstr "اتصال قطع شد: اعتبار سنجی سریال با شکست مواجه شد"
+msgstr "اتصال قطع شد: تأیید سریال ناموفق بود"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
 #, c-format
@@ -3096,7 +3096,7 @@ msgstr "اتصال قطع شد: شما توسط %s محروم شدید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
 msgid "Disconnected: Server shutdown or restarting"
-msgstr "قطع شده: سرور خاموش یا راه‌اندازی مجدد شد"
+msgstr "اتصال قطع شد: سرور خاموش یا راه‌اندازی مجدد شد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
 msgid "You were kicked from the game"
@@ -3105,7 +3105,7 @@ msgstr "شما از بازی اخراج شدید"
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "این سرور به یک gta_sa.exe دستکاری نشده نیاز دارد"
+msgstr "این سرور به یک gta_sa.exe تغییر یافته نشده نیاز دارد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
@@ -3142,7 +3142,7 @@ msgstr "MTA را دوباره راه‌اندازی کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "برای ورود به این سرور به gta3.img و gta_int.img دستکاری نشده نیاز دارید"
+msgstr "این سرور به gta3.img و gta_int.img تغییر یافته نشده نیاز دارد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Please replace gta3.img or gta_int.img"
@@ -3154,7 +3154,7 @@ msgstr "این سرور اجازه ورود افراد توسط برنامه Win
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "اطمینان حاصل کنید که هیچ برنامه دیگری MTA:SA را اصلاح نمی کند"
+msgstr "اطمینان حاصل کنید که هیچ برنامهٔ دیگری در حال تغییر MTA: SA نیست"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
 msgid "Time Remaining: "
@@ -3191,7 +3191,7 @@ msgstr[1] "%d ثانیه ها"
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
 msgid "Disconnected"
-msgstr "قطع شد"
+msgstr "اتصال قطع شد"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
@@ -3217,7 +3217,7 @@ msgstr "برای لغو دانلود، اتصال را قطع کنید"
 #: Shared/mods/deathmatch/logic/Utils.cpp:109
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "خطای مهم (%u). در صورت حل نشدن مشکل، لطفا برای پشتیبانی، به وبسایت mtasa.com مراجعه کنید."
+msgstr "خطای مهم (%u). در صورت حل نشدن مشکل، لطفاً برای پشتیبانی، به وبسایت mtasa.com مراجعه کنید."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3226,7 +3226,7 @@ msgstr "خطای مهم (%u). در صورت حل نشدن مشکل، لطفا ب
 #: Shared/mods/deathmatch/logic/Utils.cpp:125
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
-msgstr "خطای پروتکل (%u). در صورت حل نشدن مشکل، لطفا برای پشتیبانی، به mtasa.com مراجعه کنید."
+msgstr "خطای پروتکل (%u). در صورت حل نشدن مشکل، لطفاً برای پشتیبانی، به mtasa.com مراجعه کنید."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 msgid "Connection error"
