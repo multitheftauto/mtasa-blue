@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-26 12:45\n"
+"PO-Revision-Date: 2024-03-26 19:22\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -154,7 +154,7 @@ msgstr "Client و Server"
 #. INST_SERVER
 #: Shared/installer/nightly.nsi:442
 msgid "Server only"
-msgstr "فقط Server"
+msgstr "فقط سرور"
 
 #. INST_STARTMENU_GROUP
 #: Shared/installer/nightly.nsi:456
@@ -194,7 +194,7 @@ msgstr "Server سفارشی"
 #. INST_SEC_CORE
 #: Shared/installer/nightly.nsi:496
 msgid "Core components"
-msgstr "اجزای هسته"
+msgstr "اجزای اصلی"
 
 #. INST_SEC_GAME
 #: Shared/installer/nightly.nsi:497
@@ -223,12 +223,12 @@ msgstr "نسخه معتبری از Grand Theft Auto: San Andreas پیدا نشد
 #. INST_SEC_CORE_RESOURCES
 #: Shared/installer/nightly.nsi:504
 msgid "Core Resources"
-msgstr "منابع/ریسورس‌های اصلی"
+msgstr "منابع اصلی"
 
 #. INST_SEC_OPTIONAL_RESOURCES
 #: Shared/installer/nightly.nsi:505
 msgid "Optional Resources"
-msgstr "منابع/ریسورس‌های اختیاری"
+msgstr "منابع اختیاری"
 
 #. INST_SEC_EDITOR
 #: Shared/installer/nightly.nsi:506
@@ -260,8 +260,8 @@ msgstr "آیا مطمئن هستید که می‌خواهید (Name^)$ و همه
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
-msgstr "حذف قبل از به روز رسانی؟$\\r$\n"
-"نیازی به حذف قبل از نصب نسخه جدیدی از MTA:SA وجود ندارد$\\r$\n"
+msgstr "آیا میخواهید قبل از بروزرسانی حذف کنید؟$\\r$\n"
+"ضروری نیست نسخه قبلی را قبل از نصب بروزرسانی MTA:SA$\\r$ حذف کنید\n"
 "نصب کننده نسخه جدید را برای ارتقا و حفظ تنظیمات خود اجرا کنید."
 
 #. UNINST_DATA_REQUEST
