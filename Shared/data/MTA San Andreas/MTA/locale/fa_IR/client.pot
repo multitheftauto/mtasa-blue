@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-26 12:45\n"
+"PO-Revision-Date: 2024-03-26 21:10\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -2883,7 +2883,7 @@ msgstr "سرور محلی"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Starting local server ..."
-msgstr "در حال راه‌اندازی سرور خانگی ..."
+msgstr "در حال راه‌اندازی سرور محلی ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1013
 msgid "Area 51"
