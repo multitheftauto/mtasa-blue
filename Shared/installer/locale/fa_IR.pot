@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-26 19:22\n"
+"PO-Revision-Date: 2024-03-26 22:10\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -149,7 +149,7 @@ msgstr "Client برنامه ای است که برای بازی کردن روی M
 #. INST_CLIENTSERVER
 #: Shared/installer/nightly.nsi:441
 msgid "Client and Server"
-msgstr "Client و Server"
+msgstr "سرور و کلاینت"
 
 #. INST_SERVER
 #: Shared/installer/nightly.nsi:442
