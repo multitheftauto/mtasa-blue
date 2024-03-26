@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-09-10 16:36+0000\n"
-"PO-Revision-Date: 2024-03-24 01:20\n"
+"PO-Revision-Date: 2024-03-26 03:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #. Found in the main menu navigation
 msgid "Quick connect"
-msgstr "پیوستن با شتاب"
+msgstr "اتصال سریع"
 
 #. Found in the main menu navigation
 msgid "Disconnect"
@@ -39,7 +39,7 @@ msgstr "ویرایشگر نقشه"
 
 #. Found in the main menu navigation
 msgid "Settings"
-msgstr "پیکربندی ها"
+msgstr "تنظیمات"
 
 #. Found in the main menu navigation
 msgid "About"
