@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-24 11:20\n"
+"PO-Revision-Date: 2024-03-26 01:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -39,7 +39,7 @@ msgstr "اجازه بده"
 
 #: Client/cefweb/CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr "اجازه نده"
+msgstr "رد کن"
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1360
@@ -196,7 +196,7 @@ msgstr "اگر تا به حال گزینه ای را که کار میکند را
 
 #: Client/loader/Dialogs.cpp:186
 msgid "Force windowed mode"
-msgstr "اجبار حالت پنجره ای"
+msgstr "حالت پنجره ای اجباری"
 
 #: Client/loader/Dialogs.cpp:187
 msgid "Don't show again"
@@ -214,8 +214,8 @@ msgstr "هشدار: برنامه آنتی ویروس شناسایی نشد"
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
-msgstr "MTA نتوانست آنتی ویروسی روی سیستم شما شناسایی کند.\n\n"
-"ویروس ها می توانند در تجربه MTA و گیم پلی آن مشکل و اختلال ایجاد کنند.\n\n"
+msgstr "MTA نتوانست آنتی ویروسی روی کامپیوتر شما شناسایی کند.\n\n"
+"ویروس ها می توانند در تجربه MTA و بازی کردن شما اختلال ایجاد کنند.\n\n"
 "برای دیدن اطلاعات بیشتر روی دکمه 'کمک' کلیک کنید."
 
 #: Client/loader/Dialogs.cpp:200
@@ -258,11 +258,11 @@ msgstr "در حال اتمام..."
 
 #: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1462
 msgid "Done!"
-msgstr "تمام!"
+msgstr "انجام شد!"
 
 #: Client/loader/Utils.cpp:600
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "پوشه نصب Grand Theft Auto: San Andreas را انتخاب کنید"
+msgstr "لطفاً محل نصب بازی Grand Theft Auto: San Andreas را انتخاب کنید"
 
 #: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
 #, c-format
@@ -389,8 +389,7 @@ msgstr "اتصالات GTA:SA را بسازید"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA اجرا نشد زیرا کپی یک فایل با شکست مواجه شد:\n"
-"به دلیل مشکل در کپی فایل ها MTA:SA نمی تواند اجرا شود:"
+msgstr "MTA:SA اجرا نشد زیرا کپی یک فایل با شکست مواجه شد:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
@@ -436,7 +435,7 @@ msgstr "MTA:SA اجرا نشد زیرا اعمال بسته تکمیلی GTA:SA 
 #: Client/loader/CInstallManager.cpp:1057 Client/core/CCore.cpp:811
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA نمی تواند ادامه دهد زیرا درایو %s فضای کافی ندارد.‎‏‎‪‎‏"
+msgstr "MTA:SA نمی تواند ادامه دهد زیرا محل ذخیره سایزی %s فضای کافی ندارد‎‏‎‪‎‏."
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -444,7 +443,7 @@ msgstr "فایل یافت نشده:"
 
 #: Client/loader/CInstallManager.cpp:1117
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "اگر MTA لود نشد، لطفا GTA:SA را مجدد نصب کنید."
+msgstr "اگر MTA در بارگزاری شکست خورد، لطفا GTA:SA را مجدد نصب کنید"
 
 #: Client/loader/CInstallManager.cpp:1152
 msgid "Update install settings"
@@ -476,16 +475,16 @@ msgid "Your installation may be corrupt now.\n\n"
 msgstr "فرایند نصب شما ممکن است در حال حاضر خراب باشد.\n\n"
 "فایل %zu از %zu از نسخه پشتیبان نمیتواند بازیابی شود.\n\n"
 "میبایست Multi Theft Auto را از www.multitheftauto.com دوباره نصب کنید\n"
-"یا سعی کنید به روز رسانی را با دسترسی administrator اجرا کنید."
+"یا سعی کنید بروزرسانی را با دسترسی administrator اجرا کنید."
 
 #: Client/loader/MainFunctions.cpp:248
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
 "Try to launch MTA:SA again?"
-msgstr "مشکل در راه اندازی مجددی MTA:SA\n\n"
-"اگر مشکل ادامه یافت, تسک منیجر را باز کرده\n"
-"و 'gta_sa.exe' و 'Multi Theft Auto.exe' را متوفق کنید\n\n\n"
+msgstr "مشکل در راه‌اندازی مجددی MTA:SA\n\n"
+"اگر مشکل ادامه یافت، 'Task Manager' را باز کرده\n"
+"و 'gta_sa.exe' و 'Multi Theft Auto.exe' را متوقف کنید\n\n\n"
 "تلاش مجدد برای اجرای MTA:SA ؟"
 
 #: Client/loader/MainFunctions.cpp:266
