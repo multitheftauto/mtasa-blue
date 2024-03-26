@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-26 01:20\n"
+"PO-Revision-Date: 2024-03-26 02:20\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -491,19 +491,19 @@ msgstr "مشکل در راه‌اندازی مجددی MTA:SA\n\n"
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
 msgstr "یک نسخه دیگر از MTA از قبل در حال اجرا می باشد.\n\n"
-"اگر این مشکل پابرجا ماند، لطفا سیستم خود را ریستارت کنید"
+"اگر این مشکل پابرجا ماند، لطفا کامپیوتر خود را دوباره راه‌اندازی کنید"
 
 #: Client/loader/MainFunctions.cpp:269
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
-msgstr "یک نمونه از ام تی ای در حال حاضر در حال اجرا است.\n\n"
-"آیا می خواهید آن را ببندید؟"
+msgstr "یک نسخه از MTA در حال حاضر در حال اجرا است.\n\n"
+"آیا می خواهید آن را متوقف کنید؟"
 
 #: Client/loader/MainFunctions.cpp:294
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
-msgstr "آیا در اجرای ام تی ای:اس ای به مشکل برخوردید؟\n\n"
-"آیا می خواهد به نسخه قبل بازگردانی کنید؟"
+msgstr "آیا در اجرای MTA:SA ای به مشکل برخوردید؟\n\n"
+"آیا می خواهد به نسخه قبلی برگردید؟"
 
 #: Client/loader/MainFunctions.cpp:324
 msgid "There seems to be a problem launching MTA:SA.\n"
@@ -626,7 +626,7 @@ msgstr "فایل اصلی نام اشتباهی دارد (%s)"
 msgid "Main file is unsigned. Possible virus activity.\n\n"
 "See online help if MTA does not work correctly."
 msgstr "فایل اصلی بدون امضا می‌باشد. احتمال وجود ویروس.\n\n"
-"اگر MTA به درستی کارنمیکند به پشتیبانی آنلاین مراجعه کنید."
+"اگر MTA به درستی کار نمیکند به پشتیبانی آنلاین مراجعه کنید."
 
 #: Client/loader/MainFunctions.cpp:882
 #, c-format
@@ -668,7 +668,7 @@ msgstr "MTA:SA با 'Safe Mode' ویندوز سازگار نیست.\n\n"
 
 #: Client/loader/MainFunctions.cpp:1123
 msgid "Fix configuration issue"
-msgstr "رفع مشکل تنظیمات"
+msgstr "رفع مشکل پیکربندی"
 
 #. Try to relaunch as admin if not done so already
 #: Client/loader/MainFunctions.cpp:1157
@@ -688,12 +688,12 @@ msgstr "GTA: San Andreas ممکن است به درستی اجرا نشده با�
 
 #: Client/game_sa/CSettingsSA.cpp:753
 msgid "Can't find valid screen resolution."
-msgstr "نمی توان وضوح درست را پیدا کرد."
+msgstr "اندازه‌ی صفحه متناسب پیدا نشد."
 
 #. Confirm that res should be used
 #: Client/game_sa/CSettingsSA.cpp:829
 msgid "Are you sure you want to use this screen resolution?"
-msgstr "آیا برای استفاده از این وضوح صفحه اطمینان دارید؟"
+msgstr "آیا مطمئنید میخواهید از این اندازه‌ی صفحه استفاده کنید؟"
 
 #: Client/core/CCore.cpp:674 Client/core/CSettings.cpp:3465
 #: Client/mods/deathmatch/logic/CResource.cpp:372
@@ -705,7 +705,7 @@ msgstr "در بازی"
 #: Client/core/CMainMenu.cpp:304
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 msgid "Main menu"
-msgstr "منوی اصلی"
+msgstr "فهرست اصلی"
 
 #: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
@@ -939,15 +939,15 @@ msgstr "ترمز/دنده عقب"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr "ایسگاه رادیو بعدی"
+msgstr "رادیو بعدی"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr "ایستگاه رادیو قبلی"
+msgstr "رادیو قبلی"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr "رادیوی کاربر آهنگ بعدی"
+msgstr "پریدن به آهنگ بعدی"
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
@@ -1556,7 +1556,7 @@ msgstr "سایه متحرک کارکترها"
 
 #: Client/core/CSettings.cpp:820
 msgid "Motion blur"
-msgstr "کِش آمدن تصویر"
+msgstr "کدری متحرک"
 
 #: Client/core/CSettings.cpp:825
 msgid "Full Screen Minimize"
@@ -2032,8 +2032,8 @@ msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
 msgstr "به نظر می رسد که گزینه اتصال Rich Presence را فعال کرده اید.\n"
-"آیا می خواهید به سرورها اجازه دهید داده های خود را به اشتراک بگذارند؟\n\n"
-"این شامل شناسه منحصر به فرد شما نیز می‌شود."
+"آیا به سرورها اجازه می‌دهید داده های خود را به اشتراک بگذارند؟\n\n"
+"این شامل شناسه منحصر بفرد شما نیز می‌شود."
 
 #: Client/core/CSettings.cpp:4542
 msgid "CONSENT TO ALLOW DATA SHARING"
@@ -2650,11 +2650,11 @@ msgstr "از بازی جدا شوید"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
-msgstr "تگ های نام را نشان می دهد"
+msgstr "نمایش برجسب‌های نام"
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "shows the chatbox"
-msgstr "چت باکس را نشان می دهد"
+msgstr "محدوده گفت و گو را نشان می دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the network statistics"
@@ -2663,7 +2663,7 @@ msgstr "جزییات شبکه را نشان می دهد"
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:63
 msgid "open the chat input"
-msgstr "ورودی چت را باز کنید"
+msgstr "ورودی گفت و گو را باز میکند"
 
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "transmits voice to other players"
@@ -2703,7 +2703,7 @@ msgstr "نقشه را به سمت جنوب حرکت می‌دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the radar east"
-msgstr "نقشه را به سمت شرق حرکت‌می دهد"
+msgstr "نقشه را به سمت شرق حرکت‌ می‌دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the radar west"
