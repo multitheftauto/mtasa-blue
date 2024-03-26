@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-24 11:20\n"
+"PO-Revision-Date: 2024-03-26 12:45\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -60,7 +60,7 @@ msgid "Please select your Grand Theft Auto: San Andreas folder.$\n"
 "You MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n"
 "$\n"
 "Click Install to begin installing."
-msgstr "لطفا پوشه Grand Theft Auto: San Andreas را انتخاب کنید.$\n"
+msgstr "لطفاً پوشه Grand Theft Auto: San Andreas را انتخاب کنید.$\n"
 "$\n"
 "برای استفاده از MTA:SA باید Grand Theft Auto: San Andreas 1.0 را نصب کرده باشید، نسخه های دیگر پشتیبانی نمی‌شوند.$\n"
 "$\n"
@@ -209,7 +209,7 @@ msgstr "انجام ارتقاء در محل..."
 #. INFO_UPDATE_PERMISSIONS
 #: Shared/installer/nightly.nsi:500
 msgid "Updating permissions. This could take a few minutes..."
-msgstr "به روزرسانی دسترسی‌ها. ممکن است چند دقیقه طول بکشد..."
+msgstr "بروزرسانی دسترسی‌ها. ممکن است چند دقیقه طول بکشد..."
 
 #. MSGBOX_INVALID_GTASA
 #: Shared/installer/nightly.nsi:501
@@ -358,7 +358,7 @@ msgstr "پوشه مقصد"
 #. INST_CHOOSE_LOC_BROWSE
 #: Shared/installer/nightly.nsi:1967
 msgid "Browse..."
-msgstr "انتخاب..."
+msgstr "مرور کردن..."
 
 #. INST_CHOOSE_LOC_DEFAULT
 #: Shared/installer/nightly.nsi:1968
@@ -393,17 +393,17 @@ msgstr "نوع نصب: ارتقا"
 #. NETTEST_TITLE1
 #: Shared/installer/nightly.nsi:2401
 msgid "Online update"
-msgstr "به روز رسانی آنلاین"
+msgstr "بروزرسانی آنلاین"
 
 #. NETTEST_TITLE2
 #: Shared/installer/nightly.nsi:2402
 msgid "Checking for update information"
-msgstr "بررسی اطلاعات به روز رسانی"
+msgstr "بررسی اطلاعات بروزرسانی"
 
 #. NETTEST_STATUS1
 #: Shared/installer/nightly.nsi:2403
 msgid "Checking for installer update information..."
-msgstr "در حال بررسی اطلاعات به‌روزرسانی نصب‌کننده..."
+msgstr "در حال بررسی اطلاعات بروزرسانی نصب‌کننده..."
 
 #. NETTEST_STATUS2
 #: Shared/installer/nightly.nsi:2404
