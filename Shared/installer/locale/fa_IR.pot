@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-26 22:10\n"
+"PO-Revision-Date: 2024-03-27 14:13\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -74,7 +74,7 @@ msgstr "افزودن در فهرست استارت ویندوز برای نرم�
 #. DESC_Section11
 #: Shared/installer/nightly.nsi:218
 msgid "Create a Desktop Shortcut for the MTA:SA Client."
-msgstr "ایجاد کردن یک میانبر بر روی صفحه نمایش برای MTA:SA Client."
+msgstr "ایجاد کردن یک میانبر بر روی دسکتاپ برای MTA:SA Client."
 
 #. DESC_Section12
 #: Shared/installer/nightly.nsi:219
@@ -164,7 +164,7 @@ msgstr "فهرست start ویندوز"
 #. INST_DESKTOP_ICON
 #: Shared/installer/nightly.nsi:457
 msgid "Desktop icon"
-msgstr "میانبر صفحه نمایش"
+msgstr "میانبر دسکتاپ"
 
 #. INST_PROTOCOL
 #: Shared/installer/nightly.nsi:458
@@ -184,12 +184,12 @@ msgstr "نصب DirectX"
 #. INST_SEC_CLIENT
 #: Shared/installer/nightly.nsi:494
 msgid "Game client"
-msgstr "Game client"
+msgstr "نسخه بازیکن"
 
 #. INST_SEC_SERVER
 #: Shared/installer/nightly.nsi:495
 msgid "Dedicated server"
-msgstr "Server سفارشی"
+msgstr "سرور اختصاصی"
 
 #. INST_SEC_CORE
 #: Shared/installer/nightly.nsi:496
@@ -272,22 +272,22 @@ msgstr "آیا می خواهید فایل های داده خود (مانند م�
 #. UAC_RIGHTS1
 #: Shared/installer/nightly.nsi:1236
 msgid "This installer requires admin access, try again"
-msgstr "این نصب کننده به دسترسی سرپرست نیاز دارد، دوباره امتحان کنید"
+msgstr "این نصب کننده به دسترسی admin نیاز دارد، دوباره امتحان کنید"
 
 #. UAC_RIGHTS_UN
 #: Shared/installer/nightly.nsi:1237
 msgid "This uninstaller requires admin access, try again"
-msgstr "این حذف نصب نیاز به دسترسی سرپرست دارد، دوباره امتحان کنید"
+msgstr "این حذف نصب نیاز به دسترسی admin دارد، دوباره امتحان کنید"
 
 #. UAC_RIGHTS3
 #: Shared/installer/nightly.nsi:1238
 msgid "Logon service not running, aborting!"
-msgstr "سرویس لاگین اجرا نمی شود، سقط می شود!"
+msgstr "سرویس ورود به سیستم اجرا نشده است. عملیات لغو شد!"
 
 #. UAC_RIGHTS4
 #: Shared/installer/nightly.nsi:1239
 msgid "Unable to elevate"
-msgstr "قادر به بالا بردن نیست"
+msgstr "قادر به بالا آوردن نیست"
 
 #. INST_MTA_CONFLICT
 #: Shared/installer/nightly.nsi:1835
@@ -309,7 +309,7 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 msgstr "MTA را نمی توان در مسیر GTA:SA.$ نصب کرد\n"
 "$\n"
 "آیا می خواهید از مسیر نصب پیش فرض$ استفاده کنید\n"
-"$DEFAULT_INSTDIR ?"
+"$DEFAULT_INSTDIR ؟"
 
 #. INST_GTA_ERROR1
 #: Shared/installer/nightly.nsi:1842
@@ -346,7 +346,7 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 "$\n"
 " Click Next to continue."
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} در پوشه زیر نصب خواهد شد.$\n"
-"برای نصب در یک پوشه دیگر، روی انتخاب کلیک کنید و پوشه دیگری را انتخاب کنید.$\n"
+"برای نصب در یک پوشه دیگر، روی مسیر کلیک کنید و پوشه دیگری را انتخاب کنید.$\n"
 "$\n"
 " برای ادامه بر روی بعدی کلیک کنید."
 
@@ -358,7 +358,7 @@ msgstr "پوشه مقصد"
 #. INST_CHOOSE_LOC_BROWSE
 #: Shared/installer/nightly.nsi:1967
 msgid "Browse..."
-msgstr "مرور کردن..."
+msgstr "مسیر..."
 
 #. INST_CHOOSE_LOC_DEFAULT
 #: Shared/installer/nightly.nsi:1968
@@ -383,7 +383,7 @@ msgstr "پوشه را برای نصب ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} 
 #. INST_LOC_OW
 #: Shared/installer/nightly.nsi:2166
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
-msgstr "هشدار: نسخه اصلی دیگری از MTA ($1) از قبل در آن مسیر وجود دارد."
+msgstr "هشدار: یک نسخه اصلی دیگر از نسخه ($1) MTA در همان مسیر وجود دارد."
 
 #. INST_LOC_UPGRADE
 #: Shared/installer/nightly.nsi:2167
