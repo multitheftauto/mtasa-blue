@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-27 11:10\n"
+"PO-Revision-Date: 2024-03-27 12:12\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -339,7 +339,7 @@ msgstr "نصب فایل های بروزرسانی شده MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:552
 msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "به دلیل درگیر بودن فایل ها نمی توان آپدیت کرد. لطفا برنامه های دیگر را بسته و مجددا تلاش کنید"
+msgstr "به دلیل درگیر بودن فایل ها نمی توان بروزرسانی کرد. لطفا برنامه های دیگر را بسته و مجددا تلاش کنید"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -865,11 +865,11 @@ msgstr "راست"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
-msgstr "زوم به داخل"
+msgstr "بزرگ نمایی"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Zoom out"
-msgstr "زوم به بیرون"
+msgstr "کوچک نمایی"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
@@ -1061,7 +1061,7 @@ msgstr "در حال بررسی"
 
 #: Client/core/CVersionUpdater.cpp:1821 Client/core/CVersionUpdater.cpp:1914
 msgid "UPDATE CHECK"
-msgstr "بررسی آپدیت"
+msgstr "بررسی بروزرسانی"
 
 #: Client/core/CVersionUpdater.cpp:1822
 msgid "No update needed"
@@ -1073,37 +1073,37 @@ msgstr "در حال دانلود"
 
 #: Client/core/CVersionUpdater.cpp:1840
 msgid "waiting..."
-msgstr "در جال انتظار ..."
+msgstr "در حال انتظار..."
 
 #: Client/core/CVersionUpdater.cpp:1856
 msgid "MANDATORY UPDATE"
-msgstr "آپدیت اجباری"
+msgstr "بروزرسانی اجباری"
 
 #: Client/core/CVersionUpdater.cpp:1857
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
-msgstr "برای به ورود به این سرور باید MTA خود را بروزرسانی نمایید.\n\n"
+msgstr "برای ورود به این سرور باید MTA خود را بروزرسانی نمایید.\n\n"
 "آیا می خواهید همین الان بروزرسانی کنید؟"
 
 #: Client/core/CVersionUpdater.cpp:1875
 msgid "OPTIONAL UPDATE"
-msgstr "آپدیت اختیاری"
+msgstr "بروزرسانی اختیاری"
 
 #: Client/core/CVersionUpdater.cpp:1876
 msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
-msgstr "سرور: آپدیت MTA پیشنهاد می شود اما اجباری نیست.\n\n"
-"آیا می خواهید همین الان آپدیت کنید؟"
+msgstr "سرور: بروزرسانی MTA پیشنهاد می شود اما اجباری نیست.\n\n"
+"آیا می خواهید همین الان بروزرسانی کنید؟"
 
 #: Client/core/CVersionUpdater.cpp:1915
 msgid "Update not currently avalable.\n\n"
 "Please check www.mtasa.com"
-msgstr "آپدیت در حال حاضر موجود نمی باشد.\n\n"
-"لطفا www.mtasa.com را بررسی نمایید."
+msgstr "بروزرسانی در حال حاضر موجود نمی باشد.\n\n"
+"لطفا www.mtasa.com را بررسی نمایید"
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
-msgstr "خطا در ذخیره سازی"
+msgstr "خطا در ذخیره‌سازی"
 
 #: Client/core/CVersionUpdater.cpp:1937 Client/core/CVersionUpdater.cpp:2119
 msgid "Unable to create the file."
@@ -1168,7 +1168,7 @@ msgstr "کنسول"
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:86
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "اسکین انتخابی شما نمی تواند باگذاری شود, همچنین اسکین های پیشفرض, لطفا مجددا MTA را نصب نمایید."
+msgstr "اسکین انتخابی شما نمی تواند باگذاری شود، همچنین اسکین های پیشفرض، لطفا مجددا MTA را نصب نمایید."
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -1244,7 +1244,7 @@ msgstr "پرواز با موس"
 #. Joypad options
 #: Client/core/CSettings.cpp:217
 msgid "Joypad options"
-msgstr "گزینه های جوی استیک"
+msgstr "گزینه های Joypad"
 
 #: Client/core/CSettings.cpp:230
 msgid "Standard controls (Mouse + Keyboard)"
@@ -1319,7 +1319,7 @@ msgstr "اجازه برقراری ارتباط با Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
-msgstr "استفاده از فایل های دستکاری شده GTA:SA"
+msgstr "استفاده از فایل های سفارشی شده GTA:SA"
 
 #: Client/core/CSettings.cpp:401
 msgid "Map rendering options"
@@ -1426,7 +1426,7 @@ msgstr "بی صدا بودن تمامی صداها هنگام مینمایز ب�
 #. *
 #: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:624
 msgid "Resolution:"
-msgstr "رزولوشن:"
+msgstr "وضوح تصویر:"
 
 #: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:671
 msgid "FOV:"
@@ -1434,11 +1434,11 @@ msgstr "اف او وی:"
 
 #: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:687
 msgid "Draw Distance:"
-msgstr "فاصله رسم:"
+msgstr "محدوده دید:"
 
 #: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:705
 msgid "Brightness:"
-msgstr "روشنایی"
+msgstr "روشنایی:"
 
 #: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:723
 msgid "FX Quality:"
@@ -1564,7 +1564,7 @@ msgstr "تمام صفحه مینیمایز"
 
 #: Client/core/CSettings.cpp:837
 msgid "Enable Device Selection Dialog"
-msgstr "دیالوگِ انتخاب دستگاه فعال"
+msgstr "فعال‌سازی صفحهٔ انتخاب دستگاه"
 
 #: Client/core/CSettings.cpp:849
 msgid "Show unsafe resolutions"
@@ -1572,7 +1572,7 @@ msgstr "نمایش وضوح های غیر امن"
 
 #: Client/core/CSettings.cpp:861
 msgid "Render vehicles always in high detail"
-msgstr "رندر وسایل نقلیه همیشه با جزئیات زیاد"
+msgstr "نمایش وسایل نقلیه با جزئیات زیاد"
 
 #: Client/core/CSettings.cpp:865
 msgid "Render peds always in high detail"
@@ -1600,7 +1600,7 @@ msgstr "یک دامنه را وارد کنید. مثال: google.com"
 
 #: Client/core/CSettings.cpp:927
 msgid "Block"
-msgstr "انسداد"
+msgstr "مسدود کردن"
 
 #: Client/core/CSettings.cpp:935 Client/core/CSettings.cpp:970
 msgid "Domain"
@@ -1624,7 +1624,7 @@ msgstr "غیره"
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:998
 #: Client/core/CSettings.cpp:4785
 msgid "Fast CJ clothes loading:"
-msgstr "بارگذاری سریع لباس های CD:"
+msgstr "بارگذاری سریع لباس های CJ:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1012
@@ -1671,7 +1671,7 @@ msgstr "حافظه استریم:"
 #. Update build type
 #: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1203
 msgid "Update build type:"
-msgstr "نوع ساختار آپدیت:"
+msgstr "نوع ساختار بروزرسانی:"
 
 #. UpdateAutoInstall
 #: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1182
@@ -1729,12 +1729,12 @@ msgstr "رنگ 16 بیت"
 
 #: Client/core/CSettings.cpp:1138
 msgid "Mouse fix"
-msgstr "فیکس موس"
+msgstr "تعمیر مشکل موس"
 
 #. Cache path info
 #: Client/core/CSettings.cpp:1156
 msgid "Client resource files:"
-msgstr "فایل های کلاینت ریسورس:"
+msgstr "فایل‌های منبع کلاینت:"
 
 #: Client/core/CSettings.cpp:1160
 msgid "Show in Explorer"
@@ -1743,12 +1743,12 @@ msgstr "نمایش در اکسپلورر"
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1175 Client/core/CSettings.cpp:1178
 msgid "Auto updater"
-msgstr "آپدیت کننده خودکار"
+msgstr "بروزرسانی کننده خودکار"
 
 #. Check for updates
 #: Client/core/CSettings.cpp:1216
 msgid "Check for update now"
-msgstr "برای بروزرسانی بررسی کن"
+msgstr "هم‌اکنون بررسی بروزرسانی را انجام دهید"
 
 #: Client/core/CSettings.cpp:1370
 msgid "Some settings will be changed when you next start MTA"
@@ -1758,16 +1758,15 @@ msgstr "بعضی تنظیمات هنگام اجرای بعدی MTA تغییر خ
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
-"آیا می خواهید همین الان ریستارت کنید؟"
+"آیا می خواهید همین الان راه‌اندازی مجدد کنید؟"
 
 #: Client/core/CSettings.cpp:1374
 msgid "RESTART REQUIRED"
-msgstr "نیازمند ریستارت"
+msgstr "نیازمند راه‌اندازی مجدد"
 
 #: Client/core/CSettings.cpp:1394
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "\n\n"
-"آیا می خواهید همین الان قطع اتصال کنید؟"
+msgstr "با قطع اتصال سرور فعلی، برخی از تنظیمات تغییر خواهند کرد"
 
 #: Client/core/CSettings.cpp:1395
 msgid "\n\n"
@@ -1782,15 +1781,15 @@ msgstr "نیاز به قطع اتصال"
 #. Update the joystick name
 #: Client/core/CSettings.cpp:1725
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "جوی استیک یافت نشد - اتصالات را بررسی نموده و بازی را مجددا اجرا فرمایید"
+msgstr "Joypad یافت نشد - اتصالات را بررسی نموده و بازی را مجددا اجرا فرمایید"
 
 #: Client/core/CSettings.cpp:1920
 msgid "Binding axis"
-msgstr "بایند جوی استیک"
+msgstr "محور بایند"
 
 #: Client/core/CSettings.cpp:1920
 msgid "Move an axis to bind, or escape to clear"
-msgstr "برای بایند, جوی استیک را تکان دهید یا Esc را برای پاک کردن فشار دهید"
+msgstr "برای بایند، یک محور را تکان دهید یا Esc را برای پاک کردن فشار دهید"
 
 #: Client/core/CSettings.cpp:1997
 msgid "Language:"
@@ -1806,7 +1805,7 @@ msgstr "نمونه ها:"
 
 #: Client/core/CSettings.cpp:2046
 msgid "Chat"
-msgstr "چت"
+msgstr "گفت‌وگو"
 
 #: Client/core/CSettings.cpp:2063
 msgid "Load"
@@ -1826,7 +1825,7 @@ msgstr "گزینه ها"
 
 #: Client/core/CSettings.cpp:2083
 msgid "Chat Background"
-msgstr "پس زمینه چت"
+msgstr "پس زمینه گفت و گو"
 
 #: Client/core/CSettings.cpp:2083
 msgid "Chat Text"
@@ -2105,7 +2104,7 @@ msgstr "حداکثر همیشه بهتر است"
 
 #: Client/core/CSettings.cpp:4799 Client/core/CSettings.cpp:4801
 msgid "Auto updater:"
-msgstr "آپدیت کننده خودکار:"
+msgstr "بروزرسانی کننده خودکار:"
 
 #: Client/core/CSettings.cpp:4799
 msgid "Select default unless you like filling out bug reports."
@@ -2113,7 +2112,7 @@ msgstr "پیشفرض را انتحاب نمایید مگر آنکه تمایل �
 
 #: Client/core/CSettings.cpp:4801
 msgid "Select default to automatically install important updates."
-msgstr "برای دریافت خودکار آپدیت های مهم پیشفرض را انتخاب نمایید."
+msgstr "برای دریافت خودکار بروزرسانی‌های مهم پیشفرض را انتخاب نمایید."
 
 #: Client/core/CSettings.cpp:4803
 msgid "16-bit color:"
@@ -2313,7 +2312,7 @@ msgstr "شما از نسخه (نمایش قابلیت جدید) استفاده �
 #: Client/core/CMainMenu.cpp:352
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr "از جولای 2019 به بعد ام تی ای برای ویندوز ویستا/اکس پی آپدیت نخواهد.\n\n"
+msgstr "MTA بعد از ژوئیه 2019 به‌روزرسانی‌های XP/Vista را دریافت نخواهد کرد.\n\n"
 "برای بازی کردن در سرور های جدید ویندوز خود را ارتقا دهید."
 
 #: Client/core/CMainMenu.cpp:1193
@@ -2340,7 +2339,7 @@ msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
 msgstr "Direct3D9 اجرا نشد.\n\n"
-"لطفا از آخرین نسخه بودن DirectX و سرویس پک/آپدیت ویندوز خود اطمینان حاصل فرمایید."
+"لطفا از آخرین نسخه بودن DirectX و سرویس پک/بروزرسانی ویندوز خود اطمینان حاصل فرمایید."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:85
