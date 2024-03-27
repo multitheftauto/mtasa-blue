@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-06-17 17:35\n"
+"POT-Creation-Date: 2023-12-08 01:17\n"
+"PO-Revision-Date: 2024-01-28 13:00\n"
 "Last-Translator: \n"
 "Language-Team: Slovak\n"
 "Language: sk_SK\n"
@@ -236,27 +236,27 @@ msgid "Editor"
 msgstr "Mapový editor"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:1001
+#: Shared/installer/nightly.nsi:978
 msgid "Development"
 msgstr "Vývoj"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1049
+#: Shared/installer/nightly.nsi:1026
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) bol úspešne odstránený z Vášho počítača."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1056
+#: Shared/installer/nightly.nsi:1033
 msgid "Uninstallation has failed!"
 msgstr "Odinštalácia neúspešná!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1064
+#: Shared/installer/nightly.nsi:1041
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "Ste si istý že chcete kompletne odstrániť $(^Name) a všetky jeho súčasti?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1065
+#: Shared/installer/nightly.nsi:1042
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -265,32 +265,32 @@ msgstr "Odinštalovanie pred aktualizovaním?$\\r$\n"
 "Spustite novú inštaláciu, aby ste aktualizovali a zachovali svoje nastavenia."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1078
+#: Shared/installer/nightly.nsi:1055
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Chcete ponechať Vaše osobné súbory (ako doplnky, screenshoty a nastavenie servera)? Ak kliknete na nie, všetky doplnky, nastavenia a screenshoty ktoré ste vytvorili budú zmazané."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1253
+#: Shared/installer/nightly.nsi:1230
 msgid "This installer requires admin access, try again"
 msgstr "Tento inštalátor vyžaduje administrátorský prístup, skúste to znovu"
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1254
+#: Shared/installer/nightly.nsi:1231
 msgid "This uninstaller requires admin access, try again"
 msgstr "Tento odinštalátor vyžaduje administrátorský prístup, skúste to znovu"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1255
+#: Shared/installer/nightly.nsi:1232
 msgid "Logon service not running, aborting!"
 msgstr "Prihlasovacia služba nie je spustená, ukončenie!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1256
+#: Shared/installer/nightly.nsi:1233
 msgid "Unable to elevate"
 msgstr "Nemožno povýšiť"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1852
+#: Shared/installer/nightly.nsi:1829
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -301,7 +301,7 @@ msgstr "Odlišná hlavná verzia MTA ($1) existuje v danom umiestnení.$\n"
 "Ste si istý, že chcete nahradiť MTA $1 v $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1856
+#: Shared/installer/nightly.nsi:1833
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -312,7 +312,7 @@ msgstr "MTA nemožno nainštalovať do rovnakého adresára ako GTA:SA.$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1859
+#: Shared/installer/nightly.nsi:1836
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -321,7 +321,7 @@ msgstr "Vybratý priečinok neexistuje.$\n"
 "Prosím zvoľte priečinok s hrou GTA:SA"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1861
+#: Shared/installer/nightly.nsi:1838
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -330,17 +330,17 @@ msgstr "Nemožno nájsť hru GTA:SA nainštalovanú v $GTA_DIR $\n"
 "Ste si istý že chcete pokračovať?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1979
+#: Shared/installer/nightly.nsi:1956
 msgid "Choose Install Location"
 msgstr "Vyberte umiestnenie inštalácie"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1980
+#: Shared/installer/nightly.nsi:1957
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Vyberte priečinok do ktorého chcete nainštalovať ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1981
+#: Shared/installer/nightly.nsi:1958
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -351,62 +351,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} bude nainštalovaný do nasled
 "Kliknite na Ďalej pre pokračovanie."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1983
+#: Shared/installer/nightly.nsi:1960
 msgid "Destination Folder"
 msgstr "Cieľový priečinok"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1984
+#: Shared/installer/nightly.nsi:1961
 msgid "Browse..."
 msgstr "Prehľadávať..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1985
+#: Shared/installer/nightly.nsi:1962
 msgid "Default"
 msgstr "Predvolené"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1986
+#: Shared/installer/nightly.nsi:1963
 msgid "Last used"
 msgstr "Naposledy použité"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1987
+#: Shared/installer/nightly.nsi:1964
 msgid "Custom"
 msgstr "Pokročilé"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2165
+#: Shared/installer/nightly.nsi:2142
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Vyberte priečinok pre inštaláciu ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2183
+#: Shared/installer/nightly.nsi:2160
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Varovanie: Odlišná hlavná verzia MTA ($1) existuje v danom umiestnení."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2184
+#: Shared/installer/nightly.nsi:2161
 msgid "Installation type:  Upgrade"
 msgstr "Typ inštalácie: Aktualizácia"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2418
+#: Shared/installer/nightly.nsi:2395
 msgid "Online update"
 msgstr "Online aktualizácia"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2419
+#: Shared/installer/nightly.nsi:2396
 msgid "Checking for update information"
 msgstr "Hľadajú sa informácie o aktualizácii"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2420
+#: Shared/installer/nightly.nsi:2397
 msgid "Checking for installer update information..."
 msgstr "Hľadajú sa informácie o aktualizácii inštalátora..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2421
+#: Shared/installer/nightly.nsi:2398
 msgid "Please ensure your firewall is not blocking"
 msgstr "Uistite sa, že váš firewall neni blokovaný"
 
