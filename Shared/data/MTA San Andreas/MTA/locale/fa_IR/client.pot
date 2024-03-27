@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-26 22:10\n"
+"PO-Revision-Date: 2024-03-27 10:13\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -3134,7 +3134,7 @@ msgstr "لطفا کامپیوتر خود را مجددا راه‌اندازی �
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server has detected missing anti-cheat components"
-msgstr "این سرور عدم وجود بخش هایی از آنتی چیت را شناسایی کرد"
+msgstr "سرور بررسی کرد و متوجه شده که بعضی قسمت‌های ضد تقلب (Anti-Cheat) وجود ندارند"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Try restarting MTA"
