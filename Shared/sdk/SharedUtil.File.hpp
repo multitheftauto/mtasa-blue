@@ -613,7 +613,7 @@ SString SharedUtil::GetDriveNameWithNotEnoughSpace(uint uiResourcesPathMinMB, ui
 
 WString SharedUtil::FromUTF8(const SString& strPath)
 {
-#ifdef _WIN32_TESTING   // This might be faster - Needs testing
+#ifdef WIN32_TESTING   // This might be faster - Needs testing
     const char* szSrc = strPath;
     uint        cCharacters = strlen(szSrc) + 1;
     uint        cbUnicode = cCharacters * 4;
@@ -634,7 +634,7 @@ WString SharedUtil::FromUTF8(const SString& strPath)
 
 SString SharedUtil::ToUTF8(const WString& strPath)
 {
-#ifdef _WIN32_TESTING   // This might be faster - Needs testing
+#ifdef WIN32_TESTING   // This might be faster - Needs testing
     const wchar_t* pszW = strPath;
     uint           cCharacters = wcslen(pszW) + 1;
     uint           cbAnsi = cCharacters * 6;
