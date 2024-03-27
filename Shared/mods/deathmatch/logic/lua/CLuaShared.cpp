@@ -77,6 +77,7 @@ void CLuaShared::LoadFunctions()
     CLuaCryptDefs::LoadFunctions();
     CLuaFileDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
+    CLuaPathDefs::LoadFunctions();
     CLuaTrainTrackDefs::LoadFunctions();
     CLuaUTFDefs::LoadFunctions();
     CLuaUtilDefs::LoadFunctions();
@@ -85,6 +86,7 @@ void CLuaShared::LoadFunctions()
 void CLuaShared::AddClasses(lua_State* luaVM)
 {
     CLuaFileDefs::AddClass(luaVM);
+    CLuaPathDefs::AddClass(luaVM);
     CLuaXMLDefs::AddClass(luaVM);
 }
 
