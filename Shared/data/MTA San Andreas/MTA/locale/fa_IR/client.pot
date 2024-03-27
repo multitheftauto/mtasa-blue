@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-27 12:12\n"
+"PO-Revision-Date: 2024-03-27 13:11\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -122,7 +122,7 @@ msgstr "انجام اینکار احتمال کرش شدن را زیاد می ک
 
 #: Client/loader/Dialogs.cpp:155
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "آیا می خواهید ام تی ای: سن آندریاس را ریستارت کنید؟"
+msgstr "آیا می خواهید MTA: San Andreas را راه‌اندازی مجدد کنید؟"
 
 #: Client/loader/Dialogs.cpp:162
 msgid "MTA: San Andreas - Warning"
@@ -156,11 +156,11 @@ msgstr "این فایل ها را به من نشان بده"
 
 #: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
-msgstr "اجرای ام تی ای:اس ای"
+msgstr "اجرای MTA:SA"
 
 #: Client/loader/Dialogs.cpp:177
 msgid "MTA: San Andreas - Confusing options"
-msgstr "ام تی ای: سن آندریاس - تنظیمات گیج کننده"
+msgstr "MTA: San Andreas - تنظیمات گیج کننده"
 
 #: Client/loader/Dialogs.cpp:178
 msgid "NVidia Optimus detected!"
@@ -1295,7 +1295,7 @@ msgstr "لقب:"
 
 #: Client/core/CSettings.cpp:366
 msgid "Save server passwords"
-msgstr "ذخیره رمز سرور ها"
+msgstr "ذخیره گذرواژه سرور ها"
 
 #: Client/core/CSettings.cpp:371
 msgid "Auto-refresh server browser"
@@ -1729,7 +1729,7 @@ msgstr "رنگ 16 بیت"
 
 #: Client/core/CSettings.cpp:1138
 msgid "Mouse fix"
-msgstr "تعمیر مشکل موس"
+msgstr "رفع مشکل موس"
 
 #. Cache path info
 #: Client/core/CSettings.cpp:1156
@@ -1829,7 +1829,7 @@ msgstr "پس زمینه گفت و گو"
 
 #: Client/core/CSettings.cpp:2083
 msgid "Chat Text"
-msgstr "متن چت"
+msgstr "متن گفت و گو"
 
 #: Client/core/CSettings.cpp:2083
 msgid "Input Background"
@@ -1917,11 +1917,11 @@ msgstr "فونت"
 
 #: Client/core/CSettings.cpp:2329
 msgid "Hide background when not typing"
-msgstr "مخفی کردن پس زمینه هنگام تایپ نکردن"
+msgstr "مخفی کردن پس زمینه هنگام ننوشتن نکردن"
 
 #: Client/core/CSettings.cpp:2334
 msgid "Nickname completion using the \"Tab\" key"
-msgstr "تکمیل کردن نیک نیم هنگام استفاده از کلید \"TAB\""
+msgstr "تکمیل کردن نام مستعار هنگام استفاده از کلید \"TAB\""
 
 #: Client/core/CSettings.cpp:2339
 msgid "Allow server to flash the window"
@@ -1929,11 +1929,11 @@ msgstr "اجازه به سرور برای چشمک زدن پنجره"
 
 #: Client/core/CSettings.cpp:2344
 msgid "Allow tray balloon notifications"
-msgstr "اجازه برای ناتیفیکیشن پنچره ای"
+msgstr "اجازهٔ نمایش نوار اعلان‌ها"
 
 #: Client/core/CSettings.cpp:2349
 msgid "Chat text black/white outline"
-msgstr "هایلایت سیاه و سفید متن چت"
+msgstr "هایلایت سیاه و سفید متن گفت و گو"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -2003,7 +2003,7 @@ msgstr "سایه های حجمی می تواند باعث کند در بعضی �
 
 #: Client/core/CSettings.cpp:4468
 msgid "PERFORMANCE WARNING"
-msgstr "هشدار اجرایی"
+msgstr "هشدار عملکرد"
 
 #: Client/core/CSettings.cpp:4488
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
@@ -2019,8 +2019,8 @@ msgstr "مشخصات آپلود صفحه"
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
-msgstr "بعضی از اسکریپت ها ممکن است صداهایی را از اینترنت پخش کنند . مانند رادیو و غیره.\n\n"
-" .غیرفعال کردن این تنظیمات ممکن است باعث کاهش مصرف پهنای باند شبکه ارتباطی شود \n"
+msgstr "بعضی از اسکریپت ها ممکن است صداهایی را از اینترنت پخش کنند. مانند رادیو و غیره.\n\n"
+"غیرفعال کردن این تنظیمات ممکن است باعث کاهش مصرف پهنای باند شبکه ارتباطی شود."
 
 #: Client/core/CSettings.cpp:4508
 msgid "EXTERNAL SOUNDS"
@@ -2043,9 +2043,9 @@ msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
 "Are you sure you want to use them?"
-msgstr "بعضی از فایل ها دیتای جی تی ای سن آندریاس شما دستکاری شده اند.\n"
-"ام تی ای تنها در صورت تیک خوردن این چک باکس از این فایل ها استفاده می کند.\n\n"
-"با این حال, خیلی از سرور ها دستکاری فایل های جی تی اس سن آندریاس را بلاک کرده اند.\n\n"
+msgstr "بعضی از فایل ها GTA:SA شما دستکاری شده اند.\n"
+"MTA تنها در صورت تیک خوردن این چک باکس از این فایل ها استفاده می کند.\n\n"
+"با این حال، خیلی از سرور ها دستکاری فایل های GTA:SA را بلاک کرده اند.\n\n"
 "آیا برای استفاده از این فایل ها اطمینان دارید؟"
 
 #: Client/core/CSettings.cpp:4615
@@ -2067,7 +2067,7 @@ msgstr "لطفا یک لقب وارد نمایید"
 #: Client/core/CSettings.cpp:4765
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr "لطفا یک لقب برای استفاده در بازی وارد نمایید. \n"
+msgstr "لطفا یک لقب برای استفاده در بازی وارد نمایید.\n"
 "این لقب نام شما در سروری که به آن متصل شوید خواهد بود"
 
 #: Client/core/CSettings.cpp:4783
@@ -2080,7 +2080,7 @@ msgstr "توقف لگ احتمالی CJ (65 مگابایت رم بیشتر مص�
 
 #: Client/core/CSettings.cpp:4787
 msgid "Older routers may require a slower scan speed."
-msgstr "ممکن است روتر های قدیمی نیاز به سرعت جستجوی پایین تر داشته باشند."
+msgstr "ممکن است روتر های قدیمی نیاز به سرعت جستجوی پایین‌تر داشته باشند."
 
 #: Client/core/CSettings.cpp:4789
 msgid "Switch on to use only one connection when downloading."
@@ -2088,7 +2088,7 @@ msgstr "تنها برای دانلود تک اتصالی روشن نمایید."
 
 #: Client/core/CSettings.cpp:4791
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "تگ کردن پکت های شبکه برای ارائه دهندگان اینترنت جهت شناسایی ترافیک MTA."
+msgstr "بسته های شبکه را برای کمک به ISP ها در شناسایی ترافیک MTA برچسب گذاری کنید."
 
 #: Client/core/CSettings.cpp:4793
 msgid "Spinning circle animation at the bottom of the screen"
@@ -2108,7 +2108,7 @@ msgstr "بروزرسانی کننده خودکار:"
 
 #: Client/core/CSettings.cpp:4799
 msgid "Select default unless you like filling out bug reports."
-msgstr "پیشفرض را انتحاب نمایید مگر آنکه تمایل به پر کردن فرم گزارش باگ را دارید."
+msgstr "پیشفرض را انتحاب نمایید مگر آنکه تمایل به پر کردن فرم گزارش خرابی را دارید."
 
 #: Client/core/CSettings.cpp:4801
 msgid "Select default to automatically install important updates."
@@ -2124,11 +2124,11 @@ msgstr "فعالسازی حالت رنگ 16 بیت - MTA نیاز به راه ا
 
 #: Client/core/CSettings.cpp:4805
 msgid "Mouse fix:"
-msgstr "فیکس موس:"
+msgstr "رفع اشکال موس:"
 
 #: Client/core/CSettings.cpp:4805
 msgid "Mouse movement fix - May need PC restart"
-msgstr "رفع مشکل موس - ممکن است نیاز به راه انداری مجدد رایانه باشد"
+msgstr "رفع اشکال موس - ممکن است نیاز به راه انداری مجدد رایانه باشد"
 
 #: Client/core/CConnectManager.cpp:79
 msgid "Connecting failed. Invalid nick provided!"
@@ -2158,7 +2158,7 @@ msgstr "در حال اتصال"
 #: Client/core/CConnectManager.cpp:263
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1330
 msgid "Connection timed out"
-msgstr "اتصال تایم اوت شد"
+msgstr "اتصال منقضی شد"
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1378
@@ -2211,11 +2211,11 @@ msgstr "پاسخ بد از سرور (1)"
 
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
-msgstr "جوی استیک گاز"
+msgstr "محور گاز"
 
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
-msgstr "جوی استیک ترمز"
+msgstr "محور ترمز"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
@@ -2223,7 +2223,7 @@ msgstr "برنامه نویسی"
 
 #: Client/core/CCredits.cpp:63
 msgid "Contributors"
-msgstr "اهدا کنندگان"
+msgstr "مشارکت کنندگان"
 
 #: Client/core/CCredits.cpp:84
 msgid "Game Design / Scripting"
@@ -2235,7 +2235,7 @@ msgstr "بومی سازی زبان"
 
 #: Client/core/CCredits.cpp:110
 msgid "Patch contributors"
-msgstr "اهدا کنندگان پچ"
+msgstr "اهدا کنندگان بسته تکمیلی"
 
 #: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
@@ -2261,7 +2261,7 @@ msgstr "زمان %d:%02d:%02d می باشد"
 
 #: Client/core/CCommandFuncs.cpp:242
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "اتصال: سینکس 'connect <آدرس> [<پورت> <لقب> <گذرواژه>]'"
+msgstr "اتصال: نحو 'connect <آدرس> [<پورت> <لقب> <گذرواژه>]'"
 
 #: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
 msgid "connect: Bad port number"
@@ -2406,7 +2406,7 @@ msgstr "جستجوی سرورها"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:257
 msgid "Search players"
-msgstr "جستجوی پلیرها"
+msgstr "جستجوی بازیکن‌ها"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:213
 #: Client/core/ServerBrowser/CServerBrowser.cpp:258
@@ -2416,7 +2416,7 @@ msgstr "شروع جستجو"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:299
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1697
 msgid "Search players..."
-msgstr "جستجوی پلیرها..."
+msgstr "جستجوی بازیکن‌ها..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:422
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1695
@@ -2429,7 +2429,7 @@ msgstr "نام"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:454
 msgid "Players"
-msgstr "پلیرها"
+msgstr "بازیکن‌ها"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 msgid "Ping"
@@ -2444,7 +2444,7 @@ msgstr "گیم مود"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:478
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
 msgid "Player list"
-msgstr "لیست پلیر"
+msgstr "فهرست بازیکن‌ها"
 
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
@@ -2502,7 +2502,7 @@ msgstr "لطفا از پروتوکل mtasa:// استفاده نمایید!"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:635
 #: Client/mods/deathmatch/logic/CClientGame.cpp:733
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "نیک نیم نادرست! لطفا به تنظیمات رفته و نیک نیم جدیدی ثبت نمایید!"
+msgstr "نام مستعار نادرست! لطفا به تنظیمات رفته و نام مستعار جدیدی ثبت نمایید!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
@@ -2532,21 +2532,21 @@ msgstr[1] "سرورها"
 #: Client/core/ServerBrowser/CServerList.cpp:238
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "در حال درخواست سرور لیست اصلی (%lu میلی ثانیه گذشته)"
+msgstr "در حال درخواست فهرست سرور اصلی (%lu میلی ثانیه گذشته)"
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:254
 msgid "Master server list could not be parsed."
-msgstr "نمی توان سرور لیست را تحلیل کرد."
+msgstr "نمی توان فهرست سرور را تحلیل کرد."
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:264
 msgid "Master server list could not be retrieved."
-msgstr "نمی توان سرور لیست را دریافت کرد."
+msgstr "نمی توان فهرست سرور را دریافت کرد."
 
 #: Client/core/ServerBrowser/CServerList.cpp:274
 msgid "(Backup server list)"
-msgstr "(سرور لیست پشتیبان)"
+msgstr "(پشتیبانی فهرست سرور)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:326
 msgid "Cannot bind LAN-broadcast socket"
@@ -2592,19 +2592,19 @@ msgstr "نقشه:"
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:97
 msgid "Players:"
-msgstr "پلیرها:"
+msgstr "بازیکن‌ها:"
 
 #. Passworded
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr "رمزدار:"
+msgstr "دارای گذرواژه:"
 
 #. Latency
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:119
 msgid "Latency:"
-msgstr "لتسنی:"
+msgstr "تاخیر:"
 
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
@@ -2619,7 +2619,7 @@ msgstr "ورود به بازی"
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "لطفا پسورد ورود به سرور را وارد نمایید:"
+msgstr "لطفا گذرواژه ورود به سرور را وارد نمایید:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
@@ -2627,7 +2627,7 @@ msgstr "ورود به سرور در اولین موقعیتی که سرور جا
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "لطفا پسورد سرور را وارد نمایید"
+msgstr "لطفا گذرواژه سرور را وارد نمایید"
 
 #. The server has timed out
 #: Client/core/ServerBrowser/CServerInfo.cpp:402
@@ -2919,7 +2919,7 @@ msgstr "اتصال قطع شد: سرور در حال حاضر پر است"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: invalid password specified"
-msgstr "اتصال قطع شد: رمز عبور اشتباه میباشد"
+msgstr "اتصال قطع شد: گذرواژه اشتباه میباشد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1428
 msgid "MTA Client verification failed!"
