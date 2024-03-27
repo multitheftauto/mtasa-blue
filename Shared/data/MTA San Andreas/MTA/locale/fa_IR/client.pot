@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-27 10:13\n"
+"PO-Revision-Date: 2024-03-27 11:10\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -226,7 +226,7 @@ msgstr "من از قبل آنتی ویروس نصب کرده ام"
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "من آنتی ویروس نصب نمی‌کنم.\n"
-"میخواهم سیستم من دچار لگ و جز سیستم های ویروسی باشد."
+"من می‌خواهم کامپیوترم کند شود و قسمتی از یک بات‌نت باشد."
 
 #: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:534
 msgid "Searching for Grand Theft Auto San Andreas"
@@ -234,7 +234,7 @@ msgstr "در حال جستجوی Grand Theft Auto San Andreas"
 
 #: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:536
 msgid "Please start Grand Theft Auto San Andreas"
-msgstr "لطفا جی تی ای سن آندریاس را اجرا کنید."
+msgstr "لطفا Grand Theft Auto San Andreas را اجرا کنید"
 
 #: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
 msgid "Installing update..."
@@ -269,14 +269,14 @@ msgstr "لطفاً محل نصب بازی Grand Theft Auto: San Andreas را ا�
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
 "Please confirm in the next window."
-msgstr "ام تی ای:اس ای برای عملیات های زیر نیاز به دسترسی ادمین دارد:\n\n"
+msgstr "MTA:SA برای عملیات های زیر نیاز به دسترسی ناظر دارد:\n\n"
 "'%s'\n\n"
-"لطفا در پنجره بعدی تایید کنید"
+"لطفا در پنجره بعدی تایید کنید."
 
 #: Client/loader/Utils.cpp:1069
 #, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "خطا در بارگذاری ماژول %s module! (%s)"
+msgstr "خطا در بارگذاری %s ماژول! (%s)"
 
 #: Client/loader/Utils.cpp:1502
 #, c-format
@@ -324,18 +324,18 @@ msgstr "لطفاً قبل از ادامه، از برنامه های زیر خا
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
-msgstr "ام تی ای:اس ای نتوانست عملیات های زیر را انجام دهد:\n\n"
+msgstr "MTA:SA نتوانست عملیات های زیر را انجام دهد:\n\n"
 "'%s'\n"
 
 #: Client/loader/CInstallManager.cpp:426
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
-msgstr "** دلیل کرش به خاطر خطای درایور کارت گرافیک است **\n\n"
-"** لطفا درایور کارت گرافیک خود را آپدیت نمایید **"
+msgstr "** دلیل خرابی به خاطر خطای درایور کارت گرافیک است **\n\n"
+"** لطفا درایور کارت گرافیک خود را بروزرسانی نمایید **"
 
 #: Client/loader/CInstallManager.cpp:532
 msgid "Install updated MTA:SA files"
-msgstr "نصب فایل های آپدیت شده ام تی ای:اس ای"
+msgstr "نصب فایل های بروزرسانی شده MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:552
 msgid "Could not update due to file conflicts. Please close other applications and retry"
@@ -560,7 +560,7 @@ msgid "WARNING\n\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
 msgstr "هشدار\n\n"
 "MTA:SA فعالیت های غیرمعمولی را شناسایی کرده است.\n"
-"لطفا سیستم خود را ویروس اسکن کنید و از امنیت سیستم خود مطمئن شوید.\n\n"
+"لطفا 'Virus Scan' را فعال کنید تا از امنیت سیستم خود مطمئن شوید.\n\n"
 
 #: Client/loader/MainFunctions.cpp:468
 #, c-format
@@ -569,7 +569,7 @@ msgstr "فایل شناسایی شده:  %s\n"
 
 #: Client/loader/MainFunctions.cpp:602
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "یک نمونه از جی تی ای سن آندریاس در حال اجرا است. برای اجرای ام تی اس ای نیاز به توقف آن است. آیا این کار انجام شود؟"
+msgstr "یک نمونه از GTA: San Andreas در حال حاضر در حال اجرا است. قبل از اجرای MTA:SA نیاز به توقف آن است. الان میخواهید این کار را انجام دهید؟"
 
 #: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
 #: Client/loader/MainFunctions.cpp:1219
@@ -580,15 +580,15 @@ msgstr "اطلاعات"
 
 #: Client/loader/MainFunctions.cpp:609
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "بستن جی تی ای سن آندریاس ناموفق بود, در صورت بروز مجدد, کامپیوتر خود را ریستارت کنید."
+msgstr "بستن GTA: San Andreas ناموفق بود، اگر مشکل همچنان ادامه داشت، کامپیوتر خود را راه‌اندازی مجدد کنید."
 
 #: Client/loader/MainFunctions.cpp:632
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "ورودی های رجیستری یافت نشد. لطفا ام تی ای اس ای را مجدد نصب نمایید."
+msgstr "ورودی های رجیستری وجود ندارد. لطفا Multi Theft Auto: San Andreas را مجدد نصب نمایید."
 
 #: Client/loader/MainFunctions.cpp:638
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "مسیر نصب جی تی ای سن آندریاس شما حاوی کاراکتر های غیرمجاز (یونیکد) می باشد. لطفا جی تی ای سن آندریاس را به یک مسیر پشتیبانی شده که حاوی کاراکتر های استاندارد (ASCII) است انتقال داده و ام تی ای اس ای را مجدد نصب نمایید."
+msgstr "مسیر نصب GTA: San Andreas شما حاوی کاراکتر های غیرمجاز (unicode) می باشد. لطفا Grand Theft Auto: San Andreas را به یک مسیر پشتیبانی شده که حاوی کاراکتر های استاندارد (ASCII) است انتقال داده و Multi Theft Auto: San Andreas را مجدد نصب نمایید."
 
 #: Client/loader/MainFunctions.cpp:648
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
@@ -749,7 +749,7 @@ msgstr "زمان را نشان می دهد"
 
 #: Client/core/CCore.cpp:1394
 msgid "shows the hud"
-msgstr "هاد را نشان می دهد"
+msgstr "HUD را نشان می دهد"
 
 #: Client/core/CCore.cpp:1395
 msgid "shows all the binds"
@@ -789,23 +789,23 @@ msgstr "بلافاصله تنظیمات را ذخیره می کند"
 
 #: Client/core/CCore.cpp:1413
 msgid "clears the debug view"
-msgstr "نمای دیباگ را پاک می کند"
+msgstr "نمای اشکال زدایی را پاک می کند"
 
 #: Client/core/CCore.cpp:1414
 msgid "scrolls the chatbox upwards"
-msgstr "چت باکس را به سمت بالا اسکرول می کند"
+msgstr "محدوده گفت و گو را به سمت بالا اسکرول می کند"
 
 #: Client/core/CCore.cpp:1415
 msgid "scrolls the chatbox downwards"
-msgstr "چت باکس را به سمت پایین اسکرول می کند"
+msgstr "محدوده گفت و گو را به سمت پایین اسکرول می کند"
 
 #: Client/core/CCore.cpp:1416
 msgid "scrolls the debug view upwards"
-msgstr "دیباگ را به سمت بالا اسکرول می کند"
+msgstr "اشکال زدایی را به سمت بالا اسکرول می کند"
 
 #: Client/core/CCore.cpp:1417
 msgid "scrolls the debug view downwards"
-msgstr "دیباگ را به سمت پایین اسکرول می کند"
+msgstr "اشکال زدایی را به سمت پایین اسکرول می کند"
 
 #: Client/core/CCore.cpp:1420
 msgid "shows the memory statistics"
@@ -894,7 +894,7 @@ msgstr "نگاه به پشت سر"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
-msgstr "زانو زدن"
+msgstr "خم شدن"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
@@ -902,7 +902,7 @@ msgstr "حرکت"
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
-msgstr "قدم زدن"
+msgstr "راه رفتن"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
@@ -1660,7 +1660,7 @@ msgstr "اولویت پردازش:"
 #: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1079
 #: Client/core/CSettings.cpp:4795
 msgid "Debug setting:"
-msgstr "تنظیمات دیباگ:"
+msgstr "تنظیمات اشکال زدایی:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1102
@@ -2010,7 +2010,7 @@ msgstr "هشدار اجرایی"
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "آپلود صفحه برای برخی از سرور ها به منظور آنتی-چیت نیاز است.\n\n"
-"(چت باکس و رابط کاربری آپلود نخواهند شد)\n"
+"(محدوده گفت و گو و رابط کاربری آپلود نخواهند شد)\n"
 
 #: Client/core/CSettings.cpp:4490
 msgid "SCREEN UPLOAD INFORMATION"
@@ -2842,7 +2842,7 @@ msgstr "جت پک سواری در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Literally on fire in"
-msgstr "کاملاً در آتش"
+msgstr "به معنای واقعی کلمه در حال سوختن"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Burning up in"
@@ -2924,7 +2924,7 @@ msgstr "اتصال قطع شد: رمز عبور اشتباه میباشد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1428
 msgid "MTA Client verification failed!"
-msgstr "بررسی اصالت MTA Client با شکست مواجه شد!"
+msgstr "بررسی MTA Client با شکست مواجه شد!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5693
 msgid "In a ditch"
@@ -3068,7 +3068,7 @@ msgstr "اتصال قطع شد: این اسم در حال حاضر در حال �
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
 msgid "Disconnected: Player element could not be created."
-msgstr "اتصال قطع شد: المنت پلیر ساخته نشد."
+msgstr "اتصال قطع شد: عنصر (Element) بازیکن ساخته نشد."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
 #, c-format
