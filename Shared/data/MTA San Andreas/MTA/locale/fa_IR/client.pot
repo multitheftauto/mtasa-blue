@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-03-07 07:15+0000\n"
-"PO-Revision-Date: 2024-03-27 13:11\n"
+"PO-Revision-Date: 2024-03-27 14:13\n"
 "Last-Translator: \n"
 "Language-Team: Persian\n"
 "Language: fa_IR\n"
@@ -2645,7 +2645,7 @@ msgstr "این نسخه منقضی شده است."
 
 #: Client/mods/deathmatch/CClient.cpp:56
 msgid "disconnect from the game"
-msgstr "از بازی جدا شوید"
+msgstr "از بازی قطع اتصال میکند"
 
 #: Client/mods/deathmatch/CClient.cpp:57
 msgid "shows the nametags"
