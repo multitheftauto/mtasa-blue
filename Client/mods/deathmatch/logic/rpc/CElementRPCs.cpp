@@ -321,8 +321,25 @@ void CElementRPCs::AttachElements(CClientEntity* pSource, NetBitStreamInterface&
         CClientEntity* pAttachedToEntity = CElementIDs::GetElement(usAttachedToID);
         if (pAttachedToEntity)
         {
-            pSource->SetAttachedOffsets(vecPosition, vecRotation);
-            pSource->AttachTo(pAttachedToEntity);
+            ConvertRadiansToDegrees(vecRotation);
+
+            CLuaArguments Arguments;
+            Arguments.PushElement(pAttachedToEntity);
+            Arguments.PushNumber(vecPosition.fX);
+            Arguments.PushNumber(vecPosition.fY);
+            Arguments.PushNumber(vecPosition.fZ);
+            Arguments.PushNumber(vecRotation.fX);
+            Arguments.PushNumber(vecRotation.fY);
+            Arguments.PushNumber(vecRotation.fZ);
+            bool bContinue = pSource->CallEvent("onClientElementAttach", Arguments, true);
+
+            if (bContinue)
+            {
+                ConvertDegreesToRadians(vecRotation);
+
+                pSource->SetAttachedOffsets(vecPosition, vecRotation);
+                pSource->AttachTo(pAttachedToEntity);
+            }
         }
     }
 }
@@ -332,13 +349,46 @@ void CElementRPCs::DetachElements(CClientEntity* pSource, NetBitStreamInterface&
     unsigned char ucTimeContext;
     if (bitStream.Read(ucTimeContext))
     {
-        pSource->SetSyncTimeContext(ucTimeContext);
-        pSource->AttachTo(NULL);
+        ElementID      usAttachedToID;
+        CClientEntity* pAttachedToEntity = CElementIDs::GetElement(usAttachedToID);
 
         CVector vecPosition;
-        if (bitStream.Read(vecPosition.fX) && bitStream.Read(vecPosition.fY) && bitStream.Read(vecPosition.fZ))
+        CVector vecRotation;
+
+        bitStream.Read(vecPosition.fX);
+        bitStream.Read(vecPosition.fY);
+        bitStream.Read(vecPosition.fZ);
+
+        bitStream.Read(vecRotation.fX);
+        bitStream.Read(vecRotation.fY);
+        bitStream.Read(vecRotation.fZ);
+
+        CLuaArguments Arguments;
+        Arguments.PushElement(pAttachedToEntity);
+        Arguments.PushNumber(vecPosition.fX);
+        Arguments.PushNumber(vecPosition.fY);
+        Arguments.PushNumber(vecPosition.fZ);
+
+        Arguments.PushNumber(vecRotation.fX);
+        Arguments.PushNumber(vecRotation.fY);
+        Arguments.PushNumber(vecRotation.fZ);
+
+        bool bContinue = pSource->CallEvent("onClientElementDetach", Arguments, true);
+
+        if (bContinue)
         {
-            pSource->SetPosition(vecPosition);
+            pSource->SetSyncTimeContext(ucTimeContext);
+            pSource->AttachTo(NULL);
+
+            if (vecPosition.fX != 0.0f || vecPosition.fY != 0.0f || vecPosition.fZ != 0.0f)
+            {
+                pSource->SetPosition(vecPosition);
+            }
+
+            if (vecRotation.fX != 0.0f || vecRotation.fY != 0.0f || vecRotation.fZ != 0.0f)
+            {
+                pSource->SetRotationDegrees(vecRotation);
+            }
         }
     }
 }

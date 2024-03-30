@@ -1367,6 +1367,20 @@ bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEn
     if (Entity.IsAttachToable() && AttachedToEntity.IsAttachable() && !AttachedToEntity.IsAttachedToElement(&Entity) &&
         Entity.GetDimension() == AttachedToEntity.GetDimension())
     {
+        CLuaArguments Arguments;
+        Arguments.PushElement(&AttachedToEntity);
+        Arguments.PushNumber(vecPosition.fX);
+        Arguments.PushNumber(vecPosition.fY);
+        Arguments.PushNumber(vecPosition.fZ);
+        Arguments.PushNumber(vecRotation.fX);
+        Arguments.PushNumber(vecRotation.fY);
+        Arguments.PushNumber(vecRotation.fZ);
+        bool bContinue = Entity.CallEvent("onClientElementAttach", Arguments, true);
+
+        if (!bContinue) {
+            return false;
+        }
+
         ConvertDegreesToRadians(vecRotation);
 
         Entity.SetAttachedOffsets(vecPosition, vecRotation);
@@ -1387,6 +1401,27 @@ bool CStaticFunctionDefinitions::DetachElements(CClientEntity& Entity, CClientEn
     {
         if (pAttachedToEntity == NULL || pActualAttachedToEntity == pAttachedToEntity)
         {
+            CVector vecPosition;
+            CVector vecRotation;
+
+            Entity.GetPosition(vecPosition);
+            Entity.GetRotationDegrees(vecRotation);
+
+            CLuaArguments Arguments;
+            Arguments.PushElement(pActualAttachedToEntity);
+            Arguments.PushNumber(vecPosition.fX);
+            Arguments.PushNumber(vecPosition.fY);
+            Arguments.PushNumber(vecPosition.fZ);
+            Arguments.PushNumber(vecRotation.fX);
+            Arguments.PushNumber(vecRotation.fY);
+            Arguments.PushNumber(vecRotation.fZ);
+            bool bContinue = Entity.CallEvent("onClientElementDetach", Arguments, true);
+
+            if (!bContinue)
+            {
+                return false;
+            }
+
             Entity.AttachTo(NULL);
             return true;
         }
