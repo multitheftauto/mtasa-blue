@@ -358,9 +358,18 @@ void CElementRPCs::DetachElements(CClientEntity* pSource, NetBitStreamInterface&
         bitStream.Read(vecPosition.fY);
         bitStream.Read(vecPosition.fZ);
 
-        bitStream.Read(vecRotation.fX);
-        bitStream.Read(vecRotation.fY);
-        bitStream.Read(vecRotation.fZ);
+        if (g_pNet->CanServerBitStream((eBitStreamVersion::DetachElementsRotation)))
+        {
+            bitStream.Read(vecRotation.fX);
+            bitStream.Read(vecRotation.fY);
+            bitStream.Read(vecRotation.fZ);
+        }
+        else
+        {
+            vecRotation.fX = 0;
+            vecRotation.fY = 0;
+            vecRotation.fZ = 0;
+        }
 
         CLuaArguments Arguments;
         Arguments.PushElement(pAttachedToEntity);
