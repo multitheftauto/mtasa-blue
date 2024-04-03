@@ -1577,9 +1577,8 @@ bool CStaticFunctionDefinitions::DetachElements(CElement* pElement, CElement* pA
             Arguments.PushNumber(vecRotation.fX);
             Arguments.PushNumber(vecRotation.fY);
             Arguments.PushNumber(vecRotation.fZ);
-            bool bContinue = pElement->CallEvent("onElementDetach", Arguments);
 
-            if (!bContinue)
+            if (!pElement->CallEvent("onElementDetach", Arguments))
             {
                 return false;
             }

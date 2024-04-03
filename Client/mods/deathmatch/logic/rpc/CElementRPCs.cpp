@@ -331,9 +331,8 @@ void CElementRPCs::AttachElements(CClientEntity* pSource, NetBitStreamInterface&
             Arguments.PushNumber(vecRotation.fX);
             Arguments.PushNumber(vecRotation.fY);
             Arguments.PushNumber(vecRotation.fZ);
-            bool bContinue = pSource->CallEvent("onClientElementAttach", Arguments, true);
 
-            if (bContinue)
+            if (pSource->CallEvent("onClientElementAttach", Arguments, true))
             {
                 ConvertDegreesToRadians(vecRotation);
 
@@ -373,9 +372,7 @@ void CElementRPCs::DetachElements(CClientEntity* pSource, NetBitStreamInterface&
         Arguments.PushNumber(vecRotation.fY);
         Arguments.PushNumber(vecRotation.fZ);
 
-        bool bContinue = pSource->CallEvent("onClientElementDetach", Arguments, true);
-
-        if (bContinue)
+        if (pSource->CallEvent("onClientElementDetach", Arguments, true))
         {
             pSource->SetSyncTimeContext(ucTimeContext);
             pSource->AttachTo(NULL);

@@ -1375,11 +1375,9 @@ bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEn
         Arguments.PushNumber(vecRotation.fX);
         Arguments.PushNumber(vecRotation.fY);
         Arguments.PushNumber(vecRotation.fZ);
-        bool bContinue = Entity.CallEvent("onClientElementAttach", Arguments, true);
 
-        if (!bContinue) {
+        if (!Entity.CallEvent("onClientElementAttach", Arguments, true))
             return false;
-        }
 
         ConvertDegreesToRadians(vecRotation);
 
@@ -1415,12 +1413,9 @@ bool CStaticFunctionDefinitions::DetachElements(CClientEntity& Entity, CClientEn
             Arguments.PushNumber(vecRotation.fX);
             Arguments.PushNumber(vecRotation.fY);
             Arguments.PushNumber(vecRotation.fZ);
-            bool bContinue = Entity.CallEvent("onClientElementDetach", Arguments, true);
 
-            if (!bContinue)
-            {
+            if (!Entity.CallEvent("onClientElementDetach", Arguments, true))
                 return false;
-            }
 
             Entity.AttachTo(NULL);
             return true;
