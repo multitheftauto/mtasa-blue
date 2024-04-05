@@ -36,7 +36,6 @@ CPoolsSA::CPoolsSA()
     m_ppObjectPoolInterface = (CPoolSAInterface<CObjectSAInterface>**)0xB7449C;
     m_ppVehiclePoolInterface = (CPoolSAInterface<CVehicleSAInterface>**)0xB74494;
     m_ppTxdPoolInterface = (CPoolSAInterface<CTextureDictonarySAInterface>**)0xC8800C;
-    m_ppBuildingPoolInterface = (CPoolSAInterface<CBuildingSAInterface>**)0xB74498;
 
     m_bGetVehicleEnabled = true;
 }
@@ -331,115 +330,6 @@ void CPoolsSA::DeleteAllObjects()
 
         RemoveObject(pObject);
     }
-}
-
-//////////////////////////////////////////////////////////////////////////////////////////
-//                                     BUILDINGS POOL                                   //
-//////////////////////////////////////////////////////////////////////////////////////////
-
-inline bool CPoolsSA::AddBuildingToPool(CClientBuilding* pClientBuilding, CBuildingSA* pBuilding)
-{
-    // Grab the new object interface
-    CBuildingSAInterface* pInterface = pBuilding->GetBuildingInterface();
-
-    if (!pInterface)
-        return false;
-
-    DWORD dwElementIndexInPool = GetBuildingPoolIndex((std::uint8_t*)pInterface);
-    if (dwElementIndexInPool >= MAX_BUILDINGS)
-    {
-        return false;
-    }
-
-    m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
-
-    // Increase the count of objects
-    ++m_buildingPool.ulCount;
-
-    return true;
-}
-
-CBuilding* CPoolsSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector *vPos, CVector4D *vRot, uint8_t interior)
-{
-    if (!HasFreeBuildingSlot())
-        return nullptr;
-
-    // Load building
-    SFileObjectInstance instance;
-    instance.modelID = modelId;
-    instance.lod = -1;
-    instance.interiorID = interior;
-    instance.position = *vPos;
-    instance.rotation = *vRot;
-
-    // Fix strange SA rotation 
-    instance.rotation.fW = -instance.rotation.fW;
-
-    auto pBuilding = static_cast<CBuildingSAInterface*>(CFileLoaderSA::LoadObjectInstance(&instance));
-
-    // Disable lod and ipl
-    pBuilding->m_pLod = nullptr;
-    pBuilding->m_iplIndex = 0;
-
-    // Always stream model collosion
-    // TODO We can setup collison bounding box and use GTA streamer for it
-    auto modelInfo = pGame->GetModelInfo(modelId);
-    modelInfo->AddColRef();
-
-    // Add building in world
-    auto pBuildingSA = new CBuildingSA(pBuilding);
-    pGame->GetWorld()->Add(pBuildingSA, CBuildingPool_Constructor);
-
-    // Add CBuildingSA object in pool
-    AddBuildingToPool(pClientBuilding, pBuildingSA);
-
-    return pBuildingSA;
-}
-
-void CPoolsSA::RemoveBuilding(CBuilding* pBuilding)
-{
-    assert(NULL != pBuilding);
-
-    CBuildingSAInterface* pInterface = pBuilding->GetBuildingInterface();
-
-    DWORD dwElementIndexInPool = GetBuildingPoolIndex((std::uint8_t*)pInterface);
-    if (dwElementIndexInPool >= MAX_BUILDINGS)
-    {
-        return;
-    }
-
-    // Remove building from world
-    pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
-
-    // Remove building from cover list
-    CPtrNodeSingleListSAInterface<CBuildingSAInterface>* coverList = reinterpret_cast<CPtrNodeSingleListSAInterface<CBuildingSAInterface>*>(0xC1A2B8);
-    coverList->RemoveItem(pInterface);
-
-    // Remove plant
-    using CPlantColEntry_Remove = CEntitySAInterface* (*)(CEntitySAInterface*);
-    ((CPlantColEntry_Remove)0x5DBEF0)(pInterface);
-
-    // Remove col reference
-    auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
-    modelInfo->RemoveColRef();
-
-    // Remove from BuildingSA pool
-    auto* pBuildingSA = m_buildingPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-    m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
-
-    // Delete it from memory
-    delete pBuildingSA;
-
-    // Remove building from SA pool
-    (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
-
-    // Decrease the count of elements in the pool
-    --m_buildingPool.ulCount;
-}
-
-bool CPoolsSA::HasFreeBuildingSlot()
-{
-    return (*m_ppBuildingPoolInterface)->GetFreeSlot() != -1;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -812,18 +702,6 @@ DWORD CPoolsSA::GetObjectPoolIndex(std::uint8_t* pInterface)
     if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
     {
         return MAX_OBJECTS;
-    }
-    return ((pInterface - pTheObjects) / dwAlignedSize);
-}
-
-DWORD CPoolsSA::GetBuildingPoolIndex(std::uint8_t* pInterface)
-{
-    DWORD         dwAlignedSize = sizeof(CBuildingSAInterface);
-    std::uint8_t* pTheObjects = (std::uint8_t*)(*m_ppBuildingPoolInterface)->m_pObjects;
-    DWORD         dwMaxIndex = MAX_BUILDINGS - 1;
-    if (pInterface < pTheObjects || pInterface > pTheObjects + (dwMaxIndex * dwAlignedSize))
-    {
-        return MAX_BUILDINGS;
     }
     return ((pInterface - pTheObjects) / dwAlignedSize);
 }
