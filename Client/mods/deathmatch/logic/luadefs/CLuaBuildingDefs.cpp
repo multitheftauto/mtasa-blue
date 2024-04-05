@@ -15,6 +15,8 @@ void CLuaBuildingDefs::LoadFunctions()
     // Backwards compatibility functions
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"createBuilding", ArgumentParser<CreateBuilding>},
+        {"removeAllGameBuildings", ArgumentParser<RemoveAllGameBuildings>},
+        {"restoreAllGameBuildings", ArgumentParser<RestoreGameBuildings>},
     };
 
     // Add functions
@@ -43,7 +45,7 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (!CClientBuildingManager::IsValidModel(modelId))
         throw std::invalid_argument("Invalid building model id");
 
-    if (!g_pGame->GetPools()->HasFreeBuildingSlot())
+    if (!g_pGame->GetPools()->GetBuildingsPool().HasFreeBuildingSlot())
         throw std::invalid_argument("No free slot in buildings pool");
 
     if (!CClientBuildingManager::IsValidPosition(pos))
@@ -57,4 +59,48 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     pBuilding->SetParent(pRoot);
 
     return pBuilding;
+}
+
+void CLuaBuildingDefs::RemoveAllGameBuildings()
+{
+    // We do not want to remove scripted buildings
+    // But we need remove them from the buildings pool for a bit...
+    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
+    {
+        building->Destroy();
+    }
+
+    // This function makes buildings backup without scripted buildings
+    g_pGame->RemoveAllBuildings();
+
+    // ... And restore here
+    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
+    {
+        building->Create();
+    }
+}
+
+void CLuaBuildingDefs::RestoreGameBuildings()
+{
+    // We want to restore the game buildings to the same positions as they were before the backup.
+    // Remove scripted buildings for a bit
+    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
+    {
+        building->Destroy();
+    }
+
+    g_pGame->RestoreGameBuildings();
+
+    // Restore what we can
+    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
+    {
+        building->Create();
+
+        if (!building->IsValid())
+        {
+            // User creates too much buildings
+            // We can't restore them all
+            delete building;
+        }
+    }
 }
