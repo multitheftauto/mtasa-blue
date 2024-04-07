@@ -26,6 +26,7 @@
 #include "CWorldSA.h"
 #include "CKeyGenSA.h"
 #include "CFileLoaderSA.h"
+#include "CPtrNodeSingleListSA.h"
 
 extern CGameSA* pGame;
 
