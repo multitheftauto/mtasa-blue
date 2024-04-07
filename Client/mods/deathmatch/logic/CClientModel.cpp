@@ -109,6 +109,8 @@ void CClientModel::RestoreEntitiesUsingThisModel()
     {
         case eClientModelType::PED:
         case eClientModelType::OBJECT:
+        case eClientModelType::CLUMP:
+        case eClientModelType::TIMED_OBJECT:
         case eClientModelType::VEHICLE:
             RestoreDFF(pModelInfo);
             return;
