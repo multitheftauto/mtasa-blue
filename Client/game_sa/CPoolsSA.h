@@ -17,6 +17,7 @@
 #include "CBuildingSA.h"
 #include "CTextureDictonarySA.h"
 #include "CBuildingsPoolSA.h"
+#include "CDummyPoolSA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
@@ -99,6 +100,7 @@ public:
     ushort GetFreeTextureDictonarySlot();
 
     CBuildingsPool& GetBuildingsPool() noexcept override { return m_BuildingsPool; };
+    CDummyPool&     GetDummyPool() noexcept { return m_DummyPool; };
 
 private:
     // Pools
@@ -112,6 +114,7 @@ private:
     CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;
 
     CBuildingsPoolSA m_BuildingsPool;
+    CDummyPoolSA     m_DummyPool;
 
     bool m_bGetVehicleEnabled;
 };

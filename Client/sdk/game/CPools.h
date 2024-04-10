@@ -13,6 +13,7 @@
 
 #include "Common.h"
 #include "CBuildingsPool.h"
+#include "CDummyPool.h"
 
 class CClientEntity;
 class CEntity;
@@ -111,4 +112,5 @@ public:
     virtual ushort GetFreeTextureDictonarySlot() = 0;
 
     virtual CBuildingsPool& GetBuildingsPool() noexcept = 0;
+    virtual CDummyPool&   GetDummyPool() noexcept = 0;
 };

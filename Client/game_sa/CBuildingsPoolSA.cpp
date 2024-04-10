@@ -119,6 +119,9 @@ void CBuildingsPoolSA::RemoveAllBuildings()
     if (m_pOriginalBuildingsBackup)
         return;
 
+    pGame->GetCoverManager()->RemoveAllCovers();
+    pGame->GetPlantManager()->RemoveAllPlants();
+
     m_pOriginalBuildingsBackup = std::make_unique<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>>();
 
     auto pBuildsingsPool = (*m_ppBuildingPoolInterface);
@@ -128,7 +131,16 @@ void CBuildingsPoolSA::RemoveAllBuildings()
         {
             CBuildingSAInterface* building = pBuildsingsPool->GetObject(i);
 
-            RemoveBuildingFromWorld(building);
+            //RemoveBuildingFromWorld(building);
+
+            pGame->GetWorld()->Remove(building, CBuildingPool_Destructor);
+
+            CEntitySA entity{};
+            entity.SetInterface(building);
+            entity.DeleteRwObject();
+
+            using CEntity_ResolveReferences = void*(__thiscall*)(CEntitySAInterface*);
+            ((CEntity_ResolveReferences)0x571A40)(building);
 
             pBuildsingsPool->Release(i);
 
@@ -140,9 +152,6 @@ void CBuildingsPoolSA::RemoveAllBuildings()
             (*m_pOriginalBuildingsBackup)[i].first = false;
         }
     }
-
-    pGame->GetCoverManager()->RemoveAllCovers();
-    pGame->GetPlantManager()->RemoveAllPlants();
 }
 
 void CBuildingsPoolSA::RestoreAllBuildings()
@@ -178,12 +187,15 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
     // Remove plant
     pGame->GetPlantManager()->RemovePlant(pBuilding);
 
-    if (pBuilding->m_pRwObject != nullptr)
-    {
-        CEntitySA entity{};
-        entity.SetInterface(pBuilding);
-        entity.DeleteRwObject();
-    }
+    CEntitySA entity{};
+    entity.SetInterface(pBuilding);
+    entity.DeleteRwObject();
+
+    using CEntity_ResolveReferences = void * (__thiscall*)(CEntitySAInterface*);
+    ((CEntity_ResolveReferences)0x571A40)(pBuilding);
+
+    //using CPlaceable_destructor = void*(__thiscall*)(CEntitySAInterface*);
+    //((CPlaceable_destructor)0x0054F490)(pBuilding);
 }
 
 bool CBuildingsPoolSA::SetSize(int size)
@@ -195,8 +207,6 @@ bool CBuildingsPoolSA::SetSize(int size)
 
     if (oldPool != nullptr)
     {
-        //std::free((void*)pool->m_pObjects);
-        //free(pool->m_pObjects);
         MemSA::free(pool->m_pObjects);
         pool->m_pObjects = nullptr;
     }
@@ -242,6 +252,8 @@ bool CBuildingsPoolSA::SetSize(int size)
     {
         UpdateBackupLodPointers(offset);
     }
+
+    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(oldPool, newObjects);
 
     return true;
 }

@@ -896,12 +896,14 @@ void CGameSA::RemoveAllBuildings()
 {
     m_pIplStore->SetDynamicIplStreamingEnabled(false);
 
+    m_pPools->GetDummyPool().RemoveAllBuildingLods();
     m_pPools->GetBuildingsPool().RemoveAllBuildings();
 }
 
 void CGameSA::RestoreGameBuildings()
 {
     m_pPools->GetBuildingsPool().RestoreAllBuildings();
+    m_pPools->GetDummyPool().RestoreAllBuildingsLods();
 
     m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
 }
