@@ -9,10 +9,7 @@ CCoverManagerSA::CCoverManagerSA()
 
 void CCoverManagerSA::RemoveAllCovers()
 {
-    while (m_pCoverList->m_pList)
-    {
-        RemoveCover(m_pCoverList->m_pList->pItem);
-    }
+    m_pCoverList->RemoveAllItems();
 }
 
 void CCoverManagerSA::RemoveCover(CEntitySAInterface* entity)
