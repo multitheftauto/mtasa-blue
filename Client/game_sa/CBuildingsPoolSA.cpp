@@ -315,9 +315,16 @@ void CBuildingsPoolSA::RemoveVehicleDamageLinks()
     const int count = pGame->GetPools()->GetVehicleCount();
     for (int i = 0; i < count; i++)
     {
-        auto* vehicle = pGame->GetPools()->GetVehicle(i);
+        auto* vehLinks = pGame->GetPools()->GetVehicle(i);
+        if (vehLinks->pEntity)
         {
-            vehicle->pEntity->GetVehicleInterface()->m_pCollidedEntity = nullptr;
+            CVehicleSAInterface* vehicle = vehLinks->pEntity->GetVehicleInterface();
+            vehicle->m_pCollidedEntity = nullptr;
+            vehicle->pLastContactedEntity[0] = nullptr;
+            vehicle->pLastContactedEntity[1] = nullptr;
+            vehicle->pLastContactedEntity[2] = nullptr;
+            vehicle->pLastContactedEntity[3] = nullptr;
+            vehicle->m_ucCollisionState = 0;
         }
     }
 }
