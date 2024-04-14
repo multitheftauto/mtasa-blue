@@ -225,10 +225,20 @@ int CLuaResourceDefs::GetResourceName(lua_State* luaVM)
     // Verify arguments
     CResource*       pResource = NULL;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
+    argStream.ReadUserData(pResource, NULL);
 
     if (!argStream.HasErrors())
     {
+        if (!pResource)
+        {
+            // Find our vm and get the root
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+            if (pLuaMain)
+            {
+                pResource = pLuaMain->GetResource();
+            }
+        }
+
         if (pResource)
         {
             // Grab its name and return it
