@@ -901,9 +901,8 @@ int CLuaResourceDefs::getResourceLoadTime(lua_State* luaVM)
 int CLuaResourceDefs::getResourceName(lua_State* luaVM)
 {
     CResource* pResource;
-
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource, NULL);
+    argStream.ReadUserData(pResource, nullptr);
 
     if (!argStream.HasErrors())
     {

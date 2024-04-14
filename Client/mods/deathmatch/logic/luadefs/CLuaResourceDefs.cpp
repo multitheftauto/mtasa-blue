@@ -223,9 +223,9 @@ int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
 int CLuaResourceDefs::GetResourceName(lua_State* luaVM)
 {
     // Verify arguments
-    CResource*       pResource = NULL;
+    CResource* pResource;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource, NULL);
+    argStream.ReadUserData(pResource, nullptr);
 
     if (!argStream.HasErrors())
     {
