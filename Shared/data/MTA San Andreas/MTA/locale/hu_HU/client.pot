@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-05 03:08+0000\n"
-"PO-Revision-Date: 2024-04-14 19:22\n"
+"PO-Revision-Date: 2024-04-14 20:22\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -47,7 +47,7 @@ msgstr "Nézd meg a legfrissebb híreket"
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Szeretne néhány online tanácsot kapni erről a hibáról?"
+msgstr "Szeretnél néhány online tanácsot kapni erről a hibáról?"
 
 #: Client/core/CQuestionBox.cpp:194 Client/core/CSettings.cpp:1376
 #: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4470
@@ -348,7 +348,7 @@ msgstr "Hiba"
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 msgid "In-game"
-msgstr "Játékon belül"
+msgstr "Játékban"
 
 #: Client/core/CCore.cpp:674 Client/core/CSettings.cpp:3461
 #: Client/core/CMainMenu.cpp:304
@@ -1477,12 +1477,12 @@ msgid "It seems that you have the Rich Presence connection option enabled.\n"
 "Do you want to allow servers to share their data?\n\n"
 "This includes yours unique ID identifier."
 msgstr "Úgy tűnik, hogy be van kapcsolva a Rich Presence csatlakozási lehetőség.\n"
-"Engedélyezi, hogy a szerverek megosszák adatait?\n\n"
-"Ez magában foglalja az Ön egyedi azonosítóját is."
+"Engedélyezed, hogy a szerverek megosszák adataid?\n\n"
+"Ez magában foglalja az egyedi azonosítód is."
 
 #: Client/core/CSettings.cpp:4542
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr "BELEEGYEZÉS AZ ADATMEGOSZTÁS ENGEDÉLYEZÉSÉRE"
+msgstr "HOZZÁJÁRULÁS AZ ADATMEGOSZTÁSHOZ"
 
 #: Client/core/CSettings.cpp:4566
 msgid "Some files in your GTA:SA data directory are customized.\n"
@@ -2438,7 +2438,7 @@ msgstr "Repülni"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Riding around"
-msgstr ""
+msgstr "Krúzol"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Monster truckin' around"
@@ -2446,7 +2446,7 @@ msgstr "Monster Truckozni"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:372
 msgid "Quaddin' around"
-msgstr ""
+msgstr "Quadozik"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:373
 msgid "Bunny hopping around"
@@ -2491,7 +2491,7 @@ msgstr "Verekedni"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:386
 msgid "Blastin' fools in"
-msgstr ""
+msgstr "Lövöldözik itt:"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:387
 msgid "Shooting up"
@@ -2515,7 +2515,7 @@ msgstr "Úszni"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:392
 msgid "Floating around in"
-msgstr ""
+msgstr "Úszik itt:"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:393
 msgid "Being chased by a shark"
@@ -2715,7 +2715,7 @@ msgstr "Multi Theft Auto nem lett megfelelően telepítve, kérlek telepítsd ú
 
 #: Client/loader/CInstallManager.cpp:613
 msgid "Create GTA:SA junctions"
-msgstr "Hozza létre a GTA:SA csomópontjait"
+msgstr "GTA:SA kapcsolatok létrehozása"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
@@ -2874,8 +2874,8 @@ msgid "Your installation may be corrupt now.\n\n"
 "or try running the update with administrator rights."
 msgstr "Lehet, hogy a telepítés most sérült.\n\n"
 "%zu fájlból %zu nem állítható vissza a biztonsági másolatból.\n\n"
-"Telepítse újra a Multi Theft Auto-t a www.multitheftauto.com webhelyről\n"
-"vagy próbálja meg futtatni a frissítést rendszergazdai jogokkal."
+"Telepítsd újra a Multi Theft Auto-t a www.multitheftauto.com webhelyről\n"
+"vagy próbáld meg futtatni a frissítést rendszergazdai jogokkal."
 
 #: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
 msgid "Installing update..."
@@ -3027,18 +3027,18 @@ msgstr "Az alap fájl aláíratlan. Lehetséges vírus aktivitása.\n\n"
 msgid "Data file %s is missing. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "A %s adatfájl hiányzik. Lehetséges vírusaktivitás.\n\n"
-"Biztonsága érdekében fontolja meg a Multi Theft Auto újratelepítését.\n"
-"Ha az MTA nem működik megfelelően, nézze meg az online súgót."
+msgstr "A(z) %s adatfájl hiányzik. Lehetséges vírusaktivitás.\n\n"
+"Biztonságod érdekében fontold meg a Multi Theft Auto újratelepítését.\n"
+"Ha az MTA nem működik megfelelően, nézd meg az online súgót."
 
 #: Client/loader/MainFunctions.cpp:893
 #, c-format
 msgid "Data file %s is modified. Possible virus activity.\n\n"
 "Consider reinstalling Multi Theft Auto for your security.\n"
 "See online help if MTA does not work correctly."
-msgstr "A %s adatfájl módosult. Lehetséges vírusaktivitás.\n\n"
-"Biztonsága érdekében fontolja meg a Multi Theft Auto újratelepítését.\n"
-"Ha az MTA nem működik megfelelően, nézze meg az online súgót."
+msgstr "A(z) %s adatfájl módosult. Lehetséges vírusaktivitás.\n\n"
+"Biztonságod érdekében fontold meg a Multi Theft Auto újratelepítését.\n"
+"Ha az MTA nem működik megfelelően, nézd meg az online súgót."
 
 #: Client/loader/MainFunctions.cpp:907
 msgid ".asi files are in the 'MTA:SA' or 'GTA: San Andreas' installation directory.\n\n"
@@ -3117,7 +3117,7 @@ msgstr "A Grand Theft Auto: San Andreas telepítési könyvtára a következő f
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
 msgstr "Ezek a fájlok nem szükségesek, és zavarhatják az MTA:SA jelen verziójának grafikus funkcióit.\n\n"
-"Javasoljuk, hogy távolítsa el vagy nevezze át ezeket a fájlokat."
+"Javasoljuk, hogy távolítsd el vagy nevezd át ezeket a fájlokat."
 
 #: Client/loader/Dialogs.cpp:167
 msgid "Keep these files, but also show this warning on next start"
@@ -3133,7 +3133,7 @@ msgstr "Nevezze át ezeket a fájlokat *.dll-ről *.dll.bak-ra"
 
 #: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
-msgstr "Mutasd meg ezeket a fájlokat"
+msgstr "Mutassa meg ezeket a fájlokat"
 
 #: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
