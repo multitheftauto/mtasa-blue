@@ -38,11 +38,8 @@ private:
 public:
     void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
     SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface);
-    unsigned long              GetVehicleCount()
-    {
-        return m_vehiclePool.ulCount;
-        ;
-    }
+    SClientEntity<CVehicleSA>* GetVehicle(size_t pos) { return &m_vehiclePool.arrayOfClientEntities[pos]; };
+    unsigned long              GetVehicleCount() { return m_vehiclePool.ulCount; };
     void DeleteAllVehicles();
 
     // Objects pool

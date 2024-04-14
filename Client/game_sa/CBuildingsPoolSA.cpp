@@ -17,6 +17,7 @@
 #include "CGameSA.h"
 #include "CPtrNodeSingleListSA.h"
 #include "MemSA.h"
+#include "CVehicleSA.h"
 
 extern CGameSA* pGame;
 
@@ -263,6 +264,8 @@ bool CBuildingsPoolSA::SetSize(int size)
 
     pGame->GetPools()->GetDummyPool().UpdateBuildingLods(oldPool, newObjects);
 
+    RemoveVehicleDamageLinks();
+
     return true;
 }
 
@@ -303,6 +306,18 @@ void CBuildingsPoolSA::UpdateBackupLodPointers(uint32_t offset)
             {
                 building->m_pLod = (CBuildingSAInterface*)((uint32_t)building->m_pLod + offset);
             }
+        }
+    }
+}
+
+void CBuildingsPoolSA::RemoveVehicleDamageLinks()
+{
+    const int count = pGame->GetPools()->GetVehicleCount();
+    for (int i = 0; i < count; i++)
+    {
+        auto* vehicle = pGame->GetPools()->GetVehicle(i);
+        {
+            vehicle->pEntity->GetVehicleInterface()->m_pCollidedEntity = nullptr;
         }
     }
 }

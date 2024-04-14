@@ -69,6 +69,7 @@ public:
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
+    virtual SClientEntity<CVehicleSA>* GetVehicle(size_t pos) = 0;
     virtual unsigned long              GetVehicleCount() = 0;
 
     // Objects pool

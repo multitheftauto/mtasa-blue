@@ -9,6 +9,8 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 #include <game/CBuildingsPool.h>
 #include <CVector.h>
 #include "CPoolSAInterface.h"
@@ -34,6 +36,7 @@ private:
     bool AddBuildingToPool(CClientBuilding* pClientBuilding, CBuildingSA* pBuilding);
     void UpdateIplEntrysPointers(uint32_t offset);
     void UpdateBackupLodPointers(uint32_t offset);
+    void RemoveVehicleDamageLinks();
 
 private:
     SPoolData<CBuildingSA, CBuildingSAInterface, MAX_BUILDINGS> m_buildingPool;
