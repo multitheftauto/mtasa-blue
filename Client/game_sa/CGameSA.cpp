@@ -758,7 +758,7 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     // Call CWaterCannon constructor & CWaterCannon::Init
     for (int i = 0; i < newLimit; ++i)
     {
-        char* currentCannon = (char*)aCannons + i * SIZE_CWaterCannon; // 0x3CC is size of CWaterCannon struct
+        char* currentCannon = (char*)aCannons + i * SIZE_CWaterCannon;
 
         ((void(__thiscall*)(void*))FUNC_CWaterCannon_Constructor)(currentCannon); // CWaterCannon::CWaterCannon
         ((void(__thiscall*)(void*))FUNC_CWaterCannon_Init)(currentCannon); // CWaterCannon::Init
