@@ -80,6 +80,20 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
+#define FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity 0x4EFCD0
+#define STRUC_CAESoundManager                               0xB62CB0
+#define FUNC_CWaterCannon_Constructor                       0x728B10
+#define FUNC_CWaterCannon_Destructor                        0x728B30
+#define FUNC_CWaterCannon_Init                              0x728B40
+#define ARRAY_aCannons                                      0xC80740
+#define ARRAY_aCannons_CurrentPtr                           0x728C83
+#define NUM_WaterCannon_Limit                               0x728C88
+#define SIZE_CWaterCannon                                   0x3CC
+#define NUM_CWaterCannon_Audio_Offset                       0x32C
+#define NUM_CWaterCannon_DefaultLimit                       3
+
+constexpr int MAX_WATER_CANNONS = 30; // extended CWaterCannon limit, it can be increased
+
 struct SCheatSA
 {
     BYTE* m_byAddress;            // Cheat Address
@@ -219,6 +233,9 @@ public:
     bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
     void SetFireballDestructEnabled(bool isEnabled) override;
 
+    bool IsExtendedWaterCannonsEnabled() const noexcept override { return m_isExtendedWaterCannonsEnabled; }
+    void SetExtendedWaterCannonsEnabled(bool isEnabled) override;
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -336,6 +353,7 @@ private:
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
+    bool         m_isExtendedWaterCannonsEnabled;
 
     static unsigned int&  ClumpOffset;
 
