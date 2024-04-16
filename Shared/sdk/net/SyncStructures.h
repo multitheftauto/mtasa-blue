@@ -2099,7 +2099,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.watercreatures = true;
         data.burnflippedcars = true;
         data2.fireballdestruct = true;
-        data.extendedwatercannons = false;
+        data.extendedwatercannons = true;
     }
 };
 
