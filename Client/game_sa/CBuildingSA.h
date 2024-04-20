@@ -25,4 +25,6 @@ public:
     CBuildingSA(CBuildingSAInterface* pInterface);
 
     CBuildingSAInterface* GetBuildingInterface() { return reinterpret_cast<CBuildingSAInterface*>(GetInterface()); };
+
+    void SetLod(CBuilding* pLod) override;
 };

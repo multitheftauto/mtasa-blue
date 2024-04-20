@@ -18,7 +18,9 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
       m_vPos(pos),
       m_vRot(rot),
       m_interior(interior),
-      m_pBuilding(nullptr)
+      m_pBuilding(nullptr),
+      m_pHighBuilding(nullptr),
+      m_pLowBuilding(nullptr)
 {
     m_pManager = pManager;
     SetTypeName("building");
@@ -30,6 +32,14 @@ CClientBuilding::~CClientBuilding()
 {
     m_pBuildingManager->RemoveFromList(this);
     Destroy();
+}
+
+void CClientBuilding::Unlink()
+{
+    if (m_pHighBuilding)
+    {
+        m_pHighBuilding->SetLowLodBuilding();
+    }
 }
 
 void CClientBuilding::SetPosition(const CVector& vecPosition)
@@ -97,13 +107,52 @@ void CClientBuilding::Create()
     ConvertZXYEulersToQuaternion(m_vRot, vRot4D);
 
     m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
+
+    if (m_pHighBuilding)
+    {
+        dynamic_cast<CBuilding*>(m_pHighBuilding->GetGameEntity())->SetLod(m_pBuilding);
+    }
 }
 
 void CClientBuilding::Destroy()
 {
     if (m_pBuilding)
     {
+        if (m_pHighBuilding)
+        {
+            dynamic_cast<CBuilding*>(m_pHighBuilding->GetGameEntity())->SetLod(nullptr);
+        }
         g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
         m_pBuilding = nullptr;
     }
+}
+
+bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
+{
+    if (pLod)
+    {
+        // Remove prev LOD
+        SetLowLodBuilding();
+
+        // Add new LOD
+        m_pLowBuilding = pLod;
+        m_pBuilding->SetLod(dynamic_cast<CBuilding*>(pLod->GetGameEntity()));
+        pLod->SetHighLodBuinding(this);
+    }
+    else
+    {
+        // Remove LOD
+        if (m_pLowBuilding)
+        {
+            m_pLowBuilding->SetHighLodBuinding();
+        }
+        m_pBuilding->SetLod(nullptr);
+        m_pLowBuilding = nullptr;
+    }
+    return true;
+}
+
+void CClientBuilding::SetHighLodBuinding(CClientBuilding* pHighBuilding)
+{
+    m_pHighBuilding = pHighBuilding;
 }
