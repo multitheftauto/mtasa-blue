@@ -9205,7 +9205,7 @@ bool CStaticFunctionDefinitions::SetPlayerTeam(CPlayer* pPlayer, CTeam* pTeam)
     assert(pPlayer);
     CTeam* currentTeam = pPlayer->GetTeam();
     // If its a different team
-    if (pTeam != currentTeam){
+    if (pTeam == currentTeam){
         return false;
     }
     // Change his team
