@@ -137,22 +137,17 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
         // Add new LOD
         m_pLowBuilding = pLod;
         m_pBuilding->SetLod(dynamic_cast<CBuilding*>(pLod->GetGameEntity()));
-        pLod->SetHighLodBuinding(this);
+        pLod->SetHighLodBuilding(this);
     }
     else
     {
         // Remove LOD
         if (m_pLowBuilding)
         {
-            m_pLowBuilding->SetHighLodBuinding();
+            m_pLowBuilding->SetHighLodBuilding();
         }
         m_pBuilding->SetLod(nullptr);
         m_pLowBuilding = nullptr;
     }
     return true;
-}
-
-void CClientBuilding::SetHighLodBuinding(CClientBuilding* pHighBuilding)
-{
-    m_pHighBuilding = pHighBuilding;
 }

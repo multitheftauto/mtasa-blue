@@ -51,7 +51,7 @@ public:
     bool SetLowLodBuilding(CClientBuilding* pLod = nullptr);
     bool IsLod() { return m_pHighBuilding != nullptr; };
 
-    void SetHighLodBuinding(CClientBuilding* pHighBuilding = nullptr);
+    void SetHighLodBuilding(CClientBuilding* pHighBuilding = nullptr) { m_pHighBuilding = pHighBuilding; };
 
 private:
 
