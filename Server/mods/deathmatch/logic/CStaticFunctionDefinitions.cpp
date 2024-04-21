@@ -333,6 +333,22 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
     {
         return false;
     }
+    // Its team trigger onPlayerTeamChange for each player in the team
+    else if (iType == CElement::TEAM) 
+    {
+        CTeam* pTeam = static_cast<CTeam*>(pElement);
+
+        auto iterBegin = pTeam->PlayersBegin();
+        auto iterEnd = pTeam->PlayersEnd();
+
+        for (auto iter = iterBegin; iter != iterEnd; ++iter){
+            CPlayer* player = *iter;
+            CLuaArguments arguments;
+            arguments.PushNil(); // Current team going to delete so return nil
+            arguments.PushNil(); // No new team return nil
+            player->CallEvent("onPlayerTeamChange", arguments);
+        }
+    }
 
     // Tell everyone to destroy it if this is not a per-player entity
     if (IS_PERPLAYER_ENTITY(pElement))
@@ -340,7 +356,7 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
         // Unsync it (will destroy it for those that know about it)
         CPerPlayerEntity* pEntity = static_cast<CPerPlayerEntity*>(pElement);
         pEntity->Sync(false);
-    }
+    }  
 
     // Tell everyone to destroy it
     CEntityRemovePacket Packet;
@@ -9205,21 +9221,23 @@ bool CStaticFunctionDefinitions::SetPlayerTeam(CPlayer* pPlayer, CTeam* pTeam)
     assert(pPlayer);
     CTeam* currentTeam = pPlayer->GetTeam();
     // If its a different team
-    if (pTeam == currentTeam){
+    if (pTeam == currentTeam)
         return false;
-    }
-    // Change his team
-    pPlayer->SetTeam(pTeam, true);
 
     // Call the Event
     CLuaArguments Arguments;
     if (currentTeam){
-        Arguments.PushString(currentTeam->GetTeamName());
+        Arguments.PushElement(currentTeam);
     } else {
-        Arguments.PushBoolean(false);
+        Arguments.PushNil(); // No oldTeam return nil
     }
-    Arguments.PushString(pTeam->GetTeamName());
-    pPlayer->CallEvent("onPlayerTeamChange", Arguments);
+    Arguments.PushElement(pTeam);
+    if (!pPlayer->CallEvent("onPlayerTeamChange", Arguments))
+        // Event cancelled, return false
+        return false;
+
+    // Change his team
+    pPlayer->SetTeam(pTeam, true);
 
     // Tell everyone his new team
     CBitStream BitStream;
