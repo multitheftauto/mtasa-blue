@@ -329,13 +329,11 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
     // We can't destroy the root or a player/remote client/console
     int iType = pElement->GetType();
     if (pElement == m_pMapManager->GetRootElement() || iType == CElement::PLAYER || iType == CElement::CONSOLE ||
-        g_pGame->GetResourceManager()->IsAResourceElement(pElement))
-    {
+        g_pGame->GetResourceManager()->IsAResourceElement(pElement)){
         return false;
-    }
-    // Its team trigger onPlayerTeamChange for each player in the team
-    else if (iType == CElement::TEAM) 
-    {
+    } 
+
+    if (iType == CElement::TEAM) { // Its team trigger onPlayerTeamChange for each player in the team
         CTeam* pTeam = static_cast<CTeam*>(pElement);
 
         auto iterBegin = pTeam->PlayersBegin();
@@ -344,7 +342,7 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
         for (auto iter = iterBegin; iter != iterEnd; ++iter){
             CPlayer* player = *iter;
             CLuaArguments arguments;
-            arguments.PushNil(); // Current team going to delete so return nil
+            arguments.PushNil(pTeam); // Return team element as oldteam
             arguments.PushNil(); // No new team return nil
             player->CallEvent("onPlayerTeamChange", arguments);
         }
@@ -9219,6 +9217,7 @@ bool CStaticFunctionDefinitions::SetTeamColor(CTeam* pTeam, unsigned char ucRed,
 bool CStaticFunctionDefinitions::SetPlayerTeam(CPlayer* pPlayer, CTeam* pTeam)
 {
     assert(pPlayer);
+
     CTeam* currentTeam = pPlayer->GetTeam();
     // If its a different team
     if (pTeam == currentTeam)
