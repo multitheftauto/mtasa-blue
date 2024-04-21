@@ -9205,30 +9205,28 @@ bool CStaticFunctionDefinitions::SetPlayerTeam(CPlayer* pPlayer, CTeam* pTeam)
     assert(pPlayer);
     CTeam* currentTeam = pPlayer->GetTeam();
     // If its a different team
-    if (pTeam != currentTeam)
-    {
-        // Change his team
-        pPlayer->SetTeam(pTeam, true);
-
-        // Call the Event
-        CLuaArguments Arguments;
-        if (currentTeam){
-            Arguments.PushString(currentTeam->GetTeamName());
-        } else {
-            Arguments.PushBoolean(false);
-        }
-        Arguments.PushString(pTeam->GetTeamName());
-        pPlayer->CallEvent("onPlayerTeamChange", Arguments);
-
-        // Tell everyone his new team
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(pTeam ? pTeam->GetID() : INVALID_ELEMENT_ID);
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPlayer, SET_PLAYER_TEAM, *BitStream.pBitStream));
-
-        return true;
+    if (pTeam != currentTeam){
+        return false;
     }
+    // Change his team
+    pPlayer->SetTeam(pTeam, true);
 
-    return false;
+    // Call the Event
+    CLuaArguments Arguments;
+    if (currentTeam){
+        Arguments.PushString(currentTeam->GetTeamName());
+    } else {
+        Arguments.PushBoolean(false);
+    }
+    Arguments.PushString(pTeam->GetTeamName());
+    pPlayer->CallEvent("onPlayerTeamChange", Arguments);
+
+    // Tell everyone his new team
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(pTeam ? pTeam->GetID() : INVALID_ELEMENT_ID);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPlayer, SET_PLAYER_TEAM, *BitStream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetTeamFriendlyFire(CTeam* pTeam, bool bFriendlyFire)
