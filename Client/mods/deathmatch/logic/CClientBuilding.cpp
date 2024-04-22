@@ -110,7 +110,7 @@ void CClientBuilding::Create()
 
     if (m_pHighBuilding)
     {
-        dynamic_cast<CBuilding*>(m_pHighBuilding->GetGameEntity())->SetLod(m_pBuilding);
+        m_pHighBuilding->GeBuildingEntity()->SetLod(m_pBuilding);
     }
 }
 
@@ -120,7 +120,7 @@ void CClientBuilding::Destroy()
     {
         if (m_pHighBuilding)
         {
-            dynamic_cast<CBuilding*>(m_pHighBuilding->GetGameEntity())->SetLod(nullptr);
+            m_pHighBuilding->GeBuildingEntity()->SetLod(nullptr);
         }
         g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
         m_pBuilding = nullptr;

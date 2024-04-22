@@ -30,6 +30,7 @@ public:
     void GetRotationRadians(CVector& vecOutRadians) const override { vecOutRadians = m_vRot; };
     void SetRotationRadians(const CVector& vecRadians) override;
 
+    CBuilding*     GeBuildingEntity() const { return m_pBuilding; };
     CEntity*       GetGameEntity() override { return m_pBuilding; };
     const CEntity* GetGameEntity() const override { return m_pBuilding; };
 
@@ -49,11 +50,11 @@ public:
     
     CClientBuilding* GetLowLodBuilding() const noexcept { return m_pLowBuilding; };
     bool SetLowLodBuilding(CClientBuilding* pLod = nullptr);
-    bool IsLod() { return m_pHighBuilding != nullptr; };
+    bool IsLod() const noexcept { return m_pHighBuilding != nullptr; };
 
-    void SetHighLodBuilding(CClientBuilding* pHighBuilding = nullptr) { m_pHighBuilding = pHighBuilding; };
 
 private:
+    void SetHighLodBuilding(CClientBuilding* pHighBuilding = nullptr) { m_pHighBuilding = pHighBuilding; };
 
     void Recreate()
     {

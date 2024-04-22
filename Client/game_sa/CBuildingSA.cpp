@@ -30,7 +30,8 @@ void CBuildingSA::SetLod(CBuilding* pLod)
             SetLod(nullptr);
         }
 
-        CBuildingSAInterface* pLodInterface = (dynamic_cast<CBuildingSA*>(pLod))->GetBuildingInterface();
+        CBuildingSAInterface* pLodInterface = reinterpret_cast<CBuildingSA*>(pLod)->GetBuildingInterface();
+        assert(pLodInterface);
 
         // We should recreate buildings...
         pGame->GetWorld()->Remove(pLodInterface, CBuilding_SetLod);
