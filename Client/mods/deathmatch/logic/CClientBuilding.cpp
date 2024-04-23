@@ -31,7 +31,6 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
 CClientBuilding::~CClientBuilding()
 {
     m_pBuildingManager->RemoveFromList(this);
-    Destroy();
 }
 
 void CClientBuilding::Unlink()
@@ -44,6 +43,7 @@ void CClientBuilding::Unlink()
     {
         SetLowLodBuilding();
     }
+    Destroy();
 }
 
 void CClientBuilding::SetPosition(const CVector& vecPosition)
@@ -105,6 +105,9 @@ void CClientBuilding::SetModel(uint16_t model)
 void CClientBuilding::Create()
 {
     if (m_pBuilding)
+        return;
+
+    if (m_bBeingDeleted)
         return;
 
     CVector4D vRot4D;
