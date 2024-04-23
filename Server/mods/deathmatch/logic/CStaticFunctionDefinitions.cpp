@@ -339,11 +339,10 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
         auto iterBegin = pTeam->PlayersBegin();
         auto iterEnd = pTeam->PlayersEnd();
 
-        for (auto iter = iterBegin; iter != iterEnd; ++iter)
-        {
+        for (auto iter = iterBegin; iter != iterEnd; ++iter){
             CPlayer* player = *iter;
             CLuaArguments arguments;
-            arguments.PushNil(pTeam); // Return team element as oldteam
+            arguments.PushElement(pTeam); // Return team element as oldteam
             arguments.PushNil(); // No new team return nil
             player->CallEvent("onPlayerTeamChange", arguments);
         }
@@ -9229,7 +9228,9 @@ bool CStaticFunctionDefinitions::SetPlayerTeam(CPlayer* pPlayer, CTeam* pTeam)
     if (currentTeam)
     {
         Arguments.PushElement(currentTeam);
-    } else {
+    } 
+    else
+    {
         Arguments.PushNil(); // No oldTeam return nil
     }
     Arguments.PushElement(pTeam);
