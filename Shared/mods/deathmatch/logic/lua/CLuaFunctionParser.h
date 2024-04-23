@@ -463,10 +463,16 @@ struct CLuaFunctionParserBase
                 }
 
                 int  i = -2;
-                auto k = PopUnsafe<key_t>(L, i);
+
+                // When key_t is a string and the actual type of a key is number Lua will conduct an implicit value change
+                // that can confuse lua_next and lead to a crash. To fix it we can copy a key in order to save an original key
+                // that will be used during the next lua_next invocation.
+                lua_pushvalue(L, i);
+
                 auto v = PopUnsafe<value_t>(L, i);
+                auto k = PopUnsafe<key_t>(L, i);                
                 map.emplace(std::move(k), std::move(v));
-                lua_pop(L, 1);            // drop value, keep key for lua_next
+                lua_pop(L, 2);            // drop values(key copy and value), keep original key for lua_next
             }
             ++index;
             return map;
@@ -582,8 +588,6 @@ struct CLuaFunctionParserBase
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
                     return *pVec4D;
-                if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
-                    return *pMatrix;
 
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type

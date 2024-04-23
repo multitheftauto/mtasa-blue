@@ -11,6 +11,9 @@
 
 #pragma once
 
+#include "Common.h"
+#include "CBuildingsPool.h"
+
 class CClientEntity;
 class CEntity;
 class CEntitySAInterface;
@@ -18,6 +21,8 @@ class CObject;
 class CObjectSA;
 class CPed;
 class CPedSA;
+class CBuilding;
+class CBuildingSA;
 class CVector;
 class CVehicle;
 class CVehicleSA;
@@ -97,4 +102,12 @@ public:
 
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;
+
+    virtual uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName) = 0;
+    virtual void RemoveTextureDictonarySlot(uint uiTxdID) = 0;
+    virtual bool IsFreeTextureDictonarySlot(uint uiTxdID) = 0;
+
+    virtual ushort GetFreeTextureDictonarySlot() = 0;
+
+    virtual CBuildingsPool& GetBuildingsPool() noexcept = 0;
 };

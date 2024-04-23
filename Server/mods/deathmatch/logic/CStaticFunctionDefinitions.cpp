@@ -2079,6 +2079,11 @@ bool CStaticFunctionDefinitions::DetonateSatchels(CElement* pElement)
         CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
         if (pPlayer->IsJoined())
         {
+            // Trigger Lua event and see if we are allowed to continue
+            CLuaArguments arguments;
+            if (!pPlayer->CallEvent("onPlayerDetonateSatchels", arguments))
+                return false;
+
             CDetonateSatchelsPacket Packet;
             Packet.SetSourceElement(pPlayer);
             m_pPlayerManager->BroadcastOnlyJoined(Packet);
@@ -11023,6 +11028,25 @@ bool CStaticFunctionDefinitions::IsGlitchEnabled(const std::string& strGlitchNam
         return true;
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
+{
+    return g_pGame->IsWorldSpecialPropertyEnabled(property);
+}
+
+bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
+{
+    if (g_pGame->IsWorldSpecialPropertyEnabled(property) == isEnabled)
+        return false;
+
+    g_pGame->SetWorldSpecialPropertyEnabled(property, isEnabled);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write((uchar)property);
+    BitStream.pBitStream->WriteBit(isEnabled);
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_WORLD_SPECIAL_PROPERTY, *BitStream.pBitStream));
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)

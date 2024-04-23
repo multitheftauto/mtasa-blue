@@ -58,6 +58,7 @@
 #include "packets/CPlayerNetworkStatusPacket.h"
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
+#include "packets/CServerInfoSyncPacket.h"
 #include "../utils/COpenPortsTester.h"
 #include "../utils/CMasterServerAnnouncer.h"
 #include "../utils/CHqComms.h"
@@ -70,11 +71,12 @@
 #include "net/SimHeaders.h"
 #include <signal.h>
 
-#define MAX_BULLETSYNC_DISTANCE 400.0f
-#define MAX_EXPLOSION_SYNC_DISTANCE 400.0f
+#define MAX_BULLETSYNC_DISTANCE      400.0f
+#define MAX_EXPLOSION_SYNC_DISTANCE  400.0f
 #define MAX_PROJECTILE_SYNC_DISTANCE 400.0f
 
-#define RELEASE_MIN_CLIENT_VERSION              "1.6.0-0.00000"
+#define RELEASE_MIN_CLIENT_VERSION          "1.6.0-0.00000"
+#define FIREBALLDESTRUCT_MIN_CLIENT_VERSION "1.6.0-9.22199"
 
 #ifndef WIN32
     #include <limits.h>
@@ -229,6 +231,21 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
         m_JetpackWeapons[i] = false;
+
+    // Setup world special properties
+    m_WorldSpecialProps[WorldSpecialProperty::HOVERCARS] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::AIRCARS] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRABUNNY] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRAJUMP] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::RANDOMFOLIAGE] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::SNIPERMOON] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTRAAIRRESISTANCE] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::UNDERWORLDWARP] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::VEHICLESUNGLARE] = false;
+    m_WorldSpecialProps[WorldSpecialProperty::CORONAZTEST] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::WATERCREATURES] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::BURNFLIPPEDCARS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::FIREBALLDESTRUCT] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -386,14 +403,14 @@ CGame::~CGame()
     // Clear our global pointer
     g_pGame = NULL;
 
-    // Remove our console control handler
-    #ifdef WIN32
+// Remove our console control handler
+#ifdef WIN32
     SetConsoleCtrlHandler(ConsoleEventHandler, FALSE);
-    #else
+#else
     signal(SIGTERM, SIG_DFL);
     signal(SIGINT, SIG_DFL);
     signal(SIGPIPE, SIG_DFL);
-    #endif
+#endif
 }
 
 void CGame::GetTag(char* szInfoTag, int iInfoTag)
@@ -510,6 +527,8 @@ void CGame::DoPulse()
 
     // Process our resource stop/restart queue
     CLOCK_CALL1(m_pResourceManager->ProcessQueue(););
+
+    ProcessClientTriggeredEventSpam();
 
     // Delete all items requested
     CLOCK_CALL1(m_ElementDeleter.DoDeleteAll(););
@@ -637,9 +656,9 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Encrypt crash dumps for uploading
     HandleCrashDumpEncryption();
 
-    // Check Windows server is using correctly compiled Lua dll
-    #ifndef MTA_DEBUG
-        #ifdef WIN32
+// Check Windows server is using correctly compiled Lua dll
+#ifndef MTA_DEBUG
+    #ifdef WIN32
     HMODULE hModule = LoadLibrary("lua5.1.dll");
     // Release server should not have this function
     PVOID pFunc = static_cast<PVOID>(GetProcAddress(hModule, "luaX_is_apicheck_enabled"));
@@ -649,8 +668,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         CLogger::ErrorPrintf("Problem with Lua dll\n");
         return false;
     }
-        #endif
     #endif
+#endif
 
     // Read some settings
     m_pACLManager->SetFileName(m_pMainConfig->GetAccessControlListFile().c_str());
@@ -860,16 +879,16 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
     m_pPlayerManager->SetScriptDebugging(m_pScriptDebugging);
 
-    // Set our console control handler
-    #ifdef WIN32
+// Set our console control handler
+#ifdef WIN32
     SetConsoleCtrlHandler(ConsoleEventHandler, TRUE);
-    // Hide the close box
-    // DeleteMenu ( GetSystemMenu ( GetConsoleWindow(), FALSE ), SC_CLOSE, MF_BYCOMMAND );
-    #else
+// Hide the close box
+// DeleteMenu ( GetSystemMenu ( GetConsoleWindow(), FALSE ), SC_CLOSE, MF_BYCOMMAND );
+#else
     signal(SIGTERM, &sighandler);
     signal(SIGINT, &sighandler);
     signal(SIGPIPE, SIG_IGN);
-    #endif
+#endif
 
     // Add our builtin events
     AddBuiltInEvents();
@@ -1289,10 +1308,11 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("Start");
 
     // Let him join
-    Player.Send(CPlayerJoinCompletePacket(
-        Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(), m_pMainConfig->GetHTTPPort(),
-        m_pMainConfig->GetHTTPDownloadURL().c_str(), m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
-        m_pMainConfig->IsVoiceEnabled(), m_pMainConfig->GetVoiceSampleRate(), m_pMainConfig->GetVoiceQuality(), m_pMainConfig->GetVoiceBitrate()));
+    Player.Send(CPlayerJoinCompletePacket(Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(),
+                                          m_pMainConfig->GetHTTPPort(), m_pMainConfig->GetHTTPDownloadURL().c_str(),
+                                          m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
+                                          m_pMainConfig->IsVoiceEnabled(), m_pMainConfig->GetVoiceSampleRate(), m_pMainConfig->GetVoiceQuality(),
+                                          m_pMainConfig->GetVoiceBitrate(), m_pMainConfig->GetServerName().c_str()));
 
     marker.Set("CPlayerJoinCompletePacket");
 
@@ -1566,6 +1586,9 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
+    m_Events.AddEvent("onPlayerProjectileCreation", "weaponType, posX, posY, posZ, force, target, rotX, rotY, rotZ, velX, velY, velZ", nullptr, false);
+    m_Events.AddEvent("onPlayerDetonateSatchels", "", nullptr, false);
+    m_Events.AddEvent("onPlayerTriggerEventThreshold", "", nullptr, false);
 
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
@@ -1730,13 +1753,13 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
             strExtra = SStringX(strExtraTemp);
             strPlayerVersion = SStringX(strPlayerVersionTemp);
         }
-    #if MTASA_VERSION_TYPE < VERSION_TYPE_UNSTABLE
+#if MTASA_VERSION_TYPE < VERSION_TYPE_UNSTABLE
         if (atoi(ExtractVersionStringBuildNumber(Packet.GetPlayerVersion())) != 0)
         {
             // Use player version from packet if it contains a valid build number
             strPlayerVersion = Packet.GetPlayerVersion();
         }
-    #endif
+#endif
 
         SString strIP = pPlayer->GetSourceIP();
         SString strIPAndSerial("IP: %s  Serial: %s  Version: %s", strIP.c_str(), strSerial.c_str(), strPlayerVersion.c_str());
@@ -1791,6 +1814,8 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetSerial(strSerial, 0);
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
+
+                            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
 
                             // Check if client must update
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
@@ -1872,7 +1897,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 return;
                             }
 
-                        #if MTASA_VERSION_TYPE > VERSION_TYPE_UNSTABLE
+#if MTASA_VERSION_TYPE > VERSION_TYPE_UNSTABLE
                             if (Packet.GetPlayerVersion().length() > 0 && Packet.GetPlayerVersion() != pPlayer->GetPlayerVersion())
                             {
                                 // Tell the console
@@ -1882,7 +1907,7 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::VERSION_MISMATCH);
                                 return;
                             }
-                        #endif
+#endif
 
                             PlayerCompleteConnect(pPlayer);
                         }
@@ -2272,6 +2297,11 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         if ((pPlayer->GetPuresyncCount() % 4) == 0)
             pPlayer->Send(CReturnSyncPacket(pPlayer));
 
+        // Send a server info sync packet to the player
+        // Only every 512 packets
+        if ((pPlayer->GetPuresyncCount() % 512) == 0)
+            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
+
         CLOCK("PlayerPuresync", "RelayPlayerPuresync");
         // Relay to other players
         RelayPlayerPuresync(Packet);
@@ -2413,6 +2443,10 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        // Early return when the player attempts to fire a weapon they do not have
+        if (!pPlayer->HasWeaponType(Packet.m_WeaponType))
+            return;
+
         // Relay to other players
         RelayNearbyPacket(Packet);
 
@@ -2542,6 +2576,8 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
         }
         else
             m_pScriptDebugging->LogError(NULL, "Client (%s) triggered serverside event %s, but event is not added serverside", pCaller->GetNick(), szName);
+
+        RegisterClientTriggeredEventUsage(pCaller);
     }
 }
 
@@ -2600,6 +2636,11 @@ void CGame::Packet_DetonateSatchels(CDetonateSatchelsPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        // Trigger Lua event and see if we are allowed to continue
+        CLuaArguments arguments;
+        if (!pPlayer->CallEvent("onPlayerDetonateSatchels", arguments))
+            return;
+
         // Tell everyone to blow up this guy's satchels
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
@@ -2752,6 +2793,29 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
             if (pOriginSource)
                 vecPosition += pOriginSource->GetPosition();
         }
+
+        CLuaArguments arguments;
+        arguments.PushNumber(Packet.m_ucWeaponType);            // "weaponType"
+        arguments.PushNumber(vecPosition.fX);                   // "posX"
+        arguments.PushNumber(vecPosition.fY);                   // "posY"
+        arguments.PushNumber(vecPosition.fZ);                   // "posZ"
+        arguments.PushNumber(Packet.m_fForce);                  // "force"
+
+        CElement* pTarget = nullptr;
+        if (Packet.m_bHasTarget && Packet.m_TargetID != INVALID_ELEMENT_ID)
+            pTarget = CElementIDs::GetElement(Packet.m_TargetID);
+
+        arguments.PushElement(pTarget);                            // "target"
+        arguments.PushNumber(Packet.m_vecRotation.fX);             // "rotX"
+        arguments.PushNumber(Packet.m_vecRotation.fY);             // "rotY"
+        arguments.PushNumber(Packet.m_vecRotation.fZ);             // "rotZ"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fX);            // "velX"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fY);            // "velY"
+        arguments.PushNumber(Packet.m_vecMoveSpeed.fZ);            // "velZ"
+
+        // Trigger Lua event and see if we are allowed to continue
+        if (!pPlayer->CallEvent("onPlayerProjectileCreation", arguments))
+            return;
 
         // Make a list of players to send this packet to
         CSendList sendList;
@@ -4451,7 +4515,7 @@ void CGame::SendPacketBatchEnd()
 bool CGame::IsBulletSyncActive()
 {
     bool bConfigSaysEnable = m_pMainConfig->GetBulletSyncEnabled();
-#if 0       // No auto bullet sync as there are some problems with it
+#if 0            // No auto bullet sync as there are some problems with it
     bool bGlitchesSayEnable = ( m_Glitches [ GLITCH_FASTFIRE ] || m_Glitches [ GLITCH_CROUCHBUG ] );
 #else
     bool bGlitchesSayEnable = false;
@@ -4548,13 +4612,11 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < strMinClientRequirementFromResources)
         strNewMin = strMinClientRequirementFromResources;
 
-#if 0
-    if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+    if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
     {
-        if (strNewMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
-            strNewMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
+        if (strNewMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
+            strNewMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
     }
-#endif
 
     // Log effective min client version
     if (strNewMin != m_strPrevMinClientConnectRequirement)
@@ -4573,15 +4635,14 @@ CMtaVersion CGame::CalculateMinClientRequirement()
         SendSyncSettings();
     }
 
-#if 0
     // Do version based kick check as well
     {
         CMtaVersion strKickMin;
 
-        if (g_pGame->IsGlitchEnabled(GLITCH_DONTBURNFLIPPEDCARS))
+        if (!g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT))
         {
-            if (strKickMin < DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION)
-                strKickMin = DONTBURNFLIPPEDCARS_MIN_CLIENT_VERSION;
+            if (strKickMin < FIREBALLDESTRUCT_MIN_CLIENT_VERSION)
+                strKickMin = FIREBALLDESTRUCT_MIN_CLIENT_VERSION;
         }
 
         if (strKickMin != m_strPrevMinClientKickRequirement)
@@ -4604,7 +4665,6 @@ CMtaVersion CGame::CalculateMinClientRequirement()
                 CLogger::LogPrintf(SString("Forced %d player(s) to reconnect so they can update to %s\n", uiNumIncompatiblePlayers, *strKickMin));
         }
     }
-#endif
 
     // Also seems a good place to keep this setting synchronized
     g_pBandwidthSettings->NotifyBulletSyncEnabled(g_pGame->IsBulletSyncActive());
@@ -4648,4 +4708,49 @@ void CGame::HandleCrashDumpEncryption()
         }
     }
 #endif
+}
+
+void CGame::RegisterClientTriggeredEventUsage(CPlayer* pPlayer)
+{
+    if (!pPlayer || !pPlayer->IsPlayer() || pPlayer->IsBeingDeleted())
+        return;
+
+    auto now = GetTickCount64_();
+
+    // If key/player doesn't exist in map, store time of entry
+    if (m_mapClientTriggeredEvents.find(pPlayer) == m_mapClientTriggeredEvents.end())
+        m_mapClientTriggeredEvents[pPlayer].m_llTicks = now;
+
+    // Only increment if we haven't reached the interval time already
+    if (now - m_mapClientTriggeredEvents[pPlayer].m_llTicks <= m_iClientTriggeredEventsIntervalMs)
+        m_mapClientTriggeredEvents[pPlayer].m_uiCounter++;
+}
+
+void CGame::ProcessClientTriggeredEventSpam()
+{
+    for (auto it = m_mapClientTriggeredEvents.begin(); it != m_mapClientTriggeredEvents.end();)
+    {
+        const auto& [player, data] = *it;
+        bool remove = false;
+
+        if (player && player->IsPlayer() && !player->IsBeingDeleted())
+        {
+            if (GetTickCount64_() - data.m_llTicks >= m_iClientTriggeredEventsIntervalMs)
+            {
+                if (data.m_uiCounter > m_iMaxClientTriggeredEventsPerInterval)
+                    player->CallEvent("onPlayerTriggerEventThreshold", {});
+
+                remove = true;
+            }
+        }
+        else
+        {
+            remove = true;
+        }
+
+        if (remove)
+            it = m_mapClientTriggeredEvents.erase(it);
+        else
+            it++;
+    }
 }

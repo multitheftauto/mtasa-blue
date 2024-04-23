@@ -18,8 +18,10 @@ void CLuaWorldDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{// World get functions
                                                                              {"getTime", GetTime},
+                                                                             {"getColorFilter", ArgumentParser<GetColorFilter>},
                                                                              {"getRoofPosition", GetRoofPosition},
                                                                              {"getGroundPosition", GetGroundPosition},
+                                                                             {"processLineAgainstMesh", ArgumentParser<ProcessLineAgainstMesh>},
                                                                              {"processLineOfSight", ProcessLineOfSight},
                                                                              {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
                                                                              {"getScreenFromWorldPosition", GetScreenFromWorldPosition},
@@ -71,7 +73,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setWaveHeight", SetWaveHeight},
                                                                              {"setMinuteDuration", SetMinuteDuration},
                                                                              {"setGarageOpen", SetGarageOpen},
-                                                                             {"setWorldSpecialPropertyEnabled", SetWorldSpecialPropertyEnabled},
+                                                                             {"setWorldSpecialPropertyEnabled", ArgumentParserWarn<false, SetWorldSpecialPropertyEnabled>},
                                                                              {"setBlurLevel", SetBlurLevel},
                                                                              {"setJetpackMaxHeight", SetJetpackMaxHeight},
                                                                              {"setCloudsEnabled", SetCloudsEnabled},
@@ -125,7 +127,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
-                                                                             {"isWorldSpecialPropertyEnabled", IsWorldSpecialPropertyEnabled},
+                                                                             {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
                                                                              {"isGarageOpen", IsGarageOpen}};
 
     // Add functions
@@ -227,6 +229,32 @@ int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
     // Return false
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, CLuaMultiReturn<bool, float, float, const char*, const char*, float, float, float>> CLuaWorldDefs::ProcessLineAgainstMesh(CClientEntity* e, CVector start, CVector end) {
+    const auto ge = e->GetGameEntity();
+    if (!ge) {
+        // Element likely not streamed in, and such
+        // Can't process it. This isn't an error per-se, thus we won't raise anything and treat this as a no-hit scenario
+        return { false };
+    }
+    const SProcessLineOfSightMaterialInfoResult matInfo{g_pGame->GetWorld()->ProcessLineAgainstMesh(ge->GetInterface(), start, end)};
+    if (!matInfo.valid) {
+        return { false }; // No hit
+    }
+    return CLuaMultiReturn<bool, float, float, const char*, const char*, float, float, float>{
+        true,
+
+        matInfo.uv.fX,
+        matInfo.uv.fY,
+
+        matInfo.textureName,
+        matInfo.frameName,
+
+        matInfo.hitPos.fX,
+        matInfo.hitPos.fY,
+        matInfo.hitPos.fZ,
+    };
 }
 
 int CLuaWorldDefs::ProcessLineOfSight(lua_State* L)
@@ -1217,50 +1245,14 @@ int CLuaWorldDefs::SetOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWorldDefs::IsWorldSpecialPropertyEnabled(lua_State* luaVM)
+bool CLuaWorldDefs::IsWorldSpecialPropertyEnabled(WorldSpecialProperty property)
 {
-    //  bool isWorldSpecialPropertyEnabled ( string propname )
-    SString strPropName;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strPropName);
-
-    if (!argStream.HasErrors())
-    {
-        bool bResult = CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(strPropName);
-        lua_pushboolean(luaVM, bResult);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return m_pClientGame->IsWorldSpecialProperty(property);
 }
 
-int CLuaWorldDefs::SetWorldSpecialPropertyEnabled(lua_State* luaVM)
+bool CLuaWorldDefs::SetWorldSpecialPropertyEnabled(WorldSpecialProperty property, bool isEnabled)
 {
-    //  bool setWorldSpecialPropertyEnabled ( string propname, bool enable )
-    SString strPropName;
-    bool    bEnable;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strPropName);
-    argStream.ReadBool(bEnable);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(strPropName, bEnable))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return m_pClientGame->SetWorldSpecialProperty(property, isEnabled);
 }
 
 int CLuaWorldDefs::SetCloudsEnabled(lua_State* luaVM)
@@ -2022,6 +2014,17 @@ bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar u
     unsigned long ulColor1 = COLOR_RGBA(ucPass1Red, ucPass1Green, ucPass1Blue, ucPass1Alpha);
     g_pMultiplayer->SetColorFilter(ulColor0, ulColor1);
     return true;
+}
+
+CLuaMultiReturn<uchar, uchar, uchar, uchar, uchar, uchar, uchar, uchar> CLuaWorldDefs::GetColorFilter(bool isOriginal)
+{
+    SColor uColor0 = 0;
+    SColor uColor1 = 0;
+    g_pMultiplayer->GetColorFilter(uColor0.ulARGB, uColor1.ulARGB, isOriginal);
+    return {
+        uColor0.R, uColor0.G, uColor0.B, uColor0.A,
+        uColor1.R, uColor1.G, uColor1.B, uColor1.A,
+    };
 }
 
 bool CLuaWorldDefs::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)

@@ -42,6 +42,7 @@ namespace
         {"engineSetModelFlag", "1.6.0-9.21695"},
         {"fileGetContents", "1.6.0-9.21938"},
         {"engineStreamingSetModelCacheLimits", "1.6.0-9.21946"},
+        {"engineStreamingRestoreBufferSize", "1.6.0-9.22195"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -49,6 +50,8 @@ namespace
         {"isObjectBreakable", "1.6.0-9.21765"},
         {"setObjectBreakable", "1.6.0-9.21765"},
         {"fileGetContents", "1.6.0-9.21938"},
+        {"isWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
+        {"setWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
     };
 
     //
@@ -143,6 +146,10 @@ namespace
 
         // Ped jetpacks
         //{false, "doesPedHaveJetPack", "isPedWearingJetpack"},
+
+        // Base Encoding & Decoding
+        {false, "base64Encode", "encodeString"},
+        {false, "base64Decode", "decodeString"}
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -241,5 +248,9 @@ namespace
 
         // Old Discord implementation (see #2499)
         {true, "setPlayerDiscordJoinParams", "See GitHub PR #2499 for more details"},
+
+        // Base Encoding & Decoding
+        {false, "base64Encode", "encodeString"},
+        {false, "base64Decode", "decodeString"}
     };
 }            // namespace
