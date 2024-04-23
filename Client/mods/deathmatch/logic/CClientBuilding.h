@@ -54,6 +54,7 @@ public:
 
 
 private:
+    CClientBuilding* GetHighLodBuilding() const { return m_pHighBuilding; }; 
     void SetHighLodBuilding(CClientBuilding* pHighBuilding = nullptr) { m_pHighBuilding = pHighBuilding; };
 
     void Recreate()

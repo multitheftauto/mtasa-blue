@@ -40,6 +40,10 @@ void CClientBuilding::Unlink()
     {
         m_pHighBuilding->SetLowLodBuilding();
     }
+    if (m_pLowBuilding)
+    {
+        SetLowLodBuilding();
+    }
 }
 
 void CClientBuilding::SetPosition(const CVector& vecPosition)
@@ -134,9 +138,17 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
         // Remove prev LOD
         SetLowLodBuilding();
 
+        // Unlink old high lod element
+        CClientBuilding* pOveridedBuilding = pLod->GetHighLodBuilding();
+        if (pOveridedBuilding && pOveridedBuilding != this)
+        {
+            pOveridedBuilding->SetLowLodBuilding();
+        }
+
         // Add new LOD
         m_pLowBuilding = pLod;
         m_pBuilding->SetLod(pLod->GeBuildingEntity());
+
         pLod->SetHighLodBuilding(this);
     }
     else
