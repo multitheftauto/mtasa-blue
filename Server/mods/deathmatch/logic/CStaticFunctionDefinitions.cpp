@@ -328,10 +328,11 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 
     // We can't destroy the root or a player/remote client/console
     int iType = pElement->GetType();
-    if (pElement == m_pMapManager->GetRootElement() || iType == CElement::PLAYER || iType == CElement::CONSOLE ||
-        g_pGame->GetResourceManager()->IsAResourceElement(pElement)){
+    if (pElement == m_pMapManager->GetRootElement() || iType == CElement::PLAYER || iType == CElement::CONSOLE || 
+        g_pGame->GetResourceManager()->IsAResourceElement(pElement))
+    {
         return false;
-    } 
+    }
 
     if (iType == CElement::TEAM) { // Its team trigger onPlayerTeamChange for each player in the team
         CTeam* pTeam = static_cast<CTeam*>(pElement);
