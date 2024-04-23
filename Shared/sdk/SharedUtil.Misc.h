@@ -234,6 +234,7 @@ namespace SharedUtil
 
     std::string UTF16ToMbUTF8(const std::wstring& ws);
     std::string UTF16ToMbUTF8(const wchar_t* ws);
+    std::string UTF16ToMbUTF8(const char16_t* ws);
 
     std::wstring ANSIToUTF16(const SString& s);
 
@@ -343,13 +344,14 @@ namespace SharedUtil
     template <class TL, class T>
     bool ListContains(const TL& itemList, const T& item)
     {
+        if (itemList.empty())
+            return false;
         typename TL ::const_iterator it = itemList.begin();
         for (; it != itemList.end(); ++it)
             if (item == *it)
                 return true;
         return false;
     }
-
     // Add item if it does not aleady exist in itemList
     template <class TL, class T>
     void ListAddUnique(TL& itemList, const T& item)

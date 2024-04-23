@@ -148,6 +148,11 @@ void CModManagerImpl::DoPulse()
     }
 }
 
+bool CModManagerImpl::IsReadyToAcceptConnections() const noexcept
+{
+    return (m_pBase != nullptr) && m_pBase->IsReadyToAcceptConnections();
+}
+
 bool CModManagerImpl::IsFinished()
 {
     if (m_pBase)

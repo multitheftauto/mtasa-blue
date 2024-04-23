@@ -204,7 +204,8 @@ CGifItem* CRenderItemManager::CreateGif(uint width, uint height)
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderTargetItem* CRenderItemManager::CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce)
+CRenderTargetItem* CRenderItemManager::CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel, int surfaceFormat,
+                                                          bool bForce)
 {
     if (!bForce && !CanCreateRenderItem(CRenderTargetItem::GetClassId()))
         return NULL;
@@ -213,7 +214,7 @@ CRenderTargetItem* CRenderItemManager::CreateRenderTarget(uint uiSizeX, uint uiS
     bool bIncludeInMemoryStats = (bForce == false);
 
     CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem();
-    pRenderTargetItem->PostConstruct(this, uiSizeX, uiSizeY, bWithAlphaChannel, bIncludeInMemoryStats);
+    pRenderTargetItem->PostConstruct(this, uiSizeX, uiSizeY, bHasSurfaceFormat, bWithAlphaChannel, surfaceFormat, bIncludeInMemoryStats);
 
     if (!pRenderTargetItem->IsValid())
     {
@@ -524,7 +525,7 @@ void CRenderItemManager::UpdateBackBufferCopySize()
 
         // Try to create new one if needed
         if (uiSizeX > 0)
-            m_pBackBufferCopy = CreateRenderTarget(uiSizeX, uiSizeY, false, true);
+            m_pBackBufferCopy = CreateRenderTarget(uiSizeX, uiSizeY, false, false, (_D3DFORMAT)0, true);
     }
 }
 

@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "lua/CLuaFunctionParser.h"
+#include <regex>
 
 void CLuaBrowserDefs::LoadFunctions()
 {
@@ -182,8 +183,12 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Remove empty URLs
-        pages.erase(std::remove_if(pages.begin(), pages.end(), [](const auto& url) { return url.empty(); }), pages.end());
+        // Remove empty and invalid URLs
+        std::regex invalidSynmbolsRegex("[^A-Za-z0-9\-._~!#$&'()*+,;=:@\/?%]");
+
+        pages.erase(std::remove_if(pages.begin(), pages.end(),
+                                   [&invalidSynmbolsRegex](const auto& url) { return url.empty() || std::regex_search(url, invalidSynmbolsRegex); }),
+                    pages.end());
 
         // Convert to domains if we got a list of URLs
         if (bIsURL)
@@ -310,17 +315,19 @@ int CLuaBrowserDefs::InjectBrowserMouseMove(lua_State* luaVM)
 
 int CLuaBrowserDefs::InjectBrowserMouseDown(lua_State* luaVM)
 {
-    //  bool injectBrowserMouseDown ( browser webBrowser, string mouseButton )
-    CClientWebBrowser*     pWebBrowser;
-    eWebBrowserMouseButton mouseButton;
+    //  bool injectBrowserMouseDown ( browser webBrowser, string mouseButton [ , bool doubleClick = false ] )
+    CClientWebBrowser*     pWebBrowser{};
+    eWebBrowserMouseButton mouseButton{};
+    bool                   doubleClick{};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pWebBrowser);
     argStream.ReadEnumString(mouseButton);
+    argStream.ReadBool(doubleClick, false);
 
     if (!argStream.HasErrors())
     {
-        pWebBrowser->InjectMouseDown(mouseButton);
+        pWebBrowser->InjectMouseDown(mouseButton, doubleClick ? 2 : 1);
         lua_pushboolean(luaVM, true);
         return 1;
     }

@@ -612,36 +612,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         #############################################################
 
         #############################################################
-        # Fix missing or incorrect VS2013 redist files
-        SetOutPath $SYSDIR
-        Push $SYSDIR\msvcp120.dll
-        Call IsDll32Bit
-        Pop $0
-        ${If} $0 != 1
-            File "${FILES_ROOT}\redist\msvcp120.dll"
-        ${EndIf}
-
-        Push $SYSDIR\msvcr120.dll
-        Call IsDll32Bit
-        Pop $0
-        ${If} $0 != 1
-            File "${FILES_ROOT}\redist\msvcr120.dll"
-        ${EndIf}
-        #############################################################
-
-        #############################################################
-        # For XP, install Microsoft Internationalized Domain Names (IDN) Mitigation APIs
-        SetOutPath "$TEMP"
-        ${If} ${AtMostWinXP}
-            ${IfNot} ${FileExists} $SYSDIR\normaliz.dll
-                ${LogText} "Did not find $SYSDIR\normaliz.dll"
-                File "${FILES_ROOT}\redist\idndl.x86.exe"
-                ExecWait '"$TEMP\idndl.x86.exe" /passive'
-            ${EndIf}
-        ${EndIf}
-        #############################################################
-
-        #############################################################
         # Install SHA2 support for older Win7 x64
         ${If} ${IsWin7}
             ${If} ${RunningX64}
@@ -694,13 +664,20 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         File "${FILES_ROOT}\mta\tags.dll"
 
         SetOutPath "$INSTDIR\MTA"
-		File "${FILES_ROOT}\mta\chrome_elf.dll"
+        File "${FILES_ROOT}\mta\chrome_elf.dll"
         File "${FILES_ROOT}\mta\libcef.dll"
         File "${FILES_ROOT}\mta\icudtl.dat"
         File "${FILES_ROOT}\mta\libEGL.dll"
         File "${FILES_ROOT}\mta\libGLESv2.dll"
+        File "${FILES_ROOT}\mta\vk_swiftshader.dll"
+        File "${FILES_ROOT}\mta\vulkan-1.dll"
         File "${FILES_ROOT}\mta\snapshot_blob.bin"
         File "${FILES_ROOT}\mta\v8_context_snapshot.bin"
+
+        File "${FILES_ROOT}\mta\XInput9_1_0_mta.dll"
+        File "${FILES_ROOT}\mta\xinput1_3_mta.dll"
+        File "${FILES_ROOT}\mta\d3dcompiler_43.dll"
+        File "${FILES_ROOT}\mta\d3dcompiler_47.dll"
 
         SetOutPath "$INSTDIR\MTA\CEF"
         File "${FILES_ROOT}\mta\CEF\CEFLauncher.exe"
@@ -872,6 +849,8 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
+            File "${SERVER_FILES_ROOT}\mods\deathmatch\libcrypto-3.dll"
+            File "${SERVER_FILES_ROOT}\mods\deathmatch\libssl-3.dll"
         !endif
 
         ;Only overwrite the following files if previous versions were bugged and explicitly need replacing
@@ -1106,6 +1085,8 @@ Section Uninstall
         Delete "$INSTDIR\server\mods\deathmatch\dbconmy.dll"
         Delete "$INSTDIR\server\mods\deathmatch\deathmatch.dll"
         Delete "$INSTDIR\server\mods\deathmatch\libmysql.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\libcrypto-3.dll"
+        Delete "$INSTDIR\server\mods\deathmatch\libssl-3.dll"
         Delete "$INSTDIR\server\mods\deathmatch\lua5.1.dll"
         Delete "$INSTDIR\server\mods\deathmatch\pcre3.dll"
 
@@ -1120,6 +1101,8 @@ Section Uninstall
         Delete "$INSTDIR\server\x64\dbconmy.dll"
         Delete "$INSTDIR\server\x64\deathmatch.dll"
         Delete "$INSTDIR\server\x64\libmysql.dll"
+        Delete "$INSTDIR\server\x64\libcrypto-3-x64.dll"
+        Delete "$INSTDIR\server\x64\libssl-3-x64.dll"
         Delete "$INSTDIR\server\x64\lua5.1.dll"
         Delete "$INSTDIR\server\x64\pcre3.dll"
         RmDir "$INSTDIR\server\x64"

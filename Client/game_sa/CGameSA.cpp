@@ -38,7 +38,6 @@
 #include "CHudSA.h"
 #include "CKeyGenSA.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
-#include "COffsets.h"
 #include "CPadSA.h"
 #include "CPickupsSA.h"
 #include "CPlayerInfoSA.h"
@@ -57,19 +56,11 @@
 #include "CWeatherSA.h"
 #include "CWorldSA.h"
 #include "D3DResourceSystemSA.h"
+#include "CIplStoreSA.h"
 
 extern CGameSA* pGame;
 
 unsigned int&  CGameSA::ClumpOffset = *(unsigned int*)0xB5F878;
-unsigned long* CGameSA::VAR_SystemTime;
-unsigned long* CGameSA::VAR_IsAtMenu;
-bool*          CGameSA::VAR_IsForegroundWindow;
-unsigned long* CGameSA::VAR_SystemState;
-float*         CGameSA::VAR_TimeScale;
-float*         CGameSA::VAR_FPS;
-float*         CGameSA::VAR_OldTimeStep;
-float*         CGameSA::VAR_TimeStep;
-unsigned long* CGameSA::VAR_Framelimiter;
 
 unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint32_t*)0x59FB4C : 160;            // default: 160
 
@@ -79,6 +70,10 @@ unsigned int OBJECTDYNAMICINFO_MAX = *(uint32_t*)0x59FB4C != 0x90909090 ? *(uint
 CGameSA::CGameSA()
 {
     pGame = this;
+
+    // Find the game version and initialize m_eGameVersion so GetGameVersion() will return the correct value
+    FindGameVersion();
+
     m_bAsyncScriptEnabled = false;
     m_bAsyncScriptForced = false;
     m_bASyncLoadingSuspended = false;
@@ -89,21 +84,6 @@ CGameSA::CGameSA()
     ObjectGroupsInfo = new CObjectGroupPhysicalPropertiesSA[OBJECTDYNAMICINFO_MAX];
 
     SetInitialVirtualProtect();
-
-    // Initialize the offsets
-    eGameVersion version = FindGameVersion();
-    switch (version)
-    {
-        case VERSION_EU_10:
-            COffsets::Initialize10EU();
-            break;
-        case VERSION_US_10:
-            COffsets::Initialize10US();
-            break;
-        case VERSION_11:
-            COffsets::Initialize11();
-            break;
-    }
 
     // Set the model ids for all the CModelInfoSA instances
     for (unsigned int i = 0; i < modelInfoMax; i++)
@@ -142,7 +122,7 @@ CGameSA::CGameSA()
     m_pCarEnterExit = new CCarEnterExitSA();
     m_pControllerConfigManager = new CControllerConfigManagerSA();
     m_pProjectileInfo = new CProjectileInfoSA();
-    m_pRenderWare = new CRenderWareSA(version);
+    m_pRenderWare = new CRenderWareSA();
     m_pHandlingManager = new CHandlingManagerSA();
     m_pEventList = new CEventListSA();
     m_pGarages = new CGaragesSA((CGaragesSAInterface*)CLASS_CGarages);
@@ -158,6 +138,7 @@ CGameSA::CGameSA()
     m_pWeaponStatsManager = new CWeaponStatManagerSA();
     m_pPointLights = new CPointLightsSA();
     m_collisionStore = new CColStoreSA();
+    m_pIplStore = new CIplStoreSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -294,6 +275,7 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CAudioContainerSA*>(m_pAudioContainer);
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
     delete static_cast<CColStoreSA*>(m_collisionStore);
+    delete static_cast<CIplStore*>(m_pIplStore);
 
     delete[] ModelInfo;
     delete[] ObjectGroupsInfo;
@@ -363,12 +345,12 @@ void CGameSA::StartGame()
  */
 void CGameSA::SetSystemState(eSystemState State)
 {
-    *VAR_SystemState = (DWORD)State;
+    MemPutFast<DWORD>(0xC8D4C0, State); // gGameState
 }
 
 eSystemState CGameSA::GetSystemState()
 {
-    return (eSystemState)*VAR_SystemState;
+    return *(eSystemState*)0xC8D4C0; // gGameState
 }
 
 /**
@@ -443,6 +425,12 @@ void CGameSA::Reset()
 
         // Restore vehicle model wheel sizes
         CModelInfoSA::ResetAllVehiclesWheelSizes();
+
+        // Restore changed TXD IDs
+        CModelInfoSA::StaticResetTextureDictionaries();
+
+        // Restore default world state
+        RestoreGameBuildings();
     }
 }
 
@@ -500,27 +488,27 @@ eGameVersion CGameSA::FindGameVersion()
 
 float CGameSA::GetFPS()
 {
-    return *VAR_FPS;
+    return *(float*)0xB7CB50; // CTimer::game_FPS
 }
 
 float CGameSA::GetTimeStep()
 {
-    return *VAR_TimeStep;
+    return *(float*)0xB7CB5C; // CTimer::ms_fTimeStep
 }
 
 float CGameSA::GetOldTimeStep()
 {
-    return *VAR_OldTimeStep;
+    return *(float*)0xB7CB54; // CTimer::ms_fOldTimeStep
 }
 
 float CGameSA::GetTimeScale()
 {
-    return *VAR_TimeScale;
+    return *(float*)0xB7CB64; // CTimer::ms_fTimeScale
 }
 
 void CGameSA::SetTimeScale(float fTimeScale)
 {
-    *VAR_TimeScale = fTimeScale;
+    MemPutFast<float>(0xB7CB64, fTimeScale); // CTimer::ms_fTimeScale
 }
 
 unsigned char CGameSA::GetBlurLevel()
@@ -545,24 +533,6 @@ void CGameSA::SetMinuteDuration(unsigned long ulTime)
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
 {
-    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))
-        return IsRandomFoliageEnabled();
-
-    if (!strcmp(szCheatName, PROP_SNIPER_MOON))
-        return IsMoonEasterEggEnabled();
-
-    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
-        return IsExtraAirResistanceEnabled();
-
-    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
-        return IsUnderWorldWarpEnabled();
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-        return IsVehicleSunGlareEnabled();
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-        return IsCoronaZTestEnabled();
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -571,42 +541,6 @@ bool CGameSA::IsCheatEnabled(const char* szCheatName)
 
 bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 {
-    if (!strcmp(szCheatName, PROP_RANDOM_FOLIAGE))
-    {
-        SetRandomFoliageEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_SNIPER_MOON))
-    {
-        SetMoonEasterEggEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_EXTRA_AIR_RESISTANCE))
-    {
-        SetExtraAirResistanceEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_UNDERWORLD_WARP))
-    {
-        SetUnderWorldWarpEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_VEHICLE_SUNGLARE))
-    {
-        SetVehicleSunGlareEnabled(bEnable);
-        return true;
-    }
-
-    if (!strcmp(szCheatName, PROP_CORONA_ZTEST))
-    {
-        SetCoronaZTestEnabled(bEnable);
-        return true;
-    }
-
     std::map<std::string, SCheatSA*>::iterator it = m_Cheats.find(szCheatName);
     if (it == m_Cheats.end())
         return false;
@@ -619,13 +553,6 @@ bool CGameSA::SetCheatEnabled(const char* szCheatName, bool bEnable)
 
 void CGameSA::ResetCheats()
 {
-    SetRandomFoliageEnabled(true);
-    SetMoonEasterEggEnabled(false);
-    SetExtraAirResistanceEnabled(true);
-    SetUnderWorldWarpEnabled(true);
-    SetCoronaZTestEnabled(true);
-    CVehicleSA::SetVehiclesSunGlareEnabled(false);
-
     std::map<std::string, SCheatSA*>::iterator it;
     for (it = m_Cheats.begin(); it != m_Cheats.end(); it++)
     {
@@ -728,6 +655,78 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
     }
 
     m_isCoronaZTestEnabled = isEnabled;
+}
+
+void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
+{
+    if (isEnabled == m_areWaterCreaturesEnabled)
+        return;
+
+    const auto manager = reinterpret_cast<class WaterCreatureManager_c*>(0xC1DF30);
+    if (isEnabled)
+    {
+        unsigned char(__thiscall * Init)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Init)>(0x6E3F90);
+        Init(manager);
+    }
+    else
+    {
+        void(__thiscall * Exit)(WaterCreatureManager_c*) = reinterpret_cast<decltype(Exit)>(0x6E3FD0);
+        Exit(manager);
+    }
+
+    m_areWaterCreaturesEnabled = isEnabled;
+}
+
+void CGameSA::SetBurnFlippedCarsEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isBurnFlippedCarsEnabled)
+        return;
+
+    // CAutomobile::VehicleDamage
+    if (isEnabled)
+    {
+        BYTE originalCodes[6] = {0xD9, 0x9E, 0xC0, 0x04, 0x00, 0x00};
+        MemCpy((void*)0x6A776B, &originalCodes, 6);
+    }
+    else
+    {
+        BYTE newCodes[6] = {0xD8, 0xDD, 0x90, 0x90, 0x90, 0x90};
+        MemCpy((void*)0x6A776B, &newCodes, 6);
+    }
+
+    // CPlayerInfo::Process
+    if (isEnabled)
+    {
+        BYTE originalCodes[6] = {0xD9, 0x99, 0xC0, 0x04, 0x00, 0x00};
+        MemCpy((void*)0x570E7F, &originalCodes, 6);
+    }
+    else
+    {
+        BYTE newCodes[6] = {0xD8, 0xDD, 0x90, 0x90, 0x90, 0x90};
+        MemCpy((void*)0x570E7F, &newCodes, 6);
+    }
+
+    m_isBurnFlippedCarsEnabled = isEnabled;
+}
+
+void CGameSA::SetFireballDestructEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isFireballDestructEnabled)
+        return;
+
+    if (isEnabled)
+    {
+        BYTE originalCodes[7] = {0x81, 0x66, 0x1C, 0x7E, 0xFF, 0xFF, 0xFF};
+        MemCpy((void*)0x6CCE45, &originalCodes, 7); // CPlane::BlowUpCar
+        MemCpy((void*)0x6C6E01, &originalCodes, 7); // CHeli::BlowUpCar
+    }
+    else
+    {
+        MemSet((void*)0x6CCE45, 0x90, 7); // CPlane::BlowUpCar
+        MemSet((void*)0x6C6E01, 0x90, 7); // CHeli::BlowUpCar
+    }
+
+    m_isFireballDestructEnabled = isEnabled;
 }
 
 bool CGameSA::PerformChecks()
@@ -887,6 +886,20 @@ void CGameSA::FlushPendingRestreamIPL()
 void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
 {
     m_pRenderWare->GetShaderReplacementStats(outStats);
+}
+
+void CGameSA::RemoveAllBuildings()
+{
+    m_pIplStore->SetDynamicIplStreamingEnabled(false);
+
+    m_pPools->GetBuildingsPool().RemoveAllBuildings();
+}
+
+void CGameSA::RestoreGameBuildings()
+{
+    m_pPools->GetBuildingsPool().RestoreAllBuildings();
+
+    m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
 }
 
 // Ensure models have the default lod distances

@@ -324,6 +324,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     // 2 - URL
     // unsigned short   (2)     - HTTP Download URL Size
     // unsigned char    (X)     - HTTP Download URL
+    // unsigned char    (X)     - Server name
 
     // Make sure any existing messageboxes are hided
     g_pCore->RemoveMessageBox();
@@ -464,6 +465,23 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     g_pClientGame->m_pLocalPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
 
     g_pCore->UpdateRecentlyPlayed();
+
+    if (g_pNet->CanServerBitStream((eBitStreamVersion::CPlayerJoinCompletePacket_ServerName)))
+    {
+        auto discord = g_pCore->GetDiscord();
+        if (discord && discord->IsDiscordRPCEnabled())
+        {
+            std::string serverName;
+            bitStream.ReadString(serverName);
+
+            if (serverName.length() > 0)
+            {
+                g_pCore->SetLastConnectedServerName(serverName);
+                discord->SetPresenceDetails(serverName.c_str(), false);
+            }
+        }
+    }
+        
 }
 
 void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
@@ -1777,9 +1795,32 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             CClientPed* pJacked = pVehicle->GetOccupant(ucSeat);
 
                             // If it's the local player or syncing ped getting jacked, reset some stuff
-                            if (pJacked && (pJacked->IsLocalPlayer() || pJacked->IsSyncing()))
-                            {
-                                pJacked->ResetVehicleInOut();
+                            if (pJacked) {
+                                if (pJacked->IsLocalPlayer() || pJacked->IsSyncing()) {
+                                    pJacked->ResetVehicleInOut();
+                                }
+                                else {
+                                    // Desynced? Outside but supposed to be in
+                                    // For local player or synced peds this is taken care of in CClientPed::UpdateVehicleInOut()
+                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle()) {
+                                        // Warp him back in
+                                        pJacked->WarpIntoVehicle(pJacked->GetOccupiedVehicle(), pJacked->GetOccupiedVehicleSeat());
+
+                                        // For bikes and cars where jacked through passenger door, warp the passenger back in if desynced
+                                        if (ucSeat == 0) {
+                                            CClientPed* pPassenger = pJacked->GetOccupiedVehicle()->GetOccupant(1);
+                                            // Is the passenger a remote player or ped and is he physically outside but supposed to be in
+                                            if (pPassenger &&
+                                                !pPassenger->IsLocalPlayer() &&
+                                                !pPassenger->IsSyncing() &&
+                                                pPassenger->GetOccupiedVehicle() &&
+                                                !pPassenger->GetRealOccupiedVehicle())
+                                            {
+                                                pPassenger->WarpIntoVehicle(pPassenger->GetOccupiedVehicle(), pPassenger->GetOccupiedVehicleSeat());
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
 
@@ -2328,6 +2369,24 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_FASTSPRINT, funBugs.data3.bFastSprint);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_BADDRIVEBYHITBOX, funBugs.data4.bBadDrivebyHitboxes);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_QUICKSTAND, funBugs.data5.bQuickStand);
+
+    SWorldSpecialPropertiesStateSync wsProps;
+    if (bitStream.Can(eBitStreamVersion::WorldSpecialProperties))
+        bitStream.Read(&wsProps);
+
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::HOVERCARS, wsProps.data.hovercars);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::AIRCARS, wsProps.data.aircars);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRABUNNY, wsProps.data.extrabunny);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRAJUMP, wsProps.data.extrajump);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::RANDOMFOLIAGE, wsProps.data.randomfoliage);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::SNIPERMOON, wsProps.data.snipermoon);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTRAAIRRESISTANCE, wsProps.data.extraairresistance);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::UNDERWORLDWARP, wsProps.data.underworldwarp);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLESUNGLARE, wsProps.data.vehiclesunglare);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::CORONAZTEST, wsProps.data.coronaztest);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::WATERCREATURES, wsProps.data.watercreatures);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::BURNFLIPPEDCARS, wsProps.data.burnflippedcars);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FIREBALLDESTRUCT, wsProps.data2.fireballdestruct);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))

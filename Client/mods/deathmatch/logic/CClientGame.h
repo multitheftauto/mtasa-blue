@@ -1,4 +1,5 @@
 /*****************************************************************************
+/*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
@@ -45,8 +46,8 @@
 #include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
 
-#define HeliKill_List_Clear_Rate 500
-#define MIN_PUSH_ANTISPAM_RATE 1500
+#define HeliKill_List_Clear_Rate        500
+#define MIN_PUSH_ANTISPAM_RATE          1500
 #define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
 
 class CClientModelCacheManager;
@@ -315,15 +316,15 @@ public:
     void ShowEaeg(bool bShow);
     void ShowFPS(bool bShow) { m_bShowFPS = bShow; };
 
-    #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
     void ShowSyncingInfo(bool bShow) { m_bShowSyncingInfo = bShow; };
-    #endif
+#endif
 
 #ifdef MTA_WEPSYNCDBG
     void ShowWepdata(const char* szNick);
 #endif
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     void ShowWepdata(const char* szNick);
     void ShowTasks(const char* szNick);
     void ShowPlayer(const char* szNick);
@@ -332,7 +333,7 @@ public:
     void SetDoPaintballs(bool bDoPaintballs) { m_bDoPaintballs = bDoPaintballs; }
     void ShowInterpolation(bool bShow) { m_bShowInterpolation = bShow; }
     bool IsShowingInterpolation() const { return m_bShowInterpolation; }
-    #endif
+#endif
 
     CEntity*       GetTargetedGameEntity() { return m_pTargetedGameEntity; }
     CClientEntity* GetTargetedEntity() { return m_pTargetedEntity; }
@@ -400,6 +401,9 @@ public:
     bool SetGlitchEnabled(unsigned char cGlitch, bool bEnabled);
     bool IsGlitchEnabled(unsigned char cGlitch);
 
+    bool SetWorldSpecialProperty(WorldSpecialProperty property, bool isEnabled);
+    bool IsWorldSpecialProperty(WorldSpecialProperty property);
+
     bool SetCloudsEnabled(bool bEnabled);
     bool GetCloudsEnabled();
 
@@ -440,6 +444,7 @@ public:
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
     void RestreamWorld(bool removeBigBuildings);
+    void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
 
@@ -472,17 +477,17 @@ private:
 
     void DrawFPS();
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     void DrawTasks(CClientPlayer* pPlayer);
     void DrawPlayerDetails(CClientPlayer* pPlayer);
     void UpdateMimics();
     void DoPaintballs();
     void DrawWeaponsyncData(CClientPlayer* pPlayer);
-    #endif
+#endif
 
-    #ifdef MTA_WEPSYNCDBG
+#ifdef MTA_WEPSYNCDBG
     void DrawWeaponsyncData(CClientPlayer* pPlayer);
-    #endif
+#endif
 
     void DownloadSingularResourceFiles();
 
@@ -787,11 +792,11 @@ private:
     std::map<CEntitySAInterface*, CClientEntity*> m_CachedCollisionMap;
     bool                                          m_BuiltCollisionMapThisFrame;
 
-    #if defined (MTA_DEBUG) || defined (MTA_BETA)
+#if defined(MTA_DEBUG) || defined(MTA_BETA)
     bool m_bShowSyncingInfo;
-    #endif
+#endif
 
-    #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
     CClientPlayer*            m_pShowPlayerTasks;
     CClientPlayer*            m_pShowPlayer;
     std::list<CClientPlayer*> m_Mimics;
@@ -803,10 +808,10 @@ private:
     CVector                   m_vecLastMimicRot;
     bool                      m_bDoPaintballs;
     bool                      m_bShowInterpolation;
-    #endif
-    bool                      m_bDevelopmentMode;
-    bool                      m_bShowCollision;
-    bool                      m_bShowSound;
+#endif
+    bool m_bDevelopmentMode;
+    bool m_bShowCollision;
+    bool m_bShowSound;
 
     // Debug class. Empty in release.
 public:
@@ -844,6 +849,8 @@ private:
     AnimAssociations_type                                m_mapOfCustomAnimationAssociations;
     // Key is the task and value is the CClientPed*
     RunNamedAnimTask_type m_mapOfRunNamedAnimTasks;
+    
+    long long m_timeLastDiscordStateUpdate;
 };
 
 extern CClientGame* g_pClientGame;

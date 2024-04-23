@@ -59,6 +59,7 @@ public:
     LUA_DECLARE(GetVehicleNameFromModel);
     LUA_DECLARE(GetVehicleAdjustableProperty);
     LUA_DECLARE(GetHelicopterRotorSpeed);
+    static std::variant<bool, float> GetVehicleRotorSpeed(CClientVehicle* pVehicle);
     LUA_DECLARE(GetVehicleEngineState);
     LUA_DECLARE(IsTrainDerailed);
     LUA_DECLARE(IsTrainDerailable);
@@ -117,6 +118,7 @@ public:
     LUA_DECLARE(SetVehicleFrozen);
     LUA_DECLARE(SetVehicleAdjustableProperty);
     LUA_DECLARE(SetHelicopterRotorSpeed);
+    static bool SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed);
     LUA_DECLARE(SetTrainDerailed);
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
