@@ -393,10 +393,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
 
-    // m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
-    // m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
-    // m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
-    // m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
+    m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
+    m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
+    m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
 
     m_pMapRenderingLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Map rendering options")));
     m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
