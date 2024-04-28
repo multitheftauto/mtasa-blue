@@ -1148,8 +1148,8 @@ msgid "Always show download window"
 msgstr "إظهار نافذة التنزيل دائمًا"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "إستخدام ملفات معدلة لـ GTA:SA"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "السماح بالاتصال باستخدام Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

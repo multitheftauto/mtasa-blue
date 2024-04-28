@@ -1132,8 +1132,8 @@ msgid "Always show download window"
 msgstr "Να εμφανίζεται πάντα το παράθυρο λήψης"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "Χρησιμοποιήστε εξατομικευμένα GTA:SA αρχεία"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Επιτρέψτε τη σύνδεση με το Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

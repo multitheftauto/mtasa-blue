@@ -1128,8 +1128,8 @@ msgid "Always show download window"
 msgstr "Selalu perlihatkan jendela unduhan"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "Gunakan berkas GTA:SA yang telah dikustomisasi"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Izinkan terhubung dengan Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

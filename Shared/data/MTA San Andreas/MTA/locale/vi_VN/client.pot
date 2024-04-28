@@ -1128,8 +1128,8 @@ msgid "Always show download window"
 msgstr "Luôn hiển thị cửa sổ tải xuống"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "Sử dụng các file GTA:SA đã tùy chỉnh"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Cho phép kết nối với Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

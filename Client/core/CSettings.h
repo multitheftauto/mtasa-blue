@@ -154,7 +154,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxShowUnsafeResolutions;
     CGUICheckBox*  m_pCheckBoxAllowScreenUpload;
     CGUICheckBox*  m_pCheckBoxAllowExternalSounds;
-    CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
+    // CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
     CGUICheckBox*  m_pCheckBoxAllowDiscordRPC;
     CGUICheckBox*  m_pCheckBoxAlwaysShowTransferBox;
     CGUICheckBox*  m_pCheckBoxGrass;
@@ -392,7 +392,7 @@ protected:
     bool OnAllowScreenUploadClick(CGUIElement* pElement);
     bool OnAllowExternalSoundsClick(CGUIElement* pElement);
     bool OnAllowDiscordRPC(CGUIElement* pElement);
-    bool OnCustomizedSAFilesClick(CGUIElement* pElement);
+    // bool OnCustomizedSAFilesClick(CGUIElement* pElement);
     bool ShowUnsafeResolutionsClick(CGUIElement* pElement);
     bool OnWindowedClick(CGUIElement* pElement);
     bool OnDPIAwareClick(CGUIElement* pElement);

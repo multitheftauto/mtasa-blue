@@ -393,10 +393,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
     m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
-    m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
-    m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
-    m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
+    // m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
+    // m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    // m_pCheckBoxCustomizedSAFiles->GetPosition(vecTemp, false);
+    // m_pCheckBoxCustomizedSAFiles->AutoSize(NULL, 20.0f);
 
     m_pMapRenderingLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabMultiplayer, _("Map rendering options")));
     m_pMapRenderingLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 29.0f));
@@ -1258,7 +1258,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
     m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
     m_pCheckBoxAllowDiscordRPC->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowDiscordRPC, this));
-    m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
+    // m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
@@ -3022,8 +3022,8 @@ void CSettings::LoadData()
     m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
     // Customized sa files
-    m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
-    m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
+    // m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
+    // m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
 
     // Controls
     CVARS_GET("invert_mouse", bVar);
@@ -3362,8 +3362,8 @@ void CSettings::SaveData()
         iNextFullscreenStyle = (int)pSelected->GetData();
     if (CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem())
         iAntiAliasing = (int)pSelected->GetData();
-    bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
-    bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt("customized-sa-files-request") != 0;
+    // bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
+    // bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt("customized-sa-files-request") != 0;
 
     if (CGUIListItem* pSelected = m_pPriorityCombo->GetSelectedItem())
     {
@@ -3376,14 +3376,14 @@ void CSettings::SaveData()
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle);
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing() != iAntiAliasing;
-    bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
+    // bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
 
     gameSettings->SetAntiAliasing(iAntiAliasing, true);
     gameSettings->SetDrawDistance((m_pDrawDistance->GetScrollPosition() * 0.875f) + 0.925f);
     gameSettings->SetBrightness(m_pBrightness->GetScrollPosition() * 384);
     gameSettings->SetMouseSensitivity(m_pMouseSensitivity->GetScrollPosition());
     gameSettings->SetMipMappingEnabled(m_pCheckBoxMipMapping->GetSelected());
-    SetApplicationSettingInt("customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0);
+    // SetApplicationSettingInt("customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0);
 
     // Process DPI awareness
     bool previousProcessDPIAware = false;
@@ -3702,7 +3702,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged /*|| bIsCustomizedSAFilesChanged*/ || processsDPIAwareChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
@@ -4547,6 +4547,7 @@ void CSettings::ShowRichPresenceShareDataQuestionBox() const
     pQuestionBox->Show();
 }
 
+/*
 //
 // CustomizedSAFiles
 //
@@ -4578,6 +4579,7 @@ bool CSettings::OnCustomizedSAFilesClick(CGUIElement* pElement)
     }
     return true;
 }
+*/
 
 //
 // ShowUnsafeResolutionsClick

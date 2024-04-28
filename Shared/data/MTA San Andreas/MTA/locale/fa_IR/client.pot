@@ -1132,8 +1132,8 @@ msgid "Always show download window"
 msgstr "همیشه پنجره دانلود را نشان بده"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "استفاده از فایل های دستکاری شده GTA:SA"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "اجازه اتصال با Discord Rich Presence را بدهید"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

@@ -1132,8 +1132,8 @@ msgid "Always show download window"
 msgstr "Alati näita allalaadimis akent"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "Kasuta muudetud GTA:SA faile"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Lubage ühendada Discord Rich Presence'iga"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

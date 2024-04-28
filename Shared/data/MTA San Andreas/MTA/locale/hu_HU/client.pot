@@ -1132,8 +1132,8 @@ msgid "Always show download window"
 msgstr "Mindig mutassa a letöltési ablakot"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "Egyéni GTA:SA fájlok használata"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Csatlakozás engedélyezése a Discord Rich Presence szolgáltatással"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

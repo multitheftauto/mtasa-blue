@@ -1136,8 +1136,8 @@ msgid "Always show download window"
 msgstr "Atļaut redzēt lejupielādes logu"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "Lietot pārveidotos GTA:SA failus"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Atļaut izveidot savienojumu ar Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

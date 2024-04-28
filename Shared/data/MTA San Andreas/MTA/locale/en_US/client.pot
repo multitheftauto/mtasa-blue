@@ -752,10 +752,6 @@ msgstr ""
 msgid "Allow connecting with Discord Rich Presence"
 msgstr ""
 
-#: Client/core/CSettings.cpp:396
-msgid "Use customized GTA:SA files"
-msgstr ""
-
 #: Client/core/CSettings.cpp:401
 msgid "Map rendering options"
 msgstr ""

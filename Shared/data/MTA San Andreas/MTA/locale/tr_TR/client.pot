@@ -1132,8 +1132,8 @@ msgid "Always show download window"
 msgstr "İndirme penceresini her zaman göster"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "Değiştirilmiş GTA San Andreas dosyalarını kullan"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Discord Rich Presence ile bağlantıya izin ver"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

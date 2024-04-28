@@ -1140,8 +1140,8 @@ msgid "Always show download window"
 msgstr "Vždy zobrazit okno stahování"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "Používat upravené soubory GTA:SA"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Discord Rich Presence arqılı qosılwğa ruqsat beriñiz"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

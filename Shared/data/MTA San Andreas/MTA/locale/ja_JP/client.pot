@@ -1128,8 +1128,8 @@ msgid "Always show download window"
 msgstr "ダウンロードウィンドウを表示する"
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
-msgstr "カスタムGTA:SAファイルを利用する"
+msgid "Allow connecting with Discord Rich Presence"
+msgstr "Discord リッチ プレゼンスへの接続を許可する"
 
 #: Client/core/CSettings.cpp:396
 msgid "Map rendering options"

@@ -1118,7 +1118,7 @@ msgid "Always show download window"
 msgstr ""
 
 #: Client/core/CSettings.cpp:391
-msgid "Use customized GTA:SA files"
+msgid "Allow connecting with Discord Rich Presence"
 msgstr "გამოიყენეთ მორგებული GTA:SA ფაილები"
 
 #: Client/core/CSettings.cpp:396
