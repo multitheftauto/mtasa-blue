@@ -95,6 +95,12 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     if (dwElementIndexInPool == UINT_MAX)
         return;
 
+    // Remove building from cover list
+    pGame->GetCoverManager()->RemoveCover(pInterface);
+
+    // Remove plant
+    pGame->GetPlantManager()->RemovePlant(pInterface);
+
     RemoveBuildingFromWorld(pInterface);
 
     // Remove col reference
@@ -136,16 +142,7 @@ void CBuildingsPoolSA::RemoveAllBuildings()
         {
             CBuildingSAInterface* building = pBuildsingsPool->GetObject(i);
 
-            //RemoveBuildingFromWorld(building);
-
-            pGame->GetWorld()->Remove(building, CBuildingPool_Destructor);
-
-            CEntitySA entity{};
-            entity.SetInterface(building);
-            entity.DeleteRwObject();
-
-            using CEntity_ResolveReferences = void*(__thiscall*)(CEntitySAInterface*);
-            ((CEntity_ResolveReferences)0x571A40)(building);
+            RemoveBuildingFromWorld(building);
 
             pBuildsingsPool->Release(i);
 
@@ -185,12 +182,6 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
 {
     // Remove building from world
     pGame->GetWorld()->Remove(pBuilding, CBuildingPool_Destructor);
-
-    // Remove building from cover list
-    pGame->GetCoverManager()->RemoveCover(pBuilding);
-
-    // Remove plant
-    pGame->GetPlantManager()->RemovePlant(pBuilding);
 
     CEntitySA entity{};
     entity.SetInterface(pBuilding);
