@@ -3022,8 +3022,8 @@ void CSettings::LoadData()
     m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
     // Customized sa files
-    // m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
-    // m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
+    m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
+    m_pCheckBoxCustomizedSAFiles->SetVisible(GetApplicationSettingInt("customized-sa-files-show") != 0);
 
     // Controls
     CVARS_GET("invert_mouse", bVar);
@@ -3362,8 +3362,8 @@ void CSettings::SaveData()
         iNextFullscreenStyle = (int)pSelected->GetData();
     if (CGUIListItem* pSelected = m_pComboAntiAliasing->GetSelectedItem())
         iAntiAliasing = (int)pSelected->GetData();
-    // bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
-    // bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt("customized-sa-files-request") != 0;
+    bool bCustomizedSAFilesEnabled = m_pCheckBoxCustomizedSAFiles->GetSelected();
+    bool bCustomizedSAFilesWasEnabled = GetApplicationSettingInt("customized-sa-files-request") != 0;
 
     if (CGUIListItem* pSelected = m_pPriorityCombo->GetSelectedItem())
     {
@@ -3376,14 +3376,14 @@ void CSettings::SaveData()
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle);
     bool bIsAntiAliasingChanged = gameSettings->GetAntiAliasing() != iAntiAliasing;
-    // bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
+    bool bIsCustomizedSAFilesChanged = bCustomizedSAFilesWasEnabled != bCustomizedSAFilesEnabled;
 
     gameSettings->SetAntiAliasing(iAntiAliasing, true);
     gameSettings->SetDrawDistance((m_pDrawDistance->GetScrollPosition() * 0.875f) + 0.925f);
     gameSettings->SetBrightness(m_pBrightness->GetScrollPosition() * 384);
     gameSettings->SetMouseSensitivity(m_pMouseSensitivity->GetScrollPosition());
     gameSettings->SetMipMappingEnabled(m_pCheckBoxMipMapping->GetSelected());
-    // SetApplicationSettingInt("customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0);
+    SetApplicationSettingInt("customized-sa-files-request", bCustomizedSAFilesEnabled ? 1 : 0);
 
     // Process DPI awareness
     bool previousProcessDPIAware = false;
@@ -3702,7 +3702,7 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged /*|| bIsCustomizedSAFilesChanged*/ || processsDPIAwareChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
