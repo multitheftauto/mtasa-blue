@@ -1,7 +1,17 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto v1.0
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CCoverManagerSA.h
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #pragma once
 
 #include "CEntitySA.h"
-#include "CPtrNodeSingleListSA.h"
+#include "CPtrNodeDoubleListSA.h"
 
 class CCoverManagerSA
 {
@@ -13,5 +23,8 @@ public:
     void RemoveCover(CEntitySAInterface* entity);
 
 private:
-    CPtrNodeSingleListSAInterface<CEntitySAInterface>* m_pCoverList;
+    void RemoveCoverFromArray(CEntitySAInterface* entity);
+
+private:
+    CPtrNodeDoubleListSAInterface<CEntitySAInterface>* m_pCoverList;
 };
