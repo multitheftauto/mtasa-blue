@@ -269,7 +269,9 @@ private:
     CPedIntelligenceSA* m_pPedIntelligence;
     CPedSAInterface*    m_pPedInterface;
     CPedSoundSA*        m_pPedSound;
-    CPedSoundSA*        m_pDefaultPedSound;
+
+    short m_sDefaultVoiceType;
+    short m_sDefaultVoiceID;
 
     DWORD         m_dwType;
     unsigned char m_ucOccupiedSeat;
