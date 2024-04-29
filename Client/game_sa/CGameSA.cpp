@@ -912,7 +912,7 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
 {
     RemoveAllBuildings();
 
-    bool status = m_pPools->GetBuildingsPool().SetSize(size);
+    bool status = m_pPools->GetBuildingsPool().Resize(size);
 
     RestoreGameBuildings();
 

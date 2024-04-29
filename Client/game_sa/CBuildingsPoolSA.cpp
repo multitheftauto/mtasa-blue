@@ -188,7 +188,7 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
     pBuilding->RemoveShadows();
 }
 
-bool CBuildingsPoolSA::SetSize(int size)
+bool CBuildingsPoolSA::Resize(int size)
 {
     auto*     pool = (*m_ppBuildingPoolInterface);
     const int curretnSize = pool->m_nSize;
@@ -210,7 +210,7 @@ bool CBuildingsPoolSA::SetSize(int size)
     CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
     if (newObjects == nullptr)
     {
-        SetSize(curretnSize);
+        Resize(curretnSize);
         return false;
     }
 
@@ -218,7 +218,7 @@ bool CBuildingsPoolSA::SetSize(int size)
     if (newBytemap == nullptr)
     {
         MemSA::free(newObjects);
-        SetSize(curretnSize);
+        Resize(curretnSize);
         return false;
     }
 

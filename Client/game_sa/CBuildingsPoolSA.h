@@ -28,7 +28,7 @@ public:
 
     void RemoveAllBuildings() override;
     void RestoreAllBuildings() override;
-    bool SetSize(int size) override;
+    bool Resize(int size) override;
     int  GetSize() const override { return (*m_ppBuildingPoolInterface)->m_nSize; };
 
 private:
