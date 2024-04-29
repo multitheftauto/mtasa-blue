@@ -264,11 +264,11 @@ class CPedSA : public virtual CPed, public virtual CPhysicalSA
     friend class CPoolsSA;
 
 private:
-    CWeaponSA*          m_pWeapons[WEAPONSLOT_MAX];
-    CPedIKSA*           m_pPedIK;
-    CPedIntelligenceSA* m_pPedIntelligence;
-    CPedSAInterface*    m_pPedInterface;
-    CPedSoundSA*        m_pPedSound;
+    CWeaponSA*          m_pWeapons[WEAPONSLOT_MAX]{};
+    CPedIKSA*           m_pPedIK{};
+    CPedIntelligenceSA* m_pPedIntelligence{};
+    CPedSAInterface*    m_pPedInterface{};
+    CPedSoundSA*        m_pPedSound{};
 
     short m_sDefaultVoiceType;
     short m_sDefaultVoiceID;
@@ -277,11 +277,10 @@ private:
     unsigned char m_ucOccupiedSeat;
 
 protected:
-    int m_iCustomMoveAnim;
+    int m_iCustomMoveAnim{ 0 };
 
 public:
-    CPedSA();
-    CPedSA(CPedSAInterface* pedInterface);
+    CPedSA(CPedSAInterface* pedInterface = nullptr) noexcept;
     ~CPedSA();
 
     void             SetInterface(CEntitySAInterface* intInterface);

@@ -27,14 +27,8 @@ extern CGameSA* pGame;
 
 int g_bOnlyUpdateRotations = false;
 
-CPedSA::CPedSA() : m_pPedIntelligence(NULL), m_pPedInterface(NULL), m_pPedSound(NULL),
-m_iCustomMoveAnim(0)
-{
-    MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
-}
-
-CPedSA::CPedSA(CPedSAInterface* pPedInterface) : m_pPedIntelligence(NULL), m_pPedInterface(pPedInterface),
-m_pPedSound(NULL), m_iCustomMoveAnim(0)
+CPedSA::CPedSA(CPedSAInterface* pPedInterface) noexcept
+    : m_pPedInterface(pPedInterface)
 {
     MemSetFast(m_pWeapons, 0, sizeof(CWeaponSA*) * WEAPONSLOT_MAX);
 }
