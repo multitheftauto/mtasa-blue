@@ -175,7 +175,7 @@ void CBuildingsPoolSA::RestoreAllBuildings()
         }
     }
 
-    m_pOriginalBuildingsBackup.release();
+    m_pOriginalBuildingsBackup = nullptr;
 }
 
 void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
