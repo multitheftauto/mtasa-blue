@@ -40,7 +40,7 @@ public:
     uint16_t GetModel() const noexcept { return m_usModelId; };
     void     SetModel(uint16_t ulModel);
 
-    eClientEntityType GetType() const noexcept { return CCLIENTBUILDING; }
+    eClientEntityType GetType() const { return CCLIENTBUILDING; }
 
     void Create();
     void Destroy();

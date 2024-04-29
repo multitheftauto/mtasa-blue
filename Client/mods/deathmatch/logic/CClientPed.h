@@ -167,7 +167,7 @@ public:
 
     void Unlink() {};
 
-    virtual eClientEntityType GetType() const noexcept { return CCLIENTPED; }
+    virtual eClientEntityType GetType() const { return CCLIENTPED; }
 
     CPlayerPed*    GetGamePlayer() noexcept { return m_pPlayerPed; }
     CEntity*       GetGameEntity() noexcept { return m_pPlayerPed; }
