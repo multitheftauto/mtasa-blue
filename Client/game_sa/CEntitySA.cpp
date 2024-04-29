@@ -189,21 +189,6 @@ void CEntitySA::SetupLighting()
     }
 }
 
-// REWRITE THIS SHIT
-void CEntitySA::DeleteRwObject()
-{
-    DWORD dwFunc = m_pInterface->vtbl->DeleteRwObject;
-    DWORD dwThis = (DWORD)m_pInterface;
-    if (dwFunc)
-    {
-        _asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
-    }
-}
-
 void CEntitySA::Render()
 {
     DWORD dwFunc = 0x59F180;            // m_pInterface->vtbl->Render;

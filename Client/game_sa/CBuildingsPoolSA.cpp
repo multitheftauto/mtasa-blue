@@ -168,10 +168,10 @@ void CBuildingsPoolSA::RestoreAllBuildings()
         if (originalData[i].first)
         {
             pBuildsingsPool->AllocateAt(i);
-            auto building = pBuildsingsPool->GetObject(i);
-            *building = originalData[i].second;
+            auto pBuilding = pBuildsingsPool->GetObject(i);
+            *pBuilding = originalData[i].second;
 
-            pGame->GetWorld()->Add(building, CBuildingPool_Constructor);
+            pGame->GetWorld()->Add(pBuilding, CBuildingPool_Constructor);
         }
     }
 
@@ -183,19 +183,9 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
     // Remove building from world
     pGame->GetWorld()->Remove(pBuilding, CBuildingPool_Destructor);
 
-    CEntitySA entity{};
-    entity.SetInterface(pBuilding);
-    entity.DeleteRwObject();
-
-    using CEntity_ResolveReferences = void * (__thiscall*)(CEntitySAInterface*);
-    ((CEntity_ResolveReferences)0x571A40)(pBuilding);
-
-    //using CPlaceable_destructor = void*(__thiscall*)(CEntitySAInterface*);
-    //((CPlaceable_destructor)0x0054F490)(pBuilding);
-
-    // Remove shadows
-    using CStencilShadow_dtorByOwner = void* (__cdecl*)(CEntitySAInterface * a2);
-    ((CStencilShadow_dtorByOwner)0x711730)(pBuilding);
+    pBuilding->DeleteRwObject();
+    pBuilding->ResolveReferences();
+    pBuilding->RemoveShadows();
 }
 
 bool CBuildingsPoolSA::SetSize(int size)

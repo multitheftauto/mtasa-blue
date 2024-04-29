@@ -224,6 +224,24 @@ public:
             return numLodChildrenRendered & 0x1f;
         return -1;
     }
+
+    void ResolveReferences()
+    {
+        using CEntity_ResolveReferences = void*(__thiscall*)(CEntitySAInterface*);
+        ((CEntity_ResolveReferences)0x571A40)(this);
+    };
+
+    void RemoveShadows()
+    {
+        using CStencilShadow_dtorByOwner = void*(__cdecl*)(CEntitySAInterface * pEntity);
+        ((CStencilShadow_dtorByOwner)0x711730)(this);
+    };
+
+    void DeleteRwObject()
+    {
+        using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
+        ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
+    };
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
@@ -309,8 +327,6 @@ public:
     bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll);
     bool GetBonePosition(eBone boneId, CVector& position);
     bool SetBonePosition(eBone boneId, const CVector& position);
-    
-    void DeleteRwObject();
 
     // CEntitySA interface
     virtual void OnChangingPosition(const CVector& vecNewPosition) {}
