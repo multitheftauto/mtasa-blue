@@ -4774,7 +4774,7 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
             Arguments.PushNumber(fLoss);
 
             CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
-            ElementID      attackerID;
+            ElementID      attackerID = INVALID_ELEMENT_ID;
 
             if (pClientAttacker)
             {
@@ -4818,7 +4818,7 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
             CLuaArguments Arguments;
 
             CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
-            ElementID attackerID = INVALID_ELEMENT_ID;
+            ElementID      attackerID = INVALID_ELEMENT_ID;
 
             if (pClientAttacker)
             {
