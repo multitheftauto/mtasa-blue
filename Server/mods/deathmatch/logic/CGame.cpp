@@ -1152,6 +1152,18 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_OBJECT_BREAK:
+        {
+            Packet_ObjectBreak(static_cast<CObjectBreakPacket&>(Packet));
+            return true;
+        }
+
+        case PACKET_ID_OBJECT_DAMAGE:
+        {
+            Packet_ObjectDamage(static_cast<CObjectDamagePacket&>(Packet));
+            return true;
+        }
+
         case PACKET_ID_WEAPON_BULLETSYNC:
         {
             Packet_WeaponBulletsync(static_cast<CCustomWeaponBulletSyncPacket&>(Packet));
@@ -1546,6 +1558,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerVoiceStop", "", NULL, false);
 
     // Object events
+    m_Events.AddEvent("onObjectBreak", "attacker", NULL, false);
+    m_Events.AddEvent("onObjectDamage", "loss, atacker", NULL, false);
 
     // Pickup events
     m_Events.AddEvent("onPickupHit", "player", NULL, false);
@@ -2322,6 +2336,52 @@ void CGame::Packet_Command(CCommandPacket& Packet)
     {
         // Tell the console
         m_pConsole->HandleInput(Packet.GetCommand(), pPlayer, pPlayer);
+    }
+}
+
+void CGame::Packet_ObjectBreak(CObjectBreakPacket& Packet)
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (!pPlayer || !pPlayer->IsJoined())
+        return;
+
+    CObject* pObject = static_cast<CObject*>(CElementIDs::GetElement(Packet.m_ObjectID));
+
+    if (pObject != nullptr)
+    {
+        CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : NULL;
+
+        CLuaArguments Arguments;
+        if (pAttacker)
+            Arguments.PushElement(pAttacker);
+        else
+            Arguments.PushNil();
+
+        pObject->CallEvent("onObjectBreak", Arguments);
+    }
+}
+
+void CGame::Packet_ObjectDamage(CObjectDamagePacket& Packet)
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (!pPlayer || !pPlayer->IsJoined())
+        return;
+
+    CObject* pObject = static_cast<CObject*>(CElementIDs::GetElement(Packet.m_ObjectID));
+
+    if (pObject != nullptr)
+    {
+        CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : NULL;
+
+        CLuaArguments Arguments;
+        Arguments.PushNumber(Packet.m_fLoss);
+
+        if (pAttacker)
+            Arguments.PushElement(pAttacker);
+        else
+            Arguments.PushNil();
+
+        pObject->CallEvent("onObjectDamage", Arguments);
     }
 }
 

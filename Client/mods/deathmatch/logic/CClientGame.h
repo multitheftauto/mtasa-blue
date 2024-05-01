@@ -390,6 +390,9 @@ public:
     void SendPedWastedPacket(CClientPed* Ped, ElementID damagerID = INVALID_ELEMENT_ID, unsigned char ucWeapon = 0xFF, unsigned char ucBodyPiece = 0xFF,
                              AssocGroupId animGroup = 0, AnimationId animID = 15);
 
+    void SendObjectBreakPacket(CClientObject* Object, ElementID attackerID);
+    void SendObjectDamagePacket(CClientObject* Object, float fHealthLoss, ElementID attackerID);
+
     CClientGUIElement* GetClickedGUIElement() { return m_pClickedGUIElement; }
     void               SetClickedGUIElement(CClientGUIElement* pElement) { m_pClickedGUIElement = NULL; }
 

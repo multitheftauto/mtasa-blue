@@ -38,6 +38,8 @@
 #include "packets/CLuaEventPacket.h"
 #include "packets/CCustomDataPacket.h"
 #include "packets/CCameraSyncPacket.h"
+#include "packets/CObjectBreakPacket.h"
+#include "packets/CObjectDamagePacket.h"
 #include "packets/CObjectSyncPacket.h"
 #include "packets/CPlayerTransgressionPacket.h"
 #include "packets/CPlayerDiagnosticPacket.h"
@@ -174,6 +176,14 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
 
         case PACKET_ID_OBJECT_SYNC:
             pTemp = new CObjectSyncPacket;
+            break;
+
+        case PACKET_ID_OBJECT_BREAK:
+            pTemp = new CObjectBreakPacket;
+            break;
+
+        case PACKET_ID_OBJECT_DAMAGE:
+            pTemp = new CObjectDamagePacket;
             break;
 
         case PACKET_ID_PLAYER_TRANSGRESSION:
