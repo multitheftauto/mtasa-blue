@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-05-01 20:00\n"
+"PO-Revision-Date: 2024-05-01 20:57\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -306,38 +306,38 @@ msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
 "$DEFAULT_INSTDIR ?"
-msgstr "Az MTA-t nem lehet telepíteni ugyanabba a könyvtárba, mint a GTA: SA-t.$\n"
+msgstr "A Multi Theft Auto-t nem lehet ugyanabban a mappában telepíteni, mint a GTA:SA-t.$\n"
 "$\n"
-"Szeretnéd használni az alapértelmezett telepítési könyvtárat$\n"
-"$DEFAULT_INSTDIR ?"
+"Szeretnéd használni az alapértelmezett telepítési útvonalat?$\n"
+"$DEFAULT_INSTDIR"
 
 #. INST_GTA_ERROR1
 #: Shared/installer/nightly.nsi:1842
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
-msgstr "A kiválasztott könyvtár nem létezik.$\n"
+msgstr "A kiválasztott mappa nem létezik.$\n"
 "$\n"
-"Kérlek válaszd ki a GTA:SA könyvtárát"
+"Kérlek válaszd ki a GTA:SA elérési útvonalát."
 
 #. INST_GTA_ERROR2
 #: Shared/installer/nightly.nsi:1844
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
-msgstr "Nem található a GTA:SA telepítve itt: $GTA_DIR $\n"
+msgstr "A kiválasztott elérési útvonalon ($GTA_DIR) nem található a GTA:SA.$\n"
 "$\n"
-"Biztosan folytatod?"
+"Biztosan szeretnéd folytatni?"
 
 #. INST_CHOOSE_LOC_TOP
 #: Shared/installer/nightly.nsi:1962
 msgid "Choose Install Location"
-msgstr "Válaszd ki a telepítési helyet"
+msgstr "Válaszd ki a telepítés helyét"
 
 #. INST_CHOOSE_LOC
 #: Shared/installer/nightly.nsi:1963
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
-msgstr "Válaszd ki a mappát, ahova telepíteni fogod a(z): ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+msgstr "Válaszd ki a mappát, ahova telepíteni szeretnéd a ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}-t"
 
 #. INST_CHOOSE_LOC2
 #: Shared/installer/nightly.nsi:1964
@@ -345,8 +345,8 @@ msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the follow
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
 " Click Next to continue."
-msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} telepítve lesz a következő mappába.$\n"
-"Ha máshova szeretnéd telepíteni, kattints az Egyéni fülre és a Tallózás gombra.$\n"
+msgstr "A ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} ezen mappában lesz telepítve.$\n"
+"Ha máshová szeretnéd telepíteni, kattints az Egyéni fülre és a Tallózás gombra.$\n"
 "$\n"
 "Kattints a Tovább gombra a folytatáshoz."
 
@@ -368,7 +368,7 @@ msgstr "Alapértelmezett"
 #. INST_CHOOSE_LOC_LAST_USED
 #: Shared/installer/nightly.nsi:1969
 msgid "Last used"
-msgstr "Utoljára használva"
+msgstr "Utoljára használt"
 
 #. INST_CHOOSE_LOC_CUSTOM
 #: Shared/installer/nightly.nsi:1970
@@ -378,12 +378,12 @@ msgstr "Egyéni"
 #. INST_CHOOSE_LOC4
 #: Shared/installer/nightly.nsi:2148
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
-msgstr "Válaszd ki a mappát, ahova telepíted ezt: ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+msgstr "Válaszd ki a mappát, ahova telepíteni szeretnéd a ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}-t:"
 
 #. INST_LOC_OW
 #: Shared/installer/nightly.nsi:2166
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
-msgstr "Figyelem: Egy másik MTA verzió ($1) már létezik ezen az útvonalon."
+msgstr "Figyelmeztetés: A Multi Theft Auto ($1) egy másik verziója már létezik ezen az elérési útvonalon."
 
 #. INST_LOC_UPGRADE
 #: Shared/installer/nightly.nsi:2167
@@ -408,5 +408,5 @@ msgstr "Telepítő frissítési információk ellenőrzése..."
 #. NETTEST_STATUS2
 #: Shared/installer/nightly.nsi:2404
 msgid "Please ensure your firewall is not blocking"
-msgstr "Kérjük biztosítsd, hogy a tűzfal ne blokkoljon"
+msgstr "Biztosítsd, hogy a tűzfal nem blokkolja a letöltést."
 
