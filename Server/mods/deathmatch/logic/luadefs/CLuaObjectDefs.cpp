@@ -24,6 +24,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"getObjectRotation", GetObjectRotation},
         {"getObjectScale", GetObjectScale},
         {"isObjectBreakable", ArgumentParser<IsObjectBreakable>},
+        {"isObjectMoving", ArgumentParser<IsObjectMoving>},
 
         // Object set funcs
         {"setObjectRotation", SetObjectRotation},
@@ -50,6 +51,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "isBreakable", "isObjectBreakable");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
+    lua_classfunction(luaVM, "isMoving", "isObjectMoving");
 
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
@@ -220,6 +222,11 @@ int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaObjectDefs::IsObjectMoving(CObject* const pObject)
+{
+    return pObject->IsMoving();
 }
 
 int CLuaObjectDefs::MoveObject(lua_State* luaVM)

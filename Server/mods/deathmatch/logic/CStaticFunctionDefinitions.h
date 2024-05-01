@@ -412,6 +412,7 @@ public:
     static bool GetObjectRotation(CObject* pObject, CVector& vecRotation);
     static bool IsObjectVisibleInAllDimensions(CElement* pElement);
     static bool IsObjectBreakable(CElement* pElement);
+    static bool IsObjectMoving(CElement* pElement);
 
     // Object set functions
     static bool SetObjectRotation(CElement* pElement, const CVector& vecRotation);
