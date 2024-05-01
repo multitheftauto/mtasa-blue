@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-05 03:08+0000\n"
-"PO-Revision-Date: 2024-04-14 20:22\n"
+"PO-Revision-Date: 2024-05-01 20:57\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -47,7 +47,7 @@ msgstr "Nézd meg a legfrissebb híreket"
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Szeretnél néhány online tanácsot kapni erről a hibáról?"
+msgstr "Szeretne néhány online tanácsot kapni erről a hibáról?"
 
 #: Client/core/CQuestionBox.cpp:194 Client/core/CSettings.cpp:1376
 #: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4470
@@ -578,7 +578,7 @@ msgstr "Külön köszönet:"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
-msgstr "Ez a szoftver a következő könyvtárakat és szoftvereket használja:"
+msgstr "Ez a szoftver és projekt a következő könyvtárakat és szoftvereket használja:"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:84
@@ -627,7 +627,7 @@ msgstr "Haladó"
 #: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
 #: Client/loader/Dialogs.cpp:133 Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
-msgstr "Oké"
+msgstr "OK"
 
 #. Cancel button
 #: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4766
@@ -915,7 +915,7 @@ msgstr "Ablak keret nélkül"
 
 #: Client/core/CSettings.cpp:663
 msgid "Mip Mapping"
-msgstr "Mip feltérképezés"
+msgstr "Mip Mapping"
 
 #: Client/core/CSettings.cpp:731 Client/core/CSettings.cpp:1505
 msgid "Low"
@@ -993,11 +993,11 @@ msgstr "Gumi füstölés stb."
 
 #: Client/core/CSettings.cpp:816
 msgid "Dynamic ped shadows"
-msgstr "Dinamikus ped árnyékok"
+msgstr "Dinamikus karakter árnyékok"
 
 #: Client/core/CSettings.cpp:820
 msgid "Motion blur"
-msgstr "Elmosódás"
+msgstr "Mozgási elmosódás"
 
 #: Client/core/CSettings.cpp:825
 msgid "Full Screen Minimize"
@@ -1021,7 +1021,7 @@ msgstr "Játékos/NPC renderelés magas felbontáson"
 
 #: Client/core/CSettings.cpp:869
 msgid "Corona rain reflections"
-msgstr "Korona eső tükröződések"
+msgstr "Eső tükröződés"
 
 #: Client/core/CSettings.cpp:898
 msgid "Enable remote websites"
@@ -1250,7 +1250,7 @@ msgstr "Beállítások:"
 
 #: Client/core/CSettings.cpp:2046
 msgid "Chat"
-msgstr "Csevegő"
+msgstr "Chat"
 
 #: Client/core/CSettings.cpp:2063
 msgid "Load"
@@ -1738,7 +1738,7 @@ msgstr "Ismeretlen hiba ebben: _DialogUpdateResult"
 
 #: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
 msgid "Ok"
-msgstr "Oké"
+msgstr "Ok"
 
 #: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
@@ -2007,7 +2007,7 @@ msgstr "Játékosok"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 msgid "Ping"
-msgstr "Válaszidő"
+msgstr "Ping"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:456
 msgid "Gamemode"
@@ -2271,7 +2271,7 @@ msgstr "Lecsatlakozva: A felhasználónév már használatban van"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
 msgid "Disconnected: Player element could not be created."
-msgstr "Lecsatlakoztatva: A játékos elemet nem lehetett létrehozni."
+msgstr "Lecsatlakoztatva: A karaktert nem sikerült létrehozni."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
 #, c-format
@@ -2719,11 +2719,11 @@ msgstr "GTA:SA kapcsolatok létrehozása"
 
 #: Client/loader/CInstallManager.cpp:657
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA nem indul el, mert a fájl másolása nem sikerült:"
+msgstr "MTA:SA nem tudott elindulni, mert egy fájl másolása nem sikerült:"
 
 #: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "Az MTA:SA nem indítható el, mert egy MTA:SA fájl hibás vagy hiányzik:"
+msgstr "MTA:SA nem tudott elindulni, mert egy MTA:SA fájl hibás vagy hiányzik:"
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
@@ -2731,7 +2731,7 @@ msgstr "MTA:SA fájlok másolása"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "Az MTA:SA nem indítható el, mert egy GTA:SA fájl hibás vagy hiányzik:"
+msgstr "MTA:SA nem tudott elindulni, mert egy GTA:SA fájl hibás vagy hiányzik:"
 
 #: Client/loader/CInstallManager.cpp:780
 msgid "Patch GTA:SA dependency"
@@ -2739,11 +2739,11 @@ msgstr "GTA:SA tartozékok frissítése"
 
 #: Client/loader/CInstallManager.cpp:828
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "Az MTA:SA nem indulhat el, mert a GTA:SA végrehajtható fájl helytelen vagy hiányzik:"
+msgstr "Az MTA:SA nem indul el, mert a GTA:SA alkalmazás hibás vagy hiányzik:"
 
 #: Client/loader/CInstallManager.cpp:832
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "Kérjük, ellenőrizd a víruskeresőd, hogy nem észlel-e hamis pozitívat, próbáld meg kivételként hozzáadni a GTA:SA végrehajtható fájlt majd indítsd újra az MTA:SA-t."
+msgstr "Kérlek ellenőrizd az antivírus programod téves észlelésért, próbálj hozzáadni egy kivételt a GTA:SA alkalmazáshoz, majd indítsd újra az MTA:SA-t."
 
 #: Client/loader/CInstallManager.cpp:838
 msgid "Generate GTA:SA"
@@ -2751,7 +2751,7 @@ msgstr "GTA:SA generálása"
 
 #: Client/loader/CInstallManager.cpp:853
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "Az MTA:SA nem indul el, mert a GTA:SA végrehajtható fájl nem tölthető be:"
+msgstr "MTA:SA nem tudott elindulni, mert a GTA:SA alkalmazás nem tölthető be:"
 
 #: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
 msgid "Patch GTA:SA"
@@ -2759,7 +2759,7 @@ msgstr "GTA:SA frissítése"
 
 #: Client/loader/CInstallManager.cpp:876
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "Az MTA:SA nem indul el, mert a GTA:SA frissítése nem sikerült:"
+msgstr "MTA:SA nem tudott elindulni, mert a GTA:SA javítása nem sikerült:"
 
 #: Client/loader/CInstallManager.cpp:1113
 msgid "Missing file:"
@@ -3133,7 +3133,7 @@ msgstr "Nevezze át ezeket a fájlokat *.dll-ről *.dll.bak-ra"
 
 #: Client/loader/Dialogs.cpp:170
 msgid "Show me these files"
-msgstr "Mutassa meg ezeket a fájlokat"
+msgstr "Mutasd meg ezeket a fájlokat"
 
 #: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
