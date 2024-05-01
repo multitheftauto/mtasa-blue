@@ -8212,7 +8212,7 @@ bool CStaticFunctionDefinitions::StopObject(CElement* pElement)
     {
         CObject* pObject = static_cast<CObject*>(pElement);
 
-        pObject->StopMoving();
+        pObject->StopMoving(true);
 
         // Grab the source position and rotation
         CVector vecSourcePosition = pObject->GetPosition();

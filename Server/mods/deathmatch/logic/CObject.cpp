@@ -346,9 +346,12 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
         SetPosition(positionRotation.m_vecPosition);
         SetRotation(positionRotation.m_vecRotation);
     }
+
+    CLuaArguments Arguments;
+    this->CallEvent("onObjectMoveStart", Arguments);
 }
 
-void CObject::StopMoving()
+void CObject::StopMoving(bool bStoppedByScript)
 {
     // Were we moving in the first place
     if (m_pMoveAnimation != NULL)
@@ -360,6 +363,11 @@ void CObject::StopMoving()
 
         delete m_pMoveAnimation;
         m_pMoveAnimation = NULL;
+
+        CLuaArguments Arguments;
+        Arguments.PushBoolean(bStoppedByScript);
+
+        this->CallEvent("onObjectMoveStop", Arguments);
 
         UpdateSpatialData();
     }
