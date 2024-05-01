@@ -8155,17 +8155,6 @@ bool CStaticFunctionDefinitions::SetObjectScale(CElement* pElement, const CVecto
     return false;
 }
 
-bool CStaticFunctionDefinitions::IsObjectMoving(CElement* pElement)
-{
-    if (IS_OBJECT(pElement))
-    {
-        CObject* pObject = static_cast<CObject*>(pElement);
-        return pObject->IsMoving();
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::MoveObject(CResource* pResource, CElement* pElement, unsigned long ulTime, const CVector& vecPosition,
                                             const CVector& vecRotation, CEasingCurve::eType a_easingType, double a_fEasingPeriod, double a_fEasingAmplitude,
                                             double a_fEasingOvershoot)
