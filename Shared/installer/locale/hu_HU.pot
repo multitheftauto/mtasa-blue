@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-07 01:18\n"
-"PO-Revision-Date: 2024-03-15 20:32\n"
+"PO-Revision-Date: 2024-05-01 20:00\n"
 "Last-Translator: \n"
 "Language-Team: Hungarian\n"
 "Language: hu_HU\n"
@@ -134,17 +134,17 @@ msgstr "Pályaszerkesztő a szerveredhez. Ezzel elkészítheted a saját pályá
 #. DESC_Section9
 #: Shared/installer/nightly.nsi:232
 msgid "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-msgstr "Ez egy SDK, amely létrehozza a bináris modulokat az MTA szerverhez. Csak akkor telepítsd, ha értesz is a C++-hoz!"
+msgstr "Egy szoftverfejlesztői csomag, amely segítségével létrehozhatsz komponenseket a Multi Theft Auto Szerverhez. Telepítése csak abban az esetben javasolt, ha rendelkezel tapasztalattal a C++ programozási nyelv terén."
 
 #. DESC_SectionGroupDev
 #: Shared/installer/nightly.nsi:234
 msgid "Development code and tools that aid in the creation of mods for Multi Theft Auto"
-msgstr "Fejlesztői kód és eszközök Multi Theft Auto módok létrehozásához"
+msgstr "Egy fejlesztői kód- és eszközcsomag a mod-ok létrehozásához és szerkesztéséhez."
 
 #. DESC_SectionGroupClient
 #: Shared/installer/nightly.nsi:235
 msgid "The client is the program you run to play on a Multi Theft Auto server"
-msgstr "A kliens egy program, amellyel játszhatsz Multi Theft Auto szervereken."
+msgstr "A kliens, amely segítségével csatlakozhatsz és játszhatsz a Multi Theft Auto szervereken."
 
 #. INST_CLIENTSERVER
 #: Shared/installer/nightly.nsi:441
@@ -174,17 +174,17 @@ msgstr "mtasa:// protokoll regisztráció"
 #. INST_GAMES_EXPLORER
 #: Shared/installer/nightly.nsi:459
 msgid "Add to Games Explorer"
-msgstr "Hozzáadás a játéktallózóhoz"
+msgstr "Hozzáadás a Windows-Játékokhoz"
 
 #. INST_DIRECTX
 #: Shared/installer/nightly.nsi:460
 msgid "Install DirectX"
-msgstr "DirectX telepítés"
+msgstr "DirectX telepítése"
 
 #. INST_SEC_CLIENT
 #: Shared/installer/nightly.nsi:494
 msgid "Game client"
-msgstr "Játék kliens"
+msgstr "Kliens"
 
 #. INST_SEC_SERVER
 #: Shared/installer/nightly.nsi:495
@@ -194,7 +194,7 @@ msgstr "Dedikált szerver"
 #. INST_SEC_CORE
 #: Shared/installer/nightly.nsi:496
 msgid "Core components"
-msgstr "Alapvető összetevők"
+msgstr "Alapvető komponensek"
 
 #. INST_SEC_GAME
 #: Shared/installer/nightly.nsi:497
@@ -204,7 +204,7 @@ msgstr "Játék modul"
 #. INFO_INPLACE_UPGRADE
 #: Shared/installer/nightly.nsi:499
 msgid "Performing in-place upgrade..."
-msgstr "A frissítés előkészítése..."
+msgstr "Helyi frissítés végrehajtása..."
 
 #. INFO_UPDATE_PERMISSIONS
 #: Shared/installer/nightly.nsi:500
@@ -248,36 +248,36 @@ msgstr "$(^Name) sikeresen el lett távolítva a számítógépedről."
 #. UNINST_FAIL
 #: Shared/installer/nightly.nsi:1035
 msgid "Uninstallation has failed!"
-msgstr "Eltávolítás sikertelen!"
+msgstr "Sikertelen eltávolítás!"
 
 #. UNINST_REQUEST
 #: Shared/installer/nightly.nsi:1043
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
-msgstr "Biztosan el szeretné távolítani $(^Name) és az összes összetevőjét?"
+msgstr "Biztosan el szeretnéd távolítani az $(^Name)-t és az összes komponensét?"
 
 #. UNINST_REQUEST_NOTE
 #: Shared/installer/nightly.nsi:1044
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
-msgstr "Eltávolítás a frissítés előtt?$\\r$\n"
-"Nem szükséges eltávolítani, az új MTA: SA verzió telepítése előtt$\\r$\n"
-"Futtassa az új telepítőt a frissítéshez, és az megőrzi a beállításokat."
+msgstr "Frissítés előtt távolítanád el?$\\r$\n"
+"Felesleges eltávolítani a Multi Theft Auto-t frissítés előtt$\\r$\n"
+"Futtasd az új telepítőt, így megmaradnak a beállításaid."
 
 #. UNINST_DATA_REQUEST
 #: Shared/installer/nightly.nsi:1057
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
-msgstr "Megszeretnéd tartani az adataid, mint például erőforrások, képek és szerver beállítások? Minden adat elveszik, ha nem."
+msgstr "Szeretnéd megtartani az adataidat? (mint például erőforrások, képernyőképek és szerver konfiguráció)? Ha a Nem lehetőséget választod, minden erőforrás, beállítás és képernyőkép el fog veszni."
 
 #. UAC_RIGHTS1
 #: Shared/installer/nightly.nsi:1236
 msgid "This installer requires admin access, try again"
-msgstr "A telepítéshez rendszergazda jogosultság kell, próbáld újra."
+msgstr "A telepítéshez rendszergazdai jogosultság szükséges, próbáld újra."
 
 #. UAC_RIGHTS_UN
 #: Shared/installer/nightly.nsi:1237
 msgid "This uninstaller requires admin access, try again"
-msgstr "Az eltávolításhoz rendszergazda jogosultság kell, próbáld újra."
+msgstr "Az eltávolításhoz rendszergazdai jogosultság szükséges, próbáld újra."
 
 #. UAC_RIGHTS3
 #: Shared/installer/nightly.nsi:1238
@@ -287,7 +287,7 @@ msgstr "A bejelentkezési szolgáltatás nem fut, megszakítás!"
 #. UAC_RIGHTS4
 #: Shared/installer/nightly.nsi:1239
 msgid "Unable to elevate"
-msgstr "Sikertelen"
+msgstr "A művelet elvégzéséhez magasabb jogosultsági szint szükséges."
 
 #. INST_MTA_CONFLICT
 #: Shared/installer/nightly.nsi:1835
@@ -295,10 +295,10 @@ msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
 " Are you sure you want to overwrite MTA $1 at $INSTDIR ?"
-msgstr "Egy másik változata az MTA-nak ($1) elérhető ezen az úton.$\n"
+msgstr "A Multi Theft Auto $1-nek egy másik verziója már létezik a megadott útvonalon.\n"
 "$\n"
-"Az MTA szeretné telepíteni az újabb verziót egy másik telepítési úton.$\n"
-"Biztosan felül szeretné írni az MTA verzióját $1 at $INSTDIR ?"
+"Különböző verziók egyidejű telepítése lehetséges más útvonal használatával.\n"
+"Biztosan felül szeretnéd írni a Multi Theft Auto $1-et a $INSTDIR útvonalon?"
 
 #. INST_GTA_CONFLICT
 #: Shared/installer/nightly.nsi:1839
