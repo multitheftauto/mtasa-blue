@@ -637,6 +637,7 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
         std::sort(vecSortedArguments.begin(), vecSortedArguments.end());
 
         // only the first and last element are checked, everything else is correct by default because the vector was sorted
+        // the last key should match the size of vecSortedArguments to ensure there are no gaps in this array-like table
         auto const iFirstKey = vecSortedArguments.front().first;
         auto const iLastKey = vecSortedArguments.back().first;
 
