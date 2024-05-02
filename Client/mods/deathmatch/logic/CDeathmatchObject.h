@@ -34,19 +34,21 @@ public:
 
     void StartMovement(const CPositionRotationAnimation& a_rMoveAnimation);
     void UpdateMovement();
-    void StopMovement();
+    void StopMovement(bool bStoppedByScript = false);
 
     bool IsMoving() { return m_pMoveAnimation != NULL; };
 
     void UpdateContactingBegin(const CVector& vecPreviousPosition, const CVector& vecPreviousRotation);
     void UpdateContacting(const CVector& vecCenterOfRotation, const CVector& vecFrameTranslation, const CVector& vecFrameRotation);
 
+    void SendObjectStopPacket(bool bStoppedByScript);
+
 protected:
     class CMovingObjectsManager* m_pMovingObjectsManager;
 #ifdef WITH_OBJECT_SYNC
     class CObjectSync* m_pObjectSync;
 #endif
-    void _StopMovement(bool a_bUnregister);
+    void _StopMovement(bool a_bUnregister, bool bStoppedByScript = false);
 
     CPositionRotationAnimation* m_pMoveAnimation;
 };

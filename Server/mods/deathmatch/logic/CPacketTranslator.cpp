@@ -48,6 +48,7 @@
 #include "packets/CPlayerNoSocketPacket.h"
 #include "packets/CPlayerNetworkStatusPacket.h"
 #include "packets/CPlayerResourceStartPacket.h"
+#include "packets/CObjectStopPacket.h"
 
 CPacketTranslator::CPacketTranslator(CPlayerManager* pPlayerManager)
 {
@@ -174,6 +175,10 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
 
         case PACKET_ID_OBJECT_SYNC:
             pTemp = new CObjectSyncPacket;
+            break;
+
+        case PACKET_ID_OBJECT_STOP:
+            pTemp = new CObjectStopPacket;
             break;
 
         case PACKET_ID_PLAYER_TRANSGRESSION:

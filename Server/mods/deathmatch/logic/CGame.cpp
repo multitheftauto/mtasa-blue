@@ -1152,6 +1152,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_OBJECT_STOP:
+        {
+            Packet_ObjectStop(static_cast<CObjectStopPacket&>(Packet));
+            return true;
+        }
+
         case PACKET_ID_WEAPON_BULLETSYNC:
         {
             Packet_WeaponBulletsync(static_cast<CCustomWeaponBulletSyncPacket&>(Packet));
@@ -2324,6 +2330,23 @@ void CGame::Packet_Command(CCommandPacket& Packet)
     {
         // Tell the console
         m_pConsole->HandleInput(Packet.GetCommand(), pPlayer, pPlayer);
+    }
+}
+
+void CGame::Packet_ObjectStop(CObjectStopPacket& Packet)
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (!pPlayer || !pPlayer->IsJoined())
+        return;
+
+    CElement* pObject = CElementIDs::GetElement(Packet.m_ObjectID);
+
+    if (pObject != nullptr && IS_OBJECT(pObject))
+    {
+        CLuaArguments Arguments;
+        Arguments.PushBoolean(Packet.m_bStoppedByScript);
+
+        pObject->CallEvent("onObjectMoveStop", Arguments);
     }
 }
 

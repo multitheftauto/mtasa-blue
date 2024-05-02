@@ -51,6 +51,7 @@ class CGame;
 #include "packets/CPlayerModInfoPacket.h"
 #include "packets/CPlayerACInfoPacket.h"
 #include "packets/CPlayerScreenShotPacket.h"
+#include "packets/CObjectStopPacket.h"
 
 #include "CRPCFunctions.h"
 
@@ -485,6 +486,7 @@ private:
     void Packet_ExplosionSync(class CExplosionSyncPacket& Packet);
     void Packet_ProjectileSync(class CProjectileSyncPacket& Packet);
     void Packet_Command(class CCommandPacket& Packet);
+    void Packet_ObjectStop(class CObjectStopPacket& Packet);
     void Packet_VehicleDamageSync(class CVehicleDamageSyncPacket& Packet);
     void Packet_VehiclePuresync(class CVehiclePuresyncPacket& Packet);
     void Packet_Keysync(class CKeysyncPacket& Packet);

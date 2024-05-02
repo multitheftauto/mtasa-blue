@@ -4066,7 +4066,7 @@ bool CStaticFunctionDefinitions::StopObject(CClientEntity& Entity)
         CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
 
         // Stop the movement
-        Object.StopMovement();
+        Object.StopMovement(true);
         return true;
     }
 

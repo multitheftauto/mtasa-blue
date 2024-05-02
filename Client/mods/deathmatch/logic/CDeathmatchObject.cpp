@@ -70,15 +70,15 @@ void CDeathmatchObject::StartMovement(const CPositionRotationAnimation& a_rMoveA
         SetOrientation(positionRotation.m_vecPosition, positionRotation.m_vecRotation);
     }
     CLuaArguments Arguments;
-    this->CallEvent("onClientObjectMoveStart", Arguments, true);
+    CallEvent("onClientObjectMoveStart", Arguments, true);
 }
 
-void CDeathmatchObject::StopMovement()
+void CDeathmatchObject::StopMovement(bool bStoppedByScript)
 {
-    _StopMovement(true);
+    _StopMovement(true, bStoppedByScript);
 }
 
-void CDeathmatchObject::_StopMovement(bool a_bUnregister)
+void CDeathmatchObject::_StopMovement(bool a_bUnregister, bool bStoppedByScript)
 {
     if (m_pMoveAnimation != NULL)
     {
@@ -89,7 +89,12 @@ void CDeathmatchObject::_StopMovement(bool a_bUnregister)
         delete m_pMoveAnimation;
         m_pMoveAnimation = NULL;
         CLuaArguments Arguments;
-        this->CallEvent("onClientObjectMoveStop", Arguments, true);
+        Arguments.PushBoolean(bStoppedByScript);
+
+        CallEvent("onClientObjectMoveStop", Arguments, true);
+
+        if (!IsLocalEntity())
+            SendObjectStopPacket(bStoppedByScript);
     }
 }
 
@@ -223,5 +228,18 @@ void CDeathmatchObject::UpdateContacting(const CVector& vecCenterOfRotation, con
             CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(pEntity);
             pObject->UpdateContacting(vecCenterOfRotation, vecFrameTranslation, vecFrameRotation);
         }
+    }
+}
+
+void CDeathmatchObject::SendObjectStopPacket(bool bStoppedByScript)
+{
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    if (pBitStream)
+    {
+        pBitStream->Write(GetID());
+        pBitStream->Write(bStoppedByScript);
+
+        g_pNet->SendPacket(PACKET_ID_OBJECT_STOP, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(pBitStream);
     }
 }

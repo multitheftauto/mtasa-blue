@@ -75,7 +75,10 @@ void CObjectRPCs::StopObject(CClientEntity* pSource, NetBitStreamInterface& bitS
             bitStream.Read(vecSourceRotation.fX) && bitStream.Read(vecSourceRotation.fY) && bitStream.Read(vecSourceRotation.fZ))
         {
             // Stop the movement
-            pObject->StopMovement();
+            int bStoppedByScript;
+            bitStream.Read(bStoppedByScript);
+
+            pObject->StopMovement(bStoppedByScript);
             // Set it to the source position and rotation
             pObject->SetOrientation(vecSourcePosition, vecSourceRotation);
         }

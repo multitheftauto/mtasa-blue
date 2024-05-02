@@ -8212,7 +8212,7 @@ bool CStaticFunctionDefinitions::StopObject(CElement* pElement)
     {
         CObject* pObject = static_cast<CObject*>(pElement);
 
-        pObject->StopMoving(true);
+        pObject->StopMoving();
 
         // Grab the source position and rotation
         CVector vecSourcePosition = pObject->GetPosition();
@@ -8227,6 +8227,8 @@ bool CStaticFunctionDefinitions::StopObject(CElement* pElement)
         BitStream.pBitStream->Write(vecSourceRotation.fX);
         BitStream.pBitStream->Write(vecSourceRotation.fY);
         BitStream.pBitStream->Write(vecSourceRotation.fZ);
+        BitStream.pBitStream->Write(true);
+
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, STOP_OBJECT, *BitStream.pBitStream));
 
         return true;

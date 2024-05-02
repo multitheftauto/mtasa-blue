@@ -44,7 +44,7 @@ public:
 
     bool                              IsMoving();
     void                              Move(const CPositionRotationAnimation& a_rMoveAnimation);
-    void                              StopMoving(bool bStoppedByScript = false);
+    void                              StopMoving();
     const CPositionRotationAnimation* GetMoveAnimation();
 
     unsigned char GetAlpha() { return m_ucAlpha; }
