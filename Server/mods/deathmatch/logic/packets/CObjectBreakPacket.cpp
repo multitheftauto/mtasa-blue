@@ -14,10 +14,8 @@
 #include <CObject.h>
 #include <net/SyncStructures.h>
 
-CObjectBreakPacket::CObjectBreakPacket()
+CObjectBreakPacket::CObjectBreakPacket() : m_ObjectID(INVALID_ELEMENT_ID), m_Attacker(INVALID_ELEMENT_ID)
 {
-    m_ObjectID = INVALID_ELEMENT_ID;
-    m_Attacker = INVALID_ELEMENT_ID;
 }
 
 CObjectBreakPacket::CObjectBreakPacket(CObject* pObject, CElement* pAttacker)

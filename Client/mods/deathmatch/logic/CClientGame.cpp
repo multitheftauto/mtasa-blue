@@ -5602,14 +5602,14 @@ void CClientGame::ResetMapInfo()
     ReinitMarkers();
 }
 
-void CClientGame::SendObjectBreakPacket(CClientObject* Object, ElementID attackerID)
+void CClientGame::SendObjectBreakPacket(CClientObject* pObject, ElementID attackerID)
 {
-    if (Object && Object->GetHealth() == 0.0f)
+    if (pObject != nullptr && pObject->GetHealth() == 0.0f)
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         if (pBitStream)
         {
-            pBitStream->Write(Object->GetID());
+            pBitStream->Write(pObject->GetID());
             pBitStream->Write(attackerID);
 
             g_pNet->SendPacket(PACKET_ID_OBJECT_BREAK, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
@@ -5618,14 +5618,14 @@ void CClientGame::SendObjectBreakPacket(CClientObject* Object, ElementID attacke
     }
 }
 
-void CClientGame::SendObjectDamagePacket(CClientObject* Object, float fLoss, ElementID attackerID)
+void CClientGame::SendObjectDamagePacket(CClientObject* pObject, float fLoss, ElementID attackerID)
 {
-    if (Object)
+    if (pObject != nullptr)
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         if (pBitStream)
         {
-            pBitStream->Write(Object->GetID());
+            pBitStream->Write(pObject->GetID());
             pBitStream->Write(fLoss);
             pBitStream->Write(attackerID);
 

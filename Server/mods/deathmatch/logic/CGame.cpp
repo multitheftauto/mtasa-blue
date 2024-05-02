@@ -2345,11 +2345,11 @@ void CGame::Packet_ObjectBreak(CObjectBreakPacket& Packet)
     if (!pPlayer || !pPlayer->IsJoined())
         return;
 
-    CObject* pObject = static_cast<CObject*>(CElementIDs::GetElement(Packet.m_ObjectID));
+    CElement* pObject = CElementIDs::GetElement(Packet.m_ObjectID);
 
-    if (pObject != nullptr)
+    if (pObject != nullptr && IS_OBJECT(pObject))
     {
-        CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : NULL;
+        CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : nullptr;
 
         CLuaArguments Arguments;
         if (pAttacker)
@@ -2367,11 +2367,11 @@ void CGame::Packet_ObjectDamage(CObjectDamagePacket& Packet)
     if (!pPlayer || !pPlayer->IsJoined())
         return;
 
-    CObject* pObject = static_cast<CObject*>(CElementIDs::GetElement(Packet.m_ObjectID));
+    CElement* pObject = CElementIDs::GetElement(Packet.m_ObjectID);
 
-    if (pObject != nullptr)
+    if (pObject != nullptr && IS_OBJECT(pObject))
     {
-        CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : NULL;
+        CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : nullptr;
 
         CLuaArguments Arguments;
         Arguments.PushNumber(Packet.m_fLoss);

@@ -14,11 +14,8 @@
 #include <CObject.h>
 #include <net/SyncStructures.h>
 
-CObjectDamagePacket::CObjectDamagePacket()
+CObjectDamagePacket::CObjectDamagePacket() : m_ObjectID(INVALID_ELEMENT_ID), m_Attacker(INVALID_ELEMENT_ID), m_fLoss(0)
 {
-    m_ObjectID = INVALID_ELEMENT_ID;
-    m_Attacker = INVALID_ELEMENT_ID;
-    m_fLoss = 0;
 }
 
 CObjectDamagePacket::CObjectDamagePacket(CObject* pObject, float fLoss, CElement* pAttacker)
