@@ -27,6 +27,6 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    ElementID m_ObjectID;
-    int      m_bStoppedByScript;
+    ElementID m_ObjectID{INVALID_ELEMENT_ID};
+    int       m_bStoppedByScript{false};
 };

@@ -14,24 +14,13 @@
 #include <CObject.h>
 #include <net/SyncStructures.h>
 
-CObjectStopPacket::CObjectStopPacket() : m_ObjectID(INVALID_ELEMENT_ID), m_bStoppedByScript(false)
-{
-}
+CObjectStopPacket::CObjectStopPacket() {}
 
-CObjectStopPacket::CObjectStopPacket(CObject* pObject, bool bStoppedByScript)
-{
-    m_ObjectID = pObject->GetID();
-    m_bStoppedByScript = bStoppedByScript;
-}
+CObjectStopPacket::CObjectStopPacket(CObject* pObject, bool bStoppedByScript) : m_ObjectID(pObject->GetID()), m_bStoppedByScript(bStoppedByScript) {}
 
 bool CObjectStopPacket::Read(NetBitStreamInterface& BitStream)
 {
-    if (BitStream.Read(m_ObjectID) && BitStream.Read(m_bStoppedByScript))
-    {
-        return true;
-    }
-
-    return false;
+    return BitStream.Read(m_ObjectID) && BitStream.Read(m_bStoppedByScript);
 }
 
 bool CObjectStopPacket::Write(NetBitStreamInterface& BitStream) const

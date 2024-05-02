@@ -2340,14 +2340,13 @@ void CGame::Packet_ObjectStop(CObjectStopPacket& Packet)
         return;
 
     CElement* pObject = CElementIDs::GetElement(Packet.m_ObjectID);
+    if (!pObject || !IS_OBJECT(pObject))
+        return;
 
-    if (pObject != nullptr && IS_OBJECT(pObject))
-    {
-        CLuaArguments Arguments;
-        Arguments.PushBoolean(Packet.m_bStoppedByScript);
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(Packet.m_bStoppedByScript);
 
-        pObject->CallEvent("onObjectMoveStop", Arguments);
-    }
+    pObject->CallEvent("onObjectMoveStop", Arguments);
 }
 
 void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)

@@ -234,12 +234,12 @@ void CDeathmatchObject::UpdateContacting(const CVector& vecCenterOfRotation, con
 void CDeathmatchObject::SendObjectStopPacket(bool bStoppedByScript)
 {
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-    if (pBitStream)
-    {
-        pBitStream->Write(GetID());
-        pBitStream->Write(bStoppedByScript);
+    if (!pBitStream)
+        return;
 
-        g_pNet->SendPacket(PACKET_ID_OBJECT_STOP, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
-        g_pNet->DeallocateNetBitStream(pBitStream);
-    }
+    pBitStream->Write(GetID());
+    pBitStream->Write(bStoppedByScript);
+
+    g_pNet->SendPacket(PACKET_ID_OBJECT_STOP, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
+    g_pNet->DeallocateNetBitStream(pBitStream);
 }
