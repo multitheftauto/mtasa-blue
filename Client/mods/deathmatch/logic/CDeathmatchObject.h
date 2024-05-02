@@ -36,7 +36,7 @@ public:
     void UpdateMovement();
     void StopMovement(bool bStoppedByScript = false);
 
-    bool IsMoving() { return m_pMoveAnimation != NULL; };
+    bool IsMoving() { return m_pMoveAnimation != nullptr; };
 
     void UpdateContactingBegin(const CVector& vecPreviousPosition, const CVector& vecPreviousRotation);
     void UpdateContacting(const CVector& vecCenterOfRotation, const CVector& vecFrameTranslation, const CVector& vecFrameRotation);

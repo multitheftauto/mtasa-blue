@@ -2626,175 +2626,175 @@ void CClientGame::SetWanted(DWORD dwWanted)
 void CClientGame::AddBuiltInEvents()
 {
     // Resource events
-    m_Events.AddEvent("onClientResourceStart", "resource", NULL, false);
-    m_Events.AddEvent("onClientResourceStop", "resource", NULL, false);
+    m_Events.AddEvent("onClientResourceStart", "resource", nullptr, false);
+    m_Events.AddEvent("onClientResourceStop", "resource", nullptr, false);
 
     // Element events
-    m_Events.AddEvent("onClientElementDataChange", "name", NULL, false);
-    m_Events.AddEvent("onClientElementStreamIn", "", NULL, false);
-    m_Events.AddEvent("onClientElementStreamOut", "", NULL, false);
-    m_Events.AddEvent("onClientElementDestroy", "", NULL, false);
+    m_Events.AddEvent("onClientElementDataChange", "name", nullptr, false);
+    m_Events.AddEvent("onClientElementStreamIn", "", nullptr, false);
+    m_Events.AddEvent("onClientElementStreamOut", "", nullptr, false);
+    m_Events.AddEvent("onClientElementDestroy", "", nullptr, false);
     m_Events.AddEvent("onClientElementModelChange", "oldModel, newModel", nullptr, false);
     m_Events.AddEvent("onClientElementDimensionChange", "oldDimension, newDimension", nullptr, false);
     m_Events.AddEvent("onClientElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Player events
-    m_Events.AddEvent("onClientPlayerJoin", "", NULL, false);
-    m_Events.AddEvent("onClientPlayerQuit", "reason", NULL, false);
-    m_Events.AddEvent("onClientPlayerTarget", "target", NULL, false);
-    m_Events.AddEvent("onClientPlayerSpawn", "team", NULL, false);
-    m_Events.AddEvent("onClientPlayerChangeNick", "oldNick", NULL, false);
-    m_Events.AddEvent("onClientPlayerVehicleEnter", "vehicle, seat", NULL, false);
-    m_Events.AddEvent("onClientPlayerVehicleExit", "vehicle, seat", NULL, false);
-    m_Events.AddEvent("onClientPlayerTask", "priority, slot, name", NULL, false);
-    m_Events.AddEvent("onClientPlayerWeaponSwitch", "previous, current", NULL, false);
-    m_Events.AddEvent("onClientPlayerStuntStart", "type", NULL, false);
-    m_Events.AddEvent("onClientPlayerStuntFinish", "type, time, distance", NULL, false);
-    m_Events.AddEvent("onClientPlayerRadioSwitch", "", NULL, false);
-    m_Events.AddEvent("onClientPlayerDamage", "attacker, weapon, bodypart", NULL, false);
-    m_Events.AddEvent("onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false);
-    m_Events.AddEvent("onClientPlayerWasted", "", NULL, false);
-    m_Events.AddEvent("onClientPlayerChoke", "", NULL, false);
-    m_Events.AddEvent("onClientPlayerVoiceStart", "", NULL, false);
-    m_Events.AddEvent("onClientPlayerVoiceStop", "", NULL, false);
-    m_Events.AddEvent("onClientPlayerVoicePause", "reason", NULL, false);
-    m_Events.AddEvent("onClientPlayerVoiceResumed", "reason", NULL, false);
-    m_Events.AddEvent("onClientPlayerStealthKill", "target", NULL, false);
-    m_Events.AddEvent("onClientPlayerHitByWaterCannon", "vehicle", NULL, false);
-    m_Events.AddEvent("onClientPlayerHeliKilled", "heli", NULL, false);
-    m_Events.AddEvent("onClientPlayerPickupHit", "pickup, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientPlayerPickupLeave", "pickup, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientPlayerNetworkStatus", "type, ticks", NULL, false);
+    m_Events.AddEvent("onClientPlayerJoin", "", nullptr, false);
+    m_Events.AddEvent("onClientPlayerQuit", "reason", nullptr, false);
+    m_Events.AddEvent("onClientPlayerTarget", "target", nullptr, false);
+    m_Events.AddEvent("onClientPlayerSpawn", "team", nullptr, false);
+    m_Events.AddEvent("onClientPlayerChangeNick", "oldNick", nullptr, false);
+    m_Events.AddEvent("onClientPlayerVehicleEnter", "vehicle, seat", nullptr, false);
+    m_Events.AddEvent("onClientPlayerVehicleExit", "vehicle, seat", nullptr, false);
+    m_Events.AddEvent("onClientPlayerTask", "priority, slot, name", nullptr, false);
+    m_Events.AddEvent("onClientPlayerWeaponSwitch", "previous, current", nullptr, false);
+    m_Events.AddEvent("onClientPlayerStuntStart", "type", nullptr, false);
+    m_Events.AddEvent("onClientPlayerStuntFinish", "type, time, distance", nullptr, false);
+    m_Events.AddEvent("onClientPlayerRadioSwitch", "", nullptr, false);
+    m_Events.AddEvent("onClientPlayerDamage", "attacker, weapon, bodypart", nullptr, false);
+    m_Events.AddEvent("onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", nullptr, false);
+    m_Events.AddEvent("onClientPlayerWasted", "", nullptr, false);
+    m_Events.AddEvent("onClientPlayerChoke", "", nullptr, false);
+    m_Events.AddEvent("onClientPlayerVoiceStart", "", nullptr, false);
+    m_Events.AddEvent("onClientPlayerVoiceStop", "", nullptr, false);
+    m_Events.AddEvent("onClientPlayerVoicePause", "reason", nullptr, false);
+    m_Events.AddEvent("onClientPlayerVoiceResumed", "reason", nullptr, false);
+    m_Events.AddEvent("onClientPlayerStealthKill", "target", nullptr, false);
+    m_Events.AddEvent("onClientPlayerHitByWaterCannon", "vehicle", nullptr, false);
+    m_Events.AddEvent("onClientPlayerHeliKilled", "heli", nullptr, false);
+    m_Events.AddEvent("onClientPlayerPickupHit", "pickup, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientPlayerPickupLeave", "pickup, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientPlayerNetworkStatus", "type, ticks", nullptr, false);
 
     // Ped events
-    m_Events.AddEvent("onClientPedDamage", "attacker, weapon, bodypart", NULL, false);
-    m_Events.AddEvent("onClientPedVehicleEnter", "vehicle, seat", NULL, false);
-    m_Events.AddEvent("onClientPedVehicleExit", "vehicle, seat", NULL, false);
-    m_Events.AddEvent("onClientPedWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false);
-    m_Events.AddEvent("onClientPedWasted", "", NULL, false);
-    m_Events.AddEvent("onClientPedChoke", "", NULL, false);
-    m_Events.AddEvent("onClientPedHeliKilled", "heli", NULL, false);
-    m_Events.AddEvent("onClientPedHitByWaterCannon", "vehicle", NULL, false);
+    m_Events.AddEvent("onClientPedDamage", "attacker, weapon, bodypart", nullptr, false);
+    m_Events.AddEvent("onClientPedVehicleEnter", "vehicle, seat", nullptr, false);
+    m_Events.AddEvent("onClientPedVehicleExit", "vehicle, seat", nullptr, false);
+    m_Events.AddEvent("onClientPedWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", nullptr, false);
+    m_Events.AddEvent("onClientPedWasted", "", nullptr, false);
+    m_Events.AddEvent("onClientPedChoke", "", nullptr, false);
+    m_Events.AddEvent("onClientPedHeliKilled", "heli", nullptr, false);
+    m_Events.AddEvent("onClientPedHitByWaterCannon", "vehicle", nullptr, false);
     m_Events.AddEvent("onClientPedStep", "foot", nullptr, false);
 
     // Vehicle events
-    m_Events.AddEvent("onClientVehicleRespawn", "", NULL, false);
-    m_Events.AddEvent("onClientVehicleEnter", "player, seat", NULL, false);
-    m_Events.AddEvent("onClientVehicleExit", "player, seat", NULL, false);
-    m_Events.AddEvent("onClientVehicleStartEnter", "player, seat", NULL, false);
-    m_Events.AddEvent("onClientVehicleStartExit", "player, seat", NULL, false);
-    m_Events.AddEvent("onClientTrailerAttach", "towedBy", NULL, false);
-    m_Events.AddEvent("onClientTrailerDetach", "towedBy", NULL, false);
-    m_Events.AddEvent("onClientVehicleExplode", "", NULL, false);
-    m_Events.AddEvent("onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false);
-    m_Events.AddEvent("onClientVehicleDamage", "attacker, weapon, loss, x, y, z, tyre", NULL, false);
-    m_Events.AddEvent("onClientVehicleNitroStateChange", "activated", NULL, false);
+    m_Events.AddEvent("onClientVehicleRespawn", "", nullptr, false);
+    m_Events.AddEvent("onClientVehicleEnter", "player, seat", nullptr, false);
+    m_Events.AddEvent("onClientVehicleExit", "player, seat", nullptr, false);
+    m_Events.AddEvent("onClientVehicleStartEnter", "player, seat", nullptr, false);
+    m_Events.AddEvent("onClientVehicleStartExit", "player, seat", nullptr, false);
+    m_Events.AddEvent("onClientTrailerAttach", "towedBy", nullptr, false);
+    m_Events.AddEvent("onClientTrailerDetach", "towedBy", nullptr, false);
+    m_Events.AddEvent("onClientVehicleExplode", "", nullptr, false);
+    m_Events.AddEvent("onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", nullptr, false);
+    m_Events.AddEvent("onClientVehicleDamage", "attacker, weapon, loss, x, y, z, tyre", nullptr, false);
+    m_Events.AddEvent("onClientVehicleNitroStateChange", "activated", nullptr, false);
     m_Events.AddEvent("onClientVehicleWeaponHit", "weaponType, hitElement, hitX, hitY, hitZ, model, materialID", nullptr, false);
 
     // GUI events
-    m_Events.AddEvent("onClientGUIClick", "button, state, absoluteX, absoluteY", NULL, false);
-    m_Events.AddEvent("onClientGUIDoubleClick", "button, state, absoluteX, absoluteY", NULL, false);
-    m_Events.AddEvent("onClientGUIMouseDown", "button, absoluteX, absoluteY", NULL, false);
-    m_Events.AddEvent("onClientGUIMouseUp", "button, absoluteX, absoluteY", NULL, false);
-    m_Events.AddEvent("onClientGUIScroll", "element", NULL, false);
-    m_Events.AddEvent("onClientGUIChanged", "element", NULL, false);
-    m_Events.AddEvent("onClientGUIAccepted", "element", NULL, false);
+    m_Events.AddEvent("onClientGUIClick", "button, state, absoluteX, absoluteY", nullptr, false);
+    m_Events.AddEvent("onClientGUIDoubleClick", "button, state, absoluteX, absoluteY", nullptr, false);
+    m_Events.AddEvent("onClientGUIMouseDown", "button, absoluteX, absoluteY", nullptr, false);
+    m_Events.AddEvent("onClientGUIMouseUp", "button, absoluteX, absoluteY", nullptr, false);
+    m_Events.AddEvent("onClientGUIScroll", "element", nullptr, false);
+    m_Events.AddEvent("onClientGUIChanged", "element", nullptr, false);
+    m_Events.AddEvent("onClientGUIAccepted", "element", nullptr, false);
     // m_Events.AddEvent ( "onClientGUIClose", "element", NULL, false );
     // m_Events.AddEvent ( "onClientGUIKeyDown", "element", NULL, false );
-    m_Events.AddEvent("onClientGUITabSwitched", "element", NULL, false);
-    m_Events.AddEvent("onClientGUIComboBoxAccepted", "element", NULL, false);
+    m_Events.AddEvent("onClientGUITabSwitched", "element", nullptr, false);
+    m_Events.AddEvent("onClientGUIComboBoxAccepted", "element", nullptr, false);
 
     // Input events
-    m_Events.AddEvent("onClientDoubleClick", "button, screenX, screenY, worldX, worldY, worldZ, element", NULL, false);
-    m_Events.AddEvent("onClientMouseMove", "screenX, screenY", NULL, false);
-    m_Events.AddEvent("onClientMouseEnter", "screenX, screenY", NULL, false);
-    m_Events.AddEvent("onClientMouseLeave", "screenX, screenY", NULL, false);
-    m_Events.AddEvent("onClientMouseWheel", "", NULL, false);
-    m_Events.AddEvent("onClientGUIMove", "", NULL, false);
-    m_Events.AddEvent("onClientGUISize", "", NULL, false);
-    m_Events.AddEvent("onClientGUIFocus", "", NULL, false);
-    m_Events.AddEvent("onClientGUIBlur", "", NULL, false);
-    m_Events.AddEvent("onClientKey", "key, state", NULL, false);
-    m_Events.AddEvent("onClientCharacter", "character", NULL, false);
-    m_Events.AddEvent("onClientPaste", "clipboardText", NULL, false);
+    m_Events.AddEvent("onClientDoubleClick", "button, screenX, screenY, worldX, worldY, worldZ, element", nullptr, false);
+    m_Events.AddEvent("onClientMouseMove", "screenX, screenY", nullptr, false);
+    m_Events.AddEvent("onClientMouseEnter", "screenX, screenY", nullptr, false);
+    m_Events.AddEvent("onClientMouseLeave", "screenX, screenY", nullptr, false);
+    m_Events.AddEvent("onClientMouseWheel", "", nullptr, false);
+    m_Events.AddEvent("onClientGUIMove", "", nullptr, false);
+    m_Events.AddEvent("onClientGUISize", "", nullptr, false);
+    m_Events.AddEvent("onClientGUIFocus", "", nullptr, false);
+    m_Events.AddEvent("onClientGUIBlur", "", nullptr, false);
+    m_Events.AddEvent("onClientKey", "key, state", nullptr, false);
+    m_Events.AddEvent("onClientCharacter", "character", nullptr, false);
+    m_Events.AddEvent("onClientPaste", "clipboardText", nullptr, false);
 
     // Console events
-    m_Events.AddEvent("onClientConsole", "text", NULL, false);
+    m_Events.AddEvent("onClientConsole", "text", nullptr, false);
 
     // Chat events
-    m_Events.AddEvent("onClientChatMessage", "text, r, g, b, messageType", NULL, false);
+    m_Events.AddEvent("onClientChatMessage", "text, r, g, b, messageType", nullptr, false);
 
     // Debug events
-    m_Events.AddEvent("onClientDebugMessage", "message, level, file, line", NULL, false);
+    m_Events.AddEvent("onClientDebugMessage", "message, level, file, line", nullptr, false);
 
     // Game events
-    m_Events.AddEvent("onClientPreRender", "", NULL, false);
-    m_Events.AddEvent("onClientPedsProcessed", "", NULL, false);
-    m_Events.AddEvent("onClientHUDRender", "", NULL, false);
-    m_Events.AddEvent("onClientRender", "", NULL, false);
-    m_Events.AddEvent("onClientMinimize", "", NULL, false);
-    m_Events.AddEvent("onClientRestore", "", NULL, false);
-    m_Events.AddEvent("onClientMTAFocusChange", "focused", NULL, false);
+    m_Events.AddEvent("onClientPreRender", "", nullptr, false);
+    m_Events.AddEvent("onClientPedsProcessed", "", nullptr, false);
+    m_Events.AddEvent("onClientHUDRender", "", nullptr, false);
+    m_Events.AddEvent("onClientRender", "", nullptr, false);
+    m_Events.AddEvent("onClientMinimize", "", nullptr, false);
+    m_Events.AddEvent("onClientRestore", "", nullptr, false);
+    m_Events.AddEvent("onClientMTAFocusChange", "focused", nullptr, false);
 
     // Cursor events
-    m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
-    m_Events.AddEvent("onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", NULL, false);
+    m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", nullptr, false);
+    m_Events.AddEvent("onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", nullptr, false);
 
     // Marker events
-    m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientMarkerLeave", "entity, matchingDimension", NULL, false);
+    m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientMarkerLeave", "entity, matchingDimension", nullptr, false);
 
     // Marker events
-    m_Events.AddEvent("onClientPickupHit", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientPickupLeave", "entity, matchingDimension", NULL, false);
+    m_Events.AddEvent("onClientPickupHit", "entity, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientPickupLeave", "entity, matchingDimension", nullptr, false);
 
     // Col-shape events
-    m_Events.AddEvent("onClientColShapeHit", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientColShapeLeave", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientElementColShapeHit", "colShape, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientElementColShapeLeave", "colShape, matchingDimension", NULL, false);
+    m_Events.AddEvent("onClientColShapeHit", "entity, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientColShapeLeave", "entity, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientElementColShapeHit", "colShape, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onClientElementColShapeLeave", "colShape, matchingDimension", nullptr, false);
 
     // Explosion events
-    m_Events.AddEvent("onClientExplosion", "x, y, z, type", NULL, false);
+    m_Events.AddEvent("onClientExplosion", "x, y, z, type", nullptr, false);
 
     // Projectile events
-    m_Events.AddEvent("onClientProjectileCreation", "creator", NULL, false);
+    m_Events.AddEvent("onClientProjectileCreation", "creator", nullptr, false);
 
     // Sound events
-    m_Events.AddEvent("onClientSoundStream", "success, length, streamName, error", NULL, false);
-    m_Events.AddEvent("onClientSoundFinishedDownload", "length", NULL, false);
-    m_Events.AddEvent("onClientSoundChangedMeta", "streamTitle", NULL, false);
-    m_Events.AddEvent("onClientSoundStarted", "reason", NULL, false);
-    m_Events.AddEvent("onClientSoundStopped", "reason", NULL, false);
-    m_Events.AddEvent("onClientSoundBeat", "time", NULL, false);
+    m_Events.AddEvent("onClientSoundStream", "success, length, streamName, error", nullptr, false);
+    m_Events.AddEvent("onClientSoundFinishedDownload", "length", nullptr, false);
+    m_Events.AddEvent("onClientSoundChangedMeta", "streamTitle", nullptr, false);
+    m_Events.AddEvent("onClientSoundStarted", "reason", nullptr, false);
+    m_Events.AddEvent("onClientSoundStopped", "reason", nullptr, false);
+    m_Events.AddEvent("onClientSoundBeat", "time", nullptr, false);
 
     // Object events
-    m_Events.AddEvent("onClientObjectDamage", "loss, attacker", NULL, false);
-    m_Events.AddEvent("onClientObjectBreak", "attacker", NULL, false);
-    m_Events.AddEvent("onClientObjectMoveStart", "", NULL, false);
-    m_Events.AddEvent("onClientObjectMoveStop", "stoppedByScript", NULL, false);
+    m_Events.AddEvent("onClientObjectDamage", "loss, attacker", nullptr, false);
+    m_Events.AddEvent("onClientObjectBreak", "attacker", nullptr, false);
+    m_Events.AddEvent("onClientObjectMoveStart", "", nullptr, false);
+    m_Events.AddEvent("onClientObjectMoveStop", "stoppedByScript", nullptr, false);
 
     // Web events
-    m_Events.AddEvent("onClientBrowserWhitelistChange", "newPages", NULL, false);
-    m_Events.AddEvent("onClientBrowserCreated", "", NULL, false);
-    m_Events.AddEvent("onClientBrowserLoadingStart", "url, mainframe", NULL, false);
-    m_Events.AddEvent("onClientBrowserDocumentReady", "url", NULL, false);
-    m_Events.AddEvent("onClientBrowserLoadingFailed", "url, errorcode, errordescription", NULL, false);
-    m_Events.AddEvent("onClientBrowserNavigate", "url, isblocked", NULL, false);
-    m_Events.AddEvent("onClientBrowserPopup", "targeturl, openerurl, ispopup", NULL, false);
-    m_Events.AddEvent("onClientBrowserCursorChange", "cursor", NULL, false);
-    m_Events.AddEvent("onClientBrowserTooltip", "text", NULL, false);
-    m_Events.AddEvent("onClientBrowserInputFocusChanged", "gainedfocus", NULL, false);
-    m_Events.AddEvent("onClientBrowserResourceBlocked", "url, domain, reason", NULL, false);
+    m_Events.AddEvent("onClientBrowserWhitelistChange", "newPages", nullptr, false);
+    m_Events.AddEvent("onClientBrowserCreated", "", nullptr, false);
+    m_Events.AddEvent("onClientBrowserLoadingStart", "url, mainframe", nullptr, false);
+    m_Events.AddEvent("onClientBrowserDocumentReady", "url", nullptr, false);
+    m_Events.AddEvent("onClientBrowserLoadingFailed", "url, errorcode, errordescription", nullptr, false);
+    m_Events.AddEvent("onClientBrowserNavigate", "url, isblocked", nullptr, false);
+    m_Events.AddEvent("onClientBrowserPopup", "targeturl, openerurl, ispopup", nullptr, false);
+    m_Events.AddEvent("onClientBrowserCursorChange", "cursor", nullptr, false);
+    m_Events.AddEvent("onClientBrowserTooltip", "text", nullptr, false);
+    m_Events.AddEvent("onClientBrowserInputFocusChanged", "gainedfocus", nullptr, false);
+    m_Events.AddEvent("onClientBrowserResourceBlocked", "url, domain, reason", nullptr, false);
 
     // Misc events
-    m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", NULL, false);
+    m_Events.AddEvent("onClientFileDownloadComplete", "fileName, success", nullptr, false);
 
     m_Events.AddEvent("onClientResourceFileDownload", "resource, fileName, fileSize, state", nullptr, false);
     m_Events.AddEvent("onClientTransferBoxProgressChange", "downloadedBytes, downloadTotalBytes", nullptr, false);
     m_Events.AddEvent("onClientTransferBoxVisibilityChange", "isVisible", nullptr, false);
 
-    m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", NULL, false);
+    m_Events.AddEvent("onClientWeaponFire", "ped, x, y, z", nullptr, false);
 
     m_Events.AddEvent("onClientWorldSound", "group, index, x, y, z", nullptr, false);
 }

@@ -22,7 +22,7 @@ CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsMan
 {
     m_pMovingObjectsManager = pMovingObjectsManager;
     m_pObjectSync = pObjectSync;
-    m_pMoveAnimation = NULL;
+    m_pMoveAnimation = nullptr;
 }
 
 CDeathmatchObject::~CDeathmatchObject()
@@ -41,7 +41,7 @@ CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsMan
     : ClassInit(this), CClientObject(pManager, ID, usModel, bLowLod)
 {
     m_pMovingObjectsManager = pMovingObjectsManager;
-    m_pMoveAnimation = NULL;
+    m_pMoveAnimation = nullptr;
 }
 
 CDeathmatchObject::~CDeathmatchObject()
@@ -52,7 +52,7 @@ CDeathmatchObject::~CDeathmatchObject()
 
 void CDeathmatchObject::StartMovement(const CPositionRotationAnimation& a_rMoveAnimation)
 {
-    if (m_pMoveAnimation != NULL)
+    if (m_pMoveAnimation != nullptr)
     {
         _StopMovement(true);
     }
@@ -80,22 +80,22 @@ void CDeathmatchObject::StopMovement(bool bStoppedByScript)
 
 void CDeathmatchObject::_StopMovement(bool a_bUnregister, bool bStoppedByScript)
 {
-    if (m_pMoveAnimation != NULL)
-    {
-        if (a_bUnregister)
-        {
-            m_pMovingObjectsManager->Remove(this);
-        }
-        delete m_pMoveAnimation;
-        m_pMoveAnimation = NULL;
-        CLuaArguments Arguments;
-        Arguments.PushBoolean(bStoppedByScript);
+    if (!m_pMoveAnimation)
+        return;
 
-        CallEvent("onClientObjectMoveStop", Arguments, true);
+    if (a_bUnregister)
+        m_pMovingObjectsManager->Remove(this);
 
-        if (!IsLocalEntity())
-            SendObjectStopPacket(bStoppedByScript);
-    }
+    delete m_pMoveAnimation;
+    m_pMoveAnimation = nullptr;
+
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(bStoppedByScript);
+
+    CallEvent("onClientObjectMoveStop", Arguments, true);
+
+    if (!IsLocalEntity())
+        SendObjectStopPacket(bStoppedByScript);
 }
 
 void CDeathmatchObject::UpdateMovement()
@@ -106,11 +106,9 @@ void CDeathmatchObject::UpdateMovement()
     SetOrientation(positionRotation.m_vecPosition, positionRotation.m_vecRotation);
 
     if (!bStillRunning)
-    {
         _StopMovement(false);            // We don't unregister ourselves here since CDeathmatchObject::UpdateMovement is called from an iteration in
                                          // CMovingObjectsManager::DoPulse
         // and we are automatically removed from the list after CDeathmatchObject::UpdateMovement if we are finished
-    }
 }
 
 //

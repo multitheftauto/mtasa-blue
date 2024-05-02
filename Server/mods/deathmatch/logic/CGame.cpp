@@ -1536,125 +1536,125 @@ void CGame::QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason, bool bSayI
 void CGame::AddBuiltInEvents()
 {
     // Resource events
-    m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
-    m_Events.AddEvent("onResourceStart", "resource", NULL, false);
-    m_Events.AddEvent("onResourceStop", "resource, deleted", NULL, false);
-    m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", NULL, false);
+    m_Events.AddEvent("onResourcePreStart", "resource", nullptr, false);
+    m_Events.AddEvent("onResourceStart", "resource", nullptr, false);
+    m_Events.AddEvent("onResourceStop", "resource, deleted", nullptr, false);
+    m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", nullptr, false);
 
     // Blip events
 
     // Marker events
-    m_Events.AddEvent("onMarkerHit", "player, matchingDimension", NULL, false);
-    m_Events.AddEvent("onMarkerLeave", "player, matchingDimension", NULL, false);
+    m_Events.AddEvent("onMarkerHit", "player, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onMarkerLeave", "player, matchingDimension", nullptr, false);
 
     // Voice events
-    m_Events.AddEvent("onPlayerVoiceStart", "", NULL, false);
-    m_Events.AddEvent("onPlayerVoiceStop", "", NULL, false);
+    m_Events.AddEvent("onPlayerVoiceStart", "", nullptr, false);
+    m_Events.AddEvent("onPlayerVoiceStop", "", nullptr, false);
 
     // Object events
-    m_Events.AddEvent("onObjectMoveStart", "", NULL, false);
-    m_Events.AddEvent("onObjectMoveStop", "stoppedByScript", NULL, false);
+    m_Events.AddEvent("onObjectMoveStart", "", nullptr, false);
+    m_Events.AddEvent("onObjectMoveStop", "stoppedByScript", nullptr, false);
 
     // Pickup events
-    m_Events.AddEvent("onPickupHit", "player", NULL, false);
-    m_Events.AddEvent("onPickupLeave", "player", NULL, false);
-    m_Events.AddEvent("onPickupUse", "player", NULL, false);
-    m_Events.AddEvent("onPickupSpawn", "", NULL, false);
+    m_Events.AddEvent("onPickupHit", "player", nullptr, false);
+    m_Events.AddEvent("onPickupLeave", "player", nullptr, false);
+    m_Events.AddEvent("onPickupUse", "player", nullptr, false);
+    m_Events.AddEvent("onPickupSpawn", "", nullptr, false);
 
     // Player events
-    m_Events.AddEvent("onPlayerConnect", "player", NULL, false);
-    m_Events.AddEvent("onPlayerChat", "text, messageType", NULL, false);
-    m_Events.AddEvent("onPlayerDamage", "attacker, weapon, bodypart, loss", NULL, false);
-    m_Events.AddEvent("onPlayerVehicleEnter", "vehicle, seat, jacked", NULL, false);
-    m_Events.AddEvent("onPlayerVehicleExit", "vehicle, reason, jacker", NULL, false);
-    m_Events.AddEvent("onPlayerJoin", "", NULL, false);
-    m_Events.AddEvent("onPlayerQuit", "reason", NULL, false);
-    m_Events.AddEvent("onPlayerSpawn", "spawnpoint, team", NULL, false);
-    m_Events.AddEvent("onPlayerTarget", "target", NULL, false);
-    m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart", NULL, false);
-    m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", NULL, false);
-    m_Events.AddEvent("onPlayerMarkerHit", "marker, matchingDimension", NULL, false);
-    m_Events.AddEvent("onPlayerMarkerLeave", "marker, matchingDimension", NULL, false);
-    m_Events.AddEvent("onPlayerPickupHit", "pickup", NULL, false);
-    m_Events.AddEvent("onPlayerPickupLeave", "pickup", NULL, false);
-    m_Events.AddEvent("onPlayerPickupUse", "pickup", NULL, false);
-    m_Events.AddEvent("onPlayerClick", "button, state, element, posX, posY, posZ", NULL, false);
-    m_Events.AddEvent("onPlayerContact", "previous, current", NULL, false);
-    m_Events.AddEvent("onPlayerBan", "ban", NULL, false);
-    m_Events.AddEvent("onPlayerLogin", "guest_account, account, auto-login", NULL, false);
-    m_Events.AddEvent("onPlayerLogout", "account, guest_account", NULL, false);
-    m_Events.AddEvent("onPlayerChangeNick", "oldnick, newnick, manuallyChanged", NULL, false);
-    m_Events.AddEvent("onPlayerPrivateMessage", "text, player", NULL, false);
-    m_Events.AddEvent("onPlayerStealthKill", "target", NULL, false);
-    m_Events.AddEvent("onPlayerMute", "", NULL, false);
-    m_Events.AddEvent("onPlayerUnmute", "", NULL, false);
-    m_Events.AddEvent("onPlayerCommand", "command", NULL, false);
-    m_Events.AddEvent("onPlayerModInfo", "filename, itemlist", NULL, false);
-    m_Events.AddEvent("onPlayerACInfo", "aclist, size, md5, sha256", NULL, false);
-    m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
-    m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
-    m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
+    m_Events.AddEvent("onPlayerConnect", "player", nullptr, false);
+    m_Events.AddEvent("onPlayerChat", "text, messageType", nullptr, false);
+    m_Events.AddEvent("onPlayerDamage", "attacker, weapon, bodypart, loss", nullptr, false);
+    m_Events.AddEvent("onPlayerVehicleEnter", "vehicle, seat, jacked", nullptr, false);
+    m_Events.AddEvent("onPlayerVehicleExit", "vehicle, reason, jacker", nullptr, false);
+    m_Events.AddEvent("onPlayerJoin", "", nullptr, false);
+    m_Events.AddEvent("onPlayerQuit", "reason", nullptr, false);
+    m_Events.AddEvent("onPlayerSpawn", "spawnpoint, team", nullptr, false);
+    m_Events.AddEvent("onPlayerTarget", "target", nullptr, false);
+    m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart", nullptr, false);
+    m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", nullptr, false);
+    m_Events.AddEvent("onPlayerMarkerHit", "marker, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onPlayerMarkerLeave", "marker, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onPlayerPickupHit", "pickup", nullptr, false);
+    m_Events.AddEvent("onPlayerPickupLeave", "pickup", nullptr, false);
+    m_Events.AddEvent("onPlayerPickupUse", "pickup", nullptr, false);
+    m_Events.AddEvent("onPlayerClick", "button, state, element, posX, posY, posZ", nullptr, false);
+    m_Events.AddEvent("onPlayerContact", "previous, current", nullptr, false);
+    m_Events.AddEvent("onPlayerBan", "ban", nullptr, false);
+    m_Events.AddEvent("onPlayerLogin", "guest_account, account, auto-login", nullptr, false);
+    m_Events.AddEvent("onPlayerLogout", "account, guest_account", nullptr, false);
+    m_Events.AddEvent("onPlayerChangeNick", "oldnick, newnick, manuallyChanged", nullptr, false);
+    m_Events.AddEvent("onPlayerPrivateMessage", "text, player", nullptr, false);
+    m_Events.AddEvent("onPlayerStealthKill", "target", nullptr, false);
+    m_Events.AddEvent("onPlayerMute", "", nullptr, false);
+    m_Events.AddEvent("onPlayerUnmute", "", nullptr, false);
+    m_Events.AddEvent("onPlayerCommand", "command", nullptr, false);
+    m_Events.AddEvent("onPlayerModInfo", "filename, itemlist", nullptr, false);
+    m_Events.AddEvent("onPlayerACInfo", "aclist, size, md5, sha256", nullptr, false);
+    m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", nullptr, false);
+    m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", nullptr, false);
+    m_Events.AddEvent("onPlayerResourceStart", "resource", nullptr, false);
     m_Events.AddEvent("onPlayerProjectileCreation", "weaponType, posX, posY, posZ, force, target, rotX, rotY, rotZ, velX, velY, velZ", nullptr, false);
     m_Events.AddEvent("onPlayerDetonateSatchels", "", nullptr, false);
     m_Events.AddEvent("onPlayerTriggerEventThreshold", "", nullptr, false);
 
     // Ped events
-    m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
-    m_Events.AddEvent("onPedVehicleExit", "vehicle, reason, jacker", NULL, false);
-    m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", NULL, false);
-    m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
-    m_Events.AddEvent("onPedDamage", "loss", NULL, false);
+    m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", nullptr, false);
+    m_Events.AddEvent("onPedVehicleExit", "vehicle, reason, jacker", nullptr, false);
+    m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", nullptr, false);
+    m_Events.AddEvent("onPedWeaponSwitch", "previous, current", nullptr, false);
+    m_Events.AddEvent("onPedDamage", "loss", nullptr, false);
 
     // Element events
-    m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", NULL, false);
-    m_Events.AddEvent("onElementColShapeLeave", "colshape, matchingDimension", NULL, false);
-    m_Events.AddEvent("onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false);
-    m_Events.AddEvent("onElementDataChange", "key, oldValue", NULL, false);
-    m_Events.AddEvent("onElementDestroy", "", NULL, false);
-    m_Events.AddEvent("onElementStartSync", "newSyncer", NULL, false);
-    m_Events.AddEvent("onElementStopSync", "oldSyncer", NULL, false);
-    m_Events.AddEvent("onElementModelChange", "oldModel, newModel", NULL, false);
+    m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onElementColShapeLeave", "colshape, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onElementClicked", "button, state, clicker, posX, posY, posZ", nullptr, false);
+    m_Events.AddEvent("onElementDataChange", "key, oldValue", nullptr, false);
+    m_Events.AddEvent("onElementDestroy", "", nullptr, false);
+    m_Events.AddEvent("onElementStartSync", "newSyncer", nullptr, false);
+    m_Events.AddEvent("onElementStopSync", "oldSyncer", nullptr, false);
+    m_Events.AddEvent("onElementModelChange", "oldModel, newModel", nullptr, false);
     m_Events.AddEvent("onElementDimensionChange", "oldDimension, newDimension", nullptr, false);
     m_Events.AddEvent("onElementInteriorChange", "oldInterior, newInterior", nullptr, false);
 
     // Radar area events
 
     // Shape events
-    m_Events.AddEvent("onColShapeHit", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onColShapeLeave", "entity, matchingDimension", NULL, false);
+    m_Events.AddEvent("onColShapeHit", "entity, matchingDimension", nullptr, false);
+    m_Events.AddEvent("onColShapeLeave", "entity, matchingDimension", nullptr, false);
 
     // Vehicle events
-    m_Events.AddEvent("onVehicleDamage", "loss", NULL, false);
-    m_Events.AddEvent("onVehicleRespawn", "exploded", NULL, false);
-    m_Events.AddEvent("onTrailerAttach", "towedBy", NULL, false);
-    m_Events.AddEvent("onTrailerDetach", "towedBy", NULL, false);
-    m_Events.AddEvent("onVehicleStartEnter", "player, seat, jacked", NULL, false);
-    m_Events.AddEvent("onVehicleStartExit", "player, seat, jacker", NULL, false);
-    m_Events.AddEvent("onVehicleEnter", "player, seat, jacked", NULL, false);
-    m_Events.AddEvent("onVehicleExit", "player, seat, jacker", NULL, false);
-    m_Events.AddEvent("onVehicleExplode", "", NULL, false);
+    m_Events.AddEvent("onVehicleDamage", "loss", nullptr, false);
+    m_Events.AddEvent("onVehicleRespawn", "exploded", nullptr, false);
+    m_Events.AddEvent("onTrailerAttach", "towedBy", nullptr, false);
+    m_Events.AddEvent("onTrailerDetach", "towedBy", nullptr, false);
+    m_Events.AddEvent("onVehicleStartEnter", "player, seat, jacked", nullptr, false);
+    m_Events.AddEvent("onVehicleStartExit", "player, seat, jacker", nullptr, false);
+    m_Events.AddEvent("onVehicleEnter", "player, seat, jacked", nullptr, false);
+    m_Events.AddEvent("onVehicleExit", "player, seat, jacker", nullptr, false);
+    m_Events.AddEvent("onVehicleExplode", "", nullptr, false);
 
     // Console events
-    m_Events.AddEvent("onConsole", "text", NULL, false);
+    m_Events.AddEvent("onConsole", "text", nullptr, false);
 
     // Debug events
-    m_Events.AddEvent("onDebugMessage", "message, level, file, line", NULL, false);
+    m_Events.AddEvent("onDebugMessage", "message, level, file, line", nullptr, false);
 
     // Ban events
-    m_Events.AddEvent("onBan", "ip", NULL, false);
-    m_Events.AddEvent("onUnban", "ip", NULL, false);
+    m_Events.AddEvent("onBan", "ip", nullptr, false);
+    m_Events.AddEvent("onUnban", "ip", nullptr, false);
 
     // Account events
-    m_Events.AddEvent("onAccountDataChange", "account, key, value", NULL, false);
+    m_Events.AddEvent("onAccountDataChange", "account, key, value", nullptr, false);
 
     // Other events
-    m_Events.AddEvent("onSettingChange", "setting, oldValue, newValue", NULL, false);
-    m_Events.AddEvent("onChatMessage", "message, element", NULL, false);
+    m_Events.AddEvent("onSettingChange", "setting, oldValue, newValue", nullptr, false);
+    m_Events.AddEvent("onChatMessage", "message, element", nullptr, false);
     m_Events.AddEvent("onExplosion", "x, y, z, type, origin", nullptr, false);
 
     // Weapon events
-    m_Events.AddEvent("onWeaponFire", "", NULL, false);
-    m_Events.AddEvent("onPlayerWeaponFire", "weapon, endX, endY, endZ, hitElement, startX, startY, startZ", NULL, false);
+    m_Events.AddEvent("onWeaponFire", "", nullptr, false);
+    m_Events.AddEvent("onPlayerWeaponFire", "weapon, endX, endY, endZ, hitElement, startX, startY, startZ", nullptr, false);
 }
 
 void CGame::ProcessTrafficLights(long long llCurrentTime)
