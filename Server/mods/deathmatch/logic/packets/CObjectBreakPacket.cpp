@@ -14,24 +14,13 @@
 #include <CObject.h>
 #include <net/SyncStructures.h>
 
-CObjectBreakPacket::CObjectBreakPacket() : m_ObjectID(INVALID_ELEMENT_ID), m_Attacker(INVALID_ELEMENT_ID)
-{
-}
+CObjectBreakPacket::CObjectBreakPacket() {}
 
-CObjectBreakPacket::CObjectBreakPacket(CObject* pObject, CElement* pAttacker)
-{
-    m_ObjectID = pObject->GetID();
-    m_Attacker = (pAttacker) ? pAttacker->GetID() : INVALID_ELEMENT_ID;
-}
+CObjectBreakPacket::CObjectBreakPacket(CObject* pObject, CElement* pAttacker) : m_ObjectID(pObject->GetID()), m_Attacker(pAttacker ? pAttacker->GetID() : INVALID_ELEMENT_ID) {}
 
 bool CObjectBreakPacket::Read(NetBitStreamInterface& BitStream)
 {
-    if (BitStream.Read(m_ObjectID) && BitStream.Read(m_Attacker))
-    {
-        return true;
-    }
-
-    return false;
+    return BitStream.Read(m_ObjectID) && BitStream.Read(m_Attacker);
 }
 
 bool CObjectBreakPacket::Write(NetBitStreamInterface& BitStream) const

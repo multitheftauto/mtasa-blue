@@ -4759,84 +4759,78 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
 
 bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, float fLoss, CEntitySAInterface* pAttackerInterface)
 {
-    if (pObjectInterface)
+    if (!pObjectInterface)
+        return false;
+
+    CPools*                   pPools = g_pGame->GetPools();
+    SClientEntity<CObjectSA>* pObjectEntity = pPools->GetObject((DWORD*)pObjectInterface);
+    if (!pObjectEntity)
+        return false;
+
+    CClientObject* pClientObject = reinterpret_cast<CClientObject*>(pObjectEntity->pClientEntity);
+    if (!pClientObject)
+        return true;
+
+    CLuaArguments Arguments;
+    Arguments.PushNumber(fLoss);
+
+    CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
+    ElementID      attackerID = INVALID_ELEMENT_ID;
+
+    if (pClientAttacker)
     {
-        CPools*                   pPools = g_pGame->GetPools();
-        SClientEntity<CObjectSA>* pObjectEntity = pPools->GetObject((DWORD*)pObjectInterface);
-        if (pObjectEntity)
-        {
-            CClientObject* pClientObject = reinterpret_cast<CClientObject*>(pObjectEntity->pClientEntity);
-            if (!pClientObject)
-            {
-                return true;
-            }
-            CLuaArguments Arguments;
-            Arguments.PushNumber(fLoss);
-
-            CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
-            ElementID      attackerID = INVALID_ELEMENT_ID;
-
-            if (pClientAttacker)
-            {
-                attackerID = pClientAttacker->GetID();
-                Arguments.PushElement(pClientAttacker);
-            }
-            else
-                Arguments.PushNil();
-
-            bool bResult = pClientObject->CallEvent("onClientObjectDamage", Arguments, true);
-
-            if (bResult && !pClientObject->IsLocalEntity())
-                SendObjectDamagePacket(pClientObject, fLoss, attackerID);
-
-            return bResult;
-        }
+        attackerID = pClientAttacker->GetID();
+        Arguments.PushElement(pClientAttacker);
     }
-    return true;
+    else
+        Arguments.PushNil();
+
+    bool bResult = pClientObject->CallEvent("onClientObjectDamage", Arguments, true);
+
+    if (bResult && !pClientObject->IsLocalEntity())
+        SendObjectDamagePacket(pClientObject, fLoss, attackerID);
+
+    return bResult;
 }
 
 bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface)
 {
-    if (pObjectInterface)
+    if (!pObjectInterface)
+        return false;
+
+    CPools*                   pPools = g_pGame->GetPools();
+    SClientEntity<CObjectSA>* pObjectEntity = pPools->GetObject((DWORD*)pObjectInterface);
+    if (!pObjectEntity)
+        return false;
+
+    CClientObject* pClientObject = reinterpret_cast<CClientObject*>(pObjectEntity->pClientEntity);
+    if (!pClientObject)
+        return true;
+
+    if (!pClientObject->IsBreakable(false))
+        return false;
+
+    pClientObject->SetHealth(0.0f);
+
+    CLuaArguments Arguments;
+
+    CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
+    ElementID      attackerID = INVALID_ELEMENT_ID;
+
+    if (pClientAttacker)
     {
-        CPools*                   pPools = g_pGame->GetPools();
-        SClientEntity<CObjectSA>* pObjectEntity = pPools->GetObject((DWORD*)pObjectInterface);
-        if (pObjectEntity)
-        {
-            CClientObject* pClientObject = reinterpret_cast<CClientObject*>(pObjectEntity->pClientEntity);
-            if (!pClientObject)
-            {
-                return true;
-            }
-
-            if (!pClientObject->IsBreakable(false))
-                return false;
-
-            // Apply to MTA's "internal storage", too
-            pClientObject->SetHealth(0.0f);
-
-            CLuaArguments Arguments;
-
-            CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
-            ElementID      attackerID = INVALID_ELEMENT_ID;
-
-            if (pClientAttacker)
-            {
-                attackerID = pClientAttacker->GetID();
-                Arguments.PushElement(pClientAttacker);
-            }
-            else
-                Arguments.PushNil();
-
-            bool bResult = pClientObject->CallEvent("onClientObjectBreak", Arguments, true);
-
-            if (bResult && !pClientObject->IsLocalEntity())
-                SendObjectBreakPacket(pClientObject, attackerID);
-
-            return bResult;
-        }
+        attackerID = pClientAttacker->GetID();
+        Arguments.PushElement(pClientAttacker);
     }
-    return true;
+    else
+        Arguments.PushNil();
+
+    bool bResult = pClientObject->CallEvent("onClientObjectBreak", Arguments, true);
+
+    if (bResult && !pClientObject->IsLocalEntity())
+        SendObjectBreakPacket(pClientObject, attackerID);
+
+    return bResult;
 }
 
 bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed)
@@ -5602,37 +5596,37 @@ void CClientGame::ResetMapInfo()
     ReinitMarkers();
 }
 
-void CClientGame::SendObjectBreakPacket(CClientObject* pObject, ElementID attackerID)
+void CClientGame::SendObjectBreakPacket(CClientObject* pObject, ElementID attackerID) const noexcept
 {
-    if (pObject != nullptr && pObject->GetHealth() == 0.0f)
-    {
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-        if (pBitStream)
-        {
-            pBitStream->Write(pObject->GetID());
-            pBitStream->Write(attackerID);
+    if (!pObject || pObject->GetHealth() > 0.0f)
+        return;
 
-            g_pNet->SendPacket(PACKET_ID_OBJECT_BREAK, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
-            g_pNet->DeallocateNetBitStream(pBitStream);
-        }
-    }
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    if (!pBitStream)
+        return;
+
+    pBitStream->Write(pObject->GetID());
+    pBitStream->Write(attackerID);
+
+    g_pNet->SendPacket(PACKET_ID_OBJECT_BREAK, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
+    g_pNet->DeallocateNetBitStream(pBitStream);
 }
 
-void CClientGame::SendObjectDamagePacket(CClientObject* pObject, float fLoss, ElementID attackerID)
+void CClientGame::SendObjectDamagePacket(CClientObject* pObject, float fLoss, ElementID attackerID) const noexcept
 {
-    if (pObject != nullptr)
-    {
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-        if (pBitStream)
-        {
-            pBitStream->Write(pObject->GetID());
-            pBitStream->Write(fLoss);
-            pBitStream->Write(attackerID);
+    if (!pObject)
+        return;
 
-            g_pNet->SendPacket(PACKET_ID_OBJECT_DAMAGE, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
-            g_pNet->DeallocateNetBitStream(pBitStream);
-        }
-    }
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    if (!pBitStream)
+        return;
+
+    pBitStream->Write(pObject->GetID());
+    pBitStream->Write(fLoss);
+    pBitStream->Write(attackerID);
+
+    g_pNet->SendPacket(PACKET_ID_OBJECT_DAMAGE, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
+    g_pNet->DeallocateNetBitStream(pBitStream);
 }
 
 void CClientGame::SendPedWastedPacket(CClientPed* Ped, ElementID damagerID, unsigned char ucWeapon, unsigned char ucBodyPiece, AssocGroupId animGroup,

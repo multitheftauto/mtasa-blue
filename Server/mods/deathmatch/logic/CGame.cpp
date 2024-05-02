@@ -1558,8 +1558,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerVoiceStop", "", NULL, false);
 
     // Object events
-    m_Events.AddEvent("onObjectBreak", "attacker", NULL, false);
-    m_Events.AddEvent("onObjectDamage", "loss, atacker", NULL, false);
+    m_Events.AddEvent("onObjectBreak", "attacker", nullptr, false);
+    m_Events.AddEvent("onObjectDamage", "loss, atacker", nullptr, false);
 
     // Pickup events
     m_Events.AddEvent("onPickupHit", "player", NULL, false);
@@ -2346,19 +2346,18 @@ void CGame::Packet_ObjectBreak(CObjectBreakPacket& Packet)
         return;
 
     CElement* pObject = CElementIDs::GetElement(Packet.m_ObjectID);
+    if (!pObject || !IS_OBJECT(pObject))
+        return;
 
-    if (pObject != nullptr && IS_OBJECT(pObject))
-    {
-        CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : nullptr;
+    CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : nullptr;
 
-        CLuaArguments Arguments;
-        if (pAttacker)
-            Arguments.PushElement(pAttacker);
-        else
-            Arguments.PushNil();
+    CLuaArguments Arguments;
+    if (pAttacker)
+        Arguments.PushElement(pAttacker);
+    else
+        Arguments.PushNil();
 
-        pObject->CallEvent("onObjectBreak", Arguments);
-    }
+    pObject->CallEvent("onObjectBreak", Arguments);
 }
 
 void CGame::Packet_ObjectDamage(CObjectDamagePacket& Packet)
@@ -2368,21 +2367,20 @@ void CGame::Packet_ObjectDamage(CObjectDamagePacket& Packet)
         return;
 
     CElement* pObject = CElementIDs::GetElement(Packet.m_ObjectID);
+    if (!pObject || !IS_OBJECT(pObject))
+        return;
 
-    if (pObject != nullptr && IS_OBJECT(pObject))
-    {
-        CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : nullptr;
+    CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : nullptr;
 
-        CLuaArguments Arguments;
-        Arguments.PushNumber(Packet.m_fLoss);
+    CLuaArguments Arguments;
+    Arguments.PushNumber(Packet.m_fLoss);
 
-        if (pAttacker)
-            Arguments.PushElement(pAttacker);
-        else
-            Arguments.PushNil();
+    if (pAttacker)
+        Arguments.PushElement(pAttacker);
+    else
+        Arguments.PushNil();
 
-        pObject->CallEvent("onObjectDamage", Arguments);
-    }
+    pObject->CallEvent("onObjectDamage", Arguments);
 }
 
 void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)

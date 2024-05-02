@@ -14,25 +14,13 @@
 #include <CObject.h>
 #include <net/SyncStructures.h>
 
-CObjectDamagePacket::CObjectDamagePacket() : m_ObjectID(INVALID_ELEMENT_ID), m_Attacker(INVALID_ELEMENT_ID), m_fLoss(0)
-{
-}
+CObjectDamagePacket::CObjectDamagePacket() {}
 
-CObjectDamagePacket::CObjectDamagePacket(CObject* pObject, float fLoss, CElement* pAttacker)
-{
-    m_ObjectID = pObject->GetID();
-    m_Attacker = (pAttacker) ? pAttacker->GetID() : INVALID_ELEMENT_ID;
-    m_fLoss = fLoss;
-}
+CObjectDamagePacket::CObjectDamagePacket(CObject* pObject, float fLoss, CElement* pAttacker) : m_ObjectID(pObject->GetID()), m_fLoss(fLoss), m_Attacker(pAttacker ? pAttacker->GetID() : INVALID_ELEMENT_ID) {}
 
 bool CObjectDamagePacket::Read(NetBitStreamInterface& BitStream)
 {
-    if (BitStream.Read(m_ObjectID) && BitStream.Read(m_fLoss) && BitStream.Read(m_Attacker))
-    {
-        return true;
-    }
-
-    return false;
+    return BitStream.Read(m_ObjectID) && BitStream.Read(m_fLoss) && BitStream.Read(m_Attacker);
 }
 
 bool CObjectDamagePacket::Write(NetBitStreamInterface& BitStream) const

@@ -27,7 +27,7 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    ElementID   m_ObjectID;
-    float       m_fLoss; 
-    ElementID   m_Attacker;
+    ElementID   m_ObjectID{INVALID_ELEMENT_ID};
+    float       m_fLoss{0}; 
+    ElementID   m_Attacker{INVALID_ELEMENT_ID};
 };
