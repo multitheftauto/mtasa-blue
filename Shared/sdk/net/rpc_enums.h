@@ -115,7 +115,6 @@ enum eElementRPCFunctions
     SET_OBJECT_ROTATION,
     MOVE_OBJECT,
     STOP_OBJECT,
-    BREAK_OBJECT,
 
     DESTROY_ALL_RADAR_AREAS,
     SET_RADAR_AREA_SIZE,
@@ -277,6 +276,8 @@ enum eElementRPCFunctions
     SET_OBJECT_BREAKABLE,
 
     SET_WORLD_SPECIAL_PROPERTY,
+
+    BREAK_OBJECT,
 
     NUM_RPC_FUNCS            // Add above this line
 };
