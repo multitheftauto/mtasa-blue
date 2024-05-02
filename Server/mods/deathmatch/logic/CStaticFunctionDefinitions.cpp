@@ -8239,18 +8239,18 @@ bool CStaticFunctionDefinitions::BreakObject(CElement* pElement)
 {
     RUN_CHILDREN(BreakObject(*iter));
 
-    if (IS_OBJECT(pElement))
-    {
-        CObject* pObject = static_cast<CObject*>(pElement);
+    if (!IS_OBJECT(pElement))
+        return false;
 
-        if (pObject != nullptr)
-        {
-            CBitStream BitStream;
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, BREAK_OBJECT, *BitStream.pBitStream));
-        }
-    }
+    CObject* pObject = static_cast<CObject*>(pElement);
 
-    return false;
+    if (!pObject)
+        return false;
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, BREAK_OBJECT, *BitStream.pBitStream));
+    
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(CElement* pElement, bool bVisible, unsigned short usNewDimension)
