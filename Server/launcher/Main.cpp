@@ -26,7 +26,7 @@
 #include "SharedUtil.h"
 
 #ifdef WIN32
-    // Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
+// Linux gcc 4.4.5 memory corruption on destruction of g_StatEvents (Reason unknown)
     #include "SharedUtil.hpp"
 #else
     #include <unistd.h>
@@ -84,6 +84,7 @@ int main(int argc, char* argv[])
             printf("  -u                   Disable output buffering and flush instantly (useful for screenlog)\n");
 #ifndef WIN32
             printf("  -x                   Disable simplified crash reports (To allow core dumps)\n");
+            printf("  --child-process      Run server without output buffering and with a readyness event\n");
 #endif
             printf("  -D [PATH]            Use as base directory\n");
             printf("  --config [FILE]      Alternate mtaserver.conf file\n");

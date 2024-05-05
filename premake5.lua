@@ -5,6 +5,7 @@ require "install_data"
 require "install_resources"
 require "install_cef"
 require "install_unifont"
+require "install_discord"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -26,6 +27,8 @@ workspace "MTASA"
 
 	if os.host() == "macosx" then
 		platforms { "x64" }
+	elseif os.host() == "windows" then
+		platforms { "x86", "x64", "arm64" }
 	else
 		platforms { "x86", "x64", "arm", "arm64" }
 	end
@@ -123,7 +126,7 @@ workspace "MTASA"
 	filter { "system:linux or macosx", "configurations:not Debug" }
 		buildoptions { "-fvisibility=hidden" }
 
-	filter { "system:linux or macosx", "configurations:not Debug", "language:C++" }
+	filter { "system:linux or macosx", "configurations:not Debug", "files:*.cpp" }
 		buildoptions { "-fvisibility-inlines-hidden" }
 
 	filter { "system:linux", "platforms:x86 or x64" }
@@ -153,6 +156,7 @@ workspace "MTASA"
 		group "Vendor"
 		include "vendor/portaudio"
 		include "vendor/cef3"
+		include "vendor/discord-rpc"
 		include "vendor/freetype"
 		include "vendor/jpeg-9e"
 		include "vendor/ksignals"

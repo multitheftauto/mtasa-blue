@@ -14,49 +14,13 @@
 #include "CPedSA.h"
 #include "CVehicleSA.h"
 #include "CObjectSA.h"
+#include "CBuildingSA.h"
+#include "CTextureDictonarySA.h"
+#include "CBuildingsPoolSA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
 class CClientEntity;
-
-// size of tPoolObjectFlags is 1 byte only
-union tPoolObjectFlags
-{
-    struct
-    {
-        unsigned char nId : 7;
-        bool          bEmpty : 1;
-    };
-
-private:
-    unsigned char nValue;
-};
-
-template <class A, class B = A>
-class CPoolSAInterface
-{
-public:
-    // m_pObjects contains all interfaces. 140 maximum for ped objects.
-    B*                m_pObjects;
-    tPoolObjectFlags* m_byteMap;
-    int               m_nSize;
-    int               m_nFirstFree;
-    bool              m_bOwnsAllocations;
-    bool              field_11;
-
-    // Default constructor for statically allocated pools
-    CPoolSAInterface()
-    {
-        // Remember to call CPool::Init to fill in the fields!
-        m_pObjects = nullptr;
-        m_byteMap = nullptr;
-        m_nSize = 0;
-        m_bOwnsAllocations = false;
-    }
-
-    bool IsEmpty(std::int32_t objectIndex) { return m_byteMap[objectIndex].bEmpty; }
-    B*   GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
-};
 
 class CPoolsSA : public CPools
 {
@@ -127,36 +91,26 @@ public:
     void ResetPedPoolCount() { m_pedPool.ulCount = 0; }
     void InvalidateLocalPlayerClientEntity();
 
+    uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName);
+    void RemoveTextureDictonarySlot(uint uiTxdId);
+    bool IsFreeTextureDictonarySlot(uint uiTxdId);
+
+    ushort GetFreeTextureDictonarySlot();
+
+    CBuildingsPool& GetBuildingsPool() noexcept override { return m_BuildingsPool; };
+
 private:
-    // Generic container for pools
-    template <class T, class I, unsigned long MAX>
-    struct SPoolData
-    {
-        std::array<SClientEntity<T>, MAX> arrayOfClientEntities;
-        unsigned long                     ulCount;
-
-    private:
-        friend class CPoolsSA;
-
-        SPoolData() : ulCount(0UL)
-        {
-            for (unsigned int i = 0; i < MAX; ++i)
-            {
-                arrayOfClientEntities[i] = {nullptr, nullptr};
-            }
-        }
-    };
-
     // Pools
-    typedef SPoolData<CVehicleSA, CVehicleSAInterface, MAX_VEHICLES> vehiclePool_t;
-    typedef SPoolData<CPedSA, CPedSAInterface, MAX_PEDS>             pedPool_t;
-    typedef SPoolData<CObjectSA, CObjectSAInterface, MAX_OBJECTS>    objectPool_t;
-    vehiclePool_t                                                    m_vehiclePool;
-    pedPool_t                                                        m_pedPool;
-    objectPool_t                                                     m_objectPool;
-    CPoolSAInterface<CPedSAInterface>**                              m_ppPedPoolInterface;
-    CPoolSAInterface<CObjectSAInterface>**                           m_ppObjectPoolInterface;
-    CPoolSAInterface<CVehicleSAInterface>**                          m_ppVehiclePoolInterface;
+    SPoolData<CVehicleSA, CVehicleSAInterface, MAX_VEHICLES>    m_vehiclePool;
+    SPoolData<CPedSA, CPedSAInterface, MAX_PEDS>                m_pedPool;
+    SPoolData<CObjectSA, CObjectSAInterface, MAX_OBJECTS>       m_objectPool;
+
+    CPoolSAInterface<CPedSAInterface>**              m_ppPedPoolInterface;
+    CPoolSAInterface<CObjectSAInterface>**           m_ppObjectPoolInterface;
+    CPoolSAInterface<CVehicleSAInterface>**          m_ppVehiclePoolInterface;
+    CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;
+
+    CBuildingsPoolSA m_BuildingsPool;
 
     bool m_bGetVehicleEnabled;
 };

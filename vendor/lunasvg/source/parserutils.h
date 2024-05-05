@@ -43,10 +43,8 @@ inline bool skipDesc(const char*& ptr, const char* end, const char ch)
 inline bool skipDesc(const char*& ptr, const char* end, const char* data)
 {
     int read = 0;
-    while(data[read])
-    {
-        if(ptr >= end || *ptr != data[read])
-        {
+    while(data[read]) {
+        if(ptr >= end || *ptr != data[read]) {
             ptr -= read;
             return false;
         }
@@ -68,8 +66,7 @@ inline bool skipUntil(const char*& ptr, const char* end, const char ch)
 
 inline bool skipUntil(const char*& ptr, const char* end, const char* data)
 {
-    while(ptr < end)
-    {
+    while(ptr < end) {
         auto start = ptr;
         if(skipDesc(start, end, data))
             break;
@@ -112,10 +109,8 @@ inline bool skipWsDelimiter(const char*& ptr, const char* end, const char delimi
     if(ptr < end && !IS_WS(*ptr) && *ptr != delimiter)
         return false;
 
-    if(skipWs(ptr, end))
-    {
-        if(ptr < end && *ptr == delimiter)
-        {
+    if(skipWs(ptr, end)) {
+        if(ptr < end && *ptr == delimiter) {
             ++ptr;
             skipWs(ptr, end);
         }
@@ -153,8 +148,7 @@ inline bool parseInteger(const char*& ptr, const char* end, T& integer, int base
 
     if(ptr < end && *ptr == '+')
         ++ptr;
-    else if(ptr < end && isSigned && *ptr == '-')
-    {
+    else if(ptr < end && isSigned && *ptr == '-') {
         ++ptr;
         isNegative = true;
     }
@@ -200,8 +194,7 @@ inline bool parseNumber(const char*& ptr, const char* end, T& number)
 
     if(ptr < end && *ptr == '+')
         ++ptr;
-    else if(ptr < end && *ptr == '-')
-    {
+    else if(ptr < end && *ptr == '-') {
         ++ptr;
         sign = -1;
     }
@@ -209,16 +202,14 @@ inline bool parseNumber(const char*& ptr, const char* end, T& number)
     if(ptr >= end || !(IS_NUM(*ptr) || *ptr == '.'))
         return false;
 
-    if(*ptr != '.')
-    {
+    if(*ptr != '.') {
         do {
             integer = static_cast<T>(10) * integer + (*ptr - '0');
             ++ptr;
         } while(ptr < end && IS_NUM(*ptr));
     }
 
-    if(ptr < end && *ptr == '.')
-    {
+    if(ptr < end && *ptr == '.') {
         ++ptr;
         if(ptr >= end || !IS_NUM(*ptr))
             return false;
@@ -238,8 +229,7 @@ inline bool parseNumber(const char*& ptr, const char* end, T& number)
         ++ptr;
         if(ptr < end && *ptr == '+')
             ++ptr;
-        else if(ptr < end && *ptr == '-')
-        {
+        else if(ptr < end && *ptr == '-') {
             ++ptr;
             expsign = -1;
         }

@@ -64,6 +64,10 @@ extern const struct Curl_handler Curl_handler_wss;
 
 struct dynhds;
 
+CURLcode Curl_bump_headersize(struct Curl_easy *data,
+                              size_t delta,
+                              bool connect_only);
+
 /* Header specific functions */
 bool Curl_compareheader(const char *headerline,  /* line to check */
                         const char *header,   /* header keyword _with_ colon */
@@ -183,21 +187,19 @@ CURLcode Curl_http_auth_act(struct Curl_easy *data);
 #define EXPECT_100_THRESHOLD (1024*1024)
 #endif
 
+/* MAX_HTTP_RESP_HEADER_SIZE is the maximum size of all response headers
+   combined that libcurl allows for a single HTTP response, any HTTP
+   version. This count includes CONNECT response headers. */
+#define MAX_HTTP_RESP_HEADER_SIZE (300*1024)
+
 #endif /* CURL_DISABLE_HTTP */
 
 /****************************************************************************
  * HTTP unique setup
  ***************************************************************************/
 struct HTTP {
-  curl_mimepart *sendit;
   curl_off_t postsize; /* off_t to handle large file sizes */
   const char *postdata;
-
-  const char *p_pragma;      /* Pragma: string */
-
-  /* For FORM posting */
-  curl_mimepart form;
-
   struct back {
     curl_read_callback fread_func; /* backup storage for fread pointer */
     void *fread_in;           /* backup storage for fread_in pointer */
@@ -225,8 +227,8 @@ CURLcode Curl_http_size(struct Curl_easy *data);
 
 CURLcode Curl_http_readwrite_headers(struct Curl_easy *data,
                                      struct connectdata *conn,
-                                     ssize_t *nread,
-                                     bool *stop_reading);
+                                     const char *buf, size_t blen,
+                                     size_t *pconsumed);
 
 /**
  * Curl_http_output_auth() setups the authentication headers for the
@@ -260,8 +262,8 @@ CURLcode Curl_http_decode_status(int *pstatus, const char *s, size_t len);
 /**
  * All about a core HTTP request, excluding body and trailers
  */
-struct http_req {
-  char method[12];
+struct httpreq {
+  char method[24];
   char *scheme;
   char *authority;
   char *path;
@@ -272,17 +274,17 @@ struct http_req {
 /**
  * Create a HTTP request struct.
  */
-CURLcode Curl_http_req_make(struct http_req **preq,
+CURLcode Curl_http_req_make(struct httpreq **preq,
                             const char *method, size_t m_len,
                             const char *scheme, size_t s_len,
                             const char *authority, size_t a_len,
                             const char *path, size_t p_len);
 
-CURLcode Curl_http_req_make2(struct http_req **preq,
+CURLcode Curl_http_req_make2(struct httpreq **preq,
                              const char *method, size_t m_len,
                              CURLU *url, const char *scheme_default);
 
-void Curl_http_req_free(struct http_req *req);
+void Curl_http_req_free(struct httpreq *req);
 
 #define HTTP_PSEUDO_METHOD ":method"
 #define HTTP_PSEUDO_SCHEME ":scheme"
@@ -292,7 +294,7 @@ void Curl_http_req_free(struct http_req *req);
 
 /**
  * Create the list of HTTP/2 headers which represent the request,
- * using HTTP/2 pseudo headers preceeding the `req->headers`.
+ * using HTTP/2 pseudo headers preceding the `req->headers`.
  *
  * Applies the following transformations:
  * - if `authority` is set, any "Host" header is removed.
@@ -306,7 +308,7 @@ void Curl_http_req_free(struct http_req *req);
  * @param data       the handle to lookup defaults like ' :scheme' from
  */
 CURLcode Curl_http_req_to_h2(struct dynhds *h2_headers,
-                             struct http_req *req, struct Curl_easy *data);
+                             struct httpreq *req, struct Curl_easy *data);
 
 /**
  * All about a core HTTP response, excluding body and trailers

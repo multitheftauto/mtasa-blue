@@ -66,9 +66,7 @@
  * Non-ANSI integer extensions
  */
 
-#if (defined(__BORLANDC__) && (__BORLANDC__ >= 0x520)) || \
-    (defined(__POCC__) && defined(_MSC_VER)) || \
-    (defined(_WIN32_WCE)) || \
+#if (defined(_WIN32_WCE)) || \
     (defined(__MINGW32__)) || \
     (defined(_MSC_VER) && (_MSC_VER >= 900) && (_INTEGRAL_MAX_BITS >= 64))
 #  define MP_HAVE_INT_EXTENSIONS
@@ -743,11 +741,11 @@ static int dprintf_formatf(
 
       goto number;
 
-      unsigned_number:
+unsigned_number:
       /* Unsigned number of base BASE.  */
       is_neg = 0;
 
-      number:
+number:
       /* Number of base BASE.  */
 
       /* Supply a default precision if none was given.  */
@@ -1070,9 +1068,6 @@ static int alloc_addbyter(int output, FILE *data)
   }
   return outc; /* fputc() returns like this on success */
 }
-
-extern int Curl_dyn_vprintf(struct dynbuf *dyn,
-                            const char *format, va_list ap_save);
 
 /* appends the formatted string, returns 0 on success, 1 on error */
 int Curl_dyn_vprintf(struct dynbuf *dyn, const char *format, va_list ap_save)

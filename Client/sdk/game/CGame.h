@@ -66,6 +66,7 @@ class CWeaponStat;
 class CWeaponStatManager;
 class CWeather;
 class CWorld;
+class CIplStore;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -195,6 +196,27 @@ public:
     virtual bool IsMoonEasterEggEnabled() = 0;
     virtual void SetMoonEasterEggEnabled(bool bEnable) = 0;
 
+    virtual bool IsExtraAirResistanceEnabled() = 0;
+    virtual void SetExtraAirResistanceEnabled(bool bEnable) = 0;
+
+    virtual bool IsUnderWorldWarpEnabled() = 0;
+    virtual void SetUnderWorldWarpEnabled(bool bEnable) = 0;
+
+    virtual void SetVehicleSunGlareEnabled(bool bEnabled) = 0;
+    virtual bool IsVehicleSunGlareEnabled() = 0;
+
+    virtual void SetCoronaZTestEnabled(bool isEnabled) = 0;
+    virtual bool IsCoronaZTestEnabled() const noexcept = 0;
+
+    virtual bool IsWaterCreaturesEnabled() const noexcept = 0;
+    virtual void SetWaterCreaturesEnabled(bool isEnabled) = 0;
+
+    virtual bool IsBurnFlippedCarsEnabled() const noexcept = 0;
+    virtual void SetBurnFlippedCarsEnabled(bool isEnabled) = 0;
+
+    virtual bool IsFireballDestructEnabled() const noexcept = 0;
+    virtual void SetFireballDestructEnabled(bool isEnabled) = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
@@ -234,4 +256,7 @@ public:
     virtual int32_t GetBaseIDforRRR() = 0;
     virtual int32_t GetBaseIDforSCM() = 0;
     virtual int32_t GetCountOfAllFileIDs() = 0;
+
+    virtual void RemoveAllBuildings() = 0;
+    virtual void RestoreGameBuildings() = 0;
 };

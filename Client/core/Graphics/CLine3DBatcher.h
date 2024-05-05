@@ -38,7 +38,7 @@ class CLine3DBatcher
 {
 public:
     ZERO_ON_NEW
-    CLine3DBatcher(bool bZTest);
+    CLine3DBatcher(bool bPreGUI);
     ~CLine3DBatcher();
 
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
@@ -47,7 +47,7 @@ public:
     void AddLine3D(const CVector& vecFrom, const CVector& vecTo, float fWidth, ulong ulColor);
 
 protected:
-    bool                     m_bZTest;
+    bool                     m_bPreGUI;
     IDirect3DDevice9*        m_pDevice;
     std::vector<SLine3DItem> m_LineList;
 };

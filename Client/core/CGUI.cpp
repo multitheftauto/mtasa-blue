@@ -383,7 +383,7 @@ void CLocalGUI::SetConsoleVisible(bool bVisible)
         CGUI* pGUI = CCore::GetSingleton().GetGUI();
         if (bVisible)
             pGUI->SetCursorAlpha(1.0f);
-        else
+        else if (!g_pCore->IsMenuVisible())
             pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
     }
 }
@@ -430,9 +430,7 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
             pGUI->SelectInputHandlers(INPUT_MOD);
         }
 
-        if (bVisible)
-            pGUI->SetCursorAlpha(1.0f);
-        else
+        if (!bVisible)
             pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
     }
 }

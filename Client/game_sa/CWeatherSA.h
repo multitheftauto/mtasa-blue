@@ -60,4 +60,5 @@ private:
     static unsigned char* VAR_CWeather__OldWeatherType;
     static unsigned char* VAR_CWeather__NewWeatherType;
     static float*         VAR_CWeather__Rain;
+
 };

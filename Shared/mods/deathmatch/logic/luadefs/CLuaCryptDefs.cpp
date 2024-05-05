@@ -31,7 +31,7 @@ void CLuaCryptDefs::LoadFunctions()
         {"generateKeyPair", ArgumentParser<GenerateKeyPair>},
         {"passwordVerify", PasswordVerify},
         {"encodeString", EncodeString},
-        {"decodeString", DecodeString},
+        {"decodeString", DecodeString}
     };
 
     // Add functions
@@ -402,7 +402,11 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(algorithm);
     argStream.ReadString(data);
-    argStream.ReadStringMap(options);
+
+    if ((algorithm != StringEncodeFunction::BASE64 && algorithm != StringEncodeFunction::BASE32) || argStream.NextIsTable())
+    {
+        argStream.ReadStringMap(options);
+    }
 
     argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
     argStream.ReadFunctionComplete();
@@ -589,6 +593,140 @@ int CLuaCryptDefs::EncodeString(lua_State* luaVM)
                 }
                 return 1;
             }
+            case StringEncodeFunction::BASE64:
+            {
+                const SString variant = options["variant"].ToUpper();
+
+                if (!variant.empty() && variant != "URL")
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
+                            [data, variant]
+                            {
+                                try
+                                {
+                                    return std::make_pair(SharedUtil::Base64encode(data, variant), true);
+                                }
+                                catch (const CryptoPP::Exception& ex)
+                                {
+                                    return std::make_pair(SString(ex.GetWhat()), false);
+                                }
+                            },
+                            [luaFunctionRef](const std::pair<SString, bool>& result)
+                            {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result.second)
+                                    {
+                                        arguments.PushString(result.first);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua::Push(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    try
+                    {
+                        lua::Push(luaVM, SharedUtil::Base64encode(data, variant));
+                    }
+                    catch (const CryptoPP::Exception& ex)
+                    {
+                        m_pScriptDebugging->LogWarning(luaVM, ex.what());
+                        lua::Push(luaVM, false);
+                    }
+                    return 1;
+                }
+                return 1;
+            }
+            case StringEncodeFunction::BASE32:
+            {
+                const SString variant = options["variant"].ToUpper();
+
+                if (!variant.empty() && variant != "HEX")
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
+                            [data, variant]
+                            {
+                                try
+                                {
+                                    return std::make_pair(SharedUtil::Base32encode(data, variant), true);
+                                }
+                                catch (const CryptoPP::Exception& ex)
+                                {
+                                    return std::make_pair(SString(ex.GetWhat()), false);
+                                }
+                            },
+                            [luaFunctionRef](const std::pair<SString, bool>& result)
+                            {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result.second)
+                                    {
+                                        arguments.PushString(result.first);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua::Push(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    try
+                    {
+                        lua::Push(luaVM, SharedUtil::Base32encode(data, variant));
+                    }
+                    catch (const CryptoPP::Exception& ex)
+                    {
+                        m_pScriptDebugging->LogWarning(luaVM, ex.what());
+                        lua::Push(luaVM, false);
+                    }
+                    return 1;
+                }
+                return 1;
+            }
             default:
             {
                 m_pScriptDebugging->LogCustom(luaVM, "Unknown encryption algorithm");
@@ -614,7 +752,11 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(algorithm);
     argStream.ReadString(data);
-    argStream.ReadStringMap(options);
+
+    if ((algorithm != StringEncodeFunction::BASE64 && algorithm != StringEncodeFunction::BASE32) || argStream.NextIsTable())
+    {
+        argStream.ReadStringMap(options);
+    }
 
     argStream.ReadFunction(luaFunctionRef, LUA_REFNIL);
     argStream.ReadFunctionComplete();
@@ -798,6 +940,140 @@ int CLuaCryptDefs::DecodeString(lua_State* luaVM)
                     try
                     {
                         lua::Push(luaVM, SharedUtil::RsaDecode(data, key));
+                    }
+                    catch (const CryptoPP::Exception& ex)
+                    {
+                        m_pScriptDebugging->LogWarning(luaVM, ex.what());
+                        lua::Push(luaVM, false);
+                    }
+                    return 1;
+                }
+                return 1;
+            }
+            case StringEncodeFunction::BASE64:
+            {
+                const SString variant = options["variant"].ToUpper();
+
+                if (!variant.empty() && variant != "URL")
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
+                            [data, variant]
+                            {
+                                try
+                                {
+                                    return std::make_pair(SharedUtil::Base64decode(data, variant), true);
+                                }
+                                catch (const CryptoPP::Exception& ex)
+                                {
+                                    return std::make_pair(SString(ex.GetWhat()), false);
+                                }
+                            },
+                            [luaFunctionRef](const std::pair<SString, bool>& result)
+                            {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result.second)
+                                    {
+                                        arguments.PushString(result.first);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua::Push(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    try
+                    {
+                        lua::Push(luaVM, SharedUtil::Base64decode(data, variant));
+                    }
+                    catch (const CryptoPP::Exception& ex)
+                    {
+                        m_pScriptDebugging->LogWarning(luaVM, ex.what());
+                        lua::Push(luaVM, false);
+                    }
+                    return 1;
+                }
+                return 1;
+            }
+            case StringEncodeFunction::BASE32:
+            {
+                const SString variant = options["variant"].ToUpper();
+
+                if (!variant.empty() && variant != "HEX")
+                {
+                    m_pScriptDebugging->LogCustom(luaVM, "Invalid value for field 'variant'");
+                    lua::Push(luaVM, false);
+                    return 1;
+                }
+
+                // Async
+                if (VERIFY_FUNCTION(luaFunctionRef))
+                {
+                    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+                    if (pLuaMain)
+                    {
+                        CLuaShared::GetAsyncTaskScheduler()->PushTask(
+                            [data, variant]
+                            {
+                                try
+                                {
+                                    return std::make_pair(SharedUtil::Base32decode(data, variant), true);
+                                }
+                                catch (const CryptoPP::Exception& ex)
+                                {
+                                    return std::make_pair(SString(ex.GetWhat()), false);
+                                }
+                            },
+                            [luaFunctionRef](const std::pair<SString, bool>& result)
+                            {
+                                CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+                                if (pLuaMain)
+                                {
+                                    CLuaArguments arguments;
+                                    if (result.second)
+                                    {
+                                        arguments.PushString(result.first);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                    else
+                                    {
+                                        m_pScriptDebugging->LogWarning(luaFunctionRef.GetLuaVM(), result.first.c_str());
+                                        arguments.PushBoolean(false);
+                                        arguments.Call(pLuaMain, luaFunctionRef);
+                                    }
+                                }
+                            });
+
+                        lua::Push(luaVM, true);
+                    }
+                }
+                else            // Sync
+                {
+                    try
+                    {
+                        lua::Push(luaVM, SharedUtil::Base32decode(data, variant));
                     }
                     catch (const CryptoPP::Exception& ex)
                     {

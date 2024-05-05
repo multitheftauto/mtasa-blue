@@ -79,6 +79,7 @@ enum eClientEntityType
     CCLIENTVECTORGRAPHIC,
     CCLIENTUNKNOWN,
     CCLIENTIMG,
+    CCLIENTBUILDING,
 };
 
 class CEntity;
@@ -143,6 +144,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientPointLights,
     CLASS_CClientSearchLight,
     CLASS_CClientIMG,
+    CLASS_CClientBuilding,
 };
 
 class CClientEntity : public CClientEntityBase
@@ -339,11 +341,8 @@ protected:
     CCustomData* m_pCustomData;
 
     ElementID m_ID;
-    CVector   m_vecRelativePosition;
 
     unsigned short m_usDimension;
-
-    unsigned int m_uiLine;
 
 private:
     unsigned int m_uiTypeHash;

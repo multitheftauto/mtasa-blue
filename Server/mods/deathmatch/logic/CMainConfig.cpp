@@ -660,8 +660,6 @@ bool CMainConfig::LoadExtended()
         }
     } while (pNode);
 
-    RegisterCommands();
-
     // Handle the <resource> nodes
     pNode = NULL;
     uiCurrentIndex = 0;
@@ -751,11 +749,7 @@ bool CMainConfig::LoadExtended()
 
     CLogger::ProgressDotsEnd();
     CLogger::SetMinLogLevel(LOGLEVEL_LOW);
-    return true;
-}
 
-void CMainConfig::RegisterCommands()
-{
     // Register the commands
     RegisterCommand("start", CConsoleCommands::StartResource, false, "Usage: start <resource-name>\nStart a loaded resource eg: start admin");
     RegisterCommand("stop", CConsoleCommands::StopResource, false, "Usage: stop <resource-name>\nStop a resource eg: stop admin");
@@ -825,6 +819,7 @@ void CMainConfig::RegisterCommands()
     RegisterCommand("sfakelag", CConsoleCommands::FakeLag, false,
                     "Usage: sfakelag <packet loss> <extra ping> <ping variance> [<KBPS limit>]\nOnly available if enabled in the mtaserver.conf file.\nAdds "
                     "artificial packet loss, ping, jitter and bandwidth limits to the server-client connections.");
+    return true;
 }
 
 bool CMainConfig::Save()
@@ -852,12 +847,11 @@ bool CMainConfig::AddMissingSettings()
     if (!g_pGame->IsUsingMtaServerConf())
         return false;
 
-    // Load template
-    const char* szTemplateText =
-        #include MTA_SERVER_CONF_TEMPLATE
-        ;
-    SString strTemplateFilename = PathJoin(g_pServerInterface->GetServerModPath(), "resource-cache", "conf.template");
-    FileSave(strTemplateFilename, szTemplateText);
+    SString strTemplateFilename = PathJoin(g_pServerInterface->GetServerModPath(), "mtaserver.conf.template");
+
+    if (!FileExists(strTemplateFilename))
+        return false;
+
     CXMLFile* pFileTemplate = g_pServerInterface->GetXML()->CreateXML(strTemplateFilename);
     CXMLNode* pRootNodeTemplate = pFileTemplate && pFileTemplate->Parse() ? pFileTemplate->GetRootNode() : nullptr;
     if (!pRootNodeTemplate)
@@ -1468,6 +1462,8 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 0, 1, 1, "filter_duplicate_log_lines", &m_bFilterDuplicateLogLinesEnabled, NULL},
         {false, false, 0, 1, 1, "database_credentials_protection", &m_bDatabaseCredentialsProtectionEnabled, NULL},
         {false, false, 0, 0, 1, "fakelag", &m_bFakeLagCommandEnabled, NULL},
+        {true, true, 50, 1000, 5000, "player_triggered_event_interval", &m_iPlayerTriggeredEventIntervalMs, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
+        {true, true, 1, 100, 1000, "max_player_triggered_events_per_interval", &m_iMaxPlayerTriggeredEventsPerInterval, &CMainConfig::OnPlayerTriggeredEventIntervalChange},
     };
 
     static std::vector<SIntSetting> settingsList;
@@ -1510,4 +1506,15 @@ void CGame::ApplyAseSetting()
         if (!m_pLanBroadcast)
             m_pLanBroadcast = m_pASE->InitLan();
     }
+}
+
+void CMainConfig::OnPlayerTriggeredEventIntervalChange()
+{
+    g_pGame->ApplyPlayerTriggeredEventIntervalChange();
+}
+
+void CGame::ApplyPlayerTriggeredEventIntervalChange()
+{
+    m_iClientTriggeredEventsIntervalMs = m_pMainConfig->GetPlayerTriggeredEventInterval();
+    m_iMaxClientTriggeredEventsPerInterval = m_pMainConfig->GetMaxPlayerTriggeredEventsPerInterval();
 }

@@ -1,0 +1,202 @@
+<meta charset="utf-8">
+
+<template class="menu_item">
+    <svg class="menu_item" height="100" width="1000" xmlns="http://www.w3.org/2000/svg"><text dominant-baseline="text-before-edge" fill="#fff" font-family="Inter" font-size="43px" font-weight="700" letter-spacing="-1.5" y="25"></text></svg>
+</template>
+
+<template class="latest_news">
+    <svg class="latest_news" height="150" width="1000" xmlns="http://www.w3.org/2000/svg"><text dominant-baseline="text-before-edge" fill="#fff" font-family="Inter" font-size="43px" font-weight="700" letter-spacing="-2.5" y="50"></text></svg>
+</template>
+
+<script>
+    function rowBlank(imageData, width, y) {
+        const yw = y * width;
+        for (let x = 0; x < width; ++x) {
+            if (imageData.data[yw * 4 + x * 4 + 3] !== 0) return false;
+        }
+        return true;
+    }
+
+    function columnBlank(imageData, width, x, top, bottom) {
+        for (let y = top; y < bottom; ++y) {
+            if (imageData.data[y * width * 4 + x * 4 + 3] !== 0) return false;
+        }
+        return true;
+    }
+
+    /**
+     * trimCanvas edited from https://gist.github.com/timdown/021d9c8f2aabc7092df564996f5afbbf
+     */
+    function trimCanvas({ canvas, top: initTop, bottom: initBottom, left: initLeft, right: initRight }) {
+        const ctx = canvas.getContext('2d', { desynchronized: true, willReadFrequently: true });
+        const width = canvas.width;
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        let top = initTop ?? 0;
+        let bottom = initBottom ?? imageData.height;
+        let left = initLeft ?? 0;
+        let right = initRight ?? imageData.width;
+
+        if (initTop === undefined) {
+            while (top < bottom && rowBlank(imageData, width, top)) ++top;
+        }
+        if (initBottom === undefined) {
+            while (bottom - 1 > top && rowBlank(imageData, width, bottom - 1)) --bottom;
+        }
+        if (initLeft === undefined) {
+            while (left < right && columnBlank(imageData, width, left, top, bottom)) ++left;
+        }
+        if (initRight === undefined) {
+            while (right - 1 > left && columnBlank(imageData, width, right - 1, top, bottom)) --right;
+        }
+
+        const trimmed = ctx.getImageData(left, top, right - left, bottom - top);
+        const copy = canvas.ownerDocument.createElement('canvas');
+        copy.width = trimmed.width;
+        copy.height = trimmed.height;
+        const copyCtx = copy.getContext('2d', { desynchronized: true, willReadFrequently: true });
+        copyCtx.imageSmoothingEnabled = true;
+        copyCtx.putImageData(trimmed, 0, 0);
+
+        return { top, bottom, left, right, canvas: copy };
+    }
+
+    const xmlSerializer = new XMLSerializer();
+
+    async function svg2img({ constraints = {}, locale, svgs }, passTwo = false) {
+        const result = await Promise.all(svgs.map((svg) => new Promise((resolve, reject) => {
+            const xml = xmlSerializer.serializeToString(svg).replace('#000', '#fff');
+            const svg64 = btoa(unescape(encodeURIComponent(xml)));
+
+            const filename = `${svg.dataset.name}.png`;
+            const width = svg.width.baseVal.value;
+            const height = svg.height.baseVal.value;
+
+            const img = new Image(width, height);
+            img.src = `data:image/svg+xml;base64,${svg64}`;
+            img.onerror = () => reject(new Error(svg.dataset.name));
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d', { desynchronized: true, willReadFrequently: true });
+                ctx.imageSmoothingEnabled = true;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const trimmed = trimCanvas({ ...constraints, canvas });
+
+                if (passTwo) {
+                    resolve([
+                        filename,
+                        trimmed.canvas.toDataURL('image/png', 1.0).substring(22),
+                    ]);
+                } else {
+                    resolve(trimmed);
+                }
+            };
+        })));
+
+        if (passTwo) {
+            return result;
+        }
+
+        let leastTop;
+        let mostBottom;
+
+        for (const trimmed of result) {
+            if (leastTop === undefined || trimmed.top < leastTop) {
+                leastTop = trimmed.top;
+            }
+
+            if (mostBottom === undefined || trimmed.bottom > mostBottom) {
+                mostBottom = trimmed.bottom;
+            }
+        }
+
+        return svg2img({
+            constraints: {
+                top: leastTop,
+                bottom: mostBottom,
+            },
+            locale,
+            svgs,
+        }, true);
+    }
+
+    const images = {
+        menu_item: {
+            'About': 'menu_about',
+            'Disconnect': 'menu_disconnect',
+            'Host game': 'menu_host_game',
+            'Map editor': 'menu_map_editor',
+            'Server browser': 'menu_browse_servers',
+            'Settings': 'menu_settings',
+            'Quick connect': 'menu_quick_connect',
+            'Quit': 'menu_quit',
+        },
+        latest_news: {
+            'The Latest News': 'latest_news',
+        },
+    };
+
+    /**
+     * @todo / notes
+     * - Only render images that have changed
+     * - Maybe get rid of images entirely and just use font and figure out how to do letter spacing and scaling effect in MTA
+     */
+    function main() {
+        const locales = window.location.search.substring(9).split(',');
+
+        return Promise.all(locales.map(async (locale) => {
+            const response = await fetch(`locale/${locale}/main_menu.pot`);
+            const pot = await response.text();
+
+            const strings = [...pot.matchAll(/msgid "(.+)"\r?\nmsgstr "(.*)"/g)].reduce((accumulator, [, key, value]) => {
+                if (value) {
+                    accumulator[key] = value;
+                } else {
+                    accumulator[key] = key;
+                }
+                return accumulator;
+            }, {});
+
+            return [
+                locale,
+                (await Promise.all(Object.entries(images).map(([group, items]) => {
+                    const svgTemplate = document.querySelector(`template.${group}`).content;
+
+                    return svg2img({
+                        locale,
+                        svgs: Object.entries(items).map(([id, key]) => {
+                            const svg = svgTemplate.cloneNode(true).children[0];
+
+                            svg.dataset.name = key;
+
+                            if (group === 'latest_news') {
+                                svg.children[0].innerHTML = strings[id];
+                            } else {
+                                svg.children[0].innerHTML = strings[id].toUpperCase();
+                            }
+
+                            switch (locale) {
+                                case 'ar_SA':
+                                case 'fa_IR':
+                                case 'hi_IN':
+                                case 'ja_JP':
+                                case 'ko_KR':
+                                case 'zh_CN':
+                                case 'zh_TW':
+                                    svg.children[0].removeAttribute('letter-spacing');
+                                default:
+                                    break;
+                            }
+
+                            return svg;
+                        })
+                    });
+                }))).flat(),
+            ];
+        }));
+    }
+</script>
