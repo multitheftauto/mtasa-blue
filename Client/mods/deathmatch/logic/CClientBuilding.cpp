@@ -123,15 +123,15 @@ void CClientBuilding::Create()
 
 void CClientBuilding::Destroy()
 {
-    if (m_pBuilding)
+    if (!m_pBuilding)
+        return;
+
+    if (m_pHighBuilding)
     {
-        if (m_pHighBuilding)
-        {
-            m_pHighBuilding->GeBuildingEntity()->SetLod(nullptr);
-        }
-        g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
-        m_pBuilding = nullptr;
+        m_pHighBuilding->GeBuildingEntity()->SetLod(nullptr);
     }
+    g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
+    m_pBuilding = nullptr;
 }
 
 bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)

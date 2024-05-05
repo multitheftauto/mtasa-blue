@@ -1100,21 +1100,22 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
 void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* szReason)
 {
     CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain)
+    if (!pLuaMain)
+        return;
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return;
+    
+    if (pResource->GetMinClientReq() < szVersionReq)
     {
-        CResource* pResource = pLuaMain->GetResource();
-        if (pResource)
-        {
-            if (pResource->GetMinClientReq() < szVersionReq)
-            {
-                #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
-                SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least %s %s because %s)", "client",
-                                      szVersionReq, szReason);
-                throw std::invalid_argument(err);
-                #endif
-            }
-        }
+        #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+        SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client %s because %s)",
+                                szVersionReq, szReason);
+        throw std::invalid_argument(err);
+        #endif
     }
+    
 }
 
 //
