@@ -152,6 +152,7 @@ public:
     CColStore*                GetCollisionStore() override { return m_collisionStore; }
     CRenderWareSA*            GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
+    CIplStore*                GetIplStore() { return m_pIplStore; };
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -273,6 +274,9 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
+    void RemoveAllBuildings();
+    void RestoreGameBuildings();
+
 private:
     CPools*                         m_pPools;
     CPlayerInfo*                    m_pPlayerInfo;
@@ -320,6 +324,7 @@ private:
     CGameSettings*            m_pSettings;
     CCarEnterExit*            m_pCarEnterExit;
     CControllerConfigManager* m_pControllerConfigManager;
+    CIplStore*                m_pIplStore;
 
     eGameVersion m_eGameVersion;
     bool         m_bAsyncScriptEnabled;
