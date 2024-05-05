@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-05 03:08+0000\n"
-"PO-Revision-Date: 2024-05-05 09:12\n"
+"PO-Revision-Date: 2024-05-05 10:13\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -78,7 +78,7 @@ msgstr "Yes"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
-msgstr ""
+msgstr "फायर"
 
 #: Client/core/CKeyBinds.cpp:187
 msgid "Next weapon"
@@ -137,23 +137,23 @@ msgstr "पीछे देखने के लिए"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
-msgstr ""
+msgstr "क्राउच"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
-msgstr ""
+msgstr "एक्शन"
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
-msgstr ""
+msgstr "चलना"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
-msgstr ""
+msgstr "व्हीकल फायर"
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Vehicle secondary fire"
-msgstr ""
+msgstr "व्हीकल सेकंडरी फायर"
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
@@ -186,11 +186,11 @@ msgstr "अगला रेडियो"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr ""
+msgstr "रेडियो प्रीवियस"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr ""
+msgstr "रेडियो यूजर ट्रैक स्किप"
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
@@ -198,7 +198,7 @@ msgstr "हॉर्न"
 
 #: Client/core/CKeyBinds.cpp:215
 msgid "Sub-mission"
-msgstr ""
+msgstr "सुब-मिशन"
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
@@ -207,35 +207,35 @@ msgstr "हथब्रेक"
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr ""
+msgstr "वाहन दाहिने देखे"
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
-msgstr ""
+msgstr "वाहन दाहिने देखे"
 
 #: Client/core/CKeyBinds.cpp:219
 msgid "Vehicle look behind"
-msgstr ""
+msgstr "वाहन पीछे देखो"
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
-msgstr ""
+msgstr "वाहन माउस लुक"
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
-msgstr ""
+msgstr "स्पेशल कण्ट्रोल लेफ्ट"
 
 #: Client/core/CKeyBinds.cpp:222
 msgid "Special control right"
-msgstr ""
+msgstr "स्पेशल कण्ट्रोल राइट"
 
 #: Client/core/CKeyBinds.cpp:223
 msgid "Special control down"
-msgstr ""
+msgstr "स्पेशल कण्ट्रोल डाउन"
 
 #: Client/core/CKeyBinds.cpp:224
 msgid "Special control up"
-msgstr ""
+msgstr "स्पेशल कण्ट्रोल उप"
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
@@ -348,13 +348,13 @@ msgstr "Kharabi"
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 msgid "In-game"
-msgstr ""
+msgstr "इन गेम"
 
 #: Client/core/CCore.cpp:674 Client/core/CSettings.cpp:3461
 #: Client/core/CMainMenu.cpp:304
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 msgid "Main menu"
-msgstr ""
+msgstr "मुख्य मेनू"
 
 #: Client/core/CCore.cpp:811 Client/loader/CInstallManager.cpp:1057
 #, c-format
@@ -363,7 +363,7 @@ msgstr ""
 
 #: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
-msgstr ""
+msgstr "फेटल एरर"
 
 #: Client/core/CCore.cpp:938
 msgid "TO FIX, REMOVE THIS FILE:"
@@ -399,11 +399,11 @@ msgstr ""
 
 #: Client/core/CCore.cpp:1393
 msgid "shows the time"
-msgstr ""
+msgstr "समय दिखाता है"
 
 #: Client/core/CCore.cpp:1394
 msgid "shows the hud"
-msgstr ""
+msgstr "हुड दिखाता है"
 
 #: Client/core/CCore.cpp:1395
 msgid "shows all the binds"
@@ -570,11 +570,11 @@ msgstr ""
 
 #: Client/core/CCredits.cpp:110
 msgid "Patch contributors"
-msgstr ""
+msgstr "पैच कंट्रीब्युटर्स"
 
 #: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
-msgstr ""
+msgstr "विशेष धन्यवाद"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
@@ -734,23 +734,23 @@ msgstr "ऑटो-रिफ्रेश सर्वर ब्राउज़र
 
 #: Client/core/CSettings.cpp:376
 msgid "Allow screen upload"
-msgstr ""
+msgstr "स्क्रीन अपलोड की अनुमति दें"
 
 #: Client/core/CSettings.cpp:381
 msgid "Allow external sounds"
-msgstr ""
+msgstr "बाहरी साउंड की अनुमति दें"
 
 #: Client/core/CSettings.cpp:386
 msgid "Always show download window"
-msgstr ""
+msgstr "हमेशा डाउनलोड विंडो दिखाएं"
 
 #: Client/core/CSettings.cpp:391
 msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
+msgstr "डिस्कॉर्ड रिच प्रेजेंस को चालू की अनुमति दें"
 
 #: Client/core/CSettings.cpp:396
 msgid "Use customized GTA:SA files"
-msgstr ""
+msgstr "उसे कस्टमाइज्ड GTA:SA फाइल्स"
 
 #: Client/core/CSettings.cpp:401
 msgid "Map rendering options"
@@ -928,11 +928,11 @@ msgstr ""
 #: Client/core/CSettings.cpp:733 Client/core/CSettings.cpp:1074
 #: Client/core/CSettings.cpp:1509 Client/core/CSettings.cpp:3127
 msgid "High"
-msgstr ""
+msgstr "हाई"
 
 #: Client/core/CSettings.cpp:734 Client/core/CSettings.cpp:1511
 msgid "Very high"
-msgstr ""
+msgstr "वैरी हाई"
 
 #: Client/core/CSettings.cpp:749 Client/core/CSettings.cpp:772
 #: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1059
@@ -940,36 +940,36 @@ msgstr ""
 #: Client/core/CSettings.cpp:3134 Client/core/CSettings.cpp:3166
 #: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4216
 msgid "Off"
-msgstr ""
+msgstr "बंद"
 
 #: Client/core/CSettings.cpp:773 Client/core/CSettings.cpp:1517
 msgid "1x"
-msgstr ""
+msgstr "1x"
 
 #: Client/core/CSettings.cpp:774 Client/core/CSettings.cpp:1519
 msgid "2x"
-msgstr ""
+msgstr "2x"
 
 #: Client/core/CSettings.cpp:775 Client/core/CSettings.cpp:1521
 msgid "3x"
-msgstr ""
+msgstr "3x"
 
 #: Client/core/CSettings.cpp:788 Client/core/CSettings.cpp:1007
 #: Client/core/CSettings.cpp:1527 Client/core/CSettings.cpp:3136
 msgid "Auto"
-msgstr ""
+msgstr "ऑटो"
 
 #: Client/core/CSettings.cpp:789 Client/core/CSettings.cpp:1529
 msgid "4:3"
-msgstr ""
+msgstr "4:3"
 
 #: Client/core/CSettings.cpp:790 Client/core/CSettings.cpp:1531
 msgid "16:10"
-msgstr ""
+msgstr "16:10"
 
 #: Client/core/CSettings.cpp:791 Client/core/CSettings.cpp:1533
 msgid "16:9"
-msgstr ""
+msgstr "16:9"
 
 #: Client/core/CSettings.cpp:794
 msgid "HUD Match Aspect Ratio"
@@ -1127,7 +1127,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:3138
 #: Client/core/CSettings.cpp:3154 Client/core/CSettings.cpp:3161
 msgid "On"
-msgstr ""
+msgstr "चालू"
 
 #: Client/core/CSettings.cpp:1019 Client/core/CSettings.cpp:3143
 msgid "Very slow"
@@ -1747,17 +1747,17 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 msgid "Idle"
-msgstr ""
+msgstr "इडली"
 
 #: Client/core/ServerBrowser/CServerList.cpp:150
 msgid "player"
 msgid_plural "players"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "प्लेयर"
+msgstr[1] "प्लेयर्स"
 
 #: Client/core/ServerBrowser/CServerList.cpp:151
 msgid "on"
-msgstr ""
+msgstr "चालू"
 
 #: Client/core/ServerBrowser/CServerList.cpp:154
 msgid "server"
@@ -1829,36 +1829,36 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:97
 msgid "Players:"
-msgstr ""
+msgstr "प्लेयर्स:"
 
 #. Passworded
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr ""
+msgstr "पासवर्ड:"
 
 #. Latency
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:119
 msgid "Latency:"
-msgstr ""
+msgstr "लेटेंसी:"
 
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
 #: Client/core/ServerBrowser/CServerBrowser.cpp:478
 msgid "Player list"
-msgstr ""
+msgstr "प्लेयर लिस्ट"
 
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
 msgid "Close"
-msgstr ""
+msgstr "बंद करे"
 
 #. Join Game button
 #: Client/core/ServerBrowser/CServerInfo.cpp:152
 msgid "Join Game"
-msgstr ""
+msgstr "ज्वाइन गेम"
 
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
@@ -1878,7 +1878,7 @@ msgstr ""
 #: Client/loader/MainFunctions.cpp:603 Client/loader/MainFunctions.cpp:610
 #: Client/loader/MainFunctions.cpp:1219
 msgid "Information"
-msgstr ""
+msgstr "जानकारी"
 
 #. The server has timed out
 #: Client/core/ServerBrowser/CServerInfo.cpp:402
@@ -1972,40 +1972,40 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:453
 msgid "Name"
-msgstr ""
+msgstr "नाम"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:454
 msgid "Players"
-msgstr ""
+msgstr "प्लेयर्स"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 msgid "Ping"
-msgstr ""
+msgstr "पिंग"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:456
 msgid "Gamemode"
-msgstr ""
+msgstr "गेममोड"
 
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:486
 msgid "Include:"
-msgstr ""
+msgstr "शामिल:"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:492
 msgid "Empty"
-msgstr ""
+msgstr "खाली"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:498
 msgid "Full"
-msgstr ""
+msgstr "भरा हुआ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:504
 msgid "Locked"
-msgstr ""
+msgstr "बंद"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:516
 msgid "Offline"
-msgstr ""
+msgstr "ऑफ़लाइन"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:529
 msgid "Other Versions"
@@ -2013,12 +2013,12 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:550
 msgid "Back"
-msgstr ""
+msgstr "पीछे"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:556
 #: Client/loader/Dialogs.cpp:135
 msgid "Help"
-msgstr ""
+msgstr "सहायता"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:741
 msgid "Loading..."
@@ -2375,7 +2375,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:105
 #, c-format
 msgid "%s of %s"
-msgstr ""
+msgstr "%s का %s"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
@@ -2612,11 +2612,11 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:116
 msgid "All"
-msgstr ""
+msgstr "सारे"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr ""
+msgstr "शुरू करें"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
@@ -2815,7 +2815,7 @@ msgstr ""
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr ""
+msgstr "अननोन"
 
 #: Client/loader/Install.cpp:272
 #, c-format
@@ -3064,7 +3064,7 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:171
 msgid "Play MTA:SA"
-msgstr ""
+msgstr "MTA:SA खेल"
 
 #: Client/loader/Dialogs.cpp:177
 msgid "MTA: San Andreas - Confusing options"
