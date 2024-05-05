@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-05 03:08+0000\n"
-"PO-Revision-Date: 2024-05-05 10:13\n"
+"PO-Revision-Date: 2024-05-05 11:12\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -407,7 +407,7 @@ msgstr "हुड दिखाता है"
 
 #: Client/core/CCore.cpp:1395
 msgid "shows all the binds"
-msgstr ""
+msgstr "सभी बैंड्स दिखाता है"
 
 #: Client/core/CCore.cpp:1396
 msgid "shows your serial"
@@ -435,7 +435,7 @@ msgstr ""
 
 #: Client/core/CCore.cpp:1410
 msgid "outputs a screenshot"
-msgstr ""
+msgstr "स्क्रीनशॉट ले"
 
 #: Client/core/CCore.cpp:1411
 msgid "immediately saves the config"
@@ -554,11 +554,11 @@ msgstr ""
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
-msgstr ""
+msgstr "प्रोग्रामिंग"
 
 #: Client/core/CCredits.cpp:63
 msgid "Contributors"
-msgstr ""
+msgstr "सहयोगी"
 
 #: Client/core/CCredits.cpp:84
 msgid "Game Design / Scripting"
@@ -919,11 +919,11 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:731 Client/core/CSettings.cpp:1505
 msgid "Low"
-msgstr ""
+msgstr "कम"
 
 #: Client/core/CSettings.cpp:732 Client/core/CSettings.cpp:1507
 msgid "Medium"
-msgstr ""
+msgstr "मीडियम"
 
 #: Client/core/CSettings.cpp:733 Client/core/CSettings.cpp:1074
 #: Client/core/CSettings.cpp:1509 Client/core/CSettings.cpp:3127
@@ -1041,15 +1041,15 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:927
 msgid "Block"
-msgstr ""
+msgstr "ब्लॉक"
 
 #: Client/core/CSettings.cpp:935 Client/core/CSettings.cpp:970
 msgid "Domain"
-msgstr ""
+msgstr "डोमेन"
 
 #: Client/core/CSettings.cpp:937 Client/core/CSettings.cpp:972
 msgid "Remove domain"
-msgstr ""
+msgstr "डोमेन निकालें"
 
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:943
@@ -1063,7 +1063,7 @@ msgstr "अनुमत करें"
 #. Misc section label
 #: Client/core/CSettings.cpp:985
 msgid "Misc"
-msgstr ""
+msgstr "विविध"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:998
@@ -1145,15 +1145,15 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1021 Client/core/CSettings.cpp:3147
 msgid "Fast"
-msgstr ""
+msgstr "फ़ास्ट"
 
 #: Client/core/CSettings.cpp:1072 Client/core/CSettings.cpp:3123
 msgid "Normal"
-msgstr ""
+msgstr "नार्मल"
 
 #: Client/core/CSettings.cpp:1073 Client/core/CSettings.cpp:3125
 msgid "Above normal"
-msgstr ""
+msgstr "सामान्य से ऊपर"
 
 #: Client/core/CSettings.cpp:1109
 msgid "Min"
@@ -1240,11 +1240,11 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1997
 msgid "Skin:"
-msgstr ""
+msgstr "स्किन:"
 
 #: Client/core/CSettings.cpp:1997
 msgid "Presets:"
-msgstr ""
+msgstr "प्रीसेट:"
 
 #: Client/core/CSettings.cpp:2046
 msgid "Chat"
@@ -1284,35 +1284,35 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:2106
 msgid "Lines:"
-msgstr ""
+msgstr "लाइन्स"
 
 #: Client/core/CSettings.cpp:2106
 msgid "Scale:"
-msgstr ""
+msgstr "स्केल:"
 
 #: Client/core/CSettings.cpp:2106
 msgid "Width:"
-msgstr ""
+msgstr "चौड़ाई:"
 
 #: Client/core/CSettings.cpp:2109
 msgid "Size"
-msgstr ""
+msgstr "साइज"
 
 #: Client/core/CSettings.cpp:2158
 msgid "after"
-msgstr ""
+msgstr "बादमें"
 
 #: Client/core/CSettings.cpp:2158
 msgid "for"
-msgstr ""
+msgstr "के लिये"
 
 #: Client/core/CSettings.cpp:2158
 msgid "sec"
-msgstr ""
+msgstr "सेकंड"
 
 #: Client/core/CSettings.cpp:2161
 msgid "Fading"
-msgstr ""
+msgstr "फडिंग"
 
 #: Client/core/CSettings.cpp:2167
 msgid "Fade out old lines"
@@ -1320,11 +1320,11 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:2207
 msgid "Horizontal:"
-msgstr ""
+msgstr "हॉरिज़ोंटल:"
 
 #: Client/core/CSettings.cpp:2207
 msgid "Vertical:"
-msgstr ""
+msgstr "वर्टिकल:"
 
 #: Client/core/CSettings.cpp:2207
 msgid "Text-Align:"
@@ -1340,23 +1340,23 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:2214
 msgid "Position"
-msgstr ""
+msgstr "पोजीशन"
 
 #: Client/core/CSettings.cpp:2229 Client/core/CSettings.cpp:2243
 msgid "Center"
-msgstr ""
+msgstr "सेण्टर"
 
 #: Client/core/CSettings.cpp:2242
 msgid "Top"
-msgstr ""
+msgstr "टॉप"
 
 #: Client/core/CSettings.cpp:2244
 msgid "Bottom"
-msgstr ""
+msgstr "बॉटम"
 
 #: Client/core/CSettings.cpp:2292
 msgid "Font"
-msgstr ""
+msgstr "फ़ॉन्ट"
 
 #: Client/core/CSettings.cpp:2329
 msgid "Hide background when not typing"
@@ -1408,27 +1408,27 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:3760
 msgid "Red:"
-msgstr ""
+msgstr "लाल:"
 
 #: Client/core/CSettings.cpp:3760
 msgid "Green:"
-msgstr ""
+msgstr "हरा:"
 
 #: Client/core/CSettings.cpp:3760
 msgid "Blue:"
-msgstr ""
+msgstr "नीला:"
 
 #: Client/core/CSettings.cpp:3760
 msgid "Transparency:"
-msgstr ""
+msgstr "ट्रांसपेरेंट:"
 
 #: Client/core/CSettings.cpp:3763
 msgid "Color"
-msgstr ""
+msgstr "रंग"
 
 #: Client/core/CSettings.cpp:3840
 msgid "Preview"
-msgstr ""
+msgstr "प्रीव्यू"
 
 #: Client/core/CSettings.cpp:4148
 msgid "Please disconnect before changing language"
@@ -1607,7 +1607,7 @@ msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
-msgstr ""
+msgstr "व्यस्त"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Can't check for updates right now"
@@ -1637,11 +1637,11 @@ msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1788
 msgid "Connecting"
-msgstr ""
+msgstr "कनेक्टिंग"
 
 #: Client/core/CVersionUpdater.cpp:1789 Client/core/CVersionUpdater.cpp:1805
 msgid "Please wait..."
-msgstr ""
+msgstr "कृपया प्रतीक्षा करें..."
 
 #: Client/core/CVersionUpdater.cpp:1804
 msgid "CHECKING"
@@ -1661,7 +1661,7 @@ msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1840
 msgid "waiting..."
-msgstr ""
+msgstr "प्रतीक्षा करे"
 
 #: Client/core/CVersionUpdater.cpp:1856
 msgid "MANDATORY UPDATE"
@@ -1717,7 +1717,7 @@ msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:2088 Client/core/CVersionUpdater.cpp:2098
 msgid "Ok"
-msgstr ""
+msgstr "ठीक है"
 
 #: Client/core/CVersionUpdater.cpp:2096
 msgid "ERROR"
@@ -1762,7 +1762,7 @@ msgstr "चालू"
 #: Client/core/ServerBrowser/CServerList.cpp:154
 msgid "server"
 msgid_plural "servers"
-msgstr[0] ""
+msgstr[0] "सर्वर"
 msgstr[1] ""
 
 #. We are polling for the master server list (first pass)
