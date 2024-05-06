@@ -347,7 +347,7 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
             arguments.PushElement(pTeam); // Return team element as oldteam
             arguments.PushNil(); // No new team return nil
             player->CallEvent("onPlayerTeamChange", arguments);
-            arguments.DeleteArguments()
+            arguments.DeleteArguments();
         }
     }
 
