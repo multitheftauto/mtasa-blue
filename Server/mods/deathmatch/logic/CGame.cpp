@@ -1553,7 +1553,6 @@ void CGame::AddBuiltInEvents()
 
     // Object events
     m_Events.AddEvent("onObjectBreak", "attacker", nullptr, false);
-    m_Events.AddEvent("onObjectDamage", "loss, atacker", nullptr, false);
 
     // Pickup events
     m_Events.AddEvent("onPickupHit", "player", NULL, false);
