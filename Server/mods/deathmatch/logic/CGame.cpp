@@ -1158,12 +1158,6 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
-        case PACKET_ID_OBJECT_DAMAGE:
-        {
-            Packet_ObjectDamage(static_cast<CObjectDamagePacket&>(Packet));
-            return true;
-        }
-
         case PACKET_ID_WEAPON_BULLETSYNC:
         {
             Packet_WeaponBulletsync(static_cast<CCustomWeaponBulletSyncPacket&>(Packet));
@@ -2358,29 +2352,6 @@ void CGame::Packet_ObjectBreak(CObjectBreakPacket& Packet)
         Arguments.PushNil();
 
     pObject->CallEvent("onObjectBreak", Arguments);
-}
-
-void CGame::Packet_ObjectDamage(CObjectDamagePacket& Packet)
-{
-    CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (!pPlayer || !pPlayer->IsJoined())
-        return;
-
-    CElement* pObject = CElementIDs::GetElement(Packet.m_ObjectID);
-    if (!pObject || !IS_OBJECT(pObject))
-        return;
-
-    CElement* pAttacker = (Packet.m_Attacker != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Attacker) : nullptr;
-
-    CLuaArguments Arguments;
-    Arguments.PushNumber(Packet.m_fLoss);
-
-    if (pAttacker)
-        Arguments.PushElement(pAttacker);
-    else
-        Arguments.PushNil();
-
-    pObject->CallEvent("onObjectDamage", Arguments);
 }
 
 void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)

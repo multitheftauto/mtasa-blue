@@ -4775,22 +4775,15 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
     Arguments.PushNumber(fLoss);
 
     CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
-    ElementID      attackerID = INVALID_ELEMENT_ID;
 
     if (pClientAttacker)
     {
-        attackerID = pClientAttacker->GetID();
         Arguments.PushElement(pClientAttacker);
     }
     else
         Arguments.PushNil();
 
-    bool bResult = pClientObject->CallEvent("onClientObjectDamage", Arguments, true);
-
-    if (bResult && !pClientObject->IsLocalEntity())
-        SendObjectDamagePacket(pClientObject, fLoss, attackerID);
-
-    return bResult;
+    return pClientObject->CallEvent("onClientObjectDamage", Arguments, true);
 }
 
 bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEntitySAInterface* pAttackerInterface)
@@ -5609,23 +5602,6 @@ void CClientGame::SendObjectBreakPacket(CClientObject* pObject, ElementID attack
     pBitStream->Write(attackerID);
 
     g_pNet->SendPacket(PACKET_ID_OBJECT_BREAK, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
-    g_pNet->DeallocateNetBitStream(pBitStream);
-}
-
-void CClientGame::SendObjectDamagePacket(CClientObject* pObject, float fLoss, ElementID attackerID) const noexcept
-{
-    if (!pObject)
-        return;
-
-    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-    if (!pBitStream)
-        return;
-
-    pBitStream->Write(pObject->GetID());
-    pBitStream->Write(fLoss);
-    pBitStream->Write(attackerID);
-
-    g_pNet->SendPacket(PACKET_ID_OBJECT_DAMAGE, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_ORDERED);
     g_pNet->DeallocateNetBitStream(pBitStream);
 }
 

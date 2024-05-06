@@ -391,7 +391,6 @@ public:
                              AssocGroupId animGroup = 0, AnimationId animID = 15);
 
     void SendObjectBreakPacket(CClientObject* pObject, ElementID attackerID) const noexcept;
-    void SendObjectDamagePacket(CClientObject* pObject, float fHealthLoss, ElementID attackerID) const noexcept;
 
     CClientGUIElement* GetClickedGUIElement() { return m_pClickedGUIElement; }
     void               SetClickedGUIElement(CClientGUIElement* pElement) { m_pClickedGUIElement = NULL; }

@@ -154,5 +154,4 @@ enum ePacketID
 
     // Objects
     PACKET_ID_OBJECT_BREAK,
-    PACKET_ID_OBJECT_DAMAGE,
 };
