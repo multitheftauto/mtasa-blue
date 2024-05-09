@@ -1589,6 +1589,12 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
 
                 if (vecFiles.empty())
                 {
+                    if (glob::has_magic(strFilename))
+                    {
+                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+                        continue;
+                    }
+
                     m_strFailureReason = SString("Couldn't find file(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
@@ -1785,6 +1791,12 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 
                 if (vecFiles.empty())
                 {
+                    if (glob::has_magic(strFilename))
+                    {
+                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+                        continue;
+                    }
+
                     m_strFailureReason = SString("Couldn't find script(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
