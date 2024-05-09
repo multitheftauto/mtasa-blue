@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-05 03:08+0000\n"
-"PO-Revision-Date: 2024-05-09 18:12\n"
+"PO-Revision-Date: 2024-05-09 19:12\n"
 "Last-Translator: \n"
 "Language-Team: Hebrew\n"
 "Language: he_IL\n"
@@ -137,7 +137,7 @@ msgstr "להסתכל אחורה"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
-msgstr ""
+msgstr "להתכופף"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
@@ -145,52 +145,52 @@ msgstr "פעולה"
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
-msgstr ""
+msgstr "הליכה"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
-msgstr ""
+msgstr "יריית רכב"
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Vehicle secondary fire"
-msgstr ""
+msgstr "יריית רכב שניה"
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
-msgstr ""
+msgstr "רכב שמאל"
 
 #: Client/core/CKeyBinds.cpp:206
 msgid "Vehicle right"
-msgstr ""
+msgstr "רכב ימין"
 
 #. 20
 #: Client/core/CKeyBinds.cpp:207
 msgid "Steer forwards/down"
-msgstr ""
+msgstr "להטות קדימה\\למטה"
 
 #: Client/core/CKeyBinds.cpp:208
 msgid "Steer backwards/up"
-msgstr ""
+msgstr "להוטות אחורה\\למעלה"
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
-msgstr ""
+msgstr "האצה"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
-msgstr ""
+msgstr "בלימה\\ריוורס"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr ""
+msgstr "רדיו הבא"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr ""
+msgstr "רדיו הקודם"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr ""
+msgstr "רדיו של המשתמש לדלג"
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
@@ -207,56 +207,56 @@ msgstr "בלם-יד"
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr ""
+msgstr "רכב להסתכל שמאל"
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
-msgstr ""
+msgstr "רכב להסתכל ימין"
 
 #: Client/core/CKeyBinds.cpp:219
 msgid "Vehicle look behind"
-msgstr ""
+msgstr "רכב להסתכל אחורה"
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
-msgstr ""
+msgstr "להסתכל בעכבר ברכב"
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
-msgstr ""
+msgstr "מפתח מיוחד שמאל"
 
 #: Client/core/CKeyBinds.cpp:222
 msgid "Special control right"
-msgstr ""
+msgstr "מפתח מיוחד ימין"
 
 #: Client/core/CKeyBinds.cpp:223
 msgid "Special control down"
-msgstr ""
+msgstr "מפתח מיוחד למטה"
 
 #: Client/core/CKeyBinds.cpp:224
 msgid "Special control up"
-msgstr ""
+msgstr "מפתח מיוחד למעלה"
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
-msgstr ""
+msgstr "כוון"
 
 #: Client/core/CKeyBinds.cpp:226
 msgid "Conversation yes"
-msgstr ""
+msgstr "דיאלוג כן"
 
 #. 40
 #: Client/core/CKeyBinds.cpp:227
 msgid "Conversation no"
-msgstr ""
+msgstr "דיאלוג לא"
 
 #: Client/core/CKeyBinds.cpp:228
 msgid "Group control forwards"
-msgstr ""
+msgstr "מפתח קבוצה קדימה"
 
 #: Client/core/CKeyBinds.cpp:229
 msgid "Group control backwards"
-msgstr ""
+msgstr "מפתח קבוצה אחורה"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -269,7 +269,7 @@ msgstr "* השעה היא %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:242
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr ""
+msgstr "התחברות: הסינטקס הוא 'התחברות <הוסט> [<פורט> <שם> <סיסמה>]'"
 
 #: Client/core/CCommandFuncs.cpp:250 Client/core/CCommandFuncs.cpp:318
 msgid "connect: Bad port number"
@@ -291,7 +291,7 @@ msgstr "התחברות: נכשלה הפריקה של מצב המשחק הנוכ�
 
 #: Client/core/CCommandFuncs.cpp:371
 msgid "Bound all controls from GTA"
-msgstr ""
+msgstr "חוברו כל המפתחות מGTA"
 
 #: Client/core/CCommandFuncs.cpp:385
 msgid "Saved configuration file"
@@ -348,46 +348,46 @@ msgstr "שגיאה"
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1083
 msgid "In-game"
-msgstr ""
+msgstr "בזמן משחק"
 
 #: Client/core/CCore.cpp:674 Client/core/CSettings.cpp:3461
 #: Client/core/CMainMenu.cpp:304
 #: Client/mods/deathmatch/logic/CClientGame.cpp:527
 msgid "Main menu"
-msgstr ""
+msgstr "תפריט ראשי"
 
 #: Client/core/CCore.cpp:811 Client/loader/CInstallManager.cpp:1057
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr ""
+msgstr "MTA:SA לא יכולה להמשיך כי כונן %s אין בו מספיק זיכרון."
 
 #: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
 msgid "Fatal error"
-msgstr ""
+msgstr "שגיאת מערכת"
 
 #: Client/core/CCore.cpp:938
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr ""
+msgstr "כדי לתקן, הסיר קובץ זה:"
 
 #: Client/core/CCore.cpp:970
 #, c-format
 msgid "%s module is incorrect!"
-msgstr ""
+msgstr "מודול של %s אינו נכון!"
 
 #: Client/core/CCore.cpp:1275
 msgid "Error executing URL"
-msgstr ""
+msgstr "שגיאה בהעלאת URL"
 
 #: Client/core/CCore.cpp:1287
 #, c-format
 msgid "Error running mod specified in command line ('%s')"
-msgstr ""
+msgstr "שגיאה בהרצת המוד הנזכר בקו (%s)"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: Client/core/CCore.cpp:1389
 msgid "this help screen"
-msgstr ""
+msgstr "חלון עזרה זה"
 
 #: Client/core/CCore.cpp:1390 Client/core/CCore.cpp:1391
 msgid "exits the application"
@@ -407,11 +407,11 @@ msgstr "מציג את ה-HUD"
 
 #: Client/core/CCore.cpp:1395
 msgid "shows all the binds"
-msgstr ""
+msgstr "לראות את כל המפתחות"
 
 #: Client/core/CCore.cpp:1396
 msgid "shows your serial"
-msgstr ""
+msgstr "מראה את המספר הסיריאלי שלך"
 
 #: Client/core/CCore.cpp:1405
 msgid "connects to a server (host port nick pass)"
