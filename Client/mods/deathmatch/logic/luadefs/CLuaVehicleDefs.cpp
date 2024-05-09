@@ -241,7 +241,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getWheelScale", "getVehicleWheelScale");
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
     lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
-    lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<OOP_GetVehicleEntryPoints>);
+    lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<GetVehicleEntryPoints>);
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -4171,26 +4171,7 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
 
-std::variant<bool, std::array<std::array<float, 3>, 4>> CLuaVehicleDefs::GetVehicleEntryPoints(CClientVehicle* vehicle)
-{
-    if (CClientVehicleManager::GetMaxPassengerCount(vehicle->GetModel()) == 255)
-    {
-        return false;
-    }
-
-    std::array<std::array<float, 3>, 4> entryPoints;
-
-    for (unsigned int i = 0; i < 4; i++)
-    {
-        CVector entryPoint = vehicle->GetEntryPoint(i);
-
-        entryPoints[i] = {entryPoint.fX, entryPoint.fY, entryPoint.fZ};
-    }
-
-    return entryPoints;
-}
-
-std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryPoints(CClientVehicle* vehicle)
+std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::GetVehicleEntryPoints(CClientVehicle* vehicle)
 {
     if (CClientVehicleManager::GetMaxPassengerCount(vehicle->GetModel()) == 255)
     {
@@ -4199,9 +4180,10 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
 
     std::array<CVector, 4> entryPoints;
 
-    for (unsigned int i = 0; i < 4; i++)
+    std::uint32_t i = 0;
+    for (auto& entryPoint : entryPoints)
     {
-        entryPoints[i] = vehicle->GetEntryPoint(i);
+        entryPoint = vehicle->GetEntryPoint(i++);
     }
 
     return entryPoints;
