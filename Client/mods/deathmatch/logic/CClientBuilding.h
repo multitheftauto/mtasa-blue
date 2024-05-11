@@ -42,6 +42,8 @@ public:
 
     eClientEntityType GetType() const noexcept { return CCLIENTBUILDING; }
 
+    void SetUsesCollision(bool state);
+
     void Create();
     void Destroy();
     bool IsValid() const noexcept { return m_pBuilding != nullptr; };
@@ -62,4 +64,5 @@ private:
     CVector    m_vPos;
     CVector    m_vRot;
     uint8_t    m_interior;
+    bool       m_bUsesCollision;
 };

@@ -18,7 +18,8 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
       m_vPos(pos),
       m_vRot(rot),
       m_interior(interior),
-      m_pBuilding(nullptr)
+      m_pBuilding(nullptr),
+      m_bUsesCollision(true)
 {
     m_pManager = pManager;
     SetTypeName("building");
@@ -88,6 +89,15 @@ void CClientBuilding::SetModel(uint16_t model)
     }
 }
 
+void CClientBuilding::SetUsesCollision(bool state)
+{
+    m_bUsesCollision = state;
+    if (m_pBuilding)
+    {
+        m_pBuilding->SetUsesCollision(state);
+    }
+}
+
 void CClientBuilding::Create()
 {
     if (m_pBuilding)
@@ -97,6 +107,11 @@ void CClientBuilding::Create()
     ConvertZXYEulersToQuaternion(m_vRot, vRot4D);
 
     m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
+
+    if (m_bUsesCollision == false)
+    {
+        m_pBuilding->SetUsesCollision(m_bUsesCollision);
+    }
 }
 
 void CClientBuilding::Destroy()
