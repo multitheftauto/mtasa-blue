@@ -2026,7 +2026,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 12
+        BITCOUNT = 13
     };
     enum
     {
@@ -2074,6 +2074,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool coronaztest : 1;
         bool watercreatures : 1;
         bool burnflippedcars : 1;
+        bool roadsignstext : 1;
     } data;
 
     // Add new ones in separate structs
@@ -2098,6 +2099,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.watercreatures = true;
         data.burnflippedcars = true;
         data2.fireballdestruct = true;
+        data.roadsignstext = true;
     }
 };
 

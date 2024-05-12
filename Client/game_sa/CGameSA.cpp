@@ -729,6 +729,17 @@ void CGameSA::SetFireballDestructEnabled(bool isEnabled)
     m_isFireballDestructEnabled = isEnabled;
 }
 
+void CGameSA::SetRoadSignsTextEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isRoadSignsTextEnabled)
+        return;
+
+    // Skip JMP to CCustomRoadsignMgr::RenderRoadsignAtomic
+    MemPut<BYTE>(0x5342ED, isEnabled ? 0xEB : 0x74);
+
+    m_isRoadSignsTextEnabled = isEnabled;
+}
+
 bool CGameSA::PerformChecks()
 {
     std::map<std::string, SCheatSA*>::iterator it;
