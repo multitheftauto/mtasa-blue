@@ -70,6 +70,19 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 return false;
             pContactElement = CElementIDs::GetElement(Temp);
         }
+
+        // Player position
+        SPositionSync position(false);
+        if (!BitStream.Read(&position))
+            return false;
+
+        if (pContactElement != nullptr && !IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), MIN_CONTACT_SYNC_RADIUS))
+        {
+            pContactElement = nullptr;
+            // Use current player position. They are not reporting their absolute position so we have to disregard it.
+            position.data.vecPosition = pSourcePlayer->GetPosition();
+        }
+
         CElement* pPreviousContactElement = pSourcePlayer->GetContactElement();
         pSourcePlayer->SetContactElement(pContactElement);
 
@@ -89,11 +102,6 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             pSourcePlayer->CallEvent("onPlayerContact", Arguments);
         }
 
-        // Player position
-        SPositionSync position(false);
-        if (!BitStream.Read(&position))
-            return false;
-
         if (pContactElement)
         {
             pSourcePlayer->SetContactPosition(position.data.vecPosition);
@@ -102,6 +110,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             CVector vecTempPos = pContactElement->GetPosition();
             position.data.vecPosition += vecTempPos;
         }
+
         pSourcePlayer->SetPosition(position.data.vecPosition);
 
         // Player rotation
