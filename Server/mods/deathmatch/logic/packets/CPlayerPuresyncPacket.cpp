@@ -14,6 +14,7 @@
 #include "CElementIDs.h"
 #include "CWeaponNames.h"
 #include "Utils.h"
+#include "CTickRateSettings.h"
 #include <net/SyncStructures.h>
 
 extern CGame* g_pGame;
@@ -76,7 +77,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(&position))
             return false;
 
-        if (pContactElement != nullptr && !IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), MAX_CONTACT_SYNC_RADIUS))
+        if (pContactElement != nullptr && !IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), g_TickRateSettings.iVehicleContactSyncRadius))
         {
             pContactElement = nullptr;
             // Use current player position. They are not reporting their absolute position so we have to disregard it.

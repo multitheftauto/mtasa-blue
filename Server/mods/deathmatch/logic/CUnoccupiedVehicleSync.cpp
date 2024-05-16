@@ -488,7 +488,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehicle
             // Is the player syncing this vehicle and there is no driver? Also only process
             // this packet if the time context matches.
             if (pVehicle->GetSyncer() != pPlayer && pVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE &&
-                IsPointNearPoint3D(pVehicle->GetPosition(), pPlayer->GetPosition(), MAX_CONTACT_SYNC_RADIUS))
+                IsPointNearPoint3D(pVehicle->GetPosition(), pPlayer->GetPosition(), g_TickRateSettings.iVehicleContactSyncRadius))
             {
                 // Is there no player driver?
                 CPed* pOccupant = pVehicle->GetOccupant(0);
