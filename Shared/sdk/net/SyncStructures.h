@@ -2026,11 +2026,15 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 13
+        BITCOUNT = 12
     };
     enum
     {
         BITCOUNT2 = 1
+    };
+    enum
+    {
+        BITCOUNT3 = 1
     };
 
     bool Read(NetBitStreamInterface& bitStream)
@@ -2040,6 +2044,12 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
              isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
          else
              data2.fireballdestruct = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data3), BITCOUNT3);
+         else
+             data3.roadsignstext = true;
+
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2054,6 +2064,9 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2074,7 +2087,6 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool coronaztest : 1;
         bool watercreatures : 1;
         bool burnflippedcars : 1;
-        bool roadsignstext : 1;
     } data;
 
     // Add new ones in separate structs
@@ -2082,6 +2094,11 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     {
         bool fireballdestruct : 1;
     } data2;
+
+    struct
+    {
+        bool roadsignstext : 1;
+    } data3;
 
     SWorldSpecialPropertiesStateSync()
     {
@@ -2099,7 +2116,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.watercreatures = true;
         data.burnflippedcars = true;
         data2.fireballdestruct = true;
-        data.roadsignstext = true;
+        data3.roadsignstext = true;
     }
 };
 
