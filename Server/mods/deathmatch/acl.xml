@@ -49,6 +49,10 @@
    <group name="DevGroup">
       <acl name="DevACL" />
    </group>
+   <group name="runcodeACLGroup">
+      <acl name="runcodeACL" />
+      <object name="resource.runcode" />
+   </group>
    <acl name="Default">
       <right name="general.ModifyOtherObjects" access="false" />
       <right name="general.http" access="false" />
@@ -277,5 +281,8 @@
    <acl name="DevACL">
         <right name="resource.performancebrowser.http" access="true"></right>
         <right name="resource.ajax.http" access="true"></right>
+   </acl>
+   <acl name="runcodeACL">
+      <right name="function.loadstring" access="true" />
    </acl>
 </acl>
