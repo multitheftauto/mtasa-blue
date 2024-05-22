@@ -16,7 +16,14 @@ extern "C"
 }
 #include <net/bitstream.h>
 #include <string>
-#include "json.h"
+
+#include "rapidjson/document.h"
+#include "rapidjson/reader.h"
+#include "rapidjson/error/en.h"
+#include "rapidjson/error/error.h"
+#include "rapidjson/prettywriter.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
 
 class CClientEntity;
 class CLuaArguments;
@@ -59,9 +66,16 @@ public:
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
-    json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
-    bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
     char*        WriteToString(char* szBuffer, int length);
+
+    // json parser
+    bool        DeserializeValueFromJSON(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables = NULL);
+
+    // json serializer
+    bool        GetResourceNameFromUserData(std::string& result) const;
+
+    template    <typename Writer>
+    void        SerializeToJSON(Writer& writer, bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;

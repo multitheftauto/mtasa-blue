@@ -111,15 +111,13 @@ enum eFieldOfViewMode
 };
 DECLARE_ENUM(eFieldOfViewMode);
 
-#include "json.h"
-// Prettify toJSON (see mantis #9210)
-enum eJSONPrettyType
+enum eJSONPrettifyType
 {
-    JSONPRETTY_SPACES = JSON_C_TO_STRING_PRETTY,
-    JSONPRETTY_NONE = -1,
-    JSONPRETTY_TABS = JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_TAB
+    JSON_PRETTIFY_NONE = 1,
+    JSON_PRETTIFY_SPACES,
+    JSON_PRETTIFY_TABS,
 };
-DECLARE_ENUM(eJSONPrettyType);
+DECLARE_ENUM(eJSONPrettifyType);
 
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)

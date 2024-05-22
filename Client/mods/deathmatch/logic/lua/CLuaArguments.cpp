@@ -492,39 +492,205 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
     return bSuccess;
 }
 
-bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int flags)
+bool CLuaArguments::ReadJSONString(const char* szJSON, bool bBackwardsCompatibility)
 {
-    json_object* my_array = WriteToJSONArray(bSerialize);
-    if (my_array)
+    if (bBackwardsCompatibility)
     {
-        strJSON = json_object_to_json_string_ext(my_array, flags);
-        json_object_put(my_array);            // dereference - causes a crash, is actually commented out in the example too
+        // Backwards compatibility with old resources using function get()
+        // Fast isJSON check: Check first non-white space character is '[' or '{'
+        for (const char* ptr = szJSON; true;)
+        {
+            char c = *ptr++;
+            if (c == '[' || c == '{')
+                break;
+            if (isspace((uchar)c))
+                continue;
+            return false;
+        }
+    }
+
+    rapidjson::Document    doc;
+    rapidjson::ParseResult result = doc.Parse(szJSON);
+
+    if (!result)
+    {
+        g_pClientGame->GetScriptDebugging()->LogError(nullptr, "JSON Parser Error: %s (%u)", rapidjson::GetParseError_En(result.Code()), result.Offset());
+        return false;
+    }
+
+    std::vector<CLuaArguments*> knownTables;
+    bool                        bSuccess = true;
+
+    CLuaArgument* pArg = new CLuaArgument();
+    bSuccess = pArg->DeserializeValueFromJSON(doc, &knownTables);
+    m_Arguments.push_back(pArg);
+
+    // PushArguments(*this);
+
+    return bSuccess;
+}
+
+bool CLuaArguments::ReadJSONArray(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables)
+{
+    if (!obj.IsArray())
+        return false;
+
+    bool bKnownTablesCreated = false;
+    if (!pKnownTables)
+    {
+        pKnownTables = new std::vector<CLuaArguments*>();
+        bKnownTablesCreated = true;
+    }
+
+    pKnownTables->push_back(this);
+
+    bool bSuccess = true;
+    int  count = 1;
+
+    for (const auto& field : obj.GetArray())
+    {
+        // push key
+        CLuaArgument* pArg = new CLuaArgument();
+        pArg->ReadNumber(count);
+        m_Arguments.push_back(pArg);
+
+        // push value
+        pArg = new CLuaArgument();
+        bSuccess = pArg->DeserializeValueFromJSON(field, pKnownTables);
+        m_Arguments.push_back(pArg);
+
+        if (!bSuccess)
+            break;
+
+        // do not touch
+        count += 1;
+    }
+
+    if (bKnownTablesCreated)
+        delete pKnownTables;
+
+    return bSuccess;
+}
+
+bool CLuaArguments::ReadJSONObject(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables)
+{
+    if (!obj.IsObject())
+        return false;
+
+    bool bKnownTablesCreated = false;
+    if (!pKnownTables)
+    {
+        pKnownTables = new std::vector<CLuaArguments*>();
+        bKnownTablesCreated = true;
+    }
+
+    pKnownTables->push_back(this);
+
+    bool bSuccess = true;
+
+    for (rapidjson::Value::ConstMemberIterator itr = obj.MemberBegin(); itr != obj.MemberEnd(); ++itr)
+    {
+        std::string_view view(itr->name.GetString());
+
+        // push key
+        CLuaArgument* pArg = new CLuaArgument();
+        pArg->ReadString(view.data());
+        m_Arguments.push_back(pArg);
+
+        // push value
+        pArg = new CLuaArgument();
+        bSuccess = pArg->DeserializeValueFromJSON(itr->value, pKnownTables);
+        m_Arguments.push_back(pArg);
+
+        if (!bSuccess)
+            break;
+    }
+
+    if (bKnownTablesCreated)
+        delete pKnownTables;
+
+    return bSuccess;
+}
+
+///////////////////////////////////////////////////////////
+bool CLuaArguments::SerializeToJSONString(rapidjson::StringBuffer* buffer, bool bSerialize, int flags, bool bBackwardsCompatibility)
+{
+    try
+    {
+        rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(*buffer);
+        if (flags != JSON_PRETTIFY_NONE)
+        {
+            rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(*buffer);
+
+            switch (flags)
+            {
+                case JSON_PRETTIFY_SPACES:
+                    writer.SetIndent(' ', 1);
+                    writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatDefault);
+                    break;
+
+                case JSON_PRETTIFY_TABS:
+                    writer.SetIndent('\t', 2);
+                    writer.SetFormatOptions(rapidjson::PrettyFormatOptions::kFormatDefault);
+                    break;
+            }
+
+            if (bBackwardsCompatibility)
+                SerializeAsJSONArray(writer, bSerialize);
+            else
+                SerializeAsJSONObject(writer, bSerialize);
+        }
+        else
+        {
+            rapidjson::Writer<rapidjson::StringBuffer> writer(*buffer);
+
+            if (bBackwardsCompatibility)
+                SerializeAsJSONArray(writer, bSerialize);
+            else
+                SerializeAsJSONObject(writer, bSerialize);
+        }
+
         return true;
+    }
+    catch (const std::exception& e)
+    {
+        g_pClientGame->GetScriptDebugging()->LogError(nullptr, "Error while encoding JSON: %s", e.what());
+    }
+    catch (...)
+    {
+        g_pClientGame->GetScriptDebugging()->LogError(nullptr, "Unknown error while encoding!");
     }
     return false;
 }
 
-json_object* CLuaArguments::WriteToJSONArray(bool bSerialize)
+template <typename Writer>
+void CLuaArguments::SerializeAsJSONObject(Writer& writer, bool bSerialize)
 {
-    json_object*                          my_array = json_object_new_array();
     vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
-    for (; iter != m_Arguments.end(); iter++)
+    for (; iter != m_Arguments.end(); ++iter)
     {
         CLuaArgument* pArgument = *iter;
-        json_object*  object = pArgument->WriteToJSONObject(bSerialize);
-        if (object)
-        {
-            json_object_array_add(my_array, object);
-        }
-        else
-        {
-            break;
-        }
+        pArgument->SerializeToJSON(writer, bSerialize);
     }
-    return my_array;
 }
 
-json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+template <typename Writer>
+void CLuaArguments::SerializeAsJSONArray(Writer& writer, bool bSerialize)
+{
+    writer.StartArray();
+
+    vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
+    for (; iter != m_Arguments.end(); ++iter)
+    {
+        CLuaArgument* pArgument = *iter;
+        pArgument->SerializeToJSON(writer, bSerialize);
+    }
+
+    writer.EndArray();
+}
+
+template <typename Writer>
+void CLuaArguments::ConvertTableToJSON(Writer& writer, bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
@@ -569,183 +735,52 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
 
     if (bIsArray)
     {
-        json_object*                          my_array = json_object_new_array();
+        writer.StartArray();
+
         vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
-        for (; iter != m_Arguments.end(); iter++)
+        for (; iter != m_Arguments.end(); ++iter)
         {
             iter++;            // skip the key values
             CLuaArgument* pArgument = *iter;
-            json_object*  object = pArgument->WriteToJSONObject(bSerialize, pKnownTables);
-            if (object)
-            {
-                json_object_array_add(my_array, object);
-            }
-            else
-            {
-                break;
-            }
+            pArgument->SerializeToJSON(writer, bSerialize, pKnownTables);
         }
+
+        writer.EndArray();
+
         if (bKnownTablesCreated)
             delete pKnownTables;
-        return my_array;
     }
     else
     {
-        json_object* my_object = json_object_new_object();
-        iter = m_Arguments.begin();
-        for (; iter != m_Arguments.end(); iter++)
-        {
-            char szKey[255];
-            szKey[0] = '\0';
-            CLuaArgument* pArgument = *iter;
-            if (!pArgument->WriteToString(szKey, 255))            // index
-                break;
-            iter++;
-            pArgument = *iter;
-            json_object* object = pArgument->WriteToJSONObject(bSerialize, pKnownTables);            // value
+        writer.StartObject();
 
-            if (object)
-            {
-                json_object_object_add(my_object, szKey, object);
-            }
+        iter = m_Arguments.begin();
+        for (; iter != m_Arguments.end(); ++iter)
+        {
+            // key
+            CLuaArgument*      pArgument = *iter;
+            const std::string& key = pArgument->GetString();
+
+            if (!key.empty())
+                writer.Key(key.c_str(), static_cast<rapidjson::SizeType>(key.length()));
             else
-            {
-                break;
-            }
+                writer.Null();
+
+            ++iter;
+            pArgument = *iter;
+            pArgument->SerializeToJSON(writer, bSerialize, pKnownTables);
         }
+
+        writer.EndObject();
+
         if (bKnownTablesCreated)
             delete pKnownTables;
-        return my_object;
     }
 }
 
-bool CLuaArguments::ReadFromJSONString(const char* szJSON)
-{
-    // Fast isJSON check: Check first non-white space character is '[' or '{'
-    for (const char* ptr = szJSON; true;)
-    {
-        char c = *ptr++;
-        if (c == '[' || c == '{')
-            break;
-        if (isspace((uchar)c))
-            continue;
-        return false;
-    }
-
-    json_object* object = json_tokener_parse(szJSON);
-    if (object)
-    {
-        if (json_object_get_type(object) == json_type_array)
-        {
-            bool bSuccess = true;
-
-            std::vector<CLuaArguments*> knownTables;
-
-            for (uint i = 0; i < json_object_array_length(object); i++)
-            {
-                json_object*  arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument* pArgument = new CLuaArgument();
-                bSuccess = pArgument->ReadFromJSONObject(arrayObject, &knownTables);
-                m_Arguments.push_back(pArgument);            // then the value
-                if (!bSuccess)
-                    break;
-            }
-            json_object_put(object);            // dereference
-            return bSuccess;
-        }
-        else if (json_object_get_type(object) == json_type_object)
-        {
-            std::vector<CLuaArguments*> knownTables;
-            CLuaArgument*               pArgument = new CLuaArgument();
-            bool                        bSuccess = pArgument->ReadFromJSONObject(object, &knownTables);
-            m_Arguments.push_back(pArgument);            // value
-            json_object_put(object);
-
-            return bSuccess;
-        }
-        json_object_put(object);            // dereference
-    }
-    //    else
-    //        g_pClientGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
-    //   else
-    //        g_pClientGame->GetScriptDebugging()->LogError ( "Could not parse HTTP POST request, ensure data uses JSON.");
-    return false;
-}
-
-bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
-{
-    if (object)
-    {
-        if (json_object_get_type(object) == json_type_object)
-        {
-            bool bKnownTablesCreated = false;
-            if (!pKnownTables)
-            {
-                pKnownTables = new std::vector<CLuaArguments*>();
-                bKnownTablesCreated = true;
-            }
-
-            pKnownTables->push_back(this);
-
-            bool bSuccess = true;
-            json_object_object_foreach(object, key, val)
-            {
-                CLuaArgument* pArgument = new CLuaArgument();
-                pArgument->ReadString(key);
-                m_Arguments.push_back(pArgument);            // push the key first
-                pArgument = new CLuaArgument();
-                bSuccess = pArgument->ReadFromJSONObject(val, pKnownTables);            // then the value
-                m_Arguments.push_back(pArgument);
-                if (!bSuccess)
-                    break;
-            }
-
-            if (bKnownTablesCreated)
-                delete pKnownTables;
-            return bSuccess;
-        }
-    }
-    //   else
-    //        g_pClientGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
-    return false;
-}
-
-bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
-{
-    if (object)
-    {
-        if (json_object_get_type(object) == json_type_array)
-        {
-            bool bKnownTablesCreated = false;
-            if (!pKnownTables)
-            {
-                pKnownTables = new std::vector<CLuaArguments*>();
-                bKnownTablesCreated = true;
-            }
-
-            pKnownTables->push_back(this);
-
-            bool bSuccess = true;
-            for (uint i = 0; i < json_object_array_length(object); i++)
-            {
-                json_object*  arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument* pArgument = new CLuaArgument();
-                pArgument->ReadNumber(i + 1);            // push the key
-                m_Arguments.push_back(pArgument);
-
-                pArgument = new CLuaArgument();
-                bSuccess = pArgument->ReadFromJSONObject(arrayObject, pKnownTables);
-                m_Arguments.push_back(pArgument);            // then the valoue
-                if (!bSuccess)
-                    break;
-            }
-
-            if (bKnownTablesCreated)
-                delete pKnownTables;
-            return bSuccess;
-        }
-    }
-    //    else
-    //        g_pClientGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
-    return false;
-}
+template void CLuaArguments::ConvertTableToJSON<rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>>(
+    rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>& writer, bool bSerialize,
+    CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables);
+template void CLuaArguments::ConvertTableToJSON<rapidjson::PrettyWriter<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>>(
+    rapidjson::PrettyWriter<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>& writer, bool bSerialize,
+    CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables);

@@ -781,106 +781,15 @@ void CLuaArgument::DeleteTableData()
     }
 }
 
-json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+bool CLuaArgument::GetResourceNameFromUserData(std::string& result) const
 {
-    switch (GetType())
-    {
-        case LUA_TNIL:
-        {
-            return json_object_new_int(0);
-        }
-        case LUA_TBOOLEAN:
-        {
-            return json_object_new_boolean(GetBoolean());
-        }
-        case LUA_TTABLE:
-        {
-            ulong* pTableId;
-            if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
-            {
-                // Self-referencing table
-                char szTableID[10];
-                snprintf(szTableID, sizeof(szTableID), "^T^%lu", *pTableId);
-                return json_object_new_string(szTableID);
-            }
-            else
-            {
-                return m_pTableData->WriteTableToJSONObject(bSerialize, pKnownTables);
-            }
-        }
-        case LUA_TNUMBER:
-        {
-            int iNumber;
-            if (ShouldUseInt(GetNumber(), &iNumber))
-            {
-                return json_object_new_int(iNumber);
-            }
-            else
-            {
-                return json_object_new_double(GetNumber());
-            }
-            break;
-        }
-        case LUA_TSTRING:
-        {
-            SString strTemp = GetString();
-            if (strTemp.length() > 3 && strTemp[0] == '^' && strTemp[2] == '^' && strTemp[1] != '^')
-            {
-                // Prevent clash with how MTA stores elements, resources and table refs as strings
-                strTemp[2] = '~';
-            }
-            if (strTemp.length() <= USHRT_MAX)
-            {
-                return json_object_new_string_len(strTemp.c_str(), strTemp.length());
-            }
-            else
-            {
-                g_pClientGame->GetScriptDebugging()->LogError(NULL,
-                                                              "Couldn't convert argument list to JSON. Invalid string specified, limit is 65535 characters.");
-            }
-            break;
-        }
-        case LUA_TUSERDATA:
-        case LUA_TLIGHTUSERDATA:
-        {
-            CClientEntity* pElement = GetElement();
-            CResource*     pResource = g_pClientGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(GetUserData()));
+    CResource*         pResource = g_pClientGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(GetUserData()));
+    if (!VERIFY_RESOURCE(pResource))
+        return {};
 
-            // Elements are dynamic, so storing them is potentially unsafe
-            if (pElement && bSerialize)
-            {
-                char szElementID[10] = {0};
-                snprintf(szElementID, 9, "^E^%d", (int)pElement->GetID().Value());
-                return json_object_new_string(szElementID);
-            }
-            else if (VERIFY_RESOURCE(pResource))
-            {
-                char szElementID[MAX_RESOURCE_NAME_LENGTH + 4] = {0};
-                snprintf(szElementID, MAX_RESOURCE_NAME_LENGTH + 3, "^R^%s", pResource->GetName() /*.c_str ()*/);
-                return json_object_new_string(szElementID);
-            }
-            else
-            {
-                if (pElement)            // eg toJSON() with valid element
-                    g_pClientGame->GetScriptDebugging()->LogError(NULL, "Couldn't convert userdata argument to JSON, elements not allowed for this function.");
-                else if (!bSerialize)            // eg toJSON() with invalid element
-                    g_pClientGame->GetScriptDebugging()->LogError(
-                        NULL, "Couldn't convert userdata argument to JSON, only valid resources can be included for this function.");
-                else
-                    g_pClientGame->GetScriptDebugging()->LogError(
-                        NULL, "Couldn't convert userdata argument to JSON, only valid elements or resources can be included.");
-                return NULL;
-            }
-            break;
-        }
-        default:
-        {
-            g_pClientGame->GetScriptDebugging()->LogError(
-                NULL, "Couldn't convert argument list to JSON, unsupported data type. Use Table, Nil, String, Number, Boolean, Resource or Element.");
-            return NULL;
-        }
-    }
-    return NULL;
+    const std::string& resourceName = pResource->GetName();
+    result = resourceName;
+    return !resourceName.empty();
 }
 
 char* CLuaArgument::WriteToString(char* szBuffer, int length)
@@ -968,108 +877,199 @@ char* CLuaArgument::WriteToString(char* szBuffer, int length)
     return NULL;
 }
 
-bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArgument::DeserializeValueFromJSON(const rapidjson::Value& obj, std::vector<CLuaArguments*>* pKnownTables)
 {
     DeleteTableData();
 
-    if (!object)
-        m_iType = LUA_TNIL;
-    else
+    switch (obj.GetType())
     {
-        switch (json_object_get_type(object))
+        case rapidjson::Type::kNullType:
+            m_iType = LUA_TNIL;
+            break;
+        case rapidjson::Type::kTrueType:
+        case rapidjson::Type::kFalseType:
+            ReadBool(obj.GetBool());
+            break;
+        case rapidjson::Type::kArrayType:
         {
-            case json_type_null:
-                m_iType = LUA_TNIL;
-                break;
-            case json_type_boolean:
-                if (json_object_get_boolean(object) == TRUE)
-                    ReadBool(true);
-                else
-                    ReadBool(false);
-                break;
-            case json_type_double:
-            case json_type_int:
-                ReadNumber(json_object_get_double(object));
-                break;
-            case json_type_object:
-                m_pTableData = new CLuaArguments();
-                m_pTableData->ReadFromJSONObject(object, pKnownTables);
-                m_bWeakTableRef = false;
-                m_iType = LUA_TTABLE;
-                break;
-            case json_type_array:
-                m_pTableData = new CLuaArguments();
-                m_pTableData->ReadFromJSONArray(object, pKnownTables);
-                m_bWeakTableRef = false;
-                m_iType = LUA_TTABLE;
-                break;
-            case json_type_string:
+            m_pTableData = new CLuaArguments();
+            m_pTableData->ReadJSONArray(obj, pKnownTables);
+            m_bWeakTableRef = false;
+            m_iType = LUA_TTABLE;
+            break;
+        }
+        case rapidjson::Type::kObjectType:
+        {
+            m_pTableData = new CLuaArguments();
+            m_pTableData->ReadJSONObject(obj, pKnownTables);
+            m_bWeakTableRef = false;
+            m_iType = LUA_TTABLE;
+            break;
+        }
+        case rapidjson::Type::kNumberType:
+            ReadNumber(obj.IsInt() ? obj.GetInt() : obj.GetDouble());
+            break;
+        case rapidjson::Type::kStringType:
+        {
+            std::string_view view(obj.GetString());
+            if (view.length() > 3 && view[0] == '^' && view[2] == '^' && view[1] != '^')
             {
-                int     iLength = json_object_get_string_len(object);
-                SString strString;
-                strString.assign(json_object_get_string(object), iLength);
-                if (iLength > 3 && strString[0] == '^' && strString[2] == '^' && strString[1] != '^')
+                switch (view[1])
                 {
-                    switch (strString[1])
+                    case 'E':
                     {
-                        case 'E':            // element
+                        int       id = atoi(view.data() + 3);
+                        CElement* element = nullptr;
+                        if (id != INT_MAX && id != INT_MIN && id != 0)
+                            element = CElementIDs::GetElement(id);
+                        if (element)
+                            ReadElement(element);
+                        else
+                            m_iType = LUA_TNIL;
+                        break;
+                    }
+                    case 'R':
+                    {
+                        CResource* resource = g_pClientGame->GetResourceManager()->GetResource(view.data() + 3);
+                        if (resource)
+                            ReadScriptID(resource->GetScriptID());
+                        else
                         {
-                            int            id = atoi(strString.c_str() + 3);
-                            CClientEntity* element = NULL;
-                            if (id != INT_MAX && id != INT_MIN && id != 0)
-                                element = CElementIDs::GetElement(id);
-                            if (element)
-                            {
-                                ReadElement(element);
-                            }
-                            else
-                            {
-                                // Appears sometimes when a player quits
-                                // g_pClientGame->GetScriptDebugging()->LogError ( NULL, "Invalid element specified in JSON string '%s'.", szString );
-                                m_iType = LUA_TNIL;
-                            }
-                            break;
+                            g_pClientGame->GetScriptDebugging()->LogError(nullptr, "Invalid resource specified in JSON string '%s'.", view.data());
+                            m_iType = LUA_TNIL;
                         }
-                        case 'R':            // resource
+                        break;
+                    }
+                    case 'T':
+                    {
+                        // this should only works on "disabled ref"?
+                        unsigned long ulTableID = static_cast<unsigned long>(atol(view.data() + 3));
+                        if (pKnownTables && ulTableID < pKnownTables->size())
                         {
-                            CResource* resource = g_pClientGame->GetResourceManager()->GetResource(strString.c_str() + 3);
-                            if (resource)
-                            {
-                                ReadScriptID(resource->GetScriptID());
-                            }
-                            else
-                            {
-                                g_pClientGame->GetScriptDebugging()->LogError(NULL, "Invalid resource specified in JSON string '%s'.", strString.c_str());
-                                m_iType = LUA_TNIL;
-                            }
-                            break;
+                            m_pTableData = pKnownTables->at(ulTableID);
+                            m_bWeakTableRef = true;
+                            m_iType = LUA_TTABLE;
                         }
-                        case 'T':            // Table reference
+                        else
                         {
-                            unsigned long ulTableID = static_cast<unsigned long>(atol(strString.c_str() + 3));
-                            if (pKnownTables && ulTableID < pKnownTables->size())
-                            {
-                                m_pTableData = pKnownTables->at(ulTableID);
-                                m_bWeakTableRef = true;
-                                m_iType = LUA_TTABLE;
-                            }
-                            else
-                            {
-                                g_pClientGame->GetScriptDebugging()->LogError(NULL, "Invalid table reference specified in JSON string '%s'.",
-                                                                              strString.c_str());
-                                m_iType = LUA_TNIL;
-                            }
-                            break;
+                            g_pClientGame->GetScriptDebugging()->LogError(nullptr, "Invalid table reference specified in JSON string '%s'.", view.data());
+                            m_iType = LUA_TNIL;
                         }
+                        break;
                     }
                 }
-                else
-                    ReadString(strString);
-                break;
             }
-            default:
-                return false;
+            else
+                ReadString(view.data());
+            break;
         }
+        default:
+            return false;
     }
     return true;
 }
+
+template <typename Writer>
+void CLuaArgument::SerializeToJSON(Writer& writer, bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
+{
+    switch (GetType())
+    {
+        case LUA_TNIL:
+            writer.Null();
+            break;
+        case LUA_TBOOLEAN:
+            writer.Bool(GetBoolean());
+            break;
+        case LUA_TTABLE:
+        {
+            /*
+            for now its disabled
+
+            ulong* pTableId;
+            if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
+            {
+                // Self-referencing table
+                char szTableID[10];
+                snprintf(szTableID, sizeof(szTableID), "^T^%lu", *pTableId);
+                writer->String(szTableID, static_cast<rapidjson::SizeType>(strlen(szTableID)));
+            } else*/
+
+            m_pTableData->ConvertTableToJSON(writer, bSerialize, pKnownTables);
+            break;
+        }
+        case LUA_TNUMBER:
+        {
+            int number;
+            if (ShouldUseInt(GetNumber(), &number))
+                writer.Int(number);
+            else
+                writer.Double(GetNumber());
+
+            break;
+        }
+        case LUA_TSTRING:
+        {
+            SString strTemp = GetString();
+            if (strTemp.length() > 3 && strTemp[0] == '^' && strTemp[2] == '^' && strTemp[1] != '^')
+            {
+                // Prevent clash with how MTA stores elements, resources and table refs as strings
+                strTemp[2] = '~';
+            }
+
+            if (strTemp.length() <= USHRT_MAX)
+                writer.String(strTemp.c_str(), static_cast<rapidjson::SizeType>(strTemp.length()));
+            else
+            {
+                g_pClientGame->GetScriptDebugging()->LogError(NULL, "Invalid string specified, limit is 65535 characters.");
+                writer.Null();
+            }
+            break;
+        }
+        case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
+        {
+            CClientEntity* pElement = GetElement();
+            std::string pResourceName;
+
+            if (pElement && bSerialize)
+            {
+                SString elementID = SString("^E^%d", (int)pElement->GetID().Value());
+                writer.String(elementID.c_str(), static_cast<rapidjson::SizeType>(strlen(elementID)));
+            }
+            else if (GetResourceNameFromUserData(pResourceName))
+            {
+                SString resourceName = SString("^R^%s", pResourceName.c_str());
+                writer.String(resourceName.c_str(), static_cast<rapidjson::SizeType>(strlen(resourceName)));
+            }
+            else
+            {
+                if (pElement)            // eg toJSON() with valid element
+                    g_pClientGame->GetScriptDebugging()->LogError(NULL, "Couldn't convert userdata argument to JSON, elements not allowed for this function.");
+                else if (!bSerialize)            // eg toJSON() with invalid element
+                    g_pClientGame->GetScriptDebugging()->LogError(
+                        NULL, "Couldn't convert userdata argument to JSON, only valid resources can be included for this function.");
+                else
+                    g_pClientGame->GetScriptDebugging()->LogError(
+                        NULL,
+                                                            "Couldn't convert userdata argument to JSON, only valid elements or resources can be included.");
+                writer.Null();
+            }
+            break;
+        }
+        case LUA_TFUNCTION:
+        case LUA_TTHREAD:
+        case LUA_TNONE:
+        default:
+        {
+            g_pClientGame->GetScriptDebugging()->LogError(NULL, "Unsupported data type. Use Table, Nil, String, Number, Boolean, Resource or Element.");
+            writer.Null();
+        }
+    }
+}
+
+template void CLuaArgument::SerializeToJSON<rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>>(
+    rapidjson::Writer<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>& writer, bool bSerialize,
+    CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables);
+template void CLuaArgument::SerializeToJSON<rapidjson::PrettyWriter<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>>(
+    rapidjson::PrettyWriter<rapidjson::GenericStringBuffer<rapidjson::UTF8<char>, rapidjson::CrtAllocator>>& writer, bool bSerialize,
+    CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables);

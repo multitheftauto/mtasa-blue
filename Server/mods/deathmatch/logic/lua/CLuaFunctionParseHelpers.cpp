@@ -85,11 +85,11 @@ ADD_ENUM(HUD_CROSSHAIR, "crosshair")
 ADD_ENUM(HUD_ALL, "all")
 IMPLEMENT_ENUM_END("hud-component")
 
-IMPLEMENT_ENUM_BEGIN(eJSONPrettyType)
-ADD_ENUM(JSONPRETTY_SPACES, "spaces")
-ADD_ENUM(JSONPRETTY_NONE, "none")
-ADD_ENUM(JSONPRETTY_TABS, "tabs")
-IMPLEMENT_ENUM_END("json-pretty-type")
+IMPLEMENT_ENUM_BEGIN(eJSONPrettifyType)
+ADD_ENUM(JSON_PRETTIFY_NONE, "none")
+ADD_ENUM(JSON_PRETTIFY_SPACES, "spaces")
+ADD_ENUM(JSON_PRETTIFY_TABS, "tabs")
+IMPLEMENT_ENUM_END("json-prettify-type")
 
 IMPLEMENT_ENUM_BEGIN(eWeaponType)
 // Compatible with getWeaponNameFromID                          From setWeaponProperty before r4523
