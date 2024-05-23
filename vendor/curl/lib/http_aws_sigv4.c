@@ -158,10 +158,7 @@ static CURLcode make_headers(struct Curl_easy *data,
   msnprintf(date_full_hdr, DATE_FULL_HDR_LEN,
             "x-%s-date:%s", provider1, timestamp);
 
-  if(Curl_checkheaders(data, STRCONST("Host"))) {
-    head = NULL;
-  }
-  else {
+  if(!Curl_checkheaders(data, STRCONST("Host"))) {
     char full_host[FULL_HOST_LEN + 1];
 
     if(data->state.aptr.host) {
@@ -247,7 +244,7 @@ static CURLcode make_headers(struct Curl_easy *data,
   }
   else {
     char *value;
-
+    char *endp;
     value = strchr(*date_header, ':');
     if(!value) {
       *date_header = NULL;
@@ -256,8 +253,17 @@ static CURLcode make_headers(struct Curl_easy *data,
     ++value;
     while(ISBLANK(*value))
       ++value;
-    strncpy(timestamp, value, TIMESTAMP_SIZE - 1);
-    timestamp[TIMESTAMP_SIZE - 1] = 0;
+    endp = value;
+    while(*endp && ISALNUM(*endp))
+      ++endp;
+    /* 16 bytes => "19700101T000000Z" */
+    if((endp - value) == TIMESTAMP_SIZE - 1) {
+      memcpy(timestamp, value, TIMESTAMP_SIZE - 1);
+      timestamp[TIMESTAMP_SIZE - 1] = 0;
+    }
+    else
+      /* bad timestamp length */
+      timestamp[0] = 0;
     *date_header = NULL;
   }
 
@@ -605,7 +611,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
       result = CURLE_URL_MALFORMAT;
       goto fail;
     }
-    strncpy(service, hostname, len);
+    memcpy(service, hostname, len);
     service[len] = '\0';
 
     infof(data, "aws_sigv4: picked service %s from host", service);
@@ -624,7 +630,7 @@ CURLcode Curl_output_aws_sigv4(struct Curl_easy *data, bool proxy)
         result = CURLE_URL_MALFORMAT;
         goto fail;
       }
-      strncpy(region, reg, len);
+      memcpy(region, reg, len);
       region[len] = '\0';
       infof(data, "aws_sigv4: picked region %s from host", region);
     }
