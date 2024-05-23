@@ -6093,6 +6093,8 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
             return true;
         case WorldSpecialProperty::EXTENDEDWATERCANNONS:
             g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
+        case WorldSpecialProperty::ROADSIGNSTEXT:
+            g_pGame->SetRoadSignsTextEnabled(isEnabled);
             return true;
     }
     return false;
@@ -6127,6 +6129,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsFireballDestructEnabled();
         case WorldSpecialProperty::EXTENDEDWATERCANNONS:
             return g_pGame->IsExtendedWaterCannonsEnabled();
+        case WorldSpecialProperty::ROADSIGNSTEXT:
+            return g_pGame->IsRoadSignsTextEnabled();
     }
     return false;
 }

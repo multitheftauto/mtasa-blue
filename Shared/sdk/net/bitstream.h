@@ -541,8 +541,12 @@ enum class eBitStreamVersion : unsigned short
     CPlayerJoinCompletePacket_ServerName,
 
     // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
-    // 2024-04-16
+    // 2024-05-23
     WorldSpecialProperty_ExtendedWaterCannons,
+    
+    // Add "roadsignstext" to setWorldSpecialPropertyEnabled
+    // 2024-05-23
+    WorldSpecialProperty_RoadSignsText,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

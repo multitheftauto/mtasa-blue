@@ -132,6 +132,8 @@ protected:
     CGUIButton*   m_pButtonOK;
     CGUIButton*   m_pButtonCancel;
     CGUILabel*    m_pLabelNick;
+    CGUIButton*   m_pButtonGenerateNick;
+    CGUIStaticImage*   m_pButtonGenerateNickIcon;
     CGUIEdit*     m_pEditNick;
     CGUICheckBox* m_pSavePasswords;
     CGUICheckBox* m_pAutoRefreshBrowser;
@@ -347,6 +349,7 @@ protected:
     bool OnVideoDefaultClick(CGUIElement* pElement);
     bool OnBindsListClick(CGUIElement* pElement);
     bool OnOKButtonClick(CGUIElement* pElement);
+    bool OnNickButtonClick(CGUIElement* pElement);
     bool OnCancelButtonClick(CGUIElement* pElement);
     bool OnFieldOfViewChanged(CGUIElement* pElement);
     bool OnDrawDistanceChanged(CGUIElement* pElement);

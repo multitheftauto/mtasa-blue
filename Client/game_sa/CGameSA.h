@@ -236,6 +236,9 @@ public:
     bool IsExtendedWaterCannonsEnabled() const noexcept override { return m_isExtendedWaterCannonsEnabled; }
     void SetExtendedWaterCannonsEnabled(bool isEnabled) override;
 
+    bool IsRoadSignsTextEnabled() const noexcept override { return m_isRoadSignsTextEnabled; }
+    void SetRoadSignsTextEnabled(bool isEnabled) override;
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -354,6 +357,7 @@ private:
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
     bool         m_isExtendedWaterCannonsEnabled;
+    bool         m_isRoadSignsTextEnabled{true};
 
     static unsigned int&  ClumpOffset;
 

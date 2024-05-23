@@ -89,6 +89,7 @@ enum class WorldSpecialProperty
     BURNFLIPPEDCARS,
     FIREBALLDESTRUCT,
     EXTENDEDWATERCANNONS,
+    ROADSIGNSTEXT,
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 

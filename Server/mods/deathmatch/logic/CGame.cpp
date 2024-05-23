@@ -247,6 +247,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::BURNFLIPPEDCARS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::FIREBALLDESTRUCT] = true;
     m_WorldSpecialProps[WorldSpecialProperty::EXTENDEDWATERCANNONS] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::ROADSIGNSTEXT] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -1534,6 +1535,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onResourcePreStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStart", "resource", NULL, false);
     m_Events.AddEvent("onResourceStop", "resource, deleted", NULL, false);
+    m_Events.AddEvent("onResourceStateChange", "resource, oldState, newState", nullptr, false);
     m_Events.AddEvent("onResourceLoadStateChange", "resource, oldState, newState", NULL, false);
 
     // Blip events
