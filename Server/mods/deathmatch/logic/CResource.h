@@ -270,6 +270,8 @@ public:
     void OnPlayerJoin(CPlayer& Player);
     void SendNoClientCacheScripts(CPlayer* pPlayer = nullptr);
 
+    void OnResourceStateChange(const char* state) noexcept;
+
     CDummy*       GetResourceRootElement() { return m_pResourceElement; }
     const CDummy* GetResourceRootElement() const noexcept { return m_pResourceElement; }
 
