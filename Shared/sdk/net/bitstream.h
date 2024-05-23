@@ -544,6 +544,11 @@ enum class eBitStreamVersion : unsigned short
     // 2023-01-13
     OnPlayerWeaponSwitch_Remote,
 
+    // Add "roadsignstext" to setWorldSpecialPropertyEnabled
+    // 2024-05-17
+    WorldSpecialProperty_RoadSignsText,
+
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
