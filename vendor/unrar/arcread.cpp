@@ -122,7 +122,7 @@ void Archive::BrokenHeaderMsg()
 void Archive::UnkEncVerMsg(const std::wstring &Name,const std::wstring &Info)
 {
   uiMsg(UIERROR_UNKNOWNENCMETHOD,FileName,Name,Info);
-  ErrHandler.SetErrorCode(RARX_WARNING);
+  ErrHandler.SetErrorCode(RARX_FATAL);
 }
 
 
@@ -587,10 +587,10 @@ size_t Archive::ReadHeader50()
       RequestArcPassword(CheckPwd.IsSet() ? &CheckPwd:NULL);
 
       byte PswCheck[SIZE_PSWCHECK];
-      HeadersCrypt.SetCryptKeys(false,CRYPT_RAR50,&Cmd->Password,CryptHead.Salt,HeadersInitV,CryptHead.Lg2Count,NULL,PswCheck);
+      bool EncSet=HeadersCrypt.SetCryptKeys(false,CRYPT_RAR50,&Cmd->Password,CryptHead.Salt,HeadersInitV,CryptHead.Lg2Count,NULL,PswCheck);
       // Verify password validity. If header is damaged, we cannot rely on
       // password check value, because it can be damaged too.
-      if (CryptHead.UsePswCheck && !BrokenHeader &&
+      if (EncSet && CryptHead.UsePswCheck && !BrokenHeader &&
           memcmp(PswCheck,CryptHead.PswCheck,SIZE_PSWCHECK)!=0)
       {
         if (GlobalPassword) // For -p<pwd> or Ctrl+P.
@@ -1050,35 +1050,38 @@ void Archive::ProcessExtra50(RawRead *Raw,size_t ExtraSize,const BaseBlock *bb)
               hd->Lg2Count=Raw->Get1();
               if (hd->Lg2Count>CRYPT5_KDF_LG2_COUNT_MAX)
                 UnkEncVerMsg(hd->FileName,L"xc" + std::to_wstring(hd->Lg2Count));
-              Raw->GetB(hd->Salt,SIZE_SALT50);
-              Raw->GetB(hd->InitV,SIZE_INITV);
-              if (hd->UsePswCheck)
+              else
               {
-                Raw->GetB(hd->PswCheck,SIZE_PSWCHECK);
+                Raw->GetB(hd->Salt,SIZE_SALT50);
+                Raw->GetB(hd->InitV,SIZE_INITV);
+                if (hd->UsePswCheck)
+                {
+                  Raw->GetB(hd->PswCheck,SIZE_PSWCHECK);
 
-                // It is important to know if password check data is valid.
-                // If it is damaged and header CRC32 fails to detect it,
-                // archiver would refuse to decompress a possibly valid file.
-                // Since we want to be sure distinguishing a wrong password
-                // or corrupt file data, we use 64-bit password check data
-                // and to control its validity we use 32 bits of password
-                // check data SHA-256 additionally to 32-bit header CRC32.
-                byte csum[SIZE_PSWCHECK_CSUM];
-                Raw->GetB(csum,SIZE_PSWCHECK_CSUM);
+                  // It is important to know if password check data is valid.
+                  // If it is damaged and header CRC32 fails to detect it,
+                  // archiver would refuse to decompress a possibly valid file.
+                  // Since we want to be sure distinguishing a wrong password
+                  // or corrupt file data, we use 64-bit password check data
+                  // and to control its validity we use 32 bits of password
+                  // check data SHA-256 additionally to 32-bit header CRC32.
+                  byte csum[SIZE_PSWCHECK_CSUM];
+                  Raw->GetB(csum,SIZE_PSWCHECK_CSUM);
 
-                byte Digest[SHA256_DIGEST_SIZE];
-                sha256_get(hd->PswCheck, SIZE_PSWCHECK, Digest);
+                  byte Digest[SHA256_DIGEST_SIZE];
+                  sha256_get(hd->PswCheck, SIZE_PSWCHECK, Digest);
 
-                hd->UsePswCheck=memcmp(csum,Digest,SIZE_PSWCHECK_CSUM)==0;
+                  hd->UsePswCheck=memcmp(csum,Digest,SIZE_PSWCHECK_CSUM)==0;
 
-                // RAR 5.21 and earlier set PswCheck field in service records to 0
-                // even if UsePswCheck was present.
-                if (bb->HeaderType==HEAD_SERVICE && memcmp(hd->PswCheck,"\0\0\0\0\0\0\0\0",SIZE_PSWCHECK)==0)
-                  hd->UsePswCheck=0;
+                  // RAR 5.21 and earlier set PswCheck field in service records to 0
+                  // even if UsePswCheck was present.
+                  if (bb->HeaderType==HEAD_SERVICE && memcmp(hd->PswCheck,"\0\0\0\0\0\0\0\0",SIZE_PSWCHECK)==0)
+                    hd->UsePswCheck=0;
+                }
+                hd->SaltSet=true;
+                hd->CryptMethod=CRYPT_RAR50;
+                hd->Encrypted=true;
               }
-              hd->SaltSet=true;
-              hd->CryptMethod=CRYPT_RAR50;
-              hd->Encrypted=true;
             }
           }
           break;
