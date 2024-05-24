@@ -748,7 +748,7 @@ bool CWebView::SetAudioVolume(float fVolume)
 
     for (auto& name : frameNames)
     {
-        auto frame = m_pWebView->GetFrameByName(name);
+        auto frame = m_pWebView->GetFrame(name);
         if (frame)
             frame->ExecuteJavaScript(strJSCode, "", 0);
     }
