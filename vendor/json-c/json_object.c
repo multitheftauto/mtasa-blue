@@ -1037,7 +1037,7 @@ static int json_object_double_to_json_string_format(struct json_object *jso, str
 	}
 	else
 	{
-		const char *std_format = "%.17g";
+		const char *std_format = "%.16g";
 		int format_drops_decimals = 0;
 		int looks_numeric = 0;
 
