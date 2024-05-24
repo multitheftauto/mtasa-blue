@@ -121,13 +121,26 @@ void CommandData::ParseArg(const wchar *Arg)
         // Check if last character is the path separator.
         size_t Length=wcslen(Arg);
         wchar EndChar=Length==0 ? 0:Arg[Length-1];
-        bool EndSeparator=IsDriveDiv(EndChar) || IsPathDiv(EndChar);
+        // Check if trailing path separator like path\ is present.
+        bool FolderArg=IsDriveDiv(EndChar) || IsPathDiv(EndChar);
+
+        // 2024.01.05: We were asked to support exotic d:. and d:.. paths.
+        if (IsDriveLetter(Arg) && Arg[2]=='.' && (Arg[3]==0 || Arg[3]=='.' && Arg[4]==0))
+          FolderArg=true;
+
+        // 2024.01.06: FindFile::FastFind check below fails in Windows 10 if
+        // "." or ".." points at disk root. So we enforce it for "." and ".."
+        // optionally preceded with some path like "..\..".
+        size_t L=Length;
+        if (L>0 && Arg[L-1]=='.' && (L==1 || L>=2 && (IsPathDiv(Arg[L-2]) ||
+            Arg[L-2]=='.' && (L==2 || L>=3 && IsPathDiv(Arg[L-3])))))
+          FolderArg=true;
 
         wchar CmdChar=toupperw(Command[0]);
         bool Add=wcschr(L"AFUM",CmdChar)!=NULL;
         bool Extract=CmdChar=='X' || CmdChar=='E';
         bool Repair=CmdChar=='R' && Command[1]==0;
-        if (EndSeparator && !Add)
+        if (FolderArg && !Add)
           ExtrPath=Arg;
         else
           if ((Add || CmdChar=='T') && (*Arg!='@' || ListMode==RCLM_REJECT_LISTS))
@@ -190,7 +203,7 @@ void CommandData::ParseEnvVar()
 
 #if !defined(SFX_MODULE)
 // Preprocess those parameters, which must be processed before the rest of
-// command line. Return 'false' to stop further processing.
+// command line.
 void CommandData::PreprocessArg(const wchar *Arg)
 {
   if (IsSwitch(Arg[0]) && !NoMoreSwitches)
@@ -413,7 +426,7 @@ void CommandData::ProcessSwitch(const wchar *Switch)
               break;
             case '4':
               // Convert slashes here than before every comparison.
-              SlashToNative(Switch+3,ArcPath);
+              SlashToNative(Switch+3,ExclArcPath);
               break;
             default:
               BadSwitch(Switch);

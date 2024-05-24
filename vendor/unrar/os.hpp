@@ -11,6 +11,7 @@
 #include <new>
 #include <string>
 #include <vector>
+#include <deque>
 #include <memory> // For automatic pointers.
 
 
@@ -209,6 +210,10 @@
   #ifndef BIG_ENDIAN
      #define BIG_ENDIAN
   #endif
+#endif
+
+#ifdef __VMS
+# define LITTLE_ENDIAN
 #endif
 
 // Unlike Apple x64, utimensat shall be available in all Apple M1 systems.
