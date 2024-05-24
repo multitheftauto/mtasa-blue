@@ -32,6 +32,9 @@ project "curl"
 		defines { "USE_SCHANNEL", "USE_WINDOWS_SSPI", "USE_WIN32_IDN" }
 		links { "crypt32", "Normaliz" }
 
+	filter { "system:not windows" }
+		defines { "USE_MBEDTLS" }
+
 	filter { "system:linux or bsd or macosx" }
 		defines { "CURL_HIDDEN_SYMBOLS" }
 

@@ -869,7 +869,7 @@
 /* #undef USE_MANUAL */
 
 /* if mbedTLS is enabled */
-/* #undef USE_MBEDTLS */
+#define USE_MBEDTLS 1
 
 /* if msh3 is in use */
 /* #undef USE_MSH3 */
