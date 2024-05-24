@@ -349,6 +349,9 @@ void uiMsgStore::Msg()
     case UIERROR_ADJUSTVALUE:
       Log(NULL,St(MAdjustValue),Str[0],Str[1]);
       break;
+    case UIERROR_SKIPUNSAFELINK:
+      Log(NULL,St(MSkipUnsafeLink),Str[0],Str[1]);
+      break;
 
 #ifndef SFX_MODULE
     case UIMSG_STRING:
