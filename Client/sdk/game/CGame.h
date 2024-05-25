@@ -217,6 +217,9 @@ public:
     virtual bool IsFireballDestructEnabled() const noexcept = 0;
     virtual void SetFireballDestructEnabled(bool isEnabled) = 0;
 
+    virtual bool IsRoadSignsTextEnabled() const noexcept = 0;
+    virtual void SetRoadSignsTextEnabled(bool isEnabled) = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
