@@ -1331,6 +1331,14 @@ public:
             bOutValue = bDefaultValue;
     }
 
+    bool ReadIfNextIsBool(const bool bDefaultValue = false)
+    {
+        bool bOutValue{bDefaultValue};
+        if (NextIsBool())
+            ReadBool(bOutValue, bDefaultValue);
+        return bOutValue;
+    }
+
     template <class T>
     void ReadIfNextIsUserData(T*& outValue, T* defaultValue)
     {
