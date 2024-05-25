@@ -69,6 +69,7 @@ public:
     void                 SetResourceEntity(CClientEntity* pEntity) { m_pResourceEntity = pEntity; }
     class CClientEntity* GetResourceDynamicEntity() { return m_pResourceDynamicEntity; }
     void                 SetResourceDynamicEntity(CClientEntity* pEntity) { m_pResourceDynamicEntity = pEntity; }
+    SString              GetResourceDirectoryPath() { return GetResourceDirectoryPath(eAccessType::ACCESS_PUBLIC, ""); }
     SString              GetResourceDirectoryPath(eAccessType accessType, const SString& strMetaPath);
     class CClientEntity* GetResourceGUIEntity() { return m_pResourceGUIEntity; }
     void                 SetResourceGUIEntity(CClientEntity* pEntity) { m_pResourceGUIEntity = pEntity; }
