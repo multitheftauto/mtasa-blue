@@ -38,6 +38,7 @@
 #include "http2.h"
 #include "http_proxy.h"
 #include "multiif.h"
+#include "sendf.h"
 #include "cf-h2-proxy.h"
 
 /* The last 3 #include files should be in this order */
@@ -155,7 +156,7 @@ static void h2_tunnel_go_state(struct Curl_cfilter *cf,
     infof(data, "CONNECT phase completed");
     data->state.authproxy.done = TRUE;
     data->state.authproxy.multipass = FALSE;
-    /* FALLTHROUGH */
+    FALLTHROUGH();
   case H2_TUNNEL_FAILED:
     if(new_state == H2_TUNNEL_FAILED)
       CURL_TRC_CF(data, cf, "[%d] new tunnel state 'failed'", ts->stream_id);
@@ -221,10 +222,10 @@ static void drain_tunnel(struct Curl_cfilter *cf,
   bits = CURL_CSELECT_IN;
   if(!tunnel->closed && !tunnel->reset && tunnel->upload_blocked_len)
     bits |= CURL_CSELECT_OUT;
-  if(data->state.dselect_bits != bits) {
-    CURL_TRC_CF(data, cf, "[%d] DRAIN dselect_bits=%x",
+  if(data->state.select_bits != bits) {
+    CURL_TRC_CF(data, cf, "[%d] DRAIN select_bits=%x",
                 tunnel->stream_id, bits);
-    data->state.dselect_bits = bits;
+    data->state.select_bits = bits;
     Curl_expire(data, 0, EXPIRE_RUN_NOW);
   }
 }
@@ -956,6 +957,9 @@ static CURLcode submit_CONNECT(struct Curl_cfilter *cf,
   result = Curl_http_proxy_create_CONNECT(&req, cf, data, 2);
   if(result)
     goto out;
+  result = Curl_creader_set_null(data);
+  if(result)
+    goto out;
 
   infof(data, "Establish HTTP/2 proxy tunnel to %s", req->authority);
 
@@ -1033,7 +1037,7 @@ static CURLcode H2_CONNECT(struct Curl_cfilter *cf,
       if(result)
         goto out;
       h2_tunnel_go_state(cf, ts, H2_TUNNEL_CONNECT, data);
-      /* FALLTHROUGH */
+      FALLTHROUGH();
 
     case H2_TUNNEL_CONNECT:
       /* see that the request is completely sent */
@@ -1052,7 +1056,7 @@ static CURLcode H2_CONNECT(struct Curl_cfilter *cf,
         result = CURLE_OK;
         goto out;
       }
-      /* FALLTHROUGH */
+      FALLTHROUGH();
 
     case H2_TUNNEL_RESPONSE:
       DEBUGASSERT(ts->has_final_response);
@@ -1125,7 +1129,12 @@ static CURLcode cf_h2_proxy_connect(struct Curl_cfilter *cf,
 
 out:
   *done = (result == CURLE_OK) && (ts->state == H2_TUNNEL_ESTABLISHED);
-  cf->connected = *done;
+  if(*done) {
+    cf->connected = TRUE;
+    /* The real request will follow the CONNECT, reset request partially */
+    Curl_req_soft_reset(&data->req, data);
+    Curl_client_reset(data);
+  }
   CF_DATA_RESTORE(cf, save);
   return result;
 }
@@ -1523,7 +1532,7 @@ static bool cf_h2_proxy_is_alive(struct Curl_cfilter *cf,
 
 struct Curl_cftype Curl_cft_h2_proxy = {
   "H2-PROXY",
-  CF_TYPE_IP_CONNECT,
+  CF_TYPE_IP_CONNECT|CF_TYPE_PROXY,
   CURL_LOG_LVL_NONE,
   cf_h2_proxy_destroy,
   cf_h2_proxy_connect,

@@ -21,4 +21,5 @@ public:
     virtual ~CBuilding(){};
 
     virtual CBuildingSAInterface* GetBuildingInterface() = 0;
+    virtual void                  SetLod(CBuilding* pLod) = 0;
 };
