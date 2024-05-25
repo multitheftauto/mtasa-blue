@@ -199,8 +199,8 @@ int CLuaDrawingDefs::DxDrawLine3D(lua_State* luaVM)
     argStream.ReadVector3D(vecEnd);
     argStream.ReadColor(color, 0xFFFFFFFF);
     argStream.ReadNumber(fWidth, 1);
-    if (bool bPostGUI = argStream.ReadIfNextIsBool())
-        renderStage = bPostGUI ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
     else
         argStream.ReadIfNextIsEnumString(renderStage, eRenderStage::POST_FX);
 
@@ -240,8 +240,8 @@ int CLuaDrawingDefs::DxDrawMaterialLine3D(lua_State* luaVM)
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
-    if (bool bPostGUI = argStream.ReadIfNextIsBool())
-        renderStage = bPostGUI ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
     else
         argStream.ReadIfNextIsEnumString(renderStage, eRenderStage::POST_FX);
 
@@ -292,10 +292,11 @@ int CLuaDrawingDefs::DxDrawMaterialSectionLine3D(lua_State* luaVM)
     argStream.ReadUserData(pMaterial);
     argStream.ReadNumber(fWidth);
     argStream.ReadColor(color, 0xFFFFFFFF);
-    if (bool bPostGUI = argStream.ReadIfNextIsBool())
-        renderStage = bPostGUI ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
     else
         argStream.ReadIfNextIsEnumString(renderStage, eRenderStage::POST_FX);
+
     if (argStream.NextIsVector3D())
     {
         argStream.ReadVector3D(vecFaceToward);
@@ -599,8 +600,8 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     eRenderStage renderStage{eRenderStage::POST_FX};
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
-    if (bool bPostGUI = argStream.ReadIfNextIsBool())
-        renderStage = bPostGUI ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
     else
         argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
 
@@ -654,8 +655,8 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadEnumString(ePrimitiveType);
     MixedReadMaterialString(argStream, pMaterialElement);
-    if (bool bPostGUI = argStream.ReadIfNextIsBool())
-        renderStage = bPostGUI ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+    if (argStream.NextIsBool())
+        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
     else
         argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
 
