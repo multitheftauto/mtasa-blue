@@ -824,6 +824,12 @@ ADD_ENUM(_D3DFORMAT::D3DFMT_G32R32F, "g32r32f")
 ADD_ENUM(_D3DFORMAT::D3DFMT_A32B32G32R32F, "a32b32g32r32f")
 IMPLEMENT_ENUM_CLASS_END("surface-format")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eRenderStage)
+ADD_ENUM(eRenderStage::PRE_FX, "prefx")
+ADD_ENUM(eRenderStage::POST_FX, "postfx")
+ADD_ENUM(eRenderStage::POST_GUI, "postgui")
+IMPLEMENT_ENUM_CLASS_END("render-stage")
+
 //
 // CResource from userdata
 //
