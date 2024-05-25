@@ -602,7 +602,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     if (bool bPostGUI = argStream.ReadIfNextIsBool())
         renderStage = bPostGUI ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
     else
-        argStream.ReadIfNextIsEnumString(renderStage, eRenderStage::POST_FX);
+        argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
 
     std::vector<double> vecTableContent;
 
@@ -657,7 +657,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     if (bool bPostGUI = argStream.ReadIfNextIsBool())
         renderStage = bPostGUI ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
     else
-        argStream.ReadIfNextIsEnumString(renderStage, eRenderStage::POST_FX);
+        argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
 
     std::vector<double> vecTableContent;
 
