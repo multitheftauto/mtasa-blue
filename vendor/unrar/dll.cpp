@@ -390,6 +390,10 @@ int PASCAL ProcessFile(HANDLE hArcData,int Operation,char *DestPath,char *DestNa
       Data->Extract.ExtractCurrentFile(Data->Arc,Data->HeaderSize,Repeat);
 
       // Now we process extra file information if any.
+      // It is important to do it in the same ProcessFile(), because caller
+      // app can rely on this behavior, for example, to overwrite
+      // the extracted Mark of the Web with propagated from archive
+      // immediately after ProcessFile() call.
       //
       // Archive can be closed if we process volumes, next volume is missing
       // and current one is already removed or deleted. So we need to check

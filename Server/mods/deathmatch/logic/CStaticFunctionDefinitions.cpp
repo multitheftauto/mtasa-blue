@@ -328,10 +328,27 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 
     // We can't destroy the root or a player/remote client/console
     int iType = pElement->GetType();
-    if (pElement == m_pMapManager->GetRootElement() || iType == CElement::PLAYER || iType == CElement::CONSOLE ||
+    if (pElement == m_pMapManager->GetRootElement() || iType == CElement::PLAYER || iType == CElement::CONSOLE || 
         g_pGame->GetResourceManager()->IsAResourceElement(pElement))
     {
         return false;
+    }
+
+    if (iType == CElement::TEAM) { // Its team trigger onPlayerTeamChange for each player in the team
+        CTeam* pTeam = static_cast<CTeam*>(pElement);
+
+        auto iterBegin = pTeam->PlayersBegin();
+        auto iterEnd = pTeam->PlayersEnd();
+        CLuaArguments arguments;
+
+        for (auto iter = iterBegin; iter != iterEnd; ++iter)
+        {
+            CPlayer* player = *iter;
+            arguments.PushElement(pTeam); // Return team element as oldteam
+            arguments.PushNil(); // No new team return nil
+            player->CallEvent("onPlayerTeamChange", arguments);
+            arguments.DeleteArguments();
+        }
     }
 
     // Tell everyone to destroy it if this is not a per-player entity
@@ -340,7 +357,7 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
         // Unsync it (will destroy it for those that know about it)
         CPerPlayerEntity* pEntity = static_cast<CPerPlayerEntity*>(pElement);
         pEntity->Sync(false);
-    }
+    }  
 
     // Tell everyone to destroy it
     CEntityRemovePacket Packet;
@@ -9204,21 +9221,34 @@ bool CStaticFunctionDefinitions::SetPlayerTeam(CPlayer* pPlayer, CTeam* pTeam)
 {
     assert(pPlayer);
 
+    CTeam* currentTeam = pPlayer->GetTeam();
     // If its a different team
-    if (pTeam != pPlayer->GetTeam())
+    if (pTeam == currentTeam)
+        return false;
+
+    // Call the Event
+    CLuaArguments Arguments;
+    if (currentTeam)
     {
-        // Change his team
-        pPlayer->SetTeam(pTeam, true);
-
-        // Tell everyone his new team
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(pTeam ? pTeam->GetID() : INVALID_ELEMENT_ID);
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPlayer, SET_PLAYER_TEAM, *BitStream.pBitStream));
-
-        return true;
+        Arguments.PushElement(currentTeam);
+    } 
+    else
+    {
+        Arguments.PushNil(); // No oldTeam return nil
     }
+    Arguments.PushElement(pTeam);
+    if (!pPlayer->CallEvent("onPlayerTeamChange", Arguments))
+        return false; // Event cancelled, return false
 
-    return false;
+    // Change his team
+    pPlayer->SetTeam(pTeam, true);
+
+    // Tell everyone his new team
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(pTeam ? pTeam->GetID() : INVALID_ELEMENT_ID);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPlayer, SET_PLAYER_TEAM, *BitStream.pBitStream));
+
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetTeamFriendlyFire(CTeam* pTeam, bool bFriendlyFire)

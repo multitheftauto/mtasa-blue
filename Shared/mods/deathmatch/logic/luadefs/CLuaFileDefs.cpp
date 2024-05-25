@@ -121,8 +121,8 @@ int CLuaFileDefs::File(lua_State* luaVM)
 
             if (CResourceManager::ParseResourcePathInput(strInputPath, pResource, &strAbsPath, &strMetaPath))
             {
-                CheckCanModifyOtherResource(argStream, pResource, pResource);
-                CheckCanAccessOtherResourceFile(argStream, pResource, pResource, strAbsPath);
+                CheckCanModifyOtherResource(argStream, pThisResource, pResource);
+                CheckCanAccessOtherResourceFile(argStream, pThisResource, pResource, strAbsPath);
 
                 if (!argStream.HasErrors())
                 {

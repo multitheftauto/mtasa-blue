@@ -1,18 +1,18 @@
 /* gzlib.c -- zlib functions common to reading and writing gzip files
- * Copyright (C) 2004-2019 Mark Adler
+ * Copyright (C) 2004-2024 Mark Adler
  * For conditions of distribution and use, see copyright notice in zlib.h
  */
 
 #include "gzguts.h"
 
-#if defined(_WIN32) && !defined(__BORLANDC__)
+#if defined(__DJGPP__)
+#  define LSEEK llseek
+#elif defined(_WIN32) && !defined(__BORLANDC__) && !defined(UNDER_CE)
 #  define LSEEK _lseeki64
-#else
-#if defined(_LARGEFILE64_SOURCE) && _LFS64_LARGEFILE-0
+#elif defined(_LARGEFILE64_SOURCE) && _LFS64_LARGEFILE-0
 #  define LSEEK lseek64
 #else
 #  define LSEEK lseek
-#endif
 #endif
 
 #if defined UNDER_CE
@@ -52,7 +52,7 @@ char ZLIB_INTERNAL *gz_strwinerror(DWORD error) {
             msgbuf[chars] = 0;
         }
 
-        wcstombs(buf, msgbuf, chars + 1);
+        wcstombs(buf, msgbuf, chars + 1);       // assumes buf is big enough
         LocalFree(msgbuf);
     }
     else {
@@ -179,11 +179,8 @@ local gzFile gz_open(const void *path, int fd, const char *mode) {
 
     /* save the path name for error messages */
 #ifdef WIDECHAR
-    if (fd == -2) {
+    if (fd == -2)
         len = wcstombs(NULL, path, 0);
-        if (len == (z_size_t)-1)
-            len = 0;
-    }
     else
 #endif
         len = strlen((const char *)path);
@@ -193,18 +190,21 @@ local gzFile gz_open(const void *path, int fd, const char *mode) {
         return NULL;
     }
 #ifdef WIDECHAR
-    if (fd == -2)
+    if (fd == -2) {
         if (len)
             wcstombs(state->path, path, len + 1);
         else
             *(state->path) = 0;
+    }
     else
 #endif
+    {
 #if !defined(NO_snprintf) && !defined(NO_vsnprintf)
         (void)snprintf(state->path, len + 1, "%s", (const char *)path);
 #else
         strcpy(state->path, path);
 #endif
+    }
 
     /* compute the flags for open() */
     oflag =
@@ -228,11 +228,14 @@ local gzFile gz_open(const void *path, int fd, const char *mode) {
            O_APPEND)));
 
     /* open the file with the appropriate flags (or just use fd) */
-    state->fd = fd > -1 ? fd : (
+    if (fd == -1)
+        state->fd = open((const char *)path, oflag, 0666);
 #ifdef WIDECHAR
-        fd == -2 ? _wopen(path, oflag, 0666) :
+    else if (fd == -2)
+        state->fd = _wopen(path, oflag, _S_IREAD | _S_IWRITE);
 #endif
-        open((const char *)path, oflag, 0666));
+    else
+        state->fd = fd;
     if (state->fd == -1) {
         free(state->path);
         free(state);
@@ -563,20 +566,20 @@ void ZLIB_INTERNAL gz_error(gz_statep state, int err, const char *msg) {
 #endif
 }
 
-#ifndef INT_MAX
 /* portably return maximum value for an int (when limits.h presumed not
    available) -- we need to do this to cover cases where 2's complement not
    used, since C standard permits 1's complement and sign-bit representations,
    otherwise we could just use ((unsigned)-1) >> 1 */
 unsigned ZLIB_INTERNAL gz_intmax(void) {
-    unsigned p, q;
-
-    p = 1;
+#ifdef INT_MAX
+    return INT_MAX;
+#else
+    unsigned p = 1, q;
     do {
         q = p;
         p <<= 1;
         p++;
     } while (p > q);
     return q >> 1;
-}
 #endif
+}

@@ -22,7 +22,7 @@ bool FileCreate(CommandData *Cmd,File *NewFile,std::wstring &Name,
 
       // Maybe our long name matches the short name of existing file.
       // Let's check if we can change the short name.
-      if (UpdateExistingShortName(Name.c_str()))
+      if (UpdateExistingShortName(Name))
         continue;
     }
     // Allow short name check again. It is necessary, because rename and

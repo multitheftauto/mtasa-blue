@@ -2014,6 +2014,10 @@ void CCore::OnPreHUDRender()
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
+    // Draw post-fx 3D primitives
+    CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+    CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
 
