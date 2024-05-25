@@ -117,7 +117,7 @@ void CClientBuilding::Create()
 
     if (m_pHighBuilding)
     {
-        m_pHighBuilding->GeBuildingEntity()->SetLod(m_pBuilding);
+        m_pHighBuilding->GetBuildingEntity()->SetLod(m_pBuilding);
     }
 }
 
@@ -128,7 +128,7 @@ void CClientBuilding::Destroy()
 
     if (m_pHighBuilding)
     {
-        m_pHighBuilding->GeBuildingEntity()->SetLod(nullptr);
+        m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
     }
     g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
     m_pBuilding = nullptr;
@@ -150,7 +150,7 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
 
         // Add new LOD
         m_pLowBuilding = pLod;
-        m_pBuilding->SetLod(pLod->GeBuildingEntity());
+        m_pBuilding->SetLod(pLod->GetBuildingEntity());
 
         pLod->SetHighLodBuilding(this);
     }

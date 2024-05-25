@@ -30,7 +30,7 @@ public:
     void GetRotationRadians(CVector& vecOutRadians) const override { vecOutRadians = m_vRot; };
     void SetRotationRadians(const CVector& vecRadians) override;
 
-    CBuilding*     GeBuildingEntity() const { return m_pBuilding; };
+    CBuilding*     GetBuildingEntity() const { return m_pBuilding; };
     CEntity*       GetGameEntity() override { return m_pBuilding; };
     const CEntity* GetGameEntity() const override { return m_pBuilding; };
 
