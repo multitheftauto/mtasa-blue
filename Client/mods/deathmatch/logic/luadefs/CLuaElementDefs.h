@@ -97,6 +97,6 @@ public:
     LUA_DECLARE(SetElementCollidableWith);
     LUA_DECLARE(SetElementDoubleSided);
     LUA_DECLARE(SetElementFrozen);
-    LUA_DECLARE(SetLowLodElement);
+    static bool SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity, std::optional<CClientEntity*> pLowLodEntity);
     LUA_DECLARE(SetElementCallPropagationEnabled);
 };
