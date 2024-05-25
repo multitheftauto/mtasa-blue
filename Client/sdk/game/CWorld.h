@@ -168,7 +168,7 @@ enum eDebugCaller
     CBuilding_Destructor,
     CBuildingPool_Constructor,
     CBuildingPool_Destructor,
-
+    CBuilding_SetLod,
 };
 
 enum eSurfaceProperties
@@ -327,6 +327,7 @@ class CWorld
 {
 public:
     virtual void  Add(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Add(CEntitySAInterface* entity, eDebugCaller CallerId) = 0;
     virtual void  Remove(CEntity* entity, eDebugCaller CallerId) = 0;
     virtual void  Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
     virtual auto  ProcessLineAgainstMesh(CEntitySAInterface* e, CVector start, CVector end) -> SProcessLineOfSightMaterialInfoResult = 0;

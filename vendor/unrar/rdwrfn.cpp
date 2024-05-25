@@ -246,15 +246,24 @@ void ComprDataIO::GetUnpackedData(byte **Data,size_t *Size)
 }
 
 
-void ComprDataIO::SetEncryption(bool Encrypt,CRYPT_METHOD Method,
+// Return true if encryption or decryption mode is set correctly.
+bool ComprDataIO::SetEncryption(bool Encrypt,CRYPT_METHOD Method,
      SecPassword *Password,const byte *Salt,const byte *InitV,
      uint Lg2Cnt,byte *HashKey,byte *PswCheck)
 {
-#ifndef RAR_NOCRYPT
+#ifdef RAR_NOCRYPT
+  return false;
+#else
   if (Encrypt)
+  {
     Encryption=Crypt->SetCryptKeys(true,Method,Password,Salt,InitV,Lg2Cnt,HashKey,PswCheck);
+    return Encryption;
+  }
   else
+  {
     Decryption=Decrypt->SetCryptKeys(false,Method,Password,Salt,InitV,Lg2Cnt,HashKey,PswCheck);
+    return Decryption;
+  }
 #endif
 }
 

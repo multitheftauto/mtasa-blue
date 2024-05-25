@@ -300,7 +300,7 @@ static CURLcode deflate_do_write(struct Curl_easy *data,
   struct zlib_writer *zp = (struct zlib_writer *) writer;
   z_stream *z = &zp->z;     /* zlib state structure */
 
-  if(!(type & CLIENTWRITE_BODY))
+  if(!(type & CLIENTWRITE_BODY) || !nbytes)
     return Curl_cwriter_write(data, writer->next, type, buf, nbytes);
 
   /* Set the compressed input when this function is called */
@@ -365,11 +365,14 @@ static CURLcode gzip_do_init(struct Curl_easy *data,
 
 #ifdef OLD_ZLIB_SUPPORT
 /* Skip over the gzip header */
-static enum {
+typedef enum {
   GZIP_OK,
   GZIP_BAD,
   GZIP_UNDERFLOW
-} check_gzip_header(unsigned char const *data, ssize_t len, ssize_t *headerlen)
+} gzip_status;
+
+static gzip_status check_gzip_header(unsigned char const *data, ssize_t len,
+                                     ssize_t *headerlen)
 {
   int method, flags;
   const ssize_t totallen = len;
@@ -454,7 +457,7 @@ static CURLcode gzip_do_write(struct Curl_easy *data,
   struct zlib_writer *zp = (struct zlib_writer *) writer;
   z_stream *z = &zp->z;     /* zlib state structure */
 
-  if(!(type & CLIENTWRITE_BODY))
+  if(!(type & CLIENTWRITE_BODY) || !nbytes)
     return Curl_cwriter_write(data, writer->next, type, buf, nbytes);
 
   if(zp->zlib_init == ZLIB_INIT_GZIP) {
@@ -666,7 +669,7 @@ static CURLcode brotli_do_write(struct Curl_easy *data,
   CURLcode result = CURLE_OK;
   BrotliDecoderResult r = BROTLI_DECODER_RESULT_NEEDS_MORE_OUTPUT;
 
-  if(!(type & CLIENTWRITE_BODY))
+  if(!(type & CLIENTWRITE_BODY) || !nbytes)
     return Curl_cwriter_write(data, writer->next, type, buf, nbytes);
 
   if(!bp->br)
@@ -759,7 +762,7 @@ static CURLcode zstd_do_write(struct Curl_easy *data,
   ZSTD_outBuffer out;
   size_t errorCode;
 
-  if(!(type & CLIENTWRITE_BODY))
+  if(!(type & CLIENTWRITE_BODY) || !nbytes)
     return Curl_cwriter_write(data, writer->next, type, buf, nbytes);
 
   if(!zp->decomp) {
@@ -832,8 +835,8 @@ static const struct Curl_cwtype identity_encoding = {
 };
 
 
-/* supported content encodings table. */
-static const struct Curl_cwtype * const encodings[] = {
+/* supported general content decoders. */
+static const struct Curl_cwtype * const general_unencoders[] = {
   &identity_encoding,
 #ifdef HAVE_LIBZ
   &deflate_encoding,
@@ -848,6 +851,13 @@ static const struct Curl_cwtype * const encodings[] = {
   NULL
 };
 
+/* supported content decoders only for transfer encodings */
+static const struct Curl_cwtype * const transfer_unencoders[] = {
+#ifndef CURL_DISABLE_HTTP
+  &Curl_httpchunk_unencoder,
+#endif
+  NULL
+};
 
 /* Provide a list of comma-separated names of supported encodings.
 */
@@ -861,7 +871,7 @@ void Curl_all_content_encodings(char *buf, size_t blen)
   DEBUGASSERT(blen);
   buf[0] = 0;
 
-  for(cep = encodings; *cep; cep++) {
+  for(cep = general_unencoders; *cep; cep++) {
     ce = *cep;
     if(!strcasecompare(ce->name, CONTENT_ENCODING_DEFAULT))
       len += strlen(ce->name) + 2;
@@ -873,7 +883,7 @@ void Curl_all_content_encodings(char *buf, size_t blen)
   }
   else if(blen > len) {
     char *p = buf;
-    for(cep = encodings; *cep; cep++) {
+    for(cep = general_unencoders; *cep; cep++) {
       ce = *cep;
       if(!strcasecompare(ce->name, CONTENT_ENCODING_DEFAULT)) {
         strcpy(p, ce->name);
@@ -906,7 +916,7 @@ static CURLcode error_do_write(struct Curl_easy *data,
   (void) buf;
   (void) nbytes;
 
-  if(!(type & CLIENTWRITE_BODY))
+  if(!(type & CLIENTWRITE_BODY) || !nbytes)
     return Curl_cwriter_write(data, writer->next, type, buf, nbytes);
 
   failf(data, "Unrecognized content encoding type. "
@@ -931,12 +941,23 @@ static const struct Curl_cwtype error_writer = {
 };
 
 /* Find the content encoding by name. */
-static const struct Curl_cwtype *find_encoding(const char *name,
-                                                    size_t len)
+static const struct Curl_cwtype *find_unencode_writer(const char *name,
+                                                      size_t len,
+                                                      Curl_cwriter_phase phase)
 {
   const struct Curl_cwtype * const *cep;
 
-  for(cep = encodings; *cep; cep++) {
+  if(phase == CURL_CW_TRANSFER_DECODE) {
+    for(cep = transfer_unencoders; *cep; cep++) {
+      const struct Curl_cwtype *ce = *cep;
+      if((strncasecompare(name, ce->name, len) && !ce->name[len]) ||
+         (ce->alias && strncasecompare(name, ce->alias, len)
+                    && !ce->alias[len]))
+        return ce;
+    }
+  }
+  /* look among the general decoders */
+  for(cep = general_unencoders; *cep; cep++) {
     const struct Curl_cwtype *ce = *cep;
     if((strncasecompare(name, ce->name, len) && !ce->name[len]) ||
        (ce->alias && strncasecompare(name, ce->alias, len) && !ce->alias[len]))
@@ -950,7 +971,6 @@ static const struct Curl_cwtype *find_encoding(const char *name,
 CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
                                      const char *enclist, int is_transfer)
 {
-  struct SingleRequest *k = &data->req;
   Curl_cwriter_phase phase = is_transfer?
                              CURL_CW_TRANSFER_DECODE:CURL_CW_CONTENT_DECODE;
   CURLcode result;
@@ -958,6 +978,7 @@ CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
   do {
     const char *name;
     size_t namelen;
+    bool is_chunked = FALSE;
 
     /* Parse a single encoding name. */
     while(ISBLANK(*enclist) || *enclist == ',')
@@ -969,16 +990,15 @@ CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
       if(!ISSPACE(*enclist))
         namelen = enclist - name + 1;
 
-    /* Special case: chunked encoding is handled at the reader level. */
-    if(is_transfer && namelen == 7 && strncasecompare(name, "chunked", 7)) {
-      k->chunk = TRUE;             /* chunks coming our way. */
-      Curl_httpchunk_init(data);   /* init our chunky engine. */
-    }
-    else if(namelen) {
+    if(namelen) {
       const struct Curl_cwtype *cwt;
       struct Curl_cwriter *writer;
 
-      if((is_transfer && !data->set.http_transfer_encoding) ||
+      is_chunked = (is_transfer && (namelen == 7) &&
+                    strncasecompare(name, "chunked", 7));
+      /* if we skip the decoding in this phase, do not look further.
+       * Exception is "chunked" transfer-encoding which always must happen */
+      if((is_transfer && !data->set.http_transfer_encoding && !is_chunked) ||
          (!is_transfer && data->set.http_ce_skip)) {
         /* not requested, ignore */
         return CURLE_OK;
@@ -990,7 +1010,32 @@ CURLcode Curl_build_unencoding_stack(struct Curl_easy *data,
         return CURLE_BAD_CONTENT_ENCODING;
       }
 
-      cwt = find_encoding(name, namelen);
+      cwt = find_unencode_writer(name, namelen, phase);
+      if(cwt && is_chunked && Curl_cwriter_get_by_type(data, cwt)) {
+        /* A 'chunked' transfer encoding has already been added.
+         * Ignore duplicates. See #13451.
+         * Also RFC 9112, ch. 6.1:
+         * "A sender MUST NOT apply the chunked transfer coding more than
+         *  once to a message body."
+         */
+        return CURLE_OK;
+      }
+
+      if(is_transfer && !is_chunked &&
+         Curl_cwriter_get_by_name(data, "chunked")) {
+        /* RFC 9112, ch. 6.1:
+         * "If any transfer coding other than chunked is applied to a
+         *  response's content, the sender MUST either apply chunked as the
+         *  final transfer coding or terminate the message by closing the
+         *  connection."
+         * "chunked" must be the last added to be the first in its phase,
+         *  reject this.
+         */
+        failf(data, "Reject response due to 'chunked' not being the last "
+              "Transfer-Encoding");
+        return CURLE_BAD_CONTENT_ENCODING;
+      }
+
       if(!cwt)
         cwt = &error_writer;  /* Defer error at use. */
 

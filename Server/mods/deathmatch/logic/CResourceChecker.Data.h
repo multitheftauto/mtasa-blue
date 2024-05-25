@@ -43,6 +43,9 @@ namespace
         {"fileGetContents", "1.6.0-9.21938"},
         {"engineStreamingSetModelCacheLimits", "1.6.0-9.21946"},
         {"engineStreamingRestoreBufferSize", "1.6.0-9.22195"},
+        {"createBuilding", "1.6.0-9.22410"},
+        {"restoreAllGameBuildings", "1.6.0-9.22420"},
+        {"removeAllGameBuildings", "1.6.0-9.22420"},
     };
 
     SVersionItem serverFunctionInitList[] = {
@@ -52,6 +55,9 @@ namespace
         {"fileGetContents", "1.6.0-9.21938"},
         {"isWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
         {"setWorldSpecialPropertyEnabled", "1.6.0-9.22195"},
+        {"onResourceStateChange", "1.6.0-9.22430"},
+        {"isObjectMoving", "1.6.0-9.22457"},
+        {"onPlayerTriggerInvalidEvent", "1.6.0-9.22459"},
     };
 
     //

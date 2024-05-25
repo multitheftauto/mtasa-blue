@@ -863,9 +863,9 @@ void CheckDataFiles()
     {
         const char* expected;
         const char* fileName;
-    } integrityCheckList[] = {{"DFACEEEB636240C0190C7B1B0145C89E", "bass.dll"},           {"FBE6A48C4E9FAAA6569C360DD49CCE06", "bass_aac.dll"},
-                              {"E7E69A3B369F0ABA1A4A18C831BC4364", "bass_ac3.dll"},       {"8164042444F819CA107297CA4A0408F3", "bass_fx.dll"},
-                              {"9F48DD702AB5BE002F9223E3B45A2261", "bassflac.dll"},       {"4E89426025D1E1F524495D910B60C709", "bassmidi.dll"},
+    } integrityCheckList[] = {{"36CB1B284BC7CBB4F25CD00BBB044550", "bass.dll"},           {"1B909B47946167D153FB94020393E781", "bass_aac.dll"},
+                              {"E7E69A3B369F0ABA1A4A18C831BC4364", "bass_ac3.dll"},       {"E20A57EA7D845FADC9A48A0AA919121A", "bass_fx.dll"},
+                              {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"F246D72BA73E9624FE8BE66E785FB5C5", "bassmidi.dll"},
                               {"5DEEC10A943E352EF7E0223327E8B48C", "bassmix.dll"},        {"2F87C5E0A1B7B28C8FC0D7E74116DDFC", "bassopus.dll"},
                               {"0F1B2FC6C0C703A43A24DC05352E7ADA", "basswebm.dll"},       {"893113C6C49DC1E1EF288310E68DB306", "basswma.dll"},
                               {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
