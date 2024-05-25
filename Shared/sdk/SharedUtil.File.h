@@ -20,8 +20,8 @@ namespace SharedUtil
     //
     // Returns true if the file/directory exists
     //
-    bool FileExists(const SString& strFilename);
-    bool DirectoryExists(const SString& strPath);
+    bool FileExists(const std::string& strFilename) noexcept;
+    bool DirectoryExists(const std::string& strPath) noexcept;
 
     //
     // Load from a file
@@ -101,6 +101,8 @@ namespace SharedUtil
 
     WString FromUTF8(const SString& strPath);
     SString ToUTF8(const WString& strPath);
+
+    std::vector<std::string> ListDir(const char* szPath) noexcept;
 
     namespace File
     {
