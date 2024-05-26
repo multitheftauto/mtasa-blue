@@ -19,15 +19,15 @@ class CVehicle;
 class CVehiclePuresyncPacket final : public CPacket
 {
 public:
-    CVehiclePuresyncPacket(){};
-    explicit CVehiclePuresyncPacket(class CPlayer* pPlayer);
+    CVehiclePuresyncPacket() noexcept {};
+    explicit CVehiclePuresyncPacket(class CPlayer* pPlayer) noexcept;
 
-    bool          HasSimHandler() const { return true; }
-    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    bool          HasSimHandler() const noexcept { return true; }
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     void ReadVehicleSpecific(class CVehicle* pVehicle, NetBitStreamInterface& BitStream, int iRemoteModel);

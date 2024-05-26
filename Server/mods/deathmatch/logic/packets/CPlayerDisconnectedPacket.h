@@ -46,8 +46,8 @@ public:
     CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::ePlayerDisconnectType eType, const char* szReason = "");
     CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::ePlayerDisconnectType eType, time_t BanDuration = 0, const char* szReason = "");
 
-    ePacketID     GetPacketID() const { return PACKET_ID_SERVER_DISCONNECTED; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_SERVER_DISCONNECTED; };
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

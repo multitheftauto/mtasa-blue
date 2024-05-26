@@ -19,7 +19,7 @@ public:
     CVoiceEndPacket(class CPlayer* pPlayer = NULL);
     ~CVoiceEndPacket();
 
-    ePacketID               GetPacketID() const { return PACKET_ID_VOICE_END; }
+    ePacketID               GetPacketID() const noexcept { return PACKET_ID_VOICE_END; }
     unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_VOICE; }
 

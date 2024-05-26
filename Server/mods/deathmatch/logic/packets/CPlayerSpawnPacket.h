@@ -21,8 +21,8 @@ public:
     CPlayerSpawnPacket(ElementID PlayerID, const CVector& vecSpawnPosition, float fSpawnRotation, unsigned short usPlayerSkin, unsigned char ucInterior,
                        unsigned short usDimension, ElementID Team, unsigned char ucTimeContext);
 
-    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_SPAWN; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_SPAWN; };
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

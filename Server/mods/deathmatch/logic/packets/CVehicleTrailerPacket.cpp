@@ -14,7 +14,7 @@
 #include "CVehicle.h"
 #include <net/SyncStructures.h>
 
-CVehicleTrailerPacket::CVehicleTrailerPacket(CVehicle* pVehicle, CVehicle* pTrailer, bool bAttached)
+CVehicleTrailerPacket::CVehicleTrailerPacket(CVehicle* pVehicle, CVehicle* pTrailer, bool bAttached) noexcept
 {
     m_Vehicle = pVehicle->GetID();
     m_AttachedVehicle = pTrailer->GetID();
@@ -24,46 +24,47 @@ CVehicleTrailerPacket::CVehicleTrailerPacket(CVehicle* pVehicle, CVehicle* pTrai
     m_vecTurnSpeed = pTrailer->GetTurnSpeed();
 }
 
-bool CVehicleTrailerPacket::Read(NetBitStreamInterface& BitStream)
+bool CVehicleTrailerPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     SPositionSync        position(false);
     SRotationDegreesSync rotation(false);
     SVelocitySync        turn;
+    
+    if (!BitStream.Read(m_Vehicle) || !BitStream.Read(m_AttachedVehicle) || !BitStream.ReadBit(m_bAttached))
+        return false;
 
-    if (BitStream.Read(m_Vehicle) && BitStream.Read(m_AttachedVehicle) && BitStream.ReadBit(m_bAttached) &&
-        (!m_bAttached || (BitStream.Read(&position) && BitStream.Read(&rotation) && BitStream.Read(&turn))))
+    if (m_bAttached && (!BitStream.Read(&position) || !BitStream.Read(&rotation) || !BitStream.Read(&turn)))
+        return false;
+
+    if (m_bAttached)
     {
-        if (m_bAttached)
-        {
-            m_vecPosition = position.data.vecPosition;
-            m_vecRotationDegrees = rotation.data.vecRotation;
-            m_vecTurnSpeed = turn.data.vecVelocity;
-        }
-        return true;
+        m_vecPosition = position.data.vecPosition;
+        m_vecRotationDegrees = rotation.data.vecRotation;
+        m_vecTurnSpeed = turn.data.vecVelocity;
     }
-    return false;
+    return true;
 }
 
-bool CVehicleTrailerPacket::Write(NetBitStreamInterface& BitStream) const
+bool CVehicleTrailerPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     BitStream.Write(m_Vehicle);
     BitStream.Write(m_AttachedVehicle);
     BitStream.WriteBit(m_bAttached);
 
-    if (m_bAttached)
-    {
-        SPositionSync position(false);
-        position.data.vecPosition = m_vecPosition;
-        BitStream.Write(&position);
+    if (!m_bAttached)
+        return true;
 
-        SRotationDegreesSync rotation(false);
-        rotation.data.vecRotation = m_vecRotationDegrees;
-        BitStream.Write(&rotation);
+    SPositionSync position(false);
+    position.data.vecPosition = m_vecPosition;
+    BitStream.Write(&position);
 
-        SVelocitySync turn;
-        turn.data.vecVelocity = m_vecTurnSpeed;
-        BitStream.Write(&turn);
-    }
+    SRotationDegreesSync rotation(false);
+    rotation.data.vecRotation = m_vecRotationDegrees;
+    BitStream.Write(&rotation);
+
+    SVelocitySync turn;
+    turn.data.vecVelocity = m_vecTurnSpeed;
+    BitStream.Write(&turn);
 
     return true;
 }

@@ -14,12 +14,7 @@
 #include "CPlayer.h"
 #include <net/SyncStructures.h>
 
-CProjectileSyncPacket::CProjectileSyncPacket()
-{
-    m_usModel = 0;
-}
-
-bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     bool bHasOrigin;
     if (!BitStream.ReadBit(bHasOrigin))
@@ -93,7 +88,7 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
     return true;
 }
 
-bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the source player and latency if any. Otherwize 0
     if (m_pSourceElement)

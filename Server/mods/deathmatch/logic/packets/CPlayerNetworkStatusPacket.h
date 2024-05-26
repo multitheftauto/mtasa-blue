@@ -16,7 +16,7 @@ class CPlayerNetworkStatusPacket final : public CPacket
 {
 public:
     virtual bool  RequiresSourcePlayer() const { return true; }
-    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_NETWORK_STATUS; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_NETWORK_STATUS; };
     unsigned long GetFlags() const
     {
         assert(0);

@@ -14,13 +14,13 @@
 #include "CPlayer.h"
 #include <net/SyncStructures.h>
 
-CExplosionSyncPacket::CExplosionSyncPacket()
+CExplosionSyncPacket::CExplosionSyncPacket() noexcept
 {
     m_OriginID = INVALID_ELEMENT_ID;
     m_ucType = EXPLOSION_SMALL;
 }
 
-CExplosionSyncPacket::CExplosionSyncPacket(const CVector& vecPosition, unsigned char ucType)
+CExplosionSyncPacket::CExplosionSyncPacket(const CVector& vecPosition, std::uint8_t ucType) noexcept
 {
     m_OriginID = INVALID_ELEMENT_ID;
     m_vecPosition = vecPosition;
@@ -47,18 +47,16 @@ bool CExplosionSyncPacket::Read(NetBitStreamInterface& BitStream)
     }
 
     SPositionSync position(false);
-    if (BitStream.Read(&position))
-    {
-        SExplosionTypeSync explosionType;
-        if (BitStream.Read(&explosionType))
-        {
-            m_vecPosition = position.data.vecPosition;
-            m_ucType = explosionType.data.uiType;
-            return true;
-        }
-    }
+    if (!BitStream.Read(&position))
+        return false;
+    
+    SExplosionTypeSync explosionType;
+    if (!BitStream.Read(&explosionType))
+        return false;
 
-    return false;
+    m_vecPosition = position.data.vecPosition;
+    m_ucType = explosionType.data.uiType;
+    return true;
 }
 
 bool CExplosionSyncPacket::Write(NetBitStreamInterface& BitStream) const

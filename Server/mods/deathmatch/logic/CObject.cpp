@@ -16,7 +16,7 @@
 
 extern CGame* g_pGame;
 
-CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod) : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
+CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod) : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(nullptr)
 {
     // Init
     m_iType = CElement::OBJECT;
@@ -24,12 +24,12 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
 
     m_pObjectManager = pObjectManager;
     m_usModel = 0xFFFF;
-    m_pMoveAnimation = NULL;
+    m_pMoveAnimation = nullptr;
     m_ucAlpha = 255;
     m_vecScale = CVector(1.0f, 1.0f, 1.0f);
     m_fHealth = 1000.0f;
     m_bSyncable = true;
-    m_pSyncer = NULL;
+    m_pSyncer = nullptr;
     m_bIsFrozen = false;
     m_bDoubleSided = false;
     m_bBreakable = false;
@@ -59,8 +59,8 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
 
-    m_pMoveAnimation = NULL;
-    if (Copy.m_pMoveAnimation != NULL)
+    m_pMoveAnimation = nullptr;
+    if (Copy.m_pMoveAnimation != nullptr)
     {
         m_pMoveAnimation = new CPositionRotationAnimation(*Copy.m_pMoveAnimation);
     }
@@ -74,14 +74,14 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
 
 CObject::~CObject()
 {
-    if (m_pMoveAnimation != NULL)
+    if (m_pMoveAnimation != nullptr)
     {
         delete m_pMoveAnimation;
-        m_pMoveAnimation = NULL;
+        m_pMoveAnimation = nullptr;
     }
 
     // Remove syncer
-    SetSyncer(NULL);
+    SetSyncer(nullptr);
 
     // Unlink us from manager
     Unlink();
@@ -98,9 +98,9 @@ void CObject::Unlink()
     m_pObjectManager->RemoveFromList(this);
 
     // Remove LowLod refs in others
-    SetLowLodObject(NULL);
+    SetLowLodObject(nullptr);
     while (!m_HighLodObjectList.empty())
-        m_HighLodObjectList[0]->SetLowLodObject(NULL);
+        m_HighLodObjectList[0]->SetLowLodObject(nullptr);
 }
 
 bool CObject::ReadSpecialData(const int iLine)
@@ -310,7 +310,7 @@ void CObject::SetRotation(const CVector& vecRotation)
 bool CObject::IsMoving()
 {
     // Are we currently moving?
-    if (m_pMoveAnimation != NULL)
+    if (m_pMoveAnimation != nullptr)
     {
         // Should we have stopped moving by now?
         if (!m_pMoveAnimation->IsRunning())
@@ -320,7 +320,7 @@ bool CObject::IsMoving()
         }
     }
     // Are we still moving after the above check?
-    return (m_pMoveAnimation != NULL);
+    return (m_pMoveAnimation != nullptr);
 }
 
 void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
@@ -351,7 +351,7 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
 void CObject::StopMoving()
 {
     // Were we moving in the first place
-    if (m_pMoveAnimation != NULL)
+    if (m_pMoveAnimation != nullptr)
     {
         SPositionRotation positionRotation;
         m_pMoveAnimation->GetValue(positionRotation);
@@ -359,7 +359,7 @@ void CObject::StopMoving()
         m_vecRotation = positionRotation.m_vecRotation;
 
         delete m_pMoveAnimation;
-        m_pMoveAnimation = NULL;
+        m_pMoveAnimation = nullptr;
 
         UpdateSpatialData();
     }
@@ -373,7 +373,7 @@ const CPositionRotationAnimation* CObject::GetMoveAnimation()
     }
     else
     {
-        return NULL;
+        return nullptr;
     }
 }
 
@@ -424,8 +424,8 @@ bool CObject::SetLowLodObject(CObject* pNewLowLodObject)
         assert(ListContains(m_pLowLodObject->m_HighLodObjectList, this));
 
         // Clear there and here
-        ListRemove(m_pLowLodObject->m_HighLodObjectList, this);
-        m_pLowLodObject = NULL;
+        ListRemoveFirst(m_pLowLodObject->m_HighLodObjectList, this);
+        m_pLowLodObject = nullptr;
         return true;
     }
     else
@@ -435,7 +435,7 @@ bool CObject::SetLowLodObject(CObject* pNewLowLodObject)
             return false;
 
         // Remove any previous link
-        SetLowLodObject(NULL);
+        SetLowLodObject(nullptr);
 
         // Make new link
         m_pLowLodObject = pNewLowLodObject;
@@ -447,6 +447,6 @@ bool CObject::SetLowLodObject(CObject* pNewLowLodObject)
 CObject* CObject::GetLowLodObject()
 {
     if (m_bIsLowLod)
-        return NULL;
+        return nullptr;
     return m_pLowLodObject;
 }

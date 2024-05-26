@@ -21,8 +21,8 @@ public:
                         short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix);
 
-    ePacketID     GetPacketID() const { return PACKET_ID_SYNC_SETTINGS; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_SYNC_SETTINGS; };
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

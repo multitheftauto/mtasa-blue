@@ -13,14 +13,9 @@
 #include "CPacket.h"
 #include "CPlayer.h"
 
-CPacket::CPacket()
-{
-    // Init
-    m_pSourceElement = NULL;
-    m_Source = NetServerPlayerID(0, 0);
-}
+CPacket::CPacket() noexcept : m_Source(NetServerPlayerID(0, 0)) {}
 
-CPlayer* CPacket::GetSourcePlayer()
+CPlayer* CPacket::GetSourcePlayer() noexcept
 {
     return static_cast<CPlayer*>(m_pSourceElement);
 }

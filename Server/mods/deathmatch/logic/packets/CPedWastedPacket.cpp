@@ -14,7 +14,7 @@
 #include "CPed.h"
 #include <net/SyncStructures.h>
 
-CPedWastedPacket::CPedWastedPacket()
+CPedWastedPacket::CPedWastedPacket() noexcept
 {
     m_PedID = INVALID_ELEMENT_ID;
     m_Killer = INVALID_ELEMENT_ID;
@@ -23,11 +23,12 @@ CPedWastedPacket::CPedWastedPacket()
     m_bStealth = false;
 }
 
-CPedWastedPacket::CPedWastedPacket(CPed* pPed, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth, AssocGroupId animGroup,
-                                   AnimationId animID)
+CPedWastedPacket::CPedWastedPacket(CPed* pPed, CElement* pKiller,
+    std::uint8_t ucKillerWeapon, std::uint8_t ucBodyPart, bool bStealth,
+    AssocGroupId animGroup, AnimationId animID) noexcept
 {
-    m_PedID = pPed->GetID();
-    m_Killer = (pKiller) ? pKiller->GetID() : INVALID_ELEMENT_ID;
+    m_PedID = pPed ? pPed->GetID() : INVALID_ELEMENT_ID;
+    m_Killer = pKiller ? pKiller->GetID() : INVALID_ELEMENT_ID;
     m_ucKillerWeapon = ucKillerWeapon;
     m_ucBodyPart = ucBodyPart;
     m_vecPosition = pPed->GetPosition();
@@ -39,31 +40,33 @@ CPedWastedPacket::CPedWastedPacket(CPed* pPed, CElement* pKiller, unsigned char 
     m_ucTimeContext = pPed->GenerateSyncTimeContext();
 }
 
-bool CPedWastedPacket::Read(NetBitStreamInterface& BitStream)
+bool CPedWastedPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     SWeaponTypeSync weapon;
     SBodypartSync   bodyPart;
     SPositionSync   pos(false);
 
-    if (BitStream.ReadCompressed(m_AnimGroup) && BitStream.ReadCompressed(m_AnimID) && BitStream.Read(m_Killer) && BitStream.Read(&weapon) &&
-        BitStream.Read(&bodyPart) && BitStream.Read(&pos) && BitStream.Read(m_PedID))
-    {
-        m_ucKillerWeapon = weapon.data.ucWeaponType;
-        m_ucBodyPart = bodyPart.data.uiBodypart;
-        m_vecPosition = pos.data.vecPosition;
+    if (!BitStream.ReadCompressed(m_AnimGroup) || !BitStream.ReadCompressed(m_AnimID) ||
+        !BitStream.Read(m_Killer) || !BitStream.Read(&weapon) ||
+        !BitStream.Read(&bodyPart) || !BitStream.Read(&pos) || !BitStream.Read(m_PedID)
+    )
+        return false;
 
-        SWeaponAmmoSync ammo(m_ucKillerWeapon, true, false);
-        if (BitStream.Read(&ammo))
-        {
-            m_usAmmo = ammo.data.usTotalAmmo;
-            return true;
-        }
+    m_ucKillerWeapon = weapon.data.ucWeaponType;
+    m_ucBodyPart = bodyPart.data.uiBodypart;
+    m_vecPosition = pos.data.vecPosition;
+
+    SWeaponAmmoSync ammo(m_ucKillerWeapon, true, false);
+    if (BitStream.Read(&ammo))
+    {
+        m_usAmmo = ammo.data.usTotalAmmo;
+        return true;
     }
 
     return false;
 }
 
-bool CPedWastedPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPedWastedPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     SWeaponTypeSync weapon;
     SBodypartSync   bodyPart;

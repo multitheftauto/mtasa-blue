@@ -13,43 +13,46 @@
 #include "CVehicleInOutPacket.h"
 #include "CGame.h"
 
-CVehicleInOutPacket::CVehicleInOutPacket()
+CVehicleInOutPacket::CVehicleInOutPacket() noexcept
 {
     m_PedID = INVALID_ELEMENT_ID;
     m_VehicleID = INVALID_ELEMENT_ID;
     m_ucSeat = 0;
     m_ucAction = 0;
     m_ucFailReason = 0xFF;
-    m_pCorrectVector = NULL;
+    m_pCorrectVector = nullptr;
     m_bOnWater = false;
     m_ucDoor = 0;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID,
+    std::uint8_t ucSeat, std::uint8_t ucAction) noexcept
 {
     m_PedID = PedID;
     m_VehicleID = VehicleID;
     m_ucSeat = ucSeat;
     m_ucAction = ucAction;
     m_ucFailReason = 0xFF;
-    m_pCorrectVector = NULL;
+    m_pCorrectVector = nullptr;
     m_bOnWater = false;
     m_ucDoor = 0;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction, unsigned char ucDoor)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID,
+    std::uint8_t ucSeat, std::uint8_t ucAction, std::uint8_t ucDoor) noexcept
 {
     m_PedID = PedID;
     m_VehicleID = VehicleID;
     m_ucSeat = ucSeat;
     m_ucAction = ucAction;
     m_ucFailReason = 0xFF;
-    m_pCorrectVector = NULL;
+    m_pCorrectVector = nullptr;
     m_bOnWater = false;
     m_ucDoor = ucDoor;
 }
 
-CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction, ElementID PedIn, ElementID PedOut)
+CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID,
+    std::uint8_t ucSeat, std::uint8_t ucAction, ElementID PedIn, ElementID PedOut) noexcept
 {
     m_PedID = PedID;
     m_VehicleID = VehicleID;
@@ -59,21 +62,21 @@ CVehicleInOutPacket::CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, u
     m_PedOut = PedOut;
     m_ucStartedJacking = 0;
     m_ucFailReason = 0xFF;
-    m_pCorrectVector = NULL;
+    m_pCorrectVector = nullptr;
     m_bOnWater = false;
     m_ucDoor = 0;
 }
 
-CVehicleInOutPacket::~CVehicleInOutPacket()
+CVehicleInOutPacket::~CVehicleInOutPacket() noexcept
 {
-    if (m_pCorrectVector)
-    {
-        delete m_pCorrectVector;
-        m_pCorrectVector = NULL;
-    }
+    if (!m_pCorrectVector)
+        return;
+
+    delete m_pCorrectVector;
+    m_pCorrectVector = nullptr;
 }
 
-bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream)
+bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     m_PedID = INVALID_ELEMENT_ID;
     if (BitStream.Can(eBitStreamVersion::PedEnterExit))
@@ -138,53 +141,51 @@ bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream)
     return true;
 }
 
-bool CVehicleInOutPacket::Write(NetBitStreamInterface& BitStream) const
+bool CVehicleInOutPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    if (m_PedID != INVALID_ELEMENT_ID && m_VehicleID != INVALID_ELEMENT_ID)
+    if (m_PedID == INVALID_ELEMENT_ID || m_VehicleID == INVALID_ELEMENT_ID)
+        return false;
+
+    BitStream.Write(m_PedID);
+    BitStream.Write(m_VehicleID);
+    BitStream.WriteBits(&m_ucSeat, 4);
+    BitStream.WriteBits(&m_ucAction, 4);
+
+    if (m_ucAction == CGame::VEHICLE_REQUEST_IN_CONFIRMED || m_ucAction == CGame::VEHICLE_REQUEST_JACK_CONFIRMED)
     {
-        BitStream.Write(m_PedID);
-        BitStream.Write(m_VehicleID);
-        BitStream.WriteBits(&m_ucSeat, 4);
-        BitStream.WriteBits(&m_ucAction, 4);
-
-        if (m_ucAction == CGame::VEHICLE_REQUEST_IN_CONFIRMED || m_ucAction == CGame::VEHICLE_REQUEST_JACK_CONFIRMED)
-        {
-            BitStream.WriteBits(&m_ucDoor, 3);
-        }
-        // If the action id is VEHICLE_NOTIFY_JACK_RETURN, send the in/out ped chars aswell
-        if (m_ucAction == CGame::VEHICLE_NOTIFY_JACK_RETURN)
-        {
-            BitStream.Write(m_PedIn);
-            BitStream.Write(m_PedOut);
-        }
-
-        if (m_ucAction == 9 /*VEHICLE_ATTEMPT_FAILED*/)
-        {
-            BitStream.Write(m_ucFailReason);
-            if (m_ucFailReason == 5 /*FAIL_DISTANCE*/ && m_pCorrectVector)
-            {
-                SPositionSync pos(false);
-                pos.data.vecPosition = *m_pCorrectVector;
-                BitStream.Write(&pos);
-            }
-        }
-
-        if (m_ucAction == CGame::VEHICLE_NOTIFY_IN_ABORT_RETURN)
-        {
-            BitStream.WriteBits(&m_ucDoor, 3);
-            SDoorOpenRatioSync door;
-            door.data.fRatio = m_fDoorAngle;
-            BitStream.Write(&door);
-        }
-
-        if (m_ucAction == CGame::VEHICLE_REQUEST_OUT_CONFIRMED)
-        {
-            if (m_ucDoor < 4)
-                BitStream.WriteBits(&m_ucDoor, 2);
-        }
-
-        return true;
+        BitStream.WriteBits(&m_ucDoor, 3);
+    }
+    // If the action id is VEHICLE_NOTIFY_JACK_RETURN, send the in/out ped chars aswell
+    if (m_ucAction == CGame::VEHICLE_NOTIFY_JACK_RETURN)
+    {
+        BitStream.Write(m_PedIn);
+        BitStream.Write(m_PedOut);
     }
 
-    return false;
+    if (m_ucAction == 9 /*VEHICLE_ATTEMPT_FAILED*/)
+    {
+        BitStream.Write(m_ucFailReason);
+        if (m_ucFailReason == 5 /*FAIL_DISTANCE*/ && m_pCorrectVector)
+        {
+            SPositionSync pos(false);
+            pos.data.vecPosition = *m_pCorrectVector;
+            BitStream.Write(&pos);
+        }
+    }
+
+    if (m_ucAction == CGame::VEHICLE_NOTIFY_IN_ABORT_RETURN)
+    {
+        BitStream.WriteBits(&m_ucDoor, 3);
+        SDoorOpenRatioSync door;
+        door.data.fRatio = m_fDoorAngle;
+        BitStream.Write(&door);
+    }
+
+    if (m_ucAction == CGame::VEHICLE_REQUEST_OUT_CONFIRMED)
+    {
+        if (m_ucDoor < 4)
+            BitStream.WriteBits(&m_ucDoor, 2);
+    }
+
+    return true;
 }

@@ -18,10 +18,10 @@
 class CCameraSyncPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID() const { return PACKET_ID_CAMERA_SYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_CAMERA_SYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
 
     bool      m_bFixed;
     CVector   m_vecPosition, m_vecLookAt;

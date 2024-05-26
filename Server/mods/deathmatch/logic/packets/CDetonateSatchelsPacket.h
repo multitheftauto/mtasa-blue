@@ -16,11 +16,11 @@
 class CDetonateSatchelsPacket final : public CPacket
 {
 public:
-    CDetonateSatchelsPacket();
+    CDetonateSatchelsPacket() noexcept;
 
-    ePacketID     GetPacketID() const { return PACKET_ID_DETONATE_SATCHELS; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_DETONATE_SATCHELS; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 };

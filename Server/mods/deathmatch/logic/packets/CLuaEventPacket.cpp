@@ -27,27 +27,32 @@ CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments
 
 bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
 {
-    unsigned short usNameLength;
-    if (BitStream.ReadCompressed(usNameLength))
-    {
-        if (usNameLength < (MAX_EVENT_NAME_LENGTH - 1) && BitStream.ReadStringCharacters(m_strName, usNameLength) && BitStream.Read(m_ElementID))
-        {
-            // Faster than using a constructor
-            m_ArgumentsStore.DeleteArguments();
-            if (!m_ArgumentsStore.ReadFromBitStream(BitStream))
-                return false;
-            m_pArguments = &m_ArgumentsStore;
+    std::uint16_t usNameLength;
+    if (!BitStream.ReadCompressed(usNameLength))
+        return false;
 
-            return true;
-        }
-    }
+    if (usNameLength >= (MAX_EVENT_NAME_LENGTH - 1))
+        return false;
 
-    return false;
+    if (!BitStream.ReadStringCharacters(m_strName, usNameLength))
+        return false;
+
+    if (!BitStream.Read(m_ElementID))
+        return false;
+
+    // Faster than using a constructor
+    m_ArgumentsStore.DeleteArguments();
+    if (!m_ArgumentsStore.ReadFromBitStream(BitStream))
+        return false;
+
+    m_pArguments = &m_ArgumentsStore;
+
+    return true;
 }
 
-bool CLuaEventPacket::Write(NetBitStreamInterface& BitStream) const
+bool CLuaEventPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    BitStream.WriteCompressed(static_cast<unsigned short>(m_strName.length()));
+    BitStream.WriteCompressed(static_cast<std::uint16_t>(m_strName.length()));
     BitStream.WriteStringCharacters(m_strName);
     BitStream.Write(m_ElementID);
     m_pArguments->WriteToBitStream(BitStream);

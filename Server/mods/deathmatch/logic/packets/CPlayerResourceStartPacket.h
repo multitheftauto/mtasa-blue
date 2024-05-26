@@ -19,7 +19,7 @@ class CPlayerResourceStartPacket final : public CPacket
 public:
     CPlayerResourceStartPacket() {}
 
-    ePacketID               GetPacketID() const { return PACKET_ID_PLAYER_RESOURCE_START; }
+    ePacketID               GetPacketID() const noexcept { return PACKET_ID_PLAYER_RESOURCE_START; }
     unsigned long           GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
 

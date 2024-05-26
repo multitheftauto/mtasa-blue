@@ -16,21 +16,23 @@
 class CPlayerQuitPacket final : public CPacket
 {
 public:
-    CPlayerQuitPacket();
+    CPlayerQuitPacket() noexcept;
 
-    ePacketID     GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_PLAYER_QUIT); };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return static_cast<ePacketID>(PACKET_ID_PLAYER_QUIT); }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream) { return true; };
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept { return true; }
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    ElementID GetPlayer() { return m_PlayerID; };
-    void      SetPlayer(ElementID PlayerID) { m_PlayerID = PlayerID; };
+    ElementID GetPlayer() const noexcept { return m_PlayerID; };
+    void      SetPlayer(const ElementID PlayerID) noexcept { m_PlayerID = PlayerID; };
 
-    unsigned char GetQuitReason() { return m_ucQuitReason; }
-    void          SetQuitReason(unsigned char ucQuitReason) { m_ucQuitReason = ucQuitReason; }
+    std::uint8_t GetQuitReason() const noexcept { return m_ucQuitReason; }
+    void         SetQuitReason(const std::uint8_t ucQuitReason) noexcept {
+        m_ucQuitReason = ucQuitReason;
+    }
 
 private:
-    ElementID     m_PlayerID;
-    unsigned char m_ucQuitReason;
+    ElementID    m_PlayerID;
+    std::uint8_t m_ucQuitReason;
 };

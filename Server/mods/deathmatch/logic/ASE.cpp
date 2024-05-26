@@ -21,13 +21,13 @@ extern "C"
     #include "ASEQuerySDK.h"
 }
 
-ASE* ASE::_instance = NULL;
+ASE* ASE::_instance = nullptr;
 
 ASE::ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList /*, bool bLan*/)
-    : m_QueryDosProtect(5, 6000, 7000)            // Max of 5 queries per 6 seconds, then 7 second ignore
+    noexcept : m_QueryDosProtect(5, 6000, 7000) // Max of 5 queries per 6 seconds, then 7 second ignore
 {
     _instance = this;
-    m_tStartTime = time(NULL);
+    m_tStartTime = time(nullptr);
 
     m_usPortBase = usPort;
 
@@ -61,9 +61,9 @@ ASE::ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned shor
     m_strMtaAseVersion = MTA_DM_ASE_VERSION;
 }
 
-ASE::~ASE()
+ASE::~ASE() noexcept
 {
-    _instance = NULL;
+    _instance = nullptr;
     ClearRules();
 }
 
@@ -124,12 +124,12 @@ bool ASE::SetPortEnabled(bool bInternetEnabled, bool bLanEnabled)
         }
 
         // Set it to non blocking, so we dont have to wait for a packet
-        #ifdef WIN32
-        unsigned long ulNonBlock = 1;
+#ifdef _WIN32
+        u_long ulNonBlock = 1;
         ioctlsocket(newSocket, FIONBIO, &ulNonBlock);
-        #else
+#else
         fcntl(newSocket, F_SETFL, fcntl(newSocket, F_GETFL) | O_NONBLOCK);
-        #endif
+#endif
 
         m_SocketList.push_back(newSocket);
     }
@@ -171,7 +171,7 @@ void ASE::DoPulse()
                 if (m_QueryDosProtect.AddConnect(inet_ntoa(SockAddr.sin_addr)))
                     continue;
 
-            const std::string* strReply = NULL;
+            const std::string* strReply = nullptr;
 
             switch (szBuffer[0])
             {
@@ -273,14 +273,13 @@ std::string ASE::QueryFull()
     reply << temp.str();
 
     // rules
-    list<CASERule*>::iterator rIter = IterBegin();
-    for (; rIter != IterEnd(); rIter++)
+    for (const auto& aseRule : m_Rules)
     {
         // maybe use a map and std strings for rules?
-        reply << (unsigned char)(strlen((*rIter)->GetKey()) + 1);
-        reply << (*rIter)->GetKey();
-        reply << (unsigned char)(strlen((*rIter)->GetValue()) + 1);
-        reply << (*rIter)->GetValue();
+        reply << (unsigned char)(strlen(aseRule->GetKey()) + 1);
+        reply << aseRule->GetKey();
+        reply << (unsigned char)(strlen(aseRule->GetValue()) + 1);
+        reply << aseRule->GetValue();
     }
     reply << (unsigned char)1;
 
@@ -296,7 +295,7 @@ std::string ASE::QueryFull()
     ucFlags |= 0x32;            // time
 
     char     szTemp[256] = {'\0'};
-    CPlayer* pPlayer = NULL;
+    CPlayer* pPlayer = nullptr;
 
     list<CPlayer*>::const_iterator pIter = m_pPlayerManager->IterBegin();
     for (; pIter != m_pPlayerManager->IterEnd(); pIter++)
@@ -410,7 +409,7 @@ std::string ASE::QueryLight()
     g_pNetServer->GetNetRoute(&strNetRouteFixed);
     SString strPingStatus = (const char*)strPingStatusFixed;
     SString strNetRoute = (const char*)strNetRouteFixed;
-    SString strUpTime("%d", (uint)(time(NULL) - m_tStartTime));
+    SString strUpTime("%d", (uint)(time(nullptr) - m_tStartTime));
     SString strHttpPort("%d", m_pMainConfig->GetHTTPPort());
 
     uint uiExtraDataLength = (strPlayerCount.length() + 1 + strBuildType.length() + 1 + strBuildNumber.length() + 1 + strPingStatus.length() + 1 +
@@ -462,7 +461,7 @@ std::string ASE::QueryLight()
     reply << (unsigned char)std::min(iMaxPlayers, 255);
 
     // players
-    CPlayer* pPlayer = NULL;
+    CPlayer* pPlayer = nullptr;
 
     // Keep the packet under 1350 bytes to try to avoid fragmentation
     int iBytesLeft = 1340 - (int)reply.tellp();
@@ -497,17 +496,17 @@ CLanBroadcast* ASE::InitLan()
     return new CLanBroadcast(m_usPort);
 }
 
-void ASE::SetGameType(const char* szGameType)
+void ASE::SetGameType(const char* szGameType) noexcept
 {
     m_strGameType = SStringX(szGameType).Left(MAX_ASE_GAME_TYPE_LENGTH);
 }
 
-void ASE::SetMapName(const char* szMapName)
+void ASE::SetMapName(const char* szMapName) noexcept
 {
     m_strMapName = SStringX(szMapName).Left(MAX_ASE_MAP_NAME_LENGTH);
 }
 
-const char* ASE::GetRuleValue(const char* szKey)
+const char* ASE::GetRuleValue(const char* szKey) const noexcept
 {
     // Limit szKey length
     SString strKeyTemp;
@@ -517,18 +516,17 @@ const char* ASE::GetRuleValue(const char* szKey)
         szKey = *strKeyTemp;
     }
 
-    list<CASERule*>::iterator iter = m_Rules.begin();
-    for (; iter != m_Rules.end(); iter++)
+    for (const auto& aseRule : m_Rules)
     {
-        if (strcmp((*iter)->GetKey(), szKey) == 0)
+        if (!strcmp(aseRule->GetKey(), szKey))
         {
-            return (*iter)->GetValue();
+            return aseRule->GetValue();
         }
     }
-    return NULL;
+    return nullptr;
 }
 
-void ASE::SetRuleValue(const char* szKey, const char* szValue)
+void ASE::SetRuleValue(const char* szKey, const char* szValue) noexcept
 {
     // Limit szKey length
     SString strKeyTemp;
@@ -538,70 +536,67 @@ void ASE::SetRuleValue(const char* szKey, const char* szValue)
         szKey = *strKeyTemp;
     }
 
-    if (szKey && szKey[0])
-    {
-        // Limit szValue to 200 characters
-        SString strValueTemp;
-        if (szValue && strlen(szValue) > MAX_RULE_VALUE_LENGTH)
-        {
-            strValueTemp = SStringX(szValue).Left(MAX_RULE_VALUE_LENGTH);
-            szValue = *strValueTemp;
-        }
+    if (!szKey || !szKey[0])
+        return;
 
-        list<CASERule*>::iterator iter = m_Rules.begin();
-        for (; iter != m_Rules.end(); iter++)
-        {
-            CASERule* pRule = *iter;
-            if (strcmp((*iter)->GetKey(), szKey) == 0)
-            {
-                if (szValue && szValue[0])
-                {
-                    (*iter)->SetValue(szValue);
-                }
-                else
-                {
-                    // Remove from the list
-                    delete pRule;
-                    m_Rules.erase(iter);
-                }
-                // And return
-                return;
-            }
-        }
-        m_Rules.push_back(new CASERule(szKey, szValue));
-    }
-}
-
-bool ASE::RemoveRuleValue(const char* szKey)
-{
-    // Limit szKey length
-    SString strKeyTemp;
-    if (szKey && strlen(szKey) > MAX_RULE_KEY_LENGTH)
+    // Limit szValue to 200 characters
+    SString strValueTemp;
+    if (szValue && strlen(szValue) > MAX_RULE_VALUE_LENGTH)
     {
-        strKeyTemp = SStringX(szKey).Left(MAX_RULE_KEY_LENGTH);
-        szKey = *strKeyTemp;
+        strValueTemp = SStringX(szValue).Left(MAX_RULE_VALUE_LENGTH);
+        szValue = *strValueTemp;
     }
 
-    list<CASERule*>::iterator iter = m_Rules.begin();
+    auto iter = m_Rules.begin();
     for (; iter != m_Rules.end(); iter++)
     {
-        CASERule* pRule = *iter;
-        if (strcmp(pRule->GetKey(), szKey) == 0)
+        const auto& pRule = *iter;
+        if (strcmp(pRule->GetKey(), szKey))
+            continue;
+
+        if (szValue && szValue[0])
+        {
+            pRule->SetValue(szValue);
+            return;
+        }
+
+        // Remove from the list
+        delete pRule;
+        m_Rules.erase(iter);
+
+        // And return
+        return;
+    }
+    m_Rules.push_back(new CASERule(szKey, szValue));
+}
+
+bool ASE::RemoveRuleValue(const char* szKey) noexcept
+{
+    // Limit szKey length
+    SString strKeyTemp;
+    if (szKey && strlen(szKey) > MAX_RULE_KEY_LENGTH)
+    {
+        strKeyTemp = SStringX(szKey).Left(MAX_RULE_KEY_LENGTH);
+        szKey = *strKeyTemp;
+    }
+
+    m_Rules.remove_if([&](const CASERule* pRule) {
+        if (!std::strcmp(pRule->GetKey(), szKey))
         {
             delete pRule;
-            m_Rules.erase(iter);
             return true;
         }
-    }
+        return false;
+    });
+
     return false;
 }
 
-void ASE::ClearRules()
+void ASE::ClearRules() noexcept
 {
-    list<CASERule*>::iterator iter = m_Rules.begin();
-    for (; iter != m_Rules.end(); iter++)
+    for (const auto& pRule : m_Rules)
     {
-        delete *iter;
+        delete pRule;
     }
     m_Rules.clear();
 }

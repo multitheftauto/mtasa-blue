@@ -25,12 +25,12 @@
 namespace SharedUtil
 {
     class CArgMap;
-#ifdef WIN32
+#ifdef _WIN32
 
     SString GetMajorVersionString();
 
     // Get a system registry value
-    SString GetSystemRegistryValue(uint hKey, const SString& strPath, const SString& strName);
+    SString GetSystemRegistryValue(std::uint32_t hKey, const SString& strPath, const SString& strName);
 
     // Get/set registry values for the current version
     void    SetRegistryValue(const SString& strPath, const SString& strName, const SString& strValue, bool bFlush = false);
@@ -100,8 +100,8 @@ namespace SharedUtil
     //
     // For tracking results of new features
     //
-    void    AddReportLog(uint uiId, const SString& strText, uint uiAmountLimit = 0);
-    void    AddExceptionReportLog(uint uiId, const char* szExceptionName, const char* szExceptionText);
+    void    AddReportLog(std::uint32_t uiId, const SString& strText, std::uint32_t uiAmountLimit = 0);
+    void    AddExceptionReportLog(std::uint32_t uiId, const char* szExceptionName, const char* szExceptionText);
     void    SetReportLogContents(const SString& strText);
     SString GetReportLogContents();
     SString GetReportLogProcessTag();
@@ -163,7 +163,7 @@ namespace SharedUtil
     bool ProcessPendingBrowseToSolution();
     void ClearPendingBrowseToSolution();
 
-    SString GetSystemErrorMessage(uint uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true);
+    SString GetSystemErrorMessage(std::uint32_t uiErrorCode, bool bRemoveNewlines = true, bool bPrependCode = true);
     void    SetClipboardText(const SString& strText);
     SString GetClipboardText();
 
@@ -191,7 +191,7 @@ namespace SharedUtil
     // CPU stats
     struct SThreadCPUTimes
     {
-        uint  uiProcessorNumber = 0;
+        std::uint32_t uiProcessorNumber = 0;
         float fUserPercent = 0;
         float fKernelPercent = 0;
         float fTotalCPUPercent = 0;
@@ -209,7 +209,7 @@ namespace SharedUtil
     };
     DWORD _GetCurrentProcessorNumber();
     void  GetThreadCPUTimes(uint64& outUserTime, uint64& outKernelTime);
-    void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount = NULL);
+    void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount = nullptr);
 
     SString EscapeString(const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', uchar ucLowerLimit = 0, uchar ucUpperLimit = 255);
     SString UnescapeString(const SString& strText, char cSpecialChar = '#');
@@ -238,13 +238,13 @@ namespace SharedUtil
 
     std::wstring ANSIToUTF16(const SString& s);
 
-    int GetUTF8Confidence(const unsigned char* input, int len);
+    int GetUTF8Confidence(const std::uint8_t* input, int len);
 
-    bool IsUTF8BOM(const void* pData, uint uiLength);
+    bool IsUTF8BOM(const void* pData, std::uint32_t uiLength);
 
     // Buffer identification
-    bool IsLuaCompiledScript(const void* pData, uint uiLength);
-    bool IsLuaObfuscatedScript(const void* pData, uint uiLength);
+    bool IsLuaCompiledScript(const void* pData, std::uint32_t uiLength);
+    bool IsLuaObfuscatedScript(const void* pData, std::uint32_t uiLength);
 
     // Return a pointer to the (shifted) trimmed string
     // @ref https://stackoverflow.com/a/26984026
@@ -255,7 +255,7 @@ namespace SharedUtil
     //
     // Clamps a value between two other values ( min < a < max )
     template <class T>
-    T Clamp(const T& min, const T& a, const T& max)
+    constexpr T Clamp(const T& min, const T& a, const T& max) noexcept
     {
         return a < min ? min : a > max ? max : a;
     }
@@ -310,14 +310,15 @@ namespace SharedUtil
     };
 
     template <class T>
-    T EvalSamplePosition(const SSamplePoint<T>* pPoints, uint uiNumPoints, const T& samplePosition)
-    {
+    T EvalSamplePosition(const SSamplePoint<T>* pPoints,
+        std::uint32_t uiNumPoints, const T& samplePosition
+    ) noexcept {
         // Before first point
         if (samplePosition < pPoints[0].in)
             return pPoints[0].out;
 
         // Between points
-        for (uint i = 1; i < uiNumPoints; i++)
+        for (auto i = 1; i < uiNumPoints; i++)
         {
             if (samplePosition < pPoints[i].in)
             {
@@ -346,12 +347,15 @@ namespace SharedUtil
     {
         if (itemList.empty())
             return false;
-        typename TL ::const_iterator it = itemList.begin();
-        for (; it != itemList.end(); ++it)
-            if (item == *it)
+
+        for (const auto& elem : itemList)
+        {
+            if (elem == item)
                 return true;
+        }
         return false;
     }
+
     // Add item if it does not aleady exist in itemList
     template <class TL, class T>
     void ListAddUnique(TL& itemList, const T& item)
@@ -384,40 +388,52 @@ namespace SharedUtil
         itemList.remove(item);
     }
 
+    template <class Value>
+    void ListRemoveIf(std::list<Value>& list, const Value& item) noexcept
+    {
+        list.remove_if([&](const Value& value) { return value == item; });
+    }
+
+    template <class Value, class Pred>
+    void ListRemoveIf(std::list<Value>& list, const Pred& pred) noexcept
+    {
+        list.remove_if(pred);
+    }
+
     //
     // std::vector helpers
     //
 
     // Remove first occurrence of item from itemList
     template <class T>
-    void ListRemoveFirst(std::vector<T>& itemList, const T& item)
+    constexpr void ListRemove(std::vector<T>& itemList, const T& item) noexcept
     {
-        typename std::vector<T>::iterator it = itemList.begin();
-        for (; it != itemList.end(); ++it)
-            if (item == *it)
-            {
-                itemList.erase(it);
-                break;
-            }
+        auto it = std::find(itemList.begin(), itemList.end(), item);
+        if (it != itemList.end())
+        {
+            itemList.erase(it);
+        }
+    }
+
+    // Remove first occurrence of item from itemList
+    template <class T>
+    constexpr void ListRemoveFirst(std::vector<T>& itemList, const T& item) noexcept {
+        ListRemove(itemList, item);
     }
 
     // Remove all occurrences of item from itemList
     template <class T>
-    void ListRemove(std::vector<T>& itemList, const T& item)
+    constexpr void ListRemoveAll(std::vector<T>& itemList, const T& item) noexcept
     {
-        typename std::vector<T>::iterator it = itemList.begin();
-        while (it != itemList.end())
-        {
-            if (item == *it)
-                it = itemList.erase(it);
-            else
-                ++it;
-        }
+        itemList.erase(
+            std::remove(itemList.begin(), itemList.end(), item),
+            itemList.end()
+        );
     }
 
     // Remove item at index from itemList
     template <class T>
-    void ListRemoveIndex(std::vector<T>& itemList, uint index)
+    void ListRemoveIndex(std::vector<T>& itemList, std::uint32_t index)
     {
         if (index < itemList.size())
             itemList.erase(itemList.begin() + index);
@@ -445,16 +461,12 @@ namespace SharedUtil
 
     // Remove all occurrences of item from itemList
     template <class T>
-    void ListRemove(std::deque<T>& itemList, const T& item)
+    void ListRemoveAll(std::deque<T>& itemList, const T& item) noexcept
     {
-        typename std::deque<T>::iterator it = itemList.begin();
-        while (it != itemList.end())
-        {
-            if (item == *it)
-                it = itemList.erase(it);
-            else
-                ++it;
-        }
+        itemList.erase(
+            std::remove(itemList.begin(), itemList.end(), item),
+            itemList.end()
+        );
     }
 
     //
@@ -470,16 +482,21 @@ namespace SharedUtil
         {
             struct
             {
-                unsigned char B, G, R, A;
+                std::uint8_t B, G, R, A;
             };
-            unsigned long ulARGB;
+            std::uint32_t ulARGB;
         };
 
-        SColor() : ulARGB(0) {}
+        constexpr SColor() noexcept : ulARGB(0) {}
+        constexpr SColor(const std::uint32_t ulValue) noexcept : ulARGB(ulValue) {}
+        constexpr SColor(
+            const std::uint8_t ucA,
+            const std::uint8_t ucR,
+            const std::uint8_t ucG,
+            const std::uint8_t ucB
+        ) noexcept : A(ucA), R(ucR), G(ucG), B(ucB) {}
 
-        SColor(unsigned long ulValue) { ulARGB = ulValue; }
-
-        operator unsigned long() const { return ulARGB; }
+        constexpr operator std::uint32_t() const noexcept { return ulARGB; }
     };
 
     //
@@ -490,22 +507,19 @@ namespace SharedUtil
     class SColorARGB : public SColor
     {
     public:
-        SColorARGB(unsigned char ucA, unsigned char ucR, unsigned char ucG, unsigned char ucB)
-        {
-            A = ucA;
-            R = ucR;
-            G = ucG;
-            B = ucB;
-        }
+        constexpr SColorARGB(
+            const std::uint8_t ucA,
+            const std::uint8_t ucR,
+            const std::uint8_t ucG,
+            const std::uint8_t ucB
+        ) noexcept : SColor(ucA, ucR, ucG, ucB) {}
 
         template <class T, class U, class V, class W>
-        SColorARGB(T a, U r, V g, W b)
-        {
-            A = Clamp<unsigned char>(0, static_cast<unsigned char>(a), 255);
-            R = Clamp<unsigned char>(0, static_cast<unsigned char>(r), 255);
-            G = Clamp<unsigned char>(0, static_cast<unsigned char>(g), 255);
-            B = Clamp<unsigned char>(0, static_cast<unsigned char>(b), 255);
-        }
+        constexpr SColorARGB(const T a, const U r, const V g, const W b) noexcept :
+            A(Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(a), 255)),
+            R(Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(r), 255)),
+            G(Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(g), 255)),
+            B(Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(b), 255)) {}
     };
 
     //
@@ -516,38 +530,55 @@ namespace SharedUtil
     class SColorRGBA : public SColor
     {
     public:
-        SColorRGBA(unsigned char ucR, unsigned char ucG, unsigned char ucB, unsigned char ucA)
-        {
-            A = ucA;
-            R = ucR;
-            G = ucG;
-            B = ucB;
-        }
+        constexpr SColorRGBA(
+            const std::uint8_t ucR,
+            const std::uint8_t ucG,
+            const std::uint8_t ucB,
+            const std::uint8_t ucA
+        )
+            noexcept : SColor(ucA, ucR, ucG, ucB) {}
 
         template <class T, class U, class V, class W>
-        SColorRGBA(T r, U g, V b, W a)
-        {
-            A = Clamp<unsigned char>(0, static_cast<unsigned char>(a), 255);
-            R = Clamp<unsigned char>(0, static_cast<unsigned char>(r), 255);
-            G = Clamp<unsigned char>(0, static_cast<unsigned char>(g), 255);
-            B = Clamp<unsigned char>(0, static_cast<unsigned char>(b), 255);
-        }
+        constexpr SColorRGBA(T r, U g, V b, W a) noexcept
+            : SColor(
+                Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(a), 255),
+                Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(r), 255),
+                Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(g), 255),
+                Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(b), 255)
+            ) {}
     };
 
     //
     // Things to make it simpler to use SColor with the source code as it stands
     //
-    typedef SColor RGBA;
+    using RGBA = SColor;
 
-    inline unsigned char COLOR_RGBA_R(SColor color) { return color.R; }
-    inline unsigned char COLOR_RGBA_G(SColor color) { return color.G; }
-    inline unsigned char COLOR_RGBA_B(SColor color) { return color.B; }
-    inline unsigned char COLOR_RGBA_A(SColor color) { return color.A; }
-    inline unsigned char COLOR_ARGB_A(SColor color) { return color.A; }
+    inline std::uint8_t COLOR_RGBA_R(const SColor color) noexcept { return color.R; }
+    inline std::uint8_t COLOR_RGBA_G(const SColor color) noexcept { return color.G; }
+    inline std::uint8_t COLOR_RGBA_B(const SColor color) noexcept { return color.B; }
+    inline std::uint8_t COLOR_RGBA_A(const SColor color) noexcept { return color.A; }
+    inline std::uint8_t COLOR_ARGB_A(const SColor color) noexcept { return color.A; }
 
-    inline SColor COLOR_RGBA(unsigned char R, unsigned char G, unsigned char B, unsigned char A) { return SColorRGBA(R, G, B, A); }
-    inline SColor COLOR_ARGB(unsigned char A, unsigned char R, unsigned char G, unsigned char B) { return SColorRGBA(R, G, B, A); }
-    inline SColor COLOR_ABGR(unsigned char A, unsigned char B, unsigned char G, unsigned char R) { return SColorRGBA(R, G, B, A); }
+    inline SColor COLOR_RGBA(
+        const std::uint8_t R,
+        const std::uint8_t G,
+        const std::uint8_t B,
+        const std::uint8_t A
+    ) noexcept { return SColorRGBA(R, G, B, A); }
+
+    inline SColor COLOR_ARGB(
+        const std::uint8_t A,
+        const std::uint8_t R,
+        const std::uint8_t G,
+        const std::uint8_t B
+    ) noexcept { return SColorRGBA(R, G, B, A); }
+
+    inline SColor COLOR_ABGR(
+        const std::uint8_t A,
+        const std::uint8_t B,
+        const std::uint8_t G,
+        const std::uint8_t R
+    ) noexcept { return SColorRGBA(R, G, B, A); }
 
     //
     // Cross platform critical section
@@ -803,7 +834,7 @@ namespace SharedUtil
         GetOption<T>(strText, strKey, strNumbers);
         std::vector<SString> numberList;
         strNumbers.Split(szSeperator, numberList);
-        for (uint i = 0; i < numberList.size(); i++)
+        for (std::uint32_t i = 0; i < numberList.size(); i++)
             if (!numberList[i].empty())
                 MapInsert(outValues, static_cast<U>(atoi(numberList[i])));
     }
@@ -829,7 +860,7 @@ namespace SharedUtil
         typename LIST_TYPE ::const_iterator   end() const { return m_List.end(); }
         typename LIST_TYPE ::reverse_iterator rbegin() { return m_List.rbegin(); }
         typename LIST_TYPE ::reverse_iterator rend() { return m_List.rend(); }
-        uint                                  size() const { return m_List.size(); }
+        std::uint32_t                                  size() const { return m_List.size(); }
         bool                                  empty() const { return m_List.empty(); }
         const T&                              back() const { return m_List.back(); }
         const T&                              front() const { return m_List.front(); }
@@ -966,13 +997,14 @@ namespace SharedUtil
     class CIntrusiveListNode
     {
     public:
-        typedef CIntrusiveListNode<T> Node;
+        using Node = CIntrusiveListNode<T>;
 
-        CIntrusiveListNode(T* pOuterItem) : m_pOuterItem(pOuterItem), m_pPrev(NULL), m_pNext(NULL) {}
+        constexpr CIntrusiveListNode(T* pOuterItem) noexcept
+            : m_pOuterItem(pOuterItem) {}
 
         T*    m_pOuterItem;            // Item this node is inside
-        Node* m_pPrev;
-        Node* m_pNext;
+        Node* m_pPrev{};
+        Node* m_pNext{};
     };
 
     ///////////////////////////////////////////////////////////////
@@ -985,20 +1017,26 @@ namespace SharedUtil
     template <typename T>
     class CIntrusiveList
     {
-        void operator=(const CIntrusiveList& other);            // Copy will probably not work as expected
-        // CIntrusiveList ( const CIntrusiveList& other );       // Default copy constructor is required by dense_hash for some reason
+        // Copy will probably not work as expected
+        void operator=(const CIntrusiveList& other);
+        // Default copy constructor is required by dense_hash for some reason
+        // CIntrusiveList ( const CIntrusiveList& other );
 
     public:
         class IteratorBase;
 
     protected:
-        typedef CIntrusiveListNode<T> Node;
+        using Node = CIntrusiveListNode<T>;
 
         size_t m_Size;
         Node*  m_pFirst;
         Node*  m_pLast;
-        Node T::*                  m_pNodePtr;                   // Pointer to the CIntrusiveListNode member variable in T
-        std::vector<IteratorBase*> m_ActiveIterators;            // Keep track of iterators
+
+        // Pointer to the CIntrusiveListNode member variable in T
+        Node T::*m_pNodePtr;
+
+        // Keep track of iterators
+        std::vector<IteratorBase*> m_ActiveIterators;
 
     public:
         //
@@ -1010,11 +1048,18 @@ namespace SharedUtil
             CIntrusiveList<T>* m_pList;
 
         public:
-            Node* m_pNode;
-            IteratorBase(CIntrusiveList<T>* pList, Node* pNode) : m_pList(pList), m_pNode(pNode) { m_pList->m_ActiveIterators.push_back(this); }
-            ~IteratorBase() { ListRemove(m_pList->m_ActiveIterators, this); }
-            T*           operator*() { return m_pNode->m_pOuterItem; }
+            IteratorBase(CIntrusiveList<T>* pList, Node* pNode)
+                noexcept : m_pList(pList), m_pNode(pNode) {
+                m_pList->m_ActiveIterators.push_back(this);
+            }
+            ~IteratorBase() noexcept {
+                ListRemove(m_pList->m_ActiveIterators, this);
+            }
+
+            T*           operator*() noexcept { return m_pNode->m_pOuterItem; }
             virtual void NotifyRemovingNode(Node* pNode) = 0;
+
+            Node* m_pNode;
         };
 
         //
@@ -1060,8 +1105,8 @@ namespace SharedUtil
         {
             assert(m_pNodePtr);            // This must be set upon construction
             m_Size = 0;
-            m_pFirst = NULL;
-            m_pLast = NULL;
+            m_pFirst = nullptr;
+            m_pLast = nullptr;
         }
 
         ~CIntrusiveList() { assert(m_ActiveIterators.empty()); }
@@ -1100,14 +1145,14 @@ namespace SharedUtil
                 {
                     // Only item in list
                     assert(!pNode->m_pPrev && !pNode->m_pNext);
-                    m_pFirst = NULL;
-                    m_pLast = NULL;
+                    m_pFirst = nullptr;
+                    m_pLast = nullptr;
                 }
                 else
                 {
                     // First item in list
                     assert(!pNode->m_pPrev && pNode->m_pNext && pNode->m_pNext->m_pPrev == pNode);
-                    pNode->m_pNext->m_pPrev = NULL;
+                    pNode->m_pNext->m_pPrev = nullptr;
                     m_pFirst = pNode->m_pNext;
                 }
             }
@@ -1115,7 +1160,7 @@ namespace SharedUtil
             {
                 // Last item in list
                 assert(pNode->m_pPrev && !pNode->m_pNext && pNode->m_pPrev->m_pNext == pNode);
-                pNode->m_pPrev->m_pNext = NULL;
+                pNode->m_pPrev->m_pNext = nullptr;
                 m_pLast = pNode->m_pPrev;
             }
             else
@@ -1125,8 +1170,8 @@ namespace SharedUtil
                 pNode->m_pPrev->m_pNext = pNode->m_pNext;
                 pNode->m_pNext->m_pPrev = pNode->m_pPrev;
             }
-            pNode->m_pNext = NULL;
-            pNode->m_pPrev = NULL;
+            pNode->m_pNext = nullptr;
+            pNode->m_pPrev = nullptr;
             m_Size--;
         }
 
@@ -1176,11 +1221,11 @@ namespace SharedUtil
 
         Iterator begin() { return Iterator(this, m_pFirst); }
 
-        Iterator end() { return Iterator(this, NULL); }
+        Iterator end() { return Iterator(this, nullptr); }
 
         ReverseIterator rbegin() { return ReverseIterator(this, m_pLast); }
 
-        ReverseIterator rend() { return ReverseIterator(this, NULL); }
+        ReverseIterator rend() { return ReverseIterator(this, nullptr); }
 
         // Allow use of std iterator names
         typedef Iterator        iterator;
@@ -1240,12 +1285,12 @@ namespace SharedUtil
     template <typename T>
     inline T tolower(T c)
     {
-        return static_cast<T>(ms_ucTolowerTab[static_cast<unsigned char>(c)]);
+        return static_cast<T>(ms_ucTolowerTab[static_cast<std::uint8_t>(c)]);
     }
     template <typename T>
     inline T toupper(T c)
     {
-        return static_cast<T>(ms_ucToupperTab[static_cast<unsigned char>(c)]);
+        return static_cast<T>(ms_ucToupperTab[static_cast<std::uint8_t>(c)]);
     }
 
     //
@@ -1264,12 +1309,12 @@ namespace SharedUtil
             const char* szName;
         };
 
-        CEnumInfo(const SString& strTypeName, const SEnumItem* pItemList, uint uiAmount, eDummy defaultValue, const SString& strDefaultName)
+        CEnumInfo(const SString& strTypeName, const SEnumItem* pItemList, std::uint32_t uiAmount, eDummy defaultValue, const SString& strDefaultName)
         {
             m_strTypeName = strTypeName;
             m_strDefaultName = strDefaultName;
             m_DefaultValue = defaultValue;
-            for (uint i = 0; i < uiAmount; i++)
+            for (std::uint32_t i = 0; i < uiAmount; i++)
             {
                 const SEnumItem& item = pItemList[i];
                 m_ValueMap[item.szName] = (eDummy)item.iValue;
@@ -1350,7 +1395,7 @@ namespace SharedUtil
         // Written by Jack Handy - jakkhandy@hotmail.com
         assert(wild && string);
 
-        const char *cp = NULL, *mp = NULL;
+        const char *cp = nullptr, *mp = nullptr;
 
         while ((*string) && (*wild != '*'))
         {
@@ -1400,7 +1445,7 @@ namespace SharedUtil
         // Written by Jack Handy - jakkhandy@hotmail.com
         assert(wild && string);
 
-        const char *cp = NULL, *mp = NULL;
+        const char *cp = nullptr, *mp = nullptr;
 
         while ((*string) && (*wild != '*'))
         {
@@ -1496,7 +1541,7 @@ namespace SharedUtil
         {
             std::vector<SString> partList;
             strFilterDesc.Split(",", partList);
-            for (uint i = 0; i < partList.size(); i++)
+            for (std::uint32_t i = 0; i < partList.size(); i++)
             {
                 const SString& part = partList[i];
                 char           cType = part.Left(1)[0];
@@ -1540,7 +1585,7 @@ namespace SharedUtil
             cDefaultType = cType;
         }
 
-        std::map<uint, bool> idMap;
+        std::map<std::uint32_t, bool> idMap;
         char                 cDefaultType;
     };
 
@@ -1555,14 +1600,15 @@ namespace SharedUtil
     class CRefCountable
     {
         int                     m_iRefCount;
-        CCriticalSection*       m_pCS;            // Use a pointer incase the static variable exists more than once
+        // Use a pointer incase the static variable exists more than once
+        CCriticalSection*       m_pCS;
         static CCriticalSection ms_CS;
 
     protected:
-        virtual ~CRefCountable() {}
+        virtual ~CRefCountable() noexcept {}
 
     public:
-        CRefCountable() : m_iRefCount(1), m_pCS(&ms_CS) {}
+        constexpr CRefCountable() noexcept : m_iRefCount(1), m_pCS(&ms_CS) {}
 
         void AddRef()
         {
@@ -1593,13 +1639,13 @@ namespace SharedUtil
     template <class T, int SIZE>
     struct SFixedArray
     {
-        T& operator[](uint uiIndex)
+        T& operator[](std::uint32_t uiIndex)
         {
             assert(uiIndex < SIZE);
             return data[uiIndex];
         }
 
-        const T& operator[](uint uiIndex) const
+        const T& operator[](std::uint32_t uiIndex) const
         {
             assert(uiIndex < SIZE);
             return data[uiIndex];
@@ -1615,7 +1661,7 @@ namespace SharedUtil
     template <class T, int SIZE>
     struct SFixedArrayInit : SFixedArray<T, SIZE>
     {
-        SFixedArrayInit(const T* pInitData, uint uiInitCount)
+        SFixedArrayInit(const T* pInitData, std::uint32_t uiInitCount)
         {
             dassert(SIZE == uiInitCount);
             memcpy(SFixedArray<T, SIZE>::data, pInitData, sizeof(SFixedArray<T, SIZE>::data));
@@ -1632,17 +1678,17 @@ namespace SharedUtil
     class CRanges
     {
     public:
-        void SetRange(uint uiStart, uint uiLength);
-        void UnsetRange(uint uiStart, uint uiLength);
-        bool IsRangeSet(uint uiStart, uint uiLength);            // Returns true if any part of the range already exists in the map
+        void SetRange(std::uint32_t uiStart, std::uint32_t uiLength);
+        void UnsetRange(std::uint32_t uiStart, std::uint32_t uiLength);
+        bool IsRangeSet(std::uint32_t uiStart, std::uint32_t uiLength);            // Returns true if any part of the range already exists in the map
 
     protected:
-        typedef std::map<uint, uint>::iterator IterType;
+        typedef std::map<std::uint32_t, std::uint32_t>::iterator IterType;
 
-        void RemoveObscuredRanges(uint uiStart, uint uiLast);
-        bool GetRangeOverlappingPoint(uint uiPoint, IterType& result);
+        void RemoveObscuredRanges(std::uint32_t uiStart, std::uint32_t uiLast);
+        bool GetRangeOverlappingPoint(std::uint32_t uiPoint, IterType& result);
 
-        std::map<uint, uint> m_StartLastMap;
+        std::map<std::uint32_t, std::uint32_t> m_StartLastMap;
     };
 
     //
@@ -1674,9 +1720,9 @@ namespace SharedUtil
         CRefedPointer<T>* pPointer;
 
     public:
-        CAutoRefedPointer() { pPointer = new CRefedPointer<T>(); }
+        CAutoRefedPointer() noexcept { pPointer = new CRefedPointer<T>(); }
 
-        CAutoRefedPointer(const CAutoRefedPointer<T>& other)
+        CAutoRefedPointer(const CAutoRefedPointer<T>& other)noexcept 
         {
             pPointer = other.pPointer;
             pPointer->AddRef();
@@ -1713,5 +1759,5 @@ using namespace SharedUtil;
 //
 // For checking MTA library module versions
 //
-typedef void(FUNC_GetMtaVersion)(char* pBuffer, uint uiMaxSize);
-MTAEXPORT void GetLibMtaVersion(char* pBuffer, uint uiMaxSize);
+using FUNC_GetMtaVersion = void(char* pBuffer, std::uint32_t uiMaxSize);
+MTAEXPORT void GetLibMtaVersion(char* pBuffer, std::uint32_t uiMaxSize);

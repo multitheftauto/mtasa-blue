@@ -16,15 +16,15 @@
 class CCommandPacket final : public CPacket
 {
 public:
-    CCommandPacket() { m_strCommand = ""; };
+    CCommandPacket() noexcept { m_strCommand = ""; };
 
-    ePacketID               GetPacketID() const { return static_cast<ePacketID>(PACKET_ID_COMMAND); };
-    unsigned long           GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
+    ePacketID               GetPacketID() const noexcept { return static_cast<ePacketID>(PACKET_ID_COMMAND); }
+    std::uint32_t           GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_CHAT; }
 
-    bool Read(NetBitStreamInterface& BitStream);
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
 
-    const char* GetCommand() const { return m_strCommand.c_str(); };
+    const char* GetCommand() const noexcept { return m_strCommand.c_str(); };
 
 private:
     std::string m_strCommand;

@@ -17,18 +17,18 @@
 class CLuaEventPacket final : public CPacket
 {
 public:
-    CLuaEventPacket();
-    CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments);
+    CLuaEventPacket() noexcept;
+    CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments) noexcept;
 
-    ePacketID     GetPacketID() const { return PACKET_ID_LUA_EVENT; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_LUA_EVENT; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    const char*    GetName() { return m_strName; }
-    ElementID      GetElementID() { return m_ElementID; }
-    CLuaArguments* GetArguments() { return m_pArguments; }
+    const char*    GetName() const noexcept { return m_strName; }
+    ElementID      GetElementID() const noexcept { return m_ElementID; }
+    CLuaArguments* GetArguments() const noexcept { return m_pArguments; }
 
 private:
     SString        m_strName;

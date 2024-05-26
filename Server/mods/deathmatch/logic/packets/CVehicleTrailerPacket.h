@@ -19,21 +19,21 @@ class CVehicle;
 class CVehicleTrailerPacket final : public CPacket
 {
 public:
-    CVehicleTrailerPacket(){};
-    CVehicleTrailerPacket(CVehicle* pVehicle, CVehicle* pTrailer, bool bAttached);
+    CVehicleTrailerPacket() noexcept {};
+    CVehicleTrailerPacket(CVehicle* pVehicle, CVehicle* pTrailer, bool bAttached) noexcept;
 
-    ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_TRAILER; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_TRAILER; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    ElementID GetVehicle() { return m_Vehicle; };
-    ElementID GetAttachedVehicle() { return m_AttachedVehicle; };
-    bool      GetAttached() { return m_bAttached; }
-    CVector   GetPosition() { return m_vecPosition; }
-    CVector   GetRotationDegrees() { return m_vecRotationDegrees; }
-    CVector   GetTurnSpeed() { return m_vecTurnSpeed; }
+    ElementID GetVehicle() const noexcept { return m_Vehicle; }
+    ElementID GetAttachedVehicle() const noexcept { return m_AttachedVehicle; }
+    bool      GetAttached() const noexcept { return m_bAttached; }
+    CVector   GetPosition() const noexcept { return m_vecPosition; }
+    CVector   GetRotationDegrees() const noexcept { return m_vecRotationDegrees; }
+    CVector   GetTurnSpeed() const noexcept { return m_vecTurnSpeed; }
 
 private:
     ElementID m_Vehicle;

@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CPlayerTransgressionPacket.h"
 
-bool CPlayerTransgressionPacket::Read(NetBitStreamInterface& BitStream)
+bool CPlayerTransgressionPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     return BitStream.Read(m_uiLevel) && BitStream.ReadString(m_strMessage);
 }

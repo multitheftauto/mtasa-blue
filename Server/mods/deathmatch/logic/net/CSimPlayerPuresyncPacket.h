@@ -14,15 +14,15 @@
 class CSimPacket
 {
 public:
-    CSimPacket() { DEBUG_CREATE_COUNT("CSimPacket"); }
-    virtual ~CSimPacket() { DEBUG_DESTROY_COUNT("CSimPacket"); }
+    CSimPacket() noexcept { DEBUG_CREATE_COUNT("CSimPacket"); }
+    virtual ~CSimPacket() noexcept { DEBUG_DESTROY_COUNT("CSimPacket"); }
 
-    virtual ePacketID       GetPacketID() const = 0;
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
-    virtual unsigned long   GetFlags() const = 0;
+    virtual ePacketID       GetPacketID() const noexcept = 0;
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_DEFAULT; }
+    virtual unsigned long   GetFlags() const noexcept = 0;
 
-    virtual bool Read(NetBitStreamInterface& BitStream) { return false; };
-    virtual bool Write(NetBitStreamInterface& BitStream) const { return false; };
+    virtual bool Read(NetBitStreamInterface& BitStream) noexcept { return false; }
+    virtual bool Write(NetBitStreamInterface& BitStream) const noexcept{ return false; }
 };
 
 //
@@ -33,16 +33,17 @@ class CSimPlayerPuresyncPacket : public CSimPacket
 public:
     ZERO_ON_NEW
 
-    CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType, float WeaponRange,
-                             CControllerState& sharedControllerState);
+    CSimPlayerPuresyncPacket(ElementID PlayerID,
+        std::uint16_t PlayerLatency, std::uint8_t PlayerSyncTimeContext, std::uint8_t PlayerGotWeaponType, float WeaponRange,
+        CControllerState& sharedControllerState);
 
-    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_PURESYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_PURESYNC; };
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    bool CanUpdateSync(unsigned char ucRemote)
+    bool CanUpdateSync(std::uint8_t ucRemote) noexcept
     {
         // We can update this element's sync only if the sync time
         // matches or either of them are 0 (ignore).
@@ -51,16 +52,16 @@ public:
 
     // Set in constructor
     const ElementID   m_PlayerID;
-    const ushort      m_PlayerLatency;
-    const uchar       m_PlayerSyncTimeContext;
-    const uchar       m_PlayerGotWeaponType;
+    const std::uint16_t      m_PlayerLatency;
+    const std::uint8_t       m_PlayerSyncTimeContext;
+    const std::uint8_t       m_PlayerGotWeaponType;
     const float       m_WeaponRange;
     CControllerState& m_sharedControllerState;
 
     // Set in Read ()
     struct
     {
-        uchar                ucTimeContext;
+        std::uint8_t                ucTimeContext;
         SPlayerPuresyncFlags flags;
         ElementID            ContactElementID;
         CVector              Position;
@@ -73,9 +74,9 @@ public:
         CVector              vecCamFwd;
 
         bool   bWeaponCorrect;
-        uchar  ucWeaponSlot;            // Only valid if bWeaponCorrect
-        ushort usAmmoInClip;            // Only valid if bWeaponCorrect
-        ushort usTotalAmmo;             // Only valid if bWeaponCorrect
+        std::uint8_t  ucWeaponSlot;            // Only valid if bWeaponCorrect
+        std::uint16_t usAmmoInClip;            // Only valid if bWeaponCorrect
+        std::uint16_t usTotalAmmo;             // Only valid if bWeaponCorrect
 
         bool    bIsAimFull;
         float   fAimDirection;              // Only valid if bWeaponCorrect

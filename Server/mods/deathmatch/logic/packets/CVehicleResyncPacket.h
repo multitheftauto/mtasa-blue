@@ -21,8 +21,8 @@ class CVehicleResyncPacket final : public CPacket
 public:
     explicit CVehicleResyncPacket(CVehicle* pVehicle) { m_pVehicle = pVehicle; };
 
-    ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_RESYNC; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_RESYNC; };
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;

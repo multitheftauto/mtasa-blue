@@ -15,9 +15,9 @@
 #include "CGame.h"
 #include "CResourceManager.h"
 
-bool CPlayerScreenShotPacket::Read(NetBitStreamInterface& BitStream)
+bool CPlayerScreenShotPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
-    m_pResource = NULL;
+    m_pResource = nullptr;
 
     CPlayer* pPlayer = GetSourcePlayer();
     if (!pPlayer)

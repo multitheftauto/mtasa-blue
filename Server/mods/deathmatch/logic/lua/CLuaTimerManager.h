@@ -31,11 +31,11 @@ public:
 
     CLuaTimer* GetTimerFromScriptID(unsigned int uiScriptID);
 
-    CLuaTimer*    AddTimer(const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments);
-    void          RemoveTimer(CLuaTimer* pLuaTimer);
-    void          RemoveAllTimers();
-    unsigned long GetTimerCount() const { return m_TimerList.size(); }
-
+    CLuaTimer*  AddTimer(const CLuaFunctionRef& iLuaFunction, CTickCount llTimeDelay, unsigned int uiRepeats, const CLuaArguments& Arguments);
+    void        RemoveTimer(CLuaTimer* pLuaTimer);
+    void        RemoveAllTimers();
+    std::size_t GetTimerCount() const { return m_TimerList.size(); }
+    
     void ResetTimer(CLuaTimer* pLuaTimer);
 
     CFastList<CLuaTimer*>::const_iterator IterBegin() { return m_TimerList.begin(); }

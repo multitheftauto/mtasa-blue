@@ -24,7 +24,7 @@ class CServerInfoSyncPacket final : public CPacket
 public:
     CServerInfoSyncPacket(uint8 flags) { m_ActualInfo = flags; }
 
-    ePacketID               GetPacketID() const { return PACKET_ID_SERVER_INFO_SYNC; }
+    ePacketID               GetPacketID() const noexcept { return PACKET_ID_SERVER_INFO_SYNC; }
     unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
 

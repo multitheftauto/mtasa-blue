@@ -21,8 +21,8 @@ class CUnoccupiedVehiclePushPacket final : public CPacket
 public:
     CUnoccupiedVehiclePushPacket(){};
 
-    ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_PUSH_SYNC; };
-    unsigned long GetFlags() const { return 0; };            // Not used
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_PUSH_SYNC; };
+    std::uint32_t GetFlags() const noexcept { return 0; };            // Not used
 
     bool Read(NetBitStreamInterface& BitStream);
 

@@ -198,26 +198,24 @@ void CColManager::DeleteAll()
 
 void CColManager::RemoveFromList(CColShape* pShape)
 {
-    if (m_bCanRemoveFromList)
+    if (!m_bCanRemoveFromList)
+        return;
+
+    // Dont wanna remove it if we're going through the list
+    if (m_bIteratingList)
     {
-        // Dont wanna remove it if we're going through the list
-        if (m_bIteratingList)
-        {
-            m_TrashCan.push_back(pShape);
-        }
-        else
-        {
-            ListRemove(m_List, pShape);
-        }
+        m_TrashCan.push_back(pShape);
+        return;
     }
+
+    ListRemoveFirst(m_List, pShape);
 }
 
 void CColManager::TakeOutTheTrash()
 {
-    std::vector<CColShape*>::const_iterator iter = m_TrashCan.begin();
-    for (; iter != m_TrashCan.end(); iter++)
+    for (const auto& pShape : m_TrashCan)
     {
-        ListRemove(m_List, *iter);
+        ListRemoveFirst(m_List, pShape);
     }
 
     m_TrashCan.clear();

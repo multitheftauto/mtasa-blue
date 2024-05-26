@@ -314,7 +314,7 @@ bool ListContains(const CFastList<T*>& itemList, const U& item)
 
 // Remove all occurrences of item from itemList (There should never be more than one anyway)
 template <class T, class U>
-void ListRemove(CFastList<T*>& itemList, const U& item)
+void ListRemoveAll(CFastList<T*>& itemList, const U& item)
 {
     itemList.remove(item);
 }

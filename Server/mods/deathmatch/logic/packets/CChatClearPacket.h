@@ -19,7 +19,7 @@ public:
     CChatClearPacket(){};
 
     // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
-    ePacketID               GetPacketID() const { return PACKET_ID_CHAT_CLEAR; };
+    ePacketID               GetPacketID() const noexcept { return PACKET_ID_CHAT_CLEAR; };
     unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
 

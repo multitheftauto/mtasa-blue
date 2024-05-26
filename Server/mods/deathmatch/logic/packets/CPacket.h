@@ -34,27 +34,27 @@ enum
 class CPacket
 {
 public:
-    CPacket();
-    virtual ~CPacket(){};
+    CPacket() noexcept;
+    virtual ~CPacket() noexcept {};
 
-    virtual bool            RequiresSourcePlayer() const { return true; }
-    virtual bool            HasSimHandler() const { return false; }
-    virtual ePacketID       GetPacketID() const = 0;
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
-    virtual unsigned long   GetFlags() const = 0;
+    virtual bool            RequiresSourcePlayer() const noexcept { return true; }
+    virtual bool            HasSimHandler() const noexcept { return false; }
+    virtual ePacketID       GetPacketID() const noexcept = 0;
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_DEFAULT; }
+    virtual std::uint32_t   GetFlags() const noexcept = 0;
 
-    virtual bool Read(NetBitStreamInterface& BitStream) { return false; };
-    virtual bool Write(NetBitStreamInterface& BitStream) const { return false; };
+    virtual bool Read(NetBitStreamInterface& BitStream) noexcept { return false; }
+    virtual bool Write(NetBitStreamInterface& BitStream) const noexcept { return false; }
 
-    void                     SetSourceElement(CElement* pSource) { m_pSourceElement = pSource; };
-    CElement*                GetSourceElement() const { return m_pSourceElement; };
+    void                     SetSourceElement(CElement* pSource) noexcept { m_pSourceElement = pSource; }
+    CElement*                GetSourceElement() const noexcept { return m_pSourceElement; }
     CPlayer*                 GetSourcePlayer();
-    void                     SetSourceSocket(const NetServerPlayerID& Source) { m_Source = Source; };
-    const NetServerPlayerID& GetSourceSocket() const { return m_Source; };
-    unsigned long            GetSourceIP() const { return m_Source.GetBinaryAddress(); };
-    unsigned short           GetSourcePort() const { return m_Source.GetPort(); };
+    void                     SetSourceSocket(const NetServerPlayerID& Source) noexcept { m_Source = Source; }
+    const NetServerPlayerID& GetSourceSocket() const noexcept { return m_Source; }
+    std::uint32_t            GetSourceIP() const noexcept { return m_Source.GetBinaryAddress(); }
+    std::uint16_t            GetSourcePort() const noexcept { return m_Source.GetPort(); }
 
 protected:
-    CElement*         m_pSourceElement;
+    CElement*         m_pSourceElement{nullptr};
     NetServerPlayerID m_Source;
 };

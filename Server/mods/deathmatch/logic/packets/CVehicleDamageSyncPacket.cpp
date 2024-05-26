@@ -13,16 +13,15 @@
 #include "CVehicleDamageSyncPacket.h"
 #include "CVehicle.h"
 
-CVehicleDamageSyncPacket::CVehicleDamageSyncPacket() : m_damage(true, true, true, true, true)
+CVehicleDamageSyncPacket::CVehicleDamageSyncPacket() noexcept
+    : m_damage(true, true, true, true, true) {}
+
+bool CVehicleDamageSyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
+    return BitStream.Read(m_Vehicle) && BitStream.Read(&m_damage);
 }
 
-bool CVehicleDamageSyncPacket::Read(NetBitStreamInterface& BitStream)
-{
-    return (BitStream.Read(m_Vehicle) && BitStream.Read(&m_damage));
-}
-
-bool CVehicleDamageSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CVehicleDamageSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     BitStream.Write(m_Vehicle);
     BitStream.Write(&m_damage);
@@ -30,19 +29,20 @@ bool CVehicleDamageSyncPacket::Write(NetBitStreamInterface& BitStream) const
     return true;
 }
 
-void CVehicleDamageSyncPacket::SetFromVehicle(CVehicle* pVehicle)
+void CVehicleDamageSyncPacket::SetFromVehicle(CVehicle* pVehicle) noexcept
 {
     m_Vehicle = pVehicle->GetID();
     m_damage.data.ucDoorStates = pVehicle->m_ucDoorStates;
     m_damage.data.ucWheelStates = pVehicle->m_ucWheelStates;
     m_damage.data.ucPanelStates = pVehicle->m_ucPanelStates;
     m_damage.data.ucLightStates = pVehicle->m_ucLightStates;
-    for (unsigned int i = 0; i < MAX_DOORS; ++i)
+
+    for (auto i = 0; i < MAX_DOORS; ++i)
         m_damage.data.bDoorStatesChanged[i] = true;
-    for (unsigned int i = 0; i < MAX_WHEELS; ++i)
+    for (auto i = 0; i < MAX_WHEELS; ++i)
         m_damage.data.bWheelStatesChanged[i] = true;
-    for (unsigned int i = 0; i < MAX_PANELS; ++i)
+    for (auto i = 0; i < MAX_PANELS; ++i)
         m_damage.data.bPanelStatesChanged[i] = true;
-    for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
+    for (auto i = 0; i < MAX_LIGHTS; ++i)
         m_damage.data.bLightStatesChanged[i] = true;
 }

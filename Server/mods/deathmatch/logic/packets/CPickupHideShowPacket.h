@@ -19,8 +19,8 @@ class CPickupHideShowPacket final : public CPacket
 public:
     CPickupHideShowPacket(bool bShow) { m_bShow = bShow; };
 
-    ePacketID     GetPacketID() const { return PACKET_ID_PICKUP_HIDESHOW; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PICKUP_HIDESHOW; };
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
     bool Write(NetBitStreamInterface& BitStream) const;
 

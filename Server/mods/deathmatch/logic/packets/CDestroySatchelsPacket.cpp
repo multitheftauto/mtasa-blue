@@ -13,24 +13,19 @@
 #include "CDestroySatchelsPacket.h"
 #include "CElement.h"
 
-CDestroySatchelsPacket::CDestroySatchelsPacket()
-{
-}
+CDestroySatchelsPacket::CDestroySatchelsPacket() noexcept {}
 
-bool CDestroySatchelsPacket::Read(NetBitStreamInterface& BitStream)
+bool CDestroySatchelsPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     return true;
 }
 
-bool CDestroySatchelsPacket::Write(NetBitStreamInterface& BitStream) const
+bool CDestroySatchelsPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the source player.
-    if (m_pSourceElement)
-    {
-        BitStream.Write(m_pSourceElement->GetID());
-    }
-    else
+    if (!m_pSourceElement)
         return false;
 
+    BitStream.Write(m_pSourceElement->GetID());
     return true;
 }

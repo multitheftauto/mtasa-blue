@@ -17,12 +17,12 @@
 class CResourceStartPacket final : public CPacket
 {
 public:
-    CResourceStartPacket(const char* szResourceName, class CResource* pResource);
+    CResourceStartPacket(const char* szResourceName, class CResource* pResource) noexcept;
 
-    ePacketID     GetPacketID() const { return PACKET_ID_RESOURCE_START; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_RESOURCE_START; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     std::string m_strResourceName;

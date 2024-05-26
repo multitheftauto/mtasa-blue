@@ -17,51 +17,74 @@
 class CVehicleInOutPacket final : public CPacket
 {
 public:
-    CVehicleInOutPacket();
-    CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction);
-    CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction, unsigned char ucDoor);
-    CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, unsigned char ucSeat, unsigned char ucAction, ElementID PedIn, ElementID PedOut);
-    virtual ~CVehicleInOutPacket();
+    CVehicleInOutPacket() noexcept;
+    CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, std::uint8_t ucSeat, std::uint8_t ucAction) noexcept;
+    CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, std::uint8_t ucSeat, std::uint8_t ucAction, std::uint8_t ucDoor) noexcept;
+    CVehicleInOutPacket(ElementID PedID, ElementID VehicleID, std::uint8_t ucSeat, std::uint8_t ucAction, ElementID PedIn, ElementID PedOut) noexcept;
+    virtual ~CVehicleInOutPacket() noexcept;
 
-    ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_INOUT; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_INOUT; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    unsigned char GetDoor() { return m_ucDoor; };
-    bool          GetOnWater() { return m_bOnWater; };
-    ElementID     GetVehicleID() { return m_VehicleID; };
-    ElementID     GetPedID() { return m_PedID; };
-    unsigned char GetSeat() { return m_ucSeat; };
-    float         GetDoorAngle() { return m_fDoorAngle; }
-    unsigned char GetAction() { return m_ucAction; };
-    ElementID     GetPedIn() { return m_PedIn; };
-    ElementID     GetPedOut() { return m_PedOut; };
-    unsigned char GetStartedJacking() { return m_ucStartedJacking; };
+    std::uint8_t GetDoor() const noexcept { return m_ucDoor; }
+    bool         GetOnWater() const noexcept { return m_bOnWater; }
+    ElementID    GetVehicleID() const noexcept { return m_VehicleID; }
+    ElementID    GetPedID() const noexcept { return m_PedID; }
+    std::uint8_t GetSeat() const noexcept { return m_ucSeat; }
+    float        GetDoorAngle() const noexcept { return m_fDoorAngle; }
+    std::uint8_t GetAction() const noexcept { return m_ucAction; }
+    ElementID    GetPedIn() const noexcept { return m_PedIn; }
+    ElementID    GetPedOut() const noexcept { return m_PedOut; }
+    std::uint8_t GetStartedJacking() const noexcept { return m_ucStartedJacking; }
 
-    void SetPedID(ElementID ID) { m_PedID = ID; };
-    void SetVehicleID(ElementID ID) { m_VehicleID = ID; };
-    void SetSeat(unsigned char ucSeat) { m_ucSeat = ucSeat; };
-    void SetDoor(unsigned char ucDoor) { m_ucDoor = ucDoor; }
-    void SetDoorAngle(float fDoorAngle) { m_fDoorAngle = fDoorAngle; }
-    void SetAction(unsigned char ucAction) { m_ucAction = ucAction; };
-    void SetPedIn(ElementID PedIn) { m_PedIn = PedIn; };
-    void SetPedOut(ElementID PedOut) { m_PedOut = PedOut; };
-    void SetFailReason(unsigned char ucReason) { m_ucFailReason = ucReason; }
-    void SetCorrectVector(const CVector& vector) { m_pCorrectVector = new CVector(vector.fX, vector.fY, vector.fZ); }
+    void SetPedID(const ElementID ID) noexcept { m_PedID = ID; }
+    void SetVehicleID(const ElementID ID) noexcept { m_VehicleID = ID; }
+    void SetSeat(const std::uint8_t ucSeat) noexcept { m_ucSeat = ucSeat; }
+    void SetDoor(const std::uint8_t ucDoor) noexcept { m_ucDoor = ucDoor; }
+    void SetDoorAngle(const float fDoorAngle) noexcept { m_fDoorAngle = fDoorAngle; }
+    void SetAction(const std::uint8_t ucAction) noexcept { m_ucAction = ucAction; }
+    void SetPedIn(const ElementID PedIn) noexcept { m_PedIn = PedIn; }
+    void SetPedOut(const ElementID PedOut) noexcept { m_PedOut = PedOut; }
+    void SetFailReason(const std::uint8_t ucReason) noexcept { m_ucFailReason = ucReason; }
+    void SetCorrectVector(const CVector& vector) noexcept { m_pCorrectVector = new CVector(vector.fX, vector.fY, vector.fZ); }
 
 private:
-    ElementID     m_PedID;                       // The ped
-    ElementID     m_VehicleID;                   // The vehicle
-    unsigned char m_ucSeat;                      // The seat
-    unsigned char m_ucAction;                    // The action, see CGame.h
-    ElementID     m_PedIn;                       // The ped jacking
-    ElementID     m_PedOut;                      // The ped getting jacked
-    unsigned char m_ucStartedJacking;            // 1 = client reports he started jacking
-    unsigned char m_ucFailReason;                // eFailReasons
-    CVector*      m_pCorrectVector;              // Ped position reported by client
-    bool          m_bOnWater;                    // Vehicle in water reported by client
-    unsigned char m_ucDoor;                      // Door ID
-    float         m_fDoorAngle;                  // Door angle
+    // The ped
+    ElementID m_PedID;
+
+    // The vehicle
+    ElementID m_VehicleID;
+
+    // The seat
+    std::uint8_t m_ucSeat;
+
+    // The action, see CGame.h
+    std::uint8_t m_ucAction;
+
+    // The ped jacking
+    ElementID m_PedIn;
+
+    // The ped getting jacked
+    ElementID m_PedOut;
+
+    // 1 = client reports he started jacking
+    std::uint8_t m_ucStartedJacking;
+
+    // eFailReasons
+    std::uint8_t m_ucFailReason;
+
+    // Ped position reported by client
+    CVector* m_pCorrectVector;
+
+    // Vehicle in water reported by client
+    bool m_bOnWater;
+
+    // Door ID
+    std::uint8_t m_ucDoor;
+
+    // Door angle
+    float m_fDoorAngle;
 };

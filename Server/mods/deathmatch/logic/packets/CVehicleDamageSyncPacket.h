@@ -19,15 +19,15 @@ class CVehicle;
 class CVehicleDamageSyncPacket final : public CPacket
 {
 public:
-    CVehicleDamageSyncPacket();
+    CVehicleDamageSyncPacket() noexcept;
 
-    ePacketID     GetPacketID() const { return PACKET_ID_VEHICLE_DAMAGE_SYNC; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_DAMAGE_SYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept; 
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    void SetFromVehicle(CVehicle* pVehicle);
+    void SetFromVehicle(CVehicle* pVehicle) noexcept;
 
     ElementID          m_Vehicle;
     SVehicleDamageSync m_damage;

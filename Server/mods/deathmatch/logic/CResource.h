@@ -197,7 +197,7 @@ public:
     bool CallExportedFunction(const char* szFunctionName, CLuaArguments& Arguments, CLuaArguments& Returns, CResource& Caller);
 
     std::list<CResource*>& GetDependents() { return m_Dependents; }
-    int                    GetDependentCount() const noexcept { return m_Dependents.size(); }
+    std::size_t GetDependentCount() const noexcept { return m_Dependents.size(); }
 
     std::list<CIncludedResources*>::iterator       GetIncludedResourcesBegin() { return m_IncludedResources.begin(); }
     std::list<CIncludedResources*>::const_iterator GetIncludedResourcesBegin() const noexcept { return m_IncludedResources.begin(); }

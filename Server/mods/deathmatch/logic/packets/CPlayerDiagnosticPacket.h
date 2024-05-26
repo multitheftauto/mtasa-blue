@@ -16,11 +16,11 @@
 class CPlayerDiagnosticPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_DIAGNOSTIC; };
-    unsigned long GetFlags() const { return 0; };            // Not used
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_DIAGNOSTIC; }
+    std::uint32_t GetFlags() const noexcept { return 0; } // Not used
 
-    bool Read(NetBitStreamInterface& BitStream);
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
 
-    uint    m_uiLevel;
-    SString m_strMessage;
+    std::uint32_t m_uiLevel;
+    SString       m_strMessage;
 };

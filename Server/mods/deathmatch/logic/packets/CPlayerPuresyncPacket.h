@@ -16,13 +16,13 @@
 class CPlayerPuresyncPacket final : public CPacket
 {
 public:
-    CPlayerPuresyncPacket(){};
-    explicit CPlayerPuresyncPacket(CPlayer* pPlayer);
+    CPlayerPuresyncPacket() noexcept {};
+    explicit CPlayerPuresyncPacket(CPlayer* pPlayer) noexcept;
 
-    bool          HasSimHandler() const { return true; }
-    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_PURESYNC; };
-    unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    bool          HasSimHandler() const noexcept { return true; }
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_PURESYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 };

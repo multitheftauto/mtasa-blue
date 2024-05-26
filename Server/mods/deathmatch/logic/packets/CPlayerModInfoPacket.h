@@ -33,10 +33,10 @@ struct SModInfoItem
 class CPlayerModInfoPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_MODINFO; };
-    unsigned long GetFlags() const { return 0; };            // Not used
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_MODINFO; }
+    std::uint32_t GetFlags() const noexcept { return 0; } // Not used
 
-    bool Read(NetBitStreamInterface& BitStream);
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
 
     SString                   m_strInfoType;
     std::vector<SModInfoItem> m_ModInfoItemList;

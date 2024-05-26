@@ -30,7 +30,7 @@ public:
         m_uiLevel = uiLevel;
     }
 
-    ePacketID               GetPacketID() const { return PACKET_ID_DEBUG_ECHO; };
+    ePacketID               GetPacketID() const noexcept { return PACKET_ID_DEBUG_ECHO; };
     unsigned long           GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
 

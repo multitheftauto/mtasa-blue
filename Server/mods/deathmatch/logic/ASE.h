@@ -11,7 +11,7 @@
 
 #pragma once
 
-#ifdef WIN32
+#ifdef _WIN32
     #include <conio.h>
     #define sockclose closesocket
 #else
@@ -25,13 +25,14 @@
     #ifndef INVALID_SOCKET
         #define INVALID_SOCKET -1
     #endif
-typedef int SOCKET;
+using SOCKET = int;
 #endif
 
 #include "CConnectHistory.h"
 #include <string.h>
 #include <stdio.h>
 #include <list>
+#include <string>
 
 #define MAX_ASE_GAME_TYPE_LENGTH    200
 #define MAX_ASE_MAP_NAME_LENGTH     200
@@ -48,35 +49,39 @@ class ASE
 {
 public:
     ZERO_ON_NEW
-    ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, unsigned short usPort, const SString& strServerIPList);
-    ~ASE();
+    ASE(CMainConfig* pMainConfig, CPlayerManager* pPlayerManager, std::uint16_t usPort,
+        const SString& strServerIPList) noexcept;
+    ~ASE() noexcept;
 
     void DoPulse();
     bool SetPortEnabled(bool bInternetEnabled, bool bLanEnabled);
 
-    static ASE* GetInstance() { return _instance; }
+    static ASE* GetInstance() noexcept { return _instance; }
 
-    unsigned long GetMasterServerQueryCount() { return m_ulMasterServerQueryCount; }
-    uint          GetTotalQueryCount() { return m_uiNumQueriesTotal; }
-    uint          GetQueriesPerMinute() { return m_uiNumQueriesPerMinute; }
+    std::uint32_t GetMasterServerQueryCount() noexcept { return m_ulMasterServerQueryCount; }
+    std::uint32_t GetTotalQueryCount() noexcept { return m_uiNumQueriesTotal; }
+    std::uint32_t GetQueriesPerMinute() noexcept { return m_uiNumQueriesPerMinute; }
 
     CLanBroadcast* InitLan();
 
-    const char* GetGameType() { return m_strGameType.c_str(); }
-    void        SetGameType(const char* szGameType);
-    const char* GetMapName() { return m_strMapName.c_str(); }
-    void        SetMapName(const char* szMapName);
+    const char* GetGameType() const noexcept { return m_strGameType.c_str(); }
+    void        SetGameType(const char* szGameType) noexcept;
+    const char* GetMapName() const noexcept { return m_strMapName.c_str(); }
+    void        SetMapName(const char* szMapName) noexcept;
 
-    CMainConfig*    GetMainConfig() { return m_pMainConfig; };
-    CPlayerManager* GetPlayerManager() { return m_pPlayerManager; };
+    CMainConfig*    GetMainConfig() const noexcept { return m_pMainConfig; };
+    CPlayerManager* GetPlayerManager() const noexcept { return m_pPlayerManager; };
 
-    const char* GetRuleValue(const char* szKey);
-    void        SetRuleValue(const char* szKey, const char* szValue);
-    bool        RemoveRuleValue(const char* szKey);
-    void        ClearRules();
+    const char* GetRuleValue(const char* szKey) const noexcept;
+    void        SetRuleValue(const char* szKey, const char* szValue) noexcept;
+    bool        RemoveRuleValue(const char* szKey) noexcept;
+    void        ClearRules() noexcept;
 
-    std::list<CASERule*>::iterator IterBegin() { return m_Rules.begin(); }
-    std::list<CASERule*>::iterator IterEnd() { return m_Rules.end(); }
+    std::list<CASERule*>::iterator begin() noexcept { return m_Rules.begin(); }
+    std::list<CASERule*>::iterator end() noexcept { return m_Rules.end(); }
+
+    std::list<CASERule*>::const_iterator begin() const noexcept { return m_Rules.cbegin(); }
+    std::list<CASERule*>::const_iterator end() const noexcept { return m_Rules.cend(); }
 
     std::string QueryLight();
 
@@ -87,8 +92,8 @@ private:
     const std::string* QueryXfireLightCached();
     std::string        QueryXfireLight();
 
-    long long m_llCurrentTime;
-    uint      m_uiCurrentPlayerCount;
+    std::int64_t  m_llCurrentTime;
+    std::uint32_t m_uiCurrentPlayerCount;
 
     CMainConfig*    m_pMainConfig;
     CPlayerManager* m_pPlayerManager;
@@ -105,34 +110,34 @@ private:
 
     std::vector<SOCKET> m_SocketList;
 
-    unsigned short m_usPortBase;
-    unsigned short m_usPort;
+    std::uint16_t m_usPortBase;
+    std::uint16_t m_usPort;
 
     // Full query cache
-    unsigned int m_uiFullLastPlayerCount;
-    long long    m_llFullLastTime;
-    long         m_lFullMinInterval;
-    std::string  m_strFullCached;
+    std::uint32_t m_uiFullLastPlayerCount;
+    std::int64_t  m_llFullLastTime;
+    std::int32_t  m_lFullMinInterval;
+    std::string   m_strFullCached;
 
     // Light query cache
-    unsigned int m_uiLightLastPlayerCount;
-    long long    m_llLightLastTime;
-    long         m_lLightMinInterval;
-    std::string  m_strLightCached;
+    std::uint32_t m_uiLightLastPlayerCount;
+    std::int64_t  m_llLightLastTime;
+    std::int32_t  m_lLightMinInterval;
+    std::string   m_strLightCached;
 
     // XFire Light query cache
-    unsigned int m_uiXfireLightLastPlayerCount;
-    long long    m_llXfireLightLastTime;
-    long         m_lXfireLightMinInterval;
-    std::string  m_strXfireLightCached;
+    std::uint32_t m_uiXfireLightLastPlayerCount;
+    std::int64_t  m_llXfireLightLastTime;
+    std::int32_t  m_lXfireLightMinInterval;
+    std::string   m_strXfireLightCached;
 
     std::string m_strMtaAseVersion;
 
     // Stats
-    unsigned long m_ulMasterServerQueryCount;
-    uint          m_uiNumQueriesTotal;
-    uint          m_uiNumQueriesPerMinute;
-    uint          m_uiTotalAtMinuteStart;
+    std::uint32_t m_ulMasterServerQueryCount;
+    std::uint32_t m_uiNumQueriesTotal;
+    std::uint32_t m_uiNumQueriesPerMinute;
+    std::uint32_t m_uiTotalAtMinuteStart;
     CElapsedTime  m_MinuteTimer;
 
     CConnectHistory m_QueryDosProtect;
@@ -142,14 +147,12 @@ class CASERule
 {
 public:
     CASERule(const char* szKey, const char* szValue)
-    {
-        m_strKey = szKey;
-        m_strValue = szValue;
-    }
-    const char* GetKey() { return m_strKey.c_str(); }
-    void        SetKey(const char* szKey) { m_strKey = szKey; }
-    const char* GetValue() { return m_strValue.c_str(); }
-    void        SetValue(const char* szValue) { m_strValue = szValue; }
+        noexcept : m_strKey(szKey), m_strValue(szValue) {}
+
+    const char* GetKey() const noexcept { return m_strKey.c_str(); }
+    void        SetKey(const char* szKey) noexcept { m_strKey = szKey; }
+    const char* GetValue() const noexcept { return m_strValue.c_str(); }
+    void        SetValue(const char* szValue) noexcept { m_strValue = szValue; }
 
 private:
     std::string m_strKey;

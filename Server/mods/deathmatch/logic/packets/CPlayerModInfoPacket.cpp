@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CPlayerModInfoPacket.h"
 
-bool CPlayerModInfoPacket::Read(NetBitStreamInterface& BitStream)
+bool CPlayerModInfoPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // Read type
     if (!BitStream.ReadString(m_strInfoType))
@@ -24,7 +24,7 @@ bool CPlayerModInfoPacket::Read(NetBitStreamInterface& BitStream)
         return false;
 
     // Read each item
-    for (uint i = 0; i < uiCount; i++)
+    for (auto i = 0; i < uiCount; i++)
     {
         SModInfoItem item;
 

@@ -66,12 +66,12 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
         if (m_pPendingDelete)
         {
             assert(m_pPendingDelete == m_pProcessingTimer);
-            m_pProcessingTimer = NULL;
+            m_pProcessingTimer = nullptr;
             delete m_pPendingDelete;
-            m_pPendingDelete = NULL;
+            m_pPendingDelete = nullptr;
         }
         else
-            m_pProcessingTimer = NULL;
+            m_pProcessingTimer = nullptr;
     }
 }
 
@@ -84,8 +84,8 @@ void CLuaTimerManager::RemoveTimer(CLuaTimer* pLuaTimer)
         return;
 
     // Remove all references
-    ListRemove(m_TimerList, pLuaTimer);
-    ListRemove(m_ProcessQueue, pLuaTimer);
+    ListRemoveAll(m_TimerList, pLuaTimer);
+    ListRemoveAll(m_ProcessQueue, pLuaTimer);
 
     if (m_pProcessingTimer == pLuaTimer)
     {
@@ -109,8 +109,8 @@ void CLuaTimerManager::RemoveAllTimers()
     // Clear the timer list
     m_TimerList.clear();
     m_ProcessQueue.clear();
-    m_pPendingDelete = NULL;
-    m_pProcessingTimer = NULL;
+    m_pPendingDelete = nullptr;
+    m_pProcessingTimer = nullptr;
 }
 
 void CLuaTimerManager::ResetTimer(CLuaTimer* pLuaTimer)
@@ -125,10 +125,10 @@ CLuaTimer* CLuaTimerManager::GetTimerFromScriptID(uint uiScriptID)
 {
     CLuaTimer* pLuaTimer = (CLuaTimer*)CIdArray::FindEntry(uiScriptID, EIdClass::TIMER);
     if (!pLuaTimer)
-        return NULL;
+        return nullptr;
 
     if (!ListContains(m_TimerList, pLuaTimer))
-        return NULL;
+        return nullptr;
     return pLuaTimer;
 }
 
@@ -136,7 +136,7 @@ CLuaTimer* CLuaTimerManager::AddTimer(const CLuaFunctionRef& iLuaFunction, CTick
 {
     // Check for the minimum interval
     if (llTimeDelay.ToLongLong() < LUA_TIMER_MIN_INTERVAL)
-        return NULL;
+        return nullptr;
 
     if (VERIFY_FUNCTION(iLuaFunction))
     {
@@ -149,5 +149,5 @@ CLuaTimer* CLuaTimerManager::AddTimer(const CLuaFunctionRef& iLuaFunction, CTick
         return pLuaTimer;
     }
 
-    return NULL;
+    return nullptr;
 }

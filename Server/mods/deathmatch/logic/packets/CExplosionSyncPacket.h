@@ -34,18 +34,18 @@ public:
         EXPLOSION_TINY,
     };
 
-    CExplosionSyncPacket();
-    CExplosionSyncPacket(const CVector& vecPosition, unsigned char ucType);
+    CExplosionSyncPacket() noexcept;
+    CExplosionSyncPacket(const CVector& vecPosition, std::uint8_t ucType) noexcept;
 
-    ePacketID     GetPacketID() const { return PACKET_ID_EXPLOSION; };
-    unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_EXPLOSION; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    ElementID     m_OriginID;
-    CVector       m_vecPosition;
-    unsigned char m_ucType;
+    ElementID    m_OriginID;
+    CVector      m_vecPosition;
+    std::uint8_t m_ucType;
 
     bool m_isVehicleResponsible = false;
     bool m_blowVehicleWithoutExplosion = false;
