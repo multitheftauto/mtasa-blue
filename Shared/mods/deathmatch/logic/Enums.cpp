@@ -98,6 +98,7 @@ ADD_ENUM(WorldSpecialProperty::CORONAZTEST, "coronaztest")
 ADD_ENUM(WorldSpecialProperty::WATERCREATURES, "watercreatures")
 ADD_ENUM(WorldSpecialProperty::BURNFLIPPEDCARS, "burnflippedcars")
 ADD_ENUM(WorldSpecialProperty::FIREBALLDESTRUCT, "fireballdestruct")
+ADD_ENUM(WorldSpecialProperty::ROADSIGNSTEXT, "roadsignstext")
 IMPLEMENT_ENUM_CLASS_END("world-special-property")
 
 IMPLEMENT_ENUM_BEGIN(ePacketID)
