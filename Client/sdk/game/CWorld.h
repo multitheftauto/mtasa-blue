@@ -168,7 +168,7 @@ enum eDebugCaller
     CBuilding_Destructor,
     CBuildingPool_Constructor,
     CBuildingPool_Destructor,
-
+    CBuilding_SetLod,
 };
 
 enum eSurfaceProperties
