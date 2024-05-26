@@ -47,41 +47,74 @@ public:
     void                              StopMoving();
     const CPositionRotationAnimation* GetMoveAnimation();
 
-    unsigned char GetAlpha() { return m_ucAlpha; }
+    unsigned char GetAlpha() const { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha) { m_ucAlpha = ucAlpha; }
 
-    unsigned short GetModel() { return m_usModel; }
+    unsigned short GetModel() const { return m_usModel; }
     void           SetModel(unsigned short usModel) { m_usModel = usModel; }
 
-    const CVector& GetScale() { return m_vecScale; }
+    const CVector& GetScale() const { return m_vecScale; }
     void           SetScale(const CVector& vecScale) { m_vecScale = vecScale; }
 
-    bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
+    bool GetCollisionEnabled() const { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
-    bool IsFrozen() { return m_bIsFrozen; }
+    bool IsFrozen() const { return m_bIsFrozen; }
     void SetFrozen(bool bFrozen) { m_bIsFrozen = bFrozen; }
 
-    float GetHealth() { return m_fHealth; }
+    float GetHealth() const { return m_fHealth; }
     void  SetHealth(float fHealth) { m_fHealth = fHealth; }
 
-    bool IsSyncable() { return m_bSyncable; }
+    bool IsSyncable() const { return m_bSyncable; }
     void SetSyncable(bool bSyncable) { m_bSyncable = bSyncable; }
 
-    CPlayer* GetSyncer() { return m_pSyncer; }
+    CPlayer* GetSyncer() const { return m_pSyncer; }
     void     SetSyncer(CPlayer* pPlayer);
 
     bool     IsLowLod();
     bool     SetLowLodObject(CObject* pLowLodObject);
     CObject* GetLowLodObject();
 
-    bool IsVisibleInAllDimensions() { return m_bVisibleInAllDimensions; };
+    bool IsVisibleInAllDimensions() const { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible) { m_bVisibleInAllDimensions = bVisible; };
 
-    bool IsBreakable() { return m_bBreakable; }
+    bool IsBreakable() const { return m_bBreakable; }
     void SetBreakable(bool bBreakable) { m_bBreakable = bBreakable; }
 
-protected:
+    CVector GetMoveSpeed() const { return m_vecMoveSpeed; }
+    void    SetMoveSpeed(CVector vecMoveSpeed);
+
+    CVector GetTurnSpeed() const { return m_vecTurnSpeed; }
+    void    SetTurnSpeed(CVector vecTurnSpeed);
+
+    bool IsStatic() const { return m_bIsStatic; }
+    void SetStatic(bool bStatic) { m_bIsStatic = bStatic; }
+
+    bool IsInWater() const { return m_bInWater; }
+    void SetInWater(bool bInWater) { m_bInWater = bInWater; }
+
+    bool IsRespawnEnabled() const { return m_bRespawnEnabled; }
+    void SetRespawnEnabled(bool bEnabled) { m_bRespawnEnabled = bEnabled; }
+
+    float GetMass() const { return m_fMass; }
+    void  SetMass(float fMass) { m_fMass = fMass; };
+
+    float GetTurnMass() const { return m_fTurnMass; }
+    void SetTurnMass(float fTurnMass) { m_fTurnMass = fTurnMass; }
+
+    float GetAirResistance() const { return m_fAirResistance; }
+    void  SetAirResistance(float fResistance) { m_fAirResistance = fResistance; }
+
+    float GetElasticity() const { return m_fElasticity; }
+    void  SetElasticity(float fElasticity) { m_fElasticity = fElasticity; }
+
+    float GetBuoyancyConstant() const { return m_fBuoyancyConstant; }
+    void  SetBuoyancyConstant(float fBuoyancy) { m_fBuoyancyConstant = fBuoyancy; }
+
+    CVector GetCenterOfMass() const { return m_vecCenterOfMass; }
+    void    SetCenterOfMass(CVector vecCenterOfMass) { m_vecCenterOfMass = vecCenterOfMass; }
+
+    protected:
     bool ReadSpecialData(const int iLine) override;
 
 private:
@@ -96,6 +129,19 @@ private:
     bool            m_bSyncable;
     CPlayer*        m_pSyncer;
     bool            m_bVisibleInAllDimensions = false;
+    CVector         m_vecMoveSpeed;
+    CVector         m_vecTurnSpeed;
+    bool            m_bInWater;
+    bool            m_bIsStatic;            // true if the object never moved using setElementVelocity/setElementAngularVelocity
+    bool            m_bRespawnEnabled;
+
+    // Properties
+    float m_fMass;
+    float m_fTurnMass;
+    float m_fAirResistance;
+    float m_fElasticity;
+    float m_fBuoyancyConstant;
+    CVector m_vecCenterOfMass;
 
 protected:
     bool m_bCollisionsEnabled;
@@ -106,4 +152,5 @@ protected:
 
 public:
     CPositionRotationAnimation* m_pMoveAnimation;
+    bool                        m_bIsMoving;            // Value for the onObjectMoveStop event
 };

@@ -29,6 +29,7 @@ public:
     LUA_DECLARE(GetObjectMass);
     LUA_DECLARE(GetObjectProperty);
     LUA_DECLARE(GetObjectProperties);
+    static bool IsObjectRespawnEnabled(CClientEntity* pEntity);
 
     // Object set funcs
     LUA_DECLARE(SetObjectRotation);

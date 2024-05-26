@@ -28,6 +28,7 @@
 #include "lua/CLuaCallback.h"
 #include "CWeaponStatManager.h"
 #include "CPedSync.h"
+#include "CObjectSync.h"
 #include "CHTTPD.h"
 #include "CBan.h"
 #include "CPlayerCamera.h"
@@ -1548,6 +1549,10 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerVoiceStop", "", NULL, false);
 
     // Object events
+    m_Events.AddEvent("onObjectDamage", "loss, attacker", nullptr, false);
+    m_Events.AddEvent("onObjectBreak", "attacker", nullptr, false);
+    m_Events.AddEvent("onObjectMoveStart", "", nullptr, false);
+    m_Events.AddEvent("onObjectMoveStop", "", nullptr, false);
 
     // Pickup events
     m_Events.AddEvent("onPickupHit", "player", NULL, false);

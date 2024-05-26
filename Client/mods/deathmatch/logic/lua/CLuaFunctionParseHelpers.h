@@ -42,7 +42,6 @@ DECLARE_ENUM(EEntityTypeMask);
 DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(eVehicleComponent);
-DECLARE_ENUM(eObjectProperty);
 DECLARE_ENUM(eObjectGroup::Modifiable);
 DECLARE_ENUM(eObjectGroup::DamageEffect);
 DECLARE_ENUM(eObjectGroup::CollisionResponse);

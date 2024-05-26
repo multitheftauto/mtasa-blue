@@ -40,13 +40,14 @@ bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(pData->ucSyncTimeContext))
             return false;
 
-        // Read out flags
-        SIntegerSync<unsigned char, 3> flags;
-        if (!BitStream.Read(&flags))
+        // Read out the flags
+        //SIntegerSync<unsigned char, 12> flags;
+        unsigned int flags;
+        if (!BitStream.Read(flags))
             return false;
         pData->ucFlags = flags;
 
-        // Read out the position if we need
+        // Read out the position
         if (flags & 0x1)
         {
             SPositionSync position;
@@ -64,13 +65,98 @@ bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream)
             pData->vecRotation = rotation.data.vecRotation;
         }
 
-        // Read out the health
+        // Read out the velocity
         if (flags & 0x4)
         {
+            SVelocitySync velocity;
+            if (!BitStream.Read(&velocity))
+                return false;
+
+            pData->vecVelocity = velocity.data.vecVelocity;
+        }
+
+        // Read out the angular velocity
+        if (flags & 0x8)
+        {
+            SVelocitySync angularVelocity;
+            if (!BitStream.Read(&angularVelocity))
+                return false;
+
+            pData->vecTurnVelocity = angularVelocity.data.vecVelocity;
+        }
+
+        // Read out the health & attacker
+        if (flags & 0x10)
+        {
             SObjectHealthSync health;
-            if (!BitStream.Read(&health))
+            if (!BitStream.Read(&health) || !BitStream.Read(pData->attackerID))
                 return false;
             pData->fHealth = health.data.fValue;
+        }
+
+        // Read out inWater state
+        if (flags & 0x20)
+            pData->bIsInWater = BitStream.ReadBit();
+
+        // Read properties
+        // Read mass
+        if (flags & 0x40)
+        {
+            float fMass;
+            if (!BitStream.Read(fMass))
+                return false;
+
+            pData->fMass = fMass;
+        }
+
+        // Read turn mass
+        if (flags & 0x80)
+        {
+            float fTurnMass;
+            if (!BitStream.Read(fTurnMass))
+                return false;
+
+            pData->fTurnMass = fTurnMass;
+        }
+
+        // Read air resistance
+        if (flags & 0x100)
+        {
+            float fAirResistance;
+            if (!BitStream.Read(fAirResistance))
+                return false;
+
+            pData->fAirResistance = fAirResistance;
+        }
+
+        // Read elasticity
+        if (flags & 0x200)
+        {
+            float fElasticity;
+            if (!BitStream.Read(fElasticity))
+                return false;
+
+            pData->fElasticity = fElasticity;
+        }
+
+        // Read Buoyancy Constant
+        if (flags & 0x400)
+        {
+            float fBuoyancyConstant;
+            if (!BitStream.Read(fBuoyancyConstant))
+                return false;
+
+            pData->fBuoyancyConstant = fBuoyancyConstant;
+        }
+
+        // Read center of mass
+        if (flags & 0x800)
+        {
+            CVector centerOfMass;
+            if (!BitStream.Read(centerOfMass.fX) || !BitStream.Read(centerOfMass.fY) || !BitStream.Read(centerOfMass.fZ))
+                return false;
+
+            pData->vecCenterOfMass = centerOfMass;
         }
 
         // Add it to our list
@@ -97,11 +183,12 @@ bool CObjectSyncPacket::Write(NetBitStreamInterface& BitStream) const
             // Write the sync time context
             BitStream.Write(pData->ucSyncTimeContext);
 
-            // Write flags
-            SIntegerSync<unsigned char, 3> flags(pData->ucFlags);
-            BitStream.Write(&flags);
+            // Write the flags
+            //SIntegerSync<unsigned char, 12> flags(pData->ucFlags);
+            unsigned int flags = pData->ucFlags;
+            BitStream.Write(flags);
 
-            // Write position if we need
+            // Write the position
             if (flags & 0x1)
             {
                 SPositionSync position;
@@ -109,7 +196,7 @@ bool CObjectSyncPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.Write(&position);
             }
 
-            // Write rotation
+            // Write the rotation
             if (flags & 0x2)
             {
                 SRotationRadiansSync rotation;
@@ -117,11 +204,63 @@ bool CObjectSyncPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.Write(&rotation);
             }
 
-            // Write health
+            // Write the velocity
             if (flags & 0x4)
+            {
+                SVelocitySync velocity;
+                velocity.data.vecVelocity = pData->vecVelocity;
+                BitStream.Write(&velocity);
+            }
+
+            // Write the angular velocity
+            if (flags & 0x8)
+            {
+                SVelocitySync angularVelocity;
+                angularVelocity.data.vecVelocity = pData->vecTurnVelocity;
+                BitStream.Write(&angularVelocity);
+            }
+
+            // Write the health & attacker
+            if (flags & 0x10)
             {
                 SObjectHealthSync health;
                 health.data.fValue = pData->fHealth;
+                BitStream.Write(&health);
+                BitStream.Write(pData->attackerID);
+            }
+
+            // Write the inWater state
+            if (flags & 0x20)
+                BitStream.WriteBit(pData->bIsInWater);
+
+            // Write the properties
+            // Write mass
+            if (flags & 0x40)
+                BitStream.Write(pData->fMass);
+
+            // Write turn mass
+            if (flags & 0x80)
+                BitStream.Write(pData->fTurnMass);
+
+            // Write air resistance
+            if (flags & 0x100)
+                BitStream.Write(pData->fAirResistance);
+
+            // Write elasticity
+            if (flags & 0x200)
+                BitStream.Write(pData->fElasticity);
+
+            // Write buoyancy constant
+            if (flags & 0x400)
+                BitStream.Write(pData->fBuoyancyConstant);
+
+            // Write center of mass
+            if (flags & 0x800)
+            {
+                CVector centerOfMass = pData->vecCenterOfMass;
+                BitStream.Write(centerOfMass.fX);
+                BitStream.Write(centerOfMass.fY);
+                BitStream.Write(centerOfMass.fZ);
             }
 
             // We've sent atleast one sync

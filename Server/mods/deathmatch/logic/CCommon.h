@@ -798,3 +798,5 @@ DECLARE_ENUM(eJSONPrettyType);
 #define WEAPONTYPE_RANDOM_SPEED     (0x020000)  //
 #define WEAPONTYPE_FORCE_FINISH_ANIM (0x040000)  // force the anim to finish player after aim/fire rather than blending out
 #define WEAPONTYPE_EXPANDS (0x080000)            //
+
+#define WITH_OBJECT_SYNC    1

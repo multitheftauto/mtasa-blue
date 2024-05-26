@@ -277,5 +277,9 @@ enum eElementRPCFunctions
 
     SET_WORLD_SPECIAL_PROPERTY,
 
+    TOGGLE_OBJECT_RESPAWN,
+    RESPAWN_OBJECT,
+    SET_OBJECT_PROPERTY,
+
     NUM_RPC_FUNCS            // Add above this line
 };

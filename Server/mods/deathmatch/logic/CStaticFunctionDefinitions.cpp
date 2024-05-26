@@ -32,6 +32,7 @@
 #include "CColPolygon.h"
 #include "CColSphere.h"
 #include "CPedSync.h"
+#include "CObjectSync.h"
 #include "CZoneNames.h"
 #include "CKeyBinds.h"
 #include "CAccountManager.h"
@@ -906,6 +907,13 @@ bool CStaticFunctionDefinitions::IsElementInWater(CElement* pElement, bool& bInW
             bInWater = pVehicle->IsInWater();
             break;
         }
+        case CElement::OBJECT:
+        case CElement::WEAPON:
+        {
+            CObject* pObject = static_cast<CObject*>(pElement);
+            bInWater = pObject->IsInWater();
+            break;
+        }
         default:
             return false;
     }
@@ -1193,6 +1201,14 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CElement* pElement, CVector&
 
             break;
         }
+        case CElement::OBJECT:
+        case CElement::WEAPON:
+        {
+            CObject* pObject = static_cast<CObject*>(pElement);
+            vecVelocity = pObject->GetMoveSpeed();
+
+            break;
+        }
         default:
             return false;
     }
@@ -1212,6 +1228,13 @@ bool CStaticFunctionDefinitions::GetElementTurnVelocity(CElement* pElement, CVec
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             vecTurnVelocity = pVehicle->GetTurnSpeed();
 
+            break;
+        }
+        case CElement::WEAPON:
+        case CElement::OBJECT:
+        {
+            CObject* pObject = static_cast<CObject*>(pElement);
+            vecTurnVelocity = pObject->GetTurnSpeed();
             break;
         }
         default:
@@ -1360,7 +1383,8 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
         case CElement::OBJECT:
         case CElement::WEAPON:
         {
-            // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
+            CObject* pObject = static_cast<CObject*>(pElement);
+            pObject->SetMoveSpeed(vecVelocity);
             break;
         }
         default:
@@ -1400,7 +1424,9 @@ bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, c
         case CElement::OBJECT:
         case CElement::WEAPON:
         {
-            // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
+            CObject* pObject = static_cast<CObject*>(pElement);
+            pObject->SetTurnSpeed(vecTurnVelocity);
+
             break;
         }
         default:
@@ -12413,4 +12439,131 @@ bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, f
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::ToggleObjectRespawn(CElement* pElement, bool enableRespawn)
+{
+    RUN_CHILDREN(ToggleObjectRespawn(*iter, enableRespawn))
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+    if (!pObject || pObject->IsRespawnEnabled() == enableRespawn)
+        return false;
+
+    pObject->SetRespawnEnabled(enableRespawn);
+
+    CBitStream bitStream;
+    bitStream->WriteBit(enableRespawn);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, TOGGLE_OBJECT_RESPAWN, *bitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::RespawnObject(CElement* pElement)
+{
+    RUN_CHILDREN(RespawnObject(*iter))
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+    if (!pObject)
+        return false;
+
+    CBitStream bitStream;
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, RESPAWN_OBJECT, *bitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetObjectProperty(CElement* pElement, std::string sProperty, std::variant<float, CVector> vValue)
+{
+    RUN_CHILDREN(SetObjectProperty(*iter, sProperty, vValue))
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+    if (!pObject)
+        return false;
+
+    eObjectProperty eProperty;
+    if (!StringToEnum(sProperty, eProperty))
+        return false;
+
+    switch (eProperty)
+    {
+        case OBJECT_PROPERTY_MASS:
+        {
+            if (auto pMass = std::get_if<float>(&vValue))
+                pObject->SetMass(*pMass);
+            else
+                return false;
+
+            break;
+        }
+        case OBJECT_PROPERTY_TURNMASS:
+        {
+            if (auto pTurnMass = std::get_if<float>(&vValue))
+                pObject->SetTurnMass(*pTurnMass);
+            else
+                return false;
+
+            break;
+        }
+        case OBJECT_PROPERTY_AIRRESISTANCE:
+        {
+            if (auto pAirRes = std::get_if<float>(&vValue))
+                pObject->SetAirResistance(*pAirRes);
+            else
+                return false;
+
+            break;
+        }
+        case OBJECT_PROPERTY_ELASTICITY:
+        {
+            if (auto pElasticity = std::get_if<float>(&vValue))
+                pObject->SetElasticity(*pElasticity);
+            else
+                return false;
+
+            break;
+        }
+        case OBJECT_PROPERTY_CENTEROFMASS:
+        {
+            if (auto pVec = std::get_if<CVector>(&vValue))
+                pObject->SetCenterOfMass(*pVec);
+            else
+                return false;
+
+            break;
+        }
+        case OBJECT_PROPERTY_BUOYANCY:
+        {
+            if (auto pBuo = std::get_if<float>(&vValue))
+                pObject->SetBuoyancyConstant(*pBuo);
+            else
+                return false;
+
+            break;
+        }
+    }
+
+    CBitStream bitStream;
+    bitStream->WriteString(sProperty);
+    if (std::holds_alternative<float>(vValue))
+        bitStream->Write(std::get<float>(vValue));
+    else if (std::holds_alternative<CVector>(vValue))
+    {
+        CVector vecValue = std::get<CVector>(vValue);
+        bitStream->Write(vecValue.fX);
+        bitStream->Write(vecValue.fY);
+        bitStream->Write(vecValue.fZ);
+    }
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, SET_OBJECT_PROPERTY, *bitStream.pBitStream));
+
+    return true;
 }

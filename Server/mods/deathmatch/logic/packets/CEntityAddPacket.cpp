@@ -297,6 +297,24 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     health.data.fValue = pObject->GetHealth();
                     BitStream.Write(&health);
 
+                    // Static, respawnable & properties
+                    if (BitStream.Can(eBitStreamVersion::ObjectSync_FixAndUpdate))
+                    {
+                        BitStream.WriteBit(pObject->IsStatic());
+                        BitStream.WriteBit(pObject->IsRespawnEnabled());
+
+                        BitStream.Write(pObject->GetMass());
+                        BitStream.Write(pObject->GetTurnMass());
+                        BitStream.Write(pObject->GetAirResistance());
+                        BitStream.Write(pObject->GetElasticity());
+                        BitStream.Write(pObject->GetBuoyancyConstant());
+
+                        CVector vecCenterOfMass = pObject->GetCenterOfMass();
+                        BitStream.Write(vecCenterOfMass.fX);
+                        BitStream.Write(vecCenterOfMass.fY);
+                        BitStream.Write(vecCenterOfMass.fZ);
+                    }
+
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
                         CCustomWeapon* pWeapon = static_cast<CCustomWeapon*>(pElement);

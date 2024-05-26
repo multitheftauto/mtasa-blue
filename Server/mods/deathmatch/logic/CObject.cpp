@@ -16,7 +16,7 @@
 
 extern CGame* g_pGame;
 
-CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod) : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
+CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod) : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(nullptr)
 {
     // Init
     m_iType = CElement::OBJECT;
@@ -24,15 +24,26 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
 
     m_pObjectManager = pObjectManager;
     m_usModel = 0xFFFF;
-    m_pMoveAnimation = NULL;
+    m_pMoveAnimation = nullptr;
     m_ucAlpha = 255;
     m_vecScale = CVector(1.0f, 1.0f, 1.0f);
     m_fHealth = 1000.0f;
     m_bSyncable = true;
-    m_pSyncer = NULL;
+    m_pSyncer = nullptr;
     m_bIsFrozen = false;
     m_bDoubleSided = false;
     m_bBreakable = false;
+    m_bInWater = false;
+    m_bIsStatic = true;
+    m_bRespawnEnabled = false;
+    m_bIsMoving = false;
+
+    m_fMass = -1.0f;
+    m_fTurnMass = -1.0f;
+    m_fAirResistance = -1.0f;
+    m_fElasticity = -1.0f;
+    m_fBuoyancyConstant = -1.0f;
+    m_vecCenterOfMass = CVector(0.0f, 0.0f, 0.0f);
 
     m_bCollisionsEnabled = true;
 
@@ -58,9 +69,12 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     m_bBreakable = Copy.m_bBreakable;
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
+    m_bInWater = Copy.m_bInWater;
+    m_bIsStatic = Copy.m_bIsStatic;
+    m_bIsMoving = Copy.m_bIsMoving;
 
-    m_pMoveAnimation = NULL;
-    if (Copy.m_pMoveAnimation != NULL)
+    m_pMoveAnimation = nullptr;
+    if (Copy.m_pMoveAnimation != nullptr)
     {
         m_pMoveAnimation = new CPositionRotationAnimation(*Copy.m_pMoveAnimation);
     }
@@ -74,14 +88,14 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
 
 CObject::~CObject()
 {
-    if (m_pMoveAnimation != NULL)
+    if (m_pMoveAnimation != nullptr)
     {
         delete m_pMoveAnimation;
-        m_pMoveAnimation = NULL;
+        m_pMoveAnimation = nullptr;
     }
 
     // Remove syncer
-    SetSyncer(NULL);
+    SetSyncer(nullptr);
 
     // Unlink us from manager
     Unlink();
@@ -98,9 +112,9 @@ void CObject::Unlink()
     m_pObjectManager->RemoveFromList(this);
 
     // Remove LowLod refs in others
-    SetLowLodObject(NULL);
+    SetLowLodObject(nullptr);
     while (!m_HighLodObjectList.empty())
-        m_HighLodObjectList[0]->SetLowLodObject(NULL);
+        m_HighLodObjectList[0]->SetLowLodObject(nullptr);
 }
 
 bool CObject::ReadSpecialData(const int iLine)
@@ -229,17 +243,15 @@ const CVector& CObject::GetPosition()
     // Are we attached to something?
     if (m_pAttachedTo)
         GetAttachedPosition(m_vecPosition);
-
     // Are we moving?
     else if (IsMoving())
     {
         SPositionRotation positionRotation;
         bool              bStillRunning = m_pMoveAnimation->GetValue(positionRotation);
         m_vecPosition = positionRotation.m_vecPosition;
+
         if (!bStillRunning)
-        {
             StopMoving();
-        }
     }
 
     if (vecOldPosition != m_vecPosition)
@@ -274,17 +286,16 @@ void CObject::GetRotation(CVector& vecRotation)
     // Are we attached to something?
     if (m_pAttachedTo)
         GetAttachedRotation(vecRotation);
-
     // Are we moving?
     else if (IsMoving())
     {
         SPositionRotation positionRotation;
         bool              bStillRunning = m_pMoveAnimation->GetValue(positionRotation);
         m_vecRotation = positionRotation.m_vecRotation;
+
         if (!bStillRunning)
-        {
             StopMoving();
-        }
+
         vecRotation = m_vecRotation;
     }
 }
@@ -301,36 +312,31 @@ void CObject::SetRotation(const CVector& vecRotation)
 
     // Different rotation?
     if (m_vecRotation != vecRotation)
-    {
         // Set the new rotation
         m_vecRotation = vecRotation;
-    }
 }
 
 bool CObject::IsMoving()
 {
     // Are we currently moving?
-    if (m_pMoveAnimation != NULL)
+    if (m_pMoveAnimation != nullptr)
     {
         // Should we have stopped moving by now?
         if (!m_pMoveAnimation->IsRunning())
-        {
             // Stop our movement
             StopMoving();
-        }
     }
+
     // Are we still moving after the above check?
-    return (m_pMoveAnimation != NULL);
+    return (m_pMoveAnimation != nullptr);
 }
 
 void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
 {
     // Are we already moving?
     if (IsMoving())
-    {
         // Stop our current movement
         StopMoving();
-    }
 
     if (a_rMoveAnimation.IsRunning())
     {
@@ -346,35 +352,34 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
         SetPosition(positionRotation.m_vecPosition);
         SetRotation(positionRotation.m_vecRotation);
     }
+
+    CLuaArguments Arguments;
+    CallEvent("onObjectMoveStart", Arguments);
+
+    m_bIsMoving = true;
 }
 
 void CObject::StopMoving()
 {
+    if (!m_pMoveAnimation)
+        return;
+
     // Were we moving in the first place
-    if (m_pMoveAnimation != NULL)
-    {
-        SPositionRotation positionRotation;
-        m_pMoveAnimation->GetValue(positionRotation);
-        m_vecPosition = positionRotation.m_vecPosition;
-        m_vecRotation = positionRotation.m_vecRotation;
+    SPositionRotation positionRotation;
+    m_pMoveAnimation->GetValue(positionRotation);
+    m_vecPosition = positionRotation.m_vecPosition;
+    m_vecRotation = positionRotation.m_vecRotation;
 
-        delete m_pMoveAnimation;
-        m_pMoveAnimation = NULL;
+    delete m_pMoveAnimation;
+    m_pMoveAnimation = nullptr;
 
-        UpdateSpatialData();
-    }
+    UpdateSpatialData();
 }
 
 const CPositionRotationAnimation* CObject::GetMoveAnimation()
 {
-    if (IsMoving())            // Call IsMoving since it will make sure the anim is stopped if it's finished
-    {
-        return m_pMoveAnimation;
-    }
-    else
-    {
-        return NULL;
-    }
+    // Call IsMoving since it will make sure the anim is stopped if it's finished
+    return (IsMoving() ? m_pMoveAnimation : nullptr);
 }
 
 void CObject::SetSyncer(CPlayer* pPlayer)
@@ -386,15 +391,12 @@ void CObject::SetSyncer(CPlayer* pPlayer)
         // Update the last player if any
         bAlreadyIn = true;
         if (m_pSyncer)
-        {
             m_pSyncer->RemoveSyncingObject(this);
-        }
 
         // Update the new player
         if (pPlayer)
-        {
             pPlayer->AddSyncingObject(this);
-        }
+
         bAlreadyIn = false;
 
         // Set it
@@ -425,7 +427,7 @@ bool CObject::SetLowLodObject(CObject* pNewLowLodObject)
 
         // Clear there and here
         ListRemove(m_pLowLodObject->m_HighLodObjectList, this);
-        m_pLowLodObject = NULL;
+        m_pLowLodObject = nullptr;
         return true;
     }
     else
@@ -435,7 +437,7 @@ bool CObject::SetLowLodObject(CObject* pNewLowLodObject)
             return false;
 
         // Remove any previous link
-        SetLowLodObject(NULL);
+        SetLowLodObject(nullptr);
 
         // Make new link
         m_pLowLodObject = pNewLowLodObject;
@@ -446,7 +448,21 @@ bool CObject::SetLowLodObject(CObject* pNewLowLodObject)
 
 CObject* CObject::GetLowLodObject()
 {
-    if (m_bIsLowLod)
-        return NULL;
-    return m_pLowLodObject;
+    return (m_bIsLowLod ? nullptr : m_pLowLodObject);
+}
+
+void CObject::SetMoveSpeed(CVector vecMoveSpeed)
+{
+    m_vecMoveSpeed = vecMoveSpeed;
+
+    // Mark an object as non-static
+    SetStatic(false);
+}
+
+void CObject::SetTurnSpeed(CVector vecTurnSpeed)
+{
+    m_vecTurnSpeed = vecTurnSpeed;
+
+    // Mark an object as non-static
+    SetStatic(false);
 }

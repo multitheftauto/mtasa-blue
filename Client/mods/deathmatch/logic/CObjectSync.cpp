@@ -10,39 +10,35 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "net/SyncStructures.h"
-
-#ifdef WITH_OBJECT_SYNC
 
 using std::list;
+extern CClientGame* g_pClientGame;
 
-#define OBJECT_SYNC_RATE   ( g_TickRateSettings.iObjectSync )
+#define OBJECT_SYNC_RATE (g_TickRateSettings.iObjectSync)
 
-CObjectSync::CObjectSync(CClientObjectManager* pObjectManager)
+CObjectSync::CObjectSync(CClientObjectManager* pObjectManager) : m_pObjectManager(pObjectManager), m_ulLastSyncTime(0)
 {
-    m_pObjectManager = pObjectManager;
-    m_ulLastSyncTime = 0;
 }
 
-bool CObjectSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& BitStream)
+bool CObjectSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
 {
     switch (ucPacketID)
     {
         case PACKET_ID_OBJECT_STARTSYNC:
         {
-            Packet_ObjectStartSync(BitStream);
+            Packet_ObjectStartSync(bitStream);
             return true;
         }
 
         case PACKET_ID_OBJECT_STOPSYNC:
         {
-            Packet_ObjectStopSync(BitStream);
+            Packet_ObjectStopSync(bitStream);
             return true;
         }
 
         case PACKET_ID_OBJECT_SYNC:
         {
-            Packet_ObjectSync(BitStream);
+            Packet_ObjectSync(bitStream);
             return true;
         }
     }
@@ -52,11 +48,10 @@ bool CObjectSync::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface&
 
 void CObjectSync::DoPulse()
 {
-    // Has it been long enough since our last state's sync?
     unsigned long ulCurrentTime = CClientTime::GetTime();
     if (ulCurrentTime >= m_ulLastSyncTime + OBJECT_SYNC_RATE)
     {
-        Sync();
+        Update();
         m_ulLastSyncTime = ulCurrentTime;
     }
 }
@@ -72,199 +67,330 @@ void CObjectSync::RemoveObject(CDeathmatchObject* pObject)
         m_List.remove(pObject);
 }
 
-void CObjectSync::ClearObjects()
-{
-    m_List.clear();
-}
-
 bool CObjectSync::Exists(CDeathmatchObject* pObject)
 {
     return m_List.Contains(pObject);
 }
 
-void CObjectSync::Packet_ObjectStartSync(NetBitStreamInterface& BitStream)
+void CObjectSync::Packet_ObjectStartSync(NetBitStreamInterface& bitStream)
 {
-    // Read out the ID
+    // Read out the element ID
     ElementID ID;
-    if (BitStream.Read(ID))
-    {
-        // Grab the object
-        CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(ID));
-        if (pObject)
-        {
-            // Read out the position and rotation
-            SPositionSync        position;
-            SRotationRadiansSync rotation;
-            if (BitStream.Read(&position) && BitStream.Read(&rotation))
-            {
-                // Disabled due to problem when attached in the editor - issue #5886
-                #if 0
-                pObject->SetOrientation ( position.data.vecPosition, rotation.data.vecRotation );
-                #endif
-            }
-            // No velocity due to issue #3522
+    if (!bitStream.Read(ID))
+        return;
 
-            // Read out the health
-            SObjectHealthSync health;
-            if (BitStream.Read(&health))
-            {
-                pObject->SetHealth(health.data.fValue);
-            }
+    // Grab the object
+    auto pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(ID));
+    if (!pObject)
+        return;
 
-            AddObject(pObject);
-        }
-    }
+    // Read out the data
+    SPositionSync        position;
+    SRotationRadiansSync rotation;
+    SVelocitySync        velocity;
+    SVelocitySync        angularVelocity;
+    SObjectHealthSync    health;
+
+    if (!bitStream.Read(&position) || !bitStream.Read(&rotation) || !bitStream.Read(&velocity) || !bitStream.Read(&angularVelocity) || !bitStream.Read(&health))
+        return;
+
+    // Set data from the server
+    pObject->SetOrientation(position.data.vecPosition, rotation.data.vecRotation);
+    pObject->SetHealth(health.data.fValue);
+    pObject->SetMoveSpeed(velocity.data.vecVelocity);
+    pObject->SetTurnSpeed(angularVelocity.data.vecVelocity);
+
+    // Add object to the sync list
+    AddObject(pObject);
 }
 
-void CObjectSync::Packet_ObjectStopSync(NetBitStreamInterface& BitStream)
+void CObjectSync::Packet_ObjectStopSync(NetBitStreamInterface& bitStream)
 {
-    // Read out the ID
+    // Read out the element ID
     ElementID ID;
-    if (BitStream.Read(ID))
-    {
-        // Grab the object
-        CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(ID));
-        if (pObject)
-        {
-            RemoveObject(pObject);
-        }
-    }
+    if (!bitStream.Read(ID))
+        return;
+
+    // Grab the object
+    auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(ID));
+    if (!pObject)
+        return;
+
+    // Remove object from the sync list
+    RemoveObject(pObject);
 }
 
-void CObjectSync::Packet_ObjectSync(NetBitStreamInterface& BitStream)
+void CObjectSync::Packet_ObjectSync(NetBitStreamInterface& bitStream)
 {
     // While we're not out of bytes
-    while (BitStream.GetNumberOfUnreadBits() > 8)
+    while (bitStream.GetNumberOfUnreadBits() > 8)
     {
-        // Read out the ID
+        // Read out the element ID
         ElementID ID;
-        if (!BitStream.Read(ID))
+        if (!bitStream.Read(ID))
             return;
 
-        // Read out the sync time context. See CClientEntity for documentation on that.
+        // Read out the sync time context
         unsigned char ucSyncTimeContext;
-        if (!BitStream.Read(ucSyncTimeContext))
+        if (!bitStream.Read(ucSyncTimeContext))
             return;
 
-        // Read out flags
-        SIntegerSync<unsigned char, 3> flags(0);
-        if (!BitStream.Read(&flags))
+        // Read out the flags
+        SIntegerSync<unsigned char, 5> ucFlags(0);
+        if (!bitStream.Read(&ucFlags))
             return;
 
-        // Read out the position if we need
+        // Read out the position
         SPositionSync position;
-        if (flags & 0x1)
+        if (ucFlags & 0x1)
         {
-            if (!BitStream.Read(&position))
+            if (!bitStream.Read(&position))
                 return;
         }
 
         // Read out the rotation
         SRotationRadiansSync rotation;
-        if (flags & 0x2)
+        if (ucFlags & 0x2)
         {
-            if (!BitStream.Read(&rotation))
+            if (!bitStream.Read(&rotation))
+                return;
+        }
+
+        // Read out the velocity
+        SVelocitySync velocity;
+        if (ucFlags & 0x4)
+        {
+            if (!bitStream.Read(&velocity))
+                return;
+        }
+
+        // Read out the angular velocity
+        SVelocitySync angularVelocity;
+        if (ucFlags & 0x8)
+        {
+            if (!bitStream.Read(&angularVelocity))
                 return;
         }
 
         // Read out the health
         SObjectHealthSync health;
-        if (flags & 0x4)
+        if (ucFlags & 0x10)
         {
-            if (!BitStream.Read(&health))
+            if (!bitStream.Read(&health))
                 return;
         }
 
-        // Grab the object
-        CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(ID));
+        // Grab the object.
+        auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(ID));
+
         // Only update the sync if this packet is from the same context
-        if (pObject && pObject->CanUpdateSync(ucSyncTimeContext))
-        {
-            if (flags & 0x1)
-                pObject->SetPosition(position.data.vecPosition);
-            if (flags & 0x2)
-                pObject->SetRotationRadians(rotation.data.vecRotation);
-            if (flags & 0x4)
-                pObject->SetHealth(health.data.fValue);
-        }
+        if (!pObject || !pObject->CanUpdateSync(ucSyncTimeContext))
+            return;
+
+        // Set data
+        if (ucFlags & 0x1)
+            pObject->SetPosition(position.data.vecPosition);
+        if (ucFlags & 0x2)
+            pObject->SetRotationRadians(rotation.data.vecRotation);
+        if (ucFlags & 0x4)
+            pObject->SetMoveSpeed(velocity.data.vecVelocity);
+        if (ucFlags & 0x8)
+            pObject->SetTurnSpeed(angularVelocity.data.vecVelocity);
+        if (ucFlags & 0x10)
+            pObject->SetHealth(health.data.fValue);
     }
 }
 
-void CObjectSync::Sync()
+void CObjectSync::Update()
 {
-    // Got any items?
+    // Got any objects to sync?
     if (m_List.size() > 0)
     {
-        // Write each object to packet
-        CBitStream                               bitStream;
+        // Create packet
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+        if (!pBitStream)
+            return;
+
+        // Write object information
         list<CDeathmatchObject*>::const_iterator iter = m_List.begin();
         for (; iter != m_List.end(); iter++)
         {
-            WriteObjectInformation(bitStream.pBitStream, *iter);
+            WriteObjectInformation(pBitStream, *iter);
         }
 
-        // Send the packet
-        g_pNet->SendPacket(PACKET_ID_OBJECT_SYNC, bitStream.pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+        // Send and destroy the packet
+        g_pNet->SendPacket(PACKET_ID_OBJECT_SYNC, pBitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED);
+        g_pNet->DeallocateNetBitStream(pBitStream);
     }
 }
 
 void CObjectSync::WriteObjectInformation(NetBitStreamInterface* pBitStream, CDeathmatchObject* pObject)
 {
-    unsigned char ucFlags = 0;
-
-    // What's changed?
-    CVector vecPosition, vecRotation;
+    CVector vecPosition, vecRotation, vecVelocity, vecAngularVelocity, vecCenterOfMass;
     pObject->GetPosition(vecPosition);
     pObject->GetRotationRadians(vecRotation);
+    pObject->GetMoveSpeed(vecVelocity);
+    pObject->GetTurnSpeed(vecAngularVelocity);
+    pObject->GetCenterOfMass(vecCenterOfMass);
+
+    unsigned int ucFlags = 0;
 
     if (vecPosition != pObject->m_LastSyncedData.vecPosition)
         ucFlags |= 0x1;
     if (vecRotation != pObject->m_LastSyncedData.vecRotation)
         ucFlags |= 0x2;
-    if (pObject->GetHealth() != pObject->m_LastSyncedData.fHealth)
+    if (vecVelocity != pObject->m_LastSyncedData.vecVelocity)
         ucFlags |= 0x4;
+    if (vecAngularVelocity != pObject->m_LastSyncedData.vecTurnVelocity)
+        ucFlags |= 0x8;
+    if (pObject->GetHealth() != pObject->m_LastSyncedData.fHealth)
+        ucFlags |= 0x10;
+    if (pObject->IsInWater() != pObject->m_LastSyncedData.bIsInWater)
+        ucFlags |= 0x20;
+    if (pObject->GetMass() != pObject->m_LastSyncedData.fMass)
+        ucFlags |= 0x40;
+    if (pObject->GetTurnMass() != pObject->m_LastSyncedData.fTurnMass)
+        ucFlags |= 0x80;
+    if (pObject->GetAirResistance() != pObject->m_LastSyncedData.fAirResistance)
+        ucFlags |= 0x100;
+    if (pObject->GetElasticity() != pObject->m_LastSyncedData.fElasticity)
+        ucFlags |= 0x200;
+    if (pObject->GetBuoyancyConstant() != pObject->m_LastSyncedData.fBuoyancyConstant)
+        ucFlags |= 0x400;
+    if (vecCenterOfMass != pObject->m_LastSyncedData.vecCenterOfMass)
+        ucFlags |= 0x800;
 
     // Don't sync if nothing changed
     if (ucFlags == 0)
         return;
 
-    // Write the ID
+    // Write the object ID
     pBitStream->Write(pObject->GetID());
 
     // Write the sync time context
     pBitStream->Write(pObject->GetSyncTimeContext());
 
     // Write flags
-    SIntegerSync<unsigned char, 3> flags(ucFlags);
-    pBitStream->Write(&flags);
+    //SIntegerSync<unsigned char, 12> flags(ucFlags);
+    pBitStream->Write(ucFlags);
 
-    // Write changed stuff
-    // Position
+    // Write position
     if (ucFlags & 0x1)
     {
-        SPositionSync position;
+        SPositionSync position(false);
         pObject->GetPosition(position.data.vecPosition);
         pBitStream->Write(&position);
+
         pObject->m_LastSyncedData.vecPosition = position.data.vecPosition;
     }
 
-    // Rotation
+    // Write rotation
     if (ucFlags & 0x2)
     {
         SRotationRadiansSync rotation;
         pObject->GetRotationRadians(rotation.data.vecRotation);
         pBitStream->Write(&rotation);
+
         pObject->m_LastSyncedData.vecRotation = rotation.data.vecRotation;
     }
 
-    // Health
+    // Write velocity
     if (ucFlags & 0x4)
+    {
+        SVelocitySync velocity;
+        pObject->GetMoveSpeed(velocity.data.vecVelocity);
+        pBitStream->Write(&velocity);
+
+        pObject->m_LastSyncedData.vecVelocity = velocity.data.vecVelocity;
+    }
+
+    // Write angular velocity
+    if (ucFlags & 0x8)
+    {
+        SVelocitySync angularVelocity;
+        pObject->GetTurnSpeed(angularVelocity.data.vecVelocity);
+        pBitStream->Write(&angularVelocity);
+
+        pObject->m_LastSyncedData.vecTurnVelocity = angularVelocity.data.vecVelocity;
+    }
+
+    // Write health & attacker
+    if (ucFlags & 0x10)
     {
         SObjectHealthSync health;
         health.data.fValue = pObject->GetHealth();
         pBitStream->Write(&health);
+        pBitStream->Write(pObject->GetAttackerID());
+
         pObject->m_LastSyncedData.fHealth = health.data.fValue;
     }
-}
 
-#endif
+    // Write inWater state
+    if (ucFlags & 0x20)
+    {
+        bool bIsInWater = pObject->IsInWater();
+        pBitStream->WriteBit(bIsInWater);
+
+        pObject->m_LastSyncedData.bIsInWater = bIsInWater;
+    }
+
+    // Write properties
+
+    // Write mass
+    if (ucFlags & 0x40)
+    {
+        float fMass = pObject->GetMass();
+        pBitStream->Write(fMass);
+
+        pObject->m_LastSyncedData.fMass = fMass;
+    }
+
+    // Write turn mass
+    if (ucFlags & 0x80)
+    {
+        float fTurnMass = pObject->GetTurnMass();
+        pBitStream->Write(fTurnMass);
+
+        pObject->m_LastSyncedData.fTurnMass = fTurnMass;
+    }
+
+    // Write air resistance
+    if (ucFlags & 0x100)
+    {
+        float fAirResistance = pObject->GetAirResistance();
+        pBitStream->Write(fAirResistance);
+
+        pObject->m_LastSyncedData.fAirResistance = fAirResistance;
+    }
+
+    // Write elasiticy
+    if (ucFlags & 0x200)
+    {
+        float fElasticity = pObject->GetElasticity();
+        pBitStream->Write(fElasticity);
+
+        pObject->m_LastSyncedData.fElasticity = fElasticity;
+    }
+
+    // Write buoyancy constant
+    if (ucFlags & 0x400)
+    {
+        float fBuoyancyConstant = pObject->GetBuoyancyConstant();
+        pBitStream->Write(fBuoyancyConstant);
+
+        pObject->m_LastSyncedData.fBuoyancyConstant = fBuoyancyConstant;
+    }
+
+    // Write center of mass
+    if (ucFlags & 0x800)
+    {
+        CVector vecCenterOfMass;
+        pObject->GetCenterOfMass(vecCenterOfMass);
+
+        pBitStream->Write(vecCenterOfMass.fX);
+        pBitStream->Write(vecCenterOfMass.fY);
+        pBitStream->Write(vecCenterOfMass.fZ);
+
+        pObject->m_LastSyncedData.vecCenterOfMass = vecCenterOfMass;
+    }
+}

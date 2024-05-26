@@ -4779,7 +4779,13 @@ bool CClientGame::ObjectDamageHandler(CObjectSAInterface* pObjectInterface, floa
             else
                 Arguments.PushNil();
 
-            return pClientObject->CallEvent("onClientObjectDamage", Arguments, true);
+            bool bContinue = pClientObject->CallEvent("onClientObjectDamage", Arguments, true);
+            if (bContinue && !pClientObject->IsLocalEntity() && pClientAttacker)
+            {
+                pClientObject->SetAttackerID(pClientAttacker->GetID());
+            }
+
+            return bContinue;
         }
     }
     return true;

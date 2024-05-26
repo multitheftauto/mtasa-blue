@@ -20,7 +20,16 @@ struct SLastSyncedObjectData
 {
     CVector vecPosition;
     CVector vecRotation;
+    CVector vecVelocity;
+    CVector vecTurnVelocity;
     float   fHealth;
+    bool    bIsInWater;
+    float   fMass;
+    float   fTurnMass;
+    float   fAirResistance;
+    float   fElasticity;
+    float   fBuoyancyConstant;
+    CVector vecCenterOfMass;
 };
 
 class CClientObject : public CClientStreamElement
@@ -37,8 +46,7 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTOBJECT; };
 
-    CObject*       GetGameObject() { return m_pObject; }
-    CEntity*       GetGameEntity() { return m_pObject; }
+    CObject*       GetGameObject() const { return m_pObject; }
     const CEntity* GetGameEntity() const { return m_pObject; }
 
     void            GetPosition(CVector& vecPosition) const;
@@ -65,22 +73,22 @@ public:
 
     float GetDistanceFromCentreOfMassToBaseOfModel();
 
-    bool IsVisible() { return m_bIsVisible; };
+    bool IsVisible() const { return m_bIsVisible; };
     void SetVisible(bool bVisible);
 
-    unsigned short GetModel() const { return m_usModel; };
+    unsigned short GetModel() const const { return m_usModel; };
     void           SetModel(unsigned short usModel);
 
-    bool           IsLowLod();
+    bool           IsLowLod() const { return m_bIsLowLod; }
     bool           SetLowLodObject(CClientObject* pLowLodObject);
     CClientObject* GetLowLodObject();
 
     void Render();
 
-    bool IsFrozen() { return m_bIsFrozen; }
+    bool IsFrozen() const { return m_bIsFrozen; }
     void SetFrozen(bool bFrozen);
 
-    unsigned char GetAlpha() { return m_ucAlpha; }
+    unsigned char GetAlpha() const { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha);
     void          GetScale(CVector& vecScale) const;
     void          SetScale(const CVector& vecScale);
@@ -104,21 +112,28 @@ public:
     bool IsBreakable(bool bCheckModelList = true);
     bool SetBreakable(bool bBreakable);
     bool Break();
-    bool IsRespawnEnabled() { return m_bRespawnEnabled; };
+    bool IsRespawnEnabled() const { return m_bRespawnEnabled; };
     void SetRespawnEnabled(bool bRespawnEnabled) { m_bRespawnEnabled = bRespawnEnabled; };
 
     float GetMass();
     void  SetMass(float fMass);
 
-    bool IsVisibleInAllDimensions() { return m_bVisibleInAllDimensions; };
+    bool IsVisibleInAllDimensions() const { return m_bVisibleInAllDimensions; };
     void SetVisibleInAllDimensions(bool bVisible, unsigned short usNewDimension = 0);
 
     void ReCreate();
     void UpdateVisibility();
 
-    bool IsBeingRespawned() { return m_bBeingRespawned; };
+    bool IsBeingRespawned() const { return m_bBeingRespawned; };
     void SetBeingRespawned(bool bBeingRespawned) { m_bBeingRespawned = bBeingRespawned; };
 
+    bool IsInWater();
+
+    bool IsStatic() const { return m_bIsStatic; }
+    void SetStatic(bool isStatic) { m_bIsStatic = isStatic; }
+
+    ElementID GetAttackerID() const { return m_AttackerID; }
+    void SetAttackerID(ElementID attackerID) { m_AttackerID = attackerID; }
 protected:
     void StreamIn(bool bInstantly);
     void StreamOut();
@@ -154,9 +169,12 @@ protected:
     float         m_fBuoyancyConstant;
     CVector       m_vecCenterOfMass;
     bool          m_bVisibleInAllDimensions = false;
+    bool          m_bIsStatic;            // true if the object never moved using setElementVelocity/setElementAngularVelocity
 
     CVector m_vecMoveSpeed;
     CVector m_vecTurnSpeed;
+
+    ElementID m_AttackerID = INVALID_ELEMENT_ID;
 
     const bool                    m_bIsLowLod;                    // true if this object is low LOD
     CClientObject*                m_pLowLodObject;                // Pointer to low LOD version of this object
