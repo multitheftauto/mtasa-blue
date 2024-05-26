@@ -18,7 +18,9 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
       m_vPos(pos),
       m_vRot(rot),
       m_interior(interior),
-      m_pBuilding(nullptr)
+      m_pBuilding(nullptr),
+      m_pHighBuilding(nullptr),
+      m_pLowBuilding(nullptr)
 {
     m_pManager = pManager;
     SetTypeName("building");
@@ -29,6 +31,18 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
 CClientBuilding::~CClientBuilding()
 {
     m_pBuildingManager->RemoveFromList(this);
+}
+
+void CClientBuilding::Unlink()
+{
+    if (m_pHighBuilding)
+    {
+        m_pHighBuilding->SetLowLodBuilding();
+    }
+    if (m_pLowBuilding)
+    {
+        SetLowLodBuilding();
+    }
     Destroy();
 }
 
@@ -93,17 +107,62 @@ void CClientBuilding::Create()
     if (m_pBuilding)
         return;
 
+    if (m_bBeingDeleted)
+        return;
+
     CVector4D vRot4D;
     ConvertZXYEulersToQuaternion(m_vRot, vRot4D);
 
     m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
+
+    if (m_pHighBuilding)
+    {
+        m_pHighBuilding->GetBuildingEntity()->SetLod(m_pBuilding);
+    }
 }
 
 void CClientBuilding::Destroy()
 {
-    if (m_pBuilding)
+    if (!m_pBuilding)
+        return;
+
+    if (m_pHighBuilding)
     {
-        g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
-        m_pBuilding = nullptr;
+        m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
     }
+    g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
+    m_pBuilding = nullptr;
+}
+
+bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
+{
+    if (pLod)
+    {
+        // Remove prev LOD
+        SetLowLodBuilding();
+
+        // Unlink old high lod element
+        CClientBuilding* pOveridedBuilding = pLod->GetHighLodBuilding();
+        if (pOveridedBuilding && pOveridedBuilding != this)
+        {
+            pOveridedBuilding->SetLowLodBuilding();
+        }
+
+        // Add new LOD
+        m_pLowBuilding = pLod;
+        m_pBuilding->SetLod(pLod->GetBuildingEntity());
+
+        pLod->SetHighLodBuilding(this);
+    }
+    else
+    {
+        // Remove LOD
+        if (m_pLowBuilding)
+        {
+            m_pLowBuilding->SetHighLodBuilding();
+        }
+        m_pBuilding->SetLod(nullptr);
+        m_pLowBuilding = nullptr;
+    }
+    return true;
 }

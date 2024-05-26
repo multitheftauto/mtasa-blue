@@ -824,6 +824,12 @@ ADD_ENUM(_D3DFORMAT::D3DFMT_G32R32F, "g32r32f")
 ADD_ENUM(_D3DFORMAT::D3DFMT_A32B32G32R32F, "a32b32g32r32f")
 IMPLEMENT_ENUM_CLASS_END("surface-format")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eRenderStage)
+ADD_ENUM(eRenderStage::PRE_FX, "prefx")
+ADD_ENUM(eRenderStage::POST_FX, "postfx")
+ADD_ENUM(eRenderStage::POST_GUI, "postgui")
+IMPLEMENT_ENUM_CLASS_END("render-stage")
+
 //
 // CResource from userdata
 //
@@ -1091,6 +1097,31 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         }
     }
     return true;
+}
+
+//
+// Check min client is correct
+// Thrown a error if below required
+//
+void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* szReason)
+{
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return;
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return;
+    
+    if (pResource->GetMinClientReq() < szVersionReq)
+    {
+        #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+        SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client %s because %s)",
+                                szVersionReq, szReason);
+        throw std::invalid_argument(err);
+        #endif
+    }
+    
 }
 
 //
