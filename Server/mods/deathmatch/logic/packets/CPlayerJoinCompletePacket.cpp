@@ -15,7 +15,7 @@
 #include "CMainConfig.h"
 #include <net/SyncStructures.h>
 
-CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
+CPlayerJoinCompletePacket::CPlayerJoinCompletePacket() noexcept
 {
     m_PlayerID = INVALID_ELEMENT_ID;
     m_RootElementID = INVALID_ELEMENT_ID;
@@ -31,9 +31,9 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
 }
 
 CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType,
-                                                     unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient,
-                                                     int iEnableClientChecks, bool bVoiceEnabled, unsigned char ucSampleRate, unsigned char ucVoiceQuality,
-                                                     unsigned int uiBitrate, const char* szServerName)
+                                                     std::uint16_t usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient,
+                                                     int iEnableClientChecks, bool bVoiceEnabled, std::uint8_t ucSampleRate, std::uint8_t ucVoiceQuality,
+                                                     std::uint32_t uiBitrate, const char* szServerName) noexcept
 {
     m_PlayerID = PlayerID;
     m_RootElementID = RootElementID;
@@ -60,14 +60,14 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, Element
     }
 }
 
-bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
+bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     BitStream.Write(m_PlayerID);
 
     // For protocol backwards compatibility: write a non-zero single byte value.
     // This used to hold the number of players, it was never used on the client side,
     // and it caused protocol error 14 whenever the value wrapped back to zero (uint32_t -> uint8_t).
-    uint8_t numPlayers = 1;
+    std::uint8_t numPlayers = 1;
     BitStream.Write(numPlayers);
 
     BitStream.Write(m_RootElementID);
@@ -79,11 +79,11 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteBit(m_bVoiceEnabled);
 
     // Transmit the sample rate for voice
-    SIntegerSync<unsigned char, 2> sampleRate(m_ucSampleRate);
+    SIntegerSync<std::uint8_t, 2> sampleRate(m_ucSampleRate);
     BitStream.Write(&sampleRate);
 
     // Transmit the quality for voice
-    SIntegerSync<unsigned char, 4> voiceQuality(m_ucQuality);
+    SIntegerSync<std::uint8_t, 4> voiceQuality(m_ucQuality);
     BitStream.Write(&voiceQuality);
 
     // Transmit the max bitrate for voice
@@ -98,7 +98,7 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
     // Tellclient about maybe throttling back http client requests
     BitStream.Write(m_iHTTPMaxConnectionsPerClient);
 
-    BitStream.Write(static_cast<unsigned char>(m_ucHTTPDownloadType));
+    BitStream.Write(static_cast<std::uint8_t>(m_ucHTTPDownloadType));
 
     switch (m_ucHTTPDownloadType)
     {

@@ -13,24 +13,25 @@
 #include "CFireSyncPacket.h"
 #include "CPlayer.h"
 
-CFireSyncPacket::CFireSyncPacket()
+CFireSyncPacket::CFireSyncPacket() noexcept
 {
     // Default size
     m_fSize = 1.8f;
 }
 
-CFireSyncPacket::CFireSyncPacket(const CVector& vecPosition, float fSize)
+CFireSyncPacket::CFireSyncPacket(const CVector& vecPosition, float fSize) noexcept
 {
     m_vecPosition = vecPosition;
     m_fSize = fSize;
 }
 
-bool CFireSyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CFireSyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
-    return (BitStream.Read(m_vecPosition.fX) && BitStream.Read(m_vecPosition.fY) && BitStream.Read(m_vecPosition.fZ) && BitStream.Read(m_fSize));
+    return BitStream.Read(m_vecPosition.fX) && BitStream.Read(m_vecPosition.fY)
+        && BitStream.Read(m_vecPosition.fZ) && BitStream.Read(m_fSize);
 }
 
-bool CFireSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CFireSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the source player and latency if any. Otherwize 0
     if (m_pSourceElement)
@@ -38,13 +39,13 @@ bool CFireSyncPacket::Write(NetBitStreamInterface& BitStream) const
         ElementID ID = m_pSourceElement->GetID();
         BitStream.Write(ID);
 
-        unsigned short usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        std::uint16_t usLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
         BitStream.WriteCompressed(usLatency);
     }
     else
     {
         BitStream.Write(static_cast<ElementID>(INVALID_ELEMENT_ID));
-        BitStream.WriteCompressed(static_cast<unsigned short>(0));
+        BitStream.WriteCompressed(static_cast<std::uint16_t>(0));
     }
 
     // Write position and size

@@ -17,14 +17,14 @@
 class CFireSyncPacket final : public CPacket
 {
 public:
-    CFireSyncPacket();
-    CFireSyncPacket(const CVector& vecPosition, float fSize);
+    CFireSyncPacket() noexcept;
+    CFireSyncPacket(const CVector& vecPosition, float fSize) noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_FIRE; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_FIRE; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     CVector m_vecPosition;

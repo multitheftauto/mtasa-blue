@@ -13,7 +13,7 @@
 #include "CGame.h"
 #include "CResourceManager.h"
 
-bool CPlayerResourceStartPacket::Read(NetBitStreamInterface& BitStream)
+bool CPlayerResourceStartPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     ushort usResourceNetId;
     BitStream.Read(usResourceNetId);

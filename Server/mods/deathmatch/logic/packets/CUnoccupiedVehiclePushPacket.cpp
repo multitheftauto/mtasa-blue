@@ -12,11 +12,7 @@
 #include "StdInc.h"
 #include "CUnoccupiedVehiclePushPacket.h"
 
-bool CUnoccupiedVehiclePushPacket::Read(NetBitStreamInterface& BitStream)
+bool CUnoccupiedVehiclePushPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
-    if (BitStream.Read(&vehicle))
-    {
-        return true;
-    }
-    return false;
+    return BitStream.Read(&vehicle);
 }

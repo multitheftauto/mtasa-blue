@@ -105,7 +105,7 @@ HttpResponse* CHTTPD::RouteRequest(HttpRequest* ipoHttpRequest)
         // create an HttpRespose object for the message
         HttpResponse* poHttpResponse = new HttpResponse(ipoHttpRequest->m_nRequestId, ipoHttpRequest->m_poSourceEHSConnection);
         SStringX      strWait("The server is not ready. Please try again in a minute.");
-        poHttpResponse->SetBody(strWait.c_str(), strWait.size());
+        poHttpResponse->SetBody(strWait.c_str(), static_cast<std::int32_t>(strWait.size()));
         poHttpResponse->m_nResponseCode = HTTPRESPONSECODE_200_OK;
         return poHttpResponse;
     }
@@ -149,7 +149,7 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
 
             if (!cipherText.empty())
             {
-                ipoHttpResponse->SetBody((const char*)cipherText.BytePtr(), cipherText.SizeInBytes());
+                ipoHttpResponse->SetBody((const char*)cipherText.BytePtr(), static_cast<std::int32_t>(cipherText.SizeInBytes()));
                 return HTTPRESPONSECODE_200_OK;
             }
             else
@@ -171,7 +171,7 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
         if (!m_strDefaultResourceName.empty())
         {
             SString strWelcome("<a href='/%s/'>This is the page you want</a>", m_strDefaultResourceName.c_str());
-            ipoHttpResponse->SetBody(strWelcome.c_str(), strWelcome.size());
+            ipoHttpResponse->SetBody(strWelcome.c_str(), static_cast<std::int32_t>(strWelcome.size()));
             SString strNewURL("http://%s/%s/", ipoHttpRequest->oRequestHeaders["host"].c_str(), m_strDefaultResourceName.c_str());
             ipoHttpResponse->oResponseHeaders["location"] = strNewURL.c_str();
             return HTTPRESPONSECODE_302_FOUND;
@@ -182,7 +182,7 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
         "You haven't set a default resource in your configuration file. You can either do this or visit http://%s/<i>resourcename</i>/ to see a specific "
         "resource.<br/><br/>Alternatively, the server may be still starting up, if so, please try again in a minute.",
         ipoHttpRequest->oRequestHeaders["host"].c_str());
-    ipoHttpResponse->SetBody(strWelcome.c_str(), strWelcome.size());
+    ipoHttpResponse->SetBody(strWelcome.c_str(), static_cast<std::int32_t>(strWelcome.size()));
     return HTTPRESPONSECODE_200_OK;
 }
 
@@ -195,12 +195,12 @@ ResponseCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipo
         strMessage += SString("<br/><a href='%s'>See here for more information</a>",
                               "https:"
                               "//mtasa.com/authserialhttp");
-        ipoHttpResponse->SetBody(strMessage, strMessage.length());
+        ipoHttpResponse->SetBody(strMessage, static_cast<std::int32_t>(strMessage.length()));
         return HTTPRESPONSECODE_401_UNAUTHORIZED;
     }
 
     const char* szAuthenticateMessage = "Access denied, please login";
-    ipoHttpResponse->SetBody(szAuthenticateMessage, strlen(szAuthenticateMessage));
+    ipoHttpResponse->SetBody(szAuthenticateMessage, static_cast<std::int32_t>(strlen(szAuthenticateMessage)));
     SString strName("Basic realm=\"%s\"", g_pGame->GetConfig()->GetServerName().c_str());
     ipoHttpResponse->oResponseHeaders["WWW-Authenticate"] = strName.c_str();
     return HTTPRESPONSECODE_401_UNAUTHORIZED;

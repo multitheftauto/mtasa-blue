@@ -13,51 +13,46 @@
 #include "CPlayerClothesPacket.h"
 #include "CElement.h"
 
-CPlayerClothesPacket::~CPlayerClothesPacket()
+CPlayerClothesPacket::~CPlayerClothesPacket() noexcept
 {
-    std::vector<SPlayerClothes*>::iterator iter = m_List.begin();
-    for (; iter != m_List.end(); ++iter)
+    for (const auto& pClothes : m_List)
     {
-        delete[](*iter)->szTexture;
-        delete[](*iter)->szModel;
-        delete *iter;
+        delete[] pClothes->szTexture;
+        delete[] pClothes->szModel;
+        delete pClothes;
     }
     m_List.clear();
 }
 
-bool CPlayerClothesPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPlayerClothesPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the source player.
-    if (m_pSourceElement)
+    if (!m_pSourceElement)
+        return false;
+
+    BitStream.Write(m_pSourceElement->GetID());
+
+    // Write the clothes
+    auto usNumClothes = static_cast<std::uint16_t>(m_List.size());
+    BitStream.Write(usNumClothes);
+
+    for (const auto& pClothes : m_List)
     {
-        ElementID ID = m_pSourceElement->GetID();
-        BitStream.Write(ID);
-
-        // Write the clothes
-        unsigned short usNumClothes = static_cast<unsigned short>(m_List.size());
-        BitStream.Write(usNumClothes);
-
-        std::vector<SPlayerClothes*>::const_iterator iter = m_List.begin();
-        for (; iter != m_List.end(); ++iter)
-        {
-            char*         szTexture = (*iter)->szTexture;
-            char*         szModel = (*iter)->szModel;
-            unsigned char ucTextureLength = static_cast<uchar>(strlen(szTexture));
-            unsigned char ucModelLength = static_cast<uchar>(strlen(szModel));
-            BitStream.Write(ucTextureLength);
-            BitStream.Write(szTexture, ucTextureLength);
-            BitStream.Write(ucModelLength);
-            BitStream.Write(szModel, ucModelLength);
-            BitStream.Write((*iter)->ucType);
-        }
-
-        return true;
+        char*         szTexture = pClothes->szTexture;
+        char*         szModel = pClothes->szModel;
+        auto ucTextureLength = static_cast<std::uint8_t>(strlen(szTexture));
+        auto ucModelLength = static_cast<std::uint8_t>(strlen(szModel));
+        BitStream.Write(ucTextureLength);
+        BitStream.Write(szTexture, ucTextureLength);
+        BitStream.Write(ucModelLength);
+        BitStream.Write(szModel, ucModelLength);
+        BitStream.Write(pClothes->ucType);
     }
 
-    return false;
+    return true;
 }
 
-void CPlayerClothesPacket::Add(const char* szTexture, const char* szModel, unsigned char ucType)
+void CPlayerClothesPacket::Add(const char* szTexture, const char* szModel, std::uint8_t ucType) noexcept
 {
     SPlayerClothes* Clothes = new SPlayerClothes;
     Clothes->szTexture = new char[strlen(szTexture) + 1];
@@ -68,14 +63,14 @@ void CPlayerClothesPacket::Add(const char* szTexture, const char* szModel, unsig
     m_List.push_back(Clothes);
 }
 
-void CPlayerClothesPacket::Add(CPlayerClothes* pClothes)
+void CPlayerClothesPacket::Add(CPlayerClothes* pClothes) noexcept
 {
-    for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
+    for (auto ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
     {
         const SPlayerClothing* pClothing = pClothes->GetClothing(ucType);
-        if (pClothing)
-        {
-            Add(pClothing->szTexture, pClothing->szModel, ucType);
-        }
+        if (!pClothing)
+            continue;
+
+        Add(pClothing->szTexture, pClothing->szModel, ucType);
     }
 }

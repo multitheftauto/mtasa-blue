@@ -17,16 +17,20 @@
 class CConsoleEchoPacket final : public CPacket
 {
 public:
-    CConsoleEchoPacket(const char* szMessage) { m_strMessage.AssignLeft(szMessage, MAX_CONSOLEECHO_LENGTH); }
+    CConsoleEchoPacket(const char* szMessage) noexcept {
+        m_strMessage.AssignLeft(szMessage, MAX_CONSOLEECHO_LENGTH);
+    }
 
-    ePacketID               GetPacketID() const noexcept { return PACKET_ID_CONSOLE_ECHO; };
-    unsigned long           GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
+    ePacketID               GetPacketID() const noexcept { return PACKET_ID_CONSOLE_ECHO; }
+    std::uint32_t           GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_CHAT; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    const char* GetMessage() { return m_strMessage; };
-    void        SetMessage(const char* szMessage) { m_strMessage.AssignLeft(szMessage, MAX_CONSOLEECHO_LENGTH); }
+    const char* GetMessage() const noexcept { return m_strMessage; };
+    void        SetMessage(const char* szMessage) noexcept {
+        m_strMessage.AssignLeft(szMessage, MAX_CONSOLEECHO_LENGTH);
+    }
 
 private:
     SString m_strMessage;

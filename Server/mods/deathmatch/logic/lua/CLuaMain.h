@@ -70,12 +70,12 @@ public:
     bool          DestroyXML(CXMLNode* pRootNode);
     bool          SaveXML(CXMLNode* pRootNode);
     bool          XMLExists(CXMLFile* pFile);
-    std::size_t   GetXMLFileCount() const { return m_XMLFiles.size(); };
-    std::size_t   GetOpenFileCount() const { return m_OpenFilenameList.size(); };
-    std::uint32_t GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
-    std::uint32_t GetElementCount() const;
-    std::size_t GetTextDisplayCount() const { return m_Displays.size(); };
-    std::size_t GetTextItemCount() const { return m_TextItems.size(); };
+    std::size_t   GetXMLFileCount() const noexcept { return m_XMLFiles.size(); }
+    std::size_t   GetOpenFileCount() const noexcept { return m_OpenFilenameList.size(); }
+    std::size_t   GetTimerCount() const noexcept { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; }
+    std::uint32_t GetElementCount() const noexcept;
+    std::size_t   GetTextDisplayCount() const noexcept { return m_Displays.size(); }
+    std::size_t   GetTextItemCount() const noexcept { return m_TextItems.size(); }
     void          OnOpenFile(const SString& strFilename);
     void          OnCloseFile(const SString& strFilename);
 

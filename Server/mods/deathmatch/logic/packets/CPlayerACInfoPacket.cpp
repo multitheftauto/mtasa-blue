@@ -12,14 +12,14 @@
 #include "StdInc.h"
 #include "CPlayerACInfoPacket.h"
 
-bool CPlayerACInfoPacket::Read(NetBitStreamInterface& BitStream)
+bool CPlayerACInfoPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // Read type
-    uchar ucNumItems = 0;
+    std::uint8_t ucNumItems = 0;
     BitStream.Read(ucNumItems);
-    for (uint i = 0; i < ucNumItems; i++)
+    for (auto i = 0; i < ucNumItems; i++)
     {
-        uchar ucId;
+        std::uint8_t ucId;
         if (!BitStream.Read(ucId))
             return false;
         m_IdList.push_back(ucId);

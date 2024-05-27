@@ -13,7 +13,7 @@
 #include "CElementRPCPacket.h"
 #include "CElement.h"
 
-bool CElementRPCPacket::Write(NetBitStreamInterface& BitStream) const
+bool CElementRPCPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the action ID
     BitStream.Write(m_ucActionID);
@@ -22,8 +22,8 @@ bool CElementRPCPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.Write(m_pSourceElement->GetID());
 
     // Copy each byte from the bitstream we have to this one
-    unsigned char ucTemp;
-    int           iLength = m_BitStream.GetNumberOfBitsUsed();
+    std::uint8_t ucTemp;
+    auto iLength = m_BitStream.GetNumberOfBitsUsed();
     while (iLength > 8)
     {
         m_BitStream.Read(ucTemp);

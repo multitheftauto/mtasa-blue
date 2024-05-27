@@ -15,7 +15,7 @@
 #include "CPlayer.h"
 #include <net/SyncStructures.h>
 
-bool CCameraSyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CCameraSyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     if (BitStream.Version() >= 0x5E)
     {
@@ -35,21 +35,17 @@ bool CCameraSyncPacket::Read(NetBitStreamInterface& BitStream)
     if (!BitStream.ReadBit(m_bFixed))
         return false;
 
-    if (m_bFixed)
-    {
-        SPositionSync position(false);
-        if (!BitStream.Read(&position))
-            return false;
-        m_vecPosition = position.data.vecPosition;
-
-        SPositionSync lookAt(false);
-        if (!BitStream.Read(&lookAt))
-            return false;
-        m_vecLookAt = lookAt.data.vecPosition;
-        return true;
-    }
-    else
-    {
+    if (!m_bFixed)
         return BitStream.Read(m_TargetID);
-    }
+
+    SPositionSync position(false);
+    if (!BitStream.Read(&position))
+        return false;
+    m_vecPosition = position.data.vecPosition;
+
+    SPositionSync lookAt(false);
+    if (!BitStream.Read(&lookAt))
+        return false;
+    m_vecLookAt = lookAt.data.vecPosition;
+    return true;
 }

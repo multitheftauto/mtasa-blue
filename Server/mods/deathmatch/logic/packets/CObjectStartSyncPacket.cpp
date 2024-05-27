@@ -14,7 +14,7 @@
 #include "CObject.h"
 #include <net/SyncStructures.h>
 
-bool CObjectStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CObjectStartSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     if (!m_pObject)
         return false;

@@ -497,10 +497,10 @@ bool RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath)
 #else
 bool IsValidFilePath(const char* szDir)
 {
-    if (szDir == NULL)
+    if (!szDir)
         return false;
 
-    unsigned int uiLen = strlen(szDir);
+    auto uiLen = strlen(szDir);
 
     if (uiLen > 0 && szDir[uiLen - 1] == '/')            // will return false if ending with an invalid character, mainly used for linux (#6871)
         return false;
@@ -508,7 +508,7 @@ bool IsValidFilePath(const char* szDir)
     unsigned char c, c_d;
 
     // iterate through the char array
-    for (unsigned int i = 0; i < uiLen; i++)
+    for (auto i = 0; i < uiLen; i++)
     {
         c = szDir[i];                                          // current character
         c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
@@ -520,7 +520,7 @@ bool IsValidFilePath(const char* szDir)
 
 bool IsValidOrganizationPath(const char* szDir)
 {
-    if (szDir == NULL)
+    if (!szDir)
         return false;
 
     unsigned int uiLen = strlen(szDir);

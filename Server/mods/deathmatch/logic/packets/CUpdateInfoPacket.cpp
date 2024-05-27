@@ -12,22 +12,22 @@
 #include "StdInc.h"
 #include "CUpdateInfoPacket.h"
 
-CUpdateInfoPacket::CUpdateInfoPacket()
+CUpdateInfoPacket::CUpdateInfoPacket() noexcept
 {
 }
 
-CUpdateInfoPacket::CUpdateInfoPacket(const SString& strType, const SString& strData)
+CUpdateInfoPacket::CUpdateInfoPacket(const SString& strType, const SString& strData) noexcept
 {
     m_strType = strType;
     m_strData = strData;
 }
 
-bool CUpdateInfoPacket::Write(NetBitStreamInterface& BitStream) const
+bool CUpdateInfoPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    BitStream.Write((unsigned short)m_strType.length());
+    BitStream.Write((std::uint16_t)m_strType.length());
     BitStream.Write(m_strType.c_str(), m_strType.length());
 
-    BitStream.Write((unsigned short)m_strData.length());
+    BitStream.Write((std::uint16_t)m_strData.length());
     BitStream.Write(m_strData.c_str(), m_strData.length());
 
     return true;

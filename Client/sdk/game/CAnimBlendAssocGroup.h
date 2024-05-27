@@ -17,8 +17,8 @@ class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociation;
 class CAnimBlock;
 struct RpClump;
-typedef unsigned char BYTE;
-typedef unsigned long AssocGroupId;
+using BYTE = std::uint8_t;
+using AssocGroupId = std::uint32_t;
 
 enum class eAnimGroup : int
 {

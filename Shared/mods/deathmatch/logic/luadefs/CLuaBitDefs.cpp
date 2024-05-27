@@ -63,7 +63,7 @@ int CLuaBitDefs::bitAnd(lua_State* luaVM)
 int CLuaBitDefs::bitNot(lua_State* luaVM)
 {
     //  uint bitNot ( uint var )
-    uint uiVar;
+    std::uint32_t uiVar;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(uiVar, false);
@@ -83,8 +83,8 @@ int CLuaBitDefs::bitNot(lua_State* luaVM)
 int CLuaBitDefs::bitOr(lua_State* luaVM)
 {
     //  uint bitOr ( uint var1, uint var2, ... )
-    uint uiVar1;
-    uint uiVar2;
+    std::uint32_t uiVar1;
+    std::uint32_t uiVar2;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(uiVar1, false);
@@ -92,10 +92,10 @@ int CLuaBitDefs::bitOr(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        uint uiResult = uiVar1 | uiVar2;
+        auto uiResult = uiVar1 | uiVar2;
         while (argStream.NextIsNumber())
         {
-            uint uiVar;
+            std::uint32_t uiVar;
             argStream.ReadNumber(uiVar, false);
 
             uiResult |= uiVar;

@@ -13,17 +13,16 @@
 #include "CObjectSyncPacket.h"
 #include <net/SyncStructures.h>
 
-CObjectSyncPacket::~CObjectSyncPacket()
+CObjectSyncPacket::~CObjectSyncPacket() noexcept
 {
-    std::vector<SyncData*>::const_iterator iter = m_Syncs.begin();
-    for (; iter != m_Syncs.end(); ++iter)
+    for (const auto& pData : m_Syncs)
     {
-        delete *iter;
+        delete pData;
     }
     m_Syncs.clear();
 }
 
-bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // While we're not out of bytes
     while (BitStream.GetNumberOfUnreadBits() > 8)
@@ -41,7 +40,7 @@ bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
 
         // Read out flags
-        SIntegerSync<unsigned char, 3> flags;
+        SIntegerSync<std::uint8_t, 3> flags;
         if (!BitStream.Read(&flags))
             return false;
         pData->ucFlags = flags;
@@ -80,53 +79,51 @@ bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream)
     return m_Syncs.size() > 0;
 }
 
-bool CObjectSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CObjectSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    bool                                   bSent = false;
-    std::vector<SyncData*>::const_iterator iter = m_Syncs.begin();
+    bool bSent = false;
     // Write syncs
-    for (; iter != m_Syncs.end(); ++iter)
+    for (const auto& pData : m_Syncs)
     {
-        SyncData* pData = *iter;
-        // If we're not supposed to ignore the packet
-        if (pData->bSend)
+        // If we're supposed to ignore the packet
+        if (!pData->bSend)
+            continue;
+
+        // Write the ID
+        BitStream.Write(pData->ID);
+
+        // Write the sync time context
+        BitStream.Write(pData->ucSyncTimeContext);
+
+        // Write flags
+        SIntegerSync<std::uint8_t, 3> flags(pData->ucFlags);
+        BitStream.Write(&flags);
+
+        // Write position if we need
+        if (flags & 0x1)
         {
-            // Write the ID
-            BitStream.Write(pData->ID);
-
-            // Write the sync time context
-            BitStream.Write(pData->ucSyncTimeContext);
-
-            // Write flags
-            SIntegerSync<unsigned char, 3> flags(pData->ucFlags);
-            BitStream.Write(&flags);
-
-            // Write position if we need
-            if (flags & 0x1)
-            {
-                SPositionSync position;
-                position.data.vecPosition = pData->vecPosition;
-                BitStream.Write(&position);
-            }
-
-            // Write rotation
-            if (flags & 0x2)
-            {
-                SRotationRadiansSync rotation;
-                rotation.data.vecRotation = pData->vecRotation;
-                BitStream.Write(&rotation);
-            }
-
-            // Write health
-            if (flags & 0x4)
-            {
-                SObjectHealthSync health;
-                health.data.fValue = pData->fHealth;
-            }
-
-            // We've sent atleast one sync
-            bSent = true;
+            SPositionSync position;
+            position.data.vecPosition = pData->vecPosition;
+            BitStream.Write(&position);
         }
+
+        // Write rotation
+        if (flags & 0x2)
+        {
+            SRotationRadiansSync rotation;
+            rotation.data.vecRotation = pData->vecRotation;
+            BitStream.Write(&rotation);
+        }
+
+        // Write health
+        if (flags & 0x4)
+        {
+            SObjectHealthSync health;
+            health.data.fValue = pData->fHealth;
+        }
+
+        // We've sent atleast one sync
+        bSent = true;
     }
 
     return bSent;

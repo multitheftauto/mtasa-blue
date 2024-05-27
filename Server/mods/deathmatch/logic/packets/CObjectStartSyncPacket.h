@@ -18,12 +18,12 @@ class CObject;
 class CObjectStartSyncPacket final : public CPacket
 {
 public:
-    CObjectStartSyncPacket(CObject* pObject) { m_pObject = pObject; };
+    CObjectStartSyncPacket(CObject* pObject) noexcept { m_pObject = pObject; }
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_OBJECT_STARTSYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_OBJECT_STARTSYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     CObject* m_pObject;

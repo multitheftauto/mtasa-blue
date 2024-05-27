@@ -12,10 +12,10 @@
 #include "StdInc.h"
 #include "CDebugEchoPacket.h"
 
-bool CDebugEchoPacket::Write(NetBitStreamInterface& BitStream) const
+bool CDebugEchoPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the level
-    BitStream.Write(static_cast<unsigned char>(m_uiLevel));
+    BitStream.Write(static_cast<std::uint8_t>(m_uiLevel));
     if (m_uiLevel == 0)
     {
         // Write the color
@@ -25,12 +25,10 @@ bool CDebugEchoPacket::Write(NetBitStreamInterface& BitStream) const
     }
 
     // Too short?
-    if (m_strMessage.length() >= MIN_DEBUGECHO_LENGTH)
-    {
-        // Write the string
-        BitStream.WriteStringCharacters(m_strMessage);
-        return true;
-    }
+    if (m_strMessage.length() < MIN_DEBUGECHO_LENGTH)
+        return false;
 
-    return false;
+    // Write the string
+    BitStream.WriteStringCharacters(m_strMessage);
+    return true;
 }

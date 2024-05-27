@@ -13,7 +13,7 @@
 #include "CPedStartSyncPacket.h"
 #include "CPed.h"
 
-bool CPedStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPedStartSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     if (!m_pPed)
         return false;

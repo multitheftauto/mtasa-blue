@@ -16,13 +16,13 @@
 class CServerTextItemPacket final : public CPacket
 {
 public:
-    CServerTextItemPacket(unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, unsigned char format,
-                          unsigned char ucShadowAlpha, const char* szText);
+    CServerTextItemPacket(std::uint32_t ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color, std::uint8_t format,
+                          std::uint8_t ucShadowAlpha, const char* szText) noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_TEXT_ITEM; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_TEXT_ITEM; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     SString       m_strText;
@@ -30,8 +30,8 @@ private:
     float         m_fY;
     SColor        m_Color;
     float         m_fScale;
-    unsigned char m_ucFormat;
-    unsigned char m_ucShadowAlpha;
-    unsigned long m_ulUniqueId;
+    std::uint8_t  m_ucFormat;
+    std::uint8_t  m_ucShadowAlpha;
+    std::uint32_t m_ulUniqueId;
     bool          m_bDeletable;
 };

@@ -19,7 +19,7 @@ public:
 
     virtual ePacketID       GetPacketID() const noexcept = 0;
     virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_DEFAULT; }
-    virtual unsigned long   GetFlags() const noexcept = 0;
+    virtual std::uint32_t   GetFlags() const noexcept = 0;
 
     virtual bool Read(NetBitStreamInterface& BitStream) noexcept { return false; }
     virtual bool Write(NetBitStreamInterface& BitStream) const noexcept{ return false; }
@@ -33,12 +33,12 @@ class CSimPlayerPuresyncPacket : public CSimPacket
 public:
     ZERO_ON_NEW
 
-    CSimPlayerPuresyncPacket(ElementID PlayerID,
-        std::uint16_t PlayerLatency, std::uint8_t PlayerSyncTimeContext, std::uint8_t PlayerGotWeaponType, float WeaponRange,
-        CControllerState& sharedControllerState);
+    CSimPlayerPuresyncPacket(ElementID PlayerID, std::uint16_t PlayerLatency,
+        std::uint8_t PlayerSyncTimeContext, std::uint8_t PlayerGotWeaponType,
+        float WeaponRange, CControllerState& sharedControllerState) noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_PURESYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_PURESYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; }
 
     bool Read(NetBitStreamInterface& BitStream) noexcept;
     bool Write(NetBitStreamInterface& BitStream) const noexcept;

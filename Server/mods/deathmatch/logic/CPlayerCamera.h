@@ -51,10 +51,10 @@ public:
 
     void SetRotation(CVector& vecRotation);
 
-    unsigned char GetInterior() const { return m_ucInterior; }
-    void          SetInterior(unsigned char ucInterior) { m_ucInterior = ucInterior; }
+    unsigned char GetInterior() const noexcept { return m_ucInterior; }
+    void          SetInterior(unsigned char ucInterior) noexcept { m_ucInterior = ucInterior; }
 
-    CPlayer* GetPlayer() const { return m_pPlayer; }
+    CPlayer* GetPlayer() const noexcept { return m_pPlayer; }
 
     uchar GenerateSyncTimeContext();
     bool  CanUpdateSync(uchar ucRemote);

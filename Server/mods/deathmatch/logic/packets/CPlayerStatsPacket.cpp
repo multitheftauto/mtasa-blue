@@ -13,7 +13,7 @@
 #include "CPlayerStatsPacket.h"
 #include "CElement.h"
 
-bool CPlayerStatsPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPlayerStatsPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     if (!m_pSourceElement)
         return false;
@@ -21,7 +21,8 @@ bool CPlayerStatsPacket::Write(NetBitStreamInterface& BitStream) const
     // Write the source elements's ID
     BitStream.Write(m_pSourceElement->GetID());
 
-    BitStream.WriteCompressed(static_cast<unsigned short>(m_map.size()));            // Write stat count
+    // Write stat count
+    BitStream.WriteCompressed(static_cast<std::uint16_t>(m_map.size()));
     for (auto&& [statID, value] : m_map)
     {
         BitStream.Write(statID);
@@ -31,7 +32,7 @@ bool CPlayerStatsPacket::Write(NetBitStreamInterface& BitStream) const
     return true;
 }
 
-void CPlayerStatsPacket::Add(unsigned short usID, float fValue)
+void CPlayerStatsPacket::Add(const std::uint16_t usID, const float fValue) noexcept
 {
     if (auto iter = m_map.find(usID); iter != m_map.end())
     {

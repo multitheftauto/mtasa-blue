@@ -16,16 +16,16 @@
 class CPedStopSyncPacket final : public CPacket
 {
 public:
-    CPedStopSyncPacket(ElementID ID) { m_ID = ID; };
+    CPedStopSyncPacket(ElementID ID) noexcept { m_ID = ID; }
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PED_STOPSYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PED_STOPSYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const
+    bool Write(NetBitStreamInterface& BitStream) const noexcept
     {
         BitStream.Write(m_ID);
         return true;
-    };
+    }
 
 private:
     ElementID m_ID;

@@ -14,7 +14,7 @@
 #include "CPlayer.h"
 #include <net/SyncStructures.h>
 
-bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // string          (X)   - AC info
     // string          (X)   - SD info
@@ -86,27 +86,21 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
     // Write the global flags
     BitStream.WriteBit(m_bShowInChat);
 
-    CPlayer* pPlayer = NULL;
     // Put each player in our list into the packet
-    std::list<CPlayer*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); ++iter)
+    for (const auto& pPlayer : m_List)
     {
-        // Grab the real pointer
-        pPlayer = *iter;
-
         // Write the player ID
-        ElementID PlayerID = pPlayer->GetID();
-        BitStream.Write(PlayerID);
+        BitStream.Write(pPlayer->GetID());
 
         // Time sync context
         BitStream.Write(pPlayer->GetSyncTimeContext());
 
         // Write the nick length
         const char*   szNickPointer = pPlayer->GetNick();
-        unsigned char ucNickLength = static_cast<unsigned char>(strlen(szNickPointer));
+        auto ucNickLength = static_cast<std::uint8_t>(strlen(szNickPointer));
         if (ucNickLength < MIN_PLAYER_NICK_LENGTH || ucNickLength > MAX_PLAYER_NICK_LENGTH)
         {
-            BitStream.Write(static_cast<unsigned char>(3));
+            BitStream.Write(static_cast<std::uint8_t>(3));
             BitStream.Write("???", 3);
         }
         else
@@ -123,7 +117,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         }
 
         // Flags
-        bool bInVehicle = (pPlayer->GetOccupiedVehicle() != NULL);
+        bool bInVehicle = pPlayer->GetOccupiedVehicle() != nullptr;
         BitStream.WriteBit(pPlayer->IsDead());
         BitStream.WriteBit(true);            // (Was IsSpawned) Used by the client to determine if extra info was sent (in this packet)
         BitStream.WriteBit(bInVehicle);
@@ -134,15 +128,15 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.WriteBit(pPlayer->IsFrozen());
 
         // Nametag stuff
-        unsigned char ucNametagTextLength = 0;
+        std::uint8_t ucNametagTextLength = 0;
         char*         szNametagText = pPlayer->GetNametagText();
         if (szNametagText)
-            ucNametagTextLength = static_cast<unsigned char>(strlen(szNametagText));
+            ucNametagTextLength = static_cast<std::uint8_t>(strlen(szNametagText));
 
         if (!BitStream.Can(eBitStreamVersion::UnicodeNametags))
         {
             // Old client version has a fixed buffer of 22 characters
-            ucNametagTextLength = std::min<uchar>(ucNametagTextLength, 22);
+            ucNametagTextLength = std::min<std::uint8_t>(ucNametagTextLength, 22);
         }
 
         BitStream.Write(ucNametagTextLength);
@@ -152,7 +146,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         // Write nametag color if it's overridden
         if (pPlayer->IsNametagColorOverridden())
         {
-            unsigned char ucR, ucG, ucB;
+            std::uint8_t ucR, ucG, ucB;
             pPlayer->GetNametagColor(ucR, ucG, ucB);
             BitStream.Write(ucR);
             BitStream.Write(ucG);
@@ -162,74 +156,71 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
         // Move anim
         if (BitStream.Version() > 0x4B)
         {
-            uchar ucMoveAnim = pPlayer->GetMoveAnim();
+            std::uint8_t ucMoveAnim = pPlayer->GetMoveAnim();
             BitStream.Write(ucMoveAnim);
         }
 
-        // Always send extra info (Was: "Write spawn info if he's spawned")
-        if (true)
+        // Player model ID
+        BitStream.WriteCompressed(pPlayer->GetModel());
+
+        // Team id
+        CTeam* pTeam = pPlayer->GetTeam();
+        if (pTeam)
         {
-            // Player model ID
-            BitStream.WriteCompressed(pPlayer->GetModel());
+            BitStream.WriteBit(true);
+            BitStream.Write(pTeam->GetID());
+        }
+        else
+            BitStream.WriteBit(false);
 
-            // Team id
-            CTeam* pTeam = pPlayer->GetTeam();
-            if (pTeam)
+        if (bInVehicle)
+        {
+            // Grab the occupied vehicle
+            CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
+
+            // Vehicle ID and seat
+            BitStream.Write(pVehicle->GetID());
+
+            SOccupiedSeatSync seat;
+            seat.data.ucSeat = pPlayer->GetOccupiedVehicleSeat();
+            BitStream.Write(&seat);
+        }
+        else
+        {
+            // Player position
+            SPositionSync position(false);
+            position.data.vecPosition = pPlayer->GetPosition();
+            BitStream.Write(&position);
+
+            // Player rotation
+            SPedRotationSync rotation;
+            rotation.data.fRotation = pPlayer->GetRotation();
+            BitStream.Write(&rotation);
+        }
+
+        BitStream.WriteCompressed(pPlayer->GetDimension());
+        BitStream.Write(pPlayer->GetFightingStyle());
+
+        SEntityAlphaSync alpha;
+        alpha.data.ucAlpha = pPlayer->GetAlpha();
+        BitStream.Write(&alpha);
+
+        BitStream.Write(pPlayer->GetInterior());
+
+        // Write the weapons of the player weapon slots
+        for (auto i = 0; i < 16; ++i)
+        {
+            CWeapon* pWeapon = pPlayer->GetWeapon(i);
+            if (!pWeapon || !pWeapon->ucType)
             {
-                BitStream.WriteBit(true);
-                BitStream.Write(pTeam->GetID());
-            }
-            else
                 BitStream.WriteBit(false);
-
-            if (bInVehicle)
-            {
-                // Grab the occupied vehicle
-                CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
-
-                // Vehicle ID and seat
-                BitStream.Write(pVehicle->GetID());
-
-                SOccupiedSeatSync seat;
-                seat.data.ucSeat = pPlayer->GetOccupiedVehicleSeat();
-                BitStream.Write(&seat);
-            }
-            else
-            {
-                // Player position
-                SPositionSync position(false);
-                position.data.vecPosition = pPlayer->GetPosition();
-                BitStream.Write(&position);
-
-                // Player rotation
-                SPedRotationSync rotation;
-                rotation.data.fRotation = pPlayer->GetRotation();
-                BitStream.Write(&rotation);
+                continue;
             }
 
-            BitStream.WriteCompressed(pPlayer->GetDimension());
-            BitStream.Write(pPlayer->GetFightingStyle());
-
-            SEntityAlphaSync alpha;
-            alpha.data.ucAlpha = pPlayer->GetAlpha();
-            BitStream.Write(&alpha);
-
-            BitStream.Write(pPlayer->GetInterior());
-
-            // Write the weapons of the player weapon slots
-            for (unsigned int i = 0; i < 16; ++i)
-            {
-                CWeapon* pWeapon = pPlayer->GetWeapon(i);
-                if (pWeapon && pWeapon->ucType != 0)
-                {
-                    BitStream.WriteBit(true);
-                    SWeaponTypeSync weaponType;
-                    weaponType.data.ucWeaponType = pWeapon->ucType;
-                    BitStream.Write(&weaponType);
-                }
-                else
-                    BitStream.WriteBit(false);
-            }
+            BitStream.WriteBit(true);
+            SWeaponTypeSync weaponType;
+            weaponType.data.ucWeaponType = pWeapon->ucType;
+            BitStream.Write(&weaponType);
         }
     }
 

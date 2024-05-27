@@ -17,13 +17,13 @@
 class CEntityRemovePacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_ENTITY_REMOVE; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_ENTITY_REMOVE; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    void Add(class CElement* pElement) { m_List.push_back(pElement); };
-    void Clear() { m_List.clear(); };
+    void Add(class CElement* pElement) noexcept { m_List.push_back(pElement); }
+    void Clear() noexcept { m_List.clear(); }
 
 private:
     std::vector<class CElement*> m_List;

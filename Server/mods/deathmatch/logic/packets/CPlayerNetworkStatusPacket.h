@@ -15,16 +15,16 @@
 class CPlayerNetworkStatusPacket final : public CPacket
 {
 public:
-    virtual bool  RequiresSourcePlayer() const { return true; }
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_NETWORK_STATUS; };
-    unsigned long GetFlags() const
+    virtual bool  RequiresSourcePlayer() const noexcept { return true; }
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_NETWORK_STATUS; }
+    std::uint32_t GetFlags() const noexcept
     {
         assert(0);
         return 0;
     };
 
-    bool Read(NetBitStreamInterface& BitStream);
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
 
-    uchar m_ucType;
-    uint  m_uiTicks;
+    std::uint8_t  m_ucType;
+    std::uint32_t m_uiTicks;
 };

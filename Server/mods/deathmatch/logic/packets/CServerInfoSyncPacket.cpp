@@ -12,21 +12,19 @@
 #include "CServerInfoSyncPacket.h"
 #include "CStaticFunctionDefinitions.h"
 
-bool CServerInfoSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CServerInfoSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    if (m_ActualInfo)            // Flag is set
+    // Flag is set
+    if (!m_ActualInfo)
+        return false;
+
+    BitStream.Write(m_ActualInfo);
+
+    // Check the flags one by one & write in order
+    if (maxPlayers)
     {
-        BitStream.Write(m_ActualInfo);
-
-        // Check the flags one by one & write in order
-        if (maxPlayers)
-            BitStream.Write(static_cast<uint>(
-                CStaticFunctionDefinitions::GetMaxPlayers()));            // static_cast ensures the type is uint in case it's changed in future
-
-        // other info
-
-        return true;
+        BitStream.Write(CStaticFunctionDefinitions::GetMaxPlayers());
     }
 
-    return false;
+    return true;
 }

@@ -777,7 +777,7 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
                 continue;
 
             // Write the data
-            long lArgBytesWritten = pFile->Write(strData.uiSize, strData.pData);
+            auto lArgBytesWritten = pFile->Write(strData.uiSize, strData.pData);
 
             // Did the file mysteriously disappear?
             if (lArgBytesWritten == -1)

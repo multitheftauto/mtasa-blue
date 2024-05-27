@@ -34,8 +34,9 @@ enum eMessageType
 class CChatEchoPacket final : public CPacket
 {
 public:
-    CChatEchoPacket(SString strMessage, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, bool bColorCoded = false,
-                    unsigned char ucMessageType = MESSAGE_TYPE_PLAYER)
+    CChatEchoPacket(SString strMessage,
+        std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue,
+        bool bColorCoded = false, std::uint8_t ucMessageType = MESSAGE_TYPE_PLAYER) noexcept
     {
         m_strMessage = strMessage;
         m_ucRed = ucRed;
@@ -46,17 +47,17 @@ public:
     };
 
     // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
-    ePacketID               GetPacketID() const noexcept { return PACKET_ID_CHAT_ECHO; };
-    unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
+    ePacketID               GetPacketID() const noexcept { return PACKET_ID_CHAT_ECHO; }
+    std::uint32_t           GetFlags() const noexcept { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_CHAT; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
-    unsigned char m_ucRed;
-    unsigned char m_ucGreen;
-    unsigned char m_ucBlue;
-    SString       m_strMessage;
-    bool          m_bColorCoded;
-    unsigned char m_ucMessageType;
+    std::uint8_t m_ucRed;
+    std::uint8_t m_ucGreen;
+    std::uint8_t m_ucBlue;
+    SString      m_strMessage;
+    bool         m_bColorCoded;
+    std::uint8_t m_ucMessageType;
 };

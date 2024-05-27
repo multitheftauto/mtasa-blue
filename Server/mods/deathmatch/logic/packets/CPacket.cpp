@@ -15,7 +15,7 @@
 
 CPacket::CPacket() noexcept : m_Source(NetServerPlayerID(0, 0)) {}
 
-CPlayer* CPacket::GetSourcePlayer() noexcept
+CPlayer* CPacket::GetSourcePlayer() const noexcept
 {
     return static_cast<CPlayer*>(m_pSourceElement);
 }

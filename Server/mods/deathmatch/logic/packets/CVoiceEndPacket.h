@@ -16,18 +16,18 @@
 class CVoiceEndPacket final : public CPacket
 {
 public:
-    CVoiceEndPacket(class CPlayer* pPlayer = NULL);
-    ~CVoiceEndPacket();
+    CVoiceEndPacket(class CPlayer* pPlayer = nullptr) noexcept;
+    ~CVoiceEndPacket() noexcept;
 
     ePacketID               GetPacketID() const noexcept { return PACKET_ID_VOICE_END; }
-    unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_VOICE; }
+    std::uint32_t           GetFlags() const noexcept { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; }
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_VOICE; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    ElementID GetPlayer();
-    void      SetPlayer(ElementID PlayerID);
+    ElementID GetPlayer() const noexcept;
+    void      SetPlayer(ElementID PlayerID) noexcept;
 
 private:
     ElementID m_PlayerID;

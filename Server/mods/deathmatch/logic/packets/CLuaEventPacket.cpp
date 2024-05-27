@@ -12,20 +12,20 @@
 #include "StdInc.h"
 #include "CLuaEventPacket.h"
 
-CLuaEventPacket::CLuaEventPacket()
+CLuaEventPacket::CLuaEventPacket() noexcept
 {
     m_ElementID = INVALID_ELEMENT_ID;
     m_pArguments = &m_ArgumentsStore;
 }
 
-CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments)
+CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments) noexcept
 {
     m_strName.AssignLeft(szName, MAX_EVENT_NAME_LENGTH);
     m_ElementID = ID;
     m_pArguments = pArguments;            // Use a pointer to save copying the arguments
 }
 
-bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
+bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     std::uint16_t usNameLength;
     if (!BitStream.ReadCompressed(usNameLength))

@@ -13,23 +13,21 @@
 #include "CPlayerChangeNickPacket.h"
 #include "CElement.h"
 
-CPlayerChangeNickPacket::CPlayerChangeNickPacket(const char* szNewNick)
+CPlayerChangeNickPacket::CPlayerChangeNickPacket(const char* szNewNick) noexcept
 {
     m_strNewNick.AssignLeft(szNewNick, MAX_PLAYER_NICK_LENGTH);
 }
 
-bool CPlayerChangeNickPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPlayerChangeNickPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    if (m_pSourceElement)
-    {
-        // Write the source player id
-        ElementID ID = m_pSourceElement->GetID();
-        BitStream.Write(ID);
+    if (!m_pSourceElement)
+        return false;
 
-        // Write the nick
-        BitStream.WriteStringCharacters(m_strNewNick);
-        return true;
-    }
+    // Write the source player id
+    ElementID ID = m_pSourceElement->GetID();
+    BitStream.Write(ID);
 
-    return false;
+    // Write the nick
+    BitStream.WriteStringCharacters(m_strNewNick);
+    return true;
 }

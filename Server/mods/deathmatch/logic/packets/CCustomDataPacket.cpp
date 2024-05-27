@@ -13,37 +13,35 @@
 #include "CCustomDataPacket.h"
 #include "CCustomData.h"
 
-CCustomDataPacket::CCustomDataPacket()
+CCustomDataPacket::CCustomDataPacket() noexcept
 {
-    m_szName = NULL;
+    m_szName = nullptr;
 }
 
-CCustomDataPacket::~CCustomDataPacket()
+CCustomDataPacket::~CCustomDataPacket() noexcept
 {
     delete[] m_szName;
-    m_szName = NULL;
+    m_szName = nullptr;
 }
 
-bool CCustomDataPacket::Read(NetBitStreamInterface& BitStream)
+bool CCustomDataPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
-    unsigned short usNameLength;
-    if (BitStream.Read(m_ElementID) && BitStream.ReadCompressed(usNameLength) && usNameLength > 0 && usNameLength <= MAX_CUSTOMDATA_NAME_LENGTH)
-    {
-        m_szName = new char[usNameLength + 1];
-        if (BitStream.Read(m_szName, usNameLength))
-        {
-            m_szName[usNameLength] = 0;
-            if (m_Value.ReadFromBitStream(BitStream))
-            {
-                return true;
-            }
-        }
-    }
+    std::uint16_t usNameLength;
+    if (!BitStream.Read(m_ElementID) || !BitStream.ReadCompressed(usNameLength))
+        return false;
 
-    return false;
+    if (usNameLength <= 0 || usNameLength > MAX_CUSTOMDATA_NAME_LENGTH)
+        return false;
+
+    m_szName = new char[usNameLength + 1];
+    if (!BitStream.Read(m_szName, usNameLength))
+        return false;
+
+    m_szName[usNameLength] = 0;
+    return m_Value.ReadFromBitStream(BitStream);
 }
 
-bool CCustomDataPacket::Write(NetBitStreamInterface& BitStream) const
+bool CCustomDataPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     return true;
 }

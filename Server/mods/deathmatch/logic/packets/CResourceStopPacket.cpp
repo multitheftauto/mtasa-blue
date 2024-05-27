@@ -12,12 +12,10 @@
 #include "StdInc.h"
 #include "CResourceStopPacket.h"
 
-CResourceStopPacket::CResourceStopPacket(unsigned short usID)
-{
-    m_usID = usID;
-}
+CResourceStopPacket::CResourceStopPacket(const std::uint16_t usID) noexcept
+    : m_usID(usID) {}
 
-bool CResourceStopPacket::Write(NetBitStreamInterface& BitStream) const
+bool CResourceStopPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the resource id
     BitStream.Write(m_usID);

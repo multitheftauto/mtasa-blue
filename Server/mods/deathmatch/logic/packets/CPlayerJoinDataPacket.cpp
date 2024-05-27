@@ -12,7 +12,7 @@
 #include "StdInc.h"
 #include "CPlayerJoinDataPacket.h"
 
-bool CPlayerJoinDataPacket::Read(NetBitStreamInterface& BitStream)
+bool CPlayerJoinDataPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // Read out the stuff
     if (!BitStream.Read(m_usNetVersion) || !BitStream.Read(m_usMTAVersion))
@@ -25,14 +25,19 @@ bool CPlayerJoinDataPacket::Read(NetBitStreamInterface& BitStream)
 
     m_bOptionalUpdateInfoRequired = BitStream.ReadBit();
 
-    if (BitStream.Read(m_ucGameVersion) && BitStream.ReadStringCharacters(m_strNick, MAX_PLAYER_NICK_LENGTH) &&
-        BitStream.Read(reinterpret_cast<char*>(&m_Password), 16) && BitStream.ReadStringCharacters(m_strSerialUser, MAX_SERIAL_LENGTH))
-    {
-        // Shrink string sizes to fit
-        m_strNick = *m_strNick;
-        m_strSerialUser = *m_strSerialUser;
+    if (!BitStream.Read(m_ucGameVersion))
+        return false;
 
-        return true;
-    }
-    return false;
+    if (!BitStream.ReadStringCharacters(m_strNick, MAX_PLAYER_NICK_LENGTH))
+        return false;
+    if (!BitStream.Read(reinterpret_cast<char*>(&m_Password), 16))
+        return false;
+    if (!BitStream.ReadStringCharacters(m_strSerialUser, MAX_SERIAL_LENGTH))
+        return false;
+
+    // Shrink string sizes to fit
+    m_strNick = *m_strNick;
+    m_strSerialUser = *m_strSerialUser;
+
+    return true;
 }

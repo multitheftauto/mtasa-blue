@@ -12,7 +12,7 @@
 
 #include "CPacket.h"
 
-enum EServerInfoSyncFlag : uint8
+enum EServerInfoSyncFlag : std::uint8_t
 {
     SERVER_INFO_FLAG_ALL = 0xFF,                  // 0b11111111
     SERVER_INFO_FLAG_MAX_PLAYERS = 1,             // 0b00000001
@@ -22,18 +22,18 @@ enum EServerInfoSyncFlag : uint8
 class CServerInfoSyncPacket final : public CPacket
 {
 public:
-    CServerInfoSyncPacket(uint8 flags) { m_ActualInfo = flags; }
+    CServerInfoSyncPacket(std::uint8_t flags) noexcept { m_ActualInfo = flags; }
 
     ePacketID               GetPacketID() const noexcept { return PACKET_ID_SERVER_INFO_SYNC; }
-    unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
+    std::uint32_t           GetFlags() const noexcept { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_DEFAULT; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     union
     {
-        uint8 m_ActualInfo;
+        std::uint8_t m_ActualInfo;
         struct
         {
             bool maxPlayers : 1;

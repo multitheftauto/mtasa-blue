@@ -16,14 +16,14 @@
 class CLuaPacket final : public CPacket
 {
 public:
-    CLuaPacket(unsigned char ucActionID, NetBitStreamInterface& BitStream) : m_ucActionID(ucActionID), m_BitStream(BitStream){};
+    CLuaPacket(std::uint8_t ucActionID, NetBitStreamInterface& BitStream) noexcept : m_ucActionID(ucActionID), m_BitStream(BitStream){};
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_LUA; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_LUA; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
-    unsigned char          m_ucActionID;
+    std::uint8_t           m_ucActionID;
     NetBitStreamInterface& m_BitStream;
 };

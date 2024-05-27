@@ -14,47 +14,45 @@
 #include "CPlayer.h"
 #include "net/SyncStructures.h"
 
-CReturnSyncPacket::CReturnSyncPacket(CPlayer* pPlayer)
+CReturnSyncPacket::CReturnSyncPacket(CPlayer* pPlayer) noexcept
 {
     m_pSourceElement = pPlayer;
 }
 
-bool CReturnSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CReturnSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Got a player to write?
-    if (m_pSourceElement)
+    if (!m_pSourceElement)
+        return false;
+
+    CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
+
+    // Grab eventual vehicle
+    CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle();
+
+    SPositionSync position(false);
+
+    // Flags
+    BitStream.WriteBit(pVehicle != nullptr);
+
+    // In a vehicle?
+    if (pVehicle)
     {
-        CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
+        // Write its position
+        position.data.vecPosition = pVehicle->GetPosition();
+        BitStream.Write(&position);
 
-        // Grab eventual vehicle
-        CVehicle* pVehicle = pSourcePlayer->GetOccupiedVehicle();
-
-        SPositionSync position(false);
-
-        // Flags
-        BitStream.WriteBit(pVehicle != NULL);
-
-        // In a vehicle?
-        if (pVehicle)
-        {
-            // Write its position
-            position.data.vecPosition = pVehicle->GetPosition();
-            BitStream.Write(&position);
-
-            // And rotation
-            SRotationDegreesSync rotation(false);
-            pVehicle->GetRotationDegrees(rotation.data.vecRotation);
-            BitStream.Write(&rotation);
-        }
-        else
-        {
-            // Write his position
-            position.data.vecPosition = pSourcePlayer->GetPosition();
-            BitStream.Write(&position);
-        }
-
-        return true;
+        // And rotation
+        SRotationDegreesSync rotation(false);
+        pVehicle->GetRotationDegrees(rotation.data.vecRotation);
+        BitStream.Write(&rotation);
+    }
+    else
+    {
+        // Write his position
+        position.data.vecPosition = pSourcePlayer->GetPosition();
+        BitStream.Write(&position);
     }
 
-    return false;
+    return true;
 }

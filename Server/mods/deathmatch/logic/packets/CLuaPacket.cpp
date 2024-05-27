@@ -12,14 +12,14 @@
 #include "StdInc.h"
 #include "CLuaPacket.h"
 
-bool CLuaPacket::Write(NetBitStreamInterface& BitStream) const
+bool CLuaPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the action ID
     BitStream.Write(m_ucActionID);
 
     // Copy each byte from the bitstream we have to this one
-    unsigned char ucTemp;
-    int           iLength = m_BitStream.GetNumberOfBitsUsed();
+    std::uint8_t ucTemp;
+    auto iLength = m_BitStream.GetNumberOfBitsUsed();
     while (iLength > 8)
     {
         m_BitStream.Read(ucTemp);

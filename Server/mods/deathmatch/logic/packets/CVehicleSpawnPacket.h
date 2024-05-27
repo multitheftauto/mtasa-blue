@@ -19,13 +19,13 @@ class CVehicle;
 class CVehicleSpawnPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_SPAWN; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_SPAWN; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    void Add(CVehicle* pVehicle) { m_List.push_back(pVehicle); };
-    void Clear() { m_List.clear(); };
+    void Add(CVehicle* pVehicle) noexcept { m_List.push_back(pVehicle); }
+    void Clear() noexcept { m_List.clear(); }
 
 private:
     std::vector<CVehicle*> m_List;

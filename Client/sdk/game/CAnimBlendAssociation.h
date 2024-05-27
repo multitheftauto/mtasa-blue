@@ -13,8 +13,8 @@
 
 #include <memory>
 
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+using AssocGroupId = std::uint32_t;
+using AnimationId = std::uint32_t;
 
 class CAnimBlendAssociationSAInterface;
 class CAnimBlendHierarchy;

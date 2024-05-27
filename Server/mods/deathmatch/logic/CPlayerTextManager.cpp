@@ -92,33 +92,32 @@ void CPlayerTextManager::Update(CTextItem* pTextItem, bool bRemovedFromDisplay)
 // this is not the same as the parameter as the item on the queue is a CLONE of the original
 CTextItem* CPlayerTextManager::GetTextItemOnQueue(CTextItem* textItem)
 {
-    list<CTextItem*>::iterator iter = m_highQueue.begin();
-    for (; iter != m_highQueue.end(); iter++)
+    for (const auto& pItem : m_highQueue)
     {
-        if ((*iter)->GetUniqueID() == textItem->GetUniqueID())
+        if (pItem->GetUniqueID() == textItem->GetUniqueID())
         {
-            return (*iter);
+            return pItem;
         }
     }
 
-    for (iter = m_mediumQueue.begin(); iter != m_mediumQueue.end(); iter++)
+    for (const auto& pItem : m_mediumQueue)
     {
-        if ((*iter)->GetUniqueID() == textItem->GetUniqueID())
+        if (pItem->GetUniqueID() == textItem->GetUniqueID())
         {
-            return (*iter);
+            return pItem;
         }
     }
 
-    for (iter = m_lowQueue.begin(); iter != m_lowQueue.end(); iter++)
+    for (const auto& pItem : m_lowQueue)
     {
-        if ((*iter)->GetUniqueID() == textItem->GetUniqueID())
+        if (pItem->GetUniqueID() == textItem->GetUniqueID())
         {
-            return (*iter);
+            return pItem;
         }
     }
 
     // not found it
-    return NULL;
+    return nullptr;
 }
 
 CPlayer* CPlayerTextManager::GetPlayer()
@@ -129,7 +128,7 @@ CPlayer* CPlayerTextManager::GetPlayer()
 void CPlayerTextManager::Process()
 {
     // Pop some item off the queue
-    CTextItem* textItem = NULL;
+    CTextItem* textItem = nullptr;
     if (m_highQueue.size() != 0)
     {
         textItem = m_highQueue.front();
@@ -146,13 +145,15 @@ void CPlayerTextManager::Process()
         m_lowQueue.pop_front();
     }
 
-    if (textItem)
-    {
-        // Tell the player
-        m_pPlayer->Send(CServerTextItemPacket(textItem->m_ulUniqueId, textItem->m_bDeletable, textItem->m_vecPosition.fX, textItem->m_vecPosition.fY,
-                                              textItem->m_fScale, textItem->m_Color, textItem->m_ucFormat, textItem->m_ucShadowAlpha, textItem->m_strText));
+    if (!textItem)
+        return;
 
-        // Delete the text item created on the queue
-        delete textItem;
-    }
+    // Tell the player
+    m_pPlayer->Send(CServerTextItemPacket(textItem->m_ulUniqueId, textItem->m_bDeletable,
+        textItem->m_vecPosition.fX, textItem->m_vecPosition.fY, textItem->m_fScale,
+        textItem->m_Color, textItem->m_ucFormat, textItem->m_ucShadowAlpha,
+        textItem->m_strText));
+
+    // Delete the text item created on the queue
+    delete textItem;
 }

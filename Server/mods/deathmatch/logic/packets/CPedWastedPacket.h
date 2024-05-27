@@ -15,8 +15,8 @@
 #include <CVector.h>
 
 class CPed;
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+using AssocGroupId = std::uint32_t;
+using AnimationId = std::uint32_t;
 
 class CPedWastedPacket final : public CPacket
 {

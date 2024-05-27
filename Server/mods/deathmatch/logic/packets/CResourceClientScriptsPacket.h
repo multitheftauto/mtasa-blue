@@ -18,14 +18,14 @@
 class CResourceClientScriptsPacket final : public CPacket
 {
 public:
-    CResourceClientScriptsPacket(CResource* pResource);
+    CResourceClientScriptsPacket(CResource* pResource) noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_RESOURCE_CLIENT_SCRIPTS; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_RESOURCE_CLIENT_SCRIPTS; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    void AddItem(CResourceClientScriptItem* pItem);
+    void AddItem(CResourceClientScriptItem* pItem) noexcept;
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     std::vector<CResourceClientScriptItem*> m_vecItems;

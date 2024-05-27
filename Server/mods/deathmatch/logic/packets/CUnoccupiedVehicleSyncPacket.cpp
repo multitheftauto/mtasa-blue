@@ -14,16 +14,17 @@
 #include "CGame.h"
 #include "CVehicleManager.h"
 
-CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket()
+CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket() noexcept
 {
     m_Syncs.clear();
 }
 
-bool CUnoccupiedVehicleSyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CUnoccupiedVehicleSyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
-    uint uiMaxCount = static_cast<uint>(g_pGame->GetVehicleManager()->GetVehicleCount()) * 2u + 10u;
+    auto uiMaxCount = static_cast<std::uint32_t>(g_pGame->GetVehicleManager()->GetVehicleCount()) * 2u + 10u;
+
     // While we're not out of bytes
-    for (uint i = 0; BitStream.GetNumberOfUnreadBits() >= 8; i++)
+    for (auto i = 0; BitStream.GetNumberOfUnreadBits() >= 8; i++)
     {
         if (i > uiMaxCount)
         {
@@ -36,37 +37,36 @@ bool CUnoccupiedVehicleSyncPacket::Read(NetBitStreamInterface& BitStream)
         data.bSend = false;
 
         SUnoccupiedVehicleSync vehicle;
-        if (BitStream.Read(&vehicle))
-        {
-            data.syncStructure = vehicle;
+        if (!BitStream.Read(&vehicle))
+            continue;
 
-            // Add it to our list. We no longer check if it's valid here
-            // because CUnoccupiedVehicleSync does and it won't write bad ID's
-            // back to clients.
-            m_Syncs.push_back(data);
-        }
+        data.syncStructure = vehicle;
+
+        // Add it to our list. We no longer check if it's valid here
+        // because CUnoccupiedVehicleSync does and it won't write bad ID's
+        // back to clients.
+        m_Syncs.push_back(data);
     }
 
     return m_Syncs.size() > 0;
 }
 
-bool CUnoccupiedVehicleSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CUnoccupiedVehicleSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // While we're not out of syncs to write
-    bool                             bSent = false;
-    vector<SyncData>::const_iterator iter = m_Syncs.begin();
-    for (; iter != m_Syncs.end(); ++iter)
+    bool bSent = false;
+    for (const auto& pData : m_Syncs)
     {
         // If we're not supposed to ignore the packet
-        const SyncData* data = &(*iter);
+        const auto data = &pData;
 
-        if (data->bSend)
-        {
-            BitStream.Write(&(data->syncStructure));
+        if (!data->bSend)
+            continue;
 
-            // We've sent atleast one sync
-            bSent = true;
-        }
+        BitStream.Write(&(data->syncStructure));
+
+        // We've sent atleast one sync
+        bSent = true;
     }
 
     return bSent;

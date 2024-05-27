@@ -12,8 +12,8 @@
 #include "Utils.h"
 #include "CWeaponNames.h"
 
-CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType,
-                                                   float WeaponRange, CControllerState& sharedControllerState)
+CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, std::uint16_t PlayerLatency, std::uint8_t PlayerSyncTimeContext, std::uint8_t PlayerGotWeaponType,
+                                                   float WeaponRange, CControllerState& sharedControllerState) noexcept
 
     : m_PlayerID(PlayerID),
       m_PlayerLatency(PlayerLatency),
@@ -27,7 +27,7 @@ CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort Pl
 //
 // Should do the same this as what CPlayerPuresyncPacket::Read() does
 //
-bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // Read out the time context
     if (!BitStream.Read(m_Cache.ucTimeContext))
@@ -101,82 +101,77 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
     // Read the camera orientation
     ReadCameraOrientation(position.data.vecPosition, BitStream, m_Cache.vecCamPosition, m_Cache.vecCamFwd);
 
-    if (m_Cache.flags.data.bHasAWeapon)
-    {
-        // Read client weapon data, but only apply it if the weapon matches with the server
-        uchar ucUseWeaponType = m_PlayerGotWeaponType;
-        bool  bWeaponCorrect = true;
-        m_Cache.bIsAimFull = false;
-
-        // Check client has the weapon we think he has
-        unsigned char ucClientWeaponType;
-        if (!BitStream.Read(ucClientWeaponType))
-            return false;
-
-        if (m_PlayerGotWeaponType != ucClientWeaponType)
-        {
-            bWeaponCorrect = false;                          // Possibly old weapon data.
-            ucUseWeaponType = ucClientWeaponType;            // Use the packet supplied weapon type to skip over the correct amount of data
-        }
-
-        // Update check counts
-        m_Cache.bWeaponCorrect = bWeaponCorrect;
-
-        // Current weapon slot
-        SWeaponSlotSync slot;
-        if (!BitStream.Read(&slot))
-            return false;
-        unsigned int uiSlot = slot.data.uiSlot;
-
-        // Set weapon slot
-        if (bWeaponCorrect)
-            m_Cache.ucWeaponSlot = static_cast<uchar>(uiSlot);
-
-        if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
-        {
-            // Read out the ammo states
-            SWeaponAmmoSync ammo(ucUseWeaponType, true, true);
-            if (!BitStream.Read(&ammo))
-                return false;
-
-            // Read out the aim data
-            SWeaponAimSync sync(m_WeaponRange, (m_sharedControllerState.RightShoulder1 || m_sharedControllerState.ButtonCircle));
-            if (!BitStream.Read(&sync))
-                return false;
-
-            // Set the arm directions and whether or not arms are up
-            // Save this here incase weapon is not correct
-            m_Cache.fAimDirection = sync.data.fArm;
-
-            if (bWeaponCorrect)
-            {
-                // Set the ammo states
-                m_Cache.usAmmoInClip = ammo.data.usAmmoInClip;
-                m_Cache.usTotalAmmo = ammo.data.usTotalAmmo;
-
-                // Read the aim data only if he's shooting or aiming
-                if (sync.isFull())
-                {
-                    m_Cache.vecSniperSource = sync.data.vecOrigin;
-                    m_Cache.vecTargetting = sync.data.vecTarget;
-                    m_Cache.bIsAimFull = true;
-                }
-            }
-        }
-        else
-        {
-            if (bWeaponCorrect)
-            {
-                m_Cache.usAmmoInClip = 1;
-                m_Cache.usTotalAmmo = 1;
-            }
-        }
-    }
-    else
+    if (!m_Cache.flags.data.bHasAWeapon)
     {
         m_Cache.ucWeaponSlot = 0;
         m_Cache.usAmmoInClip = 1;
         m_Cache.usTotalAmmo = 1;
+        return true;
+    }
+    // Read client weapon data, but only apply it if the weapon matches with the server
+    std::uint8_t ucUseWeaponType = m_PlayerGotWeaponType;
+    bool  bWeaponCorrect = true;
+    m_Cache.bIsAimFull = false;
+
+    // Check client has the weapon we think he has
+    std::uint8_t ucClientWeaponType;
+    if (!BitStream.Read(ucClientWeaponType))
+        return false;
+
+    if (m_PlayerGotWeaponType != ucClientWeaponType)
+    {
+        bWeaponCorrect = false;                          // Possibly old weapon data.
+        ucUseWeaponType = ucClientWeaponType;            // Use the packet supplied weapon type to skip over the correct amount of data
+    }
+
+    // Update check counts
+    m_Cache.bWeaponCorrect = bWeaponCorrect;
+
+    // Current weapon slot
+    SWeaponSlotSync slot;
+    if (!BitStream.Read(&slot))
+        return false;
+
+    auto uiSlot = slot.data.uiSlot;
+
+    // Set weapon slot
+    if (bWeaponCorrect)
+        m_Cache.ucWeaponSlot = static_cast<std::uint8_t>(uiSlot);
+
+    if (!CWeaponNames::DoesSlotHaveAmmo(uiSlot) && bWeaponCorrect)
+    {
+        m_Cache.usAmmoInClip = 1;
+        m_Cache.usTotalAmmo = 1;
+        return true;
+    }
+
+    // Read out the ammo states
+    SWeaponAmmoSync ammo(ucUseWeaponType, true, true);
+    if (!BitStream.Read(&ammo))
+        return false;
+
+    // Read out the aim data
+    SWeaponAimSync sync(m_WeaponRange, (m_sharedControllerState.RightShoulder1 || m_sharedControllerState.ButtonCircle));
+    if (!BitStream.Read(&sync))
+        return false;
+
+    // Set the arm directions and whether or not arms are up
+    // Save this here incase weapon is not correct
+    m_Cache.fAimDirection = sync.data.fArm;
+
+    if (!bWeaponCorrect)
+        return true;
+
+    // Set the ammo states
+    m_Cache.usAmmoInClip = ammo.data.usAmmoInClip;
+    m_Cache.usTotalAmmo = ammo.data.usTotalAmmo;
+
+    // Read the aim data only if he's shooting or aiming
+    if (sync.isFull())
+    {
+        m_Cache.vecSniperSource = sync.data.vecOrigin;
+        m_Cache.vecTargetting = sync.data.vecTarget;
+        m_Cache.bIsAimFull = true;
     }
 
     // Success
@@ -186,7 +181,7 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 //
 // Should do the same this as what CPlayerPuresyncPacket::Write() does
 //
-bool CSimPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CSimPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     BitStream.Write(m_PlayerID);
 
@@ -229,33 +224,34 @@ bool CSimPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
     camRotation.data.fRotation = m_Cache.fCameraRotation;
     BitStream.Write(&camRotation);
 
-    if (m_Cache.flags.data.bHasAWeapon)
+    if (!m_Cache.flags.data.bHasAWeapon)
+        return true;
+
+    // check m_Cache.bWeaponCorrect !
+    unsigned int uiSlot = m_Cache.ucWeaponSlot;
+    SWeaponSlotSync slot;
+    slot.data.uiSlot = uiSlot;
+    BitStream.Write(&slot);
+
+    if (!CWeaponNames::DoesSlotHaveAmmo(uiSlot))
+        return true;
+
+    std::uint16_t usWeaponAmmoInClip = m_Cache.usAmmoInClip;
+
+    SWeaponAmmoSync ammo(m_PlayerGotWeaponType, false, true);
+    ammo.data.usAmmoInClip = usWeaponAmmoInClip;
+    BitStream.Write(&ammo);
+
+    SWeaponAimSync aim(0.0f, m_Cache.bIsAimFull);
+    aim.data.fArm = m_Cache.fAimDirection;
+
+    // Write the aim data only if he's aiming or shooting
+    if (aim.isFull())
     {
-        unsigned int    uiSlot = m_Cache.ucWeaponSlot;            // check m_Cache.bWeaponCorrect !
-        SWeaponSlotSync slot;
-        slot.data.uiSlot = uiSlot;
-        BitStream.Write(&slot);
-
-        if (CWeaponNames::DoesSlotHaveAmmo(uiSlot))
-        {
-            unsigned short usWeaponAmmoInClip = m_Cache.usAmmoInClip;
-
-            SWeaponAmmoSync ammo(m_PlayerGotWeaponType, false, true);
-            ammo.data.usAmmoInClip = usWeaponAmmoInClip;
-            BitStream.Write(&ammo);
-
-            SWeaponAimSync aim(0.0f, m_Cache.bIsAimFull);
-            aim.data.fArm = m_Cache.fAimDirection;
-
-            // Write the aim data only if he's aiming or shooting
-            if (aim.isFull())
-            {
-                aim.data.vecOrigin = m_Cache.vecSniperSource;
-                aim.data.vecTarget = m_Cache.vecTargetting;
-            }
-            BitStream.Write(&aim);
-        }
+        aim.data.vecOrigin = m_Cache.vecSniperSource;
+        aim.data.vecTarget = m_Cache.vecTargetting;
     }
+    BitStream.Write(&aim);
 
     // Success
     return true;

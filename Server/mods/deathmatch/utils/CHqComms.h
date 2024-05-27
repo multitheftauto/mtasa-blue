@@ -113,29 +113,25 @@ public:
     //
     // Process response from hq
     //
-    void DownloadFinishedCallback(const SHttpDownloadResult& result)
+    void DownloadFinishedCallback(const SHttpDownloadResult& result) noexcept
     {
-        if (result.bSuccess)
-        {
-            m_Stage = HQCOMMS_STAGE_TIMER;
-            CBitStream bitStream(result.pData, result.dataSize);
+        m_Stage = HQCOMMS_STAGE_TIMER;
+        if (!result.bSuccess)
+            return;
 
-            // Process various parts of returned data
-            ProcessPollInterval(bitStream);
-            ProcessMinClientVersion(bitStream);
-            ProcessMessage(bitStream);
-            ProcessBadFileHashes(bitStream);
-            ProcessCrashInfo(bitStream);
-            ProcessAseServers(bitStream);
-        }
-        else
-        {
-            m_Stage = HQCOMMS_STAGE_TIMER;
-        }
+        CBitStream bitStream(result.pData, result.dataSize);
+
+        // Process various parts of returned data
+        ProcessPollInterval(bitStream);
+        ProcessMinClientVersion(bitStream);
+        ProcessMessage(bitStream);
+        ProcessBadFileHashes(bitStream);
+        ProcessCrashInfo(bitStream);
+        ProcessAseServers(bitStream);
     }
 
     // Interval until next HQ check
-    void ProcessPollInterval(CBitStream& bitStream)
+    void ProcessPollInterval(CBitStream& bitStream) noexcept
     {
         int iPollInterval = 0;
         bitStream->Read(iPollInterval);

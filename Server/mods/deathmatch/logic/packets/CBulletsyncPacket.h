@@ -16,21 +16,21 @@
 class CBulletsyncPacket final : public CPacket
 {
 public:
-    CBulletsyncPacket(){};
-    CBulletsyncPacket(class CPlayer* pPlayer);
+    CBulletsyncPacket() noexcept {};
+    CBulletsyncPacket(class CPlayer* pPlayer) noexcept;
 
-    bool          HasSimHandler() const { return true; }
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_BULLETSYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; };
+    bool          HasSimHandler() const noexcept { return true; }
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_BULLETSYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    eWeaponType m_WeaponType;
-    CVector     m_vecStart;
-    CVector     m_vecEnd;
-    uchar       m_ucOrderCounter;
-    float       m_fDamage;
-    uchar       m_ucHitZone;
-    ElementID   m_DamagedPlayerID;
+    eWeaponType  m_WeaponType;
+    CVector      m_vecStart;
+    CVector      m_vecEnd;
+    std::uint8_t m_ucOrderCounter;
+    float        m_fDamage;
+    std::uint8_t m_ucHitZone;
+    ElementID    m_DamagedPlayerID;
 };

@@ -48,7 +48,7 @@ public:
 
     void                     SetSourceElement(CElement* pSource) noexcept { m_pSourceElement = pSource; }
     CElement*                GetSourceElement() const noexcept { return m_pSourceElement; }
-    CPlayer*                 GetSourcePlayer();
+    CPlayer*                 GetSourcePlayer() const noexcept;
     void                     SetSourceSocket(const NetServerPlayerID& Source) noexcept { m_Source = Source; }
     const NetServerPlayerID& GetSourceSocket() const noexcept { return m_Source; }
     std::uint32_t            GetSourceIP() const noexcept { return m_Source.GetBinaryAddress(); }

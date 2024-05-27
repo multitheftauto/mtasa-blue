@@ -12,15 +12,13 @@
 #include "StdInc.h"
 #include "CConsoleEchoPacket.h"
 
-bool CConsoleEchoPacket::Write(NetBitStreamInterface& BitStream) const
+bool CConsoleEchoPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    // Not too short?
-    if (m_strMessage.length() >= MIN_CONSOLEECHO_LENGTH)
-    {
-        // Write the string
-        BitStream.WriteStringCharacters(m_strMessage);
-        return true;
-    }
+    // Too short?
+    if (m_strMessage.length() < MIN_CONSOLEECHO_LENGTH)
+        return false;
 
-    return false;
+    // Write the string
+    BitStream.WriteStringCharacters(m_strMessage);
+    return true;
 }

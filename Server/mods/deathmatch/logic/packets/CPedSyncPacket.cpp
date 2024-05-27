@@ -12,13 +12,13 @@
 #include "StdInc.h"
 #include "CPedSyncPacket.h"
 
-CPedSyncPacket::CPedSyncPacket(SyncData& ReadData)
+CPedSyncPacket::CPedSyncPacket(SyncData& ReadData) noexcept
 {
     // Copy the struct
     m_Syncs.push_back(ReadData);
 }
 
-bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // While we're not out of bytes
     while (BitStream.GetNumberOfUnreadBits() > 32)
@@ -94,7 +94,7 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
     return m_Syncs.size() > 0;
 }
 
-bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     const SyncData& Data = m_Syncs.front();
     if (!&Data)

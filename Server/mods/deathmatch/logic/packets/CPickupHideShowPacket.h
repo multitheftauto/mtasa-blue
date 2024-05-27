@@ -17,19 +17,19 @@
 class CPickupHideShowPacket final : public CPacket
 {
 public:
-    CPickupHideShowPacket(bool bShow) { m_bShow = bShow; };
+    CPickupHideShowPacket(bool bShow) noexcept { m_bShow = bShow; }
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PICKUP_HIDESHOW; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PICKUP_HIDESHOW; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    bool GetShow() { return m_bShow; };
-    void SetShow(bool bShow) { m_bShow = bShow; };
+    bool GetShow() const noexcept { return m_bShow; }
+    void SetShow(bool bShow) noexcept { m_bShow = bShow; }
 
-    void         Add(class CPickup* pPickup) { m_List.push_back(pPickup); };
-    void         Clear() { m_List.clear(); };
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
+    void         Add(class CPickup* pPickup) noexcept { m_List.push_back(pPickup); }
+    void         Clear() noexcept { m_List.clear(); }
+    std::size_t  Count() const noexcept { return m_List.size(); }
 
 private:
     bool                        m_bShow;

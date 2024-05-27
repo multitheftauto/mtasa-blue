@@ -13,30 +13,29 @@
 #include "CVoiceEndPacket.h"
 #include "CPlayer.h"
 
-CVoiceEndPacket::CVoiceEndPacket(CPlayer* pPlayer)
+CVoiceEndPacket::CVoiceEndPacket(CPlayer* pPlayer) noexcept
 {
     m_PlayerID = INVALID_ELEMENT_ID;
     if (pPlayer)
         SetSourceElement(pPlayer);
 }
 
-CVoiceEndPacket::~CVoiceEndPacket()
+CVoiceEndPacket::~CVoiceEndPacket() noexcept
 {
 }
 
-bool CVoiceEndPacket::Read(NetBitStreamInterface& BitStream)
+bool CVoiceEndPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     return true;
 }
 
-bool CVoiceEndPacket::Write(NetBitStreamInterface& BitStream) const
+bool CVoiceEndPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    if (m_pSourceElement)
-    {
-        // Write the source player
-        ElementID ID = m_pSourceElement->GetID();
-        BitStream.Write(ID);
-        return true;
-    }
-    return false;
+    if (!m_pSourceElement)
+        return false;
+
+    // Write the source player
+    ElementID ID = m_pSourceElement->GetID();
+    BitStream.Write(ID);
+    return true;
 }

@@ -12,13 +12,14 @@
 class CPlayerNoSocketPacket final : public CPacket
 {
 public:
-    virtual bool  RequiresSourcePlayer() const { return true; }
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_NO_SOCKET; };
-    unsigned long GetFlags() const
+    virtual bool  RequiresSourcePlayer() const noexcept { return true; }
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_NO_SOCKET; }
+    std::uint32_t GetFlags() const noexcept
     {
+        // ???
         assert(0);
         return 0;
-    };
+    }
 
-    bool Read(NetBitStreamInterface& BitStream) { return true; };
+    bool Read(NetBitStreamInterface& BitStream) noexcept { return true; }
 };

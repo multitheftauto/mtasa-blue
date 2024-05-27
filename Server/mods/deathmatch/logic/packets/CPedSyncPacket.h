@@ -20,29 +20,29 @@ class CPedSyncPacket final : public CPacket
 public:
     struct SyncData
     {
-        ElementID     ID;
-        unsigned char ucFlags;
-        unsigned char ucSyncTimeContext;
-        CVector       vecPosition;
-        float         fRotation;
-        CVector       vecVelocity;
-        float         fHealth;
-        float         fArmor;
-        bool          bOnFire;
-        bool          bIsInWater;
+        ElementID    ID;
+        std::uint8_t ucFlags;
+        std::uint8_t ucSyncTimeContext;
+        CVector      vecPosition;
+        float        fRotation;
+        CVector      vecVelocity;
+        float        fHealth;
+        float        fArmor;
+        bool         bOnFire;
+        bool         bIsInWater;
     };
 
 public:
     // Used when receiving ped sync from clients, can contain multiple SyncData
-    CPedSyncPacket(){};
+    CPedSyncPacket() noexcept {};
     // Used when sending ped sync to clients, only contains one SyncData
-    CPedSyncPacket(SyncData& pReadData);
+    CPedSyncPacket(SyncData& pReadData) noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PED_SYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PED_SYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
     std::vector<SyncData> m_Syncs;
 };

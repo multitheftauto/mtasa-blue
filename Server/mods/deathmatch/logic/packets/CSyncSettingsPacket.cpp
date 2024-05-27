@@ -13,10 +13,12 @@
 #include "CCommon.h"
 #include <net/SyncStructures.h>
 
-CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync, uchar ucVehExtrapolateEnabled, short sVehExtrapolateBaseMs,
-                                         short sVehExtrapolatePercent, short sVehExtrapolateMaxMs, uchar ucUseAltPulseOrder, uchar ucAllowFastSprintFix,
-                                         uchar ucAllowDrivebyAnimationFix, uchar ucAllowShotgunDamageFix)
-{
+CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponTypesUsingBulletSync,
+    std::uint8_t ucVehExtrapolateEnabled, std::int16_t sVehExtrapolateBaseMs,
+    std::int16_t sVehExtrapolatePercent, std::int16_t sVehExtrapolateMaxMs,
+    std::uint8_t ucUseAltPulseOrder, std::uint8_t ucAllowFastSprintFix,
+    std::uint8_t ucAllowDrivebyAnimationFix, std::uint8_t ucAllowShotgunDamageFix
+) noexcept {
     m_weaponTypesUsingBulletSync = weaponTypesUsingBulletSync;
     m_ucVehExtrapolateEnabled = ucVehExtrapolateEnabled;
     m_sVehExtrapolateBaseMs = sVehExtrapolateBaseMs;
@@ -28,19 +30,19 @@ CSyncSettingsPacket::CSyncSettingsPacket(const std::set<eWeaponType>& weaponType
     m_ucAllowShotgunDamageFix = ucAllowShotgunDamageFix;
 }
 
-bool CSyncSettingsPacket::Read(NetBitStreamInterface& BitStream)
+bool CSyncSettingsPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     return false;
 }
 
-bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const
+bool CSyncSettingsPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    uchar ucNumWeapons = static_cast<uchar>(m_weaponTypesUsingBulletSync.size());
+    std::uint8_t ucNumWeapons = static_cast<std::uint8_t>(m_weaponTypesUsingBulletSync.size());
     BitStream.Write(ucNumWeapons);
 
-    for (std::set<eWeaponType>::const_iterator iter = m_weaponTypesUsingBulletSync.begin(); iter != m_weaponTypesUsingBulletSync.end(); ++iter)
+    for (const auto& pType : m_weaponTypesUsingBulletSync)
     {
-        BitStream.Write((uchar)*iter);
+        BitStream.Write((std::uint8_t)pType);
     }
 
     if (BitStream.Version() >= 0x35)

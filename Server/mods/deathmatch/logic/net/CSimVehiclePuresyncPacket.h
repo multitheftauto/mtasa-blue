@@ -18,27 +18,27 @@ struct STrailerInfo
     CVector   m_TrailerRotationDeg;
 };
 
-enum class eVehicleAimDirection : unsigned char;
+enum class eVehicleAimDirection : std::uint8_t;
 
 class CSimVehiclePuresyncPacket : public CSimPacket
 {
 public:
     ZERO_ON_NEW
-    CSimVehiclePuresyncPacket(ElementID PlayerID, ushort usPlayerLatency, uchar ucPlayerSyncTimeContext, bool bPlayerHasOccupiedVehicle,
-                              ushort usVehicleGotModel, uchar ucPlayerGotOccupiedVehicleSeat, uchar ucPlayerGotWeaponType, float fPlayerGotWeaponRange,
-                              CControllerState& sharedControllerState, uint m_uiDamageInfoSendPhase, const SSimVehicleDamageInfo& damageInfo);
+    CSimVehiclePuresyncPacket(ElementID PlayerID, std::uint16_t usPlayerLatency, std::uint8_t ucPlayerSyncTimeContext, bool bPlayerHasOccupiedVehicle,
+                              std::uint16_t usVehicleGotModel, std::uint8_t ucPlayerGotOccupiedVehicleSeat, std::uint8_t ucPlayerGotWeaponType, float fPlayerGotWeaponRange,
+                              CControllerState& sharedControllerState, std::uint32_t m_uiDamageInfoSendPhase, const SSimVehicleDamageInfo& damageInfo) noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_VEHICLE_PURESYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
-    void ReadVehicleSpecific(NetBitStreamInterface& BitStream);
-    void WriteVehicleSpecific(NetBitStreamInterface& BitStream) const;
+    void ReadVehicleSpecific(NetBitStreamInterface& BitStream) noexcept;
+    void WriteVehicleSpecific(NetBitStreamInterface& BitStream) const noexcept;
 
-    bool CanUpdateSync(unsigned char ucRemote)
+    bool CanUpdateSync(std::uint8_t ucRemote) noexcept
     {
         // We can update this element's sync only if the sync time
         // matches or either of them are 0 (ignore).
@@ -47,21 +47,21 @@ private:
 
     // Set in constructor
     const ElementID              m_PlayerID;
-    const ushort                 m_usPlayerLatency;
-    const uchar                  m_ucPlayerSyncTimeContext;
+    const std::uint16_t          m_usPlayerLatency;
+    const std::uint8_t           m_ucPlayerSyncTimeContext;
     const bool                   m_bPlayerHasOccupiedVehicle;
-    const ushort                 m_usVehicleGotModel;
-    const uchar                  m_ucPlayerGotOccupiedVehicleSeat;
-    const uchar                  m_ucPlayerGotWeaponType;
+    const std::uint16_t          m_usVehicleGotModel;
+    const std::uint8_t           m_ucPlayerGotOccupiedVehicleSeat;
+    const std::uint8_t           m_ucPlayerGotWeaponType;
     const float                  m_fPlayerGotWeaponRange;
     CControllerState&            m_sharedControllerState;
-    const uint                   m_uiDamageInfoSendPhase;
+    const std::uint32_t          m_uiDamageInfoSendPhase;
     const SSimVehicleDamageInfo& m_DamageInfo;
 
     // Set in Read()
     struct
     {
-        uchar ucTimeContext;
+        std::uint8_t ucTimeContext;
 
         int iModelID;
 
@@ -82,10 +82,10 @@ private:
         float                 fArmor;
         SVehiclePuresyncFlags flags;
 
-        uchar ucWeaponSlot;
+        std::uint8_t ucWeaponSlot;
 
-        ushort usAmmoInClip;
-        ushort usTotalAmmo;
+        std::uint16_t usAmmoInClip;
+        std::uint16_t usTotalAmmo;
 
         float   fAimDirection;
         CVector vecSniperSource;
@@ -95,10 +95,10 @@ private:
 
         float  fTurretX;
         float  fTurretY;
-        ushort usAdjustableProperty;
+        std::uint16_t usAdjustableProperty;
 
         float fRailPosition;
-        uchar ucRailTrack;
+        std::uint8_t ucRailTrack;
         bool  bRailDirection;
         float fRailSpeed;
 

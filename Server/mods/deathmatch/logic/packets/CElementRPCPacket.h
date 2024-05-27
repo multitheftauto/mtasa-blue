@@ -16,16 +16,17 @@
 class CElementRPCPacket final : public CPacket
 {
 public:
-    CElementRPCPacket(CElement* pSourceElement, unsigned char ucActionID, NetBitStreamInterface& BitStream)
-        : m_ucActionID(ucActionID), m_BitStream(BitStream), m_pSourceElement(pSourceElement){};
+    CElementRPCPacket(CElement* pSourceElement, std::uint8_t ucActionID, NetBitStreamInterface& BitStream) noexcept
+        : m_ucActionID(ucActionID), m_BitStream(BitStream), m_pSourceElement(pSourceElement)
+    {}
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_LUA_ELEMENT_RPC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_LUA_ELEMENT_RPC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
-    unsigned char          m_ucActionID;
+    std::uint8_t           m_ucActionID;
     NetBitStreamInterface& m_BitStream;
     CElement*              m_pSourceElement;
 };

@@ -17,19 +17,19 @@
 class CPlayerStatsPacket final : public CPacket
 {
 public:
-    ~CPlayerStatsPacket() = default;
+    ~CPlayerStatsPacket() noexcept = default;
 
     ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_STATS; }
     std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    void Add(unsigned short usID, float fValue);
-    void Remove(unsigned short usID, float fValue) { m_map.erase(usID); }
+    void Add(const std::uint16_t usID, const float fValue) noexcept;
+    void Remove(const std::uint16_t usID, const float fValue) noexcept { m_map.erase(usID); }
 
-    void   Clear() noexcept { m_map.clear(); }
-    size_t GetSize() const noexcept { return m_map.size(); }
+    void        Clear() noexcept { m_map.clear(); }
+    std::size_t GetSize() const noexcept { return m_map.size(); }
 
 private:
-    std::map<unsigned short, float> m_map;            // id - value pairs
+    std::map<std::uint16_t, float> m_map; // id - value pairs
 };

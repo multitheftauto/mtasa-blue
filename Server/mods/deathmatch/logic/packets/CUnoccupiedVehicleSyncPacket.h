@@ -26,17 +26,20 @@ public:
     };
 
 public:
-    CUnoccupiedVehicleSyncPacket(){};
-    ~CUnoccupiedVehicleSyncPacket();
+    CUnoccupiedVehicleSyncPacket() noexcept {}
+    ~CUnoccupiedVehicleSyncPacket() noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_UNOCCUPIED_VEHICLE_SYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_UNOCCUPIED_VEHICLE_SYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    std::vector<SyncData>::iterator IterBegin() { return m_Syncs.begin(); };
-    std::vector<SyncData>::iterator IterEnd() { return m_Syncs.end(); };
+    std::vector<SyncData>::iterator begin() noexcept { return m_Syncs.begin(); }
+    std::vector<SyncData>::iterator end() noexcept { return m_Syncs.end(); }
+
+    std::vector<SyncData>::const_iterator begin() const noexcept { return m_Syncs.cbegin(); }
+    std::vector<SyncData>::const_iterator end() const noexcept { return m_Syncs.cend(); }
 
     std::vector<SyncData> m_Syncs;
 };

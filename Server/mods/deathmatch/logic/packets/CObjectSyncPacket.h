@@ -20,26 +20,29 @@ class CObjectSyncPacket final : public CPacket
 public:
     struct SyncData
     {
-        ElementID     ID;
-        CVector       vecPosition;
-        CVector       vecRotation;
-        float         fHealth;
-        unsigned char ucSyncTimeContext;
-        unsigned char ucFlags;
-        bool          bSend;
+        ElementID    ID;
+        CVector      vecPosition;
+        CVector      vecRotation;
+        float        fHealth;
+        std::uint8_t ucSyncTimeContext;
+        std::uint8_t ucFlags;
+        bool         bSend;
     };
 
 public:
-    ~CObjectSyncPacket();
+    ~CObjectSyncPacket() noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_OBJECT_SYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_OBJECT_SYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; }
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    std::vector<SyncData*>::const_iterator IterBegin() { return m_Syncs.begin(); };
-    std::vector<SyncData*>::const_iterator IterEnd() { return m_Syncs.end(); };
+    std::vector<SyncData*>::iterator begin() noexcept { return m_Syncs.begin(); }
+    std::vector<SyncData*>::iterator end() noexcept { return m_Syncs.end(); }
+
+    std::vector<SyncData*>::const_iterator begin() const noexcept { return m_Syncs.cbegin(); }
+    std::vector<SyncData*>::const_iterator end() const noexcept { return m_Syncs.cend(); }
 
     std::vector<SyncData*> m_Syncs;
 };

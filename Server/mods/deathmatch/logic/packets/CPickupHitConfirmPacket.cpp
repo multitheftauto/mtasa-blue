@@ -13,23 +13,21 @@
 #include "CPickupHitConfirmPacket.h"
 #include "CPickup.h"
 
-bool CPickupHitConfirmPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPickupHitConfirmPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // unsigned short   (2)     - pickup id
     // bool                     - hide it?
 
     // Got a pickup to send?
-    if (m_pPickup)
-    {
-        // Write the pickup id and visibily state
-        BitStream.Write(m_pPickup->GetID());
+    if (!m_pPickup)
+        return false;
 
-        // WRite the flags
-        BitStream.WriteBit(m_pPickup->IsVisible());
-        BitStream.WriteBit(m_bPlaySound);
+    // Write the pickup id and visibily state
+    BitStream.Write(m_pPickup->GetID());
 
-        return true;
-    }
+    // WRite the flags
+    BitStream.WriteBit(m_pPickup->IsVisible());
+    BitStream.WriteBit(m_bPlaySound);
 
-    return false;
+    return true;
 }

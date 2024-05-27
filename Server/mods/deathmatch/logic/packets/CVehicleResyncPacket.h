@@ -19,13 +19,13 @@ class CVehicle;
 class CVehicleResyncPacket final : public CPacket
 {
 public:
-    explicit CVehicleResyncPacket(CVehicle* pVehicle) { m_pVehicle = pVehicle; };
+    explicit CVehicleResyncPacket(CVehicle* pVehicle) noexcept { m_pVehicle = pVehicle; }
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_RESYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_VEHICLE_RESYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
+    
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     CVehicle* m_pVehicle;

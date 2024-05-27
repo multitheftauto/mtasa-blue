@@ -18,12 +18,12 @@ class CVehicle;
 class CUnoccupiedVehicleStartSyncPacket final : public CPacket
 {
 public:
-    CUnoccupiedVehicleStartSyncPacket(CVehicle* pVehicle) { m_pVehicle = pVehicle; };
+    CUnoccupiedVehicleStartSyncPacket(CVehicle* pVehicle) noexcept { m_pVehicle = pVehicle; }
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_UNOCCUPIED_VEHICLE_STARTSYNC; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_UNOCCUPIED_VEHICLE_STARTSYNC; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     CVehicle* m_pVehicle;

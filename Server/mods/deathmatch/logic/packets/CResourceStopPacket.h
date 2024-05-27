@@ -16,13 +16,13 @@
 class CResourceStopPacket final : public CPacket
 {
 public:
-    CResourceStopPacket(unsigned short usID);
+    CResourceStopPacket(const std::uint16_t usID) noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_RESOURCE_STOP; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_RESOURCE_STOP; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
-    unsigned short m_usID;
+    std::uint16_t m_usID;
 };

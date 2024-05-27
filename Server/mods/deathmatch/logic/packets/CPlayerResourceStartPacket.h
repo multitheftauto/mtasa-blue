@@ -17,15 +17,15 @@ class CResource;
 class CPlayerResourceStartPacket final : public CPacket
 {
 public:
-    CPlayerResourceStartPacket() {}
+    CPlayerResourceStartPacket() noexcept {}
 
     ePacketID               GetPacketID() const noexcept { return PACKET_ID_PLAYER_RESOURCE_START; }
-    unsigned long           GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_DEFAULT; }
+    std::uint32_t           GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_DEFAULT; }
 
-    bool Read(NetBitStreamInterface& BitStream);
+    bool Read(NetBitStreamInterface& BitStream) noexcept;
 
-    CResource* GetResource() const { return m_pResource; }
+    CResource* GetResource() const noexcept { return m_pResource; }
 
 private:
     CResource* m_pResource;

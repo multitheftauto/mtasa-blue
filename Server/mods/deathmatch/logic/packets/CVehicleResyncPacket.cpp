@@ -14,13 +14,13 @@
 #include "CVehicle.h"
 #include "net/SyncStructures.h"
 
-bool CVehicleResyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CVehicleResyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // Only the server sends these.
     return false;
 }
 
-bool CVehicleResyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CVehicleResyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     if (!m_pVehicle)
         return false;

@@ -219,7 +219,7 @@ public:
     }
 
     // Write all characters in `value` (incl. length as `SizeType`)
-    template <typename SizeType = unsigned short>
+    template <typename SizeType = std::uint16_t>
     void WriteString(std::string_view value)
     {
         // Write the length
@@ -232,7 +232,7 @@ public:
     // Write a string (incl. variable size header)
     void WriteStr(std::string_view value)
     {
-        WriteLength(value.length());
+        WriteLength(static_cast<std::uint32_t>(value.length()));
         return WriteStringCharacters(value, value.length());
     }
 #else

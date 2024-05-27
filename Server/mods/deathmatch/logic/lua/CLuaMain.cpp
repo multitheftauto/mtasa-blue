@@ -701,7 +701,7 @@ int CLuaMain::OnUndump(const char* p, size_t n)
 // CLuaMain::GetElementCount
 //
 ///////////////////////////////////////////////////////////////
-unsigned long CLuaMain::GetElementCount() const
+std::uint32_t CLuaMain::GetElementCount() const noexcept
 {
     return m_pResource && m_pResource->GetElementGroup() ? m_pResource->GetElementGroup()->GetCount() : 0;
 }

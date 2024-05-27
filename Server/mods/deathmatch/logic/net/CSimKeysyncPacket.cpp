@@ -13,9 +13,9 @@
 #include "CWeaponNames.h"
 #include "CVehicleManager.h"
 
-CSimKeysyncPacket::CSimKeysyncPacket(ElementID PlayerID, bool bPlayerHasOccupiedVehicle, ushort usVehicleGotModel, uchar ucPlayerGotWeaponType,
+CSimKeysyncPacket::CSimKeysyncPacket(ElementID PlayerID, bool bPlayerHasOccupiedVehicle, std::uint16_t usVehicleGotModel, std::uint8_t ucPlayerGotWeaponType,
                                      float fPlayerGotWeaponRange, bool bVehicleHasHydraulics, bool bVehicleIsPlaneOrHeli,
-                                     CControllerState& sharedControllerState)
+                                     CControllerState& sharedControllerState) noexcept
     : m_PlayerID(PlayerID),
       m_bPlayerHasOccupiedVehicle(bPlayerHasOccupiedVehicle),
       m_usVehicleGotModel(usVehicleGotModel),
@@ -30,7 +30,7 @@ CSimKeysyncPacket::CSimKeysyncPacket(ElementID PlayerID, bool bPlayerHasOccupied
 //
 // Should do the same this as what CKeysyncPacket::Read() does
 //
-bool CSimKeysyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CSimKeysyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // Read out the controller states
     if (!ReadSmallKeysync(m_sharedControllerState, BitStream))
@@ -49,16 +49,14 @@ bool CSimKeysyncPacket::Read(NetBitStreamInterface& BitStream)
     // If he's shooting or aiming
     if (m_sharedControllerState.ButtonCircle || m_sharedControllerState.RightShoulder1)
     {
-        bool bHasWeapon = BitStream.ReadBit();
-
-        if (bHasWeapon)
+        if (BitStream.ReadBit())
         {
             // Read client weapon data, but only apply it if the weapon matches with the server
-            uchar ucUseWeaponType = m_ucPlayerGotWeaponType;
+            std::uint8_t ucUseWeaponType = m_ucPlayerGotWeaponType;
             bool  bWeaponCorrect = true;
 
             // Check client has the weapon we think he has
-            unsigned char ucClientWeaponType;
+            std::uint8_t ucClientWeaponType;
             if (!BitStream.Read(ucClientWeaponType))
                 return false;
 
@@ -74,7 +72,7 @@ bool CSimKeysyncPacket::Read(NetBitStreamInterface& BitStream)
             SWeaponSlotSync slot;
             if (!BitStream.Read(&slot))
                 return false;
-            unsigned int uiSlot = slot.data.uiSlot;
+            std::uint32_t uiSlot = slot.data.uiSlot;
 
             if (bWeaponCorrect)
                 m_Cache.ucWeaponSlot = uiSlot;
@@ -147,7 +145,7 @@ bool CSimKeysyncPacket::Read(NetBitStreamInterface& BitStream)
 //
 // Should do the same this as what CKeysyncPacket::Write() does
 //
-bool CSimKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CSimKeysyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the source player id
     BitStream.Write(m_PlayerID);
@@ -168,7 +166,8 @@ bool CSimKeysyncPacket::Write(NetBitStreamInterface& BitStream) const
     if (m_sharedControllerState.ButtonCircle || (m_sharedControllerState.RightShoulder1))
     {
         // Write his current weapon slot
-        unsigned int    uiSlot = m_Cache.ucWeaponSlot;            // check m_Cache.bWeaponCorrect !
+        // check m_Cache.bWeaponCorrect !
+        std::uint32_t   uiSlot = m_Cache.ucWeaponSlot;
         SWeaponSlotSync slot;
         slot.data.uiSlot = uiSlot;
         BitStream.Write(&slot);

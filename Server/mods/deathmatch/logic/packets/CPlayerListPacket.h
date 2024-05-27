@@ -17,17 +17,17 @@
 class CPlayerListPacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_LIST; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_LIST; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    void AddPlayer(CPlayer* pPlayer) { m_List.push_back(pPlayer); };
-    void RemovePlayer(CPlayer* pPlayer) { m_List.remove(pPlayer); };
-    void RemoveAllPlayers() { m_List.clear(); };
+    void AddPlayer(CPlayer* pPlayer) noexcept { m_List.push_back(pPlayer); }
+    void RemovePlayer(CPlayer* pPlayer) noexcept { m_List.remove(pPlayer); }
+    void RemoveAllPlayers() noexcept { m_List.clear(); }
 
-    bool GetShowInChat() { return m_bShowInChat; };
-    void SetShowInChat(bool bShowInChat) { m_bShowInChat = bShowInChat; };
+    bool GetShowInChat() const noexcept { return m_bShowInChat; }
+    void SetShowInChat(bool bShowInChat) noexcept { m_bShowInChat = bShowInChat; }
 
 private:
     std::list<CPlayer*> m_List;

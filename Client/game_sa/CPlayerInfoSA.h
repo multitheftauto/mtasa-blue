@@ -17,7 +17,7 @@
 /**
  * \todo Confirm that AssocGroupId is a DWORD
  */
-typedef DWORD AssocGroupId;
+using AssocGroupId = std::uint32_t;
 
 class CPedClothesDesc;
 

@@ -215,7 +215,7 @@ void CUnoccupiedVehicleSync::StopSync(CVehicle* pVehicle)
     pSyncer->Send(CUnoccupiedVehicleStopSyncPacket(pVehicle->GetID()));
 
     // Unmark him as the syncing player
-    pVehicle->SetSyncer(NULL);
+    pVehicle->SetSyncer(nullptr);
 
     SetSyncerAsPersistent(false);
 
@@ -231,8 +231,8 @@ CPlayer* CUnoccupiedVehicleSync::FindPlayerCloseToVehicle(CVehicle* pVehicle, fl
     CVector vecVehiclePosition = pVehicle->GetPosition();
 
     // See if any players are close enough
-    CPlayer*                       pLastPlayerSyncing = NULL;
-    CPlayer*                       pPlayer = NULL;
+    CPlayer*                       pLastPlayerSyncing = nullptr;
+    CPlayer*                       pPlayer = nullptr;
     list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
     for (; iter != m_pPlayerManager->IterEnd(); ++iter)
     {
@@ -264,213 +264,211 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
 {
     // Grab the player
     CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer && pPlayer->IsJoined())
+    if (!pPlayer || !pPlayer->IsJoined())
+        return;
+
+    // Apply the data for each vehicle in the packet
+    for (auto& data : Packet)
     {
-        // Apply the data for each vehicle in the packet
-        std::vector<CUnoccupiedVehicleSyncPacket::SyncData>::iterator iter = Packet.IterBegin();
-        for (; iter != Packet.IterEnd(); ++iter)
+        auto& vehicle = data.syncStructure;
+
+        // Grab the vehicle this packet is for
+        CElement* pVehicleElement = CElementIDs::GetElement(vehicle.data.vehicleID);
+        if (pVehicleElement && IS_VEHICLE(pVehicleElement))
         {
-            CUnoccupiedVehicleSyncPacket::SyncData& data = *iter;
-            SUnoccupiedVehicleSync&                 vehicle = data.syncStructure;
+            // Convert to a CVehicle
+            CVehicle* pVehicle = static_cast<CVehicle*>(pVehicleElement);
 
-            // Grab the vehicle this packet is for
-            CElement* pVehicleElement = CElementIDs::GetElement(vehicle.data.vehicleID);
-            if (pVehicleElement && IS_VEHICLE(pVehicleElement))
+            // Is the player syncing this vehicle and there is no driver? Also only process
+            // this packet if the time context matches.
+            if (pVehicle->GetSyncer() == pPlayer && pVehicle->CanUpdateSync(vehicle.data.ucTimeContext))
             {
-                // Convert to a CVehicle
-                CVehicle* pVehicle = static_cast<CVehicle*>(pVehicleElement);
-
-                // Is the player syncing this vehicle and there is no driver? Also only process
-                // this packet if the time context matches.
-                if (pVehicle->GetSyncer() == pPlayer && pVehicle->CanUpdateSync(vehicle.data.ucTimeContext))
+                // Is there no player driver, or is he exiting?
+                CPed* pOccupant = pVehicle->GetOccupant(0);
+                if (!pOccupant || !IS_PLAYER(pOccupant) || pOccupant->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
                 {
-                    // Is there no player driver, or is he exiting?
-                    CPed* pOccupant = pVehicle->GetOccupant(0);
-                    if (!pOccupant || !IS_PLAYER(pOccupant) || pOccupant->GetVehicleAction() == CPed::VEHICLEACTION_EXITING)
+                    // Apply the data to the vehicle
+                    if (vehicle.data.bSyncPosition)
                     {
-                        // Apply the data to the vehicle
-                        if (vehicle.data.bSyncPosition)
+                        const CVector& vecLastPosition = pVehicle->GetPosition();
+                        if (fabs(vecLastPosition.fX - vehicle.data.vecPosition.fX) <= FLOAT_EPSILON &&
+                            fabs(vecLastPosition.fY - vehicle.data.vecPosition.fY) <= FLOAT_EPSILON &&
+                            fabs(vecLastPosition.fZ - vehicle.data.vecPosition.fZ) <= 0.1f)
                         {
-                            const CVector& vecLastPosition = pVehicle->GetPosition();
-                            if (fabs(vecLastPosition.fX - vehicle.data.vecPosition.fX) <= FLOAT_EPSILON &&
-                                fabs(vecLastPosition.fY - vehicle.data.vecPosition.fY) <= FLOAT_EPSILON &&
-                                fabs(vecLastPosition.fZ - vehicle.data.vecPosition.fZ) <= 0.1f)
-                            {
-                                vehicle.data.bSyncPosition = false;
-                            }
-                            pVehicle->SetPosition(vehicle.data.vecPosition);
+                            vehicle.data.bSyncPosition = false;
                         }
-                        if (vehicle.data.bSyncRotation)
+                        pVehicle->SetPosition(vehicle.data.vecPosition);
+                    }
+                    if (vehicle.data.bSyncRotation)
+                    {
+                        CVector vecLastRotation;
+                        pVehicle->GetRotation(vecLastRotation);
+                        if (GetSmallestWrapUnsigned(vecLastRotation.fX - vehicle.data.vecRotation.fX, 360) <= MIN_ROTATION_DIFF &&
+                            GetSmallestWrapUnsigned(vecLastRotation.fY - vehicle.data.vecRotation.fY, 360) <= MIN_ROTATION_DIFF &&
+                            GetSmallestWrapUnsigned(vecLastRotation.fZ - vehicle.data.vecRotation.fZ, 360) <= MIN_ROTATION_DIFF)
                         {
-                            CVector vecLastRotation;
-                            pVehicle->GetRotation(vecLastRotation);
-                            if (GetSmallestWrapUnsigned(vecLastRotation.fX - vehicle.data.vecRotation.fX, 360) <= MIN_ROTATION_DIFF &&
-                                GetSmallestWrapUnsigned(vecLastRotation.fY - vehicle.data.vecRotation.fY, 360) <= MIN_ROTATION_DIFF &&
-                                GetSmallestWrapUnsigned(vecLastRotation.fZ - vehicle.data.vecRotation.fZ, 360) <= MIN_ROTATION_DIFF)
-                            {
-                                vehicle.data.bSyncRotation = false;
-                            }
-                            pVehicle->SetRotationDegrees(vehicle.data.vecRotation);
+                            vehicle.data.bSyncRotation = false;
                         }
-                        if (vehicle.data.bSyncVelocity)
+                        pVehicle->SetRotationDegrees(vehicle.data.vecRotation);
+                    }
+                    if (vehicle.data.bSyncVelocity)
+                    {
+                        if (fabs(vehicle.data.vecVelocity.fX) <= FLOAT_EPSILON && fabs(vehicle.data.vecVelocity.fY) <= FLOAT_EPSILON &&
+                            fabs(vehicle.data.vecVelocity.fZ) <= 0.1f)
                         {
-                            if (fabs(vehicle.data.vecVelocity.fX) <= FLOAT_EPSILON && fabs(vehicle.data.vecVelocity.fY) <= FLOAT_EPSILON &&
-                                fabs(vehicle.data.vecVelocity.fZ) <= 0.1f)
-                            {
-                                vehicle.data.bSyncVelocity = false;
-                            }
-                            pVehicle->SetVelocity(vehicle.data.vecVelocity);
+                            vehicle.data.bSyncVelocity = false;
                         }
-                        if (vehicle.data.bSyncTurnVelocity)
-                        {
-                            pVehicle->SetTurnSpeed(vehicle.data.vecTurnVelocity);
-                        }
+                        pVehicle->SetVelocity(vehicle.data.vecVelocity);
+                    }
+                    if (vehicle.data.bSyncTurnVelocity)
+                    {
+                        pVehicle->SetTurnSpeed(vehicle.data.vecTurnVelocity);
+                    }
 
-                        // Less health than last time?
-                        if (vehicle.data.bSyncHealth)
+                    // Less health than last time?
+                    if (vehicle.data.bSyncHealth)
+                    {
+                        float fPreviousHealth = pVehicle->GetLastSyncedHealth();
+
+                        if (vehicle.data.fHealth < fPreviousHealth)
                         {
-                            float fPreviousHealth = pVehicle->GetLastSyncedHealth();
+                            // Grab the delta health
+                            float fDeltaHealth = fPreviousHealth - vehicle.data.fHealth;
 
-                            if (vehicle.data.fHealth < fPreviousHealth)
+                            if (fDeltaHealth > FLOAT_EPSILON)
                             {
-                                // Grab the delta health
-                                float fDeltaHealth = fPreviousHealth - vehicle.data.fHealth;
+                                // Call the onVehicleDamage event
+                                CLuaArguments Arguments;
+                                Arguments.PushNumber(fDeltaHealth);
+                                pVehicle->CallEvent("onVehicleDamage", Arguments);
+                            }
+                        }
+                        pVehicle->SetHealth(vehicle.data.fHealth);
+                        // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a seperate stored float keeping track of
+                        // ONLY what comes in via sync
+                        // - Caz
+                        pVehicle->SetLastSyncedHealth(vehicle.data.fHealth);
+                    }
 
-                                if (fDeltaHealth > FLOAT_EPSILON)
+                    if (vehicle.data.bSyncTrailer)
+                    {
+                        CVehicle* pTrailer = GetElementFromId<CVehicle>(vehicle.data.trailer);
+                        // Trailer attach/detach
+                        if (pTrailer)
+                        {
+                            CVehicle* pCurrentTrailer = pVehicle->GetTowedVehicle();
+
+                            // Is this a new trailer, attached?
+                            if (pCurrentTrailer != pTrailer)
+                            {
+                                // If theres a trailer already attached
+                                if (pCurrentTrailer)
                                 {
-                                    // Call the onVehicleDamage event
-                                    CLuaArguments Arguments;
-                                    Arguments.PushNumber(fDeltaHealth);
-                                    pVehicle->CallEvent("onVehicleDamage", Arguments);
-                                }
-                            }
-                            pVehicle->SetHealth(vehicle.data.fHealth);
-                            // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a seperate stored float keeping track of
-                            // ONLY what comes in via sync
-                            // - Caz
-                            pVehicle->SetLastSyncedHealth(vehicle.data.fHealth);
-                        }
-
-                        if (vehicle.data.bSyncTrailer)
-                        {
-                            CVehicle* pTrailer = GetElementFromId<CVehicle>(vehicle.data.trailer);
-                            // Trailer attach/detach
-                            if (pTrailer)
-                            {
-                                CVehicle* pCurrentTrailer = pVehicle->GetTowedVehicle();
-
-                                // Is this a new trailer, attached?
-                                if (pCurrentTrailer != pTrailer)
-                                {
-                                    // If theres a trailer already attached
-                                    if (pCurrentTrailer)
-                                    {
-                                        // Tell everyone to detach them
-                                        CVehicleTrailerPacket DetachPacket(pVehicle, pCurrentTrailer, false);
-                                        m_pPlayerManager->BroadcastOnlyJoined(DetachPacket);
-
-                                        // Execute the attach trailer script function
-                                        CLuaArguments Arguments;
-                                        Arguments.PushElement(pVehicle);
-                                        pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
-
-                                        pVehicle->SetTowedVehicle(NULL);
-                                        pCurrentTrailer->SetTowedByVehicle(NULL);
-                                    }
-
-                                    // If something else is towing this trailer
-                                    CVehicle* pCurrentVehicle = pTrailer->GetTowedByVehicle();
-                                    if (pCurrentVehicle)
-                                    {
-                                        // Tell everyone to detach them
-                                        CVehicleTrailerPacket DetachPacket(pCurrentVehicle, pTrailer, false);
-                                        m_pPlayerManager->BroadcastOnlyJoined(DetachPacket);
-
-                                        // Execute the attach trailer script function
-                                        CLuaArguments Arguments;
-                                        Arguments.PushElement(pCurrentVehicle);
-                                        pTrailer->CallEvent("onTrailerDetach", Arguments);
-
-                                        pCurrentVehicle->SetTowedVehicle(NULL);
-                                        pTrailer->SetTowedByVehicle(NULL);
-                                    }
-
-                                    pVehicle->SetTowedVehicle(pTrailer);
-                                    pTrailer->SetTowedByVehicle(pVehicle);
-
-                                    // Tell everyone to attach the new one
-                                    CVehicleTrailerPacket AttachPacket(pVehicle, pTrailer, true);
-                                    m_pPlayerManager->BroadcastOnlyJoined(AttachPacket);
+                                    // Tell everyone to detach them
+                                    CVehicleTrailerPacket DetachPacket(pVehicle, pCurrentTrailer, false);
+                                    m_pPlayerManager->BroadcastOnlyJoined(DetachPacket);
 
                                     // Execute the attach trailer script function
                                     CLuaArguments Arguments;
                                     Arguments.PushElement(pVehicle);
-                                    bool bContinue = pTrailer->CallEvent("onTrailerAttach", Arguments);
+                                    pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
 
-                                    if (!bContinue)
-                                    {
-                                        // Detach them
-                                        pVehicle->SetTowedVehicle(NULL);
-                                        pTrailer->SetTowedByVehicle(NULL);
-
-                                        CVehicleTrailerPacket DetachPacket(pVehicle, pTrailer, false);
-                                        DetachPacket.SetSourceElement(pPlayer);
-                                        m_pPlayerManager->BroadcastOnlyJoined(DetachPacket);
-                                    }
+                                    pVehicle->SetTowedVehicle(nullptr);
+                                    pCurrentTrailer->SetTowedByVehicle(nullptr);
                                 }
-                            }
-                            else
-                            {
-                                // If there was a trailer before
-                                CVehicle* pCurrentTrailer = pVehicle->GetTowedVehicle();
-                                if (pCurrentTrailer)
-                                {
-                                    pVehicle->SetTowedVehicle(NULL);
-                                    pCurrentTrailer->SetTowedByVehicle(NULL);
 
-                                    // Tell everyone else to detach them
-                                    CVehicleTrailerPacket DetachPacket(pVehicle, pCurrentTrailer, false);
+                                // If something else is towing this trailer
+                                CVehicle* pCurrentVehicle = pTrailer->GetTowedByVehicle();
+                                if (pCurrentVehicle)
+                                {
+                                    // Tell everyone to detach them
+                                    CVehicleTrailerPacket DetachPacket(pCurrentVehicle, pTrailer, false);
                                     m_pPlayerManager->BroadcastOnlyJoined(DetachPacket);
 
-                                    // Execute the detach trailer script function
+                                    // Execute the attach trailer script function
                                     CLuaArguments Arguments;
-                                    Arguments.PushElement(pVehicle);
-                                    pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                                    Arguments.PushElement(pCurrentVehicle);
+                                    pTrailer->CallEvent("onTrailerDetach", Arguments);
+
+                                    pCurrentVehicle->SetTowedVehicle(nullptr);
+                                    pTrailer->SetTowedByVehicle(nullptr);
+                                }
+
+                                pVehicle->SetTowedVehicle(pTrailer);
+                                pTrailer->SetTowedByVehicle(pVehicle);
+
+                                // Tell everyone to attach the new one
+                                CVehicleTrailerPacket AttachPacket(pVehicle, pTrailer, true);
+                                m_pPlayerManager->BroadcastOnlyJoined(AttachPacket);
+
+                                // Execute the attach trailer script function
+                                CLuaArguments Arguments;
+                                Arguments.PushElement(pVehicle);
+                                bool bContinue = pTrailer->CallEvent("onTrailerAttach", Arguments);
+
+                                if (!bContinue)
+                                {
+                                    // Detach them
+                                    pVehicle->SetTowedVehicle(nullptr);
+                                    pTrailer->SetTowedByVehicle(nullptr);
+
+                                    CVehicleTrailerPacket DetachPacket(pVehicle, pTrailer, false);
+                                    DetachPacket.SetSourceElement(pPlayer);
+                                    m_pPlayerManager->BroadcastOnlyJoined(DetachPacket);
                                 }
                             }
                         }
-                        bool bEngineOn = pVehicle->IsEngineOn();
-                        bool bDerailed = pVehicle->IsDerailed();
-                        bool bInWater = pVehicle->IsInWater();
-
-                        // Turn the engine on if it's on
-                        pVehicle->SetEngineOn(vehicle.data.bEngineOn);
-
-                        // Derailed state
-                        pVehicle->SetDerailed(vehicle.data.bDerailed);
-
-                        // Set our In Water State
-                        pVehicle->SetInWater(vehicle.data.bIsInWater);
-
-                        // Run colpoint checks on vehicle
-                        g_pGame->GetColManager()->DoHitDetection(pVehicle->GetPosition(), pVehicle);
-
-                        // Send this sync if something important changed or one of the flags has changed since last sync.
-                        data.bSend = vehicle.HasChanged() ||
-                                     (bEngineOn != vehicle.data.bEngineOn || bDerailed != vehicle.data.bDerailed || bInWater != vehicle.data.bIsInWater);
-
-                        if (data.bSend)
+                        else
                         {
-                            pVehicle->OnRelayUnoccupiedSync();
+                            // If there was a trailer before
+                            CVehicle* pCurrentTrailer = pVehicle->GetTowedVehicle();
+                            if (pCurrentTrailer)
+                            {
+                                pVehicle->SetTowedVehicle(nullptr);
+                                pCurrentTrailer->SetTowedByVehicle(nullptr);
+
+                                // Tell everyone else to detach them
+                                CVehicleTrailerPacket DetachPacket(pVehicle, pCurrentTrailer, false);
+                                m_pPlayerManager->BroadcastOnlyJoined(DetachPacket);
+
+                                // Execute the detach trailer script function
+                                CLuaArguments Arguments;
+                                Arguments.PushElement(pVehicle);
+                                pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                            }
                         }
+                    }
+                    bool bEngineOn = pVehicle->IsEngineOn();
+                    bool bDerailed = pVehicle->IsDerailed();
+                    bool bInWater = pVehicle->IsInWater();
+
+                    // Turn the engine on if it's on
+                    pVehicle->SetEngineOn(vehicle.data.bEngineOn);
+
+                    // Derailed state
+                    pVehicle->SetDerailed(vehicle.data.bDerailed);
+
+                    // Set our In Water State
+                    pVehicle->SetInWater(vehicle.data.bIsInWater);
+
+                    // Run colpoint checks on vehicle
+                    g_pGame->GetColManager()->DoHitDetection(pVehicle->GetPosition(), pVehicle);
+
+                    // Send this sync if something important changed or one of the flags has changed since last sync.
+                    data.bSend = vehicle.HasChanged() ||
+                                    (bEngineOn != vehicle.data.bEngineOn || bDerailed != vehicle.data.bDerailed || bInWater != vehicle.data.bIsInWater);
+
+                    if (data.bSend)
+                    {
+                        pVehicle->OnRelayUnoccupiedSync();
                     }
                 }
             }
         }
-
-        // Tell everyone in the same dimension
-        m_pPlayerManager->BroadcastDimensionOnlyJoined(Packet, pPlayer->GetDimension(), pPlayer);
     }
+
+    // Tell everyone in the same dimension
+    m_pPlayerManager->BroadcastDimensionOnlyJoined(Packet, pPlayer->GetDimension(), pPlayer);
 }
 
 void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehiclePushPacket& Packet)

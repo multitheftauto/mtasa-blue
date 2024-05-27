@@ -16,8 +16,8 @@
 class CPlayerConnectCompletePacket final : public CPacket
 {
 public:
-    ePacketID     GetPacketID() const noexcept { return static_cast<ePacketID>(PACKET_ID_SERVER_JOIN_COMPLETE); };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return static_cast<ePacketID>(PACKET_ID_SERVER_JOIN_COMPLETE); }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 };

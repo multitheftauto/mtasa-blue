@@ -16,7 +16,7 @@
 
 #define MAX_CONN_TEXT_LEN 128
 
-bool CPlayerConnectCompletePacket::Write(NetBitStreamInterface& BitStream) const
+bool CPlayerConnectCompletePacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Send the connection string
     SString strConnText("%s %s [%s]", MTA_DM_FULL_STRING, MTA_DM_VERSIONSTRING, MTA_OS_STRING);

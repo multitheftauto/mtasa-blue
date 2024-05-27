@@ -49,8 +49,8 @@ class CWeaponInfo;
 // temporary
 class CAnimBlendAssociation;
 class CAnimBlendHierarchy;
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+using AssocGroupId = std::uint32_t;
+using AnimationId = std::uint32_t;
 
 ///////////////////////
 // Do a gang driveby

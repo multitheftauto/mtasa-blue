@@ -71,8 +71,8 @@ class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociationSAInterface;
 class CAnimBlendAssocGroupSAInterface;
 class CIFPAnimations;
-typedef unsigned long AssocGroupId;
-typedef unsigned long AnimationId;
+using AssocGroupId = std::uint32_t;
+using AnimationId = std::uint32_t;
 enum class eAnimGroup;
 enum class eAnimID;
 

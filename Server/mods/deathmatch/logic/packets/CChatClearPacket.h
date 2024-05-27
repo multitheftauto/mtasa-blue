@@ -16,12 +16,12 @@
 class CChatClearPacket final : public CPacket
 {
 public:
-    CChatClearPacket(){};
+    CChatClearPacket() noexcept {}
 
     // Chat uses low priority channel to avoid getting queued behind large map downloads #6877
-    ePacketID               GetPacketID() const noexcept { return PACKET_ID_CHAT_CLEAR; };
-    unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
-    virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_CHAT; }
+    ePacketID               GetPacketID() const noexcept { return PACKET_ID_CHAT_CLEAR; }
+    std::uint32_t           GetFlags() const noexcept { return PACKET_LOW_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
+    virtual ePacketOrdering GetPacketOrdering() const noexcept { return PACKET_ORDERING_CHAT; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept { return true; }
 };

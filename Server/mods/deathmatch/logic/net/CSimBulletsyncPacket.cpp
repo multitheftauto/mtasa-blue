@@ -10,7 +10,7 @@
 #include "StdInc.h"
 #include "SimHeaders.h"
 
-CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID PlayerID) : m_PlayerID(PlayerID)
+CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID PlayerID) noexcept : m_PlayerID(PlayerID)
 {
     m_Cache.ucOrderCounter = 0;
     m_Cache.fDamage = 0;
@@ -21,7 +21,7 @@ CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID PlayerID) : m_PlayerID(Play
 //
 // Should do the same this as what CBulletsyncPacket::Read() does
 //
-bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     char cWeaponType;
     BitStream.Read(cWeaponType);
@@ -34,12 +34,12 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
     if (!BitStream.Read(m_Cache.ucOrderCounter))
         return false;
 
-    if (BitStream.ReadBit())
-    {
-        BitStream.Read(m_Cache.fDamage);
-        BitStream.Read(m_Cache.ucHitZone);
-        BitStream.Read(m_Cache.DamagedPlayerID);
-    }
+    if (!BitStream.ReadBit())
+        return true;
+
+    BitStream.Read(m_Cache.fDamage);
+    BitStream.Read(m_Cache.ucHitZone);
+    BitStream.Read(m_Cache.DamagedPlayerID);
 
     return true;
 }
@@ -47,7 +47,7 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
 //
 // Should do the same this as what CBulletsyncPacket::Write() does
 //
-bool CSimBulletsyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CSimBulletsyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the source player id
     BitStream.Write(m_PlayerID);

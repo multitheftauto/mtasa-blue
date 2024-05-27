@@ -12,28 +12,28 @@
 #include "StdInc.h"
 #include "CPlayerDisconnectedPacket.h"
 
-CPlayerDisconnectedPacket::CPlayerDisconnectedPacket(const char* szReason)
+CPlayerDisconnectedPacket::CPlayerDisconnectedPacket(const char* szReason) noexcept
 {
     m_eType = CPlayerDisconnectedPacket::CUSTOM;
     m_strReason = szReason;
     m_Duration = 0;
 }
 
-CPlayerDisconnectedPacket::CPlayerDisconnectedPacket(ePlayerDisconnectType eType, const char* szReason)
+CPlayerDisconnectedPacket::CPlayerDisconnectedPacket(ePlayerDisconnectType eType, const char* szReason) noexcept
 {
     m_eType = eType;
+    m_strReason = szReason;
     m_Duration = 0;
-    m_strReason = szReason;
 }
 
-CPlayerDisconnectedPacket::CPlayerDisconnectedPacket(ePlayerDisconnectType eType, time_t BanDuration, const char* szReason)
+CPlayerDisconnectedPacket::CPlayerDisconnectedPacket(ePlayerDisconnectType eType, time_t BanDuration, const char* szReason) noexcept
 {
     m_eType = eType;
-    m_Duration = BanDuration;
     m_strReason = szReason;
+    m_Duration = BanDuration;
 }
 
-bool CPlayerDisconnectedPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPlayerDisconnectedPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     BitStream.WriteBits(&m_eType, 5);
 

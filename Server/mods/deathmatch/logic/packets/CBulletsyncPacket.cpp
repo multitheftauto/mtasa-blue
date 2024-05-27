@@ -13,7 +13,7 @@
 #include "net/SyncStructures.h"
 #include "CPlayer.h"
 
-CBulletsyncPacket::CBulletsyncPacket(CPlayer* pPlayer)
+CBulletsyncPacket::CBulletsyncPacket(CPlayer* pPlayer) noexcept
 {
     m_pSourceElement = pPlayer;
     m_WeaponType = WEAPONTYPE_UNARMED;
@@ -23,68 +23,64 @@ CBulletsyncPacket::CBulletsyncPacket(CPlayer* pPlayer)
     m_DamagedPlayerID = INVALID_ELEMENT_ID;
 }
 
-bool CBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
+bool CBulletsyncPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     // Got a player?
-    if (m_pSourceElement)
+    if (!m_pSourceElement)
+        return false;
+
+    char cWeaponType;
+    BitStream.Read(cWeaponType);
+    m_WeaponType = (eWeaponType)cWeaponType;
+
+    BitStream.Read((char*)&m_vecStart, sizeof(CVector));
+    BitStream.Read((char*)&m_vecEnd, sizeof(CVector));
+
+    // Duplicate packet protection
+    if (!BitStream.Read(m_ucOrderCounter))
+        return false;
+
+    if (BitStream.ReadBit())
     {
-        char cWeaponType;
-        BitStream.Read(cWeaponType);
-        m_WeaponType = (eWeaponType)cWeaponType;
-
-        BitStream.Read((char*)&m_vecStart, sizeof(CVector));
-        BitStream.Read((char*)&m_vecEnd, sizeof(CVector));
-
-        // Duplicate packet protection
-        if (!BitStream.Read(m_ucOrderCounter))
-            return false;
-
-        if (BitStream.ReadBit())
-        {
-            BitStream.Read(m_fDamage);
-            BitStream.Read(m_ucHitZone);
-            BitStream.Read(m_DamagedPlayerID);
-        }
-        return true;
+        BitStream.Read(m_fDamage);
+        BitStream.Read(m_ucHitZone);
+        BitStream.Read(m_DamagedPlayerID);
     }
-
-    return false;
+    return true;
 }
 
 // Note: Relays a previous Read()
-bool CBulletsyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CBulletsyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Got a player to write?
-    if (m_pSourceElement)
+    if (!m_pSourceElement)
+        return false;
+
+    CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
+
+    // Write the source player id
+    ElementID PlayerID = pSourcePlayer->GetID();
+    BitStream.Write(PlayerID);
+
+    // Write the bulletsync data
+    BitStream.Write((char)m_WeaponType);
+    BitStream.Write((const char*)&m_vecStart, sizeof(CVector));
+    BitStream.Write((const char*)&m_vecEnd, sizeof(CVector));
+
+    // Duplicate packet protection
+    BitStream.Write(m_ucOrderCounter);
+
+    if (m_fDamage > 0 && m_DamagedPlayerID != INVALID_ELEMENT_ID)
     {
-        CPlayer* pSourcePlayer = static_cast<CPlayer*>(m_pSourceElement);
-
-        // Write the source player id
-        ElementID PlayerID = pSourcePlayer->GetID();
-        BitStream.Write(PlayerID);
-
-        // Write the bulletsync data
-        BitStream.Write((char)m_WeaponType);
-        BitStream.Write((const char*)&m_vecStart, sizeof(CVector));
-        BitStream.Write((const char*)&m_vecEnd, sizeof(CVector));
-
-        // Duplicate packet protection
-        BitStream.Write(m_ucOrderCounter);
-
-        if (m_fDamage > 0 && m_DamagedPlayerID != INVALID_ELEMENT_ID)
-        {
-            BitStream.WriteBit(true);
-            BitStream.Write(m_fDamage);
-            BitStream.Write(m_ucHitZone);
-            BitStream.Write(m_DamagedPlayerID);
-        }
-        else
-        {
-            BitStream.WriteBit(false);
-        }
-
-        return true;
+        BitStream.WriteBit(true);
+        BitStream.Write(m_fDamage);
+        BitStream.Write(m_ucHitZone);
+        BitStream.Write(m_DamagedPlayerID);
+    }
+    else
+    {
+        BitStream.WriteBit(false);
     }
 
-    return false;
+    return true;
 }

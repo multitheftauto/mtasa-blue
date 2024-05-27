@@ -11,9 +11,3 @@
 
 #include "StdInc.h"
 #include "CChatClearPacket.h"
-
-// Needed because compiler throwing LNK2001 and LNK1120 error.
-bool CChatClearPacket::Write(NetBitStreamInterface& BitStream) const
-{
-    return true;
-}

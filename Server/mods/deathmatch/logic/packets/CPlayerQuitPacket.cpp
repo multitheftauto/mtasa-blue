@@ -13,13 +13,13 @@
 #include "CPlayerQuitPacket.h"
 #include <net/SyncStructures.h>
 
-CPlayerQuitPacket::CPlayerQuitPacket()
+CPlayerQuitPacket::CPlayerQuitPacket() noexcept
 {
     m_PlayerID = INVALID_ELEMENT_ID;
     m_ucQuitReason = 0;
 }
 
-bool CPlayerQuitPacket::Write(NetBitStreamInterface& BitStream) const
+bool CPlayerQuitPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     if (m_PlayerID == INVALID_ELEMENT_ID)
         return false;

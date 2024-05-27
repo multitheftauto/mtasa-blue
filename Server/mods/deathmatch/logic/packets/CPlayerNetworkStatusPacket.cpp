@@ -11,10 +11,8 @@
 #include "StdInc.h"
 #include "CPlayerNetworkStatusPacket.h"
 
-bool CPlayerNetworkStatusPacket::Read(NetBitStreamInterface& BitStream)
+bool CPlayerNetworkStatusPacket::Read(NetBitStreamInterface& BitStream) noexcept
 {
     BitStream.Read(m_ucType);
-    if (!BitStream.Read(m_uiTicks))
-        return false;
-    return true;
+    return BitStream.Read(m_uiTicks);
 }

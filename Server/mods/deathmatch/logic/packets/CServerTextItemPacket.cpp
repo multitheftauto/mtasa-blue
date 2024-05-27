@@ -12,8 +12,9 @@
 #include "StdInc.h"
 #include "CServerTextItemPacket.h"
 
-CServerTextItemPacket::CServerTextItemPacket(unsigned long ulUniqueId, bool bDeleteable, float fX, float fY, float fScale, const SColor color,
-                                             unsigned char format, unsigned char ucShadowAlpha, const char* szText)
+CServerTextItemPacket::CServerTextItemPacket(std::uint32_t ulUniqueId, bool bDeleteable,
+    float fX, float fY, float fScale, const SColor color, std::uint8_t format,
+    std::uint8_t ucShadowAlpha, const char* szText) noexcept
 {
     m_ulUniqueId = ulUniqueId;
     m_bDeletable = bDeleteable;
@@ -26,7 +27,7 @@ CServerTextItemPacket::CServerTextItemPacket(unsigned long ulUniqueId, bool bDel
     m_strText = szText;
 }
 
-bool CServerTextItemPacket::Write(NetBitStreamInterface& BitStream) const
+bool CServerTextItemPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     BitStream.WriteCompressed(m_ulUniqueId);
 
@@ -34,27 +35,27 @@ bool CServerTextItemPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteBit(m_bDeletable);
 
     // Not deleting this?
-    if (!m_bDeletable)
+    if (m_bDeletable)
+        return true;
+
+    BitStream.Write(m_fX);
+    BitStream.Write(m_fY);
+    BitStream.Write(m_fScale);
+    BitStream.Write(m_Color.R);
+    BitStream.Write(m_Color.G);
+    BitStream.Write(m_Color.B);
+    BitStream.Write(m_Color.A);
+    BitStream.Write(m_ucFormat);
+    BitStream.Write(m_ucShadowAlpha);
+
+    // Grab the text length
+    size_t sizeText = std::min<size_t>(1024, m_strText.length());
+
+    // Write the text
+    BitStream.WriteCompressed(static_cast<std::uint16_t>(sizeText));
+    if (sizeText)
     {
-        BitStream.Write(m_fX);
-        BitStream.Write(m_fY);
-        BitStream.Write(m_fScale);
-        BitStream.Write(m_Color.R);
-        BitStream.Write(m_Color.G);
-        BitStream.Write(m_Color.B);
-        BitStream.Write(m_Color.A);
-        BitStream.Write(m_ucFormat);
-        BitStream.Write(m_ucShadowAlpha);
-
-        // Grab the text length
-        size_t sizeText = std::min<size_t>(1024, m_strText.length());
-
-        // Write the text
-        BitStream.WriteCompressed(static_cast<unsigned short>(sizeText));
-        if (sizeText)
-        {
-            BitStream.Write(m_strText, sizeText);
-        }
+        BitStream.Write(m_strText, sizeText);
     }
 
     return true;

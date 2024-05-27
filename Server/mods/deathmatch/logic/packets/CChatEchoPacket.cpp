@@ -13,7 +13,7 @@
 #include "CChatEchoPacket.h"
 #include "CElement.h"
 
-bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
+bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     // Write the color
     BitStream.Write(m_ucRed);
@@ -28,20 +28,18 @@ bool CChatEchoPacket::Write(NetBitStreamInterface& BitStream) const
     }
 
     // Too short?
-    size_t sizeMessage = m_strMessage.length();
-    if (sizeMessage >= MIN_CHATECHO_LENGTH)
+    std::size_t sizeMessage = m_strMessage.length();
+    if (sizeMessage < MIN_CHATECHO_LENGTH)
+        return false;
+
+    if (BitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
     {
-        if (BitStream.Can(eBitStreamVersion::OnClientChatMessage_MessageType))
-        {
-            // Write the message type
-            BitStream.Write(m_ucMessageType);
-        }
-
-        // Write the string
-        BitStream.Write(m_strMessage.c_str(), sizeMessage);
-
-        return true;
+        // Write the message type
+        BitStream.Write(m_ucMessageType);
     }
 
-    return false;
+    // Write the string
+    BitStream.Write(m_strMessage.c_str(), sizeMessage);
+
+    return true;
 }

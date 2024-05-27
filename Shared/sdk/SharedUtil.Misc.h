@@ -851,19 +851,19 @@ namespace SharedUtil
     {
     public:
         // map only
-        bool Contains(const T& item) const { return MapContains(m_Map, item); }
+        bool Contains(const T& item) const noexcept { return MapContains(m_Map, item); }
 
         // list only
-        typename LIST_TYPE ::iterator         begin() { return m_List.begin(); }
-        typename LIST_TYPE ::iterator         end() { return m_List.end(); }
-        typename LIST_TYPE ::const_iterator   begin() const { return m_List.begin(); }
-        typename LIST_TYPE ::const_iterator   end() const { return m_List.end(); }
-        typename LIST_TYPE ::reverse_iterator rbegin() { return m_List.rbegin(); }
-        typename LIST_TYPE ::reverse_iterator rend() { return m_List.rend(); }
-        std::uint32_t                                  size() const { return m_List.size(); }
-        bool                                  empty() const { return m_List.empty(); }
-        const T&                              back() const { return m_List.back(); }
-        const T&                              front() const { return m_List.front(); }
+        typename LIST_TYPE ::iterator         begin() noexcept { return m_List.begin(); }
+        typename LIST_TYPE ::iterator         end() noexcept { return m_List.end(); }
+        typename LIST_TYPE ::const_iterator   begin() const noexcept { return m_List.begin(); }
+        typename LIST_TYPE ::const_iterator   end() const noexcept { return m_List.end(); }
+        typename LIST_TYPE ::reverse_iterator rbegin() noexcept { return m_List.rbegin(); }
+        typename LIST_TYPE ::reverse_iterator rend() noexcept { return m_List.rend(); }
+        std::size_t                           size() const noexcept { return m_List.size(); }
+        bool                                  empty() const noexcept { return m_List.empty(); }
+        const T&                              back() const noexcept { return m_List.back(); }
+        const T&                              front() const noexcept { return m_List.front(); }
 
         // list and map
         void push_back(const T& item)

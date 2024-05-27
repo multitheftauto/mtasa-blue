@@ -12,32 +12,31 @@
 #include "StdInc.h"
 #include "CResourceClientScriptsPacket.h"
 
-CResourceClientScriptsPacket::CResourceClientScriptsPacket(CResource* pResource) : m_pResource(pResource)
-{
-}
+CResourceClientScriptsPacket::CResourceClientScriptsPacket(CResource* pResource) noexcept
+    : m_pResource(pResource) {}
 
-void CResourceClientScriptsPacket::AddItem(CResourceClientScriptItem* pItem)
+void CResourceClientScriptsPacket::AddItem(CResourceClientScriptItem* pItem) noexcept
 {
     m_vecItems.push_back(pItem);
 }
 
-bool CResourceClientScriptsPacket::Write(NetBitStreamInterface& BitStream) const
+bool CResourceClientScriptsPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
-    if (m_vecItems.size() == 0)
+    if (m_vecItems.empty())
         return false;
 
     BitStream.Write(m_pResource->GetNetID());
 
-    auto usItemCount = static_cast<unsigned short>(m_vecItems.size());
+    auto usItemCount = static_cast<std::uint16_t>(m_vecItems.size());
     BitStream.Write(usItemCount);
 
-    for (std::vector<CResourceClientScriptItem*>::const_iterator iter = m_vecItems.begin(); iter != m_vecItems.end(); ++iter)
+    for (const auto& pItem : m_vecItems)
     {
         if (BitStream.Version() >= 0x50)
-            BitStream.WriteString(ConformResourcePath((*iter)->GetFullName()));
+            BitStream.WriteString(ConformResourcePath(pItem->GetFullName()));
 
-        const SString& data = (*iter)->GetSourceCode();
-        unsigned int   len = data.length();
+        const auto& data = pItem->GetSourceCode();
+        std::uint32_t len = data.length();
         BitStream.Write(len);
         BitStream.Write(data.c_str(), len);
     }

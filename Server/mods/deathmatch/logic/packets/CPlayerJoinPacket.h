@@ -16,9 +16,9 @@
 class CPlayerJoinPacket final : public CPacket
 {
 public:
-    virtual bool  RequiresSourcePlayer() const { return false; }
+    virtual bool  RequiresSourcePlayer() const noexcept { return false; }
     ePacketID     GetPacketID() const noexcept { return static_cast<ePacketID>(PACKET_ID_PLAYER_JOIN); };
     std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool Read(NetBitStreamInterface& BitStream) { return true; };
+    bool Read(NetBitStreamInterface& BitStream) noexcept { return true; }
 };

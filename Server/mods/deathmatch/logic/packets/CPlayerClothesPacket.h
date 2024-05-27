@@ -24,16 +24,16 @@ struct SPlayerClothes
 class CPlayerClothesPacket final : public CPacket
 {
 public:
-    ~CPlayerClothesPacket();
+    ~CPlayerClothesPacket() noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_CLOTHES; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_PLAYER_CLOTHES; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    void         Add(const char* szTexture, const char* szModel, unsigned char ucType);
-    void         Add(CPlayerClothes* pClothes);
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
+    void        Add(const char* szTexture, const char* szModel, std::uint8_t ucType) noexcept;
+    void        Add(CPlayerClothes* pClothes) noexcept;
+    std::size_t Count() const noexcept { return m_List.size(); }
 
 private:
     std::vector<SPlayerClothes*> m_List;

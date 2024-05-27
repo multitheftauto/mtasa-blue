@@ -13,7 +13,7 @@
 #include "CUnoccupiedVehicleStartSyncPacket.h"
 #include "CVehicle.h"
 
-bool CUnoccupiedVehicleStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
+bool CUnoccupiedVehicleStartSyncPacket::Write(NetBitStreamInterface& BitStream) const noexcept
 {
     if (!m_pVehicle)
         return false;

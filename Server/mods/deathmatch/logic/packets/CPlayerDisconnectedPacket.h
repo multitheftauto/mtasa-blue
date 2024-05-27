@@ -42,17 +42,17 @@ public:
         SHUTDOWN
     };
 
-    CPlayerDisconnectedPacket(const char* szReason);
-    CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::ePlayerDisconnectType eType, const char* szReason = "");
-    CPlayerDisconnectedPacket(CPlayerDisconnectedPacket::ePlayerDisconnectType eType, time_t BanDuration = 0, const char* szReason = "");
+    CPlayerDisconnectedPacket(const char* szReason) noexcept;
+    CPlayerDisconnectedPacket(ePlayerDisconnectType eType, const char* szReason = "") noexcept;
+    CPlayerDisconnectedPacket(ePlayerDisconnectType eType, std::time_t BanDuration = 0, const char* szReason = "") noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_SERVER_DISCONNECTED; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_SERVER_DISCONNECTED; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
-    const char* GetReason() { return m_strReason; }
-    void        SetReason(const char* szReason) { m_strReason = szReason; }
+    const char* GetReason() const noexcept { return m_strReason; }
+    void        SetReason(const char* szReason) noexcept { m_strReason = szReason; }
 
 private:
     SString               m_strReason;

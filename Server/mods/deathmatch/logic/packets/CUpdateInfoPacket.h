@@ -16,13 +16,13 @@
 class CUpdateInfoPacket final : public CPacket
 {
 public:
-    CUpdateInfoPacket();
-    CUpdateInfoPacket(const SString& m_strType, const SString& strData);
+    CUpdateInfoPacket() noexcept;
+    CUpdateInfoPacket(const SString& m_strType, const SString& strData) noexcept;
 
-    ePacketID     GetPacketID() const noexcept { return PACKET_ID_UPDATE_INFO; };
-    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
+    ePacketID     GetPacketID() const noexcept { return PACKET_ID_UPDATE_INFO; }
+    std::uint32_t GetFlags() const noexcept { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; }
 
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Write(NetBitStreamInterface& BitStream) const noexcept;
 
 private:
     SString m_strType;
