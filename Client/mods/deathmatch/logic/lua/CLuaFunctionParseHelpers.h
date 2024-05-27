@@ -81,6 +81,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
 DECLARE_ENUM_CLASS(eRenderStage);
+DECLARE_ENUM(ePools);
 
 class CRemoteCall;
 
