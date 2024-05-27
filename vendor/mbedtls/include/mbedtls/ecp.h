@@ -16,19 +16,7 @@
 
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
 #ifndef MBEDTLS_ECP_H
@@ -41,6 +29,11 @@
 #endif
 
 #include "mbedtls/bignum.h"
+
+#if (defined(__ARMCC_VERSION) || defined(_MSC_VER)) && \
+    !defined(inline) && !defined(__cplusplus)
+#define inline __inline
+#endif
 
 /*
  * ECP error codes
@@ -214,7 +207,7 @@ mbedtls_ecp_point;
 
 #if !defined(MBEDTLS_ECP_ALT)
 /*
- * default mbed TLS elliptic curve arithmetic implementation
+ * default Mbed TLS elliptic curve arithmetic implementation
  *
  * (in case MBEDTLS_ECP_ALT is defined then the developer has to provide an
  * alternative implementation for the whole module and it will replace this
@@ -236,6 +229,27 @@ mbedtls_ecp_point;
  * odd prime as mbedtls_ecp_mul() requires an odd number, and
  * mbedtls_ecdsa_sign() requires that it is prime for blinding purposes.
  *
+ * The default implementation only initializes \p A without setting it to the
+ * authentic value for curves with <code>A = -3</code>(SECP256R1, etc), in which
+ * case you need to load \p A by yourself when using domain parameters directly,
+ * for example:
+ * \code
+ * mbedtls_mpi_init(&A);
+ * mbedtls_ecp_group_init(&grp);
+ * CHECK_RETURN(mbedtls_ecp_group_load(&grp, grp_id));
+ * if (mbedtls_ecp_group_a_is_minus_3(&grp)) {
+ *     CHECK_RETURN(mbedtls_mpi_sub_int(&A, &grp.P, 3));
+ * } else {
+ *     CHECK_RETURN(mbedtls_mpi_copy(&A, &grp.A));
+ * }
+ *
+ * do_something_with_a(&A);
+ *
+ * cleanup:
+ * mbedtls_mpi_free(&A);
+ * mbedtls_ecp_group_free(&grp);
+ * \endcode
+ *
  * For Montgomery curves, we do not store \p A, but <code>(A + 2) / 4</code>,
  * which is the quantity used in the formulas. Additionally, \p nbits is
  * not the size of \p N but the required size for private keys.
@@ -256,8 +270,11 @@ mbedtls_ecp_point;
 typedef struct mbedtls_ecp_group {
     mbedtls_ecp_group_id id;    /*!< An internal group identifier. */
     mbedtls_mpi P;              /*!< The prime modulus of the base field. */
-    mbedtls_mpi A;              /*!< For Short Weierstrass: \p A in the equation. For
-                                     Montgomery curves: <code>(A + 2) / 4</code>. */
+    mbedtls_mpi A;              /*!< For Short Weierstrass: \p A in the equation. Note that
+                                     \p A is not set to the authentic value in some cases.
+                                     Refer to detailed description of ::mbedtls_ecp_group if
+                                     using domain parameters in the structure.
+                                     For Montgomery curves: <code>(A + 2) / 4</code>. */
     mbedtls_mpi B;              /*!< For Short Weierstrass: \p B in the equation.
                                      For Montgomery curves: unused. */
     mbedtls_ecp_point G;        /*!< The generator of the subgroup used. */
@@ -990,6 +1007,26 @@ int mbedtls_ecp_mul_restartable(mbedtls_ecp_group *grp, mbedtls_ecp_point *R,
 
 #if defined(MBEDTLS_ECP_SHORT_WEIERSTRASS_ENABLED)
 /**
+ * \brief           This function checks if domain parameter A of the curve is
+ *                  \c -3.
+ *
+ * \note            This function is only defined for short Weierstrass curves.
+ *                  It may not be included in builds without any short
+ *                  Weierstrass curve.
+ *
+ * \param grp       The ECP group to use.
+ *                  This must be initialized and have group parameters
+ *                  set, for example through mbedtls_ecp_group_load().
+ *
+ * \return          \c 1 if <code>A = -3</code>.
+ * \return          \c 0 Otherwise.
+ */
+static inline int mbedtls_ecp_group_a_is_minus_3(const mbedtls_ecp_group *grp)
+{
+    return grp->A.p == NULL;
+}
+
+/**
  * \brief           This function performs multiplication and addition of two
  *                  points by integers: \p R = \p m * \p P + \p n * \p Q
  *
@@ -1081,7 +1118,7 @@ int mbedtls_ecp_muladd_restartable(
  *
  *                  It only checks that the point is non-zero, has
  *                  valid coordinates and lies on the curve. It does not verify
- *                  that it is indeed a multiple of \p G. This additional
+ *                  that it is indeed a multiple of \c G. This additional
  *                  check is computationally more expensive, is not required
  *                  by standards, and should not be necessary if the group
  *                  used has a small cofactor. In particular, it is useless for
@@ -1106,7 +1143,7 @@ int mbedtls_ecp_check_pubkey(const mbedtls_ecp_group *grp,
                              const mbedtls_ecp_point *pt);
 
 /**
- * \brief           This function checks that an \p mbedtls_mpi is a
+ * \brief           This function checks that an \c mbedtls_mpi is a
  *                  valid private key for this curve.
  *
  * \note            This function uses bare components rather than an
@@ -1228,6 +1265,8 @@ int mbedtls_ecp_gen_key(mbedtls_ecp_group_id grp_id, mbedtls_ecp_keypair *key,
 /**
  * \brief           This function reads an elliptic curve private key.
  *
+ * \note            This function does not support Curve448 yet.
+ *
  * \param grp_id    The ECP group identifier.
  * \param key       The destination key.
  * \param buf       The buffer containing the binary representation of the
@@ -1249,17 +1288,43 @@ int mbedtls_ecp_read_key(mbedtls_ecp_group_id grp_id, mbedtls_ecp_keypair *key,
 /**
  * \brief           This function exports an elliptic curve private key.
  *
+ * \note            Note that although this function accepts an output
+ *                  buffer that is smaller or larger than the key, most key
+ *                  import interfaces require the output to have exactly
+ *                  key's nominal length. It is generally simplest to
+ *                  pass the key's nominal length as \c buflen, after
+ *                  checking that the output buffer is large enough.
+ *                  See the description of the \p buflen parameter for
+ *                  how to calculate the nominal length.
+ *
+ * \note            If the private key was not set in \p key,
+ *                  the output is unspecified. Future versions
+ *                  may return an error in that case.
+ *
+ * \note            This function does not support Curve448 yet.
+ *
  * \param key       The private key.
  * \param buf       The output buffer for containing the binary representation
- *                  of the key. (Big endian integer for Weierstrass curves, byte
- *                  string for Montgomery curves.)
+ *                  of the key.
+ *                  For Weierstrass curves, this is the big-endian
+ *                  representation, padded with null bytes at the beginning
+ *                  to reach \p buflen bytes.
+ *                  For Montgomery curves, this is the standard byte string
+ *                  representation (which is little-endian), padded with
+ *                  null bytes at the end to reach \p buflen bytes.
  * \param buflen    The total length of the buffer in bytes.
+ *                  The length of the output is
+ *                  (`grp->nbits` + 7) / 8 bytes
+ *                  where `grp->nbits` is the private key size in bits.
+ *                  For Weierstrass keys, if the output buffer is smaller,
+ *                  leading zeros are trimmed to fit if possible. For
+ *                  Montgomery keys, the output buffer must always be large
+ *                  enough for the nominal length.
  *
  * \return          \c 0 on success.
- * \return          #MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL if the \p key
-                    representation is larger than the available space in \p buf.
- * \return          #MBEDTLS_ERR_ECP_FEATURE_UNAVAILABLE if the operation for
- *                  the group is not implemented.
+ * \return          #MBEDTLS_ERR_ECP_BUFFER_TOO_SMALL or
+ *                  #MBEDTLS_ERR_MPI_BUFFER_TOO_SMALL if the \p key
+ *                  representation is larger than the available space in \p buf.
  * \return          Another negative error code on different kinds of failure.
  */
 int mbedtls_ecp_write_key(mbedtls_ecp_keypair *key,

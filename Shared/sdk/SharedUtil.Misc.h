@@ -234,6 +234,7 @@ namespace SharedUtil
 
     std::string UTF16ToMbUTF8(const std::wstring& ws);
     std::string UTF16ToMbUTF8(const wchar_t* ws);
+    std::string UTF16ToMbUTF8(const char16_t* ws);
 
     std::wstring ANSIToUTF16(const SString& s);
 
@@ -343,13 +344,14 @@ namespace SharedUtil
     template <class TL, class T>
     bool ListContains(const TL& itemList, const T& item)
     {
+        if (itemList.empty())
+            return false;
         typename TL ::const_iterator it = itemList.begin();
         for (; it != itemList.end(); ++it)
             if (item == *it)
                 return true;
         return false;
     }
-
     // Add item if it does not aleady exist in itemList
     template <class TL, class T>
     void ListAddUnique(TL& itemList, const T& item)
@@ -667,7 +669,6 @@ namespace SharedUtil
     public:
         constexpr SFixedString() { szData[0] = 0; }
 
-
         // In
         constexpr SFixedString& Assign(const char* szOther, size_t len)
         {
@@ -690,16 +691,16 @@ namespace SharedUtil
 
 #ifdef __cpp_lib_string_view
         // Out
-        constexpr operator std::string_view() const { return { szData }; }
+        constexpr operator std::string_view() const { return {szData}; }
 #endif
-        constexpr operator const char*() const { return szData; }
-        constexpr char*           Data() { return &szData[0]; }
+        constexpr       operator const char*() const { return szData; }
+        constexpr char* Data() { return &szData[0]; }
 
         constexpr size_t GetMaxLength() const { return MAX_LENGTH; }
-        size_t GetLength() const { return strlen(szData); }
+        size_t           GetLength() const { return strlen(szData); }
 
         // Shake it all about
-        void Encrypt();
+        void           Encrypt();
         constexpr bool Empty() { return szData[0] == 0; }
         constexpr void Clear() const { szData[0] = 0; }
 

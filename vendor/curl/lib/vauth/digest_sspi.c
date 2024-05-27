@@ -27,7 +27,7 @@
 
 #include "curl_setup.h"
 
-#if defined(USE_WINDOWS_SSPI) && !defined(CURL_DISABLE_CRYPTO_AUTH)
+#if defined(USE_WINDOWS_SSPI) && !defined(CURL_DISABLE_DIGEST_AUTH)
 
 #include <curl/curl.h>
 
@@ -211,8 +211,10 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     if(status == SEC_E_INSUFFICIENT_MEMORY)
       return CURLE_OUT_OF_MEMORY;
 
+#if !defined(CURL_DISABLE_VERBOSE_STRINGS)
     infof(data, "schannel: InitializeSecurityContext failed: %s",
           Curl_sspi_strerror(status, buffer, sizeof(buffer)));
+#endif
 
     return CURLE_AUTH_ERROR;
   }
@@ -603,8 +605,10 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
       if(status == SEC_E_INSUFFICIENT_MEMORY)
         return CURLE_OUT_OF_MEMORY;
 
+#if !defined(CURL_DISABLE_VERBOSE_STRINGS)
       infof(data, "schannel: InitializeSecurityContext failed: %s",
             Curl_sspi_strerror(status, buffer, sizeof(buffer)));
+#endif
 
       return CURLE_AUTH_ERROR;
     }
@@ -665,4 +669,4 @@ void Curl_auth_digest_cleanup(struct digestdata *digest)
   Curl_safefree(digest->passwd);
 }
 
-#endif /* USE_WINDOWS_SSPI && !CURL_DISABLE_CRYPTO_AUTH */
+#endif /* USE_WINDOWS_SSPI && !CURL_DISABLE_DIGEST_AUTH */

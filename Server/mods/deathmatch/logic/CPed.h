@@ -168,6 +168,7 @@ public:
     void           SetWeaponAmmoInClip(unsigned short uscAmmoInClip, unsigned char ucSlot = 0xFF);
     unsigned short GetWeaponTotalAmmo(unsigned char ucSlot = 0xFF);
     void           SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot = 0xFF);
+    bool           HasWeaponType(unsigned char ucWeaponType);
 
     float GetMaxHealth();
     float GetHealth() { return m_fHealth; }
@@ -269,11 +270,11 @@ public:
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
     long long GetLastFarSyncTick() { return m_llLastFarSyncTick; }
-    void SetLastFarSyncTick(long long llLastSyncTick) { m_llLastFarSyncTick = llLastSyncTick; }
+    void      SetLastFarSyncTick(long long llLastSyncTick) { m_llLastFarSyncTick = llLastSyncTick; }
 
-    void ClearNearPlayersList() { m_nearPlayersList.clear(); }
-    void AddPlayerToNearList(CPlayer* pPlayer) { m_nearPlayersList.push_back(pPlayer); }
-    bool IsNearPlayersListEmpty() { return m_nearPlayersList.empty(); }
+    void                                  ClearNearPlayersList() { m_nearPlayersList.clear(); }
+    void                                  AddPlayerToNearList(CPlayer* pPlayer) { m_nearPlayersList.push_back(pPlayer); }
+    bool                                  IsNearPlayersListEmpty() { return m_nearPlayersList.empty(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterBegin() { return m_nearPlayersList.begin(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterEnd() { return m_nearPlayersList.end(); }
 

@@ -39,7 +39,8 @@ struct connectdata;
 struct conncache {
   struct Curl_hash hash;
   size_t num_conn;
-  long next_connection_id;
+  curl_off_t next_connection_id;
+  curl_off_t next_easy_id;
   struct curltime last_cleanup;
   /* handle used for closing cached connections */
   struct Curl_easy *closure_handle;
@@ -84,7 +85,7 @@ struct connectbundle {
 };
 
 /* returns 1 on error, 0 is fine */
-int Curl_conncache_init(struct conncache *, int size);
+int Curl_conncache_init(struct conncache *, size_t size);
 void Curl_conncache_destroy(struct conncache *connc);
 
 /* return the correct bundle, to a host or a proxy */

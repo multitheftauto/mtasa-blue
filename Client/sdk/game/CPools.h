@@ -11,6 +11,10 @@
 
 #pragma once
 
+#include "Common.h"
+#include "CBuildingsPool.h"
+#include "CDummyPool.h"
+
 class CClientEntity;
 class CEntity;
 class CEntitySAInterface;
@@ -18,6 +22,8 @@ class CObject;
 class CObjectSA;
 class CPed;
 class CPedSA;
+class CBuilding;
+class CBuildingSA;
 class CVector;
 class CVehicle;
 class CVehicleSA;
@@ -63,6 +69,7 @@ public:
     virtual void      RemoveVehicle(CVehicle* pVehicle, bool bDelete = true) = 0;
 
     virtual SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface) = 0;
+    virtual SClientEntity<CVehicleSA>* GetVehicle(size_t pos) = 0;
     virtual unsigned long              GetVehicleCount() = 0;
 
     // Objects pool
@@ -92,9 +99,19 @@ public:
 
     virtual int  GetNumberOfUsedSpaces(ePools pool) = 0;
     virtual int  GetPoolDefaultCapacity(ePools pool) = 0;
+    virtual int  GetPoolDefaultModdedCapacity(ePools pool) = 0;
     virtual int  GetPoolCapacity(ePools pool) = 0;
     virtual void SetPoolCapacity(ePools pool, int iValue) = 0;
 
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;
+
+    virtual uint AllocateTextureDictonarySlot(uint uiSlotID, std::string& strTxdName) = 0;
+    virtual void RemoveTextureDictonarySlot(uint uiTxdID) = 0;
+    virtual bool IsFreeTextureDictonarySlot(uint uiTxdID) = 0;
+
+    virtual ushort GetFreeTextureDictonarySlot() = 0;
+
+    virtual CBuildingsPool& GetBuildingsPool() noexcept = 0;
+    virtual CDummyPool&   GetDummyPool() noexcept = 0;
 };

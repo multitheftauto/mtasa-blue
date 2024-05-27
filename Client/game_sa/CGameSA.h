@@ -15,6 +15,8 @@
 #include "CFxManagerSA.h"
 #include "CModelInfoSA.h"
 #include "CStreamingSA.h"
+#include "CCoverManagerSA.h"
+#include "CPlantManagerSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -35,6 +37,10 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define NUM_WeaponInfosStdSkill         WEAPONTYPE_LAST_WEAPONTYPE
 #define NUM_WeaponInfosOtherSkill       11
 #define NUM_WeaponInfosTotal            (NUM_WeaponInfosStdSkill + (3*NUM_WeaponInfosOtherSkill)) // std, (poor, pro, special)
+
+#define MODELINFO_DFF_MAX               20000
+#define MODELINFO_TXD_MAX               25000
+#define MODELINFO_MAX                   26000       // Actual max is 25755
 
 #define VAR_FlyingCarsEnabled           0x969160
 #define VAR_ExtraBunnyhopEnabled        0x969161
@@ -75,13 +81,6 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CHEAT_INFINITEHEALTH        "infinitehealth"
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
-
-#define PROP_RANDOM_FOLIAGE         "randomfoliage"
-#define PROP_SNIPER_MOON            "snipermoon"
-#define PROP_EXTRA_AIR_RESISTANCE   "extraairresistance"
-#define PROP_UNDERWORLD_WARP        "underworldwarp"
-#define PROP_VEHICLE_SUNGLARE       "vehiclesunglare"
-#define PROP_CORONA_ZTEST           "coronaztest"
 
 struct SCheatSA
 {
@@ -155,6 +154,9 @@ public:
     CColStore*                GetCollisionStore() override { return m_collisionStore; }
     CRenderWareSA*            GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
+    CIplStore*                GetIplStore() { return m_pIplStore; };
+    CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
+    CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -170,9 +172,9 @@ public:
     int32_t GetBaseIDforSCM() { return *(int32_t*)(0x46A574 + 2); }
     int32_t GetCountOfAllFileIDs() { return (*(char**)(0x5B8AFA + 2) - *(char**)(0x5B8B08 + 6)) / sizeof(CStreamingInfo); }
 
-    DWORD GetSystemTime() { return *VAR_SystemTime; }
+    DWORD GetSystemTime() { return *(DWORD*)0xB7CB84; } // CTimer::m_snTimeInMilliseconds
 
-    bool IsAtMenu() { return *VAR_IsAtMenu != 0; }
+    bool IsAtMenu() { return *(unsigned long*)0xBA677B != 0; } // FrontEndMenuManager + 0x33
 
     void         StartGame();
     void         SetSystemState(eSystemState State);
@@ -209,8 +211,20 @@ public:
     void SetVehicleSunGlareEnabled(bool bEnabled);
     bool IsVehicleSunGlareEnabled();
 
-    void SetCoronaZTestEnabled(bool isEnabled);
-    bool IsCoronaZTestEnabled() const noexcept { return m_isCoronaZTestEnabled; }
+    void SetCoronaZTestEnabled(bool isEnabled) override;
+    bool IsCoronaZTestEnabled() const noexcept override { return m_isCoronaZTestEnabled; }
+
+    bool IsWaterCreaturesEnabled() const noexcept override { return m_areWaterCreaturesEnabled; }
+    void SetWaterCreaturesEnabled(bool isEnabled) override;
+
+    bool IsBurnFlippedCarsEnabled() const noexcept override { return m_isBurnFlippedCarsEnabled; }
+    void SetBurnFlippedCarsEnabled(bool isEnabled) override;
+
+    bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
+    void SetFireballDestructEnabled(bool isEnabled) override;
+
+    bool IsRoadSignsTextEnabled() const noexcept override { return m_isRoadSignsTextEnabled; }
+    void SetRoadSignsTextEnabled(bool isEnabled) override;
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -267,6 +281,11 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
+    void RemoveAllBuildings();
+    void RestoreGameBuildings();
+
+    bool SetBuildingPoolSize(size_t size);
+
 private:
     CPools*                         m_pPools;
     CPlayerInfo*                    m_pPlayerInfo;
@@ -301,6 +320,8 @@ private:
     CPointLights*                   m_pPointLights;
     CColStore*                      m_collisionStore;
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
+    CCoverManagerSA*                m_pCoverManager;
+    CPlantManagerSA*                m_pPlantManager;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
@@ -314,6 +335,7 @@ private:
     CGameSettings*            m_pSettings;
     CCarEnterExit*            m_pCarEnterExit;
     CControllerConfigManager* m_pControllerConfigManager;
+    CIplStore*                m_pIplStore;
 
     eGameVersion m_eGameVersion;
     bool         m_bAsyncScriptEnabled;
@@ -322,17 +344,12 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
+    bool         m_areWaterCreaturesEnabled{true};
+    bool         m_isBurnFlippedCarsEnabled{true};
+    bool         m_isFireballDestructEnabled{true};
+    bool         m_isRoadSignsTextEnabled{true};
 
     static unsigned int&  ClumpOffset;
-    static unsigned long* VAR_SystemTime;
-    static unsigned long* VAR_IsAtMenu;
-    static bool*          VAR_IsForegroundWindow;
-    static unsigned long* VAR_SystemState;
-    static float*         VAR_TimeScale;
-    static float*         VAR_FPS;
-    static float*         VAR_OldTimeStep;
-    static float*         VAR_TimeStep;
-    static unsigned long* VAR_Framelimiter;
 
     std::map<std::string, SCheatSA*> m_Cheats;
 

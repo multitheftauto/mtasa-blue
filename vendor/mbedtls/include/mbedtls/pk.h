@@ -5,19 +5,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
 #ifndef MBEDTLS_PK_H
@@ -395,7 +383,7 @@ int mbedtls_pk_can_do(const mbedtls_pk_context *ctx, mbedtls_pk_type_t type);
  *
  * \return          0 on success (signature is valid),
  *                  #MBEDTLS_ERR_PK_SIG_LEN_MISMATCH if there is a valid
- *                  signature in sig but its length is less than \p siglen,
+ *                  signature in \p sig but its length is less than \p sig_len,
  *                  or a specific error code.
  *
  * \note            For RSA keys, the default padding type is PKCS#1 v1.5.
@@ -459,7 +447,7 @@ int mbedtls_pk_verify_restartable(mbedtls_pk_context *ctx,
  *                  #MBEDTLS_ERR_PK_TYPE_MISMATCH if the PK context can't be
  *                  used for this type of signatures,
  *                  #MBEDTLS_ERR_PK_SIG_LEN_MISMATCH if there is a valid
- *                  signature in sig but its length is less than \p siglen,
+ *                  signature in \p sig but its length is less than \p sig_len,
  *                  or a specific error code.
  *
  * \note            If hash_len is 0, then the length associated with md_alg

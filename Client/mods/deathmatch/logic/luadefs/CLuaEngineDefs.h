@@ -64,6 +64,8 @@ public:
     static bool                                            EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool state);
     static bool                                            EngineResetModelFlags(uint uiModelID);
     static uint                                            EngineGetModelTXDID(uint uiDffModelID);
+    static bool                                            EngineSetModelTXDID(uint uiDffModelID, unsigned short uiTxdId);
+    static bool                                            EngineResetModelTXDID(uint uiDffModelID);
     static CClientIMG*                                     EngineLoadIMG(lua_State* const luaVM, std::string strFilePath);
     static bool                                            EngineAddImage(CClientIMG* pImg);
     static bool                                            EngineRemoveImage(CClientIMG* pImg);
@@ -77,6 +79,14 @@ public:
     static bool                                            EngineRestreamWorld(lua_State* const luaVM);
     static bool                                            EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
+
+    static size_t EngineGetPoolCapacity(ePools pool);
+    static size_t EngineGetPoolDefaultCapacity(ePools pool);
+    static size_t EngineGetPoolUsedCapacity(ePools pool);
+    static bool   EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t newSize);
+
+    static uint EngineRequestTXD(lua_State* const luaVM, std::string strTxdName);
+    static bool EngineFreeTXD(uint txdID);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

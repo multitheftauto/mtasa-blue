@@ -5,19 +5,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 #ifndef MBEDTLS_ASN1_H
 #define MBEDTLS_ASN1_H
@@ -453,7 +441,7 @@ void mbedtls_asn1_sequence_free(mbedtls_asn1_sequence *seq);
  *                       on a successful invocation.
  * \param end            The end of the ASN.1 SEQUENCE container.
  * \param tag_must_mask  A mask to be applied to the ASN.1 tags found within
- *                       the SEQUENCE before comparing to \p tag_must_value.
+ *                       the SEQUENCE before comparing to \p tag_must_val.
  * \param tag_must_val   The required value of each ASN.1 tag found in the
  *                       SEQUENCE, after masking with \p tag_must_mask.
  *                       Mismatching tags lead to an error.
@@ -462,7 +450,7 @@ void mbedtls_asn1_sequence_free(mbedtls_asn1_sequence *seq);
  *                       while a value of \c 0xFF for \p tag_must_mask means
  *                       that \p tag_must_val is the only allowed tag.
  * \param tag_may_mask   A mask to be applied to the ASN.1 tags found within
- *                       the SEQUENCE before comparing to \p tag_may_value.
+ *                       the SEQUENCE before comparing to \p tag_may_val.
  * \param tag_may_val    The desired value of each ASN.1 tag found in the
  *                       SEQUENCE, after masking with \p tag_may_mask.
  *                       Mismatching tags will be silently ignored.

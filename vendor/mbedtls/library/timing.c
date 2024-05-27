@@ -2,20 +2,10 @@
  *  Portable interface to the CPU cycle counter
  *
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
+
+#include <string.h>
 
 #include "common.h"
 
@@ -231,17 +221,20 @@ volatile int mbedtls_timing_alarmed = 0;
 
 unsigned long mbedtls_timing_get_timer(struct mbedtls_timing_hr_time *val, int reset)
 {
-    struct _hr_time *t = (struct _hr_time *) val;
+    struct _hr_time t;
 
     if (reset) {
-        QueryPerformanceCounter(&t->start);
+        QueryPerformanceCounter(&t.start);
+        memcpy(val, &t, sizeof(struct _hr_time));
         return 0;
     } else {
         unsigned long delta;
         LARGE_INTEGER now, hfreq;
+        /* We can't safely cast val because it may not be aligned, so use memcpy */
+        memcpy(&t, val, sizeof(struct _hr_time));
         QueryPerformanceCounter(&now);
         QueryPerformanceFrequency(&hfreq);
-        delta = (unsigned long) ((now.QuadPart - t->start.QuadPart) * 1000ul
+        delta = (unsigned long) ((now.QuadPart - t.start.QuadPart) * 1000ul
                                  / hfreq.QuadPart);
         return delta;
     }
@@ -277,17 +270,20 @@ void mbedtls_set_alarm(int seconds)
 
 unsigned long mbedtls_timing_get_timer(struct mbedtls_timing_hr_time *val, int reset)
 {
-    struct _hr_time *t = (struct _hr_time *) val;
+    struct _hr_time t;
 
     if (reset) {
-        gettimeofday(&t->start, NULL);
+        gettimeofday(&t.start, NULL);
+        memcpy(val, &t, sizeof(struct _hr_time));
         return 0;
     } else {
         unsigned long delta;
         struct timeval now;
+        /* We can't safely cast val because it may not be aligned, so use memcpy */
+        memcpy(&t, val, sizeof(struct _hr_time));
         gettimeofday(&now, NULL);
-        delta = (now.tv_sec  - t->start.tv_sec) * 1000ul
-                + (now.tv_usec - t->start.tv_usec) / 1000;
+        delta = (now.tv_sec  - t.start.tv_sec) * 1000ul
+                + (now.tv_usec - t.start.tv_usec) / 1000;
         return delta;
     }
 }
@@ -405,6 +401,7 @@ int mbedtls_timing_self_test(int verbose)
     uint32_t a = 0, b = 0;
     mbedtls_timing_delay_context ctx;
 
+    memset(&ctx, 0, sizeof(ctx));
     if (verbose != 0) {
         mbedtls_printf("  TIMING tests note: will take some time!\n");
     }

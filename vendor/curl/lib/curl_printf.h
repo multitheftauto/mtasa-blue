@@ -31,12 +31,17 @@
 
 #include <curl/mprintf.h>
 
+#define MERR_OK        0
+#define MERR_MEM       1
+#define MERR_TOO_LARGE 2
+
 # undef printf
 # undef fprintf
 # undef msnprintf
 # undef vprintf
 # undef vfprintf
 # undef vsnprintf
+# undef mvsnprintf
 # undef aprintf
 # undef vaprintf
 # define printf curl_mprintf

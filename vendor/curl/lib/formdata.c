@@ -27,7 +27,7 @@
 #include <curl/curl.h>
 
 #include "formdata.h"
-#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_MIME)
+#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_FORM_API)
 
 #if defined(HAVE_LIBGEN_H) && defined(HAVE_BASENAME)
 #include <libgen.h>
@@ -277,7 +277,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
     case CURLFORM_PTRNAME:
       current_form->flags |= HTTPPOST_PTRNAME; /* fall through */
 
-      /* FALLTHROUGH */
+      FALLTHROUGH();
     case CURLFORM_COPYNAME:
       if(current_form->name)
         return_value = CURL_FORMADD_OPTION_TWICE;
@@ -303,7 +303,7 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
        */
     case CURLFORM_PTRCONTENTS:
       current_form->flags |= HTTPPOST_PTRCONTENTS;
-      /* FALLTHROUGH */
+      FALLTHROUGH();
     case CURLFORM_COPYCONTENTS:
       if(current_form->value)
         return_value = CURL_FORMADD_OPTION_TWICE;
@@ -603,9 +603,9 @@ CURLFORMcode FormAdd(struct curl_httppost **httppost,
            app passed in a bad combo, so we better check for that first. */
         if(form->name) {
           /* copy name (without strdup; possibly not null-terminated) */
-          form->name = Curl_memdup(form->name, form->namelength?
-                                   form->namelength:
-                                   strlen(form->name) + 1);
+          form->name = Curl_memdup0(form->name, form->namelength?
+                                    form->namelength:
+                                    strlen(form->name));
         }
         if(!form->name) {
           return_value = CURL_FORMADD_MEMORY;
@@ -779,14 +779,26 @@ static CURLcode setname(curl_mimepart *part, const char *name, size_t len)
 
   if(!name || !len)
     return curl_mime_name(part, name);
-  zname = malloc(len + 1);
+  zname = Curl_memdup0(name, len);
   if(!zname)
     return CURLE_OUT_OF_MEMORY;
-  memcpy(zname, name, len);
-  zname[len] = '\0';
   res = curl_mime_name(part, zname);
   free(zname);
   return res;
+}
+
+/* wrap call to fseeko so it matches the calling convention of callback */
+static int fseeko_wrapper(void *stream, curl_off_t offset, int whence)
+{
+#if defined(HAVE_FSEEKO) && defined(HAVE_DECL_FSEEKO)
+  return fseeko(stream, (off_t)offset, whence);
+#elif defined(HAVE__FSEEKI64)
+  return _fseeki64(stream, (__int64)offset, whence);
+#else
+  if(offset > LONG_MAX)
+    return -1;
+  return fseek(stream, (long)offset, whence);
+#endif
 }
 
 /*
@@ -874,8 +886,7 @@ CURLcode Curl_getformdata(struct Curl_easy *data,
                compatibility: use of "-" pseudo file name should be avoided. */
             result = curl_mime_data_cb(part, (curl_off_t) -1,
                                        (curl_read_callback) fread,
-                                       CURLX_FUNCTION_CAST(curl_seek_callback,
-                                                           fseek),
+                                       fseeko_wrapper,
                                        NULL, (void *) stdin);
           }
           else
@@ -941,7 +952,7 @@ int curl_formget(struct curl_httppost *form, void *arg,
 void curl_formfree(struct curl_httppost *form)
 {
   (void)form;
-  /* does nothing HTTP is disabled */
+  /* Nothing to do. */
 }
 
 #endif  /* if disabled */

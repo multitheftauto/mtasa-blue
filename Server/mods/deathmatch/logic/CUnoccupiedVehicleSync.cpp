@@ -131,7 +131,8 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
         if (pSyncer)
         {
             // He isn't close enough to the vehicle and in the right dimension?
-            if (!IsSyncerPersistent() && (!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance)) ||
+            if (!IsSyncerPersistent() &&
+                    (!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance)) ||
                 (pVehicle->GetDimension() != pSyncer->GetDimension()))
             {
                 // Stop him from syncing it
@@ -486,7 +487,9 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehicle
             CVehicle* pVehicle = static_cast<CVehicle*>(pVehicleElement);
             // Is the player syncing this vehicle and there is no driver? Also only process
             // this packet if the time context matches.
-            if (pVehicle->GetSyncer() != pPlayer && pVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE)
+            if (pVehicle->GetSyncer() != pPlayer && pVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE &&
+                IsPointNearPoint3D(pVehicle->GetPosition(), pPlayer->GetPosition(), g_TickRateSettings.iVehicleContactSyncRadius)
+                && pVehicle->GetDimension() == pPlayer->GetDimension())
             {
                 // Is there no player driver?
                 CPed* pOccupant = pVehicle->GetOccupant(0);
@@ -497,7 +500,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehicle
                     {
                         OverrideSyncer(pVehicle, pPlayer);
                     }
-                    
+
                     // Reset our push time
                     pVehicle->ResetLastPushTime();
                 }

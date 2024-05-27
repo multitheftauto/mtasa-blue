@@ -5,19 +5,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 /*
  *      Multiply source vector [s] with b, add result
@@ -677,6 +665,15 @@
 #if defined(__arm__) && !defined(MULADDC_CANNOT_USE_R7)
 
 #if defined(__thumb__) && !defined(__thumb2__)
+#if !defined(__ARMCC_VERSION) && !defined(__clang__) \
+    && !defined(__llvm__) && !defined(__INTEL_COMPILER)
+/*
+ * Thumb 1 ISA. This code path has only been tested successfully on gcc;
+ * it does not compile on clang or armclang.
+ *
+ * Other compilers which define __GNUC__ may not work. The above macro
+ * attempts to exclude these untested compilers.
+ */
 
 #define MULADDC_INIT                                    \
     asm(                                                \
@@ -730,6 +727,8 @@
          : "r0", "r1", "r2", "r3", "r4", "r5",  \
            "r6", "r7", "r8", "r9", "cc"         \
          );
+
+#endif /* Compiler is gcc */
 
 #elif (__ARM_ARCH >= 6) && \
     defined (__ARM_FEATURE_DSP) && (__ARM_FEATURE_DSP == 1)

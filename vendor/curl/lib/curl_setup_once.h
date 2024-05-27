@@ -56,7 +56,7 @@
 #include <sys/time.h>
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #include <fcntl.h>
 #endif
@@ -70,11 +70,13 @@
 #endif
 
 #ifdef USE_WOLFSSL
-#  if defined(HAVE_STDINT_H)
-#    include <stdint.h>
-#  elif defined(HAVE_INTTYPES_H)
-#    include <inttypes.h>
-#  endif
+#include <stdint.h>
+#endif
+
+#ifdef USE_SCHANNEL
+/* Must set this before <schannel.h> is included directly or indirectly by
+   another Windows header. */
+#  define SCHANNEL_USE_BLACKLISTS 1
 #endif
 
 #ifdef __hpux
@@ -162,9 +164,7 @@ struct timeval {
                                    (RECV_TYPE_ARG4)(0))
 #else /* HAVE_RECV */
 #ifndef sread
-  /* */
-  Error Missing_definition_of_macro_sread
-  /* */
+#error "Missing definition of macro sread!"
 #endif
 #endif /* HAVE_RECV */
 
@@ -182,9 +182,7 @@ struct timeval {
                                     (SEND_TYPE_ARG4)(SEND_4TH_ARG))
 #else /* HAVE_SEND */
 #ifndef swrite
-  /* */
-  Error Missing_definition_of_macro_swrite
-  /* */
+#error "Missing definition of macro swrite!"
 #endif
 #endif /* HAVE_SEND */
 

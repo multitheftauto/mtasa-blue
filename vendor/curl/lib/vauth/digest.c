@@ -27,7 +27,7 @@
 
 #include "curl_setup.h"
 
-#if !defined(CURL_DISABLE_CRYPTO_AUTH)
+#ifndef CURL_DISABLE_DIGEST_AUTH
 
 #include <curl/curl.h>
 
@@ -38,6 +38,7 @@
 #include "curl_hmac.h"
 #include "curl_md5.h"
 #include "curl_sha256.h"
+#include "curl_sha512_256.h"
 #include "vtls/vtls.h"
 #include "warnless.h"
 #include "strtok.h"
@@ -125,7 +126,6 @@ bool Curl_auth_digest_get_pair(const char *str, char *value, char *content,
         }
         else
           return FALSE;
-        break;
       }
     }
 
@@ -151,7 +151,7 @@ static void auth_digest_md5_to_ascii(unsigned char *source, /* 16 bytes */
     msnprintf((char *) &dest[i * 2], 3, "%02x", source[i]);
 }
 
-/* Convert sha256 chunk to RFC7616 -suitable ascii string */
+/* Convert sha256 or SHA-512/256 chunk to RFC7616 -suitable ascii string */
 static void auth_digest_sha256_to_ascii(unsigned char *source, /* 32 bytes */
                                      unsigned char *dest) /* 65 bytes */
 {
@@ -288,7 +288,7 @@ static CURLcode auth_decode_digest_md5_message(const struct bufref *chlgref,
   /* Retrieve realm string from the challenge */
   if(!auth_digest_get_key_value(chlg, "realm=\"", realm, rlen, '\"')) {
     /* Challenge does not have a realm, set empty string [RFC2831] page 6 */
-    strcpy(realm, "");
+    *realm = '\0';
   }
 
   /* Retrieve algorithm string from the challenge */
@@ -420,7 +420,7 @@ CURLcode Curl_auth_create_digest_md5_message(struct Curl_easy *data,
     msnprintf(&HA1_hex[2 * i], 3, "%02x", digest[i]);
 
   /* Generate our SPN */
-  spn = Curl_auth_build_spn(service, realm, NULL);
+  spn = Curl_auth_build_spn(service, data->conn->host.name, NULL);
   if(!spn)
     return CURLE_OUT_OF_MEMORY;
 
@@ -602,10 +602,20 @@ CURLcode Curl_auth_decode_digest_http_message(const char *chlg,
           digest->algo = ALGO_SHA256;
         else if(strcasecompare(content, "SHA-256-SESS"))
           digest->algo = ALGO_SHA256SESS;
-        else if(strcasecompare(content, "SHA-512-256"))
+        else if(strcasecompare(content, "SHA-512-256")) {
+#ifdef CURL_HAVE_SHA512_256
           digest->algo = ALGO_SHA512_256;
-        else if(strcasecompare(content, "SHA-512-256-SESS"))
+#else  /* ! CURL_HAVE_SHA512_256 */
+          return CURLE_NOT_BUILT_IN;
+#endif /* ! CURL_HAVE_SHA512_256 */
+        }
+        else if(strcasecompare(content, "SHA-512-256-SESS")) {
+#ifdef CURL_HAVE_SHA512_256
           digest->algo = ALGO_SHA512_256SESS;
+#else  /* ! CURL_HAVE_SHA512_256 */
+          return CURLE_NOT_BUILT_IN;
+#endif /* ! CURL_HAVE_SHA512_256 */
+        }
         else
           return CURLE_BAD_CONTENT_ENCODING;
       }
@@ -718,8 +728,10 @@ static CURLcode auth_create_digest_http_message(
     if(!hashthis)
       return CURLE_OUT_OF_MEMORY;
 
-    hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
+    result = hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
     free(hashthis);
+    if(result)
+      return result;
     convert_to_ascii(hashbuf, (unsigned char *)userh);
   }
 
@@ -739,8 +751,10 @@ static CURLcode auth_create_digest_http_message(
   if(!hashthis)
     return CURLE_OUT_OF_MEMORY;
 
-  hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
+  result = hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
   free(hashthis);
+  if(result)
+    return result;
   convert_to_ascii(hashbuf, ha1);
 
   if(digest->algo & SESSION_ALGO) {
@@ -749,8 +763,10 @@ static CURLcode auth_create_digest_http_message(
     if(!tmp)
       return CURLE_OUT_OF_MEMORY;
 
-    hash(hashbuf, (unsigned char *) tmp, strlen(tmp));
+    result = hash(hashbuf, (unsigned char *) tmp, strlen(tmp));
     free(tmp);
+    if(result)
+      return result;
     convert_to_ascii(hashbuf, ha1);
   }
 
@@ -776,7 +792,11 @@ static CURLcode auth_create_digest_http_message(
     char hashed[65];
     char *hashthis2;
 
-    hash(hashbuf, (const unsigned char *)"", 0);
+    result = hash(hashbuf, (const unsigned char *)"", 0);
+    if(result) {
+      free(hashthis);
+      return result;
+    }
     convert_to_ascii(hashbuf, (unsigned char *)hashed);
 
     hashthis2 = aprintf("%s:%s", hashthis, hashed);
@@ -787,8 +807,10 @@ static CURLcode auth_create_digest_http_message(
   if(!hashthis)
     return CURLE_OUT_OF_MEMORY;
 
-  hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
+  result = hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
   free(hashthis);
+  if(result)
+    return result;
   convert_to_ascii(hashbuf, ha2);
 
   if(digest->qop) {
@@ -802,8 +824,10 @@ static CURLcode auth_create_digest_http_message(
   if(!hashthis)
     return CURLE_OUT_OF_MEMORY;
 
-  hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
+  result = hash(hashbuf, (unsigned char *) hashthis, strlen(hashthis));
   free(hashthis);
+  if(result)
+    return result;
   convert_to_ascii(hashbuf, request_digest);
 
   /* For test case 64 (snooped from a Mozilla 1.3a request)
@@ -958,12 +982,24 @@ CURLcode Curl_auth_create_digest_http_message(struct Curl_easy *data,
                                            outptr, outlen,
                                            auth_digest_md5_to_ascii,
                                            Curl_md5it);
-  DEBUGASSERT(digest->algo <= ALGO_SHA512_256SESS);
-  return auth_create_digest_http_message(data, userp, passwdp,
-                                         request, uripath, digest,
-                                         outptr, outlen,
-                                         auth_digest_sha256_to_ascii,
-                                         Curl_sha256it);
+
+  if(digest->algo <= ALGO_SHA256SESS)
+    return auth_create_digest_http_message(data, userp, passwdp,
+                                           request, uripath, digest,
+                                           outptr, outlen,
+                                           auth_digest_sha256_to_ascii,
+                                           Curl_sha256it);
+#ifdef CURL_HAVE_SHA512_256
+  if(digest->algo <= ALGO_SHA512_256SESS)
+    return auth_create_digest_http_message(data, userp, passwdp,
+                                           request, uripath, digest,
+                                           outptr, outlen,
+                                           auth_digest_sha256_to_ascii,
+                                           Curl_sha512_256it);
+#endif /* CURL_HAVE_SHA512_256 */
+
+  /* Should be unreachable */
+  return CURLE_BAD_CONTENT_ENCODING;
 }
 
 /*
@@ -992,4 +1028,4 @@ void Curl_auth_digest_cleanup(struct digestdata *digest)
 }
 #endif  /* !USE_WINDOWS_SSPI */
 
-#endif  /* CURL_DISABLE_CRYPTO_AUTH */
+#endif  /* !CURL_DISABLE_DIGEST_AUTH */

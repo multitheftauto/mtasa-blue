@@ -1,4 +1,3 @@
-R"=====(
 <!-- This file is compiled into the server binary.
      It is used for inserting missing settings into mtaserver.conf at server startup -->
 <config>
@@ -101,7 +100,8 @@ R"=====(
          will be 22126 ). Available values: 0 - disabled , 1 - enabled. Optional parameter, defaults to 1. -->
     <ase>1</ase>
 
-    <!-- This parameter allows you to disable LAN broadcasting. -->
+    <!-- This parameter allows you to disable LAN broadcasting.
+         Values: 0 - broadcast , 1 - do not broadcast ; default value: 0 -->
     <donotbroadcastlan>0</donotbroadcastlan>
 
     <!-- If set, players will have to provide a password specified below, before they can connect to the
@@ -135,6 +135,10 @@ R"=====(
     <!-- This parameter can improve the reliability of shots when using certain weapons. However, it uses more bandwidth.
          Values: 0 - disabled , 1 - enabled ; default value: 1. -->
     <bullet_sync>1</bullet_sync>
+
+    <!-- This parameter specifies the radius in which any contact with a vehicle will turn the player into its syncer.
+         Available range: 0 to 130. Default - 30 -->
+    <vehicle_contact_sync_radius>30</vehicle_contact_sync_radius>
 
     <!-- This parameter sets the amount of extrapolation that clients will apply to remote vehicles. This can reduce
          some of the latency induced location disparency by predicting where the remote vehicles will probably be.
@@ -264,5 +268,11 @@ R"=====(
          *NOTE* This only protects resources which use dbConnect with mysql
          Values: 0 - Off, 1 - Enabled.  Default - 1 -->
     <database_credentials_protection>1</database_credentials_protection>
+
+    <!-- These parameters specify the maximum amount of events that can be triggered by the client (via triggerServerEvent) within the given interval.
+          Note: The interval is given in milliseconds
+          Interval range: 50 to 5000. Default: 1000
+          Max events per interval range: 1 to 1000. Default: 100  -->
+    <player_triggered_event_interval>1000</player_triggered_event_interval>
+    <max_player_triggered_events_per_interval>100</max_player_triggered_events_per_interval>
 </config>
-)====="

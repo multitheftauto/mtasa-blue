@@ -343,7 +343,7 @@ void CWebView::InjectMouseMove(int iPosX, int iPosY)
     m_vecMousePosition.y = iPosY;
 }
 
-void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton)
+void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton, int count)
 {
     if (!m_pWebView)
         return;
@@ -355,7 +355,7 @@ void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton)
     // Save mouse button states
     m_mouseButtonStates[static_cast<int>(mouseButton)] = true;
 
-    m_pWebView->GetHost()->SendMouseClickEvent(mouseEvent, static_cast<CefBrowserHost::MouseButtonType>(mouseButton), false, 1);
+    m_pWebView->GetHost()->SendMouseClickEvent(mouseEvent, static_cast<CefBrowserHost::MouseButtonType>(mouseButton), false, count);
 }
 
 void CWebView::InjectMouseUp(eWebBrowserMouseButton mouseButton)
@@ -410,7 +410,7 @@ bool CWebView::SetAudioVolume(float fVolume)
 
     for (auto& name : frameNames)
     {
-        auto frame = m_pWebView->GetFrame(name);
+        auto frame = m_pWebView->GetFrameByName(name);
         frame->ExecuteJavaScript(strJSCode, "", 0);
     }
     m_fVolume = fVolume;

@@ -2019,6 +2019,109 @@ struct SFunBugsStateSync : public ISyncStructure
 
 //////////////////////////////////////////
 //                                      //
+//    World special properties state    //
+//                                      //
+//////////////////////////////////////////
+struct SWorldSpecialPropertiesStateSync : public ISyncStructure
+{
+    enum
+    {
+        BITCOUNT = 12
+    };
+    enum
+    {
+        BITCOUNT2 = 1
+    };
+    enum
+    {
+        BITCOUNT3 = 1
+    };
+
+    bool Read(NetBitStreamInterface& bitStream)
+    {
+        bool isOK = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
+         else
+             data2.fireballdestruct = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data3), BITCOUNT3);
+         else
+             data3.roadsignstext = true;
+
+
+        //// Example for adding item:
+        // if (bitStream.Can(eBitStreamVersion::YourProperty))
+        //     isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data9), BITCOUNT9);
+        // else
+        //     data9.YourPropertyVariable = DefaultState (true / false);
+
+        return isOK;
+    }
+    void Write(NetBitStreamInterface& bitStream) const
+    {
+        bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
+
+        //// Example for adding item:
+        // if (bitStream.Can(eBitStreamVersion::YourProperty))
+        //     bitStream.WriteBits(reinterpret_cast<const char*>(&data9), BITCOUNT9);
+    }
+
+    struct
+    {
+        bool hovercars : 1;
+        bool aircars : 1;
+        bool extrabunny : 1;
+        bool extrajump : 1;
+        bool randomfoliage : 1;
+        bool snipermoon : 1;
+        bool extraairresistance : 1;
+        bool underworldwarp : 1;
+        bool vehiclesunglare : 1;
+        bool coronaztest : 1;
+        bool watercreatures : 1;
+        bool burnflippedcars : 1;
+    } data;
+
+    // Add new ones in separate structs
+    struct
+    {
+        bool fireballdestruct : 1;
+    } data2;
+
+    struct
+    {
+        bool roadsignstext : 1;
+    } data3;
+
+    SWorldSpecialPropertiesStateSync()
+    {
+        // Set default states
+        data.hovercars = false;
+        data.aircars = false;
+        data.extrabunny = false;
+        data.extrajump = false;
+        data.randomfoliage = true;
+        data.snipermoon = false;
+        data.extraairresistance = true;
+        data.underworldwarp = true;
+        data.vehiclesunglare = false;
+        data.coronaztest = true;
+        data.watercreatures = true;
+        data.burnflippedcars = true;
+        data2.fireballdestruct = true;
+        data3.roadsignstext = true;
+    }
+};
+
+//////////////////////////////////////////
+//                                      //
 //             Quit reasons             //
 //                                      //
 //////////////////////////////////////////

@@ -51,6 +51,14 @@ struct SLineOfSightBuildingResult
     CEntitySAInterface* pInterface;
 };
 
+struct SProcessLineOfSightMaterialInfoResult {
+    CVector2D   uv;            //< On-texture UV coordinates of the intersection point
+    const char* textureName;   //< GTA texture name
+    const char* frameName;     //< The name of the frame the hit geometry belongs to
+    CVector     hitPos;        //< Precise hit position on the clump [World space]
+    bool        valid{};       //< Data found in this struct is only valid if this is `true`!
+};
+
 struct SBuildingRemoval
 {
     SBuildingRemoval()
@@ -87,15 +95,27 @@ struct SBuildingRemoval
     std::list<CEntitySAInterface*>* m_pBinaryRemoveList;
     std::list<CEntitySAInterface*>* m_pDataRemoveList;
 };
+
 struct SIPLInst
 {
-    CVector m_pPosition;
-    CVector m_pRotation;
-    float   m_fRotationCont;
-    WORD    m_nModelIndex;
-    BYTE    m_nInterior;
-    BYTE    m_bLOD;
+    CVector     m_pPosition;
+    CVector4D   m_pRotation;
+    int32_t     m_nModelIndex;
+    union {
+        struct {
+            uint32_t m_nAreaCode : 8;
+            uint32_t m_bRedundantStream : 1;
+            uint32_t m_bDontStream : 1;
+            uint32_t m_bUnderwater : 1;
+            uint32_t m_bTunnel : 1;
+            uint32_t m_bTunnelTransition : 1;
+            uint32_t m_nReserved : 19;
+        };
+        uint32_t m_nInstanceType;
+    };
+    int32_t m_nLodInstanceIndex;
 };
+static_assert(sizeof(SIPLInst) == 0x28, "Invalid sizeof(SIPLInst)");
 
 struct sDataBuildingRemovalItem
 {
@@ -146,7 +166,9 @@ enum eDebugCaller
     CCivPed_Constructor,
     CCivPed_Destructor,
     CBuilding_Destructor,
-
+    CBuildingPool_Constructor,
+    CBuildingPool_Destructor,
+    CBuilding_SetLod,
 };
 
 enum eSurfaceProperties
@@ -305,10 +327,12 @@ class CWorld
 {
 public:
     virtual void  Add(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Add(CEntitySAInterface* entity, eDebugCaller CallerId) = 0;
     virtual void  Remove(CEntity* entity, eDebugCaller CallerId) = 0;
     virtual void  Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
+    virtual auto  ProcessLineAgainstMesh(CEntitySAInterface* e, CVector start, CVector end) -> SProcessLineOfSightMaterialInfoResult = 0;
     virtual bool  ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd, CColPoint** colCollision, CEntity** CollisionEntity,
-                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL) = 0;
+                                     const SLineOfSightFlags flags = SLineOfSightFlags(), SLineOfSightBuildingResult* pBuildingResult = NULL, SProcessLineOfSightMaterialInfoResult* outMatInfo = {}) = 0;
     virtual void  IgnoreEntity(CEntity* entity) = 0;
     virtual float FindGroundZFor3DPosition(CVector* vecPosition) = 0;
     virtual float FindRoofZFor3DCoord(CVector* pvecPosition, bool* pbOutResult) = 0;

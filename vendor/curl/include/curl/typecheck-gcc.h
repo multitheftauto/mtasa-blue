@@ -275,11 +275,13 @@ CURLWARNING(_curl_easy_getinfo_err_curl_off_t,
    (option) == CURLOPT_DNS_LOCAL_IP6 ||                                       \
    (option) == CURLOPT_DNS_SERVERS ||                                         \
    (option) == CURLOPT_DOH_URL ||                                             \
+   (option) == CURLOPT_ECH        ||                                          \
    (option) == CURLOPT_EGDSOCKET ||                                           \
    (option) == CURLOPT_FTP_ACCOUNT ||                                         \
    (option) == CURLOPT_FTP_ALTERNATIVE_TO_USER ||                             \
    (option) == CURLOPT_FTPPORT ||                                             \
    (option) == CURLOPT_HSTS ||                                                \
+   (option) == CURLOPT_HAPROXY_CLIENT_IP ||                                   \
    (option) == CURLOPT_INTERFACE ||                                           \
    (option) == CURLOPT_ISSUERCERT ||                                          \
    (option) == CURLOPT_KEYPASSWD ||                                           \

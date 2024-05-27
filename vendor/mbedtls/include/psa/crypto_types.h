@@ -15,19 +15,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
 #ifndef PSA_CRYPTO_TYPES_H
@@ -295,7 +283,7 @@ typedef uint32_t psa_key_id_t;
 typedef psa_key_id_t mbedtls_svc_key_id_t;
 
 #else /* MBEDTLS_PSA_CRYPTO_KEY_ID_ENCODES_OWNER */
-/* Implementation-specific: The Mbed Cryptography library can be built as
+/* Implementation-specific: The Mbed TLS library can be built as
  * part of a multi-client service that exposes the PSA Cryptography API in each
  * client and encodes the client identity in the key identifier argument of
  * functions such as psa_open_key().
@@ -437,7 +425,7 @@ typedef struct psa_key_attributes_s psa_key_attributes_t;
 
 #ifndef __DOXYGEN_ONLY__
 #if defined(MBEDTLS_PSA_CRYPTO_SE_C)
-/* Mbed Crypto defines this type in crypto_types.h because it is also
+/* Mbed TLS defines this type in crypto_types.h because it is also
  * visible to applications through an implementation-specific extension.
  * For the PSA Cryptography specification, this type is only visible
  * via crypto_se_driver.h. */

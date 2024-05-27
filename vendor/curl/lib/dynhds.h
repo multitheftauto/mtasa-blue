@@ -137,6 +137,7 @@ size_t Curl_dynhds_remove(struct dynhds *dynhds,
                           const char *name, size_t namelen);
 size_t Curl_dynhds_cremove(struct dynhds *dynhds, const char *name);
 
+
 /**
  * Set the give header name and value, replacing any entries with
  * the same name. The header is added at the end of all (remaining)
@@ -145,6 +146,7 @@ size_t Curl_dynhds_cremove(struct dynhds *dynhds, const char *name);
 CURLcode Curl_dynhds_set(struct dynhds *dynhds,
                          const char *name, size_t namelen,
                          const char *value, size_t valuelen);
+
 CURLcode Curl_dynhds_cset(struct dynhds *dynhds,
                           const char *name, const char *value);
 
@@ -168,5 +170,14 @@ CURLcode Curl_dynhds_h1_add_line(struct dynhds *dynhds,
  * cr+lf line endings. Will NOT output a last empty line.
  */
 CURLcode Curl_dynhds_h1_dprint(struct dynhds *dynhds, struct dynbuf *dbuf);
+
+#ifdef USE_NGHTTP2
+
+#include <stdint.h>
+#include <nghttp2/nghttp2.h>
+
+nghttp2_nv *Curl_dynhds_to_nva(struct dynhds *dynhds, size_t *pcount);
+
+#endif /* USE_NGHTTP2 */
 
 #endif /* HEADER_CURL_DYNHDS_H */

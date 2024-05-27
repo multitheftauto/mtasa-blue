@@ -363,6 +363,18 @@ void CSettings::CreateGUI()
     m_pEditNick->SetMaxLength(MAX_PLAYER_NICK_LENGTH);
     m_pEditNick->SetTextAcceptedHandler(GUI_CALLBACK(&CSettings::OnOKButtonClick, this));
 
+    m_pButtonGenerateNick = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabMultiplayer));
+    m_pButtonGenerateNick->SetPosition(CVector2D(vecSize.fX + vecTemp.fX + 50.0f + 178.0f + 5.0f, vecTemp.fY - 1.0f), false);
+    m_pButtonGenerateNick->SetSize(CVector2D(26.0f, 26.0f), false);
+    m_pButtonGenerateNick->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickButtonClick, this));
+    m_pButtonGenerateNick->SetZOrderingEnabled(false);
+
+    m_pButtonGenerateNickIcon = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pButtonGenerateNick));
+    m_pButtonGenerateNickIcon->SetSize(CVector2D(1, 1), true);
+    m_pButtonGenerateNickIcon->LoadFromFile("cgui\\images\\serverbrowser\\refresh.png");
+    m_pButtonGenerateNickIcon->SetProperty("MousePassThroughEnabled", "True");
+    m_pButtonGenerateNickIcon->SetProperty("DistributeCapturedInputs", "True");
+
     m_pSavePasswords = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save server passwords"), true));
     m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 50.0f));
     m_pSavePasswords->GetPosition(vecTemp, false);
@@ -387,6 +399,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAlwaysShowTransferBox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
     m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
+
+    m_pCheckBoxAllowDiscordRPC = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), false));
+    m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -1252,6 +1269,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
     m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
+    m_pCheckBoxAllowDiscordRPC->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowDiscordRPC, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
@@ -2934,6 +2952,12 @@ bool CSettings::OnOKButtonClick(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnNickButtonClick(CGUIElement* pElement)
+{
+    m_pEditNick->SetText(CNickGen::GetRandomNickname());
+    return true;
+}
+
 bool CSettings::OnCancelButtonClick(CGUIElement* pElement)
 {
     CMainMenu* pMainMenu = CLocalGUI::GetSingleton().GetMainMenu();
@@ -3009,6 +3033,11 @@ void CSettings::LoadData()
     bool alwaysShowTransferBox = false;
     CVARS_GET("always_show_transferbox", alwaysShowTransferBox);
     m_pCheckBoxAlwaysShowTransferBox->SetSelected(alwaysShowTransferBox);
+
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC;
+    CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
+    m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -3435,6 +3464,31 @@ void CSettings::SaveData()
     bool alwaysShowTransferBox = m_pCheckBoxAlwaysShowTransferBox->GetSelected();
     CVARS_SET("always_show_transferbox", alwaysShowTransferBox);
     g_pCore->GetModManager()->TriggerCommand(mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX, alwaysShowTransferBox);
+
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    CVARS_SET("allow_discord_rpc", bAllowDiscordRPC);
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(bAllowDiscordRPC);
+
+    if (bAllowDiscordRPC)
+    {
+        const auto discord = g_pCore->GetDiscord();
+
+        if (discord)
+        {
+            const char* state = _("Main menu");
+
+            if (g_pCore->IsConnected())
+            {                
+                state = _("In-game");
+
+                const SString& serverName = g_pCore->GetLastConnectedServerName();
+                discord->SetPresenceDetails(serverName.c_str(), false);
+            }
+
+            discord->SetPresenceState(state, false);
+        }
+    }
 
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
@@ -4472,6 +4526,43 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
         CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
+}
+
+//
+// DiscordRPC
+//
+bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
+{
+    bool isEnabled = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(isEnabled);
+
+    if (isEnabled)
+        ShowRichPresenceShareDataQuestionBox(); // show question box
+
+    return true;
+}
+
+static void ShowRichPresenceShareDataCallback(void* ptr, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    CVARS_SET("discord_rpc_share_data", static_cast<bool>(uiButton));
+}
+
+void CSettings::ShowRichPresenceShareDataQuestionBox() const
+{
+    SStringX strMessage(
+        _("It seems that you have the Rich Presence connection option enabled."
+          "\nDo you want to allow servers to share their data?"
+          "\n\nThis includes yours unique ID identifier."));
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("CONSENT TO ALLOW DATA SHARING"));
+    pQuestionBox->SetMessage(strMessage);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(ShowRichPresenceShareDataCallback);
+    pQuestionBox->Show();
 }
 
 //

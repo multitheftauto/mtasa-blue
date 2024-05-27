@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "game/CStreaming.h"
 
 CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelType eModelType)
 {
@@ -50,6 +51,13 @@ bool CClientModel::Allocate(ushort usParentID)
                 return true;
             }
             break;
+        case eClientModelType::CLUMP:
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            {
+                pModelInfo->MakeClumpModel(usParentID);
+                return true;
+            }
+            break;
         case eClientModelType::TIMED_OBJECT:
             if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
             {
@@ -70,20 +78,59 @@ bool CClientModel::Allocate(ushort usParentID)
     return false;
 }
 
-bool CClientModel::Deallocate(void)
+// You can call it only in destructor for DFF.
+bool CClientModel::Deallocate()
 {
     if (!m_bAllocatedByUs)
         return false;
+
+    SetParentResource(nullptr);
+
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
     if (!pModelInfo || !pModelInfo->IsValid())
         return false;
-    pModelInfo->DeallocateModel();
-    SetParentResource(nullptr);
+
+    if (m_eModelType != eClientModelType::TXD)
+    {
+        // Remove model info
+        pModelInfo->DeallocateModel();
+    }
+
     return true;
 }
 
 void CClientModel::RestoreEntitiesUsingThisModel()
 {
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
+    if (!pModelInfo || !pModelInfo->IsValid())
+        return;
+
+    switch (m_eModelType)
+    {
+        case eClientModelType::PED:
+        case eClientModelType::OBJECT:
+        case eClientModelType::CLUMP:
+        case eClientModelType::TIMED_OBJECT:
+        case eClientModelType::VEHICLE:
+            RestoreDFF(pModelInfo);
+            return;
+        case eClientModelType::TXD:
+            RestoreTXD(pModelInfo);
+            return;
+        default:
+            return;
+    }
+}
+
+void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
+{
+    auto callElementChangeEvent = [](auto &element, unsigned short usParentID, auto modelId) {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(modelId);
+        Arguments.PushNumber(usParentID);
+        element.CallEvent("onClientElementModelChange", Arguments, true);
+    };
+
     auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
@@ -97,10 +144,21 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 
             setElementModelLambda(element);
 
-            CLuaArguments Arguments;
-            Arguments.PushNumber(m_iModelID);
-            Arguments.PushNumber(usParentID);
-            element.CallEvent("onClientElementModelChange", Arguments, true);
+            callElementChangeEvent(element, usParentID, m_iModelID);
+        }
+    };
+
+    auto unloadModelsAndCallEventsNonStreamed = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    {
+        for (auto iter = iterBegin; iter != iterEnd; iter++)
+        {
+            auto& element = **iter;
+
+            if (element.GetModel() != m_iModelID)
+                continue;
+
+            setElementModelLambda(element);
+            callElementChangeEvent(element, usParentID, m_iModelID);
         }
     };
 
@@ -114,6 +172,7 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
             break;
         }
+        case eClientModelType::CLUMP:
         case eClientModelType::OBJECT:
         case eClientModelType::TIMED_OBJECT:
         {
@@ -126,6 +185,12 @@ void CClientModel::RestoreEntitiesUsingThisModel()
             CClientPickupManager* pPickupManager = g_pClientGame->GetManager()->GetPickupManager();
 
             unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+
+            // Restore buildings
+            CClientBuildingManager* pBuildingsManager = g_pClientGame->GetManager()->GetBuildingManager();
+            auto&                   buildingsList = pBuildingsManager->GetBuildings();
+            unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID,
+                                      [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);
@@ -144,4 +209,31 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 
     // Restore DFF/TXD
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(m_iModelID);
+}
+
+bool CClientModel::AllocateTXD(std::string &strTxdName)
+{
+    uint uiSlotID = g_pGame->GetPools()->AllocateTextureDictonarySlot(m_iModelID - MAX_MODEL_DFF_ID, strTxdName);
+    if (uiSlotID != -1)
+    {
+        m_bAllocatedByUs = true;
+        return true;
+    }
+    return false;
+}
+
+void CClientModel::RestoreTXD(CModelInfo* pModelInfo)
+{
+    uint uiTextureDictonarySlotID = pModelInfo->GetModel() - MAX_MODEL_DFF_ID;
+
+    for (uint uiModelID = 0; uiModelID < MAX_MODEL_DFF_ID; uiModelID++)
+    {
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID, true);
+
+        if (pModelInfo->GetTextureDictionaryID() == uiTextureDictonarySlotID)
+            pModelInfo->SetTextureDictionaryID(0);
+    }
+
+    g_pGame->GetPools()->RemoveTextureDictonarySlot(uiTextureDictonarySlotID);
+    g_pGame->GetStreaming()->SetStreamingInfo(pModelInfo->GetModel(), 0, 0, 0, -1);
 }

@@ -118,7 +118,7 @@ typedef struct CURLMsg CURLMsg;
 struct curl_waitfd {
   curl_socket_t fd;
   short events;
-  short revents; /* not supported yet */
+  short revents;
 };
 
 /*
@@ -426,6 +426,17 @@ CURL_EXTERN CURLMcode curl_multi_setopt(CURLM *multi_handle,
 CURL_EXTERN CURLMcode curl_multi_assign(CURLM *multi_handle,
                                         curl_socket_t sockfd, void *sockp);
 
+/*
+ * Name:    curl_multi_get_handles()
+ *
+ * Desc:    Returns an allocated array holding all handles currently added to
+ *          the multi handle. Marks the final entry with a NULL pointer. If
+ *          there is no easy handle added to the multi handle, this function
+ *          returns an array with the first entry as a NULL pointer.
+ *
+ * Returns: NULL on failure, otherwise a CURL **array pointer
+ */
+CURL_EXTERN CURL **curl_multi_get_handles(CURLM *multi_handle);
 
 /*
  * Name: curl_push_callback
@@ -452,6 +463,20 @@ typedef int (*curl_push_callback)(CURL *parent,
                                   size_t num_headers,
                                   struct curl_pushheaders *headers,
                                   void *userp);
+
+/*
+ * Name:    curl_multi_waitfds()
+ *
+ * Desc:    Ask curl for fds for polling. The app can use these to poll on.
+ *          We want curl_multi_perform() called as soon as one of them are
+ *          ready. Passing zero size allows to get just a number of fds.
+ *
+ * Returns: CURLMcode type, general multi error code.
+ */
+CURL_EXTERN CURLMcode curl_multi_waitfds(CURLM *multi,
+                                         struct curl_waitfd *ufds,
+                                         unsigned int size,
+                                         unsigned int *fd_count);
 
 #ifdef __cplusplus
 } /* end of extern "C" */

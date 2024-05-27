@@ -1,8 +1,12 @@
-## Multi Theft Auto: San Andreas 
+## Multi Theft Auto: San Andreas
 
 [![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Unique servers online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Fservers-shields.io.json)](https://community.multitheftauto.com/index.php?p=servers) [![Unique players online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Fplayers-shields.io.json)](https://multitheftauto.com) [![Unique players last 24 hours](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Funique-players-shields.io.json)](https://multitheftauto.com) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://discord.com/invite/mtasa) [![Crowdin](https://badges.crowdin.net/e/f5dba7b9aa6594139af737c85d81d3aa/localized.svg)](https://multitheftauto.crowdin.com/multitheftauto)
 
 [Multi Theft Auto](https://www.multitheftauto.com/) (MTA) is a software project that adds network play functionality to Rockstar North's Grand Theft Auto game series, in which this functionality is not originally found. It is a unique modification that incorporates an extendable network play element into a proprietary commercial single-player PC game.
+
+> **Note**
+> If you're a fork developer, please read this note carefully. We have changed the default build type back to *CUSTOM* in `Shared/sdk/version.h`. If you're developing without the anti-cheat in mind, say in the Debug configuration, this doesn't affect you at all. Now, if you plan to test your custom client with anti-cheat enabled, you should change your build type to `UNTESTED`. If you want to publish a release of your custom client, you must switch to a *fork support* hardened release of `netc.dll`.
+> Please read our [Forks_Full_AC](https://wiki.multitheftauto.com/wiki/Forks_Full_AC) wiki page for more information.
 
 ## Introduction
 

@@ -119,6 +119,7 @@ public:
     bool IsActive();
 
     void SetSelectedIndex(unsigned int uiIndex);
+    void ShowRichPresenceShareDataQuestionBox() const;
 
 protected:
     const static int SecKeyNum = 3;            // Number of secondary keys
@@ -131,6 +132,8 @@ protected:
     CGUIButton*   m_pButtonOK;
     CGUIButton*   m_pButtonCancel;
     CGUILabel*    m_pLabelNick;
+    CGUIButton*   m_pButtonGenerateNick;
+    CGUIStaticImage*   m_pButtonGenerateNickIcon;
     CGUIEdit*     m_pEditNick;
     CGUICheckBox* m_pSavePasswords;
     CGUICheckBox* m_pAutoRefreshBrowser;
@@ -154,6 +157,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxAllowScreenUpload;
     CGUICheckBox*  m_pCheckBoxAllowExternalSounds;
     CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
+    CGUICheckBox*  m_pCheckBoxAllowDiscordRPC;
     CGUICheckBox*  m_pCheckBoxAlwaysShowTransferBox;
     CGUICheckBox*  m_pCheckBoxGrass;
     CGUICheckBox*  m_pCheckBoxHeatHaze;
@@ -345,6 +349,7 @@ protected:
     bool OnVideoDefaultClick(CGUIElement* pElement);
     bool OnBindsListClick(CGUIElement* pElement);
     bool OnOKButtonClick(CGUIElement* pElement);
+    bool OnNickButtonClick(CGUIElement* pElement);
     bool OnCancelButtonClick(CGUIElement* pElement);
     bool OnFieldOfViewChanged(CGUIElement* pElement);
     bool OnDrawDistanceChanged(CGUIElement* pElement);
@@ -389,6 +394,7 @@ protected:
     bool OnVolumetricShadowsClick(CGUIElement* pElement);
     bool OnAllowScreenUploadClick(CGUIElement* pElement);
     bool OnAllowExternalSoundsClick(CGUIElement* pElement);
+    bool OnAllowDiscordRPC(CGUIElement* pElement);
     bool OnCustomizedSAFilesClick(CGUIElement* pElement);
     bool ShowUnsafeResolutionsClick(CGUIElement* pElement);
     bool OnWindowedClick(CGUIElement* pElement);

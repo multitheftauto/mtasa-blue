@@ -264,21 +264,23 @@ class CPedSA : public virtual CPed, public virtual CPhysicalSA
     friend class CPoolsSA;
 
 private:
-    CWeaponSA*          m_pWeapons[WEAPONSLOT_MAX];
-    CPedIKSA*           m_pPedIK;
-    CPedIntelligenceSA* m_pPedIntelligence;
-    CPedSAInterface*    m_pPedInterface;
-    CPedSoundSA*        m_pPedSound;
+    CWeaponSA*          m_pWeapons[WEAPONSLOT_MAX]{};
+    CPedIKSA*           m_pPedIK{};
+    CPedIntelligenceSA* m_pPedIntelligence{};
+    CPedSAInterface*    m_pPedInterface{};
+    CPedSoundSA*        m_pPedSound{};
+
+    short m_sDefaultVoiceType;
+    short m_sDefaultVoiceID;
 
     DWORD         m_dwType;
     unsigned char m_ucOccupiedSeat;
 
 protected:
-    int m_iCustomMoveAnim;
+    int m_iCustomMoveAnim{ 0 };
 
 public:
-    CPedSA();
-    CPedSA(CPedSAInterface* pedInterface);
+    CPedSA(CPedSAInterface* pedInterface = nullptr) noexcept;
     ~CPedSA();
 
     void             SetInterface(CEntitySAInterface* intInterface);
@@ -383,6 +385,7 @@ public:
     void GetVoice(const char** pszVoiceType, const char** pszVoice);
     void SetVoice(short sVoiceType, short sVoiceID);
     void SetVoice(const char* szVoiceType, const char* szVoice);
+    void ResetVoice();
     void SetLanding(bool bIsLanding) { GetPedInterface()->pedFlags.bIsLanding = bIsLanding; }
     void SetUpdateMetricsRequired(bool required) { GetPedInterface()->pedFlags.bUpdateMatricesRequired = required; }
 

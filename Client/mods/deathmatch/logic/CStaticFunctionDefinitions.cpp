@@ -426,6 +426,16 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
             }
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            pBuilding.GetRotationDegrees(vecRotation);
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
+            break;
+        }
         case CCLIENTPROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
@@ -760,6 +770,12 @@ bool CStaticFunctionDefinitions::GetElementModel(CClientEntity& Entity, unsigned
         {
             CClientPickup& pPickup = static_cast<CClientPickup&>(Entity);
             usModel = pPickup.GetModel();
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            usModel = pBuilding.GetModel();
             break;
         }
         case CCLIENTPROJECTILE:
@@ -1105,6 +1121,19 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
                 Object.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY));
             }
 
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
+            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
+            {
+                pBuilding.SetRotationDegrees(vecRotation);
+            }
+            else
+            {
+                pBuilding.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY));
+            }
             break;
         }
         case CCLIENTPROJECTILE:
@@ -1461,6 +1490,26 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 {
     RUN_CHILDREN(SetElementModel(**iter, usModel))
 
+    auto callOnChangeEvent = [](auto &element, uint16_t usCurrentModel, uint16_t usModel) {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(usCurrentModel);
+        Arguments.PushNumber(usModel);
+        bool bContinue = element.CallEvent("onClientElementModelChange", Arguments, true);
+
+        // Check for another call to setElementModel
+        if (usModel != element.GetModel())
+            return false;
+
+        if (!bContinue)
+        {
+            // Change canceled
+            element.SetModel(usCurrentModel);
+            return false;
+        }
+
+        return true;
+    };
+
     switch (Entity.GetType())
     {
         case CCLIENTPED:
@@ -1476,23 +1525,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             if (!Ped.SetModel(usModel))
                 return false;
 
-            CLuaArguments Arguments;
-            Arguments.PushNumber(usCurrentModel);
-            Arguments.PushNumber(usModel);
-            bool bContinue = Ped.CallEvent("onClientElementModelChange", Arguments, true);
-
-            // Check for another call to setElementModel
-            if (usModel != Ped.GetModel())
-                return false;
-
-            if (!bContinue)
-            {
-                // Change canceled
-                Ped.SetModel(usCurrentModel);
-                return false;
-            }
-
-            break;
+            return callOnChangeEvent(Ped, usCurrentModel, usModel);
         }
         case CCLIENTVEHICLE:
         {
@@ -1539,23 +1572,22 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
             Object.SetModel(usModel);
 
-            CLuaArguments Arguments;
-            Arguments.PushNumber(usCurrentModel);
-            Arguments.PushNumber(usModel);
-            bool bContinue = Object.CallEvent("onClientElementModelChange", Arguments, true);
+            return callOnChangeEvent(Object, usCurrentModel, usModel);
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding&     Object = static_cast<CClientBuilding&>(Entity);
+            const unsigned short usCurrentModel = Object.GetModel();
 
-            // Check for another call to setElementModel
-            if (usModel != Object.GetModel())
+            if (usCurrentModel == usModel)
                 return false;
 
-            if (!bContinue)
-            {
-                // Change canceled
-                Object.SetModel(usCurrentModel);
+            if (!CClientObjectManager::IsValidModel(usModel))
                 return false;
-            }
 
-            break;
+            Object.SetModel(usModel);
+
+            return callOnChangeEvent(Object, usCurrentModel, usModel);
         }
         case CCLIENTPROJECTILE:
         {
@@ -1570,11 +1602,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
             Projectile.SetModel(usModel);
 
-            CLuaArguments Arguments;
-            Arguments.PushNumber(usCurrentModel);
-            Arguments.PushNumber(usModel);
-            Projectile.CallEvent("onClientElementModelChange", Arguments, true);
-            break;
+            return callOnChangeEvent(Projectile, usCurrentModel, usModel);
         }
         default:
             return false;
@@ -3802,13 +3830,26 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CClientEntity& Entity, CClient
 {
     RUN_CHILDREN(SetLowLodElement(**iter, pLowLodEntity))
 
-    switch (Entity.GetType())
+    eClientEntityType entityType = Entity.GetType();
+
+    if (pLowLodEntity != nullptr && entityType != pLowLodEntity->GetType())
+        return false;
+
+    switch (entityType)
     {
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             CClientObject* pLowLodObject = static_cast<CClientObject*>(pLowLodEntity);
             if (!Object.SetLowLodObject(pLowLodObject))
+                return false;
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            CClientBuilding* pLowLodBuilding = static_cast<CClientBuilding*>(pLowLodEntity);
+            if (!Building.SetLowLodBuilding(pLowLodBuilding))
                 return false;
             break;
         }
@@ -3831,6 +3872,12 @@ bool CStaticFunctionDefinitions::GetLowLodElement(CClientEntity& Entity, CClient
             pOutLowLodEntity = Object.GetLowLodObject();
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            pOutLowLodEntity = Building.GetLowLodBuilding();
+            break;
+        }
         default:
             return false;
     }
@@ -3848,6 +3895,12 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CClientEntity& Entity, bool& bO
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             bOutIsLowLod = Object.IsLowLod();
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            bOutIsLowLod = Building.IsLod();
             break;
         }
         default:
@@ -4973,7 +5026,7 @@ bool CStaticFunctionDefinitions::FadeCamera(bool bFadeIn, float fFadeTime, unsig
 
 bool CStaticFunctionDefinitions::GetCursorPosition(CVector2D& vecCursor, CVector& vecWorld)
 {
-    if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled())
+    if (m_pClientGame->AreCursorEventsEnabled() || GUIGetInputEnabled() || g_pCore->GetConsole()->IsVisible() || g_pCore->IsChatInputEnabled())
     {
         tagPOINT point;
         GetCursorPos(&point);
@@ -5030,7 +5083,11 @@ bool CStaticFunctionDefinitions::SetCursorAlpha(float fAlpha)
 {
     if (fAlpha >= 0.0f && fAlpha <= 1.0f)
     {
-        m_pGUI->SetCursorAlpha(fAlpha, true);
+        if (!m_pCore->IsMenuVisible() && !m_pCore->GetConsole()->IsVisible())
+            m_pGUI->SetCursorAlpha(fAlpha, true);
+        else
+            m_pGUI->SetCurrentServerCursorAlpha(fAlpha);
+
         return true;
     }
     return false;
@@ -6312,7 +6369,7 @@ bool CStaticFunctionDefinitions::SetTime(unsigned char ucHour, unsigned char ucM
 
 bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, const CVector& vecEnd, bool& bCollision, CColPoint** pColPoint,
                                                     CClientEntity** pColEntity, const SLineOfSightFlags& flags, CEntity* pIgnoredEntity,
-                                                    SLineOfSightBuildingResult* pBuildingResult)
+                                                    SLineOfSightBuildingResult* pBuildingResult, SProcessLineOfSightMaterialInfoResult* outMatInfo)
 {
     assert(pColPoint);
     assert(pColEntity);
@@ -6321,7 +6378,7 @@ bool CStaticFunctionDefinitions::ProcessLineOfSight(const CVector& vecStart, con
         g_pGame->GetWorld()->IgnoreEntity(pIgnoredEntity);
 
     CEntity* pColGameEntity = 0;
-    bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult);
+    bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&vecStart, &vecEnd, pColPoint, &pColGameEntity, flags, pBuildingResult, outMatInfo);
 
     if (pIgnoredEntity)
         g_pGame->GetWorld()->IgnoreEntity(NULL);
@@ -6634,11 +6691,6 @@ bool CStaticFunctionDefinitions::GetWindVelocity(float& fX, float& fY, float& fZ
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsWorldSpecialPropertyEnabled(const char* szPropName)
-{
-    return g_pGame->IsCheatEnabled(szPropName);
-}
-
 bool CStaticFunctionDefinitions::GetTrafficLightState(unsigned char& ucState)
 {
     ucState = g_pMultiplayer->GetTrafficLightState();
@@ -6824,11 +6876,6 @@ bool CStaticFunctionDefinitions::SetGarageOpen(unsigned char ucGarageID, bool bI
     }
 
     return false;
-}
-
-bool CStaticFunctionDefinitions::SetWorldSpecialPropertyEnabled(const char* szPropName, bool bEnabled)
-{
-    return g_pGame->SetCheatEnabled(szPropName, bEnabled);
 }
 
 bool CStaticFunctionDefinitions::SetCloudsEnabled(bool bEnabled)
@@ -8806,9 +8853,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8825,9 +8869,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, unsigned int uiValue)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
@@ -8846,9 +8887,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8865,9 +8903,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eHandlingProperty eProperty, std::string strValue)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
@@ -8886,9 +8921,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 {
     assert(pVehicle);
 
-    if (!pVehicle->IsLocalEntity())
-        return false;
-
     CHandlingEntry* pEntry = pVehicle->GetHandlingData();
 
     if (pEntry)
@@ -8906,9 +8938,6 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, eH
 bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     eVehicleTypes         eModel = (eVehicleTypes)pVehicle->GetModel();
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
@@ -8971,9 +9000,6 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
 bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pVehicle, eHandlingProperty eProperty)
 {
     assert(pVehicle);
-
-    if (!pVehicle->IsLocalEntity())
-        return false;
 
     CHandlingEntry*       pEntry = pVehicle->GetHandlingData();
     const CHandlingEntry* pOrigEntry = pVehicle->GetOriginalHandlingData();

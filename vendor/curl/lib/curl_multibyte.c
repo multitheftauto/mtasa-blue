@@ -32,7 +32,7 @@
 
 #include "curl_setup.h"
 
-#if defined(WIN32)
+#if defined(_WIN32)
 
 #include "curl_multibyte.h"
 
@@ -84,7 +84,7 @@ char *curlx_convert_wchar_to_UTF8(const wchar_t *str_w)
   return str_utf8;
 }
 
-#endif /* WIN32 */
+#endif /* _WIN32 */
 
 #if defined(USE_WIN32_LARGE_FILES) || defined(USE_WIN32_SMALL_FILES)
 
@@ -156,23 +156,6 @@ int curlx_win32_stat(const char *path, struct_stat *buffer)
 #else
   return _stati64(path, buffer);
 #endif
-#endif
-}
-
-int curlx_win32_access(const char *path, int mode)
-{
-#if defined(_UNICODE)
-  int result = -1;
-  wchar_t *path_w = curlx_convert_UTF8_to_wchar(path);
-  if(path_w) {
-    result = _waccess(path_w, mode);
-    curlx_unicodefree(path_w);
-  }
-  else
-    errno = EINVAL;
-  return result;
-#else
-  return _access(path, mode);
 #endif
 }
 

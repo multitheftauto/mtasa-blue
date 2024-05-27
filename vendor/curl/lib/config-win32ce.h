@@ -50,15 +50,6 @@
 /* Define if you have the <netinet/in.h> header file.  */
 /* #define HAVE_NETINET_IN_H 1 */
 
-/* Define if you have the <signal.h> header file. */
-#define HAVE_SIGNAL_H 1
-
-/* Define if you have the <ssl.h> header file.  */
-/* #define HAVE_SSL_H 1 */
-
-/* Define if you have the <stdlib.h> header file.  */
-#define HAVE_STDLIB_H 1
-
 /* Define if you have the <sys/param.h> header file.  */
 /* #define HAVE_SYS_PARAM_H 1 */
 
@@ -89,22 +80,10 @@
 /* Define if you have the <termios.h> header file.  */
 /* #define HAVE_TERMIOS_H 1 */
 
-/* Define if you have the <time.h> header file.  */
-#define HAVE_TIME_H 1
-
 /* Define if you have the <unistd.h> header file.  */
-#if defined(__MINGW32__) || defined(__LCC__)
+#if defined(__MINGW32__)
 #define HAVE_UNISTD_H 1
 #endif
-
-/* Define if you have the <windows.h> header file.  */
-#define HAVE_WINDOWS_H 1
-
-/* Define if you have the <winsock2.h> header file.  */
-#define HAVE_WINSOCK2_H 1
-
-/* Define if you have the <ws2tcpip.h> header file.  */
-#define HAVE_WS2TCPIP_H 1
 
 /* ---------------------------------------------------------------- */
 /*                        OTHER HEADER INFO                         */
@@ -112,9 +91,6 @@
 
 /* Define if you have the ANSI C header files.  */
 #define STDC_HEADERS 1
-
-/* Define if you can safely include both <sys/time.h> and <time.h>.  */
-/* #define TIME_WITH_SYS_TIME 1 */
 
 /* ---------------------------------------------------------------- */
 /*                             FUNCTIONS                            */
@@ -205,8 +181,7 @@
 #define in_addr_t unsigned long
 
 /* Define ssize_t if it is not an available 'typedefed' type */
-#if defined(__POCC__)
-#elif defined(_WIN64)
+#if defined(_WIN64)
 #define ssize_t __int64
 #else
 #define ssize_t int

@@ -30,6 +30,7 @@
 #include "timeval.h"
 
 struct Curl_dns_entry;
+struct ip_quadruple;
 
 /* generic function that returns how much time there's left to run, according
    to the timeouts set */
@@ -52,7 +53,7 @@ bool Curl_addr2string(struct sockaddr *sa, curl_socklen_t salen,
                       char *addr, int *port);
 
 void Curl_persistconninfo(struct Curl_easy *data, struct connectdata *conn,
-                          char *local_ip, int local_port);
+                          struct ip_quadruple *ip);
 
 /*
  * Curl_conncontrol() marks the end of a connection/stream. The 'closeit'
@@ -103,31 +104,6 @@ typedef CURLcode cf_ip_connect_create(struct Curl_cfilter **pcf,
                                       struct connectdata *conn,
                                       const struct Curl_addrinfo *ai,
                                       int transport);
-
-/**
- * Create a happy eyeball connection filter that uses the, once resolved,
- * address information to connect on ip families based on connection
- * configuration.
- * @param pcf        output, the created cfilter
- * @param data       easy handle used in creation
- * @param conn       connection the filter is created for
- * @param cf_create  method to create the sub-filters performing the
- *                   actual connects.
- */
-CURLcode
-Curl_cf_happy_eyeballs_create(struct Curl_cfilter **pcf,
-                              struct Curl_easy *data,
-                              struct connectdata *conn,
-                              cf_ip_connect_create *cf_create,
-                              const struct Curl_dns_entry *remotehost,
-                              int transport);
-
-CURLcode Curl_cf_setup_add(struct Curl_easy *data,
-                           struct connectdata *conn,
-                           int sockindex,
-                           const struct Curl_dns_entry *remotehost,
-                           int transport,
-                           int ssl_mode);
 
 CURLcode Curl_cf_setup_insert_after(struct Curl_cfilter *cf_at,
                                     struct Curl_easy *data,

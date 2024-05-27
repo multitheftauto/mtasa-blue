@@ -35,7 +35,6 @@
 #include "urldata.h"
 
 #include "vauth/vauth.h"
-#include "curl_md5.h"
 #include "warnless.h"
 #include "strtok.h"
 #include "sendf.h"
@@ -108,12 +107,11 @@ CURLcode Curl_auth_create_plain_message(const char *authzid,
  * valuep  [in]     - The user name or user's password.
  * out     [out]    - The result storage.
  *
- * Returns CURLE_OK on success.
+ * Returns void.
  */
-CURLcode Curl_auth_create_login_message(const char *valuep, struct bufref *out)
+void Curl_auth_create_login_message(const char *valuep, struct bufref *out)
 {
   Curl_bufref_set(out, valuep, strlen(valuep), NULL);
-  return CURLE_OK;
 }
 
 /*
@@ -127,13 +125,13 @@ CURLcode Curl_auth_create_login_message(const char *valuep, struct bufref *out)
  * user    [in]     - The user name.
  * out     [out]    - The result storage.
  *
- * Returns CURLE_OK on success.
+ * Returns void.
  */
-CURLcode Curl_auth_create_external_message(const char *user,
+void Curl_auth_create_external_message(const char *user,
                                            struct bufref *out)
 {
   /* This is the same formatting as the login message */
-  return Curl_auth_create_login_message(user, out);
+  Curl_auth_create_login_message(user, out);
 }
 
 #endif /* if no users */

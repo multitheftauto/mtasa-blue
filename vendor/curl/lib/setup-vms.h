@@ -262,7 +262,6 @@ static struct passwd *vms_getpwuid(uid_t uid)
 #define PKCS12_parse PKCS12_PARSE
 #define RAND_add RAND_ADD
 #define RAND_bytes RAND_BYTES
-#define RAND_egd RAND_EGD
 #define RAND_file_name RAND_FILE_NAME
 #define RAND_load_file RAND_LOAD_FILE
 #define RAND_status RAND_STATUS
@@ -375,8 +374,8 @@ static struct passwd *vms_getpwuid(uid_t uid)
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #ifndef AI_NUMERICHOST
-#ifdef ENABLE_IPV6
-#undef ENABLE_IPV6
+#ifdef USE_IPV6
+#undef USE_IPV6
 #endif
 #endif
 #endif

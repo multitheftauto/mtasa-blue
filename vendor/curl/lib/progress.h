@@ -30,7 +30,8 @@
 typedef enum {
   TIMER_NONE,
   TIMER_STARTOP,
-  TIMER_STARTSINGLE,
+  TIMER_STARTSINGLE, /* start of transfer, might get queued */
+  TIMER_POSTQUEUE,   /* start, immediately after dequeue */
   TIMER_NAMELOOKUP,
   TIMER_CONNECT,
   TIMER_APPCONNECT,
@@ -46,7 +47,10 @@ int Curl_pgrsDone(struct Curl_easy *data);
 void Curl_pgrsStartNow(struct Curl_easy *data);
 void Curl_pgrsSetDownloadSize(struct Curl_easy *data, curl_off_t size);
 void Curl_pgrsSetUploadSize(struct Curl_easy *data, curl_off_t size);
-void Curl_pgrsSetDownloadCounter(struct Curl_easy *data, curl_off_t size);
+
+/* It is fine to not check the return code if 'size' is set to 0 */
+CURLcode Curl_pgrsSetDownloadCounter(struct Curl_easy *data, curl_off_t size);
+
 void Curl_pgrsSetUploadCounter(struct Curl_easy *data, curl_off_t size);
 void Curl_ratelimit(struct Curl_easy *data, struct curltime now);
 int Curl_pgrsUpdate(struct Curl_easy *data);

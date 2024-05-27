@@ -44,24 +44,25 @@ struct Curl_message {
 typedef enum {
   MSTATE_INIT,         /* 0 - start in this state */
   MSTATE_PENDING,      /* 1 - no connections, waiting for one */
-  MSTATE_CONNECT,      /* 2 - resolve/connect has been sent off */
-  MSTATE_RESOLVING,    /* 3 - awaiting the resolve to finalize */
-  MSTATE_CONNECTING,   /* 4 - awaiting the TCP connect to finalize */
-  MSTATE_TUNNELING,    /* 5 - awaiting HTTPS proxy SSL initialization to
+  MSTATE_SETUP,        /* 2 - start a new transfer */
+  MSTATE_CONNECT,      /* 3 - resolve/connect has been sent off */
+  MSTATE_RESOLVING,    /* 4 - awaiting the resolve to finalize */
+  MSTATE_CONNECTING,   /* 5 - awaiting the TCP connect to finalize */
+  MSTATE_TUNNELING,    /* 6 - awaiting HTTPS proxy SSL initialization to
                           complete and/or proxy CONNECT to finalize */
-  MSTATE_PROTOCONNECT, /* 6 - initiate protocol connect procedure */
-  MSTATE_PROTOCONNECTING, /* 7 - completing the protocol-specific connect
+  MSTATE_PROTOCONNECT, /* 7 - initiate protocol connect procedure */
+  MSTATE_PROTOCONNECTING, /* 8 - completing the protocol-specific connect
                              phase */
-  MSTATE_DO,           /* 8 - start send off the request (part 1) */
-  MSTATE_DOING,        /* 9 - sending off the request (part 1) */
-  MSTATE_DOING_MORE,   /* 10 - send off the request (part 2) */
-  MSTATE_DID,          /* 11 - done sending off request */
-  MSTATE_PERFORMING,   /* 12 - transfer data */
-  MSTATE_RATELIMITING, /* 13 - wait because limit-rate exceeded */
-  MSTATE_DONE,         /* 14 - post data transfer operation */
-  MSTATE_COMPLETED,    /* 15 - operation complete */
-  MSTATE_MSGSENT,      /* 16 - the operation complete message is sent */
-  MSTATE_LAST          /* 17 - not a true state, never use this */
+  MSTATE_DO,           /* 9 - start send off the request (part 1) */
+  MSTATE_DOING,        /* 10 - sending off the request (part 1) */
+  MSTATE_DOING_MORE,   /* 11 - send off the request (part 2) */
+  MSTATE_DID,          /* 12 - done sending off request */
+  MSTATE_PERFORMING,   /* 13 - transfer data */
+  MSTATE_RATELIMITING, /* 14 - wait because limit-rate exceeded */
+  MSTATE_DONE,         /* 15 - post data transfer operation */
+  MSTATE_COMPLETED,    /* 16 - operation complete */
+  MSTATE_MSGSENT,      /* 17 - the operation complete message is sent */
+  MSTATE_LAST          /* 18 - not a true state, never use this */
 } CURLMstate;
 
 /* we support N sockets per easy handle. Set the corresponding bit to what
@@ -93,9 +94,9 @@ struct Curl_multi {
   struct Curl_easy *easyp;
   struct Curl_easy *easylp; /* last node */
 
-  int num_easy; /* amount of entries in the linked list above. */
-  int num_alive; /* amount of easy handles that are added but have not yet
-                    reached COMPLETE state */
+  unsigned int num_easy; /* amount of entries in the linked list above. */
+  unsigned int num_alive; /* amount of easy handles that are added but have
+                             not yet reached COMPLETE state */
 
   struct Curl_llist msglist; /* a list of messages from completed transfers */
 
@@ -124,6 +125,13 @@ struct Curl_multi {
      times of all currently set timers */
   struct Curl_tree *timetree;
 
+  /* buffer used for transfer data, lazy initialized */
+  char *xfer_buf; /* the actual buffer */
+  size_t xfer_buf_len;      /* the allocated length */
+  /* buffer used for upload data, lazy initialized */
+  char *xfer_ulbuf; /* the actual buffer */
+  size_t xfer_ulbuf_len;      /* the allocated length */
+
 #if defined(USE_SSL)
   struct multi_ssl_backend_data *ssl_backend_data;
 #endif
@@ -136,9 +144,6 @@ struct Curl_multi {
   /* Shared connection cache (bundles)*/
   struct conncache conn_cache;
 
-  long maxconnects; /* if >0, a fixed limit of the maximum number of entries
-                       we're allowed to grow the connection cache to */
-
   long max_host_connections; /* if >0, a fixed limit of the maximum number
                                 of connections per host */
 
@@ -150,16 +155,18 @@ struct Curl_multi {
   void *timer_userp;
   struct curltime timer_lastcall; /* the fixed time for the timeout for the
                                     previous callback */
-  unsigned int max_concurrent_streams;
-
 #ifdef USE_WINSOCK
   WSAEVENT wsa_event; /* winsock event used for waits */
 #else
 #ifdef ENABLE_WAKEUP
-  curl_socket_t wakeup_pair[2]; /* socketpair() used for wakeup
+  curl_socket_t wakeup_pair[2]; /* pipe()/socketpair() used for wakeup
                                    0 is used for read, 1 is used for write */
 #endif
 #endif
+  unsigned int max_concurrent_streams;
+  unsigned int maxconnects; /* if >0, a fixed limit of the maximum number of
+                               entries we're allowed to grow the connection
+                               cache to */
 #define IPV6_UNKNOWN 0
 #define IPV6_DEAD    1
 #define IPV6_WORKS   2
@@ -172,6 +179,8 @@ struct Curl_multi {
 #endif
   BIT(dead); /* a callback returned error, everything needs to crash and
                 burn */
+  BIT(xfer_buf_borrowed);      /* xfer_buf is currently being borrowed */
+  BIT(xfer_ulbuf_borrowed);    /* xfer_ulbuf is currently being borrowed */
 #ifdef DEBUGBUILD
   BIT(warned);                 /* true after user warned of DEBUGBUILD */
 #endif

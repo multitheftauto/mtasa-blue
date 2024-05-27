@@ -2,19 +2,7 @@
  *  Debugging routines
  *
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 
 #include "common.h"
@@ -30,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
+/* DEBUG_BUF_SIZE must be at least 2 */
 #define DEBUG_BUF_SIZE      512
 
 static int debug_threshold = 0;
@@ -69,6 +58,8 @@ void mbedtls_debug_print_msg(const mbedtls_ssl_context *ssl, int level,
     char str[DEBUG_BUF_SIZE];
     int ret = MBEDTLS_ERR_ERROR_CORRUPTION_DETECTED;
 
+    MBEDTLS_STATIC_ASSERT(DEBUG_BUF_SIZE >= 2, "DEBUG_BUF_SIZE too small");
+
     if (NULL == ssl              ||
         NULL == ssl->conf        ||
         NULL == ssl->conf->f_dbg ||
@@ -80,10 +71,15 @@ void mbedtls_debug_print_msg(const mbedtls_ssl_context *ssl, int level,
     ret = mbedtls_vsnprintf(str, DEBUG_BUF_SIZE, format, argp);
     va_end(argp);
 
-    if (ret >= 0 && ret < DEBUG_BUF_SIZE - 1) {
-        str[ret]     = '\n';
-        str[ret + 1] = '\0';
+    if (ret < 0) {
+        ret = 0;
+    } else {
+        if (ret >= DEBUG_BUF_SIZE - 1) {
+            ret = DEBUG_BUF_SIZE - 2;
+        }
     }
+    str[ret]     = '\n';
+    str[ret + 1] = '\0';
 
     debug_send_line(ssl, level, file, line, str);
 }

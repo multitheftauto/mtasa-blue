@@ -524,6 +524,7 @@ void CLuaGUIDefs::AddGuiGridlistClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getSelectedCount", "guiGridListGetSelectedCount");
     lua_classfunction(luaVM, "getSelectedItems", "guiGridListGetSelectedItems");
     lua_classfunction(luaVM, "getColumnCount", "guiGridListGetColumnCount");
+    lua_classfunction(luaVM, "getColumnWidth", "guiGridListGetColumnWidth");
 
     lua_classfunction(luaVM, "setItemData", "guiGridListSetItemData");
     lua_classfunction(luaVM, "setItemText", "guiGridListSetItemText");

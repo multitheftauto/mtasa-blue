@@ -5,19 +5,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 #ifndef MBEDTLS_X509_CRT_H
 #define MBEDTLS_X509_CRT_H
@@ -509,7 +497,7 @@ int mbedtls_x509_crt_parse_path(mbedtls_x509_crt *chain, const char *path);
  * \param san_buf  The buffer holding the raw data item of the subject
  *                 alternative name.
  * \param san      The target structure to populate with the parsed presentation
- *                 of the subject alternative name encoded in \p san_raw.
+ *                 of the subject alternative name encoded in \p san_buf.
  *
  * \note           Only "dnsName" and "otherName" of type hardware_module_name
  *                 as defined in RFC 4180 is supported.
@@ -517,7 +505,7 @@ int mbedtls_x509_crt_parse_path(mbedtls_x509_crt *chain, const char *path);
  * \note           This function should be called on a single raw data of
  *                 subject alternative name. For example, after successful
  *                 certificate parsing, one must iterate on every item in the
- *                 \p crt->subject_alt_names sequence, and pass it to
+ *                 \c crt->subject_alt_names sequence, and pass it to
  *                 this function.
  *
  * \warning        The target structure contains pointers to the raw data of the
@@ -914,7 +902,7 @@ int mbedtls_x509write_crt_set_validity(mbedtls_x509write_cert *ctx, const char *
  * \brief           Set the issuer name for a Certificate
  *                  Issuer names should contain a comma-separated list
  *                  of OID types and values:
- *                  e.g. "C=UK,O=ARM,CN=mbed TLS CA"
+ *                  e.g. "C=UK,O=ARM,CN=Mbed TLS CA"
  *
  * \param ctx           CRT context to use
  * \param issuer_name   issuer name to set
@@ -929,7 +917,7 @@ int mbedtls_x509write_crt_set_issuer_name(mbedtls_x509write_cert *ctx,
  * \brief           Set the subject name for a Certificate
  *                  Subject names should contain a comma-separated list
  *                  of OID types and values:
- *                  e.g. "C=UK,O=ARM,CN=mbed TLS Server 1"
+ *                  e.g. "C=UK,O=ARM,CN=Mbed TLS Server 1"
  *
  * \param ctx           CRT context to use
  * \param subject_name  subject name to set

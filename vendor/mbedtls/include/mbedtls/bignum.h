@@ -5,19 +5,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 #ifndef MBEDTLS_BIGNUM_H
 #define MBEDTLS_BIGNUM_H
@@ -533,7 +521,7 @@ int mbedtls_mpi_write_file(const char *p, const mbedtls_mpi *X,
  * \param X        The destination MPI. This must point to an initialized MPI.
  * \param buf      The input buffer. This must be a readable buffer of length
  *                 \p buflen Bytes.
- * \param buflen   The length of the input buffer \p p in Bytes.
+ * \param buflen   The length of the input buffer \p buf in Bytes.
  *
  * \return         \c 0 if successful.
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if memory allocation failed.
@@ -548,7 +536,7 @@ int mbedtls_mpi_read_binary(mbedtls_mpi *X, const unsigned char *buf,
  * \param X        The destination MPI. This must point to an initialized MPI.
  * \param buf      The input buffer. This must be a readable buffer of length
  *                 \p buflen Bytes.
- * \param buflen   The length of the input buffer \p p in Bytes.
+ * \param buflen   The length of the input buffer \p buf in Bytes.
  *
  * \return         \c 0 if successful.
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if memory allocation failed.
@@ -986,8 +974,8 @@ int mbedtls_mpi_gcd(mbedtls_mpi *G, const mbedtls_mpi *A,
  * \return         #MBEDTLS_ERR_MPI_ALLOC_FAILED if a memory allocation failed.
  * \return         #MBEDTLS_ERR_MPI_BAD_INPUT_DATA if \p N is less than
  *                 or equal to one.
- * \return         #MBEDTLS_ERR_MPI_NOT_ACCEPTABLE if \p has no modular inverse
- *                 with respect to \p N.
+ * \return         #MBEDTLS_ERR_MPI_NOT_ACCEPTABLE if \p A has no modular
+ *                 inverse with respect to \p N.
  */
 int mbedtls_mpi_inv_mod(mbedtls_mpi *X, const mbedtls_mpi *A,
                         const mbedtls_mpi *N);
@@ -1039,7 +1027,7 @@ MBEDTLS_DEPRECATED int mbedtls_mpi_is_prime(const mbedtls_mpi *X,
  *                 This must point to an initialized MPI.
  * \param rounds   The number of bases to perform the Miller-Rabin primality
  *                 test for. The probability of returning 0 on a composite is
- *                 at most 2<sup>-2*\p rounds</sup>.
+ *                 at most 2<sup>-2*\p rounds </sup>.
  * \param f_rng    The RNG function to use. This must not be \c NULL.
  * \param p_rng    The RNG parameter to be passed to \p f_rng.
  *                 This may be \c NULL if \p f_rng doesn't use

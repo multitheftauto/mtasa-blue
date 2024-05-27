@@ -33,9 +33,11 @@
 #define H1_PARSE_OPT_NONE       (0)
 #define H1_PARSE_OPT_STRICT     (1 << 0)
 
+#define H1_PARSE_DEFAULT_MAX_LINE_LEN   DYN_HTTP_REQUEST
+
 struct h1_req_parser {
-  struct http_req *req;
-  struct bufq scratch;
+  struct httpreq *req;
+  struct dynbuf scratch;
   size_t scratch_skip;
   const char *line;
   size_t max_line_len;
@@ -51,9 +53,11 @@ ssize_t Curl_h1_req_parse_read(struct h1_req_parser *parser,
                                const char *scheme_default, int options,
                                CURLcode *err);
 
-CURLcode Curl_h1_req_dprint(const struct http_req *req,
+CURLcode Curl_h1_req_dprint(const struct httpreq *req,
                             struct dynbuf *dbuf);
 
+CURLcode Curl_h1_req_write_head(struct httpreq *req, int http_minor,
+                                struct dynbuf *dbuf);
 
 #endif /* !CURL_DISABLE_HTTP */
 #endif /* HEADER_CURL_HTTP1_H */

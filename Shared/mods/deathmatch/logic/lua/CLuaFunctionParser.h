@@ -352,19 +352,42 @@ struct CLuaFunctionParserBase
         if constexpr (std::is_same_v<T, dummy_type>)
             return dummy_type{};
         // primitive types are directly popped
-        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_integral_v<T>)
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return lua::PopPrimitive<T>(L, index);
-        // floats/doubles may not be NaN
-        else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
+        else if constexpr (std::is_same_v<T, bool>)
+            return lua::PopPrimitive<T>(L, index);
+        else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) // bool is an integral type, so must pop it before ^^
         {
-            T value = lua::PopPrimitive<T>(L, index);
-            if (std::isnan(value))
-            {
+            const auto number = lua::PopPrimitive<lua_Number>(L, index);
+
+            const auto SetError = [&](const char* expected, const char* got) {
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
-                SetBadArgumentError(L, "number", index - 1, "NaN");
+                SetBadArgumentError(L, expected, index - 1, got);
+            };
+
+            if (std::isnan(number))
+            {
+                SetError("number", "NaN");
+                return static_cast<T>(number);
             }
-            return value;
+
+            if (std::isinf(number)) {
+                SetError("number", "inf");
+                return static_cast<T>(number);
+            }
+
+            // NOTE/TODO: Use C++20 `std::in_range` here instead
+            // For now this doesn't do all the safety checks, but this should be "good enough" [until we switch to C++20]
+            if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
+            {
+                if (number < 0) {
+                    SetError("positive number", "negative");
+                    return static_cast<T>(number);
+                }
+            }
+
+            return static_cast<T>(number);
         }
         else if constexpr (std::is_enum_v<T>)
         {
@@ -439,11 +462,17 @@ struct CLuaFunctionParserBase
                     continue;
                 }
 
-                int i = -2;
-                auto        k = PopUnsafe<key_t>(L, i);
-                auto        v = PopUnsafe<value_t>(L, i);
+                int  i = -2;
+
+                // When key_t is a string and the actual type of a key is number Lua will conduct an implicit value change
+                // that can confuse lua_next and lead to a crash. To fix it we can copy a key in order to save an original key
+                // that will be used during the next lua_next invocation.
+                lua_pushvalue(L, i);
+
+                auto v = PopUnsafe<value_t>(L, i);
+                auto k = PopUnsafe<key_t>(L, i);                
                 map.emplace(std::move(k), std::move(v));
-                lua_pop(L, 1);            // drop value, keep key for lua_next
+                lua_pop(L, 2);            // drop values(key copy and value), keep original key for lua_next
             }
             ++index;
             return map;
@@ -488,10 +517,7 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector2D vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -520,11 +546,7 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                vec.fZ = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -551,12 +573,8 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector4D vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                vec.fZ = lua::PopPrimitive<float>(L, index);
-                vec.fW = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index),
+                         PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -570,8 +588,6 @@ struct CLuaFunctionParserBase
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
                     return *pVec4D;
-                if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
-                    return *pMatrix;
 
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
@@ -583,19 +599,17 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
+                const auto ReadVector = [&] {
+                    return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index));
+                };
+                
                 CMatrix matrix;
-                matrix.vRight.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vRight.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vRight.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fZ = lua::PopPrimitive<float>(L, index);
+
+                matrix.vRight = ReadVector();
+                matrix.vFront = ReadVector();
+                matrix.vUp = ReadVector();
+                matrix.vPos = ReadVector();
+
                 return matrix;
             }
             else
@@ -635,7 +649,7 @@ struct CLuaFunctionParserBase
             return static_cast<T>(result);
         }
         else if constexpr (std::is_same_v<T, SColor>)
-            return static_cast<unsigned long>(lua::PopPrimitive<int64_t>(L, index));
+            return static_cast<unsigned long>(static_cast<int64_t>(lua::PopPrimitive<lua_Number>(L, index)));
         else if constexpr (std::is_same_v<T, CLuaArgument>)
         {
             CLuaArgument argument;
@@ -649,7 +663,7 @@ struct CLuaFunctionParserBase
     }
 };
 
-template <bool, auto, auto*>
+template <bool, auto, auto>
 struct CLuaFunctionParser
 {
 };
@@ -733,5 +747,23 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
             return 1;
         }
         return iResult;
+    }
+};
+
+// Case where F is a class method pointer
+// Note: If you see weird compiler errors like: Undefined type, overload resolution failed, etc..
+// Ask on Dev Discord(#new-argument-parser), because rn this implementation is pretty beta. - 03/2021
+template <bool ErrorOnFailure, auto ReturnOnFailure, typename T, typename R, typename... Args, R(T::*F)(Args...)>
+struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, F>
+{
+    // Remove constness here, because we must be able to std::move
+    static R Call(T* o, std::remove_const_t<Args>... args)
+    {
+        return (o->*F)(std::move(args)...);
+    }
+
+    auto operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
+    {
+        return CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, &Call>()(L, pScriptDebugging);
     }
 };

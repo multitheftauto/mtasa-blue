@@ -68,8 +68,7 @@ static void bundle_destroy(struct connectbundle *bundle)
 static void bundle_add_conn(struct connectbundle *bundle,
                             struct connectdata *conn)
 {
-  Curl_llist_insert_next(&bundle->conn_list, bundle->conn_list.tail, conn,
-                         &conn->bundle_node);
+  Curl_llist_append(&bundle->conn_list, conn, &conn->bundle_node);
   conn->bundle = bundle;
   bundle->num_connections++;
 }
@@ -101,12 +100,13 @@ static void free_bundle_hash_entry(void *freethis)
   bundle_destroy(b);
 }
 
-int Curl_conncache_init(struct conncache *connc, int size)
+int Curl_conncache_init(struct conncache *connc, size_t size)
 {
   /* allocate a new easy handle to use when closing cached connections */
   connc->closure_handle = curl_easy_init();
   if(!connc->closure_handle)
     return 1; /* bad */
+  connc->closure_handle->state.internal = true;
 
   Curl_hash_init(&connc->hash, size, Curl_hash_str,
                  Curl_str_key_compare, free_bundle_hash_entry);
@@ -130,7 +130,7 @@ static void hashkey(struct connectdata *conn, char *buf, size_t len)
 #ifndef CURL_DISABLE_PROXY
   if(conn->bits.httpproxy && !conn->bits.tunnel_proxy) {
     hostname = conn->http_proxy.host.name;
-    port = conn->port;
+    port = conn->primary.remote_port;
   }
   else
 #endif
@@ -140,7 +140,7 @@ static void hashkey(struct connectdata *conn, char *buf, size_t len)
     hostname = conn->host.name;
 
   /* put the numbers first so that the hostname gets cut off if too long */
-#ifdef ENABLE_IPV6
+#ifdef USE_IPV6
   msnprintf(buf, len, "%u/%ld/%s", conn->scope_id, port, hostname);
 #else
   msnprintf(buf, len, "%ld/%s", port, hostname);
@@ -242,11 +242,11 @@ CURLcode Curl_conncache_add_conn(struct Curl_easy *data)
   conn->connection_id = connc->next_connection_id++;
   connc->num_conn++;
 
-  DEBUGF(infof(data, "Added connection %ld. "
+  DEBUGF(infof(data, "Added connection %" CURL_FORMAT_CURL_OFF_T ". "
                "The cache now contains %zu members",
                conn->connection_id, connc->num_conn));
 
-  unlock:
+unlock:
   CONNCACHE_UNLOCK(data);
 
   return result;
@@ -378,21 +378,24 @@ conncache_find_first_connection(struct conncache *connc)
 bool Curl_conncache_return_conn(struct Curl_easy *data,
                                 struct connectdata *conn)
 {
-  /* data->multi->maxconnects can be negative, deal with it. */
-  size_t maxconnects =
-    (data->multi->maxconnects < 0) ? data->multi->num_easy * 4:
-    data->multi->maxconnects;
+  unsigned int maxconnects = !data->multi->maxconnects ?
+    data->multi->num_easy * 4: data->multi->maxconnects;
   struct connectdata *conn_candidate = NULL;
 
   conn->lastused = Curl_now(); /* it was used up until now */
-  if(maxconnects > 0 &&
-     Curl_conncache_size(data) > maxconnects) {
+  if(maxconnects && Curl_conncache_size(data) > maxconnects) {
     infof(data, "Connection cache is full, closing the oldest one");
 
     conn_candidate = Curl_conncache_extract_oldest(data);
     if(conn_candidate) {
-      /* the winner gets the honour of being disconnected */
-      Curl_disconnect(data, conn_candidate, /* dead_connection */ FALSE);
+      /* Use the closure handle for this disconnect so that anything that
+         happens during the disconnect is not stored and associated with the
+         'data' handle which already just finished a transfer and it is
+         important that details from this (unrelated) disconnect does not
+         taint meta-data in the data handle. */
+      struct conncache *connc = data->state.conn_cache;
+      Curl_disconnect(connc->closure_handle, conn_candidate,
+                      /* dead_connection */ FALSE);
     }
   }
 
@@ -516,12 +519,9 @@ Curl_conncache_extract_oldest(struct Curl_easy *data)
 void Curl_conncache_close_all_connections(struct conncache *connc)
 {
   struct connectdata *conn;
-  char buffer[READBUFFER_MIN + 1];
   SIGPIPE_VARIABLE(pipe_st);
   if(!connc->closure_handle)
     return;
-  connc->closure_handle->state.buffer = buffer;
-  connc->closure_handle->set.buffer_size = READBUFFER_MIN;
 
   conn = conncache_find_first_connection(connc);
   while(conn) {
@@ -535,7 +535,6 @@ void Curl_conncache_close_all_connections(struct conncache *connc)
     conn = conncache_find_first_connection(connc);
   }
 
-  connc->closure_handle->state.buffer = NULL;
   sigpipe_ignore(connc->closure_handle, &pipe_st);
 
   Curl_hostcache_clean(connc->closure_handle,
