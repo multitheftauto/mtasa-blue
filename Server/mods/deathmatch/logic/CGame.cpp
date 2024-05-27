@@ -1548,6 +1548,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerVoiceStop", "", NULL, false);
 
     // Object events
+    m_Events.AddEvent("onObjectMoveStart", "", nullptr, false);
+    m_Events.AddEvent("onObjectMoveStop", "", nullptr, false);
 
     // Pickup events
     m_Events.AddEvent("onPickupHit", "player", NULL, false);
