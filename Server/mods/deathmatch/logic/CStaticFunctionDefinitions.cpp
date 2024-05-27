@@ -8202,6 +8202,10 @@ bool CStaticFunctionDefinitions::MoveObject(CResource* pResource, CElement* pEle
         moveAnimation.SetEasing(a_easingType, a_fEasingPeriod, a_fEasingAmplitude, a_fEasingOvershoot);
         moveAnimation.SetDuration(ulTime);
 
+        CLuaArguments Arguments;
+        if (!pObject->CallEvent("onObjectMoveStart", Arguments)) // Call Event
+            return false;            // Event cancelled, return false
+        
         // Start moving it here so we can keep track of the position/rotation
         pObject->Move(moveAnimation);
 
@@ -8228,6 +8232,10 @@ bool CStaticFunctionDefinitions::StopObject(CElement* pElement)
     if (IS_OBJECT(pElement))
     {
         CObject* pObject = static_cast<CObject*>(pElement);
+
+        CLuaArguments Arguments;
+        if (!pObject->CallEvent("onObjectMoveStop", Arguments))
+            return false;            // Event cancelled, return false
 
         pObject->StopMoving();
 
