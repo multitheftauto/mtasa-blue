@@ -80,6 +80,11 @@ public:
     static bool                                            EngineSetModelVisibleTime(std::string strModelId, char cHourOn, char cHourOff);
     static std::variant<bool, CLuaMultiReturn<char, char>> EngineGetModelVisibleTime(std::string strModelId);
 
+    static size_t EngineGetPoolCapacity(ePools pool);
+    static size_t EngineGetPoolDefaultCapacity(ePools pool);
+    static size_t EngineGetPoolUsedCapacity(ePools pool);
+    static bool   EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t newSize);
+
     static uint EngineRequestTXD(lua_State* const luaVM, std::string strTxdName);
     static bool EngineFreeTXD(uint txdID);
 

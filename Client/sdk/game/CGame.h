@@ -265,4 +265,6 @@ public:
 
     virtual void RemoveAllBuildings() = 0;
     virtual void RestoreGameBuildings() = 0;
+
+    virtual bool SetBuildingPoolSize(size_t size) = 0;
 };
