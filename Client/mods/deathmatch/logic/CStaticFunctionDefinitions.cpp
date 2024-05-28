@@ -3763,6 +3763,11 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Enti
             Ped.SetUsesCollision(bEnabled);
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            static_cast<CClientBuilding&>(Entity).SetUsesCollision(bEnabled);
+            break;
+        }
         default:
             return false;
     }
