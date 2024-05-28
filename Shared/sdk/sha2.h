@@ -31,8 +31,11 @@
  * SUCH DAMAGE.
  */
 
+#pragma once
 #ifndef SHA2_H
 #define SHA2_H
+
+#include <SharedUtil.IntTypes.h>
 
 #define SHA224_DIGEST_SIZE ( 224 / 8)
 #define SHA256_DIGEST_SIZE ( 256 / 8)
@@ -46,9 +49,6 @@
 
 #ifndef SHA2_TYPES
 #define SHA2_TYPES
-typedef unsigned char      uint8;
-typedef unsigned int       uint32;
-typedef unsigned long long uint64;
 #endif
 
 #ifdef __cplusplus

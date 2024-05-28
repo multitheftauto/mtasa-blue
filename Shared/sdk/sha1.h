@@ -24,14 +24,17 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+
+#pragma once
 #ifndef SHA1_H
 #define SHA1_H
+
+#include <SharedUtil.IntTypes.h>
 
 #include <string.h>
 
 #if defined(_MSC_VER) && !defined(EFIX64) && !defined(EFI32)
 #include <basetsd.h>
-typedef UINT32 uint32_t;
 #else
 #include <inttypes.h>
 #endif
