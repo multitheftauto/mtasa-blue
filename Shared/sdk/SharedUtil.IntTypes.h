@@ -31,12 +31,9 @@ using int16 = std::int16_t;        //       16
 using int8 = std::int8_t;          //        8
 
 // Windowsesq types
-// DWORD must be set to uint32 and not unsigned long
-// due to the nature of DWORD ("A DWORD is a 32-bit unsigned integer")
-using DWORD = std::uint32_t;       //       32      32      32
+using DWORD = unsigned long;       //       32      32      32
 using WORD = std::uint16_t;        //       16      16      16
 using BYTE = std::uint8_t;         //        8       8       8
-using FLOAT = float;
 
 using AnimationId = std::uint32_t;
 using AssocGroupId = std::uint32_t;
