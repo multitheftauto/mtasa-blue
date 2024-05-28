@@ -43,6 +43,11 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTBUILDING; }
 
+    void SetUsesCollision(bool state);
+
+    void Create();
+    void Destroy();
+
     bool IsValid() const noexcept { return m_pBuilding != nullptr; };
 
     
@@ -52,9 +57,6 @@ public:
 
 
 private:
-    void Create();
-    void Destroy();
-
     CClientBuilding* GetHighLodBuilding() const { return m_pHighBuilding; }; 
     void SetHighLodBuilding(CClientBuilding* pHighBuilding = nullptr) { m_pHighBuilding = pHighBuilding; };
 
@@ -72,6 +74,7 @@ private:
     CVector    m_vPos;
     CVector    m_vRot;
     uint8_t    m_interior;
+    bool       m_usesCollision;
 
     CClientBuilding* m_pHighBuilding;
     CClientBuilding* m_pLowBuilding;
