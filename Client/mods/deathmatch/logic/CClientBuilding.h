@@ -77,7 +77,7 @@ private:
     CVector    m_vPos;
     CVector    m_vRot;
     uint8_t    m_interior;
-    bool       m_bUsesCollision;
+    bool       m_usesCollision;
 
     CClientBuilding* m_pHighBuilding;
     CClientBuilding* m_pLowBuilding;

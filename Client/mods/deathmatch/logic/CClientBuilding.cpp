@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector &pos, const CVector &rot, uint8_t interior)
+CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector& pos, const CVector& rot, uint8_t interior)
     : ClassInit(this),
       CClientEntity(ID),
       m_pBuildingManager(pManager->GetBuildingManager()),
@@ -19,7 +19,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
       m_vRot(rot),
       m_interior(interior),
       m_pBuilding(nullptr),
-      m_bUsesCollision(true),
+      m_usesCollision(true),
       m_pHighBuilding(nullptr),
       m_pLowBuilding(nullptr)
 {
@@ -92,7 +92,7 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
         return;
     m_interior = ucInterior;
     Recreate();
-} 
+}
 
 void CClientBuilding::SetModel(uint16_t model)
 {
@@ -105,7 +105,10 @@ void CClientBuilding::SetModel(uint16_t model)
 
 void CClientBuilding::SetUsesCollision(bool state)
 {
-    m_bUsesCollision = state;
+    if (m_usesCollision == state)
+        return;
+
+    m_usesCollision = state;
     if (m_pBuilding)
     {
         m_pBuilding->SetUsesCollision(state);
@@ -125,9 +128,9 @@ void CClientBuilding::Create()
 
     m_pBuilding = g_pGame->GetPools()->GetBuildingsPool().AddBuilding(this, m_usModelId, &m_vPos, &vRot4D, m_interior);
 
-    if (m_bUsesCollision == false)
+    if (!m_usesCollision)
     {
-        m_pBuilding->SetUsesCollision(m_bUsesCollision);
+        m_pBuilding->SetUsesCollision(m_usesCollision);
     }
     if (m_pHighBuilding)
     {
