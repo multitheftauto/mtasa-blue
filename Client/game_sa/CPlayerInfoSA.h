@@ -13,11 +13,7 @@
 
 #include <game/CPlayerInfo.h>
 #include "CPlayerPedSA.h"
-
-/**
- * \todo Confirm that AssocGroupId is a DWORD
- */
-using AssocGroupId = std::uint32_t;
+#include <SharedUtil.IntTypes.h>
 
 class CPedClothesDesc;
 
