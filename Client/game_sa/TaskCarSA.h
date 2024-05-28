@@ -15,10 +15,11 @@
 #include "CVehicleSA.h"
 #include "TaskSA.h"
 
+#include <SharedUtil.IntTypes.h>
+
 // temporary
 class CAnimBlendAssociation;
 typedef DWORD CTaskUtilityLineUpPedWithCar;
-typedef DWORD AnimationId;
 
 #define FUNC_CTaskComplexEnterCarAsDriver__Constructor              0x6402F0
 #define FUNC_CTaskComplexEnterCarAsPassenger__Constructor           0x640340

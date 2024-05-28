@@ -11,15 +11,14 @@
 
 #pragma once
 
+#include <SharedUtil.IntTypes.h>
+
 class CEntity;
 class CEventDamageSAInterface;
 class CPed;
 class CPedDamageResponse;
 enum ePedPieceTypes;
 enum eWeaponType;
-
-using AnimationId = std::uint32_t;
-using AssocGroupId = std::uint32_t;
 
 namespace EDamageReason
 {

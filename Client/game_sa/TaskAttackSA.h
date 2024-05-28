@@ -14,6 +14,7 @@
 #include <CVector2D.h>
 #include <game/TaskAttack.h>
 #include "TaskSA.h"
+#include <SharedUtil.IntTypes.h>
 
 class CWeaponInfo;
 
@@ -49,8 +50,6 @@ class CWeaponInfo;
 // temporary
 class CAnimBlendAssociation;
 class CAnimBlendHierarchy;
-using AssocGroupId = std::uint32_t;
-using AnimationId = std::uint32_t;
 
 ///////////////////////
 // Do a gang driveby

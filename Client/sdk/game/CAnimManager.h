@@ -12,14 +12,12 @@
 #pragma once
 
 #include <memory>
+#include <SharedUtil.IntTypes.h>
 
 // Get correct values
 #define MAX_ANIM_GROUPS 200
 #define MAX_ANIMATIONS 500
 #define MAX_ANIM_BLOCKS 200
-
-using AssocGroupId = std::uint32_t;
-using AnimationId = std::uint32_t;
 
 class CAnimBlendAssocGroup;
 class CAnimBlendAssocGroupSAInterface;

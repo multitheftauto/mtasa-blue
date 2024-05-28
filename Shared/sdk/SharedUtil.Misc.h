@@ -515,11 +515,13 @@ namespace SharedUtil
         ) noexcept : SColor(ucA, ucR, ucG, ucB) {}
 
         template <class T, class U, class V, class W>
-        constexpr SColorARGB(const T a, const U r, const V g, const W b) noexcept :
-            A(Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(a), 255)),
-            R(Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(r), 255)),
-            G(Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(g), 255)),
-            B(Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(b), 255)) {}
+        constexpr SColorARGB(const T a, const U r, const V g, const W b) noexcept
+            : SColor(
+                Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(a), 255),
+                Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(r), 255),
+                Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(g), 255),
+                Clamp<std::uint8_t>(0, static_cast<std::uint8_t>(b), 255)
+            ) {}
     };
 
     //

@@ -13,10 +13,9 @@
 
 #include "CPacket.h"
 #include <CVector.h>
+#include <SharedUtil.IntTypes.h>
 
 class CPed;
-using AssocGroupId = std::uint32_t;
-using AnimationId = std::uint32_t;
 
 class CPedWastedPacket final : public CPacket
 {

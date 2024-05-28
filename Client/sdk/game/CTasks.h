@@ -14,6 +14,7 @@
 #include "CPed.h"
 #include "CWeaponInfo.h"
 #include "TaskSecondary.h"
+#include <SharedUtil.IntTypes.h>
 
 class CEntity;
 class CTaskComplexDie;
@@ -48,9 +49,6 @@ class CTaskSimpleTriggerLookAt;
 class CTaskSimpleUseGun;
 class CVector;
 class CVehicle;
-
-using AssocGroupId = std::uint32_t;
-using AnimationId = std::uint32_t;
 
 enum eClimbHeights
 {

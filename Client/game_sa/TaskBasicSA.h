@@ -15,6 +15,7 @@
 #include <game/CPed.h>
 #include <game/TaskBasic.h>
 #include "TaskSA.h"
+#include <SharedUtil.IntTypes.h>
 
 class CVehicleSAInterface;
 class CObjectSAInterface;
@@ -54,8 +55,6 @@ public:
 // temporary
 class CAnimBlendAssociation;
 class CAnimBlendHierarchy;
-using AssocGroupId = std::uint32_t;
-using AnimationId = std::uint32_t;
 
 class CTaskSimpleAnimSAInterface : public CTaskSimpleSAInterface
 {

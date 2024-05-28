@@ -19,6 +19,7 @@
 #include "CLimits.h"
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
+#include <SharedUtil.IntTypes.h>
 
 class CEntitySAInterface;
 
@@ -71,8 +72,6 @@ class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociationSAInterface;
 class CAnimBlendAssocGroupSAInterface;
 class CIFPAnimations;
-using AssocGroupId = std::uint32_t;
-using AnimationId = std::uint32_t;
 enum class eAnimGroup;
 enum class eAnimID;
 
@@ -270,7 +269,7 @@ public:
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
     virtual void  ResetColorFilter() = 0;
     virtual void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color) = 0;
-    virtual void  GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bool isOriginal) = 0;
+    virtual void  GetColorFilter(std::uint32_t& uiPass0Color, std::uint32_t& uiPass1Color, bool isOriginal) = 0;
     virtual void  SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier) = 0;
     virtual void  SetGrainLevel(BYTE ucLevel) = 0;
     virtual void  ResetHeatHaze() = 0;

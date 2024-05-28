@@ -12,9 +12,7 @@
 #pragma once
 
 #include <memory>
-
-using AssocGroupId = std::uint32_t;
-using AnimationId = std::uint32_t;
+#include <SharedUtil.IntTypes.h>
 
 class CAnimBlendAssociationSAInterface;
 class CAnimBlendHierarchy;
