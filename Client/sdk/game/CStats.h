@@ -19,7 +19,7 @@
 enum
 {
     /*********************************
-     ALL FLOAT VALUES TO BE ADDED HERE
+     ALL float VALUES TO BE ADDED HERE
      *********************************/
     PROGRESS_MADE = 0,
     TOTAL_PROGRESS,

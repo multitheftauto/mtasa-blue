@@ -113,7 +113,7 @@ interface CProxyDirect3DDevice9 : public IDirect3DDevice9
     virtual HRESULT __stdcall SetSoftwareVertexProcessing(BOOL bSoftware);
     virtual BOOL __stdcall GetSoftwareVertexProcessing();
     virtual HRESULT __stdcall SetNPatchMode(float nSegments);
-    virtual FLOAT __stdcall GetNPatchMode();
+    virtual float __stdcall GetNPatchMode();
     virtual HRESULT __stdcall DrawPrimitive(D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount);
     virtual HRESULT __stdcall DrawIndexedPrimitive(D3DPRIMITIVETYPE, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex,
                                                    UINT primCount);

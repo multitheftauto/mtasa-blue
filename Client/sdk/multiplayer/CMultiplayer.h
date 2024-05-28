@@ -206,7 +206,7 @@ public:
 
     virtual void PreventLeavingVehicles() = 0;
     virtual void HideRadar(bool bHide) = 0;
-    virtual void SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;
+    virtual void SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, float fHeading) = 0;
     virtual void DisablePadHandler(bool bDisabled) = 0;
     virtual void DisableAllVehicleWeapons(bool bDisable) = 0;
     virtual void DisableBirds(bool bDisabled) = 0;

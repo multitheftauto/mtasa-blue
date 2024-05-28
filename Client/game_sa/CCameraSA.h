@@ -50,7 +50,7 @@ public:
     {
         MAXPATHLENGTH = 800
     };
-    float* m_arr_PathData;            //    FLOAT m_arr_PathData[MAXPATHLENGTH];
+    float* m_arr_PathData;            //    float m_arr_PathData[MAXPATHLENGTH];
 };
 
 class CQueuedMode
@@ -356,7 +356,7 @@ public:
     CVector m_vecOldFrontForInter;
     CVector m_vecOldUpForInter;
     float   m_vecOldFOVForInter;
-    float   m_fFLOATingFade;            // variable representing the FLOAT version of CDraw::Fade. Necessary to stop loss of precision
+    float   m_fFLOATingFade;            // variable representing the float version of CDraw::Fade. Necessary to stop loss of precision
     float   m_fFLOATingFadeMusic;
     float   m_fTimeToFadeOut;
     float   m_fTimeToFadeMusic;

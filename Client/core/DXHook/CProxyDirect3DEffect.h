@@ -50,10 +50,10 @@ public:
     HRESULT __stdcall GetInt(D3DXHANDLE hParameter, INT* pn) { return m_pOriginal->GetInt(hParameter, pn); }
     HRESULT __stdcall SetIntArray(D3DXHANDLE hParameter, CONST INT* pn, UINT Count) { return m_pOriginal->SetIntArray(hParameter, pn, Count); }
     HRESULT __stdcall GetIntArray(D3DXHANDLE hParameter, INT* pn, UINT Count) { return m_pOriginal->GetIntArray(hParameter, pn, Count); }
-    HRESULT __stdcall SetFloat(D3DXHANDLE hParameter, FLOAT f) { return m_pOriginal->SetFloat(hParameter, f); }
-    HRESULT __stdcall GetFloat(D3DXHANDLE hParameter, FLOAT* pf) { return m_pOriginal->GetFloat(hParameter, pf); }
-    HRESULT __stdcall SetFloatArray(D3DXHANDLE hParameter, CONST FLOAT* pf, UINT Count) { return m_pOriginal->SetFloatArray(hParameter, pf, Count); }
-    HRESULT __stdcall GetFloatArray(D3DXHANDLE hParameter, FLOAT* pf, UINT Count) { return m_pOriginal->GetFloatArray(hParameter, pf, Count); }
+    HRESULT __stdcall SetFloat(D3DXHANDLE hParameter, float f) { return m_pOriginal->SetFloat(hParameter, f); }
+    HRESULT __stdcall GetFloat(D3DXHANDLE hParameter, float* pf) { return m_pOriginal->GetFloat(hParameter, pf); }
+    HRESULT __stdcall SetFloatArray(D3DXHANDLE hParameter, CONST float* pf, UINT Count) { return m_pOriginal->SetFloatArray(hParameter, pf, Count); }
+    HRESULT __stdcall GetFloatArray(D3DXHANDLE hParameter, float* pf, UINT Count) { return m_pOriginal->GetFloatArray(hParameter, pf, Count); }
     HRESULT __stdcall SetVector(D3DXHANDLE hParameter, CONST D3DXVECTOR4* pVector) { return m_pOriginal->SetVector(hParameter, pVector); }
     HRESULT __stdcall GetVector(D3DXHANDLE hParameter, D3DXVECTOR4* pVector) { return m_pOriginal->GetVector(hParameter, pVector); }
     HRESULT __stdcall SetVectorArray(D3DXHANDLE hParameter, CONST D3DXVECTOR4* pVector, UINT Count)

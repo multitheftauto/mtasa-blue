@@ -739,7 +739,7 @@ HRESULT CProxyDirect3DDevice9::SetNPatchMode(float nSegments)
     return m_pDevice->SetNPatchMode(nSegments);
 }
 
-FLOAT CProxyDirect3DDevice9::GetNPatchMode()
+float CProxyDirect3DDevice9::GetNPatchMode()
 {
     return m_pDevice->GetNPatchMode();
 }

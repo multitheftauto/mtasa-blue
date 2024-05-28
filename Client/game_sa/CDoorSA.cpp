@@ -14,7 +14,7 @@
 
 /**
  * \todo Find out what GetAngleOpenRatio actually does
- * @return FLOAT Not sure...
+ * @return float Not sure...
  */
 float CDoorSA::GetAngleOpenRatio()
 {

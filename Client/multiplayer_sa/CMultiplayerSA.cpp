@@ -298,7 +298,7 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
-FLOAT         fFalseHeading;
+float         fFalseHeading;
 bool          bSetCenterOfWorld;
 DWORD         dwVectorPointer;
 bool          bInStreamingUpdate;
@@ -2389,7 +2389,7 @@ void CMultiplayerSA::DoSoundHacksOnLostFocus(bool bLostFocus)
     }
 }
 
-void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLOAT fHeading)
+void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, float fHeading)
 {
     if (vecPosition)
     {

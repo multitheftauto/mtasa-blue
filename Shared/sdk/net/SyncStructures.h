@@ -2482,26 +2482,26 @@ struct sWeaponPropertySync : public ISyncStructure
     struct
     {
         int   weaponType;
-        FLOAT fTargetRange;            // max targeting range
-        FLOAT fWeaponRange;            // absolute gun range / default melee attack range
+        float fTargetRange;            // max targeting range
+        float fWeaponRange;            // absolute gun range / default melee attack range
 
         int nFlags;            // flags defining characteristics
 
         short nAmmo;              // ammo in one clip
         short nDamage;            // damage inflicted per hit
 
-        FLOAT fAccuracy;             // modify accuracy of weapon
-        FLOAT fMoveSpeed;            // how fast can move with weapon
+        float fAccuracy;             // modify accuracy of weapon
+        float fMoveSpeed;            // how fast can move with weapon
 
-        FLOAT anim_loop_start;                  // start of animation loop
-        FLOAT anim_loop_stop;                   // end of animation loop
-        FLOAT anim_loop_bullet_fire;            // time in animation when weapon should be fired
+        float anim_loop_start;                  // start of animation loop
+        float anim_loop_stop;                   // end of animation loop
+        float anim_loop_bullet_fire;            // time in animation when weapon should be fired
 
-        FLOAT anim2_loop_start;                  // start of animation2 loop
-        FLOAT anim2_loop_stop;                   // end of animation2 loop
-        FLOAT anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
+        float anim2_loop_start;                  // start of animation2 loop
+        float anim2_loop_stop;                   // end of animation2 loop
+        float anim2_loop_bullet_fire;            // time in animation2 when weapon should be fired
 
-        FLOAT anim_breakout_time;            // time after which player can break out of attack and run off
+        float anim_breakout_time;            // time after which player can break out of attack and run off
     } data;
 };
 

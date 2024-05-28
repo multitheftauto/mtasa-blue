@@ -38,7 +38,7 @@ public:
     CVector2D m_vecFightMovement;            // 12
     float     m_moveBlendRatio;              // 20
     float     m_fSprintEnergy;               // 24
-    // FLOAT m_fSprintControlCounter; // Removed arbitatrily to aligned next byte, should be here really
+    // float m_fSprintControlCounter; // Removed arbitatrily to aligned next byte, should be here really
     BYTE                    m_nChosenWeapon;                   // 28
     BYTE                    m_nCarDangerCounter;               // 29
     BYTE                    m_pad0;                            // 30

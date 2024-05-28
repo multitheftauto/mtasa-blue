@@ -90,7 +90,7 @@ public:
 
     void PreventLeavingVehicles();
     void HideRadar(bool bHide);
-    void SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLOAT fHeading);
+    void SetCenterOfWorld(CEntity* entity, CVector* vecPosition, float fHeading);
     void DisablePadHandler(bool bDisabled);
     void DisableEnterExitVehicleKey(bool bDisabled);
     void DisableAllVehicleWeapons(bool bDisable);
