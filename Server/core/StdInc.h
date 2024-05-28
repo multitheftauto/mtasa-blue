@@ -8,17 +8,11 @@
  *
  *****************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <string>
 
-#ifndef WIN32
-// Linux allocation tracking doesn't work in this module for some reason
-    #define WITH_ALLOC_TRACKING 0
-#endif
-#include "SharedUtil.h"
-
-#ifdef WIN32
+#ifdef _WIN32
 //
 // Windows
 //
@@ -29,7 +23,7 @@
 //
 // POSIX
 //
-    #include <stdlib.h>
+    #include <cstdlib>
     #include <unistd.h>
     #include <fcntl.h>
     #include <dlfcn.h>
@@ -58,3 +52,9 @@
         #define Sleep(duration) usleep((duration)*1000)
     #endif
 #endif
+
+#ifndef _WIN32
+// Linux allocation tracking doesn't work in this module for some reason
+    #define WITH_ALLOC_TRACKING 0
+#endif
+#include "SharedUtil.h"

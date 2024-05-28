@@ -10,22 +10,23 @@
  *****************************************************************************/
 #pragma once
 
-#include "SharedUtil.IntTypes.h"
-#include <assert.h>
-#include "SharedUtil.Defines.h"
-#include "SharedUtil.AllocTracking.h"
+#include <cassert>
 #include <list>
 #include <vector>
 #include <map>
 #include <set>
 #include <deque>
 #include <algorithm>
-#include <limits.h>
-#include <stdio.h>
-#include <string.h>
+#include <climits>
+#include <cstdio>
+#include <cstring>
 #include <string>
-#include <stdarg.h>
+#include <cstdarg>
 #include <chrono>
+
+#include "SharedUtil.IntTypes.h"
+#include "SharedUtil.Defines.h"
+#include "SharedUtil.AllocTracking.h"
 
 // Vendor
 #ifndef _
