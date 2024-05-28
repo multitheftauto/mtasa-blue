@@ -11,14 +11,14 @@
 
 #pragma once
 
+#include <SharedUtil.IntTypes.h>
+
 class CAnimBlendAssocGroupSAInterface;
 class CAnimBlendAssociation;
 class CAnimBlendAssociationSAInterface;
 class CAnimBlendStaticAssociation;
 class CAnimBlock;
 struct RpClump;
-using BYTE = std::uint8_t;
-using AssocGroupId = std::uint32_t;
 
 enum class eAnimGroup : int
 {

@@ -11,7 +11,7 @@
 
 #pragma once
 
-using AssocGroupId = std::uint32_t;
+#include <SharedUtil.IntTypes.h>
 
 class CPedModelInfo
 {
