@@ -348,6 +348,7 @@ private:
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
     bool         m_isRoadSignsTextEnabled{true};
+    bool         m_isBuildingsRemoved{false};
 
     static unsigned int&  ClumpOffset;
 
