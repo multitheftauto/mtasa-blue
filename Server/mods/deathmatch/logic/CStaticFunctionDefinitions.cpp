@@ -4871,7 +4871,7 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
 }
 
 CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
-                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
+                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool bSynced)
 {
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
@@ -4890,6 +4890,7 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
         pVehicle->SetRotationDegrees(vecRotation);
         pVehicle->SetRespawnPosition(vecPosition);
         pVehicle->SetRespawnRotationDegrees(vecRotation);
+        pVehicle->SetUnoccupiedSyncable(bSynced);
 
         if (szRegPlate && szRegPlate[0])
             pVehicle->SetRegPlate(szRegPlate);
