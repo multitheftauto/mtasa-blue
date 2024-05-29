@@ -8264,6 +8264,9 @@ bool CStaticFunctionDefinitions::BreakObject(CElement* pElement)
     if (!pObject)
         return false;
 
+    if (!pObject->IsBreakable())
+        return false;
+
     CBitStream BitStream;
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, BREAK_OBJECT, *BitStream.pBitStream));
     
