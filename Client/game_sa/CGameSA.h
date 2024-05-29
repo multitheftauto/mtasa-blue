@@ -83,7 +83,7 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
 #define FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity 0x4EFCD0
-#define STRUC_CAESoundManager                               0xB62CB0
+#define STRUCT_CAESoundManager                              0xB62CB0
 #define FUNC_CWaterCannon_Constructor                       0x728B10
 #define FUNC_CWaterCannon_Destructor                        0x728B30
 #define FUNC_CWaterCannon_Init                              0x728B40
@@ -364,8 +364,8 @@ private:
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
-    bool         m_isExtendedWaterCannonsEnabled;
     bool         m_isRoadSignsTextEnabled{true};
+    bool         m_isExtendedWaterCannonsEnabled{false};
 
     static unsigned int&  ClumpOffset;
 

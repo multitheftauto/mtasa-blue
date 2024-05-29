@@ -755,7 +755,7 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     {
         char* currentCannon = (char*)currentACannons + i * SIZE_CWaterCannon;
 
-        ((void(__thiscall*)(int, void*, bool))FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity)(STRUC_CAESoundManager, currentCannon + NUM_CWaterCannon_Audio_Offset, true); // CAESoundManager::CancelSoundsOwnedByAudioEntity to prevent random crashes from CAESound::UpdateParameters
+        ((void(__thiscall*)(int, void*, bool))FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity)(STRUCT_CAESoundManager, currentCannon + NUM_CWaterCannon_Audio_Offset, true); // CAESoundManager::CancelSoundsOwnedByAudioEntity to prevent random crashes from CAESound::UpdateParameters
         ((void(__thiscall*)(void*))FUNC_CWaterCannon_Destructor)(currentCannon); // CWaterCannon::~CWaterCannon
     }
 
