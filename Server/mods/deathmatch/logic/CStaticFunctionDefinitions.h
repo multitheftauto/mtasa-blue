@@ -240,7 +240,7 @@ public:
 
     // Vehicle create/destroy functions
     static CVehicle* CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate,
-                                   unsigned char ucVariant, unsigned char ucVariant2);
+                                   unsigned char ucVariant, unsigned char ucVariant2, bool bSynced);
 
     // Vehicle get functions
     static bool  GetVehicleVariant(CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
