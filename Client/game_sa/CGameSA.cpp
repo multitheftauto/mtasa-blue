@@ -733,6 +733,80 @@ void CGameSA::SetFireballDestructEnabled(bool isEnabled)
     m_isFireballDestructEnabled = isEnabled;
 }
 
+void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isExtendedWaterCannonsEnabled)
+        return;
+
+    // Allocate memory for new bigger array or use default aCannons array
+    void* aCannons = isEnabled ? malloc(MAX_WATER_CANNONS * SIZE_CWaterCannon) : (void*)ARRAY_aCannons;
+
+    int newLimit = isEnabled ? MAX_WATER_CANNONS : NUM_CWaterCannon_DefaultLimit; // default: 3
+    MemSetFast(aCannons, 0, newLimit * SIZE_CWaterCannon); // clear aCannons array
+
+    // Get current limit
+    int currentLimit = *(int*)NUM_WaterCannon_Limit;
+
+    // Get current aCannons array
+    void* currentACannons = *(void**)ARRAY_aCannons_CurrentPtr;
+
+    // Call CWaterCannon destructor
+    for (int i = 0; i < currentLimit; i++)
+    {
+        char* currentCannon = (char*)currentACannons + i * SIZE_CWaterCannon;
+
+        ((void(__thiscall*)(int, void*, bool))FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity)(STRUCT_CAESoundManager, currentCannon + NUM_CWaterCannon_Audio_Offset, true); // CAESoundManager::CancelSoundsOwnedByAudioEntity to prevent random crashes from CAESound::UpdateParameters
+        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Destructor)(currentCannon); // CWaterCannon::~CWaterCannon
+    }
+
+    // Call CWaterCannon constructor & CWaterCannon::Init
+    for (int i = 0; i < newLimit; ++i)
+    {
+        char* currentCannon = (char*)aCannons + i * SIZE_CWaterCannon;
+
+        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Constructor)(currentCannon); // CWaterCannon::CWaterCannon
+        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Init)(currentCannon); // CWaterCannon::Init
+    }
+
+    // Patch references to array
+    MemPut((void*)0x728C83, aCannons);                // CWaterCannons::Init
+    MemPut((void*)0x728CCB, aCannons);                // CWaterCannons::UpdateOne
+    MemPut((void*)0x728CEB, aCannons);                // CWaterCannons::UpdateOne
+    MemPut((void*)0x728D0D, aCannons);                // CWaterCannons::UpdateOne
+    MemPut((void*)0x728D71, aCannons);                // CWaterCannons::UpdateOne
+    MemPutFast((void*)0x729B33, aCannons);            // CWaterCannons::Render
+    MemPut((void*)0x72A3C5, aCannons);                // CWaterCannons::UpdateOne
+    MemPut((void*)0x855432, aCannons);                // 0x855431
+    MemPut((void*)0x856BFD, aCannons);                // 0x856BFC
+
+    // CWaterCannons::Init
+    MemPut<BYTE>(0x728C88, newLimit);
+
+    // CWaterCannons::Update
+    MemPut<BYTE>(0x72A3F2, newLimit);
+
+    // CWaterCanons::UpdateOne
+    MemPut<BYTE>(0x728CD4, newLimit);
+    MemPut<BYTE>(0x728CF6, newLimit);
+    MemPut<BYTE>(0x728CFF, newLimit);
+    MemPut<BYTE>(0x728D62, newLimit);
+
+    // CWaterCannons::Render
+    MemPutFast<BYTE>(0x729B38, newLimit);
+
+    // 0x85542A
+    MemPut<BYTE>(0x85542B, newLimit);
+
+    // 0x856BF5
+    MemPut<BYTE>(0x856BF6, newLimit);
+
+    // Free previous allocated memory
+    if (!isEnabled && currentACannons != nullptr)
+        free(currentACannons);
+
+    m_isExtendedWaterCannonsEnabled = isEnabled;
+}
+
 void CGameSA::SetRoadSignsTextEnabled(bool isEnabled)
 {
     if (isEnabled == m_isRoadSignsTextEnabled)
