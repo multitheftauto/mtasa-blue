@@ -539,10 +539,6 @@ enum class eBitStreamVersion : unsigned short
     // Send server name to player in CPlayerJoinCompletePacket
     // 2023-10-12
     CPlayerJoinCompletePacket_ServerName,
-    
-    // Send weapon switch for other players
-    // 2023-01-13
-    OnPlayerWeaponSwitch_Remote,
 
     // Add "roadsignstext" to setWorldSpecialPropertyEnabled
     // 2024-05-17
