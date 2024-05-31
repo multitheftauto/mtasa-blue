@@ -2012,7 +2012,21 @@ void CCore::OnPreHUDRender()
 {
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
 
-    CGraphics::GetSingleton().EnteringMTARenderZone();
+    if (CGraphics::GetSingleton().HasLine3DPostFXQueueItems() || CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+    {
+        /*
+            Although MTA render zones are expensive, we should use them twice in the bounds of the function
+            because some of render states from PostFX drain to the 2D part of the frame.
+        */
+        CGraphics::GetSingleton().EnteringMTARenderZone();
+
+        CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+        CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
+        CGraphics::GetSingleton().LeavingMTARenderZone();
+    }
+
+    CGraphics::GetSingleton().EnteringMTARenderZone();    
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();

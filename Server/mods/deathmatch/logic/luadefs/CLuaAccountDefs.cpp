@@ -23,6 +23,7 @@ void CLuaAccountDefs::LoadFunctions()
 
         // Account get functions
         {"getAccountName", GetAccountName},
+        {"getAccountType", ArgumentParser<GetAccountType>},
         {"getAccountPlayer", GetAccountPlayer},
         {"isGuestAccount", IsGuestAccount},
         {"getAccountData", GetAccountData},
@@ -77,6 +78,7 @@ void CLuaAccountDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getData", "getAccountData");
     lua_classfunction(luaVM, "getAllData", "getAllAccountData");
     lua_classfunction(luaVM, "getName", "getAccountName");
+    lua_classfunction(luaVM, "getType", "getAccountType");
     lua_classfunction(luaVM, "getPlayer", "getAccountPlayer");
     lua_classfunction(luaVM, "isGuest", "isGuestAccount");
 
@@ -114,6 +116,20 @@ int CLuaAccountDefs::GetAccountName(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::optional<std::string> CLuaAccountDefs::GetAccountType(CAccount* pAccount)
+{
+    switch (pAccount->GetType())
+    {
+        case EAccountType::Guest:
+            return "guest";
+        case EAccountType::Console:
+            return "console";
+        case EAccountType::Player:
+            return "player";
+    }
+    return {};
 }
 
 int CLuaAccountDefs::GetAccountPlayer(lua_State* luaVM)
