@@ -20,19 +20,19 @@ constants.WeaponSlot = setmetatable({
     Gift = 10,
     Parachute = 11,
     Detonator = 12,
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.WeaponSkillLevel = setmetatable({
     Poor = 0,
     Gangster = 1,
     Hitman = 2
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.WeaponSkillName = setmetatable({
     Pro = 'pro',
     Gangster = 'std',
     Poor = 'poor'
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.WeaponProperties = setmetatable({
     WeaponRange = 'weapon_range',
@@ -82,7 +82,7 @@ constants.WeaponProperties = setmetatable({
     AimOffset = 'aim_offset',
     DefaultCombo = 'default_combo',
     CombosAvailable = 'combos_available',
-}, metatable)
+}, __readonly_table_meta__)
 
     )~LUA~";
 }

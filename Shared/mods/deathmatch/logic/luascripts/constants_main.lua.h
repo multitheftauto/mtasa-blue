@@ -6,7 +6,7 @@ namespace EmbeddedLuaCode
     Defines a constant variables available for server and client.
 --]]
 
-metatable = {
+__readonly_table_meta__ = {
     __index = function(tbl, key)
         local val = rawget(tbl, key)
         if val then

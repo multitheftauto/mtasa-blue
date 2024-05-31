@@ -11,7 +11,7 @@ constants.TriggerPriority = setmetatable({
     High = 'high',
     Normal = 'normal',
     Low = 'low'
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.DebugMessageLevel = setmetatable({
     Custom = 0,
@@ -19,13 +19,13 @@ constants.DebugMessageLevel = setmetatable({
     Warning = 2,
     Information = 3,
     CustomNoPath = 4
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.KeyState = setmetatable({
     Up = 'up',
     Down = 'down',
     Both = 'both'
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.KeyName = setmetatable({
     LeftClick = 'mouse1',
@@ -134,7 +134,7 @@ constants.KeyName = setmetatable({
     Hash = '#',
     BackSlash = '\\',
     Equals = '='
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.ControlName = setmetatable({
     Fire = 'fire',
@@ -182,7 +182,7 @@ constants.ControlName = setmetatable({
     SpecialControlDown = 'special_control_down',
     SpecialControlUp = 'special_control_up',
     EnterExit = 'enter_exit',
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.AnimationBlock = setmetatable({
     airport = 'airport',
@@ -313,7 +313,7 @@ constants.AnimationBlock = setmetatable({
     wayfarer = 'wayfarer',
     weapons = 'weapons',
     wuzi = 'wuzi',
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.BodyPart = setmetatable({
     Torso = 3,
@@ -323,7 +323,7 @@ constants.BodyPart = setmetatable({
     LeftLeg = 7,
     RightLeg = 8,
     Head = 9,
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.ClothesType = setmetatable({
     Shirt = 0,
@@ -344,7 +344,7 @@ constants.ClothesType = setmetatable({
     Glasses = 15,
     Hat = 16,
     Extra = 17,
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.Weather = setmetatable({
     ExtraSunnyLS = 0,
@@ -370,7 +370,7 @@ constants.Weather = setmetatable({
     Underwater = 20,
     ExtraColours1 = 21,
     ExtraColours2 = 22,
-}, metatable)
+}, __readonly_table_meta__)
 
     )~LUA~";
 }

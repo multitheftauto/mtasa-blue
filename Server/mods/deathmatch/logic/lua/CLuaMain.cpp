@@ -249,6 +249,7 @@ void CLuaMain::LoadEmbeddedScripts()
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
+    
     LoadScript(EmbeddedLuaCode::constantsMain);
     LoadScript(EmbeddedLuaCode::constantsElements);
     LoadScript(EmbeddedLuaCode::constantsVehicles);
@@ -259,8 +260,8 @@ void CLuaMain::LoadEmbeddedScripts()
 
     // To make `constants` table read-only;
     LoadScript(R"~LUA~(
-        setmetatable(constants, metatable)
-        metatable = nil
+        setmetatable(constants, __readonly_table_meta__)
+        __readonly_table_meta__ = nil
     )~LUA~");
 }
 

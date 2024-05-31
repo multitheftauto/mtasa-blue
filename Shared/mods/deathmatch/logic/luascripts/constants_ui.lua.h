@@ -21,7 +21,7 @@ constants.HudComponents = setmetatable({
     Radio = 'radio',
     Wanted = 'wanted',
     Crosshair = 'crosshair',
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.BlipIcons = setmetatable({
     Marker = 0,
@@ -88,7 +88,7 @@ constants.BlipIcons = setmetatable({
     GangRifa = 61,
     GangFamilies = 62,
     Spray = 63,
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.MarkerTypes = setmetatable({
     Checkpoint = 'checkpoint',
@@ -96,14 +96,14 @@ constants.MarkerTypes = setmetatable({
     Cylinder = 'cylinder',
     Arrow = 'arrow',
     Corona = 'corona',
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.PickupTypes = setmetatable({
     Health = 0,
     Armour = 1,
     Weapon = 2,
     Custom = 3
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.ModelPickupTypes = setmetatable({
     Jetpack = 370,
@@ -128,7 +128,7 @@ constants.ModelPickupTypes = setmetatable({
     Skulls = 1313,
     PlayersIcon = 1314,
     DownArrow = 1318,
-}, metatable)
+}, __readonly_table_meta__)
 
     )~LUA~";
 }

@@ -11,12 +11,12 @@ constants.VehicleLights = setmetatable({
     FrontRight = 1,
     RearRight = 2,
     RearLeft = 3
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.VehicleLightState = setmetatable({
     Normal = 0,
     Broken = 1
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.VehicleDoorType = setmetatable({
     Hood = 0,
@@ -25,7 +25,7 @@ constants.VehicleDoorType = setmetatable({
     FrontRight = 3,
     RearLeft = 4,
     RearRight = 5
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.VehicleDoorState = setmetatable({
     ClosedUndamaged = 0,
@@ -33,13 +33,13 @@ constants.VehicleDoorState = setmetatable({
     ClosedDamaged = 2,
     OpenDamaged = 3,
     Missing = 4
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.VehicleLightOverride = setmetatable({
     Disable = 0,
     Off = 1,
     On = 2
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.CarPanel = setmetatable({
     FrontLeft = 0,
@@ -49,7 +49,7 @@ constants.CarPanel = setmetatable({
     Windscreen = 4,
     FrontBumper = 5,
     RearBumper = 6
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.PlanePanels = setmetatable({
     LeftEngine = 0,
@@ -59,28 +59,28 @@ constants.PlanePanels = setmetatable({
     Ailerons = 4,
     --Unknown = 5,
     --Unknown = 6
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.VehiclePanelState = setmetatable({
     Undamaged = 0,
     SlightlyDamaged = 1,
     Damaged = 2,
     HeavilyDamaged = 3
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.vehicleWheelState = setmetatable({
     Inflated = 0,
     Flat = 1,
     FallenOff = 2,
     Collisionless = 3
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.VehicleSeat = setmetatable({
     FrontLeft = 0,
     FrontRight = 1,
     RearLeft = 2,
     RearRight = 3
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.TrafficLightState = setmetatable({
     Auto = 'auto',
@@ -88,7 +88,7 @@ constants.TrafficLightState = setmetatable({
     Red = 'red',
     Yellow = 'yellow',
     Green = 'green'
-}, metatable)
+}, __readonly_table_meta__)
 
     )~LUA~";
 }

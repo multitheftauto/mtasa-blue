@@ -27,7 +27,7 @@ constants.ElementType = setmetatable({
     Searchlight = 'searchlight',
     Shader = 'shader',
     Texture = 'texture',
-}, metatable)
+}, __readonly_table_meta__)
 
     )~LUA~";
 }

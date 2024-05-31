@@ -169,7 +169,7 @@ constants.PedStats = setmetatable({
     UnderwaterStamina = 225,
     BikeSkill = 229,
     CycleSkill = 230,
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.PedWalkingStyle = setmetatable({
     Default = 0,
@@ -211,7 +211,7 @@ constants.PedWalkingStyle = setmetatable({
     JogWoman = 136,
     OldFatWoman = 137,
     Skate = 138,
-}, metatable)
+}, __readonly_table_meta__)
 
 constants.PedFightingStyle = setmetatable({
     Standard = 4,
@@ -220,7 +220,7 @@ constants.PedFightingStyle = setmetatable({
     KneeHead = 7,
     GrabKick = 15,
     Elbows = 16,
-}, metatable)
+}, __readonly_table_meta__)
 
     )~LUA~";
 }

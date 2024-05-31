@@ -202,8 +202,8 @@ void CLuaMain::LoadEmbeddedScripts()
 
     // To make `constants` table read-only
     LoadScript(R"~LUA~(
-        setmetatable(constants, metatable)
-        metatable = nil
+        setmetatable(constants, __readonly_table_meta__)
+        __readonly_table_meta__ = nil
     )~LUA~");
     DECLARE_PROFILER_SECTION(OnPostLoadScript)
 }
