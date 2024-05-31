@@ -6097,6 +6097,8 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::FIREBALLDESTRUCT:
             g_pGame->SetFireballDestructEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::EXTENDEDWATERCANNONS:
+            g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
         case WorldSpecialProperty::ROADSIGNSTEXT:
             g_pGame->SetRoadSignsTextEnabled(isEnabled);
             return true;
@@ -6131,6 +6133,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsBurnFlippedCarsEnabled();
         case WorldSpecialProperty::FIREBALLDESTRUCT:
             return g_pGame->IsFireballDestructEnabled();
+        case WorldSpecialProperty::EXTENDEDWATERCANNONS:
+            return g_pGame->IsExtendedWaterCannonsEnabled();
         case WorldSpecialProperty::ROADSIGNSTEXT:
             return g_pGame->IsRoadSignsTextEnabled();
     }
