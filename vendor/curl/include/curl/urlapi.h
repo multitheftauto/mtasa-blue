@@ -63,6 +63,7 @@ typedef enum {
   CURLUE_BAD_SLASHES,         /* 28 */
   CURLUE_BAD_USER,            /* 29 */
   CURLUE_LACKS_IDN,           /* 30 */
+  CURLUE_TOO_LARGE,           /* 31 */
   CURLUE_LAST
 } CURLUcode;
 
@@ -98,6 +99,9 @@ typedef enum {
 #define CURLU_ALLOW_SPACE (1<<11)       /* Allow spaces in the URL */
 #define CURLU_PUNYCODE (1<<12)          /* get the host name in punycode */
 #define CURLU_PUNY2IDN (1<<13)          /* punycode => IDN conversion */
+#define CURLU_GET_EMPTY (1<<14)         /* allow empty queries and fragments
+                                           when extracting the URL or the
+                                           components */
 
 typedef struct Curl_URL CURLU;
 

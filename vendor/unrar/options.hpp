@@ -33,7 +33,7 @@ enum RECURSE_MODE
   RECURSE_NONE=0,    // no recurse switches
   RECURSE_DISABLE,   // switch -r-
   RECURSE_ALWAYS,    // switch -r
-  RECURSE_WILDCARDS, // switch -r0
+  RECURSE_WILDCARDS  // switch -r0
 };
 
 enum OVERWRITE_MODE 
