@@ -3079,9 +3079,12 @@ retry:
                         if (bitStream.Read(&health))
                             pObject->SetHealth(health.data.fValue);
 
-                        if (bitStream.ReadBit())
-                            pObject->Break();
-
+                        if (bitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        {
+                            if (bitStream.ReadBit())
+                                pObject->Break();
+                        }
+                        
                         pObject->SetCollisionEnabled(bCollisonsEnabled);
                         if (ucEntityTypeID == CClientGame::WEAPON)
                         {
