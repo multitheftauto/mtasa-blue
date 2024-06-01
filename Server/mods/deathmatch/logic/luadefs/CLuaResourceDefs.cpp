@@ -927,43 +927,6 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
     return resourceName;
 }
 
-//int CLuaResourceDefs::getResourceName(lua_State* luaVM)
-//{
-//    CResource* pResource;
-//    CScriptArgReader argStream(luaVM);
-//    argStream.ReadUserData(pResource, nullptr);
-//
-//    if (!argStream.HasErrors())
-//    {
-//        if (!pResource)
-//        {
-//            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-//            if (pLuaMain)
-//            {
-//                pResource = pLuaMain->GetResource();
-//            }
-//
-//            // No Lua VM or no assigned resource?
-//            if (!pResource)
-//            {
-//                lua_pushboolean(luaVM, false);
-//                return 1;
-//            }
-//        }
-//
-//        if (pResource->IsActive())
-//        {
-//            lua_pushstring(luaVM, pResource->GetName().c_str());
-//            return 1;
-//        }
-//    }
-//    else
-//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-//
-//    lua_pushboolean(luaVM, false);
-//    return 1;
-//}
-
 int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
 {
     CResource* pResource;
