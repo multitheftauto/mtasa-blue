@@ -906,23 +906,23 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
         CResource* localResource;
 
         if (!localVM)
-            return false;
+            throw std::runtime_error("Couldn't find the virtual machine");
 
         localResource = localVM->GetResource();
 
         if (!localResource)
-            return false;
+            throw std::runtime_error("Couldn't find the resource");
 
         resourceElement = localResource;
     }
 
     if (!(*resourceElement)->IsActive())
-        return false;
+        throw std::runtime_error("The resource isn't active");
 
     std::string resourceName = (*resourceElement)->GetName();
 
     if (resourceName.empty())
-        return false;
+        throw std::runtime_error("The resource name is empty");
 
     return resourceName;
 }
