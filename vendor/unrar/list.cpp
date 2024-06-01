@@ -54,7 +54,7 @@ void ListArchive(CommandData *Cmd)
             else
               mprintf(L", %s", St(MListVolume));
           if (Arc.Protected)
-            mprintf(L"%, %s", St(MListRR));
+            mprintf(L", %s", St(MListRR));
           if (Arc.Locked)
             mprintf(L", %s", St(MListLock));
           if (Arc.Encrypted)

@@ -3785,6 +3785,11 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Enti
             Ped.SetUsesCollision(bEnabled);
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            static_cast<CClientBuilding&>(Entity).SetUsesCollision(bEnabled);
+            break;
+        }
         default:
             return false;
     }
@@ -3859,13 +3864,26 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CClientEntity& Entity, CClient
 {
     RUN_CHILDREN(SetLowLodElement(**iter, pLowLodEntity))
 
-    switch (Entity.GetType())
+    eClientEntityType entityType = Entity.GetType();
+
+    if (pLowLodEntity != nullptr && entityType != pLowLodEntity->GetType())
+        return false;
+
+    switch (entityType)
     {
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             CClientObject* pLowLodObject = static_cast<CClientObject*>(pLowLodEntity);
             if (!Object.SetLowLodObject(pLowLodObject))
+                return false;
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            CClientBuilding* pLowLodBuilding = static_cast<CClientBuilding*>(pLowLodEntity);
+            if (!Building.SetLowLodBuilding(pLowLodBuilding))
                 return false;
             break;
         }
@@ -3888,6 +3906,12 @@ bool CStaticFunctionDefinitions::GetLowLodElement(CClientEntity& Entity, CClient
             pOutLowLodEntity = Object.GetLowLodObject();
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            pOutLowLodEntity = Building.GetLowLodBuilding();
+            break;
+        }
         default:
             return false;
     }
@@ -3905,6 +3929,12 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CClientEntity& Entity, bool& bO
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             bOutIsLowLod = Object.IsLowLod();
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            bOutIsLowLod = Building.IsLod();
             break;
         }
         default:

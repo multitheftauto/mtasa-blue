@@ -596,8 +596,10 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
 
                                         // Send the message and player pointer to the script
                                         CLuaArguments Arguments;
-                                        Arguments.PushString(szArguments);
+                                        Arguments.PushString(szArguments); // We don't want to remove this for backwards compatibility reasons
                                         Arguments.PushElement(pPlayer);
+                                        Arguments.PushString(szMessage); // Fix #2135
+
                                         bool bContinue = pSender->CallEvent("onPlayerPrivateMessage", Arguments);
                                         if (bContinue)
                                         {

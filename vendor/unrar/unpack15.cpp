@@ -474,7 +474,8 @@ void Unpack::CorrHuff(ushort *CharSet,byte *NumToPlace)
 void Unpack::CopyString15(uint Distance,uint Length)
 {
   DestUnpSize-=Length;
-  if (!FirstWinDone && Distance>UnpPtr || Distance>MaxWinSize)
+  // 2024.04.18: Distance can be 0 in corrupt RAR 1.5 archives.
+  if (!FirstWinDone && Distance>UnpPtr || Distance>MaxWinSize || Distance==0)
     while (Length-- > 0)
     {
       Window[UnpPtr]=0;
