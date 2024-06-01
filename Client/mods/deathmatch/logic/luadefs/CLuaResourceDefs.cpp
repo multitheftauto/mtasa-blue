@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
+
 using std::list;
 
 void CLuaResourceDefs::LoadFunctions()
@@ -18,7 +20,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"call", Call},
         {"getThisResource", GetThisResource},
         {"getResourceConfig", GetResourceConfig},
-        {"getResourceName", GetResourceName},
+        {"getResourceName", ArgumentParser<GetResourceName>},
         {"getResourceFromName", GetResourceFromName},
         {"getResourceRootElement", GetResourceRootElement},
         {"getResourceGUIElement", GetResourceGUIElement},
@@ -220,45 +222,71 @@ int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::GetResourceName(lua_State* luaVM)
+std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    // Verify arguments
-    CResource* pResource;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource, nullptr);
-
-    if (!argStream.HasErrors())
+    if (!resourceElement)
     {
-        if (!pResource)
-        {
-            // Find our vm and get the root
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                pResource = pLuaMain->GetResource();
-            }
-        }
+        CLuaMain*  localVM = m_pLuaManager->GetVirtualMachine(luaVM);
+        CResource* localResource;
 
-        if (pResource)
-        {
-            // Grab its name and return it
-            const char* szName = pResource->GetName();
-            if (szName)
-            {
-                lua_pushstring(luaVM, szName);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer(luaVM, "resource", 1);
+        if (!localVM)
+            return false;
+
+        localResource = localVM->GetResource();
+
+        if (!localResource)
+            return false;
+
+        resourceElement = localResource;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    std::string resourceName = (*resourceElement)->GetName();
+
+    if (resourceName.empty())
+        return false;
+
+    return resourceName;
 }
+
+//int CLuaResourceDefs::GetResourceName(lua_State* luaVM)
+//{
+//    // Verify arguments
+//    CResource* pResource;
+//    CScriptArgReader argStream(luaVM);
+//    argStream.ReadUserData(pResource, nullptr);
+//
+//    if (!argStream.HasErrors())
+//    {
+//        if (!pResource)
+//        {
+//            // Find our vm and get the root
+//            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+//            if (pLuaMain)
+//            {
+//                pResource = pLuaMain->GetResource();
+//            }
+//        }
+//
+//        if (pResource)
+//        {
+//            // Grab its name and return it
+//            const char* szName = pResource->GetName();
+//            if (szName)
+//            {
+//                lua_pushstring(luaVM, szName);
+//                return 1;
+//            }
+//        }
+//        else
+//            m_pScriptDebugging->LogBadPointer(luaVM, "resource", 1);
+//    }
+//    else
+//        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+//
+//    // Failed
+//    lua_pushboolean(luaVM, false);
+//    return 1;
+//}
 
 int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
 {
