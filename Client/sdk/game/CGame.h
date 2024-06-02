@@ -217,6 +217,9 @@ public:
     virtual bool IsFireballDestructEnabled() const noexcept = 0;
     virtual void SetFireballDestructEnabled(bool isEnabled) = 0;
 
+    virtual bool IsExtendedWaterCannonsEnabled() const noexcept = 0;
+    virtual void SetExtendedWaterCannonsEnabled(bool isEnabled) = 0;
+
     virtual bool IsRoadSignsTextEnabled() const noexcept = 0;
     virtual void SetRoadSignsTextEnabled(bool isEnabled) = 0;
 
@@ -262,4 +265,6 @@ public:
 
     virtual void RemoveAllBuildings() = 0;
     virtual void RestoreGameBuildings() = 0;
+
+    virtual bool SetBuildingPoolSize(size_t size) = 0;
 };

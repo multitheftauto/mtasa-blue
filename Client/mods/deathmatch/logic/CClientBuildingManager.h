@@ -31,6 +31,9 @@ public:
     static bool IsValidModel(uint16_t modelId);
     static bool IsValidPosition(const CVector& pos) noexcept;
 
+    void DestroyAllForABit();
+    void RestoreDestroyed();
+
 private:
     void AddToList(CClientBuilding* pBuilding) { m_List.push_back(pBuilding); }
     void RemoveFromList(CClientBuilding* pBuilding);
