@@ -1317,6 +1317,9 @@ void CGame::JoinPlayer(CPlayer& Player)
 
     marker.Set("CPlayerJoinCompletePacket");
 
+    // Sync up server info on entry
+    Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
+
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
         CPerfStatDebugInfo::GetSingleton()->AddLine("PlayerInGameNotice", marker.GetString());
@@ -1818,8 +1821,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetSerial(strSerial, 0);
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
-
-                            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
 
                             // Check if client must update
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
