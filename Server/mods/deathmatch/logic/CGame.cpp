@@ -2302,11 +2302,6 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         if ((pPlayer->GetPuresyncCount() % 4) == 0)
             pPlayer->Send(CReturnSyncPacket(pPlayer));
 
-        // Send a server info sync packet to the player
-        // Only every 512 packets
-        if ((pPlayer->GetPuresyncCount() % 512) == 0)
-            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
-
         CLOCK("PlayerPuresync", "RelayPlayerPuresync");
         // Relay to other players
         RelayPlayerPuresync(Packet);
