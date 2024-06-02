@@ -191,7 +191,7 @@ CVehicle* CPedSA::GetVehicle()
 {
     if (((CPedSAInterface*)GetInterface())->pedFlags.bInVehicle)
     {
-        CVehicleSAInterface* vehicle = (CVehicleSAInterface*)(((CPedSAInterface*)GetInterface())->CurrentObjective);
+        CVehicleSAInterface* vehicle = (CVehicleSAInterface*)(((CPedSAInterface*)GetInterface())->pVehicle);
         if (vehicle)
         {
             SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)vehicle);
