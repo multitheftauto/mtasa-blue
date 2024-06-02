@@ -65,6 +65,7 @@ private:
 public:
     void                   RemovePed(CPed* ped, bool bDelete = true);
     SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
+    SClientEntity<CPedSA>* GetPed(size_t pos) { return &m_pedPool.arrayOfClientEntities[pos]; };
     CPed*                  GetPedFromRef(DWORD dwGameRef);
     CPedSAInterface*       GetPedInterface(DWORD dwGameRef);            // game_sa specific
     unsigned long          GetPedCount() { return m_pedPool.ulCount; }
