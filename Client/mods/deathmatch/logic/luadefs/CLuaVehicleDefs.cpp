@@ -2654,7 +2654,7 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
             argStream.ReadString(strProperty);
 
             eHandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
-            if (!eProperty)
+            if (eProperty == HANDLING_MAX)
             {
                 argStream.SetCustomError("Invalid property");
                 m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
