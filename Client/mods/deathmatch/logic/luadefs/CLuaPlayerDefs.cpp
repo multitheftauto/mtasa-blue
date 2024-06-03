@@ -28,6 +28,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"isPlayerHudComponentVisible", IsPlayerHudComponentVisible},
         {"getPlayerMoney", GetPlayerMoney},
         {"getPlayerWantedLevel", GetPlayerWantedLevel},
+        {"hasPlayerSpawned", ArgumentParser<HasPlayerSpawned>},
 
         // Player set funcs
         {"showPlayerHudComponent", ShowPlayerHudComponent},
@@ -308,6 +309,13 @@ int CLuaPlayerDefs::GetPlayerWantedLevel(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+
+bool CLuaPlayerDefs::HasPlayerSpawned(CClientPlayer* player)
+{
+    return player->IsPlayerSpawned();
+}
+
 
 int CLuaPlayerDefs::ShowPlayerHudComponent(lua_State* luaVM)
 {

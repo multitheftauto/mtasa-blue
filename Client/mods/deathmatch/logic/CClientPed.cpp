@@ -731,6 +731,8 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
     {
         SetFrozenWaitingForGroundToLoad(true);
         m_iLoadAllModelsCounter = 10;
+
+        static_cast<CClientPlayer&>(*this).SetPlayerSpawned(true);
     }
 
     // Remove any animation

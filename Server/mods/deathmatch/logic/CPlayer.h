@@ -104,6 +104,9 @@ public:
     bool IsJoined() { return m_bIsJoined; }
     void SetJoined() { m_bIsJoined = true; }
 
+    bool IsPlayerSpawned() const noexcept { return m_bHasPlayerSpawned; }
+    void SetPlayerSpawned(const bool bSetSpawned) noexcept { m_bHasPlayerSpawned = bSetSpawned; }
+
     bool SubscribeElementData(CElement* pElement, const std::string& strName);
     bool UnsubscribeElementData(CElement* pElement, const std::string& strName);
     bool UnsubscribeElementData(CElement* pElement);
@@ -465,4 +468,6 @@ private:
 
     ushort  m_usPrevDimension;
     SString m_strQuitReasonForLog;
+
+    bool m_bHasPlayerSpawned;
 };

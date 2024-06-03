@@ -66,6 +66,9 @@ public:
 
     unsigned short GetLatency() { return m_usLatency; }
     void           SetLatency(unsigned short usLatency) { m_usLatency = (m_usLatency + usLatency) / 2; }
+    
+    bool IsPlayerSpawned() const noexcept { return m_bHasPlayerSpawned; }
+    void SetPlayerSpawned(const bool bSetSpawned) noexcept { m_bHasPlayerSpawned = bSetSpawned; }
 
     unsigned long  GetLastPuresyncTime() { return m_ulLastPuresyncTime; }
     void           SetLastPuresyncTime(unsigned long ulLastPuresyncTime) { m_ulLastPuresyncTime = ulLastPuresyncTime; }
@@ -116,6 +119,8 @@ public:
     uchar   m_ucPrevBulletSyncOrderCounter;
 
 private:
+    bool m_bHasPlayerSpawned{false};
+
     bool    m_bIsLocalPlayer;
     SString m_strNick;
 

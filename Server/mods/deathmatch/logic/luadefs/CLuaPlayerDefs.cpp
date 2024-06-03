@@ -49,6 +49,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"resendPlayerModInfo", ResendPlayerModInfo},
         {"resendPlayerACInfo", ResendPlayerACInfo},
         {"getPlayerScriptDebugLevel", ArgumentParser<GetPlayerScriptDebugLevel>},
+        {"hasPlayerSpawned", ArgumentParser<HasPlayerSpawned>},
 
         // Player set funcs
         {"setPlayerMoney", SetPlayerMoney},
@@ -1457,6 +1458,11 @@ int CLuaPlayerDefs::ResendPlayerACInfo(lua_State* luaVM)
 unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
 {
     return player->GetScriptDebugLevel();
+}
+
+bool CLuaPlayerDefs::HasPlayerSpawned(CPlayer* player)
+{
+    return player->IsPlayerSpawned();
 }
 
 int CLuaPlayerDefs::BindKey(lua_State* luaVM)
