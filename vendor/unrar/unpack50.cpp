@@ -588,10 +588,19 @@ bool Unpack::ReadBlockHeader(BitInput &Inp,UnpackBlockHeader &Header)
 
   Header.BlockSize=BlockSize;
   byte CheckSum=byte(0x5a^BlockFlags^BlockSize^(BlockSize>>8)^(BlockSize>>16));
+
+  // 2024.01.04: In theory the valid block can have Header.BlockSize == 0
+  // and Header.TablePresent == false in case the only block purpose is to
+  // store Header.LastBlockInFile flag if it didn't fit into previous block.
+  // So we do not reject Header.BlockSize == 0. Though currently RAR doesn't
+  // seem to issue such zero length blocks.
   if (CheckSum!=SavedCheckSum)
     return false;
 
   Header.BlockStart=Inp.InAddr;
+
+  // We called Inp.faddbits(8) above, thus Header.BlockStart can't be 0 here.
+  // So there is no overflow even if Header.BlockSize is 0.
   ReadBorder=Min(ReadBorder,Header.BlockStart+Header.BlockSize-1);
 
   Header.LastBlockInFile=(BlockFlags & 0x40)!=0;

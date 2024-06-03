@@ -96,6 +96,13 @@ namespace EBlendMode
 }
 using EBlendMode::EBlendModeType;
 
+enum class eRenderStage
+{
+    PRE_FX,
+    POST_FX,
+    POST_GUI
+};
+
 class CGraphicsInterface
 {
 public:
@@ -145,11 +152,11 @@ public:
     // Queued up drawing
     virtual void DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, unsigned long ulColor, bool bPostGUI) = 0;
 
-    virtual void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI) = 0;
+    virtual void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, eRenderStage stage = eRenderStage::PRE_FX) = 0;
 
     virtual void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial,
                                           float fU = 0, float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bFlipUV = false,
-                                          bool bUseFaceToward = false, const CVector& vecFaceToward = CVector(), bool bPostGUI = false) = 0;
+                                          bool bUseFaceToward = false, const CVector& vecFaceToward = CVector(), eRenderStage renderStage = eRenderStage::POST_FX) = 0;
 
     virtual void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false) = 0;
 
@@ -165,9 +172,9 @@ public:
     virtual void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
                                              bool bPostGUI) = 0;
 
-    virtual void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI) = 0;
+    virtual void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, eRenderStage stage = eRenderStage::PRE_FX) = 0;
     virtual void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial,
-                                               bool bPostGUI) = 0;
+                                               eRenderStage stage = eRenderStage::PRE_FX) = 0;
 
     virtual void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                                   short siSegments, float fRatio, bool bPostGUI) = 0;
