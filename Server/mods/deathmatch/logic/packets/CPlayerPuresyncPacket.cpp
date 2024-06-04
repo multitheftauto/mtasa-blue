@@ -79,7 +79,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         if (pContactElement != nullptr)
         {
-            float radius = -1;
+            int32_t radius = -1;
 
             switch (pContactElement->GetType())
             {
