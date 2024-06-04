@@ -537,7 +537,7 @@ int CLuaPlayerDefs::GetAlivePlayers(lua_State* luaVM)
         {
             CPlayer* pPlayer = *iter;
 
-            if (pPlayer->IsJoined() && pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
+            if (pPlayer->IsJoined() && !pPlayer->IsDead() && !pPlayer->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++uiIndex);
                 lua_pushelement(luaVM, pPlayer);
@@ -568,7 +568,7 @@ int CLuaPlayerDefs::GetDeadPlayers(lua_State* luaVM)
         {
             CPlayer* pPlayer = *iter;
 
-            if (pPlayer->IsJoined() && !pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
+            if (pPlayer->IsJoined() && pPlayer->IsDead() && !pPlayer->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++uiIndex);
                 lua_pushelement(luaVM, pPlayer);

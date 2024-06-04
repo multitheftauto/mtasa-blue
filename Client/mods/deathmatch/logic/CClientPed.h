@@ -287,7 +287,7 @@ public:
     void StealthKill(CClientPed* pPed);
     void BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
-    int  IsSpawned() const noexcept { return m_bIsSpawned; }
+    bool IsSpawned() const noexcept { return m_bIsSpawned; }
     void SetSpawned(const bool bSpawned) noexcept { m_bIsSpawned = bSpawned; }
 
     CWeapon*    GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent = false);
