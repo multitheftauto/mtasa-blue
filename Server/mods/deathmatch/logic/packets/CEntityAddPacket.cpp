@@ -298,7 +298,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&health);
 
                     // is object break?
-                    BitStream.WriteBit(pObject->GetHealth() <= 0);
+                    if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        BitStream.WriteBit(pObject->GetHealth() <= 0);
 
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
