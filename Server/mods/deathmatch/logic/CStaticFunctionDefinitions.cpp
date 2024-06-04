@@ -12164,23 +12164,22 @@ bool CStaticFunctionDefinitions::ResetMapInfo(CElement* pElement)
 
 CElement* CStaticFunctionDefinitions::GetResourceMapRootElement(CResource* pResource, const char* szMap)
 {
-    if (pResource)
+    if (!pResource)
+        return nullptr;
+
+    for (const auto& pFile : pResource->GetFiles())
     {
-        list<CResourceFile*>::const_iterator iter = pResource->IterBegin();
-        for (; iter != pResource->IterEnd(); iter++)
-        {
-            if ((*iter)->GetType() == (*iter)->RESOURCE_FILE_TYPE_MAP)
-            {
-                if (strcmp((*iter)->GetName(), szMap) == 0)
-                {
-                    CResourceMapItem* pMapItem = static_cast<CResourceMapItem*>(*iter);
-                    return pMapItem->GetMapRootElement();
-                }
-            }
-        }
+        if (pFile->GetType() != pFile->RESOURCE_FILE_TYPE_MAP)
+            continue;
+
+        if (strcmp(pFile->GetName(), szMap))
+            continue;
+
+        CResourceMapItem* pMapItem = static_cast<CResourceMapItem*>(pFile);
+        return pMapItem->GetMapRootElement();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 CXMLNode* CStaticFunctionDefinitions::AddResourceMap(CResource* pResource, const std::string& strFilePath, const std::string& strMapName, int iDimension,
@@ -12243,7 +12242,7 @@ CXMLNode* CStaticFunctionDefinitions::AddResourceMap(CResource* pResource, const
         CLogger::ErrorPrintf("Unable to add map %s to resource %s; Resource is not loaded\n", strMapName.c_str(), pResource->GetName().c_str());
 
     // Failed
-    return NULL;
+    return nullptr;
 }
 
 CXMLNode* CStaticFunctionDefinitions::AddResourceConfig(CResource* pResource, const std::string& strFilePath, const std::string& strConfigName, int iType,

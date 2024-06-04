@@ -52,14 +52,15 @@ struct SHttpDownloadResult
 // For transferring SString to net module
 struct SStringContent
 {
-    void operator=(const SString& other)
+    std::size_t length = 0;
+    const char* pData = nullptr;
+
+    void operator=(const SString& other) noexcept
     {
         length = other.length();
         pData = *other;
     }
-                operator SString() const { return SStringX(pData, length); }
-    size_t      length = 0;
-    const char* pData = nullptr;
+    operator SString() const noexcept { return SStringX(pData, length); }
 };
 
 // For transferring std::map<SString,SString> to net module

@@ -49,41 +49,39 @@ void CResourceChecker::CheckResourceForIssues(CResource* pResource, const string
     m_upgradedFullPathList.clear();
 
     // Check each file in the resource
-    std::list<CResourceFile*>::iterator iterf = pResource->IterBegin();
-    for (; iterf != pResource->IterEnd(); iterf++)
+    for (const auto& pResourceFile : pResource->GetFiles())
     {
-        CResourceFile* pResourceFile = *iterf;
         // Skip this one if validate=false in the meta.xml
-        if (stricmp(pResourceFile->GetMetaFileAttribute("validate").c_str(), "false"))
+        if (!stricmp(pResourceFile->GetMetaFileAttribute("validate").c_str(), "false"))
+            continue;
+
+        std::string strPath;
+        if (!pResource->GetFilePath(pResourceFile->GetName(), strPath))
+            continue;
+
+        CResourceFile::eResourceType type = pResourceFile->GetType();
+
+        bool bScript;
+        bool bClient;
+        if (type == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT)
         {
-            string strPath;
-            if (pResource->GetFilePath(pResourceFile->GetName(), strPath))
-            {
-                CResourceFile::eResourceType type = pResourceFile->GetType();
-
-                bool bScript;
-                bool bClient;
-                if (type == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT)
-                {
-                    bScript = true;
-                    bClient = false;
-                }
-                else if (type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT)
-                {
-                    bScript = true;
-                    bClient = true;
-                }
-                else if (type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
-                {
-                    bScript = false;
-                    bClient = true;
-                }
-                else
-                    continue;
-
-                CheckFileForIssues(strPath, pResourceFile->GetName(), pResource->GetName(), bScript, bClient, false);
-            }
+            bScript = true;
+            bClient = false;
         }
+        else if (type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT)
+        {
+            bScript = true;
+            bClient = true;
+        }
+        else if (type == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
+        {
+            bScript = false;
+            bClient = true;
+        }
+        else
+            continue;
+
+        CheckFileForIssues(strPath, pResourceFile->GetName(), pResource->GetName(), bScript, bClient, false);
     }
 
     // Also check meta.xml

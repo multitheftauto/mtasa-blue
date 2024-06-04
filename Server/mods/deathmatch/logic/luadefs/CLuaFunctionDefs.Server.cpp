@@ -693,24 +693,22 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        std::list<CLuaModule*> modules = m_pLuaModuleManager->GetLoadedModules();
-        for (const auto mod : modules)
+        for (const auto& mod : m_pLuaModuleManager->GetLoadedModules())
         {
-            if (mod->_GetName() == strModuleName)
+            if (mod->GetName() == strModuleName)
             {
                 lua_newtable(luaVM);
 
                 lua_pushstring(luaVM, "name");
-                lua_pushstring(luaVM, mod->_GetFunctions().szModuleName);
+                lua_pushstring(luaVM, mod->GetFunctions().szModuleName);
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "author");
-                lua_pushstring(luaVM, mod->_GetFunctions().szAuthor);
+                lua_pushstring(luaVM, mod->GetFunctions().szAuthor);
                 lua_settable(luaVM, -3);
 
                 lua_pushstring(luaVM, "version");
-                SString strVersion("%.2f", mod->_GetFunctions().fVersion);
-                lua_pushstring(luaVM, strVersion);
+                lua_pushstring(luaVM, SString("%.2f", mod->GetFunctions().fVersion));
                 lua_settable(luaVM, -3);
 
                 return 1;
@@ -727,13 +725,11 @@ int CLuaFunctionDefs::GetModuleInfo(lua_State* luaVM)
 int CLuaFunctionDefs::GetModules(lua_State* luaVM)
 {
     lua_newtable(luaVM);
-    list<CLuaModule*>           lua_LoadedModules = m_pLuaModuleManager->GetLoadedModules();
-    list<CLuaModule*>::iterator iter = lua_LoadedModules.begin();
-    unsigned int                uiIndex = 1;
-    for (; iter != lua_LoadedModules.end(); ++iter)
+    std::uint32_t uiIndex = 1;
+    for (const auto& pModule : m_pLuaModuleManager->GetLoadedModules())
     {
         lua_pushnumber(luaVM, uiIndex++);
-        lua_pushstring(luaVM, (*iter)->_GetFunctions().szFileName);
+        lua_pushstring(luaVM, pModule->GetFunctions().szFileName);
         lua_settable(luaVM, -3);
     }
     return 1;

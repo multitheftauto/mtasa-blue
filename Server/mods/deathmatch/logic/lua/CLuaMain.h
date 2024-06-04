@@ -70,12 +70,12 @@ public:
     bool          DestroyXML(CXMLNode* pRootNode);
     bool          SaveXML(CXMLNode* pRootNode);
     bool          XMLExists(CXMLFile* pFile);
-    unsigned long GetXMLFileCount() const { return m_XMLFiles.size(); };
-    unsigned long GetOpenFileCount() const { return m_OpenFilenameList.size(); };
-    unsigned long GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; };
+    std::size_t   GetXMLFileCount() const { return m_XMLFiles.size(); }
+    std::size_t   GetOpenFileCount() const { return m_OpenFilenameList.size(); }
+    unsigned long GetTimerCount() const { return m_pLuaTimerManager ? m_pLuaTimerManager->GetTimerCount() : 0; }
     unsigned long GetElementCount() const;
-    unsigned long GetTextDisplayCount() const { return m_Displays.size(); };
-    unsigned long GetTextItemCount() const { return m_TextItems.size(); };
+    std::size_t   GetTextDisplayCount() const { return m_Displays.size(); }
+    std::size_t   GetTextItemCount() const { return m_TextItems.size(); }
     void          OnOpenFile(const SString& strFilename);
     void          OnCloseFile(const SString& strFilename);
 
@@ -89,7 +89,7 @@ public:
     CTextItem*    GetTextItemFromScriptID(uint uiScriptID);
 
     bool       BeingDeleted();
-    lua_State* GetVirtualMachine() const { return m_luaVM; };
+    lua_State* GetVirtualMachine() const { return m_luaVM; }
 
     void ResetInstructionCount();
 

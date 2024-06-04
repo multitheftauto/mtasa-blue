@@ -43,10 +43,16 @@ public:
     void       OnLuaMainOpenVM(CLuaMain* pLuaMain, lua_State* luaVM);
     void       OnLuaMainCloseVM(CLuaMain* pLuaMain, lua_State* luaVM);
 
-    CLuaModuleManager* GetLuaModuleManager() const { return m_pLuaModuleManager; }
+    CLuaModuleManager* GetLuaModuleManager() const noexcept { return m_pLuaModuleManager; }
 
-    std::list<CLuaMain*>::const_iterator IterBegin() { return m_virtualMachines.begin(); };
-    std::list<CLuaMain*>::const_iterator IterEnd() { return m_virtualMachines.end(); };
+    std::list<CLuaMain*>&       GetVirtualMachines() noexcept { return m_virtualMachines; }
+    const std::list<CLuaMain*>& GetVirtualMachines() const noexcept { return m_virtualMachines; }
+
+    std::list<CLuaMain*>::iterator begin() noexcept { return m_virtualMachines.begin(); }
+    std::list<CLuaMain*>::iterator end() noexcept { return m_virtualMachines.end(); }
+    
+    std::list<CLuaMain*>::const_iterator begin() const noexcept { return m_virtualMachines.cbegin(); }
+    std::list<CLuaMain*>::const_iterator end() const noexcept { return m_virtualMachines.cend(); }
 
     void DoPulse();
 
