@@ -2136,8 +2136,8 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
             }
 
             pPed->SetPosition(vecPosition);
-            pPed->SetIsDead(false);
             pPed->SetSpawned(true);
+            pPed->SetIsDead(false);
             pPed->SetHealth(100.0f);
             pPed->SetSyncable(bSynced);
 
@@ -3722,7 +3722,6 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             }
 
             // Update the ped
-            pPed->SetSpawned(false);
             pPed->SetIsDead(true);
             pPed->SetHealth(0.0f);
             pPed->SetArmor(0.0f);

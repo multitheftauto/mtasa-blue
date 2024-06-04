@@ -1462,7 +1462,7 @@ unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
 
 bool CLuaPlayerDefs::HasPlayerSpawned(CPlayer* player)
 {
-    return player->IsPlayerSpawned();
+    return player->IsSpawned();
 }
 
 int CLuaPlayerDefs::BindKey(lua_State* luaVM)

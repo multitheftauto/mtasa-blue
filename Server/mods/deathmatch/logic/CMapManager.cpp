@@ -592,7 +592,6 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
     }
 
     // Update the player data
-    Player.SetPlayerSpawned(true);
     Player.SetSpawned(true);
     Player.SetHealth(Player.GetMaxHealth());
     Player.SetIsDead(false);

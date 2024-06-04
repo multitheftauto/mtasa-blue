@@ -72,9 +72,6 @@ public:
     // remove jetpack, etc...
     void Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior);
 
-    bool IsPlayerSpawned() const noexcept { return m_bHasPlayerSpawned; }
-    void SetPlayerSpawned(const bool bSetSpawned) noexcept { m_bHasPlayerSpawned = bSetSpawned; }
-
     unsigned long  GetLastPuresyncTime() { return m_ulLastPuresyncTime; }
     void           SetLastPuresyncTime(unsigned long ulLastPuresyncTime) { m_ulLastPuresyncTime = ulLastPuresyncTime; }
     const CVector& GetLastPuresyncPosition() { return m_vecLastPuresyncPosition; }
@@ -124,8 +121,6 @@ public:
     uchar   m_ucPrevBulletSyncOrderCounter;
 
 private:
-    bool m_bHasPlayerSpawned{false};
-
     bool    m_bIsLocalPlayer;
     SString m_strNick;
 

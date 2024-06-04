@@ -216,7 +216,6 @@ void CClientPlayer::Spawn(const CVector& vecPosition, float fRotation, unsigned 
     {
         SetFrozenWaitingForGroundToLoad(true);
         m_iLoadAllModelsCounter = 10;
-        SetPlayerSpawned(true);
     }
 
     // Remove any animation
@@ -246,6 +245,7 @@ void CClientPlayer::Spawn(const CVector& vecPosition, float fRotation, unsigned 
     }
 
     // Set some states
+    SetSpawned(true);
     SetFrozen(false);
     Teleport(vecPosition);
     SetCurrentRotationNew(fRotation);

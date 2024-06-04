@@ -313,7 +313,7 @@ int CLuaPlayerDefs::GetPlayerWantedLevel(lua_State* luaVM)
 
 bool CLuaPlayerDefs::HasPlayerSpawned(CClientPlayer* player)
 {
-    return player->IsPlayerSpawned();
+    return player->IsSpawned();
 }
 
 

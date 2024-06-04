@@ -131,8 +131,8 @@ public:
     bool CanUse(class CPlayer& Player, bool bOnfootCheck = true);
     void Use(class CPlayer& Player);
 
-    bool IsSpawned() { return m_bSpawned; }
-    void SetSpawned(bool bSpawned) { m_bSpawned = bSpawned; }
+    bool IsSpawned() const noexcept { return m_bSpawned; }
+    void SetSpawned(bool bSpawned) noexcept { m_bSpawned = bSpawned; }
 
     CColShape* GetColShape() { return m_pCollision; }
     void       SetEnabled(bool bEnabled)
