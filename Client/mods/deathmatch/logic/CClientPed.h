@@ -200,11 +200,6 @@ public:
 
     void Teleport(const CVector& vecPosition);
 
-    // This function spawns/respawns this ped in any location. This will force a recreation
-    // and restoration of initial state. This will also remove all weapons, unfreeze,
-    // remove jetpack, etc...
-    void Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior);
-
     void ResetInterpolation();
 
     float GetCurrentRotation();

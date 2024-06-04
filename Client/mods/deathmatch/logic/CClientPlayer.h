@@ -67,6 +67,11 @@ public:
     unsigned short GetLatency() { return m_usLatency; }
     void           SetLatency(unsigned short usLatency) { m_usLatency = (m_usLatency + usLatency) / 2; }
     
+    // This function spawns/respawns this ped in any location. This will force a recreation
+    // and restoration of initial state. This will also remove all weapons, unfreeze,
+    // remove jetpack, etc...
+    void Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior);
+
     bool IsPlayerSpawned() const noexcept { return m_bHasPlayerSpawned; }
     void SetPlayerSpawned(const bool bSetSpawned) noexcept { m_bHasPlayerSpawned = bSetSpawned; }
 
