@@ -544,6 +544,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-05-17
     WorldSpecialProperty_RoadSignsText,
 
+    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
+    // 2024-05-23
+    WorldSpecialProperty_ExtendedWaterCannons,
+
     // Add breakObject to serverside as well
     // 2024-05-31
     BreakObject_Serverside,
