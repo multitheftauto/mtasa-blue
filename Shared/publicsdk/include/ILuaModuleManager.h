@@ -22,6 +22,7 @@ extern "C"
     #include <lauxlib.h>
 }
 #include <string>
+#include <optional>
 
 #ifndef __CChecksum_H
 #define __CChecksum_H
@@ -47,8 +48,8 @@ public:
         lua_CFunction Func
     ) noexcept = 0;
 
-    virtual bool        GetResourceName(lua_State* luaVM, std::string& strName) const noexcept = 0;
-    virtual std::string GetResourceName(lua_State* luaVM) const noexcept = 0;
+    virtual bool GetResourceName(lua_State* luaVM, std::string& strName) const noexcept = 0;
+    virtual std::optional<std::string> GetResourceName(lua_State* luaVM) const noexcept = 0;
     virtual lua_State*  GetResourceFromName(const char* szResourceName) const noexcept = 0;
 
     virtual std::string GetResourcePath(lua_State* luaVM) const noexcept = 0;

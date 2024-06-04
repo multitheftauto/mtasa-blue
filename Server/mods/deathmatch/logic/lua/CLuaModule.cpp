@@ -308,17 +308,17 @@ bool CLuaModule::GetResourceName(lua_State* luaVM, std::string& strName) const n
     return true;
 }
 
-std::string CLuaModule::GetResourceName(lua_State* luaVM) const noexcept {
+std::optional<std::string> CLuaModule::GetResourceName(lua_State* luaVM) const noexcept {
     if (!luaVM)
-        return "";
+        return std::nullopt;
         
     CLuaMain* pLuaMain = m_pLuaModuleManager->GetLuaManager()->GetVirtualMachine(luaVM);
     if (!pLuaMain)
-        return "";
+        return std::nullopt;
         
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        return "";
+        return std::nullopt;
         
     return pResource->GetName();
 }

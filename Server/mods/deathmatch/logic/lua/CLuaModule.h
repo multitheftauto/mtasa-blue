@@ -64,8 +64,9 @@ public:
 
     bool RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func) noexcept;
 
-    bool        GetResourceName(lua_State* luaVM, std::string& strName) const noexcept;
-    std::string GetResourceName(lua_State* luaVM) const noexcept;
+    bool GetResourceName(lua_State* luaVM, std::string& strName) const noexcept;
+    std::optional<std::string> GetResourceName(lua_State* luaVM) const noexcept;
+
     lua_State*  GetResourceFromName(const char* szResourceName) const noexcept;
 
     std::string GetResourcePath(lua_State* luaVM) const noexcept;
