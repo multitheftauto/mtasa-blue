@@ -24,7 +24,7 @@ CPickup::CPickup(CElement* pParent, CPickupManager* pPickupManager, CColManager*
 {
     // Init
     m_pPickupManager = pPickupManager;
-    m_pCollision = new CColSphere(pColManager, nullptr, m_vecPosition, 2.0f, true);
+    m_pCollision = new CColSphere(pColManager, nullptr, m_vecPosition, 1.0f, true);
     m_pCollision->SetEnabled(false);
     m_pCollision->SetCallback(this);
     m_pCollision->SetAutoCallEvent(false);

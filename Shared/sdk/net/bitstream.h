@@ -548,6 +548,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-05-23
     WorldSpecialProperty_ExtendedWaterCannons,
 
+    // Add breakObject to serverside as well
+    // 2024-05-31
+    BreakObject_Serverside,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
