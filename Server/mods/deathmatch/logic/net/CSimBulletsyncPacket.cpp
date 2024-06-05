@@ -9,6 +9,7 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
+#include "CPickupManager.h"
 
 CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID PlayerID) : m_PlayerID(PlayerID)
 {
@@ -25,11 +26,9 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
 {
     char cWeaponType;
     BitStream.Read(cWeaponType);
-    auto weaponType = static_cast<eWeaponType>(cWeaponType);
-    if (!(weaponType >= WEAPONTYPE_UNARMED && weaponType < WEAPONTYPE_LAST_WEAPONTYPE))
+    if (!CPickupManager::IsValidWeaponID(cWeaponType))
         return false;
-
-    m_Cache.weaponType = weaponType;
+    m_Cache.weaponType = (eWeaponType)cWeaponType;
 
     BitStream.Read((char*)&m_Cache.vecStart, sizeof(CVector));
     BitStream.Read((char*)&m_Cache.vecEnd, sizeof(CVector));
