@@ -25,7 +25,11 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& BitStream)
 {
     char cWeaponType;
     BitStream.Read(cWeaponType);
-    m_Cache.weaponType = (eWeaponType)cWeaponType;
+    auto weaponType = static_cast<eWeaponType>(cWeaponType);
+    if (!(weaponType >= WEAPONTYPE_UNARMED && weaponType < WEAPONTYPE_LAST_WEAPONTYPE))
+        return false;
+
+    m_Cache.weaponType = weaponType;
 
     BitStream.Read((char*)&m_Cache.vecStart, sizeof(CVector));
     BitStream.Read((char*)&m_Cache.vecEnd, sizeof(CVector));
