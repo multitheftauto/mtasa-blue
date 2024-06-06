@@ -24,7 +24,7 @@ class CCarEnterExitSA : public CCarEnterExit
 public:
     bool GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector* pVector, int* pDoor);
     bool GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle, CVector* pVector, int* pDoor, bool bUnknown, bool bUnknown2, bool bCheckIfRoomToGetIn);
-    const void GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, unsigned int door);
+    const void GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, unsigned int door) noexcept;
     int  ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle);
     bool IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown = 0);
 };

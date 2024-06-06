@@ -24,5 +24,5 @@ public:
     virtual int  ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle) = 0;
     virtual bool IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown = 0) = 0;
 
-    virtual const void GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, unsigned int door) = 0;
+    virtual const void GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, unsigned int door) noexcept = 0;
 };
