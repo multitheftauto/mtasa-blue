@@ -82,10 +82,8 @@ void CCarEnterExitSA::GetPositionToOpenCarDoor(CVector& position, CVehicle* vehi
 {
     CVehicleSA* vehicleSA = dynamic_cast<CVehicleSA*>(vehicle);
 
-    if (vehicleSA == nullptr)
-    {
+    if (!vehicleSA)
         return;
-    }
 
     CVehicleSAInterface* vehicleInterface = vehicleSA->GetVehicleInterface();
 

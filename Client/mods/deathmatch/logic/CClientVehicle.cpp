@@ -5029,16 +5029,12 @@ CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
 {
     static const uint32_t lookup[4] = {10, 8, 11, 9};
     assert(entryPointIndex < 4);
-    const uint32_t saDoorIndex = lookup[entryPointIndex];
+    const std::uint32_t saDoorIndex = lookup[entryPointIndex];
 
     CVector      entryPoint;
+    CVehicle*    gameVehicle = GetGameVehicle();
 
-    if (saDoorIndex != 0)
-    {
-        CVehicle* gameVehicle = GetGameVehicle();
-
-        g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(entryPoint, gameVehicle, saDoorIndex);
-    }
+    g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(entryPoint, gameVehicle, saDoorIndex);
 
     return entryPoint;
 }
