@@ -14,6 +14,7 @@
 #include "CElementIDs.h"
 #include "CWeaponNames.h"
 #include "Utils.h"
+#include "CTickRateSettings.h"
 #include <net/SyncStructures.h>
 
 extern CGame* g_pGame;
@@ -70,6 +71,38 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 return false;
             pContactElement = CElementIDs::GetElement(Temp);
         }
+
+        // Player position
+        SPositionSync position(false);
+        if (!BitStream.Read(&position))
+            return false;
+
+        if (pContactElement != nullptr)
+        {
+            int32_t radius = -1;
+
+            switch (pContactElement->GetType())
+            {
+                case CElement::VEHICLE:
+                    if (((CVehicle*)pContactElement)->GetSyncer() != pSourcePlayer)
+                        radius = g_TickRateSettings.iVehicleContactSyncRadius;
+                    break;
+                case CElement::OBJECT:
+                    if (((CObject*)pContactElement)->GetSyncer() != pSourcePlayer)
+                        radius = g_TickRateSettings.iObjectContactSyncRadius;
+                    break;
+            }
+
+            if (radius > -1 && 
+                (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), radius) ||
+                    pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
+            {
+                pContactElement = nullptr;
+                // Use current player position. They are not reporting their absolute position so we have to disregard it.
+                position.data.vecPosition = pSourcePlayer->GetPosition();
+            }
+        }
+
         CElement* pPreviousContactElement = pSourcePlayer->GetContactElement();
         pSourcePlayer->SetContactElement(pContactElement);
 
@@ -89,11 +122,6 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             pSourcePlayer->CallEvent("onPlayerContact", Arguments);
         }
 
-        // Player position
-        SPositionSync position(false);
-        if (!BitStream.Read(&position))
-            return false;
-
         if (pContactElement)
         {
             pSourcePlayer->SetContactPosition(position.data.vecPosition);
@@ -102,6 +130,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
             CVector vecTempPos = pContactElement->GetPosition();
             position.data.vecPosition += vecTempPos;
         }
+
         pSourcePlayer->SetPosition(position.data.vecPosition);
 
         // Player rotation

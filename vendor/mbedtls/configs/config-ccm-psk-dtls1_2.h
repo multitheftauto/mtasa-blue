@@ -5,19 +5,7 @@
  */
 /*
  *  Copyright The Mbed TLS Contributors
- *  SPDX-License-Identifier: Apache-2.0
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may
- *  not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ *  SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
  */
 /*
  * Minimal configuration for DTLS 1.2 with PSK and AES-CCM ciphersuites
@@ -34,8 +22,6 @@
  *
  * See README.txt for usage instructions.
  */
-#ifndef MBEDTLS_CONFIG_H
-#define MBEDTLS_CONFIG_H
 
 /* System support */
 //#define MBEDTLS_HAVE_TIME /* Optionally used in Hello messages */
@@ -61,7 +47,6 @@
 #define MBEDTLS_SSL_PROTO_TLS1_2
 #define MBEDTLS_SSL_PROTO_DTLS
 #define MBEDTLS_SSL_DTLS_ANTI_REPLAY
-#define MBEDTLS_SSL_DTLS_BADMAC_LIMIT
 #define MBEDTLS_SSL_DTLS_CLIENT_PORT_REUSE
 #define MBEDTLS_SSL_DTLS_CONNECTION_ID
 #define MBEDTLS_SSL_DTLS_HELLO_VERIFY
@@ -80,7 +65,8 @@
  * both ends of the connection!  (See comments in "mbedtls/ssl.h".)
  * The optimal size here depends on the typical size of records.
  */
-#define MBEDTLS_SSL_MAX_CONTENT_LEN             256
+#define MBEDTLS_SSL_IN_CONTENT_LEN              256
+#define MBEDTLS_SSL_OUT_CONTENT_LEN             256
 
 /* Save RAM at the expense of ROM */
 #define MBEDTLS_AES_ROM_TABLES
@@ -90,10 +76,10 @@
 
 /*
  * You should adjust this to the exact number of sources you're using: default
- * is the "platform_entropy_poll" source plus a weak clock source, but you may
- * want to add other ones. Minimum is 3 for the entropy test suite.
+ * is the "platform_entropy_poll" source, but you may want to add other ones
+ * Minimum is 2 for the entropy test suite.
  */
-#define MBEDTLS_ENTROPY_MAX_SOURCES 3
+#define MBEDTLS_ENTROPY_MAX_SOURCES 2
 
 /* These defines are present so that the config modifying scripts can enable
  * them during tests/scripts/test-ref-configs.pl */
@@ -104,7 +90,3 @@
  * (huge code size increase, needed for tests/ssl-opt.sh) */
 //#define MBEDTLS_DEBUG_C
 //#define MBEDTLS_ERROR_C
-
-#include "mbedtls/check_config.h"
-
-#endif /* MBEDTLS_CONFIG_H */
