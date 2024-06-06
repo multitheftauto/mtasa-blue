@@ -5025,25 +5025,11 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
-const CVector CClientVehicle::GetEntryPoint(int entryPointIndex)
+CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
 {
-    std::uint32_t saDoorIndex = 0;
-
-    switch (entryPointIndex)
-    {
-        case 0:
-            saDoorIndex = 10;
-            break;
-        case 1:
-            saDoorIndex = 8;
-            break;
-        case 2:
-            saDoorIndex = 11;
-            break;
-        case 3:
-            saDoorIndex = 9;
-            break;
-    }
+    static const uint32_t lookup[4] = {10, 8, 11, 9};
+    assert(entryPointIndex < 4);
+    const uint32_t saDoorIndex = lookup[entryPointIndex];
 
     CVector      entryPoint;
 

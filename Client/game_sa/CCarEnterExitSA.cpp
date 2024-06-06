@@ -78,7 +78,7 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle,
     return bReturn;
 }
 
-const void CCarEnterExitSA::GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, unsigned int door) noexcept
+void CCarEnterExitSA::GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, std::uint32_t door) const noexcept
 {
     CVehicleSA* vehicleSA = dynamic_cast<CVehicleSA*>(vehicle);
 

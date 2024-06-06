@@ -4201,8 +4201,8 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
     }
 
     std::array<CVector, 4> entryPoints;
-    std::uint32_t          i = 0;
 
+    std::uint32_t i = 0;
     for (auto& entryPoint : entryPoints)
     {
         entryPoint = vehicle->GetEntryPoint(i++);
