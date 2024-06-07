@@ -123,6 +123,8 @@ enum eJSONPrettyType
 };
 DECLARE_ENUM(eJSONPrettyType);
 
+DECLARE_ENUM(eFxParticleSystems);
+
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)
 {
