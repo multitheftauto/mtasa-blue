@@ -82,6 +82,7 @@ DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
 DECLARE_ENUM_CLASS(eRenderStage);
+DECLARE_ENUM_CLASS(eFxParticleSystems);
 DECLARE_ENUM(ePools);
 
 class CRemoteCall;
@@ -122,8 +123,6 @@ enum eJSONPrettyType
     JSONPRETTY_TABS = JSON_C_TO_STRING_PRETTY | JSON_C_TO_STRING_PRETTY_TAB
 };
 DECLARE_ENUM(eJSONPrettyType);
-
-DECLARE_ENUM(eFxParticleSystems);
 
 // class -> class type
 inline eCGUIType GetClassType(CGUIButton*)

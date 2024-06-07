@@ -240,7 +240,7 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     }
 }
 
-void CFxSA::AddParticle(eFxParticleSystems eFxParticle, CVector& vecPosition, CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, int iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
+void CFxSA::AddParticle(eFxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
 {
     // Init our own FxPrtMult struct
     FxPrtMult_c fxPrt{{fR,fG,fB,fA}, fSize, 0, fLife};
@@ -250,82 +250,82 @@ void CFxSA::AddParticle(eFxParticleSystems eFxParticle, CVector& vecPosition, CV
 
     switch (eFxParticle)
     {
-        case PRT_BLOOD:
+        case eFxParticleSystems::PRT_BLOOD:
             fxParticleSystem = m_pInterface->m_fxSysBlood;
             break;
-        case PRT_BOATSPLASH:
+        case eFxParticleSystems::PRT_BOATSPLASH:
             fxParticleSystem = m_pInterface->m_fxSysBoatSplash;
             break;
-        case PRT_BUBBLE:
+        case eFxParticleSystems::PRT_BUBBLE:
             fxParticleSystem = m_pInterface->m_fxSysBubble;
             break;
-        case PRT_DEBRIS:
+        case eFxParticleSystems::PRT_DEBRIS:
             fxParticleSystem = m_pInterface->m_fxSysDebris;
             break;
-        case PRT_GUNSHELL:
+        case eFxParticleSystems::PRT_GUNSHELL:
             fxParticleSystem = m_pInterface->m_fxSysGunshell;
             break;
-        case PRT_SAND:
+        case eFxParticleSystems::PRT_SAND:
             fxParticleSystem = m_pInterface->m_fxSysSand;
             break;
-        case PRT_SAND2:
+        case eFxParticleSystems::PRT_SAND2:
             fxParticleSystem = m_pInterface->m_fxSysSand2;
             break;
-        case PRT_SMOKE:
+        case eFxParticleSystems::PRT_SMOKE:
             fxParticleSystem = m_pInterface->m_fxSysSmoke;
             break;
-        case PRT_SMOKEHUGE:
+        case eFxParticleSystems::PRT_SMOKEHUGE:
             fxParticleSystem = m_pInterface->m_fxSysSmokeHuge;
             break;
-        case PRT_SMOKE2:
+        case eFxParticleSystems::PRT_SMOKE2:
             fxParticleSystem = m_pInterface->m_fxSysSmoke2;
             break;
-        case PRT_SPARK:
+        case eFxParticleSystems::PRT_SPARK:
             fxParticleSystem = m_pInterface->m_fxSysSpark;
             break;
-        case PRT_SPARK2:
+        case eFxParticleSystems::PRT_SPARK2:
             fxParticleSystem = m_pInterface->m_fxSysSpark2;
             break;
-        case PRT_SPLASH:
+        case eFxParticleSystems::PRT_SPLASH:
             fxParticleSystem = m_pInterface->m_fxSysSplash;
             break;
-        case PRT_WAKE:
+        case eFxParticleSystems::PRT_WAKE:
             fxParticleSystem = m_pInterface->m_fxSysWake;
             break;
-        case PRT_WATERSPLASH:
+        case eFxParticleSystems::PRT_WATERSPLASH:
             fxParticleSystem = m_pInterface->m_fxSysWaterSplash;
             break;
-        case PRT_WHEELDIRT:
+        case eFxParticleSystems::PRT_WHEELDIRT:
             fxParticleSystem = m_pInterface->m_fxSysWheelDirt;
             break;
-        case PRT_GLASS:
+        case eFxParticleSystems::PRT_GLASS:
             fxParticleSystem = m_pInterface->m_fxSysGlass;
             break;
         default:
             fxParticleSystem = m_pInterface->m_fxSysBlood;
     }
 
-    for (int i = 0; i < iCount; i++)
+    for (size_t i = 0; i < iCount; i++)
     {
         if (bRandomizeColors)
         {
             // 0x49EECB
-            fxPrt.m_color.red = (rand() % 10000) * 0.0001 * fR + 0.13;
-            fxPrt.m_color.green = (rand() % 10000) * 0.0001 * fG + 0.12;
-            fxPrt.m_color.blue = (rand() % 10000) * 0.0001 * fB + 0.04;
+            fxPrt.m_color.red = (rand() % 10000) * 0.0001f * fR + 0.13f;
+            fxPrt.m_color.green = (rand() % 10000) * 0.0001f * fG + 0.12f;
+            fxPrt.m_color.blue = (rand() % 10000) * 0.0001f * fB + 0.04f;
         }
 
         if (bRandomizeSizes)
             // 0x49EF21 - Calculate random size for each particle
-            fxPrt.m_fSize = (rand() % 10000) * 0.0001 * fSize + 0.3;
+            fxPrt.m_fSize = (rand() % 10000) * 0.0001f * fSize + 0.3f;
 
         // 0x49EF4C - Calculate random direction for each particle
         newDirection = CVector(vecDirection.fX * 4, vecDirection.fY * 4, vecDirection.fZ * 4);
-        newDirection.fX = (rand() % 10000) * 0.0001 * 4.0 - 2.0 + newDirection.fX;
-        newDirection.fY = (rand() % 10000) * 0.0001 * 4.0 - 2.0 + newDirection.fY;
-        newDirection.fZ = (rand() % 10000) * 0.0001 * 4.0 - 2.0 + newDirection.fZ;
+        newDirection.fX = (rand() % 10000) * 0.0001f * 4 - 2 + newDirection.fX;
+        newDirection.fY = (rand() % 10000) * 0.0001f * 4 - 2 + newDirection.fY;
+        newDirection.fZ = (rand() % 10000) * 0.0001f * 4 - 2 + newDirection.fZ;
 
         // Call FxSystem_c::AddParticle
-        ((int(__thiscall*)(FxSystem_c*, CVector*, CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
+        ((int(__thiscall*)(FxSystem_c*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
     }
 }

@@ -1600,7 +1600,7 @@ namespace eSoundEffectParams
     };
 }            // namespace eSoundEffectParams
 
-enum eFxParticleSystems
+enum class eFxParticleSystems
 {
     PRT_BLOOD,
     PRT_BOATSPLASH,
