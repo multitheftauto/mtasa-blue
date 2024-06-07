@@ -37,6 +37,7 @@ private:
     void UpdateIplEntrysPointers(uint32_t offset);
     void UpdateBackupLodPointers(uint32_t offset);
     void RemoveVehicleDamageLinks();
+    void RemovePedsContactEnityLinks();
 
 private:
     SPoolData<CBuildingSA, CBuildingSAInterface, MAX_BUILDINGS> m_buildingPool;

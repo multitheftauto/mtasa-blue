@@ -77,13 +77,30 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(&position))
             return false;
 
-        if (pContactElement != nullptr &&
-            (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), g_TickRateSettings.iVehicleContactSyncRadius) ||
-                pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
+        if (pContactElement != nullptr)
         {
-            pContactElement = nullptr;
-            // Use current player position. They are not reporting their absolute position so we have to disregard it.
-            position.data.vecPosition = pSourcePlayer->GetPosition();
+            int32_t radius = -1;
+
+            switch (pContactElement->GetType())
+            {
+                case CElement::VEHICLE:
+                    if (((CVehicle*)pContactElement)->GetSyncer() != pSourcePlayer)
+                        radius = g_TickRateSettings.iVehicleContactSyncRadius;
+                    break;
+                case CElement::OBJECT:
+                    if (((CObject*)pContactElement)->GetSyncer() != pSourcePlayer)
+                        radius = g_TickRateSettings.iObjectContactSyncRadius;
+                    break;
+            }
+
+            if (radius > -1 && 
+                (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), radius) ||
+                    pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
+            {
+                pContactElement = nullptr;
+                // Use current player position. They are not reporting their absolute position so we have to disregard it.
+                position.data.vecPosition = pSourcePlayer->GetPosition();
+            }
         }
 
         CElement* pPreviousContactElement = pSourcePlayer->GetContactElement();
