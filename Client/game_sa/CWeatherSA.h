@@ -27,31 +27,31 @@ public:
     void  SetAmountOfRain(float fAmount);
     void  ResetAmountOfRain();
 
-    float GetWetRoads();
+    float GetWetRoads() const;
     bool  SetWetRoads(float fAmount);
     bool  ResetWetRoads();
 
-    float GetFoggyness();
+    float GetFoggyness() const;
     bool  SetFoggyness(float fAmount);
     bool  ResetFoggyness();
 
-    float GetFog();
+    float GetFog() const;
     bool  SetFog(float fAmount);
     bool  ResetFog();
 
-    float GetRainFog();
+    float GetRainFog() const;
     bool  SetRainFog(float fAmount);
     bool  ResetRainFog();
 
-    float GetWaterFog();
+    float GetWaterFog() const;
     bool  SetWaterFog(float fAmount);
     bool  ResetWaterFog();
 
-    float GetSandstorm();
+    float GetSandstorm() const;
     bool  SetSandstorm(float fAmount);
     bool  ResetSandstorm();
 
-    float GetRainbow();
+    float GetRainbow() const;
     bool  SetRainbow(float fAmount);
     bool  ResetRainbow();
 

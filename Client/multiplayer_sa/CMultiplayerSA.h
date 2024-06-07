@@ -196,55 +196,55 @@ public:
     int   GetMoonSize();
     void  ResetMoonSize();
 
-    void  GetAmbientColor(float& red, float& green, float& blue);
+    void  GetAmbientColor(float& red, float& green, float& blue) const;
     bool  SetAmbientColor(float red, float green, float blue);
     bool  ResetAmbientColor();
 
-    void  GetAmbientObjectColor(float& red, float& green, float& blue);
+    void  GetAmbientObjectColor(float& red, float& green, float& blue) const;
     bool  SetAmbientObjectColor(float red, float green, float blue);
     bool  ResetAmbientObjectColor();
 
-    void  GetDirectionalColor(float& red, float& green, float& blue);
+    void  GetDirectionalColor(float& red, float& green, float& blue) const;
     bool  SetDirectionalColor(float red, float green, float blue);
     bool  ResetDirectionalColor();
 
-    float GetSpriteSize();
+    float GetSpriteSize() const;
     bool  SetSpriteSize(float size);
     bool  ResetSpriteSize();
 
-    float GetSpriteBrightness();
+    float GetSpriteBrightness() const;
     bool  SetSpriteBrightness(float brightness);
     bool  ResetSpriteBrightness();
 
-    int16 GetPoleShadowStrength();
+    int16 GetPoleShadowStrength() const;
     bool  SetPoleShadowStrength(int16 strength);
     bool  ResetPoleShadowStrength();
 
-    int16 GetShadowStrength();
+    int16 GetShadowStrength() const;
     bool  SetShadowStrength(int16 strength);
     bool  ResetShadowStrength();
 
-    float GetShadowsOffset();
+    float GetShadowsOffset() const;
     bool  SetShadowsOffset(float offset);
     bool  ResetShadowsOffset();
 
-    float GetLightsOnGroundBrightness();
+    float GetLightsOnGroundBrightness() const;
     bool  SetLightsOnGroundBrightness(float brightness);
     bool  ResetLightsOnGroundBrightness();
 
-    void  GetLowCloudsColor(int16& red, int16& green, int16& blue);
+    void  GetLowCloudsColor(int16& red, int16& green, int16& blue) const;
     bool  SetLowCloudsColor(int16 red, int16 green, int16 blue);
     bool  ResetLowCloudsColor();
 
-    void  GetBottomCloudsColor(int16& red, int16& green, int16& blue);
+    void  GetBottomCloudsColor(int16& red, int16& green, int16& blue) const;
     bool  SetBottomCloudsColor(int16 red, int16 green, int16 blue);
     bool  ResetBottomCloudsColor();
 
-    float GetCloudsAlpha1();
+    float GetCloudsAlpha1() const;
     bool  SetCloudsAlpha1(float alpha);
     bool  ResetCloudsAlpha1();
 
-    float GetIllumination();
+    float GetIllumination() const;
     bool  SetIllumination(float illumination);
     bool  ResetIllumination();
 

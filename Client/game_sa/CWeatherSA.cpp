@@ -63,7 +63,7 @@ void CWeatherSA::ResetAmountOfRain()
     MemCpy((LPVOID)0x72C686, &originalFstp2, 6);
 }
 
-float CWeatherSA::GetWetRoads()
+float CWeatherSA::GetWetRoads() const
 {
     return *(float*)0xC81308;
 }
@@ -89,7 +89,7 @@ bool CWeatherSA::ResetWetRoads()
     return true;
 }
 
-float CWeatherSA::GetFoggyness()
+float CWeatherSA::GetFoggyness() const
 {
     return *(float*)0xC81300;
 }
@@ -113,7 +113,7 @@ bool CWeatherSA::ResetFoggyness()
     return true;
 }
 
-float CWeatherSA::GetFog()
+float CWeatherSA::GetFog() const
 {
     return *(float*)0xC812FC;
 }
@@ -137,7 +137,7 @@ bool CWeatherSA::ResetFog()
     return true;
 }
 
-float CWeatherSA::GetRainFog()
+float CWeatherSA::GetRainFog() const
 {
     return *(float*)0xC81410;
 }
@@ -159,7 +159,7 @@ bool CWeatherSA::ResetRainFog()
     return true;
 }
 
-float CWeatherSA::GetWaterFog()
+float CWeatherSA::GetWaterFog() const
 {
     return *(float*)0xC81338;
 }
@@ -183,7 +183,7 @@ bool CWeatherSA::ResetWaterFog()
     return true;
 }
 
-float CWeatherSA::GetSandstorm()
+float CWeatherSA::GetSandstorm() const
 {
     return *(float*)0xC812F4;
 }
@@ -207,7 +207,7 @@ bool CWeatherSA::ResetSandstorm()
     return true;
 }
 
-float CWeatherSA::GetRainbow()
+float CWeatherSA::GetRainbow() const
 {
     return *(float*)0xC812E4;
 }

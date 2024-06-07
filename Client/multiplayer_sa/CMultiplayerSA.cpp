@@ -2250,7 +2250,7 @@ void CMultiplayerSA::ResetWater()
     MemPut<BYTE>(0x7051D7, 184);
 }
 
-void CMultiplayerSA::GetAmbientColor(float& red, float& green, float& blue)
+void CMultiplayerSA::GetAmbientColor(float& red, float& green, float& blue) const
 {
     if (bUsingCustomAmbientColor)
         red = fAmbientColorR, green = fAmbientColorG, blue = fAmbientColorB;
@@ -2273,7 +2273,7 @@ bool CMultiplayerSA::ResetAmbientColor()
     return true;
 }
 
-void CMultiplayerSA::GetAmbientObjectColor(float& red, float& green, float& blue)
+void CMultiplayerSA::GetAmbientObjectColor(float& red, float& green, float& blue) const
 {
     if (bUsingCustomAmbientObjectColor)
         red = fAmbientObjectColorR, green = fAmbientObjectColorG, blue = fAmbientObjectColorB;
@@ -2296,7 +2296,7 @@ bool CMultiplayerSA::ResetAmbientObjectColor()
     return true;
 }
 
-void CMultiplayerSA::GetDirectionalColor(float& red, float& green, float& blue)
+void CMultiplayerSA::GetDirectionalColor(float& red, float& green, float& blue) const
 {
     if (bUsingCustomDirectionalColor)
         red = fDirectionalColorR, green = fDirectionalColorG, blue = fDirectionalColorB;
@@ -2319,7 +2319,7 @@ bool CMultiplayerSA::ResetDirectionalColor()
     return true;
 }
 
-float CMultiplayerSA::GetSpriteSize()
+float CMultiplayerSA::GetSpriteSize() const
 {
     return *(float*)0xB7C4E0;
 }
@@ -2342,7 +2342,7 @@ bool CMultiplayerSA::ResetSpriteSize()
     return true;
 }
 
-float CMultiplayerSA::GetSpriteBrightness()
+float CMultiplayerSA::GetSpriteBrightness() const
 {
     return *(float*)0xB7C4E4;
 }
@@ -2365,7 +2365,7 @@ bool CMultiplayerSA::ResetSpriteBrightness()
     return true;
 }
 
-int16 CMultiplayerSA::GetPoleShadowStrength()
+int16 CMultiplayerSA::GetPoleShadowStrength() const
 {
     return *(int16*)0xB7C4EC;
 }
@@ -2391,7 +2391,7 @@ bool CMultiplayerSA::ResetPoleShadowStrength()
     return true;
 }
 
-int16 CMultiplayerSA::GetShadowStrength()
+int16 CMultiplayerSA::GetShadowStrength() const
 {
     return *(int16*)0xB7C4E8;
 }
@@ -2421,7 +2421,7 @@ bool CMultiplayerSA::ResetShadowStrength()
     return true;
 }
 
-float CMultiplayerSA::GetShadowsOffset()
+float CMultiplayerSA::GetShadowsOffset() const
 {
     return m_fShadowsOffset;
 }
@@ -2438,7 +2438,7 @@ bool CMultiplayerSA::ResetShadowsOffset()
     return true;
 }
 
-float CMultiplayerSA::GetLightsOnGroundBrightness()
+float CMultiplayerSA::GetLightsOnGroundBrightness() const
 {
     return *(float*)0xB7C4F8;
 }
@@ -2464,7 +2464,7 @@ bool CMultiplayerSA::ResetLightsOnGroundBrightness()
     return true;
 }
 
-void CMultiplayerSA::GetLowCloudsColor(int16& red, int16& green, int16& blue)
+void CMultiplayerSA::GetLowCloudsColor(int16& red, int16& green, int16& blue) const
 {
     if (bUsingCustomLowCloudsColor)
         red = iLowCloudsColorR, green = iLowCloudsColorG, blue = iLowCloudsColorB;
@@ -2487,7 +2487,7 @@ bool CMultiplayerSA::ResetLowCloudsColor()
     return true;
 }
 
-void CMultiplayerSA::GetBottomCloudsColor(int16& red, int16& green, int16& blue)
+void CMultiplayerSA::GetBottomCloudsColor(int16& red, int16& green, int16& blue) const
 {
     if (bUsingCustomBottomCloudsColor)
         red = iBottomCloudsColorR, green = iBottomCloudsColorG, blue = iBottomCloudsColorB;
@@ -2510,7 +2510,7 @@ bool CMultiplayerSA::ResetBottomCloudsColor()
     return true;
 }
 
-float CMultiplayerSA::GetCloudsAlpha1()
+float CMultiplayerSA::GetCloudsAlpha1() const
 {
     return *(float*)0xB7C538;
 }
@@ -2528,7 +2528,7 @@ bool CMultiplayerSA::ResetCloudsAlpha1()
     return true;
 }
 
-float CMultiplayerSA::GetIllumination()
+float CMultiplayerSA::GetIllumination() const
 {
     return *(float*)0xB7C544;
 }
