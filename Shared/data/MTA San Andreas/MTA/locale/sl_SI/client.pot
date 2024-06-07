@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-06-06 17:33+0000\n"
-"PO-Revision-Date: 2024-06-07 10:03\n"
+"PO-Revision-Date: 2024-06-07 11:03\n"
 "Last-Translator: \n"
 "Language-Team: Slovenian\n"
 "Language: sl_SI\n"
@@ -24,11 +24,11 @@ msgstr "No se puede encontrar una resolución válida."
 #. Confirm that res should be used
 #: Client/game_sa/CSettingsSA.cpp:829
 msgid "Are you sure you want to use this screen resolution?"
-msgstr ""
+msgstr "¿Estas seguro que quieres usar esta resolucion de pantalla?"
 
 #: Client/game_sa/CSettingsSA.cpp:831 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
-msgstr ""
+msgstr "MTA: San Andreas"
 
 #: Client/loader/CInstallManager.cpp:361 Client/loader/Utils.cpp:968
 #, c-format
@@ -115,7 +115,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:672
 msgid "Copy MTA:SA files"
-msgstr ""
+msgstr "Copiar archivos de MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
