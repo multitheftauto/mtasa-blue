@@ -469,7 +469,7 @@ void CClientMarker::CreateOfType(int iType)
             CClient3DMarker* p3DMarker = new CClient3DMarker(this);
             p3DMarker->Set3DMarkerType(CClient3DMarker::TYPE_CYLINDER);
             m_pMarker = p3DMarker;
-            m_pCollision = new CClientColCircle(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
