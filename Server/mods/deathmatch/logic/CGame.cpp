@@ -1586,7 +1586,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerStealthKill", "target", NULL, false);
     m_Events.AddEvent("onPlayerMute", "", NULL, false);
     m_Events.AddEvent("onPlayerUnmute", "", NULL, false);
-    m_Events.AddEvent("onPlayerCommand", "command", NULL, false);
+    m_Events.AddEvent("onPlayerCommand", "command, args", NULL, false);
     m_Events.AddEvent("onPlayerModInfo", "filename, itemlist", NULL, false);
     m_Events.AddEvent("onPlayerACInfo", "aclist, size, md5, sha256", NULL, false);
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);

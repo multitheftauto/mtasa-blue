@@ -57,6 +57,24 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
             CLuaArguments Arguments;
             Arguments.PushString(szKey);
 
+            if (szArguments)
+            {
+                // Create a copy and strtok modifies the string
+                char* szTempArguments = new char[strlen(szArguments) + 1];
+                strcpy(szTempArguments, szArguments);
+
+                char* arg;
+                arg = strtok(szTempArguments, " ");
+
+                while (arg)
+                {
+                    Arguments.PushString(arg);
+                    arg = strtok(NULL, " ");
+                }
+
+                delete[] szTempArguments;
+            }
+
             if (!pPlayer->CallEvent("onPlayerCommand", Arguments))
                 return false;
         }
