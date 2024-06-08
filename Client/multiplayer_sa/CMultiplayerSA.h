@@ -76,6 +76,7 @@ public:
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
     void                InitHooks_FrameRateFixes();
+    void                InitHooks_WidescreenFix();
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();
     void                InitHooks_Postprocess();
