@@ -35,16 +35,6 @@
 
 #define CODE_ShowMoney              0x58F47D
 
-struct RsGlobal
-{
-    char* AppName;
-    int   width;
-    int   height;
-    int   frameLimit;
-    int   quit;
-    int   ps;
-};
-
 struct SHudComponent
 {
     bool          bIsPartOfAll;
