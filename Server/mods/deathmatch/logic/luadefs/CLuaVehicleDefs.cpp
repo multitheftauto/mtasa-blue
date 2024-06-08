@@ -2357,17 +2357,17 @@ int CLuaVehicleDefs::SetVehicleRespawnRotation(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaVehicleDefs::IsVehicleRespawnable(const CVehicle* vehicle) noexcept
+bool CLuaVehicleDefs::IsVehicleRespawnable(CVehicle* vehicle) noexcept
 {
     return vehicle->GetRespawnEnabled();
 }
 
-std::uint32_t CLuaVehicleDefs::GetVehicleRespawnDelay(const CVehicle* vehicle) noexcept
+std::uint32_t CLuaVehicleDefs::GetVehicleRespawnDelay(CVehicle* vehicle) noexcept
 {
     return vehicle->GetBlowRespawnInterval();
 }
 
-std::uint32_t CLuaVehicleDefs::GetVehicleIdleRespawnDelay(const CVehicle* vehicle) noexcept
+std::uint32_t CLuaVehicleDefs::GetVehicleIdleRespawnDelay(CVehicle* vehicle) noexcept
 {
     return vehicle->GetIdleRespawnInterval();
 }
