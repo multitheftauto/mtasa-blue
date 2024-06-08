@@ -94,6 +94,9 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleRespawnRotation", SetVehicleRespawnRotation},
         {"getVehicleRespawnPosition", GetVehicleRespawnPosition},
         {"getVehicleRespawnRotation", GetVehicleRespawnRotation},
+        {"isVehicleRespawnable", ArgumentParser<IsVehicleRespawnable>},
+        {"getVehicleRespawnDelay", ArgumentParser<GetVehicleRespawnDelay>},
+        {"getVehicleIdleRespawnDelay", ArgumentParser<GetVehicleIdleRespawnDelay>},
         {"respawnVehicle", RespawnVehicle},
         {"resetVehicleExplosionTime", ResetVehicleExplosionTime},
         {"resetVehicleIdleTime", ResetVehicleIdleTime},
@@ -201,6 +204,9 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getHandling", "getVehicleHandling");
     lua_classfunction(luaVM, "getRespawnPosition", "getVehicleRespawnPosition");
     lua_classfunction(luaVM, "getRespawnRotation", "getVehicleRespawnRotation");
+    lua_classfunction(luaVM, "isRespawnable", "isVehicleRespawnable");
+    lua_classfunction(luaVM, "getRespawnDelay", "getVehicleRespawnDelay");
+    lua_classfunction(luaVM, "getIdleRespawnDelay", "getVehicleIdleRespawnDelay");
 
     lua_classfunction(luaVM, "setColor", "setVehicleColor");
     lua_classfunction(luaVM, "setDamageProof", "setVehicleDamageProof");
@@ -2349,6 +2355,21 @@ int CLuaVehicleDefs::SetVehicleRespawnRotation(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaVehicleDefs::IsVehicleRespawnable(const CVehicle* vehicle) noexcept
+{
+    return vehicle->GetRespawnEnabled();
+}
+
+std::uint32_t CLuaVehicleDefs::GetVehicleRespawnDelay(const CVehicle* vehicle) noexcept
+{
+    return vehicle->GetBlowRespawnInterval();
+}
+
+std::uint32_t CLuaVehicleDefs::GetVehicleIdleRespawnDelay(const CVehicle* vehicle) noexcept
+{
+    return vehicle->GetIdleRespawnInterval();
 }
 
 int CLuaVehicleDefs::SetVehicleIdleRespawnDelay(lua_State* luaVM)
