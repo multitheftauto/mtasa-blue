@@ -26,6 +26,7 @@ public:
     LUA_DECLARE(GetObjectRotation);
     LUA_DECLARE(GetObjectScale);
     static bool IsObjectBreakable(CObject* const pObject);
+    static bool IsObjectMoving(CObject* const pObject);
 
     // Object set functions
     LUA_DECLARE(SetObjectName);
@@ -34,4 +35,5 @@ public:
     static bool SetObjectBreakable(CObject* const pObject, const bool bBreakable);
     LUA_DECLARE(MoveObject);
     LUA_DECLARE(StopObject);
+    static bool BreakObject(CObject* const pObject);
 };

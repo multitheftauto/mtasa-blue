@@ -17,6 +17,7 @@ project "Deathmatch"
 			"../../../vendor/bochs",
 			"../../../vendor/pme",
 			"../../../vendor/zip",
+			"../../../vendor/glob/include",
 			"../../../vendor/zlib",
 			"../../../vendor/pcre",
 			"../../../vendor/json-c",
@@ -33,7 +34,7 @@ project "Deathmatch"
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {
