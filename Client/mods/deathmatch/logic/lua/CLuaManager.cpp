@@ -226,7 +226,7 @@ void CLuaManager::LoadCFunctions()
         {"getPerformanceStats", CLuaFunctionDefs::GetPerformanceStats},
         {"setDevelopmentMode", CLuaFunctionDefs::SetDevelopmentMode},
         {"getDevelopmentMode", CLuaFunctionDefs::GetDevelopmentMode},
-        {"addDebugHook", CLuaFunctionDefs::AddDebugHook},
+        {"addDebugHook", CLuaUtilDefs::DisabledFunction},
         {"removeDebugHook", CLuaFunctionDefs::RemoveDebugHook},
 
         // Version functions

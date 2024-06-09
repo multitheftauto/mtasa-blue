@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CLuaFunctionDefs.h"
+#include <luadefs/CLuaUtilDefs.h>
 
 CTimeUsMarker<20> markerLatentEvent;            // For timing triggerLatentClientEvent
 
@@ -24,7 +25,7 @@ void CLuaFunctionDefs::LoadFunctions()
             {"cancelEvent", CLuaFunctionDefs::CancelEvent}, {"wasEventCancelled", CLuaFunctionDefs::WasEventCancelled},
             {"getCancelReason", CLuaFunctionDefs::GetCancelReason}, {"triggerLatentClientEvent", CLuaFunctionDefs::TriggerLatentClientEvent},
             {"getLatentEventHandles", CLuaFunctionDefs::GetLatentEventHandles}, {"getLatentEventStatus", CLuaFunctionDefs::GetLatentEventStatus},
-            {"cancelLatentEvent", CLuaFunctionDefs::CancelLatentEvent}, {"addDebugHook", CLuaFunctionDefs::AddDebugHook},
+            {"cancelLatentEvent", CLuaFunctionDefs::CancelLatentEvent}, {"addDebugHook", CLuaUtilDefs::DisabledFunction},
             {"removeDebugHook", CLuaFunctionDefs::RemoveDebugHook},
 
             // Explosion create funcs
