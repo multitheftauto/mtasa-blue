@@ -34,6 +34,8 @@ public:
 
     void OnWindowFocusChange(bool state) override;
 
+    void OnChatboxLayoutChange();
+
 private:
     struct InitializeArguments
     {

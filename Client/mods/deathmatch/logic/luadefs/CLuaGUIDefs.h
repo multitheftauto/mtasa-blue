@@ -12,7 +12,6 @@
 #pragma once
 #include "CLuaDefs.h"
 
-#define MAX_CHATBOX_LAYOUT_CVARS 21
 
 class CLuaGUIDefs : public CLuaDefs
 {
