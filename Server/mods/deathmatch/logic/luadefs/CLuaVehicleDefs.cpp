@@ -2362,12 +2362,12 @@ bool CLuaVehicleDefs::IsVehicleRespawnable(CVehicle* vehicle) noexcept
     return vehicle->GetRespawnEnabled();
 }
 
-std::uint32_t CLuaVehicleDefs::GetVehicleRespawnDelay(CVehicle* vehicle) noexcept
+uint32_t CLuaVehicleDefs::GetVehicleRespawnDelay(CVehicle* vehicle) noexcept
 {
     return vehicle->GetBlowRespawnInterval();
 }
 
-std::uint32_t CLuaVehicleDefs::GetVehicleIdleRespawnDelay(CVehicle* vehicle) noexcept
+uint32_t CLuaVehicleDefs::GetVehicleIdleRespawnDelay(CVehicle* vehicle) noexcept
 {
     return vehicle->GetIdleRespawnInterval();
 }
