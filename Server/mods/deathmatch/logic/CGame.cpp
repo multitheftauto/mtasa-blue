@@ -966,7 +966,10 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Is the script debug log enabled?
     if (m_pMainConfig->GetScriptDebugLogEnabled())
     {
-        if (!m_pScriptDebugging->SetLogfile(m_pMainConfig->GetScriptDebugLogFile().c_str(), m_pMainConfig->GetScriptDebugLogLevel()))
+        if (!m_pScriptDebugging->SetLogfile(
+            m_pMainConfig->GetScriptDebugLogFile().c_str(),
+            m_pMainConfig->GetScriptDebugLogLevel())
+         )
         {
             CLogger::LogPrint("WARNING: Unable to open the given script debug logfile\n");
         }

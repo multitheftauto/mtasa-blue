@@ -84,7 +84,10 @@ public:
     bool                        GetJoinFloodProtectionEnabled() { return m_bJoinFloodProtectionEnabled; };
     bool                        GetScriptDebugLogEnabled() { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty(); };
     const std::string&          GetScriptDebugLogFile() { return m_strScriptDebugLogFile; };
-    unsigned int                GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
+
+    const std::set<SString>&    GetScriptDebugLogLevelMap() const noexcept { return m_scriptDebugLogLevelMap; };
+    std::set<SString>&          GetScriptDebugLogLevelMap() noexcept { return m_scriptDebugLogLevelMap; };
+
     const std::string&          GetAccessControlListFile() { return m_strAccessControlListFile; };
     bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
     bool                        IsDisableAC(const char* szTagAC) { return MapContains(m_DisableComboACMap, szTagAC); };
@@ -184,7 +187,7 @@ private:
     bool                       m_bJoinFloodProtectionEnabled;
     bool                       m_bScriptDebugLogEnabled;
     std::string                m_strScriptDebugLogFile;
-    unsigned int               m_uiScriptDebugLogLevel;
+    std::set<SString>          m_scriptDebugLogLevelMap;
     std::string                m_strAccessControlListFile;
     bool                       m_bVerifySerials;
     unsigned short             m_usFPSLimit;
