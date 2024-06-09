@@ -118,7 +118,7 @@ int CLuaAccountDefs::GetAccountName(lua_State* luaVM)
     return 1;
 }
 
-std::optional<std::string> CLuaAccountDefs::GetAccountType(CAccount* pAccount)
+std::string CLuaAccountDefs::GetAccountType(CAccount* pAccount)
 {
     switch (pAccount->GetType())
     {
@@ -128,8 +128,9 @@ std::optional<std::string> CLuaAccountDefs::GetAccountType(CAccount* pAccount)
             return "console";
         case EAccountType::Player:
             return "player";
+        default:
+            return "unknown";
     }
-    return {};
 }
 
 int CLuaAccountDefs::GetAccountPlayer(lua_State* luaVM)
