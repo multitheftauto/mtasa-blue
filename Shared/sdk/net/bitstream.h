@@ -552,6 +552,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-05-31
     BreakObject_Serverside,
 
+    // Add respawnObject and toggleObjectRespawn to serverside
+    // 2024-06-09
+    RespawnObject_Serverside,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

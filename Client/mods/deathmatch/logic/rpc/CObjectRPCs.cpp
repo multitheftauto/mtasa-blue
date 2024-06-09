@@ -22,6 +22,8 @@ void CObjectRPCs::LoadFunctions()
     AddHandler(SET_OBJECT_VISIBLE_IN_ALL_DIMENSIONS, SetObjectVisibleInAllDimensions, "SetObjectVisibleInAllDimensions");
     AddHandler(SET_OBJECT_BREAKABLE, SetObjectBreakable, "SetObjectBreakable");
     AddHandler(BREAK_OBJECT, BreakObject, "BreakObject");
+    AddHandler(RESPAWN_OBJECT, RespawnObject, "RespawnObject");
+    AddHandler(TOGGLE_OBJECT_RESPAWN, ToggleObjectRespawn, "ToggleObjectRespawn");
 }
 
 void CObjectRPCs::DestroyAllObjects(NetBitStreamInterface& bitStream)
@@ -130,8 +132,24 @@ void CObjectRPCs::SetObjectBreakable(CClientEntity* pSource, NetBitStreamInterfa
 
 void CObjectRPCs::BreakObject(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-   auto pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
+   auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
 
-    if (pObject != nullptr)
+    if (pObject)
         pObject->Break();
+}
+
+void CObjectRPCs::RespawnObject(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
+
+    if (pObject)
+        g_pClientGame->GetObjectRespawner()->Respawn(pObject);
+}
+
+void CObjectRPCs::ToggleObjectRespawn(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
+
+    if (pObject)
+        pObject->SetRespawnEnabled(bitStream.ReadBit());
 }
