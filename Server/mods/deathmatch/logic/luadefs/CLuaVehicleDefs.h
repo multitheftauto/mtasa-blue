@@ -92,6 +92,9 @@ public:
     LUA_DECLARE(SetVehicleRespawnRotation);
     LUA_DECLARE_OOP(GetVehicleRespawnPosition);
     LUA_DECLARE_OOP(GetVehicleRespawnRotation);
+    static bool IsVehicleRespawnable(CVehicle* vehicle) noexcept;
+    static uint32_t GetVehicleRespawnDelay(CVehicle* vehicle) noexcept;
+    static uint32_t GetVehicleIdleRespawnDelay(CVehicle* vehicle) noexcept;
     LUA_DECLARE(ToggleVehicleRespawn);
     LUA_DECLARE(ResetVehicleExplosionTime);
     LUA_DECLARE(ResetVehicleIdleTime);
