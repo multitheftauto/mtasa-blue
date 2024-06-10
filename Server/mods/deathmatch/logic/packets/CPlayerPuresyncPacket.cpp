@@ -74,10 +74,9 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         // Player position
         SPositionSync position(false);
-        if (!BitStream.Read(&position))
-            return false;
+        bool          positionRead = BitStream.Read(&position);
 
-        if (pContactElement != nullptr)
+        if (positionRead && pContactElement != nullptr)
         {
             int32_t radius = -1;
 
@@ -86,10 +85,6 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 case CElement::VEHICLE:
                     if (((CVehicle*)pContactElement)->GetSyncer() != pSourcePlayer)
                         radius = g_TickRateSettings.iVehicleContactSyncRadius;
-                    break;
-                case CElement::OBJECT:
-                    if (((CObject*)pContactElement)->GetSyncer() != pSourcePlayer)
-                        radius = g_TickRateSettings.iObjectContactSyncRadius;
                     break;
             }
 
@@ -121,6 +116,9 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
             pSourcePlayer->CallEvent("onPlayerContact", Arguments);
         }
+
+        if (!positionRead)
+            return false;
 
         if (pContactElement)
         {
