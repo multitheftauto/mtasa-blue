@@ -141,8 +141,8 @@
     <vehicle_contact_sync_radius>30</vehicle_contact_sync_radius>
 
     <!-- This parameter specifies the radius in which any contact with a object will turn the player into its syncer.
-         Available range: 0 to 300. Default - 200 -->
-    <object_contact_sync_radius>200</object_contact_sync_radius>
+         Available range: 0 to 512. Default - 400 -->
+    <object_contact_sync_radius>400</object_contact_sync_radius>
 
     <!-- This parameter sets the amount of extrapolation that clients will apply to remote vehicles. This can reduce
          some of the latency induced location disparency by predicting where the remote vehicles will probably be.

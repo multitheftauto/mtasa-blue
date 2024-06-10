@@ -1456,7 +1456,7 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 50, 100, 400, "ped_syncer_distance", &g_TickRateSettings.iPedSyncerDistance, &CMainConfig::OnTickRateChange},
         {true, true, 50, 130, 400, "unoccupied_vehicle_syncer_distance", &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance, &CMainConfig::OnTickRateChange},
         {true, true, 0, 30, 130, "vehicle_contact_sync_radius", &g_TickRateSettings.iVehicleContactSyncRadius, &CMainConfig::OnTickRateChange},
-        {true, true, 0, 200, 300, "object_contact_sync_radius", &g_TickRateSettings.iObjectContactSyncRadius, &CMainConfig::OnTickRateChange},
+        {true, true, 0, 400, 512, "object_contact_sync_radius", &g_TickRateSettings.iObjectContactSyncRadius, &CMainConfig::OnTickRateChange},
         {false, false, 0, 1, 2, "compact_internal_databases", &m_iCompactInternalDatabases, NULL},
         {true, true, 0, 1, 2, "minclientversion_auto_update", &m_iMinClientVersionAutoUpdate, NULL},
         {true, true, 0, 0, 100, "server_logic_fps_limit", &m_iServerLogicFpsLimit, NULL},
