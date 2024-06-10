@@ -46,7 +46,6 @@
 #include "curl_trc.h"
 #include "curl_msh3.h"
 #include "curl_ngtcp2.h"
-#include "curl_osslq.h"
 #include "curl_quiche.h"
 #include "rand.h"
 #include "vquic.h"
@@ -59,7 +58,7 @@
 #include "memdebug.h"
 
 
-#ifdef USE_HTTP3
+#ifdef ENABLE_QUIC
 
 #ifdef O_BINARY
 #define QLOGMODE O_WRONLY|O_CREAT|O_BINARY
@@ -75,8 +74,6 @@ void Curl_quic_ver(char *p, size_t len)
 {
 #if defined(USE_NGTCP2) && defined(USE_NGHTTP3)
   Curl_ngtcp2_ver(p, len);
-#elif defined(USE_OPENSSL_QUIC) && defined(USE_NGHTTP3)
-  Curl_osslq_ver(p, len);
 #elif defined(USE_QUICHE)
   Curl_quiche_ver(p, len);
 #elif defined(USE_MSH3)
@@ -182,7 +179,7 @@ static CURLcode do_sendmsg(struct Curl_cfilter *cf,
         qctx->no_gso = TRUE;
         return send_packet_no_gso(cf, data, qctx, pkt, pktlen, gsolen, psent);
       }
-      FALLTHROUGH();
+      /* FALLTHROUGH */
     default:
       failf(data, "sendmsg() returned %zd (errno %d)", sent, SOCKERRNO);
       return CURLE_SEND_ERROR;
@@ -370,10 +367,12 @@ static CURLcode recvmmsg_packets(struct Curl_cfilter *cf,
         goto out;
       }
       if(!cf->connected && SOCKERRNO == ECONNREFUSED) {
-        struct ip_quadruple ip;
-        Curl_cf_socket_peek(cf->next, data, NULL, NULL, &ip);
+        const char *r_ip = NULL;
+        int r_port = 0;
+        Curl_cf_socket_peek(cf->next, data, NULL, NULL,
+                            &r_ip, &r_port, NULL, NULL);
         failf(data, "QUIC: connection to %s port %u refused",
-              ip.remote_ip, ip.remote_port);
+              r_ip, r_port);
         result = CURLE_COULDNT_CONNECT;
         goto out;
       }
@@ -438,10 +437,12 @@ static CURLcode recvmsg_packets(struct Curl_cfilter *cf,
         goto out;
       }
       if(!cf->connected && SOCKERRNO == ECONNREFUSED) {
-        struct ip_quadruple ip;
-        Curl_cf_socket_peek(cf->next, data, NULL, NULL, &ip);
+        const char *r_ip = NULL;
+        int r_port = 0;
+        Curl_cf_socket_peek(cf->next, data, NULL, NULL,
+                            &r_ip, &r_port, NULL, NULL);
         failf(data, "QUIC: connection to %s port %u refused",
-              ip.remote_ip, ip.remote_port);
+              r_ip, r_port);
         result = CURLE_COULDNT_CONNECT;
         goto out;
       }
@@ -496,10 +497,12 @@ static CURLcode recvfrom_packets(struct Curl_cfilter *cf,
         goto out;
       }
       if(!cf->connected && SOCKERRNO == ECONNREFUSED) {
-        struct ip_quadruple ip;
-        Curl_cf_socket_peek(cf->next, data, NULL, NULL, &ip);
+        const char *r_ip = NULL;
+        int r_port = 0;
+        Curl_cf_socket_peek(cf->next, data, NULL, NULL,
+                            &r_ip, &r_port, NULL, NULL);
         failf(data, "QUIC: connection to %s port %u refused",
-              ip.remote_ip, ip.remote_port);
+              r_ip, r_port);
         result = CURLE_COULDNT_CONNECT;
         goto out;
       }
@@ -540,13 +543,8 @@ CURLcode vquic_recv_packets(struct Curl_cfilter *cf,
 #else
   result = recvfrom_packets(cf, data, qctx, max_pkts, recv_cb, userp);
 #endif
-  if(!result) {
-    if(!qctx->got_first_byte) {
-      qctx->got_first_byte = TRUE;
-      qctx->first_byte_at = qctx->last_op;
-    }
+  if(!result)
     qctx->last_io = qctx->last_op;
-  }
   return result;
 }
 
@@ -605,8 +603,6 @@ CURLcode Curl_cf_quic_create(struct Curl_cfilter **pcf,
   DEBUGASSERT(transport == TRNSPRT_QUIC);
 #if defined(USE_NGTCP2) && defined(USE_NGHTTP3)
   return Curl_cf_ngtcp2_create(pcf, data, conn, ai);
-#elif defined(USE_OPENSSL_QUIC) && defined(USE_NGHTTP3)
-  return Curl_cf_osslq_create(pcf, data, conn, ai);
 #elif defined(USE_QUICHE)
   return Curl_cf_quiche_create(pcf, data, conn, ai);
 #elif defined(USE_MSH3)
@@ -626,8 +622,6 @@ bool Curl_conn_is_http3(const struct Curl_easy *data,
 {
 #if defined(USE_NGTCP2) && defined(USE_NGHTTP3)
   return Curl_conn_is_ngtcp2(data, conn, sockindex);
-#elif defined(USE_OPENSSL_QUIC) && defined(USE_NGHTTP3)
-  return Curl_conn_is_osslq(data, conn, sockindex);
 #elif defined(USE_QUICHE)
   return Curl_conn_is_quiche(data, conn, sockindex);
 #elif defined(USE_MSH3)
@@ -663,7 +657,7 @@ CURLcode Curl_conn_may_http3(struct Curl_easy *data,
   return CURLE_OK;
 }
 
-#else /* USE_HTTP3 */
+#else /* ENABLE_QUIC */
 
 CURLcode Curl_conn_may_http3(struct Curl_easy *data,
                              const struct connectdata *conn)
@@ -674,4 +668,4 @@ CURLcode Curl_conn_may_http3(struct Curl_easy *data,
   return CURLE_NOT_BUILT_IN;
 }
 
-#endif /* !USE_HTTP3 */
+#endif /* !ENABLE_QUIC */

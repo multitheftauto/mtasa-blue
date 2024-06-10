@@ -164,7 +164,9 @@ struct timeval {
                                    (RECV_TYPE_ARG4)(0))
 #else /* HAVE_RECV */
 #ifndef sread
-#error "Missing definition of macro sread!"
+  /* */
+  Error Missing_definition_of_macro_sread
+  /* */
 #endif
 #endif /* HAVE_RECV */
 
@@ -182,7 +184,9 @@ struct timeval {
                                     (SEND_TYPE_ARG4)(SEND_4TH_ARG))
 #else /* HAVE_SEND */
 #ifndef swrite
-#error "Missing definition of macro swrite!"
+  /* */
+  Error Missing_definition_of_macro_swrite
+  /* */
 #endif
 #endif /* HAVE_SEND */
 

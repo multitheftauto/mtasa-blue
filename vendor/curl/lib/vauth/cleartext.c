@@ -107,11 +107,12 @@ CURLcode Curl_auth_create_plain_message(const char *authzid,
  * valuep  [in]     - The user name or user's password.
  * out     [out]    - The result storage.
  *
- * Returns void.
+ * Returns CURLE_OK on success.
  */
-void Curl_auth_create_login_message(const char *valuep, struct bufref *out)
+CURLcode Curl_auth_create_login_message(const char *valuep, struct bufref *out)
 {
   Curl_bufref_set(out, valuep, strlen(valuep), NULL);
+  return CURLE_OK;
 }
 
 /*
@@ -125,13 +126,13 @@ void Curl_auth_create_login_message(const char *valuep, struct bufref *out)
  * user    [in]     - The user name.
  * out     [out]    - The result storage.
  *
- * Returns void.
+ * Returns CURLE_OK on success.
  */
-void Curl_auth_create_external_message(const char *user,
+CURLcode Curl_auth_create_external_message(const char *user,
                                            struct bufref *out)
 {
   /* This is the same formatting as the login message */
-  Curl_auth_create_login_message(user, out);
+  return Curl_auth_create_login_message(user, out);
 }
 
 #endif /* if no users */

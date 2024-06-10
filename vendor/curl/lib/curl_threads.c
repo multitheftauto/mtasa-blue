@@ -131,8 +131,7 @@ curl_thread_t Curl_thread_create(unsigned int (CURL_STDCALL *func) (void *),
 
 void Curl_thread_destroy(curl_thread_t hnd)
 {
-  if(hnd != curl_thread_t_null)
-    CloseHandle(hnd);
+  CloseHandle(hnd);
 }
 
 int Curl_thread_join(curl_thread_t *hnd)

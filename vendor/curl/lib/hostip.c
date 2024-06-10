@@ -144,7 +144,7 @@ void Curl_printable_address(const struct Curl_addrinfo *ai, char *buf,
     (void)Curl_inet_ntop(ai->ai_family, (const void *)ipaddr4, buf, bufsize);
     break;
   }
-#ifdef USE_IPV6
+#ifdef ENABLE_IPV6
   case AF_INET6: {
     const struct sockaddr_in6 *sa6 = (const void *)ai->ai_addr;
     const struct in6_addr *ipaddr6 = &sa6->sin6_addr;
@@ -167,12 +167,17 @@ create_hostcache_id(const char *name,
                     int port, char *ptr, size_t buflen)
 {
   size_t len = nlen ? nlen : strlen(name);
+  size_t olen = 0;
   DEBUGASSERT(buflen >= MAX_HOSTCACHE_LEN);
   if(len > (buflen - 7))
     len = buflen - 7;
   /* store and lower case the name */
-  Curl_strntolower(ptr, name, len);
-  return msnprintf(&ptr[len], 7, ":%u", port) + len;
+  while(len--) {
+    *ptr++ = Curl_raw_tolower(*name++);
+    olen++;
+  }
+  olen += msnprintf(ptr, 7, ":%u", port);
+  return olen;
 }
 
 struct hostcache_prune_data {
@@ -244,7 +249,7 @@ void Curl_hostcache_prune(struct Curl_easy *data)
   if(data->share)
     Curl_share_lock(data, CURL_LOCK_DATA_DNS, CURL_LOCK_ACCESS_SINGLE);
 
-  now = time(NULL);
+  time(&now);
 
   do {
     /* Remove outdated and unused entries from the hostcache */
@@ -283,7 +288,7 @@ static struct Curl_dns_entry *fetch_addr(struct Curl_easy *data,
   size_t entry_len = create_hostcache_id(hostname, 0, port,
                                          entry_id, sizeof(entry_id));
 
-  /* See if it's already in our dns cache */
+  /* See if its already in our dns cache */
   dns = Curl_hash_pick(data->dns.hostcache, entry_id, entry_len + 1);
 
   /* No entry found in cache, check if we might have a wildcard entry */
@@ -298,7 +303,7 @@ static struct Curl_dns_entry *fetch_addr(struct Curl_easy *data,
     /* See whether the returned entry is stale. Done before we release lock */
     struct hostcache_prune_data user;
 
-    user.now = time(NULL);
+    time(&user.now);
     user.cache_timeout = data->set.dns_cache_timeout;
     user.oldest = 0;
 
@@ -518,7 +523,7 @@ Curl_cache_addr(struct Curl_easy *data,
   return dns;
 }
 
-#ifdef USE_IPV6
+#ifdef ENABLE_IPV6
 /* return a static IPv6 ::1 for the name */
 static struct Curl_addrinfo *get_localhost6(int port, const char *name)
 {
@@ -595,7 +600,7 @@ static struct Curl_addrinfo *get_localhost(int port, const char *name)
   return ca6;
 }
 
-#ifdef USE_IPV6
+#ifdef ENABLE_IPV6
 /*
  * Curl_ipv6works() returns TRUE if IPv6 seems to work.
  */
@@ -627,7 +632,7 @@ bool Curl_ipv6works(struct Curl_easy *data)
     return (ipv6_works>0)?TRUE:FALSE;
   }
 }
-#endif /* USE_IPV6 */
+#endif /* ENABLE_IPV6 */
 
 /*
  * Curl_host_is_ipnum() returns TRUE if the given string is a numerical IPv4
@@ -636,11 +641,11 @@ bool Curl_ipv6works(struct Curl_easy *data)
 bool Curl_host_is_ipnum(const char *hostname)
 {
   struct in_addr in;
-#ifdef USE_IPV6
+#ifdef ENABLE_IPV6
   struct in6_addr in6;
 #endif
   if(Curl_inet_pton(AF_INET, hostname, &in) > 0
-#ifdef USE_IPV6
+#ifdef ENABLE_IPV6
      || Curl_inet_pton(AF_INET6, hostname, &in6) > 0
 #endif
     )
@@ -736,7 +741,7 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
       Curl_set_in_callback(data, true);
       st = data->set.resolver_start(
 #ifdef USE_CURL_ASYNC
-        data->state.async.resolver,
+        conn->resolve_async.resolver,
 #else
         NULL,
 #endif
@@ -749,24 +754,18 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
 
 #ifndef USE_RESOLVE_ON_IPS
     /* First check if this is an IPv4 address string */
-    if(Curl_inet_pton(AF_INET, hostname, &in) > 0) {
+    if(Curl_inet_pton(AF_INET, hostname, &in) > 0)
       /* This is a dotted IP address 123.123.123.123-style */
       addr = Curl_ip2addr(AF_INET, &in, hostname, port);
-      if(!addr)
-        return CURLRESOLV_ERROR;
-    }
-#ifdef USE_IPV6
-    else {
+#ifdef ENABLE_IPV6
+    if(!addr) {
       struct in6_addr in6;
       /* check if this is an IPv6 address string */
-      if(Curl_inet_pton(AF_INET6, hostname, &in6) > 0) {
+      if(Curl_inet_pton(AF_INET6, hostname, &in6) > 0)
         /* This is an IPv6 address literal */
         addr = Curl_ip2addr(AF_INET6, &in6, hostname, port);
-        if(!addr)
-          return CURLRESOLV_ERROR;
-      }
     }
-#endif /* USE_IPV6 */
+#endif /* ENABLE_IPV6 */
 
 #else /* if USE_RESOLVE_ON_IPS */
 #ifndef CURL_DISABLE_DOH
@@ -774,7 +773,7 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
     if(Curl_inet_pton(AF_INET, hostname, &in) > 0)
       /* This is a dotted IP address 123.123.123.123-style */
       ipnum = TRUE;
-#ifdef USE_IPV6
+#ifdef ENABLE_IPV6
     else {
       struct in6_addr in6;
       /* check if this is an IPv6 address string */
@@ -782,7 +781,7 @@ enum resolve_t Curl_resolv(struct Curl_easy *data,
         /* This is an IPv6 address literal */
         ipnum = TRUE;
     }
-#endif /* USE_IPV6 */
+#endif /* ENABLE_IPV6 */
 #endif /* CURL_DISABLE_DOH */
 
 #endif /* !USE_RESOLVE_ON_IPS */
@@ -1065,23 +1064,6 @@ static void freednsentry(void *freethis)
   dns->inuse--;
   if(dns->inuse == 0) {
     Curl_freeaddrinfo(dns->addr);
-#ifdef USE_HTTPSRR
-    if(dns->hinfo) {
-      if(dns->hinfo->target)
-        free(dns->hinfo->target);
-      if(dns->hinfo->alpns)
-        free(dns->hinfo->alpns);
-      if(dns->hinfo->ipv4hints)
-        free(dns->hinfo->ipv4hints);
-      if(dns->hinfo->echconfiglist)
-        free(dns->hinfo->echconfiglist);
-      if(dns->hinfo->ipv6hints)
-        free(dns->hinfo->ipv6hints);
-      if(dns->hinfo->val)
-        free(dns->hinfo->val);
-      free(dns->hinfo);
-    }
-#endif
     free(dns);
   }
 }
@@ -1089,7 +1071,7 @@ static void freednsentry(void *freethis)
 /*
  * Curl_init_dnscache() inits a new DNS cache.
  */
-void Curl_init_dnscache(struct Curl_hash *hash, size_t size)
+void Curl_init_dnscache(struct Curl_hash *hash, int size)
 {
   Curl_hash_init(hash, size, Curl_hash_str, Curl_str_key_compare,
                  freednsentry);
@@ -1222,7 +1204,7 @@ CURLcode Curl_loadhostpairs(struct Curl_easy *data)
         memcpy(address, addr_begin, alen);
         address[alen] = '\0';
 
-#ifndef USE_IPV6
+#ifndef ENABLE_IPV6
         if(strchr(address, ':')) {
           infof(data, "Ignoring resolve address '%s', missing IPv6 support.",
                 address);
@@ -1433,9 +1415,9 @@ CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_done)
   struct connectdata *conn = data->conn;
 
 #ifdef USE_CURL_ASYNC
-  if(data->state.async.dns) {
-    conn->dns_entry = data->state.async.dns;
-    data->state.async.dns = NULL;
+  if(conn->resolve_async.dns) {
+    conn->dns_entry = conn->resolve_async.dns;
+    conn->resolve_async.dns = NULL;
   }
 #endif
 
@@ -1457,11 +1439,11 @@ CURLcode Curl_once_resolved(struct Curl_easy *data, bool *protocol_done)
 #ifdef USE_CURL_ASYNC
 CURLcode Curl_resolver_error(struct Curl_easy *data)
 {
+  struct connectdata *conn = data->conn;
   const char *host_or_proxy;
   CURLcode result;
 
 #ifndef CURL_DISABLE_PROXY
-  struct connectdata *conn = data->conn;
   if(conn->bits.httpproxy) {
     host_or_proxy = "proxy";
     result = CURLE_COULDNT_RESOLVE_PROXY;
@@ -1474,7 +1456,7 @@ CURLcode Curl_resolver_error(struct Curl_easy *data)
   }
 
   failf(data, "Could not resolve %s: %s", host_or_proxy,
-        data->state.async.hostname);
+        conn->resolve_async.hostname);
 
   return result;
 }

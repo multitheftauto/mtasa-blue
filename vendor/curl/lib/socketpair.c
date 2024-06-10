@@ -27,33 +27,15 @@
 #include "urldata.h"
 #include "rand.h"
 
-#if defined(HAVE_PIPE) && defined(HAVE_FCNTL)
-#include <fcntl.h>
-
-int Curl_pipe(curl_socket_t socks[2])
-{
-  if(pipe(socks))
-    return -1;
-
-  if(fcntl(socks[0], F_SETFD, FD_CLOEXEC) ||
-     fcntl(socks[1], F_SETFD, FD_CLOEXEC) ) {
-    close(socks[0]);
-    close(socks[1]);
-    socks[0] = socks[1] = CURL_SOCKET_BAD;
-    return -1;
-  }
-
-  return 0;
-}
-#endif
-
-
 #if !defined(HAVE_SOCKETPAIR) && !defined(CURL_DISABLE_SOCKETPAIR)
 #ifdef _WIN32
 /*
  * This is a socketpair() implementation for Windows.
  */
 #include <string.h>
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
 #include <io.h>
 #else
 #ifdef HAVE_NETDB_H

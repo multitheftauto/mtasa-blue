@@ -28,7 +28,6 @@
 
 #include <string.h>
 
-#include "strdup.h"
 #include "curl_md4.h"
 #include "warnless.h"
 
@@ -55,8 +54,7 @@
 #else
 #include <mbedtls/config.h>
 #endif
-#if(MBEDTLS_VERSION_NUMBER >= 0x02070000) && \
-   (MBEDTLS_VERSION_NUMBER < 0x03000000)
+#if(MBEDTLS_VERSION_NUMBER >= 0x02070000)
   #define HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS
 #endif
 #endif /* USE_MBEDTLS */
@@ -196,9 +194,11 @@ static int MD4_Init(MD4_CTX *ctx)
 static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
 {
   if(!ctx->data) {
-    ctx->data = Curl_memdup(data, size);
-    if(ctx->data)
+    ctx->data = malloc(size);
+    if(ctx->data) {
+      memcpy(ctx->data, data, size);
       ctx->size = size;
+    }
   }
 }
 
