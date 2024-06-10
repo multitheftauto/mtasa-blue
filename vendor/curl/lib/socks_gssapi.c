@@ -35,7 +35,6 @@
 #include "timeval.h"
 #include "socks.h"
 #include "warnless.h"
-#include "strdup.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -140,9 +139,10 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(struct Curl_cfilter *cf,
   /* prepare service name */
   if(strchr(serviceptr, '/')) {
     service.length = serviceptr_length;
-    service.value = Curl_memdup(serviceptr, service.length);
+    service.value = malloc(service.length);
     if(!service.value)
       return CURLE_OUT_OF_MEMORY;
+    memcpy(service.value, serviceptr, service.length);
 
     gss_major_status = gss_import_name(&gss_minor_status, &service,
                                        (gss_OID) GSS_C_NULL_OID, &server);
@@ -387,11 +387,12 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(struct Curl_cfilter *cf,
   }
   else {
     gss_send_token.length = 1;
-    gss_send_token.value = Curl_memdup(&gss_enc, 1);
+    gss_send_token.value = malloc(1);
     if(!gss_send_token.value) {
       gss_delete_sec_context(&gss_status, &gss_context, NULL);
       return CURLE_OUT_OF_MEMORY;
     }
+    memcpy(gss_send_token.value, &gss_enc, 1);
 
     gss_major_status = gss_wrap(&gss_minor_status, gss_context, 0,
                                 GSS_C_QOP_DEFAULT, &gss_send_token,
@@ -475,7 +476,7 @@ CURLcode Curl_SOCKS5_gssapi_negotiate(struct Curl_cfilter *cf,
                               gss_recv_token.length, &actualread);
 
   if(result || (actualread != us_length)) {
-    failf(data, "Failed to receive GSS-API encryption type.");
+    failf(data, "Failed to receive GSS-API encryptrion type.");
     gss_release_buffer(&gss_status, &gss_recv_token);
     gss_delete_sec_context(&gss_status, &gss_context, NULL);
     return CURLE_COULDNT_CONNECT;

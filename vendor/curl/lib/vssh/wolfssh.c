@@ -42,7 +42,6 @@
 #include "select.h"
 #include "multiif.h"
 #include "warnless.h"
-#include "strdup.h"
 
 /* The last 3 #include files should be in this order */
 #include "curl_printf.h"
@@ -93,8 +92,7 @@ const struct Curl_handler Curl_handler_scp = {
   ZERO_NULL,                            /* domore_getsock */
   wssh_getsock,                         /* perform_getsock */
   wscp_disconnect,                      /* disconnect */
-  ZERO_NULL,                            /* write_resp */
-  ZERO_NULL,                            /* write_resp_hd */
+  ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_SSH,                             /* defport */
@@ -123,8 +121,7 @@ const struct Curl_handler Curl_handler_sftp = {
   ZERO_NULL,                            /* domore_getsock */
   wssh_getsock,                         /* perform_getsock */
   wsftp_disconnect,                     /* disconnect */
-  ZERO_NULL,                            /* write_resp */
-  ZERO_NULL,                            /* write_resp_hd */
+  ZERO_NULL,                            /* readwrite */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_SSH,                             /* defport */
@@ -515,9 +512,15 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         return CURLE_OK;
       }
       else if(name && (rc == WS_SUCCESS)) {
-        sshc->homedir = Curl_memdup0(name->fName, name->fSz);
-        if(!sshc->homedir)
+        sshc->homedir = malloc(name->fSz + 1);
+        if(!sshc->homedir) {
           sshc->actualcode = CURLE_OUT_OF_MEMORY;
+        }
+        else {
+          memcpy(sshc->homedir, name->fName, name->fSz);
+          sshc->homedir[name->fSz] = 0;
+          infof(data, "wolfssh SFTP realpath succeeded");
+        }
         wolfSSH_SFTPNAME_list_free(name);
         state(data, SSH_STOP);
         return CURLE_OK;
@@ -627,10 +630,10 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
       if(data->state.resume_from > 0) {
         /* Let's read off the proper amount of bytes from the input. */
         int seekerr = CURL_SEEKFUNC_OK;
-        if(data->set.seek_func) {
+        if(conn->seek_func) {
           Curl_set_in_callback(data, true);
-          seekerr = data->set.seek_func(data->set.seek_client,
-                                        data->state.resume_from, SEEK_SET);
+          seekerr = conn->seek_func(conn->seek_client, data->state.resume_from,
+                                    SEEK_SET);
           Curl_set_in_callback(data, false);
         }
 
@@ -643,15 +646,14 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
           }
           /* seekerr == CURL_SEEKFUNC_CANTSEEK (can't seek to offset) */
           do {
-            char scratch[4*1024];
             size_t readthisamountnow =
-              (data->state.resume_from - passed >
-                (curl_off_t)sizeof(scratch)) ?
-              sizeof(scratch) : curlx_sotouz(data->state.resume_from - passed);
+              (data->state.resume_from - passed > data->set.buffer_size) ?
+              (size_t)data->set.buffer_size :
+              curlx_sotouz(data->state.resume_from - passed);
 
             size_t actuallyread;
             Curl_set_in_callback(data, true);
-            actuallyread = data->state.fread_func(scratch, 1,
+            actuallyread = data->state.fread_func(data->state.buffer, 1,
                                                   readthisamountnow,
                                                   data->state.in);
             Curl_set_in_callback(data, false);
@@ -680,9 +682,9 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         Curl_pgrsSetUploadSize(data, data->state.infilesize);
       }
       /* upload data */
-      Curl_xfer_setup(data, -1, -1, FALSE, FIRSTSOCKET);
+      Curl_setup_transfer(data, -1, -1, FALSE, FIRSTSOCKET);
 
-      /* not set by Curl_xfer_setup to preserve keepon bits */
+      /* not set by Curl_setup_transfer to preserve keepon bits */
       conn->sockfd = conn->writesockfd;
 
       if(result) {
@@ -697,7 +699,7 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
         /* we want to use the _sending_ function even when the socket turns
            out readable as the underlying libssh2 sftp send function will deal
            with both accordingly */
-        data->state.select_bits = CURL_CSELECT_OUT;
+        conn->cselect_bits = CURL_CSELECT_OUT;
 
         /* since we don't really wait for anything at this point, we want the
            state machine to move on as soon as possible so we set a very short
@@ -780,20 +782,20 @@ static CURLcode wssh_statemach_act(struct Curl_easy *data, bool *block)
       /* Setup the actual download */
       if(data->req.size == 0) {
         /* no data to transfer */
-        Curl_xfer_setup(data, -1, -1, FALSE, -1);
+        Curl_setup_transfer(data, -1, -1, FALSE, -1);
         infof(data, "File already completely downloaded");
         state(data, SSH_STOP);
         break;
       }
-      Curl_xfer_setup(data, FIRSTSOCKET, data->req.size, FALSE, -1);
+      Curl_setup_transfer(data, FIRSTSOCKET, data->req.size, FALSE, -1);
 
-      /* not set by Curl_xfer_setup to preserve keepon bits */
+      /* not set by Curl_setup_transfer to preserve keepon bits */
       conn->writesockfd = conn->sockfd;
 
       /* we want to use the _receiving_ function even when the socket turns
          out writableable as the underlying libssh2 recv function will deal
          with both accordingly */
-      data->state.select_bits = CURL_CSELECT_IN;
+      conn->cselect_bits = CURL_CSELECT_IN;
 
       if(result) {
         /* this should never occur; the close state should be entered

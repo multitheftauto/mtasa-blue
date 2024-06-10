@@ -365,7 +365,7 @@ static void strstore(char **str, const char *newstr, size_t len)
   DEBUGASSERT(newstr);
   DEBUGASSERT(str);
   free(*str);
-  *str = Curl_memdup0(newstr, len);
+  *str = Curl_strndup(newstr, len);
 }
 
 /*
@@ -426,7 +426,6 @@ static void remove_expired(struct CookieInfo *cookies)
   }
 }
 
-#ifndef USE_LIBPSL
 /* Make sure domain contains a dot or is localhost. */
 static bool bad_domain(const char *domain, size_t len)
 {
@@ -444,7 +443,6 @@ static bool bad_domain(const char *domain, size_t len)
   }
   return TRUE;
 }
-#endif
 
 /*
   RFC 6265 section 4.1.1 says a server should accept this range:
@@ -823,8 +821,10 @@ Curl_cookie_add(struct Curl_easy *data,
         endslash = memrchr(path, '/', (queryp - path));
       if(endslash) {
         size_t pathlen = (endslash-path + 1); /* include end slash */
-        co->path = Curl_memdup0(path, pathlen);
+        co->path = malloc(pathlen + 1); /* one extra for the zero byte */
         if(co->path) {
+          memcpy(co->path, path, pathlen);
+          co->path[pathlen] = 0; /* null-terminate */
           co->spath = sanitize_cookie_path(co->path);
           if(!co->spath)
             badcookie = TRUE; /* out of memory bad */
@@ -886,8 +886,7 @@ Curl_cookie_add(struct Curl_easy *data,
      * Now loop through the fields and init the struct we already have
      * allocated
      */
-    fields = 0;
-    for(ptr = firstptr; ptr && !badcookie;
+    for(ptr = firstptr, fields = 0; ptr && !badcookie;
         ptr = strtok_r(NULL, "\t", &tok_buf), fields++) {
       switch(fields) {
       case 0:
@@ -928,7 +927,7 @@ Curl_cookie_add(struct Curl_easy *data,
         if(!co->spath)
           badcookie = TRUE;
         fields++; /* add a field and fall down to secure */
-        FALLTHROUGH();
+        /* FALLTHROUGH */
       case 3:
         co->secure = FALSE;
         if(strcasecompare(ptr, "TRUE")) {
@@ -1043,7 +1042,7 @@ Curl_cookie_add(struct Curl_easy *data,
         Curl_psl_release(data);
       }
       else
-        infof(data, "libpsl problem, rejecting cookie for satety");
+        acceptable = !bad_domain(domain, strlen(domain));
     }
 
     if(!acceptable) {
@@ -1208,6 +1207,7 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
                                     bool newsession)
 {
   struct CookieInfo *c;
+  char *line = NULL;
   FILE *handle = NULL;
 
   if(!inc) {
@@ -1229,7 +1229,7 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
 
   if(data) {
     FILE *fp = NULL;
-    if(file && *file) {
+    if(file) {
       if(!strcmp(file, "-"))
         fp = stdin;
       else {
@@ -1243,14 +1243,16 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
 
     c->running = FALSE; /* this is not running, this is init */
     if(fp) {
-      struct dynbuf buf;
-      Curl_dyn_init(&buf, MAX_COOKIE_LINE);
-      while(Curl_get_line(&buf, fp)) {
-        char *lineptr = Curl_dyn_ptr(&buf);
+
+      line = malloc(MAX_COOKIE_LINE);
+      if(!line)
+        goto fail;
+      while(Curl_get_line(line, MAX_COOKIE_LINE, fp)) {
+        char *lineptr = line;
         bool headerline = FALSE;
-        if(checkprefix("Set-Cookie:", lineptr)) {
+        if(checkprefix("Set-Cookie:", line)) {
           /* This is a cookie line, get it! */
-          lineptr += 11;
+          lineptr = &line[11];
           headerline = TRUE;
           while(*lineptr && ISBLANK(*lineptr))
             lineptr++;
@@ -1258,7 +1260,7 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
 
         Curl_cookie_add(data, c, headerline, TRUE, lineptr, NULL, NULL, TRUE);
       }
-      Curl_dyn_free(&buf); /* free the line buffer */
+      free(line); /* free the line buffer */
 
       /*
        * Remove expired cookies from the hash. We must make sure to run this
@@ -1274,6 +1276,18 @@ struct CookieInfo *Curl_cookie_init(struct Curl_easy *data,
   c->running = TRUE;          /* now, we're running */
 
   return c;
+
+fail:
+  free(line);
+  /*
+   * Only clean up if we allocated it here, as the original could still be in
+   * use by a share handle.
+   */
+  if(!inc)
+    Curl_cookie_cleanup(c);
+  if(handle)
+    fclose(handle);
+  return NULL; /* out of memory */
 }
 
 /*

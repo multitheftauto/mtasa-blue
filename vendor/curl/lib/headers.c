@@ -27,7 +27,6 @@
 #include "urldata.h"
 #include "strdup.h"
 #include "strcase.h"
-#include "sendf.h"
 #include "headers.h"
 
 /* The last 3 #include files should be in this order */
@@ -186,7 +185,7 @@ struct curl_header *curl_easy_nextheader(CURL *easy,
 }
 
 static CURLcode namevalue(char *header, size_t hlen, unsigned int type,
-                          char **name, char **value)
+                           char **name, char **value)
 {
   char *end = header + hlen - 1; /* point to the last byte */
   DEBUGASSERT(hlen);
@@ -253,7 +252,7 @@ static CURLcode unfold_value(struct Curl_easy *data, const char *value,
   newhs = Curl_saferealloc(hs, sizeof(*hs) + vlen + oalloc + 1);
   if(!newhs)
     return CURLE_OUT_OF_MEMORY;
-  /* ->name and ->value point into ->buffer (to keep the header allocation
+  /* ->name' and ->value point into ->buffer (to keep the header allocation
      in a single memory block), which now potentially have moved. Adjust
      them. */
   newhs->name = newhs->buffer;
@@ -264,7 +263,8 @@ static CURLcode unfold_value(struct Curl_easy *data, const char *value,
   newhs->value[olen + vlen] = 0; /* null-terminate at newline */
 
   /* insert this node into the list of headers */
-  Curl_llist_append(&data->state.httphdrs, newhs, &newhs->node);
+  Curl_llist_insert_next(&data->state.httphdrs, data->state.httphdrs.tail,
+                         newhs, &newhs->node);
   data->state.prevhead = newhs;
   return CURLE_OK;
 }
@@ -292,10 +292,9 @@ CURLcode Curl_headers_push(struct Curl_easy *data, const char *header,
   if(!end) {
     end = strchr(header, '\n');
     if(!end)
-      /* neither CR nor LF as terminator is not a valid header */
-      return CURLE_WEIRD_SERVER_REPLY;
+      return CURLE_BAD_FUNCTION_ARGUMENT;
   }
-  hlen = end - header;
+  hlen = end - header + 1;
 
   if((header[0] == ' ') || (header[0] == '\t')) {
     if(data->state.prevhead)
@@ -320,84 +319,31 @@ CURLcode Curl_headers_push(struct Curl_easy *data, const char *header,
   hs->buffer[hlen] = 0; /* nul terminate */
 
   result = namevalue(hs->buffer, hlen, type, &name, &value);
-  if(!result) {
-    hs->name = name;
-    hs->value = value;
-    hs->type = type;
-    hs->request = data->state.requests;
+  if(result)
+    goto fail;
 
-    /* insert this node into the list of headers */
-    Curl_llist_append(&data->state.httphdrs, hs, &hs->node);
-    data->state.prevhead = hs;
-  }
-  else
-    free(hs);
+  hs->name = name;
+  hs->value = value;
+  hs->type = type;
+  hs->request = data->state.requests;
+
+  /* insert this node into the list of headers */
+  Curl_llist_insert_next(&data->state.httphdrs, data->state.httphdrs.tail,
+                         hs, &hs->node);
+  data->state.prevhead = hs;
+  return CURLE_OK;
+fail:
+  free(hs);
   return result;
 }
 
 /*
- * Curl_headers_reset(). Reset the headers subsystem.
+ * Curl_headers_init(). Init the headers subsystem.
  */
-static void headers_reset(struct Curl_easy *data)
+static void headers_init(struct Curl_easy *data)
 {
   Curl_llist_init(&data->state.httphdrs, NULL);
   data->state.prevhead = NULL;
-}
-
-struct hds_cw_collect_ctx {
-  struct Curl_cwriter super;
-};
-
-static CURLcode hds_cw_collect_write(struct Curl_easy *data,
-                                     struct Curl_cwriter *writer, int type,
-                                     const char *buf, size_t blen)
-{
-  if((type & CLIENTWRITE_HEADER) && !(type & CLIENTWRITE_STATUS)) {
-    unsigned char htype = (unsigned char)
-      (type & CLIENTWRITE_CONNECT ? CURLH_CONNECT :
-       (type & CLIENTWRITE_1XX ? CURLH_1XX :
-        (type & CLIENTWRITE_TRAILER ? CURLH_TRAILER :
-         CURLH_HEADER)));
-    CURLcode result = Curl_headers_push(data, buf, htype);
-    CURL_TRC_WRITE(data, "header_collect pushed(type=%x, len=%zu) -> %d",
-                   htype, blen, result);
-    if(result)
-      return result;
-  }
-  return Curl_cwriter_write(data, writer->next, type, buf, blen);
-}
-
-static const struct Curl_cwtype hds_cw_collect = {
-  "hds-collect",
-  NULL,
-  Curl_cwriter_def_init,
-  hds_cw_collect_write,
-  Curl_cwriter_def_close,
-  sizeof(struct hds_cw_collect_ctx)
-};
-
-CURLcode Curl_headers_init(struct Curl_easy *data)
-{
-  struct Curl_cwriter *writer;
-  CURLcode result;
-
-  if(data->conn && (data->conn->handler->protocol & PROTO_FAMILY_HTTP)) {
-    /* avoid installing it twice */
-    if(Curl_cwriter_get_by_name(data, hds_cw_collect.name))
-      return CURLE_OK;
-
-    result = Curl_cwriter_create(&writer, data, &hds_cw_collect,
-                                 CURL_CW_PROTOCOL);
-    if(result)
-      return result;
-
-    result = Curl_cwriter_add(data, writer);
-    if(result) {
-      Curl_cwriter_free(data, writer);
-      return result;
-    }
-  }
-  return CURLE_OK;
 }
 
 /*
@@ -413,7 +359,7 @@ CURLcode Curl_headers_cleanup(struct Curl_easy *data)
     n = e->next;
     free(hs);
   }
-  headers_reset(data);
+  headers_init(data);
   return CURLE_OK;
 }
 

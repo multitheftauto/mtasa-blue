@@ -39,11 +39,11 @@
 #define INT16SZ          2
 
 /*
- * If USE_IPV6 is disabled, we still want to parse IPv6 addresses, so make
+ * If ENABLE_IPV6 is disabled, we still want to parse IPv6 addresses, so make
  * sure we have _some_ value for AF_INET6 without polluting our fake value
  * everywhere.
  */
-#if !defined(USE_IPV6) && !defined(AF_INET6)
+#if !defined(ENABLE_IPV6) && !defined(AF_INET6)
 #define AF_INET6 (AF_INET + 1)
 #endif
 
@@ -112,8 +112,7 @@ inet_pton4(const char *src, unsigned char *dst)
 
     pch = strchr(digits, ch);
     if(pch) {
-      unsigned int val = (unsigned int)(*tp * 10) +
-                         (unsigned int)(pch - digits);
+      unsigned int val = *tp * 10 + (unsigned int)(pch - digits);
 
       if(saw_digit && *tp == 0)
         return (0);

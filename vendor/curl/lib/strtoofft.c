@@ -79,10 +79,11 @@ static int get_char(char c, int base);
 static curl_off_t strtooff(const char *nptr, char **endptr, int base)
 {
   char *end;
-  bool is_negative = FALSE;
-  bool overflow = FALSE;
+  int is_negative = 0;
+  int overflow;
   int i;
   curl_off_t value = 0;
+  curl_off_t newval;
 
   /* Skip leading whitespace. */
   end = (char *)nptr;
@@ -92,7 +93,7 @@ static curl_off_t strtooff(const char *nptr, char **endptr, int base)
 
   /* Handle the sign, if any. */
   if(end[0] == '-') {
-    is_negative = TRUE;
+    is_negative = 1;
     end++;
   }
   else if(end[0] == '+') {
@@ -128,15 +129,19 @@ static curl_off_t strtooff(const char *nptr, char **endptr, int base)
   }
 
   /* Loop handling digits. */
+  value = 0;
+  overflow = 0;
   for(i = get_char(end[0], base);
       i != -1;
       end++, i = get_char(end[0], base)) {
-
-    if(value > (CURL_OFF_T_MAX - i) / base) {
-      overflow = TRUE;
+    newval = base * value + i;
+    if(newval < value) {
+      /* We've overflowed. */
+      overflow = 1;
       break;
     }
-    value = base * value + i;
+    else
+      value = newval;
   }
 
   if(!overflow) {
@@ -212,7 +217,7 @@ static int get_char(char c, int base)
 CURLofft curlx_strtoofft(const char *str, char **endp, int base,
                          curl_off_t *num)
 {
-  char *end = NULL;
+  char *end;
   curl_off_t number;
   errno = 0;
   *num = 0; /* clear by default */
