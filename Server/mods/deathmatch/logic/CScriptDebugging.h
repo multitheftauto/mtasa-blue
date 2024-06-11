@@ -16,19 +16,34 @@
 #include <cstdio>
 #include <list>
 
+#include <SharedUtil.DebugScript.h>
+
 struct SLogLine
 {
-    SString       strText;
-    unsigned int  uiMinimumDebugLevel;
-    unsigned char ucRed;
-    unsigned char ucGreen;
-    unsigned char ucBlue;
-    void          operator+=(const char* szAppend) { strText += szAppend; }
-    bool          operator==(const SLogLine& other) const
+    DebugScriptLevel debugLevel;
+
+    SString      strText;
+    std::uint8_t ucRed;
+    std::uint8_t ucGreen;
+    std::uint8_t ucBlue;
+
+    void operator+=(const char* szAppend) noexcept { strText += szAppend; }
+    bool operator==(const SLogLine& other) const noexcept
     {
-        return strText == other.strText && uiMinimumDebugLevel == other.uiMinimumDebugLevel && ucRed == other.ucRed && ucGreen == other.ucGreen &&
-               ucBlue == other.ucBlue;
+        if (strText != other.strText)
+            return false;
+        if (ucRed != other.ucRed)
+            return false;
+        if (ucGreen != other.ucGreen)
+            return false;
+        if (ucBlue != other.ucBlue)
+            return false;
+        if (debugLevel != other.debugLevel)
+            return false;
+
+        return true;
     }
+    bool operator!=(const SLogLine& other) const noexcept { return !operator==(other); }
 };
 
 class CScriptDebugging
@@ -55,7 +70,7 @@ public:
     void LogError(const SLuaDebugInfo& luaDebugInfo, const char* szFormat, ...);
     void LogPCallError(lua_State* luaVM, const SString& strRes, bool bInitialCall = false);
 
-    bool SetLogfile(const char* szFilename, unsigned int uiLevel);
+    bool SetLogfile(const char* szFilename, std::set<DebugScriptLevel> uiLevel) noexcept;
     void SetHTMLLogLevel(unsigned int uiLevel) { m_uiHtmlLogLevel = uiLevel; }
 
     const SLuaDebugInfo& GetLuaDebugInfo(lua_State* luaVM);
@@ -73,12 +88,12 @@ private:
                    unsigned char ucGreen = 255, unsigned char ucBlue = 255);
 
     void PrintLog(const char* szText);
-    void Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel);
+    void Broadcast(const CPacket& Packet, DebugScriptLevel uiMinimumDebugLevel);
 
-    unsigned int                   m_uiLogFileLevel;
+    std::set<DebugScriptLevel>     m_LogFileLevels;
     unsigned int                   m_uiHtmlLogLevel;
     FILE*                          m_pLogFile;
-    list<class CPlayer*>           m_Players;
+    std::list<class CPlayer*>      m_Players;
     bool                           m_bTriggeringMessageEvent;
     SLuaDebugInfo                  m_SavedLuaDebugInfo;
     std::list<CLuaMain*>           m_LuaMainStack;

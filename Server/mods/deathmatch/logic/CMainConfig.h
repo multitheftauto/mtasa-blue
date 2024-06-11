@@ -85,8 +85,8 @@ public:
     bool                        GetScriptDebugLogEnabled() { return m_bScriptDebugLogEnabled && !m_strScriptDebugLogFile.empty(); };
     const std::string&          GetScriptDebugLogFile() { return m_strScriptDebugLogFile; };
 
-    const std::set<SString>&    GetScriptDebugLogLevelMap() const noexcept { return m_scriptDebugLogLevelMap; };
-    std::set<SString>&          GetScriptDebugLogLevelMap() noexcept { return m_scriptDebugLogLevelMap; };
+    const std::set<std::uint8_t>& GetScriptDebugLogLevelMap() const noexcept { return m_scriptDebugLogLevelMap; };
+    std::set<std::uint8_t>&       GetScriptDebugLogLevelMap() noexcept { return m_scriptDebugLogLevelMap; };
 
     const std::string&          GetAccessControlListFile() { return m_strAccessControlListFile; };
     bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
@@ -187,7 +187,7 @@ private:
     bool                       m_bJoinFloodProtectionEnabled;
     bool                       m_bScriptDebugLogEnabled;
     std::string                m_strScriptDebugLogFile;
-    std::set<SString>          m_scriptDebugLogLevelMap;
+    std::set<std::uint8_t>     m_scriptDebugLogLevelMap;
     std::string                m_strAccessControlListFile;
     bool                       m_bVerifySerials;
     unsigned short             m_usFPSLimit;

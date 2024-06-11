@@ -53,7 +53,7 @@ public:
     void LogError(const SLuaDebugInfo& luaDebugInfo, const char* szFormat, ...);
     void LogPCallError(lua_State* luaVM, const SString& strRes, bool bInitialCall = false);
 
-    bool SetLogfile(const char* szFilename, unsigned int uiLevel);
+    bool SetLogfile(const char* szFilename, std::set<DebugScriptLevel> debugLevel);
 
     const SLuaDebugInfo& GetLuaDebugInfo(lua_State* luaVM);
     void                 SaveLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_SavedLuaDebugInfo = luaDebugInfo; }
@@ -75,7 +75,7 @@ public:
 
 private:
     CLuaManager*                   m_pLuaManager;
-    unsigned int                   m_uiLogFileLevel;
+    std::set<DebugScriptLevel>     m_LogFileLevels;
     bool                           m_bTriggeringMessageEvent;
     SLuaDebugInfo                  m_SavedLuaDebugInfo;
     std::list<CLuaMain*>           m_LuaMainStack;

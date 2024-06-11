@@ -35,6 +35,8 @@
 #include <windowsx.h>
 #include "CServerInfo.h"
 
+#include <SharedUtil.DebugScript.h>
+
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
     SString strResult = strInput;
@@ -308,7 +310,13 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     m_pLuaManager = new CLuaManager(this);
     m_pScriptDebugging = new CScriptDebugging(m_pLuaManager);
-    m_pScriptDebugging->SetLogfile(CalcMTASAPath("mta\\logs\\clientscript.log"), 3);
+    m_pScriptDebugging->SetLogfile(CalcMTASAPath("mta\\logs\\clientscript.log"), {
+        DebugScriptLevels::NONE,
+        DebugScriptLevels::INFO,
+        DebugScriptLevels::WARNINGS,
+        DebugScriptLevels::ERRORS,
+        DebugScriptLevels::CUSTOM,
+    });
 
     CStaticFunctionDefinitions(m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager);
     CLuaFunctionDefs::Initialize(m_pLuaManager, m_pScriptDebugging, this);

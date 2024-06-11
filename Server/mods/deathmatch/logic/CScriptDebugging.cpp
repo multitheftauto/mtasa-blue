@@ -17,9 +17,9 @@ extern CGame* g_pGame;
 
 CScriptDebugging::CScriptDebugging()
 {
-    m_uiLogFileLevel = 0;
+    m_LogFileLevels = {};
     m_uiHtmlLogLevel = 0;
-    m_pLogFile = NULL;
+    m_pLogFile = nullptr;
     m_bTriggeringMessageEvent = false;
 }
 
@@ -90,28 +90,26 @@ void CScriptDebugging::LogBadAccess(lua_State* luaVM)
     LogWarning(luaVM, "Access denied @ '%s'", lua_tostring(luaVM, lua_upvalueindex(1)));
 }
 
-bool CScriptDebugging::SetLogfile(const char* szFilename, unsigned int uiLevel)
+bool CScriptDebugging::SetLogfile(const char* szFilename, std::set<DebugScriptLevel> levels) noexcept
 {
     assert(szFilename);
 
     // Try to load the new file
     FILE* pFile = File::Fopen(szFilename, "a+");
-    if (pFile)
-    {
-        // Close the previously loaded file
-        if (m_pLogFile)
-        {
-            fprintf(m_pLogFile, "INFO: Logging to this file ended\n");
-            fclose(m_pLogFile);
-        }
+    if (!pFile)
+        return false;
 
-        // Set the new pointer and level and return true
-        m_uiLogFileLevel = uiLevel;
-        m_pLogFile = pFile;
-        return true;
+    // Close the previously loaded file
+    if (m_pLogFile)
+    {
+        fprintf(m_pLogFile, "INFO: Logging to this file ended\n");
+        fclose(m_pLogFile);
     }
 
-    return false;
+    // Set the new pointer and level and return true
+    m_LogFileLevels = levels;
+    m_pLogFile = pFile;
+    return true;
 }
 
 void CScriptDebugging::UpdateLogOutput()
@@ -119,16 +117,25 @@ void CScriptDebugging::UpdateLogOutput()
     SLogLine line;
     while (m_DuplicateLineFilter.PopOutputLine(line))
     {
-        // Log it to the file if enough level
-        if (m_uiLogFileLevel >= line.uiMinimumDebugLevel)
+        for (const auto& level : m_LogFileLevels)
         {
-            PrintLog(line.strText);
+            // Log it to the file if enough level
+            if (line.debugLevel == level)
+            {
+                PrintLog(line.strText);
+                break;
+            }
         }
+        
         // Log to console
         CLogger::LogPrintf("%s", line.strText.c_str());
         CLogger::LogPrintNoStamp("\n");
         // Tell the players
-        Broadcast(CDebugEchoPacket(line.strText, line.uiMinimumDebugLevel, line.ucRed, line.ucGreen, line.ucBlue), line.uiMinimumDebugLevel);
+        Broadcast(
+            CDebugEchoPacket(line.strText, line.debugLevel,
+                line.ucRed, line.ucGreen, line.ucBlue),
+            line.debugLevel
+        );
     }
 }
 
@@ -143,15 +150,14 @@ void CScriptDebugging::PrintLog(const char* szText)
     }
 }
 
-void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel)
+void CScriptDebugging::Broadcast(const CPacket& Packet, DebugScriptLevel debugLevel)
 {
     // Tell everyone we log to about it
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
+    for (const auto& pPlayer : m_Players)
     {
-        if ((*iter)->m_uiScriptDebugLevel >= uiMinimumDebugLevel)
-        {
-            (*iter)->Send(Packet);
-        }
+        if (pPlayer->m_uiScriptDebugLevel >= debugLevel)
+            continue;
+        
+        pPlayer->Send(Packet);
     }
 }

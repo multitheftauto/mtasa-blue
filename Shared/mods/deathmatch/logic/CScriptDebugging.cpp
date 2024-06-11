@@ -177,15 +177,15 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, const char* szMessage)
     LogWarning(luaVM, "%s", szMessage);
 }
 
-void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage, unsigned int uiMinimumDebugLevel,
-                                 unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
+void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& luaDebugInfo, const char* szMessage,
+    unsigned int uiDebugLevel, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue)
 {
     SString strText = SString("%s%s", szPrePend, szMessage);
 
-    if (luaDebugInfo.infoType != DEBUG_INFO_NONE && uiMinimumDebugLevel <= 2)
+    if (luaDebugInfo.infoType != DEBUG_INFO_NONE && uiDebugLevel <= 2)
         strText = ComposeErrorMessage(szPrePend, luaDebugInfo, szMessage);
 
-    switch (uiMinimumDebugLevel)
+    switch (uiDebugLevel)
     {
         case 1:
             ucRed = 255, ucGreen = 0, ucBlue = 0;
@@ -241,7 +241,9 @@ void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& lua
     }
 
     if (notCancelled)
-        m_DuplicateLineFilter.AddLine({strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue});
+        m_DuplicateLineFilter.AddLine({
+            strText, uiMinimumDebugLevel, ucRed, ucGreen, ucBlue
+        });
 
 #ifdef MTA_CLIENT
     if (g_pCore->GetCVars()->GetValue<bool>("filter_duplicate_log_lines") == false)

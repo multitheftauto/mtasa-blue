@@ -968,8 +968,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     {
         if (!m_pScriptDebugging->SetLogfile(
             m_pMainConfig->GetScriptDebugLogFile().c_str(),
-            m_pMainConfig->GetScriptDebugLogLevel())
-         )
+            m_pMainConfig->GetScriptDebugLogLevelMap()
+        ))
         {
             CLogger::LogPrint("WARNING: Unable to open the given script debug logfile\n");
         }

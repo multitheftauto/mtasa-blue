@@ -1412,7 +1412,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
             if(combo.empty())
                 continue;
             try{
-                auto level = std::stoi(combo[0]);
+                auto level = std::stoi(combo);
                 MapInsert(comboDebugLevelMap, level);
             }catch(...) {}
         }
@@ -1420,7 +1420,7 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
             if(combo.empty())
                 continue;
             try{
-                auto level = std::stoi(combo[0]);
+                auto level = std::stoi(combo);
                 MapInsert(comboDebugLevelMap, level);
             }catch(...) {}
         }
