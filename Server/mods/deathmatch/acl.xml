@@ -21,6 +21,7 @@
       <acl name="Admin" />
       <acl name="RPC" />
       <object name="resource.admin" />
+      <object name="resource.admin2" />
       <object name="resource.webadmin" />
       <object name="resource.acpanel" />
    </group>
