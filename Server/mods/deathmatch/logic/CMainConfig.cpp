@@ -344,7 +344,9 @@ bool CMainConfig::Load()
         ReadCommaSeparatedList(strDebugLevel, debugLevelList);
         for (const auto& level : debugLevelList)
         {
-            if (!isdigit(**level))
+            if(level.empty())
+                continue;
+            if (!isdigit(level[0]))
                 continue;
 
             MapInsert(m_scriptDebugLogLevelMap, level);
@@ -1406,10 +1408,22 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
 
         // Merge
         std::set<std::uint32_t> comboDebugLevelMap;
-        for (const auto& combo : curDebugLevelList)
-            MapInsert(comboDebugLevelMap, atoi(*combo));
-        for (const auto& combo : newDebugLevelList)
-            MapInsert(comboDebugLevelMap, atoi(*combo));
+        for (const auto& combo : curDebugLevelList) {
+            if(combo.empty())
+                continue;
+            try{
+                auto level = std::stoi(combo[0]);
+                MapInsert(comboDebugLevelMap, level);
+            }catch(...) {}
+        }
+        for (const auto& combo : newDebugLevelList) {
+            if(combo.empty())
+                continue;
+            try{
+                auto level = std::stoi(combo[0]);
+                MapInsert(comboDebugLevelMap, level);
+            }catch(...) {}
+        }
 
         // Make a string
         SString strComboResult;
@@ -1417,9 +1431,12 @@ bool CMainConfig::SetSetting(const SString& strName, const SString& strValue, bo
         {
             if (!uiId)
                 continue;
+            if (uiId > 4)
+                continue;
 
             if (!strComboResult.empty())
                 strComboResult += ",";
+
             strComboResult += SString("%d", uiId);
         }
 
