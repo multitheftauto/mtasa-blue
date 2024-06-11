@@ -20,7 +20,6 @@ public:
 
     // Object create/destroy functions
     LUA_DECLARE(CreateObject);
-    static bool RespawnObject(CObject* const pObject);
 
     // Object get functions
     LUA_DECLARE(GetObjectName);
@@ -28,7 +27,6 @@ public:
     LUA_DECLARE(GetObjectScale);
     static bool IsObjectBreakable(CObject* const pObject);
     static bool IsObjectMoving(CObject* const pObject);
-    static bool IsObjectRespawnEnabled(CObject* const pObject);
     LUA_DECLARE(GetObjectProperty);
     LUA_DECLARE(GetObjectProperties);
 
@@ -40,6 +38,5 @@ public:
     LUA_DECLARE(MoveObject);
     LUA_DECLARE(StopObject);
     static bool BreakObject(CObject* const pObject);
-    static bool ToggleObjectRespawn(CObject* const pObject, const bool bEnabled);
     static bool SetObjectProperty(CObject* const pObject, const std::string sProperty, const std::variant<float, CVector> vValue);
 };

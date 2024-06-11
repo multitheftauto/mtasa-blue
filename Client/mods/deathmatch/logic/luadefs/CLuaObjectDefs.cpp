@@ -25,7 +25,6 @@ void CLuaObjectDefs::LoadFunctions()
         {"getObjectMass", GetObjectMass},
         {"getObjectProperty", GetObjectProperty},
         {"isObjectMoving", ArgumentParser<IsObjectMoving>},
-        {"isObjectRespawnEnabled", ArgumentParser<IsObjectRespawnEnabled>},
 
         // Object set funcs
         {"moveObject", MoveObject},
@@ -54,7 +53,6 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "stop", "stopObject");
     lua_classfunction(luaVM, "break", "breakObject");
     lua_classfunction(luaVM, "respawn", "respawnObject");
-    lua_classfunction(luaVM, "toggleRespawn", "toggleObjectRespawn");
 
     lua_classfunction(luaVM, "getScale", "getObjectScale");
     lua_classfunction(luaVM, "isBreakable", "isObjectBreakable");
@@ -62,7 +60,6 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
     lua_classfunction(luaVM, "isMoving", "isObjectMoving");
-    lua_classfunction(luaVM, "isRespawnEnabled", "isObjectRespawnEnabled");
 
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
@@ -708,16 +705,4 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
-}
-
-bool CLuaObjectDefs::IsObjectRespawnEnabled(CClientEntity* pEntity)
-{
-    if (!IS_OBJECT(pEntity))
-        return false;
-
-    auto* pObject = static_cast<CDeathmatchObject*>(pEntity);
-    if (!pObject)
-        return false;
-
-    return pObject->IsRespawnEnabled();
 }

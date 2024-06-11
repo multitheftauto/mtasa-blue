@@ -93,9 +93,6 @@ public:
     bool IsInWater() const { return m_bInWater; }
     void SetInWater(bool bInWater) { m_bInWater = bInWater; }
 
-    bool IsRespawnEnabled() const { return m_bRespawnEnabled; }
-    void SetRespawnEnabled(bool bEnabled) { m_bRespawnEnabled = bEnabled; }
-
     float GetMass() const { return m_fMass; }
     void  SetMass(float fMass) { m_fMass = fMass; };
 
@@ -133,7 +130,6 @@ private:
     CVector         m_vecTurnSpeed;
     bool            m_bInWater;
     bool            m_bIsStatic;            // true if the object never moved using setElementVelocity/setElementAngularVelocity
-    bool            m_bRespawnEnabled;
 
     // Properties
     float m_fMass;

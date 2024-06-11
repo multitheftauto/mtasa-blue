@@ -27,7 +27,5 @@ public:
     DECLARE_ELEMENT_RPC(SetObjectVisibleInAllDimensions);
     DECLARE_ELEMENT_RPC(SetObjectBreakable);
     DECLARE_ELEMENT_RPC(BreakObject);
-    DECLARE_ELEMENT_RPC(RespawnObject);
-    DECLARE_ELEMENT_RPC(ToggleObjectRespawn);
     DECLARE_ELEMENT_RPC(SetObjectProperty);
 };

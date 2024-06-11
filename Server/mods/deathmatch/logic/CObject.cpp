@@ -35,7 +35,6 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
     m_bBreakable = false;
     m_bInWater = false;
     m_bIsStatic = true;
-    m_bRespawnEnabled = false;
     m_bIsMoving = false;
 
     m_fMass = -1.0f;

@@ -408,7 +408,6 @@ public:
 
     // Object create/destroy functions
     static CObject* CreateObject(CResource* pResource, unsigned short usModelID, const CVector& vecPosition, const CVector& vecRotation, bool bIsLowLod);
-    static bool     RespawnObject(CElement* pElement);
 
     // Object get functions
     static bool GetObjectRotation(CObject* pObject, CVector& vecRotation);
@@ -424,7 +423,6 @@ public:
     static bool BreakObject(CElement* pElement);
     static bool SetObjectVisibleInAllDimensions(CElement* pElement, bool bVisible, unsigned short usNewDimension = 0);
     static bool SetObjectBreakable(CElement* pElement, const bool bBreakable);
-    static bool ToggleObjectRespawn(CElement* pElement, const bool bEnable);
     static bool SetObjectProperty(CElement* pElement, const std::string sProperty, std::variant<float, CVector> vValue);
 
     // Radar area create/destroy funcs

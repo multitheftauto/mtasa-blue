@@ -12463,43 +12463,6 @@ bool CStaticFunctionDefinitions::SetColPolygonHeight(CColPolygon* pColPolygon, f
     return false;
 }
 
-bool CStaticFunctionDefinitions::ToggleObjectRespawn(CElement* pElement, bool enableRespawn)
-{
-    RUN_CHILDREN(ToggleObjectRespawn(*iter, enableRespawn))
-
-    if (!IS_OBJECT(pElement))
-        return false;
-
-    CObject* pObject = static_cast<CObject*>(pElement);
-    if (!pObject || pObject->IsRespawnEnabled() == enableRespawn)
-        return false;
-
-    pObject->SetRespawnEnabled(enableRespawn);
-
-    CBitStream bitStream;
-    bitStream->WriteBit(enableRespawn);
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, TOGGLE_OBJECT_RESPAWN, *bitStream.pBitStream));
-
-    return true;
-}
-
-bool CStaticFunctionDefinitions::RespawnObject(CElement* pElement)
-{
-    RUN_CHILDREN(RespawnObject(*iter))
-
-    if (!IS_OBJECT(pElement))
-        return false;
-
-    CObject* pObject = static_cast<CObject*>(pElement);
-    if (!pObject)
-        return false;
-
-    CBitStream bitStream;
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, RESPAWN_OBJECT, *bitStream.pBitStream));
-
-    return true;
-}
-
 bool CStaticFunctionDefinitions::SetObjectProperty(CElement* pElement, std::string sProperty, std::variant<float, CVector> vValue)
 {
     RUN_CHILDREN(SetObjectProperty(*iter, sProperty, vValue))

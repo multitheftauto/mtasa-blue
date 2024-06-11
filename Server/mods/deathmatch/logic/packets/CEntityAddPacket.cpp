@@ -301,11 +301,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
                         BitStream.WriteBit(pObject->GetHealth() <= 0);
                   
-                    // Static, respawnable & properties
+                    // Static & properties
                     if (BitStream.Can(eBitStreamVersion::ObjectSync_FixAndUpdate))
                     {
                         BitStream.WriteBit(pObject->IsStatic());
-                        BitStream.WriteBit(pObject->IsRespawnEnabled());
 
                         BitStream.Write(pObject->GetMass());
                         BitStream.Write(pObject->GetTurnMass());

@@ -19,14 +19,12 @@ void CLuaObjectDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Object create/destroy funcs
         {"createObject", CreateObject},
-        {"respawnObject", ArgumentParser<RespawnObject>},
 
         // Object get funcs
         {"getObjectRotation", GetObjectRotation},
         {"getObjectScale", GetObjectScale},
         {"isObjectBreakable", ArgumentParser<IsObjectBreakable>},
         {"isObjectMoving", ArgumentParser<IsObjectMoving>},
-        {"isObjectRespawnEnabled", ArgumentParser<IsObjectRespawnEnabled>},
         {"getObjectProperty", GetObjectProperty},
 
         // Object set funcs
@@ -36,7 +34,6 @@ void CLuaObjectDefs::LoadFunctions()
         {"moveObject", MoveObject},
         {"stopObject", StopObject},
         {"breakObject", ArgumentParser<BreakObject>},
-        {"toggleObjectRespawn", ArgumentParser<ToggleObjectRespawn>},
         {"setObjectProperty", ArgumentParser<SetObjectProperty>},
     };
 
@@ -53,15 +50,12 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "move", "moveObject");
     lua_classfunction(luaVM, "stop", "stopObject");
     lua_classfunction(luaVM, "break", "breakObject");
-    lua_classfunction(luaVM, "respawn", "respawnObject");
 
     lua_classfunction(luaVM, "getScale", "getObjectScale");
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "isBreakable", "isObjectBreakable");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
     lua_classfunction(luaVM, "isMoving", "isObjectMoving");
-    lua_classfunction(luaVM, "toggleRespawn", "toggleObjectRespawn");
-    lua_classfunction(luaVM, "isRespawnEnabled", "isObjectRespawnEnabled");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
     lua_classfunction(luaVM, "setProperty", "setObjectProperty");
@@ -323,21 +317,6 @@ bool CLuaObjectDefs::SetObjectBreakable(CObject* const pObject, const bool bBrea
 bool CLuaObjectDefs::BreakObject(CObject* const pObject)
 {
     return CStaticFunctionDefinitions::BreakObject(pObject);
-}
-
-bool CLuaObjectDefs::RespawnObject(CObject* const pObject)
-{
-    return CStaticFunctionDefinitions::RespawnObject(pObject);
-}
-
-bool CLuaObjectDefs::ToggleObjectRespawn(CObject* const pObject, const bool bEnable)
-{
-    return CStaticFunctionDefinitions::ToggleObjectRespawn(pObject, bEnable);
-}
-
-bool CLuaObjectDefs::IsObjectRespawnEnabled(CObject* const pObject)
-{
-    return pObject->IsRespawnEnabled();
 }
 
 int CLuaObjectDefs::GetObjectProperties(lua_State* luaVM)
