@@ -57,6 +57,7 @@
 #include "CWorldSA.h"
 #include "D3DResourceSystemSA.h"
 #include "CIplStoreSA.h"
+#include "CBuildingRemovalSA.h"
 
 extern CGameSA* pGame;
 
@@ -141,6 +142,7 @@ CGameSA::CGameSA()
     m_pIplStore = new CIplStoreSA();
     m_pCoverManager = new CCoverManagerSA();
     m_pPlantManager = new CPlantManagerSA();
+    m_pBuildingRemoval = new CBuildingRemovalSA();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -278,6 +280,7 @@ CGameSA::~CGameSA()
     delete reinterpret_cast<CPointLightsSA*>(m_pPointLights);
     delete static_cast<CColStoreSA*>(m_collisionStore);
     delete static_cast<CIplStore*>(m_pIplStore);
+    delete static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
     delete m_pCoverManager;
     delete m_pPlantManager;
 
