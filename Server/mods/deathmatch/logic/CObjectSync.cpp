@@ -114,6 +114,15 @@ void CObjectSync::UpdateObject(CObject* pObject)
     else
         // Try to find a syncer
         FindSyncer(pObject);
+
+    // If an object is marked as moving, is it really still moving?
+    if (pObject->m_bIsMoving && !pObject->IsMoving())
+    {
+        pObject->m_bIsMoving = false;
+
+        CLuaArguments Arguments;
+        pObject->CallEvent("onObjectMoveStop", Arguments);
+    }
 }
 
 void CObjectSync::FindSyncer(CObject* pObject)
@@ -277,15 +286,6 @@ void CObjectSync::Packet_ObjectSync(CObjectSyncPacket& Packet)
             pObject->SetBuoyancyConstant(pData->fBuoyancyConstant);
         if (pData->ucFlags & 0x800)
             pObject->SetCenterOfMass(pData->vecCenterOfMass);
-
-        // We check whether the object is marked as "moving" and whether it is actually still moving
-        if (pObject->m_bIsMoving && !pObject->IsMoving())
-        {
-            CLuaArguments Arguments;
-            pObject->CallEvent("onObjectMoveStop", Arguments);
-
-            pObject->m_bIsMoving = false;
-        }
 
         // Send this sync
         pData->bSend = true;

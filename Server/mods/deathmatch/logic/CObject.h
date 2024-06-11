@@ -148,5 +148,5 @@ protected:
 
 public:
     CPositionRotationAnimation* m_pMoveAnimation;
-    bool                        m_bIsMoving;            // Value for the onObjectMoveStop event
+    bool                        m_bIsMoving; // Variable for onObjectMoveStop event
 };

@@ -70,12 +70,12 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     m_vecRotation = Copy.m_vecRotation;
     m_bInWater = Copy.m_bInWater;
     m_bIsStatic = Copy.m_bIsStatic;
-    m_bIsMoving = Copy.m_bIsMoving;
 
     m_pMoveAnimation = nullptr;
     if (Copy.m_pMoveAnimation != nullptr)
     {
         m_pMoveAnimation = new CPositionRotationAnimation(*Copy.m_pMoveAnimation);
+        m_bIsMoving = true;
     }
 
     m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
@@ -352,10 +352,11 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
         SetRotation(positionRotation.m_vecRotation);
     }
 
+    // Mark object as moving
+    m_bIsMoving = true;
+
     CLuaArguments Arguments;
     CallEvent("onObjectMoveStart", Arguments);
-
-    m_bIsMoving = true;
 }
 
 void CObject::StopMoving()
