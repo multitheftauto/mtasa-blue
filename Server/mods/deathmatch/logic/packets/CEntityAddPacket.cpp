@@ -297,6 +297,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     health.data.fValue = pObject->GetHealth();
                     BitStream.Write(&health);
 
+                    // is object break?
+                    if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        BitStream.WriteBit(pObject->GetHealth() <= 0);
+                  
                     // Static, respawnable & properties
                     if (BitStream.Can(eBitStreamVersion::ObjectSync_FixAndUpdate))
                     {

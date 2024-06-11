@@ -27,7 +27,7 @@ public:
     LUA_DECLARE(GetAccounts);
     LUA_DECLARE(GetAccountName);
 
-    static std::optional<std::string> GetAccountType(CAccount* pAccount);
+    static std::string GetAccountType(CAccount* pAccount);
 
     LUA_DECLARE(GetAccountPlayer);
     LUA_DECLARE(IsGuestAccount);

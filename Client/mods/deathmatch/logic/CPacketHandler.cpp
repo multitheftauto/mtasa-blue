@@ -2726,6 +2726,7 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // CVector                      (12)    - scale
         // bool                         (1)     - frozen
         // SObjectHealthSync            (?)     - health
+        // bool                         (1)     - is break
         // bool                         (1)     - static flag
         // bool                         (1)     - respawnEnabled
         // float                        (4)     - properties (mass, turnMass etc)
@@ -3090,6 +3091,12 @@ retry:
                         if (bitStream.Read(&health))
                             pObject->SetHealth(health.data.fValue);
 
+                        if (bitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        {
+                            if (bitStream.ReadBit())
+                                pObject->Break();
+                        }
+                      
                         // Set static, respawnable & properties
                         if (bitStream.Can(eBitStreamVersion::ObjectSync_FixAndUpdate))
                         {

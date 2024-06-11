@@ -39,6 +39,7 @@ public:
     static bool SetObjectBreakable(CObject* const pObject, const bool bBreakable);
     LUA_DECLARE(MoveObject);
     LUA_DECLARE(StopObject);
+    static bool BreakObject(CObject* const pObject);
     static bool ToggleObjectRespawn(CObject* const pObject, const bool bEnabled);
     static bool SetObjectProperty(CObject* const pObject, const std::string sProperty, const std::variant<float, CVector> vValue);
 };
