@@ -149,7 +149,7 @@ void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDe
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)
     {
-        if ((*iter)->m_uiScriptDebugLevel >= uiMinimumDebugLevel)
+        if ((*iter)->m_uiScriptDebugLevel >= uiMinimumDebugLevel || (*iter)->m_uiScriptDebugLevel == 3) // Make sure it doesn't skip outputDebugString with level 4
         {
             (*iter)->Send(Packet);
         }
