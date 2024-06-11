@@ -232,8 +232,9 @@ bool IsUnreadable(uint Attr)
 {
 #if defined(_UNIX) && defined(S_ISFIFO) && defined(S_ISSOCK) && defined(S_ISCHR)
   return S_ISFIFO(Attr) || S_ISSOCK(Attr) || S_ISCHR(Attr);
-#endif
+#else
   return false;
+#endif
 }
 
 

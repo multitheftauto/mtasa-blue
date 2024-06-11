@@ -72,7 +72,7 @@ void CClientColTube::DebugRender(const CVector& vecPosition, float fDrawRadius)
             {
                 const CVector& vecBegin = vertexList[i] * vecMult + vecAdd;
                 const CVector& vecEnd = vertexList[(i + 1) % uiNumPoints] * vecMult + vecAdd;
-                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
             }
         }
     }
@@ -87,7 +87,7 @@ void CClientColTube::DebugRender(const CVector& vecPosition, float fDrawRadius)
         {
             const CVector& vecBegin = vertexList[i] * vecMultB + vecAdd;
             const CVector& vecEnd = vertexList[i] * vecMultT + vecAdd;
-            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
         }
     }
 
@@ -100,7 +100,7 @@ void CClientColTube::DebugRender(const CVector& vecPosition, float fDrawRadius)
         for (uint i = 0; i < vertexList.size(); i++)
         {
             const CVector& vecEnd = vertexList[i] * vecMult + vecAdd;
-            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
         }
     }
 
@@ -113,7 +113,7 @@ void CClientColTube::DebugRender(const CVector& vecPosition, float fDrawRadius)
         for (uint i = 0; i < vertexList.size(); i++)
         {
             const CVector& vecEnd = vertexList[i] * vecMult + vecAdd;
-            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
         }
     }
 }

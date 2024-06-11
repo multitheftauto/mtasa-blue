@@ -2032,6 +2032,14 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     {
         BITCOUNT2 = 1
     };
+    enum
+    {
+        BITCOUNT3 = 1
+    };
+    enum
+    {
+        BITCOUNT4 = 1
+    };
 
     bool Read(NetBitStreamInterface& bitStream)
     {
@@ -2040,6 +2048,16 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
              isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
          else
              data2.fireballdestruct = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data3), BITCOUNT3);
+         else
+             data3.roadsignstext = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
+             isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
+         else
+             data4.extendedwatercannons = true;
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2054,6 +2072,12 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_FireballDestruct))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_RoadSignsText))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data3), BITCOUNT3);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2082,6 +2106,16 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool fireballdestruct : 1;
     } data2;
 
+    struct
+    {
+        bool roadsignstext : 1;
+    } data3;
+
+    struct
+    {
+        bool extendedwatercannons : 1;
+    } data4;
+
     SWorldSpecialPropertiesStateSync()
     {
         // Set default states
@@ -2098,6 +2132,8 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.watercreatures = true;
         data.burnflippedcars = true;
         data2.fireballdestruct = true;
+        data3.roadsignstext = true;
+        data4.extendedwatercannons = true;
     }
 };
 

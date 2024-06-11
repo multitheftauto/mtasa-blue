@@ -67,7 +67,11 @@ bool CreateReparsePoint(CommandData *Cmd,const wchar *Name,FileHeader *hd)
   // path as a prefix, which can confuse IsRelativeSymlinkSafe algorithm.
   if (!Cmd->AbsoluteLinks && (AbsPath || IsFullPath(hd->RedirName) ||
       !IsRelativeSymlinkSafe(Cmd,hd->FileName,Name,hd->RedirName)))
+  {
+    uiMsg(UIERROR_SKIPUNSAFELINK,hd->FileName,hd->RedirName);
+    ErrHandler.SetErrorCode(RARX_WARNING);
     return false;
+  }
 
   CreatePath(Name,true,Cmd->DisableNames);
 
