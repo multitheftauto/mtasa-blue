@@ -321,7 +321,7 @@ float CClientColTube::adjustSize(float fSize)
     }
     else
     {        
-        nextValue = initialValue + 1.1f * ((size - 5.0f) / 2.0f);            // check for float values
+           
     }
     return nextValue;
 }
