@@ -853,6 +853,26 @@ ADD_ENUM(ePools::ENV_MAP_ATOMIC_POOL, "env-map-atomic")
 ADD_ENUM(ePools::SPEC_MAP_MATERIAL_POOL, "spec-map-material")
 IMPLEMENT_ENUM_END("gta-pool")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eFxParticleSystems)
+ADD_ENUM(eFxParticleSystems::PRT_BLOOD, "blood")
+ADD_ENUM(eFxParticleSystems::PRT_BOATSPLASH, "boat_splash")
+ADD_ENUM(eFxParticleSystems::PRT_BUBBLE, "bubble")
+ADD_ENUM(eFxParticleSystems::PRT_DEBRIS, "car_debris")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKE, "collision_smoke")
+ADD_ENUM(eFxParticleSystems::PRT_GUNSHELL, "gunshell")
+ADD_ENUM(eFxParticleSystems::PRT_SAND, "sand")
+ADD_ENUM(eFxParticleSystems::PRT_SAND2, "sand2")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKEHUGE, "huge_smoke")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKE2, "smoke")
+ADD_ENUM(eFxParticleSystems::PRT_SPARK, "spark")
+ADD_ENUM(eFxParticleSystems::PRT_SPARK2, "spark2")
+ADD_ENUM(eFxParticleSystems::PRT_SPLASH, "splash")
+ADD_ENUM(eFxParticleSystems::PRT_WAKE, "wake")
+ADD_ENUM(eFxParticleSystems::PRT_WATERSPLASH, "water_splash")
+ADD_ENUM(eFxParticleSystems::PRT_WHEELDIRT, "wheel_dirt")
+ADD_ENUM(eFxParticleSystems::PRT_GLASS, "glass")
+IMPLEMENT_ENUM_CLASS_END("particle-system")
+
 //
 // CResource from userdata
 //
