@@ -660,6 +660,7 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
                 // is the pointer the same as the one being deleted
                 if ((DWORD)pFound->m_pInterface == (DWORD)pInterface)
                 {
+                    delete pFound;
                     // remove it from the data buildings list so we don't try and remove or add it again.
                     m_pDataBuildings->erase(iterator++);
                 }
@@ -672,9 +673,9 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
     }
     {
         // Init some variables
-        std::pair<std::multimap<unsigned short, sBuildingRemovalItem*>::iterator, std::multimap<unsigned short, sBuildingRemovalItem*>::iterator>
+        std::pair<std::multimap<uint16_t, sBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sBuildingRemovalItem*>::iterator>
                                                                              binaryIterators = m_pBinaryBuildings->equal_range(pInterface->m_nModelIndex);
-        std::multimap<unsigned short, sBuildingRemovalItem*>::const_iterator iteratorBinary = binaryIterators.first;
+        std::multimap<uint16_t, sBuildingRemovalItem*>::const_iterator iteratorBinary = binaryIterators.first;
         for (; iteratorBinary != binaryIterators.second;)
         {
             sBuildingRemovalItem* pFound = (*iteratorBinary).second;
@@ -683,6 +684,7 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
                 // is the pointer the same as the one being deleted
                 if ((DWORD)pFound->m_pInterface == (DWORD)pInterface)
                 {
+                    delete pFound;
                     // remove it from the data buildings list so we don't try and remove or add it again.
                     m_pBinaryBuildings->erase(iteratorBinary++);
                 }
