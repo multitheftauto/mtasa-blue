@@ -304,13 +304,9 @@ float CClientColTube::adjustSize(float fSize)
     float nextValue = 0.0f;
     float initialValue = 2.4f;            // Replace with your actual initial value
     float increment = 1.03f;
-    double epsilon = std::numeric_limits<double>::epsilon();// Very small epsilon value
+ 
 
-     if (std::abs(fSize - std::round(fSize)) > epsilon)
-    {
-         size = std::floor(fSize - 0.5f);            // Round non-integer values
-    }
-
+   
     if (std::fmod(size, 2.0) == 0.0)            // check for even
     {
         nextValue = (size / 2.0f) + 0.15f;
@@ -321,7 +317,7 @@ float CClientColTube::adjustSize(float fSize)
     }
     else
     {        
-           
+         nextValue = (size / 2.0f) + 0.15f;    
     }
     return nextValue;
 }
