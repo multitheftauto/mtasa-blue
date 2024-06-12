@@ -21,24 +21,24 @@ class CBuildingRemovalSA : public CBuildingRemoval
 public:
     CBuildingRemovalSA();
 
-    void              RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
-    bool              IsRemovedModelInRadius(SIPLInst* pInst);
-    bool              IsModelRemoved(unsigned short modelID);
-    void              ClearRemovedBuildingLists(uint* pOutAmount = NULL);
-    bool              RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
-    SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface);
-    void              AddDataBuilding(CEntitySAInterface* pInterface);
-    void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface);
-    void              AddBinaryBuilding(CEntitySAInterface* pInterface);
-    bool              IsObjectRemoved(CEntitySAInterface* pInterface);
-    bool              IsDataModelRemoved(unsigned short usModelID);
-    bool              IsEntityRemoved(CEntitySAInterface* pInterface);
+    SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface) override;
+
+    void RemoveBuilding(uint16_t usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, size_t* pOutAmount = NULL) override;
+    bool RestoreBuilding(uint16_t usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, size_t* pOutAmount = NULL) override;
+    bool IsRemovedModelInRadius(SIPLInst* pInst) override;
+    bool IsModelRemoved(uint16_t modelID) override;
+    void ClearRemovedBuildingLists(uint* pOutAmount = NULL) override;
+    void AddDataBuilding(CEntitySAInterface* pInterface) override;
+    void RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface) override;
+    void AddBinaryBuilding(CEntitySAInterface* pInterface) override;
+    bool IsObjectRemoved(CEntitySAInterface* pInterface) override;
+    bool IsDataModelRemoved(uint16_t usModelID) override;
+    bool IsEntityRemoved(CEntitySAInterface* pInterface) override;
 
 private:
-    std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
-    std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;
-    std::multimap<unsigned short, sBuildingRemovalItem*>*     m_pBinaryBuildings;
-    std::map<unsigned short, unsigned short>*                 m_pRemovedObjects;
+    std::multimap<uint16_t, SBuildingRemoval*>*               m_pBuildingRemovals;
+    std::multimap<uint16_t, sDataBuildingRemovalItem*>*       m_pDataBuildings;
+    std::multimap<uint16_t, sBuildingRemovalItem*>*           m_pBinaryBuildings;
     std::map<DWORD, bool>                                     m_pRemovedEntities;
     std::map<DWORD, bool>                                     m_pAddedEntities;
 };

@@ -20,12 +20,12 @@ extern CGameSA* pGame;
 
 CBuildingRemovalSA::CBuildingRemovalSA()
 {
-    m_pBuildingRemovals = new std::multimap<unsigned short, SBuildingRemoval*>;
-    m_pDataBuildings = new std::multimap<unsigned short, sDataBuildingRemovalItem*>;
-    m_pBinaryBuildings = new std::multimap<unsigned short, sBuildingRemovalItem*>;
+    m_pBuildingRemovals = new std::multimap<uint16_t, SBuildingRemoval*>;
+    m_pDataBuildings = new std::multimap<uint16_t, sDataBuildingRemovalItem*>;
+    m_pBinaryBuildings = new std::multimap<uint16_t, sBuildingRemovalItem*>;
 }
 
-void CBuildingRemovalSA::RemoveBuilding(unsigned short usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior, uint* pOutAmount)
+void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, float fX, float fY, float fZ, char cInterior, size_t* pOutAmount)
 {
     // New building Removal
     SBuildingRemoval* pRemoval = new SBuildingRemoval();
@@ -36,14 +36,14 @@ void CBuildingRemovalSA::RemoveBuilding(unsigned short usModelToRemove, float fR
     pRemoval->m_fRadius = fRange;
     pRemoval->m_cInterior = cInterior;
     // Push it to the back of the removal list
-    m_pBuildingRemovals->insert(std::pair<unsigned short, SBuildingRemoval*>(usModelToRemove, pRemoval));
+    m_pBuildingRemovals->insert(std::pair<uint16_t, SBuildingRemoval*>(usModelToRemove, pRemoval));
 
     bool bFound = false;
     uint uiAmount = 0;
     // Init loop variables
-    std::pair<std::multimap<unsigned short, sDataBuildingRemovalItem*>::iterator, std::multimap<unsigned short, sDataBuildingRemovalItem*>::iterator>
+    std::pair<std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator>
                                                                              iterators = m_pDataBuildings->equal_range(usModelToRemove);
-    std::multimap<unsigned short, sDataBuildingRemovalItem*>::const_iterator iter = iterators.first;
+    std::multimap<uint16_t, sDataBuildingRemovalItem*>::const_iterator iter = iterators.first;
     for (; iter != iterators.second; ++iter)
     {
         sDataBuildingRemovalItem* pFind = (*iter).second;
@@ -100,9 +100,9 @@ void CBuildingRemovalSA::RemoveBuilding(unsigned short usModelToRemove, float fR
         }
     }
 
-    std::pair<std::multimap<unsigned short, sBuildingRemovalItem*>::iterator, std::multimap<unsigned short, sBuildingRemovalItem*>::iterator> iteratorsBinary =
+    std::pair<std::multimap<uint16_t, sBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sBuildingRemovalItem*>::iterator> iteratorsBinary =
         m_pBinaryBuildings->equal_range(usModelToRemove);
-    std::multimap<unsigned short, sBuildingRemovalItem*>::const_iterator iterBinary = iteratorsBinary.first;
+    std::multimap<uint16_t, sBuildingRemovalItem*>::const_iterator iterBinary = iteratorsBinary.first;
     for (; iterBinary != iteratorsBinary.second; ++iterBinary)
     {
         sBuildingRemovalItem* pFindBinary = (*iterBinary).second;
@@ -166,15 +166,15 @@ void CBuildingRemovalSA::RemoveBuilding(unsigned short usModelToRemove, float fR
         *pOutAmount = uiAmount;
 }
 
-bool CBuildingRemovalSA::RestoreBuilding(unsigned short usModelToRestore, float fRange, float fX, float fY, float fZ, char cInterior, uint* pOutAmount)
+bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange, float fX, float fY, float fZ, char cInterior, uint* pOutAmount)
 {
     bool bSuccess = false;
     uint uiAmount = 0;
 
     // Init some variables
-    std::pair<std::multimap<unsigned short, SBuildingRemoval*>::iterator, std::multimap<unsigned short, SBuildingRemoval*>::iterator> iterators =
+    std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
         m_pBuildingRemovals->equal_range(usModelToRestore);
-    std::multimap<unsigned short, SBuildingRemoval*>::const_iterator iter = iterators.first;
+    std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
     // Loop through the buildings list
     for (; iter != iterators.second;)
     {
@@ -268,9 +268,9 @@ bool CBuildingRemovalSA::RestoreBuilding(unsigned short usModelToRestore, float 
         else
             iter++;
     }
-    std::pair<std::multimap<unsigned short, sDataBuildingRemovalItem*>::iterator, std::multimap<unsigned short, sDataBuildingRemovalItem*>::iterator>
+    std::pair<std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator>
                                                                              dataBuildingIterators = m_pDataBuildings->equal_range(usModelToRestore);
-    std::multimap<unsigned short, sDataBuildingRemovalItem*>::const_iterator iterator = dataBuildingIterators.first;
+    std::multimap<uint16_t, sDataBuildingRemovalItem*>::const_iterator iterator = dataBuildingIterators.first;
     for (; iterator != dataBuildingIterators.second; ++iterator)
     {
         sDataBuildingRemovalItem* pFound = (*iterator).second;
@@ -300,9 +300,9 @@ bool CBuildingRemovalSA::RestoreBuilding(unsigned short usModelToRestore, float 
         }
     }
 
-    std::pair<std::multimap<unsigned short, sBuildingRemovalItem*>::iterator, std::multimap<unsigned short, sBuildingRemovalItem*>::iterator>
+    std::pair<std::multimap<uint16_t, sBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sBuildingRemovalItem*>::iterator>
                                                                          binaryBuildingIterators = m_pBinaryBuildings->equal_range(usModelToRestore);
-    std::multimap<unsigned short, sBuildingRemovalItem*>::const_iterator iteratorBinary = binaryBuildingIterators.first;
+    std::multimap<uint16_t, sBuildingRemovalItem*>::const_iterator iteratorBinary = binaryBuildingIterators.first;
     for (; iteratorBinary != binaryBuildingIterators.second; ++iteratorBinary)
     {
         sBuildingRemovalItem* pFoundBinary = (*iteratorBinary).second;
@@ -342,9 +342,9 @@ bool CBuildingRemovalSA::RestoreBuilding(unsigned short usModelToRestore, float 
 bool CBuildingRemovalSA::IsRemovedModelInRadius(SIPLInst* pInst)
 {
     // Init some variables
-    std::pair<std::multimap<unsigned short, SBuildingRemoval*>::iterator, std::multimap<unsigned short, SBuildingRemoval*>::iterator> iterators =
+    std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
         m_pBuildingRemovals->equal_range(pInst->m_nModelIndex);
-    std::multimap<unsigned short, SBuildingRemoval*>::const_iterator iter = iterators.first;
+    std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
     // Loop through the buildings list
     for (; iter != iterators.second; ++iter)
     {
@@ -372,9 +372,9 @@ bool CBuildingRemovalSA::IsRemovedModelInRadius(SIPLInst* pInst)
 bool CBuildingRemovalSA::IsObjectRemoved(CEntitySAInterface* pInterface)
 {
     // Init some variables
-    std::pair<std::multimap<unsigned short, SBuildingRemoval*>::iterator, std::multimap<unsigned short, SBuildingRemoval*>::iterator> iterators =
+    std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
         m_pBuildingRemovals->equal_range(pInterface->m_nModelIndex);
-    std::multimap<unsigned short, SBuildingRemoval*>::const_iterator iter = iterators.first;
+    std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
     // Loop through the buildings list
     for (; iter != iterators.second; ++iter)
     {
@@ -410,13 +410,13 @@ bool CBuildingRemovalSA::IsObjectRemoved(CEntitySAInterface* pInterface)
 }
 
 // Check if a given model is replaced
-bool CBuildingRemovalSA::IsModelRemoved(unsigned short usModelID)
+bool CBuildingRemovalSA::IsModelRemoved(uint16_t usModelID)
 {
     return m_pBuildingRemovals->count(usModelID) > 0;
 }
 
 // Check if a given model is replaced
-bool CBuildingRemovalSA::IsDataModelRemoved(unsigned short usModelID)
+bool CBuildingRemovalSA::IsDataModelRemoved(uint16_t usModelID)
 {
     return m_pBuildingRemovals->count(usModelID) > 0;
 }
@@ -432,7 +432,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
 {
     // Ensure no memory leaks by deleting items.
     uint                                                             uiAmount = 0;
-    std::multimap<unsigned short, SBuildingRemoval*>::const_iterator iter = m_pBuildingRemovals->begin();
+    std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = m_pBuildingRemovals->begin();
 
     for (; iter != m_pBuildingRemovals->end();)
     {
@@ -498,7 +498,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
             iter++;
     }
     // Init some variables
-    std::multimap<unsigned short, sDataBuildingRemovalItem*>::const_iterator iterator = m_pDataBuildings->begin();
+    std::multimap<uint16_t, sDataBuildingRemovalItem*>::const_iterator iterator = m_pDataBuildings->begin();
     // Loop through the data building list
     for (; iterator != m_pDataBuildings->end(); ++iterator)
     {
@@ -510,7 +510,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
         }
     }
     // Init some variables
-    std::multimap<unsigned short, sBuildingRemovalItem*>::const_iterator iteratorBinary = m_pBinaryBuildings->begin();
+    std::multimap<uint16_t, sBuildingRemovalItem*>::const_iterator iteratorBinary = m_pBinaryBuildings->begin();
     // Loop through the data building list
     for (; iteratorBinary != m_pBinaryBuildings->end(); ++iteratorBinary)
     {
@@ -524,7 +524,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
     // Delete old building lists
     delete m_pBuildingRemovals;
     // Create new
-    m_pBuildingRemovals = new std::multimap<unsigned short, SBuildingRemoval*>;
+    m_pBuildingRemovals = new std::multimap<uint16_t, SBuildingRemoval*>;
     m_pRemovedEntities.clear();
 
     if (pOutAmount)
@@ -535,9 +535,9 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
 SBuildingRemoval* CBuildingRemovalSA::GetBuildingRemoval(CEntitySAInterface* pInterface)
 {
     // Init some variables
-    std::pair<std::multimap<unsigned short, SBuildingRemoval*>::iterator, std::multimap<unsigned short, SBuildingRemoval*>::iterator> iterators =
+    std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
         m_pBuildingRemovals->equal_range(pInterface->m_nModelIndex);
-    std::multimap<unsigned short, SBuildingRemoval*>::const_iterator iter = iterators.first;
+    std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
     // Loop through the buildings list
     for (; iter != iterators.second; ++iter)
     {
@@ -575,7 +575,7 @@ void CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
         // Create a new building removal
         sDataBuildingRemovalItem* pBuildingRemoval = new sDataBuildingRemovalItem(pInterface, true);
         // Insert it with the model index so we can fast lookup
-        m_pDataBuildings->insert(std::pair<unsigned short, sDataBuildingRemovalItem*>((unsigned short)pInterface->m_nModelIndex, pBuildingRemoval));
+        m_pDataBuildings->insert(std::pair<uint16_t, sDataBuildingRemovalItem*>((uint16_t)pInterface->m_nModelIndex, pBuildingRemoval));
         m_pAddedEntities[(DWORD)pInterface] = true;
         m_pRemovedEntities[(DWORD)pInterface] = false;
     }
@@ -588,7 +588,7 @@ void CBuildingRemovalSA::AddBinaryBuilding(CEntitySAInterface* pInterface)
         // Create a new building removal
         sBuildingRemovalItem* pBuildingRemoval = new sBuildingRemovalItem(pInterface, false);
         // Insert it with the model index so we can fast lookup
-        m_pBinaryBuildings->insert(std::pair<unsigned short, sBuildingRemovalItem*>((unsigned short)pInterface->m_nModelIndex, pBuildingRemoval));
+        m_pBinaryBuildings->insert(std::pair<uint16_t, sBuildingRemovalItem*>((uint16_t)pInterface->m_nModelIndex, pBuildingRemoval));
         m_pAddedEntities[(DWORD)pInterface] = true;
         m_pRemovedEntities[(DWORD)pInterface] = false;
     }
@@ -596,9 +596,9 @@ void CBuildingRemovalSA::AddBinaryBuilding(CEntitySAInterface* pInterface)
 
 void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface)
 {
-    std::pair<std::multimap<unsigned short, SBuildingRemoval*>::iterator, std::multimap<unsigned short, SBuildingRemoval*>::iterator> iterators =
+    std::pair<std::multimap<uint16_t, SBuildingRemoval*>::iterator, std::multimap<uint16_t, SBuildingRemoval*>::iterator> iterators =
         m_pBuildingRemovals->equal_range(pInterface->m_nModelIndex);
-    std::multimap<unsigned short, SBuildingRemoval*>::const_iterator iter = iterators.first;
+    std::multimap<uint16_t, SBuildingRemoval*>::const_iterator iter = iterators.first;
 
     // Loop through the buildings list
     for (; iter != iterators.second; ++iter)
@@ -649,9 +649,9 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
     }
     {
         // Init some variables
-        std::pair<std::multimap<unsigned short, sDataBuildingRemovalItem*>::iterator, std::multimap<unsigned short, sDataBuildingRemovalItem*>::iterator>
+        std::pair<std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator>
                                                                                  dataIterators = m_pDataBuildings->equal_range(pInterface->m_nModelIndex);
-        std::multimap<unsigned short, sDataBuildingRemovalItem*>::const_iterator iterator = dataIterators.first;
+        std::multimap<uint16_t, sDataBuildingRemovalItem*>::const_iterator iterator = dataIterators.first;
         for (; iterator != dataIterators.second;)
         {
             sDataBuildingRemovalItem* pFound = (*iterator).second;
