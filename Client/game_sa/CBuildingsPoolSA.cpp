@@ -322,6 +322,7 @@ void CBuildingsPoolSA::RemovePedsContactEnityLinks()
             CPedSAInterface* ped = pedLinks->pEntity->GetPedInterface();
             ped->m_pCollidedEntity = nullptr;
             ped->pContactEntity = nullptr;
+            ped->pLastContactEntity = nullptr;
             ped->pLastContactedEntity[0] = nullptr;
             ped->pLastContactedEntity[1] = nullptr;
             ped->pLastContactedEntity[2] = nullptr;

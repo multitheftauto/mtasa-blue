@@ -242,11 +242,11 @@ public:
     float               fTargetRotation;
     float               fRotationSpeed;
     float               fMoveAnim;
-    CPedSAInterface*    unkPed;
+    CEntitySAInterface* pContactEntity;
     CVector             unk_56C;
     CVector             unk_578;
 
-    CEntitySAInterface*  pContactEntity;
+    CEntitySAInterface*  pLastContactEntity;
     CVehicleSAInterface* pLastVehicle;
     CVehicleSAInterface* pVehicle;
 
