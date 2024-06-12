@@ -200,6 +200,12 @@ public:
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 
+    std::tuple<bool, float, float> GetUnderwaterEffect();
+    std::tuple<bool, float> GetUnderwaterDarkness();
+    void SetUnderwaterEffectEnabled(bool bEnabled);
+    void SetUnderwaterEffectSpeed(float fSpeed, float fFrequency);
+    void SetUnderwaterDarkness(bool bEnabled, float fFullDarknessDepth);
+
     void AllowWindowsCursorShowing(bool bAllow);
 
     CShotSyncData* GetLocalShotSyncData();

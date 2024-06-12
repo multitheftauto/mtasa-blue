@@ -407,4 +407,10 @@ public:
     virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
     virtual unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept = 0;
     virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+
+    virtual std::tuple<bool, float, float> GetUnderwaterEffect() = 0;
+    virtual std::tuple<bool, float> GetUnderwaterDarkness() = 0;
+    virtual void SetUnderwaterEffectEnabled(bool bEnabled) = 0;
+    virtual void SetUnderwaterEffectSpeed(float fSpeed, float fFrequency) = 0;
+    virtual void SetUnderwaterDarkness(bool bEnabled, float fFullDarknessDepth) = 0;
 };
