@@ -19,7 +19,7 @@ constexpr char DEFAULT_APP_ASSET_TEXT[] = "Multi Theft Auto";
 constexpr char DEFAULT_APP_ASSET_SMALL[] = "";
 constexpr char DEFAULT_APP_ASSET_SMALL_TEXT[] = "";
 
-CDiscordRichPresence::CDiscordRichPresence() : m_uiDiscordAppStart(0), m_uiDiscordAppEnd(0)
+CDiscordRichPresence::CDiscordRichPresence() : m_iDiscordAppStart(0), m_iDiscordAppEnd(0)
 {
     SetDefaultData();
 
@@ -82,8 +82,8 @@ void CDiscordRichPresence::SetDefaultData()
     m_bUpdateRichPresence = true;
     m_bDisallowCustomDetails = true;
 
-    m_uiDiscordAppStart = 0;
-    m_uiDiscordAppEnd = 0;
+    m_iDiscordAppStart = 0;
+    m_iDiscordAppEnd = 0;
 
     m_iPartySize = 0;
     m_iPartyMax = 0;
@@ -119,8 +119,8 @@ void CDiscordRichPresence::UpdatePresence()
 
     discordPresence.details =
         (!m_strDiscordAppCustomDetails.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomDetails.c_str() : m_strDiscordAppDetails.c_str();
-    discordPresence.startTimestamp = m_uiDiscordAppStart;
-    discordPresence.endTimestamp = m_uiDiscordAppEnd;
+    discordPresence.startTimestamp = m_iDiscordAppStart;
+    discordPresence.endTimestamp = m_iDiscordAppEnd;
     discordPresence.instance = 0;
 
     DiscordButton buttons[2]{0};
@@ -141,15 +141,15 @@ void CDiscordRichPresence::UpdatePresence()
     m_bUpdateRichPresence = false;
 }
 
-void CDiscordRichPresence::SetPresenceStartTimestamp(const unsigned long ulStart)
+void CDiscordRichPresence::SetPresenceStartTimestamp(const int64_t iStart)
 {
-    m_uiDiscordAppStart = ulStart;
+    m_iDiscordAppStart = iStart;
     m_bUpdateRichPresence = true;
 }
 
-void CDiscordRichPresence::SetPresenceEndTimestamp(const unsigned long ulEnd)
+void CDiscordRichPresence::SetPresenceEndTimestamp(const int64_t iEnd)
 {
-    m_uiDiscordAppEnd = ulEnd;
+    m_iDiscordAppEnd = iEnd;
     m_bUpdateRichPresence = true;
 }
 
@@ -167,13 +167,13 @@ void CDiscordRichPresence::SetAsset(const char* szAsset, const char* szAssetText
 {
     if (isLarge)
     {
-        m_strDiscordAppAsset = (std::strlen(szAsset) > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET;
-        m_strDiscordAppAssetText = (std::strlen(szAssetText) > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_TEXT;
+        m_strDiscordAppAsset = (strlen(szAsset) > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET;
+        m_strDiscordAppAssetText = (strlen(szAssetText) > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_TEXT;
     }
     else
     {
-        m_strDiscordAppAssetSmall = (std::strlen(szAsset) > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET_SMALL;
-        m_strDiscordAppAssetSmallText = (std::strlen(szAssetText) > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
+        m_strDiscordAppAssetSmall = (strlen(szAsset) > 0 && szAsset && *szAsset) ? szAsset : DEFAULT_APP_ASSET_SMALL;
+        m_strDiscordAppAssetSmallText = (strlen(szAssetText) > 0 && szAssetText && *szAssetText) ? szAssetText : DEFAULT_APP_ASSET_SMALL_TEXT;
     }
     m_bUpdateRichPresence = true;
 }
@@ -189,18 +189,18 @@ bool CDiscordRichPresence::SetPresenceState(const char* szState, bool bCustom)
     return true;
 }
 
-bool CDiscordRichPresence::SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl)
+bool CDiscordRichPresence::SetPresenceButtons(uint8_t uiIndex, const char* szName, const char* szUrl)
 {
     // Should it always return true?
-    if (iIndex <= 2)
+    if (uiIndex <= 2)
     {
         std::decay_t<decltype(*m_aButtons)> buttons;
         if (m_aButtons)
             buttons = *m_aButtons;
 
-        if (iIndex == 1)
+        if (uiIndex == 1)
             std::get<0>(buttons) = {szName, szUrl};
-        else if (iIndex == 2)
+        else if (uiIndex == 2)
             std::get<1>(buttons) = {szName, szUrl};
 
         m_aButtons = buttons;

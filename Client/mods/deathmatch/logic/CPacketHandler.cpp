@@ -468,16 +468,17 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
     if (g_pNet->CanServerBitStream((eBitStreamVersion::CPlayerJoinCompletePacket_ServerName)))
     {
-        auto discord = g_pCore->GetDiscord();
+        const auto discord = g_pCore->GetDiscord();
         if (discord && discord->IsDiscordRPCEnabled())
         {
             std::string serverName;
-            bitStream.ReadString(serverName);
-
-            if (serverName.length() > 0)
+            if (bitStream.ReadString(serverName))
             {
-                g_pCore->SetLastConnectedServerName(serverName);
-                discord->SetPresenceDetails(serverName.c_str(), false);
+                if (serverName.length() > 0)
+                {
+                    g_pCore->SetLastConnectedServerName(serverName);
+                    discord->SetPresenceDetails(serverName.c_str(), false);
+                }
             }
         }
     }

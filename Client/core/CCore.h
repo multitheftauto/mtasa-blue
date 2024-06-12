@@ -286,8 +286,8 @@ public:
     bool   IsUsingCustomStreamingMemorySize();
     size_t GetStreamingMemory();
 
-    const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
-    void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
+    const std::string& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
+    void               SetLastConnectedServerName(const std::string& strServerName) { m_strLastConnectedServerName = strServerName; }
 
 private:
     void ApplyCoreInitSettings();
@@ -390,7 +390,7 @@ private:
     bool    m_bIsRenderingGrass;
     bool    m_bFakeLagCommandEnabled;
 
-    SString m_strLastConnectedServerName{};
+    std::string m_strLastConnectedServerName{};
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);

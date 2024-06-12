@@ -994,10 +994,9 @@ void CClientGame::DoPulsePostFrame()
         }
 
         // Check if we need to update the Discord Rich Presence state
-        if (const long long ticks = GetTickCount64_(); ticks > m_timeLastDiscordStateUpdate + TIME_DISCORD_UPDATE_RATE)
+        if (const int64_t ticks = GetTickCount64_(); ticks > m_timeLastDiscordStateUpdate + TIME_DISCORD_UPDATE_RATE)
         {
             const auto discord = g_pCore->GetDiscord();
-
             if (discord && discord->IsDiscordRPCEnabled() && discord->IsDiscordCustomDetailsDisallowed())
             {
                 if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
@@ -1018,8 +1017,8 @@ void CClientGame::DoPulsePostFrame()
                     auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
                     bool useZoneName = true;
 
-                    const eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
-                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : _("Walking around ");
+                    const auto  vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
+                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType) : _("Walking around ");
 
                     if (task && task->IsValid())
                     {
@@ -1059,7 +1058,7 @@ void CClientGame::DoPulsePostFrame()
                         }
 
                         // Choose a random task state (if we have any)
-                        const int stateCount = taskStates.size();
+                        const auto stateCount = taskStates.size();
                         if (stateCount > 0)
                         {
                             std::srand(GetTickCount64_());

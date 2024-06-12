@@ -667,16 +667,18 @@ void CCore::SetConnected(bool bConnected)
 
     if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
     {
-        const auto discord = g_pCore->GetDiscord();
-        if (!discord->IsDiscordRPCEnabled())
-            discord->SetDiscordRPCEnabled(true);
+        if (const auto discord = g_pCore->GetDiscord(); discord)
+        {
+            if (!discord->IsDiscordRPCEnabled())
+                discord->SetDiscordRPCEnabled(true);
 
-        discord->SetPresenceState(bConnected ? _("In-game") : _("Main menu"), false);
-        discord->SetPresenceStartTimestamp(0);
-        discord->SetPresenceDetails("", false);
+            discord->SetPresenceState(bConnected ? _("In-game") : _("Main menu"), false);
+            discord->SetPresenceStartTimestamp(0);
+            discord->SetPresenceDetails("", false);
 
-        if (bConnected)
-            discord->SetPresenceStartTimestamp(time(nullptr));
+            if (bConnected)
+                discord->SetPresenceStartTimestamp(time(nullptr));
+        }
     }
 }
 
@@ -1340,7 +1342,7 @@ void CCore::DoPostFramePulse()
     m_pConnectManager->DoPulse();
 
     // Update Discord Rich Presence status
-    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    if (const int64_t ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
     {
         if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
         {
