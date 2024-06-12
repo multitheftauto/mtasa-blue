@@ -300,38 +300,27 @@ float CClientMarker::GetSize() const
 
 float CClientColTube::adjustSize(float fSize)
 {
-    float size = fSize;
-    float nextValue = 0.0f;
-    float initialValue = 2.4f;            // Replace with your actual initial value
-    float increment = 1.03f;
- 
-
-   
-    if (std::fmod(size, 2.0) == 0.0)            // check for even
+            // Replace with your actual initial value
+    
+    if (std::fmod(fSize, 2.0) == 0.0)            // check for even
     {
-        nextValue = (size / 2.0f) + 0.15f;
+        fSize = (fSize / 2.0f) + 0.15f;
     }
-    else if (std::fmod(size, 2.0) == 1.0) //check for odd
+    else if (std::fmod(fSize, 2.0) == 1.0)            // check for odd
     {
-        nextValue = initialValue + increment * ((size - 5.0f) / 2.0f);
+        fSize = 2.4f + 1.03f * ((fSize - 5.0f) / 2.0f);
     }
     else
     {        
-         nextValue = (size / 2.0f) + 0.15f;    
+         fSize = (fSize / 2.0f) + 0.15f;    //check for float
     }
-    return nextValue;
+    return fSize;
 }
-
 
 void CClientMarker::SetSize(float fSize)
 {
-
-     std::string str1 = std::to_string(m_pCollision->GetShapeType());
-    CStaticFunctionDefinitions::OutputConsole(str1.c_str());
-
     switch (m_pCollision->GetShapeType())
     {
-
         case COLSHAPE_CIRCLE:
         {
             CClientColCircle* pShape = static_cast<CClientColCircle*>(m_pCollision);
@@ -349,8 +338,6 @@ void CClientMarker::SetSize(float fSize)
             CClientColTube* pShape = static_cast<CClientColTube*>(m_pCollision);
             pShape->SetRadius(pShape->adjustSize(fSize));
             pShape->SetHeight(fSize);
-            CStaticFunctionDefinitions::OutputConsole("tube");
-        
             break;
         }
     }
