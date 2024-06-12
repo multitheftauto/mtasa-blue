@@ -1006,6 +1006,7 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
         RemoveAllBuildings();
     }
 
+    ((CBuildingRemovalSA*)GetBuildingRemoval())->DropCaches();
     bool status = m_pPools->GetBuildingsPool().Resize(size);
 
     if (shouldRemoveBuilding)

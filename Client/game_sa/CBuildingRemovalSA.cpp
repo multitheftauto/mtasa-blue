@@ -696,3 +696,22 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
     m_pRemovedEntities[(DWORD)pInterface] = false;
     m_pAddedEntities[(DWORD)pInterface] = false;
 }
+
+void CBuildingRemovalSA::DropCaches()
+{
+    m_pRemovedEntities.clear();
+    m_pAddedEntities.clear();
+
+    for (auto& it : *m_pBinaryBuildings)
+    {
+        delete it.second;
+    }
+
+    for (auto& it : *m_pDataBuildings)
+    {
+        delete it.second;
+    }
+
+    m_pBinaryBuildings->clear();
+    m_pDataBuildings->clear();
+}
