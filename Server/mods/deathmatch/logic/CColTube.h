@@ -36,6 +36,7 @@ public:
         m_fHeight = fHeight;
         SizeChanged();
     };
+    float adjustSize(float fSize);
 
 protected:
     bool ReadSpecialData(const int iLine) override;
