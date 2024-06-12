@@ -156,14 +156,7 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 
 void CMultiplayerSA::SetUnderwaterEffectEnabled(bool bEnabled)
 {
-    if (bEnabled)
-    {
-        MemPutFast<BYTE>(0xC402D3, 1);
-    }
-    else
-    {
-        MemPutFast<BYTE>(0xC402D3, 0);
-    }
+    MemPutFast<BYTE>(0xC402D3, bEnabled ?  1 : 0);
 }
 
 void CMultiplayerSA::SetUnderwaterEffectSpeed(float fSpeed, float fFrequency)
@@ -174,14 +167,7 @@ void CMultiplayerSA::SetUnderwaterEffectSpeed(float fSpeed, float fFrequency)
 
 void CMultiplayerSA::SetUnderwaterDarkness(bool bEnabled, float fFullDarknessDepth)
 {
-    if (bEnabled)
-    {
-        MemPutFast<BYTE>(0x8D5144, 1);
-    }
-    else
-    {
-        MemPutFast<BYTE>(0x8D5144, 0);
-    }
+    MemPutFast<BYTE>(0x8D5144, bEnabled ? 1 : 0);
 
     MemPutFast<float>(0x8D5148, fFullDarknessDepth);
 }
@@ -218,7 +204,7 @@ bool CMultiplayerSA::IsThermalVisionEnabled()
 
 std::tuple<bool, float, float> CMultiplayerSA::GetUnderwaterEffect()
 {
-    bool bEnabled = (*(BYTE*)0xC402D3 == 1);
+    bool bEnabled = (*(BYTE*)0xC402D3 == 1) || (*(float*)0xC8132C) >= 0.535f;
     float fSpeed = (*(float*)0x8D5138);
     float fFrequency = (*(float*)0x8D513C);
 
@@ -235,7 +221,7 @@ std::tuple<bool, float> CMultiplayerSA::GetUnderwaterDarkness()
 }
 
 void CMultiplayerSA::InitHooks_Postprocess()
-    {
+{
     HookInstallCall(HOOKPOS_GrainEffect_NightModifier, (DWORD)GrainEffect::NightModifier::ApplyEffect);
     HookInstallCall(HOOKPOS_GrainEffect_InfraredModifier, (DWORD)GrainEffect::InfraredModifier::ApplyEffect);
     HookInstallCall(HOOKPOS_GrainEffect_RainModifier, (DWORD)GrainEffect::RainModifier::ApplyEffect);
