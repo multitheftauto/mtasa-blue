@@ -35,6 +35,7 @@ public:
         m_fHeight = fHeight;
         SizeChanged();
     };
+    float adjustSize(float fSize);
 
 protected:
     float m_fRadius;

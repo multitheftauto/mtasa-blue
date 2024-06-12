@@ -14,6 +14,7 @@
 #include "CMarkerManager.h"
 #include "CColCircle.h"
 #include "CColSphere.h"
+#include "CColTube.h"
 #include "CResource.h"
 #include "CLogger.h"
 #include "Utils.h"
@@ -353,6 +354,23 @@ void CMarker::Callback_OnCollisionDestroy(CColShape* pCollision)
         m_pCollision = NULL;
 }
 
+float CColTube::adjustSize(float fSize)
+{
+    if (std::fmod(fSize, 2.0) == 0.0)            // check for even
+    {
+        fSize = (fSize / 2.0f) + 0.14f;
+    }
+    else if (std::fmod(fSize, 2.0) == 1.0)            // check for odd
+    {
+        fSize = 2.4f + 1.03f * ((fSize - 5.0f) / 2.0f);
+    }
+    else
+    {
+        fSize = (fSize / 2.0f) + 0.15f;            // check for float
+    }
+    return fSize;
+}
+
 void CMarker::UpdateCollisionObject(unsigned char ucOldType)
 {
     // Different type than before?
@@ -365,15 +383,19 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
         {
             if (m_pCollision)
                 g_pGame->GetElementDeleter()->Delete(m_pCollision);
-
-            m_pCollision = new CColCircle(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
+                m_pCollision = new CColCircle(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
+        }
+        else if (m_ucType == CMarker::TYPE_CYLINDER)
+        {
+            if (m_pCollision)
+                g_pGame->GetElementDeleter()->Delete(m_pCollision);
+                m_pCollision = new CColTube(m_pColManager, nullptr, m_vecPosition, m_fSize, m_fSize);
         }
         else if (ucOldType == CMarker::TYPE_CHECKPOINT)
         {
             if (m_pCollision)
                 g_pGame->GetElementDeleter()->Delete(m_pCollision);
-
-            m_pCollision = new CColSphere(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
+                m_pCollision = new CColSphere(m_pColManager, nullptr, m_vecPosition, m_fSize, true);
         }
 
         m_pCollision->SetCallback(this);
@@ -385,6 +407,12 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
     if (m_ucType == CMarker::TYPE_CHECKPOINT)
     {
         static_cast<CColCircle*>(m_pCollision)->SetRadius(m_fSize);
+    }
+    else if (m_ucType == CMarker::TYPE_CYLINDER)
+    {
+        CColTube* pShape = static_cast<CColTube*>(m_pCollision);
+        pShape->SetRadius(pShape->adjustSize(m_fSize));
+        pShape->SetHeight(m_fSize);
     }
     else
     {

@@ -298,6 +298,24 @@ float CClientMarker::GetSize() const
     return m_pMarker->GetSize();
 }
 
+float CClientColTube::adjustSize(float fSize)
+{
+
+    if (std::fmod(fSize, 2.0) == 0.0)      // check for even
+    {
+        fSize = (fSize / 2.0f) + 0.14f;
+    }
+    else if (std::fmod(fSize, 2.0) == 1.0)   // check for odd
+    {
+        fSize = 2.4f + 1.03f * ((fSize - 5.0f) / 2.0f);
+    }
+    else
+    {        
+         fSize = (fSize / 2.0f) + 0.15f;   //check for float
+    }
+    return fSize;
+}
+
 void CClientMarker::SetSize(float fSize)
 {
     switch (m_pCollision->GetShapeType())
@@ -314,7 +332,15 @@ void CClientMarker::SetSize(float fSize)
             pShape->SetRadius(fSize);
             break;
         }
+        case COLSHAPE_TUBE:
+        {
+            CClientColTube* pShape = static_cast<CClientColTube*>(m_pCollision);
+            pShape->SetRadius(pShape->adjustSize(fSize));
+            pShape->SetHeight(fSize);
+            break;
+        }
     }
+   
     m_pMarker->SetSize(fSize);
 }
 
@@ -469,7 +495,7 @@ void CClientMarker::CreateOfType(int iType)
             CClient3DMarker* p3DMarker = new CClient3DMarker(this);
             p3DMarker->Set3DMarkerType(CClient3DMarker::TYPE_CYLINDER);
             m_pMarker = p3DMarker;
-            m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize());
+            m_pCollision = new CClientColTube(g_pClientGame->GetManager(), NULL, vecOrigin, GetSize(), GetSize());
             m_pCollision->m_pOwningMarker = this;
             m_pCollision->SetHitCallback(this);
             break;
