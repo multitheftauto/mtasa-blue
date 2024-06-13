@@ -40,7 +40,7 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
     if (dwElementIndexInPool == UINT_MAX)
         return false;
 
-    m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
+    m_buildingPool.entities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
 
     // Increase the count of objects
     ++m_buildingPool.ulCount;
@@ -108,8 +108,8 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     modelInfo->RemoveColRef();
 
     // Remove from BuildingSA pool
-    auto* pBuildingSA = m_buildingPool.arrayOfClientEntities[dwElementIndexInPool].pEntity;
-    m_buildingPool.arrayOfClientEntities[dwElementIndexInPool] = {nullptr, nullptr};
+    auto* pBuildingSA = m_buildingPool.entities[dwElementIndexInPool].pEntity;
+    m_buildingPool.entities[dwElementIndexInPool] = {nullptr, nullptr};
 
     // Delete it from memory
     delete pBuildingSA;
@@ -191,7 +191,9 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
 bool CBuildingsPoolSA::Resize(int size)
 {
     auto*     pool = (*m_ppBuildingPoolInterface);
-    const int curretnSize = pool->m_nSize;
+    const int currentSize = pool->m_nSize;
+
+    m_buildingPool.entities.resize(size);
 
     void* oldPool = pool->m_pObjects;
 
@@ -210,7 +212,7 @@ bool CBuildingsPoolSA::Resize(int size)
     CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
     if (newObjects == nullptr)
     {
-        Resize(curretnSize);
+        Resize(currentSize);
         return false;
     }
 
@@ -218,7 +220,7 @@ bool CBuildingsPoolSA::Resize(int size)
     if (newBytemap == nullptr)
     {
         MemSA::free(newObjects);
-        Resize(curretnSize);
+        Resize(currentSize);
         return false;
     }
 

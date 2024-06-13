@@ -149,3 +149,16 @@ public:
         }
     }
 };
+
+template <class T, class I>
+struct SVectorPoolData
+{
+    std::vector<SClientEntity<T>> entities;
+    unsigned long                 ulCount;
+
+public:
+    SVectorPoolData(size_t defaultSize) : ulCount(0UL)
+    {
+        entities.resize(defaultSize, {nullptr, nullptr});
+    }
+};
