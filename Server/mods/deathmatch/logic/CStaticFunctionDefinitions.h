@@ -17,6 +17,7 @@ class CStaticFunctionDefinitions;
 #include "CRegistry.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <optional>
+#include <variant>
 
 class CVector2D;
 struct SLineOfSightFlags;
@@ -422,6 +423,7 @@ public:
     static bool BreakObject(CElement* pElement);
     static bool SetObjectVisibleInAllDimensions(CElement* pElement, bool bVisible, unsigned short usNewDimension = 0);
     static bool SetObjectBreakable(CElement* pElement, const bool bBreakable);
+    static bool SetObjectProperty(CElement* pElement, const std::string sProperty, std::variant<float, CVector> vValue);
 
     // Radar area create/destroy funcs
     static CRadarArea* CreateRadarArea(CResource* pResource, const CVector2D& vecPosition, const CVector2D& vecSize, const SColor color, CElement* pVisibleTo);

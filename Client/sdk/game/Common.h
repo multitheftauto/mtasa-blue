@@ -1430,7 +1430,7 @@ enum class eResizableVehicleWheelGroup
     REAR_AXLE,
     ALL_WHEELS = 0xFF,
 };
-
+/*
 enum eObjectProperty
 {
     OBJECT_PROPERTY_ALL,
@@ -1442,7 +1442,7 @@ enum eObjectProperty
     OBJECT_PROPERTY_BUOYANCY,
     OBJECT_PROPERTY_MAX,
 };
-
+*/
 namespace eObjectGroup
 {
     enum Modifiable

@@ -32,6 +32,16 @@ bool CObjectStartSyncPacket::Write(NetBitStreamInterface& BitStream) const
     m_pObject->GetRotation(rotation.data.vecRotation);
     BitStream.Write(&rotation);
 
+    // Write the velocity
+    SVelocitySync velocity;
+    velocity.data.vecVelocity = m_pObject->GetMoveSpeed();
+    BitStream.Write(&velocity);
+
+    // Write the angular velocity
+    SVelocitySync turnVelocity;
+    turnVelocity.data.vecVelocity = m_pObject->GetTurnSpeed();
+    BitStream.Write(&turnVelocity);
+
     // Write the health
     SObjectHealthSync health;
     health.data.fValue = m_pObject->GetHealth();

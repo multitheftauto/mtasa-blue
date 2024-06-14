@@ -14,7 +14,7 @@
 #define CCLIENTOBJECT_MAX 250
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+    #define M_PI 3.14159265358979323846
 #endif
 
 CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned short usModel, bool bLowLod)
@@ -25,12 +25,11 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
     m_pObjectManager = pManager->GetObjectManager();
     m_pModelRequester = pManager->GetModelRequestManager();
 
-    m_pObject = NULL;
+    m_pObject = nullptr;
     m_usModel = usModel;
 
     SetTypeName("object");
 
-    m_usModel = usModel;
     m_bIsVisible = true;
     m_bIsFrozen = false;
     m_bUsesCollision = true;
@@ -45,6 +44,7 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
     m_fElasticity = -1.0f;
     m_fBuoyancyConstant = -1.0f;
     m_vecCenterOfMass = CVector(0.0f, 0.0f, 0.0f);
+    m_bIsStatic = true;
 
     m_pModelInfo = g_pGame->GetModelInfo(usModel);
 
@@ -53,6 +53,7 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
 
     if (m_bIsLowLod)
         m_pManager->OnLowLODElementCreated();
+
     m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
 }
 
@@ -62,7 +63,7 @@ CClientObject::~CClientObject()
     m_pModelRequester->Cancel(this, false);
 
     // Detach us from anything
-    AttachTo(NULL);
+    AttachTo(nullptr);
 
     // Destroy the object
     Destroy();
@@ -72,6 +73,7 @@ CClientObject::~CClientObject()
 
     if (m_bIsLowLod)
         m_pManager->OnLowLODElementDestroyed();
+
     m_clientModel = nullptr;
 }
 
@@ -81,9 +83,9 @@ void CClientObject::Unlink()
     g_pClientGame->GetObjectRespawner()->Unreference(this);
 
     // Remove LowLod refs in others
-    SetLowLodObject(NULL);
+    SetLowLodObject(nullptr);
     while (!m_HighLodObjectList.empty())
-        m_HighLodObjectList[0]->SetLowLodObject(NULL);
+        m_HighLodObjectList[0]->SetLowLodObject(nullptr);
 }
 
 void CClientObject::GetPosition(CVector& vecPosition) const
@@ -136,18 +138,17 @@ void CClientObject::GetRotationDegrees(CVector& vecRotation) const
 
 void CClientObject::GetRotationRadians(CVector& vecRotation) const
 {
-    if (m_pObject && m_pAttachedToEntity)            // Temp fix for static objects->
+    if (m_pObject && (!IsStatic() || m_pAttachedToEntity))
     {
-        // We've been returning the rotation that got set last so far (::m_vecRotation)..
-        //   but we need to get the real rotation for when the game moves the objects..
-        CMatrix matTemp;
-        m_pObject->GetMatrix(&matTemp);
-        vecRotation = matTemp.GetRotation();
+        // Get the real rotation (game can moves the non-static objects)
+        CMatrix matrix;
+        m_pObject->GetMatrix(&matrix);
+        vecRotation = matrix.GetRotation();
+
+        return;
     }
-    else
-    {
-        vecRotation = m_vecRotation;
-    }
+
+    vecRotation = m_vecRotation;
 }
 
 void CClientObject::SetRotationDegrees(const CVector& vecRotation)
@@ -228,14 +229,7 @@ void CClientObject::ModelRequestCallback(CModelInfo* pModelInfo)
 
 float CClientObject::GetDistanceFromCentreOfMassToBaseOfModel()
 {
-    if (m_pObject)
-    {
-        return m_pObject->GetDistanceFromCentreOfMassToBaseOfModel();
-    }
-    else
-    {
-        return 0;
-    }
+    return (m_pObject ? m_pObject->GetDistanceFromCentreOfMassToBaseOfModel() : 0.0);
 }
 
 void CClientObject::SetVisible(bool bVisible)
@@ -247,10 +241,10 @@ void CClientObject::SetVisible(bool bVisible)
 // Call this when m_bIsVisible, m_IsHiddenLowLod or m_pObject is changed
 void CClientObject::UpdateVisibility()
 {
-    if (m_pObject)
-    {
-        m_pObject->SetVisible(m_bIsVisible && !m_IsHiddenLowLod);
-    }
+    if (!m_pObject)
+        return;
+
+    m_pObject->SetVisible(m_bIsVisible && !m_IsHiddenLowLod);
 }
 
 void CClientObject::SetModel(unsigned short usModel)
@@ -265,6 +259,7 @@ void CClientObject::SetModel(unsigned short usModel)
         m_usModel = usModel;
         if (m_clientModel && m_clientModel->GetModelID() != m_usModel)
             m_clientModel = nullptr;
+
         m_pModelInfo = g_pGame->GetModelInfo(usModel);
         UpdateSpatialData();
 
@@ -278,11 +273,6 @@ void CClientObject::SetModel(unsigned short usModel)
             }
         }
     }
-}
-
-bool CClientObject::IsLowLod()
-{
-    return m_bIsLowLod;
 }
 
 bool CClientObject::SetLowLodObject(CClientObject* pNewLowLodObject)
@@ -303,7 +293,7 @@ bool CClientObject::SetLowLodObject(CClientObject* pNewLowLodObject)
 
         // Clear there and here
         ListRemove(m_pLowLodObject->m_HighLodObjectList, this);
-        m_pLowLodObject = NULL;
+        m_pLowLodObject = nullptr;
         return true;
     }
     else
@@ -313,7 +303,7 @@ bool CClientObject::SetLowLodObject(CClientObject* pNewLowLodObject)
             return false;
 
         // Remove any previous link
-        SetLowLodObject(NULL);
+        SetLowLodObject(nullptr);
 
         // Make new link
         m_pLowLodObject = pNewLowLodObject;
@@ -324,17 +314,13 @@ bool CClientObject::SetLowLodObject(CClientObject* pNewLowLodObject)
 
 CClientObject* CClientObject::GetLowLodObject()
 {
-    if (m_bIsLowLod)
-        return NULL;
-    return m_pLowLodObject;
+    return (m_bIsLowLod ? nullptr : m_pLowLodObject);
 }
 
 void CClientObject::Render()
 {
     if (m_pObject)
-    {
         m_pObject->Render();
-    }
 }
 
 void CClientObject::SetFrozen(bool bFrozen)
@@ -342,9 +328,7 @@ void CClientObject::SetFrozen(bool bFrozen)
     m_bIsFrozen = bFrozen;
 
     if (m_pObject)
-    {
         m_pObject->SetFrozen(bFrozen);
-    }
 
     // Reset speed if we frozing object
     if (bFrozen)
@@ -355,74 +339,52 @@ void CClientObject::SetFrozen(bool bFrozen)
 
         GetMoveSpeed(vecSpeed);
         if (vecZero != vecSpeed)
-        {
             SetMoveSpeed(vecZero);
-        }
 
         GetTurnSpeed(vecSpeed);
         if (vecZero != vecSpeed)
-        {
             SetTurnSpeed(vecZero);
-        }
     }
 }
 
 void CClientObject::SetAlpha(unsigned char ucAlpha)
 {
     if (m_pObject)
-    {
         m_pObject->SetAlpha(ucAlpha);
-    }
+
     m_ucAlpha = ucAlpha;
 }
 
 void CClientObject::GetScale(CVector& vecScale) const
 {
-    if (m_pObject)
-    {
-        vecScale = *m_pObject->GetScale();
-    }
-    else
-    {
-        vecScale = m_vecScale;
-    }
+    vecScale = (m_pObject ? *m_pObject->GetScale() : m_vecScale);
 }
 
 void CClientObject::SetScale(const CVector& vecScale)
 {
     if (m_pObject)
-    {
         m_pObject->SetScale(vecScale.fX, vecScale.fY, vecScale.fZ);
-    }
+
     m_vecScale = vecScale;
 }
 
 void CClientObject::SetCollisionEnabled(bool bCollisionEnabled)
 {
     if (m_pObject)
-    {
         m_pObject->SetUsesCollision(bCollisionEnabled);
-    }
 
     m_bUsesCollision = bCollisionEnabled;
 }
 
 float CClientObject::GetHealth()
 {
-    if (m_pObject)
-    {
-        return m_pObject->GetHealth();
-    }
-
-    return m_fHealth;
+    return (m_pObject ? m_pObject->GetHealth() : m_fHealth);
 }
 
 void CClientObject::SetHealth(float fHealth)
 {
     if (m_pObject)
-    {
         m_pObject->SetHealth(fHealth);
-    }
 
     m_fHealth = fHealth;
 }
@@ -438,10 +400,8 @@ void CClientObject::StreamIn(bool bInstantly)
     {
         // Request the model blocking
         if (m_pModelRequester->RequestBlocking(m_usModel, "CClientObject::StreamIn - bInstantly"))
-        {
             // Create us
             Create();
-        }
         else
             NotifyUnableToCreate();
     }
@@ -449,10 +409,8 @@ void CClientObject::StreamIn(bool bInstantly)
     {
         // Request the model async
         if (m_pModelRequester->Request(m_usModel, this))
-        {
             // Create us now if we already had it loaded
             Create();
-        }
         else
             NotifyUnableToCreate();
     }
@@ -517,9 +475,9 @@ void CClientObject::Create()
                 // Apply our data to the object
                 m_pObject->Teleport(m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ);
                 m_pObject->SetOrientation(m_vecRotation.fX, m_vecRotation.fY, m_vecRotation.fZ);
-                #ifndef MTA_BUILDINGS
+#ifndef MTA_BUILDINGS
                 m_pObject->ProcessCollision();
-                #endif
+#endif
                 m_pObject->SetupLighting();
                 m_pObject->SetFrozen(m_bIsFrozen);
 
@@ -572,21 +530,20 @@ void CClientObject::Create()
 
 void CClientObject::Destroy()
 {
-    // If the object exists
-    if (m_pObject)
-    {
-        // Invalidate
-        m_pManager->InvalidateEntity(this);
+    if (!m_pObject)
+        return;
 
-        // Destroy the object
-        g_pGame->GetPools()->RemoveObject(m_pObject);
-        m_pObject = NULL;
+    // Invalidate
+    m_pManager->InvalidateEntity(this);
 
-        // Remove our reference to its model
-        m_pModelInfo->RemoveRef();
+    // Destroy the object
+    g_pGame->GetPools()->RemoveObject(m_pObject);
+    m_pObject = nullptr;
 
-        NotifyDestroy();
-    }
+    // Remove our reference to its model
+    m_pModelInfo->RemoveRef();
+
+    NotifyDestroy();
 }
 
 void CClientObject::NotifyCreate()
@@ -628,9 +585,7 @@ void CClientObject::StreamedInPulse()
     {
         // Fixed attachment bug #9339 where [object1] -> [object2] -> [vehicle] causes positional lag for [object1]
         if (m_pAttachedToEntity && m_pAttachedToEntity->GetAttachedTo())
-        {
             DoAttaching();
-        }
     }
 
     // Are we not frozen
@@ -653,43 +608,36 @@ void CClientObject::StreamedInPulse()
 void CClientObject::GetMoveSpeed(CVector& vecMoveSpeed) const
 {
     if (m_pObject)
-    {
         m_pObject->GetMoveSpeed(&vecMoveSpeed);
-    }
     else
-    {
         vecMoveSpeed = m_vecMoveSpeed;
-    }
 }
 
 void CClientObject::SetMoveSpeed(const CVector& vecMoveSpeed)
 {
     if (m_pObject)
-    {
         m_pObject->SetMoveSpeed(const_cast<CVector*>(&vecMoveSpeed));
-    }
+
     m_vecMoveSpeed = vecMoveSpeed;
+    SetStatic(false);
 }
 
 void CClientObject::GetTurnSpeed(CVector& vecTurnSpeed) const
 {
     if (m_pObject)
-    {
         m_pObject->GetTurnSpeed(&vecTurnSpeed);
-    }
     else
-    {
         vecTurnSpeed = m_vecTurnSpeed;
-    }
 }
 
 void CClientObject::SetTurnSpeed(const CVector& vecTurnSpeed)
 {
     if (m_pObject)
-    {
         m_pObject->SetTurnSpeed(const_cast<CVector*>(&vecTurnSpeed));
-    }
+
     m_vecTurnSpeed = vecTurnSpeed;
+
+    SetStatic(false);
 }
 
 CSphere CClientObject::GetWorldBoundingSphere()
@@ -733,21 +681,16 @@ bool CClientObject::SetBreakable(bool bBreakable)
 
 bool CClientObject::Break()
 {
-    // Are we breakable?
-    if (m_pObject && CClientObjectManager::IsBreakableModel(m_usModel) && !m_bBreakingDisabled)
-    {
-        m_pObject->Break();
-        return true;
-    }
-    return false;
+    if (!m_pObject || m_bBreakingDisabled || !CClientObjectManager::IsBreakableModel(m_usModel))
+        return false;
+
+    m_pObject->Break();
+    return true;
 }
 
 float CClientObject::GetMass()
 {
-    if (m_pObject)
-        return m_pObject->GetMass();
-
-    return m_fMass;
+    return (m_pObject ? m_pObject->GetMass() : m_fMass);
 }
 
 void CClientObject::SetMass(float fMass)
@@ -760,10 +703,7 @@ void CClientObject::SetMass(float fMass)
 
 float CClientObject::GetTurnMass()
 {
-    if (m_pObject)
-        return m_pObject->GetTurnMass();
-
-    return m_fTurnMass;
+    return (m_pObject ? m_pObject->GetTurnMass() : m_fTurnMass);
 }
 
 void CClientObject::SetTurnMass(float fTurnMass)
@@ -776,10 +716,7 @@ void CClientObject::SetTurnMass(float fTurnMass)
 
 float CClientObject::GetAirResistance()
 {
-    if (m_pObject)
-        return m_pObject->GetAirResistance();
-
-    return m_fAirResistance;
+    return (m_pObject ? m_pObject->GetAirResistance() : m_fAirResistance);
 }
 
 void CClientObject::SetAirResistance(float fAirResistance)
@@ -792,10 +729,7 @@ void CClientObject::SetAirResistance(float fAirResistance)
 
 float CClientObject::GetElasticity()
 {
-    if (m_pObject)
-        return m_pObject->GetElasticity();
-
-    return m_fElasticity;
+    return (m_pObject ? m_pObject->GetElasticity() : m_fElasticity);
 }
 
 void CClientObject::SetElasticity(float fElasticity)
@@ -808,10 +742,7 @@ void CClientObject::SetElasticity(float fElasticity)
 
 float CClientObject::GetBuoyancyConstant()
 {
-    if (m_pObject)
-        return m_pObject->GetBuoyancyConstant();
-
-    return m_fBuoyancyConstant;
+    return (m_pObject ? m_pObject->GetBuoyancyConstant() : m_fBuoyancyConstant);
 }
 
 void CClientObject::SetBuoyancyConstant(float fBuoyancyConstant)
@@ -846,12 +777,34 @@ void CClientObject::SetVisibleInAllDimensions(bool bVisible, unsigned short usNe
     if (bVisible)
     {
         if (g_pClientGame->GetLocalPlayer())
-        {
             SetDimension(g_pClientGame->GetLocalPlayer()->GetDimension());
-        }
     }
     else
-    {
         SetDimension(usNewDimension);
-    }
+}
+
+bool CClientObject::IsInWater()
+{
+    if (!m_pModelInfo)
+        return false;
+
+    // Get object bounding box
+    CBoundingBox* pBoundingBox = m_pModelInfo->GetBoundingBox();
+    if (!pBoundingBox)
+        return false;
+
+    // Get bounding box min. Z position
+    CVector vecMin = pBoundingBox->vecBoundMin;
+    vecMin.fZ += pBoundingBox->vecBoundOffset.fZ;
+
+    CVector vecPosition, vecUnknown;
+    GetPosition(vecPosition);
+
+    // Get water level
+    float fWaterLevel;
+    if (!g_pGame->GetWaterManager()->GetWaterLevel(vecPosition, &fWaterLevel, true, &vecUnknown))
+        return false;
+
+    // Check if min. Z is in the water
+    return (vecPosition.fZ + vecMin.fZ <= fWaterLevel);
 }

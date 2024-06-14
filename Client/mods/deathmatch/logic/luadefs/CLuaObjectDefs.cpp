@@ -272,7 +272,7 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
                 lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_TURNMASS));
 
                 lua_pushnumber(luaVM, pObject->GetAirResistance());
-                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_TURNMASS));
+                lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_AIRRESISTANCE));
 
                 lua_pushnumber(luaVM, pObject->GetElasticity());
                 lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_ELASTICITY));

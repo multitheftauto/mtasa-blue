@@ -2712,14 +2712,24 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // ???                  (?)     - custom data
 
         // Objects:
-        // CVector              (12)    - position
-        // CVector              (12)    - rotation
-        // unsigned short       (2)     - object model id
-        // unsigned char        (1)     - alpha
-        // CVector              (12)    - scale
-        // bool                 (1)     - static
-        // SObjectHealthSync    (?)     - health
-        // bool                 (1)     - is break
+        // CVector                      (12)    - position
+        // CVector                      (12)    - rotation
+        // unsigned short               (2)     - object model id
+        // unsigned char                (1)     - alpha
+        // bool                         (1)     - is low lod
+        // ElementID                    (2)     - low lod object id
+        // bool                         (1)     - doublesided
+        // bool                         (1)     - breakable
+        // bool                         (1)     - visible in all dimensions
+        // bool                         (1)     - moving
+        // CPositionRotationAnimation   (?)     - Moving animation data
+        // CVector                      (12)    - scale
+        // bool                         (1)     - frozen
+        // SObjectHealthSync            (?)     - health
+        // bool                         (1)     - is break
+        // bool                         (1)     - static flag
+        // float                        (4)     - properties (mass, turnMass etc)
+        // CVector                      (12)    - center_of_mass property
 
         // Pickups:
         // CVector              (12)    - position
@@ -3085,7 +3095,34 @@ retry:
                             if (bitStream.ReadBit())
                                 pObject->Break();
                         }
-                        
+                      
+                        // Set static & properties
+                        if (bitStream.Can(eBitStreamVersion::ObjectSync_FixAndUpdate))
+                        {
+                            pObject->SetStatic(bitStream.ReadBit());
+
+                            float fMass, fTurnMass, fAirResistance, fElasticity, fBuoyancy;
+                            CVector centerOfMass;
+
+                            if (bitStream.Read(fMass))
+                                pObject->SetMass(fMass);
+
+                            if (bitStream.Read(fTurnMass))
+                                pObject->SetTurnMass(fTurnMass);
+
+                            if (bitStream.Read(fAirResistance))
+                                pObject->SetAirResistance(fAirResistance);
+
+                            if (bitStream.Read(fElasticity))
+                                pObject->SetElasticity(fElasticity);
+
+                            if (bitStream.Read(fBuoyancy))
+                                pObject->SetBuoyancyConstant(fBuoyancy);
+
+                            if (bitStream.Read(centerOfMass.fX) && bitStream.Read(centerOfMass.fY) && bitStream.Read(centerOfMass.fZ))
+                                pObject->SetCenterOfMass(centerOfMass);
+                        }
+
                         pObject->SetCollisionEnabled(bCollisonsEnabled);
                         if (ucEntityTypeID == CClientGame::WEAPON)
                         {

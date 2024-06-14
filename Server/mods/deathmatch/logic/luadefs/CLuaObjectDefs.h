@@ -27,6 +27,8 @@ public:
     LUA_DECLARE(GetObjectScale);
     static bool IsObjectBreakable(CObject* const pObject);
     static bool IsObjectMoving(CObject* const pObject);
+    LUA_DECLARE(GetObjectProperty);
+    LUA_DECLARE(GetObjectProperties);
 
     // Object set functions
     LUA_DECLARE(SetObjectName);
@@ -36,4 +38,5 @@ public:
     LUA_DECLARE(MoveObject);
     LUA_DECLARE(StopObject);
     static bool BreakObject(CObject* const pObject);
+    static bool SetObjectProperty(CObject* const pObject, const std::string sProperty, const std::variant<float, CVector> vValue);
 };

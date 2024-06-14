@@ -41,6 +41,8 @@
 // Defines the maximum size for a HTTP Download URL (with file / directory information appended)
 #define MAX_HTTP_DOWNLOAD_URL_WITH_FILE 768
 
+#define WITH_OBJECT_SYNC    1
+
 enum eHTTPDownloadType
 {
     HTTP_DOWNLOAD_DISABLED = 0,

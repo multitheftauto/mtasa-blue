@@ -11,16 +11,20 @@
 
 #include "StdInc.h"
 #include "CObjectSync.h"
+#include <Utils.h>
+#include "CElementIDs.h"
+#include "packets/CObjectStartSyncPacket.h"
+#include "packets/CObjectStopSyncPacket.h"
+#include "CGame.h"
+#include "CColManager.h"
 
 #ifdef WITH_OBJECT_SYNC
 
-#define SYNC_RATE 500
-#define MAX_PLAYER_SYNC_DISTANCE 100.0f
+    #define SYNC_RATE                500
+    #define MAX_PLAYER_SYNC_DISTANCE 100.0f
 
-CObjectSync::CObjectSync(CPlayerManager* pPlayerManager, CObjectManager* pObjectManager)
+CObjectSync::CObjectSync(CPlayerManager* pPlayerManager, CObjectManager* pObjectManager) : m_pPlayerManager(pPlayerManager), m_pObjectManager(pObjectManager)
 {
-    m_pPlayerManager = pPlayerManager;
-    m_pObjectManager = pObjectManager;
 }
 
 void CObjectSync::DoPulse()
@@ -53,9 +57,7 @@ void CObjectSync::OverrideSyncer(CObject* pObject, CPlayer* pPlayer, bool bPersi
         if (pSyncer == pPlayer)
         {
             if (bPersist == false)
-            {
                 SetSyncerAsPersistent(false);
-            }
 
             return;
         }
@@ -73,7 +75,7 @@ void CObjectSync::OverrideSyncer(CObject* pObject, CPlayer* pPlayer, bool bPersi
 void CObjectSync::Update()
 {
     // Update all objects
-    list<CObject*>::const_iterator iter = m_pObjectManager->IterBegin();
+    CFastList<CObject*>::const_iterator iter = m_pObjectManager->IterBegin();
     for (; iter != m_pObjectManager->IterEnd(); iter++)
     {
         UpdateObject(*iter);
@@ -85,14 +87,13 @@ void CObjectSync::UpdateObject(CObject* pObject)
     CPlayer* pSyncer = pObject->GetSyncer();
 
     // Does the object need to be synced?
-    // We have no reason to sync static and unbreakable objects
-    if (!pObject->IsSyncable() || (pObject->IsStatic() && !pObject->IsBreakable()))
+    // We have no reason to sync frozen and unbreakable objects
+    if (!pObject->IsSyncable() || (pObject->IsFrozen() && !pObject->IsBreakable()))
     {
         if (pSyncer)
-        {
             // Tell the syncer to stop syncing
             StopSync(pObject);
-        }
+
         return;
     }
 
@@ -101,7 +102,7 @@ void CObjectSync::UpdateObject(CObject* pObject)
     {
         // Does the syncer still near the object?
         if (!IsSyncerPersistent() && !IsPointNearPoint3D(pSyncer->GetPosition(), pObject->GetPosition(), MAX_PLAYER_SYNC_DISTANCE) ||
-            (pObject->GetDimension() != pSyncer->GetDimension()))
+            (pObject->GetDimension() != pSyncer->GetDimension()) || (pObject->GetInterior() != pSyncer->GetInterior()))
         {
             // Stop him from syncing it
             StopSync(pObject);
@@ -111,9 +112,16 @@ void CObjectSync::UpdateObject(CObject* pObject)
         }
     }
     else
-    {
         // Try to find a syncer
         FindSyncer(pObject);
+
+    // If an object is marked as moving, is it really still moving?
+    if (pObject->m_bIsMoving && !pObject->IsMoving())
+    {
+        pObject->m_bIsMoving = false;
+
+        CLuaArguments Arguments;
+        pObject->CallEvent("onObjectMoveStop", Arguments);
     }
 }
 
@@ -121,11 +129,11 @@ void CObjectSync::FindSyncer(CObject* pObject)
 {
     // Find a player close enough to it
     CPlayer* pPlayer = FindPlayerCloseToObject(pObject, MAX_PLAYER_SYNC_DISTANCE);
-    if (pPlayer)
-    {
-        // Tell him to start syncing it
-        StartSync(pPlayer, pObject);
-    }
+    if (!pPlayer)
+        return;
+
+    // Tell him to start syncing it
+    StartSync(pPlayer, pObject);
 }
 
 void CObjectSync::StartSync(CPlayer* pPlayer, CObject* pObject)
@@ -152,7 +160,7 @@ void CObjectSync::StopSync(CObject* pObject)
     pSyncer->Send(CObjectStopSyncPacket(pObject));
 
     // Unmark him as the syncing player
-    pObject->SetSyncer(NULL);
+    pObject->SetSyncer(nullptr);
 
     SetSyncerAsPersistent(false);
 
@@ -168,7 +176,7 @@ CPlayer* CObjectSync::FindPlayerCloseToObject(CObject* pObject, float fMaxDistan
     CVector vecPosition = pObject->GetPosition();
 
     // See if any players are close enough
-    CPlayer*                       pSyncer = NULL;
+    CPlayer*                       pSyncer = nullptr;
     list<CPlayer*>::const_iterator iter = m_pPlayerManager->IterBegin();
     for (; iter != m_pPlayerManager->IterEnd(); iter++)
     {
@@ -181,9 +189,7 @@ CPlayer* CObjectSync::FindPlayerCloseToObject(CObject* pObject, float fMaxDistan
             {
                 // Prefer a player that syncs less objects
                 if (!pSyncer || pPlayer->CountSyncingObjects() < pSyncer->CountSyncingObjects())
-                {
                     pSyncer = pPlayer;
-                }
             }
         }
     }
@@ -196,43 +202,97 @@ void CObjectSync::Packet_ObjectSync(CObjectSyncPacket& Packet)
 {
     // Grab the player
     CPlayer* pPlayer = Packet.GetSourcePlayer();
-    if (pPlayer && pPlayer->IsJoined())
+    if (!pPlayer || !pPlayer->IsJoined())
+        return;
+
+    // Apply the data for each object in the packet
+    std::vector<CObjectSyncPacket::SyncData*>::const_iterator iter = Packet.IterBegin();
+    for (; iter != Packet.IterEnd(); iter++)
     {
-        // Apply the data for each object in the packet
-        vector<CObjectSyncPacket::SyncData*>::const_iterator iter = Packet.IterBegin();
-        for (; iter != Packet.IterEnd(); iter++)
+        CObjectSyncPacket::SyncData* pData = *iter;
+
+        // Grab the element
+        CElement* pElement = CElementIDs::GetElement(pData->ID);
+        if (!pElement || !IS_OBJECT(pElement))
+            continue;
+
+        // Is the player syncing this object?
+        CObject* pObject = static_cast<CObject*>(pElement);
+        if (!pObject || pObject->GetSyncer() != pPlayer || !pObject->CanUpdateSync(pData->ucSyncTimeContext))
+            continue;
+
+        // Apply the data to the object
+        if (pData->ucFlags & 0x1)
         {
-            CObjectSyncPacket::SyncData* pData = *iter;
+            pObject->SetPosition(pData->vecPosition);
+            g_pGame->GetColManager()->DoHitDetection(pObject->GetPosition(), pObject);
+        }
+        if (pData->ucFlags & 0x2)
+            pObject->SetRotation(pData->vecRotation);
+        if (pData->ucFlags & 0x4)
+            pObject->SetMoveSpeed(pData->vecVelocity);            // Sync velocity from client
+        if (pData->ucFlags & 0x8)
+            pObject->SetTurnSpeed(pData->vecTurnVelocity);            // Sync angular velocity from client
+        if (pData->ucFlags & 0x10)
+        {
+            float fPreviousHealth = pObject->GetHealth();
+            pObject->SetHealth(pData->fHealth);
 
-            // Grab the element
-            CElement* pElement = CElementIDs::GetElement(pData->ID);
-            if (pElement && IS_OBJECT(pElement))
+            if (pData->fHealth < fPreviousHealth)
             {
-                CObject* pObject = static_cast<CObject*>(pElement);
+                CElement* pAttacker = CElementIDs::GetElement(pData->attackerID);
 
-                // Is the player syncing this object?
-                if ((pObject->GetSyncer() == pPlayer) && pObject->CanUpdateSync(pData->ucSyncTimeContext))
+                if (pData->fHealth > 0)
                 {
-                    // Apply the data to the object
-                    if (pData->ucFlags & 0x1)
-                    {
-                        pObject->SetPosition(pData->vecPosition);
-                        g_pGame->GetColManager()->DoHitDetection(pObject->GetPosition(), pObject);
-                    }
-                    if (pData->ucFlags & 0x2)
-                        pObject->SetRotation(pData->vecRotation);
-                    if (pData->ucFlags & 0x4)
-                        pObject->SetHealth(pData->fHealth);
+                    float fLoss = fPreviousHealth - pData->fHealth;
 
-                    // Send this sync
-                    pData->bSend = true;
+                    if (fLoss > 0)
+                    {
+                        CLuaArguments Arguments;
+                        Arguments.PushNumber(fLoss);
+
+                        if (pAttacker)
+                            Arguments.PushElement(pAttacker);
+                        else
+                            Arguments.PushNil();
+
+                        pObject->CallEvent("onObjectDamage", Arguments);
+                    }
+                }
+                else // object has been break?
+                {
+                    CLuaArguments Arguments;
+                    if (pAttacker)
+                        Arguments.PushElement(pAttacker);
+                    else
+                        Arguments.PushNil();
+
+                    pObject->CallEvent("onObjectBreak", Arguments);
                 }
             }
         }
+        if (pData->ucFlags & 0x20)            // Sync inWater state from client
+            pObject->SetInWater(pData->bIsInWater);
+        // Sync properties
+        if (pData->ucFlags & 0x40)
+            pObject->SetMass(pData->fMass);
+        if (pData->ucFlags & 0x80)
+            pObject->SetTurnMass(pData->fTurnMass);
+        if (pData->ucFlags & 0x100)
+            pObject->SetAirResistance(pData->fAirResistance);
+        if (pData->ucFlags & 0x200)
+            pObject->SetElasticity(pData->fElasticity);
+        if (pData->ucFlags & 0x400)
+            pObject->SetBuoyancyConstant(pData->fBuoyancyConstant);
+        if (pData->ucFlags & 0x800)
+            pObject->SetCenterOfMass(pData->vecCenterOfMass);
 
-        // Tell everyone
-        m_pPlayerManager->BroadcastOnlyJoined(Packet, pPlayer);
+        // Send this sync
+        pData->bSend = true;
     }
+
+    // Tell everyone
+    m_pPlayerManager->BroadcastOnlyJoined(Packet, pPlayer);
 }
 
 #endif

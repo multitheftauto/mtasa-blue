@@ -441,6 +441,22 @@ void lua_classfunction(lua_State* luaVM, const char* szFunction, const char* fn)
         dassert(false);
 }
 
+void lua_classfunction(lua_State* luaVM, const char* szFunction, lua_CFunction fn)
+{
+    if (fn)
+    {
+        lua_pushstring(luaVM, "__class");
+        lua_rawget(luaVM, -2);
+
+        lua_pushstring(luaVM, szFunction);
+        lua_pushstring(luaVM, szFunction);
+        lua_pushcclosure(luaVM, fn, 1);
+        lua_rawset(luaVM, -3);
+
+        lua_pop(luaVM, 1);
+    }
+}
+
 void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* szACLNameSet, const char* szACLNameGet, lua_CFunction set, lua_CFunction get,
                        bool bACLIgnore)
 {
@@ -483,6 +499,48 @@ void lua_classvariable(lua_State* luaVM, const char* szVariable, const char* szA
         lua_pushstring(luaVM, szVariable);
         lua_pushstring(luaVM, szACLNameGet);
         lua_pushcclosure(luaVM, get, 2);
+        lua_rawset(luaVM, -3);
+    }
+    lua_pop(luaVM, 1);
+}
+
+void lua_classvariable(lua_State* luaVM, const char* szVariable, lua_CFunction set, lua_CFunction get)
+{
+    lua_pushstring(luaVM, "__set");
+    lua_rawget(luaVM, -2);
+
+    if (!set)
+    {
+        lua_pushstring(luaVM, szVariable);
+        lua_pushstring(luaVM, szVariable);
+        lua_pushcclosure(luaVM, CLuaClassDefs::ReadOnly, 1);
+        lua_rawset(luaVM, -3);
+    }
+    else
+    {
+        lua_pushstring(luaVM, szVariable);
+        lua_pushstring(luaVM, szVariable);
+        lua_pushcclosure(luaVM, set, 1);
+        lua_rawset(luaVM, -3);
+    }
+    lua_pop(luaVM, 1);
+
+    // Get
+    lua_pushstring(luaVM, "__get");
+    lua_rawget(luaVM, -2);
+
+    if (!get)
+    {
+        lua_pushstring(luaVM, szVariable);
+        lua_pushstring(luaVM, szVariable);
+        lua_pushcclosure(luaVM, CLuaClassDefs::WriteOnly, 1);
+        lua_rawset(luaVM, -3);
+    }
+    else
+    {
+        lua_pushstring(luaVM, szVariable);
+        lua_pushstring(luaVM, szVariable);
+        lua_pushcclosure(luaVM, get, 1);
         lua_rawset(luaVM, -3);
     }
     lua_pop(luaVM, 1);

@@ -815,6 +815,13 @@ bool CStaticFunctionDefinitions::IsElementInWater(CClientEntity& Entity, bool& b
             bInWater = Vehicle.IsInWater();
             break;
         }
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        {
+            CClientObject& Object = static_cast<CClientObject&>(Entity);
+            bInWater = Object.IsInWater();
+            break;
+        }
         default:
             return false;
     }

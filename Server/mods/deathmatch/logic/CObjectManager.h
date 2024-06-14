@@ -14,6 +14,8 @@
 #include "CObject.h"
 #include <list>
 
+#define WITH_OBJECT_SYNC    1
+
 using std::list;
 
 class CObject;

@@ -18,7 +18,7 @@ extern CClientGame* g_pClientGame;
 #ifdef WITH_OBJECT_SYNC
 CDeathmatchObject::CDeathmatchObject(CClientManager* pManager, CMovingObjectsManager* pMovingObjectsManager, CObjectSync* pObjectSync, ElementID ID,
                                      unsigned short usModel)
-    : ClassInit(this), CClientObject(pManager, ID, usModel)
+    : ClassInit(this), CClientObject(pManager, ID, usModel, false)
 {
     m_pMovingObjectsManager = pMovingObjectsManager;
     m_pObjectSync = pObjectSync;

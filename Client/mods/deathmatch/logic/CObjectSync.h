@@ -26,7 +26,6 @@ public:
 
     void AddObject(CDeathmatchObject* pObject);
     void RemoveObject(CDeathmatchObject* pObject);
-    void ClearObjects();
 
     std::list<CDeathmatchObject*>::const_iterator IterBegin() { return m_List.begin(); };
     std::list<CDeathmatchObject*>::const_iterator IterEnd() { return m_List.end(); };
@@ -38,7 +37,7 @@ private:
     void Packet_ObjectStopSync(NetBitStreamInterface& BitStream);
     void Packet_ObjectSync(NetBitStreamInterface& BitStream);
 
-    void Sync();
+    void Update();
     void WriteObjectInformation(NetBitStreamInterface* pBitStream, CDeathmatchObject* pObject);
 
     CClientObjectManager*           m_pObjectManager;
