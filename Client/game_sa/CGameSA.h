@@ -17,6 +17,7 @@
 #include "CStreamingSA.h"
 #include "CCoverManagerSA.h"
 #include "CPlantManagerSA.h"
+#include "CRendererSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -171,6 +172,7 @@ public:
     CIplStore*                GetIplStore() { return m_pIplStore; };
     CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
+    CRenderer*                GetRenderer() const override { return m_pRenderer.get(); }
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -339,6 +341,8 @@ private:
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
     CCoverManagerSA*                m_pCoverManager;
     CPlantManagerSA*                m_pPlantManager;
+
+    std::unique_ptr<CRendererSA>    m_pRenderer;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
