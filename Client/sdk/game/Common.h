@@ -1599,3 +1599,24 @@ namespace eSoundEffectParams
         HIGH_FREQ_RT_RATIO,
     };
 }            // namespace eSoundEffectParams
+
+enum class eFxParticleSystems
+{
+    PRT_BLOOD,
+    PRT_BOATSPLASH,
+    PRT_BUBBLE,
+    PRT_DEBRIS,
+    PRT_SMOKE,
+    PRT_GUNSHELL,
+    PRT_SAND,
+    PRT_SAND2,
+    PRT_SMOKEHUGE,
+    PRT_SMOKE2,
+    PRT_SPARK,
+    PRT_SPARK2,
+    PRT_SPLASH,
+    PRT_WAKE,
+    PRT_WATERSPLASH,
+    PRT_WHEELDIRT,
+    PRT_GLASS,
+};

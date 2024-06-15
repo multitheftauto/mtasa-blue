@@ -482,6 +482,20 @@ mbed_set_selected_ciphers(struct Curl_easy *data,
   return CURLE_OK;
 }
 
+#ifdef TLS13_SUPPORT
+static int mbed_no_verify(void *udata, mbedtls_x509_crt *crt,
+                          int depth, uint32_t *flags)
+{
+  (void)udata;
+  (void)crt;
+  (void)depth;
+  /* we clear any faults the mbedtls' own verification found.
+   * See <https://github.com/Mbed-TLS/mbedtls/issues/9210> */
+  *flags = 0;
+  return 0;
+}
+#endif
+
 static CURLcode
 mbed_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
 {
@@ -737,6 +751,15 @@ mbed_connect_step1(struct Curl_cfilter *cf, struct Curl_easy *data)
     failf(data, "mbedTLS: ssl_config failed");
     return CURLE_SSL_CONNECT_ERROR;
   }
+#ifdef TLS13_SUPPORT
+  if(!verifypeer) {
+    /* Default verify behaviour changed in mbedtls v3.6.0 with TLS v1.3.
+     * On 1.3 connections, the handshake fails by default without trust
+     * anchors. We override this questionable change by installing our
+     * own verify callback that clears all errors. */
+    mbedtls_ssl_conf_verify(&backend->config, mbed_no_verify, cf);
+  }
+#endif
 
   mbedtls_ssl_init(&backend->ssl);
 
@@ -922,10 +945,16 @@ mbed_connect_step2(struct Curl_cfilter *cf, struct Curl_easy *data)
     connssl->connecting_state = ssl_connect_2_writing;
     return CURLE_OK;
   }
+  else if(ret == MBEDTLS_ERR_X509_CERT_VERIFY_FAILED) {
+    failf(data, "peer certificate could not be verified");
+    return CURLE_PEER_FAILED_VERIFICATION;
+  }
   else if(ret) {
     char errorbuf[128];
+    CURL_TRC_CF(data, cf, "TLS version %04X",
+                mbedtls_ssl_get_version_number(&backend->ssl));
     mbedtls_strerror(ret, errorbuf, sizeof(errorbuf));
-    failf(data, "ssl_handshake returned - mbedTLS: (-0x%04X) %s",
+    failf(data, "ssl_handshake returned: (-0x%04X) %s",
           -ret, errorbuf);
     return CURLE_SSL_CONNECT_ERROR;
   }
@@ -1146,8 +1175,13 @@ static ssize_t mbed_send(struct Curl_cfilter *cf, struct Curl_easy *data,
   ret = mbedtls_ssl_write(&backend->ssl, (unsigned char *)mem, len);
 
   if(ret < 0) {
-    *curlcode = (ret == MBEDTLS_ERR_SSL_WANT_WRITE) ?
-      CURLE_AGAIN : CURLE_SEND_ERROR;
+    CURL_TRC_CF(data, cf, "mbedtls_ssl_write(len=%zu) -> -0x%04X",
+                len, -ret);
+    *curlcode = ((ret == MBEDTLS_ERR_SSL_WANT_WRITE)
+#ifdef TLS13_SUPPORT
+      || (ret == MBEDTLS_ERR_SSL_RECEIVED_NEW_SESSION_TICKET)
+#endif
+      )? CURLE_AGAIN : CURLE_SEND_ERROR;
     ret = -1;
   }
 
@@ -1205,6 +1239,8 @@ static ssize_t mbed_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
                          buffersize);
 
   if(ret <= 0) {
+    CURL_TRC_CF(data, cf, "mbedtls_ssl_read(len=%zu) -> -0x%04X",
+                buffersize, -ret);
     if(ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY)
       return 0;
 
@@ -1213,6 +1249,11 @@ static ssize_t mbed_recv(struct Curl_cfilter *cf, struct Curl_easy *data,
               || (ret == MBEDTLS_ERR_SSL_RECEIVED_NEW_SESSION_TICKET)
 #endif
     ) ? CURLE_AGAIN : CURLE_RECV_ERROR;
+    if(*curlcode != CURLE_AGAIN) {
+      char errorbuf[128];
+      mbedtls_strerror(ret, errorbuf, sizeof(errorbuf));
+      failf(data, "ssl_read returned: (-0x%04X) %s", -ret, errorbuf);
+    }
     return -1;
   }
 

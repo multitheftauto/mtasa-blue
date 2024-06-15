@@ -277,5 +277,7 @@ enum eElementRPCFunctions
 
     SET_WORLD_SPECIAL_PROPERTY,
 
+    BREAK_OBJECT,
+
     NUM_RPC_FUNCS            // Add above this line
 };

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 17:55+0000\n"
+"POT-Creation-Date: 2024-06-09 00:12+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -437,11 +437,11 @@ msgid ""
 "I want my PC to lag and be part of a botnet."
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:849
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:852
 msgid "Installing update..."
 msgstr ""
 
-#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:931
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:934
 msgid "Extracting files..."
 msgstr ""
 
@@ -1344,23 +1344,23 @@ msgstr ""
 msgid "MTA Client verification failed!"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5687
 msgid "In a ditch"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5687
 msgid "En-route to hospital"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5687
 msgid "Meeting their maker"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5688
 msgid "Regretting their decisions"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5688
 msgid "Wasted"
 msgstr ""
 
