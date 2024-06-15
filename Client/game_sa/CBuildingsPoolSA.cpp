@@ -43,7 +43,7 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
     m_buildingPool.entities[dwElementIndexInPool] = {pBuilding, (CClientEntity*)pClientBuilding};
 
     // Increase the count of objects
-    ++m_buildingPool.ulCount;
+    ++m_buildingPool.count;
 
     return true;
 }
@@ -118,7 +118,7 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     (*m_ppBuildingPoolInterface)->Release(dwElementIndexInPool);
 
     // Decrease the count of elements in the pool
-    --m_buildingPool.ulCount;
+    --m_buildingPool.count;
 }
 
 void CBuildingsPoolSA::RemoveAllBuildings()
