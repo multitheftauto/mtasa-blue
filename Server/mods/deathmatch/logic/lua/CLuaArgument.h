@@ -29,45 +29,46 @@ class CLuaArguments;
 class CLuaArgument
 {
 public:
-    CLuaArgument();
-    CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
-    CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    ~CLuaArgument();
+    CLuaArgument() noexcept;
+    CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = nullptr) noexcept;
+    CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = nullptr) noexcept;
+    ~CLuaArgument() noexcept;
 
-    const CLuaArgument& operator=(const CLuaArgument& Argument);
-    bool                operator==(const CLuaArgument& Argument) const;
-    bool                operator!=(const CLuaArgument& Argument) const;
+    const CLuaArgument& operator=(const CLuaArgument& Argument) noexcept;
+    bool                operator==(const CLuaArgument& Argument) const noexcept;
+    bool                operator!=(const CLuaArgument& Argument) const noexcept;
 
-    void Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
+    void Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = nullptr) noexcept;
+    void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = nullptr) const noexcept;
 
-    void ReadBool(bool bBool);
-    void ReadNumber(double dNumber);
-    void ReadString(const std::string& strString);
-    void ReadElement(CElement* pElement);
-    void ReadElementID(ElementID ID);
-    void ReadScriptID(uint uiScriptID);
-    void ReadTable(class CLuaArguments* table);
+    void ReadBool(bool bBool) noexcept;
+    void ReadNumber(double dNumber) noexcept;
+    void ReadString(const std::string& strString) noexcept;
+    void ReadElement(CElement* pElement) noexcept;
+    void ReadElementID(ElementID ID) noexcept;
+    void ReadScriptID(uint uiScriptID) noexcept;
+    void ReadTable(class CLuaArguments* table) noexcept;
 
-    int GetType() const { return m_iType; };
+    int GetType() const noexcept { return m_iType; }
 
-    bool               GetBoolean() const { return m_bBoolean; };
-    lua_Number         GetNumber() const { return m_Number; };
-    const std::string& GetString() { return m_strString; };
-    void*              GetUserData() const { return m_pUserData; };
-    CElement*          GetElement() const;
-    bool               GetAsString(SString& strBuffer);
+    bool               GetBoolean() const noexcept { return m_bBoolean; }
+    lua_Number         GetNumber() const noexcept { return m_Number; }
+    const std::string& GetString() const noexcept { return m_strString; }
+    std::string&       GetString() noexcept { return m_strString; }
+    void*              GetUserData() const noexcept { return m_pUserData; }
+    CElement*          GetElement() const noexcept;
+    bool               GetAsString(SString& strBuffer) noexcept;
 
-    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
-    json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
-    bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    char*        WriteToString(char* szBuffer, int length);
+    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
+    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = nullptr) const noexcept;
+    json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = nullptr) noexcept;
+    bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
+    char*        WriteToString(char* szBuffer, int length) noexcept;
 
-    bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
+    bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const noexcept;
 
 private:
-    void LogUnableToPacketize(const char* szMessage) const;
+    void LogUnableToPacketize(const char* szMessage) const noexcept;
 
     int            m_iType;
     bool           m_bBoolean;
@@ -82,6 +83,6 @@ private:
     int         m_iLine;
 #endif
 
-    void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
+    void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = nullptr);
     void DeleteTableData();
 };
