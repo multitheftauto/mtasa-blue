@@ -21,6 +21,7 @@ void CObjectRPCs::LoadFunctions()
     AddHandler(SET_OBJECT_SCALE, SetObjectScale, "SetObjectScale");
     AddHandler(SET_OBJECT_VISIBLE_IN_ALL_DIMENSIONS, SetObjectVisibleInAllDimensions, "SetObjectVisibleInAllDimensions");
     AddHandler(SET_OBJECT_BREAKABLE, SetObjectBreakable, "SetObjectBreakable");
+    AddHandler(BREAK_OBJECT, BreakObject, "BreakObject");
 }
 
 void CObjectRPCs::DestroyAllObjects(NetBitStreamInterface& bitStream)
@@ -125,4 +126,12 @@ void CObjectRPCs::SetObjectBreakable(CClientEntity* pSource, NetBitStreamInterfa
     {
         pObject->SetBreakable(bitStream.ReadBit());
     }
+}
+
+void CObjectRPCs::BreakObject(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+   auto pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
+
+    if (pObject != nullptr)
+        pObject->Break();
 }

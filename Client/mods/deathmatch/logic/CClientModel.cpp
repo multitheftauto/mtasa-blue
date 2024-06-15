@@ -109,6 +109,8 @@ void CClientModel::RestoreEntitiesUsingThisModel()
     {
         case eClientModelType::PED:
         case eClientModelType::OBJECT:
+        case eClientModelType::CLUMP:
+        case eClientModelType::TIMED_OBJECT:
         case eClientModelType::VEHICLE:
             RestoreDFF(pModelInfo);
             return;
@@ -122,6 +124,13 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 
 void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 {
+    auto callElementChangeEvent = [](auto &element, unsigned short usParentID, auto modelId) {
+        CLuaArguments Arguments;
+        Arguments.PushNumber(modelId);
+        Arguments.PushNumber(usParentID);
+        element.CallEvent("onClientElementModelChange", Arguments, true);
+    };
+
     auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
@@ -135,10 +144,21 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 
             setElementModelLambda(element);
 
-            CLuaArguments Arguments;
-            Arguments.PushNumber(m_iModelID);
-            Arguments.PushNumber(usParentID);
-            element.CallEvent("onClientElementModelChange", Arguments, true);
+            callElementChangeEvent(element, usParentID, m_iModelID);
+        }
+    };
+
+    auto unloadModelsAndCallEventsNonStreamed = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    {
+        for (auto iter = iterBegin; iter != iterEnd; iter++)
+        {
+            auto& element = **iter;
+
+            if (element.GetModel() != m_iModelID)
+                continue;
+
+            setElementModelLambda(element);
+            callElementChangeEvent(element, usParentID, m_iModelID);
         }
     };
 
@@ -165,6 +185,12 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             CClientPickupManager* pPickupManager = g_pClientGame->GetManager()->GetPickupManager();
 
             unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+
+            // Restore buildings
+            CClientBuildingManager* pBuildingsManager = g_pClientGame->GetManager()->GetBuildingManager();
+            auto&                   buildingsList = pBuildingsManager->GetBuildings();
+            unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID,
+                                      [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(m_iModelID);

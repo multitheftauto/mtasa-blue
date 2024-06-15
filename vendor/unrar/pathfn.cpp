@@ -531,10 +531,14 @@ void MakeNameUsable(std::wstring &Name,bool Extended)
 
       // No spaces or dots before the path separator are allowed on Windows
       // shares. But they are allowed and automatically removed at the end of
-      // file or folder name, so it is useless to replace them here.
+      // file or folder name, so we need to replace them only before
+      // the path separator, but not at the end of file name.
       // Since such files or folders are created successfully, a supposed
-      // conversion here would never be invoked.
-      if ((Name[I]==' ' || Name[I]=='.') && IsPathDiv(Name[I+1]))
+      // conversion at the end of file name would never be invoked here.
+      // While converting dots, we preserve "." and ".." path components,
+      // such as when specifying ".." in the destination path.
+      if (IsPathDiv(Name[I+1]) && (Name[I]==' ' || Name[I]=='.' && I>0 &&
+          !IsPathDiv(Name[I-1]) && (Name[I-1]!='.' || I>1 && !IsPathDiv(Name[I-2]))))
         Name[I]='_';
     }
 #else
@@ -1077,17 +1081,24 @@ void MakeNameCompatible(std::wstring &Name)
     if (I+1==Name.size() || IsPathDiv(Name[I+1]))
       while (I>=0 && (Name[I]=='.' || Name[I]==' '))
       {
-        if (I==0)
+        if (I==0 && Name[I]==' ')
         {
           // Windows 10 Explorer can't rename or delete " " files and folders.
-          if (Name[I]==' ')
-            Name[I]='_'; // Convert " /path" to "_/path".
-          break; // Allow ./path1 paths.
-        }
-        // Permit path1/./path2 and ../path1 paths. Leading dots are possible
-        // if specified by user in the destination path.
-        if (Name[I]=='.' && I>0 && (IsPathDiv(Name[I-1]) || Name[I-1]=='.' && I==1))
+          Name[I]='_'; // Convert " /path" to "_/path".
           break;
+        }
+        if (Name[I]=='.')
+        {
+          // 2024.05.01: Permit ./path1, path1/./path2, ../path1,
+          // path1/../path2 and exotic Win32 d:.\path1, d:..\path1 paths
+          // requested by user. Leading dots are possible here if specified
+          // by user in the destination path.
+          if (I==0 || IsPathDiv(Name[I-1]) || I==2 && IsDriveLetter(Name))
+            break;
+          if (I>=1 && Name[I-1]=='.' && (I==1 || IsPathDiv(Name[I-2]) ||
+              I==3 && IsDriveLetter(Name)))
+            break;
+        }
         Name.erase(I,1);
         I--;
       }

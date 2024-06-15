@@ -135,11 +135,11 @@ public:
     // Queued up drawing funcs
     void DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, unsigned long ulColor, bool bPostGUI);
 
-    void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, bool bPostGUI);
+    void DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, eRenderStage stage = eRenderStage::PRE_FX);
 
     void DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector& vecEnd, float fWidth, unsigned long ulColor, CMaterialItem* pMaterial, float fU = 0,
                                   float fV = 0, float fSizeU = 1, float fSizeV = 1, bool bRelativeUV = true, bool bFlipUV = false, bool bUseFaceToward = false,
-                                  const CVector& vecFaceToward = CVector(), bool bPostGUI = false) override;
+                                  const CVector& vecFaceToward = CVector(), eRenderStage stage = eRenderStage::PRE_FX) override;
 
     void DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning = false);
 
@@ -153,8 +153,8 @@ public:
     void DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI = false);
     void DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice>* vertices, D3DPRIMITIVETYPE type, CMaterialItem* pMaterial, bool bPostGUI);
 
-    void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, bool bPostGUI);
-    void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, bool bPostGUI);
+    void DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertices, D3DPRIMITIVETYPE eType, eRenderStage stage = eRenderStage::PRE_FX);
+    void DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVertice>* pVecVertices, D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, eRenderStage stage = eRenderStage::PRE_FX);
 
     void DrawCircleQueued(float fX, float fY, float fRadius, float fStartAngle, float fStopAngle, unsigned long ulColor, unsigned long ulColorCenter,
                           short siSegments, float fRatio, bool bPostGUI);
@@ -188,9 +188,13 @@ public:
     void DrawPreGUIQueue(void);
     void DrawPostGUIQueue(void);
     void DrawLine3DPreGUIQueue(void);
+    void DrawLine3DPostFXQueue(void);
     bool HasLine3DPreGUIQueueItems(void);
+    bool HasLine3DPostFXQueueItems();
+    void DrawPrimitive3DPostFXQueue(void);
     void DrawPrimitive3DPreGUIQueue(void);
     bool HasPrimitive3DPreGUIQueueItems(void);
+    bool HasPrimitive3DPostFXQueueItems();
 
     void DidRenderScene();
     void SetProgressMessage(const SString& strMessage);
@@ -226,14 +230,18 @@ private:
     CPixelsManagerInterface*     m_pPixelsManager = nullptr;
     CTileBatcher*                m_pTileBatcher = nullptr;
     CLine3DBatcher*              m_pLine3DBatcherPreGUI = nullptr;
+    CLine3DBatcher*              m_pLine3DBatcherPostFX = nullptr;
     CLine3DBatcher*              m_pLine3DBatcherPostGUI = nullptr;
     CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPreGUI = nullptr;
+    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPostFX = nullptr;
     CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPostGUI = nullptr;
     CPrimitiveBatcher*           m_pPrimitiveBatcher = nullptr;
     CPrimitiveMaterialBatcher*   m_pPrimitiveMaterialBatcher = nullptr;
     CPrimitive3DBatcher*         m_pPrimitive3DBatcherPreGUI = nullptr;
-    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostFX = nullptr;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;    
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI = nullptr;
+    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostFX = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
     CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
 

@@ -29,6 +29,8 @@ public:
     CFileLoaderSA();
     ~CFileLoaderSA();
 
+    static CEntitySAInterface* LoadObjectInstance(SFileObjectInstance*);
+
     static void StaticSetHooks();
 };
 

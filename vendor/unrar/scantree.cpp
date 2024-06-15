@@ -104,10 +104,10 @@ bool ScanTree::ExpandFolderMask()
     {
       FD.Name+=CurMask.substr(SlashPos);
 
-      // Treat dir*\* or dir*\*.* as dir, so empty 'dir' is also matched
+      // Treat dir*\*, dir*\*.* or dir*\ as dir, so empty 'dir' is also matched
       // by such mask. Skipping empty dir with dir*\*.* confused some users.
       std::wstring LastMask=PointToName(FD.Name);
-      if (LastMask==L"*" || LastMask==L"*.*")
+      if (LastMask==L"*" || LastMask==L"*.*" || LastMask.empty())
         RemoveNameFromPath(FD.Name);
 
       ExpandedFolderList.AddString(FD.Name);
