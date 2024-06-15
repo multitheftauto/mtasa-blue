@@ -246,6 +246,7 @@ bool CBuildingsPoolSA::Resize(int size)
     pGame->GetPools()->GetDummyPool().UpdateBuildingLods(oldPool, newObjects);
 
     RemoveVehicleDamageLinks();
+    RemovePedsContactEnityLinks();
 
     return true;
 }
@@ -306,6 +307,28 @@ void CBuildingsPoolSA::RemoveVehicleDamageLinks()
             vehicle->pLastContactedEntity[2] = nullptr;
             vehicle->pLastContactedEntity[3] = nullptr;
             vehicle->m_ucCollisionState = 0;
+        }
+    }
+}
+
+void CBuildingsPoolSA::RemovePedsContactEnityLinks()
+{
+    const int count = pGame->GetPools()->GetPedCount();
+    for (int i = 0; i < count; i++)
+    {
+        auto* pedLinks = pGame->GetPools()->GetPed(i);
+        if (pedLinks->pEntity)
+        {
+            CPedSAInterface* ped = pedLinks->pEntity->GetPedInterface();
+            ped->m_pCollidedEntity = nullptr;
+            ped->pContactEntity = nullptr;
+            ped->pLastContactEntity = nullptr;
+            ped->pLastContactedEntity[0] = nullptr;
+            ped->pLastContactedEntity[1] = nullptr;
+            ped->pLastContactedEntity[2] = nullptr;
+            ped->pLastContactedEntity[3] = nullptr;
+            ped->m_ucCollisionState = 0;
+            ped->pTargetedEntity = nullptr;
         }
     }
 }
