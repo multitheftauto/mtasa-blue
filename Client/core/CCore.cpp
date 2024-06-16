@@ -2008,48 +2008,47 @@ void CCore::OnPreFxRender()
 //
 // OnPreHUDRender
 //
-void CCore::OnPreHUDRender()
+void CCore::OnPreHUDRender(PreHUDRenderStage stage)
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-
-    if (CGraphics::GetSingleton().HasLine3DPostFXQueueItems() || CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+    if (stage == PreHUDRenderStage::PostColorFilter)
     {
-        /*
-            Although MTA render zones are expensive, we should use them twice in the bounds of the function
-            because some of render states from PostFX drain to the 2D part of the frame.
-        */
-        CGraphics::GetSingleton().EnteringMTARenderZone();
+        if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+            return;
+    
+        CGraphics::GetSingleton().EnteringMTARenderZone();      
 
         CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
-        CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+        CGraphics::GetSingleton().DrawLine3DPostFXQueue();  
 
         CGraphics::GetSingleton().LeavingMTARenderZone();
     }
-
-    CGraphics::GetSingleton().EnteringMTARenderZone();    
-
-    // Maybe capture screen and other stuff
-    CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
-
-    // Handle script stuffs
-    if (m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0)
+    else if (stage == PreHUDRenderStage::PostEffects)
     {
-        m_pModManager->DoPulsePreHUDRender(true, m_bDidRecreateRenderTargets);
-        m_bDidRecreateRenderTargets = false;
+        CGraphics::GetSingleton().EnteringMTARenderZone();    
+
+        // Maybe capture screen and other stuff
+        CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
+
+        // Handle script stuffs
+        if (m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0)
+        {
+            m_pModManager->DoPulsePreHUDRender(true, m_bDidRecreateRenderTargets);
+            m_bDidRecreateRenderTargets = false;
+        }
+        else
+            m_pModManager->DoPulsePreHUDRender(false, false);
+
+        // Handle saving depth buffer
+        CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
+
+        // Restore in case script forgets
+        CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
+
+        // Draw pre-GUI primitives
+        CGraphics::GetSingleton().DrawPreGUIQueue();
+
+        CGraphics::GetSingleton().LeavingMTARenderZone();
     }
-    else
-        m_pModManager->DoPulsePreHUDRender(false, false);
-
-    // Handle saving depth buffer
-    CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
-
-    // Restore in case script forgets
-    CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
-
-    // Draw pre-GUI primitives
-    CGraphics::GetSingleton().DrawPreGUIQueue();
-
-    CGraphics::GetSingleton().LeavingMTARenderZone();
 }
 
 //

@@ -271,6 +271,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
+    g_pMultiplayer->SetPostColorFilterRenderHandler(CClientGame::StaticPostColorFilterRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(CClientGame::StaticCAnimBlendAssocDestructorHandler);
@@ -3607,9 +3608,14 @@ void CClientGame::StaticPreFxRenderHandler()
     g_pCore->OnPreFxRender();
 }
 
+void CClientGame::StaticPostColorFilterRenderHandler()
+{
+    g_pCore->OnPreHUDRender(PreHUDRenderStage::PostColorFilter);
+}
+
 void CClientGame::StaticPreHudRenderHandler()
 {
-    g_pCore->OnPreHUDRender();
+    g_pCore->OnPreHUDRender(PreHUDRenderStage::PostEffects);
 }
 
 bool CClientGame::StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface)

@@ -244,7 +244,7 @@ public:
     void                                HandleCrashDumpEncryption();
 
     void                 OnPreFxRender();
-    void                 OnPreHUDRender();
+    void                 OnPreHUDRender(PreHUDRenderStage stage);
     void                 OnDeviceRestore();
     void                 OnCrashAverted(uint uiId);
     void                 OnEnterCrashZone(uint uiId);
