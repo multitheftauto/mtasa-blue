@@ -20,7 +20,7 @@
 
 extern CGame* g_pGame;
 
-CLuaArgument::CLuaArgument()
+CLuaArgument::CLuaArgument() noexcept
 {
     m_iType = LUA_TNIL;
     m_pTableData = nullptr;

@@ -1393,7 +1393,7 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
             callbackArguments.Call(pLuaMain, iLuaFunction, &returnValues);
             if (returnValues.Count())
             {
-                CLuaArgument* returnedValue = *returnValues.IterBegin();
+                CLuaArgument* returnedValue = *returnValues.begin();
                 int           iType = returnedValue->GetType();
                 if (iType == LUA_TNIL)
                     break;

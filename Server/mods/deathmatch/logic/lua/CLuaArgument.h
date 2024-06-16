@@ -44,10 +44,10 @@ public:
     void ReadBool(bool bBool) noexcept;
     void ReadNumber(double dNumber) noexcept;
     void ReadString(const std::string& strString) noexcept;
-    void ReadElement(CElement* pElement) noexcept;
+    void ReadElement(const CElement* pElement) noexcept;
     void ReadElementID(ElementID ID) noexcept;
-    void ReadScriptID(uint uiScriptID) noexcept;
-    void ReadTable(class CLuaArguments* table) noexcept;
+    void ReadScriptID(std::uint32_t uiScriptID) noexcept;
+    void ReadTable(const CLuaArguments* table) noexcept;
 
     int GetType() const noexcept { return m_iType; }
 
@@ -83,6 +83,6 @@ private:
     int         m_iLine;
 #endif
 
-    void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = nullptr);
-    void DeleteTableData();
+    void CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = nullptr) noexcept;
+    void DeleteTableData() noexcept;
 };

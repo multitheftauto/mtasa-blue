@@ -52,10 +52,10 @@ public:
     void CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = nullptr) noexcept;
 
     const CLuaArguments& operator=(const CLuaArguments& Arguments) noexcept;
-    CLuaArgument*        operator[](const std::uint32_t uiPosition) const noexcept;
+    CLuaArgument*        operator[](const std::size_t uiPosition) const noexcept;
 
-    void ReadArgument(lua_State* luaVM, std::int32_t iIndex) noexcept;
-    void ReadArguments(lua_State* luaVM, std::int32_t iIndexBegin = 1) noexcept;
+    void ReadArgument(lua_State* luaVM, int iIndex) noexcept;
+    void ReadArguments(lua_State* luaVM, int iIndexBegin = 1) noexcept;
     void PushArguments(lua_State* luaVM) const noexcept;
     void PushArguments(const CLuaArguments& Arguments) noexcept;
     bool Call(class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments* returnValues = nullptr) const noexcept;
@@ -68,19 +68,19 @@ public:
     CLuaArgument* PushBoolean(bool bBool) noexcept;
     CLuaArgument* PushNumber(double dNumber) noexcept;
     CLuaArgument* PushString(const std::string& strString) noexcept;
-    CLuaArgument* PushElement(CElement* pElement) noexcept;
-    CLuaArgument* PushBan(CBan* pBan) noexcept;
-    CLuaArgument* PushACL(CAccessControlList* pACL) noexcept;
-    CLuaArgument* PushACLGroup(CAccessControlListGroup* pACLGroup) noexcept;
-    CLuaArgument* PushAccount(CAccount* pAccount) noexcept;
-    CLuaArgument* PushResource(CResource* pResource) noexcept;
-    CLuaArgument* PushTextDisplay(CTextDisplay* pTextDisplay) noexcept;
-    CLuaArgument* PushTextItem(CTextItem* pTextItem) noexcept;
-    CLuaArgument* PushTimer(CLuaTimer* pLuaTimer) noexcept;
-    CLuaArgument* PushDbQuery(CDbJobData* pJobData) noexcept;
+    CLuaArgument* PushElement(const CElement* pElement) noexcept;
+    CLuaArgument* PushBan(const CBan* pBan) noexcept;
+    CLuaArgument* PushACL(const CAccessControlList* pACL) noexcept;
+    CLuaArgument* PushACLGroup(const CAccessControlListGroup* pACLGroup) noexcept;
+    CLuaArgument* PushAccount(const CAccount* pAccount) noexcept;
+    CLuaArgument* PushResource(const CResource* pResource) noexcept;
+    CLuaArgument* PushTextDisplay(const CTextDisplay* pTextDisplay) noexcept;
+    CLuaArgument* PushTextItem(const CTextItem* pTextItem) noexcept;
+    CLuaArgument* PushTimer(const CLuaTimer* pLuaTimer) noexcept;
+    CLuaArgument* PushDbQuery(const CDbJobData* pJobData) noexcept;
 
     CLuaArgument* PushArgument(const CLuaArgument& argument) noexcept;
-    CLuaArgument* PushTable(CLuaArguments* table) noexcept;
+    CLuaArgument* PushTable(const CLuaArguments* table) noexcept;
 
     void DeleteArguments() noexcept;
     void ValidateTableKeys() noexcept;
@@ -95,7 +95,7 @@ public:
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
     bool         ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
 
-    std::size_t Count() const noexcept { m_Arguments.size(); }
+    std::size_t Count() const noexcept { return m_Arguments.size(); }
 
     std::vector<CLuaArgument*>& GetArguments() noexcept { return m_Arguments; }
     const std::vector<CLuaArgument*>& GetArguments() const noexcept { return m_Arguments; }
