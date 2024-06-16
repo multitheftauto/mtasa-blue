@@ -84,6 +84,7 @@ Rijndael::Rijndael()
 {
   if (S5[0]==0)
     GenerateTables();
+  m_uRounds = 0;
   CBCMode = true; // Always true for RAR.
 #ifdef USE_SSE
   AES_NI=false;

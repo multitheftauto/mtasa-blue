@@ -13,7 +13,9 @@
 
 class CEntitySAInterface;
 class CVector;
+class CVector2D;
 class CColPoint;
+class CEntity;
 
 struct SLineOfSightFlags
 {
@@ -59,77 +61,6 @@ struct SProcessLineOfSightMaterialInfoResult {
     bool        valid{};       //< Data found in this struct is only valid if this is `true`!
 };
 
-struct SBuildingRemoval
-{
-    SBuildingRemoval()
-    {
-        m_pBinaryRemoveList = new std::list<CEntitySAInterface*>;
-        m_pDataRemoveList = new std::list<CEntitySAInterface*>;
-        m_usModel = 0;
-        m_vecPos = CVector(0, 0, 0);
-        m_fRadius = 0.0f;
-        m_cInterior = -1;
-    }
-
-    ~SBuildingRemoval()
-    {
-        delete m_pBinaryRemoveList;
-        delete m_pDataRemoveList;
-    }
-
-    void AddBinaryBuilding(CEntitySAInterface* pInterface)
-    {
-        // Add to list of binary buildings for this removal
-        m_pBinaryRemoveList->push_back(pInterface);
-    }
-    void AddDataBuilding(CEntitySAInterface* pInterface)
-    {
-        // Add to list of data buildings for this removal
-        m_pDataRemoveList->push_back(pInterface);
-    }
-
-    unsigned short                  m_usModel;
-    CVector                         m_vecPos;
-    float                           m_fRadius;
-    char                            m_cInterior;
-    std::list<CEntitySAInterface*>* m_pBinaryRemoveList;
-    std::list<CEntitySAInterface*>* m_pDataRemoveList;
-};
-struct SIPLInst
-{
-    CVector m_pPosition;
-    CVector m_pRotation;
-    float   m_fRotationCont;
-    WORD    m_nModelIndex;
-    BYTE    m_nInterior;
-    BYTE    m_bLOD;
-};
-
-struct sDataBuildingRemovalItem
-{
-    sDataBuildingRemovalItem(CEntitySAInterface* pInterface, bool bData)
-    {
-        m_pInterface = pInterface;
-        m_iCount = 0;
-    }
-    void                AddCount() { m_iCount++; }
-    void                RemoveCount() { m_iCount--; }
-    CEntitySAInterface* m_pInterface;
-    int                 m_iCount;
-};
-struct sBuildingRemovalItem
-{
-    sBuildingRemovalItem(CEntitySAInterface* pInterface, bool bData)
-    {
-        m_pInterface = pInterface;
-        m_iCount = 0;
-    }
-    void                AddCount() { m_iCount++; }
-    void                RemoveCount() { m_iCount--; }
-    CEntitySAInterface* m_pInterface;
-    int                 m_iCount;
-};
-
 enum eDebugCaller
 {
     CEntity_SetMatrix,
@@ -154,7 +85,9 @@ enum eDebugCaller
     CCivPed_Constructor,
     CCivPed_Destructor,
     CBuilding_Destructor,
-
+    CBuildingPool_Constructor,
+    CBuildingPool_Destructor,
+    CBuilding_SetLod,
 };
 
 enum eSurfaceProperties
@@ -313,6 +246,7 @@ class CWorld
 {
 public:
     virtual void  Add(CEntity* entity, eDebugCaller CallerId) = 0;
+    virtual void  Add(CEntitySAInterface* entity, eDebugCaller CallerId) = 0;
     virtual void  Remove(CEntity* entity, eDebugCaller CallerId) = 0;
     virtual void  Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId) = 0;
     virtual auto  ProcessLineAgainstMesh(CEntitySAInterface* e, CVector start, CVector end) -> SProcessLineOfSightMaterialInfoResult = 0;
@@ -335,20 +269,7 @@ public:
     virtual bool  GetOcclusionsEnabled() = 0;
     virtual void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition) = 0;
     virtual int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance) = 0;
-
-    virtual void RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
-    virtual bool IsRemovedModelInRadius(SIPLInst* pInst) = 0;
-    virtual bool IsModelRemoved(unsigned short usModelID) = 0;
-    virtual void ClearRemovedBuildingLists(uint* pOutAmount = NULL) = 0;
-    virtual bool RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL) = 0;
-    virtual SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface) = 0;
-    virtual void              AddDataBuilding(CEntitySAInterface* pInterface) = 0;
-    virtual void              AddBinaryBuilding(CEntitySAInterface* pInterface) = 0;
-    virtual void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface) = 0;
-    virtual bool              IsObjectRemoved(CEntitySAInterface* pInterface) = 0;
-    virtual bool              IsDataModelRemoved(unsigned short usModelID) = 0;
-    virtual bool              IsEntityRemoved(CEntitySAInterface* pInterface) = 0;
-    virtual bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
+    virtual bool  CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
 
     virtual CSurfaceType* GetSurfaceInfo() = 0;
     virtual void          ResetAllSurfaceInfo() = 0;

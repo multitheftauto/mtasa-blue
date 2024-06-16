@@ -101,9 +101,8 @@ bool Archive::DoGetComment(std::wstring &CmtData)
         // 4x memory for OEM to UTF-8 output here.
         OemToCharBuffA((char *)UnpData,(char *)UnpData,(DWORD)UnpDataSize);
 #endif
-//        CmtData.resize(UnpDataSize+1);
-        CharToWide((const char *)UnpData,CmtData);
-//        CmtData.resize(wcslen(CmtData->data()));
+        std::string UnpStr((char*)UnpData,UnpDataSize);
+        CharToWide(UnpStr,CmtData);
       }
     }
   }

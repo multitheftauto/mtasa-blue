@@ -19,6 +19,7 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
+#include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
 
@@ -2387,6 +2388,8 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::WATERCREATURES, wsProps.data.watercreatures);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::BURNFLIPPEDCARS, wsProps.data.burnflippedcars);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FIREBALLDESTRUCT, wsProps.data2.fireballdestruct);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::ROADSIGNSTEXT, wsProps.data3.roadsignstext);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTENDEDWATERCANNONS, wsProps.data4.extendedwatercannons);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
@@ -2639,7 +2642,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 
     bool bOcclusionsEnabled = true;
@@ -2717,6 +2720,7 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // CVector              (12)    - scale
         // bool                 (1)     - static
         // SObjectHealthSync    (?)     - health
+        // bool                 (1)     - is break
 
         // Pickups:
         // CVector              (12)    - position
@@ -3077,6 +3081,12 @@ retry:
                         if (bitStream.Read(&health))
                             pObject->SetHealth(health.data.fValue);
 
+                        if (bitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        {
+                            if (bitStream.ReadBit())
+                                pObject->Break();
+                        }
+                        
                         pObject->SetCollisionEnabled(bCollisonsEnabled);
                         if (ucEntityTypeID == CClientGame::WEAPON)
                         {
