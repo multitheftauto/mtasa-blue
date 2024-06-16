@@ -19,6 +19,7 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
+#include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
 
@@ -2642,7 +2643,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 
     bool bOcclusionsEnabled = true;

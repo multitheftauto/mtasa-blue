@@ -32,6 +32,7 @@
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
 #include <game/Task.h>
+#include <game/CBuildingRemoval.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -3424,7 +3425,7 @@ void CClientGame::Event_OnIngame()
 
     g_pMultiplayer->DeleteAndDisableGangTags();
 
-    g_pGame->GetWorld()->ClearRemovedBuildingLists();
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
 
     g_pGame->ResetModelLodDistances();
