@@ -344,7 +344,7 @@ void CLuaArgument::ReadElement(const CElement* pElement) noexcept
     }
     
     m_iType = LUA_TUSERDATA;
-    m_pUserData = reinterpret_cast<void*>(pElement->GetID().Value());
+    m_pUserData = reinterpret_cast<void*>(&pElement->GetID().Value());
 }
 
 void CLuaArgument::ReadElementID(ElementID ID) noexcept
@@ -352,7 +352,7 @@ void CLuaArgument::ReadElementID(ElementID ID) noexcept
     m_strString = "";
     DeleteTableData();
     m_iType = LUA_TUSERDATA;
-    m_pUserData = (void*)reinterpret_cast<unsigned int*>(ID.Value());
+    m_pUserData = (void*)reinterpret_cast<std::uint32_t*>(&ID.Value());
 }
 
 void CLuaArgument::ReadScriptID(std::uint32_t uiScriptID) noexcept
@@ -360,12 +360,12 @@ void CLuaArgument::ReadScriptID(std::uint32_t uiScriptID) noexcept
     m_strString = "";
     DeleteTableData();
     m_iType = LUA_TUSERDATA;
-    m_pUserData = reinterpret_cast<void*>(uiScriptID);
+    m_pUserData = reinterpret_cast<void*>(&uiScriptID);
 }
 
 CElement* CLuaArgument::GetElement() const noexcept
 {
-    return CElementIDs::GetElement(TO_ELEMENTID(m_pUserData));
+    return CElementIDs::GetElement(*reinterpret_cast<std::uint32_t*>(m_pUserData));
 }
 
 bool CLuaArgument::GetAsString(SString& strBuffer) noexcept
@@ -558,7 +558,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
 }
 
 // Can't use bitStream.Version() here as it is sometimes not set
-bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const noexcept
+bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) const noexcept
 {
     SLuaTypeSync type;
 
@@ -586,7 +586,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
         // Table argument
         case LUA_TTABLE:
         {
-            ulong* pThingy;
+            std::uint32_t* pThingy;
             if (pKnownTables && (pThingy = MapFind(*pKnownTables, m_pTableData)))
             {
                 // Self-referencing table
@@ -664,7 +664,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
                 bitStream.Write(&type);
 
                 // Write its length
-                uint uiLength = sizeTemp;
+                auto uiLength = static_cast<std::uint32_t>(sizeTemp);
                 bitStream.WriteCompressed(uiLength);
 
                 // Write the content too if it's not empty
@@ -745,7 +745,7 @@ void CLuaArgument::DeleteTableData() noexcept
     m_pTableData = nullptr;
 }
 
-json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) noexcept
+json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) noexcept
 {
     switch (GetType())
     {
@@ -759,7 +759,7 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
         }
         case LUA_TTABLE:
         {
-            ulong* pTableId;
+            std::uint32_t* pTableId;
             if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
             {
                 // Self-referencing table
@@ -795,7 +795,7 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
             }
             if (strTemp.length() <= USHRT_MAX)
             {
-                return json_object_new_string_len((char*)strTemp.c_str(), strTemp.length());
+                return json_object_new_string_len((char*)strTemp.c_str(), static_cast<int>(strTemp.length()));
             }
             else
             {
@@ -807,7 +807,7 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
         case LUA_TUSERDATA:
         {
             CElement*  pElement = GetElement();
-            CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(GetUserData()));
+            CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(*reinterpret_cast<std::uint32_t*>(GetUserData()));
 
             // Elements are dynamic, so storing them is potentially unsafe
             if (pElement && bSerialize)
@@ -903,8 +903,9 @@ char* CLuaArgument::WriteToString(char* szBuffer, int length) noexcept
         case LUA_TLIGHTUSERDATA:
         case LUA_TUSERDATA:
         {
+            auto       id = *reinterpret_cast<std::uint32_t*>(GetUserData());
             CElement*  pElement = GetElement();
-            CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(reinterpret_cast<unsigned long>(GetUserData()));
+            CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(id);
             if (pElement)
             {
                 snprintf(szBuffer, length, "#E#%d", (int)pElement->GetID().Value());

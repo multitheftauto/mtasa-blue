@@ -163,7 +163,7 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     // push it onto the known tables
     auto size = pKnownTables->size();
     lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
-    lua_pushnumber(luaVM, ++size);
+    lua_pushnumber(luaVM, static_cast<lua_Number>(++size));
     lua_pushvalue(luaVM, -3);
     lua_settable(luaVM, -3);
     lua_pop(luaVM, 1);
@@ -213,7 +213,7 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
     // Call the function with our arguments
     pLuaMain->ResetInstructionCount();
 
-    int iret = pLuaMain->PCall(luaVM, m_Arguments.size(), LUA_MULTRET, 0);
+    int iret = pLuaMain->PCall(luaVM, static_cast<int>(m_Arguments.size()), LUA_MULTRET, 0);
     if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
     {
         SString strRes = ConformResourcePath(lua_tostring(luaVM, -1));
@@ -526,18 +526,18 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     return true;
 }
 
-bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const noexcept
+bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) const noexcept
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        pKnownTables = new CFastHashMap<CLuaArguments*, std::uint32_t>();
         bKnownTablesCreated = true;
     }
 
     bool bSuccess = true;
     pKnownTables->insert(make_pair((CLuaArguments*)this, pKnownTables->size()));
-    bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
+    bitStream.WriteCompressed(static_cast<std::uint32_t>(m_Arguments.size()));
 
     for (const auto& pArg : m_Arguments)
     {
@@ -578,12 +578,12 @@ json_object* CLuaArguments::WriteToJSONArray(bool bSerialize) noexcept
     return my_array;
 }
 
-json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) noexcept
+json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) noexcept
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        pKnownTables = new CFastHashMap<CLuaArguments*, std::uint32_t>();
         bKnownTablesCreated = true;
     }
 
@@ -683,7 +683,7 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON) noexcept
 
         std::vector<CLuaArguments*> knownTables;
 
-        for (auto i = 0; i < json_object_array_length(object); i++)
+        for (std::size_t i = 0; i < json_object_array_length(object); i++)
         {
             json_object* arrayObject = json_object_array_get_idx(object, i);
             CLuaArgument* pArgument = new CLuaArgument();

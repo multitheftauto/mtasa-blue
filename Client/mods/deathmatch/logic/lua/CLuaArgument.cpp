@@ -361,7 +361,8 @@ void CLuaArgument::ReadTable(const CLuaArguments* table) noexcept
 
 CClientEntity* CLuaArgument::GetElement() const noexcept
 {
-    return CElementIDs::GetElement(TO_ELEMENTID(m_pUserData));
+    ElementID ID = TO_ELEMENTID(m_pUserData);
+    return CElementIDs::GetElement(ID);
 }
 
 void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const noexcept
@@ -581,7 +582,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
 }
 
 // Can't use bitStream.Version() here as it is sometimes not set
-bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const noexcept
+bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) const noexcept
 {
     SLuaTypeSync type;
 
@@ -609,7 +610,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
         // Table argument
         case LUA_TTABLE:
         {
-            ulong* pTableId;
+            std::uint32_t* pTableId;
             if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
             {
                 // Self-referencing table
@@ -774,7 +775,7 @@ void CLuaArgument::DeleteTableData() noexcept
     m_pTableData = nullptr;
 }
 
-json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) noexcept
+json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) noexcept
 {
     switch (GetType())
     {
@@ -788,7 +789,7 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
         }
         case LUA_TTABLE:
         {
-            ulong* pTableId;
+            std::uint32_t* pTableId;
             if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
             {
                 // Self-referencing table
