@@ -449,12 +449,12 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     return true;
 }
 
-bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const noexcept
+bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) const noexcept
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        pKnownTables = new CFastHashMap<CLuaArguments*, std::uint32_t>();
         bKnownTablesCreated = true;
     }
 
@@ -501,12 +501,12 @@ json_object* CLuaArguments::WriteToJSONArray(bool bSerialize) noexcept
     return my_array;
 }
 
-json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) noexcept
+json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables) noexcept
 {
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
+        pKnownTables = new CFastHashMap<CLuaArguments*, std::uint32_t>();
         bKnownTablesCreated = true;
     }
 

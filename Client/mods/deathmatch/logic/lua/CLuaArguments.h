@@ -40,7 +40,7 @@ public:
     void CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = nullptr) noexcept;
 
     const CLuaArguments& operator=(const CLuaArguments& Arguments) noexcept;
-    CLuaArgument*        operator[](const unsigned int uiPosition) const noexcept;
+    CLuaArgument*        operator[](const std::size_t uiPosition) const noexcept;
 
     void ReadArgument(lua_State* luaVM, int uiIndex) noexcept;
     void ReadArguments(lua_State* luaVM, int uiIndexBegin = 1) noexcept;
@@ -65,11 +65,11 @@ public:
     void Pop() noexcept;
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
-    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = nullptr) const noexcept;
+    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables = nullptr) const noexcept;
     void         ValidateTableKeys() noexcept;
     bool         ReadFromJSONString(const char* szJSON) noexcept;
     bool         WriteToJSONString(std::string& strJSON, bool bSerialize = false, int flags = JSON_C_TO_STRING_PLAIN) noexcept;
-    json_object* WriteTableToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = nullptr) noexcept;
+    json_object* WriteTableToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables = nullptr) noexcept;
     json_object* WriteToJSONArray(bool bSerialize) noexcept;
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
     bool         ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
