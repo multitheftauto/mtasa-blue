@@ -1033,7 +1033,7 @@ int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
                         if (result.Count() == 0)
                             return "";
 
-                        CLuaArgument* returnedValue = *result.IterBegin();
+                        auto returnedValue = *result.begin();
                         if (returnedValue->GetType() == LUA_TSTRING)
                             return returnedValue->GetString();
                         else

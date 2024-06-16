@@ -161,7 +161,7 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     lua_newtable(luaVM);
 
     // push it onto the known tables
-    int size = pKnownTables->size();
+    auto size = pKnownTables->size();
     lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
     lua_pushnumber(luaVM, ++size);
     lua_pushvalue(luaVM, -3);
@@ -277,7 +277,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
     pLuaMain->ResetInstructionCount();
 
     // Call the function with our arguments
-    int iret = pLuaMain->PCall(luaVM, m_Arguments.size(), LUA_MULTRET, 0);
+    int iret = pLuaMain->PCall(luaVM, static_cast<int>(m_Arguments.size()), LUA_MULTRET, 0);
     if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
     {
         std::string strRes = ConformResourcePath(lua_tostring(luaVM, -1));
@@ -431,7 +431,7 @@ CLuaArgument* CLuaArguments::PushTimer(const CLuaTimer* pLuaTimer) noexcept
 CLuaArgument* CLuaArguments::PushDbQuery(const CDbJobData* pJobData) noexcept
 {
     CLuaArgument* pArgument = new CLuaArgument;
-    pArgument->ReadScriptID(pJobData->GetId());
+    pArgument->ReadScriptID(static_cast<std::uint32_t>(pJobData->GetId()));
     m_Arguments.push_back(pArgument);
     return pArgument;
 }
@@ -506,7 +506,7 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     if (bitStream.ReadCompressed(uiNumArgs))
     {
         pKnownTables->push_back(this);
-        for (auto i = 0; i < uiNumArgs; i++)
+        for (std::uint32_t i = 0; i < uiNumArgs; i++)
         {
             CLuaArgument* pArgument = new CLuaArgument();
             if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
