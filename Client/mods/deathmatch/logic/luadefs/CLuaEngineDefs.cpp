@@ -1947,7 +1947,8 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
-            lua_pushnumber(luaVM, pModelInfo->GetObjectPropertiesGroup());
+            uint16_t groupId = pModelInfo->GetObjectPropertiesGroup();
+            lua_pushnumber(luaVM, groupId == 0xFFFF ? -1 : groupId);
             return 1;
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
