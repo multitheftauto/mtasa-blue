@@ -354,7 +354,7 @@ void CMarker::Callback_OnCollisionDestroy(CColShape* pCollision)
         m_pCollision = NULL;
 }
 
-float CColTube::adjustSize(float fSize)
+float CColTube::AdjustSize(float fSize)
 {
     if (std::fmod(fSize, 2.0) == 0.0)            // check for even
     {
@@ -411,7 +411,7 @@ void CMarker::UpdateCollisionObject(unsigned char ucOldType)
     else if (m_ucType == CMarker::TYPE_CYLINDER)
     {
         CColTube* pShape = static_cast<CColTube*>(m_pCollision);
-        pShape->SetRadius(pShape->adjustSize(m_fSize));
+        pShape->SetRadius(pShape->AdjustSize(m_fSize));
         pShape->SetHeight(m_fSize);
     }
     else
