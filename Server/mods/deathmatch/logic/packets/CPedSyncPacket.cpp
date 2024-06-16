@@ -40,12 +40,10 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
 
         // Did we recieve position?
         if (ucFlags & 0x01)
-        {
-            if (BitStream.Can(eBitStreamVersion::PedSync_Revision))
-                Data.ReadSpatialData(BitStream);
-            else
-                Data.ReadSpatialDataBC(BitStream);
-        }        
+        {    
+            if (!(BitStream.Can(eBitStreamVersion::PedSync_Revision) ? Data.ReadSpatialData(BitStream) : Data.ReadSpatialDataBC(BitStream)))
+                return false;
+        }
 
         // Health and armour
         if (ucFlags & 0x08)
