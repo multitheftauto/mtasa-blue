@@ -41,21 +41,21 @@ bool CPedSyncPacket::Read(NetBitStreamInterface& BitStream)
         // Did we recieve position?
         if (ucFlags & 0x01)
         {
-            if (!BitStream.Read(Data.vecPosition.fX) || !BitStream.Read(Data.vecPosition.fY) || !BitStream.Read(Data.vecPosition.fZ))
+            if (!BitStream.Read(&Data.position))
                 return false;
         }
 
         // Rotation
         if (ucFlags & 0x02)
         {
-            if (!BitStream.Read(Data.fRotation))
+            if (!BitStream.Read(&Data.rotation))
                 return false;
         }
 
         // Velocity
         if (ucFlags & 0x04)
         {
-            if (!BitStream.Read(Data.vecVelocity.fX) || !BitStream.Read(Data.vecVelocity.fY) || !BitStream.Read(Data.vecVelocity.fZ))
+            if (!BitStream.Read(&Data.velocity))
                 return false;
         }
 
@@ -110,24 +110,14 @@ bool CPedSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     // Position and rotation
     if (Data.ucFlags & 0x01)
-    {
-        BitStream.Write(Data.vecPosition.fX);
-        BitStream.Write(Data.vecPosition.fY);
-        BitStream.Write(Data.vecPosition.fZ);
-    }
+        BitStream.Write(&Data.position);
 
     if (Data.ucFlags & 0x02)
-    {
-        BitStream.Write(Data.fRotation);
-    }
+        BitStream.Write(&Data.rotation);
 
     // Velocity
     if (Data.ucFlags & 0x04)
-    {
-        BitStream.Write(Data.vecVelocity.fX);
-        BitStream.Write(Data.vecVelocity.fY);
-        BitStream.Write(Data.vecVelocity.fZ);
-    }
+        BitStream.Write(&Data.velocity);
 
     // Health, armour, on fire and is in water
     if (Data.ucFlags & 0x08)
