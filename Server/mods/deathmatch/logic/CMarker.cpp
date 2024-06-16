@@ -356,8 +356,7 @@ void CMarker::Callback_OnCollisionDestroy(CColShape* pCollision)
 
 float CColTube::AdjustSize(float fSize)
 {
-    fSize = (fSize / 2.0f) + 0.15f; 
-    return fSize;
+    return (fSize / 2.0f) + 0.15f; 
 }
 
 void CMarker::UpdateCollisionObject(unsigned char ucOldType)

@@ -300,8 +300,7 @@ float CClientMarker::GetSize() const
 
 float CClientColTube::AdjustSize(float fSize)
 {
-    fSize = (fSize / 2.0f) + 0.15f;  
-    return fSize;
+    return (fSize / 2.0f) + 0.15f;  
 }
 
 void CClientMarker::SetSize(float fSize)
