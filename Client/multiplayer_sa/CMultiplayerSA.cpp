@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CWorld.h>
+#include <game/CBuildingRemoval.h>
 #include <game/CAnimBlendAssocGroup.h>
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
@@ -5853,15 +5854,15 @@ bool CheckRemovedModelNoSet()
     bNextHookSetModel = false;
     bCodePathCheck = bNextHookSetModel;
     pLODInterface = NULL;
-    CWorld* pWorld = pGameInterface->GetWorld();
+    CBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval();
     // You never know.
-    if (pWorld)
+    if (pBuildingRemoval)
     {
         // Is the model in question even removed?
-        if (pWorld->IsModelRemoved(pEntityWorldAdd->m_nModelIndex))
+        if (pBuildingRemoval->IsModelRemoved(pEntityWorldAdd->m_nModelIndex))
         {
             // is the replaced model in the spherical radius of any building removal
-            if (pGameInterface->GetWorld()->IsRemovedModelInRadius(pEntityWorldAdd))
+            if (pGameInterface->GetBuildingRemoval()->IsRemovedModelInRadius(pEntityWorldAdd))
             {
                 // if it is next hook remove it from the world
                 return true;
@@ -5912,7 +5913,7 @@ void HideEntitySomehow()
         // Init pInterface with the Initial model
         CEntitySAInterface* pInterface = pLODInterface;
         // Grab the removal for the interface
-        SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pInterface);
+        SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pInterface);
         // Remove down the LOD tree
         if (pBuildingRemoval && pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 &&
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
@@ -5932,7 +5933,7 @@ void HideEntitySomehow()
         if (pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 &&
             (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
         {
-            pGameInterface->GetWorld()->AddBinaryBuilding(pInterface);
+            pGameInterface->GetBuildingRemoval()->AddBinaryBuilding(pInterface);
         }
     }
     // Reset our next hook variable
@@ -5962,7 +5963,7 @@ void                StorePointerToBuilding()
 {
     if (pBuildingAdd != NULL)
     {
-        pGameInterface->GetWorld()->AddDataBuilding(pBuildingAdd);
+        pGameInterface->GetBuildingRemoval()->AddDataBuilding(pBuildingAdd);
     }
 }
 
@@ -5991,7 +5992,7 @@ bool CheckForRemoval()
         // Init pInterface with the Initial model
         CEntitySAInterface* pInterface = pLODInterface;
         // Remove down the LOD tree
-        if (pGameInterface->GetWorld()->IsObjectRemoved(pInterface))
+        if (pGameInterface->GetBuildingRemoval()->IsObjectRemoved(pInterface))
         {
             return true;
         }
@@ -6020,7 +6021,7 @@ void _declspec(naked) Hook_CWorld_ADD_CPopulation_ConvertToRealObject()
 void RemoveObjectIfNeeded()
 {
     TIMING_CHECKPOINT("+RemoveObjectIfNeeded");
-    SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pLODInterface);
+    SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
         if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
@@ -6069,7 +6070,7 @@ void                RemovePointerToBuilding()
 {
     if (pBuildingRemove->nType == ENTITY_TYPE_BUILDING || pBuildingRemove->nType == ENTITY_TYPE_DUMMY || pBuildingRemove->nType == ENTITY_TYPE_OBJECT)
     {
-        pGameInterface->GetWorld()->RemoveWorldBuildingFromLists(pBuildingRemove);
+        pGameInterface->GetBuildingRemoval()->RemoveWorldBuildingFromLists(pBuildingRemove);
     }
 }
 
@@ -6099,7 +6100,7 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
 // if it's replaced get rid of it
 void RemoveDummyIfReplaced()
 {
-    SBuildingRemoval* pBuildingRemoval = pGameInterface->GetWorld()->GetBuildingRemoval(pLODInterface);
+    SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pLODInterface);
     if (pBuildingRemoval != NULL)
     {
         if ((DWORD)(pBuildingAdd->vtbl) != VTBL_CPlaceable)
