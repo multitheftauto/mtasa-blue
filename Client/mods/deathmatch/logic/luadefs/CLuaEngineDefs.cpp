@@ -2498,13 +2498,7 @@ bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t
     {
         case ePools::BUILDING_POOL:
         {
-            m_pBuildingManager->DestroyAllForABit();
-
-            bool success = g_pGame->SetBuildingPoolSize(newSize);
-
-            m_pBuildingManager->RestoreDestroyed();
-
-            return success;
+            return m_pBuildingManager->SetPoolCapacity(newSize);
         }
         default:
             throw std::invalid_argument("Can not change this pool capacity");
