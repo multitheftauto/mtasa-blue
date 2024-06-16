@@ -356,18 +356,7 @@ void CMarker::Callback_OnCollisionDestroy(CColShape* pCollision)
 
 float CColTube::AdjustSize(float fSize)
 {
-    if (std::fmod(fSize, 2.0) == 0.0)            // check for even
-    {
-        fSize = (fSize / 2.0f) + 0.14f;
-    }
-    else if (std::fmod(fSize, 2.0) == 1.0)            // check for odd
-    {
-        fSize = 2.4f + 1.03f * ((fSize - 5.0f) / 2.0f);
-    }
-    else
-    {
-        fSize = (fSize / 2.0f) + 0.15f;            // check for float
-    }
+    fSize = (fSize / 2.0f) + 0.15f; 
     return fSize;
 }
 
