@@ -221,6 +221,7 @@ public:
     virtual void SetAdjustablePropertyValue(unsigned short usAdjustableProperty) = 0;
     virtual void SetHeliRotorSpeed(float fSpeed) = 0;
     virtual void SetPlaneRotorSpeed(float fSpeed) = 0;
+    virtual void SetVehicleWheelSpeed(float fSpeed) = 0;
     virtual void SetTaxiLightOn(bool bLightState) = 0;
     virtual void SetExplodeTime(unsigned long ulTime) = 0;
     virtual void SetRadioStatus(bool bStatus) = 0;

@@ -302,6 +302,8 @@ public:
 
     bool GetRotorSpeed(float&);
     bool SetRotorSpeed(float);
+    bool SetWheelSpeed(float);
+
 
     void SetHeliRotorSpeed(float fSpeed);
     void SetPlaneRotorSpeed(float fSpeed);

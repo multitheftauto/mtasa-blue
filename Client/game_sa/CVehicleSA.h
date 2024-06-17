@@ -568,6 +568,7 @@ public:
     };
     void SetHeliRotorSpeed(float fSpeed) { *reinterpret_cast<float*>(reinterpret_cast<unsigned int>(m_pInterface) + 2124) = fSpeed; };
     void SetPlaneRotorSpeed(float fSpeed);
+    void SetVehicleWheelSpeed(float fSpeed);
     void SetExplodeTime(unsigned long ulTime) { *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240) = ulTime; };
     void SetRadioStatus(bool bStatus) { *reinterpret_cast<unsigned char*>(reinterpret_cast<unsigned int>(m_pInterface) + 0x1D3) = bStatus; };
 
