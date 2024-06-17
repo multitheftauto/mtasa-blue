@@ -12,6 +12,9 @@
 #pragma once
 #include "CLuaDefs.h"
 
+#include <variant>
+#include <optional>
+
 class CLuaAudioDefs : public CLuaDefs
 {
 public:
@@ -19,24 +22,51 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Audio funcs
-    LUA_DECLARE(PlaySoundFrontEnd);
-    LUA_DECLARE(SetAmbientSoundEnabled);
-    LUA_DECLARE(IsAmbientSoundEnabled);
-    LUA_DECLARE(ResetAmbientSounds);
-    LUA_DECLARE(SetWorldSoundEnabled);
-    LUA_DECLARE(IsWorldSoundEnabled);
-    LUA_DECLARE(ResetWorldSounds);
-    LUA_DECLARE(PlaySFX);
-    LUA_DECLARE(PlaySFX3D);
-    LUA_DECLARE(GetSFXStatus);
+    bool PlaySoundFrontEnd(std::uint8_t sound);
+    bool SetAmbientSoundEnabled(eAmbientSoundType type, bool enabled) noexcept;
+    bool IsAmbientSoundEnabled(eAmbientSoundType type) noexcept;
+    bool ResetAmbientSounds() noexcept;
+    bool SetWorldSoundEnabled (
+        int group,
+        std::optional<int> index,
+        bool enable,
+        std::optional<bool> immediate
+    ) noexcept;
+    bool IsWorldSoundEnabled(int group, std::optional<int> index) noexcept;
+    bool ResetWorldSounds() noexcept;
+    CClientSound* PlaySFX(lua_State* luaVM, eAudioLookupIndex container, int bank,
+        int audio, std::optional<bool> loop
+    );
+    CClientSound* PlaySFX3D(lua_State* luaVM, eAudioLookupIndex container, int bank,
+        int audio, float posX, float posY, float posZ, std::optional<bool> loop
+    );
+    bool GetSFXStatus(eAudioLookupIndex container) noexcept;
 
     // Sound effects and synth functions
-    LUA_DECLARE(PlaySound);
-    LUA_DECLARE(PlaySound3D);
-    LUA_DECLARE(StopSound);
-    LUA_DECLARE(SetSoundPosition);
-    LUA_DECLARE(GetSoundPosition);
-    LUA_DECLARE(GetSoundLength);
+    CClientSound* PlaySound(
+        lua_State* luaVM,
+        SString path,
+        std::optional<bool> loop,
+        std::optional<bool> throttle
+    );
+    CClientSound* PlaySound3D(
+        lua_State* luaVM,
+        SString path,
+        float x,
+        float y,
+        float z,
+        std::optional<bool> loop,
+        std::optional<bool> throttle
+    );
+    bool StopSound(CClientSound* sound) noexcept;
+    bool SetSoundPosition(
+        std::variant<CClientSound*, CClientPlayer*> element,
+        double pos
+    ) noexcept;
+    double GetSoundPosition(
+        std::variant<CClientSound*, CClientPlayer*> element
+    ) noexcept;
+    double GetSoundLength(std::variant<CClientSound*, CClientPlayer*> element) noexcept;
     LUA_DECLARE(GetSoundBufferLength);
     LUA_DECLARE(SetSoundPaused);
     LUA_DECLARE(IsSoundPaused);

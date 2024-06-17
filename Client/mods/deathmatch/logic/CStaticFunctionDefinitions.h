@@ -348,9 +348,16 @@ public:
     static bool SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bMute, bool bImmediate);
     static bool IsWorldSoundEnabled(uint uiGroup, uint uiIndex, bool& bOutMute);
     static bool ResetWorldSounds();
-    static bool PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound);
-    static bool PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop,
-                          CClientSound*& outSound);
+    static CClientSound* PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex,
+        int iBankIndex, int iAudioIndex, bool bLoop) noexcept;
+    static bool PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex,
+        int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound);
+    static CClientSound* PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex,
+        int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop) noexcept;
+    static bool PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex,
+        int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop,
+        CClientSound*& outSound) noexcept;
+    static bool GetSFXStatus(eAudioLookupIndex containerIndex) noexcept;
     static bool GetSFXStatus(eAudioLookupIndex containerIndex, bool& bOutNotCut);
 
     // Blip funcs
@@ -738,7 +745,9 @@ public:
                                      bool bThrottle);
     static bool          StopSound(CClientSound& Sound);
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
+    static double        GetSoundPosition(CClientSound& Sound) noexcept;
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);
+    static double        GetSoundLength(CClientSound& Sound) noexcept;
     static bool          GetSoundLength(CClientSound& Sound, double& dLength);
     static bool          GetSoundBufferLength(CClientSound& Sound, double& dBufferLength);
     static bool          SetSoundPaused(CClientSound& Sound, bool bPaused);
@@ -768,6 +777,8 @@ public:
 
     static bool   SetSoundPosition(CClientPlayer& Player, double dPosition);
     static bool   GetSoundPosition(CClientPlayer& Player, double& dPosition);
+    static std::optional<double> GetSoundPosition(CClientPlayer& Player) noexcept;
+    static std::optional<double> GetSoundLength(CClientPlayer& Player) noexcept;
     static bool   GetSoundLength(CClientPlayer& Player, double& dLength);
     static bool   SetSoundPaused(CClientPlayer& Sound, bool bPaused);
     static bool   IsSoundPaused(CClientPlayer& Sound, bool& bPaused);
@@ -781,6 +792,11 @@ public:
     static bool   SetSoundEffectEnabled(CClientPlayer& Player, const SString& strEffectName, bool bEnable);
     static bool   SetSoundPan(CClientPlayer& Player, float fPan);
     static bool   GetSoundPan(CClientPlayer& Player, float& fPan);
+
+    // Sound/Player voice funcs
+    static bool   SetSoundPosition(std::variant<CClientSound*, CClientPlayer*>& element, double dPosition) noexcept;
+    static double GetSoundPosition(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
+    static double GetSoundLength(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
 
     // Handling funcs
     static eHandlingProperty GetVehicleHandlingEnum(std::string strProperty);
