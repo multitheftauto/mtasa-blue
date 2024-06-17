@@ -106,11 +106,8 @@ bool CClientWaterManager::SetAllElementWaterLevel(float fLevel, void* pChangeSou
 
 bool CClientWaterManager::ResetAllElementWaterLevel()
 {
-    list<CClientWater*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); iter++)
-    {
-        (*iter)->ResetLevel();
-    }
+    for (CClientWater* pWater : m_List)
+        pWater->ResetLevel();
     return true;
 }
 
