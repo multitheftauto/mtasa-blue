@@ -98,7 +98,7 @@ bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* p
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         // Apply the data and return success
         m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
         return true;
@@ -112,7 +112,7 @@ const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eM
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         // Return it
         return m_pOriginalEntries[eHandling];
     }
@@ -125,14 +125,14 @@ const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eMode
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         // Return it
         return m_pModelEntries[eHandling];
     }
     return nullptr;
 }
 
-eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
+eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& strName)
 {
     const auto it = m_HandlingNames.find(strName);
     return it != m_HandlingNames.end() ? it->second : HANDLING_MAX;
@@ -144,7 +144,7 @@ bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         // Return if we have changed
         return m_bModelHandlingChanged[eHandling];
     }
@@ -157,7 +157,7 @@ void CHandlingManager::SetModelHandlingHasChanged(eVehicleTypes eModel, bool bCh
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         // Return if we have changed.
         m_bModelHandlingChanged[eHandling] = bChanged;
     }

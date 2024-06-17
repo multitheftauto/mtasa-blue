@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CHandlingManager.h
+ *  FILE:        Server/mods/deathmatch/logic/CHandlingManager.h
  *  PURPOSE:     Header file for vehicle handling manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -32,7 +32,7 @@ public:
     eHandlingTypes GetHandlingID(eVehicleTypes eModel);
 
     // Helper functions
-    eHandlingProperty GetPropertyEnumFromName(std::string strName);
+    eHandlingProperty GetPropertyEnumFromName(const std::string& strName);
     bool              HasModelHandlingChanged(eVehicleTypes eModel);
     void              SetModelHandlingHasChanged(eVehicleTypes eModel, bool bChanged);
 

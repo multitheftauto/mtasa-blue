@@ -214,7 +214,7 @@ CHandlingManagerSA::~CHandlingManagerSA()
     }
 }
 
-eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(std::string strName)
+eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(const std::string& strName)
 {
     const auto it = m_HandlingNames.find(strName);
     return it != m_HandlingNames.end() ? it->second : HANDLING_MAX;
@@ -246,7 +246,7 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes 
     if (IsVehicleModel(eModel))
     {
         // Get our Handling ID, the default value will be HT_LANDSTAL
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         // Return it
         return m_pOriginalEntries[eHandling];
     }
@@ -259,7 +259,7 @@ const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eV
     if (IsVehicleModel(eModel))
     {
         // Get our Handling ID, the default value will be HT_LANDSTAL
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         // Original GTA:SA behavior
         if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
             return m_pOriginalFlyingEntries[0];
@@ -275,7 +275,7 @@ const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehic
     if (IsVehicleModel(eModel))
     {
         // Get our Handling ID, the default value will be HT_LANDSTAL
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         // Original GTA:SA behavior
         if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
             return m_pOriginalBoatEntries[0];
@@ -291,7 +291,7 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehic
     if (IsVehicleModel(eModel))
     {
         // Get our Handling ID, the default value will be HT_LANDSTAL
-        const auto eHandling = GetHandlingID(eModel);
+        eHandlingTypes eHandling = GetHandlingID(eModel);
         if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
             return m_pOriginalBikeEntries[eHandling - HT_BIKE];
         else if (eHandling == HT_FAGGIO)
@@ -9158,10 +9158,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)
 {
     // Grab us a multiplayer_sa pointer
-    const auto pMultiplayer = g_pCore->GetMultiplayer();
-    const auto eModel = pEntry->GetModel();
+    CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
+    eVehicleTypes eModel = pEntry->GetModel();
     // Find our original data
-    const auto pOriginal = m_pOriginalEntries[eModel];
+    CHandlingEntrySA* pOriginal = m_pOriginalEntries[eModel];
     // Default bChanged to false
     bool bChanged = false;
 
