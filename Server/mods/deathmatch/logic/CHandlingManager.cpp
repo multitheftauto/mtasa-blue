@@ -95,41 +95,38 @@ CHandlingEntry* CHandlingManager::CreateHandlingData()
 bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry)
 {
     // Within range?
-    if (CVehicleManager::IsValidModel(eModel))
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Apply the data and return success
-        m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
-        return true;
-    }
-    return false;
+    if (!CVehicleManager::IsValidModel(eModel))
+        return false;
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Apply the data and return success
+    m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
+    return true;
 }
 
 const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (CVehicleManager::IsValidModel(eModel))
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return it
-        return m_pOriginalEntries[eHandling];
-    }
-    return nullptr;
+    if (!CVehicleManager::IsValidModel(eModel))
+        return nullptr;
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Return it
+    return m_pOriginalEntries[eHandling];
 }
 
 const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eModel)
 {
     // Within range?
-    if (CVehicleManager::IsValidModel(eModel))
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return it
-        return m_pModelEntries[eHandling];
-    }
-    return nullptr;
+    if (!CVehicleManager::IsValidModel(eModel))
+        return nullptr;
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Return it
+    return m_pModelEntries[eHandling];
 }
 
 eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& strName)
@@ -141,26 +138,25 @@ eHandlingProperty CHandlingManager::GetPropertyEnumFromName(const std::string& s
 bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
 {
     // Within range?
-    if (CVehicleManager::IsValidModel(eModel))
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return if we have changed
-        return m_bModelHandlingChanged[eHandling];
-    }
-    return false;
+    if (!CVehicleManager::IsValidModel(eModel))
+        return false;
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Return if we have changed
+    return m_bModelHandlingChanged[eHandling];
 }
 
 void CHandlingManager::SetModelHandlingHasChanged(eVehicleTypes eModel, bool bChanged)
 {
     // Within range?
-    if (CVehicleManager::IsValidModel(eModel))
-    {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return if we have changed.
-        m_bModelHandlingChanged[eHandling] = bChanged;
-    }
+    if (!CVehicleManager::IsValidModel(eModel))
+        return;
+
+    // Get our Handling ID
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Return if we have changed.
+    m_bModelHandlingChanged[eHandling] = bChanged;
 }
 
 // Return the handling manager id

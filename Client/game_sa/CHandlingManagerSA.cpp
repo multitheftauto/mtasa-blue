@@ -243,61 +243,59 @@ CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData()
 const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel)
 {
     // Vehicle?
-    if (IsVehicleModel(eModel))
-    {
-        // Get our Handling ID, the default value will be HT_LANDSTAL
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Return it
-        return m_pOriginalEntries[eHandling];
-    }
-    return nullptr;
+    if (!IsVehicleModel(eModel))
+        return nullptr;
+
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Return it
+    return m_pOriginalEntries[eHandling];
 }
 
 const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel)
 {
     // Vehicle?
-    if (IsVehicleModel(eModel))
-    {
-        // Get our Handling ID, the default value will be HT_LANDSTAL
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Original GTA:SA behavior
-        if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
-            return m_pOriginalFlyingEntries[0];
-        else
-            return m_pOriginalFlyingEntries[eHandling - HT_SEAPLANE];
-    }
-    return nullptr;
+    if (!IsVehicleModel(eModel))
+        return nullptr;
+
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Original GTA:SA behavior
+    if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
+        return m_pOriginalFlyingEntries[0];
+    else
+        return m_pOriginalFlyingEntries[eHandling - HT_SEAPLANE];
 }
 
 const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel)
 {
     // Vehicle?
-    if (IsVehicleModel(eModel))
-    {
-        // Get our Handling ID, the default value will be HT_LANDSTAL
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        // Original GTA:SA behavior
-        if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
-            return m_pOriginalBoatEntries[0];
-        else
-            return m_pOriginalBoatEntries[eHandling - HT_PREDATOR];
-    }
-    return nullptr;
+    if (!IsVehicleModel(eModel))
+        return nullptr;
+
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    // Original GTA:SA behavior
+    if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
+        return m_pOriginalBoatEntries[0];
+    else
+        return m_pOriginalBoatEntries[eHandling - HT_PREDATOR];
 }
 
 const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel)
 {
     // Vehicle?
-    if (IsVehicleModel(eModel))
-    {
-        // Get our Handling ID, the default value will be HT_LANDSTAL
-        eHandlingTypes eHandling = GetHandlingID(eModel);
-        if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
-            return m_pOriginalBikeEntries[eHandling - HT_BIKE];
-        else if (eHandling == HT_FAGGIO)
-            return m_pOriginalBikeEntries[13];
-    }
-    return nullptr;
+    if (!IsVehicleModel(eModel))
+        return nullptr;
+
+    // Get our Handling ID, the default value will be HT_LANDSTAL
+    eHandlingTypes eHandling = GetHandlingID(eModel);
+    if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
+        return m_pOriginalBikeEntries[eHandling - HT_BIKE];
+    else if (eHandling == HT_FAGGIO)
+        return m_pOriginalBikeEntries[13];
+    else
+        return nullptr;
 }
 
 // Return the handling manager id
