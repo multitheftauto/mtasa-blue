@@ -105,8 +105,9 @@ public:
     static bool          IsElementFrozenWaitingForGroundToLoad(CClientEntity& Entity, bool& bWaitingForGroundToLoad);
 
     // Radio funcs
-    static bool SetRadioChannel(unsigned char& ucChannel);
-    static bool GetRadioChannel(unsigned char& ucChannel);
+    static bool         SetRadioChannel(unsigned char& ucChannel);
+    static std::uint8_t GetRadioChannel() noexcept;
+    static bool         GetRadioChannel(unsigned char& ucChannel);
 
     // Player get funcs
     static CClientPlayer* GetLocalPlayer();
@@ -777,6 +778,7 @@ public:
     static bool          GetSoundMetaTags(CClientSound& Sound, const SString& strFormat, SString& strMetaTags);
     static bool          SetSoundEffectEnabled(CClientSound& Sound, const SString& strEffectName, bool bEnable);
     static bool          SetSoundPan(CClientSound& Sound, float fPan);
+    static float         GetSoundPan(CClientSound& pSound) noexcept;
     static bool          GetSoundPan(CClientSound& Sound, float& fPan);
 
     // Player Voice Sound Functions
@@ -800,6 +802,7 @@ public:
     static bool                  GetSoundLevelData(CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight);
     static bool                  SetSoundEffectEnabled(CClientPlayer& Player, const SString& strEffectName, bool bEnable);
     static bool                  SetSoundPan(CClientPlayer& Player, float fPan);
+    static std::optional<float>  GetSoundPan(CClientPlayer& Player) noexcept;
     static bool                  GetSoundPan(CClientPlayer& Player, float& fPan);
 
     // Sound/Player voice funcs
@@ -814,7 +817,9 @@ public:
     static float  GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
     static float* GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*>& element, int iLength, int iBands) noexcept;
     static float* GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*>& element, int iLength) noexcept;
-    static bool   GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*>& element, int& dwLeft, int& dwRight) noexcept;
+    static bool   GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*>& element, DWORD& dwLeft, DWORD& dwRight) noexcept;
+    static bool   SetSoundPan(std::variant<CClientSound*, CClientPlayer*>& element, float fPan) noexcept;
+    static float  GetSoundPan(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
 
     // Handling funcs
     static eHandlingProperty GetVehicleHandlingEnum(std::string strProperty);

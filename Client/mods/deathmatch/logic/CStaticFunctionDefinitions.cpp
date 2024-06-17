@@ -1616,9 +1616,14 @@ bool CStaticFunctionDefinitions::SetRadioChannel(unsigned char& ucChannel)
     return m_pPlayerManager->GetLocalPlayer()->SetCurrentRadioChannel(ucChannel);
 }
 
+std::uint8_t CStaticFunctionDefinitions::GetRadioChannel() noexcept
+{
+    return m_pPlayerManager->GetLocalPlayer()->GetCurrentRadioChannel();
+}
+
 bool CStaticFunctionDefinitions::GetRadioChannel(unsigned char& ucChannel)
 {
-    ucChannel = m_pPlayerManager->GetLocalPlayer()->GetCurrentRadioChannel();
+    ucChannel = GetRadioChannel();
     return true;
 }
 
@@ -8501,15 +8506,13 @@ bool CStaticFunctionDefinitions::GetSoundLevelData(CClientPlayer& Player, DWORD&
 
 bool CStaticFunctionDefinitions::GetSoundLevelData(
     std::variant<CClientSound*, CClientPlayer*>& element,
-    int& dwLeft,
-    int& dwRight
+    DWORD& dwLeft,
+    DWORD& dwRight
 ) noexcept {
-    DWORD left = dwLeft;
-    DWORD right = dwRight;
     if (std::holds_alternative<CClientSound*>(element))
-        return GetSoundLevelData(*std::get<CClientSound*>(element), left, right);
+        return GetSoundLevelData(*std::get<CClientSound*>(element), dwLeft, dwRight);
     else if (std::holds_alternative<CClientPlayer*>(element))
-        return GetSoundLevelData(*std::get<CClientPlayer*>(element), left, right);
+        return GetSoundLevelData(*std::get<CClientPlayer*>(element), dwLeft, dwRight);
 }
 
 bool CStaticFunctionDefinitions::GetSoundBPM(CClientSound& Sound, float& fBPM)
@@ -8617,6 +8620,27 @@ bool CStaticFunctionDefinitions::SetSoundPan(CClientPlayer& Player, float fPan)
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetSoundPan (
+    std::variant<CClientSound*, CClientPlayer*>& element,
+    float fPan
+) noexcept {
+    if (std::holds_alternative<CClientSound*>(element))
+        return SetSoundPan(*std::get<CClientSound*>(element), fPan);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return SetSoundPan(*std::get<CClientPlayer*>(element), fPan);
+}
+
+std::optional<float> CStaticFunctionDefinitions::GetSoundPan(CClientPlayer& Player) noexcept
+{
+    CClientPlayerVoice* pVoice = Player.GetVoice();
+    if (!pVoice)
+        return std::nullopt;
+
+    float fPan;
+    pVoice->GetPan(fPan);
+    return fPan;
+}
+
 bool CStaticFunctionDefinitions::GetSoundPan(CClientPlayer& Player, float& fPan)
 {
     CClientPlayerVoice* pVoice = Player.GetVoice();
@@ -8624,6 +8648,15 @@ bool CStaticFunctionDefinitions::GetSoundPan(CClientPlayer& Player, float& fPan)
         return pVoice->GetPan(fPan);
 
     return false;
+}
+
+float CStaticFunctionDefinitions::GetSoundPan(
+    std::variant<CClientSound*, CClientPlayer*>& element
+) noexcept {
+    if (std::holds_alternative<CClientSound*>(element))
+        return GetSoundPan(*std::get<CClientSound*>(element));
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return GetSoundPan(*std::get<CClientPlayer*>(element)).value_or(0.0);
 }
 
 /** Version functions **/
@@ -10178,6 +10211,15 @@ bool CStaticFunctionDefinitions::RemovePedFromVehicle(CClientPed* pPed)
 bool CStaticFunctionDefinitions::SetSoundPan(CClientSound& pSound, float fPan)
 {
     return pSound.SetPan(fPan);
+}
+
+float CStaticFunctionDefinitions::GetSoundPan(CClientSound& pSound) noexcept
+{
+    // TODO: Refactor .GetPad method so it will return a float instead of
+    // taking a lvalue parameter
+    float fPan;
+    pSound.GetPan(fPan);
+    return fPan;
 }
 
 bool CStaticFunctionDefinitions::GetSoundPan(CClientSound& pSound, float& fPan)

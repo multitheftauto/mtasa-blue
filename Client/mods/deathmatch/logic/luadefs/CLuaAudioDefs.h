@@ -13,6 +13,7 @@
 #include "CLuaDefs.h"
 
 #include "../Shared/mods/deathmatch/logic/lua/CLuaMultiReturn.h"
+#include <unordered_map>
 #include <variant>
 #include <optional>
 
@@ -95,10 +96,10 @@ public:
         int samples
     ) noexcept;
     static bool SetSoundPanningEnabled(CClientSound* sound, bool enable) noexcept;
-    LUA_DECLARE(IsSoundPanEnabled);
-    static CLuaMultiReturn<int, int> GetSoundLevelData(
+    static std::variant<bool, CLuaMultiReturn<std::uint32_t, std::uint32_t>> GetSoundLevelData(
         std::variant<CClientSound*, CClientPlayer*> element
     ) noexcept;
+    LUA_DECLARE(IsSoundPanEnabled);
     LUA_DECLARE(GetSoundBPM);
     LUA_DECLARE(SetSoundMinDistance);
     LUA_DECLARE(GetSoundMinDistance);
@@ -108,18 +109,24 @@ public:
     LUA_DECLARE(SetSoundEffectEnabled);
     LUA_DECLARE(GetSoundEffects);
     LUA_DECLARE(SetSoundEffectParameter);
-    LUA_DECLARE(GetSoundEffectParameters);
-    LUA_DECLARE(SetSoundPan);
-    LUA_DECLARE(GetSoundPan);
+    static std::variant<bool, std::unordered_map<const char*, float>> GetSoundEffectParameters(
+        CClientSound* sound,
+        eSoundEffectType effectType
+    ) noexcept;
+    static bool SetSoundPan(
+        std::variant<CClientSound*, CClientPlayer*> element,
+        float pan
+    ) noexcept;
+    static float GetSoundPan(std::variant<CClientSound*, CClientPlayer*> element) noexcept;
 
-    static bool SetSoundLooped(CClientSound* pSound, bool bLoop);
-    static bool IsSoundLooped(CClientSound* pSound);
+    static bool SetSoundLooped(CClientSound* pSound, bool bLoop) noexcept;
+    static bool IsSoundLooped(CClientSound* pSound) noexcept;
 
     // Radio functions
-    LUA_DECLARE(SetRadioChannel);
-    LUA_DECLARE(GetRadioChannel);
-    LUA_DECLARE(GetRadioChannelName);
+    static bool SetRadioChannel(std::uint8_t channel) noexcept;
+    static std::uint8_t GetRadioChannel() noexcept;
+    static std::variant<bool, const char*> GetRadioChannelName(int channel) noexcept;
 
-    static bool ShowSound(bool state);
-    static bool IsShowSoundEnabled();
+    static bool ShowSound(bool state) noexcept;
+    static bool IsShowSoundEnabled() noexcept;
 };
