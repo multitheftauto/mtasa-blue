@@ -1614,7 +1614,7 @@ bool CClientVehicle::SetRotorSpeed(float fSpeed)
     }
 }
 
-bool CClientVehicle::SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4)
+bool CClientVehicle::SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept
 {
     if (!m_pVehicle)
         return false;

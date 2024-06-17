@@ -2223,7 +2223,7 @@ bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpee
     return pVehicle->SetRotorSpeed(fSpeed);
 }
 
-bool CLuaVehicleDefs::SetVehicleWheelsRotation(CClientVehicle* pVehicle, float fRotation)
+bool CLuaVehicleDefs::SetVehicleWheelsRotation(CClientVehicle* pVehicle, float fRotation) noexcept
 {
     return pVehicle->SetWheelsRotation(fRotation, fRotation, fRotation, fRotation);
 }

@@ -495,7 +495,7 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
     pInterface->m_fPropSpeed = fSpeed;
 }
 
-void CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4)
+void CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
 {
     auto pInterface = static_cast<CAutomobileSAInterface*>(GetInterface());
     pInterface->m_wheelRotation[0] = fWheelRot1;
@@ -504,7 +504,7 @@ void CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, flo
     pInterface->m_wheelRotation[3] = fWheelRot4;
 }
 
-void CVehicleSA::SetBikeWheelRotation(float fWheelRot1, float fWheelRot2)
+void CVehicleSA::SetBikeWheelRotation(float fWheelRot1, float fWheelRot2) noexcept
 {
     auto pInterface = static_cast<CBikeSAInterface*>(GetInterface());
     pInterface->m_afWheelRotationX[0] = fWheelRot1;
