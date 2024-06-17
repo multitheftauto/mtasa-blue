@@ -120,7 +120,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleAdjustableProperty", SetVehicleAdjustableProperty},
         {"setHelicopterRotorSpeed", SetHelicopterRotorSpeed},
         {"setVehicleRotorSpeed", ArgumentParser<SetVehicleRotorSpeed>},
-        {"setVehicleWheelRotation", ArgumentParser<SetVehicleWheelRotation>},
+        {"setVehicleWheelsRotation", ArgumentParser<SetVehicleWheelsRotation>},
+        //{"setVehicleWheelRotation", ArgumentParser<SetVehicleWheelsRotation>}, Todo: Allows set rotation for specific wheels
         {"setTrainDerailed", SetTrainDerailed},
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
@@ -2223,9 +2224,9 @@ bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpee
     return pVehicle->SetRotorSpeed(fSpeed);
 }
 
-bool CLuaVehicleDefs::SetVehicleWheelRotation(CClientVehicle* pVehicle, float fRot1, float fRot2, float fRot3, float fRot4)
+bool CLuaVehicleDefs::SetVehicleWheelsRotation(CClientVehicle* pVehicle, float fRotation)
 {
-    return pVehicle->SetWheelsRotation(fRot1, fRot2, fRot3, fRot4);
+    return pVehicle->SetWheelsRotation(fRotation, fRotation, fRotation, fRotation);
 }
 
 
