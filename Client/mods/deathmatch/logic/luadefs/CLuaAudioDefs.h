@@ -12,6 +12,7 @@
 #pragma once
 #include "CLuaDefs.h"
 
+#include "../Shared/mods/deathmatch/logic/lua/CLuaMultiReturn.h"
 #include <variant>
 #include <optional>
 
@@ -22,34 +23,34 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Audio funcs
-    bool PlaySoundFrontEnd(std::uint8_t sound);
-    bool SetAmbientSoundEnabled(eAmbientSoundType type, bool enabled) noexcept;
-    bool IsAmbientSoundEnabled(eAmbientSoundType type) noexcept;
-    bool ResetAmbientSounds() noexcept;
-    bool SetWorldSoundEnabled (
+    static bool PlaySoundFrontEnd(std::uint8_t sound);
+    static bool SetAmbientSoundEnabled(eAmbientSoundType type, bool enabled) noexcept;
+    static bool IsAmbientSoundEnabled(eAmbientSoundType type) noexcept;
+    static bool ResetAmbientSounds() noexcept;
+    static bool SetWorldSoundEnabled(
         int group,
         std::optional<int> index,
         bool enable,
         std::optional<bool> immediate
     ) noexcept;
-    bool IsWorldSoundEnabled(int group, std::optional<int> index) noexcept;
-    bool ResetWorldSounds() noexcept;
-    CClientSound* PlaySFX(lua_State* luaVM, eAudioLookupIndex container, int bank,
+    static bool IsWorldSoundEnabled(int group, std::optional<int> index) noexcept;
+    static bool ResetWorldSounds() noexcept;
+    static CClientSound* PlaySFX(lua_State* luaVM, eAudioLookupIndex container, int bank,
         int audio, std::optional<bool> loop
     );
-    CClientSound* PlaySFX3D(lua_State* luaVM, eAudioLookupIndex container, int bank,
+    static CClientSound* PlaySFX3D(lua_State* luaVM, eAudioLookupIndex container, int bank,
         int audio, float posX, float posY, float posZ, std::optional<bool> loop
     );
-    bool GetSFXStatus(eAudioLookupIndex container) noexcept;
+    static bool GetSFXStatus(eAudioLookupIndex container) noexcept;
 
     // Sound effects and synth functions
-    CClientSound* PlaySound(
+    static CClientSound* PlaySound(
         lua_State* luaVM,
         SString path,
         std::optional<bool> loop,
         std::optional<bool> throttle
     );
-    CClientSound* PlaySound3D(
+    static CClientSound* PlaySound3D(
         lua_State* luaVM,
         SString path,
         float x,
@@ -58,29 +59,46 @@ public:
         std::optional<bool> loop,
         std::optional<bool> throttle
     );
-    bool StopSound(CClientSound* sound) noexcept;
-    bool SetSoundPosition(
+    static bool StopSound(CClientSound* sound) noexcept;
+    static bool SetSoundPosition(
         std::variant<CClientSound*, CClientPlayer*> element,
         double pos
     ) noexcept;
-    double GetSoundPosition(
+    static double GetSoundPosition(
         std::variant<CClientSound*, CClientPlayer*> element
     ) noexcept;
-    double GetSoundLength(std::variant<CClientSound*, CClientPlayer*> element) noexcept;
-    LUA_DECLARE(GetSoundBufferLength);
-    LUA_DECLARE(SetSoundPaused);
-    LUA_DECLARE(IsSoundPaused);
-    LUA_DECLARE(SetSoundVolume);
-    LUA_DECLARE(GetSoundVolume);
-    LUA_DECLARE(SetSoundSpeed);
-    LUA_DECLARE(GetSoundSpeed);
-    LUA_DECLARE(SetSoundProperties);
-    LUA_DECLARE(GetSoundProperties);
-    LUA_DECLARE(GetSoundFFTData);
-    LUA_DECLARE(GetSoundWaveData);
-    LUA_DECLARE(SetSoundPanEnabled);
+    static double GetSoundLength(std::variant<CClientSound*, CClientPlayer*> element) noexcept;
+    static double GetSoundBufferLength(CClientSound* sound) noexcept;
+    static bool SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> element, bool paused) noexcept;
+    static bool IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> element) noexcept;
+    static bool SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> element, float volume) noexcept;
+    static float GetSoundVolume(std::variant<CClientSound*, CClientPlayer*> element) noexcept;
+    static bool SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> element, float speed) noexcept;
+    static float GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> element) noexcept;
+    static bool SetSoundProperties(
+        CClientSound* sound,
+        float sampleRate,
+        float tempo,
+        float pitch,
+        std::optional<bool> reverse
+    ) noexcept;
+    static std::variant<bool, CLuaMultiReturn<float, float, float, bool>> GetSoundProperties(
+        CClientSound* sound
+    ) noexcept;
+    static std::variant<bool, std::vector<float>> GetSoundFFTData(
+        std::variant<CClientSound*, CClientPlayer*> element,
+        int samples,
+        std::optional<int> bands
+    ) noexcept;
+    static std::variant<bool, std::vector<float>> GetSoundWaveData(
+        std::variant<CClientSound*, CClientPlayer*> element,
+        int samples
+    ) noexcept;
+    static bool SetSoundPanningEnabled(CClientSound* sound, bool enable) noexcept;
     LUA_DECLARE(IsSoundPanEnabled);
-    LUA_DECLARE(GetSoundLevelData);
+    static CLuaMultiReturn<int, int> GetSoundLevelData(
+        std::variant<CClientSound*, CClientPlayer*> element
+    ) noexcept;
     LUA_DECLARE(GetSoundBPM);
     LUA_DECLARE(SetSoundMinDistance);
     LUA_DECLARE(GetSoundMinDistance);
