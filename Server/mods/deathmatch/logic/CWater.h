@@ -60,5 +60,5 @@ private:
     EWaterType              m_WaterType;
     bool                    m_bShallow;
 
-    float m_iDefaultLevel = .0f;
+    float m_iDefaultLevel{};
 };
