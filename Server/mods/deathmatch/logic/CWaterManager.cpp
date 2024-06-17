@@ -71,11 +71,8 @@ void CWaterManager::SetAllElementWaterLevel(float fLevel)
 
 void CWaterManager::ResetAllElementWaterLevel()
 {
-    std::list<CWater*>::const_iterator iter = m_List.begin();
-    for (; iter != m_List.end(); ++iter)
-    {
-        (*iter)->ResetLevel();
-    }
+    for (CWater* pWater : m_List)
+        pWater->ResetLevel();
 }
 
 void CWaterManager::ResetElementWaterLevel(CWater* pWater)
