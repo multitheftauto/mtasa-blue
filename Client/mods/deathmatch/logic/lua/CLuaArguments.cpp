@@ -229,7 +229,7 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
 
     if (returnValues)
     {
-        for (int i = -iReturns; i <= -1; i++)
+        for (std::int32_t i = -iReturns; i <= -1; i++)
         {
             returnValues->ReadArgument(luaVM, i);
         }
@@ -290,7 +290,7 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
 
     if (returnValues)
     {
-        for (int i = -iReturns; i <= -1; i++)
+        for (std::int32_t i = -iReturns; i <= -1; i++)
         {
             returnValues->ReadArgument(luaVM, i);
         }
@@ -516,7 +516,7 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
     // lua arrays are 1 based
     std::uint32_t iArrayPos = 1;
 
-    std::vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
+    auto iter = m_Arguments.begin();
     for (; iter != m_Arguments.end(); iter += 2)
     {
         CLuaArgument* pArgument = *iter;

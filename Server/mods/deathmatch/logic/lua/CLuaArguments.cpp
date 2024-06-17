@@ -161,7 +161,7 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     lua_newtable(luaVM);
 
     // push it onto the known tables
-    auto size = pKnownTables->size();
+    int size = static_cast<int>(pKnownTables->size());
     lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
     lua_pushnumber(luaVM, static_cast<lua_Number>(++size));
     lua_pushvalue(luaVM, -3);

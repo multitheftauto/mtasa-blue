@@ -170,20 +170,9 @@ bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaA
             if (m_pTableData->Count() != Argument.m_pTableData->Count())
                 return false;
 
-            auto iter = m_pTableData->begin();
-            auto iterCompare = Argument.m_pTableData->begin();
-            if (pKnownTables->find(m_pTableData) != pKnownTables->end())
-                return true;
-
             pKnownTables->insert(m_pTableData);
 
-            for (std::size_t i = 0; i < m_pTableData->Count(); i++)
-            {
-                if (m_pTableData->at(i) != Argument.m_pTableData->at(i))
-                    return false;
-            }
-
-            return true;
+            return m_pTableData == Argument.m_pTableData;
         }
         case LUA_TSTRING:
         {
