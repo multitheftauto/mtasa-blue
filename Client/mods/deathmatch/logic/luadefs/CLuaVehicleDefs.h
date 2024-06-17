@@ -119,6 +119,8 @@ public:
     LUA_DECLARE(SetVehicleAdjustableProperty);
     LUA_DECLARE(SetHelicopterRotorSpeed);
     static bool SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed);
+    static bool SetVehicleWheelsRotation(CClientVehicle* pVehicle, float fRotation);
+    //static bool SetVehicleWheelRotation(CClientVehicle* pVehicle, int type, float fRotation); // Todo
     LUA_DECLARE(SetTrainDerailed);
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
