@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CHandlingManager.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CHandlingManager.cpp
  *  PURPOSE:     Vehicle handling manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -24,15 +24,13 @@ CHandlingManager::CHandlingManager()
     // Initialize all default handlings
     InitializeDefaultHandlings();
 
-    // Create a handling entry for every original handling data
+    // Create a handling entry
     for (int i = 0; i < HT_MAX; i++)
     {
+        // For every original handling data
         m_pOriginalEntries[i] = new CHandlingEntry(&m_OriginalHandlingData[i]);
-    }
 
-    // Create a handling entry for every model
-    for (int i = 0; i < HT_MAX; i++)
-    {
+        // For every model
         m_pModelEntries[i] = new CHandlingEntry(&m_OriginalHandlingData[i]);
         m_bModelHandlingChanged[i] = false;
     }
@@ -78,23 +76,20 @@ CHandlingManager::CHandlingManager()
 
 CHandlingManager::~CHandlingManager()
 {
-    // Destroy all original handling entries
+    // Destroy
     for (int i = 0; i < HT_MAX; i++)
     {
+        // All original handling entries
         delete m_pOriginalEntries[i];
-    }
 
-    // Destroy all model handling entries
-    for (int i = 0; i < HT_MAX; i++)
-    {
+        // All model handling entries
         delete m_pModelEntries[i];
     }
 }
 
 CHandlingEntry* CHandlingManager::CreateHandlingData()
 {
-    CHandlingEntry* pHandlingEntry = new CHandlingEntry();
-    return pHandlingEntry;
+    return new CHandlingEntry;
 }
 
 bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* pEntry)
@@ -103,13 +98,11 @@ bool CHandlingManager::ApplyHandlingData(eVehicleTypes eModel, CHandlingEntry* p
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
+        const auto eHandling = GetHandlingID(eModel);
         // Apply the data and return success
         m_pModelEntries[eHandling]->ApplyHandlingData(pEntry);
         return true;
     }
-
-    // Failed
     return false;
 }
 
@@ -119,12 +112,11 @@ const CHandlingEntry* CHandlingManager::GetOriginalHandlingData(eVehicleTypes eM
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
+        const auto eHandling = GetHandlingID(eModel);
         // Return it
         return m_pOriginalEntries[eHandling];
     }
-
-    return NULL;
+    return nullptr;
 }
 
 const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eModel)
@@ -133,25 +125,17 @@ const CHandlingEntry* CHandlingManager::GetModelHandlingData(eVehicleTypes eMode
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
+        const auto eHandling = GetHandlingID(eModel);
         // Return it
         return m_pModelEntries[eHandling];
     }
-
-    return NULL;
+    return nullptr;
 }
 
 eHandlingProperty CHandlingManager::GetPropertyEnumFromName(std::string strName)
 {
-    std::map<std::string, eHandlingProperty>::iterator it;
-    it = m_HandlingNames.find(strName);
-
-    if (it != m_HandlingNames.end())
-    {
-        return it->second;
-    }
-
-    return HANDLING_MAX;
+    const auto it = m_HandlingNames.find(strName);
+    return it != m_HandlingNames.end() ? it->second : HANDLING_MAX;
 }
 
 bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
@@ -160,7 +144,7 @@ bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
     if (CVehicleManager::IsValidModel(eModel))
     {
         // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
+        const auto eHandling = GetHandlingID(eModel);
         // Return if we have changed
         return m_bModelHandlingChanged[eHandling];
     }
@@ -169,10 +153,14 @@ bool CHandlingManager::HasModelHandlingChanged(eVehicleTypes eModel)
 
 void CHandlingManager::SetModelHandlingHasChanged(eVehicleTypes eModel, bool bChanged)
 {
-    // Get our Handling ID
-    eHandlingTypes eHandling = GetHandlingID(eModel);
-    // Return if we have changed.
-    m_bModelHandlingChanged[eHandling] = bChanged;
+    // Within range?
+    if (CVehicleManager::IsValidModel(eModel))
+    {
+        // Get our Handling ID
+        const auto eHandling = GetHandlingID(eModel);
+        // Return if we have changed.
+        m_bModelHandlingChanged[eHandling] = bChanged;
+    }
 }
 
 // Return the handling manager id

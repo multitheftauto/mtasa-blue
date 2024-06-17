@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CHandlingManagerSA.cpp
+ *  FILE:        Client/game_sa/CHandlingManagerSA.cpp
  *  PURPOSE:     Vehicle handling manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -13,8 +13,10 @@
 #include <core/CCoreInterface.h>
 #include <multiplayer/CMultiplayer.h>
 #include "CHandlingManagerSA.h"
+#include "CGameSA.h"
 
 extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
@@ -117,6 +119,12 @@ __declspec(naked) void Hook_Calculate()
     }
 }
 
+static bool IsVehicleModel(eVehicleTypes eModel)
+{
+    const auto pModelInfo = pGame->GetModelInfo(eModel);
+    return pModelInfo && pModelInfo->IsVehicle();
+}
+
 CHandlingManagerSA::CHandlingManagerSA()
 {
     // Initialize all default handlings
@@ -208,102 +216,88 @@ CHandlingManagerSA::~CHandlingManagerSA()
 
 eHandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(std::string strName)
 {
-    std::map<std::string, eHandlingProperty>::iterator it;
-    it = m_HandlingNames.find(strName);
-
-    if (it != m_HandlingNames.end())
-    {
-        return it->second;
-    }
-    return HANDLING_MAX;
+    const auto it = m_HandlingNames.find(strName);
+    return it != m_HandlingNames.end() ? it->second : HANDLING_MAX;
 }
 
 CHandlingEntry* CHandlingManagerSA::CreateHandlingData()
 {
-    CHandlingEntrySA* pHandlingEntry = new CHandlingEntrySA();
-    return pHandlingEntry;
+    return new CHandlingEntrySA;
 }
 
 CFlyingHandlingEntry* CHandlingManagerSA::CreateFlyingHandlingData()
 {
-    CFlyingHandlingEntrySA* pFlyingHandlingEntry = new CFlyingHandlingEntrySA();
-    return pFlyingHandlingEntry;
+    return new CFlyingHandlingEntrySA;
 }
 
 CBoatHandlingEntry* CHandlingManagerSA::CreateBoatHandlingData()
 {
-    CBoatHandlingEntrySA* pBoatHandlingEntry = new CBoatHandlingEntrySA();
-    return pBoatHandlingEntry;
+    return new CBoatHandlingEntrySA;
 }
 
 CBikeHandlingEntry* CHandlingManagerSA::CreateBikeHandlingData()
 {
-    CBikeHandlingEntrySA* pBikeHandlingEntry = new CBikeHandlingEntrySA();
-    return pBikeHandlingEntry;
+    return new CBikeHandlingEntrySA;
 }
 
 const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(eVehicleTypes eModel)
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    // Vehicle?
+    if (IsVehicleModel(eModel))
     {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
+        // Get our Handling ID, the default value will be HT_LANDSTAL
+        const auto eHandling = GetHandlingID(eModel);
         // Return it
         return m_pOriginalEntries[eHandling];
     }
-
-    return NULL;
+    return nullptr;
 }
 
 const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(eVehicleTypes eModel)
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    // Vehicle?
+    if (IsVehicleModel(eModel))
     {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
+        // Get our Handling ID, the default value will be HT_LANDSTAL
+        const auto eHandling = GetHandlingID(eModel);
         // Original GTA:SA behavior
-        if (eHandling < 186 || eHandling > 209)
+        if (eHandling < HT_SEAPLANE || eHandling > HT_RCRAIDER)
             return m_pOriginalFlyingEntries[0];
         else
-            return m_pOriginalFlyingEntries[eHandling - 186];
+            return m_pOriginalFlyingEntries[eHandling - HT_SEAPLANE];
     }
-
-    return NULL;
+    return nullptr;
 }
 
 const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(eVehicleTypes eModel)
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    // Vehicle?
+    if (IsVehicleModel(eModel))
     {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
+        // Get our Handling ID, the default value will be HT_LANDSTAL
+        const auto eHandling = GetHandlingID(eModel);
         // Original GTA:SA behavior
-        if (eHandling < 175 || eHandling > 186)
+        if (eHandling < HT_PREDATOR || eHandling > HT_SEAPLANE)
             return m_pOriginalBoatEntries[0];
         else
-            return m_pOriginalBoatEntries[eHandling - 175];
+            return m_pOriginalBoatEntries[eHandling - HT_PREDATOR];
     }
-
-    return NULL;
+    return nullptr;
 }
 
 const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(eVehicleTypes eModel)
 {
-    // Within range?
-    if (eModel >= 400 && eModel < VT_MAX)
+    // Vehicle?
+    if (IsVehicleModel(eModel))
     {
-        // Get our Handling ID
-        eHandlingTypes eHandling = GetHandlingID(eModel);
+        // Get our Handling ID, the default value will be HT_LANDSTAL
+        const auto eHandling = GetHandlingID(eModel);
         if (eHandling >= HT_BIKE && eHandling <= HT_FREEWAY)
             return m_pOriginalBikeEntries[eHandling - HT_BIKE];
         else if (eHandling == HT_FAGGIO)
             return m_pOriginalBikeEntries[13];
     }
-
-    return NULL;
+    return nullptr;
 }
 
 // Return the handling manager id
@@ -9164,10 +9158,10 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)
 {
     // Grab us a multiplayer_sa pointer
-    CMultiplayer* pMultiplayer = g_pCore->GetMultiplayer();
-    eVehicleTypes eModel = pEntry->GetModel();
+    const auto pMultiplayer = g_pCore->GetMultiplayer();
+    const auto eModel = pEntry->GetModel();
     // Find our original data
-    const CHandlingEntry* pOriginal = m_pOriginalEntries[eModel];
+    const auto pOriginal = m_pOriginalEntries[eModel];
     // Default bChanged to false
     bool bChanged = false;
 
@@ -9195,10 +9189,10 @@ void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)
         bChanged = true;
 
     // Is bChanged true and the suspension flag changed marker false
-    if (bChanged == true && pEntry->HasSuspensionChanged() == false)
+    if (bChanged && !pEntry->HasSuspensionChanged())
     {
         // Is our hook uninstalled?
-        if (pMultiplayer->IsSuspensionEnabled() == false)
+        if (!pMultiplayer->IsSuspensionEnabled())
             // Install the hook
             pMultiplayer->SetSuspensionEnabled(true);
 
@@ -9208,17 +9202,19 @@ void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry)
         pEntry->SetSuspensionChanged(true);
     }
     // is bChanged false and is this model supposed to contain non-default info? (i.e. they just reverted)
-    else if (bChanged == false && pEntry->HasSuspensionChanged() == true)
+    else if (!bChanged && pEntry->HasSuspensionChanged())
     {
         // Decrement iChangedVehicles
         iChangedVehicles--;
         // Set the suspension Changed flag to false
         pEntry->SetSuspensionChanged(false);
     }
+
     // if we hit 0 vehicles installed and it's installed uninstall the hook
-    if (iChangedVehicles == 0 && pMultiplayer->IsSuspensionEnabled() == true)
+    if (iChangedVehicles == 0 && pMultiplayer->IsSuspensionEnabled())
         pMultiplayer->SetSuspensionEnabled(false);
 }
+
 void CHandlingManagerSA::RemoveChangedVehicle()
 {
     // Decrement the count
