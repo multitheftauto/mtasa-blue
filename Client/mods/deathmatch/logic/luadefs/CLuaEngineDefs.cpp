@@ -186,6 +186,10 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "resetModelFlags", "engineResetModelFlags");
     lua_classfunction(luaVM, "getModelFlags", "engineGetModelFlags");
 
+    lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
+    lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
+    lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
+
     lua_registerstaticclass(luaVM, "Engine");
 
     // `EngineStreaming` class
@@ -2356,74 +2360,6 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
 }
 
 uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelId)
-{
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
-
-    if (uiModelId >= 20000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
-
-    return pModelInfo->GetFlags();
-}
-
-bool CLuaEngineDefs::EngineGetModelFlag(uint uiModelId, eModelIdeFlag eFlag)
-{
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
-
-    if (uiModelId >= 20000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
-
-    return pModelInfo->GetIdeFlag(eFlag);
-}
-
-bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags)
-{
-    // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
-
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-
-    if (uiModelID >= 20000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
-
-    if (bIdeFlags.value_or(false))
-        pModelInfo->SetIdeFlags(uiFlags);
-    else
-        pModelInfo->SetFlags(uiFlags);
-
-    return true; 
-}
-
-bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool bState)
-{
-    // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
-
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-
-    if (uiModelID >= 20000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
-
-    pModelInfo->SetIdeFlag(eFlag, bState);
-
-    return true;
-}
-
-bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
-{
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-    if (!pModelInfo)
-        return false;
-
-    ushort usCurrentFlags = pModelInfo->GetFlags();
-    ushort usOriginalFlags = pModelInfo->GetOriginalFlags();
-    if (usOriginalFlags != usCurrentFlags)
-    {
-        pModelInfo->SetFlags(usOriginalFlags);
-        return true;
-    }
-
-    return false;
-}
-
-bool CLuaEngineDefs::EngineRestreamWorld()
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
 
