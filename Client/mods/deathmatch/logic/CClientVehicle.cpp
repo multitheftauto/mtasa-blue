@@ -1117,8 +1117,12 @@ void CClientVehicle::SetVariant(unsigned char ucVariant, unsigned char ucVariant
 
     // clear our component data to regenerate it
     m_ComponentData.clear();
-
     ReCreate();
+
+    if (!m_bEngineOn)
+    {
+        m_pVehicle->SetEngineOn(m_bEngineOn); 
+    }
 }
 
 bool CClientVehicle::IsEngineBroken()
