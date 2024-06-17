@@ -120,7 +120,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleAdjustableProperty", SetVehicleAdjustableProperty},
         {"setHelicopterRotorSpeed", SetHelicopterRotorSpeed},
         {"setVehicleRotorSpeed", ArgumentParser<SetVehicleRotorSpeed>},
-        {"setVehicleWheelSpeed", ArgumentParser<SetVehicleWheelSpeed>},
+        {"setVehicleWheelRotation", ArgumentParser<SetVehicleWheelRotation>},
         {"setTrainDerailed", SetTrainDerailed},
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
@@ -2223,9 +2223,9 @@ bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpee
     return pVehicle->SetRotorSpeed(fSpeed);
 }
 
-bool CLuaVehicleDefs::SetVehicleWheelSpeed(CClientVehicle* pVehicle, float fSpeed)
+bool CLuaVehicleDefs::SetVehicleWheelRotation(CClientVehicle* pVehicle, float fRot1, float fRot2, float fRot3, float fRot4)
 {
-    return pVehicle->SetWheelSpeed(fSpeed);
+    return pVehicle->SetWheelsRotation(fRot1, fRot2, fRot3, fRot4);
 }
 
 

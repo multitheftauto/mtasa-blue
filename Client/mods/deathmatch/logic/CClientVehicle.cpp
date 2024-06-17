@@ -1618,11 +1618,25 @@ bool CClientVehicle::SetRotorSpeed(float fSpeed)
 }
 
 
-bool CClientVehicle::SetWheelSpeed(float fSpeed)
+bool CClientVehicle::SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4)
 {
-    if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_CAR)
-        m_pVehicle->SetVehicleWheelSpeed(fSpeed);
-    return false;
+    if (!m_pVehicle)
+        return false;
+
+    switch (m_eVehicleType)
+    {
+        case CLIENTVEHICLE_CAR:
+        case CLIENTVEHICLE_MONSTERTRUCK:
+        case CLIENTVEHICLE_QUADBIKE:
+            m_pVehicle->SetVehicleWheelRotation(fRot1, fRot2, fRot3, fRot4);
+            return true;
+        case CLIENTVEHICLE_BIKE:
+        case CLIENTVEHICLE_BMX:
+            m_pVehicle->SetBikeWheelRotation(fRot1, fRot2);
+            return true;
+        default:
+            return false;
+    }
 }
 
 
