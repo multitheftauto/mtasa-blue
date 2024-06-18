@@ -47,13 +47,13 @@ public:
     // Sound effects and synth functions
     static CClientSound* PlaySound(
         lua_State* luaVM,
-        SString path,
+        std::string path,
         std::optional<bool> loop,
         std::optional<bool> throttle
     );
     static CClientSound* PlaySound3D(
         lua_State* luaVM,
-        SString path,
+        std::string path,
         float x,
         float y,
         float z,
@@ -99,20 +99,36 @@ public:
     static std::variant<bool, CLuaMultiReturn<std::uint32_t, std::uint32_t>> GetSoundLevelData(
         std::variant<CClientSound*, CClientPlayer*> element
     ) noexcept;
-    LUA_DECLARE(IsSoundPanEnabled);
-    LUA_DECLARE(GetSoundBPM);
-    LUA_DECLARE(SetSoundMinDistance);
-    LUA_DECLARE(GetSoundMinDistance);
-    LUA_DECLARE(SetSoundMaxDistance);
-    LUA_DECLARE(GetSoundMaxDistance);
-    LUA_DECLARE(GetSoundMetaTags);
-    LUA_DECLARE(SetSoundEffectEnabled);
-    LUA_DECLARE(GetSoundEffects);
-    LUA_DECLARE(SetSoundEffectParameter);
-    static std::variant<bool, std::unordered_map<const char*, float>> GetSoundEffectParameters(
-        CClientSound* sound,
-        eSoundEffectType effectType
+    static bool IsSoundPanEnabled(CClientSound* sound) noexcept;
+    static float GetSoundBPM(CClientSound* sound) noexcept;
+    static bool SetSoundMinDistance(CClientSound* sound, float distance) noexcept;
+    static float GetSoundMinDistance(CClientSound* sound) noexcept;
+    static bool SetSoundMaxDistance(CClientSound* sound, float distance) noexcept;
+    static float GetSoundMaxDistance(CClientSound* sound) noexcept;
+    static std::variant<bool, std::string, std::unordered_map<std::string, std::string>>
+        GetSoundMetaTags(
+            CClientSound* sound,
+            std::optional<std::string> format
+        ) noexcept;
+    static bool SetSoundEffectEnabled(
+        std::variant<CClientSound*, CClientPlayer*> element,
+        std::string effectName,
+        std::optional<bool> enable
     ) noexcept;
+    static std::unordered_map<std::string, bool> GetSoundEffects(
+        std::variant<CClientSound*, CClientPlayer*> element
+    ) noexcept;
+    static bool SetSoundEffectParameter(
+        CClientSound* sound,
+        eSoundEffectType effectType,
+        std::string effectParam,
+        CLuaArgument value
+    );
+    static std::variant<bool, std::unordered_map<std::string, CLuaArgument>>
+        GetSoundEffectParameters(
+            CClientSound* sound,
+            eSoundEffectType effectType
+        ) noexcept;
     static bool SetSoundPan(
         std::variant<CClientSound*, CClientPlayer*> element,
         float pan
@@ -125,7 +141,7 @@ public:
     // Radio functions
     static bool SetRadioChannel(std::uint8_t channel) noexcept;
     static std::uint8_t GetRadioChannel() noexcept;
-    static std::variant<bool, const char*> GetRadioChannelName(int channel) noexcept;
+    static std::variant<bool, std::string> GetRadioChannelName(int channel) noexcept;
 
     static bool ShowSound(bool state) noexcept;
     static bool IsShowSoundEnabled() noexcept;

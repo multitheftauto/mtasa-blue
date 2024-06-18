@@ -8515,9 +8515,13 @@ bool CStaticFunctionDefinitions::GetSoundLevelData(
         return GetSoundLevelData(*std::get<CClientPlayer*>(element), dwLeft, dwRight);
 }
 
+float CStaticFunctionDefinitions::GetSoundBPM(CClientSound& Sound) noexcept {
+    return Sound.GetSoundBPM();
+}
+
 bool CStaticFunctionDefinitions::GetSoundBPM(CClientSound& Sound, float& fBPM)
 {
-    fBPM = Sound.GetSoundBPM();
+    fBPM = GetSoundBPM(Sound);
     return fBPM != 0.0f;
 }
 
@@ -8562,9 +8566,14 @@ bool CStaticFunctionDefinitions::SetSoundMinDistance(CClientSound& Sound, float 
     return true;
 }
 
+float CStaticFunctionDefinitions::GetSoundMinDistance(CClientSound& Sound) noexcept
+{
+    return Sound.GetMinDistance();
+}
+
 bool CStaticFunctionDefinitions::GetSoundMinDistance(CClientSound& Sound, float& fDistance)
 {
-    fDistance = Sound.GetMinDistance();
+    fDistance = GetSoundMinDistance(Sound);
     return true;
 }
 
@@ -8574,9 +8583,13 @@ bool CStaticFunctionDefinitions::SetSoundMaxDistance(CClientSound& Sound, float 
     return true;
 }
 
+float CStaticFunctionDefinitions::GetSoundMaxDistance(CClientSound& Sound) noexcept {
+    return Sound.GetMaxDistance();
+}
+
 bool CStaticFunctionDefinitions::GetSoundMaxDistance(CClientSound& Sound, float& fDistance)
 {
-    fDistance = Sound.GetMaxDistance();
+    fDistance = GetSoundMaxDistance(Sound);
     return true;
 }
 
@@ -8609,6 +8622,17 @@ bool CStaticFunctionDefinitions::SetSoundEffectEnabled(CClientPlayer& Player, co
                 return true;
     }
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetSoundEffectEnabled(
+    std::variant<CClientSound*, CClientPlayer*>& element,
+    const SString& strEffectName,
+    bool bEnable
+) noexcept {
+    if (std::holds_alternative<CClientSound*>(element))
+        return SetSoundEffectEnabled(*std::get<CClientSound*>(element), strEffectName, bEnable);
+    else if (std::holds_alternative<CClientPlayer*>(element))
+        return SetSoundEffectEnabled(*std::get<CClientPlayer*>(element), strEffectName, bEnable);
 }
 
 bool CStaticFunctionDefinitions::SetSoundPan(CClientPlayer& Player, float fPan)

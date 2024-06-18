@@ -245,7 +245,7 @@ bool CLuaAudioDefs::GetSFXStatus(eAudioLookupIndex container) noexcept
 
 CClientSound* CLuaAudioDefs::PlaySound(
     lua_State* luaVM,
-    SString path,
+    std::string path,
     std::optional<bool> loop,
     std::optional<bool> throttle
 ) {
@@ -259,16 +259,14 @@ CClientSound* CLuaAudioDefs::PlaySound(
     if (!pResource)
         throw std::runtime_error("Cannot get resource!");
 
-    SString strFilename;
+    SString strFilename = path;
     bool bIsURL = false;
     bool bIsRawData = false;
 
-    if (CResourceManager::ParseResourcePathInput(path, pResource, &strFilename))
-        path = strFilename;
-    else
+    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strFilename))
     {
-        if ((!stricmp(path.Left(4), "http") || !stricmp(path.Left(3), "ftp")) &&
-            (path.length() <= 2048 || path.find('\n') == SString::npos))
+        if ((!stricmp(strFilename.Left(4), "http") ||!stricmp(strFilename.Left(3), "ftp")) &&
+            (strFilename.length() <= 2048 || strFilename.find('\n') == SString::npos))
             bIsURL = true;
         else
             bIsRawData = true;
@@ -280,7 +278,7 @@ CClientSound* CLuaAudioDefs::PlaySound(
     if (!pResource)
         throw std::runtime_error("Cannot get resource!");
         
-    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, path,
+    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strFilename,
         bIsURL, bIsRawData, loop.value_or(false), throttle.value_or(true));
 
     if (!pSound)
@@ -297,7 +295,7 @@ CClientSound* CLuaAudioDefs::PlaySound(
 
 CClientSound* CLuaAudioDefs::PlaySound3D (
     lua_State* luaVM,
-    SString path,
+    std::string path,
     float x,
     float y,
     float z,
@@ -313,16 +311,14 @@ CClientSound* CLuaAudioDefs::PlaySound3D (
     if (!pResource)
         throw std::runtime_error("Cannot get resource!");
 
-    SString strFilename;
+    SString strFilename = path;
     bool bIsURL = false;
     bool bIsRawData = false;
 
-    if (CResourceManager::ParseResourcePathInput(path, pResource, &strFilename))
-        path = strFilename;
-    else
+    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strFilename))
     {
-        if ((!stricmp(path.Left(4), "http") || !stricmp(path.Left(3), "ftp")) &&
-            (path.length() <= 2048 || path.find('\n') == SString::npos))
+        if ((!stricmp(strFilename.Left(4), "http") || !stricmp(strFilename.Left(3), "ftp")) &&
+            (strFilename.length() <= 2048 || strFilename.find('\n') == SString::npos))
             bIsURL = true;
         else
             bIsRawData = true;
@@ -334,7 +330,8 @@ CClientSound* CLuaAudioDefs::PlaySound3D (
     if (!pResource)
         throw std::runtime_error("Cannot get resource!");
         
-    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D(pResource, path,
+    CClientSound* pSound =
+        CStaticFunctionDefinitions::PlaySound3D(pResource, strFilename,
         bIsURL, bIsRawData, CVector(x, y, z), loop.value_or(false), throttle.value_or(true));
 
     if (!pSound)
@@ -493,31 +490,6 @@ bool CLuaAudioDefs::SetSoundPanningEnabled(CClientSound* sound, bool enable) noe
     return CStaticFunctionDefinitions::SetSoundPanEnabled(*sound, enable);
 }
 
-int CLuaAudioDefs::IsSoundPanEnabled(lua_State* luaVM)
-{
-    CClientSound*    pSound = nullptr;
-    bool             bEnabled = true;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::IsSoundPanEnabled(*pSound))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
 std::variant<bool, CLuaMultiReturn<std::uint32_t, std::uint32_t>> CLuaAudioDefs::GetSoundLevelData(
     std::variant<CClientSound*, CClientPlayer*> element
 ) noexcept {
@@ -530,867 +502,525 @@ std::variant<bool, CLuaMultiReturn<std::uint32_t, std::uint32_t>> CLuaAudioDefs:
     return CLuaMultiReturn<std::uint32_t, std::uint32_t>(left, right);
 }
 
-int CLuaAudioDefs::GetSoundBPM(lua_State* luaVM)
+bool CLuaAudioDefs::IsSoundPanEnabled(CClientSound* sound) noexcept
 {
-    CClientSound*    pSound = nullptr;
-    float            fBPM = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::GetSoundBPM(*pSound, fBPM))
-        {
-            lua_pushnumber(luaVM, fBPM);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::IsSoundPanEnabled(*sound);
 }
 
-int CLuaAudioDefs::SetSoundMinDistance(lua_State* luaVM)
+float CLuaAudioDefs::GetSoundBPM(CClientSound* sound) noexcept
 {
-    CClientSound*    pSound = nullptr;
-    float            fDistance = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadNumber(fDistance);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundMinDistance(*pSound, fDistance))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::GetSoundBPM(*sound);
 }
 
-int CLuaAudioDefs::GetSoundMinDistance(lua_State* luaVM)
+bool CLuaAudioDefs::SetSoundMinDistance(CClientSound* sound, float distance) noexcept
 {
-    CClientSound*    pSound = nullptr;
-    float            fDistance = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::GetSoundMinDistance(*pSound, fDistance))
-            {
-                lua_pushnumber(luaVM, fDistance);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetSoundMinDistance(*sound, distance);
 }
 
-int CLuaAudioDefs::SetSoundMaxDistance(lua_State* luaVM)
+float CLuaAudioDefs::GetSoundMinDistance(CClientSound* sound) noexcept
 {
-    CClientSound*    pSound = nullptr;
-    float            fDistance = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadNumber(fDistance);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundMaxDistance(*pSound, fDistance))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::GetSoundMinDistance(*sound);
 }
 
-int CLuaAudioDefs::GetSoundMaxDistance(lua_State* luaVM)
+bool CLuaAudioDefs::SetSoundMaxDistance(CClientSound* sound, float distance) noexcept
 {
-    CClientSound*    pSound = nullptr;
-    float            fDistance = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::GetSoundMaxDistance(*pSound, fDistance))
-            {
-                lua_pushnumber(luaVM, fDistance);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetSoundMaxDistance(*sound, distance);
 }
 
-int CLuaAudioDefs::GetSoundMetaTags(lua_State* luaVM)
+float CLuaAudioDefs::GetSoundMaxDistance(CClientSound* sound) noexcept
 {
-    CClientSound*    pSound = nullptr;
-    SString          strFormat = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadString(strFormat, "");
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            SString strMetaTags = "";
-            if (strFormat != "")
-            {
-                if (CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, strFormat, strMetaTags))
-                {
-                    if (!strMetaTags.empty())
-                    {
-                        lua_pushstring(luaVM, strMetaTags);
-                        return 1;
-                    }
-                }
-            }
-            else
-            {
-                lua_newtable(luaVM);
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%TITL", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "title");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%ARTI", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "artist");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%ALBM", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "album");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%GNRE", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "genre");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%YEAR", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "year");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%CMNT", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "comment");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%TRCK", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "track");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%COMP", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "composer");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%COPY", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "copyright");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%SUBT", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "subtitle");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%AART", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "album_artist");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "streamName", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "stream_name");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "streamTitle", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "stream_title");
-                }
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::GetSoundMaxDistance(*sound);
 }
 
-int CLuaAudioDefs::SetSoundEffectEnabled(lua_State* luaVM)
-{
-    CClientPlayer*   pPlayer = nullptr;
-    CClientSound*    pSound = nullptr;
-    SString          strEffectName = "";
-    bool             bEnable = false;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
+std::variant<bool, std::string, std::unordered_map<std::string, std::string>>
+CLuaAudioDefs::GetSoundMetaTags(
+    CClientSound* sound,
+    std::optional<std::string> format
+) noexcept {
+    if (!sound)
         return false;
-    }
-    argStream.ReadString(strEffectName);
-    argStream.ReadBool(bEnable, false);
-
-    if (!argStream.HasErrors())
+        
+    SString strMetaTags = "";
+    if (format.has_value())
     {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundEffectEnabled(*pSound, strEffectName, bEnable))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            if (CStaticFunctionDefinitions::SetSoundEffectEnabled(*pPlayer, strEffectName, bEnable))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
+        if (!CStaticFunctionDefinitions::GetSoundMetaTags(*sound, format.value(), strMetaTags))
+            return false;
+            
+        if (strMetaTags.empty())
+            return false;
+            
+        return strMetaTags;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    
+    std::unordered_map<std::string, std::string> mapFormats;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    const auto& GetMetaTags = [&](const char* format, const char* name) {
+        CStaticFunctionDefinitions::GetSoundMetaTags(*sound, format, strMetaTags);
+        if (!strMetaTags.empty())
+            mapFormats[name] = strMetaTags;
+    };
+
+    GetMetaTags("%TITL", "title");
+    GetMetaTags("%ARTI", "artist");
+    GetMetaTags("%ALBM", "album");
+    GetMetaTags("%GNRE", "genre");
+    GetMetaTags("%YEAR", "year");
+    GetMetaTags("%CMNT", "comment");
+    GetMetaTags("%TRCK", "track");
+    GetMetaTags("%COMP", "composer");
+    GetMetaTags("%COPY", "copyright");
+    GetMetaTags("%SUBT", "subtitle");
+    GetMetaTags("%AART", "album_artist");
+    GetMetaTags("streamName", "stream_name");
+    GetMetaTags("streamTitle", "stream_title");
+    
+    return mapFormats;
 }
 
-int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
-{
-    CClientPlayer*   pPlayer = nullptr;
-    CClientSound*    pSound = nullptr;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            std::map<std::string, int> iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
-            lua_newtable(luaVM);
-            for (std::map<std::string, int>::const_iterator iter = iFxEffects.begin(); iter != iFxEffects.end(); ++iter)
-            {
-                lua_pushboolean(luaVM, pSound->IsFxEffectEnabled((*iter).second));
-                lua_setfield(luaVM, -2, (*iter).first.c_str());
-            }
-            return 1;
-        }
-        else if (pPlayer)
-        {
-            CClientPlayerVoice*        pPlayerVoice = pPlayer->GetVoice();
-            std::map<std::string, int> iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
-            lua_newtable(luaVM);
-            for (std::map<std::string, int>::const_iterator iter = iFxEffects.begin(); iter != iFxEffects.end(); ++iter)
-            {
-                lua_pushboolean(luaVM, pPlayerVoice->IsFxEffectEnabled((*iter).second));
-                lua_setfield(luaVM, -2, (*iter).first.c_str());
-            }
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+bool CLuaAudioDefs::SetSoundEffectEnabled(
+    std::variant<CClientSound*, CClientPlayer*> element,
+    std::string effectName,
+    std::optional<bool> enable
+) noexcept {
+    return CStaticFunctionDefinitions::SetSoundEffectEnabled(element, effectName, enable.value_or(false));
 }
 
-bool CLuaAudioDefs::SetSoundEffectParameter(CClientSound* sound, eSoundEffectType effectType, const char* effectParam)
-{
-    if (!pSound || !pSound->IsFxEffectEnabled(eEffectType))
+std::unordered_map<std::string, bool> CLuaAudioDefs::GetSoundEffects(
+    std::variant<CClientSound*, CClientPlayer*> element
+) noexcept {
+    std::map<std::string, int> fxEffects = m_pManager->GetSoundManager()->GetFxEffects();
+    
+    std::unordered_map<std::string, bool> arr;
+    arr.reserve(fxEffects.size());
+    
+    for (const auto& [effectName, effect] : fxEffects)
+    {
+        if (std::holds_alternative<CClientSound*>(element)) {
+            auto sound = std::get<CClientSound*>(element);
+            arr[effectName] = sound->IsFxEffectEnabled(effect);
+        } else if (std::holds_alternative<CClientPlayer*>(element)) {
+            auto sound = std::get<CClientPlayer*>(element)->GetVoice();
+            arr[effectName] = sound->IsFxEffectEnabled(effect);
+        }
+    }
+    
+    return arr;
+}
+
+bool CLuaAudioDefs::SetSoundEffectParameter(
+    CClientSound* sound,
+    eSoundEffectType effectType,
+    std::string effectParam,
+    CLuaArgument value
+) {
+    if (!sound || !sound->IsFxEffectEnabled(effectType))
         throw std::invalid_argument("Effect's parameters can't be set unless it's enabled");
 
     using namespace eSoundEffectParams;
-    switch (eEffectType)
+
+    const auto SetParamWithErrorLog = [&](auto effectParam, auto& params)
+    {
+        // Try setting parameter
+        if (sound->SetFxEffectParameters(effectType, &params))
+            return true;
+
+        // Unsuccessful, log error. (Hard error on usage mistakes)
+        // 
+        // Previous info about the `luaL_error` was invalid.
+        // If the user was able to inject stuff into parameters via
+        // `luaL_error` then he will be able to inject stuff
+        // via `lua_error`. Why?
+        // Because of this line (`SString(...)`).
+        // Manually pushing values into the lua stack
+        // and then calling `lua_error` is pointless.
+        throw std::runtime_error(
+            SString("BASS Error %i, after setting parameter %s -> %s. (Message: %s)",
+                CBassAudio::ErrorGetCode(), EnumToString(effectType).c_str(),
+                EnumToString(effectParam).c_str(), CBassAudio::ErrorGetMessage()
+            )
+        );
+    };
+
+    switch (effectType)
     {
         case BASS_FX_DX8_CHORUS:
         {
             BASS_DX8_CHORUS params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
-            Chorus eEffectParameter;            
+            Chorus eEffectParameter;
             StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case Chorus::WET_DRY_MIX:
                 {
-                    argStream.ReadNumber(params.fWetDryMix);
+                    params.fWetDryMix = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Chorus::DEPTH:
                 {
-                    argStream.ReadNumber(params.fDepth);
+                    params.fDepth = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Chorus::FEEDBACK:
                 {
-                    argStream.ReadNumber(params.fFeedback);
+                    params.fFeedback = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Chorus::FREQUENCY:
                 {
-                    argStream.ReadNumber(params.fFrequency);
+                    params.fFrequency = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Chorus::WAVEFORM:
                 {
-                    argStream.ReadNumber(params.lWaveform);
+                    params.lWaveform = static_cast<DWORD>(value.GetNumber());
                     break;
                 }
                 case Chorus::DELAY:
                 {
-                    argStream.ReadNumber(params.fDelay);
+                    params.fDelay = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Chorus::PHASE:
                 {
-                    argStream.ReadNumber(params.lPhase);
+                    params.lPhase = static_cast<DWORD>(value.GetNumber());
                     break;
                 }
             }
-
-            if (argStream.HasErrors())
-                break;
-
-            return SetParamWithErrorLog(eEffectParameter, params);
-        }
-    };
-}
-
-int CLuaAudioDefs::SetSoundEffectParameter(CClientSound* sound, eSoundEffectType effectType)
-{
-    // bool setSoundEffectParameter ( sound sound, string effectName, string effectParameter, var effectParameterValue  )
-    CClientSound*    pSound = nullptr;
-    eSoundEffectType eEffectType;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadEnumString(eEffectType);
-
-    if (argStream.HasErrors())
-    {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
-    }
-
-    if (!pSound->IsFxEffectEnabled(eEffectType))
-    {
-        return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
-    }
-
-    // Call `SetFxEffectParameters` and log errors if any
-    const auto SetParamWithErrorLog = [&](auto effectParam, auto& params) {
-        // Try setting parameter
-        if (pSound->SetFxEffectParameters(eEffectType, &params))
-        {
-            lua::Push(luaVM, true);
-            return 1;
-        }
-
-        // Unsuccessful, log error. (Hard error on usage mistakes)
-        // `luaL_error` with a format string straight out crashes, so we have to do it this way..
-        const SString msg("BASS Error %i, after setting parameter %s -> %s. (Message: %s)", CBassAudio::ErrorGetCode(), EnumToString(eEffectType).c_str(),
-                          EnumToString(effectParam).c_str(), CBassAudio::ErrorGetMessage());
-
-        // Do not use `luaL_error` here and pass in `msg` as the format string,
-        // user could inject paramters into the format string, and that would be bad :D
-        // The below code is based on the code from `luaL_error`
-        luaL_where(luaVM, 1);
-        lua::Push(luaVM, msg);
-        lua_concat(luaVM, 2);
-        lua_error(luaVM);
-
-        return 1;
-    };
-
-    using namespace eSoundEffectParams;
-    switch (eEffectType)
-    {
-        case BASS_FX_DX8_CHORUS:
-        {
-            BASS_DX8_CHORUS params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
-
-            Chorus eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
-            switch (eEffectParameter)
-            {
-                case Chorus::WET_DRY_MIX:
-                {
-                    argStream.ReadNumber(params.fWetDryMix);
-                    break;
-                }
-                case Chorus::DEPTH:
-                {
-                    argStream.ReadNumber(params.fDepth);
-                    break;
-                }
-                case Chorus::FEEDBACK:
-                {
-                    argStream.ReadNumber(params.fFeedback);
-                    break;
-                }
-                case Chorus::FREQUENCY:
-                {
-                    argStream.ReadNumber(params.fFrequency);
-                    break;
-                }
-                case Chorus::WAVEFORM:
-                {
-                    argStream.ReadNumber(params.lWaveform);
-                    break;
-                }
-                case Chorus::DELAY:
-                {
-                    argStream.ReadNumber(params.fDelay);
-                    break;
-                }
-                case Chorus::PHASE:
-                {
-                    argStream.ReadNumber(params.lPhase);
-                    break;
-                }
-            }
-
-            if (argStream.HasErrors())
-                break;
 
             return SetParamWithErrorLog(eEffectParameter, params);
         }
         case BASS_FX_DX8_COMPRESSOR:
         {
             BASS_DX8_COMPRESSOR params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
             Compressor eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
+            StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case Compressor::GAIN:
                 {
-                    argStream.ReadNumber(params.fGain);
+                    params.fGain = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Compressor::ATTACK:
                 {
-                    argStream.ReadNumber(params.fAttack);
+                    params.fAttack = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Compressor::RELEASE:
                 {
-                    argStream.ReadNumber(params.fRelease);
+                    params.fRelease = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Compressor::THRESHOLD:
                 {
-                    argStream.ReadNumber(params.fThreshold);
+                    params.fThreshold = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Compressor::RATIO:
                 {
-                    argStream.ReadNumber(params.fRatio);
+                    params.fRatio = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Compressor::PREDELAY:
                 {
-                    argStream.ReadNumber(params.fPredelay);
+                    params.fPredelay = static_cast<float>(value.GetNumber());
                     break;
                 }
             }
-
-            if (argStream.HasErrors())
-                break;
 
             return SetParamWithErrorLog(eEffectParameter, params);
         }
         case BASS_FX_DX8_DISTORTION:
         {
             BASS_DX8_DISTORTION params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
             Distortion eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
+            StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case Distortion::GAIN:
                 {
-                    argStream.ReadNumber(params.fGain);
+                    params.fGain = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Distortion::EDGE:
                 {
-                    argStream.ReadNumber(params.fEdge);
+                    params.fEdge = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Distortion::POST_EQ_CENTER_FREQUENCY:
                 {
-                    argStream.ReadNumber(params.fPostEQCenterFrequency);
+                    params.fPostEQCenterFrequency = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Distortion::POST_EQ_BANDWIDTH:
                 {
-                    argStream.ReadNumber(params.fPostEQBandwidth);
+                    params.fPostEQBandwidth = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Distortion::PRE_LOWPASS_CUTOFF:
                 {
-                    argStream.ReadNumber(params.fPreLowpassCutoff);
+                    params.fPreLowpassCutoff = static_cast<float>(value.GetNumber());
                     break;
                 }
             }
-
-            if (argStream.HasErrors())
-                break;
 
             return SetParamWithErrorLog(eEffectParameter, params);
         }
         case BASS_FX_DX8_ECHO:
         {
             BASS_DX8_ECHO params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
             Echo eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
+            StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case Echo::WET_DRY_MIX:
                 {
-                    argStream.ReadNumber(params.fWetDryMix);
+                    params.fWetDryMix = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Echo::FEEDBACK:
                 {
-                    argStream.ReadNumber(params.fFeedback);
+                    params.fFeedback = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Echo::LEFT_DELAY:
                 {
-                    argStream.ReadNumber(params.fLeftDelay);
+                    params.fLeftDelay = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Echo::RIGHT_DELAY:
                 {
-                    argStream.ReadNumber(params.fRightDelay);
+                    params.fRightDelay = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Echo::PAN_DELAY:
                 {
-                    bool bPanDelay;
-                    argStream.ReadBool(bPanDelay);
-                    params.lPanDelay = bPanDelay;
+                    params.lPanDelay = value.GetBoolean();
                     break;
                 }
             }
-
-            if (argStream.HasErrors())
-                break;
 
             return SetParamWithErrorLog(eEffectParameter, params);
         }
         case BASS_FX_DX8_FLANGER:
         {
             BASS_DX8_FLANGER params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
             Flanger eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
+            StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case Flanger::WET_DRY_MIX:
                 {
-                    argStream.ReadNumber(params.fWetDryMix);
+                    params.fWetDryMix = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Flanger::DEPTH:
                 {
-                    argStream.ReadNumber(params.fDepth);
+                    params.fDepth = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Flanger::FEEDBACK:
                 {
-                    argStream.ReadNumber(params.fFeedback);
+                    params.fFeedback = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Flanger::FREQUENCY:
                 {
-                    argStream.ReadNumber(params.fFrequency);
+                    params.fFrequency = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Flanger::WAVEFORM:
                 {
-                    argStream.ReadNumber(params.lWaveform);
+                    params.lWaveform = static_cast<DWORD>(value.GetNumber());
                     break;
                 }
                 case Flanger::DELAY:
                 {
-                    argStream.ReadNumber(params.fDelay);
+                    params.fDelay = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Flanger::PHASE:
                 {
-                    argStream.ReadNumber(params.lPhase);
+                    params.lPhase = static_cast<DWORD>(value.GetNumber());
                     break;
                 }
             }
-
-            if (argStream.HasErrors())
-                break;
 
             return SetParamWithErrorLog(eEffectParameter, params);
         }
         case BASS_FX_DX8_GARGLE:
         {
             BASS_DX8_GARGLE params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
             Gargle eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
+            StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case Gargle::RATE_HZ:
                 {
-                    argStream.ReadNumber(params.dwRateHz);
+                    params.dwRateHz = static_cast<DWORD>(value.GetNumber());
                     break;
                 }
                 case Gargle::WAVE_SHAPE:
                 {
-                    argStream.ReadNumber(params.dwWaveShape);
+                    params.dwWaveShape = static_cast<DWORD>(value.GetNumber());
                     break;
                 }
             }
-
-            if (argStream.HasErrors())
-                break;
 
             return SetParamWithErrorLog(eEffectParameter, params);
         }
         case BASS_FX_DX8_I3DL2REVERB:
         {
             BASS_DX8_I3DL2REVERB params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
             I3DL2Reverb eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
+            StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case I3DL2Reverb::ROOM:
                 {
-                    argStream.ReadNumber(params.lRoom);
+                    params.lRoom = static_cast<int>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::ROOM_HF:
                 {
-                    argStream.ReadNumber(params.lRoomHF);
+                    params.lRoomHF = static_cast<int>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::ROOM_ROLLOFF_FACTOR:
                 {
-                    argStream.ReadNumber(params.flRoomRolloffFactor);
+                    params.flRoomRolloffFactor = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::DECAY_TIME:
                 {
-                    argStream.ReadNumber(params.flDecayTime);
+                    params.flDecayTime = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::DECAY_HF_RATIO:
                 {
-                    argStream.ReadNumber(params.flDecayHFRatio);
+                    params.flDecayHFRatio = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::REFLECTIONS:
                 {
-                    argStream.ReadNumber(params.lReflections);
+                    params.lReflections = static_cast<int>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::REFLECTIONS_DELAY:
                 {
-                    argStream.ReadNumber(params.flReflectionsDelay);
+                    params.flReflectionsDelay = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::REVERB:
                 {
-                    argStream.ReadNumber(params.lReverb);
+                    params.lReverb = static_cast<int>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::REVERB_DELAY:
                 {
-                    argStream.ReadNumber(params.flReverbDelay);
+                    params.flReverbDelay = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::DIFFUSION:
                 {
-                    argStream.ReadNumber(params.flDiffusion);
+                    params.flDiffusion = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::DENSITY:
                 {
-                    argStream.ReadNumber(params.flDensity);
+                    params.flDensity = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case I3DL2Reverb::HF_REFERENCE:
                 {
-                    argStream.ReadNumber(params.flHFReference);
+                    params.flHFReference = static_cast<float>(value.GetNumber());
                     break;
                 }
             }
-
-            if (argStream.HasErrors())
-                break;
 
             return SetParamWithErrorLog(eEffectParameter, params);
         }
         case BASS_FX_DX8_PARAMEQ:
         {
             BASS_DX8_PARAMEQ params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
             ParamEq eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
+            StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case ParamEq::CENTER:
                 {
-                    argStream.ReadNumber(params.fCenter);
+                    params.fCenter = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case ParamEq::BANDWIDTH:
                 {
-                    argStream.ReadNumber(params.fBandwidth);
+                    params.fBandwidth = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case ParamEq::GAIN:
                 {
-                    argStream.ReadNumber(params.fGain);
+                    params.fGain = static_cast<float>(value.GetNumber());
                     break;
                 }
             }
-
-            if (argStream.HasErrors())
-                break;
 
             return SetParamWithErrorLog(eEffectParameter, params);
         }
         case BASS_FX_DX8_REVERB:
         {
             BASS_DX8_REVERB params;
-            pSound->GetFxEffectParameters(eEffectType, &params);
+            sound->GetFxEffectParameters(effectType, &params);
 
             Reverb eEffectParameter;
-            argStream.ReadEnumString(eEffectParameter);
+            StringToEnum(effectParam, eEffectParameter);
             switch (eEffectParameter)
             {
                 case Reverb::IN_GAIN:
                 {
-                    argStream.ReadNumber(params.fInGain);
+                    params.fInGain = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Reverb::REVERB_MIX:
                 {
-                    argStream.ReadNumber(params.fReverbMix);
+                    params.fReverbMix = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Reverb::REVERB_TIME:
                 {
-                    argStream.ReadNumber(params.fReverbTime);
+                    params.fReverbTime = static_cast<float>(value.GetNumber());
                     break;
                 }
                 case Reverb::HIGH_FREQ_RT_RATIO:
                 {
-                    argStream.ReadNumber(params.fHighFreqRTRatio);
+                    params.fHighFreqRTRatio = static_cast<float>(value.GetNumber());
                     break;
                 }
             }
 
-            if (argStream.HasErrors())
-                break;
-
             return SetParamWithErrorLog(eEffectParameter, params);
         }
-    }
-
-    // Only ever reaches this point if there's an error
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    };
+    throw std::runtime_error("Cannot set effect parameter!");
 }
 
-std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSoundEffectParameters(
+std::variant<bool, std::unordered_map<std::string, CLuaArgument>>
+CLuaAudioDefs::GetSoundEffectParameters(
     CClientSound* sound,
     eSoundEffectType effectType
 ) noexcept {
@@ -1398,9 +1028,11 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
     if (!sound || !sound->IsFxEffectEnabled(effectType))
         return false;
 
-    std::unordered_map<const char*, float> arr;
+    std::unordered_map<std::string, CLuaArgument> arr;
 
     using namespace eSoundEffectParams;
+
+    CLuaArgument arg;
 
     switch (effectType)
     {
@@ -1410,13 +1042,20 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxChorusParams))
                 break;
 
-            arr.insert({EnumToString(Chorus::WET_DRY_MIX), fxChorusParams.fWetDryMix});
-            arr.insert({EnumToString(Chorus::DEPTH), fxChorusParams.fDepth});
-            arr.insert({EnumToString(Chorus::FEEDBACK), fxChorusParams.fFeedback});
-            arr.insert({EnumToString(Chorus::FREQUENCY), fxChorusParams.fFrequency});
-            arr.insert({EnumToString(Chorus::WAVEFORM), fxChorusParams.lWaveform});
-            arr.insert({EnumToString(Chorus::DELAY), fxChorusParams.fDelay});
-            arr.insert({EnumToString(Chorus::PHASE), fxChorusParams.lPhase});
+            arg.ReadNumber(fxChorusParams.fWetDryMix);
+            arr[EnumToString(Chorus::WET_DRY_MIX)] = arg;
+            arg.ReadNumber(fxChorusParams.fDepth);
+            arr[EnumToString(Chorus::DEPTH)] = arg;
+            arg.ReadNumber(fxChorusParams.fFeedback);
+            arr[EnumToString(Chorus::FEEDBACK)] = arg;
+            arg.ReadNumber(fxChorusParams.fFrequency);
+            arr[EnumToString(Chorus::FREQUENCY)] = arg;
+            arg.ReadNumber(fxChorusParams.lWaveform);
+            arr[EnumToString(Chorus::WAVEFORM)] = arg;
+            arg.ReadNumber(fxChorusParams.fDelay);
+            arr[EnumToString(Chorus::DELAY)] = arg;
+            arg.ReadNumber(fxChorusParams.lPhase);
+            arr[EnumToString(Chorus::PHASE)] = arg;
             break;
         }
         case BASS_FX_DX8_COMPRESSOR:
@@ -1425,12 +1064,18 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxCompressorParams))
                 break;
 
-            arr.insert({EnumToString(Compressor::GAIN), fxCompressorParams.fGain});
-            arr.insert({EnumToString(Compressor::ATTACK), fxCompressorParams.fAttack});
-            arr.insert({EnumToString(Compressor::RELEASE), fxCompressorParams.fRelease});
-            arr.insert({EnumToString(Compressor::THRESHOLD), fxCompressorParams.fThreshold});
-            arr.insert({EnumToString(Compressor::RATIO), fxCompressorParams.fRatio});
-            arr.insert({EnumToString(Compressor::PREDELAY), fxCompressorParams.fPredelay});
+            arg.ReadNumber(fxCompressorParams.fGain);
+            arr[EnumToString(Compressor::GAIN)] = arg;
+            arg.ReadNumber(fxCompressorParams.fAttack);
+            arr[EnumToString(Compressor::ATTACK)] = arg;
+            arg.ReadNumber(fxCompressorParams.fRelease);
+            arr[EnumToString(Compressor::RELEASE)] = arg;
+            arg.ReadNumber(fxCompressorParams.fThreshold);
+            arr[EnumToString(Compressor::THRESHOLD)] = arg;
+            arg.ReadNumber(fxCompressorParams.fRatio);
+            arr[EnumToString(Compressor::RATIO)] = arg;
+            arg.ReadNumber(fxCompressorParams.fPredelay);
+            arr[EnumToString(Compressor::PREDELAY)] = arg;
             break;
         }
         case BASS_FX_DX8_DISTORTION:
@@ -1439,11 +1084,16 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxDistortionParams))
                 break;
 
-            arr.insert({EnumToString(Distortion::GAIN), fxDistortionParams.fGain});
-            arr.insert({EnumToString(Distortion::EDGE), fxDistortionParams.fEdge});
-            arr.insert({EnumToString(Distortion::POST_EQ_CENTER_FREQUENCY), fxDistortionParams.fPostEQCenterFrequency});
-            arr.insert({EnumToString(Distortion::POST_EQ_BANDWIDTH), fxDistortionParams.fPostEQBandwidth});
-            arr.insert({EnumToString(Distortion::PRE_LOWPASS_CUTOFF), fxDistortionParams.fPreLowpassCutoff});
+            arg.ReadNumber(fxDistortionParams.fGain);
+            arr[EnumToString(Distortion::GAIN)] = arg;
+            arg.ReadNumber(fxDistortionParams.fEdge);
+            arr[EnumToString(Distortion::EDGE)] = arg;
+            arg.ReadNumber(fxDistortionParams.fPostEQCenterFrequency);
+            arr[EnumToString(Distortion::POST_EQ_CENTER_FREQUENCY)] = arg;
+            arg.ReadNumber(fxDistortionParams.fPostEQBandwidth);
+            arr[EnumToString(Distortion::POST_EQ_BANDWIDTH)] = arg;
+            arg.ReadNumber(fxDistortionParams.fPreLowpassCutoff);
+            arr[EnumToString(Distortion::PRE_LOWPASS_CUTOFF)] = arg;
             break;
         }
         case BASS_FX_DX8_ECHO:
@@ -1452,11 +1102,16 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxEchoParams))
                 break;
 
-            arr.insert({EnumToString(Echo::WET_DRY_MIX), fxEchoParams.fWetDryMix});
-            arr.insert({EnumToString(Echo::FEEDBACK), fxEchoParams.fFeedback});
-            arr.insert({EnumToString(Echo::LEFT_DELAY), fxEchoParams.fLeftDelay});
-            arr.insert({EnumToString(Echo::RIGHT_DELAY), fxEchoParams.fRightDelay});
-            arr.insert({EnumToString(Echo::PAN_DELAY), fxEchoParams.lPanDelay});
+            arg.ReadNumber(fxEchoParams.fWetDryMix);
+            arr[EnumToString(Echo::WET_DRY_MIX)] = arg;
+            arg.ReadNumber(fxEchoParams.fFeedback);
+            arr[EnumToString(Echo::FEEDBACK)] = arg;
+            arg.ReadNumber(fxEchoParams.fLeftDelay);
+            arr[EnumToString(Echo::LEFT_DELAY)] = arg;
+            arg.ReadNumber(fxEchoParams.fRightDelay);
+            arr[EnumToString(Echo::RIGHT_DELAY)] = arg;
+            arg.ReadBool(fxEchoParams.lPanDelay);
+            arr[EnumToString(Echo::PAN_DELAY)] = arg;
             break;
         }
         case BASS_FX_DX8_FLANGER:
@@ -1465,13 +1120,20 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxFlangerParams))
                 break;
 
-            arr.insert({EnumToString(Flanger::WET_DRY_MIX), fxFlangerParams.fWetDryMix});
-            arr.insert({EnumToString(Flanger::DEPTH), fxFlangerParams.fDepth});
-            arr.insert({EnumToString(Flanger::FEEDBACK), fxFlangerParams.fFeedback});
-            arr.insert({EnumToString(Flanger::FREQUENCY), fxFlangerParams.fFrequency});
-            arr.insert({EnumToString(Flanger::WAVEFORM), fxFlangerParams.lWaveform});
-            arr.insert({EnumToString(Flanger::DELAY), fxFlangerParams.fDelay});
-            arr.insert({EnumToString(Flanger::PHASE), fxFlangerParams.lPhase});
+            arg.ReadNumber(fxFlangerParams.fWetDryMix);
+            arr[EnumToString(Flanger::WET_DRY_MIX)] = arg;
+            arg.ReadNumber(fxFlangerParams.fDepth);
+            arr[EnumToString(Flanger::DEPTH)] = arg;
+            arg.ReadNumber(fxFlangerParams.fFeedback);
+            arr[EnumToString(Flanger::FEEDBACK)] = arg;
+            arg.ReadNumber(fxFlangerParams.fFrequency);
+            arr[EnumToString(Flanger::FREQUENCY)] = arg;
+            arg.ReadNumber(fxFlangerParams.lWaveform);
+            arr[EnumToString(Flanger::WAVEFORM)] = arg;
+            arg.ReadNumber(fxFlangerParams.fDelay);
+            arr[EnumToString(Flanger::DELAY)] = arg;
+            arg.ReadNumber(fxFlangerParams.lPhase);
+            arr[EnumToString(Flanger::PHASE)] = arg;
             break;
         }
         case BASS_FX_DX8_GARGLE:
@@ -1480,8 +1142,10 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxGargleParams))
                 break;
 
-            arr.insert({EnumToString(Gargle::RATE_HZ), fxGargleParams.dwRateHz});
-            arr.insert({EnumToString(Gargle::WAVE_SHAPE), fxGargleParams.dwWaveShape});
+            arg.ReadNumber(fxGargleParams.dwRateHz);
+            arr[EnumToString(Gargle::RATE_HZ)] = arg;
+            arg.ReadNumber(fxGargleParams.dwWaveShape);
+            arr[EnumToString(Gargle::WAVE_SHAPE)] = arg;
             break;
         }
         case BASS_FX_DX8_I3DL2REVERB:
@@ -1490,18 +1154,30 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxI3DL2ReverbParams))
                 break;
 
-            arr.insert({EnumToString(I3DL2Reverb::ROOM), fxI3DL2ReverbParams.lRoom});
-            arr.insert({EnumToString(I3DL2Reverb::ROOM_HF), fxI3DL2ReverbParams.lRoomHF});
-            arr.insert({EnumToString(I3DL2Reverb::ROOM_ROLLOFF_FACTOR), fxI3DL2ReverbParams.flRoomRolloffFactor});
-            arr.insert({EnumToString(I3DL2Reverb::DECAY_TIME), fxI3DL2ReverbParams.flDecayTime});
-            arr.insert({EnumToString(I3DL2Reverb::DECAY_HF_RATIO), fxI3DL2ReverbParams.flDecayHFRatio});
-            arr.insert({EnumToString(I3DL2Reverb::REFLECTIONS), fxI3DL2ReverbParams.lReflections});
-            arr.insert({EnumToString(I3DL2Reverb::REFLECTIONS_DELAY), fxI3DL2ReverbParams.flReflectionsDelay});
-            arr.insert({EnumToString(I3DL2Reverb::REVERB), fxI3DL2ReverbParams.lReverb});
-            arr.insert({EnumToString(I3DL2Reverb::REVERB_DELAY), fxI3DL2ReverbParams.flReverbDelay});
-            arr.insert({EnumToString(I3DL2Reverb::DIFFUSION), fxI3DL2ReverbParams.flDiffusion});
-            arr.insert({EnumToString(I3DL2Reverb::DENSITY), fxI3DL2ReverbParams.flDensity});
-            arr.insert({EnumToString(I3DL2Reverb::HF_REFERENCE), fxI3DL2ReverbParams.flHFReference});
+            arg.ReadNumber(fxI3DL2ReverbParams.lRoom);
+            arr[EnumToString(I3DL2Reverb::ROOM)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.lRoomHF);
+            arr[EnumToString(I3DL2Reverb::ROOM_HF)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.flRoomRolloffFactor);
+            arr[EnumToString(I3DL2Reverb::ROOM_ROLLOFF_FACTOR)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.flDecayTime);
+            arr[EnumToString(I3DL2Reverb::DECAY_TIME)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.flDecayHFRatio);
+            arr[EnumToString(I3DL2Reverb::DECAY_HF_RATIO)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.lReflections);
+            arr[EnumToString(I3DL2Reverb::REFLECTIONS)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.flReflectionsDelay);
+            arr[EnumToString(I3DL2Reverb::REFLECTIONS_DELAY)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.lReverb);
+            arr[EnumToString(I3DL2Reverb::REVERB)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.flReverbDelay);
+            arr[EnumToString(I3DL2Reverb::REVERB_DELAY)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.flDiffusion);
+            arr[EnumToString(I3DL2Reverb::DIFFUSION)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.flDensity);
+            arr[EnumToString(I3DL2Reverb::DENSITY)] = arg;
+            arg.ReadNumber(fxI3DL2ReverbParams.flHFReference);
+            arr[EnumToString(I3DL2Reverb::HF_REFERENCE)] = arg;
             break;
         }
         case BASS_FX_DX8_PARAMEQ:
@@ -1510,9 +1186,12 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxParameqParams))
                 break;
 
-            arr.insert({EnumToString(ParamEq::CENTER), fxParameqParams.fCenter});
-            arr.insert({EnumToString(ParamEq::BANDWIDTH), fxParameqParams.fBandwidth});
-            arr.insert({EnumToString(ParamEq::GAIN), fxParameqParams.fGain});
+            arg.ReadNumber(fxParameqParams.fCenter);
+            arr[EnumToString(ParamEq::CENTER)] = arg;
+            arg.ReadNumber(fxParameqParams.fBandwidth);
+            arr[EnumToString(ParamEq::BANDWIDTH)] = arg;
+            arg.ReadNumber(fxParameqParams.fGain);
+            arr[EnumToString(ParamEq::GAIN)] = arg;
             break;
         }
         case BASS_FX_DX8_REVERB:
@@ -1521,10 +1200,14 @@ std::variant<bool, std::unordered_map<const char*, float>> CLuaAudioDefs::GetSou
             if (!sound->GetFxEffectParameters(effectType, &fxReverbParams))
                 break;
 
-            arr.insert({EnumToString(Reverb::IN_GAIN), fxReverbParams.fInGain});
-            arr.insert({EnumToString(Reverb::REVERB_MIX), fxReverbParams.fReverbMix});
-            arr.insert({EnumToString(Reverb::REVERB_TIME), fxReverbParams.fReverbTime});
-            arr.insert({EnumToString(Reverb::HIGH_FREQ_RT_RATIO), fxReverbParams.fHighFreqRTRatio});
+            arg.ReadNumber(fxReverbParams.fInGain);
+            arr[EnumToString(Reverb::IN_GAIN)] = arg;
+            arg.ReadNumber(fxReverbParams.fReverbMix);
+            arr[EnumToString(Reverb::REVERB_MIX)] = arg;
+            arg.ReadNumber(fxReverbParams.fReverbTime);
+            arr[EnumToString(Reverb::REVERB_TIME)] = arg;
+            arg.ReadNumber(fxReverbParams.fHighFreqRTRatio);
+            arr[EnumToString(Reverb::HIGH_FREQ_RT_RATIO)] = arg;
             break;
         }
     }
@@ -1566,7 +1249,7 @@ std::uint8_t CLuaAudioDefs::GetRadioChannel() noexcept
     return CStaticFunctionDefinitions::GetRadioChannel();
 }
 
-std::variant<bool, const char*> CLuaAudioDefs::GetRadioChannelName(int channel) noexcept
+std::variant<bool, std::string> CLuaAudioDefs::GetRadioChannelName(int channel) noexcept
 {
     static const SFixedArray<const char*, 13> szRadioStations = {{
         "Radio off", "Playback FM", "K-Rose", "K-DST", "Bounce FM", "SF-UR", "Radio Los Santos",
