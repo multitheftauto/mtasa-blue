@@ -757,14 +757,14 @@ std::variant<bool, std::string> CLuaFileDefs::fileRead (
         auto canModify = CheckCanModifyOtherResource(pThisResource, pResource);
         if (!canModify.first)
         {
-            throw std::runtime_error(canModify.second);
+            throw std::invalid_argument(canModify.second);
         }
     }
     {
         auto canModify = CheckCanAccessOtherResourceFile(pThisResource, pResource, strAbsPath);
         if (!canModify.first)
         {
-            throw std::runtime_error(canModify.second);
+            throw std::invalid_argument(canModify.second);
         }
     }
 
@@ -780,10 +780,10 @@ std::variant<bool, std::string> CLuaFileDefs::fileRead (
     if (!pFile->Load(pResource, CScriptFile::MODE_READ))
     {
         delete pFile;
-        throw std::runtime_error(SString("unable to load file '%s'", strInputPath.c_str()));
+        throw std::invalid_argument(SString("unable to load file '%s'", strInputPath.c_str()));
     }
 
-    auto content = ReadFile(pFile, pFile->GetSize());
+    std::variant<bool, std::string> content = ReadFile(pFile, pFile->GetSize());
     pFile->Unload();
     delete pFile;
     return content;
