@@ -46,7 +46,7 @@ void CLuaFileDefs::LoadFunctions()
         {"fileDelete", fileDelete},
         {"fileClose", fileClose},
         {"fileFlush", fileFlush},
-        {"fileRead", fileRead},
+        {"fileRead", ArgumentParser<fileRead>},
         {"fileWrite", fileWrite},
         {"fileGetPos", fileGetPos},
         {"fileGetSize", fileGetSize},
@@ -702,51 +702,91 @@ int CLuaFileDefs::fileFlush(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFileDefs::fileRead(lua_State* luaVM)
-{
-    //  string fileRead ( file theFile, int count )
-    CScriptFile*  pFile;
-    unsigned long ulCount = 0;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pFile);
-    argStream.ReadNumber(ulCount);
-
-    if (!argStream.HasErrors())
+std::variant<bool, std::string> CLuaFileDefs::fileRead (
+    lua_State* luaVM,
+    std::variant<CScriptFile*, std::string> file,
+    std::optional<std::uint32_t> count
+) {
+    const auto& ReadFile = [&](CScriptFile* pFile, std::uint32_t count)
+        -> std::variant<bool, std::string>
     {
-        // Reading zero bytes from a file results in an empty string
-        if (ulCount == 0)
-        {
-            lua_pushstring(luaVM, "");
-            return 1;
-        }
+        if (count == 0)
+            return "";
 
-        // Allocate a buffer to read the stuff into and read some :~ into it
         SString buffer;
-        long    lBytesRead = pFile->Read(ulCount, buffer);
+        auto    bytesRead = pFile->Read(count, buffer);
 
-        if (lBytesRead >= 0)
-        {
-            // Push the string onto the Lua stack. Use pushlstring so we are binary
-            // compatible. Normal push string takes zero terminated strings.
-            lua_pushlstring(luaVM, buffer.data(), lBytesRead);
-            return 1;
-        }
-        else if (lBytesRead == -2)
+        if (bytesRead == -2)
         {
             m_pScriptDebugging->LogWarning(luaVM, "out of memory");
+            return false;
         }
-        else
+        if (bytesRead >= 0)
+            return buffer;
+    };
+    if (std::holds_alternative<CScriptFile*>(file))
+    {
+        auto pFile = std::get<CScriptFile*>(file);
+        if (!pFile)
         {
             m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
+            return false;
+        }
+        if (!count.has_value())
+        {
+            m_pScriptDebugging->LogBadType(luaVM);
+            return false;
+        }
+        return ReadFile(pFile, count.value());
+    }
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    std::string strInputPath = std::get<std::string>(file);
+
+    SString    strAbsPath;
+    SString    strMetaPath;
+    CResource* pThisResource = pLuaMain->GetResource();
+    CResource* pResource = pThisResource;
+    if (!CResourceManager::ParseResourcePathInput(strInputPath, pResource, &strAbsPath, &strMetaPath))
+        return false;
+
+    {
+        auto canModify = CheckCanModifyOtherResource(pThisResource, pResource);
+        if (!canModify.first)
+        {
+            throw std::runtime_error(canModify.second);
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    {
+        auto canModify = CheckCanAccessOtherResourceFile(pThisResource, pResource, strAbsPath);
+        if (!canModify.first)
+        {
+            throw std::runtime_error(canModify.second);
+        }
+    }
 
-    // Error
-    lua_pushnil(luaVM);
-    return 1;
+    // IF SERVER
+#ifndef MTA_CLIENT
+    // Create the file to create
+    CScriptFile* pFile = new CScriptFile(pThisResource->GetScriptID(), strMetaPath, DEFAULT_MAX_FILESIZE);
+#else
+    eAccessType  accessType = strInputPath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
+    CScriptFile* pFile = new CScriptFile(pThisResource->GetScriptID(), strMetaPath, DEFAULT_MAX_FILESIZE, accessType);
+#endif
+    // Try to load it
+    if (!pFile->Load(pResource, CScriptFile::MODE_READ))
+    {
+        delete pFile;
+        throw std::runtime_error(SString("unable to load file '%s'", strInputPath));
+    }
+
+    auto content = ReadFile(pFile, pFile->GetSize());
+    pFile->Unload();
+    delete pFile;
+    return content;
 }
 
 int CLuaFileDefs::fileWrite(lua_State* luaVM)

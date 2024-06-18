@@ -28,7 +28,7 @@ private:
 
     LUA_DECLARE(fileClose);
     LUA_DECLARE(fileFlush);
-    LUA_DECLARE(fileRead);
+    static std::variant<bool, std::string> fileRead(lua_State* luaVM, std::variant<CScriptFile*, std::string> file, std::optional<std::uint32_t> count);
     LUA_DECLARE(fileWrite);
     static std::optional<std::string> fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents);
 
