@@ -3709,10 +3709,10 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         }
 
                                         CLuaArguments Arguments2;
-                                        Arguments2.PushElement(pJacked);                 // player / ped
-                                        Arguments2.PushNumber(ucOccupiedSeat);            // seat
-                                        Arguments2.PushElement(pPed);                     // jacker
-                                        Arguments2.PushBoolean(false);     
+                                        Arguments2.PushElement(pJacked);                 // jacked
+                                        Arguments2.PushNumber(ucOccupiedSeat);           // seat
+                                        Arguments2.PushElement(pPed);                    // jacker
+                                        Arguments2.PushBoolean(false);                   // forcedByScript
     
                                         pVehicle->CallEvent("onVehicleExit", Arguments2);
 
