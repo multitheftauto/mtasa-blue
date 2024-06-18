@@ -224,22 +224,22 @@ int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
 
 std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    if (!resourceElement)
+    if (resourceElement && resourceElement.has_value())
     {
-        CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
-
-        if (!localVM)
-            throw std::runtime_error("Couldn't find the virtual machine");
-
-        CResource* localResource = localVM->GetResource();
-
-        if (!localResource)
-            throw std::runtime_error("Couldn't find the resource");
-
-        resourceElement = localResource;
+        return (*resourceElement)->GetName();
     }
 
-    return (*resourceElement)->GetName();
+    CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    if (!localVM)
+        throw std::invalid_argument("Couldn't find the virtual machine");
+
+    CResource* localResource = localVM->GetResource();
+
+    if (!localResource)
+        throw std::invalid_argument("Couldn't find the resource");
+
+    return localResource->GetName();
 }
 
 int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
