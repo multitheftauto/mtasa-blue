@@ -3696,7 +3696,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         CLuaArguments Arguments;
                                         Arguments.PushElement(pVehicle);                 // vehicle 
                                         Arguments.PushNumber(ucOccupiedSeat);            // seat
-                                        Arguments.PushElement(pJacked);                  // jacked                                    
+                                        Arguments.PushElement(pPed);                     // jacker                                    
                                         Arguments.PushBoolean(false);                    // forcedByScript
 
                                         if (pJacked->IsPlayer())
