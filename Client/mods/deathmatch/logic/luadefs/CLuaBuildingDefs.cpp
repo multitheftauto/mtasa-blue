@@ -45,13 +45,12 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (!CClientBuildingManager::IsValidModel(modelId))
         throw std::invalid_argument("Invalid building model id");
 
-    if (!g_pGame->GetPools()->GetBuildingsPool().HasFreeBuildingSlot())
-        throw std::invalid_argument("No free slot in buildings pool");
-
     if (!CClientBuildingManager::IsValidPosition(pos))
         throw std::invalid_argument("Position is outside of game world");
 
     ConvertDegreesToRadians(rot);
+
+    m_pBuildingManager->ResizePoolIfNeeds();
 
     CClientBuilding* pBuilding = new CClientBuilding(m_pManager, INVALID_ELEMENT_ID, modelId, pos, rot, interior.value_or(0));
 
@@ -63,44 +62,10 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
 
 void CLuaBuildingDefs::RemoveAllGameBuildings()
 {
-    // We do not want to remove scripted buildings
-    // But we need remove them from the buildings pool for a bit...
-    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
-    {
-        building->Destroy();
-    }
-
-    // This function makes buildings backup without scripted buildings
-    g_pGame->RemoveAllBuildings();
-
-    // ... And restore here
-    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
-    {
-        building->Create();
-    }
+    m_pBuildingManager->RemoveAllGameBuildings();
 }
 
 void CLuaBuildingDefs::RestoreGameBuildings()
 {
-    // We want to restore the game buildings to the same positions as they were before the backup.
-    // Remove scripted buildings for a bit
-    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
-    {
-        building->Destroy();
-    }
-
-    g_pGame->RestoreGameBuildings();
-
-    // Restore what we can
-    for (CClientBuilding* building : m_pBuildingManager->GetBuildings())
-    {
-        building->Create();
-
-        if (!building->IsValid())
-        {
-            // User creates too much buildings
-            // We can't restore them all
-            delete building;
-        }
-    }
+    m_pBuildingManager->RestoreAllGameBuildings();
 }

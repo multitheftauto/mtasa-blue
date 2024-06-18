@@ -37,6 +37,7 @@ struct Curl_ssl_session;
 #define SSLSUPP_HTTPS_PROXY  (1<<4) /* supports access via HTTPS proxies */
 #define SSLSUPP_TLS13_CIPHERSUITES (1<<5) /* supports TLS 1.3 ciphersuites */
 #define SSLSUPP_CAINFO_BLOB  (1<<6)
+#define SSLSUPP_ECH          (1<<7)
 
 #define ALPN_ACCEPTED "ALPN: server accepted "
 
@@ -107,7 +108,8 @@ void Curl_ssl_conn_config_update(struct Curl_easy *data, bool for_proxy);
 /**
  * Init SSL peer information for filter. Can be called repeatedly.
  */
-CURLcode Curl_ssl_peer_init(struct ssl_peer *peer, struct Curl_cfilter *cf);
+CURLcode Curl_ssl_peer_init(struct ssl_peer *peer,
+                            struct Curl_cfilter *cf, int transport);
 /**
  * Free all allocated data and reset peer information.
  */
@@ -228,7 +230,9 @@ struct ssl_primary_config *
   Curl_ssl_cf_get_primary_config(struct Curl_cfilter *cf);
 
 extern struct Curl_cftype Curl_cft_ssl;
+#ifndef CURL_DISABLE_PROXY
 extern struct Curl_cftype Curl_cft_ssl_proxy;
+#endif
 
 #else /* if not USE_SSL */
 

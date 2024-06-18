@@ -17,6 +17,7 @@
 #include "CBuildingSA.h"
 #include "CTextureDictonarySA.h"
 #include "CBuildingsPoolSA.h"
+#include "CDummyPoolSA.h"
 
 #define INVALID_POOL_ARRAY_ID 0xFFFFFFFF
 
@@ -37,11 +38,8 @@ private:
 public:
     void                       RemoveVehicle(CVehicle* pVehicle, bool bDelete = true);
     SClientEntity<CVehicleSA>* GetVehicle(DWORD* pGameInterface);
-    unsigned long              GetVehicleCount()
-    {
-        return m_vehiclePool.ulCount;
-        ;
-    }
+    SClientEntity<CVehicleSA>* GetVehicle(size_t pos) { return &m_vehiclePool.arrayOfClientEntities[pos]; };
+    unsigned long              GetVehicleCount() { return m_vehiclePool.ulCount; };
     void DeleteAllVehicles();
 
     // Objects pool
@@ -67,6 +65,7 @@ private:
 public:
     void                   RemovePed(CPed* ped, bool bDelete = true);
     SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface);
+    SClientEntity<CPedSA>* GetPed(size_t pos) { return &m_pedPool.arrayOfClientEntities[pos]; };
     CPed*                  GetPedFromRef(DWORD dwGameRef);
     CPedSAInterface*       GetPedInterface(DWORD dwGameRef);            // game_sa specific
     unsigned long          GetPedCount() { return m_pedPool.ulCount; }
@@ -85,6 +84,7 @@ public:
 
     int  GetNumberOfUsedSpaces(ePools pools);
     int  GetPoolDefaultCapacity(ePools pool);
+    int  GetPoolDefaultModdedCapacity(ePools pool);
     int  GetPoolCapacity(ePools pool);
     void SetPoolCapacity(ePools pool, int iValue);
 
@@ -98,6 +98,7 @@ public:
     ushort GetFreeTextureDictonarySlot();
 
     CBuildingsPool& GetBuildingsPool() noexcept override { return m_BuildingsPool; };
+    CDummyPool&     GetDummyPool() noexcept { return m_DummyPool; };
 
 private:
     // Pools
@@ -111,6 +112,7 @@ private:
     CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;
 
     CBuildingsPoolSA m_BuildingsPool;
+    CDummyPoolSA     m_DummyPool;
 
     bool m_bGetVehicleEnabled;
 };
