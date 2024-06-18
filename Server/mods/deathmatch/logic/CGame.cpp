@@ -3694,7 +3694,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         m_pPlayerManager->BroadcastOnlyJoined(JackedReply);
 
                                         CLuaArguments Arguments;
-                                        Arguments.PushElement(pJacked);                  // player / ped
+                                        Arguments.PushElement(pVehicle);                 // vehicle 
                                         Arguments.PushNumber(ucOccupiedSeat);            // seat
                                         Arguments.PushElement(pPed);                     // jacker                                    
                                         Arguments.PushBoolean(false);                    // forcedByScript
@@ -3707,8 +3707,14 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         {
                                          pJacked->CallEvent("onPedVehicleExit", Arguments);
                                         }
+
+                                        CLuaArguments Arguments2;
+                                        Arguments2.PushElement(pJacked);                 // player / ped
+                                        Arguments2.PushNumber(ucOccupiedSeat);            // seat
+                                        Arguments2.PushElement(pPed);                     // jacker
+                                        Arguments2.PushBoolean(false);     
     
-                                        pVehicle->CallEvent("onVehicleExit", Arguments);
+                                        pVehicle->CallEvent("onVehicleExit", Arguments2);
 
                                         if (!sendListIncompatiblePlayers.empty())
                                         {
