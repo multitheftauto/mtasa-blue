@@ -3694,9 +3694,9 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         m_pPlayerManager->BroadcastOnlyJoined(JackedReply);
 
                                         CLuaArguments Arguments;
-                                        Arguments.PushElement(pPed);                     // player / ped
+                                        Arguments.PushElement(pJacked);                  // player / ped
                                         Arguments.PushNumber(ucOccupiedSeat);            // seat
-                                        Arguments.PushElement(pJacked);                  // jacker
+                                        Arguments.PushElement(pPed);                       // jacker                                    
                                         Arguments.PushBoolean(false);                    // forcedByScript
 
                                         if (pJacked->IsPlayer())
