@@ -849,32 +849,48 @@ int CLuaFileDefs::fileWrite(lua_State* luaVM)
     return 1;
 }
 
-std::optional<std::string> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents)
-{
+std::optional<std::string> CLuaFileDefs::fileGetContents(
+    lua_State* luaVM,
+    std::variant<CScriptFile*, std::string> file,
+    std::optional<bool> maybeVerifyContents
+) {
     // string fileGetContents ( file target [, bool verifyContents = true ] )
 
-    std::string buffer;
-    const long bytesRead = scriptFile->GetContents(buffer);
-
-    if (bytesRead == -2)
+    const auto& ReadFile = [&](CScriptFile* pFile) -> std::optional<std::string>
     {
-        m_pScriptDebugging->LogWarning(L, "out of memory");
-        return {};
-    }
-    else if (bytesRead < 0)
-    {
-        m_pScriptDebugging->LogBadPointer(L, "file", 1);
-        return {};
-    }
+        std::string buffer;
+        const auto  bytesRead = pFile->GetContents(buffer);
 
-    if (maybeVerifyContents.value_or(true) == false)
-        return buffer;
+        if (bytesRead == -2)
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "out of memory");
+            return std::nullopt;
+        }
+        else if (bytesRead < 0)
+        {
+            m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
+            return std::nullopt;
+        }
 
-    CResource& thisResource = lua_getownerresource(L);
+        if (!maybeVerifyContents.value_or(true))
+            return buffer;
 
-    if (CResourceFile* resourceFile = scriptFile->GetResourceFile(); resourceFile != nullptr)
-    {
-        const CChecksum current = CChecksum::GenerateChecksumFromBuffer(buffer.data(), static_cast<unsigned long>(buffer.size()));
+        CResource&     thisResource = lua_getownerresource(luaVM);
+        CResourceFile* resourceFile = pFile->GetResourceFile();
+        if (!resourceFile)
+        {
+            const SString warningFilePath = getResourceFilePath(&thisResource,
+                pFile->GetResource(), pFile->GetFilePath()
+            );
+            m_pScriptDebugging->LogWarning(luaVM,
+                "verification failed: resource file not found '%s'",
+                warningFilePath.c_str()
+            );
+            return std::nullopt;
+        }
+        const CChecksum current = CChecksum::GenerateChecksumFromBuffer(
+            buffer.data(), buffer.size()
+        );
 
 #ifdef MTA_CLIENT
         const CChecksum expected = resourceFile->GetServerChecksum();
@@ -885,17 +901,67 @@ std::optional<std::string> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFi
         if (current == expected)
             return buffer;
 
-        const SString warningFilePath = getResourceFilePath(&thisResource, scriptFile->GetResource(), scriptFile->GetFilePath());
-        m_pScriptDebugging->LogWarning(L, "verification failed: checksum mismatch for resource file '%s' (expected %08X, got %08X)", warningFilePath.c_str(),
-                                       expected.ulCRC, current.ulCRC);
-    }
-    else
+        const SString warningFilePath = getResourceFilePath(&thisResource,
+            pFile->GetResource(), pFile->GetFilePath()
+        );
+        m_pScriptDebugging->LogWarning(luaVM,
+            "verification failed: checksum mismatch for resource file '%s' (expected %08X, got %08X)",
+            warningFilePath.c_str(), expected.ulCRC, current.ulCRC
+        );
+
+        return std::nullopt;
+    };
+
+    if (std::holds_alternative<CScriptFile*>(file))
+        return ReadFile(std::get<CScriptFile*>(file));
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return std::nullopt;
+
+    std::string strInputPath = std::get<std::string>(file);
+
+    SString    strAbsPath;
+    SString    strMetaPath;
+    CResource* pThisResource = pLuaMain->GetResource();
+    CResource* pResource = pThisResource;
+    if (!CResourceManager::ParseResourcePathInput(strInputPath, pResource, &strAbsPath, &strMetaPath))
+        return std::nullopt;
+
     {
-        const SString warningFilePath = getResourceFilePath(&thisResource, scriptFile->GetResource(), scriptFile->GetFilePath());
-        m_pScriptDebugging->LogWarning(L, "verification failed: resource file not found '%s'", warningFilePath.c_str());
+        auto canModify = CheckCanModifyOtherResource(pThisResource, pResource);
+        if (!canModify.first)
+        {
+            throw std::invalid_argument(canModify.second);
+        }
+    }
+    {
+        auto canModify = CheckCanAccessOtherResourceFile(pThisResource, pResource, strAbsPath);
+        if (!canModify.first)
+        {
+            throw std::invalid_argument(canModify.second);
+        }
     }
 
-    return {};
+    // IF SERVER
+#ifndef MTA_CLIENT
+    // Create the file to create
+    CScriptFile* pFile = new CScriptFile(pThisResource->GetScriptID(), strMetaPath, DEFAULT_MAX_FILESIZE);
+#else
+    eAccessType  accessType = strInputPath[0] == '@' ? eAccessType::ACCESS_PRIVATE : eAccessType::ACCESS_PUBLIC;
+    CScriptFile* pFile = new CScriptFile(pThisResource->GetScriptID(), strMetaPath, DEFAULT_MAX_FILESIZE, accessType);
+#endif
+    // Try to load it
+    if (!pFile->Load(pResource, CScriptFile::MODE_READ))
+    {
+        delete pFile;
+        throw std::invalid_argument(SString("unable to load file '%s'", strInputPath.c_str()));
+    }
+
+    auto content = ReadFile(pFile);
+    pFile->Unload();
+    delete pFile;
+    return content;
 }
 
 int CLuaFileDefs::fileGetPos(lua_State* luaVM)
