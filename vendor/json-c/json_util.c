@@ -37,13 +37,13 @@
 #include <unistd.h>
 #endif /* HAVE_UNISTD_H */
 
-#ifdef WIN32
+#ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <io.h>
 #include <windows.h>
-#endif /* defined(WIN32) */
+#endif /* defined(_WIN32) */
 
-#if !defined(HAVE_OPEN) && defined(WIN32)
+#if !defined(HAVE_OPEN) && defined(_WIN32)
 #define open _open
 #endif
 
@@ -60,7 +60,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 
 static char _last_err[256] = "";
 
-const char *json_util_get_last_err()
+const char *json_util_get_last_err(void)
 {
 	if (_last_err[0] == '\0')
 		return NULL;
@@ -85,7 +85,7 @@ struct json_object *json_object_from_fd_ex(int fd, int in_depth)
 	struct printbuf *pb;
 	struct json_object *obj;
 	char buf[JSON_FILE_BUF_SIZE];
-	int ret;
+	ssize_t ret;
 	int depth = JSON_TOKENER_DEFAULT_DEPTH;
 	json_tokener *tok;
 
@@ -101,15 +101,25 @@ struct json_object *json_object_from_fd_ex(int fd, int in_depth)
 	if (!tok)
 	{
 		_json_c_set_last_err(
-		    "json_object_from_fd_ex: unable to allocate json_tokener(depth=%d): %s\n", depth,
-		    strerror(errno));
+		    "json_object_from_fd_ex: unable to allocate json_tokener(depth=%d): %s\n",
+		    depth, strerror(errno));
 		printbuf_free(pb);
 		return NULL;
 	}
 
-	while ((ret = read(fd, buf, JSON_FILE_BUF_SIZE)) > 0)
+	while ((ret = read(fd, buf, sizeof(buf))) > 0)
 	{
-		printbuf_memappend(pb, buf, ret);
+		if (printbuf_memappend(pb, buf, ret) < 0)
+		{
+#if JSON_FILE_BUF_SIZE > INT_MAX
+#error "Can't append more than INT_MAX bytes at a time"
+#endif
+			_json_c_set_last_err(
+		    	"json_object_from_fd_ex: failed to printbuf_memappend after reading %d+%d bytes: %s", printbuf_length(pb), (int)ret, strerror(errno));
+			json_tokener_free(tok);
+			printbuf_free(pb);
+			return NULL;
+		}
 	}
 	if (ret < 0)
 	{
@@ -184,9 +194,9 @@ int json_object_to_fd(int fd, struct json_object *obj, int flags)
 }
 static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const char *filename)
 {
-	int ret;
+	ssize_t ret;
 	const char *json_str;
-	unsigned int wpos, wsize;
+	size_t wpos, wsize;
 
 	filename = filename ? filename : "(fd)";
 
@@ -195,8 +205,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 		return -1;
 	}
 
-	/* CAW: probably unnecessary, but the most 64bit safe */
-	wsize = (unsigned int)(strlen(json_str) & UINT_MAX);
+	wsize = strlen(json_str);
 	wpos = 0;
 	while (wpos < wsize)
 	{
@@ -208,7 +217,7 @@ static int _json_object_to_fd(int fd, struct json_object *obj, int flags, const 
 		}
 
 		/* because of the above check for ret < 0, we can safely cast and add */
-		wpos += (unsigned int)ret;
+		wpos += (size_t)ret;
 	}
 
 	return 0;
@@ -238,7 +247,12 @@ int json_parse_int64(const char *buf, int64_t *retval)
 	val = strtoll(buf, &end, 10);
 	if (end != buf)
 		*retval = val;
-	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
+	if ((val == 0 && errno != 0) || (end == buf))
+	{
+		errno = EINVAL;
+		return 1;
+	}
+	return 0;
 }
 
 int json_parse_uint64(const char *buf, uint64_t *retval)
@@ -255,7 +269,12 @@ int json_parse_uint64(const char *buf, uint64_t *retval)
 	val = strtoull(buf, &end, 10);
 	if (end != buf)
 		*retval = val;
-	return ((val == 0 && errno != 0) || (end == buf)) ? 1 : 0;
+	if ((val == 0 && errno != 0) || (end == buf))
+	{
+		errno = EINVAL;
+		return 1;
+	}
+	return 0;
 }
 
 #ifndef HAVE_REALLOC

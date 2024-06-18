@@ -147,9 +147,10 @@ void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDe
 {
     // Tell everyone we log to about it
     list<CPlayer*>::const_iterator iter = m_Players.begin();
+    auto uiRequiredDebugLevel = std::min(uiMinimumDebugLevel, 3u); // Make sure it doesn't skip outputDebugString with level 4
     for (; iter != m_Players.end(); iter++)
     {
-        if ((*iter)->m_uiScriptDebugLevel >= uiMinimumDebugLevel)
+        if ((*iter)->m_uiScriptDebugLevel >= uiRequiredDebugLevel)
         {
             (*iter)->Send(Packet);
         }

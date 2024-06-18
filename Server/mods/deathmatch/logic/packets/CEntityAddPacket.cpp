@@ -297,6 +297,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     health.data.fValue = pObject->GetHealth();
                     BitStream.Write(&health);
 
+                    // is object break?
+                    if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        BitStream.WriteBit(pObject->GetHealth() <= 0);
+
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
                         CCustomWeapon* pWeapon = static_cast<CCustomWeapon*>(pElement);

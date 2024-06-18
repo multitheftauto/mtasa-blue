@@ -26,11 +26,15 @@ private:
     static constexpr float FLOAT_EPSILON = 0.0001f;
 
 public:
-    float fX = 0.0f;
-    float fY = 0.0f;
-    float fZ = 0.0f;
+    float fX;
+    float fY;
+    float fZ;
 
-    constexpr CVector() = default;
+    struct NoInit{};
+
+    CVector(NoInit) {}
+
+    constexpr CVector() : fX(0.0f), fY(0.0f), fZ(0.0f) {}
 
     constexpr CVector(float x, float y, float z) : fX(x), fY(y), fZ(z) {}
 
