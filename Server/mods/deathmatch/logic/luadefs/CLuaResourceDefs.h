@@ -55,7 +55,7 @@ public:
     LUA_DECLARE(isResourceArchived);
 
     static bool isResourceProtected(CResource* const resource);
-    static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement);
+    static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement) noexcept;
 
     // Set stuff
     LUA_DECLARE(setResourceInfo);

@@ -903,7 +903,7 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
     if (resourceElement && resourceElement.has_value())
     {
         if (!(*resourceElement)->IsActive())
-            throw std::invalid_argument("The resource isn't active");
+            return false;
 
         return (*resourceElement)->GetName();
     }
@@ -911,15 +911,15 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
     CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
 
     if (!localVM)
-        throw std::invalid_argument("Couldn't find the virtual machine");
+        return false;
 
     CResource* localResource = localVM->GetResource();
 
     if (!localResource)
-        throw std::invalid_argument("Couldn't find the resource");
+        return false;
 
     if (!localResource->IsActive())
-        throw std::invalid_argument("The resource isn't active");
+        return false;
 
     return localResource->GetName();
 }

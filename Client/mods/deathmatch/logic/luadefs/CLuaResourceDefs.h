@@ -30,5 +30,5 @@ public:
     LUA_DECLARE(LoadString);
     LUA_DECLARE(Load);
 
-    static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement);
+    static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement) noexcept;
 };
