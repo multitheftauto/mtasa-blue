@@ -233,6 +233,15 @@ inline float GetOffsetDegrees(float a, float b)
         c = (360.0f + c);
     return c;
 }
+inline float GetOffsetRadians(float a, float b)
+{
+    float c = (b > a) ? b - a : 0.0f - (a - b);
+    if (c > PI)
+        c = 0.0f - (2 * PI - c);
+    else if (c <= -PI)
+        c = (2 * PI + c);
+    return c;
+}
 
 // Assuming fValue is the result of a difference calculation, calculate
 // the shortest positive distance after wrapping
