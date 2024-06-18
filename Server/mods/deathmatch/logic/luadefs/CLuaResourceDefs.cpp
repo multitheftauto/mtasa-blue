@@ -54,7 +54,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceLoadFailureReason", getResourceLoadFailureReason},
         {"getResourceLastStartTime", getResourceLastStartTime},
         {"getResourceLoadTime", getResourceLoadTime},
-        {"getResourceName", ArgumentParser<GetResourceName>},
+        {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceRootElement", getResourceRootElement},
         {"getResourceDynamicElementRoot", getResourceDynamicElementRoot},
         {"getResourceMapRootElement", getResourceMapRootElement},
@@ -902,13 +902,12 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
 {
     if (!resourceElement)
     {
-        CLuaMain*  localVM = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* localResource;
-
+        CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
+        
         if (!localVM)
             throw std::runtime_error("Couldn't find the virtual machine");
 
-        localResource = localVM->GetResource();
+        CResource* localResource = localVM->GetResource();
 
         if (!localResource)
             throw std::runtime_error("Couldn't find the resource");
@@ -919,12 +918,7 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
     if (!(*resourceElement)->IsActive())
         throw std::runtime_error("The resource isn't active");
 
-    std::string resourceName = (*resourceElement)->GetName();
-
-    if (resourceName.empty())
-        throw std::runtime_error("The resource name is empty");
-
-    return resourceName;
+    return (*resourceElement)->GetName();
 }
 
 int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)

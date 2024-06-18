@@ -20,7 +20,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"call", Call},
         {"getThisResource", GetThisResource},
         {"getResourceConfig", GetResourceConfig},
-        {"getResourceName", ArgumentParser<GetResourceName>},
+        {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceFromName", GetResourceFromName},
         {"getResourceRootElement", GetResourceRootElement},
         {"getResourceGUIElement", GetResourceGUIElement},
@@ -226,13 +226,12 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
 {
     if (!resourceElement)
     {
-        CLuaMain*  localVM = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* localResource;
+        CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
 
         if (!localVM)
             throw std::runtime_error("Couldn't find the virtual machine");
 
-        localResource = localVM->GetResource();
+        CResource* localResource = localVM->GetResource();
 
         if (!localResource)
             throw std::runtime_error("Couldn't find the resource");
@@ -240,12 +239,7 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
         resourceElement = localResource;
     }
 
-    std::string resourceName = (*resourceElement)->GetName();
-
-    if (resourceName.empty())
-        throw std::runtime_error("The resource name is empty");
-
-    return resourceName;
+    return (*resourceElement)->GetName();
 }
 
 int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)
