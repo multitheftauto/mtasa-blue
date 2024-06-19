@@ -32,6 +32,7 @@
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
 #include <game/Task.h>
+#include <game/CBuildingRemoval.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -2041,13 +2042,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastCarTwoWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetCarTwoWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("2wheeler");
         Arguments.PushNumber(ulLastCarTwoWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastCarTwoWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastCarTwoWheelCounter = ulTemp;
@@ -2068,13 +2067,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastBikeRearWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetBikeRearWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("wheelie");
         Arguments.PushNumber(ulLastBikeRearWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastBikeRearWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastBikeRearWheelCounter = ulTemp;
@@ -2095,13 +2092,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastBikeFrontWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetBikeFrontWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("stoppie");
         Arguments.PushNumber(ulLastBikeFrontWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastBikeFrontWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastBikeFrontWheelCounter = ulTemp;
@@ -3431,7 +3426,7 @@ void CClientGame::Event_OnIngame()
 
     g_pMultiplayer->DeleteAndDisableGangTags();
 
-    g_pGame->GetWorld()->ClearRemovedBuildingLists();
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
 
     g_pGame->ResetModelLodDistances();

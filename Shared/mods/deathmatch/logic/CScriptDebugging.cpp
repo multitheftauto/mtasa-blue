@@ -62,8 +62,7 @@ void CScriptDebugging::LogCustom(lua_State* luaVM, unsigned char ucRed, unsigned
     VSNPRINTF(szBuffer, MAX_STRING_LENGTH, szFormat, marker);
     va_end(marker);
 
-    SLuaDebugInfo luaDebugInfo;
-    LogString("", luaDebugInfo, szBuffer, 0, ucRed, ucGreen, ucBlue);
+    LogString("", GetLuaDebugInfo(luaVM), szBuffer, 4, ucRed, ucGreen, ucBlue);
 }
 
 void CScriptDebugging::LogDebug(lua_State* luaVM, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, const char* szFormat, ...)
