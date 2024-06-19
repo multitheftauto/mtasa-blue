@@ -256,11 +256,6 @@ inline SString GetClassTypeName(CLuaMatrix*)
     return "matrix";
 }
 
-inline SString GetClassTypeName(lua_State*)
-{
-    return "lua-vm";
-}
-
 //
 // CResource from userdata
 //
