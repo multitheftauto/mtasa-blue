@@ -87,7 +87,7 @@ struct CLuaFunctionParserBase
             return "colour";
         if constexpr (std::is_same_v<T, lua_State*>)
             return "";            // not reachable
-        else if constexpr (is_variant<T>::value)
+        if constexpr (is_variant<T>::value)
         {
             SString strTypes;
             TypeToNameVariant<T>(strTypes);
@@ -125,10 +125,8 @@ struct CLuaFunctionParserBase
                 // Avoid printing binary data
                 if (std::find_if(strValue.begin(), strValue.end(), [](char ch) { return !(std::isprint(ch)); }) != strValue.end())
                     return "string";
-                else
-                {
-                    return SString("string (\"%s\")", strValue.c_str());
-                }
+
+                return SString("string (\"%s\")", strValue.c_str());
             }
             case LUA_TBOOLEAN:
                 return SString("boolean (%s)", lua_toboolean(L, index) == 1 ? "true" : "false");
@@ -154,14 +152,13 @@ struct CLuaFunctionParserBase
     template <typename T>
     T Pop(lua_State* L, int& index)
     {
-        if (!TypeMatch<T>(L, index))
-        {
-            SString strReceived = ReadParameterAsString(L, index);
-            SString strExpected = TypeToName<T>();
-            SetBadArgumentError(L, strExpected, index, strReceived);
-            return T{};
-        }
-        return PopUnsafe<T>(L, index);
+        if (TypeMatch<T>(L, index))
+            return PopUnsafe<T>(L, index);
+
+        SString strReceived = ReadParameterAsString(L, index);
+        SString strExpected = TypeToName<T>();
+        SetBadArgumentError(L, strExpected, index, strReceived);
+        return T{};
     }
 
     // Special type matcher for variants. Returns -1 if the type does not match
@@ -173,21 +170,19 @@ struct CLuaFunctionParserBase
         // The type therefore doesn't match the variant
         if constexpr (std::is_same_v<T, std::variant<>>)
             return -1;
-        else
-        {
-            // Try to match the first type of the variant
-            // If it matches, we've found our index
-            using first_t = typename is_variant<T>::param1_t;
-            using next_t = typename is_variant<T>::rest_t;
-            if (TypeMatch<first_t>(L, index))
-                return 0;
 
-            // Else try the remaining types of the variant
-            int iResult = TypeMatchVariant<next_t>(L, index);
-            if (iResult == -1)
-                return -1;
-            return 1 + iResult;
-        }
+        // Try to match the first type of the variant
+        // If it matches, we've found our index
+        using first_t = typename is_variant<T>::param1_t;
+        using next_t = typename is_variant<T>::rest_t;
+        if (TypeMatch<first_t>(L, index))
+            return 0;
+
+        // Else try the remaining types of the variant
+        int iResult = TypeMatchVariant<next_t>(L, index);
+        if (iResult == -1)
+            return -1;
+        return 1 + iResult;
     }
 
     // TypeMatch<T> should return true if the value on top of the Lua stack can be popped via
@@ -309,16 +304,14 @@ struct CLuaFunctionParserBase
             using type_t = typename is_variant<T>::param1_t;
             return type_t{};
         }
-        else
-        {
-            // If we haven't reached the target index go to the next type
-            if (vindex != currIndex)
-                return PopUnsafeVariant<T, currIndex + 1>(L, index, vindex);
 
-            // Pop the actual type
-            using type_t = std::remove_reference_t<decltype(std::get<currIndex>(T{}))>;
-            return PopUnsafe<type_t>(L, index);
-        }
+        // If we haven't reached the target index go to the next type
+        if (vindex != currIndex)
+            return PopUnsafeVariant<T, currIndex + 1>(L, index, vindex);
+
+        // Pop the actual type
+        using type_t = std::remove_reference_t<decltype(std::get<currIndex>(T{}))>;
+        return PopUnsafe<type_t>(L, index);
     }
 
     template <typename T>
@@ -361,11 +354,11 @@ struct CLuaFunctionParserBase
         if constexpr (std::is_same_v<T, dummy_type>)
             return dummy_type{};
         // primitive types are directly popped
-        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
+        if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return lua::PopPrimitive<T>(L, index);
-        else if constexpr (std::is_same_v<T, bool>)
+        if constexpr (std::is_same_v<T, bool>)
             return lua::PopPrimitive<T>(L, index);
-        else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) // bool is an integral type, so must pop it before ^^
+        if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) // bool is an integral type, so must pop it before ^^
         {
             const auto number = lua::PopPrimitive<lua_Number>(L, index);
 
@@ -398,7 +391,7 @@ struct CLuaFunctionParserBase
 
             return static_cast<T>(number);
         }
-        else if constexpr (std::is_enum_v<T>)
+        if constexpr (std::is_enum_v<T>)
         {
             // Enums are considered strings in Lua
             std::string strValue = lua::PopPrimitive<std::string>(L, index);
@@ -415,7 +408,7 @@ struct CLuaFunctionParserBase
                 return static_cast<T>(0);
             }
         }
-        else if constexpr (is_specialization<T, std::optional>::value)
+        if constexpr (is_specialization<T, std::optional>::value)
         {
             // optionals may either type match the desired value, or be nullopt
             using param = typename is_specialization<T, std::optional>::param_t;
@@ -435,7 +428,7 @@ struct CLuaFunctionParserBase
             return std::nullopt;
         }
 
-        else if constexpr (is_2specialization<T, std::vector>::value)            // 2 specialization due to allocator
+        if constexpr (is_2specialization<T, std::vector>::value)            // 2 specialization due to allocator
         {
             using param = typename is_2specialization<T, std::vector>::param1_t;
             T vecData;
@@ -456,7 +449,7 @@ struct CLuaFunctionParserBase
             ++index;
             return vecData;
         }
-        else if constexpr (is_5specialization<T, std::unordered_map>::value)
+        if constexpr (is_5specialization<T, std::unordered_map>::value)
         {
             using key_t = typename is_5specialization<T, std::unordered_map>::param1_t;
             using value_t = typename is_5specialization<T, std::unordered_map>::param2_t;
@@ -732,30 +725,34 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
     int operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
     {
         int iResult = 0;
+        bool bIsCustomError = false;
         try
         {
             iResult = Call(L);
         }
-        catch (std::invalid_argument& e)
+        catch (std::logic_error& e)
         {
             // This exception can be thrown from the called function
             // as an additional way to provide further argument errors
             strError = e.what();
         }
-        if (strError.length() != 0)
+        catch (ArgumentParserError& e)
         {
-            if constexpr (ErrorOnFailure)
-            {
-                luaL_error(L, strError.c_str());
-            }
-            else
-            {
-                pScriptDebugging->LogCustom(L, strError.c_str());
-                lua::Push(L, ReturnOnFailure);
-            }
+            strError = e.what();
+            bIsCustomError = true;
+        }
+        if (!strError.empty())
+            return iResult;
+
+        if (ErrorOnFailure && !bIsCustomError)
+        {
+            luaL_error(L, strError.c_str());
             return 1;
         }
-        return iResult;
+
+        pScriptDebugging->LogCustom(L, strError.c_str());
+        lua::Push(L, ReturnOnFailure);
+        return 1;
     }
 };
 
