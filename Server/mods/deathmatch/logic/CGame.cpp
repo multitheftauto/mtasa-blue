@@ -3659,7 +3659,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_JACKING)
                             {
                                 unsigned char ucDoor = Packet.GetDoor();
-                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();  
+                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 float         fAngle = Packet.GetDoorAngle();
                                 CPed*         pJacked = pVehicle->GetOccupant(0);
 
@@ -3694,26 +3694,26 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         m_pPlayerManager->BroadcastOnlyJoined(JackedReply);
 
                                         CLuaArguments Arguments;
-                                        Arguments.PushElement(pVehicle);                 // vehicle 
+                                        Arguments.PushElement(pVehicle);                 // vehicle
                                         Arguments.PushNumber(ucOccupiedSeat);            // seat
-                                        Arguments.PushElement(pPed);                     // jacker                                    
+                                        Arguments.PushElement(pPed);                     // jacker
                                         Arguments.PushBoolean(false);                    // forcedByScript
 
                                         if (pJacked->IsPlayer())
                                         {
-                                         pJacked->CallEvent("onPlayerVehicleExit", Arguments);
+                                            pJacked->CallEvent("onPlayerVehicleExit", Arguments);
                                         }
                                         else
                                         {
-                                         pJacked->CallEvent("onPedVehicleExit", Arguments);
+                                            pJacked->CallEvent("onPedVehicleExit", Arguments);
                                         }
 
                                         CLuaArguments Arguments2;
-                                        Arguments2.PushElement(pJacked);                 // jacked
-                                        Arguments2.PushNumber(ucOccupiedSeat);           // seat
-                                        Arguments2.PushElement(pPed);                    // jacker
-                                        Arguments2.PushBoolean(false);                   // forcedByScript
-    
+                                        Arguments2.PushElement(pJacked);                  // jacked
+                                        Arguments2.PushNumber(ucOccupiedSeat);            // seat
+                                        Arguments2.PushElement(pPed);                     // jacker
+                                        Arguments2.PushBoolean(false);                    // forcedByScript
+
                                         pVehicle->CallEvent("onVehicleExit", Arguments2);
 
                                         if (!sendListIncompatiblePlayers.empty())
