@@ -14,6 +14,8 @@
 #include <lua/CLuaFunctionParser.h>
 using std::list;
 
+#define MIN_CLIENT_REQ_LOD_FOR_BUILDING "1.6.0-9.22470"
+
 void CLuaElementDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -95,7 +97,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementCollidableWith", SetElementCollidableWith},
         {"setElementDoubleSided", SetElementDoubleSided},
         {"setElementFrozen", SetElementFrozen},
-        {"setLowLODElement", SetLowLodElement},
+        {"setLowLODElement", ArgumentParser<SetLowLodElement>},
         {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
     };
 
@@ -2497,29 +2499,14 @@ int CLuaElementDefs::GetLowLodElement(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::SetLowLodElement(lua_State* luaVM)
+bool CLuaElementDefs::SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity, std::optional<CClientEntity*> pLowLodEntity)
 {
-    //  bool setLowLODElement ( element theElement )
-    CClientEntity* pEntity;
-    CClientEntity* pLowLodEntity;
+    //  bool setLowLODElement ( element theElement [, element lowLowElement ] )
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadUserData(pLowLodEntity, NULL);
+    if (pEntity->GetType() == CCLIENTBUILDING)
+        MinClientReqCheck(luaVM, MIN_CLIENT_REQ_LOD_FOR_BUILDING, "target is building");
 
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetLowLodElement(*pEntity, pLowLodEntity))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetLowLodElement(*pEntity, pLowLodEntity.value_or(nullptr));
 }
 
 int CLuaElementDefs::IsElementLowLod(lua_State* luaVM)
