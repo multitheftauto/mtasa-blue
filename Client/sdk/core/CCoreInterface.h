@@ -58,12 +58,6 @@ enum eCoreVersion
         }
 #endif
 
-enum class PreHUDRenderStage
-{
-    PostColorFilter,
-    PostEffects
-};
-
 class CCoreInterface
 {
 public:
@@ -156,7 +150,7 @@ public:
     virtual void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit) = 0;
 
     virtual void                 OnPreFxRender() = 0;
-    virtual void                 OnPreHUDRender(PreHUDRenderStage stage) = 0;
+    virtual void                 OnPreHUDRender() = 0;
     virtual uint                 GetMinStreamingMemory() = 0;
     virtual uint                 GetMaxStreamingMemory() = 0;
     virtual void                 OnCrashAverted(uint uiId) = 0;
@@ -198,6 +192,8 @@ public:
 
     virtual const SString& GetLastConnectedServerName() const = 0;
     virtual void           SetLastConnectedServerName(const SString& strServerName) = 0;
+
+    virtual void OnPostColorFilterRender() = 0;
 };
 
 class CClientTime

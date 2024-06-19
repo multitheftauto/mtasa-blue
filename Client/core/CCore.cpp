@@ -1787,6 +1787,19 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::OnPostColorFilterRender()
+{
+    if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+        return;
+    
+    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+    CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
+    CGraphics::GetSingleton().LeavingMTARenderZone();
+}
+
 void CCore::ApplyCoreInitSettings()
 {
 #if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
@@ -2008,47 +2021,32 @@ void CCore::OnPreFxRender()
 //
 // OnPreHUDRender
 //
-void CCore::OnPreHUDRender(PreHUDRenderStage stage)
+void CCore::OnPreHUDRender()
 {
-    if (stage == PreHUDRenderStage::PostColorFilter)
+    CGraphics::GetSingleton().EnteringMTARenderZone();    
+
+    // Maybe capture screen and other stuff
+    CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
+
+    // Handle script stuffs
+    if (m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0)
     {
-        if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
-            return;
-    
-        CGraphics::GetSingleton().EnteringMTARenderZone();      
-
-        CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
-        CGraphics::GetSingleton().DrawLine3DPostFXQueue();  
-
-        CGraphics::GetSingleton().LeavingMTARenderZone();
+        m_pModManager->DoPulsePreHUDRender(true, m_bDidRecreateRenderTargets);
+        m_bDidRecreateRenderTargets = false;
     }
-    else if (stage == PreHUDRenderStage::PostEffects)
-    {
-        CGraphics::GetSingleton().EnteringMTARenderZone();    
+    else
+        m_pModManager->DoPulsePreHUDRender(false, false);
 
-        // Maybe capture screen and other stuff
-        CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
+    // Handle saving depth buffer
+    CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
 
-        // Handle script stuffs
-        if (m_iUnminimizeFrameCounter && --m_iUnminimizeFrameCounter == 0)
-        {
-            m_pModManager->DoPulsePreHUDRender(true, m_bDidRecreateRenderTargets);
-            m_bDidRecreateRenderTargets = false;
-        }
-        else
-            m_pModManager->DoPulsePreHUDRender(false, false);
+    // Restore in case script forgets
+    CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
 
-        // Handle saving depth buffer
-        CGraphics::GetSingleton().GetRenderItemManager()->SaveReadableDepthBuffer();
+    // Draw pre-GUI primitives
+    CGraphics::GetSingleton().DrawPreGUIQueue();
 
-        // Restore in case script forgets
-        CGraphics::GetSingleton().GetRenderItemManager()->RestoreDefaultRenderTarget();
-
-        // Draw pre-GUI primitives
-        CGraphics::GetSingleton().DrawPreGUIQueue();
-
-        CGraphics::GetSingleton().LeavingMTARenderZone();
-    }
+    CGraphics::GetSingleton().LeavingMTARenderZone();
 }
 
 //

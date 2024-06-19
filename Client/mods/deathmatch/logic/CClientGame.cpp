@@ -3610,12 +3610,12 @@ void CClientGame::StaticPreFxRenderHandler()
 
 void CClientGame::StaticPostColorFilterRenderHandler()
 {
-    g_pCore->OnPreHUDRender(PreHUDRenderStage::PostColorFilter);
+    g_pCore->OnPostColorFilterRender();
 }
 
 void CClientGame::StaticPreHudRenderHandler()
 {
-    g_pCore->OnPreHUDRender(PreHUDRenderStage::PostEffects);
+    g_pCore->OnPreHUDRender();
 }
 
 bool CClientGame::StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface)

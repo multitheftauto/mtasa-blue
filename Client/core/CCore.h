@@ -244,7 +244,7 @@ public:
     void                                HandleCrashDumpEncryption();
 
     void                 OnPreFxRender();
-    void                 OnPreHUDRender(PreHUDRenderStage stage);
+    void                 OnPreHUDRender();
     void                 OnDeviceRestore();
     void                 OnCrashAverted(uint uiId);
     void                 OnEnterCrashZone(uint uiId);
@@ -288,6 +288,8 @@ public:
 
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
+
+    void OnPostColorFilterRender() override;
 
 private:
     void ApplyCoreInitSettings();
