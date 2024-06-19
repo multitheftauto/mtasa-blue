@@ -143,21 +143,20 @@ int CLuaWaterDefs::TestLineAgainstWater(lua_State* luaVM)
 
 bool CLuaWaterDefs::ResetWaterLevel(std::variant<std::monostate, bool, std::vector<CClientWater*>, CClientWater*> resetElements)
 {
-    CStaticFunctionDefinitions::ResetWorldWaterLevel();
-
     CClientWaterManager* pWaterManager = g_pClientGame->GetManager()->GetWaterManager();
 
     switch (resetElements.index())
     {
         case 0:
+            CStaticFunctionDefinitions::ResetWorldWaterLevel();
             break;
 
         case 1:
         {
             if (std::get<bool>(resetElements) == true)
-            {
                 pWaterManager->ResetAllElementWaterLevel();
-            }
+            else
+                CStaticFunctionDefinitions::ResetWorldWaterLevel();
 
             break;
         }
@@ -174,11 +173,6 @@ bool CLuaWaterDefs::ResetWaterLevel(std::variant<std::monostate, bool, std::vect
             auto pWaterElement = std::get<CClientWater*>(resetElements);
             pWaterManager->ResetElementWaterLevel(pWaterElement);
             break;
-        }
-
-        default:
-        {
-            throw std::invalid_argument("Invalid argument supplied for 'resetElements' - expected bool, table or element.");
         }
     }
 
