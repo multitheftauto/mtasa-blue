@@ -1240,7 +1240,7 @@ bool CConsoleCommands::WhoIs(CConsole* pConsole, const char* szArguments, CClien
 
 bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    const char* syntaxMessage = "debugscript: Syntax is 'debugscript <mode: 0 (None), 1 (Errors), 2 (Errors + Warnings), 3 (All)>'";
+    constexpr const char* syntaxMessage = "debugscript: Syntax is 'debugscript <mode: 0 (None), 1 (Errors), 2 (Errors + Warnings), 3 (All)>'";
 
     // Validate arguments
     if (!szArguments || std::strlen(szArguments) != 1 || !std::isdigit(szArguments[0])) {
