@@ -2636,7 +2636,7 @@ void CClientVehicle::Create()
         if (m_pDriver)
             m_pDriver->WarpIntoVehicle(this, 0);
 
-         m_pVehicle->SetEngineOn(m_bEngineOn);
+        m_pVehicle->SetEngineOn(m_bEngineOn);
 
         // Warp the passengers back in
         for (unsigned int i = 0; i < 8; i++)
