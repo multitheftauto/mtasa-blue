@@ -1240,7 +1240,7 @@ bool CConsoleCommands::WhoIs(CConsole* pConsole, const char* szArguments, CClien
 
 bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
-    const std::string syntaxMessage = "debugscript: Syntax is 'debugscript <mode: 0 (None), 1 (Errors), 2 (Errors + Warnings), 3 (All)>'";
+    const char* syntaxMessage = "debugscript: Syntax is 'debugscript <mode: 0 (None), 1 (Errors), 2 (Errors + Warnings), 3 (All)>'";
 
     // Validate arguments
     if (!szArguments || std::strlen(szArguments) != 1 || !std::isdigit(szArguments[0])) {
@@ -1260,7 +1260,7 @@ bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, 
 
     // Check if the level is the same
     if (iLevel == currentLevel) {
-        pEchoClient->SendEcho("debugscript: Your debug mode is already set to " + std::to_string(iLevel));
+        pEchoClient->SendEcho(("debugscript: Your debug mode is already set to " + std::to_string(iLevel)).c_str());
         return false;
     }
 
@@ -1272,7 +1272,7 @@ bool CConsoleCommands::DebugScript(CConsole* pConsole, const char* szArguments, 
 
     // Set the new level
     pPlayer->SetScriptDebugLevel(iLevel);
-    pEchoClient->SendEcho("debugscript: Your debug mode was set to " + std::to_string(iLevel));
+    pEchoClient->SendEcho(("debugscript: Your debug mode was set to " + std::to_string(iLevel)).c_str());
     CLogger::LogPrintf("SCRIPT: %s set their script debug mode to %d\n", GetAdminNameForLog(pClient).c_str(), iLevel);
 
     // Enable or disable the debugger based on the level
