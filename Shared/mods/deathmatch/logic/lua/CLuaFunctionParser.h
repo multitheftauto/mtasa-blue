@@ -19,6 +19,15 @@ class CLuaArgument;
 #include "lua/LuaBasic.h"
 #include <lua/CLuaMultiReturn.h>
 
+class ArgumentParserError
+{
+    const char* m_message;
+
+public:
+    constexpr ArgumentParserError(const char* what) noexcept : m_message(what) {}
+    constexpr const char* what() const noexcept { return m_message; }
+};
+
 struct CLuaFunctionParserBase
 {
     // iIndex is passed around by reference
@@ -33,7 +42,7 @@ struct CLuaFunctionParserBase
     void TypeToNameVariant(SString& accumulator)
     {
         using param = typename is_variant<T>::param1_t;
-        if (accumulator.length() == 0)
+        if (accumulator.empty())
             accumulator = TypeToName<param>();
         else
             accumulator += "/" + TypeToName<param>();
@@ -47,36 +56,36 @@ struct CLuaFunctionParserBase
     {
         if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return "string";
-        else if constexpr (std::is_same_v<T, bool>)
+        if constexpr (std::is_same_v<T, bool>)
             return "boolean";
-        else if constexpr (std::is_arithmetic_v<T>)
+        if constexpr (std::is_arithmetic_v<T>)
             return "number";
-        else if constexpr (std::is_enum_v<T>)
+        if constexpr (std::is_enum_v<T>)
             return "enum";
-        else if constexpr (is_specialization<T, std::optional>::value)
+        if constexpr (is_specialization<T, std::optional>::value)
         {
             using param_t = typename is_specialization<T, std::optional>::param_t;
             return TypeToName<param_t>();
         }
-        else if constexpr (std::is_same_v<T, CLuaArgument>)
+        if constexpr (std::is_same_v<T, CLuaArgument>)
             return "value";
-        else if constexpr (is_2specialization<T, std::vector>::value)
+        if constexpr (is_2specialization<T, std::vector>::value)
             return "table";
-        else if constexpr (is_5specialization<T, std::unordered_map>::value)
+        if constexpr (is_5specialization<T, std::unordered_map>::value)
             return "table";
-        else if constexpr (std::is_same_v<T, CLuaFunctionRef>)
+        if constexpr (std::is_same_v<T, CLuaFunctionRef>)
             return "function";
-        else if constexpr (std::is_same_v<T, CVector2D>)
+        if constexpr (std::is_same_v<T, CVector2D>)
             return "vector2";
-        else if constexpr (std::is_same_v<T, CVector>)
+        if constexpr (std::is_same_v<T, CVector>)
             return "vector3";
-        else if constexpr (std::is_same_v<T, CVector4D>)
+        if constexpr (std::is_same_v<T, CVector4D>)
             return "vector4";
-        else if constexpr (std::is_same_v<T, CMatrix>)
+        if constexpr (std::is_same_v<T, CMatrix>)
             return "matrix";
-        else if constexpr (std::is_same_v<T, SColor>)
+        if constexpr (std::is_same_v<T, SColor>)
             return "colour";
-        else if constexpr (std::is_same_v<T, lua_State*>)
+        if constexpr (std::is_same_v<T, lua_State*>)
             return "";            // not reachable
         else if constexpr (is_variant<T>::value)
         {
@@ -84,11 +93,11 @@ struct CLuaFunctionParserBase
             TypeToNameVariant<T>(strTypes);
             return strTypes;
         }
-        else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
+        if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
             return GetClassTypeName((T)0);
-        else if constexpr (std::is_same_v<T, dummy_type>)
+        if constexpr (std::is_same_v<T, dummy_type>)
             return "";
-        else if constexpr (std::is_same_v<T, std::monostate>)
+        if constexpr (std::is_same_v<T, std::monostate>)
             return "";
     }
 
