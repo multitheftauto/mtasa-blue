@@ -46,7 +46,7 @@ private:
     bool                 m_bShallow;             // Shallow water?
     std::vector<CVector> m_Vertices;             // List of vertices for this water
 
-    float m_iDefaultLevel = .0f;
+    float m_iDefaultLevel{};
 
     friend class CClientWaterManager;
 };
