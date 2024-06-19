@@ -19,13 +19,18 @@ class CLuaArgument;
 #include "lua/LuaBasic.h"
 #include <lua/CLuaMultiReturn.h>
 
-class ArgumentParserError
+class LuaFunctionError
 {
+protected:
     const char* m_message;
+    bool        m_bWarning;
 
 public:
-    constexpr ArgumentParserError(const char* what) noexcept : m_message(what) {}
+    constexpr LuaFunctionError(const char* what, bool throwWarning = true) noexcept
+        : m_message(what), m_bWarning(throwWarning) {}
+
     constexpr const char* what() const noexcept { return m_message; }
+    constexpr bool        IsWarning() const noexcept { return m_bWarning; }
 };
 
 struct CLuaFunctionParserBase
@@ -712,7 +717,7 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
     int operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
     {
         int  iResult = 0;
-        bool bIsCustomError = false;
+        bool bIsWarning = false;
         try
         {
             iResult = Call(L);
@@ -723,15 +728,15 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
             // as an additional way to provide further argument errors
             strError = e.what();
         }
-        catch (ArgumentParserError& e)
+        catch (LuaFunctionError& e)
         {
             strError = e.what();
-            bIsCustomError = true;
+            bIsWarning = e.IsWarning();
         }
         if (strError.empty())
             return iResult;
 
-        if (ErrorOnFailure && !bIsCustomError)
+        if (ErrorOnFailure && !bIsWarning)
         {
             luaL_error(L, strError.c_str());
             return 1;
