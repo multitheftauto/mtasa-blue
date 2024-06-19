@@ -1,52 +1,7 @@
 #include "element.h"
-#include "parser.h"
 #include "svgelement.h"
 
 namespace lunasvg {
-
-void PropertyList::set(PropertyId id, const std::string& value, int specificity)
-{
-    auto property = get(id);
-    if(property == nullptr)
-    {
-        Property property{id, value, specificity};
-        m_properties.push_back(std::move(property));
-        return;
-    }
-
-    if(property->specificity > specificity)
-        return;
-
-    property->specificity = specificity;
-    property->value = value;
-}
-
-Property* PropertyList::get(PropertyId id) const
-{
-    auto data = m_properties.data();
-    auto end = data + m_properties.size();
-    while(data < end)
-    {
-        if(data->id == id)
-            return const_cast<Property*>(data);
-        ++data;
-    }
-
-    return nullptr;
-}
-
-void PropertyList::add(const Property& property)
-{
-    set(property.id, property.value, property.specificity);
-}
-
-void PropertyList::add(const PropertyList& properties)
-{
-    auto it = properties.m_properties.begin();
-    auto end = properties.m_properties.end();
-    for(;it != end;++it)
-        add(*it);
-}
 
 void Node::layout(LayoutContext*, LayoutContainer*) const
 {
@@ -59,30 +14,44 @@ std::unique_ptr<Node> TextNode::clone() const
     return std::move(node);
 }
 
-Element::Element(ElementId id)
+Element::Element(ElementID id)
     : id(id)
 {
 }
 
-void Element::set(PropertyId id, const std::string& value, int specificity)
+void Element::set(PropertyID id, const std::string& value, int specificity)
 {
-    properties.set(id, value, specificity);
+    for(auto& property : properties) {
+        if(property.id == id) {
+            if(specificity >= property.specificity) {
+                property.specificity = specificity;
+                property.value = value;
+            }
+
+            return;
+        }
+    }
+
+    Property property{specificity, id, value};
+    properties.push_back(std::move(property));
 }
 
 static const std::string EmptyString;
 
-const std::string& Element::get(PropertyId id) const
+const std::string& Element::get(PropertyID id) const
 {
-    auto property = properties.get(id);
-    if(property == nullptr)
-        return EmptyString;
+    for(auto& property : properties) {
+        if(property.id == id) {
+            return property.value;
+        }
+    }
 
-    return property->value;
+    return EmptyString;
 }
 
 static const std::string InheritString{"inherit"};
 
-const std::string& Element::find(PropertyId id) const
+const std::string& Element::find(PropertyID id) const
 {
     auto element = this;
     do {
@@ -95,12 +64,18 @@ const std::string& Element::find(PropertyId id) const
     return EmptyString;
 }
 
-bool Element::has(PropertyId id) const
+bool Element::has(PropertyID id) const
 {
-    return properties.get(id);
+    for(auto& property : properties) {
+        if(property.id == id) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
-Element* Element::previousSibling() const
+Element* Element::previousElement() const
 {
     if(parent == nullptr)
         return nullptr;
@@ -108,12 +83,10 @@ Element* Element::previousSibling() const
     Element* element = nullptr;
     auto it = parent->children.begin();
     auto end = parent->children.end();
-    for(;it != end;++it)
-    {
+    for(; it != end; ++it) {
         auto node = it->get();
         if(node->isText())
             continue;
-
         if(node == this)
             return element;
         element = static_cast<Element*>(node);
@@ -122,7 +95,7 @@ Element* Element::previousSibling() const
     return nullptr;
 }
 
-Element* Element::nextSibling() const
+Element* Element::nextElement() const
 {
     if(parent == nullptr)
         return nullptr;
@@ -130,8 +103,7 @@ Element* Element::nextSibling() const
     Element* element = nullptr;
     auto it = parent->children.rbegin();
     auto end = parent->children.rend();
-    for(;it != end;++it)
-    {
+    for(; it != end; ++it) {
         auto node = it->get();
         if(node->isText())
             continue;
@@ -153,24 +125,23 @@ Node* Element::addChild(std::unique_ptr<Node> child)
 
 void Element::layoutChildren(LayoutContext* context, LayoutContainer* current) const
 {
-    for(auto& child : children)
+    for(auto& child : children) {
         child->layout(context, current);
+    }
 }
 
 Rect Element::currentViewport() const
 {
-    if(parent == nullptr)
-    {
+    if(parent == nullptr) {
         auto element = static_cast<const SVGElement*>(this);
-        if(element->has(PropertyId::ViewBox))
+        if(element->has(PropertyID::ViewBox))
             return element->viewBox(); 
-        return Rect{0, 0, 512, 512};
+        return Rect{0, 0, 300, 150};
     }
 
-    if(parent->id == ElementId::Svg)
-    {
+    if(parent->id == ElementID::Svg) {
         auto element = static_cast<SVGElement*>(parent);
-        if(element->has(PropertyId::ViewBox))
+        if(element->has(PropertyID::ViewBox))
             return element->viewBox();
 
         LengthContext lengthContext(element);

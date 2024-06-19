@@ -80,6 +80,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_bCollisionsEnabled = true;
 
     m_pJackingVehicle = NULL;
+    m_nearPlayersList.reserve(20);
 
     // Add us to the Ped manager
     if (pPedManager)
@@ -353,6 +354,17 @@ void CPed::SetWeaponTotalAmmo(unsigned short usTotalAmmo, unsigned char ucSlot)
     {
         m_Weapons[ucSlot].usAmmo = usTotalAmmo;
     }
+}
+
+bool CPed::HasWeaponType(unsigned char ucWeaponType)
+{
+    for (unsigned char slot = 0; slot < WEAPON_SLOTS; slot++)
+    {
+        if (GetWeaponType(slot) == ucWeaponType)
+            return true;
+    }
+
+    return false;
 }
 
 float CPed::GetMaxHealth()

@@ -15,6 +15,7 @@ class CClientVehicle;
 
 #include <game/CPlane.h>
 #include <game/CVehicle.h>
+#include <game/CModelInfo.h>
 
 #include "CClientCommon.h"
 #include "CClientCamera.h"
@@ -25,9 +26,13 @@ class CClientVehicle;
 #include "CVehicleUpgrades.h"
 #include "CClientModel.h"
 
+class CBikeHandlingEntry;
+class CBoatHandlingEntry;
+class CClientProjectile;
+
 #define INVALID_PASSENGER_SEAT 0xFF
 #define DEFAULT_VEHICLE_HEALTH 1000
-#define MAX_VEHICLE_HEALTH 10000
+#define MAX_VEHICLE_HEALTH     10000
 
 enum eClientVehicleType
 {
@@ -43,6 +48,8 @@ enum eClientVehicleType
     CLIENTVEHICLE_BMX,
     CLIENTVEHICLE_TRAILER
 };
+
+static constexpr int NUM_VEHICLE_TYPES = 11; 
 
 enum eDelayedSyncVehicleData
 {
@@ -139,7 +146,8 @@ struct SVehicleComponentData
     bool    m_bScaleChanged;
     bool    m_bVisible;
 };
-class CClientProjectile;
+
+static std::array<std::string, NUM_VEHICLE_TYPES> g_vehicleTypePrefixes;
 
 class CClientVehicle : public CClientStreamElement
 {
@@ -183,7 +191,6 @@ public:
     virtual CSphere GetWorldBoundingSphere();
 
     void GetMoveSpeed(CVector& vecMoveSpeed) const;
-    void GetMoveSpeedMeters(CVector& vecMoveSpeed) const;
     void SetMoveSpeed(const CVector& vecMoveSpeed);
     void GetTurnSpeed(CVector& vecTurnSpeed) const;
     void SetTurnSpeed(const CVector& vecTurnSpeed);
@@ -279,6 +286,7 @@ public:
     int           GetWheelFrictionState(unsigned char ucWheel);
     unsigned char GetPanelStatus(unsigned char ucPanel);
     unsigned char GetLightStatus(unsigned char ucLight);
+    SString GetComponentNameForWheel(unsigned char ucWheel) const noexcept;
 
     bool AreLightsOn();
 
@@ -290,8 +298,13 @@ public:
 
     // TODO: Make the class remember on virtualization
     float GetHeliRotorSpeed();
-    void  SetHeliRotorSpeed(float fSpeed);
+    float GetPlaneRotorSpeed();
 
+    bool GetRotorSpeed(float&);
+    bool SetRotorSpeed(float);
+
+    void SetHeliRotorSpeed(float fSpeed);
+    void SetPlaneRotorSpeed(float fSpeed);
     bool IsHeliSearchLightVisible();
     void SetHeliSearchLightVisible(bool bVisible);
 
@@ -568,10 +581,6 @@ protected:
     CClientVehiclePtr            m_pPreviousLink;
     CClientVehiclePtr            m_pNextLink;
     CMatrix                      m_Matrix;
-    CMatrix                      m_MatrixLast;
-    CMatrix                      m_MatrixPure;
-    CVector                      m_vecMoveSpeedInterpolate;
-    CVector                      m_vecMoveSpeedMeters;
     CVector                      m_vecMoveSpeed;
     CVector                      m_vecTurnSpeed;
     float                        m_fHealth;
@@ -638,6 +647,7 @@ protected:
     bool                                   m_bIsOnGround;
     bool                                   m_bHeliSearchLightVisible;
     float                                  m_fHeliRotorSpeed;
+    float                                  m_fPlaneRotorSpeed;
     const CHandlingEntry*                  m_pOriginalHandlingEntry = nullptr;
     CHandlingEntry*                        m_pHandlingEntry = nullptr;
     const CFlyingHandlingEntry*            m_pOriginalFlyingHandlingEntry = nullptr;

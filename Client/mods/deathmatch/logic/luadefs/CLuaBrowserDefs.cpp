@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "lua/CLuaFunctionParser.h"
+#include <regex>
 
 void CLuaBrowserDefs::LoadFunctions()
 {
@@ -131,39 +132,37 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
         }
         else if (vecSize.fX == 0 || vecSize.fY == 0)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+            argStream.SetCustomError("A browser must be at least 1x1 in size.", "Invalid parameter");
         }
     }
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+
+    if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
     {
-        if (!bIsLocal && !g_pCore->GetWebCore()->GetRemotePagesEnabled())
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pParentResource = pLuaMain->GetResource();
-
-            CClientWebBrowser* pBrowserTexture =
-                g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser((int)vecSize.fX, (int)vecSize.fY, bIsLocal, bTransparent);
-            if (pBrowserTexture)
-            {
-                // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
-                pBrowserTexture->SetParent(pParentResource->GetResourceDynamicEntity());
-
-                // Set our owner resource
-                pBrowserTexture->SetResource(pParentResource);
-            }
-            lua_pushelement(luaVM, pBrowserTexture);
-            return 1;
-        }
+        lua_pushboolean(luaVM, false);
+        return 1;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (pLuaMain)
+    {
+        CResource* pParentResource = pLuaMain->GetResource();
+
+        CClientWebBrowser* pBrowserTexture =
+            g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser((int)vecSize.fX, (int)vecSize.fY, bIsLocal, bTransparent);
+        if (pBrowserTexture)
+        {
+            // Make it a child of the resource's file root ** CHECK  Should parent be pFileResource, and element added to pParentResource's ElementGroup? **
+            pBrowserTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+
+            // Set our owner resource
+            pBrowserTexture->SetResource(pParentResource);
+        }
+        lua_pushelement(luaVM, pBrowserTexture);
+        return 1;
+    }
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -184,8 +183,12 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Remove empty URLs
-        pages.erase(std::remove_if(pages.begin(), pages.end(), [](const auto& url) { return url.empty(); }), pages.end());
+        // Remove empty and invalid URLs
+        std::regex invalidSynmbolsRegex("[^A-Za-z0-9\-._~!#$&'()*+,;=:@\/?%]");
+
+        pages.erase(std::remove_if(pages.begin(), pages.end(),
+                                   [&invalidSynmbolsRegex](const auto& url) { return url.empty() || std::regex_search(url, invalidSynmbolsRegex); }),
+                    pages.end());
 
         // Convert to domains if we got a list of URLs
         if (bIsURL)
@@ -254,28 +257,14 @@ int CLuaBrowserDefs::LoadBrowserURL(lua_State* luaVM)
             lua_pushboolean(luaVM, pWebBrowser->LoadURL(strURL, !isLocalURL, strPostData, bURLEncoded));
             return 1;
         }
-
-        // Are we dealing with a local website? If so, parse resource path. Otherwise, return false and load nothing
-        // Todo: Add an ACL right which is necessary to load local websites or websites in general
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        else
         {
-            SString    strAbsPath;
-            CResource* pResource = pLuaMain->GetResource();
-            if (CResourceManager::ParseResourcePathInput(strURL, pResource, &strAbsPath) && pWebBrowser->IsLocal())
-            {
-                // Output deprecated warning, TODO: Remove this at a later point
-                m_pScriptDebugging->LogWarning(luaVM,
-                                               "This URL scheme is deprecated and may not work in future versions. Please consider using http://mta/* instead. "
-                                               "See https://wiki.mtasa.com/wiki/LoadBrowserURL for details");
-
-                lua_pushboolean(luaVM, pWebBrowser->LoadURL("mtalocal://" + strURL, false, strPostData, bURLEncoded));
-                return 1;
-            }
+            argStream.SetCustomError("Invalid URL scheme provided. Only http:// and https:// is supported.", "Invalid parameter");
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    if (argStream.HasErrors())
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -326,17 +315,19 @@ int CLuaBrowserDefs::InjectBrowserMouseMove(lua_State* luaVM)
 
 int CLuaBrowserDefs::InjectBrowserMouseDown(lua_State* luaVM)
 {
-    //  bool injectBrowserMouseDown ( browser webBrowser, string mouseButton )
-    CClientWebBrowser*     pWebBrowser;
-    eWebBrowserMouseButton mouseButton;
+    //  bool injectBrowserMouseDown ( browser webBrowser, string mouseButton [ , bool doubleClick = false ] )
+    CClientWebBrowser*     pWebBrowser{};
+    eWebBrowserMouseButton mouseButton{};
+    bool                   doubleClick{};
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pWebBrowser);
     argStream.ReadEnumString(mouseButton);
+    argStream.ReadBool(doubleClick, false);
 
     if (!argStream.HasErrors())
     {
-        pWebBrowser->InjectMouseDown(mouseButton);
+        pWebBrowser->InjectMouseDown(mouseButton, doubleClick ? 2 : 1);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -475,7 +466,7 @@ int CLuaBrowserDefs::ExecuteBrowserJavascript(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pWebBrowser->ExecuteJavascript(strJavascriptCode))
+        if (strJavascriptCode.empty() || pWebBrowser->ExecuteJavascript(strJavascriptCode))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -917,7 +908,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
         }
         else if (size.fX == 0 || size.fY == 0)
         {
-            m_pScriptDebugging->LogWarning(luaVM, "A browser must be at least 1x1 in size. This warning may be an error in future versions.");
+            argStream.SetCustomError("A browser must be at least 1x1 in size.", "Invalid parameter");
         }
     }
 
@@ -948,7 +939,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        return luaL_error(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;

@@ -11,60 +11,7 @@
 
 #pragma once
 
-class CPed;
-class CVehicle;
 class CTask;
-
-#include <CVector.h>
-
-#ifndef GAME_SA_EXPORTS
-    #include "TaskBasic.h"
-    #include "TaskCarAccessories.h"
-    #include "TaskCar.h"
-    #include "TaskGoTo.h"
-    #include "TaskSecondary.h"
-    #include "TaskJumpFall.h"
-    #include "TaskPhysicalResponse.h"
-    #include "TaskIK.h"
-    #include "TaskAttack.h"
-#else
-class CTaskSimplePlayerOnFoot;
-class CTaskComplexFacial;
-class CTaskSimpleCarSetPedInAsDriver;
-class CTaskSimpleCarSetPedInAsPassenger;
-class CTaskSimpleCarSetPedOut;
-class CTaskComplexWanderStandard;
-class CTaskComplexEnterCarAsDriver;
-class CTaskComplexEnterCarAsPassenger;
-class CTaskComplexEnterBoatAsDriver;
-class CTaskComplexLeaveCar;
-class CTaskComplexUseMobilePhone;
-class CTaskSimpleDuck;
-class CTaskSimpleChoking;
-class CTaskSimpleClimb;
-class CTaskSimpleJetPack;
-class CTaskSimpleAnim;
-class CTaskSimpleRunAnim;
-class CTaskSimpleRunNamedAnim;
-class CTaskComplexDie;
-class CTaskSimpleStealthKill;
-class CTaskSimpleDead;
-class CTaskSimpleBeHit;
-class CTaskComplexSunbathe;
-
-// IK
-class CTaskSimpleIKChain;
-class CTaskSimpleIKLookAt;
-class CTaskSimpleIKManager;
-class CTaskSimpleTriggerLookAt;
-
-// Attack
-class CTaskSimpleGangDriveBy;
-class CTaskSimpleUseGun;
-class CTaskSimpleFight;
-
-enum eDuckControlTypes;
-#endif
 
 enum
 {
@@ -76,7 +23,7 @@ enum
     TASK_PRIORITY_MAX
 };
 
-enum
+enum eSecondaryTaskType
 {
     TASK_SECONDARY_ATTACK = 0,            // want duck to be after attack
     TASK_SECONDARY_DUCK,                  // because attack controls ducking movement

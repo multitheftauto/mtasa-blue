@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CCoronas.h>
+#include <game/CRegisteredCorona.h>
 
 CClientCorona::CClientCorona(CClientMarker* pThis)
 {

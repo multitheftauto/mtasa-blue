@@ -9,7 +9,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
-#include "game/CAnimBlendAssocGroup.h"
+#include <game/CAnimBlendAssocGroup.h>
+#include <game/CAnimManager.h>
 
 std::shared_ptr<CClientIFP> CIFPEngine::LoadIFP(CResource* resource, CClientManager* clientManager, const SString& blockName, bool isRawInput, SString input)
 {

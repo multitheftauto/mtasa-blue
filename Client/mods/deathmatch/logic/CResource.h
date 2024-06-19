@@ -69,6 +69,7 @@ public:
     void                 SetResourceEntity(CClientEntity* pEntity) { m_pResourceEntity = pEntity; }
     class CClientEntity* GetResourceDynamicEntity() { return m_pResourceDynamicEntity; }
     void                 SetResourceDynamicEntity(CClientEntity* pEntity) { m_pResourceDynamicEntity = pEntity; }
+    SString              GetResourceDirectoryPath() { return GetResourceDirectoryPath(eAccessType::ACCESS_PUBLIC, ""); }
     SString              GetResourceDirectoryPath(eAccessType accessType, const SString& strMetaPath);
     class CClientEntity* GetResourceGUIEntity() { return m_pResourceGUIEntity; }
     void                 SetResourceGUIEntity(CClientEntity* pEntity) { m_pResourceGUIEntity = pEntity; }
@@ -76,6 +77,7 @@ public:
     CClientEntity*       GetResourceDFFRoot() { return m_pResourceDFFEntity; };
     CClientEntity*       GetResourceTXDRoot() { return m_pResourceTXDRoot; };
     CClientEntity*       GetResourceIFPRoot() { return m_pResourceIFPRoot; };
+    CClientEntity*       GetResourceIMGRoot() { return m_pResourceIMGRoot; };
 
     // This is to delete all the elements created in this resource that are created locally in this client
     void DeleteClientChildren();
@@ -87,6 +89,13 @@ public:
 
     std::list<CResourceFile*>::iterator IterBeginResourceFiles() { return m_ResourceFiles.begin(); }
     std::list<CResourceFile*>::iterator IterEndResourceFiles() { return m_ResourceFiles.end(); }
+
+    /**
+     * @brief Searches for a CResourceFile with the given relative path.
+     * @param relativePath Relative resource file path (from meta)
+     * @return A pointer to CResourceFile on success, null otherwise
+     */
+    CResourceFile* GetResourceFile(const SString& relativePath) const;
 
     void               SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
     void               LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
@@ -115,6 +124,7 @@ private:
     class CClientEntity* m_pResourceGUIEntity;
     class CClientEntity* m_pResourceTXDRoot;
     class CClientEntity* m_pResourceIFPRoot;
+    class CClientEntity* m_pResourceIMGRoot;
     unsigned short       m_usRemainingNoClientCacheScripts;
     bool                 m_bLoadAfterReceivingNoClientCacheScripts;
     CMtaVersion          m_strMinServerReq;

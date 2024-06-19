@@ -234,6 +234,7 @@ namespace SharedUtil
 
     std::string UTF16ToMbUTF8(const std::wstring& ws);
     std::string UTF16ToMbUTF8(const wchar_t* ws);
+    std::string UTF16ToMbUTF8(const char16_t* ws);
 
     std::wstring ANSIToUTF16(const SString& s);
 
@@ -343,13 +344,14 @@ namespace SharedUtil
     template <class TL, class T>
     bool ListContains(const TL& itemList, const T& item)
     {
+        if (itemList.empty())
+            return false;
         typename TL ::const_iterator it = itemList.begin();
         for (; it != itemList.end(); ++it)
             if (item == *it)
                 return true;
         return false;
     }
-
     // Add item if it does not aleady exist in itemList
     template <class TL, class T>
     void ListAddUnique(TL& itemList, const T& item)
@@ -659,23 +661,48 @@ namespace SharedUtil
     //
     // Fixed sized string buffer
     //
-    template <int MAX_LENGTH>
+    template <size_t MAX_LENGTH>
     class SFixedString
     {
         char szData[MAX_LENGTH + 1];
 
     public:
-        SFixedString() { szData[0] = 0; }
+        constexpr SFixedString() { szData[0] = 0; }
 
         // In
-        SFixedString& operator=(const char* szOther)
+        constexpr SFixedString& Assign(const char* szOther, size_t len)
         {
-            STRNCPY(szData, szOther, MAX_LENGTH + 1);
+            STRNCPY(szData, szOther, len + 1);
             return *this;
         }
 
+        constexpr SFixedString& operator=(const char* szOther)
+        {
+            Assign(szOther, MAX_LENGTH + 1);
+            return *this;
+        }
+#ifdef __cpp_lib_string_view
+        constexpr SFixedString& operator=(std::string_view other)
+        {
+            Assign(other.data(), other.length() + 1);
+            return *this;
+        }
+#endif
+
+#ifdef __cpp_lib_string_view
         // Out
-        operator const char*() const { return szData; }
+        constexpr operator std::string_view() const { return {szData}; }
+#endif
+        constexpr       operator const char*() const { return szData; }
+        constexpr char* Data() { return &szData[0]; }
+
+        constexpr size_t GetMaxLength() const { return MAX_LENGTH; }
+        size_t           GetLength() const { return strlen(szData); }
+
+        // Shake it all about
+        void           Encrypt();
+        constexpr bool Empty() { return szData[0] == 0; }
+        constexpr void Clear() const { szData[0] = 0; }
 
         // Returns a pointer to a null-terminated character array
         const char* c_str() const noexcept { return &szData[0]; }
@@ -1515,37 +1542,6 @@ namespace SharedUtil
 
         std::map<uint, bool> idMap;
         char                 cDefaultType;
-    };
-
-    ///////////////////////////////////////////////////////////////
-    //
-    // CRefCountableST
-    //
-    // Reference counting base class
-    //
-    ///////////////////////////////////////////////////////////////
-    class CRefCountableST
-    {
-        int m_iRefCount;
-
-    protected:
-        virtual ~CRefCountableST() {}
-
-    public:
-        CRefCountableST() : m_iRefCount(1) {}
-
-        void AddRef() { ++m_iRefCount; }
-
-        void Release()
-        {
-            assert(m_iRefCount > 0);
-            bool bLastRef = --m_iRefCount == 0;
-
-            if (!bLastRef)
-                return;
-
-            delete this;
-        }
     };
 
     ///////////////////////////////////////////////////////////////

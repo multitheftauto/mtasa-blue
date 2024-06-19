@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 // Show info about where the actual files are coming from
-//#define RESOURCE_DEBUG_MESSAGES
+// #define RESOURCE_DEBUG_MESSAGES
 
 #include "StdInc.h"
 #include "CResource.h"
@@ -34,6 +34,7 @@
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>
+#include <glob/glob.h>
 
 #ifdef WIN32
     #include <zip/iowin32.h>
@@ -338,10 +339,13 @@ bool CResource::Unload()
         m_pNodeSettings = nullptr;
     }
 
+    OnResourceStateChange("unloaded");
+
     m_strResourceZip = "";
     m_strResourceCachePath = "";
     m_strResourceDirectoryPath = "";
     m_eState = EResourceState::None;
+
     return true;
 }
 
@@ -385,6 +389,7 @@ void CResource::TidyUp()
         delete pResourceFile;
 
     m_ResourceFiles.clear();
+    m_ResourceFilesCountPerDir.clear();
 
     // Go through each included resource item and delete it
     for (CIncludedResources* pIncludedResources : m_IncludedResources)
@@ -592,8 +597,12 @@ bool CResource::GenerateChecksums()
 bool CResource::HasResourceChanged()
 {
     std::string strPath;
+    std::string_view strDirPath = m_strResourceDirectoryPath;
+
     if (IsResourceZip())
     {
+        strDirPath = m_strResourceCachePath;
+
         // Zip file might have changed
         CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strResourceZip);
         if (checksum != m_zipHash)
@@ -602,32 +611,40 @@ bool CResource::HasResourceChanged()
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
-        if (GetFilePath(pResourceFile->GetName(), strPath))
+        if (!GetFilePath(pResourceFile->GetName(), strPath))
+            return true;
+
+        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+
+        if (pResourceFile->GetLastChecksum() != checksum)
+            return true;
+
+        // Also check if file in http cache has been externally altered
+        switch (pResourceFile->GetType())
         {
-            CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
-
-            if (pResourceFile->GetLastChecksum() != checksum)
-                return true;
-
-            // Also check if file in http cache has been externally altered
-            switch (pResourceFile->GetType())
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+            case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
             {
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
-                case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
-                {
-                    string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
-                    CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
+                string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
+                CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
-                    if (cachedChecksum != checksum)
-                        return true;
+                if (cachedChecksum != checksum)
+                    return true;
 
-                    break;
-                }
-                default:
-                    break;
+                break;
             }
+            default:
+                break;
         }
+    }
+
+    for (const auto& [strGlob, uiFileCount] : m_ResourceFilesCountPerDir)
+    {
+        std::vector<std::filesystem::path> files = glob::rglob(strDirPath.data() + strGlob);
+
+        if (files.size() != uiFileCount)
+            return true;
     }
 
     if (GetFilePath("meta.xml", strPath))
@@ -740,6 +757,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
     if (m_bDestroyed)
         return false;
+
+    OnResourceStateChange("starting");
 
     m_eState = EResourceState::Starting;
 
@@ -974,6 +993,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             AddDependent(pDependent);
     }
 
+    OnResourceStateChange("running");
+
     m_eState = EResourceState::Running;
 
     // Call the onResourceStart event. If it returns false, cancel this script again
@@ -1016,6 +1037,37 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     return true;
 }
 
+void CResource::OnResourceStateChange(const char* state) noexcept
+{
+    if (!m_pResourceElement)
+        return;
+
+    CLuaArguments stateArgs;
+    stateArgs.PushResource(this);
+    switch (m_eState)
+    {
+        case EResourceState::Loaded: // When resource is stopped
+            stateArgs.PushString("loaded");
+            break;
+        case EResourceState::Running: // When resource is running
+            stateArgs.PushString("running");
+            break;
+        case EResourceState::Starting: // When resource is starting
+            stateArgs.PushString("starting");
+            break;
+        case EResourceState::Stopping: // When resource is stopping
+            stateArgs.PushString("stopping");
+            break;
+        case EResourceState::None: // When resource is not loaded
+        default:
+            stateArgs.PushString("unloaded");
+            break;
+    }
+    stateArgs.PushString(state);
+
+    m_pResourceElement->CallEvent("onResourceStateChange", stateArgs);
+}
+
 bool CResource::Stop(bool bManualStop)
 {
     if (m_eState == EResourceState::Loaded)
@@ -1026,6 +1078,8 @@ bool CResource::Stop(bool bManualStop)
 
     if (m_bStartedManually && !bManualStop)
         return false;
+
+    OnResourceStateChange("stopping");
 
     m_eState = EResourceState::Stopping;
     m_pResourceManager->RemoveMinClientRequirement(this);
@@ -1113,6 +1167,7 @@ bool CResource::Stop(bool bManualStop)
     // Broadcast the packet to joined players
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
 
+    OnResourceStateChange("loaded");
     m_eState = EResourceState::Loaded;
     return true;
 }
@@ -1298,6 +1353,23 @@ bool CResource::GetFilePath(const char* szFilename, string& strPath)
 
     strPath = m_strResourceCachePath + szFilename;
     return FileExists(strPath);
+}
+
+std::vector<std::string> CResource::GetFilePaths(const char* szFilename)
+{
+    std::vector<std::string>    vecFiles;
+    const std::string&          strDirectory = IsResourceZip() ? m_strResourceCachePath : m_strResourceDirectoryPath;
+    const std::string           strFilePath = strDirectory + szFilename;
+
+    for (const std::filesystem::path& path : glob::rglob(strFilePath))
+    {
+        std::string strPath = std::filesystem::relative(path, strDirectory).string();
+        ReplaceSlashes(strPath);
+
+        vecFiles.push_back(std::move(strPath));
+    }
+
+    return vecFiles;
 }
 
 // Return true if file name is used by this resource
@@ -1545,13 +1617,28 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (IsFilenameUsed(strFilename, true))
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                    continue;
+                    m_strFailureReason = SString("Couldn't find file(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+
+                if (vecFiles.empty())
+                {
+                    if (glob::has_magic(strFilename))
+                    {
+                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+                        continue;
+                    }
+
+                    m_strFailureReason = SString("Couldn't find file(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
                 }
 
                 bool           bDownload = true;
@@ -1559,23 +1646,30 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
 
                 if (pDownload)
                 {
-                    const char* szDownload = pDownload->GetValue().c_str();
+                    const std::string strDownload = pDownload->GetValue();
 
-                    if (!stricmp(szDownload, "no") || !stricmp(szDownload, "false"))
+                    if (strDownload == "no" || strDownload == "false")
                         bDownload = false;
                 }
 
-                // Create a new resourcefile item
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
+                for (const std::string& strFilePath : vecFiles)
                 {
-                    m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                    std::string strFullFilename;
+
+                    if (IsFilenameUsed(strFilePath, true))
+                    {
+                        CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilePath.c_str());
+                        continue;
+                    }
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                    }
                 }
-                else
-                {
-                    m_strFailureReason = SString("Couldn't find file %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
-                    CLogger::ErrorPrintf(m_strFailureReason);
-                    return false;
-                }
+
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
             }
             else
             {
@@ -1725,35 +1819,67 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (bClient && IsFilenameUsed(strFilename, true))
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
-                    CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
-                                       strFilename.c_str());
-                    bClient = false;
-                }
-                if (bServer && IsFilenameUsed(strFilename, false))
-                {
-                    CLogger::LogPrintf("WARNING: Duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                }
-
-                // Extract / get the filepath of the file
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-                {
-                    // Create it depending on the type (client or server or shared) and add it to the list of resource files
-                    if (bServer)
-                        m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
-                    if (bClient)
-                        m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes));
-                }
-                else
-                {
-                    m_strFailureReason = SString("Couldn't find script %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    m_strFailureReason = SString("Couldn't find script(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
                 }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+
+                if (vecFiles.empty())
+                {
+                    if (glob::has_magic(strFilename))
+                    {
+                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+                        continue;
+                    }
+
+                    m_strFailureReason = SString("Couldn't find script(s) %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                for (const std::string& strFilePath : vecFiles)
+                {
+                    std::string strFullFilename;
+                    bool        bLoadClient = bClient;
+                    bool        bLoadServer = bServer;
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        // Check if the filename is already used by this resource
+
+                        if (bClient && IsFilenameUsed(strFilePath, true))
+                        {
+                            CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                               strFilePath.c_str());
+                            bLoadClient = false;
+                        }
+
+                        if (bServer && IsFilenameUsed(strFilePath, false))
+                        {
+                            CLogger::LogPrintf("WARNING: Ignoring duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
+                                               strFilePath.c_str());
+
+                            bLoadServer = false;
+                        }
+
+                        // Create it depending on the type (client or server or shared) and add it to the list of resource files
+
+                        if (bLoadServer)
+                            m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+
+                        if (bLoadClient)
+                            m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+                    }
+                }
+
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
             }
             else
             {
@@ -2369,24 +2495,48 @@ ResponseCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse*
     return HTTPRESPONSECODE_200_OK;
 }
 
-void Unescape(std::string& str)
+std::string Unescape(std::string_view sv)
 {
-    const char* pPercent = strchr(str.c_str(), '%');
+    // Converts a character to a hexadecimal value
+    auto toHex = [](char c) {
+        if (c >= '0' && c <= '9')
+            return c - '0';
+        if (c >= 'a' && c <= 'f')
+            return c - 'a' + 10;
+        if (c >= 'A' && c <= 'F')
+            return c - 'A' + 10;
+        return 0;
+    };
 
-    while (pPercent)
+    std::string out;
+    // String can only shrink here
+    // as %?? is collapsed to a single char
+    out.reserve(sv.length());
+    auto it = sv.begin();
+    while (it != sv.end())
     {
-        if (pPercent[1] && pPercent[2])
+        if (*it == '%')
         {
-            int iCharCode = 0;
-            sscanf(&pPercent[1], "%02X", &iCharCode);
-            str.replace(pPercent - str.c_str(), 3, (char*)&iCharCode);
-            pPercent = strchr(pPercent + 3, '%');
+            // Avoid reading past the end
+            if (std::distance(it, sv.end()) < 3)
+            {
+                out.push_back(*it++);
+                continue;
+            }
+            // Skip %
+            ++it;
+            // Read two digits/letters and convert to char
+            uint8_t digit1 = toHex(*it++);
+            uint8_t digit2 = toHex(*it++);
+            out.push_back(static_cast<char>(digit1 * 0x10 + digit2));
         }
         else
         {
-            break;
+            // Push normally
+            out.push_back(*it++);
         }
     }
+    return out;
 }
 
 ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse, CAccount* pAccount)
@@ -2447,7 +2597,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
                 if (iKey >= 0 && iKey < MAX_INPUT_VARIABLES)
                 {
                     std::string strValue(pEqual + 1, pAnd - (pEqual + 1));
-                    Unescape(strValue);
+                    strValue = Unescape(strValue);
 
                     if (iKey + 1 > static_cast<int>(vecArguments.size()))
                         vecArguments.resize(iKey + 1);
@@ -2463,7 +2613,7 @@ ResponseCode CResource::HandleRequestCall(HttpRequest* ipoHttpRequest, HttpRespo
         }
     }
 
-    Unescape(strFuncName);
+    strFuncName = Unescape(strFuncName);
 
     for (CExportedFunction& Exported : m_ExportedFunctions)
     {
@@ -2673,6 +2823,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
     }
 
     Unescape(strFile);
+    strFile = Unescape(strFile);
 
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
@@ -2705,7 +2856,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
                 }
                 else
                 {
-                    SString err("Resource %s is not running.", m_strResourceName.c_str());
+                    SString err = "That resource is not running.";
                     ipoHttpResponse->SetBody(err.c_str(), err.size());
                     return HTTPRESPONSECODE_401_UNAUTHORIZED;
                 }
@@ -2751,7 +2902,7 @@ ResponseCode CResource::HandleRequestActive(HttpRequest* ipoHttpRequest, HttpRes
         }
     }
 
-    SString err("Cannot find a resource file named '%s' in the resource %s.", strFile.c_str(), m_strResourceName.c_str());
+    SString err = "That resource file could not be found in that resource.";
     ipoHttpResponse->SetBody(err.c_str(), err.size());
     return HTTPRESPONSECODE_404_NOTFOUND;
 }
@@ -3381,4 +3532,17 @@ bool CResource::IsFileDbConnectMysqlProtected(const SString& strAbsFilename, boo
     }
 
     return false;
+}
+
+CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
+{
+    for (CResourceFile* resourceFile : m_ResourceFiles)
+    {
+        if (!stricmp(relativePath.c_str(), resourceFile->GetName()))
+        {
+            return resourceFile;
+        }
+    }
+
+    return nullptr;
 }

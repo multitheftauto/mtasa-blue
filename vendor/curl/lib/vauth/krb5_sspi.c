@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2014 - 2021, Steve Holme, <steve_holme@hotmail.com>.
+ * Copyright (C) Steve Holme, <steve_holme@hotmail.com>.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  * RFC4752 The Kerberos V5 ("GSSAPI") SASL Mechanism
  *
@@ -317,7 +319,8 @@ CURLcode Curl_auth_create_gssapi_security_message(struct Curl_easy *data,
   /* Extract the security layer and the maximum message size */
   indata = input_buf[1].pvBuffer;
   sec_layer = indata[0];
-  max_size = (indata[1] << 16) | (indata[2] << 8) | indata[3];
+  max_size = ((unsigned long)indata[1] << 16) |
+             ((unsigned long)indata[2] << 8) | indata[3];
 
   /* Free the challenge as it is not required anymore */
   s_pSecFn->FreeContextBuffer(input_buf[1].pvBuffer);
@@ -469,4 +472,4 @@ void Curl_auth_cleanup_gssapi(struct kerberos5data *krb5)
   krb5->token_max = 0;
 }
 
-#endif /* USE_WINDOWS_SSPI && USE_KERBEROS5*/
+#endif /* USE_WINDOWS_SSPI && USE_KERBEROS5 */

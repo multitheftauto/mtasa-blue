@@ -10,7 +10,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
+#include "CWaterManagerSA.h"
+
+extern CCoreInterface* g_pCore;
+
 extern int ms_iNumNonDefaultAndNonZeroVertices;
+
+#define WATER_VISIBLE 1
+#define WATER_SHALLOW 2
 
 using namespace std;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2021  Internet Software Consortium.
+ * Copyright (C) 1996-2022  Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -13,6 +13,8 @@
  * FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
  * NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ *
+ * SPDX-License-Identifier: ISC
  */
 /*
  * Original code by Paul Vixie. "curlified" by Gisle Vanem.
@@ -38,6 +40,15 @@
 #define IN6ADDRSZ       16
 #define INADDRSZ         4
 #define INT16SZ          2
+
+/*
+ * If USE_IPV6 is disabled, we still want to parse IPv6 addresses, so make
+ * sure we have _some_ value for AF_INET6 without polluting our fake value
+ * everywhere.
+ */
+#if !defined(USE_IPV6) && !defined(AF_INET6)
+#define AF_INET6 (AF_INET + 1)
+#endif
 
 /*
  * Format an IPv4 address, more or less like inet_ntop().
@@ -70,7 +81,6 @@ static char *inet_ntop4 (const unsigned char *src, char *dst, size_t size)
   return dst;
 }
 
-#ifdef ENABLE_IPV6
 /*
  * Convert IPv6 binary address into presentation (printable) format.
  */
@@ -86,10 +96,10 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
   char tmp[sizeof("ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255")];
   char *tp;
   struct {
-    long base;
-    long len;
+    int base;
+    int len;
   } best, cur;
-  unsigned long words[IN6ADDRSZ / INT16SZ];
+  unsigned int words[IN6ADDRSZ / INT16SZ];
   int i;
 
   /* Preprocess:
@@ -98,7 +108,7 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
    */
   memset(words, '\0', sizeof(words));
   for(i = 0; i < IN6ADDRSZ; i++)
-    words[i/2] |= (src[i] << ((1 - (i % 2)) << 3));
+    words[i/2] |= ((unsigned int)src[i] << ((1 - (i % 2)) << 3));
 
   best.base = -1;
   cur.base  = -1;
@@ -107,8 +117,9 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
 
   for(i = 0; i < (IN6ADDRSZ / INT16SZ); i++) {
     if(words[i] == 0) {
-      if(cur.base == -1)
-        cur.base = i, cur.len = 1;
+      if(cur.base == -1) {
+        cur.base = i; cur.len = 1;
+      }
       else
         cur.len++;
     }
@@ -148,13 +159,13 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
       tp += strlen(tp);
       break;
     }
-    tp += msnprintf(tp, 5, "%lx", words[i]);
+    tp += msnprintf(tp, 5, "%x", words[i]);
   }
 
   /* Was it a trailing run of 0x00's?
    */
   if(best.base != -1 && (best.base + best.len) == (IN6ADDRSZ / INT16SZ))
-     *tp++ = ':';
+    *tp++ = ':';
   *tp++ = '\0';
 
   /* Check for overflow, copy, and we're done.
@@ -166,7 +177,6 @@ static char *inet_ntop6 (const unsigned char *src, char *dst, size_t size)
   strcpy(dst, tmp);
   return dst;
 }
-#endif  /* ENABLE_IPV6 */
 
 /*
  * Convert a network format address to presentation format.
@@ -185,10 +195,8 @@ char *Curl_inet_ntop(int af, const void *src, char *buf, size_t size)
   switch(af) {
   case AF_INET:
     return inet_ntop4((const unsigned char *)src, buf, size);
-#ifdef ENABLE_IPV6
   case AF_INET6:
     return inet_ntop6((const unsigned char *)src, buf, size);
-#endif
   default:
     errno = EAFNOSUPPORT;
     return NULL;

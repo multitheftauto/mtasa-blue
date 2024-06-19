@@ -16,10 +16,11 @@
 
 #include <game/CExplosion.h>
 #include <game/CStats.h>
-#include "CPopulationMP.h"
 #include "CLimits.h"
 #include <../Client/game_sa/CAnimBlendAssociationSA.h>
 #include <../Client/game_sa/CAnimBlendStaticAssociationSA.h>
+
+class CEntitySAInterface;
 
 struct SRwResourceStats
 {
@@ -44,6 +45,16 @@ enum EVehicleWeaponType : int
     TANK_GUN,
     ROCKET,
     HEAT_SEEKING_ROCKET,
+};
+
+enum class eGrainMultiplierType
+{
+    MASTER = 0,
+    INFRARED,
+    NIGHT,
+    RAIN,
+    OVERLAY,
+    ALL
 };
 
 struct SVehicleWeaponHitEvent
@@ -194,16 +205,15 @@ public:
 
     virtual class CPed* GetContextSwitchedPed() = 0;
 
-    virtual class CPopulationMP* GetPopulationMP() = 0;
-    virtual void                 PreventLeavingVehicles() = 0;
-    virtual void                 HideRadar(bool bHide) = 0;
-    virtual void                 SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;
-    virtual void                 DisablePadHandler(bool bDisabled) = 0;
-    virtual void                 DisableAllVehicleWeapons(bool bDisable) = 0;
-    virtual void                 DisableBirds(bool bDisabled) = 0;
-    virtual void                 DisableQuickReload(bool bDisable) = 0;
-    virtual void                 DisableCloseRangeDamage(bool bDisable) = 0;
-    virtual void                 DisableBadDrivebyHitboxes(bool bDisable) = 0;
+    virtual void PreventLeavingVehicles() = 0;
+    virtual void HideRadar(bool bHide) = 0;
+    virtual void SetCenterOfWorld(class CEntity* entity, class CVector* vecPosition, FLOAT fHeading) = 0;
+    virtual void DisablePadHandler(bool bDisabled) = 0;
+    virtual void DisableAllVehicleWeapons(bool bDisable) = 0;
+    virtual void DisableBirds(bool bDisabled) = 0;
+    virtual void DisableQuickReload(bool bDisable) = 0;
+    virtual void DisableCloseRangeDamage(bool bDisable) = 0;
+    virtual void DisableBadDrivebyHitboxes(bool bDisable) = 0;
 
     virtual bool  GetExplosionsDisabled() = 0;
     virtual void  DisableExplosions(bool bDisabled) = 0;
@@ -260,6 +270,9 @@ public:
     virtual void  GetHeatHaze(SHeatHazeSettings& settings) = 0;
     virtual void  ResetColorFilter() = 0;
     virtual void  SetColorFilter(DWORD dwPass0Color, DWORD dwPass1Color) = 0;
+    virtual void  GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bool isOriginal) = 0;
+    virtual void  SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier) = 0;
+    virtual void  SetGrainLevel(BYTE ucLevel) = 0;
     virtual void  ResetHeatHaze() = 0;
     virtual void  SetHeatHazeEnabled(bool bEnabled) = 0;
     virtual bool  HasWaterColor() = 0;
@@ -390,4 +403,8 @@ public:
     virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
     virtual eAnimID    GetLastStaticAnimationID() = 0;
     virtual DWORD      GetLastAnimArrayAddress() = 0;
+
+    virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
+    virtual unsigned int PtrNodeSingleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+    virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
 };

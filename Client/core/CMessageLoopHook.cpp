@@ -124,15 +124,37 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
     // Alternate alt-tab system
     if (pThis && hwnd == pThis->GetHookedWindowHandle())
     {
-        if (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_ACTIVE)
+        if (uMsg == WM_ACTIVATE)
         {
-            GetVideoModeManager()->OnGainFocus();
+            CModManager* pModManager = CModManager::GetSingletonPtr();
+            WORD         wState = LOWORD(wParam);
+
+            if (pModManager && pModManager->IsLoaded())
+            {
+                CClientBase* pBase = pModManager->GetCurrentMod();
+
+                if (pBase)
+                {
+                    bool bFocus = (wState == WA_CLICKACTIVE) || (wState == WA_ACTIVE);
+                    pBase->OnWindowFocusChange(bFocus);
+                }
+            }
+
+            switch (wState)
+            {
+                case WA_ACTIVE:
+                    GetVideoModeManager()->OnGainFocus();
+                    break;
+
+                case WA_INACTIVE:
+                {
+                    GetVideoModeManager()->OnLoseFocus();
+                    g_pCore->GetKeyBinds()->OnLoseFocus();
+                    break;
+                }
+            }
         }
-        if (uMsg == WM_ACTIVATE && LOWORD(wParam) == WA_INACTIVE)
-        {
-            GetVideoModeManager()->OnLoseFocus();
-            g_pCore->GetKeyBinds()->OnLoseFocus();
-        }
+
         if (uMsg == WM_PAINT)
         {
             GetVideoModeManager()->OnPaint();
@@ -161,6 +183,13 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
     {
         if (wParam == 0xF093 || wParam == SC_KEYMENU || wParam == SC_MOUSEMENU)
             return 0;
+    }
+
+    // Disable the system context menu by clicking on window bar (freezes the game).
+    // Disable right mouse button outside application window area (holding it over window bar freezes the game).
+    if (uMsg == WM_CONTEXTMENU || uMsg == WM_NCRBUTTONDOWN)
+    {
+        return 0;
     }
 
     // Quit message?
@@ -264,6 +293,11 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                         {
                             ms_bIgnoreNextEscapeCharacter = true;
                             pConsole->SetVisible(false);
+
+                            CGUI* pGUI = g_pCore->GetGUI();
+                            if (!g_pCore->IsMenuVisible())
+                                pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
+
                             return true;
                         }
 
@@ -524,7 +558,7 @@ void CMessageLoopHook::StartWindowMovement()
 
     LONG lExStyle = GetWindowLong(m_MovementDummyWindow, GWL_EXSTYLE);
     lExStyle &= ~(WS_EX_DLGMODALFRAME | WS_EX_CLIENTEDGE | WS_EX_STATICEDGE);
-    lExStyle |= WS_EX_LAYERED;
+    lExStyle |= WS_EX_LAYERED | WS_EX_TOOLWINDOW;
     SetWindowLong(m_MovementDummyWindow, GWL_EXSTYLE, lExStyle);
     SetLayeredWindowAttributes(m_MovementDummyWindow, 0, 140, LWA_ALPHA);
 

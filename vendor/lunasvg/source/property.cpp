@@ -1,21 +1,27 @@
 #include "property.h"
-#include "styledelement.h"
+#include "element.h"
+#include "lunasvg.h"
 
+#include <algorithm>
 #include <cmath>
 
 namespace lunasvg {
 
-const Color Color::Black{0, 0, 0, 1};
-const Color Color::White{1, 1, 1, 1};
-const Color Color::Red{1, 0, 0, 1};
-const Color Color::Green{0, 1, 0, 1};
-const Color Color::Blue{0, 0, 1, 1};
-const Color Color::Yellow{1, 1, 0, 1};
-const Color Color::Transparent{0, 0, 0, 0};
+const Color Color::Black(0xFF000000);
+const Color Color::White(0xFFFFFFFF);
+const Color Color::Transparent(0x00000000);
 
-Color::Color(double r, double g, double b, double a)
-    : r(r), g(g), b(b), a(a)
+Color& Color::combine(double opacity)
 {
+    *this = combined(opacity);
+    return *this;
+}
+
+Color Color::combined(double opacity) const
+{
+    auto rgb = m_value & 0x00FFFFFF;
+    auto a = static_cast<int>(std::clamp(opacity * alpha(), 0.0, 255.0));
+    return Color(rgb | a << 24);
 }
 
 Paint::Paint(const Color& color)
@@ -38,6 +44,11 @@ const Rect Rect::Invalid{0, 0, -1, -1};
 
 Rect::Rect(double x, double y, double w, double h)
     : x(x), y(y), w(w), h(h)
+{
+}
+
+Rect::Rect(const Box& box)
+    : x(box.x), y(box.y), w(box.w), h(box.h)
 {
 }
 
@@ -87,6 +98,11 @@ Rect& Rect::unite(const Rect& rect)
 
 Transform::Transform(double m00, double m10, double m01, double m11, double m02, double m12)
     : m00(m00), m10(m10), m01(m01), m11(m11), m02(m02), m12(m12)
+{
+}
+
+Transform::Transform(const Matrix& matrix)
+    : m00(matrix.a), m10(matrix.b), m01(matrix.c), m11(matrix.d), m02(matrix.e), m12(matrix.f)
 {
 }
 
@@ -222,8 +238,7 @@ Rect Transform::map(const Rect& rect) const
     auto r = p[0].x;
     auto b = p[0].y;
 
-    for(int i = 1;i < 4;i++)
-    {
+    for(int i = 1; i < 4; i++) {
         if(p[i].x < l) l = p[i].x;
         if(p[i].x > r) r = p[i].x;
         if(p[i].y < t) t = p[i].y;
@@ -340,8 +355,7 @@ void Path::arcTo(double cx, double cy, double rx, double ry, double xAxisRotatio
     auto Px = dx1 * dx1;
     auto Py = dy1 * dy1;
     auto check = Px / Pr1 + Py / Pr2;
-    if(check > 1)
-    {
+    if(check > 1) {
         rx = rx * std::sqrt(check);
         ry = ry * std::sqrt(check);
     }
@@ -372,8 +386,7 @@ void Path::arcTo(double cx, double cy, double rx, double ry, double xAxisRotatio
         th_arc -= 2.0 * pi;
 
     auto n_segs = static_cast<int>(std::ceil(std::fabs(th_arc / (pi * 0.5 + 0.001))));
-    for(int i = 0;i < n_segs;i++)
-    {
+    for(int i = 0; i < n_segs; i++) {
         auto th2 = th0 + i * th_arc / n_segs;
         auto th3 = th0 + (i + 1) * th_arc / n_segs;
 
@@ -429,17 +442,14 @@ void Path::rect(double x, double y, double w, double h, double rx, double ry)
     auto right = x + w;
     auto bottom = y + h;
 
-    if(rx == 0.0 && ry == 0.0)
-    {
+    if(rx == 0.0 && ry == 0.0) {
         moveTo(x, y);
         lineTo(right, y);
         lineTo(right, bottom);
         lineTo(x, bottom);
         lineTo(x, y);
         close();
-    }
-    else
-    {
+    } else {
         double cpx = rx * kappa;
         double cpy = ry * kappa;
         moveTo(x, y+ry);
@@ -465,8 +475,7 @@ Rect Path::box() const
     auto r = m_points[0].x;
     auto b = m_points[0].y;
 
-    for(std::size_t i = 1;i < m_points.size();i++)
-    {
+    for(std::size_t i = 1; i < m_points.size(); i++) {
         if(m_points[i].x < l) l = m_points[i].x;
         if(m_points[i].x > r) r = m_points[i].x;
         if(m_points[i].y < t) t = m_points[i].y;
@@ -531,7 +540,7 @@ void PathIterator::next()
 const Length Length::Unknown{0, LengthUnits::Unknown};
 const Length Length::Zero{0, LengthUnits::Number};
 const Length Length::One{1, LengthUnits::Number};
-const Length Length::ThreePercent{3, LengthUnits::Percent};
+const Length Length::Three{3, LengthUnits::Number};
 const Length Length::HundredPercent{100, LengthUnits::Percent};
 const Length Length::FiftyPercent{50, LengthUnits::Percent};
 const Length Length::OneTwentyPercent{120, LengthUnits::Percent};
@@ -578,8 +587,7 @@ static const double sqrt2 = 1.41421356237309504880;
 
 double Length::value(const Element* element, LengthMode mode) const
 {
-    if(m_units == LengthUnits::Percent)
-    {
+    if(m_units == LengthUnits::Percent) {
         auto viewport = element->currentViewport();
         auto w = viewport.w;
         auto h = viewport.h;
@@ -619,8 +627,7 @@ Transform PreserveAspectRatio::getMatrix(double width, double height, const Rect
 
     auto xscale = width / viewBox.w;
     auto yscale = height / viewBox.h;
-    if(m_align == Align::None)
-    {
+    if(m_align == Align::None) {
         auto xoffset = -viewBox.x * xscale;
         auto yoffset = -viewBox.y * yscale;
         return Transform{xscale, 0, 0, yscale, xoffset, yoffset};

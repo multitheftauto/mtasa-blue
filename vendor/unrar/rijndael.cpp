@@ -84,24 +84,51 @@ Rijndael::Rijndael()
 {
   if (S5[0]==0)
     GenerateTables();
+  m_uRounds = 0;
   CBCMode = true; // Always true for RAR.
+#ifdef USE_SSE
+  AES_NI=false;
+#endif
+#ifdef USE_NEON_AES
+  AES_Neon=false;
+#endif
 }
 
 
 void Rijndael::Init(bool Encrypt,const byte *key,uint keyLen,const byte * initVector)
 {
-#ifdef USE_SSE
-  // Check SSE here instead of constructor, so if object is a part of some
-  // structure memset'ed before use, this variable is not lost.
+  // Check SIMD here instead of constructor, so if object is a part of some
+  // structure memset'ed before use, these variables are not lost.
+#if defined(USE_SSE)
+
+#ifdef _MSC_VER
   int CPUInfo[4];
-  __cpuid(CPUInfo, 0x80000000); // Get the maximum supported cpuid function.
-  if ((CPUInfo[0] & 0x7fffffff)>=1)
+  __cpuid(CPUInfo, 0);
+  if (CPUInfo[0]>=1) // Check the maximum supported cpuid function.
   {
     __cpuid(CPUInfo, 1);
     AES_NI=(CPUInfo[2] & 0x2000000)!=0;
   }
   else
     AES_NI=false;
+#elif defined(__GNUC__)
+  AES_NI=__builtin_cpu_supports("aes");
+#endif
+
+#elif defined(USE_NEON_AES)
+  #ifdef _APPLE
+    // getauxval isn't available in OS X
+    uint Value=0;
+    size_t Size=sizeof(Value);
+    int RetCode=sysctlbyname("hw.optional.arm.FEAT_AES",&Value,&Size,NULL,0);
+
+    // We treat sysctlbyname failure with -1 return code as AES presence,
+    // because "hw.optional.arm.FEAT_AES" was missing in OS X 11, but AES
+    // still was supported by Neon.
+    AES_Neon=RetCode!=0 || Value!=0;
+  #else
+    AES_Neon=(getauxval(AT_HWCAP) & HWCAP_AES)!=0;
+  #endif
 #endif
 
   // Other developers asked us to initialize it to suppress "may be used
@@ -141,16 +168,23 @@ void Rijndael::Init(bool Encrypt,const byte *key,uint keyLen,const byte * initVe
     keyEncToDec();
 }
 
+
 void Rijndael::blockEncrypt(const byte *input,size_t inputLen,byte *outBuffer)
 {
   if (inputLen <= 0)
     return;
 
   size_t numBlocks = inputLen/16;
-#ifdef USE_SSE
+#if defined(USE_SSE)
   if (AES_NI)
   {
     blockEncryptSSE(input,numBlocks,outBuffer);
+    return;
+  }
+#elif defined(USE_NEON_AES)
+  if (AES_Neon)
+  {
+    blockEncryptNeon(input,numBlocks,outBuffer);
     return;
   }
 #endif
@@ -239,6 +273,40 @@ void Rijndael::blockEncryptSSE(const byte *input,size_t numBlocks,byte *outBuffe
 }
 #endif
 
+
+#ifdef USE_NEON_AES
+void Rijndael::blockEncryptNeon(const byte *input,size_t numBlocks,byte *outBuffer)
+{
+  byte *prevBlock = m_initVector;
+  while (numBlocks > 0)
+  {
+    byte block[16];
+    if (CBCMode)
+      vst1q_u8(block, veorq_u8(vld1q_u8(prevBlock), vld1q_u8(input)));
+    else
+      vst1q_u8(block, vld1q_u8(input));
+
+    uint8x16_t data = vld1q_u8(block);
+    for (uint i = 0; i < m_uRounds-1; i++)
+    {
+      data = vaeseq_u8(data, vld1q_u8((byte *)m_expandedKey[i]));
+      data = vaesmcq_u8(data);
+    }
+    data = vaeseq_u8(data, vld1q_u8((byte *)(m_expandedKey[m_uRounds-1])));
+    data = veorq_u8(data, vld1q_u8((byte *)(m_expandedKey[m_uRounds])));
+    vst1q_u8(outBuffer, data);
+
+    prevBlock=outBuffer;
+
+    outBuffer += 16;
+    input += 16;
+    numBlocks--;
+  }
+  vst1q_u8(m_initVector, vld1q_u8(prevBlock));
+  return;
+}
+#endif
+
   
 void Rijndael::blockDecrypt(const byte *input, size_t inputLen, byte *outBuffer)
 {
@@ -246,10 +314,16 @@ void Rijndael::blockDecrypt(const byte *input, size_t inputLen, byte *outBuffer)
     return;
 
   size_t numBlocks=inputLen/16;
-#ifdef USE_SSE
+#if defined(USE_SSE)
   if (AES_NI)
   {
     blockDecryptSSE(input,numBlocks,outBuffer);
+    return;
+  }
+#elif defined(USE_NEON_AES)
+  if (AES_Neon)
+  {
+    blockDecryptNeon(input,numBlocks,outBuffer);
     return;
   }
 #endif
@@ -339,6 +413,41 @@ void Rijndael::blockDecryptSSE(const byte *input, size_t numBlocks, byte *outBuf
     numBlocks--;
   }
   _mm_storeu_si128((__m128i*)m_initVector,initVector);
+}
+#endif
+
+
+#ifdef USE_NEON_AES
+void Rijndael::blockDecryptNeon(const byte *input, size_t numBlocks, byte *outBuffer)
+{
+  byte iv[16];
+  memcpy(iv,m_initVector,16);
+
+  while (numBlocks > 0)
+  {
+    uint8x16_t data = vld1q_u8(input);
+
+    for (int i=m_uRounds-1; i>0; i--)
+    {
+      data = vaesdq_u8(data, vld1q_u8((byte *)m_expandedKey[i+1]));
+      data = vaesimcq_u8(data);
+    }
+
+    data = vaesdq_u8(data, vld1q_u8((byte *)m_expandedKey[1]));
+    data = veorq_u8(data, vld1q_u8((byte *)m_expandedKey[0]));
+
+    if (CBCMode)
+      data = veorq_u8(data, vld1q_u8(iv));
+
+    vst1q_u8(iv, vld1q_u8(input));
+    vst1q_u8(outBuffer, data);
+
+    input += 16;
+    outBuffer += 16;
+    numBlocks--;
+  }
+
+  memcpy(m_initVector,iv,16);
 }
 #endif
 
@@ -501,16 +610,16 @@ void TestRijndael()
   for (uint L=0;L<3;L++)
   {
     byte Out[16];
-    wchar Str[sizeof(Out)*2+1];
+    std::wstring Str;
 
     uint KeyLength=128+L*64;
     rij.Init(true,Key[L],KeyLength,IV);
     for (uint I=0;I<sizeof(PT);I+=16)
       rij.blockEncrypt(PT+I,16,Out);
-    BinToHex(Chk[L],16,NULL,Str,ASIZE(Str));
-    mprintf(L"\nAES-%d expected: %s",KeyLength,Str);
-    BinToHex(Out,sizeof(Out),NULL,Str,ASIZE(Str));
-    mprintf(L"\nAES-%d result:   %s",KeyLength,Str);
+    BinToHex(Chk[L],16,Str);
+    mprintf(L"\nAES-%d expected: %s",KeyLength,Str.c_str());
+    BinToHex(Out,sizeof(Out),Str);
+    mprintf(L"\nAES-%d result:   %s",KeyLength,Str.c_str());
     if (memcmp(Out,Chk[L],16)==0)
       mprintf(L" OK");
     else

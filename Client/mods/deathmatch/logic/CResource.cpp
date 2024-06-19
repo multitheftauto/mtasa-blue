@@ -68,6 +68,11 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_pResourceIFPRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "ifproot");
     m_pResourceIFPRoot->MakeSystemEntity();
 
+    // Create our IMG root element. We set its parent when we're loaded.
+    // Make it a system entity so nothing but us can delete it.
+    m_pResourceIMGRoot = new CClientDummy(g_pClientGame->GetManager(), INVALID_ELEMENT_ID, "imgroot");
+    m_pResourceIMGRoot->MakeSystemEntity();
+
     m_strResourceDirectoryPath = SString("%s/resources/%s", g_pClientGame->GetFileCacheRoot(), *m_strResourceName);
     m_strResourcePrivateDirectoryPath = PathJoin(CServerIdManager::GetSingleton()->GetConnectionPrivateDirectory(), m_strResourceName);
 
@@ -115,6 +120,10 @@ CResource::~CResource()
     // Destroy the ifp root so all ifp elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceIFPRoot);
     m_pResourceIFPRoot = NULL;
+
+    // Destroy the img root so all img elements are deleted except those moved out
+    g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceIMGRoot);
+    m_pResourceIMGRoot = NULL;
 
     // Destroy the ddf root so all dff elements are deleted except those moved out
     g_pClientGame->GetElementDeleter()->DeleteRecursive(m_pResourceDFFEntity);
@@ -266,15 +275,16 @@ void CResource::Load()
         }
     }
 
-    // Load the no cache scripts first
-    for (std::list<SNoClientCacheScript>::iterator iter = m_NoClientCacheScriptList.begin(); iter != m_NoClientCacheScriptList.end(); ++iter)
+    for (auto& list = m_NoClientCacheScriptList; !list.empty(); list.pop_front())
     {
         DECLARE_PROFILER_SECTION(OnPreLoadNoClientCacheScript)
-        const SNoClientCacheScript& item = *iter;
+
+        auto& item = list.front();
         GetVM()->LoadScriptFromBuffer(item.buffer.GetData(), item.buffer.GetSize(), item.strFilename);
+        item.buffer.ZeroClear();
+
         DECLARE_PROFILER_SECTION(OnPostLoadNoClientCacheScript)
     }
-    m_NoClientCacheScriptList.clear();
 
     // Load the files that are queued in the list "to be loaded"
     list<CResourceFile*>::iterator iter = m_ResourceFiles.begin();
@@ -351,6 +361,19 @@ void CResource::Stop()
     CLuaArguments Arguments;
     Arguments.PushResource(this);
     m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);
+
+    // When a custom application is used - reset discord stuff
+    const auto discord = g_pCore->GetDiscord();
+    if (discord && !discord->IsDiscordCustomDetailsDisallowed() && discord->GetDiscordResourceName() == m_strResourceName)
+    {
+        if (discord->IsDiscordRPCEnabled())
+        {
+            discord->ResetDiscordData();
+            discord->SetPresenceState(_("In-game"), false);
+            discord->SetPresenceStartTimestamp(time(nullptr));
+            discord->UpdatePresence();
+        }
+    }
 }
 
 SString CResource::GetState()
@@ -428,6 +451,19 @@ SString CResource::GetResourceDirectoryPath(eAccessType accessType, const SStrin
         return PathJoin(m_strResourcePrivateDirectoryPath, strMetaPath);
     }
     return PathJoin(m_strResourceDirectoryPath, strMetaPath);
+}
+
+CResourceFile* CResource::GetResourceFile(const SString& relativePath) const
+{
+    for (CResourceFile* resourceFile : m_ResourceFiles)
+    {
+        if (!stricmp(relativePath.c_str(), resourceFile->GetShortName()))
+        {
+            return resourceFile;
+        }
+    }
+
+    return nullptr;
 }
 
 void CResource::LoadNoClientCacheScript(const char* chunk, unsigned int len, const SString& strFilename)

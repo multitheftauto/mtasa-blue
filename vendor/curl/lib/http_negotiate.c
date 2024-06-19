@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -82,7 +84,7 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
 
   /* Obtain the input token, if any */
   header += strlen("Negotiate");
-  while(*header && ISSPACE(*header))
+  while(*header && ISBLANK(*header))
     header++;
 
   len = strlen(header);
@@ -118,15 +120,28 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
 CURLcode Curl_output_negotiate(struct Curl_easy *data,
                                struct connectdata *conn, bool proxy)
 {
-  struct negotiatedata *neg_ctx = proxy ? &conn->proxyneg :
-    &conn->negotiate;
-  struct auth *authp = proxy ? &data->state.authproxy : &data->state.authhost;
-  curlnegotiate *state = proxy ? &conn->proxy_negotiate_state :
-    &conn->http_negotiate_state;
+  struct negotiatedata *neg_ctx;
+  struct auth *authp;
+  curlnegotiate *state;
   char *base64 = NULL;
   size_t len = 0;
   char *userp;
   CURLcode result;
+
+  if(proxy) {
+#ifndef CURL_DISABLE_PROXY
+    neg_ctx = &conn->proxyneg;
+    authp = &data->state.authproxy;
+    state = &conn->proxy_negotiate_state;
+#else
+    return CURLE_NOT_BUILT_IN;
+#endif
+  }
+  else {
+    neg_ctx = &conn->negotiate;
+    authp = &data->state.authhost;
+    state = &conn->http_negotiate_state;
+  }
 
   authp->done = FALSE;
 
@@ -169,8 +184,10 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
                     base64);
 
     if(proxy) {
+#ifndef CURL_DISABLE_PROXY
       Curl_safefree(data->state.aptr.proxyuserpwd);
       data->state.aptr.proxyuserpwd = userp;
+#endif
     }
     else {
       Curl_safefree(data->state.aptr.userpwd);

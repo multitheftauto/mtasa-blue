@@ -170,11 +170,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.WriteBit(pElement->IsCallPropagationEnabled());
 
             // Write custom data
-            CCustomData* pCustomData = pElement->GetCustomDataPointer();
-            assert(pCustomData);
-            BitStream.WriteCompressed(pCustomData->CountOnlySynchronized());
-            map<string, SCustomData>::const_iterator iter = pCustomData->SyncedIterBegin();
-            for (; iter != pCustomData->SyncedIterEnd(); ++iter)
+            CCustomData& pCustomData = pElement->GetCustomDataManager();
+            BitStream.WriteCompressed(pCustomData.CountOnlySynchronized());
+            map<string, SCustomData>::const_iterator iter = pCustomData.SyncedIterBegin();
+            for (; iter != pCustomData.SyncedIterEnd(); ++iter)
             {
                 const char*         szName = iter->first.c_str();
                 const CLuaArgument* pArgument = &iter->second.Variable;
@@ -241,6 +240,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     bool bIsDoubleSided = pObject->IsDoubleSided();
                     BitStream.WriteBit(bIsDoubleSided);
 
+                    // Breakable
+                    if (BitStream.Can(eBitStreamVersion::CEntityAddPacket_ObjectBreakable))
+                        BitStream.WriteBit(pObject->IsBreakable());
+
                     // Visible in all dimensions
                     if (BitStream.Can(eBitStreamVersion::DimensionOmnipresence))
                     {
@@ -293,6 +296,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     SObjectHealthSync health;
                     health.data.fValue = pObject->GetHealth();
                     BitStream.Write(&health);
+
+                    // is object break?
+                    if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
+                        BitStream.WriteBit(pObject->GetHealth() <= 0);
 
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
@@ -747,17 +754,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Write the icon
                     SIntegerSync<unsigned char, 6> icon(pBlip->m_ucIcon);
                     BitStream.Write(&icon);
-                    if (pBlip->m_ucIcon == 0)
-                    {
-                        // Write the size
-                        SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
-                        BitStream.Write(&size);
 
-                        // Write the color
-                        SColorSync color;
-                        color = pBlip->GetColor();
-                        BitStream.Write(&color);
-                    }
+                    // Write the size
+                    SIntegerSync<unsigned char, 5> size(pBlip->m_ucSize);
+                    BitStream.Write(&size);
+
+                    // Write the color
+                    SColorSync color;
+                    color = pBlip->GetColor();
+                    BitStream.Write(&color);
 
                     break;
                 }

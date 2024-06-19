@@ -250,9 +250,11 @@ public:
     bool CheckIfStartable();
     void DisplayInfo();
 
-    bool               GetFilePath(const char* szFilename, std::string& strPath);
-    const std::string& GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
-    const std::string& GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
+    bool                        GetFilePath(const char* szFilename, std::string& strPath);
+    std::vector<std::string>    GetFilePaths(const char* szFilename);
+
+    const std::string&          GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
+    const std::string&          GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
 
     std::list<CResourceFile*>& GetFiles() { return m_ResourceFiles; }
     size_t                     GetFileCount() const noexcept { return m_ResourceFiles.size(); }
@@ -267,6 +269,8 @@ public:
 
     void OnPlayerJoin(CPlayer& Player);
     void SendNoClientCacheScripts(CPlayer* pPlayer = nullptr);
+
+    void OnResourceStateChange(const char* state) noexcept;
 
     CDummy*       GetResourceRootElement() { return m_pResourceElement; }
     const CDummy* GetResourceRootElement() const noexcept { return m_pResourceElement; }
@@ -318,6 +322,13 @@ public:
     void SetUsingDbConnectMysql(bool bUsingDbConnectMysql) { m_bUsingDbConnectMysql = bUsingDbConnectMysql; }
     bool IsUsingDbConnectMysql();
     bool IsFileDbConnectMysqlProtected(const SString& strFilename, bool bReadOnly);
+
+    /**
+     * @brief Searches for a CResourceFile with the given relative path.
+     * @param relativePath Relative resource file path (from meta)
+     * @return A pointer to CResourceFile on success, null otherwise
+     */
+    CResourceFile* GetResourceFile(const SString& relativePath) const;
 
 public:
     static std::list<CResource*> m_StartedResources;
@@ -386,6 +397,7 @@ private:
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;            // we store them here temporarily, then read them once all the resources are loaded
     std::list<CResourceFile*>      m_ResourceFiles;
+    std::map<std::string, int>     m_ResourceFilesCountPerDir;
     std::list<CResource*>          m_Dependents;            // resources that have "included" or loaded this one
     std::list<CExportedFunction>   m_ExportedFunctions;
     std::list<CResource*>          m_TemporaryIncludes;            // started by startResource script command

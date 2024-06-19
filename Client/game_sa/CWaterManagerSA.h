@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <CVector.h>
+#include <game/CWaterManager.h>
 #include "CWaterSA.h"
 
 #define DEFAULT_WATER_LEVEL                0.0f

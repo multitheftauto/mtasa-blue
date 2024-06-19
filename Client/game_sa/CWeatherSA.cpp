@@ -10,82 +10,32 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-
-unsigned char* CWeatherSA::VAR_CurrentWeather;
-unsigned char* CWeatherSA::VAR_CurrentWeather_b;
-unsigned char* CWeatherSA::VAR_CurrentWeather_c;
-float*         CWeatherSA::VAR_AmountOfRain;
-
-unsigned long CWeatherSA::FUNC_IsRaining;
+#include "CWeatherSA.h"
 
 unsigned char CWeatherSA::Get()
 {
-    DEBUG_TRACE("unsigned char CWeatherSA::Get ( void )");
-    return (unsigned char)*VAR_CurrentWeather;
+    return *(unsigned char*)0xC81318; // CWeather::ForcedWeatherType
 }
 
 void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
 {
-    DEBUG_TRACE("void CWeatherSA::Set ( unsigned char primary, unsigned char secondary )");
-    *VAR_CurrentWeather_b = static_cast<unsigned char>(primary);
-    *VAR_CurrentWeather_c = static_cast<unsigned char>(secondary);
-}
-
-void CWeatherSA::SetPrimary(unsigned char weather)
-{
-    DEBUG_TRACE("void CWeatherSA::SetPrimary ( unsigned char weather )");
-    *VAR_CurrentWeather_b = static_cast<unsigned char>(weather);
-}
-
-void CWeatherSA::SetSecondary(unsigned char weather)
-{
-    DEBUG_TRACE("void CWeatherSA::SetSecondary ( unsigned char weather )");
-    *VAR_CurrentWeather_c = static_cast<unsigned char>(weather);
-}
-
-void CWeatherSA::ForceWeather(unsigned char weather)
-{
-    DEBUG_TRACE("void CWeatherSA::Forcunsigned char ( unsigned char weather )");
-    *VAR_CurrentWeather = static_cast<unsigned char>(weather);
-}
-
-void CWeatherSA::ForceWeatherNow(unsigned char weather)
-{
-    DEBUG_TRACE("void CWeatherSA::Forcunsigned charNow ( unsigned char weather )");
-
-    unsigned char ucWeather = static_cast<unsigned char>(weather);
-    *VAR_CurrentWeather = ucWeather;
-    *VAR_CurrentWeather_b = ucWeather;
-    *VAR_CurrentWeather_c = ucWeather;
+    MemPutFast<unsigned char>(0xC81320, primary); // CWeather::OldWeatherType
+    MemPutFast<unsigned char>(0xC8131C, secondary); // CWeather::NewWeatherType
 }
 
 void CWeatherSA::Release()
 {
-    DEBUG_TRACE("void CWeatherSA::Release ( void )");
-    *VAR_CurrentWeather = 0xFF;
-}
-
-bool CWeatherSA::IsRaining()
-{
-    DEBUG_TRACE("bool CWeatherSA::IsRaining ( void )");
-    DWORD dwFunc = FUNC_IsRaining;
-    bool  bReturn = false;
-    _asm
-    {
-        call    dwFunc
-        mov     bReturn, al
-    }
-    return bReturn;
+    MemPutFast<unsigned char>(0xC81318, 0xFF); // CWeather::ForcedWeatherType
 }
 
 float CWeatherSA::GetAmountOfRain()
 {
-    return *VAR_AmountOfRain;
+    return *(float*)0xC81324; // CWeather::Rain
 }
 
 void CWeatherSA::SetAmountOfRain(float fAmount)
 {
-    // Nop the functions which don't like us take care of the rain
+    // Patch all the places inside of CWeather::Update that would overwrite CWeather::Rain
     MemPut<BYTE>(0x72C686, 0xDD);
     MemPut<BYTE>(0x72C687, 0xD8);
 
@@ -99,7 +49,7 @@ void CWeatherSA::SetAmountOfRain(float fAmount)
     MemSet((void*)0x72BC72, 0x90, 5);
 
     // Set the amount of rain
-    *VAR_AmountOfRain = fAmount;
+    MemPutFast<float>(0xC81324, fAmount); // CWeather::Rain
 }
 
 void CWeatherSA::ResetAmountOfRain()

@@ -10,15 +10,15 @@
 
 #include "StdInc.h"
 
-static bool bWouldBeNewFrame = false;
+static bool         bWouldBeNewFrame = false;
 static unsigned int nLastFrameTime = 0;
 
 constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 
+// Fixes player movement issue while aiming and walking on high FPS.
 #define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim 0x61E4F2
 #define HOOKSIZE_CTaskSimpleUseGun__SetMoveAnim 0x6
 const unsigned int RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
-
 void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
 {
     _asm {
@@ -33,6 +33,7 @@ void _declspec(naked) HOOK_CTaskSimpleUseGun__SetMoveAnim()
     }
 }
 
+// Fixes excessively fast camera shaking with setCameraShakeLevel on high FPS.
 #define HOOKPOS_CCamera__Process 0x52C723
 #define HOOKSIZE_CCamera__Process 0x12
 static const unsigned int RETURN_CCamera__Process = 0x52C735;
@@ -48,6 +49,7 @@ static void _declspec(naked) HOOK_CCamera__Process()
     }
 }
 
+// Fixes helicopters accelerating excessively during takeoff at high FPS.
 #define HOOKPOS_CHeli__ProcessFlyingCarStuff 0x6C4F13
 #define HOOKSIZE_CHeli__ProcessFlyingCarStuff 0x2A
 static const unsigned int RETURN_CHeli__ProcessFlyingCarStuff = 0x6C4F3D;
@@ -74,6 +76,100 @@ static void _declspec(naked) HOOK_CHeli__ProcessFlyingCarStuff()
     }
 }
 
+// Fixes excessively fast movement of fog on high FPS.
+#define HOOKPOS_CClouds__MovingFog_Update 0x716BA6
+#define HOOKSIZE_CClouds__MovingFog_Update 0x16
+static const unsigned int RETURN_CClouds__MovingFog_Update = 0x716BBC;
+static void _declspec(naked) HOOK_CClouds__MovingFog_Update()
+{
+    _asm {
+        fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fadd [esi]
+        fstp [esi]
+        fld [esp+0x18]
+        fmul [edi*4+0xC6E394]       // CClouds::ms_mf.fSpeedFactor
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        jmp RETURN_CClouds__MovingFog_Update
+    }
+}
+
+// Fixes glass shards spinning and moving at excessive speeds on high FPS.
+#define HOOKPOS_CFallingGlassPane__Update_A 0x71AABF
+#define HOOKSIZE_CFallingGlassPane__Update_A 0x6
+static const unsigned int RETURN_CFallingGlassPane__Update_A = 0x71AAC5;
+static void _declspec(naked) HOOK_CFallingGlassPane__Update_A()
+{
+    _asm {
+        fld [esp+0x28]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [esp+0x28]
+        fld [esp+0x24]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [esp+0x24]
+        fld [esp+0x20]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fadd [esi]
+        jmp RETURN_CFallingGlassPane__Update_A
+    }
+}
+
+// Fixes glass shards spinning and moving at excessive speeds on high FPS.
+#define HOOKPOS_CFallingGlassPane__Update_B 0x71AAEA
+#define HOOKSIZE_CFallingGlassPane__Update_B 0x6
+static const unsigned int RETURN_CFallingGlassPane__Update_B = 0x71AAF0;
+static void _declspec(naked) HOOK_CFallingGlassPane__Update_B()
+{
+    _asm {
+        fld [eax]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax]
+        fld [eax+0x4]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax+0x4]
+        fld [eax+0x8]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax+0x8]
+        mov ecx, [eax]
+        mov [esp+0x2C], ecx
+        jmp RETURN_CFallingGlassPane__Update_B
+    }
+}
+
+// Fixes glass shards spinning and moving at excessive speeds on high FPS.
+#define HOOKPOS_CFallingGlassPane__Update_C 0x71AB29
+#define HOOKSIZE_CFallingGlassPane__Update_C 0x6
+static const unsigned int RETURN_CFallingGlassPane__Update_C = 0x71AB2F;
+static void _declspec(naked) HOOK_CFallingGlassPane__Update_C()
+{
+    _asm {
+        fld [eax]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax]
+        fld [eax+0x4]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax+0x4]
+        fld [eax+0x8]
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 1.666f
+        fstp [eax+0x8]
+        mov edx, [eax]
+        mov [esp+0x38], edx
+        jmp RETURN_CFallingGlassPane__Update_C
+    }
+}
+
+// Ensure that CTimer::CurrentFrame is updated only every 33+ milliseconds.
 #define HOOKPOS_CTimer__Update 0x561C5D
 #define HOOKSIZE_CTimer__Update 0xE
 static void _declspec(naked) HOOK_CTimer__Update()
@@ -100,6 +196,7 @@ static void _declspec(naked) HOOK_CTimer__Update()
     }
 }
 
+// Fixes premature despawning of broken breakable objects on high FPS.
 #define HOOKPOS_BreakObject_c__Update 0x59E420
 #define HOOKSIZE_BreakObject_c__Update 0xB
 static const unsigned int RETURN_BreakObject_c__Update = 0x59E42B;
@@ -120,6 +217,7 @@ static void _declspec(naked) HOOK_BreakObject_c__Update()
     }
 }
 
+// Fixes limited reach of the water cannon on high FPS.
 #define HOOKPOS_CWaterCannon__Update_OncePerFrame  0x72A29B
 #define HOOKSIZE_CWaterCannon__Update_OncePerFrame 0x5
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame = 0x72A2A0;
@@ -140,6 +238,7 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame()
     }
 }
 
+// Fixes money animation issues on high FPS.
 #define HOOKPOS_CPlayerInfo__Process 0x5700F5
 #define HOOKSIZE_CPlayerInfo__Process 0x6
 static const unsigned int RETURN_CPlayerInfo__Process = 0x5700FB;
@@ -159,6 +258,7 @@ static void _declspec(naked) HOOK_CPlayerInfo__Process()
     }
 }
 
+// Fixes excessive effects spawning from rocket launchers on high FPS.
 #define HOOKPOS_CProjectileInfo__Update 0x738C63
 #define HOOKSIZE_CProjectileInfo__Update 0x5
 static const unsigned int RETURN_CProjectileInfo__Update = 0x738C68;
@@ -179,6 +279,7 @@ static void _declspec(naked) HOOK_CProjectileInfo__Update()
     }
 }
 
+// Fixes excessive surface effects spawning from wheels on high FPS.
 #define HOOKPOS_CVehicle__AddWheelDirtAndWater 0x6D2D50
 #define HOOKSIZE_CVehicle__AddWheelDirtAndWater 0x6
 static const unsigned int RETURN_CVehicle__AddWheelDirtAndWater = 0x6D2D56;
@@ -199,6 +300,7 @@ static void _declspec(naked) HOOK_CVehicle__AddWheelDirtAndWater()
     }
 }
 
+// Fixes excessive smoke trail particle spawning from stuntplanes and cropdusters on high FPS.
 #define HOOKPOS_CPlane__PreRender 0x6CA937
 #define HOOKSIZE_CPlane__PreRender 0x6
 static const unsigned int RETURN_CPlane__PreRender = 0x6CA93D;
@@ -218,6 +320,7 @@ static void _declspec(naked) HOOK_CPlane__PreRender()
     }
 }
 
+// Fixes increased frequency of water cannon pushing peds on high FPS.
 #define HOOKPOS_CWaterCannon__Update_OncePerFrame_PushPedFix 0x72A37B
 #define HOOKSIZE_CWaterCannon__Update_OncePerFrame_PushPedFix 0x6
 static const unsigned int RETURN_CWaterCannon__Update_OncePerFrame_PushPedFix = 0x72A381;
@@ -237,8 +340,9 @@ static void _declspec(naked) HOOK_CWaterCannon__Update_OncePerFrame_PushPedFix()
     }
 }
 
-#define HOOKPOS_CWaterCannon__Render_FxFix 0x729430
-#define HOOKSIZE_CWaterCannon__Render_FxFix 0x7
+// Fixes excessive particle spawning from water cannons on high FPS.
+#define HOOKPOS_CWaterCannon__Render_FxFix 0x729437
+#define HOOKSIZE_CWaterCannon__Render_FxFix 0x5
 static const unsigned int RETURN_CWaterCannon__Render_FxFix = 0x729440;
 static const unsigned int RETURN_CWaterCannon__Render_FxFix_SKIP = 0x7294EE;
 static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
@@ -248,14 +352,13 @@ static void _declspec(naked) HOOK_CWaterCannon__Render_FxFix()
         test edx, edx
         jz skip
 
-        fstp [esp+0x84]
-
         jmp RETURN_CWaterCannon__Render_FxFix
     skip:
         jmp RETURN_CWaterCannon__Render_FxFix_SKIP
     }
 }
 
+// Fixes excessive particle spawning with setPedHeadless on high FPS.
 #define HOOKPOS_CPed__PreRenderAfterTest 0x5E7181
 #define HOOKSIZE_CPed__PreRenderAfterTest 0x6
 static const unsigned int RETURN_CPed__PreRenderAfterTest = 0x5E7187;
@@ -275,6 +378,7 @@ static void _declspec(naked) HOOK_CPed__PreRenderAfterTest()
     }
 }
 
+// Fixes excessive particle spawning from boats on high FPS.
 #define HOOKPOS_cBuoyancy__AddSplashParticles 0x6C34E0
 #define HOOKSIZE_cBuoyancy__AddSplashParticles 0x6
 static const unsigned int RETURN_cBuoyancy__AddSplashParticles = 0x6C34E6;
@@ -293,6 +397,7 @@ static void _declspec(naked) HOOK_cBuoyancy__AddSplashParticles()
     }
 }
 
+// Fixes excessive weather particle spawning on high FPS.
 #define HOOKPOS_CWeather__AddRain 0x72AAA8
 #define HOOKSIZE_CWeather__AddRain 0x6
 static const unsigned int RETURN_CWeather__AddRain = 0x72AAAE;
@@ -313,6 +418,7 @@ static void _declspec(naked) HOOK_CWeather__AddRain()
     }
 }
 
+// Fixes excessive damage particle spawning from airplanes on high FPS.
 #define HOOKPOS_CPlane__ProcessFlyingCarStuff 0x6CBE4B
 #define HOOKSIZE_CPlane__ProcessFlyingCarStuff 0x6
 static const unsigned int RETURN_CPlane__ProcessFlyingCarStuff = 0x6CBE51;
@@ -332,6 +438,7 @@ static void _declspec(naked) HOOK_CPlane__ProcessFlyingCarStuff()
     }
 }
 
+// Fixes excessive spawning of sand and water particles from vehicles on high FPS.
 #define HOOKPOS_CAutomobile__UpdateWheelMatrix 0x6AA78A
 #define HOOKSIZE_CAutomobile__UpdateWheelMatrix 0x5
 static const unsigned int RETURN_CAutomobile__UpdateWheelMatrix = 0x6AA78F;
@@ -351,6 +458,7 @@ static void _declspec(naked) HOOK_CAutomobile__UpdateWheelMatrix()
     }
 }
 
+// Fixes excessive particle spawning from boats on high FPS.
 #define HOOKPOS_CVehicle__DoBoatSplashes 0x6DD130
 #define HOOKSIZE_CVehicle__DoBoatSplashes 0x6
 static const unsigned int RETURN_CVehicle__DoBoatSplashes = 0x6DD136;
@@ -369,6 +477,7 @@ static void _declspec(naked) HOOK_CVehicle__DoBoatSplashes()
     }
 }
 
+// Fixes excessive rain particle spawning on vehicles on high FPS.
 #define HOOKPOS_CVehicle__AddWaterSplashParticles 0x6DDF60
 #define HOOKSIZE_CVehicle__AddWaterSplashParticles 0x6
 static const unsigned int RETURN_CVehicle__AddWaterSplashParticles = 0x6DDF66;
@@ -387,6 +496,7 @@ static void _declspec(naked) HOOK_CVehicle__AddWaterSplashParticles()
     }
 }
 
+// Fixes excessive particle spawning from airplanes when damaged on high FPS.
 #define HOOKPOS_CPlane__ProcessControl 0x6C939A
 #define HOOKSIZE_CPlane__ProcessControl 0x5
 static const unsigned int RETURN_CPlane__ProcessControl = 0x6C939F;
@@ -407,6 +517,7 @@ static void _declspec(naked) HOOK_CPlane__ProcessControl()
     }
 }
 
+// Fixes excessive exhaust particle spawning from vehicles on high FPS.
 #define HOOKPOS_CVehicle__AddExhaustParticles 0x6DE240
 #define HOOKSIZE_CVehicle__AddExhaustParticles 0x6
 static const unsigned int RETURN_CVehicle__AddExhaustParticles = 0x6DE246;
@@ -425,6 +536,7 @@ static void _declspec(naked) HOOK_CVehicle__AddExhaustParticles()
     }
 }
 
+// Fixes excessive particle spawning while swimming on high FPS.
 #define HOOKPOS_CTaskSimpleSwim__ProcessEffects 0x68AD3B
 #define HOOKSIZE_CTaskSimpleSwim__ProcessEffects 0x6
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffects = 0x68AD41;
@@ -445,6 +557,7 @@ static void _declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffects()
     }
 }
 
+// Fixes excessive particle spawning while swimming on high FPS.
 #define HOOKPOS_CTaskSimpleSwim__ProcessEffectsBubbleFix 0x68AC31
 #define HOOKSIZE_CTaskSimpleSwim__ProcessEffectsBubbleFix 0x7
 static const unsigned int RETURN_CTaskSimpleSwim__ProcessEffectsBubbleFix = 0x68AC38;
@@ -470,6 +583,18 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CTaskSimpleUseGun__SetMoveAnim);
     EZHookInstall(CCamera__Process);
     EZHookInstall(CHeli__ProcessFlyingCarStuff);
+    EZHookInstall(CClouds__MovingFog_Update);
+    EZHookInstall(CFallingGlassPane__Update_A);
+    EZHookInstall(CFallingGlassPane__Update_B);
+    EZHookInstall(CFallingGlassPane__Update_C);
+
+    // Fixes slow camera movement towards the back of the vehicle on high FPS.
+    // CCam::Process_FollowCar_SA
+    MemSet((void*)0x524FD7, 0x90, 0x1B);
+
+    // Fixes slow boat movement on high FPS.
+    // CVehicle::ProcessBoatControl
+    MemPut(0x6DC23F, &kOriginalTimeStep);
 
     // CTimer::m_FrameCounter fixes
     EZHookInstall(CTimer__Update);

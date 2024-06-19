@@ -14,6 +14,7 @@
 #include <game/CPhysical.h>
 #include "CEntitySA.h"
 #include <CVector.h>
+#include "CPtrNodeDoubleListSA.h"
 
 #define FUNC_GetMoveSpeed                       0x404460
 #define FUNC_GetTurnSpeed                       0x470030
@@ -102,7 +103,7 @@ public:
     CVector                   m_vecAttachedRotation;                      // 268
     CVector                   m_vecUnk;                                   // 280
     uint32                    m_pad4;                                     // 292
-    class CPtrNodeDoubleLink* m_pControlCodeNodeLink;                     // 296
+    CPtrNodeDoubleLink<void>* m_pControlCodeNodeLink;                           // 296
     float                     m_fLighting;                                // 300
     float                     m_fLighting2;                               // 304
     class CShadowDataSA*      m_pShadowData;                              // 308
@@ -157,21 +158,4 @@ public:
     void  SetLighting(float fLighting);
 
     void SetFrozen(bool bFrozen);
-
-    /*
-    VOID        SetMassMultiplier(FLOAT fMassMultiplier);
-    FLOAT       GetMassMultiplier();
-
-    BOOL        GetExtraHeavy();
-    VOID        SetExtraHeavy(BOOL bExtraHeavy);
-    BOOL        GetDoGravity();
-    VOID        SetDoGravity(BOOL bDoGravity);
-    BOOL        GetInfiniteMass();
-    VOID        SetInfiniteMass(BOOL bInfiniteMass);
-    BOOL        GetPositionFrozen();
-    VOID        SetPositionFrozen(BOOL bPositionFrozen);
-    BYTE        GetLastMaterialToHaveBeenStandingOn();
-
-    BYTE        GetLevel();
-    VOID        SetLevel(BYTE LivesInThisLevel);*/
 };

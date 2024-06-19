@@ -142,7 +142,7 @@ inline __attribute__((always_inline)) static void SaveBacktraceSummary()
     }
 }
 
-    // Linux/Mac crash callback when using google-breakpad
+// Linux/Mac crash callback when using google-breakpad
 #ifdef __APPLE__
 bool DumpCallback(const char* dump_dir, const char* minidump_id, void* context, bool succeeded)
 {
@@ -194,7 +194,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
 {
     // Try to load the DLL in our directory
     HMODULE hDll = NULL;
-    char szDbgHelpPath[MAX_PATH];
+    char    szDbgHelpPath[MAX_PATH];
     if (GetModuleFileNameA(NULL, szDbgHelpPath, MAX_PATH))
     {
         char* pSlash = _tcsrchr(szDbgHelpPath, '\\');

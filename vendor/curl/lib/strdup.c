@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,13 +18,15 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
 
 #include <curl/curl.h>
 
-#ifdef WIN32
+#ifdef _WIN32
 #include <wchar.h>
 #endif
 
@@ -35,7 +37,7 @@
 #include "memdebug.h"
 
 #ifndef HAVE_STRDUP
-char *curlx_strdup(const char *str)
+char *Curl_strdup(const char *str)
 {
   size_t len;
   char *newstr;
@@ -54,7 +56,7 @@ char *curlx_strdup(const char *str)
 }
 #endif
 
-#ifdef WIN32
+#ifdef _WIN32
 /***************************************************************************
  *
  * Curl_wcsdup(source)
@@ -95,6 +97,26 @@ void *Curl_memdup(const void *src, size_t length)
   memcpy(buffer, src, length);
 
   return buffer;
+}
+
+/***************************************************************************
+ *
+ * Curl_memdup0(source, length)
+ *
+ * Copies the 'source' string to a newly allocated buffer (that is returned).
+ * Copies 'length' bytes then adds a null terminator.
+ *
+ * Returns the new pointer or NULL on failure.
+ *
+ ***************************************************************************/
+void *Curl_memdup0(const char *src, size_t length)
+{
+  char *buf = malloc(length + 1);
+  if(!buf)
+    return NULL;
+  memcpy(buf, src, length);
+  buf[length] = 0;
+  return buf;
 }
 
 /***************************************************************************

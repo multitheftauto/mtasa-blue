@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <game/CWaterManager.h>
+
 class CClientWater final : public CClientEntity
 {
     DECLARE_CLASS(CClientWater, CClientEntity)

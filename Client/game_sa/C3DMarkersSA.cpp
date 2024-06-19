@@ -10,13 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "C3DMarkersSA.h"
 
 C3DMarkersSA::C3DMarkersSA()
 {
-    DEBUG_TRACE("C3DMarkersSA::C3DMarkersSA()");
     for (int i = 0; i < MAX_3D_MARKERS; i++)
     {
-        this->Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface*)(ARRAY_3D_MARKERS + i * sizeof(C3DMarkerSAInterface)));
+        Markers[i] = new C3DMarkerSA((C3DMarkerSAInterface*)(ARRAY_3D_MARKERS + i * sizeof(C3DMarkerSAInterface)));
     }
 }
 
@@ -28,10 +28,9 @@ C3DMarkersSA::~C3DMarkersSA()
     }
 }
 
-C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, FLOAT fSize, FLOAT fPulseFraction, BYTE r, BYTE g, BYTE b,
+C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b,
                                       BYTE a)
 {
-    DEBUG_TRACE("C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector * vecPosition, FLOAT fSize, FLOAT fPulseFraction)");
     /*
     static C3dMarker *PlaceMarker(unsigned int nIdentifier, unsigned short nType,
     CVector &vecPosition, float fSize, unsigned char r, unsigned char g, unsigned char b, unsigned char a,
@@ -65,27 +64,7 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
         mov     dwReturn, eax
         add     esp, 0x3C
     }
-    /*
-        DWORD dwFunc = 0x0726D40;
-        DWORD dwReturn = 0;
-        _asm
-        {
-            push    0           // uses collision
-            push    5           // rotate rate
-            push    0x3F800000  // pulse (1.0)
-            push    1024        // period
-            push    255         // alpha
-            push    0           // blue
-            push    255         // green
-            push    255         // red
-            push    0x40000000      // size (2.0)
-            push    vecPosition // position
-            push    Identifier  // identifier
-            call    dwFunc
-            mov     dwReturn, eax
-            add     esp, 0x2C
-        }
-        */
+
     if (dwReturn)
     {
         for (int i = 0; i < MAX_3D_MARKERS; i++)
@@ -103,7 +82,6 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, e3DMarkerType dwType, CV
 
 C3DMarker* C3DMarkersSA::FindFreeMarker()
 {
-    DEBUG_TRACE("C3DMarker * C3DMarkersSA::FindFreeMarker()");
     for (int i = 0; i < MAX_3D_MARKERS; i++)
     {
         if (!Markers[i]->IsActive())
@@ -114,11 +92,22 @@ C3DMarker* C3DMarkersSA::FindFreeMarker()
 
 C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
 {
-    DEBUG_TRACE("C3DMarker * C3DMarkersSA::FindMarker( DWORD Identifier )");
     for (int i = 0; i < MAX_3D_MARKERS; i++)
     {
         if (Markers[i]->GetIdentifier() == Identifier)
             return Markers[i];
     }
     return NULL;
+}
+
+void C3DMarkersSA::ReinitMarkers()
+{
+    using Function_ShutdownMarkers = void(__cdecl *)();
+    auto shutdownMarkers = reinterpret_cast<Function_ShutdownMarkers>(0x722710);
+
+    using Function_InitMarkers = void(__cdecl*)();
+    auto initMarkers = reinterpret_cast<Function_InitMarkers>(0x724E40);
+
+    shutdownMarkers();
+    initMarkers();
 }

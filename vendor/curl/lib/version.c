@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,21 +18,28 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
+
+#ifdef USE_NGHTTP2
+#include <nghttp2/nghttp2.h>
+#endif
 
 #include <curl/curl.h>
 #include "urldata.h"
 #include "vtls/vtls.h"
 #include "http2.h"
 #include "vssh/ssh.h"
-#include "quic.h"
+#include "vquic/vquic.h"
 #include "curl_printf.h"
+#include "easy_lock.h"
 
 #ifdef USE_ARES
 #  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
-  defined(WIN32)
+  defined(_WIN32)
 #    define CARES_STATICLIB
 #  endif
 #  include <ares.h>
@@ -48,14 +55,23 @@
 
 #ifdef USE_LIBRTMP
 #include <librtmp/rtmp.h>
+#include "curl_rtmp.h"
 #endif
 
-#ifdef HAVE_ZLIB_H
+#ifdef HAVE_LIBZ
 #include <zlib.h>
 #endif
 
 #ifdef HAVE_BROTLI
+#if defined(__GNUC__)
+/* Ignore -Wvla warnings in brotli headers */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wvla"
+#endif
 #include <brotli/decode.h>
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 #endif
 
 #ifdef HAVE_ZSTD
@@ -137,7 +153,7 @@ char *curl_version(void)
 #ifdef USE_NGHTTP2
   char h2_version[40];
 #endif
-#ifdef ENABLE_QUIC
+#ifdef USE_HTTP3
   char h3_version[40];
 #endif
 #ifdef USE_LIBRTMP
@@ -159,8 +175,7 @@ char *curl_version(void)
   /* Override version string when environment variable CURL_VERSION is set */
   const char *debugversion = getenv("CURL_VERSION");
   if(debugversion) {
-    strncpy(out, debugversion, sizeof(out)-1);
-    out[sizeof(out)-1] = '\0';
+    msnprintf(out, sizeof(out), "%s", debugversion);
     return out;
   }
 #endif
@@ -193,11 +208,23 @@ char *curl_version(void)
   src[i++] = idn_version;
 #elif defined(USE_WIN32_IDN)
   src[i++] = (char *)"WinIDN";
+#elif defined(USE_APPLE_IDN)
+  src[i++] = (char *)"AppleIDN";
 #endif
 
 #ifdef USE_LIBPSL
-  msnprintf(psl_version, sizeof(psl_version), "libpsl/%s", psl_get_version());
-  src[i++] = psl_version;
+  {
+#if defined(PSL_VERSION_MAJOR) && (PSL_VERSION_MAJOR > 0 ||     \
+                                   PSL_VERSION_MINOR >= 11)
+    int num = psl_check_version_number(0);
+    msnprintf(psl_version, sizeof(psl_version), "libpsl/%d.%d.%d",
+              num >> 16, (num >> 8) & 0xff, num & 0xff);
+#else
+    msnprintf(psl_version, sizeof(psl_version), "libpsl/%s",
+              psl_get_version());
+#endif
+    src[i++] = psl_version;
+  }
 #endif
 
 #ifdef USE_SSH
@@ -208,25 +235,13 @@ char *curl_version(void)
   Curl_http2_ver(h2_version, sizeof(h2_version));
   src[i++] = h2_version;
 #endif
-#ifdef ENABLE_QUIC
+#ifdef USE_HTTP3
   Curl_quic_ver(h3_version, sizeof(h3_version));
   src[i++] = h3_version;
 #endif
 #ifdef USE_LIBRTMP
-  {
-    char suff[2];
-    if(RTMP_LIB_VERSION & 0xff) {
-      suff[0] = (RTMP_LIB_VERSION & 0xff) + 'a' - 1;
-      suff[1] = '\0';
-    }
-    else
-      suff[0] = '\0';
-
-    msnprintf(rtmp_version, sizeof(rtmp_version), "librtmp/%d.%d%s",
-              RTMP_LIB_VERSION >> 16, (RTMP_LIB_VERSION >> 8) & 0xff,
-              suff);
-    src[i++] = rtmp_version;
-  }
+  Curl_rtmp_version(rtmp_version, sizeof(rtmp_version));
+  src[i++] = rtmp_version;
 #endif
 #ifdef USE_HYPER
   msnprintf(hyper_buf, sizeof(hyper_buf), "Hyper/%s", hyper_version());
@@ -285,7 +300,7 @@ char *curl_version(void)
    protocol line has its own #if line to make things easier on the eye.
  */
 
-static const char * const protocols[] = {
+static const char * const supported_protocols[] = {
 #ifndef CURL_DISABLE_DICT
   "dict",
 #endif
@@ -335,6 +350,11 @@ static const char * const protocols[] = {
 #endif
 #ifdef USE_LIBRTMP
   "rtmp",
+  "rtmpe",
+  "rtmps",
+  "rtmpt",
+  "rtmpte",
+  "rtmpts",
 #endif
 #ifndef CURL_DISABLE_RTSP
   "rtsp",
@@ -345,8 +365,7 @@ static const char * const protocols[] = {
 #ifdef USE_SSH
   "sftp",
 #endif
-#if !defined(CURL_DISABLE_SMB) && defined(USE_CURL_NTLM_CORE) && \
-   (SIZEOF_CURL_OFF_T > 4)
+#if !defined(CURL_DISABLE_SMB) && defined(USE_CURL_NTLM_CORE)
   "smb",
 #  ifdef USE_SSL
   "smbs",
@@ -364,98 +383,168 @@ static const char * const protocols[] = {
 #ifndef CURL_DISABLE_TFTP
   "tftp",
 #endif
+#ifdef USE_WEBSOCKETS
+  "ws",
+#endif
+#if defined(USE_SSL) && defined(USE_WEBSOCKETS)
+  "wss",
+#endif
 
   NULL
 };
+
+/*
+ * Feature presence run-time check functions.
+ *
+ * Warning: the value returned by these should not change between
+ * curl_global_init() and curl_global_cleanup() calls.
+ */
+
+#if defined(USE_LIBIDN2)
+static int idn_present(curl_version_info_data *info)
+{
+  return info->libidn != NULL;
+}
+#else
+#define idn_present     NULL
+#endif
+
+#if defined(USE_SSL) && !defined(CURL_DISABLE_PROXY) && \
+  !defined(CURL_DISABLE_HTTP)
+static int https_proxy_present(curl_version_info_data *info)
+{
+  (void) info;
+  return Curl_ssl_supports(NULL, SSLSUPP_HTTPS_PROXY);
+}
+#endif
+
+#if defined(USE_SSL) && defined(USE_ECH)
+static int ech_present(curl_version_info_data *info)
+{
+  (void) info;
+  return Curl_ssl_supports(NULL, SSLSUPP_ECH);
+}
+#endif
+
+/*
+ * Features table.
+ *
+ * Keep the features alphabetically sorted.
+ * Use FEATURE() macro to define an entry: this allows documentation check.
+ */
+
+#define FEATURE(name, present, bitmask) {(name), (present), (bitmask)}
+
+struct feat {
+  const char *name;
+  int        (*present)(curl_version_info_data *info);
+  int        bitmask;
+};
+
+static const struct feat features_table[] = {
+#ifndef CURL_DISABLE_ALTSVC
+  FEATURE("alt-svc",     NULL,                CURL_VERSION_ALTSVC),
+#endif
+#ifdef CURLRES_ASYNCH
+  FEATURE("AsynchDNS",   NULL,                CURL_VERSION_ASYNCHDNS),
+#endif
+#ifdef HAVE_BROTLI
+  FEATURE("brotli",      NULL,                CURL_VERSION_BROTLI),
+#endif
+#ifdef DEBUGBUILD
+  FEATURE("Debug",       NULL,                CURL_VERSION_DEBUG),
+#endif
+#if defined(USE_SSL) && defined(USE_ECH)
+  FEATURE("ECH",         ech_present,         0),
+#endif
+#ifdef USE_GSASL
+  FEATURE("gsasl",       NULL,                CURL_VERSION_GSASL),
+#endif
+#ifdef HAVE_GSSAPI
+  FEATURE("GSS-API",     NULL,                CURL_VERSION_GSSAPI),
+#endif
+#ifndef CURL_DISABLE_HSTS
+  FEATURE("HSTS",        NULL,                CURL_VERSION_HSTS),
+#endif
+#if defined(USE_NGHTTP2)
+  FEATURE("HTTP2",       NULL,                CURL_VERSION_HTTP2),
+#endif
+#if defined(USE_HTTP3)
+  FEATURE("HTTP3",       NULL,                CURL_VERSION_HTTP3),
+#endif
+#if defined(USE_SSL) && !defined(CURL_DISABLE_PROXY) && \
+  !defined(CURL_DISABLE_HTTP)
+  FEATURE("HTTPS-proxy", https_proxy_present, CURL_VERSION_HTTPS_PROXY),
+#endif
+#if defined(USE_LIBIDN2) || defined(USE_WIN32_IDN) || defined(USE_APPLE_IDN)
+  FEATURE("IDN",         idn_present,         CURL_VERSION_IDN),
+#endif
+#ifdef USE_IPV6
+  FEATURE("IPv6",        NULL,                CURL_VERSION_IPV6),
+#endif
+#ifdef USE_KERBEROS5
+  FEATURE("Kerberos",    NULL,                CURL_VERSION_KERBEROS5),
+#endif
+#if (SIZEOF_CURL_OFF_T > 4) && \
+    ( (SIZEOF_OFF_T > 4) || defined(USE_WIN32_LARGE_FILES) )
+  FEATURE("Largefile",   NULL,                CURL_VERSION_LARGEFILE),
+#endif
+#ifdef HAVE_LIBZ
+  FEATURE("libz",        NULL,                CURL_VERSION_LIBZ),
+#endif
+#ifdef CURL_WITH_MULTI_SSL
+  FEATURE("MultiSSL",    NULL,                CURL_VERSION_MULTI_SSL),
+#endif
+#ifdef USE_NTLM
+  FEATURE("NTLM",        NULL,                CURL_VERSION_NTLM),
+#endif
+#if defined(USE_LIBPSL)
+  FEATURE("PSL",         NULL,                CURL_VERSION_PSL),
+#endif
+#ifdef USE_SPNEGO
+  FEATURE("SPNEGO",      NULL,                CURL_VERSION_SPNEGO),
+#endif
+#ifdef USE_SSL
+  FEATURE("SSL",         NULL,                CURL_VERSION_SSL),
+#endif
+#ifdef USE_WINDOWS_SSPI
+  FEATURE("SSPI",        NULL,                CURL_VERSION_SSPI),
+#endif
+#ifdef GLOBAL_INIT_IS_THREADSAFE
+  FEATURE("threadsafe",  NULL,                CURL_VERSION_THREADSAFE),
+#endif
+#ifdef USE_TLS_SRP
+  FEATURE("TLS-SRP",     NULL,                CURL_VERSION_TLSAUTH_SRP),
+#endif
+#ifdef CURLDEBUG
+  FEATURE("TrackMemory", NULL,                CURL_VERSION_CURLDEBUG),
+#endif
+#if defined(_WIN32) && defined(UNICODE) && defined(_UNICODE)
+  FEATURE("Unicode",     NULL,                CURL_VERSION_UNICODE),
+#endif
+#ifdef USE_UNIX_SOCKETS
+  FEATURE("UnixSockets", NULL,                CURL_VERSION_UNIX_SOCKETS),
+#endif
+#ifdef HAVE_ZSTD
+  FEATURE("zstd",        NULL,                CURL_VERSION_ZSTD),
+#endif
+  {NULL,             NULL,                0}
+};
+
+static const char *feature_names[sizeof(features_table) /
+                                 sizeof(features_table[0])] = {NULL};
+
 
 static curl_version_info_data version_info = {
   CURLVERSION_NOW,
   LIBCURL_VERSION,
   LIBCURL_VERSION_NUM,
-  OS, /* as found by configure or set by hand at build-time */
-  0 /* features is 0 by default */
-#ifdef ENABLE_IPV6
-  | CURL_VERSION_IPV6
-#endif
-#ifdef USE_SSL
-  | CURL_VERSION_SSL
-#endif
-#ifdef USE_NTLM
-  | CURL_VERSION_NTLM
-#endif
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_NTLM) && \
-  defined(NTLM_WB_ENABLED)
-  | CURL_VERSION_NTLM_WB
-#endif
-#ifdef USE_SPNEGO
-  | CURL_VERSION_SPNEGO
-#endif
-#ifdef USE_KERBEROS5
-  | CURL_VERSION_KERBEROS5
-#endif
-#ifdef HAVE_GSSAPI
-  | CURL_VERSION_GSSAPI
-#endif
-#ifdef USE_WINDOWS_SSPI
-  | CURL_VERSION_SSPI
-#endif
-#ifdef HAVE_LIBZ
-  | CURL_VERSION_LIBZ
-#endif
-#ifdef DEBUGBUILD
-  | CURL_VERSION_DEBUG
-#endif
-#ifdef CURLDEBUG
-  | CURL_VERSION_CURLDEBUG
-#endif
-#ifdef CURLRES_ASYNCH
-  | CURL_VERSION_ASYNCHDNS
-#endif
-#if (SIZEOF_CURL_OFF_T > 4) && \
-    ( (SIZEOF_OFF_T > 4) || defined(USE_WIN32_LARGE_FILES) )
-  | CURL_VERSION_LARGEFILE
-#endif
-#if defined(WIN32) && defined(UNICODE) && defined(_UNICODE)
-  | CURL_VERSION_UNICODE
-#endif
-#if defined(USE_TLS_SRP)
-  | CURL_VERSION_TLSAUTH_SRP
-#endif
-#if defined(USE_NGHTTP2) || defined(USE_HYPER)
-  | CURL_VERSION_HTTP2
-#endif
-#if defined(ENABLE_QUIC)
-  | CURL_VERSION_HTTP3
-#endif
-#if defined(USE_UNIX_SOCKETS)
-  | CURL_VERSION_UNIX_SOCKETS
-#endif
-#if defined(USE_LIBPSL)
-  | CURL_VERSION_PSL
-#endif
-#if defined(CURL_WITH_MULTI_SSL)
-  | CURL_VERSION_MULTI_SSL
-#endif
-#if defined(HAVE_BROTLI)
-  | CURL_VERSION_BROTLI
-#endif
-#if defined(HAVE_ZSTD)
-  | CURL_VERSION_ZSTD
-#endif
-#ifndef CURL_DISABLE_ALTSVC
-  | CURL_VERSION_ALTSVC
-#endif
-#ifndef CURL_DISABLE_HSTS
-  | CURL_VERSION_HSTS
-#endif
-#if defined(USE_GSASL)
-  | CURL_VERSION_GSASL
-#endif
-  ,
+  OS,   /* as found by configure or set by hand at build-time */
+  0,    /* features bitmask is built at run-time */
   NULL, /* ssl_version */
   0,    /* ssl_version_num, this is kept at zero */
   NULL, /* zlib_version */
-  protocols,
+  supported_protocols,
   NULL, /* c-ares version */
   0,    /* c-ares version numerical */
   NULL, /* libidn version */
@@ -479,11 +568,17 @@ static curl_version_info_data version_info = {
   0,    /* zstd_ver_num */
   NULL, /* zstd version */
   NULL, /* Hyper version */
-  NULL  /* gsasl version */
+  NULL, /* gsasl version */
+  feature_names,
+  NULL  /* rtmp version */
 };
 
 curl_version_info_data *curl_version_info(CURLversion stamp)
 {
+  size_t n;
+  const struct feat *p;
+  int features = 0;
+
 #if defined(USE_SSH)
   static char ssh_buffer[80];
 #endif
@@ -501,15 +596,11 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
   static char zstd_buffer[80];
 #endif
 
+  (void)stamp; /* avoid compiler warnings, we don't use this */
+
 #ifdef USE_SSL
   Curl_ssl_version(ssl_buffer, sizeof(ssl_buffer));
   version_info.ssl_version = ssl_buffer;
-#ifndef CURL_DISABLE_PROXY
-  if(Curl_ssl->supports & SSLSUPP_HTTPS_PROXY)
-    version_info.features |= CURL_VERSION_HTTPS_PROXY;
-  else
-    version_info.features &= ~CURL_VERSION_HTTPS_PROXY;
-#endif
 #endif
 
 #ifdef HAVE_LIBZ
@@ -527,10 +618,6 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
   /* This returns a version string if we use the given version or later,
      otherwise it returns NULL */
   version_info.libidn = idn2_check_version(IDN2_VERSION);
-  if(version_info.libidn)
-    version_info.features |= CURL_VERSION_IDN;
-#elif defined(USE_WIN32_IDN)
-  version_info.features |= CURL_VERSION_IDN;
 #endif
 
 #if defined(USE_SSH)
@@ -558,7 +645,7 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
   }
 #endif
 
-#ifdef ENABLE_QUIC
+#ifdef USE_HTTP3
   {
     static char quicbuffer[80];
     Curl_quic_ver(quicbuffer, sizeof(quicbuffer));
@@ -580,6 +667,24 @@ curl_version_info_data *curl_version_info(CURLversion stamp)
   }
 #endif
 
-  (void)stamp; /* avoid compiler warnings, we don't use this */
+  /* Get available features, build bitmask and names array. */
+  n = 0;
+  for(p = features_table; p->name; p++)
+    if(!p->present || p->present(&version_info)) {
+      features |= p->bitmask;
+      feature_names[n++] = p->name;
+    }
+
+  feature_names[n] = NULL;  /* Terminate array. */
+  version_info.features = features;
+
+#ifdef USE_LIBRTMP
+  {
+    static char rtmp_version[30];
+    Curl_rtmp_version(rtmp_version, sizeof(rtmp_version));
+    version_info.rtmp_version = rtmp_version;
+  }
+#endif
+
   return &version_info;
 }

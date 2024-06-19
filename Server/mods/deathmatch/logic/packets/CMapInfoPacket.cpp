@@ -172,6 +172,28 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     funBugs.data5.bQuickStand = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKSTAND);
     BitStream.Write(&funBugs);
 
+    // Write world special properties states
+    if (BitStream.Can(eBitStreamVersion::WorldSpecialProperties))
+    {
+        SWorldSpecialPropertiesStateSync wsProps;
+        wsProps.data.hovercars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::HOVERCARS);
+        wsProps.data.aircars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::AIRCARS);
+        wsProps.data.extrabunny = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRABUNNY);
+        wsProps.data.extrajump = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAJUMP);
+        wsProps.data.randomfoliage = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::RANDOMFOLIAGE);
+        wsProps.data.snipermoon = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::SNIPERMOON);
+        wsProps.data.extraairresistance = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTRAAIRRESISTANCE);
+        wsProps.data.underworldwarp = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::UNDERWORLDWARP);
+        wsProps.data.vehiclesunglare = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLESUNGLARE);
+        wsProps.data.coronaztest = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::CORONAZTEST);
+        wsProps.data.watercreatures = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::WATERCREATURES);
+        wsProps.data.burnflippedcars = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::BURNFLIPPEDCARS);
+        wsProps.data2.fireballdestruct = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FIREBALLDESTRUCT);
+        wsProps.data3.roadsignstext = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::ROADSIGNSTEXT);
+        wsProps.data4.extendedwatercannons = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::EXTENDEDWATERCANNONS);
+        BitStream.Write(&wsProps);
+    }
+
     BitStream.Write(m_fJetpackMaxHeight);
 
     BitStream.WriteBit(m_bOverrideWaterColor);

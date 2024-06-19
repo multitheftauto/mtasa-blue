@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -84,6 +86,22 @@ Curl_llist_insert_next(struct Curl_llist *list, struct Curl_llist_element *e,
   }
 
   ++list->size;
+}
+
+/*
+ * Curl_llist_append()
+ *
+ * Adds a new list element to the end of the list.
+ *
+ * The 'ne' argument should be a pointer into the object to store.
+ *
+ * @unittest: 1300
+ */
+void
+Curl_llist_append(struct Curl_llist *list, const void *p,
+                  struct Curl_llist_element *ne)
+{
+  Curl_llist_insert_next(list, list->tail, p, ne);
 }
 
 /*

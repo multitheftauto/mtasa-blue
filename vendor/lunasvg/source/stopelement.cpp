@@ -4,20 +4,20 @@
 namespace lunasvg {
 
 StopElement::StopElement()
-    : StyledElement(ElementId::Stop)
+    : StyledElement(ElementID::Stop)
 {
 }
 
 double StopElement::offset() const
 {
-    auto& value = get(PropertyId::Offset);
-    return Parser::parseNumberPercentage(value, 1.0);
+    auto& value = get(PropertyID::Offset);
+    return Parser::parseNumberPercentage(value, 0.0);
 }
 
 Color StopElement::stopColorWithOpacity() const
 {
     auto color = stop_color();
-    color.a = stop_opacity();
+    color.combine(stop_opacity());
     return color;
 }
 

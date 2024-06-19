@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,12 +18,14 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
 
 #if !defined(CURL_DISABLE_COOKIES) || !defined(CURL_DISABLE_ALTSVC) ||  \
-  !defined(CURL_DISABLE_HSTS)
+  !defined(CURL_DISABLE_HSTS) || !defined(CURL_DISABLE_NETRC)
 
 #include "curl_get_line.h"
 #include "curl_memory.h"
@@ -31,30 +33,45 @@
 #include "memdebug.h"
 
 /*
- * get_line() makes sure to only return complete whole lines that fit in 'len'
- * bytes and end with a newline.
+ * Curl_get_line() makes sure to only return complete whole lines that end
+ * newlines.
  */
-char *Curl_get_line(char *buf, int len, FILE *input)
+int Curl_get_line(struct dynbuf *buf, FILE *input)
 {
-  bool partial = FALSE;
+  CURLcode result;
+  char buffer[128];
+  Curl_dyn_reset(buf);
   while(1) {
-    char *b = fgets(buf, len, input);
+    char *b = fgets(buffer, sizeof(buffer), input);
+
     if(b) {
       size_t rlen = strlen(b);
-      if(rlen && (b[rlen-1] == '\n')) {
-        if(partial) {
-          partial = FALSE;
-          continue;
-        }
-        return b;
+
+      if(!rlen)
+        break;
+
+      result = Curl_dyn_addn(buf, b, rlen);
+      if(result)
+        /* too long line or out of memory */
+        return 0; /* error */
+
+      else if(b[rlen-1] == '\n')
+        /* end of the line */
+        return 1; /* all good */
+
+      else if(feof(input)) {
+        /* append a newline */
+        result = Curl_dyn_addn(buf, "\n", 1);
+        if(result)
+          /* too long line or out of memory */
+          return 0; /* error */
+        return 1; /* all good */
       }
-      /* read a partial, discard the next piece that ends with newline */
-      partial = TRUE;
     }
     else
       break;
   }
-  return NULL;
+  return 0;
 }
 
 #endif /* if not disabled */

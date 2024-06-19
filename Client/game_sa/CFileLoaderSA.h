@@ -1,5 +1,13 @@
 #pragma once
 
+#include "CVector.h"
+#include "CVector4D.h"
+
+class CEntitySAInterface;
+struct RpAtomic;
+struct RpClump;
+struct RwStream;
+
 struct SRelatedModelInfo
 {
     RpClump* pClump;
@@ -20,6 +28,8 @@ class CFileLoaderSA
 public:
     CFileLoaderSA();
     ~CFileLoaderSA();
+
+    static CEntitySAInterface* LoadObjectInstance(SFileObjectInstance*);
 
     static void StaticSetHooks();
 };

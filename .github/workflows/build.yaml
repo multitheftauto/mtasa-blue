@@ -7,19 +7,13 @@ jobs:
   windows:
     strategy:
       matrix:
-        configuration: [release, debug]
         platform: [win32, x64, arm64]
-        include:
-        - configuration: release
-          artifact-name: InstallFiles
-        - configuration: debug
-          artifact-name: InstallFiles-debug
-    name: windows-${{ matrix.configuration }}-${{ matrix.platform }}
+    name: windows-${{ matrix.platform }}
     runs-on: windows-2022
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         id: cache-dxfiles
         with:
           path: utils/DXFiles
@@ -27,7 +21,7 @@ jobs:
 
       - name: Download DirectX
         if: steps.cache-dxfiles.outputs.cache-hit != 'true'
-        run: Invoke-WebRequest https://mirror.mtasa.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
+        run: Invoke-WebRequest https://mirror-cdn.multitheftauto.com/bdata/DXFiles.zip -OutFile utils/DXFiles.zip
         shell: powershell
 
       - name: Extract DirectX
@@ -42,7 +36,7 @@ jobs:
         run: utils\premake5 install_data
 
       - name: Run Build
-        run: win-build.bat ${{ matrix.configuration }} ${{ matrix.platform }}
+        run: win-build.bat release ${{ matrix.platform }}
         shell: cmd
         env:
           DXSDK_DIR: './utils/DXFiles/'
@@ -51,19 +45,16 @@ jobs:
       - name: Create build artifacts
         run: utils\premake5 compose_files
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.artifact-name }}
+          name: InstallFiles-${{ matrix.platform }}
           path: InstallFiles/
 
   macOS:
-    strategy:
-      matrix:
-        type: [release, debug]
-    name: macOS-${{ matrix.type }}
-    runs-on: macOS-latest
+    name: macOS
+    runs-on: macOS-13
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Install MySQL
         run: brew install mysql
@@ -73,24 +64,23 @@ jobs:
         run: brew link --overwrite mysql
 
       - name: Run Build
-        run: ./linux-build.sh --config=${{ matrix.type }}
+        run: ./linux-build.sh --os=macosx
 
   linux:
     strategy:
       matrix:
-        type: [release, debug]
         architecture: [x64, arm64]
         include:
         - architecture: x64
           image-tag: latest
         - architecture: arm64
           image-tag: arm64
-    name: linux-${{ matrix.type }}-${{ matrix.architecture }}
+    name: linux-${{ matrix.architecture }}
     runs-on: ubuntu-latest
     container:
       image: docker://ghcr.io/multitheftauto/mtasa-blue-build:${{ matrix.image-tag }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run Build
-        run: ./linux-build.sh --arch=${{ matrix.architecture }} --config=${{ matrix.type }}
+        run: ./linux-build.sh --arch=${{ matrix.architecture }}

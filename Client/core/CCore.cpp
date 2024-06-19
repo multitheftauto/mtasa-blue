@@ -11,19 +11,26 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CSettings.h>
 #include <Accctrl.h>
 #include <Aclapi.h>
+#include <filesystem>
 #include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
+#include "DXHook/CDirect3DHook9.h"
+#include "DXHook/CDirect3DHookManager.h"
 #include "CTimingCheckpoints.hpp"
 #include "CModelCacheManager.h"
 #include <SharedUtil.Detours.h>
 #include <ServerBrowser/CServerCache.h>
+#include "CDiscordRichPresence.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
+
+namespace fs = std::filesystem;
 
 static float fTest = 1;
 
@@ -31,18 +38,40 @@ extern CCore* g_pCore;
 bool          g_bBoundsChecker = false;
 SString       g_strJingleBells;
 
+extern fs::path g_gtaDirectory;
+
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
 static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
 {
-    if (StrCmpIA("dpnhpast.dll", fileName) != 0)
-        return Win32LoadLibraryA(fileName);
-
     // GTA:SA expects a valid module handle for DirectPlay. We return a handle for an already loaded library.
-    return Win32LoadLibraryA("d3d8.dll");
+    if (!StrCmpIA("dpnhpast.dll", fileName))
+        return Win32LoadLibraryA("d3d8.dll");
+
+    if (!StrCmpIA("enbseries\\enbhelper.dll", fileName))
+    {
+        std::error_code ec;
+        
+        // Try to load enbhelper.dll from our custom launch directory first.
+        const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
+
+        if (fs::is_regular_file(inLaunchDir, ec))
+            return Win32LoadLibraryA(inLaunchDir.u8string().c_str());
+
+        // Try to load enbhelper.dll from the GTA install directory second.
+        const fs::path inGTADir = g_gtaDirectory / "enbseries" / "enbhelper.dll";
+
+        if (fs::is_regular_file(inGTADir, ec))
+            return Win32LoadLibraryA(inGTADir.u8string().c_str());
+
+        return nullptr;
+    }
+
+    return Win32LoadLibraryA(fileName);
 }
 
 CCore::CCore()
@@ -119,9 +148,6 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
-    // Reset the screenshot flag
-    bScreenShot = false;
-
     // No initial fps limit
     m_bDoneFrameRateLimit = false;
     m_uiFrameRateLimit = 0;
@@ -133,14 +159,22 @@ CCore::CCore()
     m_fMaxStreamingMemory = 0;
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
+    m_timeDiscordAppLastUpdate = 0;
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
+
+    // Create discord rich presence
+    m_pDiscordRichPresence = std::shared_ptr<CDiscordRichPresence>(new CDiscordRichPresence());
 }
 
 CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
+
+    // Reset Discord rich presence
+    if (m_pDiscordRichPresence)
+        m_pDiscordRichPresence.reset();
 
     // Destroy tray icon
     delete m_pTrayIcon;
@@ -474,9 +508,9 @@ bool CCore::ClearChat()
     return false;
 }
 
-void CCore::TakeScreenShot()
+void CCore::InitiateScreenShot(bool bIsCameraShot)
 {
-    bScreenShot = true;
+    CScreenShot::InitiateScreenShot(bIsCameraShot);
 }
 
 void CCore::EnableChatInput(char* szCommand, DWORD dwColor)
@@ -501,6 +535,47 @@ bool CCore::IsChatInputEnabled()
     }
 
     return false;
+}
+
+bool CCore::SetChatboxCharacterLimit(int charLimit)
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return false;
+
+    pChat->SetCharacterLimit(charLimit);
+    return true;
+}
+
+void CCore::ResetChatboxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return;
+
+    pChat->SetCharacterLimit(pChat->GetDefaultCharacterLimit());
+}
+
+int CCore::GetChatboxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return 0;
+
+    return pChat->GetCharacterLimit();
+}
+
+int CCore::GetChatboxMaxCharacterLimit()
+{
+    CChat* pChat = m_pLocalGUI->GetChat();
+
+    if (!pChat)
+        return 0;
+
+    return pChat->GetMaxCharacterLimit();
 }
 
 bool CCore::IsSettingsVisible()
@@ -573,9 +648,12 @@ void CCore::ApplyGameSettings()
     CVARS_GET("tyre_smoke_enabled", bVal);
     m_pMultiplayer->SetTyreSmokeEnabled(bVal);
     pGameSettings->UpdateFieldOfViewFromSettings();
+    pGameSettings->ResetBlurEnabled();
     pGameSettings->ResetVehiclesLODDistance();
     pGameSettings->ResetPedsLODDistance();
     pGameSettings->ResetCoronaReflectionsEnabled();
+    CVARS_GET("dynamic_ped_shadows", bVal);
+    pGameSettings->SetDynamicPedShadowsEnabled(bVal);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     CVARS_GET("mastervolume", fVal);
     pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
@@ -586,6 +664,20 @@ void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
     UpdateIsWindowMinimized();            // Force update of stuff
+
+    if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
+    {
+        const auto discord = g_pCore->GetDiscord();
+        if (!discord->IsDiscordRPCEnabled())
+            discord->SetDiscordRPCEnabled(true);
+
+        discord->SetPresenceState(bConnected ? _("In-game") : _("Main menu"), false);
+        discord->SetPresenceStartTimestamp(0);
+        discord->SetPresenceDetails("", false);
+
+        if (bConnected)
+            discord->SetPresenceStartTimestamp(time(nullptr));
+    }
 }
 
 bool CCore::IsConnected()
@@ -928,11 +1020,6 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
-
-    // and set the screenshot path to this default library (screenshots shouldnt really be made outside mods)
-    std::string strScreenShotPath = CalcMTASAPath("screenshots");
-    CVARS_SET("screenshot_path", strScreenShotPath);
-    CScreenShot::SetPath(strScreenShotPath.c_str());
 }
 
 void CCore::CreateGUI()
@@ -1252,6 +1339,20 @@ void CCore::DoPostFramePulse()
     GetGraphStats()->Draw();
     m_pConnectManager->DoPulse();
 
+    // Update Discord Rich Presence status
+    if (const long long ticks = GetTickCount64_(); ticks > m_timeDiscordAppLastUpdate + TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE)
+    {
+        if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+        {
+            discord->UpdatePresence();
+            m_timeDiscordAppLastUpdate = ticks;
+#ifdef DISCORD_DISABLE_IO_THREAD
+            // Update manually if we're not using the IO thread
+            discord->UpdatePresenceConnection();
+#endif
+        }
+    }
+
     TIMING_CHECKPOINT("-CorePostFrame2");
 }
 
@@ -1276,6 +1377,9 @@ void CCore::OnModUnload()
 
     // Destroy tray icon
     m_pTrayIcon->DestroyTrayIcon();
+
+    // Reset chatbox character limit
+    ResetChatboxCharacterLimit();
 }
 
 void CCore::RegisterCommands()
@@ -1318,7 +1422,7 @@ void CCore::RegisterCommands()
     m_pCommands->Add("jinglebells", "", CCommandFuncs::JingleBells);
     m_pCommands->Add("fakelag", "", CCommandFuncs::FakeLag);
 
-    m_pCommands->Add("reloadnews", "for developers: reload news", CCommandFuncs::ReloadNews);
+    m_pCommands->Add("reloadnews", _("for developers: reload news"), CCommandFuncs::ReloadNews);
 }
 
 void CCore::SwitchRenderWindow(HWND hWnd, HWND hWndInput)
@@ -1419,7 +1523,22 @@ void CCore::ParseCommandLine(std::map<std::string, std::string>& options, const 
     }
 
     const char* szCmdLine = GetCommandLine();
-    char        szCmdLineCopy[512];
+
+    // Skip the leading game executable path (starts and ends with a quotation mark).
+    if (szCmdLine[0] == '"')
+    {
+        if (const char* afterPath = strchr(szCmdLine + 1, '"'); afterPath != nullptr)
+        {
+            ++afterPath;
+
+            while (*afterPath && isspace(*afterPath))
+                ++afterPath;
+
+            szCmdLine = afterPath;
+        }
+    }
+
+    char szCmdLineCopy[512];
     STRNCPY(szCmdLineCopy, szCmdLine, sizeof(szCmdLineCopy));
 
     char*       pCmdLineEnd = szCmdLineCopy + strlen(szCmdLineCopy);
@@ -1681,6 +1800,21 @@ void CCore::ApplyCoreInitSettings()
         SetProcessDPIAware();
     }
 #endif
+
+    if (int revision = GetApplicationSettingInt("reset-settings-revision"); revision < 21486)
+    {
+        // Force users with default skin to the 2023 version by replacing "Default" with "Default 2023".
+        // The GUI skin "Default 2023" was introduced in commit 2d9e03324b07e355031ecb3263477477f1a91399.
+        std::string currentSkinName;
+        CVARS_GET("current_skin", currentSkinName);
+
+        if (currentSkinName == "Default")
+        {
+            CVARS_SET("current_skin", "Default 2023");
+        }
+
+        SetApplicationSettingInt("reset-settings-revision", 21486);
+    }
 }
 
 //
@@ -1860,16 +1994,12 @@ void CCore::OnDeviceRestore()
 //
 void CCore::OnPreFxRender()
 {
-    // Don't do nothing if nothing won't be drawn
-
-    if (CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
-
-    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems())
-        return;
+    if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
+        return;    
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
+    CGraphics::GetSingleton().DrawPrimitive3DPreGUIQueue();
     CGraphics::GetSingleton().DrawLine3DPreGUIQueue();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
@@ -1882,7 +2012,21 @@ void CCore::OnPreHUDRender()
 {
     IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
 
-    CGraphics::GetSingleton().EnteringMTARenderZone();
+    if (CGraphics::GetSingleton().HasLine3DPostFXQueueItems() || CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+    {
+        /*
+            Although MTA render zones are expensive, we should use them twice in the bounds of the function
+            because some of render states from PostFX drain to the 2D part of the frame.
+        */
+        CGraphics::GetSingleton().EnteringMTARenderZone();
+
+        CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+        CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
+        CGraphics::GetSingleton().LeavingMTARenderZone();
+    }
+
+    CGraphics::GetSingleton().EnteringMTARenderZone();    
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
@@ -2243,4 +2387,31 @@ SString CCore::GetBlueCopyrightString()
 {
     SString strCopyright = BLUE_COPYRIGHT_STRING;
     return strCopyright.Replace("%BUILD_YEAR%", std::to_string(BUILD_YEAR).c_str());
+}
+
+// Set streaming memory size override [See `engineStreamingSetMemorySize`]
+// Use `0` to turn it off, and thus restore the value to the `cvar` setting
+void CCore::SetCustomStreamingMemory(size_t sizeBytes) {
+    // NOTE: The override is applied to the game in `CClientGame::DoPulsePostFrame`
+    // There's no specific reason we couldn't do it here, but we wont
+    m_CustomStreamingMemoryLimitBytes = sizeBytes;
+}
+
+bool CCore::IsUsingCustomStreamingMemorySize()
+{
+    return m_CustomStreamingMemoryLimitBytes != 0;
+}
+
+// Streaming memory size used [In Bytes]
+size_t CCore::GetStreamingMemory()
+{
+    return IsUsingCustomStreamingMemorySize()
+        ? m_CustomStreamingMemoryLimitBytes
+        : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+}
+
+// Discord rich presence
+std::shared_ptr<CDiscordInterface> CCore::GetDiscord()
+{
+    return m_pDiscordRichPresence;
 }

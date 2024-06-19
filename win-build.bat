@@ -4,7 +4,7 @@ set VSWHERE=utils\vswhere.exe
 rem Download vswhere (command line utility to find MSBuild path)
 if not exist %VSWHERE% (
 	echo vswhere utility doesn't exist. Downloading...
-	powershell -Command "Invoke-WebRequest https://mirror.mtasa.com/bdata/vswhere.exe -OutFile %VSWHERE%"
+	powershell -Command "Invoke-WebRequest https://mirror-cdn.multitheftauto.com/bdata/vswhere.exe -OutFile %VSWHERE%"
 )
 
 rem Find MSBuild installation path

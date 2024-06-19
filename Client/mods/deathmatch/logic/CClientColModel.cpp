@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CColModel.h>
 
 CClientColModel::CClientColModel(CClientManager* pManager, ElementID ID) : ClassInit(this), CClientEntity(ID)
 {

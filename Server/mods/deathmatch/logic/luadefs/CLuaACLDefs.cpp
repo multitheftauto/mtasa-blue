@@ -57,6 +57,7 @@ void CLuaACLDefs::LoadFunctions()
 
         {"isObjectInACLGroup", isObjectInACLGroup},
         {"hasObjectPermissionTo", hasObjectPermissionTo},
+        {"aclObjectGetGroups", ArgumentParser<aclObjectGetGroups>},
     };
 
     // Add functions
@@ -74,6 +75,7 @@ void CLuaACLDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "reload", "aclReload");
     lua_classfunction(luaVM, "list", "aclList");
     lua_classfunction(luaVM, "hasObjectPermissionTo", "hasObjectPermissionTo");
+    lua_classfunction(luaVM, "aclObjectGetGroups", "aclObjectGetGroups");
 
     lua_classfunction(luaVM, "create", "aclCreate");
     lua_classfunction(luaVM, "destroy", "aclDestroy");
@@ -746,6 +748,9 @@ int CLuaACLDefs::aclGroupAddObject(lua_State* luaVM)
     argStream.ReadUserData(pGroup);
     argStream.ReadString(strObject);
 
+    if (strObject.length() > 255)
+        argStream.SetCustomError(SString("Object name is too long, max length 255, got %d.", strObject.length()));
+
     if (!argStream.HasErrors())
     {
         // Figure out what type of object this is
@@ -1045,4 +1050,34 @@ int CLuaACLDefs::OOP_isObjectInACLGroup(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::vector<CAccessControlListGroup*> CLuaACLDefs::aclObjectGetGroups(std::string strObject)
+{
+    CAccessControlListGroupObject::EObjectType objectType;
+    const char* szObjectAfterDot = strObject.c_str();
+    if (StringBeginsWith(szObjectAfterDot, "resource."))
+    {
+        szObjectAfterDot += 9;
+        objectType = CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE;
+    }
+    else if (StringBeginsWith(szObjectAfterDot, "user."))
+    {
+        szObjectAfterDot += 5;
+        objectType = CAccessControlListGroupObject::OBJECT_TYPE_USER;
+    }
+    else
+        throw std::invalid_argument("Object must be either a resource or an user.");
+
+    std::vector<CAccessControlListGroup*> groups;
+
+    for (auto iter = m_pACLManager->Groups_Begin();
+        iter != m_pACLManager->Groups_End(); ++iter)
+    {
+        if (!(*iter)->FindObjectMatch(szObjectAfterDot, objectType))
+            continue;
+
+        groups.push_back(*iter);
+    }
+    return groups;
 }

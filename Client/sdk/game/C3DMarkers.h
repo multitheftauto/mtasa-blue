@@ -11,13 +11,16 @@
 
 #pragma once
 
-#include <CVector.h>
-#include "C3DMarker.h"
+#include "Common.h"
+
+class C3DMarker;
+class CVector;
 
 class C3DMarkers
 {
 public:
-    virtual C3DMarker* CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, FLOAT fSize, FLOAT fPulseFraction, BYTE r, BYTE g, BYTE b,
+    virtual C3DMarker* CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b,
                                     BYTE a) = 0;
     virtual C3DMarker* FindFreeMarker() = 0;
+    virtual void       ReinitMarkers() = 0;
 };

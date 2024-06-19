@@ -101,10 +101,16 @@ bool CLuaVectorGraphicDefs::SetSize(CClientVectorGraphic* vectorGraphic, CVector
     if (!vectorGraphicItem)
         return false;
 
-    vectorGraphicItem->Resize(size);
+    if (size.fX <= 0 || size.fY <= 0)
+        throw std::invalid_argument("A vector graphic must be atleast 1x1 in size.");
 
-    if ((int)vectorGraphicItem->m_uiSizeX != size.fX || (int)vectorGraphicItem->m_uiSizeY != size.fY)
-        return false;            // failed to resize
+    if (size.fX > 4096 || size.fY > 4096)
+        throw std::invalid_argument("A vector graphic cannot exceed 4096x4096 in size.");
+
+    int intSizeX = static_cast<int>(size.fX);
+    int intSizeY = static_cast<int>(size.fY);
+
+    vectorGraphicItem->Resize(CVector2D(intSizeX, intSizeY));
 
     vectorGraphic->GetDisplay()->Update();
     return true;
@@ -126,7 +132,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
         g_pClientGame->GetManager()->GetRenderElementManager()->CreateVectorGraphic(static_cast<int>(size.fX), static_cast<int>(size.fY));
 
     if (!vectorGraphic)
-        return false;
+        return nullptr;
 
     if (pathOrRawData.has_value())
     {
@@ -151,7 +157,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
             if (!didLoad)
             {
                 delete vectorGraphic;
-                return false;
+                return nullptr;
             }
         }
         else
@@ -177,7 +183,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 if (!didLoad)
                 {
                     delete vectorGraphic;
-                    return false;
+                    return nullptr;
                 }
             }
             else
@@ -185,7 +191,7 @@ CClientVectorGraphic* CLuaVectorGraphicDefs::SVGCreate(lua_State* luaVM, CVector
                 delete vectorGraphic;
 
                 m_pScriptDebugging->LogCustom(luaVM, SString("Unable to load SVG (invalid file path) [%s]", pathOrRawData.value().c_str()));
-                return false;
+                return nullptr;
             }
         }
     }

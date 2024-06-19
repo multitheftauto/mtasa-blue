@@ -15,6 +15,7 @@
 #define ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED     2
 
 struct RpClump;
+struct RwObject;
 
 class CVisibilityPlugins
 {

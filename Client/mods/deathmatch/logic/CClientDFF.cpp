@@ -164,6 +164,16 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
         {
             return ReplacePedModel(pClump, usModel, bAlphaTransparency);
         }
+        else if (CClientMarkerManager::IsMarkerModel(usModel))
+        {
+            bool wasReplaced = ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
+
+            // 'Restream' 3D markers
+            if (wasReplaced)
+                g_pClientGame->ReinitMarkers();
+
+            return wasReplaced;
+        }
         else if (CClientObjectManager::IsValidModel(usModel))
         {
             if (CVehicleUpgrades::IsUpgrade(usModel))
@@ -272,6 +282,10 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
         m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 
+    // 'Restream' 3D markers
+    if (CClientMarkerManager::IsMarkerModel(usModel))
+        g_pClientGame->ReinitMarkers();
+
     // Force dff reload if this model id is used again
     SLoadedClumpInfo* pInfo = MapFind(m_LoadedClumpInfoMap, usModel);
     if (pInfo)
@@ -292,7 +306,9 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->SetCustomModel(pClump);
+
+    if (!pModelInfo->SetCustomModel(pClump))
+        return false;
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
@@ -313,7 +329,9 @@ bool CClientDFF::ReplaceWeaponModel(RpClump* pClump, ushort usModel, bool bAlpha
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->SetCustomModel(pClump);
+
+    if (!pModelInfo->SetCustomModel(pClump))
+        return false;
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
@@ -333,7 +351,9 @@ bool CClientDFF::ReplacePedModel(RpClump* pClump, ushort usModel, bool bAlphaTra
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->SetCustomModel(pClump);
+
+    if (!pModelInfo->SetCustomModel(pClump))
+        return false;
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 
@@ -351,7 +371,9 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
 
     // Grab the model info for that model and replace the model
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    pModelInfo->SetCustomModel(pClump);
+
+    if (!pModelInfo->SetCustomModel(pClump))
+        return false;
 
     pModelInfo->ResetVehicleWheelSizes();
 

@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,6 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #include "curl_setup.h"
@@ -28,13 +30,10 @@
 #include "timeval.h" /* for timediff_t */
 #include "asyn.h"
 
-#ifdef HAVE_SETJMP_H
 #include <setjmp.h>
-#endif
 
-#ifdef NETWARE
-#undef in_addr_t
-#define in_addr_t unsigned long
+#ifdef USE_HTTPSRR
+# include <stdint.h>
 #endif
 
 /* Allocate enough memory to hold the full name information structs and
@@ -63,12 +62,49 @@ struct connectdata;
  */
 struct Curl_hash *Curl_global_host_cache_init(void);
 
+#ifdef USE_HTTPSRR
+
+#define CURL_MAXLEN_host_name 253
+
+struct Curl_https_rrinfo {
+  size_t len; /* raw encoded length */
+  unsigned char *val; /* raw encoded octets */
+  /*
+   * fields from HTTPS RR, with the mandatory fields
+   * first (priority, target), then the others in the
+   * order of the keytag numbers defined at
+   * https://datatracker.ietf.org/doc/html/rfc9460#section-14.3.2
+   */
+  uint16_t priority;
+  char *target;
+  char *alpns; /* keytag = 1 */
+  bool no_def_alpn; /* keytag = 2 */
+  /*
+   * we don't support ports (keytag = 3) as we don't support
+   * port-switching yet
+   */
+  unsigned char *ipv4hints; /* keytag = 4 */
+  size_t ipv4hints_len;
+  unsigned char *echconfiglist; /* keytag = 5 */
+  size_t echconfiglist_len;
+  unsigned char *ipv6hints; /* keytag = 6 */
+  size_t ipv6hints_len;
+};
+#endif
+
 struct Curl_dns_entry {
   struct Curl_addrinfo *addr;
+#ifdef USE_HTTPSRR
+  struct Curl_https_rrinfo *hinfo;
+#endif
   /* timestamp == 0 -- permanent CURLOPT_RESOLVE entry (doesn't time out) */
   time_t timestamp;
   /* use-counter, use Curl_resolv_unlock to release reference */
   long inuse;
+  /* hostname port number that resolved to addr. */
+  int hostport;
+  /* hostname that resolved to addr. may be NULL (unix domain sockets). */
+  char hostname[1];
 };
 
 bool Curl_host_is_ipnum(const char *hostname);
@@ -97,7 +133,7 @@ enum resolve_t Curl_resolv_timeout(struct Curl_easy *data,
                                    struct Curl_dns_entry **dnsentry,
                                    timediff_t timeoutms);
 
-#ifdef ENABLE_IPV6
+#ifdef USE_IPV6
 /*
  * Curl_ipv6works() returns TRUE if IPv6 seems to work.
  */
@@ -130,13 +166,10 @@ void Curl_resolv_unlock(struct Curl_easy *data,
                         struct Curl_dns_entry *dns);
 
 /* init a new dns cache */
-void Curl_init_dnscache(struct Curl_hash *hash);
+void Curl_init_dnscache(struct Curl_hash *hash, size_t hashsize);
 
 /* prune old entries from the DNS cache */
 void Curl_hostcache_prune(struct Curl_easy *data);
-
-/* Return # of addresses in a Curl_addrinfo struct */
-int Curl_num_addresses(const struct Curl_addrinfo *addr);
 
 /* IPv4 threadsafe resolve function used for synch and asynch builds */
 struct Curl_addrinfo *Curl_ipv4_resolve_r(const char *hostname, int port);
@@ -181,21 +214,12 @@ Curl_fetch_addr(struct Curl_easy *data,
  */
 struct Curl_dns_entry *
 Curl_cache_addr(struct Curl_easy *data, struct Curl_addrinfo *addr,
-                const char *hostname, int port);
+                const char *hostname, size_t hostlen, int port);
 
 #ifndef INADDR_NONE
 #define CURL_INADDR_NONE (in_addr_t) ~0
 #else
 #define CURL_INADDR_NONE INADDR_NONE
-#endif
-
-#ifdef HAVE_SIGSETJMP
-/* Forward-declaration of variable defined in hostip.c. Beware this
- * is a global and unique instance. This is used to store the return
- * address that we can jump back to from inside a signal handler.
- * This is not thread-safe stuff.
- */
-extern sigjmp_buf curl_jmpenv;
 #endif
 
 /*

@@ -2,7 +2,8 @@ commit_message: '[ci skip]'
 files:
   - source: /Shared/data/MTA San Andreas/MTA/locale/en_US/*
     ignore:
-      - '*.psd'
+      - 'latest_news.png'
+      - 'menu_*.png'
     translation: /Shared/data/MTA San Andreas/MTA/locale/%locale_with_underscore%/%original_file_name%
   - source: /Shared/installer/locale/en_US.pot
     translation: /Shared/installer/locale/%locale_with_underscore%.%file_extension%

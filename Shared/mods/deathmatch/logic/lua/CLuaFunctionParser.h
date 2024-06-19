@@ -22,7 +22,7 @@ class CLuaArgument;
 struct CLuaFunctionParserBase
 {
     // iIndex is passed around by reference
-    std::size_t iIndex = 1;
+    int iIndex = 1;
 
     std::string strError = "";
     std::string strErrorFoundType = "";
@@ -94,7 +94,7 @@ struct CLuaFunctionParserBase
 
     // Reads the parameter type (& value in some cases) at a given index
     // For example a 42 on the Lua stack is returned as 'number (42)'
-    static SString ReadParameterAsString(lua_State* L, std::size_t index)
+    static SString ReadParameterAsString(lua_State* L, int index)
     {
         switch (lua_type(L, index))
         {
@@ -143,7 +143,7 @@ struct CLuaFunctionParserBase
 
     // Pop should remove a T from the Lua Stack after verifying that it is a valid type
     template <typename T>
-    T Pop(lua_State* L, std::size_t& index)
+    T Pop(lua_State* L, int& index)
     {
         if (!TypeMatch<T>(L, index))
         {
@@ -158,7 +158,7 @@ struct CLuaFunctionParserBase
     // Special type matcher for variants. Returns -1 if the type does not match
     // returns n if the nth type of the variant matches
     template <typename T>
-    int TypeMatchVariant(lua_State* L, std::size_t index)
+    int TypeMatchVariant(lua_State* L, int index)
     {
         // If the variant is empty, we have exhausted all options
         // The type therefore doesn't match the variant
@@ -186,7 +186,7 @@ struct CLuaFunctionParserBase
     // should only check for obvious type violations (e.g. false is not a string) but not
     // for internal type errors (passing a vehicle to a function expecting a ped)
     template <typename T>
-    bool TypeMatch(lua_State* L, std::size_t index)
+    bool TypeMatch(lua_State* L, int index)
     {
         int iArgument = lua_type(L, index);
         // primitive types
@@ -289,8 +289,8 @@ struct CLuaFunctionParserBase
     }
 
     // Special PopUnsafe for variants
-    template <typename T, std::size_t currIndex = 0>
-    T PopUnsafeVariant(lua_State* L, std::size_t& index, int vindex)
+    template <typename T, int currIndex = 0>
+    T PopUnsafeVariant(lua_State* L, int& index, int vindex)
     {
         // As std::variant<> cannot be constructed, we simply return the first value
         // in the error case. This is actually unreachable in the regular path,
@@ -344,7 +344,7 @@ struct CLuaFunctionParserBase
     // as this condition cannot be caught before actually reading the userdata from the Lua stack
     // On success, this function may also increment `index`
     template <typename T>
-    T PopUnsafe(lua_State* L, std::size_t& index)
+    T PopUnsafe(lua_State* L, int& index)
     {
         // Expect no change in stack size
         LUA_STACK_EXPECT(0);
@@ -352,19 +352,42 @@ struct CLuaFunctionParserBase
         if constexpr (std::is_same_v<T, dummy_type>)
             return dummy_type{};
         // primitive types are directly popped
-        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_integral_v<T>)
+        else if constexpr (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)
             return lua::PopPrimitive<T>(L, index);
-        // floats/doubles may not be NaN
-        else if constexpr (std::is_same_v<T, float> || std::is_same_v<T, double>)
+        else if constexpr (std::is_same_v<T, bool>)
+            return lua::PopPrimitive<T>(L, index);
+        else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>) // bool is an integral type, so must pop it before ^^
         {
-            T value = lua::PopPrimitive<T>(L, index);
-            if (std::isnan(value))
-            {
+            const auto number = lua::PopPrimitive<lua_Number>(L, index);
+
+            const auto SetError = [&](const char* expected, const char* got) {
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
-                SetBadArgumentError(L, "number", index - 1, "NaN");
+                SetBadArgumentError(L, expected, index - 1, got);
+            };
+
+            if (std::isnan(number))
+            {
+                SetError("number", "NaN");
+                return static_cast<T>(number);
             }
-            return value;
+
+            if (std::isinf(number)) {
+                SetError("number", "inf");
+                return static_cast<T>(number);
+            }
+
+            // NOTE/TODO: Use C++20 `std::in_range` here instead
+            // For now this doesn't do all the safety checks, but this should be "good enough" [until we switch to C++20]
+            if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>)
+            {
+                if (number < 0) {
+                    SetError("positive number", "negative");
+                    return static_cast<T>(number);
+                }
+            }
+
+            return static_cast<T>(number);
         }
         else if constexpr (std::is_enum_v<T>)
         {
@@ -417,7 +440,7 @@ struct CLuaFunctionParserBase
                     continue;
                 }
 
-                std::size_t i = -1;
+                int i = -1;
                 vecData.emplace_back(PopUnsafe<param>(L, i));
                 lua_pop(L, 1);            // drop value, keep key for lua_next
             }
@@ -439,11 +462,17 @@ struct CLuaFunctionParserBase
                     continue;
                 }
 
-                std::size_t i = -2;
-                auto        k = PopUnsafe<key_t>(L, i);
-                auto        v = PopUnsafe<value_t>(L, i);
+                int  i = -2;
+
+                // When key_t is a string and the actual type of a key is number Lua will conduct an implicit value change
+                // that can confuse lua_next and lead to a crash. To fix it we can copy a key in order to save an original key
+                // that will be used during the next lua_next invocation.
+                lua_pushvalue(L, i);
+
+                auto v = PopUnsafe<value_t>(L, i);
+                auto k = PopUnsafe<key_t>(L, i);                
                 map.emplace(std::move(k), std::move(v));
-                lua_pop(L, 1);            // drop value, keep key for lua_next
+                lua_pop(L, 2);            // drop values(key copy and value), keep original key for lua_next
             }
             ++index;
             return map;
@@ -488,10 +517,7 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector2D vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -500,7 +526,7 @@ struct CLuaFunctionParserBase
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
                     return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector2 may also be filled from a vector3/vector4
                 if (CLuaVector2D* pVec2D = cast((CLuaVector2D*)0); pVec2D != nullptr)
@@ -520,11 +546,7 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                vec.fZ = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -533,7 +555,7 @@ struct CLuaFunctionParserBase
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
                     return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
@@ -551,12 +573,8 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
-                CVector4D vec;
-                vec.fX = lua::PopPrimitive<float>(L, index);
-                vec.fY = lua::PopPrimitive<float>(L, index);
-                vec.fZ = lua::PopPrimitive<float>(L, index);
-                vec.fW = lua::PopPrimitive<float>(L, index);
-                return vec;
+                return { PopUnsafe<float>(L, index), PopUnsafe<float>(L, index),
+                         PopUnsafe<float>(L, index), PopUnsafe<float>(L, index) };
             }
             else
             {
@@ -565,13 +583,11 @@ struct CLuaFunctionParserBase
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
                     return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector3 may also be filled from a vector4
                 if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
                     return *pVec4D;
-                if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
-                    return *pMatrix;
 
                 // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
                 // underlying element is of a wrong type
@@ -583,19 +599,17 @@ struct CLuaFunctionParserBase
         {
             if (lua_isnumber(L, index))
             {
+                const auto ReadVector = [&] {
+                    return CVector(PopUnsafe<float>(L, index), PopUnsafe<float>(L, index), PopUnsafe<float>(L, index));
+                };
+                
                 CMatrix matrix;
-                matrix.vRight.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vRight.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vRight.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vFront.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vUp.fZ = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fX = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fY = lua::PopPrimitive<float>(L, index);
-                matrix.vPos.fZ = lua::PopPrimitive<float>(L, index);
+
+                matrix.vRight = ReadVector();
+                matrix.vFront = ReadVector();
+                matrix.vUp = ReadVector();
+                matrix.vPos = ReadVector();
+
                 return matrix;
             }
             else
@@ -605,7 +619,7 @@ struct CLuaFunctionParserBase
                 void* pValue = lua::PopPrimitive<void*>(L, index);
                 auto  cast = [isLightUserData, pValue, L](auto null) {
                     return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 };
                 // A vector4 may also be filled from a CLuaMatrix
                 if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
@@ -635,7 +649,7 @@ struct CLuaFunctionParserBase
             return static_cast<T>(result);
         }
         else if constexpr (std::is_same_v<T, SColor>)
-            return static_cast<unsigned long>(lua::PopPrimitive<int64_t>(L, index));
+            return static_cast<unsigned long>(static_cast<int64_t>(lua::PopPrimitive<lua_Number>(L, index)));
         else if constexpr (std::is_same_v<T, CLuaArgument>)
         {
             CLuaArgument argument;
@@ -649,7 +663,7 @@ struct CLuaFunctionParserBase
     }
 };
 
-template <bool, auto, auto*>
+template <bool, auto, auto>
 struct CLuaFunctionParser
 {
 };
@@ -733,5 +747,23 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
             return 1;
         }
         return iResult;
+    }
+};
+
+// Case where F is a class method pointer
+// Note: If you see weird compiler errors like: Undefined type, overload resolution failed, etc..
+// Ask on Dev Discord(#new-argument-parser), because rn this implementation is pretty beta. - 03/2021
+template <bool ErrorOnFailure, auto ReturnOnFailure, typename T, typename R, typename... Args, R(T::*F)(Args...)>
+struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, F>
+{
+    // Remove constness here, because we must be able to std::move
+    static R Call(T* o, std::remove_const_t<Args>... args)
+    {
+        return (o->*F)(std::move(args)...);
+    }
+
+    auto operator()(lua_State* L, CScriptDebugging* pScriptDebugging)
+    {
+        return CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, &Call>()(L, pScriptDebugging);
     }
 };

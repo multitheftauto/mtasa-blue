@@ -22,7 +22,7 @@
 #include "CElementGroup.h"
 
 // Used to check fast version of getElementsByType
-//#define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
+// #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
 #define IS_BLIP(element)     ((element)->GetType()==CElement::BLIP)
 #define IS_COLSHAPE(element) ((element)->GetType()==CElement::COLSHAPE)
@@ -46,10 +46,8 @@ class CLuaMain;
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
 
-// List of elements which is auto deleted when the last user calls Release()
-class CElementListSnapshot final : public std::vector<CElement*>, public CRefCountableST
-{
-};
+typedef std::vector<CElement*>                CElementListSnapshot;
+typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
 class CElement
 {
@@ -137,7 +135,7 @@ public:
     void DeleteAllEvents();
 
     void           ReadCustomData(CEvents* pEvents, CXMLNode& Node);
-    CCustomData*   GetCustomDataPointer() { return m_pCustomData; }
+    CCustomData&   GetCustomDataManager() { return m_CustomData; }
     CLuaArgument*  GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType = NULL);
     CLuaArguments* GetAllCustomData(CLuaArguments* table);
     bool           GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData);
@@ -158,7 +156,7 @@ public:
     CChildListType ::const_iterator         IterEnd() { return m_Children.end(); };
     CChildListType ::const_reverse_iterator IterReverseBegin() { return m_Children.rbegin(); };
     CChildListType ::const_reverse_iterator IterReverseEnd() { return m_Children.rend(); };
-    CElementListSnapshot*                   GetChildrenListSnapshot();
+    CElementListSnapshotRef                 GetChildrenListSnapshot();
 
     static uint        GetTypeHashFromString(const SString& strTypeName);
     EElementType       GetType() { return m_iType; };
@@ -250,7 +248,7 @@ protected:
     void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL);
 
     CMapEventManager* m_pEventManager;
-    CCustomData*      m_pCustomData;
+    CCustomData       m_CustomData;
 
     EElementType m_iType;
     ElementID    m_ID;
@@ -259,12 +257,12 @@ protected:
 
     CVector m_vecPosition;
 
-    unsigned int          m_uiTypeHash;
-    std::string           m_strTypeName;
-    std::string           m_strName;
-    CChildListType        m_Children;
-    CElementListSnapshot* m_pChildrenListSnapshot;
-    uint                  m_uiChildrenListSnapshotRevision;
+    unsigned int            m_uiTypeHash;
+    std::string             m_strTypeName;
+    std::string             m_strName;
+    CChildListType          m_Children;
+    CElementListSnapshotRef m_pChildrenListSnapshot;
+    uint                    m_uiChildrenListSnapshotRevision;
 
     std::list<class CPerPlayerEntity*> m_ElementReferenced;
     std::list<class CColShape*>        m_Collisions;

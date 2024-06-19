@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 #include "curl_setup.h"
@@ -39,43 +41,41 @@ void Curl_disconnect(struct Curl_easy *data,
                      struct connectdata *, bool dead_connection);
 CURLcode Curl_setup_conn(struct Curl_easy *data,
                          bool *protocol_done);
-void Curl_free_request_state(struct Curl_easy *data);
 CURLcode Curl_parse_login_details(const char *login, const size_t len,
                                   char **userptr, char **passwdptr,
                                   char **optionsptr);
 
-const struct Curl_handler *Curl_builtin_scheme(const char *scheme);
-
-bool Curl_is_ASCII_name(const char *hostname);
-CURLcode Curl_idnconvert_hostname(struct Curl_easy *data,
-                                  struct hostname *host);
-void Curl_free_idnconverted_hostname(struct hostname *host);
+/* Get protocol handler for a URI scheme
+ * @param scheme URI scheme, case-insensitive
+ * @return NULL of handler not found
+ */
+const struct Curl_handler *Curl_get_scheme_handler(const char *scheme);
+const struct Curl_handler *Curl_getn_scheme_handler(const char *scheme,
+                                                    size_t len);
 
 #define CURL_DEFAULT_PROXY_PORT 1080 /* default proxy port unless specified */
 #define CURL_DEFAULT_HTTPS_PROXY_PORT 443 /* default https proxy port unless
                                              specified */
 
 #ifdef CURL_DISABLE_VERBOSE_STRINGS
-#define Curl_verboseconnect(x,y)  Curl_nop_stmt
+#define Curl_verboseconnect(x,y,z)  Curl_nop_stmt
 #else
-void Curl_verboseconnect(struct Curl_easy *data, struct connectdata *conn);
+void Curl_verboseconnect(struct Curl_easy *data, struct connectdata *conn,
+                         int sockindex);
 #endif
 
-#ifdef CURL_DISABLE_PROXY
-#define CONNECT_PROXY_SSL() FALSE
+#if defined(USE_HTTP2) || defined(USE_HTTP3)
+void Curl_data_priority_clear_state(struct Curl_easy *data);
 #else
+#define Curl_data_priority_clear_state(x)
+#endif /* !(defined(USE_HTTP2) || defined(USE_HTTP3)) */
 
-#define CONNECT_PROXY_SSL()\
-  (conn->http_proxy.proxytype == CURLPROXY_HTTPS &&\
-  !conn->bits.proxy_ssl_connected[sockindex])
-
-#define CONNECT_FIRSTSOCKET_PROXY_SSL()\
-  (conn->http_proxy.proxytype == CURLPROXY_HTTPS &&\
-  !conn->bits.proxy_ssl_connected[FIRSTSOCKET])
-
-#define CONNECT_SECONDARYSOCKET_PROXY_SSL()\
-  (conn->http_proxy.proxytype == CURLPROXY_HTTPS &&\
-  !conn->bits.proxy_ssl_connected[SECONDARYSOCKET])
-#endif /* !CURL_DISABLE_PROXY */
+#ifdef USE_NGHTTP2
+CURLcode Curl_data_priority_add_child(struct Curl_easy *parent,
+                                      struct Curl_easy *child,
+                                      bool exclusive);
+#else
+#define Curl_data_priority_add_child(x, y, z) CURLE_NOT_BUILT_IN
+#endif
 
 #endif /* HEADER_CURL_URL_H */

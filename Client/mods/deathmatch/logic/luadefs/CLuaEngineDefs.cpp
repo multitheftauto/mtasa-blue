@@ -10,16 +10,63 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CColPoint.h>
+#include <game/CObjectGroupPhysicalProperties.h>
+#include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
+
+//! Set the CModelCacheManager limits
+//! By passing `nil`/no value the original values are restored
+void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
+    g_pClientGame->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
+}
 
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
 {
     g_pGame->GetStreaming()->MakeSpaceFor(bytes);
 }
 
+// Get currenlty used memory for stremaing [In bytes]
 std::uint32_t EngineStreamingGetUsedMemory()
 {
     return g_pGame->GetStreaming()->GetMemoryUsed();
+}
+
+// Set the streaming memory size to a custom value
+void EngineStreamingSetMemorySize(size_t sizeBytes) {
+    if (sizeBytes == 0) {
+        throw std::invalid_argument{"Memory size must be > 0"};
+    }
+    g_pCore->SetCustomStreamingMemory(sizeBytes);
+}
+
+// Restore memory size to cvar
+void EngineStreamingRestoreMemorySize() {
+    g_pCore->SetCustomStreamingMemory(0);
+}
+
+// Get the streaming memory size [In bytes] - This is the limit, not the amount currently used! [See `EngineStreamingGetUsedMemory`]
+size_t EngineStreamingGetMemorySize() {
+    return g_pCore->GetStreamingMemory();
+}
+
+// Set streaming buffer size
+bool EngineStreamingSetBufferSize(size_t sizeBytes) {
+    const auto sizeBlocks = sizeBytes / 2048;
+    if (sizeBlocks > g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks()) { // Can't allow it to be less than the largest file
+        return g_pGame->GetStreaming()->SetStreamingBufferSize(sizeBlocks);
+    } else {
+        return false;
+    }
+}
+
+void EngineStreamingRestoreBufferSize() {
+    g_pGame->GetStreaming()->SetStreamingBufferSize(g_pClientGame->GetManager()->GetIMGManager()->GetLargestFileSizeBlocks());
+}
+
+// Get current streaming buffer size
+size_t EngineStreamingGetBufferSize() {
+    return g_pGame->GetStreaming()->GetStreamingBufferSize();
 }
 
 void CLuaEngineDefs::LoadFunctions()
@@ -60,10 +107,41 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineSetObjectGroupPhysicalProperty", EngineSetObjectGroupPhysicalProperty},
         {"engineGetObjectGroupPhysicalProperty", EngineGetObjectGroupPhysicalProperty},
         {"engineRestoreObjectGroupPhysicalProperties", EngineRestoreObjectGroupPhysicalProperties},
+        {"engineGetModelFlags", ArgumentParser<EngineGetModelFlags>},
+        {"engineSetModelFlags", ArgumentParser<EngineSetModelFlags>},
+        {"engineGetModelFlag", ArgumentParser<EngineGetModelFlag>},
+        {"engineSetModelFlag", ArgumentParser<EngineSetModelFlag>},
+        {"engineResetModelFlags", ArgumentParser<EngineResetModelFlags>},
         {"engineRestreamWorld", ArgumentParser<EngineRestreamWorld>},
+        {"engineLoadIMG", ArgumentParser<EngineLoadIMG>},
+        {"engineImageLinkDFF", ArgumentParser<EngineImageLinkDFF>},
+        {"engineImageLinkTXD", ArgumentParser<EngineImageLinkTXD>},
+        {"engineRestoreDFFImage", ArgumentParser<EngineRestoreDFFImage>},
+        {"engineRestoreTXDImage", ArgumentParser<EngineRestoreTXDImage>},
+        {"engineAddImage", ArgumentParser<EngineAddImage>},
+        {"engineRemoveImage", ArgumentParser<EngineRemoveImage>},
+        {"engineImageGetFilesCount", ArgumentParser<EngineImageGetFilesCount>},
+        {"engineImageGetFiles", ArgumentParser<EngineImageGetFileList>},
+        {"engineImageGetFile", ArgumentParser<EngineImageGetFile>},
+        {"engineGetModelTXDID", ArgumentParser<EngineGetModelTXDID>},
+        {"engineSetModelTXDID", ArgumentParser<EngineSetModelTXDID>},
+        {"engineResetModelTXDID", ArgumentParser<EngineResetModelTXDID>},
         {"engineStreamingFreeUpMemory", ArgumentParser<EngineStreamingFreeUpMemory>},
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
-
+        {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
+        {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
+        {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
+        {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
+        {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
+        {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
+        {"engineStreamingRestoreBufferSize", ArgumentParser<EngineStreamingRestoreBufferSize>},
+        {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
+        {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
+        {"engineGetPoolCapacity", ArgumentParser<EngineGetPoolCapacity>},
+        {"engineGetPoolDefaultCapacity", ArgumentParser<EngineGetPoolDefaultCapacity>},
+        {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
+        {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
+        
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
         // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );
@@ -87,6 +165,8 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setModelLODDistance", "engineSetModelLODDistance");
     lua_classfunction(luaVM, "resetModelLODDistance", "engineResetModelLODDistance");
     lua_classfunction(luaVM, "setModelVisibleTime", "engineSetModelVisibleTime");
+    lua_classfunction(luaVM, "restoreDFFImage", "engineRestoreDFFImage");
+    lua_classfunction(luaVM, "restoreTXDImage", "engineRestoreTXDImage");
 
     lua_classfunction(luaVM, "getVisibleTextureNames", "engineGetVisibleTextureNames");
     lua_classfunction(luaVM, "getModelLODDistance", "engineGetModelLODDistance");
@@ -102,11 +182,39 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getObjectGroupPhysicalProperty", "engineGetObjectGroupPhysicalProperty");
     lua_classfunction(luaVM, "restoreObjectGroupPhysicalProperties", "engineRestoreObjectGroupPhysicalProperties");
 
+    lua_classfunction(luaVM, "setModelFlags", "engineSetModelFlags");
+    lua_classfunction(luaVM, "resetModelFlags", "engineResetModelFlags");
+    lua_classfunction(luaVM, "getModelFlags", "engineGetModelFlags");
+
+    lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
+    lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
+    lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
+
     lua_registerstaticclass(luaVM, "Engine");
+
+    // `EngineStreaming` class
+    lua_newclass(luaVM);
+    {
+        lua_classfunction(luaVM, "freeUpMemory", "engineStreamingFreeUpMemory");
+        lua_classfunction(luaVM, "getUsedMemory", "engineStreamingGetUsedMemory");
+        lua_classfunction(luaVM, "setMemorySize", "engineStreamingSetMemorySize");
+        lua_classfunction(luaVM, "getMemorySize", "engineStreamingGetMemorySize");
+        lua_classfunction(luaVM, "setModelCacheLimits", "engineStreamingSetModelCacheLimits");
+        lua_classfunction(luaVM, "restoreMemorySize", "engineStreamingRestoreMemorySize");
+        lua_classfunction(luaVM, "getBufferSize", "engineStreamingGetBufferSize");
+        lua_classfunction(luaVM, "setBufferSize", "engineStreamingSetBufferSize");
+        lua_classfunction(luaVM, "restoreBufferSize", "engineStreamingRestoreBufferSize");
+
+        lua_classvariable(luaVM, "memorySize", "engineStreamingSetMemorySize", "engineStreamingGetMemorySize");
+        lua_classvariable(luaVM, "bufferSize", "engineStreamingSetBufferSize", "engineStreamingGetBufferSize");
+        lua_classvariable(luaVM, "usedMemory", NULL, "engineStreamingGetUsedMemory");
+    }
+    lua_registerstaticclass(luaVM, "EngineStreaming");
 
     AddEngineColClass(luaVM);
     AddEngineTxdClass(luaVM);
     AddEngineDffClass(luaVM);
+    AddEngineImgClass(luaVM);
 }
 
 void CLuaEngineDefs::AddEngineColClass(lua_State* luaVM)
@@ -128,6 +236,25 @@ void CLuaEngineDefs::AddEngineTxdClass(lua_State* luaVM)
     lua_classfunction(luaVM, "import", "engineImportTXD");
 
     lua_registerclass(luaVM, "EngineTXD", "Element");
+}
+
+void CLuaEngineDefs::AddEngineImgClass(lua_State* luaVM)
+{
+    lua_newclass(luaVM);
+
+    lua_classfunction(luaVM, "create", "engineLoadIMG");
+    lua_classfunction(luaVM, "add", "engineAddImage");
+    lua_classfunction(luaVM, "remove", "engineRemoveImage");
+    lua_classfunction(luaVM, "getFile", "engineImageGetFile");
+    lua_classfunction(luaVM, "getFiles", "engineImageGetFiles");
+    lua_classfunction(luaVM, "getFilesCount", "engineImageGetFilesCount");
+    lua_classfunction(luaVM, "linkTXD", "engineImageLinkTXD");
+    lua_classfunction(luaVM, "linkDFF", "engineImageLinkDFF");
+
+    lua_classvariable(luaVM, "filesCount", nullptr, ArgumentParser<EngineImageGetFilesCount>);
+    lua_classvariable(luaVM, "files", nullptr, ArgumentParser<EngineImageGetFileList>);
+
+    lua_registerclass(luaVM, "EngineIMG", "Element");
 }
 
 void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
@@ -516,6 +643,148 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
     return 1;
 }
 
+CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strRelativeFilePath)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    // Get the resource we belong to
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return false;
+
+    std::string strFullPath;
+
+    if (CResourceManager::ParseResourcePathInput(strRelativeFilePath, pResource, &strFullPath))
+    {
+        // Grab the resource root entity
+        CClientEntity* pRoot = pResource->GetResourceIMGRoot();
+        // Create the img handle
+        CClientIMG* pImg = new CClientIMG(m_pManager, INVALID_ELEMENT_ID);
+
+        // Fix path encoding for sdt::filesystem
+        std::wstring utf8Path = SharedUtil::MbUTF8ToUTF16(strFullPath);
+
+        // Attempt loading the file
+        if (pImg->Load(std::move(utf8Path)))
+        {
+            // Success. Make it a child of the resource img root
+            pImg->SetParent(pRoot);
+
+            return pImg;
+        }
+        else
+        {
+            delete pImg;
+            throw std::invalid_argument("Error loading IMG");
+        }
+    }
+
+    throw std::invalid_argument("Bad file path");
+}
+
+bool CLuaEngineDefs::EngineAddImage(CClientIMG* pIMG)
+{
+    return pIMG->StreamEnable();
+}
+
+bool CLuaEngineDefs::EngineRemoveImage(CClientIMG* pIMG)
+{
+    return pIMG->StreamDisable();
+}
+
+uint CLuaEngineDefs::EngineImageGetFilesCount(CClientIMG* pIMG)
+{
+    return pIMG->GetFilesCount();
+}
+
+std::vector<std::string_view> CLuaEngineDefs::EngineImageGetFileList(CClientIMG* pIMG)
+{
+    const auto& fileInfos = pIMG->GetFileInfos();
+
+    std::vector<std::string_view> out;
+    out.reserve(fileInfos.size());
+
+    for (const auto& fileInfo : fileInfos)
+        out.emplace_back(fileInfo.szFileName);
+
+    return out;
+}
+
+static size_t ResolveIMGFileID(CClientIMG* pIMG, std::variant<size_t, std::string_view> file)
+{
+    if (std::holds_alternative<size_t>(file))
+        return std::get<size_t>(file);
+
+    const auto fileName = std::get<std::string_view>(file);
+    if (const auto id = pIMG->GetFileID(fileName))
+        return id.value();
+    throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)fileName.length(), fileName.data()));
+}
+
+std::string CLuaEngineDefs::EngineImageGetFile(CClientIMG* pIMG, std::variant<size_t, std::string_view> file)
+{
+    std::string buffer;
+
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))            // Get file might throw
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    return buffer;
+}
+
+bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiModelID)
+{
+    if (uiModelID >= 20000)
+        throw std::invalid_argument(SString("Expected modelid in range 0 - 19999, got %d", uiModelID));
+
+    size_t      fileID = ResolveIMGFileID(pIMG, file);
+    std::string buffer;
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    if (!g_pCore->GetNetwork()->CheckFile("dff", "", buffer.data(), buffer.size()))
+        throw std::invalid_argument("Failed to link file. Make sure the archieve isn't corrupted.");
+
+    return pIMG->LinkModel(uiModelID, fileID);
+}
+
+bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
+{
+    if (uiTxdID >= 5000)
+        throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
+
+    size_t      fileID = ResolveIMGFileID(pIMG, file);
+    std::string buffer;
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
+        throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
+
+    if (!g_pCore->GetNetwork()->CheckFile("txd", "", buffer.data(), buffer.size()))
+        throw std::invalid_argument("Failed to link file. Make sure the archieve isn't corrupted.");
+
+    return pIMG->LinkModel(20000 + uiTxdID, fileID);
+}
+
+bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
+{
+    if (uiModelID >= 20000)
+        throw std::invalid_argument("Expected model ID in range [0-19999] at argument 1");
+
+    if (CClientIMGManager::IsLinkableModel(uiModelID))
+        return m_pImgManager->RestoreModel(uiModelID);
+
+    return false;
+}
+
+bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
+{
+    if (uiModelID >= 5000)
+        throw std::invalid_argument("Expected TXD ID in range [0-4999] at argument 1");
+
+    if (CClientIMGManager::IsLinkableModel(uiModelID))
+        return m_pImgManager->RestoreModel(20000 + uiModelID);
+
+    return false;
+}
+
 int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 {
     CClientDFF* pDFF;
@@ -594,12 +863,10 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
             if (!argStream.HasErrors())
             {
                 int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
-                if (iModelID != INVALID_MODEL_ID)
-                {
-                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(iModelID);
-                    if (pModel == nullptr)
-                        pModel = std::make_shared<CClientModel>(m_pManager, iModelID, eModelType);
+                if (iModelID != INVALID_MODEL_ID) {
+                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
                     m_pManager->GetModelManager()->Add(pModel);
+
                     ushort usParentID = -1;
 
                     if (argStream.NextIsNumber())
@@ -610,6 +877,12 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
                         {
                             case eClientModelType::PED:
                                 usParentID = 7;            // male01
+                                break;
+                            case eClientModelType::TIMED_OBJECT:
+                                usParentID = 4715;            // LTSLAsky1_LAn2
+                                break;
+                            case eClientModelType::CLUMP:
+                                usParentID = 3425;            // nt_windmill (windmill)
                                 break;
                             case eClientModelType::OBJECT:
                                 usParentID = 1337;            // BinNt07_LA (trash can)
@@ -1011,6 +1284,38 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
     // We failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    return pModelInfo->GetTextureDictionaryID();
+}
+
+bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    pModelInfo->SetTextureDictionaryID(usTxdId);
+    return true;
+}
+
+bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    pModelInfo->ResetTextureDictionaryID();
+    return true;
 }
 
 int CLuaEngineDefs::EngineGetModelNameFromID(lua_State* luaVM)
@@ -1642,7 +1947,8 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
-            lua_pushnumber(luaVM, pModelInfo->GetObjectPropertiesGroup());
+            uint16_t groupId = pModelInfo->GetObjectPropertiesGroup();
+            lua_pushnumber(luaVM, groupId == 0xFFFF ? -1 : groupId);
             return 1;
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
@@ -1654,8 +1960,8 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
-    int          iModelID;
-    unsigned int iNewGroup;
+    int iModelID;
+    int iNewGroup;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(iModelID);
@@ -1669,9 +1975,9 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
-        if (iNewGroup < 0 || iNewGroup > 159)
+        if (iNewGroup < -1 || iNewGroup > 159)
         {
-            argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+            argStream.SetCustomError("Expected group ID in range [0-159] or -1 at argument 1");
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
@@ -2053,8 +2359,149 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
     return 1;
 }
 
+uint CLuaEngineDefs::EngineGetModelFlags(uint uiModelId)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
+
+    if (uiModelId >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    return pModelInfo->GetFlags();
+}
+
+bool CLuaEngineDefs::EngineGetModelFlag(uint uiModelId, eModelIdeFlag eFlag)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelId);
+
+    if (uiModelId >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    return pModelInfo->GetIdeFlag(eFlag);
+}
+
+bool CLuaEngineDefs::EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags)
+{
+    // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    if (bIdeFlags.value_or(false))
+        pModelInfo->SetIdeFlags(uiFlags);
+    else
+        pModelInfo->SetFlags(uiFlags);
+
+    return true;
+}
+
+bool CLuaEngineDefs::EngineSetModelFlag(uint uiModelID, eModelIdeFlag eFlag, bool bState)
+{
+    // bool engineSetModelFlags ( int modelID, int flags [, bool isIde ] )
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    pModelInfo->SetIdeFlag(eFlag, bState);
+
+    return true;
+}
+
+bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
+{
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
+
+    if (uiModelID >= 20000 || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID in range [0-19999] at argument 1");
+
+    ushort usCurrentFlags = pModelInfo->GetFlags();
+    ushort usOriginalFlags = pModelInfo->GetOriginalFlags();
+    if (usOriginalFlags != usCurrentFlags)
+    {
+        pModelInfo->SetFlags(usOriginalFlags);
+        return true;
+    }
+
+    return false;
+}
+
 bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
 {
-    g_pClientGame->RestreamWorld();
+    bool restreamLODs{};
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(restreamLODs, false);
+
+    g_pClientGame->RestreamWorld(restreamLODs);
+    return true;
+}
+
+uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName)
+{
+    if (strTxdName.size() > 24)
+        throw std::invalid_argument("TXD name length shoudn't be more than 24 characters");
+
+    int iModelID = m_pManager->GetModelManager()->GetFreeTxdModelID();
+    if (iModelID == INVALID_MODEL_ID)
+        return false;
+
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eClientModelType::TXD);
+
+    pModel->AllocateTXD(strTxdName);
+    pModel->SetParentResource(m_pLuaManager->GetVirtualMachine(luaVM)->GetResource());
+    m_pManager->GetModelManager()->Add(pModel);
+
+    return iModelID - MAX_MODEL_DFF_ID;
+}
+
+bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
+{
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(MAX_MODEL_DFF_ID + txdID);
+    return pModel && pModel->Deallocate();
+}
+
+size_t CLuaEngineDefs::EngineGetPoolCapacity(ePools pool)
+{
+    return g_pGame->GetPools()->GetPoolCapacity(pool);
+}
+
+size_t CLuaEngineDefs::EngineGetPoolDefaultCapacity(ePools pool)
+{
+    return g_pGame->GetPools()->GetPoolDefaultModdedCapacity(pool);
+}
+
+size_t CLuaEngineDefs::EngineGetPoolUsedCapacity(ePools pool)
+{
+    return g_pGame->GetPools()->GetNumberOfUsedSpaces(pool);
+}
+
+bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t newSize)
+{
+    size_t minSize = g_pGame->GetPools()->GetPoolDefaultModdedCapacity(pool);
+    if (newSize < minSize)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot set the pool capacity to less than the default capacity.");
+        return false;
+    }
+
+    minSize = g_pGame->GetPools()->GetNumberOfUsedSpaces(pool);
+    if (newSize < minSize)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot set the pool capacity to less than the used capacity.");
+        return false;
+    }
+
+    switch (pool)
+    {
+        case ePools::BUILDING_POOL:
+        {
+            return m_pBuildingManager->SetPoolCapacity(newSize);
+        }
+        default:
+            throw std::invalid_argument("Can not change this pool capacity");
+    }
     return true;
 }

@@ -20,8 +20,8 @@ namespace SharedUtil
     //
     // Returns true if the file/directory exists
     //
-    bool FileExists(const SString& strFilename);
-    bool DirectoryExists(const SString& strPath);
+    bool FileExists(const std::string& strFilename) noexcept;
+    bool DirectoryExists(const std::string& strPath) noexcept;
 
     //
     // Load from a file
@@ -70,6 +70,7 @@ namespace SharedUtil
     bool                 FileCopy(const SString& strSrc, const SString& strDest, bool bForce = true);
     std::vector<SString> FindFiles(const SString& strMatch, bool bFiles, bool bDirectories, bool bSortByDate = false);
     SString              MakeUniquePath(const SString& strPathFilename);
+    SString              MakeGenericPath(const SString& uniqueFilePath);
     SString              ConformPathForSorting(const SString& strPathFilename);
     bool                 IsAbsolutePath(const SString& strPath);
 
@@ -100,6 +101,8 @@ namespace SharedUtil
 
     WString FromUTF8(const SString& strPath);
     SString ToUTF8(const WString& strPath);
+
+    std::vector<std::string> ListDir(const char* szPath) noexcept;
 
     namespace File
     {

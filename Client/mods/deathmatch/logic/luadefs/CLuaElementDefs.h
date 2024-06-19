@@ -27,6 +27,7 @@ public:
     LUA_DECLARE(GetElementByID);
     LUA_DECLARE(GetElementByIndex);
     LUA_DECLARE(GetElementData);
+    static CLuaArguments GetAllElementData(CClientEntity* pElement);
     LUA_DECLARE(HasElementData);
     LUA_DECLARE(GetElementParent);
     LUA_DECLARE_OOP(GetElementMatrix);
@@ -53,6 +54,7 @@ public:
     LUA_DECLARE(IsElementLocal);
     LUA_DECLARE(GetElementAttachedOffsets);
     LUA_DECLARE(GetElementAlpha);
+    static std::variant<bool, float> GetElementLighting(CClientEntity* entity);
     LUA_DECLARE(IsElementOnScreen);
     LUA_DECLARE(GetElementHealth);
     LUA_DECLARE(IsElementStreamedIn);
@@ -95,6 +97,6 @@ public:
     LUA_DECLARE(SetElementCollidableWith);
     LUA_DECLARE(SetElementDoubleSided);
     LUA_DECLARE(SetElementFrozen);
-    LUA_DECLARE(SetLowLodElement);
+    static bool SetLowLodElement(lua_State* luaVM, CClientEntity* pEntity, std::optional<CClientEntity*> pLowLodEntity);
     LUA_DECLARE(SetElementCallPropagationEnabled);
 };

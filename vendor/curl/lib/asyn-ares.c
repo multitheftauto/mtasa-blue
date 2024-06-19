@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -45,15 +47,6 @@
 #include <inet.h>
 #endif
 
-#ifdef HAVE_PROCESS_H
-#include <process.h>
-#endif
-
-#if (defined(NETWARE) && defined(__NOVELL_LIBC__))
-#undef in_addr_t
-#define in_addr_t unsigned long
-#endif
-
 #include "urldata.h"
 #include "sendf.h"
 #include "hostip.h"
@@ -67,13 +60,13 @@
 #include "progress.h"
 #include "timediff.h"
 
-#  if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
-  defined(WIN32)
-#    define CARES_STATICLIB
-#  endif
-#  include <ares.h>
-#  include <ares_version.h> /* really old c-ares didn't include this by
-                               itself */
+#if defined(CURL_STATICLIB) && !defined(CARES_STATICLIB) &&   \
+  defined(_WIN32)
+#  define CARES_STATICLIB
+#endif
+#include <ares.h>
+#include <ares_version.h> /* really old c-ares didn't include this by
+                             itself */
 
 #if ARES_VERSION >= 0x010500
 /* c-ares 1.5.0 or later, the callback proto is modified */
@@ -113,10 +106,11 @@ struct thread_data {
 #ifndef HAVE_CARES_GETADDRINFO
   struct curltime happy_eyeballs_dns_time; /* when this timer started, or 0 */
 #endif
+  char hostname[1];
 };
 
 /* How long we are willing to wait for additional parallel responses after
-   obtaining a "definitive" one.
+   obtaining a "definitive" one. For old c-ares without getaddrinfo.
 
    This is intended to equal the c-ares default timeout.  cURL always uses that
    default value.  Unfortunately, c-ares doesn't expose its default timeout in
@@ -125,6 +119,10 @@ struct thread_data {
    See query_completed_cb() for an explanation of how this is used.
  */
 #define HAPPY_EYEBALLS_DNS_TIMEOUT 5000
+
+#define CARES_TIMEOUT_PER_ATTEMPT 2000
+
+static int ares_ver = 0;
 
 /*
  * Curl_resolver_global_init() - the generic low-level asynchronous name
@@ -138,6 +136,7 @@ int Curl_resolver_global_init(void)
     return CURLE_FAILED_INIT;
   }
 #endif
+  ares_version(&ares_ver);
   return CURLE_OK;
 }
 
@@ -179,6 +178,22 @@ CURLcode Curl_resolver_init(struct Curl_easy *easy, void **resolver)
   int optmask = ARES_OPT_SOCK_STATE_CB;
   options.sock_state_cb = sock_state_cb;
   options.sock_state_cb_data = easy;
+
+  /*
+     if c ares < 1.20.0: curl set timeout to CARES_TIMEOUT_PER_ATTEMPT (2s)
+
+     if c-ares >= 1.20.0 it already has the timeout to 2s, curl does not need
+     to set the timeout value;
+
+     if c-ares >= 1.24.0, user can set the timeout via /etc/resolv.conf to
+     overwrite c-ares' timeout.
+  */
+  DEBUGASSERT(ares_ver);
+  if(ares_ver < 0x011400) {
+    options.timeout = CARES_TIMEOUT_PER_ATTEMPT;
+    optmask |= ARES_OPT_TIMEOUTMS;
+  }
+
   status = ares_init_options((ares_channel*)resolver, &options, optmask);
   if(status != ARES_SUCCESS) {
     if(status == ARES_ENOMEM)
@@ -250,8 +265,6 @@ void Curl_resolver_kill(struct Curl_easy *data)
  */
 static void destroy_async_data(struct Curl_async *async)
 {
-  free(async->hostname);
-
   if(async->tdata) {
     struct thread_data *res = async->tdata;
     if(res) {
@@ -263,8 +276,6 @@ static void destroy_async_data(struct Curl_async *async)
     }
     async->tdata = NULL;
   }
-
-  async->hostname = NULL;
 }
 
 /*
@@ -306,7 +317,7 @@ int Curl_resolver_getsock(struct Curl_easy *data,
  * 2) wait for the timeout period to check for action on ares' sockets.
  * 3) tell ares to act on all the sockets marked as "with action"
  *
- * return number of sockets it worked on
+ * return number of sockets it worked on, or -1 on error
  */
 
 static int waitperform(struct Curl_easy *data, timediff_t timeout_ms)
@@ -338,8 +349,11 @@ static int waitperform(struct Curl_easy *data, timediff_t timeout_ms)
       break;
   }
 
-  if(num)
+  if(num) {
     nfds = Curl_poll(pfd, num, timeout_ms);
+    if(nfds < 0)
+      return -1;
+  }
   else
     nfds = 0;
 
@@ -376,7 +390,8 @@ CURLcode Curl_resolver_is_resolved(struct Curl_easy *data,
   DEBUGASSERT(dns);
   *dns = NULL;
 
-  waitperform(data, 0);
+  if(waitperform(data, 0) < 0)
+    return CURLE_UNRECOVERABLE_POLL;
 
 #ifndef HAVE_CARES_GETADDRINFO
   /* Now that we've checked for any last minute results above, see if there are
@@ -475,7 +490,8 @@ CURLcode Curl_resolver_wait_resolv(struct Curl_easy *data,
     else
       timeout_ms = 1000;
 
-    waitperform(data, timeout_ms);
+    if(waitperform(data, timeout_ms) < 0)
+      return CURLE_UNRECOVERABLE_POLL;
     result = Curl_resolver_is_resolved(data, entry);
 
     if(result || data->state.async.done)
@@ -523,7 +539,7 @@ static void compound_results(struct thread_data *res,
   if(!ai)
     return;
 
-#ifdef ENABLE_IPV6 /* CURLRES_IPV6 */
+#ifdef USE_IPV6 /* CURLRES_IPV6 */
   if(res->temp_ai && res->temp_ai->ai_family == PF_INET6) {
     /* We have results already, put the new IPv6 entries at the head of the
        list. */
@@ -668,7 +684,7 @@ static struct Curl_addrinfo *ares2addr(struct ares_addrinfo_node *node)
     /* settle family-specific sockaddr structure size.  */
     if(ai->ai_family == AF_INET)
       ss_size = sizeof(struct sockaddr_in);
-#ifdef ENABLE_IPV6
+#ifdef USE_IPV6
     else if(ai->ai_family == AF_INET6)
       ss_size = sizeof(struct sockaddr_in6);
 #endif
@@ -742,7 +758,7 @@ static void addrinfo_cb(void *arg, int status, int timeouts,
  * Curl_resolver_getaddrinfo() - when using ares
  *
  * Returns name information about the given hostname and port number. If
- * successful, the 'hostent' is returned and the forth argument will point to
+ * successful, the 'hostent' is returned and the fourth argument will point to
  * memory we need to free after use. That memory *MUST* be freed with
  * Curl_freeaddrinfo(), nothing else.
  */
@@ -751,25 +767,18 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
                                                 int port,
                                                 int *waitp)
 {
-  char *bufp;
-
+  struct thread_data *res = NULL;
+  size_t namelen = strlen(hostname);
   *waitp = 0; /* default to synchronous response */
 
-  bufp = strdup(hostname);
-  if(bufp) {
-    struct thread_data *res = NULL;
-    free(data->state.async.hostname);
-    data->state.async.hostname = bufp;
+  res = calloc(1, sizeof(struct thread_data) + namelen);
+  if(res) {
+    strcpy(res->hostname, hostname);
+    data->state.async.hostname = res->hostname;
     data->state.async.port = port;
     data->state.async.done = FALSE;   /* not done */
     data->state.async.status = 0;     /* clear */
     data->state.async.dns = NULL;     /* clear */
-    res = calloc(sizeof(struct thread_data), 1);
-    if(!res) {
-      free(data->state.async.hostname);
-      data->state.async.hostname = NULL;
-      return NULL;
-    }
     data->state.async.tdata = res;
 
     /* initial status - failed */
@@ -782,13 +791,22 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
       int pf = PF_INET;
       memset(&hints, 0, sizeof(hints));
 #ifdef CURLRES_IPV6
-      if(Curl_ipv6works(data))
+      if((data->conn->ip_version != CURL_IPRESOLVE_V4) &&
+         Curl_ipv6works(data)) {
         /* The stack seems to be IPv6-enabled */
-        pf = PF_UNSPEC;
+        if(data->conn->ip_version == CURL_IPRESOLVE_V6)
+          pf = PF_INET6;
+        else
+          pf = PF_UNSPEC;
+      }
 #endif /* CURLRES_IPV6 */
       hints.ai_family = pf;
       hints.ai_socktype = (data->conn->transport == TRNSPRT_TCP)?
         SOCK_STREAM : SOCK_DGRAM;
+      /* Since the service is a numerical one, set the hint flags
+       * accordingly to save a call to getservbyname in inside C-Ares
+       */
+      hints.ai_flags = ARES_AI_NUMERICSERV;
       msnprintf(service, sizeof(service), "%d", port);
       res->num_pending = 1;
       ares_getaddrinfo((ares_channel)data->state.async.resolver, hostname,
@@ -797,7 +815,7 @@ struct Curl_addrinfo *Curl_resolver_getaddrinfo(struct Curl_easy *data,
 #else
 
 #ifdef HAVE_CARES_IPV6
-    if(Curl_ipv6works(data)) {
+    if((data->conn->ip_version != CURL_IPRESOLVE_V4) && Curl_ipv6works(data)) {
       /* The stack seems to be IPv6-enabled */
       res->num_pending = 2;
 
@@ -832,7 +850,7 @@ CURLcode Curl_set_dns_servers(struct Curl_easy *data,
   /* If server is NULL or empty, this would purge all DNS servers
    * from ares library, which will cause any and all queries to fail.
    * So, just return OK if none are configured and don't actually make
-   * any changes to c-ares.  This lets c-ares use it's defaults, which
+   * any changes to c-ares.  This lets c-ares use its defaults, which
    * it gets from the OS (for instance from /etc/resolv.conf on Linux).
    */
   if(!(servers && servers[0]))
@@ -856,6 +874,7 @@ CURLcode Curl_set_dns_servers(struct Curl_easy *data,
   case ARES_ENODATA:
   case ARES_EBADSTR:
   default:
+    DEBUGF(infof(data, "bad servers set"));
     result = CURLE_BAD_FUNCTION_ARGUMENT;
     break;
   }
@@ -894,6 +913,7 @@ CURLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
   }
   else {
     if(Curl_inet_pton(AF_INET, local_ip4, &a4) != 1) {
+      DEBUGF(infof(data, "bad DNS IPv4 address"));
       return CURLE_BAD_FUNCTION_ARGUMENT;
     }
   }
@@ -912,7 +932,7 @@ CURLcode Curl_set_dns_local_ip4(struct Curl_easy *data,
 CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
                                 const char *local_ip6)
 {
-#if defined(HAVE_CARES_SET_LOCAL) && defined(ENABLE_IPV6)
+#if defined(HAVE_CARES_SET_LOCAL) && defined(USE_IPV6)
   unsigned char a6[INET6_ADDRSTRLEN];
 
   if((!local_ip6) || (local_ip6[0] == 0)) {
@@ -921,6 +941,7 @@ CURLcode Curl_set_dns_local_ip6(struct Curl_easy *data,
   }
   else {
     if(Curl_inet_pton(AF_INET6, local_ip6, a6) != 1) {
+      DEBUGF(infof(data, "bad DNS IPv6 address"));
       return CURLE_BAD_FUNCTION_ARGUMENT;
     }
   }

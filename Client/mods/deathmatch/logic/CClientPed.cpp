@@ -9,7 +9,28 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "game/CAnimBlendAssocGroup.h"
+#include <game/CAEVehicleAudioEntity.h>
+#include <game/CAnimBlendAssocGroup.h>
+#include <game/CAnimManager.h>
+#include <game/CCam.h>
+#include <game/CCarEnterExit.h>
+#include <game/CColPoint.h>
+#include <game/CPedIntelligence.h>
+#include <game/CPedSound.h>
+#include <game/CStreaming.h>
+#include <game/CTaskManager.h>
+#include <game/CTasks.h>
+#include <game/CVisibilityPlugins.h>
+#include <game/CWeapon.h>
+#include <game/CWeaponStat.h>
+#include <game/CWeaponStatManager.h>
+#include <game/TaskBasic.h>
+#include <game/TaskCar.h>
+#include <game/TaskCarAccessories.h>
+#include <game/TaskIK.h>
+#include <game/TaskJumpFall.h>
+#include <game/TaskPhysicalResponse.h>
+#include <game/TaskAttack.h>
 
 using std::list;
 using std::vector;
@@ -516,21 +537,17 @@ void CClientPed::SetPosition(const CVector& vecPosition, bool bResetInterpolatio
         // Don't set the actual position if we're in a vehicle
         if (!GetRealOccupiedVehicle())
         {
-            // Set it only if we're not in a vehicle or not working on getting in/out
-            if (!m_pOccupiedVehicle || GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT)
+            // Is this the local player?
+            if (m_bIsLocalPlayer)
             {
-                // Is this the local player?
-                if (m_bIsLocalPlayer)
-                {
-                    // If move is big enough, do ground checks
-                    float DistanceMoved = (m_Matrix.vPos - vecPosition).Length();
-                    if (DistanceMoved > 50 && !IsFrozen() && bAllowGroundLoadFreeze)
-                        SetFrozenWaitingForGroundToLoad(true);
-                }
-
-                // Set the real position
-                m_pPlayerPed->SetPosition(const_cast<CVector*>(&vecPosition));
+                // If move is big enough, do ground checks
+                float DistanceMoved = (m_Matrix.vPos - vecPosition).Length();
+                if (DistanceMoved > 50 && !IsFrozen() && bAllowGroundLoadFreeze)
+                    SetFrozenWaitingForGroundToLoad(true);
             }
+
+            // Set the real position
+            m_pPlayerPed->SetPosition(const_cast<CVector*>(&vecPosition));
         }
     }
 
@@ -2036,10 +2053,6 @@ void CClientPed::SetFrozenWaitingForGroundToLoad(bool bFrozen)
 
 CWeapon* CClientPed::GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, bool bSetAsCurrent)
 {
-    // Multiply ammo with 10 if flamethrower to get the numbers correct.
-    if (weaponType == WEAPONTYPE_FLAMETHROWER)
-        uiAmmo *= 10;
-
     CWeapon* pWeapon = NULL;
     if (m_pPlayerPed)
     {
@@ -3266,57 +3279,6 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
             }
         }
     }
-
-    // Fix for stuck aim+move when FPS is greater than 45. This hack will raise the limit to 70 FPS
-    // Fix works by applying a small input pulse on the other axis, at the start of movement
-    pTask = m_pTaskManager->GetTaskSecondary(TASK_SECONDARY_ATTACK);
-    if (pTask && pTask->GetTaskType() == TASK_SIMPLE_USE_GUN)
-    {
-        // Make sure not crouching
-        pTask = m_pTaskManager->GetTaskSecondary(TASK_SECONDARY_DUCK);
-        if (!pTask || pTask->GetTaskType() != TASK_SIMPLE_DUCK)
-        {
-            eWeaponType  eWeapon = GetCurrentWeaponType();
-            float        fSkill = GetStat(g_pGame->GetStats()->GetSkillStatIndex(eWeapon));
-            CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(eWeapon, fSkill);
-            // Apply fix for aimable weapons only
-            if (pWeaponStat && pWeaponStat->IsFlagSet(WEAPONTYPE_CANAIMWITHARM) == false)
-            {
-                // See which way input wants to go
-                const bool bInputRight = Current.LeftStickX > 6;
-                const bool bInputLeft = Current.LeftStickX < -6;
-                const bool bInputFwd = Current.LeftStickY < -6;
-                const bool bInputBack = Current.LeftStickY > 6;
-
-                // See which way ped is currently going
-                CVector vecVelocity, vecRotationRadians;
-                GetMoveSpeed(vecVelocity);
-                GetRotationRadians(vecRotationRadians);
-                RotateVector(vecVelocity, -vecRotationRadians);
-
-                // Calc how much to pulse other axis
-                short sFixY = 0;
-                short sFixX = 0;
-
-                if (bInputRight && vecVelocity.fX >= 0.f)
-                    sFixY = static_cast<short>(UnlerpClamped(0.02f, vecVelocity.fX, 0.f) * 64);
-                else if (bInputLeft && vecVelocity.fX <= 0.f)
-                    sFixY = static_cast<short>(UnlerpClamped(-0.02f, vecVelocity.fX, 0.f) * -64);
-
-                if (bInputFwd && vecVelocity.fY >= 0.f)
-                    sFixX = static_cast<short>(UnlerpClamped(0.02f, vecVelocity.fY, 0.f) * 64);
-                else if (bInputBack && vecVelocity.fY <= 0.f)
-                    sFixX = static_cast<short>(UnlerpClamped(-0.02f, vecVelocity.fY, 0.f) * -64);
-
-                // Apply pulse if bigger than existing input value
-                if (abs(sFixY) > abs(Current.LeftStickY))
-                    Current.LeftStickY = sFixY;
-
-                if (abs(sFixX) > abs(Current.LeftStickX))
-                    Current.LeftStickX = sFixX;
-            }
-        }
-    }
 }
 
 float CClientPed::GetCurrentRotation()
@@ -3363,7 +3325,7 @@ void CClientPed::SetTargetRotation(unsigned long ulDelay, float fRotation, float
 {
     m_ulBeginRotationTime = CClientTime::GetTime();
     m_ulEndRotationTime = m_ulBeginRotationTime + ulDelay;
-    m_fBeginRotation = (m_pPlayerPed) ? m_pPlayerPed->GetTargetRotation() : m_fCurrentRotation;
+    m_fBeginRotation = (m_pPlayerPed) ? m_pPlayerPed->GetCurrentRotation() : m_fCurrentRotation;
     m_fTargetRotationA = fRotation;
     m_fBeginCameraRotation = GetCameraRotation();
     m_fTargetCameraRotation = fCameraRotation;
@@ -3421,23 +3383,24 @@ void CClientPed::Interpolate()
         {
             // We're not at the end?
             if (ulCurrentTime < m_ulEndRotationTime)
-            {
-                // Interpolate the player rotation
-                float fDeltaTime = float(m_ulEndRotationTime - m_ulBeginRotationTime);
-                float fDelta = GetOffsetDegrees(m_fBeginRotation, m_fTargetRotationA);
-                float fCameraDelta = GetOffsetDegrees(m_fBeginCameraRotation, m_fTargetCameraRotation);
-                float fProgress = float(ulCurrentTime - m_ulBeginRotationTime);
-                float fNewRotation = m_fBeginRotation + (fDelta / fDeltaTime * fProgress);
-                float fNewCameraRotation = m_fBeginCameraRotation + (fCameraDelta / fDeltaTime * fProgress);
+            {                              
+                const float fDelta = GetOffsetRadians(m_fBeginRotation, m_fTargetRotationA);                
 
                 // Hack for the wrap-around (the edge seems to be varying...)
-                if (fDelta < -5.0f || fDelta > 5.0f)
+                if (fDelta < -M_PI || fDelta > M_PI)
                 {
                     SetCurrentRotation(m_fTargetRotationA);
                     SetCameraRotation(m_fTargetCameraRotation);
                 }
                 else
                 {
+                    // Interpolate the player rotation  
+                    const float fDeltaTime = float(m_ulEndRotationTime - m_ulBeginRotationTime);
+                    const float fCameraDelta = GetOffsetRadians(m_fBeginCameraRotation, m_fTargetCameraRotation);
+                    const float fProgress = float(ulCurrentTime - m_ulBeginRotationTime);
+                    const float fNewRotation = m_fBeginRotation + fDelta * (fProgress / fDeltaTime);
+                    const float fNewCameraRotation = m_fBeginCameraRotation + fCameraDelta * (fProgress / fDeltaTime);
+
                     SetCurrentRotation(fNewRotation);
                     SetCameraRotation(fNewCameraRotation);
                 }
@@ -3608,7 +3571,7 @@ void CClientPed::_CreateModel()
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
 
     // Create the new ped
-    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, static_cast<ePedModel>(m_ulModel)));
+    m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, m_ulModel));
     if (m_pPlayerPed)
     {
         // Put our pointer in the stored data and update the remote data with the new model pointer
@@ -5980,6 +5943,12 @@ void CClientPed::SetVoice(const char* szVoiceType, const char* szVoice)
 {
     if (m_pPlayerPed)
         m_pPlayerPed->SetVoice(szVoiceType, szVoice);
+}
+
+void CClientPed::ResetVoice()
+{
+    if (m_pPlayerPed)
+        m_pPlayerPed->ResetVoice();
 }
 
 bool CClientPed::IsSpeechEnabled()

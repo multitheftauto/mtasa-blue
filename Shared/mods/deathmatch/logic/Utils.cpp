@@ -117,9 +117,9 @@ void RaiseFatalError(unsigned int uiCode)
 
 void RaiseProtocolError(unsigned int uiCode)
 {
-    //#ifdef MTA_DEBUG
-    //    assert ( 0 );
-    //#endif
+    // #ifdef MTA_DEBUG
+    //     assert ( 0 );
+    // #endif
 
     // Populate the message and show the box
     SString strBuffer(_("Protocol error (%u). If this problem persists, please check out mtasa.com for support."), uiCode);

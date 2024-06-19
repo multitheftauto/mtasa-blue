@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,10 +20,24 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 
 #if defined(BUILDING_LIBCURL) && !defined(CURL_NO_OLDIES)
 #define CURL_NO_OLDIES
+#endif
+
+/* FIXME: Delete this once the warnings have been fixed. */
+#if !defined(CURL_WARN_SIGN_CONVERSION)
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
+#endif
+
+/* Set default _WIN32_WINNT */
+#ifdef __MINGW32__
+#include <_mingw.h>
 #endif
 
 /*
@@ -34,15 +48,7 @@
 #pragma warning(disable:4127)
 #endif
 
-/*
- * Define WIN32 when build target is Win32 API
- */
-
-#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32)
-#define WIN32
-#endif
-
-#ifdef WIN32
+#ifdef _WIN32
 /*
  * Don't include unneeded stuff in Windows headers to avoid compiler
  * warnings and macro clashes.
@@ -66,6 +72,11 @@
 # endif
 #endif
 
+/* Compatibility */
+#if defined(ENABLE_IPV6)
+#  define USE_IPV6 1
+#endif
+
 /*
  * Include configuration script results or hand-crafted
  * configuration file for platforms which lack config tool.
@@ -80,12 +91,12 @@
 #ifdef _WIN32_WCE
 #  include "config-win32ce.h"
 #else
-#  ifdef WIN32
+#  ifdef _WIN32
 #    include "config-win32.h"
 #  endif
 #endif
 
-#if defined(macintosh) && defined(__MRC__)
+#ifdef macintosh
 #  include "config-mac.h"
 #endif
 
@@ -103,6 +114,10 @@
 
 #ifdef __PLAN9__
 #  include "config-plan9.h"
+#endif
+
+#ifdef MSDOS
+#  include "config-dos.h"
 #endif
 
 #endif /* HAVE_CONFIG_H */
@@ -150,8 +165,6 @@
 /*  If you need to include a system header file for your platform,  */
 /*  please, do it beyond the point further indicated in this file.  */
 /* ================================================================ */
-
-#include <curl/curl.h>
 
 /*
  * Disable other protocols when http is the only one desired.
@@ -210,9 +223,26 @@
 #  define CURL_DISABLE_RTSP
 #endif
 
+/*
+ * When HTTP is disabled, disable HTTP-only features
+ */
+
+#if defined(CURL_DISABLE_HTTP)
+#  define CURL_DISABLE_ALTSVC 1
+#  define CURL_DISABLE_COOKIES 1
+#  define CURL_DISABLE_BASIC_AUTH 1
+#  define CURL_DISABLE_BEARER_AUTH 1
+#  define CURL_DISABLE_AWS 1
+#  define CURL_DISABLE_DOH 1
+#  define CURL_DISABLE_FORM_API 1
+#  define CURL_DISABLE_HEADERS_API 1
+#  define CURL_DISABLE_HSTS 1
+#  define CURL_DISABLE_HTTP_AUTH 1
+#endif
+
 /* ================================================================ */
 /* No system header file shall be included in this file before this */
-/* point. The only allowed ones are those included from curl/system.h */
+/* point.                                                           */
 /* ================================================================ */
 
 /*
@@ -235,8 +265,45 @@
  * Windows setup file includes some system headers.
  */
 
-#ifdef HAVE_WINDOWS_H
+#ifdef _WIN32
 #  include "setup-win32.h"
+#endif
+
+#include <curl/system.h>
+
+/* Helper macro to expand and concatenate two macros.
+ * Direct macros concatenation does not work because macros
+ * are not expanded before direct concatenation.
+ */
+#define CURL_CONC_MACROS_(A,B) A ## B
+#define CURL_CONC_MACROS(A,B) CURL_CONC_MACROS_(A,B)
+
+/* curl uses its own printf() function internally. It understands the GNU
+ * format. Use this format, so that is matches the GNU format attribute we
+ * use with the mingw compiler, allowing it to verify them at compile-time.
+ */
+#ifdef  __MINGW32__
+#  undef CURL_FORMAT_CURL_OFF_T
+#  undef CURL_FORMAT_CURL_OFF_TU
+#  define CURL_FORMAT_CURL_OFF_T   "lld"
+#  define CURL_FORMAT_CURL_OFF_TU  "llu"
+#endif
+
+/* based on logic in "curl/mprintf.h" */
+
+#if (defined(__GNUC__) || defined(__clang__) ||                         \
+  defined(__IAR_SYSTEMS_ICC__)) &&                                      \
+  defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) &&         \
+  !defined(CURL_NO_FMT_CHECKS)
+#if defined(__MINGW32__) && !defined(__clang__)
+#define CURL_PRINTF(fmt, arg) \
+  __attribute__((format(gnu_printf, fmt, arg)))
+#else
+#define CURL_PRINTF(fmt, arg) \
+  __attribute__((format(__printf__, fmt, arg)))
+#endif
+#else
+#define CURL_PRINTF(fmt, arg)
 #endif
 
 /*
@@ -247,8 +314,9 @@
 #if defined(__APPLE__) && !defined(USE_ARES)
 #include <TargetConditionals.h>
 #define USE_RESOLVE_ON_IPS 1
-#  if defined(TARGET_OS_OSX) && TARGET_OS_OSX
-#    define CURL_OSX_CALL_COPYPROXIES 1
+#  if TARGET_OS_MAC && !(defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE) && \
+     defined(USE_IPV6)
+#    define CURL_MACOS_CALL_COPYPROXIES 1
 #  endif
 #endif
 
@@ -267,14 +335,42 @@
 #endif
 
 #ifdef __AMIGA__
+#  ifdef __amigaos4__
+#    define __USE_INLINE__
+     /* use our own resolver which uses runtime feature detection */
+#    define CURLRES_AMIGA
+     /* getaddrinfo() currently crashes bsdsocket.library, so disable */
+#    undef HAVE_GETADDRINFO
+#    if !(defined(__NEWLIB__) || \
+          (defined(__CLIB2__) && defined(__THREAD_SAFE)))
+       /* disable threaded resolver with clib2 - requires newlib or clib-ts */
+#      undef USE_THREADS_POSIX
+#    endif
+#  endif
 #  include <exec/types.h>
 #  include <exec/execbase.h>
 #  include <proto/exec.h>
 #  include <proto/dos.h>
 #  include <unistd.h>
-#  ifdef HAVE_PROTO_BSDSOCKET_H
-#    include <proto/bsdsocket.h> /* ensure bsdsocket.library use */
-#    define select(a,b,c,d,e) WaitSelect(a,b,c,d,e,0)
+#  if defined(HAVE_PROTO_BSDSOCKET_H) && \
+    (!defined(__amigaos4__) || defined(USE_AMISSL))
+     /* use bsdsocket.library directly, instead of libc networking functions */
+#    define _SYS_MBUF_H /* m_len define clashes with curl */
+#    include <proto/bsdsocket.h>
+#    ifdef __amigaos4__
+       int Curl_amiga_select(int nfds, fd_set *readfds, fd_set *writefds,
+                             fd_set *errorfds, struct timeval *timeout);
+#      define select(a,b,c,d,e) Curl_amiga_select(a,b,c,d,e)
+#    else
+#      define select(a,b,c,d,e) WaitSelect(a,b,c,d,e,0)
+#    endif
+     /* must not use libc's fcntl() on bsdsocket.library sockfds! */
+#    undef HAVE_FCNTL
+#    undef HAVE_FCNTL_O_NONBLOCK
+#  else
+     /* use libc networking and hence close() and fnctl() */
+#    undef HAVE_CLOSESOCKET_CAMEL
+#    undef HAVE_IOCTLSOCKET_CAMEL
 #  endif
 /*
  * In clib2 arpa/inet.h warns that some prototypes may clash
@@ -284,33 +380,16 @@
 #endif
 
 #include <stdio.h>
-#ifdef HAVE_ASSERT_H
 #include <assert.h>
-#endif
 
-#ifdef __TANDEM /* for nsr-tandem-nsk systems */
-#include <floss.h>
+#ifdef __TANDEM /* for ns*-tandem-nsk systems */
+# if ! defined __LP64
+#  include <floss.h> /* FLOSS is only used for 32-bit builds. */
+# endif
 #endif
 
 #ifndef STDC_HEADERS /* no standard C headers! */
 #include <curl/stdcheaders.h>
-#endif
-
-#ifdef __POCC__
-#  include <sys/types.h>
-#  include <unistd.h>
-#  define sys_nerr EILSEQ
-#endif
-
-/*
- * Salford-C kludge section (mostly borrowed from wxWidgets).
- */
-#ifdef __SALFORDC__
-  #pragma suppress 353             /* Possible nested comments */
-  #pragma suppress 593             /* Define not used */
-  #pragma suppress 61              /* enum has no name */
-  #pragma suppress 106             /* unnamed, unused parameter */
-  #include <clib.h>
 #endif
 
 /*
@@ -331,11 +410,9 @@
 #  define LSEEK_ERROR                (__int64)-1
 #  define open                       curlx_win32_open
 #  define fopen(fname,mode)          curlx_win32_fopen(fname, mode)
-#  define access(fname,mode)         curlx_win32_access(fname, mode)
    int curlx_win32_open(const char *filename, int oflag, ...);
    int curlx_win32_stat(const char *path, struct_stat *buffer);
    FILE *curlx_win32_fopen(const char *filename, const char *mode);
-   int curlx_win32_access(const char *path, int mode);
 #endif
 
 /*
@@ -354,11 +431,9 @@
 #    define struct_stat                struct _stat
 #    define open                       curlx_win32_open
 #    define fopen(fname,mode)          curlx_win32_fopen(fname, mode)
-#    define access(fname,mode)         curlx_win32_access(fname, mode)
      int curlx_win32_stat(const char *path, struct_stat *buffer);
      int curlx_win32_open(const char *filename, int oflag, ...);
      FILE *curlx_win32_fopen(const char *filename, const char *mode);
-     int curlx_win32_access(const char *path, int mode);
 #  endif
 #  define LSEEK_ERROR                (long)-1
 #endif
@@ -374,6 +449,24 @@
 #ifndef SIZEOF_TIME_T
 /* assume default size of time_t to be 32 bit */
 #define SIZEOF_TIME_T 4
+#endif
+
+#ifndef SIZEOF_CURL_SOCKET_T
+/* configure and cmake check and set the define */
+#  ifdef _WIN64
+#    define SIZEOF_CURL_SOCKET_T 8
+#  else
+/* default guess */
+#    define SIZEOF_CURL_SOCKET_T 4
+#  endif
+#endif
+
+#if SIZEOF_CURL_SOCKET_T < 8
+#  define CURL_FORMAT_SOCKET_T "d"
+#elif defined(__MINGW32__)
+#  define CURL_FORMAT_SOCKET_T "zd"
+#else
+#  define CURL_FORMAT_SOCKET_T "qd"
 #endif
 
 /*
@@ -403,13 +496,27 @@
 #  endif
 #endif
 
-#if (SIZEOF_CURL_OFF_T == 4)
-#  define CURL_OFF_T_MAX CURL_OFF_T_C(0x7FFFFFFF)
+#if (SIZEOF_CURL_OFF_T < 8)
+#error "too small curl_off_t"
 #else
    /* assume SIZEOF_CURL_OFF_T == 8 */
 #  define CURL_OFF_T_MAX CURL_OFF_T_C(0x7FFFFFFFFFFFFFFF)
 #endif
 #define CURL_OFF_T_MIN (-CURL_OFF_T_MAX - CURL_OFF_T_C(1))
+
+#if (SIZEOF_CURL_OFF_T != 8)
+#  error "curl_off_t must be exactly 64 bits"
+#else
+  typedef unsigned CURL_TYPEOF_CURL_OFF_T curl_uint64_t;
+  typedef CURL_TYPEOF_CURL_OFF_T  curl_int64_t;
+#  ifndef CURL_SUFFIX_CURL_OFF_TU
+#    error "CURL_SUFFIX_CURL_OFF_TU must be defined"
+#  endif
+#  define CURL_UINT64_SUFFIX  CURL_SUFFIX_CURL_OFF_TU
+#  define CURL_UINT64_C(val)  CURL_CONC_MACROS(val,CURL_UINT64_SUFFIX)
+# define CURL_PRId64  CURL_FORMAT_CURL_OFF_T
+# define CURL_PRIu64  CURL_FORMAT_CURL_OFF_TU
+#endif
 
 #if (SIZEOF_TIME_T == 4)
 #  ifdef HAVE_TIME_T_UNSIGNED
@@ -465,11 +572,11 @@
    5. set dir/file naming defines
    */
 
-#ifdef WIN32
+#ifdef _WIN32
 
 #  define DIR_CHAR      "\\"
 
-#else /* WIN32 */
+#else /* _WIN32 */
 
 #  ifdef MSDOS  /* Watt-32 */
 
@@ -494,27 +601,7 @@
 
 #  define DIR_CHAR      "/"
 
-#  ifndef fileno /* sunos 4 have this as a macro! */
-     int fileno(FILE *stream);
-#  endif
-
-#endif /* WIN32 */
-
-/*
- * msvc 6.0 requires PSDK in order to have INET6_ADDRSTRLEN
- * defined in ws2tcpip.h as well as to provide IPv6 support.
- * Does not apply if lwIP is used.
- */
-
-#if defined(_MSC_VER) && !defined(__POCC__) && !defined(USE_LWIPSOCK)
-#  if !defined(HAVE_WS2TCPIP_H) || \
-     ((_MSC_VER < 1300) && !defined(INET6_ADDRSTRLEN))
-#    undef HAVE_GETADDRINFO_THREADSAFE
-#    undef HAVE_FREEADDRINFO
-#    undef HAVE_GETADDRINFO
-#    undef ENABLE_IPV6
-#  endif
-#endif
+#endif /* _WIN32 */
 
 /* ---------------------------------------------------------------- */
 /*             resolver specialty compile-time defines              */
@@ -522,20 +609,11 @@
 /* ---------------------------------------------------------------- */
 
 /*
- * lcc-win32 doesn't have _beginthreadex(), lacks threads support.
- */
-
-#if defined(__LCC__) && defined(WIN32)
-#  undef USE_THREADS_POSIX
-#  undef USE_THREADS_WIN32
-#endif
-
-/*
  * MSVC threads support requires a multi-threaded runtime library.
  * _beginthreadex() is not available in single-threaded ones.
  */
 
-#if defined(_MSC_VER) && !defined(__POCC__) && !defined(_MT)
+#if defined(_MSC_VER) && !defined(_MT)
 #  undef USE_THREADS_POSIX
 #  undef USE_THREADS_WIN32
 #endif
@@ -544,8 +622,11 @@
  * Mutually exclusive CURLRES_* definitions.
  */
 
-#if defined(ENABLE_IPV6) && defined(HAVE_GETADDRINFO)
+#if defined(USE_IPV6) && defined(HAVE_GETADDRINFO)
 #  define CURLRES_IPV6
+#elif defined(USE_IPV6) && (defined(_WIN32) || defined(__CYGWIN__))
+/* assume on Windows that IPv6 without getaddrinfo is a broken build */
+#  error "Unexpected build: IPv6 is enabled but getaddrinfo was not found."
 #else
 #  define CURLRES_IPV4
 #endif
@@ -556,7 +637,6 @@
 /* now undef the stock libc functions just to avoid them being used */
 #  undef HAVE_GETADDRINFO
 #  undef HAVE_FREEADDRINFO
-#  undef HAVE_GETHOSTBYNAME
 #elif defined(USE_THREADS_POSIX) || defined(USE_THREADS_WIN32)
 #  define CURLRES_ASYNCH
 #  define CURLRES_THREADED
@@ -566,72 +646,42 @@
 
 /* ---------------------------------------------------------------- */
 
-/*
- * msvc 6.0 does not have struct sockaddr_storage and
- * does not define IPPROTO_ESP in winsock2.h. But both
- * are available if PSDK is properly installed.
- */
-
-#if defined(_MSC_VER) && !defined(__POCC__)
-#  if !defined(HAVE_WINSOCK2_H) || ((_MSC_VER < 1300) && !defined(IPPROTO_ESP))
-#    undef HAVE_STRUCT_SOCKADDR_STORAGE
-#  endif
-#endif
-
-/*
- * Intentionally fail to build when using msvc 6.0 without PSDK installed.
- * The brave of heart can circumvent this, defining ALLOW_MSVC6_WITHOUT_PSDK
- * in lib/config-win32.h although absolutely discouraged and unsupported.
- */
-
-#if defined(_MSC_VER) && !defined(__POCC__)
-#  if !defined(HAVE_WINDOWS_H) || ((_MSC_VER < 1300) && !defined(_FILETIME_))
-#    if !defined(ALLOW_MSVC6_WITHOUT_PSDK)
-#      error MSVC 6.0 requires "February 2003 Platform SDK" a.k.a. \
-             "Windows Server 2003 PSDK"
-#    else
-#      define CURL_DISABLE_LDAP 1
-#    endif
-#  endif
-#endif
-
-#if defined(HAVE_LIBIDN2) && defined(HAVE_IDN2_H) && !defined(USE_WIN32_IDN)
+#if defined(HAVE_LIBIDN2) && defined(HAVE_IDN2_H) && \
+  !defined(USE_WIN32_IDN) && !defined(USE_APPLE_IDN)
 /* The lib and header are present */
 #define USE_LIBIDN2
 #endif
 
-#if defined(USE_LIBIDN2) && defined(USE_WIN32_IDN)
-#error "Both libidn2 and WinIDN are enabled, choose one."
+#if defined(USE_LIBIDN2) && (defined(USE_WIN32_IDN) || defined(USE_APPLE_IDN))
+#error "libidn2 cannot be enabled with WinIDN or AppleIDN, choose one."
 #endif
 
 #define LIBIDN_REQUIRED_VERSION "0.4.1"
 
-#if defined(USE_GNUTLS) || defined(USE_OPENSSL) || defined(USE_NSS) || \
-    defined(USE_MBEDTLS) || \
-    defined(USE_WOLFSSL) || defined(USE_SCHANNEL) || \
-    defined(USE_SECTRANSP) || defined(USE_GSKIT) || \
-    defined(USE_BEARSSL) || defined(USE_RUSTLS)
+#if defined(USE_GNUTLS) || defined(USE_OPENSSL) || defined(USE_MBEDTLS) || \
+  defined(USE_WOLFSSL) || defined(USE_SCHANNEL) || defined(USE_SECTRANSP) || \
+  defined(USE_BEARSSL) || defined(USE_RUSTLS)
 #define USE_SSL    /* SSL support has been enabled */
 #endif
 
 /* Single point where USE_SPNEGO definition might be defined */
-#if !defined(CURL_DISABLE_CRYPTO_AUTH) && \
+#if !defined(CURL_DISABLE_NEGOTIATE_AUTH) && \
     (defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI))
 #define USE_SPNEGO
 #endif
 
 /* Single point where USE_KERBEROS5 definition might be defined */
-#if !defined(CURL_DISABLE_CRYPTO_AUTH) && \
+#if !defined(CURL_DISABLE_KERBEROS_AUTH) && \
     (defined(HAVE_GSSAPI) || defined(USE_WINDOWS_SSPI))
 #define USE_KERBEROS5
 #endif
 
 /* Single point where USE_NTLM definition might be defined */
-#if !defined(CURL_DISABLE_CRYPTO_AUTH) && !defined(CURL_DISABLE_NTLM)
-#  if defined(USE_OPENSSL) || defined(USE_MBEDTLS) ||                       \
-      defined(USE_GNUTLS) || defined(USE_NSS) || defined(USE_SECTRANSP) ||  \
-      defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO) ||              \
-      (defined(USE_WOLFSSL) && defined(HAVE_WOLFSSL_DES_ECB_ENCRYPT))
+#if !defined(CURL_DISABLE_NTLM)
+#  if defined(USE_OPENSSL) || defined(USE_MBEDTLS) ||                   \
+  defined(USE_GNUTLS) || defined(USE_SECTRANSP) ||                      \
+  defined(USE_OS400CRYPTO) || defined(USE_WIN32_CRYPTO) ||              \
+  (defined(USE_WOLFSSL) && defined(HAVE_WOLFSSL_DES_ECB_ENCRYPT))
 #    define USE_CURL_NTLM_CORE
 #  endif
 #  if defined(USE_CURL_NTLM_CORE) || defined(USE_WINDOWS_SSPI)
@@ -657,9 +707,40 @@
   ((__GNUC__ == 2) && defined(__GNUC_MINOR__) && (__GNUC_MINOR__ >= 7)))
 #  define UNUSED_PARAM __attribute__((__unused__))
 #  define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#elif defined(__IAR_SYSTEMS_ICC__)
+#  define UNUSED_PARAM __attribute__((__unused__))
+#  if (__VER__ >= 9040001)
+#    define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#  else
+#    define WARN_UNUSED_RESULT
+#  endif
 #else
-#  define UNUSED_PARAM /*NOTHING*/
+#  define UNUSED_PARAM /* NOTHING */
 #  define WARN_UNUSED_RESULT
+#endif
+
+/* noreturn attribute */
+
+#if !defined(CURL_NORETURN)
+#if (defined(__GNUC__) && (__GNUC__ >= 3)) || defined(__clang__) || \
+  defined(__IAR_SYSTEMS_ICC__)
+#  define CURL_NORETURN  __attribute__((__noreturn__))
+#elif defined(_MSC_VER) && (_MSC_VER >= 1200)
+#  define CURL_NORETURN  __declspec(noreturn)
+#else
+#  define CURL_NORETURN
+#endif
+#endif
+
+/* fallthrough attribute */
+
+#if !defined(FALLTHROUGH)
+#if (defined(__GNUC__) && __GNUC__ >= 7) || \
+    (defined(__clang__) && __clang_major__ >= 10)
+#  define FALLTHROUGH()  __attribute__((fallthrough))
+#else
+#  define FALLTHROUGH()  do {} while (0)
+#endif
 #endif
 
 /*
@@ -683,10 +764,7 @@
  */
 
 #if defined(__LWIP_OPT_H__) || defined(LWIP_HDR_OPT_H)
-#  if defined(SOCKET) || \
-     defined(USE_WINSOCK) || \
-     defined(HAVE_WINSOCK2_H) || \
-     defined(HAVE_WS2TCPIP_H)
+#  if defined(SOCKET) || defined(USE_WINSOCK)
 #    error "WinSock and lwIP TCP/IP stack definitions shall not coexist!"
 #  endif
 #endif
@@ -707,12 +785,12 @@
 #define SHUT_RDWR 0x02
 #endif
 
-/* Define S_ISREG if not defined by system headers, f.e. MSVC */
+/* Define S_ISREG if not defined by system headers, e.g. MSVC */
 #if !defined(S_ISREG) && defined(S_IFMT) && defined(S_IFREG)
 #define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
 #endif
 
-/* Define S_ISDIR if not defined by system headers, f.e. MSVC */
+/* Define S_ISDIR if not defined by system headers, e.g. MSVC */
 #if !defined(S_ISDIR) && defined(S_IFMT) && defined(S_IFDIR)
 #define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 #endif
@@ -720,7 +798,7 @@
 /* In Windows the default file mode is text but an application can override it.
 Therefore we specify it explicitly. https://github.com/curl/curl/pull/258
 */
-#if defined(WIN32) || defined(MSDOS)
+#if defined(_WIN32) || defined(MSDOS)
 #define FOPEN_READTEXT "rt"
 #define FOPEN_WRITETEXT "wt"
 #define FOPEN_APPENDTEXT "at"
@@ -739,21 +817,6 @@ endings either CRLF or LF so 't' is appropriate.
 #define FOPEN_WRITETEXT "w"
 #define FOPEN_APPENDTEXT "a"
 #endif
-
-/* WinSock destroys recv() buffer when send() failed.
- * Enabled automatically for Windows and for Cygwin as Cygwin sockets are
- * wrappers for WinSock sockets. https://github.com/curl/curl/issues/657
- * Define DONT_USE_RECV_BEFORE_SEND_WORKAROUND to force disable workaround.
- */
-#if !defined(DONT_USE_RECV_BEFORE_SEND_WORKAROUND)
-#  if defined(WIN32) || defined(__CYGWIN__)
-#    define USE_RECV_BEFORE_SEND_WORKAROUND
-#  endif
-#else  /* DONT_USE_RECV_BEFORE_SEND_WORKAROUND */
-#  ifdef USE_RECV_BEFORE_SEND_WORKAROUND
-#    undef USE_RECV_BEFORE_SEND_WORKAROUND
-#  endif
-#endif /* DONT_USE_RECV_BEFORE_SEND_WORKAROUND */
 
 /* for systems that don't detect this in configure */
 #ifndef CURL_SA_FAMILY_T
@@ -790,18 +853,30 @@ int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf,
 #define UNITTEST static
 #endif
 
-#if defined(USE_NGHTTP2) || defined(USE_HYPER)
+/* Hyper supports HTTP2 also, but Curl's integration with Hyper does not */
+#if defined(USE_NGHTTP2)
 #define USE_HTTP2
 #endif
 
-#if defined(USE_NGTCP2) || defined(USE_QUICHE) || defined(USE_MSH3)
-#define ENABLE_QUIC
+#if (defined(USE_NGTCP2) && defined(USE_NGHTTP3)) || \
+    (defined(USE_OPENSSL_QUIC) && defined(USE_NGHTTP3)) || \
+    defined(USE_QUICHE) || defined(USE_MSH3)
+
+#ifdef CURL_WITH_MULTI_SSL
+#error "Multi-SSL combined with QUIC is not supported"
 #endif
 
-#if defined(USE_UNIX_SOCKETS) && defined(WIN32)
-#  if defined(__MINGW32__) && !defined(LUP_SECURE)
-     typedef u_short ADDRESS_FAMILY; /* Classic mingw, 11y+ old mingw-w64 */
-#  endif
+#define USE_HTTP3
+#endif
+
+/* Certain Windows implementations are not aligned with what curl expects,
+   so always use the local one on this platform. E.g. the mingw-w64
+   implementation can return wrong results for non-ASCII inputs. */
+#if defined(HAVE_BASENAME) && defined(_WIN32)
+#undef HAVE_BASENAME
+#endif
+
+#if defined(USE_UNIX_SOCKETS) && defined(_WIN32)
 #  if !defined(UNIX_PATH_MAX)
      /* Replicating logic present in afunix.h
         (distributed with newer Windows 10 SDK versions only) */
@@ -813,6 +888,34 @@ int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf,
      } SOCKADDR_UN, *PSOCKADDR_UN;
 #    define WIN32_SOCKADDR_UN
 #  endif
+#endif
+
+/* OpenSSLv3 marks DES, MD5 and ENGINE functions deprecated but we have no
+   replacements (yet) so tell the compiler to not warn for them. */
+#ifdef USE_OPENSSL
+#define OPENSSL_SUPPRESS_DEPRECATED
+#endif
+
+#if defined(inline)
+  /* 'inline' is defined as macro and assumed to be correct */
+  /* No need for 'inline' replacement */
+#elif defined(__cplusplus)
+  /* The code is compiled with C++ compiler.
+     C++ always supports 'inline'. */
+  /* No need for 'inline' replacement */
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901
+  /* C99 (and later) supports 'inline' keyword */
+  /* No need for 'inline' replacement */
+#elif defined(__GNUC__) && __GNUC__ >= 3
+  /* GCC supports '__inline__' as an extension */
+#  define inline __inline__
+#elif defined(_MSC_VER) && _MSC_VER >= 1400
+  /* MSC supports '__inline' from VS 2005 (or even earlier) */
+#  define inline __inline
+#else
+  /* Probably 'inline' is not supported by compiler.
+     Define to the empty string to be on the safe side. */
+#  define inline /* empty */
 #endif
 
 #endif /* HEADER_CURL_SETUP_H */

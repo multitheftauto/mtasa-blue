@@ -41,7 +41,7 @@ public:
             if (!node)
                 return;
 
-            if (node->GetType() == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && !node->GetFormControlElementType().empty())
+            if (node->GetType() == CefDOMNode::Type::DOM_NODE_TYPE_ELEMENT && node->GetFormControlElementType() != CefDOMNode::FormControlType::DOM_FORM_CONTROL_TYPE_UNSUPPORTED)
             {
                 auto message = CefProcessMessage::Create("InputFocus");
                 message->GetArgumentList()->SetBool(0, true);
@@ -51,12 +51,6 @@ public:
                 m_bHasInputFocus = true;
             }
         }
-    }
-
-    virtual void OnRegisterCustomSchemes(CefRawPtr<CefSchemeRegistrar> registrar) override
-    {
-        // Register custom MTA scheme (has to be called in all proceseses)
-        registrar->AddCustomScheme("mtalocal", CEF_SCHEME_OPTION_CSP_BYPASSING);
     }
 
     // http://magpcss.org/ceforum/apidocs3/projects/(default)/CefRenderProcessHandler.html#OnContextCreated(CefRefPtr%3CCefBrowser%3E,CefRefPtr%3CCefFrame%3E,CefRefPtr%3CCefV8Context%3E)

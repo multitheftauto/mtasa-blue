@@ -1,6 +1,17 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CFileLoaderSA.cpp
+ *
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
 #include "StdInc.h"
 #include "gamesa_renderware.h"
 #include "CFileLoaderSA.h"
+#include "CModelInfoSA.h"
 
 CFileLoaderSA::CFileLoaderSA()
 {
@@ -15,6 +26,12 @@ void CFileLoaderSA::StaticSetHooks()
     HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
     HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
     HookInstall(0x538690, (DWORD)CFileLoader_LoadObjectInstance, 5);
+}
+
+CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(SFileObjectInstance* obj)
+{
+    // Second argument is model name. It's unused in the function
+    return ((CEntitySAInterface * (__cdecl*)(SFileObjectInstance*, const char*))0x538090)(obj, nullptr);
 }
 
 class CAtomicModelInfo
@@ -45,7 +62,7 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
 
     const auto NodeNameEndsWith = [=](const char* with) {
         const auto withLen = strlen(with);
-        //dassert(withLen <= nodeNameLen);
+        // dassert(withLen <= nodeNameLen);
         return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
                && strncmp(nodeName + nodeNameLen - withLen, with, withLen) == 0;
     };

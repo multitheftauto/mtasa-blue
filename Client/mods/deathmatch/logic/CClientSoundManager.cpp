@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 #include "CBassAudio.h"
 
 using SharedUtil::CalcMTASAPath;

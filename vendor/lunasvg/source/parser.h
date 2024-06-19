@@ -2,6 +2,7 @@
 #define PARSER_H
 
 #include <map>
+#include <set>
 
 #include "property.h"
 #include "element.h"
@@ -11,14 +12,12 @@ namespace lunasvg {
 class SVGElement;
 class StyledElement;
 
-enum LengthNegativeValuesMode
-{
+enum LengthNegativeValuesMode {
     AllowNegativeLengths,
     ForbidNegativeLengths
 };
 
-enum class TransformType
-{
+enum class TransformType {
     Matrix,
     Rotate,
     Scale,
@@ -27,8 +26,7 @@ enum class TransformType
     Translate
 };
 
-class Parser
-{
+class Parser {
 public:
     static Length parseLength(const std::string& string, LengthNegativeValuesMode mode, const Length& defaultValue);
     static LengthList parseLengthList(const std::string& string, LengthNegativeValuesMode mode);
@@ -58,16 +56,18 @@ private:
     static bool parseLength(const char*& ptr, const char* end, double& value, LengthUnits& units, LengthNegativeValuesMode mode);
     static bool parseNumberList(const char*& ptr, const char* end, double* values, int count);
     static bool parseArcFlag(const char*& ptr, const char* end, bool& flag);
-    static bool parseColorComponent(const char*& ptr, const char* end, double& value);
+    static bool parseColorComponent(const char*& ptr, const char* end, int& component);
+    static bool parseUrlFragment(const char*& ptr, const char* end, std::string& ref);
     static bool parseTransform(const char*& ptr, const char* end, TransformType& type, double* values, int& count);
 };
 
-struct Selector;
+struct SimpleSelector;
 
-struct AttributeSelector
-{
-    enum class MatchType
-    {
+using Selector = std::vector<SimpleSelector>;
+using SelectorList = std::vector<Selector>;
+
+struct AttributeSelector {
+    enum class MatchType {
         None,
         Equal,
         Includes,
@@ -77,20 +77,17 @@ struct AttributeSelector
         Contains
     };
 
-    PropertyId id{PropertyId::Unknown};
-    std::string value;
     MatchType matchType{MatchType::None};
+    PropertyID id{PropertyID::Unknown};
+    std::string value;
 };
 
-using SelectorList = std::vector<Selector>;
-
-struct PseudoClass
-{
-    enum class Type
-    {
+struct PseudoClassSelector {
+    enum class Type {
         Unknown,
         Empty,
         Root,
+        Is,
         Not,
         FirstChild,
         LastChild,
@@ -101,88 +98,99 @@ struct PseudoClass
     };
 
     Type type{Type::Unknown};
-    SelectorList notSelectors;
+    SelectorList subSelectors;
 };
 
-struct SimpleSelector
-{
-    enum class Combinator
-    {
+struct SimpleSelector {
+    enum class Combinator {
         Descendant,
         Child,
         DirectAdjacent,
         InDirectAdjacent
     };
 
-    ElementId id{ElementId::Star};
-    std::vector<AttributeSelector> attributeSelectors;
-    std::vector<PseudoClass> pseudoClasses;
     Combinator combinator{Combinator::Descendant};
+    ElementID id{ElementID::Star};
+    std::vector<AttributeSelector> attributeSelectors;
+    std::vector<PseudoClassSelector> pseudoClassSelectors;
 };
 
-struct Selector
-{
-    std::vector<SimpleSelector> simpleSelectors;
-    int specificity{0};
+struct Declaration {
+    int specificity;
+    PropertyID id;
+    std::string value;
 };
 
-struct Rule
-{
+using DeclarationList = std::vector<Declaration>;
+
+struct Rule {
     SelectorList selectors;
-    PropertyList declarations;
+    DeclarationList declarations;
 };
 
-class RuleMatchContext
-{
+class RuleData {
 public:
-    RuleMatchContext(const std::vector<Rule>& rules);
+    RuleData(const Selector& selector, const DeclarationList& declarations, uint32_t specificity, uint32_t position)
+        : m_selector(selector), m_declarations(declarations), m_specificity(specificity), m_position(position)
+    {}
 
-    std::vector<const PropertyList*> match(const Element* element) const;
+    const Selector& selector() const { return m_selector; }
+    const DeclarationList& declarations() const { return m_declarations; }
+    const uint32_t& specificity() const { return m_specificity; }
+    const uint32_t& position() const { return m_position; }
+
+    bool match(const Element* element) const;
 
 private:
-    bool selectorMatch(const Selector* selector, const Element* element) const;
-    bool simpleSelectorMatch(const SimpleSelector& selector, const Element* element) const;
-    bool attributeSelectorMatch(const AttributeSelector& selector, const Element* element) const;
-    bool pseudoClassMatch(const PseudoClass& pseudo, const Element* element) const;
+    static bool matchSimpleSelector(const SimpleSelector& selector, const Element* element);
+    static bool matchAttributeSelector(const AttributeSelector& selector, const Element* element);
+    static bool matchPseudoClassSelector(const PseudoClassSelector& selector, const Element* element);
 
 private:
-    std::multimap<int, std::pair<const Selector*, const PropertyList*>, std::less<int>> m_selectors;
+    Selector m_selector;
+    DeclarationList m_declarations;
+    uint32_t m_specificity;
+    uint32_t m_position;
 };
 
-class CSSParser
-{
+inline bool operator<(const RuleData& a, const RuleData& b) { return std::tie(a.specificity(), a.position()) < std::tie(b.specificity(), b.position()); }
+inline bool operator>(const RuleData& a, const RuleData& b) { return std::tie(a.specificity(), a.position()) > std::tie(b.specificity(), b.position()); }
+
+class StyleSheet {
 public:
-    CSSParser() = default;
+    StyleSheet() = default;
 
-    bool parseMore(const std::string& value);
+    bool parse(const std::string& content);
+    void add(const Rule& rule);
+    bool empty() const { return m_rules.empty(); }
 
-    const std::vector<Rule>& rules() const { return m_rules; }
-
-private:
-    bool parseAtRule(const char*& ptr, const char* end) const;
-    bool parseRule(const char*& ptr, const char* end, Rule& rule) const;
-    bool parseSelectors(const char*& ptr, const char* end, SelectorList& selectors) const;
-    bool parseDeclarations(const char*& ptr, const char* end, PropertyList& declarations) const;
-    bool parseSelector(const char*& ptr, const char* end, Selector& selector) const;
-    bool parseSimpleSelector(const char*& ptr, const char* end, SimpleSelector& simpleSelector) const;
+    const std::multiset<RuleData>& rules() const { return m_rules; }
 
 private:
-    std::vector<Rule> m_rules;
+    static bool parseAtRule(const char*& ptr, const char* end);
+    static bool parseRule(const char*& ptr, const char* end, Rule& rule);
+    static bool parseSelectors(const char*& ptr, const char* end, SelectorList& selectors);
+    static bool parseDeclarations(const char*& ptr, const char* end, DeclarationList& declarations);
+    static bool parseSelector(const char*& ptr, const char* end, Selector& selector);
+    static bool parseSimpleSelector(const char*& ptr, const char* end, SimpleSelector& simpleSelector);
+
+private:
+    std::multiset<RuleData> m_rules;
+    uint32_t m_position{0};
 };
 
 class LayoutSymbol;
 
-class ParseDocument
-{
+class TreeBuilder {
 public:
-    ParseDocument();
-    ~ParseDocument();
+    TreeBuilder();
+    ~TreeBuilder();
 
     bool parse(const char* data, std::size_t size);
 
     SVGElement* rootElement() const { return m_rootElement.get(); }
     Element* getElementById(const std::string& id) const;
-    std::unique_ptr<LayoutSymbol> layout() const;
+    std::unique_ptr<LayoutSymbol> build() const;
 
 private:
     std::unique_ptr<SVGElement> m_rootElement;

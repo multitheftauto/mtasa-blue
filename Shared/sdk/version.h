@@ -3,24 +3,48 @@
 //
 #pragma once
 
-//
-// To compile a client:
-//      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
-//      2. Use netc.dll from the latest unstable build (nightly.mtasa.com)
-//
-//
-// To compile a public server:
-//      1. set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
-//      2. Use net.dll/net.so from the latest untested/rc/release (nightly.mtasa.com)
-//
-// To compile a custom server:
-//      1. set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
-//      2. Use net.dll/net.so from the latest unstable (nightly.mtasa.com)
+/*******************************************************************************
+ * Note for fork developers:
+ *
+ * If you don't follow these guidelines, you may suffer from inadequate or even
+ * zero anti-cheat support, when you release a fork client to the public with a
+ * misconfigured deployment pipeline. Never use build type VERSION_TYPE_CUSTOM in
+ * a public release of your fork.
+ *
+ * Please read the wiki article at https://wiki.multitheftauto.com/wiki/Forks for
+ * more information, guidelines and security considerations.
+ *
+ * To compile a client for mass consumption by your player base (as a public release):
+ *   1. Set MTASA_VERSION_TYPE to VERSION_TYPE_UNSTABLE
+ *   2. Use netc.dll from https://mirror-cdn.multitheftauto.com/bdata/fork-support/netc.dll
+ *   3. Switch to Nightly build configuration
+ *
+ * To develop and test a client locally or in a trustworthy closed group (local or private release):
+ *  a. With active anti-cheat:
+ *      1. Set MTASA_VERSION_TYPE to VERSION_TYPE_UNSTABLE
+ *      2. Use netc.dll from https://mirror-cdn.multitheftauto.com/bdata/netc.dll (preferably run utils/buildactions/install_data.lua)
+ *  b. Without anti-cheat:
+ *      1. Set MTASA_VERSION_TYPE to VERSION_TYPE_CUSTOM
+ *      2. Use netc.dll from https://mirror-cdn.multitheftauto.com/bdata/netc.dll (preferably run utils/buildactions/install_data.lua)
+ *
+ * To compile and host an official public server (anyone on official MTA client can connect):
+ *      1. Copy net.dll or net.so from a nightly release (see https://nightly.multitheftauto.com/)
+ *      2. Set MTASA_VERSION_TYPE to VERSION_TYPE_RELEASE
+ *      3. Set MTASA_VERSION_BUILD to the build number from the network library (see file version information)
+ *      4. Switch to Nightly build configuration
+ *
+ * To compile and host a custom public server (only custom MTA clients can connect):
+ *      1. Use `<disableac>5,6,21</disableac>` in your mtaserver.conf (may not be needed in the future)
+ *      2. Use regular developer net.dll or net.so (preferably run utils/buildactions/install_data.lua)
+ *      3. Set MTASA_VERSION_TYPE to VERSION_TYPE_UNSTABLE
+ *      4. Switch to Nightly build configuration
+ *
+ *******************************************************************************/
 
 // New version info
 #define MTASA_VERSION_MAJOR         1
-#define MTASA_VERSION_MINOR         5
-#define MTASA_VERSION_MAINTENANCE   9
+#define MTASA_VERSION_MINOR         6
+#define MTASA_VERSION_MAINTENANCE   0
 #define MTASA_VERSION_TYPE          VERSION_TYPE_CUSTOM
 #define MTASA_VERSION_BUILD         0
 
@@ -84,7 +108,7 @@
 
 #define _ASE_VERSION QUOTE_DEFINE(MTASA_VERSION_MAJOR) "." QUOTE_DEFINE(MTASA_VERSION_MINOR)
 #define _NETCODE_VERSION_BRANCH_ID      0x4         // Use 0x1 - 0xF to indicate an incompatible branch is being used (0x0 is reserved, 0x4 is trunk)
-#define _CLIENT_NET_MODULE_VERSION      0x0AB       // (0x000 - 0xfff) Lvl9 wizards only
+#define _CLIENT_NET_MODULE_VERSION      0x0AE       // (0x000 - 0xfff) Lvl9 wizards only
 #define _SERVER_NET_MODULE_VERSION      0x0AB       // (0x000 - 0xfff) Lvl9 wizards only
 #define _NETCODE_VERSION                0x1DA       // (0x000 - 0xfff) Increment when net messages change (pre-release)
 

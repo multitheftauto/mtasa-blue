@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -74,10 +76,10 @@ CURLcode Curl_initinfo(struct Curl_easy *data)
   free(info->wouldredirect);
   info->wouldredirect = NULL;
 
-  info->conn_primary_ip[0] = '\0';
-  info->conn_local_ip[0] = '\0';
-  info->conn_primary_port = 0;
-  info->conn_local_port = 0;
+  info->primary.remote_ip[0] = '\0';
+  info->primary.local_ip[0] = '\0';
+  info->primary.remote_port = 0;
+  info->primary.local_port = 0;
   info->retry_after = 0;
 
   info->conn_scheme = 0;
@@ -151,20 +153,37 @@ static CURLcode getinfo_char(struct Curl_easy *data, CURLINFO info,
     break;
   case CURLINFO_PRIMARY_IP:
     /* Return the ip address of the most recent (primary) connection */
-    *param_charp = data->info.conn_primary_ip;
+    *param_charp = data->info.primary.remote_ip;
     break;
   case CURLINFO_LOCAL_IP:
     /* Return the source/local ip address of the most recent (primary)
        connection */
-    *param_charp = data->info.conn_local_ip;
+    *param_charp = data->info.primary.local_ip;
     break;
   case CURLINFO_RTSP_SESSION_ID:
+#ifndef CURL_DISABLE_RTSP
     *param_charp = data->set.str[STRING_RTSP_SESSION_ID];
+#else
+    *param_charp = NULL;
+#endif
     break;
   case CURLINFO_SCHEME:
     *param_charp = data->info.conn_scheme;
     break;
-
+  case CURLINFO_CAPATH:
+#ifdef CURL_CA_PATH
+    *param_charp = CURL_CA_PATH;
+#else
+    *param_charp = NULL;
+#endif
+    break;
+  case CURLINFO_CAINFO:
+#ifdef CURL_CA_BUNDLE
+    *param_charp = CURL_CA_BUNDLE;
+#else
+    *param_charp = NULL;
+#endif
+    break;
   default:
     return CURLE_UNKNOWN_OPTION;
   }
@@ -269,11 +288,11 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
     break;
   case CURLINFO_PRIMARY_PORT:
     /* Return the (remote) port of the most recent (primary) connection */
-    *param_longp = data->info.conn_primary_port;
+    *param_longp = data->info.primary.remote_port;
     break;
   case CURLINFO_LOCAL_PORT:
     /* Return the local port of the most recent (primary) connection */
-    *param_longp = data->info.conn_local_port;
+    *param_longp = data->info.primary.local_port;
     break;
   case CURLINFO_PROXY_ERROR:
     *param_longp = (long)data->info.pxcode;
@@ -285,6 +304,7 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
       /* return if the condition prevented the document to get transferred */
       *param_longp = data->info.timecond ? 1L : 0L;
     break;
+#ifndef CURL_DISABLE_RTSP
   case CURLINFO_RTSP_CLIENT_CSEQ:
     *param_longp = data->state.rtsp_next_client_CSeq;
     break;
@@ -294,6 +314,7 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
   case CURLINFO_RTSP_CSEQ_RECV:
     *param_longp = data->state.rtsp_CSeq_recv;
     break;
+#endif
   case CURLINFO_HTTP_VERSION:
     switch(data->info.httpversion) {
     case 10:
@@ -315,6 +336,15 @@ static CURLcode getinfo_long(struct Curl_easy *data, CURLINFO info,
     break;
   case CURLINFO_PROTOCOL:
     *param_longp = data->info.conn_protocol;
+    break;
+  case CURLINFO_USED_PROXY:
+    *param_longp =
+#ifdef CURL_DISABLE_PROXY
+      0
+#else
+      data->info.used_proxy
+#endif
+      ;
     break;
   default:
     return CURLE_UNKNOWN_OPTION;
@@ -391,11 +421,21 @@ static CURLcode getinfo_offt(struct Curl_easy *data, CURLINFO info,
   case CURLINFO_STARTTRANSFER_TIME_T:
     *param_offt = data->progress.t_starttransfer;
     break;
+  case CURLINFO_QUEUE_TIME_T:
+    *param_offt = data->progress.t_postqueue;
+    break;
   case CURLINFO_REDIRECT_TIME_T:
     *param_offt = data->progress.t_redirect;
     break;
   case CURLINFO_RETRY_AFTER:
     *param_offt = data->info.retry_after;
+    break;
+  case CURLINFO_XFER_ID:
+    *param_offt = data->id;
+    break;
+  case CURLINFO_CONN_ID:
+    *param_offt = data->conn?
+      data->conn->connection_id : data->state.recent_conn_id;
     break;
   default:
     return CURLE_UNKNOWN_OPTION;
@@ -515,13 +555,7 @@ static CURLcode getinfo_slist(struct Curl_easy *data, CURLINFO info,
 
 #ifdef USE_SSL
       if(conn && tsi->backend != CURLSSLBACKEND_NONE) {
-        unsigned int i;
-        for(i = 0; i < (sizeof(conn->ssl) / sizeof(conn->ssl[0])); ++i) {
-          if(conn->ssl[i].use) {
-            tsi->internals = Curl_ssl->get_internals(&conn->ssl[i], info);
-            break;
-          }
-        }
+        tsi->internals = Curl_ssl_get_internals(data, FIRSTSOCKET, info, 0);
       }
 #endif
     }
@@ -560,7 +594,7 @@ CURLcode Curl_getinfo(struct Curl_easy *data, CURLINFO info, ...)
   CURLcode result = CURLE_UNKNOWN_OPTION;
 
   if(!data)
-    return result;
+    return CURLE_BAD_FUNCTION_ARGUMENT;
 
   va_start(arg, info);
 

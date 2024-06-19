@@ -130,6 +130,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_bIsJoined = pPlayer->IsJoined();
     pSim->m_usBitStreamVersion = pPlayer->GetBitStreamVersion();
     pSim->m_bHasOccupiedVehicle = pVehicle != NULL;
+    pSim->m_bIsExitingVehicle = pPlayer->GetVehicleAction() == CPed::VEHICLEACTION_EXITING;
     pSim->m_PlayerID = pPlayer->GetID();
     pSim->m_usLatency = static_cast<unsigned short>(pPlayer->GetPing());
     pSim->m_ucWeaponType = pPlayer->GetWeaponType();
@@ -233,7 +234,7 @@ bool CSimPlayerManager::HandlePlayerPureSync(const NetServerPlayerID& Socket, Ne
     CSimPlayer* pSourceSimPlayer = Get(Socket);
 
     // Check is good for player pure sync
-    if (pSourceSimPlayer && pSourceSimPlayer->IsJoined() && !pSourceSimPlayer->m_bHasOccupiedVehicle)
+    if (pSourceSimPlayer && pSourceSimPlayer->IsJoined() && (!pSourceSimPlayer->m_bHasOccupiedVehicle || pSourceSimPlayer->m_bIsExitingVehicle))
     {
         // Read the incoming packet data
         CSimPlayerPuresyncPacket* pPacket =
@@ -357,8 +358,11 @@ bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& Socket, NetBit
 
         if (pPacket->Read(*BitStream))
         {
-            // Relay it to nearbyers
-            Broadcast(*pPacket, pSourceSimPlayer->GetPuresyncSendList());
+            // Relay it to nearbyers, if the player really has this weapon
+            if (pSourceSimPlayer->m_pRealPlayer->HasWeaponType(pPacket->m_Cache.weaponType))
+            {
+                Broadcast(*pPacket, pSourceSimPlayer->GetPuresyncSendList());
+            }
         }
 
         delete pPacket;

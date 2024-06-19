@@ -172,7 +172,7 @@ inline SString GetClassTypeName(CPed*)
 }
 inline SString GetClassTypeName(class CRemoteCall*)
 {
-    return "remotecall";
+    return "request";
 }
 inline SString GetClassTypeName(CColShape*)
 {

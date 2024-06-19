@@ -6,17 +6,17 @@ premake.modules.install_data = {}
 local BIN_DIR = "Bin"
 local DATA_DIR = "Shared/data/MTA San Andreas"
 
-local NET_PATH_X86_WIN = "https://mirror.mtasa.com/bdata/net.dll"
-local NET_PATH_X64_WIN = "https://mirror.mtasa.com/bdata/net_64.dll"
-local NET_PATH_ARM64_WIN = "https://mirror.mtasa.com/bdata/net_arm64.dll"
-local NETC_PATH_WIN = "https://mirror.mtasa.com/bdata/netc.dll"
+local NET_PATH_X86_WIN = "https://mirror-cdn.multitheftauto.com/bdata/net.dll"
+local NET_PATH_X64_WIN = "https://mirror-cdn.multitheftauto.com/bdata/net_64.dll"
+local NET_PATH_ARM64_WIN = "https://mirror-cdn.multitheftauto.com/bdata/net_arm64.dll"
+local NETC_PATH_WIN = "https://mirror-cdn.multitheftauto.com/bdata/netc.dll"
 
-local NET_PATH_X86_LINUX = "https://mirror.mtasa.com/bdata/net.so"
-local NET_PATH_X64_LINUX = "https://mirror.mtasa.com/bdata/net_64.so"
-local NET_PATH_ARM_LINUX = "https://mirror.mtasa.com/bdata/net_arm.so"
-local NET_PATH_ARM64_LINUX = "https://mirror.mtasa.com/bdata/net_arm64.so"
+local NET_PATH_X86_LINUX = "https://mirror-cdn.multitheftauto.com/bdata/net.so"
+local NET_PATH_X64_LINUX = "https://mirror-cdn.multitheftauto.com/bdata/net_64.so"
+local NET_PATH_ARM_LINUX = "https://mirror-cdn.multitheftauto.com/bdata/net_arm.so"
+local NET_PATH_ARM64_LINUX = "https://mirror-cdn.multitheftauto.com/bdata/net_arm64.so"
 
-local NET_PATH_X64_MACOS = "https://mirror.mtasa.com/bdata/net.dylib"
+local NET_PATH_X64_MACOS = "https://mirror-cdn.multitheftauto.com/bdata/net.dylib"
 
 newaction {
 	trigger = "install_data",
@@ -43,6 +43,13 @@ newaction {
 
 		-- Copy configs if they don't already exist
 		local success, message = os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "*.conf", false, true)
+		if not success then
+			errormsg("ERROR: Couldn't copy server config files", "\n"..message)
+			os.exit(1)
+			return
+		end
+
+		local success, message = os.copydir("Server/mods/deathmatch", BIN_DIR.."/server/mods/deathmatch", "mtaserver.conf.template", false, true)
 		if not success then
 			errormsg("ERROR: Couldn't copy server config files", "\n"..message)
 			os.exit(1)

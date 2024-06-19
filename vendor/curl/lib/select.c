@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -59,8 +61,8 @@
  * for the intended use of this function in the library.
  *
  * Return values:
- *   -1 = system call error, invalid timeout value, or interrupted
- *    0 = specified timeout has elapsed
+ *   -1 = system call error, or invalid timeout value
+ *    0 = specified timeout has elapsed, or interrupted
  */
 int Curl_wait_ms(timediff_t timeout_ms)
 {
@@ -74,7 +76,7 @@ int Curl_wait_ms(timediff_t timeout_ms)
   }
 #if defined(MSDOS)
   delay(timeout_ms);
-#elif defined(WIN32)
+#elif defined(_WIN32)
   /* prevent overflow, timeout_ms is typecast to ULONG/DWORD. */
 #if TIMEDIFF_T_MAX >= ULONG_MAX
   if(timeout_ms >= ULONG_MAX)
@@ -97,8 +99,13 @@ int Curl_wait_ms(timediff_t timeout_ms)
   }
 #endif /* HAVE_POLL_FINE */
 #endif /* USE_WINSOCK */
-  if(r)
-    r = -1;
+  if(r) {
+    if((r == -1) && (SOCKERRNO == EINTR))
+      /* make EINTR from select or poll not a "lethal" error */
+      r = 0;
+    else
+      r = -1;
+  }
   return r;
 }
 
@@ -228,14 +235,14 @@ int Curl_socket_check(curl_socket_t readfd0, /* two sockets to read from */
   if(readfd0 != CURL_SOCKET_BAD) {
     if(pfd[num].revents & (POLLRDNORM|POLLIN|POLLERR|POLLHUP))
       r |= CURL_CSELECT_IN;
-    if(pfd[num].revents & (POLLRDBAND|POLLPRI|POLLNVAL))
+    if(pfd[num].revents & (POLLPRI|POLLNVAL))
       r |= CURL_CSELECT_ERR;
     num++;
   }
   if(readfd1 != CURL_SOCKET_BAD) {
     if(pfd[num].revents & (POLLRDNORM|POLLIN|POLLERR|POLLHUP))
       r |= CURL_CSELECT_IN2;
-    if(pfd[num].revents & (POLLRDBAND|POLLPRI|POLLNVAL))
+    if(pfd[num].revents & (POLLPRI|POLLNVAL))
       r |= CURL_CSELECT_ERR;
     num++;
   }
@@ -308,8 +315,12 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
   else
     pending_ms = 0;
   r = poll(ufds, nfds, pending_ms);
-  if(r <= 0)
+  if(r <= 0) {
+    if((r == -1) && (SOCKERRNO == EINTR))
+      /* make EINTR from select or poll not a "lethal" error */
+      r = 0;
     return r;
+  }
 
   for(i = 0; i < nfds; i++) {
     if(ufds[i].fd == CURL_SOCKET_BAD)
@@ -352,8 +363,12 @@ int Curl_poll(struct pollfd ufds[], unsigned int nfds, timediff_t timeout_ms)
      value).
   */
   r = our_select(maxfd, &fds_read, &fds_write, &fds_err, timeout_ms);
-  if(r <= 0)
+  if(r <= 0) {
+    if((r == -1) && (SOCKERRNO == EINTR))
+      /* make EINTR from select or poll not a "lethal" error */
+      r = 0;
     return r;
+  }
 
   r = 0;
   for(i = 0; i < nfds; i++) {

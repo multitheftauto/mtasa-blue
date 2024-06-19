@@ -73,7 +73,7 @@ private:
     void RemoveACLDependencies(class CAccessControlList* pACL);
 
     std::list<class CAccessControlListGroup*> m_Groups;
-    std::list<class CAccessControlList*> m_ACLs;
+    std::list<class CAccessControlList*>      m_ACLs;
 
     CAccountManager* m_pAccountManager;
 

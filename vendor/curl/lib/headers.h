@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2022, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,10 +20,12 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #include "curl_setup.h"
 
-#if !defined(CURL_DISABLE_HTTP) && defined(USE_HEADERS_API)
+#if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_HEADERS_API)
 
 struct Curl_header_store {
   struct Curl_llist_element node;
@@ -33,6 +35,12 @@ struct Curl_header_store {
   unsigned char type; /* CURLH_* defines */
   char buffer[1]; /* this is the raw header blob */
 };
+
+/*
+ * Initialize header collecting for a transfer.
+ * Will add a client writer that catches CLIENTWRITE_HEADER writes.
+ */
+CURLcode Curl_headers_init(struct Curl_easy *data);
 
 /*
  * Curl_headers_push() gets passed a full header to store.
@@ -46,6 +54,7 @@ CURLcode Curl_headers_push(struct Curl_easy *data, const char *header,
 CURLcode Curl_headers_cleanup(struct Curl_easy *data);
 
 #else
+#define Curl_headers_init(x) CURLE_OK
 #define Curl_headers_push(x,y,z) CURLE_OK
 #define Curl_headers_cleanup(x) Curl_nop_stmt
 #endif

@@ -9,10 +9,14 @@
  *****************************************************************************/
 #pragma once
 #include <cryptopp/base64.h>
+#include <cryptopp/base32.h>
 #include <cryptopp/aes.h>
 #include <cryptopp/rsa.h>
 #include <cryptopp/modes.h>
 #include <cryptopp/osrng.h>
+#include <cryptopp/hmac.h>
+#include <cryptopp/hex.h>
+#include <cryptopp/md5.h>
 #include "SString.h"
 
 namespace SharedUtil
@@ -22,18 +26,91 @@ namespace SharedUtil
         SString publicKey, privateKey;
     };
 
-    inline SString Base64encode(const SString& data)
+    inline SString Base64encode(const SString& data, const SString& variant = SString())
     {
-        SString                result;
-        CryptoPP::StringSource ss(data, true, new CryptoPP::Base64Encoder(new CryptoPP::StringSink(result), false));            // Memory is freed automatically
+        SString result;
+
+        if (variant == "URL")
+        {
+            CryptoPP::StringSource ss(data, true, new CryptoPP::Base64URLEncoder(new CryptoPP::StringSink(result), false));
+        }
+        else
+        {
+            CryptoPP::StringSource ss(data, true, new CryptoPP::Base64Encoder(new CryptoPP::StringSink(result), false));
+        }
 
         return result;
     }
 
-    inline SString Base64decode(const SString& data)
+    inline SString Base64decode(const SString& data, const SString& variant = SString())
     {
-        SString                result;
-        CryptoPP::StringSource ss(data, true, new CryptoPP::Base64Decoder(new CryptoPP::StringSink(result)));            // Memory is freed automatically
+        SString result;
+
+        if (variant == "URL")
+        {
+            CryptoPP::StringSource ss(data, true, new CryptoPP::Base64URLDecoder(new CryptoPP::StringSink(result)));
+        }
+        else
+        {
+            CryptoPP::StringSource ss(data, true, new CryptoPP::Base64Decoder(new CryptoPP::StringSink(result)));
+        }
+
+        return result;
+    }
+
+    inline SString Base32encode(const SString& data, const SString& variant = SString())
+    {
+        SString result;
+
+        if (variant == "HEX")
+        {
+            CryptoPP::StringSource ss(data, true, new CryptoPP::Base32HexEncoder(new CryptoPP::StringSink(result), false));
+        }
+        else
+        {
+            CryptoPP::StringSource ss(data, true, new CryptoPP::Base32Encoder(new CryptoPP::StringSink(result), false));
+        }
+
+        return result;
+    }
+
+    inline SString Base32decode(const SString& data, const SString& variant = SString())
+    {
+        SString result;
+
+        if (variant == "HEX")
+        {
+            CryptoPP::StringSource ss(data, true, new CryptoPP::Base32HexDecoder(new CryptoPP::StringSink(result)));
+        }
+        else
+        {
+            CryptoPP::StringSource ss(data, true, new CryptoPP::Base32Decoder(new CryptoPP::StringSink(result)));
+        }
+
+        return result;
+    }
+
+    template <class HashType>
+    inline SString Hash(const SString& value)
+    {
+        SString  result;
+        HashType hashType{};
+
+        CryptoPP::StringSource ss(value, true, new CryptoPP::HashFilter(hashType, new CryptoPP::HexEncoder(new CryptoPP::StringSink(result))));
+
+        return result;
+    }
+
+    template <class HmacType>
+    inline SString Hmac(const SString& value, const SString& key)
+    {
+        SString mac;
+        SString result;
+
+        CryptoPP::HMAC<HmacType> hmac(reinterpret_cast<const CryptoPP::byte*>(key.c_str()), key.size());
+
+        CryptoPP::StringSource ssMac(value, true, new CryptoPP::HashFilter(hmac, new CryptoPP::StringSink(mac)));
+        CryptoPP::StringSource ssResult(mac, true, new CryptoPP::HexEncoder(new CryptoPP::StringSink(result)));
 
         return result;
     }

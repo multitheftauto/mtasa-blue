@@ -12,6 +12,7 @@ class CClientObject;
 
 #pragma once
 
+#include <game/CObject.h>
 #include "CClientStreamElement.h"
 #include "CClientModel.h"
 

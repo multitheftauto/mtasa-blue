@@ -120,10 +120,10 @@ DictionaryManager::get_dictionary(const Language& language, const std::string& t
       for(std::vector<std::string>::iterator filename = files.begin(); filename != files.end(); filename++)
       {
         // check if filename matches requested language
-        if (has_suffix(*filename, ".po"))
+        if (has_suffix(*filename, ".po") || has_suffix(*filename, ".pot"))
         { // ignore anything that isn't a .po file
           Language po_language = Language::from_env(filename->substr(0, filename->size()-3));
-           if (!po_language)
+          if (!po_language)
           {
             log_warning << *filename << ": warning: ignoring, unknown language" << std::endl;
           }
@@ -140,26 +140,32 @@ DictionaryManager::get_dictionary(const Language& language, const std::string& t
         }
       }
 
-	  // If we were given a text domain, we also search directories looking for ll_CC/textdomain.po
-	  if ( !textdomain.empty() )
-	  {
+      // If we were given a text domain, we also search directories looking for ll_CC/textdomain.po
+      if ( !textdomain.empty() )
+      {
         for(std::vector<std::string>::iterator directory = dirs.begin(); directory != dirs.end(); directory++)
         {
-	      Language po_language = Language::from_env(*directory);
-		  std::string filename = *directory + "/" + textdomain + ".po";
-	      if ( po_language && filesystem->file_exists(*p + "/" + filename) )
-		  {
-              int score = Language::match(language, po_language);
+          Language po_language = Language::from_env(*directory);
+          std::string filename = *directory + "/" + textdomain + ".po";
+
+          if (!filesystem->file_exists(*p + "/" + filename))
+          {
+            filename += "t";
+          }
+
+          if ( po_language && filesystem->file_exists(*p + "/" + filename) )
+          {
+            int score = Language::match(language, po_language);
               
-              if (score > best_score)
-              {
-                best_score = score;
-                best_filename = filename;
-              }          
-		  }		
-	    }
-	  }
-	  
+            if (score > best_score)
+            {
+              best_score = score;
+              best_filename = filename;
+            }
+          }
+        }
+      }
+
       if (!best_filename.empty())
       {
         std::string pofile = *p + "/" + best_filename;
@@ -172,7 +178,7 @@ DictionaryManager::get_dictionary(const Language& language, const std::string& t
           }
           else
           {
-		    dict = new Dictionary(charset,pofile);
+            dict = new Dictionary(charset,pofile);
             POParser::parse(pofile, *in, *dict);
           }
         }
@@ -183,9 +189,9 @@ DictionaryManager::get_dictionary(const Language& language, const std::string& t
         }
       }
     }
-  
+
     dictionaries[language] = dict;
-	
+
     return *dict;
   }
 }
@@ -203,26 +209,31 @@ DictionaryManager::get_languages(const std::string& textdomain)
 
     for(std::vector<std::string>::iterator file = files.begin(); file != files.end(); ++file)
     {
-      if (has_suffix(*file, ".po")) 
+      if (has_suffix(*file, ".po") || has_suffix(*file, ".pot"))
       {
         languages.insert(Language::from_env(file->substr(0, file->size()-3)));
       }
     }
 
-	// If we were given a text domain, we also search directories looking for ll_CC/textdomain.po
-	if ( !textdomain.empty() )
-	{
+    // If we were given a text domain, we also search directories looking for ll_CC/textdomain.po
+    if ( !textdomain.empty() )
+    {
       for(std::vector<std::string>::iterator directory = dirs.begin(); directory != dirs.end(); directory++)
       {
-	    Language po_language = Language::from_env(*directory);
-		std::string filename = *directory + "/" + textdomain + ".po";
-	    if ( po_language && filesystem->file_exists(*p + "/" + filename) )
-		{
-		  languages.insert(Language::from_env(*directory));
-		}
-	  }		
-	}	
-	
+        Language po_language = Language::from_env(*directory);
+        std::string filename = *directory + "/" + textdomain + ".po";
+
+        if (!filesystem->file_exists(*p + "/" + filename))
+        {
+          filename += "t";
+        }
+
+        if ( po_language && filesystem->file_exists(*p + "/" + filename) )
+        {
+          languages.insert(Language::from_env(*directory));
+        }
+      }
+    }
   }
   return languages;
 }
@@ -233,7 +244,7 @@ DictionaryManager::set_language(const Language& language)
   if (current_language != language)
   {
     current_language = language;
-    current_dict     = 0;
+    current_dict = 0;
   }
 }
 

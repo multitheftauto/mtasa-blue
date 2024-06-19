@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <game/CWeapon.h>
 #include "CWeaponRPCs.h"
 #include "net/SyncStructures.h"
 

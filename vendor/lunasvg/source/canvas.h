@@ -13,20 +13,17 @@ using GradientStops = std::vector<GradientStop>;
 
 using DashArray = std::vector<double>;
 
-struct DashData
-{
+struct DashData {
     DashArray array;
     double offset{0.0};
 };
 
-enum class TextureType
-{
+enum class TextureType {
     Plain,
     Tiled
 };
 
-enum class BlendMode
-{
+enum class BlendMode {
     Src,
     Src_Over,
     Dst_In,
@@ -35,8 +32,7 @@ enum class BlendMode
 
 class CanvasImpl;
 
-class Canvas
-{
+class Canvas {
 public:
     static std::shared_ptr<Canvas> create(unsigned char* data, unsigned int width, unsigned int height, unsigned int stride);
     static std::shared_ptr<Canvas> create(double x, double y, double width, double height);
@@ -52,8 +48,6 @@ public:
     void blend(const Canvas* source, BlendMode mode, double opacity);
     void mask(const Rect& clip, const Transform& transform);
 
-    void clear(unsigned int value);
-    void rgba();
     void luminance();
 
     unsigned int width() const;
@@ -63,6 +57,7 @@ public:
     Rect box() const;
 
     ~Canvas();
+
 private:
     Canvas(unsigned char* data, int width, int height, int stride);
     Canvas(int x, int y, int width, int height);

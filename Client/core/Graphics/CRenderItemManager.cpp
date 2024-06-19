@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <game/CRenderWare.h>
+#include <game/CSettings.h>
 #include "CRenderItem.EffectCloner.h"
 
 // Type of vertex used to emulate StretchRect for SwiftShader bug
@@ -176,7 +178,8 @@ CVectorGraphicItem* CRenderItemManager::CreateVectorGraphic(uint width, uint hei
 //
 //
 ////////////////////////////////////////////////////////////////
-CRenderTargetItem* CRenderItemManager::CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bWithAlphaChannel, bool bForce)
+CRenderTargetItem* CRenderItemManager::CreateRenderTarget(uint uiSizeX, uint uiSizeY, bool bHasSurfaceFormat, bool bWithAlphaChannel, int surfaceFormat,
+                                                          bool bForce)
 {
     if (!bForce && !CanCreateRenderItem(CRenderTargetItem::GetClassId()))
         return NULL;
@@ -185,7 +188,7 @@ CRenderTargetItem* CRenderItemManager::CreateRenderTarget(uint uiSizeX, uint uiS
     bool bIncludeInMemoryStats = (bForce == false);
 
     CRenderTargetItem* pRenderTargetItem = new CRenderTargetItem();
-    pRenderTargetItem->PostConstruct(this, uiSizeX, uiSizeY, bWithAlphaChannel, bIncludeInMemoryStats);
+    pRenderTargetItem->PostConstruct(this, uiSizeX, uiSizeY, bHasSurfaceFormat, bWithAlphaChannel, surfaceFormat, bIncludeInMemoryStats);
 
     if (!pRenderTargetItem->IsValid())
     {
@@ -496,7 +499,7 @@ void CRenderItemManager::UpdateBackBufferCopySize()
 
         // Try to create new one if needed
         if (uiSizeX > 0)
-            m_pBackBufferCopy = CreateRenderTarget(uiSizeX, uiSizeY, false, true);
+            m_pBackBufferCopy = CreateRenderTarget(uiSizeX, uiSizeY, false, false, (_D3DFORMAT)0, true);
     }
 }
 
@@ -782,7 +785,9 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     outStatus.settings.fFieldOfView = 70;
     outStatus.settings.bHighDetailVehicles = false;
     outStatus.settings.bHighDetailPeds = false;
+    outStatus.settings.bBlur = true;
     outStatus.settings.bCoronaReflections = false;
+    outStatus.settings.bDynamicPedShadows = false;
 
     CVARS_GET("streaming_memory", outStatus.settings.iStreamingMemory);
     CVARS_GET("volumetric_shadows", outStatus.settings.bVolumetricShadows);
@@ -794,13 +799,20 @@ void CRenderItemManager::GetDxStatus(SDxStatus& outStatus)
     CVARS_GET("fov", outStatus.settings.fFieldOfView);
     CVARS_GET("high_detail_vehicles", outStatus.settings.bHighDetailVehicles);
     CVARS_GET("high_detail_peds", outStatus.settings.bHighDetailPeds);
+    CVARS_GET("blur", outStatus.settings.bBlur);
     CVARS_GET("corona_reflections", outStatus.settings.bCoronaReflections);
+    CVARS_GET("dynamic_ped_shadows", outStatus.settings.bDynamicPedShadows);
 
     if (outStatus.settings.iFXQuality == 0)
     {
         // These are always off with low fx quality
         outStatus.settings.bVolumetricShadows = false;
         outStatus.settings.bGrassEffect = false;
+    }
+
+    if (outStatus.settings.iFXQuality < 2)
+    {
+        outStatus.settings.bDynamicPedShadows = false;
     }
 
     // Display color depth

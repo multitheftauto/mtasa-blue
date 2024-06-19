@@ -12,7 +12,6 @@
 #pragma once
 
 #include <game/CBikeHandlingEntry.h>
-#include "Common.h"
 
 struct tBikeHandlingDataSA
 {

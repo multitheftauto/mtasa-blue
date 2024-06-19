@@ -5,7 +5,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -17,6 +17,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -77,21 +79,20 @@ static int get_char(char c, int base);
 static curl_off_t strtooff(const char *nptr, char **endptr, int base)
 {
   char *end;
-  int is_negative = 0;
-  int overflow;
+  bool is_negative = FALSE;
+  bool overflow = FALSE;
   int i;
   curl_off_t value = 0;
-  curl_off_t newval;
 
   /* Skip leading whitespace. */
   end = (char *)nptr;
-  while(ISSPACE(end[0])) {
+  while(ISBLANK(end[0])) {
     end++;
   }
 
   /* Handle the sign, if any. */
   if(end[0] == '-') {
-    is_negative = 1;
+    is_negative = TRUE;
     end++;
   }
   else if(end[0] == '+') {
@@ -127,19 +128,15 @@ static curl_off_t strtooff(const char *nptr, char **endptr, int base)
   }
 
   /* Loop handling digits. */
-  value = 0;
-  overflow = 0;
   for(i = get_char(end[0], base);
       i != -1;
       end++, i = get_char(end[0], base)) {
-    newval = base * value + i;
-    if(newval < value) {
-      /* We've overflowed. */
-      overflow = 1;
+
+    if(value > (CURL_OFF_T_MAX - i) / base) {
+      overflow = TRUE;
       break;
     }
-    else
-      value = newval;
+    value = base * value + i;
   }
 
   if(!overflow) {
@@ -215,14 +212,15 @@ static int get_char(char c, int base)
 CURLofft curlx_strtoofft(const char *str, char **endp, int base,
                          curl_off_t *num)
 {
-  char *end;
+  char *end = NULL;
   curl_off_t number;
   errno = 0;
   *num = 0; /* clear by default */
+  DEBUGASSERT(base); /* starting now, avoid base zero */
 
-  while(*str && ISSPACE(*str))
+  while(*str && ISBLANK(*str))
     str++;
-  if('-' == *str) {
+  if(('-' == *str) || (ISSPACE(*str))) {
     if(endp)
       *endp = (char *)str; /* didn't actually move */
     return CURL_OFFT_INVAL; /* nothing parsed */

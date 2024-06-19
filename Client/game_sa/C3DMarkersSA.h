@@ -11,24 +11,13 @@
 
 #pragma once
 
-#ifdef GTASA_30
-
-#define FUNC_PlaceMarker        0x756D60
-#define ARRAY_3D_MARKERS        0xCEA2F0
-
-#else
-
-#define FUNC_PlaceMarker        0x725120 // ##SA##
-#define ARRAY_3D_MARKERS        0xC7DD58
-
-#endif
-
-#define MAX_3D_MARKERS          32
-
 #include <game/C3DMarkers.h>
 #include "C3DMarkerSA.h"
 
-class C3DMarkerVC;
+#define FUNC_PlaceMarker        0x725120
+#define ARRAY_3D_MARKERS        0xC7DD58
+
+#define MAX_3D_MARKERS          32
 
 class C3DMarkersSA : public C3DMarkers
 {
@@ -36,11 +25,11 @@ private:
     C3DMarkerSA* Markers[MAX_3D_MARKERS];
 
 public:
-    // constructor
     C3DMarkersSA();
     ~C3DMarkersSA();
 
-    C3DMarker* CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, FLOAT fSize, FLOAT fPulseFraction, BYTE r, BYTE g, BYTE b, BYTE a);
+    C3DMarker* CreateMarker(DWORD Identifier, e3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b, BYTE a);
     C3DMarker* FindFreeMarker();
     C3DMarker* FindMarker(DWORD Identifier);
+    void       ReinitMarkers();
 };

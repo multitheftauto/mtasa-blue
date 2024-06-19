@@ -13,6 +13,7 @@
 
 #include <CVector.h>
 #include "CPacket.h"
+#include <net/SyncStructures.h>
 #include <vector>
 
 class CPedSyncPacket final : public CPacket
@@ -20,22 +21,27 @@ class CPedSyncPacket final : public CPacket
 public:
     struct SyncData
     {
-        bool          bSend;
-        ElementID     Model;
-        unsigned char ucFlags;
-        unsigned char ucSyncTimeContext;
-        CVector       vecPosition;
-        float         fRotation;
-        CVector       vecVelocity;
-        float         fHealth;
-        float         fArmor;
-        bool          bOnFire;
-        bool          bIsInWater;
+        ElementID           ID;
+        unsigned char       ucFlags;
+        unsigned char       ucSyncTimeContext;
+        SPositionSync       position;
+        SPedRotationSync    rotation;
+        SVelocitySync       velocity;
+        float               fHealth;
+        float               fArmor;
+        bool                bOnFire;
+        bool                bIsInWater;
+
+        bool ReadSpatialData(NetBitStreamInterface& BitStream);
+        // Backward compatibility
+        bool ReadSpatialDataBC(NetBitStreamInterface& BitStream);
     };
 
 public:
+    // Used when receiving ped sync from clients, can contain multiple SyncData
     CPedSyncPacket(){};
-    ~CPedSyncPacket();
+    // Used when sending ped sync to clients, only contains one SyncData
+    CPedSyncPacket(SyncData& pReadData);
 
     ePacketID     GetPacketID() const { return PACKET_ID_PED_SYNC; };
     unsigned long GetFlags() const { return PACKET_MEDIUM_PRIORITY | PACKET_SEQUENCED; };
@@ -43,8 +49,5 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
 
-    std::vector<SyncData*>::const_iterator IterBegin() { return m_Syncs.begin(); };
-    std::vector<SyncData*>::const_iterator IterEnd() { return m_Syncs.end(); };
-
-    std::vector<SyncData*> m_Syncs;
+    std::vector<SyncData> m_Syncs;
 };

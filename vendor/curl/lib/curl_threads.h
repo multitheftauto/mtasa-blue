@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 #include "curl_setup.h"
@@ -38,8 +40,7 @@
 #  define curl_thread_t          HANDLE
 #  define curl_thread_t_null     (HANDLE)0
 #  if !defined(_WIN32_WINNT) || !defined(_WIN32_WINNT_VISTA) || \
-      (_WIN32_WINNT < _WIN32_WINNT_VISTA) || \
-      (defined(__MINGW32__) && !defined(__MINGW64_VERSION_MAJOR))
+      (_WIN32_WINNT < _WIN32_WINNT_VISTA)
 #    define Curl_mutex_init(m)   InitializeCriticalSection(m)
 #  else
 #    define Curl_mutex_init(m)   InitializeCriticalSectionEx(m, 0, 1)

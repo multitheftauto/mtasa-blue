@@ -59,7 +59,8 @@ public:
             // The string received may not actually be a number
             if (!lua_isnumber(m_luaVM, m_iIndex))
             {
-                SetCustomWarning("Expected number, got non-convertible string. This warning may be an error in future versions.");
+                SetCustomError("Expected number, got non-convertible string", "Bad argument");
+                return;
             }
 
             // Returns 0 even if the string cannot be parsed as a number
@@ -76,7 +77,8 @@ public:
             {
                 if (checkSign && number < -FLT_EPSILON)
                 {
-                    SetCustomWarning("Expected positive value, got negative. This warning may be an error in future versions.");
+                    SetCustomError("Expected positive value, got negative", "Bad argument");
+                    return;
                 }
                 outValue = static_cast<T>(static_cast<int64_t>(number));
                 return;
@@ -103,7 +105,8 @@ public:
             // The string received may not actually be a number
             if (!lua_isnumber(m_luaVM, m_iIndex))
             {
-                SetCustomWarning("Expected number, got non-convertible string. This warning may be an error in future versions.");
+                SetCustomError("Expected number, got non-convertible string", "Bad argument");
+                return;
             }
 
             // Returns 0 even if the string cannot be parsed as a number
@@ -118,7 +121,8 @@ public:
 
             if (checkSign && std::is_unsigned<T>() && number < -FLT_EPSILON)
             {
-                SetCustomWarning("Expected positive value, got negative. This warning may be an error in future versions.");
+                SetCustomError("Expected positive value, got negative", "Bad argument");
+                return;
             }
 
             outValue = static_cast<T>(number);
@@ -519,6 +523,22 @@ public:
         bOutValue = false;
         SetTypeError("bool");
         m_iIndex++;
+    }
+
+    //
+    // Read next bool or false if failed
+    // Intended for use in pair with NextIsBool()
+    //
+    bool ReadBool()
+    {
+        int iArgument = lua_type(m_luaVM, m_iIndex);
+        if (iArgument == LUA_TBOOLEAN)
+        {
+            return lua_toboolean(m_luaVM, m_iIndex++) ? true : false;
+        }
+        
+        m_iIndex++;
+        return false;
     }
 
     //

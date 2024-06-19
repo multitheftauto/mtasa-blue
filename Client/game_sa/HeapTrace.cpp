@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "HeapTrace.h"
 
 #ifdef DETECT_LEAKS
 #include <list>

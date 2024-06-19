@@ -11,16 +11,16 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CFire.h>
-#include "Common.h"
-#include "CEntitySA.h"
 
-#define FUNC_Extinguish                 0x5393F0        //  ##SA##
-#define FUNC_CreateFxSysForStrength     0x539360        //  ##SA##
+class CEntitySAInterface;
+class FxSystem_c;
 
-class FxSystem_c;            // we don't actually define this anywhere
+#define FUNC_Extinguish                 0x5393F0
+#define FUNC_CreateFxSysForStrength     0x539360
 
-class CFireSAInterface : public CFireInterface
+class CFireSAInterface
 {
 public:
     BYTE                bActive : 1;
@@ -33,11 +33,10 @@ public:
     CEntitySAInterface* entityTarget;
     CEntitySAInterface* entityCreator;
     DWORD               nTimeToBurn;
-    FLOAT               Strength;
+    float               Strength;
     signed char         nNumGenerationsAllowed;
     BYTE                RemovalDist;
-
-    FxSystem_c* m_fxSysPtr;
+    FxSystem_c*         m_fxSysPtr;
 };
 
 class CFireSA : public CFire
@@ -46,24 +45,23 @@ private:
     CFireSAInterface* internalInterface;
 
 public:
-    // constructor
-    CFireSA(CFireSAInterface* fireInterface) { this->internalInterface = fireInterface; }
+    CFireSA(CFireSAInterface* fireInterface) { internalInterface = fireInterface; }
 
-    VOID            Extinguish();
-    CVector*        GetPosition();
-    VOID            SetPosition(CVector& vecPosition);
-    VOID            SetTimeToBurnOut(DWORD dwTime);
-    DWORD           GetTimeToBurnOut();
-    CEntity*        GetCreator();
-    CEntity*        GetEntityOnFire();
-    VOID            SetTarget(CEntity* entity);
-    BOOL            IsIgnited();
-    BOOL            IsFree();
-    VOID            SetSilent(BOOL bSilent);
-    BOOL            IsBeingExtinguished();
-    VOID            Ignite();
-    FLOAT           GetStrength();
-    VOID            SetStrength(FLOAT fStrength);
-    VOID            SetNumGenerationsAllowed(char generations);
-    CFireInterface* GetInterface() { return this->internalInterface; }
+    void              Extinguish();
+    CVector*          GetPosition();
+    void              SetPosition(CVector& vecPosition);
+    void              SetTimeToBurnOut(DWORD dwTime);
+    DWORD             GetTimeToBurnOut();
+    CEntity*          GetCreator();
+    CEntity*          GetEntityOnFire();
+    void              SetTarget(CEntity* entity);
+    bool              IsIgnited();
+    bool              IsFree();
+    void              SetSilent(bool bSilent);
+    bool              IsBeingExtinguished();
+    void              Ignite();
+    float             GetStrength();
+    void              SetStrength(float fStrength);
+    void              SetNumGenerationsAllowed(char generations);
+    CFireSAInterface* GetInterface() { return internalInterface; }
 };

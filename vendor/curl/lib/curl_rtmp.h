@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2010 - 2020, Howard Chu, <hyc@highlandsun.com>
+ * Copyright (C) Howard Chu, <hyc@highlandsun.com>
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,6 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #ifdef USE_LIBRTMP
 extern const struct Curl_handler Curl_handler_rtmp;
@@ -28,6 +30,8 @@ extern const struct Curl_handler Curl_handler_rtmpe;
 extern const struct Curl_handler Curl_handler_rtmpte;
 extern const struct Curl_handler Curl_handler_rtmps;
 extern const struct Curl_handler Curl_handler_rtmpts;
+
+void Curl_rtmp_version(char *version, size_t len);
 #endif
 
 #endif /* HEADER_CURL_RTMP_H */

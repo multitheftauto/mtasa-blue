@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <core/CClientCommands.h>
 #include <game/CGame.h>
+#include <game/CSettings.h>
 
 using namespace std;
 
@@ -158,7 +159,7 @@ void CSettings::CreateGUI()
     // Mouse Options
     m_pControlsMouseLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Mouse options")));
     m_pControlsMouseLabel->SetPosition(CVector2D(vecTemp.fX + 11, vecTemp.fY));
-    m_pControlsMouseLabel->AutoSize(NULL, 5.0f);
+    m_pControlsMouseLabel->AutoSize(NULL, 20.0f);
     m_pControlsMouseLabel->SetFont("default-bold-small");
     vecTemp.fY += 18;
 
@@ -176,7 +177,7 @@ void CSettings::CreateGUI()
     m_pFlyWithMouse->AutoSize(NULL, 20.0f);
 
     // MouseSensitivity
-    vecTemp.fY += 52.0f;
+    vecTemp.fY += 54.0f;
     m_pLabelMouseSensitivity = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Mouse sensitivity:")));
     m_pLabelMouseSensitivity->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pLabelMouseSensitivity->AutoSize();
@@ -192,7 +193,7 @@ void CSettings::CreateGUI()
     m_pLabelMouseSensitivityValue->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 5.0f, vecTemp.fY));
     m_pLabelMouseSensitivityValue->AutoSize("100%");
     vecTemp.fX = 16;
-    vecTemp.fY += 26.f;
+    vecTemp.fY += 24.f;
 
     // VerticalAimSensitivity
     m_pLabelVerticalAimSensitivity = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Vertical aim sensitivity:")));
@@ -271,12 +272,12 @@ void CSettings::CreateGUI()
         m_pEditSaturation->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
 
         CGUILabel* pLabelDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Dead Zone")));
-        pLabelDeadZone->SetPosition(m_pEditDeadzone->GetPosition() + CVector2D(52.f, -1.f));
+        pLabelDeadZone->SetPosition(m_pEditDeadzone->GetPosition() + CVector2D(52.f, 1.f));
         pLabelDeadZone->AutoSize();
         pLabelDeadZone->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 
         CGUILabel* pLabelSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Saturation")));
-        pLabelSaturation->SetPosition(m_pEditSaturation->GetPosition() + CVector2D(52.f, -1.f));
+        pLabelSaturation->SetPosition(m_pEditSaturation->GetPosition() + CVector2D(52.f, 1.f));
         pLabelSaturation->AutoSize();
         pLabelSaturation->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
         vecTemp.fY += 106;
@@ -362,6 +363,18 @@ void CSettings::CreateGUI()
     m_pEditNick->SetMaxLength(MAX_PLAYER_NICK_LENGTH);
     m_pEditNick->SetTextAcceptedHandler(GUI_CALLBACK(&CSettings::OnOKButtonClick, this));
 
+    m_pButtonGenerateNick = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabMultiplayer));
+    m_pButtonGenerateNick->SetPosition(CVector2D(vecSize.fX + vecTemp.fX + 50.0f + 178.0f + 5.0f, vecTemp.fY - 1.0f), false);
+    m_pButtonGenerateNick->SetSize(CVector2D(26.0f, 26.0f), false);
+    m_pButtonGenerateNick->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickButtonClick, this));
+    m_pButtonGenerateNick->SetZOrderingEnabled(false);
+
+    m_pButtonGenerateNickIcon = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pButtonGenerateNick));
+    m_pButtonGenerateNickIcon->SetSize(CVector2D(1, 1), true);
+    m_pButtonGenerateNickIcon->LoadFromFile("cgui\\images\\serverbrowser\\refresh.png");
+    m_pButtonGenerateNickIcon->SetProperty("MousePassThroughEnabled", "True");
+    m_pButtonGenerateNickIcon->SetProperty("DistributeCapturedInputs", "True");
+
     m_pSavePasswords = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save server passwords"), true));
     m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 50.0f));
     m_pSavePasswords->GetPosition(vecTemp, false);
@@ -386,6 +399,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAlwaysShowTransferBox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAlwaysShowTransferBox->GetPosition(vecTemp, false);
     m_pCheckBoxAlwaysShowTransferBox->AutoSize(nullptr, 20.0f);
+
+    m_pCheckBoxAllowDiscordRPC = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow connecting with Discord Rich Presence"), false));
+    m_pCheckBoxAllowDiscordRPC->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowDiscordRPC->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowDiscordRPC->AutoSize(NULL, 20.0f);
 
     m_pCheckBoxCustomizedSAFiles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Use customized GTA:SA files"), true));
     m_pCheckBoxCustomizedSAFiles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -525,7 +543,7 @@ void CSettings::CreateGUI()
     m_pAudioRadioLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Radio options")));
     m_pAudioRadioLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
     m_pAudioRadioLabel->GetPosition(vecTemp, false);
-    m_pAudioRadioLabel->AutoSize(NULL, 10.0f);
+    m_pAudioRadioLabel->AutoSize(NULL, 20.0f);
     m_pAudioRadioLabel->SetFont("default-bold-small");
 
     m_pCheckBoxAudioEqualizer = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAudio, _("Radio Equalizer"), true));
@@ -541,7 +559,7 @@ void CSettings::CreateGUI()
     m_pAudioUsertrackLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Usertrack options")));
     m_pAudioUsertrackLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
     m_pAudioUsertrackLabel->GetPosition(vecTemp, false);
-    m_pAudioUsertrackLabel->AutoSize(NULL, 10.0f);
+    m_pAudioUsertrackLabel->AutoSize(NULL, 20.0f);
     m_pAudioUsertrackLabel->SetFont("default-bold-small");
 
     m_pLabelUserTrackMode = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Play mode:")));
@@ -567,7 +585,7 @@ void CSettings::CreateGUI()
     m_pAudioMuteLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Mute options")));
     m_pAudioMuteLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 52.0f));
     m_pAudioMuteLabel->GetPosition(vecTemp, false);
-    m_pAudioMuteLabel->AutoSize(NULL, 5.0f);
+    m_pAudioMuteLabel->AutoSize(NULL, 20.0f);
     m_pAudioMuteLabel->SetFont("default-bold-small");
 
     m_pCheckBoxMuteMaster = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAudio, _("Mute All sounds when minimized"), true));
@@ -807,13 +825,13 @@ void CSettings::CreateGUI()
     m_pCheckBoxTyreSmokeParticles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 90.0f));
     m_pCheckBoxTyreSmokeParticles->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
-    m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
-    m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+    m_pCheckBoxDynamicPedShadows = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Dynamic ped shadows"), true));
+    m_pCheckBoxDynamicPedShadows->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 110.0f));
+    m_pCheckBoxDynamicPedShadows->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
-    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
-    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
+    m_pCheckBoxBlur = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Motion blur"), true));
+    m_pCheckBoxBlur->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 130.0f));
+    m_pCheckBoxBlur->AutoSize(NULL, 20.0f);
 
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
@@ -852,8 +870,16 @@ void CSettings::CreateGUI()
     }
 #endif
 
+    m_pCheckBoxHighDetailVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render vehicles always in high detail"), true));
+    m_pCheckBoxHighDetailVehicles->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
+    m_pCheckBoxHighDetailVehicles->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxHighDetailPeds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Render peds always in high detail"), true));
+    m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
+    m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
+
     m_pCheckBoxCoronaReflections = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Corona rain reflections"), true));
-    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 90.0f));
+    m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
     m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
 
     vecTemp.fY += 10;
@@ -894,16 +920,16 @@ void CSettings::CreateGUI()
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);
-    m_pLabelBrowserCustomBlacklist->AutoSize(NULL, 5.0f);
+    m_pLabelBrowserCustomBlacklist->AutoSize(NULL, 20.0f);
     m_pLabelBrowserCustomBlacklist->SetFont("default-bold-small");
 
     m_pEditBrowserBlacklistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserBlacklistAdd->GetPosition(vecTemp);
-    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(191.0f, 22.0f));
+    m_pEditBrowserBlacklistAdd->SetSize(CVector2D(209.0f, 22.0f));
 
     m_pLabelBrowserBlacklistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserBlacklistAdd, _("Enter a domain e.g. google.com")));
-    m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10, 3), false);
+    m_pLabelBrowserBlacklistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
     m_pLabelBrowserBlacklistAdd->SetTextColor(0, 0, 0);
     m_pLabelBrowserBlacklistAdd->SetSize(CVector2D(1, 1), true);
     m_pLabelBrowserBlacklistAdd->SetAlpha(0.7f);
@@ -912,12 +938,12 @@ void CSettings::CreateGUI()
 
     m_pButtonBrowserBlacklistAdd = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Block")));
     m_pButtonBrowserBlacklistAdd->SetPosition(CVector2D(vecTemp.fX + m_pEditBrowserBlacklistAdd->GetSize().fX + 2.0f, vecTemp.fY));
-    m_pButtonBrowserBlacklistAdd->SetSize(CVector2D(64.0f, 22.0f));
+    m_pButtonBrowserBlacklistAdd->SetSize(CVector2D(90.0f, 22.0f));
 
     m_pGridBrowserBlacklist = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pTabBrowser));
     m_pGridBrowserBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserBlacklist->GetPosition(vecTemp);
-    m_pGridBrowserBlacklist->SetSize(CVector2D(256.0f, 150.0f));
+    m_pGridBrowserBlacklist->SetSize(CVector2D(300.0f, 150.0f));
     m_pGridBrowserBlacklist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserBlacklistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
@@ -927,18 +953,18 @@ void CSettings::CreateGUI()
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);            // Reset vecTemp
 
     m_pLabelBrowserCustomWhitelist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom whitelist")));
-    m_pLabelBrowserCustomWhitelist->SetPosition(CVector2D(292.0f, vecTemp.fY));
+    m_pLabelBrowserCustomWhitelist->SetPosition(CVector2D(vecTemp.fX + 300.0f + 19.0f, vecTemp.fY));
     m_pLabelBrowserCustomWhitelist->GetPosition(vecTemp);
-    m_pLabelBrowserCustomWhitelist->AutoSize(NULL, 5.0f);
+    m_pLabelBrowserCustomWhitelist->AutoSize(NULL, 20.0f);
     m_pLabelBrowserCustomWhitelist->SetFont("default-bold-small");
 
     m_pEditBrowserWhitelistAdd = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pTabBrowser));
     m_pEditBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 25.0f));
     m_pEditBrowserWhitelistAdd->GetPosition(vecTemp);
-    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(191.0f, 22.0f));
+    m_pEditBrowserWhitelistAdd->SetSize(CVector2D(209.0f, 22.0f));
 
     m_pLabelBrowserWhitelistAdd = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pEditBrowserWhitelistAdd, _("Enter a domain e.g. google.com")));
-    m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10, 3), false);
+    m_pLabelBrowserWhitelistAdd->SetPosition(CVector2D(10.0f, 3.0f), false);
     m_pLabelBrowserWhitelistAdd->SetTextColor(0, 0, 0);
     m_pLabelBrowserWhitelistAdd->SetSize(CVector2D(1, 1), true);
     m_pLabelBrowserWhitelistAdd->SetAlpha(0.7f);
@@ -947,12 +973,12 @@ void CSettings::CreateGUI()
 
     m_pButtonBrowserWhitelistAdd = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Allow")));
     m_pButtonBrowserWhitelistAdd->SetPosition(CVector2D(vecTemp.fX + m_pEditBrowserWhitelistAdd->GetSize().fX + 2.0f, vecTemp.fY));
-    m_pButtonBrowserWhitelistAdd->SetSize(CVector2D(64.0f, 22.0f));
+    m_pButtonBrowserWhitelistAdd->SetSize(CVector2D(90.0f, 22.0f));
 
     m_pGridBrowserWhitelist = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pTabBrowser));
     m_pGridBrowserWhitelist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 32.0f));
     m_pGridBrowserWhitelist->GetPosition(vecTemp);
-    m_pGridBrowserWhitelist->SetSize(CVector2D(256.0f, 150.0f));
+    m_pGridBrowserWhitelist->SetSize(CVector2D(300.0f, 150.0f));
     m_pGridBrowserWhitelist->AddColumn(_("Domain"), 0.9f);
 
     m_pButtonBrowserWhitelistRemove = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pTabBrowser, _("Remove domain")));
@@ -1115,18 +1141,17 @@ void CSettings::CreateGUI()
     m_pWin8Label = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Windows 8 compatibility:")));
     m_pWin8Label->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pWin8Label->AutoSize();
-    vecTemp.fX += 20;
 
     m_pWin8ColorCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("16-bit color")));
-    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
     m_pWin8ColorCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fX += 90;
+    vecTemp.fX += 140;
 
     m_pWin8MouseCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Mouse fix")));
-    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
     m_pWin8MouseCheckBox->AutoSize(NULL, 20.0f);
     vecTemp.fY += fLineHeight;
-    vecTemp.fX -= 110;
+    vecTemp.fX -= 140;
 
     // Hide if not Win8
     if (atoi(GetApplicationSetting("real-os-version")) != 8)
@@ -1244,6 +1269,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
     m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
+    m_pCheckBoxAllowDiscordRPC->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowDiscordRPC, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
@@ -1562,10 +1588,23 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("high_detail_peds", bHighDetailPeds);
     m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
 
+    // Blur
+    bool bBlur;
+    CVARS_GET("blur", bBlur);
+    m_pCheckBoxBlur->SetSelected(bBlur);
+
     // Corona rain reflections
     bool bCoronaReflections;
     CVARS_GET("corona_reflections", bCoronaReflections);
     m_pCheckBoxCoronaReflections->SetSelected(bCoronaReflections);
+
+    // Dynamic ped shadows
+    bool bDynamicPedShadows;
+    CVARS_GET("dynamic_ped_shadows", bDynamicPedShadows);
+    m_pCheckBoxDynamicPedShadows->SetSelected(bDynamicPedShadows);
+
+    // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
+    m_pCheckBoxDynamicPedShadows->SetEnabled(FxQuality >= 2);
 
     PopulateResolutionComboBox();
 
@@ -1791,7 +1830,9 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
+    CVARS_SET("blur", true);
     CVARS_SET("corona_reflections", false);
+    CVARS_SET("dynamic_ped_shadows", false);
     gameSettings->UpdateFieldOfViewFromSettings();
     gameSettings->SetDrawDistance(1.19625f);            // All values taken from a default SA install, no gta_sa.set or coreconfig.xml modifications.
     gameSettings->SetBrightness(253);
@@ -1799,6 +1840,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     gameSettings->SetAntiAliasing(1, true);
     gameSettings->ResetVehiclesLODDistance(false);
     gameSettings->ResetPedsLODDistance(false);
+    gameSettings->SetDynamicPedShadowsEnabled(false);
 
     // change
     bool bIsVideoModeChanged = GetVideoModeManager()->SetVideoMode(0, false, false, FULLSCREEN_STANDARD);
@@ -2293,7 +2335,7 @@ void CSettings::CreateInterfaceTabGUI()
             pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabOptions, _("Options")));
             pLabel->SetPosition(CVector2D(fMarginX, 10.0f));
             pLabel->GetPosition(vecTemp);
-            pLabel->AutoSize(NULL, 5.0f);
+            pLabel->AutoSize(NULL, 20.0f);
             pLabel->SetFont("default-bold-small");
 
             m_pChatCssBackground = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabOptions, _("Hide background when not typing")));
@@ -2910,6 +2952,12 @@ bool CSettings::OnOKButtonClick(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnNickButtonClick(CGUIElement* pElement)
+{
+    m_pEditNick->SetText(CNickGen::GetRandomNickname());
+    return true;
+}
+
 bool CSettings::OnCancelButtonClick(CGUIElement* pElement)
 {
     CMainMenu* pMainMenu = CLocalGUI::GetSingleton().GetMainMenu();
@@ -2985,6 +3033,11 @@ void CSettings::LoadData()
     bool alwaysShowTransferBox = false;
     CVARS_GET("always_show_transferbox", alwaysShowTransferBox);
     m_pCheckBoxAlwaysShowTransferBox->SetSelected(alwaysShowTransferBox);
+
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC;
+    CVARS_GET("allow_discord_rpc", bAllowDiscordRPC);
+    m_pCheckBoxAllowDiscordRPC->SetSelected(bAllowDiscordRPC);
 
     // Customized sa files
     m_pCheckBoxCustomizedSAFiles->SetSelected(GetApplicationSettingInt("customized-sa-files-request") != 0);
@@ -3412,6 +3465,31 @@ void CSettings::SaveData()
     CVARS_SET("always_show_transferbox", alwaysShowTransferBox);
     g_pCore->GetModManager()->TriggerCommand(mtasa::CMD_ALWAYS_SHOW_TRANSFERBOX, alwaysShowTransferBox);
 
+    // Allow DiscordRPC
+    bool bAllowDiscordRPC = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    CVARS_SET("allow_discord_rpc", bAllowDiscordRPC);
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(bAllowDiscordRPC);
+
+    if (bAllowDiscordRPC)
+    {
+        const auto discord = g_pCore->GetDiscord();
+
+        if (discord)
+        {
+            const char* state = _("Main menu");
+
+            if (g_pCore->IsConnected())
+            {                
+                state = _("In-game");
+
+                const SString& serverName = g_pCore->GetLastConnectedServerName();
+                discord->SetPresenceDetails(serverName.c_str(), false);
+            }
+
+            discord->SetPresenceState(state, false);
+        }
+    }
+
     // Grass
     bool bGrassEnabled = m_pCheckBoxGrass->GetSelected();
     CVARS_SET("grass", bGrassEnabled);
@@ -3437,10 +3515,20 @@ void CSettings::SaveData()
     CVARS_SET("high_detail_peds", bHighDetailPeds);
     gameSettings->ResetPedsLODDistance(false);
 
+    // Blur
+    bool bBlur = m_pCheckBoxBlur->GetSelected();
+    CVARS_SET("blur", bBlur);
+    gameSettings->ResetBlurEnabled();
+
     // Corona rain reflections
     bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();
     CVARS_SET("corona_reflections", bCoronaReflections);
     gameSettings->ResetCoronaReflectionsEnabled();
+
+    // Dynamic ped shadows
+    bool bDynamicPedShadows = m_pCheckBoxDynamicPedShadows->GetSelected();
+    CVARS_SET("dynamic_ped_shadows", bDynamicPedShadows);
+    gameSettings->SetDynamicPedShadowsEnabled(bDynamicPedShadows);
 
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
@@ -4373,6 +4461,8 @@ bool CSettings::OnFxQualityChanged(CGUIElement* pElement)
         m_pCheckBoxGrass->SetEnabled(true);
     }
 
+    // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
+    m_pCheckBoxDynamicPedShadows->SetEnabled((int)pItem->GetData() >= 2);
     return true;
 }
 
@@ -4436,6 +4526,43 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
         CCore::GetSingleton().ShowMessageBox(_("EXTERNAL SOUNDS"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
+}
+
+//
+// DiscordRPC
+//
+bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
+{
+    bool isEnabled = m_pCheckBoxAllowDiscordRPC->GetSelected();
+    g_pCore->GetDiscord()->SetDiscordRPCEnabled(isEnabled);
+
+    if (isEnabled)
+        ShowRichPresenceShareDataQuestionBox(); // show question box
+
+    return true;
+}
+
+static void ShowRichPresenceShareDataCallback(void* ptr, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    CVARS_SET("discord_rpc_share_data", static_cast<bool>(uiButton));
+}
+
+void CSettings::ShowRichPresenceShareDataQuestionBox() const
+{
+    SStringX strMessage(
+        _("It seems that you have the Rich Presence connection option enabled."
+          "\nDo you want to allow servers to share their data?"
+          "\n\nThis includes yours unique ID identifier."));
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("CONSENT TO ALLOW DATA SHARING"));
+    pQuestionBox->SetMessage(strMessage);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(ShowRichPresenceShareDataCallback);
+    pQuestionBox->Show();
 }
 
 //

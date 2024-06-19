@@ -5,8 +5,8 @@
  *                | (__| |_| |  _ <| |___
  *                 \___|\___/|_| \_\_____|
  *
- * Copyright (C) 2012 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
- * Copyright (C) 2010, Howard Chu, <hyc@highlandsun.com>
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Howard Chu, <hyc@highlandsun.com>
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -18,6 +18,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -33,11 +35,13 @@
 #include "warnless.h"
 #include <curl/curl.h>
 #include <librtmp/rtmp.h>
+
+/* The last 3 #include files should be in this order */
+#include "curl_printf.h"
 #include "curl_memory.h"
-/* The last #include file should be: */
 #include "memdebug.h"
 
-#if defined(WIN32) && !defined(USE_LWIPSOCK)
+#if defined(_WIN32) && !defined(USE_LWIPSOCK)
 #define setsockopt(a,b,c,d,e) (setsockopt)(a,b,c,(const char *)d,(int)e)
 #define SET_RCVTIMEO(tv,s)   int tv = s*1000
 #elif defined(LWIP_SO_SNDRCVTIMEO_NONSTANDARD)
@@ -64,7 +68,7 @@ static Curl_send rtmp_send;
  */
 
 const struct Curl_handler Curl_handler_rtmp = {
-  "RTMP",                               /* scheme */
+  "rtmp",                               /* scheme */
   rtmp_setup_connection,                /* setup_connection */
   rtmp_do,                              /* do_it */
   rtmp_done,                            /* done */
@@ -77,17 +81,18 @@ const struct Curl_handler Curl_handler_rtmp = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   rtmp_disconnect,                      /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_RTMP,                            /* defport */
   CURLPROTO_RTMP,                       /* protocol */
   CURLPROTO_RTMP,                       /* family */
-  PROTOPT_NONE                          /* flags*/
+  PROTOPT_NONE                          /* flags */
 };
 
 const struct Curl_handler Curl_handler_rtmpt = {
-  "RTMPT",                              /* scheme */
+  "rtmpt",                              /* scheme */
   rtmp_setup_connection,                /* setup_connection */
   rtmp_do,                              /* do_it */
   rtmp_done,                            /* done */
@@ -100,17 +105,18 @@ const struct Curl_handler Curl_handler_rtmpt = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   rtmp_disconnect,                      /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_RTMPT,                           /* defport */
   CURLPROTO_RTMPT,                      /* protocol */
   CURLPROTO_RTMPT,                      /* family */
-  PROTOPT_NONE                          /* flags*/
+  PROTOPT_NONE                          /* flags */
 };
 
 const struct Curl_handler Curl_handler_rtmpe = {
-  "RTMPE",                              /* scheme */
+  "rtmpe",                              /* scheme */
   rtmp_setup_connection,                /* setup_connection */
   rtmp_do,                              /* do_it */
   rtmp_done,                            /* done */
@@ -123,17 +129,18 @@ const struct Curl_handler Curl_handler_rtmpe = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   rtmp_disconnect,                      /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_RTMP,                            /* defport */
   CURLPROTO_RTMPE,                      /* protocol */
   CURLPROTO_RTMPE,                      /* family */
-  PROTOPT_NONE                          /* flags*/
+  PROTOPT_NONE                          /* flags */
 };
 
 const struct Curl_handler Curl_handler_rtmpte = {
-  "RTMPTE",                             /* scheme */
+  "rtmpte",                             /* scheme */
   rtmp_setup_connection,                /* setup_connection */
   rtmp_do,                              /* do_it */
   rtmp_done,                            /* done */
@@ -146,17 +153,18 @@ const struct Curl_handler Curl_handler_rtmpte = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   rtmp_disconnect,                      /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_RTMPT,                           /* defport */
   CURLPROTO_RTMPTE,                     /* protocol */
   CURLPROTO_RTMPTE,                     /* family */
-  PROTOPT_NONE                          /* flags*/
+  PROTOPT_NONE                          /* flags */
 };
 
 const struct Curl_handler Curl_handler_rtmps = {
-  "RTMPS",                              /* scheme */
+  "rtmps",                              /* scheme */
   rtmp_setup_connection,                /* setup_connection */
   rtmp_do,                              /* do_it */
   rtmp_done,                            /* done */
@@ -169,17 +177,18 @@ const struct Curl_handler Curl_handler_rtmps = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   rtmp_disconnect,                      /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_RTMPS,                           /* defport */
   CURLPROTO_RTMPS,                      /* protocol */
   CURLPROTO_RTMP,                       /* family */
-  PROTOPT_NONE                          /* flags*/
+  PROTOPT_NONE                          /* flags */
 };
 
 const struct Curl_handler Curl_handler_rtmpts = {
-  "RTMPTS",                             /* scheme */
+  "rtmpts",                             /* scheme */
   rtmp_setup_connection,                /* setup_connection */
   rtmp_do,                              /* do_it */
   rtmp_done,                            /* done */
@@ -192,13 +201,14 @@ const struct Curl_handler Curl_handler_rtmpts = {
   ZERO_NULL,                            /* domore_getsock */
   ZERO_NULL,                            /* perform_getsock */
   rtmp_disconnect,                      /* disconnect */
-  ZERO_NULL,                            /* readwrite */
+  ZERO_NULL,                            /* write_resp */
+  ZERO_NULL,                            /* write_resp_hd */
   ZERO_NULL,                            /* connection_check */
   ZERO_NULL,                            /* attach connection */
   PORT_RTMPS,                           /* defport */
   CURLPROTO_RTMPTS,                     /* protocol */
   CURLPROTO_RTMPT,                      /* family */
-  PROTOPT_NONE                          /* flags*/
+  PROTOPT_NONE                          /* flags */
 };
 
 static CURLcode rtmp_setup_connection(struct Curl_easy *data,
@@ -229,7 +239,7 @@ static CURLcode rtmp_connect(struct Curl_easy *data, bool *done)
   /* We have to know if it's a write before we send the
    * connect request packet
    */
-  if(data->set.upload)
+  if(data->state.upload)
     r->Link.protocol |= RTMP_FEATURE_WRITE;
 
   /* For plain streams, use the buffer toggle trick to keep data flowing */
@@ -261,12 +271,12 @@ static CURLcode rtmp_do(struct Curl_easy *data, bool *done)
   if(!RTMP_ConnectStream(r, 0))
     return CURLE_FAILED_INIT;
 
-  if(data->set.upload) {
+  if(data->state.upload) {
     Curl_pgrsSetUploadSize(data, data->state.infilesize);
-    Curl_setup_transfer(data, -1, -1, FALSE, FIRSTSOCKET);
+    Curl_xfer_setup(data, -1, -1, FALSE, FIRSTSOCKET);
   }
   else
-    Curl_setup_transfer(data, FIRSTSOCKET, -1, FALSE, -1);
+    Curl_xfer_setup(data, FIRSTSOCKET, -1, FALSE, -1);
   *done = TRUE;
   return CURLE_OK;
 }
@@ -333,4 +343,20 @@ static ssize_t rtmp_send(struct Curl_easy *data, int sockindex,
 
   return num;
 }
+
+void Curl_rtmp_version(char *version, size_t len)
+{
+  char suff[2];
+  if(RTMP_LIB_VERSION & 0xff) {
+    suff[0] = (RTMP_LIB_VERSION & 0xff) + 'a' - 1;
+    suff[1] = '\0';
+  }
+  else
+    suff[0] = '\0';
+
+  msnprintf(version, len, "librtmp/%d.%d%s",
+            RTMP_LIB_VERSION >> 16, (RTMP_LIB_VERSION >> 8) & 0xff,
+            suff);
+}
+
 #endif  /* USE_LIBRTMP */

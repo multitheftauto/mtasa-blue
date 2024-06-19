@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -19,6 +19,8 @@
  *
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
+ *
+ * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
 
@@ -43,6 +45,8 @@ struct Curl_llist {
 void Curl_llist_init(struct Curl_llist *, Curl_llist_dtor);
 void Curl_llist_insert_next(struct Curl_llist *, struct Curl_llist_element *,
                             const void *, struct Curl_llist_element *node);
+void Curl_llist_append(struct Curl_llist *,
+                       const void *, struct Curl_llist_element *node);
 void Curl_llist_remove(struct Curl_llist *, struct Curl_llist_element *,
                        void *);
 size_t Curl_llist_count(struct Curl_llist *);

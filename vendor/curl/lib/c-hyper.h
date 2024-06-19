@@ -7,7 +7,7 @@
  *                            | (__| |_| |  _ <| |___
  *                             \___|\___/|_| \_\_____|
  *
- * Copyright (C) 1998 - 2021, Daniel Stenberg, <daniel@haxx.se>, et al.
+ * Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
  *
  * This software is licensed as described in the file COPYING, which
  * you should have received as part of this distribution. The terms
@@ -20,6 +20,8 @@
  * This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
  * KIND, either express or implied.
  *
+ * SPDX-License-Identifier: curl
+ *
  ***************************************************************************/
 #include "curl_setup.h"
 
@@ -27,13 +29,18 @@
 
 #include <hyper.h>
 
+struct hyp_io_ctx {
+  struct Curl_easy *data;
+  int sockindex;
+};
+
 /* per-transfer data for the Hyper backend */
 struct hyptransfer {
   hyper_waker *write_waker;
   hyper_waker *read_waker;
   const hyper_executor *exec;
-  hyper_task *endtask;
-  hyper_waker *exp100_waker;
+  hyper_waker *send_body_waker;
+  struct hyp_io_ctx io_ctx;
 };
 
 size_t Curl_hyper_recv(void *userp, hyper_context *ctx,
@@ -43,7 +50,6 @@ size_t Curl_hyper_send(void *userp, hyper_context *ctx,
 CURLcode Curl_hyper_stream(struct Curl_easy *data,
                            struct connectdata *conn,
                            int *didwhat,
-                           bool *done,
                            int select_res);
 
 CURLcode Curl_hyper_header(struct Curl_easy *data, hyper_headers *headers,

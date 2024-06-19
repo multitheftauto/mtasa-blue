@@ -10,6 +10,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <CVector.h>
+#include "CWaterSA.h"
+#include "CWaterManagerSA.h"
 
 extern CWaterManagerSA* g_pWaterManager;
 int                     ms_iNumNonDefaultAndNonZeroVertices = 0;

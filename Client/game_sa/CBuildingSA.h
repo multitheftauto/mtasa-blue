@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CBuildingSA.h
- *  PURPOSE:     Header file for building physical entity class
+ *  PURPOSE:     Header file for game building class
  *
  *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
@@ -14,21 +14,17 @@
 #include <game/CBuilding.h>
 #include "CEntitySA.h"
 
-#define FUNC_CBuilding_operator_new     0x404090
-#define FUNC_CBuilding_Constructor      0x403E00
-
 class CBuildingSAInterface : public CEntitySAInterface
 {
 };
-static_assert(sizeof(CBuildingSAInterface) == sizeof(CEntitySAInterface), "Invalid size for CBuildingSAInterface");
+static_assert(sizeof(CBuildingSAInterface) == 0x38, "Invalid size CBuildingSAInterface");
 
-class CBuildingSA : public virtual CBuilding, public virtual CEntitySA
+class CBuildingSA final : public virtual CBuilding, public virtual CEntitySA
 {
-private:
-    CBuildingSAInterface* internalInterface;
-
 public:
-    CBuildingSA(CBuildingSAInterface* objectInterface);
-    CBuildingSA(DWORD dwModel);
-    ~CBuildingSA();
+    CBuildingSA(CBuildingSAInterface* pInterface);
+
+    CBuildingSAInterface* GetBuildingInterface() { return static_cast<CBuildingSAInterface*>(GetInterface()); };
+
+    void SetLod(CBuilding* pLod) override;
 };

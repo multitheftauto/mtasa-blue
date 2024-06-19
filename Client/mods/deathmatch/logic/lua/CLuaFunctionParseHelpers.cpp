@@ -7,6 +7,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CSettings.h>
 
 //
 // enum values <-> script strings
@@ -283,6 +284,8 @@ IMPLEMENT_ENUM_END("weapon-skill")
 IMPLEMENT_ENUM_BEGIN(ERenderFormat)
 ADD_ENUM(RFORMAT_UNKNOWN, "unknown")
 ADD_ENUM(RFORMAT_ARGB, "argb")
+ADD_ENUM(RFORMAT_XRGB, "xrgb")
+ADD_ENUM(RFORMAT_RGB,  "rgb")
 ADD_ENUM(RFORMAT_DXT1, "dxt1")
 ADD_ENUM(RFORMAT_DXT2, "dxt2")
 ADD_ENUM(RFORMAT_DXT3, "dxt3")
@@ -313,6 +316,7 @@ ADD_ENUM(EPixelsFormat::UNKNOWN, "unknown")
 ADD_ENUM(EPixelsFormat::PLAIN, "plain")
 ADD_ENUM(EPixelsFormat::JPEG, "jpeg")
 ADD_ENUM(EPixelsFormat::PNG, "png")
+ADD_ENUM(EPixelsFormat::DDS, "dds")
 IMPLEMENT_ENUM_END("pixel-format")
 
 IMPLEMENT_ENUM_BEGIN(EBlendModeType)
@@ -580,6 +584,15 @@ ADD_ENUM(WING_AIRTRAIL, "wing_airtrail")
 ADD_ENUM(VEH_GUN, "veh_gun")
 IMPLEMENT_ENUM_END("vehicle-dummy")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eGrainMultiplierType)
+ADD_ENUM(eGrainMultiplierType::MASTER, "master")
+ADD_ENUM(eGrainMultiplierType::INFRARED, "infrared")
+ADD_ENUM(eGrainMultiplierType::NIGHT, "night")
+ADD_ENUM(eGrainMultiplierType::RAIN, "rain")
+ADD_ENUM(eGrainMultiplierType::OVERLAY, "overlay")
+ADD_ENUM(eGrainMultiplierType::ALL, "all")
+IMPLEMENT_ENUM_CLASS_END("grain-multiplier-type")
+
 IMPLEMENT_ENUM_CLASS_BEGIN(eResizableVehicleWheelGroup)
 ADD_ENUM(eResizableVehicleWheelGroup::FRONT_AXLE, "front_axle")
 ADD_ENUM(eResizableVehicleWheelGroup::REAR_AXLE, "rear_axle")
@@ -663,6 +676,8 @@ IMPLEMENT_ENUM_CLASS_BEGIN(eClientModelType)
 ADD_ENUM(eClientModelType::PED, "ped")
 ADD_ENUM(eClientModelType::OBJECT, "object")
 ADD_ENUM(eClientModelType::VEHICLE, "vehicle")
+ADD_ENUM(eClientModelType::TIMED_OBJECT, "timed-object")
+ADD_ENUM(eClientModelType::CLUMP, "clump")
 IMPLEMENT_ENUM_CLASS_END("client-model-type")
 
 // Sound effects
@@ -755,6 +770,108 @@ ADD_ENUM(eSoundEffectParams::Reverb::REVERB_MIX, "reverbMix")
 ADD_ENUM(eSoundEffectParams::Reverb::REVERB_TIME, "reverbTime")
 ADD_ENUM(eSoundEffectParams::Reverb::HIGH_FREQ_RT_RATIO, "highFreqRTRatio")
 IMPLEMENT_ENUM_CLASS_END("soundeffect-params-reverb")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eModelIdeFlag)
+ADD_ENUM(eModelIdeFlag::IS_ROAD, "is_road")
+ADD_ENUM(eModelIdeFlag::DRAW_LAST, "draw_last")
+ADD_ENUM(eModelIdeFlag::ADDITIVE, "additive")
+ADD_ENUM(eModelIdeFlag::IGNORE_LIGHTING, "ignore_lighting")
+ADD_ENUM(eModelIdeFlag::NO_ZBUFFER_WRITE, "no_zbuffer_write")
+ADD_ENUM(eModelIdeFlag::DONT_RECEIVE_SHADOWS, "dont_receive_shadows")
+ADD_ENUM(eModelIdeFlag::IS_GLASS_TYPE_1, "is_glass_type_1")
+ADD_ENUM(eModelIdeFlag::IS_GLASS_TYPE_2, "is_glass_type_2")
+ADD_ENUM(eModelIdeFlag::IS_GARAGE_DOOR, "is_garage_door")
+ADD_ENUM(eModelIdeFlag::IS_DAMAGABLE, "is_damagable")
+ADD_ENUM(eModelIdeFlag::IS_TREE, "is_tree")
+ADD_ENUM(eModelIdeFlag::IS_PALM, "is_palm")
+ADD_ENUM(eModelIdeFlag::DOES_NOT_COLLIDE_WITH_FLYER, "does_not_collide_with_flyer")
+ADD_ENUM(eModelIdeFlag::IS_TAG, "is_tag")
+ADD_ENUM(eModelIdeFlag::DISABLE_BACKFACE_CULLING, "disable_backface_culling")
+ADD_ENUM(eModelIdeFlag::IS_BREAKABLE_STATUE, "is_breakable_statue")
+ADD_ENUM(eModelIdeFlag::IS_CRANE, "is_crane")
+IMPLEMENT_ENUM_CLASS_END("model-ide-flag")
+
+// https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat
+IMPLEMENT_ENUM_CLASS_BEGIN(_D3DFORMAT)
+ADD_ENUM(_D3DFORMAT::D3DFMT_R8G8B8, "r8g8b8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A8R8G8B8, "a8r8g8b8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_X8R8G8B8, "x8r8g8b8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_R5G6B5, "r5g6b5")
+ADD_ENUM(_D3DFORMAT::D3DFMT_X1R5G5B5, "x1r5g5b5")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A1R5G5B5, "a1r5g5b5")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A4R4G4B4, "a4r4g4b4")
+ADD_ENUM(_D3DFORMAT::D3DFMT_R3G3B2, "r3g3b2")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A8, "a8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A8R3G3B2, "a8r3g3b2")
+ADD_ENUM(_D3DFORMAT::D3DFMT_X4R4G4B4, "x4r4g4b4")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A2B10G10R10, "a2b10g10r10")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A8B8G8R8, "a8b8g8r8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_X8B8G8R8, "x8b8g8r8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_G16R16, "g16r16")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A2R10G10B10, "a2r10g10b10")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A16B16G16R16, "a16b16g16r16")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A8P8, "a8p8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_P8, "p8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_L8, "l8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_L16, "l16")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A8L8, "a8l8")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A4L4, "a4l4")
+ADD_ENUM(_D3DFORMAT::D3DFMT_R16F, "r16f")
+ADD_ENUM(_D3DFORMAT::D3DFMT_G16R16F, "g16r16f")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A16B16G16R16F, "a16b16g16r16f")
+ADD_ENUM(_D3DFORMAT::D3DFMT_R32F, "r32f")
+ADD_ENUM(_D3DFORMAT::D3DFMT_G32R32F, "g32r32f")
+ADD_ENUM(_D3DFORMAT::D3DFMT_A32B32G32R32F, "a32b32g32r32f")
+IMPLEMENT_ENUM_CLASS_END("surface-format")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eRenderStage)
+ADD_ENUM(eRenderStage::PRE_FX, "prefx")
+ADD_ENUM(eRenderStage::POST_FX, "postfx")
+ADD_ENUM(eRenderStage::POST_GUI, "postgui")
+IMPLEMENT_ENUM_CLASS_END("render-stage")
+
+IMPLEMENT_ENUM_BEGIN(ePools)
+ADD_ENUM(ePools::BUILDING_POOL, "building")
+ADD_ENUM(ePools::PED_POOL, "ped")
+ADD_ENUM(ePools::OBJECT_POOL, "object")
+ADD_ENUM(ePools::DUMMY_POOL, "dummy")
+ADD_ENUM(ePools::VEHICLE_POOL, "vehicle")
+ADD_ENUM(ePools::COL_MODEL_POOL, "col-model")
+ADD_ENUM(ePools::TASK_POOL, "task")
+ADD_ENUM(ePools::EVENT_POOL, "event")
+ADD_ENUM(ePools::TASK_ALLOCATOR_POOL, "task-allocator")
+ADD_ENUM(ePools::PED_INTELLIGENCE_POOL, "ped-intelligence")
+ADD_ENUM(ePools::PED_ATTRACTOR_POOL, "ped-attractor")
+ADD_ENUM(ePools::ENTRY_INFO_NODE_POOL, "entry-info-node")
+ADD_ENUM(ePools::NODE_ROUTE_POOL, "node-route")
+ADD_ENUM(ePools::PATROL_ROUTE_POOL, "patrol-route")
+ADD_ENUM(ePools::POINT_ROUTE_POOL, "point-route")
+ADD_ENUM(ePools::POINTER_DOUBLE_LINK_POOL, "pointer-double-link-pool")
+ADD_ENUM(ePools::POINTER_SINGLE_LINK_POOL, "pointer-single-link-pool")
+ADD_ENUM(ePools::ENV_MAP_MATERIAL_POOL, "env-map-material")
+ADD_ENUM(ePools::ENV_MAP_ATOMIC_POOL, "env-map-atomic")
+ADD_ENUM(ePools::SPEC_MAP_MATERIAL_POOL, "spec-map-material")
+IMPLEMENT_ENUM_END("gta-pool")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(eFxParticleSystems)
+ADD_ENUM(eFxParticleSystems::PRT_BLOOD, "blood")
+ADD_ENUM(eFxParticleSystems::PRT_BOATSPLASH, "boat_splash")
+ADD_ENUM(eFxParticleSystems::PRT_BUBBLE, "bubble")
+ADD_ENUM(eFxParticleSystems::PRT_DEBRIS, "car_debris")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKE, "collision_smoke")
+ADD_ENUM(eFxParticleSystems::PRT_GUNSHELL, "gunshell")
+ADD_ENUM(eFxParticleSystems::PRT_SAND, "sand")
+ADD_ENUM(eFxParticleSystems::PRT_SAND2, "sand2")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKEHUGE, "huge_smoke")
+ADD_ENUM(eFxParticleSystems::PRT_SMOKE2, "smoke")
+ADD_ENUM(eFxParticleSystems::PRT_SPARK, "spark")
+ADD_ENUM(eFxParticleSystems::PRT_SPARK2, "spark2")
+ADD_ENUM(eFxParticleSystems::PRT_SPLASH, "splash")
+ADD_ENUM(eFxParticleSystems::PRT_WAKE, "wake")
+ADD_ENUM(eFxParticleSystems::PRT_WATERSPLASH, "water_splash")
+ADD_ENUM(eFxParticleSystems::PRT_WHEELDIRT, "wheel_dirt")
+ADD_ENUM(eFxParticleSystems::PRT_GLASS, "glass")
+IMPLEMENT_ENUM_CLASS_END("particle-system")
 
 //
 // CResource from userdata
@@ -870,6 +987,8 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))            // Try 3D Vector
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
+        return GetClassTypeName(pVar);
+    if (auto* pVar = UserDataCast((CRemoteCall*)ptr, luaVM))
         return GetClassTypeName(pVar);
 
     return "";
@@ -1021,6 +1140,31 @@ bool MinClientReqCheck(CScriptArgReader& argStream, const char* szVersionReq, co
         }
     }
     return true;
+}
+
+//
+// Check min client is correct
+// Thrown a error if below required
+//
+void MinClientReqCheck(lua_State* luaVM, const char* szVersionReq, const char* szReason)
+{
+    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return;
+
+    CResource* pResource = pLuaMain->GetResource();
+    if (!pResource)
+        return;
+    
+    if (pResource->GetMinClientReq() < szVersionReq)
+    {
+        #if MTASA_VERSION_TYPE == VERSION_TYPE_RELEASE
+        SString err("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least client %s because %s)",
+                                szVersionReq, szReason);
+        throw std::invalid_argument(err);
+        #endif
+    }
+    
 }
 
 //

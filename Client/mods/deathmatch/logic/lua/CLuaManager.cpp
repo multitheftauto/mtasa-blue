@@ -279,4 +279,6 @@ void CLuaManager::LoadCFunctions()
     CLuaWorldDefs::LoadFunctions();
     CLuaXMLDefs::LoadFunctions();
     CLuaClientDefs::LoadFunctions();
+    CLuaDiscordDefs::LoadFunctions();
+    CLuaBuildingDefs::LoadFunctions();
 }

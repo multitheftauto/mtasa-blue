@@ -11,29 +11,11 @@
 
 #pragma once
 
+#include <CVector.h>
 #include <game/CFxSystem.h>
+#include <game/RenderWare.h>
 
-#define FUNC_FxSystem_c__AddParticle            0x004AA440
-#define FUNC_FxSystem_c__AttachToBone           0x004AA400
-#define FUNC_FxSystem_c__CopyParentMatrix       0x004AA890
-#define FUNC_FxSystem_c__DoFxAudio              0x004AAC90
-#define FUNC_FxSystem_c__EnablePrim             0x004AA610
-#define FUNC_FxSystem_c__Exit                   0x004AA840
-#define FUNC_FxSystem_c__GetBoundingSphereWld   0x004AAAD0
-#define FUNC_FxSystem_c__GetCompositeMatrix     0x007F18F0
-#define FUNC_FxSystem_c__GetPlayStatus          0x004AA900
-#define FUNC_FxSystem_c__Init                   0x004AA750
-#define FUNC_FxSystem_c__IsVisible              0x004AAF30
-#define FUNC_FxSystem_c__Kill                   0x004AA3F0
-#define FUNC_FxSystem_c__Play                   0x004AA2F0
-#define FUNC_FxSystem_c__PlayAndKill            0x004AA3D0
-#define FUNC_FxSystem_c__SetConstTime           0x004AA6C0
-#define FUNC_FxSystem_c__SetLocalParticles      0x004AA910
-#define FUNC_FxSystem_c__SetMatrix              0x004AA630
-#define FUNC_FxSystem_c__SetOffsetPos           0x004AA660
-#define FUNC_FxSystem_c__SetRateMult            0x004AA6F0
-#define FUNC_FxSystem_c__Stop                   0x004AA390
-#define FUNC_FxSystem_c__Update                 0x004AAF70
+#define FUNC_FxSystem_c__PlayAndKill                    0x4AA3D0
 #define VAR_FxSystemUpdateCullDistMultiplier            0x4AB032
 #define VAR_FxCreateParticleCullDistMultiplierA         0x4A4247
 #define VAR_FxCreateParticleCullDistMultiplierB         0x4A4255
@@ -51,7 +33,9 @@ public:
 };
 static_assert(sizeof(CAEFireAudioEntitySAInterface) == 0x88, "Invalid size for CAEFireAudioEntitySAInterface");
 
+class FxInfoSAInterface;
 class CFxSystemBPSAInterface;
+
 class CFxSystemSAInterface            // Internal SA Name: FxSystem_c
 {
 public:
@@ -116,16 +100,41 @@ protected:
     float                 m_fDrawDistance;
 };
 
-// FxEmitter stuff
-class CFxEmitterBPSAInterface
+class FxInfoManagerSAInterface
 {
 public:
-    void*  vtbl;                          // 0x00
-    char   pad[0x34];                     // 0x04
-    ushort usFadeNearDistance;            // 0x38
-    ushort usFadeFarDistance;             // 0x3A
-    // TODO the rest
+    uint32_t           m_nNumInfos;                     // 0x00
+    FxInfoSAInterface* m_pInfos;                        // 0x04
+    uint8_t            m_nFirstMovementInfo;            // 0x08
+    uint8_t            m_nFirstRenderInfo;              // 0x09
 };
+static_assert(sizeof(FxInfoManagerSAInterface) == 0xC, "Invalid size for FxInfoManagerSAInterface");
+
+class FxPrimBPSAInterface
+{
+public:
+    void*                    vtbl;                                  // 0x00
+    uint8_t                  field_4;                               // 0x04
+    uint8_t                  m_nSrcBlendId;                         // 0x05
+    uint8_t                  m_nDstBlendId;                         // 0x06
+    uint8_t                  m_bAlphaOn;                            // 0x07
+    void*                    m_pCompressedInitialMatrix;            // 0x08
+    RwTexture*               m_apTextures[4];                       // 0x0C
+    void*                    field_1C;                              // 0x1C
+    uint32_t                 particlesList[3];                      // 0x20 -- List_c
+    FxInfoManagerSAInterface m_infoManager;                         // 0x2C
+};
+static_assert(sizeof(FxPrimBPSAInterface) == 0x38, "Invalid size for FxPrimBPSAInterface");
+
+class CFxEmitterBPSAInterface : public FxPrimBPSAInterface
+{
+public:
+    uint16_t m_nLodStart;                       // 0x38
+    uint16_t m_nLodEnd;                         // 0x3A
+    bool     m_bHasInfoFlatData;                // 0x3C
+    bool     m_bHasInfoHeatHazeData;            // 0x3C
+};
+static_assert(sizeof(CFxEmitterBPSAInterface) == 0x40, "Invalid size for CFxEmitterBPSAInterface");
 
 class CFxEmitterSAInterface
 {
