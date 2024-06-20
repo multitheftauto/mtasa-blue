@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-20 22:30+0000\n"
+"POT-Creation-Date: 2024-06-20 23:55+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,17 +93,17 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1406
 #: Client/core/DXHook/CDirect3DHook9.cpp:127
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:637
-#: Client/mods/deathmatch/logic/CClientGame.cpp:711
-#: Client/mods/deathmatch/logic/CClientGame.cpp:735
-#: Client/mods/deathmatch/logic/CClientGame.cpp:757
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1173
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1332
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1369
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1418
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1430
+#: Client/mods/deathmatch/logic/CClientGame.cpp:638
+#: Client/mods/deathmatch/logic/CClientGame.cpp:712
+#: Client/mods/deathmatch/logic/CClientGame.cpp:736
+#: Client/mods/deathmatch/logic/CClientGame.cpp:758
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1174
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1333
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1370
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1431
 #: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
 #: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
 #: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
@@ -1176,12 +1176,12 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:3479 Client/core/CCore.cpp:674
 #: Client/core/CMainMenu.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:529
+#: Client/mods/deathmatch/logic/CClientGame.cpp:530
 msgid "Main menu"
 msgstr ""
 
 #: Client/core/CSettings.cpp:3483 Client/core/CCore.cpp:674
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1085
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1086
 #: Client/mods/deathmatch/logic/CResource.cpp:372
 msgid "In-game"
 msgstr ""
@@ -1387,47 +1387,47 @@ msgstr ""
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:653
+#: Client/mods/deathmatch/logic/CClientGame.cpp:654
 msgid "CONNECTING"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1332
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1333
 msgid "Connection timed out"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1380
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1381
 msgid "Disconnected: unknown protocol error"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1384
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1385
 msgid "Disconnected: disconnected remotely"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1388
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
 msgid "Disconnected: connection lost remotely"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1392
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
 msgid "Disconnected: you are banned from this server"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1400
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
 msgid "Disconnected: disconnected from the server"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1404
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
 msgid "Disconnected: connection to the server was lost"
 msgstr ""
 
 #: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1412
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
 msgid "Disconnected: connection was refused"
 msgstr ""
 
@@ -2095,8 +2095,8 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1300
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:637
-#: Client/mods/deathmatch/logic/CClientGame.cpp:735
+#: Client/mods/deathmatch/logic/CClientGame.cpp:638
+#: Client/mods/deathmatch/logic/CClientGame.cpp:736
 msgid "Invalid nickname! Please go to Settings and set a new one!"
 msgstr ""
 
@@ -2558,87 +2558,87 @@ msgstr ""
 msgid "Choking to death in"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:653
+#: Client/mods/deathmatch/logic/CClientGame.cpp:654
 msgid "Entering the game ..."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:711
+#: Client/mods/deathmatch/logic/CClientGame.cpp:712
 msgid ""
 "Not connected; please use Quick Connect or the 'connect' command to connect "
 "to a server."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:757
+#: Client/mods/deathmatch/logic/CClientGame.cpp:758
 msgid "Could not start the local server. See console for details."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:767
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1242
+#: Client/mods/deathmatch/logic/CClientGame.cpp:768
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
 msgid "Local Server"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:767
+#: Client/mods/deathmatch/logic/CClientGame.cpp:768
 msgid "Starting local server ..."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1015
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1016
 msgid "Area 51"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1024
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1025
 msgid "Walking around "
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1173
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1174
 #, c-format
 msgid "You were kicked from the game ( %s )"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1242
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
 msgid "Connecting to local server..."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1253
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
 msgid "Error connecting to server."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1263
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
 msgid "Connecting to local server timed out. See console for details."
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1369
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1370
 msgid "Connection with the server was lost"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1396
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
 msgid "Disconnected: the server is currently full"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1408
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
 msgid "Disconnected: invalid password specified"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1430
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1431
 msgid "MTA Client verification failed!"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5695
 msgid "In a ditch"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5695
 msgid "En-route to hospital"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5695
 msgid "Meeting their maker"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5695
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5696
 msgid "Regretting their decisions"
 msgstr ""
 
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5695
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5696
 msgid "Wasted"
 msgstr ""
 
