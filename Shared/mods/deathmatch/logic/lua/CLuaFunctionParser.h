@@ -727,7 +727,7 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
         {
             iResult = Call(L);
         }
-        catch (std::invalid_argument& e)
+        catch (std::logic_error& e)
         {
             // This exception can be thrown from the called function
             // as an additional way to provide further argument errors
