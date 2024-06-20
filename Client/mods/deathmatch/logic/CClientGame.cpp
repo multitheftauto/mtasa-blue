@@ -477,6 +477,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
+    g_pMultiplayer->SetPostColorFilterRenderHandler(nullptr);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(NULL);
