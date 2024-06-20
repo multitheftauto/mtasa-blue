@@ -73,6 +73,7 @@ private:
                    unsigned char ucGreen = 255, unsigned char ucBlue = 255);
 
     void PrintLog(const char* szText);
+    bool CheckForSufficientDebugLevel(unsigned int uiPlayerDebugLevel, unsigned int uiMessageDebugLevel);
     void Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel);
 
     unsigned int                   m_uiLogFileLevel;
