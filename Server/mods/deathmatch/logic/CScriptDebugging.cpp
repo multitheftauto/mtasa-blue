@@ -149,16 +149,16 @@ bool CScriptDebugging::CheckForSufficientDebugLevel(unsigned int uiPlayerDebugLe
 
     switch (uiMessageDebugLevel)
     {
-        case 1: // error message
-            uiSufficientDebugLevel = (uiPlayerDebugLevel >= 1); // errors
+        case eDebugMessageLevels::MESSAGE_TYPE_ERROR:
+            uiSufficientDebugLevel = (uiPlayerDebugLevel >= eDebugScriptLevels::ERRORS_ONLY);
             break;
-        case 2: // warning message
-            uiSufficientDebugLevel = (uiPlayerDebugLevel >= 2); // errors, warnings
+        case eDebugMessageLevels::MESSAGE_TYPE_WARNING:
+            uiSufficientDebugLevel = (uiPlayerDebugLevel >= eDebugScriptLevels::ERRORS_AND_WARNINGS);
             break;
-        case 3: // information message
-        case 4: // custom message
-        case 0: // debug message
-            uiSufficientDebugLevel = (uiPlayerDebugLevel == 3); // all
+        case eDebugMessageLevels::MESSAGE_TYPE_INFO:
+        case eDebugMessageLevels::MESSAGE_TYPE_CUSTOM:
+        case eDebugMessageLevels::MESSAGE_TYPE_DEBUG:
+            uiSufficientDebugLevel = (uiPlayerDebugLevel == eDebugScriptLevels::ALL);
             break;
     }
 
