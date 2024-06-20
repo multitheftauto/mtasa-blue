@@ -751,7 +751,7 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
 // Case where F is a class method pointer
 // Note: If you see weird compiler errors like: Undefined type, overload resolution failed, etc..
 // Ask on Dev Discord(#new-argument-parser), because rn this implementation is pretty beta. - 03/2021
-template <bool ErrorOnFailure, auto ReturnOnFailure, typename T, typename R, typename... Args, R (T::*F)(Args...)>
+template <bool ErrorOnFailure, auto ReturnOnFailure, typename T, typename R, typename... Args, R(T::*F)(Args...)>
 struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, F>
 {
     // Remove constness here, because we must be able to std::move
