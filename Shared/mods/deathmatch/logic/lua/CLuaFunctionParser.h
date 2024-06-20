@@ -105,7 +105,7 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, std::monostate>)
             return "";
         else
-            static_assert(false, "Invalid parameter type provided to CLuaFunctionParser!");
+            static_assert(sizeof(T) == 0, "Invalid parameter type provided to CLuaFunctionParser!");
     }
 
     // Reads the parameter type (& value in some cases) at a given index
