@@ -97,7 +97,7 @@ bool IsValidFilePath(const char* szDir, size_t length)
     if (szDir == nullptr)
         return false;
 
-    unsigned char c, c_d;
+    std::uint8_t c, c_d;
 
     // iterate through the char array
     for (size_t i = 0; i < length; i++)
@@ -541,7 +541,7 @@ bool IsValidFilePath(const char* szDir, size_t length)
     if (szDir == nullptr)
         return false;
 
-    unsigned char c, c_d;
+    std::uint8_t c, c_d;
 
     // iterate through the char array
     for (size_t i = 0; i < length; i++)
