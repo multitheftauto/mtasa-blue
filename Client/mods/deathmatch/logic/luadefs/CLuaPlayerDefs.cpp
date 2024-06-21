@@ -28,6 +28,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"isPlayerHudComponentVisible", IsPlayerHudComponentVisible},
         {"getPlayerMoney", GetPlayerMoney},
         {"getPlayerWantedLevel", GetPlayerWantedLevel},
+        {"getPlayerScriptDebugLevel", ArgumentParser<GetPlayerScriptDebugLevel>},
 
         // Player set funcs
         {"showPlayerHudComponent", ShowPlayerHudComponent},
@@ -87,6 +88,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTeam", "getPlayerTeam");
     lua_classfunction(luaVM, "getNametagText", "getPlayerNametagText");
     lua_classfunction(luaVM, "getNametagColor", "getPlayerNametagColor");
+    lua_classfunction(luaVM, "getScriptDebugLevel", "getPlayerScriptDebugLevel");
 
     lua_classfunction(luaVM, "isNametagShowing", "isPlayerNametagShowing");
 
@@ -307,6 +309,11 @@ int CLuaPlayerDefs::GetPlayerWantedLevel(lua_State* luaVM)
     }
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+const unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel() noexcept
+{
+    return g_pClientGame->GetPlayerManager()->GetLocalPlayer()->GetPlayerScriptDebugLevel();
 }
 
 int CLuaPlayerDefs::ShowPlayerHudComponent(lua_State* luaVM)

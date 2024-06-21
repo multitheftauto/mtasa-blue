@@ -111,6 +111,9 @@ public:
     bool   GetWasRecentlyInNetworkInterruption(uint uiMaxTicksAgo);
     void   SetIsInNetworkInterruption(bool bInNetworkInterruption);
 
+    unsigned long GetPlayerScriptDebugLevel() { return scriptDebugLevel; };
+    void          SetPlayerScriptDebugLevel(unsigned long level) { scriptDebugLevel = level; }
+
     CVector m_vecPrevBulletSyncStart;
     CVector m_vecPrevBulletSyncEnd;
     uchar   m_ucPrevBulletSyncOrderCounter;
@@ -167,6 +170,8 @@ private:
     uint                m_uiRemoteBuildNumber;
     bool                m_bInNetworkInterruption;
     CElapsedTime        m_TimeSinceNetworkInterruptionEnded;
+
+    unsigned int scriptDebugLevel;
 
 #ifdef MTA_DEBUG
 private:
