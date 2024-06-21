@@ -149,15 +149,15 @@ bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint32_t playerDebugLev
 
     switch (messageDebugLevel)
     {
-        case DebugMessageLevels::MESSAGE_TYPE_ERROR:
+        case MESSAGE_TYPE_ERROR:
             sufficientDebugLevel = (playerDebugLevel >= DebugScriptLevels::ERRORS_ONLY);
             break;
-        case DebugMessageLevels::MESSAGE_TYPE_WARNING:
+        case MESSAGE_TYPE_WARNING:
             sufficientDebugLevel = (playerDebugLevel >= DebugScriptLevels::ERRORS_AND_WARNINGS);
             break;
-        case DebugMessageLevels::MESSAGE_TYPE_INFO:
-        case DebugMessageLevels::MESSAGE_TYPE_CUSTOM:
-        case DebugMessageLevels::MESSAGE_TYPE_DEBUG:
+        case MESSAGE_TYPE_INFO:
+        case MESSAGE_TYPE_CUSTOM:
+        case MESSAGE_TYPE_DEBUG:
             sufficientDebugLevel = (playerDebugLevel == DebugScriptLevels::ALL);
             break;
     }
