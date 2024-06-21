@@ -350,9 +350,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Add our lua events
     AddBuiltInEvents();
 
-    // Init debugger class
-    m_Foo.Init(this);
-
     // Load some stuff from the core config
     float fScale;
     g_pCore->GetCVars()->Get("text_scale", fScale);
@@ -1122,9 +1119,6 @@ void CClientGame::DoPulses()
         m_bFirstPlaybackFrame = false;
     }
 
-    // Call debug code if debug mode
-    m_Foo.DoPulse();
-
     // Output stuff from our server eventually
     m_Server.Pulse();
 
@@ -1619,12 +1613,6 @@ void CClientGame::ShowNetstat(int iCmd)
         m_pNetworkStats->Reset();
     }
     m_bShowNetstat = bShow;
-}
-
-void CClientGame::ShowEaeg(bool)
-{
-    if (m_pLocalPlayer)
-        m_pLocalPlayer->SetStat(0x2329, 1.0f);
 }
 
 #ifdef MTA_WEPSYNCDBG

@@ -28,7 +28,6 @@ project "cryptopp"
 		"arc4.cpp",
 		"aria.cpp",
 		"ariatab.cpp",
-		"aria_simd.cpp",
 		"asn.cpp",
 		"authenc.cpp",
 		"base32.cpp",
