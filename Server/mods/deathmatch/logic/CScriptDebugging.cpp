@@ -143,7 +143,7 @@ void CScriptDebugging::PrintLog(const char* szText)
     }
 }
 
-bool CScriptDebugging::CheckForSufficientDebugLevel(unsigned int playerDebugLevel, unsigned int messageDebugLevel)
+bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint32_t playerDebugLevel, std::uint32_t messageDebugLevel) const noexcept
 {
     bool sufficientDebugLevel = false;
 
