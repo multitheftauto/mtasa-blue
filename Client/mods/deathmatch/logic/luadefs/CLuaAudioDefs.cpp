@@ -15,7 +15,9 @@
 
 void CLuaAudioDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[] {// Audio funcs
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        // Audio funcs
         {"playSoundFrontEnd", ArgumentParser<PlaySoundFrontEnd>},
         {"setAmbientSoundEnabled", ArgumentParser<SetAmbientSoundEnabled>},
         {"isAmbientSoundEnabled", ArgumentParser<IsAmbientSoundEnabled>},
@@ -48,8 +50,8 @@ void CLuaAudioDefs::LoadFunctions()
         {"getSoundFFTData", ArgumentParser<GetSoundFFTData>},
         {"getSoundWaveData", ArgumentParser<GetSoundWaveData>},
         {"getSoundLevelData", ArgumentParser<GetSoundLevelData>},
-        {"setSoundPanningEnabled", ArgumentParser<SetSoundPanningEnabled>},
-        {"isSoundPanningEnabled", ArgumentParser<IsSoundPanEnabled>},
+        {"setSoundPanningEnabled", ArgumentParser<SetSoundPanEnabled>},
+        {"isSoundPanningEnabled", ArgumentParser<IsSoundPanningEnabled>},
         {"getSoundBPM", ArgumentParser<GetSoundBPM>},
         {"setSoundMinDistance", ArgumentParser<SetSoundMinDistance>},
         {"getSoundMinDistance", ArgumentParser<GetSoundMinDistance>},
@@ -147,6 +149,7 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
 
 bool CLuaAudioDefs::PlaySoundFrontEnd(std::uint8_t sound)
 {
+    // bool playSoundFrontEnd ( int sound )
     if(sound > 101)
         throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
     
@@ -155,26 +158,25 @@ bool CLuaAudioDefs::PlaySoundFrontEnd(std::uint8_t sound)
 
 bool CLuaAudioDefs::SetAmbientSoundEnabled(eAmbientSoundType type, bool enabled) noexcept
 {
+    // bool setAmbientSoundEnabled( string theType, bool enable )
     return CStaticFunctionDefinitions::SetAmbientSoundEnabled(type, enabled);
 }
 
 bool CLuaAudioDefs::IsAmbientSoundEnabled(eAmbientSoundType type) noexcept
 {
+    // bool isAmbientSoundEnabled( string theType )
     return CStaticFunctionDefinitions::IsAmbientSoundEnabled(type);
 }
 
 bool CLuaAudioDefs::ResetAmbientSounds() noexcept
 {
+    // bool resetAmbientSounds()
     return CStaticFunctionDefinitions::ResetAmbientSounds();
 }
 
-bool CLuaAudioDefs::SetWorldSoundEnabled(
-    int group,
-    std::optional<int> index,
-    bool enable,
-    std::optional<bool> immediate
-) noexcept
+bool CLuaAudioDefs::SetWorldSoundEnabled(int group, std::optional<int> index, bool enable, std::optional<bool> immediate) noexcept
 {
+    // bool setWorldSoundEnabled ( int group, [ int index = -1, ] bool enable [, bool immediate = false ] )
     return CStaticFunctionDefinitions::SetWorldSoundEnabled(
         group, index.value_or(-1), enable, immediate.value_or(false)
     );
@@ -188,49 +190,37 @@ bool CLuaAudioDefs::IsWorldSoundEnabled(int group, std::optional<int> index) noe
 
 bool CLuaAudioDefs::ResetWorldSounds() noexcept
 {
+    // bool resetWorldSounds()
     return CStaticFunctionDefinitions::ResetWorldSounds();
 }
 
-CClientSound* CLuaAudioDefs::PlaySFX (
-    lua_State* luaVM,
-    eAudioLookupIndex container,
-    int bank,
-    int audio,
-    std::optional<bool> loop
-) {
+CClientSound* CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudioLookupIndex container, int bank, int audio, std::optional<bool> loop)
+{
     // sound playSFX ( string audioContainer, int bankIndex, int audioIndex [, loop = false ] )    
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
-        throw std::runtime_error("Cannot detect virtual machine!");
+        throw std::invalid_argument("Cannot detect virtual machine!");
         
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        throw std::runtime_error("Cannot get resource!");
-    
+        throw std::invalid_argument("Cannot get resource!");
     
     return CStaticFunctionDefinitions::PlaySFX(pResource, container, bank, audio,
         loop.value_or(false)
     );
 }
 
-CClientSound* CLuaAudioDefs::PlaySFX3D (
-    lua_State* luaVM,
-    eAudioLookupIndex container,
-    int bank,
-    int audio,
-    float posX,
-    float posY,
-    float posZ,
-    std::optional<bool> loop
-) {
+CClientSound* CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAudioLookupIndex container, int bank, int audio, float posX, float posY, float posZ,
+                                       std::optional<bool> loop)
+{
     // sound playSFX3D ( string audioContainer, int bankIndex, int audioIndex, float posX, float posY, float posZ [, loop = false ] )
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
-        throw std::runtime_error("Cannot detect virtual machine!");
+        throw std::invalid_argument("Cannot detect virtual machine!");
         
     CResource* pResource = pLuaMain->GetResource();
     if (!pResource)
-        throw std::runtime_error("Cannot get resource!");
+        throw std::invalid_argument("Cannot get resource!");
 
     return CStaticFunctionDefinitions::PlaySFX3D(pResource, container, bank, audio,
         CVector(posX, posY, posZ), loop.value_or(false)
@@ -239,25 +229,20 @@ CClientSound* CLuaAudioDefs::PlaySFX3D (
 
 bool CLuaAudioDefs::GetSFXStatus(eAudioLookupIndex container) noexcept
 {
-    //  bool getSFXStatus ( string audioContainer )
+    // bool getSFXStatus ( string audioContainer )
     return CStaticFunctionDefinitions::GetSFXStatus(container);
 }
 
-CClientSound* CLuaAudioDefs::PlaySound(
-    lua_State* luaVM,
-    std::string path,
-    std::optional<bool> loop,
-    std::optional<bool> throttle
-) {
+CClientSound* CLuaAudioDefs::PlaySound(lua_State* luaVM, std::string path, std::optional<bool> loop, std::optional<bool> throttle)
+{
     // element playSound ( string soundPath, [ bool looped = false, bool throttled = true ] )
-    
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!luaMain)
-        throw std::runtime_error("Cannot detect virtual machine!");
+        throw std::invalid_argument("Cannot detect virtual machine!");
 
     CResource* pResource = luaMain->GetResource();
     if (!pResource)
-        throw std::runtime_error("Cannot get resource!");
+        throw std::invalid_argument("Cannot get resource!");
 
     SString strFilename = path;
     bool bIsURL = false;
@@ -276,7 +261,7 @@ CClientSound* CLuaAudioDefs::PlaySound(
     // ) Fixes #6507 - Caz
     // TODO: Fix ParseResourcePathInput
     if (!pResource)
-        throw std::runtime_error("Cannot get resource!");
+        throw std::invalid_argument("Cannot get resource!");
         
     CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strFilename,
         bIsURL, bIsRawData, loop.value_or(false), throttle.value_or(true));
@@ -293,23 +278,16 @@ CClientSound* CLuaAudioDefs::PlaySound(
     return pSound;
 }
 
-CClientSound* CLuaAudioDefs::PlaySound3D (
-    lua_State* luaVM,
-    std::string path,
-    float x,
-    float y,
-    float z,
-    std::optional<bool> loop,
-    std::optional<bool> throttle
-) {
+CClientSound* CLuaAudioDefs::PlaySound3D(lua_State* luaVM, std::string path, float x, float y, float z, std::optional<bool> loop, std::optional<bool> throttle)
+{
     // element playSound3D ( string soundPath, float x, float y, float z, [ bool looped = false, bool throttled = true ] )
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!luaMain)
-        throw std::runtime_error("Cannot detect virtual machine!");
+        throw std::invalid_argument("Cannot detect virtual machine!");
 
     CResource* pResource = luaMain->GetResource();
     if (!pResource)
-        throw std::runtime_error("Cannot get resource!");
+        throw std::invalid_argument("Cannot get resource!");
 
     SString strFilename = path;
     bool bIsURL = false;
@@ -328,7 +306,7 @@ CClientSound* CLuaAudioDefs::PlaySound3D (
     // ) Fixes #6507 - Caz
     // TODO: Fix ParseResourcePathInput
     if (!pResource)
-        throw std::runtime_error("Cannot get resource!");
+        throw std::invalid_argument("Cannot get resource!");
         
     CClientSound* pSound =
         CStaticFunctionDefinitions::PlaySound3D(pResource, strFilename,
@@ -352,10 +330,8 @@ bool CLuaAudioDefs::StopSound(CClientSound* sound) noexcept
     return CStaticFunctionDefinitions::StopSound(*sound);
 }
 
-bool CLuaAudioDefs::SetSoundPosition(
-    std::variant<CClientSound*, CClientPlayer*> element,
-    double pos
-) noexcept {
+bool CLuaAudioDefs::SetSoundPosition(std::variant<CClientSound*, CClientPlayer*> element, double pos) noexcept
+{
     // bool setSoundPosition ( element theSound, float pos )
     return CStaticFunctionDefinitions::SetSoundPosition(element, pos);
 }
@@ -374,6 +350,7 @@ double CLuaAudioDefs::GetSoundLength(std::variant<CClientSound*, CClientPlayer*>
 
 double CLuaAudioDefs::GetSoundBufferLength(CClientSound* sound) noexcept
 {
+    // float getSoundBufferLength ( element theSound )
     return CStaticFunctionDefinitions::GetSoundBufferLength(*sound).value_or(0.0);
 }
 
@@ -385,42 +362,36 @@ bool CLuaAudioDefs::SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> e
 
 bool CLuaAudioDefs::IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> element) noexcept
 {
+    // bool isSoundPaused ( element theSound )
     return CStaticFunctionDefinitions::IsSoundPaused(element);
 }
 
-bool CLuaAudioDefs::SetSoundVolume(
-    std::variant<CClientSound*, CClientPlayer*> element,
-    float volume
-) noexcept {
+bool CLuaAudioDefs::SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> element, float volume) noexcept
+{
     // bool setSoundVolume ( element theSound/thePlayer, float volume )
     return CStaticFunctionDefinitions::SetSoundVolume(element, volume);
 }
 
 float CLuaAudioDefs::GetSoundVolume(std::variant<CClientSound*, CClientPlayer*> element) noexcept
 {
+    // float getSoundVolume ( element theSound )
     return CStaticFunctionDefinitions::GetSoundVolume(element);
 }
 
-bool CLuaAudioDefs::SetSoundSpeed(
-    std::variant<CClientSound*, CClientPlayer*> element,
-    float speed
-) noexcept {
+bool CLuaAudioDefs::SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> element, float speed) noexcept
+{
     // bool setSoundSpeed ( element theSound, float speed )
     return CStaticFunctionDefinitions::SetSoundSpeed(element, speed);
 }
 
 float CLuaAudioDefs::GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> element) noexcept
 {
+    // float getSoundSpeed ( element theSound )
     return CStaticFunctionDefinitions::GetSoundSpeed(element);
 }
 
-bool CLuaAudioDefs::SetSoundProperties(
-    CClientSound* sound,
-    float sampleRate,
-    float tempo,
-    float pitch,
-    std::optional<bool> reverse
-) noexcept {
+bool CLuaAudioDefs::SetSoundProperties(CClientSound* sound, float sampleRate, float tempo, float pitch, std::optional<bool> reverse) noexcept
+{
     // bool setSoundProperties(element sound, float fSampleRate, float fTempo, float fPitch [, bool bReverse = false ] )
     return CStaticFunctionDefinitions::SetSoundProperties(*sound, sampleRate,
         tempo, pitch, reverse.value_or(false)
@@ -442,11 +413,9 @@ std::variant<bool, CLuaMultiReturn<float, float, float, bool>> CLuaAudioDefs::Ge
     return CLuaMultiReturn<float, float, float, bool>(sampleRate, tempo, pitch, reversed);
 }
 
-std::variant<bool, std::vector<float>> CLuaAudioDefs::GetSoundFFTData(
-    std::variant<CClientSound*, CClientPlayer*> element,
-    int samples,
-    std::optional<int> bands
-) noexcept {
+std::variant<bool, std::vector<float>> CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> element, int samples,
+    std::optional<int> bands) noexcept
+{
     // table getSoundFFTData ( element sound, int samples [, int bands = 0 ] )
     int    iBands = bands.value_or(0);
     float* pData = CStaticFunctionDefinitions::GetSoundFFTData(element, samples, iBands);
@@ -464,10 +433,8 @@ std::variant<bool, std::vector<float>> CLuaAudioDefs::GetSoundFFTData(
     return arr;
 }
 
-std::variant<bool, std::vector<float>> CLuaAudioDefs::GetSoundWaveData(
-    std::variant<CClientSound*, CClientPlayer*> element,
-    int samples
-) noexcept {
+std::variant<bool, std::vector<float>> CLuaAudioDefs::GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*> element, int samples) noexcept
+{
     // table getSoundWaveData ( element sound, int samples )
     float* pData = CStaticFunctionDefinitions::GetSoundWaveData(element, samples);
     if (!pData)
@@ -484,7 +451,7 @@ std::variant<bool, std::vector<float>> CLuaAudioDefs::GetSoundWaveData(
     return 1;
 }
 
-bool CLuaAudioDefs::SetSoundPanningEnabled(CClientSound* sound, bool enable) noexcept
+bool CLuaAudioDefs::SetSoundPanEnabled(CClientSound* sound, bool enable) noexcept
 {
     // bool setSoundPanningEnabled ( element sound, bool enable )
     return CStaticFunctionDefinitions::SetSoundPanEnabled(*sound, enable);
@@ -502,41 +469,46 @@ std::variant<bool, CLuaMultiReturn<std::uint32_t, std::uint32_t>> CLuaAudioDefs:
     return CLuaMultiReturn<std::uint32_t, std::uint32_t>(left, right);
 }
 
-bool CLuaAudioDefs::IsSoundPanEnabled(CClientSound* sound) noexcept
+bool CLuaAudioDefs::IsSoundPanningEnabled(CClientSound* sound) noexcept
 {
+    // bool isSoundPanningEnabled ( element theSound )
     return CStaticFunctionDefinitions::IsSoundPanEnabled(*sound);
 }
 
 float CLuaAudioDefs::GetSoundBPM(CClientSound* sound) noexcept
 {
+    // int getSoundBPM ( element sound )
     return CStaticFunctionDefinitions::GetSoundBPM(*sound);
 }
 
 bool CLuaAudioDefs::SetSoundMinDistance(CClientSound* sound, float distance) noexcept
 {
+    // bool setSoundMinDistance ( element sound, int distance )
     return CStaticFunctionDefinitions::SetSoundMinDistance(*sound, distance);
 }
 
 float CLuaAudioDefs::GetSoundMinDistance(CClientSound* sound) noexcept
 {
+    // int getSoundMinDistance ( element sound )
     return CStaticFunctionDefinitions::GetSoundMinDistance(*sound);
 }
 
 bool CLuaAudioDefs::SetSoundMaxDistance(CClientSound* sound, float distance) noexcept
 {
+    // bool setSoundMaxDistance ( element sound, int distance )
     return CStaticFunctionDefinitions::SetSoundMaxDistance(*sound, distance);
 }
 
 float CLuaAudioDefs::GetSoundMaxDistance(CClientSound* sound) noexcept
 {
+    // int getSoundMaxDistance ( element sound )
     return CStaticFunctionDefinitions::GetSoundMaxDistance(*sound);
 }
 
-std::variant<bool, std::string, std::unordered_map<std::string, std::string>>
-CLuaAudioDefs::GetSoundMetaTags(
-    CClientSound* sound,
-    std::optional<std::string> format
-) noexcept {
+std::variant<bool, std::string, std::unordered_map<std::string, std::string>> CLuaAudioDefs::GetSoundMetaTags(CClientSound*              sound,
+    std::optional<std::string> format) noexcept
+{
+    // table getSoundMetaTags ( element sound [, string format = "" ] )
     if (!sound)
         return false;
         
@@ -577,17 +549,15 @@ CLuaAudioDefs::GetSoundMetaTags(
     return mapFormats;
 }
 
-bool CLuaAudioDefs::SetSoundEffectEnabled(
-    std::variant<CClientSound*, CClientPlayer*> element,
-    std::string effectName,
-    std::optional<bool> enable
-) noexcept {
+bool CLuaAudioDefs::SetSoundEffectEnabled(std::variant<CClientSound*, CClientPlayer*> element, std::string effectName, std::optional<bool> enable) noexcept
+{
+    // bool setSoundEffectEnabled ( element theSound/thePlayer, string effectName, bool bEnable )
     return CStaticFunctionDefinitions::SetSoundEffectEnabled(element, effectName, enable.value_or(false));
 }
 
-std::unordered_map<std::string, bool> CLuaAudioDefs::GetSoundEffects(
-    std::variant<CClientSound*, CClientPlayer*> element
-) noexcept {
+std::unordered_map<std::string, bool> CLuaAudioDefs::GetSoundEffects(std::variant<CClientSound*, CClientPlayer*> element) noexcept
+{
+    // table getSoundEffects ( element sound )
     std::map<std::string, int> fxEffects = m_pManager->GetSoundManager()->GetFxEffects();
     
     std::unordered_map<std::string, bool> arr;
@@ -607,12 +577,9 @@ std::unordered_map<std::string, bool> CLuaAudioDefs::GetSoundEffects(
     return arr;
 }
 
-bool CLuaAudioDefs::SetSoundEffectParameter(
-    CClientSound* sound,
-    eSoundEffectType effectType,
-    std::string effectParam,
-    CLuaArgument value
-) {
+bool CLuaAudioDefs::SetSoundEffectParameter(CClientSound* sound, eSoundEffectType effectType, std::string effectParam, CLuaArgument value)
+{
+    // bool setSoundEffectParameter ( element sound, string effectName, string effectParam, var paramValue )
     if (!sound || !sound->IsFxEffectEnabled(effectType))
         throw std::invalid_argument("Effect's parameters can't be set unless it's enabled");
 
@@ -633,7 +600,7 @@ bool CLuaAudioDefs::SetSoundEffectParameter(
         // Because of this line (`SString(...)`).
         // Manually pushing values into the lua stack
         // and then calling `lua_error` is pointless.
-        throw std::runtime_error(
+        throw std::invalid_argument(
             SString("BASS Error %i, after setting parameter %s -> %s. (Message: %s)",
                 CBassAudio::ErrorGetCode(), EnumToString(effectType).c_str(),
                 EnumToString(effectParam).c_str(), CBassAudio::ErrorGetMessage()
@@ -1016,14 +983,12 @@ bool CLuaAudioDefs::SetSoundEffectParameter(
             return SetParamWithErrorLog(eEffectParameter, params);
         }
     };
-    throw std::runtime_error("Cannot set effect parameter!");
+    throw std::invalid_argument("Cannot set effect parameter!");
 }
 
-std::variant<bool, std::unordered_map<std::string, CLuaArgument>>
-CLuaAudioDefs::GetSoundEffectParameters(
-    CClientSound* sound,
-    eSoundEffectType effectType
-) noexcept {
+std::variant<bool, std::unordered_map<std::string, CLuaArgument>> CLuaAudioDefs::GetSoundEffectParameters(CClientSound*    sound,
+    eSoundEffectType effectType) noexcept
+{
     // table getSoundEffectParameters ( sound sound, string effectName )
     if (!sound || !sound->IsFxEffectEnabled(effectType))
         return false;
@@ -1214,10 +1179,8 @@ CLuaAudioDefs::GetSoundEffectParameters(
     return arr;
 }
 
-bool CLuaAudioDefs::SetSoundPan(
-    std::variant<CClientSound*, CClientPlayer*> element,
-    float pan
-) noexcept {
+bool CLuaAudioDefs::SetSoundPan(std::variant<CClientSound*, CClientPlayer*> element, float pan) noexcept
+{
     // bool setSoundPan ( element theSound, float pan )
     return CStaticFunctionDefinitions::SetSoundPan(element, pan);
 }
@@ -1230,11 +1193,13 @@ float CLuaAudioDefs::GetSoundPan(std::variant<CClientSound*, CClientPlayer*> ele
 
 bool CLuaAudioDefs::SetSoundLooped(CClientSound* pSound, bool bLoop) noexcept
 {
+    // bool setSoundLooped ( element theSound, bool loop )
     return pSound->SetLooped(bLoop);
 }
 
 bool CLuaAudioDefs::IsSoundLooped(CClientSound* pSound) noexcept
 {
+    // bool isSoundLooped ( element theSound )
     return pSound->IsLooped();
 }
 
@@ -1246,12 +1211,14 @@ bool CLuaAudioDefs::SetRadioChannel(std::uint8_t channel) noexcept
 
 std::uint8_t CLuaAudioDefs::GetRadioChannel() noexcept
 {
+    // int getRadioChannel ( )
     return CStaticFunctionDefinitions::GetRadioChannel();
 }
 
 std::variant<bool, std::string> CLuaAudioDefs::GetRadioChannelName(int channel) noexcept
 {
-    static const SFixedArray<const char*, 13> szRadioStations = {{
+    // string getRadioChannelName ( int id )
+    static constexpr SFixedArray<const char*, 13> szRadioStations = {{
         "Radio off", "Playback FM", "K-Rose", "K-DST", "Bounce FM", "SF-UR", "Radio Los Santos",
         "Radio X", "CSR 103.9", "K-Jah West", "Master Sounds 98.3", "WCTR", "User Track Player"
     }};
@@ -1265,6 +1232,7 @@ std::variant<bool, std::string> CLuaAudioDefs::GetRadioChannelName(int channel) 
 
 bool CLuaAudioDefs::ShowSound(bool state) noexcept
 {
+    // bool showSound ( bool state )
     if (!g_pClientGame->GetDevelopmentMode())
         return false;
 
@@ -1274,5 +1242,6 @@ bool CLuaAudioDefs::ShowSound(bool state) noexcept
 
 bool CLuaAudioDefs::IsShowSoundEnabled() noexcept
 {
+    // bool isShowSoundEnabled ( )
     return g_pClientGame->GetShowSound();
 }
