@@ -198,6 +198,9 @@ DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 #define HOOKPOS_PreFxRender                                     0x049E650
 DWORD RETURN_PreFxRender = 0x0404D1E;
 
+#define HOOKPOS_PostColorFilterRender                             0x705099
+DWORD RETURN_PostColorFilterRender = 0x70509E;
+
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender = 0x053EADD;
 
@@ -377,6 +380,7 @@ PostWorldProcessHandler*                   m_pPostWorldProcessHandler = NULL;
 PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
 IdleHandler*                               m_pIdleHandler = NULL;
 PreFxRenderHandler*                        m_pPreFxRenderHandler = NULL;
+PostColorFilterRenderHandler*              m_pPostColorFilterRenderHandler = nullptr;
 PreHudRenderHandler*                       m_pPreHudRenderHandler = NULL;
 ProcessCollisionHandler*                   m_pProcessCollisionHandler = NULL;
 HeliKillHandler*                           m_pHeliKillHandler = NULL;
@@ -479,6 +483,7 @@ void HOOK_Transmission_CalculateDriveAcceleration();
 void HOOK_isVehDriveTypeNotRWD();
 void HOOK_isVehDriveTypeNotFWD();
 void HOOK_PreFxRender();
+void HOOK_PostColorFilterRender();
 void HOOK_PreHUDRender();
 
 void HOOK_CTrafficLights_GetPrimaryLightState();
@@ -657,6 +662,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9);
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5);
+    HookInstall(HOOKPOS_PostColorFilterRender, (DWORD)HOOK_PostColorFilterRender, 5);
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7);
 
@@ -2313,6 +2319,11 @@ void CMultiplayerSA::SetIdleHandler(IdleHandler* pHandler)
 void CMultiplayerSA::SetPreFxRenderHandler(PreFxRenderHandler* pHandler)
 {
     m_pPreFxRenderHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler)
+{
+    m_pPostColorFilterRenderHandler = pHandler;
 }
 
 void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
@@ -4777,6 +4788,24 @@ void _declspec(naked) HOOK_PreFxRender()
 skip:
         popad
         jmp     RETURN_PreFxRender  // 00404D1E
+    }
+}
+
+// Hooked from 00705099  5 bytes
+void _declspec(naked) HOOK_PostColorFilterRender()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (m_pPostColorFilterRenderHandler) m_pPostColorFilterRenderHandler();
+
+    _asm
+    {
+        popad
+        mov al, ds:0C402BAh
+        jmp     RETURN_PostColorFilterRender  // 0070509E
     }
 }
 
