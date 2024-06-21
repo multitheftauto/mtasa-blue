@@ -166,11 +166,7 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
                 bool    bIsURL = false;
                 bool    bIsRawData = false;
 
-                // Fix OGG sound files can't be played as RAW data #3495 
-                static constexpr std::uint8_t oggHeader[] = {0x4F, 0x67, 0x67, 0x53};
-                bool bIsOGGFile = std::memcmp(strSound.data(), oggHeader, 4) == 0;
-
-                if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename) && !bIsOGGFile)
+                if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename, nullptr, true))
                     strSound = strFilename;
                 else
                 {

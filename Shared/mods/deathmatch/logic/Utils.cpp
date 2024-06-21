@@ -92,6 +92,24 @@ bool IsValidFilePath(const char* szDir)
     return true;
 }
 
+bool IsValidFilePath(const char* szDir, size_t length)
+{
+    if (szDir == nullptr)
+        return false;
+
+    unsigned char c, c_d;
+
+    // iterate through the char array
+    for (size_t i = 0; i < length; i++)
+    {
+        c = szDir[i];                                          // current character
+        c_d = (i < (length - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
+            return false;
+    }
+    return true;
+}
+
 void ReplaceOccurrencesInString(std::string& s, const char* a, const char* b)
 {
     int idx = 0;
@@ -512,6 +530,24 @@ bool IsValidFilePath(const char* szDir)
     {
         c = szDir[i];                                          // current character
         c_d = (i < (uiLen - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
+        if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
+            return false;
+    }
+    return true;
+}
+
+bool IsValidFilePath(const char* szDir, size_t length)
+{
+    if (szDir == nullptr)
+        return false;
+
+    unsigned char c, c_d;
+
+    // iterate through the char array
+    for (size_t i = 0; i < length; i++)
+    {
+        c = szDir[i];                                           // current character
+        c_d = (i < (length - 1)) ? szDir[i + 1] : 0;            // one character ahead, if any
         if (!IsVisibleCharacter(c) || c == ':' || (c == '.' && c_d == '.') || (c == '\\' && c_d == '\\'))
             return false;
     }
