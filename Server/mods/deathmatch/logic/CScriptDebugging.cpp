@@ -15,6 +15,22 @@
 
 extern CGame* g_pGame;
 
+enum CScriptDebugging::DebugMessageLevels
+{
+    MESSAGE_TYPE_DEBUG = 0,
+    MESSAGE_TYPE_ERROR = 1,
+    MESSAGE_TYPE_WARNING = 2,
+    MESSAGE_TYPE_INFO = 3,
+    MESSAGE_TYPE_CUSTOM = 4,
+};
+
+enum CScriptDebugging::DebugScriptLevels
+{
+    ERRORS_ONLY = 1,
+    ERRORS_AND_WARNINGS = 2,
+    ALL = 3,
+};
+
 CScriptDebugging::CScriptDebugging()
 {
     m_uiLogFileLevel = 0;
