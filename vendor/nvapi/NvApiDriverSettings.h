@@ -57,7 +57,6 @@
 #define OGL_OVERLAY_SUPPORT_STRING                 L"Enable overlay"
 #define OGL_QUALITY_ENHANCEMENTS_STRING            L"High level control of the rendering quality on OpenGL"
 #define OGL_SINGLE_BACKDEPTH_BUFFER_STRING         L"Unified back/depth buffer"
-#define OGL_SLI_CFR_MODE_STRING                    L"Set CFR mode"
 #define OGL_SLI_MULTICAST_STRING                   L"Enable NV_gpu_multicast extension"
 #define OGL_THREAD_CONTROL_STRING                  L"Threaded optimization"
 #define OGL_TMON_LEVEL_STRING                      L"Event Log Tmon Severity Threshold"
@@ -74,6 +73,8 @@
 #define ANSEL_ALLOW_STRING                         L"NVIDIA Predefined Ansel Usage"
 #define ANSEL_ALLOWLISTED_STRING                   L"Ansel flags for enabled applications"
 #define ANSEL_ENABLE_STRING                        L"Enable Ansel"
+#define APPIDLE_DYNAMIC_FRL_FPS_STRING             L"Idle Application Max FPS Limit"
+#define APPIDLE_DYNAMIC_FRL_THRESHOLD_TIME_STRING  L"Idle Application Threshold Time out in seconds"
 #define APPLICATION_PROFILE_NOTIFICATION_TIMEOUT_STRING L"Application Profile Notification Popup Timeout"
 #define APPLICATION_STEAM_ID_STRING                L"Steam Application ID"
 #define BATTERY_BOOST_APP_FPS_STRING               L"Battery Boost Application FPS"
@@ -128,6 +129,8 @@
 #define MAXWELL_B_SAMPLE_INTERLEAVE_STRING         L"Enable sample interleaving (MFAA)"
 #define PRERENDERLIMIT_STRING                      L"Maximum pre-rendered frames"
 #define PS_SHADERDISKCACHE_STRING                  L"Shader Cache"
+#define PS_SHADERDISKCACHE_DLL_PATH_WCHAR_STRING   L"shader cache path to dll"
+#define PS_SHADERDISKCACHE_FLAGS_STRING            L"shader cache control flags"
 #define PS_SHADERDISKCACHE_MAX_SIZE_STRING         L"Shader disk cache maximum size"
 #define PS_TEXFILTER_ANISO_OPTS2_STRING            L"Texture filtering - Anisotropic sample optimization"
 #define PS_TEXFILTER_BILINEAR_IN_ANISO_STRING      L"Texture filtering - Anisotropic filter optimization"
@@ -159,7 +162,6 @@ enum ESetting {
     OGL_OVERLAY_SUPPORT_ID                        = 0x206C28C4,
     OGL_QUALITY_ENHANCEMENTS_ID                   = 0x20797D6C,
     OGL_SINGLE_BACKDEPTH_BUFFER_ID                = 0x20A29055,
-    OGL_SLI_CFR_MODE_ID                           = 0x20343843,
     OGL_SLI_MULTICAST_ID                          = 0x2092D3BE,
     OGL_THREAD_CONTROL_ID                         = 0x20C1221E,
     OGL_TMON_LEVEL_ID                             = 0x202888C1,
@@ -176,6 +178,8 @@ enum ESetting {
     ANSEL_ALLOW_ID                                = 0x1035DB89,
     ANSEL_ALLOWLISTED_ID                          = 0x1085DA8A,
     ANSEL_ENABLE_ID                               = 0x1075D972,
+    APPIDLE_DYNAMIC_FRL_FPS_ID                    = 0x10835016,
+    APPIDLE_DYNAMIC_FRL_THRESHOLD_TIME_ID         = 0x10835017,
     APPLICATION_PROFILE_NOTIFICATION_TIMEOUT_ID   = 0x104554B6,
     APPLICATION_STEAM_ID_ID                       = 0x107CDDBC,
     BATTERY_BOOST_APP_FPS_ID                      = 0x10115C8C,
@@ -230,6 +234,8 @@ enum ESetting {
     MAXWELL_B_SAMPLE_INTERLEAVE_ID                = 0x0098C1AC,
     PRERENDERLIMIT_ID                             = 0x007BA09E,
     PS_SHADERDISKCACHE_ID                         = 0x00198FFF,
+    PS_SHADERDISKCACHE_DLL_PATH_WCHAR_ID          = 0x0019A002,
+    PS_SHADERDISKCACHE_FLAGS_ID                   = 0x00F4889B,
     PS_SHADERDISKCACHE_MAX_SIZE_ID                = 0x00AC8497,
     PS_TEXFILTER_ANISO_OPTS2_ID                   = 0x00E73211,
     PS_TEXFILTER_BILINEAR_IN_ANISO_ID             = 0x0084CD70,
@@ -242,9 +248,9 @@ enum ESetting {
     SET_VAB_DATA_ID                               = 0x00AB8687,
     VSYNCMODE_ID                                  = 0x00A879CF,
     VSYNCTEARCONTROL_ID                           = 0x005A375C,
-    TOTAL_DWORD_SETTING_NUM = 96,
-    TOTAL_WSTRING_SETTING_NUM = 4,
-    TOTAL_SETTING_NUM = 100,
+    TOTAL_DWORD_SETTING_NUM = 98,
+    TOTAL_WSTRING_SETTING_NUM = 5,
+    TOTAL_SETTING_NUM = 103,
     INVALID_SETTING_ID = 0xFFFFFFFF
 };
 
@@ -369,14 +375,6 @@ enum EValues_OGL_SINGLE_BACKDEPTH_BUFFER {
     OGL_SINGLE_BACKDEPTH_BUFFER_USE_HW_DEFAULT           = 0xffffffff,
     OGL_SINGLE_BACKDEPTH_BUFFER_NUM_VALUES = 3,
     OGL_SINGLE_BACKDEPTH_BUFFER_DEFAULT = OGL_SINGLE_BACKDEPTH_BUFFER_DISABLE
-};
-
-enum EValues_OGL_SLI_CFR_MODE {
-    OGL_SLI_CFR_MODE_DISABLE                             = 0x00,
-    OGL_SLI_CFR_MODE_ENABLE                              = 0x01,
-    OGL_SLI_CFR_MODE_CLASSIC_SFR                         = 0x02,
-    OGL_SLI_CFR_MODE_NUM_VALUES = 3,
-    OGL_SLI_CFR_MODE_DEFAULT = OGL_SLI_CFR_MODE_DISABLE
 };
 
 enum EValues_OGL_SLI_MULTICAST {
@@ -1054,6 +1052,31 @@ enum EValues_PS_SHADERDISKCACHE {
     PS_SHADERDISKCACHE_ON                                = 0x00000001,
     PS_SHADERDISKCACHE_NUM_VALUES = 2,
     PS_SHADERDISKCACHE_DEFAULT = PS_SHADERDISKCACHE_ON
+};
+
+enum EValues_PS_SHADERDISKCACHE_FLAGS {
+    PS_SHADERDISKCACHE_FLAGS_DISABLE_DEFAULT_COMPILES    = 0x00000001,
+    PS_SHADERDISKCACHE_FLAGS_DISABLE_OPTIONAL_COMPILES   = 0x00000002,
+    PS_SHADERDISKCACHE_FLAGS_DISABLE_DRIVER_VERSIONING   = 0x00000008,
+    PS_SHADERDISKCACHE_FLAGS_DUMP_HISTOGRAM              = 0x00000010,
+    PS_SHADERDISKCACHE_FLAGS_DUMP_TIMELINE               = 0x00000020,
+    PS_SHADERDISKCACHE_FLAGS_DISABLE_GARBAGE_COLLECTION  = 0x00000040,
+    PS_SHADERDISKCACHE_FLAGS_ENABLE_ENCRYPTION           = 0x00000080,
+    PS_SHADERDISKCACHE_FLAGS_DISABLE_CRC                 = 0x00000100,
+    PS_SHADERDISKCACHE_FLAGS_ENABLE_STATS_FILES          = 0x00000200,
+    PS_SHADERDISKCACHE_FLAGS_DISABLE_STATS_RESET         = 0x00000400,
+    PS_SHADERDISKCACHE_FLAGS_DISABLE_DEBUG_FORCED_COMPILE = 0x00000800,
+    PS_SHADERDISKCACHE_FLAGS_NO_COMPRESSION              = 0x00001000,
+    PS_SHADERDISKCACHE_FLAGS_RLE_COMPRESSION             = 0x00002000,
+    PS_SHADERDISKCACHE_FLAGS_LZMA_COMPRESSION            = 0x00004000,
+    PS_SHADERDISKCACHE_FLAGS_BACKEND_MEM_MAP_FILES       = 0x00010000,
+    PS_SHADERDISKCACHE_FLAGS_BACKEND_DLL                 = 0x00020000,
+    PS_SHADERDISKCACHE_FLAGS_FLOOD_CACHE_DIRECTORY       = 0x00100000,
+    PS_SHADERDISKCACHE_FLAGS_DISABLE_DEDUPLICATION       = 0x00200000,
+    PS_SHADERDISKCACHE_FLAGS_DELETE_PERFECT_CACHES       = 0x00400000,
+    PS_SHADERDISKCACHE_FLAGS_ALL_BUILDS_MISMATCH_TEST    = 0x00800000,
+    PS_SHADERDISKCACHE_FLAGS_NUM_VALUES = 20,
+    PS_SHADERDISKCACHE_FLAGS_DEFAULT = 0x0
 };
 
 enum EValues_PS_SHADERDISKCACHE_MAX_SIZE {
