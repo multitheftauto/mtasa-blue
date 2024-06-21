@@ -16,7 +16,7 @@
 #include <cstdio>
 #include <list>
 
-enum eDebugMessageLevels
+enum DebugMessageLevels
 {
     MESSAGE_TYPE_DEBUG = 0,
     MESSAGE_TYPE_ERROR = 1,
@@ -25,7 +25,7 @@ enum eDebugMessageLevels
     MESSAGE_TYPE_CUSTOM = 4,
 };
 
-enum eDebugScriptLevels
+enum DebugScriptLevels
 {
     ERRORS_ONLY = 1,
     ERRORS_AND_WARNINGS = 2,
@@ -89,7 +89,7 @@ private:
                    unsigned char ucGreen = 255, unsigned char ucBlue = 255);
 
     void PrintLog(const char* szText);
-    bool CheckForSufficientDebugLevel(unsigned int uiPlayerDebugLevel, unsigned int uiMessageDebugLevel);
+    bool CheckForSufficientDebugLevel(unsigned int playerDebugLevel, unsigned int messageDebugLevel);
     void Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel);
 
     unsigned int                   m_uiLogFileLevel;

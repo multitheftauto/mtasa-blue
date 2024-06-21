@@ -143,26 +143,26 @@ void CScriptDebugging::PrintLog(const char* szText)
     }
 }
 
-bool CScriptDebugging::CheckForSufficientDebugLevel(unsigned int uiPlayerDebugLevel, unsigned int uiMessageDebugLevel)
+bool CScriptDebugging::CheckForSufficientDebugLevel(unsigned int playerDebugLevel, unsigned int messageDebugLevel)
 {
-    bool uiSufficientDebugLevel = false;
+    bool sufficientDebugLevel = false;
 
-    switch (uiMessageDebugLevel)
+    switch (messageDebugLevel)
     {
-        case eDebugMessageLevels::MESSAGE_TYPE_ERROR:
-            uiSufficientDebugLevel = (uiPlayerDebugLevel >= eDebugScriptLevels::ERRORS_ONLY);
+        case DebugMessageLevels::MESSAGE_TYPE_ERROR:
+            sufficientDebugLevel = (playerDebugLevel >= DebugScriptLevels::ERRORS_ONLY);
             break;
-        case eDebugMessageLevels::MESSAGE_TYPE_WARNING:
-            uiSufficientDebugLevel = (uiPlayerDebugLevel >= eDebugScriptLevels::ERRORS_AND_WARNINGS);
+        case DebugMessageLevels::MESSAGE_TYPE_WARNING:
+            sufficientDebugLevel = (playerDebugLevel >= DebugScriptLevels::ERRORS_AND_WARNINGS);
             break;
-        case eDebugMessageLevels::MESSAGE_TYPE_INFO:
-        case eDebugMessageLevels::MESSAGE_TYPE_CUSTOM:
-        case eDebugMessageLevels::MESSAGE_TYPE_DEBUG:
-            uiSufficientDebugLevel = (uiPlayerDebugLevel == eDebugScriptLevels::ALL);
+        case DebugMessageLevels::MESSAGE_TYPE_INFO:
+        case DebugMessageLevels::MESSAGE_TYPE_CUSTOM:
+        case DebugMessageLevels::MESSAGE_TYPE_DEBUG:
+            sufficientDebugLevel = (playerDebugLevel == DebugScriptLevels::ALL);
             break;
     }
 
-    return uiSufficientDebugLevel;
+    return sufficientDebugLevel;
 }
 
 void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel)
@@ -170,9 +170,9 @@ void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDe
     // Tell everyone we log to about it
     for (const auto& pPlayer : m_Players)
     {
-        bool uiSufficientDebugLevel = CheckForSufficientDebugLevel(pPlayer->m_uiScriptDebugLevel, uiMinimumDebugLevel);
+        bool sufficientDebugLevel = CheckForSufficientDebugLevel(pPlayer->m_uiScriptDebugLevel, uiMinimumDebugLevel);
 
-        if (uiSufficientDebugLevel)
+        if (sufficientDebugLevel)
         {
             pPlayer->Send(Packet);
         }
