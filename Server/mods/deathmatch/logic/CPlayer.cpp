@@ -479,7 +479,7 @@ bool CPlayer::SetScriptDebugLevel(unsigned int uiLevel)
     CPlayerBitStream BitStream(this);
     BitStream.pBitStream->Write(uiLevel);
 
-    this->Send(CLuaPacket(SET_PLAYER_SCRIPT_DEBUG_LEVEL, *BitStream.pBitStream));
+    Send(CLuaPacket(SET_PLAYER_SCRIPT_DEBUG_LEVEL, *BitStream.pBitStream));
     return true;
 }
 

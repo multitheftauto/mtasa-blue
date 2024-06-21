@@ -311,7 +311,7 @@ int CLuaPlayerDefs::GetPlayerWantedLevel(lua_State* luaVM)
     return 1;
 }
 
-const unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel() noexcept
+const std::uint8_t CLuaPlayerDefs::GetPlayerScriptDebugLevel() noexcept
 {
     return g_pClientGame->GetPlayerManager()->GetLocalPlayer()->GetPlayerScriptDebugLevel();
 }

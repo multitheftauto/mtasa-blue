@@ -111,8 +111,8 @@ public:
     bool   GetWasRecentlyInNetworkInterruption(uint uiMaxTicksAgo);
     void   SetIsInNetworkInterruption(bool bInNetworkInterruption);
 
-    unsigned long GetPlayerScriptDebugLevel() { return scriptDebugLevel; };
-    void          SetPlayerScriptDebugLevel(unsigned long level) { scriptDebugLevel = level; }
+    std::uint8_t GetPlayerScriptDebugLevel() const { return scriptDebugLevel; };
+    void         SetPlayerScriptDebugLevel(std::uint8_t level) { scriptDebugLevel = level; }
 
     CVector m_vecPrevBulletSyncStart;
     CVector m_vecPrevBulletSyncEnd;
@@ -171,7 +171,7 @@ private:
     bool                m_bInNetworkInterruption;
     CElapsedTime        m_TimeSinceNetworkInterruptionEnded;
 
-    unsigned int scriptDebugLevel;
+    std::uint8_t scriptDebugLevel;
 
 #ifdef MTA_DEBUG
 private:
