@@ -22,6 +22,7 @@
 #include "CBandwidthSettings.h"
 #include "CUnoccupiedVehicleSync.h"
 #include "CScriptDebugging.h"
+#include "packets/CLuaPacket.h"
 #include "packets/CConsoleEchoPacket.h"
 #include "packets/CChatEchoPacket.h"
 #include "CWeaponStatManager.h"
@@ -472,7 +473,14 @@ void CPlayer::RemoveAllSyncingObjects()
 
 bool CPlayer::SetScriptDebugLevel(unsigned int uiLevel)
 {
-    return m_pScriptDebugging->AddPlayer(*this, uiLevel);
+    if (!m_pScriptDebugging->AddPlayer(*this, uiLevel))
+        return false;
+
+    CPlayerBitStream BitStream(this);
+    BitStream.pBitStream->Write(uiLevel);
+
+    this->Send(CLuaPacket(SET_PLAYER_SCRIPT_DEBUG_LEVEL, *BitStream.pBitStream));
+    return true;
 }
 
 void CPlayer::SetDamageInfo(ElementID ElementID, unsigned char ucWeapon, unsigned char ucBodyPart)
