@@ -1625,6 +1625,123 @@ uint4 NvWaveMultiPrefixExclusiveXOr(uint4 val, uint mask)
     return NvWaveMultiPrefixInclusiveXOr(val, mask);
 }
 
+
+//----------------------------------------------------------------------------//
+//------------------------- DXR Micro-map Extension --------------------------//
+//----------------------------------------------------------------------------//
+
+float3x3 NvRtTriangleObjectPositions()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_TRIANGLE_OBJECT_POSITIONS;
+
+    float3x3 ret;
+    ret[0][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[0][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[0][2] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][2] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2][2] = asfloat(g_NvidiaExt.IncrementCounter());
+    return ret;
+}
+
+float3x3 NvRtMicroTriangleObjectPositions()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_MICRO_TRIANGLE_OBJECT_POSITIONS;
+
+    float3x3 ret;
+    ret[0][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[0][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[0][2] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][2] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2][2] = asfloat(g_NvidiaExt.IncrementCounter());
+    return ret;
+}
+
+float3x2 NvRtMicroTriangleBarycentrics()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_MICRO_TRIANGLE_BARYCENTRICS;
+
+    float3x2 ret;
+    ret[0][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[0][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[1][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2][0] = asfloat(g_NvidiaExt.IncrementCounter());
+    ret[2][1] = asfloat(g_NvidiaExt.IncrementCounter());
+    return ret;
+}
+
+bool NvRtIsMicroTriangleHit()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_IS_MICRO_TRIANGLE_HIT;
+    uint ret = g_NvidiaExt.IncrementCounter();
+    return ret != 0;
+}
+
+bool NvRtIsBackFacing()
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_IS_BACK_FACING;
+    uint ret = g_NvidiaExt.IncrementCounter();
+    return ret != 0;
+}
+
+#if __SHADER_TARGET_MAJOR > 6 || (__SHADER_TARGET_MAJOR == 6 && __SHADER_TARGET_MINOR >= 5)
+
+float3 NvRtMicroVertexObjectPosition(RaytracingAccelerationStructure AccelerationStructure, uint InstanceIndex, uint GeometryIndex, uint PrimitiveIndex, uint2 UV)
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_MICRO_VERTEX_OBJECT_POSITION;
+    g_NvidiaExt[index].src0u.x = InstanceIndex;
+    g_NvidiaExt[index].src0u.y = GeometryIndex;
+    g_NvidiaExt[index].src0u.z = PrimitiveIndex;
+    g_NvidiaExt[index].src0u.w = UV.x;
+    g_NvidiaExt[index].src1u.x = UV.y;
+    uint handle = g_NvidiaExt.IncrementCounter();
+    float3 ret;
+    ret.x = asfloat(g_NvidiaExt.IncrementCounter());
+    ret.y = asfloat(g_NvidiaExt.IncrementCounter());
+    ret.z = asfloat(g_NvidiaExt.IncrementCounter());
+
+    RayQuery<0> rq;
+    rq.TraceRayInline(AccelerationStructure, 0, handle, (RayDesc)0);
+
+    return ret;
+}
+
+float2 NvRtMicroVertexBarycentrics(RaytracingAccelerationStructure AccelerationStructure, uint InstanceIndex, uint GeometryIndex, uint PrimitiveIndex, uint2 UV)
+{
+    uint index = g_NvidiaExt.IncrementCounter();
+    g_NvidiaExt[index].opcode = NV_EXTN_OP_RT_MICRO_VERTEX_BARYCENTRICS;
+    g_NvidiaExt[index].src0u.x = InstanceIndex;
+    g_NvidiaExt[index].src0u.y = GeometryIndex;
+    g_NvidiaExt[index].src0u.z = PrimitiveIndex;
+    g_NvidiaExt[index].src0u.w = UV.x;
+    g_NvidiaExt[index].src1u.x = UV.y;
+    uint handle = g_NvidiaExt.IncrementCounter();
+    float2 ret;
+    ret.x = asfloat(g_NvidiaExt.IncrementCounter());
+    ret.y = asfloat(g_NvidiaExt.IncrementCounter());
+
+    RayQuery<0> rq;
+    rq.TraceRayInline(AccelerationStructure, 0, handle, (RayDesc)0);
+
+    return ret;
+}
+
+#endif
+
 //----------------------------------------------------------------------------//
 //------------------------- DXR HitObject Extension --------------------------//
 //----------------------------------------------------------------------------//
