@@ -60,8 +60,6 @@ extern "C" {
 ///////////////////////////////////////////////////////////////////////////////
 NVAPI_INTERFACE NvAPI_DISP_GetGDIPrimaryDisplayId(NvU32* displayId);
 #define NV_MOSAIC_MAX_DISPLAYS      (64)
-//! SUPPORTED OS:  Windows 7 and higher
-//!
 ///////////////////////////////////////////////////////////////////////////////
 //
 // FUNCTION NAME:   NvAPI_Mosaic_GetDisplayViewportsByResolution
@@ -77,10 +75,10 @@ NVAPI_INTERFACE NvAPI_DISP_GetGDIPrimaryDisplayId(NvU32* displayId);
 //! \param [in]      srcHeight       Height of full display topology. If both
 //!                                  width and height are 0, the current
 //!                                  resolution is used.
-//! \param [out]     viewports       Array of NV_RECT viewports which represent
-//!                                  the displays as identified in
-//!                                  NvAPI_Mosaic_EnumGridTopologies. If the
-//!                                  requested resolution is a single-wide
+//! \param [out]     viewports       Array of NV_RECT viewports.
+//! SUPPORTED OS:  Windows 7 and higher
+//!
+//!                                  If the requested resolution is a single-wide
 //!                                  resolution, only viewports[0] will
 //!                                  contain the viewport details, regardless
 //!                                  of which display is driving the display.

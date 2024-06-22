@@ -3,7 +3,7 @@
    @file pseudofloat.h
    @brief Pseudo-floating point
  * This header file provides a lightweight floating point type for
- * use on fixed-point platforms when a large dynamic range is 
+ * use on fixed-point platforms when a large dynamic range is
  * required. The new type is not compatible with the 32-bit IEEE format,
  * it is not even remotely as accurate as 32-bit floats, and is not
  * even guaranteed to produce even remotely correct results for code
@@ -16,18 +16,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -84,7 +84,7 @@ static inline spx_float_t PSEUDOFLOAT(spx_int32_t x)
       r.e = e;
       return r;
    }
-   else      
+   else
    {
       spx_float_t r;
       r.m = x;
@@ -101,12 +101,12 @@ static inline spx_float_t FLOAT_ADD(spx_float_t a, spx_float_t b)
       return b;
    else if (b.m==0)
       return a;
-   if ((a).e > (b).e) 
+   if ((a).e > (b).e)
    {
       r.m = ((a).m>>1) + ((b).m>>MIN(15,(a).e-(b).e+1));
       r.e = (a).e+1;
    }
-   else 
+   else
    {
       r.m = ((b).m>>1) + ((a).m>>MIN(15,(b).e-(a).e+1));
       r.e = (b).e+1;
@@ -141,7 +141,7 @@ static inline spx_float_t FLOAT_SUB(spx_float_t a, spx_float_t b)
       r.m = ((a).m>>1) - ((b).m>>MIN(15,(a).e-(b).e+1));
       r.e = (a).e+1;
    }
-   else 
+   else
    {
       r.m = ((a).m>>MIN(15,(b).e-(a).e+1)) - ((b).m>>1);
       r.e = (b).e+1;
@@ -169,10 +169,10 @@ static inline int FLOAT_LT(spx_float_t a, spx_float_t b)
    if (a.m==0)
       return b.m>0;
    else if (b.m==0)
-      return a.m<0;   
+      return a.m<0;
    if ((a).e > (b).e)
       return ((a).m>>1) < ((b).m>>MIN(15,(a).e-(b).e+1));
-   else 
+   else
       return ((b).m>>1) > ((a).m>>MIN(15,(b).e-(a).e+1));
 
 }
@@ -202,7 +202,7 @@ static inline spx_float_t FLOAT_MULT(spx_float_t a, spx_float_t b)
       }
    }
    /*printf ("%f * %f = %f\n", REALFLOAT(a), REALFLOAT(b), REALFLOAT(r));*/
-   return r;   
+   return r;
 }
 
 static inline spx_float_t FLOAT_AMULT(spx_float_t a, spx_float_t b)
@@ -210,7 +210,7 @@ static inline spx_float_t FLOAT_AMULT(spx_float_t a, spx_float_t b)
    spx_float_t r;
    r.m = (spx_int16_t)((spx_int32_t)(a).m*(b).m>>15);
    r.e = (a).e+(b).e+15;
-   return r;   
+   return r;
 }
 
 

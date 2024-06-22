@@ -155,7 +155,7 @@ void CScriptDebugging::Broadcast(const CPacket& Packet, DebugScriptLevel debugLe
     // Tell everyone we log to about it
     for (const auto& pPlayer : m_Players)
     {
-        if (pPlayer->m_uiScriptDebugLevel >= debugLevel)
+        if (pPlayer->m_uiScriptDebugLevel < debugLevel)
             continue;
         
         pPlayer->Send(Packet);
