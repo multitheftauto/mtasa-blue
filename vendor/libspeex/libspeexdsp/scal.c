@@ -33,8 +33,8 @@
 /*
 The algorithm implemented here is described in:
 
-* J.-M. Valin, Perceptually-Motivated Nonlinear Channel Decorrelation For 
-  Stereo Acoustic Echo Cancellation, Accepted for Joint Workshop on 
+* J.-M. Valin, Perceptually-Motivated Nonlinear Channel Decorrelation For
+  Stereo Acoustic Echo Cancellation, Accepted for Joint Workshop on
   Hands­free Speech Communication and Microphone Arrays (HSCMA), 2008.
   http://people.xiph.org/~jm/papers/valin_hscma2008.pdf
 
@@ -71,7 +71,7 @@ struct SpeexDecorrState_ {
    float *vorbis_win;
    int    seed;
    float *y;
-   
+
    /* Per-channel stuff */
    float *buff;
    float (*ring)[ALLPASS_ORDER];
@@ -102,13 +102,13 @@ EXPORT SpeexDecorrState *speex_decorrelate_new(int rate, int channels, int frame
    st->order = speex_alloc(channels*sizeof(int));
    st->alpha = speex_alloc(channels*sizeof(float));
    st->ring = speex_alloc(channels*ALLPASS_ORDER*sizeof(float));
-   
+
    /*FIXME: The +20 is there only as a kludge for ALL_PASS_OLA*/
    st->vorbis_win = speex_alloc((2*frame_size+20)*sizeof(float));
    for (i=0;i<2*frame_size;i++)
       st->vorbis_win[i] = sin(.5*M_PI* sin(M_PI*i/(2*frame_size))*sin(M_PI*i/(2*frame_size)) );
    st->seed = rand();
-   
+
    for (ch=0;ch<channels;ch++)
    {
       for (i=0;i<ALLPASS_ORDER;i++)
@@ -142,12 +142,12 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
 {
    int ch;
    float amount;
-   
+
    if (strength<0)
       strength = 0;
    if (strength>100)
       strength = 100;
-   
+
    amount = .01*strength;
    for (ch=0;ch<st->channels;ch++)
    {
@@ -156,7 +156,7 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
       float beta, beta2;
       float *x;
       float max_alpha = 0;
-      
+
       float *buff;
       float *ring;
       int ringID;
@@ -168,7 +168,7 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
       ringID = st->ringID[ch];
       order = st->order[ch];
       alpha = st->alpha[ch];
-      
+
       for (i=0;i<st->frame_size;i++)
          buff[i] = buff[i+st->frame_size];
       for (i=0;i<st->frame_size;i++)
@@ -182,12 +182,12 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
          beta = 1-0.63246*amount;
       if (beta<0)
          beta = 0;
-   
+
       beta2 = beta;
       for (i=0;i<st->frame_size;i++)
       {
-         st->y[i] = alpha*(x[i-ALLPASS_ORDER+order]-beta*x[i-ALLPASS_ORDER+order-1])*st->vorbis_win[st->frame_size+i+order] 
-               + x[i-ALLPASS_ORDER]*st->vorbis_win[st->frame_size+i] 
+         st->y[i] = alpha*(x[i-ALLPASS_ORDER+order]-beta*x[i-ALLPASS_ORDER+order-1])*st->vorbis_win[st->frame_size+i+order]
+               + x[i-ALLPASS_ORDER]*st->vorbis_win[st->frame_size+i]
                - alpha*(ring[ringID]
                - beta*ring[ringID+1>=order?0:ringID+1]);
          ring[ringID++]=st->y[i];
@@ -204,7 +204,7 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
       max_alpha = pow(.96+.04*(amount-1),order);
       if (max_alpha > .98/(1.+beta2))
          max_alpha = .98/(1.+beta2);
-   
+
       alpha = alpha + .4*uni_rand(&st->seed);
       if (alpha > max_alpha)
          alpha = max_alpha;
@@ -215,8 +215,8 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
       ringID = 0;
       for (i=0;i<st->frame_size;i++)
       {
-         float tmp =  alpha*(x[i-ALLPASS_ORDER+order]-beta*x[i-ALLPASS_ORDER+order-1])*st->vorbis_win[i+order] 
-               + x[i-ALLPASS_ORDER]*st->vorbis_win[i] 
+         float tmp =  alpha*(x[i-ALLPASS_ORDER+order]-beta*x[i-ALLPASS_ORDER+order-1])*st->vorbis_win[i+order]
+               + x[i-ALLPASS_ORDER]*st->vorbis_win[i]
                - alpha*(ring[ringID]
                - beta*ring[ringID+1>=order?0:ringID+1]);
          ring[ringID++]=tmp;
@@ -225,7 +225,7 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
             ringID=0;
          st->y[i] += tmp;
       }
-   
+
 #ifdef VORBIS_PSYCHO
       float frame[N];
       float scale = 1./N;
@@ -252,7 +252,7 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
       for (i=0;i<2*st->frame_size;i++)
          frame[i] *= st->vorbis_win[i];
 #endif
-   
+
       for (i=0;i<st->frame_size;i++)
       {
 #ifdef VORBIS_PSYCHO
@@ -267,7 +267,7 @@ EXPORT void speex_decorrelate(SpeexDecorrState *st, const spx_int16_t *in, spx_i
             tmp = -32767;
          out[i*st->channels+ch] = tmp;
       }
-      
+
       st->ringID[ch] = ringID;
       st->order[ch] = order;
       st->alpha[ch] = alpha;
