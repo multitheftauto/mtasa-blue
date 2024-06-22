@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-21 20:59+0000\n"
+"POT-Creation-Date: 2024-06-22 18:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1455,7 +1455,7 @@ msgstr ""
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
 msgstr ""
 
-#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
+#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
 msgstr ""
 
@@ -3282,7 +3282,7 @@ msgid "Deny"
 msgstr ""
 
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:109
+#: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid ""
 "Fatal error (%u). If this problem persists, please check out mtasa.com for "
@@ -3293,14 +3293,14 @@ msgstr ""
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:125
+#: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid ""
 "Protocol error (%u). If this problem persists, please check out mtasa.com "
 "for support."
 msgstr ""
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:127
+#: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
 msgstr ""
 
