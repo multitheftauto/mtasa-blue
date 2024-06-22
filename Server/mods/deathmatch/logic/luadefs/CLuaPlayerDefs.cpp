@@ -1460,7 +1460,7 @@ unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
     return player->GetScriptDebugLevel();
 }
 
-bool CLuaPlayerDefs::HasPlayerSpawned(CPlayer* player)
+bool CLuaPlayerDefs::HasPlayerSpawned(CPlayer* const player) noexcept
 {
     return player->IsSpawned();
 }

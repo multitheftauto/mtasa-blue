@@ -29,7 +29,6 @@ public:
     LUA_DECLARE(GetPlayerTeam);
     LUA_DECLARE(GetPlayerMoney);
     LUA_DECLARE(GetPlayerWantedLevel);
-    static bool HasPlayerSpawned(CClientPlayer* player);
 
     // Player set
     LUA_DECLARE(ShowPlayerHudComponent);

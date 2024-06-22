@@ -310,13 +310,6 @@ int CLuaPlayerDefs::GetPlayerWantedLevel(lua_State* luaVM)
     return 1;
 }
 
-
-bool CLuaPlayerDefs::HasPlayerSpawned(CClientPlayer* player)
-{
-    return player->IsSpawned();
-}
-
-
 int CLuaPlayerDefs::ShowPlayerHudComponent(lua_State* luaVM)
 {
     //  bool showPlayerHudComponent ( string component, bool show )
