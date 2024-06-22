@@ -15,7 +15,8 @@
 
 extern CGame* g_pGame;
 
-enum CScriptDebugging::DebugMessageLevels : std::uint32_t {
+enum CScriptDebugging::DebugMessageLevels : std::uint32_t
+{
     MESSAGE_TYPE_DEBUG = 0,
     MESSAGE_TYPE_ERROR = 1,
     MESSAGE_TYPE_WARNING = 2,
@@ -23,7 +24,8 @@ enum CScriptDebugging::DebugMessageLevels : std::uint32_t {
     MESSAGE_TYPE_CUSTOM = 4,
 };
 
-enum CScriptDebugging::DebugScriptLevels : std::uint32_t {
+enum CScriptDebugging::DebugScriptLevels : std::uint32_t
+{
     ERRORS_ONLY = 1,
     ERRORS_AND_WARNINGS = 2,
     ALL = 3,
