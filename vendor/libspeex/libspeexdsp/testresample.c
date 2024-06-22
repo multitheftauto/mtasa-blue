@@ -1,8 +1,7 @@
 /* Copyright (C) 2007 Jean-Marc Valin
 
-   File: speex_buffer.h
-   This is a very simple ring buffer implementation. It is not thread-safe
-   so you need to do your own locking.
+   File: testresample.c
+   Testing the resampling code
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
@@ -31,38 +30,57 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef SPEEX_BUFFER_H
-#define SPEEX_BUFFER_H
-
-#include "speexdsp_types.h"
-
-#ifdef __cplusplus
-extern "C" {
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
-struct SpeexBuffer_;
-typedef struct SpeexBuffer_ SpeexBuffer;
+#include "speex/speex_resampler.h"
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
 
-SpeexBuffer *speex_buffer_init(int size);
+#define NN 256
 
-void speex_buffer_destroy(SpeexBuffer *st);
+int main()
+{
+   spx_uint32_t i;
+   short *in;
+   short *out;
+   float *fin, *fout;
+   int count = 0;
+   SpeexResamplerState *st = speex_resampler_init(1, 8000, 12000, 10, NULL);
+   speex_resampler_set_rate(st, 96000, 44100);
+   speex_resampler_skip_zeros(st);
 
-int speex_buffer_write(SpeexBuffer *st, void *data, int len);
-
-int speex_buffer_writezeros(SpeexBuffer *st, int len);
-
-int speex_buffer_read(SpeexBuffer *st, void *data, int len);
-
-int speex_buffer_get_available(SpeexBuffer *st);
-
-int speex_buffer_resize(SpeexBuffer *st, int len);
-
-#ifdef __cplusplus
+   in = malloc(NN*sizeof(short));
+   out = malloc(2*NN*sizeof(short));
+   fin = malloc(NN*sizeof(float));
+   fout = malloc(2*NN*sizeof(float));
+   while (1)
+   {
+      spx_uint32_t in_len;
+      spx_uint32_t out_len;
+      fread(in, sizeof(short), NN, stdin);
+      if (feof(stdin))
+         break;
+      for (i=0;i<NN;i++)
+         fin[i]=in[i];
+      in_len = NN;
+      out_len = 2*NN;
+      /*if (count==2)
+         speex_resampler_set_quality(st, 10);*/
+      speex_resampler_process_float(st, 0, fin, &in_len, fout, &out_len);
+      for (i=0;i<out_len;i++)
+         out[i]=floor(.5+fout[i]);
+      /*speex_warning_int("writing", out_len);*/
+      fwrite(out, sizeof(short), out_len, stdout);
+      count++;
+   }
+   speex_resampler_destroy(st);
+   free(in);
+   free(out);
+   free(fin);
+   free(fout);
+   return 0;
 }
-#endif
-
-#endif
-
-
-
 
