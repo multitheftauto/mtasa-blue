@@ -271,6 +271,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
+    g_pMultiplayer->SetPostColorFilterRenderHandler(CClientGame::StaticPostColorFilterRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(CClientGame::StaticCAnimBlendAssocDestructorHandler);
@@ -348,9 +349,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Add our lua events
     AddBuiltInEvents();
-
-    // Init debugger class
-    m_Foo.Init(this);
 
     // Load some stuff from the core config
     float fScale;
@@ -476,6 +474,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
+    g_pMultiplayer->SetPostColorFilterRenderHandler(nullptr);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(NULL);
@@ -1119,9 +1118,6 @@ void CClientGame::DoPulses()
         m_bFirstPlaybackFrame = false;
     }
 
-    // Call debug code if debug mode
-    m_Foo.DoPulse();
-
     // Output stuff from our server eventually
     m_Server.Pulse();
 
@@ -1616,12 +1612,6 @@ void CClientGame::ShowNetstat(int iCmd)
         m_pNetworkStats->Reset();
     }
     m_bShowNetstat = bShow;
-}
-
-void CClientGame::ShowEaeg(bool)
-{
-    if (m_pLocalPlayer)
-        m_pLocalPlayer->SetStat(0x2329, 1.0f);
 }
 
 #ifdef MTA_WEPSYNCDBG
@@ -3604,6 +3594,11 @@ void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
 void CClientGame::StaticPreFxRenderHandler()
 {
     g_pCore->OnPreFxRender();
+}
+
+void CClientGame::StaticPostColorFilterRenderHandler()
+{
+    g_pCore->OnPostColorFilterRender();
 }
 
 void CClientGame::StaticPreHudRenderHandler()

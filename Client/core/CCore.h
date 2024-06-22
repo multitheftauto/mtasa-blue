@@ -289,6 +289,8 @@ public:
     const std::string& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void               SetLastConnectedServerName(const std::string& strServerName) { m_strLastConnectedServerName = strServerName; }
 
+    void OnPostColorFilterRender() override;
+
 private:
     void ApplyCoreInitSettings();
 
