@@ -28,7 +28,7 @@ public:
     LUA_DECLARE(GetObjectScale);
     static bool IsObjectBreakable(CObject* const pObject);
     static bool IsObjectMoving(CObject* const pObject);
-    static bool IsObjectRespawnable(CObject* const pObject);
+    static bool IsObjectRespawnable(CObject* const pObject) noexcept;
 
     // Object set functions
     LUA_DECLARE(SetObjectName);

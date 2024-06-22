@@ -329,7 +329,7 @@ bool CLuaObjectDefs::ToggleObjectRespawn(CObject* const pObject, const bool bRes
     return CStaticFunctionDefinitions::ToggleObjectRespawn(pObject, bRespawn);
 }
 
-bool CLuaObjectDefs::IsObjectRespawnable(CObject* const pObject)
+bool CLuaObjectDefs::IsObjectRespawnable(CObject* const pObject) noexcept
 {
     return pObject->IsRespawnEnabled();
 }
