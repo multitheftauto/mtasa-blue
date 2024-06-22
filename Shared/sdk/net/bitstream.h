@@ -552,6 +552,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-05-31
     BreakObject_Serverside,
 
+    // Ped syncronization revision
+    // 2024-06-16
+    PedSync_Revision,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
