@@ -198,6 +198,9 @@ DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 #define HOOKPOS_PreFxRender                                     0x049E650
 DWORD RETURN_PreFxRender = 0x0404D1E;
 
+#define HOOKPOS_PostColorFilterRender                             0x705099
+DWORD RETURN_PostColorFilterRender = 0x70509E;
+
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender = 0x053EADD;
 
@@ -307,7 +310,6 @@ bool          bHideRadar;
 bool          bHasProcessedScript;
 float         fX, fY, fZ;
 DWORD         RoadSignFixTemp;
-DWORD         dwEAEG = 0;
 bool          m_bExplosionsDisabled;
 float         fGlobalGravity = 0.008f;
 float         fLocalPlayerGravity = 0.008f;
@@ -377,6 +379,7 @@ PostWorldProcessHandler*                   m_pPostWorldProcessHandler = NULL;
 PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
 IdleHandler*                               m_pIdleHandler = NULL;
 PreFxRenderHandler*                        m_pPreFxRenderHandler = NULL;
+PostColorFilterRenderHandler*              m_pPostColorFilterRenderHandler = nullptr;
 PreHudRenderHandler*                       m_pPreHudRenderHandler = NULL;
 ProcessCollisionHandler*                   m_pProcessCollisionHandler = NULL;
 HeliKillHandler*                           m_pHeliKillHandler = NULL;
@@ -479,6 +482,7 @@ void HOOK_Transmission_CalculateDriveAcceleration();
 void HOOK_isVehDriveTypeNotRWD();
 void HOOK_isVehDriveTypeNotFWD();
 void HOOK_PreFxRender();
+void HOOK_PostColorFilterRender();
 void HOOK_PreHUDRender();
 
 void HOOK_CTrafficLights_GetPrimaryLightState();
@@ -657,6 +661,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9);
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5);
+    HookInstall(HOOKPOS_PostColorFilterRender, (DWORD)HOOK_PostColorFilterRender, 5);
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7);
 
@@ -2315,6 +2320,11 @@ void CMultiplayerSA::SetPreFxRenderHandler(PreFxRenderHandler* pHandler)
     m_pPreFxRenderHandler = pHandler;
 }
 
+void CMultiplayerSA::SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler)
+{
+    m_pPostColorFilterRenderHandler = pHandler;
+}
+
 void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
 {
     m_pPreHudRenderHandler = pHandler;
@@ -3394,31 +3404,6 @@ static void RestoreAlphaValues()
 /**
  ** Vehicles
  **/
-static RpAtomic* CVehicle_EAEG(RpAtomic* pAtomic, void*)
-{
-    RwFrame* pFrame = ((RwFrame*)(((RwObject*)(pAtomic))->parent));
-    if (pFrame)
-    {
-        switch (pFrame->szName[0])
-        {
-            case '\0':
-            case 'h':
-                break;
-            default:
-                DWORD dwFunc = (DWORD)0x533290;
-                DWORD dwAtomic = (DWORD)pAtomic;
-                _asm
-                {
-                    push    0
-                    push    dwAtomic
-                    call    dwFunc
-                    add     esp, 0x8
-                }
-        }
-    }
-
-    return pAtomic;
-}
 
 static void SetVehicleAlpha()
 {
@@ -3427,15 +3412,6 @@ static void SetVehicleAlpha()
 
     if (ucAlpha < 255)
         GetAlphaAndSetNewValues(ucAlpha);
-    else if (dwEAEG && pInterface->m_pVehicle->GetModelIndex() == 0x20A)
-    {
-        bEntityHasAlpha = true;
-        uiAlphaIdx = 0;
-        SetEntityAlphaHooked(dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0);
-        MemPutFast<DWORD>(0x5332D6, (DWORD)CVehicle_EAEG);
-        SetEntityAlphaHooked(dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, 0);
-        MemPutFast<DWORD>(0x5332D6, 0x533290);
-    }
     else
         bEntityHasAlpha = false;
 }
@@ -3947,8 +3923,6 @@ void CMultiplayerSA::SetLocalStatValue(unsigned short usStat, float fValue)
         localStatsData.StatTypesFloat[usStat] = fValue;
     else if (usStat >= STATS_OFFSET && usStat < MAX_INT_FLOAT_STATS)
         localStatsData.StatTypesInt[usStat - STATS_OFFSET] = (int)fValue;
-    else if (usStat == 0x2329)
-        dwEAEG = !dwEAEG;
 }
 
 float CMultiplayerSA::GetLocalStatValue(unsigned short usStat)
@@ -4777,6 +4751,24 @@ void _declspec(naked) HOOK_PreFxRender()
 skip:
         popad
         jmp     RETURN_PreFxRender  // 00404D1E
+    }
+}
+
+// Hooked from 00705099  5 bytes
+void _declspec(naked) HOOK_PostColorFilterRender()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (m_pPostColorFilterRenderHandler) m_pPostColorFilterRenderHandler();
+
+    _asm
+    {
+        popad
+        mov al, ds:0C402BAh
+        jmp     RETURN_PostColorFilterRender  // 0070509E
     }
 }
 
