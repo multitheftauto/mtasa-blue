@@ -205,7 +205,7 @@ bool CClientPlayer::IsOnMyTeam(CClientPlayer* pPlayer)
     return false;
 }
 
-void CClientPlayer::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
+void CClientPlayer::Spawn(const CVector& vecPosition, float fRotation, std::uint16_t usModel, std::uint8_t ucInterior)
 {
     // Remove us from our car
     RemoveFromVehicle();
@@ -225,7 +225,7 @@ void CClientPlayer::Spawn(const CVector& vecPosition, float fRotation, unsigned 
     SetModel(usModel);
 
     // Detach from any entities
-    AttachTo(NULL);
+    AttachTo(nullptr);
 
     // Restore our health before any resurrection calls (::SetHealth/SetInitialState)
     // So we don't get recreated more than once

@@ -28,7 +28,6 @@ void CLuaPlayerDefs::LoadFunctions()
         {"isPlayerHudComponentVisible", IsPlayerHudComponentVisible},
         {"getPlayerMoney", GetPlayerMoney},
         {"getPlayerWantedLevel", GetPlayerWantedLevel},
-        {"hasPlayerSpawned", ArgumentParser<HasPlayerSpawned>},
 
         // Player set funcs
         {"showPlayerHudComponent", ShowPlayerHudComponent},

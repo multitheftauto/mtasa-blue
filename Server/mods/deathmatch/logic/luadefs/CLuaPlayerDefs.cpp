@@ -181,6 +181,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getCameraMatrix", "getCameraMatrix");
     lua_classfunction(luaVM, "getCameraTarget", "getCameraTarget");
     lua_classfunction(luaVM, "getScriptDebugLevel", "getPlayerScriptDebugLevel");
+    lua_classfunction(luaVM, "hasSpawned", "hasPlayerSpawned");
 
     lua_classvariable(luaVM, "account", NULL, "getPlayerAccount");
     lua_classvariable(luaVM, "cameraInterior", "setCameraInterior", "getCameraInterior");
@@ -204,6 +205,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
     lua_classvariable(luaVM, "scriptDebugLevel", "setPlayerScriptDebugLevel", "getPlayerScriptDebugLevel");
+    lua_classvariable(luaVM, "spawned", nullptr, "hasPlayerSpawned");
 
     lua_registerclass(luaVM, "Player", "Ped");
 }
