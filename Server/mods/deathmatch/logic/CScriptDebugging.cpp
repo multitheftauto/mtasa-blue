@@ -15,7 +15,7 @@
 
 extern CGame* g_pGame;
 
-enum CScriptDebugging::DebugMessageLevels : std::uint32_t
+enum CScriptDebugging::DebugMessageLevels : std::uint8_t
 {
     MESSAGE_TYPE_DEBUG = 0,
     MESSAGE_TYPE_ERROR = 1,
@@ -24,7 +24,7 @@ enum CScriptDebugging::DebugMessageLevels : std::uint32_t
     MESSAGE_TYPE_CUSTOM = 4,
 };
 
-enum CScriptDebugging::DebugScriptLevels : std::uint32_t
+enum CScriptDebugging::DebugScriptLevels : std::uint8_t
 {
     ERRORS_ONLY = 1,
     ERRORS_AND_WARNINGS = 2,
@@ -159,7 +159,7 @@ void CScriptDebugging::PrintLog(const char* szText)
     }
 }
 
-bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint32_t playerDebugLevel, std::uint32_t messageDebugLevel) const noexcept
+bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint8_t playerDebugLevel, std::uint8_t messageDebugLevel) const noexcept
 {
     bool sufficientDebugLevel = false;
 

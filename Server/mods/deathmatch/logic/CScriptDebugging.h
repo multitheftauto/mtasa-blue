@@ -73,7 +73,7 @@ private:
                    unsigned char ucGreen = 255, unsigned char ucBlue = 255);
 
     void PrintLog(const char* szText);
-    bool CheckForSufficientDebugLevel(std::uint32_t playerDebugLevel, std::uint32_t messageDebugLevel) const noexcept;
+    bool CheckForSufficientDebugLevel(std::uint8_t playerDebugLevel, std::uint8_t messageDebugLevel) const noexcept;
     void Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel);
 
     unsigned int                   m_uiLogFileLevel;
@@ -85,6 +85,6 @@ private:
     std::list<CLuaMain*>           m_LuaMainStack;
     CDuplicateLineFilter<SLogLine> m_DuplicateLineFilter;
 
-    enum DebugMessageLevels : std::uint32_t;
-    enum DebugScriptLevels : std::uint32_t;
+    enum DebugMessageLevels : std::uint8_t;
+    enum DebugScriptLevels : std::uint8_t;
 };
