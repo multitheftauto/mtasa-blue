@@ -213,7 +213,8 @@ project "cryptopp"
 	filter "platforms:x64"
 		files {
 			"x64dll.asm",
-			"x64masm.asm"
+			"x64masm.asm",
+			"cpuid64.asm"
 		}
 
 	filter { "system:windows" }
