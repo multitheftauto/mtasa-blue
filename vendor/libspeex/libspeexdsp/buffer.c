@@ -1,5 +1,5 @@
 /* Copyright (C) 2007 Jean-Marc Valin
-      
+
    File: buffer.c
    This is a very simple ring buffer implementation. It is not thread-safe
    so you need to do your own locking.
@@ -99,7 +99,7 @@ EXPORT int speex_buffer_write(SpeexBuffer *st, void *_data, int len)
 
 EXPORT int speex_buffer_writezeros(SpeexBuffer *st, int len)
 {
-   /* This is almost the same as for speex_buffer_write() but using 
+   /* This is almost the same as for speex_buffer_write() but using
    SPEEX_MEMSET() instead of SPEEX_COPY(). Update accordingly. */
    int end;
    int end1;
@@ -135,7 +135,7 @@ EXPORT int speex_buffer_read(SpeexBuffer *st, void *_data, int len)
    char *data = _data;
    if (len > st->available)
    {
-      SPEEX_MEMSET(data+st->available, 0, st->size-st->available);
+      SPEEX_MEMSET(data+st->available, 0, len - st->available);
       len = st->available;
    }
    end = st->read_ptr + len;

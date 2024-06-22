@@ -350,8 +350,3 @@ void DeletePointersAndClearList(T& elementList)
         delete *iter;
     }
 }
-
-// for debug
-#if defined(MTA_DEBUG) && defined(MTA_CLIENT)
-bool RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
-#endif
