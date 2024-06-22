@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include "Common.h"
+
 class CEntity;
 class CVector;
 class CVehicle;
@@ -34,4 +36,5 @@ public:
     virtual void TriggerWaterSplash(CVector& vecPosition) = 0;
     virtual void TriggerBulletSplash(CVector& vecPosition) = 0;
     virtual void TriggerFootSplash(CVector& vecPosition) = 0;
+    virtual void AddParticle(eFxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife) = 0;
 };
