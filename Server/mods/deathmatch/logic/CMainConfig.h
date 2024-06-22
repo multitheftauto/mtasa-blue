@@ -187,7 +187,7 @@ private:
     bool                       m_bJoinFloodProtectionEnabled;
     bool                       m_bScriptDebugLogEnabled;
     std::string                m_strScriptDebugLogFile;
-    std::set<std::uint8_t>     m_scriptDebugLogLevelMap;
+    std::set<DebugScriptLevel> m_scriptDebugLogLevelSet;
     std::string                m_strAccessControlListFile;
     bool                       m_bVerifySerials;
     unsigned short             m_usFPSLimit;

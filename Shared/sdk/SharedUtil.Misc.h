@@ -24,6 +24,25 @@
 
 namespace SharedUtil
 {
+    template <std::integral T>
+    inline std::optional<T> StringToNumber(const std::string& str) noexcept {
+        try {
+            if constexpr(std::is_same_v<T, int>) {
+                return std::stoi(str.c_str());
+            } else if constexpr(std::is_same_v<T, long>) {
+                return std::stol(str.c_str());
+            } else if constexpr(std::is_same_v<T, long long>) {
+                return std::stoll(str.c_str());
+            } else if constexpr(std::is_same_v<T, unsigned long>) {
+                return std::stoul(str.c_str());
+            } else if constexpr(std::is_same_v<T, unsigned long long>) {
+                return std::stoull(str.c_str());
+            }
+        } catch(...) {}
+
+        return std::nullopt;
+    }
+
     class CArgMap;
 #ifdef WIN32
 

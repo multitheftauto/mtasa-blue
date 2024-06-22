@@ -21,6 +21,7 @@
 #include "CConsoleCommands.h"
 #include "CHTTPD.h"
 #include "CStaticFunctionDefinitions.h"
+#include <SharedUtil.Misc.h>
 
 #define MTA_SERVER_CONF_TEMPLATE "mtaserver.conf.template"
 
@@ -344,12 +345,12 @@ bool CMainConfig::Load()
         ReadCommaSeparatedList(strDebugLevel, debugLevelList);
         for (const auto& level : debugLevelList)
         {
-            if(level.empty())
-                continue;
-            if (!isdigit(level[0]))
+            auto levelNum = SharedUtil::StringToNumber<int>(level);
+
+            if(!levelNum.has_value())
                 continue;
 
-            MapInsert(m_scriptDebugLogLevelMap, level);
+            MapInsert(m_scriptDebugLogLevelSet, levelNum.value());
         }
     }
 
