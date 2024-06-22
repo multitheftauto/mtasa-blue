@@ -30,13 +30,15 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
 #include "speex/speex_resampler.h"
 #include <stdio.h>
-#include <math.h>
 #include <stdlib.h>
 
 #define PERIOD 32
