@@ -85,6 +85,6 @@ private:
     std::list<CLuaMain*>           m_LuaMainStack;
     CDuplicateLineFilter<SLogLine> m_DuplicateLineFilter;
 
-    enum DebugMessageLevels : std::uint8_t;
-    enum DebugScriptLevels : std::uint8_t;
+    enum DebugMessageLevels;
+    enum DebugScriptLevels;
 };
