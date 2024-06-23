@@ -15,16 +15,16 @@
 
 extern CGame* g_pGame;
 
-enum CScriptDebugging::DebugMessageLevels : std::uint8_t
+enum class DebugMessageLevels : std::uint8_t
 {
     MESSAGE_TYPE_DEBUG = 0,
-    MESSAGE_TYPE_ERROR = 1,
-    MESSAGE_TYPE_WARNING = 2,
-    MESSAGE_TYPE_INFO = 3,
-    MESSAGE_TYPE_CUSTOM = 4,
+    MESSAGE_TYPE_ERROR,
+    MESSAGE_TYPE_WARNING,
+    MESSAGE_TYPE_INFO,
+    MESSAGE_TYPE_CUSTOM,
 };
 
-enum CScriptDebugging::DebugScriptLevels : std::uint8_t
+enum class DebugScriptLevels : std::uint8_t
 {
     ERRORS_ONLY = 1,
     ERRORS_AND_WARNINGS = 2,
@@ -163,18 +163,18 @@ bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint8_t playerDebugLeve
 {
     bool sufficientDebugLevel = false;
 
-    switch (messageDebugLevel)
+    switch (static_cast<DebugMessageLevels>(messageDebugLevel))
     {
-        case MESSAGE_TYPE_ERROR:
-            sufficientDebugLevel = (playerDebugLevel >= ERRORS_ONLY);
+        case DebugMessageLevels::MESSAGE_TYPE_ERROR:
+            sufficientDebugLevel = (playerDebugLevel >= static_cast<std::uint8_t>(DebugScriptLevels::ERRORS_ONLY));
             break;
-        case MESSAGE_TYPE_WARNING:
-            sufficientDebugLevel = (playerDebugLevel >= ERRORS_AND_WARNINGS);
+        case DebugMessageLevels::MESSAGE_TYPE_WARNING:
+            sufficientDebugLevel = (playerDebugLevel >= static_cast<std::uint8_t>(DebugScriptLevels::ERRORS_AND_WARNINGS));
             break;
-        case MESSAGE_TYPE_INFO:
-        case MESSAGE_TYPE_CUSTOM:
-        case MESSAGE_TYPE_DEBUG:
-            sufficientDebugLevel = (playerDebugLevel == ALL);
+        case DebugMessageLevels::MESSAGE_TYPE_INFO:
+        case DebugMessageLevels::MESSAGE_TYPE_CUSTOM:
+        case DebugMessageLevels::MESSAGE_TYPE_DEBUG:
+            sufficientDebugLevel = (playerDebugLevel == static_cast<std::uint8_t>(DebugScriptLevels::ALL));
             break;
     }
 
