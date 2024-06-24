@@ -136,6 +136,7 @@ double GetRandomDouble();
 int    GetRandom(int iLow, int iHigh);
 
 bool IsValidFilePath(const char* szPath);
+bool IsValidFilePath(const char* szDir, size_t length);
 bool IsValidOrganizationPath(const char* szPath);
 #endif
 
@@ -277,6 +278,7 @@ unsigned int StripUnwantedCharacters(char* szText, unsigned char cReplace = ' ')
 unsigned int StripControlCodes(char* szText, unsigned char cReplace = ' ');
 bool         IsControlCode(unsigned char c);
 bool         IsValidFilePath(const char* szDir);
+bool         IsValidFilePath(const char* szDir, size_t length);
 void         ReplaceOccurrencesInString(std::string& s, const char* a, const char* b);
 
 void RaiseFatalError(unsigned int uiCode);
@@ -350,8 +352,3 @@ void DeletePointersAndClearList(T& elementList)
         delete *iter;
     }
 }
-
-// for debug
-#if defined(MTA_DEBUG) && defined(MTA_CLIENT)
-bool RemoteLoadLibrary(HANDLE hProcess, const char* szLibPath);
-#endif
