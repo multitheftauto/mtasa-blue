@@ -1245,12 +1245,22 @@ void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisRe
     // No operation on the client
 }
 
+std::pair<bool, std::string> CheckCanModifyOtherResource(CResource* pThisResource, CResource* pOtherResource) noexcept
+{
+    return {true, ""};
+}
+
 //
 // Set error if pThisResource does not have permission to modify every resource in resourceList
 //
 void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList)
 {
     // No operation on the client
+}
+
+std::pair<bool, std::string> CheckCanModifyOtherResources(CResource* pThisResource, std::initializer_list<CResource*> resourceList) noexcept
+{
+    return {true, ""};
 }
 
 //
@@ -1260,4 +1270,9 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
                                      bool* pbReadOnly)
 {
     // No operation on the client
+}
+
+std::pair<bool, std::string> CheckCanAccessOtherResourceFile(CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly) noexcept
+{
+    return {true, ""};
 }
