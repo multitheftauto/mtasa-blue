@@ -84,4 +84,7 @@ private:
     SLuaDebugInfo                  m_SavedLuaDebugInfo;
     std::list<CLuaMain*>           m_LuaMainStack;
     CDuplicateLineFilter<SLogLine> m_DuplicateLineFilter;
+
+    enum DebugScriptLevels;
+    enum DebugMessageLevels;
 };
