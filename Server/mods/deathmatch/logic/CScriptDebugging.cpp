@@ -18,10 +18,10 @@ extern CGame* g_pGame;
 enum class DebugMessageLevels : std::uint8_t
 {
     MESSAGE_TYPE_DEBUG = 0,
-    MESSAGE_TYPE_ERROR,
-    MESSAGE_TYPE_WARNING,
-    MESSAGE_TYPE_INFO,
-    MESSAGE_TYPE_CUSTOM,
+    MESSAGE_TYPE_ERROR = 1,
+    MESSAGE_TYPE_WARNING = 2,
+    MESSAGE_TYPE_INFO = 3,
+    MESSAGE_TYPE_CUSTOM = 4,
 };
 
 enum class DebugScriptLevels : std::uint8_t
