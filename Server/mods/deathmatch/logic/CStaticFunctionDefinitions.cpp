@@ -1670,7 +1670,7 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
                 pPed->SetHealth(fHealth);
 
-                if (pPed->IsDead() && fHealth > 0)
+                if (pPed->IsDead() && fHealth > 0.0f)
                     pPed->SetIsDead(false);
             }
             else
