@@ -116,6 +116,7 @@ public:
     void SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler);
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
+    void SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler) override;
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
     void DisableCallsToCAnimBlendNode(bool bDisableCalls);
     void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler);

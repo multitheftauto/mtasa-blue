@@ -28,7 +28,6 @@ project "cryptopp"
 		"arc4.cpp",
 		"aria.cpp",
 		"ariatab.cpp",
-		"aria_simd.cpp",
 		"asn.cpp",
 		"authenc.cpp",
 		"base32.cpp",
@@ -214,7 +213,8 @@ project "cryptopp"
 	filter "platforms:x64"
 		files {
 			"x64dll.asm",
-			"x64masm.asm"
+			"x64masm.asm",
+			"cpuid64.asm"
 		}
 
 	filter { "system:windows" }

@@ -1,4 +1,4 @@
-## Multi Theft Auto: San Andreas 
+## Multi Theft Auto: San Andreas
 
 [![Build Status](https://github.com/multitheftauto/mtasa-blue/workflows/Build/badge.svg?event=push&branch=master)](https://github.com/multitheftauto/mtasa-blue/actions?query=branch%3Amaster+event%3Apush) [![Unique servers online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Fservers-shields.io.json)](https://community.multitheftauto.com/index.php?p=servers) [![Unique players online](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Fplayers-shields.io.json)](https://multitheftauto.com) [![Unique players last 24 hours](https://img.shields.io/endpoint?url=https%3A%2F%2Fmultitheftauto.com%2Fapi%2Funique-players-shields.io.json)](https://multitheftauto.com) [![Discord](https://img.shields.io/discord/278474088903606273?label=discord&logo=discord)](https://discord.com/invite/mtasa) [![Crowdin](https://badges.crowdin.net/e/f5dba7b9aa6594139af737c85d81d3aa/localized.svg)](https://multitheftauto.crowdin.com/multitheftauto)
 
@@ -39,7 +39,9 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 #### Windows
 
 Prerequisites
-- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) with:
+  - Desktop development with C++
+  - Optional component *C++ MFC for latest v143 build tools (x86 & x64)*
 - [Microsoft DirectX SDK](https://wiki.multitheftauto.com/wiki/Compiling_MTASA#Microsoft_DirectX_SDK)
 - [Git for Windows](https://git-scm.com/download/win) (Optional)
 
@@ -48,13 +50,15 @@ Prerequisites
 3. Compile
 4. Execute: `win-install-data.bat`
 
+Visit the wiki article ["Compiling MTASA"](https://wiki.multitheftauto.com/wiki/Compiling_MTASA) for additional information and error troubleshooting.
+
 #### GNU/Linux
 
 You can build the MTA:SA server on GNU/Linux distributions only for x86, x86_64, armhf and arm64 CPU architectures. ARM architectures are currently in **experimental phase**, which means they're unstable, untested and may crash randomly. Beware that we only officially support building from x86_64 and that includes cross-compiling for x86, arm and arm64.
 
 **Build dependencies**
 
-*Please always read the Dockerfiles for up-to-date build dependencies.*  
+*Please always read the Dockerfiles for up-to-date build dependencies.*
 *Note: ncftp is not required for building the MTA:SA server.*
 
 - git

@@ -289,6 +289,8 @@ public:
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
+    void OnPostColorFilterRender() override;
+
 private:
     void ApplyCoreInitSettings();
 
