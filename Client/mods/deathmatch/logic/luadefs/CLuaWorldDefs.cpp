@@ -58,7 +58,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"getFPSLimit", GetFPSLimit},
                                                                              {"getBirdsEnabled", GetBirdsEnabled},
                                                                              {"getCoronaReflectionsEnabled", ArgumentParser<GetCoronaReflectionsEnabled>},
-                                                                             {"getWorldProperty", ArgumentParserWarn<false, GetWorldProperty>},
+                                                                             {"getWorldProperty", ArgumentParser<GetWorldProperty>},
 
                                                                              // World set funcs
                                                                              {"setTime", SetTime},
@@ -74,7 +74,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setWaveHeight", SetWaveHeight},
                                                                              {"setMinuteDuration", SetMinuteDuration},
                                                                              {"setGarageOpen", SetGarageOpen},
-                                                                             {"setWorldSpecialPropertyEnabled", ArgumentParserWarn<false, SetWorldSpecialPropertyEnabled>},
+                                                                             {"setWorldSpecialPropertyEnabled", ArgumentParser<SetWorldSpecialPropertyEnabled>},
                                                                              {"setBlurLevel", SetBlurLevel},
                                                                              {"setJetpackMaxHeight", SetJetpackMaxHeight},
                                                                              {"setCloudsEnabled", SetCloudsEnabled},
@@ -99,7 +99,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setMoonSize", SetMoonSize},
                                                                              {"setFPSLimit", SetFPSLimit},
                                                                              {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
-                                                                             {"setWorldProperty", ArgumentParserWarn<false, SetWorldProperty>},
+                                                                             {"setWorldProperty", ArgumentParser<SetWorldProperty>},
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
