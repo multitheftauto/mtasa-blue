@@ -201,11 +201,13 @@ public:
     bool IsNightVisionEnabled();
     bool IsThermalVisionEnabled();
 
-    std::tuple<bool, float, float> GetUnderwaterEffect();
-    std::tuple<bool, float> GetUnderwaterDarkness();
-    void SetUnderwaterEffectEnabled(bool bEnabled);
-    void SetUnderwaterEffectSpeed(float fSpeed, float fFrequency);
-    void SetUnderwaterDarkness(bool bEnabled, float fFullDarknessDepth);
+    void GetUnderwaterEffect(bool& isEnabled, float& speed, float& frequency);
+    void GetUnderwaterDarkness(bool& isEnabled, float& fullDarknessDepth);
+    void SetUnderwaterEffectEnabled(bool isEnabled) override;
+    void SetUnderwaterEffectSpeed(float speed, float frequency) override;
+    void SetUnderwaterDarkness(bool isEnabled, float fullDarknessDepth) override;
+    void ResetUnderwaterEffect() override;
+    void ResetUnderwaterDarkness() override;
 
     void AllowWindowsCursorShowing(bool bAllow);
 

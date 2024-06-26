@@ -45,9 +45,9 @@ public:
     LUA_DECLARE(SetCameraGoggleEffect);
     static bool SetCameraDrunkLevel(short drunkLevel);
 
-    static bool SetCameraUnderwaterEffectEnabled(bool bEnabled);
-    static bool SetCameraUnderwaterEffectSpeed(float fSpeed, float fFrequency);
-    static bool SetCameraUnderwaterDarkness(bool bEnabled, std::optional<float> fFullDarknessDepth);
+    static bool SetCameraUnderwaterEffectEnabled(bool isEnabled);
+    static bool SetCameraUnderwaterEffectSpeed(float speed, float frequency);
+    static bool SetCameraUnderwaterDarkness(bool isEnabled, std::optional<float> fullDarknessDepth);
     static bool ResetCameraUnderwaterEffect();
     static bool ResetCameraUnderwaterDarkness();
 

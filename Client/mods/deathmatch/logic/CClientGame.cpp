@@ -5483,9 +5483,8 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->SetGrainLevel(0);
 
     // Underwater effects
-    g_pMultiplayer->SetUnderwaterDarkness(true, 90.0f);
-    g_pMultiplayer->SetUnderwaterEffectEnabled(false);
-    g_pMultiplayer->SetUnderwaterEffectSpeed(0.0015f, 0.04f);
+    g_pMultiplayer->ResetUnderwaterDarkness();
+    g_pMultiplayer->ResetUnderwaterEffect();
 
     // Water
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
