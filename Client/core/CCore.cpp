@@ -894,6 +894,30 @@ void CCore::SetCenterCursor(bool bEnabled)
         m_pSetCursorPosHook->DisableSetCursorPos();
 }
 
+// Changes visibility of the system mouse cursor within application window
+void CCore::SetSystemCursorVisible(bool bVisible)
+{
+    if (m_pMultiplayer)
+    {
+        m_pMultiplayer->AllowWindowsCursorShowing(bVisible);
+        ShowCursor(bVisible);
+    }
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// ShouldShowSystemCursorDuringLoad
+//
+// Whenever system cursor should be shown during game load.
+// It should be if game is being launched in windowed mode or user has multiple monitors and full screen minimize is disabled.
+//
+////////////////////////////////////////////////////////////////////////
+bool CCore::ShouldShowSystemCursorDuringLoad()
+{
+    CVideoModeManagerInterface* pVidMan = GetVideoModeManager();
+    return pVidMan->IsDisplayModeWindowed() || (pVidMan->IsMultiMonitor() && !pVidMan->IsMinimizeEnabled());
+}
+
 ////////////////////////////////////////////////////////////////////////
 //
 // LoadModule
@@ -1020,6 +1044,11 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+
+    SetSystemCursorVisible(ShouldShowSystemCursorDuringLoad());
+
+    // Hide GUI mouse cursor during game startup
+    m_pGUI->SetCursorEnabled(false);
 }
 
 void CCore::CreateGUI()
@@ -1260,6 +1289,9 @@ void CCore::DoPostFramePulse()
             if (m_bFirstFrame)
             {
                 m_bFirstFrame = false;
+
+                // Make sure system mouse cursor is not visible
+                CCore::GetSingletonPtr()->SetSystemCursorVisible(false);
 
                 // Disable vsync while it's all dark
                 m_pGame->DisableVSync();
