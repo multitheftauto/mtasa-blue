@@ -15,7 +15,7 @@
 
 extern CGame* g_pGame;
 
-enum CScriptDebugging::DebugScriptLevels : std::uint8_t
+enum DebugScriptLevels : std::uint8_t
 {
     NONE,
     ERRORS_ONLY,
@@ -23,7 +23,7 @@ enum CScriptDebugging::DebugScriptLevels : std::uint8_t
     ALL,
 };
 
-enum CScriptDebugging::DebugMessageLevels : std::uint8_t
+enum DebugMessageLevels : std::uint8_t
 {
     MESSAGE_TYPE_DEBUG,
     MESSAGE_TYPE_ERROR,
