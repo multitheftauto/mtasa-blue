@@ -351,15 +351,12 @@ public:
     static bool IsWorldSoundEnabled(std::uint32_t uiGroup, std::uint32_t uiIndex) noexcept;
     static bool IsWorldSoundEnabled(uint uiGroup, uint uiIndex, bool& bOutMute);
     static bool ResetWorldSounds();
-    static CClientSound* PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex,
-        int iBankIndex, int iAudioIndex, bool bLoop) noexcept;
-    static bool PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex,
-        int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound) noexcept;
-    static CClientSound* PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex,
-        int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop) noexcept;
-    static bool PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex,
-        int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop,
-        CClientSound*& outSound) noexcept;
+    static CClientSound* PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop) noexcept;
+    static bool PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound) noexcept;
+    static CClientSound* PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition,
+                                   bool bLoop) noexcept;
+    static bool PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop,
+                          CClientSound*& outSound) noexcept;
     static bool GetSFXStatus(eAudioLookupIndex containerIndex) noexcept;
     static bool GetSFXStatus(eAudioLookupIndex containerIndex, bool& bOutNotCut);
 

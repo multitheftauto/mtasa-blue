@@ -398,9 +398,8 @@ bool CLuaAudioDefs::SetSoundProperties(CClientSound* sound, float sampleRate, fl
     );
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float, bool>> CLuaAudioDefs::GetSoundProperties(
-    CClientSound* sound
-) noexcept {
+std::variant<bool, CLuaMultiReturn<float, float, float, bool>> CLuaAudioDefs::GetSoundProperties(CClientSound* sound) noexcept
+{
     // float, float, float, bool getSoundProperties( element sound )
     float sampleRate;
     float tempo;
@@ -414,7 +413,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float, bool>> CLuaAudioDefs::Ge
 }
 
 std::variant<bool, std::vector<float>> CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> element, int samples,
-    std::optional<int> bands) noexcept
+                                                                      std::optional<int> bands) noexcept
 {
     // table getSoundFFTData ( element sound, int samples [, int bands = 0 ] )
     int    iBands = bands.value_or(0);
@@ -458,8 +457,8 @@ bool CLuaAudioDefs::SetSoundPanEnabled(CClientSound* sound, bool enable) noexcep
 }
 
 std::variant<bool, CLuaMultiReturn<std::uint32_t, std::uint32_t>> CLuaAudioDefs::GetSoundLevelData(
-    std::variant<CClientSound*, CClientPlayer*> element
-) noexcept {
+    std::variant<CClientSound*, CClientPlayer*> element) noexcept
+{
     // int, int getSoundLevelData ( element theSound )
     DWORD left;
     DWORD right;
@@ -506,7 +505,7 @@ float CLuaAudioDefs::GetSoundMaxDistance(CClientSound* sound) noexcept
 }
 
 std::variant<bool, std::string, std::unordered_map<std::string, std::string>> CLuaAudioDefs::GetSoundMetaTags(CClientSound*              sound,
-    std::optional<std::string> format) noexcept
+                                                                                                              std::optional<std::string> format) noexcept
 {
     // table getSoundMetaTags ( element sound [, string format = "" ] )
     if (!sound)
@@ -987,7 +986,7 @@ bool CLuaAudioDefs::SetSoundEffectParameter(CClientSound* sound, eSoundEffectTyp
 }
 
 std::variant<bool, std::unordered_map<std::string, CLuaArgument>> CLuaAudioDefs::GetSoundEffectParameters(CClientSound*    sound,
-    eSoundEffectType effectType) noexcept
+                                                                                                          eSoundEffectType effectType) noexcept
 {
     // table getSoundEffectParameters ( sound sound, string effectName )
     if (!sound || !sound->IsFxEffectEnabled(effectType))
