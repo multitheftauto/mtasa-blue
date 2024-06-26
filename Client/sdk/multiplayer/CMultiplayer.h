@@ -102,6 +102,7 @@ typedef void(PostWorldProcessHandler)();
 typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
 typedef void(IdleHandler)();
 typedef void(PreFxRenderHandler)();
+typedef void(PostColorFilterRenderHandler)();
 typedef void(PreHudRenderHandler)();
 typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
 typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
@@ -231,6 +232,7 @@ public:
     virtual void  SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler) = 0;
     virtual void  SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void  SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
+    virtual void  SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler) = 0;
     virtual void  SetPreHudRenderHandler(PreHudRenderHandler* pHandler) = 0;
     virtual void  DisableCallsToCAnimBlendNode(bool bDisableCalls) = 0;
     virtual void  SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler) = 0;
