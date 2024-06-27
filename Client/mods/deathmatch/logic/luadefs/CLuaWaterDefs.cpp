@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaWaterDefs::LoadFunctions()
 {
@@ -17,7 +18,7 @@ void CLuaWaterDefs::LoadFunctions()
         {"createWater", CreateWater},
         {"testLineAgainstWater", TestLineAgainstWater},
         {"resetWaterColor", ResetWaterColor},
-        {"resetWaterLevel", ResetWaterLevel},
+        {"resetWaterLevel", ArgumentParserWarn<false, ResetWaterLevel>},
 
         {"setWaterColor", SetWaterColor},
         {"setWaterLevel", SetWaterLevel},
@@ -140,11 +141,42 @@ int CLuaWaterDefs::TestLineAgainstWater(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWaterDefs::ResetWaterLevel(lua_State* luaVM)
+bool CLuaWaterDefs::ResetWaterLevel(std::variant<std::monostate, bool, std::vector<CClientWater*>, CClientWater*> resetElements)
 {
-    CStaticFunctionDefinitions::ResetWorldWaterLevel();
-    lua_pushboolean(luaVM, true);
-    return 1;
+    CClientWaterManager* pWaterManager = g_pClientGame->GetManager()->GetWaterManager();
+
+    switch (resetElements.index())
+    {
+        case 0:
+            CStaticFunctionDefinitions::ResetWorldWaterLevel();
+            break;
+
+        case 1:
+        {
+            if (std::get<bool>(resetElements) == true)
+                pWaterManager->ResetAllElementWaterLevel();
+            else
+                CStaticFunctionDefinitions::ResetWorldWaterLevel();
+
+            break;
+        }
+
+        case 2:
+        {
+            auto& vecWaterElements = std::get<std::vector<CClientWater*>>(resetElements);
+            pWaterManager->ResetElementWaterLevel(vecWaterElements);
+            break;
+        }
+
+        case 3:
+        {
+            auto pWaterElement = std::get<CClientWater*>(resetElements);
+            pWaterManager->ResetElementWaterLevel(pWaterElement);
+            break;
+        }
+    }
+
+    return true;
 }
 
 int CLuaWaterDefs::ResetWaterColor(lua_State* luaVM)
