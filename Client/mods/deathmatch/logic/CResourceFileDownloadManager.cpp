@@ -79,7 +79,7 @@ void CResourceFileDownloadManager::UpdatePendingDownloads()
         if (pResourceFile->GetDownloadPriorityGroup() == iGroup)
         {
             // Move to active list and begin download
-            ListRemove(m_PendingFileDownloadList, pResourceFile);
+            ListRemoveAll(m_PendingFileDownloadList, pResourceFile);
             m_ActiveFileDownloadList.push_back(pResourceFile);
             BeginResourceFileDownload(pResourceFile, 0);
 
@@ -105,8 +105,8 @@ void CResourceFileDownloadManager::UpdatePendingDownloads()
 ///////////////////////////////////////////////////////////////
 void CResourceFileDownloadManager::OnRemoveResourceFile(CDownloadableResource* pResourceFile)
 {
-    ListRemove(m_PendingFileDownloadList, pResourceFile);
-    ListRemove(m_ActiveFileDownloadList, pResourceFile);
+    ListRemoveAll(m_PendingFileDownloadList, pResourceFile);
+    ListRemoveAll(m_ActiveFileDownloadList, pResourceFile);
 }
 
 ///////////////////////////////////////////////////////////////

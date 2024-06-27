@@ -59,7 +59,7 @@ public:
 
     void DestroyCallback(CLuaCallback* pCallback)
     {
-        ListRemove(m_CallbackList, pCallback);
+        ListRemoveAll(m_CallbackList, pCallback);
         delete pCallback;
     }
 

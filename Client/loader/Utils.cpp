@@ -368,7 +368,7 @@ std::vector<DWORD> GetOtherMTAProcessList()
         ListAddUnique(result, processId);
 
     // Ignore this process
-    ListRemove(result, GetCurrentProcessId());
+    ListRemoveAll(result, GetCurrentProcessId());
 
     return result;
 }

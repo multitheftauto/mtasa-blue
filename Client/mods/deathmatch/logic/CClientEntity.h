@@ -296,7 +296,7 @@ public:
     void RemoveOriginSourceUser(CClientPed* pModel) { m_OriginSourceUsers.remove(pModel); }
 
     void AddContact(CClientPed* pModel) { m_Contacts.push_back(pModel); }
-    void RemoveContact(CClientPed* pModel) { ListRemove(m_Contacts, pModel); }
+    void RemoveContact(CClientPed* pModel) { ListRemoveAll(m_Contacts, pModel); }
 
     virtual CEntity*       GetGameEntity() { return NULL; }
     virtual const CEntity* GetGameEntity() const { return NULL; }

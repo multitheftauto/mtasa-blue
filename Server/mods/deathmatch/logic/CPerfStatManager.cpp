@@ -136,7 +136,7 @@ void CPerfStatManagerImpl::AddModule(CPerfStatModule* pModule)
 ///////////////////////////////////////////////////////////////
 void CPerfStatManagerImpl::RemoveModule(CPerfStatModule* pModule)
 {
-    ListRemove(m_ModuleList, pModule);
+    ListRemoveAll(m_ModuleList, pModule);
 }
 
 ///////////////////////////////////////////////////////////////

@@ -26,7 +26,7 @@ CProxyDirect3D9::CProxyDirect3D9(IDirect3D9* pInterface)
 CProxyDirect3D9::~CProxyDirect3D9()
 {
     WriteDebugEvent(SString("CProxyDirect3D9::~CProxyDirect3D9 %08x", this));
-    ListRemove(ms_CreatedDirect3D9List, m_pDevice);
+    ListRemoveAll(ms_CreatedDirect3D9List, m_pDevice);
     m_pDevice = NULL;
 }
 

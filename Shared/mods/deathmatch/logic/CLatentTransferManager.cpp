@@ -86,7 +86,7 @@ void CLatentTransferManager::RemoveRemote(NetPlayerID remoteId)
 {
     CLatentSendQueue* pSendQueue = FindSendQueueForRemote(remoteId);
     CLatentReceiver*  pReceiver = FindReceiverForRemote(remoteId);
-    ListRemove(m_SendQueueList, pSendQueue);
+    ListRemoveAll(m_SendQueueList, pSendQueue);
     MapRemove(m_SendQueueMap, remoteId);
 
     SAFE_DELETE(pSendQueue);
