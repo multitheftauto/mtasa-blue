@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-16 19:36\n"
+"POT-Creation-Date: 2023-12-08 01:17\n"
+"PO-Revision-Date: 2024-01-27 14:20\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -25,12 +25,12 @@ msgstr "Versiunea de MTA:SA pe care ați descărcat-o nu suportă Windows XP sau
 #. GET_WIN81_PLEASE
 #: Shared/installer/nightly.nsi:206
 msgid "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Versiunea de MTA:SA pe care ați descărcat-o nu este compatibilă cu Windows 7, 8 sau 8.1. Vă rugăm să descărcați o versiune alternativă de pe www.mtasa.com."
 
 #. GET_MASTER_PLEASE
 #: Shared/installer/nightly.nsi:207
 msgid "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.mtasa.com."
-msgstr ""
+msgstr "Versiunea de MTA:SA pe care ați descărcat-o este destinată versiunilor vechi de Windows. Vă rugăm să descărcați o versiune alternativă de pe www.mtasa.com."
 
 #. WELCOME_TEXT
 #: Shared/installer/nightly.nsi:208
@@ -236,27 +236,27 @@ msgid "Editor"
 msgstr "Editor"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:1001
+#: Shared/installer/nightly.nsi:978
 msgid "Development"
 msgstr "Dezvoltare"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1049
+#: Shared/installer/nightly.nsi:1026
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) a fost șters cu succes de pe calculatorul dumneavoastră."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1056
+#: Shared/installer/nightly.nsi:1033
 msgid "Uninstallation has failed!"
 msgstr "Dezinstalarea a eșuat!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1064
+#: Shared/installer/nightly.nsi:1041
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "Sunteți sigur că doriți sa eliminați complet $(^Name) și toate componentele sale?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1065
+#: Shared/installer/nightly.nsi:1042
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -265,32 +265,32 @@ msgstr "Dezinstalare înainte de actualizare?\\r$\n"
 "Execută noul fişier de instalare pentru a actualiza programul păstrând setările personale."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1078
+#: Shared/installer/nightly.nsi:1055
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Doriți să vă păstrați datele (cum ar fi resursele, capturile de ecran și configurația serverului)? Dacă apăsați nu, orice resurse, configurații sau capturi de ecran create de dumneavoastră vor fi pierdute."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1253
+#: Shared/installer/nightly.nsi:1230
 msgid "This installer requires admin access, try again"
 msgstr "Acest program necesită acces de administrator, reîncercați"
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1254
+#: Shared/installer/nightly.nsi:1231
 msgid "This uninstaller requires admin access, try again"
 msgstr "Acest dezinstalator necesită acces de administrator, reîncercați"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1255
+#: Shared/installer/nightly.nsi:1232
 msgid "Logon service not running, aborting!"
 msgstr "Serviciul Logon nu rulează, se anulează!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1256
+#: Shared/installer/nightly.nsi:1233
 msgid "Unable to elevate"
 msgstr "Nu s-a putut eleva"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1852
+#: Shared/installer/nightly.nsi:1829
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -301,7 +301,7 @@ msgstr "O altă versiune majoră de MTA ($1) există deja în acel director.$\n"
 "Sigur doriți să înlocuiți MTA $1 din $INSTDIR?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1856
+#: Shared/installer/nightly.nsi:1833
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -312,7 +312,7 @@ msgstr "MTA nu poate fi instalat în același director cu GTA:SA.$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1859
+#: Shared/installer/nightly.nsi:1836
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -321,7 +321,7 @@ msgstr "Directorul selectat nu există.$\n"
 "Selectați dosarul de instalare al GTA:SA"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1861
+#: Shared/installer/nightly.nsi:1838
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -330,17 +330,17 @@ msgstr "Nu s-a găsit GTA:SA instalat în $GTA_DIR $\n"
 "Sunteți sigur că vreți să continuați?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1979
+#: Shared/installer/nightly.nsi:1956
 msgid "Choose Install Location"
 msgstr "Alegeți locația instalării"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1980
+#: Shared/installer/nightly.nsi:1957
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Alegeți dosarul în care să instalați ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1981
+#: Shared/installer/nightly.nsi:1958
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -351,62 +351,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} va fi instalat în dosarul urm
 "Apasă pe Următorul pentru a continua."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1983
+#: Shared/installer/nightly.nsi:1960
 msgid "Destination Folder"
 msgstr "Dosarul destinație"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1984
+#: Shared/installer/nightly.nsi:1961
 msgid "Browse..."
 msgstr "Răsfoiește..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1985
+#: Shared/installer/nightly.nsi:1962
 msgid "Default"
 msgstr "Implicită"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1986
+#: Shared/installer/nightly.nsi:1963
 msgid "Last used"
 msgstr "Ultima folosită"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1987
+#: Shared/installer/nightly.nsi:1964
 msgid "Custom"
 msgstr "Diferită"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2165
+#: Shared/installer/nightly.nsi:2142
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Selectați dosarul instalării ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2183
+#: Shared/installer/nightly.nsi:2160
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Avertisment: O altă versiune majoră de MTA ($1) există deja în acel director."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2184
+#: Shared/installer/nightly.nsi:2161
 msgid "Installation type:  Upgrade"
 msgstr "Tip de instalare: Actualizare"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2418
+#: Shared/installer/nightly.nsi:2395
 msgid "Online update"
 msgstr "Actualizare online"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2419
+#: Shared/installer/nightly.nsi:2396
 msgid "Checking for update information"
 msgstr "Verificăm informațiile despre noua actualizare"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2420
+#: Shared/installer/nightly.nsi:2397
 msgid "Checking for installer update information..."
 msgstr "Verificăm informațiile pentru instalare..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2421
+#: Shared/installer/nightly.nsi:2398
 msgid "Please ensure your firewall is not blocking"
 msgstr "Vă rugăm să vă asigurați că firewall-ul dumneavoastră nu blochează"
 

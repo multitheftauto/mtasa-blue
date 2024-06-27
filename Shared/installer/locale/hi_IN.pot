@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-16 19:11\n"
-"PO-Revision-Date: 2023-04-25 08:31\n"
+"POT-Creation-Date: 2023-12-08 01:17\n"
+"PO-Revision-Date: 2024-01-27 14:21\n"
 "Last-Translator: \n"
 "Language-Team: Hindi\n"
 "Language: hi_IN\n"
@@ -233,27 +233,27 @@ msgid "Editor"
 msgstr "संपादक"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:1001
+#: Shared/installer/nightly.nsi:978
 msgid "Development"
 msgstr "विकास"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1049
+#: Shared/installer/nightly.nsi:1026
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) आपके कंप्यूटर से सफलतापूर्वक हटा दिया गया है।"
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1056
+#: Shared/installer/nightly.nsi:1033
 msgid "Uninstallation has failed!"
 msgstr "स्थापना रद्द करना विफल रहा!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1064
+#: Shared/installer/nightly.nsi:1041
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "क्या आप वाकई $(^Name) और उसके सभी अवयव को पूरी तरह से हटाना चाहते हैं?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1065
+#: Shared/installer/nightly.nsi:1042
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -262,32 +262,32 @@ msgstr "अपडेट से पहले अनइंस्टॉल कर�
 "अपनी सेटिंग्स को अपग्रेड और संरक्षित करने के लिए नया इंस्टॉलर चलाएं।"
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1078
+#: Shared/installer/nightly.nsi:1055
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "क्या आप अपनी डेटा फ़ाइलें (जैसे संसाधन, स्क्रीनशॉट और सर्वर कॉन्फ़िगरेशन) रखना चाहेंगे? यदि आप नहीं क्लिक करते हैं, तो आपके द्वारा बनाया गया कोई भी संसाधन, कॉन्फ़िगरेशन या स्क्रीनशॉट खो जाएगा।"
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1253
+#: Shared/installer/nightly.nsi:1230
 msgid "This installer requires admin access, try again"
 msgstr "इस इंस्टॉलर को व्यवस्थापक पहुंच की आवश्यकता है, पुनः प्रयास करें"
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1254
+#: Shared/installer/nightly.nsi:1231
 msgid "This uninstaller requires admin access, try again"
 msgstr "इस अनइंस्टालर को एडमिन एक्सेस की आवश्यकता है, पुनः प्रयास करें"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1255
+#: Shared/installer/nightly.nsi:1232
 msgid "Logon service not running, aborting!"
 msgstr "लॉगऑन सेवा नहीं चल रही है, निरस्त की जा रही है!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1256
+#: Shared/installer/nightly.nsi:1233
 msgid "Unable to elevate"
 msgstr "उनाबले तो एलेवते"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1852
+#: Shared/installer/nightly.nsi:1829
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -298,7 +298,7 @@ msgstr "उस पथ पर MTA ($1) का एक अलग प्रमुख
 " क्या आप वाकई $INSTDIR पर MTA $1 को ओवरराइट करना चाहते हैं?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1856
+#: Shared/installer/nightly.nsi:1833
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -309,7 +309,7 @@ msgstr "MTA को GTA:SA के समान निर्देशिका म
 "$DEFAULT_INSTDIR"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1859
+#: Shared/installer/nightly.nsi:1836
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -318,7 +318,7 @@ msgstr "चयनित निर्देशिका मौजूद नही
 "कृपया GTA:SA इंस्टॉल निर्देशिका का चयन करें"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1861
+#: Shared/installer/nightly.nsi:1838
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -327,17 +327,17 @@ msgstr "GTA:SA $GTA_DIR पर स्थापित नहीं पाया �
 "क्या तुम वाकई जारी रखना चाहते हो ?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1979
+#: Shared/installer/nightly.nsi:1956
 msgid "Choose Install Location"
 msgstr "इनस्टॉल लोकेशन चुनें"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1980
+#: Shared/installer/nightly.nsi:1957
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} इनस्टॉल करने के लिए फ़ोल्डर चुनें"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1981
+#: Shared/installer/nightly.nsi:1958
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -347,62 +347,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} निम्नलिखित
 " जारी रखने के लिए आगे दबाएँ।"
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1983
+#: Shared/installer/nightly.nsi:1960
 msgid "Destination Folder"
 msgstr "गंतव्य फ़ोल्डर"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1984
+#: Shared/installer/nightly.nsi:1961
 msgid "Browse..."
 msgstr "ब्राउज़ करें..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1985
+#: Shared/installer/nightly.nsi:1962
 msgid "Default"
 msgstr "डिफॉल्ट"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1986
+#: Shared/installer/nightly.nsi:1963
 msgid "Last used"
 msgstr "आखिरी बार इस्तेमाल"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1987
+#: Shared/installer/nightly.nsi:1964
 msgid "Custom"
 msgstr "कस्टम"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2165
+#: Shared/installer/nightly.nsi:2142
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} स्थापित करने के लिए फ़ोल्डर का चयन करें:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2183
+#: Shared/installer/nightly.nsi:2160
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "चेतावनी: उस जघा पर MTA ($1) का एक अलग प्रमुख संस्करण पहले से मौजूद है।"
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2184
+#: Shared/installer/nightly.nsi:2161
 msgid "Installation type:  Upgrade"
 msgstr "इंस्टालेशन टाइप: अपग्रेड"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2418
+#: Shared/installer/nightly.nsi:2395
 msgid "Online update"
 msgstr "ऑनलाइन अपडेट"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2419
+#: Shared/installer/nightly.nsi:2396
 msgid "Checking for update information"
 msgstr "चेकिंग फॉर अपडेट इनफार्मेशन"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2420
+#: Shared/installer/nightly.nsi:2397
 msgid "Checking for installer update information..."
 msgstr "चेकिंग फॉर इंस्टालर अपडेट इनफार्मेशन..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2421
+#: Shared/installer/nightly.nsi:2398
 msgid "Please ensure your firewall is not blocking"
 msgstr "कृपया सुनिश्चित करें कि आपका फ़ायरवॉल अवरुद्ध नहीं हो रहा है"
 
