@@ -3873,6 +3873,10 @@ void CClientPed::_ChangeModel()
             SetStat(23, 0.0f);
         }
 
+        // Store attached satchels
+        std::vector<SSatchelsData> attachedSatchels;
+        m_pPlayerPed->GetAttachedSatchels(attachedSatchels);
+
         if (m_bIsLocalPlayer)
         {
             // TODO: Create a simple function to save and restore player states and use it
@@ -3986,6 +3990,21 @@ void CClientPed::_ChangeModel()
             // Create the new with the new skin
             _CreateModel();
         }
+
+        // ReAttach satchels
+        static CClientProjectileManager* pProjectileManager = m_pManager->GetProjectileManager();
+
+        for (const SSatchelsData& satchelData : attachedSatchels)
+        {
+            CClientProjectile* pSatchel = pProjectileManager->Get((CEntitySAInterface*)satchelData.pProjectileInterface);
+            if (!pSatchel || pSatchel->IsBeingDeleted())
+                continue;
+
+            pSatchel->SetAttachedOffsets(*satchelData.vecAttachedOffsets, *satchelData.vecAttachedRotation);
+            pSatchel->InternalAttachTo(this);
+        }
+
+        attachedSatchels.clear();
 
         g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter(true);
     }

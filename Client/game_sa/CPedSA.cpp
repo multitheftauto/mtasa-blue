@@ -1108,3 +1108,37 @@ void CPedSA::StaticSetHooks()
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
 }
+
+void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList)
+{
+    // Array of projectiles objects
+    CProjectileSAInterface** projectilesArray = (CProjectileSAInterface**)ARRAY_CProjectile;
+    CProjectileSAInterface*  pProjectileInterface;
+
+    // Array of projectiles infos
+    CProjectileInfoSAInterface* projectilesInfoArray = (CProjectileInfoSAInterface*)ARRAY_CProjectileInfo;
+    CProjectileInfoSAInterface* pProjectileInfoInterface;
+
+    // Get current ped interface
+    CEntitySAInterface* thisInterface = GetInterface();
+
+    // Loop through all projectiles
+    for (size_t i = 0; i < PROJECTILE_COUNT; i++)
+    {
+        pProjectileInterface = projectilesArray[i];
+
+        // is attached to our ped?
+        if (!pProjectileInterface || pProjectileInterface->m_pAttachedEntity != thisInterface)
+            continue;
+
+        // index is always the same for both arrays
+        pProjectileInfoInterface = &projectilesInfoArray[i];
+
+        // We are only interested in satchels
+        if (!pProjectileInfoInterface || pProjectileInfoInterface->dwProjectileType != eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
+            continue;
+
+        // Push satchel into the array. There is no need to check the counter because for satchels it restarts until the player detonates the charges
+        satchelsList.push_back({pProjectileInterface, &pProjectileInterface->m_vecAttachedOffset, &pProjectileInterface->m_vecAttachedRotation});
+    }
+}

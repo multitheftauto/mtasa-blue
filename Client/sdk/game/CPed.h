@@ -15,6 +15,7 @@
 #include "Common.h"
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
+#include <vector>
 
 class CObject;
 class CPedIK;
@@ -25,6 +26,7 @@ class CTaskManager;
 class CVehicle;
 class CWeapon;
 class CWeaponStat;
+class CProjectileSAInterface;
 
 enum ePedPieceTypes
 {
@@ -170,6 +172,13 @@ namespace EPedWeaponAudioEvent
 }
 using EPedWeaponAudioEvent::EPedWeaponAudioEventType;
 
+struct SSatchelsData
+{
+    CProjectileSAInterface* pProjectileInterface;
+    CVector*                vecAttachedOffsets;
+    CVector*                vecAttachedRotation;
+};
+
 class CPed : public virtual CPhysical
 {
 public:
@@ -277,4 +286,6 @@ public:
     virtual CPedIKSAInterface*      GetPedIKInterface() = 0;
     virtual void*                   GetPedNodeInterface(std::int32_t nodeId) = 0;
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
+
+    virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) = 0;
 };
