@@ -3992,7 +3992,7 @@ void CClientPed::_ChangeModel()
         }
 
         // ReAttach satchels
-        static CClientProjectileManager* pProjectileManager = m_pManager->GetProjectileManager();
+        CClientProjectileManager* pProjectileManager = m_pManager->GetProjectileManager();
 
         for (const SSatchelsData& satchelData : attachedSatchels)
         {
@@ -4003,8 +4003,6 @@ void CClientPed::_ChangeModel()
             pSatchel->SetAttachedOffsets(*satchelData.vecAttachedOffsets, *satchelData.vecAttachedRotation);
             pSatchel->InternalAttachTo(this);
         }
-
-        attachedSatchels.clear();
 
         g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter(true);
     }

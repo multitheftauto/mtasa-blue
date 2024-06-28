@@ -1109,7 +1109,7 @@ void CPedSA::StaticSetHooks()
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
 }
 
-void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList)
+void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
 {
     // Array of projectiles objects
     CProjectileSAInterface** projectilesArray = (CProjectileSAInterface**)ARRAY_CProjectile;
@@ -1119,16 +1119,13 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList)
     CProjectileInfoSAInterface* projectilesInfoArray = (CProjectileInfoSAInterface*)ARRAY_CProjectileInfo;
     CProjectileInfoSAInterface* pProjectileInfoInterface;
 
-    // Get current ped interface
-    CEntitySAInterface* thisInterface = GetInterface();
-
     // Loop through all projectiles
     for (size_t i = 0; i < PROJECTILE_COUNT; i++)
     {
         pProjectileInterface = projectilesArray[i];
 
         // is attached to our ped?
-        if (!pProjectileInterface || pProjectileInterface->m_pAttachedEntity != thisInterface)
+        if (!pProjectileInterface || pProjectileInterface->m_pAttachedEntity != m_pInterface)
             continue;
 
         // index is always the same for both arrays

@@ -409,5 +409,5 @@ public:
     std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
     static void             StaticSetHooks();
 
-    void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList);
+    void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 };
