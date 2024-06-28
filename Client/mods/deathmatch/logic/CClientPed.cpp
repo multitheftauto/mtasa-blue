@@ -1761,6 +1761,11 @@ void CClientPed::InternalSetHealth(float fHealth)
             }
             else
             {
+                // Ped is alive again (Fix #414)
+                UnlockHealth();
+                UnlockArmor();
+                SetIsDead(false);
+
                 // Recreate the player
                 ReCreateModel();
             }
