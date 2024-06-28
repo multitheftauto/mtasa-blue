@@ -15,7 +15,6 @@
 #include "Common.h"
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
-#include <vector>
 
 class CObject;
 class CPedIK;
