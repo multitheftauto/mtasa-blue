@@ -410,8 +410,8 @@ bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std
                                   std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame,
                                   std::optional<int> blendTime, std::optional<bool> restoreTask)
 {
-    std::string animBlockName = "";
-    std::string animationName = "";
+    std::string animBlockName;
+    std::string animationName;
 
     if (blockName.has_value())
     {
@@ -431,7 +431,7 @@ bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std
                 throw LuaFunctionError("Animation name cannot be true. Possible values: nil, false, string.");
     }
 
-    return CStaticFunctionDefinitions::SetPedAnimation(pPed, animBlockName.empty() ? NULL : animBlockName.c_str(), animationName.empty() ? NULL : animationName.c_str(), time.value_or(-1), blendTime.value_or(250), loop.value_or(true), updatePosition.value_or(true), interruptable.value_or(true), freezeLastFrame.value_or(true), restoreTask.value_or(false));
+    return CStaticFunctionDefinitions::SetPedAnimation(pPed, animBlockName, animationName, time.value_or(-1), blendTime.value_or(250), loop.value_or(true), updatePosition.value_or(true), interruptable.value_or(true), freezeLastFrame.value_or(true), restoreTask.value_or(false));
 }
 
 int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
