@@ -497,19 +497,35 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
 
 void CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
 {
-    auto pInterface = static_cast<CAutomobileSAInterface*>(GetInterface());
-    pInterface->m_wheelRotation[0] = fWheelRot1;
-    pInterface->m_wheelRotation[1] = fWheelRot2;
-    pInterface->m_wheelRotation[2] = fWheelRot3;
-    pInterface->m_wheelRotation[3] = fWheelRot4;
+    VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass);
+
+    switch (m_eVehicleType)
+    {
+        case VehicleClass::AUTOMOBILE:
+        case VehicleClass::MONSTER_TRUCK:
+        case VehicleClass::QUAD:
+        case VehicleClass::TRAILER:
+        {
+            auto pInterface = static_cast<CAutomobileSAInterface*>(GetInterface());
+            pInterface->m_wheelRotation[0] = fWheelRot1;
+            pInterface->m_wheelRotation[1] = fWheelRot2;
+            pInterface->m_wheelRotation[2] = fWheelRot3;
+            pInterface->m_wheelRotation[3] = fWheelRot4;
+            break;
+        }
+        case VehicleClass::BIKE:
+        case VehicleClass::BMX:
+        {
+            auto pInterface = static_cast<CBikeSAInterface*>(GetInterface());
+            pInterface->m_afWheelRotationX[0] = fWheelRot1;
+            pInterface->m_afWheelRotationX[1] = fWheelRot2;
+            break;
+        }
+        default:
+            break;
+    }
 }
 
-void CVehicleSA::SetBikeWheelRotation(float fWheelRot1, float fWheelRot2) noexcept
-{
-    auto pInterface = static_cast<CBikeSAInterface*>(GetInterface());
-    pInterface->m_afWheelRotationX[0] = fWheelRot1;
-    pInterface->m_afWheelRotationX[1] = fWheelRot2;
-}
 
 float CVehicleSA::GetPlaneRotorSpeed() 
 {

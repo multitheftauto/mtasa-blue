@@ -1624,12 +1624,10 @@ bool CClientVehicle::SetWheelsRotation(float fRot1, float fRot2, float fRot3, fl
         case CLIENTVEHICLE_CAR:
         case CLIENTVEHICLE_MONSTERTRUCK:
         case CLIENTVEHICLE_QUADBIKE:
-        case CLIENTVEHICLE_TRAILER:
-            m_pVehicle->SetVehicleWheelRotation(fRot1, fRot2, fRot3, fRot4);
-            return true;
         case CLIENTVEHICLE_BIKE:
         case CLIENTVEHICLE_BMX:
-            m_pVehicle->SetBikeWheelRotation(fRot1, fRot2);
+        case CLIENTVEHICLE_TRAILER:
+            m_pVehicle->SetVehicleWheelRotation(fRot1, fRot2, fRot3, fRot4);
             return true;
         default:
             return false;
