@@ -144,25 +144,6 @@ unsigned char CLuaCameraDefs::GetCameraInterior()
     return ucInterior;
 }
 
-void CLuaCameraDefs::SetGoggleEffect(std::string CameraGoogleEffect)
-{
-    if (CameraGoogleEffect == "nightvision")
-    {
-        g_pMultiplayer->SetNightVisionEnabled(true, true);
-        g_pMultiplayer->SetThermalVisionEnabled(false, true);
-    }
-    else if (CameraGoogleEffect == "thermalvision")
-    {
-        g_pMultiplayer->SetNightVisionEnabled(false, true);
-        g_pMultiplayer->SetThermalVisionEnabled(true, true);
-    }
-    else
-    {
-        g_pMultiplayer->SetNightVisionEnabled(false, true);
-        g_pMultiplayer->SetThermalVisionEnabled(false, true);
-    }
-}
-
 
 std::string CLuaCameraDefs::GetCameraGoggleEffect()
 {
