@@ -1529,6 +1529,10 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x524084, 0xFF);
     MemPut<BYTE>(0x524089, 0xFF);
 
+    // Allow change alpha for arrow & checkpoint markers (#1860)
+    MemSet((void*)0x7225F5, 0x90, 4);
+    MemCpy((void*)0x725DDE, "\xFF\x76\xB\x90\x90", 5);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
