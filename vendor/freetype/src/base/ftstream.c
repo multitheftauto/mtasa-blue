@@ -4,7 +4,7 @@
  *
  *   I/O stream support (body).
  *
- * Copyright (C) 2000-2023 by
+ * Copyright (C) 2000-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -830,7 +830,7 @@
         goto Exit;
       }
 
-      /* now, compute the signed value is necessary */
+      /* now, compute the signed value if necessary */
       if ( fields->value & FT_FRAME_OP_SIGNED )
         value = (FT_ULong)( (FT_Int32)( value << sign_shift ) >> sign_shift );
 
