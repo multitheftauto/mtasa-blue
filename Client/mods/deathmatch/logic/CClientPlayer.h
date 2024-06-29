@@ -111,8 +111,8 @@ public:
     bool   GetWasRecentlyInNetworkInterruption(uint uiMaxTicksAgo);
     void   SetIsInNetworkInterruption(bool bInNetworkInterruption);
 
-    std::uint8_t GetPlayerScriptDebugLevel() const noexcept { return m_scriptDebugLevel; }
-    void         SetPlayerScriptDebugLevel(std::uint8_t level) noexcept { m_scriptDebugLevel = level; }
+    std::uint32_t GetPlayerScriptDebugLevel() const noexcept { return m_scriptDebugLevel; }
+    void          SetPlayerScriptDebugLevel(std::uint32_t level) noexcept { m_scriptDebugLevel = level; }
 
     CVector m_vecPrevBulletSyncStart;
     CVector m_vecPrevBulletSyncEnd;
@@ -139,7 +139,7 @@ private:
     unsigned long  m_ulTick;
     bool           m_bDoExtrapolatingAim;
 
-    std::uint8_t   m_scriptDebugLevel;
+    std::uint32_t   m_scriptDebugLevel;
 
     bool    m_bForce;
     CVector m_vecForcedMoveSpeed;
