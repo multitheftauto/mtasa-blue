@@ -105,26 +105,17 @@ enum eBone
 
 struct SPlayerAnimData
 {
-    std::string blockName;
-    std::string animName;
-    int         time;
-    bool        loop;
-    bool        updatePosition;
-    bool        interruptable;
-    bool        freezeLastFrame;
-    int         blendTime;
-    bool        taskToBeRestoredOnAnimEnd;
+    std::string blockName{""};
+    std::string animName{""};
+    int         time{-1};
+    bool        loop{true};
+    bool        updatePosition{true};
+    bool        interruptable{true};
+    bool        freezeLastFrame{true};
+    int         blendTime{250};
+    bool        taskToBeRestoredOnAnimEnd{false};
 
-    SPlayerAnimData()
-        : blockName(""),
-          animName(""),
-          time(-1),
-          loop(true),
-          updatePosition(true),
-          interruptable(true),
-          freezeLastFrame(true),
-          blendTime(250),
-          taskToBeRestoredOnAnimEnd(false){};
+    SPlayerAnimData() = default;
 
     SPlayerAnimData(const std::string& block, const std::string& anim, int time, bool loop, bool updatePos, bool interrupt, bool freeze, int blend,
                     bool taskRestore)
@@ -314,8 +305,8 @@ public:
     std::vector<CPlayer*>::const_iterator NearPlayersIterBegin() { return m_nearPlayersList.begin(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterEnd() { return m_nearPlayersList.end(); }
 
-    const SPlayerAnimData& GetAnimationData() const noexcept { return m_pAnimData; };
-    void                   SetAnimationData(SPlayerAnimData animData) noexcept { m_pAnimData = animData; };
+    const SPlayerAnimData& GetAnimationData() const noexcept { return m_animData; };
+    void                   SetAnimationData(const SPlayerAnimData& animData) noexcept { m_animData = animData; };
 
 protected:
     bool ReadSpecialData(const int iLine) override;
@@ -355,7 +346,7 @@ protected:
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
     CVehicle*                            m_pJackingVehicle;
-    SPlayerAnimData                      m_pAnimData;
+    SPlayerAnimData                      m_animData;
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;
