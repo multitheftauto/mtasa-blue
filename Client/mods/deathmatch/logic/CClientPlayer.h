@@ -139,7 +139,7 @@ private:
     unsigned long  m_ulTick;
     bool           m_bDoExtrapolatingAim;
 
-    std::uint8_t   m_scriptDebugLevel;
+    std::uint8_t   m_scriptDebugLevel{};
 
     bool    m_bForce;
     CVector m_vecForcedMoveSpeed;
