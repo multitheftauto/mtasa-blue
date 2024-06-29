@@ -5220,6 +5220,9 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
 
             m_pPlayerPed->SetLanding(false);
 
+            // Set it to 0 (Fix #501)
+            SetCurrentWeaponSlot(eWeaponSlot::WEAPONSLOT_TYPE_UNARMED);
+
             if (bRestoreState)
             {
                 // Jax: restore all the things we saved
