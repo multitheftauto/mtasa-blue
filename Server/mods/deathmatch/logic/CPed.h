@@ -103,6 +103,42 @@ enum eBone
     BONE_RIGHTFOOT
 };
 
+struct SPlayerAnimData
+{
+    std::string blockName;
+    std::string animName;
+    int         time;
+    bool        loop;
+    bool        updatePosition;
+    bool        interruptable;
+    bool        freezeLastFrame;
+    int         blendTime;
+    bool        taskToBeRestoredOnAnimEnd;
+
+    SPlayerAnimData()
+        : blockName(""),
+          animName(""),
+          time(-1),
+          loop(true),
+          updatePosition(true),
+          interruptable(true),
+          freezeLastFrame(true),
+          blendTime(250),
+          taskToBeRestoredOnAnimEnd(false){};
+
+    SPlayerAnimData(const std::string& block, const std::string& anim, int time, bool loop, bool updatePos, bool interrupt, bool freeze, int blend,
+                    bool taskRestore)
+        : blockName(block),
+          animName(anim),
+          time(time),
+          loop(loop),
+          updatePosition(updatePos),
+          interruptable(interrupt),
+          freezeLastFrame(freeze),
+          blendTime(blend),
+          taskToBeRestoredOnAnimEnd(taskRestore){};
+};
+
 class CWeapon
 {
 public:
@@ -278,6 +314,9 @@ public:
     std::vector<CPlayer*>::const_iterator NearPlayersIterBegin() { return m_nearPlayersList.begin(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterEnd() { return m_nearPlayersList.end(); }
 
+    const SPlayerAnimData& GetAnimationData() const noexcept { return m_pAnimData; };
+    void                   SetAnimationData(SPlayerAnimData animData) noexcept { m_pAnimData = animData; };
+
 protected:
     bool ReadSpecialData(const int iLine) override;
 
@@ -316,6 +355,7 @@ protected:
     bool                                 m_bFrozen;
     bool                                 m_bStealthAiming;
     CVehicle*                            m_pJackingVehicle;
+    SPlayerAnimData                      m_pAnimData;
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;
