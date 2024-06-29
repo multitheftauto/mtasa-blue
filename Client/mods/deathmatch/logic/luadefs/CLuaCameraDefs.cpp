@@ -144,7 +144,6 @@ unsigned char CLuaCameraDefs::GetCameraInterior()
     return ucInterior;
 }
 
-
 std::string CLuaCameraDefs::GetCameraGoggleEffect()
 {
     bool bNightVision = g_pMultiplayer->IsNightVisionEnabled();
