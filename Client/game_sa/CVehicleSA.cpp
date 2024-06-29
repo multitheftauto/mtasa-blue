@@ -495,10 +495,9 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
     pInterface->m_fPropSpeed = fSpeed;
 }
 
-void CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
-{
-    VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass);
-
+bool CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
+{ 
+    VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleSubClass);
     switch (m_eVehicleType)
     {
         case VehicleClass::AUTOMOBILE:
@@ -511,7 +510,7 @@ void CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, flo
             pInterface->m_wheelRotation[1] = fWheelRot2;
             pInterface->m_wheelRotation[2] = fWheelRot3;
             pInterface->m_wheelRotation[3] = fWheelRot4;
-            break;
+            return true;
         }
         case VehicleClass::BIKE:
         case VehicleClass::BMX:
@@ -519,13 +518,13 @@ void CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, flo
             auto pInterface = static_cast<CBikeSAInterface*>(GetInterface());
             pInterface->m_afWheelRotationX[0] = fWheelRot1;
             pInterface->m_afWheelRotationX[1] = fWheelRot2;
-            break;
+            return true;
         }
         default:
-            break;
+            return false;
     }
+    return false;
 }
-
 
 float CVehicleSA::GetPlaneRotorSpeed() 
 {
