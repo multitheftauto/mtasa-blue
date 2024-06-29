@@ -5210,6 +5210,7 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             float         fTargetRotation = m_pPlayerPed->GetTargetRotation();
             unsigned char ucInterior = GetInterior();
             unsigned char ucCameraInterior = static_cast<unsigned char>(g_pGame->GetWorld()->GetCurrentArea());
+            std::string   sCameraGoogleEffect = CLuaCameraDefs::GetCameraGoggleEffect();
 
             // Don't allow any camera movement if we're in fixed mode
             if (m_pManager->GetCamera()->IsInFixedMode())
@@ -5237,6 +5238,7 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             }
             // Restore the camera's interior whether we're restoring player states or not
             g_pGame->GetWorld()->SetCurrentArea(ucCameraInterior);
+            CLuaCameraDefs::SetGoggleEffect(sCameraGoogleEffect);
 
             // Reattach us
             if (pAttachedTo && pAttachedTo->IsEntityAttached(this))

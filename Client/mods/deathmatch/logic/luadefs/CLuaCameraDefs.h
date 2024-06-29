@@ -29,6 +29,7 @@ public:
     static std::variant<CClientEntity*, bool>                                      GetCameraTarget();
     static unsigned char                                                           GetCameraInterior();
     static std::string                                                             GetCameraGoggleEffect();
+    static void                                                                    SetGoggleEffect(std::string sCameraGoogleEffect);
     LUA_DECLARE(GetCameraFieldOfView);
     static unsigned char GetCameraDrunkLevel();
 
