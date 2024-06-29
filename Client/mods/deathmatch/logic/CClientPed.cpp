@@ -5240,7 +5240,7 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             // Restore the camera's interior whether we're restoring player states or not
             g_pGame->GetWorld()->SetCurrentArea(ucCameraInterior);
 
-             // reset goggle effect 
+            // Reset goggle effect 
             g_pMultiplayer->SetNightVisionEnabled(bOldNightVision, false);
             g_pMultiplayer->SetThermalVisionEnabled(bOldThermalVision, false);
 
