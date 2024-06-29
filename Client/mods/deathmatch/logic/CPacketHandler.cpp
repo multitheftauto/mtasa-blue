@@ -3968,13 +3968,16 @@ retry:
                     // Animation
                     if (bitStream.Can(eBitStreamVersion::AnimationsSync))
                     {
-                        std::string blockName, animName;
-                        if (bitStream.ReadString(blockName) && bitStream.ReadString(animName))
+                        // Contains animation data?
+                        if (bitStream.ReadBit())
                         {
+                            std::string blockName, animName;
                             int time, blendTime;
                             bool looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
 
                             // Read data
+                            bitStream.ReadString(blockName);
+                            bitStream.ReadString(animName);
                             bitStream.Read(time);
                             bitStream.ReadBit(looped);
                             bitStream.ReadBit(updatePosition);

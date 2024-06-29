@@ -105,8 +105,8 @@ enum eBone
 
 struct SPlayerAnimData
 {
-    std::string blockName{""};
-    std::string animName{""};
+    std::string blockName{};
+    std::string animName{};
     int         time{-1};
     bool        loop{true};
     bool        updatePosition{true};
@@ -306,7 +306,7 @@ public:
     std::vector<CPlayer*>::const_iterator NearPlayersIterEnd() { return m_nearPlayersList.end(); }
 
     const SPlayerAnimData& GetAnimationData() const noexcept { return m_animData; };
-    void                   SetAnimationData(const SPlayerAnimData& animData) noexcept { m_animData = animData; };
+    void                   SetAnimationData(const SPlayerAnimData& animData) { m_animData = animData; };
 
 protected:
     bool ReadSpecialData(const int iLine) override;
