@@ -170,7 +170,7 @@ void CPlayerRPCs::TakePlayerScreenShot(NetBitStreamInterface& bitStream)
     m_pClientGame->TakePlayerScreenShot(usSizeX, usSizeY, strTag, ucQuality, uiMaxBandwidth, usMaxPacketSize, pResource, uiServerSentTime);
 }
 
-void CPlayerRPCs::SetPlayerScriptDebugLevel(NetBitStreamInterface& stream)
+void CPlayerRPCs::SetPlayerScriptDebugLevel(NetBitStreamInterface& stream) noexcept
 {
     CClientPlayer* localPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
 

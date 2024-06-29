@@ -29,7 +29,7 @@ public:
     LUA_DECLARE(GetPlayerTeam);
     LUA_DECLARE(GetPlayerMoney);
     LUA_DECLARE(GetPlayerWantedLevel);
-    static const std::uint8_t GetPlayerScriptDebugLevel() noexcept;
+    static std::uint8_t GetPlayerScriptDebugLevel() noexcept;
 
     // Player set
     LUA_DECLARE(ShowPlayerHudComponent);
