@@ -177,7 +177,7 @@ void CPlayerRPCs::SetPlayerScriptDebugLevel(NetBitStreamInterface& stream)
     if (!localPlayer)
         return;
 
-    std::uint32_t scriptDebugLevel;
+    std::uint8_t scriptDebugLevel;
 
     if (!stream.Read(scriptDebugLevel))
         return;

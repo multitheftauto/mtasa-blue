@@ -471,13 +471,13 @@ void CPlayer::RemoveAllSyncingObjects()
     }
 }
 
-bool CPlayer::SetScriptDebugLevel(unsigned int uiLevel)
+bool CPlayer::SetScriptDebugLevel(std::uint8_t level)
 {
-    if (!m_pScriptDebugging->AddPlayer(*this, uiLevel))
+    if (!m_pScriptDebugging->AddPlayer(*this, level))
         return false;
 
     CPlayerBitStream BitStream(this);
-    BitStream.pBitStream->Write(uiLevel);
+    BitStream.pBitStream->Write(level);
 
     Send(CLuaPacket(SET_PLAYER_SCRIPT_DEBUG_LEVEL, *BitStream.pBitStream));
     return true;
