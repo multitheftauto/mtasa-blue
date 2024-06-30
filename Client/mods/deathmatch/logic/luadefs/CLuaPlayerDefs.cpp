@@ -95,7 +95,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "ping", NULL, "getPlayerPing");
     lua_classvariable(luaVM, "name", NULL, "getPlayerName");
     lua_classvariable(luaVM, "team", NULL, "getPlayerTeam");
-    lua_classvariable(luaVM, "debugLevel", nullptr, "getScriptDebugLevel");
+    lua_classvariable(luaVM, "debugLevel", nullptr, "getPlayerScriptDebugLevel");
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
 
