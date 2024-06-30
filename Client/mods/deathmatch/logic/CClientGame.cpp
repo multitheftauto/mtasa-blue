@@ -5521,6 +5521,28 @@ void CClientGame::ResetMapInfo()
     // Moon size
     g_pMultiplayer->ResetMoonSize();
 
+    // World properties
+    g_pMultiplayer->ResetAmbientColor();
+    g_pMultiplayer->ResetAmbientObjectColor();
+    g_pMultiplayer->ResetDirectionalColor();
+    g_pMultiplayer->ResetSpriteSize();
+    g_pMultiplayer->ResetSpriteBrightness();
+    g_pMultiplayer->ResetPoleShadowStrength();
+    g_pMultiplayer->ResetShadowStrength();
+    g_pMultiplayer->ResetShadowsOffset();
+    g_pMultiplayer->ResetLightsOnGroundBrightness();
+    g_pMultiplayer->ResetLowCloudsColor();
+    g_pMultiplayer->ResetBottomCloudsColor();
+    g_pMultiplayer->ResetCloudsAlpha1();
+    g_pMultiplayer->ResetIllumination();
+    g_pGame->GetWeather()->ResetWetRoads();
+    g_pGame->GetWeather()->ResetFoggyness();
+    g_pGame->GetWeather()->ResetFog();
+    g_pGame->GetWeather()->ResetRainFog();
+    g_pGame->GetWeather()->ResetWaterFog();
+    g_pGame->GetWeather()->ResetSandstorm();
+    g_pGame->GetWeather()->ResetRainbow();
+
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
 

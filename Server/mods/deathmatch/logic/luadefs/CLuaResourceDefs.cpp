@@ -54,7 +54,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceLoadFailureReason", getResourceLoadFailureReason},
         {"getResourceLastStartTime", getResourceLastStartTime},
         {"getResourceLoadTime", getResourceLoadTime},
-        {"getResourceName", getResourceName},
+        {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceRootElement", getResourceRootElement},
         {"getResourceDynamicElementRoot", getResourceDynamicElementRoot},
         {"getResourceMapRootElement", getResourceMapRootElement},
@@ -898,23 +898,30 @@ int CLuaResourceDefs::getResourceLoadTime(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::getResourceName(lua_State* luaVM)
+std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    CResource* pResource;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
-
-    if (!argStream.HasErrors())
+    if (resourceElement && resourceElement.has_value())
     {
-        lua_pushstring(luaVM, pResource->GetName().c_str());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        if (!(*resourceElement)->IsActive())
+            throw std::invalid_argument("The resource isn't active");
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        return (*resourceElement)->GetName();
+    }
+
+    CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    if (!localVM)
+        throw std::invalid_argument("Couldn't find the virtual machine");
+
+    CResource* localResource = localVM->GetResource();
+
+    if (!localResource)
+        throw std::invalid_argument("Couldn't find the resource");
+
+    if (!localResource->IsActive())
+        throw std::invalid_argument("The resource isn't active");
+
+    return localResource->GetName();
 }
 
 int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
