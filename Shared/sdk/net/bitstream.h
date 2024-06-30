@@ -548,10 +548,6 @@ enum class eBitStreamVersion : unsigned short
     // 2024-05-23
     WorldSpecialProperty_ExtendedWaterCannons,
 
-    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
-    // 2024-06-30
-    WorldSpecialProperty_TunnelWeatherBlend,
-
     // Add breakObject to serverside as well
     // 2024-05-31
     BreakObject_Serverside,
@@ -559,6 +555,11 @@ enum class eBitStreamVersion : unsigned short
     // Ped syncronization revision
     // 2024-06-16
     PedSync_Revision,
+
+    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
+    // 2024-06-30
+    WorldSpecialProperty_TunnelWeatherBlend,
+
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
