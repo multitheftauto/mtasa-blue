@@ -31,10 +31,17 @@ public:
     static bool IsValidModel(uint16_t modelId);
     static bool IsValidPosition(const CVector& pos) noexcept;
 
+    void ResizePoolIfNeeds();
+    bool SetPoolCapacity(size_t newCapacity);
+
+    void RemoveAllGameBuildings();
+    void RestoreAllGameBuildings();
+
+private:
     void DestroyAllForABit();
     void RestoreDestroyed();
 
-private:
+    bool DoPoolResize(size_t newCapacity);
     void AddToList(CClientBuilding* pBuilding) { m_List.push_back(pBuilding); }
     void RemoveFromList(CClientBuilding* pBuilding);
 

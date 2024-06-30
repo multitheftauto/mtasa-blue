@@ -64,9 +64,6 @@
 
 #ifndef DISABLE_WIDEBAND
 
-
-#define sqr(x) ((x)*(x))
-
 #define SUBMODE(x) st->submodes[st->submodeID]->x
 
 #ifdef FIXED_POINT
@@ -223,7 +220,7 @@ void *sb_encoder_init(const SpeexMode *m)
    speex_encoder_ctl(st->st_low, SPEEX_GET_SAMPLING_RATE, &st->sampling_rate);
    st->sampling_rate*=2;
 #ifdef ENABLE_VALGRIND
-   VALGRIND_MAKE_READABLE(st, (st->stack-(char*)st));
+   VALGRIND_MAKE_MEM_DEFINED(st, (st->stack-(char*)st));
 #endif
    return st;
 }
@@ -1017,7 +1014,7 @@ void *sb_decoder_init(const SpeexMode *m)
    st->seed = 1000;
 
 #ifdef ENABLE_VALGRIND
-   VALGRIND_MAKE_READABLE(st, (st->stack-(char*)st));
+   VALGRIND_MAKE_MEM_DEFINED(st, (st->stack-(char*)st));
 #endif
    return st;
 }
@@ -1280,6 +1277,9 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
    /* If null mode (no transmission), just set a couple things to zero*/
    if (st->submodes[st->submodeID] == NULL)
    {
+      if (st->innov_save)
+        SPEEX_MEMSET(st->innov_save, 0, st->full_frame_size);
+
       if (dtx)
       {
          sb_decode_lost(st, out, 1, stack);
@@ -1343,7 +1343,7 @@ int sb_decode(void *state, SpeexBits *bits, void *vout)
       /* LSP to LPC */
       lsp_to_lpc(interp_qlsp, ak, st->lpcSize, stack);
 
-      /* Calculate reponse ratio between the low and high filter in the middle
+      /* Calculate response ratio between the low and high filter in the middle
          of the band (4000 Hz) */
 
          st->pi_gain[sub]=LPC_SCALING;
