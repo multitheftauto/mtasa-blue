@@ -711,7 +711,7 @@ std::variant<bool, std::string> CLuaFileDefs::fileRead (
         -> std::variant<bool, std::string>
     {
         if (count == 0)
-            return std::string{};
+            return "";
 
         SString buffer;
         auto    bytesRead = pFile->Read(count, buffer);
