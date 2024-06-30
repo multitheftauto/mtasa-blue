@@ -13,6 +13,7 @@
 #define ALLOC_STATS_MODULE_NAME "client"
 #include "SharedUtil.hpp"
 #include <core/CClientCommands.h>
+#include <../Client/core/CClientChatboxVariables.h>
 
 CCoreInterface*         g_pCore = NULL;
 CLocalizationInterface* g_pLocalization = NULL;
@@ -303,6 +304,75 @@ void CClient::GetPlayerNames(std::vector<SString>& vPlayerNames)
 void CClient::OnWindowFocusChange(bool state)
 {
     g_pClientGame->OnWindowFocusChange(state);
+}
+
+void CClient::OnChatboxLayoutChange()
+{
+    if (g_pClientGame)
+    {
+        CCVarsInterface*  pCVars = g_pCore->GetCVars();
+        SString           strCVarValue;
+        std::stringstream ss;
+        float             fNumber, fX, fY;
+        int               iR, iG, iB, iA;
+        CLuaArguments     chatboxItemList;
+
+        for (unsigned int i = 0; i < MAX_CHATBOX_LAYOUT_CVARS; i++)
+        {
+            chatboxItemList.PushString(g_chatboxLayoutCVars[i]);
+            if (g_chatboxLayoutCVars[i] == "chat_color" || g_chatboxLayoutCVars[i] == "chat_text_color" || g_chatboxLayoutCVars[i] == "chat_input_color" ||
+                g_chatboxLayoutCVars[i] == "chat_input_prefix_color" || g_chatboxLayoutCVars[i] == "chat_input_text_color")
+            {
+                pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
+                if (strCVarValue.empty())
+                    continue;
+                ss.clear();
+                ss.str(strCVarValue);
+                ss >> iR >> iG >> iB >> iA;
+
+                CLuaArguments chatboxColorItem;
+                chatboxColorItem.PushNumber(1);
+                chatboxColorItem.PushNumber(iR);
+                chatboxColorItem.PushNumber(2);
+                chatboxColorItem.PushNumber(iG);
+                chatboxColorItem.PushNumber(3);
+                chatboxColorItem.PushNumber(iB);
+                chatboxColorItem.PushNumber(4);
+                chatboxColorItem.PushNumber(iA);
+
+                chatboxItemList.PushTable(&chatboxColorItem);
+            }
+            else if (g_chatboxLayoutCVars[i] == "chat_scale")
+            {
+                pCVars->Get(g_chatboxLayoutCVars[i], strCVarValue);
+                if (strCVarValue.empty())
+                    continue;
+                ss.clear();
+                ss.str(strCVarValue);
+                ss >> fX >> fY;
+
+                CLuaArguments numberTable;
+                numberTable.PushNumber(1);
+                numberTable.PushNumber(fX);
+                numberTable.PushNumber(2);
+                numberTable.PushNumber(fY);
+
+                chatboxItemList.PushTable(&numberTable);
+            }
+            else
+            {
+                pCVars->Get(g_chatboxLayoutCVars[i], fNumber);
+                if (g_chatboxLayoutCVars[i] == "chat_use_cegui")
+                    chatboxItemList.PushBoolean(fNumber ? true : false);
+                else
+                    chatboxItemList.PushNumber(fNumber);
+            }
+        }
+
+        CLuaArguments Arguments;
+        Arguments.PushTable(&chatboxItemList);
+        g_pClientGame->GetRootEntity()->CallEvent("onClientChatboxLayoutChange", Arguments, false);
+    }
 }
 
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
