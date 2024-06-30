@@ -585,13 +585,9 @@ void ReadPregFlags(CScriptArgReader& argStream, pcrecpp::RE_Options& pOptions);
 // Resource access helpers
 //
 void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource);
-std::pair<bool, std::string> CheckCanModifyOtherResource(CResource* pThisResource, CResource* pOtherResource) noexcept;
 void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList);
-std::pair<bool, std::string> CheckCanModifyOtherResources(CResource* pThisResource, std::initializer_list<CResource*> resourceList) noexcept;
-    void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
+void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
                                      bool* pbReadOnly = nullptr);
-std::pair<bool, std::string> CheckCanAccessOtherResourceFile(CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath,
-                                                             bool* pbReadOnly = nullptr) noexcept;
 
 //
 // Other misc helpers
