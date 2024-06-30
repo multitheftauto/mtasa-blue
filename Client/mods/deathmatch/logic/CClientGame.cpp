@@ -5522,6 +5522,28 @@ void CClientGame::ResetMapInfo()
     // Moon size
     g_pMultiplayer->ResetMoonSize();
 
+    // World properties
+    g_pMultiplayer->ResetAmbientColor();
+    g_pMultiplayer->ResetAmbientObjectColor();
+    g_pMultiplayer->ResetDirectionalColor();
+    g_pMultiplayer->ResetSpriteSize();
+    g_pMultiplayer->ResetSpriteBrightness();
+    g_pMultiplayer->ResetPoleShadowStrength();
+    g_pMultiplayer->ResetShadowStrength();
+    g_pMultiplayer->ResetShadowsOffset();
+    g_pMultiplayer->ResetLightsOnGroundBrightness();
+    g_pMultiplayer->ResetLowCloudsColor();
+    g_pMultiplayer->ResetBottomCloudsColor();
+    g_pMultiplayer->ResetCloudsAlpha1();
+    g_pMultiplayer->ResetIllumination();
+    g_pGame->GetWeather()->ResetWetRoads();
+    g_pGame->GetWeather()->ResetFoggyness();
+    g_pGame->GetWeather()->ResetFog();
+    g_pGame->GetWeather()->ResetRainFog();
+    g_pGame->GetWeather()->ResetWaterFog();
+    g_pGame->GetWeather()->ResetSandstorm();
+    g_pGame->GetWeather()->ResetRainbow();
+
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
 
@@ -6086,6 +6108,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::ROADSIGNSTEXT:
             g_pGame->SetRoadSignsTextEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::TUNNELWEATHERBLEND:
+            g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -6121,6 +6146,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsExtendedWaterCannonsEnabled();
         case WorldSpecialProperty::ROADSIGNSTEXT:
             return g_pGame->IsRoadSignsTextEnabled();
+        case WorldSpecialProperty::TUNNELWEATHERBLEND:
+            return g_pGame->IsTunnelWeatherBlendEnabled();
     }
     return false;
 }
