@@ -103,6 +103,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"setVolumetricShadowsEnabled", ArgumentParser<SetVolumetricShadowsEnabled>},
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -2233,4 +2234,11 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
             return g_pGame->GetWeather()->ResetRainbow();
     }
     return false;
+}
+
+bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool bEnable)
+{
+    CGameSettings* pGameSettings = g_pGame->GetSettings();
+    pGameSettings->SetVolumetricShadowsEnabled(bEnable);
+    return true;
 }
