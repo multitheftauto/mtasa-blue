@@ -18,7 +18,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"call", Call},
         {"getThisResource", GetThisResource},
         {"getResourceConfig", GetResourceConfig},
-        {"getResourceName", GetResourceName},
+        {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceFromName", GetResourceFromName},
         {"getResourceRootElement", GetResourceRootElement},
         {"getResourceGUIElement", GetResourceGUIElement},
@@ -218,6 +218,21 @@ int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
     // Failed
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, std::string> CLuaResourceDefs::GetResourceName(lua_State* luaVM, CResource* resource)
+{
+    if (!resource)
+    {
+        m_pScriptDebugging->LogBadPointer(luaVM, "resource", 1);
+        // return false as throw std::invalid_argument() would have a different
+        // warning message, unless I'd manually copy it
+        return false;
+    }
+
+    auto name = resource->GetName();
+
+    return name ? name : false;
 }
 
 int CLuaResourceDefs::GetResourceName(lua_State* luaVM)

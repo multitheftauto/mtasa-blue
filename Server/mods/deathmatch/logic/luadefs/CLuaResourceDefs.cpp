@@ -54,7 +54,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceLoadFailureReason", getResourceLoadFailureReason},
         {"getResourceLastStartTime", getResourceLastStartTime},
         {"getResourceLoadTime", getResourceLoadTime},
-        {"getResourceName", getResourceName},
+        {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceRootElement", getResourceRootElement},
         {"getResourceDynamicElementRoot", getResourceDynamicElementRoot},
         {"getResourceMapRootElement", getResourceMapRootElement},
@@ -898,23 +898,9 @@ int CLuaResourceDefs::getResourceLoadTime(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::getResourceName(lua_State* luaVM)
+std::string CLuaResourceDefs::GetResourceName(CResource* resource) noexcept
 {
-    CResource* pResource;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
-
-    if (!argStream.HasErrors())
-    {
-        lua_pushstring(luaVM, pResource->GetName().c_str());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return resource->GetName().c_str();
 }
 
 int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)

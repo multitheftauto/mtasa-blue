@@ -47,7 +47,7 @@ public:
     LUA_DECLARE(getResourceLoadFailureReason);
     LUA_DECLARE(getResourceLastStartTime);
     LUA_DECLARE(getResourceLoadTime);
-    LUA_DECLARE(getResourceName);
+    static std::string GetResourceName(CResource* resource) noexcept;
     LUA_DECLARE(getResourceRootElement);
     LUA_DECLARE(getResourceDynamicElementRoot);
     LUA_DECLARE(getResourceMapRootElement);

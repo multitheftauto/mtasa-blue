@@ -21,7 +21,7 @@ public:
     LUA_DECLARE(Call);
     LUA_DECLARE(GetThisResource);
     LUA_DECLARE(GetResourceConfig);
-    LUA_DECLARE(GetResourceName);
+    static std::variant<bool, std::string> CLuaResourceDefs::GetResourceName(lua_State* luaVM, CResource* resource);
     LUA_DECLARE(GetResourceFromName);
     LUA_DECLARE(GetResourceRootElement);
     LUA_DECLARE(GetResourceGUIElement);
