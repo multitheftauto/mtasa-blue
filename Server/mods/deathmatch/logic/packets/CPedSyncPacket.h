@@ -13,6 +13,7 @@
 
 #include <CVector.h>
 #include "CPacket.h"
+#include <net/SyncStructures.h>
 #include <vector>
 
 class CPedSyncPacket final : public CPacket
@@ -20,16 +21,20 @@ class CPedSyncPacket final : public CPacket
 public:
     struct SyncData
     {
-        ElementID     ID;
-        unsigned char ucFlags;
-        unsigned char ucSyncTimeContext;
-        CVector       vecPosition;
-        float         fRotation;
-        CVector       vecVelocity;
-        float         fHealth;
-        float         fArmor;
-        bool          bOnFire;
-        bool          bIsInWater;
+        ElementID           ID;
+        unsigned char       ucFlags;
+        unsigned char       ucSyncTimeContext;
+        SPositionSync       position;
+        SPedRotationSync    rotation;
+        SVelocitySync       velocity;
+        float               fHealth;
+        float               fArmor;
+        bool                bOnFire;
+        bool                bIsInWater;
+
+        bool ReadSpatialData(NetBitStreamInterface& BitStream);
+        // Backward compatibility
+        bool ReadSpatialDataBC(NetBitStreamInterface& BitStream);
     };
 
 public:

@@ -171,6 +171,7 @@ public:
     CIplStore*                GetIplStore() { return m_pIplStore; };
     CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
+    CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -339,6 +340,7 @@ private:
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
     CCoverManagerSA*                m_pCoverManager;
     CPlantManagerSA*                m_pPlantManager;
+    CBuildingRemoval*               m_pBuildingRemoval;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
