@@ -263,6 +263,8 @@ public:
     bool IsUnderWorldWarpEnabled();
     void SetUnderWorldWarpEnabled(bool bEnable);
 
+    void SetCullZoneWeatherBlendingEnabled(bool isEnabled) noexcept;
+
     bool VerifySADataFileNames();
     bool PerformChecks();
     int& GetCheckStatus() { return m_iCheckStatus; }

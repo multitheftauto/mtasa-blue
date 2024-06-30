@@ -269,4 +269,6 @@ public:
     virtual void RestoreGameBuildings() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
+
+    virtual void SetCullZoneWeatherBlendingEnabled(bool isEnabled) noexcept = 0;
 };

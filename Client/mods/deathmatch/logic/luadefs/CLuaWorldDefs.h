@@ -124,6 +124,7 @@ public:
     static bool SetGrainLevel(uchar ucLevel);
 
     static bool  SetCoronaReflectionsEnabled(uchar ucEnabled);
+    static bool  SetCullZoneWeatherBlendEnabled(bool bEnabled);
     static uchar GetCoronaReflectionsEnabled();
     static bool  ResetCoronaReflectionsEnabled();
 
