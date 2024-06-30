@@ -959,6 +959,29 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.Write(currentWeaponSlot);
                     }
 
+                    // Animation
+                    if (BitStream.Can(eBitStreamVersion::AnimationsSync))
+                    {
+                        const SPlayerAnimData& animData = pPed->GetAnimationData();
+
+                        // Contains animation data?
+                        bool animRunning = !animData.blockName.empty() && !animData.animName.empty();
+                        BitStream.WriteBit(animRunning);
+
+                        if (animRunning)
+                        {
+                            BitStream.WriteString(animData.blockName);
+                            BitStream.WriteString(animData.animName);
+                            BitStream.Write(animData.time);
+                            BitStream.WriteBit(animData.loop);
+                            BitStream.WriteBit(animData.updatePosition);
+                            BitStream.WriteBit(animData.interruptable);
+                            BitStream.WriteBit(animData.freezeLastFrame);
+                            BitStream.Write(animData.blendTime);
+                            BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
+                        }
+                    }
+
                     break;
                 }
 
