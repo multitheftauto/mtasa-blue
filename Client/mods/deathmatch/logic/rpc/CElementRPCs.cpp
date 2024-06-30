@@ -406,6 +406,7 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
             case CCLIENTPLAYER:
             {
                 CClientPed* pPed = static_cast<CClientPed*>(pSource);
+
                 if (pPed->IsHealthLocked())
                     pPed->LockHealth(fHealth);
                 else
@@ -416,6 +417,7 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
             case CCLIENTVEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
+
                 pVehicle->SetHealth(fHealth);
                 break;
             }
@@ -424,6 +426,7 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
             case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
+
                 pObject->SetHealth(fHealth);
                 break;
             }
