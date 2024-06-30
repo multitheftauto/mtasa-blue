@@ -66,7 +66,7 @@ public:
         return std::get<CChecksum>(result);
     }
 
-    static CChecksum GenerateChecksumFromBuffer(const char* cpBuffer, std::size_t ulLength)
+    static CChecksum GenerateChecksumFromBuffer(const char* cpBuffer, unsigned long ulLength)
     {
         CChecksum result;
         result.ulCRC = CRCGenerator::GetCRCFromBuffer(cpBuffer, ulLength);
