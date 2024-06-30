@@ -133,7 +133,6 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             // Execute it
             if (!bIsScriptedBind || pEntry->bAllowScriptedBind)
                 ExecuteHandler(pEntry->pfnCmdFunc, szParameters);
-            return true;
         }
     }
 
@@ -208,7 +207,8 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     // Try to execute the handler
     if (m_pfnExecuteHandler)
     {
-        if (m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, (pEntry != NULL), bIsScriptedBind))
+        bool bAllowScriptedBind = (!pEntry || pEntry->bAllowScriptedBind);
+        if (m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, (pEntry != NULL), bIsScriptedBind, bAllowScriptedBind))
             return true;
     }
 
