@@ -27,4 +27,5 @@ public:
     DECLARE_ELEMENT_RPC(SetPlayerNametagShowing);
     DECLARE_ELEMENT_RPC(SetPlayerTeam);
     DECLARE_RPC(TakePlayerScreenShot);
+    DECLARE_RPC(SetPlayerScriptDebugLevel);
 };

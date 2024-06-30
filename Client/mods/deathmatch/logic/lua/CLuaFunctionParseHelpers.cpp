@@ -873,6 +873,29 @@ ADD_ENUM(eFxParticleSystems::PRT_WHEELDIRT, "wheel_dirt")
 ADD_ENUM(eFxParticleSystems::PRT_GLASS, "glass")
 IMPLEMENT_ENUM_CLASS_END("particle-system")
 
+IMPLEMENT_ENUM_BEGIN(eWorldProperty)
+ADD_ENUM(AMBIENT_COLOR, "AmbientColor")
+ADD_ENUM(AMBIENT_OBJ_COLOR, "AmbientObjColor")
+ADD_ENUM(DIRECTIONAL_COLOR, "DirectionalColor")
+ADD_ENUM(SPRITE_SIZE, "SpriteSize")
+ADD_ENUM(SPRITE_BRIGHTNESS, "SpriteBrightness")
+ADD_ENUM(POLE_SHADOW_STRENGTH, "PoleShadowStrength")
+ADD_ENUM(SHADOW_STRENGTH, "ShadowStrength")
+ADD_ENUM(SHADOWS_OFFSET, "ShadowsOffset")
+ADD_ENUM(LIGHTS_ON_GROUND, "LightsOnGround")
+ADD_ENUM(LOW_CLOUDS_COLOR, "LowCloudsColor")
+ADD_ENUM(BOTTOM_CLOUDS_COLOR, "BottomCloudsColor")
+ADD_ENUM(CLOUDS_ALPHA1, "CloudsAlpha")
+ADD_ENUM(ILLUMINATION, "Illumination")
+ADD_ENUM(WEATHER_WET_ROADS, "WetRoads")
+ADD_ENUM(WEATHER_FOGGYNESS, "Foggyness")
+ADD_ENUM(WEATHER_FOG, "Fog")
+ADD_ENUM(WEATHER_RAIN_FOG, "RainFog")
+ADD_ENUM(WEATHER_WATER_FOG, "WaterFog")
+ADD_ENUM(WEATHER_SANDSTORM, "Sandstorm")
+ADD_ENUM(WEATHER_RAINBOW, "Rainbow")
+IMPLEMENT_ENUM_END("world-property")
+
 //
 // CResource from userdata
 //
@@ -1245,22 +1268,12 @@ void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisRe
     // No operation on the client
 }
 
-std::pair<bool, std::string> CheckCanModifyOtherResource(CResource* pThisResource, CResource* pOtherResource) noexcept
-{
-    return {true, ""};
-}
-
 //
 // Set error if pThisResource does not have permission to modify every resource in resourceList
 //
 void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList)
 {
     // No operation on the client
-}
-
-std::pair<bool, std::string> CheckCanModifyOtherResources(CResource* pThisResource, std::initializer_list<CResource*> resourceList) noexcept
-{
-    return {true, ""};
 }
 
 //
@@ -1270,9 +1283,4 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
                                      bool* pbReadOnly)
 {
     // No operation on the client
-}
-
-std::pair<bool, std::string> CheckCanAccessOtherResourceFile(CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly) noexcept
-{
-    return {true, ""};
 }
