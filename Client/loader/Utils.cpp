@@ -2178,6 +2178,32 @@ bool IsNativeArm64Host()
     return isArm64;
 }
 
+bool RegQueryInteger(HKEY rootKey, LPCWSTR keyName, LPCWSTR valueName, DWORD& value)
+{
+    value = {};
+
+    HKEY key{};
+    if (RegOpenKeyExW(rootKey, keyName, 0, KEY_READ, &key) != ERROR_SUCCESS)
+        return false;
+
+    DWORD   valueType = REG_DWORD;
+    DWORD   valueSize = sizeof(value);
+    LSTATUS status = RegQueryValueExW(key, valueName, nullptr, &valueType, reinterpret_cast<LPBYTE>(&value), &valueSize);
+    RegCloseKey(key);
+    return status == ERROR_SUCCESS;
+}
+
+bool RegWriteInteger(HKEY rootKey, LPCWSTR keyName, LPCWSTR valueName, DWORD value)
+{
+    HKEY key{};
+    if (RegCreateKeyExW(rootKey, keyName, 0, 0, REG_OPTION_NON_VOLATILE, KEY_WRITE, nullptr, &key, nullptr) != ERROR_SUCCESS)
+        return false;
+
+    LSTATUS status = RegSetValueExW(key, valueName, 0, REG_DWORD, reinterpret_cast<LPBYTE>(&value), sizeof(value));
+    RegCloseKey(key);
+    return status == ERROR_SUCCESS;
+}
+
 //////////////////////////////////////////////////////////
 //
 // ReadCompatibilityEntries

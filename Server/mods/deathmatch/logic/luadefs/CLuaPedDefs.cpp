@@ -13,6 +13,7 @@
 #include "CLuaPedDefs.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaPedDefs::LoadFunctions()
 {
@@ -64,7 +65,7 @@ void CLuaPedDefs::LoadFunctions()
         {"warpPedIntoVehicle", WarpPedIntoVehicle},
         {"removePedFromVehicle", RemovePedFromVehicle},
         {"setPedDoingGangDriveby", SetPedDoingGangDriveby},
-        {"setPedAnimation", SetPedAnimation},
+        {"setPedAnimation", ArgumentParserWarn<false, SetPedAnimation>},
         {"setPedAnimationProgress", SetPedAnimationProgress},
         {"setPedAnimationSpeed", SetPedAnimationSpeed},
         {"setPedOnFire", SetPedOnFire},
@@ -404,56 +405,33 @@ int CLuaPedDefs::IsPedFrozen(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
+bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std::string, std::monostate, bool>> blockName,
+                                  std::optional<std::variant<std::string, std::monostate, bool>> animName, std::optional<int> time, std::optional<bool> loop,
+                                  std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame,
+                                  std::optional<int> blendTime, std::optional<bool> restoreTask)
 {
-    // bool setPedAnimation ( ped thePed [, string block=nil, string anim=nil, int time=-1, int blend=250, bool loop=true, bool updatePosition=true, bool
-    // interruptable=true, bool freezeLastFrame = true] )
-    CElement* pPed;
-    SString   strBlockName, strAnimName;
-    int       iTime;
-    int       iBlend = 250;
-    bool      bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame;
-    bool      bDummy;
-    bool      bTaskToBeRestoredOnAnimEnd;
+    std::string animBlockName;
+    std::string animationName;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
-    if (argStream.NextIsBool())
-        argStream.ReadBool(bDummy);            // Wiki used setPedAnimation(source,false) as an example
-    else if (argStream.NextIsNil())
-        argStream.m_iIndex++;            // Wiki docs said blockName could be nil
-    else
-        argStream.ReadString(strBlockName, "");
-    argStream.ReadString(strAnimName, "");
-    if (argStream.NextCouldBeNumber())            // Freeroam skips the time arg sometimes
-        argStream.ReadNumber(iTime, -1);
-    else
-        iTime = -1;
-    argStream.ReadBool(bLoop, true);
-    argStream.ReadBool(bUpdatePosition, true);
-    argStream.ReadBool(bInterruptable, true);
-    argStream.ReadBool(bFreezeLastFrame, true);
-    argStream.ReadNumber(iBlend, 250);
-    argStream.ReadBool(bTaskToBeRestoredOnAnimEnd, false);
-
-    if (!argStream.HasErrors())
+    if (blockName.has_value())
     {
-        const char *szBlock, *szAnim;
-        szBlock = strBlockName.empty() ? NULL : strBlockName.c_str();
-        szAnim = strAnimName.empty() ? NULL : strAnimName.c_str();
-
-        if (CStaticFunctionDefinitions::SetPedAnimation(pPed, szBlock, szAnim, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame,
-                                                        bTaskToBeRestoredOnAnimEnd))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        if (std::holds_alternative<std::string>(blockName.value()))
+            animBlockName = std::get<std::string>(blockName.value());
+        else if (std::holds_alternative<bool>(blockName.value()))
+            if (std::get<bool>(blockName.value()))
+                throw LuaFunctionError("Anim block name cannot be true. Possible values: nil, false, string.");
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (animName.has_value())
+    {
+        if (std::holds_alternative<std::string>(animName.value()))
+            animationName = std::get<std::string>(animName.value());
+        else if (std::holds_alternative<bool>(animName.value()))
+            if (std::get<bool>(animName.value()))
+                throw LuaFunctionError("Animation name cannot be true. Possible values: nil, false, string.");
+    }
+
+    return CStaticFunctionDefinitions::SetPedAnimation(pPed, animBlockName, animationName, time.value_or(-1), blendTime.value_or(250), loop.value_or(true), updatePosition.value_or(true), interruptable.value_or(true), freezeLastFrame.value_or(true), restoreTask.value_or(false));
 }
 
 int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)

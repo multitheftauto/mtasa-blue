@@ -1761,6 +1761,11 @@ void CClientPed::InternalSetHealth(float fHealth)
             }
             else
             {
+                // Ped is alive again (Fix #414)
+                UnlockHealth();
+                UnlockArmor();
+                SetIsDead(false);
+
                 // Recreate the player
                 ReCreateModel();
             }
@@ -5214,6 +5219,9 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             SetPosition(*pvecPosition);
 
             m_pPlayerPed->SetLanding(false);
+
+            // Set it to 0 (Fix #501)
+            SetCurrentWeaponSlot(eWeaponSlot::WEAPONSLOT_TYPE_UNARMED);
 
             if (bRestoreState)
             {

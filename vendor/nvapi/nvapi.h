@@ -41,7 +41,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Date: Feb 1, 2024 
+// Date: May 30, 2024 
 // File: nvapi.h
 //
 // NvAPI provides an interface to NVIDIA devices. This file contains the 
@@ -1741,6 +1741,8 @@ NVAPI_INTERFACE NvAPI_GetPhysicalGPUsFromLogicalGPU(NvLogicalGpuHandle hLogicalG
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 80
 //!
 //! \retval NVAPI_INVALID_ARGUMENT         gpuId is zero or pPhysicalGPU is NULL
@@ -1760,6 +1762,8 @@ NVAPI_INTERFACE NvAPI_GetPhysicalGPUFromGPUID(NvU32 gpuId, NvPhysicalGpuHandle *
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 95
 //!
@@ -1781,6 +1785,8 @@ NVAPI_INTERFACE NvAPI_GetGPUIDfromPhysicalGPU(NvPhysicalGpuHandle hPhysicalGpu, 
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 170
 //!
@@ -1805,6 +1811,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetShaderSubPipeCount(NvPhysicalGpuHandle hPhysicalGpu
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \retval ::NVAPI_INVALID_ARGUMENT              pCount is NULL
 //! \retval ::NVAPI_OK                            *pCount is set
@@ -2092,6 +2100,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetConnectedSLIOutputsWithLidState(NvPhysicalGpuHandle
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 95
 //!
 //! \retval  NVAPI_INVALID_ARGUMENT              hPhysicalGpu or pOutputsMask is NULL
@@ -2248,6 +2258,8 @@ NVAPI_INTERFACE NvAPI_GPU_ValidateOutputCombination(NvPhysicalGpuHandle hPhysica
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 90
 //!
 //! \return  NVAPI_ERROR or NVAPI_OK
@@ -2265,6 +2277,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetFullName(NvPhysicalGpuHandle hPhysicalGpu, NvAPI_Sh
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 90
 //!
@@ -2306,6 +2320,8 @@ typedef enum _NV_GPU_TYPE
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 173
 //!
 //! \retval  NVAPI_INVALID_ARGUMENT              hPhysicalGpu
@@ -2342,6 +2358,8 @@ typedef enum _NV_GPU_BUS_TYPE
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 90
 //!
 //! \return      This API can return any of the error codes enumerated in #NvAPI_Status. If there are return error codes with
@@ -2364,6 +2382,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetBusType(NvPhysicalGpuHandle hPhysicalGpu,NV_GPU_BUS
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 167
 //!
 //!  \retval  NVAPI_INVALID_ARGUMENT              hPhysicalGpu or pBusId is NULL.
@@ -2385,6 +2405,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetBusId(NvPhysicalGpuHandle hPhysicalGpu, NvU32 *pBus
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 167
 //!
@@ -2410,6 +2432,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetBusSlotId(NvPhysicalGpuHandle hPhysicalGpu, NvU32 *
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 90
 //!
 //! \retval  NVAPI_INVALID_ARGUMENT              hPhysicalGpu or pIRQ is NULL.
@@ -2431,6 +2455,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetIRQ(NvPhysicalGpuHandle hPhysicalGpu,NvU32 *pIRQ);
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 90
 //!
 //! \retval    NVAPI_INVALID_ARGUMENT               hPhysicalGpu or pBiosRevision is NULL.
@@ -2451,6 +2477,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetVbiosRevision(NvPhysicalGpuHandle hPhysicalGpu,NvU3
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 90
 //!
@@ -2474,6 +2502,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetVbiosOEMRevision(NvPhysicalGpuHandle hPhysicalGpu,N
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 90
 //!
@@ -2538,6 +2568,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetCurrentAGPRate(NvPhysicalGpuHandle hPhysicalGpu,NvU
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 90
 //!
 //! \retval  NVAPI_INVALID_ARGUMENT              pWidth is NULL.
@@ -2562,6 +2594,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetCurrentPCIEDownstreamWidth(NvPhysicalGpuHandle hPhy
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 90
 //!
 //! \retval  NVAPI_INVALID_ARGUMENT              pSize is NULL
@@ -2583,6 +2617,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetPhysicalFrameBufferSize(NvPhysicalGpuHandle hPhysic
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 90
 //!
@@ -2648,6 +2684,8 @@ typedef NV_BOARD_INFO_V1    NV_BOARD_INFO;
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \retval ::NVAPI_OK                     completed request
 //! \retval ::NVAPI_ERROR                  miscellaneous error occurred
 //! \retval ::NVAPI_EXPECTED_PHYSICAL_GPU_HANDLE  handle passed is not a physical GPU handle
@@ -2672,6 +2710,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetBoardInfo(NvPhysicalGpuHandle hPhysicalGpu, NV_BOAR
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 100
 //!
@@ -2878,6 +2918,8 @@ typedef NV_GPU_ARCH_INFO_V2 NV_GPU_ARCH_INFO;
 //!
 //!
 //! TCC_SUPPORTED       
+//!
+//! MCDM_SUPPORTED
 //! \since Release: 85
 //!
 //! \return  This API can return any of the error codes enumerated in
@@ -3141,6 +3183,8 @@ NVAPI_INTERFACE NvAPI_GPU_WorkstationFeatureQuery(__in NvPhysicalGpuHandle hPhys
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 175
 //!
 //!  \retval ::NVAPI_OK
@@ -3308,6 +3352,8 @@ NVAPI_INTERFACE NvAPI_GPU_CudaEnumComputeCapableGpus(__inout NV_COMPUTE_GPU_TOPO
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \param [in]    hPhysicalGpu   GPU selection.
 //! \param [out]   pValue         Pointer to a variable to get the tachometer reading
 //!
@@ -3338,6 +3384,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetTachReading(NvPhysicalGpuHandle hPhysicalGPU, NvU32
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \param [in]      hPhysicalGpu      A handle identifying the physical GPU for which ECC
 //!                                    status information is to be retrieved.
@@ -3416,6 +3464,8 @@ typedef struct
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \param [in]      hPhysicalGpu  A handle identifying the physical GPU for
 //!                                which ECC error information is to be
 //!                                retrieved.
@@ -3449,6 +3499,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetECCErrorInfo(NvPhysicalGpuHandle hPhysicalGpu,
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \requires Administrator privileges since release 430.39
 //!
 //! \param [in]     hPhysicalGpu     A handle identifying the physical GPU for
@@ -3480,6 +3532,8 @@ NVAPI_INTERFACE NvAPI_GPU_ResetECCErrorInfo(NvPhysicalGpuHandle hPhysicalGpu, Nv
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \param [in]      hPhysicalGpu  A handle identifying the physical GPU for
 //!                                which ECC configuration information
@@ -3526,6 +3580,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetECCConfigurationInfo(NvPhysicalGpuHandle hPhysicalG
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \requires Administrator privileges since release 430.39
 //!
@@ -4008,6 +4064,8 @@ typedef NV_GPU_VIRTUALIZATION_INFO_V1     NV_GPU_VIRTUALIZATION_INFO;
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 367
 //!
 //! \param [in,out] pVirtualizationInfo         Pointer to NV_GPU_VIRTUALIZATION_INFO structure.
@@ -4223,6 +4281,8 @@ typedef NV_LICENSABLE_FEATURES_V4     NV_LICENSABLE_FEATURES;
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \param [in]  hPhysicalGpu                   GPU selection
 //! \param [in,out] pLicensableFeatures         Licensable features information.
@@ -4545,6 +4605,8 @@ typedef NV_GPU_INFO_V2               NV_GPU_INFO;
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 400
 //!
 //! \param [in,out] pGpuInfo - This structure will be filled with required information.
@@ -4581,6 +4643,8 @@ typedef NV_GPU_VR_READY_V1               NV_GPU_VR_READY;
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 465
 //!
 //! \param [in,out] pGpuVrReadyData - This structure will be filled with required information.
@@ -4592,6 +4656,16 @@ typedef NV_GPU_VR_READY_V1               NV_GPU_VR_READY;
 //! \ingroup gpu
 ///////////////////////////////////////////////////////////////////////////////
 NVAPI_INTERFACE NvAPI_GPU_GetVRReadyData(__in NvPhysicalGpuHandle hPhysicalGpu, __inout NV_GPU_VR_READY *pGpuVrReadyData);
+
+
+typedef enum _NV_ADAPTER_TYPE
+{
+    NV_ADAPTER_TYPE_UNKNOWN    = 0x0,
+    NV_ADAPTER_TYPE_WDDM       = NV_BIT(0),       //<! WDDM = Windows Display Driver Model
+    NV_ADAPTER_TYPE_MCDM       = NV_BIT(1),       //<! MCDM = Microsoft Compute Driver Model
+    NV_ADAPTER_TYPE_TCC        = NV_BIT(2),       //<! TCC  = Tesla Compute Cluster
+    NV_ADAPTER_TYPE_LAST       = 0xFFFFFFFF,      //<! Do not use this member
+} NV_ADAPTER_TYPE;
 
 
 //! \ingroup gpu
@@ -4624,6 +4698,8 @@ typedef NV_GPU_GSP_INFO_V1               NV_GPU_GSP_INFO;
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 550
 //!
@@ -4846,6 +4922,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetPstatesInfoEx(NvPhysicalGpuHandle hPhysicalGpu, NV_
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 295
 //!
 //! SUPPORTED OS:  Windows 7 and higher
@@ -4874,6 +4952,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetPstates20(__in NvPhysicalGpuHandle hPhysicalGpu, __
 //! \since Release: 165
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \param [in]      hPhysicalGPU     GPU selection
 //! \param [out]     pCurrentPstate   The ID of the current P-State of the GPU - see \ref NV_GPU_PERF_PSTATES.
@@ -4928,6 +5008,8 @@ typedef struct
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //! \since Release: 185
 //!
 //! \retval ::NVAPI_OK
@@ -5048,6 +5130,8 @@ typedef NV_GPU_THERMAL_SETTINGS_V2  NV_GPU_THERMAL_SETTINGS;
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 85
 //!
 //! \param [in]   hPhysicalGPU      GPU selection.
@@ -5140,6 +5224,8 @@ typedef NV_GPU_CLOCK_FREQUENCIES_V2 NV_GPU_CLOCK_FREQUENCIES;
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 295
 //!
 //! \return  This API can return any of the error codes enumerated in #NvAPI_Status.
@@ -5167,6 +5253,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetAllClockFrequencies(__in NvPhysicalGpuHandle hPhysi
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 300.05
 //!
@@ -5236,6 +5324,8 @@ NVAPI_INTERFACE NvAPI_GPU_QueryIlluminationSupport(__inout NV_GPU_QUERY_ILLUMINA
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 300.05
 //!
 //! \param [in]  hPhysicalGpu        Physical GPU handle
@@ -5302,6 +5392,8 @@ NVAPI_INTERFACE NvAPI_GPU_GetIllumination(NV_GPU_GET_ILLUMINATION_PARM *pIllumin
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 300.05
 //!
@@ -5555,6 +5647,8 @@ typedef NV_GPU_CLIENT_ILLUM_DEVICE_INFO_PARAMS_V1    NV_GPU_CLIENT_ILLUM_DEVICE_
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 400
 //! \param [in]  hPhysicalGpu       The physical GPU handle
 //! \param [out] pIllumDevicesInfo  Pointer to structure containing static
@@ -5651,6 +5745,8 @@ typedef NV_GPU_CLIENT_ILLUM_DEVICE_CONTROL_PARAMS_V1    NV_GPU_CLIENT_ILLUM_DEVI
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 400
 //! \param [in]  hPhysicalGpu          The physical GPU handle
 //! \param [inout] pIllumDevicesControl  Pointer to structure containing control
@@ -5672,6 +5768,8 @@ NVAPI_INTERFACE NvAPI_GPU_ClientIllumDevicesGetControl(__in NvPhysicalGpuHandle 
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 400
 //! \param [in]  hPhysicalGpu          The physical GPU handle
@@ -5781,6 +5879,8 @@ typedef NV_GPU_CLIENT_ILLUM_ZONE_INFO_PARAMS_V1    NV_GPU_CLIENT_ILLUM_ZONE_INFO
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 400
 //! \param [in]  hPhysicalGpu     The physical GPU handle
@@ -6229,6 +6329,8 @@ typedef NV_GPU_CLIENT_ILLUM_ZONE_CONTROL_PARAMS_V1    NV_GPU_CLIENT_ILLUM_ZONE_C
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 400
 //! \param [in]  hPhysicalGpu        The physical GPU handle
 //! \param [out] pIllumZonesControl  Pointer to structure containing control
@@ -6250,6 +6352,8 @@ NVAPI_INTERFACE NvAPI_GPU_ClientIllumZonesGetControl(__in NvPhysicalGpuHandle hP
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 400
 //! \param [in]  hPhysicalGpu        The physical GPU handle
@@ -17872,7 +17976,8 @@ typedef struct _NV_LATENCY_MARKER_PARAMS
     NvU32  version;                                       //!< (IN) Structure version
     NvU64  frameID;
     NV_LATENCY_MARKER_TYPE markerType;
-    NvU8   rsvd[64];
+    NvU64  rsvd0;
+    NvU8   rsvd[56];
 } NV_LATENCY_MARKER_PARAMS_V1;
 
 typedef NV_LATENCY_MARKER_PARAMS_V1            NV_LATENCY_MARKER_PARAMS;
@@ -17912,12 +18017,22 @@ typedef NV_LATENCY_MARKER_PARAMS_V1            NV_LATENCY_MARKER_PARAMS;
 NVAPI_INTERFACE NvAPI_D3D_SetLatencyMarker(__in IUnknown *pDev, __in NV_LATENCY_MARKER_PARAMS* pSetLatencyMarkerParams);
 #endif //defined(__cplusplus) && (defined(_D3D9_H_) || defined(__d3d10_h__) || defined(__d3d10_1_h__) || defined(__d3d11_h__) || defined(__d3d12_h__))
 
+//! SUPPORTED OS:  Windows 10 and higher
+//!
 //! Used in NvAPI_D3D12_SetAsyncFrameMarker
 //! \ingroup dx
-typedef NV_LATENCY_MARKER_PARAMS_V1         NV_ASYNC_FRAME_MARKER_PARAMS_V1;
+typedef struct _NV_ASYNC_FRAME_MARKER_PARAMS_V1
+{
+    NvU32  version;                                       //!< (IN) Structure version
+    NvU64  frameID;
+    NV_LATENCY_MARKER_TYPE markerType;
+    NvU64  presentFrameID;
+    NvU8   rsvd[56];
+} NV_ASYNC_FRAME_MARKER_PARAMS_V1;
+
 typedef NV_ASYNC_FRAME_MARKER_PARAMS_V1     NV_ASYNC_FRAME_MARKER_PARAMS;
-#define NV_ASYNC_FRAME_MARKER_PARAMS_VER1   NV_LATENCY_MARKER_PARAMS_VER1
-#define NV_ASYNC_FRAME_MARKER_PARAMS_VER    NV_LATENCY_MARKER_PARAMS_VER1
+#define NV_ASYNC_FRAME_MARKER_PARAMS_VER1   MAKE_NVAPI_VERSION(NV_ASYNC_FRAME_MARKER_PARAMS_V1, 1)
+#define NV_ASYNC_FRAME_MARKER_PARAMS_VER    NV_ASYNC_FRAME_MARKER_PARAMS_VER1
 
 #if defined(__cplusplus) && (defined(__d3d12_h__))
 ///////////////////////////////////////////////////////////////////////////////
@@ -17948,6 +18063,7 @@ typedef enum
 {
     OUT_OF_BAND_RENDER  = 0,
     OUT_OF_BAND_PRESENT = 1,
+    OUT_OF_BAND_IGNORE  = 2,
 } NV_OUT_OF_BAND_CQ_TYPE;
 
 #if defined(__cplusplus) && defined(__d3d12_h__)
@@ -18048,6 +18164,9 @@ NVAPI_INTERFACE NvAPI_D3D12_LaunchCubinShader(__in  ID3D12GraphicsCommandList*  
 NVAPI_INTERFACE NvAPI_D3D12_DestroyCubinComputeShader(__in  ID3D12Device*       pDevice,
                                                       __in  NVDX_ObjectHandle   hShader);
 
+#endif //defined(__cplusplus) && defined(__d3d12_h__)
+
+#if defined(__d3d12_h__)
 // Experimental API for internal use. DO NOT USE!
 //! SUPPORTED OS:  Windows 10 and higher
 //!
@@ -23102,6 +23221,98 @@ typedef NV_DISPLAY_DRIVER_INFO_V2               NV_DISPLAY_DRIVER_INFO;
 //! \ingroup gpu
 ///////////////////////////////////////////////////////////////////////////////
 NVAPI_INTERFACE NvAPI_SYS_GetDisplayDriverInfo(__inout NV_DISPLAY_DRIVER_INFO *pDriverInfo);
+
+
+typedef struct _NV_PHYSICAL_GPU_HANDLE_DATA
+{
+    NvPhysicalGpuHandle hPhysicalGpu;       //<! [OUT] The GPU handle returned by the API
+    NV_ADAPTER_TYPE     adapterType;        //<! [OUT] Indicates the adapter type from #NV_ADAPTER_TYPE enum, corresponding to the GPU handle 'hPhysicalGpu'
+    NvU32               reserved2[4];       //<! Reserved for future use
+} NV_PHYSICAL_GPU_HANDLE_DATA;
+
+typedef struct _NV_PHYSICAL_GPUS
+{
+    NvU32                           version;                                    //<! [IN]  Structure Version
+    NV_PHYSICAL_GPU_HANDLE_DATA     gpuHandleData[NVAPI_MAX_PHYSICAL_GPUS];     //<! [OUT] The GPU handle data returned by the API.
+    NvU32                           gpuHandleCount;                             //<! [OUT] The number of GPU handles returned by the API in 'gpuHandleData' array. 
+    NvU32                           reserved[4];                                //<! Reserved for future use
+} NV_PHYSICAL_GPUS_V1;
+
+#define NV_PHYSICAL_GPUS_VER1        MAKE_NVAPI_VERSION(NV_PHYSICAL_GPUS_V1, 1)
+#define NV_PHYSICAL_GPUS_VER         NV_PHYSICAL_GPUS_VER1
+typedef NV_PHYSICAL_GPUS_V1          NV_PHYSICAL_GPUS;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_SYS_GetPhysicalGPUs
+//
+//! DESCRIPTION: This API will return the GPU handles for all the physical GPUs
+//!              in the system. Additional metadata is also returned with each handle.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
+//!
+//! \since Release: 530
+//!
+//! \param [inout]    pPhysicalGPUs    - Pointer to the structure holding the physical GPU handle related information.
+//!
+//! \return  This API can return any of the error codes enumerated in
+//!          #NvAPI_Status.  If there are return error codes with specific
+//!          meaning for this API, they are listed below.
+//!
+//! \retval     NVAPI_NVIDIA_DEVICE_NOT_FOUND       No GPU handles are enumerated.
+//!
+//! \ingroup sysgeneral
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_SYS_GetPhysicalGPUs(__inout NV_PHYSICAL_GPUS *pPhysicalGPUs);
+
+
+typedef struct _NV_LOGICAL_GPU_HANDLE_DATA
+{
+    NvLogicalGpuHandle  hLogicalGpu;        //<! [OUT] The GPU handle returned by the API
+    NV_ADAPTER_TYPE     adapterType;        //<! [OUT] Indicates the adapter type from #NV_ADAPTER_TYPE enum, corresponding to the GPU handle 'hLogicalGpu'
+    NvU32               reserved[4];        //<! Reserved for future use
+} NV_LOGICAL_GPU_HANDLE_DATA;
+
+typedef struct _NV_LOGICAL_GPUS
+{
+    NvU32                           version;                                    //<! [IN]  Structure Version
+    NV_LOGICAL_GPU_HANDLE_DATA      gpuHandleData[NVAPI_MAX_LOGICAL_GPUS];      //<! [OUT] The GPU handle data returned by the API.
+    NvU32                           gpuHandleCount;                             //<! [OUT] The number of GPU handles returned by the API in 'gpuHandleData' array.
+    NvU32                           reserved[4];                                //<! Reserved for future use
+} NV_LOGICAL_GPUS_V1;
+
+#define NV_LOGICAL_GPUS_VER1        MAKE_NVAPI_VERSION(NV_LOGICAL_GPUS_V1, 1)
+#define NV_LOGICAL_GPUS_VER         NV_LOGICAL_GPUS_VER1
+typedef NV_LOGICAL_GPUS_V1          NV_LOGICAL_GPUS;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// FUNCTION NAME: NvAPI_SYS_GetLogicalGPUs
+//
+//! DESCRIPTION: This API will return the GPU handles for all the logical GPUs in the system.
+//!              Additional metadata is also returned with each handle.
+//!
+//! SUPPORTED OS:  Windows 10 and higher
+//!
+//! MCDM_SUPPORTED
+//!
+//! \since Release: 530
+//!
+//! \param [inout]    pLogicalGPUs    - Pointer to the structure holding the logical GPU handle related information.
+//!
+//! \return  This API can return any of the error codes enumerated in
+//!          #NvAPI_Status.  If there are return error codes with specific
+//!          meaning for this API, they are listed below.
+//!
+//! \retval     NVAPI_NVIDIA_DEVICE_NOT_FOUND       No GPU handles are enumerated.
+//!
+//! \ingroup sysgeneral
+///////////////////////////////////////////////////////////////////////////////
+NVAPI_INTERFACE NvAPI_SYS_GetLogicalGPUs(__inout NV_LOGICAL_GPUS *pLogicalGPUs);
 
 
 /*!
