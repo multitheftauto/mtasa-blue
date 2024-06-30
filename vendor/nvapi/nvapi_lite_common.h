@@ -568,6 +568,8 @@ typedef NV_GPU_MEMORY_INFO_EX_V1 NV_GPU_MEMORY_INFO_EX;
 //!
 //! TCC_SUPPORTED
 //!
+//! MCDM_SUPPORTED
+//!
 //! \since Release: 520
 //!
 //!  \param [in]   hPhysicalGpu  Handle of the physical GPU for which the memory information is to be extracted.
