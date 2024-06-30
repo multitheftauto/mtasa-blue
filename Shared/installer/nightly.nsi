@@ -369,6 +369,9 @@ Function .onInstSuccess
 
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\Common" "GTA:SA Path" $GTA_DIR
     WriteRegStr HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location" $INSTDIR
+
+    # Add 'MaxLoaderThreads' DWORD value for gta_sa.exe to disable multi-threaded loading of DLLs.
+    WriteRegDWORD HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads" 1
 	
 	# Initilize variables holding paths and names
 	Call MTAInitFileNamesAndPaths
@@ -1141,6 +1144,10 @@ Section Uninstall
         ${If} $0 == "$INSTDIR\Multi Theft Auto.exe"
             DeleteRegKey HKCR "mtasa"
         ${EndIf}
+
+        # Remove 'MaxLoaderThreads' DWORD value for gta_sa.exe.
+        DeleteRegValue HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe" "MaxLoaderThreads"
+        DeleteRegKey /ifempty HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\gta_sa.exe"
 
         ${GameExplorer_RemoveGame} ${GUID}
 
