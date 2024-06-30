@@ -99,7 +99,6 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setMoonSize", SetMoonSize},
                                                                              {"setFPSLimit", SetFPSLimit},
                                                                              {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
-                                                                             {"setCullZoneWeatherBlendEnabled", ArgumentParser<SetCullZoneWeatherBlendEnabled>},
                                                                              {"setWorldProperty", ArgumentParser<SetWorldProperty>},
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
@@ -2050,12 +2049,6 @@ bool CLuaWorldDefs::SetCoronaReflectionsEnabled(uchar ucEnabled)
 
     g_pGame->GetSettings()->SetCoronaReflectionsControlledByScript(true);
     g_pGame->GetCoronas()->SetCoronaReflectionsEnabled(ucEnabled);
-    return true;
-}
-
-bool CLuaWorldDefs::SetCullZoneWeatherBlendEnabled(bool bEnabled)
-{
-    g_pGame->SetCullZoneWeatherBlendingEnabled(bEnabled);
     return true;
 }
 

@@ -225,6 +225,9 @@ public:
     virtual bool IsRoadSignsTextEnabled() const noexcept = 0;
     virtual void SetRoadSignsTextEnabled(bool isEnabled) = 0;
 
+    virtual bool IsTunnelWeatherBlendEnabled() const noexcept = 0;
+    virtual void SetTunnelWeatherBlendEnabled(bool isEnabled) = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
@@ -270,5 +273,4 @@ public:
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
 
-    virtual void SetCullZoneWeatherBlendingEnabled(bool isEnabled) noexcept = 0;
 };

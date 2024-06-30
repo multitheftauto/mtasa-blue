@@ -244,6 +244,10 @@ public:
     bool IsRoadSignsTextEnabled() const noexcept override { return m_isRoadSignsTextEnabled; }
     void SetRoadSignsTextEnabled(bool isEnabled) override;
 
+    bool IsTunnelWeatherBlendEnabled() const noexcept override { return m_isTunnelWeatherBlendEnabled; }
+    void SetTunnelWeatherBlendEnabled(bool isEnabled) override;
+
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -262,8 +266,6 @@ public:
 
     bool IsUnderWorldWarpEnabled();
     void SetUnderWorldWarpEnabled(bool bEnable);
-
-    void SetCullZoneWeatherBlendingEnabled(bool isEnabled) noexcept;
 
     bool VerifySADataFileNames();
     bool PerformChecks();
@@ -365,6 +367,7 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
+    bool         m_isTunnelWeatherBlendEnabled{true}; 
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};

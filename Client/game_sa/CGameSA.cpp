@@ -684,8 +684,10 @@ void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
     m_areWaterCreaturesEnabled = isEnabled;
 }
 
-void CGameSA::SetCullZoneWeatherBlendingEnabled(bool isEnabled) noexcept
+void CGameSA::SetTunnelWeatherBlendEnabled(bool isEnabled)
 {
+    if (isEnabled == m_isTunnelWeatherBlendEnabled)
+        return;
     // CWeather::UpdateInTunnelness
     DWORD functionAddress = 0x72B630; 
     if (isEnabled)
@@ -702,8 +704,7 @@ void CGameSA::SetCullZoneWeatherBlendingEnabled(bool isEnabled) noexcept
         MemPut<BYTE>(functionAddress + 1, 0x90);            // Write 90 (NOP)
         MemPut<BYTE>(functionAddress + 2, 0x90);            // Write 90 (NOP)
     }
-   
-
+    m_isTunnelWeatherBlendEnabled = isEnabled;
 }
 
 void CGameSA::SetBurnFlippedCarsEnabled(bool isEnabled)
