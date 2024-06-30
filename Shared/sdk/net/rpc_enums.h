@@ -281,5 +281,7 @@ enum eElementRPCFunctions
     RESPAWN_OBJECT,
     TOGGLE_OBJECT_RESPAWN,
 
+    SET_PLAYER_SCRIPT_DEBUG_LEVEL,
+
     NUM_RPC_FUNCS            // Add above this line
 };
