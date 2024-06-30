@@ -1117,7 +1117,6 @@ void CClientVehicle::SetVariant(unsigned char ucVariant, unsigned char ucVariant
 
     // clear our component data to regenerate it
     m_ComponentData.clear();
-
     ReCreate();
 }
 
@@ -2593,7 +2592,6 @@ void CClientVehicle::Create()
         m_pVehicle->SetOverrideLights(m_ucOverrideLights);
         m_pVehicle->SetRemap(static_cast<unsigned int>(m_ucPaintjob));
         m_pVehicle->SetBodyDirtLevel(m_fDirtLevel);
-        m_pVehicle->SetEngineOn(m_bEngineOn);
         m_pVehicle->SetAreaCode(m_ucInterior);
         m_pVehicle->SetSmokeTrailEnabled(m_bSmokeTrail);
         m_pVehicle->SetGravity(&m_vecGravity);
@@ -2645,6 +2643,8 @@ void CClientVehicle::Create()
         // Eventually warp driver back in
         if (m_pDriver)
             m_pDriver->WarpIntoVehicle(this, 0);
+
+        m_pVehicle->SetEngineOn(m_bEngineOn);
 
         // Warp the passengers back in
         for (unsigned int i = 0; i < 8; i++)
