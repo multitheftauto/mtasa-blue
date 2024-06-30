@@ -1615,6 +1615,9 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
                 pPed->SetHealth(fHealth);
+
+                if (pPed->IsDead() && fHealth > 0.0f)
+                    pPed->SetIsDead(false);
             }
             else
                 return false;
@@ -4955,6 +4958,7 @@ bool CStaticFunctionDefinitions::RemoveVehicleSirens(CVehicle* pVehicle)
     assert(pVehicle);
 
     pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    pVehicle->SetSirenActive(false);
     pVehicle->RemoveVehicleSirens();
 
     CBitStream BitStream;

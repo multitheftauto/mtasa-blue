@@ -73,6 +73,7 @@ private:
                    unsigned char ucGreen = 255, unsigned char ucBlue = 255);
 
     void PrintLog(const char* szText);
+    bool CheckForSufficientDebugLevel(std::uint8_t playerDebugLevel, std::uint8_t messageDebugLevel) const noexcept;
     void Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel);
 
     unsigned int                   m_uiLogFileLevel;
