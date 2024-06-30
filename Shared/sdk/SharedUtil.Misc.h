@@ -981,7 +981,7 @@ namespace SharedUtil
         class Iterator : public IteratorBase
         {
         public:
-            Iterator(CIntrusiveList<T>* pList, Node* pNode) : noexcept IteratorBase(pList, pNode) {}
+            Iterator(CIntrusiveList<T>* pList, Node* pNode) noexcept : IteratorBase(pList, pNode) {}
             bool         operator==(const Iterator& other) const noexcept { return IteratorBase::m_pNode == other.m_pNode; }
             bool         operator!=(const Iterator& other) const noexcept { return IteratorBase::m_pNode != other.m_pNode; }
             void         operator++() noexcept { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
