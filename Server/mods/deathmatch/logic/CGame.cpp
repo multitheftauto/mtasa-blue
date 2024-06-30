@@ -246,6 +246,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::WATERCREATURES] = true;
     m_WorldSpecialProps[WorldSpecialProperty::BURNFLIPPEDCARS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::FIREBALLDESTRUCT] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::EXTENDEDWATERCANNONS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::ROADSIGNSTEXT] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
@@ -1317,6 +1318,9 @@ void CGame::JoinPlayer(CPlayer& Player)
 
     marker.Set("CPlayerJoinCompletePacket");
 
+    // Sync up server info on entry
+    Player.Send(CServerInfoSyncPacket(SERVER_INFO_FLAG_ALL));
+
     // Add debug info if wanted
     if (CPerfStatDebugInfo::GetSingleton()->IsActive("PlayerInGameNotice"))
         CPerfStatDebugInfo::GetSingleton()->AddLine("PlayerInGameNotice", marker.GetString());
@@ -1643,6 +1647,9 @@ void CGame::AddBuiltInEvents()
     // Account events
     m_Events.AddEvent("onAccountDataChange", "account, key, value", NULL, false);
 
+    m_Events.AddEvent("onAccountCreate", "account", NULL, false);
+    m_Events.AddEvent("onAccountRemove", "account", NULL, false);
+
     // Other events
     m_Events.AddEvent("onSettingChange", "setting, oldValue, newValue", NULL, false);
     m_Events.AddEvent("onChatMessage", "message, element", NULL, false);
@@ -1818,8 +1825,6 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                             pPlayer->SetSerial(strSerial, 0);
                             pPlayer->SetSerial(strExtra, 1);
                             pPlayer->SetPlayerVersion(strPlayerVersion);
-
-                            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
 
                             // Check if client must update
                             if (IsBelowMinimumClient(pPlayer->GetPlayerVersion()) && !pPlayer->ShouldIgnoreMinClientVersionChecks())
@@ -2300,11 +2305,6 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         // Only every 4 packets.
         if ((pPlayer->GetPuresyncCount() % 4) == 0)
             pPlayer->Send(CReturnSyncPacket(pPlayer));
-
-        // Send a server info sync packet to the player
-        // Only every 512 packets
-        if ((pPlayer->GetPuresyncCount() % 512) == 0)
-            pPlayer->Send(CServerInfoSyncPacket(EServerInfoSyncFlag::SERVER_INFO_FLAG_MAX_PLAYERS));
 
         CLOCK("PlayerPuresync", "RelayPlayerPuresync");
         // Relay to other players
@@ -3659,6 +3659,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                             if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_JACKING)
                             {
                                 unsigned char ucDoor = Packet.GetDoor();
+                                unsigned char ucOccupiedSeat = pPed->GetOccupiedVehicleSeat();
                                 float         fAngle = Packet.GetDoorAngle();
                                 CPed*         pJacked = pVehicle->GetOccupant(0);
 
@@ -3691,6 +3692,29 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                         // Tell everyone to get the jacked person out
                                         CVehicleInOutPacket JackedReply(pJacked->GetID(), VehicleID, 0, VEHICLE_NOTIFY_OUT_RETURN);
                                         m_pPlayerManager->BroadcastOnlyJoined(JackedReply);
+
+                                        CLuaArguments Arguments;
+                                        Arguments.PushElement(pVehicle);                 // vehicle
+                                        Arguments.PushNumber(ucOccupiedSeat);            // seat
+                                        Arguments.PushElement(pPed);                     // jacker
+                                        Arguments.PushBoolean(false);                    // forcedByScript
+
+                                        if (pJacked->IsPlayer())
+                                        {
+                                            pJacked->CallEvent("onPlayerVehicleExit", Arguments);
+                                        }
+                                        else
+                                        {
+                                            pJacked->CallEvent("onPedVehicleExit", Arguments);
+                                        }
+
+                                        CLuaArguments Arguments2;
+                                        Arguments2.PushElement(pJacked);                  // jacked
+                                        Arguments2.PushNumber(ucOccupiedSeat);            // seat
+                                        Arguments2.PushElement(pPed);                     // jacker
+                                        Arguments2.PushBoolean(false);                    // forcedByScript
+
+                                        pVehicle->CallEvent("onVehicleExit", Arguments2);
 
                                         if (!sendListIncompatiblePlayers.empty())
                                         {

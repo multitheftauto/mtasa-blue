@@ -27,6 +27,7 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
+#include <game/CBuildingRemoval.h>
 #include <game/Task.h>
 
 using std::list;
@@ -562,6 +563,13 @@ bool CStaticFunctionDefinitions::GetElementBoundingBox(CClientEntity& Entity, CV
             pModelInfo = g_pGame->GetModelInfo(Object.GetModel());
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& building = static_cast<CClientBuilding&>(Entity);
+            pModelInfo = g_pGame->GetModelInfo(building.GetModel());
+            break;
+        }
+
     }
 
     if (pModelInfo)
@@ -3756,6 +3764,11 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Enti
             Ped.SetUsesCollision(bEnabled);
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            static_cast<CClientBuilding&>(Entity).SetUsesCollision(bEnabled);
+            break;
+        }
         default:
             return false;
     }
@@ -3830,13 +3843,26 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CClientEntity& Entity, CClient
 {
     RUN_CHILDREN(SetLowLodElement(**iter, pLowLodEntity))
 
-    switch (Entity.GetType())
+    eClientEntityType entityType = Entity.GetType();
+
+    if (pLowLodEntity != nullptr && entityType != pLowLodEntity->GetType())
+        return false;
+
+    switch (entityType)
     {
         case CCLIENTOBJECT:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             CClientObject* pLowLodObject = static_cast<CClientObject*>(pLowLodEntity);
             if (!Object.SetLowLodObject(pLowLodObject))
+                return false;
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            CClientBuilding* pLowLodBuilding = static_cast<CClientBuilding*>(pLowLodEntity);
+            if (!Building.SetLowLodBuilding(pLowLodBuilding))
                 return false;
             break;
         }
@@ -3859,6 +3885,12 @@ bool CStaticFunctionDefinitions::GetLowLodElement(CClientEntity& Entity, CClient
             pOutLowLodEntity = Object.GetLowLodObject();
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            pOutLowLodEntity = Building.GetLowLodBuilding();
+            break;
+        }
         default:
             return false;
     }
@@ -3876,6 +3908,12 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CClientEntity& Entity, bool& bO
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             bOutIsLowLod = Object.IsLowLod();
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            bOutIsLowLod = Building.IsLod();
             break;
         }
         default:
@@ -6681,20 +6719,20 @@ bool CStaticFunctionDefinitions::AreTrafficLightsLocked(bool& bLocked)
 bool CStaticFunctionDefinitions::RemoveWorldBuilding(unsigned short usModelToRemove, float fRadius, float fX, float fY, float fZ, char cInterior,
                                                      uint& uiOutAmount)
 {
-    g_pGame->GetWorld()->RemoveBuilding(usModelToRemove, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
+    g_pGame->GetBuildingRemoval()->RemoveBuilding(usModelToRemove, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
     return true;
 }
 
 bool CStaticFunctionDefinitions::RestoreWorldBuildings(uint& uiOutAmount)
 {
-    g_pGame->GetWorld()->ClearRemovedBuildingLists(&uiOutAmount);
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists(&uiOutAmount);
     return true;
 }
 
 bool CStaticFunctionDefinitions::RestoreWorldBuilding(unsigned short usModelToRestore, float fRadius, float fX, float fY, float fZ, char cInterior,
                                                       uint& uiOutAmount)
 {
-    return g_pGame->GetWorld()->RestoreBuilding(usModelToRestore, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
+    return g_pGame->GetBuildingRemoval()->RestoreBuilding(usModelToRestore, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
 }
 
 bool CStaticFunctionDefinitions::GetSkyGradient(unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed,
@@ -7892,6 +7930,12 @@ bool CStaticFunctionDefinitions::FxAddBulletSplash(CVector& vecPosition)
 bool CStaticFunctionDefinitions::FxAddFootSplash(CVector& vecPosition)
 {
     g_pGame->GetFx()->TriggerFootSplash(vecPosition);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::FxCreateParticle(eFxParticleSystems eFxParticle, CVector& vecPosition, CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
+{
+    g_pGame->GetFx()->AddParticle(eFxParticle, vecPosition, vecDirection, fR, fG, fB, fA, bRandomizeColors, iCount, fBrightness, fSize, bRandomizeSizes, fLife);
     return true;
 }
 

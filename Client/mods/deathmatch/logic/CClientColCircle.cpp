@@ -79,7 +79,7 @@ void CClientColCircle::DebugRender(const CVector& vecPosition, float fDrawRadius
             {
                 CVector vecBegin = vertexList[i] * vecMult + vecAdd;
                 CVector vecEnd = vertexList[(i + 1) % uiNumPoints] * vecMult + vecAdd;
-                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+                pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
             }
         }
     }
@@ -94,7 +94,7 @@ void CClientColCircle::DebugRender(const CVector& vecPosition, float fDrawRadius
         {
             CVector vecBegin = vertexList[i] * vecMultB + vecAdd;
             CVector vecEnd = vertexList[i] * vecMultT + vecAdd;
-            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, false);
+            pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
         }
     }
 }

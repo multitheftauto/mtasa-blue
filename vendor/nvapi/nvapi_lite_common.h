@@ -70,7 +70,7 @@ typedef signed long        NvS32; /* -2147483648 to 2147483647  */
 typedef signed int         NvS32; /* -2147483648 to 2147483647 */  
 #endif
 
-#ifndef __unix
+#if !(NVOS_IS_UNIX ||  (defined(__unix)))
 // mac os 32-bit still needs this
 #if ( (defined(macintosh) && defined(__LP64__) && (__NVAPI_RESERVED0__)) || \
       (!defined(macintosh) && defined(__NVAPI_RESERVED0__)) ) 
@@ -409,6 +409,7 @@ typedef enum _NvAPI_Status
     NVAPI_NOT_PERMITTED                         = -240,    //!< Attempted operation is not permitted.
     NVAPI_CALLBACK_ALREADY_REGISTERED           = -241,    //!< The callback function has already been registered.
     NVAPI_CALLBACK_NOT_FOUND                    = -242,    //!< The callback function is not found or not registered.
+    NVAPI_INVALID_OUTPUT_WIRE_FORMAT            = -243,    //!< Invalid Wire Format for the VR HMD
 } NvAPI_Status;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -527,10 +528,14 @@ NVAPI_INTERFACE NvAPI_GPU_GetMemoryInfo(NvPhysicalGpuHandle hPhysicalGpu, NV_DIS
 typedef struct
 {
     NvU32   version;                           //!< Structure version
-    NvU64   dedicatedVideoMemory;              //!< Size(in bytes) of the physical framebuffer.
+    NvU64   dedicatedVideoMemory;              //!< Size(in bytes) of the physical framebuffer. Refers to the dedicated video memory on discrete GPUs.
+                                               //!  It is more performant for GPU operations than the reserved systemVideoMemory.
     NvU64   availableDedicatedVideoMemory;     //!< Size(in bytes) of the available physical framebuffer for allocating video memory surfaces.
-    NvU64   systemVideoMemory;                 //!< Size(in bytes) of system memory the driver allocates at load time.
+    NvU64   systemVideoMemory;                 //!< Size(in bytes) of system memory the driver allocates at load time. It is a substitute for dedicated video memory.
+                                               //!< Typically used with integrated GPUs that do not have dedicated video memory.
     NvU64   sharedSystemMemory;                //!< Size(in bytes) of shared system memory that driver is allowed to commit for surfaces across all allocations.
+                                               //!< On discrete GPUs, it is used to utilize system memory for various operations. It does not need to be reserved during boot.
+                                               //!< It may be used by both GPU and CPU, and has an “on-demand” type of usage.
     NvU64   curAvailableDedicatedVideoMemory;  //!< Size(in bytes) of the current available physical framebuffer for allocating video memory surfaces.
     NvU64   dedicatedVideoMemoryEvictionsSize; //!< Size(in bytes) of the total size of memory released as a result of the evictions.
     NvU64   dedicatedVideoMemoryEvictionCount; //!< Indicates the number of eviction events that caused an allocation to be removed from dedicated video memory to free GPU
@@ -562,6 +567,8 @@ typedef NV_GPU_MEMORY_INFO_EX_V1 NV_GPU_MEMORY_INFO_EX;
 //!
 //!
 //! TCC_SUPPORTED
+//!
+//! MCDM_SUPPORTED
 //!
 //! \since Release: 520
 //!

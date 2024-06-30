@@ -1669,6 +1669,9 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
                 pPed->SetHealth(fHealth);
+
+                if (pPed->IsDead() && fHealth > 0.0f)
+                    pPed->SetIsDead(false);
             }
             else
                 return false;
@@ -4871,7 +4874,7 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
 }
 
 CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
-                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
+                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool bSynced)
 {
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
@@ -4890,6 +4893,7 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
         pVehicle->SetRotationDegrees(vecRotation);
         pVehicle->SetRespawnPosition(vecPosition);
         pVehicle->SetRespawnRotationDegrees(vecRotation);
+        pVehicle->SetUnoccupiedSyncable(bSynced);
 
         if (szRegPlate && szRegPlate[0])
             pVehicle->SetRegPlate(szRegPlate);
@@ -8250,6 +8254,27 @@ bool CStaticFunctionDefinitions::StopObject(CElement* pElement)
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::BreakObject(CElement* pElement)
+{
+    RUN_CHILDREN(BreakObject(*iter));
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+
+    if (!pObject)
+        return false;
+
+    if (!pObject->IsBreakable())
+        return false;
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, BREAK_OBJECT, *BitStream.pBitStream));
+    
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(CElement* pElement, bool bVisible, unsigned short usNewDimension)

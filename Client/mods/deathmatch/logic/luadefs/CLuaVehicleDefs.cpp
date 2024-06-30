@@ -120,6 +120,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleAdjustableProperty", SetVehicleAdjustableProperty},
         {"setHelicopterRotorSpeed", SetHelicopterRotorSpeed},
         {"setVehicleRotorSpeed", ArgumentParser<SetVehicleRotorSpeed>},
+        {"setVehicleWheelsRotation", ArgumentParser<SetVehicleWheelsRotation>},
         {"setTrainDerailed", SetTrainDerailed},
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
@@ -2220,6 +2221,11 @@ int CLuaVehicleDefs::SetHelicopterRotorSpeed(lua_State* luaVM)
 bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed)
 {
     return pVehicle->SetRotorSpeed(fSpeed);
+}
+
+bool CLuaVehicleDefs::SetVehicleWheelsRotation(CClientVehicle* pVehicle, float fRotation) noexcept
+{
+    return pVehicle->SetWheelsRotation(fRotation, fRotation, fRotation, fRotation);
 }
 
 int CLuaVehicleDefs::SetTrainDerailed(lua_State* luaVM)

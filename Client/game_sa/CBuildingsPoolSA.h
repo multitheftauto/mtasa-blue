@@ -9,6 +9,8 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 #include <game/CBuildingsPool.h>
 #include <CVector.h>
 #include "CPoolSAInterface.h"
@@ -24,15 +26,22 @@ public:
     void       RemoveBuilding(CBuilding* pBuilding);
     bool       HasFreeBuildingSlot();
 
-    void RemoveAllBuildings();
-    void RestoreAllBuildings();
+    void RemoveAllBuildings() override;
+    void RestoreAllBuildings() override;
+    bool Resize(int size) override;
+    int  GetSize() const override { return (*m_ppBuildingPoolInterface)->m_nSize; };
 
 private:
-    bool  AddBuildingToPool(CClientBuilding* pClientBuilding, CBuildingSA* pBuilding);
+    void RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding);
+    bool AddBuildingToPool(CClientBuilding* pClientBuilding, CBuildingSA* pBuilding);
+    void UpdateIplEntrysPointers(uint32_t offset);
+    void UpdateBackupLodPointers(uint32_t offset);
+    void RemoveVehicleDamageLinks();
+    void RemovePedsContactEnityLinks();
 
 private:
-    SPoolData<CBuildingSA, CBuildingSAInterface, MAX_BUILDINGS> m_buildingPool;
-    CPoolSAInterface<CBuildingSAInterface>**         m_ppBuildingPoolInterface;
+    SVectorPoolData<CBuildingSA> m_buildingPool{MAX_BUILDINGS};
+    CPoolSAInterface<CBuildingSAInterface>**           m_ppBuildingPoolInterface;
 
     std::unique_ptr<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>> m_pOriginalBuildingsBackup;
 };

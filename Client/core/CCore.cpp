@@ -1787,6 +1787,19 @@ void CCore::UpdateRecentlyPlayed()
     CCore::GetSingleton().SaveConfig();
 }
 
+void CCore::OnPostColorFilterRender()
+{
+    if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
+        return;
+    
+    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
+    CGraphics::GetSingleton().DrawLine3DPostFXQueue();
+
+    CGraphics::GetSingleton().LeavingMTARenderZone();
+}
+
 void CCore::ApplyCoreInitSettings()
 {
 #if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN) // Windows Vista
@@ -2010,9 +2023,7 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    IDirect3DDevice9* pDevice = CGraphics::GetSingleton().GetDevice();
-
-    CGraphics::GetSingleton().EnteringMTARenderZone();
+    CGraphics::GetSingleton().EnteringMTARenderZone();    
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
