@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
+
 using std::list;
 
 void CLuaResourceDefs::LoadFunctions()
@@ -18,7 +20,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"call", Call},
         {"getThisResource", GetThisResource},
         {"getResourceConfig", GetResourceConfig},
-        {"getResourceName", GetResourceName},
+        {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceFromName", GetResourceFromName},
         {"getResourceRootElement", GetResourceRootElement},
         {"getResourceGUIElement", GetResourceGUIElement},
@@ -220,34 +222,24 @@ int CLuaResourceDefs::GetResourceConfig(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::GetResourceName(lua_State* luaVM)
+std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    // Verify arguments
-    CResource*       pResource = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
-
-    if (!argStream.HasErrors())
+    if (resourceElement && resourceElement.has_value())
     {
-        if (pResource)
-        {
-            // Grab its name and return it
-            const char* szName = pResource->GetName();
-            if (szName)
-            {
-                lua_pushstring(luaVM, szName);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogBadPointer(luaVM, "resource", 1);
+        return (*resourceElement)->GetName();
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    if (!localVM)
+        throw std::invalid_argument("Couldn't find the virtual machine");
+
+    CResource* localResource = localVM->GetResource();
+
+    if (!localResource)
+        throw std::invalid_argument("Couldn't find the resource");
+
+    return localResource->GetName();
 }
 
 int CLuaResourceDefs::GetResourceFromName(lua_State* luaVM)

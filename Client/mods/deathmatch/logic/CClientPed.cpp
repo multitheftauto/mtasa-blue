@@ -3819,6 +3819,10 @@ void CClientPed::_ChangeModel()
             SetStat(23, 0.0f);
         }
 
+        // Store attached satchels
+        std::vector<SSatchelsData> attachedSatchels;
+        m_pPlayerPed->GetAttachedSatchels(attachedSatchels);
+
         if (m_bIsLocalPlayer)
         {
             // TODO: Create a simple function to save and restore player states and use it
@@ -3931,6 +3935,19 @@ void CClientPed::_ChangeModel()
 
             // Create the new with the new skin
             _CreateModel();
+        }
+
+        // ReAttach satchels
+        CClientProjectileManager* pProjectileManager = m_pManager->GetProjectileManager();
+
+        for (const SSatchelsData& satchelData : attachedSatchels)
+        {
+            CClientProjectile* pSatchel = pProjectileManager->Get((CEntitySAInterface*)satchelData.pProjectileInterface);
+            if (!pSatchel || pSatchel->IsBeingDeleted())
+                continue;
+
+            pSatchel->SetAttachedOffsets(*satchelData.vecAttachedOffsets, *satchelData.vecAttachedRotation);
+            pSatchel->InternalAttachTo(this);
         }
 
         g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter(true);
@@ -5156,6 +5173,8 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             float         fTargetRotation = m_pPlayerPed->GetTargetRotation();
             unsigned char ucInterior = GetInterior();
             unsigned char ucCameraInterior = static_cast<unsigned char>(g_pGame->GetWorld()->GetCurrentArea());
+            bool          bOldNightVision = g_pMultiplayer->IsNightVisionEnabled();
+            bool          bOldThermalVision = g_pMultiplayer->IsThermalVisionEnabled();
 
             // Don't allow any camera movement if we're in fixed mode
             if (m_pManager->GetCamera()->IsInFixedMode())
@@ -5165,6 +5184,9 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             SetPosition(*pvecPosition);
 
             m_pPlayerPed->SetLanding(false);
+
+            // Set it to 0 (Fix #501)
+            SetCurrentWeaponSlot(eWeaponSlot::WEAPONSLOT_TYPE_UNARMED);
 
             if (bRestoreState)
             {
@@ -5180,6 +5202,10 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             }
             // Restore the camera's interior whether we're restoring player states or not
             g_pGame->GetWorld()->SetCurrentArea(ucCameraInterior);
+
+            // Reset goggle effect 
+            g_pMultiplayer->SetNightVisionEnabled(bOldNightVision, false);
+            g_pMultiplayer->SetThermalVisionEnabled(bOldThermalVision, false);
 
             // Reattach us
             if (pAttachedTo && pAttachedTo->IsEntityAttached(this))

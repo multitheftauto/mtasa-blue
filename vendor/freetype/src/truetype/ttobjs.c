@@ -4,7 +4,7 @@
  *
  *   Objects manager (body).
  *
- * Copyright (C) 1996-2023 by
+ * Copyright (C) 1996-2024 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -115,7 +115,7 @@
   FT_LOCAL_DEF( FT_Error )
   tt_glyphzone_new( FT_Memory     memory,
                     FT_UShort     maxPoints,
-                    FT_Short      maxContours,
+                    FT_UShort     maxContours,
                     TT_GlyphZone  zone )
   {
     FT_Error  error;
@@ -152,18 +152,20 @@
   static const FT_String*
   tt_skip_pdffont_random_tag( const FT_String*  name )
   {
-    unsigned int  i;
+    if ( ft_isupper( name[0] ) &&
+         ft_isupper( name[1] ) &&
+         ft_isupper( name[2] ) &&
+         ft_isupper( name[3] ) &&
+         ft_isupper( name[4] ) &&
+         ft_isupper( name[5] ) &&
+              '+' == name[6]   &&
+                     name[7]   )
+    {
+      FT_TRACE7(( "name without randomization tag: %s\n", name + 7 ));
+      return name + 7;
+    }
 
-
-    if ( ft_strlen( name ) < 8 || name[6] != '+' )
-      return name;
-
-    for ( i = 0; i < 6; i++ )
-      if ( !ft_isupper( name[i] ) )
-        return name;
-
-    FT_TRACE7(( "name without randomization tag: %s\n", name + 7 ));
-    return name + 7;
+    return name;
   }
 
 
@@ -254,17 +256,20 @@
   {
     FT_Error   error;
     FT_UInt32  checksum = 0;
-    FT_UInt    i;
+    FT_Byte*   p;
+    FT_Int     shift;
 
 
     if ( FT_FRAME_ENTER( length ) )
       return 0;
 
-    for ( ; length > 3; length -= 4 )
-      checksum += (FT_UInt32)FT_GET_ULONG();
+    p = (FT_Byte*)stream->cursor;
 
-    for ( i = 3; length > 0; length--, i-- )
-      checksum += (FT_UInt32)FT_GET_BYTE() << ( i * 8 );
+    for ( ; length > 3; length -= 4 )
+      checksum += FT_NEXT_ULONG( p );
+
+    for ( shift = 24; length > 0; length--, shift -=8 )
+      checksum += (FT_UInt32)FT_NEXT_BYTE( p ) << shift;
 
     FT_FRAME_EXIT();
 
@@ -782,8 +787,7 @@
       FT_UInt  instance_index = (FT_UInt)face_index >> 16;
 
 
-      if ( FT_HAS_MULTIPLE_MASTERS( ttface ) &&
-           instance_index > 0                )
+      if ( FT_HAS_MULTIPLE_MASTERS( ttface ) )
       {
         error = FT_Set_Named_Instance( ttface, instance_index );
         if ( error )
