@@ -5227,6 +5227,8 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             float         fTargetRotation = m_pPlayerPed->GetTargetRotation();
             unsigned char ucInterior = GetInterior();
             unsigned char ucCameraInterior = static_cast<unsigned char>(g_pGame->GetWorld()->GetCurrentArea());
+            bool          bOldNightVision = g_pMultiplayer->IsNightVisionEnabled();
+            bool          bOldThermalVision = g_pMultiplayer->IsThermalVisionEnabled();
 
             // Don't allow any camera movement if we're in fixed mode
             if (m_pManager->GetCamera()->IsInFixedMode())
@@ -5254,6 +5256,10 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             }
             // Restore the camera's interior whether we're restoring player states or not
             g_pGame->GetWorld()->SetCurrentArea(ucCameraInterior);
+
+            // Reset goggle effect 
+            g_pMultiplayer->SetNightVisionEnabled(bOldNightVision, false);
+            g_pMultiplayer->SetThermalVisionEnabled(bOldThermalVision, false);
 
             // Reattach us
             if (pAttachedTo && pAttachedTo->IsEntityAttached(this))
