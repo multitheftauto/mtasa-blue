@@ -170,6 +170,9 @@ void CLuaMain::InitVM()
     lua_pushelement(m_luaVM, m_pResource->GetResourceEntity());
     lua_setglobal(m_luaVM, "resourceRoot");
 
+    lua_pushstring(m_luaVM, m_pResource->GetName());
+    lua_setglobal(m_luaVM, "resourceName");
+
     lua_pushelement(m_luaVM, m_pResource->GetResourceGUIEntity());
     lua_setglobal(m_luaVM, "guiRoot");
 
