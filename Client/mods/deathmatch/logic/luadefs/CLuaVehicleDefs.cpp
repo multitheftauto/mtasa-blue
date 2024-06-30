@@ -91,6 +91,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleWheelScale", ArgumentParser<GetVehicleWheelScale>},
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
+        {"getVehicleEntryPoints", ArgumentParser<GetVehicleEntryPoints>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -241,6 +242,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getWheelScale", "getVehicleWheelScale");
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
     lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
+    lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<OOP_GetVehicleEntryPoints>);
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -4173,4 +4175,44 @@ bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)
 bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion)
 {
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
+}
+
+std::variant<bool, std::array<std::array<float, 3>, 4>> CLuaVehicleDefs::GetVehicleEntryPoints(CClientVehicle* vehicle)
+{
+    auto entryPointVectors = OOP_GetVehicleEntryPoints(vehicle);
+
+    if (std::holds_alternative<bool>(entryPointVectors))
+    {
+        return false;
+    }
+
+    std::array<std::array<float, 3>, 4> entryPoints;
+    std::array<CVector, 4>              vectorArray = std::get<std::array<CVector, 4>>(entryPointVectors);
+
+    std::uint32_t i = 0;
+    for (auto& entryPoint : entryPoints)
+    {
+        entryPoints[i] = {vectorArray[i].fX, vectorArray[i].fY, vectorArray[i].fZ};
+        i++;
+    }
+
+    return entryPoints;
+}
+
+std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryPoints(CClientVehicle* vehicle)
+{
+    if (CClientVehicleManager::GetMaxPassengerCount(vehicle->GetModel()) == 255)
+    {
+        return false;
+    }
+
+    std::array<CVector, 4> entryPoints;
+
+    std::uint32_t i = 0;
+    for (auto& entryPoint : entryPoints)
+    {
+        entryPoint = vehicle->GetEntryPoint(i++);
+    }
+
+    return entryPoints;
 }
