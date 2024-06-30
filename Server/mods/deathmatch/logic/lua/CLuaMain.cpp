@@ -205,7 +205,7 @@ void CLuaMain::Initialize()
     // Set the instruction count hook
     lua_sethook(m_luaVM, InstructionCountHook, LUA_MASKCOUNT, HOOK_INSTRUCTION_COUNT);
 
-    // Load LUA libraries
+    // Load Lua libraries
     luaopen_base(m_luaVM);
     luaopen_math(m_luaVM);
     luaopen_string(m_luaVM);
@@ -213,6 +213,7 @@ void CLuaMain::Initialize()
     luaopen_debug(m_luaVM);
     luaopen_utf8(m_luaVM);
     luaopen_os(m_luaVM);
+    luaopen_vec(m_luaVM);
 
     // Initialize security restrictions. Very important to prevent lua trojans and viruses!
     InitSecurity();
