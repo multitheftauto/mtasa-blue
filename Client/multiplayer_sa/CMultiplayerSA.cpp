@@ -1690,8 +1690,8 @@ void CMultiplayerSA::GetColorFilter(DWORD& dwPass0Color, DWORD& dwPass1Color, bo
     if (bUseTimeCycle || isOriginal){ //If we are using color filter from time cycle or we specified color filter from time cycle
         SColorRGBA pass0SColor(*(float*)0xB7C518, *(float*)0xB7C51C, *(float*)0xB7C520, *(float*)0xB7C524);
         SColorRGBA pass1SColor(*(float*)0xB7C528, *(float*)0xB7C52C, *(float*)0xB7C530, *(float*)0xB7C534);
-        dwPass0Color = pass0SColor.ulARGB;
-        dwPass1Color = pass1SColor.ulARGB;
+        dwPass0Color = pass0SColor.GetARGB();
+        dwPass1Color = pass1SColor.GetARGB();
     }
     else
     {

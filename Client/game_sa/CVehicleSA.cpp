@@ -872,7 +872,7 @@ void CVehicleSA::SetColor(SharedUtil::SColor color1, SharedUtil::SColor color2, 
             || color == 0x00FFC8             //   0, 255, 200
             || color == 0xFF3C00             // 255,  60,   0
             || color == 0x3CFF00)            //  60, 255,   0
-            m_RGBColorsFixed[i].ulARGB |= 0x010101;
+            m_RGBColorsFixed[i].GetARGB() |= 0x010101;
     }
 }
 

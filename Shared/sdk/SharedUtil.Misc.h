@@ -207,10 +207,10 @@ namespace SharedUtil
         float  fAvgTimeSeconds = 5.0f;
     };
     DWORD _GetCurrentProcessorNumber();
-    void  GetThreadCPUTimes(uint64& outUserTime, uint64& outKernelTime);
+    void  GetThreadCPUTimes(std::uint64_t& outUserTime, std::uint64_t& outKernelTime);
     void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, std::int64_t* pllTickCount = nullptr);
 
-    SString EscapeString(const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', uchar ucLowerLimit = 0, uchar ucUpperLimit = 255);
+    SString EscapeString(const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', std::uint8_t ucLowerLimit = 0, std::uint8_t ucUpperLimit = 255);
     SString UnescapeString(const SString& strText, char cSpecialChar = '#');
     SString EscapeURLArgument(const SString& strText);
 
@@ -289,13 +289,13 @@ namespace SharedUtil
     }
 
     template <class T>
-    int Round(T value) noexcept
+    int Round(const T value) noexcept
     {
         return static_cast<int>(std::floor(value + 0.5f));
     }
 
     template <class T>
-    T WrapAround(T fLow, T fValue, T fHigh) noexcept
+    T WrapAround(const T fLow, const T fValue, const T fHigh) noexcept
     {
         const T fSize = fHigh - fLow;
         return fValue - (fSize * std::floor((fValue - fLow) / fSize));
@@ -437,12 +437,21 @@ namespace SharedUtil
         std::uint8_t B;
 
         constexpr SColor() noexcept : A(0), R(0), G(0), B(0) {}
-        constexpr SColor(std::uint32_t value) noexcept : A(value & 0xFF000000), R(value & 0xFF0000), G(value & 0xFF00), B(value & 0xFF) {}
+        constexpr SColor(std::uint32_t value) noexcept : A((value & 0xFF000000) >> 24), R((value & 0xFF0000) >> 16), G((value & 0xFF00) >> 8), B(value & 0xFF)
+        {}
         constexpr SColor(std::uint8_t a, std::uint8_t r, std::uint8_t g, std::uint8_t b) noexcept : A(a), R(r), G(g), B(b) {}
 
-        constexpr operator std::uint32_t() const noexcept {
-            return A << 24 | R << 16 | G << 8 | B;
+        constexpr std::uint32_t GetARGB() const noexcept {
+            return A << 24 | R << 16 | G << 8 | B; }
+
+        constexpr void SetARGB(std::uint32_t argb) noexcept {
+            A = static_cast<std::uint8_t>((argb & 0xFF000000) >> 24);
+            R = static_cast<std::uint8_t>((argb & 0x00FF0000) >> 16);
+            G = static_cast<std::uint8_t>((argb & 0x0000FF00) >> 8);
+            B = static_cast<std::uint8_t>(argb & 0x000000FF);
         }
+
+        constexpr operator std::uint32_t() const noexcept { return GetARGB(); }
     };
 
     //
@@ -515,7 +524,8 @@ namespace SharedUtil
         CAutoCSLock& operator=(const CAutoCSLock&);
 
     public:
-        CAutoCSLock(CCriticalSection& criticalSection) noexcept : m_CS(criticalSection) { m_CS.Lock(); }
+        CAutoCSLock(CCriticalSection& criticalSection) noexcept
+            : m_CS(criticalSection) { m_CS.Lock(); }
 
         ~CAutoCSLock() noexcept { m_CS.Unlock(); }
 
@@ -546,7 +556,7 @@ namespace SharedUtil
     //
     // Note: IDs run from 1 to Capacity
     //
-    template <typename T, std::uint32_t INITIAL_MAX_STACK_SIZE>
+    template <typename T, std::size_t INITIAL_MAX_STACK_SIZE>
     class CStack
     {
     public:
@@ -556,20 +566,20 @@ namespace SharedUtil
             ExpandBy(INITIAL_MAX_STACK_SIZE - 1);
         }
 
-        std::uint32_t GetCapacity() const noexcept { return m_ulCapacity; }
-        std::uint32_t GetUnusedAmount() const noexcept { return m_Queue.size(); }
+        std::size_t GetCapacity() const noexcept { return m_ulCapacity; }
+        std::size_t GetUnusedAmount() const noexcept { return m_Queue.size(); }
 
-        void ExpandBy(std::uint32_t amount)
+        void ExpandBy(std::size_t amount)
         {
-            const std::uint32_t ulOldSize = m_ulCapacity;
-            const std::uint32_t ulNewSize = m_ulCapacity + amount;
+            const auto oldSize = m_ulCapacity;
+            const auto newSize = m_ulCapacity + amount;
 
             // Add ID's for new items
-            for (T ID = ulOldSize + 1; ID <= ulNewSize; ++ID)
+            for (T ID = oldSize + 1; ID <= newSize; ++ID)
             {
                 m_Queue.push_front(ID);
             }
-            m_ulCapacity = ulNewSize;
+            m_ulCapacity = newSize;
         }
 
         bool Pop(T& dest)
@@ -599,9 +609,10 @@ namespace SharedUtil
     //
     // Fixed sized string buffer
     //
-    template <size_t MAX_LENGTH>
+    template <std::size_t MAX_LENGTH>
     class SFixedString
     {
+        std::size_t m_length{ 0 };
         char szData[MAX_LENGTH + 1];
 
     public:
@@ -611,6 +622,7 @@ namespace SharedUtil
         constexpr SFixedString& Assign(const char* szOther, std::size_t len) noexcept 
         {
             STRNCPY(szData, szOther, len + 1);
+            for (m_length = 0; m_length < len; m_length++);
             return *this;
         }
 
@@ -635,15 +647,18 @@ namespace SharedUtil
         constexpr char* Data() noexcept { return &szData[0]; }
 
         constexpr std::size_t GetMaxLength() const noexcept { return MAX_LENGTH; }
-        std::size_t           GetLength() const noexcept { return strlen(szData); }
+        constexpr std::size_t GetLength() const noexcept { return m_length; }
 
         // Shake it all about
         void           Encrypt();
-        constexpr bool Empty() const noexcept { return szData[0] == 0; }
-        constexpr void Clear() noexcept { szData[0] = 0; }
+        constexpr bool Empty() const noexcept { return m_length <= 0; }
+        constexpr void Clear() noexcept {
+            for (auto i = 0; i < m_length; i++)
+                szData[i] = 0;
+        }
 
         // Returns a pointer to a null-terminated character array
-        const char* c_str() const noexcept { return &szData[0]; }
+        constexpr const char* c_str() const noexcept { return &szData[0]; }
     };
 
     ///////////////////////////////////////////////////////////////
@@ -935,11 +950,11 @@ namespace SharedUtil
         class IteratorBase;
 
     protected:
-        typedef CIntrusiveListNode<T> Node;
+        using Node = CIntrusiveListNode<T>;
 
-        size_t m_Size;
-        Node*  m_pFirst;
-        Node*  m_pLast;
+        std::size_t m_Size;
+        Node* m_pFirst;
+        Node* m_pLast;
         Node T::*                  m_pNodePtr;                   // Pointer to the CIntrusiveListNode member variable in T
         std::vector<IteratorBase*> m_ActiveIterators;            // Keep track of iterators
 
@@ -954,9 +969,9 @@ namespace SharedUtil
 
         public:
             Node* m_pNode;
-            IteratorBase(CIntrusiveList<T>* pList, Node* pNode) : m_pList(pList), m_pNode(pNode) { m_pList->m_ActiveIterators.push_back(this); }
-            ~IteratorBase() { ListRemoveAll(m_pList->m_ActiveIterators, this); }
-            T*           operator*() { return m_pNode->m_pOuterItem; }
+            IteratorBase(CIntrusiveList<T>* pList, Node* pNode) noexcept : m_pList(pList), m_pNode(pNode) { m_pList->m_ActiveIterators.push_back(this); }
+            ~IteratorBase() noexcept { ListRemoveAll(m_pList->m_ActiveIterators, this); }
+            T*           operator*() noexcept { return m_pNode->m_pOuterItem; }
             virtual void NotifyRemovingNode(Node* pNode) = 0;
         };
 
@@ -966,12 +981,12 @@ namespace SharedUtil
         class Iterator : public IteratorBase
         {
         public:
-            Iterator(CIntrusiveList<T>* pList, Node* pNode) : IteratorBase(pList, pNode) {}
-            bool         operator==(const Iterator& other) const { return IteratorBase::m_pNode == other.m_pNode; }
-            bool         operator!=(const Iterator& other) const { return IteratorBase::m_pNode != other.m_pNode; }
-            void         operator++() { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
-            void         operator++(int) { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
-            virtual void NotifyRemovingNode(Node* pNode)
+            Iterator(CIntrusiveList<T>* pList, Node* pNode) : noexcept IteratorBase(pList, pNode) {}
+            bool         operator==(const Iterator& other) const noexcept { return IteratorBase::m_pNode == other.m_pNode; }
+            bool         operator!=(const Iterator& other) const noexcept { return IteratorBase::m_pNode != other.m_pNode; }
+            void         operator++() noexcept { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
+            void         operator++(int) noexcept { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext; }
+            virtual void NotifyRemovingNode(Node* pNode) noexcept 
             {
                 if (IteratorBase::m_pNode == pNode)
                     IteratorBase::m_pNode = IteratorBase::m_pNode->m_pNext;
@@ -984,12 +999,12 @@ namespace SharedUtil
         class ReverseIterator : public IteratorBase
         {
         public:
-            ReverseIterator(CIntrusiveList<T>* pList, Node* pNode) : IteratorBase(pList, pNode) {}
-            bool         operator==(const ReverseIterator& other) const { return IteratorBase::m_pNode == other.m_pNode; }
-            bool         operator!=(const ReverseIterator& other) const { return IteratorBase::m_pNode != other.m_pNode; }
-            void         operator++() { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
-            void         operator++(int) { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
-            virtual void NotifyRemovingNode(Node* pNode)
+            ReverseIterator(CIntrusiveList<T>* pList, Node* pNode) noexcept : IteratorBase(pList, pNode) {}
+            bool         operator==(const ReverseIterator& other) const noexcept { return IteratorBase::m_pNode == other.m_pNode; }
+            bool         operator!=(const ReverseIterator& other) const noexcept { return IteratorBase::m_pNode != other.m_pNode; }
+            void         operator++() noexcept { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
+            void         operator++(int) noexcept { IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev; }
+            virtual void NotifyRemovingNode(Node* pNode) noexcept
             {
                 if (IteratorBase::m_pNode == pNode)
                     IteratorBase::m_pNode = IteratorBase::m_pNode->m_pPrev;
@@ -999,7 +1014,7 @@ namespace SharedUtil
         //
         // Constructor
         //
-        CIntrusiveList(Node T::*pNodePtr) : m_pNodePtr(pNodePtr)
+        CIntrusiveList(Node T::*pNodePtr) noexcept : m_pNodePtr(pNodePtr)
         {
             assert(m_pNodePtr);            // This must be set upon construction
             m_Size = 0;
@@ -1007,11 +1022,11 @@ namespace SharedUtil
             m_pLast = nullptr;
         }
 
-        ~CIntrusiveList() { assert(m_ActiveIterators.empty()); }
+        ~CIntrusiveList() noexcept { assert(m_ActiveIterators.empty()); }
 
-        bool empty() const { return m_Size == 0; }
+        bool empty() const noexcept { return m_Size == 0; }
 
-        size_t size() const { return m_Size; }
+        size_t size() const noexcept { return m_Size; }
 
         //
         // Check if list contains item
@@ -1117,19 +1132,17 @@ namespace SharedUtil
             m_Size++;
         }
 
-        Iterator begin() { return Iterator(this, m_pFirst); }
+        Iterator begin() noexcept { return Iterator(this, m_pFirst); }
+        Iterator end() noexcept { return Iterator(this, nullptr); }
 
-        Iterator end() { return Iterator(this, nullptr); }
-
-        ReverseIterator rbegin() { return ReverseIterator(this, m_pLast); }
-
-        ReverseIterator rend() { return ReverseIterator(this, nullptr); }
+        ReverseIterator rbegin() noexcept { return ReverseIterator(this, m_pLast); }
+        ReverseIterator rend() noexcept { return ReverseIterator(this, nullptr); }
 
         // Allow use of std iterator names
-        typedef Iterator        iterator;
-        typedef Iterator        const_iterator;            // TODO
-        typedef ReverseIterator reverse_iterator;
-        typedef ReverseIterator const_reverse_iterator;            // TODO
+        using iterator = Iterator;
+        using const_iterator = Iterator; // TODO
+        using reverse_iterator = ReverseIterator;
+        using const_reverse_iterator = ReverseIterator; // TODO
     };
 
     ///////////////////////////////////////////////////////////////
@@ -1143,14 +1156,14 @@ namespace SharedUtil
     class CIntrusiveListExt : public CIntrusiveList<T>
     {
     public:
-        CIntrusiveListExt() : CIntrusiveList<T>(member_ptr) {}
+        CIntrusiveListExt() noexcept : CIntrusiveList<T>(member_ptr) {}
     };
 
     //
     // tolower / toupper
     // Implemented here so it can be inlined.
     //
-    static const char ms_ucTolowerTab[256] = {
+    static constexpr const char ms_ucTolowerTab[256] = {
         '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f', '\x10', '\x11', '\x12',
         '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f', '\x20', '\x21', '\x22', '\x23', '\x24', '\x25',
         '\x26', '\x27', '\x28', '\x29', '\x2a', '\x2b', '\x2c', '\x2d', '\x2e', '\x2f', '\x30', '\x31', '\x32', '\x33', '\x34', '\x35', '\x36', '\x37', '\x38',
@@ -1165,7 +1178,7 @@ namespace SharedUtil
         '\xd1', '\xd2', '\xd3', '\xd4', '\xd5', '\xd6', '\xd7', '\xd8', '\xd9', '\xda', '\xdb', '\xdc', '\xdd', '\xde', '\xdf', '\xe0', '\xe1', '\xe2', '\xe3',
         '\xe4', '\xe5', '\xe6', '\xe7', '\xe8', '\xe9', '\xea', '\xeb', '\xec', '\xed', '\xee', '\xef', '\xf0', '\xf1', '\xf2', '\xf3', '\xf4', '\xf5', '\xf6',
         '\xf7', '\xf8', '\xf9', '\xfa', '\xfb', '\xfc', '\xfd', '\xfe', '\xff'};
-    static const char ms_ucToupperTab[256] = {
+    static constexpr const char ms_ucToupperTab[256] = {
         '\x00', '\x01', '\x02', '\x03', '\x04', '\x05', '\x06', '\x07', '\x08', '\x09', '\x0a', '\x0b', '\x0c', '\x0d', '\x0e', '\x0f', '\x10', '\x11', '\x12',
         '\x13', '\x14', '\x15', '\x16', '\x17', '\x18', '\x19', '\x1a', '\x1b', '\x1c', '\x1d', '\x1e', '\x1f', '\x20', '\x21', '\x22', '\x23', '\x24', '\x25',
         '\x26', '\x27', '\x28', '\x29', '\x2a', '\x2b', '\x2c', '\x2d', '\x2e', '\x2f', '\x30', '\x31', '\x32', '\x33', '\x34', '\x35', '\x36', '\x37', '\x38',
@@ -1180,13 +1193,14 @@ namespace SharedUtil
         '\xd1', '\xd2', '\xd3', '\xd4', '\xd5', '\xd6', '\xd7', '\xd8', '\xd9', '\xda', '\xdb', '\xdc', '\xdd', '\xde', '\xdf', '\xe0', '\xe1', '\xe2', '\xe3',
         '\xe4', '\xe5', '\xe6', '\xe7', '\xe8', '\xe9', '\xea', '\xeb', '\xec', '\xed', '\xee', '\xef', '\xf0', '\xf1', '\xf2', '\xf3', '\xf4', '\xf5', '\xf6',
         '\xf7', '\xf8', '\xf9', '\xfa', '\xfb', '\xfc', '\xfd', '\xfe', '\xff'};
+
     template <typename T>
-    inline T tolower(T c)
+    constexpr T tolower(T c) noexcept
     {
         return static_cast<T>(ms_ucTolowerTab[static_cast<std::uint8_t>(c)]);
     }
     template <typename T>
-    inline T toupper(T c)
+    constexpr T toupper(T c) noexcept
     {
         return static_cast<T>(ms_ucToupperTab[static_cast<std::uint8_t>(c)]);
     }
@@ -1502,10 +1516,10 @@ namespace SharedUtil
         static CCriticalSection ms_CS;
 
     protected:
-        virtual ~CRefCountable() {}
+        virtual ~CRefCountable() noexcept {}
 
     public:
-        CRefCountable() : m_iRefCount(1), m_pCS(&ms_CS) {}
+        CRefCountable() noexcept : m_iRefCount(1), m_pCS(&ms_CS) {}
 
         void AddRef()
         {
@@ -1533,7 +1547,7 @@ namespace SharedUtil
     // Replacement for e.g.  int var[100]
     // Checks bounds
     //
-    template <class T, int SIZE>
+    template <class T, std::size_t SIZE>
     struct SFixedArray
     {
         T& operator[](std::uint32_t uiIndex)
@@ -1555,7 +1569,7 @@ namespace SharedUtil
     // Fixed size array with a constructer
     // so it can be used with the IMPLEMENT_FIXED_ARRAY macro
     //
-    template <class T, int SIZE>
+    template <class T, std::size_t SIZE>
     struct SFixedArrayInit : SFixedArray<T, SIZE>
     {
         SFixedArrayInit(const T* pInitData, std::uint32_t uiInitCount)
@@ -1580,7 +1594,7 @@ namespace SharedUtil
         bool IsRangeSet(std::uint32_t uiStart, std::uint32_t uiLength);            // Returns true if any part of the range already exists in the map
 
     protected:
-        typedef std::map<std::uint32_t, std::uint32_t>::iterator IterType;
+        using IterType = std::map<std::uint32_t, std::uint32_t>::iterator;
 
         void RemoveObscuredRanges(std::uint32_t uiStart, std::uint32_t uiLast);
         bool GetRangeOverlappingPoint(std::uint32_t uiPoint, IterType& result);
@@ -1597,14 +1611,15 @@ namespace SharedUtil
     private:
         T* pData;            // Target
 
-        virtual ~CRefedPointer() { SAFE_DELETE(pData); }
+        virtual ~CRefedPointer() noexcept { SAFE_DELETE(pData); }
         CRefedPointer(const CRefedPointer<T>& other);
         CRefedPointer<T>& operator=(const CRefedPointer<T>& other);
 
     public:
-        CRefedPointer() { pData = new T(); }
+        CRefedPointer() noexcept { pData = new T(); }
 
-        T* GetData() { return pData; }
+        T* GetData() noexcept { return pData; }
+        const T* GetData() const noexcept { return pData; }
     };
 
     //
@@ -1617,37 +1632,36 @@ namespace SharedUtil
         CRefedPointer<T>* pPointer;
 
     public:
-        CAutoRefedPointer() { pPointer = new CRefedPointer<T>(); }
+        CAutoRefedPointer() noexcept { pPointer = new CRefedPointer<T>(); }
 
-        CAutoRefedPointer(const CAutoRefedPointer<T>& other)
+        CAutoRefedPointer(const CAutoRefedPointer<T>& other) noexcept 
         {
             pPointer = other.pPointer;
             pPointer->AddRef();
         }
 
-        ~CAutoRefedPointer() { pPointer->Release(); }
+        ~CAutoRefedPointer() noexcept { pPointer->Release(); }
 
         CAutoRefedPointer<T>& operator=(const CAutoRefedPointer<T>& other)
         {
             // Assignment operator
-            if (this != &other)            // Avoid self assignment
-            {
-                CRefedPointer<T>* pOldPointer = pPointer;
+            if (this == &other)            // Avoid self assignment
+                return *this;
 
-                // Copy the data and reference pointer
-                // and increment the reference count
-                pPointer = other.pPointer;
-                pPointer->AddRef();
+            CRefedPointer<T>* pOldPointer = pPointer;
 
-                // Decrement the old reference count
-                pOldPointer->Release();
-            }
+            // Copy the data and reference pointer
+            // and increment the reference count
+            pPointer = other.pPointer;
+            pPointer->AddRef();
+
+            // Decrement the old reference count
+            pOldPointer->Release();
             return *this;
         }
 
-        T* operator->() { return pPointer->GetData(); }
-
-        const T* operator->() const { return pPointer->GetData(); }
+        T* operator->() noexcept { return pPointer->GetData(); }
+        const T* operator->() const noexcept { return pPointer->GetData(); }
     };
 };            // namespace SharedUtil
 
@@ -1656,5 +1670,5 @@ using namespace SharedUtil;
 //
 // For checking MTA library module versions
 //
-typedef void(FUNC_GetMtaVersion)(char* pBuffer, std::uint32_t uiMaxSize);
+using FUNC_GetMtaVersion = void(*)(char* pBuffer, std::uint32_t uiMaxSize);
 MTAEXPORT void GetLibMtaVersion(char* pBuffer, std::uint32_t uiMaxSize);
