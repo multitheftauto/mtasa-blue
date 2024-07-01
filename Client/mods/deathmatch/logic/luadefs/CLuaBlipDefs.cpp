@@ -10,23 +10,25 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaBlipDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createBlip", CreateBlip},
-        {"createBlipAttachedTo", CreateBlipAttachedTo},
-        {"getBlipIcon", GetBlipIcon},
-        {"getBlipSize", GetBlipSize},
-        {"getBlipColor", GetBlipColor},
-        {"getBlipOrdering", GetBlipOrdering},
-        {"getBlipVisibleDistance", GetBlipVisibleDistance},
+        {"createBlip", ArgumentParserWarn<false, CreateBlip>},
+        {"createBlipAttachedTo", ArgumentParserWarn<false, CreateBlipAttachedTo>},
 
-        {"setBlipIcon", SetBlipIcon},
-        {"setBlipSize", SetBlipSize},
-        {"setBlipColor", SetBlipColor},
-        {"setBlipOrdering", SetBlipOrdering},
-        {"setBlipVisibleDistance", SetBlipVisibleDistance},
+        {"getBlipIcon", ArgumentParserWarn<false, GetBlipIcon>},
+        {"getBlipSize", ArgumentParserWarn<false, GetBlipSize>},
+        {"getBlipColor", ArgumentParserWarn<false, GetBlipColor>},
+        {"getBlipOrdering", ArgumentParserWarn<false, GetBlipOrdering>},
+        {"getBlipVisibleDistance", ArgumentParserWarn<false, GetBlipVisibleDistance>},
+
+        {"setBlipIcon", ArgumentParserWarn<false, SetBlipIcon>},
+        {"setBlipSize", ArgumentParserWarn<false, SetBlipSize>},
+        {"setBlipColor", ArgumentParserWarn<false, SetBlipColor>},
+        {"setBlipOrdering", ArgumentParserWarn<false, SetBlipOrdering>},
+        {"setBlipVisibleDistance", ArgumentParserWarn<false, SetBlipVisibleDistance>},
     };
 
     // Add functions
@@ -57,358 +59,151 @@ void CLuaBlipDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "size", "setBlipSize", "getBlipSize");
     lua_classvariable(luaVM, "ordering", "setBlipOrdering", "getBlipOrdering");
     lua_classvariable(luaVM, "visibleDistance", "setBlipVisibleDistance", "getBlipVisibleDistance");
-    // lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor" );
+    //lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor" );
 
     lua_registerclass(luaVM, "Blip", "Element");
 }
 
-int CLuaBlipDefs::CreateBlip(lua_State* luaVM)
+std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, CVector vecPosition, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int32_t> ordering, std::optional<std::uint32_t> visibleDistance)
 {
-    CVector          vecPosition;
-    unsigned char    ucIcon = 0;
-    int              iSize = 2;
-    SColorRGBA       color(255, 0, 0, 255);
-    int              iOrdering = 0;
-    int              iVisibleDistance = 16383;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(ucIcon, 0);
-    argStream.ReadNumber(iSize, 2);
-    argStream.ReadNumber(color.R, 255);
-    argStream.ReadNumber(color.G, 0);
-    argStream.ReadNumber(color.B, 0);
-    argStream.ReadNumber(color.A, 255);
-    argStream.ReadNumber(iOrdering, 0);
-    argStream.ReadNumber(iVisibleDistance, 16383);
+    if (icon.has_value() && !CClientRadarMarkerManager::IsValidIcon(icon.value()))
+        throw std::invalid_argument("Invalid icon");
 
-    if (!CClientRadarMarkerManager::IsValidIcon(ucIcon))
+    if (size.has_value() && (size.value() < 0 || size.value() > 25))
     {
-        argStream.SetCustomError("Invalid icon");
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size.value()));
+        size = Clamp(0ui8, size.value(), 25ui8);
     }
 
-    if (iSize < 0 || iSize > 25)
-        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
+    if (ordering.has_value())
+        ordering = Clamp(0i32, ordering.value(), (std::int32_t)UINT16_MAX);
 
-    if (!argStream.HasErrors())
+    if (visibleDistance.has_value())
+        visibleDistance = Clamp(0ui32, visibleDistance.value(), (std::uint32_t)UINT16_MAX);
+
+    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!luaMain)
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                unsigned char  ucSize = Clamp(0, iSize, 25);
-                short          sOrdering = Clamp(-32768, iOrdering, 32767);
-                unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
-
-                // Create the blip
-                CClientRadarMarker* pMarker =
-                    CStaticFunctionDefinitions::CreateBlip(*pResource, vecPosition, ucIcon, ucSize, color, sOrdering, usVisibleDistance);
-                if (pMarker)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pMarker);
-                    }
-
-                    lua_pushelement(luaVM, pMarker);
-                    return 1;
-                }
-            }
-        }
+        m_pScriptDebugging->LogError(luaVM, "Couldn't find the virtual machine");
+        return false;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CResource* resource = luaMain->GetResource();
+    if (!resource)
+    {
+        m_pScriptDebugging->LogError(luaVM, "Couldn't find the resource element");
+        return false;
+    }
+
+    CClientRadarMarker* radarMarker = CStaticFunctionDefinitions::CreateBlip(*resource, vecPosition, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383));
+    if (!radarMarker)
+        return false;
+
+    CElementGroup* elementGroup = resource->GetElementGroup();
+    if (elementGroup)
+        elementGroup->Add(radarMarker);
+
+    return radarMarker;
 }
 
-int CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM)
+std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, CClientEntity* entity, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int32_t> ordering, std::optional<std::uint32_t> visibleDistance)
 {
-    CClientEntity* pEntity = NULL;
-    // Default colors and size
-    unsigned char    ucIcon = 0;
-    int              iSize = 2;
-    SColorRGBA       color(255, 0, 0, 255);
-    int              iOrdering = 0;
-    int              iVisibleDistance = 16383;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(ucIcon, 0);
-    argStream.ReadNumber(iSize, 2);
-    argStream.ReadNumber(color.R, 255);
-    argStream.ReadNumber(color.G, 0);
-    argStream.ReadNumber(color.B, 0);
-    argStream.ReadNumber(color.A, 255);
-    argStream.ReadNumber(iOrdering, 0);
-    argStream.ReadNumber(iVisibleDistance, 16383);
+    if (icon.has_value() && !CClientRadarMarkerManager::IsValidIcon(icon.value()))
+        throw std::invalid_argument("Invalid icon");
 
-    if (!CClientRadarMarkerManager::IsValidIcon(ucIcon))
+    if (size.has_value() && (size.value() < 0 || size.value() > 25))
     {
-        argStream.SetCustomError("Invalid icon");
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size.value()));
+        size = Clamp(0ui8, size.value(), 25ui8);
     }
 
-    if (iSize < 0 || iSize > 25)
-        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
+    if (ordering.has_value())
+        ordering = Clamp(0i32, ordering.value(), (std::int32_t)UINT16_MAX);
 
-    if (!argStream.HasErrors())
+    if (visibleDistance.has_value())
+        visibleDistance = Clamp(0ui32, visibleDistance.value(), (std::uint32_t)UINT16_MAX);
+
+    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!luaMain)
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                unsigned char  ucSize = Clamp(0, iSize, 25);
-                short          sOrdering = Clamp(-32768, iOrdering, 32767);
-                unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
-
-                // Create the blip
-                CClientRadarMarker* pMarker =
-                    CStaticFunctionDefinitions::CreateBlipAttachedTo(*pResource, *pEntity, ucIcon, ucSize, color, sOrdering, usVisibleDistance);
-                if (pMarker)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pMarker);
-                    }
-                    lua_pushelement(luaVM, pMarker);
-                    return 1;
-                }
-            }
-        }
+        m_pScriptDebugging->LogError(luaVM, "Couldn't find the virtual machine");
+        return false;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CResource* resource = luaMain->GetResource();
+    if (!resource)
+    {
+        m_pScriptDebugging->LogError(luaVM, "Couldn't find the resource element");
+        return false;
+    }
+
+    CClientRadarMarker* radarMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo(*resource, *entity, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383));
+    if (!radarMarker)
+        return false;
+
+    CElementGroup* elementGroup = resource->GetElementGroup();
+    if (elementGroup)
+        elementGroup->Add(radarMarker);
+
+    return radarMarker;
 }
 
-int CLuaBlipDefs::GetBlipIcon(lua_State* luaVM)
+std::uint8_t CLuaBlipDefs::GetBlipIcon(CClientRadarMarker* radarMarker) noexcept
 {
-    CClientRadarMarker* pMarker = NULL;
-    CScriptArgReader    argStream(luaVM);
-    argStream.ReadUserData(pMarker);
-
-    if (!argStream.HasErrors())
-    {
-        unsigned char ucIcon = static_cast<unsigned char>(pMarker->GetSprite());
-        lua_pushnumber(luaVM, ucIcon);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return std::uint8_t(radarMarker->GetSprite());
 }
 
-int CLuaBlipDefs::GetBlipSize(lua_State* luaVM)
+std::uint8_t CLuaBlipDefs::GetBlipSize(CClientRadarMarker* radarMarker) noexcept
 {
-    CClientRadarMarker* pMarker = NULL;
-    CScriptArgReader    argStream(luaVM);
-    argStream.ReadUserData(pMarker);
-
-    if (!argStream.HasErrors())
-    {
-        unsigned char ucSize = static_cast<unsigned char>(pMarker->GetScale());
-        lua_pushnumber(luaVM, ucSize);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return radarMarker->GetScale();
 }
 
-int CLuaBlipDefs::GetBlipColor(lua_State* luaVM)
+CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t> CLuaBlipDefs::GetBlipColor(CClientRadarMarker* radarMarker) noexcept
 {
-    CClientRadarMarker* pMarker = NULL;
-    CScriptArgReader    argStream(luaVM);
-    argStream.ReadUserData(pMarker);
-
-    if (!argStream.HasErrors())
-    {
-        SColor color = pMarker->GetColor();
-        lua_pushnumber(luaVM, color.R);
-        lua_pushnumber(luaVM, color.G);
-        lua_pushnumber(luaVM, color.B);
-        lua_pushnumber(luaVM, color.A);
-        return 4;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    SColor color = radarMarker->GetColor();
+    return {color.R, color.G, color.B, color.A};
 }
 
-int CLuaBlipDefs::GetBlipOrdering(lua_State* luaVM)
+std::int16_t CLuaBlipDefs::GetBlipOrdering(CClientRadarMarker* radarMarker) noexcept
 {
-    CClientRadarMarker* pMarker = NULL;
-    CScriptArgReader    argStream(luaVM);
-    argStream.ReadUserData(pMarker);
-
-    if (!argStream.HasErrors())
-    {
-        short sOrdering = pMarker->GetOrdering();
-        lua_pushnumber(luaVM, sOrdering);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return radarMarker->GetOrdering();
 }
 
-int CLuaBlipDefs::GetBlipVisibleDistance(lua_State* luaVM)
+std::uint16_t CLuaBlipDefs::GetBlipVisibleDistance(CClientRadarMarker* radarMarker) noexcept
 {
-    CClientRadarMarker* pMarker = NULL;
-    CScriptArgReader    argStream(luaVM);
-    argStream.ReadUserData(pMarker);
-
-    if (!argStream.HasErrors())
-    {
-        unsigned short usVisibleDistance = pMarker->GetVisibleDistance();
-        lua_pushnumber(luaVM, usVisibleDistance);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return radarMarker->GetVisibleDistance();
 }
 
-int CLuaBlipDefs::SetBlipIcon(lua_State* luaVM)
+bool CLuaBlipDefs::SetBlipIcon(CClientRadarMarker* radarMarker, std::uint8_t icon)
 {
-    CClientEntity*   pEntity = NULL;
-    unsigned char    ucIcon = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(ucIcon);
+    if (!CClientRadarMarkerManager::IsValidIcon(icon))
+        throw std::invalid_argument("Invalid icon");
 
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetBlipIcon(*pEntity, ucIcon))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetBlipIcon(*radarMarker, icon);
 }
 
-int CLuaBlipDefs::SetBlipSize(lua_State* luaVM)
+bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CClientRadarMarker* radarMarker, std::uint8_t size) noexcept
 {
-    CClientEntity*   pEntity = NULL;
-    int              iSize = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(iSize);
-
-    if (iSize < 0 || iSize > 25)
-        argStream.SetCustomWarning(SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", iSize));
-
-    if (!argStream.HasErrors())
+    if (size < 0 || size > 25)
     {
-        unsigned char ucSize = Clamp(0, iSize, 25);
-
-        if (CStaticFunctionDefinitions::SetBlipSize(*pEntity, ucSize))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size));
+        size = Clamp(0ui8, size, 25ui8);
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetBlipSize(*radarMarker, size);
 }
 
-int CLuaBlipDefs::SetBlipColor(lua_State* luaVM)
+bool CLuaBlipDefs::SetBlipColor(CClientRadarMarker* radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a) noexcept
 {
-    CClientEntity*   pEntity = NULL;
-    SColor           color;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(color.R);
-    argStream.ReadNumber(color.G);
-    argStream.ReadNumber(color.B);
-    argStream.ReadNumber(color.A);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetBlipColor(*pEntity, color))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetBlipColor(*radarMarker, SColorRGBA(r, g, b, a));
 }
 
-int CLuaBlipDefs::SetBlipOrdering(lua_State* luaVM)
+bool CLuaBlipDefs::SetBlipOrdering(CClientRadarMarker* radarMarker, std::int32_t ordering) noexcept
 {
-    CClientEntity*   pEntity = NULL;
-    int              iOrdering;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(iOrdering);
-
-    if (!argStream.HasErrors())
-    {
-        short sOrdering = Clamp(-32768, iOrdering, 32767);
-
-        if (CStaticFunctionDefinitions::SetBlipOrdering(*pEntity, sOrdering))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetBlipOrdering(*radarMarker, Clamp(0i32, ordering, (std::int32_t)UINT16_MAX));
 }
 
-int CLuaBlipDefs::SetBlipVisibleDistance(lua_State* luaVM)
+bool CLuaBlipDefs::SetBlipVisibleDistance(CClientRadarMarker* radarMarker, std::uint32_t visibleDistance) noexcept
 {
-    CClientEntity*   pEntity = NULL;
-    int              iVisibleDistance;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(iVisibleDistance);
-
-    if (!argStream.HasErrors())
-    {
-        unsigned short usVisibleDistance = Clamp(0, iVisibleDistance, 65535);
-
-        if (CStaticFunctionDefinitions::SetBlipVisibleDistance(*pEntity, usVisibleDistance))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetBlipVisibleDistance(*radarMarker, Clamp(0ui32, visibleDistance, (std::uint32_t)UINT16_MAX));
 }
