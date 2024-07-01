@@ -2236,8 +2236,8 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
     return false;
 }
 
-bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool bEnable)
+bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable)
 {
-    g_pGame->GetSettings()->SetVolumetricShadowsEnabled(bEnable);
+    g_pGame->GetSettings()->SetVolumetricShadowsEnabled(enable);
     return true;
 }
