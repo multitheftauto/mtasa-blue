@@ -85,6 +85,7 @@ class CSettingsSA : public CGameSettings
 private:
     CSettingsSAInterface* m_pInterface;
     bool                  m_bVolumetricShadowsEnabled;
+    bool                  m_bVolumetricShadowsEnabledByScript;
     bool                  m_bVolumetricShadowsSuspended;
     bool                  m_bDynamicPedShadowsEnabled;
     eAspectRatio          m_AspectRatio;

@@ -131,4 +131,5 @@ public:
     static bool SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3);
     static bool ResetWorldProperty(eWorldProperty property);
     static bool SetVolumetricShadowsEnabled(bool enable);
+    static bool IsVolumetricShadowsEnabled();
 };

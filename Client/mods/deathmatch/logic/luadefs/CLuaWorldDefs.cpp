@@ -132,7 +132,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
-                                                                             {"isGarageOpen", IsGarageOpen}};
+                                                                             {"isGarageOpen", IsGarageOpen},
+                                                                             {"isVolumetricShadowsEnabled", ArgumentParserWarn<false, IsVolumetricShadowsEnabled>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -2240,4 +2241,15 @@ bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable)
 {
     g_pGame->GetSettings()->SetVolumetricShadowsEnabled(enable);
     return true;
+}
+
+bool CLuaWorldDefs::IsVolumetricShadowsEnabled()
+{
+
+    if (g_pGame->GetSettings()->IsVolumetricShadowsEnabled())
+    {
+        return true;  
+    }
+    return false;
+
 }
