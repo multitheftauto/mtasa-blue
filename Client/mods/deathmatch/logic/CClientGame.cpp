@@ -5543,7 +5543,10 @@ void CClientGame::ResetMapInfo()
     g_pGame->GetWeather()->ResetWaterFog();
     g_pGame->GetWeather()->ResetSandstorm();
     g_pGame->GetWeather()->ResetRainbow();
-    g_pGame->GetSettings()->SetVolumetricShadowsEnabled(false);
+
+    bool VolumetricShadow;
+    g_pCore->GetCVars()->Get("volumetric_shadows", VolumetricShadow);
+    g_pGame->GetSettings()->SetVolumetricShadowsEnabled(VolumetricShadow);
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
