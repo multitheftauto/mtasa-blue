@@ -133,7 +133,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
                                                                              {"isGarageOpen", IsGarageOpen},
-                                                                             {"isVolumetricShadowsEnabled", ArgumentParserWarn<false, IsVolumetricShadowsEnabled>}};
+                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -2237,19 +2237,13 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
     return false;
 }
 
-bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable)
+bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable) noexcept
 {
     g_pGame->GetSettings()->SetVolumetricShadowsEnabled(enable);
     return true;
 }
 
-bool CLuaWorldDefs::IsVolumetricShadowsEnabled()
+bool CLuaWorldDefs::IsVolumetricShadowsEnabled() noexcept
 {
-
-    if (g_pGame->GetSettings()->IsVolumetricShadowsEnabled())
-    {
-        return true;  
-    }
-    return false;
-
+    return g_pGame->GetSettings()->IsVolumetricShadowsEnabled();
 }
