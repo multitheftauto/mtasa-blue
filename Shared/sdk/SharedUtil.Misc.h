@@ -455,10 +455,10 @@ namespace SharedUtil
         constexpr operator std::uint32_t() const noexcept { return GetARGB(); }
 
         constexpr SColor operator|(std::uint32_t value) const noexcept {
-            return SColor(GetARG() | value);
+            return SColor(GetARGB() | value);
         }
         constexpr SColor operator&(std::uint32_t value) const noexcept {
-            return SColor(GetARG() & value);
+            return SColor(GetARGB() & value);
         }
         constexpr SColor& operator|=(std::uint32_t value) noexcept {
             SetARGB(GetARGB() | value);
