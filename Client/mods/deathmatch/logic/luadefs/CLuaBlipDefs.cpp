@@ -15,15 +15,18 @@
 void CLuaBlipDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Create functions
         {"createBlip", ArgumentParserWarn<false, CreateBlip>},
         {"createBlipAttachedTo", ArgumentParserWarn<false, CreateBlipAttachedTo>},
 
+        // Get functions
         {"getBlipIcon", ArgumentParserWarn<false, GetBlipIcon>},
         {"getBlipSize", ArgumentParserWarn<false, GetBlipSize>},
         {"getBlipColor", ArgumentParserWarn<false, GetBlipColor>},
         {"getBlipOrdering", ArgumentParserWarn<false, GetBlipOrdering>},
         {"getBlipVisibleDistance", ArgumentParserWarn<false, GetBlipVisibleDistance>},
 
+        // Set functions
         {"setBlipIcon", ArgumentParserWarn<false, SetBlipIcon>},
         {"setBlipSize", ArgumentParserWarn<false, SetBlipSize>},
         {"setBlipColor", ArgumentParserWarn<false, SetBlipColor>},
@@ -59,7 +62,7 @@ void CLuaBlipDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "size", "setBlipSize", "getBlipSize");
     lua_classvariable(luaVM, "ordering", "setBlipOrdering", "getBlipOrdering");
     lua_classvariable(luaVM, "visibleDistance", "setBlipVisibleDistance", "getBlipVisibleDistance");
-    //lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor" );
+    // lua_classvariable ( luaVM, "color", "setBlipColor", "getBlipColor" );
 
     lua_registerclass(luaVM, "Blip", "Element");
 }
