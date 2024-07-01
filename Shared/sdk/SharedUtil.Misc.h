@@ -442,7 +442,8 @@ namespace SharedUtil
         constexpr SColor(std::uint8_t a, std::uint8_t r, std::uint8_t g, std::uint8_t b) noexcept : A(a), R(r), G(g), B(b) {}
 
         constexpr std::uint32_t GetARGB() const noexcept {
-            return A << 24 | R << 16 | G << 8 | B; }
+            return A << 24 | R << 16 | G << 8 | B;
+        }
 
         constexpr void SetARGB(std::uint32_t argb) noexcept {
             A = static_cast<std::uint8_t>((argb & 0xFF000000) >> 24);
@@ -452,6 +453,21 @@ namespace SharedUtil
         }
 
         constexpr operator std::uint32_t() const noexcept { return GetARGB(); }
+
+        constexpr SColor operator|(std::uint32_t value) const noexcept {
+            return SColor(GetARG() | value);
+        }
+        constexpr SColor operator&(std::uint32_t value) const noexcept {
+            return SColor(GetARG() & value);
+        }
+        constexpr SColor& operator|=(std::uint32_t value) noexcept {
+            SetARGB(GetARGB() | value);
+            return *this;
+        }
+        constexpr SColor& operator&=(std::uint32_t value) noexcept {
+            SetARGB(GetARGB() & value);
+            return *this;
+        }
     };
 
     //
@@ -678,8 +694,8 @@ namespace SharedUtil
         char                            m_cEscapeCharacter;
 
     public:
-        CArgMap(const SString& strArgSep = "=", const SString& strPartsSep = "&", const SString& strExtraDisallowedChars = "");
-        void    SetEscapeCharacter(char cEscapeCharacter);
+        CArgMap(const SString& strArgSep = "=", const SString& strPartsSep = "&", const SString& strExtraDisallowedChars = "") noexcept;
+        void    SetEscapeCharacter(char cEscapeCharacter) noexcept;
         void    Merge(const CArgMap& other, bool bAllowMultiValues = false);
         void    SetFromString(const SString& strLine, bool bAllowMultiValues = false);
         void    MergeFromString(const SString& strLine, bool bAllowMultiValues = false);
