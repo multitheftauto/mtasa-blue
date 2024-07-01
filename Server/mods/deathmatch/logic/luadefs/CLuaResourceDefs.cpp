@@ -900,7 +900,7 @@ int CLuaResourceDefs::getResourceLoadTime(lua_State* luaVM)
 
 std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    if (resourceElement && resourceElement.has_value())
+    if (resourceElement.has_value())
         return (*resourceElement)->GetName();
 
     CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
