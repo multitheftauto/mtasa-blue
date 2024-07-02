@@ -56,7 +56,7 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
 
 bool CLuaDiscordDefs::ResetData()
 {
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
@@ -72,12 +72,12 @@ bool CLuaDiscordDefs::ResetData()
 
 bool CLuaDiscordDefs::SetState(std::string strState)
 {
-    int stateLength = strState.length();
+    const auto stateLength = strState.length();
 
     if (stateLength > 128)
         throw std::invalid_argument("State must be less than/equal to 128");
 
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
@@ -93,18 +93,18 @@ bool CLuaDiscordDefs::SetState(std::string strState)
 
 bool CLuaDiscordDefs::SetAppID(lua_State* luaVM, std::string strAppID)
 {
-    int appIDLength = strAppID.length();
+    const auto appIDLength = strAppID.length();
 
     if (appIDLength < 1 || appIDLength > 32)
         throw std::invalid_argument("Application ID must be greater than 0, or less than/equal to 32");
 
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    const auto  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     const char* resourceName = "";
     if (pLuaMain)
     {
-        CResource* pResource = pLuaMain->GetResource();
+        const auto pResource = pLuaMain->GetResource();
         if (pResource)
             resourceName = pResource->GetName();
     }
@@ -117,12 +117,12 @@ bool CLuaDiscordDefs::SetAppID(lua_State* luaVM, std::string strAppID)
 
 bool CLuaDiscordDefs::SetDetails(std::string strDetails)
 {
-    int detailsLength = strDetails.length();
+    const auto detailsLength = strDetails.length();
 
     if (detailsLength > 128)
         throw std::invalid_argument("Details length must be less than/equal to 128");
 
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
@@ -136,14 +136,14 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
     return true;
 }
 
-bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
+bool CLuaDiscordDefs::SetStartTime(int64_t iTime)
 {
-    unsigned long ulSecondsSinceEpoch = time(nullptr) + ulTime;
+    int64_t iSecondsSinceEpoch = time(nullptr) + iTime;
 
-    if (ulTime == 0)
-        ulSecondsSinceEpoch = 0;
+    if (iTime == 0)
+        iSecondsSinceEpoch = 0;
 
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
@@ -151,18 +151,18 @@ bool CLuaDiscordDefs::SetStartTime(unsigned long ulTime)
     if (discord->IsDiscordCustomDetailsDisallowed())
         return false;
 
-    discord->SetPresenceStartTimestamp(ulSecondsSinceEpoch);
+    discord->SetPresenceStartTimestamp(iSecondsSinceEpoch);
     return true;
 }
 
-bool CLuaDiscordDefs::SetEndTime(unsigned long ulTime)
+bool CLuaDiscordDefs::SetEndTime(int64_t iTime)
 {
-    unsigned long ulSecondsSinceEpoch = time(nullptr) + ulTime;
+    int64_t iSecondsSinceEpoch = time(nullptr) + iTime;
 
-    if (ulTime == 0)
-        ulSecondsSinceEpoch = 0;
+    if (iTime == 0)
+        iSecondsSinceEpoch = 0;
 
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
@@ -170,7 +170,7 @@ bool CLuaDiscordDefs::SetEndTime(unsigned long ulTime)
     if (discord->IsDiscordCustomDetailsDisallowed())
         return false;
 
-    discord->SetPresenceEndTimestamp(ulSecondsSinceEpoch);
+    discord->SetPresenceEndTimestamp(iSecondsSinceEpoch);
     return true;
 }
 
@@ -179,7 +179,7 @@ bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
     if (iSize > iMax)
         throw std::invalid_argument("Party size must be less than or equal to max party size");
 
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
@@ -193,15 +193,15 @@ bool CLuaDiscordDefs::SetPartySize(int iSize, int iMax)
 
 bool CLuaDiscordDefs::SetAsset(std::string szAsset, std::string szAssetText, bool bIsLarge)
 {
-    int assetLength = szAsset.length();
-    int assetTextLength = szAssetText.length();
+    const auto assetLength = szAsset.length();
+    const auto assetTextLength = szAssetText.length();
 
     if (assetLength > 32)
         throw std::invalid_argument("Asset name length must be less than/equal to 32");
     if (assetTextLength > 128)
         throw std::invalid_argument("Asset text length must be less than/equal to 128");
 
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
@@ -227,13 +227,13 @@ bool CLuaDiscordDefs::SetSmallAsset(std::string szAsset, std::string szAssetText
     return SetAsset(szAsset, szAssetText, false);
 }
 
-bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, std::string szUrl)
+bool CLuaDiscordDefs::SetButtons(uint8_t uiIndex, std::string szName, std::string szUrl)
 {
-    if (iIndex < 1 || iIndex > 2)
+    if (uiIndex < 1 || uiIndex > 2)
         return false;
 
-    int nameLength = szName.length();
-    int urlLength = szUrl.length();
+    const auto nameLength = szName.length();
+    const auto urlLength = szUrl.length();
 
     if (nameLength > 32)
         throw std::invalid_argument("Button name length must be less than/equal to 32");
@@ -243,7 +243,7 @@ bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, 
     if (szUrl.find("https://") != 0 && szUrl.find("mtasa://") != 0)
         throw std::invalid_argument("Button URL should include the https:// or mtasa:// link");
 
-    auto discord = g_pCore->GetDiscord();
+    const auto discord = g_pCore->GetDiscord();
 
     if (!discord || !discord->IsDiscordRPCEnabled())
         return false;
@@ -251,7 +251,7 @@ bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, 
     if (discord->IsDiscordCustomDetailsDisallowed())
         return false;
 
-    if (!discord->SetPresenceButtons(iIndex, szName.c_str(), szUrl.c_str()))
+    if (!discord->SetPresenceButtons(uiIndex, szName.c_str(), szUrl.c_str()))
         return false;
 
     return true;
@@ -259,20 +259,15 @@ bool CLuaDiscordDefs::SetButtons(unsigned short int iIndex, std::string szName, 
 
 bool CLuaDiscordDefs::IsDiscordRPCConnected()
 {
-    auto discord = g_pCore->GetDiscord();
-
-    if (!discord || !discord->IsDiscordRPCEnabled())
-        return false;
-
-    return discord->IsDiscordClientConnected();
+    const auto discord = g_pCore->GetDiscord();
+    return (!discord || !discord->IsDiscordRPCEnabled()) && discord->IsDiscordClientConnected();
 }
 
 std::string CLuaDiscordDefs::GetDiscordUserID()
 {
-    auto discord = g_pCore->GetDiscord();
-
-    if (!discord || !discord->IsDiscordRPCEnabled())
-        return {};
-
-    return discord->GetDiscordUserID();
+    if (const auto discord = g_pCore->GetDiscord(); discord && discord->IsDiscordRPCEnabled())
+    {
+        return discord->GetDiscordUserID();
+    }
+    return {};
 }

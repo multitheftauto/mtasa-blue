@@ -23,8 +23,8 @@ public:
 #endif
     virtual void SetAssetLargeData(const char* szAsset, const char* szAssetText) = 0;
     virtual void SetAssetSmallData(const char* szAsset, const char* szAssetText) = 0;
-    virtual void SetPresenceStartTimestamp(const unsigned long ulStart) = 0;
-    virtual void SetPresenceEndTimestamp(const unsigned long ulEnd) = 0;
+    virtual void SetPresenceStartTimestamp(const int64_t iStart) = 0;
+    virtual void SetPresenceEndTimestamp(const int64_t iEnd) = 0;
     virtual void SetPresencePartySize(int iSize, int iMax, bool bCustom) = 0;
     virtual void SetDiscordClientConnected(bool bConnected) = 0;
     virtual void SetDiscordUserID(const std::string& strUserID) = 0;
@@ -33,7 +33,7 @@ public:
     virtual bool SetApplicationID(const char* szResourceName, const char* szAppID) = 0;
     virtual bool ResetDiscordData() = 0;
     virtual bool SetPresenceState(const char* szState, bool bCustom) = 0;
-    virtual bool SetPresenceButtons(unsigned short int iIndex, const char* szName, const char* szUrl) = 0;
+    virtual bool SetPresenceButtons(uint8_t uiIndex, const char* szName, const char* szUrl) = 0;
     virtual bool SetDiscordRPCEnabled(bool bEnabled) = 0;
     virtual bool IsDiscordRPCEnabled() const = 0;
     virtual bool IsDiscordCustomDetailsDisallowed() const = 0;

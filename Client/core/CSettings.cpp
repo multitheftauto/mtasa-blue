@@ -3468,22 +3468,22 @@ void CSettings::SaveData()
     // Allow DiscordRPC
     bool bAllowDiscordRPC = m_pCheckBoxAllowDiscordRPC->GetSelected();
     CVARS_SET("allow_discord_rpc", bAllowDiscordRPC);
-    g_pCore->GetDiscord()->SetDiscordRPCEnabled(bAllowDiscordRPC);
 
-    if (bAllowDiscordRPC)
+    // Applying the data [DiscordRPC]
+    if (const auto discord = g_pCore->GetDiscord(); discord)
     {
-        const auto discord = g_pCore->GetDiscord();
+        discord->SetDiscordRPCEnabled(bAllowDiscordRPC);
 
-        if (discord)
+        if (bAllowDiscordRPC)
         {
             const char* state = _("Main menu");
 
             if (g_pCore->IsConnected())
-            {                
+            {
                 state = _("In-game");
 
-                const SString& serverName = g_pCore->GetLastConnectedServerName();
-                discord->SetPresenceDetails(serverName.c_str(), false);
+                const auto& strServerName = g_pCore->GetLastConnectedServerName();
+                discord->SetPresenceDetails(strServerName.c_str(), false);
             }
 
             discord->SetPresenceState(state, false);
@@ -4534,7 +4534,9 @@ bool CSettings::OnAllowExternalSoundsClick(CGUIElement* pElement)
 bool CSettings::OnAllowDiscordRPC(CGUIElement* pElement)
 {
     bool isEnabled = m_pCheckBoxAllowDiscordRPC->GetSelected();
-    g_pCore->GetDiscord()->SetDiscordRPCEnabled(isEnabled);
+
+    if (const auto discord = g_pCore->GetDiscord(); discord)
+        discord->SetDiscordRPCEnabled(isEnabled);
 
     if (isEnabled)
         ShowRichPresenceShareDataQuestionBox(); // show question box
