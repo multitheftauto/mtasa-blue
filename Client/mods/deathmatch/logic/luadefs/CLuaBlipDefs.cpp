@@ -79,10 +79,10 @@ std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaV
     }
 
     if (ordering.has_value())
-        ordering = Clamp(0i32, ordering.value(), (std::int32_t)UINT16_MAX);
+        ordering = Clamp(std::numeric_limits<std::int16_t>().min(), (std::int16_t)ordering.value(), std::numeric_limits<std::int16_t>().max());
 
     if (visibleDistance.has_value())
-        visibleDistance = Clamp(0ui32, visibleDistance.value(), (std::uint32_t)UINT16_MAX);
+        visibleDistance = Clamp(std::numeric_limits<std::uint16_t>().min(), (std::uint16_t)visibleDistance.value(), std::numeric_limits<std::uint16_t>().max());
 
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!luaMain)
@@ -121,10 +121,10 @@ std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_S
     }
 
     if (ordering.has_value())
-        ordering = Clamp(0i32, ordering.value(), (std::int32_t)UINT16_MAX);
+        ordering = Clamp(std::numeric_limits<std::int16_t>().min(), (std::int16_t)ordering.value(), std::numeric_limits<std::int16_t>().max());
 
     if (visibleDistance.has_value())
-        visibleDistance = Clamp(0ui32, visibleDistance.value(), (std::uint32_t)UINT16_MAX);
+        visibleDistance = Clamp(std::numeric_limits<std::uint16_t>().min(), (std::uint16_t)visibleDistance.value(), std::numeric_limits<std::uint16_t>().max());
 
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!luaMain)
@@ -203,10 +203,10 @@ bool CLuaBlipDefs::SetBlipColor(CClientRadarMarker* radarMarker, std::uint8_t r,
 
 bool CLuaBlipDefs::SetBlipOrdering(CClientRadarMarker* radarMarker, std::int32_t ordering) noexcept
 {
-    return CStaticFunctionDefinitions::SetBlipOrdering(*radarMarker, Clamp(0i32, ordering, (std::int32_t)UINT16_MAX));
+    return CStaticFunctionDefinitions::SetBlipOrdering(*radarMarker, Clamp(std::numeric_limits<std::int16_t>().min(), (std::int16_t)ordering, std::numeric_limits<std::int16_t>().max()));
 }
 
 bool CLuaBlipDefs::SetBlipVisibleDistance(CClientRadarMarker* radarMarker, std::uint32_t visibleDistance) noexcept
 {
-    return CStaticFunctionDefinitions::SetBlipVisibleDistance(*radarMarker, Clamp(0ui32, visibleDistance, (std::uint32_t)UINT16_MAX));
+    return CStaticFunctionDefinitions::SetBlipVisibleDistance(*radarMarker, Clamp(std::numeric_limits<std::uint16_t>().min(), (std::uint16_t)visibleDistance, std::numeric_limits<std::uint16_t>().max()));
 }
