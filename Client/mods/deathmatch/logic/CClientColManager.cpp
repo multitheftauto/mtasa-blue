@@ -214,5 +214,5 @@ void CClientColManager::DeleteAll()
 
 void CClientColManager::RemoveFromList(CClientColShape* pShape)
 {
-    ListRemove(m_List, pShape);
+    ListRemoveAll(m_List, pShape);
 }

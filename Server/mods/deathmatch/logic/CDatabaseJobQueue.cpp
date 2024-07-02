@@ -365,7 +365,7 @@ bool CDatabaseJobQueueImpl::PollCommand(CDbJobData* pJobData, uint uiTimeout)
         // See if result has come in yet
         if (ListContains(shared.m_ResultQueue, pJobData))
         {
-            ListRemove(shared.m_ResultQueue, pJobData);
+            ListRemoveAll(shared.m_ResultQueue, pJobData);
 
             pJobData->stage = EJobStage::FINISHED;
             MapInsert(m_FinishedList, pJobData);

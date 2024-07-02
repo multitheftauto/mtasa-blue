@@ -41,7 +41,7 @@ bool CRegistryManager::CloseRegistry(CRegistry* pRegistry)
 {
     if (ListContains(m_RegistryList, pRegistry))
     {
-        ListRemove(m_RegistryList, pRegistry);
+        ListRemoveAll(m_RegistryList, pRegistry);
         delete pRegistry;
         return true;
     }

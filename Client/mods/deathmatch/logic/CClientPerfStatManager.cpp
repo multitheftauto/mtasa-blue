@@ -108,7 +108,7 @@ void CClientPerfStatManagerImpl::AddModule(CClientPerfStatModule* pModule)
 ///////////////////////////////////////////////////////////////
 void CClientPerfStatManagerImpl::RemoveModule(CClientPerfStatModule* pModule)
 {
-    ListRemove(m_ModuleList, pModule);
+    ListRemoveAll(m_ModuleList, pModule);
 }
 
 ///////////////////////////////////////////////////////////////

@@ -715,9 +715,9 @@ void CClientVehicleManager::RemoveFromLists(CClientVehicle* pVehicle)
 {
     if (m_bCanRemoveFromList)
     {
-        ListRemove(m_List, pVehicle);
+        ListRemoveAll(m_List, pVehicle);
     }
-    ListRemove(m_StreamedIn, pVehicle);
+    ListRemoveAll(m_StreamedIn, pVehicle);
 }
 
 bool CClientVehicleManager::Exists(CClientVehicle* pVehicle)
@@ -739,7 +739,7 @@ void CClientVehicleManager::OnCreation(CClientVehicle* pVehicle)
 
 void CClientVehicleManager::OnDestruction(CClientVehicle* pVehicle)
 {
-    ListRemove(m_StreamedIn, pVehicle);
+    ListRemoveAll(m_StreamedIn, pVehicle);
 }
 
 void CClientVehicleManager::RestreamVehicles(unsigned short usModel)

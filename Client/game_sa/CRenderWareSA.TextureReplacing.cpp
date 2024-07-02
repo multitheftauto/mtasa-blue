@@ -249,7 +249,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         }
 
         // Remove refs
-        ListRemove(pInfo->usedByReplacements, pReplacementTextures);
+        ListRemoveAll(pInfo->usedByReplacements, pReplacementTextures);
 
         // If no refs left, check original state and then remove info
         if (pInfo->usedByReplacements.empty())
@@ -263,7 +263,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             {
                 RwTexture* pOriginalTexture = pInfo->originalTextures[i];
                 assert(ListContains(currentTextures, pOriginalTexture));
-                ListRemove(currentTextures, pOriginalTexture);
+                ListRemoveAll(currentTextures, pOriginalTexture);
             }
             assert(currentTextures.empty());
         #endif
