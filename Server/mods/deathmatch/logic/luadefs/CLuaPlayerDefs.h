@@ -47,6 +47,7 @@ public:
     LUA_DECLARE(GetPlayerVersion);
     LUA_DECLARE(GetPlayerACInfo);
     static unsigned int GetPlayerScriptDebugLevel(CPlayer* const player);
+    static bool HasPlayerSpawned(CPlayer* const player) noexcept;
 
     // Player set functions
     LUA_DECLARE(SetPlayerMoney);

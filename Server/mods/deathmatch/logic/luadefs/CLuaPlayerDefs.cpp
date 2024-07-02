@@ -49,6 +49,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"resendPlayerModInfo", ResendPlayerModInfo},
         {"resendPlayerACInfo", ResendPlayerACInfo},
         {"getPlayerScriptDebugLevel", ArgumentParser<GetPlayerScriptDebugLevel>},
+        {"hasPlayerSpawned", ArgumentParser<HasPlayerSpawned>},
 
         // Player set funcs
         {"setPlayerMoney", SetPlayerMoney},
@@ -180,6 +181,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getCameraMatrix", "getCameraMatrix");
     lua_classfunction(luaVM, "getCameraTarget", "getCameraTarget");
     lua_classfunction(luaVM, "getScriptDebugLevel", "getPlayerScriptDebugLevel");
+    lua_classfunction(luaVM, "hasSpawned", "hasPlayerSpawned");
 
     lua_classvariable(luaVM, "account", NULL, "getPlayerAccount");
     lua_classvariable(luaVM, "cameraInterior", "setCameraInterior", "getCameraInterior");
@@ -203,6 +205,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "nametagText", "setPlayerNametagText", "getPlayerNametagText");
     lua_classvariable(luaVM, "nametagShowing", "setPlayerNametagShowing", "isPlayerNametagShowing");
     lua_classvariable(luaVM, "scriptDebugLevel", "setPlayerScriptDebugLevel", "getPlayerScriptDebugLevel");
+    lua_classvariable(luaVM, "spawned", nullptr, "hasPlayerSpawned");
 
     lua_registerclass(luaVM, "Player", "Ped");
 }
@@ -536,7 +539,7 @@ int CLuaPlayerDefs::GetAlivePlayers(lua_State* luaVM)
         {
             CPlayer* pPlayer = *iter;
 
-            if (pPlayer->IsJoined() && pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
+            if (pPlayer->IsJoined() && !pPlayer->IsDead() && !pPlayer->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++uiIndex);
                 lua_pushelement(luaVM, pPlayer);
@@ -567,7 +570,7 @@ int CLuaPlayerDefs::GetDeadPlayers(lua_State* luaVM)
         {
             CPlayer* pPlayer = *iter;
 
-            if (pPlayer->IsJoined() && !pPlayer->IsSpawned() && !pPlayer->IsBeingDeleted())
+            if (pPlayer->IsJoined() && pPlayer->IsDead() && !pPlayer->IsBeingDeleted())
             {
                 lua_pushnumber(luaVM, ++uiIndex);
                 lua_pushelement(luaVM, pPlayer);
@@ -1457,6 +1460,11 @@ int CLuaPlayerDefs::ResendPlayerACInfo(lua_State* luaVM)
 unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
 {
     return player->GetScriptDebugLevel();
+}
+
+bool CLuaPlayerDefs::HasPlayerSpawned(CPlayer* const player) noexcept
+{
+    return player->IsSpawned();
 }
 
 int CLuaPlayerDefs::BindKey(lua_State* luaVM)
