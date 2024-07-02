@@ -1781,7 +1781,7 @@ int CLuaElementDefs::SetElementData(lua_State* luaVM)
                 strKey = strKey.Left(MAX_CUSTOMDATA_NAME_LENGTH);
             }
 
-            if (CStaticFunctionDefinitions::SetElementData(*pEntity, strKey, value, bSynchronize))
+            if (pEntity->SetCustomData(std::move(strKey), std::move(value), bSynchronize, true))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;

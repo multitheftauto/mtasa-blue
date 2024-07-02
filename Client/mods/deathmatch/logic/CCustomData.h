@@ -17,7 +17,28 @@
 struct SCustomData
 {
     CLuaArgument Variable;
-    bool         bSynchronized;
+    bool         bSynchronized{true};
+};
+
+struct SCustomDataResult
+{
+    using iterator = std::unordered_map<SString, SCustomData>::iterator;
+
+    SCustomDataResult() = default;
+
+    SCustomDataResult(const iterator& iter) :
+        Iter(iter),
+        bValid(true)
+    {
+    }
+
+    const SString& GetName() const { return Iter->first; }
+    const SCustomData& GetData() const { return Iter->second; }
+
+    operator bool() const { return bValid; }
+
+    iterator Iter;
+    bool bValid{};
 };
 
 class CCustomData
@@ -25,14 +46,13 @@ class CCustomData
 public:
     void Copy(CCustomData* pCustomData);
 
-    SCustomData* Get(const char* szName);
-    void         Set(const char* szName, const CLuaArgument& Variable, bool bSynchronized = true);
+    const SCustomData* Get(const SString& strName);
+    SCustomDataResult Set(SString&& strName, CLuaArgument&& Variable, bool bSynchronized = true, SCustomData* oldValue = {});
 
-    bool Delete(const char* szName);
+    bool Delete(const SString& strName, SCustomData* pOldData = {});
 
-    std::map<std::string, SCustomData>::const_iterator IterBegin() { return m_Data.begin(); }
-    std::map<std::string, SCustomData>::const_iterator IterEnd() { return m_Data.end(); }
+    const std::unordered_map<SString, SCustomData>& GetData() const { return m_Data; }
 
 private:
-    std::map<std::string, SCustomData> m_Data;
+    std::unordered_map<SString, SCustomData> m_Data;
 };

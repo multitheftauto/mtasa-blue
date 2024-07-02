@@ -14,39 +14,35 @@
 
 void CCustomData::Copy(CCustomData* pCustomData)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = pCustomData->IterBegin();
-    for (; iter != pCustomData->IterEnd(); iter++)
-    {
-        Set(iter->first.c_str(), iter->second.Variable);
-    }
+    for (const auto& [key, data] : pCustomData->GetData())
+        Set(SString(key), CLuaArgument(data.Variable));
 }
 
-SCustomData* CCustomData::Get(const char* szName)
+SCustomData* CCustomData::Get(const SString& strName, bool bCreate)
 {
-    assert(szName);
-
-    std::map<std::string, SCustomData>::const_iterator it = m_Data.find(szName);
+    auto it = m_Data.find(strName);
     if (it != m_Data.end())
-        return (SCustomData*)&it->second;
+        return &it->second;
 
-    return NULL;
+    if (bCreate)
+        return &m_Data[strName];
+
+    return {};
 }
 
-SCustomData* CCustomData::GetSynced(const char* szName)
+SCustomData* CCustomData::GetSynced(const SString& strName)
 {
-    assert(szName);
-
-    std::map<std::string, SCustomData>::const_iterator it = m_SyncedData.find(szName);
+    auto it = m_SyncedData.find(strName);
     if (it != m_SyncedData.end())
-        return (SCustomData*)&it->second;
+        return &it->second;
 
-    return NULL;
+    return {};
 }
 
-bool CCustomData::DeleteSynced(const char* szName)
+bool CCustomData::DeleteSynced(const SString& strName)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator iter = m_SyncedData.find(szName);
+    auto iter = m_SyncedData.find(strName);
     if (iter != m_SyncedData.end())
     {
         m_SyncedData.erase(iter);
@@ -57,11 +53,11 @@ bool CCustomData::DeleteSynced(const char* szName)
     return false;
 }
 
-void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+void CCustomData::UpdateSynced(const SString& strName, const CLuaArgument& Variable, ESyncType syncType)
 {
     if (syncType == ESyncType::BROADCAST)
     {
-        SCustomData* pDataSynced = GetSynced(szName);
+        SCustomData* pDataSynced = GetSynced(strName);
         if (pDataSynced)
         {
             pDataSynced->Variable = Variable;
@@ -72,46 +68,53 @@ void CCustomData::UpdateSynced(const char* szName, const CLuaArgument& Variable,
             SCustomData newData;
             newData.Variable = Variable;
             newData.syncType = syncType;
-            m_SyncedData[szName] = newData;
+            m_SyncedData[strName] = newData;
         }
     }
     else
     {
-        DeleteSynced(szName);
+        DeleteSynced(strName);
     }
 }
 
-void CCustomData::Set(const char* szName, const CLuaArgument& Variable, ESyncType syncType)
+SCustomDataResult CCustomData::Set(SString&& strName, CLuaArgument&& Variable, ESyncType syncType, SCustomData* pOldData)
 {
-    assert(szName);
+    if (strName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
+        return {};
 
-    // Grab the item with the given name
-    SCustomData* pData = Get(szName);
-    if (pData)
+    auto iter = m_Data.try_emplace(std::move(strName)).first;
+    SCustomData& pCurrentVariable = iter->second;
+
+    if (pCurrentVariable.Variable.IsEmpty() || pCurrentVariable.syncType != syncType || pCurrentVariable.Variable != Variable)
     {
-        // Update existing
-        pData->Variable = Variable;
-        pData->syncType = syncType;
-        UpdateSynced(szName, Variable, syncType);
-    }
-    else
-    {
-        // Add new
-        SCustomData newData;
-        newData.Variable = Variable;
-        newData.syncType = syncType;
-        m_Data[szName] = newData;
-        UpdateSynced(szName, Variable, syncType);
-    }
+        if (syncType == ESyncType::PERSISTENT)
+            syncType = pCurrentVariable.syncType;
+
+        // Save the old variable
+        if (pOldData)
+            *pOldData = std::move(pCurrentVariable);        
+
+        // Set the new data
+        pCurrentVariable.Variable = std::move(Variable);        
+        pCurrentVariable.syncType = syncType;
+        UpdateSynced(strName, Variable, syncType);
+
+        return SCustomDataResult(iter);
+    }   
+
+    return {};    
 }
 
-bool CCustomData::Delete(const char* szName)
+bool CCustomData::Delete(const SString& strName, SCustomData* pOldData)
 {
     // Find the item and delete it
-    std::map<std::string, SCustomData>::iterator it = m_Data.find(szName);
+    auto it = m_Data.find(strName);
     if (it != m_Data.end())
     {
-        DeleteSynced(szName);
+        if (pOldData)
+            *pOldData = it->second;
+
+        DeleteSynced(strName);
         m_Data.erase(it);
         return true;
     }
@@ -122,37 +125,32 @@ bool CCustomData::Delete(const char* szName)
 
 CXMLNode* CCustomData::OutputToXML(CXMLNode* pNode)
 {
-    std::map<std::string, SCustomData>::const_iterator iter = m_Data.begin();
-    for (; iter != m_Data.end(); iter++)
+    for (const auto& [key, data] : m_Data)
     {
-        CLuaArgument* arg = (CLuaArgument*)&iter->second.Variable;
+        const CLuaArgument& arg = data.Variable;
 
-        switch (arg->GetType())
+        switch (arg.GetType())
         {
             case LUA_TSTRING:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue(arg->GetString().c_str());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(key.c_str());
+                attr->SetValue(arg.GetString().c_str());
                 break;
             }
             case LUA_TNUMBER:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue((float)arg->GetNumber());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(key.c_str());
+                attr->SetValue((float)arg.GetNumber());
                 break;
             }
             case LUA_TBOOLEAN:
             {
-                CXMLAttribute* attr = pNode->GetAttributes().Create(iter->first.c_str());
-                attr->SetValue(arg->GetBoolean());
+                CXMLAttribute* attr = pNode->GetAttributes().Create(key.c_str());
+                attr->SetValue(arg.GetBoolean());
                 break;
             }
         }
     }
+    
     return pNode;
-}
-
-unsigned short CCustomData::CountOnlySynchronized()
-{
-    return static_cast<unsigned short>(m_SyncedData.size());
 }

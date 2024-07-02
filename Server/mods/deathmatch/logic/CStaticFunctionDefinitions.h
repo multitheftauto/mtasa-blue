@@ -51,7 +51,6 @@ public:
     static CElement*      GetElementByIndex(const char* szType, unsigned int uiIndex);
     static CElement*      GetElementChild(CElement* pElement, unsigned int uiIndex);
     static bool           GetElementChildrenCount(CElement* pElement, unsigned int& uiCount);
-    static CLuaArgument*  GetElementData(CElement* pElement, const char* szName, bool bInherit);
     static CLuaArguments* GetAllElementData(CElement* pElement, CLuaArguments* table);
     static CElement*      GetElementParent(CElement* pElement);
     static bool           GetElementMatrix(CElement* pElement, CMatrix& matrix);
@@ -83,11 +82,10 @@ public:
     // Element set funcs
     static bool ClearElementVisibleTo(CElement* pElement);
     static bool SetElementID(CElement* pElement, const char* szID);
-    static bool SetElementData(CElement* pElement, const char* szName, const CLuaArgument& Variable, ESyncType syncType);
-    static bool RemoveElementData(CElement* pElement, const char* szName);
-    static bool AddElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
-    static bool RemoveElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
-    static bool HasElementDataSubscriber(CElement* pElement, const char* szName, CPlayer* pPlayer);
+    static bool RemoveElementData(CElement* pElement, const SString& strName);
+    static bool AddElementDataSubscriber(CElement* pElement, const SString& strName, CPlayer* pPlayer);
+    static bool RemoveElementDataSubscriber(CElement* pElement, const SString& strName, CPlayer* pPlayer);
+    static bool HasElementDataSubscriber(CElement* pElement, const SString& strName, CPlayer* pPlayer);
     static bool SetElementParent(CElement* pElement, CElement* pParent);
     static bool SetElementMatrix(CElement* pElement, const CMatrix& matrix);
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);

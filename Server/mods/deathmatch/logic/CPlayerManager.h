@@ -46,7 +46,7 @@ public:
 
     size_t BroadcastOnlyJoined(const CPacket& Packet, CPlayer* pSkip = NULL);
     size_t BroadcastDimensionOnlyJoined(const CPacket& Packet, ushort usDimension, CPlayer* pSkip = NULL);
-    size_t BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const char* szName, CPlayer* pSkip = NULL);
+    size_t BroadcastOnlySubscribed(const CPacket& Packet, CElement* pElement, const SString& strName, CPlayer* pSkip = NULL);
 
     static void Broadcast(const CPacket& Packet, const std::set<CPlayer*>& sendList);
     static void Broadcast(const CPacket& Packet, const std::list<CPlayer*>& sendList);

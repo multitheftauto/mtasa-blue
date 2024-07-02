@@ -1017,38 +1017,6 @@ bool CStaticFunctionDefinitions::SetElementID(CClientEntity& Entity, const char*
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetElementData(CClientEntity& Entity, const char* szName, CLuaArgument& Variable, bool bSynchronize)
-{
-    assert(szName);
-    assert(strlen(szName) <= MAX_CUSTOMDATA_NAME_LENGTH);
-
-    bool          bIsSynced;
-    CLuaArgument* pCurrentVariable = Entity.GetCustomData(szName, false, &bIsSynced);
-    if (!pCurrentVariable || Variable != *pCurrentVariable || bIsSynced != bSynchronize)
-    {
-        if (bSynchronize && !Entity.IsLocalEntity())
-        {
-            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-            // Write element ID, name length and the name. Also write the variable.
-            pBitStream->Write(Entity.GetID());
-            unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
-            pBitStream->WriteCompressed(usNameLength);
-            pBitStream->Write(szName, usNameLength);
-            Variable.WriteToBitStream(*pBitStream);
-
-            // Send the packet and deallocate
-            g_pNet->SendPacket(PACKET_ID_CUSTOM_DATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
-            g_pNet->DeallocateNetBitStream(pBitStream);
-        }
-
-        // Set its custom data
-        Entity.SetCustomData(szName, Variable, bSynchronize);
-        return true;
-    }
-
-    return false;
-}
-
 bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, const char* szName)
 {
     // TODO
