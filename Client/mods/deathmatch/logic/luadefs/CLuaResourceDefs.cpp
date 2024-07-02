@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 using std::list;
 
 void CLuaResourceDefs::LoadFunctions()
@@ -22,7 +23,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceFromName", GetResourceFromName},
         {"getResourceRootElement", GetResourceRootElement},
         {"getResourceGUIElement", GetResourceGUIElement},
-        {"getResourceDynamicElementRoot", GetResourceDynamicElementRoot},
+        {"getResourceDynamicElementRoot", ArgumentParser<GetResourceDynamicElementRoot>},
         {"getResourceExportedFunctions", GetResourceExportedFunctions},
         {"getResourceState", GetResourceState},
         {"loadstring", LoadString},
@@ -352,28 +353,17 @@ int CLuaResourceDefs::GetResourceGUIElement(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM)
+CClientEntity* CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM, std::optional<CResource*> resource)
 {
-    CResource*       pResource = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
+    CResource* pResource = resource.value_or(&lua_getownerresource(luaVM));
 
-    if (!argStream.HasErrors())
+    CClientEntity* resourceDynamicRoot = pResource->GetResourceDynamicEntity();
+    if (!resourceDynamicRoot)
     {
-        CClientEntity* pEntity = pResource->GetResourceDynamicEntity();
-        if (pEntity)
-        {
-            lua_pushelement(luaVM, pEntity);
-            return 1;
-        }
-        else
-            m_pScriptDebugging->LogError(luaVM, "getResourceDynamicElementRoot: Resource %s Is Not Currently Running", pResource->GetName());
+        SString err("Resource \"%s\" is not currently running!", pResource->GetName());
+        throw LuaFunctionError(err, false);
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return resourceDynamicRoot;
 }
 
 int CLuaResourceDefs::GetResourceExportedFunctions(lua_State* luaVM)
