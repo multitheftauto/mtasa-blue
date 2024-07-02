@@ -98,9 +98,22 @@ void CClientBuildingManager::DestroyAllForABit()
 
 void CClientBuildingManager::RestoreDestroyed()
 {
-    for (CClientBuilding* building : GetBuildings())
+    bool hasInvalidLods = true;
+    while (hasInvalidLods)
     {
-        building->Create();
+        hasInvalidLods = false;
+        for (CClientBuilding* building : GetBuildings())
+        {
+            const CClientBuilding* highLodBuilding = building->GetHighLodBuilding();
+            if (highLodBuilding && !highLodBuilding->IsValid())
+            {
+                hasInvalidLods = true;
+            }
+            else
+            {
+                building->Create();
+            }
+        }
     }
 }
 
