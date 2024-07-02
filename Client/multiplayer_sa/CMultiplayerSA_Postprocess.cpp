@@ -15,6 +15,18 @@
 #define HOOKPOS_GrainEffect_RainModifier 0x705078
 #define HOOKPOS_GrainEffect_OverlayModifier 0x705091
 
+#define VAR_CPostEffects_WaterEnable 0xC402D3
+#define VAR_CPostEffects_WaterSpeed 0x8D5138
+#define VAR_CPostEffects_WaterFreq 0x8D513C
+#define VAR_CPostEffects_WaterDepthDarkessEnabled 0x8D5144
+#define VAR_CPostEffects_WaterFullDarknessDepth 0x8D5148
+#define VAR_CPostEffects_WaterFxStartUnderWaterness 0x8D514C
+#define VAR_CWeather_UnderWaterness 0xC8132C
+
+#define DEFAULT_UNDERWATER_EFFECT_SPEED ( 0.0015f )
+#define DEFAULT_UNDERWATER_EFFECT_FREQUENCY ( 0.04f )
+#define DEFAULT_UNDERWATER_FULL_DARKNESS_DEPTH ( 90.0f )
+
 namespace GrainEffect
 {
 
@@ -154,6 +166,35 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
     }
 }
 
+void CMultiplayerSA::SetUnderwaterEffectEnabled(bool isEnabled)
+{
+    MemPutFast<uint8_t>(VAR_CPostEffects_WaterEnable, isEnabled ?  1 : 0);
+}
+
+void CMultiplayerSA::SetUnderwaterEffectSpeed(float speed, float frequency)
+{
+    MemPutFast<float>(VAR_CPostEffects_WaterSpeed, speed);
+    MemPutFast<float>(VAR_CPostEffects_WaterFreq, frequency);
+}
+
+void CMultiplayerSA::SetUnderwaterDarkness(bool isEnabled, float fullDarknessDepth)
+{
+    MemPutFast<uint8_t>(VAR_CPostEffects_WaterDepthDarkessEnabled, isEnabled ? 1 : 0);
+
+    MemPutFast<float>(VAR_CPostEffects_WaterFullDarknessDepth, fullDarknessDepth);
+}
+
+void CMultiplayerSA::ResetUnderwaterEffect()
+{
+    this->SetUnderwaterEffectEnabled(false);
+    this->SetUnderwaterEffectSpeed(DEFAULT_UNDERWATER_EFFECT_SPEED, DEFAULT_UNDERWATER_EFFECT_FREQUENCY);
+}
+
+void CMultiplayerSA::ResetUnderwaterDarkness()
+{
+    this->SetUnderwaterDarkness(false, DEFAULT_UNDERWATER_FULL_DARKNESS_DEPTH);
+}
+
 void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
     if (bEnabled)
@@ -182,6 +223,19 @@ bool CMultiplayerSA::IsNightVisionEnabled()
 bool CMultiplayerSA::IsThermalVisionEnabled()
 {
     return (*(BYTE*)0xC402B9 == 1);
+}
+
+void CMultiplayerSA::GetUnderwaterEffect(bool& isEnabled, float& speed, float& frequency)
+{
+    isEnabled = (*(uint8_t*)VAR_CPostEffects_WaterEnable == 1) || (*(float*)VAR_CWeather_UnderWaterness) >= (*(float*)VAR_CPostEffects_WaterFxStartUnderWaterness);
+    speed  = (*(float*)VAR_CPostEffects_WaterSpeed);
+    frequency = (*(float*)VAR_CPostEffects_WaterFreq);
+}
+
+void CMultiplayerSA::GetUnderwaterDarkness(bool& isEnabled, float& fullDarknessDepth)
+{
+    isEnabled = (*(uint8_t*)VAR_CPostEffects_WaterDepthDarkessEnabled);
+    fullDarknessDepth = (*(float*)VAR_CPostEffects_WaterFullDarknessDepth);
 }
 
 void CMultiplayerSA::InitHooks_Postprocess()

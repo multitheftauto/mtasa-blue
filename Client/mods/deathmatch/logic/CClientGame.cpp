@@ -5482,6 +5482,10 @@ void CClientGame::ResetMapInfo()
     g_pMultiplayer->SetGrainMultiplier(eGrainMultiplierType::ALL, 1.0f);
     g_pMultiplayer->SetGrainLevel(0);
 
+    // Underwater effects
+    g_pMultiplayer->ResetUnderwaterDarkness();
+    g_pMultiplayer->ResetUnderwaterEffect();
+
     // Water
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
 

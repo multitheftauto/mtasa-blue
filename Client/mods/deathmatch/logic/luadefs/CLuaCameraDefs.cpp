@@ -29,6 +29,8 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraGoggleEffect", ArgumentParserWarn<false, GetCameraGoggleEffect>},
         {"getCameraFieldOfView", GetCameraFieldOfView},
         {"getCameraDrunkLevel", ArgumentParserWarn<false, GetCameraDrunkLevel>},
+        {"getCameraUnderwaterEffect", ArgumentParser<GetCameraUnderwaterEffect>},
+        {"getCameraUnderwaterDarkness", ArgumentParser<GetCameraUnderwaterDarkness>},
 
         // Cam set funcs
         {"setCameraMatrix", SetCameraMatrix},
@@ -41,6 +43,11 @@ void CLuaCameraDefs::LoadFunctions()
         {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
         {"setCameraDrunkLevel", ArgumentParserWarn<false, SetCameraDrunkLevel>},
+        {"setCameraUnderwaterEffectEnabled", ArgumentParser<SetCameraUnderwaterEffectEnabled>},
+        {"setCameraUnderwaterEffectSpeed", ArgumentParser<SetCameraUnderwaterEffectSpeed>},
+        {"setCameraUnderwaterDarkness", ArgumentParser<SetCameraUnderwaterDarkness>},
+        {"resetCameraUnderwaterEffect", ArgumentParser<ResetCameraUnderwaterEffect>},
+        {"resetCameraUnderwaterDarkness", ArgumentParser<ResetCameraUnderwaterDarkness>},
     };
 
     // Add functions
@@ -68,6 +75,8 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getFarClipDistance", "getFarClipDistance");
     lua_classfunction(luaVM, "getNearClipDistance", "getNearClipDistance");
     lua_classfunction(luaVM, "getType", ArgumentParser<GetElementType>);
+    lua_classfunction(luaVM, "getUnderwaterEffect", ArgumentParser<GetCameraUnderwaterEffect>);
+    lua_classfunction(luaVM, "getUnderwaterDarkness", ArgumentParser<GetCameraUnderwaterDarkness>);
 
     lua_classfunction(luaVM, "setPosition", OOP_SetCameraPosition);
     lua_classfunction(luaVM, "setRotation", OOP_SetCameraRotation);
@@ -80,6 +89,11 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setClip", "setCameraClip");
     lua_classfunction(luaVM, "setFarClipDistance", "setFarClipDistance");
     lua_classfunction(luaVM, "setNearClipDistance", "setNearClipDistance");
+    lua_classfunction(luaVM, "setUnderwaterEffectEnabled", ArgumentParser<SetCameraUnderwaterEffectEnabled>);
+    lua_classfunction(luaVM, "setUnderwaterEffectSpeed", ArgumentParser<SetCameraUnderwaterEffectSpeed>);
+    lua_classfunction(luaVM, "setUnderwaterDarkness", ArgumentParser<SetCameraUnderwaterDarkness>);
+    lua_classfunction(luaVM, "resetUnderwaterEffect", ArgumentParser<ResetCameraUnderwaterEffect>);
+    lua_classfunction(luaVM, "resetUnderwaterDarkness", ArgumentParser<ResetCameraUnderwaterDarkness>);
 
     lua_classvariable(luaVM, "interior", "setCameraInterior", "getCameraInterior");
     lua_classvariable(luaVM, "target", "setCameraTarget", "getCameraTarget");
@@ -160,6 +174,22 @@ std::string CLuaCameraDefs::GetCameraGoggleEffect()
 unsigned char CLuaCameraDefs::GetCameraDrunkLevel()
 {
     return g_pGame->GetPlayerInfo()->GetCamDrunkLevel();
+}
+
+CLuaMultiReturn<bool, float, float> CLuaCameraDefs::GetCameraUnderwaterEffect()
+{
+    bool isEnabled;
+    float speed, frequency;
+    g_pMultiplayer->GetUnderwaterEffect(isEnabled, speed, frequency);
+    return {isEnabled, speed, frequency};
+}
+
+CLuaMultiReturn<bool, float> CLuaCameraDefs::GetCameraUnderwaterDarkness()
+{
+    bool isEnabled;
+    float fullDarknessDepth;
+    g_pMultiplayer->GetUnderwaterDarkness(isEnabled, fullDarknessDepth);
+    return {isEnabled, fullDarknessDepth};
 }
 
 int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
@@ -462,6 +492,41 @@ int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaCameraDefs::SetCameraUnderwaterEffectEnabled(bool bEnabled)
+{
+    g_pMultiplayer->SetUnderwaterEffectEnabled(bEnabled);
+
+    return true;
+}
+
+bool CLuaCameraDefs::SetCameraUnderwaterEffectSpeed(float fSpeed, float fFrequency)
+{
+    g_pMultiplayer->SetUnderwaterEffectSpeed(fSpeed, fFrequency);
+
+    return true;
+}
+
+bool CLuaCameraDefs::SetCameraUnderwaterDarkness(bool bEnabled, std::optional<float> fFullDarknessDepth)
+{
+    g_pMultiplayer->SetUnderwaterDarkness(bEnabled, fFullDarknessDepth.value_or(90.0f));
+
+    return true;
+}
+
+bool CLuaCameraDefs::ResetCameraUnderwaterEffect()
+{
+    g_pMultiplayer->ResetUnderwaterEffect();
+
+    return true;
+}
+
+bool CLuaCameraDefs::ResetCameraUnderwaterDarkness()
+{
+    g_pMultiplayer->ResetUnderwaterDarkness();
+
+    return true;
 }
 
 bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)
