@@ -77,8 +77,7 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, CVector ve
 
     if (size.has_value() && (size.value() < 0 || size.value() > 25))
     {
-        m_pScriptDebugging->LogWarning(luaVM,
-                                       SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size.value()));
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size.value()));
         size = Clamp(0ui8, size.value(), 25ui8);
     }
 
