@@ -965,7 +965,7 @@ CElement* CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM, std:
     CResource* pResource = resource.value_or(&lua_getownerresource(luaVM));
     if (!pResource || !pResource->IsActive())
     {
-        SString err("Resource \"%s\" is not currently running!", pResource->GetName());
+        SString err("Resource \"%s\" is not currently running!", pResource->GetName().c_str());
         throw LuaFunctionError(err, false);
     }
 
