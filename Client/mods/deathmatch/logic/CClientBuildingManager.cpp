@@ -111,7 +111,23 @@ void CClientBuildingManager::RestoreDestroyed()
             }
             else
             {
-                building->Create();
+                CModelInfo* modelInfo = building->GetModelInfo();
+                const uint16_t physicalGroup = modelInfo->GetObjectPropertiesGroup();
+
+                if (physicalGroup == -1)
+                {
+                    building->Create();
+                }
+                else
+                {
+                    // GTA creates dynamic models as dummies.
+                    // It's possible that the physical group was changes after
+                    // creating a new building. We can avoid crashes in this case.
+                    modelInfo->SetObjectPropertiesGroup(-1);
+                    building->Create();
+                    modelInfo->SetObjectPropertiesGroup(physicalGroup);
+                }
+                
             }
         }
     }
