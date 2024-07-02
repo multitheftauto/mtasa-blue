@@ -39,6 +39,4 @@ public:
     virtual bool IsDisabled() = 0;
     virtual void SetComponentVisible(eHudComponent component, bool bVisible) = 0;
     virtual bool IsComponentVisible(eHudComponent component) = 0;
-    virtual void AdjustComponents(float fAspectRatio) = 0;
-    virtual void ResetComponentAdjustment() = 0;
 };
