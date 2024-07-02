@@ -85,7 +85,6 @@ class CSettingsSA : public CGameSettings
 private:
     CSettingsSAInterface* m_pInterface;
     bool                  m_bVolumetricShadowsEnabled;
-    bool                  m_bVolumetricShadowsEnabledByScript;
     bool                  m_bVolumetricShadowsSuspended;
     bool                  m_bDynamicPedShadowsEnabled;
     eAspectRatio          m_AspectRatio;
@@ -140,6 +139,7 @@ public:
     void SetMipMappingEnabled(bool bEnable);
 
     bool IsVolumetricShadowsEnabled();
+    bool GetVolumetricShadowsEnabledByVideoSetting(); 
     void SetVolumetricShadowsEnabled(bool bEnable);
     void SetVolumetricShadowsSuspended(bool bSuspended);
 
