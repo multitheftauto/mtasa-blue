@@ -176,4 +176,7 @@ public:
     LUA_DECLARE(SetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponents);
+
+    static void        SetVehName(CClientVehicle* veh);
+    static std::string GetVehName();
 };

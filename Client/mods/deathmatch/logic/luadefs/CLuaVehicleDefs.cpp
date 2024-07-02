@@ -13,6 +13,7 @@
 #include <game/CHandlingEntry.h>
 #include <game/CHandlingManager.h>
 #include "lua/CLuaFunctionParser.h"
+#include "../../../../game_sa/CHudSA.h"
 
 void CLuaVehicleDefs::LoadFunctions()
 {
@@ -154,6 +155,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
+
+        {"setVehName", ArgumentParser<SetVehName>},
     };
 
     // Add functions
@@ -4173,4 +4176,15 @@ bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)
 bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion)
 {
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
+}
+
+void CLuaVehicleDefs::SetVehName(CClientVehicle* veh)
+{
+    veh->SetName("abc");
+}
+
+std::string CLuaVehicleDefs::GetVehName()
+{
+    std::string copy;
+    return copy;
 }

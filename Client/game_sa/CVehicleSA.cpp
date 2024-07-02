@@ -2269,3 +2269,57 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     }
     return bReturn;
 }
+
+#include "CPlayerInfoSA.h"
+
+void testHook()
+{
+    DWORD* PlayerInFocusRaw = (DWORD*)0xB7CD74;
+    // CWorld::PlayerInFocus
+    std::uint8_t PlayerInFocus = *(std::uint8_t*)PlayerInFocusRaw;
+
+    DWORD* TheText = (DWORD*)0xC1B340;
+    DWORD* ms_modelInfoPtrs = (DWORD*)0xA9B0C8;
+
+    DWORD* PlayersRaw = (DWORD*)0xB7CD98;
+    // CWorld::Players[2]
+    CPlayerInfo* Players = *(CPlayerInfo**)PlayersRaw;
+
+    DWORD* CHud__SetVehicleNameRaw = (DWORD*)0x588F50;
+    DWORD* CText__GetRaw = (DWORD*)0x6A0050;
+    void(__cdecl * CHud__SetVehicleName)(char*) = reinterpret_cast<decltype(CHud__SetVehicleName)>(CHud__SetVehicleNameRaw);
+    char*(__thiscall * CText__Get)(void*, char*) = reinterpret_cast<decltype(CText__Get)>(CText__GetRaw);
+
+    DWORD* Player = (DWORD*)(PlayerInFocus + Players);
+    DWORD  Ped = *Player;
+    DWORD  pedFlags = *(DWORD*)(Ped + 0x46C);
+
+    if (!(pedFlags & 0x100))
+    {
+        _asm {
+            mov [ecx], 0
+        }
+        CHud__SetVehicleName(0);
+        return;
+    }
+
+    DWORD vehicle = *(DWORD*)((BYTE*)Ped + 0x58C);
+    if (!vehicle)
+    {
+        CHud__SetVehicleName(0);
+        return;
+    }
+    DWORD modelIndex = *(DWORD*)(vehicle + 0x22);
+    DWORD* modelInfo = (DWORD*)(ms_modelInfoPtrs[modelIndex * 4] + 0x32);
+    auto name = CText__Get(&TheText, (char*)modelInfo);
+    CHud__SetVehicleName(name);
+    return;
+}
+
+void CVehicleSA::SetVehicleName(const char* name)
+{
+    // originalFunc = 0x572040
+    DWORD dwFunc = 0x5720B9;
+    DWORD dwOutFunc = (DWORD)testHook;
+    HookInstall(dwFunc, dwOutFunc);
+}

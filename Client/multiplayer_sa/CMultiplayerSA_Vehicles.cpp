@@ -107,6 +107,7 @@ static void _declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise()
     }
 }
 
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Vehicles

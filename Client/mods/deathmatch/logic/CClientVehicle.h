@@ -396,6 +396,8 @@ public:
     const char* GetRegPlate() { return m_strRegPlate.empty() ? NULL : m_strRegPlate.c_str(); }
     bool        SetRegPlate(const char* szPlate);
 
+    void SetName(const char* name);
+
     unsigned char GetPaintjob();
     void          SetPaintjob(unsigned char ucPaintjob);
 

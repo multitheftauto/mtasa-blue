@@ -3381,6 +3381,7 @@ bool CClientVehicle::SetRegPlate(const char* szPlate)
             {
                 m_pVehicle->SetPlateText(m_strRegPlate);
             }
+            
             return true;
         }
     }
@@ -5030,4 +5031,9 @@ void CClientVehicle::ResetWheelScale()
         m_fWheelScale = 1.0f;
 
     m_bWheelScaleChanged = false;
+}
+
+void CClientVehicle::SetName(const char* name)
+{
+    m_pVehicle->SetVehicleName(name);
 }
