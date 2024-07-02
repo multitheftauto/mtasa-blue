@@ -197,7 +197,7 @@ public:
     CChildListType ::const_iterator IterEnd() { return m_Children.end(); }
     CElementListSnapshotRef         GetChildrenListSnapshot();
 
-    ElementID GetID() { return m_ID; };
+    ElementID GetID() const noexcept { return m_ID; }
     void      SetID(ElementID ID);
 
     CCustomData*   GetCustomDataPointer() { return m_pCustomData; }

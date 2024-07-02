@@ -656,7 +656,7 @@ bool CDebugHookManager::CallHook(const char* szName, const std::vector<SDebugHoo
         // Check for skip option
         if (returnValues.Count())
         {
-            CLuaArgument* returnedValue = *returnValues.IterBegin();
+            CLuaArgument* returnedValue = *returnValues.begin();
             if (returnedValue->GetType() == LUA_TSTRING)
             {
                 if (returnedValue->GetString() == "skip")
