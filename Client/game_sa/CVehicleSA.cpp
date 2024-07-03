@@ -2303,15 +2303,15 @@ void testHook()
         return;
     }
 
-    DWORD vehicle = *(DWORD*)((BYTE*)Ped + 0x58C);
+    DWORD* vehicle = (DWORD*)((BYTE*)Ped + 0x58C);
     if (!vehicle)
     {
         CHud__SetVehicleName(0);
         return;
     }
-    DWORD modelIndex = *(DWORD*)(vehicle + 0x22);
-    DWORD* modelInfo = (DWORD*)(ms_modelInfoPtrs[modelIndex * 4] + 0x32);
-    auto name = CText__Get(&TheText, (char*)modelInfo);
+    DWORD modelIndex = *(DWORD*)((BYTE*)vehicle + 0x22);
+    DWORD* modelInfo = (DWORD*)((BYTE*)(ms_modelInfoPtrs[modelIndex * 4]) + 0x32);
+    auto name = CText__Get(&TheText, (char*)*modelInfo);
     CHud__SetVehicleName(name);
     return;
 }
