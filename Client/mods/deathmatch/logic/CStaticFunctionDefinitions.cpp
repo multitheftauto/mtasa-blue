@@ -4789,7 +4789,7 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
         pMarker->SetPosition(vecPosition);
 
         if (ucType == CClientMarker::MARKER_ARROW || ucType == CClientMarker::MARKER_CHECKPOINT)
-            pMarker->IgnoreAlphaLimits(ignoreAlphaLimits);
+            pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
 
         pMarker->SetColor(color);
         pMarker->SetSize(fSize);

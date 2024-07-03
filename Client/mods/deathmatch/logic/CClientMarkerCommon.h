@@ -57,6 +57,6 @@ public:
     virtual void StreamIn() = 0;
     virtual void StreamOut() = 0;
 
-    virtual void IgnoreAlphaLimits(bool ignore) = 0;
-    virtual bool AreAlphaLimitsIgnored() const = 0;
+    virtual void SetIgnoreAlphaLimits(bool ignore) noexcept = 0;
+    virtual bool AreAlphaLimitsIgnored() const noexcept = 0;
 };

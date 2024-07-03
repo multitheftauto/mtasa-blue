@@ -511,7 +511,7 @@ CSphere CClientMarker::GetWorldBoundingSphere()
     return sphere;
 }
 
-void CClientMarker::IgnoreAlphaLimits(bool ignore)
+void CClientMarker::SetIgnoreAlphaLimits(bool ignore)
 {
-    m_pMarker->IgnoreAlphaLimits(ignore);
+    m_pMarker->SetIgnoreAlphaLimits(ignore);
 }

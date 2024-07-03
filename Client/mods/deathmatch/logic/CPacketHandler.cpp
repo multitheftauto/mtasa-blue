@@ -3656,7 +3656,7 @@ retry:
 
                             // Read out alpha limit flag
                             if (bitStream.Can(eBitStreamVersion::Marker_IgnoreAlphaLimits))
-                                pMarker->IgnoreAlphaLimits(bitStream.ReadBit());
+                                pMarker->SetIgnoreAlphaLimits(bitStream.ReadBit());
 
                             pMarker->SetColor(color);
                         }

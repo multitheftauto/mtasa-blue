@@ -74,7 +74,7 @@ public:
     static bool          IconToString(unsigned char ucIcon, SString& strOutString);
     void                 ReCreateWithSameIdentifier();
 
-    void IgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
+    void SetIgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
     bool AreAlphaLimitsIgnored() const noexcept override { return m_ignoreAlphaLimits; };
 
 protected:

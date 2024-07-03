@@ -45,7 +45,7 @@ public:
     void SetVisible(bool bVisible) { m_bVisible = bVisible; };
 
     SColor GetColor() const { return m_Color; }
-    void   SetColor(const SColor& color);
+    void   SetColor(const SColor& color) noexcept;
 
     float GetSize() const { return m_fSize; };
     void  SetSize(float fSize) { m_fSize = fSize; };
@@ -53,7 +53,7 @@ public:
     float GetPulseFraction() { return static_cast<float>(m_pMarker->GetPulseFraction()); };
     void  SetPulseFraction(float fFraction) { m_pMarker->SetPulseFraction(fFraction); };
 
-    void IgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
+    void SetIgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
     bool AreAlphaLimitsIgnored() const noexcept override { return m_ignoreAlphaLimits; };
 
 protected:

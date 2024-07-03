@@ -67,7 +67,7 @@ public:
 
     virtual CSphere GetWorldBoundingSphere();
 
-    void IgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
+    void SetIgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
     bool AreAlphaLimitsIgnored() const noexcept { return m_ignoreAlphaLimits; };
 
 protected:

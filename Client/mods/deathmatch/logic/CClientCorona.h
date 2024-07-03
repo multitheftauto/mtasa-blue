@@ -41,7 +41,7 @@ public:
     void SetReflectionEnabled(bool bEnabled) { m_bReflectionEnabled = bEnabled; };
     bool IsReflectionEnabled() const { return m_bReflectionEnabled; };
 
-    void IgnoreAlphaLimits(bool ignore) noexcept { };
+    void SetIgnoreAlphaLimits(bool ignore) noexcept {};
     bool AreAlphaLimitsIgnored() const noexcept override { return true; };
 
 protected:
