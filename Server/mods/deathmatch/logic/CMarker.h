@@ -67,6 +67,9 @@ public:
 
     virtual CSphere GetWorldBoundingSphere();
 
+    void IgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
+    bool AreAlphaLimitsIgnored() const noexcept { return m_ignoreAlphaLimits; };
+
 protected:
     bool ReadSpecialData(const int iLine) override;
 
@@ -85,6 +88,7 @@ private:
     float                 m_fSize;
     SColor                m_Color;
     unsigned char         m_ucIcon;
+    bool                  m_ignoreAlphaLimits;
 
     CColShape* m_pCollision;
 };

@@ -733,6 +733,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             BitStream.WriteBit(false);
                     }
 
+                    // Alpha limit
+                    if (BitStream.Can(eBitStreamVersion::Marker_IgnoreAlphaLimits))
+                        BitStream.WriteBit(pMarker->AreAlphaLimitsIgnored());
+
                     break;
                 }
 

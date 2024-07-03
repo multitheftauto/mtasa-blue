@@ -74,6 +74,9 @@ public:
     static bool          IconToString(unsigned char ucIcon, SString& strOutString);
     void                 ReCreateWithSameIdentifier();
 
+    void IgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
+    bool AreAlphaLimitsIgnored() const noexcept override { return m_ignoreAlphaLimits; };
+
 protected:
     bool IsStreamedIn() { return m_bStreamedIn; };
     void StreamIn();
@@ -95,6 +98,7 @@ private:
     float            m_fSize;
     SColor           m_Color;
     CCheckpoint*     m_pCheckpoint;
+    bool             m_ignoreAlphaLimits;
 
     DWORD   m_dwIdentifier;
     bool    m_bHasTarget;

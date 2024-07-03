@@ -366,7 +366,7 @@ public:
     static bool SetBlipVisibleDistance(CClientEntity& Entity, unsigned short usVisibleDistance);
 
     // Marker create/destroy funcs
-    static CClientMarker* CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color);
+    static CClientMarker* CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, bool ignoreAlphaLimits);
 
     // Marker get funcs
     static bool GetMarkerTarget(CClientMarker& Marker, CVector& vecTarget);

@@ -7662,7 +7662,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CElement* pElement, uns
 }
 
 CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color,
-                                                  CElement* pVisibleTo)
+                                                  CElement* pVisibleTo, bool ignoreAlphaLimits)
 {
     assert(szType);
 
@@ -7678,6 +7678,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
             // Set the properties
             pMarker->SetPosition(vecPosition);
             pMarker->SetMarkerType(ucType);
+            pMarker->IgnoreAlphaLimits(ignoreAlphaLimits);
             pMarker->SetColor(color);
             pMarker->SetSize(fSize);
 
