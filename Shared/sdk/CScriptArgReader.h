@@ -502,7 +502,7 @@ public:
     void ReadColor(SColor& outValue, const SColor& defaultValue)
     {
         lua_Number color;
-        ReadNumber(color, static_cast<lua_Number>(defaultValue.ARGB));
+        ReadNumber(color, static_cast<lua_Number>(defaultValue));
 
         if (!m_bError)
             outValue = static_cast<unsigned long>(static_cast<int64_t>(color));

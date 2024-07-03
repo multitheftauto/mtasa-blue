@@ -162,7 +162,7 @@ const SString& CPerfStatServerInfoImpl::GetCategoryName()
 ///////////////////////////////////////////////////////////////
 void CPerfStatServerInfoImpl::DoPulse()
 {
-    std::int64_t llTime = GetTickCount64_();
+    long long llTime = GetTickCount64_();
 
     UpdateThreadCPUTimes(m_MainThreadCPUTimes, &llTime);
 
