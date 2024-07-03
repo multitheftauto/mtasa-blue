@@ -2281,20 +2281,22 @@ void testHook()
     DWORD* TheText = (DWORD*)0xC1B340;
     DWORD* ms_modelInfoPtrs = (DWORD*)0xA9B0C8;
 
+    CVehicleModelInfoSAInterface** ms_modelInfo = (CVehicleModelInfoSAInterface**)(*ms_modelInfoPtrs);
+
     DWORD* PlayersRaw = (DWORD*)0xB7CD98;
     // CWorld::Players[2]
-    CPlayerInfo* Players = *(CPlayerInfo**)PlayersRaw;
+    CPlayerInfoSAInterface* Players = *(CPlayerInfoSAInterface**)PlayersRaw;
 
     DWORD* CHud__SetVehicleNameRaw = (DWORD*)0x588F50;
     DWORD* CText__GetRaw = (DWORD*)0x6A0050;
     void(__cdecl * CHud__SetVehicleName)(char*) = reinterpret_cast<decltype(CHud__SetVehicleName)>(CHud__SetVehicleNameRaw);
     char*(__thiscall * CText__Get)(void*, char*) = reinterpret_cast<decltype(CText__Get)>(CText__GetRaw);
 
-    DWORD* Player = (DWORD*)(PlayerInFocus + Players);
-    DWORD  Ped = *Player;
-    DWORD  pedFlags = *(DWORD*)(Ped + 0x46C);
+    CPlayerInfoSAInterface Player = Players[PlayerInFocus];
+    auto                   Ped = Player.pPed;
+    CPedFlags              pedFlags = Ped->pedFlags;
 
-    if (!(pedFlags & 0x100))
+    if (!pedFlags.bInVehicle)
     {
         _asm {
             mov [ecx], 0
@@ -2303,15 +2305,14 @@ void testHook()
         return;
     }
 
-    DWORD* vehicle = (DWORD*)((BYTE*)Ped + 0x58C);
+    CVehicleSAInterface* vehicle = Ped->pVehicle;
     if (!vehicle)
     {
         CHud__SetVehicleName(0);
         return;
     }
-    DWORD modelIndex = *(DWORD*)((BYTE*)vehicle + 0x22);
-    DWORD* modelInfo = (DWORD*)((BYTE*)(ms_modelInfoPtrs[modelIndex * 4]) + 0x32);
-    auto name = CText__Get(&TheText, (char*)*modelInfo);
+    auto   modelInfo = ms_modelInfo[vehicle->m_nModelIndex];
+    auto name = CText__Get(&TheText, modelInfo->gameName);
     CHud__SetVehicleName(name);
     return;
 }

@@ -91,8 +91,7 @@ public:
     unsigned int bStopAndShoot : 1;                   // Ped cannot reach target to attack with fist, need to use gun
     unsigned int bIsPedDieAnimPlaying : 1;            // is ped die animation finished so can dead now
     unsigned int bStayInSamePlace : 1;                // when set, ped stays put
-    unsigned int
-        bKindaStayInSamePlace : 1;                    // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
+    unsigned int bKindaStayInSamePlace : 1;           // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
     unsigned int bBeingChasedByPolice : 1;            // use nodes for routefind
 
     unsigned int bNotAllowedToDuck : 1;              // Is this ped allowed to duck at all?
