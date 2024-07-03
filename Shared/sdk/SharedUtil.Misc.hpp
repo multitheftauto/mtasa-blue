@@ -1913,7 +1913,7 @@ namespace SharedUtil
     // Updates struct with datum
     //
     ///////////////////////////////////////////////////////////////////////////
-    void UpdateThreadCPUTimes(SThreadCPUTimesStore& store, std::int64_t* pllTickCount)
+    void UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount)
     {
         // Use supplied tick count if present
         std::uint64_t ullCPUMeasureTimeMs;
