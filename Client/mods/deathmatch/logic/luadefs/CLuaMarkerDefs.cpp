@@ -179,7 +179,12 @@ int CLuaMarkerDefs::GetMarkerColor(lua_State* luaVM)
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.R));
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.G));
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.B));
-        lua_pushnumber(luaVM, !pMarker->AreAlphaLimitsIgnored() ? 255 : static_cast<lua_Number>(color.A)); // return fake 255 alpha
+
+        if (!pMarker->AreAlphaLimitsIgnored() && (pMarker->GetMarkerType() == CClientMarker::MARKER_CHECKPOINT || pMarker->GetMarkerType() == CClientMarker::MARKER_ARROW))
+            lua_pushnumber(luaVM, 255); // fake alpha
+        else
+            lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
+
         return 4;
     }
     else
