@@ -208,7 +208,7 @@ namespace SharedUtil
     };
     DWORD _GetCurrentProcessorNumber();
     void  GetThreadCPUTimes(std::uint64_t& outUserTime, std::uint64_t& outKernelTime);
-    void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, std::int64_t* pllTickCount = nullptr);
+    void  UpdateThreadCPUTimes(SThreadCPUTimesStore& store, long long* pllTickCount = nullptr);
 
     SString EscapeString(const SString& strText, const SString& strDisallowedChars, char cSpecialChar = '#', std::uint8_t ucLowerLimit = 0, std::uint8_t ucUpperLimit = 255);
     SString UnescapeString(const SString& strText, char cSpecialChar = '#');
