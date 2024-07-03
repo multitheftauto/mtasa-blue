@@ -182,7 +182,7 @@ static void WriteRegistryStringValue(HKEY hkRoot, const char* szSubKey, const ch
     if (!hkTemp)
         return;
         
-    RegSetValueExW(hkTemp, wstrValue, nullptr, REG_SZ, (LPBYTE)wstrBuffer.c_str(), (wstrBuffer.length() + 1) * sizeof(wchar_t));
+    RegSetValueExW(hkTemp, wstrValue, 0, REG_SZ, (LPBYTE)wstrBuffer.c_str(), (wstrBuffer.length() + 1) * sizeof(wchar_t));
     if (bFlush)
     {
         // Very slow. Only needed if there is a risk of BSOD soon afterwards.
@@ -1120,7 +1120,7 @@ SString SharedUtil::UnescapeString(const SString& strText, char cSpecialChar)
 {
     SString strResult;
     // Replace #FF with char
-    for (auto i = 0; i < strText.length(); i++)
+    for (std::size_t i = 0; i < strText.length(); i++)
     {
         std::uint8_t c = strText[i];
         if (c == cSpecialChar && i < strText.length() - 2)
@@ -1569,9 +1569,9 @@ bool SharedUtil::IsLuaObfuscatedScript(const void* pData, std::uint32_t uiLength
 bool SharedUtil::IsValidVersionString(const SString& strVersion)
 {
     const SString strCheck = "0.0.0-0.00000.0.000";
-    std::uint32_t uiLength = std::min(strCheck.length(), strVersion.length());
+    std::size_t uiLength = std::min(strCheck.length(), strVersion.length());
     
-    for (auto i = 0; i < uiLength; i++)
+    for (std::size_t i = 0; i < uiLength; i++)
     {
         std::uint8_t c = strVersion[i];
         std::uint8_t d = strCheck[i];
@@ -1683,21 +1683,25 @@ namespace SharedUtil
     SString CArgMap::ToString() const
     {
         SString strResult;
-        for (const auto& [first, second] : m_Map)
+        // cant use structurized binding because
+        // game_sa is C++14 (C++17 required)
+        for(auto it = m_Map.begin(); it != m_Map.end(); ++it)
         {
             if (!strResult.empty())
                 strResult += m_strPartsSep;
-            strResult += first + m_strArgSep + second;
+            strResult += it->first + m_strArgSep + it->second;
         }
         return strResult;
     }
 
     bool CArgMap::HasMultiValues() const
     {
-        for (const auto& [first, second] : m_Map)
+        // cant use structurized binding because
+        // game_sa is C++14 (C++17 required)
+        for(auto it = m_Map.begin(); it != m_Map.end(); ++it)
         {
             std::vector<SString> newItems;
-            MultiFind(m_Map, first, &newItems);
+            MultiFind(m_Map, it->first, &newItems);
             if (newItems.size() > 1)
                 return true;
         }
@@ -1789,8 +1793,10 @@ namespace SharedUtil
     // All keys
     void CArgMap::GetKeys(std::vector<SString>& outList) const
     {
-        for (const auto& [first, second] : m_Map)
-            outList.push_back(first);
+        // cant use structurized binding because
+        // game_sa is C++14 (C++17 required)
+        for (auto it = m_Map.begin(); it != m_Map.end(); ++it)
+            outList.push_back(it->first);
     }
 
 #ifdef _WIN32

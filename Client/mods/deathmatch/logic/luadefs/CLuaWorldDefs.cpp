@@ -2021,9 +2021,9 @@ bool CLuaWorldDefs::SetColorFilter(uchar ucPass0Red, uchar ucPass0Green, uchar u
 
 CLuaMultiReturn<uchar, uchar, uchar, uchar, uchar, uchar, uchar, uchar> CLuaWorldDefs::GetColorFilter(bool isOriginal)
 {
-    SColor uColor0 = 0;
-    SColor uColor1 = 0;
-    g_pMultiplayer->GetColorFilter(uColor0, uColor1, isOriginal);
+    SColor uColor0;
+    SColor uColor1;
+    g_pMultiplayer->GetColorFilter(uColor0.ARGB, uColor1.ARGB, isOriginal);
     return {
         uColor0.R, uColor0.G, uColor0.B, uColor0.A,
         uColor1.R, uColor1.G, uColor1.B, uColor1.A,

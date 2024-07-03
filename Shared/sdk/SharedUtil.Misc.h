@@ -431,43 +431,33 @@ namespace SharedUtil
     //
     struct SColor
     {
-        std::uint8_t A;
-        std::uint8_t R;
-        std::uint8_t G;
-        std::uint8_t B;
-
-        constexpr SColor() noexcept : A(0), R(0), G(0), B(0) {}
-        constexpr SColor(std::uint32_t value) noexcept : A((value & 0xFF000000) >> 24), R((value & 0xFF0000) >> 16), G((value & 0xFF00) >> 8), B(value & 0xFF)
-        {}
+        union
+        {
+            struct { std::uint8_t B, G, R, A; };
+            DWORD ARGB;
+        };
+        constexpr SColor() noexcept : ARGB(0) {}
+        constexpr SColor(std::uint32_t value) noexcept : ARGB(value) {}
         constexpr SColor(std::uint8_t a, std::uint8_t r, std::uint8_t g, std::uint8_t b) noexcept : A(a), R(r), G(g), B(b) {}
 
-        constexpr std::uint32_t GetARGB() const noexcept {
-            return A << 24 | R << 16 | G << 8 | B;
-        }
-
-        constexpr void SetARGB(std::uint32_t argb) noexcept {
-            A = static_cast<std::uint8_t>((argb & 0xFF000000) >> 24);
-            R = static_cast<std::uint8_t>((argb & 0x00FF0000) >> 16);
-            G = static_cast<std::uint8_t>((argb & 0x0000FF00) >> 8);
-            B = static_cast<std::uint8_t>(argb & 0x000000FF);
-        }
-
-        constexpr operator std::uint32_t() const noexcept { return GetARGB(); }
+        constexpr operator unsigned long() const noexcept { return ARGB; }
 
         constexpr SColor operator|(std::uint32_t value) const noexcept {
-            return SColor(GetARGB() | value);
+            return SColor(ARGB | value);
         }
         constexpr SColor operator&(std::uint32_t value) const noexcept {
-            return SColor(GetARGB() & value);
+            return SColor(ARGB & value);
         }
         constexpr SColor& operator|=(std::uint32_t value) noexcept {
-            SetARGB(GetARGB() | value);
+            ARGB |= value;
             return *this;
         }
         constexpr SColor& operator&=(std::uint32_t value) noexcept {
-            SetARGB(GetARGB() & value);
+            ARGB &= value;
             return *this;
         }
+        constexpr bool operator==(SColor other) noexcept { return ARGB == other.ARGB; }
+        constexpr bool operator!=(SColor other) noexcept { return !operator==(other); }
     };
 
     //
