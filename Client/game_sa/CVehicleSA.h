@@ -94,6 +94,14 @@ struct RwTexture;
 #define FUNC_CAutomobile_OnVehiclePreRender 0x6ABCFD
 #define FUNC_CVehicle_DoSunGlare            0x6DD6F0
 
+// for vehicle names
+#define FUNC_CCurrentVehicle_Display 0x571EA0
+#define VAR_CWorld_PlayerInFocus     0xB7CD74
+#define VAR_CWorld_Players           0xB7CD98
+#define FUNC_CHud_SetVehicleName     0x588F50
+#define FUNC_CText_Get               0x6A0050
+
+
 struct SRailNodeSA
 {
     short sX;                       // x coordinate times 8
@@ -385,6 +393,12 @@ public:
 static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
 
 class CAutomobileSAInterface;
+
+
+struct CCurrentVehicleSAInterface
+{
+    CVehicleSAInterface* m_pCurrentVehicle;
+};
 
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "gamesa_renderware.h"
 #include "CAutomobileSA.h"
 #include "CBikeSA.h"
 #include "CCameraSA.h"
@@ -23,7 +24,7 @@
 #include "CVehicleSA.h"
 #include "CVisibilityPluginsSA.h"
 #include "CWorldSA.h"
-#include "gamesa_renderware.h"
+#include "../game_sa/CPlayerInfoSA.h"
 
 extern CGameSA* pGame;
 
@@ -2270,57 +2271,8 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     return bReturn;
 }
 
-#include "CPlayerInfoSA.h"
-
-void testHook()
-{
-    DWORD* PlayerInFocusRaw = (DWORD*)0xB7CD74;
-    // CWorld::PlayerInFocus
-    std::uint8_t PlayerInFocus = *(std::uint8_t*)PlayerInFocusRaw;
-
-    DWORD* TheText = (DWORD*)0xC1B340;
-    DWORD* ms_modelInfoPtrs = (DWORD*)0xA9B0C8;
-
-    CVehicleModelInfoSAInterface** ms_modelInfo = (CVehicleModelInfoSAInterface**)(*ms_modelInfoPtrs);
-
-    DWORD* PlayersRaw = (DWORD*)0xB7CD98;
-    // CWorld::Players[2]
-    CPlayerInfoSAInterface* Players = *(CPlayerInfoSAInterface**)PlayersRaw;
-
-    DWORD* CHud__SetVehicleNameRaw = (DWORD*)0x588F50;
-    DWORD* CText__GetRaw = (DWORD*)0x6A0050;
-    void(__cdecl * CHud__SetVehicleName)(char*) = reinterpret_cast<decltype(CHud__SetVehicleName)>(CHud__SetVehicleNameRaw);
-    char*(__thiscall * CText__Get)(void*, char*) = reinterpret_cast<decltype(CText__Get)>(CText__GetRaw);
-
-    CPlayerInfoSAInterface Player = Players[PlayerInFocus];
-    auto                   Ped = Player.pPed;
-    CPedFlags              pedFlags = Ped->pedFlags;
-
-    if (!pedFlags.bInVehicle)
-    {
-        _asm {
-            mov [ecx], 0
-        }
-        CHud__SetVehicleName(0);
-        return;
-    }
-
-    CVehicleSAInterface* vehicle = Ped->pVehicle;
-    if (!vehicle)
-    {
-        CHud__SetVehicleName(0);
-        return;
-    }
-    auto   modelInfo = ms_modelInfo[vehicle->m_nModelIndex];
-    auto name = CText__Get(&TheText, modelInfo->gameName);
-    CHud__SetVehicleName(name);
-    return;
-}
-
 void CVehicleSA::SetVehicleName(const char* name)
 {
-    // originalFunc = 0x572040
-    DWORD dwFunc = 0x5720B9;
-    DWORD dwOutFunc = (DWORD)testHook;
-    HookInstall(dwFunc, dwOutFunc);
+    
 }
+

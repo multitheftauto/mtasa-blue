@@ -107,6 +107,47 @@ static void _declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise()
     }
 }
 
+#include "../game_sa/CVehicleSA.h"
+#include "../game_sa/CPlayerInfoSA.h"
+#include "../game_sa/CTextSA.h"
+
+#define HOOKPOS_CCurrentVehicle__Process 0x5720B9
+#define HOOKSIZE_CCurrentVehicle__Process 0x5
+
+static void HOOK_CCurrentVehicle__Process()
+{
+    static auto currentVehicle = (CCurrentVehicleSAInterface*)0xBA18FC;
+    static auto TheText = (CTextSAInterface*)0xC1B340;
+    static auto ModelInfoPtr = (CVehicleModelInfoSAInterface**)0xA9B0C8;
+
+    using CHud__SetVehicleName_t = void(__cdecl*)(const char*);
+    using CCurrentVehicle__Display_t = void(__thiscall*)(CCurrentVehicleSAInterface*);
+    using CText__Get_t = char*(__thiscall*)(CTextSAInterface*, char*);
+
+    static const auto CHud__SetVehicleName = reinterpret_cast<CHud__SetVehicleName_t>(FUNC_CHud_SetVehicleName);
+    static const auto CCurrentVehicle__Display = reinterpret_cast<CCurrentVehicle__Display_t>(FUNC_CCurrentVehicle_Display);
+    static const auto CText__Get = reinterpret_cast<CText__Get_t>(FUNC_CText_Get);
+
+    std::uint8_t            CWorld__PlayerInFocus = *(std::uint8_t*)VAR_CWorld_PlayerInFocus;
+    CPlayerInfoSAInterface* CWorld__Players = (CPlayerInfoSAInterface*)VAR_CWorld_Players;
+    CPlayerPedSAInterface*  playerPed = CWorld__Players[CWorld__PlayerInFocus].pPed;
+
+    const char* name = "My custom Name";
+
+    currentVehicle->m_pCurrentVehicle = playerPed->pVehicle;
+    if (!playerPed->pedFlags.bInVehicle)
+    {
+        CHud__SetVehicleName(0);
+        CCurrentVehicle__Display(currentVehicle);
+        return;
+    }
+    auto modelIndex = playerPed->pVehicle->m_nModelIndex;
+    auto modelInfo = ModelInfoPtr[modelIndex];
+    auto gameName = modelInfo->gameName;
+    auto textName = CText__Get(TheText, gameName);
+
+    CHud__SetVehicleName(textName);
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -119,4 +160,5 @@ void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
     EZHookInstall(CAEVehicleAudioEntity__Initialise);
+    EZHookInstall(CCurrentVehicle__Process);
 }
