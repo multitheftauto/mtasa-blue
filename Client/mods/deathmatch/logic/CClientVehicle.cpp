@@ -1614,6 +1614,14 @@ bool CClientVehicle::SetRotorSpeed(float fSpeed)
     }
 }
 
+bool CClientVehicle::SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept
+{
+    if (!m_pVehicle)
+        return false;
+
+    return m_pVehicle->SetVehicleWheelRotation(fRot1, fRot2, fRot3, fRot4);
+}
+
 bool CClientVehicle::IsHeliSearchLightVisible()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
