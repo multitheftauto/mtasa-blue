@@ -1471,7 +1471,7 @@ void CPacketHandler::Packet_DebugEcho(NetBitStreamInterface& bitStream)
     if (!bitStream.Read(ucLevel))
         return;
 
-    if (ucLevel == 0)
+    if (ucLevel == 0 || ucLevel == 4)
     {
         // Read out the color
         if (!bitStream.Read(ucRed) || !bitStream.Read(ucGreen) || !bitStream.Read(ucBlue))
@@ -1481,7 +1481,7 @@ void CPacketHandler::Packet_DebugEcho(NetBitStreamInterface& bitStream)
     }
 
     // Valid length?
-    int iBytesRead = (ucLevel == 0) ? 4 : 1;
+    int iBytesRead = (ucLevel == 0 || ucLevel == 4) ? 4 : 1;
     int iNumberOfBytesUsed = bitStream.GetNumberOfBytesUsed() - iBytesRead;
     if (iNumberOfBytesUsed >= MIN_DEBUGECHO_LENGTH && iNumberOfBytesUsed <= MAX_DEBUGECHO_LENGTH)
     {
@@ -2390,6 +2390,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FIREBALLDESTRUCT, wsProps.data2.fireballdestruct);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::ROADSIGNSTEXT, wsProps.data3.roadsignstext);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTENDEDWATERCANNONS, wsProps.data4.extendedwatercannons);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::TUNNELWEATHERBLEND, wsProps.data5.tunnelweatherblend);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))

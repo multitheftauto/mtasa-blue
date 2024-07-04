@@ -198,6 +198,9 @@ DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 #define HOOKPOS_PreFxRender                                     0x049E650
 DWORD RETURN_PreFxRender = 0x0404D1E;
 
+#define HOOKPOS_PostColorFilterRender                             0x705099
+DWORD RETURN_PostColorFilterRender = 0x70509E;
+
 #define HOOKPOS_PreHUDRender                                      0x053EAD8
 DWORD RETURN_PreHUDRender = 0x053EADD;
 
@@ -307,7 +310,6 @@ bool          bHideRadar;
 bool          bHasProcessedScript;
 float         fX, fY, fZ;
 DWORD         RoadSignFixTemp;
-DWORD         dwEAEG = 0;
 bool          m_bExplosionsDisabled;
 float         fGlobalGravity = 0.008f;
 float         fLocalPlayerGravity = 0.008f;
@@ -325,6 +327,32 @@ BYTE  ucSkyGradientTopB = 0;
 BYTE  ucSkyGradientBottomR = 0;
 BYTE  ucSkyGradientBottomG = 0;
 BYTE  ucSkyGradientBottomB = 0;
+
+bool  bUsingCustomAmbientColor = false;
+float fAmbientColorR = 0.0F;
+float fAmbientColorG = 0.0F;
+float fAmbientColorB = 0.0F;
+
+bool  bUsingCustomAmbientObjectColor = false;
+float fAmbientObjectColorR = 0.0F;
+float fAmbientObjectColorG = 0.0F;
+float fAmbientObjectColorB = 0.0F;
+
+bool  bUsingCustomDirectionalColor = false;
+float fDirectionalColorR = 0.0F;
+float fDirectionalColorG = 0.0F;
+float fDirectionalColorB = 0.0F;
+
+bool  bUsingCustomLowCloudsColor = false;
+int16 iLowCloudsColorR = 0;
+int16 iLowCloudsColorG = 0;
+int16 iLowCloudsColorB = 0;
+
+bool  bUsingCustomBottomCloudsColor = false;
+int16 iBottomCloudsColorR = 0;
+int16 iBottomCloudsColorG = 0;
+int16 iBottomCloudsColorB = 0;
+
 bool  bUsingCustomWaterColor = false;
 float fWaterColorR = 0.0F;
 float fWaterColorG = 0.0F;
@@ -377,6 +405,7 @@ PostWorldProcessHandler*                   m_pPostWorldProcessHandler = NULL;
 PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
 IdleHandler*                               m_pIdleHandler = NULL;
 PreFxRenderHandler*                        m_pPreFxRenderHandler = NULL;
+PostColorFilterRenderHandler*              m_pPostColorFilterRenderHandler = nullptr;
 PreHudRenderHandler*                       m_pPreHudRenderHandler = NULL;
 ProcessCollisionHandler*                   m_pProcessCollisionHandler = NULL;
 HeliKillHandler*                           m_pHeliKillHandler = NULL;
@@ -479,6 +508,7 @@ void HOOK_Transmission_CalculateDriveAcceleration();
 void HOOK_isVehDriveTypeNotRWD();
 void HOOK_isVehDriveTypeNotFWD();
 void HOOK_PreFxRender();
+void HOOK_PostColorFilterRender();
 void HOOK_PreHUDRender();
 
 void HOOK_CTrafficLights_GetPrimaryLightState();
@@ -657,6 +687,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9);
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5);
+    HookInstall(HOOKPOS_PostColorFilterRender, (DWORD)HOOK_PostColorFilterRender, 5);
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
     HookInstall(HOOKPOS_CAutomobile__ProcessSwingingDoor, (DWORD)HOOK_CAutomobile__ProcessSwingingDoor, 7);
 
@@ -1483,7 +1514,7 @@ void CMultiplayerSA::InitHooks()
     fDuckingHealthThreshold = 0;
 
     // Lower the GTA shadows offset closer to ground/floor level
-    m_fShadowsOffset = 0.013f;            // GTA default = 0.06f
+    m_fShadowsOffset = DEFAULT_SHADOWS_OFFSET;
     for (auto uiAddr : shadowAddr)
         MemPut(uiAddr, &m_fShadowsOffset);
 
@@ -1523,6 +1554,10 @@ void CMultiplayerSA::InitHooks()
     // Allow vertical camera movement during a camera fade (#411)
     MemPut<BYTE>(0x524084, 0xFF);
     MemPut<BYTE>(0x524089, 0xFF);
+
+    // Allow change alpha for arrow & checkpoint markers (#1860)
+    MemSet((void*)0x7225F5, 0x90, 4);
+    MemCpy((void*)0x725DDE, "\xFF\x76\xB\x90\x90", 5);
 
     InitHooks_CrashFixHacks();
 
@@ -2225,6 +2260,302 @@ void CMultiplayerSA::ResetWater()
     MemPut<BYTE>(0x7051D7, 184);
 }
 
+void CMultiplayerSA::GetAmbientColor(float& red, float& green, float& blue) const
+{
+    if (bUsingCustomAmbientColor)
+        red = fAmbientColorR, green = fAmbientColorG, blue = fAmbientColorB;
+    else
+        red = *(float*)0xB7C4A0, green = *(float*)0xB7C4A4, blue = *(float*)0xB7C4A8;
+}
+
+bool CMultiplayerSA::SetAmbientColor(float red, float green, float blue)
+{
+    bUsingCustomAmbientColor = true;
+    fAmbientColorR = red;
+    fAmbientColorG = green;
+    fAmbientColorB = blue;
+    return true;
+}
+
+bool CMultiplayerSA::ResetAmbientColor()
+{
+    bUsingCustomAmbientColor = false;
+    return true;
+}
+
+void CMultiplayerSA::GetAmbientObjectColor(float& red, float& green, float& blue) const
+{
+    if (bUsingCustomAmbientObjectColor)
+        red = fAmbientObjectColorR, green = fAmbientObjectColorG, blue = fAmbientObjectColorB;
+    else
+        red = *(float*)0xB7C4AC, green = *(float*)0xB7C4B0, blue = *(float*)0xB7C4B4;
+}
+
+bool CMultiplayerSA::SetAmbientObjectColor(float red, float green, float blue)
+{
+    bUsingCustomAmbientObjectColor = true;
+    fAmbientObjectColorR = red;
+    fAmbientObjectColorG = green;
+    fAmbientObjectColorB = blue;
+    return true;
+}
+
+bool CMultiplayerSA::ResetAmbientObjectColor()
+{
+    bUsingCustomAmbientObjectColor = false;
+    return true;
+}
+
+void CMultiplayerSA::GetDirectionalColor(float& red, float& green, float& blue) const
+{
+    if (bUsingCustomDirectionalColor)
+        red = fDirectionalColorR, green = fDirectionalColorG, blue = fDirectionalColorB;
+    else
+        red = *(float*)0xB7C4B8, green = *(float*)0xB7C4BC, blue = *(float*)0xB7C4C0;
+}
+
+bool CMultiplayerSA::SetDirectionalColor(float red, float green, float blue)
+{
+    bUsingCustomDirectionalColor = true;
+    fDirectionalColorR = red;
+    fDirectionalColorG = green;
+    fDirectionalColorB = blue;
+    return true;
+}
+
+bool CMultiplayerSA::ResetDirectionalColor()
+{
+    bUsingCustomDirectionalColor = false;
+    return true;
+}
+
+float CMultiplayerSA::GetSpriteSize() const
+{
+    return *(float*)0xB7C4E0;
+}
+
+bool CMultiplayerSA::SetSpriteSize(float size)
+{
+    MemPut<BYTE>(0x55FC21, 0xDD);
+    MemPut<BYTE>(0x55FC22, 0xD8);
+    MemPut<BYTE>(0x55FC23, 0x90);
+
+    MemPutFast<float>(0xB7C4E0, size);
+    return true;
+}
+
+bool CMultiplayerSA::ResetSpriteSize()
+{
+    MemPut<BYTE>(0x55FC21, 0xD9);
+    MemPut<BYTE>(0x55FC22, 0x5E);
+    MemPut<BYTE>(0x55FC23, 0x40);
+    return true;
+}
+
+float CMultiplayerSA::GetSpriteBrightness() const
+{
+    return *(float*)0xB7C4E4;
+}
+
+bool CMultiplayerSA::SetSpriteBrightness(float brightness)
+{
+    MemPut<BYTE>(0x55FC34, 0xDD);
+    MemPut<BYTE>(0x55FC35, 0xD8);
+    MemPut<BYTE>(0x55FC36, 0x90);
+
+    MemPutFast<float>(0xB7C4E4, brightness);
+    return true;
+}
+
+bool CMultiplayerSA::ResetSpriteBrightness()
+{
+    MemPut<BYTE>(0x55FC34, 0xD9);
+    MemPut<BYTE>(0x55FC35, 0x5E);
+    MemPut<BYTE>(0x55FC36, 0x44);
+    return true;
+}
+
+int16 CMultiplayerSA::GetPoleShadowStrength() const
+{
+    return *(int16*)0xB7C4EC;
+}
+
+bool CMultiplayerSA::SetPoleShadowStrength(int16 strength)
+{
+    MemSet((LPVOID)0x55FCB8, 0x90, 4);
+    MemSet((LPVOID)(0x56023A + 2), 0x90, 3);
+    MemSet((LPVOID)(0x5602A6 + 2), 0x90, 3);
+
+    MemPutFast<int16>(0xB7C4EC, strength);
+    return true;
+}
+
+bool CMultiplayerSA::ResetPoleShadowStrength()
+{
+    BYTE originalMov[4] = {0x66, 0x89, 0x46, 0x4C};
+    MemCpy((LPVOID)0x55FCB8, &originalMov, 4);
+
+    BYTE originalCodes[3] = {0xEC, 0xC4, 0xB7};
+    MemCpy((LPVOID)(0x56023A + 2), &originalCodes, 3);
+    MemCpy((LPVOID)(0x5602A6 + 2), &originalCodes, 3);
+    return true;
+}
+
+int16 CMultiplayerSA::GetShadowStrength() const
+{
+    return *(int16*)0xB7C4E8;
+}
+
+bool CMultiplayerSA::SetShadowStrength(int16 strength)
+{
+    MemSet((LPVOID)0x55FC5E, 0x90, 4);
+    MemSet((LPVOID)(0x56022E + 2), 0x90, 3);
+    MemSet((LPVOID)(0x560234 + 2), 0x90, 3);
+    MemSet((LPVOID)(0x56029A + 2), 0x90, 3);
+    MemSet((LPVOID)(0x5602A0 + 2), 0x90, 3);
+
+    MemPutFast<int16>(0xB7C4E8, strength);
+    return true;
+}
+
+bool CMultiplayerSA::ResetShadowStrength()
+{
+    BYTE originalMov[4] = {0x66, 0x89, 0x46, 0x48};
+    MemCpy((LPVOID)0x55FC5E, &originalMov, 4);
+
+    BYTE originalCodes[3] = {0xE8, 0xC4, 0xB7};
+    MemCpy((LPVOID)(0x56022E + 2), &originalCodes, 3);
+    MemCpy((LPVOID)(0x560234 + 2), &originalCodes, 3);
+    MemCpy((LPVOID)(0x56029A + 2), &originalCodes, 3);
+    MemCpy((LPVOID)(0x5602A0 + 2), &originalCodes, 3);
+    return true;
+}
+
+float CMultiplayerSA::GetShadowsOffset() const
+{
+    return m_fShadowsOffset;
+}
+
+bool CMultiplayerSA::SetShadowsOffset(float offset)
+{
+    m_fShadowsOffset = offset;
+    return true;
+}
+
+bool CMultiplayerSA::ResetShadowsOffset()
+{
+    m_fShadowsOffset = DEFAULT_SHADOWS_OFFSET;
+    return true;
+}
+
+float CMultiplayerSA::GetLightsOnGroundBrightness() const
+{
+    return *(float*)0xB7C4F8;
+}
+
+bool CMultiplayerSA::SetLightsOnGroundBrightness(float brightness)
+{
+    MemPut<BYTE>(0x55FDBC, 0xDD);
+    MemPut<BYTE>(0x55FDBD, 0xD8);
+    MemPut<BYTE>(0x55FDBE, 0x90);
+    MemSet((LPVOID)(0x5602AC + 2), 0x90, 3);
+
+    MemPutFast<float>(0xB7C4F8, brightness);
+    return true;
+}
+
+bool CMultiplayerSA::ResetLightsOnGroundBrightness()
+{
+    BYTE originalFstp[3] = {0xD9, 0x5E, 0x58};
+    MemCpy((LPVOID)0x55FDBC, &originalFstp, 3);
+
+    BYTE originalCodes[3] = {0xF8, 0xC4, 0xB7};
+    MemCpy((LPVOID)(0x5602AC + 2), &originalCodes, 3);
+    return true;
+}
+
+void CMultiplayerSA::GetLowCloudsColor(int16& red, int16& green, int16& blue) const
+{
+    if (bUsingCustomLowCloudsColor)
+        red = iLowCloudsColorR, green = iLowCloudsColorG, blue = iLowCloudsColorB;
+    else
+        red = *(int16*)0xB7C4FC, green = *(int16*)0xB7C4FE, blue = *(int16*)0xB7C500;
+}
+
+bool CMultiplayerSA::SetLowCloudsColor(int16 red, int16 green, int16 blue)
+{
+    bUsingCustomLowCloudsColor = true;
+    iLowCloudsColorR = red;
+    iLowCloudsColorG = green;
+    iLowCloudsColorB = blue;
+    return true;
+}
+
+bool CMultiplayerSA::ResetLowCloudsColor()
+{
+    bUsingCustomLowCloudsColor = false;
+    return true;
+}
+
+void CMultiplayerSA::GetBottomCloudsColor(int16& red, int16& green, int16& blue) const
+{
+    if (bUsingCustomBottomCloudsColor)
+        red = iBottomCloudsColorR, green = iBottomCloudsColorG, blue = iBottomCloudsColorB;
+    else
+        red = *(int16*)0xB7C502, green = *(int16*)0xB7C504, blue = *(int16*)0xB7C506;
+}
+
+bool CMultiplayerSA::SetBottomCloudsColor(int16 red, int16 green, int16 blue)
+{
+    bUsingCustomBottomCloudsColor = true;
+    iBottomCloudsColorR = red;
+    iBottomCloudsColorG = green;
+    iBottomCloudsColorB = blue;
+    return true;
+}
+
+bool CMultiplayerSA::ResetBottomCloudsColor()
+{
+    bUsingCustomBottomCloudsColor = false;
+    return true;
+}
+
+float CMultiplayerSA::GetCloudsAlpha1() const
+{
+    return *(float*)0xB7C538;
+}
+
+bool CMultiplayerSA::SetCloudsAlpha1(float alpha)
+{
+    MemPut<BYTE>(0x55FDD5, 0xD8);
+    MemPutFast<float>(0xB7C538, alpha);
+    return true;
+}
+
+bool CMultiplayerSA::ResetCloudsAlpha1()
+{
+    MemPut<BYTE>(0x55FDD5, 0xD9);
+    return true;
+}
+
+float CMultiplayerSA::GetIllumination() const
+{
+    return *(float*)0xB7C544;
+}
+
+bool CMultiplayerSA::SetIllumination(float illumination)
+{
+    MemPut<BYTE>(0x55FE46, 0xD8);
+    MemPutFast<float>(0xB7C544, illumination);
+    return true;
+}
+
+bool CMultiplayerSA::ResetIllumination()
+{
+    MemPut<BYTE>(0x55FE46, 0xD9);
+    return true;
+}
+
 bool CMultiplayerSA::GetExplosionsDisabled()
 {
     return m_bExplosionsDisabled;
@@ -2313,6 +2644,11 @@ void CMultiplayerSA::SetIdleHandler(IdleHandler* pHandler)
 void CMultiplayerSA::SetPreFxRenderHandler(PreFxRenderHandler* pHandler)
 {
     m_pPreFxRenderHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler)
+{
+    m_pPostColorFilterRenderHandler = pHandler;
 }
 
 void CMultiplayerSA::SetPreHudRenderHandler(PreHudRenderHandler* pHandler)
@@ -3394,31 +3730,6 @@ static void RestoreAlphaValues()
 /**
  ** Vehicles
  **/
-static RpAtomic* CVehicle_EAEG(RpAtomic* pAtomic, void*)
-{
-    RwFrame* pFrame = ((RwFrame*)(((RwObject*)(pAtomic))->parent));
-    if (pFrame)
-    {
-        switch (pFrame->szName[0])
-        {
-            case '\0':
-            case 'h':
-                break;
-            default:
-                DWORD dwFunc = (DWORD)0x533290;
-                DWORD dwAtomic = (DWORD)pAtomic;
-                _asm
-                {
-                    push    0
-                    push    dwAtomic
-                    call    dwFunc
-                    add     esp, 0x8
-                }
-        }
-    }
-
-    return pAtomic;
-}
 
 static void SetVehicleAlpha()
 {
@@ -3427,15 +3738,6 @@ static void SetVehicleAlpha()
 
     if (ucAlpha < 255)
         GetAlphaAndSetNewValues(ucAlpha);
-    else if (dwEAEG && pInterface->m_pVehicle->GetModelIndex() == 0x20A)
-    {
-        bEntityHasAlpha = true;
-        uiAlphaIdx = 0;
-        SetEntityAlphaHooked(dwAlphaEntity, (DWORD)HOOK_GetAlphaValues, 0);
-        MemPutFast<DWORD>(0x5332D6, (DWORD)CVehicle_EAEG);
-        SetEntityAlphaHooked(dwAlphaEntity, (DWORD)HOOK_SetAlphaValues, 0);
-        MemPutFast<DWORD>(0x5332D6, 0x533290);
-    }
     else
         bEntityHasAlpha = false;
 }
@@ -3586,6 +3888,36 @@ void _cdecl DoEndWorldColorsPokes()
         MemPutFast<BYTE>(0xB7C4CA, ucSkyGradientBottomR);
         MemPutFast<BYTE>(0xB7C4CC, ucSkyGradientBottomG);
         MemPutFast<BYTE>(0xB7C4CE, ucSkyGradientBottomB);
+    }
+    if (bUsingCustomAmbientColor)
+    {
+        MemPutFast<float>(0xB7C4A0, fAmbientColorR);
+        MemPutFast<float>(0xB7C4A4, fAmbientColorG);
+        MemPutFast<float>(0xB7C4A8, fAmbientColorB);
+    }
+    if (bUsingCustomAmbientObjectColor)
+    {
+        MemPutFast<float>(0xB7C4AC, fAmbientObjectColorR);
+        MemPutFast<float>(0xB7C4B0, fAmbientObjectColorG);
+        MemPutFast<float>(0xB7C4B4, fAmbientObjectColorB);
+    }
+    if (bUsingCustomDirectionalColor)
+    {
+        MemPutFast<float>(0xB7C4B8, fDirectionalColorR);
+        MemPutFast<float>(0xB7C4BC, fDirectionalColorG);
+        MemPutFast<float>(0xB7C4C0, fDirectionalColorB);
+    }
+    if (bUsingCustomLowCloudsColor)
+    {
+        MemPutFast<int16>(0xB7C4FC, iLowCloudsColorR);
+        MemPutFast<int16>(0xB7C4FE, iLowCloudsColorG);
+        MemPutFast<int16>(0xB7C500, iLowCloudsColorB);
+    }
+    if (bUsingCustomBottomCloudsColor)
+    {
+        MemPutFast<int16>(0xB7C502, iBottomCloudsColorR);
+        MemPutFast<int16>(0xB7C504, iBottomCloudsColorG);
+        MemPutFast<int16>(0xB7C506, iBottomCloudsColorB);
     }
     if (bUsingCustomWaterColor)
     {
@@ -3947,8 +4279,6 @@ void CMultiplayerSA::SetLocalStatValue(unsigned short usStat, float fValue)
         localStatsData.StatTypesFloat[usStat] = fValue;
     else if (usStat >= STATS_OFFSET && usStat < MAX_INT_FLOAT_STATS)
         localStatsData.StatTypesInt[usStat - STATS_OFFSET] = (int)fValue;
-    else if (usStat == 0x2329)
-        dwEAEG = !dwEAEG;
 }
 
 float CMultiplayerSA::GetLocalStatValue(unsigned short usStat)
@@ -4777,6 +5107,24 @@ void _declspec(naked) HOOK_PreFxRender()
 skip:
         popad
         jmp     RETURN_PreFxRender  // 00404D1E
+    }
+}
+
+// Hooked from 00705099  5 bytes
+void _declspec(naked) HOOK_PostColorFilterRender()
+{
+    _asm
+    {
+        pushad
+    }
+
+    if (m_pPostColorFilterRenderHandler) m_pPostColorFilterRenderHandler();
+
+    _asm
+    {
+        popad
+        mov al, ds:0C402BAh
+        jmp     RETURN_PostColorFilterRender  // 0070509E
     }
 }
 

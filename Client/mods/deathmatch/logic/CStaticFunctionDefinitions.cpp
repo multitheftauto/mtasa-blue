@@ -563,6 +563,13 @@ bool CStaticFunctionDefinitions::GetElementBoundingBox(CClientEntity& Entity, CV
             pModelInfo = g_pGame->GetModelInfo(Object.GetModel());
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& building = static_cast<CClientBuilding&>(Entity);
+            pModelInfo = g_pGame->GetModelInfo(building.GetModel());
+            break;
+        }
+
     }
 
     if (pModelInfo)

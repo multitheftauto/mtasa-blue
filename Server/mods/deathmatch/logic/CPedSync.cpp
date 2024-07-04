@@ -234,13 +234,13 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
         // Apply the data to the ped
         if (Data.ucFlags & 0x01)
         {
-            pPed->SetPosition(Data.vecPosition);
+            pPed->SetPosition(Data.position.data.vecPosition);
             g_pGame->GetColManager()->DoHitDetection(pPed->GetPosition(), pPed);
         }
         if (Data.ucFlags & 0x02)
-            pPed->SetRotation(Data.fRotation);
+            pPed->SetRotation(Data.rotation.data.fRotation);
         if (Data.ucFlags & 0x04)
-            pPed->SetVelocity(Data.vecVelocity);
+            pPed->SetVelocity(Data.velocity.data.vecVelocity);
 
         if (Data.ucFlags & 0x08)
         {
