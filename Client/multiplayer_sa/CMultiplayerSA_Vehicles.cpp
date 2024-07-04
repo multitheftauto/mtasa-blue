@@ -9,6 +9,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CVehicleSA.h"
+#include "../game_sa/CPlayerInfoSA.h"
+#include "../game_sa/CTextSA.h"
+#include <unordered_map>
 
 static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 {
@@ -107,22 +111,18 @@ static void _declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise()
     }
 }
 
-#include "../game_sa/CVehicleSA.h"
-#include "../game_sa/CPlayerInfoSA.h"
-#include "../game_sa/CTextSA.h"
-
 #define HOOKPOS_CCurrentVehicle__Process 0x5720B9
 #define HOOKSIZE_CCurrentVehicle__Process 0x5
 
 static void HOOK_CCurrentVehicle__Process()
 {
-    static auto currentVehicle = (CCurrentVehicleSAInterface*)0xBA18FC;
-    static auto TheText = (CTextSAInterface*)0xC1B340;
-    static auto ModelInfoPtr = (CVehicleModelInfoSAInterface**)0xA9B0C8;
+    static auto currentVehicle = reinterpret_cast<CCurrentVehicleSAInterface*>(VAR_CUserDisplay_CurrentVehicle);
+    static auto TheText = reinterpret_cast<CTextSAInterface*>(VAR_TheText);
+    static auto ModelInfoPtr = reinterpret_cast<CVehicleModelInfoSAInterface**>(VAR_ModelInfoPtrs);
 
     using CHud__SetVehicleName_t = void(__cdecl*)(const char*);
     using CCurrentVehicle__Display_t = void(__thiscall*)(CCurrentVehicleSAInterface*);
-    using CText__Get_t = char*(__thiscall*)(CTextSAInterface*, char*);
+    using CText__Get_t = char*(__thiscall*)(CTextSAInterface*, const char*);
 
     static const auto CHud__SetVehicleName = reinterpret_cast<CHud__SetVehicleName_t>(FUNC_CHud_SetVehicleName);
     static const auto CCurrentVehicle__Display = reinterpret_cast<CCurrentVehicle__Display_t>(FUNC_CCurrentVehicle_Display);
@@ -132,21 +132,18 @@ static void HOOK_CCurrentVehicle__Process()
     CPlayerInfoSAInterface* CWorld__Players = (CPlayerInfoSAInterface*)VAR_CWorld_Players;
     CPlayerPedSAInterface*  playerPed = CWorld__Players[CWorld__PlayerInFocus].pPed;
 
-    const char* name = "My custom Name";
-
     currentVehicle->m_pCurrentVehicle = playerPed->pVehicle;
     if (!playerPed->pedFlags.bInVehicle)
     {
-        CHud__SetVehicleName(0);
+        currentVehicle->m_pCurrentVehicle = nullptr; 
+        CHud__SetVehicleName("");
         CCurrentVehicle__Display(currentVehicle);
         return;
     }
     auto modelIndex = playerPed->pVehicle->m_nModelIndex;
     auto modelInfo = ModelInfoPtr[modelIndex];
-    auto gameName = modelInfo->gameName;
-    auto textName = CText__Get(TheText, gameName);
-
-    CHud__SetVehicleName(textName);
+    auto modelName = CText__Get(TheText, modelInfo->gameName);
+    CHud__SetVehicleName(modelName);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -4178,9 +4178,9 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
 
-void CLuaVehicleDefs::SetVehName(CClientVehicle* veh)
+bool CLuaVehicleDefs::SetVehName(CClientVehicle* const veh, std::string name)
 {
-    veh->SetName("abc");
+    return veh->SetName(name);
 }
 
 std::string CLuaVehicleDefs::GetVehName()

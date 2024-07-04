@@ -5033,7 +5033,7 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
-void CClientVehicle::SetName(const char* name)
+bool CClientVehicle::SetName(std::string name)
 {
-    m_pVehicle->SetVehicleName(name);
+    return m_pVehicle->SetVehicleName(name);
 }

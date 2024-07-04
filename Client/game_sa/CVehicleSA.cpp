@@ -2271,8 +2271,11 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     return bReturn;
 }
 
-void CVehicleSA::SetVehicleName(const char* name)
+bool CVehicleSA::SetVehicleName(std::string name)
 {
-    
+    if (name.size() > 63)
+        return false;
+
+    return true;
 }
 

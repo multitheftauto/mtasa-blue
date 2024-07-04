@@ -95,11 +95,14 @@ struct RwTexture;
 #define FUNC_CVehicle_DoSunGlare            0x6DD6F0
 
 // for vehicle names
-#define FUNC_CCurrentVehicle_Display 0x571EA0
-#define VAR_CWorld_PlayerInFocus     0xB7CD74
-#define VAR_CWorld_Players           0xB7CD98
-#define FUNC_CHud_SetVehicleName     0x588F50
-#define FUNC_CText_Get               0x6A0050
+#define FUNC_CCurrentVehicle_Display    0x571EA0
+#define VAR_CWorld_PlayerInFocus        0xB7CD74
+#define VAR_CWorld_Players              0xB7CD98
+#define VAR_TheText                     0xC1B340
+#define VAR_ModelInfoPtrs               0xA9B0C8
+#define VAR_CUserDisplay_CurrentVehicle 0xBA18FC
+#define FUNC_CHud_SetVehicleName        0x588F50
+#define FUNC_CText_Get                  0x6A0050
 
 
 struct SRailNodeSA
@@ -679,7 +682,7 @@ public:
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
-    void                              SetVehicleName(const char* name);
+    bool                              SetVehicleName(std::string name);
 
     void UpdateLandingGearPosition();
 
