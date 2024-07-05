@@ -7850,6 +7850,24 @@ bool CStaticFunctionDefinitions::SetMarkerIcon(CElement* pElement, const char* s
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(CElement* pElement, const SColor color, float size)
+{
+    RUN_CHILDREN(SetMarkerTargetArrowProperties(*iter, color, size))
+
+    if (!IS_MARKER(pElement))
+        return false;
+
+    CMarker* marker = static_cast<CMarker*>(pElement);
+    if (!marker)
+        return false;
+
+    if (!marker->HasTarget() || marker->GetMarkerType() != CMarker::TYPE_CHECKPOINT)
+        return false;
+
+    marker->SetTargetArrowProperties(color, size);
+    return true;
+}
+
 CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color,
                                               short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo)
 {

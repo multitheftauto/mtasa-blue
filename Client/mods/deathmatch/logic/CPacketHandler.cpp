@@ -3652,6 +3652,19 @@ retry:
                                         pCheckpoint->SetNextPosition(position.data.vecPosition);
                                         pCheckpoint->SetIcon(CClientCheckpoint::ICON_ARROW);
                                     }
+
+                                    if (ucType == CClientGame::MARKER_CHECKPOINT && bitStream.Can(eBitStreamVersion::SetMarkerTargetArrowProperties))
+                                    {
+                                        SColor color;
+                                        float  size;
+                                        bitStream.Read(color.R);
+                                        bitStream.Read(color.G);
+                                        bitStream.Read(color.B);
+                                        bitStream.Read(color.A);
+                                        bitStream.Read(size);
+
+                                        pCheckpoint->SetTargetArrowProperties(color, size);
+                                    }
                                 }
                             }
                         }

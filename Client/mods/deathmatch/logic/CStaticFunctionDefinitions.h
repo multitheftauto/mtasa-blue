@@ -377,6 +377,7 @@ public:
     static bool SetMarkerColor(CClientEntity& Entity, const SColor color);
     static bool SetMarkerTarget(CClientEntity& Entity, const CVector* pTarget);
     static bool SetMarkerIcon(CClientEntity& Entity, const char* szIcon);
+    static bool SetMarkerTargetArrowProperties(CClientEntity& Entity, const SColor color, float size);
 
     // Camera get funcs
     static bool           GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV);

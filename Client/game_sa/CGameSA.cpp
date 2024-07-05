@@ -58,6 +58,7 @@
 #include "D3DResourceSystemSA.h"
 #include "CIplStoreSA.h"
 #include "CBuildingRemovalSA.h"
+#include "CCheckpointSA.h"
 
 extern CGameSA* pGame;
 
@@ -238,6 +239,7 @@ CGameSA::CGameSA()
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
     CVehicleSA::StaticSetHooks();
+    CCheckpointSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
