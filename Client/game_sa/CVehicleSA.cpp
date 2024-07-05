@@ -53,7 +53,7 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
     }
 }
 
-static std::unordered_map<std::uint32_t, const char*> g_vehicleNames;
+static std::unordered_map<std::uint32_t, std::string> g_vehicleNames;
 
 void HOOK_CCurrentVehicle__Process()
 {
@@ -86,8 +86,12 @@ void HOOK_CCurrentVehicle__Process()
     auto modelName = CText__Get(TheText, modelInfo->gameName);
     if(g_vehicleNames.find(modelIndex) == g_vehicleNames.end())
         CHud__SetVehicleName(modelName);
-    else
-        CHud__SetVehicleName(g_vehicleNames[modelIndex]);
+    else {
+        auto vname = g_vehicleNames[modelIndex];
+        char vehicleName[64]{0};
+        strncpy(vehicleName, vname.c_str(), 63);
+        CHud__SetVehicleName(vehicleName);
+    }
 }
 
 namespace
@@ -2310,9 +2314,9 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     return bReturn;
 }
 
-bool CVehicleSA::SetVehicleName(const char* name)
+bool CVehicleSA::SetVehicleName(std::string name)
 {
-    if (strlen(name) > 63)
+    if (name.size() > 63)
         return false;
 
     auto index = this->GetModelIndex();

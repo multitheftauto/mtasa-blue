@@ -63,10 +63,6 @@ public:
     void AdjustComponents(float fAspectRatio);
     void ResetComponentAdjustment();
 
-    void SetVehicleName(const char* name);
-    const char* GetVehicleName();
-
-
 protected:
     void InitComponentList();
 

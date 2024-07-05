@@ -178,5 +178,5 @@ public:
     LUA_DECLARE(GetVehicleComponents);
 
     static bool        SetVehName(CClientVehicle* const veh, std::string name);
-    static std::string GetVehName();
+    static std::string GetVehName(CClientVehicle* const veh);
 };

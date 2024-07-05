@@ -4183,8 +4183,7 @@ bool CLuaVehicleDefs::SetVehName(CClientVehicle* const veh, std::string name)
     return veh->SetName(name);
 }
 
-std::string CLuaVehicleDefs::GetVehName()
+std::string CLuaVehicleDefs::GetVehName(CClientVehicle* const veh)
 {
-    std::string copy;
-    return copy;
+    return veh->GetName();
 }
