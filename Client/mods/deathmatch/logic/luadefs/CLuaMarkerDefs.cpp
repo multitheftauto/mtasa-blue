@@ -428,7 +428,7 @@ bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CClientMarker* marker, std::
     color.B = b.value_or(64);
     color.A = a.value_or(255);
 
-    return CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(*marker, color, size.value_or(marker->GetSize() * 0.625));
+    return CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(*marker, color, size.value_or(marker->GetSize() * 0.625f));
 }
 
 std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(CClientMarker* marker) noexcept

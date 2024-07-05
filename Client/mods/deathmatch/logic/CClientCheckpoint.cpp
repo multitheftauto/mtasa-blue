@@ -393,13 +393,13 @@ void CClientCheckpoint::ReCreateWithSameIdentifier()
 
 void CClientCheckpoint::SetTargetArrowProperties(const SColor& arrowColor, float size) noexcept
 {
-    if (m_TargetArrowColor != arrowColor || m_TargetArrowSize != size)
-    {
-        m_TargetArrowColor = arrowColor;
-        m_TargetArrowSize = size;
+    if (m_TargetArrowColor == arrowColor && m_TargetArrowSize == size)
+        return;
 
-        ApplyCheckpointTargetArrowProperties();
-    }
+    m_TargetArrowColor = arrowColor;
+    m_TargetArrowSize = size;
+
+    ApplyCheckpointTargetArrowProperties();
 }
 
 void CClientCheckpoint::ApplyCheckpointTargetArrowProperties() noexcept

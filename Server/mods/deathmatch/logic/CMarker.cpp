@@ -307,19 +307,19 @@ void CMarker::SetIcon(unsigned char ucIcon)
 
 void CMarker::SetTargetArrowProperties(const SColor color, float size) noexcept
 {
-    if (m_TargetArrowColor != color || m_TargetArrowSize != size)
-    {
-        m_TargetArrowColor = color;
-        m_TargetArrowSize = size;
+    if (m_TargetArrowColor == color && m_TargetArrowSize == size)
+        return;
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(color.R);
-        BitStream.pBitStream->Write(color.G);
-        BitStream.pBitStream->Write(color.B);
-        BitStream.pBitStream->Write(color.A);
-        BitStream.pBitStream->Write(size);
-        BroadcastOnlyVisible(CElementRPCPacket(this, SET_MARKER_TARGET_ARROW_PROPERTIES, *BitStream.pBitStream));
-    }
+    m_TargetArrowColor = color;
+    m_TargetArrowSize = size;
+
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(color.R);
+    BitStream.pBitStream->Write(color.G);
+    BitStream.pBitStream->Write(color.B);
+    BitStream.pBitStream->Write(color.A);
+    BitStream.pBitStream->Write(size);
+    BroadcastOnlyVisible(CElementRPCPacket(this, SET_MARKER_TARGET_ARROW_PROPERTIES, *BitStream.pBitStream));
 }
 
 void CMarker::Callback_OnCollision(CColShape& Shape, CElement& Element)

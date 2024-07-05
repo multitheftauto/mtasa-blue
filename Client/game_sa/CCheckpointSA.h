@@ -16,7 +16,7 @@
 
 #define HOOKPOS_CCheckpoint__Render  0x725E56
 #define HOOKSIZE_CCheckpoint__Render 0x5
-static const constexpr std::uint32_t RETURN_CCheckpoint__Render = 0x725E5B;
+static constexpr std::uint32_t RETURN_CCheckpoint__Render = 0x725E5B;
 
 #define C3dMarkers_DirectionArrowSet 0x721140
 
