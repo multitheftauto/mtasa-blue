@@ -95,6 +95,7 @@ struct RwTexture;
 #define FUNC_CVehicle_DoSunGlare            0x6DD6F0
 
 // for vehicle names
+#define FUNC_CCurrentVehicle_Process    0x5720B9
 #define FUNC_CCurrentVehicle_Display    0x571EA0
 #define VAR_CWorld_PlayerInFocus        0xB7CD74
 #define VAR_CWorld_Players              0xB7CD98
@@ -682,7 +683,7 @@ public:
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
-    bool                              SetVehicleName(std::string name);
+    bool                              SetVehicleName(const char* name);
 
     void UpdateLandingGearPosition();
 
