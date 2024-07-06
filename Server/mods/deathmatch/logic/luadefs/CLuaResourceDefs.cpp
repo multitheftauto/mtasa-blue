@@ -903,12 +903,8 @@ std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CR
     if (resourceElement.has_value())
         return (*resourceElement)->GetName();
 
-    CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
-
-    if (!localVM)
-        throw std::invalid_argument("Couldn't find the virtual machine");
-
-    CResource* localResource = localVM->GetResource();
+    CLuaMain&  luaMain = lua_getownercluamain(luaVM);
+    CResource* localResource = luaMain.GetResource();
 
     if (!localResource)
         throw std::invalid_argument("Couldn't find the resource");
