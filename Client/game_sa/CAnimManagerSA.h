@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CAnimManagerSA.h
+ *  FILE:        Client/game_sa/CAnimManagerSA.h
  *  PURPOSE:     Header file for animation manager class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -159,10 +159,12 @@ public:
     void DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface);
     void DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface);
 
-    bool           isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface);
-    const SString& GetGateWayBlockName() { return m_kGateWayBlockName; };
-    const SString& GetGateWayAnimationName() { return m_kGateWayAnimationName; };
+    bool        isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface);
+    const char* GetGateWayBlockName() { return m_kGateWayBlockName; }
+    const char* GetGateWayAnimationName() { return m_kGateWayAnimationName; }
 
+    bool IsValidGroup(uint32_t uiAnimGroup);
+    bool IsValidAnim(uint32_t uiAnimGroup, uint32_t uiAnimID);
 private:
     CAnimBlendAssocGroup* m_pAnimAssocGroups[MAX_ANIM_GROUPS];
     CAnimBlock*           m_pAnimBlocks[MAX_ANIM_BLOCKS];
@@ -173,6 +175,6 @@ private:
     // ped block, but in reality, it's playing our custom animation, and Of course, we can return run_wuzi
     // animation within the hook if we want to play it instead. Why run_wuzi? We can also use another animation,
     // but I've tested with this one mostly, so let's stick to this.
-    const SString m_kGateWayBlockName = "ped";
-    const SString m_kGateWayAnimationName = "run_wuzi";
+    const char* m_kGateWayBlockName = "ped";
+    const char* m_kGateWayAnimationName = "run_wuzi";
 };

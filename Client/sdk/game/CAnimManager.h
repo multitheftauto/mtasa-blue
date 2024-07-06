@@ -128,7 +128,10 @@ public:
     virtual void                                 DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface) = 0;
     virtual void                                 DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface) = 0;
 
-    virtual bool           isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
-    virtual const SString& GetGateWayBlockName() = 0;
-    virtual const SString& GetGateWayAnimationName() = 0;
+    virtual bool        isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
+    virtual const char* GetGateWayBlockName() = 0;
+    virtual const char* GetGateWayAnimationName() = 0;
+
+    virtual bool IsValidGroup(uint32_t uiAnimGroup) = 0;
+    virtual bool IsValidAnim(uint32_t uiAnimGroup, uint32_t uiAnimID) = 0;
 };

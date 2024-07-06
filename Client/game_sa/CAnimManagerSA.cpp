@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CAnimManagerSA.cpp
+ *  FILE:        Client/game_sa/CAnimManagerSA.cpp
  *  PURPOSE:     Animation manager
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -20,8 +20,6 @@
 #include "CKeyGenSA.h"
 
 extern CGameSA* pGame;
-
-using std::list;
 
 CAnimManagerSA::CAnimManagerSA()
 {
@@ -276,6 +274,10 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::CreateAnimAssociation(Ass
 
 CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID)
 {
+    // We check the validity of the group, avoid crashes due to an invalid group
+    if (!IsValidGroup(static_cast<uint32_t>(animGroup)))
+        return nullptr;
+
     CAnimBlendStaticAssociationSAInterface* pInterface = nullptr;
     DWORD                                   dwFunc = FUNC_CAnimManager_GetAnimAssociation;
     _asm
@@ -295,6 +297,10 @@ CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation
 
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName)
 {
+    // We check the validity of the group, avoid crashes due to an invalid group
+    if (!IsValidGroup(animGroup))
+        return nullptr;
+
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_GetAnimAssociation_str;
     _asm
@@ -363,7 +369,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::AddAnimationAndSync(RpClu
                                                                            AnimationId animID)
 {
     if (!pClump)
-        return NULL;
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_AddAnimationAndSync;
@@ -387,8 +393,8 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::AddAnimationAndSync(RpClu
 
 std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::BlendAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID, float fBlendDelta)
 {
-    if (!pClump)
-        return NULL;
+    if (!pClump || !IsValidAnim(animGroup, animID))
+        return nullptr;
 
     CAnimBlendAssociationSAInterface* pInterface = nullptr;
     DWORD                             dwFunc = FUNC_CAnimManager_BlendAnimation;
@@ -495,7 +501,10 @@ void CAnimManagerSA::RemoveAnimBlock(int ID)
 AnimAssocDefinition* CAnimManagerSA::AddAnimAssocDefinition(const char* szBlockName, const char* szAnimName, AssocGroupId animGroup, AnimationId animID,
                                                             AnimDescriptor* pDescriptor)
 {
-    AnimAssocDefinition* pReturn;
+    if (!IsValidAnim(animGroup, animID))
+        return nullptr;
+
+    AnimAssocDefinition* pReturn{};
     DWORD                dwFunc = FUNC_CAnimManager_AddAnimAssocDefinition;
     _asm
     {
@@ -508,7 +517,7 @@ AnimAssocDefinition* CAnimManagerSA::AddAnimAssocDefinition(const char* szBlockN
         mov     pReturn, eax
         add     esp, 0x14
     }
-    return NULL;
+    return pReturn;
 }
 
 void CAnimManagerSA::ReadAnimAssociationDefinitions()
@@ -849,5 +858,23 @@ void CAnimManagerSA::DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInter
 
 bool CAnimManagerSA::isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface)
 {
-    return pGame->GetKeyGen()->GetUppercaseKey(m_kGateWayAnimationName.c_str()) == pInterface->uiHashKey;
+    return pGame->GetKeyGen()->GetUppercaseKey(m_kGateWayAnimationName) == pInterface->uiHashKey;
+}
+
+bool CAnimManagerSA::IsValidGroup(uint32_t uiAnimGroup)
+{
+    const auto pGroup = GetAnimBlendAssoc(uiAnimGroup);
+    return pGroup && pGroup->IsCreated();
+}
+
+bool CAnimManagerSA::IsValidAnim(uint32_t uiAnimGroup, uint32_t uiAnimID)
+{
+    // We get an animation for the checks
+    const auto pAnim = GetAnimStaticAssociation((eAnimGroup)uiAnimGroup, (eAnimID)uiAnimID);
+    if (!pAnim)
+        return false;
+
+    // We check the interface and sAnimID, if AnimID is not in GTA:SA, it will differ from our indicators in sAnimID
+    const auto pInterface = pAnim->GetInterface();
+    return pInterface && pInterface->sAnimID == uiAnimID;
 }
