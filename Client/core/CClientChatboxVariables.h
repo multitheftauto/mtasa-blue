@@ -15,7 +15,7 @@
 
 #define MAX_CHATBOX_LAYOUT_CVARS 21
 
-static const SFixedArray<const char*, 21>& g_chatboxLayoutCVars = {{"chat_font",
+static const SFixedArray<const char*, MAX_CHATBOX_LAYOUT_CVARS>& g_chatboxLayoutCVars = {{"chat_font",
                                                                     "chat_lines",
                                                                     "chat_color",
                                                                     "chat_text_color",
