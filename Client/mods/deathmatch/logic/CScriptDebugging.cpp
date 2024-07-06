@@ -10,6 +10,23 @@
 
 #include <StdInc.h>
 
+enum DebugScriptLevels : std::uint8_t
+{
+    NONE,
+    ERRORS_ONLY,
+    ERRORS_AND_WARNINGS,
+    ALL,
+};
+
+enum DebugMessageLevels : std::uint8_t
+{
+    MESSAGE_TYPE_DEBUG,
+    MESSAGE_TYPE_ERROR,
+    MESSAGE_TYPE_WARNING,
+    MESSAGE_TYPE_INFO,
+    MESSAGE_TYPE_CUSTOM,
+};
+
 FILE* CScriptDebugging::m_pLogFile;
 
 CScriptDebugging::CScriptDebugging(CLuaManager* pLuaManager)
@@ -41,6 +58,28 @@ CScriptDebugging::~CScriptDebugging()
         fclose(m_pLogFile);
         m_pLogFile = NULL;
     }
+}
+
+bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint8_t playerDebugLevel, std::uint8_t messageDebugLevel) const noexcept
+{
+    bool sufficientDebugLevel = false;
+
+    switch (messageDebugLevel)
+    {
+        case MESSAGE_TYPE_ERROR:
+            sufficientDebugLevel = (playerDebugLevel >= ERRORS_ONLY);
+            break;
+        case MESSAGE_TYPE_WARNING:
+            sufficientDebugLevel = (playerDebugLevel >= ERRORS_AND_WARNINGS);
+            break;
+        case MESSAGE_TYPE_INFO:
+        case MESSAGE_TYPE_CUSTOM:
+        case MESSAGE_TYPE_DEBUG:
+            sufficientDebugLevel = (playerDebugLevel == ALL);
+            break;
+    }
+
+    return sufficientDebugLevel;
 }
 
 void CScriptDebugging::LogBadLevel(lua_State* luaVM, unsigned int uiRequiredLevel)
@@ -123,7 +162,9 @@ void CScriptDebugging::UpdateLogOutput()
     while (m_DuplicateLineFilter.PopOutputLine(line))
     {
         // Log it to the file if enough level
-        if (m_uiLogFileLevel >= line.uiMinimumDebugLevel)
+        bool sufficientDebugLevel = CheckForSufficientDebugLevel(m_uiLogFileLevel, line.uiMinimumDebugLevel);
+
+        if (sufficientDebugLevel)
         {
             PrintLog(line.strText);
         }
