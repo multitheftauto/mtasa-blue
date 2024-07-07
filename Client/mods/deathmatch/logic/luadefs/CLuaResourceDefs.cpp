@@ -358,7 +358,7 @@ CClientEntity* CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM,
     CResource* pResource = resource.value_or(&lua_getownerresource(luaVM));
     if (!pResource->IsActive())
     {
-        SString err("Resource \"%s\" is not currently running!", pResource->GetName().c_str());
+        SString err("Resource \"%s\" is not currently running!", pResource->GetName());
         throw LuaFunctionError(err, false);
     }
 
