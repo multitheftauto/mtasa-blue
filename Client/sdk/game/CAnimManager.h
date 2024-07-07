@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CAnimManager.h
+ *  FILE:        Client/sdk/game/CAnimManager.h
  *  PURPOSE:     Animation manager interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -132,6 +132,6 @@ public:
     virtual const char* GetGateWayBlockName() = 0;
     virtual const char* GetGateWayAnimationName() = 0;
 
-    virtual bool IsValidGroup(uint32_t uiAnimGroup) = 0;
-    virtual bool IsValidAnim(uint32_t uiAnimGroup, uint32_t uiAnimID) = 0;
+    virtual bool IsValidGroup(std::uint32_t uiAnimGroup) = 0;
+    virtual bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) = 0;
 };

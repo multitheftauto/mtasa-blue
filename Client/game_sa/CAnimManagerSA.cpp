@@ -275,7 +275,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::CreateAnimAssociation(Ass
 CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID)
 {
     // We check the validity of the group, avoid crashes due to an invalid group
-    if (!IsValidGroup(static_cast<uint32_t>(animGroup)))
+    if (!IsValidGroup(static_cast<std::uint32_t>(animGroup)))
         return nullptr;
 
     CAnimBlendStaticAssociationSAInterface* pInterface = nullptr;
@@ -861,13 +861,13 @@ bool CAnimManagerSA::isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface*
     return pGame->GetKeyGen()->GetUppercaseKey(m_kGateWayAnimationName) == pInterface->uiHashKey;
 }
 
-bool CAnimManagerSA::IsValidGroup(uint32_t uiAnimGroup)
+bool CAnimManagerSA::IsValidGroup(std::uint32_t uiAnimGroup)
 {
     const auto pGroup = GetAnimBlendAssoc(uiAnimGroup);
     return pGroup && pGroup->IsCreated();
 }
 
-bool CAnimManagerSA::IsValidAnim(uint32_t uiAnimGroup, uint32_t uiAnimID)
+bool CAnimManagerSA::IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID)
 {
     // We get an animation for the checks
     const auto pAnim = GetAnimStaticAssociation((eAnimGroup)uiAnimGroup, (eAnimID)uiAnimID);

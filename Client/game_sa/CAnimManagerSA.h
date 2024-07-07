@@ -163,8 +163,8 @@ public:
     const char* GetGateWayBlockName() { return m_kGateWayBlockName; }
     const char* GetGateWayAnimationName() { return m_kGateWayAnimationName; }
 
-    bool IsValidGroup(uint32_t uiAnimGroup);
-    bool IsValidAnim(uint32_t uiAnimGroup, uint32_t uiAnimID);
+    bool IsValidGroup(std::uint32_t uiAnimGroup);
+    bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID);
 private:
     CAnimBlendAssocGroup* m_pAnimAssocGroups[MAX_ANIM_GROUPS];
     CAnimBlock*           m_pAnimBlocks[MAX_ANIM_BLOCKS];
