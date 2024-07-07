@@ -1226,8 +1226,6 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
                 else
                     Arguments.PushBoolean(false);
                 Arguments.PushBoolean(bStealth);
-                Arguments.PushNumber(animGroup);
-                Arguments.PushNumber(animID);
                 if (IS_PLAYER(pPed))
                     pPed->CallEvent("onClientPlayerWasted", Arguments, true);
                 else
