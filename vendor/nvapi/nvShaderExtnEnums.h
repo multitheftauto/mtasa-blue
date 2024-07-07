@@ -114,6 +114,15 @@
 #define NV_EXTN_OP_HIT_OBJECT_IS_NOP                       84
 #define NV_EXTN_OP_HIT_OBJECT_MAKE_NOP                     85
 
+// Micro-map API
+#define NV_EXTN_OP_RT_TRIANGLE_OBJECT_POSITIONS            86
+#define NV_EXTN_OP_RT_MICRO_TRIANGLE_OBJECT_POSITIONS      87
+#define NV_EXTN_OP_RT_MICRO_TRIANGLE_BARYCENTRICS          88
+#define NV_EXTN_OP_RT_IS_MICRO_TRIANGLE_HIT                89
+#define NV_EXTN_OP_RT_IS_BACK_FACING                       90
+#define NV_EXTN_OP_RT_MICRO_VERTEX_OBJECT_POSITION         91
+#define NV_EXTN_OP_RT_MICRO_VERTEX_BARYCENTRICS            92
+
 //----------------------------------------------------------------------------//
 //-------------------- GET_SPECIAL subOpCode constants -----------------------//
 //----------------------------------------------------------------------------//
