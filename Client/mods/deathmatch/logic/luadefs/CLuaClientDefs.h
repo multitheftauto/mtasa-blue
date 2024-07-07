@@ -17,6 +17,7 @@ class CLuaClientDefs : public CLuaDefs
 {
 public:
     static void LoadFunctions();
+    static bool SetCursorColor(float r, float g, float b, float alpha);
 
 private:
     static bool SetTransferBoxVisible(bool visible);

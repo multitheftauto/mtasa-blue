@@ -126,6 +126,8 @@ public:
     virtual void        SetCursorEnabled(bool bEnabled) = 0;
     virtual bool        IsCursorEnabled() = 0;
     virtual void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false) = 0;
+    virtual void        SetCursorColor(float r, float g, float b, float alpha) = 0;
+    virtual std::tuple<float, float, float, float> GetCursorColor() = 0;
     virtual void        SetCurrentServerCursorAlpha(float fAlpha) = 0;
     virtual float       GetCurrentServerCursorAlpha() = 0;
     virtual eCursorType GetCursorType() = 0;

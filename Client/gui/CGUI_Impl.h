@@ -145,6 +145,8 @@ public:
     void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false);
     void        SetCurrentServerCursorAlpha(float fAlpha);
     float       GetCurrentServerCursorAlpha();
+    void        SetCursorColor(float r, float g, float b, float alpha);
+    std::tuple<float, float, float, float> GetCursorColor();
     eCursorType GetCursorType();
 
     void                    AddChild(CGUIElement_Impl* pChild);
@@ -312,6 +314,9 @@ private:
     CEGUI::DefaultWindow* m_pTop;
     const CEGUI::Image*   m_pCursor;
     float                 m_fCurrentServerCursorAlpha;
+    float                 m_fCurrentServerCursorRed;
+    float                 m_fCurrentServerCursorGreen;
+    float                 m_fCurrentServerCursorBlue;
 
     CGUIFont_Impl* m_pDefaultFont;
     CGUIFont_Impl* m_pSmallFont;

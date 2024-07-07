@@ -381,10 +381,16 @@ void CLocalGUI::SetConsoleVisible(bool bVisible)
         m_pConsole->SetVisible(bVisible);
 
         CGUI* pGUI = CCore::GetSingleton().GetGUI();
+        float r;
+        float g;
+        float b;
+        float a;
+        std::tie(r, b, g, a) = pGUI->GetCursorColor();
+
         if (bVisible)
-            pGUI->SetCursorAlpha(1.0f);
+            pGUI->SetCursorColor(r,b,g,a);
         else if (!g_pCore->IsMenuVisible())
-            pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
+            pGUI->SetCursorColor(r,b,g,a);
     }
 }
 
@@ -431,7 +437,16 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
         }
 
         if (!bVisible)
+        {
+            float r;
+            float g;
+            float b;
+            float a;
             pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
+            std::tie(r, b, g, a) = pGUI->GetCursorColor();
+            pGUI->SetCursorColor(r, g, b, a);
+        }
+           
     }
 }
 

@@ -23,7 +23,8 @@ void CLuaClientDefs::LoadFunctions()
                                                                              {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
                                                                              {"clearDebugBox", ArgumentParser<ClearDebug>},
                                                                              {"isMTAWindowFocused", ArgumentParser<IsMTAWindowFocused>},
-                                                                             {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>}};
+                                                                             {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>},
+                                                                             {"setCursorColor", ArgumentParser<SetCursorColor>}};
 
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
@@ -79,4 +80,11 @@ bool CLuaClientDefs::IsMTAWindowFocused()
 bool CLuaClientDefs::IsCapsLockEnabled()
 {
     return ((::GetKeyState(VK_CAPITAL) & 0x0001) != 0);
+}
+
+bool CLuaClientDefs::SetCursorColor(float r, float g, float b, float alpha)
+{
+    CGUI* pGUI = g_pCore->GetGUI();
+    pGUI->SetCursorColor(r, b, g, alpha);
+    return true;
 }

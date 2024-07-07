@@ -188,6 +188,7 @@ public:
         Nothing.
     */
     void    setAlpha(float alpha);
+    void    setColor(float r, float g, float b, float alpha);
 
 	/*!
 	\brief
