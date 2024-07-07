@@ -136,9 +136,9 @@ bool CLuaDiscordDefs::SetDetails(std::string strDetails)
     return true;
 }
 
-bool CLuaDiscordDefs::SetStartTime(int64_t iTime)
+bool CLuaDiscordDefs::SetStartTime(std::int64_t iTime)
 {
-    int64_t iSecondsSinceEpoch = time(nullptr) + iTime;
+    std::int64_t iSecondsSinceEpoch = time(nullptr) + iTime;
 
     if (iTime == 0)
         iSecondsSinceEpoch = 0;
@@ -155,9 +155,9 @@ bool CLuaDiscordDefs::SetStartTime(int64_t iTime)
     return true;
 }
 
-bool CLuaDiscordDefs::SetEndTime(int64_t iTime)
+bool CLuaDiscordDefs::SetEndTime(std::int64_t iTime)
 {
-    int64_t iSecondsSinceEpoch = time(nullptr) + iTime;
+    std::int64_t iSecondsSinceEpoch = time(nullptr) + iTime;
 
     if (iTime == 0)
         iSecondsSinceEpoch = 0;
@@ -227,7 +227,7 @@ bool CLuaDiscordDefs::SetSmallAsset(std::string szAsset, std::string szAssetText
     return SetAsset(szAsset, szAssetText, false);
 }
 
-bool CLuaDiscordDefs::SetButtons(uint8_t uiIndex, std::string szName, std::string szUrl)
+bool CLuaDiscordDefs::SetButtons(std::uint8_t uiIndex, std::string szName, std::string szUrl)
 {
     if (uiIndex < 1 || uiIndex > 2)
         return false;

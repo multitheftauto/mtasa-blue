@@ -141,13 +141,13 @@ void CDiscordRichPresence::UpdatePresence()
     m_bUpdateRichPresence = false;
 }
 
-void CDiscordRichPresence::SetPresenceStartTimestamp(const int64_t iStart)
+void CDiscordRichPresence::SetPresenceStartTimestamp(const std::int64_t iStart)
 {
     m_iDiscordAppStart = iStart;
     m_bUpdateRichPresence = true;
 }
 
-void CDiscordRichPresence::SetPresenceEndTimestamp(const int64_t iEnd)
+void CDiscordRichPresence::SetPresenceEndTimestamp(const std::int64_t iEnd)
 {
     m_iDiscordAppEnd = iEnd;
     m_bUpdateRichPresence = true;
@@ -189,7 +189,7 @@ bool CDiscordRichPresence::SetPresenceState(const char* szState, bool bCustom)
     return true;
 }
 
-bool CDiscordRichPresence::SetPresenceButtons(uint8_t uiIndex, const char* szName, const char* szUrl)
+bool CDiscordRichPresence::SetPresenceButtons(std::uint8_t uiIndex, const char* szName, const char* szUrl)
 {
     // Should it always return true?
     if (uiIndex <= 2)

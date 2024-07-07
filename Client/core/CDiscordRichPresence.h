@@ -28,8 +28,8 @@ public:
     void UpdatePresenceConnection();
 #endif
 
-    void SetPresenceStartTimestamp(const int64_t iStart);
-    void SetPresenceEndTimestamp(const int64_t iEnd);
+    void SetPresenceStartTimestamp(const std::int64_t iStart);
+    void SetPresenceEndTimestamp(const std::int64_t iEnd);
     void SetAsset(const char* szAsset, const char* szAssetText, bool bIsLarge);
     void SetAssetLargeData(const char* szAsset, const char* szAssetText);
     void SetAssetSmallData(const char* szAsset, const char* szAssetText);
@@ -40,7 +40,7 @@ public:
     bool ResetDiscordData();
     bool SetPresenceState(const char* szState, bool bCustom);
     bool SetPresenceDetails(const char* szDetails, bool bCustom);
-    bool SetPresenceButtons(uint8_t uiIndex, const char* szName, const char* szUrl);
+    bool SetPresenceButtons(std::uint8_t uiIndex, const char* szName, const char* szUrl);
     bool SetDiscordRPCEnabled(bool bEnabled);
     bool SetApplicationID(const char* resourceName, const char* szAppID);
     bool IsDiscordCustomDetailsDisallowed() const { return m_bDisallowCustomDetails; };
@@ -74,8 +74,8 @@ private:
 
     std::mutex m_threadSafetyMutex;
 
-    int64_t m_iDiscordAppStart;
-    int64_t m_iDiscordAppEnd;
+    std::int64_t m_iDiscordAppStart;
+    std::int64_t m_iDiscordAppEnd;
 
     bool m_bDisallowCustomDetails;
     bool m_bDiscordRPCEnabled;
