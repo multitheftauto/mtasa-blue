@@ -26,6 +26,7 @@
 #include "CWorldSA.h"
 #include "CPlayerInfoSA.h"
 #include "CTextSA.h"
+#include "../mods/deathmatch/logic/CVehicleNames.h"
 
 extern CGameSA* pGame;
 
@@ -53,9 +54,10 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
     }
 }
 
-static std::unordered_map<std::uint32_t, std::string> g_vehicleNames;
+static std::unordered_map<std::uint16_t, std::string> g_vehicleIDNames;
+static std::unordered_map<const CVehicleSA*, std::string> g_vehicleRefNames;
 
-void HOOK_CCurrentVehicle__Process()
+void CVehicleSA::HOOK_CCurrentVehicle__Process()
 {
     static auto currentVehicle = reinterpret_cast<CCurrentVehicleSAInterface*>(VAR_CUserDisplay_CurrentVehicle);
     static auto TheText = reinterpret_cast<CTextSAInterface*>(VAR_TheText);
@@ -82,16 +84,20 @@ void HOOK_CCurrentVehicle__Process()
         return;
     }
     auto modelIndex = playerPed->pVehicle->m_nModelIndex;
-    auto modelInfo = ModelInfoPtr[modelIndex];
-    auto modelName = CText__Get(TheText, modelInfo->gameName);
-    if(g_vehicleNames.find(modelIndex) == g_vehicleNames.end())
-        CHud__SetVehicleName(modelName);
-    else {
-        auto vname = g_vehicleNames[modelIndex];
-        char vehicleName[64]{0};
-        strncpy(vehicleName, vname.c_str(), 63);
-        CHud__SetVehicleName(vehicleName);
+
+    if (SharedUtil::MapContains(g_vehicleRefNames, this))
+    {
+        CHud__SetVehicleName(g_vehicleRefNames[this].c_str());
+        return;
     }
+    if (SharedUtil::MapContains(g_vehicleIDNames, modelIndex))
+    {
+        CHud__SetVehicleName(g_vehicleIDNames[modelIndex].c_str());
+        return;
+    }
+
+    CHud__SetVehicleName(CText__Get(TheText, ModelInfoPtr[modelIndex]->gameName));
+    CCurrentVehicle__Display(currentVehicle);
 }
 
 namespace
@@ -1817,7 +1823,9 @@ void CVehicleSA::StaticSetHooks()
 {
     // Setup vehicle sun glare hook
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
-    HookInstall(FUNC_CCurrentVehicle_Process, (DWORD)HOOK_CCurrentVehicle__Process, 5);
+
+    // Setup vehicle names
+    HookInstall(FUNC_CCurrentVehicle_Process, &CVehicleSA::HOOK_CCurrentVehicle__Process, 5);
 }
 
 void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)
@@ -2313,14 +2321,47 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     }
     return bReturn;
 }
+struct SVehicleName
+{
+    const char* szName;
+    const char* szName_replaced;            // Compatibility
+};
 
-bool CVehicleSA::SetVehicleName(std::string name)
+extern const SFixedArray<SVehicleName, 212> VehicleNames;
+
+std::string CVehicleSA::GetVehicleName() const noexcept
+{
+    if (SharedUtil::MapContains(g_vehicleRefNames, this))
+        return g_vehicleRefNames[this];
+
+    auto index = GetModelIndex();
+    if (SharedUtil::MapContains(g_vehicleIDNames, index))
+        return g_vehicleIDNames[index];
+
+    if (index < 400 || index > 611)
+        return "";
+    if (index - 400 >= NUMELMS(VehicleNames))
+        return "";
+
+    return VehicleNames[index - 400].szName;
+}
+
+bool CVehicleSA::SetVehicleName(std::string name) noexcept
 {
     if (name.size() > 63)
         return false;
 
-    auto index = this->GetModelIndex();
-    g_vehicleNames[index] = name;
+    g_vehicleRefNames[this] = name;
+
+    return true;
+}
+
+bool CVehicleSA::SetVehicleName(std::uint16_t id, std::string name) noexcept
+{
+    if (name.size() > 63)
+        return false;
+
+    g_vehicleIDNames[id] = name;
 
     return true;
 }

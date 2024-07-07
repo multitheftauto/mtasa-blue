@@ -683,7 +683,9 @@ public:
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
-    bool                              SetVehicleName(std::string name);
+    std::string                       GetVehicleName() const noexcept;
+    bool                              SetVehicleName(std::string name) noexcept;
+    bool                              SetVehicleName(std::uint16_t id, std::string name) noexcept;
 
     void UpdateLandingGearPosition();
 
@@ -706,4 +708,6 @@ private:
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();
+
+    void HOOK_CCurrentVehicle__Process();
 };

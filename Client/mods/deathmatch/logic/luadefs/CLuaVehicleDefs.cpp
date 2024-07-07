@@ -156,7 +156,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
 
-        {"setVehName", ArgumentParser<SetVehName>},
+        {"setVehicleName", ArgumentParser<SetVehicleName>},
     };
 
     // Add functions
@@ -4178,12 +4178,12 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
 
-bool CLuaVehicleDefs::SetVehName(CClientVehicle* const veh, std::string name)
+bool CLuaVehicleDefs::SetVehicleName(CClientVehicle* const vehicle, std::string name) noexcept
 {
-    return veh->SetName(name);
+    return vehicle->SetName(name);
 }
 
-std::string CLuaVehicleDefs::GetVehName(CClientVehicle* const veh)
+std::string CLuaVehicleDefs::GetVehName(CClientVehicle* const veh) noexcept
 {
     return veh->GetName();
 }

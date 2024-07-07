@@ -5033,7 +5033,17 @@ void CClientVehicle::ResetWheelScale()
     m_bWheelScaleChanged = false;
 }
 
-bool CClientVehicle::SetName(std::string name)
+std::string CClientVehicle::GetName() const noexcept
+{
+    return m_pVehicle->GetVehicleName();
+}
+
+bool CClientVehicle::SetName(std::string name) noexcept
 {
     return m_pVehicle->SetVehicleName(name);
+}
+
+bool CClientVehicle::SetName(std::uint16_t id, std::string name) noexcept
+{
+    return m_pVehicle->SetVehicleName(id, name);
 }
