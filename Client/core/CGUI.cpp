@@ -443,7 +443,7 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
             float b;
             float a;
             pGUI->SetCursorAlpha(pGUI->GetCurrentServerCursorAlpha());
-            std::tie(r, b, g, a) = pGUI->GetCursorColor();
+            std::tie(r,g,b,a) = pGUI->GetCursorColor();
             pGUI->SetCursorColor(r, g, b, a);
         }
            

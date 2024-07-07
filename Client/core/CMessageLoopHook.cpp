@@ -302,7 +302,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
 
                             if (!g_pCore->IsMenuVisible())
                             {
-                                std::tie(r, b, g, a) = pGUI->GetCursorColor();
+                                std::tie(r, g, b, a) = pGUI->GetCursorColor();
                                 pGUI->SetCursorColor(r,g,b,a);
                             }
                             return true;
