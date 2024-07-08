@@ -522,6 +522,9 @@ void CGUI_Impl::GetCursorColor(float &r, float &g, float &b, float &alpha)
 void CGUI_Impl::SetCurrentServerCursorAlpha(float fAlpha)
 {
     m_fCurrentServerCursorAlpha = fAlpha;
+    m_fCurrentServerCursorRed = 1.0f;
+    m_fCurrentServerCursorGreen = 1.0f;
+    m_fCurrentServerCursorBlue = 1.0f;
 }
 
 float CGUI_Impl::GetCurrentServerCursorAlpha()

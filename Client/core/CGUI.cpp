@@ -379,7 +379,6 @@ void CLocalGUI::SetConsoleVisible(bool bVisible)
 
         // Set the visible state
         m_pConsole->SetVisible(bVisible);
-
     }
 }
 
