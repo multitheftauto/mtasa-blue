@@ -511,9 +511,12 @@ void CGUI_Impl::SetCursorColor(float r, float g, float b, float alpha)
     m_fCurrentServerCursorAlpha = alpha;
 }
 
-std::tuple<float, float, float, float> CGUI_Impl::GetCursorColor()
+void CGUI_Impl::GetCursorColor(float &r, float &g, float &b, float &alpha)
 {
-    return std::make_tuple(m_fCurrentServerCursorRed, m_fCurrentServerCursorGreen, m_fCurrentServerCursorBlue, m_fCurrentServerCursorAlpha);
+    r = m_fCurrentServerCursorRed;
+    g = m_fCurrentServerCursorGreen;
+    b = m_fCurrentServerCursorBlue;
+    alpha = m_fCurrentServerCursorAlpha;
 }
 
 void CGUI_Impl::SetCurrentServerCursorAlpha(float fAlpha)

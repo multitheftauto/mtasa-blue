@@ -295,15 +295,12 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                             pConsole->SetVisible(false);
 
                             CGUI* pGUI = g_pCore->GetGUI();
-                            float r;
-                            float g;
-                            float b;
-                            float a;
+                            float r, g, b, alpha;
 
                             if (!g_pCore->IsMenuVisible())
                             {
-                                std::tie(r, g, b, a) = pGUI->GetCursorColor();
-                                pGUI->SetCursorColor(r,g,b,a);
+                                pGUI->GetCursorColor(r, g, b, alpha);
+                                pGUI->SetCursorColor(r, g, b, alpha);
                             }
                             return true;
                         }
