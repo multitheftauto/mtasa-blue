@@ -21,6 +21,9 @@
 
 extern CGameSA* pGame;
 
+const char* const CAnimManagerSA::m_kGateWayBlockName = "ped";
+const char* const CAnimManagerSA::m_kGateWayAnimationName = "run_wuzi";
+
 CAnimManagerSA::CAnimManagerSA()
 {
     MemSetFast(m_pAnimAssocGroups, 0, sizeof(m_pAnimAssocGroups));

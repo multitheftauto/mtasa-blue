@@ -159,9 +159,9 @@ public:
     void DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface);
     void DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface);
 
-    bool        isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface);
-    const char* GetGateWayBlockName() { return m_kGateWayBlockName; }
-    const char* GetGateWayAnimationName() { return m_kGateWayAnimationName; }
+    bool              isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface);
+    const char* const GetGateWayBlockName() { return m_kGateWayBlockName; }
+    const char* const GetGateWayAnimationName() { return m_kGateWayAnimationName; }
 
     bool IsValidGroup(std::uint32_t uiAnimGroup);
     bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID);
@@ -175,6 +175,6 @@ private:
     // ped block, but in reality, it's playing our custom animation, and Of course, we can return run_wuzi
     // animation within the hook if we want to play it instead. Why run_wuzi? We can also use another animation,
     // but I've tested with this one mostly, so let's stick to this.
-    const char* m_kGateWayBlockName = "ped";
-    const char* m_kGateWayAnimationName = "run_wuzi";
+    static const char* const m_kGateWayBlockName;
+    static const char* const m_kGateWayAnimationName;
 };
