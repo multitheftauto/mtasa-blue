@@ -94,14 +94,14 @@ public:
     int                         GetAnimationBlockIndex(const char* szName);
     int                         RegisterAnimBlock(const char* szName);
 
-    std::unique_ptr<CAnimBlendAssocGroup> GetAnimBlendAssoc(AssocGroupId groupID);
+    std::unique_ptr<CAnimBlendAssocGroup> GetAnimBlendAssoc(AssocGroupId groupID) const;
     AssocGroupId                          GetFirstAssocGroup(const char* szName);
 
     const char* GetAnimGroupName(AssocGroupId groupID);
     const char* GetAnimBlockName(AssocGroupId groupID);
 
     std::unique_ptr<CAnimBlendAssociation> CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID);
-    StaticAssocIntface_type                GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID);
+    StaticAssocIntface_type                GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID) const;
     std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName);
     std::unique_ptr<CAnimBlendAssociation> AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
     std::unique_ptr<CAnimBlendAssociation> AddAnimation(RpClump* pClump, CAnimBlendHierarchy*, int ID);
@@ -163,8 +163,8 @@ public:
     const char* GetGateWayBlockName() const;
     const char* GetGateWayAnimationName() const;
 
-    bool IsValidGroup(std::uint32_t uiAnimGroup);
-    bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID);
+    bool IsValidGroup(std::uint32_t uiAnimGroup) const;
+    bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) const;
 private:
     CAnimBlendAssocGroup* m_pAnimAssocGroups[MAX_ANIM_GROUPS];
     CAnimBlock*           m_pAnimBlocks[MAX_ANIM_BLOCKS];

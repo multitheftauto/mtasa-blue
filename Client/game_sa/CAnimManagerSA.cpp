@@ -202,7 +202,7 @@ int CAnimManagerSA::RegisterAnimBlock(const char* szName)
     return iReturn;
 }
 
-std::unique_ptr<CAnimBlendAssocGroup> CAnimManagerSA::GetAnimBlendAssoc(AssocGroupId groupID)
+std::unique_ptr<CAnimBlendAssocGroup> CAnimManagerSA::GetAnimBlendAssoc(AssocGroupId groupID) const
 {
     CAnimBlendAssocGroupSAInterface* pInterface = nullptr;
     DWORD                            dwFunc = FUNC_CAnimManager_GetAnimBlendAssoc;
@@ -281,7 +281,7 @@ std::unique_ptr<CAnimBlendAssociation> CAnimManagerSA::CreateAnimAssociation(Ass
     return nullptr;
 }
 
-CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID)
+CAnimManagerSA::StaticAssocIntface_type CAnimManagerSA::GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID) const
 {
     // We check the validity of the group, avoid crashes due to an invalid group
     if (!IsValidGroup(static_cast<std::uint32_t>(animGroup)))
@@ -880,13 +880,13 @@ const char* CAnimManagerSA::GetGateWayAnimationName() const
     return kGateWayAnimationName;
 }
 
-bool CAnimManagerSA::IsValidGroup(std::uint32_t uiAnimGroup)
+bool CAnimManagerSA::IsValidGroup(std::uint32_t uiAnimGroup) const
 {
     const auto pGroup = GetAnimBlendAssoc(uiAnimGroup);
     return pGroup && pGroup->IsCreated();
 }
 
-bool CAnimManagerSA::IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID)
+bool CAnimManagerSA::IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) const
 {
     // We get an animation for the checks
     const auto pAnim = GetAnimStaticAssociation((eAnimGroup)uiAnimGroup, (eAnimID)uiAnimID);

@@ -66,14 +66,14 @@ public:
     virtual int                         GetAnimationBlockIndex(const char* szName) = 0;
     virtual int                         RegisterAnimBlock(const char* szName) = 0;
 
-    virtual AnimAssocGroup_type GetAnimBlendAssoc(AssocGroupId groupID) = 0;
+    virtual AnimAssocGroup_type GetAnimBlendAssoc(AssocGroupId groupID) const = 0;
     virtual AssocGroupId        GetFirstAssocGroup(const char* szName) = 0;
 
     virtual const char* GetAnimGroupName(AssocGroupId groupID) = 0;
     virtual const char* GetAnimBlockName(AssocGroupId groupID) = 0;
 
     virtual AnimBlendAssoc_type     CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID) = 0;
-    virtual StaticAssocIntface_type GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID) = 0;
+    virtual StaticAssocIntface_type GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID) const = 0;
     virtual AnimBlendAssoc_type     GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName) = 0;
     virtual AnimBlendAssoc_type     AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID) = 0;
     virtual AnimBlendAssoc_type     AddAnimation(RpClump* pClump, CAnimBlendHierarchy*, int ID) = 0;
@@ -132,6 +132,6 @@ public:
     virtual const char* GetGateWayBlockName() const = 0;
     virtual const char* GetGateWayAnimationName() const = 0;
 
-    virtual bool IsValidGroup(std::uint32_t uiAnimGroup) = 0;
-    virtual bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) = 0;
+    virtual bool IsValidGroup(std::uint32_t uiAnimGroup) const = 0;
+    virtual bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) const = 0;
 };
