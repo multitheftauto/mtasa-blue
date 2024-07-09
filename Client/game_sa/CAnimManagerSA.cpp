@@ -21,8 +21,14 @@
 
 extern CGameSA* pGame;
 
-const char* const CAnimManagerSA::m_kGateWayBlockName = "ped";
-const char* const CAnimManagerSA::m_kGateWayAnimationName = "run_wuzi";
+// This "gateway" animation will allow us to play custom animations by simply playing this animation
+// and then in AddAnimation and AddAnimationAndSync hook, we can return our custom animation in the
+// hook instead of run_wuzi. This will trick GTA SA into thinking that it is playing run_wuzi from
+// ped block, but in reality, it's playing our custom animation, and Of course, we can return run_wuzi
+// animation within the hook if we want to play it instead. Why run_wuzi? We can also use another animation,
+// but I've tested with this one mostly, so let's stick to this.
+static const char* const kGateWayBlockName = "ped";
+static const char* const kGateWayAnimationName = "run_wuzi";
 
 CAnimManagerSA::CAnimManagerSA()
 {
@@ -861,7 +867,17 @@ void CAnimManagerSA::DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInter
 
 bool CAnimManagerSA::isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface)
 {
-    return pGame->GetKeyGen()->GetUppercaseKey(m_kGateWayAnimationName) == pInterface->uiHashKey;
+    return pGame->GetKeyGen()->GetUppercaseKey(kGateWayAnimationName) == pInterface->uiHashKey;
+}
+
+const char* CAnimManagerSA::GetGateWayBlockName() const
+{
+    return kGateWayBlockName;
+}
+
+const char* CAnimManagerSA::GetGateWayAnimationName() const
+{
+    return kGateWayAnimationName;
 }
 
 bool CAnimManagerSA::IsValidGroup(std::uint32_t uiAnimGroup)

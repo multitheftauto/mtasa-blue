@@ -159,22 +159,13 @@ public:
     void DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface);
     void DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface);
 
-    bool              isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface);
-    const char* const GetGateWayBlockName() { return m_kGateWayBlockName; }
-    const char* const GetGateWayAnimationName() { return m_kGateWayAnimationName; }
+    bool        isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface);
+    const char* GetGateWayBlockName() const;
+    const char* GetGateWayAnimationName() const;
 
     bool IsValidGroup(std::uint32_t uiAnimGroup);
     bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID);
 private:
     CAnimBlendAssocGroup* m_pAnimAssocGroups[MAX_ANIM_GROUPS];
     CAnimBlock*           m_pAnimBlocks[MAX_ANIM_BLOCKS];
-
-    // This "gateway" animation will allow us to play custom animations by simply playing this animation
-    // and then in AddAnimation and AddAnimationAndSync hook, we can return our custom animation in the
-    // hook instead of run_wuzi. This will trick GTA SA into thinking that it is playing run_wuzi from
-    // ped block, but in reality, it's playing our custom animation, and Of course, we can return run_wuzi
-    // animation within the hook if we want to play it instead. Why run_wuzi? We can also use another animation,
-    // but I've tested with this one mostly, so let's stick to this.
-    static const char* const m_kGateWayBlockName;
-    static const char* const m_kGateWayAnimationName;
 };
