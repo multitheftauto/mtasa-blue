@@ -426,8 +426,8 @@ void CLocalGUI::SetMainMenuVisible(bool bVisible)
 
         if (!bVisible)
         {
-            float r,g,b,a;
-            pGUI->GetCursorColor(r,g,b,a);
+            float r, g, b, a; 
+            pGUI->GetCursorColor(r, g, b, a); //restore the cursor color when we close the main menu
             pGUI->SetCursorColor(r, g, b, a);
         }
            

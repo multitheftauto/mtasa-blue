@@ -85,15 +85,13 @@ bool CLuaClientDefs::IsCapsLockEnabled()
 
 bool CLuaClientDefs::SetCursorColor(float r, float g, float b, float alpha)
 {
-    CGUI* pGUI = g_pCore->GetGUI();
-    pGUI->SetCursorColor(r, g, b, alpha);
+    g_pCore->GetGUI()->SetCursorColor(r, g, b, alpha);
     return true;
 }
 
 CLuaMultiReturn<float, float, float, float> CLuaClientDefs::GetCursorColor()
 {
     float r, g, b, alpha;
-    CGUI* pGUI = g_pCore->GetGUI();
-    pGUI->GetCursorColor(r,g,b,alpha);
+    g_pCore->GetGUI()->GetCursorColor(r, g, b, alpha);
     return {r, g, b, alpha};
 }

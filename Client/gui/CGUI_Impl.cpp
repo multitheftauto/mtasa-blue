@@ -504,7 +504,7 @@ void CGUI_Impl::SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer)
 
 void CGUI_Impl::SetCursorColor(float r, float g, float b, float alpha)
 {
-    CEGUI::MouseCursor::getSingleton().setColor(r,g,b,alpha);
+    CEGUI::MouseCursor::getSingleton().setColor(r, g, b, alpha);
     m_fCurrentServerCursorRed = r;
     m_fCurrentServerCursorGreen = g;
     m_fCurrentServerCursorBlue = b;
@@ -522,9 +522,9 @@ void CGUI_Impl::GetCursorColor(float &r, float &g, float &b, float &alpha)
 void CGUI_Impl::SetCurrentServerCursorAlpha(float fAlpha)
 {
     m_fCurrentServerCursorAlpha = fAlpha;
-    m_fCurrentServerCursorRed = 1.0f;
-    m_fCurrentServerCursorGreen = 1.0f;
-    m_fCurrentServerCursorBlue = 1.0f;
+    m_fCurrentServerCursorRed = 255.0f;
+    m_fCurrentServerCursorGreen = 255.0f;
+    m_fCurrentServerCursorBlue = 255.0f;
 }
 
 float CGUI_Impl::GetCurrentServerCursorAlpha()
