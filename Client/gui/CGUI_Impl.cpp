@@ -526,10 +526,10 @@ void CGUI_Impl::ResetMenuCursorColor()
 
 void CGUI_Impl::RestCursorColor()
 {
-    m_fCurrentServerCursorRed = 255;
-    m_fCurrentServerCursorGreen = 255;
-    m_fCurrentServerCursorBlue = 255;
-    m_fCurrentServerCursorAlpha = 255;
+    m_fCurrentServerCursorRed = 255.0f;
+    m_fCurrentServerCursorGreen = 255.0f;
+    m_fCurrentServerCursorBlue = 255.0f;
+    m_fCurrentServerCursorAlpha = 1.0f;
 }
 
 void CGUI_Impl::SetCurrentServerCursorAlpha(float fAlpha)
