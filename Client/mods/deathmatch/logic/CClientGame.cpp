@@ -3425,7 +3425,7 @@ void CClientGame::Event_OnIngame()
     g_pGame->ResetModelTimes();
 
     //reset cursor color
-    g_pCore->GetGUI()->SetCursorColor(255.0f, 255.0f, 255.0f, 1.0f);
+    g_pCore->GetGUI()->RestCursorColor();
 
     // Make sure we can access all areas
     g_pGame->GetStats()->ModifyStat(CITIES_PASSED, 2.0);

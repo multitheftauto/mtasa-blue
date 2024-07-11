@@ -129,6 +129,7 @@ public:
     virtual void        SetCursorColor(float r, float g, float b, float alpha) = 0;
     virtual void        GetCursorColor(float &r, float &g, float &b, float &alpha) = 0;
     virtual void        ResetMenuCursorColor() = 0;
+    virtual void        RestCursorColor() = 0;
     virtual void        SetCurrentServerCursorAlpha(float fAlpha) = 0;
     virtual float       GetCurrentServerCursorAlpha() = 0;
     virtual eCursorType GetCursorType() = 0;
