@@ -55,7 +55,6 @@ void InstallAspectRatioFixes();
 void InstallMiscFixes();
 void InstallHUDFixes();
 
-void UpdateFrontendFixes();
 void UpdateMiscFixes();
 void UpdateHUDFixes();
 void UpdateScriptFixes();
@@ -82,92 +81,6 @@ void __declspec(naked) CalculateAimingPoint()
 void CalculateAspectRatio()
 {
     fWideScreenWidthScaleDown = (1.0f / 640.0f) / (*pfScreenAspectRatio / (4.0f / 3.0f));
-}
-
-void UpdateFrontendFixes()
-{
-    fFrontendWidth[0] = 0.0020312499f * fWideScreenWidthScale;
-    fFrontendWidth[1] = 0.00065625005f * fWideScreenWidthScale;
-    fFrontendWidth[2] = 0.00109375f * fWideScreenWidthScale;
-    fFrontendWidth[3] = 0.00109375f * fWideScreenWidthScale;
-    fFrontendWidth[4] = 0.00087500003f * fWideScreenWidthScale;
-    fFrontendWidth[5] = 0.000546875f * fWideScreenWidthScale;
-    fFrontendWidth[6] = 0.00076562498f * fWideScreenWidthScale;
-    fFrontendWidth[7] = 0.00076562498f * fWideScreenWidthScale;
-    fFrontendWidth[8] = 0.00046875002f * fWideScreenWidthScale;
-    fFrontendWidth[9] = 0.00093750004f * fWideScreenWidthScale;
-    fFrontendWidth[10] = 0.0625f;
-    fFrontendWidth[11] = 0.09375f;
-    fFrontendWidth[12] = 0.0015625f;
-    fFrontendWidth[13] = 0.0625f;
-    fFrontendWidth[14] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[15] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[16] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[17] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[18] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[19] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[20] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[21] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[22] = 0.00046875002f * fWideScreenWidthScale;
-    fFrontendWidth[23] = 0.00125f * fWideScreenWidthScale;
-    fFrontendWidth[24] = 0.78125f * fWideScreenWidthScale;
-    fFrontendWidth[25] = 0.78125f * fWideScreenWidthScale;
-    fFrontendWidth[26] = 0.78125f * fWideScreenWidthScale;
-    fFrontendWidth[27] = 0.78125f * fWideScreenWidthScale;
-    fFrontendWidth[28] = 0.78125f * fWideScreenWidthScale;
-    fFrontendWidth[29] = 0.0046875002f * fWideScreenWidthScale;
-    fFrontendWidth[30] = 0.15625f * fWideScreenWidthScale;
-    fFrontendWidth[31] = 0.0046875002f * fWideScreenWidthScale;
-    fFrontendWidth[32] = 0.15625f * fWideScreenWidthScale;
-    fFrontendWidth[33] = 0.0046875002f * fWideScreenWidthScale;
-    fFrontendWidth[34] = 0.15625f * fWideScreenWidthScale;
-    fFrontendWidth[35] = 0.0046875002f * fWideScreenWidthScale;
-    fFrontendWidth[36] = 0.15625f * fWideScreenWidthScale;
-    fFrontendWidth[37] = 0.0046875002f * fWideScreenWidthScale;
-    fFrontendWidth[38] = 0.15625f * fWideScreenWidthScale;
-    fFrontendWidth[39] = 0.0015625f * fWideScreenWidthScale;
-    fFrontendWidth[40] = 0.00087500003f * fWideScreenWidthScale;
-
-    fFrontendHeight[0] = 0.0046874997f * fWideScreenHeightScale;
-    fFrontendHeight[1] = 0.0021205356f * fWideScreenHeightScale;
-    fFrontendHeight[2] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[3] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[4] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[5] = 0.0021205356f * fWideScreenHeightScale;
-    fFrontendHeight[6] = 0.0026785715f * fWideScreenHeightScale;
-    fFrontendHeight[7] = 0.0015625f * fWideScreenHeightScale;
-    fFrontendHeight[8] = 0.0016741072f * fWideScreenHeightScale;
-    fFrontendHeight[9] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[10] = 0.0625f * fWideScreenHeightScale;
-    fFrontendHeight[11] = 0.21651785f * fWideScreenHeightScale;
-    fFrontendHeight[12] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[13] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[14] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[15] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[16] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[17] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[18] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[19] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[20] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[21] = 0.0012276786f * fWideScreenHeightScale;
-    fFrontendHeight[22] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[23] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[24] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[25] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[26] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[27] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[28] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[29] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[30] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[31] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[32] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[33] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[34] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[35] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[36] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[37] = 0.0017857143f * fWideScreenHeightScale;
-    fFrontendHeight[38] = 0.002232143f * fWideScreenHeightScale;
-    fFrontendHeight[39] = 0.002232143f * fWideScreenHeightScale;
 }
 
 void UpdateMiscFixes()
@@ -526,7 +439,6 @@ void UpdateScreenAspectRatio()
     fWideScreenHeightProperScale = static_cast<float>(pRsGlobal->height) / 448.0f;
     fDefaultWidth = (4.0f / 3.0f);
 
-    UpdateFrontendFixes();
     UpdateMiscFixes();
     UpdateHUDFixes();
     UpdateScriptFixes();
@@ -582,7 +494,7 @@ float __stdcall StretchYHook(float fValue)
 void InstallMiscFixes()
 {
     // Misc
-    int m_dwMiscWidth[] = {
+    uintptr_t m_dwMiscWidth[] = {
         0x5733FD,            // 0 StretchX
         0x574761,            // 1 Radio Icons
         0x5747A6,            // 2 Radio Icons
@@ -613,7 +525,7 @@ void InstallMiscFixes()
         0x573FF0,            // 27 DrawWindow header
     };
 
-    int m_dwMiscHeight[] = {
+    uintptr_t m_dwMiscHeight[] = {
         0x57342D,            // 0 StretchY
         0x57473B,            // 1 Radio Icons
         0x574783,            // 2 Radio Icons
@@ -644,38 +556,38 @@ void InstallMiscFixes()
         0x573FD6,            // 27 DrawWindow header
     };
 
-    for (int i = 0; i < sizeof(m_dwMiscWidth) / sizeof(const void*); i++)
+    for (int i = 0; i < sizeof(m_dwMiscWidth) / sizeof(float*); i++)
     {
-            MemPut<const void*>(m_dwMiscWidth[i] + 0x2, &fMiscWidth[i]);
+        MemPut<float*>(m_dwMiscWidth[i] + 0x2, &fMiscWidth[i]);
     }
 
-    for (int i = 0; i < sizeof(m_dwMiscHeight) / sizeof(const void*); i++)
+    for (int i = 0; i < sizeof(m_dwMiscHeight) / sizeof(float*); i++)
     {
-            MemPut<const void*>(m_dwMiscHeight[i] + 0x2, &fMiscHeight[i]);
+        MemPut<float*>(m_dwMiscHeight[i] + 0x2, &fMiscHeight[i]);
     }
 }
 
 void InstallHUDFixes()
 {
-    int m_dwCrosshairWidth[] = {
+    uintptr_t m_dwCrosshairWidth[] = {
         0x58E7CE, 0x58E7F8, 0x58E2FA, 0x58E4ED, 0x58E75B, 0x58E28B, 0x58E2AC, 0x58E2BA, 0x53E472, 0x53E4AE,
     };
 
-    int m_dwCrosshairHeight[] = {
+    uintptr_t m_dwCrosshairHeight[] = {
         0x58E7E4, 0x58E80E, 0x58E319, 0x58E527, 0x58E2C8, 0x53E3E7, 0x53E409,
     };
 
-    for (int i = 0; i < sizeof(m_dwCrosshairWidth) / sizeof(const void*); i++)
+    for (int i = 0; i < sizeof(m_dwCrosshairWidth) / sizeof(float*); i++)
     {
-        MemPut<const void*>(m_dwCrosshairWidth[i] + 0x2, &fMiscWidth[0]);
+        MemPut<float*>(m_dwCrosshairWidth[i] + 0x2, &fMiscWidth[0]);
     }
 
-    for (int i = 0; i < sizeof(m_dwCrosshairHeight) / sizeof(const void*); i++)
+    for (int i = 0; i < sizeof(m_dwCrosshairHeight) / sizeof(float*); i++)
     {
-        MemPut<const void*>(m_dwCrosshairHeight[i] + 0x2, &fMiscHeight[0]);
+        MemPut<float*>(m_dwCrosshairHeight[i] + 0x2, &fMiscHeight[0]);
     }
 
-    int m_dwRadarWidth[] = {
+    uintptr_t m_dwRadarWidth[] = {
         0x58A441,            // Radar plane
         0x58A791,            // Radar disc
         0x58A82E,            // Radar disc
@@ -694,7 +606,7 @@ void InstallHUDFixes()
         0x5876D4, 0x58774B, 0x58780A, 0x58788F, 0x58792E, 0x587A1A, 0x587AAA,
     };
 
-    int m_dwRadarHeight[] = {
+    uintptr_t m_dwRadarHeight[] = {
         0x58A473,            // Radar plane
         0x58A600,            // Radar disc
         0x58A69E,            // Radar disc
@@ -713,17 +625,17 @@ void InstallHUDFixes()
         0x5876BC, 0x587733, 0x587916, 0x587A02, 0x587A92,
     };
 
-    for (int i = 0; i < sizeof(m_dwRadarWidth) / sizeof(const void*); i++)
+    for (int i = 0; i < sizeof(m_dwRadarWidth) / sizeof(float*); i++)
     {
-        MemPut<const void*>(m_dwRadarWidth[i] + 0x2, &fRadarWidth[i]);
+        MemPut<float*>(m_dwRadarWidth[i] + 0x2, &fRadarWidth[i]);
     }
 
-    for (int i = 0; i < sizeof(m_dwRadarHeight) / sizeof(const void*); i++)
+    for (int i = 0; i < sizeof(m_dwRadarHeight) / sizeof(float*); i++)
     {
-        MemPut<const void*>(m_dwRadarHeight[i] + 0x2, &fRadarHeight[i]);
+        MemPut<float*>(m_dwRadarHeight[i] + 0x2, &fRadarHeight[i]);
     }
 
-    int m_dwHUDWidth[] = {
+    uintptr_t m_dwHUDWidth[] = {
         0x58EB3F,            // 0 Clock
         0x58EC0C,            // 1 Clock
         0x58F55C,            // 2 Money
@@ -821,7 +733,7 @@ void InstallHUDFixes()
         0x4477F7,            // 105 CGarages
     };
 
-    int m_dwHUDHeight[] = {
+    uintptr_t m_dwHUDHeight[] = {
         0x58EB29,            // 0 Clock
         0x58EBF9,            // 1 Clock
         0x58F546,            // 2 Money
@@ -906,25 +818,15 @@ void InstallHUDFixes()
         0x4478AC,            // 105 CGarages
     };
 
-    for (int i = 0; i < sizeof(m_dwHUDWidth) / sizeof(const void*); i++)
+    for (int i = 0; i < sizeof(m_dwHUDWidth) / sizeof(float*); i++)
     {
-        MemPut<const void*>(m_dwHUDWidth[i] + 0x2, &fHUDWidth[i]);
+        MemPut<float*>(m_dwHUDWidth[i] + 0x2, &fHUDWidth[i]);
     }
 
-    for (int i = 0; i < sizeof(m_dwHUDHeight) / sizeof(const void*); i++)
+    for (int i = 0; i < sizeof(m_dwHUDHeight) / sizeof(float*); i++)
     {
-        MemPut<const void*>(m_dwHUDHeight[i] + 0x2, &fHUDHeight[i]);
+        MemPut<float*>(m_dwHUDHeight[i] + 0x2, &fHUDHeight[i]);
     }
-
-    /*
-    // Help text bar chart offset
-    static float fBarChartOffsetY = 160.0f;
-    MemPut<float*>(0x58BE9F + 0x2, &fBarChartOffsetY);
-
-    // Lock Subtitles Width
-    static float fSubtitlesMult = 1.0f;
-    MemPut<float*>(0x58C4E8 + 0x2, &fSubtitlesMult);
-    */
 
     // Second player fix.
     MemPut<float*>(0x58F9A0 + 0x2, &fHUDWidth[110]);            // Weapon icon X
