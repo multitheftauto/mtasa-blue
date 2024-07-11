@@ -526,7 +526,6 @@ void CGUI_Impl::ResetMenuCursorColor()
 
 void CGUI_Impl::RestCursorColor()
 {
-    CEGUI::MouseCursor::getSingleton().setColor(255, 255, 255, 1);
     m_fCurrentServerCursorRed = 255;
     m_fCurrentServerCursorGreen = 255;
     m_fCurrentServerCursorBlue = 255;
