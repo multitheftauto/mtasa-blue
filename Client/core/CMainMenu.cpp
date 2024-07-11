@@ -606,7 +606,7 @@ void CMainMenu::Update()
 
                 if (pGUI)
                 {
-                    pGUI->SetCursorAlpha(1.0f); //set alpha of cursor color when we open up main menu
+                    pGUI->ResetMenuCursorColor();            // Rest cursor menu color when we open up main menu
                     m_bCursorAlphaReset = true;
                 }
             }

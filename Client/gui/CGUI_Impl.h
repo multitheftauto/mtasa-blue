@@ -147,6 +147,7 @@ public:
     float       GetCurrentServerCursorAlpha();
     void        SetCursorColor(float r, float g, float b, float alpha);
     void        GetCursorColor(float &r, float &g, float &b, float &alpha);
+    void        ResetMenuCursorColor();
     eCursorType GetCursorType();
 
     void                    AddChild(CGUIElement_Impl* pChild);
