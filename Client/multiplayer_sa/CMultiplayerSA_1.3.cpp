@@ -1707,12 +1707,10 @@ void _declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
                 retn 4
             }
         }
-        else
-        {
-            _asm
-            {
-                jmp RETURN_CPed_RemoveWeaponWhenEnteringVehicle
-            }
-        }
+    }
+
+    _asm
+    {
+        jmp RETURN_CPed_RemoveWeaponWhenEnteringVehicle
     }
 }
