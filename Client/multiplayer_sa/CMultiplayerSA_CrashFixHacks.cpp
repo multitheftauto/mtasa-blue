@@ -1982,6 +1982,31 @@ static void _declspec(naked) HOOK_FxPrim_c__Enable()
     }
 }
 
+// Fix #1757 extinguishFire in onClientVehicleDamage causes crash
+#define HOOKPOS_CFire_ProcessFire 0x53A6FC
+#define HOOKSIZE_CFire_ProcessFire 9
+static DWORD CONTINUE_CFire_ProcessFire = 0x53A705;
+static void _declspec(naked) HOOK_CFire_ProcessFire()
+{
+    _asm
+    {
+        test byte ptr [esi], 4
+        jnz skip
+
+        mov ecx, [esi+10h]
+        mov eax, [ecx+590h]
+        jmp CONTINUE_CFire_ProcessFire
+
+        skip:
+        pop edi
+        pop esi
+        pop ebp
+        pop ebx
+        add esp, 2Ch
+        retn
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -2042,6 +2067,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CAnimManager__BlendAnimation);
     EZHookInstall(FxSystemBP_c__Load);
     EZHookInstall(FxPrim_c__Enable);
+    EZHookInstall(CFire_ProcessFire);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
