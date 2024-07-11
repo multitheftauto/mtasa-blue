@@ -52,7 +52,6 @@ void  CalculateAspectRatio();
 void GetMemoryAddresses();
 
 void InstallAspectRatioFixes();
-void InstallFrontendFixes();
 void InstallMiscFixes();
 void InstallHUDFixes();
 
@@ -647,13 +646,11 @@ void InstallMiscFixes()
 
     for (int i = 0; i < sizeof(m_dwMiscWidth) / sizeof(const void*); i++)
     {
-        if (m_dwMiscWidth[i] != NULL)
             MemPut<const void*>(m_dwMiscWidth[i] + 0x2, &fMiscWidth[i]);
     }
 
     for (int i = 0; i < sizeof(m_dwMiscHeight) / sizeof(const void*); i++)
     {
-        if (m_dwMiscHeight[i] != NULL)
             MemPut<const void*>(m_dwMiscHeight[i] + 0x2, &fMiscHeight[i]);
     }
 }
@@ -665,19 +662,17 @@ void InstallHUDFixes()
     };
 
     int m_dwCrosshairHeight[] = {
-        0x58E7E4, 0x58E80E, 0x58E319, 0x58E527, 0x58E2C8, 0x53E3E7, 0x53E409, NULL, NULL, NULL,
+        0x58E7E4, 0x58E80E, 0x58E319, 0x58E527, 0x58E2C8, 0x53E3E7, 0x53E409,
     };
 
     for (int i = 0; i < sizeof(m_dwCrosshairWidth) / sizeof(const void*); i++)
     {
-        if (m_dwCrosshairWidth[i] != NULL)
-            MemPut<const void*>(m_dwCrosshairWidth[i] + 0x2, &fMiscWidth[0]);
+        MemPut<const void*>(m_dwCrosshairWidth[i] + 0x2, &fMiscWidth[0]);
     }
 
     for (int i = 0; i < sizeof(m_dwCrosshairHeight) / sizeof(const void*); i++)
     {
-        if (m_dwCrosshairHeight[i] != NULL)
-            MemPut<const void*>(m_dwCrosshairHeight[i] + 0x2, &fMiscHeight[0]);
+        MemPut<const void*>(m_dwCrosshairHeight[i] + 0x2, &fMiscHeight[0]);
     }
 
     int m_dwRadarWidth[] = {
@@ -715,19 +710,17 @@ void InstallHUDFixes()
         0x5841B0,            // Radar Trace 2
         0x584207,            // Radar Trace 1
         0x5842C6,            // Radar Trace 1
-        0x5876BC, 0x587733, 0x587916, 0x587A02, 0x587A92, NULL, NULL,
+        0x5876BC, 0x587733, 0x587916, 0x587A02, 0x587A92,
     };
 
     for (int i = 0; i < sizeof(m_dwRadarWidth) / sizeof(const void*); i++)
     {
-        if (m_dwRadarWidth[i] != NULL)
-            MemPut<const void*>(m_dwRadarWidth[i] + 0x2, &fRadarWidth[i]);
+        MemPut<const void*>(m_dwRadarWidth[i] + 0x2, &fRadarWidth[i]);
     }
 
     for (int i = 0; i < sizeof(m_dwRadarHeight) / sizeof(const void*); i++)
     {
-        if (m_dwRadarHeight[i] != NULL)
-            MemPut<const void*>(m_dwRadarHeight[i] + 0x2, &fRadarHeight[i]);
+        MemPut<const void*>(m_dwRadarHeight[i] + 0x2, &fRadarHeight[i]);
     }
 
     int m_dwHUDWidth[] = {
@@ -760,7 +753,6 @@ void InstallHUDFixes()
         0x58DD7E,            // 26 Wanted
         0x58DF71,            // 27 Wanted
         0x58DFE5,            // 28 Wanted
-        NULL,                // 29
         0x58B09F,            // 30 Vehicle names
         0x58B13F,            // 31 Vehicle names
         0x58AD3A,            // 32 Area names
@@ -783,16 +775,6 @@ void InstallHUDFixes()
         0x58A013,            // 49 Stats box
         0x58A090,            // 50 Stats box
         0x58A134,            // 51 Stats box
-        NULL,                // 52
-        NULL,                // 53
-        NULL,                // 54
-        NULL,                // 55
-        NULL,                // 56
-        NULL,                // 57
-        NULL,                // 58
-        NULL,                // 59
-        NULL,                // 60
-        NULL,                // 61
         0x58C863,            // 62 SuccessFailed text
         0x58D2DB,            // 63 MissionTitle text
         0x58D459,            // 64 MissionTitle text
@@ -857,13 +839,9 @@ void InstallHUDFixes()
         0x58D945,            // 14 Weapon icons
         0x58D882,            // 15 Weapon icons
         0x58F90B,            // 16 Weapon icons
-        NULL,                // 17
         0x5894AF,            // 18 Ammo
-        NULL,                // 19
         0x58F9C0,            // 20 Ammo
         0x58FA4A,            // 21 Ammo
-        NULL,                // 22
-        NULL,                // 23
         0x58DCA2,            // 24 Wanted
         0x58DD68,            // 25 Wanted
         0x58DDF4,            // 26 Wanted
@@ -874,15 +852,10 @@ void InstallHUDFixes()
         0x58B12D,            // 31 Vehicle names
         0x58AD24,            // 32 Area names
         0x58AE0D,            // 33 Area names
-        NULL,                // 34
         0x58C37F,            // 35 Subs
         0x58C407,            // 36 Subs
         0x58C4C6,            // 37 Subs
-        // 0x58C53B, // 38 Subs
-        // 0x58C611, // 39 Subs
         0x5898F6,            // 40 Stats box text
-        // 0x58C46E, // 41 Subs
-        NULL,                // 42
         0x589735,            // 43 Stats box
         0x58978B,            // 44 Stats box
         0x589813,            // 45 Stats box
@@ -904,15 +877,9 @@ void InstallHUDFixes()
         0x58A07A,            // 61 Stats box
         0x58C84D,            // 62 SuccessFailed text
         0x58D2C5,            // 63 MissionTitle text
-        NULL,                // 0x58D447, // 64 MissionTitle text
         0x58CBAB,            // 65 WastedBusted text
-        NULL,                // 0x58B1B7, // 66 Timers
         0x58B263,            // 67 Timers
-        NULL,                // 0x58B435, // 68 Timers
-        NULL,                // 0x58B536, // 69 Timers
         0x58B5DE,            // 70 Timers
-        NULL,                // 71
-        NULL,                // 72
         0x58B7BD,            // 73 Help text
         0x58BA4C,            // 74 Help text
         0x58BBA7,            // 75 Help text
@@ -920,9 +887,6 @@ void InstallHUDFixes()
         0x58BE2B,            // 77 Help text
         0x58BF1C,            // 78 Help text
         0x58BFCB,            // 79 Help text
-        NULL,                // 80
-        NULL,                // 81
-        NULL,                // 82
         0x580E11,            // 83 Menu system
         0x580F85,            // 84
         0x5810CC,            // 85
@@ -931,17 +895,11 @@ void InstallHUDFixes()
         0x58147A,            // 88
         0x5814E7,            // 89
         0x581699,            // 90
-        NULL,                // 91
-        NULL,                // 92
-        NULL,                // 93
         0x581889,            // 94
         0x58CCC5,            // 95 OddJob
         0x58CDD0,            // 96 OddJob
         0x58CECC,            // 97 OddJob
         0x58D146,            // 98 OddJob
-        NULL,                // 0x58A199, // 99 TripSkip
-        NULL,                // 0x58A207, // 100 TripSkip
-        NULL,                // 0x58A2B0, // 101 TripSkip
         0x4E9F1A,            // 102 RadioStation
         0x43CF47,            // 103 CDarkel
         0x4477B7,            // 104 CGarages
@@ -950,14 +908,12 @@ void InstallHUDFixes()
 
     for (int i = 0; i < sizeof(m_dwHUDWidth) / sizeof(const void*); i++)
     {
-        if (m_dwHUDWidth[i] != NULL)
-            MemPut<const void*>(m_dwHUDWidth[i] + 0x2, &fHUDWidth[i]);
+        MemPut<const void*>(m_dwHUDWidth[i] + 0x2, &fHUDWidth[i]);
     }
 
     for (int i = 0; i < sizeof(m_dwHUDHeight) / sizeof(const void*); i++)
     {
-        if (m_dwHUDHeight[i] != NULL)
-            MemPut<const void*>(m_dwHUDHeight[i] + 0x2, &fHUDHeight[i]);
+        MemPut<const void*>(m_dwHUDHeight[i] + 0x2, &fHUDHeight[i]);
     }
 
     /*
