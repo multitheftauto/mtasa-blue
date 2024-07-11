@@ -12,12 +12,8 @@
 
 struct RsGlobal
 {
-    char* AppName;
     int   width;
     int   height;
-    int   frameLimit;
-    int   quit;
-    int   ps;
 };
 
 #ifndef M_PI
@@ -584,125 +580,6 @@ float __stdcall StretchYHook(float fValue)
         return (float)pRsGlobal->height * fValue * 0.002232143f;
 }
 
-void InstallFrontendFixes()
-{
-    // Font Scales
-    int m_dwFrontendWidth[] = {
-        0x5795CF,            // 0 Menu text
-        0x579981,            // 1 Menu text
-        0x579A01,            // 2 Menu text
-        0x57A36E,            // 3 Menu text
-        0x57A319,            // 4 Menu text
-        0x57A2A0,            // 5 Menu text
-        0x579718,            // 6 Menu text
-        0x5763C0,            // 7 Menu text
-        0x5749A5,            // 8 Menu text
-        0x57500F,            // 9 Menu text
-        0x579665,            // 10 Menu text
-        0x579863,            // 11 Menu text
-        0x57A1E3,            // 12 Menu text
-        0x57A3EB,            // 13 Menu text
-        0x582DDB,            // 14 Legend
-        0x582E0D,            // 15 Legend
-        0x582EB0,            // 16 Legend
-        0x583019,            // 17 Legend
-        0x58309C,            // 18 Legend
-        0x582F82,            // 19 Legend
-        0x583128,            // 20 Legend
-        0x5831AD,            // 21 Legend
-        0x57613B,            // 22 Legend
-        0x575EDF,            // 23 Map zones
-        0x57A88D,            // 24 Brightness slider posn
-        0x57AA81,            // 25 Radio slider posn
-        0x57ACBE,            // 26 Sfx slider posn
-        0x57AEB0,            // 27 Draw slider posn
-        0x57B0E4,            // 28 Mouse slider posn
-        0x57A807,            // 29 Brightness slider
-        0x57A811,            // 30 Brightness slider
-        0x57A9FE,            // 31 Radio slider
-        0x57AA08,            // 32 Radio slider
-        0x57AC2F,            // 33 Sfx slider
-        0x57AC39,            // 34 Sfx slider
-        0x57AE36,            // 35 Draw distance slider
-        0x57AE40,            // 36 Draw distance slider
-        0x57B064,            // 37 Mouse acc slider
-        0x57B06E,            // 38 Mouse acc slider
-        0x584A12,            // 39 DrawYouAreHereSprite
-        0x5740BC,            // 40 Message screen
-    };
-
-    int m_dwFrontendHeight[] = {
-        0x5795AD,            // 0 Menu text
-        0x579958,            // 1 Menu text
-        0x5799D5,            // 2 Menu text
-        0x57A345,            // 3 Menu text
-        0x57A2DB,            // 4 Menu text
-        0x57A25F,            // 5 Menu text
-        0x5796F6,            // 6 Menu text
-        0x576398,            // 7 Menu text
-        0x57497D,            // 8 Menu text
-        0x574FED,            // 9 Menu text
-        0x579643,            // 10 Menu text
-        0x579841,            // 11 Menu text
-        0x57A1AE,            // 12 Menu text
-        0x57A3C5,            // 13 Menu text
-        0x582DC1,            // 14 Legend
-        0x582ED3,            // 15 Legend
-        0x582FA3,            // 16 Legend
-        0x582FF5,            // 17 Legend
-        0x583079,            // 18 Legend
-        0x5830F6,            // 19 Legend
-        0x58317B,            // 20 Legend
-        0x576119,            // 21 Legend
-        0x575EB7,            // 22 Map zones
-        NULL,                // 23
-        NULL,                // 24
-        NULL,                // 25
-        NULL,                // 26
-        NULL,                // 27
-        NULL,                // 28
-        NULL,                // 29
-        NULL,                // 30
-        NULL,                // 31
-        NULL,                // 32
-        NULL,                // 33
-        NULL,                // 34
-        NULL,                // 35
-        NULL,                // 36
-        NULL,                // 37
-        0x5849FA,            // 38 DrawYouAreHereSprite
-        0x574096,            // 39 Message screen
-    };
-
-    for (int i = 0; i < sizeof(m_dwFrontendWidth) / sizeof(const void*); i++)
-    {
-        if (m_dwFrontendWidth[i] != NULL)
-            MemPut<const void*>(m_dwFrontendWidth[i] + 0x2, &fFrontendWidth[i]);
-    }
-
-    for (int i = 0; i < sizeof(m_dwFrontendHeight) / sizeof(const void*); i++)
-    {
-        if (m_dwFrontendHeight[i] != NULL)
-            MemPut<const void*>(m_dwFrontendHeight[i] + 0x2, &fFrontendHeight[i]);
-    }
-
-    // StretchXY Restoration
-    int m_dwCallWidth[] = {
-        0x57E3A5, 0x577CB7, 0x577CD0, 0x577D6F, 0x577D99, 0x577DAB, 0x577FA6, 0x578031, 0x578052, 0x5780E1, 0x5788DF, 0x5788FB,
-    };
-
-    int m_dwCallHeight[] = {
-        0x57E391, 0x577C7B, 0x577C94, 0x577DEC, 0x577F6F, 0x577F81, 0x578106, 0x578199, 0x5781BA, 0x57824D, 0x5788ED,
-
-    };
-
-    for (int i = 0; i < sizeof(m_dwCallWidth) / sizeof(const void*); i++)
-        HookInstallCall(m_dwCallWidth[i], (DWORD)StretchXHook);
-
-    for (int i = 0; i < sizeof(m_dwCallHeight) / sizeof(const void*); i++)
-        HookInstallCall(m_dwCallHeight[i], (DWORD)StretchYHook);
-}
-
 void InstallMiscFixes()
 {
     // Misc
@@ -1086,18 +963,18 @@ void InstallHUDFixes()
     /*
     // Help text bar chart offset
     static float fBarChartOffsetY = 160.0f;
-    MemPut<const void*>(0x58BE9F + 0x2, &fBarChartOffsetY);
+    MemPut<float*>(0x58BE9F + 0x2, &fBarChartOffsetY);
 
     // Lock Subtitles Width
     static float fSubtitlesMult = 1.0f;
-    MemPut<const void*>(0x58C4E8 + 0x2, &fSubtitlesMult);
+    MemPut<float*>(0x58C4E8 + 0x2, &fSubtitlesMult);
     */
 
     // Second player fix.
-    MemPut<const void*>(0x58F9A0 + 0x2, &fHUDWidth[110]);            // Weapon icon X
-    MemPut<const void*>(0x58F993 + 0x2, &fHUDWidth[16]);             // Weapon icon X
-    MemPut<const void*>(0x58F972 + 0x2, &fHUDHeight[16]);            // Weapon icon Y
-    MemPut<const void*>(0x58FA8E + 0x2, &fHUDWidth[17]);             // Ammo x
+    MemPut<float*>(0x58F9A0 + 0x2, &fHUDWidth[110]);            // Weapon icon X
+    MemPut<float*>(0x58F993 + 0x2, &fHUDWidth[16]);             // Weapon icon X
+    MemPut<float*>(0x58F972 + 0x2, &fHUDHeight[16]);            // Weapon icon Y
+    MemPut<float*>(0x58FA8E + 0x2, &fHUDWidth[17]);             // Ammo x
 }
 
 void CMultiplayerSA::InitHooks_WidescreenFix()
@@ -1105,7 +982,6 @@ void CMultiplayerSA::InitHooks_WidescreenFix()
     GetMemoryAddresses();
 
     InstallAspectRatioFixes();
-    InstallFrontendFixes();
     InstallMiscFixes();
     InstallHUDFixes();
 }
