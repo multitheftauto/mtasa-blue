@@ -145,10 +145,10 @@ public:
     void        SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer = false);
     void        SetCurrentServerCursorAlpha(float fAlpha);
     float       GetCurrentServerCursorAlpha();
-    void        SetCursorColor(float r, float g, float b, float alpha);
-    void        GetCursorColor(float &r, float &g, float &b, float &alpha);
-    void        ResetMenuCursorColor();
-    void        ResetCursorColor(float r, float g, float b, float alpha);
+    void        SetCursorColor(float r, float g, float b, float alpha) noexcept;
+    void        GetCursorColor(float& r, float& g, float& b, float& alpha) noexcept;
+    void        ResetMenuCursorColor() noexcept;
+    void        ResetCursorColor(float r, float g, float b, float alpha) noexcept;
     eCursorType GetCursorType();
 
     void                    AddChild(CGUIElement_Impl* pChild);

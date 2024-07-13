@@ -96,7 +96,7 @@ bool CLuaClientDefs::SetCursorColor(float r, float g, float b, float alpha)
     return true;
 }
 
-CLuaMultiReturn<float, float, float, float> CLuaClientDefs::GetCursorColor()
+CLuaMultiReturn<float, float, float, float> CLuaClientDefs::GetCursorColor() noexcept
 {
     float r, g, b, alpha;
     g_pCore->GetGUI()->GetCursorColor(r, g, b, alpha);
