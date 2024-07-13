@@ -29,14 +29,14 @@ float fCameraWidth[2], fCameraHeight[2];
 float fWideScreenWidthScale = 1.0f;
 float fWideScreenHeightScale = 1.0f;
 
-static const float fHudHeightScale = 1.0f;
-static const float fHudWidthScale = 1.0f;
-static const float fRadarWidthScale = 1.0f;
-static const float fRadarHeightScale = 1.0f;
+constexpr float fHudHeightScale = 1.0f;
+constexpr float fHudWidthScale = 1.0f;
+constexpr float fRadarWidthScale = 1.0f;
+constexpr float fRadarHeightScale = 1.0f;
+constexpr float fDefaultWidth = (4.0f / 3.0f);
 
 float  fWideScreenWidthProperScale;
 float  fWideScreenHeightProperScale;
-float  fDefaultWidth;
 float  fDefaultCoords;
 float* pfScreenAspectRatio;
 float* pfScreenFieldOfView;
@@ -47,8 +47,7 @@ RsGlobal* pRsGlobal;
 
 float AdjustFOV(float, float);
 
-void  CalculateAspectRatio();
-
+void CalculateAspectRatio();
 void GetMemoryAddresses();
 
 void InstallAspectRatioFixes();
@@ -62,20 +61,6 @@ void UpdateScriptFixes();
 float AdjustFOV(float f, float ar)
 {
     return std::round((2.0f * atan(((ar) / (4.0f / 3.0f)) * tan(f / 2.0f * ((float)M_PI / 180.0f)))) * (180.0f / (float)M_PI) * 100.0f) / 100.0f;
-}
-
-void __declspec(naked) CalculateAimingPoint()
-{
-    _asm
-    {
-        fstp    st
-        mov     edx, [pfScreenAspectRatio]
-        fmul[edx]
-        mov     edi, [esp + 1Ch + 14h]
-        mov     edx, edi
-        mov     ebx, 5149A6h
-        jmp     ebx
-    }
 }
 
 void CalculateAspectRatio()
@@ -116,7 +101,6 @@ void UpdateMiscFixes()
     fMiscWidth[25] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
     fMiscWidth[26] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
     fMiscWidth[27] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[28] = 0.0015625f * fWideScreenWidthScale;
 
     fMiscHeight[0] = 0.002232143f * fWideScreenHeightScale;            // StretchY
     fMiscHeight[1] = 0.078125f * fWideScreenHeightScale;
@@ -146,7 +130,6 @@ void UpdateMiscFixes()
     fMiscHeight[25] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
     fMiscHeight[26] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
     fMiscHeight[27] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[28] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
 }
 
 void UpdateScriptFixes()
@@ -168,7 +151,7 @@ void UpdateHUDFixes()
     fRadarWidth[3] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
     fRadarWidth[4] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
     fRadarWidth[5] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[6] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
+    fRadarWidth[6] = 0.0015000f * fWideScreenWidthScale * fRadarWidthScale;
     fRadarWidth[7] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
     fRadarWidth[8] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
     fRadarWidth[9] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
@@ -208,7 +191,6 @@ void UpdateHUDFixes()
     fRadarHeight[19] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
     fRadarHeight[20] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
     fRadarHeight[21] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[22] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
 
     fHUDWidth[0] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
     fHUDWidth[1] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
@@ -305,17 +287,6 @@ void UpdateHUDFixes()
     fHUDWidth[92] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
     fHUDWidth[93] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
     fHUDWidth[94] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[95] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[96] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[97] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[98] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[99] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[100] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[101] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[102] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[103] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[104] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[105] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
 
     fHUDWidth[110] = 1920.0f * 0.17343046f * fWideScreenWidthScale * fHudWidthScale;
 
@@ -401,30 +372,6 @@ void UpdateHUDFixes()
     fHUDHeight[79] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
     fHUDHeight[80] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
     fHUDHeight[81] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[82] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[83] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[84] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[85] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[86] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[87] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[88] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[89] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[90] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[91] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[92] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[93] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[94] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[95] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[96] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[97] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[98] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[99] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[100] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[101] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[102] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[103] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[104] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[105] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
 
     fHUDHeight[14] /= 1.125f;
     fHUDHeight[15] /= 1.125f;
@@ -437,7 +384,6 @@ void UpdateScreenAspectRatio()
     fWideScreenHeightScale = 448.0 / 448.0f;
     fWideScreenWidthProperScale = static_cast<float>(pRsGlobal->width) / (*pfScreenAspectRatio * 448.0f);
     fWideScreenHeightProperScale = static_cast<float>(pRsGlobal->height) / 448.0f;
-    fDefaultWidth = (4.0f / 3.0f);
 
     UpdateMiscFixes();
     UpdateHUDFixes();
@@ -473,22 +419,6 @@ void GetMemoryAddresses()
 {
     pRsGlobal = (RsGlobal*)0xC17040;
     pfScreenAspectRatio = (float*)0xC3EFA4;
-}
-
-float __stdcall StretchXHook(float fValue)
-{
-    if (pRsGlobal->width == 640)
-        return fValue;
-    else
-        return (float)pRsGlobal->width * fValue * 0.0015625f;
-}
-
-float __stdcall StretchYHook(float fValue)
-{
-    if (pRsGlobal->height == 448)
-        return fValue;
-    else
-        return (float)pRsGlobal->height * fValue * 0.002232143f;
 }
 
 void InstallMiscFixes()
@@ -593,7 +523,7 @@ void InstallHUDFixes()
         0x58A82E,            // Radar disc
         0x58A8DF,            // Radar disc
         0x58A982,            // Radar disc
-        0x58A5D8, 0x58A6DE,
+        0x58A5D8, 0x58A6DE,  // Radar altimeter
         0x5834BA,            // Radar point
         0x58603F,            // Radar point
         0x5886CC,            // Radar centre
@@ -665,72 +595,72 @@ void InstallHUDFixes()
         0x58DD7E,            // 26 Wanted
         0x58DF71,            // 27 Wanted
         0x58DFE5,            // 28 Wanted
-        0x58B09F,            // 30 Vehicle names
-        0x58B13F,            // 31 Vehicle names
-        0x58AD3A,            // 32 Area names
-        0x58AD65,            // 33 Area names
-        0x58AE4A,            // 34 Area names
-        0x58C395,            // 35 Subs
-        0x58C41D,            // 36 Subs
-        0x58C4DC,            // 37 Subs
-        0x5896D8,            // 38 Stats box
-        0x589703,            // 39 Stats box
-        0x58990C,            // 40 Stats box
-        0x58986D,            // 41 Stats box
-        0x5897C3,            // 42 Stats box
-        0x589A16,            // 43 Stats box
-        0x589B2D,            // 44 Stats box
-        0x589C73,            // 45 Stats box
-        0x589D61,            // 46 Stats box
-        0x589E49,            // 47 Stats box
-        0x589F31,            // 48 Stats box
-        0x58A013,            // 49 Stats box
-        0x58A090,            // 50 Stats box
-        0x58A134,            // 51 Stats box
-        0x58C863,            // 62 SuccessFailed text
-        0x58D2DB,            // 63 MissionTitle text
-        0x58D459,            // 64 MissionTitle text
-        0x58CBC1,            // 65 WastedBusted text
-        0x58B273,            // 66 Timers
-        0x58B2A4,            // 67 Timers
-        0x58B3AF,            // 68 Timers
-        0x58B3FC,            // 69 Timers
-        0x58B56A,            // 70 Timers
-        0x58B5EE,            // 71 Timers
-        0x58B67E,            // 72 Timers
-        0x58B76F,            // 73 Helptext
-        0x58B7D6,            // 74 Helptext
-        0x58BA62,            // 75 Helptext
-        0x58BAC6,            // 76 Helptext
-        0x58BBDB,            // 77 Helptext
-        0x58BCB0,            // 78 Helptext
-        0x58BD58,            // 79 Helptext
-        0x58BE8D,            // 80 Helptext
-        0x58BF7E,            // 81 Helptext
-        0x58BFFC,            // 82 Helptext
-        0x580F16,            // 83 Menu system
-        0x580F95,            // 84
-        0x5810EF,            // 85
-        0x581158,            // 86
-        0x5811CD,            // 87
-        0x58148A,            // 88
-        0x5814F7,            // 89
-        0x5815B1,            // 90
-        0x5815EB,            // 91
-        0x581633,            // 92
-        0x47AD2A,            // 93
-        0x5818CF,            // 94
-        0x58CCDB,            // 95 OddJob
-        0x58CDE6,            // 96 OddJob
-        0x58CEE2,            // 97 OddJob
-        0x58D15C,            // 98 OddJob
-        0x58A178,            // 99 TripSkip
-        0x58A21D,            // 100 TripSkip
-        0x58A2C0,            // 101 TripSkip
-        0x4E9F30,            // 102 RadioStation
-        0x43CF57,            // 103 CDarkel
-        0x4477CD,            // 104 CGarages
-        0x4477F7,            // 105 CGarages
+        0x58B09F,            // 29 Vehicle names
+        0x58B13F,            // 30 Vehicle names
+        0x58AD3A,            // 31 Area names
+        0x58AD65,            // 32 Area names
+        0x58AE4A,            // 33 Area names
+        0x58C395,            // 34 Subs
+        0x58C41D,            // 35 Subs
+        0x58C4DC,            // 36 Subs
+        0x5896D8,            // 37 Stats box
+        0x589703,            // 38 Stats box
+        0x58990C,            // 39 Stats box
+        0x58986D,            // 40 Stats box
+        0x5897C3,            // 41 Stats box
+        0x589A16,            // 42 Stats box
+        0x589B2D,            // 43 Stats box
+        0x589C73,            // 44 Stats box
+        0x589D61,            // 45 Stats box
+        0x589E49,            // 46 Stats box
+        0x589F31,            // 47 Stats box
+        0x58A013,            // 48 Stats box
+        0x58A090,            // 49 Stats box
+        0x58A134,            // 50 Stats box
+        0x58C863,            // 51 SuccessFailed text
+        0x58D2DB,            // 52 MissionTitle text
+        0x58D459,            // 53 MissionTitle text
+        0x58CBC1,            // 54 WastedBusted text
+        0x58B273,            // 55 Timers
+        0x58B2A4,            // 56 Timers
+        0x58B3AF,            // 57 Timers
+        0x58B3FC,            // 58 Timers
+        0x58B56A,            // 59 Timers
+        0x58B5EE,            // 60 Timers
+        0x58B67E,            // 61 Timers
+        0x58B76F,            // 62 Helptext
+        0x58B7D6,            // 63 Helptext
+        0x58BA62,            // 64 Helptext
+        0x58BAC6,            // 65 Helptext
+        0x58BBDB,            // 66 Helptext
+        0x58BCB0,            // 67 Helptext
+        0x58BD58,            // 68 Helptext
+        0x58BE8D,            // 69 Helptext
+        0x58BF7E,            // 70 Helptext
+        0x58BFFC,            // 71 Helptext
+        0x580F16,            // 72 Menu system
+        0x580F95,            // 73
+        0x5810EF,            // 74
+        0x581158,            // 75
+        0x5811CD,            // 76
+        0x58148A,            // 77
+        0x5814F7,            // 78
+        0x5815B1,            // 79
+        0x5815EB,            // 80
+        0x581633,            // 81
+        0x47AD2A,            // 82
+        0x5818CF,            // 83
+        0x58CCDB,            // 84 OddJob
+        0x58CDE6,            // 85 OddJob
+        0x58CEE2,            // 86 OddJob
+        0x58D15C,            // 87 OddJob
+        0x58A178,            // 88 TripSkip
+        0x58A21D,            // 89 TripSkip
+        0x58A2C0,            // 90 TripSkip
+        0x4E9F30,            // 91 RadioStation
+        0x43CF57,            // 92 CDarkel
+        0x4477CD,            // 93 CGarages
+        0x4477F7,            // 94 CGarages
     };
 
     uintptr_t m_dwHUDHeight[] = {
@@ -751,71 +681,71 @@ void InstallHUDFixes()
         0x58D945,            // 14 Weapon icons
         0x58D882,            // 15 Weapon icons
         0x58F90B,            // 16 Weapon icons
-        0x5894AF,            // 18 Ammo
-        0x58F9C0,            // 20 Ammo
-        0x58FA4A,            // 21 Ammo
-        0x58DCA2,            // 24 Wanted
-        0x58DD68,            // 25 Wanted
-        0x58DDF4,            // 26 Wanted
-        0x58DF55,            // 27 Wanted
-        0x58DF9B,            // 28 Wanted
-        0x58DEE4,            // 29 Wanted
-        0x58B089,            // 30 Vehicle names
-        0x58B12D,            // 31 Vehicle names
-        0x58AD24,            // 32 Area names
-        0x58AE0D,            // 33 Area names
-        0x58C37F,            // 35 Subs
-        0x58C407,            // 36 Subs
-        0x58C4C6,            // 37 Subs
-        0x5898F6,            // 40 Stats box text
-        0x589735,            // 43 Stats box
-        0x58978B,            // 44 Stats box
-        0x589813,            // 45 Stats box
-        0x58983F,            // 46 Stats box
-        0x5898BD,            // 47 Stats box
-        0x5899FF,            // 48 Stats box
-        0x589A4B,            // 49 Stats box
-        0x589B16,            // 50 Stats box
-        0x589C5C,            // 51 Stats box
-        0x589CA8,            // 52 Stats box
-        0x589D4A,            // 53 Stats box
-        0x589D92,            // 54 Stats box
-        0x589E32,            // 55 Stats box
-        0x589E7A,            // 56 Stats box
-        0x589F1A,            // 57 Stats box
-        0x589F62,            // 58 Stats box
-        0x589FFC,            // 59 Stats box
-        0x58A040,            // 60 Stats box
-        0x58A07A,            // 61 Stats box
-        0x58C84D,            // 62 SuccessFailed text
-        0x58D2C5,            // 63 MissionTitle text
-        0x58CBAB,            // 65 WastedBusted text
-        0x58B263,            // 67 Timers
-        0x58B5DE,            // 70 Timers
-        0x58B7BD,            // 73 Help text
-        0x58BA4C,            // 74 Help text
-        0x58BBA7,            // 75 Help text
-        0x58BD19,            // 76 Help text
-        0x58BE2B,            // 77 Help text
-        0x58BF1C,            // 78 Help text
-        0x58BFCB,            // 79 Help text
-        0x580E11,            // 83 Menu system
-        0x580F85,            // 84
-        0x5810CC,            // 85
-        0x581132,            // 86
-        0x5811A1,            // 87
-        0x58147A,            // 88
-        0x5814E7,            // 89
-        0x581699,            // 90
-        0x581889,            // 94
-        0x58CCC5,            // 95 OddJob
-        0x58CDD0,            // 96 OddJob
-        0x58CECC,            // 97 OddJob
-        0x58D146,            // 98 OddJob
-        0x4E9F1A,            // 102 RadioStation
-        0x43CF47,            // 103 CDarkel
-        0x4477B7,            // 104 CGarages
-        0x4478AC,            // 105 CGarages
+        0x5894AF,            // 17 Ammo
+        0x58F9C0,            // 18 Ammo
+        0x58FA4A,            // 19 Ammo
+        0x58DCA2,            // 20 Wanted
+        0x58DD68,            // 21 Wanted
+        0x58DDF4,            // 22 Wanted
+        0x58DF55,            // 23 Wanted
+        0x58DF9B,            // 24 Wanted
+        0x58DEE4,            // 25 Wanted
+        0x58B089,            // 26 Vehicle names
+        0x58B12D,            // 27 Vehicle names
+        0x58AD24,            // 28 Area names
+        0x58AE0D,            // 29 Area names
+        0x58C37F,            // 30 Subs
+        0x58C407,            // 31 Subs
+        0x58C4C6,            // 32 Subs
+        0x5898F6,            // 33 Stats box text
+        0x589735,            // 34 Stats box
+        0x58978B,            // 35 Stats box
+        0x589813,            // 36 Stats box
+        0x58983F,            // 37 Stats box
+        0x5898BD,            // 38 Stats box
+        0x5899FF,            // 39 Stats box
+        0x589A4B,            // 40 Stats box
+        0x589B16,            // 41 Stats box
+        0x589C5C,            // 42 Stats box
+        0x589CA8,            // 43 Stats box
+        0x589D4A,            // 44 Stats box
+        0x589D92,            // 45 Stats box
+        0x589E32,            // 46 Stats box
+        0x589E7A,            // 47 Stats box
+        0x589F1A,            // 48 Stats box
+        0x589F62,            // 49 Stats box
+        0x589FFC,            // 50 Stats box
+        0x58A040,            // 51 Stats box
+        0x58A07A,            // 52 Stats box
+        0x58C84D,            // 53 SuccessFailed text
+        0x58D2C5,            // 54 MissionTitle text
+        0x58CBAB,            // 55 WastedBusted text
+        0x58B263,            // 56 Timers
+        0x58B5DE,            // 57 Timers
+        0x58B7BD,            // 58 Help text
+        0x58BA4C,            // 59 Help text
+        0x58BBA7,            // 60 Help text
+        0x58BD19,            // 61 Help text
+        0x58BE2B,            // 62 Help text
+        0x58BF1C,            // 63 Help text
+        0x58BFCB,            // 64 Help text
+        0x580E11,            // 65 Menu system
+        0x580F85,            // 66
+        0x5810CC,            // 67
+        0x581132,            // 68
+        0x5811A1,            // 69
+        0x58147A,            // 70
+        0x5814E7,            // 71
+        0x581699,            // 72
+        0x581889,            // 73
+        0x58CCC5,            // 74 OddJob
+        0x58CDD0,            // 75 OddJob
+        0x58CECC,            // 76 OddJob
+        0x58D146,            // 77 OddJob
+        0x4E9F1A,            // 78 RadioStation
+        0x43CF47,            // 79 CDarkel
+        0x4477B7,            // 80 CGarages
+        0x4478AC,            // 81 CGarages
     };
 
     for (int i = 0; i < sizeof(m_dwHUDWidth) / sizeof(float*); i++)
