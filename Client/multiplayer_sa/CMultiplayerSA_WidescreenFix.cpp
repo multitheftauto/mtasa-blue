@@ -40,11 +40,6 @@ float* ScreenFieldOfView;
 
 RsGlobal* rsGlobal;
 
-float AdjustFOV(float f, float ar)
-{
-    return std::round((2.0f * atan(((ar) / (4.0f / 3.0f)) * tan(f / 2.0f * ((float)M_PI / 180.0f)))) * (180.0f / (float)M_PI) * 100.0f) / 100.0f;
-}
-
 void UpdateMiscFixes()
 {
     CameraWidth[0] = 0.01403292f;
