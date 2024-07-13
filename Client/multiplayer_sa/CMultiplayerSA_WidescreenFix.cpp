@@ -12,382 +12,344 @@
 
 struct RsGlobal
 {
-    int   width;
-    int   height;
+    int width;
+    int height;
 };
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
 
-float fFrontendWidth[41], fFrontendHeight[41];
-float fMiscWidth[30], fMiscHeight[30];
-float fRadarWidth[23], fRadarHeight[23];
-float fHUDWidth[120], fHUDHeight[120];
-float fCameraWidth[2], fCameraHeight[2];
+float MiscWidth[30], MiscHeight[30];
+float RadarWidth[23], RadarHeight[23];
+float HUDWidth[120], HUDHeight[120];
+float CameraWidth[2], CameraHeight[2];
 
-float fWideScreenWidthScale = 1.0f;
-float fWideScreenHeightScale = 1.0f;
+float                  ScreenWidthScale = 1.0f;
+static constexpr float ScreenHeightScale = 1.0f;
+static constexpr float HudWidthScale = 1.0f;
+static constexpr float HudHeightScale = 1.0f;
+static constexpr float RadarWidthScale = 1.0f;
+static constexpr float RadarHeightScale = 1.0f;
 
-constexpr float fHudHeightScale = 1.0f;
-constexpr float fHudWidthScale = 1.0f;
-constexpr float fRadarWidthScale = 1.0f;
-constexpr float fRadarHeightScale = 1.0f;
-constexpr float fDefaultWidth = (4.0f / 3.0f);
+constexpr float WidthMult = 0.0015625f;
+constexpr float HeightMult = 0.002232143f;
 
-float  fWideScreenWidthProperScale;
-float  fWideScreenHeightProperScale;
-float  fDefaultCoords;
-float* pfScreenAspectRatio;
-float* pfScreenFieldOfView;
+float* ScreenAspectRatio;
+float* ScreenFieldOfView;
 
-float fWideScreenWidthScaleDown, fWideScreenHeightScaleDown;
-
-RsGlobal* pRsGlobal;
-
-float AdjustFOV(float, float);
-
-void CalculateAspectRatio();
-void GetMemoryAddresses();
-
-void InstallAspectRatioFixes();
-void InstallMiscFixes();
-void InstallHUDFixes();
-
-void UpdateMiscFixes();
-void UpdateHUDFixes();
-void UpdateScriptFixes();
+RsGlobal* rsGlobal;
 
 float AdjustFOV(float f, float ar)
 {
     return std::round((2.0f * atan(((ar) / (4.0f / 3.0f)) * tan(f / 2.0f * ((float)M_PI / 180.0f)))) * (180.0f / (float)M_PI) * 100.0f) / 100.0f;
 }
 
-void CalculateAspectRatio()
-{
-    fWideScreenWidthScaleDown = (1.0f / 640.0f) / (*pfScreenAspectRatio / (4.0f / 3.0f));
-}
-
 void UpdateMiscFixes()
 {
-    fCameraWidth[0] = 0.01403292f;
-    fCameraHeight[0] = 0.0f;
+    CameraWidth[0] = 0.01403292f;
+    CameraHeight[0] = 0.0f;
 
-    fMiscWidth[0] = 0.0015625f * fWideScreenWidthScale;            // StretchX
-    fMiscWidth[1] = 0.0546875f * fWideScreenWidthScale;
-    fMiscWidth[2] = 0.0015625f;
-    fMiscWidth[3] = 0.09375f * fWideScreenWidthScale;
-    fMiscWidth[4] = 0.0015625f;
-    fMiscWidth[5] = 0.078125f * fWideScreenWidthScale;
-    fMiscWidth[6] = 0.0703125f * fWideScreenWidthScale;
-    fMiscWidth[7] = 0.0859375f * fWideScreenWidthScale;
-    fMiscWidth[8] = 0.078125f * fWideScreenWidthScale;
-    fMiscWidth[9] = 0.078125f * fWideScreenWidthScale;
-    fMiscWidth[10] = 0.0703125f * fWideScreenWidthScale;
-    fMiscWidth[11] = 0.0859375f * fWideScreenWidthScale;
-    fMiscWidth[12] = 0.078125f * fWideScreenWidthScale;
-    fMiscWidth[13] = 0.625f;
-    fMiscWidth[14] = 0.0015625f * fWideScreenWidthScale;
-    fMiscWidth[15] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[16] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[17] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[18] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[19] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[20] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[21] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[22] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[23] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[24] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[25] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[26] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fMiscWidth[27] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
+    MiscWidth[0] = WidthMult * ScreenWidthScale;            // StretchX
+    MiscWidth[1] = 0.0546875f * ScreenWidthScale;
+    MiscWidth[2] = WidthMult;
+    MiscWidth[3] = 0.09375f * ScreenWidthScale;
+    MiscWidth[4] = WidthMult;
+    MiscWidth[5] = 0.078125f * ScreenWidthScale;
+    MiscWidth[6] = 0.0703125f * ScreenWidthScale;
+    MiscWidth[7] = 0.0859375f * ScreenWidthScale;
+    MiscWidth[8] = 0.078125f * ScreenWidthScale;
+    MiscWidth[9] = 0.078125f * ScreenWidthScale;
+    MiscWidth[10] = 0.0703125f * ScreenWidthScale;
+    MiscWidth[11] = 0.0859375f * ScreenWidthScale;
+    MiscWidth[12] = 0.078125f * ScreenWidthScale;
+    MiscWidth[13] = 0.625f;
+    MiscWidth[14] = WidthMult * ScreenWidthScale;
+    MiscWidth[15] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[16] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[17] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[18] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[19] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[20] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[21] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[22] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[23] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[24] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[25] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[26] = WidthMult * ScreenWidthScale * HudWidthScale;
+    MiscWidth[27] = WidthMult * ScreenWidthScale * HudWidthScale;
 
-    fMiscHeight[0] = 0.002232143f * fWideScreenHeightScale;            // StretchY
-    fMiscHeight[1] = 0.078125f * fWideScreenHeightScale;
-    fMiscHeight[2] = 0.66964287f * fWideScreenHeightScale;
-    fMiscHeight[3] = 0.13392857f * fWideScreenHeightScale;
-    fMiscHeight[4] = 0.6473214f * fWideScreenHeightScale;
-    fMiscHeight[5] = 0.22321428f * fWideScreenHeightScale;
-    fMiscHeight[6] = 0.24553572f * fWideScreenHeightScale;
-    fMiscHeight[7] = 0.24553572f * fWideScreenHeightScale;
-    fMiscHeight[8] = 0.22321428f * fWideScreenHeightScale;
-    fMiscHeight[9] = 0.77678573f * fWideScreenHeightScale;
-    fMiscHeight[10] = 0.75446427f * fWideScreenHeightScale;
-    fMiscHeight[11] = 0.75446427f * fWideScreenHeightScale;
-    fMiscHeight[12] = 0.77678573f * fWideScreenHeightScale;
-    fMiscHeight[13] = 0.037946429f * fWideScreenHeightScale;
-    fMiscHeight[14] = 0.002232143f * fWideScreenHeightScale;
-    fMiscHeight[15] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[16] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[17] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[18] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[19] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[20] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[21] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[22] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[23] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[24] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[25] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[26] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fMiscHeight[27] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-}
-
-void UpdateScriptFixes()
-{
-    float w;
-    if (*pfScreenAspectRatio < fDefaultWidth)
-        w = static_cast<float>(pRsGlobal->width);
-    else
-        w = pRsGlobal->width * fDefaultWidth / *pfScreenAspectRatio;
-
-    fDefaultCoords = 0.5f * (pRsGlobal->width - w);
+    MiscHeight[0] = HeightMult * ScreenHeightScale;            // StretchY
+    MiscHeight[1] = 0.078125f * ScreenHeightScale;
+    MiscHeight[2] = 0.66964287f * ScreenHeightScale;
+    MiscHeight[3] = 0.13392857f * ScreenHeightScale;
+    MiscHeight[4] = 0.6473214f * ScreenHeightScale;
+    MiscHeight[5] = 0.22321428f * ScreenHeightScale;
+    MiscHeight[6] = 0.24553572f * ScreenHeightScale;
+    MiscHeight[7] = 0.24553572f * ScreenHeightScale;
+    MiscHeight[8] = 0.22321428f * ScreenHeightScale;
+    MiscHeight[9] = 0.77678573f * ScreenHeightScale;
+    MiscHeight[10] = 0.75446427f * ScreenHeightScale;
+    MiscHeight[11] = 0.75446427f * ScreenHeightScale;
+    MiscHeight[12] = 0.77678573f * ScreenHeightScale;
+    MiscHeight[13] = 0.037946429f * ScreenHeightScale;
+    MiscHeight[14] = HeightMult * ScreenHeightScale;
+    MiscHeight[15] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[16] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[17] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[18] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[19] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[20] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[21] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[22] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[23] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[24] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[25] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[26] = HeightMult * ScreenHeightScale * HudHeightScale;
+    MiscHeight[27] = HeightMult * ScreenHeightScale * HudHeightScale;
 }
 
 void UpdateHUDFixes()
 {
-    fRadarWidth[0] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[1] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[2] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[3] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[4] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[5] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[6] = 0.0015000f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[7] = 0.0015625f * fWideScreenWidthScale * fRadarWidthScale;
-    fRadarWidth[8] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[9] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[10] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[11] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[12] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[13] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[14] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[15] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[16] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[17] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[18] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[19] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[20] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[21] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fRadarWidth[22] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
+    RadarWidth[0] = WidthMult * ScreenWidthScale * RadarWidthScale;
+    RadarWidth[1] = WidthMult * ScreenWidthScale * RadarWidthScale;
+    RadarWidth[2] = WidthMult * ScreenWidthScale * RadarWidthScale;
+    RadarWidth[3] = WidthMult * ScreenWidthScale * RadarWidthScale;
+    RadarWidth[4] = WidthMult * ScreenWidthScale * RadarWidthScale;
+    RadarWidth[5] = WidthMult * ScreenWidthScale * RadarWidthScale;
+    RadarWidth[6] = 0.0015000f * ScreenWidthScale * RadarWidthScale;
+    RadarWidth[7] = WidthMult * ScreenWidthScale * RadarWidthScale;
+    RadarWidth[8] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[9] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[10] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[11] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[12] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[13] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[14] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[15] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[16] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[17] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[18] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[19] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[20] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[21] = WidthMult * ScreenWidthScale * HudWidthScale;
+    RadarWidth[22] = WidthMult * ScreenWidthScale * HudWidthScale;
 
-    fRadarHeight[0] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[1] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[2] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[3] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[4] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[5] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[6] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[7] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[8] = 0.002232143f * fWideScreenHeightScale * fRadarHeightScale;
-    fRadarHeight[9] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[10] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[11] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[12] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[13] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[14] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[15] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[16] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[17] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[18] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[19] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[20] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fRadarHeight[21] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
+    RadarHeight[0] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[1] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[2] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[3] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[4] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[5] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[6] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[7] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[8] = HeightMult * ScreenHeightScale * RadarHeightScale;
+    RadarHeight[9] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[10] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[11] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[12] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[13] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[14] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[15] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[16] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[17] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[18] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[19] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[20] = HeightMult * ScreenHeightScale * HudHeightScale;
+    RadarHeight[21] = HeightMult * ScreenHeightScale * HudHeightScale;
 
-    fHUDWidth[0] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[1] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[2] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[3] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[4] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[5] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[6] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[7] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[8] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[9] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[10] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[11] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[12] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[13] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[14] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[15] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[16] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[17] = 0.17343046f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[18] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[19] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[20] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[21] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[22] = 0.17343046f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[23] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[24] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[25] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[26] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[27] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[28] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[29] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[30] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[31] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[32] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[33] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[34] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[35] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[36] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[37] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[38] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[39] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[40] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[41] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[42] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[43] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[44] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[45] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[46] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[47] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[48] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[49] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[50] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[51] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[52] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[53] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[54] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[55] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[56] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[57] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[58] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[59] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[60] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[61] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[62] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[63] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[64] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[65] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[66] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[67] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[68] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[69] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[70] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[71] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[72] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[73] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[74] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[75] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[76] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[77] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[78] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[79] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[80] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[81] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[82] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[83] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[84] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[85] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[86] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[87] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[88] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[89] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[90] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[91] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[92] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[93] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
-    fHUDWidth[94] = 0.0015625f * fWideScreenWidthScale * fHudWidthScale;
+    HUDWidth[0] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[1] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[2] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[3] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[4] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[5] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[6] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[7] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[8] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[9] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[10] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[11] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[12] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[13] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[14] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[15] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[16] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[17] = 0.17343046f * ScreenWidthScale * HudWidthScale;
+    HUDWidth[18] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[19] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[20] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[21] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[22] = 0.17343046f * ScreenWidthScale * HudWidthScale;
+    HUDWidth[23] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[24] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[25] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[26] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[27] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[28] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[29] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[30] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[31] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[32] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[33] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[34] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[35] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[36] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[37] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[38] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[39] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[40] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[41] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[42] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[43] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[44] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[45] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[46] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[47] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[48] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[49] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[50] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[51] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[52] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[53] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[54] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[55] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[56] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[57] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[58] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[59] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[60] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[61] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[62] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[63] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[64] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[65] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[66] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[67] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[68] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[69] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[70] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[71] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[72] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[73] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[74] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[75] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[76] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[77] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[78] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[79] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[80] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[81] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[82] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[83] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[84] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[85] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[86] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[87] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[88] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[89] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[90] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[91] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[92] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[93] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[94] = WidthMult * ScreenWidthScale * HudWidthScale;
 
-    fHUDWidth[110] = 1920.0f * 0.17343046f * fWideScreenWidthScale * fHudWidthScale;
+    HUDWidth[110] = 1920.0f * 0.17343046f * ScreenWidthScale * HudWidthScale;
 
-    fHUDHeight[0] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[1] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[2] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[3] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[4] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[5] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[6] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[7] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[8] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[9] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[10] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[11] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[12] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[13] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[14] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[15] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[16] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[17] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[18] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[19] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[20] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[21] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[22] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[23] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[24] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[25] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[26] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[27] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[28] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[29] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[30] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[31] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[32] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[33] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[34] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[35] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[36] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[37] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[38] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[39] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[40] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[41] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[42] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[43] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[44] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[45] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[46] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[47] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[48] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[49] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[50] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[51] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[52] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[53] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[54] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[55] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[56] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[57] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[58] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[59] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[60] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[61] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[62] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[63] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[64] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[65] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[66] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[67] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[68] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[69] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[70] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[71] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[72] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[73] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[74] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[75] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[76] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[77] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[78] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[79] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[80] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
-    fHUDHeight[81] = 0.002232143f * fWideScreenHeightScale * fHudHeightScale;
+    HUDHeight[0] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[1] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[2] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[3] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[4] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[5] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[6] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[7] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[8] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[9] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[10] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[11] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[12] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[13] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[14] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[15] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[16] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[17] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[18] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[19] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[20] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[21] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[22] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[23] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[24] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[25] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[26] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[27] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[28] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[29] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[30] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[31] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[32] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[33] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[34] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[35] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[36] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[37] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[38] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[39] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[40] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[41] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[42] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[43] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[44] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[45] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[46] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[47] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[48] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[49] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[50] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[51] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[52] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[53] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[54] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[55] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[56] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[57] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[58] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[59] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[60] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[61] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[62] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[63] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[64] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[65] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[66] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[67] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[68] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[69] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[70] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[71] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[72] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[73] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[74] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[75] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[76] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[77] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[78] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[79] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[80] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[81] = HeightMult * ScreenHeightScale * HudHeightScale;
 
-    fHUDHeight[14] /= 1.125f;
-    fHUDHeight[15] /= 1.125f;
-    fHUDHeight[16] /= 1.125f;
+    HUDHeight[14] /= 1.125f;
+    HUDHeight[15] /= 1.125f;
+    HUDHeight[16] /= 1.125f;
 }
 
 void UpdateScreenAspectRatio()
 {
-    fWideScreenWidthScale = 640.0f / (*(pfScreenAspectRatio) * 448.0f);
-    fWideScreenHeightScale = 448.0 / 448.0f;
-    fWideScreenWidthProperScale = static_cast<float>(pRsGlobal->width) / (*pfScreenAspectRatio * 448.0f);
-    fWideScreenHeightProperScale = static_cast<float>(pRsGlobal->height) / 448.0f;
+    ScreenWidthScale = 640.0f / (*(ScreenAspectRatio) * 448.0f);
 
     UpdateMiscFixes();
     UpdateHUDFixes();
-    UpdateScriptFixes();
 }
 
 void InstallAspectRatioFixes()
@@ -406,8 +368,6 @@ void InstallAspectRatioFixes()
     MemPut<BYTE>(0x713EFC, 0x30);
     MemPut<BYTE>(0x714004, 0x38);
 
-    HookInstall(0x6FF420, (DWORD)CalculateAspectRatio, 5);
-
     HookInstallCall(0x0053D695 - 0x1, (DWORD)UpdateScreenAspectRatio);
     HookInstallCall(0x0053D7B2 - 0x1, (DWORD)UpdateScreenAspectRatio);
     HookInstallCall(0x0053D967 - 0x1, (DWORD)UpdateScreenAspectRatio);
@@ -415,16 +375,10 @@ void InstallAspectRatioFixes()
     HookInstallCall(0x0053EB1A - 0x1, (DWORD)UpdateScreenAspectRatio);
 }
 
-void GetMemoryAddresses()
-{
-    pRsGlobal = (RsGlobal*)0xC17040;
-    pfScreenAspectRatio = (float*)0xC3EFA4;
-}
-
 void InstallMiscFixes()
 {
     // Misc
-    uintptr_t m_dwMiscWidth[] = {
+    uintptr_t miscWidthAddresses[28] = {
         0x5733FD,            // 0 StretchX
         0x574761,            // 1 Radio Icons
         0x5747A6,            // 2 Radio Icons
@@ -455,7 +409,7 @@ void InstallMiscFixes()
         0x573FF0,            // 27 DrawWindow header
     };
 
-    uintptr_t m_dwMiscHeight[] = {
+    uintptr_t miscHeightAddresses[28] = {
         0x57342D,            // 0 StretchY
         0x57473B,            // 1 Radio Icons
         0x574783,            // 2 Radio Icons
@@ -486,57 +440,57 @@ void InstallMiscFixes()
         0x573FD6,            // 27 DrawWindow header
     };
 
-    for (int i = 0; i < sizeof(m_dwMiscWidth) / sizeof(float*); i++)
+    for (size_t i = 0; i < std::size(miscWidthAddresses); i++)
     {
-        MemPut<float*>(m_dwMiscWidth[i] + 0x2, &fMiscWidth[i]);
+        MemPut<float*>(miscWidthAddresses[i] + 0x2, &MiscWidth[i]);
     }
 
-    for (int i = 0; i < sizeof(m_dwMiscHeight) / sizeof(float*); i++)
+    for (size_t i = 0; i < std::size(miscHeightAddresses); i++)
     {
-        MemPut<float*>(m_dwMiscHeight[i] + 0x2, &fMiscHeight[i]);
+        MemPut<float*>(miscHeightAddresses[i] + 0x2, &MiscHeight[i]);
     }
 }
 
 void InstallHUDFixes()
 {
-    uintptr_t m_dwCrosshairWidth[] = {
+    uintptr_t crosshairWidthAddresses[10] = {
         0x58E7CE, 0x58E7F8, 0x58E2FA, 0x58E4ED, 0x58E75B, 0x58E28B, 0x58E2AC, 0x58E2BA, 0x53E472, 0x53E4AE,
     };
 
-    uintptr_t m_dwCrosshairHeight[] = {
+    uintptr_t crosshairHeightAddresses[7] = {
         0x58E7E4, 0x58E80E, 0x58E319, 0x58E527, 0x58E2C8, 0x53E3E7, 0x53E409,
     };
 
-    for (int i = 0; i < sizeof(m_dwCrosshairWidth) / sizeof(float*); i++)
+    for (size_t i = 0; i < std::size(crosshairWidthAddresses); i++)
     {
-        MemPut<float*>(m_dwCrosshairWidth[i] + 0x2, &fMiscWidth[0]);
+        MemPut<float*>(crosshairWidthAddresses[i] + 0x2, &MiscWidth[0]);
     }
 
-    for (int i = 0; i < sizeof(m_dwCrosshairHeight) / sizeof(float*); i++)
+    for (size_t i = 0; i < std::size(crosshairHeightAddresses); i++)
     {
-        MemPut<float*>(m_dwCrosshairHeight[i] + 0x2, &fMiscHeight[0]);
+        MemPut<float*>(crosshairHeightAddresses[i] + 0x2, &MiscHeight[0]);
     }
 
-    uintptr_t m_dwRadarWidth[] = {
-        0x58A441,            // Radar plane
-        0x58A791,            // Radar disc
-        0x58A82E,            // Radar disc
-        0x58A8DF,            // Radar disc
-        0x58A982,            // Radar disc
-        0x58A5D8, 0x58A6DE,  // Radar altimeter
-        0x5834BA,            // Radar point
-        0x58603F,            // Radar point
-        0x5886CC,            // Radar centre
-        0x58439C,            // Radar Trace 0
-        0x584434,            // Radar Trace 0
-        0x58410B,            // Radar Trace 2
-        0x584190,            // Radar Trace 2
-        0x584249,            // Radar Trace 1
-        0x5842E6,            // Radar Trace 1
+    uintptr_t radarWidthAddresses[23] = {
+        0x58A441,                      // Radar plane
+        0x58A791,                      // Radar disc
+        0x58A82E,                      // Radar disc
+        0x58A8DF,                      // Radar disc
+        0x58A982,                      // Radar disc
+        0x58A5D8, 0x58A6DE,            // Radar altimeter
+        0x5834BA,                      // Radar point
+        0x58603F,                      // Radar point
+        0x5886CC,                      // Radar centre
+        0x58439C,                      // Radar Trace 0
+        0x584434,                      // Radar Trace 0
+        0x58410B,                      // Radar Trace 2
+        0x584190,                      // Radar Trace 2
+        0x584249,                      // Radar Trace 1
+        0x5842E6,                      // Radar Trace 1
         0x5876D4, 0x58774B, 0x58780A, 0x58788F, 0x58792E, 0x587A1A, 0x587AAA,
     };
 
-    uintptr_t m_dwRadarHeight[] = {
+    uintptr_t radarHeightAddresses[21] = {
         0x58A473,            // Radar plane
         0x58A600,            // Radar disc
         0x58A69E,            // Radar disc
@@ -555,17 +509,17 @@ void InstallHUDFixes()
         0x5876BC, 0x587733, 0x587916, 0x587A02, 0x587A92,
     };
 
-    for (int i = 0; i < sizeof(m_dwRadarWidth) / sizeof(float*); i++)
+    for (size_t i = 0; i < std::size(radarWidthAddresses); i++)
     {
-        MemPut<float*>(m_dwRadarWidth[i] + 0x2, &fRadarWidth[i]);
+        MemPut<float*>(radarWidthAddresses[i] + 0x2, &RadarWidth[i]);
     }
 
-    for (int i = 0; i < sizeof(m_dwRadarHeight) / sizeof(float*); i++)
+    for (size_t i = 0; i < std::size(radarHeightAddresses); i++)
     {
-        MemPut<float*>(m_dwRadarHeight[i] + 0x2, &fRadarHeight[i]);
+        MemPut<float*>(radarHeightAddresses[i] + 0x2, &RadarHeight[i]);
     }
 
-    uintptr_t m_dwHUDWidth[] = {
+    uintptr_t hudWidthAddresses[95] = {
         0x58EB3F,            // 0 Clock
         0x58EC0C,            // 1 Clock
         0x58F55C,            // 2 Money
@@ -663,7 +617,7 @@ void InstallHUDFixes()
         0x4477F7,            // 94 CGarages
     };
 
-    uintptr_t m_dwHUDHeight[] = {
+    uintptr_t hudHeightAddresses[82] = {
         0x58EB29,            // 0 Clock
         0x58EBF9,            // 1 Clock
         0x58F546,            // 2 Money
@@ -748,21 +702,27 @@ void InstallHUDFixes()
         0x4478AC,            // 81 CGarages
     };
 
-    for (int i = 0; i < sizeof(m_dwHUDWidth) / sizeof(float*); i++)
+    for (size_t i = 0; i < std::size(hudWidthAddresses); i++)
     {
-        MemPut<float*>(m_dwHUDWidth[i] + 0x2, &fHUDWidth[i]);
+        MemPut<float*>(hudWidthAddresses[i] + 0x2, &HUDWidth[i]);
     }
 
-    for (int i = 0; i < sizeof(m_dwHUDHeight) / sizeof(float*); i++)
+    for (size_t i = 0; i < std::size(hudHeightAddresses); i++)
     {
-        MemPut<float*>(m_dwHUDHeight[i] + 0x2, &fHUDHeight[i]);
+        MemPut<float*>(hudHeightAddresses[i] + 0x2, &HUDHeight[i]);
     }
 
     // Second player fix.
-    MemPut<float*>(0x58F9A0 + 0x2, &fHUDWidth[110]);            // Weapon icon X
-    MemPut<float*>(0x58F993 + 0x2, &fHUDWidth[16]);             // Weapon icon X
-    MemPut<float*>(0x58F972 + 0x2, &fHUDHeight[16]);            // Weapon icon Y
-    MemPut<float*>(0x58FA8E + 0x2, &fHUDWidth[17]);             // Ammo x
+    MemPut<float*>(0x58F9A0 + 0x2, &HUDWidth[110]);            // Weapon icon X
+    MemPut<float*>(0x58F993 + 0x2, &HUDWidth[16]);             // Weapon icon X
+    MemPut<float*>(0x58F972 + 0x2, &HUDHeight[16]);            // Weapon icon Y
+    MemPut<float*>(0x58FA8E + 0x2, &HUDWidth[17]);             // Ammo x
+}
+
+void GetMemoryAddresses()
+{
+    rsGlobal = (RsGlobal*)0xC17040;
+    ScreenAspectRatio = (float*)0xC3EFA4;
 }
 
 void CMultiplayerSA::InitHooks_WidescreenFix()
