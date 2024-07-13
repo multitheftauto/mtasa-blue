@@ -1982,8 +1982,13 @@ static void _declspec(naked) HOOK_FxPrim_c__Enable()
     }
 }
 
-// Fix #1757 extinguishFire in onClientVehicleDamage causes crash
-#define HOOKPOS_CFire_ProcessFire 0x53A6FC
+////////////////////////////////////////////////////////////////////////
+// Location: CFire::ProcessFire
+// Description: The crash occurs when the fire is extinguished in the onClientVehicleDamage event because the attachedTo field becomes a null pointer
+// Issue: GitHub #1757 (https://github.com/multitheftauto/mtasa-blue/issues/1757)
+// Cause: Null pointer to the attachedTo field in the CFire structure
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CFire_ProcessFire  0x53A6FC
 #define HOOKSIZE_CFire_ProcessFire 9
 static DWORD CONTINUE_CFire_ProcessFire = 0x53A705;
 static void _declspec(naked) HOOK_CFire_ProcessFire()
@@ -1991,6 +1996,7 @@ static void _declspec(naked) HOOK_CFire_ProcessFire()
     _asm
     {
         test byte ptr [esi], 4
+        // If the beingExtinguished flag has been set, we skip processing this fire instance
         jnz skip
 
         mov ecx, [esi+10h]
