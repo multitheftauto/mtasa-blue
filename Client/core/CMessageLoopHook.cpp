@@ -299,8 +299,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
 
                             if (!g_pCore->IsMenuVisible())
                             {
-                                pGUI->GetCursorColor(r, g, b, alpha);
-                                pGUI->SetCursorColor(r, g, b, alpha);
+                                pGUI->RestorCurrentServerCursorColor();
                             }
                             return true;
                         }
