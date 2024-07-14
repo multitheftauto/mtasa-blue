@@ -51,4 +51,6 @@ public:
     virtual float GetRainbow() const = 0;
     virtual bool  SetRainbow(float fAmount) = 0;
     virtual bool  ResetRainbow() = 0;
+
+    virtual bool SetTimerCycle(bool value) = 0;
 };

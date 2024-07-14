@@ -55,6 +55,8 @@ public:
     bool  SetRainbow(float fAmount);
     bool  ResetRainbow();
 
+    bool SetTimerCycle(bool value);
+
 private:
     static unsigned char* VAR_CWeather__ForcedWeatherType;
     static unsigned char* VAR_CWeather__OldWeatherType;

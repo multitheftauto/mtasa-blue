@@ -228,3 +228,16 @@ bool CWeatherSA::ResetRainbow()
     MemCpy((LPVOID)(0x72BF59 + 2), &originalCodes, 3);
     return true;
 }
+
+bool CWeatherSA::SetTimerCycle(bool value)
+{
+    if (value == true)
+    {
+        MemSet((void*)0x53BFBD, 0x90, 5);
+    }
+    else
+    {
+        MemCpy((void*)0x53BFBD, "\xE8\x4E\x0F\xFF\xFF", 5);
+    }
+    return true;
+}

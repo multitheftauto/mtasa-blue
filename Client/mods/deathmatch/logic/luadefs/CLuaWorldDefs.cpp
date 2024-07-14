@@ -2183,6 +2183,8 @@ bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, float arg1, std::o
             return g_pGame->GetWeather()->SetSandstorm(arg1);
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->SetRainbow(arg1);
+        case  eWorldProperty::TIME_CYCLE:
+            return g_pGame->GetWeather()->SetTimerCycle(arg1);
     }
     return false;
 }
