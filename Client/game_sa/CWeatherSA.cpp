@@ -244,7 +244,7 @@ bool CWeatherSA::SetTimerCycle(unsigned char value) noexcept
     return true;
 }
 
-bool CWeatherSA::ResetTimerCycle()
+bool CWeatherSA::ResetTimerCycle() noexcept
 {
     SetTimerCycle(0);
     m_bTimeCycleFrozen = false;

@@ -57,7 +57,7 @@ public:
 
     bool SetTimerCycle(unsigned char value) noexcept;
     bool GetTimerCycleEnabled() const noexcept { return m_bTimeCycleFrozen; };
-    bool ResetTimerCycle();
+    bool ResetTimerCycle() noexcept;
 
 private:
     static unsigned char* VAR_CWeather__ForcedWeatherType;
