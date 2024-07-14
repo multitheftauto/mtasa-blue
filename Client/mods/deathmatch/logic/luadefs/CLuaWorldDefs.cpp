@@ -2128,6 +2128,8 @@ std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::G
             return g_pGame->GetWeather()->GetSandstorm();
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->GetRainbow();
+        case eWorldProperty::TIME_CYCLE:
+            return g_pGame->GetWeather()->GetTimerCycleEnabled();
     }
     return false;
 }
@@ -2233,6 +2235,8 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
             return g_pGame->GetWeather()->ResetSandstorm();
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->ResetRainbow();
+        case eWorldProperty::TIME_CYCLE:
+            return g_pGame->GetWeather()->ResetTimerCycle();
     }
     return false;
 }

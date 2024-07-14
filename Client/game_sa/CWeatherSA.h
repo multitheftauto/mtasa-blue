@@ -56,11 +56,14 @@ public:
     bool  ResetRainbow();
 
     bool SetTimerCycle(bool value);
+    bool GetTimerCycleEnabled();
+    bool ResetTimerCycle();
 
 private:
     static unsigned char* VAR_CWeather__ForcedWeatherType;
     static unsigned char* VAR_CWeather__OldWeatherType;
     static unsigned char* VAR_CWeather__NewWeatherType;
     static float*         VAR_CWeather__Rain;
+    bool                  m_bTimeCycle;
 
 };

@@ -53,4 +53,6 @@ public:
     virtual bool  ResetRainbow() = 0;
 
     virtual bool SetTimerCycle(bool value) = 0;
+    virtual bool GetTimerCycleEnabled() = 0;
+    virtual bool ResetTimerCycle() = 0;
 };

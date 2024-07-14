@@ -231,13 +231,27 @@ bool CWeatherSA::ResetRainbow()
 
 bool CWeatherSA::SetTimerCycle(bool value)
 {
-    if (value == true)
+    if (value)
     {
         MemSet((void*)0x53BFBD, 0x90, 5);
+        m_bTimeCycle = true;
     }
     else
     {
         MemCpy((void*)0x53BFBD, "\xE8\x4E\x0F\xFF\xFF", 5);
+        m_bTimeCycle = false;
     }
+    return true;
+}
+
+bool CWeatherSA::GetTimerCycleEnabled()
+{
+    return m_bTimeCycle;
+}
+
+bool CWeatherSA::ResetTimerCycle()
+{
+    MemCpy((void*)0x53BFBD, "\xE8\x4E\x0F\xFF\xFF", 5);
+    m_bTimeCycle = false;
     return true;
 }
