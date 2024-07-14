@@ -1147,7 +1147,7 @@ SString CInstallManager::_ProcessServiceChecks()
 {
     if (!CheckService(CHECK_SERVICE_PRE_GAME))
     {
-        if (!IsUserAdmin())
+        if (!IsNativeArm64Host() && !IsUserAdmin())
         {
             m_strAdminReason = _("Update install settings");
             return "fail";
