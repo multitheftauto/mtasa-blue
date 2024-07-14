@@ -1947,7 +1947,8 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
-            lua_pushnumber(luaVM, pModelInfo->GetObjectPropertiesGroup());
+            uint16_t groupId = pModelInfo->GetObjectPropertiesGroup();
+            lua_pushnumber(luaVM, groupId == 0xFFFF ? -1 : groupId);
             return 1;
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
@@ -2497,13 +2498,7 @@ bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t
     {
         case ePools::BUILDING_POOL:
         {
-            m_pBuildingManager->DestroyAllForABit();
-
-            bool success = g_pGame->SetBuildingPoolSize(newSize);
-
-            m_pBuildingManager->RestoreDestroyed();
-
-            return success;
+            return m_pBuildingManager->SetPoolCapacity(newSize);
         }
         default:
             throw std::invalid_argument("Can not change this pool capacity");
