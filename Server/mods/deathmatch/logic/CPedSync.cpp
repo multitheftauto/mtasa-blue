@@ -272,6 +272,9 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
         if (Data.ucFlags & 0x40)
             pPed->SetInWater(Data.bIsInWater);
 
+        if (Data.ucFlags & 0x80)
+            pPed->SetAnimationData({});
+
         // Is it time to sync to everyone
         bool bDoFarSync = llTickCountNow - pPed->GetLastFarSyncTick() >= g_TickRateSettings.iPedFarSync;
 

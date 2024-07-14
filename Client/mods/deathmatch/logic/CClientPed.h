@@ -85,6 +85,34 @@ enum eDeathAnims
     DEATH_ANIM_TORSO = 20,
 };
 
+
+struct SAnimationCache
+{
+    SString strName;
+    int     iTime;
+    bool    bLoop;
+    bool    bUpdatePosition;
+    bool    bInterruptable;
+    bool    bFreezeLastFrame;
+    int     iBlend;
+
+    SAnimationCache()
+    {
+        iTime = -1;
+        bLoop = false;
+        bUpdatePosition = false;
+        bInterruptable = false;
+        bFreezeLastFrame = true;
+        iBlend = 250;
+    }
+
+    bool operator!=(const SAnimationCache& other) const
+    {
+        return strName != other.strName || iTime != other.iTime || bLoop != other.bLoop || bUpdatePosition != other.bUpdatePosition ||
+               bInterruptable != other.bInterruptable || bFreezeLastFrame != other.bFreezeLastFrame || iBlend != other.iBlend;
+    }
+};
+
 struct SDelayedSyncData
 {
     unsigned long    ulTime;
@@ -107,6 +135,7 @@ struct SLastSyncedPedData
     float   fRotation;
     bool    bOnFire;
     bool    bIsInWater;
+    SAnimationCache animCache;
 };
 
 struct SRestoreWeaponItem
@@ -123,27 +152,6 @@ struct SReplacedAnimation
 {
     std::shared_ptr<CClientIFP>     pIFP;
     CAnimBlendHierarchySAInterface* pAnimationHierarchy;
-};
-
-struct SAnimationCache
-{
-    SString strName;
-    int     iTime;
-    bool    bLoop;
-    bool    bUpdatePosition;
-    bool    bInterruptable;
-    bool    bFreezeLastFrame;
-    int     iBlend;
-
-    SAnimationCache()
-    {
-        iTime = -1;
-        bLoop = false;
-        bUpdatePosition = false;
-        bInterruptable = false;
-        bFreezeLastFrame = true;
-        iBlend = 250;
-    }
 };
 
 class CClientObject;
@@ -553,6 +561,8 @@ public:
 
     std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
 
+    void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; };
+    bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; };
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
     CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer);
@@ -788,4 +798,7 @@ public:
     CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
 
     std::shared_ptr<CClientModel> m_clientModel;
+
+    bool m_hasSyncedAnim;
+    bool m_animationOverridedByClient;
 };

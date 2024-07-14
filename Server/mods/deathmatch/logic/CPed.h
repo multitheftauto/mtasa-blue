@@ -105,8 +105,8 @@ enum eBone
 
 struct SPlayerAnimData
 {
-    std::string blockName{};
-    std::string animName{};
+    std::string blockName;
+    std::string animName;
     int         time{-1};
     bool        loop{true};
     bool        updatePosition{true};
@@ -115,10 +115,15 @@ struct SPlayerAnimData
     int         blendTime{250};
     bool        taskToBeRestoredOnAnimEnd{false};
 
+    std::int64_t startedTick{0};
+
+    float progress{0.0f};
+    float speed{1.0f};
+
     SPlayerAnimData() = default;
 
     SPlayerAnimData(const std::string& block, const std::string& anim, int time, bool loop, bool updatePos, bool interrupt, bool freeze, int blend,
-                    bool taskRestore)
+                    bool taskRestore, std::int64_t tick)
         : blockName(block),
           animName(anim),
           time(time),
@@ -127,7 +132,10 @@ struct SPlayerAnimData
           interruptable(interrupt),
           freezeLastFrame(freeze),
           blendTime(blend),
-          taskToBeRestoredOnAnimEnd(taskRestore){};
+          taskToBeRestoredOnAnimEnd(taskRestore),
+          startedTick(tick),
+          progress(0.0f),
+          speed(1.0f){};
 };
 
 class CWeapon
@@ -307,6 +315,8 @@ public:
 
     const SPlayerAnimData& GetAnimationData() const noexcept { return m_animData; };
     void                   SetAnimationData(const SPlayerAnimData& animData) { m_animData = animData; };
+    void                   SetAnimationProgress(float progress) { m_animData.progress = progress; };
+    void                   SetAnimationSpeed(float speed) { m_animData.speed = speed; };
 
 protected:
     bool ReadSpecialData(const int iLine) override;
