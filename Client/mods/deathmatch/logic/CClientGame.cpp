@@ -3418,6 +3418,7 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
+    g_pGame->GetWeather()->ResetTimerCycle();
 
     g_pGame->ResetModelLodDistances();
     g_pGame->ResetModelFlags();
