@@ -1009,6 +1009,11 @@ void CGameSA::RemoveAllBuildings()
 
     m_pPools->GetDummyPool().RemoveAllBuildingLods();
     m_pPools->GetBuildingsPool().RemoveAllBuildings();
+
+    auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
+    pBuildingRemoval->ClearRemovedBuildingLists();
+    pBuildingRemoval->DropCaches();
+
     m_isBuildingsRemoved = true;
 }
 
