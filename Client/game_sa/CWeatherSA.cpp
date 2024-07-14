@@ -234,24 +234,24 @@ bool CWeatherSA::SetTimerCycle(bool value)
     if (value)
     {
         MemSet((void*)0x53BFBD, 0x90, 5);
-        m_bTimeCycle = true;
+        m_bTimeCycleEnabled = true;
     }
     else
     {
         MemCpy((void*)0x53BFBD, "\xE8\x4E\x0F\xFF\xFF", 5);
-        m_bTimeCycle = false;
+        m_bTimeCycleEnabled = false;
     }
     return true;
 }
 
 bool CWeatherSA::GetTimerCycleEnabled()
 {
-    return m_bTimeCycle;
+    return m_bTimeCycleEnabled;
 }
 
 bool CWeatherSA::ResetTimerCycle()
 {
     MemCpy((void*)0x53BFBD, "\xE8\x4E\x0F\xFF\xFF", 5);
-    m_bTimeCycle = false;
+    m_bTimeCycleEnabled = false;
     return true;
 }
