@@ -55,8 +55,8 @@ public:
     bool  SetRainbow(float fAmount);
     bool  ResetRainbow();
 
-    bool SetTimerCycle(unsigned char value);
-    bool GetTimerCycleEnabled();
+    bool SetTimerCycle(unsigned char value) noexcept;
+    bool GetTimerCycleEnabled() const noexcept { return m_bTimeCycleFrozen; };
     bool ResetTimerCycle();
 
 private:

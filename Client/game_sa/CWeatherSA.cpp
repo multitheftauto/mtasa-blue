@@ -229,7 +229,7 @@ bool CWeatherSA::ResetRainbow()
     return true;
 }
 
-bool CWeatherSA::SetTimerCycle(unsigned char value)
+bool CWeatherSA::SetTimerCycle(unsigned char value) noexcept
 {
     if (value == 1)
     {
@@ -244,14 +244,9 @@ bool CWeatherSA::SetTimerCycle(unsigned char value)
     return true;
 }
 
-bool CWeatherSA::GetTimerCycleEnabled()
-{
-    return m_bTimeCycleFrozen;
-}
-
 bool CWeatherSA::ResetTimerCycle()
 {
-    MemCpy((void*)0x53BFBD, "\xE8\x4E\x0F\xFF\xFF", 5);
+    SetTimerCycle(0);
     m_bTimeCycleFrozen = false;
     return true;
 }

@@ -53,6 +53,6 @@ public:
     virtual bool  ResetRainbow() = 0;
 
     virtual bool SetTimerCycle(unsigned char value) = 0;
-    virtual bool GetTimerCycleEnabled() = 0;
+    virtual bool GetTimerCycleEnabled() const = 0;
     virtual bool ResetTimerCycle() = 0;
 };
