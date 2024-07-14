@@ -560,6 +560,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-06-29
     AnimationsSync,
 
+    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
+    // 2024-06-30
+    WorldSpecialProperty_TunnelWeatherBlend,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

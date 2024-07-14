@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Lua static function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -4141,6 +4141,8 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot(CElement* pElement, unsigned c
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            pPed->SetWeaponSlot(ucWeaponSlot);
+
             CBitStream BitStream;
 
             SWeaponSlotSync slot;

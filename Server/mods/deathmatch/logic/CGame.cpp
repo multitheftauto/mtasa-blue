@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CGame.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CGame.cpp
  *  PURPOSE:     Server game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -248,6 +248,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::FIREBALLDESTRUCT] = true;
     m_WorldSpecialProps[WorldSpecialProperty::EXTENDEDWATERCANNONS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::ROADSIGNSTEXT] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::TUNNELWEATHERBLEND] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;

@@ -21,6 +21,7 @@ public:
     LUA_DECLARE(Call);
     LUA_DECLARE(GetThisResource);
     LUA_DECLARE(GetResourceConfig);
+    LUA_DECLARE(GetResourceName);
     LUA_DECLARE(GetResourceFromName);
     LUA_DECLARE(GetResourceRootElement);
     LUA_DECLARE(GetResourceGUIElement);
@@ -29,6 +30,4 @@ public:
     LUA_DECLARE(GetResourceState);
     LUA_DECLARE(LoadString);
     LUA_DECLARE(Load);
-
-    static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement);
 };
