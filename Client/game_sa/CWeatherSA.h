@@ -55,7 +55,7 @@ public:
     bool  SetRainbow(float fAmount);
     bool  ResetRainbow();
 
-    bool SetTimerCycle(bool value);
+    bool SetTimerCycle(unsigned char value);
     bool GetTimerCycleEnabled();
     bool ResetTimerCycle();
 
@@ -64,6 +64,6 @@ private:
     static unsigned char* VAR_CWeather__OldWeatherType;
     static unsigned char* VAR_CWeather__NewWeatherType;
     static float*         VAR_CWeather__Rain;
-    bool                  m_bTimeCycleEnabled;
+    bool                  m_bTimeCycleFrozen;
 
 };

@@ -52,7 +52,7 @@ public:
     virtual bool  SetRainbow(float fAmount) = 0;
     virtual bool  ResetRainbow() = 0;
 
-    virtual bool SetTimerCycle(bool value) = 0;
+    virtual bool SetTimerCycle(unsigned char value) = 0;
     virtual bool GetTimerCycleEnabled() = 0;
     virtual bool ResetTimerCycle() = 0;
 };
