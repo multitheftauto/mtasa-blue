@@ -3975,7 +3975,7 @@ retry:
                             std::string blockName, animName;
                             int time, blendTime;
                             bool looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
-                            float       progress, speed;
+                            float progress, speed;
 
                             // Read data
                             bitStream.ReadString(blockName);
