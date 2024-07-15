@@ -102,3 +102,11 @@ void CClient3DMarker::DoPulse()
         }
     }
 }
+
+void CClient3DMarker::SetColor(const SColor& color) noexcept
+{
+    m_Color = color;
+
+    if (!m_ignoreAlphaLimits && m_dwType == MARKER3D_ARROW)
+        m_Color.A = 255;
+}
