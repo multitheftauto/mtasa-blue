@@ -2158,7 +2158,8 @@ bool CStaticFunctionDefinitions::KillPed(CClientEntity& Entity, CClientEntity* p
     else
         Arguments.PushBoolean(false);
     Arguments.PushBoolean(bStealth);
-
+    Arguments.PushBoolean(false);
+    Arguments.PushBoolean(false);
     pPed.CallEvent("onClientPedWasted", Arguments, false);
     pPed.RemoveAllWeapons();
 
