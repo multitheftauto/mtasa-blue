@@ -385,6 +385,8 @@ public:
     static bool SetMarkerTarget(CElement* pElement, const CVector* pTarget);
     static bool SetMarkerIcon(CElement* pElement, const char* szIcon);
 
+    static bool SetMarkerTargetArrowProperties(CElement* Element, const SColor color, float size);
+
     // Blip create/destroy functions
     static CBlip* CreateBlip(CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering,
                              unsigned short usVisibleDistance, CElement* pVisibleTo);

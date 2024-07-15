@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CPacketHandler.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CPacketHandler.cpp
  *  PURPOSE:     Packet handling and processing
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1226,6 +1226,8 @@ void CPacketHandler::Packet_PlayerWasted(NetBitStreamInterface& bitStream)
                 else
                     Arguments.PushBoolean(false);
                 Arguments.PushBoolean(bStealth);
+                Arguments.PushNumber(animGroup);
+                Arguments.PushNumber(animID);
                 if (IS_PLAYER(pPed))
                     pPed->CallEvent("onClientPlayerWasted", Arguments, true);
                 else
@@ -3650,6 +3652,19 @@ retry:
                                         // Set the next position and the icon
                                         pCheckpoint->SetNextPosition(position.data.vecPosition);
                                         pCheckpoint->SetIcon(CClientCheckpoint::ICON_ARROW);
+                                    }
+
+                                    if (ucType == CClientGame::MARKER_CHECKPOINT && bitStream.Can(eBitStreamVersion::SetMarkerTargetArrowProperties))
+                                    {
+                                        SColor color;
+                                        float  size;
+                                        bitStream.Read(color.R);
+                                        bitStream.Read(color.G);
+                                        bitStream.Read(color.B);
+                                        bitStream.Read(color.A);
+                                        bitStream.Read(size);
+
+                                        pCheckpoint->SetTargetArrowProperties(color, size);
                                     }
                                 }
                             }

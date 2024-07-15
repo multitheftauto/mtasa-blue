@@ -77,6 +77,10 @@ public:
     void SetIgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
     bool AreAlphaLimitsIgnored() const noexcept override { return m_ignoreAlphaLimits; };
 
+    SColor GetTargetArrowColor() const noexcept { return m_TargetArrowColor; };
+    float  GetTargetArrowSize() const noexcept { return m_TargetArrowSize; };
+    void   SetTargetArrowProperties(const SColor& arrowColor, float size) noexcept;
+
 protected:
     bool IsStreamedIn() { return m_bStreamedIn; };
     void StreamIn();
@@ -86,6 +90,7 @@ private:
     void Create(unsigned long ulIdentifier = 0);
     void Destroy();
     void ReCreate();
+    void ApplyCheckpointTargetArrowProperties() noexcept;
 
     CClientMarkerPtr m_pThis;
     bool             m_bStreamedIn;
@@ -99,6 +104,8 @@ private:
     SColor           m_Color;
     CCheckpoint*     m_pCheckpoint;
     bool             m_ignoreAlphaLimits;
+    SColor           m_TargetArrowColor;
+    float            m_TargetArrowSize;
 
     DWORD   m_dwIdentifier;
     bool    m_bHasTarget;
