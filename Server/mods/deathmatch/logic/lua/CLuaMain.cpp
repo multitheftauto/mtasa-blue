@@ -234,9 +234,12 @@ void CLuaMain::Initialize()
 
     lua_pushelement(m_luaVM, m_pResource->GetResourceRootElement());
     lua_setglobal(m_luaVM, "resourceRoot");
-
+  
     lua_pushelement(m_luaVM, m_pResource->GetDynamicElementRoot());
     lua_setglobal(m_luaVM, "resourceDynamicRoot");
+  
+    lua_pushstring(m_luaVM, m_pResource->GetName());
+    lua_setglobal(m_luaVM, "resourceName");
 }
 
 void CLuaMain::LoadEmbeddedScripts()

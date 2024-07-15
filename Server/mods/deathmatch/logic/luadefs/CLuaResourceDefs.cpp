@@ -54,7 +54,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceLoadFailureReason", getResourceLoadFailureReason},
         {"getResourceLastStartTime", getResourceLastStartTime},
         {"getResourceLoadTime", getResourceLoadTime},
-        {"getResourceName", getResourceName},
+        {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceRootElement", getResourceRootElement},
         {"getResourceDynamicElementRoot", ArgumentParser<GetResourceDynamicElementRoot>},
         {"getResourceMapRootElement", getResourceMapRootElement},
@@ -898,23 +898,17 @@ int CLuaResourceDefs::getResourceLoadTime(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::getResourceName(lua_State* luaVM)
+std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    CResource* pResource;
+    if (resourceElement.has_value())
+        return (*resourceElement)->GetName();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
+    CResource* localResource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        lua_pushstring(luaVM, pResource->GetName().c_str());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (!localResource)
+        throw std::invalid_argument("Couldn't find the resource");
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return localResource->GetName();
 }
 
 int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)

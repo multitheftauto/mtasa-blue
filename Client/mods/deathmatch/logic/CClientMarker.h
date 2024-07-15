@@ -84,6 +84,9 @@ public:
 
     virtual CSphere GetWorldBoundingSphere();
 
+    void SetIgnoreAlphaLimits(bool ignore);
+    bool AreAlphaLimitsIgnored() const noexcept { return m_pMarker->AreAlphaLimitsIgnored(); };
+
 protected:
     void StreamIn(bool bInstantly);
     void StreamOut();

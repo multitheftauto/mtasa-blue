@@ -281,5 +281,7 @@ enum eElementRPCFunctions
 
     SET_PLAYER_SCRIPT_DEBUG_LEVEL,
 
+    SET_MARKER_TARGET_ARROW_PROPERTIES,
+
     NUM_RPC_FUNCS            // Add above this line
 };
