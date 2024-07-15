@@ -373,7 +373,7 @@ public:
     static bool SetBlipVisibleDistance(CClientEntity& Entity, unsigned short usVisibleDistance);
 
     // Marker create/destroy funcs
-    static CClientMarker* CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color);
+    static CClientMarker* CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, bool ignoreAlphaLimits);
 
     // Marker get funcs
     static bool GetMarkerTarget(CClientMarker& Marker, CVector& vecTarget);
@@ -384,6 +384,7 @@ public:
     static bool SetMarkerColor(CClientEntity& Entity, const SColor color);
     static bool SetMarkerTarget(CClientEntity& Entity, const CVector* pTarget);
     static bool SetMarkerIcon(CClientEntity& Entity, const char* szIcon);
+    static bool SetMarkerTargetArrowProperties(CClientEntity& Entity, const SColor color, float size);
 
     // Camera get funcs
     static bool           GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV);

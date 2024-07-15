@@ -4812,7 +4812,7 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance(CClientEntity& Entity, u
     return false;
 }
 
-CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color)
+CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, bool ignoreAlphaLimits)
 {
     assert(szType);
 
@@ -4826,6 +4826,10 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
         // Set its parent and its properties
         pMarker->SetParent(Resource.GetResourceDynamicEntity());
         pMarker->SetPosition(vecPosition);
+
+        if (ucType == CClientMarker::MARKER_ARROW || ucType == CClientMarker::MARKER_CHECKPOINT)
+            pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
+
         pMarker->SetColor(color);
         pMarker->SetSize(fSize);
 
@@ -4962,6 +4966,25 @@ bool CStaticFunctionDefinitions::SetMarkerIcon(CClientEntity& Entity, const char
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(CClientEntity& Entity, const SColor color, float size)
+{
+    RUN_CHILDREN(SetMarkerTargetArrowProperties(**iter, color, size))
+
+    if (!IS_MARKER(&Entity))
+        return false;
+
+    CClientMarker& marker = static_cast<CClientMarker&>(Entity);
+    CClientCheckpoint* checkpoint = marker.GetCheckpoint();
+    if (!checkpoint)
+        return false;
+
+    if (checkpoint->GetIcon() != CClientCheckpoint::ICON_ARROW)
+        return false;
+
+    checkpoint->SetTargetArrowProperties(color, size);
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV)
