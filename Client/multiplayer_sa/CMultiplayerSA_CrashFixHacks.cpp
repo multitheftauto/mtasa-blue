@@ -1983,10 +1983,11 @@ static void _declspec(naked) HOOK_FxPrim_c__Enable()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CFire::ProcessFire
-// Description: The crash occurs when the fire is extinguished in the onClientVehicleDamage event because the attachedTo field becomes a null pointer
-// Issue: GitHub #1757 (https://github.com/multitheftauto/mtasa-blue/issues/1757)
-// Cause: Null pointer to the attachedTo field in the CFire structure
+// CFire::ProcessFire
+// 
+// GitHub #1757 (https://github.com/multitheftauto/mtasa-blue/issues/1757)
+// 
+// Null pointer to the attachedTo field in the CFire structure
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CFire_ProcessFire  0x53A6FC
 #define HOOKSIZE_CFire_ProcessFire 9
