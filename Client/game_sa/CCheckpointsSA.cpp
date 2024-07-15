@@ -66,3 +66,14 @@ CCheckpoint* CCheckpointsSA::FindFreeMarker()
     }
     return NULL;
 }
+
+CCheckpoint* CCheckpointsSA::FindMarker(DWORD identifier)
+{
+    for (CCheckpointSA* checkpoint : Checkpoints)
+    {
+        if (checkpoint->GetIdentifier() == identifier)
+            return checkpoint;
+    }
+
+    return nullptr;
+}
