@@ -2144,9 +2144,13 @@ bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, std::variant<bool,
     {
         arg1 = std::get<float>(argVariant);
     }
-    else
+    else if (std::holds_alternative<bool>(argVariant))
     {
         argBool = std::get<bool>(argVariant);
+    } 
+    else
+    {
+        return false; //in case the type is invalid 
     }
 
     if (arg2.has_value() && arg3.has_value())

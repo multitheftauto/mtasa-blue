@@ -234,13 +234,12 @@ bool CWeatherSA::SetTimerCycle(bool value) noexcept
     if (value)
     {
         MemSet((void*)0x53BFBD, 0x90, 5);
-        m_bTimeCycleFrozen = true;
     }
     else
     {
         MemCpy((void*)0x53BFBD, "\xE8\x4E\x0F\xFF\xFF", 5);
-        m_bTimeCycleFrozen = false;
     }
+    m_bTimeCycleFrozen = value;
     return true;
 }
 
