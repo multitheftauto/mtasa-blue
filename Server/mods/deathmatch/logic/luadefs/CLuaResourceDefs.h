@@ -47,13 +47,14 @@ public:
     LUA_DECLARE(getResourceLoadFailureReason);
     LUA_DECLARE(getResourceLastStartTime);
     LUA_DECLARE(getResourceLoadTime);
-    LUA_DECLARE(getResourceName);
     LUA_DECLARE(getResourceRootElement);
     LUA_DECLARE(getResourceDynamicElementRoot);
     LUA_DECLARE(getResourceMapRootElement);
     LUA_DECLARE(getResourceExportedFunctions);
     LUA_DECLARE(getResourceOrganizationalPath);
     LUA_DECLARE(isResourceArchived);
+
+    static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement);
     static bool isResourceProtected(CResource* const resource);
 
     // Set stuff
