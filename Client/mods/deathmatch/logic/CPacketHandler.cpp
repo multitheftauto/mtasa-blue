@@ -3632,7 +3632,6 @@ retry:
                             CClientMarker* pMarker = new CClientMarker(g_pClientGame->m_pManager, EntityID, ucType);
                             pMarker->SetPosition(position.data.vecPosition);
                             pMarker->SetSize(fSize);
-                            pMarker->SetColor(color);
 
                             // Entity is this
                             pEntity = pMarker;
@@ -3654,8 +3653,27 @@ retry:
                                         pCheckpoint->SetNextPosition(position.data.vecPosition);
                                         pCheckpoint->SetIcon(CClientCheckpoint::ICON_ARROW);
                                     }
+
+                                    if (ucType == CClientGame::MARKER_CHECKPOINT && bitStream.Can(eBitStreamVersion::SetMarkerTargetArrowProperties))
+                                    {
+                                        SColor color;
+                                        float  size;
+                                        bitStream.Read(color.R);
+                                        bitStream.Read(color.G);
+                                        bitStream.Read(color.B);
+                                        bitStream.Read(color.A);
+                                        bitStream.Read(size);
+
+                                        pCheckpoint->SetTargetArrowProperties(color, size);
+                                    }
                                 }
                             }
+
+                            // Read out alpha limit flag
+                            if (bitStream.Can(eBitStreamVersion::Marker_IgnoreAlphaLimits))
+                                pMarker->SetIgnoreAlphaLimits(bitStream.ReadBit());
+
+                            pMarker->SetColor(color);
                         }
                         else
                         {

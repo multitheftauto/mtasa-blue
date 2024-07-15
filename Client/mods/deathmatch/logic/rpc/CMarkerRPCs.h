@@ -23,4 +23,5 @@ public:
     DECLARE_ELEMENT_RPC(SetMarkerSize);
     DECLARE_ELEMENT_RPC(SetMarkerTarget);
     DECLARE_ELEMENT_RPC(SetMarkerIcon);
+    DECLARE_ELEMENT_RPC(SetMarkerTargetArrowProperties);
 };
