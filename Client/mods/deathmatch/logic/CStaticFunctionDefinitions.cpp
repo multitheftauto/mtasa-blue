@@ -4774,7 +4774,7 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance(CClientEntity& Entity, u
     return false;
 }
 
-CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color)
+CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, bool ignoreAlphaLimits)
 {
     assert(szType);
 
@@ -4788,6 +4788,10 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
         // Set its parent and its properties
         pMarker->SetParent(Resource.GetResourceDynamicEntity());
         pMarker->SetPosition(vecPosition);
+
+        if (ucType == CClientMarker::MARKER_ARROW || ucType == CClientMarker::MARKER_CHECKPOINT)
+            pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
+
         pMarker->SetColor(color);
         pMarker->SetSize(fSize);
 
