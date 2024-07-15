@@ -41,6 +41,9 @@ public:
     void SetReflectionEnabled(bool bEnabled) { m_bReflectionEnabled = bEnabled; };
     bool IsReflectionEnabled() const { return m_bReflectionEnabled; };
 
+    void SetIgnoreAlphaLimits(bool ignore) noexcept {};
+    bool AreAlphaLimitsIgnored() const noexcept override { return true; };
+
 protected:
     bool IsStreamedIn() { return m_bStreamedIn; };
     void StreamIn();
