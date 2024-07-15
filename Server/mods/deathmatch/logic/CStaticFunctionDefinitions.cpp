@@ -3753,6 +3753,8 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             else
                 Arguments.PushBoolean(false);
             Arguments.PushBoolean(bStealth);
+            Arguments.PushBoolean(false);
+            Arguments.PushBoolean(false);
             // TODO: change to onPedWasted
             if (IS_PLAYER(pPed))
             {
@@ -4141,6 +4143,8 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot(CElement* pElement, unsigned c
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            pPed->SetWeaponSlot(ucWeaponSlot);
+
             CBitStream BitStream;
 
             SWeaponSlotSync slot;
