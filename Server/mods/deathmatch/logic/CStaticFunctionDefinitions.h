@@ -368,7 +368,7 @@ public:
     static bool RemoveVehicleSirens(CVehicle* pVehicle);
 
     // Marker create/destroy functions
-    static CMarker* CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo);
+    static CMarker* CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo, bool ignoreAlphaLimits);
 
     // Marker get functions
     static bool GetMarkerCount(unsigned int& uiCount);

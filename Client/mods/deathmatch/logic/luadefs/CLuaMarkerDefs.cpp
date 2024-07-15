@@ -77,6 +77,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
     float            fSize = 4.0f;
     SColorRGBA       color(0, 0, 255, 255);
     SString          strType = "default";
+    bool             ignoreAlphaLimits;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadString(strType, "default");
@@ -85,6 +86,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
     argStream.ReadNumber(color.G, 0);
     argStream.ReadNumber(color.B, 255);
     argStream.ReadNumber(color.A, 255);
+    argStream.ReadBool(ignoreAlphaLimits, false);
 
     if (!argStream.HasErrors())
     {
@@ -94,7 +96,7 @@ int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
             CResource* pResource = pLuaMain->GetResource();
             {
                 // Create it
-                CClientMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(*pResource, vecPosition, strType, fSize, color);
+                CClientMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(*pResource, vecPosition, strType, fSize, color, ignoreAlphaLimits);
                 if (pMarker)
                 {
                     CElementGroup* pGroup = pResource->GetElementGroup();
@@ -179,7 +181,12 @@ int CLuaMarkerDefs::GetMarkerColor(lua_State* luaVM)
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.R));
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.G));
         lua_pushnumber(luaVM, static_cast<lua_Number>(color.B));
-        lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
+
+        if (!pMarker->AreAlphaLimitsIgnored() && (pMarker->GetMarkerType() == CClientMarker::MARKER_CHECKPOINT || pMarker->GetMarkerType() == CClientMarker::MARKER_ARROW))
+            lua_pushnumber(luaVM, 255); // fake alpha
+        else
+            lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
+
         return 4;
     }
     else
