@@ -127,7 +127,6 @@ enum eElementRPCFunctions
     SET_MARKER_SIZE,
     SET_MARKER_TARGET,
     SET_MARKER_ICON,
-    SET_MARKER_TARGET_ARROW_PROPERTIES,
 
     DESTROY_ALL_PICKUPS,
     SET_PICKUP_TYPE,
@@ -281,6 +280,8 @@ enum eElementRPCFunctions
     BREAK_OBJECT,
 
     SET_PLAYER_SCRIPT_DEBUG_LEVEL,
+
+    SET_MARKER_TARGET_ARROW_PROPERTIES,
 
     NUM_RPC_FUNCS            // Add above this line
 };
