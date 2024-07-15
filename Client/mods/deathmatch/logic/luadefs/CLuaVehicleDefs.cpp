@@ -1939,14 +1939,16 @@ int CLuaVehicleDefs::SetVehiclePanelState(lua_State* luaVM)
 {
     CClientEntity*   pEntity = NULL;
     unsigned char    ucPanel = 0, ucState = 0;
+    bool             spawnFlyingComponent;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
     argStream.ReadNumber(ucPanel);
     argStream.ReadNumber(ucState);
+    argStream.ReadBool(spawnFlyingComponent, true);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehiclePanelState(*pEntity, ucPanel, ucState))
+        if (CStaticFunctionDefinitions::SetVehiclePanelState(*pEntity, ucPanel, ucState, spawnFlyingComponent))
         {
             lua_pushboolean(luaVM, true);
             return 1;

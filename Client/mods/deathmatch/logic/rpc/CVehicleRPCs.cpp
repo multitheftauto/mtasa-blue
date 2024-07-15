@@ -350,7 +350,11 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                     unsigned char ucPanel, ucState;
                     if (bitStream.Read(ucPanel) && bitStream.Read(ucState))
                     {
-                        pVehicle->SetPanelStatus(ucPanel, ucState);
+                        bool spawnFlyingComponent = true;
+                        if (bitStream.Can(eBitStreamVersion::SetVehiclePanelState_SpawnFlyingComponent))
+                            bitStream.ReadBit(spawnFlyingComponent);
+
+                        pVehicle->SetPanelStatus(ucPanel, ucState, spawnFlyingComponent);
                     }
                 }
                 default:

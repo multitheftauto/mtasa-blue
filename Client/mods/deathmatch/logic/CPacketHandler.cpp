@@ -1635,7 +1635,7 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
             for (unsigned int i = 0; i < MAX_PANELS; ++i)
             {
                 if (damage.data.bPanelStatesChanged[i])
-                    pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i]);
+                    pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i], true);
             }
             for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
             {
@@ -3386,7 +3386,7 @@ retry:
                     for (int i = 0; i < MAX_WHEELS; i++)
                         pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
                     for (int i = 0; i < MAX_PANELS; i++)
-                        pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i]);
+                        pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i], true);
                     for (int i = 0; i < MAX_LIGHTS; i++)
                         pVehicle->SetLightStatus(i, damage.data.ucLightStates[i]);
                     pVehicle->ResetDamageModelSync();
