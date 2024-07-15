@@ -560,6 +560,9 @@ enum class eBitStreamVersion : unsigned short
     // 2024-06-30
     WorldSpecialProperty_TunnelWeatherBlend,
 
+    // Add "setMarkerTargetArrowProperties"
+    // 2024-07-05
+    SetMarkerTargetArrowProperties,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

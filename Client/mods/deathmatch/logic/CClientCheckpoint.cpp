@@ -27,6 +27,8 @@ CClientCheckpoint::CClientCheckpoint(CClientMarker* pThis)
     m_dwType = CHECKPOINT_EMPTYTUBE;
     m_vecDirection.fX = 1.0f;
     m_bHasTarget = false;
+    m_TargetArrowColor = SColorRGBA(255, 64, 64, 255);
+    m_TargetArrowSize = m_fSize * 0.625f;
 }
 
 CClientCheckpoint::~CClientCheckpoint()
@@ -261,6 +263,8 @@ void CClientCheckpoint::SetSize(float fSize)
     {
         // Set the new size and recreate
         m_fSize = fSize;
+        m_TargetArrowSize = fSize * 0.625f;
+
         ReCreate();
     }
 }
@@ -352,6 +356,7 @@ void CClientCheckpoint::Create(unsigned long ulIdentifier)
         {
             // Set properties
             m_pCheckpoint->SetRotateRate(0);
+            ApplyCheckpointTargetArrowProperties();
         }
     }
 }
@@ -384,4 +389,21 @@ void CClientCheckpoint::ReCreateWithSameIdentifier()
         Destroy();
         Create(m_dwIdentifier);
     }
+}
+
+void CClientCheckpoint::SetTargetArrowProperties(const SColor& arrowColor, float size) noexcept
+{
+    if (m_TargetArrowColor == arrowColor && m_TargetArrowSize == size)
+        return;
+
+    m_TargetArrowColor = arrowColor;
+    m_TargetArrowSize = size;
+
+    ApplyCheckpointTargetArrowProperties();
+}
+
+void CClientCheckpoint::ApplyCheckpointTargetArrowProperties() noexcept
+{
+    if (m_pCheckpoint && m_uiIcon == CClientCheckpoint::ICON_ARROW)
+        m_pCheckpoint->SetTargetArrowData(m_TargetArrowColor, m_TargetArrowSize);
 }

@@ -23,12 +23,14 @@ void CLuaMarkerDefs::LoadFunctions()
         {"getMarkerColor", GetMarkerColor},
         {"getMarkerTarget", GetMarkerTarget},
         {"getMarkerIcon", GetMarkerIcon},
+        {"getMarkerTargetArrowProperties", ArgumentParser<GetMarkerTargetArrowProperties>},
 
         {"setMarkerType", SetMarkerType},
         {"setMarkerSize", SetMarkerSize},
         {"setMarkerColor", SetMarkerColor},
         {"setMarkerTarget", SetMarkerTarget},
         {"setMarkerIcon", SetMarkerIcon},
+        {"setMarkerTargetArrowProperties", ArgumentParser<SetMarkerTargetArrowProperties>},
 
         {"setCoronaReflectionEnabled", ArgumentParser<SetCoronaReflectionEnabled>},
         {"isCoronaReflectionEnabled", ArgumentParser<IsCoronaReflectionEnabled>},
@@ -416,4 +418,28 @@ bool CLuaMarkerDefs::IsCoronaReflectionEnabled(CClientMarker* pMarker)
         return false;
 
     return pCorona->IsReflectionEnabled();
+}
+
+bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CClientMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size)
+{
+    SColor color;
+    color.R = r.value_or(255);
+    color.G = g.value_or(64);
+    color.B = b.value_or(64);
+    color.A = a.value_or(255);
+
+    return CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(*marker, color, size.value_or(marker->GetSize() * 0.625f));
+}
+
+std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(CClientMarker* marker) noexcept
+{
+    CClientCheckpoint* checkpoint = marker->GetCheckpoint();
+    if (!checkpoint)
+        return false;
+
+    if (!checkpoint->HasTarget() || marker->GetMarkerType() != CClientMarker::MARKER_CHECKPOINT)
+        return false;
+
+    SColor color = checkpoint->GetTargetArrowColor();
+    return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>(color.R, color.G, color.B, color.A, checkpoint->GetTargetArrowSize());
 }
