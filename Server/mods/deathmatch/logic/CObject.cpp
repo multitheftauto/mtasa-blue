@@ -450,3 +450,21 @@ CObject* CObject::GetLowLodObject()
         return NULL;
     return m_pLowLodObject;
 }
+
+void CObject::SetHealth(float fHealth)
+{
+    if (fHealth < 0.0f)
+        fHealth = 0.0;
+
+    float fOldHealth = m_fHealth;
+
+    if (fabs(fOldHealth - fHealth) >= FLOAT_EPSILON)
+    {
+        CLuaArguments arguments;
+        arguments.PushNumber(fOldHealth);
+        arguments.PushNumber(fHealth);
+        CallEvent("onElementHealthChange", arguments);
+    }
+
+    m_fHealth = fHealth;
+}

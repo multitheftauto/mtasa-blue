@@ -1658,6 +1658,7 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
             {
                 // Limit their max health to what the stat says
                 float fMaxHealth = pPed->GetMaxHealth();
+
                 if (fHealth > fMaxHealth)
                     fHealth = fMaxHealth;
 
@@ -1680,12 +1681,14 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
         case CElement::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
+
             pVehicle->SetHealth(fHealth);
             break;
         }
         case CElement::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
+
             pObject->SetHealth(fHealth);
             break;
         }
@@ -8734,7 +8737,7 @@ bool CStaticFunctionDefinitions::CreateExplosion(const CVector& vecPosition, uns
     if (pElement)
     {
         RUN_CHILDREN(CreateExplosion(vecPosition, ucType, *iter))
-        
+
         if (IS_PLAYER(pElement))
         {
             CPlayer* player = static_cast<CPlayer*>(pElement);
