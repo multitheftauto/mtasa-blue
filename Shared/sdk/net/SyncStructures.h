@@ -2040,6 +2040,10 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     {
         BITCOUNT4 = 1
     };
+    enum
+    {
+        BITCOUNT5 = 1
+    };
 
     bool Read(NetBitStreamInterface& bitStream)
     {
@@ -2058,6 +2062,11 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
              isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data4), BITCOUNT4);
          else
              data4.extendedwatercannons = true;
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data5), BITCOUNT5);
+        else
+            data5.tunnelweatherblend = true;
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2078,6 +2087,9 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 
         if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_ExtendedWaterCannons))
             bitStream.WriteBits(reinterpret_cast<const char*>(&data4), BITCOUNT4);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_TunnelWeatherBlend))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data5), BITCOUNT5);
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2116,6 +2128,11 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool extendedwatercannons : 1;
     } data4;
 
+    struct
+    {
+        bool tunnelweatherblend : 1;
+    } data5;
+    
     SWorldSpecialPropertiesStateSync()
     {
         // Set default states
@@ -2134,6 +2151,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data2.fireballdestruct = true;
         data3.roadsignstext = true;
         data4.extendedwatercannons = true;
+        data5.tunnelweatherblend = true;
     }
 };
 

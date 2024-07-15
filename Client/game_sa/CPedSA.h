@@ -408,4 +408,6 @@ public:
     void*                   GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
     std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
     static void             StaticSetHooks();
+
+    void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 };
