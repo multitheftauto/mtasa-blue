@@ -1147,7 +1147,7 @@ SString CInstallManager::_ProcessServiceChecks()
 {
     if (!CheckService(CHECK_SERVICE_PRE_GAME))
     {
-        if (!IsUserAdmin())
+        if (!IsNativeArm64Host() && !IsUserAdmin())
         {
             m_strAdminReason = _("Update install settings");
             return "fail";
@@ -1269,17 +1269,31 @@ SString CInstallManager::_ProcessAppCompatChecks()
     }
 
     // Windows 7: Fix invalid GameUX URL (which causes rundll32.exe to use excessive CPU)
-    WString strUrlKey = L"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\GameUX\\ServiceLocation";
-    WString strUrlItem = L"Games";
-    WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
-    if (!strUrlValue.empty())
     {
-        WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
-        if (strUrlValue.ContainsI(L":"))
+        WString strUrlKey = L"SOFTWARE\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\GameUX\\ServiceLocation";
+        WString strUrlItem = L"Games";
+        WString strUrlValue = ReadCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0);
+        if (!strUrlValue.empty())
         {
-            strUrlValue = L"disabled";            // Can be anything not containing `:`
-            if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
-                bTryAdmin = true;
+            WriteDebugEvent(SString("GameUX ServiceLocation was '%s'", *ToUTF8(strUrlValue)));
+            if (strUrlValue.ContainsI(L":"))
+            {
+                strUrlValue = L"disabled";            // Can be anything not containing `:`
+                if (!WriteCompatibilityEntries(strUrlItem, strUrlKey, HKEY_CURRENT_USER, 0, strUrlValue))
+                    bTryAdmin = true;
+            }
+        }
+    }
+
+    // Windows 10: Disable multi-threaded loading of DLLs.
+    {
+        DWORD   maxLoaderThreads{};
+        LPCWSTR imageFileExecutionOptions = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\" GTA_EXE_NAME;
+        RegQueryInteger(HKEY_LOCAL_MACHINE, imageFileExecutionOptions, L"MaxLoaderThreads", maxLoaderThreads);
+
+        if (maxLoaderThreads != 1 && !RegWriteInteger(HKEY_LOCAL_MACHINE, imageFileExecutionOptions, L"MaxLoaderThreads", 1))
+        {
+            bTryAdmin = true;
         }
     }
 

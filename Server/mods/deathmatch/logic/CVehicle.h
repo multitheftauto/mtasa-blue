@@ -321,9 +321,11 @@ public:
     void           SetRespawnRotationDegrees(const CVector& vecRotation) { m_vecRespawnRotationDegrees = vecRotation; };
     float          GetRespawnHealth() { return m_fRespawnHealth; };
     void           SetRespawnHealth(float fHealth) { m_fRespawnHealth = fHealth; };
-    bool           GetRespawnEnabled() { return m_bRespawnEnabled; }
+    bool           GetRespawnEnabled() const noexcept { return m_bRespawnEnabled; }
     void           SetRespawnEnabled(bool bEnabled);
+    std::uint32_t  GetBlowRespawnInterval() const noexcept { return m_ulBlowRespawnInterval; }
     void           SetBlowRespawnInterval(unsigned long ulTime) { m_ulBlowRespawnInterval = ulTime; }
+    std::uint32_t  GetIdleRespawnInterval() const noexcept { return m_ulIdleRespawnInterval; }
     void           SetIdleRespawnInterval(unsigned long ulTime) { m_ulIdleRespawnInterval = ulTime; }
 
     void SpawnAt(const CVector& vecPosition, const CVector& vecRotation);

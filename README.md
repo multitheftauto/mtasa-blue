@@ -39,7 +39,9 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 #### Windows
 
 Prerequisites
-- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
+- [Visual Studio 2022](https://visualstudio.microsoft.com/vs/) with:
+  - Desktop development with C++
+  - Optional component *C++ MFC for latest v143 build tools (x86 & x64)*
 - [Microsoft DirectX SDK](https://wiki.multitheftauto.com/wiki/Compiling_MTASA#Microsoft_DirectX_SDK)
 - [Git for Windows](https://git-scm.com/download/win) (Optional)
 
@@ -48,13 +50,15 @@ Prerequisites
 3. Compile
 4. Execute: `win-install-data.bat`
 
+Visit the wiki article ["Compiling MTASA"](https://wiki.multitheftauto.com/wiki/Compiling_MTASA) for additional information and error troubleshooting.
+
 #### GNU/Linux
 
 You can build the MTA:SA server on GNU/Linux distributions only for x86, x86_64, armhf and arm64 CPU architectures. ARM architectures are currently in **experimental phase**, which means they're unstable, untested and may crash randomly. Beware that we only officially support building from x86_64 and that includes cross-compiling for x86, arm and arm64.
 
 **Build dependencies**
 
-*Please always read the Dockerfiles for up-to-date build dependencies.*  
+*Please always read the Dockerfiles for up-to-date build dependencies.*
 *Note: ncftp is not required for building the MTA:SA server.*
 
 - git
@@ -127,4 +131,4 @@ Execute `win-create-projects.bat`
 
 Unless otherwise specified, all source code hosted on this repository is licensed under the GPLv3 license. See the [LICENSE](./LICENSE) file for more details.
 
-Grand Theft Auto and all related trademarks are © Rockstar North 1997–2023.
+Grand Theft Auto and all related trademarks are © Rockstar North 1997–2024.
