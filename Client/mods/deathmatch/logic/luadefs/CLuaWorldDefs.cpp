@@ -2138,9 +2138,8 @@ bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, std::variant<bool,
 {
     float arg1;
     bool  argBool;
-    bool  isFloat = std::holds_alternative<float>(argVariant);
 
-    if (isFloat)
+    if (std::holds_alternative<float>(argVariant))
     {
         arg1 = std::get<float>(argVariant);
     }
