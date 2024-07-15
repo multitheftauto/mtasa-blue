@@ -229,9 +229,9 @@ bool CWeatherSA::ResetRainbow()
     return true;
 }
 
-bool CWeatherSA::SetTimerCycle(unsigned char value) noexcept
+bool CWeatherSA::SetTimerCycle(bool value) noexcept
 {
-    if (value == 1)
+    if (value)
     {
         MemSet((void*)0x53BFBD, 0x90, 5);
         m_bTimeCycleFrozen = true;

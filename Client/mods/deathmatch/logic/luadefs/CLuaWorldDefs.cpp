@@ -2134,10 +2134,24 @@ std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::G
     return false;
 }
 
-bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3)
+bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, std::variant<bool, float> argVariant, std::optional<float> arg2, std::optional<float> arg3)
 {
+    float arg1;
+    bool  argBool;
+    bool  isFloat = std::holds_alternative<float>(argVariant);
+
+    if (isFloat)
+    {
+        arg1 = std::get<float>(argVariant);
+    }
+    else
+    {
+        argBool = std::get<bool>(argVariant);
+    }
+
     if (arg2.has_value() && arg3.has_value())
     {
+      
         switch (property)
         {
             case eWorldProperty::AMBIENT_COLOR:
@@ -2186,7 +2200,7 @@ bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, float arg1, std::o
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->SetRainbow(arg1);
         case  eWorldProperty::TIME_CYCLE:
-            return g_pGame->GetWeather()->SetTimerCycle(arg1);
+            return g_pGame->GetWeather()->SetTimerCycle(argBool);
     }
     return false;
 }
