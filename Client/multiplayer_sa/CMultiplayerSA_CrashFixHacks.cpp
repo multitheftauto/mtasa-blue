@@ -44,10 +44,9 @@ void _declspec(naked) CrashAverted()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CCustomCarEnvMapPipeline::CustomPipeRenderCB
-// Description: A crash occurs during lighting specular calculations
-// Issue: N/A
-// Cause: Null mesh material pointer
+// CCustomCarEnvMapPipeline::CustomPipeRenderCB
+// 
+// Null mesh material pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc1                              0x5D9A6E
 #define HOOKSIZE_CrashFix_Misc1                             6
@@ -73,10 +72,9 @@ void _declspec(naked) HOOK_CrashFix_Misc1()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAutomobile::ProcessControl
-// Description: A crash occurs when the vehicle's collision data is corrupted or when the vehicle has no collision data at all
-// Issue: N/A
-// Cause: Null CColModel pointer or corrupted m_pColData
+// CAutomobile::ProcessControl
+// 
+// Null CColModel pointer or corrupted m_pColData
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc2                              0x6B18B0
 #define HOOKSIZE_CrashFix_Misc2                             9
@@ -109,10 +107,9 @@ void _declspec(naked) HOOK_CrashFix_Misc2()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CTaskSimpleCarOpenDoorFromOutside::ComputeAnimID
-// Description: The crash likely occurs when vehicle is invalid
-// Issue: N/A
-// Cause: Invalid m_veh in CTaskSimpleCarOpenDoorFromOutside
+// CTaskSimpleCarOpenDoorFromOutside::ComputeAnimID
+//
+// Invalid m_veh pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc3                              0x645FD9
 #define HOOKSIZE_CrashFix_Misc3                             6
@@ -134,10 +131,9 @@ void _declspec(naked) HOOK_CrashFix_Misc3()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAESoundManager::Service
-// Description: The crash occurs when attempting to divide by zero
-// Issue: N/A
-// Cause: Cause: Division by 0
+// CAESoundManager::Service
+// 
+// Division by 0
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc4                              0x4F02D2
 #define HOOKSIZE_CrashFix_Misc4                             5
@@ -162,10 +158,9 @@ void _declspec(naked) HOOK_CrashFix_Misc4()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CPed::SetPedPositionInCar
-// Description: The crash occurs when the ped does not have a model
-// Issue: N/A
-// Cause: Null pointer m_pVehicleStruct in the CVehicleModelInfo structure
+// CPed::SetPedPositionInCar
+// 
+// Null pointer m_pVehicleStruct in the CVehicleModelInfo structure
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc5                              0x5DF949
 #define HOOKSIZE_CrashFix_Misc5                             7
@@ -192,10 +187,11 @@ void _declspec(naked) HOOK_CrashFix_Misc5()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: RpAnimBlend::FrameUpdateCallBackSkinnedWithVelocityExtraction
-// Description: The crash occurs when the pointer to an object of type CAnimBlendNode in the BlendNodeArrays array of the AnimBlendUpdateData structure is null
-// Issue: Mantis #5465 (2/2) (https://web.archive.org/web/20160411120202/http://bugs.mtasa.com/view.php?id=5465)
-// Cause: Null pointer to object in the BlendNodeArrays array of the AnimBlendUpdateData structure
+// RpAnimBlend::FrameUpdateCallBackSkinnedWithVelocityExtraction
+//
+// Mantis #5465 (2/2) (https://web.archive.org/web/20160411120202/http://bugs.mtasa.com/view.php?id=5465)
+//
+// Null pointer to object in the BlendNodeArrays array of the AnimBlendUpdateData structure
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc6                              0x4D1750
 #define HOOKSIZE_CrashFix_Misc6                             5
@@ -219,10 +215,11 @@ void _declspec(naked) HOOK_CrashFix_Misc6()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CCollision::ProcessVerticalLine
-// Description: The crash occurs when the received collision is null
-// Issue: Mantis #5466 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5466)
-// Cause: Null colModel pointer
+// CCollision::ProcessVerticalLine
+//
+// Mantis #5466 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5466)
+//
+// Null colModel pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc7                              0x417BF8
 #define HOOKSIZE_CrashFix_Misc7                             5
@@ -246,10 +243,11 @@ void _declspec(naked) HOOK_CrashFix_Misc7()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: Get2DEffectAtomicCallback
-// Description: The crash occurs when the atomic received as an argument has invalid geometry
-// Issue: Mantis #5468  1/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
-// Cause: Null pointer atomic->geometry in the RpAtomic
+// Get2DEffectAtomicCallback
+//
+// Mantis #5468  1/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
+//
+// Null pointer atomic->geometry in the RpAtomic
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc8                              0x73485D
 #define HOOKSIZE_CrashFix_Misc8                             5
@@ -273,10 +271,11 @@ void _declspec(naked) HOOK_CrashFix_Misc8()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CProjectileInfo::Update
-// Description: The crash occurs when the projectile from the m_apProjectile array is invalid
-// Issue: Mantis #5468 2/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
-// Cause: Null pointer projectile of type CObject* in the array CProjectileInfo::ms_apProjectile
+// CProjectileInfo::Update
+//
+// Mantis #5468 2/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
+//
+// Null pointer projectile of type CObject* in the array CProjectileInfo::ms_apProjectile
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc9                              0x738B64
 #define HOOKSIZE_CrashFix_Misc9                             6
@@ -300,10 +299,11 @@ void _declspec(naked) HOOK_CrashFix_Misc9()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CEntity::TransformFromObjectSpace
-// Description: The crash occurs when the received offset vector is invalid
-// Issue: Mantis #5468 3/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
-// Cause: Invalid pointer to a vector
+// CEntity::TransformFromObjectSpace
+//
+// Mantis #5468 3/3 (https://web.archive.org/web/20160401233418/http://bugs.mtasa.com/view.php?id=5468)
+//
+// Invalid pointer to a vector
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc10                             0x5334FE
 #define HOOKSIZE_CrashFix_Misc10                            6
@@ -331,10 +331,11 @@ void _declspec(naked) HOOK_CrashFix_Misc10()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: RpAnimBlend::FrameUpdateCallBackSkinned
-// Description: The crash likely occurs due to invalid data passed as the second argument
-// Issue: Mantis #5576 (https://web.archive.org/web/20160408163600/http://bugs.mtasa.com/view.php?id=5576)
-// Cause: Unknown
+// RpAnimBlend::FrameUpdateCallBackSkinned
+//
+// Mantis #5576 (https://web.archive.org/web/20160408163600/http://bugs.mtasa.com/view.php?id=5576)
+//
+// The crash likely occurs due to invalid data passed as the second argument
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc11                             0x4D2C62
 #define HOOKSIZE_CrashFix_Misc11                            5
@@ -358,10 +359,11 @@ void _declspec(naked) HOOK_CrashFix_Misc11()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAnimManager::UncompressAnimation
-// Description: The crash occurs when the received argument pointer of type CAnimBlendHierarchy is null
-// Issue: Mantis #5530 (https://web.archive.org/web/20160411114105/http://bugs.mtasa.com/view.php?id=5530)
-// Cause: Null pointer of type CAnimBlendHierarchy passed to the function
+// CAnimManager::UncompressAnimation
+//
+// Mantis #5530 (https://web.archive.org/web/20160411114105/http://bugs.mtasa.com/view.php?id=5530)
+//
+// Null pointer of type CAnimBlendHierarchy passed to the function
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc12                             0x4D41C5
 #define HOOKSIZE_CrashFix_Misc12                            5
@@ -385,10 +387,9 @@ void _declspec(naked) HOOK_CrashFix_Misc12()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAnimManager::BlendAnimation
-// Description: The crash occurs when the animation (CAnimBlendStaticAssociation) is invalid
-// Issue: N/A
-// Cause: Invalid animation (Null pointer returned by CAnimBlendAssocGroup::GetAnimation)
+// CAnimManager::BlendAnimation
+//
+// Invalid animation (Null pointer returned by CAnimBlendAssocGroup::GetAnimation)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc13                             0x4D464E
 #define HOOKSIZE_CrashFix_Misc13                            6
@@ -412,10 +413,9 @@ void _declspec(naked) HOOK_CrashFix_Misc13()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAEFrontendAudioEntity::AddAudioEvent
-// Description: Audio event volumes table not initialized
-// Issue: N/A
-// Cause: Invalid pointer to the array CAEAudioEntity::m_pAudioEventVolumes
+// CAEFrontendAudioEntity::AddAudioEvent
+// 
+// Invalid pointer to the array CAEAudioEntity::m_pAudioEventVolumes
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc14                             0x4DD4B5
 #define HOOKSIZE_CrashFix_Misc14                            6
@@ -483,10 +483,9 @@ void _declspec(naked) HOOK_FreezeFix_Misc15()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CPed::PlayFootSteps
-// Description: Handle RpAnimBlendClumpGetFirstAssociation returning NULL
-// Issue: N/A
-// Cause: RpAnimBlendClumpGetFirstAssociation returns null pointer
+// CPed::PlayFootSteps
+//
+// RpAnimBlendClumpGetFirstAssociation returns null pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc16                             0x5E5815
 #define HOOKSIZE_CrashFix_Misc16                            6
@@ -512,10 +511,9 @@ void _declspec(naked) HOOK_CrashFix_Misc16()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: RwFrameForAllObjects
-// Description: Handle RwFrameSetStaticPluginsSize having NULL member at 0x90
-// Issue: N/A
-// Cause: Null pointer for the objectList (0x90) field of the RwFrame structure
+// RwFrameForAllObjects
+//
+// Null pointer for the objectList (0x90) field of the RwFrame structure
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc17                             0x7F120E
 #define HOOKSIZE_CrashFix_Misc17                            6
@@ -540,10 +538,9 @@ void _declspec(naked) HOOK_CrashFix_Misc17()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CVehicleModelInfo::GetWheelPosn
-// Description: The crash occurs due to an invalid frame returned by CClumpModelInfo::GetFrameFromId
-// Issue: N/A
-// Cause: Null pointer frame returned by CClumpModelInfo::GetFrameFromId
+// CVehicleModelInfo::GetWheelPosn
+//
+// Null pointer frame returned by CClumpModelInfo::GetFrameFromId
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc18                             0x4C7DAD
 #define HOOKSIZE_CrashFix_Misc18                            7
@@ -575,10 +572,9 @@ void _declspec(naked) HOOK_CrashFix_Misc18()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: RwFrameAddChild
-// Description: The crash occurs because the first argument of type RwFrame received is invalid
-// Issue: N/A
-// Cause: The pointer passed as the first argument of type RwFrame to the function is null
+// RwFrameAddChild
+//
+// The pointer passed as the first argument of type RwFrame to the function is null
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc19                             0x7F0BF7
 #define HOOKSIZE_CrashFix_Misc19                            6
@@ -605,10 +601,9 @@ void _declspec(naked) HOOK_CrashFix_Misc19()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CPlaceable::RemoveMatrix
-// Description: Handle CPlaceable::RemoveMatrix having wrong data
-// Issue: N/A
-// Cause: "this" is invalid
+// CPlaceable::RemoveMatrix
+// 
+// "this" is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc20                             0x54F3B0
 #define HOOKSIZE_CrashFix_Misc20                            6
@@ -633,10 +628,9 @@ void _declspec(naked) HOOK_CrashFix_Misc20()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CTaskSimpleCarFallOut::FinishAnimFallOutCB
-// Description: Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
-// Issue: N/A
-// Cause: Unknown
+// CTaskSimpleCarFallOut::FinishAnimFallOutCB
+// 
+// Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
 ////////////////////////////////////////////////////////////////////////
 bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAssociation, CTaskSimpleCarFallOutSAInterface* pTask)
 {
@@ -691,10 +685,9 @@ void _declspec(naked) HOOK_CrashFix_Misc21()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAnimBlendAssociation::Init
-// Handle CAnimBlendAssociation::Init having wrong data
-// Issue: N/A
-// Cause: this->m_clumpAssoc.m_pNodeArray[v5] is invalid
+// CAnimBlendAssociation::Init
+//
+// this->m_clumpAssoc.m_pNodeArray[v5] is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc22                             0x4CEF08
 #define HOOKSIZE_CrashFix_Misc22                            6
@@ -741,10 +734,9 @@ void _declspec(naked) HOOK_CrashFix_Misc22()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CVehicleAnimGroup::ComputeAnimDoorOffsets
-// Description: Handle CVehicleAnimGroup::ComputeAnimDoorOffsets having wrong door index
-// Issue: N/A
-// Cause: Door index is out of range
+// CVehicleAnimGroup::ComputeAnimDoorOffsets
+//
+// Door index is out of range
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc23                             0x6E3D10
 #define HOOKSIZE_CrashFix_Misc23                            7
@@ -773,10 +765,9 @@ void _declspec(naked) HOOK_CrashFix_Misc23()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: RwFrameForAllChildren
-// Description: Handle _RwFrameForAllChildren being called with NULL
-// Issue: N/A
-// Cause: The first argument of type RwFrame received is invalid
+// RwFrameForAllChildren
+// 
+// The first argument of type RwFrame received is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc24                             0x7F0DC8
 #define HOOKSIZE_CrashFix_Misc24                            6
@@ -802,10 +793,9 @@ void _declspec(naked) HOOK_CrashFix_Misc24()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CTaskSimpleCarOpenDoorFromOutside::FinishAnimCarOpenDoorFromOutsideCB
-// Description: Handle CTaskSimpleCarOpenDoorFromOutside::FinishAnimCarOpenDoorFromOutsideCB having zero pointer to vehicle
-// Issue: N/A
-// Cause: Null vehicle pointer
+// CTaskSimpleCarOpenDoorFromOutside::FinishAnimCarOpenDoorFromOutsideCB
+//
+// Null vehicle pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc25                             0x646026
 #define HOOKSIZE_CrashFix_Misc25                            5
@@ -835,10 +825,9 @@ void _declspec(naked) HOOK_CrashFix_Misc25()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CShotInfo::Update
-// Description: Handle CShotInfo::Update having invalid item
-// Issue: N/A
-// Cause: _creator->m_pIntelligence is invalid
+// CShotInfo::Update
+// 
+// _creator->m_pIntelligence is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc26                             0x739FA0
 #define HOOKSIZE_CrashFix_Misc26                            6
@@ -869,10 +858,9 @@ void _declspec(naked) HOOK_CrashFix_Misc26()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CTaskComplexDieInCar::ControlSubTask
-// Description: Handle CTaskComplexDieInCar::ControlSubTask ped with no vehicle
-// Issue: N/A
-// Cause: ped or ped->m_pVehicle is null pointer
+// CTaskComplexDieInCar::ControlSubTask
+// 
+// ped or ped->m_pVehicle is null pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc27                             0x6377FB
 #define HOOKSIZE_CrashFix_Misc27                            7
@@ -899,10 +887,9 @@ cont:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CObject::ProcessGarageDoorBehaviour
-// Description: Handle CObject::ProcessGarageDoorBehaviour object with no dummy
-// Issue: N/A
-// Cause: Null this->m_pDummyObject pointer
+// CObject::ProcessGarageDoorBehaviour
+//
+// Null this->m_pDummyObject pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc28                             0x44A4FD
 #define HOOKSIZE_CrashFix_Misc28                            6
@@ -931,10 +918,9 @@ cont:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAEMP3BankLoader::IsSoundBankLoaded
-// Description: Handle CAEPCBankLoader::IsSoundBankLoaded with invalid argument
-// Issue: N/A
-// Cause: The value of the argument BankSlotId is invalid
+// CAEMP3BankLoader::IsSoundBankLoaded
+//
+// The value of the argument BankSlotId is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc29                             0x4E022C
 #define HOOKSIZE_CrashFix_Misc29                            5
@@ -963,10 +949,9 @@ cont:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAnimBlendAssociation::SetFinishCallback
-// Description: Handle CAnimBlendAssociation::SetFinishCallback with invalid ecx
-// Issue: N/A
-// Cause: "this" is invalid
+// CAnimBlendAssociation::SetFinishCallback
+// 
+// "this" is invalid
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CrashFix_Misc30                             0x4CEBE8
 #define HOOKSIZE_CrashFix_Misc30                            7
@@ -995,10 +980,9 @@ cont:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CClumpModelInfo::GetFrameFromId
-// Description: Null frame (Probably due to a custom vehicle with missing frames)
-// Issue: N/A
-// Cause: Invalid frame
+// CClumpModelInfo::GetFrameFromId
+//
+// Invalid frame
 ////////////////////////////////////////////////////////////////////////
 RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _ebx, DWORD _esi, DWORD _edi, DWORD calledFrom, RpClump* pClump, int id)
 {
@@ -1110,10 +1094,9 @@ CStreamingInfo* GetStreamingInfo(uint id)
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CEntity::GetBoundRect
-// Description: The crash occurs when the pointer to CModelInfo is invalid
-// Issue: N/A
-// Cause: modelInfo->m_pColModel is a null pointer
+// CEntity::GetBoundRect
+//
+// modelInfo->m_pColModel is a null pointer
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 {
@@ -1170,10 +1153,9 @@ void _declspec(naked) HOOK_CEntity_GetBoundRect()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Location: CVehicle_AddUpgrade
-// Description: Record some variables in case crash occurs
-// Issue: N/A
-// Cause: Unknown
+// CVehicle_AddUpgrade
+//
+// Record some variables in case crash occurs
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CVehicle_AddUpgrade_Pre(CVehicleSAInterface* pVehicle, int iUpgradeId, int iFrame)
 {
@@ -1223,10 +1205,9 @@ inner:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CObject::~CObject, CObject::ProcessTrainCrossingBehavior
-// Description: Train crossings: Detach barrier from post (to be able to create objects 1373 and 1374 separately)
-// Issue: N/A
-// Cause: Unknown
+// CObject::~CObject, CObject::ProcessTrainCrossingBehavior
+// 
+// Train crossings: Detach barrier from post (to be able to create objects 1373 and 1374 separately)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CObject_Destructor_TrainCrossing_Check 0x59F7A8
 #define HOOKPOS_CObject_ProcessTrainCrossingBehavior1 0x5A0C34
@@ -1259,10 +1240,9 @@ jmp_invalid:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: Interior_c::Init
-// Description: GTA doesn't reset the furniture object counter, so do it manually everytime before GTA furnishes an interior (Interior_c::Init)
-// Issue: N/A
-// Cause: Unknown
+// Interior_c::Init
+// 
+// GTA doesn't reset the furniture object counter, so do it manually everytime before GTA furnishes an interior (Interior_c::Init)
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_ResetFurnitureObjectCounter 0x593BF0
 #define HOOKSIZE_ResetFurnitureObjectCounter 6
@@ -1280,11 +1260,10 @@ void _declspec(naked) HOOK_ResetFurnitureObjectCounter()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CVolumetricShadowMgr_Render
+// CVolumetricShadowMgr_Render
 // 
 // Custom models can cause problems for volumetric shadows.
 // Record when volumetric shadows are being rendered so we can disable them if a crash occurs.
-//
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CVolumetricShadowMgr_Render_Pre()
 {
@@ -1325,11 +1304,10 @@ inner:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CVolumetricShadowMgr_Update
+// CVolumetricShadowMgr_Update
 // 
 // Custom models can cause problems for volumetric shadows.
 // Record when volumetric shadows are being updated so we can disable them if a crash occurs.
-//
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CVolumetricShadowMgr_Update_Pre()
 {
@@ -1371,10 +1349,9 @@ inner:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAnimManager::CreateAnimAssocGroups
-// Description: A model (usually 7) has to be loaded to avoid a crash
-// Issue: N/A
-// Cause: CModelInfo::ms_modelInfoPtrs at the given index is a null pointer
+// CAnimManager::CreateAnimAssocGroups
+// 
+// CModelInfo::ms_modelInfoPtrs at the given index is a null pointer
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
@@ -1416,11 +1393,10 @@ void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CTaskComplexCarSlowBeDraggedOut::CreateFirstSubTask
+// CTaskComplexCarSlowBeDraggedOut::CreateFirstSubTask
 //
 // Accessing a temporally not existing vehicle
 // (seems to happen when the driver is slower being thrown out than the jacker enters the vehicle)
-//
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask   0x6485AC
 #define HOOKSIZE_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask  6
@@ -1450,8 +1426,9 @@ void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: OnMY_printf
-// Description: GTA outputs stuff via printf which we can use to help diagnose problems
+// OnMY_printf
+// 
+// GTA outputs stuff via printf which we can use to help diagnose problems
 ////////////////////////////////////////////////////////////////////////
 void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
 {
@@ -1506,10 +1483,9 @@ void _declspec(naked) HOOK_printf()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: RwMatrixMultiply
-// Description: The crash occurs if the third argument of type RwMatrixTag passed is invalid
-// Issue: N/A
-// Cause: The third received argument of type RwMatrixTag* is a null pointer
+// RwMatrixMultiply
+// 
+// The third received argument of type RwMatrixTag* is a null pointer
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_RwMatrixMultiply                0x7F18B0
 #define HOOKSIZE_RwMatrixMultiply               6
@@ -1534,10 +1510,9 @@ cont:
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CAnimBlendNode::GetCurrentTranslation
-// Description: Check for corrupt endKeyFrameIndex
-// Issue: N/A
-// Cause: Invalid endKeyFrameIndex
+// CAnimBlendNode::GetCurrentTranslation
+// 
+// Invalid endKeyFrameIndex
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInterface)
 {
@@ -1602,11 +1577,10 @@ void _declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CStreaming::AreAnimsUsedByRequestedModels
+// CStreaming::AreAnimsUsedByRequestedModels
 // 
 // GTA streamer will use this function to decide if IFP blocks should be unloaded or not.
 // We will return true to disable unloading.
-//
 ////////////////////////////////////////////////////////////////////////
 bool __cdecl OnMY_CStreaming_AreAnimsUsedByRequestedModels(int modelID)
 {
@@ -1640,8 +1614,7 @@ void _declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: CTrain::ProcessControl
+// CTrain::ProcessControl
 // 
 // This hook overwrites the logic to wrap the train's rail distance, because in the
 // original game code this could cause an infinite loop
@@ -1708,8 +1681,7 @@ static void _declspec(naked) HOOK_CTrain__ProcessControl()
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: CTaskComplexCarSlowBeDraggedOutAndStandUp::CreateFirstSubTask
+// CTaskComplexCarSlowBeDraggedOutAndStandUp::CreateFirstSubTask
 // 
 // This hook adds a null-pointer check for eax, which stores the ped's current vehicle.
 // Returning a null-pointer from this function will prevent the animation from being played.
@@ -1747,14 +1719,12 @@ static void _declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__Cre
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: CVehicleModelInfo::LoadVehicleColours
+// CVehicleModelInfo::LoadVehicleColours
 // 
 // A modified data/carcols.dat can have entries with invalid model names and these cause
 // CModelInfo::GetModelInfo to return a null pointer, but the original code doesn't verify
 // the return value and tries to use the null pointer. This hook adds a null pointer check
 // and then skips the line if in the null case. There are two locations to hook.
-//
 ////////////////////////////////////////////////////////////////////////
 static void _cdecl LOG_CVehicleModelInfo__LoadVehicleColours(int location, const char* modelName)
 {
@@ -1830,8 +1800,7 @@ static void _declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: CPlaceName::Process
+// CPlaceName::Process
 // 
 // Prevent the original game code from accessing the ped's vehicle, when it's a null pointer
 // and the ped flag bInVehicle is set by setting the ped flag to zero.
@@ -1866,10 +1835,9 @@ static void _declspec(naked) HOOK_CPlaceName__Process()
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Location: CWorld::FindObjectsKindaCollidingSectorList
-// Description: The crash occurs when CModelInfo::ms_modelInfoPtrs at the given index is a null pointer and when the collision is invalid
-// Issue: N/A
-// Cause: A null pointer at the given index in CModelInfo::ms_modelInfoPtrs or a null pointer in the m_pColModel field
+// CWorld::FindObjectsKindaCollidingSectorList
+//
+// A null pointer at the given index in CModelInfo::ms_modelInfoPtrs or a null pointer in the m_pColModel field
 ////////////////////////////////////////////////////////////////////////
 static void LOG_CWorld__FindObjectsKindaCollidingSectorList(unsigned int modelId)
 {
@@ -1915,8 +1883,7 @@ static void _declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: RpClumpForAllAtomics
+// RpClumpForAllAtomics
 // 
 // Adds a nullptr check for the clump object pointer.
 //
@@ -1946,8 +1913,7 @@ static void _declspec(naked) HOOK_RpClumpForAllAtomics()
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: RpAnimBlendClumpGetFirstAssociation
+// RpAnimBlendClumpGetFirstAssociation
 // 
 // Adds a nullptr check for the clump object pointer.
 //
@@ -1974,8 +1940,7 @@ static void _declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: CAnimManager::BlendAnimation
+// CAnimManager::BlendAnimation
 // 
 // Adds a nullptr check for the clump object pointer.
 //
@@ -2004,8 +1969,7 @@ static void _declspec(naked) HOOK_CAnimManager__BlendAnimation()
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: FxSystemBP_c::Load
+// FxSystemBP_c::Load
 //
 // Remove every FxEmitter without a main texture because the game logic expects AT LEAST
 // one texture at index 0 ("main texture").
@@ -2071,8 +2035,7 @@ static void _declspec(naked) HOOK_FxSystemBP_c__Load()
 }
 
 ////////////////////////////////////////////////////////////////////////
-//
-// Location: FxPrim_c::Enable
+// FxPrim_c::Enable
 //
 // Add a null-pointer check for the ecx pointer. This hook is a side-effect of the hook for
 // FxSystemBP_c::Load above.
@@ -2098,11 +2061,11 @@ static void _declspec(naked) HOOK_FxPrim_c__Enable()
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
 //
-//////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_CrashFixHacks()
 {
     EZHookInstall(CrashFix_Misc1);
