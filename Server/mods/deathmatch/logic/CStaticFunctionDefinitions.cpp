@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Lua static function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1703,6 +1703,9 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
                 pPed->SetHealth(fHealth);
+
+                if (pPed->IsDead() && fHealth > 0.0f)
+                    pPed->SetIsDead(false);
             }
             else
                 return false;
@@ -4172,6 +4175,8 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot(CElement* pElement, unsigned c
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            pPed->SetWeaponSlot(ucWeaponSlot);
+
             CBitStream BitStream;
 
             SWeaponSlotSync slot;
@@ -5043,6 +5048,7 @@ bool CStaticFunctionDefinitions::RemoveVehicleSirens(CVehicle* pVehicle)
     assert(pVehicle);
 
     pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    pVehicle->SetSirenActive(false);
     pVehicle->RemoveVehicleSirens();
 
     CBitStream BitStream;

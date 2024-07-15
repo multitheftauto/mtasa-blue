@@ -165,7 +165,8 @@ int CLuaAudioDefs::PlaySound(lua_State* luaVM)
                 SString strFilename;
                 bool    bIsURL = false;
                 bool    bIsRawData = false;
-                if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename))
+
+                if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename, nullptr, true))
                     strSound = strFilename;
                 else
                 {

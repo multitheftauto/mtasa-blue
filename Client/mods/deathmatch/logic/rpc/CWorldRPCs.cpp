@@ -17,6 +17,7 @@
 #include <game/CGarage.h>
 #include <game/CClock.h>
 #include <game/CWeaponStatManager.h>
+#include <game/CBuildingRemoval.h>
 #include "CWorldRPCs.h"
 
 void CWorldRPCs::LoadFunctions()
@@ -582,7 +583,7 @@ void CWorldRPCs::RemoveWorldModel(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 }
 
@@ -597,13 +598,13 @@ void CWorldRPCs::RestoreWorldModel(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RestoreBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RestoreBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 }
 
 void CWorldRPCs::RestoreAllWorldModels(NetBitStreamInterface& bitStream)
 {
-    g_pGame->GetWorld()->ClearRemovedBuildingLists();
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
 }
 
 void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)

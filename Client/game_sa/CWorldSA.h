@@ -68,32 +68,13 @@ public:
     bool  GetOcclusionsEnabled();
     void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition);
     int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance);
-
-    void              RemoveBuilding(unsigned short usModelToRemove, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
-    bool              IsRemovedModelInRadius(SIPLInst* pInst);
-    bool              IsModelRemoved(unsigned short modelID);
-    void              ClearRemovedBuildingLists(uint* pOutAmount = NULL);
-    bool              RestoreBuilding(unsigned short usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, uint* pOutAmount = NULL);
-    SBuildingRemoval* GetBuildingRemoval(CEntitySAInterface* pInterface);
-    void              AddDataBuilding(CEntitySAInterface* pInterface);
-    void              RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface);
-    void              AddBinaryBuilding(CEntitySAInterface* pInterface);
-    bool              IsObjectRemoved(CEntitySAInterface* pInterface);
-    bool              IsDataModelRemoved(unsigned short usModelID);
-    bool              IsEntityRemoved(CEntitySAInterface* pInterface);
-    bool              CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
+    bool  CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd);
 
     CSurfaceType* GetSurfaceInfo() override;
     void          ResetAllSurfaceInfo() override;
     bool          ResetSurfaceInfo(short sSurfaceID) override;
 
 private:
-    std::multimap<unsigned short, SBuildingRemoval*>*         m_pBuildingRemovals;
-    std::multimap<unsigned short, sDataBuildingRemovalItem*>* m_pDataBuildings;
-    std::multimap<unsigned short, sBuildingRemovalItem*>*     m_pBinaryBuildings;
-    std::map<unsigned short, unsigned short>*                 m_pRemovedObjects;
-    std::map<DWORD, bool>                                     m_pRemovedEntities;
-    std::map<DWORD, bool>                                     m_pAddedEntities;
     float                                                     m_fAircraftMaxHeight;
     CSurfaceType*                                             m_pSurfaceInfo;
 };

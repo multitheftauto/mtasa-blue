@@ -729,6 +729,7 @@ public:
     static bool           FxAddWaterSplash(CVector& vecPosition);
     static bool           FxAddBulletSplash(CVector& vecPosition);
     static bool           FxAddFootSplash(CVector& vecPosition);
+    static bool           FxCreateParticle(eFxParticleSystems eFxParticle, CVector& vecPosition, CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife);
     static CClientEffect* CreateEffect(CResource& Resource, const SString& strFxName, const CVector& vecPosition, bool bSoundEnable);
 
     // Sound funcs
