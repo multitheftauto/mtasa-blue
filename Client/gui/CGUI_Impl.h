@@ -148,7 +148,7 @@ public:
     void        SetCursorColor(float r, float g, float b, float alpha) noexcept;
     void        GetCursorColor(float& r, float& g, float& b, float& alpha) noexcept;
     void        ResetMenuCursorColor() noexcept;
-    void        RestoreCurrentServerCursorColor();
+    void        RestoreCurrentServerCursorColor() noexcept;
     void        ResetCursorColor(float r, float g, float b, float alpha) noexcept;
     eCursorType GetCursorType();
 

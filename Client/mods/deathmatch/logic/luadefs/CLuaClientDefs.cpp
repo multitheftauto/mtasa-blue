@@ -83,16 +83,13 @@ bool CLuaClientDefs::IsCapsLockEnabled()
     return ((::GetKeyState(VK_CAPITAL) & 0x0001) != 0);
 }
 
-bool CLuaClientDefs::SetCursorColor(float r, float g, float b, float alpha)
+bool CLuaClientDefs::SetCursorColor(float r, float g, float b, float alpha) noexcept
 {
     if (!g_pCore->IsMenuVisible())
-    {
         g_pCore->GetGUI()->SetCursorColor(r, g, b, alpha);
-    }
     else
-    {
-      g_pCore->GetGUI()->ResetCursorColor(r, g, b, alpha); // Force values to be updated
-    }
+        g_pCore->GetGUI()->ResetCursorColor(r, g, b, alpha); // Force values to be updated
+
     return true;
 }
 
