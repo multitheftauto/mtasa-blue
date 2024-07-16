@@ -956,14 +956,14 @@ int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
 
 CElement* CLuaResourceDefs::GetResourceDynamicElementRoot(lua_State* luaVM, std::optional<CResource*> resource)
 {
-    CResource* pResource = resource.value_or(&lua_getownerresource(luaVM));
-    if (!pResource->IsActive())
+    CResource* targetResource = resource.value_or(&lua_getownerresource(luaVM));
+    if (!targetResource->IsActive())
     {
-        SString err("Resource \"%s\" is not currently running!", pResource->GetName().c_str());
+        SString err("Resource \"%s\" is not currently running!", targetResource->GetName().c_str());
         throw LuaFunctionError(err, false);
     }
 
-    return pResource->GetDynamicElementRoot();
+    return targetResource->GetDynamicElementRoot();
 }
 
 int CLuaResourceDefs::getResourceMapRootElement(lua_State* luaVM)
