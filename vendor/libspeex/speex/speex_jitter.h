@@ -7,18 +7,18 @@
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
    are met:
-   
+
    - Redistributions of source code must retain the above copyright
    notice, this list of conditions and the following disclaimer.
-   
+
    - Redistributions in binary form must reproduce the above copyright
    notice, this list of conditions and the following disclaimer in the
    documentation and/or other materials provided with the distribution.
-   
+
    - Neither the name of the Xiph.org Foundation nor the names of its
    contributors may be used to endorse or promote products derived from
    this software without specific prior written permission.
-   
+
    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -89,7 +89,7 @@ struct _JitterBufferPacket {
 /** Included because of an early misspelling (will remove in next release) */
 #define JITTER_BUFFER_GET_AVALIABLE_COUNT 3
 
-/** Assign a function to destroy unused packet. When setting that, the jitter 
+/** Assign a function to destroy unused packet. When setting that, the jitter
     buffer no longer copies packet data. */
 #define JITTER_BUFFER_SET_DESTROY_CALLBACK 4
 /**  */
@@ -104,7 +104,7 @@ struct _JitterBufferPacket {
 #define JITTER_BUFFER_SET_CONCEALMENT_SIZE 8
 #define JITTER_BUFFER_GET_CONCEALMENT_SIZE 9
 
-/** Absolute max amount of loss that can be tolerated regardless of the delay. Typical loss 
+/** Absolute max amount of loss that can be tolerated regardless of the delay. Typical loss
     should be half of that or less. */
 #define JITTER_BUFFER_SET_MAX_LATE_RATE 10
 #define JITTER_BUFFER_GET_MAX_LATE_RATE 11
@@ -114,59 +114,59 @@ struct _JitterBufferPacket {
 #define JITTER_BUFFER_GET_LATE_COST 13
 
 
-/** Initialises jitter buffer 
- * 
- * @param step_size Starting value for the size of concleanment packets and delay 
+/** Initialises jitter buffer
+ *
+ * @param step_size Starting value for the size of concleanment packets and delay
        adjustment steps. Can be changed at any time using JITTER_BUFFER_SET_DELAY_STEP
        and JITTER_BUFFER_GET_CONCEALMENT_SIZE.
  * @return Newly created jitter buffer state
  */
 JitterBuffer *jitter_buffer_init(int step_size);
 
-/** Restores jitter buffer to its original state 
- * 
+/** Restores jitter buffer to its original state
+ *
  * @param jitter Jitter buffer state
  */
 void jitter_buffer_reset(JitterBuffer *jitter);
 
-/** Destroys jitter buffer 
- * 
+/** Destroys jitter buffer
+ *
  * @param jitter Jitter buffer state
  */
 void jitter_buffer_destroy(JitterBuffer *jitter);
 
 /** Put one packet into the jitter buffer
- * 
+ *
  * @param jitter Jitter buffer state
  * @param packet Incoming packet
 */
 void jitter_buffer_put(JitterBuffer *jitter, const JitterBufferPacket *packet);
 
 /** Get one packet from the jitter buffer
- * 
+ *
  * @param jitter Jitter buffer state
  * @param packet Returned packet
  * @param desired_span Number of samples (or units) we wish to get from the buffer (no guarantee)
- * @param current_timestamp Timestamp for the returned packet 
+ * @param current_timestamp Timestamp for the returned packet
 */
 int jitter_buffer_get(JitterBuffer *jitter, JitterBufferPacket *packet, spx_int32_t desired_span, spx_int32_t *start_offset);
 
 /** Used right after jitter_buffer_get() to obtain another packet that would have the same timestamp.
  * This is mainly useful for media where a single "frame" can be split into several packets.
- * 
+ *
  * @param jitter Jitter buffer state
  * @param packet Returned packet
  */
 int jitter_buffer_get_another(JitterBuffer *jitter, JitterBufferPacket *packet);
 
 /** Get pointer timestamp of jitter buffer
- * 
+ *
  * @param jitter Jitter buffer state
 */
 int jitter_buffer_get_pointer_timestamp(JitterBuffer *jitter);
 
 /** Advance by one tick
- * 
+ *
  * @param jitter Jitter buffer state
 */
 void jitter_buffer_tick(JitterBuffer *jitter);
@@ -178,7 +178,7 @@ void jitter_buffer_tick(JitterBuffer *jitter);
 void jitter_buffer_remaining_span(JitterBuffer *jitter, spx_uint32_t rem);
 
 /** Used like the ioctl function to control the jitter buffer parameters
- * 
+ *
  * @param jitter Jitter buffer state
  * @param request ioctl-type request (one of the JITTER_BUFFER_* macros)
  * @param ptr Data exchanged to-from function
