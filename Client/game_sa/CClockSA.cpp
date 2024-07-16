@@ -31,7 +31,6 @@ void CClockSA::Get(BYTE* bHour, BYTE* bMinute)
     *bHour = *(BYTE*)VAR_TimeHours;
 }
 
-
 bool CClockSA::SetTimerCycle(bool value) noexcept
 {
     if (value)
