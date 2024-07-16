@@ -104,6 +104,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"setTimeFrozen", ArgumentParser<SetTimeFrozen>},
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -126,13 +127,15 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"resetMoonSize", ResetMoonSize},
                                                                              {"resetBlurLevel", ResetBlurLevel},
                                                                              {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
+                                                                             {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
 
                                                                              // World check funcs
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
-                                                                             {"isGarageOpen", IsGarageOpen}};
+                                                                             {"isGarageOpen", IsGarageOpen},
+                                                                             {"isTimeFrozen", ArgumentParser<IsTimeFrozen>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -2129,33 +2132,14 @@ std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::G
             return g_pGame->GetWeather()->GetSandstorm();
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->GetRainbow();
-        case eWorldProperty::TIME_CYCLE:
-            return g_pGame->GetClock()->GetTimerCycleEnabled();
     }
     return false;
 }
 
-bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, std::variant<bool, float> argVariant, std::optional<float> arg2, std::optional<float> arg3)
+bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3)
 {
-    float arg1;
-    bool  argBool;
-
-    if (std::holds_alternative<float>(argVariant))
-    {
-        arg1 = std::get<float>(argVariant);
-    }
-    else if (std::holds_alternative<bool>(argVariant))
-    {
-        argBool = std::get<bool>(argVariant);
-    } 
-    else
-    {
-        return false; //in case the type is invalid 
-    }
-
     if (arg2.has_value() && arg3.has_value())
     {
-      
         switch (property)
         {
             case eWorldProperty::AMBIENT_COLOR:
@@ -2203,8 +2187,6 @@ bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, std::variant<bool,
             return g_pGame->GetWeather()->SetSandstorm(arg1);
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->SetRainbow(arg1);
-        case  eWorldProperty::TIME_CYCLE:
-            return g_pGame->GetClock()->SetTimerCycle(argBool);
     }
     return false;
 }
@@ -2253,8 +2235,21 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
             return g_pGame->GetWeather()->ResetSandstorm();
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->ResetRainbow();
-        case eWorldProperty::TIME_CYCLE:
-            return g_pGame->GetClock()->ResetTimerCycle();
     }
     return false;
+}
+
+bool CLuaWorldDefs::SetTimeFrozen(bool value) noexcept
+{
+    return g_pGame->GetClock()->SetTimerCycle(value);
+}
+
+bool CLuaWorldDefs::IsTimeFrozen() noexcept
+{
+    return g_pGame->GetClock()->GetTimerCycleEnabled();
+}
+
+bool CLuaWorldDefs::ResetTimeFrozen() noexcept
+{
+    return g_pGame->GetClock()->ResetTimerCycle();
 }

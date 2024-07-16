@@ -1643,5 +1643,4 @@ enum eWorldProperty
     WEATHER_WATER_FOG,
     WEATHER_SANDSTORM,
     WEATHER_RAINBOW,
-    TIME_CYCLE,
 };
