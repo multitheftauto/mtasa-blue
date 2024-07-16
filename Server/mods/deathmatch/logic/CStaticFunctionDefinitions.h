@@ -368,7 +368,7 @@ public:
     static bool RemoveVehicleSirens(CVehicle* pVehicle);
 
     // Marker create/destroy functions
-    static CMarker* CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo);
+    static CMarker* CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo, bool ignoreAlphaLimits);
 
     // Marker get functions
     static bool GetMarkerCount(unsigned int& uiCount);
@@ -384,6 +384,8 @@ public:
     static bool SetMarkerColor(CElement* pElement, const SColor color);
     static bool SetMarkerTarget(CElement* pElement, const CVector* pTarget);
     static bool SetMarkerIcon(CElement* pElement, const char* szIcon);
+
+    static bool SetMarkerTargetArrowProperties(CElement* Element, const SColor color, float size);
 
     // Blip create/destroy functions
     static CBlip* CreateBlip(CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color, short sOrdering,
