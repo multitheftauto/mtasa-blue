@@ -900,26 +900,13 @@ int CLuaResourceDefs::getResourceLoadTime(lua_State* luaVM)
 
 std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    if (resourceElement && resourceElement.has_value())
-    {
-        if (!(*resourceElement)->IsActive())
-            throw std::invalid_argument("The resource isn't active");
-
+    if (resourceElement.has_value())
         return (*resourceElement)->GetName();
-    }
 
-    CLuaMain* localVM = m_pLuaManager->GetVirtualMachine(luaVM);
-
-    if (!localVM)
-        throw std::invalid_argument("Couldn't find the virtual machine");
-
-    CResource* localResource = localVM->GetResource();
+    CResource* localResource = &lua_getownerresource(luaVM);
 
     if (!localResource)
         throw std::invalid_argument("Couldn't find the resource");
-
-    if (!localResource->IsActive())
-        throw std::invalid_argument("The resource isn't active");
 
     return localResource->GetName();
 }

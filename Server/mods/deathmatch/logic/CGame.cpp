@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CGame.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CGame.cpp
  *  PURPOSE:     Server game class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -248,6 +248,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::FIREBALLDESTRUCT] = true;
     m_WorldSpecialProps[WorldSpecialProperty::EXTENDEDWATERCANNONS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::ROADSIGNSTEXT] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::TUNNELWEATHERBLEND] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -1569,7 +1570,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerQuit", "reason", NULL, false);
     m_Events.AddEvent("onPlayerSpawn", "spawnpoint, team", NULL, false);
     m_Events.AddEvent("onPlayerTarget", "target", NULL, false);
-    m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart", NULL, false);
+    m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", NULL, false);
     m_Events.AddEvent("onPlayerMarkerHit", "marker, matchingDimension", NULL, false);
     m_Events.AddEvent("onPlayerMarkerLeave", "marker, matchingDimension", NULL, false);
@@ -1601,7 +1602,7 @@ void CGame::AddBuiltInEvents()
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
     m_Events.AddEvent("onPedVehicleExit", "vehicle, reason, jacker", NULL, false);
-    m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", NULL, false);
+    m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
     m_Events.AddEvent("onPedDamage", "loss", NULL, false);
 
@@ -2044,6 +2045,8 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
         else
             Arguments.PushBoolean(false);
         Arguments.PushBoolean(false);
+        Arguments.PushNumber(Packet.m_AnimGroup);
+        Arguments.PushNumber(Packet.m_AnimID);
         pPed->CallEvent("onPedWasted", Arguments);
 
         // Reset the weapons list, because a ped loses his weapons on death
@@ -2104,6 +2107,8 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         else
             Arguments.PushBoolean(false);
         Arguments.PushBoolean(false);
+        Arguments.PushNumber(Packet.m_AnimGroup);
+        Arguments.PushNumber(Packet.m_AnimID);
         pPlayer->CallEvent("onPlayerWasted", Arguments);
 
         // Reset the weapons list, because a player loses his weapons on death

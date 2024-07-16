@@ -728,10 +728,25 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                             position.data.vecPosition = pMarker->GetTarget();
                             BitStream.Write(&position);
+
+                            if (markerType.data.ucType == CMarker::TYPE_CHECKPOINT && BitStream.Can(eBitStreamVersion::SetMarkerTargetArrowProperties))
+                            {
+                                SColor color = pMarker->GetTargetArrowColor();
+
+                                BitStream.Write(color.R);
+                                BitStream.Write(color.G);
+                                BitStream.Write(color.B);
+                                BitStream.Write(color.A);
+                                BitStream.Write(pMarker->GetTargetArrowSize());
+                            }
                         }
                         else
                             BitStream.WriteBit(false);
                     }
+
+                    // Alpha limit
+                    if (BitStream.Can(eBitStreamVersion::Marker_IgnoreAlphaLimits))
+                        BitStream.WriteBit(pMarker->AreAlphaLimitsIgnored());
 
                     break;
                 }
