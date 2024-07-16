@@ -19,7 +19,9 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Vehicle create/destroy functions
-    LUA_DECLARE(CreateVehicle);
+    static std::variant<bool, CVehicle*> CreateVehicle(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<CVector> rot,
+                                                       std::optional<std::string> plate, std::optional<bool> direction, std::optional<std::uint8_t> variant,
+                                                       std::optional<std::uint8_t> variant2, std::optional<bool> synced) noexcept;
 
     // Vehicle get functions
     LUA_DECLARE(GetVehicleType);

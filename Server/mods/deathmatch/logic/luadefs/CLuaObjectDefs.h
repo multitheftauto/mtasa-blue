@@ -19,7 +19,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Object create/destroy functions
-    LUA_DECLARE(CreateObject);
+    static std::variant<bool, CObject*> CreateObject(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<CVector> rot, std::optional<bool> lod);
 
     // Object get functions
     LUA_DECLARE(GetObjectName);

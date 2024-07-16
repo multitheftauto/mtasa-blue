@@ -21,12 +21,14 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Shape create funcs
-    LUA_DECLARE(CreateColCircle);
-    LUA_DECLARE(CreateColCuboid);
-    LUA_DECLARE(CreateColSphere);
-    LUA_DECLARE(CreateColRectangle);
-    LUA_DECLARE(CreateColPolygon);
-    LUA_DECLARE(CreateColTube);
+    static std::variant<bool, CColCircle*>    CreateColCircle(lua_State* luaVM, CVector2D pos, float radius) noexcept;
+    static std::variant<bool, CColCuboid*>    CreateColCuboid(lua_State* luaVM, CVector pos, CVector size) noexcept;
+    static std::variant<bool, CColShape*>     CreateColSphere(lua_State* luaVM, CVector pos, float radius) noexcept;
+    static std::variant<bool, CColRectangle*> CreateColRectangle(lua_State* luaVM, CVector2D pos, CVector2D size) noexcept;
+    //static std::variant<bool, CColPolygon*>   CreateColPolygon(lua_State* luaVM, CVector2D pos1, CVector2D pos2, CVector2D pos3,
+    //                                                           std::optional<CLuaArguments> dims) noexcept;
+    static int CreateColPolygon(lua_State* luaVM);
+    static std::variant<bool, CColTube*>      CreateColTube(lua_State* luaVM, CVector pos, float height, float radius) noexcept;
 
     LUA_DECLARE(GetColShapeRadius);
     LUA_DECLARE(SetColShapeRadius);

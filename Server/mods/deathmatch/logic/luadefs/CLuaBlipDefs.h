@@ -19,8 +19,13 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Blip create/destroy functions
-    LUA_DECLARE(CreateBlip);
-    LUA_DECLARE(CreateBlipAttachedTo);
+    static std::variant<bool, CBlip*> CreateBlip(lua_State* luaVM, CVector pos, std::optional<std::uint8_t> icon, std::optional<int> size,
+                                                 std::optional<SColor> color, std::optional<int> ordering, std::optional<int> visibleDistance,
+                                                 std::optional<CElement*> visibleTo) noexcept;
+
+    static std::variant<bool, CBlip*> CreateBlipAttachedTo(lua_State* luaVM, CElement* element, std::optional<std::uint8_t> icon, std::optional<int> size,
+                                                 std::optional<SColor> color, std::optional<int> ordering, std::optional<int> visibleDistance,
+                                                 std::optional<CElement*> visibleTo) noexcept;
 
     // Blip get functions
     LUA_DECLARE(GetBlipIcon);

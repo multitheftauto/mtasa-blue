@@ -27,7 +27,8 @@ public:
     LUA_DECLARE(TakeAllWeapons);
 
     // Ped get functions
-    LUA_DECLARE(CreatePed);
+    static std::variant<bool, CPed*> CreatePed(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<float> rot,
+                                               std::optional<bool> synced) noexcept;
     LUA_DECLARE(GetPedArmor);
     LUA_DECLARE(GetPedRotation);
     LUA_DECLARE(IsPedChoking);

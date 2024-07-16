@@ -20,7 +20,7 @@ void CLuaElementDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Create/destroy
-        {"createElement", createElement},
+        {"createElement", ArgumentParser<createElement>},
         {"destroyElement", destroyElement},
         {"cloneElement", cloneElement},
 
@@ -221,117 +221,59 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Element");
 }
 
-int CLuaElementDefs::createElement(lua_State* luaVM)
+CElement* CLuaElementDefs::createElement(lua_State* luaVM, std::string elementType, std::optional<std::string> elementID)
 {
-    //  element createElement ( string elementType, [ string elementID ] )
-    SString strTypeName;
-    SString strId;
+    CResource* resource = &lua_getownerresource(luaVM);
+    bool       wasDisallowed;
+    CDummy*    element = CStaticFunctionDefinitions::CreateElement(resource, elementType.c_str(),
+        elementID.value_or("").c_str(), &wasDisallowed);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strTypeName);
-    argStream.ReadString(strId, "");
-
-    if (!argStream.HasErrors())
+    if (!element)
     {
-        // Get the virtual machine
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
+        if (wasDisallowed)
         {
-            // Get the resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Try to create
-                CDummy* pDummy = CStaticFunctionDefinitions::CreateElement(pResource, strTypeName, strId);
-                if (pDummy)
-                {
-                    // Get the group
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pDummy);
-                    }
-                    lua_pushelement(luaVM, pDummy);
-                    return 1;
-                }
-                argStream.SetCustomError(SString("element type '%s' cannot be used", *strTypeName));
-            }
+            SString err("element type '%s' cannot be used", elementType.c_str());
+            // warning instead of error
+            throw LuaFunctionError(err.c_str());
         }
+        return nullptr;
     }
 
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    // Get the group
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(element);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return element;
 }
 
-int CLuaElementDefs::destroyElement(lua_State* luaVM)
+bool CLuaElementDefs::destroyElement(CElement* element) noexcept
 {
-    //  bool destroyElement ( element elementToDestroy )
-    CElement* pElement;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::DestroyElement(pElement))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    // bool destroyElement ( element elementToDestroy )
+    return CStaticFunctionDefinitions::DestroyElement(element);
 }
 
-int CLuaElementDefs::cloneElement(lua_State* luaVM)
+std::variant<bool, CElement*> CLuaElementDefs::cloneElement(lua_State* luaVM, CElement* element, std::optional<CVector> pos,
+                                                          std::optional<bool> cloneChildren) noexcept
 {
-    //  element cloneElement ( element theElement, [ float xPos = 0, float yPos = 0, float zPos = 0, bool cloneChildren = false ] )
-    CElement* pElement;
-    CVector   vecPosition;
-    bool      bCloneChildren = false;
+    if (!pos.has_value())
+        pos = element->GetPosition();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    if (!argStream.HasErrors())
-    {
-        argStream.ReadVector3D(vecPosition, pElement->GetPosition());
-        argStream.ReadBool(bCloneChildren, false);
-    }
+    if (!cloneChildren.has_value())
+        cloneChildren = false;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CElement* pNewElement = CStaticFunctionDefinitions::CloneElement(pResource, pElement, vecPosition, bCloneChildren);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-                if (pNewElement)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pNewElement);
-                    }
-                    lua_pushelement(luaVM, pNewElement);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CElement* newElement = CStaticFunctionDefinitions::CloneElement(resource, element, pos.value(), cloneChildren.value());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (!newElement)
+        return false;
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(newElement);
+
+    return newElement;
 }
 
 int CLuaElementDefs::isElement(lua_State* luaVM)

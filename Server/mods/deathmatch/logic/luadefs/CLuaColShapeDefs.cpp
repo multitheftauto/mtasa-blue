@@ -21,13 +21,14 @@
 
 void CLuaColShapeDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createColCircle", CreateColCircle},
-        {"createColCuboid", CreateColCuboid},
-        {"createColSphere", CreateColSphere},
-        {"createColRectangle", CreateColRectangle},
-        {"createColPolygon", CreateColPolygon},
-        {"createColTube", CreateColTube},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"createColCircle", ArgumentParser<CreateColCircle>},
+        {"createColCuboid", ArgumentParser<CreateColCuboid>},
+        {"createColSphere", ArgumentParser<CreateColSphere>},
+        {"createColRectangle", ArgumentParser<CreateColRectangle>},
+        {"createColPolygon", ArgumentParser<CreateColPolygon>},
+        {"createColTube", ArgumentParser<CreateColTube>},
 
         {"getColShapeRadius", GetColShapeRadius},
         {"setColShapeRadius", SetColShapeRadius},
@@ -112,265 +113,154 @@ int CLuaColShapeDefs::GetColShapeType(lua_State* luaVM)
     return 1;
 }
 
-int CLuaColShapeDefs::CreateColCircle(lua_State* luaVM)
+std::variant<bool, CColCircle*> CLuaColShapeDefs::CreateColCircle(lua_State* luaVM, CVector2D pos, float radius) noexcept
 {
-    CVector2D vecPosition;
-    float     fRadius;
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector2D(vecPosition);
-    argStream.ReadNumber(fRadius);
+    CColCircle* shape = CStaticFunctionDefinitions::CreateColCircle(resource, pos, radius);
+    if (!shape)
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        if (fRadius < 0.0f)
-            fRadius = 0.1f;
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(shape);
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColCircle* pShape = CStaticFunctionDefinitions::CreateColCircle(pResource, vecPosition, fRadius);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return shape;
 }
 
-int CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM)
+std::variant<bool, CColCuboid*> CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM, CVector pos, CVector size) noexcept
 {
-    CVector vecPosition;
-    CVector vecSize;
+    if (size.fX < 0.0f)
+        size.fX = 0.1f;
+    if (size.fY < 0.0f)
+        size.fY = 0.1f;
+    if (size.fZ < 0.0f)
+        size.fZ = 0.1f;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecSize);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        if (vecSize.fX < 0.0f)
-            vecSize.fX = 0.1f;
-        if (vecSize.fY < 0.0f)
-            vecSize.fY = 0.1f;
-        if (vecSize.fZ < 0.0f)
-            vecSize.fZ = 0.1f;
+    CColCuboid* shape = CStaticFunctionDefinitions::CreateColCuboid(resource, pos, size);
+    if (!shape)
+        return false;
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColCuboid* pShape = CStaticFunctionDefinitions::CreateColCuboid(pResource, vecPosition, vecSize);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(shape);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return shape;
 }
 
-int CLuaColShapeDefs::CreateColSphere(lua_State* luaVM)
+std::variant<bool, CColCuboid*> CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM, CVector pos, CVector size) noexcept
 {
-    CVector vecPosition;
-    float   fRadius;
+    if (size.fX < 0.0f)
+        size.fX = 0.1f;
+    if (size.fY < 0.0f)
+        size.fY = 0.1f;
+    if (size.fZ < 0.0f)
+        size.fZ = 0.1f;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fRadius);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        if (fRadius < 0.0f)
-            fRadius = 0.1f;
+    // Create it and return it
+    CColCuboid* shape = CStaticFunctionDefinitions::CreateColCuboid(resource, pos, size);
+    if (!shape)
+        return false;
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColSphere* pShape = CStaticFunctionDefinitions::CreateColSphere(pResource, vecPosition, fRadius);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(shape);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return shape;
 }
 
-int CLuaColShapeDefs::CreateColRectangle(lua_State* luaVM)
+std::variant<bool, CColShape*> CLuaColShapeDefs::CreateColSphere(lua_State* luaVM, CVector pos, float radius) noexcept
 {
-    CVector2D vecPosition;
-    CVector2D vecSize;
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector2D(vecPosition);
-    argStream.ReadVector2D(vecSize);
+    // Create it and return it
+    CColSphere* shape = CStaticFunctionDefinitions::CreateColSphere(resource, pos, radius);
+    if (!shape)
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        if (vecSize.fX < 0.0f)
-            vecSize.fX = 0.1f;
-        if (vecSize.fY < 0.0f)
-            vecSize.fY = 0.1f;
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(shape);
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColRectangle* pShape = CStaticFunctionDefinitions::CreateColRectangle(pResource, vecPosition, vecSize);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return shape;
 }
 
+std::variant<bool, CColRectangle*> CLuaColShapeDefs::CreateColRectangle(lua_State* luaVM, CVector2D pos, CVector2D size) noexcept
+{
+    if (size.fX < 0.0f)
+        size.fX = 0.1f;
+    if (size.fY < 0.0f)
+        size.fY = 0.1f;
+
+    CResource* resource = &lua_getownerresource(luaVM);
+
+    // Create it and return it
+    CColRectangle* shape = CStaticFunctionDefinitions::CreateColRectangle(resource, pos, size);
+    if (!shape)
+        return false;
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(shape);
+
+    return shape;
+}
+
+//std::variant<bool, CColPolygon*> CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM, CVector2D pos1, CVector2D pos2, CVector2D pos3,
+//                                                                    std::optional<CLuaArguments> dims) noexcept
 int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
 {
-    //  colshape createColPolygon ( float fX, float fY, float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, ... )
-    std::vector<CVector2D> vecPointList;
+    // colshape createColPolygon ( float fX, float fY, float fX1, float fY1, float fX2, float fY2, float fX3, float fY3, ... )
 
-    CScriptArgReader argStream(luaVM);
-    for (uint i = 0; i < 4 || argStream.NextIsVector2D(); i++)
-    {
-        CVector2D vecPoint;
-        argStream.ReadVector2D(vecPoint);
-        vecPointList.push_back(vecPoint);
-    }
+    std::vector<CVector2D> pointList;
+    CScriptArgReader       argStream(luaVM);
 
-    if (!argStream.HasErrors())
+    if (argStream.HasErrors())
     {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CColPolygon* pShape = CStaticFunctionDefinitions::CreateColPolygon(pResource, vecPointList);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
 
-    lua_pushboolean(luaVM, false);
+    CResource*   resource = &lua_getownerresource(luaVM);
+    CColPolygon* shape = CStaticFunctionDefinitions::CreateColPolygon(resource, pointList);
+    if (!shape)
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(shape);
+
+    lua_pushelement(luaVM, shape);
     return 1;
 }
 
-int CLuaColShapeDefs::CreateColTube(lua_State* luaVM)
+std::variant<bool, CColTube*> CLuaColShapeDefs::CreateColTube(lua_State* luaVM, CVector pos, float height, float radius) noexcept
 {
-    CVector vecPosition;
-    float   fHeight, fRadius;
+    if (radius < 0.0f)
+        radius = 0.1f;
+    if (height < 0.0f)
+        height = 0.1f;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fRadius);
-    argStream.ReadNumber(fHeight);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        if (fRadius < 0.0f)
-            fRadius = 0.1f;
-        if (fHeight < 0.0f)
-            fHeight = 0.1f;
+    // Create it and return it
+    CColTube* shape = CStaticFunctionDefinitions::CreateColTube(resource, pos, radius, height);
+    if (!shape)
+        return false;
 
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it and return it
-                CColTube* pShape = CStaticFunctionDefinitions::CreateColTube(pResource, vecPosition, fRadius, fHeight);
-                if (pShape)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pShape);
-                    }
-                    lua_pushelement(luaVM, pShape);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(shape);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return shape;
 }
 
 int CLuaColShapeDefs::IsInsideColShape(lua_State* luaVM)

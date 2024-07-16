@@ -53,7 +53,7 @@ public:
     LUA_DECLARE(SetWeaponProperty);
     LUA_DECLARE(GetSlotFromWeapon);
 
-    LUA_DECLARE(CreateWeapon);
+    static std::variant<bool, CCustomWeapon*> CreateWeapon(lua_State* luaVM, eWeaponType type, CVector pos) noexcept;
     LUA_DECLARE(GetWeaponNameFromID);
     LUA_DECLARE(GetWeaponIDFromName);
     LUA_DECLARE(FireWeapon);

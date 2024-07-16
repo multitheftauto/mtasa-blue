@@ -16,9 +16,10 @@
 
 void CLuaPickupDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Create/destroy
-        {"createPickup", createPickup},
+        {"createPickup", ArgumentParser<createPickup>},
 
         // Get
         {"getPickupType", getPickupType},
@@ -64,50 +65,27 @@ void CLuaPickupDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Pickup", "Element");
 }
 
-int CLuaPickupDefs::createPickup(lua_State* luaVM)
+std::variant<bool, CPickup*> CLuaPickupDefs::createPickup(lua_State* luaVM, CVector pos, std::uint8_t type, double value, std::optional<std::uint32_t> interval,
+                                                          std::optional<double> ammo) noexcept
 {
-    //  pickup createPickup ( float x, float y, float z, int theType, int amount/weapon/model, [ int respawnTime = 30000, int ammo = 50 ] )
-    CVector       vecPosition;
-    unsigned char ucType;
-    double        dValue;
-    unsigned long ulRespawnInterval;
-    double        dAmmo;
+    if (!interval.has_value())
+        interval = 30000;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(ucType);
-    argStream.ReadNumber(dValue);
-    argStream.ReadNumber(ulRespawnInterval, 30000);
-    argStream.ReadNumber(dAmmo, 50.0);
+    if (!ammo.has_value())
+        ammo = 50.0;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CPickup* pPickup = CStaticFunctionDefinitions::CreatePickup(pResource, vecPosition, ucType, dValue, ulRespawnInterval, dAmmo);
-                if (pPickup)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pPickup);
-                    }
-                    // Return the handle
-                    lua_pushelement(luaVM, pPickup);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CPickup* pickup = CStaticFunctionDefinitions::CreatePickup(resource, pos, type, value, interval.value(), ammo.value());
+    if (!pickup)
+        return false;
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(pickup);
+
+    // Return the handle
+    return pickup;
 }
 
 int CLuaPickupDefs::getPickupType(lua_State* luaVM)

@@ -16,9 +16,10 @@
 
 void CLuaObjectDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Object create/destroy funcs
-        {"createObject", CreateObject},
+        {"createObject", ArgumentParser<CreateObject>},
 
         // Object get funcs
         {"getObjectRotation", GetObjectRotation},
@@ -62,53 +63,32 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Object", "Element");
 }
 
-int CLuaObjectDefs::CreateObject(lua_State* luaVM)
+std::variant<bool, CObject*> CLuaObjectDefs::CreateObject(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<CVector> rot,
+                                                          std::optional<bool> lod)
 {
-    //  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
-    ushort  usModelID;
-    CVector vecPosition;
-    CVector vecRotation;
-    bool    bIsLowLod;
+    if (!rot.has_value())
+        rot = CVector();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModelID);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecRotation, CVector());
-    argStream.ReadBool(bIsLowLod, false);
+    if (!lod.has_value())
+        lod = false;
 
-    if (!argStream.HasErrors())
+    if (!CObjectManager::IsValidModel(model))
     {
-        if (CObjectManager::IsValidModel(usModelID))
-        {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                CResource* pResource = pLuaMain->GetResource();
-                if (pResource)
-                {
-                    CObject* pObject = CStaticFunctionDefinitions::CreateObject(pResource, usModelID, vecPosition, vecRotation, bIsLowLod);
-                    if (pObject)
-                    {
-                        CElementGroup* pGroup = pResource->GetElementGroup();
-                        if (pGroup)
-                        {
-                            pGroup->Add(pObject);
-                        }
-
-                        lua_pushelement(luaVM, pObject);
-                        return 1;
-                    }
-                }
-            }
-        }
-        else
-            argStream.SetCustomError("Invalid model id");
+        // warning instead of error
+        throw LuaFunctionError("Invalid model id");
     }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CResource* resource = &lua_getownerresource(luaVM);
+
+    CObject* object = CStaticFunctionDefinitions::CreateObject(resource, model, pos, rot.value(), lod.value());
+    if (!object)
+        return false;
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(object);
+
+    return object;
 }
 
 int CLuaObjectDefs::GetObjectRotation(lua_State* luaVM)

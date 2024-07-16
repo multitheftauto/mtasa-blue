@@ -259,7 +259,7 @@ bool CStaticFunctionDefinitions::WasEventCancelled()
     return m_pEvents->WasEventCancelled();
 }
 
-CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const char* szTypeName, const char* szID)
+CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const char* szTypeName, const char* szID, bool* wasDissallowed)
 {
     assert(szTypeName);
     assert(szID);
@@ -270,42 +270,60 @@ CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const ch
     // Allow use of some internal types for backwards compatibility
     if (bIsInternalType)
     {
-        bool               bOldDissallowed = false;
-        static const char* szOldDissallowedTypes[] = {"dummy", "player", "vehicle", "object", "marker", "blip", "pickup", "radararea", "console"};
-        for (uint i = 0; i < NUMELMS(szOldDissallowedTypes); i++)
-            if (strcmp(szTypeName, szOldDissallowedTypes[i]) == 0)
-                bOldDissallowed = true;
+        static bool                  isDissallowedType = false;
+        static constexpr const char* szOldDissallowedTypes[] = {
+            "dummy", "player", "vehicle", "object", "marker", "blip", "pickup", "radararea", "console"
+        };
 
-        if (!bOldDissallowed)
+        for (auto i = 0; i < NUMELMS(szOldDissallowedTypes); i++)
+        {
+            if (!strcmp(szTypeName, szOldDissallowedTypes[i]))
+            {
+                isDissallowedType = true;
+                break;
+            }
+        }
+
+        if (!isDissallowedType)
         {
             // Maybe issue a warning about this one day
             bIsInternalType = false;
         }
+
+        if (wasDissallowed)
+            *wasDissallowed = isDissallowedType;
     }
 
     // Long enough typename and not an internal one?
-    if (strlen(szTypeName) > 0 && !bIsInternalType)
-    {
-        // Create the element.
-        CDummy* pDummy = new CDummy(g_pGame->GetGroups(), pResource->GetDynamicElementRoot());
+    if (strlen(szTypeName) <= 0 || bIsInternalType)
+        return nullptr;
 
-        // Set the ID
-        pDummy->SetName(szID);
+    // Create the element.
+    CDummy* pDummy = new CDummy(g_pGame->GetGroups(), pResource->GetDynamicElementRoot());
 
-        // Set the type name
-        pDummy->SetTypeName(szTypeName);
+    // Set the ID
+    pDummy->SetName(szID);
 
-        if (pResource->IsClientSynced())
-        {
-            CEntityAddPacket Packet;
-            Packet.Add(pDummy);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-        }
+    // Set the type name
+    pDummy->SetTypeName(szTypeName);
 
-        return pDummy;
+    CLuaArguments args;
+    args.PushElement(pDummy);
+    args.PushString(szTypeName);
+
+    if (!pDummy->CallEvent("onElementCreate", args)) {
+        delete pDummy;
+        return nullptr;
     }
 
-    return NULL;
+    if (pResource->IsClientSynced())
+    {
+        CEntityAddPacket Packet;
+        Packet.Add(pDummy);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    }
+
+    return pDummy;
 }
 
 bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
@@ -379,15 +397,15 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
     {
         // Copy the current children list (prevents a continuous loop)
         std::list<CElement*> copyList;
-        for (CChildListType ::const_iterator iter = pElement->IterBegin(); iter != pElement->IterEnd(); iter++)
+        for (auto iter = pElement->IterBegin(); iter != pElement->IterEnd(); iter++)
         {
             copyList.push_back(*iter);
         }
 
         // Loop through the children list doing this (cloning elements)
-        for (std::list<CElement*>::iterator iter = copyList.begin(); iter != copyList.end(); iter++)
+        for (const auto& elem : copyList)
         {
-            CloneElement(pResource, *iter, vecPosition, true);
+            CloneElement(pResource, elem, vecPosition, true);
         }
     }
 
@@ -406,26 +424,36 @@ CElement* CStaticFunctionDefinitions::CloneElement(CResource* pResource, CElemen
     bool      bAddEntity = true;
     CElement* pNewElement = pElement->Clone(&bAddEntity, pResource);
 
-    if (pNewElement)
+    if (!pNewElement)
+        return nullptr;
+
+    CVector vecNewPosition = vecPosition;
+    // If we're cloning children, use the given position as an offset
+    if (bCloneChildren)
+        vecNewPosition += pElement->GetPosition();
+
+    pNewElement->SetPosition(vecNewPosition);
+    pNewElement->GetCustomDataManager().Copy(&pElement->GetCustomDataManager());
+    pNewElement->SetInterior(pElement->GetInterior());
+    pNewElement->SetDimension(pElement->GetDimension());
+
+    CLuaArguments args;
+    args.PushElement(pNewElement);
+    args.PushString(pNewElement->GetTypeName());
+
+    if (!pNewElement->CallEvent("onElementCreate", args))
     {
-        CVector vecNewPosition = vecPosition;
-        // If we're cloning children, use the given position as an offset
-        if (bCloneChildren)
-            vecNewPosition += pElement->GetPosition();
+        delete pNewElement;
+        return nullptr;
+    }
 
-        pNewElement->SetPosition(vecNewPosition);
-        pNewElement->GetCustomDataManager().Copy(&pElement->GetCustomDataManager());
-        pNewElement->SetInterior(pElement->GetInterior());
-        pNewElement->SetDimension(pElement->GetDimension());
-
-        if (bAddEntity)
+    if (bAddEntity)
+    {
+        if (pResource->IsClientSynced())
         {
-            if (pResource->IsClientSynced())
-            {
-                CEntityAddPacket Packet;
-                Packet.Add(pNewElement);
-                m_pPlayerManager->BroadcastOnlyJoined(Packet);
-            }
+            CEntityAddPacket Packet;
+            Packet.Add(pNewElement);
+            m_pPlayerManager->BroadcastOnlyJoined(Packet);
         }
     }
 
@@ -2115,49 +2143,57 @@ bool CStaticFunctionDefinitions::DetonateSatchels(CElement* pElement)
 
 CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short usModel, const CVector& vecPosition, float fRotation, bool bSynced)
 {
-    if (CPlayerManager::IsValidPlayerModel(usModel))
+    if (!CPlayerManager::IsValidPlayerModel(usModel))
+        return nullptr;
+
+    CPed* pPed = m_pPedManager->Create(usModel, pResource->GetDynamicElementRoot());
+    if (!pPed)
+        return nullptr;
+
+    CLuaArguments args;
+    args.PushElement(pPed);
+    args.PushString(pPed->GetTypeName());
+
+    if (!pPed->CallEvent("onElementCreate", args))
     {
-        CPed* pPed = m_pPedManager->Create(usModel, pResource->GetDynamicElementRoot());
-        if (pPed)
-        {
-            // Convert the rotation to radians
-            float fRotationRadians = ConvertDegreesToRadians(fRotation);
-            // Clamp it to -PI .. PI
-            if (fRotationRadians < -PI)
-            {
-                do
-                {
-                    fRotationRadians += PI * 2.0f;
-                } while (fRotationRadians < -PI);
-            }
-            else if (fRotationRadians > PI)
-            {
-                do
-                {
-                    fRotationRadians -= PI * 2.0f;
-                } while (fRotationRadians > PI);
-            }
-
-            pPed->SetPosition(vecPosition);
-            pPed->SetIsDead(false);
-            pPed->SetSpawned(true);
-            pPed->SetHealth(100.0f);
-            pPed->SetSyncable(bSynced);
-
-            pPed->SetRotation(fRotationRadians);
-
-            // Only sync if the resource has started on client
-            if (pResource->IsClientSynced())
-            {
-                CEntityAddPacket Packet;
-                Packet.Add(pPed);
-                m_pPlayerManager->BroadcastOnlyJoined(Packet);
-            }
-            return pPed;
-        }
+        delete pPed;
+        return nullptr;
     }
 
-    return NULL;
+    // Convert the rotation to radians
+    float fRotationRadians = ConvertDegreesToRadians(fRotation);
+    // Clamp it to -PI .. PI
+    if (fRotationRadians < -PI)
+    {
+        do
+        {
+            fRotationRadians += PI * 2.0f;
+        } while (fRotationRadians < -PI);
+    }
+    else if (fRotationRadians > PI)
+    {
+        do
+        {
+            fRotationRadians -= PI * 2.0f;
+        } while (fRotationRadians > PI);
+    }
+
+    pPed->SetPosition(vecPosition);
+    pPed->SetIsDead(false);
+    pPed->SetSpawned(true);
+    pPed->SetHealth(100.0f);
+    pPed->SetSyncable(bSynced);
+
+    pPed->SetRotation(fRotationRadians);
+
+    // Only sync if the resource has started on client
+    if (pResource->IsClientSynced())
+    {
+        CEntityAddPacket Packet;
+        Packet.Add(pPed);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    }
+    return pPed;
 }
 
 unsigned int CStaticFunctionDefinitions::GetPlayerCount()
@@ -4880,40 +4916,52 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
 CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
                                                     const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool bSynced)
 {
-    unsigned char ucVariation = ucVariant;
-    unsigned char ucVariation2 = ucVariant2;
+    std::uint8_t ucVariation = ucVariant;
+    std::uint8_t ucVariation2 = ucVariant2;
 
     if (ucVariant == 254 && ucVariant2 == 254)
         CVehicleManager::GetRandomVariation(usModel, ucVariation, ucVariation2);
 
-    if (CVehicleManager::IsValidModel(usModel) && (ucVariation <= 5 || ucVariation == 255) && (ucVariation2 <= 5 || ucVariation2 == 255))
+    if (!CVehicleManager::IsValidModel(usModel))
+        return nullptr;
+
+    if(ucVariation > 5 && ucVariation != 255)
+        return nullptr;
+    if (ucVariation2 > 5 && ucVariation2 != 255)
+        return nullptr;
+
+    CVehicle* const pVehicle = m_pVehicleManager->Create(pResource->GetDynamicElementRoot(), usModel, ucVariation, ucVariation2);
+
+    if (!pVehicle)
+        return nullptr;
+
+    CLuaArguments args;
+    args.PushElement(pVehicle);
+    args.PushString(pVehicle->GetTypeName());
+    if (!pVehicle->CallEvent("onElementCreate", args))
     {
-        CVehicle* const pVehicle = m_pVehicleManager->Create(pResource->GetDynamicElementRoot(), usModel, ucVariation, ucVariation2);
-
-        if (!pVehicle)
-            return nullptr;
-
-        pVehicle->SetPosition(vecPosition);
-        pVehicle->SetRotationDegrees(vecRotation);
-        pVehicle->SetRespawnPosition(vecPosition);
-        pVehicle->SetRespawnRotationDegrees(vecRotation);
-        pVehicle->SetUnoccupiedSyncable(bSynced);
-
-        if (szRegPlate && szRegPlate[0])
-            pVehicle->SetRegPlate(szRegPlate);
-
-        // Only sync if the resource has started on client
-        if (pResource->IsClientSynced())
-        {
-            CEntityAddPacket Packet;
-            Packet.Add(pVehicle);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-        }
-
-        return pVehicle;
+        delete pVehicle;
+        return nullptr;
     }
 
-    return nullptr;
+    pVehicle->SetPosition(vecPosition);
+    pVehicle->SetRotationDegrees(vecRotation);
+    pVehicle->SetRespawnPosition(vecPosition);
+    pVehicle->SetRespawnRotationDegrees(vecRotation);
+    pVehicle->SetUnoccupiedSyncable(bSynced);
+
+    if (szRegPlate && szRegPlate[0])
+        pVehicle->SetRegPlate(szRegPlate);
+
+    // Only sync if the resource has started on client
+    if (pResource->IsClientSynced())
+    {
+        CEntityAddPacket Packet;
+        Packet.Add(pVehicle);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    }
+
+    return pVehicle;
 }
 
 bool CStaticFunctionDefinitions::SetVehicleVariant(CVehicle* pVehicle, unsigned char ucVariant, unsigned char ucVariant2)
@@ -7671,36 +7719,44 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
     assert(szType);
 
     // Grab the type id
-    unsigned char ucType = CMarkerManager::StringToType(szType);
-    if (ucType != CMarker::TYPE_INVALID)
+    auto ucType = CMarkerManager::StringToType(szType);
+    if (ucType == CMarker::TYPE_INVALID)
+        return nullptr;
+
+    // Create the marker
+    // CMarker* pMarker = m_pMarkers->Create ( m_pMapManager->GetRootElement () );
+    CMarker* pMarker = m_pMarkerManager->Create(pResource->GetDynamicElementRoot());
+    if (!pMarker)
+        return nullptr;
+
+    CLuaArguments args;
+    args.PushElement(pMarker);
+    args.PushString(pMarker->GetTypeName());
+    if (!pMarker->CallEvent("onElementCreate", args))
     {
-        // Create the marker
-        // CMarker* pMarker = m_pMarkers->Create ( m_pMapManager->GetRootElement () );
-        CMarker* pMarker = m_pMarkerManager->Create(pResource->GetDynamicElementRoot());
-        if (pMarker)
-        {
-            // Set the properties
-            pMarker->SetPosition(vecPosition);
-            pMarker->SetMarkerType(ucType);
-            pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
-            pMarker->SetColor(color);
-            pMarker->SetSize(fSize);
-
-            // Make him visible to the given element
-            if (pVisibleTo)
-            {
-                pMarker->RemoveVisibleToReference(m_pMapManager->GetRootElement());
-                pMarker->AddVisibleToReference(pVisibleTo);
-            }
-
-            // Tell everyone about it
-            if (pResource->IsClientSynced())
-                pMarker->Sync(true);
-            return pMarker;
-        }
+        delete pMarker;
+        return nullptr;
     }
 
-    return NULL;
+    // Set the properties
+    pMarker->SetPosition(vecPosition);
+    pMarker->SetMarkerType(ucType);
+    pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
+    pMarker->SetColor(color);
+    pMarker->SetSize(fSize);
+
+    // Make him visible to the given element
+    if (pVisibleTo)
+    {
+        pMarker->RemoveVisibleToReference(m_pMapManager->GetRootElement());
+        pMarker->AddVisibleToReference(pVisibleTo);
+    }
+
+    // Tell everyone about it
+    if (pResource->IsClientSynced())
+        pMarker->Sync(true);
+
+    return pMarker;
 }
 
 bool CStaticFunctionDefinitions::GetMarkerCount(unsigned int& uiCount)
@@ -7877,35 +7933,43 @@ CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVecto
                                               short sOrdering, unsigned short usVisibleDistance, CElement* pVisibleTo)
 {
     // Valid icon and size?
-    if (CBlipManager::IsValidIcon(ucIcon) && ucSize <= 25)
+    if (!CBlipManager::IsValidIcon(ucIcon) || ucSize > 25)
+        return nullptr;
+
+    // Create the blip as a child of the resource's dynamic element root item
+    CBlip* pBlip = m_pBlipManager->Create(pResource->GetDynamicElementRoot());
+    if (!pBlip)
+        return nullptr;
+
+    CLuaArguments args;
+    args.PushElement(pBlip);
+    args.PushString(pBlip->GetTypeName());
+
+    if (!pBlip->CallEvent("onElementCreate", args))
     {
-        // Create the blip as a child of the resource's dynamic element root item
-        CBlip* pBlip = m_pBlipManager->Create(pResource->GetDynamicElementRoot());
-        if (pBlip)
-        {
-            // Set the given properties
-            pBlip->SetPosition(vecPosition);
-            pBlip->m_ucIcon = ucIcon;
-            pBlip->m_ucSize = ucSize;
-            pBlip->SetColor(color);
-            pBlip->m_sOrdering = sOrdering;
-            pBlip->m_usVisibleDistance = usVisibleDistance;
-
-            // Make him visible to the given element
-            if (pVisibleTo)
-            {
-                pBlip->RemoveVisibleToReference(m_pMapManager->GetRootElement());
-                pBlip->AddVisibleToReference(pVisibleTo);
-            }
-
-            // Tell everyone about it
-            if (pResource->IsClientSynced())
-                pBlip->Sync(true);
-            return pBlip;
-        }
+        delete pBlip;
+        return nullptr;
     }
 
-    return NULL;
+    // Set the given properties
+    pBlip->SetPosition(vecPosition);
+    pBlip->m_ucIcon = ucIcon;
+    pBlip->m_ucSize = ucSize;
+    pBlip->SetColor(color);
+    pBlip->m_sOrdering = sOrdering;
+    pBlip->m_usVisibleDistance = usVisibleDistance;
+
+    // Make him visible to the given element
+    if (pVisibleTo)
+    {
+        pBlip->RemoveVisibleToReference(m_pMapManager->GetRootElement());
+        pBlip->AddVisibleToReference(pVisibleTo);
+    }
+
+    // Tell everyone about it
+    if (pResource->IsClientSynced())
+        pBlip->Sync(true);
+    return pBlip;
 }
 
 CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource* pResource, CElement* pElement, unsigned char ucIcon, unsigned char ucSize,
@@ -7913,35 +7977,44 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource* pResource, CE
 {
     assert(pElement);
     // Valid icon and size?
-    if (CBlipManager::IsValidIcon(ucIcon) && ucSize <= 25)
+    if (!CBlipManager::IsValidIcon(ucIcon) || ucSize > 25)
+        return nullptr;
+
+    // Create the blip as a child of the resource's dynamic element root item
+    CBlip* pBlip = m_pBlipManager->Create(pResource->GetDynamicElementRoot());
+    if (!pBlip)
+        return nullptr;
+
+    CLuaArguments args;
+    args.PushElement(pBlip);
+    args.PushString(pBlip->GetTypeName());
+
+    if (!pBlip->CallEvent("onElementCreate", args))
     {
-        // Create the blip as a child of the resource's dynamic element root item
-        CBlip* pBlip = m_pBlipManager->Create(pResource->GetDynamicElementRoot());
-        if (pBlip)
-        {
-            // Set the properties
-            pBlip->m_ucIcon = ucIcon;
-            pBlip->m_ucSize = ucSize;
-            pBlip->SetColor(color);
-            pBlip->m_sOrdering = sOrdering;
-            pBlip->m_usVisibleDistance = usVisibleDistance;
-
-            // Set his visible to element
-            if (pVisibleTo)
-            {
-                pBlip->RemoveVisibleToReference(m_pMapManager->GetRootElement());
-                pBlip->AddVisibleToReference(pVisibleTo);
-            }
-            pBlip->AttachTo(pElement);
-
-            // Tell everyone about it
-            if (pResource->IsClientSynced())
-                pBlip->Sync(true);
-
-            return pBlip;
-        }
+        delete pBlip;
+        return nullptr;
     }
-    return NULL;
+
+    // Set the properties
+    pBlip->m_ucIcon = ucIcon;
+    pBlip->m_ucSize = ucSize;
+    pBlip->SetColor(color);
+    pBlip->m_sOrdering = sOrdering;
+    pBlip->m_usVisibleDistance = usVisibleDistance;
+
+    // Set his visible to element
+    if (pVisibleTo)
+    {
+        pBlip->RemoveVisibleToReference(m_pMapManager->GetRootElement());
+        pBlip->AddVisibleToReference(pVisibleTo);
+    }
+    pBlip->AttachTo(pElement);
+
+    // Tell everyone about it
+    if (pResource->IsClientSynced())
+        pBlip->Sync(true);
+
+    return pBlip;
 }
 
 bool CStaticFunctionDefinitions::GetBlipIcon(CBlip* pBlip, unsigned char& ucIcon)
@@ -8126,6 +8199,15 @@ CObject* CStaticFunctionDefinitions::CreateObject(CResource* pResource, unsigned
 
     if (!pObject)
         return nullptr;
+
+    CLuaArguments args;
+    args.PushElement(pObject);
+    args.PushString(pObject->GetTypeName());
+    if (!pObject->CallEvent("onElementCreate", args))
+    {
+        delete pObject;
+        return nullptr;
+    }
 
     // Convert the rotation from degrees to radians managed internally
     CVector vecRadians = vecRotation;
@@ -8378,6 +8460,16 @@ CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, co
     if (!pRadarArea)
         return nullptr;
 
+    CLuaArguments args;
+    args.PushElement(pRadarArea);
+    args.PushString(pRadarArea->GetTypeName());
+
+    if (!pRadarArea->CallEvent("onElementCreate", args))
+    {
+        delete pRadarArea;
+        return nullptr;
+    }
+
     // Set the properties
     CVector vecPosition = CVector(vecPosition2D.fX, vecPosition2D.fY, 0.0f);
     pRadarArea->SetPosition(vecPosition);
@@ -8492,30 +8584,29 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
                                                   unsigned long ulRespawnInterval, double dSix)
 {
     // Is the type armor or health?
-    CPickup* pPickup = NULL;
-    if (ucType == CPickup::ARMOR || ucType == CPickup::HEALTH)
-    {
-        // Is the fifth argument (health) a number between 0 and 100?
-        if (dFive >= 0 && dFive <= 100)
-        {
+    CPickup* pickup = nullptr;
+    switch (ucType) {
+        case CPickup::ARMOR:
+        case CPickup::HEALTH:
+            // Is the fifth argument (health) a number between 0 and 100?
+            if (dFive < 0 || dFive > 100)
+                break;
+
             // Create the pickup
-            // pPickup = m_pPickupManager->Create ( m_pMapManager->GetRootElement () );
-            pPickup = m_pPickupManager->Create(pResource->GetDynamicElementRoot());
-            if (pPickup)
-            {
-                // Set the health/armor
-                pPickup->SetAmount(static_cast<float>(dFive));
-            }
-        }
-    }
-    else if (ucType == CPickup::WEAPON)
-    {
-        // Get the weapon id
-        unsigned char ucWeaponID = static_cast<unsigned char>(dFive);
-        if (CPickupManager::IsValidWeaponID(ucWeaponID))
-        {
+            pickup = m_pPickupManager->Create(pResource->GetDynamicElementRoot());
+            if (!pickup)
+                break;
+
+            // Set the health/armor
+            pickup->SetAmount(static_cast<float>(dFive));
+            break;
+        case CPickup::WEAPON:
+            auto ucWeaponID = static_cast<std::uint8_t>(dFive);
+            if (!CPickupManager::IsValidWeaponID(ucWeaponID))
+                break;
+
             // Limit ammo to 9999
-            unsigned short usAmmo = static_cast<unsigned short>(dSix);
+            auto usAmmo = static_cast<std::uint16_t>(dSix);
             if (dSix > 9999)
             {
                 usAmmo = 9999;
@@ -8523,51 +8614,59 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
 
             // Create the pickup
             // pPickup = m_pPickupManager->Create ( m_pMapManager->GetRootElement () );
-            pPickup = m_pPickupManager->Create(pResource->GetDynamicElementRoot());
-            if (pPickup)
-            {
-                // Set the weapon type and ammo
-                pPickup->SetWeaponType(ucWeaponID);
-                pPickup->SetAmmo(usAmmo);
-            }
-        }
-    }
-    else if (ucType == CPickup::CUSTOM)
-    {
-        // Get the model id
-        unsigned short usModel = static_cast<unsigned short>(dFive);
-        if (CObjectManager::IsValidModel(usModel))
-        {
+            pickup = m_pPickupManager->Create(pResource->GetDynamicElementRoot());
+            if (!pickup)
+                break;
+
+            // Set the weapon type and ammo
+            pickup->SetWeaponType(ucWeaponID);
+            pickup->SetAmmo(usAmmo);
+            break;
+        case CPickup::CUSTOM:
+            // Get the model id
+            auto usModel = static_cast<std::uint16_t>(dFive);
+            if (!CObjectManager::IsValidModel(usModel))
+                break;
+
             // Create the pickup
             // pPickup = m_pPickupManager->Create ( m_pMapManager->GetRootElement () );
-            pPickup = m_pPickupManager->Create(pResource->GetDynamicElementRoot());
-            if (pPickup)
-            {
-                // Set the model id
-                pPickup->SetModel(usModel);
-            }
-        }
+            pickup = m_pPickupManager->Create(pResource->GetDynamicElementRoot());
+            if (!pickup)
+                break;
+
+            // Set the model id
+            pickup->SetModel(usModel);
     }
 
     // Got a pickup?
-    if (pPickup)
-    {
-        // Set the type and respawn intervals first!
-        // Apply the position, type too and send it
-        pPickup->SetPickupType(ucType);
-        pPickup->SetRespawnIntervals(ulRespawnInterval);
-        pPickup->SetPosition(vecPosition);
+    if (!pickup)
+        return nullptr;
 
-        if (pResource->IsClientSynced())
-        {
-            // Tell the clients
-            CEntityAddPacket Packet;
-            Packet.Add(pPickup);
-            m_pPlayerManager->BroadcastOnlyJoined(Packet);
-        }
+    CLuaArguments args;
+    args.PushElement(pickup);
+    args.PushString(pickup->GetTypeName());
+
+    if (!pickup->CallEvent("onElementCreate", args))
+    {
+        delete pickup;
+        return nullptr;
     }
 
-    return pPickup;
+    // Set the type and respawn intervals first!
+    // Apply the position, type too and send it
+    pickup->SetPickupType(ucType);
+    pickup->SetRespawnIntervals(ulRespawnInterval);
+    pickup->SetPosition(vecPosition);
+
+    if (pResource->IsClientSynced())
+    {
+        // Tell the clients
+        CEntityAddPacket Packet;
+        Packet.Add(pickup);
+        m_pPlayerManager->BroadcastOnlyJoined(Packet);
+    }
+
+    return pickup;
 }
 
 bool CStaticFunctionDefinitions::GetPickupType(CPickup* pPickup, unsigned char& ucType)
@@ -9167,6 +9266,15 @@ CTeam* CStaticFunctionDefinitions::CreateTeam(CResource* pResource, const char* 
     // Create the new team
     CTeam* const pTeam = new CTeam(m_pTeamManager, pResource->GetDynamicElementRoot(), szTeamName, ucRed, ucGreen, ucBlue);
 
+    CLuaArguments args;
+    args.PushElement(pTeam);
+    args.PushString(pTeam->GetTypeName());
+
+    if (!pTeam->CallEvent("onElementCreate", args)) {
+        delete pTeam;
+        return nullptr;
+    }
+
     // Tell everyone to add this team
     if (pResource->IsClientSynced())
     {
@@ -9328,6 +9436,16 @@ CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* p
 
     if (!pWater)
         return nullptr;
+    
+    CLuaArguments args;
+    args.PushElement(pWater);
+    args.PushString(pWater->GetTypeName());
+
+    if (!pWater->CallEvent("onElementCreate", args))
+    {
+        delete pWater;
+        return nullptr;
+    }
 
     pWater->SetVertex(0, *pV1);
     pWater->SetVertex(1, *pV2);
@@ -9470,6 +9588,16 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource* pResource, co
 {
     CColCircle* const pColShape = new CColCircle(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius);
 
+    CLuaArguments args;
+    args.PushElement(pColShape);
+    args.PushString(pColShape->GetTypeName());
+
+    if (!pColShape->CallEvent("onElementCreate", args))
+    {
+        delete pColShape;
+        return nullptr;
+    }
+
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
@@ -9488,6 +9616,16 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource* pResource, co
 {
     // CColCuboid * pColShape = new CColCuboid ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, vecSize );
     CColCuboid* pColShape = new CColCuboid(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, vecSize);
+
+    CLuaArguments args;
+    args.PushElement(pColShape);
+    args.PushString(pColShape->GetTypeName());
+
+    if (!pColShape->CallEvent("onElementCreate", args))
+    {
+        delete pColShape;
+        return nullptr;
+    }
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement();
@@ -9508,6 +9646,16 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource* pResource, co
     // CColSphere * pColShape = new CColSphere ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius );
     CColSphere* pColShape = new CColSphere(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius);
 
+    CLuaArguments args;
+    args.PushElement(pColShape);
+    args.PushString(pColShape->GetTypeName());
+
+    if (!pColShape->CallEvent("onElementCreate", args))
+    {
+        delete pColShape;
+        return nullptr;
+    }
+
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
@@ -9526,6 +9674,16 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource* pResour
 {
     // CColRectangle * pColShape = new CColRectangle ( m_pColManager, m_pMapManager->GetRootElement(), vecPosition, vecSize );
     CColRectangle* pColShape = new CColRectangle(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, vecSize);
+
+    CLuaArguments args;
+    args.PushElement(pColShape);
+    args.PushString(pColShape->GetTypeName());
+
+    if (!pColShape->CallEvent("onElementCreate", args))
+    {
+        delete pColShape;
+        return nullptr;
+    }
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement();
@@ -9548,6 +9706,16 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource* pResource, 
 
     CVector      vecPosition(vecPointList[0].fX, vecPointList[0].fY, 0);
     CColPolygon* pColShape = new CColPolygon(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition);
+
+    CLuaArguments args;
+    args.PushElement(pColShape);
+    args.PushString(pColShape->GetTypeName());
+
+    if (!pColShape->CallEvent("onElementCreate", args))
+    {
+        delete pColShape;
+        return nullptr;
+    }
 
     for (uint i = 1; i < vecPointList.size(); i++)
     {
@@ -9572,6 +9740,16 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
 {
     // CColTube * pColShape = new CColTube ( m_pColManager, m_pMapManager->GetRootElement (), vecPosition, fRadius, fHeight );
     CColTube* pColShape = new CColTube(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition, fRadius, fHeight);
+
+    CLuaArguments args;
+    args.PushElement(pColShape);
+    args.PushString(pColShape->GetTypeName());
+
+    if (!pColShape->CallEvent("onElementCreate", args))
+    {
+        delete pColShape;
+        return nullptr;
+    }
 
     // Run collision detection
     CElement* pRoot = m_pMapManager->GetRootElement();
@@ -9795,6 +9973,17 @@ bool CStaticFunctionDefinitions::GetWeaponIDFromName(const char* szName, unsigne
 CCustomWeapon* CStaticFunctionDefinitions::CreateWeapon(CResource* pResource, eWeaponType weaponType, CVector vecPosition)
 {
     CCustomWeapon* const pWeapon = new CCustomWeapon(pResource->GetDynamicElementRoot(), m_pObjectManager, m_pCustomWeaponManager, weaponType);
+
+    CLuaArguments args;
+    args.PushElement(pWeapon);
+    args.PushString(pWeapon->GetTypeName());
+
+    if (!pWeapon->CallEvent("onElementCreate", args))
+    {
+        delete pWeapon;
+        return nullptr;
+    }
+
     pWeapon->SetPosition(vecPosition);
 
     if (pResource->IsClientSynced())

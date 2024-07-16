@@ -19,7 +19,8 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Radar area create/destroy funcs
-    LUA_DECLARE(CreateRadarArea);
+    static std::variant<bool, CRadarArea*> CreateRadarArea(lua_State* luaVM, CVector2D pos, CVector2D size, std::optional<SColor> color,
+                                                           std::optional<CElement*> visibleTo) noexcept;
 
     // Radar area get funcs
     LUA_DECLARE_OOP(GetRadarAreaSize);

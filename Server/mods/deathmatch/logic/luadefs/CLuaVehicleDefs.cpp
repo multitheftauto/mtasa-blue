@@ -19,9 +19,10 @@
 
 void CLuaVehicleDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Vehicle create/destroy funcs
-        {"createVehicle", CreateVehicle},
+        {"createVehicle", ArgumentParser<CreateVehicle>},
 
         // Vehicle get funcs
         {"getVehicleType", GetVehicleType},
@@ -287,66 +288,37 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
 
-int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
+std::variant<bool, CVehicle*> CLuaVehicleDefs::CreateVehicle(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<CVector> rot,
+                                                             std::optional<std::string> plate, std::optional<bool> direction,
+                                                             std::optional<std::uint8_t> variant, std::optional<std::uint8_t> variant2,
+                                                             std::optional<bool> synced) noexcept
 {
-    //  vehicle createVehicle ( int model, float x, float y, float z, [float rx, float ry, float rz, string numberplate, bool bDirection, int variant1, int
-    //  variant2] )
-    ushort  usModel;
-    CVector vecPosition;
-    CVector vecRotation;
-    SString strNumberPlate;
-    uchar   ucVariant;
-    uchar   ucVariant2;
-    bool    bSynced;
+    if (!rot.has_value())
+        rot = CVector();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModel);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecRotation, CVector());
-    argStream.ReadString(strNumberPlate, "");
-    if (argStream.NextIsBool())
-    {
-        bool bDirection;
-        argStream.ReadBool(bDirection);
-    }
-    argStream.ReadNumber(ucVariant, 254);
-    argStream.ReadNumber(ucVariant2, 254);
-    argStream.ReadBool(bSynced, true);
+    if (!plate.has_value())
+        plate = "";
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // if ( usModel != 570 || m_pResourceManager->GetMinClientRequirement () > "1.3.2-xx" ) // Todo: On merge: Please insert the revision
-                {
-                    // Create the vehicle and return its handle
-                    CVehicle* pVehicle =
-                        CStaticFunctionDefinitions::CreateVehicle(pResource, usModel, vecPosition, vecRotation, strNumberPlate, ucVariant, ucVariant2, bSynced);
-                    if (pVehicle)
-                    {
-                        CElementGroup* pGroup = pResource->GetElementGroup();
-                        if (pGroup)
-                        {
-                            pGroup->Add(pVehicle);
-                        }
-                        lua_pushelement(luaVM, pVehicle);
-                        return 1;
-                    }
-                }
-                /*else
-                m_pScriptDebugging->LogCustom ( luaVM, "Please set min_mta_version to xxx" ); // Todo*/
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (!variant.has_value())
+        variant = 254;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (!variant2.has_value())
+        variant2 = 254;
+
+    if (!synced.has_value())
+        synced = true;
+
+    CResource* resource = &lua_getownerresource(luaVM);
+
+    CVehicle* vehicle = CStaticFunctionDefinitions::CreateVehicle(resource, model, pos, rot.value(), plate.value().c_str(), variant.value(), variant2.value(), synced.value());
+    if (!vehicle)
+        return false;
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(vehicle);
+
+    return vehicle;
 }
 
 int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)

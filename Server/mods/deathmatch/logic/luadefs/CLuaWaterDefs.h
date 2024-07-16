@@ -18,7 +18,8 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateWater);
+    static std::variant<bool, CWater*> CreateWater(lua_State* luaVM, CVector pos1, CVector pos2, CVector pos3, std::optional<CVector> pos4,
+                                                   std::optional<bool> shallow) noexcept;
     LUA_DECLARE(SetWaterLevel);
     LUA_DECLARE(ResetWaterLevel);
     LUA_DECLARE(GetWaterVertexPosition);

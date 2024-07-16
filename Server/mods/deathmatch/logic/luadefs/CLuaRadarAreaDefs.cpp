@@ -16,9 +16,10 @@
 
 void CLuaRadarAreaDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Radar area create/destroy funcs
-        {"createRadarArea", CreateRadarArea},
+        {"createRadarArea", ArgumentParser<CreateRadarArea>},
 
         // Radar area get funcs
         {"getRadarAreaSize", GetRadarAreaSize},
@@ -58,54 +59,27 @@ void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "RadarArea", "Element");
 }
 
-int CLuaRadarAreaDefs::CreateRadarArea(lua_State* luaVM)
+std::variant<bool, CRadarArea*> CLuaRadarAreaDefs::CreateRadarArea(lua_State* luaVM, CVector2D pos, CVector2D size, std::optional<SColor> color,
+                                                                   std::optional<CElement*> visibleTo) noexcept
 {
     //  radararea createRadarArea ( float startPosX, float startPosY, float sizeX, float sizeY, [ int r = 255, int g = 0, int b = 0, int a = 255, element
     //  visibleTo = getRootElement() ] )
-    CVector2D vecPosition;
-    CVector2D vecSize;
-    float     dRed;
-    float     dGreen;
-    float     dBlue;
-    float     dAlpha;
-    CElement* pVisibleTo;
+    if (!color.has_value())
+        color = SColorRGBA(255, 0, 0, 255);
+    if (!visibleTo.has_value())
+        visibleTo = m_pRootElement;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector2D(vecPosition);
-    argStream.ReadVector2D(vecSize);
-    argStream.ReadNumber(dRed, 255);
-    argStream.ReadNumber(dGreen, 0);
-    argStream.ReadNumber(dBlue, 0);
-    argStream.ReadNumber(dAlpha, 255);
-    argStream.ReadUserData(pVisibleTo, m_pRootElement);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain*  pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-        if (pResource)
-        {
-            SColorRGBA color(dRed, dGreen, dBlue, dAlpha);
+    CRadarArea* radarArea = CStaticFunctionDefinitions::CreateRadarArea(resource, pos, size, color.value(), visibleTo.value());
+    if (!radarArea)
+        return false;
 
-            // Create it
-            CRadarArea* pRadarArea = CStaticFunctionDefinitions::CreateRadarArea(pResource, vecPosition, vecSize, color, pVisibleTo);
-            if (pRadarArea)
-            {
-                CElementGroup* pGroup = pResource->GetElementGroup();
-                if (pGroup)
-                {
-                    pGroup->Add(pRadarArea);
-                }
-                lua_pushelement(luaVM, pRadarArea);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(radarArea);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return radarArea;
 }
 
 int CLuaRadarAreaDefs::GetRadarAreaSize(lua_State* luaVM)

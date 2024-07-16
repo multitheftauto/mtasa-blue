@@ -16,9 +16,10 @@
 
 void CLuaMarkerDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Marker functions
-        {"createMarker", CreateMarker},
+        {"createMarker", ArgumentParser<CreateMarker>},
 
         // Marker get functions
         {"getMarkerCount", GetMarkerCount},
@@ -72,62 +73,33 @@ void CLuaMarkerDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Marker", "Element");
 }
 
-int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
+std::variant<bool, CMarker*> CLuaMarkerDefs::CreateMarker(lua_State* luaVM, CVector pos, std::optional<std::string> type, std::optional<float> size,
+                                                          std::optional<SColor> color, std::optional<CElement*> visibleTo,
+                                                          std::optional<bool> ignoreAlphaLimits) noexcept
 {
-    CVector    vecPosition;
-    float      fSize;
-    SColorRGBA color(0, 0, 255, 255);
-    SString    strType;
-    CElement*  pVisibleTo;
-    bool       ignoreAlphaLimits;
+    if (!type.has_value())
+        type = "default";
+    if (!size.has_value())
+        size = 4.0f;
+    if (!color.has_value())
+        color = SColorRGBA(0, 0, 255, 255);
+    if (!visibleTo.has_value())
+        visibleTo = nullptr;
+    if (!ignoreAlphaLimits.has_value())
+        ignoreAlphaLimits = false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadString(strType, "default");
-    argStream.ReadNumber(fSize, 4.0f);
-    argStream.ReadNumber(color.R, color.R);
-    argStream.ReadNumber(color.G, color.G);
-    argStream.ReadNumber(color.B, color.B);
-    argStream.ReadNumber(color.A, color.A);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (argStream.NextIsBool() || argStream.NextIsNil())
-    {
-        pVisibleTo = NULL;
-        argStream.m_iIndex++;
-    }
-    else
-        argStream.ReadUserData(pVisibleTo, m_pRootElement);
+    CMarker* marker = CStaticFunctionDefinitions::CreateMarker(resource, pos, type.value().c_str(), size.value(), color.value(), visibleTo.value(),
+                                                               ignoreAlphaLimits.value());
+    if (!marker)
+        return false;
 
-    argStream.ReadBool(ignoreAlphaLimits, false);
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(marker);
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create it
-                CMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(pResource, vecPosition, strType, fSize, color, pVisibleTo, ignoreAlphaLimits);
-                if (pMarker)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pMarker);
-                    }
-                    lua_pushelement(luaVM, pMarker);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return marker;
 }
 
 int CLuaMarkerDefs::GetMarkerCount(lua_State* luaVM)

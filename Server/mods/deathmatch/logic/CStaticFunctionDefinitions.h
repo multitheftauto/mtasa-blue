@@ -42,7 +42,7 @@ public:
     static bool        WasEventCancelled();
 
     // Element create/destroy
-    static CDummy*   CreateElement(CResource* pResource, const char* szTypeName, const char* szID);
+    static CDummy*   CreateElement(CResource* pResource, const char* szTypeName, const char* szID, bool* wasDissallowed = nullptr);
     static bool      DestroyElement(CElement* pElement);
     static CElement* CloneElement(CResource* pResource, CElement* pElement, const CVector& vecPosition, bool bCloneElement);
 

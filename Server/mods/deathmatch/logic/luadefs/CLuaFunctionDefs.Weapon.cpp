@@ -118,42 +118,19 @@ int CLuaFunctionDefs::GetWeaponIDFromName(lua_State* luaVM)
     return 1;
 }
 
-int CLuaFunctionDefs::CreateWeapon(lua_State* luaVM)
+std::variant<bool, CCustomWeapon*> CLuaFunctionDefs::CreateWeapon(lua_State* luaVM, eWeaponType type, CVector pos) noexcept
 {
-    CVector          vecPos;
-    eWeaponType      weaponType;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumStringOrNumber(weaponType);
-    argStream.ReadVector3D(vecPos);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CCustomWeapon* pWeapon = CStaticFunctionDefinitions::CreateWeapon(pResource, weaponType, vecPos);
-                if (pWeapon)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add((CElement*)pWeapon);
-                    }
+    CCustomWeapon* weapon = CStaticFunctionDefinitions::CreateWeapon(resource, type, pos);
+    if (!weapon)
+        return false;
 
-                    lua_pushelement(luaVM, pWeapon);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(weapon);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return weapon;
 }
 
 int CLuaFunctionDefs::FireWeapon(lua_State* luaVM)

@@ -17,9 +17,10 @@
 
 void CLuaTeamDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Team create/destroy functions
-        {"createTeam", CreateTeam},
+        {"createTeam", ArgumentParser<CreateTeam>},
 
         // Team get funcs
         {"getTeamFromName", GetTeamFromName},
@@ -91,46 +92,29 @@ int CLuaTeamDefs::SetPlayerTeam(lua_State* luaVM)
     return 1;
 }
 
-int CLuaTeamDefs::CreateTeam(lua_State* luaVM)
+std::variant<bool, CTeam*> CLuaTeamDefs::CreateTeam(lua_State* luaVM, std::string name, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
+                                                    std::optional<std::uint8_t> b) noexcept
 {
-    SString       strName;
-    unsigned char ucRed;
-    unsigned char ucGreen;
-    unsigned char ucBlue;
+    if (!r.has_value())
+        r = 235;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strName);
-    argStream.ReadNumber(ucRed, 235);
-    argStream.ReadNumber(ucGreen, 221);
-    argStream.ReadNumber(ucBlue, 178);
+    if (!g.has_value())
+        g = 221;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CTeam* pTeam = CStaticFunctionDefinitions::CreateTeam(pResource, strName, ucRed, ucGreen, ucBlue);
-                if (pTeam)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pTeam);
-                    }
-                    lua_pushelement(luaVM, pTeam);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (!b.has_value())
+        b = 178;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CResource* resource = &lua_getownerresource(luaVM);
+
+    CTeam* team = CStaticFunctionDefinitions::CreateTeam(resource, name.c_str(), r.value(), g.value(), b.value());
+    if (!team)
+        return false;
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(team);
+
+    return team;
 }
 
 int CLuaTeamDefs::GetPlayersInTeam(lua_State* luaVM)

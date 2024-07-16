@@ -19,7 +19,8 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Create/destroy
-    LUA_DECLARE(createPickup);
+    static std::variant<bool, CPickup*> createPickup(lua_State* luaVM, CVector pos, std::uint8_t type, double value, std::optional<std::uint32_t> interval,
+                                                     std::optional<double> ammo) noexcept;
 
     // Get
     LUA_DECLARE(getPickupType);

@@ -17,8 +17,9 @@
 
 void CLuaWaterDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createWater", CreateWater},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"createWater", ArgumentParser<CreateWater>},
         {"setWaterLevel", SetWaterLevel},
         {"resetWaterLevel", ResetWaterLevel},
         {"getWaterVertexPosition", GetWaterVertexPosition},
@@ -55,50 +56,23 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Water", "Element");
 }
 
-int CLuaWaterDefs::CreateWater(lua_State* luaVM)
+std::variant<bool, CWater*> CLuaWaterDefs::CreateWater(lua_State* luaVM, CVector pos1, CVector pos2, CVector pos3, std::optional<CVector> pos4,
+                                                       std::optional<bool> shallow) noexcept
 {
-    CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (!pLuaMain)
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
+    if (!shallow.has_value())
+        shallow = false;
 
-    CVector          v1, v2, v3, v4;
-    CVector*         pv4 = NULL;
-    bool             bShallow;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(v1);
-    argStream.ReadVector3D(v2);
-    argStream.ReadVector3D(v3);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (argStream.NextCouldBeNumber())
-    {
-        argStream.ReadVector3D(v4);
-        pv4 = &v4;
-    }
+    CWater* water = CStaticFunctionDefinitions::CreateWater(resource, &pos1, &pos2, &pos3, &pos4.value(), shallow.value());
+    if (!water)
+        return false;
 
-    argStream.ReadBool(bShallow, false);
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(water);
 
-    if (!argStream.HasErrors())
-    {
-        CWater* pWater = CStaticFunctionDefinitions::CreateWater(pLuaMain->GetResource(), &v1, &v2, &v3, pv4, bShallow);
-        if (pWater)
-        {
-            CElementGroup* pGroup = pLuaMain->GetResource()->GetElementGroup();
-            if (pGroup)
-            {
-                pGroup->Add(pWater);
-            }
-            lua_pushelement(luaVM, pWater);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return water;
 }
 
 int CLuaWaterDefs::SetWaterLevel(lua_State* luaVM)

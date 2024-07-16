@@ -17,9 +17,10 @@
 
 void CLuaPedDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Ped funcs
-        {"createPed", CreatePed},
+        {"createPed", ArgumentParser<CreatePed>},
         {"getValidPedModels", GetValidPedModels},
 
         // Ped get functions
@@ -193,47 +194,26 @@ int CLuaPedDefs::GetValidPedModels(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::CreatePed(lua_State* luaVM)
+std::variant<bool, CPed*> CLuaPedDefs::CreatePed(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<float> rot,
+                                                 std::optional<bool> synced) noexcept
 {
-    unsigned short usModel;
-    CVector        vecPosition;
-    float          fRotation;
-    bool           bSynced;
+    if (!rot.has_value())
+        rot = 0.0f;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModel);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fRotation, 0.0f);
-    argStream.ReadBool(bSynced, true);
+    if (!synced.has_value())
+        synced = true;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create the ped and return its handle
-                CPed* pPed = CStaticFunctionDefinitions::CreatePed(pResource, usModel, vecPosition, fRotation, bSynced);
-                if (pPed)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add(pPed);
-                    }
-                    lua_pushelement(luaVM, pPed);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CPed* ped = CStaticFunctionDefinitions::CreatePed(resource, model, pos, rot.value(), synced.value());
+    if (!ped)
+        return false;
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(ped);
+
+    return ped;
 }
 
 int CLuaPedDefs::GetPedWeapon(lua_State* luaVM)

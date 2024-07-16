@@ -19,7 +19,8 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Team create/destroy functions
-    LUA_DECLARE(CreateTeam);
+    static std::variant<bool, CTeam*> CreateTeam(lua_State* luaVM, std::string name, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
+                                                 std::optional<std::uint8_t> b) noexcept;
 
     // Team get funcs
     LUA_DECLARE(GetTeamFromName);
