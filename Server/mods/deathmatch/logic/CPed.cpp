@@ -534,3 +534,25 @@ void CPed::SetJackingVehicle(CVehicle* pVehicle)
     if (m_pJackingVehicle)
         m_pJackingVehicle->SetJackingPed(this);
 }
+
+void CPed::SetHasJetPack(bool bHasJetPack)
+{
+    if (m_bHasJetPack == bHasJetPack)
+        return;
+
+    m_bHasJetPack = bHasJetPack;
+
+    if (!bHasJetPack)
+        return;
+
+    // Set weapon slot to 0 if weapon is disabled with jetpack to avoid HUD and audio bugs
+    eWeaponType weaponType = static_cast<eWeaponType>(GetWeaponType(GetWeaponSlot()));
+    if (weaponType <= WEAPONTYPE_UNARMED)
+        return;
+
+    bool weaponEnabled;
+    CStaticFunctionDefinitions::GetJetpackWeaponEnabled(weaponType, weaponEnabled);
+
+    if (!weaponEnabled)
+        CStaticFunctionDefinitions::SetPedWeaponSlot(this, 0);
+}
