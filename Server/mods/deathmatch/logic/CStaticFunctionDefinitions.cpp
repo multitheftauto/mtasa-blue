@@ -1259,6 +1259,11 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
         m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
     }
 
+    // Has jetpack?
+    CPed* ped;
+    if (IS_PLAYER(pElement) || IS_PED(pElement))
+        ped = static_cast<CPed*>(pElement);
+
     // Construct the set position packet
     CBitStream BitStream;
     BitStream.pBitStream->Write(vecPosition.fX);
@@ -1279,6 +1284,10 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     {
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_POSITION, *BitStream.pBitStream));
     }
+
+    // Restore jetpack
+    if (ped && ped->HasJetPack())
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, GIVE_PED_JETPACK, *BitStream.pBitStream));
 
     return true;
 }
