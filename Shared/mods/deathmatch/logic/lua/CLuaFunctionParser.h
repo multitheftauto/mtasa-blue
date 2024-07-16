@@ -18,7 +18,6 @@ class CLuaArgument;
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
 #include <lua/CLuaMultiReturn.h>
-#include <tuple>
 
 class LuaFunctionError
 {
