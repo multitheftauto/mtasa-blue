@@ -11,6 +11,11 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include "CColCircle.h"
+#include "CColCuboid.h"
+#include "CColRectangle.h"
+#include "CColPolygon.h"
+#include "CColTube.h"
 
 class CColPolygon;
 

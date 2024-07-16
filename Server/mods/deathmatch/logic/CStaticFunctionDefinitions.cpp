@@ -8588,6 +8588,7 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
     switch (ucType) {
         case CPickup::ARMOR:
         case CPickup::HEALTH:
+        {
             // Is the fifth argument (health) a number between 0 and 100?
             if (dFive < 0 || dFive > 100)
                 break;
@@ -8600,7 +8601,9 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
             // Set the health/armor
             pickup->SetAmount(static_cast<float>(dFive));
             break;
+        }
         case CPickup::WEAPON:
+        {
             auto ucWeaponID = static_cast<std::uint8_t>(dFive);
             if (!CPickupManager::IsValidWeaponID(ucWeaponID))
                 break;
@@ -8622,7 +8625,9 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
             pickup->SetWeaponType(ucWeaponID);
             pickup->SetAmmo(usAmmo);
             break;
+        }
         case CPickup::CUSTOM:
+        {
             // Get the model id
             auto usModel = static_cast<std::uint16_t>(dFive);
             if (!CObjectManager::IsValidModel(usModel))
@@ -8636,6 +8641,7 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
 
             // Set the model id
             pickup->SetModel(usModel);
+        }
     }
 
     // Got a pickup?
