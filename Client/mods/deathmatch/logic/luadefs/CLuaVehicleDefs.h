@@ -19,7 +19,9 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateVehicle);
+    static std::variant<bool, CClientVehicle*> CreateVehicle(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<CVector> rot,
+                                                             std::optional<std::string> plate, std::optional<std::uint8_t> variant,
+                                                             std::optional<std::uint8_t> variant2) noexcept;
 
     LUA_DECLARE(GetVehicleType);
     LUA_DECLARE(GetVehicleVariant);

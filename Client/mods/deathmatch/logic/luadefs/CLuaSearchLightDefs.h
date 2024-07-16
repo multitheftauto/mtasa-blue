@@ -18,7 +18,8 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateSearchLight);
+    static std::variant<bool, CClientSearchLight*> CreateSearchLight(lua_State* luaVM, CVector start, CVector end, float startRadius, float endRadius,
+                                                                     std::optional<bool> renderSpot) noexcept;
 
     LUA_DECLARE_OOP(GetSearchLightStartPosition);
     LUA_DECLARE_OOP(GetSearchLightEndPosition);

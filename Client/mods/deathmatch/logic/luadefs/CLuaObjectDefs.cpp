@@ -14,9 +14,10 @@
 
 void CLuaObjectDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Object create/destroy funcs
-        {"createObject", CreateObject},
+        {"createObject", ArgumentParser<CreateObject>},
 
         // Object get funcs
         {"isObjectStatic", IsObjectStatic},
@@ -79,53 +80,25 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Object", "Element");
 }
 
-int CLuaObjectDefs::CreateObject(lua_State* luaVM)
+std::variant<bool, CClientObject*> CLuaObjectDefs::CreateObject(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<CVector> rot, std::optional<bool> lod) noexcept
 {
-    //  object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
-    ushort  usModelID;
-    CVector vecPosition;
-    CVector vecRotation;
-    bool    bLowLod;
+    // object createObject ( int modelid, float x, float y, float z, [float rx, float ry, float rz, bool lowLOD] )
+    if (!rot.has_value())
+        rot = CVector();
+    if (!lod.has_value())
+        lod = false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModelID);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecRotation, vecRotation);
-    argStream.ReadBool(bLowLod, false);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        if (CClientObjectManager::IsValidModel(usModelID))
-        {
-            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-            if (pLuaMain)
-            {
-                CResource* pResource = pLuaMain->GetResource();
-                if (pResource)
-                {
-                    CClientObject* pObject = CStaticFunctionDefinitions::CreateObject(*pResource, usModelID, vecPosition, vecRotation, bLowLod);
-                    if (pObject)
-                    {
-                        CElementGroup* pGroup = pResource->GetElementGroup();
-                        if (pGroup)
-                        {
-                            pGroup->Add((CClientEntity*)pObject);
-                        }
+    CClientObject* object = CStaticFunctionDefinitions::CreateObject(*resource, model, pos, rot.value(), lod.value());
+    if (!object)
+        return false;
 
-                        lua_pushelement(luaVM, pObject);
-                        return 1;
-                    }
-                }
-            }
-        }
-        else
-            argStream.SetCustomError("Invalid model id");
-    }
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(object);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return object;
 }
 
 int CLuaObjectDefs::IsObjectStatic(lua_State* luaVM)

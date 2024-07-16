@@ -17,7 +17,7 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateRadarArea);
+    static std::variant<bool, CClientRadarArea*> CreateRadarArea(lua_State* luaVM, CVector2D pos, CVector2D size, std::optional<SColor> color) noexcept;
     LUA_DECLARE(GetRadarAreaColor);
     LUA_DECLARE_OOP(GetRadarAreaSize);
     LUA_DECLARE(IsRadarAreaFlashing);

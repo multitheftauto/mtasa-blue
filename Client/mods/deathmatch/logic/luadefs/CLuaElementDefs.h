@@ -73,8 +73,8 @@ public:
     LUA_DECLARE(IsElementWaitingForGroundToLoad);
 
     // Element set funcs
-    LUA_DECLARE(CreateElement);
-    LUA_DECLARE(DestroyElement);
+    static std::variant<bool, CClientDummy*> CreateElement(lua_State* luaVM, std::string type, std::optional<std::string> id);
+    static bool                              DestroyElement(CClientEntity* element) noexcept;
     LUA_DECLARE(SetElementID);
     LUA_DECLARE(SetElementData);
     LUA_DECLARE(RemoveElementData);

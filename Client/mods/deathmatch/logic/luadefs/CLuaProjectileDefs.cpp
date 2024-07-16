@@ -10,13 +10,21 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaProjectileDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createProjectile", CreateProjectile},         {"getProjectileType", GetProjectileType},   {"getProjectileTarget", GetProjectileTarget},
-        {"getProjectileCreator", GetProjectileCreator}, {"getProjectileForce", GetProjectileForce}, {"setProjectileCounter", SetProjectileCounter},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"createProjectile", ArgumentParser<CreateProjectile>},
+
+        {"getProjectileType", GetProjectileType},
+        {"getProjectileTarget", GetProjectileTarget},
+        {"getProjectileCreator", GetProjectileCreator},
+        {"getProjectileForce", GetProjectileForce},
         {"getProjectileCounter", GetProjectileCounter},
+
+        {"setProjectileCounter", SetProjectileCounter},
     };
 
     // Add functions
@@ -45,57 +53,43 @@ void CLuaProjectileDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Projectile", "Element");
 }
 
-int CLuaProjectileDefs::CreateProjectile(lua_State* luaVM)
+std::variant<bool, CClientProjectile*> CLuaProjectileDefs::CreateProjectile(lua_State* luaVM, CClientEntity* creator, std::uint8_t type,
+                                                                            std::optional<CVector> origin, std::optional<float> force,
+                                                                            std::optional<CClientEntity*> target, std::optional<CVector> rot,
+                                                                            std::optional<CVector> speed, std::optional<std::uint16_t> model) noexcept
 {
-    CVector          vecOrigin;
-    CClientEntity*   pCreator = NULL;
-    unsigned char    ucWeaponType = 0;
-    CScriptArgReader argStream(luaVM);
-    float            fForce = 1.0f;
-    CClientEntity*   pTarget = NULL;
-    CVector          vecRotation, vecMoveSpeed;
-    unsigned short   usModel = 0;
-    argStream.ReadUserData(pCreator);
-    if (pCreator)
-        pCreator->GetPosition(vecOrigin);
-
-    argStream.ReadNumber(ucWeaponType);
-    argStream.ReadVector3D(vecOrigin, vecOrigin);
-    argStream.ReadNumber(fForce, 1.0f);
-    argStream.ReadUserData(pTarget, NULL);
-    argStream.ReadVector3D(vecRotation, vecRotation);
-    argStream.ReadVector3D(vecMoveSpeed, vecMoveSpeed);
-    argStream.ReadNumber(usModel, 0);
-
-    if (!argStream.HasErrors())
+    // TODO: Refactor CClientEntity class
+    // GetPosition should RETURN a value
+    if (!origin.has_value())
     {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CClientProjectile* pProjectile = CStaticFunctionDefinitions::CreateProjectile(*pResource, *pCreator, ucWeaponType, vecOrigin, fForce, pTarget,
-                                                                                              vecRotation, vecMoveSpeed, usModel);
-                if (pProjectile)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add((CClientEntity*)pProjectile);
-                    }
-
-                    lua_pushelement(luaVM, pProjectile);
-                    return 1;
-                }
-            }
-        }
+        CVector temp;
+        creator->GetPosition(temp);
+        origin = temp;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (!force.has_value())
+        force = 1.0f;
+    if (!target.has_value())
+        target = nullptr;
+    if (!rot.has_value())
+        rot = CVector();
+    if (!speed.has_value())
+        speed = CVector();
+    if (!model.has_value())
+        model = 0;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CResource* resource = &lua_getownerresource(luaVM);
+
+    CClientProjectile* projectile = CStaticFunctionDefinitions::CreateProjectile(*resource, *creator, type, origin.value(), force.value(), target.value(),
+        rot.value(), speed.value(), model.value());
+        
+    if (!projectile)
+        return false;
+
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(projectile);
+
+    return projectile;
 }
 
 int CLuaProjectileDefs::GetProjectileType(lua_State* luaVM)

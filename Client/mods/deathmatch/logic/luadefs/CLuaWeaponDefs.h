@@ -18,10 +18,11 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
+    static std::variant<bool, CClientWeapon*> CreateWeapon(lua_State* luaVM, eWeaponType type, CVector pos) noexcept;
+
     LUA_DECLARE(GetWeaponNameFromID);
     LUA_DECLARE(GetWeaponIDFromName);
     LUA_DECLARE(GetSlotFromWeapon);
-    LUA_DECLARE(CreateWeapon);
     LUA_DECLARE(FireWeapon);
     LUA_DECLARE(SetWeaponProperty);
     LUA_DECLARE(GetWeaponProperty);

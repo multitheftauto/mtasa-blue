@@ -10,12 +10,22 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaPointLightDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createLight", CreateLight},     {"getLightType", GetLightType},   {"getLightRadius", GetLightRadius},       {"setLightRadius", SetLightRadius},
-        {"getLightColor", GetLightColor}, {"setLightColor", SetLightColor}, {"getLightDirection", GetLightDirection}, {"setLightDirection", SetLightDirection},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"createLight", ArgumentParser<CreateLight>},
+
+        {"getLightType", GetLightType},
+        {"getLightRadius", GetLightRadius},
+        {"getLightColor", GetLightColor},
+        {"getLightDirection", GetLightDirection},
+
+        {"setLightRadius", SetLightRadius},
+        {"setLightColor", SetLightColor},
+        {"setLightDirection", SetLightDirection},
     };
 
     // Add functions
@@ -45,52 +55,29 @@ void CLuaPointLightDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Light", "Element");
 }
 
-int CLuaPointLightDefs::CreateLight(lua_State* luaVM)
+std::variant<bool, CClientPointLights*> CLuaPointLightDefs::CreateLight(lua_State* luaVM, int mode, CVector pos, std::optional<float> radius, std::optional<SColor> color, std::optional<CVector> direction) noexcept
 {
     //  light createLight ( int lightType, float posX, float posY, float posX, [ float radius = 3, int r = 255, int g = 0, int b = 0, float dirX = 0, float dirY
-    //  = 0, float dirZ = 0, bool createsShadow = false ] )
-    int     iMode;
-    CVector vecPosition;
-    float   fRadius;
-    SColor  color;
-    CVector vecDirection;
-    bool    bCreatesShadow;
+    //  = 0, float dirZ = 0 ] )
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iMode);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadNumber(fRadius, 3.0f);
-    argStream.ReadNumber(color.R, 255);
-    argStream.ReadNumber(color.G, 0);
-    argStream.ReadNumber(color.B, 0);
-    argStream.ReadVector3D(vecDirection, vecDirection);
-    argStream.ReadBool(bCreatesShadow, false);
+    if(!radius.has_value())
+        radius = 3.0f;
+    if(!color.has_value())
+        color = SColorRGBA(255, 0, 0, 255);
+    if(!direction.has_value())
+        direction = CVector();
+    
+    CResource* resource = &lua_getownerresource(luaVM);
+    
+    CClientPointLights* light = CStaticFunctionDefinitions::CreateLight(*resource, mode, pos, radius.value(), color.value(), direction.value());
+    if (!light)
+        return false;
+        
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(light);
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-        if (pResource)
-        {
-            // Create it
-            CClientPointLights* pLight = CStaticFunctionDefinitions::CreateLight(*pResource, iMode, vecPosition, fRadius, color, vecDirection);
-            if (pLight)
-            {
-                CElementGroup* pGroup = pResource->GetElementGroup();
-                if (pGroup)
-                {
-                    pGroup->Add((CClientEntity*)pLight);
-                }
-                lua_pushelement(luaVM, pLight);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return light;
 }
 
 int CLuaPointLightDefs::GetLightType(lua_State* luaVM)

@@ -10,35 +10,40 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 #define MIN_CLIENT_REQ_WEAPON_PROPERTY_FLAG     "1.3.5-9.06139"
 
 void CLuaWeaponDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"createWeapon", ArgumentParser<CreateWeapon>},
+
         {"getWeaponNameFromID", GetWeaponNameFromID},
         {"getWeaponIDFromName", GetWeaponIDFromName},
         {"getSlotFromWeapon", GetSlotFromWeapon},
-        {"createWeapon", CreateWeapon},
-        {"setWeaponProperty", SetWeaponProperty},
         {"getWeaponProperty", GetWeaponProperty},
         {"getOriginalWeaponProperty", GetOriginalWeaponProperty},
-        {"fireWeapon", FireWeapon},
-        {"setWeaponState", SetWeaponState},
-        {"getWeaponState", GetWeaponState},
-        {"setWeaponTarget", SetWeaponTarget},
-        {"getWeaponTarget", GetWeaponTarget},
-        // {"setWeaponOwner", SetWeaponOwner},
-        {"getWeaponOwner", GetWeaponOwner},
-        {"setWeaponFlags", SetWeaponFlags},
-        {"getWeaponFlags", GetWeaponFlags},
-        {"setWeaponFiringRate", SetWeaponFiringRate},
         {"getWeaponFiringRate", GetWeaponFiringRate},
-        {"resetWeaponFiringRate", ResetWeaponFiringRate},
         {"getWeaponAmmo", GetWeaponAmmo},
         {"getWeaponClipAmmo", GetWeaponClipAmmo},
+        {"getWeaponState", GetWeaponState},
+        {"getWeaponTarget", GetWeaponTarget},
+        {"getWeaponOwner", GetWeaponOwner},
+        {"getWeaponFlags", GetWeaponFlags},
+        
+        {"setWeaponProperty", SetWeaponProperty},
+        {"setWeaponState", SetWeaponState},
+        {"setWeaponTarget", SetWeaponTarget},
+        // {"setWeaponOwner", SetWeaponOwner},
+        {"setWeaponFlags", SetWeaponFlags},
+        {"setWeaponFiringRate", SetWeaponFiringRate},
         {"setWeaponAmmo", SetWeaponAmmo},
         {"setWeaponClipAmmo", SetWeaponClipAmmo},
+
+        {"resetWeaponFiringRate", ResetWeaponFiringRate},
+        {"fireWeapon", FireWeapon},
     };
 
     // Add functions
@@ -145,42 +150,19 @@ int CLuaWeaponDefs::GetWeaponIDFromName(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWeaponDefs::CreateWeapon(lua_State* luaVM)
-{
-    CVector          vecPos;
-    eWeaponType      weaponType;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumStringOrNumber(weaponType);
-    argStream.ReadVector3D(vecPos);
+std::variant<bool, CClientWeapon*> CLuaWeaponDefs::CreateWeapon(lua_State* luaVM, eWeaponType type, CVector pos) noexcept
+{    
+    CResource* resource = &lua_getownerresource(luaVM);
+    
+    CClientWeapon* weapon = CStaticFunctionDefinitions::CreateWeapon(*resource, type, pos);
+    if (!weapon)
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CClientWeapon* pWeapon = CStaticFunctionDefinitions::CreateWeapon(*pResource, weaponType, vecPos);
-                if (pWeapon)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add((CClientEntity*)pWeapon);
-                    }
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(weapon);
 
-                    lua_pushelement(luaVM, pWeapon);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return weapon;
 }
 int CLuaWeaponDefs::FireWeapon(lua_State* luaVM)
 {

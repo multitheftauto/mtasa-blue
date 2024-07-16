@@ -10,11 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaSearchLightDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createSearchLight", CreateSearchLight},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"createSearchLight", ArgumentParser<CreateSearchLight>},
 
         {"getSearchLightStartPosition", GetSearchLightStartPosition},
         {"getSearchLightEndPosition", GetSearchLightEndPosition},
@@ -54,45 +56,25 @@ void CLuaSearchLightDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "SearchLight", "Element");
 }
 
-int CLuaSearchLightDefs::CreateSearchLight(lua_State* luaVM)
+std::variant<bool, CClientSearchLight*> CLuaSearchLightDefs::CreateSearchLight(lua_State* luaVM, CVector start, CVector end, float startRadius, float endRadius, std::optional<bool> renderSpot) noexcept
 {
-    //  searchlight createSearchLight ( float startX, float startY, float startZ, float endX, float endY, float endZ, float startRadius, float endRadius [, bool
-    //  renderSpot = true ] )
-    CVector vecStart, vecEnd;
-    float   startRadius, endRadius;
-    bool    renderSpot;
+    //  searchlight createSearchLight ( float startX, float startY, float startZ, float endX, float endY, float endZ, float startRadius, float endRadius,
+    // [, bool renderSpot = true ] )
+    
+    if(!renderSpot.has_value())
+        renderSpot = true;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecStart);
-    argStream.ReadVector3D(vecEnd);
-    argStream.ReadNumber(startRadius);
-    argStream.ReadNumber(endRadius);
-    argStream.ReadBool(renderSpot, true);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+    CClientSearchLight* light = CStaticFunctionDefinitions::CreateSearchLight(*resource, start, end, startRadius, endRadius, renderSpot.value());
+    if (light)
+        return false;
 
-        if (pResource)
-        {
-            auto pLight = CStaticFunctionDefinitions::CreateSearchLight(*pResource, vecStart, vecEnd, startRadius, endRadius, renderSpot);
-            if (pLight)
-            {
-                CElementGroup* pGroup = pResource->GetElementGroup();
-                if (pGroup)
-                    pGroup->Add(pLight);
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(light);
 
-                lua_pushelement(luaVM, pLight);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return light;
 }
 
 int CLuaSearchLightDefs::GetSearchLightStartPosition(lua_State* luaVM)

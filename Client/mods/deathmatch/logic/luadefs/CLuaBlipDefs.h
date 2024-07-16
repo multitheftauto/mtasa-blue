@@ -18,8 +18,15 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateBlip);
-    LUA_DECLARE(CreateBlipAttachedTo);
+    static std::variant<bool, CClientRadarMarker*> CreateBlip(lua_State* luaVM, CVector pos, std::optional<std::uint8_t> icon, std::optional<int> size,
+                                                              std::optional<SColor> color, std::optional<std::int16_t> ordering,
+                                                              std::optional<std::uint16_t> visibleDistance);
+
+    static std::variant<bool, CClientRadarMarker*> CreateBlipAttachedTo(lua_State* luaVM, CClientEntity* element, std::optional<std::uint8_t> icon,
+                                                                        std::optional<int> size, std::optional<SColor> color,
+                                                                        std::optional<std::int16_t>  ordering,
+                                                                        std::optional<std::uint16_t> visibleDistance);
+
     LUA_DECLARE(GetBlipIcon);
     LUA_DECLARE(GetBlipSize);
     LUA_DECLARE(GetBlipColor);

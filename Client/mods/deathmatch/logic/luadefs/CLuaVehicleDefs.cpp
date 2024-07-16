@@ -93,7 +93,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
 
         // Vehicle set funcs
-        {"createVehicle", CreateVehicle},
+        {"createVehicle", ArgumentParser<CreateVehicle>},
         {"fixVehicle", FixVehicle},
         {"blowVehicle", ArgumentParserWarn<false, BlowVehicle>},
         {"setVehicleTurnVelocity", SetVehicleTurnVelocity},
@@ -1494,53 +1494,28 @@ int CLuaVehicleDefs::GetVehicleNameFromModel(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
+std::variant<bool, CClientVehicle*> CLuaVehicleDefs::CreateVehicle(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<CVector> rot, std::optional<std::string> plate, std::optional<std::uint8_t> variant, std::optional<std::uint8_t> variant2) noexcept
 {
-    CVector          vecPosition;
-    unsigned short   usModel = 0;
-    CVector          vecRotation;
-    const char*      szRegPlate = NULL;
-    unsigned char    ucVariant = 255;
-    unsigned char    ucVariant2 = 255;
-    SString          strRegPlate = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usModel);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadVector3D(vecRotation, vecRotation);
-    argStream.ReadString(strRegPlate, "");
-    argStream.ReadNumber(ucVariant, 255);
-    argStream.ReadNumber(ucVariant2, 255);
+    if(!rot.has_value())
+        rot = CVector();
+    if(!variant.has_value())
+        variant = 255;
+    if(!variant2.has_value())
+        variant2 = 255;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Create the vehicle and return its handle
-                CClientVehicle* pVehicle = CStaticFunctionDefinitions::CreateVehicle(*pResource, usModel, vecPosition, vecRotation,
-                                                                                     strRegPlate == "" ? NULL : strRegPlate.c_str(), ucVariant, ucVariant2);
-                if (pVehicle)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add((CClientEntity*)pVehicle);
-                    }
+    CResource* resource = &lua_getownerresource(luaVM);
 
-                    lua_pushelement(luaVM, pVehicle);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CClientVehicle* vehicle = CStaticFunctionDefinitions::CreateVehicle(
+        *resource, model, pos, rot.value(), plate.has_value() ? plate.value().c_str() : nullptr, variant.value(), variant2.value());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (!vehicle)
+        return false;
+        
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(vehicle);
+
+    return vehicle;
 }
 
 int CLuaVehicleDefs::FixVehicle(lua_State* luaVM)

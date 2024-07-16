@@ -18,7 +18,8 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreatePickup);
+    static std::variant<bool, CClientPickup*> CreatePickup(lua_State* luaVM, CVector pos, std::uint8_t type, double argumentDependant,
+                                                           std::optional<std::uint32_t> interval, std::optional<double> ammo) noexcept;
 
     LUA_DECLARE(GetPickupType);
     LUA_DECLARE(GetPickupWeapon);

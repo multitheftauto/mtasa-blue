@@ -19,7 +19,8 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateMarker);
+    static std::variant<bool, CClientMarker*> CreateMarker(lua_State* luaVM, CVector pos, std::optional<std::string> type, std::optional<float> size,
+                                                           std::optional<SColor> color, std::optional<bool> ignoreAlphaLimits) noexcept;
 
     LUA_DECLARE(GetMarkerCount);
     LUA_DECLARE(GetMarkerType);

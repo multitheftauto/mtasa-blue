@@ -29,7 +29,16 @@ public:
     bool               Exists(CClientProjectile* pProjectile);
     CClientProjectile* Get(CEntitySAInterface* pProjectile);
 
-    unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
+    std::size_t Count() { return m_List.size(); }
+
+    std::list<CClientProjectile*>::iterator       begin() noexcept { return m_List.begin(); }
+    std::list<CClientProjectile*>::iterator       end() noexcept { return m_List.end(); }
+
+    std::list<CClientProjectile*>::const_iterator begin() const noexcept { return m_List.cbegin(); }
+    std::list<CClientProjectile*>::const_iterator end() const noexcept { return m_List.cend(); }
+
+    std::list<CClientProjectile*>& GetProjectiles() noexcept { return m_List; }
+    const std::list<CClientProjectile*>& GetProjectiles() const noexcept { return m_List; }
 
     // * Game-layer wrapping *
     static bool Hook_StaticProjectileAllow(CEntity* pGameCreator, eWeaponType weaponType, CVector* origin, float fForce, CVector* target,

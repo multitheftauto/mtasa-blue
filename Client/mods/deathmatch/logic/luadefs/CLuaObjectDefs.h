@@ -19,7 +19,8 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Object create funcs
-    LUA_DECLARE(CreateObject);
+    static std::variant<bool, CClientObject*> CreateObject(lua_State* luaVM, std::uint16_t model, CVector pos, std::optional<CVector> rot,
+                                                           std::optional<bool> lod) noexcept;
 
     // Object get funcs
     LUA_DECLARE(IsObjectStatic);

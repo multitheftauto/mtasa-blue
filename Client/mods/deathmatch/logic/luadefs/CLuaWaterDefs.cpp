@@ -10,11 +10,13 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaWaterDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createWater", CreateWater},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"createWater", ArgumentParser<CreateWater>},
         {"testLineAgainstWater", TestLineAgainstWater},
         {"resetWaterColor", ResetWaterColor},
         {"resetWaterLevel", ResetWaterLevel},
@@ -66,49 +68,12 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Water", "Element");
 }
 
-int CLuaWaterDefs::CreateWater(lua_State* luaVM)
+std::variant<bool, CClientWater*> CLuaWaterDefs::CreateWater(lua_State* luaVM, CVector pos1, CVector pos2, CVector pos3, std::optional<CVector> pos4,
+                                                             std::optional<bool> shallow) noexcept
 {
-    //  water createWater ( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3 [, float x4, float y4, float z4 ] [, bool
-    //  bShallow = false ] )
-    CVector v1;
-    CVector v2;
-    CVector v3;
-    CVector v4;
-    bool    bShallow;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(v1);
-    argStream.ReadVector3D(v2);
-    argStream.ReadVector3D(v3);
-    bool bIsQuad = argStream.NextCouldBeNumber(2);            // Check for existence of v4.fZ
-    if (bIsQuad)
-    {
-        argStream.ReadVector3D(v4);
-    }
-    argStream.ReadBool(bShallow, false);
-
-    if (!argStream.HasErrors())
-    {
-        CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-        if (pResource)
-        {
-            CClientWater* pWaterElement;
-
-            if (bIsQuad)
-                pWaterElement = CStaticFunctionDefinitions::CreateWater(*pResource, &v1, &v2, &v3, &v4, bShallow);
-            else
-                pWaterElement = CStaticFunctionDefinitions::CreateWater(*pResource, &v1, &v2, &v3, NULL, bShallow);
-
-            lua_pushelement(luaVM, pWaterElement);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CResource* resource = &lua_getownerresource(luaVM);
+    CVector*    pos4Temp = pos4.has_value() ? &pos4.value() : nullptr;
+    return CStaticFunctionDefinitions::CreateWater(*resource, &pos1, &pos2, &pos3, pos4Temp, shallow.value());
 }
 
 int CLuaWaterDefs::TestLineAgainstWater(lua_State* luaVM)

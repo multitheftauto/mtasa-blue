@@ -18,7 +18,10 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateProjectile);
+    static std::variant<bool, CClientProjectile*> CreateProjectile(lua_State* luaVM, CClientEntity* creator, std::uint8_t type, std::optional<CVector> origin,
+                                                                   std::optional<float> force, std::optional<CClientEntity*> target, std::optional<CVector> rot,
+                                                                   std::optional<CVector> speed, std::optional<std::uint16_t> model) noexcept;
+
     LUA_DECLARE(GetProjectileType);
     LUA_DECLARE(GetProjectileTarget);
     LUA_DECLARE(GetProjectileCreator);

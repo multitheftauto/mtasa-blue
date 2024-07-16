@@ -14,8 +14,9 @@
 
 void CLuaMarkerDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"createMarker", CreateMarker},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
+        {"createMarker", ArgumentParser<CreateMarker>},
 
         {"getMarkerCount", GetMarkerCount},
         {"getMarkerType", GetMarkerType},
@@ -71,51 +72,30 @@ void CLuaMarkerDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Marker", "Element");
 }
 
-int CLuaMarkerDefs::CreateMarker(lua_State* luaVM)
+std::variant<bool, CClientMarker*> CLuaMarkerDefs::CreateMarker(lua_State* luaVM, CVector pos, std::optional<std::string> type, std::optional<float> size, std::optional<SColor> color, std::optional<bool> ignoreAlphaLimits) noexcept
 {
-    CVector          vecPosition;
-    float            fSize = 4.0f;
-    SColorRGBA       color(0, 0, 255, 255);
-    SString          strType = "default";
-    bool             ignoreAlphaLimits;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadString(strType, "default");
-    argStream.ReadNumber(fSize, 4.0f);
-    argStream.ReadNumber(color.R, 0);
-    argStream.ReadNumber(color.G, 0);
-    argStream.ReadNumber(color.B, 255);
-    argStream.ReadNumber(color.A, 255);
-    argStream.ReadBool(ignoreAlphaLimits, false);
+    if(!type.has_value())
+        type = "default";
+    if(!size.has_value())
+        size = 4.0f;
+    if(!color.has_value())
+        color = SColorRGBA(0, 0, 255, 255);
+    if(!ignoreAlphaLimits.has_value())
+        ignoreAlphaLimits = false;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            {
-                // Create it
-                CClientMarker* pMarker = CStaticFunctionDefinitions::CreateMarker(*pResource, vecPosition, strType, fSize, color, ignoreAlphaLimits);
-                if (pMarker)
-                {
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add((CClientEntity*)pMarker);
-                    }
+    CResource* resource = &lua_getownerresource(luaVM);
 
-                    lua_pushelement(luaVM, pMarker);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CClientMarker* marker = CStaticFunctionDefinitions::CreateMarker(*resource, pos, type.value().c_str(),
+        size.value(), color.value(), ignoreAlphaLimits.value());
+        
+    if (!marker)
+        return false;
+        
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(marker);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return marker;
 }
 
 int CLuaMarkerDefs::GetMarkerCount(lua_State* luaVM)

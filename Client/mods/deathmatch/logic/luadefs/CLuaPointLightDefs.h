@@ -18,7 +18,8 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateLight);
+    static std::variant<bool, CClientPointLights*> CreateLight(lua_State* luaVM, int mode, CVector pos, std::optional<float> radius,
+                                                               std::optional<SColor> color, std::optional<CVector> direction) noexcept;
     LUA_DECLARE(GetLightType);
     LUA_DECLARE(GetLightRadius);
     LUA_DECLARE(GetLightColor);

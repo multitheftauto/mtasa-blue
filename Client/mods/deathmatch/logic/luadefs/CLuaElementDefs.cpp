@@ -18,7 +18,8 @@ using std::list;
 
 void CLuaElementDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         // Element get funcs
         {"getRootElement", GetRootElement},
         {"isElement", IsElement},
@@ -73,8 +74,8 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementWaitingForGroundToLoad", IsElementWaitingForGroundToLoad},
 
         // Element set funcs
-        {"createElement", CreateElement},
-        {"destroyElement", DestroyElement},
+        {"createElement", ArgumentParser<CreateElement>},
+        {"destroyElement", ArgumentParser<DestroyElement>},
         {"setElementID", SetElementID},
         {"setElementParent", SetElementParent},
         {"setElementData", SetElementData},
@@ -1653,81 +1654,26 @@ int CLuaElementDefs::IsElementOnScreen(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::CreateElement(lua_State* luaVM)
+std::variant<bool, CClientDummy*> CLuaElementDefs::CreateElement(lua_State* luaVM, std::string type, std::optional<std::string> id)
 {
-    // Verify the argument
-    SString          strTypeName = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strTypeName);
+    CResource*    resource = &lua_getownerresource(luaVM);
+    CClientDummy* element = CStaticFunctionDefinitions::CreateElement(*resource, type.c_str(), id.value_or("").c_str());
+    if (!element)
+        throw LuaFunctionError("createElement; unable to create more elements");
 
-    if (!argStream.HasErrors())
-    {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Grab its resource
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                // Grab the optional name argument
-                SString strID = "";
-                if (argStream.NextIsString())
-                {
-                    argStream.ReadString(strID);
-                }
+    // Add it to the element group
+    // TODO: Get rid of element groups
+    // 16.07.2024 - Still get rid of element groups
+    CElementGroup* group = resource->GetElementGroup();
+    if (group)
+        group->Add(element);
 
-                // Try to create
-                CClientDummy* pDummy = CStaticFunctionDefinitions::CreateElement(*pResource, strTypeName.c_str(), strID.c_str());
-                if (pDummy)
-                {
-                    // Add it to the element group
-                    // TODO: Get rid of element groups
-                    CElementGroup* pGroup = pResource->GetElementGroup();
-                    if (pGroup)
-                    {
-                        pGroup->Add((CClientEntity*)pDummy);
-                    }
-
-                    // Return it
-                    lua_pushelement(luaVM, pDummy);
-                    return 1;
-                }
-                else
-                    m_pScriptDebugging->LogError(luaVM, "createElement; unable to create more elements\n");
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return element;
 }
 
-int CLuaElementDefs::DestroyElement(lua_State* luaVM)
+bool CLuaElementDefs::DestroyElement(CClientEntity* element) noexcept
 {
-    // Verify the argument
-    CClientEntity*   pEntity = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-
-    if (!argStream.HasErrors())
-    {
-        // Destroy it
-        if (CStaticFunctionDefinitions::DestroyElement(*pEntity))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    // Failed
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::DestroyElement(*element);
 }
 
 int CLuaElementDefs::SetElementID(lua_State* luaVM)
