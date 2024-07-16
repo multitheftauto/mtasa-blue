@@ -2638,7 +2638,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientPlayerRadioSwitch", "", NULL, false);
     m_Events.AddEvent("onClientPlayerDamage", "attacker, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false);
-    m_Events.AddEvent("onClientPlayerWasted", "", NULL, false);
+    m_Events.AddEvent("onClientPlayerWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onClientPlayerChoke", "", NULL, false);
     m_Events.AddEvent("onClientPlayerVoiceStart", "", NULL, false);
     m_Events.AddEvent("onClientPlayerVoiceStop", "", NULL, false);
@@ -5665,6 +5665,8 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             else
                 Arguments.PushBoolean(false);
             Arguments.PushBoolean(false);
+            Arguments.PushNumber(animGroup);
+            Arguments.PushNumber(animID);
             m_pLocalPlayer->CallEvent("onClientPlayerWasted", Arguments, true);
 
             // Write some death info
@@ -6108,6 +6110,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::ROADSIGNSTEXT:
             g_pGame->SetRoadSignsTextEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::TUNNELWEATHERBLEND:
+            g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -6143,6 +6148,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsExtendedWaterCannonsEnabled();
         case WorldSpecialProperty::ROADSIGNSTEXT:
             return g_pGame->IsRoadSignsTextEnabled();
+        case WorldSpecialProperty::TUNNELWEATHERBLEND:
+            return g_pGame->IsTunnelWeatherBlendEnabled();
     }
     return false;
 }

@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Lua static function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -3759,6 +3759,8 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             else
                 Arguments.PushBoolean(false);
             Arguments.PushBoolean(bStealth);
+            Arguments.PushBoolean(false);
+            Arguments.PushBoolean(false);
             // TODO: change to onPedWasted
             if (IS_PLAYER(pPed))
             {
@@ -4147,6 +4149,8 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot(CElement* pElement, unsigned c
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            pPed->SetWeaponSlot(ucWeaponSlot);
+
             CBitStream BitStream;
 
             SWeaponSlotSync slot;
@@ -7668,7 +7672,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CElement* pElement, uns
 }
 
 CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color,
-                                                  CElement* pVisibleTo)
+                                                  CElement* pVisibleTo, bool ignoreAlphaLimits)
 {
     assert(szType);
 
@@ -7684,6 +7688,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
             // Set the properties
             pMarker->SetPosition(vecPosition);
             pMarker->SetMarkerType(ucType);
+            pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
             pMarker->SetColor(color);
             pMarker->SetSize(fSize);
 
@@ -7854,6 +7859,24 @@ bool CStaticFunctionDefinitions::SetMarkerIcon(CElement* pElement, const char* s
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(CElement* pElement, const SColor color, float size)
+{
+    RUN_CHILDREN(SetMarkerTargetArrowProperties(*iter, color, size))
+
+    if (!IS_MARKER(pElement))
+        return false;
+
+    CMarker* marker = static_cast<CMarker*>(pElement);
+    if (!marker)
+        return false;
+
+    if (!marker->HasTarget() || marker->GetMarkerType() != CMarker::TYPE_CHECKPOINT)
+        return false;
+
+    marker->SetTargetArrowProperties(color, size);
+    return true;
 }
 
 CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color,
