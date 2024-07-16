@@ -711,7 +711,7 @@ std::variant<bool, std::string> CLuaFileDefs::fileRead (
         -> std::variant<bool, std::string>
     {
         if (count == 0)
-            return "";
+            return std::string();
 
         SString buffer;
         auto    bytesRead = pFile->Read(count, buffer);
@@ -757,14 +757,14 @@ std::variant<bool, std::string> CLuaFileDefs::fileRead (
         auto canModify = CheckCanModifyOtherResource(pThisResource, pResource);
         if (!canModify.first)
         {
-            throw std::invalid_argument(canModify.second);
+            throw LuaFunctionError(canModify.second.c_str(), false);
         }
     }
     {
         auto canModify = CheckCanAccessOtherResourceFile(pThisResource, pResource, strAbsPath);
         if (!canModify.first)
         {
-            throw std::invalid_argument(canModify.second);
+            throw LuaFunctionError(canModify.second.c_str(), false);
         }
     }
 

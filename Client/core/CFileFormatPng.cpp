@@ -21,17 +21,16 @@
 ///////////////////////////////////////////////////////////////
 bool IsPng(const void* pData, uint uiDataSize)
 {
-    static uchar PngHeader[] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
-    static uchar PngTail[] = {0xAE, 0x42, 0x60, 0x82};
+    static constexpr std::uint8_t PngHeader[] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+    static constexpr std::uint8_t PngTail[] = {0xAE, 0x42, 0x60, 0x82};
 
-    if (uiDataSize >= sizeof(PngHeader))
-    {
-        if (memcmp(pData, PngHeader, sizeof(PngHeader)) == 0 && memcmp((BYTE*)pData + uiDataSize - sizeof(PngTail), PngTail, sizeof(PngTail)) == 0)
-        {
-            return true;
-        }
-    }
-    return false;
+    if (uiDataSize < sizeof(PngHeader))
+        return false;
+
+    if (memcmp(pData, PngHeader, sizeof(PngHeader)))
+        return false;
+
+    return !memcmp((BYTE*)pData + uiDataSize - sizeof(PngTail), PngTail, sizeof(PngTail));
 }
 
 ///////////////////////////////////////////////////////////////
