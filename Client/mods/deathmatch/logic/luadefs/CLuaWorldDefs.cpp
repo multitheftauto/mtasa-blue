@@ -12,6 +12,7 @@
 #include <game/CWeather.h>
 #include <game/CColPoint.h>
 #include <game/CCoronas.h>
+#include <game/CClock.h>
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaWorldDefs::LoadFunctions()
@@ -2129,7 +2130,7 @@ std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::G
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->GetRainbow();
         case eWorldProperty::TIME_CYCLE:
-            return g_pGame->GetWeather()->GetTimerCycleEnabled();
+            return g_pGame->GetClock()->GetTimerCycleEnabled();
     }
     return false;
 }
@@ -2203,7 +2204,7 @@ bool CLuaWorldDefs::SetWorldProperty(eWorldProperty property, std::variant<bool,
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->SetRainbow(arg1);
         case  eWorldProperty::TIME_CYCLE:
-            return g_pGame->GetWeather()->SetTimerCycle(argBool);
+            return g_pGame->GetClock()->SetTimerCycle(argBool);
     }
     return false;
 }
@@ -2253,7 +2254,7 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
         case eWorldProperty::WEATHER_RAINBOW:
             return g_pGame->GetWeather()->ResetRainbow();
         case eWorldProperty::TIME_CYCLE:
-            return g_pGame->GetWeather()->ResetTimerCycle();
+            return g_pGame->GetClock()->ResetTimerCycle();
     }
     return false;
 }

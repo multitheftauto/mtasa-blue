@@ -35,6 +35,7 @@
 #include <game/CBuildingRemoval.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
+#include "game/CClock.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -3418,7 +3419,6 @@ void CClientGame::Event_OnIngame()
 
     g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
-    g_pGame->GetWeather()->ResetTimerCycle();
 
     g_pGame->ResetModelLodDistances();
     g_pGame->ResetModelFlags();
@@ -5544,6 +5544,7 @@ void CClientGame::ResetMapInfo()
     g_pGame->GetWeather()->ResetWaterFog();
     g_pGame->GetWeather()->ResetSandstorm();
     g_pGame->GetWeather()->ResetRainbow();
+    g_pGame->GetClock()->ResetTimerCycle();
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);

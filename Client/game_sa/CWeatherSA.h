@@ -55,10 +55,6 @@ public:
     bool  SetRainbow(float fAmount);
     bool  ResetRainbow();
 
-    bool SetTimerCycle(bool value) noexcept;
-    bool GetTimerCycleEnabled() const noexcept { return m_bTimeCycleFrozen; };
-    bool ResetTimerCycle() noexcept;
-
 private:
     static unsigned char* VAR_CWeather__ForcedWeatherType;
     static unsigned char* VAR_CWeather__OldWeatherType;
