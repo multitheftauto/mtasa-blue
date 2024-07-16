@@ -8370,7 +8370,7 @@ bool CStaticFunctionDefinitions::SetObjectBreakable(CElement* pElement, const bo
     return false;
 }
 
-bool CStaticFunctionDefinitions::RespawnObject(CElement* const pElement)
+bool CStaticFunctionDefinitions::RespawnObject(CElement* const pElement) noexcept
 {
     RUN_CHILDREN(RespawnObject(*iter));
 
@@ -8387,7 +8387,7 @@ bool CStaticFunctionDefinitions::RespawnObject(CElement* const pElement)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ToggleObjectRespawn(CElement* const pElement, const bool bRespawn)
+bool CStaticFunctionDefinitions::ToggleObjectRespawn(CElement* const pElement, const bool bRespawn) noexcept
 {
     RUN_CHILDREN(ToggleObjectRespawn(*iter, bRespawn));
 

@@ -29,7 +29,7 @@ public:
     LUA_DECLARE(GetObjectMass);
     LUA_DECLARE(GetObjectProperty);
     LUA_DECLARE(GetObjectProperties);
-    static bool IsObjectRespawnable(CClientEntity* const pEntity);
+    static bool IsObjectRespawnable(CClientEntity* const pEntity) noexcept;
 
     // Object set funcs
     LUA_DECLARE(SetObjectRotation);

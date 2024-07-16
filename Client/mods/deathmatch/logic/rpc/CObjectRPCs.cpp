@@ -138,7 +138,7 @@ void CObjectRPCs::BreakObject(CClientEntity* pSource, NetBitStreamInterface& bit
         pObject->Break();
 }
 
-void CObjectRPCs::RespawnObject(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+void CObjectRPCs::RespawnObject(CClientEntity* pSource, NetBitStreamInterface& bitStream) noexcept
 {
     auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
 
@@ -146,7 +146,7 @@ void CObjectRPCs::RespawnObject(CClientEntity* pSource, NetBitStreamInterface& b
         g_pClientGame->GetObjectRespawner()->Respawn(pObject);
 }
 
-void CObjectRPCs::ToggleObjectRespawn(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+void CObjectRPCs::ToggleObjectRespawn(CClientEntity* pSource, NetBitStreamInterface& bitStream) noexcept
 {
     auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
 

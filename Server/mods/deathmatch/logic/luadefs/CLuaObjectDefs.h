@@ -20,7 +20,7 @@ public:
 
     // Object create/destroy functions
     LUA_DECLARE(CreateObject);
-    static bool RespawnObject(CObject* const pObject);
+    static bool RespawnObject(CObject* const pObject) noexcept;
 
     // Object get functions
     LUA_DECLARE(GetObjectName);
@@ -38,5 +38,5 @@ public:
     LUA_DECLARE(MoveObject);
     LUA_DECLARE(StopObject);
     static bool BreakObject(CObject* const pObject);
-    static bool ToggleObjectRespawn(CObject* const pObject, const bool bRespawn);
+    static bool ToggleObjectRespawn(CObject* const pObject, const bool bRespawn) noexcept;
 };

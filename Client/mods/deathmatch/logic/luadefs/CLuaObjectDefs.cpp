@@ -710,7 +710,7 @@ int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaObjectDefs::IsObjectRespawnable(CClientEntity* const pEntity)
+bool CLuaObjectDefs::IsObjectRespawnable(CClientEntity* const pEntity) noexcept
 {
     if (!IS_OBJECT(pEntity))
         return false;

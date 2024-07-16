@@ -319,12 +319,12 @@ bool CLuaObjectDefs::BreakObject(CObject* const pObject)
     return CStaticFunctionDefinitions::BreakObject(pObject);
 }
 
-bool CLuaObjectDefs::RespawnObject(CObject* const pObject)
+bool CLuaObjectDefs::RespawnObject(CObject* const pObject) noexcept
 {
     return CStaticFunctionDefinitions::RespawnObject(pObject);
 }
 
-bool CLuaObjectDefs::ToggleObjectRespawn(CObject* const pObject, const bool bRespawn)
+bool CLuaObjectDefs::ToggleObjectRespawn(CObject* const pObject, const bool bRespawn) noexcept
 {
     return CStaticFunctionDefinitions::ToggleObjectRespawn(pObject, bRespawn);
 }
