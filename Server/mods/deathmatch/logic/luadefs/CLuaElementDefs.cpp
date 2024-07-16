@@ -21,7 +21,7 @@ void CLuaElementDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Create/destroy
         {"createElement", ArgumentParser<createElement>},
-        {"destroyElement", destroyElement},
+        {"destroyElement", ArgumentParser<destroyElement>},
         {"cloneElement", cloneElement},
 
         // Get

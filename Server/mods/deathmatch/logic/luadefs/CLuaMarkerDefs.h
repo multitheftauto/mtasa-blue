@@ -20,7 +20,9 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Marker create/destroy functions
-    LUA_DECLARE(CreateMarker);
+    std::variant<bool, CMarker*> CreateMarker(lua_State* luaVM, CVector pos, std::optional<std::string> type, std::optional<float> size,
+                                                          std::optional<SColor> color, std::optional<CElement*> visibleTo,
+                                                          std::optional<bool> ignoreAlphaLimits) noexcept;
 
     // Marker get functions
     LUA_DECLARE(GetMarkerCount);

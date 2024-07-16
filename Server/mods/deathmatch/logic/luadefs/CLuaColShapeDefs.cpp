@@ -145,29 +145,6 @@ std::variant<bool, CColCuboid*> CLuaColShapeDefs::CreateColCuboid(lua_State* lua
     return shape;
 }
 
-std::variant<bool, CColCuboid*> CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM, CVector pos, CVector size) noexcept
-{
-    if (size.fX < 0.0f)
-        size.fX = 0.1f;
-    if (size.fY < 0.0f)
-        size.fY = 0.1f;
-    if (size.fZ < 0.0f)
-        size.fZ = 0.1f;
-
-    CResource* resource = &lua_getownerresource(luaVM);
-
-    // Create it and return it
-    CColCuboid* shape = CStaticFunctionDefinitions::CreateColCuboid(resource, pos, size);
-    if (!shape)
-        return false;
-
-    CElementGroup* group = resource->GetElementGroup();
-    if (group)
-        group->Add(shape);
-
-    return shape;
-}
-
 std::variant<bool, CColShape*> CLuaColShapeDefs::CreateColSphere(lua_State* luaVM, CVector pos, float radius) noexcept
 {
     CResource* resource = &lua_getownerresource(luaVM);
