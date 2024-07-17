@@ -21,7 +21,7 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Create/destroy
-    static CElement* createElement(lua_State* luaVM, std::string elementType, std::optional<std::string> elementID);
+    static std::variant<bool, CElement*> createElement(lua_State* luaVM, std::string elementType, std::optional<std::string> elementID);
     static bool destroyElement(CElement* element) noexcept;
     static std::variant<bool, CElement*> cloneElement(lua_State* luaVM, CElement* element, std::optional<CVector> pos,
                                                       std::optional<bool> cloneChildren) noexcept;

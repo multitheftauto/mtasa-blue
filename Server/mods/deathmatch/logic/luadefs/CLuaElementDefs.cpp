@@ -222,7 +222,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Element");
 }
 
-CElement* CLuaElementDefs::createElement(lua_State* luaVM, std::string elementType, std::optional<std::string> elementID)
+std::variant<bool, CElement*> CLuaElementDefs::createElement(lua_State* luaVM, std::string elementType, std::optional<std::string> elementID)
 {
     CResource* resource = &lua_getownerresource(luaVM);
     bool       wasDisallowed;
