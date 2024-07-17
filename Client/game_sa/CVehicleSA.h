@@ -428,6 +428,7 @@ public:
     void SetMoveSpeed(CVector* vecMoveSpeed);
 
     bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
+    void DeleteProjectile(CProjectile* projectile) noexcept;
 
     CTrainSAInterface* GetNextCarriageInTrain();
     CVehicle*          GetNextTrainCarriage();

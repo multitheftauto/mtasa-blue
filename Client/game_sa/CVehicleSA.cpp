@@ -311,6 +311,12 @@ bool CVehicleSA::AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fFo
     return ((CProjectileInfoSA*)pGame->GetProjectileInfo())->AddProjectile((CEntitySA*)this, eWeapon, vecOrigin, fForce, target, targetEntity);
 }
 
+void CVehicleSA::DeleteProjectile(CProjectile* projectile) noexcept
+{
+    auto* info = pGame->GetProjectileInfo();
+    info->RemoveProjectile(info, projectile, false);
+}
+
 void CVehicleSA::SetNextTrainCarriage(CVehicle* pNext)
 {
     if (pNext)

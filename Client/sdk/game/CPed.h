@@ -200,6 +200,7 @@ public:
     virtual float    GetOxygenLevel() = 0;
     virtual void     SetOxygenLevel(float fOxygen) = 0;
     virtual bool     AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
+    virtual void     DeleteProjectile(CProjectile* projectile) noexcept = 0;
     virtual CWeapon* GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill weaponSkill) = 0;
     virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) = 0;
     virtual CWeapon* GetWeapon(eWeaponType weaponType) = 0;

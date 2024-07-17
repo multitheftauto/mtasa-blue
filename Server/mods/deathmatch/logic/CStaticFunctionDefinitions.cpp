@@ -310,8 +310,8 @@ CDummy* CStaticFunctionDefinitions::CreateElement(CResource* pResource, const ch
     CLuaArguments args;
     args.PushElement(pDummy);
     args.PushString(szTypeName);
-
-    if (!pDummy->CallEvent("onElementCreate", args)) {
+    if (!pDummy->CallEvent("onElementCreate", args))
+    {
         delete pDummy;
         return nullptr;
     }
@@ -4935,15 +4935,6 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
     if (!pVehicle)
         return nullptr;
 
-    CLuaArguments args;
-    args.PushElement(pVehicle);
-    args.PushString(pVehicle->GetTypeName());
-    if (!pVehicle->CallEvent("onElementCreate", args))
-    {
-        delete pVehicle;
-        return nullptr;
-    }
-
     pVehicle->SetPosition(vecPosition);
     pVehicle->SetRotationDegrees(vecRotation);
     pVehicle->SetRespawnPosition(vecPosition);
@@ -4952,6 +4943,15 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
 
     if (szRegPlate && szRegPlate[0])
         pVehicle->SetRegPlate(szRegPlate);
+
+    CLuaArguments args;
+    args.PushElement(pVehicle);
+    args.PushString(pVehicle->GetTypeName());
+    if (!pVehicle->CallEvent("onElementCreate", args))
+    {
+        delete pVehicle;
+        return nullptr;
+    }
 
     // Only sync if the resource has started on client
     if (pResource->IsClientSynced())
@@ -7941,16 +7941,6 @@ CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVecto
     if (!pBlip)
         return nullptr;
 
-    CLuaArguments args;
-    args.PushElement(pBlip);
-    args.PushString(pBlip->GetTypeName());
-
-    if (!pBlip->CallEvent("onElementCreate", args))
-    {
-        delete pBlip;
-        return nullptr;
-    }
-
     // Set the given properties
     pBlip->SetPosition(vecPosition);
     pBlip->m_ucIcon = ucIcon;
@@ -7964,6 +7954,15 @@ CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVecto
     {
         pBlip->RemoveVisibleToReference(m_pMapManager->GetRootElement());
         pBlip->AddVisibleToReference(pVisibleTo);
+    }
+
+    CLuaArguments args;
+    args.PushElement(pBlip);
+    args.PushString(pBlip->GetTypeName());
+    if (!pBlip->CallEvent("onElementCreate", args))
+    {
+        delete pBlip;
+        return nullptr;
     }
 
     // Tell everyone about it
@@ -7985,16 +7984,6 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource* pResource, CE
     if (!pBlip)
         return nullptr;
 
-    CLuaArguments args;
-    args.PushElement(pBlip);
-    args.PushString(pBlip->GetTypeName());
-
-    if (!pBlip->CallEvent("onElementCreate", args))
-    {
-        delete pBlip;
-        return nullptr;
-    }
-
     // Set the properties
     pBlip->m_ucIcon = ucIcon;
     pBlip->m_ucSize = ucSize;
@@ -8009,6 +7998,15 @@ CBlip* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource* pResource, CE
         pBlip->AddVisibleToReference(pVisibleTo);
     }
     pBlip->AttachTo(pElement);
+
+    CLuaArguments args;
+    args.PushElement(pBlip);
+    args.PushString(pBlip->GetTypeName());
+    if (!pBlip->CallEvent("onElementCreate", args))
+    {
+        delete pBlip;
+        return nullptr;
+    }
 
     // Tell everyone about it
     if (pResource->IsClientSynced())
@@ -8460,16 +8458,6 @@ CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, co
     if (!pRadarArea)
         return nullptr;
 
-    CLuaArguments args;
-    args.PushElement(pRadarArea);
-    args.PushString(pRadarArea->GetTypeName());
-
-    if (!pRadarArea->CallEvent("onElementCreate", args))
-    {
-        delete pRadarArea;
-        return nullptr;
-    }
-
     // Set the properties
     CVector vecPosition = CVector(vecPosition2D.fX, vecPosition2D.fY, 0.0f);
     pRadarArea->SetPosition(vecPosition);
@@ -8481,6 +8469,15 @@ CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, co
     {
         pRadarArea->RemoveVisibleToReference(m_pMapManager->GetRootElement());
         pRadarArea->AddVisibleToReference(pVisibleTo);
+    }
+
+    CLuaArguments args;
+    args.PushElement(pRadarArea);
+    args.PushString(pRadarArea->GetTypeName());
+    if (!pRadarArea->CallEvent("onElementCreate", args))
+    {
+        delete pRadarArea;
+        return nullptr;
     }
 
     // Tell all the players
@@ -8648,21 +8645,20 @@ CPickup* CStaticFunctionDefinitions::CreatePickup(CResource* pResource, const CV
     if (!pickup)
         return nullptr;
 
-    CLuaArguments args;
-    args.PushElement(pickup);
-    args.PushString(pickup->GetTypeName());
-
-    if (!pickup->CallEvent("onElementCreate", args))
-    {
-        delete pickup;
-        return nullptr;
-    }
-
     // Set the type and respawn intervals first!
     // Apply the position, type too and send it
     pickup->SetPickupType(ucType);
     pickup->SetRespawnIntervals(ulRespawnInterval);
     pickup->SetPosition(vecPosition);
+
+    CLuaArguments args;
+    args.PushElement(pickup);
+    args.PushString(pickup->GetTypeName());
+    if (!pickup->CallEvent("onElementCreate", args))
+    {
+        delete pickup;
+        return nullptr;
+    }
 
     if (pResource->IsClientSynced())
     {
@@ -9442,25 +9438,24 @@ CWater* CStaticFunctionDefinitions::CreateWater(CResource* pResource, CVector* p
 
     if (!pWater)
         return nullptr;
-    
-    CLuaArguments args;
-    args.PushElement(pWater);
-    args.PushString(pWater->GetTypeName());
-
-    if (!pWater->CallEvent("onElementCreate", args))
-    {
-        delete pWater;
-        return nullptr;
-    }
 
     pWater->SetVertex(0, *pV1);
     pWater->SetVertex(1, *pV2);
     pWater->SetVertex(2, *pV3);
 
-    if (pWater->GetWaterType() == CWater::QUAD)
+    if (pWater->GetWaterType() == CWater::QUAD && pV4)
         pWater->SetVertex(3, *pV4);
 
     if (!pWater->Valid())
+    {
+        delete pWater;
+        return nullptr;
+    }
+
+    CLuaArguments args;
+    args.PushElement(pWater);
+    args.PushString(pWater->GetTypeName());
+    if (!pWater->CallEvent("onElementCreate", args))
     {
         delete pWater;
         return nullptr;
@@ -9597,7 +9592,6 @@ CColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource* pResource, co
     CLuaArguments args;
     args.PushElement(pColShape);
     args.PushString(pColShape->GetTypeName());
-
     if (!pColShape->CallEvent("onElementCreate", args))
     {
         delete pColShape;
@@ -9626,7 +9620,6 @@ CColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource* pResource, co
     CLuaArguments args;
     args.PushElement(pColShape);
     args.PushString(pColShape->GetTypeName());
-
     if (!pColShape->CallEvent("onElementCreate", args))
     {
         delete pColShape;
@@ -9655,7 +9648,6 @@ CColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource* pResource, co
     CLuaArguments args;
     args.PushElement(pColShape);
     args.PushString(pColShape->GetTypeName());
-
     if (!pColShape->CallEvent("onElementCreate", args))
     {
         delete pColShape;
@@ -9684,7 +9676,6 @@ CColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource* pResour
     CLuaArguments args;
     args.PushElement(pColShape);
     args.PushString(pColShape->GetTypeName());
-
     if (!pColShape->CallEvent("onElementCreate", args))
     {
         delete pColShape;
@@ -9713,19 +9704,16 @@ CColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource* pResource, 
     CVector      vecPosition(vecPointList[0].fX, vecPointList[0].fY, 0);
     CColPolygon* pColShape = new CColPolygon(m_pColManager, pResource->GetDynamicElementRoot(), vecPosition);
 
+    for (const auto& point : vecPointList)
+        pColShape->AddPoint(point);
+
     CLuaArguments args;
     args.PushElement(pColShape);
     args.PushString(pColShape->GetTypeName());
-
     if (!pColShape->CallEvent("onElementCreate", args))
     {
         delete pColShape;
         return nullptr;
-    }
-
-    for (uint i = 1; i < vecPointList.size(); i++)
-    {
-        pColShape->AddPoint(vecPointList[i]);
     }
 
     // Run collision detection
@@ -9750,7 +9738,6 @@ CColTube* CStaticFunctionDefinitions::CreateColTube(CResource* pResource, const 
     CLuaArguments args;
     args.PushElement(pColShape);
     args.PushString(pColShape->GetTypeName());
-
     if (!pColShape->CallEvent("onElementCreate", args))
     {
         delete pColShape;
@@ -9980,17 +9967,16 @@ CCustomWeapon* CStaticFunctionDefinitions::CreateWeapon(CResource* pResource, eW
 {
     CCustomWeapon* const pWeapon = new CCustomWeapon(pResource->GetDynamicElementRoot(), m_pObjectManager, m_pCustomWeaponManager, weaponType);
 
+    pWeapon->SetPosition(vecPosition);
+
     CLuaArguments args;
     args.PushElement(pWeapon);
     args.PushString(pWeapon->GetTypeName());
-
     if (!pWeapon->CallEvent("onElementCreate", args))
     {
         delete pWeapon;
         return nullptr;
     }
-
-    pWeapon->SetPosition(vecPosition);
 
     if (pResource->IsClientSynced())
     {

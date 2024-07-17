@@ -956,7 +956,7 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement(CResource& Resource, con
     assert(szID);
 
     // Long enough typename and not an internal one?
-    if (!szTypeName[0] || CClientEntity::GetTypeID(szTypeName) != CCLIENTUNKNOWN)
+    if (!szTypeName || !szTypeName[0] || CClientEntity::GetTypeID(szTypeName) != CCLIENTUNKNOWN)
         return nullptr;
 
     CClientDummy* pDummy = new CClientDummy(m_pManager, INVALID_ELEMENT_ID, szTypeName);
@@ -966,7 +966,6 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement(CResource& Resource, con
     CLuaArguments args;
     args.PushElement(pDummy);
     args.PushString(pDummy->GetTypeName());
-
     if (!pDummy->CallEvent("onClientElementCreate", args, true))
     {
         delete pDummy;
@@ -2868,7 +2867,6 @@ CClientVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource& Resource, u
     CLuaArguments args;
     args.PushElement(pVehicle);
     args.PushString(pVehicle->GetTypeName());
-
     if (!pVehicle->CallEvent("onClientElementCreate", args, true))
     {
         delete pVehicle;
@@ -4340,7 +4338,6 @@ CClientRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource& Resourc
     CLuaArguments args;
     args.PushElement(pRadarArea);
     args.PushString(pRadarArea->GetTypeName());
-
     if (!pRadarArea->CallEvent("onClientElementCreate", args, true))
     {
         delete pRadarArea;
@@ -4500,7 +4497,6 @@ CClientPickup* CStaticFunctionDefinitions::CreatePickup(CResource& Resource, con
     CLuaArguments args;
     args.PushElement(pPickup);
     args.PushString(pPickup->GetTypeName());
-
     if (!pPickup->CallEvent("onClientElementCreate", args, true))
     {
         delete pPickup;
@@ -4700,20 +4696,20 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip(CResource& Resource, 
 
     CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
 
-    CLuaArguments args;
-    args.PushElement(pBlip);
-    args.PushString(pBlip->GetTypeName());
-
-    if (!pBlip->CallEvent("onClientElementCreate", args, true)) {
-        delete pBlip;
-        return nullptr;
-    }
-
     pBlip->SetParent(Resource.GetResourceDynamicEntity());
     pBlip->SetPosition(vecPosition);
     pBlip->SetSprite(ucIcon);
     pBlip->SetScale(ucSize);
     pBlip->SetColor(color);
+
+    CLuaArguments args;
+    args.PushElement(pBlip);
+    args.PushString(pBlip->GetTypeName());
+    if (!pBlip->CallEvent("onClientElementCreate", args, true))
+    {
+        delete pBlip;
+        return nullptr;
+    }
 
     return pBlip;
 }
@@ -4728,21 +4724,20 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource& 
 
     CClientRadarMarker* pBlip = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, sOrdering, usVisibleDistance);
 
-    CLuaArguments args;
-    args.PushElement(pBlip);
-    args.PushString(pBlip->GetTypeName());
-
-    if (!pBlip->CallEvent("onClientElementCreate", args, true))
-    {
-        delete pBlip;
-        return nullptr;
-    }
-
     pBlip->SetParent(Resource.GetResourceDynamicEntity());
     pBlip->AttachTo(&Entity);
     pBlip->SetSprite(ucIcon);
     pBlip->SetScale(ucSize);
     pBlip->SetColor(color);
+
+    CLuaArguments args;
+    args.PushElement(pBlip);
+    args.PushString(pBlip->GetTypeName());
+    if (!pBlip->CallEvent("onClientElementCreate", args, true))
+    {
+        delete pBlip;
+        return nullptr;
+    }
 
     return pBlip;
 }
@@ -6512,7 +6507,6 @@ CClientWater* CStaticFunctionDefinitions::CreateWater(CResource& resource, CVect
     CLuaArguments args;
     args.PushElement(pWater);
     args.PushString(pWater->GetTypeName());
-
     if (!pWater->CallEvent("onClientElementCreate", args, true)) {
         delete pWater;
         return nullptr;
@@ -7395,10 +7389,10 @@ CClientProjectile* CStaticFunctionDefinitions::CreateProjectile(CResource& Resou
                     CLuaArguments args;
                     args.PushElement(pProjectile);
                     args.PushString(pProjectile->GetTypeName());
-
                     if (!pProjectile->CallEvent("onClientElementCreate", args, true))
                     {
-                        m_pProjectileManager->GetProjectiles().pop_back();
+                        m_pProjectileManager->Delete(pProjectile);
+                        m_pProjectileManager->GetProjectiles().remove(pProjectile);
                         delete pProjectile;
                         return nullptr;
                     }
@@ -7427,7 +7421,6 @@ CClientColCircle* CStaticFunctionDefinitions::CreateColCircle(CResource& Resourc
     CLuaArguments args;
     args.PushElement(pShape);
     args.PushString(pShape->GetTypeName());
-
     if (!pShape->CallEvent("onClientElementCreate", args, true))
     {
         delete pShape;
@@ -7446,7 +7439,6 @@ CClientColCuboid* CStaticFunctionDefinitions::CreateColCuboid(CResource& Resourc
     CLuaArguments args;
     args.PushElement(pShape);
     args.PushString(pShape->GetTypeName());
-
     if (!pShape->CallEvent("onClientElementCreate", args, true))
     {
         delete pShape;
@@ -7465,7 +7457,6 @@ CClientColSphere* CStaticFunctionDefinitions::CreateColSphere(CResource& Resourc
     CLuaArguments args;
     args.PushElement(pShape);
     args.PushString(pShape->GetTypeName());
-
     if (!pShape->CallEvent("onClientElementCreate", args, true))
     {
         delete pShape;
@@ -7484,7 +7475,6 @@ CClientColRectangle* CStaticFunctionDefinitions::CreateColRectangle(CResource& R
     CLuaArguments args;
     args.PushElement(pShape);
     args.PushString(pShape->GetTypeName());
-
     if (!pShape->CallEvent("onClientElementCreate", args, true))
     {
         delete pShape;
@@ -7503,7 +7493,6 @@ CClientColPolygon* CStaticFunctionDefinitions::CreateColPolygon(CResource& Resou
     CLuaArguments args;
     args.PushElement(pShape);
     args.PushString(pShape->GetTypeName());
-
     if (!pShape->CallEvent("onClientElementCreate", args, true))
     {
         delete pShape;
@@ -7522,7 +7511,6 @@ CClientColTube* CStaticFunctionDefinitions::CreateColTube(CResource& Resource, c
     CLuaArguments args;
     args.PushElement(pShape);
     args.PushString(pShape->GetTypeName());
-
     if (!pShape->CallEvent("onClientElementCreate", args, true))
     {
         delete pShape;
@@ -10144,7 +10132,6 @@ CClientPointLights* CStaticFunctionDefinitions::CreateLight(CResource& Resource,
     CLuaArguments args;
     args.PushElement(pLight);
     args.PushString(pLight->GetTypeName());
-
     if (!pLight->CallEvent("onClientElementCreate", args, true))
     {
         delete pLight;
@@ -10241,7 +10228,6 @@ CClientSearchLight* CStaticFunctionDefinitions::CreateSearchLight(CResource& Res
     CLuaArguments args;
     args.PushElement(pLight);
     args.PushString(pLight->GetTypeName());
-
     if (!pLight->CallEvent("onClientElementCreate", args, true))
     {
         delete pLight;

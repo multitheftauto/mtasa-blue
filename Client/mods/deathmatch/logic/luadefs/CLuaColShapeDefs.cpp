@@ -192,9 +192,12 @@ std::variant<bool, CClientColRectangle*> CLuaColShapeDefs::CreateColRectangle(lu
 //std::variant<bool, CClientColPolygon*>
 int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
 {
-    CVector2D        pos;
+    // TODO: Once #3574 gets merged, this function
+    // will need to be refactored to use LuaVarArgs
+    // with ArgumentParser instead of lua function
+    CVector2D        vecPosition;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadVector2D(pos);
+    argStream.ReadVector2D(vecPosition);
 
     // Get the points
     std::vector<CVector2D> vecPointList;
@@ -205,12 +208,23 @@ int CLuaColShapeDefs::CreateColPolygon(lua_State* luaVM)
         vecPointList.push_back(vecPoint);
     }
 
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
     CResource* resource = &lua_getownerresource(luaVM);
 
     // Create it and return it
-    CClientColPolygon* shape = CStaticFunctionDefinitions::CreateColPolygon(*resource, pos);
+    CClientColPolygon* shape = CStaticFunctionDefinitions::CreateColPolygon(*resource, vecPosition);
     if (!shape)
-        return false;
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
 
     // Add the points
     for (const auto& point : vecPointList)

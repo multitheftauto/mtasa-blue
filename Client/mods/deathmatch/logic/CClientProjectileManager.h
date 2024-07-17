@@ -49,6 +49,7 @@ public:
     void Hook_ProjectileCreation(CEntity* pGameCreator, CProjectile* pGameProjectile, CProjectileInfo* pProjectileInfo, eWeaponType weaponType, CVector* origin,
                                  float fForce, CVector* target, CEntity* pGameTarget);
     CClientProjectile* Create(CClientEntity* pCreator, eWeaponType eWeapon, CVector& vecOrigin, float fForce, CVector* target, CClientEntity* pTargetEntity);
+    void               Delete(CClientProjectile* projectile) noexcept;
 
 protected:
     void AddToList(CClientProjectile* pProjectile) { m_List.push_back(pProjectile); }

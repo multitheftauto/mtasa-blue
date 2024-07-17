@@ -94,6 +94,7 @@ public:
     virtual ~CVehicle(){};
 
     virtual bool AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity) = 0;
+    virtual void DeleteProjectile(CProjectile* projectile) noexcept = 0;
 
     virtual CPed* GetDriver() = 0;
     virtual CPed* GetPassenger(unsigned char ucSlot) = 0;

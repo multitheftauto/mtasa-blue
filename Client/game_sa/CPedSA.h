@@ -303,6 +303,7 @@ public:
     CVehicle* GetVehicle();
     void      Respawn(CVector* position, bool bCameraCut);
     bool      AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
+    void      DeleteProjectile(CProjectile* projectile) noexcept;
 
     float GetHealth();
     void  SetHealth(float fHealth);

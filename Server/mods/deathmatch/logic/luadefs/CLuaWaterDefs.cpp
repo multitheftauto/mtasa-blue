@@ -64,7 +64,9 @@ std::variant<bool, CWater*> CLuaWaterDefs::CreateWater(lua_State* luaVM, CVector
 
     CResource* resource = &lua_getownerresource(luaVM);
 
-    CWater* water = CStaticFunctionDefinitions::CreateWater(resource, &pos1, &pos2, &pos3, &pos4.value(), shallow.value());
+    CVector* pos4Temp = pos4.has_value() ? &pos4.value() : nullptr;
+
+    CWater* water = CStaticFunctionDefinitions::CreateWater(resource, &pos1, &pos2, &pos3, pos4Temp, shallow.value());
     if (!water)
         return false;
 

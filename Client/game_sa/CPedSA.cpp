@@ -134,7 +134,14 @@ bool CPedSA::IsInWater()
 
 bool CPedSA::AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity)
 {
-    return ((CProjectileInfoSA*)pGame->GetProjectileInfo())->AddProjectile((CEntitySA*)this, eWeapon, vecOrigin, fForce, target, targetEntity);
+    auto projectileInfo = (CProjectileInfoSA*)pGame->GetProjectileInfo();
+    return projectileInfo->AddProjectile((CEntitySA*)this, eWeapon, vecOrigin, fForce, target, targetEntity);
+}
+
+void CPedSA::DeleteProjectile(CProjectile* projectile) noexcept
+{
+    auto* info = pGame->GetProjectileInfo();
+    info->RemoveProjectile(info, projectile, false);
 }
 
 void CPedSA::DetachPedFromEntity()

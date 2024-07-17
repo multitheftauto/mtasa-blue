@@ -237,7 +237,7 @@ CElement* CLuaElementDefs::createElement(lua_State* luaVM, std::string elementTy
             // warning instead of error
             throw LuaFunctionError(err.c_str());
         }
-        return nullptr;
+        return false;
     }
 
     // Get the group

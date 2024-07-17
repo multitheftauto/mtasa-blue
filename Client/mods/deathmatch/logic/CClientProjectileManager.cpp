@@ -173,3 +173,8 @@ CClientProjectile* CClientProjectileManager::Create(CClientEntity* pCreator, eWe
     m_bCreating = false;
     return m_pLastCreated;
 }
+
+void CClientProjectileManager::Delete(CClientProjectile* projectile) noexcept
+{
+    projectile->Destroy(false);
+}
