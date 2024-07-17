@@ -33,9 +33,9 @@
 #include <game/CWeather.h>
 #include <game/Task.h>
 #include <game/CBuildingRemoval.h>
+#include "game/CClock.h"
 #include <windowsx.h>
 #include "CServerInfo.h"
-#include "game/CClock.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
