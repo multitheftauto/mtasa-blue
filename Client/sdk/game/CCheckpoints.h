@@ -20,4 +20,5 @@ public:
     virtual CCheckpoint* CreateCheckpoint(DWORD Identifier, WORD wType, CVector* vecPosition, CVector* vecPointDir, float fSize, float fPulseFraction,
                                           const SharedUtil::SColor color) = 0;
     virtual CCheckpoint* FindFreeMarker() = 0;
+    virtual CCheckpoint* FindMarker(DWORD identifier) = 0;
 };
