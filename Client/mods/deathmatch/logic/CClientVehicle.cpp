@@ -814,7 +814,7 @@ void CClientVehicle::Fix()
     for (int i = 0; i < MAX_DOORS; i++)
         SetDoorStatus(i, ucDoorStates[i], true);
     for (int i = 0; i < MAX_PANELS; i++)
-        SetPanelStatus(i, 0, true);
+        SetPanelStatus(i, 0);
     for (int i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
     for (int i = 0; i < MAX_WHEELS; i++)
@@ -1524,12 +1524,12 @@ bool CClientVehicle::GetWheelMissing(unsigned char ucWheel, const SString& strWh
     return false;
 }
 
-void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus, bool spawnFlyingComponent)
+void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus, bool spawnFlyingComponent, bool breakGlass)
 {
     if (ucPanel < MAX_PANELS)
     {
         if (m_pVehicle && HasDamageModel())
-            m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus, spawnFlyingComponent);
+            m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus, spawnFlyingComponent, breakGlass);
 
         m_ucPanelStates[ucPanel] = ucStatus;
     }

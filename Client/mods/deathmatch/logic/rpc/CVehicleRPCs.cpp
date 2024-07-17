@@ -351,10 +351,14 @@ void CVehicleRPCs::SetVehicleDamageState(CClientEntity* pSource, NetBitStreamInt
                     if (bitStream.Read(ucPanel) && bitStream.Read(ucState))
                     {
                         bool spawnFlyingComponent = true;
+                        bool breakGlass = false;
                         if (bitStream.Can(eBitStreamVersion::SetVehiclePanelState_SpawnFlyingComponent))
+                        {
                             bitStream.ReadBit(spawnFlyingComponent);
+                            bitStream.ReadBit(breakGlass);
+                        }
 
-                        pVehicle->SetPanelStatus(ucPanel, ucState, spawnFlyingComponent);
+                        pVehicle->SetPanelStatus(ucPanel, ucState, spawnFlyingComponent, breakGlass);
                     }
                 }
                 default:
