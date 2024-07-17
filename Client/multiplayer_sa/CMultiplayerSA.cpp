@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        multiplayer_sa/CMultiplayerSA.cpp
+ *  FILE:        Client/multiplayer_sa/CMultiplayerSA.cpp
  *  PURPOSE:     Multiplayer module class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -6115,7 +6115,7 @@ bool                 CheckHasSuspensionChanged()
 
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
         if (pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
-            return pVehicle->GetHandlingData()->HasSuspensionChanged();
+            return true;
         else
             return false;
     }

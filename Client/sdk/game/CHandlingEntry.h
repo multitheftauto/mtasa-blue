@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CHandlingEntry.h
+ *  FILE:        Client/sdk/game/CHandlingEntry.h
  *  PURPOSE:     Vehicle handling entry interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -91,7 +91,7 @@ public:
     virtual ~CHandlingEntry(){};
 
     // Use this to copy data from an another handling class to this
-    virtual void Assign(const CHandlingEntry* pData) = 0;
+    virtual void Assign(const CHandlingEntry* pEntry) = 0;
 
     // Get functions
     virtual float          GetMass() const = 0;
@@ -137,8 +137,7 @@ public:
     virtual eLightType    GetTailLight() const = 0;
     virtual unsigned char GetAnimGroup() const = 0;
 
-    virtual eVehicleTypes GetModel() const = 0;
-    virtual bool          HasSuspensionChanged() const = 0;
+    virtual std::uint16_t GetVehicleID() const = 0;
 
     // Set functions
     virtual void SetMass(float fMass) = 0;
@@ -184,9 +183,7 @@ public:
     virtual void SetTailLight(eLightType Style) = 0;
     virtual void SetAnimGroup(unsigned char ucGroup) = 0;
 
-    virtual void SetSuspensionChanged(bool bChanged) = 0;
-
     // Call this every time you're done changing something. This will recalculate
     // all transmission/handling values according to the new values.
-    virtual void Recalculate(unsigned short usModel) = 0;
+    virtual void Recalculate() = 0;
 };
