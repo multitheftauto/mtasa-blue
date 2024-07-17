@@ -18,6 +18,7 @@
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
 #include "CDamageManager.h"
+#include "CProjectile.h"
 
 class CAEVehicleAudioEntity;
 class CColModel;
