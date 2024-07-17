@@ -2241,15 +2241,15 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
 
 bool CLuaWorldDefs::SetTimeFrozen(bool value) noexcept
 {
-    return g_pGame->GetClock()->SetTimerCycle(value);
+    return g_pGame->GetClock()->SetTimeFrozen(value);
 }
 
 bool CLuaWorldDefs::IsTimeFrozen() noexcept
 {
-    return g_pGame->GetClock()->GetTimerCycleEnabled();
+    return g_pGame->GetClock()->IsTimeFrozen();
 }
 
 bool CLuaWorldDefs::ResetTimeFrozen() noexcept
 {
-    return g_pGame->GetClock()->ResetTimerCycle();
+    return g_pGame->GetClock()->ResetTimeFrozen();
 }

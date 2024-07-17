@@ -31,7 +31,7 @@ void CClockSA::Get(BYTE* bHour, BYTE* bMinute)
     *bHour = *(BYTE*)VAR_TimeHours;
 }
 
-bool CClockSA::SetTimerCycle(bool value) noexcept
+bool CClockSA::SetTimeFrozen(bool value) noexcept
 {
     if (value)
         MemSet((void*)0x53BFBD, 0x90, 5);
@@ -42,7 +42,7 @@ bool CClockSA::SetTimerCycle(bool value) noexcept
     return true;
 }
 
-bool CClockSA::ResetTimerCycle() noexcept
+bool CClockSA::ResetTimeFrozen() noexcept
 {
-    return SetTimerCycle(false);
+    return SetTimeFrozen(false);
 }

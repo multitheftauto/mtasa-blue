@@ -5408,6 +5408,7 @@ void CClientGame::ResetMapInfo()
 
     // Hud
     g_pGame->GetHud()->SetComponentVisible(HUD_ALL, true);
+
     // Disable area names as they are on load until camera unfades
     g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     g_pGame->GetHud()->SetComponentVisible(HUD_VITAL_STATS, false);
@@ -5544,10 +5545,12 @@ void CClientGame::ResetMapInfo()
     g_pGame->GetWeather()->ResetWaterFog();
     g_pGame->GetWeather()->ResetSandstorm();
     g_pGame->GetWeather()->ResetRainbow();
-    g_pGame->GetClock()->ResetTimerCycle();
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
+
+    // Reset Frozen Time
+    g_pGame->GetClock()->ResetTimeFrozen();
 
     // Close all garages
     CGarage*  pGarage = NULL;

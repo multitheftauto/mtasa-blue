@@ -23,9 +23,9 @@ public:
     void Set(BYTE bHour, BYTE bMinute);
     void Get(BYTE* bHour, BYTE* bMinute);
 
-    bool SetTimerCycle(bool value) noexcept;
-    bool GetTimerCycleEnabled() const noexcept { return m_bTimeCycleFrozen; };
-    bool ResetTimerCycle() noexcept;
+    bool SetTimeFrozen(bool value) noexcept;
+    bool IsTimeFrozen() const noexcept { return m_bTimeCycleFrozen; };
+    bool ResetTimeFrozen() noexcept;
 
 private:
     bool m_bTimeCycleFrozen;
