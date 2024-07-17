@@ -10,20 +10,9 @@
 
 #include "StdInc.h"
 
-struct RsGlobal
-{
-    int width;
-    int height;
-};
-
-#ifndef M_PI
-    #define M_PI 3.14159265358979323846
-#endif
-
 float MiscWidth[30], MiscHeight[30];
 float RadarWidth[23], RadarHeight[23];
 float HUDWidth[120], HUDHeight[120];
-float CameraWidth[2], CameraHeight[2];
 
 float                  ScreenWidthScale = 1.0f;
 static constexpr float ScreenHeightScale = 1.0f;
@@ -36,15 +25,9 @@ constexpr float WidthMult = 0.0015625f;
 constexpr float HeightMult = 0.002232143f;
 
 float* ScreenAspectRatio;
-float* ScreenFieldOfView;
-
-RsGlobal* rsGlobal;
 
 void UpdateMiscFixes()
 {
-    CameraWidth[0] = 0.01403292f;
-    CameraHeight[0] = 0.0f;
-
     MiscWidth[0] = WidthMult * ScreenWidthScale;            // StretchX
     MiscWidth[1] = 0.0546875f * ScreenWidthScale;
     MiscWidth[2] = WidthMult;
@@ -183,10 +166,10 @@ void UpdateHUDFixes()
     HUDWidth[27] = WidthMult * ScreenWidthScale * HudWidthScale;
     HUDWidth[28] = WidthMult * ScreenWidthScale * HudWidthScale;
     HUDWidth[29] = WidthMult * ScreenWidthScale * HudWidthScale;
-    HUDWidth[30] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[30] = 0.0019350f * ScreenWidthScale;
     HUDWidth[31] = WidthMult * ScreenWidthScale * HudWidthScale;
     HUDWidth[32] = WidthMult * ScreenWidthScale * HudWidthScale;
-    HUDWidth[33] = WidthMult * ScreenWidthScale * HudWidthScale;
+    HUDWidth[33] = 0.0019500f * ScreenWidthScale;
     HUDWidth[34] = WidthMult * ScreenWidthScale * HudWidthScale;
     HUDWidth[35] = WidthMult * ScreenWidthScale * HudWidthScale;
     HUDWidth[36] = WidthMult * ScreenWidthScale * HudWidthScale;
@@ -545,10 +528,10 @@ void InstallHUDFixes()
         0x58DF71,            // 27 Wanted
         0x58DFE5,            // 28 Wanted
         0x58B09F,            // 29 Vehicle names
-        0x58B13F,            // 30 Vehicle names
-        0x58AD3A,            // 31 Area names
-        0x58AD65,            // 32 Area names
-        0x58AE4A,            // 33 Area names
+        0x58B13F,            // 30 Vehicle names x pos
+        0x58AD3A,            // 31 Area names scale
+        0x58AD65,            // 32 Area names ?
+        0x58AE4A,            // 33 Area names x pos
         0x58C395,            // 34 Subs
         0x58C41D,            // 35 Subs
         0x58C4DC,            // 36 Subs
@@ -716,7 +699,6 @@ void InstallHUDFixes()
 
 void GetMemoryAddresses()
 {
-    rsGlobal = (RsGlobal*)0xC17040;
     ScreenAspectRatio = (float*)0xC3EFA4;
 }
 
