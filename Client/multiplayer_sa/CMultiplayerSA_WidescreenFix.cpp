@@ -10,9 +10,14 @@
 
 #include "StdInc.h"
 
-float MiscWidth[1], MiscHeight[1];
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
+float MiscWidth[30], MiscHeight[30];
 float RadarWidth[23], RadarHeight[23];
 float HUDWidth[39], HUDHeight[34];
+float CameraWidth[1];
 
 float                  ScreenWidthScale = 1.0f;
 static constexpr float ScreenHeightScale = 1.0f;
@@ -27,9 +32,36 @@ constexpr float WidthMult = 0.0015625f;
 constexpr float HeightMult = 0.002232143f;
 
 float* ScreenAspectRatio;
+float* ScreenFieldOfView;
+
+float AdjustFOV(float f, float ar)
+{
+    return std::round((2.0f * atan(((ar) / (4.0f / 3.0f)) * tan(f / 2.0f * ((float)M_PI / 180.0f)))) * (180.0f / (float)M_PI) * 100.0f) / 100.0f;
+}
+
+void SetFOV(float factor)
+{
+    *ScreenFieldOfView = AdjustFOV(factor, *ScreenAspectRatio);
+}
+
+void __declspec(naked) CalculateAimingPoint()
+{
+    _asm
+    {
+        fstp    st
+        mov     edx, [ScreenAspectRatio]
+        fmul[edx]
+        mov     edi, [esp + 1Ch + 14h]
+        mov     edx, edi
+        mov     ebx, 5149A6h
+        jmp     ebx
+    }
+}
 
 void UpdateMiscFixes()
 {
+    CameraWidth[0] = 0.01403292f;
+
     MiscWidth[0] = WidthMult * ScreenWidthScale;            // StretchX
     MiscHeight[0] = HeightMult * ScreenHeightScale;            // StretchY
 }
@@ -142,7 +174,7 @@ void UpdateHUDFixes()
     HUDHeight[15] = HeightMult * ScreenHeightScale * HudHeightScale;
     HUDHeight[16] = HeightMult * ScreenHeightScale * HudHeightScale;
     HUDHeight[17] = HeightMult * ScreenHeightScale * HudHeightScale;
-    HUDHeight[18] = HeightMult * ScreenHeightScale * HudHeightScale;
+    HUDHeight[18] = 0.002f * ScreenHeightScale * HudHeightScale;
     HUDHeight[19] = HeightMult * ScreenHeightScale * HudHeightScale;
     HUDHeight[20] = HeightMult * ScreenHeightScale * HudHeightScale;
     HUDHeight[21] = HeightMult * ScreenHeightScale * HudHeightScale;
@@ -323,7 +355,7 @@ void InstallHUDFixes()
         0x58D882,            // 15 Weapon icons
         0x58F90B,            // 16 Weapon icons
         0x5894AF,            // 17 Ammo
-        0x58F9C0,            // 18 Ammo
+        0x58F9C0,            // 18 Ammo y position
         0x58FA4A,            // 19 Ammo
         0x58DCA2,            // 20 Wanted
         0x58DD68,            // 21 Wanted
@@ -358,15 +390,27 @@ void InstallHUDFixes()
     MemPut<float*>(0x58FA8E + 0x2, &HUDWidth[17]);             // Ammo x
 }
 
+void InstallFieldOfViewFixes()
+{
+    HookInstall(0x6FF410, (DWORD)SetFOV, 5);
+    // Aiming point
+    HookInstall(0x51499E, (DWORD)CalculateAimingPoint, 5);
+    MemSet((void*)0x50AD79, 0x90, 6);
+    MemPut<float*>(0x50AD59 + 0x2, &CameraWidth[0]);
+    MemPut<float*>(0x51498D + 0x2, &CameraWidth[0]);
+}
+
 void GetMemoryAddresses()
 {
     ScreenAspectRatio = (float*)0xC3EFA4;
+    ScreenFieldOfView = (float*)0x8D5038;
 }
 
 void CMultiplayerSA::InitHooks_WidescreenFix()
 {
     GetMemoryAddresses();
-
+    
     InstallAspectRatioFixes();
+    InstallFieldOfViewFixes();
     InstallHUDFixes();
 }
