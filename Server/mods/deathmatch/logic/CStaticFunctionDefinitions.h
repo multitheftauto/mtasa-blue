@@ -700,6 +700,7 @@ public:
     // Account set funcs
     static CAccount* AddAccount(const SString& strName, const SString& strPassword, bool bAllowCaseVariations, SString& strOutError);
     static bool      RemoveAccount(CAccount* pAccount);
+    static bool      SetAccountSerial(SString strName, const SString strSerial);
     static bool      SetAccountName(CAccount* pAccount, SString strNewName, bool bAllowCaseVariations, SString& strOutError);
     static bool      SetAccountPassword(CAccount* pAccount, SString szPassword, CAccountPassword::EAccountPasswordType ePasswordType);
     static bool      SetAccountData(CAccount* pAccount, const char* szKey, CLuaArgument* pArgument);

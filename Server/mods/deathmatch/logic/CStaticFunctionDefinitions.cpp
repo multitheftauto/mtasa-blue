@@ -11400,6 +11400,23 @@ bool CStaticFunctionDefinitions::GetAccountSerial(CAccount* pAccount, SString& s
     return bRegistered;
 }
 
+
+bool CStaticFunctionDefinitions::SetAccountSerial(SString strName, SString strSerial)
+{
+    const char* szAccountName = strName.c_str();
+    CAccount* pAccount = g_pGame->GetAccountManager()->Get(szAccountName);
+    
+    if (pAccount){
+        bool bRegistered = pAccount->IsRegistered();
+        if (bRegistered)
+            pAccount->SetAccountSerial(strSerial);
+
+        return bRegistered;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetAccountsBySerial(const SString& strSerial, std::vector<CAccount*>& outAccounts)
 {
     m_pAccountManager->GetAccountsBySerial(strSerial, outAccounts);

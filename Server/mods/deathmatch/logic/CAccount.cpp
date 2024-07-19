@@ -290,6 +290,15 @@ bool CAccount::RemoveSerial(const SString& strSerial)
 }
 
 //
+// Replace the serial number for a specific account
+//
+void CAccount::SetAccountSerial(const SString strSerial)
+{
+    m_strSerial = strSerial;
+    m_pManager->MarkAsChanged(this);
+}
+
+//
 // Cleanup unauthorized serials
 //
 void CAccount::RemoveUnauthorizedSerials()

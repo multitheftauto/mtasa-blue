@@ -45,6 +45,7 @@ public:
     LUA_DECLARE(AddAccount);
     LUA_DECLARE(RemoveAccount);
     LUA_DECLARE(SetAccountName);
+    LUA_DECLARE(SetAccountSerial);
     LUA_DECLARE(SetAccountPassword);
     LUA_DECLARE(SetAccountData);
     LUA_DECLARE(CopyAccountData);
