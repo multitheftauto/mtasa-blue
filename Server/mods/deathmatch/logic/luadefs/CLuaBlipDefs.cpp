@@ -140,7 +140,7 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, 
     return radarMarker;
 }
 
-std::uint8_t CLuaBlipDefs::GetBlipIcon(CBlip* radarMarker) noexcept
+std::uint8_t CLuaBlipDefs::GetBlipIcon(CBlip* const radarMarker) noexcept
 {
     std::uint8_t icon;
     CStaticFunctionDefinitions::GetBlipIcon(radarMarker, icon);
@@ -148,7 +148,7 @@ std::uint8_t CLuaBlipDefs::GetBlipIcon(CBlip* radarMarker) noexcept
     return icon;
 }
 
-std::uint8_t CLuaBlipDefs::GetBlipSize(CBlip* radarMarker) noexcept
+std::uint8_t CLuaBlipDefs::GetBlipSize(CBlip* const radarMarker) noexcept
 {
     std::uint8_t size;
     CStaticFunctionDefinitions::GetBlipSize(radarMarker, size);
@@ -156,13 +156,13 @@ std::uint8_t CLuaBlipDefs::GetBlipSize(CBlip* radarMarker) noexcept
     return size;
 }
 
-CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t> CLuaBlipDefs::GetBlipColor(CBlip* radarMarker) noexcept
+CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t> CLuaBlipDefs::GetBlipColor(CBlip* const radarMarker) noexcept
 {
     SColor color = radarMarker->GetColor();
     return {color.R, color.G, color.B, color.A};
 }
 
-std::int16_t CLuaBlipDefs::GetBlipOrdering(CBlip* radarMarker) noexcept
+std::int16_t CLuaBlipDefs::GetBlipOrdering(CBlip* const radarMarker) noexcept
 {
     std::int16_t blipOrdering;
     CStaticFunctionDefinitions::GetBlipOrdering(radarMarker, blipOrdering);
@@ -170,7 +170,7 @@ std::int16_t CLuaBlipDefs::GetBlipOrdering(CBlip* radarMarker) noexcept
     return blipOrdering;
 }
 
-std::uint16_t CLuaBlipDefs::GetBlipVisibleDistance(CBlip* radarMarker) noexcept
+std::uint16_t CLuaBlipDefs::GetBlipVisibleDistance(CBlip* const radarMarker) noexcept
 {
     std::uint16_t visibleDistance;
     CStaticFunctionDefinitions::GetBlipVisibleDistance(radarMarker, visibleDistance);
@@ -178,7 +178,7 @@ std::uint16_t CLuaBlipDefs::GetBlipVisibleDistance(CBlip* radarMarker) noexcept
     return visibleDistance;
 }
 
-bool CLuaBlipDefs::SetBlipIcon(CElement* radarMarker, std::uint8_t icon)
+bool CLuaBlipDefs::SetBlipIcon(CElement* const radarMarker, std::uint8_t icon)
 {
     if (!CBlipManager::IsValidIcon(icon))
         throw std::invalid_argument("Invalid icon");
@@ -186,7 +186,7 @@ bool CLuaBlipDefs::SetBlipIcon(CElement* radarMarker, std::uint8_t icon)
     return CStaticFunctionDefinitions::SetBlipIcon(radarMarker, icon);
 }
 
-bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* radarMarker, std::uint8_t size) noexcept
+bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* const radarMarker, std::uint8_t size) noexcept
 {
     if (size < 0 || size > 25)
     {
@@ -197,17 +197,17 @@ bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* radarMarker, std::uin
     return CStaticFunctionDefinitions::SetBlipSize(radarMarker, size);
 }
 
-bool CLuaBlipDefs::SetBlipColor(CElement* radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a) noexcept
+bool CLuaBlipDefs::SetBlipColor(CElement* const radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a) noexcept
 {
     return CStaticFunctionDefinitions::SetBlipColor(radarMarker, SColorRGBA(r, g, b, a));
 }
 
-bool CLuaBlipDefs::SetBlipOrdering(CElement* radarMarker, std::int32_t ordering) noexcept
+bool CLuaBlipDefs::SetBlipOrdering(CElement* const radarMarker, std::int32_t ordering) noexcept
 {
     return CStaticFunctionDefinitions::SetBlipOrdering(radarMarker, Clamp(std::numeric_limits<std::int16_t>().min(), (std::int16_t)ordering, std::numeric_limits<std::int16_t>().max()));
 }
 
-bool CLuaBlipDefs::SetBlipVisibleDistance(CElement* radarMarker, std::uint32_t visibleDistance) noexcept
+bool CLuaBlipDefs::SetBlipVisibleDistance(CElement* const radarMarker, std::uint32_t visibleDistance) noexcept
 {
     return CStaticFunctionDefinitions::SetBlipVisibleDistance(radarMarker, Clamp(std::numeric_limits<std::uint16_t>().min(), (std::uint16_t)visibleDistance, std::numeric_limits<std::uint16_t>().max()));
 }
