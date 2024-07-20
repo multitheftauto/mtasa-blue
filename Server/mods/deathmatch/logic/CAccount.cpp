@@ -9,6 +9,7 @@
  *
  *****************************************************************************/
 
+#include <regex>
 #include "StdInc.h"
 #include "CAccount.h"
 #include "CAccountManager.h"
@@ -258,7 +259,7 @@ bool CAccount::IsIpAuthorized(const SString& strIp)
 //
 // Check if the serial has 32 hexadecimal characters
 //
-bool CAccount::IsValidSerial(const std::string& serial) noexcept
+bool CAccount::IsValidSerial(const std::string& serial) const noexcept
 {
     const std::regex serialPattern("^[A-Fa-f0-9]{32}$");
 
