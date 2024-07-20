@@ -256,6 +256,15 @@ bool CAccount::IsIpAuthorized(const SString& strIp)
 }
 
 //
+// Check if the serial has 32 hexadecimal characters
+//
+bool CAccount::IsValidSerial(const std::string& serial)
+{
+    const std::regex serialPattern("^[A-Fa-f0-9]{32}$");
+    return std::regex_match(serial, serialPattern);
+}
+
+//
 // Mark pending serial as authorized for this account
 //
 bool CAccount::AuthorizeSerial(const SString& strSerial, const SString& strWho)
@@ -292,10 +301,14 @@ bool CAccount::RemoveSerial(const SString& strSerial)
 //
 // Replace the serial number for a specific account
 //
-void CAccount::SetAccountSerial(const std::string strSerial)
+bool CAccount::SetAccountSerial(const std::string& serial)
 {
-    m_strSerial = strSerial;
+    if (!IsValidSerial(serial))
+        return false;
+
+    m_strSerial = serial;
     m_pManager->MarkAsChanged(this);
+    return true;
 }
 
 //

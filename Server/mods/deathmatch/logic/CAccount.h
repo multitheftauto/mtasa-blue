@@ -13,6 +13,7 @@
 
 #include <list>
 #include <string>
+#include <regex>
 #include "lua/CLuaArgument.h"
 
 class CClient;
@@ -97,11 +98,12 @@ public:
     SSerialUsage*              GetSerialUsage(const SString& strSerial);
     bool                       IsIpAuthorized(const SString& strIp);
     bool                       IsSerialAuthorized(const SString& strSerial);
+    bool                       IsValidSerial(const std::string& serial);
     bool                       AddSerialForAuthorization(const SString& strSerial, const SString& strIp);
     bool                       AuthorizeSerial(const SString& strSerial, const SString& strWho);
     bool                       RemoveSerial(const SString& strSerial);
     void                       RemoveUnauthorizedSerials();
-    void                       SetAccountSerial(const std::string strSerial);
+    bool                       SetAccountSerial(const std::string& serial);
 
     CClient* GetClient() const { return m_pClient; }
     void     SetClient(CClient* pClient);
