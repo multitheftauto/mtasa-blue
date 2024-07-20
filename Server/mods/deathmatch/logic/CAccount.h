@@ -98,12 +98,12 @@ public:
     SSerialUsage*              GetSerialUsage(const SString& strSerial);
     bool                       IsIpAuthorized(const SString& strIp);
     bool                       IsSerialAuthorized(const SString& strSerial);
-    bool                       IsValidSerial(const std::string& serial);
+    bool                       IsValidSerial(const std::string& serial) noexcept;
     bool                       AddSerialForAuthorization(const SString& strSerial, const SString& strIp);
     bool                       AuthorizeSerial(const SString& strSerial, const SString& strWho);
     bool                       RemoveSerial(const SString& strSerial);
     void                       RemoveUnauthorizedSerials();
-    bool                       SetAccountSerial(const std::string& serial);
+    bool                       SetAccountSerial(const std::string& serial) noexcept;
 
     CClient* GetClient() const { return m_pClient; }
     void     SetClient(CClient* pClient);
