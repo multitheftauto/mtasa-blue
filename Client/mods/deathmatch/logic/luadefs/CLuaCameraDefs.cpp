@@ -550,7 +550,7 @@ bool CLuaCameraDefs::ShakeCamera(float radius, std::optional<float> x, std::opti
 {
     if (!x.has_value() || !y.has_value() || !z.has_value())
     {
-        auto* player = CStaticFunctionDefinitions::GetLocalPlayer();
+        const auto* player = CStaticFunctionDefinitions::GetLocalPlayer();
         CVector out;
         player->GetPosition(out);
         x = out.fX;
