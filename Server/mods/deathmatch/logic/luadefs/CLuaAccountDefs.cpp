@@ -515,14 +515,9 @@ int CLuaAccountDefs::RemoveAccount(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaAccountDefs::SetAccountSerial(std::string strName, std::string strSerial)
+bool CLuaAccountDefs::SetAccountSerial(std::string name, std::string serial) noexcept
 {
-    if (CStaticFunctionDefinitions::SetAccountSerial(strName, strSerial))
-    {
-        return true;
-    }
-
-    return false;
+    return CStaticFunctionDefinitions::SetAccountSerial(name, serial);
 }
 
 
