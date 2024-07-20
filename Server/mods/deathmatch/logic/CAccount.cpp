@@ -261,7 +261,12 @@ bool CAccount::IsIpAuthorized(const SString& strIp)
 bool CAccount::IsValidSerial(const std::string& serial) noexcept
 {
     const std::regex serialPattern("^[A-Fa-f0-9]{32}$");
-    return std::regex_match(serial, serialPattern);
+
+    try{
+        return std::regex_match(serial, serialPattern);
+    } catch (...) {
+        return false;
+    }
 }
 
 //
