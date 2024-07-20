@@ -11401,11 +11401,8 @@ bool CStaticFunctionDefinitions::GetAccountSerial(CAccount* pAccount, SString& s
 }
 
 
-bool CStaticFunctionDefinitions::SetAccountSerial(const std::string& name, const std::string& serial) noexcept
+bool CStaticFunctionDefinitions::SetAccountSerial(CAccount* account, const std::string& serial) noexcept
 {
-    const char* accountName = name.c_str();
-    CAccount* account = g_pGame->GetAccountManager()->Get(accountName);
-
     if (account && account->IsRegistered())
         return account->SetAccountSerial(serial);
 
