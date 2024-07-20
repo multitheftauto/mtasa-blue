@@ -4179,7 +4179,7 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
 
-bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeID, std::optional<std::uint8_t> componentCollisionType)
+bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeID, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime)
 {
     if (nodeID < 1 || nodeID >= static_cast<std::uint8_t>(eCarNodes::CAR_NUM_NODES))
         throw std::invalid_argument("Invalid component index");
@@ -4187,8 +4187,8 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
     if (componentCollisionType.has_value() && componentCollisionType.value() >= static_cast<std::uint8_t>(eCarComponentCollisionTypes::COL_NUM))
         throw std::invalid_argument("Invalid collision type index");
 
-    eCarNodes nodeIndex = static_cast<eCarNodes>(nodeID);
-    eCarComponentCollisionTypes collisionType = eCarComponentCollisionTypes::COL_PANEL;
+    const eCarNodes& nodeIndex = static_cast<eCarNodes>(nodeID);
+    eCarComponentCollisionTypes collisionType;
     
     if (!componentCollisionType.has_value())
     {
@@ -4219,11 +4219,13 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
                 break;
             }
             case eCarNodes::CAR_BOOT:
+            case eCarNodes::CAR_CHASSIS:
             {
                 collisionType = eCarComponentCollisionTypes::COL_BOOT;
                 break;
             }
             case eCarNodes::CAR_BONNET:
+            case eCarNodes::CAR_WINDSCREEN:
             {
                 collisionType = eCarComponentCollisionTypes::COL_BONNET;
                 break;
@@ -4235,6 +4237,10 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
             }
         }
     }
+    else
+    {
+        collisionType = static_cast<eCarComponentCollisionTypes>(componentCollisionType.value());
+    }
 
-    return vehicle->SpawnFlyingComponent(nodeIndex, collisionType);
+    return vehicle->SpawnFlyingComponent(nodeIndex, collisionType, removalTime.value_or(-1));
 }

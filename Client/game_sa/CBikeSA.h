@@ -14,7 +14,7 @@
 #include <game/CBike.h>
 #include "CVehicleSA.h"
 
-namespace eBikeNode
+namespace eBikeNodes
 {
     enum
     {
@@ -48,7 +48,7 @@ static_assert(sizeof(sRideAnimData) == 0x1C, "Invalid size for sRideAnimData");
 class CBikeSAInterface : public CVehicleSAInterface
 {
 public:
-    RwFrame*             m_apModelNodes[eBikeNode::NUM_NODES];
+    RwFrame*             m_apModelNodes[eBikeNodes::NUM_NODES];
     int8                 m_bLeanMatrixCalculated;
     int8                 pad0[3];            // Maybe prev value is int32
     int8                 m_mLeanMatrix[72];

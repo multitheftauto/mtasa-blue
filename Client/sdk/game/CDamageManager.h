@@ -124,7 +124,7 @@ enum eLights
 enum class eCarNodes
 {
     CAR_NODE_NONE,
-    CAR_CHASIS,
+    CAR_CHASSIS,
     CAR_WHEEL_RF,
     CAR_WHEEL_RM,
     CAR_WHEEL_RB,
