@@ -307,6 +307,9 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 #define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
 
+#define HOOKPOS_CAutomobile_SpawnFlyingComponent  0x6A85B0
+#define HOOKPOS_CAutomobile_SpawnFlyingComponent2 0x6A862E
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -582,6 +585,9 @@ void HOOK_CWeapon__TakePhotograph();
 
 void HOOK_CCollision__CheckCameraCollisionObjects();
 
+void HOOK_CAutomobile_SpawnFlyingComponent_1();
+void HOOK_CAutomobile_SpawnFlyingComponent_2();
+
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -790,6 +796,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
+
+    HookInstall(HOOKPOS_CAutomobile_SpawnFlyingComponent, (DWORD)HOOK_CAutomobile_SpawnFlyingComponent_1, 7);
+    HookInstall(HOOKPOS_CAutomobile_SpawnFlyingComponent2, (DWORD)HOOK_CAutomobile_SpawnFlyingComponent_2, 7);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, 10);
@@ -7477,5 +7486,45 @@ void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
 
     out1: jmp   RETURN_CCollision__CheckCameraCollisionObjects
     out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
+    }
+}
+
+// These hooks modify the function to take an additional direct argument RwFrame*
+// so that the function can be used for vehicles that do not inherit CAutomobile
+static constexpr DWORD CONTINUE_CAutomobile_SpawnFlyingComponent_1 = 0x6A85B7;
+void _declspec(naked) HOOK_CAutomobile_SpawnFlyingComponent_1()
+{
+    _asm
+    {
+        mov eax, [esp+90h+0xC]
+        test eax, eax
+        jz continueDefault
+
+        jmp CONTINUE_CAutomobile_SpawnFlyingComponent_1
+
+        continueDefault:
+        mov eax, [ebx+edi*4+648h]
+        jmp CONTINUE_CAutomobile_SpawnFlyingComponent_1
+    }
+}
+
+static constexpr DWORD CONTINUE_CAutomobile_SpawnFlyingComponent_2 = 0x6A8635;
+void _declspec(naked) HOOK_CAutomobile_SpawnFlyingComponent_2()
+{
+    _asm
+    {
+        push eax
+        mov eax, [esp+94h+0xC]
+        test eax, eax
+        jz continueDefault
+
+        mov ecx, eax
+        pop eax
+        jmp CONTINUE_CAutomobile_SpawnFlyingComponent_2
+
+        continueDefault:
+        pop eax
+        mov ecx, [ebx+edi*4+648h]
+        jmp CONTINUE_CAutomobile_SpawnFlyingComponent_2
     }
 }

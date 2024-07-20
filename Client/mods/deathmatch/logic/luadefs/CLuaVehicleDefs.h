@@ -176,4 +176,6 @@ public:
     LUA_DECLARE(SetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponents);
+
+    static bool SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeID, std::optional<std::uint8_t> componentCollisionType);
 };

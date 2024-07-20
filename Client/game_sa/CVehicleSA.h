@@ -604,7 +604,7 @@ public:
     SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
     void               SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
 
-    CObject* SpawnFlyingComponent(int i_1, unsigned int ui_2);
+    bool     SpawnFlyingComponent(eCarNodes nodeID, eCarComponentCollisionTypes collisionType);
     void     SetWheelVisibility(eWheelPosition wheel, bool bVisible);
     CVector  GetWheelPosition(eWheelPosition wheel);
 
@@ -687,4 +687,6 @@ private:
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();
+
+    bool Custom_SpawnFlyingComponent(eCarNodes nodeID, eCarComponentCollisionTypes collisionType, RwFrame* nodesArray);
 };

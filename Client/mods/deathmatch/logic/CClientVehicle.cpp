@@ -5031,3 +5031,11 @@ void CClientVehicle::ResetWheelScale()
 
     m_bWheelScaleChanged = false;
 }
+
+bool CClientVehicle::SpawnFlyingComponent(eCarNodes nodeID, eCarComponentCollisionTypes collisionType)
+{
+    if (!m_pVehicle)
+        return false;
+
+    return m_pVehicle->SpawnFlyingComponent(nodeID, collisionType);
+}

@@ -1507,27 +1507,86 @@ void CVehicleSA::SetGravity(const CVector* pvecGravity)
     m_vecGravity = *pvecGravity;
 }
 
-CObject* CVehicleSA::SpawnFlyingComponent(int i_1, unsigned int ui_2)
+bool CVehicleSA::Custom_SpawnFlyingComponent(eCarNodes nodeID, eCarComponentCollisionTypes collisionType, RwFrame* frame)
 {
-    DWORD dwReturn;
-    DWORD dwThis = (DWORD)GetInterface();
+    if (!frame)
+        return false;
+
+    DWORD dwInterface = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CAutomobile__SpawnFlyingComponent;
+
     _asm
     {
-        mov     ecx, dwThis
-        push    ui_2
-        push    i_1
-        call    dwFunc
-        mov     dwReturn, eax
+        mov ecx, dwInterface
+        push frame
+        push collisionType
+        push nodeID
+        call dwFunc
     }
 
-    CObject* pObject = NULL;
-    if (dwReturn)
+    return true;
+}
+
+bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeID, eCarComponentCollisionTypes collisionType)
+{
+    VehicleClass vehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass);
+    std::uint8_t nodeIndex = static_cast<std::uint8_t>(nodeID);
+
+    if (nodeIndex < 1)
+        return false;
+
+    // CBike, CBmx, CBoat and CTrain don't inherit CAutomobile so let's do it manually!
+    // By default, the CAutomobile::SpawnFlyingComponent function is available only for classes inheriting from CAutomobile,
+    // but we want the function to also be available for other vehicle classes
+    switch (vehicleType)
     {
-        SClientEntity<CObjectSA>* pObjectClientEntity = pGame->GetPools()->GetObject((DWORD*)dwReturn);
-        pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
+        case VehicleClass::AUTOMOBILE:
+        case VehicleClass::MONSTER_TRUCK:
+        case VehicleClass::PLANE:
+        case VehicleClass::HELI:
+        case VehicleClass::TRAILER:
+        case VehicleClass::QUAD:
+        {
+            CAutomobileSAInterface* automobileInterface = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+            if (!automobileInterface)
+                return false;
+
+            if (!Custom_SpawnFlyingComponent(nodeID, collisionType, automobileInterface->m_aCarNodes[nodeIndex]))
+                return false;
+
+            break;
+        }
+        case VehicleClass::TRAIN:
+        {
+            CTrainSAInterface* trainInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
+            if (!trainInterface)
+                return false;
+
+            if (nodeIndex >= sizeof(trainInterface->m_aTrainNodes) / sizeof(RwFrame*))
+                return false;
+
+            if (!Custom_SpawnFlyingComponent(nodeID, collisionType, trainInterface->m_aTrainNodes[nodeIndex]))
+                return false;
+
+            break;
+        }
+        case VehicleClass::BIKE:
+        {
+            CBikeSAInterface* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
+            if (!bikeInterface)
+                return false;
+
+            if (nodeIndex >= sizeof(bikeInterface->m_apModelNodes) / sizeof(RwFrame*))
+                return false;
+
+            if (Custom_SpawnFlyingComponent(nodeID, collisionType, bikeInterface->m_apModelNodes[nodeIndex]))
+                return false;
+
+            break;
+        }
     }
-    return pObject;
+
+    return true;
 }
 
 void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
