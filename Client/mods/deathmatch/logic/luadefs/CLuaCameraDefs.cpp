@@ -548,14 +548,14 @@ const SString& CLuaCameraDefs::GetElementType()
 
 bool CLuaCameraDefs::ShakeCamera(float radius, std::optional<float> x, std::optional<float> y, std::optional<float> z) noexcept
 {
-    if (!x.has_value() || !y.has_value() || !z.has_value())
+    if (!x || !y || !z)
     {
         const auto* player = CStaticFunctionDefinitions::GetLocalPlayer();
         CVector out;
         player->GetPosition(out);
-        if (!x) x = out.fX;
-        if (!y) y = out.fY;
-        if (!z) z = out.fZ;
+        x = out.fX;
+        y = out.fY;
+        z = out.fZ;
     }
     m_pManager->GetCamera()->ShakeCamera(radius, *x, *y, *z);
 
