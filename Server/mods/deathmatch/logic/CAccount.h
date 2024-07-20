@@ -101,7 +101,7 @@ public:
     bool                       AuthorizeSerial(const SString& strSerial, const SString& strWho);
     bool                       RemoveSerial(const SString& strSerial);
     void                       RemoveUnauthorizedSerials();
-    void                       SetAccountSerial(const SString strSerial);
+    void                       SetAccountSerial(const std::string strSerial);
 
     CClient* GetClient() const { return m_pClient; }
     void     SetClient(CClient* pClient);

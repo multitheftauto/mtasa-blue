@@ -292,7 +292,7 @@ bool CAccount::RemoveSerial(const SString& strSerial)
 //
 // Replace the serial number for a specific account
 //
-void CAccount::SetAccountSerial(const SString strSerial)
+void CAccount::SetAccountSerial(const std::string strSerial)
 {
     m_strSerial = strSerial;
     m_pManager->MarkAsChanged(this);

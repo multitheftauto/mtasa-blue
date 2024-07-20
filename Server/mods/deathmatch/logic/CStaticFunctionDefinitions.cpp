@@ -11401,7 +11401,7 @@ bool CStaticFunctionDefinitions::GetAccountSerial(CAccount* pAccount, SString& s
 }
 
 
-bool CStaticFunctionDefinitions::SetAccountSerial(SString strName, SString strSerial)
+bool CStaticFunctionDefinitions::SetAccountSerial(std::string strName, std::string strSerial)
 {
     const char* szAccountName = strName.c_str();
     CAccount* pAccount = g_pGame->GetAccountManager()->Get(szAccountName);

@@ -42,7 +42,7 @@ void CLuaAccountDefs::LoadFunctions()
         {"addAccount", AddAccount},
         {"removeAccount", RemoveAccount},
         {"setAccountPassword", SetAccountPassword},
-        {"setAccountSerial", SetAccountSerial},
+        {"setAccountSerial", ArgumentParser<SetAccountSerial>},
         {"setAccountData", SetAccountData},
         {"setAccountName", SetAccountName},
         {"copyAccountData", CopyAccountData},
@@ -71,7 +71,7 @@ void CLuaAccountDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "setData", "setAccountData");
     lua_classfunction(luaVM, "setPassword", "setAccountPassword");
-    lua_classfunction(luaVM, "setSerial", "SetAccountSerial");
+    lua_classfunction(luaVM, "setSerial", "setAccountSerial");
     lua_classfunction(luaVM, "setName", "setAccountName");
 
     lua_classfunction(luaVM, "getSerial", "getAccountSerial");
@@ -515,28 +515,14 @@ int CLuaAccountDefs::RemoveAccount(lua_State* luaVM)
     return 1;
 }
 
-int CLuaAccountDefs::SetAccountSerial(lua_State* luaVM)
+bool CLuaAccountDefs::SetAccountSerial(std::string strName, std::string strSerial)
 {
-    SString strName;
-    SString strSerial;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strName);
-    argStream.ReadString(strSerial);
-
-    if (!argStream.HasErrors())
+    if (CStaticFunctionDefinitions::SetAccountSerial(strName, strSerial))
     {
-        if (CStaticFunctionDefinitions::SetAccountSerial(strName, strSerial))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        return true;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
 
