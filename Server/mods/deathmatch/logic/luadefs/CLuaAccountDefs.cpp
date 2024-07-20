@@ -71,7 +71,6 @@ void CLuaAccountDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "setData", "setAccountData");
     lua_classfunction(luaVM, "setPassword", "setAccountPassword");
-    lua_classfunction(luaVM, "setSerial", "setAccountSerial");
     lua_classfunction(luaVM, "setName", "setAccountName");
 
     lua_classfunction(luaVM, "getSerial", "getAccountSerial");
