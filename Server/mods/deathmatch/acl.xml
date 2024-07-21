@@ -103,6 +103,7 @@
       <right name="function.removeAccount" access="false" />
       <right name="function.setAccountName" access="false" />
       <right name="function.setAccountPassword" access="false" />
+      <right name="function.setAccountSerial" access="false" />
       <right name="function.kickPlayer" access="false" />
       <right name="function.banPlayer" access="false" />
       <right name="function.getBans" access="false" />
@@ -244,6 +245,7 @@
       <right name="function.updateResourceACLRequest" access="true" />
       <right name="function.shutdown" access="true" />
       <right name="function.setPlayerScriptDebugLevel" access="true" />
+      <right name="function.setAccountSerial" access="true" />
       <right name="function.removeAccount" access="true" />
    </acl>
    <acl name="RPC">
