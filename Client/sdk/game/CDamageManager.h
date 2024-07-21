@@ -121,47 +121,47 @@ enum eLights
     MAX_LIGHTS            // MUST BE 16 OR LESS
 };
 
-enum class eCarNodes
+enum eCarNodes
 {
-    CAR_NODE_NONE,
-    CAR_CHASSIS,
-    CAR_WHEEL_RF,
-    CAR_WHEEL_RM,
-    CAR_WHEEL_RB,
-    CAR_WHEEL_LF,
-    CAR_WHEEL_LM,
-    CAR_WHEEL_LB,
-    CAR_DOOR_RF,
-    CAR_DOOR_RR,
-    CAR_DOOR_LF,
-    CAR_DOOR_LR,
-    CAR_BUMP_FRONT,
-    CAR_BUMP_REAR,
-    CAR_WING_RF,
-    CAR_WING_LF,
-    CAR_BONNET,
-    CAR_BOOT,
-    CAR_WINDSCREEN,
-    CAR_EXHAUST,
-    CAR_MISC_A,
-    CAR_MISC_B,
-    CAR_MISC_C,
-    CAR_MISC_D,
-    CAR_MISC_E,
+    CAR_NODE_NONE = 0,
+    CAR_NODE_CHASSIS,
+    CAR_NODE_WHEEL_RF,
+    CAR_NODE_WHEEL_RM,
+    CAR_NODE_WHEEL_RB,
+    CAR_NODE_WHEEL_LF,
+    CAR_NODE_WHEEL_LM,
+    CAR_NODE_WHEEL_LB,
+    CAR_NODE_DOOR_RF,
+    CAR_NODE_DOOR_RR,
+    CAR_NODE_DOOR_LF,
+    CAR_NODE_DOOR_LR,
+    CAR_NODE_BUMP_FRONT,
+    CAR_NODE_BUMP_REAR,
+    CAR_NODE_WING_RF,
+    CAR_NODE_WING_LF,
+    CAR_NODE_BONNET,
+    CAR_NODE_BOOT,
+    CAR_NODE_WINDSCREEN,
+    CAR_NODE_EXHAUST,
+    CAR_NODE_MISC_A,
+    CAR_NODE_MISC_B,
+    CAR_NODE_MISC_C,
+    CAR_NODE_MISC_D,
+    CAR_NODE_MISC_E,
 
     CAR_NUM_NODES
 };
 
-enum class eCarComponentCollisionTypes
+enum eCarComponentCollisionTypes
 {
-    COL_BUMPER,
-    COL_WHEEL,
-    COL_DOOR,
-    COL_BONNET,
-    COL_BOOT,
-    COL_PANEL,
+    COL_NODE_BUMPER = 0,
+    COL_NODE_WHEEL,
+    COL_NODE_DOOR,
+    COL_NODE_BONNET,
+    COL_NODE_BOOT,
+    COL_NODE_PANEL,
 
-    COL_NUM
+    COL_NODES_NUM
 };
 
 class CDamageManager

@@ -4179,60 +4179,59 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
 
-bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeID, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime)
+bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime)
 {
-    if (nodeID < 1 || nodeID >= static_cast<std::uint8_t>(eCarNodes::CAR_NUM_NODES))
+    if (nodeIndex < 1 || nodeIndex >= CAR_NUM_NODES)
         throw std::invalid_argument("Invalid component index");
 
-    if (componentCollisionType.has_value() && componentCollisionType.value() >= static_cast<std::uint8_t>(eCarComponentCollisionTypes::COL_NUM))
+    if (componentCollisionType.has_value() && componentCollisionType.value() >= COL_NODES_NUM)
         throw std::invalid_argument("Invalid collision type index");
 
-    const eCarNodes& nodeIndex = static_cast<eCarNodes>(nodeID);
     eCarComponentCollisionTypes collisionType;
     
     if (!componentCollisionType.has_value())
     {
         switch (nodeIndex)
         {
-            case eCarNodes::CAR_WHEEL_RF:
-            case eCarNodes::CAR_WHEEL_RB:
-            case eCarNodes::CAR_WHEEL_LF:
-            case eCarNodes::CAR_WHEEL_LB:
+            case CAR_NODE_WHEEL_RF:
+            case CAR_NODE_WHEEL_RB:
+            case CAR_NODE_WHEEL_LF:
+            case CAR_NODE_WHEEL_LB:
             {
-                collisionType = eCarComponentCollisionTypes::COL_WHEEL;
+                collisionType = COL_NODE_WHEEL;
                 break;
             }
-            case eCarNodes::CAR_DOOR_RF:
-            case eCarNodes::CAR_DOOR_RR:
-            case eCarNodes::CAR_DOOR_LF:
-            case eCarNodes::CAR_DOOR_LR:
+            case CAR_NODE_DOOR_RF:
+            case CAR_NODE_DOOR_RR:
+            case CAR_NODE_DOOR_LF:
+            case CAR_NODE_DOOR_LR:
             {
-                collisionType = eCarComponentCollisionTypes::COL_DOOR;
+                collisionType = COL_NODE_DOOR;
                 break;
             }
-            case eCarNodes::CAR_BUMP_FRONT:
-            case eCarNodes::CAR_BUMP_REAR:
-            case eCarNodes::CAR_WHEEL_LM:
-            case eCarNodes::CAR_WHEEL_RM:
+            case CAR_NODE_BUMP_FRONT:
+            case CAR_NODE_BUMP_REAR:
+            case CAR_NODE_WHEEL_LM:
+            case CAR_NODE_WHEEL_RM:
             {
-                collisionType = eCarComponentCollisionTypes::COL_BUMPER;
+                collisionType = COL_NODE_BUMPER;
                 break;
             }
-            case eCarNodes::CAR_BOOT:
-            case eCarNodes::CAR_CHASSIS:
+            case CAR_NODE_BOOT:
+            case CAR_NODE_CHASSIS:
             {
-                collisionType = eCarComponentCollisionTypes::COL_BOOT;
+                collisionType = COL_NODE_BOOT;
                 break;
             }
-            case eCarNodes::CAR_BONNET:
-            case eCarNodes::CAR_WINDSCREEN:
+            case CAR_NODE_BONNET:
+            case CAR_NODE_WINDSCREEN:
             {
-                collisionType = eCarComponentCollisionTypes::COL_BONNET;
+                collisionType = COL_NODE_BONNET;
                 break;
             }
             default:
             {
-                collisionType = eCarComponentCollisionTypes::COL_PANEL;
+                collisionType = COL_NODE_PANEL;
                 break;
             }
         }
@@ -4242,5 +4241,5 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
         collisionType = static_cast<eCarComponentCollisionTypes>(componentCollisionType.value());
     }
 
-    return vehicle->SpawnFlyingComponent(nodeIndex, collisionType, removalTime.value_or(-1));
+    return vehicle->SpawnFlyingComponent(static_cast<eCarNodes>(nodeIndex), collisionType, removalTime.value_or(-1));
 }

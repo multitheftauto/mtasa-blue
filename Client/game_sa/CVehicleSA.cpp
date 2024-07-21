@@ -1508,9 +1508,8 @@ void CVehicleSA::SetGravity(const CVector* pvecGravity)
     m_vecGravity = *pvecGravity;
 }
 
-bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeID, eCarComponentCollisionTypes collisionType, std::int32_t removalTime)
+bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisionTypes collisionType, std::int32_t removalTime)
 {
-    const std::uint8_t nodeIndex = static_cast<std::uint8_t>(nodeID);
     if (nodeIndex < 1)
         return false;
 
@@ -1594,7 +1593,7 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeID, eCarComponentCollisionTy
     {
         mov ecx, dwInterface
         push collisionType
-        push nodeID
+        push nodeIndex
         call dwFunc
         mov dwReturn, eax
     }
@@ -1631,16 +1630,16 @@ void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_LF];
+            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_LF];
             break;
         case REAR_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_LB];
+            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_LB];
             break;
         case FRONT_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_RF];
+            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_RF];
             break;
         case REAR_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[eCarNode::WHEEL_RB];
+            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_RB];
             break;
         default:
             break;
