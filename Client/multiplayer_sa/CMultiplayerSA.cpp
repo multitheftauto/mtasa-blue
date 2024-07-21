@@ -1572,7 +1572,7 @@ void CMultiplayerSA::InitHooks()
     MemSetFast((void*)0x60D86F, 0x90, 19);
 
     // Fix invisible vehicle windows when lights are on (#2936)
-    MemPut<BYTE>(0x6E1425, 0);
+    MemPut<BYTE>(0x6E1425, 1);
 
     InitHooks_CrashFixHacks();
 
