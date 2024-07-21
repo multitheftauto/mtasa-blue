@@ -113,8 +113,8 @@ void CGraphStats::AddTimingPoint(const char* szName)
 
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
-    uint uiViewportWidth = pGraphics->GetViewportWidth();
-    uint uiSizeX = uiViewportWidth / 4;
+    std::uint32_t viewportWidth = pGraphics->GetViewportWidth();
+    std::uint32_t sizeX = viewportWidth / 4;
 
     // Start of next frame?
     if (szName[0] == 0)
@@ -136,7 +136,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
                 for (int i = 0; i < Dups; i++)
                 {
                     pLine->iDataPos++;
-                    if (pLine->iDataPos > uiSizeX - 1)
+                    if (pLine->iDataPos > sizeX - 1)
                         pLine->iDataPos = 0;
                     pLine->dataHistory[pLine->iDataPos] = Data;
                 }
@@ -156,7 +156,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
         // Add new line
         MapSet(m_LineList, szName, SGraphStatLine());
         pLine = MapFind(m_LineList, szName);
-        pLine->dataHistory.resize(uiSizeX);
+        pLine->dataHistory.resize(sizeX);
         memset(&pLine->dataHistory[0], 0, pLine->dataHistory.size());
         pLine->iDataPos = 0;
         pLine->prevData = 0;
@@ -182,7 +182,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
 
     // Inc position
     pLine->iDataPos++;
-    if (pLine->iDataPos > uiSizeX - 1)
+    if (pLine->iDataPos > sizeX - 1)
         pLine->iDataPos = 0;
 
     // Insert data point
