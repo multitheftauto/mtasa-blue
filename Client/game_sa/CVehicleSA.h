@@ -102,7 +102,7 @@ struct RwTexture;
 // CBike::m_apModelNodes
 // CBoat::pBoatParts
 #define OFFSET_CAutomobile_Nodes 0x648
-#define OFFSET_CTrain_Nodes 0x5A0
+#define OFFSET_CTrain_Nodes 0x668
 #define OFFSET_CBike_Nodes 0x5A0
 #define OFFSET_CBoat_Nodes 0x5B0
 

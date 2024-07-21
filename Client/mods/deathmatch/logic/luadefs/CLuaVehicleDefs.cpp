@@ -154,7 +154,6 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
-
         {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
     };
 

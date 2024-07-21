@@ -283,5 +283,7 @@ enum eElementRPCFunctions
 
     SET_MARKER_TARGET_ARROW_PROPERTIES,
 
+    SPAWN_VEHICLE_FLYING_COMPONENT,
+
     NUM_RPC_FUNCS            // Add above this line
 };
