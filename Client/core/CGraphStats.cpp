@@ -12,8 +12,6 @@
 
 namespace
 {
-    #define GRAPHSTAT_HISTORY_SIZE 256
-
     struct SGraphStatLine
     {
         TIMEUS              prevData;
@@ -113,6 +111,11 @@ void CGraphStats::AddTimingPoint(const char* szName)
     if (!IsEnabled())
         return;
 
+    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
+
+    uint uiViewportWidth = pGraphics->GetViewportWidth();
+    uint uiSizeX = uiViewportWidth / 4;
+
     // Start of next frame?
     if (szName[0] == 0)
     {
@@ -133,7 +136,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
                 for (int i = 0; i < Dups; i++)
                 {
                     pLine->iDataPos++;
-                    if (pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE - 1)
+                    if (pLine->iDataPos > uiSizeX - 1)
                         pLine->iDataPos = 0;
                     pLine->dataHistory[pLine->iDataPos] = Data;
                 }
@@ -153,7 +156,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
         // Add new line
         MapSet(m_LineList, szName, SGraphStatLine());
         pLine = MapFind(m_LineList, szName);
-        pLine->dataHistory.resize(GRAPHSTAT_HISTORY_SIZE);
+        pLine->dataHistory.resize(uiSizeX);
         memset(&pLine->dataHistory[0], 0, pLine->dataHistory.size());
         pLine->iDataPos = 0;
         pLine->prevData = 0;
@@ -179,7 +182,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
 
     // Inc position
     pLine->iDataPos++;
-    if (pLine->iDataPos > GRAPHSTAT_HISTORY_SIZE - 1)
+    if (pLine->iDataPos > uiSizeX - 1)
         pLine->iDataPos = 0;
 
     // Insert data point
@@ -200,11 +203,12 @@ void CGraphStats::Draw()
 
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
+    uint  uiViewportWidth = pGraphics->GetViewportWidth();
     uint  uiViewportHeight = pGraphics->GetViewportHeight();
     uint  uiOriginX = 10;
-    uint  uiOriginY = std::min<int>(500, uiViewportHeight - 10);
-    uint  uiSizeX = GRAPHSTAT_HISTORY_SIZE;
-    uint  uiSizeY = 150;
+    uint  uiOriginY = uiViewportHeight / 2;
+    uint  uiSizeX = uiViewportWidth / 4;
+    uint  uiSizeY = uiViewportHeight / 4;
     uint  uiRangeY = 100;            // 100ms
     float fLineScale = 1 / 1000.f / uiRangeY * uiSizeY;
     float fLineHeight = pGraphics->GetDXFontHeight();
@@ -229,7 +233,7 @@ void CGraphStats::Draw()
             iDataPosPrev = iDataPos;
             iDataPos--;
             if (iDataPos == -1)
-                iDataPos = GRAPHSTAT_HISTORY_SIZE - 1;
+                iDataPos = uiSizeX - 1;
 
             pGraphics->DrawLineQueued(uiOriginX + i - 1, uiOriginY - fY0, uiOriginX + i, uiOriginY - fY1, 1, line.color, true);
 
