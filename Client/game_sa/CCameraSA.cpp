@@ -443,3 +443,18 @@ float CCameraSA::GetShakeForce()
     CCameraSAInterface* pCameraInterface = GetInterface();
     return pCameraInterface->m_fCamShakeForce;
 }
+
+void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
+{
+    DWORD               dwFunc = FUNC_ShakeCam;
+    CCameraSAInterface* cameraInterface = GetInterface();
+    _asm
+    {
+        mov  ecx, cameraInterface
+        push z
+        push y
+        push x
+        push radius
+        call dwFunc
+    }
+}
