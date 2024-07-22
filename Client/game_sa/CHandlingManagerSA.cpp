@@ -10,13 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <core/CCoreInterface.h>
-#include <multiplayer/CMultiplayer.h>
-#include "CHandlingManagerSA.h"
 #include "CGameSA.h"
+#include "CHandlingManagerSA.h"
 
-extern CCoreInterface* g_pCore;
-extern CGameSA*        pGame;
+extern CGameSA* pGame;
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
@@ -24,7 +21,7 @@ extern CGameSA*        pGame;
 #define Var_fTurnMassMultiplier     0x858B8C
 #define Var_fBasicDragCoeff         0x858C58
 
-#define DUMP_HANDLING_DATA FALSE
+#define DUMP_HANDLING_DATA 0
 
 // Original handling data unaffected by handling.cfg changes
 tHandlingDataSA   m_OriginalHandlingData[HT_MAX];
@@ -132,22 +129,22 @@ CHandlingManagerSA::CHandlingManagerSA()
     InitializeDefaultHandlings();
 
     // Create a handling entry for every original handling data.
-    for (std::uint8_t i = 0; i < HT_MAX; i++)
+    for (std::size_t i = 0; i < HT_MAX; i++)
     {
         m_pOriginalEntries[i] = new CHandlingEntrySA(&m_OriginalHandlingData[i]);
     }
 
-    for (std::uint8_t i = 0; i < 24; i++)
+    for (std::size_t i = 0; i < 24; i++)
     {
         m_pOriginalFlyingEntries[i] = new CFlyingHandlingEntrySA(&m_OriginalFlyingHandlingData[i]);
     }
 
-    for (std::uint8_t i = 0; i < 12; i++)
+    for (std::size_t i = 0; i < 12; i++)
     {
         m_pOriginalBoatEntries[i] = new CBoatHandlingEntrySA(&m_OriginalBoatHandlingData[i]);
     }
 
-    for (std::uint8_t i = 0; i < 14; i++)
+    for (std::size_t i = 0; i < 14; i++)
     {
         m_pOriginalBikeEntries[i] = new CBikeHandlingEntrySA(&m_OriginalBikeHandlingData[i]);
     }
@@ -194,22 +191,22 @@ CHandlingManagerSA::CHandlingManagerSA()
 CHandlingManagerSA::~CHandlingManagerSA()
 {
     // Destroy all original handling entries
-    for (std::uint8_t i = 0; i < HT_MAX; i++)
+    for (std::size_t i = 0; i < HT_MAX; i++)
     {
         delete m_pOriginalEntries[i];
     }
 
-    for (std::uint8_t i = 0; i < 24; i++)
+    for (std::size_t i = 0; i < 24; i++)
     {
         delete m_pOriginalFlyingEntries[i];
     }
 
-    for (std::uint8_t i = 0; i < 12; i++)
+    for (std::size_t i = 0; i < 12; i++)
     {
         delete m_pOriginalBoatEntries[i];
     }
 
-    for (std::uint8_t i = 0; i < 14; i++)
+    for (std::size_t i = 0; i < 14; i++)
     {
         delete m_pOriginalBikeEntries[i];
     }

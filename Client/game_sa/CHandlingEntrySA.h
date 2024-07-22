@@ -190,7 +190,7 @@ public:
 
     void Recalculate();
 
-    tHandlingDataSA* GetInterface() { return m_pHandlingSA; }
+    tHandlingDataSA* GetInterface() const { return m_pHandlingSA; }
 
 private:
     tHandlingDataSA* m_pHandlingSA;
