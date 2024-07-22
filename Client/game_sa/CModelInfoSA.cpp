@@ -1067,11 +1067,6 @@ void CModelInfoSA::ModelAddRef(EModelRequestType requestType, const char* szTag)
     m_dwReferences++;
 }
 
-int CModelInfoSA::GetRefCount()
-{
-    return static_cast<int>(m_dwReferences);
-}
-
 void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
 {
     // Decrement the references
