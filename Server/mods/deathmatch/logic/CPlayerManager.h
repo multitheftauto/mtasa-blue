@@ -41,6 +41,9 @@ public:
     CPlayer* Get(const NetServerPlayerID& PlayerSocket);
     CPlayer* Get(const char* szNick, bool bCaseSensitive = false);
 
+    CMappedList<CPlayer*>&       GetPlayers() noexcept { return m_Players; }
+    const CMappedList<CPlayer*>& GetPlayers() const noexcept { return m_Players; }
+
     std::list<CPlayer*>::const_iterator IterBegin() { return m_Players.begin(); };
     std::list<CPlayer*>::const_iterator IterEnd() { return m_Players.end(); };
 
