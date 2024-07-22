@@ -249,6 +249,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connecti
     m_WorldSpecialProps[WorldSpecialProperty::EXTENDEDWATERCANNONS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::ROADSIGNSTEXT] = true;
     m_WorldSpecialProps[WorldSpecialProperty::TUNNELWEATHERBLEND] = true;
+    m_WorldSpecialProps[WorldSpecialProperty::FLYINGCOMPONENTS] = true;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;

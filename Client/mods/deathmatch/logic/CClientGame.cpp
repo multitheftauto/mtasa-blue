@@ -6107,11 +6107,15 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
             return true;
         case WorldSpecialProperty::EXTENDEDWATERCANNONS:
             g_pGame->SetExtendedWaterCannonsEnabled(isEnabled);
+            return true;
         case WorldSpecialProperty::ROADSIGNSTEXT:
             g_pGame->SetRoadSignsTextEnabled(isEnabled);
             return true;
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
+            return true;
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            m_pVehicleManager->SetSpawnFlyingComponentEnabled(isEnabled);
             return true;
     }
     return false;
@@ -6150,6 +6154,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsRoadSignsTextEnabled();
         case WorldSpecialProperty::TUNNELWEATHERBLEND:
             return g_pGame->IsTunnelWeatherBlendEnabled();
+        case WorldSpecialProperty::FLYINGCOMPONENTS:
+            return m_pVehicleManager->IsSpawnFlyingComponentEnabled();
     }
     return false;
 }

@@ -101,6 +101,7 @@ ADD_ENUM(WorldSpecialProperty::FIREBALLDESTRUCT, "fireballdestruct")
 ADD_ENUM(WorldSpecialProperty::EXTENDEDWATERCANNONS, "extendedwatercannons")
 ADD_ENUM(WorldSpecialProperty::ROADSIGNSTEXT, "roadsignstext")
 ADD_ENUM(WorldSpecialProperty::TUNNELWEATHERBLEND, "tunnelweatherblend")
+ADD_ENUM(WorldSpecialProperty::FLYINGCOMPONENTS, "flyingcomponents")
 IMPLEMENT_ENUM_CLASS_END("world-special-property")
 
 IMPLEMENT_ENUM_BEGIN(ePacketID)

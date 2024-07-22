@@ -1624,10 +1624,12 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
         CDeathmatchVehicle* pVehicle = static_cast<CDeathmatchVehicle*>(g_pClientGame->m_pVehicleManager->Get(ID));
         if (pVehicle)
         {
+            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+
             for (unsigned int i = 0; i < MAX_DOORS; ++i)
             {
                 if (damage.data.bDoorStatesChanged[i])
-                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
+                    pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
             }
             for (unsigned int i = 0; i < MAX_WHEELS; ++i)
             {
@@ -1637,7 +1639,7 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
             for (unsigned int i = 0; i < MAX_PANELS; ++i)
             {
                 if (damage.data.bPanelStatesChanged[i])
-                    pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i]);
+                    pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i], flyingComponents);
             }
             for (unsigned int i = 0; i < MAX_LIGHTS; ++i)
             {
@@ -2393,6 +2395,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::ROADSIGNSTEXT, wsProps.data3.roadsignstext);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::EXTENDEDWATERCANNONS, wsProps.data4.extendedwatercannons);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::TUNNELWEATHERBLEND, wsProps.data5.tunnelweatherblend);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data6.flyingcomponents);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
@@ -3382,13 +3385,14 @@ retry:
                     pVehicle->SetPaintjob(paintjob.data.ucPaintjob);
                     pVehicle->SetColor(vehColor);
 
+                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
                     // Setup our damage model
                     for (int i = 0; i < MAX_DOORS; i++)
-                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], true);
+                        pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
                     for (int i = 0; i < MAX_WHEELS; i++)
                         pVehicle->SetWheelStatus(i, damage.data.ucWheelStates[i]);
                     for (int i = 0; i < MAX_PANELS; i++)
-                        pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i]);
+                        pVehicle->SetPanelStatus(i, damage.data.ucPanelStates[i], flyingComponents);
                     for (int i = 0; i < MAX_LIGHTS; i++)
                         pVehicle->SetLightStatus(i, damage.data.ucLightStates[i]);
                     pVehicle->ResetDamageModelSync();

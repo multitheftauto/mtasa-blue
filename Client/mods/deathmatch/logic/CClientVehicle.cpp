@@ -811,10 +811,12 @@ void CClientVehicle::Fix()
 
     SFixedArray<unsigned char, MAX_DOORS> ucDoorStates;
     GetInitialDoorStates(ucDoorStates);
+
+    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
     for (int i = 0; i < MAX_DOORS; i++)
-        SetDoorStatus(i, ucDoorStates[i], true);
+        SetDoorStatus(i, ucDoorStates[i], flyingComponents);
     for (int i = 0; i < MAX_PANELS; i++)
-        SetPanelStatus(i, 0);
+        SetPanelStatus(i, 0, flyingComponents);
     for (int i = 0; i < MAX_LIGHTS; i++)
         SetLightStatus(i, 0);
     for (int i = 0; i < MAX_WHEELS; i++)
@@ -2156,11 +2158,12 @@ void CClientVehicle::StreamedInPulse()
             {
                 // Set the damage model doors
                 CDamageManager* pDamageManager = m_pVehicle->GetDamageManager();
+                bool            flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
 
                 for (int i = 0; i < MAX_DOORS; i++)
-                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], true);
+                    pDamageManager->SetDoorStatus(static_cast<eDoors>(i), m_ucDoorStates[i], flyingComponents);
                 for (int i = 0; i < MAX_PANELS; i++)
-                    pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i]);
+                    pDamageManager->SetPanelStatus(static_cast<ePanels>(i), m_ucPanelStates[i], flyingComponents);
                 for (int i = 0; i < MAX_LIGHTS; i++)
                     pDamageManager->SetLightStatus(static_cast<eLights>(i), m_ucLightStates[i]);
             }
