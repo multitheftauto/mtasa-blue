@@ -16,7 +16,8 @@ using std::list;
 
 void CLuaResourceDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]
+    {
         {"call", Call},
         {"getThisResource", GetThisResource},
         {"getResourceConfig", GetResourceConfig},
@@ -29,6 +30,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceState", GetResourceState},
         {"loadstring", LoadString},
         {"load", Load},
+        {"getLoadedFiles", ArgumentParser<GetLoadedFiles>},
     };
 
     // Add functions
@@ -544,4 +546,19 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::vector<std::string> CLuaResourceDefs::GetLoadedFiles(lua_State* luaVM, std::optional<CResource*> resource) noexcept
+{
+    if (!resource)
+        resource = &lua_getownerresource(luaVM);
+
+    const auto resourceFiles = (*resource)->GetResourceFiles();
+
+    std::vector<std::string> files;
+    files.reserve(resourceFiles.size());
+    for (const auto& file : resourceFiles)
+        files.push_back(file->GetName());
+
+    return files;
 }

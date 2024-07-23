@@ -338,7 +338,7 @@ void CResourceManager::ListResourcesLoaded(const SString& strListType)
             else
             {
                 if (strListType == "stopped" || strListType == "all")
-                    CLogger::LogPrintf("%-20.20s   STOPPED   (%d files)\n", res->GetName().c_str(), res->GetFileCount());
+                    CLogger::LogPrintf("%-20.20s   STOPPED   (%d files)\n", res->GetName().c_str(), res->GetResourceFiles().size());
             }
             uiCount++;
         }

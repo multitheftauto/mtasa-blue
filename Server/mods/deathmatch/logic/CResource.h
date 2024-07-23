@@ -256,8 +256,8 @@ public:
     const std::string&          GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
     const std::string&          GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
 
-    std::list<CResourceFile*>& GetFiles() { return m_ResourceFiles; }
-    size_t                     GetFileCount() const noexcept { return m_ResourceFiles.size(); }
+    std::list<CResourceFile*>&       GetResourceFiles() noexcept { return m_ResourceFiles; }
+    const std::list<CResourceFile*>& GetResourceFiles() const noexcept { return m_ResourceFiles; }
 
     time_t GetTimeStarted() const noexcept { return m_timeStarted; }
     time_t GetTimeLoaded() const noexcept { return m_timeLoaded; }

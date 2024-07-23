@@ -31,4 +31,5 @@ public:
     LUA_DECLARE(Load);
 
     static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement);
+    static std::vector<std::string> GetLoadedFiles(lua_State* luaVM, std::optional<CResource*> resource) noexcept;
 };

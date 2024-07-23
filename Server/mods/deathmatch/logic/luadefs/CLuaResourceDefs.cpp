@@ -804,7 +804,7 @@ int CLuaResourceDefs::getResourceConfig(lua_State* luaVM)
             CheckCanModifyOtherResource(argStream, pThisResource, pResource);
             if (!argStream.HasErrors())
             {
-                for (CResourceFile* pResourceFile : pResource->GetFiles())
+                for (CResourceFile* pResourceFile : pResource->GetResourceFiles())
                 {
                     if (pResourceFile->GetType() != CResourceFile::RESOURCE_FILE_TYPE_CONFIG)
                         continue;
@@ -1467,4 +1467,19 @@ int CLuaResourceDefs::isResourceArchived(lua_State* luaVM)
 bool CLuaResourceDefs::isResourceProtected(CResource* const resource)
 {
     return resource->IsProtected();
+}
+
+std::vector<std::string> CLuaResourceDefs::GetLoadedFiles(lua_State* luaVM, std::optional<CResource*> resource) noexcept
+{
+    if (!resource)
+        resource = &lua_getownerresource(luaVM);
+
+    const auto resourceFiles = (*resource)->GetResourceFiles();
+
+    std::vector<std::string> files;
+    files.reserve(resourceFiles.size());
+    for (const auto& file : resourceFiles)
+        files.push_back(file->GetName());
+
+    return files;
 }
