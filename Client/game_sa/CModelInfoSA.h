@@ -396,7 +396,7 @@ public:
     static void StaticResetAlphaTransparencies();
 
     void ModelAddRef(EModelRequestType requestType, const char* szTag);
-    int  GetRefCount();
+    int  GetRefCount() const override { return static_cast<int>(m_dwReferences); };
     void RemoveRef(bool bRemoveExtraGTARef = false);
     bool ForceUnload();
 
