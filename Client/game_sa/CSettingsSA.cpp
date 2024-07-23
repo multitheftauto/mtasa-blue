@@ -51,7 +51,6 @@ CSettingsSA::CSettingsSA()
     HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
-    // MemPut<BYTE>(0x6FF420, 0xC3);            // Truncate CalculateAspectRatio
 
     MemPut(0x732926, &ms_fVehicleLODDistance);
     MemPut(0x732940, &ms_fTrainPlaneLODDistance);
@@ -389,7 +388,7 @@ float CSettingsSA::GetAspectRatioValue()
     return *(float*)0xC3EFA4;
 }
 
-void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled)
+void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio)
 {
     // Process change
     m_AspectRatio = aspectRatio;

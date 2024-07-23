@@ -199,7 +199,7 @@ void UpdateHUDFixes()
 void UpdateScreenAspectRatio()
 {
     ScreenWidthScale = 640.0f / (*(ScreenAspectRatio) * 448.0f);
-
+    
     UpdateMiscFixes();
     UpdateHUDFixes();
 }
@@ -406,11 +406,13 @@ void GetMemoryAddresses()
     ScreenFieldOfView = (float*)0x8D5038;
 }
 
-void CMultiplayerSA::InitHooks_WidescreenFix()
+void CMultiplayerSA::InitHooks_WidescreenFix(bool enableHudFix)
 {
     GetMemoryAddresses();
     
     InstallAspectRatioFixes();
     InstallFieldOfViewFixes();
-    InstallHUDFixes();
+
+    if (enableHudFix)
+        InstallHUDFixes();
 }

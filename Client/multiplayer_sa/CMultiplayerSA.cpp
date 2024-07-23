@@ -1584,7 +1584,7 @@ void CMultiplayerSA::InitHooks()
 
     InitHooks_Streaming();
     InitHooks_FrameRateFixes();
-    InitHooks_WidescreenFix();
+    InitHooks_WidescreenFix(g_pCore->GetCVars()->GetValue<bool>("hud_match_aspect_ratio"));
     InitHooks_ProjectileCollisionFix();
     InitHooks_ObjectStreamerOptimization();
 

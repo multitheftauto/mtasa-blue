@@ -638,7 +638,7 @@ void CCore::ApplyGameSettings()
     CVARS_GET("volumetric_shadows", bVal);
     pGameSettings->SetVolumetricShadowsEnabled(bVal);
     CVARS_GET("aspect_ratio", iVal);
-    pGameSettings->SetAspectRatio((eAspectRatio)iVal, CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"));
+    pGameSettings->SetAspectRatio((eAspectRatio)iVal);
     CVARS_GET("grass", bVal);
     pGameSettings->SetGrassEnabled(bVal);
     CVARS_GET("heat_haze", bVal);

@@ -141,7 +141,7 @@ public:
 
     virtual float        GetAspectRatioValue() = 0;
     virtual eAspectRatio GetAspectRatio() = 0;
-    virtual void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true) = 0;
+    virtual void         SetAspectRatio(eAspectRatio aspectRatio) = 0;
 
     virtual bool IsGrassEnabled() = 0;
     virtual void SetGrassEnabled(bool bEnable) = 0;

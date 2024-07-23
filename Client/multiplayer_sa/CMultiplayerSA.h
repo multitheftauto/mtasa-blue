@@ -77,7 +77,7 @@ public:
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
     void                InitHooks_FrameRateFixes();
-    void                InitHooks_WidescreenFix();
+    void                InitHooks_WidescreenFix(bool enableHudFix);
     void                InitHooks_ProjectileCollisionFix();
     void                InitHooks_ObjectStreamerOptimization();
     void                InitHooks_Postprocess();
@@ -256,6 +256,8 @@ public:
     bool IsThermalVisionEnabled();
 
     void AllowWindowsCursorShowing(bool bAllow);
+
+    void FixHudSize(bool enable);
 
     CShotSyncData* GetLocalShotSyncData();
 
