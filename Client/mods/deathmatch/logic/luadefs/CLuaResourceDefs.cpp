@@ -558,7 +558,11 @@ std::vector<std::string> CLuaResourceDefs::GetLoadedFiles(lua_State* luaVM, std:
     std::vector<std::string> files;
     files.reserve(resourceFiles.size());
     for (const auto& file : resourceFiles)
+    {
+        if (file->GetResourceType() != CResourceFile::eResourceType::RESOURCE_FILE_TYPE_CLIENT_FILE)
+            continue;
         files.push_back(file->GetName());
+    }
 
     return files;
 }
