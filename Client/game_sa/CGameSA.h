@@ -308,6 +308,8 @@ public:
 
     bool SetBuildingPoolSize(size_t size);
 
+    void UnloadUnusedModels();
+
 private:
     CPools*                         m_pPools;
     CPlayerInfo*                    m_pPlayerInfo;
