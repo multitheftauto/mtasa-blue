@@ -257,8 +257,6 @@ public:
 
     void AllowWindowsCursorShowing(bool bAllow);
 
-    void FixHudSize(bool enable);
-
     CShotSyncData* GetLocalShotSyncData();
 
     void SetPreContextSwitchHandler(PreContextSwitchHandler* pHandler);
