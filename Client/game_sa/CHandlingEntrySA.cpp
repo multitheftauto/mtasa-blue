@@ -10,8 +10,11 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include "CVector.h"
+#include "CGameSA.h"
 #include "CHandlingEntrySA.h"
+#include "CHandlingManagerSA.h"
+
+extern CGameSA* pGame;
 
 CHandlingEntrySA::CHandlingEntrySA()
 {
@@ -57,4 +60,51 @@ void CHandlingEntrySA::Recalculate()
     // Copy our stored field to GTA's
     memcpy(m_pHandlingSA, &m_Handling, sizeof(m_Handling));
     ((void(_stdcall*)(tHandlingDataSA*))FUNC_HandlingDataMgr_ConvertDataToGameUnits)(m_pHandlingSA);
+}
+
+void CHandlingEntrySA::SetSuspensionForceLevel(float fForce) noexcept
+{
+    CheckSuspensionChanges();
+    m_Handling.fSuspensionForceLevel = fForce;
+}
+
+void CHandlingEntrySA::SetSuspensionDamping(float fDamping) noexcept
+{
+    CheckSuspensionChanges();
+    m_Handling.fSuspensionDamping = fDamping;
+}
+
+void CHandlingEntrySA::SetSuspensionHighSpeedDamping(float fDamping) noexcept
+{
+    CheckSuspensionChanges();
+    m_Handling.fSuspensionHighSpdDamping = fDamping;
+}
+
+void CHandlingEntrySA::SetSuspensionUpperLimit(float fUpperLimit) noexcept
+{
+    CheckSuspensionChanges();
+    m_Handling.fSuspensionUpperLimit = fUpperLimit;
+}
+
+void CHandlingEntrySA::SetSuspensionLowerLimit(float fLowerLimit) noexcept
+{
+    CheckSuspensionChanges();
+    m_Handling.fSuspensionLowerLimit = fLowerLimit;
+}
+
+void CHandlingEntrySA::SetSuspensionFrontRearBias(float fBias) noexcept
+{
+    CheckSuspensionChanges();
+    m_Handling.fSuspensionFrontRearBias = fBias;
+}
+
+void CHandlingEntrySA::SetSuspensionAntiDiveMultiplier(float fAntidive) noexcept
+{
+    CheckSuspensionChanges();
+    m_Handling.fSuspensionAntiDiveMultiplier = fAntidive;
+}
+
+void CHandlingEntrySA::CheckSuspensionChanges() noexcept
+{
+    pGame->GetHandlingManager()->CheckSuspensionChanges(this);
 }

@@ -12,8 +12,11 @@
 #include "StdInc.h"
 #include "CGameSA.h"
 #include "CHandlingManagerSA.h"
+#include <core/CCoreInterface.h>
+#include <multiplayer/CMultiplayer.h>
 
-extern CGameSA* pGame;
+extern CCoreInterface* g_pCore;
+extern CGameSA*        pGame;
 
 #define ARRAY_HANDLINGDATA          0xC2B9DC
 
@@ -101,14 +104,14 @@ __declspec(noinline) void DumpHandlingData(tHandlingDataSA* pData)
 static __declspec(naked) void Hook_Calculate()
 {
     tHandlingDataSA* pData;
-    DWORD            dwHandlingData;
+    DWORD dwHandlingData;
     _asm
     {
         mov         eax, [esp+4]
         mov         dwHandlingData, eax
     }
 
-    pData = (tHandlingDataSA*)(dwHandlingData);
+    pData = reinterpret_cast<tHandlingDataSA*>(dwHandlingData);
     DumpHandlingData(pData);
 
     _asm
@@ -9149,4 +9152,55 @@ void CHandlingManagerSA::InitializeDefaultHandlings()
 
     m_OriginalBikeHandlingData[13] = m_OriginalBikeHandlingData[1];            // HT_FAGGIO = HT_PIZZABOY
     m_OriginalBikeHandlingData[13].iVehicleID = 214;
+}
+
+void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry) noexcept
+{
+    // Valid?
+    if (!pEntry)
+        return;
+
+    // Grab us a multiplayer_sa pointer
+    CMultiplayer* const pMultiplayer = g_pCore->GetMultiplayer();
+    if (!pMultiplayer)
+        return;
+
+    // Get Handling ID
+    const eHandlingTypes eHandling = static_cast<eHandlingTypes>(pEntry->GetVehicleID());
+    if (eHandling > HT_MAX)
+        return;
+
+    const CHandlingEntrySA* pOriginal = m_pOriginalEntries[eHandling];
+    if (!pOriginal)
+        return;
+
+    // Default bChanged to false
+    bool bChanged = false;
+
+    // Set bChanged to true if we find ANY change.
+    if (pEntry->GetSuspensionAntiDiveMultiplier() != pOriginal->GetSuspensionAntiDiveMultiplier())
+        bChanged = true;
+
+    if (pEntry->GetSuspensionDamping() != pOriginal->GetSuspensionDamping())
+        bChanged = true;
+
+    if (pEntry->GetSuspensionForceLevel() != pOriginal->GetSuspensionForceLevel())
+        bChanged = true;
+
+    if (pEntry->GetSuspensionFrontRearBias() != pOriginal->GetSuspensionFrontRearBias())
+        bChanged = true;
+
+    if (pEntry->GetSuspensionHighSpeedDamping() != pOriginal->GetSuspensionHighSpeedDamping())
+        bChanged = true;
+
+    if (pEntry->GetSuspensionLowerLimit() != pOriginal->GetSuspensionLowerLimit())
+        bChanged = true;
+
+    if (pEntry->GetSuspensionUpperLimit() != pOriginal->GetSuspensionUpperLimit())
+        bChanged = true;
+
+    if (!bChanged)
+        return;
+
+    pMultiplayer->UpdateVehicleSuspension();
 }

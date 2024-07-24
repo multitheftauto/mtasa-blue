@@ -164,13 +164,13 @@ public:
     virtual void SetTractionLoss(float fTractionLoss) = 0;
     virtual void SetTractionBias(float fTractionBias) = 0;
 
-    virtual void SetSuspensionForceLevel(float fForce) = 0;
-    virtual void SetSuspensionDamping(float fDamping) = 0;
-    virtual void SetSuspensionHighSpeedDamping(float fDamping) = 0;
-    virtual void SetSuspensionUpperLimit(float fUpperLimit) = 0;
-    virtual void SetSuspensionLowerLimit(float fLowerLimit) = 0;
-    virtual void SetSuspensionFrontRearBias(float fBias) = 0;
-    virtual void SetSuspensionAntiDiveMultiplier(float fAntiDive) = 0;
+    virtual void SetSuspensionForceLevel(float fForce) noexcept = 0;
+    virtual void SetSuspensionDamping(float fDamping) noexcept = 0;
+    virtual void SetSuspensionHighSpeedDamping(float fDamping) noexcept = 0;
+    virtual void SetSuspensionUpperLimit(float fUpperLimit) noexcept = 0;
+    virtual void SetSuspensionLowerLimit(float fLowerLimit) noexcept = 0;
+    virtual void SetSuspensionFrontRearBias(float fBias) noexcept = 0;
+    virtual void SetSuspensionAntiDiveMultiplier(float fAntiDive) noexcept = 0;
 
     virtual void SetCollisionDamageMultiplier(float fMultiplier) = 0;
 

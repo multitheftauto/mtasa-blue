@@ -190,8 +190,6 @@ DWORD RETURN_CHandlingData_isNotRWD = 0x6A0493;
 DWORD RETURN_CHandlingData_isNotFWD = 0x6A04C3;
 // end of handling fix
 #define CALL_CAutomobile_ProcessEntityCollision             0x6AD053
-#define CALL_CBike_ProcessEntityCollision1                  0x6BDF82
-#define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 
@@ -600,7 +598,6 @@ CMultiplayerSA::CMultiplayerSA()
 
     MemSetFast(&localStatsData, 0, sizeof(CStatsData));
     localStatsData.StatTypesFloat[24] = 569.0f;            // Max Health
-    m_bSuspensionEnabled = true;
 
     m_fAircraftMaxHeight = 800.0f;
 
@@ -1457,7 +1454,7 @@ void CMultiplayerSA::InitHooks()
     // Disable CStreaming::StreamVehiclesAndPeds_Always
     MemPut<BYTE>(0x40B650, 0xC3);
 
-    SetSuspensionEnabled(true);
+    UpdateVehicleSuspension();
 
     // Aircraft Max Height checks are at 0x6D2614 and 0x6D2625 edit the check to use our own float.
     MemPut(0x6D2614, &m_fAircraftMaxHeight);
@@ -6183,26 +6180,10 @@ void _declspec(naked) HOOK_ProcessVehicleCollision()
     }
 }
 
-void CMultiplayerSA::SetSuspensionEnabled(bool bEnabled)
+void CMultiplayerSA::UpdateVehicleSuspension() noexcept
 {
-    // if ( bEnabled )
-    {
-        // Hook Install
-        m_bSuspensionEnabled = true;
-        HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision);
-        // HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
-        // HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
-        HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision);
-    }
-    //     else
-    //     {
-    //         // Hook Uninstall
-    //         m_bSuspensionEnabled = false;
-    //         HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, RETURN_ProcessEntityCollision );
-    //         HookInstallCall ( CALL_CBike_ProcessEntityCollision1, RETURN_ProcessEntityCollision );
-    //         HookInstallCall ( CALL_CBike_ProcessEntityCollision2, RETURN_ProcessEntityCollision );
-    //         HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, RETURN_ProcessEntityCollision );
-    //     }
+    HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
+    HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
 }
 
 // Variables

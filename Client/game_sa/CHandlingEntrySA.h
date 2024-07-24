@@ -169,13 +169,13 @@ public:
     void SetTractionLoss(float fTractionLoss) { m_Handling.fTractionLoss = fTractionLoss; }
     void SetTractionBias(float fTractionBias) { m_Handling.fTractionBias = fTractionBias; }
 
-    void SetSuspensionForceLevel(float fForce) { m_Handling.fSuspensionForceLevel = fForce; }
-    void SetSuspensionDamping(float fDamping) { m_Handling.fSuspensionDamping = fDamping; }
-    void SetSuspensionHighSpeedDamping(float fDamping) { m_Handling.fSuspensionHighSpdDamping = fDamping; }
-    void SetSuspensionUpperLimit(float fUpperLimit) { m_Handling.fSuspensionUpperLimit = fUpperLimit; }
-    void SetSuspensionLowerLimit(float fLowerLimit) { m_Handling.fSuspensionLowerLimit = fLowerLimit; }
-    void SetSuspensionFrontRearBias(float fBias) { m_Handling.fSuspensionFrontRearBias = fBias; }
-    void SetSuspensionAntiDiveMultiplier(float fAntidive) { m_Handling.fSuspensionAntiDiveMultiplier = fAntidive; }
+    void SetSuspensionForceLevel(float fForce) noexcept;
+    void SetSuspensionDamping(float fDamping) noexcept;
+    void SetSuspensionHighSpeedDamping(float fDamping) noexcept;
+    void SetSuspensionUpperLimit(float fUpperLimit) noexcept;
+    void SetSuspensionLowerLimit(float fLowerLimit) noexcept;
+    void SetSuspensionFrontRearBias(float fBias) noexcept;
+    void SetSuspensionAntiDiveMultiplier(float fAntidive) noexcept;
 
     void SetCollisionDamageMultiplier(float fMultiplier) { m_Handling.fCollisionDamageMultiplier = fMultiplier; }
 
@@ -187,6 +187,8 @@ public:
     void SetHeadLight(eLightType Style) { m_Handling.ucHeadLight = Style; }
     void SetTailLight(eLightType Style) { m_Handling.ucTailLight = Style; }
     void SetAnimGroup(unsigned char ucGroup) { m_Handling.ucAnimGroup = ucGroup; }
+
+    void CheckSuspensionChanges() noexcept;
 
     void Recalculate();
 

@@ -34,6 +34,9 @@ public:
     const CBikeHandlingEntry*   GetOriginalBikeHandlingData(eVehicleTypes eModel) const;
 
     eHandlingProperty GetPropertyEnumFromName(const std::string& strName) const;
+
+    void CheckSuspensionChanges(CHandlingEntry* pEntry) noexcept;
+
 private:
     void InitializeDefaultHandlings();
 

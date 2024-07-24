@@ -33,4 +33,6 @@ public:
     virtual const CBikeHandlingEntry*   GetOriginalBikeHandlingData(enum eVehicleTypes eModel) const = 0;
 
     virtual eHandlingProperty GetPropertyEnumFromName(const std::string& strName) const = 0;
+
+    virtual void CheckSuspensionChanges(CHandlingEntry* pEntry) noexcept = 0;
 };
