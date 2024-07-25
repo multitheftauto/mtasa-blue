@@ -176,9 +176,9 @@ bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaA
             if (m_pTableData->Count() != Argument.m_pTableData->Count())
                 return false;
 
-            vector<CLuaArgument*>::const_iterator iter = m_pTableData->IterBegin();
-            vector<CLuaArgument*>::const_iterator iterCompare = Argument.m_pTableData->IterBegin();
-            while (iter != m_pTableData->IterEnd() && iterCompare != Argument.m_pTableData->IterEnd())
+            vector<CLuaArgument*>::const_iterator iter = m_pTableData->begin();
+            vector<CLuaArgument*>::const_iterator iterCompare = Argument.m_pTableData->begin();
+            while (iter != m_pTableData->end() && iterCompare != Argument.m_pTableData->end())
             {
                 if (pKnownTables->find(m_pTableData) == pKnownTables->end())
                 {

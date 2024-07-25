@@ -191,11 +191,9 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
 
 void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 {
-    vector<CLuaArgument*>::const_iterator iter = Arguments.IterBegin();
-    for (; iter != Arguments.IterEnd(); iter++)
+    for (CLuaArgument* arg : Arguments)
     {
-        CLuaArgument* pArgument = new CLuaArgument(**iter);
-        m_Arguments.push_back(pArgument);
+        m_Arguments.push_back(new CLuaArgument(*arg));
     }
 }
 
