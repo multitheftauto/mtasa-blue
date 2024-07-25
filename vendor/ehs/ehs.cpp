@@ -1079,54 +1079,135 @@ void EHSServer::CheckClientSockets ( )
 } 
 
 
-const char * ResponsePhrase [] = { "INVALID", "OK", "Moved Permanently", "Found", "Unauthorized", "Forbidden", "Not Found", "Internal Server Error" };
-
-const char * GetResponsePhrase ( int inResponseCode ///< HTTP response code to get text version of
-)
+const char* GetHttpStatusReasonPhrase(int statusCode)
 {
-	const char * psReturn = NULL;
-	
-	switch ( inResponseCode ) {
-		
-	case HTTPRESPONSECODE_200_OK:
-		psReturn = ResponsePhrase [ 1 ];
-		break;
-		
-	case HTTPRESPONSECODE_301_MOVEDPERMANENTLY:
-		psReturn = ResponsePhrase [ 2 ];
-		break;
-		
-	case HTTPRESPONSECODE_302_FOUND:
-		psReturn = ResponsePhrase [ 3 ];
-		break;
-
-	case HTTPRESPONSECODE_401_UNAUTHORIZED:
-		psReturn = ResponsePhrase [ 4 ];
-		break;
-
-	case HTTPRESPONSECODE_403_FORBIDDEN:
-		psReturn = ResponsePhrase [ 5 ];
-		break;
-
-	case HTTPRESPONSECODE_404_NOTFOUND:
-		psReturn = ResponsePhrase [ 6 ];
-		break;
-
-	case HTTPRESPONSECODE_500_INTERNALSERVERERROR:
-		psReturn = ResponsePhrase [ 7 ];
-		break;
-		
-	default:
-		assert ( 0 );
-		psReturn = ResponsePhrase [ 0 ];
-		break;
-
+	if (statusCode >= 100 && statusCode <= 199)
+	{
+		switch (statusCode)
+		{
+			case HTTP_STATUS_CODE_100_CONTINUE:
+				return "Continue";
+			case HTTP_STATUS_CODE_101_SWITCHING_PROTOCOLS:
+				return "Switching Protocols";
+			default:
+				return "Informational";
+		}
 	}
-	
-	return psReturn;
 
+	if (statusCode >= 200 && statusCode <= 299)
+	{
+		switch (statusCode)
+		{
+			case HTTP_STATUS_CODE_200_OK:
+				return "OK";
+			case HTTP_STATUS_CODE_201_CREATED:
+				return "Created";
+			case HTTP_STATUS_CODE_202_ACCEPTED:
+				return "Accepted";
+			case HTTP_STATUS_CODE_203_NON_AUTHORITATIVE_INFO:
+				return "Non-Authoritative Information";
+			case HTTP_STATUS_CODE_204_NO_CONTENT:
+				return "No Content";
+			case HTTP_STATUS_CODE_205_RESET_CONTENT:
+				return "Reset Content";
+			case HTTP_STATUS_CODE_206_PARTIAL_CONTENT:
+				return "Partial Content";
+			default:
+				return "Success";
+		}
+	}
+
+	if (statusCode >= 300 && statusCode <= 399)
+	{
+		switch (statusCode)
+		{
+			case HTTP_STATUS_CODE_300_MULTIPLE_CHOICES:
+				return "Multiple Choices";
+			case HTTP_STATUS_CODE_301_MOVED_PERMANENTLY:
+				return "Moved Permanently";
+			case HTTP_STATUS_CODE_302_FOUND:
+				return "Found";
+			case HTTP_STATUS_CODE_303_SEE_OTHER:
+				return "See Other";
+			case HTTP_STATUS_CODE_304_NOT_MODIFIED:
+				return "Not Modified";
+			case HTTP_STATUS_CODE_305_USE_PROXY:
+				return "Use Proxy";
+			case HTTP_STATUS_CODE_307_TEMPORARY_REDIRECT:
+				return "Temporary Redirect";
+			default:
+				return "Redirection";
+		}
+	}
+
+	if (statusCode >= 400 && statusCode <= 499)
+	{
+		switch (statusCode)
+		{
+			case HTTP_STATUS_CODE_400_BAD_REQUEST:
+				return "Bad Request";
+			case HTTP_STATUS_CODE_401_UNAUTHORIZED:
+				return "Unauthorized";
+			case HTTP_STATUS_CODE_402_PAYMENT_REQUIRED:
+				return "Payment Required";
+			case HTTP_STATUS_CODE_403_FORBIDDEN:
+				return "Forbidden";
+			case HTTP_STATUS_CODE_404_NOT_FOUND:
+				return "Not Found";
+			case HTTP_STATUS_CODE_405_METHOD_NOT_ALLOWED:
+				return "Method Not Allowed";
+			case HTTP_STATUS_CODE_406_NOT_ACCEPTABLE:
+				return "Not Acceptable";
+			case HTTP_STATUS_CODE_407_PROXY_AUTH_REQUIRED:
+				return "Proxy Authentication Required";
+			case HTTP_STATUS_CODE_408_REQUEST_TIMEOUT:
+				return "Request Time-out";
+			case HTTP_STATUS_CODE_409_CONFLICT:
+				return "Conflict";
+			case HTTP_STATUS_CODE_410_GONE:
+				return "Gone";
+			case HTTP_STATUS_CODE_411_LENGTH_REQUIRED:
+				return "Length Required";
+			case HTTP_STATUS_CODE_412_PRECONDITION_FAILED:
+				return "Precondition Failed";
+			case HTTP_STATUS_CODE_413_REQUEST_ENTITY_TOO_LARGE:
+				return "Request Entity Too Large";
+			case HTTP_STATUS_CODE_414_URI_TOO_LARGE:
+				return "Request-URI Too Large";
+			case HTTP_STATUS_CODE_415_UNSUPPORTED_MEDIA_TYPE:
+				return "Unsupported Media Type";
+			case HTTP_STATUS_CODE_416_RANGE_NOT_SATISFIABLE:
+				return "Requested range not satisfiable";
+			case HTTP_STATUS_CODE_417_EXPECTATION_FAILED:
+				return "Expectation Failed";
+			default:
+				return "Client Error";
+		}
+	}
+
+	if (statusCode >= 500 && statusCode <= 599)
+	{
+		switch (statusCode)
+		{
+			case HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR:
+				return "Internal Server Error";
+			case HTTP_STATUS_CODE_501_NOT_IMPLEMENTED:
+				return "Not Implemented";
+			case HTTP_STATUS_CODE_502_BAD_GATEWAY:
+				return "Bad Gateway";
+			case HTTP_STATUS_CODE_503_SERVICE_UNAVAILABLE:
+				return "Service Unavailable";
+			case HTTP_STATUS_CODE_504_GATEWAY_TIMEOUT:
+				return "Gateway Time-out";
+			case HTTP_STATUS_CODE_505_VERSION_NOT_SUPPORTED:
+				return "HTTP Version not supported";
+			default:
+				return "Server Error";
+		}
+	}
+
+	return "Unknown";
 }
-
 
 
 void EHSConnection::AddResponse ( HttpResponse * ipoHttpResponse )
@@ -1206,7 +1287,7 @@ void EHSConnection::SendHttpResponse ( HttpResponse * ipoHttpResponse )
 	sOutput += psSmallBuffer;
 
 	sOutput += " ";
-	sOutput +=  GetResponsePhrase ( ipoHttpResponse->m_nResponseCode );
+	sOutput +=  GetHttpStatusReasonPhrase ( ipoHttpResponse->m_nResponseCode );
 	sOutput += "\r\n";
 
 
@@ -1496,7 +1577,7 @@ EHS::RouteRequest ( HttpRequest * ipoHttpRequest ///< request info for service
 		HttpResponse * poHttpResponse = new HttpResponse ( ipoHttpRequest->m_nRequestId,
 														   ipoHttpRequest->m_poSourceEHSConnection );
 
-		poHttpResponse->m_nResponseCode = HTTPRESPONSECODE_404_NOTFOUND;
+		poHttpResponse->m_nResponseCode = HTTP_STATUS_CODE_404_NOT_FOUND;
 		poHttpResponse->SetBody ( "404 - Not Found", strlen ( "404 - Not Found" ) );
 
 		return poHttpResponse;
@@ -1506,8 +1587,8 @@ EHS::RouteRequest ( HttpRequest * ipoHttpRequest ///< request info for service
 }
 
 // default handle request does nothing
-ResponseCode EHS::HandleRequest ( HttpRequest * ipoHttpRequest,
-								  HttpResponse * ipoHttpResponse)
+HttpStatusCode EHS::HandleRequest ( HttpRequest * ipoHttpRequest,
+								    HttpResponse * ipoHttpResponse)
 {
 
 	// if we have a source EHS specified, use it
@@ -1519,7 +1600,7 @@ ResponseCode EHS::HandleRequest ( HttpRequest * ipoHttpRequest,
 	char psTime [ 20 ];
 	sprintf ( psTime, "%lld", time ( NULL ) );
 	ipoHttpResponse->SetBody ( psTime, strlen ( psTime ) );
-	return HTTPRESPONSECODE_200_OK;
+	return HTTP_STATUS_CODE_200_OK;
 
 }
 
