@@ -1351,7 +1351,7 @@ void CVehicleSA::RecalculateHandling()
         }
     }
     // Hydraulics Flag fixing
-    if (pInt->m_upgrades[1] && pInt->m_upgrades[1] == 1087)
+    if (pInt->m_upgrades[0] && pInt->m_upgrades[0] == 1087)
     {
         // Flag not enabled?
         if (uiHandlingFlags | HANDLING_Hydraulics_Flag)
