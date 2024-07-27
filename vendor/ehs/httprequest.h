@@ -26,6 +26,7 @@ enum RequestMethod { REQUESTMETHOD_OPTIONS, /* not implemented */
 					 REQUESTMETHOD_DELETE, ///< not implemented
 					 REQUESTMETHOD_TRACE, ///< not implemented
 					 REQUESTMETHOD_CONNECT, ///< not implemented
+					 REQUESTMETHOD_PATCH, ///< not implemented
 					 REQUESTMETHOD_LAST, ///< must be the last valid entry
 					 REQUESTMETHOD_UNKNOWN, ///< used until we find the method
 					 REQUESTMETHOD_INVALID ///< must be the last entry
@@ -92,7 +93,7 @@ class HttpRequest {
 	void ParseRequestURI(std::string_view uri);
 
 	/// parses the form data as if it's key=value pairs and puts them into oFormElements
-	void ParseFormData(std::string_view formData);
+	void ParseFormData(std::string_view formData, bool isQueryData);
 
 	/// the current parse state -- where we are in looking at the data from the client
 	HttpParseStates nCurrentHttpParseState;
@@ -121,6 +122,9 @@ class HttpRequest {
 
 	/// Data specified by the client.  The 'name' field is mapped to a FormValue object which has the value and any metadata
 	FormValueMap oFormValueMap;
+
+	/// Data specified by the client in the query string.
+	FormValueMap oQueryValueMap;
 
 	/// cookies that come in from the client
 	CookieMap oCookieMap;
