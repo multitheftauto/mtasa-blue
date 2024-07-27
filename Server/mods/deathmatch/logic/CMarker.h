@@ -67,6 +67,9 @@ public:
 
     virtual CSphere GetWorldBoundingSphere();
 
+    void SetIgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
+    bool AreAlphaLimitsIgnored() const noexcept { return m_ignoreAlphaLimits; };
+
     SColor GetTargetArrowColor() const noexcept { return m_TargetArrowColor; };
     float  GetTargetArrowSize() const noexcept { return m_TargetArrowSize; };
     void SetTargetArrowProperties(const SColor color, float size) noexcept;
@@ -89,6 +92,7 @@ private:
     float                 m_fSize;
     SColor                m_Color;
     unsigned char         m_ucIcon;
+    bool                  m_ignoreAlphaLimits;
     SColor                m_TargetArrowColor;
     float                 m_TargetArrowSize;
 

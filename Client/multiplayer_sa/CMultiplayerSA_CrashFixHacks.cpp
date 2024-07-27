@@ -2070,26 +2070,22 @@ static void _declspec(naked) HOOK_FxPrim_c__Enable()
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CFire_ProcessFire  0x53A6FC
 #define HOOKSIZE_CFire_ProcessFire 9
-static DWORD CONTINUE_CFire_ProcessFire = 0x53A705;
+static constexpr DWORD CONTINUE_CFire_ProcessFire = 0x53A705;
+static constexpr DWORD SKIP_CFire_ProcessFire = 0x53A69C;
 static void _declspec(naked) HOOK_CFire_ProcessFire()
 {
     _asm
     {
-        test byte ptr [esi], 4
-        // If the beingExtinguished flag has been set, we skip processing this fire instance
-        jnz skip
+        test byte ptr [esi], 1 // If the "active" flag has been set to 0, we skip processing attached entities
+        jz skip
 
         mov ecx, [esi+10h]
         mov eax, [ecx+590h]
         jmp CONTINUE_CFire_ProcessFire
 
         skip:
-        pop edi
-        pop esi
-        pop ebp
-        pop ebx
-        add esp, 2Ch
-        retn
+        mov ecx, esi
+        jmp SKIP_CFire_ProcessFire
     }
 }
 

@@ -74,6 +74,9 @@ public:
     static bool          IconToString(unsigned char ucIcon, SString& strOutString);
     void                 ReCreateWithSameIdentifier();
 
+    void SetIgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
+    bool AreAlphaLimitsIgnored() const noexcept override { return m_ignoreAlphaLimits; };
+
     SColor GetTargetArrowColor() const noexcept { return m_TargetArrowColor; };
     float  GetTargetArrowSize() const noexcept { return m_TargetArrowSize; };
     void   SetTargetArrowProperties(const SColor& arrowColor, float size) noexcept;
@@ -100,6 +103,7 @@ private:
     float            m_fSize;
     SColor           m_Color;
     CCheckpoint*     m_pCheckpoint;
+    bool             m_ignoreAlphaLimits;
     SColor           m_TargetArrowColor;
     float            m_TargetArrowSize;
 
