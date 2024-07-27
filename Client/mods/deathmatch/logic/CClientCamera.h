@@ -64,6 +64,8 @@ public:
     void           SetFocusToLocalPlayer();
     void           Reset();
 
+    void ShakeCamera(float radius, float x, float y, float z) noexcept;
+
     void            SetCameraVehicleViewMode(eVehicleCamMode eMode);
     void            SetCameraPedViewMode(ePedCamMode eMode);
     eVehicleCamMode GetCameraVehicleViewMode();

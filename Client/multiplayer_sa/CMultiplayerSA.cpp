@@ -1571,6 +1571,9 @@ void CMultiplayerSA::InitHooks()
     // Allow switch weapon during jetpack task (#3569)
     MemSetFast((void*)0x60D86F, 0x90, 19);
 
+    // Fix invisible vehicle windows when lights are on (#2936)
+    MemPut<BYTE>(0x6E1425, 1);
+
     InitHooks_CrashFixHacks();
 
     // Init our 1.3 hooks.
