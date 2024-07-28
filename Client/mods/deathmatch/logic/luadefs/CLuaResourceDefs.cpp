@@ -54,6 +54,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getDynamicElementRoot", "getResourceDynamicElementRoot");
     lua_classfunction(luaVM, "getExportedFunctions", "getResourceExportedFunctions");
     lua_classfunction(luaVM, "getState", "getResourceState");
+    lua_classfunction(luaVM, "getFiles", "getResourceFiles");
 
     lua_classvariable(luaVM, "config", NULL, "getResourceConfig");
     lua_classvariable(luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot");
@@ -62,6 +63,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "state", NULL, "getResourceState");
     lua_classvariable(luaVM, "name", NULL, "getResourceName");
     lua_classvariable(luaVM, "rootElement", NULL, "getResourceRootElement");
+    lua_classvariable(luaVM, "files", nullptr, "getResourceFiles");
 
     lua_registerclass(luaVM, "Resource");
 }

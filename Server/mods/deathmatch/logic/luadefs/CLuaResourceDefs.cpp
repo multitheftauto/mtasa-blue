@@ -131,6 +131,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getACLRequests", "getResourceACLRequests");
     lua_classfunction(luaVM, "isArchived", "isResourceArchived");
     lua_classfunction(luaVM, "isProtected", "isResourceProtected");
+    lua_classfunction(luaVM, "getFiles", "getResourceFiles");
 
     lua_classvariable(luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot");
     lua_classvariable(luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions");
@@ -144,6 +145,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "archived", NULL, "isResourceArchived");
     lua_classvariable(luaVM, "protected", nullptr, "isResourceProtected");
     lua_classvariable(luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason");
+    lua_classvariable(luaVM, "files", nullptr, "getResourceFiles");
 
     lua_registerclass(luaVM, "Resource");
 }
