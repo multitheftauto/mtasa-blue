@@ -12,8 +12,6 @@
 #pragma once
 #include "CLuaDefs.h"
 
-enum class CResourceFile::eResourceCategory;
-
 class CLuaResourceDefs : public CLuaDefs
 {
 public:
