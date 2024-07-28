@@ -302,6 +302,13 @@ void CLuaArgument::ReadNumber(double dNumber) noexcept
     m_Number = dNumber;
 }
 
+void CLuaArgument::ReadString(const char* string)noexcept
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string;
+}
+
 void CLuaArgument::ReadString(const std::string& string) noexcept
 {
     m_iType = LUA_TSTRING;
@@ -309,18 +316,11 @@ void CLuaArgument::ReadString(const std::string& string) noexcept
     m_strString = string;
 }
 
-void CLuaArgument::ReadString(const std::string_view& string)
+void CLuaArgument::ReadString(const std::string_view& string) noexcept
 {
     m_iType = LUA_TSTRING;
     DeleteTableData();
     m_strString = std::string{string};
-}
-
-void CLuaArgument::ReadString(const char* string)
-{
-    m_iType = LUA_TSTRING;
-    DeleteTableData();
-    m_strString = string;
 }
 
 void CLuaArgument::ReadScriptID(std::uint32_t uiScriptID) noexcept
