@@ -143,4 +143,6 @@ public:
     virtual BYTE      GetCameraPedViewMode() = 0;
     virtual void      SetShakeForce(float fShakeForce) = 0;
     virtual float     GetShakeForce() = 0;
+
+    virtual void      ShakeCamera(float radius, float x, float y, float z) noexcept = 0;
 };
