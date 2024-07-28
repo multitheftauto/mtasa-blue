@@ -28,6 +28,8 @@ CResourceClientConfigItem::CResourceClientConfigItem(CResource* resource, const 
     m_pXMLRootNode = NULL;
     m_bInvalid = false;
     m_type = RESOURCE_FILE_TYPE_CLIENT_CONFIG;
+    m_resourceCategoryType = eResourceCategory::CONFIGS;
+
 }
 
 CResourceClientConfigItem::~CResourceClientConfigItem()

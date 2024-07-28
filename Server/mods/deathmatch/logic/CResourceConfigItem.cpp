@@ -30,6 +30,7 @@ CResourceConfigItem::CResourceConfigItem(CResource* resource, const char* szShor
     m_bInvalid = true;
 
     m_type = RESOURCE_FILE_TYPE_CONFIG;
+    m_resourceCategoryType = eResourceCategory::CONFIGS;
 }
 
 CResourceConfigItem::~CResourceConfigItem()

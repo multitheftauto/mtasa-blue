@@ -14,6 +14,21 @@
 CDownloadableResource::CDownloadableResource(CResource* pResource, eResourceType resourceType, const char* szName, const char* szNameShort, uint uiDownloadSize,
                                              CChecksum serverChecksum, bool bAutoDownload)
 {
+    switch (resourceType)
+    {
+        case eResourceType::RESOURCE_FILE_TYPE_SCRIPT:
+        case eResourceType::RESOURCE_FILE_TYPE_CLIENT_SCRIPT:
+            m_resourceCategoryType = eResourceCategory::SCRIPTS;
+        case eResourceType::RESOURCE_FILE_TYPE_MAP:
+            m_resourceCategoryType = eResourceCategory::MAPS;
+        case eResourceType::RESOURCE_FILE_TYPE_CONFIG:
+        case eResourceType::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
+            m_resourceCategoryType = eResourceCategory::CONFIGS;
+        case eResourceType::RESOURCE_FILE_TYPE_CLIENT_FILE:
+        case eResourceType::RESOURCE_FILE_TYPE_HTML:
+            m_resourceCategoryType = eResourceCategory::FILES;
+    }
+
     m_pResource = pResource;
     m_resourceType = resourceType;
     m_strName = szName;

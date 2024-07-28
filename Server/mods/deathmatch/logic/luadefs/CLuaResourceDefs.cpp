@@ -74,7 +74,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"loadstring", LoadString},
         {"load", Load},
 
-        {"getLoadedFiles", ArgumentParser<GetLoadedFiles>},
+        {"getResourceFiles", ArgumentParser<GetResourceFiles>},
     };
 
     // Add functions
@@ -1471,8 +1471,12 @@ bool CLuaResourceDefs::isResourceProtected(CResource* const resource)
     return resource->IsProtected();
 }
 
-std::vector<std::string> CLuaResourceDefs::GetLoadedFiles(lua_State* luaVM, std::optional<CResource*> resource) noexcept
+std::vector<std::string> CLuaResourceDefs::GetResourceFiles(lua_State* luaVM, std::optional<CResourceFile::eResourceCategory> type,
+                                                            std::optional<CResource*> resource) noexcept
 {
+    if (!type)
+        type = CResourceFile::eResourceCategory::ALL;
+
     if (!resource)
         resource = &lua_getownerresource(luaVM);
 
@@ -1482,10 +1486,11 @@ std::vector<std::string> CLuaResourceDefs::GetLoadedFiles(lua_State* luaVM, std:
     files.reserve(resourceFiles.size());
     for (const auto& file : resourceFiles)
     {
-        if (file->GetType() != CResourceFile::eResourceType::RESOURCE_FILE_TYPE_CLIENT_FILE)
-            continue;
-
-        files.push_back(file->GetName());
+        if (file->GetResourceCategoryType() == type.value()
+            || type.value() == CResourceFile::eResourceCategory::ALL)
+        {
+            files.push_back(file->GetName());
+        }
     }
 
     return files;

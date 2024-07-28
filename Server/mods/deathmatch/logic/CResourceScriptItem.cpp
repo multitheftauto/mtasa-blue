@@ -23,6 +23,7 @@ CResourceScriptItem::CResourceScriptItem(CResource* resource, const char* szShor
     : CResourceFile(resource, szShortName, szResourceFileName, xmlAttributes)
 {
     m_type = RESOURCE_FILE_TYPE_SCRIPT;
+    m_resourceCategoryType = eResourceCategory::SCRIPTS;
 }
 
 CResourceScriptItem::~CResourceScriptItem()

@@ -12,6 +12,8 @@
 #pragma once
 #include "CLuaDefs.h"
 
+enum class CResourceFile::eResourceCategory;
+
 class CLuaResourceDefs : public CLuaDefs
 {
 public:
@@ -31,5 +33,6 @@ public:
     LUA_DECLARE(Load);
 
     static std::string GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement);
-    static std::vector<std::string> GetLoadedFiles(lua_State* luaVM, std::optional<CResource*> resource) noexcept;
+    static std::vector<std::string> GetResourceFiles(lua_State* luaVM, std::optional<CResourceFile::eResourceCategory> type,
+                                                     std::optional<CResource*> resource) noexcept;
 };
