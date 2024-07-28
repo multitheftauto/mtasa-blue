@@ -302,7 +302,7 @@ void CLuaArgument::ReadNumber(double dNumber) noexcept
     m_Number = dNumber;
 }
 
-void CLuaArgument::ReadString(const std::string& strString) noexcept
+void CLuaArgument::ReadString(const std::string& string) noexcept
 {
     m_iType = LUA_TSTRING;
     DeleteTableData();
