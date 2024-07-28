@@ -348,6 +348,14 @@ CLuaArgument* CLuaArguments::PushArgument(const CLuaArgument& argument) noexcept
     return pArgument;
 }
 
+CLuaArgument* CLuaArguments::PushString(const char* string) noexcept
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
 CLuaArgument* CLuaArguments::PushString(const std::string& string) noexcept
 {
     CLuaArgument* arg = new CLuaArgument();
@@ -356,15 +364,7 @@ CLuaArgument* CLuaArguments::PushString(const std::string& string) noexcept
     return arg;
 }
 
-CLuaArgument* CLuaArguments::PushString(const std::string_view& string)
-{
-    CLuaArgument* arg = new CLuaArgument();
-    arg->ReadString(string);
-    m_Arguments.push_back(arg);
-    return arg;
-}
-
-CLuaArgument* CLuaArguments::PushString(const char* string)
+CLuaArgument* CLuaArguments::PushString(const std::string_view& string)noexcept
 {
     CLuaArgument* arg = new CLuaArgument();
     arg->ReadString(string);
