@@ -654,7 +654,7 @@ bool CDebugHookManager::CallHook(const char* szName, const std::vector<SDebugHoo
         // Note: info could be invalid now
 
         // Check for skip option
-        if (returnValues.Count())
+        if (returnValues.IsNotEmpty())
         {
             CLuaArgument* returnedValue = *returnValues.begin();
             if (returnedValue->GetType() == LUA_TSTRING)

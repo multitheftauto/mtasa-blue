@@ -1030,10 +1030,10 @@ int CLuaBrowserDefs::SetBrowserAjaxHandler(lua_State* luaVM)
 
                         arguments.Call(pLuaMain, callbackFunction, &result);
 
-                        if (result.Count() == 0)
+                        if (result.IsEmpty())
                             return "";
 
-                        auto returnedValue = *result.begin();
+                        CLuaArgument* returnedValue = *result.begin();
                         if (returnedValue->GetType() == LUA_TSTRING)
                             return returnedValue->GetString();
                         else

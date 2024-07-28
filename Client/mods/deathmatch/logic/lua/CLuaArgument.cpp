@@ -306,7 +306,21 @@ void CLuaArgument::ReadString(const std::string& strString) noexcept
 {
     m_iType = LUA_TSTRING;
     DeleteTableData();
-    m_strString = strString;
+    m_strString = string;
+}
+
+void CLuaArgument::ReadString(const std::string_view& string)
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = std::string{string};
+}
+
+void CLuaArgument::ReadString(const char* string)
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string;
 }
 
 void CLuaArgument::ReadScriptID(std::uint32_t uiScriptID) noexcept
@@ -738,6 +752,15 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
 
     // Success
     return true;
+}
+
+bool CLuaArgument::IsTable() const noexcept
+{
+    if (m_iType != LUA_TTABLE)
+        return false;
+    if (!m_pTableData)
+        return false;
+    return m_pTableData->Count() % 2 == 0;
 }
 
 void CLuaArgument::LogUnableToPacketize(const char* szMessage) const noexcept

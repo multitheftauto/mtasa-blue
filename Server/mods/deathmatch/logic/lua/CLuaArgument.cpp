@@ -327,11 +327,25 @@ void CLuaArgument::ReadNumber(double dNumber) noexcept
     m_Number = dNumber;
 }
 
-void CLuaArgument::ReadString(const std::string& strString) noexcept
+void CLuaArgument::ReadString(const char* string) noexcept
 {
     m_iType = LUA_TSTRING;
     DeleteTableData();
-    m_strString = strString;
+    m_strString = string;
+}
+
+void CLuaArgument::ReadString(const std::string& string) noexcept
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string;
+}
+
+void CLuaArgument::ReadString(const std::string_view& string) noexcept
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string;
 }
 
 void CLuaArgument::ReadElement(const CElement* pElement) noexcept
@@ -719,6 +733,15 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
 
     // Success
     return true;
+}
+
+bool CLuaArgument::IsTable() const noexcept
+{
+    if (m_iType != LUA_TTABLE)
+        return false;
+    if (!m_pTableData)
+        return false;
+    return m_pTableData->Count() % 2 == 0;
 }
 
 void CLuaArgument::LogUnableToPacketize(const char* szMessage) const noexcept

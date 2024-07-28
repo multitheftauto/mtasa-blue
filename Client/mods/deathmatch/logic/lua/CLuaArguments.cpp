@@ -186,11 +186,11 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     delete pKnownTables;
 }
 
-void CLuaArguments::PushArguments(const CLuaArguments& Arguments) noexcept
+void CLuaArguments::PushArguments(const CLuaArguments& args) noexcept
 {
-    for (const auto& pArg : Arguments)
+    for (const auto& arg : args)
     {
-        m_Arguments.push_back(new CLuaArgument(*pArg));
+        m_Arguments.push_back(new CLuaArgument(*arg));
     }
 }
 
@@ -327,12 +327,28 @@ CLuaArgument* CLuaArguments::PushNumber(double dNumber) noexcept
     return pArgument;
 }
 
-CLuaArgument* CLuaArguments::PushString(const std::string& strString) noexcept
+CLuaArgument* CLuaArguments::PushString(const std::string& string) noexcept
 {
-    CLuaArgument* pArgument = new CLuaArgument();
-    pArgument->ReadString(strString);
-    m_Arguments.push_back(pArgument);
-    return pArgument;
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
+CLuaArgument* CLuaArguments::PushString(const std::string_view& string)
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
+CLuaArgument* CLuaArguments::PushString(const char* string)
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
 }
 
 CLuaArgument* CLuaArguments::PushResource(const CResource* pResource) noexcept

@@ -40,7 +40,9 @@ public:
     void Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = nullptr) noexcept;
     void ReadBool(bool bBool) noexcept;
     void ReadNumber(double dNumber) noexcept;
+    void ReadString(const char* string) noexcept;
     void ReadString(const std::string& strString) noexcept;
+    void ReadString(const std::string_view& string) noexcept;
     void ReadElement(const CClientEntity* pElement) noexcept;
     void ReadScriptID(std::uint32_t uiScriptID) noexcept;
     void ReadElementID(ElementID ID) noexcept;
@@ -57,12 +59,55 @@ public:
     SString& GetString() noexcept { return m_strString; }
     void*          GetUserData() const noexcept { return m_pUserData; }
     CClientEntity* GetElement() const noexcept;
+    CLuaArguments* GetTable() const noexcept { return m_pTableData; }
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables = nullptr) const noexcept;
     json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, std::uint32_t>* pKnownTables = nullptr) noexcept;
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = nullptr) noexcept;
     char*        WriteToString(char* szBuffer, int length) noexcept;
+
+    [[nodiscard]] bool IsString() const noexcept { return m_iType == LUA_TSTRING; }
+
+    [[nodiscard]] bool TryGetString(std::string_view& string) const noexcept
+    {
+        if (IsString())
+        {
+            string = m_strString;
+            return true;
+        }
+
+        string = {};
+        return false;
+    }
+
+    [[nodiscard]] bool IsNumber() const noexcept { return m_iType == LUA_TNUMBER; }
+
+    [[nodiscard]] bool TryGetNumber(lua_Number& number) const noexcept
+    {
+        if (IsNumber())
+        {
+            number = m_Number;
+            return true;
+        }
+
+        number = {};
+        return false;
+    }
+
+    [[nodiscard]] bool IsTable() const noexcept;
+
+    [[nodiscard]] bool TryGetTable(CLuaArguments*& table)
+    {
+        if (IsTable())
+        {
+            table = m_pTableData;
+            return true;
+        }
+
+        table = nullptr;
+        return false;
+    }
 
 private:
     void LogUnableToPacketize(const char* szMessage) const noexcept;
