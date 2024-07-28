@@ -1174,7 +1174,7 @@ int CLuaResourceDefs::call(lua_State* luaVM)
                     OldResourceRoot.Push(targetLuaVM);
                     lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
-                    return returns.Count();
+                    return static_cast<int>(returns.Count());
                 }
                 else
                 {
@@ -1387,9 +1387,9 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
         {
             CLuaArguments returnValues;
             callbackArguments.Call(pLuaMain, iLuaFunction, &returnValues);
-            if (returnValues.Count())
+            if (returnValues.IsNotEmpty())
             {
-                CLuaArgument* returnedValue = *returnValues.IterBegin();
+                CLuaArgument* returnedValue = *returnValues.begin();
                 int           iType = returnedValue->GetType();
                 if (iType == LUA_TNIL)
                     break;
