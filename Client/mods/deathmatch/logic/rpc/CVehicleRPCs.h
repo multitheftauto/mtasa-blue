@@ -57,4 +57,5 @@ public:
     DECLARE_ELEMENT_RPC(RemoveVehicleSirens);
     DECLARE_ELEMENT_RPC(SetVehicleSirens);
     DECLARE_ELEMENT_RPC(SetVehiclePlateText);
+    DECLARE_ELEMENT_RPC(SpawnVehicleFlyingComponent);
 };

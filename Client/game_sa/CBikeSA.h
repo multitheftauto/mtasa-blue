@@ -14,6 +14,25 @@
 #include <game/CBike.h>
 #include "CVehicleSA.h"
 
+namespace eBikeNodes
+{
+    enum
+    {
+        NONE = 0,
+        CHASIS,
+        FORKS_FRONT,
+        FORKS_REAR,
+        WHEEL_FRONT,
+        WHEEL_REAR,
+        MUDGUARD,
+        HANDLEBARS,
+        MISC_A,
+        MISC_B,
+
+        NUM_NODES
+    };
+}
+
 struct sRideAnimData
 {
     int32 iAnimGroup;
@@ -29,7 +48,7 @@ static_assert(sizeof(sRideAnimData) == 0x1C, "Invalid size for sRideAnimData");
 class CBikeSAInterface : public CVehicleSAInterface
 {
 public:
-    int32                m_apModelNodes[10];
+    RwFrame*             m_apModelNodes[eBikeNodes::NUM_NODES];
     int8                 m_bLeanMatrixCalculated;
     int8                 pad0[3];            // Maybe prev value is int32
     int8                 m_mLeanMatrix[72];

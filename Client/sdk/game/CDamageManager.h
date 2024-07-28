@@ -121,6 +121,49 @@ enum eLights
     MAX_LIGHTS            // MUST BE 16 OR LESS
 };
 
+enum eCarNodes
+{
+    CAR_NODE_NONE = 0,
+    CAR_NODE_CHASSIS,
+    CAR_NODE_WHEEL_RF,
+    CAR_NODE_WHEEL_RM,
+    CAR_NODE_WHEEL_RB,
+    CAR_NODE_WHEEL_LF,
+    CAR_NODE_WHEEL_LM,
+    CAR_NODE_WHEEL_LB,
+    CAR_NODE_DOOR_RF,
+    CAR_NODE_DOOR_RR,
+    CAR_NODE_DOOR_LF,
+    CAR_NODE_DOOR_LR,
+    CAR_NODE_BUMP_FRONT,
+    CAR_NODE_BUMP_REAR,
+    CAR_NODE_WING_RF,
+    CAR_NODE_WING_LF,
+    CAR_NODE_BONNET,
+    CAR_NODE_BOOT,
+    CAR_NODE_WINDSCREEN,
+    CAR_NODE_EXHAUST,
+    CAR_NODE_MISC_A,
+    CAR_NODE_MISC_B,
+    CAR_NODE_MISC_C,
+    CAR_NODE_MISC_D,
+    CAR_NODE_MISC_E,
+
+    CAR_NUM_NODES
+};
+
+enum eCarComponentCollisionTypes
+{
+    COL_NODE_BUMPER = 0,
+    COL_NODE_WHEEL,
+    COL_NODE_DOOR,
+    COL_NODE_BONNET,
+    COL_NODE_BOOT,
+    COL_NODE_PANEL,
+
+    COL_NODES_NUM
+};
+
 class CDamageManager
 {
 public:

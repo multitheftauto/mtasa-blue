@@ -154,6 +154,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
+        {"spawnVehicleFlyingComponent", ArgumentParser<SpawnVehicleFlyingComponent>},
     };
 
     // Add functions
@@ -298,6 +299,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "detachTrailer", "detachTrailerFromVehicle");
     lua_classfunction(luaVM, "addUpgrade", "addVehicleUpgrade");
     lua_classfunction(luaVM, "removeUpgrade", "removeVehicleUpgrade");
+
+    lua_classfunction(luaVM, "spawnFlyingComponent", "spawnVehicleFlyingComponent");
 
     lua_classvariable(luaVM, "locked", "setVehicleLocked", "isVehicleLocked");
     lua_classvariable(luaVM, "controller", NULL, "getVehicleController");
@@ -4173,4 +4176,69 @@ bool CLuaVehicleDefs::ResetVehicleDummyPositions(CClientVehicle* vehicle)
 bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> withExplosion)
 {
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
+}
+
+bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle, std::uint8_t nodeIndex, std::optional<std::uint8_t> componentCollisionType, std::optional<std::uint32_t> removalTime)
+{
+    if (nodeIndex < 1 || nodeIndex >= CAR_NUM_NODES)
+        throw std::invalid_argument("Invalid component index");
+
+    if (componentCollisionType.has_value() && componentCollisionType.value() >= COL_NODES_NUM)
+        throw std::invalid_argument("Invalid collision type index");
+
+    eCarComponentCollisionTypes collisionType;
+    
+    if (!componentCollisionType.has_value())
+    {
+        switch (nodeIndex)
+        {
+            case CAR_NODE_WHEEL_RF:
+            case CAR_NODE_WHEEL_RB:
+            case CAR_NODE_WHEEL_LF:
+            case CAR_NODE_WHEEL_LB:
+            {
+                collisionType = COL_NODE_WHEEL;
+                break;
+            }
+            case CAR_NODE_DOOR_RF:
+            case CAR_NODE_DOOR_RR:
+            case CAR_NODE_DOOR_LF:
+            case CAR_NODE_DOOR_LR:
+            {
+                collisionType = COL_NODE_DOOR;
+                break;
+            }
+            case CAR_NODE_BUMP_FRONT:
+            case CAR_NODE_BUMP_REAR:
+            case CAR_NODE_WHEEL_LM:
+            case CAR_NODE_WHEEL_RM:
+            {
+                collisionType = COL_NODE_BUMPER;
+                break;
+            }
+            case CAR_NODE_BOOT:
+            case CAR_NODE_CHASSIS:
+            {
+                collisionType = COL_NODE_BOOT;
+                break;
+            }
+            case CAR_NODE_BONNET:
+            case CAR_NODE_WINDSCREEN:
+            {
+                collisionType = COL_NODE_BONNET;
+                break;
+            }
+            default:
+            {
+                collisionType = COL_NODE_PANEL;
+                break;
+            }
+        }
+    }
+    else
+    {
+        collisionType = static_cast<eCarComponentCollisionTypes>(componentCollisionType.value());
+    }
+
+    return vehicle->SpawnFlyingComponent(static_cast<eCarNodes>(nodeIndex), collisionType, removalTime.value_or(-1));
 }
