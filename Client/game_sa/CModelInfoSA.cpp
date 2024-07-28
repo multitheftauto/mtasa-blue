@@ -1045,7 +1045,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = 0;
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 

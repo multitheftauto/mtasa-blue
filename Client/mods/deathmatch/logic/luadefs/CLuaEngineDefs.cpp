@@ -138,6 +138,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingRestoreBufferSize", ArgumentParser<EngineStreamingRestoreBufferSize>},
         {"engineStreamingRequestModel", ArgumentParser<EngineStreamingRequestModel>},
         {"engineStreamingReleaseModel", ArgumentParser<EngineStreamingReleaseModel>},
+        {"engineStreamingGetModelLoadState", ArgumentParser<EngineStreamingGetModelLoadState>},
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
         {"engineGetPoolCapacity", ArgumentParser<EngineGetPoolCapacity>},
@@ -2516,8 +2517,8 @@ bool CLuaEngineDefs::EngineStreamingRequestModel(lua_State* const luaVM, uint16_
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
 
-    if (modelId >= 25000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-24999] at argument 1");
+    if (modelId >= g_pGame->GetBaseIDforCOL() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     // Get the resource we belong to
     CResource* pResource = pLuaMain->GetResource();
@@ -2532,11 +2533,20 @@ bool CLuaEngineDefs::EngineStreamingReleaseModel(lua_State* const luaVM, uint16_
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
 
-    if (modelId >= 25000 || !pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID in range [0-24999] at argument 1");
+    if (modelId >= g_pGame->GetBaseIDforCOL() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     // Get the resource we belong to
     CResource* pResource = pLuaMain->GetResource();
 
     return pResource->GetResourceModelStreamer()->ReleaseModel(modelId, removeReference.value_or(false));
+}
+
+eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(uint16_t modelId)
+{
+    const auto allCount = g_pGame->GetCountOfAllFileIDs();
+    if (modelId >= g_pGame->GetCountOfAllFileIDs())
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    return g_pGame->GetStreaming()->GetStreamingInfo(modelId)->loadState;
 }
