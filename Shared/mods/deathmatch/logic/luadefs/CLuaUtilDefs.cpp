@@ -499,7 +499,7 @@ int CLuaUtilDefs::fromJSON(lua_State* luaVM)
         {
             // Return it as data
             Converted.PushArguments(luaVM);
-            return Converted.Count();
+            return static_cast<int>(Converted.Count());
         }
     }
     else

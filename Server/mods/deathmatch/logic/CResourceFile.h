@@ -52,7 +52,7 @@ public:
     CResourceFile(class CResource* resource, const char* szShortName, const char* szResourceFileName, CXMLAttributes* xmlAttributes);
     virtual ~CResourceFile();
 
-    virtual ResponseCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
+    virtual HttpStatusCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
     virtual bool Start() = 0;
     virtual bool Stop() = 0;

@@ -928,10 +928,7 @@ public:
     void ReadLuaArguments(CLuaArguments& outValue)
     {
         outValue.ReadArguments(m_luaVM, m_iIndex);
-        for (int i = outValue.Count(); i > 0; i--)
-        {
-            m_iIndex++;
-        }
+        m_iIndex += outValue.Count();
     }
 
     //

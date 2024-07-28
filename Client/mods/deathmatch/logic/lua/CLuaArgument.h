@@ -40,7 +40,9 @@ public:
     void Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
     void ReadBool(bool bBool);
     void ReadNumber(double dNumber);
-    void ReadString(const std::string& strString);
+    void ReadString(const std::string& string);
+    void ReadString(const std::string_view& string);
+    void ReadString(const char* string);
     void ReadElement(CClientEntity* pElement);
     void ReadScriptID(uint uiScriptID);
     void ReadElementID(ElementID ID);
@@ -55,6 +57,7 @@ public:
     lua_Number     GetNumber() const { return m_Number; };
     const SString& GetString() { return m_strString; };
     void*          GetUserData() const { return m_pUserData; };
+    CLuaArguments* GetTable() const { return m_pTableData; }
     CClientEntity* GetElement() const;
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
@@ -62,6 +65,48 @@ public:
     json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
     char*        WriteToString(char* szBuffer, int length);
+
+    [[nodiscard]] bool IsString() const noexcept { return m_iType == LUA_TSTRING; }
+
+    [[nodiscard]] bool TryGetString(std::string_view& string) const noexcept
+    {
+        if (IsString())
+        {
+            string = m_strString;
+            return true;
+        }
+
+        string = {};
+        return false;
+    }
+
+    [[nodiscard]] bool IsNumber() const noexcept { return m_iType == LUA_TNUMBER; }
+
+    [[nodiscard]] bool TryGetNumber(lua_Number& number) const noexcept
+    {
+        if (IsNumber())
+        {
+            number = m_Number;
+            return true;
+        }
+
+        number = {};
+        return false;
+    }
+
+    [[nodiscard]] bool IsTable() const noexcept;
+
+    [[nodiscard]] bool TryGetTable(CLuaArguments*& table)
+    {
+        if (IsTable())
+        {
+            table = m_pTableData;
+            return true;
+        }
+
+        table = nullptr;
+        return false;
+    }
 
 private:
     void LogUnableToPacketize(const char* szMessage) const;

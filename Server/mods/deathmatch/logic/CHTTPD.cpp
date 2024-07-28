@@ -28,13 +28,8 @@ extern CGame* g_pGame;
 
 CHTTPD::CHTTPD()
     : m_BruteForceProtect(4, 30000, 60000 * 5)            // Max of 4 attempts per 30 seconds, then 5 minute ignore
-      ,
-      m_HttpDosProtect(0, 0, 0)
+    , m_HttpDosProtect(0, 0, 0)
 {
-    m_resource = NULL;
-    m_server = NULL;
-    m_bStartedServer = false;
-
     m_pGuestAccount = g_pGame->GetAccountManager()->AddGuestAccount(HTTP_GUEST_ACCOUNT_NAME);
 
     m_HttpDosProtect = CConnectHistory(g_pGame->GetConfig()->GetHTTPDosThreshold(), 10000,
@@ -106,7 +101,7 @@ HttpResponse* CHTTPD::RouteRequest(HttpRequest* ipoHttpRequest)
         HttpResponse* poHttpResponse = new HttpResponse(ipoHttpRequest->m_nRequestId, ipoHttpRequest->m_poSourceEHSConnection);
         SStringX      strWait("The server is not ready. Please try again in a minute.");
         poHttpResponse->SetBody(strWait.c_str(), strWait.size());
-        poHttpResponse->m_nResponseCode = HTTPRESPONSECODE_200_OK;
+        poHttpResponse->m_nResponseCode = HTTP_STATUS_CODE_200_OK;
         return poHttpResponse;
     }
 
@@ -121,7 +116,7 @@ HttpResponse* CHTTPD::RouteRequest(HttpRequest* ipoHttpRequest)
 // Called from worker thread. g_pGame->Lock() has already been called.
 // creates a page based on user input -- either displays data from
 //   form or presents a form for users to submit data.
-ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse)
+HttpStatusCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse)
 {
     // Check if server verification was requested
     auto challenge = ipoHttpRequest->oRequestHeaders["crypto_challenge"];
@@ -150,7 +145,7 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
             if (!cipherText.empty())
             {
                 ipoHttpResponse->SetBody((const char*)cipherText.BytePtr(), cipherText.SizeInBytes());
-                return HTTPRESPONSECODE_200_OK;
+                return HTTP_STATUS_CODE_200_OK;
             }
             else
                 CLogger::LogPrintf(LOGLEVEL_MEDIUM, "ERROR: Empty crypto challenge was passed during verification\n");
@@ -161,7 +156,7 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
         }
 
         ipoHttpResponse->SetBody("", 0);
-        return HTTPRESPONSECODE_401_UNAUTHORIZED;
+        return HTTP_STATUS_CODE_401_UNAUTHORIZED;
     }
 
     CAccount* account = CheckAuthentication(ipoHttpRequest);
@@ -174,7 +169,7 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
             ipoHttpResponse->SetBody(strWelcome.c_str(), strWelcome.size());
             SString strNewURL("http://%s/%s/", ipoHttpRequest->oRequestHeaders["host"].c_str(), m_strDefaultResourceName.c_str());
             ipoHttpResponse->oResponseHeaders["location"] = strNewURL.c_str();
-            return HTTPRESPONSECODE_302_FOUND;
+            return HTTP_STATUS_CODE_302_FOUND;
         }
     }
 
@@ -183,10 +178,10 @@ ResponseCode CHTTPD::HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ip
         "resource.<br/><br/>Alternatively, the server may be still starting up, if so, please try again in a minute.",
         ipoHttpRequest->oRequestHeaders["host"].c_str());
     ipoHttpResponse->SetBody(strWelcome.c_str(), strWelcome.size());
-    return HTTPRESPONSECODE_200_OK;
+    return HTTP_STATUS_CODE_200_OK;
 }
 
-ResponseCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse)
+HttpStatusCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse)
 {
     if (m_WarnMessageTimer.Get() < 4000 && m_strWarnMessageForIp == ipoHttpRequest->GetAddress())
     {
@@ -196,14 +191,14 @@ ResponseCode CHTTPD::RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipo
                               "https:"
                               "//mtasa.com/authserialhttp");
         ipoHttpResponse->SetBody(strMessage, strMessage.length());
-        return HTTPRESPONSECODE_401_UNAUTHORIZED;
+        return HTTP_STATUS_CODE_401_UNAUTHORIZED;
     }
 
     const char* szAuthenticateMessage = "Access denied, please login";
     ipoHttpResponse->SetBody(szAuthenticateMessage, strlen(szAuthenticateMessage));
     SString strName("Basic realm=\"%s\"", g_pGame->GetConfig()->GetServerName().c_str());
     ipoHttpResponse->oResponseHeaders["WWW-Authenticate"] = strName.c_str();
-    return HTTPRESPONSECODE_401_UNAUTHORIZED;
+    return HTTP_STATUS_CODE_401_UNAUTHORIZED;
 }
 
 CAccount* CHTTPD::CheckAuthentication(HttpRequest* ipoHttpRequest)

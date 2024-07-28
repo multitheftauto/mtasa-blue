@@ -267,7 +267,7 @@ int CLuaFunctionDefs::Get(lua_State* luaVM)
                     }
 
                     Args.PushArguments(luaVM);
-                    uiArgCount = Args.Count();
+                    uiArgCount = static_cast<unsigned int>(Args.Count());
 
                     /* Don't output a table because although it is more consistent with the multiple values output below,
                     ** due to lua's implementation of associative arrays (assuming we use the "setting-name", "value" key-value pairs)

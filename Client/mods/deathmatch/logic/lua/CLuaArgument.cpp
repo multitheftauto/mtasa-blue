@@ -176,9 +176,9 @@ bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaA
             if (m_pTableData->Count() != Argument.m_pTableData->Count())
                 return false;
 
-            vector<CLuaArgument*>::const_iterator iter = m_pTableData->IterBegin();
-            vector<CLuaArgument*>::const_iterator iterCompare = Argument.m_pTableData->IterBegin();
-            while (iter != m_pTableData->IterEnd() && iterCompare != Argument.m_pTableData->IterEnd())
+            vector<CLuaArgument*>::const_iterator iter = m_pTableData->begin();
+            vector<CLuaArgument*>::const_iterator iterCompare = Argument.m_pTableData->begin();
+            while (iter != m_pTableData->end() && iterCompare != Argument.m_pTableData->end())
             {
                 if (pKnownTables->find(m_pTableData) == pKnownTables->end())
                 {
@@ -320,11 +320,25 @@ void CLuaArgument::ReadNumber(double dNumber)
     m_Number = dNumber;
 }
 
-void CLuaArgument::ReadString(const std::string& strString)
+void CLuaArgument::ReadString(const std::string& string)
 {
     m_iType = LUA_TSTRING;
     DeleteTableData();
-    m_strString = strString;
+    m_strString = string;
+}
+
+void CLuaArgument::ReadString(const std::string_view& string)
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = std::string{string};
+}
+
+void CLuaArgument::ReadString(const char* string)
+{
+    m_iType = LUA_TSTRING;
+    DeleteTableData();
+    m_strString = string;
 }
 
 void CLuaArgument::ReadScriptID(uint uiScriptID)
@@ -755,6 +769,11 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
 
     // Success
     return true;
+}
+
+bool CLuaArgument::IsTable() const noexcept
+{
+    return m_iType == LUA_TTABLE && m_pTableData && (m_pTableData->Count() % 2) == 0;
 }
 
 void CLuaArgument::LogUnableToPacketize(const char* szMessage) const
