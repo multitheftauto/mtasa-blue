@@ -446,8 +446,13 @@ float CCameraSA::GetShakeForce()
 
 void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
 {
-    DWORD               dwFunc = FUNC_ShakeCam;
-    CCameraSAInterface* cameraInterface = GetInterface();
+    static CCameraSAInterface* cameraInterface = GetInterface();
+    if (radius == 0.0f) {
+        cameraInterface->m_fCamShakeForce = 0;
+        return;
+    }
+
+    static const DWORD dwFunc = FUNC_ShakeCam;
     _asm
     {
         mov  ecx, cameraInterface
