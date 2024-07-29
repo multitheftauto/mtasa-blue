@@ -447,7 +447,8 @@ float CCameraSA::GetShakeForce()
 void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
 {
     static CCameraSAInterface* cameraInterface = GetInterface();
-    if (radius == 0.0f) {
+    if (radius <= 0.0f)
+    {
         cameraInterface->m_fCamShakeForce = 0;
         return;
     }
