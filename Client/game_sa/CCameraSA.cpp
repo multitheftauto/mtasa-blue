@@ -448,19 +448,13 @@ void CCameraSA::ShakeCamera(float radius, float x, float y, float z) noexcept
 {
     static CCameraSAInterface* cameraInterface = GetInterface();
     if (radius <= 0.0f)
-    {
-        cameraInterface->m_fCamShakeForce = 0.0f;
-        return;
-    }
+        return ResetShakeCamera();
 
-    static const DWORD dwFunc = FUNC_ShakeCam;
-    _asm
-    {
-        mov  ecx, cameraInterface
-        push z
-        push y
-        push x
-        push radius
-        call dwFunc
-    }
+    using ShakeCamera_t = void(__thiscall*)(CCameraSAInterface*, float radius, float x, float y, float z);
+    ((ShakeCamera_t)FUNC_ShakeCam)(cameraInterface, radius, x, y, z);
+}
+
+void CCameraSA::ResetShakeCamera() noexcept
+{
+    GetInterface()->m_fCamShakeForce = 0.0f;
 }
