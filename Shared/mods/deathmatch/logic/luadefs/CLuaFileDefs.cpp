@@ -780,7 +780,8 @@ std::variant<bool, std::string> CLuaFileDefs::fileRead (
     if (!pFile->Load(pResource, CScriptFile::MODE_READ))
     {
         delete pFile;
-        throw std::invalid_argument(SString("unable to load file '%s'", strInputPath.c_str()));
+        SString err("unable to load file '%s'", strInputPath.c_str());
+        throw LuaFunctionError(err, false);
     }
 
     std::variant<bool, std::string> content = ReadFile(pFile, pFile->GetSize());
