@@ -36,12 +36,12 @@ void TriggerVehicleCollisionEvent()
 
         pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude,
                                  pInterface->m_fDamageImpulseMagnitude, pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition,
-                                 pCollisionVehicle->m_vecCollisionImpactVelocity);
+                                 pCollisionVehicle->m_vecCollisionImpactVelocity, false);
     }
     else
     {
         pVehicleCollisionHandler(pCollisionVehicle, pEntity, pEntity->m_nModelIndex, pCollisionVehicle->m_fDamageImpulseMagnitude, 0.0f,
-                                 pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity);
+                                 pCollisionVehicle->m_usPieceType, pCollisionVehicle->m_vecCollisionPosition, pCollisionVehicle->m_vecCollisionImpactVelocity, pEntity->nType == ENTITY_TYPE_OBJECT && pEntity->vtbl == (CEntitySAInterfaceVTBL*)0x867030);
     }
     TIMING_CHECKPOINT("-TriggerVehColEvent");
 }

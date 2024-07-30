@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
+ *  FILE:        Server/mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Lua static function definitions class
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1669,6 +1669,9 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
                 fHealth = static_cast<float>(ucHealth) / 1.25f;
                 pPed->SetHealth(fHealth);
+
+                if (pPed->IsDead() && fHealth > 0.0f)
+                    pPed->SetIsDead(false);
             }
             else
                 return false;
@@ -3750,6 +3753,8 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             else
                 Arguments.PushBoolean(false);
             Arguments.PushBoolean(bStealth);
+            Arguments.PushBoolean(false);
+            Arguments.PushBoolean(false);
             // TODO: change to onPedWasted
             if (IS_PLAYER(pPed))
             {
@@ -4138,6 +4143,8 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot(CElement* pElement, unsigned c
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
+            pPed->SetWeaponSlot(ucWeaponSlot);
+
             CBitStream BitStream;
 
             SWeaponSlotSync slot;
@@ -4871,7 +4878,7 @@ bool CStaticFunctionDefinitions::SetWeaponAmmo(CElement* pElement, unsigned char
 }
 
 CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation,
-                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2)
+                                                    const char* szRegPlate, unsigned char ucVariant, unsigned char ucVariant2, bool bSynced)
 {
     unsigned char ucVariation = ucVariant;
     unsigned char ucVariation2 = ucVariant2;
@@ -4890,6 +4897,7 @@ CVehicle* CStaticFunctionDefinitions::CreateVehicle(CResource* pResource, unsign
         pVehicle->SetRotationDegrees(vecRotation);
         pVehicle->SetRespawnPosition(vecPosition);
         pVehicle->SetRespawnRotationDegrees(vecRotation);
+        pVehicle->SetUnoccupiedSyncable(bSynced);
 
         if (szRegPlate && szRegPlate[0])
             pVehicle->SetRegPlate(szRegPlate);
@@ -5008,6 +5016,7 @@ bool CStaticFunctionDefinitions::RemoveVehicleSirens(CVehicle* pVehicle)
     assert(pVehicle);
 
     pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = false;
+    pVehicle->SetSirenActive(false);
     pVehicle->RemoveVehicleSirens();
 
     CBitStream BitStream;
@@ -7657,7 +7666,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CElement* pElement, uns
 }
 
 CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color,
-                                                  CElement* pVisibleTo)
+                                                  CElement* pVisibleTo, bool ignoreAlphaLimits)
 {
     assert(szType);
 
@@ -7673,6 +7682,7 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
             // Set the properties
             pMarker->SetPosition(vecPosition);
             pMarker->SetMarkerType(ucType);
+            pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
             pMarker->SetColor(color);
             pMarker->SetSize(fSize);
 
@@ -7843,6 +7853,24 @@ bool CStaticFunctionDefinitions::SetMarkerIcon(CElement* pElement, const char* s
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(CElement* pElement, const SColor color, float size)
+{
+    RUN_CHILDREN(SetMarkerTargetArrowProperties(*iter, color, size))
+
+    if (!IS_MARKER(pElement))
+        return false;
+
+    CMarker* marker = static_cast<CMarker*>(pElement);
+    if (!marker)
+        return false;
+
+    if (!marker->HasTarget() || marker->GetMarkerType() != CMarker::TYPE_CHECKPOINT)
+        return false;
+
+    marker->SetTargetArrowProperties(color, size);
+    return true;
 }
 
 CBlip* CStaticFunctionDefinitions::CreateBlip(CResource* pResource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color,
@@ -8250,6 +8278,27 @@ bool CStaticFunctionDefinitions::StopObject(CElement* pElement)
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::BreakObject(CElement* pElement)
+{
+    RUN_CHILDREN(BreakObject(*iter));
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+
+    if (!pObject)
+        return false;
+
+    if (!pObject->IsBreakable())
+        return false;
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, BREAK_OBJECT, *BitStream.pBitStream));
+    
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetObjectVisibleInAllDimensions(CElement* pElement, bool bVisible, unsigned short usNewDimension)

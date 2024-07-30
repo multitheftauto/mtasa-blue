@@ -765,6 +765,9 @@ static int RunInstall()
                     // If the first attempt didn't work, check if any process is locking one of the files.
                     TerminateFileLockingProcesses(file.targetFile.absolutePath, file.relativePath);
                     TerminateFileLockingProcesses(file.sourceFile.absolutePath, file.relativePath);
+
+                    // Ensure the checksum of the source file is correct (in case the archive reported checksum is invalid).
+                    file.sourceFile.ComputeChecksum();
                 }
 
                 Sleep(OPERATION_RETRY_DELAY_IN_MS);

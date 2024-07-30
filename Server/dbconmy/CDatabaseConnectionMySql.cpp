@@ -80,6 +80,8 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
                                                    const SString& strOptions)
     : m_iRefCount(1), m_pManager(pManager)
 {
+    int getServerPublicKey;
+
     // Parse options string
     CArgMap optionsMap("=", ";");
     optionsMap.SetFromString(strOptions);
@@ -87,6 +89,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     optionsMap.Get("batch", m_bAutomaticTransactionsEnabled, 1);
     optionsMap.Get("multi_statements", m_bMultipleStatements, 0);
     optionsMap.Get("use_ssl", m_bUseSSL, 0);
+    optionsMap.Get("get_server_public_key", getServerPublicKey, 1);
 
     SString strHostname;
     SString strDatabaseName;
@@ -115,6 +118,8 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
             mysql_options(m_handle, MYSQL_SET_CHARSET_NAME, strCharset);
         if (m_bMultipleStatements)
             ulClientFlags |= CLIENT_MULTI_STATEMENTS;
+        bool getServerPublicKeyOpt = (getServerPublicKey != 0);
+        mysql_options(m_handle, MYSQL_OPT_GET_SERVER_PUBLIC_KEY, &getServerPublicKeyOpt);
 
         if (mysql_real_connect(m_handle, strHostname, strUsername, strPassword, strDatabaseName, iPort, strUnixSocket, ulClientFlags))
             m_bOpened = true;

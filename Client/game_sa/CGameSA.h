@@ -82,6 +82,20 @@ extern unsigned int OBJECTDYNAMICINFO_MAX;            // default: 160
 #define CHEAT_NEVERWANTED           "neverwanted"
 #define CHEAT_HEALTARMORMONEY       "healtharmormoney"
 
+#define FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity 0x4EFCD0
+#define STRUCT_CAESoundManager                              0xB62CB0
+#define FUNC_CWaterCannon_Constructor                       0x728B10
+#define FUNC_CWaterCannon_Destructor                        0x728B30
+#define FUNC_CWaterCannon_Init                              0x728B40
+#define ARRAY_aCannons                                      0xC80740
+#define ARRAY_aCannons_CurrentPtr                           0x728C83
+#define NUM_WaterCannon_Limit                               0x728C88
+#define SIZE_CWaterCannon                                   0x3CC
+#define NUM_CWaterCannon_Audio_Offset                       0x32C
+#define NUM_CWaterCannon_DefaultLimit                       3
+
+constexpr int MAX_WATER_CANNONS = 30; // extended CWaterCannon limit, it can be increased
+
 struct SCheatSA
 {
     BYTE* m_byAddress;            // Cheat Address
@@ -157,6 +171,7 @@ public:
     CIplStore*                GetIplStore() { return m_pIplStore; };
     CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
+    CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
 
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
@@ -223,8 +238,15 @@ public:
     bool IsFireballDestructEnabled() const noexcept override { return m_isFireballDestructEnabled; }
     void SetFireballDestructEnabled(bool isEnabled) override;
 
+    bool IsExtendedWaterCannonsEnabled() const noexcept override { return m_isExtendedWaterCannonsEnabled; }
+    void SetExtendedWaterCannonsEnabled(bool isEnabled) override;
+
     bool IsRoadSignsTextEnabled() const noexcept override { return m_isRoadSignsTextEnabled; }
     void SetRoadSignsTextEnabled(bool isEnabled) override;
+
+    bool IsTunnelWeatherBlendEnabled() const noexcept override { return m_isTunnelWeatherBlendEnabled; }
+    void SetTunnelWeatherBlendEnabled(bool isEnabled) override;
+
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -281,7 +303,7 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
-    void RemoveAllBuildings();
+    void RemoveAllBuildings(bool clearBuildingRemoval = true);
     void RestoreGameBuildings();
 
     bool SetBuildingPoolSize(size_t size);
@@ -322,6 +344,7 @@ private:
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
     CCoverManagerSA*                m_pCoverManager;
     CPlantManagerSA*                m_pPlantManager;
+    CBuildingRemoval*               m_pBuildingRemoval;
 
     CPad*                     m_pPad;
     CAERadioTrackManager*     m_pCAERadioTrackManager;
@@ -344,10 +367,13 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
+    bool         m_isTunnelWeatherBlendEnabled{true}; 
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
     bool         m_isRoadSignsTextEnabled{true};
+    bool         m_isBuildingsRemoved{false};
+    bool         m_isExtendedWaterCannonsEnabled{false};
 
     static unsigned int&  ClumpOffset;
 

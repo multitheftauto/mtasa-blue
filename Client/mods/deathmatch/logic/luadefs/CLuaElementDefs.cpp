@@ -14,7 +14,7 @@
 #include <lua/CLuaFunctionParser.h>
 using std::list;
 
-#define MIN_CLIENT_REQ_LOD_FOR_BUILDING "1.6.0-0.20000"
+#define MIN_CLIENT_REQ_LOD_FOR_BUILDING "1.6.0-9.22470"
 
 void CLuaElementDefs::LoadFunctions()
 {

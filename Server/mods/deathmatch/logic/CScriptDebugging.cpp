@@ -146,12 +146,13 @@ void CScriptDebugging::PrintLog(const char* szText)
 void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDebugLevel)
 {
     // Tell everyone we log to about it
-    list<CPlayer*>::const_iterator iter = m_Players.begin();
-    for (; iter != m_Players.end(); iter++)
+    for (const auto& pPlayer : m_Players)
     {
-        if ((*iter)->m_uiScriptDebugLevel >= uiMinimumDebugLevel)
+        bool sufficientDebugLevel = CheckForSufficientDebugLevel(pPlayer->m_uiScriptDebugLevel, uiMinimumDebugLevel);
+
+        if (sufficientDebugLevel)
         {
-            (*iter)->Send(Packet);
+            pPlayer->Send(Packet);
         }
     }
 }

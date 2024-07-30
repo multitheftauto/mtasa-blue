@@ -2,10 +2,10 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
+ *  FILE:        Client/mods/deathmatch/logic/CStaticFunctionDefinitions.cpp
  *  PURPOSE:     Scripting function processing
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -27,6 +27,7 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
+#include <game/CBuildingRemoval.h>
 #include <game/Task.h>
 
 using std::list;
@@ -562,6 +563,13 @@ bool CStaticFunctionDefinitions::GetElementBoundingBox(CClientEntity& Entity, CV
             pModelInfo = g_pGame->GetModelInfo(Object.GetModel());
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& building = static_cast<CClientBuilding&>(Entity);
+            pModelInfo = g_pGame->GetModelInfo(building.GetModel());
+            break;
+        }
+
     }
 
     if (pModelInfo)
@@ -2145,7 +2153,8 @@ bool CStaticFunctionDefinitions::KillPed(CClientEntity& Entity, CClientEntity* p
     else
         Arguments.PushBoolean(false);
     Arguments.PushBoolean(bStealth);
-
+    Arguments.PushBoolean(false);
+    Arguments.PushBoolean(false);
     pPed.CallEvent("onClientPedWasted", Arguments, false);
     pPed.RemoveAllWeapons();
 
@@ -2234,15 +2243,15 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                 if (pIFP)
                 {
                     // Play the gateway animation
-                    const SString&              strGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
-                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strGateWayBlockName);
+                    const char*                 szGateWayBlockName = g_pGame->GetAnimManager()->GetGateWayBlockName();
+                    std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(szGateWayBlockName);
                     auto                        pCustomAnimBlendHierarchy = pIFP->GetAnimationHierarchy(szAnimName);
                     if ((pBlock) && (pCustomAnimBlendHierarchy != nullptr))
                     {
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
 
-                        const SString& strGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
-                        Ped.RunNamedAnimation(pBlock, strGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                        const char* szGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
+                        Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
                         return true;
                     }
                 }
@@ -3756,6 +3765,11 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Enti
             Ped.SetUsesCollision(bEnabled);
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            static_cast<CClientBuilding&>(Entity).SetUsesCollision(bEnabled);
+            break;
+        }
         default:
             return false;
     }
@@ -4760,7 +4774,7 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance(CClientEntity& Entity, u
     return false;
 }
 
-CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color)
+CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, bool ignoreAlphaLimits)
 {
     assert(szType);
 
@@ -4774,6 +4788,10 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
         // Set its parent and its properties
         pMarker->SetParent(Resource.GetResourceDynamicEntity());
         pMarker->SetPosition(vecPosition);
+
+        if (ucType == CClientMarker::MARKER_ARROW || ucType == CClientMarker::MARKER_CHECKPOINT)
+            pMarker->SetIgnoreAlphaLimits(ignoreAlphaLimits);
+
         pMarker->SetColor(color);
         pMarker->SetSize(fSize);
 
@@ -4910,6 +4928,25 @@ bool CStaticFunctionDefinitions::SetMarkerIcon(CClientEntity& Entity, const char
     }
 
     return false;
+}
+
+bool CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(CClientEntity& Entity, const SColor color, float size)
+{
+    RUN_CHILDREN(SetMarkerTargetArrowProperties(**iter, color, size))
+
+    if (!IS_MARKER(&Entity))
+        return false;
+
+    CClientMarker& marker = static_cast<CClientMarker&>(Entity);
+    CClientCheckpoint* checkpoint = marker.GetCheckpoint();
+    if (!checkpoint)
+        return false;
+
+    if (checkpoint->GetIcon() != CClientCheckpoint::ICON_ARROW)
+        return false;
+
+    checkpoint->SetTargetArrowProperties(color, size);
+    return true;
 }
 
 bool CStaticFunctionDefinitions::GetCameraMatrix(CVector& vecPosition, CVector& vecLookAt, float& fRoll, float& fFOV)
@@ -6706,20 +6743,20 @@ bool CStaticFunctionDefinitions::AreTrafficLightsLocked(bool& bLocked)
 bool CStaticFunctionDefinitions::RemoveWorldBuilding(unsigned short usModelToRemove, float fRadius, float fX, float fY, float fZ, char cInterior,
                                                      uint& uiOutAmount)
 {
-    g_pGame->GetWorld()->RemoveBuilding(usModelToRemove, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
+    g_pGame->GetBuildingRemoval()->RemoveBuilding(usModelToRemove, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
     return true;
 }
 
 bool CStaticFunctionDefinitions::RestoreWorldBuildings(uint& uiOutAmount)
 {
-    g_pGame->GetWorld()->ClearRemovedBuildingLists(&uiOutAmount);
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists(&uiOutAmount);
     return true;
 }
 
 bool CStaticFunctionDefinitions::RestoreWorldBuilding(unsigned short usModelToRestore, float fRadius, float fX, float fY, float fZ, char cInterior,
                                                       uint& uiOutAmount)
 {
-    return g_pGame->GetWorld()->RestoreBuilding(usModelToRestore, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
+    return g_pGame->GetBuildingRemoval()->RestoreBuilding(usModelToRestore, fRadius, fX, fY, fZ, cInterior, &uiOutAmount);
 }
 
 bool CStaticFunctionDefinitions::GetSkyGradient(unsigned char& ucTopRed, unsigned char& ucTopGreen, unsigned char& ucTopBlue, unsigned char& ucBottomRed,
@@ -7278,6 +7315,7 @@ CClientProjectile* CStaticFunctionDefinitions::CreateProjectile(CResource& Resou
                 case WEAPONTYPE_ROCKET_HS:
                 case WEAPONTYPE_FREEFALL_BOMB:
                 case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
+                case WEAPONTYPE_FLARE:
                 {
                     // Valid model ID? (0 means projectile will use default model)
                     if (usModel == 0 || CClientObjectManager::IsValidModel(usModel))
@@ -7917,6 +7955,12 @@ bool CStaticFunctionDefinitions::FxAddBulletSplash(CVector& vecPosition)
 bool CStaticFunctionDefinitions::FxAddFootSplash(CVector& vecPosition)
 {
     g_pGame->GetFx()->TriggerFootSplash(vecPosition);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::FxCreateParticle(eFxParticleSystems eFxParticle, CVector& vecPosition, CVector& vecDirection, float fR, float fG, float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
+{
+    g_pGame->GetFx()->AddParticle(eFxParticle, vecPosition, vecDirection, fR, fG, fB, fA, bRandomizeColors, iCount, fBrightness, fSize, bRandomizeSizes, fLife);
     return true;
 }
 

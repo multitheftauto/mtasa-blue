@@ -209,6 +209,8 @@ class CPedWeaponAudioEntitySAInterface
 public:
 };
 
+class CVehicleSAInterface;
+
 class CPedSAInterface : public CPhysicalSAInterface            // +1420  = current vehicle   312 first byte
 {
 public:
@@ -239,11 +241,17 @@ public:
     float               fCurrentRotation;
     float               fTargetRotation;
     float               fRotationSpeed;
-    BYTE                bPad8[4];
+    float               fMoveAnim;
     CEntitySAInterface* pContactEntity;
-    BYTE                bPad3[32];
-    CEntitySAInterface* CurrentObjective;            // current vehicle    1420
-    BYTE                bPad2[8];                    // 1424
+    CVector             unk_56C;
+    CVector             unk_578;
+
+    CEntitySAInterface*  pLastContactEntity;
+    CVehicleSAInterface* pLastVehicle;
+    CVehicleSAInterface* pVehicle;
+
+    int                 unk_590;
+    int                 unk_594;
     BYTE                bPedType;                    // ped type? 0 = player, >1 = ped?  // 1432
     BYTE                bPad9[7];
     CWeaponSAInterface  Weapons[WEAPONSLOT_MAX];
@@ -400,4 +408,6 @@ public:
     void*                   GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
     std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
     static void             StaticSetHooks();
+
+    void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const override;
 };

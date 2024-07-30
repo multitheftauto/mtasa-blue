@@ -32,6 +32,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"setObjectBreakable", ArgumentParser<SetObjectBreakable>},
         {"moveObject", MoveObject},
         {"stopObject", StopObject},
+        {"breakObject", ArgumentParser<BreakObject>},
     };
 
     // Add functions
@@ -46,6 +47,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "create", "createObject");
     lua_classfunction(luaVM, "move", "moveObject");
     lua_classfunction(luaVM, "stop", "stopObject");
+    lua_classfunction(luaVM, "break", "breakObject");
 
     lua_classfunction(luaVM, "getScale", "getObjectScale");
     lua_classfunction(luaVM, "setScale", "setObjectScale");
@@ -304,4 +306,9 @@ int CLuaObjectDefs::StopObject(lua_State* luaVM)
 bool CLuaObjectDefs::SetObjectBreakable(CObject* const pObject, const bool bBreakable)
 {
     return CStaticFunctionDefinitions::SetObjectBreakable(pObject, bBreakable);
+}
+
+bool CLuaObjectDefs::BreakObject(CObject* const pObject)
+{
+    return CStaticFunctionDefinitions::BreakObject(pObject);
 }

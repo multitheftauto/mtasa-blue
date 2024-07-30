@@ -295,7 +295,7 @@ class EHS {
 	virtual HttpResponse * RouteRequest ( HttpRequest * ipoHttpRequest );
 
 	/// This function should be defined by the subclass
-	virtual ResponseCode HandleRequest ( HttpRequest * ipoHttpRequest,
+	virtual HttpStatusCode HandleRequest(HttpRequest* ipoHttpRequest,
 										 HttpResponse * ipoHttpResponse );
 
 	/// This function should be defined by the subclass

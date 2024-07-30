@@ -1947,7 +1947,8 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         auto pModelInfo = g_pGame->GetModelInfo(iModelID);
         if (pModelInfo)
         {
-            lua_pushnumber(luaVM, pModelInfo->GetObjectPropertiesGroup());
+            uint16_t groupId = pModelInfo->GetObjectPropertiesGroup();
+            lua_pushnumber(luaVM, groupId == 0xFFFF ? -1 : groupId);
             return 1;
         }
         argStream.SetCustomError("Expected valid model ID at argument 1");
@@ -1959,8 +1960,8 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 {
     //  bool engineSetModelPhysicalPropertiesGroup ( int modelID, int newGroup )
-    int          iModelID;
-    unsigned int iNewGroup;
+    int iModelID;
+    int iNewGroup;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(iModelID);
@@ -1974,9 +1975,9 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
-        if (iNewGroup < 0 || iNewGroup > 159)
+        if (iNewGroup < -1 || iNewGroup > 159)
         {
-            argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
+            argStream.SetCustomError("Expected group ID in range [0-159] or -1 at argument 1");
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
@@ -2497,13 +2498,7 @@ bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t
     {
         case ePools::BUILDING_POOL:
         {
-            m_pBuildingManager->DestroyAllForABit();
-
-            bool success = g_pGame->SetBuildingPoolSize(newSize);
-
-            m_pBuildingManager->RestoreDestroyed();
-
-            return success;
+            return m_pBuildingManager->SetPoolCapacity(newSize);
         }
         default:
             throw std::invalid_argument("Can not change this pool capacity");

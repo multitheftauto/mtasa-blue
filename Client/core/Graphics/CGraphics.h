@@ -190,9 +190,11 @@ public:
     void DrawLine3DPreGUIQueue(void);
     void DrawLine3DPostFXQueue(void);
     bool HasLine3DPreGUIQueueItems(void);
+    bool HasLine3DPostFXQueueItems();
     void DrawPrimitive3DPostFXQueue(void);
     void DrawPrimitive3DPreGUIQueue(void);
     bool HasPrimitive3DPreGUIQueueItems(void);
+    bool HasPrimitive3DPostFXQueueItems();
 
     void DidRenderScene();
     void SetProgressMessage(const SString& strMessage);

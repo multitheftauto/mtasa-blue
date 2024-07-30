@@ -1,18 +1,8 @@
-diff --git a/.gitignore b/.gitignore
-index 511dcdab93d..9eb9aba4d7a 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -28,3 +28,5 @@ scalability_jobs_*
- .cproject
- .project
- .settings/
-+
-+build-*/
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 936657aadec..3d6297f78ab 100644
+index 8cd3633b877..21b9f946b2a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -53,6 +53,11 @@ IF(WIN32)
+@@ -54,6 +54,11 @@ IF(WIN32)
        CMAKE_MINIMUM_REQUIRED(VERSION 3.15.3)
      ENDIF()
    ENDIF()
@@ -24,7 +14,7 @@ index 936657aadec..3d6297f78ab 100644
  ELSEIF(APPLE)
    # Version 3.12.4 is needed because the new build system of Xcode is not
    # supported by cmake. 3.12.4 will force using the legacy build system.
-@@ -653,7 +658,7 @@ MESSAGE(STATUS "SIZEOF_VOIDP ${SIZEOF_VOIDP}")
+@@ -661,7 +666,7 @@ MESSAGE(STATUS "SIZEOF_VOIDP ${SIZEOF_VOIDP}")
  # even if we have configured for 64bit build....
  SET(CMAKE_SIZEOF_VOID_P ${SIZEOF_VOIDP})
  IF(NOT SIZEOF_VOIDP EQUAL 8)
@@ -33,45 +23,11 @@ index 936657aadec..3d6297f78ab 100644
  ENDIF()
  
  INCLUDE(compile_flags)
-diff --git a/cmake/libevent.cmake b/cmake/libevent.cmake
-index 6376c452928..2447b532fd0 100644
---- a/cmake/libevent.cmake
-+++ b/cmake/libevent.cmake
-@@ -74,20 +74,21 @@ FUNCTION(FIND_LIBEVENT_VERSION LIBEVENT_INCLUDE_DIRS)
-     "${CMAKE_BINARY_DIR}/find_libevent_version.c"
-     "${TEST_SRC}"
-     )
--  TRY_RUN(TEST_RUN_RESULT COMPILE_TEST_RESULT
--    ${CMAKE_BINARY_DIR}
--    "${CMAKE_BINARY_DIR}/find_libevent_version.c"
--    CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${LIBEVENT_INCLUDE_DIRS}"
--    COMPILE_OUTPUT_VARIABLE OUTPUT
--    RUN_OUTPUT_VARIABLE RUN_OUTPUT
--    )
-+  # TRY_RUN(TEST_RUN_RESULT COMPILE_TEST_RESULT
-+  #   ${CMAKE_BINARY_DIR}
-+  #   "${CMAKE_BINARY_DIR}/find_libevent_version.c"
-+  #   CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${LIBEVENT_INCLUDE_DIRS}"
-+  #   COMPILE_OUTPUT_VARIABLE OUTPUT
-+  #   RUN_OUTPUT_VARIABLE RUN_OUTPUT
-+  #   )
-   # MESSAGE(STATUS "TRY_EVENT TEST_RUN_RESULT is ${TEST_RUN_RESULT}")
-   # MESSAGE(STATUS "TRY_EVENT COMPILE_TEST_RESULT is ${COMPILE_TEST_RESULT}")
-   # MESSAGE(STATUS "TRY_EVENT COMPILE_OUTPUT_VARIABLE is ${OUTPUT}")
-   # MESSAGE(STATUS "TRY_EVENT RUN_OUTPUT_VARIABLE is ${RUN_OUTPUT}")
-+  SET(COMPILE_TEST_RESULT TRUE)
- 
-   IF(COMPILE_TEST_RESULT)
--    SET(LIBEVENT_VERSION_STRING "${RUN_OUTPUT}")
-+    SET(LIBEVENT_VERSION_STRING "2.1.11-stable") # extra\libevent\libevent-2.1.11-stable\
-     STRING(REGEX REPLACE
-       "([.-0-9]+).*" "\\1" LIBEVENT_VERSION "${LIBEVENT_VERSION_STRING}")
-     SET(LIBEVENT_VERSION ${LIBEVENT_VERSION} CACHE INTERNAL "" FORCE)
 diff --git a/cmake/os/Windows.cmake b/cmake/os/Windows.cmake
-index 8ae3d150b88..f58cd717b09 100644
+index f13bbdf5fff..fee48b56d28 100644
 --- a/cmake/os/Windows.cmake
 +++ b/cmake/os/Windows.cmake
-@@ -61,6 +61,8 @@ IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
+@@ -62,6 +62,8 @@ IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
  ELSE()
    IF(WITHOUT_SERVER)
      MESSAGE(WARNING "32bit is experimental!!")
@@ -81,10 +37,10 @@ index 8ae3d150b88..f58cd717b09 100644
      MESSAGE(FATAL_ERROR "32 bit Windows builds are not supported. "
        "Clean the build dir and rebuild using -G \"${CMAKE_GENERATOR} Win64\"")
 diff --git a/cmake/ssl.cmake b/cmake/ssl.cmake
-index 9d76fa19616..94bf55ece00 100644
+index 932659d030f..c2e47fc260d 100644
 --- a/cmake/ssl.cmake
 +++ b/cmake/ssl.cmake
-@@ -196,7 +196,7 @@ FUNCTION(FIND_OPENSSL_EXECUTABLE)
+@@ -197,7 +197,7 @@ FUNCTION(FIND_OPENSSL_EXECUTABLE)
      FIND_PROGRAM(OPENSSL_EXECUTABLE openssl)
    ENDIF()
  
@@ -93,7 +49,7 @@ index 9d76fa19616..94bf55ece00 100644
      SET(OPENSSL_EXECUTABLE_HAS_ZLIB 0)
      EXECUTE_PROCESS(
        COMMAND ${OPENSSL_EXECUTABLE} "list-cipher-commands"
-@@ -806,6 +806,13 @@ MACRO(MYSQL_CHECK_SSL_DLLS)
+@@ -807,6 +807,13 @@ MACRO(MYSQL_CHECK_SSL_DLLS)
          SET(SSL_MSVC_VERSION_SUFFIX "-3")
          SET(SSL_MSVC_ARCH_SUFFIX "-x64")
        ENDIF()
@@ -107,11 +63,31 @@ index 9d76fa19616..94bf55ece00 100644
  
        FIND_FILE(HAVE_CRYPTO_DLL
          NAMES
+diff --git a/extra/libcno/CMakeLists.txt b/extra/libcno/CMakeLists.txt
+index 2cc3a795f59..e1da34163a7 100644
+--- a/extra/libcno/CMakeLists.txt
++++ b/extra/libcno/CMakeLists.txt
+@@ -32,9 +32,14 @@ MYSQL_ADD_EXECUTABLE(
+   SKIP_INSTALL
+   EXCLUDE_FROM_ALL
+   )
++IF(WIN32 AND "${CMAKE_GENERATOR_PLATFORM}" STREQUAL "ARM64")
++  SET(cno_huffman_generator_CMD "${CMAKE_BINARY_DIR}/../build-x64/runtime_output_directory/RelWithDebInfo/cno_huffman_generator.exe")
++ELSE()
++  SET(cno_huffman_generator_CMD cno_huffman_generator)
++ENDIF()
+ ADD_CUSTOM_COMMAND(
+   OUTPUT "${LIBCNO_GENERATE_DIR}/hpack-data.h"
+-  COMMAND cno_huffman_generator
++  COMMAND ${cno_huffman_generator_CMD}
+   ARGS "${LIBCNO_GENERATE_DIR}/hpack-data.h"
+   DEPENDS
+   cno_huffman_generator
 diff --git a/scripts/CMakeLists.txt b/scripts/CMakeLists.txt
-index 8222a5c38a7..857f74d8242 100644
+index 9ebe10bdb51..4ea0fa5496a 100644
 --- a/scripts/CMakeLists.txt
 +++ b/scripts/CMakeLists.txt
-@@ -53,11 +53,17 @@ ELSE()
+@@ -54,11 +54,17 @@ ELSE()
    MESSAGE(FATAL_ERROR "Cannot concatenate files")
  ENDIF()
  
@@ -130,16 +106,7 @@ index 8222a5c38a7..857f74d8242 100644
    mysql_fix_privilege_tables
    mysql_fix_privilege_tables.sql
    mysql_fix_privilege_tables_sql.h
-@@ -75,7 +81,7 @@ MY_ADD_CUSTOM_TARGET(GenFixPrivs
- 
- ADD_CUSTOM_COMMAND(
-   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_commands_sys_schema.h
--  COMMAND comp_sql
-+  COMMAND ${comp_sql_CMD}
-   mysql_sys_schema
-   ${CMAKE_CURRENT_SOURCE_DIR}/mysql_sys_schema.sql
-   sql_commands_sys_schema.h
-@@ -86,7 +92,7 @@ ADD_CUSTOM_COMMAND(
+@@ -76,7 +82,7 @@ MY_ADD_CUSTOM_TARGET(GenFixPrivs
  
  ADD_CUSTOM_COMMAND(
    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_commands_system_data.h
@@ -148,7 +115,7 @@ index 8222a5c38a7..857f74d8242 100644
    mysql_system_data
    ${CMAKE_CURRENT_SOURCE_DIR}/mysql_system_tables_data.sql
    sql_commands_system_data.h
-@@ -97,7 +103,7 @@ ADD_CUSTOM_COMMAND(
+@@ -87,7 +93,7 @@ ADD_CUSTOM_COMMAND(
  
  ADD_CUSTOM_COMMAND(
    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_commands_system_tables_data_fix.h
@@ -157,7 +124,7 @@ index 8222a5c38a7..857f74d8242 100644
    mysql_system_tables_data_fix
    ${CMAKE_CURRENT_SOURCE_DIR}/mysql_system_tables_data_fix.sql
    sql_commands_system_tables_data_fix.h
-@@ -108,7 +114,7 @@ ADD_CUSTOM_COMMAND(
+@@ -98,7 +104,7 @@ ADD_CUSTOM_COMMAND(
  
  ADD_CUSTOM_COMMAND(
    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_commands_system_tables.h
@@ -166,7 +133,7 @@ index 8222a5c38a7..857f74d8242 100644
    mysql_system_tables
    ${CMAKE_CURRENT_SOURCE_DIR}/mysql_system_tables.sql
    sql_commands_system_tables.h
-@@ -119,7 +125,7 @@ ADD_CUSTOM_COMMAND(
+@@ -109,7 +115,7 @@ ADD_CUSTOM_COMMAND(
  
  ADD_CUSTOM_COMMAND(
    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_commands_system_users.h
@@ -175,7 +142,7 @@ index 8222a5c38a7..857f74d8242 100644
    mysql_system_users
    ${CMAKE_CURRENT_SOURCE_DIR}/mysql_system_users.sql
    sql_commands_system_users.h
-@@ -130,7 +136,7 @@ ADD_CUSTOM_COMMAND(
+@@ -120,7 +126,7 @@ ADD_CUSTOM_COMMAND(
  
  ADD_CUSTOM_COMMAND(
    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_commands_help_data.h
@@ -184,20 +151,74 @@ index 8222a5c38a7..857f74d8242 100644
    fill_help_tables
    ${CMAKE_CURRENT_SOURCE_DIR}/fill_help_tables.sql
    sql_commands_help_data.h
-@@ -141,7 +147,7 @@ ADD_CUSTOM_COMMAND(
+@@ -131,7 +137,7 @@ ADD_CUSTOM_COMMAND(
  
  ADD_CUSTOM_COMMAND(
-   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_firewall_stored_procedures.h
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_firewall_sp_set_firewall_mode.h
 -  COMMAND comp_sql
 +  COMMAND ${comp_sql_CMD}
-   firewall_stored_procedures
-   ${CMAKE_CURRENT_SOURCE_DIR}/firewall_stored_procedures.sql
-   sql_firewall_stored_procedures.h
+   firewall_sp_set_firewall_mode
+   ${CMAKE_CURRENT_SOURCE_DIR}/firewall/firewall_sp_set_firewall_mode.sql
+   sql_firewall_sp_set_firewall_mode.h
+@@ -142,7 +148,7 @@ ADD_CUSTOM_COMMAND(
+ 
+ ADD_CUSTOM_COMMAND(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_firewall_sp_reload_firewall_rules.h
+-  COMMAND comp_sql
++  COMMAND ${comp_sql_CMD}
+   firewall_sp_reload_firewall_rules
+   ${CMAKE_CURRENT_SOURCE_DIR}/firewall/firewall_sp_reload_firewall_rules.sql
+   sql_firewall_sp_reload_firewall_rules.h
+@@ -153,7 +159,7 @@ ADD_CUSTOM_COMMAND(
+ 
+ ADD_CUSTOM_COMMAND(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_firewall_sp_set_firewall_group_mode.h
+-  COMMAND comp_sql
++  COMMAND ${comp_sql_CMD}
+   firewall_sp_set_firewall_group_mode
+   ${CMAKE_CURRENT_SOURCE_DIR}/firewall/firewall_sp_set_firewall_group_mode.sql
+   sql_firewall_sp_set_firewall_group_mode.h
+@@ -164,7 +170,7 @@ ADD_CUSTOM_COMMAND(
+ 
+ ADD_CUSTOM_COMMAND(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_firewall_sp_set_firewall_group_mode_and_user.h
+-  COMMAND comp_sql
++  COMMAND ${comp_sql_CMD}
+   firewall_sp_set_firewall_group_mode_and_user
+   ${CMAKE_CURRENT_SOURCE_DIR}/firewall/firewall_sp_set_firewall_group_mode_and_user.sql
+   sql_firewall_sp_set_firewall_group_mode_and_user.h
+@@ -175,7 +181,7 @@ ADD_CUSTOM_COMMAND(
+ 
+ ADD_CUSTOM_COMMAND(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_firewall_sp_reload_firewall_group_rules.h
+-  COMMAND comp_sql
++  COMMAND ${comp_sql_CMD}
+   firewall_sp_reload_firewall_group_rules
+   ${CMAKE_CURRENT_SOURCE_DIR}/firewall/firewall_sp_reload_firewall_group_rules.sql
+   sql_firewall_sp_reload_firewall_group_rules.h
+@@ -186,7 +192,7 @@ ADD_CUSTOM_COMMAND(
+ 
+ ADD_CUSTOM_COMMAND(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_firewall_sp_firewall_group_enlist.h
+-  COMMAND comp_sql
++  COMMAND ${comp_sql_CMD}
+   firewall_sp_firewall_group_enlist
+   ${CMAKE_CURRENT_SOURCE_DIR}/firewall/firewall_sp_firewall_group_enlist.sql
+   sql_firewall_sp_firewall_group_enlist.h
+@@ -197,7 +203,7 @@ ADD_CUSTOM_COMMAND(
+ 
+ ADD_CUSTOM_COMMAND(
+   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/sql_firewall_sp_firewall_group_delist.h
+-  COMMAND comp_sql
++  COMMAND ${comp_sql_CMD}
+   firewall_sp_firewall_group_delist
+   ${CMAKE_CURRENT_SOURCE_DIR}/firewall/firewall_sp_firewall_group_delist.sql
+   sql_firewall_sp_firewall_group_delist.h
 diff --git a/scripts/sys_schema/CMakeLists.txt b/scripts/sys_schema/CMakeLists.txt
-index aaba3575df4..8ae560a53e9 100644
+index 1d3295e8d4f..08327e3026c 100644
 --- a/scripts/sys_schema/CMakeLists.txt
 +++ b/scripts/sys_schema/CMakeLists.txt
-@@ -204,10 +204,16 @@ ADD_CUSTOM_COMMAND(
+@@ -205,10 +205,16 @@ ADD_CUSTOM_COMMAND(
  MY_ADD_CUSTOM_TARGET(all_sys_schema
    DEPENDS ALL_SYS_SCHEMA.sql)
  
@@ -216,10 +237,10 @@ index aaba3575df4..8ae560a53e9 100644
    ${CMAKE_CURRENT_BINARY_DIR}/ALL_SYS_SCHEMA.sql
    sql_commands.h
 diff --git a/sql-common/client.cc b/sql-common/client.cc
-index a57e94d30c7..701d190675d 100644
+index 891a29a897c..43b9a74c250 100644
 --- a/sql-common/client.cc
 +++ b/sql-common/client.cc
-@@ -8535,9 +8535,9 @@ int STDCALL mysql_options(MYSQL *mysql, enum mysql_option option,
+@@ -8600,9 +8600,9 @@ int STDCALL mysql_options(MYSQL *mysql, enum mysql_option option,
        mysql->options.report_data_truncation = *static_cast<const bool *>(arg);
        break;
      case MYSQL_OPT_RECONNECT:
@@ -232,7 +253,7 @@ index a57e94d30c7..701d190675d 100644
        mysql->reconnect = *static_cast<const bool *>(arg);
        break;
      case MYSQL_OPT_BIND:
-@@ -8865,9 +8865,9 @@ int STDCALL mysql_get_option(MYSQL *mysql, enum mysql_option option,
+@@ -8930,9 +8930,9 @@ int STDCALL mysql_get_option(MYSQL *mysql, enum mysql_option option,
            mysql->options.report_data_truncation;
        break;
      case MYSQL_OPT_RECONNECT:
@@ -246,10 +267,10 @@ index a57e94d30c7..701d190675d 100644
        break;
      case MYSQL_OPT_BIND:
 diff --git a/strings/CMakeLists.txt b/strings/CMakeLists.txt
-index 4fd0f3afd16..4e1e25ddb39 100644
+index ee363b78bd5..61cfd5890ad 100644
 --- a/strings/CMakeLists.txt
 +++ b/strings/CMakeLists.txt
-@@ -68,9 +68,15 @@ SET(ZH_HANS_DST_FILE ${CMAKE_BINARY_DIR}/strings/uca900_zh_tbls.cc)
+@@ -69,9 +69,15 @@ SET(ZH_HANS_DST_FILE ${CMAKE_BINARY_DIR}/strings/uca900_zh_tbls.cc)
  SET(JA_HANS_SRC_FILE ${CMAKE_SOURCE_DIR}/strings/lang_data/ja_hans.txt)
  SET(JA_HANS_DST_FILE ${CMAKE_BINARY_DIR}/strings/uca900_ja_tbls.cc)
  
@@ -266,7 +287,7 @@ index 4fd0f3afd16..4e1e25ddb39 100644
    --in_file=${JA_HANS_SRC_FILE}
    --out_file=${JA_HANS_DST_FILE}
    DEPENDS uca9dump ${JA_HANS_SRC_FILE}
-@@ -79,7 +85,7 @@ ADD_CUSTOM_TARGET(strings_ja_hans DEPENDS ${JA_HANS_DST_FILE})
+@@ -80,7 +86,7 @@ ADD_CUSTOM_TARGET(strings_ja_hans DEPENDS ${JA_HANS_DST_FILE})
  
  ADD_CUSTOM_COMMAND(
    OUTPUT ${ZH_HANS_DST_FILE}
@@ -276,10 +297,10 @@ index 4fd0f3afd16..4e1e25ddb39 100644
    --out_file=${ZH_HANS_DST_FILE}
    DEPENDS uca9dump ${ZH_HANS_SRC_FILE}
 diff --git a/utilities/CMakeLists.txt b/utilities/CMakeLists.txt
-index 808c2e8a38a..4fe75209824 100644
+index d38157e00a4..dfb166e47a8 100644
 --- a/utilities/CMakeLists.txt
 +++ b/utilities/CMakeLists.txt
-@@ -44,8 +44,14 @@ MYSQL_ADD_EXECUTABLE(comp_client_err
+@@ -45,8 +45,14 @@ MYSQL_ADD_EXECUTABLE(comp_client_err
    SKIP_INSTALL
    )
  
@@ -295,7 +316,7 @@ index 808c2e8a38a..4fe75209824 100644
    --in_file=${PROJECT_SOURCE_DIR}/include/errmsg.h
    --out_file=${PROJECT_BINARY_DIR}/include/mysqlclient_ername.h
    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/comp_client_err.cc)
-@@ -69,12 +75,18 @@ FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${INSTALL_MYSQLSHAREDIR})
+@@ -70,12 +76,18 @@ FILE(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/${INSTALL_MYSQLSHAREDIR})
  #
  # Please see errmsg_readme.txt in the same directory for more information.
  #

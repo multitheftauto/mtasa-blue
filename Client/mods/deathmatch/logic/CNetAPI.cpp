@@ -2262,6 +2262,8 @@ void CNetAPI::ReadBulletsync(CClientPlayer* pPlayer, NetBitStreamInterface& BitS
     // Read the bulletsync data
     uchar ucWeapon = 0;
     BitStream.Read(ucWeapon);
+    if (!CClientPickupManager::IsValidWeaponID(ucWeapon))
+        return;
     eWeaponType weaponType = (eWeaponType)ucWeapon;
 
     CVector vecStart, vecEnd;
