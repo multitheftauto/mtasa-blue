@@ -39,11 +39,11 @@ public:
 
     enum class eResourceCategory
     {
-        ALL = 0,
-        SCRIPTS = 1,
-        MAPS = 2,
-        CONFIGS = 3,
-        FILES = 4,
+        ALL,
+        SCRIPTS,
+        MAPS,
+        CONFIGS,
+        FILES,
     };
 
 protected:
