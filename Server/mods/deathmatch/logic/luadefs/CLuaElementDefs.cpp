@@ -16,9 +16,19 @@
 #include "CDummy.h"
 #include "Utils.h"
 
+#ifdef ARGUMENT_PARSER_TUPLE_DEBUG
+float a(CLuaMultiReturn<float, float, float> ret)
+{
+    return std::get<0>(ret.values) + std::get<1>(ret.values) + std::get<2>(ret.values);
+}
+#endif
+
 void CLuaElementDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+#ifdef ARGUMENT_PARSER_TUPLE_DEBUG
+        {"testFunc", ArgumentParser<a>},
+#endif
         // Create/destroy
         {"createElement", createElement},
         {"destroyElement", destroyElement},

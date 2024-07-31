@@ -24,3 +24,15 @@ struct CLuaMultiReturn
 
     std::tuple<Ts...> values;
 };
+
+template <typename T>
+struct is_multireturn : std::false_type
+{
+};
+
+template <typename Arg1, typename... Args>
+struct is_multireturn<CLuaMultiReturn<Arg1, Args...>> : std::true_type
+{
+    using tupleType_t = std::tuple<Arg1, Args...>;
+    static constexpr auto count = sizeof...(Args) + 1;
+};
