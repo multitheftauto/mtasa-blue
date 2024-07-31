@@ -4279,7 +4279,7 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
     return entryPoints;
 }
 
-bool CLuaVehicleDefs::SetHeliRotorState(CClientVehicle* vehicle, bool state, std::optional<bool> stopRotor)
+bool CLuaVehicleDefs::SetHeliRotorState(CClientVehicle* vehicle, bool state, std::optional<bool> stopRotor) noexcept
 {
     if (vehicle->GetVehicleType() != eClientVehicleType::CLIENTVEHICLE_HELI)
         return false;
@@ -4288,7 +4288,7 @@ bool CLuaVehicleDefs::SetHeliRotorState(CClientVehicle* vehicle, bool state, std
     return true;
 }
 
-bool CLuaVehicleDefs::GetHeliRotorState(CClientVehicle* vehicle)
+bool CLuaVehicleDefs::GetHeliRotorState(CClientVehicle* vehicle) noexcept
 {
     return vehicle->GetHeliRotorState();
 }

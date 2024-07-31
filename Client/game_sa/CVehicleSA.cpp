@@ -524,16 +524,14 @@ void CVehicleSA::SetTrainSpeed(float fSpeed)
     pInterface->m_fTrainSpeed = fSpeed;
 }
 
-float CVehicleSA::GetHeliRotorSpeed()
+float CVehicleSA::GetHeliRotorSpeed() const
 {
-    auto* heliInterface = static_cast<CHeliSAInterface*>(GetInterface());
-    return heliInterface->m_wheelSpeed[1];
+    return static_cast<CHeliSAInterface*>(m_pInterface)->m_wheelSpeed[1];
 }
 
 void CVehicleSA::SetHeliRotorSpeed(float speed)
 {
-    auto* heliInterface = static_cast<CHeliSAInterface*>(GetInterface());
-    heliInterface->m_wheelSpeed[1] = speed;
+    static_cast<CHeliSAInterface*>(GetInterface())->m_wheelSpeed[1] = speed;
 }
 
 void CVehicleSA::SetHeliRotorState(bool state, bool stopRotor) noexcept

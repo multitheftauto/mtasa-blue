@@ -198,7 +198,7 @@ public:
     virtual bool           GetTakeLessDamage() = 0;
     virtual bool           GetTyresDontBurst() = 0;
     virtual unsigned short GetAdjustablePropertyValue() = 0;
-    virtual float          GetHeliRotorSpeed() = 0;
+    virtual float          GetHeliRotorSpeed() const = 0;
     virtual bool           GetHeliRotorState() const noexcept = 0;
     virtual float          GetPlaneRotorSpeed() = 0;
     virtual unsigned long  GetExplodeTime() = 0;

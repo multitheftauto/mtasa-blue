@@ -546,7 +546,7 @@ public:
     bool           GetTakeLessDamage() { return GetVehicleInterface()->m_nVehicleFlags.bTakeLessDamage; };
     bool           GetTyresDontBurst() { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
     unsigned short GetAdjustablePropertyValue() { return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
-    float          GetHeliRotorSpeed();
+    float          GetHeliRotorSpeed() const;
     bool           GetHeliRotorState() const noexcept override { return m_heliRotorState; }
     float          GetPlaneRotorSpeed();
 
