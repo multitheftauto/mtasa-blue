@@ -614,6 +614,10 @@ void CClientEntity::SetDimension(unsigned short usDimension)
     m_usDimension = usDimension;
 
     CLuaArguments Arguments;
+    for (uint i = 0; i < GetAttachedEntityCount(); i++)
+    {
+        GetAttachedEntity(i)->SetDimension(usDimension);
+    }
     Arguments.PushNumber(usOldDimension);
     Arguments.PushNumber(usDimension);
     CallEvent("onClientElementDimensionChange", Arguments, true);
