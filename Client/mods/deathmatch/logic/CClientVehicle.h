@@ -547,6 +547,8 @@ public:
     bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
     bool ResetDummyPositions();
 
+    CVector GetEntryPoint(std::uint32_t entryPointIndex);
+
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);
     void ConvertComponentPositionBase(const SString& vehicleComponent, CVector& vecInOutPosition, EComponentBaseType inputBase, EComponentBaseType outputBase);

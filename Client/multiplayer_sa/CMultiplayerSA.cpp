@@ -559,7 +559,6 @@ void HOOK_CObject_ProcessBreak();
 void HOOK_CObject_ProcessCollision();
 void HOOK_CGlass_WindowRespondsToCollision();
 void HOOK_CGlass__BreakGlassPhysically();
-void HOOK_CGlass_WindowRespondsToExplosion(); // get attacker & object
 
 void HOOK_FxManager_c__DestroyFxSystem();
 
@@ -754,7 +753,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10);
     HookInstall(HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8);
     HookInstall(HOOKPOS_CGlass__BreakGlassPhysically, (DWORD)HOOK_CGlass__BreakGlassPhysically, 5);
-    HookInstall(HOOKPOS_CGlass_WindowRespondsToExplosion, (DWORD)HOOK_CGlass_WindowRespondsToExplosion, 5);
     
     // Post-destruction hook for FxSystems
     HookInstall(HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
@@ -1560,6 +1558,9 @@ void CMultiplayerSA::InitHooks()
     // by skipping some entity flag check in CShadows::CastPlayerShadowSectorList()
     MemSet((void*)0x70A4CB, 0x90, 6);
 
+    // Disable setting system mouse cursor position to the center on game init
+    MemSet((void*)0x748A01, 0x90, 0x748A23 - 0x748A01);
+  
     // Allow vertical camera movement during a camera fade (#411)
     MemPut<BYTE>(0x524084, 0xFF);
     MemPut<BYTE>(0x524089, 0xFF);
@@ -1567,6 +1568,12 @@ void CMultiplayerSA::InitHooks()
     // Allow change alpha for arrow & checkpoint markers (#1860)
     MemSet((void*)0x7225F5, 0x90, 4);
     MemCpy((void*)0x725DDE, "\xFF\x76\xB\x90\x90", 5);
+
+    // Allow switch weapon during jetpack task (#3569)
+    MemSetFast((void*)0x60D86F, 0x90, 19);
+
+    // Fix invisible vehicle windows when lights are on (#2936)
+    MemPut<BYTE>(0x6E1425, 1);
 
     InitHooks_CrashFixHacks();
 
@@ -6821,6 +6828,8 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
         pop eax
     }
 
+    pObjectAttacker = nullptr;
+
     if (WindowRespondsToCollision_CalledFrom != CALL_FROM_CGlass_WindowRespondsToExplosion)
     {
         _asm
@@ -6830,45 +6839,42 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
     }
 
     // Get attacker for the glass break
-    switch (WindowRespondsToCollision_CalledFrom)
+    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplyCollision ||
+        WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplyCollision_2 ||
+        WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplySoftCollision)
     {
-        case CALL_FROM_CPhysical_ApplyCollision:
-        case CALL_FROM_CPhysical_ApplyCollision_2:
-        case CALL_FROM_CPhysical_ApplySoftCollision:
+        _asm
+        {
+            mov pObjectAttacker, edi
+        }
+    }
+
+    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CGlass_WasGlassHitByBullet)
+    {
+        _asm
+        {
+            mov pObjectAttacker, ebx // WasGlassHitByBullet called from CWeapon::DoBulletImpact
+        }
+
+        if (!pObjectAttacker || (pObjectAttacker && !pObjectAttacker->m_pRwObject)) // WasGlassHitByBullet called from CBulletInfo::Update
         {
             _asm
             {
-                mov pObjectAttacker, edi
+                push ecx
+                mov ecx, [edi]
+                mov pObjectAttacker, ecx
+                pop ecx
             }
-
-            break;
         }
-        case CALL_FROM_CGlass_WasGlassHitByBullet:
+    }
+
+    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CGlass_WindowRespondsToExplosion)
+    {
+        _asm
         {
-            _asm
-            {
-                mov pObjectAttacker, ebx // WasGlassHitByBullet called from CWeapon::DoBulletImpact
-            }
-
-            if (!pObjectAttacker || (pObjectAttacker && !pObjectAttacker->m_pRwObject)) // WasGlassHitByBullet called from CBulletInfo::Update
-            {
-                _asm
-                {
-                    push ecx
-                    mov ecx, [edi]
-                    mov pObjectAttacker, ecx
-                    pop ecx
-                }
-            }
-
-            break;
+            mov pDamagedObject, edx
+            mov pObjectAttacker, ebp
         }
-        case CALL_FROM_CGlass_WindowRespondsToExplosion:
-        {
-            break;
-        }
-        default:
-            pObjectAttacker = nullptr;
     }
 
     if (pObjectAttacker && !pObjectAttacker->m_pRwObject) // Still wrong?
@@ -6927,17 +6933,6 @@ void _declspec(naked) HOOK_CGlass__BreakGlassPhysically()
             add     esp, 0BCh
             retn
         }
-    }
-}
-
-void _declspec(naked) HOOK_CGlass_WindowRespondsToExplosion()
-{
-    _asm {
-        push 1
-        sub esp, 0Ch
-        mov pDamagedObject, edx
-        mov pObjectAttacker, ebp
-        jmp RETURN_CGlass_WindowRespondsToExplosion
     }
 }
 
