@@ -19,7 +19,6 @@
 #include <game/CHandlingEntry.h>
 #include <game/CHandlingManager.h>
 #include <game/CStreaming.h>
-#include <game/CHeli.h>
 
 using std::list;
 
