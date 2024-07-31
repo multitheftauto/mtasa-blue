@@ -16,7 +16,4 @@ class CHeli : public virtual CAutomobile
 {
 public:
     virtual ~CHeli(){};
-
-    virtual void SetHeliRotorState(bool state) = 0;
-    virtual bool GetHeliRotorState() = 0;
 };

@@ -415,6 +415,7 @@ private:
     unsigned char                    m_ucVariant2;
     unsigned char                    m_ucVariantCount{0};
     bool                             m_doorsUndamageable{false};
+    bool                             m_heliRotorState{true};
 
     std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
 
@@ -546,6 +547,7 @@ public:
     bool           GetTyresDontBurst() { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
     unsigned short GetAdjustablePropertyValue() { return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
     float          GetHeliRotorSpeed();
+    bool           GetHeliRotorState() const noexcept override { return m_heliRotorState; }
     float          GetPlaneRotorSpeed();
 
     unsigned long  GetExplodeTime() { return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240); };
@@ -572,6 +574,7 @@ public:
         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_pInterface) + 2156) = usAdjustableProperty;
     };
     void SetHeliRotorSpeed(float speed);
+    void SetHeliRotorState(bool state, bool stopRotor) noexcept override;
     void SetPlaneRotorSpeed(float fSpeed);
     bool SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept;
     void SetExplodeTime(unsigned long ulTime) { *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240) = ulTime; };

@@ -58,11 +58,7 @@ bool CanProcessFlyingCarStuff(CHeliSAInterface* heliInterface)
     if (!vehicle || !vehicle->pEntity)
         return true;
 
-    auto* heli = reinterpret_cast<CHeliSA*>(vehicle->pEntity);
-    if (!heli)
-        return true;
-
-    return heli->GetHeliRotorState();
+    return vehicle->pEntity->GetHeliRotorState();
 }
 
 void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
@@ -538,6 +534,14 @@ void CVehicleSA::SetHeliRotorSpeed(float speed)
 {
     auto* heliInterface = static_cast<CHeliSAInterface*>(GetInterface());
     heliInterface->m_wheelSpeed[1] = speed;
+}
+
+void CVehicleSA::SetHeliRotorState(bool state, bool stopRotor) noexcept
+{
+    m_heliRotorState = state;
+
+    if (!state && stopRotor)
+        SetHeliRotorSpeed(0.0f);
 }
 
 void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)

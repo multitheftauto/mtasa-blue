@@ -171,7 +171,6 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_fNitroLevel = 1.0f;
     m_cNitroCount = 0;
     m_fWheelScale = 1.0f;
-    m_heliRotorState = m_eVehicleType == CLIENTVEHICLE_HELI;
 
     for (unsigned int i = 0; i < MAX_WINDOWS; ++i)
     {
@@ -1578,30 +1577,15 @@ void CClientVehicle::SetHeliRotorSpeed(float fSpeed)
     m_fHeliRotorSpeed = fSpeed;
 }
 
-bool CClientVehicle::GetHeliRotorState()
+bool CClientVehicle::GetHeliRotorState() const noexcept
 {
-    if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
-    {
-        auto* heli = reinterpret_cast<CHeli*>(m_pVehicle);
-        if (heli)
-            return heli->GetHeliRotorState();
-    }
-
-    return m_heliRotorState;
+    return m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI ? m_pVehicle->GetHeliRotorState() : m_heliRotorState;
 }
 
-void CClientVehicle::SetHeliRotorState(bool state)
+void CClientVehicle::SetHeliRotorState(bool state, bool stopRotor) noexcept
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
-    {
-        auto* heli = reinterpret_cast<CHeli*>(m_pVehicle);
-        if (heli)
-        {
-            heli->SetHeliRotorState(state);
-            if (!state)
-                heli->SetHeliRotorSpeed(0.0f);
-        }
-    }
+        m_pVehicle->SetHeliRotorState(state, stopRotor);
 
     m_heliRotorState = state;
 }

@@ -299,12 +299,12 @@ public:
     // TODO: Make the class remember on virtualization
     float GetHeliRotorSpeed();
     float GetPlaneRotorSpeed();
-    bool  GetHeliRotorState();
+    bool  GetHeliRotorState() const noexcept;
 
     bool GetRotorSpeed(float&);
     bool SetRotorSpeed(float);
     bool SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept;
-    void SetHeliRotorState(bool state);
+    void SetHeliRotorState(bool state, bool stopRotor) noexcept;
     void SetHeliRotorSpeed(float fSpeed);
     void SetPlaneRotorSpeed(float fSpeed);
     bool IsHeliSearchLightVisible();
@@ -673,7 +673,7 @@ protected:
     uchar m_ucTrackID;
     bool  m_bJustStreamedIn;
     bool  m_bWheelScaleChanged;
-    bool  m_heliRotorState;
+    bool  m_heliRotorState{true};
 
     // Time dependent error compensation interpolation
     struct

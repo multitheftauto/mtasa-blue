@@ -53,11 +53,4 @@ class CHeliSA final : public virtual CHeli, public virtual CAutomobileSA
 {
 public:
     CHeliSA(CHeliSAInterface* pInterface);
-
-    // Not SA
-    bool GetHeliRotorState() noexcept override { return m_rotorState; }
-    void SetHeliRotorState(bool state) noexcept override { m_rotorState = state; }
-
-private:
-    bool m_rotorState;
 };

@@ -166,7 +166,7 @@ public:
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
 
-    static bool SetHeliRotorState(CClientVehicle* const vehicle, bool state);
+    static bool SetHeliRotorState(CClientVehicle* const vehicle, bool state, std::optional<bool> stopRotor);
     static bool GetHeliRotorState(CClientVehicle* const vehicle);
 
     // Components
