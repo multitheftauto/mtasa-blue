@@ -11,7 +11,7 @@
 #include "StdInc.h"
 #include "CHeliSA.h"
 
-CHeliSA::CHeliSA(CHeliSAInterface* pInterface)
+CHeliSA::CHeliSA(CHeliSAInterface* pInterface) : m_rotorState(true)
 {
     SetInterface(pInterface);
     Init();

@@ -92,6 +92,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleModelWheelSize", ArgumentParser<GetVehicleModelWheelSize>},
         {"getVehicleWheelFrictionState", ArgumentParser<GetVehicleWheelFrictionState>},
         {"getVehicleEntryPoints", ArgumentParser<GetVehicleEntryPoints>},
+        {"getHelicopterRotorState", ArgumentParser<GetHeliRotorState>},
 
         // Vehicle set funcs
         {"createVehicle", CreateVehicle},
@@ -155,6 +156,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleVariant", ArgumentParser<SetVehicleVariant>},
         {"setVehicleWheelScale", ArgumentParser<SetVehicleWheelScale>},
         {"setVehicleModelWheelSize", ArgumentParser<SetVehicleModelWheelSize>},
+        {"setHelicopterRotorState", ArgumentParser<SetHeliRotorState>},
     };
 
     // Add functions
@@ -243,6 +245,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelWheelSize", "getVehicleModelWheelSize");
     lua_classfunction(luaVM, "getWheelFrictionState", "getVehicleWheelFrictionState");
     lua_classfunction(luaVM, "getEntryPoints", ArgumentParser<OOP_GetVehicleEntryPoints>);
+    lua_classfunction(luaVM, "getRotorState", "getHelicopterRotorState");
 
     lua_classfunction(luaVM, "setComponentVisible", "setVehicleComponentVisible");
     lua_classfunction(luaVM, "setSirensOn", "setVehicleSirensOn");
@@ -291,6 +294,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setVariant", "setVehicleVariant");
     lua_classfunction(luaVM, "setWheelScale", "setVehicleWheelScale");
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
+    lua_classfunction(luaVM, "setRotorState", "setHelicopterRotorState");
 
     lua_classfunction(luaVM, "resetComponentPosition", "resetVehicleComponentPosition");
     lua_classfunction(luaVM, "resetComponentRotation", "resetVehicleComponentRotation");
@@ -347,6 +351,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "gravity", SetVehicleGravity, OOP_GetVehicleGravity);
     lua_classvariable(luaVM, "turnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
     lua_classvariable(luaVM, "wheelScale", "setVehicleWheelScale", "getVehicleWheelScale");
+    lua_classvariable(luaVM, "rotorState", "setHelicopterRotorState", "getHelicopterRotorState");
 
     lua_registerclass(luaVM, "Vehicle", "Element");
 }
@@ -4272,4 +4277,18 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
     }
 
     return entryPoints;
+}
+
+bool CLuaVehicleDefs::SetHeliRotorState(CClientVehicle* vehicle, bool state)
+{
+    if (vehicle->GetVehicleType() != eClientVehicleType::CLIENTVEHICLE_HELI)
+        return false;
+
+    vehicle->SetHeliRotorState(state);
+    return true;
+}
+
+bool CLuaVehicleDefs::GetHeliRotorState(CClientVehicle* vehicle)
+{
+    return vehicle->GetHeliRotorState();
 }
