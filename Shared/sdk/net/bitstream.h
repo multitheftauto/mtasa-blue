@@ -552,6 +552,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-05-31
     BreakObject_Serverside,
 
+    // Add respawnObject and toggleObjectRespawn to serverside
+    // 2024-06-09
+    RespawnObject_Serverside,
+    
     // Ped syncronization revision
     // 2024-06-16
     PedSync_Revision,

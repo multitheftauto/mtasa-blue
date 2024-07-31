@@ -2724,6 +2724,7 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // bool                 (1)     - static
         // SObjectHealthSync    (?)     - health
         // bool                 (1)     - is break
+        // bool                 (1)     - respawnable
 
         // Pickups:
         // CVector              (12)    - position
@@ -3089,7 +3090,10 @@ retry:
                             if (bitStream.ReadBit())
                                 pObject->Break();
                         }
-                        
+
+                        if (bitStream.Can(eBitStreamVersion::RespawnObject_Serverside))
+                            pObject->SetRespawnEnabled(bitStream.ReadBit());
+
                         pObject->SetCollisionEnabled(bCollisonsEnabled);
                         if (ucEntityTypeID == CClientGame::WEAPON)
                         {
