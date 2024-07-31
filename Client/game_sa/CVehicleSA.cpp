@@ -1830,7 +1830,7 @@ void CVehicleSA::StaticSetHooks()
     // Setup vehicle sun glare hook
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
 
-    // 
+    // Setup hook to handle setHelicopterRotorState function
     HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
 }
 
