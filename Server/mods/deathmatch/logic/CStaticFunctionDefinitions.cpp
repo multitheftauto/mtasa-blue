@@ -4341,8 +4341,6 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned())
         {
-            // TODO: save their animation?
-
             // Tell the players
             CBitStream BitStream;
             if (!blockName.empty() && !animName.empty())
@@ -4354,6 +4352,9 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                 // Remove choking state
                 if (pPed->IsChoking())
                     pPed->SetChoking(false);
+
+                // Store anim data
+                pPed->SetAnimationData({blockName, animName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, iBlend, bTaskToBeRestoredOnAnimEnd, GetTickCount64_()});
 
                 BitStream.pBitStream->WriteString<unsigned char>(blockName);
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
@@ -4369,9 +4370,12 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
             {
                 // Inform them to kill the current animation instead
                 BitStream.pBitStream->Write((unsigned char)0);
-            }
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION, *BitStream.pBitStream));
 
+                // Clear anim data
+                pPed->SetAnimationData({});
+            }
+
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION, *BitStream.pBitStream));
             return true;
         }
     }
@@ -4393,14 +4397,17 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
             {
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(fProgress);
+
+                pPed->SetAnimationProgress(fProgress);
             }
             else
             {
                 // Inform them to kill the current animation instead
                 BitStream.pBitStream->Write((unsigned char)0);
+                pPed->SetAnimationData({});
             }
-            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_PROGRESS, *BitStream.pBitStream));
 
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_PROGRESS, *BitStream.pBitStream));
             return true;
         }
     }
@@ -4421,6 +4428,7 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const 
             BitStream.pBitStream->WriteString<unsigned char>(animName);
             BitStream.pBitStream->Write(fSpeed);
 
+            pPed->SetAnimationSpeed(fSpeed);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
 
             return true;

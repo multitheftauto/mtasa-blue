@@ -2203,6 +2203,10 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
             }
 
             pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
+
+            if (pPed->HasSyncedAnim())
+                pPed->m_animationOverridedByClient = true;
+
             lua_pushboolean(luaVM, true);
             return 1;
         }

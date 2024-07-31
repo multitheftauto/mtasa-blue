@@ -553,6 +553,8 @@ public:
 
     std::unique_ptr<CAnimBlendAssociation> GetAnimAssociation(CAnimBlendHierarchySAInterface* pHierarchyInterface);
 
+    void SetHasSyncedAnim(bool synced) noexcept { m_hasSyncedAnim = synced; };
+    bool HasSyncedAnim() const noexcept { return m_hasSyncedAnim; };
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.
     CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer);
@@ -788,4 +790,7 @@ public:
     CClientPed*   m_pGettingJackedBy;                    // The ped that is jacking us
 
     std::shared_ptr<CClientModel> m_clientModel;
+
+    bool m_hasSyncedAnim;
+    bool m_animationOverridedByClient;
 };
