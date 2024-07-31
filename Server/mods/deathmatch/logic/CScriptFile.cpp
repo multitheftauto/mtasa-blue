@@ -204,7 +204,7 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
     if (feof(m_pFile) || ferror(m_pFile))
     {
         // if so, truncate the data to the amount of bytes read
-        outBuffer = outBuffer.substr(0, bytesRead);
+        outBuffer.resize(bytesRead + 1);
     }
     return bytesRead;
 }
