@@ -494,34 +494,35 @@ bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
 bool CLuaMain::SaveXML(CXMLNode* pRootNode)
 {
     for (CXMLFile* pFile : m_XMLFiles)
-        if (pFile)
-            if (pFile->GetRootNode() == pRootNode)
-                return pFile->Write();
-    if (m_pResource)
     {
-        list<CResourceFile*>::iterator iter = m_pResource->IterBegin();
-        for (; iter != m_pResource->IterEnd(); ++iter)
-        {
-            CResourceFile* pResourceFile = *iter;
-            if (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG)
-            {
-                CResourceConfigItem* pConfigItem = static_cast<CResourceConfigItem*>(pResourceFile);
-                if (pConfigItem->GetRoot() == pRootNode)
-                {
-                    CXMLFile* pFile = pConfigItem->GetFile();
-                    if (pFile)
-                        return pFile->Write();
-                    return false;
-                }
-            }
-        }
+        if (!pFile)
+            continue;
+        if (pFile->GetRootNode() != pRootNode)
+            continue;
+        return pFile->Write();
+    }
+
+    if (!m_pResource)
+        return false;
+
+    for (const auto& pResourceFile : m_pResource->GetFiles())
+    {
+        if (pResourceFile->GetType() != CResourceFile::RESOURCE_FILE_TYPE_CONFIG)
+            continue;
+
+        const auto& pConfigItem = static_cast<CResourceConfigItem*>(pResourceFile);
+        if (pConfigItem->GetRoot() != pRootNode)
+            continue;
+
+        const auto& pFile = pConfigItem->GetFile();
+        return pFile ? pFile->Write() : false;
     }
     return false;
 }
 
 CTextDisplay* CLuaMain::CreateDisplay()
 {
-    CTextDisplay* pDisplay = new CTextDisplay;
+    const auto& pDisplay = new CTextDisplay;
     m_Displays.push_back(pDisplay);
     return pDisplay;
 }
@@ -535,7 +536,7 @@ void CLuaMain::DestroyDisplay(CTextDisplay* pDisplay)
 CTextItem* CLuaMain::CreateTextItem(const char* szText, float fX, float fY, eTextPriority priority, const SColor color, float fScale, unsigned char format,
                                     unsigned char ucShadowAlpha)
 {
-    CTextItem* pTextItem = new CTextItem(szText, CVector2D(fX, fY), priority, color, fScale, format, ucShadowAlpha);
+    const auto& pTextItem = new CTextItem(szText, CVector2D(fX, fY), priority, color, fScale, format, ucShadowAlpha);
     m_TextItems.push_back(pTextItem);
     return pTextItem;
 }
@@ -548,14 +549,12 @@ void CLuaMain::DestroyTextItem(CTextItem* pTextItem)
 
 CTextDisplay* CLuaMain::GetTextDisplayFromScriptID(uint uiScriptID)
 {
-    CTextDisplay* pTextDisplay = (CTextDisplay*)CIdArray::FindEntry(uiScriptID, EIdClass::TEXT_DISPLAY);
-    return pTextDisplay;
+    return (CTextDisplay*)CIdArray::FindEntry(uiScriptID, EIdClass::TEXT_DISPLAY);
 }
 
 CTextItem* CLuaMain::GetTextItemFromScriptID(uint uiScriptID)
 {
-    CTextItem* pTextItem = (CTextItem*)CIdArray::FindEntry(uiScriptID, EIdClass::TEXT_ITEM);
-    return pTextItem;
+    return (CTextItem*)CIdArray::FindEntry(uiScriptID, EIdClass::TEXT_ITEM);
 }
 
 ///////////////////////////////////////////////////////////////

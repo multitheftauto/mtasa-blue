@@ -60,7 +60,7 @@ private:
     eExportedFunctionType m_ucType;
 
 public:
-    CExportedFunction(const std::string& strFunctionName, bool bHTTPAccess, eExportedFunctionType ucType, bool bRestricted)
+    CExportedFunction(const std::string& strFunctionName, bool bHTTPAccess, eExportedFunctionType ucType, bool bRestricted) noexcept
     {
         m_ucType = ucType;
         m_strFunctionName = strFunctionName;
@@ -68,10 +68,10 @@ public:
         m_bRestricted = bRestricted;
     }
 
-    eExportedFunctionType GetType() { return m_ucType; }
-    const std::string&    GetFunctionName() { return m_strFunctionName; }
-    bool                  IsHTTPAccessible() { return m_bHTTPAccess; }
-    bool                  IsRestricted() { return m_bRestricted; }
+    eExportedFunctionType GetType() const noexcept { return m_ucType; }
+    const std::string&    GetFunctionName() const noexcept { return m_strFunctionName; }
+    bool                  IsHTTPAccessible() const noexcept { return m_bHTTPAccess; }
+    bool                  IsRestricted() const noexcept { return m_bRestricted; }
 };
 
 class CIncludedResources
@@ -196,16 +196,8 @@ public:
 
     bool CallExportedFunction(const char* szFunctionName, CLuaArguments& Arguments, CLuaArguments& Returns, CResource& Caller);
 
-    std::list<CResource*>& GetDependents() { return m_Dependents; }
-    int                    GetDependentCount() const noexcept { return m_Dependents.size(); }
-
-    std::list<CIncludedResources*>::iterator       GetIncludedResourcesBegin() { return m_IncludedResources.begin(); }
-    std::list<CIncludedResources*>::const_iterator GetIncludedResourcesBegin() const noexcept { return m_IncludedResources.begin(); }
-
-    std::list<CIncludedResources*>::iterator       GetIncludedResourcesEnd() { return m_IncludedResources.end(); }
-    std::list<CIncludedResources*>::const_iterator GetIncludedResourcesEnd() const noexcept { return m_IncludedResources.end(); }
-
-    size_t GetIncludedResourcesCount() const noexcept { return m_IncludedResources.size(); }
+    std::list<CResource*>& GetDependents() noexcept { return m_Dependents; }
+    const std::list<CResource*>& GetDependents() const noexcept { return m_Dependents; }
 
     bool GetInfoValue(const char* szKey, std::string& strValue) const;
     void SetInfoValue(const char* szKey, const char* szValue, bool bSave = true);
@@ -256,11 +248,17 @@ public:
     const std::string&          GetResourceDirectoryPath() const { return m_strResourceDirectoryPath; }
     const std::string&          GetResourceCacheDirectoryPath() const { return m_strResourceCachePath; }
 
-    std::list<CResourceFile*>& GetFiles() { return m_ResourceFiles; }
-    size_t                     GetFileCount() const noexcept { return m_ResourceFiles.size(); }
+    std::list<CResourceFile*>&       GetFiles() noexcept { return m_ResourceFiles; }
+    const std::list<CResourceFile*>& GetFiles() const noexcept { return m_ResourceFiles; }
 
-    time_t GetTimeStarted() const noexcept { return m_timeStarted; }
-    time_t GetTimeLoaded() const noexcept { return m_timeLoaded; }
+    std::list<CExportedFunction>&       GetExportedFunctions() noexcept { return m_ExportedFunctions; }
+    const std::list<CExportedFunction>& GetExportedFunctions() const noexcept { return m_ExportedFunctions; }
+
+    std::list<CIncludedResources*>&       GetIncludedResources() noexcept { return m_IncludedResources; }
+    const std::list<CIncludedResources*>& GetIncludedResources() const noexcept { return m_IncludedResources; }
+
+    std::time_t GetTimeStarted() const noexcept { return m_timeStarted; }
+    std::time_t GetTimeLoaded() const noexcept { return m_timeLoaded; }
 
     void           SetNetID(unsigned short usNetID) { m_usNetID = usNetID; }
     unsigned short GetNetID() const noexcept { return m_usNetID; }
@@ -289,16 +287,13 @@ public:
 
     HttpStatusCode HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
-    std::list<CResourceFile*>::iterator       IterBegin() { return m_ResourceFiles.begin(); }
-    std::list<CResourceFile*>::const_iterator IterBegin() const noexcept { return m_ResourceFiles.begin(); }
+    std::list<CResourceFile*>::iterator       begin() { return m_ResourceFiles.begin(); }
+    std::list<CResourceFile*>::iterator       end() { return m_ResourceFiles.end(); }
 
-    std::list<CResourceFile*>::iterator       IterEnd() { return m_ResourceFiles.end(); }
-    std::list<CResourceFile*>::const_iterator IterEnd() const noexcept { return m_ResourceFiles.end(); }
+    std::list<CResourceFile*>::const_iterator begin() const noexcept { return m_ResourceFiles.begin(); }
+    std::list<CResourceFile*>::const_iterator end() const noexcept { return m_ResourceFiles.end(); }
 
-    size_t IterCount() const noexcept { return m_ResourceFiles.size(); }
-
-    std::list<CExportedFunction>::iterator IterBeginExportedFunctions() { return m_ExportedFunctions.begin(); }
-    std::list<CExportedFunction>::iterator IterEndExportedFunctions() { return m_ExportedFunctions.end(); }
+    std::size_t IterCount() const noexcept { return m_ResourceFiles.size(); }
 
     void GetAclRequests(std::vector<SAclRequest>& outResultList);
     bool HandleAclRequestListCommand(bool bDetail);

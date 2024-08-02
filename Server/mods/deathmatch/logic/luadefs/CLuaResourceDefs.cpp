@@ -1035,7 +1035,7 @@ int CLuaResourceDefs::getResourceExportedFunctions(lua_State* luaVM)
     CResource* pResource;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource, NULL);
+    argStream.ReadUserData(pResource, nullptr);
 
     if (!argStream.HasErrors())
     {
@@ -1056,12 +1056,11 @@ int CLuaResourceDefs::getResourceExportedFunctions(lua_State* luaVM)
         }
 
         lua_newtable(luaVM);
-        unsigned int                      uiIndex = 0;
-        list<CExportedFunction>::iterator iterd = pResource->IterBeginExportedFunctions();
-        for (; iterd != pResource->IterEndExportedFunctions(); ++iterd)
+        std::uint32_t uiIndex = 0;
+        for (const auto& pFunc : pResource->GetExportedFunctions())
         {
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushstring(luaVM, iterd->GetFunctionName().c_str());
+            lua_pushstring(luaVM, pFunc.GetFunctionName().c_str());
             lua_settable(luaVM, -3);
         }
         return 1;

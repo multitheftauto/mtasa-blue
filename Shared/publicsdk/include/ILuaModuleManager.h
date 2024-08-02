@@ -22,45 +22,46 @@ extern "C"
     #include <lauxlib.h>
 }
 #include <string>
+#include <optional>
 
 #ifndef __CChecksum_H
 #define __CChecksum_H
 class CChecksum
 {
 public:
-    unsigned long ulCRC;
-    unsigned char mD5[16];
+    std::uint32_t ulCRC;
+    std::uint8_t  mD5[16];
 };
 #endif
 
-/* Interface for modules until DP2.3 */
+// Interface for modules since 1.6
 class ILuaModuleManager
 {
 public:
-    virtual void ErrorPrintf(const char* szFormat, ...) = 0;
-    virtual void DebugPrintf(lua_State* luaVM, const char* szFormat, ...) = 0;
-    virtual void Printf(const char* szFormat, ...) = 0;
+    virtual void Printf(const char* szFormat, ...) const noexcept = 0;
+    virtual void DebugPrintf(lua_State* luaVM, const char* szFormat, ...) const noexcept = 0;
+    virtual void ErrorPrintf(const char* szFormat, ...) const noexcept = 0;
 
-    virtual bool RegisterFunction(lua_State* luaVM, const char* szFunctionName, lua_CFunction Func) = 0;
-    virtual bool GetResourceName(
-        lua_State* luaVM, std::string& strName) = 0;            // This function might not work if module and MTA were compiled with different compiler versions
-    virtual CChecksum GetResourceMetaChecksum(lua_State* luaVM) = 0;
-    virtual CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile) = 0;
+    virtual bool RegisterFunction(
+        lua_State* luaVM,
+        const char* szFunctionName,
+        lua_CFunction Func
+    ) noexcept = 0;
+
+    virtual bool GetResourceName(lua_State* luaVM, std::string& strName) const noexcept = 0;
+    virtual std::optional<std::string> GetResourceName(lua_State* luaVM) const noexcept = 0;
+    virtual lua_State*  GetResourceFromName(const char* szResourceName) const noexcept = 0;
+
+    virtual std::string GetResourcePath(lua_State* luaVM) const noexcept = 0;
+    virtual std::string GetResourceFilePath(lua_State* luaVM, const char* fileName) const noexcept = 0;
+
+    virtual CChecksum GetResourceMetaChecksum(lua_State* luaVM) const noexcept = 0;
+    virtual CChecksum GetResourceFileChecksum(lua_State* luaVM, const char* szFile) const noexcept = 0;
+
+    virtual std::uint32_t GetVersion() const noexcept = 0;
+    virtual const char*   GetVersionString() const noexcept = 0;
+    virtual const char*   GetVersionName() const noexcept = 0;
+    virtual std::uint32_t GetNetcodeVersion() const noexcept = 0;
+    virtual const char*   GetOperatingSystemName() const noexcept = 0;
 };
 
-/* Interface for modules until 1.0 */
-class ILuaModuleManager10 : public ILuaModuleManager
-{
-public:
-    virtual unsigned long GetVersion() = 0;
-    virtual const char*   GetVersionString() = 0;
-    virtual const char*   GetVersionName() = 0;
-    virtual unsigned long GetNetcodeVersion() = 0;
-    virtual const char*   GetOperatingSystemName() = 0;
-
-    virtual lua_State* GetResourceFromName(const char* szResourceName) = 0;
-
-    // GetResourceName above doesn't work if module and MTA were compiled with different compiler versions
-    virtual bool GetResourceName(lua_State* luaVM, char* szName, size_t length) = 0;
-    virtual bool GetResourceFilePath(lua_State* luaVM, const char* fileName, char* path, size_t length) = 0;
-};
