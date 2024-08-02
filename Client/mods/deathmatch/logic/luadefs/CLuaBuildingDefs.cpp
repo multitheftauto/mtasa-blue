@@ -33,7 +33,7 @@ void CLuaBuildingDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Building", "Element");
 }
 
-CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16_t modelId, CVector pos, std::optional<CVector> rot, std::optional<uint8_t> interior)
+CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::uint16_t modelId, CVector pos, std::optional<CVector> rot, std::optional<std::uint8_t> interior)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
@@ -49,13 +49,9 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
         throw std::invalid_argument("Position is outside of game world");
 
     if (rot.has_value())
-    {
         ConvertDegreesToRadians(rot.value());
-    }
     else
-    {
         rot.emplace(CVector(0, 0, 0));
-    }
 
     m_pBuildingManager->ResizePoolIfNeeds();
 
