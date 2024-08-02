@@ -33,7 +33,7 @@ public:
 
     void Add(CTextItem* pTextItem);
     void Remove(CTextItem* pTextItem, bool bRemoveFromList = true);
-    uint GetScriptID() { return m_uiScriptID; }
+    std::uint32_t GetScriptID() const noexcept { return m_uiScriptID; }
 
 private:
     std::list<CPlayerTextManager*> m_observers;

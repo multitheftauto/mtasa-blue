@@ -44,68 +44,73 @@ class CLuaArguments;
 class CLuaArguments
 {
 public:
-    CLuaArguments() {}
-    CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
+    CLuaArguments() noexcept {}
+    CLuaArguments(const CLuaArguments& arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* knownTables = nullptr) noexcept;
 
-    ~CLuaArguments() { DeleteArguments(); };
+    ~CLuaArguments() noexcept { DeleteArguments(); }
 
-    void CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
+    void CopyRecursive(const CLuaArguments& arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* knownTables = nullptr) noexcept;
 
-    const CLuaArguments& operator=(const CLuaArguments& Arguments);
-    CLuaArgument*        operator[](const unsigned int uiPosition) const;
+    const CLuaArguments& operator=(const CLuaArguments& arguments) noexcept;
+    CLuaArgument*        operator[](const std::size_t position) const noexcept;
 
-    void ReadArgument(lua_State* luaVM, signed int uiIndex);
-    void ReadArguments(lua_State* luaVM, signed int uiIndexBegin = 1);
-    void PushArguments(lua_State* luaVM) const;
-    void PushArguments(const CLuaArguments& Arguments);
-    bool Call(class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments* returnValues = NULL) const;
-    bool CallGlobal(class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments* returnValues = NULL) const;
+    void ReadArgument(lua_State* luaVM, int index) noexcept;
+    void ReadArguments(lua_State* luaVM, int indexBegin = 1) noexcept;
+    void PushArguments(lua_State* luaVM) const noexcept;
+    void PushArguments(const CLuaArguments& arguments) noexcept;
+    bool Call(class CLuaMain* luaMain, const CLuaFunctionRef& luaFunction, CLuaArguments* returnValues = nullptr) const noexcept;
+    bool CallGlobal(class CLuaMain* luaMain, const char* function, CLuaArguments* returnValues = nullptr) const noexcept;
 
-    void ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    void PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = nullptr) const;
+    void ReadTable(lua_State* luaVM, int indexBegin, CFastHashMap<const void*, CLuaArguments*>* knownTables = nullptr) noexcept;
+    void PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* knownTables = nullptr) const noexcept;
 
-    CLuaArgument* PushNil();
-    CLuaArgument* PushBoolean(bool bBool);
-    CLuaArgument* PushNumber(double dNumber);
-    CLuaArgument* PushString(const std::string& string);
-    CLuaArgument* PushString(const std::string_view& string);
-    CLuaArgument* PushString(const char* string);
-    CLuaArgument* PushElement(CElement* pElement);
-    CLuaArgument* PushBan(CBan* pBan);
-    CLuaArgument* PushACL(CAccessControlList* pACL);
-    CLuaArgument* PushACLGroup(CAccessControlListGroup* pACLGroup);
-    CLuaArgument* PushAccount(CAccount* pAccount);
-    CLuaArgument* PushResource(CResource* pResource);
-    CLuaArgument* PushTextDisplay(CTextDisplay* pTextDisplay);
-    CLuaArgument* PushTextItem(CTextItem* pTextItem);
-    CLuaArgument* PushTimer(CLuaTimer* pLuaTimer);
-    CLuaArgument* PushDbQuery(CDbJobData* pJobData);
+    CLuaArgument* PushNil() noexcept;
+    CLuaArgument* PushBoolean(bool bBool) noexcept;
+    CLuaArgument* PushNumber(double dNumber) noexcept;
+    CLuaArgument* PushString(const char* string) noexcept;
+    CLuaArgument* PushString(const std::string& strString) noexcept;
+    CLuaArgument* PushString(const std::string_view& string) noexcept;
+    CLuaArgument* PushElement(const CElement* pElement) noexcept;
+    CLuaArgument* PushBan(const CBan* pBan) noexcept;
+    CLuaArgument* PushACL(const CAccessControlList* pACL) noexcept;
+    CLuaArgument* PushACLGroup(const CAccessControlListGroup* pACLGroup) noexcept;
+    CLuaArgument* PushAccount(const CAccount* pAccount) noexcept;
+    CLuaArgument* PushResource(const CResource* pResource) noexcept;
+    CLuaArgument* PushTextDisplay(const CTextDisplay* pTextDisplay) noexcept;
+    CLuaArgument* PushTextItem(const CTextItem* pTextItem) noexcept;
+    CLuaArgument* PushTimer(const CLuaTimer* pLuaTimer) noexcept;
+    CLuaArgument* PushDbQuery(const CDbJobData* pJobData) noexcept;
 
-    CLuaArgument* PushArgument(const CLuaArgument& argument);
-    CLuaArgument* PushTable(CLuaArguments* table);
+    CLuaArgument* PushArgument(const CLuaArgument& argument) noexcept;
+    CLuaArgument* PushTable(const CLuaArguments* table) noexcept;
 
-    void DeleteArguments();
-    void ValidateTableKeys();
-    void Pop();
+    void DeleteArguments() noexcept;
+    void ValidateTableKeys() noexcept;
+    void Pop() noexcept;
 
-    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    bool         ReadFromJSONString(const char* szJSON);
-    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
-    bool         WriteToJSONString(std::string& strJSON, bool bSerialize = false, int flags = JSON_C_TO_STRING_PLAIN);
-    json_object* WriteTableToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
-    json_object* WriteToJSONArray(bool bSerialize);
-    bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
-    bool         ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
-
-    [[nodiscard]] bool IsNotEmpty() const noexcept { return !m_Arguments.empty(); }
-    [[nodiscard]] bool IsEmpty() const noexcept { return m_Arguments.empty(); }
+    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* knownTables = nullptr) noexcept;
+    bool         ReadFromJSONString(const char* json) noexcept;
+    bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, std::uint32_t>* knownTables = nullptr) const noexcept;
+    bool         WriteToJSONString(std::string& json, bool bSerialize = false, int flags = JSON_C_TO_STRING_PLAIN) noexcept;
+    json_object* WriteTableToJSONObject(bool serialize = false, CFastHashMap<CLuaArguments*, std::uint32_t>* knownTables = nullptr) noexcept;
+    json_object* WriteToJSONArray(bool serialize) noexcept;
+    bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* knownTables = nullptr) noexcept;
+    bool         ReadFromJSONArray(json_object* object, std::vector<CLuaArguments*>* knownTables = nullptr) noexcept;
 
     [[nodiscard]] std::vector<CLuaArgument*>::size_type Count() const noexcept { return m_Arguments.size(); }
 
-    [[nodiscard]] std::vector<CLuaArgument*>::const_iterator begin() const noexcept { return m_Arguments.begin(); }
-    [[nodiscard]] std::vector<CLuaArgument*>::const_iterator end() const noexcept { return m_Arguments.end(); }
+    [[nodiscard]] bool IsEmpty() const noexcept { return m_Arguments.empty(); }
+    [[nodiscard]] bool IsNotEmpty() const noexcept { return !IsEmpty(); }
+    
+    std::vector<CLuaArgument*>& GetArguments() noexcept { return m_Arguments; }
+    const std::vector<CLuaArgument*>& GetArguments() const noexcept { return m_Arguments; }
 
-    bool IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
+    [[nodiscard]] std::vector<CLuaArgument*>::iterator begin() noexcept { return m_Arguments.begin(); }
+    [[nodiscard]] std::vector<CLuaArgument*>::iterator end() noexcept { return m_Arguments.end(); }
+    [[nodiscard]] std::vector<CLuaArgument*>::const_iterator begin() const noexcept { return m_Arguments.cbegin(); }
+    [[nodiscard]] std::vector<CLuaArgument*>::const_iterator end() const noexcept { return m_Arguments.cend(); }
+
+    bool IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const noexcept;
 
 private:
     std::vector<CLuaArgument*> m_Arguments;
