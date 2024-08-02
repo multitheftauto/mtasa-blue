@@ -145,7 +145,7 @@ void CClientBuilding::Destroy()
     if (!m_pBuilding)
         return;
 
-    if (m_pHighBuilding)
+    if (m_pHighBuilding && m_pHighBuilding->IsValid())
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
     }

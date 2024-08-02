@@ -1005,7 +1005,7 @@ void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
     m_pRenderWare->GetShaderReplacementStats(outStats);
 }
 
-void CGameSA::RemoveAllBuildings(bool clearBuildingRemoval)
+void CGameSA::RemoveAllBuildings()
 {
     m_pIplStore->SetDynamicIplStreamingEnabled(false);
 
@@ -1013,10 +1013,6 @@ void CGameSA::RemoveAllBuildings(bool clearBuildingRemoval)
     m_pPools->GetBuildingsPool().RemoveAllBuildings();
 
     auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
-    if (clearBuildingRemoval)
-    {
-        pBuildingRemoval->ClearRemovedBuildingLists();
-    }
     pBuildingRemoval->DropCaches();
 
     m_isBuildingsRemoved = true;
@@ -1036,7 +1032,7 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
     const bool shouldRemoveBuilding = !m_isBuildingsRemoved;
     if (shouldRemoveBuilding)
     {
-        RemoveAllBuildings(false);
+        RemoveAllBuildings();
     }
     else
     {
