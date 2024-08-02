@@ -20,6 +20,7 @@
 #include "CProjectileInfoSA.h"
 #include "CTrainSA.h"
 #include "CPlaneSA.h"
+#include "CHeliSA.h"
 #include "CVehicleSA.h"
 #include "CVisibilityPluginsSA.h"
 #include "CWorldSA.h"
@@ -48,6 +49,40 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
         mov [esp+0D4h], edi
         push 6ABD04h
         retn
+    }
+}
+
+bool CanProcessFlyingCarStuff(CHeliSAInterface* heliInterface)
+{
+    SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)heliInterface);
+    if (!vehicle || !vehicle->pEntity)
+        return true;
+
+    return vehicle->pEntity->GetHeliRotorState();
+}
+
+void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
+{
+    _asm
+    {
+        mov esi, ecx
+        mov al, [esi+36h]
+
+        pushad
+        push ecx
+        call CanProcessFlyingCarStuff
+        add esp, 4
+
+        movzx eax, al
+        test eax, eax
+        jz skip
+
+        popad
+        jmp CONTINUE_CHeli_ProcessFlyingCarStuff
+
+        skip:
+        popad
+        jmp RETURN_CHeli_ProcessFlyingCarStuff
     }
 }
 
@@ -487,6 +522,24 @@ void CVehicleSA::SetTrainSpeed(float fSpeed)
 {
     auto pInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
     pInterface->m_fTrainSpeed = fSpeed;
+}
+
+float CVehicleSA::GetHeliRotorSpeed() const
+{
+    return static_cast<CHeliSAInterface*>(m_pInterface)->m_wheelSpeed[1];
+}
+
+void CVehicleSA::SetHeliRotorSpeed(float speed)
+{
+    static_cast<CHeliSAInterface*>(GetInterface())->m_wheelSpeed[1] = speed;
+}
+
+void CVehicleSA::SetHeliRotorState(bool state, bool stopRotor) noexcept
+{
+    m_heliRotorState = state;
+
+    if (!state && stopRotor)
+        SetHeliRotorSpeed(0.0f);
 }
 
 void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
@@ -1774,6 +1827,9 @@ void CVehicleSA::StaticSetHooks()
 {
     // Setup vehicle sun glare hook
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
+
+    // Setup hook to handle setHelicopterRotorState function
+    HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
 }
 
 void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)
