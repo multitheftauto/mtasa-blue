@@ -1009,8 +1009,14 @@ void CGameSA::RemoveAllBuildings(bool clearBuildingRemoval)
 {
     m_pIplStore->SetDynamicIplStreamingEnabled(false);
 
-    m_pPools->GetDummyPool().RemoveAllBuildingLods();
-    m_pPools->GetBuildingsPool().RemoveAllBuildings();
+    m_pCoverManager->RemoveAllCovers();
+    m_pPlantManager->RemoveAllPlants();
+
+    // Remove all shadows in CStencilShadowObjects::dtorAll
+    ((void* (*)())0x711390)();
+
+    m_pPools->GetDummyPool().RemoveAllWithBackup();
+    m_pPools->GetBuildingsPool().RemoveAllWithBackup();
 
     auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
     if (clearBuildingRemoval)
@@ -1024,8 +1030,8 @@ void CGameSA::RemoveAllBuildings(bool clearBuildingRemoval)
 
 void CGameSA::RestoreGameBuildings()
 {
-    m_pPools->GetBuildingsPool().RestoreAllBuildings();
-    m_pPools->GetDummyPool().RestoreAllBuildingsLods();
+    m_pPools->GetBuildingsPool().RestoreBackup();
+    m_pPools->GetDummyPool().RestoreBackup();
 
     m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
     m_isBuildingsRemoved = false;

@@ -88,6 +88,8 @@ enum eDebugCaller
     CBuildingPool_Constructor,
     CBuildingPool_Destructor,
     CBuilding_SetLod,
+    CDummyPool_Constructor,
+    CDummyPool_Destructor,
 };
 
 enum eSurfaceProperties

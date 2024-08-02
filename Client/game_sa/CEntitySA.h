@@ -242,6 +242,12 @@ public:
         using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
         ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
     };
+
+    void RemoveRWObjectWithReferencesCleanup() {
+        DeleteRwObject();
+        ResolveReferences();
+        RemoveShadows();
+    }
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 

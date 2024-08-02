@@ -26,8 +26,8 @@ public:
     void       RemoveBuilding(CBuilding* pBuilding);
     bool       HasFreeBuildingSlot();
 
-    void RemoveAllBuildings() override;
-    void RestoreAllBuildings() override;
+    void RemoveAllWithBackup() override;
+    void RestoreBackup() override;
     bool Resize(int size) override;
     int  GetSize() const override { return (*m_ppBuildingPoolInterface)->m_nSize; };
 
