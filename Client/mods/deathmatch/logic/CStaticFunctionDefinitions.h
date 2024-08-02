@@ -105,8 +105,9 @@ public:
     static bool          IsElementFrozenWaitingForGroundToLoad(CClientEntity& Entity, bool& bWaitingForGroundToLoad);
 
     // Radio funcs
-    static bool SetRadioChannel(unsigned char& ucChannel);
-    static bool GetRadioChannel(unsigned char& ucChannel);
+    static bool         SetRadioChannel(unsigned char& ucChannel);
+    static std::uint8_t GetRadioChannel() noexcept;
+    static bool         GetRadioChannel(unsigned char& ucChannel);
 
     // Player get funcs
     static CClientPlayer* GetLocalPlayer();
@@ -343,14 +344,20 @@ public:
     // Audio funcs
     static bool PlaySoundFrontEnd(unsigned char ucSound);
     static bool SetAmbientSoundEnabled(eAmbientSoundType eType, bool bMute);
-    static bool IsAmbientSoundEnabled(eAmbientSoundType eType, bool& bOutMute);
+    static bool IsAmbientSoundEnabled(eAmbientSoundType eType) noexcept;
+    static bool IsAmbientSoundEnabled(eAmbientSoundType eType, bool& bOutMute) noexcept;
     static bool ResetAmbientSounds();
     static bool SetWorldSoundEnabled(uint uiGroup, uint uiIndex, bool bMute, bool bImmediate);
+    static bool IsWorldSoundEnabled(std::uint32_t uiGroup, std::uint32_t uiIndex) noexcept;
     static bool IsWorldSoundEnabled(uint uiGroup, uint uiIndex, bool& bOutMute);
     static bool ResetWorldSounds();
-    static bool PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound);
+    static CClientSound* PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop) noexcept;
+    static bool PlaySFX(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, bool bLoop, CClientSound*& outSound) noexcept;
+    static CClientSound* PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition,
+                                   bool bLoop) noexcept;
     static bool PlaySFX3D(CResource* pResource, eAudioLookupIndex containerIndex, int iBankIndex, int iAudioIndex, const CVector& vecPosition, bool bLoop,
-                          CClientSound*& outSound);
+                          CClientSound*& outSound) noexcept;
+    static bool GetSFXStatus(eAudioLookupIndex containerIndex) noexcept;
     static bool GetSFXStatus(eAudioLookupIndex containerIndex, bool& bOutNotCut);
 
     // Blip funcs
@@ -739,13 +746,18 @@ public:
                                      bool bThrottle);
     static bool          StopSound(CClientSound& Sound);
     static bool          SetSoundPosition(CClientSound& Sound, double dPosition);
+    static double        GetSoundPosition(CClientSound& Sound) noexcept;
     static bool          GetSoundPosition(CClientSound& Sound, double& dPosition);
+    static double        GetSoundLength(CClientSound& Sound) noexcept;
     static bool          GetSoundLength(CClientSound& Sound, double& dLength);
+    static std::optional<double> GetSoundBufferLength(CClientSound& Sound) noexcept;
     static bool          GetSoundBufferLength(CClientSound& Sound, double& dBufferLength);
     static bool          SetSoundPaused(CClientSound& Sound, bool bPaused);
-    static bool          IsSoundPaused(CClientSound& Sound, bool& bPaused);
+    static bool          IsSoundPaused(CClientSound& Sound) noexcept;
+    static bool          IsSoundPaused(CClientSound& Sound, bool& bPaused) noexcept;
     static bool          SetSoundVolume(CClientSound& Sound, float fVolume);
-    static bool          GetSoundVolume(CClientSound& Sound, float& fVolume);
+    static float         GetSoundVolume(CClientSound& Sound) noexcept;
+    static bool          GetSoundVolume(CClientSound& Sound, float& fVolume) noexcept;
     static bool          SetSoundSpeed(CClientSound& Sound, float fSpeed);
     static bool          SetSoundProperties(CClientSound& Sound, float fSampleRate, float fTempo, float fPitch, bool bReversed);
     static bool          GetSoundProperties(CClientSound& Sound, float& fSampleRate, float& fTempo, float& fPitch, bool& bReversed);
@@ -753,35 +765,63 @@ public:
     static float*        GetSoundWaveData(CClientSound& Sound, int iLength);
     static bool          SetSoundPanEnabled(CClientSound& Sound, bool bEnabled);
     static bool          GetSoundLevelData(CClientSound& Sound, DWORD& dwLeft, DWORD& dwRight);
+    static float         GetSoundBPM(CClientSound& Sound) noexcept;
     static bool          GetSoundBPM(CClientSound& Sound, float& fBPM);
     static bool          IsSoundPanEnabled(CClientSound& Sound);
-    static bool          GetSoundSpeed(CClientSound& Sound, float& fSpeed);
+    static float         GetSoundSpeed(CClientSound& Sound) noexcept;
+    static bool          GetSoundSpeed(CClientSound& Sound, float& fSpeed) noexcept;
     static bool          SetSoundMinDistance(CClientSound& Sound, float fDistance);
+    static float         GetSoundMinDistance(CClientSound& Sound) noexcept;
     static bool          GetSoundMinDistance(CClientSound& Sound, float& fDistance);
     static bool          SetSoundMaxDistance(CClientSound& Sound, float fDistance);
+    static float         GetSoundMaxDistance(CClientSound& Sound) noexcept;
     static bool          GetSoundMaxDistance(CClientSound& Sound, float& fDistance);
     static bool          GetSoundMetaTags(CClientSound& Sound, const SString& strFormat, SString& strMetaTags);
     static bool          SetSoundEffectEnabled(CClientSound& Sound, const SString& strEffectName, bool bEnable);
     static bool          SetSoundPan(CClientSound& Sound, float fPan);
+    static float         GetSoundPan(CClientSound& pSound) noexcept;
     static bool          GetSoundPan(CClientSound& Sound, float& fPan);
 
     // Player Voice Sound Functions
 
-    static bool   SetSoundPosition(CClientPlayer& Player, double dPosition);
-    static bool   GetSoundPosition(CClientPlayer& Player, double& dPosition);
-    static bool   GetSoundLength(CClientPlayer& Player, double& dLength);
-    static bool   SetSoundPaused(CClientPlayer& Sound, bool bPaused);
-    static bool   IsSoundPaused(CClientPlayer& Sound, bool& bPaused);
-    static bool   SetSoundVolume(CClientPlayer& Player, float fVolume);
-    static bool   GetSoundVolume(CClientPlayer& Player, float& fVolume);
-    static bool   SetSoundSpeed(CClientPlayer& Player, float fSpeed);
-    static float* GetSoundFFTData(CClientPlayer& Player, int iLength, int iBands = 0);
-    static float* GetSoundWaveData(CClientPlayer& Player, int iLength);
-    static bool   GetSoundLevelData(CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight);
-    static bool   GetSoundSpeed(CClientPlayer& Player, float& fSpeed);
-    static bool   SetSoundEffectEnabled(CClientPlayer& Player, const SString& strEffectName, bool bEnable);
-    static bool   SetSoundPan(CClientPlayer& Player, float fPan);
-    static bool   GetSoundPan(CClientPlayer& Player, float& fPan);
+    static bool                  SetSoundPosition(CClientPlayer& Player, double dPosition);
+    static bool                  GetSoundPosition(CClientPlayer& Player, double& dPosition);
+    static std::optional<double> GetSoundPosition(CClientPlayer& Player) noexcept;
+    static std::optional<double> GetSoundLength(CClientPlayer& Player) noexcept;
+    static bool                  GetSoundLength(CClientPlayer& Player, double& dLength);
+    static bool                  SetSoundPaused(CClientPlayer& Sound, bool bPaused);
+    static std::optional<bool>   IsSoundPaused(CClientPlayer& Sound) noexcept;
+    static bool                  IsSoundPaused(CClientPlayer& Sound, bool& bPaused) noexcept;
+    static bool                  SetSoundVolume(CClientPlayer& Player, float fVolume);
+    static bool                  GetSoundVolume(CClientPlayer& Player, float& fVolume) noexcept;
+    static std::optional<float>  GetSoundVolume(CClientPlayer& Player) noexcept;
+    static bool                  SetSoundSpeed(CClientPlayer& Player, float fSpeed);
+    static std::optional<float>  GetSoundSpeed(CClientPlayer& Player) noexcept;
+    static bool                  GetSoundSpeed(CClientPlayer& Player, float& fSpeed) noexcept;
+    static float*                GetSoundFFTData(CClientPlayer& Player, int iLength, int iBands = 0);
+    static float*                GetSoundWaveData(CClientPlayer& Player, int iLength);
+    static bool                  GetSoundLevelData(CClientPlayer& Player, DWORD& dwLeft, DWORD& dwRight);
+    static bool                  SetSoundEffectEnabled(CClientPlayer& Player, const SString& strEffectName, bool bEnable);
+    static bool                  SetSoundPan(CClientPlayer& Player, float fPan);
+    static std::optional<float>  GetSoundPan(CClientPlayer& Player) noexcept;
+    static bool                  GetSoundPan(CClientPlayer& Player, float& fPan);
+
+    // Sound/Player voice funcs
+    static bool   SetSoundPosition(std::variant<CClientSound*, CClientPlayer*>& element, double dPosition) noexcept;
+    static double GetSoundPosition(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
+    static double GetSoundLength(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
+    static bool   SetSoundPaused(std::variant<CClientSound*, CClientPlayer*>& element, bool bPaused) noexcept;
+    static bool   IsSoundPaused(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
+    static bool   SetSoundVolume(std::variant<CClientSound*, CClientPlayer*>& element, float fVolume) noexcept;
+    static float  GetSoundVolume(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
+    static bool   SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*>& element, float fSpeed) noexcept;
+    static float  GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
+    static float* GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*>& element, int iLength, int iBands) noexcept;
+    static float* GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*>& element, int iLength) noexcept;
+    static bool   GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*>& element, DWORD& dwLeft, DWORD& dwRight) noexcept;
+    static bool   SetSoundPan(std::variant<CClientSound*, CClientPlayer*>& element, float fPan) noexcept;
+    static float  GetSoundPan(std::variant<CClientSound*, CClientPlayer*>& element) noexcept;
+    static bool   SetSoundEffectEnabled(std::variant<CClientSound*, CClientPlayer*>& element, const SString& strEffectName, bool bEnable) noexcept;
 
     // Handling funcs
     static eHandlingProperty GetVehicleHandlingEnum(std::string strProperty);
