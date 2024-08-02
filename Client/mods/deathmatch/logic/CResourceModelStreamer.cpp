@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CResourceModelStreamer.cpp
  *  PURPOSE:     Resource model manager
@@ -15,7 +15,7 @@
 #include "CClientGame.h"
 #include <game/CStreaming.h>
 
-bool CResourceModelStreamer::RequestModel(uint16_t modelId, bool addRef, bool blocking)
+bool CResourceModelStreamer::RequestModel(std::uint16_t modelId, bool addRef, bool blocking)
 {
     CModelInfo* model = g_pGame->GetModelInfo(modelId);
 
@@ -24,7 +24,7 @@ bool CResourceModelStreamer::RequestModel(uint16_t modelId, bool addRef, bool bl
 
     if (addRef)
     {
-        uint16_t refsCount = ++m_requestedModels[modelId];
+        std::uint16_t refsCount = ++m_requestedModels[modelId];
         if (refsCount == 1)
         {
             model->ModelAddRef(blocking ? EModelRequestType::BLOCKING : EModelRequestType::NON_BLOCKING, "CResourceModelStreamer::RequestModel With reference");
@@ -46,8 +46,8 @@ bool CResourceModelStreamer::RequestModel(uint16_t modelId, bool addRef, bool bl
     }
 }
 
-// Retrun true if model was unloaded
-bool CResourceModelStreamer::ReleaseModel(uint16_t modelId, bool removeRef)
+// Return true if model was unloaded
+bool CResourceModelStreamer::ReleaseModel(std::uint16_t modelId, bool removeRef)
 {
     if (removeRef)
     {
@@ -55,7 +55,7 @@ bool CResourceModelStreamer::ReleaseModel(uint16_t modelId, bool removeRef)
         if (refs == m_requestedModels.end())
             return false;
 
-        uint16_t& refsCount = (*refs).second;
+        std::uint16_t& refsCount = (*refs).second;
 
         if (refsCount == 0)
             return false;
@@ -104,9 +104,9 @@ void CResourceModelStreamer::ReleaseAll()
     m_requestedModels.clear();
 }
 
-void CResourceModelStreamer::FullyReleaseModel(uint16_t modelId)
+void CResourceModelStreamer::FullyReleaseModel(std::uint16_t modelId)
 {
-    uint16_t &refsCount = m_requestedModels[modelId];
+    std::uint16_t &refsCount = m_requestedModels[modelId];
 
     if (refsCount > 0)
     {

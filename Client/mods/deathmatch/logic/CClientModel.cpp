@@ -85,9 +85,7 @@ bool CClientModel::Deallocate()
         return false;
 
     if (m_pParentResource)
-    {
         m_pParentResource->GetResourceModelStreamer()->FullyReleaseModel(m_iModelID);
-    }
 
     SetParentResource(nullptr);
 
