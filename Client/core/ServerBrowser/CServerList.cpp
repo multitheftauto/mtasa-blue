@@ -614,7 +614,7 @@ void CServerListItemList::RemoveItem(CServerListItem* pItem)
     dassert(MapFindRef(m_AddressMap, key) == pItem);
 
     MapRemove(m_AddressMap, key);
-    ListRemove(m_List, pItem);
+    ListRemoveAll(m_List, pItem);
 
     dassert(m_List.size() == m_AddressMap.size());
 }

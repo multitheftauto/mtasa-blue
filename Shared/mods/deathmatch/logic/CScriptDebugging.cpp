@@ -401,7 +401,7 @@ void CScriptDebugging::PopLuaMain(CLuaMain* pLuaMain)
 void CScriptDebugging::OnLuaMainDestroy(CLuaMain* pLuaMain)
 {
     dassert(!ListContains(m_LuaMainStack, pLuaMain));
-    ListRemove(m_LuaMainStack, pLuaMain);
+    ListRemoveAll(m_LuaMainStack, pLuaMain);
 }
 
 CLuaMain* CScriptDebugging::GetTopLuaMain()
