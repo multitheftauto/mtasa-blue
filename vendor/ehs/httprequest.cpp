@@ -10,10 +10,10 @@ void HttpRequest::ParseRequestURI(std::string_view uri)
 		return;
 
 	// See: https://www.rfc-editor.org/rfc/rfc3986#section-3.4
-	if (size_t queryDelimiter = uri.find('?'); queryDelimiter != std::string_view::npos)
+	if (size_t queryDelimiter = uri.find_first_of("?&"); queryDelimiter != std::string_view::npos)
 	{
-		// Skip repeating '?' (question mark) characters after the first one.
-		if (queryDelimiter = uri.find_first_not_of('?', queryDelimiter + 1); queryDelimiter == std::string_view::npos)
+		// Skip repeating '?' (question mark) and '&' (ampersand) characters after the first one.
+		if (queryDelimiter = uri.find_first_not_of("?&", queryDelimiter + 1); queryDelimiter == std::string_view::npos)
 			return;
 
 		std::string_view parameters = uri.substr(queryDelimiter);
@@ -32,11 +32,11 @@ void HttpRequest::ParseRequestURI(std::string_view uri)
 
 		// According to the RFC, query can be anything, but this web server implementation only supports "key=value" pairs,
 		// which are parsable as form data.
-		ParseFormData(parameters);
+		ParseFormData(parameters, true);
 	}
 }
 
-void HttpRequest::ParseFormData(std::string_view formData)
+void HttpRequest::ParseFormData(std::string_view formData, bool isQueryData)
 {
 	size_t counter = 0;
 
@@ -88,6 +88,11 @@ void HttpRequest::ParseFormData(std::string_view formData)
 			if (!key.empty())
 			{
 				oFormValueMap[std::string{key}] = FormValue{value};
+
+				if (isQueryData)
+				{
+					oQueryValueMap[std::string{key}] = FormValue{value};
+				}
 			}
 		}
 
@@ -385,7 +390,7 @@ HttpRequest::HttpParseStates HttpRequest::ParseData ( std::string & irsData ///<
 			else {
 				
 				// everything must be uppercase according to rfc2616
-				PME oRequestLineRegex ( "^(OPTIONS|GET|HEAD|POST|PUT|DELETE|TRACE|CONNECT) ([^ ]*) HTTP/([^ ]+)\\r\\n$" );
+				PME oRequestLineRegex ( "^(OPTIONS|GET|HEAD|POST|PUT|DELETE|TRACE|CONNECT|PATCH) ([^ ]*) HTTP/([^ ]+)\\r\\n$" );
 
 				if ( oRequestLineRegex.match ( sLine ) ) {
 
@@ -554,7 +559,7 @@ HttpRequest::HttpParseStates HttpRequest::ParseData ( std::string & irsData ///<
 				// else the body is just one piece
 				else {
 					// check for any form data
-					ParseFormData(sBody);
+					ParseFormData(sBody, false);
 					
 #ifdef EHS_DEBUG
 					fprintf ( stderr, "Done with body, done with entire request\n" );
@@ -662,7 +667,7 @@ int GetNextLine ( std::string & irsLine, ///< line removed from *ippsBuffer
 
 /// List of possible HTTP request methods
 const char * RequestMethodStrings [] = { "OPTIONS", "GET", "HEAD", "POST", 
-								   "PUT", "DELETE", "TRACE", "CONNECT", "*" };
+								   "PUT", "DELETE", "TRACE", "CONNECT", "PATCH", "*"};
 
 
 RequestMethod GetRequestMethodFromString ( const std::string & isRequestMethod  ///< determine the request type enumeration from the request string
