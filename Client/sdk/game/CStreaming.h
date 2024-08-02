@@ -16,7 +16,7 @@
 #define INVALID_ARCHIVE_ID 0xFF
 #define INVALID_STREAM_ID 0xFF
 
-enum class eModelLoadState : uint32_t
+enum class eModelLoadState : std::uint32_t
 {
     // Model isn't loaded
     LOADSTATE_NOT_LOADED = 0,

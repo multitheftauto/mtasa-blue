@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CResourceModelStreamer.h
  *  PURPOSE:     Resource model manager
@@ -19,12 +19,12 @@ public:
     CResourceModelStreamer() = default;
     ~CResourceModelStreamer() = default;
 
-    bool RequestModel(uint16_t modelId, bool addRef = false, bool blocking = false);
-    bool ReleaseModel(uint16_t modelId, bool removeRef = false);
+    bool RequestModel(std::uint16_t modelId, bool addRef = false, bool blocking = false);
+    bool ReleaseModel(std::uint16_t modelId, bool removeRef = false);
 
     void ReleaseAll();
-    void FullyReleaseModel(uint16_t modelId);
+    void FullyReleaseModel(std::uint16_t modelId);
 
 private:
-    std::unordered_map<uint16_t, uint16_t> m_requestedModels;
+    std::unordered_map<std::uint16_t, std::uint16_t> m_requestedModels;
 };

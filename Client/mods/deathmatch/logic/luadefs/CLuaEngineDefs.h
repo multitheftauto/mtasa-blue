@@ -88,9 +88,9 @@ public:
     static uint EngineRequestTXD(lua_State* const luaVM, std::string strTxdName);
     static bool EngineFreeTXD(uint txdID);
 
-    static bool EngineStreamingRequestModel(lua_State* const luaVM, uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking);
-    static bool EngineStreamingReleaseModel(lua_State* const luaVM, uint16_t modelId, std::optional<bool> removeReference);
-    static eModelLoadState EngineStreamingGetModelLoadState(uint16_t modelId);
+    static bool EngineStreamingRequestModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking);
+    static bool EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference);
+    static eModelLoadState EngineStreamingGetModelLoadState(std::uint16_t modelId);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

@@ -2510,7 +2510,7 @@ bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t
     return true;
 }
 
-bool CLuaEngineDefs::EngineStreamingRequestModel(lua_State* const luaVM, uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking)
+bool CLuaEngineDefs::EngineStreamingRequestModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking)
 {
     // Grab the lua main and the resource belonging to this script
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -2526,7 +2526,7 @@ bool CLuaEngineDefs::EngineStreamingRequestModel(lua_State* const luaVM, uint16_
     return pResource->GetResourceModelStreamer()->RequestModel(modelId, addReference.value_or(false), blocking.value_or(false));
 }
 
-bool CLuaEngineDefs::EngineStreamingReleaseModel(lua_State* const luaVM, uint16_t modelId, std::optional<bool> removeReference)
+bool CLuaEngineDefs::EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference)
 {
     // Grab the lua main and the resource belonging to this script
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -2542,7 +2542,7 @@ bool CLuaEngineDefs::EngineStreamingReleaseModel(lua_State* const luaVM, uint16_
     return pResource->GetResourceModelStreamer()->ReleaseModel(modelId, removeReference.value_or(false));
 }
 
-eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(uint16_t modelId)
+eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t modelId)
 {
     const auto allCount = g_pGame->GetCountOfAllFileIDs();
     if (modelId >= g_pGame->GetCountOfAllFileIDs())
