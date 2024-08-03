@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CVehicleSA.cpp
+ *  FILE:        Client/game_sa/CVehicleSA.cpp
  *  PURPOSE:     Vehicle base entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -1320,7 +1320,7 @@ void CVehicleSA::RecalculateHandling()
     if (!m_pHandlingData)
         return;
 
-    m_pHandlingData->Recalculate(GetModelIndex());
+    m_pHandlingData->Recalculate();
 
     // Recalculate the suspension lines
     RecalculateSuspensionLines();
@@ -1699,11 +1699,6 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
-    // if suspension is master disabled or suspension hasn't changed return.
-    // if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
-    //{
-    //    return;
-    //}
 
     DWORD       dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
