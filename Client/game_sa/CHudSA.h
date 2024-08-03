@@ -18,9 +18,6 @@
 
 #define VAR_DisableClock            0xBAA400
 
-#define VAR_AspectRatioMult         0x859524
-#define VAR_CameraCrosshairScale    0x866C74
-
 #define FUNC_DrawAmmo               0x5893B0
 #define FUNC_DrawWeaponIcon         0x58D7D0
 #define FUNC_PrintHealthForPlayer   0x589270
@@ -57,15 +54,9 @@ public:
     bool IsDisabled();
     void SetComponentVisible(eHudComponent component, bool bVisible);
     bool IsComponentVisible(eHudComponent component);
-    void AdjustComponents(float fAspectRatio);
-    void ResetComponentAdjustment();
 
 protected:
     void InitComponentList();
 
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
-
-    float* m_pfAspectRatioMultiplicator;
-    float* m_pfCameraCrosshairScale;
-    float  m_fSniperCrosshairScale;
 };
