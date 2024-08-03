@@ -61,6 +61,7 @@ CClientVehicleManager::CClientVehicleManager(CClientManager* pManager)
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
+    m_spawnFlyingComponentsDuringRecreate = true;
 
     int iVehicleID = 0;
     for (int i = 0; i < 212; i++)
