@@ -44,8 +44,6 @@ CLocalGUI::CLocalGUI()
 
     m_LastSettingsRevision = -1;
     m_LocaleChangeCounter = 0;
-
-    m_StoredMousePosition = {-1, -1};
 }
 
 CLocalGUI::~CLocalGUI()
@@ -713,7 +711,8 @@ bool CLocalGUI::InputGoesToGUI()
 
     // Here we're supposed to check if things like menues are up, console is up or the chatbox is expecting input
     // If the console is visible OR the chat is expecting input OR the mainmenu is visible
-    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() || IsWebRequestGUIVisible());
+    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
+            !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
 }
 
 void CLocalGUI::ForceCursorVisible(bool bVisible)
@@ -727,18 +726,14 @@ void CLocalGUI::UpdateCursor()
 
     static DWORD dwWidth = CDirect3DData::GetSingleton().GetViewportWidth();
     static DWORD dwHeight = CDirect3DData::GetSingleton().GetViewportHeight();
-    static bool bFirstRun = true;
+    static bool  bFirstRun = true;
 
     if (bFirstRun)
     {
-        if (!CCore::GetSingleton().ShouldShowSystemCursorDuringLoad())
-        {
-            m_StoredMousePosition.x = dwWidth / 2;
-            m_StoredMousePosition.y = dwHeight / 2;
-        }
+        m_StoredMousePosition.x = dwWidth / 2;
+        m_StoredMousePosition.y = dwHeight / 2;
         bFirstRun = false;
     }
-
     // Called in each frame to make sure the mouse is only visible when a GUI control that uses the
     // mouse requires it.
     if (InputGoesToGUI())
@@ -751,8 +746,7 @@ void CLocalGUI::UpdateCursor()
             CCore::GetSingleton ().GetGame ()->GetPad ()->Clear ();*/
 
             // Restore the mouse cursor to its old position
-            if (m_StoredMousePosition.x != -1 && m_StoredMousePosition.y != -1)
-                SetCursorPos(m_StoredMousePosition.x, m_StoredMousePosition.y);
+            SetCursorPos(m_StoredMousePosition.x, m_StoredMousePosition.y);
 
             // Enable our mouse cursor
             CSetCursorPosHook::GetSingleton().DisableSetCursorPos();
