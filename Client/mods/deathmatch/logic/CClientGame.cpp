@@ -5590,7 +5590,7 @@ void CClientGame::ResetMapInfo()
     if (pPlayerInfo)
         pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
-    RestreamWorld(true);
+    RestreamWorld();
 
     ReinitMarkers();
 }
@@ -6813,7 +6813,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
             m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
-void CClientGame::RestreamWorld(bool removeBigBuildings)
+void CClientGame::RestreamWorld()
 {
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
@@ -6826,9 +6826,7 @@ void CClientGame::RestreamWorld(bool removeBigBuildings)
     m_pManager->GetPedManager()->RestreamAllPeds();
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
-    if (removeBigBuildings)
-        g_pGame->GetStreaming()->RemoveBigBuildings();
-
+    g_pGame->GetStreaming()->RemoveBigBuildings();
     g_pGame->GetStreaming()->ReinitStreaming();
 }
 
