@@ -100,9 +100,13 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"setFPSLimit", SetFPSLimit},
                                                                              {"setCoronaReflectionsEnabled", ArgumentParser<SetCoronaReflectionsEnabled>},
                                                                              {"setWorldProperty", ArgumentParser<SetWorldProperty>},
+
+                                                                             // World remove/restore functions 
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"removeGameWorld", ArgumentParser<RemoveGameWorld>},
+                                                                             {"restoreGameWorld", ArgumentParser<RestoreGameWorld>},
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -2233,4 +2237,29 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
             return g_pGame->GetWeather()->ResetRainbow();
     }
     return false;
+}
+
+void CLuaWorldDefs::RemoveGameWorld()
+{
+    // We do not want to remove scripted buildings
+    // But we need remove them from the buildings pool for a bit...
+    m_pBuildingManager->DestroyAllForABit();
+
+    // This function makes buildings backup without scripted buildings
+    g_pGame->RemoveGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyed();
+}
+
+void CLuaWorldDefs::RestoreGameWorld()
+{
+    // We want to restore the game buildings to the same positions as they were before the backup.
+    // Remove scripted buildings for a bit
+    m_pBuildingManager->DestroyAllForABit();
+
+    g_pGame->RestoreGameWorld();
+
+    // ... And restore here
+    m_pBuildingManager->RestoreDestroyedSafe();
 }

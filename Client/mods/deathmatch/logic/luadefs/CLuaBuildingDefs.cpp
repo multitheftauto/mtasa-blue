@@ -60,12 +60,14 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     return pBuilding;
 }
 
+// Deprecated
 void CLuaBuildingDefs::RemoveAllGameBuildings()
 {
-    m_pBuildingManager->RemoveAllGameBuildings();
+    CLuaWorldDefs::RemoveGameWorld();
 }
 
+// Deprecated
 void CLuaBuildingDefs::RestoreGameBuildings()
 {
-    m_pBuildingManager->RestoreAllGameBuildings();
+    CLuaWorldDefs::RestoreGameWorld();
 }

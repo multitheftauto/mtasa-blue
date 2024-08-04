@@ -121,17 +121,10 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     --m_buildingPool.count;
 }
 
-void CBuildingsPoolSA::RemoveAllBuildings()
+void CBuildingsPoolSA::RemoveAllWithBackup()
 {
     if (m_pOriginalBuildingsBackup)
         return;
-
-    pGame->GetCoverManager()->RemoveAllCovers();
-    pGame->GetPlantManager()->RemoveAllPlants();
-
-    // Remove all shadows
-    using CStencilShadowObjects_dtorAll = void* (*)();
-    ((CStencilShadowObjects_dtorAll)0x711390)();
 
     m_pOriginalBuildingsBackup = std::make_unique<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>>();
 
@@ -156,7 +149,7 @@ void CBuildingsPoolSA::RemoveAllBuildings()
     }
 }
 
-void CBuildingsPoolSA::RestoreAllBuildings()
+void CBuildingsPoolSA::RestoreBackup()
 {
     if (!m_pOriginalBuildingsBackup)
         return;
@@ -182,10 +175,7 @@ void CBuildingsPoolSA::RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding)
 {
     // Remove building from world
     pGame->GetWorld()->Remove(pBuilding, CBuildingPool_Destructor);
-
-    pBuilding->DeleteRwObject();
-    pBuilding->ResolveReferences();
-    pBuilding->RemoveShadows();
+    pBuilding->RemoveRWObjectWithReferencesCleanup();
 }
 
 bool CBuildingsPoolSA::Resize(int size)
