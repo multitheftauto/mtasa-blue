@@ -31,7 +31,7 @@ void CDummyPoolSA::RemoveAllWithBackup()
     m_pOriginalElementsBackup = std::make_unique<pool_backup_t>();
 
     auto pDummyPool = (*m_ppDummyPoolInterface);
-    for (size_t i = 0; i < MAX_DUMMIES_DEFAULT; i++)
+    for (auto i = 0; i < MAX_DUMMIES_DEFAULT; i++)
     {
         if (pDummyPool->IsContains(i))
         {
@@ -59,7 +59,7 @@ void CDummyPoolSA::RestoreBackup()
 
     auto& originalData = *m_pOriginalElementsBackup;
     auto  pDummyPool = (*m_ppDummyPoolInterface);
-    for (size_t i = 0; i < MAX_DUMMIES_DEFAULT; i++)
+    for (auto i = 0; i < MAX_DUMMIES_DEFAULT; i++)
     {
         if (originalData[i].first)
         {
@@ -80,7 +80,7 @@ void CDummyPoolSA::UpdateBuildingLods(void* oldPool, void* newPool)
 
     if (m_pOriginalElementsBackup)
     {
-        for (int i = 0; i < (*m_pOriginalElementsBackup).size(); i++)
+        for (auto i = 0; i < (*m_pOriginalElementsBackup).size(); i++)
         {
             if ((*m_pOriginalElementsBackup)[i].first)
             {
@@ -94,7 +94,7 @@ void CDummyPoolSA::UpdateBuildingLods(void* oldPool, void* newPool)
     }
     else
     {
-        for (int i = 0; i < (*m_ppDummyPoolInterface)->Size(); i++)
+        for (auto i = 0; i < (*m_ppDummyPoolInterface)->Size(); i++)
         {
             CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
             if (object->m_pLod)
