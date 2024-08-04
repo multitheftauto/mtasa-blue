@@ -217,8 +217,8 @@ void CModManager::Unload()
         CCore::GetSingleton().SetClientMessageProcessor(NULL);
         CCore::GetSingleton().GetCommands()->SetExecuteHandler(NULL);
 
-        // Reset cursor alpha
-        CCore::GetSingleton().GetGUI()->SetCursorAlpha(1.0f, true);
+        // Reset cursor color
+        CCore::GetSingleton().GetGUI()->ResetCursorColor(255.f, 255.f, 255.f, 1.f);
 
         // Reset the modules
         CCore::GetSingleton().GetGame()->Reset();

@@ -496,10 +496,45 @@ bool CGUI_Impl::IsCursorEnabled()
 
 void CGUI_Impl::SetCursorAlpha(float fAlpha, bool bOnlyCurrentServer)
 {
-    CEGUI::MouseCursor::getSingleton().setAlpha(fAlpha);
+    CEGUI::MouseCursor::getSingleton().setAlpha(m_fCurrentServerCursorRed, m_fCurrentServerCursorGreen, m_fCurrentServerCursorBlue, fAlpha);
 
     if (bOnlyCurrentServer)
         SetCurrentServerCursorAlpha(fAlpha);
+}
+
+void CGUI_Impl::SetCursorColor(float r, float g, float b, float alpha) noexcept
+{
+    CEGUI::MouseCursor::getSingleton().setColor(r, g, b, alpha);
+    m_fCurrentServerCursorRed = r;
+    m_fCurrentServerCursorGreen = g;
+    m_fCurrentServerCursorBlue = b;
+    m_fCurrentServerCursorAlpha = alpha;
+}
+
+void CGUI_Impl::GetCursorColor(float& r, float& g, float& b, float& alpha) noexcept
+{
+    r = m_fCurrentServerCursorRed;
+    g = m_fCurrentServerCursorGreen;
+    b = m_fCurrentServerCursorBlue;
+    alpha = m_fCurrentServerCursorAlpha;
+}
+
+void CGUI_Impl::ResetMenuCursorColor() noexcept
+{
+    CEGUI::MouseCursor::getSingleton().setColor(255.0f, 255.0f, 255.0f, 1.0f);
+}
+
+void CGUI_Impl::ResetCursorColor(float r, float g, float b, float alpha) noexcept
+{
+    m_fCurrentServerCursorRed = r;
+    m_fCurrentServerCursorGreen = g;
+    m_fCurrentServerCursorBlue = b;
+    m_fCurrentServerCursorAlpha = alpha;
+}
+
+void CGUI_Impl::RestoreCurrentServerCursorColor() noexcept
+{
+    CEGUI::MouseCursor::getSingleton().setColor(m_fCurrentServerCursorRed, m_fCurrentServerCursorGreen, m_fCurrentServerCursorBlue, m_fCurrentServerCursorAlpha);
 }
 
 void CGUI_Impl::SetCurrentServerCursorAlpha(float fAlpha)
