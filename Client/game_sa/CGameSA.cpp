@@ -1020,7 +1020,7 @@ void CGameSA::RemoveGameWorld()
 
     static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
 
-    m_isBuildingsRemoved = true;
+    m_isGameWorldRemoved = true;
 }
 
 void CGameSA::RestoreGameWorld()
@@ -1029,27 +1029,21 @@ void CGameSA::RestoreGameWorld()
     m_pPools->GetDummyPool().RestoreBackup();
 
     m_pIplStore->SetDynamicIplStreamingEnabled(true, [](CIplSAInterface* ipl) { return memcmp("barriers", ipl->name, 8) != 0; });
-    m_isBuildingsRemoved = false;
+    m_isGameWorldRemoved = false;
 }
 
 bool CGameSA::SetBuildingPoolSize(size_t size)
 {
-    const bool shouldRemoveBuilding = !m_isBuildingsRemoved;
-    if (shouldRemoveBuilding)
-    {
+    const bool shouldRemoveWorld = !m_isGameWorldRemoved;
+    if (shouldRemoveWorld)
         RemoveGameWorld();
-    }
     else
-    {
         static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
-    }
 
     bool status = m_pPools->GetBuildingsPool().Resize(size);
 
-    if (shouldRemoveBuilding)
-    {
+    if (shouldRemoveWorld)
         RestoreGameWorld();
-    }
 
     return status;
 }
