@@ -1476,24 +1476,28 @@ bool CLuaResourceDefs::isResourceProtected(CResource* const resource)
 std::vector<std::string> CLuaResourceDefs::GetResourceFiles(lua_State* luaVM, std::optional<CResourceFile::eResourceCategory> type,
                                                             std::optional<CResource*> resource) noexcept
 {
+    using eResourceCategory = CResourceFile::eResourceCategory;
+
     if (!type)
-        type = CResourceFile::eResourceCategory::ALL;
+        type = eResourceCategory::ALL;
 
     if (!resource)
         resource = &lua_getownerresource(luaVM);
 
     const auto resourceFiles = (*resource)->GetResourceFiles();
 
-    std::vector<std::string> files;
-    files.reserve(resourceFiles.size());
+    std::unordered_set<std::string> files;
     for (const auto& file : resourceFiles)
     {
-        if (file->GetResourceCategoryType() == type.value()
-            || type.value() == CResourceFile::eResourceCategory::ALL)
-        {
-            files.push_back(file->GetName());
-        }
+        if (file->GetResourceCategoryType() != type.value() && type.value() != eResourceCategory::ALL)
+            continue;
+        files.insert(file->GetName());
     }
 
-    return files;
+    // TODO: Upgrade ArgumentParser so it would accept
+    // std::set and std::unordered_set as return values
+    return std::vector<std::string>(
+        std::make_move_iterator(files.begin()),
+        std::make_move_iterator(files.end())
+    );
 }
