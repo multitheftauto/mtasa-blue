@@ -40,8 +40,8 @@ private:
     void RemovePedsContactEnityLinks();
 
 private:
-    SVectorPoolData<CBuildingSA> m_buildingPool{MAX_BUILDINGS};
-    CPoolSAInterface<CBuildingSAInterface>**           m_ppBuildingPoolInterface;
+    SVectorPoolData<CBuildingSA>             m_buildingPool{MAX_BUILDINGS};
+    CPoolSAInterface<CBuildingSAInterface>** m_ppBuildingPoolInterface;
 
     std::unique_ptr<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>> m_pOriginalBuildingsBackup;
 };

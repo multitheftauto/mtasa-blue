@@ -439,7 +439,7 @@ void CGameSA::Reset()
         CModelInfoSA::StaticResetTextureDictionaries();
 
         // Restore default world state
-        RestoreGameBuildings();
+        RestoreGameWorld();
     }
 }
 
@@ -1005,7 +1005,7 @@ void CGameSA::GetShaderReplacementStats(SShaderReplacementStats& outStats)
     m_pRenderWare->GetShaderReplacementStats(outStats);
 }
 
-void CGameSA::RemoveAllBuildings(bool clearBuildingRemoval)
+void CGameSA::RemoveGameWorld()
 {
     m_pIplStore->SetDynamicIplStreamingEnabled(false);
 
@@ -1018,17 +1018,12 @@ void CGameSA::RemoveAllBuildings(bool clearBuildingRemoval)
     m_pPools->GetDummyPool().RemoveAllWithBackup();
     m_pPools->GetBuildingsPool().RemoveAllWithBackup();
 
-    auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
-    if (clearBuildingRemoval)
-    {
-        pBuildingRemoval->ClearRemovedBuildingLists();
-    }
-    pBuildingRemoval->DropCaches();
+    static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
 
     m_isBuildingsRemoved = true;
 }
 
-void CGameSA::RestoreGameBuildings()
+void CGameSA::RestoreGameWorld()
 {
     m_pPools->GetBuildingsPool().RestoreBackup();
     m_pPools->GetDummyPool().RestoreBackup();
@@ -1042,7 +1037,7 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
     const bool shouldRemoveBuilding = !m_isBuildingsRemoved;
     if (shouldRemoveBuilding)
     {
-        RemoveAllBuildings(false);
+        RemoveGameWorld();
     }
     else
     {
@@ -1053,7 +1048,7 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
 
     if (shouldRemoveBuilding)
     {
-        RestoreGameBuildings();
+        RestoreGameWorld();
     }
 
     return status;

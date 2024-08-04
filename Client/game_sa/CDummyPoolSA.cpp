@@ -80,7 +80,7 @@ void CDummyPoolSA::UpdateBuildingLods(void* oldPool, void* newPool)
 
     if (m_pOriginalElementsBackup)
     {
-        for (int i = 0; i < MAX_DUMMIES_DEFAULT; i++)
+        for (int i = 0; i < (*m_pOriginalElementsBackup).size(); i++)
         {
             if ((*m_pOriginalElementsBackup)[i].first)
             {
@@ -94,7 +94,7 @@ void CDummyPoolSA::UpdateBuildingLods(void* oldPool, void* newPool)
     }
     else
     {
-        for (int i = 0; i < MAX_DUMMIES_DEFAULT; i++)
+        for (int i = 0; i < (*m_ppDummyPoolInterface)->Size(); i++)
         {
             CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
             if (object->m_pLod)

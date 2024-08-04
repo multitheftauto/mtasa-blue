@@ -303,8 +303,8 @@ public:
     PostWeaponFireHandler*  m_pPostWeaponFireHandler;
     TaskSimpleBeHitHandler* m_pTaskSimpleBeHitHandler;
 
-    void RemoveAllBuildings(bool clearBuildingRemoval = true);
-    void RestoreGameBuildings();
+    void RemoveGameWorld();
+    void RestoreGameWorld();
 
     bool SetBuildingPoolSize(size_t size);
 
