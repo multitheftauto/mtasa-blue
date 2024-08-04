@@ -35,6 +35,15 @@ public:
         RESOURCE_FILE_TYPE_CLIENT_FILE,
     };
 
+    enum class eResourceCategory
+    {
+        ALL,
+        SCRIPTS,
+        MAPS,
+        CONFIGS,
+        FILES,
+    };
+
 public:
     CDownloadableResource(CResource* pResource, eResourceType resourceType, const char* szName, const char* szNameShort, uint uiDownloadSize,
                           CChecksum serverChecksum, bool bAutoDownload);
@@ -43,6 +52,7 @@ public:
     bool DoesClientAndServerChecksumMatch();
 
     eResourceType GetResourceType() { return m_resourceType; };
+    eResourceCategory GetResourceCategoryType() const noexcept { return m_resourceCategoryType; }
     const char*   GetName() { return m_strName; };
     const char*   GetShortName() { return m_strNameShort; };
     CResource*    GetResource() { return m_pResource; }
@@ -66,6 +76,7 @@ public:
 protected:
     CResource*    m_pResource;
     eResourceType m_resourceType;
+    eResourceCategory m_resourceCategoryType;
 
     SString m_strName;
     SString m_strNameShort;

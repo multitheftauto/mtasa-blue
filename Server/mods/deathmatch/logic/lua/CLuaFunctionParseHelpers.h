@@ -8,13 +8,14 @@
 
 #pragma once
 
+#include <type_traits>
 #include "LuaCommon.h"
 #include "CElementIDs.h"
 #include "CConsoleClient.h"
 #include "CAccount.h"
 #include "CEasingCurve.h"
 #include "CAccessControlListRight.h"
-#include <type_traits>
+#include "CResourceFile.h"
 
 class CLuaVector2D;
 class CLuaVector3D;
@@ -38,6 +39,7 @@ DECLARE_ENUM(CAccessControlListRight::ERightType);
 DECLARE_ENUM(CElement::EElementType);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
 DECLARE_ENUM_CLASS(ESyncType);
+DECLARE_ENUM_CLASS(CResourceFile::eResourceCategory);
 
 enum eHudComponent
 {

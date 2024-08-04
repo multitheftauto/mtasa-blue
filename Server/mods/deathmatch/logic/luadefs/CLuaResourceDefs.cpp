@@ -73,6 +73,8 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceACLRequests", getResourceACLRequests},
         {"loadstring", LoadString},
         {"load", Load},
+
+        {"getResourceFiles", ArgumentParser<GetResourceFiles>},
     };
 
     // Add functions
@@ -129,6 +131,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getACLRequests", "getResourceACLRequests");
     lua_classfunction(luaVM, "isArchived", "isResourceArchived");
     lua_classfunction(luaVM, "isProtected", "isResourceProtected");
+    lua_classfunction(luaVM, "getFiles", "getResourceFiles");
 
     lua_classvariable(luaVM, "dynamicElementRoot", NULL, "getResourceDynamicElementRoot");
     lua_classvariable(luaVM, "exportedFunctions", NULL, "getResourceExportedFunctions");
@@ -142,6 +145,7 @@ void CLuaResourceDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "archived", NULL, "isResourceArchived");
     lua_classvariable(luaVM, "protected", nullptr, "isResourceProtected");
     lua_classvariable(luaVM, "loadFailureReason", NULL, "getResourceLoadFailureReason");
+    lua_classvariable(luaVM, "files", nullptr, "getResourceFiles");
 
     lua_registerclass(luaVM, "Resource");
 }
@@ -804,7 +808,7 @@ int CLuaResourceDefs::getResourceConfig(lua_State* luaVM)
             CheckCanModifyOtherResource(argStream, pThisResource, pResource);
             if (!argStream.HasErrors())
             {
-                for (CResourceFile* pResourceFile : pResource->GetFiles())
+                for (CResourceFile* pResourceFile : pResource->GetResourceFiles())
                 {
                     if (pResourceFile->GetType() != CResourceFile::RESOURCE_FILE_TYPE_CONFIG)
                         continue;
@@ -1467,4 +1471,33 @@ int CLuaResourceDefs::isResourceArchived(lua_State* luaVM)
 bool CLuaResourceDefs::isResourceProtected(CResource* const resource)
 {
     return resource->IsProtected();
+}
+
+std::vector<std::string> CLuaResourceDefs::GetResourceFiles(lua_State* luaVM, std::optional<CResourceFile::eResourceCategory> type,
+                                                            std::optional<CResource*> resource) noexcept
+{
+    using eResourceCategory = CResourceFile::eResourceCategory;
+
+    if (!type)
+        type = eResourceCategory::ALL;
+
+    if (!resource)
+        resource = &lua_getownerresource(luaVM);
+
+    const auto resourceFiles = (*resource)->GetResourceFiles();
+
+    std::unordered_set<std::string> files;
+    for (const auto& file : resourceFiles)
+    {
+        if (file->GetResourceCategoryType() != type.value() && type.value() != eResourceCategory::ALL)
+            continue;
+        files.insert(file->GetName());
+    }
+
+    // TODO: Upgrade ArgumentParser so it would accept
+    // std::set and std::unordered_set as return values
+    return std::vector<std::string>(
+        std::make_move_iterator(files.begin()),
+        std::make_move_iterator(files.end())
+    );
 }
