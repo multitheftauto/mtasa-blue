@@ -872,7 +872,7 @@ namespace SharedUtil
         std::string numbers;
         GetOption<T>(text, key, numbers);
         std::vector<std::string> numberList;
-        strNumbers.Split(seperator, numberList);
+        numbers.Split(separator, numberList);
         for (const auto& number : numberList)
         {
             if (number.empty())
