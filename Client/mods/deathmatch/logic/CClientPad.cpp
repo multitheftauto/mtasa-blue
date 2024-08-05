@@ -330,10 +330,10 @@ bool CClientPad::GetControlState(const char* szName, CControllerState& State, bo
                     return State.LeftStickX == 128;
                     break;            // right
                 case 7:
-                    return State.RightShoulder2 == 255;
+                    return State.LeftShoulder2 == 255;
                     break;            // zoom in
                 case 8:
-                    return State.LeftShoulder2 == 255;
+                    return State.RightShoulder2 == 255;
                     break;            // zoom out
                 case 9:
                     return false;
