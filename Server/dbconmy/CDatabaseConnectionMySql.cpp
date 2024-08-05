@@ -85,11 +85,11 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     // Parse options string
     CArgMap optionsMap("=", ";");
     optionsMap.SetFromString(strOptions);
-    optionsMap.Get("autoreconnect", m_bAutomaticReconnect, 1);
-    optionsMap.Get("batch", m_bAutomaticTransactionsEnabled, 1);
-    optionsMap.Get("multi_statements", m_bMultipleStatements, 0);
-    optionsMap.Get("use_ssl", m_bUseSSL, 0);
-    optionsMap.Get("get_server_public_key", getServerPublicKey, 1);
+    optionsMap.Get("autoreconnect"s, m_bAutomaticReconnect, 1);
+    optionsMap.Get("batch"s, m_bAutomaticTransactionsEnabled, 1);
+    optionsMap.Get("multi_statements"s, m_bMultipleStatements, 0);
+    optionsMap.Get("use_ssl"s, m_bUseSSL, 0);
+    optionsMap.Get("get_server_public_key"s, getServerPublicKey, 1);
 
     SString strHostname;
     SString strDatabaseName;
@@ -103,7 +103,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     argMap.SetFromString(strHost);
     argMap.Get("dbname", strDatabaseName, "");
     argMap.Get("host", strHostname, "localhost");
-    argMap.Get("port", iPort, 0);
+    argMap.Get("port"s, iPort, 0);
     argMap.Get("unix_socket", strUnixSocket, "");
     argMap.Get("charset", strCharset, "");
 

@@ -1647,10 +1647,21 @@ namespace SharedUtil
 
     void CArgMap::Merge(const CArgMap& other, bool bAllowMultiValues) { MergeFromString(other.ToString(), bAllowMultiValues); }
 
+    void CArgMap::SetFromString(const char* line, bool allowMultiValues)
+    {
+        return SetFromString(std::string(line), allowMultiValues);
+    }
+
     void CArgMap::SetFromString(const SString& strLine, bool bAllowMultiValues)
     {
         m_Map.clear();
         MergeFromString(strLine, bAllowMultiValues);
+    }
+
+    void CArgMap::SetFromString(const std::string& line, bool allowMultiValues)
+    {
+        m_Map.clear();
+        MergeFromString(line, allowMultiValues);
     }
 
     void CArgMap::MergeFromString(const SString& strLine, bool bAllowMultiValues)
@@ -1728,6 +1739,68 @@ namespace SharedUtil
 
     // Test if key exists
     bool CArgMap::Contains(const SString& strCmd) const { return MapFind(m_Map, Escape(strCmd)) != NULL; }
+
+    std::string CArgMap::Get(const char*& inCmd) const noexcept
+    {
+        return Get(std::string(inCmd));
+    }
+
+    bool CArgMap::Get(const char*& inCmd, std::string& out, const char* defaultValue) const noexcept
+    {
+        return Get(std::string(inCmd), out, defaultValue);
+    }
+
+    bool CArgMap::Get(const char*& inCmd, std::vector<std::string>& outList) const noexcept
+    {
+        return Get(std::string(inCmd), outList);
+    }
+
+    bool CArgMap::Get(const char*& inCmd, int& value, int defaultValue) const noexcept
+    {
+        return Get(std::string(inCmd), value, defaultValue);
+    }
+
+    std::string CArgMap::Get(const std::string& inCmd) const noexcept
+    {
+        std::string result;
+        Get(inCmd, result);
+        return result;
+    }
+
+    bool CArgMap::Get(const std::string& inCmd, std::string& out, const char* defaultValue) const noexcept
+    {
+        assert(defaultValue);
+        const SString* result = MapFind(m_Map, Escape(inCmd));
+        if (result)
+        {
+            out = Unescape(*result);
+            return true;
+        }
+        out = defaultValue;
+        return false;
+    }
+
+    bool CArgMap::Get(const std::string& inCmd, std::vector<std::string>& outList) const noexcept
+    {
+        std::vector<SString> newItems;
+        MultiFind(m_Map, Escape(inCmd), &newItems);
+        for (auto& item : newItems)
+            item = Unescape(item);
+        outList.insert(outList.end(), newItems.begin(), newItems.end());
+        return !newItems.empty();
+    }
+
+    bool CArgMap::Get(const std::string& inCmd, int& value, int defaultValue) const noexcept
+    {
+        std::string result;
+        if (Get(inCmd, result))
+        {
+            value = atoi(result.c_str());
+            return true;
+        }
+        value = defaultValue;
+        return false;
+    }
 
     // First result as string
     bool CArgMap::Get(const SString& strCmd, SString& strOut, const char* szDefault) const

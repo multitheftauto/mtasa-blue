@@ -133,7 +133,7 @@ public:
                 {
                     CArgMap argMap;
                     argMap.SetFromString(result.pData);
-                    SString strOkMessage = argMap.Get("ok_message");
+                    SString strOkMessage = argMap.Get("ok_message"s);
 
                     // Log successful initial announcement
                     if (result.iErrorCode == 200)
