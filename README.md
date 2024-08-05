@@ -30,7 +30,7 @@ Using a framework based on resources has a number of advantages. It allows conte
 
 Our project's code repository can be found on the [multitheftauto/mtasa-blue](https://github.com/multitheftauto/mtasa-blue/) Git repository at [GitHub](https://github.com/). We are always looking for new developers, so if you're interested, here are some useful links:
 
-* [Coding guidelines](https://github.com/multitheftauto/mtasa-blue/blob/master/CONTRIBUTING.md#contributors-guide)
+* [Contributors Guide and Coding Guidelines](https://github.com/multitheftauto/mtasa-docs/blob/main/mtasa-blue/CONTRIBUTING.md)
 * [Nightly Builds](https://nightly.multitheftauto.com/)
 * [Milestones](https://github.com/multitheftauto/mtasa-blue/milestones)
 
