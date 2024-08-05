@@ -601,8 +601,8 @@ namespace
             m_ArgMap.SetFromString(strSettings);
             // If build is 30 days old, default no report logging
             m_ArgMap.Get("filter2", strFilter, GetBuildAge() < 30 ? "+all" : "-all");
-            m_ArgMap.Get("min", iMinSize, DEFAULT_MIN_SIZE);
-            m_ArgMap.Get("max", iMaxSize, DEFAULT_MAX_SIZE);
+            m_ArgMap.Get(std::string("min"), iMinSize, DEFAULT_MIN_SIZE);
+            m_ArgMap.Get(std::string("max"), iMaxSize, DEFAULT_MAX_SIZE);
             SaveReportSettings();
         }
 
