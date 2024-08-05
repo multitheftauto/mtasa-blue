@@ -869,9 +869,13 @@ namespace SharedUtil
     template <class T, class U>
     void GetOption(const std::string& text, const std::string& key, const char* separator, std::set<U>& outValues)
     {
-        std::string numbers;
-        GetOption<T>(text, key, numbers);
-        std::vector<std::string> numberList;
+        SString     numbers;
+        {
+            std::string temp;
+            GetOption<T>(text, key, temp);
+            numbers = tmep;
+        }
+        std::vector<SString> numberList;
         numbers.Split(separator, numberList);
         for (const auto& number : numberList)
         {
