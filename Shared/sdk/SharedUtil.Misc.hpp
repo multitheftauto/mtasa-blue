@@ -364,8 +364,9 @@ SString SharedUtil::GetPostUpdateConnect()
 
     CArgMap argMap;
     argMap.SetFromString(strPostUpdateConnect);
-    SString strHost = argMap.Get("host");
-    time_t  timeThen = (time_t)std::atoll(argMap.Get("time"));
+    SString strHost = argMap.Get(std::string("host"));
+    std::string timeKey = argMap.Get(std::string("time"));
+    time_t      timeThen = (time_t)std::atoll(timeKey.c_str());
 
     // Expire after 5 mins
     double seconds = difftime(time(NULL), timeThen);
@@ -674,7 +675,7 @@ bool SharedUtil::ProcessPendingBrowseToSolution()
     if (!argMap.Get("type", strType))
         return false;
     argMap.Get("message", strMessageBoxMessage);
-    argMap.Get("flags", iFlags);
+    argMap.Get(std::string("flags"), iFlags);
     argMap.Get("ecode", strErrorCode);
 
     ClearPendingBrowseToSolution();

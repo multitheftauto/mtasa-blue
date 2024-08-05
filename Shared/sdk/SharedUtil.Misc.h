@@ -873,7 +873,7 @@ namespace SharedUtil
         {
             std::string temp;
             GetOption<T>(text, key, temp);
-            numbers = tmep;
+            numbers = temp;
         }
         std::vector<SString> numberList;
         numbers.Split(separator, numberList);

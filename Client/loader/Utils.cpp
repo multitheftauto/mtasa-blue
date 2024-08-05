@@ -1579,7 +1579,7 @@ void CheckAndShowModelProblems()
     CArgMap argMap;
     argMap.SetFromString(GetApplicationSetting("diagnostics", "gta-model-fail"));
     argMap.Get("reason", strReason);
-    argMap.Get("id", iModelId);
+    argMap.Get(std::string("id"), iModelId);
     SetApplicationSetting("diagnostics", "gta-model-fail", "");
 
     if (iModelId)
@@ -1604,9 +1604,9 @@ void CheckAndShowUpgradeProblems()
     int     iModelId = 0, iUpgradeId, iFrame;
     CArgMap argMap;
     argMap.SetFromString(GetApplicationSetting("diagnostics", "gta-upgrade-fail"));
-    argMap.Get("vehid", iModelId);
-    argMap.Get("upgid", iUpgradeId);
-    argMap.Get("frame", iFrame);
+    argMap.Get(std::string("vehid"), iModelId);
+    argMap.Get(std::string("upgid"), iUpgradeId);
+    argMap.Get(std::string("frame"), iFrame);
     SetApplicationSetting("diagnostics", "gta-upgrade-fail", "");
 
     if (iModelId)
