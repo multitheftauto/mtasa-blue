@@ -94,6 +94,18 @@ struct RwTexture;
 #define FUNC_CAutomobile_OnVehiclePreRender 0x6ABCFD
 #define FUNC_CVehicle_DoSunGlare            0x6DD6F0
 
+// for vehicle names
+#define FUNC_CCurrentVehicle_Process    0x5720B9
+#define FUNC_CCurrentVehicle_Display    0x571EA0
+#define VAR_CWorld_PlayerInFocus        0xB7CD74
+#define VAR_CWorld_Players              0xB7CD98
+#define VAR_TheText                     0xC1B340
+#define VAR_ModelInfoPtrs               0xA9B0C8
+#define VAR_CUserDisplay_CurrentVehicle 0xBA18FC
+#define FUNC_CHud_SetVehicleName        0x588F50
+#define FUNC_CText_Get                  0x6A0050
+
+
 struct SRailNodeSA
 {
     short sX;                       // x coordinate times 8
@@ -386,6 +398,12 @@ static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAI
 
 class CAutomobileSAInterface;
 
+
+struct CCurrentVehicleSAInterface
+{
+    CVehicleSAInterface* m_pCurrentVehicle;
+};
+
 class CVehicleSA : public virtual CVehicle, public virtual CPhysicalSA
 {
     friend class CPoolsSA;
@@ -665,6 +683,9 @@ public:
     bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState);
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
+    std::string                       GetVehicleName() const noexcept;
+    bool                              SetVehicleName(std::string name) noexcept;
+    bool                              SetVehicleName(std::uint16_t id, std::string name) noexcept;
 
     void UpdateLandingGearPosition();
 
@@ -687,4 +708,6 @@ private:
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();
+
+    void HOOK_CCurrentVehicle__Process();
 };

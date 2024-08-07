@@ -9,6 +9,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CVehicleSA.h"
+#include "../game_sa/CPlayerInfoSA.h"
+#include "../game_sa/CTextSA.h"
+#include <unordered_map>
 
 static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 {

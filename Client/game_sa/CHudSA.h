@@ -21,6 +21,9 @@
 #define VAR_AspectRatioMult         0x859524
 #define VAR_CameraCrosshairScale    0x866C74
 
+#define FUNC_SetVehicleName         0x588F50
+#define VAR_VehicleName             0xBAA458
+
 #define FUNC_DrawAmmo               0x5893B0
 #define FUNC_DrawWeaponIcon         0x58D7D0
 #define FUNC_PrintHealthForPlayer   0x589270

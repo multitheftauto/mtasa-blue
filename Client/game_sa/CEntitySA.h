@@ -277,7 +277,7 @@ public:
     CMatrix*     GetMatrix(CMatrix* matrix);
     CMatrix*     GetMatrixInternal(CMatrix* matrix);
     void         SetMatrix(CMatrix* matrix);
-    WORD         GetModelIndex();
+    WORD         GetModelIndex() const noexcept;
     eEntityType  GetEntityType();
     bool         IsOnScreen();
     bool         IsFullyVisible();
