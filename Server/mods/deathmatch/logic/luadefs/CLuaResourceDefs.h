@@ -48,7 +48,7 @@ public:
     LUA_DECLARE(getResourceLastStartTime);
     LUA_DECLARE(getResourceLoadTime);
     LUA_DECLARE(getResourceRootElement);
-    LUA_DECLARE(getResourceDynamicElementRoot);
+    static CElement* GetResourceDynamicElementRoot(lua_State* luaVM, std::optional<CResource*> resource);
     LUA_DECLARE(getResourceMapRootElement);
     LUA_DECLARE(getResourceExportedFunctions);
     LUA_DECLARE(getResourceOrganizationalPath);
