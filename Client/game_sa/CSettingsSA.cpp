@@ -287,6 +287,14 @@ void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
     MemPut<BYTE>(0x5E682A + 1, bEnable);
 }
 
+
+bool CSettingsSA::GetVolumetricShadowsEnabledByVideoSetting()
+{
+    bool volumetricShadow;
+    g_pCore->GetCVars()->Get("volumetric_shadows", volumetricShadow);
+    return volumetricShadow;
+}
+
 void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)
 {
     m_bVolumetricShadowsSuspended = bSuspended;

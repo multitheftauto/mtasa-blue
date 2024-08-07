@@ -133,6 +133,7 @@ public:
     virtual void SetMipMappingEnabled(bool bEnable) = 0;
 
     virtual bool IsVolumetricShadowsEnabled() = 0;
+    virtual bool GetVolumetricShadowsEnabledByVideoSetting() = 0;
     virtual void SetVolumetricShadowsEnabled(bool bEnable) = 0;
     virtual void SetVolumetricShadowsSuspended(bool bSuspended) = 0;
 

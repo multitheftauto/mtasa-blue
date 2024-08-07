@@ -103,6 +103,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"setVolumetricShadowsEnabled", ArgumentParser<SetVolumetricShadowsEnabled>},
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -131,7 +132,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
-                                                                             {"isGarageOpen", IsGarageOpen}};
+                                                                             {"isGarageOpen", IsGarageOpen},
+                                                                             {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -2233,4 +2235,15 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
             return g_pGame->GetWeather()->ResetRainbow();
     }
     return false;
+}
+
+bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable) noexcept
+{
+    g_pGame->GetSettings()->SetVolumetricShadowsEnabled(enable);
+    return true;
+}
+
+bool CLuaWorldDefs::IsVolumetricShadowsEnabled() noexcept
+{
+    return g_pGame->GetSettings()->IsVolumetricShadowsEnabled();
 }
