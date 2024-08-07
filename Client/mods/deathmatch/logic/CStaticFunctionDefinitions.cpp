@@ -1464,14 +1464,9 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-
-            // Limit to max health
-            float fMaxHealth = Ped.GetMaxHealth();
-            if (fHealth > fMaxHealth)
-                fHealth = fMaxHealth;
-
+            
             // Set the new health
-            Ped.SetHealth(fHealth);
+            Ped.SetHealth(Clamp(0.0f, fHealth, pPed->GetMaxHealth()));
             return true;
             break;
         }
