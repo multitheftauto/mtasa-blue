@@ -22,4 +22,11 @@ class CClockSA : public CClock
 public:
     void Set(BYTE bHour, BYTE bMinute);
     void Get(BYTE* bHour, BYTE* bMinute);
+
+    bool SetTimeFrozen(bool value) noexcept;
+    bool IsTimeFrozen() const noexcept { return m_bTimeCycleFrozen; };
+    bool ResetTimeFrozen() noexcept;
+
+private:
+    bool m_bTimeCycleFrozen;
 };
