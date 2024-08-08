@@ -43,7 +43,8 @@ void CHudSA::Disable(bool bDisabled)
     else
         MemPut<BYTE>(FUNC_Draw, 0x80);
 
-    SetComponentVisible(HUD_ALL, !bDisabled);    
+    for (const auto& component : m_HudComponentMap)
+        SetComponentVisible(component.first, !IsComponentVisible(component.first));
 
     // Also disable the radar as the above code will not hide it before the local player has spawned
     if (bDisabled)
