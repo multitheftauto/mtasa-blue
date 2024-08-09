@@ -634,3 +634,13 @@ void CClientCamera::SetGtaMatrix(const CMatrix& matInNew, CCam* pCam) const
     *pCam->GetFront() = matNew.vFront;
     *pCam->GetSource() = matNew.vPos;
 }
+
+void CClientCamera::ShakeCamera(float radius, float x, float y, float z) noexcept
+{
+    m_pCamera->ShakeCamera(radius, x, y, z);
+}
+
+void CClientCamera::ResetShakeCamera() noexcept
+{
+    m_pCamera->ResetShakeCamera();
+}

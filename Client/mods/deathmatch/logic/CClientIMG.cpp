@@ -191,7 +191,7 @@ bool CClientIMG::StreamDisable()
 
     m_pImgManager->UpdateStreamerBufferSize();
 
-    g_pClientGame->RestreamWorld(true);
+    g_pClientGame->RestreamWorld();
     return true;
 }
 
