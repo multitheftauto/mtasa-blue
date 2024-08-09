@@ -1551,19 +1551,18 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
             if (nodeIndex >= sizeof(bikeInterface->m_apModelNodes) / sizeof(RwFrame*))
                 return false;
 
-            // Set the correct "bike_chassis" frame for bikes
-            if (nodeIndex == 1)
-            {
-                defaultBikeChassisFrame = bikeInterface->m_apModelNodes[1];
-                if (defaultBikeChassisFrame && std::strcmp(defaultBikeChassisFrame->szName, "chassis_dummy") == 0)
-                {
-                    RwFrame* correctChassisFrame = ((RwFrame*(__cdecl*)(RpClump*, const char*))FUNC_CClumpModelInfo_GetFrameFromName)(bikeInterface->m_pRwObject, "chassis");
-                    if (correctChassisFrame)
-                        bikeInterface->m_apModelNodes[1] = correctChassisFrame;
-                }
-            }
-
             nodesOffset = OFFSET_CBike_Nodes;
+            if (nodeIndex != 1)
+                break;
+
+            // Set the correct "bike_chassis" frame for bikes
+            defaultBikeChassisFrame = bikeInterface->m_apModelNodes[1];
+            if (defaultBikeChassisFrame && std::strcmp(defaultBikeChassisFrame->szName, "chassis_dummy") == 0)
+            {
+                RwFrame* correctChassisFrame = ((RwFrame * (__cdecl*)(RpClump*, const char*))FUNC_CClumpModelInfo_GetFrameFromName)(bikeInterface->m_pRwObject, "chassis");
+                if (correctChassisFrame)
+                    bikeInterface->m_apModelNodes[1] = correctChassisFrame;
+            }
             break;
         }
         case VehicleClass::BOAT:
@@ -1582,7 +1581,7 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
             return false;
     }
 
-    // Patch nodes array
+    // Patch nodes array in CAutomobile::SpawnFlyingComponent
     MemPut(0x6A85B3, nodesOffset);
     MemPut(0x6A8631, nodesOffset);
 
@@ -1598,7 +1597,7 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
         mov dwReturn, eax
     }
 
-    // Restore default nodes array
+    // Restore default nodes array in CAutomobile::SpawnFlyingComponent
     MemPut(0x6A85B3, 0x648);
     MemPut(0x6A8631, 0x648);
 
@@ -1610,15 +1609,15 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
             bikeInterface->m_apModelNodes[1] = defaultBikeChassisFrame;
     }
 
-    if (removalTime > -1)
-    {
-        auto* componentObject = reinterpret_cast<CObjectSAInterface*>((DWORD*)dwReturn);
-        if (!componentObject)
-            return;
+    if (removalTime <= -1)
+        return true;
 
-        int CTimer_ms = *(int*)0xB7CB84; // CTimer::m_snTimeInMilliseconds
-        componentObject->uiObjectRemovalTime = CTimer_ms + static_cast<std::uint32_t>(removalTime);
-    }
+    auto* componentObject = reinterpret_cast<CObjectSAInterface*>((DWORD*)dwReturn);
+    if (!componentObject)
+        return;
+
+    int CTimer_ms = *(int*)0xB7CB84; // CTimer::m_snTimeInMilliseconds
+    componentObject->uiObjectRemovalTime = CTimer_ms + static_cast<std::uint32_t>(removalTime);
 
     return true;
 }
