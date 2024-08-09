@@ -158,7 +158,8 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
     DoResourceFileCheck();
 
     // If read size is large, limit it to how many bytes can be read (avoid memory problems with over allocation)
-    if (ulSize > 10000)
+    // large : >10KB
+    if (ulSize > 10240)
     {
         long lCurrentPos = m_pFile->FTell();
         m_pFile->FSeek(0, SEEK_END);
@@ -177,7 +178,18 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
         return -2;
     }
 
-    return m_pFile->FRead(outBuffer.data(), ulSize);
+    auto bytesRead = m_pFile->FRead(outBuffer.data(), ulSize);
+
+    // EOF reached?
+    // Cant check for error as binary interface
+    // is pure virtual class with no definitions
+    // available (CNetServer)
+    if (m_pFile->FEof())
+    {
+        // if so, truncate the data to the amount of bytes read
+        outBuffer.resize(bytesRead + 1);
+    }
+    return bytesRead;
 }
 
 long CScriptFile::Write(unsigned long ulSize, const char* pData)
