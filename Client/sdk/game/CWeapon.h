@@ -45,7 +45,7 @@ public:
     virtual void         Initialize(eWeaponType type, unsigned int uiAmmo, CPed* pPed) = 0;
     virtual void         Update(CPed* pPed) = 0;
     virtual bool         Fire(CEntity* pFiringEntity, CVector* pvecOrigin, CVector* pvecOffset, CEntity* pTargetEntity, CVector* pvec_1, CVector* pvec2) = 0;
-    virtual void         AddGunshell(CEntity* pFiringEntity, CVector* pvecOrigin, CVector2D* pvecDirection, float fSize) = 0;
+    virtual void         AddGunshell(CEntity* pFiringEntity, const CVector& vecOrigin, const CVector2D& vecDirection, float fSize) = 0;
     virtual void DoBulletImpact(CEntity* pFiringEntity, CEntitySAInterface* pEntityInterface, CVector* pvecOrigin, CVector* pvecTarget, CColPoint* pColPoint,
                                 int i_1) = 0;
     virtual unsigned char GenerateDamageEvent(CPed* pPed, CEntity* pResponsible, eWeaponType weaponType, int iDamagePerHit, ePedPieceTypes hitZone,
