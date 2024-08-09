@@ -84,13 +84,9 @@ bool CCommands::Execute(const char* szCommandLine)
 bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool bHandleRemotely, bool bIsScriptedBind)
 {
     // Copy szParametersIn so the contents can be changed
-    const char* szParameters = NULL;
+    char* szParameters = nullptr;
     if (szParametersIn)
-    {
-        size_t sizeParameters = strlen(szParametersIn) + 1;
-        szParameters = static_cast<char*>(alloca(sizeParameters));
-        memcpy(const_cast<char*>(szParameters), szParametersIn, sizeParameters);
-    }
+        std::strcpy(szParameters, szParametersIn);
 
     // HACK: if its a 'chatboxsay' command, use the next parameter
     // Is the command "say" and the arguments start with /? (command comes from the chatbox)
@@ -108,15 +104,12 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 
                 // Split it into command and arguments
                 szCommand = strtok(szBuffer, " ");
-                szParameters = strtok(NULL, "\0");
-                if (szCommand == NULL)
-                {
+                szParameters = strtok(nullptr, "\0");
+                if (!szCommand)
                     return false;
-                }
-                if (szParameters == NULL)
-                {
-                    szParameters = "";
-                }
+
+                if (!szParameters)
+                    std::strcpy(szParameters, "");
             }
         }
         else
