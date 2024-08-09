@@ -673,7 +673,7 @@ protected:
     uchar m_ucTrackID;
     bool  m_bJustStreamedIn;
     bool  m_bWheelScaleChanged;
-    bool  m_heliRotorState{true};
+    bool  m_rotorState{true};
 
     // Time dependent error compensation interpolation
     struct
