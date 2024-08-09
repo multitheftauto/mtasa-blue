@@ -391,7 +391,7 @@ namespace
         SString                    GetAttribute(const SString& strName) const
         {
             const SString* pValue = MapFind(attributeMap, strName);
-            return pValue ? (*pValue).c_str() : "";
+            return pValue ? *pValue : SStringX("");
         }
         void SetAttribute(const SString& strName, const SString& strValue) { MapSet(attributeMap, strName, strValue); }
     };
@@ -606,7 +606,7 @@ namespace
             SaveReportSettings();
         }
 
-        SString GetFilter() const { return strFilter != "" ? strFilter.c_str() : "+all"; }
+        SString GetFilter() const { return !strFilter.empty() ? strFilter : SStringX("+all"); }
 
         int GetMinSize() const { return iMinSize; }
 

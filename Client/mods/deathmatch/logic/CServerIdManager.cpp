@@ -70,7 +70,7 @@ protected:
     bool                                  m_bClearedDefaultDirectory;
     std::map<CServerIdKey, CServerIdInfo> m_ServerIdMap;
     SString                               m_strServerIdLookupBaseDir;
-    SString                               m_strTempErrorDir;
+    std::string                           m_strTempErrorDir;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -266,7 +266,7 @@ SString CServerIdManagerImpl::GetConnectionPrivateDirectory(bool bPreviousVer)
 
     // If ServerId is invalid, use the temp dir
     if (strServerId.length() < 10)
-        return bPreviousVer ? "" : m_strTempErrorDir.c_str();
+        return bPreviousVer ? "" : m_strTempErrorDir;
 
     // Otherwise fetch the server unique dir
     const CServerIdInfo& info = GetServerIdInfo(strServerId);

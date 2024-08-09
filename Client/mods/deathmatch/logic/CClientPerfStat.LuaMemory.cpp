@@ -297,15 +297,15 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
         int WebBrowserCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetWebBrowserCount();
         int VectorGraphicCount = g_pClientGame->GetManager()->GetRenderElementManager()->GetVectorGraphicCount();
         TextItemCount = std::max(TextItemCount - 4, 0);            // Remove count for radar items
-        row[c++] = !TextItemCount ? "-" : SString("%d", TextItemCount).c_str();
-        row[c++] = !DxFontCount ? "-" : SString("%d", DxFontCount).c_str();
-        row[c++] = !GuiFontCount ? "-" : SString("%d", GuiFontCount).c_str();
-        row[c++] = !TextureCount ? "-" : SString("%d", TextureCount).c_str();
-        row[c++] = !ShaderCount ? "-" : SString("%d", ShaderCount).c_str();
-        row[c++] = !RenderTargetCount ? "-" : SString("%d", RenderTargetCount).c_str();
-        row[c++] = !ScreenSourceCount ? "-" : SString("%d", ScreenSourceCount).c_str();
-        row[c++] = !WebBrowserCount ? "-" : SString("%d", WebBrowserCount).c_str();
-        row[c++] = !VectorGraphicCount ? "-" : SString("%d", VectorGraphicCount).c_str();
+        row[c++] = !TextItemCount ? "-" : std::to_string(TextItemCount);
+        row[c++] = !DxFontCount ? "-" : std::to_string(DxFontCount);
+        row[c++] = !GuiFontCount ? "-" : std::to_string(GuiFontCount);
+        row[c++] = !TextureCount ? "-" : std::to_string(TextureCount);
+        row[c++] = !ShaderCount ? "-" : std::to_string(ShaderCount);
+        row[c++] = !RenderTargetCount ? "-" : std::to_string(RenderTargetCount);
+        row[c++] = !ScreenSourceCount ? "-" : std::to_string(ScreenSourceCount);
+        row[c++] = !WebBrowserCount ? "-" : std::to_string(WebBrowserCount);
+        row[c++] = !VectorGraphicCount ? "-" : std::to_string(VectorGraphicCount);
     }
 
     // For each VM
@@ -333,9 +333,9 @@ void CClientPerfStatLuaMemoryImpl::GetLuaMemoryStats(CClientPerfStatResult* pRes
 
         row[c++] = SString("%d KB", LuaMainMemory.Current);
         row[c++] = SString("%d KB", LuaMainMemory.Max);
-        row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : SString("%d", LuaMainMemory.OpenXMLFiles).c_str();
-        row[c++] = !LuaMainMemory.Refs ? "-" : SString("%d", LuaMainMemory.Refs).c_str();
-        row[c++] = !LuaMainMemory.TimerCount ? "-" : SString("%d", LuaMainMemory.TimerCount).c_str();
-        row[c++] = !LuaMainMemory.ElementCount ? "-" : SString("%d", LuaMainMemory.ElementCount).c_str();
+        row[c++] = !LuaMainMemory.OpenXMLFiles ? "-" : std::to_string(LuaMainMemory.OpenXMLFiles);
+        row[c++] = !LuaMainMemory.Refs ? "-" : std::to_string(LuaMainMemory.Refs);
+        row[c++] = !LuaMainMemory.TimerCount ? "-" : std::to_string(LuaMainMemory.TimerCount);
+        row[c++] = !LuaMainMemory.ElementCount ? "-" : std::to_string(LuaMainMemory.ElementCount);
     }
 }

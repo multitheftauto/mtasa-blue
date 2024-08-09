@@ -4,8 +4,6 @@ project "Launcher"
 	targetdir(buildpath("server"))
 	targetname "mta-server"
 
-	cppdialect "C++17"
-
 	includedirs {
 		"../../Shared/sdk",
 		"../sdk",
