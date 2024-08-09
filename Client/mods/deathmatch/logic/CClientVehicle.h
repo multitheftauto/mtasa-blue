@@ -299,12 +299,12 @@ public:
     // TODO: Make the class remember on virtualization
     float GetHeliRotorSpeed();
     float GetPlaneRotorSpeed();
-    bool  GetHeliRotorState() const noexcept;
+    bool  GetVehicleRotorState() const noexcept;
 
     bool GetRotorSpeed(float&);
     bool SetRotorSpeed(float);
     bool SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept;
-    void SetHeliRotorState(bool state, bool stopRotor) noexcept;
+    void SetVehicleRotorState(bool state, bool stopRotor) noexcept;
     void SetHeliRotorSpeed(float fSpeed);
     void SetPlaneRotorSpeed(float fSpeed);
     bool IsHeliSearchLightVisible();

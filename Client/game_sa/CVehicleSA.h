@@ -95,9 +95,7 @@ struct RwTexture;
 #define FUNC_CVehicle_DoSunGlare            0x6DD6F0
 
 #define FUNC_CHeli_ProcessFlyingCarStuff 0x6C4E7D
-
-static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;
-static constexpr DWORD RETURN_CHeli_ProcessFlyingCarStuff = 0x6C5404;
+#define FUNC_CPlane_ProcessFlyingCarStuff 0x6CB7D2
 
 struct SRailNodeSA
 {
@@ -415,7 +413,7 @@ private:
     unsigned char                    m_ucVariant2;
     unsigned char                    m_ucVariantCount{0};
     bool                             m_doorsUndamageable{false};
-    bool                             m_heliRotorState{true};
+    bool                             m_rotorState{true};
 
     std::array<CVector, VEHICLE_DUMMY_COUNT> m_dummyPositions;
 
@@ -547,7 +545,7 @@ public:
     bool           GetTyresDontBurst() { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
     unsigned short GetAdjustablePropertyValue() { return *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
     float          GetHeliRotorSpeed() const;
-    bool           GetHeliRotorState() const noexcept override { return m_heliRotorState; }
+    bool           GetVehicleRotorState() const noexcept override { return m_rotorState; }
     float          GetPlaneRotorSpeed();
 
     unsigned long  GetExplodeTime() { return *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240); };
@@ -574,7 +572,7 @@ public:
         *reinterpret_cast<unsigned short*>(reinterpret_cast<unsigned int>(m_pInterface) + 2156) = usAdjustableProperty;
     };
     void SetHeliRotorSpeed(float speed);
-    void SetHeliRotorState(bool state, bool stopRotor) noexcept override;
+    void SetVehicleRotorState(bool state, bool stopRotor, bool isHeli) noexcept override;
     void SetPlaneRotorSpeed(float fSpeed);
     bool SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept;
     void SetExplodeTime(unsigned long ulTime) { *reinterpret_cast<unsigned long*>(reinterpret_cast<unsigned int>(m_pInterface) + 1240) = ulTime; };

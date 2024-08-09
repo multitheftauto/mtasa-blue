@@ -52,16 +52,18 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
     }
 }
 
-bool CanProcessFlyingCarStuff(CHeliSAInterface* heliInterface)
+static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleInterface)
 {
-    SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)heliInterface);
+    SClientEntity<CVehicleSA>* vehicle = pGame->GetPools()->GetVehicle((DWORD*)vehicleInterface);
     if (!vehicle || !vehicle->pEntity)
         return true;
 
-    return vehicle->pEntity->GetHeliRotorState();
+    return vehicle->pEntity->GetVehicleRotorState();
 }
 
-void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
+static constexpr DWORD CONTINUE_CHeli_ProcessFlyingCarStuff = 0x6C4E82;
+static constexpr DWORD RETURN_CHeli_ProcessFlyingCarStuff = 0x6C5404;
+static void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
 {
     _asm
     {
@@ -69,12 +71,8 @@ void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
         mov al, [esi+36h]
 
         pushad
-        push ecx
         call CanProcessFlyingCarStuff
-        add esp, 4
-
-        movzx eax, al
-        test eax, eax
+        test al, al
         jz skip
 
         popad
@@ -83,6 +81,30 @@ void _declspec(naked) HOOK_CHeli_ProcessFlyingCarStuff()
         skip:
         popad
         jmp RETURN_CHeli_ProcessFlyingCarStuff
+    }
+}
+
+static constexpr DWORD CONTINUE_CPlane_ProcessFlyingCarStuff = 0x6CB7D7;
+static constexpr DWORD RETURN_CPlane_ProcessFlyingCarStuff = 0x6CC482;
+static void _declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
+{
+    _asm
+    {
+        push esi
+        mov esi, ecx
+        fnstsw ax
+
+        pushad
+        call CanProcessFlyingCarStuff
+        test al, al
+        jz skip
+
+        popad
+        jmp CONTINUE_CPlane_ProcessFlyingCarStuff
+
+        skip:
+        popad
+        jmp RETURN_CPlane_ProcessFlyingCarStuff
     }
 }
 
@@ -534,12 +556,17 @@ void CVehicleSA::SetHeliRotorSpeed(float speed)
     static_cast<CHeliSAInterface*>(GetInterface())->m_wheelSpeed[1] = speed;
 }
 
-void CVehicleSA::SetHeliRotorState(bool state, bool stopRotor) noexcept
+void CVehicleSA::SetVehicleRotorState(bool state, bool stopRotor, bool isHeli) noexcept
 {
-    m_heliRotorState = state;
+    m_rotorState = state;
 
-    if (!state && stopRotor)
+    if (state || !stopRotor)
+        return;
+
+    if (isHeli)
         SetHeliRotorSpeed(0.0f);
+    else
+        SetPlaneRotorSpeed(0.0f);
 }
 
 void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
@@ -1828,8 +1855,9 @@ void CVehicleSA::StaticSetHooks()
     // Setup vehicle sun glare hook
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
 
-    // Setup hook to handle setHelicopterRotorState function
+    // Setup hooks to handle setVehicleRotorState function
     HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
+    HookInstall(FUNC_CPlane_ProcessFlyingCarStuff, (DWORD)HOOK_CPlane_ProcessFlyingCarStuff, 5);
 }
 
 void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)
