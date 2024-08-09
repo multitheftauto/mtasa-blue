@@ -2122,15 +2122,19 @@ int CLuaVehicleDefs::SetVehiclePanelState(lua_State* luaVM)
     CElement*     pElement;
     unsigned char ucPanel;
     unsigned char ucState;
+    bool          spawnFlyingComponent;
+    bool          breakGlass;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
     argStream.ReadNumber(ucPanel);
     argStream.ReadNumber(ucState);
+    argStream.ReadBool(spawnFlyingComponent, true);
+    argStream.ReadBool(breakGlass, false);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehiclePanelState(pElement, ucPanel, ucState))
+        if (CStaticFunctionDefinitions::SetVehiclePanelState(pElement, ucPanel, ucState, spawnFlyingComponent, breakGlass))
         {
             lua_pushboolean(luaVM, true);
             return 1;

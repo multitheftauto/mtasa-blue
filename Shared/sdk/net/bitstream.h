@@ -568,6 +568,10 @@ enum class eBitStreamVersion : unsigned short
     // 2024-07-05
     SetMarkerTargetArrowProperties,
 
+    // Add "spawnFlyingComponent" to setVehiclePanelState
+    // 2024-07-15
+    SetVehiclePanelState_SpawnFlyingComponent,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

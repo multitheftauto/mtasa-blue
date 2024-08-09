@@ -98,7 +98,7 @@ void CDamageManagerSA::SetWheelStatus(eWheelPosition bWheel, BYTE bTireStatus)
     }
 }
 
-void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
+void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawnFlyingComponent, bool breakGlass)
 {
     // Valid index?
     if (bPanel < MAX_PANELS && bPanelStatus <= 3)
@@ -142,11 +142,13 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
                 // Call CAutomobile::SetPanelDamage to update the vehicle
                 dwFunction = 0x6B1480;
                 dwThis = (DWORD)internalEntityInterface;
-                bool bUnknown = false;
+                bool windscreenShatter = bPanel == ePanels::WINDSCREEN_PANEL && breakGlass;
+                bool quiet = !spawnFlyingComponent;
                 _asm
                 {
                     mov     ecx, dwThis
-                    push    bUnknown
+                    push    quiet
+                    push    windscreenShatter
                     push    dwPanel
                     call    dwFunction
                 }
@@ -155,13 +157,13 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus)
     }
 }
 
-void CDamageManagerSA::SetPanelStatus(unsigned long ulStatus)
+void CDamageManagerSA::SetPanelStatus(unsigned long ulStatus, bool spawnFlyingComponent, bool breakGlass)
 {
     unsigned int uiIndex;
 
     for (uiIndex = 0; uiIndex < MAX_PANELS; uiIndex++)
     {
-        SetPanelStatus(static_cast<eDoors>(uiIndex), static_cast<unsigned char>(ulStatus));
+        SetPanelStatus(static_cast<eDoors>(uiIndex), static_cast<unsigned char>(ulStatus), spawnFlyingComponent, breakGlass);
         ulStatus >>= 4;
     }
 }

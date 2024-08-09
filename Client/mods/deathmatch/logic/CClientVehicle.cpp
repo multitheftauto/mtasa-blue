@@ -1525,12 +1525,12 @@ bool CClientVehicle::GetWheelMissing(unsigned char ucWheel, const SString& strWh
     return false;
 }
 
-void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus)
+void CClientVehicle::SetPanelStatus(unsigned char ucPanel, unsigned char ucStatus, bool spawnFlyingComponent, bool breakGlass)
 {
     if (ucPanel < MAX_PANELS)
     {
         if (m_pVehicle && HasDamageModel())
-            m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus);
+            m_pVehicle->GetDamageManager()->SetPanelStatus(static_cast<ePanels>(ucPanel), ucStatus, spawnFlyingComponent, breakGlass);
 
         m_ucPanelStates[ucPanel] = ucStatus;
     }
