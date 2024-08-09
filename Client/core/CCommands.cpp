@@ -86,7 +86,10 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     // Copy szParametersIn so the contents can be changed
     char* szParameters = nullptr;
     if (szParametersIn)
+    {
+        szParameters = static_cast<char*>(alloca(strlen(szParametersIn) + 1));
         std::strcpy(szParameters, szParametersIn);
+    }
 
     // HACK: if its a 'chatboxsay' command, use the next parameter
     // Is the command "say" and the arguments start with /? (command comes from the chatbox)
