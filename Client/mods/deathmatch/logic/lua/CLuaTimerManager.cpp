@@ -131,7 +131,7 @@ CLuaTimer* CLuaTimerManager::AddTimer(const CLuaFunctionRef& iLuaFunction, CTick
 {
     // Check for the minimum interval
     if (llTimeDelay.ToLongLong() < LUA_TIMER_MIN_INTERVAL)
-        return NULL;
+        return nullptr;
 
     if (VERIFY_FUNCTION(iLuaFunction))
     {
@@ -144,5 +144,5 @@ CLuaTimer* CLuaTimerManager::AddTimer(const CLuaFunctionRef& iLuaFunction, CTick
         return pLuaTimer;
     }
 
-    return false;
+    return nullptr;
 }

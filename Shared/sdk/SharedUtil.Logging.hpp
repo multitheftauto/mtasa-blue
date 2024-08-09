@@ -167,8 +167,8 @@ void SharedUtil::CycleFile(const SString& strPathFilename, uint uiCycleThreshKB,
             // Rename older files .1 .2 etc
             uint    uiNew = uiNumBackups - 1 - i;
             uint    uiOld = uiNumBackups - i;
-            SString strFilenameNewer = strPathFilename + (uiNew ? SString(".%d", uiNew) : "");
-            SString strFilenameOlder = strPathFilename + (uiOld ? SString(".%d", uiOld) : "");
+            SString strFilenameNewer = strPathFilename + (uiNew ? SString(".%d", uiNew).c_str() : "");
+            SString strFilenameOlder = strPathFilename + (uiOld ? SString(".%d", uiOld).c_str() : "");
 
             FileDelete(strFilenameOlder);
             FileRename(strFilenameNewer, strFilenameOlder);

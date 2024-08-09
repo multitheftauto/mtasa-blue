@@ -266,7 +266,7 @@ SString CServerIdManagerImpl::GetConnectionPrivateDirectory(bool bPreviousVer)
 
     // If ServerId is invalid, use the temp dir
     if (strServerId.length() < 10)
-        return bPreviousVer ? "" : m_strTempErrorDir;
+        return bPreviousVer ? "" : m_strTempErrorDir.c_str();
 
     // Otherwise fetch the server unique dir
     const CServerIdInfo& info = GetServerIdInfo(strServerId);

@@ -263,7 +263,7 @@ int CLuaUtilDefs::GetUserdataType(lua_State* luaVM)
         else if (iArgument == LUA_TUSERDATA)
             strType = GetUserDataClassName(*((void**)lua_touserdata(luaVM, 1)), luaVM, false);
 
-        strType = strType.empty() ? "userdata" : strType;
+        strType = strType.empty() ? "userdata" : strType.c_str();
 
         lua_pushstring(luaVM, strType.c_str());
         return 1;

@@ -4,6 +4,8 @@ project "Core"
 	targetname "core"
 	targetdir(buildpath("server"))
 
+	cppdialect "C++17"
+
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/current/src/windows" }
 		linkoptions { "/SAFESEH:NO" }

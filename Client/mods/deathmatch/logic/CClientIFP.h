@@ -242,12 +242,7 @@ private:
     void ReadKr00FramesAsCompressed(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const std::int32_t& cFrames);
 
     template <class T>
-    void ReadCompressedFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, std::int32_t iFrames)
-    {
-        BYTE*  pKeyFrames = pAnimationSequence->GetKeyFrames();
-        size_t iSizeInBytes = sizeof(T) * iFrames;
-        ReadBytes(pKeyFrames, iSizeInBytes);
-    }
+    void ReadCompressedFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, std::int32_t iFrames);
 
     void  InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, const SString& strAnimationName,
                                        const std::int32_t& iSequences);

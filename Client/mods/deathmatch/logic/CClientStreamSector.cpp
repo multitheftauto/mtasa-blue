@@ -12,7 +12,7 @@
 
 using std::list;
 
-CClientStreamSector::CClientStreamSector(CClientStreamSectorRow* pRow, CVector2D& vecBottomLeft, CVector2D& vecTopRight)
+CClientStreamSector::CClientStreamSector(CClientStreamSectorRow* pRow, const CVector2D& vecBottomLeft, const CVector2D& vecTopRight)
 {
     m_pRow = pRow;
     m_vecBottomLeft = vecBottomLeft;

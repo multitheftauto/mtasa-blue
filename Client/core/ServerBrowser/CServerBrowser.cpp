@@ -1078,21 +1078,21 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
             pServer->iRowIndex = iIndex;
         }
 
-        const SString strVersion = !bIncludeOtherVersions ? "" : pServer->strVersion;
+        const char*   szVersion = !bIncludeOtherVersions ? "" : pServer->strVersion.c_str();
         const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
-        const SString strPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d", pServer->nPlayers, pServer->nMaxPlayers);
+        const char*   szPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d", pServer->nPlayers, pServer->nMaxPlayers).c_str();
         const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
 
-        const SString strPing = pServer->nPing == 9999 ? "" : SString("%d", pServer->nPing);
+        const char*   szPing = pServer->nPing == 9999 ? "" : SString("%d", pServer->nPing).c_str();
         const SString strPingSortKey = SString("%04d-", pServer->nPing) + pServer->strTieBreakSortKey;
 
         // The row index could change at any point here if list sorting is enabled
-        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hVersion[Type], strVersion, false, false, true, strVersionSortKey);
-        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hName[Type], pServer->strName, false, false, true, pServer->strNameSortKey);
-        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hGame[Type], pServer->strGameMode, false, false, true);
-        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hPlayers[Type], strPlayers, false, false, true, strPlayersSortKey);
-        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hPing[Type], strPing, false, false, true, strPingSortKey);
+        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hVersion[Type], szVersion, false, false, true, strVersionSortKey);
+        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hName[Type], pServer->strName.c_str(), false, false, true, pServer->strNameSortKey);
+        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hGame[Type], pServer->strGameMode.c_str(), false, false, true);
+        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hPlayers[Type], szPlayers, false, false, true, strPlayersSortKey);
+        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hPing[Type], szPing, false, false, true, strPingSortKey);
 
         // Locked icon
         m_pServerList[Type]->SetItemImage(iIndex, m_hLocked[Type], pServer->bPassworded ? m_pLockedIcon : NULL);

@@ -1109,3 +1109,11 @@ CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString&
     }
     return nullptr;
 }
+
+template <class T>
+void CClientIFP::ReadCompressedFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, std::int32_t iFrames)
+{
+    BYTE*  pKeyFrames = pAnimationSequence->GetKeyFrames();
+    size_t iSizeInBytes = sizeof(T) * iFrames;
+    ReadBytes(pKeyFrames, iSizeInBytes);
+}

@@ -84,12 +84,12 @@ bool CCommands::Execute(const char* szCommandLine)
 bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool bHandleRemotely, bool bIsScriptedBind)
 {
     // Copy szParametersIn so the contents can be changed
-    char* szParameters = NULL;
+    const char* szParameters = NULL;
     if (szParametersIn)
     {
         size_t sizeParameters = strlen(szParametersIn) + 1;
         szParameters = static_cast<char*>(alloca(sizeParameters));
-        memcpy(szParameters, szParametersIn, sizeParameters);
+        memcpy(const_cast<char*>(szParameters), szParametersIn, sizeParameters);
     }
 
     // HACK: if its a 'chatboxsay' command, use the next parameter

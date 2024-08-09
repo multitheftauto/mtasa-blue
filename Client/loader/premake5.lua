@@ -4,6 +4,8 @@ project "Loader"
 	targetname "loader"
 	targetdir(buildpath("mta"))
 
+	cppdialect "C++20"
+
 	filter "system:windows"
 		linkoptions { "/SAFESEH:NO" }
 

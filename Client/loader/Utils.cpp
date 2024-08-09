@@ -572,7 +572,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
     if (strlen(pathList[0].c_str()))
     {
         // Check for replacement characters (?), to see if there are any (unsupported) unicode characters
-        if (strchr(pathList[0].c_str(), '?') > 0)
+        if (reinterpret_cast<int>(strchr(pathList[0].c_str(), '?')) > 0)
             return GAME_PATH_UNICODE_CHARS;
     }
 

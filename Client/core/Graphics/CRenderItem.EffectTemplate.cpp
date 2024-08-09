@@ -47,7 +47,7 @@ namespace
         SString                    m_strReport;
         std::map<SString, SString> m_FileMD5Map;
 
-        CIncludeManager::CIncludeManager(const SString& strRootPath, const SString& strCurrentPath)
+        CIncludeManager(const SString& strRootPath, const SString& strCurrentPath)
         {
             m_strRootPath = strRootPath;
             m_strCurrentPath = strCurrentPath;
@@ -228,15 +228,15 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 
-    SString         strMetaPath = bIsRawData ? "" : strFile.Right(strFile.length() - strRootPath.length());
-    CIncludeManager IncludeManager(strRootPath, ExtractPath(strMetaPath));
+    const char*     szMetaPath = bIsRawData ? "" : strFile.Right(strFile.length() - strRootPath.length()).c_str();
+    CIncludeManager IncludeManager(strRootPath, ExtractPath(szMetaPath));
     LPD3DXBUFFER    pBufferErrors = NULL;
     if (bIsRawData)
         m_CreateHResult =
             MyD3DXCreateEffect(m_pDevice, strFile, strFile.length(), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
     else
         m_CreateHResult =
-            MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(strMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
+            MyD3DXCreateEffectFromFile(m_pDevice, ExtractFilename(szMetaPath), &macroList[0], &IncludeManager, dwFlags, NULL, &m_pD3DEffect, &pBufferErrors);
 
     // Handle compile errors
     strOutStatus = "";

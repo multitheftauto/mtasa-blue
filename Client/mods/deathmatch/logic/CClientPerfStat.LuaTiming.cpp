@@ -430,9 +430,9 @@ void CClientPerfStatLuaTimingImpl::OutputTimingBlock(CClientPerfStatResult* pRes
 
             double total_p = total_s / double(threshList[i]) * 100;
 
-            row[c++] = total_p > 0.005 ? SString("%2.2f%%", total_p) : "-";
-            row[c++] = total_s > 0.0005 ? SString("%2.3f", total_s) : "-";
-            row[c++] = p->prev.calls > 0 ? SString("%d", p->prev.calls) : "";
+            row[c++] = total_p > 0.005 ? SString("%2.2f%%", total_p).c_str() : "-";
+            row[c++] = total_s > 0.0005 ? SString("%2.3f", total_s).c_str() : "-";
+            row[c++] = p->prev.calls > 0 ? SString("%d", p->prev.calls).c_str() : "";
             row[c++] = avg_s > 0.0005 ? SString("%2.3f", avg_s).c_str() : bSubBlock ? "-" : "";
             row[c++] = max_s > 0.0005 ? SString("%2.3f", max_s).c_str() : bSubBlock ? "-" : "";
         }
