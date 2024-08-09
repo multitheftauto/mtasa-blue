@@ -87,7 +87,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     char* szParameters = nullptr;
     if (szParametersIn)
     {
-        szParameters = static_cast<char*>(alloca(strlen(szParametersIn) + 1));
+        szParameters = new char[strlen(szParametersIn) + 1];
         std::strcpy(szParameters, szParametersIn);
     }
 
@@ -177,6 +177,10 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             ss << key << " = " << val;
             val = ss.str();
             CCore::GetSingleton().GetConsole()->Print(val.c_str());
+
+            if (szParameters)
+                delete[] szParameters;
+
             return true;
         }
     }
@@ -205,7 +209,12 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     {
         bool bAllowScriptedBind = (!pEntry || pEntry->bAllowScriptedBind);
         if (m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, (pEntry != NULL), bIsScriptedBind, bAllowScriptedBind))
+        {
+            if (szParameters)
+                delete[] szParameters;
+
             return true;
+        }
     }
 
     // Unknown command
