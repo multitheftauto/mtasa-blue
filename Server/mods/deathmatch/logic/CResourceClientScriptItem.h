@@ -25,7 +25,7 @@ public:
     bool           IsNoClientCache() const { return m_bIsNoClientCache; }
     const SString& GetSourceCode() const { return m_sourceCode; }
 
-    ResponseCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
+    HttpStatusCode Request(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
 private:
     bool    m_bIsNoClientCache;

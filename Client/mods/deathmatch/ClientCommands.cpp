@@ -29,7 +29,7 @@ using std::vector;
 
 extern CClientGame* g_pClientGame;
 
-bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind)
+bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind, bool bAllowScriptedBind)
 {
     // Has the core already handled this command?
     if (!bHandled)
@@ -95,8 +95,16 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
     }
     else
     {
-        // Call our comand-handlers for core-executed commands too
-        g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments);
+        // Call the onClientCoreCommand event
+        CLuaArguments Arguments;
+        Arguments.PushString(szCommand);
+
+        auto pLocalPlayer = g_pClientGame->GetLocalPlayer();
+        pLocalPlayer->CallEvent("onClientCoreCommand", Arguments, true);
+
+        // Call our comand-handlers for core-executed commands too, if allowed
+        if (bAllowScriptedBind)
+            g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments);
     }
     return false;
 }
@@ -159,11 +167,6 @@ void COMMAND_ShowNetstat(const char* szCmdLine)
 {
     int iCmd = (szCmdLine && szCmdLine[0]) ? atoi(szCmdLine) : -1;
     g_pClientGame->ShowNetstat(iCmd);
-}
-
-void COMMAND_Eaeg(const char* szCmdLine)
-{
-    g_pClientGame->ShowEaeg(true);
 }
 
 void COMMAND_EnterPassenger(const char* szCmdLine)
@@ -790,15 +793,6 @@ void COMMAND_ShowSyncing(const char* szCmdLine)
 
 #endif
 
-#ifdef MTA_DEBUG
-
-void COMMAND_Foo(const char* szCmdLine)
-{
-    g_pClientGame->m_Foo.Test(szCmdLine);
-}
-
-#endif
-
 #if defined(MTA_DEBUG) || defined(MTA_DEBUG_COMMANDS)
 void COMMAND_ShowWepdata(const char* szCmdLine)
 {
@@ -842,19 +836,6 @@ void COMMAND_Paintballs(const char* szCmdLine)
     g_pClientGame->SetDoPaintballs(atoi(szCmdLine) == 1);
 }
 
-void COMMAND_Breakpoint(const char* szCmdLine)
-{
-    if (!(szCmdLine && szCmdLine[0]))
-        return;
-    _asm
-    {
-        int 3
-    }
-    //   Make our main pointer easily accessable
-    //   Added by slush:  You're a lazy ass if you use this.
-    g_pClientGame;
-}
-
 void COMMAND_GiveWeapon(const char* szCmdLine)
 {
     if (!(szCmdLine && szCmdLine[0]))
@@ -889,150 +870,6 @@ void COMMAND_ShowRPCs(const char* szCmdLine)
 void COMMAND_ShowInterpolation(const char*)
 {
     g_pClientGame->ShowInterpolation(!g_pClientGame->IsShowingInterpolation());
-}
-
-void COMMAND_Watch(const char* szCmdLine)
-{
-    // Note: This code might be a little unsafe if the detouring done by the DLL happens to be done
-    //       exactly on a call to WriteProcessMemory even though the chance is small.
-    // adds a hook to a process and watches for WPMs to this one
-    DWORD        dwProcessIDs[250];
-    DWORD        pBytesReturned = 0;
-    unsigned int uiListSize = 50;
-    if (EnumProcesses(dwProcessIDs, 250 * sizeof(DWORD), &pBytesReturned))
-    {
-        for (unsigned int i = 0; i < pBytesReturned / sizeof(DWORD); i++)
-        {
-            // Open the process
-            HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, dwProcessIDs[i]);
-            if (hProcess)
-            {
-                HMODULE pModule;
-                DWORD   cbNeeded;
-                if (EnumProcessModules(hProcess, &pModule, sizeof(HMODULE), &cbNeeded))
-                {
-                    char szModuleName[500];
-                    if (GetModuleFileNameEx(hProcess, pModule, szModuleName, 500))
-                    {
-                        if (stricmp(szModuleName + strlen(szModuleName) - strlen(szCmdLine), szCmdLine) == 0)
-                        {
-                            g_pCore->GetConsole()->Printf("Attaching to %s with process id %d...", szModuleName, hProcess);
-                            RemoteLoadLibrary(hProcess, "C:/Program Files/Rockstar Games/GTA San Andreas/mta/wpmhookdll.dll");
-                            CloseHandle(hProcess);
-                            return;
-                        }
-                    }
-                }
-
-                // Close the process
-                CloseHandle(hProcess);
-            }
-        }
-    }
-}
-
-void COMMAND_Modules(const char* szCmdLine)
-{
-    // Get the base address of the requested module
-    // Take a snapshot of all modules in the specified process.
-    HANDLE hModuleSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, GetCurrentProcessId());
-    if (hModuleSnap != INVALID_HANDLE_VALUE)
-    {
-        //  Set the size of the structure before using it.
-        MODULEENTRY32 ModuleEntry;
-        ModuleEntry.dwSize = sizeof(MODULEENTRY32);
-
-        // Retrieve information about the first module,
-        // and exit if unsuccessful
-        if (Module32First(hModuleSnap, &ModuleEntry))
-        {
-            // Create a file
-            FILE* pFile = fopen("modules.txt", "w+");
-            if (pFile)
-            {
-                // Now walk the module list of the process,
-                // and display information about each module
-                do
-                {
-                    // Print it
-                    fprintf(pFile,
-                            "** MODULE **\n"
-                            "Name: %s\n"
-                            "Base: 0x%p\n"
-                            "Size: 0x%x\n"
-                            "\n",
-                            ModuleEntry.szModule, ModuleEntry.modBaseAddr, ModuleEntry.modBaseSize);
-                } while (Module32Next(hModuleSnap, &ModuleEntry));
-
-                // Close it
-                fclose(pFile);
-            }
-        }
-
-        // Close the snapshot object
-        CloseHandle(hModuleSnap);
-    }
-}
-
-#include <CClientCorona.h>
-CClientPickup* pPickupTest = NULL;
-CClientCorona* pCoronaTest = NULL;
-CVehicle*      debugTrain = NULL;
-CClientPlayer* pRonkert = NULL;
-CObject*       obj = NULL;
-
-void COMMAND_Debug(const char* szCmdLine)
-{
-    __debugbreak();
-
-    return;
-}
-
-#include "CVehicleNames.h"
-
-CVehicle* aaa = NULL;
-CVehicle* bbb = NULL;
-
-CMatrix* save = NULL;
-float    fTest = 0;
-
-#include <crtdbg.h>
-void COMMAND_Debug2(const char* szCmdLine)
-{
-    g_pGame->GetAudioEngine()->StopRadio();
-}
-
-CClientPed*     pTest = NULL;
-CClientVehicle *v, *vnew;
-
-void COMMAND_Debug3(const char* szCmdLine)
-{
-    _asm
-    {
-        pushad
-        mov     ecx, 0x8CB6F8
-        mov     eax, 0x4E7F80
-        call    eax
-        popad
-    }
-    g_pGame->GetAudioEngine()->StopRadio();
-    g_pGame->GetAudioEngine()->StartRadio(1);
-    return;
-}
-
-CVector  origin22;
-CObject* o;
-
-void COMMAND_Debug4(const char* szCmdLine)
-{
-    g_pCore->GetConsole()->Printf("debug4");
-    g_pClientGame->StartPlayback();
-    return;
-}
-
-void COMMAND_TimeStep(const char* szCmdLine)
-{
-    g_pCore->GetConsole()->Printf("TimeStep: %f", *(float*)0xB7CB5C);            // CTimer::ms_fTimeStep
 }
 
 #endif

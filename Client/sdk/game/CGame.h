@@ -225,6 +225,9 @@ public:
     virtual bool IsRoadSignsTextEnabled() const noexcept = 0;
     virtual void SetRoadSignsTextEnabled(bool isEnabled) = 0;
 
+    virtual bool IsTunnelWeatherBlendEnabled() const noexcept = 0;
+    virtual void SetTunnelWeatherBlendEnabled(bool isEnabled) = 0;
+
     virtual CWeapon*     CreateWeapon() = 0;
     virtual CWeaponStat* CreateWeaponStat(eWeaponType weaponType, eWeaponSkill weaponSkill) = 0;
 
@@ -265,8 +268,9 @@ public:
     virtual int32_t GetBaseIDforSCM() = 0;
     virtual int32_t GetCountOfAllFileIDs() = 0;
 
-    virtual void RemoveAllBuildings() = 0;
+    virtual void RemoveAllBuildings(bool clearBuildingRemoval = true) = 0;
     virtual void RestoreGameBuildings() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
+
 };

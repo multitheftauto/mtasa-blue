@@ -46,7 +46,7 @@ char * CreateHttpTime ( )
 
 HttpResponse::HttpResponse ( int inResponseId,
 							 EHSConnection * ipoEHSConnection ) :
-	m_nResponseCode ( HTTPRESPONSECODE_INVALID ),	
+	m_nResponseCode ( HTTP_STATUS_CODE_INVALID ),	
 	psBody ( NULL ),
 	nBodyLength ( 0 ),
 	m_nResponseId ( inResponseId ),
