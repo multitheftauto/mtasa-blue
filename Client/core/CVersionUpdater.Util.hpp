@@ -391,7 +391,7 @@ namespace
         SString                    GetAttribute(const SString& strName) const
         {
             const SString* pValue = MapFind(attributeMap, strName);
-            return pValue ? *pValue : SStringX("");
+            return pValue ? *pValue : SString();
         }
         void SetAttribute(const SString& strName, const SString& strValue) { MapSet(attributeMap, strName, strValue); }
     };
