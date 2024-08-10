@@ -117,7 +117,6 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
                 }
                 else
                 {
-                    // ≈сли нет параметров, создаем пустую строку
                     szParameters = std::make_unique<char[]>(1);
                     szParameters[0] = '\0';
                 }
