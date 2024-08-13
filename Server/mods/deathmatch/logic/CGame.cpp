@@ -2745,6 +2745,7 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                 {
                                     CLuaArguments arguments;
                                     arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                    arguments.PushElement(clientSource);
                                     vehicle->CallEvent("onVehicleExplode", arguments);
                                 }
 
