@@ -191,11 +191,9 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
 
 void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 {
-    vector<CLuaArgument*>::const_iterator iter = Arguments.IterBegin();
-    for (; iter != Arguments.IterEnd(); iter++)
+    for (CLuaArgument* arg : Arguments)
     {
-        CLuaArgument* pArgument = new CLuaArgument(**iter);
-        m_Arguments.push_back(pArgument);
+        m_Arguments.push_back(new CLuaArgument(*arg));
     }
 }
 
@@ -337,12 +335,28 @@ CLuaArgument* CLuaArguments::PushNumber(double dNumber)
     return pArgument;
 }
 
-CLuaArgument* CLuaArguments::PushString(const std::string& strString)
+CLuaArgument* CLuaArguments::PushString(const std::string& string)
 {
-    CLuaArgument* pArgument = new CLuaArgument();
-    pArgument->ReadString(strString);
-    m_Arguments.push_back(pArgument);
-    return pArgument;
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
+CLuaArgument* CLuaArguments::PushString(const std::string_view& string)
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
+}
+
+CLuaArgument* CLuaArguments::PushString(const char* string)
+{
+    CLuaArgument* arg = new CLuaArgument();
+    arg->ReadString(string);
+    m_Arguments.push_back(arg);
+    return arg;
 }
 
 CLuaArgument* CLuaArguments::PushResource(CResource* pResource)
