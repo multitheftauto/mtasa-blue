@@ -114,7 +114,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
     std::uint32_t viewportWidth = pGraphics->GetViewportWidth();
-    std::uint32_t sizeX = viewportWidth / 4;
+    std::uint32_t sizeX = viewportWidth / 4; // one quarter of screen width
 
     // Start of next frame?
     if (szName[0] == 0)
@@ -202,14 +202,18 @@ void CGraphStats::Draw()
         return;
 
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
+    CLocalGUI*          pLocalGUI = g_pCore->GetLocalGUI();
 
-    uint  uiViewportWidth = pGraphics->GetViewportWidth();
-    uint  uiViewportHeight = pGraphics->GetViewportHeight();
-    uint  uiOriginX = 10;
-    uint  uiOriginY = uiViewportHeight / 2;
-    uint  uiSizeX = uiViewportWidth / 4;
-    uint  uiSizeY = uiViewportHeight / 4;
-    uint  uiRangeY = 100;            // 100ms
+    uint  uiViewportWidth = pGraphics->GetViewportWidth();      // get width of current resolution
+    uint  uiViewportHeight = pGraphics->GetViewportHeight();    // get height of current resolution
+    uint  uiOriginX = 10;                                       // offset the graph by 10 pixels from left side of screen
+    uint  uiOriginY = pLocalGUI->GetChatBottomPosition();       // get chat bottom screen position
+    uint  uiSizeX = uiViewportWidth / 4;                        // set the width of graph to 1/4 of current resolution
+    uint  uiSizeY = uiViewportHeight / 4;                       // set the height of graph to 1/4 of current resolution
+    uint  uiRangeY = 100;                                       // 100ms
+
+    uiOriginY = uiOriginY + uiSizeY + 30;                       // add graph height plus a little gap to the overall Y position
+
     float fLineScale = 1 / 1000.f / uiRangeY * uiSizeY;
     float fLineHeight = pGraphics->GetDXFontHeight();
 
