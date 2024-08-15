@@ -21,13 +21,6 @@ enum class EModelLoadingScheme : uint8_t
 class CModelRenderer final
 {
 public:
-    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, EModelLoadingScheme scheme);
-
-    void Update();
-
-    void Render();
-
-private:
     struct SModelToRender final
     {
         CModelInfo* pModelInfo;
@@ -43,6 +36,16 @@ private:
         {
         }
     };
+
+    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, EModelLoadingScheme scheme);
+
+    void Update();
+
+    void Render();
+
+    static void RenderEntity(SModelToRender* entity, float distance);
+
+private:  
 
     std::vector<SModelToRender> m_Queue;
 };
