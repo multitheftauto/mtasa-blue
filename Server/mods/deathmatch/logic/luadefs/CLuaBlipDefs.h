@@ -20,8 +20,8 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Create functions
-    static std::variant<CBlip*, bool> CreateBlip(lua_State* luaVM, CVector vecPosition, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int32_t> ordering, std::optional<std::uint32_t> visibleDistance, std::optional<CElement*> visibleTo);
-    static std::variant<CBlip*, bool> CreateBlipAttachedTo(lua_State* luaVM, CElement* entity, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int32_t> ordering, std::optional<std::uint32_t> visibleDistance, std::optional<CElement*> visibleTo);
+    static std::variant<CBlip*, bool> CreateBlip(lua_State* const luaVM, const CVector vecPosition, const std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, const std::optional<std::uint8_t> r, const std::optional<std::uint8_t> g, const std::optional<std::uint8_t> b, const std::optional<std::uint8_t> a, const std::optional<std::int16_t> ordering, const std::optional<std::uint16_t> visibleDistance, const std::optional<CElement*> visibleTo);
+    static std::variant<CBlip*, bool> CreateBlipAttachedTo(lua_State* const luaVM, CElement* const entity, const std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, const std::optional<std::uint8_t> r, const std::optional<std::uint8_t> g, const std::optional<std::uint8_t> b, const std::optional<std::uint8_t> a, const std::optional<std::int16_t> ordering, const std::optional<std::uint16_t> visibleDistance, const std::optional<CElement*> visibleTo);
 
     // Get functions
     static std::uint8_t                                                            GetBlipIcon(CBlip* const radarMarker) noexcept;
@@ -31,9 +31,9 @@ public:
     static std::uint16_t                                                           GetBlipVisibleDistance(CBlip* const radarMarker) noexcept;
 
     // Set functions
-    static bool SetBlipIcon(CElement* const radarMarker, std::uint8_t icon);
-    static bool SetBlipSize(lua_State* luaVM, CElement* const radarMarker, std::uint8_t size) noexcept;
-    static bool SetBlipColor(CElement* const radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a) noexcept;
-    static bool SetBlipOrdering(CElement* const radarMarker, std::int32_t ordering) noexcept;
-    static bool SetBlipVisibleDistance(CElement* const radarMarker, std::uint32_t visibleDistance) noexcept;
+    static bool SetBlipIcon(CElement* const radarMarker, const std::uint8_t icon);
+    static bool SetBlipSize(lua_State* const luaVM, CElement* const radarMarker, std::uint8_t size) noexcept;
+    static bool SetBlipColor(CElement* const radarMarker, const std::uint8_t r, const std::uint8_t g, const std::uint8_t b, const std::uint8_t a) noexcept;
+    static bool SetBlipOrdering(CElement* const radarMarker, const std::int16_t ordering) noexcept;
+    static bool SetBlipVisibleDistance(CElement* const radarMarker, const std::uint16_t visibleDistance) noexcept;
 };

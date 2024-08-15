@@ -70,7 +70,7 @@ void CLuaBlipDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Blip", "Element");
 }
 
-std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, CVector vecPosition, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int32_t> ordering, std::optional<std::uint32_t> visibleDistance, std::optional<CElement*> visibleTo)
+std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* const luaVM, const CVector vecPosition, const std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, const std::optional<std::uint8_t> r, const std::optional<std::uint8_t> g, const std::optional<std::uint8_t> b, const std::optional<std::uint8_t> a, const std::optional<std::int16_t> ordering, const std::optional<std::uint16_t> visibleDistance, const std::optional<CElement*> visibleTo)
 {
     if (icon.has_value() && !CBlipManager::IsValidIcon(icon.value()))
         throw std::invalid_argument("Invalid icon");
@@ -81,13 +81,7 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, CVector ve
         size = Clamp<std::uint8_t>(0, size.value(), 25);
     }
 
-    if (ordering.has_value())
-        ordering = Clamp<std::int16_t>(std::numeric_limits<std::int16_t>().min(), ordering.value(), std::numeric_limits<std::int16_t>().max());
-
-    if (visibleDistance.has_value())
-        visibleDistance = Clamp<std::uint16_t>(std::numeric_limits<std::uint16_t>().min(), visibleDistance.value(), std::numeric_limits<std::uint16_t>().max());
-
-    CResource* resource = m_pLuaManager->GetVirtualMachineResource(luaVM);
+    CResource* resource = &lua_getownerresource(luaVM);
     if (!resource)
     {
         m_pScriptDebugging->LogError(luaVM, "Couldn't find the resource element");
@@ -105,7 +99,7 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, CVector ve
     return radarMarker;
 }
 
-std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, CElement* entity, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int32_t> ordering, std::optional<std::uint32_t> visibleDistance, std::optional<CElement*> visibleTo)
+std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* const luaVM, CElement* const entity, const std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, const std::optional<std::uint8_t> r, const std::optional<std::uint8_t> g, const std::optional<std::uint8_t> b, const std::optional<std::uint8_t> a, const std::optional<std::int16_t> ordering, const std::optional<std::uint16_t> visibleDistance, const std::optional<CElement*> visibleTo)
 {
     if (icon.has_value() && !CBlipManager::IsValidIcon(icon.value()))
         throw std::invalid_argument("Invalid icon");
@@ -116,13 +110,7 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, 
         size = Clamp<std::uint8_t>(0, size.value(), 25);
     }
 
-    if (ordering.has_value())
-        ordering = Clamp<std::int16_t>(std::numeric_limits<std::int16_t>().min(), ordering.value(), std::numeric_limits<std::int16_t>().max());
-
-    if (visibleDistance.has_value())
-        visibleDistance = Clamp<std::uint16_t>(std::numeric_limits<std::uint16_t>().min(), visibleDistance.value(), std::numeric_limits<std::uint16_t>().max());
-
-    CResource* resource = m_pLuaManager->GetVirtualMachineResource(luaVM);
+    CResource* resource = &lua_getownerresource(luaVM);
     if (!resource)
     {
         m_pScriptDebugging->LogError(luaVM, "Couldn't find the resource element");
@@ -142,18 +130,12 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, 
 
 std::uint8_t CLuaBlipDefs::GetBlipIcon(CBlip* const radarMarker) noexcept
 {
-    std::uint8_t icon;
-    CStaticFunctionDefinitions::GetBlipIcon(radarMarker, icon);
-
-    return icon;
+    return static_cast<std::uint8_t>(radarMarker->m_ucIcon);
 }
 
 std::uint8_t CLuaBlipDefs::GetBlipSize(CBlip* const radarMarker) noexcept
 {
-    std::uint8_t size;
-    CStaticFunctionDefinitions::GetBlipSize(radarMarker, size);
-
-    return size;
+    return static_cast<std::uint8_t>(radarMarker->m_ucSize);
 }
 
 CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t> CLuaBlipDefs::GetBlipColor(CBlip* const radarMarker) noexcept
@@ -164,21 +146,15 @@ CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t> CLuaBlip
 
 std::int16_t CLuaBlipDefs::GetBlipOrdering(CBlip* const radarMarker) noexcept
 {
-    std::int16_t blipOrdering;
-    CStaticFunctionDefinitions::GetBlipOrdering(radarMarker, blipOrdering);
-
-    return blipOrdering;
+    return static_cast<std::int16_t>(radarMarker->m_sOrdering);
 }
 
 std::uint16_t CLuaBlipDefs::GetBlipVisibleDistance(CBlip* const radarMarker) noexcept
 {
-    std::uint16_t visibleDistance;
-    CStaticFunctionDefinitions::GetBlipVisibleDistance(radarMarker, visibleDistance);
-
-    return visibleDistance;
+    return static_cast<std::uint16_t>(radarMarker->m_usVisibleDistance);
 }
 
-bool CLuaBlipDefs::SetBlipIcon(CElement* const radarMarker, std::uint8_t icon)
+bool CLuaBlipDefs::SetBlipIcon(CElement* const radarMarker, const std::uint8_t icon)
 {
     if (!CBlipManager::IsValidIcon(icon))
         throw std::invalid_argument("Invalid icon");
@@ -186,7 +162,7 @@ bool CLuaBlipDefs::SetBlipIcon(CElement* const radarMarker, std::uint8_t icon)
     return CStaticFunctionDefinitions::SetBlipIcon(radarMarker, icon);
 }
 
-bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* const radarMarker, std::uint8_t size) noexcept
+bool CLuaBlipDefs::SetBlipSize(lua_State* const luaVM, CElement* const radarMarker, std::uint8_t size) noexcept
 {
     if (size < 0 || size > 25)
     {
@@ -197,17 +173,17 @@ bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* const radarMarker, st
     return CStaticFunctionDefinitions::SetBlipSize(radarMarker, size);
 }
 
-bool CLuaBlipDefs::SetBlipColor(CElement* const radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a) noexcept
+bool CLuaBlipDefs::SetBlipColor(CElement* const radarMarker, const std::uint8_t r, const std::uint8_t g, const std::uint8_t b, const std::uint8_t a) noexcept
 {
     return CStaticFunctionDefinitions::SetBlipColor(radarMarker, SColorRGBA(r, g, b, a));
 }
 
-bool CLuaBlipDefs::SetBlipOrdering(CElement* const radarMarker, std::int32_t ordering) noexcept
+bool CLuaBlipDefs::SetBlipOrdering(CElement* const radarMarker, const std::int16_t ordering) noexcept
 {
-    return CStaticFunctionDefinitions::SetBlipOrdering(radarMarker, Clamp<std::int16_t>(std::numeric_limits<std::int16_t>().min(), ordering, std::numeric_limits<std::int16_t>().max()));
+    return CStaticFunctionDefinitions::SetBlipOrdering(radarMarker, ordering);
 }
 
-bool CLuaBlipDefs::SetBlipVisibleDistance(CElement* const radarMarker, std::uint32_t visibleDistance) noexcept
+bool CLuaBlipDefs::SetBlipVisibleDistance(CElement* const radarMarker, const std::uint16_t visibleDistance) noexcept
 {
-    return CStaticFunctionDefinitions::SetBlipVisibleDistance(radarMarker, Clamp<std::uint16_t>(std::numeric_limits<std::uint16_t>().min(), visibleDistance, std::numeric_limits<std::uint16_t>().max()));
+    return CStaticFunctionDefinitions::SetBlipVisibleDistance(radarMarker, visibleDistance);
 }
