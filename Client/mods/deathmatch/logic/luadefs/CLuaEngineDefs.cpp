@@ -2554,7 +2554,7 @@ void CLuaEngineDefs::EnginePreloadWorldArea(PreloadAreaOption option, CVector po
     switch (option)
     {
         case PreloadAreaOption::ALL:
-        case PreloadAreaOption::WORLD_OBJECTS:
+        case PreloadAreaOption::MODELS:
             g_pGame->GetStreaming()->LoadScene(&position);
 
             if (option != PreloadAreaOption::ALL)

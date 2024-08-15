@@ -39,7 +39,7 @@ enum class eModelLoadState : std::uint32_t
 
 enum class PreloadAreaOption
 {
-    WORLD_OBJECTS = 0,
+    MODELS = 0,
     COLLISIONS,
     ALL
 };

@@ -905,7 +905,7 @@ ADD_ENUM(eModelLoadState::LOADSTATE_FINISHING, "finishing")
 IMPLEMENT_ENUM_CLASS_END("model-load-state")
 
 IMPLEMENT_ENUM_CLASS_BEGIN(PreloadAreaOption)
-ADD_ENUM(PreloadAreaOption::WORLD_OBJECTS, "world_objects")
+ADD_ENUM(PreloadAreaOption::MODELS, "models")
 ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
 ADD_ENUM(PreloadAreaOption::ALL, "all")
 IMPLEMENT_ENUM_CLASS_END("preload-area-option")
