@@ -78,14 +78,14 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, CVector ve
     if (size.has_value() && (size.value() < 0 || size.value() > 25))
     {
         m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size.value()));
-        size = Clamp(0ui8, size.value(), 25ui8);
+        size = Clamp<std::uint8_t>(0, size.value(), 25);
     }
 
     if (ordering.has_value())
-        ordering = Clamp(std::numeric_limits<std::int16_t>().min(), (std::int16_t)ordering.value(), std::numeric_limits<std::int16_t>().max());
+        ordering = Clamp<std::int16_t>(std::numeric_limits<std::int16_t>().min(), ordering.value(), std::numeric_limits<std::int16_t>().max());
 
     if (visibleDistance.has_value())
-        visibleDistance = Clamp(std::numeric_limits<std::uint16_t>().min(), (std::uint16_t)visibleDistance.value(), std::numeric_limits<std::uint16_t>().max());
+        visibleDistance = Clamp<std::uint16_t>(std::numeric_limits<std::uint16_t>().min(), visibleDistance.value(), std::numeric_limits<std::uint16_t>().max());
 
     CResource* resource = m_pLuaManager->GetVirtualMachineResource(luaVM);
     if (!resource)
@@ -113,14 +113,14 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, 
     if (size.has_value() && (size.value() < 0 || size.value() > 25))
     {
         m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size.value()));
-        size = Clamp(0ui8, size.value(), 25ui8);
+        size = Clamp<std::uint8_t>(0, size.value(), 25);
     }
 
     if (ordering.has_value())
-        ordering = Clamp(std::numeric_limits<std::int16_t>().min(), (std::int16_t)ordering.value(), std::numeric_limits<std::int16_t>().max());
+        ordering = Clamp<std::int16_t>(std::numeric_limits<std::int16_t>().min(), ordering.value(), std::numeric_limits<std::int16_t>().max());
 
     if (visibleDistance.has_value())
-        visibleDistance = Clamp(std::numeric_limits<std::uint16_t>().min(), (std::uint16_t)visibleDistance.value(), std::numeric_limits<std::uint16_t>().max());
+        visibleDistance = Clamp<std::uint16_t>(std::numeric_limits<std::uint16_t>().min(), visibleDistance.value(), std::numeric_limits<std::uint16_t>().max());
 
     CResource* resource = m_pLuaManager->GetVirtualMachineResource(luaVM);
     if (!resource)
@@ -191,7 +191,7 @@ bool CLuaBlipDefs::SetBlipSize(lua_State* luaVM, CElement* const radarMarker, st
     if (size < 0 || size > 25)
     {
         m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size));
-        size = Clamp(0ui8, size, 25ui8);
+        size = Clamp<std::uint8_t>(0, size, 25);
     }
 
     return CStaticFunctionDefinitions::SetBlipSize(radarMarker, size);
@@ -204,10 +204,10 @@ bool CLuaBlipDefs::SetBlipColor(CElement* const radarMarker, std::uint8_t r, std
 
 bool CLuaBlipDefs::SetBlipOrdering(CElement* const radarMarker, std::int32_t ordering) noexcept
 {
-    return CStaticFunctionDefinitions::SetBlipOrdering(radarMarker, Clamp(std::numeric_limits<std::int16_t>().min(), (std::int16_t)ordering, std::numeric_limits<std::int16_t>().max()));
+    return CStaticFunctionDefinitions::SetBlipOrdering(radarMarker, Clamp<std::int16_t>(std::numeric_limits<std::int16_t>().min(), ordering, std::numeric_limits<std::int16_t>().max()));
 }
 
 bool CLuaBlipDefs::SetBlipVisibleDistance(CElement* const radarMarker, std::uint32_t visibleDistance) noexcept
 {
-    return CStaticFunctionDefinitions::SetBlipVisibleDistance(radarMarker, Clamp(std::numeric_limits<std::uint16_t>().min(), (std::uint16_t)visibleDistance, std::numeric_limits<std::uint16_t>().max()));
+    return CStaticFunctionDefinitions::SetBlipVisibleDistance(radarMarker, Clamp<std::uint16_t>(std::numeric_limits<std::uint16_t>().min(), visibleDistance, std::numeric_limits<std::uint16_t>().max()));
 }
