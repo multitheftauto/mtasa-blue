@@ -35,4 +35,5 @@ public:
     static bool SetObjectBreakable(CObject* const pObject, const bool bBreakable);
     LUA_DECLARE(MoveObject);
     LUA_DECLARE(StopObject);
+    static bool BreakObject(CObject* const pObject);
 };

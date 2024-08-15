@@ -275,8 +275,10 @@ void CRemoteCall::DownloadFinishedCallback(const SHttpDownloadResult& result)
 
     // Append stored arguments
     if (pCall->IsFetch())
-        for (uint i = 0; i < pCall->GetFetchArguments().Count(); i++)
-            arguments.PushArgument(*(pCall->GetFetchArguments()[i]));
+    {
+        for (CLuaArgument* argument : pCall->GetFetchArguments())
+            arguments.PushArgument(*argument);
+    }
 
     if (pCall->m_VM)
         arguments.Call(pCall->m_VM, pCall->m_iFunction);

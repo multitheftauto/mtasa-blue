@@ -1,16 +1,17 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        game_sa/CVehicleSA.cpp
+ *  FILE:        Client/game_sa/CVehicleSA.cpp
  *  PURPOSE:     Vehicle base entity
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
 #include "StdInc.h"
 #include "CAutomobileSA.h"
+#include "CBikeSA.h"
 #include "CCameraSA.h"
 #include "CColModelSA.h"
 #include "CFxManagerSA.h"
@@ -492,6 +493,37 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
 {
     auto pInterface = static_cast<CPlaneSAInterface*>(GetInterface());
     pInterface->m_fPropSpeed = fSpeed;
+}
+
+bool CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
+{ 
+    VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleSubClass);
+    switch (m_eVehicleType)
+    {
+        case VehicleClass::AUTOMOBILE:
+        case VehicleClass::MONSTER_TRUCK:
+        case VehicleClass::QUAD:
+        case VehicleClass::TRAILER:
+        {
+            auto pInterface = static_cast<CAutomobileSAInterface*>(GetInterface());
+            pInterface->m_wheelRotation[0] = fWheelRot1;
+            pInterface->m_wheelRotation[1] = fWheelRot2;
+            pInterface->m_wheelRotation[2] = fWheelRot3;
+            pInterface->m_wheelRotation[3] = fWheelRot4;
+            return true;
+        }
+        case VehicleClass::BIKE:
+        case VehicleClass::BMX:
+        {
+            auto pInterface = static_cast<CBikeSAInterface*>(GetInterface());
+            pInterface->m_afWheelRotationX[0] = fWheelRot1;
+            pInterface->m_afWheelRotationX[1] = fWheelRot2;
+            return true;
+        }
+        default:
+            return false;
+    }
+    return false;
 }
 
 float CVehicleSA::GetPlaneRotorSpeed() 
@@ -1288,7 +1320,7 @@ void CVehicleSA::RecalculateHandling()
     if (!m_pHandlingData)
         return;
 
-    m_pHandlingData->Recalculate(GetModelIndex());
+    m_pHandlingData->Recalculate();
 
     // Recalculate the suspension lines
     RecalculateSuspensionLines();
@@ -1667,11 +1699,6 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
-    // if suspension is master disabled or suspension hasn't changed return.
-    // if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
-    //{
-    //    return;
-    //}
 
     DWORD       dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);

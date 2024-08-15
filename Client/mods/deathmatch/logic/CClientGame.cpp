@@ -32,6 +32,8 @@
 #include <game/CWeaponStatManager.h>
 #include <game/CWeather.h>
 #include <game/Task.h>
+#include <game/CBuildingRemoval.h>
+#include "game/CClock.h"
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -274,6 +276,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
+    g_pMultiplayer->SetPostColorFilterRenderHandler(CClientGame::StaticPostColorFilterRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(false);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(CClientGame::StaticCAnimBlendAssocDestructorHandler);
@@ -351,9 +354,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Add our lua events
     AddBuiltInEvents();
-
-    // Init debugger class
-    m_Foo.Init(this);
 
     // Load some stuff from the core config
     float fScale;
@@ -480,6 +480,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
+    g_pMultiplayer->SetPostColorFilterRenderHandler(nullptr);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
     g_pMultiplayer->DisableCallsToCAnimBlendNode(true);
     g_pMultiplayer->SetCAnimBlendAssocDestructorHandler(NULL);
@@ -1124,9 +1125,6 @@ void CClientGame::DoPulses()
         m_bFirstPlaybackFrame = false;
     }
 
-    // Call debug code if debug mode
-    m_Foo.DoPulse();
-
     // Output stuff from our server eventually
     m_Server.Pulse();
 
@@ -1623,12 +1621,6 @@ void CClientGame::ShowNetstat(int iCmd)
     m_bShowNetstat = bShow;
 }
 
-void CClientGame::ShowEaeg(bool)
-{
-    if (m_pLocalPlayer)
-        m_pLocalPlayer->SetStat(0x2329, 1.0f);
-}
-
 #ifdef MTA_WEPSYNCDBG
 void CClientGame::ShowWepdata(const char* szNick)
 {
@@ -2046,13 +2038,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastCarTwoWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetCarTwoWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("2wheeler");
         Arguments.PushNumber(ulLastCarTwoWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastCarTwoWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastCarTwoWheelCounter = ulTemp;
@@ -2073,13 +2063,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastBikeRearWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetBikeRearWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("wheelie");
         Arguments.PushNumber(ulLastBikeRearWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastBikeRearWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastBikeRearWheelCounter = ulTemp;
@@ -2100,13 +2088,11 @@ void CClientGame::UpdateStunts()
     // Did we finish a stunt?
     else if (ulLastBikeFrontWheelCounter != 0 && ulTemp == 0)
     {
-        float fDistance = g_pGame->GetPlayerInfo()->GetBikeFrontWheelDist();
-
         // Call our stunt event
         CLuaArguments Arguments;
         Arguments.PushString("stoppie");
         Arguments.PushNumber(ulLastBikeFrontWheelCounter);
-        Arguments.PushNumber(fDistance);
+        Arguments.PushNumber(fLastBikeFrontWheelDist);
         m_pLocalPlayer->CallEvent("onClientPlayerStuntFinish", Arguments, true);
     }
     ulLastBikeFrontWheelCounter = ulTemp;
@@ -2658,7 +2644,7 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientPlayerRadioSwitch", "", NULL, false);
     m_Events.AddEvent("onClientPlayerDamage", "attacker, weapon, bodypart", NULL, false);
     m_Events.AddEvent("onClientPlayerWeaponFire", "weapon, ammo, ammoInClip, hitX, hitY, hitZ, hitElement", NULL, false);
-    m_Events.AddEvent("onClientPlayerWasted", "", NULL, false);
+    m_Events.AddEvent("onClientPlayerWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onClientPlayerChoke", "", NULL, false);
     m_Events.AddEvent("onClientPlayerVoiceStart", "", NULL, false);
     m_Events.AddEvent("onClientPlayerVoiceStop", "", NULL, false);
@@ -2725,6 +2711,7 @@ void CClientGame::AddBuiltInEvents()
 
     // Console events
     m_Events.AddEvent("onClientConsole", "text", NULL, false);
+    m_Events.AddEvent("onClientCoreCommand", "command", NULL, false);
 
     // Chat events
     m_Events.AddEvent("onClientChatMessage", "text, r, g, b, messageType", NULL, false);
@@ -3436,7 +3423,7 @@ void CClientGame::Event_OnIngame()
 
     g_pMultiplayer->DeleteAndDisableGangTags();
 
-    g_pGame->GetWorld()->ClearRemovedBuildingLists();
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
     g_pGame->GetWorld()->SetOcclusionsEnabled(true);
 
     g_pGame->ResetModelLodDistances();
@@ -3622,6 +3609,11 @@ void CClientGame::StaticPreFxRenderHandler()
     g_pCore->OnPreFxRender();
 }
 
+void CClientGame::StaticPostColorFilterRenderHandler()
+{
+    g_pCore->OnPostColorFilterRender();
+}
+
 void CClientGame::StaticPreHudRenderHandler()
 {
     g_pCore->OnPreHUDRender();
@@ -3634,10 +3626,10 @@ bool CClientGame::StaticProcessCollisionHandler(CEntitySAInterface* pThisInterfa
 
 bool CClientGame::StaticVehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                                 float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
-                                                CVector vecCollisionVelocity)
+                                                CVector vecCollisionVelocity, bool isProjectile)
 {
     return g_pClientGame->VehicleCollisionHandler(pCollidingVehicle, pCollidedVehicle, iModelIndex, fDamageImpulseMag, fCollidingDamageImpulseMag, usPieceType,
-                                                  vecCollisionPos, vecCollisionVelocity);
+                                                  vecCollisionPos, vecCollisionVelocity, isProjectile);
 }
 
 bool CClientGame::StaticVehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
@@ -4563,7 +4555,7 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
 }
 
 bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag,
-                                          float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity)
+                                          float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity, bool isProjectile)
 {
     if (pCollidingVehicle && pCollidedWith)
     {
@@ -4578,7 +4570,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
             }
 
             CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
-            CClientEntity*  pCollidedWithClientEntity = pPools->GetClientEntity((DWORD*)pCollidedWith);
+            CClientEntity*  pCollidedWithClientEntity = !isProjectile ? pPools->GetClientEntity((DWORD*)pCollidedWith) : m_pManager->GetProjectileManager()->Get(pCollidedWith);
 
             CLuaArguments Arguments;
             if (pCollidedWithClientEntity)
@@ -5429,6 +5421,7 @@ void CClientGame::ResetMapInfo()
 
     // Hud
     g_pGame->GetHud()->SetComponentVisible(HUD_ALL, true);
+
     // Disable area names as they are on load until camera unfades
     g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     g_pGame->GetHud()->SetComponentVisible(HUD_VITAL_STATS, false);
@@ -5544,8 +5537,33 @@ void CClientGame::ResetMapInfo()
     // Moon size
     g_pMultiplayer->ResetMoonSize();
 
+    // World properties
+    g_pMultiplayer->ResetAmbientColor();
+    g_pMultiplayer->ResetAmbientObjectColor();
+    g_pMultiplayer->ResetDirectionalColor();
+    g_pMultiplayer->ResetSpriteSize();
+    g_pMultiplayer->ResetSpriteBrightness();
+    g_pMultiplayer->ResetPoleShadowStrength();
+    g_pMultiplayer->ResetShadowStrength();
+    g_pMultiplayer->ResetShadowsOffset();
+    g_pMultiplayer->ResetLightsOnGroundBrightness();
+    g_pMultiplayer->ResetLowCloudsColor();
+    g_pMultiplayer->ResetBottomCloudsColor();
+    g_pMultiplayer->ResetCloudsAlpha1();
+    g_pMultiplayer->ResetIllumination();
+    g_pGame->GetWeather()->ResetWetRoads();
+    g_pGame->GetWeather()->ResetFoggyness();
+    g_pGame->GetWeather()->ResetFog();
+    g_pGame->GetWeather()->ResetRainFog();
+    g_pGame->GetWeather()->ResetWaterFog();
+    g_pGame->GetWeather()->ResetSandstorm();
+    g_pGame->GetWeather()->ResetRainbow();
+
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
+
+    // Reset Frozen Time
+    g_pGame->GetClock()->ResetTimeFrozen();
 
     // Close all garages
     CGarage*  pGarage = NULL;
@@ -5589,7 +5607,7 @@ void CClientGame::ResetMapInfo()
     if (pPlayerInfo)
         pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
-    RestreamWorld(true);
+    RestreamWorld();
 
     ReinitMarkers();
 }
@@ -5665,6 +5683,8 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             else
                 Arguments.PushBoolean(false);
             Arguments.PushBoolean(false);
+            Arguments.PushNumber(animGroup);
+            Arguments.PushNumber(animID);
             m_pLocalPlayer->CallEvent("onClientPlayerWasted", Arguments, true);
 
             // Write some death info
@@ -6108,6 +6128,9 @@ bool CClientGame::SetWorldSpecialProperty(WorldSpecialProperty property, bool is
         case WorldSpecialProperty::ROADSIGNSTEXT:
             g_pGame->SetRoadSignsTextEnabled(isEnabled);
             return true;
+        case WorldSpecialProperty::TUNNELWEATHERBLEND:
+            g_pGame->SetTunnelWeatherBlendEnabled(isEnabled);
+            return true;
     }
     return false;
 }
@@ -6143,6 +6166,8 @@ bool CClientGame::IsWorldSpecialProperty(WorldSpecialProperty property)
             return g_pGame->IsExtendedWaterCannonsEnabled();
         case WorldSpecialProperty::ROADSIGNSTEXT:
             return g_pGame->IsRoadSignsTextEnabled();
+        case WorldSpecialProperty::TUNNELWEATHERBLEND:
+            return g_pGame->IsTunnelWeatherBlendEnabled();
     }
     return false;
 }
@@ -6805,7 +6830,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
             m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
-void CClientGame::RestreamWorld(bool removeBigBuildings)
+void CClientGame::RestreamWorld()
 {
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
@@ -6818,9 +6843,7 @@ void CClientGame::RestreamWorld(bool removeBigBuildings)
     m_pManager->GetPedManager()->RestreamAllPeds();
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
-    if (removeBigBuildings)
-        g_pGame->GetStreaming()->RemoveBigBuildings();
-
+    g_pGame->GetStreaming()->RemoveBigBuildings();
     g_pGame->GetStreaming()->ReinitStreaming();
 }
 

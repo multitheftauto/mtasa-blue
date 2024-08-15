@@ -171,9 +171,10 @@ public:
     CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
     CIplStore*                GetIplStore() { return m_pIplStore; };
     CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
-    CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
+    CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };    
+    CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const override { return m_pRenderer.get(); }
-
+    
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
     CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup);
@@ -244,6 +245,10 @@ public:
 
     bool IsRoadSignsTextEnabled() const noexcept override { return m_isRoadSignsTextEnabled; }
     void SetRoadSignsTextEnabled(bool isEnabled) override;
+
+    bool IsTunnelWeatherBlendEnabled() const noexcept override { return m_isTunnelWeatherBlendEnabled; }
+    void SetTunnelWeatherBlendEnabled(bool isEnabled) override;
+
 
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
@@ -341,6 +346,7 @@ private:
     CObjectGroupPhysicalProperties* m_pObjectGroupPhysicalProperties;
     CCoverManagerSA*                m_pCoverManager;
     CPlantManagerSA*                m_pPlantManager;
+    CBuildingRemoval*               m_pBuildingRemoval;
 
     std::unique_ptr<CRendererSA>    m_pRenderer;
 
@@ -365,10 +371,12 @@ private:
     int          m_iCheckStatus;
     bool         m_bUnderworldWarp;
     bool         m_isCoronaZTestEnabled{true};
+    bool         m_isTunnelWeatherBlendEnabled{true}; 
     bool         m_areWaterCreaturesEnabled{true};
     bool         m_isBurnFlippedCarsEnabled{true};
     bool         m_isFireballDestructEnabled{true};
     bool         m_isRoadSignsTextEnabled{true};
+    bool         m_isBuildingsRemoved{false};
     bool         m_isExtendedWaterCannonsEnabled{false};
 
     static unsigned int&  ClumpOffset;

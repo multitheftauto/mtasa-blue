@@ -302,7 +302,7 @@ public:
 
     bool GetRotorSpeed(float&);
     bool SetRotorSpeed(float);
-
+    bool SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept;
     void SetHeliRotorSpeed(float fSpeed);
     void SetPlaneRotorSpeed(float fSpeed);
     bool IsHeliSearchLightVisible();
@@ -542,6 +542,8 @@ public:
     bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const;
     bool SetDummyPosition(eVehicleDummies dummy, const CVector& position);
     bool ResetDummyPositions();
+
+    CVector GetEntryPoint(std::uint32_t entryPointIndex);
 
 protected:
     void ConvertComponentRotationBase(const SString& vehicleComponent, CVector& vecInOutRotation, EComponentBaseType inputBase, EComponentBaseType outputBase);

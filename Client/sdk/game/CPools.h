@@ -86,6 +86,7 @@ public:
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
     virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
+    virtual SClientEntity<CPedSA>* GetPed(size_t pos) = 0;
     virtual CPed*                  GetPedFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long          GetPedCount() = 0;
 

@@ -54,7 +54,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceLoadFailureReason", getResourceLoadFailureReason},
         {"getResourceLastStartTime", getResourceLastStartTime},
         {"getResourceLoadTime", getResourceLoadTime},
-        {"getResourceName", getResourceName},
+        {"getResourceName", ArgumentParserWarn<false, GetResourceName>},
         {"getResourceRootElement", getResourceRootElement},
         {"getResourceDynamicElementRoot", getResourceDynamicElementRoot},
         {"getResourceMapRootElement", getResourceMapRootElement},
@@ -898,23 +898,17 @@ int CLuaResourceDefs::getResourceLoadTime(lua_State* luaVM)
     return 1;
 }
 
-int CLuaResourceDefs::getResourceName(lua_State* luaVM)
+std::string CLuaResourceDefs::GetResourceName(lua_State* luaVM, std::optional<CResource*> resourceElement)
 {
-    CResource* pResource;
+    if (resourceElement.has_value())
+        return (*resourceElement)->GetName();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pResource);
+    CResource* localResource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        lua_pushstring(luaVM, pResource->GetName().c_str());
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    if (!localResource)
+        throw std::invalid_argument("Couldn't find the resource");
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return localResource->GetName();
 }
 
 int CLuaResourceDefs::getResourceRootElement(lua_State* luaVM)
@@ -1178,7 +1172,7 @@ int CLuaResourceDefs::call(lua_State* luaVM)
                     OldResourceRoot.Push(targetLuaVM);
                     lua_setglobal(targetLuaVM, "sourceResourceRoot");
 
-                    return returns.Count();
+                    return static_cast<int>(returns.Count());
                 }
                 else
                 {
@@ -1391,9 +1385,9 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
         {
             CLuaArguments returnValues;
             callbackArguments.Call(pLuaMain, iLuaFunction, &returnValues);
-            if (returnValues.Count())
+            if (returnValues.IsNotEmpty())
             {
-                CLuaArgument* returnedValue = *returnValues.IterBegin();
+                CLuaArgument* returnedValue = *returnValues.begin();
                 int           iType = returnedValue->GetType();
                 if (iType == LUA_TNIL)
                     break;
