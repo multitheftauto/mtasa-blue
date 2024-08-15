@@ -15,6 +15,8 @@
 #include "CStaticFunctionDefinitions.h"
 #include "lua/CLuaFunctionParser.h"
 
+constexpr std::uint8_t MAX_BLIP_SIZE = 25;
+
 void CLuaBlipDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -75,10 +77,10 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* const luaVM, cons
     if (icon.has_value() && !CBlipManager::IsValidIcon(icon.value()))
         throw std::invalid_argument("Invalid icon");
 
-    if (size.has_value() && (size.value() < 0 || size.value() > 25))
+    if (size.has_value() && size.value() > MAX_BLIP_SIZE)
     {
-        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size.value()));
-        size = Clamp<std::uint8_t>(0, size.value(), 25);
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.", MAX_BLIP_SIZE, size.value(), MAX_BLIP_SIZE));
+        size = MAX_BLIP_SIZE;
     }
 
     CResource* resource = &lua_getownerresource(luaVM);
@@ -104,10 +106,10 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* const l
     if (icon.has_value() && !CBlipManager::IsValidIcon(icon.value()))
         throw std::invalid_argument("Invalid icon");
 
-    if (size.has_value() && (size.value() < 0 || size.value() > 25))
+    if (size.has_value() && size.value() > MAX_BLIP_SIZE)
     {
-        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size.value()));
-        size = Clamp<std::uint8_t>(0, size.value(), 25);
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.", MAX_BLIP_SIZE, size.value(), MAX_BLIP_SIZE));
+        size = MAX_BLIP_SIZE;
     }
 
     CResource* resource = &lua_getownerresource(luaVM);
@@ -164,10 +166,10 @@ bool CLuaBlipDefs::SetBlipIcon(CElement* const radarMarker, const std::uint8_t i
 
 bool CLuaBlipDefs::SetBlipSize(lua_State* const luaVM, CElement* const radarMarker, std::uint8_t size) noexcept
 {
-    if (size < 0 || size > 25)
+    if (size > MAX_BLIP_SIZE)
     {
-        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond 25 is no longer supported (got %i). It will be clamped between 0 and 25.", size));
-        size = Clamp<std::uint8_t>(0, size, 25);
+        m_pScriptDebugging->LogWarning(luaVM, SString("Blip size beyond %i is no longer supported (got %i). It will be clamped between 0 and %i.", MAX_BLIP_SIZE, size, MAX_BLIP_SIZE));
+        size = MAX_BLIP_SIZE;
     }
 
     return CStaticFunctionDefinitions::SetBlipSize(radarMarker, size);
