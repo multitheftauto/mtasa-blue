@@ -178,8 +178,7 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
         return -1;
 
     // If read size is large, limit it to how many bytes can be read (avoid memory problems with over allocation)
-    // large : >10KB
-    if (ulSize > 10240)
+    if (ulSize > 10000)
     {
         long lCurrentPos = ftell(m_pFile);
         fseek(m_pFile, 0, SEEK_END);
@@ -198,15 +197,7 @@ long CScriptFile::Read(unsigned long ulSize, SString& outBuffer)
         return -2;
     }
 
-    auto bytesRead = fread(outBuffer.data(), 1, ulSize, m_pFile);
-
-    // EOF reached or error was thrown?
-    if (feof(m_pFile) || ferror(m_pFile))
-    {
-        // if so, truncate the data to the amount of bytes read
-        outBuffer.resize(bytesRead + 1);
-    }
-    return bytesRead;
+    return fread(outBuffer.data(), 1, ulSize, m_pFile);
 }
 
 long CScriptFile::Write(unsigned long ulSize, const char* pData)

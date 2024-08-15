@@ -440,6 +440,16 @@ void CModelInfoSA::Remove()
     }
 }
 
+bool CModelInfoSA::UnloadUnused()
+{
+    if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
+    {
+        pGame->GetStreaming()->RemoveModel(m_dwModelID);
+        return true;
+    }
+    return false;
+}
+
 bool CModelInfoSA::IsLoaded()
 {
     if (DoIsLoaded())
@@ -1035,7 +1045,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
     for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
         pGame->GetStreaming()->RemoveModel(*it);
-        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = 0;
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 
