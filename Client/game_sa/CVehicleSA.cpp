@@ -1322,49 +1322,41 @@ void CVehicleSA::RecalculateHandling()
     // Put it in our interface
     CVehicleSAInterface* pInt = GetVehicleInterface();
     unsigned int         uiHandlingFlags = m_pHandlingData->GetInterface()->uiHandlingFlags;
-    // user error correction - NOS_INST = NOS Installed t/f
-    // if nos is installed we need the flag set
-    if (pInt->m_upgrades[0] && pInt->m_upgrades[0] >= 1008 && pInt->m_upgrades[0] <= 1010)
+    bool                 hydralicsInstalled, nitroInstalled;
+
+    // We check whether the user has not set incorrect flags via handlingFlags in the case of nitro and hydraulics
+    // If this happened, we need to correct it
+    for (std::int16_t upgradeID : pInt->m_upgrades)
     {
-        // Flag not enabled?
-        if (uiHandlingFlags | HANDLING_NOS_Flag)
+        // Empty upgrades value is -1
+        if (upgradeID < 0)
+            continue;
+
+        // If NOS is installed we need set the flag
+        if ((upgradeID >= 1008 && upgradeID <= 1010) && uiHandlingFlags | HANDLING_NOS_Flag)
         {
-            // Set zee flag
             uiHandlingFlags |= HANDLING_NOS_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
+            nitroInstalled = true;
         }
-    }
-    else
-    {
-        // Flag Enabled?
-        if (uiHandlingFlags & HANDLING_NOS_Flag)
+
+        // If hydraulics is installed we need set the flag
+        if (upgradeID == 1087 && uiHandlingFlags | HANDLING_Hydraulics_Flag)
         {
-            // Unset the flag
-            uiHandlingFlags &= ~HANDLING_NOS_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
-        }
-    }
-    // Hydraulics Flag fixing
-    if (pInt->m_upgrades[1] && pInt->m_upgrades[1] == 1087)
-    {
-        // Flag not enabled?
-        if (uiHandlingFlags | HANDLING_Hydraulics_Flag)
-        {
-            // Set zee flag
             uiHandlingFlags |= HANDLING_Hydraulics_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
+            hydralicsInstalled = true;
         }
     }
-    else
-    {
-        // Flag Enabled?
-        if (uiHandlingFlags & HANDLING_Hydraulics_Flag)
-        {
-            // Unset the flag
-            uiHandlingFlags &= ~HANDLING_Hydraulics_Flag;
-            m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
-        }
-    }
+
+    // If hydraulics isn't installed we need unset the flag
+    if (!hydralicsInstalled && uiHandlingFlags & HANDLING_Hydraulics_Flag)
+        uiHandlingFlags &= ~HANDLING_Hydraulics_Flag;
+
+    // If NOS isn't installed we need unset the flag
+    if (!nitroInstalled && uiHandlingFlags & HANDLING_NOS_Flag)
+        uiHandlingFlags &= ~HANDLING_NOS_Flag;
+
+    m_pHandlingData->SetHandlingFlags(uiHandlingFlags);
+
     pInt->dwHandlingFlags = uiHandlingFlags;
     pInt->m_fMass = m_pHandlingData->GetInterface()->fMass;
     pInt->m_fTurnMass = m_pHandlingData->GetInterface()->fTurnMass;            // * pGame->GetHandlingManager()->GetTurnMassMultiplier();
