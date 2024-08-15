@@ -903,6 +903,14 @@ ADD_ENUM(CResourceFile::eResourceCategory::FILES, "file")
 ADD_ENUM(CResourceFile::eResourceCategory::MAPS, "map")
 ADD_ENUM(CResourceFile::eResourceCategory::SCRIPTS, "script")
 IMPLEMENT_ENUM_CLASS_END("resource-category-type")
+  
+IMPLEMENT_ENUM_CLASS_BEGIN(eModelLoadState)
+ADD_ENUM(eModelLoadState::LOADSTATE_NOT_LOADED, "unloaded")
+ADD_ENUM(eModelLoadState::LOADSTATE_LOADED, "loaded")
+ADD_ENUM(eModelLoadState::LOADSTATE_REQUESTED, "requested")
+ADD_ENUM(eModelLoadState::LOADSTATE_READING, "reading")
+ADD_ENUM(eModelLoadState::LOADSTATE_FINISHING, "finishing")
+IMPLEMENT_ENUM_CLASS_END("model-load-state")
 
 //
 // CResource from userdata
@@ -1276,22 +1284,12 @@ void CheckCanModifyOtherResource(CScriptArgReader& argStream, CResource* pThisRe
     // No operation on the client
 }
 
-std::pair<bool, std::string> CheckCanModifyOtherResource(CResource* pThisResource, CResource* pOtherResource) noexcept
-{
-    return {true, ""};
-}
-
 //
 // Set error if pThisResource does not have permission to modify every resource in resourceList
 //
 void CheckCanModifyOtherResources(CScriptArgReader& argStream, CResource* pThisResource, std::initializer_list<CResource*> resourceList)
 {
     // No operation on the client
-}
-
-std::pair<bool, std::string> CheckCanModifyOtherResources(CResource* pThisResource, std::initializer_list<CResource*> resourceList) noexcept
-{
-    return {true, ""};
 }
 
 //
@@ -1301,9 +1299,4 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
                                      bool* pbReadOnly)
 {
     // No operation on the client
-}
-
-std::pair<bool, std::string> CheckCanAccessOtherResourceFile(CResource* pThisResource, CResource* pOtherResource, const SString& strAbsPath, bool* pbReadOnly) noexcept
-{
-    return {true, ""};
 }
