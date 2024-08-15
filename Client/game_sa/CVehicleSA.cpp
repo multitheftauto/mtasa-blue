@@ -1953,7 +1953,7 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
     if (strName == "")
     {
         // In MTA variant 255 means no variant
-        if (m_ucVariantCount == 0 && m_ucVariant == 255 || m_ucVariantCount == 1 && m_ucVariant2 == 255)
+        if ((m_ucVariantCount == 0 && m_ucVariant == 255) || (m_ucVariantCount == 1 && m_ucVariant2 == 255))
             return;
 
         // name starts with extra
