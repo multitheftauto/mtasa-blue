@@ -79,8 +79,8 @@ public:
     void          MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
     std::uint32_t GetMemoryUsed() const override;
 
-    void LoadScene(CVector* position);
-    void LoadSceneCollision(CVector* position);
+    void LoadScene(const CVector* position);
+    void LoadSceneCollision(const CVector* position);
 
 private:
     void AllocateArchive();

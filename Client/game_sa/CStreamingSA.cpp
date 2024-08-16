@@ -504,14 +504,14 @@ void CStreamingSA::RemoveBigBuildings()
     (reinterpret_cast<void(__cdecl*)()>(0x4093B0))();
 }
 
-void CStreamingSA::LoadScene(CVector* position)
+void CStreamingSA::LoadScene(const CVector* position)
 {
-    auto CStreaming_LoadScene = (void(__cdecl*)(CVector*))FUNC_CStreaming_LoadScene;
+    auto CStreaming_LoadScene = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadScene;
     CStreaming_LoadScene(position);
 }
 
-void CStreamingSA::LoadSceneCollision(CVector* position)
+void CStreamingSA::LoadSceneCollision(const CVector* position)
 {
-    auto CStreaming_LoadSceneCollision = (void(__cdecl*)(CVector*))FUNC_CStreaming_LoadSceneCollision;
+    auto CStreaming_LoadSceneCollision = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadSceneCollision;
     CStreaming_LoadSceneCollision(position);
 }

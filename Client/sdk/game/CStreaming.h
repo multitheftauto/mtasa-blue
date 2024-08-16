@@ -75,6 +75,6 @@ public:
     virtual void   MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
     virtual std::uint32_t GetMemoryUsed() const = 0;
     virtual void          RemoveBigBuildings() = 0;
-    virtual void          LoadScene(CVector* position) = 0;
-    virtual void          LoadSceneCollision(CVector* position) = 0;
+    virtual void          LoadScene(const CVector* position) = 0;
+    virtual void          LoadSceneCollision(const CVector* position) = 0;
 };
