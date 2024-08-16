@@ -684,6 +684,17 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
         push    dwModelID
         call    dwFunc
     }
+
+    // GTA SA only does this when CVehicle::ClearVehicleUpgradeFlags returns false.
+    // In the case of hydraulics and nitro, this function does not return false and the upgrade is never removed from the array
+    for (auto& upgrade : GetVehicleInterface()->m_upgrades)
+    {
+        if (upgrade == dwModelID)
+        {
+            upgrade = -1;
+            break;
+        }
+    }
 }
 
 bool CVehicleSA::DoesSupportUpgrade(const SString& strFrameName)
@@ -1326,7 +1337,7 @@ void CVehicleSA::RecalculateHandling()
 
     // We check whether the user has not set incorrect flags via handlingFlags in the case of nitro and hydraulics
     // If this happened, we need to correct it
-    for (std::int16_t upgradeID : pInt->m_upgrades)
+    for (auto& upgradeID : pInt->m_upgrades)
     {
         // Empty upgrades value is -1
         if (upgradeID < 0)
