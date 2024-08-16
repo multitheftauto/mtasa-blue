@@ -104,6 +104,7 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
+                                                                             {"setTimeFrozen", ArgumentParser<SetTimeFrozen>},
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
