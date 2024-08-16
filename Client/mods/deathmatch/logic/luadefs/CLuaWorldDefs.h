@@ -130,6 +130,12 @@ public:
     static std::variant<bool, float, CLuaMultiReturn<float, float, float>> GetWorldProperty(eWorldProperty property);
     static bool SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3);
     static bool ResetWorldProperty(eWorldProperty property);
+
+    static bool SetTimeFrozen(bool value) noexcept;
+    static bool IsTimeFrozen() noexcept;
+    static bool ResetTimeFrozen() noexcept;
+    };
+
     static bool SetVolumetricShadowsEnabled(bool enable) noexcept;
     static bool IsVolumetricShadowsEnabled() noexcept;
 };

@@ -14,6 +14,7 @@
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
 #include <lua/CLuaFunctionParser.h>
+#include "CLuaEngineDefs.h"
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
@@ -135,6 +136,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
         {"engineStreamingGetBufferSize", ArgumentParser<EngineStreamingGetBufferSize>},
         {"engineStreamingRestoreBufferSize", ArgumentParser<EngineStreamingRestoreBufferSize>},
+        {"engineStreamingRequestModel", ArgumentParser<EngineStreamingRequestModel>},
+        {"engineStreamingReleaseModel", ArgumentParser<EngineStreamingReleaseModel>},
+        {"engineStreamingGetModelLoadState", ArgumentParser<EngineStreamingGetModelLoadState>},
         {"engineRequestTXD", ArgumentParser<EngineRequestTXD>},
         {"engineFreeTXD", ArgumentParser<EngineFreeTXD>},
         {"engineGetPoolCapacity", ArgumentParser<EngineGetPoolCapacity>},
@@ -1046,12 +1050,14 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 {
-    // bool engineSetModelLODDistance ( int/string modelID, float distance )
+    // bool engineSetModelLODDistance ( int/string modelID, float distance [, bool extendedLod = false ])
     SString          strModelId;
     float            fDistance;
+    bool             extendedLod;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModelId);
     argStream.ReadNumber(fDistance);
+    argStream.ReadBool(extendedLod, false);
 
     if (!argStream.HasErrors())
     {
@@ -1062,7 +1068,7 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModelID);
             if (pModelInfo && fDistance > 0.0f)
             {
-                pModelInfo->SetLODDistance(fDistance);
+                pModelInfo->SetLODDistance(fDistance, extendedLod);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
@@ -2428,14 +2434,9 @@ bool CLuaEngineDefs::EngineResetModelFlags(uint uiModelID)
     return false;
 }
 
-bool CLuaEngineDefs::EngineRestreamWorld(lua_State* const luaVM)
+bool CLuaEngineDefs::EngineRestreamWorld()
 {
-    bool restreamLODs{};
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(restreamLODs, false);
-
-    g_pClientGame->RestreamWorld(restreamLODs);
+    g_pClientGame->RestreamWorld();
     return true;
 }
 
@@ -2504,4 +2505,45 @@ bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t
             throw std::invalid_argument("Can not change this pool capacity");
     }
     return true;
+}
+
+bool CLuaEngineDefs::EngineStreamingRequestModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> addReference, std::optional<bool> blocking)
+{
+    // Grab the lua main and the resource belonging to this script
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+
+    if (modelId >= g_pGame->GetBaseIDforCOL() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    // Get the resource we belong to
+    CResource* pResource = pLuaMain->GetResource();
+
+    return pResource->GetResourceModelStreamer()->RequestModel(modelId, addReference.value_or(false), blocking.value_or(false));
+}
+
+bool CLuaEngineDefs::EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference)
+{
+    // Grab the lua main and the resource belonging to this script
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+
+    if (modelId >= g_pGame->GetBaseIDforCOL() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    // Get the resource we belong to
+    CResource* pResource = pLuaMain->GetResource();
+
+    return pResource->GetResourceModelStreamer()->ReleaseModel(modelId, removeReference.value_or(false));
+}
+
+eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t modelId)
+{
+    const auto allCount = g_pGame->GetCountOfAllFileIDs();
+    if (modelId >= g_pGame->GetCountOfAllFileIDs())
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    return g_pGame->GetStreaming()->GetStreamingInfo(modelId)->loadState;
 }
