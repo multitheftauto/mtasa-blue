@@ -23,6 +23,4 @@ public:
                                             bool bCheckIfRoomToGetIn) = 0;
     virtual int  ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle) = 0;
     virtual bool IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVector* pUnknown = 0) = 0;
-
-    virtual void GetPositionToOpenCarDoor(CVector& position, CVehicle* vehicle, std::uint32_t door) const noexcept = 0;
 };

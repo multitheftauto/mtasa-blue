@@ -11,7 +11,7 @@
 
 #pragma once
 
-bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind, bool bAllowScriptedBind);
+bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind);
 
 void COMMAND_Help(const char* szCmdLine);
 void COMMAND_Disconnect(const char* szCmdLine);

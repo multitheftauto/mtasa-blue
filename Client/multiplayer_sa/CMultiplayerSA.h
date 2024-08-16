@@ -310,7 +310,8 @@ public:
 
     CLimits* GetLimits() { return &m_limits; }
 
-    void UpdateVehicleSuspension() noexcept;
+    void SetSuspensionEnabled(bool bEnabled);
+    bool IsSuspensionEnabled() { return m_bSuspensionEnabled; };
 
     virtual void FlushClothesCache();
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading);
@@ -361,6 +362,7 @@ public:
     bool         m_bBadDrivebyHitboxesDisabled;
 
 private:
+    bool                m_bSuspensionEnabled;
     std::vector<char>   m_PlayerImgCache;
     EFastClothesLoading m_FastClothesLoading;
     CLimitsSA           m_limits;

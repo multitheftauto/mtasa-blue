@@ -639,8 +639,3 @@ void CClientCamera::ShakeCamera(float radius, float x, float y, float z) noexcep
 {
     m_pCamera->ShakeCamera(radius, x, y, z);
 }
-
-void CClientCamera::ResetShakeCamera() noexcept
-{
-    m_pCamera->ResetShakeCamera();
-}

@@ -429,5 +429,4 @@ public:
     float     GetShakeForce();
 
     void ShakeCamera(float radius, float x, float y, float z) noexcept override;
-    void ResetShakeCamera() noexcept override;
 };

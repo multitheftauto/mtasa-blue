@@ -125,7 +125,6 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 
     // Grab the command
     tagCOMMANDENTRY* pEntry = Get(szCommand);
-    bool             wasHandled = false;
     if (pEntry)
     {
         // If its a core command, or if its enabled
@@ -134,8 +133,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             // Execute it
             if (!bIsScriptedBind || pEntry->bAllowScriptedBind)
                 ExecuteHandler(pEntry->pfnCmdFunc, szParameters);
-
-            wasHandled = true;
+            return true;
         }
     }
 
@@ -143,7 +141,6 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     std::string val = std::string(szCommand) + " " + std::string(szParameters ? szParameters : "");
 
     // Is it a cvar? (syntax: cvar[ = value])
-    if (!wasHandled)
     {
         // Check to see if '=' exists
         unsigned int nOpIndex = val.find('=');
@@ -191,7 +188,7 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
 
     // HACK: if its a 'nick' command, save it here
     bool bIsNickCommand = !stricmp(szCommand, "nick");
-    if (!wasHandled && bIsNickCommand && szParameters && !bIsScriptedBind)
+    if (bIsNickCommand && szParameters && !bIsScriptedBind)
     {
         if (CCore::GetSingleton().IsValidNick(szParameters))
         {
@@ -211,13 +208,9 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
     // Try to execute the handler
     if (m_pfnExecuteHandler)
     {
-        bool bAllowScriptedBind = (!pEntry || pEntry->bAllowScriptedBind);
-        if (m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, wasHandled, bIsScriptedBind, bAllowScriptedBind))
+        if (m_pfnExecuteHandler(szCommand, szParameters, bHandleRemotely, (pEntry != NULL), bIsScriptedBind))
             return true;
     }
-
-    if (wasHandled)
-        return true;
 
     // Unknown command
     val = _("Unknown command or cvar: ") + szCommand;

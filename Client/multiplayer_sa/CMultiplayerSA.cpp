@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Client/multiplayer_sa/CMultiplayerSA.cpp
+ *  FILE:        multiplayer_sa/CMultiplayerSA.cpp
  *  PURPOSE:     Multiplayer module class
  *
- *  Multi Theft Auto is available from https://multitheftauto.com/
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -190,6 +190,8 @@ DWORD RETURN_CHandlingData_isNotRWD = 0x6A0493;
 DWORD RETURN_CHandlingData_isNotFWD = 0x6A04C3;
 // end of handling fix
 #define CALL_CAutomobile_ProcessEntityCollision             0x6AD053
+#define CALL_CBike_ProcessEntityCollision1                  0x6BDF82
+#define CALL_CBike_ProcessEntityCollision2                  0x6BE0D1
 #define CALL_CMonsterTruck_ProcessEntityCollision           0x6C8B9E
 DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 
@@ -557,6 +559,7 @@ void HOOK_CObject_ProcessBreak();
 void HOOK_CObject_ProcessCollision();
 void HOOK_CGlass_WindowRespondsToCollision();
 void HOOK_CGlass__BreakGlassPhysically();
+void HOOK_CGlass_WindowRespondsToExplosion(); // get attacker & object
 
 void HOOK_FxManager_c__DestroyFxSystem();
 
@@ -597,6 +600,7 @@ CMultiplayerSA::CMultiplayerSA()
 
     MemSetFast(&localStatsData, 0, sizeof(CStatsData));
     localStatsData.StatTypesFloat[24] = 569.0f;            // Max Health
+    m_bSuspensionEnabled = true;
 
     m_fAircraftMaxHeight = 800.0f;
 
@@ -750,6 +754,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CObject_ProcessCollision, (DWORD)HOOK_CObject_ProcessCollision, 10);
     HookInstall(HOOKPOS_CGlass_WindowRespondsToCollision, (DWORD)HOOK_CGlass_WindowRespondsToCollision, 8);
     HookInstall(HOOKPOS_CGlass__BreakGlassPhysically, (DWORD)HOOK_CGlass__BreakGlassPhysically, 5);
+    HookInstall(HOOKPOS_CGlass_WindowRespondsToExplosion, (DWORD)HOOK_CGlass_WindowRespondsToExplosion, 5);
     
     // Post-destruction hook for FxSystems
     HookInstall(HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
@@ -1452,7 +1457,7 @@ void CMultiplayerSA::InitHooks()
     // Disable CStreaming::StreamVehiclesAndPeds_Always
     MemPut<BYTE>(0x40B650, 0xC3);
 
-    UpdateVehicleSuspension();
+    SetSuspensionEnabled(true);
 
     // Aircraft Max Height checks are at 0x6D2614 and 0x6D2625 edit the check to use our own float.
     MemPut(0x6D2614, &m_fAircraftMaxHeight);
@@ -6113,7 +6118,7 @@ bool                 CheckHasSuspensionChanged()
 
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
         if (pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
-            return true;
+            return pVehicle->GetHandlingData()->HasSuspensionChanged();
         else
             return false;
     }
@@ -6178,10 +6183,26 @@ void _declspec(naked) HOOK_ProcessVehicleCollision()
     }
 }
 
-void CMultiplayerSA::UpdateVehicleSuspension() noexcept
+void CMultiplayerSA::SetSuspensionEnabled(bool bEnabled)
 {
-    HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
-    HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
+    // if ( bEnabled )
+    {
+        // Hook Install
+        m_bSuspensionEnabled = true;
+        HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision);
+        // HookInstallCall ( CALL_CBike_ProcessEntityCollision1, (DWORD)HOOK_ProcessVehicleCollision );
+        // HookInstallCall ( CALL_CBike_ProcessEntityCollision2, (DWORD)HOOK_ProcessVehicleCollision );
+        HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, (DWORD)HOOK_ProcessVehicleCollision);
+    }
+    //     else
+    //     {
+    //         // Hook Uninstall
+    //         m_bSuspensionEnabled = false;
+    //         HookInstallCall ( CALL_CAutomobile_ProcessEntityCollision, RETURN_ProcessEntityCollision );
+    //         HookInstallCall ( CALL_CBike_ProcessEntityCollision1, RETURN_ProcessEntityCollision );
+    //         HookInstallCall ( CALL_CBike_ProcessEntityCollision2, RETURN_ProcessEntityCollision );
+    //         HookInstallCall ( CALL_CMonsterTruck_ProcessEntityCollision, RETURN_ProcessEntityCollision );
+    //     }
 }
 
 // Variables
@@ -6806,8 +6827,6 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
         pop eax
     }
 
-    pObjectAttacker = nullptr;
-
     if (WindowRespondsToCollision_CalledFrom != CALL_FROM_CGlass_WindowRespondsToExplosion)
     {
         _asm
@@ -6817,42 +6836,45 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
     }
 
     // Get attacker for the glass break
-    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplyCollision ||
-        WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplyCollision_2 ||
-        WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplySoftCollision)
+    switch (WindowRespondsToCollision_CalledFrom)
     {
-        _asm
-        {
-            mov pObjectAttacker, edi
-        }
-    }
-
-    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CGlass_WasGlassHitByBullet)
-    {
-        _asm
-        {
-            mov pObjectAttacker, ebx // WasGlassHitByBullet called from CWeapon::DoBulletImpact
-        }
-
-        if (!pObjectAttacker || (pObjectAttacker && !pObjectAttacker->m_pRwObject)) // WasGlassHitByBullet called from CBulletInfo::Update
+        case CALL_FROM_CPhysical_ApplyCollision:
+        case CALL_FROM_CPhysical_ApplyCollision_2:
+        case CALL_FROM_CPhysical_ApplySoftCollision:
         {
             _asm
             {
-                push ecx
-                mov ecx, [edi]
-                mov pObjectAttacker, ecx
-                pop ecx
+                mov pObjectAttacker, edi
             }
-        }
-    }
 
-    if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CGlass_WindowRespondsToExplosion)
-    {
-        _asm
-        {
-            mov pDamagedObject, edx
-            mov pObjectAttacker, ebp
+            break;
         }
+        case CALL_FROM_CGlass_WasGlassHitByBullet:
+        {
+            _asm
+            {
+                mov pObjectAttacker, ebx // WasGlassHitByBullet called from CWeapon::DoBulletImpact
+            }
+
+            if (!pObjectAttacker || (pObjectAttacker && !pObjectAttacker->m_pRwObject)) // WasGlassHitByBullet called from CBulletInfo::Update
+            {
+                _asm
+                {
+                    push ecx
+                    mov ecx, [edi]
+                    mov pObjectAttacker, ecx
+                    pop ecx
+                }
+            }
+
+            break;
+        }
+        case CALL_FROM_CGlass_WindowRespondsToExplosion:
+        {
+            break;
+        }
+        default:
+            pObjectAttacker = nullptr;
     }
 
     if (pObjectAttacker && !pObjectAttacker->m_pRwObject) // Still wrong?
@@ -6911,6 +6933,17 @@ void _declspec(naked) HOOK_CGlass__BreakGlassPhysically()
             add     esp, 0BCh
             retn
         }
+    }
+}
+
+void _declspec(naked) HOOK_CGlass_WindowRespondsToExplosion()
+{
+    _asm {
+        push 1
+        sub esp, 0Ch
+        mov pDamagedObject, edx
+        mov pObjectAttacker, ebp
+        jmp RETURN_CGlass_WindowRespondsToExplosion
     }
 }
 

@@ -29,7 +29,7 @@ using std::vector;
 
 extern CClientGame* g_pClientGame;
 
-bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind, bool bAllowScriptedBind)
+bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHandleRemotely, bool bHandled, bool bIsScriptedBind)
 {
     // Has the core already handled this command?
     if (!bHandled)
@@ -95,16 +95,8 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
     }
     else
     {
-        // Call the onClientCoreCommand event
-        CLuaArguments Arguments;
-        Arguments.PushString(szCommand);
-
-        auto pLocalPlayer = g_pClientGame->GetLocalPlayer();
-        pLocalPlayer->CallEvent("onClientCoreCommand", Arguments, true);
-
-        // Call our comand-handlers for core-executed commands too, if allowed
-        if (bAllowScriptedBind)
-            g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments);
+        // Call our comand-handlers for core-executed commands too
+        g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments);
     }
     return false;
 }

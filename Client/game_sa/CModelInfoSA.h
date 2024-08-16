@@ -362,7 +362,6 @@ public:
     BYTE           GetVehicleType();
     void           Request(EModelRequestType requestType, const char* szTag);
     void           Remove();
-    bool           UnloadUnused();
     bool           IsLoaded();
     bool           DoIsLoaded();
     unsigned short GetFlags();

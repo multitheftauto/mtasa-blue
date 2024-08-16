@@ -94,9 +94,6 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
 
 CResource::~CResource()
 {
-    // Remove refrences from requested models
-    m_modelStreamer.ReleaseAll();
-
     // Deallocate all models that this resource allocated earlier
     g_pClientGame->GetManager()->GetModelManager()->DeallocateModelsAllocatedByResource(this);
 

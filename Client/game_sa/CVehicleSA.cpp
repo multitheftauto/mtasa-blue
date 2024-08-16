@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Client/game_sa/CVehicleSA.cpp
+ *  FILE:        game_sa/CVehicleSA.cpp
  *  PURPOSE:     Vehicle base entity
  *
- *  Multi Theft Auto is available from https://multitheftauto.com/
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -186,6 +186,12 @@ void CVehicleSA::Init()
     }
 
     CopyGlobalSuspensionLinesToPrivate();
+
+    // clear our rw frames list
+    m_ExtraFrames.clear();
+    // dump the frames
+    VehicleDump(this);
+    FinalizeFramesList();
 }
 
 CVehicleSA::~CVehicleSA()
@@ -1314,7 +1320,7 @@ void CVehicleSA::RecalculateHandling()
     if (!m_pHandlingData)
         return;
 
-    m_pHandlingData->Recalculate();
+    m_pHandlingData->Recalculate(GetModelIndex());
 
     // Recalculate the suspension lines
     RecalculateSuspensionLines();
@@ -1693,6 +1699,11 @@ void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
+    // if suspension is master disabled or suspension hasn't changed return.
+    // if ( g_pCore->GetMultiplayer ()->IsSuspensionEnabled () == false || pHandlingEntry->HasSuspensionChanged ( ) == false )
+    //{
+    //    return;
+    //}
 
     DWORD       dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
@@ -1943,7 +1954,6 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
     // if the frame is invalid we don't want to be here
     if (!pFrame)
         return;
-
     // if the frame already exists ignore it
     if (IsComponentPresent(pFrame->szName) || pFrame->szName == "")
         return;
@@ -1952,22 +1962,23 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
     // variants have no name field.
     if (strName == "")
     {
-        // In MTA variant 255 means no variant
-        if ((m_ucVariantCount == 0 && m_ucVariant == 255) || (m_ucVariantCount == 1 && m_ucVariant2 == 255))
-            return;
-
         // name starts with extra
         strName = "extra_";
-
-        // variants are extra_a - extra_f
-        strName += 'a' + (m_ucVariantCount == 0 ? m_ucVariant : m_ucVariant2);
-
+        if (m_ucVariantCount == 0)
+        {
+            // variants are extra_a, extra_b and so on
+            strName += ('a' - 1) + m_ucVariant;
+        }
+        if (m_ucVariantCount == 1)
+        {
+            // variants are extra_a, extra_b and so on
+            strName += ('a' - 1) + m_ucVariant2;
+        }
         // increment the variant count ( we assume that the first variant created is variant1 and the second is variant2 )
         m_ucVariantCount++;
     }
-
-    // insert our new frame
     SVehicleFrame frame = SVehicleFrame(pFrame, bReadOnly);
+    // insert our new frame
     m_ExtraFrames.insert(std::pair<SString, SVehicleFrame>(strName, frame));
 }
 
@@ -1993,16 +2004,6 @@ void CVehicleSA::FinalizeFramesList()
             }
         }
     }
-}
-
-void CVehicleSA::DumpVehicleFrames()
-{
-    // clear our rw frames list
-    m_ExtraFrames.clear();
-
-    // dump the frames
-    VehicleDump(this);
-    FinalizeFramesList();
 }
 
 bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequestVisible)

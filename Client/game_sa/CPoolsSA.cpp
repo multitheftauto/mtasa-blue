@@ -128,8 +128,6 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, eVehicleTypes eVe
         {
             pVehicle->m_ucVariant = ucVariation;
             pVehicle->m_ucVariant2 = ucVariation2;
-
-            pVehicle->DumpVehicleFrames();
         }
         else
         {

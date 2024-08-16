@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto
+ *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        Client/sdk/game/CHandlingEntry.h
+ *  FILE:        sdk/game/CHandlingEntry.h
  *  PURPOSE:     Vehicle handling entry interface
  *
- *  Multi Theft Auto is available from https://multitheftauto.com/
+ *  Multi Theft Auto is available from http://www.multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -91,7 +91,7 @@ public:
     virtual ~CHandlingEntry(){};
 
     // Use this to copy data from an another handling class to this
-    virtual void Assign(const CHandlingEntry* pEntry) = 0;
+    virtual void Assign(const CHandlingEntry* pData) = 0;
 
     // Get functions
     virtual float          GetMass() const = 0;
@@ -137,7 +137,8 @@ public:
     virtual eLightType    GetTailLight() const = 0;
     virtual unsigned char GetAnimGroup() const = 0;
 
-    virtual std::uint16_t GetVehicleID() const = 0;
+    virtual eVehicleTypes GetModel() const = 0;
+    virtual bool          HasSuspensionChanged() const = 0;
 
     // Set functions
     virtual void SetMass(float fMass) = 0;
@@ -164,13 +165,13 @@ public:
     virtual void SetTractionLoss(float fTractionLoss) = 0;
     virtual void SetTractionBias(float fTractionBias) = 0;
 
-    virtual void SetSuspensionForceLevel(float fForce) noexcept = 0;
-    virtual void SetSuspensionDamping(float fDamping) noexcept = 0;
-    virtual void SetSuspensionHighSpeedDamping(float fDamping) noexcept = 0;
-    virtual void SetSuspensionUpperLimit(float fUpperLimit) noexcept = 0;
-    virtual void SetSuspensionLowerLimit(float fLowerLimit) noexcept = 0;
-    virtual void SetSuspensionFrontRearBias(float fBias) noexcept = 0;
-    virtual void SetSuspensionAntiDiveMultiplier(float fAntiDive) noexcept = 0;
+    virtual void SetSuspensionForceLevel(float fForce) = 0;
+    virtual void SetSuspensionDamping(float fDamping) = 0;
+    virtual void SetSuspensionHighSpeedDamping(float fDamping) = 0;
+    virtual void SetSuspensionUpperLimit(float fUpperLimit) = 0;
+    virtual void SetSuspensionLowerLimit(float fLowerLimit) = 0;
+    virtual void SetSuspensionFrontRearBias(float fBias) = 0;
+    virtual void SetSuspensionAntiDiveMultiplier(float fAntiDive) = 0;
 
     virtual void SetCollisionDamageMultiplier(float fMultiplier) = 0;
 
@@ -183,7 +184,9 @@ public:
     virtual void SetTailLight(eLightType Style) = 0;
     virtual void SetAnimGroup(unsigned char ucGroup) = 0;
 
+    virtual void SetSuspensionChanged(bool bChanged) = 0;
+
     // Call this every time you're done changing something. This will recalculate
     // all transmission/handling values according to the new values.
-    virtual void Recalculate() = 0;
+    virtual void Recalculate(unsigned short usModel) = 0;
 };

@@ -65,7 +65,6 @@ public:
     void           Reset();
 
     void ShakeCamera(float radius, float x, float y, float z) noexcept;
-    void ResetShakeCamera() noexcept;
 
     void            SetCameraVehicleViewMode(eVehicleCamMode eMode);
     void            SetCameraPedViewMode(ePedCamMode eMode);
