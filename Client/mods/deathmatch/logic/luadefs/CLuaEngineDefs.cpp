@@ -2551,7 +2551,8 @@ eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t m
 
 void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option)
 {
-    option = option.value_or(PreloadAreaOption::ALL);
+    if (!option.has_value())
+        option = PreloadAreaOption::ALL;
 
     if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::MODELS)
         g_pGame->GetStreaming()->LoadScene(&position);
