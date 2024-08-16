@@ -92,7 +92,7 @@ public:
     static bool EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference);
     static eModelLoadState EngineStreamingGetModelLoadState(std::uint16_t modelId);
 
-    static void EnginePreloadWorldArea(PreloadAreaOption option, CVector position);
+    static void EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option);
 
 private:
     static void AddEngineColClass(lua_State* luaVM);

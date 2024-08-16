@@ -2549,22 +2549,13 @@ eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t m
     return g_pGame->GetStreaming()->GetStreamingInfo(modelId)->loadState;
 }
 
-void CLuaEngineDefs::EnginePreloadWorldArea(PreloadAreaOption option, CVector position)
+void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option)
 {
-    switch (option)
-    {
-        case PreloadAreaOption::ALL:
-        case PreloadAreaOption::MODELS:
-            g_pGame->GetStreaming()->LoadScene(&position);
+    option = option.value_or(PreloadAreaOption::ALL);
 
-            if (option != PreloadAreaOption::ALL)
-            {
-                break;
-            }
-        case PreloadAreaOption::COLLISIONS:
-            g_pGame->GetStreaming()->LoadSceneCollision(&position);
-            break;
-        default:
-            throw std::invalid_argument("Invalid option at argument 1");
-    }
+    if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::MODELS)
+        g_pGame->GetStreaming()->LoadScene(&position);
+
+    if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
+        g_pGame->GetStreaming()->LoadSceneCollision(&position);
 }
