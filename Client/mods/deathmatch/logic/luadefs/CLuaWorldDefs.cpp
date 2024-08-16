@@ -12,6 +12,7 @@
 #include <game/CWeather.h>
 #include <game/CColPoint.h>
 #include <game/CCoronas.h>
+#include <game/CClock.h>
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaWorldDefs::LoadFunctions()
@@ -103,7 +104,6 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"removeWorldModel", RemoveWorldBuilding},
                                                                              {"restoreAllWorldModels", RestoreWorldBuildings},
                                                                              {"restoreWorldModel", RestoreWorldBuilding},
-                                                                             {"setVolumetricShadowsEnabled", ArgumentParser<SetVolumetricShadowsEnabled>},
 
                                                                              // World create funcs
                                                                              {"createSWATRope", CreateSWATRope},
@@ -126,12 +126,15 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"resetMoonSize", ResetMoonSize},
                                                                              {"resetBlurLevel", ResetBlurLevel},
                                                                              {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
+                                                                             {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
 
                                                                              // World check funcs
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
                                                                              {"isLineOfSightClear", IsLineOfSightClear},
                                                                              {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, IsWorldSpecialPropertyEnabled>},
+                                                                             {"isGarageOpen", IsGarageOpen},
+                                                                             {"isTimeFrozen", ArgumentParser<IsTimeFrozen>}};
                                                                              {"isGarageOpen", IsGarageOpen},
                                                                              {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>}};
 
@@ -2235,6 +2238,21 @@ bool CLuaWorldDefs::ResetWorldProperty(eWorldProperty property)
             return g_pGame->GetWeather()->ResetRainbow();
     }
     return false;
+}
+
+bool CLuaWorldDefs::SetTimeFrozen(bool value) noexcept
+{
+    return g_pGame->GetClock()->SetTimeFrozen(value);
+}
+
+bool CLuaWorldDefs::IsTimeFrozen() noexcept
+{
+    return g_pGame->GetClock()->IsTimeFrozen();
+}
+
+bool CLuaWorldDefs::ResetTimeFrozen() noexcept
+{
+    return g_pGame->GetClock()->ResetTimeFrozen();
 }
 
 bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable) noexcept

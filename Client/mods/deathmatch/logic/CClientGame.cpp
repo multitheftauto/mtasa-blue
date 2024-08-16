@@ -33,6 +33,7 @@
 #include <game/CWeather.h>
 #include <game/Task.h>
 #include <game/CBuildingRemoval.h>
+#include "game/CClock.h"
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -2705,6 +2706,7 @@ void CClientGame::AddBuiltInEvents()
 
     // Console events
     m_Events.AddEvent("onClientConsole", "text", NULL, false);
+    m_Events.AddEvent("onClientCoreCommand", "command", NULL, false);
 
     // Chat events
     m_Events.AddEvent("onClientChatMessage", "text, r, g, b, messageType", NULL, false);
@@ -5407,6 +5409,7 @@ void CClientGame::ResetMapInfo()
 
     // Hud
     g_pGame->GetHud()->SetComponentVisible(HUD_ALL, true);
+
     // Disable area names as they are on load until camera unfades
     g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     g_pGame->GetHud()->SetComponentVisible(HUD_VITAL_STATS, false);
@@ -5548,6 +5551,9 @@ void CClientGame::ResetMapInfo()
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
 
+    // Reset Frozen Time
+    g_pGame->GetClock()->ResetTimeFrozen();
+
     // Close all garages
     CGarage*  pGarage = NULL;
     CGarages* pGarages = g_pCore->GetGame()->GetGarages();
@@ -5590,7 +5596,7 @@ void CClientGame::ResetMapInfo()
     if (pPlayerInfo)
         pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(0));
 
-    RestreamWorld(true);
+    RestreamWorld();
 
     ReinitMarkers();
 }
@@ -6813,7 +6819,7 @@ void CClientGame::RestreamModel(unsigned short usModel)
             m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
 }
 
-void CClientGame::RestreamWorld(bool removeBigBuildings)
+void CClientGame::RestreamWorld()
 {
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
@@ -6826,9 +6832,7 @@ void CClientGame::RestreamWorld(bool removeBigBuildings)
     m_pManager->GetPedManager()->RestreamAllPeds();
     m_pManager->GetPickupManager()->RestreamAllPickups();
 
-    if (removeBigBuildings)
-        g_pGame->GetStreaming()->RemoveBigBuildings();
-
+    g_pGame->GetStreaming()->RemoveBigBuildings();
     g_pGame->GetStreaming()->ReinitStreaming();
 }
 
