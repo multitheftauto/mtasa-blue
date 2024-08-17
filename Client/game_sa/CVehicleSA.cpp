@@ -687,7 +687,7 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
 
     // GTA SA only does this when CVehicle::ClearVehicleUpgradeFlags returns false.
     // In the case of hydraulics and nitro, this function does not return false and the upgrade is never removed from the array
-    for (std::int16_t upgrade : GetVehicleInterface()->m_upgrades)
+    for (std::int16_t& upgrade : GetVehicleInterface()->m_upgrades)
     {
         if (upgrade == dwModelID)
         {
@@ -1337,21 +1337,21 @@ void CVehicleSA::RecalculateHandling()
 
     // We check whether the user has not set incorrect flags via handlingFlags in the case of nitro and hydraulics
     // If this happened, we need to correct it
-    for (const std::int16_t upgradeID : pInt->m_upgrades)
+    for (const std::int16_t& upgradeID : pInt->m_upgrades)
     {
         // Empty upgrades value is -1
         if (upgradeID < 0)
             continue;
 
         // If NOS is installed we need set the flag
-        if ((upgradeID >= 1008 && upgradeID <= 1010) && (uiHandlingFlags | HANDLING_NOS_Flag))
+        if ((upgradeID >= 1008 && upgradeID <= 1010) && !(uiHandlingFlags & HANDLING_NOS_Flag))
         {
             uiHandlingFlags |= HANDLING_NOS_Flag;
             nitroInstalled = true;
         }
 
         // If hydraulics is installed we need set the flag
-        if ((upgradeID == 1087) && (uiHandlingFlags | HANDLING_Hydraulics_Flag))
+        if ((upgradeID == 1087) && !(uiHandlingFlags & HANDLING_Hydraulics_Flag))
         {
             uiHandlingFlags |= HANDLING_Hydraulics_Flag;
             hydralicsInstalled = true;
