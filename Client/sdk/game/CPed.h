@@ -188,66 +188,66 @@ public:
     virtual void DetachPedFromEntity() = 0;
 
     virtual CVehicle* GetVehicle() = 0;
-    virtual void      Respawn(CVector* position, bool cameraCut) = 0;
+    virtual void      Respawn(const CVector* position, bool cameraCut) = 0;
 
     virtual void SetModelIndex(DWORD modelIndex) = 0;
     virtual void RemoveGeometryRef() = 0;
 
-    virtual float    GetHealth() = 0;
+    virtual float    GetHealth() const = 0;
     virtual void     SetHealth(float health) = 0;
-    virtual float    GetArmor() = 0;
+    virtual float    GetArmor() const = 0;
     virtual void     SetArmor(float armor) = 0;
-    virtual float    GetOxygenLevel() = 0;
+    virtual float    GetOxygenLevel() const = 0;
     virtual void     SetOxygenLevel(float oxyggen) = 0;
-    virtual bool     AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity) = 0;
+    virtual bool     AddProjectile(eWeaponType weaponType, CVector origin, float force, const CVector* target, const CEntity* targetEntity) = 0;
     virtual CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill weaponSkill) = 0;
-    virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) = 0;
-    virtual CWeapon* GetWeapon(eWeaponType weaponType) = 0;
-    virtual void     ClearWeapons() = 0;
+    virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) const noexcept = 0;
+    virtual CWeapon* GetWeapon(eWeaponType weaponType) const noexcept = 0;
+    virtual void     ClearWeapons() noexcept = 0;
     virtual void     RemoveWeaponModel(int model) = 0;
     virtual void     ClearWeapon(eWeaponType weaponType) = 0;
 
     virtual void              SetIsStanding(bool standing) = 0;
-    virtual DWORD             GetType() = 0;
-    virtual CPedIntelligence* GetPedIntelligence() = 0;
-    virtual CPedSound*        GetPedSound() = 0;
+    virtual DWORD             GetType() const noexcept = 0;
+    virtual CPedIntelligence* GetPedIntelligence() const noexcept = 0;
+    virtual CPedSound*        GetPedSound() const noexcept = 0;
 
-    virtual float       GetCurrentRotation() = 0;
-    virtual float       GetTargetRotation() = 0;
+    virtual float       GetCurrentRotation() const = 0;
+    virtual float       GetTargetRotation() const = 0;
     virtual void        SetCurrentRotation(float rotation) = 0;
     virtual void        SetTargetRotation(float rotation) = 0;
-    virtual eWeaponSlot GetCurrentWeaponSlot() = 0;
+    virtual eWeaponSlot GetCurrentWeaponSlot() const = 0;
     virtual void        SetCurrentWeaponSlot(eWeaponSlot weaponSlot) = 0;
 
     virtual CVector* GetBonePosition(eBone bone, CVector* position) = 0;
     virtual CVector* GetTransformedBonePosition(eBone bone, CVector* position) = 0;
 
-    virtual bool IsDucking() = 0;
+    virtual bool IsDucking() const = 0;
     virtual void SetDucking(bool duck) = 0;
-    virtual bool IsInWater() = 0;
-    virtual int  GetCantBeKnockedOffBike() = 0;
+    virtual bool IsInWater() noexcept = 0;
+    virtual int  GetCantBeKnockedOffBike() const = 0;
     virtual void SetCantBeKnockedOffBike(int cantBeKnockedOffBike) = 0;
 
     virtual void SetBleeding(bool bleeding) = 0;
 
-    virtual bool IsWearingGoggles() = 0;
+    virtual bool IsWearingGoggles() const = 0;
     virtual void SetGogglesState(bool isWearingThem) = 0;
 
     virtual void SetClothesTextureAndModel(const char* texture, const char* model, int textureType) = 0;
     virtual void RebuildPlayer() = 0;
 
-    virtual eFightingStyle GetFightingStyle() = 0;
+    virtual eFightingStyle GetFightingStyle() const = 0;
     virtual void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra) = 0;
 
-    virtual CEntity* GetContactEntity() = 0;
+    virtual CEntity* GetContactEntity() noexcept = 0;
 
-    virtual std::uint8_t GetRunState() = 0;
+    virtual std::uint8_t GetRunState() const = 0;
 
     virtual CEntity* GetTargetedEntity() = 0;
     virtual void     SetTargetedEntity(CEntity* targetEntity) = 0;
 
-    virtual bool GetCanBeShotInVehicle() = 0;
-    virtual bool GetTestForShotInVehicle() = 0;
+    virtual bool GetCanBeShotInVehicle() const = 0;
+    virtual bool GetTestForShotInVehicle() const = 0;
 
     virtual void SetCanBeShotInVehicle(bool shot) = 0;
     virtual void SetTestForShotInVehicle(bool test) = 0;
@@ -258,28 +258,28 @@ public:
     virtual void RemoveBodyPart(std::uint8_t boneID, std::uint8_t direction) = 0;
 
     virtual void         SetFootBlood(std::uint32_t footBlood) = 0;
-    virtual std::uint32_t GetFootBlood() = 0;
+    virtual std::uint32_t GetFootBlood() const = 0;
 
-    virtual bool IsOnFire() = 0;
+    virtual bool IsOnFire() const = 0;
     virtual void SetOnFire(bool onFire) = 0;
 
-    virtual bool GetStayInSamePlace() = 0;
+    virtual bool GetStayInSamePlace() const = 0;
     virtual void SetStayInSamePlace(bool stay) = 0;
 
-    virtual void GetVoice(std::int16_t* voiceType, std::int16_t* voiceID) = 0;
-    virtual void GetVoice(const char** voiceType, const char** voice) = 0;
+    virtual void GetVoice(std::int16_t* voiceType, std::int16_t* voiceID) const = 0;
+    virtual void GetVoice(const char** voiceType, const char** voice) const = 0;
     virtual void SetVoice(std::int16_t voiceType, std::int16_t voiceID) = 0;
     virtual void SetVoice(const char* voiceType, const char* voice) = 0;
     virtual void ResetVoice() = 0;
     virtual void SetLanding(bool isLanding) = 0;
     virtual void SetUpdateMetricsRequired(bool required) = 0;
 
-    virtual CWeaponStat* GetCurrentWeaponStat() = 0;
-    virtual float        GetCurrentWeaponRange() = 0;
+    virtual CWeaponStat* GetCurrentWeaponStat() const noexcept = 0;
+    virtual float        GetCurrentWeaponRange() const noexcept = 0;
     virtual void         AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType) = 0;
 
-    virtual int  GetCustomMoveAnim() = 0;
-    virtual bool IsDoingGangDriveby() = 0;
+    virtual int  GetCustomMoveAnim() const noexcept = 0;
+    virtual bool IsDoingGangDriveby() const noexcept = 0;
 
     virtual CPedIKSAInterface*      GetPedIKInterface() = 0;
     virtual void*                   GetPedNodeInterface(std::int32_t nodeId) = 0;

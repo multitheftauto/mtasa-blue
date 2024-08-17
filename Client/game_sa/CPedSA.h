@@ -323,6 +323,7 @@ public:
 
     void             SetInterface(CEntitySAInterface* intInterface) noexcept { m_pInterface = intInterface; }
     CPedSAInterface* GetPedInterface() noexcept { return static_cast<CPedSAInterface*>(m_pInterface); }
+    const CPedSAInterface* GetPedInterface() const noexcept { return static_cast<const CPedSAInterface*>(m_pInterface); }
     void             Init();
     void             SetModelIndex(DWORD modelIndex);
     void             RemoveGeometryRef();
@@ -330,70 +331,70 @@ public:
     void             DetachPedFromEntity();
 
     CVehicle* GetVehicle();
-    void      Respawn(CVector* position, bool cameraCut);
-    bool      AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity);
+    void      Respawn(const CVector* position, bool cameraCut);
+    bool      AddProjectile(eWeaponType weaponType, CVector origin, float force, const CVector* target, const CEntity* targetEntity);
 
-    float GetHealth() { return GetPedInterface()->fHealth; }
+    float GetHealth() const { return GetPedInterface()->fHealth; }
     void  SetHealth(float health) { GetPedInterface()->fHealth = health; }
 
-    float GetArmor() { return GetPedInterface()->fArmor; }
+    float GetArmor() const { return GetPedInterface()->fArmor; }
     void  SetArmor(float armor) { GetPedInterface()->fArmor = armor; }
 
-    float GetOxygenLevel();
+    float GetOxygenLevel() const;
     void SetOxygenLevel(float oxygen);
 
     CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill skill);
-    CWeapon* GetWeapon(eWeaponSlot weaponSlot);
-    CWeapon* GetWeapon(eWeaponType weaponType);
-    void     ClearWeapons();
+    CWeapon* GetWeapon(eWeaponSlot weaponSlot) const noexcept;
+    CWeapon* GetWeapon(eWeaponType weaponType) const noexcept;
+    void     ClearWeapons() noexcept;
     void     RemoveWeaponModel(int model);
     void     ClearWeapon(eWeaponType weaponType);
 
     void              SetIsStanding(bool standing);
-    CPedIntelligence* GetPedIntelligence() { return m_pPedIntelligence; }
-    CPedSound*        GetPedSound() { return m_pPedSound; }
-    DWORD             GetType() { return m_dwType; }
-    void              SetType(DWORD type) { m_dwType = type; }
+    CPedIntelligence* GetPedIntelligence() const noexcept { return m_pPedIntelligence; }
+    CPedSound*        GetPedSound() const noexcept { return m_pPedSound; }
+    DWORD             GetType() const noexcept { return m_dwType; }
+    void              SetType(DWORD type) noexcept { m_dwType = type; }
 
     virtual void RestoreLastGoodPhysicsState();
-    float        GetCurrentRotation() { return GetPedInterface()->fCurrentRotation; }
-    float        GetTargetRotation() { return GetPedInterface()->fTargetRotation; }
-    void         SetCurrentRotation(float rotation);
+    float        GetCurrentRotation() const { return GetPedInterface()->fCurrentRotation; }
+    float        GetTargetRotation() const { return GetPedInterface()->fTargetRotation; }
+    void         SetCurrentRotation(float rotation) { GetPedInterface()->fCurrentRotation = rotation; }
     void         SetTargetRotation(float rotation) { GetPedInterface()->fTargetRotation = rotation; }
 
-    eWeaponSlot GetCurrentWeaponSlot() { return static_cast<eWeaponSlot>(GetPedInterface()->bCurrentWeaponSlot); }
+    eWeaponSlot GetCurrentWeaponSlot() const { return static_cast<eWeaponSlot>(GetPedInterface()->bCurrentWeaponSlot); }
     void        SetCurrentWeaponSlot(eWeaponSlot weaponSlot);
 
     CVector* GetBonePosition(eBone bone, CVector* position);
     CVector* GetTransformedBonePosition(eBone bone, CVector* position);
     void     ApplySwimAndSlopeRotations();
 
-    bool IsDucking() { return GetPedInterface()->pedFlags.bIsDucking; }
+    bool IsDucking() const { return GetPedInterface()->pedFlags.bIsDucking; }
     void SetDucking(bool duck) { GetPedInterface()->pedFlags.bIsDucking = duck; }
 
-    bool IsInWater();
+    bool IsInWater() noexcept;
 
-    int  GetCantBeKnockedOffBike() { return GetPedInterface()->pedFlags.CantBeKnockedOffBike; }
+    int  GetCantBeKnockedOffBike() const { return GetPedInterface()->pedFlags.CantBeKnockedOffBike; }
     void SetCantBeKnockedOffBike(int cantBeKnockedOffBike) { GetPedInterface()->pedFlags.CantBeKnockedOffBike = cantBeKnockedOffBike; }
 
-    bool IsWearingGoggles() { return GetPedInterface()->pGogglesObject != nullptr; }
+    bool IsWearingGoggles() const { return GetPedInterface()->pGogglesObject != nullptr; }
     void SetGogglesState(bool isWearingThem);
 
     void SetClothesTextureAndModel(const char* texture, const char* model, int textureType);
     void RebuildPlayer();
 
-    eFightingStyle GetFightingStyle() { return static_cast<eFightingStyle>(GetPedInterface()->bFightingStyle); }
+    eFightingStyle GetFightingStyle() const { return static_cast<eFightingStyle>(GetPedInterface()->bFightingStyle); }
     void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra = 6);
 
-    CEntity* GetContactEntity();
+    CEntity* GetContactEntity() noexcept;
 
-    std::uint8_t GetRunState() { return static_cast<std::uint8_t>(GetPedInterface()->moveState); }
+    std::uint8_t GetRunState() const { return static_cast<std::uint8_t>(GetPedInterface()->moveState); }
 
     CEntity* GetTargetedEntity();
     void     SetTargetedEntity(CEntity* targetEntity);
 
-    bool GetCanBeShotInVehicle() { return GetPedInterface()->pedFlags.bCanBeShotInVehicle; }
-    bool GetTestForShotInVehicle() { return GetPedInterface()->pedFlags.bTestForShotInVehicle; }
+    bool GetCanBeShotInVehicle() const { return GetPedInterface()->pedFlags.bCanBeShotInVehicle; }
+    bool GetTestForShotInVehicle() const { return GetPedInterface()->pedFlags.bTestForShotInVehicle; }
 
     void SetCanBeShotInVehicle(bool shot) { GetPedInterface()->pedFlags.bCanBeShotInVehicle = shot; }
     void SetTestForShotInVehicle(bool test) { GetPedInterface()->pedFlags.bTestForShotInVehicle = test; }
@@ -406,31 +407,31 @@ public:
     void RemoveBodyPart(std::uint8_t boneID, std::uint8_t direction);
 
     void         SetFootBlood(std::uint32_t footBlood);
-    std::uint32_t GetFootBlood();
+    std::uint32_t GetFootBlood() const;
 
-    bool IsBleeding() { return GetPedInterface()->pedFlags.bPedIsBleeding; }
+    bool IsBleeding() const { return GetPedInterface()->pedFlags.bPedIsBleeding; }
     void SetBleeding(bool bleeding) { GetPedInterface()->pedFlags.bPedIsBleeding = bleeding; }
 
-    bool IsOnFire() { return GetPedInterface()->pFireOnPed != nullptr; }
+    bool IsOnFire() const { return GetPedInterface()->pFireOnPed != nullptr; }
     void SetOnFire(bool onFire);
 
-    bool GetStayInSamePlace() { return GetPedInterface()->pedFlags.bStayInSamePlace; }
+    bool GetStayInSamePlace() const { return GetPedInterface()->pedFlags.bStayInSamePlace; }
     void SetStayInSamePlace(bool stay) { GetPedInterface()->pedFlags.bStayInSamePlace = stay; }
 
-    void GetVoice(std::int16_t* voiceType, std::int16_t* voiceID);
-    void GetVoice(const char** voiceType, const char** voice);
+    void GetVoice(std::int16_t* voiceType, std::int16_t* voiceID) const;
+    void GetVoice(const char** voiceType, const char** voice) const;
     void SetVoice(std::int16_t voiceType, std::int16_t voiceID);
     void SetVoice(const char* voiceType, const char* voice);
     void ResetVoice() { SetVoice(m_sDefaultVoiceType, m_sDefaultVoiceID); }
     void SetLanding(bool isLanding) { GetPedInterface()->pedFlags.bIsLanding = isLanding; }
     void SetUpdateMetricsRequired(bool required) { GetPedInterface()->pedFlags.bUpdateMatricesRequired = required; }
 
-    CWeaponStat* GetCurrentWeaponStat();
-    float        GetCurrentWeaponRange();
+    CWeaponStat* GetCurrentWeaponStat() const noexcept;
+    float        GetCurrentWeaponRange() const noexcept;
     void         AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType);
 
-    virtual int GetCustomMoveAnim() { return m_iCustomMoveAnim; }
-    bool        IsDoingGangDriveby();
+    virtual int GetCustomMoveAnim() const noexcept { return m_iCustomMoveAnim; }
+    bool        IsDoingGangDriveby() const noexcept;
 
     CPedIKSAInterface*      GetPedIKInterface() { return &GetPedInterface()->pedIK; }
     void*                   GetPedNodeInterface(std::int32_t nodeId) { return GetPedInterface()->pedNodes[nodeId]; }
