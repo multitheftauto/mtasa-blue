@@ -13,6 +13,10 @@
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
 
+// To avoid VS intellisense highlight errors
+#include <memory>
+#include <vector>
+
 class CPedIK;
 class CPedIKSAInterface;
 class CPedIntelligence;

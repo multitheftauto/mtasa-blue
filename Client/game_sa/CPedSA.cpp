@@ -23,7 +23,7 @@
 
 extern CGameSA* pGame;
 
-int g_onlyUpdateRotations = false;
+static bool g_onlyUpdateRotations = false;
 
 CPedSA::CPedSA(CPedSAInterface* pPedInterface)
     : m_pPedInterface(pPedInterface)
@@ -683,12 +683,10 @@ void CPedSA::GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const
 #define HOOKSIZE_CPed_PreRenderAfterTest 15
 static constexpr DWORD RETURN_CPed_PreRenderAfterTest = 0x5E65AF;
 static constexpr DWORD RETURN_CPed_PreRenderAfterTestSkip = 0x5E6658;
-void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
+static void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
 {
     _asm
     {
-        mov eax, [ecx+46Ch]
-
         // Replaced code
         sub esp,70h
         push ebx
@@ -699,7 +697,8 @@ void _declspec(naked) HOOK_CPed_PreRenderAfterTest()
         push edi
 
         // Check what to do
-        test eax, 0x00000400
+        mov eax, [ebp+474h] // Load m_nThirdPedFlags
+        test eax, 400h // check bCalledPreRender flag
         jnz skip_rotation_update
 
         // Run code at start of CPed::PreRenderAfterTest
@@ -723,23 +722,23 @@ skip_rotation_update:
 #define HOOKSIZE_CPed_PreRenderAfterTest_Mid 5
 static constexpr DWORD RETURN_CPed_PreRenderAfterTest_Mid = 0x5E666E;
 static constexpr DWORD RETURN_CPed_PreRenderAfterTest_MidSkip = 0x5E766F;
-void _declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
+static void _declspec(naked) HOOK_CPed_PreRenderAfterTest_Mid()
 {
     _asm
     {
         // Check what to do
-        mov     eax, g_onlyUpdateRotations
-        cmp     eax, 0
-        jnz     skip_tail
+        movzx eax, byte ptr g_onlyUpdateRotations
+        test eax, eax
+        jnz skip_tail
 
         // Replaced code
-        mov     al,byte ptr ds:[00B7CB89h]
+        mov al, byte ptr ds:[00B7CB89h]
         // Run code at mid of CPed::PreRenderAfterTest
-        jmp     RETURN_CPed_PreRenderAfterTest_Mid
+        jmp RETURN_CPed_PreRenderAfterTest_Mid
 
 skip_tail:
         // Skip code at mid of CPed::PreRenderAfterTest
-        jmp     RETURN_CPed_PreRenderAfterTest_MidSkip
+        jmp RETURN_CPed_PreRenderAfterTest_MidSkip
     }
 }
 

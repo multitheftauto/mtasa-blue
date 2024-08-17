@@ -15,6 +15,8 @@
 #include "CAudioEngineSA.h"
 #include "CAEVehicleAudioEntitySA.h"
 
+class CPedSAInterface;
+
 #define FUNC_CAEPedSound__GetVoice          0x4E3CD0        // 4E3CD0 ; public: static short __cdecl CAEPedSound::GetVoice(char *,short)
 #define FUNC_CAEPedSound__GetAudioPedType   0x4E3C60        // 4E3C60 ; public: static short __cdecl CAEPedSound::GetAudioPedType(char *)
 #define FUNC_CAEPedSound__SetPed            0x4E68D0        // 4E69D0 ; public: void __thiscall CAEPedSound::SetPed(CPedSAInterface *)
@@ -83,7 +85,7 @@ class CPedSoundEntitySAInterface : public CAEAudioEntity
 {
 public:
     std::uint8_t           unk_7C[24];            // from 7C to 8C
-    CEntitySAInterface*    ped;
+    CPedSAInterface*       ped;
     std::uint8_t           unk_98[16];            // from 98 to A8
     CAETwinLoopSoundEntity twinLoopSoundEntity;
     std::uint8_t           unk_150[12];            // from 150 to 15C
@@ -107,7 +109,7 @@ public:
     void*               sounds;
     bool                active;
     std::uint8_t        unk_A1[3];            // from A1 to A3
-    CEntitySAInterface* ped;
+    CPedSAInterface*    ped;
 };
 
 class CPedSoundSA : public CPedSound
