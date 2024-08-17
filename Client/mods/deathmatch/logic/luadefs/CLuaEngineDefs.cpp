@@ -145,6 +145,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolDefaultCapacity", ArgumentParser<EngineGetPoolDefaultCapacity>},
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
+        {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
         
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2546,4 +2547,16 @@ eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t m
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     return g_pGame->GetStreaming()->GetStreamingInfo(modelId)->loadState;
+}
+
+void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option)
+{
+    if (!option.has_value())
+        option = PreloadAreaOption::ALL;
+
+    if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::MODELS)
+        g_pGame->GetStreaming()->LoadScene(&position);
+
+    if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
+        g_pGame->GetStreaming()->LoadSceneCollision(&position);
 }
