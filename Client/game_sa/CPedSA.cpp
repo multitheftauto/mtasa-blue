@@ -37,9 +37,7 @@ CPedSA::~CPedSA()
     SAFE_DELETE(m_pPedSound);
 
     for (std::uint8_t i = 0; i < WEAPONSLOT_MAX; i++)
-    {
         SAFE_DELETE(m_pWeapons[i]);
-    }
 
     // Make sure this ped is not refed in the flame shot info array
     CFlameShotInfo* info = (CFlameShotInfo*)ARRAY_CFlameShotInfo;
@@ -136,27 +134,27 @@ void CPedSA::DetachPedFromEntity()
     ((void(__thiscall*)(CEntitySAInterface*))FUNC_DetachPedFromEntity)(m_pInterface);
 }
 
-bool CPedSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector* vecPosition, const CVector* vecRotation)
+bool CPedSA::InternalAttachEntityToEntity(DWORD entityInteface, const CVector* position, const CVector* rotation)
 {
-    AttachPedToEntity(dwEntityInterface, const_cast<CVector*>(vecPosition), 0, 0.0f, WEAPONTYPE_UNARMED, false);
+    AttachPedToEntity(entityInteface, const_cast<CVector*>(position), 0, 0.0f, WEAPONTYPE_UNARMED, false);
     return true;
 }
 
-void CPedSA::AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, float fRotationLimit, eWeaponType weaponType, bool bChangeCamera)
+void CPedSA::AttachPedToEntity(DWORD entityInteface, CVector* vector, std::uint16_t direction, float rotationLimit, eWeaponType weaponType, bool changeCamera)
 {
     // sDirection and fRotationLimit only apply to first-person shooting (bChangeCamera)
     CPedSAInterface* pedInterface = GetPedInterface();
     std::uint8_t pedType = pedInterface->bPedType;
 
     // Hack the CPed type(?) to non-player so the camera doesn't get changed
-    if (!bChangeCamera)
+    if (!changeCamera)
         pedInterface->bPedType = 2;
 
     // CEntity *__thiscall CPed::AttachPedToEntity(CPed *this, CEntity *a2, float arg4, float a4, float a5, __int16 a6, int a7, eWeaponType a3)
-    ((CEntitySAInterface*(__thiscall*)(CEntitySAInterface*, CEntitySAInterface*, float, float, float, std::uint16_t, float, std::uint8_t))FUNC_AttachPedToEntity)(m_pInterface, reinterpret_cast<CEntitySAInterface*>(dwEntityInterface), vector->fX, vector->fY, vector->fZ, sDirection, fRotationLimit, static_cast<std::uint8_t>(weaponType));
+    ((CEntitySAInterface*(__thiscall*)(CEntitySAInterface*, CEntitySAInterface*, float, float, float, std::uint16_t, float, std::uint8_t))FUNC_AttachPedToEntity)(m_pInterface, reinterpret_cast<CEntitySAInterface*>(entityInteface), vector->fX, vector->fY, vector->fZ, direction, rotationLimit, static_cast<std::uint8_t>(weaponType));
 
     // Hack the CPed type(?) to whatever it was set to
-    if (!bChangeCamera)
+    if (!changeCamera)
         pedInterface->bPedType = pedType;
 }
 

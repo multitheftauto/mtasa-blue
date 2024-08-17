@@ -10,13 +10,9 @@
  *****************************************************************************/
 
 #pragma once
-
-#include <memory>
-#include "Common.h"
 #include "CPhysical.h"
 #include "CWeaponInfo.h"
 
-class CObject;
 class CPedIK;
 class CPedIKSAInterface;
 class CPedIntelligence;
@@ -151,7 +147,7 @@ enum eLandedPedFoot
     LANDED_PED_LEFT_FOOT = 1,
 };
 
-inline bool IsValidMoveAnim(uint iMoveAnim)
+inline bool IsValidMoveAnim(std::uint32_t iMoveAnim)
 {
     return (iMoveAnim == MOVE_DEFAULT) || (iMoveAnim >= MOVE_PLAYER && iMoveAnim <= MOVE_JETPACK) || (iMoveAnim >= MOVE_MAN && iMoveAnim <= MOVE_SKATE);
 }

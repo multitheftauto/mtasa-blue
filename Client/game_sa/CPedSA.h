@@ -9,8 +9,6 @@
  *
  *****************************************************************************/
 
-class CPedSA;
-
 #pragma once
 
 #include <game/CPed.h>
@@ -22,11 +20,11 @@ class CPedSA;
 #include "CPhysicalSA.h"
 #include "CPedSoundSA.h"
 #include "CPoolsSA.h"
-#include "CVehicleSA.h"
 #include "CWeaponSA.h"
 #include "CPedIntelligenceSA.h"
 
 class CPlayerPedDataSAInterface;
+class CVehicleSAInterface;
 
 // CPed
 #define FUNC_AttachPedToEntity          0x5E7CB0            // CPed::AttachPedToEntity
@@ -200,13 +198,11 @@ public:
     unsigned int bUsedForReplay : 1;            // This ped is controlled by replay and should be removed when replay is done.
 };
 
-class CVehicleSAInterface;
-
 class CPedSAInterface : public CPhysicalSAInterface
 {
 public:
-    CPedSoundEntitySAInterface       pedAudio; // CAEPedAudioEntity
-    CPedSoundSAInterface             pedSound; // CAEPedSpeechAudioEntity
+    CPedSoundEntitySAInterface       pedAudio;            // CAEPedAudioEntity
+    CPedSoundSAInterface             pedSound;            // CAEPedSpeechAudioEntity
     CPedWeaponAudioEntitySAInterface weaponAudioEntity;
     std::uint8_t                     unk_43C[36];
     std::uint8_t                     unk_460[8];
@@ -216,10 +212,10 @@ public:
     CPlayerPedDataSAInterface*       pPlayerData;
     std::uint8_t                     createdBy;
     std::uint8_t                     _pad0[3];
-    void*                            pedNodes[19]; // AnimBlendFrameData*
+    void*                            pedNodes[19];            // AnimBlendFrameData*
     int                              iMoveAnimGroup;
     CVector2D                        vecAnimMovingShiftLocal;
-    std::uint8_t                     pedAcquaintance[20]; // CPedAcquaintance
+    std::uint8_t                     pedAcquaintance[20];            // CPedAcquaintance
     RpClump*                         pWeaponObject;
     RwFrame*                         pGunflashObject;
     RpClump*                         pGogglesObject;
@@ -277,7 +273,7 @@ public:
     int                              unk_744;
     DWORD                            dwLookTime;
     int                              unk_74C;
-    DWORD                            dwTimeWhenDead; // death time in MS
+    DWORD                            dwTimeWhenDead;            // death time in MS
     std::uint8_t                     bodyPartToRemove;
     std::int16_t                     unk_755;
     std::int16_t                     moneyCount;
@@ -292,14 +288,14 @@ public:
     float                            fTurretAngleB;
     DWORD                            dwTurretPosnMode;
     DWORD                            dwTurretAmmo;
-    void*                            pCoverPoint; // CCoverPoint*
-    void*                            pEnex; // CEntryExit*
+    void*                            pCoverPoint;            // CCoverPoint*
+    void*                            pEnex;                  // CEntryExit*
     float                            fRemovalDistMultiplier;
     std::int16_t                     specialModelIndex;
     std::int16_t                     unk_796;
     int                              unk_798;
 };
-//static_assert(sizeof(CPedSAInterface) == 0x79C, "Invalid size for CPedSAInterface");
+static_assert(sizeof(CPedSAInterface) == 0x79C, "Invalid size for CPedSAInterface");
 
 class CPedSA : public virtual CPed, public virtual CPhysicalSA
 {
@@ -330,7 +326,7 @@ public:
     void             Init();
     void             SetModelIndex(DWORD modelIndex);
     void             RemoveGeometryRef();
-    void             AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, float fRotationLimit, eWeaponType weaponType, bool bChangeCamera);
+    void             AttachPedToEntity(DWORD entityInteface, CVector* vector, std::uint16_t direction, float rotationLimit, eWeaponType weaponType, bool changeCamera);
     void             DetachPedFromEntity();
 
     CVehicle* GetVehicle();
@@ -402,7 +398,7 @@ public:
     void SetCanBeShotInVehicle(bool shot) { GetPedInterface()->pedFlags.bCanBeShotInVehicle = shot; }
     void SetTestForShotInVehicle(bool test) { GetPedInterface()->pedFlags.bTestForShotInVehicle = test; }
 
-    bool InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector* vecPosition, const CVector* vecRotation);
+    bool InternalAttachEntityToEntity(DWORD entityInterface, const CVector* position, const CVector* rotation) override;
 
     std::uint8_t GetOccupiedSeat() const noexcept { return m_ucOccupiedSeat; }
     void SetOccupiedSeat(std::uint8_t seat) noexcept { m_ucOccupiedSeat = seat; }
