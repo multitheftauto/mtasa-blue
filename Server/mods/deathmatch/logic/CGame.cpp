@@ -1633,7 +1633,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onVehicleStartExit", "player, seat, jacker", NULL, false);
     m_Events.AddEvent("onVehicleEnter", "player, seat, jacked", NULL, false);
     m_Events.AddEvent("onVehicleExit", "player, seat, jacker", NULL, false);
-    m_Events.AddEvent("onVehicleExplode", "withExplosion, player", NULL, false);
+    m_Events.AddEvent("onVehicleExplode", "withExplosion, player", nullptr, false);
 
     // Console events
     m_Events.AddEvent("onConsole", "text", NULL, false);
