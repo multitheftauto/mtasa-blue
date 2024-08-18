@@ -198,7 +198,7 @@ public:
     virtual float    GetArmor() const = 0;
     virtual void     SetArmor(float armor) = 0;
     virtual float    GetOxygenLevel() const = 0;
-    virtual void     SetOxygenLevel(float oxyggen) = 0;
+    virtual void     SetOxygenLevel(float oxygen) = 0;
     virtual bool     AddProjectile(eWeaponType weaponType, CVector origin, float force, const CVector* target, const CEntity* targetEntity) = 0;
     virtual CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill weaponSkill) = 0;
     virtual CWeapon* GetWeapon(eWeaponSlot weaponSlot) const noexcept = 0;
