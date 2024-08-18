@@ -1633,7 +1633,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onVehicleStartExit", "player, seat, jacker", NULL, false);
     m_Events.AddEvent("onVehicleEnter", "player, seat, jacked", NULL, false);
     m_Events.AddEvent("onVehicleExit", "player, seat, jacker", NULL, false);
-    m_Events.AddEvent("onVehicleExplode", "", NULL, false);
+    m_Events.AddEvent("onVehicleExplode", "withExplosion, player", nullptr, false);
 
     // Console events
     m_Events.AddEvent("onConsole", "text", NULL, false);
@@ -2745,6 +2745,7 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                 {
                                     CLuaArguments arguments;
                                     arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                    arguments.PushElement(clientSource);
                                     vehicle->CallEvent("onVehicleExplode", arguments);
                                 }
 
