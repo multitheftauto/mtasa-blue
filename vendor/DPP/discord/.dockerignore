@@ -1,0 +1,14 @@
+doxygen-awesome-css/
+docpages/
+testdata/
+win32/
+.github/
+.circleci/
+test/
+build/
+docs/
+.vscode/
+.vs/
+.idea/
+config.json
+.misspell-fixer.ignore

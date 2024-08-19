@@ -67,7 +67,7 @@
 #include "CDuplicateLineFilter.h"
 
 #ifdef _MSC_VER
-#define snprintf _snprintf
+//#define snprintf _snprintf
 #endif
 
 #ifndef stricmp

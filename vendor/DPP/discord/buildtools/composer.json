@@ -1,0 +1,17 @@
+{
+    "name": "brainboxdotcc/dpp",
+    "description": "DPP Build Tools",
+    "type": "project",
+    "license": "Apache 2.0",
+    "autoload": {
+        "psr-4": {
+            "Dpp\\": "classes/"
+        }
+    },
+    "authors": [
+        {
+            "name": "brain"
+        }
+    ],
+    "require": {}
+}

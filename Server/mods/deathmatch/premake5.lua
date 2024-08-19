@@ -27,6 +27,7 @@ project "Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared/publicsdk/include",
 			"../../../vendor/sparsehash/src/",
+			"../../../vendor/DPP/discord/include",
 			"logic",
 			"utils",
 			"."
@@ -76,3 +77,9 @@ project "Deathmatch"
 
 	filter "platforms:arm64"
 		targetdir(buildpath("server/arm64"))
+	
+	filter "configurations:Debug"
+		links { "discord-bot-d" }
+
+	filter "configurations:not Debug"
+		links { "discord-bot" }
