@@ -2168,11 +2168,6 @@ void CPacketHandler::Packet_VehicleTrailer(NetBitStreamInterface& bitStream)
                 g_pCore->GetConsole()->Printf("Packet_VehicleTrailer: attaching trailer %d to vehicle %d", TrailerID, ID);
                 #endif
                 pVehicle->SetTowedVehicle(pTrailer);
-
-                // Call the onClientTrailerAttach
-                CLuaArguments Arguments;
-                Arguments.PushElement(pVehicle);
-                pTrailer->CallEvent("onClientTrailerAttach", Arguments, true);
             }
             else
             {

@@ -134,6 +134,8 @@ typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
 typedef void(AudioZoneRadioSwitchHandler)(DWORD dwStationID);
+typedef bool(AttachTrailerHandler)(CVehicleSAInterface* trailer, CVehicleSAInterface* truckVehicle);
+typedef bool(TowVehicleHandler)(CVehicleSAInterface* target, CVehicleSAInterface* towtruck);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
@@ -260,6 +262,8 @@ public:
     virtual void  SetPedStepHandler(PedStepHandler* pHandler) = 0;
     virtual void  SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) = 0;
     virtual void  SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler) = 0;
+    virtual void  SetAttachTrailerHandler(AttachTrailerHandler* pHandler) = 0;
+    virtual void  SetTowVehicleHandler(TowVehicleHandler* pHandler) = 0;
     virtual void  AllowMouseMovement(bool bAllow) = 0;
     virtual void  DoSoundHacksOnLostFocus(bool bLostFocus) = 0;
     virtual bool  HasSkyColor() = 0;

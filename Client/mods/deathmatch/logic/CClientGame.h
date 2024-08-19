@@ -545,6 +545,8 @@ private:
 
     static AnimationId StaticDrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     static void        StaticAudioZoneRadioSwitchHandler(DWORD dwStationID);
+    static bool        StaticAttachTrailerHandler(CVehicleSAInterface* trailer, CVehicleSAInterface* truckVehicle);
+    static bool        StaticTowVehicleHandler(CVehicleSAInterface* target, CVehicleSAInterface* towtruck);
 
     bool                              DamageHandler(CPed* pDamagePed, CEventDamage* pEvent);
     void                              DeathHandler(CPed* pKilledPed, unsigned char ucDeathReason, unsigned char ucBodyPart);
@@ -585,6 +587,8 @@ private:
     void        TaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     AnimationId DrivebyAnimationHandler(AnimationId animGroup, AssocGroupId animId);
     void        AudioZoneRadioSwitchHandler(DWORD dwStationID);
+    bool        AttachTrailerHandler(CVehicleSAInterface* trailer, CVehicleSAInterface* truckVehicle);
+    bool        TowVehicleHandler(CVehicleSAInterface* target, CVehicleSAInterface* towtruck);
 
     static bool StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     bool        ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

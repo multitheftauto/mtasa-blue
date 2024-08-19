@@ -305,6 +305,9 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 #define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
 
+#define HOOKPOS_CTrailer__SetTowLink 0x6CFDFF
+#define HOOKPOS_CAutomobile__SetTowLink 0x6B4430
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -419,6 +422,8 @@ ObjectBreakHandler*                        m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler*                m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*                   m_pDrivebyAnimationHandler = NULL;
 AudioZoneRadioSwitchHandler*               m_pAudioZoneRadioSwitchHandler = NULL;
+AttachTrailerHandler*                      m_pAttachTrailerHandler = nullptr;
+TowVehicleHandler*                         m_pTowVehicleHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;            // the entity that the streaming system considers active
@@ -578,6 +583,9 @@ void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
 void HOOK_CWeapon__TakePhotograph();
 
 void HOOK_CCollision__CheckCameraCollisionObjects();
+
+void HOOK_CTrailer__SetTowLink();
+void HOOK_CAutomobile__SetTowLink();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -785,6 +793,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
+
+    HookInstall(HOOKPOS_CTrailer__SetTowLink, (DWORD)HOOK_CTrailer__SetTowLink, 5);
+    HookInstall(HOOKPOS_CAutomobile__SetTowLink, (DWORD)HOOK_CAutomobile__SetTowLink, 6);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, 10);
@@ -2626,6 +2637,16 @@ void CMultiplayerSA::SetProcessCamHandler(ProcessCamHandler* pProcessCamHandler)
     m_pProcessCamHandler = pProcessCamHandler;
 }
 
+void CMultiplayerSA::SetAttachTrailerHandler(AttachTrailerHandler* attachTrailerHandler)
+{
+    m_pAttachTrailerHandler = attachTrailerHandler;
+}
+
+void CMultiplayerSA::SetTowVehicleHandler(TowVehicleHandler* towVehicleHandler)
+{
+    m_pTowVehicleHandler = towVehicleHandler;
+}
+
 void CMultiplayerSA::SetChokingHandler(ChokingHandler* pChokingHandler)
 {
     m_pChokingHandler = pChokingHandler;
@@ -3978,6 +3999,68 @@ end_of_entities_list:
 stop_looping:
         mov     dwObjectsChecked, 0
         jmp     dwProcessVerticalEndLooping
+    }
+}
+
+// Hook to detect when a trailer is attached to vehicle
+static constexpr DWORD CONTINUE_CTrailer_SetTowLink = 0x6CFE04;
+static constexpr DWORD RETURN_CTrailer_SetTowLink = 0x6CFE16;
+static void _declspec(naked) HOOK_CTrailer__SetTowLink()
+{
+    _asm
+    {
+        mov al, [esi+36h]
+        mov cl, al
+
+        pushad
+        mov ebx, m_pAttachTrailerHandler
+        test ebx, ebx
+        jz attachTrailer
+
+        push edi
+        push ecx
+        call ebx
+        add esp, 8
+        test al, al
+        jnz attachTrailer
+
+        popad
+        jmp RETURN_CTrailer_SetTowLink
+
+        attachTrailer:
+        popad
+        jmp CONTINUE_CTrailer_SetTowLink
+    }
+}
+
+// Hook to check when a vehicle is towed by vehicle for onClientTrailerAttach event
+static constexpr DWORD CONTINUE_CAutomobile_SetTowLink = 0x6B4436;
+static constexpr DWORD RETURN_CAutomobile_SetTowLink = 0x6B4446;
+static void _declspec(naked) HOOK_CAutomobile__SetTowLink()
+{
+    _asm
+    {
+        mov al, [esi+36h]
+        shr al, 3
+
+        pushad
+        mov ebp, m_pTowVehicleHandler
+        test ebp, ebp
+        jz towVehicle
+
+        push ebx
+        push ecx
+        call ebp
+        add esp, 8
+        test al, al
+        jnz towVehicle
+
+        popad
+        jmp RETURN_CAutomobile_SetTowLink
+
+        towVehicle:
+        popad
+        jmp CONTINUE_CAutomobile_SetTowLink
     }
 }
 

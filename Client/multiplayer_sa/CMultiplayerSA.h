@@ -144,6 +144,8 @@ public:
     void SetPedStepHandler(PedStepHandler* pHandler);
     void SetVehicleWeaponHitHandler(VehicleWeaponHitHandler* pHandler) override;
     void SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler);
+    void SetAttachTrailerHandler(AttachTrailerHandler* pHandler) override;
+    void SetTowVehicleHandler(TowVehicleHandler* pHandler) override;
 
     void  AllowMouseMovement(bool bAllow);
     void  DoSoundHacksOnLostFocus(bool bLostFocus);

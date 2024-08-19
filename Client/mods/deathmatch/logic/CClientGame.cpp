@@ -300,6 +300,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
     g_pMultiplayer->SetVehicleWeaponHitHandler(CClientGame::StaticVehicleWeaponHitHandler);
     g_pMultiplayer->SetAudioZoneRadioSwitchHandler(CClientGame::StaticAudioZoneRadioSwitchHandler);
+    g_pMultiplayer->SetAttachTrailerHandler(CClientGame::StaticAttachTrailerHandler);
+    g_pMultiplayer->SetTowVehicleHandler(CClientGame::StaticTowVehicleHandler);
     g_pGame->SetPreWeaponFireHandler(CClientGame::PreWeaponFire);
     g_pGame->SetPostWeaponFireHandler(CClientGame::PostWeaponFire);
     g_pGame->SetTaskSimpleBeHitHandler(CClientGame::StaticTaskSimpleBeHitHandler);
@@ -2669,8 +2671,8 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientVehicleExit", "player, seat", NULL, false);
     m_Events.AddEvent("onClientVehicleStartEnter", "player, seat", NULL, false);
     m_Events.AddEvent("onClientVehicleStartExit", "player, seat", NULL, false);
-    m_Events.AddEvent("onClientTrailerAttach", "towedBy", NULL, false);
-    m_Events.AddEvent("onClientTrailerDetach", "towedBy", NULL, false);
+    m_Events.AddEvent("onClientTrailerAttach", "towedBy", nullptr, false);
+    m_Events.AddEvent("onClientTrailerDetach", "towedBy", nullptr, false);
     m_Events.AddEvent("onClientVehicleExplode", "", NULL, false);
     m_Events.AddEvent("onClientVehicleCollision", "collidedelement, damageImpulseMag, bodypart, x, y, z, velX, velY, velZ", NULL, false);
     m_Events.AddEvent("onClientVehicleDamage", "attacker, weapon, loss, x, y, z, tyre", NULL, false);
@@ -3511,6 +3513,16 @@ bool CClientGame::StaticBreakTowLinkHandler(CVehicle* pTowingVehicle)
     return g_pClientGame->BreakTowLinkHandler(pTowingVehicle);
 }
 
+bool CClientGame::StaticAttachTrailerHandler(CVehicleSAInterface* trailer, CVehicleSAInterface* truckVehicle)
+{
+    return g_pClientGame->AttachTrailerHandler(trailer, truckVehicle);
+}
+
+bool CClientGame::StaticTowVehicleHandler(CVehicleSAInterface* target, CVehicleSAInterface* towtruck)
+{
+    return g_pClientGame->TowVehicleHandler(target, towtruck);
+}
+
 void CClientGame::StaticDrawRadarAreasHandler()
 {
     g_pClientGame->DrawRadarAreasHandler();
@@ -3778,6 +3790,54 @@ bool CClientGame::BreakTowLinkHandler(CVehicle* pTowedVehicle)
 
     // Allow it to break
     return true;
+}
+
+bool CClientGame::AttachTrailerHandler(CVehicleSAInterface* trailer, CVehicleSAInterface* truckVehicle)
+{
+    CPools*                    pPools = g_pGame->GetPools();
+    auto*   trailerClientEntity = pPools->GetVehicle(reinterpret_cast<DWORD*>(trailer));
+    if (!trailerClientEntity || !trailerClientEntity->pClientEntity)
+        return true;
+
+    auto* vehicleClientEntity = pPools->GetVehicle(reinterpret_cast<DWORD*>(truckVehicle));
+    if (!vehicleClientEntity || !vehicleClientEntity->pClientEntity)
+        return true;
+
+    CClientVehicle* trailerVehicle = reinterpret_cast<CClientVehicle*>(trailerClientEntity->pClientEntity);
+    if (!trailerVehicle)
+        return true;
+
+    CClientVehicle* vehicle = reinterpret_cast<CClientVehicle*>(vehicleClientEntity->pClientEntity);
+    if (!vehicle)
+        return true;
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(vehicle);
+    return trailerVehicle->CallEvent("onClientTrailerAttach", Arguments, true);
+}
+
+bool CClientGame::TowVehicleHandler(CVehicleSAInterface* target, CVehicleSAInterface* towtruck)
+{
+    CPools* pPools = g_pGame->GetPools();
+    auto*   targetClientEntity = pPools->GetVehicle(reinterpret_cast<DWORD*>(target));
+    if (!targetClientEntity || !targetClientEntity->pClientEntity)
+        return true;
+
+    auto* towtruckVehicleEntity = pPools->GetVehicle(reinterpret_cast<DWORD*>(towtruck));
+    if (!towtruckVehicleEntity || !towtruckVehicleEntity->pClientEntity)
+        return true;
+
+    CClientVehicle* targetVehicle = reinterpret_cast<CClientVehicle*>(targetClientEntity->pClientEntity);
+    if (!targetVehicle)
+        return true;
+
+    CClientVehicle* towtruckVehicle = reinterpret_cast<CClientVehicle*>(towtruckVehicleEntity->pClientEntity);
+    if (!towtruckVehicle)
+        return true;
+
+    CLuaArguments Arguments;
+    Arguments.PushElement(towtruckVehicle);
+    return targetVehicle->CallEvent("onClientTrailerAttach", Arguments, true);
 }
 
 void CClientGame::FireHandler(CFire* pFire)
