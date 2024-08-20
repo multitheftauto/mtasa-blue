@@ -143,7 +143,7 @@ void sighandler(int sig)
 }
 #endif
 
-CGame::CGame() : m_FloodProtect(4, 30000, 30000)            // Max of 4 connections per 30 seconds, then 30 second ignore
+CGame::CGame() : m_FloodProtect(4, 30000, 30000) // Max of 4 connections per 30 seconds, then 30 second ignore
 {
     // Set our global pointer
     g_pGame = this;
@@ -607,6 +607,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pCustomWeaponManager = new CCustomWeaponManager();
 
     m_pTrainTrackManager = std::make_shared<CTrainTrackManager>();
+    m_discord = std::make_unique<CDiscord>();
 
     // Parse the commandline
     if (!m_CommandLineParser.Parse(iArgumentCount, szArguments))

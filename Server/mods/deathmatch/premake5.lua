@@ -79,7 +79,7 @@ project "Deathmatch"
 		targetdir(buildpath("server/arm64"))
 	
 	filter "configurations:Debug"
-		links { "discord-bot-d" }
+		links { "discord-bot_d" }
 
 	filter "configurations:not Debug"
 		links { "discord-bot" }

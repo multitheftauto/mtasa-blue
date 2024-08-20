@@ -58,6 +58,7 @@ class CGame;
 
 #include "CLightsyncManager.h"
 #include "CBanManager.h"
+#include <CDiscord.h>
 
 // Forward declarations
 class ASE;
@@ -252,6 +253,9 @@ public:
     CFunctionUseLogger*              GetFunctionUseLogger() { return m_pFunctionUseLogger; }
     CMasterServerAnnouncer*          GetMasterServerAnnouncer() { return m_pMasterServerAnnouncer; }
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
+
+    const CDiscord* GetDiscordManager() const noexcept { return m_discord.get(); }
+    CDiscord* GetDiscordManager() noexcept { return m_discord.get(); }
 
     std::shared_ptr<CTrainTrackManager> GetTrainTrackManager() { return m_pTrainTrackManager; }
 
@@ -567,6 +571,7 @@ private:
     CBuildingRemovalManager* m_pBuildingRemovalManager;
 
     std::shared_ptr<CTrainTrackManager> m_pTrainTrackManager;
+    std::unique_ptr<CDiscord>           m_discord;
 
     CCustomWeaponManager* m_pCustomWeaponManager;
     CFunctionUseLogger*   m_pFunctionUseLogger;

@@ -2,6 +2,7 @@ project "DiscordBot"
     language "C++"
     kind "SharedLib"
     targetname "discord-bot"
+	targetdir(buildpath("server"))
  
     includedirs {
         "discord/include",
