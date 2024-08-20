@@ -89,6 +89,7 @@ DECLARE_ENUM(ePools);
 DECLARE_ENUM(eWorldProperty);
 DECLARE_ENUM_CLASS(CResourceFile::eResourceCategory);
 DECLARE_ENUM_CLASS(eModelLoadState);
+DECLARE_ENUM_CLASS(PreloadAreaOption);
 
 class CRemoteCall;
 
