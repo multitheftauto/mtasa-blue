@@ -68,5 +68,9 @@ CTickCount CLuaTimer::GetTimeLeft()
 {
     CTickCount llCurrentTime = CTickCount::Now();
     CTickCount llTimeLeft = m_llStartTime + m_llDelay - llCurrentTime;
+    
+    if (llTimeLeft.ToLongLong() < 0)
+        return CTickCount(0LL);
+    
     return llTimeLeft;
 }
