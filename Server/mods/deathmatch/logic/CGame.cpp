@@ -1570,7 +1570,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerQuit", "reason", NULL, false);
     m_Events.AddEvent("onPlayerSpawn", "spawnpoint, team", NULL, false);
     m_Events.AddEvent("onPlayerTarget", "target", NULL, false);
-    m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart", NULL, false);
+    m_Events.AddEvent("onPlayerWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onPlayerWeaponSwitch", "previous, current", NULL, false);
     m_Events.AddEvent("onPlayerMarkerHit", "marker, matchingDimension", NULL, false);
     m_Events.AddEvent("onPlayerMarkerLeave", "marker, matchingDimension", NULL, false);
@@ -1602,7 +1602,7 @@ void CGame::AddBuiltInEvents()
     // Ped events
     m_Events.AddEvent("onPedVehicleEnter", "vehicle, seat, jacked", NULL, false);
     m_Events.AddEvent("onPedVehicleExit", "vehicle, reason, jacker", NULL, false);
-    m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart", NULL, false);
+    m_Events.AddEvent("onPedWasted", "ammo, killer, weapon, bodypart, isStealth, animGroup, animID", nullptr, false);
     m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
     m_Events.AddEvent("onPedDamage", "loss", NULL, false);
 
@@ -1633,7 +1633,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onVehicleStartExit", "player, seat, jacker", NULL, false);
     m_Events.AddEvent("onVehicleEnter", "player, seat, jacked", NULL, false);
     m_Events.AddEvent("onVehicleExit", "player, seat, jacker", NULL, false);
-    m_Events.AddEvent("onVehicleExplode", "", NULL, false);
+    m_Events.AddEvent("onVehicleExplode", "withExplosion, player", nullptr, false);
 
     // Console events
     m_Events.AddEvent("onConsole", "text", NULL, false);
@@ -2045,6 +2045,8 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
         else
             Arguments.PushBoolean(false);
         Arguments.PushBoolean(false);
+        Arguments.PushNumber(Packet.m_AnimGroup);
+        Arguments.PushNumber(Packet.m_AnimID);
         pPed->CallEvent("onPedWasted", Arguments);
 
         // Reset the weapons list, because a ped loses his weapons on death
@@ -2105,6 +2107,8 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         else
             Arguments.PushBoolean(false);
         Arguments.PushBoolean(false);
+        Arguments.PushNumber(Packet.m_AnimGroup);
+        Arguments.PushNumber(Packet.m_AnimID);
         pPlayer->CallEvent("onPlayerWasted", Arguments);
 
         // Reset the weapons list, because a player loses his weapons on death
@@ -2741,6 +2745,7 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
                                 {
                                     CLuaArguments arguments;
                                     arguments.PushBoolean(!Packet.m_blowVehicleWithoutExplosion);
+                                    arguments.PushElement(clientSource);
                                     vehicle->CallEvent("onVehicleExplode", arguments);
                                 }
 

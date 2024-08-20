@@ -24,6 +24,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
       m_pLowBuilding(nullptr)
 {
     m_pManager = pManager;
+    m_pModelInfo = g_pGame->GetModelInfo(usModelId);
     SetTypeName("building");
     m_pBuildingManager->AddToList(this);
     Create();
@@ -99,6 +100,7 @@ void CClientBuilding::SetModel(uint16_t model)
     if (CClientBuildingManager::IsValidModel(model))
     {
         m_usModelId = model;
+        m_pModelInfo = g_pGame->GetModelInfo(model);
         Recreate();
     }
 }
@@ -143,7 +145,7 @@ void CClientBuilding::Destroy()
     if (!m_pBuilding)
         return;
 
-    if (m_pHighBuilding)
+    if (m_pHighBuilding && m_pHighBuilding->IsValid())
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
     }

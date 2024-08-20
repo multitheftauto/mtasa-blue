@@ -58,6 +58,7 @@
 #include "D3DResourceSystemSA.h"
 #include "CIplStoreSA.h"
 #include "CBuildingRemovalSA.h"
+#include "CCheckpointSA.h"
 
 extern CGameSA* pGame;
 
@@ -238,6 +239,7 @@ CGameSA::CGameSA()
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
     CVehicleSA::StaticSetHooks();
+    CCheckpointSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -1009,6 +1011,10 @@ void CGameSA::RemoveAllBuildings()
 
     m_pPools->GetDummyPool().RemoveAllBuildingLods();
     m_pPools->GetBuildingsPool().RemoveAllBuildings();
+
+    auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
+    pBuildingRemoval->DropCaches();
+
     m_isBuildingsRemoved = true;
 }
 
@@ -1028,8 +1034,11 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
     {
         RemoveAllBuildings();
     }
+    else
+    {
+        static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
+    }
 
-    ((CBuildingRemovalSA*)GetBuildingRemoval())->DropCaches();
     bool status = m_pPools->GetBuildingsPool().Resize(size);
 
     if (shouldRemoveBuilding)
