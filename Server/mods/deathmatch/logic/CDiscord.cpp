@@ -16,13 +16,9 @@ IDiscord::IDiscord() noexcept : dpp::cluster("")
 {
 }
 
-CDiscord::CDiscord() noexcept
+CDiscord::CDiscord() noexcept 
 {
 
-}
-
-CDiscord::~CDiscord() noexcept
-{
 }
 
 void CDiscord::login(const std::string_view& string) noexcept

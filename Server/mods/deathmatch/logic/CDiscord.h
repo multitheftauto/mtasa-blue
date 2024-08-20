@@ -105,7 +105,6 @@ public:
 
 public:
     IDiscord() noexcept;
-    virtual ~IDiscord() noexcept = 0;
 
     virtual void login(const std::string_view& token) noexcept = 0;
     virtual void start() noexcept = 0;
@@ -116,7 +115,6 @@ class CDiscord : public IDiscord
 {
 public:
     CDiscord() noexcept;
-    ~CDiscord() noexcept override;
 
     void login(const std::string_view& token) noexcept override;
     void start() noexcept override;

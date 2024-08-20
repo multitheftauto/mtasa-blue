@@ -14,6 +14,8 @@
 #include "CAccount.h"
 #include "CEasingCurve.h"
 #include "CAccessControlListRight.h"
+#include "CDiscord.h"
+
 #include <type_traits>
 
 class CLuaVector2D;
