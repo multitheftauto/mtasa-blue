@@ -882,6 +882,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
     m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxPhotoSaving = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Save photos inside documents folder"), true));
+    m_pCheckBoxPhotoSaving->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 150.0f));
+    m_pCheckBoxPhotoSaving->AutoSize(NULL, 20.0f);
+
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -1593,6 +1597,11 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("blur", bBlur);
     m_pCheckBoxBlur->SetSelected(bBlur);
 
+    // Save photos in documents folder
+    bool bPhotoSave;
+    CVARS_GET("photosaving", bPhotoSave);
+    m_pCheckBoxPhotoSaving->SetSelected(bPhotoSave);
+
     // Corona rain reflections
     bool bCoronaReflections;
     CVARS_GET("corona_reflections", bCoronaReflections);
@@ -1831,6 +1840,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
     CVARS_SET("blur", true);
+    CVARS_SET("photosaving", true);
     CVARS_SET("corona_reflections", false);
     CVARS_SET("dynamic_ped_shadows", false);
     gameSettings->UpdateFieldOfViewFromSettings();
@@ -3519,6 +3529,11 @@ void CSettings::SaveData()
     bool bBlur = m_pCheckBoxBlur->GetSelected();
     CVARS_SET("blur", bBlur);
     gameSettings->ResetBlurEnabled();
+
+    // Save photos in documents folder
+    bool bPhotoSave = m_pCheckBoxPhotoSaving->GetSelected();
+    CVARS_SET("photosaving", bPhotoSave);
+    CScreenShot::SetPhotoSavingInsideDocuments(bPhotoSave);
 
     // Corona rain reflections
     bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();
