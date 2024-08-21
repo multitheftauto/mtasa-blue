@@ -68,7 +68,7 @@ public:
     bool       IsMainMenuVisible();
 
     CChat* GetChat();
-    float  GetChatBottomPosition();
+    float  GetChatBottomPosition() const noexcept;
     void   SetChatBoxVisible(bool bVisible, bool bInputBlocked = true);
     bool   IsChatBoxVisible();
     bool   IsChatBoxInputBlocked();

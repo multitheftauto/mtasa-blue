@@ -449,7 +449,7 @@ CChat* CLocalGUI::GetChat()
     return m_pChat;
 }
 
-float CLocalGUI::GetChatBottomPosition()
+float CLocalGUI::GetChatBottomPosition() const noexcept
 {
     return m_pChat->GetChatBottomPosition();
 }

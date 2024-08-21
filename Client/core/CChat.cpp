@@ -1117,7 +1117,7 @@ void CChat::SetCharacterLimit(int charLimit)
     m_iCharacterLimit = charLimit;
 }
 
-float CChat::GetChatBottomPosition()
+float CChat::GetChatBottomPosition() const noexcept
 {
     return m_vecBackgroundSize.fY;
 }

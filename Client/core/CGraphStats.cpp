@@ -204,32 +204,32 @@ void CGraphStats::Draw()
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
     CLocalGUI*          pLocalGUI = g_pCore->GetLocalGUI();
 
-    uint  uiViewportWidth = pGraphics->GetViewportWidth();      // get width of current resolution
-    uint  uiViewportHeight = pGraphics->GetViewportHeight();    // get height of current resolution
-    uint  uiOriginX = 10;                                       // offset the graph by 10 pixels from left side of screen
-    uint  uiOriginY = pLocalGUI->GetChatBottomPosition();       // get chat bottom screen position
-    uint  uiSizeX = uiViewportWidth / 4;                        // set the width of graph to 1/4 of current resolution
-    uint  uiSizeY = uiViewportHeight / 4;                       // set the height of graph to 1/4 of current resolution
-    uint  uiRangeY = 100;                                       // 100ms
+    std::uint32_t viewportWidth = pGraphics->GetViewportWidth();    // get width of current resolution
+    std::uint32_t viewportHeight = pGraphics->GetViewportHeight();  // get height of current resolution
+    std::uint32_t originX = 10;                                     // offset the graph by 10 pixels from left side of screen
+    std::uint32_t originY = pLocalGUI->GetChatBottomPosition();     // get chat bottom screen position
+    std::uint32_t sizeX = viewportWidth / 4;                        // set the width of graph to 1/4 of current resolution
+    std::uint32_t sizeY = viewportHeight / 4;                       // set the height of graph to 1/4 of current resolution
+    std::uint32_t rangeY = 100;                                     // 100ms
 
-    uiOriginY = uiOriginY + uiSizeY + 30;                       // add graph height plus a little gap to the overall Y position
+    originY = originY + sizeY + 30;  // add graph height plus a little gap to the overall Y position
 
-    float fLineScale = 1 / 1000.f / uiRangeY * uiSizeY;
+    float fLineScale = 1 / 1000.f / rangeY * sizeY;
     float fLineHeight = pGraphics->GetDXFontHeight();
 
     // Backgroung box
-    pGraphics->DrawRectQueued(uiOriginX, uiOriginY - uiSizeY, uiSizeX, uiSizeY, SColorRGBA(0, 0, 0, 128), true);
+    pGraphics->DrawRectQueued(originX, originY - sizeY, sizeX, sizeY, SColorRGBA(0, 0, 0, 128), true);
 
     // Draw data lines
-    float fLabelX = uiOriginX + uiSizeX + 22;
-    float fLabelY = uiOriginY - m_LineList.size() * fLineHeight;
+    float fLabelX = originX + sizeX + 22;
+    float fLabelY = originY - m_LineList.size() * fLineHeight;
     for (const auto& dataLine : m_LineList)
     {
         const SGraphStatLine& line = dataLine.second;
         int                   iDataPos = line.iDataPos;
         int                   iDataPosPrev = iDataPos;
 
-        for (int i = uiSizeX - 1; i > 0; i--)
+        for (int i = sizeX - 1; i > 0; i--)
         {
             float fY0 = line.dataHistory[iDataPos] * fLineScale;
             float fY1 = line.dataHistory[iDataPosPrev] * fLineScale;
@@ -237,14 +237,14 @@ void CGraphStats::Draw()
             iDataPosPrev = iDataPos;
             iDataPos--;
             if (iDataPos == -1)
-                iDataPos = uiSizeX - 1;
+                iDataPos = sizeX - 1;
 
-            pGraphics->DrawLineQueued(uiOriginX + i - 1, uiOriginY - fY0, uiOriginX + i, uiOriginY - fY1, 1, line.color, true);
+            pGraphics->DrawLineQueued(originX + i - 1, originY - fY0, originX + i, originY - fY1, 1, line.color, true);
 
-            if (i == uiSizeX - 1)
+            if (i == sizeX - 1)
             {
                 // Line from graph to label
-                pGraphics->DrawLineQueued(uiOriginX + i - 1, uiOriginY - fY0, fLabelX - 2, fLabelY + fLineHeight / 2, 1, line.color, true);
+                pGraphics->DrawLineQueued(originX + i - 1, originY - fY0, fLabelX - 2, fLabelY + fLineHeight / 2, 1, line.color, true);
             }
         }
 
