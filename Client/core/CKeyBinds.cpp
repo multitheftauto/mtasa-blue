@@ -841,7 +841,8 @@ CCommandBind* CKeyBinds::FindCommandMatch(const char* szKey, const char* szComma
     NullEmptyStrings(szKey, szArguments, szResource, szOriginalScriptKey);
 
     std::string arguments = szArguments ? szArguments : "";
-    szArguments = SharedUtil::Trim(arguments.data());
+    if (!arguments.empty())
+        szArguments = SharedUtil::Trim(arguments.data());
 
     for (KeyBindPtr& bind : m_binds)
     {
