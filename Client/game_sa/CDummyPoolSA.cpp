@@ -79,28 +79,32 @@ void CDummyPoolSA::UpdateBuildingLods(void* oldPool, void* newPool)
     const std::uint32_t offset = (std::uint32_t)newPool - (std::uint32_t)oldPool;
 
     if (m_pOriginalElementsBackup)
+        UpdateBackupLodOffset(offset);
+    else
+        UpdateLodsOffestInPool(offset);
+}
+
+void CDummyPoolSA::UpdateBackupLodOffset(const std::uint32_t offset)
+{
+    for (auto i = 0; i < (*m_pOriginalElementsBackup).size(); i++)
     {
-        for (auto i = 0; i < (*m_pOriginalElementsBackup).size(); i++)
+        if ((*m_pOriginalElementsBackup)[i].first)
         {
-            if ((*m_pOriginalElementsBackup)[i].first)
-            {
-                CEntitySAInterface* object = &(*m_pOriginalElementsBackup)[i].second;
-                if (object->m_pLod)
-                {
-                    object->m_pLod = (CEntitySAInterface*)((std::uint32_t)(object->m_pLod) + offset);
-                }
-            }
+            CEntitySAInterface* object = &(*m_pOriginalElementsBackup)[i].second;
+            CEntitySAInterface* lod = object->GetLod();
+            if (lod)
+                object->SetLod((CEntitySAInterface*)((std::uint32_t)lod + offset));
         }
     }
-    else
+}
+
+void CDummyPoolSA::UpdateLodsOffestInPool(const std::uint32_t offset)
+{
+    for (auto i = 0; i < (*m_ppDummyPoolInterface)->Size(); i++)
     {
-        for (auto i = 0; i < (*m_ppDummyPoolInterface)->Size(); i++)
-        {
-            CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
-            if (object->m_pLod)
-            {
-                object->m_pLod = (CEntitySAInterface*)((std::uint32_t)object->m_pLod + offset);
-            }
-        }
+        CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
+        CEntitySAInterface* lod = object->GetLod();
+        if (lod)
+            object->SetLod((CEntitySAInterface*)((std::uint32_t)lod + offset));
     }
 }

@@ -29,6 +29,10 @@ public:
     void UpdateBuildingLods(void* oldPool, void* newPool);
 
 private:
+    void UpdateBackupLodOffset(const std::uint32_t offest);
+    void UpdateLodsOffestInPool(const std::uint32_t offset);
+
+private:
     CPoolSAInterface<CEntitySAInterface>**  m_ppDummyPoolInterface;
 
     using pool_backup_t = std::array<std::pair<bool, CEntitySAInterface>, MAX_DUMMIES_DEFAULT>;

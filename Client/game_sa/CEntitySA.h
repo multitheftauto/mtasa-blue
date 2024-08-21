@@ -202,6 +202,9 @@ public:
     // Functions to hide member variable misuse
     //
 
+    void SetLod(CEntitySAInterface* pLod) noexcept { m_pLod = pLod; };
+    CEntitySAInterface* GetLod() const noexcept { return m_pLod; };
+
     // Sets
     void SetIsLowLodEntity() { numLodChildrenRendered = 0x40; }
 
