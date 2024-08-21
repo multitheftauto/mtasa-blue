@@ -449,6 +449,11 @@ CChat* CLocalGUI::GetChat()
     return m_pChat;
 }
 
+float CLocalGUI::GetChatBottomPosition() const noexcept
+{
+    return m_pChat->GetChatBottomPosition();
+}
+
 CDebugView* CLocalGUI::GetDebugView()
 {
     return m_pDebugView;
