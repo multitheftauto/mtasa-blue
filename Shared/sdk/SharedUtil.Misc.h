@@ -745,12 +745,12 @@ namespace SharedUtil
 
         std::string Get(const char*& inCmd) const noexcept;
         bool        Get(const char*& inCmd, std::string& out, const char* defaultValue = "") const noexcept;
-        bool        Get(const char*& inCmd, std::vector<std::string>& outList) const noexcept;
+        bool        Get(const char*& inCmd, std::vector<std::string>& outList) const;
         bool        Get(const char*& inCmd, int& value, int defaultValue = 0) const noexcept;
 
         std::string Get(const std::string& inCmd) const noexcept;
         bool Get(const std::string& inCmd, std::string& out, const char* defaultValue = "") const noexcept;
-        bool Get(const std::string& inCmd, std::vector<std::string>& outList) const noexcept;
+        bool Get(const std::string& inCmd, std::vector<std::string>& outList) const;
         bool Get(const std::string& inCmd, int& value, int defaultValue = 0) const noexcept;
 
         bool    Get(const SString& strInCmd, SString& strOut, const char* szDefault = "") const;            // First result as string
@@ -873,7 +873,7 @@ namespace SharedUtil
         {
             std::string temp;
             GetOption<T>(text, key, temp);
-            numbers = temp;
+            numbers = std::move(temp);
         }
         std::vector<SString> numberList;
         numbers.Split(separator, numberList);

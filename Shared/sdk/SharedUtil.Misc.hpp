@@ -1751,7 +1751,7 @@ namespace SharedUtil
         return Get(std::string(inCmd), out, defaultValue);
     }
 
-    bool CArgMap::Get(const char*& inCmd, std::vector<std::string>& outList) const noexcept
+    bool CArgMap::Get(const char*& inCmd, std::vector<std::string>& outList) const
     {
         return Get(std::string(inCmd), outList);
     }
@@ -1781,7 +1781,7 @@ namespace SharedUtil
         return false;
     }
 
-    bool CArgMap::Get(const std::string& inCmd, std::vector<std::string>& outList) const noexcept
+    bool CArgMap::Get(const std::string& inCmd, std::vector<std::string>& outList) const
     {
         std::vector<SString> newItems;
         MultiFind(m_Map, Escape(inCmd), &newItems);

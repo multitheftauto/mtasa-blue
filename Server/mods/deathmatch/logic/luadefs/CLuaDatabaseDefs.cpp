@@ -248,7 +248,7 @@ std::variant<CDatabaseConnectionElement*, bool> CLuaDatabaseDefs::DbConnect(lua_
             if (!IsValidFilePath(host.c_str()))
             {
                 SString err("host path %s not valid", host.c_str());
-                throw LuaFunctionError(err.c_str());
+                throw LuaFunctionError(err.c_str(), false);
             }
 
             host = PathJoin(g_pGame->GetConfig()->GetGlobalDatabasesPath(), host);
@@ -259,15 +259,16 @@ std::variant<CDatabaseConnectionElement*, bool> CLuaDatabaseDefs::DbConnect(lua_
 
             // Parse path
             CResource* pathResource = resource;
-            if (CResourceManager::ParseResourcePathInput(host, pathResource, &absPath))
+            if (!CResourceManager::ParseResourcePathInput(host, pathResource, &absPath))
             {
-                host = absPath;
-                auto [status, err] = CheckCanModifyOtherResource(resource, pathResource);
-                if (!status)
-                    throw LuaFunctionError(err.c_str());
+                SString err("host path %s not found", host.c_str());
+                throw LuaFunctionError(err.c_str(), false);
             }
-            SString err("host path %s not found", host.c_str());
-            throw LuaFunctionError(err.c_str());
+
+            host = absPath;
+            auto [status, err] = CheckCanModifyOtherResource(resource, pathResource);
+            if (!status)
+                throw LuaFunctionError(err.c_str(), false);
         }
     }
     
@@ -338,7 +339,7 @@ std::variant<CDatabaseConnectionElement*, bool> CLuaDatabaseDefs::DbConnect(lua_
         type, host, *username, *password, *options
     );
     if (connection == INVALID_DB_HANDLE)
-        throw LuaFunctionError(g_pGame->GetDatabaseManager()->GetLastErrorMessage().c_str());
+        throw LuaFunctionError(g_pGame->GetDatabaseManager()->GetLastErrorMessage().c_str(), false);
 
     return CreateConnection(resource, connection);
 }
