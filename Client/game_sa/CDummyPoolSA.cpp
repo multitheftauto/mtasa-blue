@@ -84,11 +84,11 @@ void CDummyPoolSA::UpdateBuildingLods(const std::uint32_t offset)
 
 void CDummyPoolSA::UpdateBackupLodOffset(const std::uint32_t offset)
 {
-    for (auto i = 0; i < (*m_pOriginalElementsBackup).size(); i++)
+    for (auto& it : *m_pOriginalElementsBackup)
     {
-        if ((*m_pOriginalElementsBackup)[i].first)
+        if (it.first)
         {
-            CEntitySAInterface* object = &(*m_pOriginalElementsBackup)[i].second;
+            CEntitySAInterface* object = &it.second;
             CEntitySAInterface* lod = object->GetLod();
             if (lod)
                 object->SetLod((CEntitySAInterface*)((std::uint32_t)lod + offset));
