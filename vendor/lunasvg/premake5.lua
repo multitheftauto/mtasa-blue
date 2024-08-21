@@ -35,3 +35,8 @@ project "lunasvg"
 		"source",
 		"include"
 	}
+
+	filter "architecture:not x86"
+		flags { "ExcludeFromBuild" }
+	filter "system:not windows"
+		flags { "ExcludeFromBuild" }
