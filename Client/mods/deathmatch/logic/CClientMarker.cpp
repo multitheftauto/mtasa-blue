@@ -410,44 +410,44 @@ void CClientMarker::StreamOut()
     }
 }
 
-void CClientMarker::Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity)
+void CClientMarker::Callback_OnCollision(CClientColShape& shape, CClientEntity& entity)
 {
-    if (GetInterior() != Entity.GetInterior())
+    if (GetInterior() != entity.GetInterior())
         return;
 
     // Call the marker hit event
-    CLuaArguments Arguments;
-    Arguments.PushElement(&Entity);                                            // Hit element
-    Arguments.PushBoolean(GetDimension() == Entity.GetDimension());            // Matching dimension?
-    CallEvent("onClientMarkerHit", Arguments, true);
+    CLuaArguments arguments;
+    arguments.PushElement(&entity);                                            // Hit element
+    arguments.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    CallEvent("onClientMarkerHit", arguments, true);
 
-    if (!IS_PLAYER(&Entity))
+    if (!IS_PLAYER(&entity))
         return;
 
-    CLuaArguments Arguments2;
-    Arguments2.PushElement(this);                                               // marker
-    Arguments2.PushBoolean(GetDimension() == Entity.GetDimension());            // Matching dimension?
-    Entity.CallEvent("onClientPlayerMarkerHit", Arguments2, false);
+    CLuaArguments arguments2;
+    arguments2.PushElement(this);                                               // marker
+    arguments2.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    entity.CallEvent("onClientPlayerMarkerHit", arguments2, false);
 }
 
-void CClientMarker::Callback_OnLeave(CClientColShape& Shape, CClientEntity& Entity)
+void CClientMarker::Callback_OnLeave(CClientColShape& shape, CClientEntity& entity)
 {
-    if (GetInterior() != Entity.GetInterior())
+    if (GetInterior() != entity.GetInterior())
         return;
 
     // Call the marker leave event
-    CLuaArguments Arguments;
-    Arguments.PushElement(&Entity);                                            // Hit element
-    Arguments.PushBoolean(GetDimension() == Entity.GetDimension());            // Matching dimension?
-    CallEvent("onClientMarkerLeave", Arguments, true);
+    CLuaArguments arguments;
+    arguments.PushElement(&entity);                                            // Hit element
+    arguments.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    CallEvent("onClientMarkerLeave", arguments, true);
 
-    if (!IS_PLAYER(&Entity))
+    if (!IS_PLAYER(&entity))
         return;
 
-    CLuaArguments Arguments2;
-    Arguments2.PushElement(this);                                               // marker
-    Arguments2.PushBoolean(GetDimension() == Entity.GetDimension());            // Matching dimension?
-    Entity.CallEvent("onPlayerMarkerLeave", Arguments2, false);
+    CLuaArguments arguments2;
+    arguments2.PushElement(this);                                               // marker
+    arguments2.PushBoolean(GetDimension() == entity.GetDimension());            // Matching dimension?
+    entity.CallEvent("onPlayerMarkerLeave", arguments2, false);
 }
 
 void CClientMarker::CreateOfType(int iType)
