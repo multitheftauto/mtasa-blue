@@ -1051,10 +1051,10 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
 
 void CGameSA::UnloadUnusedModels()
 {
-    for (size_t id = 0; id < GetBaseIDforCOL(); id++)
+    for (std::size_t id = 0; id < GetBaseIDforCOL(); id++)
     {
         CStreamingInfo* streamingInfo = m_pStreaming->GetStreamingInfo(id);
-        if (streamingInfo->loadState != 0 && streamingInfo->sizeInBlocks > 0)
+        if (streamingInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED && streamingInfo->sizeInBlocks > 0)
         {
             if (ModelInfo[id].GetRefCount() == 0)
             {
