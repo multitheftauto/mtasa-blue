@@ -179,6 +179,7 @@ public:
     virtual void RemoveRef(bool bRemoveExtraGTARef = false) = 0;
     virtual int  GetRefCount() const = 0;
     virtual bool ForceUnload() = 0;
+    virtual bool UnloadUnused() = 0;
     virtual void DeallocateModel() = 0;
 
     virtual float GetDistanceFromCentreOfMassToBaseOfModel() = 0;
