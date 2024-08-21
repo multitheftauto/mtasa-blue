@@ -74,10 +74,8 @@ void CDummyPoolSA::RestoreBackup()
     m_pOriginalElementsBackup = nullptr;
 }
 
-void CDummyPoolSA::UpdateBuildingLods(void* oldPool, void* newPool)
+void CDummyPoolSA::UpdateBuildingLods(const std::uint32_t offset)
 {
-    const std::uint32_t offset = (std::uint32_t)newPool - (std::uint32_t)oldPool;
-
     if (m_pOriginalElementsBackup)
         UpdateBackupLodOffset(offset);
     else

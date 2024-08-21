@@ -224,7 +224,7 @@ bool CBuildingsPoolSA::Resize(int size)
         newBytemap[i].bEmpty = true;
     }
 
-    const uint32_t offset = (uint32_t)newObjects - (uint32_t)oldPool;
+    const std::uint32_t offset = (std::uint32_t)newObjects - (std::uint32_t)oldPool;
     if (oldPool != nullptr)
     {
         UpdateIplEntrysPointers(offset);
@@ -235,7 +235,7 @@ bool CBuildingsPoolSA::Resize(int size)
         UpdateBackupLodPointers(offset);
     }
 
-    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(oldPool, newObjects);
+    pGame->GetPools()->GetDummyPool().UpdateBuildingLods(offset);
 
     RemoveVehicleDamageLinks();
     RemovePedsContactEnityLinks();

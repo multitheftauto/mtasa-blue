@@ -26,7 +26,7 @@ public:
 
     void RemoveAllWithBackup() override;
     void RestoreBackup() override;
-    void UpdateBuildingLods(void* oldPool, void* newPool);
+    void UpdateBuildingLods(const std::uint32_t offset);
 
 private:
     void UpdateBackupLodOffset(const std::uint32_t offest);

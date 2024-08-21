@@ -18,5 +18,5 @@ class CDummyPool
 public:
     virtual void RemoveAllWithBackup() = 0;
     virtual void RestoreBackup() = 0;
-    virtual void UpdateBuildingLods(void* oldPool, void* newPool) = 0;
+    virtual void UpdateBuildingLods(const std::uint32_t offset) = 0;
 };
