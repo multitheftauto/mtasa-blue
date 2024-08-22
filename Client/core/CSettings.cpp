@@ -882,10 +882,6 @@ void CSettings::CreateGUI()
     m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
     m_pCheckBoxCoronaReflections->AutoSize(NULL, 20.0f);
 
-    m_pCheckBoxPhotoSaving = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Save photos inside documents folder"), true));
-    m_pCheckBoxPhotoSaving->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 150.0f));
-    m_pCheckBoxPhotoSaving->AutoSize(NULL, 20.0f);
-
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -1185,6 +1181,12 @@ void CSettings::CreateGUI()
     m_pCachePathValue->SetPosition(CVector2D(vecTemp.fX + fIndentX + vecSize.fX + 10, vecTemp.fY + 3));
     m_pCachePathValue->SetFont("default-small");
     m_pCachePathValue->AutoSize();
+    vecTemp.fY += fLineHeight;
+
+    // Enable camera photos getting saved to documents folder
+    m_pCheckBoxPhotoSaving = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
+    m_pCheckBoxPhotoSaving->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pCheckBoxPhotoSaving->AutoSize(NULL, 20.0f);
     vecTemp.fY += fLineHeight;
 
     // Auto updater section label
@@ -1598,9 +1600,9 @@ void CSettings::UpdateVideoTab()
     m_pCheckBoxBlur->SetSelected(bBlur);
 
     // Save photos in documents folder
-    bool bPhotoSave;
-    CVARS_GET("photosaving", bPhotoSave);
-    m_pCheckBoxPhotoSaving->SetSelected(bPhotoSave);
+    bool photoSaving;
+    CVARS_GET("photosaving", photoSaving);
+    m_pCheckBoxPhotoSaving->SetSelected(photoSaving);
 
     // Corona rain reflections
     bool bCoronaReflections;
@@ -3531,9 +3533,9 @@ void CSettings::SaveData()
     gameSettings->ResetBlurEnabled();
 
     // Save photos in documents folder
-    bool bPhotoSave = m_pCheckBoxPhotoSaving->GetSelected();
-    CVARS_SET("photosaving", bPhotoSave);
-    CScreenShot::SetPhotoSavingInsideDocuments(bPhotoSave);
+    bool photoSaving = m_pCheckBoxPhotoSaving->GetSelected();
+    CVARS_SET("photosaving", photoSaving);
+    CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
 
     // Corona rain reflections
     bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();

@@ -36,7 +36,7 @@ static uint    ms_uiWidth = 0;
 static uint    ms_uiHeight = 0;
 
 // whether we want to actually save photo in documents folder
-static bool ms_bSavePhotoInDocuments = false;
+static bool savePhotoInDocuments = false;
 
 void CScreenShot::InitiateScreenShot(bool bIsCameraShot)
 {
@@ -51,7 +51,7 @@ void CScreenShot::InitiateScreenShot(bool bIsCameraShot)
 
     if (bIsCameraShot)
     {
-        if (ms_bSavePhotoInDocuments)
+        if (savePhotoInDocuments)
         {
             // Set the screenshot path to camera gallery path
             ms_strScreenDirectoryPath = PathJoin(GetSystemPersonalPath(), "GTA San Andreas User Files", "Gallery");
@@ -88,14 +88,11 @@ void CScreenShot::CheckForScreenShot(bool bBeforeGUI)
     // Update last time of taken screenshot of given type
     ms_lLastSaveTime[ms_bIsCameraShot] = GetTickCount64_();
 
-    if (ms_bIsCameraShot)
+    if (ms_bIsCameraShot && !savePhotoInDocuments)
     {
-        if (!ms_bSavePhotoInDocuments)
-        {
-            ClearBuffer();
-            ms_bScreenShot = false;
-            return;
-        }
+        ClearBuffer();
+        ms_bScreenShot = false;
+        return;
     }
 
     ms_strScreenShotPath = GetScreenshotPath();
@@ -222,7 +219,7 @@ void CScreenShot::ClearBuffer()
     ms_ScreenShotBuffer.Clear();
 }
 
-void CScreenShot::SetPhotoSavingInsideDocuments(bool bSavePhoto)
+void CScreenShot::SetPhotoSavingInsideDocuments(bool savePhoto) noexcept
 {
-    ms_bSavePhotoInDocuments = bSavePhoto ? 1 : 0;
+    savePhotoInDocuments = savePhoto;
 }
