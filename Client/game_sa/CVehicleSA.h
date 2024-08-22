@@ -703,11 +703,12 @@ public:
 
 private:
     static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, eVehicleDummies dummy, const CVector& position);
+    
+    void HOOK_CCurrentVehicle__Process();
 
     void           RecalculateSuspensionLines();
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();
-
-    void HOOK_CCurrentVehicle__Process();
+    void           DumpVehicleFrames();
 };
