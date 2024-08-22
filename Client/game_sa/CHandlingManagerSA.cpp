@@ -9167,7 +9167,7 @@ void CHandlingManagerSA::CheckSuspensionChanges(CHandlingEntry* pEntry) noexcept
 
     // Get Handling ID
     const eHandlingTypes eHandling = static_cast<eHandlingTypes>(pEntry->GetVehicleID());
-    if (eHandling > HT_MAX)
+    if (eHandling >= HT_MAX)
         return;
 
     const CHandlingEntrySA* pOriginal = m_pOriginalEntries[eHandling];
