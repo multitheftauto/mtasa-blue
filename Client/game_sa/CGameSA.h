@@ -171,7 +171,7 @@ public:
     CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
     CIplStore*                GetIplStore() { return m_pIplStore; };
     CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
-    CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };    
+    CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
     CRenderer*                GetRenderer() const override { return m_pRenderer.get(); }
     
