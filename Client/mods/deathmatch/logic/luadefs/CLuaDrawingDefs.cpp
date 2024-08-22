@@ -2123,7 +2123,7 @@ bool CLuaDrawingDefs::DxDrawWiredSphere(lua_State* const luaVM, const CVector po
     return true;
 }
 
-bool CLuaDrawingDefs::DxDrawModel3D(uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale, const std::optional<EModelLoadingScheme> loadingScheme)
+bool CLuaDrawingDefs::DxDrawModel3D(std::uint32_t modelID, CVector position, CVector rotation, const std::optional<CVector> scale, const std::optional<EModelLoadingScheme> loadingScheme)
 {
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelID);
     if (!pModelInfo)
