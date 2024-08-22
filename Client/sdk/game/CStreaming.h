@@ -37,6 +37,13 @@ enum class eModelLoadState : std::uint32_t
     LOADSTATE_FINISHING = 4
 };
 
+enum class PreloadAreaOption
+{
+    MODELS = 0,
+    COLLISIONS,
+    ALL
+};
+
 struct CStreamingInfo
 {
     uint16_t prevId = (uint16_t)-1;
@@ -68,4 +75,6 @@ public:
     virtual void   MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
     virtual std::uint32_t GetMemoryUsed() const = 0;
     virtual void          RemoveBigBuildings() = 0;
+    virtual void          LoadScene(const CVector* position) = 0;
+    virtual void          LoadSceneCollision(const CVector* position) = 0;
 };

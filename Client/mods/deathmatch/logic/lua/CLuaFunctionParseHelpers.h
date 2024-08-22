@@ -87,6 +87,7 @@ DECLARE_ENUM_CLASS(eFxParticleSystems);
 DECLARE_ENUM(ePools);
 DECLARE_ENUM(eWorldProperty);
 DECLARE_ENUM_CLASS(eModelLoadState);
+DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(EModelLoadingScheme);
 
 class CRemoteCall;
