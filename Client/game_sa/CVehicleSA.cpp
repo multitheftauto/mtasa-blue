@@ -54,8 +54,9 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
     }
 }
 
-static std::unordered_map<std::uint16_t, std::string> g_vehicleIDNames;
-static std::unordered_map<const CVehicleSA*, std::string> g_vehicleRefNames;
+static const auto& vehicleRefNames = CGameSA::GetVehicleRefNames();
+static auto&       vehicleIDNames = CGameSA::GetVehicleIDNames();
+static const auto& originalVehNames = CGameSA::GetOriginalVehicleNames();
 
 void CVehicleSA::HOOK_CCurrentVehicle__Process()
 {
@@ -85,18 +86,36 @@ void CVehicleSA::HOOK_CCurrentVehicle__Process()
     }
     auto modelIndex = playerPed->pVehicle->m_nModelIndex;
 
-    if (SharedUtil::MapContains(g_vehicleRefNames, this))
+    if (vehicleRefNames.size() > 0)
     {
-        CHud__SetVehicleName(g_vehicleRefNames[this].c_str());
-        return;
+        const CVehicle* temp1 = this;
+        const CVehicle* temp2 = (*vehicleRefNames.begin()).first;
+
+        auto temp3 = temp1 == temp2;
+        auto temp4 = 0;
     }
-    if (SharedUtil::MapContains(g_vehicleIDNames, modelIndex))
+
+    if (SharedUtil::MapContains(vehicleRefNames, this))
     {
-        CHud__SetVehicleName(g_vehicleIDNames[modelIndex].c_str());
+        CHud__SetVehicleName(vehicleRefNames.at(this).c_str());
         return;
     }
 
-    CHud__SetVehicleName(CText__Get(TheText, ModelInfoPtr[modelIndex]->gameName));
+    if (SharedUtil::MapContains(vehicleIDNames, modelIndex))
+    {
+        CHud__SetVehicleName(vehicleIDNames.at(modelIndex).c_str());
+        return;
+    }
+
+    if (SharedUtil::MapContains(originalVehNames, modelIndex))
+    {
+        CHud__SetVehicleName(originalVehNames.at(modelIndex).c_str());
+        return;
+    }
+
+    vehicleIDNames[modelIndex] = CText__Get(TheText, ModelInfoPtr[modelIndex]->gameName);
+
+    CHud__SetVehicleName(vehicleIDNames[modelIndex].c_str());
     CCurrentVehicle__Display(currentVehicle);
 }
 
@@ -2320,29 +2339,20 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     }
     return bReturn;
 }
-struct SVehicleName
-{
-    const char* szName;
-    const char* szName_replaced;            // Compatibility
-};
-
-extern const SFixedArray<SVehicleName, 212> VehicleNames;
 
 std::string CVehicleSA::GetVehicleName() const noexcept
 {
-    if (SharedUtil::MapContains(g_vehicleRefNames, this))
-        return g_vehicleRefNames[this];
+    if (SharedUtil::MapContains(vehicleRefNames, this))
+        return vehicleRefNames.at(this);
 
     auto index = GetModelIndex();
-    if (SharedUtil::MapContains(g_vehicleIDNames, index))
-        return g_vehicleIDNames[index];
+    if (SharedUtil::MapContains(vehicleIDNames, index))
+        return vehicleIDNames.at(index);
 
-    if (index < 400 || index > 611)
-        return "";
-    if (index - 400 >= NUMELMS(VehicleNames))
-        return "";
+    if (SharedUtil::MapContains(originalVehNames, index))
+        return originalVehNames.at(index);
 
-    return VehicleNames[index - 400].szName;
+    return "";
 }
 
 bool CVehicleSA::SetVehicleName(std::string name) noexcept
@@ -2350,17 +2360,9 @@ bool CVehicleSA::SetVehicleName(std::string name) noexcept
     if (name.size() > 63)
         return false;
 
-    g_vehicleRefNames[this] = name;
+    static auto& vehicleRefNames = CGameSA::GetVehicleRefNames();
 
-    return true;
-}
-
-bool CVehicleSA::SetVehicleName(std::uint16_t id, std::string name) noexcept
-{
-    if (name.size() > 63)
-        return false;
-
-    g_vehicleIDNames[id] = name;
+    vehicleRefNames[this] = name;
 
     return true;
 }

@@ -4237,9 +4237,16 @@ bool CLuaVehicleDefs::BlowVehicle(CClientEntity* entity, std::optional<bool> wit
     return CStaticFunctionDefinitions::BlowVehicle(*entity, withExplosion);
 }
 
-bool CLuaVehicleDefs::SetVehicleName(CClientVehicle* const vehicle, std::string name) noexcept
+bool CLuaVehicleDefs::SetVehicleName(std::variant<CClientVehicle* const, std::uint16_t> vehicle, std::string name) noexcept
 {
-    return vehicle->SetName(name);
+    if (std::holds_alternative<std::uint16_t>(vehicle))
+    {
+        return g_pGame->SetVehicleName(std::get<std::uint16_t>(vehicle), name);
+    }
+    else
+    {
+        return std::get<CClientVehicle* const>(vehicle)->SetName(name);
+    }
 }
 
 std::string CLuaVehicleDefs::GetVehName(CClientVehicle* const veh) noexcept

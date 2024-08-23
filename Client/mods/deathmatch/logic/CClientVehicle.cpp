@@ -5046,7 +5046,7 @@ bool CClientVehicle::SetName(std::string name) noexcept
 
 bool CClientVehicle::SetName(std::uint16_t id, std::string name) noexcept
 {
-    return m_pVehicle->SetVehicleName(id, name);
+    return g_pGame->SetVehicleName(id, name);
 }
 
 CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)

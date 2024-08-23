@@ -322,7 +322,6 @@ public:
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
     virtual std::string                       GetVehicleName() const noexcept = 0;
     virtual bool                              SetVehicleName(std::string name) noexcept = 0;
-    virtual bool                              SetVehicleName(std::uint16_t id, std::string name) noexcept = 0;
 
     virtual bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const = 0;
     virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;

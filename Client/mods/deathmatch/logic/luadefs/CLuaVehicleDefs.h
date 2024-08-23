@@ -180,6 +180,6 @@ public:
     LUA_DECLARE(GetVehicleComponentVisible);
     LUA_DECLARE(GetVehicleComponents);
 
-    static bool        SetVehicleName(CClientVehicle* const vehicle, std::string name) noexcept;
+    static bool        SetVehicleName(std::variant<CClientVehicle* const, std::uint16_t> vehicle, std::string name) noexcept;
     static std::string GetVehName(CClientVehicle* const vehicle) noexcept;
 };

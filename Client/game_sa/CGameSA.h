@@ -17,6 +17,7 @@
 #include "CStreamingSA.h"
 #include "CCoverManagerSA.h"
 #include "CPlantManagerSA.h"
+#include "CVehicleSA.h"
 
 class CAnimBlendClumpDataSAInterface;
 class CObjectGroupPhysicalPropertiesSA;
@@ -308,6 +309,18 @@ public:
 
     bool SetBuildingPoolSize(size_t size);
 
+    bool SetVehicleName(std::uint16_t id, std::string name) noexcept;
+
+    static const std::unordered_map<std::uint16_t, std::string>& GetOriginalVehicleNames() noexcept {
+        return g_originalVehicleNames;
+    }
+    static std::unordered_map<std::uint16_t, std::string>& GetVehicleIDNames() noexcept {
+        return g_vehicleIDNames;
+    }
+    static std::unordered_map<const CVehicleSA*, std::string>& GetVehicleRefNames() noexcept {
+        return g_vehicleRefNames;
+    }
+
 private:
     CPools*                         m_pPools;
     CPlayerInfo*                    m_pPlayerInfo;
@@ -383,4 +396,8 @@ private:
 
     CPed*      m_pPedContext;
     CTickCount m_llASyncLoadingAutoUnsuspendTime;
+
+    static const std::unordered_map<std::uint16_t, std::string> g_originalVehicleNames;
+    static std::unordered_map<std::uint16_t, std::string> g_vehicleIDNames;
+    static std::unordered_map<const CVehicleSA*, std::string> g_vehicleRefNames;
 };

@@ -273,4 +273,5 @@ public:
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
 
+    virtual bool SetVehicleName(std::uint16_t id, std::string name) noexcept = 0;
 };
