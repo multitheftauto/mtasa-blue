@@ -896,6 +896,20 @@ ADD_ENUM(WEATHER_SANDSTORM, "Sandstorm")
 ADD_ENUM(WEATHER_RAINBOW, "Rainbow")
 IMPLEMENT_ENUM_END("world-property")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(eModelLoadState)
+ADD_ENUM(eModelLoadState::LOADSTATE_NOT_LOADED, "unloaded")
+ADD_ENUM(eModelLoadState::LOADSTATE_LOADED, "loaded")
+ADD_ENUM(eModelLoadState::LOADSTATE_REQUESTED, "requested")
+ADD_ENUM(eModelLoadState::LOADSTATE_READING, "reading")
+ADD_ENUM(eModelLoadState::LOADSTATE_FINISHING, "finishing")
+IMPLEMENT_ENUM_CLASS_END("model-load-state")
+
+IMPLEMENT_ENUM_CLASS_BEGIN(PreloadAreaOption)
+ADD_ENUM(PreloadAreaOption::MODELS, "models")
+ADD_ENUM(PreloadAreaOption::COLLISIONS, "collisions")
+ADD_ENUM(PreloadAreaOption::ALL, "all")
+IMPLEMENT_ENUM_CLASS_END("preload-area-option")
+
 //
 // CResource from userdata
 //

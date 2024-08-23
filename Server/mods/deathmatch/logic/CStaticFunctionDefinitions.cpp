@@ -1654,27 +1654,15 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
         case CElement::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
-            if (!pPed->IsDead())
-            {
-                // Limit their max health to what the stat says
-                float fMaxHealth = pPed->GetMaxHealth();
-                if (fHealth > fMaxHealth)
-                    fHealth = fMaxHealth;
-
-                // Do not set the health below zero
-                if (fHealth < 0.0f)
-                    fHealth = 0.0f;
-
-                // This makes sure the health is set to what will get reported
-                unsigned char ucHealth = static_cast<unsigned char>(fHealth * 1.25f);
-                fHealth = static_cast<float>(ucHealth) / 1.25f;
-                pPed->SetHealth(fHealth);
-
-                if (pPed->IsDead() && fHealth > 0.0f)
-                    pPed->SetIsDead(false);
-            }
-            else
+            if (!pPed->IsSpawned())
                 return false;
+
+            fHealth = Clamp(0.0f, fHealth, pPed->GetMaxHealth());
+            pPed->SetHealth(fHealth);
+
+            if (pPed->IsDead() && fHealth > 0.0f)
+                pPed->SetIsDead(false);
+
             break;
         }
         case CElement::VEHICLE:
