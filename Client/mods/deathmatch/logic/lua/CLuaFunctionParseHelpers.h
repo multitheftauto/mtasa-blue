@@ -13,6 +13,7 @@
 #include <game/CAudioEngine.h>
 #include <game/CRenderWare.h>
 #include <game/CHud.h>
+#include <game/CStreaming.h>
 #include <type_traits>
 
 enum eLuaType
@@ -85,6 +86,8 @@ DECLARE_ENUM_CLASS(eRenderStage);
 DECLARE_ENUM_CLASS(eFxParticleSystems);
 DECLARE_ENUM(ePools);
 DECLARE_ENUM(eWorldProperty);
+DECLARE_ENUM_CLASS(eModelLoadState);
+DECLARE_ENUM_CLASS(PreloadAreaOption);
 
 class CRemoteCall;
 

@@ -1117,6 +1117,11 @@ void CChat::SetCharacterLimit(int charLimit)
     m_iCharacterLimit = charLimit;
 }
 
+float CChat::GetChatBottomPosition() const noexcept
+{
+    return m_vecBackgroundSize.fY;
+}
+
 CChatLine::CChatLine()
 {
     m_bActive = false;
