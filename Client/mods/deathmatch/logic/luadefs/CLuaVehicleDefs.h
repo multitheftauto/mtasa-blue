@@ -119,6 +119,7 @@ public:
     LUA_DECLARE(SetVehicleAdjustableProperty);
     LUA_DECLARE(SetHelicopterRotorSpeed);
     static bool SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed);
+    static bool SetVehicleWheelsRotation(CClientVehicle* pVehicle, float fRotation) noexcept;
     LUA_DECLARE(SetTrainDerailed);
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
@@ -150,6 +151,9 @@ public:
     static std::variant<bool, CLuaMultiReturn<float, float, float>> GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
     static std::variant<bool, CVector>                              OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, eVehicleDummies dummy);
     static bool                                                     ResetVehicleDummyPositions(CClientVehicle* vehicle);
+
+    static std::variant<bool, std::array<std::array<float, 3>, 4>>    GetVehicleEntryPoints(CClientVehicle* vehicle);
+    static std::variant<bool, std::array<CVector, 4>>                 OOP_GetVehicleEntryPoints(CClientVehicle* vehicle);
 
     LUA_DECLARE(SetVehicleModelExhaustFumesPosition);
     LUA_DECLARE_OOP(GetVehicleModelExhaustFumesPosition);
