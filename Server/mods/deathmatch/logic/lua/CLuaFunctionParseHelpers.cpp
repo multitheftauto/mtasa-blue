@@ -567,6 +567,11 @@ CClient* UserDataCast(CClient* ptr, lua_State* luaState)
     return pClient;
 }
 
+CDiscordGuild* UserDataCast(CDiscordGuild* ptr, lua_State* luaState)
+{
+    return CDiscordGuild::GetFromSciptID(reinterpret_cast<std::uint32_t>(ptr));
+}
+
 //
 // Get best guess at name of userdata type
 //

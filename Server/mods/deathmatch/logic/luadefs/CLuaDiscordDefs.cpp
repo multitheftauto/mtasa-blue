@@ -19,6 +19,9 @@ void CLuaDiscordDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]
     {
         {"discordOnEvent", ArgumentParser<DiscordOnEvent>},
+        {"discordLogin", ArgumentParser<DiscordLogin>},
+        {"discordStart", ArgumentParser<DiscordStart>},
+        {"discordGetGuild", ArgumentParser<DiscordGetGuild>},
     };
 
     // Add functions
@@ -32,10 +35,44 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
 
     lua_registerclass(luaVM, "Discord");
 }
-bool CLuaDiscordDefs::DiscordOnEvent(IDiscord::DiscordEvent event, CLuaFunctionRef callback) noexcept
-{
-    const auto discord = g_pGame->GetDiscordManager();
 
+void CLuaDiscordDefs::DiscordLogin(lua_State* luaVM, std::string token) noexcept
+{
+    static const auto discord = (&lua_getownerresource(luaVM))->GetDiscordManager();
+
+    discord->login(token);
+}
+
+bool CLuaDiscordDefs::DiscordStart(lua_State* luaVM)
+{
+    static const auto discord = (&lua_getownerresource(luaVM))->GetDiscordManager();
+
+    try
+    {
+        discord->start();
+    }
+    catch (dpp::invalid_token_exception& exc)
+    {
+        throw LuaFunctionError("Invalid token", false);
+    }
+    catch (dpp::rest_exception& exc)
+    {
+        throw LuaFunctionError(exc.what(), false);
+    }
+    return true;
+}
+
+CDiscordGuild* CLuaDiscordDefs::DiscordGetGuild(lua_State* luaVM, std::string id) noexcept
+{
+    static const auto discord = (&lua_getownerresource(luaVM))->GetDiscordManager();
+    return discord->GetGuild(id);
+}
+
+// ...
+
+bool CLuaDiscordDefs::DiscordOnEvent(lua_State* luaVM, IDiscord::DiscordEvent event, CLuaFunctionRef callback) noexcept
+{
+    static const auto discord = (&lua_getownerresource(luaVM))->GetDiscordManager();
     switch (event)
     {
         case IDiscord::DiscordEvent::on_voice_state_update:
@@ -454,10 +491,9 @@ bool CLuaDiscordDefs::DiscordOnEvent(IDiscord::DiscordEvent event, CLuaFunctionR
 
 void CLuaDiscordDefs::DiscordOnVoiceStateUpdate(const dpp::voice_state_update_t& event, const CLuaFunctionRef callback) noexcept
 {
-    CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; },
-                                                  [event, callback](bool)
+    CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -468,7 +504,7 @@ void CLuaDiscordDefs::DiscordOnVoiceClientDisconnect(const dpp::voice_client_dis
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -478,7 +514,7 @@ void CLuaDiscordDefs::DiscordOnVoiceClientSpeaking(const dpp::voice_client_speak
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -488,9 +524,11 @@ void CLuaDiscordDefs::DiscordOnLog(const dpp::log_t& event, const CLuaFunctionRe
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        arguments.PushString(event.message);
+        arguments.PushNumber(event.severity);
         arguments.Call(&luaMain, callback);
     });
 }
@@ -498,7 +536,7 @@ void CLuaDiscordDefs::DiscordOnGuildJoinRequestDelete(const dpp::guild_join_requ
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -508,7 +546,7 @@ void CLuaDiscordDefs::DiscordOnInteractionCreate(const dpp::interaction_create_t
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -518,7 +556,7 @@ void CLuaDiscordDefs::DiscordOnSlashcommand(const dpp::slashcommand_t& event, co
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -528,7 +566,7 @@ void CLuaDiscordDefs::DiscordOnButtonClick(const dpp::button_click_t& event, con
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -538,7 +576,7 @@ void CLuaDiscordDefs::DiscordOnAutocomplete(const dpp::autocomplete_t& event, co
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -548,7 +586,7 @@ void CLuaDiscordDefs::DiscordOnSelectClick(const dpp::select_click_t& event, con
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -558,7 +596,7 @@ void CLuaDiscordDefs::DiscordOnMessageContextMenu(const dpp::message_context_men
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -568,7 +606,7 @@ void CLuaDiscordDefs::DiscordOnUserContextMenu(const dpp::user_context_menu_t& e
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -578,7 +616,7 @@ void CLuaDiscordDefs::DiscordOnFormSubmit(const dpp::form_submit_t& event, const
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -588,7 +626,7 @@ void CLuaDiscordDefs::DiscordOnGuildDelete(const dpp::guild_delete_t& event, con
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -598,7 +636,7 @@ void CLuaDiscordDefs::DiscordOnChannelDelete(const dpp::channel_delete_t& event,
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -608,7 +646,7 @@ void CLuaDiscordDefs::DiscordOnChannelUpdate(const dpp::channel_update_t& event,
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -618,7 +656,7 @@ void CLuaDiscordDefs::DiscordOnReady(const dpp::ready_t& event, const CLuaFuncti
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.PushString(event.session_id);
@@ -636,7 +674,6 @@ void CLuaDiscordDefs::DiscordOnReady(const dpp::ready_t& event, const CLuaFuncti
             }
             arguments.PushTable(&guildsArgs);
         }
-
         arguments.PushNumber(event.guild_count);
         arguments.Call(&luaMain, callback);
     });
@@ -645,7 +682,7 @@ void CLuaDiscordDefs::DiscordOnMessageDelete(const dpp::message_delete_t& event,
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -655,7 +692,7 @@ void CLuaDiscordDefs::DiscordOnGuildMemberRemove(const dpp::guild_member_remove_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -665,7 +702,7 @@ void CLuaDiscordDefs::DiscordOnResumed(const dpp::resumed_t& event, const CLuaFu
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -675,7 +712,7 @@ void CLuaDiscordDefs::DiscordOnGuildRoleCreate(const dpp::guild_role_create_t& e
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -685,7 +722,7 @@ void CLuaDiscordDefs::DiscordOnTypingStart(const dpp::typing_start_t& event, con
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -695,7 +732,7 @@ void CLuaDiscordDefs::DiscordOnMessageReactionAdd(const dpp::message_reaction_ad
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -705,7 +742,7 @@ void CLuaDiscordDefs::DiscordOnGuildMembersChunk(const dpp::guild_members_chunk_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -715,7 +752,7 @@ void CLuaDiscordDefs::DiscordOnMessageReactionRemove(const dpp::message_reaction
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -725,7 +762,7 @@ void CLuaDiscordDefs::DiscordOnGuildCreate(const dpp::guild_create_t& event, con
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -735,7 +772,7 @@ void CLuaDiscordDefs::DiscordOnChannelCreate(const dpp::channel_create_t& event,
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -745,7 +782,7 @@ void CLuaDiscordDefs::DiscordOnMessageReactionRemoveEmoji(const dpp::message_rea
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -755,7 +792,7 @@ void CLuaDiscordDefs::DiscordOnMessageDeleteBulk(const dpp::message_delete_bulk_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -765,7 +802,7 @@ void CLuaDiscordDefs::DiscordOnGuildRoleUpdate(const dpp::guild_role_update_t& e
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -775,7 +812,7 @@ void CLuaDiscordDefs::DiscordOnGuildRoleDelete(const dpp::guild_role_delete_t& e
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -785,7 +822,7 @@ void CLuaDiscordDefs::DiscordOnChannelPinsUpdate(const dpp::channel_pins_update_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -795,7 +832,7 @@ void CLuaDiscordDefs::DiscordOnMessageReactionRemoveAll(const dpp::message_react
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -805,7 +842,7 @@ void CLuaDiscordDefs::DiscordOnVoiceServerUpdate(const dpp::voice_server_update_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -815,7 +852,7 @@ void CLuaDiscordDefs::DiscordOnGuildEmojisUpdate(const dpp::guild_emojis_update_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -825,7 +862,7 @@ void CLuaDiscordDefs::DiscordOnGuildStickersUpdate(const dpp::guild_stickers_upd
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -835,7 +872,7 @@ void CLuaDiscordDefs::DiscordOnPresenceUpdate(const dpp::presence_update_t& even
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -845,7 +882,7 @@ void CLuaDiscordDefs::DiscordOnWebhooksUpdate(const dpp::webhooks_update_t& even
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -855,7 +892,7 @@ void CLuaDiscordDefs::DiscordOnAutomodRuleCreate(const dpp::automod_rule_create_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -865,7 +902,7 @@ void CLuaDiscordDefs::DiscordOnAutomodRuleUpdate(const dpp::automod_rule_update_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -875,7 +912,7 @@ void CLuaDiscordDefs::DiscordOnAutomodRuleDelete(const dpp::automod_rule_delete_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -885,7 +922,7 @@ void CLuaDiscordDefs::DiscordOnAutomodRuleExecute(const dpp::automod_rule_execut
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -895,7 +932,7 @@ void CLuaDiscordDefs::DiscordOnGuildMemberAdd(const dpp::guild_member_add_t& eve
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -905,7 +942,7 @@ void CLuaDiscordDefs::DiscordOnInviteDelete(const dpp::invite_delete_t& event, c
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -915,7 +952,7 @@ void CLuaDiscordDefs::DiscordOnGuildUpdate(const dpp::guild_update_t& event, con
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -925,7 +962,7 @@ void CLuaDiscordDefs::DiscordOnGuildIntegrationsUpdate(const dpp::guild_integrat
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -935,7 +972,7 @@ void CLuaDiscordDefs::DiscordOnGuildMemberUpdate(const dpp::guild_member_update_
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -945,7 +982,7 @@ void CLuaDiscordDefs::DiscordOnInviteCreate(const dpp::invite_create_t& event, c
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -955,7 +992,7 @@ void CLuaDiscordDefs::DiscordOnMessageUpdate(const dpp::message_update_t& event,
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -965,7 +1002,7 @@ void CLuaDiscordDefs::DiscordOnUserUpdate(const dpp::user_update_t& event, const
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -975,7 +1012,7 @@ void CLuaDiscordDefs::DiscordOnMessageCreate(const dpp::message_create_t& event,
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -985,7 +1022,7 @@ void CLuaDiscordDefs::DiscordOnMessagePollVoteAdd(const dpp::message_poll_vote_a
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -995,7 +1032,7 @@ void CLuaDiscordDefs::DiscordOnMessagePollVoteRemove(const dpp::message_poll_vot
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1005,7 +1042,7 @@ void CLuaDiscordDefs::DiscordOnGuildAuditLogEntryCreate(const dpp::guild_audit_l
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1015,7 +1052,7 @@ void CLuaDiscordDefs::DiscordOnGuildBanAdd(const dpp::guild_ban_add_t& event, co
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1025,7 +1062,7 @@ void CLuaDiscordDefs::DiscordOnGuildBanRemove(const dpp::guild_ban_remove_t& eve
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1035,7 +1072,7 @@ void CLuaDiscordDefs::DiscordOnIntegrationCreate(const dpp::integration_create_t
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1045,7 +1082,7 @@ void CLuaDiscordDefs::DiscordOnIntegrationUpdate(const dpp::integration_update_t
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1055,7 +1092,7 @@ void CLuaDiscordDefs::DiscordOnIntegrationDelete(const dpp::integration_delete_t
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1065,7 +1102,7 @@ void CLuaDiscordDefs::DiscordOnThreadCreate(const dpp::thread_create_t& event, c
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1075,7 +1112,7 @@ void CLuaDiscordDefs::DiscordOnThreadUpdate(const dpp::thread_update_t& event, c
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1085,7 +1122,7 @@ void CLuaDiscordDefs::DiscordOnThreadDelete(const dpp::thread_delete_t& event, c
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1095,7 +1132,7 @@ void CLuaDiscordDefs::DiscordOnThreadListSync(const dpp::thread_list_sync_t& eve
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1105,7 +1142,7 @@ void CLuaDiscordDefs::DiscordOnThreadMemberUpdate(const dpp::thread_member_updat
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1115,7 +1152,7 @@ void CLuaDiscordDefs::DiscordOnThreadMembersUpdate(const dpp::thread_members_upd
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1125,7 +1162,7 @@ void CLuaDiscordDefs::DiscordOnGuildScheduledEventCreate(const dpp::guild_schedu
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1135,7 +1172,7 @@ void CLuaDiscordDefs::DiscordOnGuildScheduledEventUpdate(const dpp::guild_schedu
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1145,7 +1182,7 @@ void CLuaDiscordDefs::DiscordOnGuildScheduledEventDelete(const dpp::guild_schedu
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1155,7 +1192,7 @@ void CLuaDiscordDefs::DiscordOnGuildScheduledEventUserAdd(const dpp::guild_sched
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1165,7 +1202,7 @@ void CLuaDiscordDefs::DiscordOnGuildScheduledEventUserRemove(const dpp::guild_sc
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1175,7 +1212,7 @@ void CLuaDiscordDefs::DiscordOnVoiceBufferSend(const dpp::voice_buffer_send_t& e
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1185,7 +1222,7 @@ void CLuaDiscordDefs::DiscordOnVoiceUserTalking(const dpp::voice_user_talking_t&
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1195,7 +1232,7 @@ void CLuaDiscordDefs::DiscordOnVoiceReady(const dpp::voice_ready_t& event, const
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1205,7 +1242,7 @@ void CLuaDiscordDefs::DiscordOnVoiceReceive(const dpp::voice_receive_t& event, c
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1215,7 +1252,7 @@ void CLuaDiscordDefs::DiscordOnVoiceTrackMarker(const dpp::voice_track_marker_t&
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1225,7 +1262,7 @@ void CLuaDiscordDefs::DiscordOnStageInstanceCreate(const dpp::stage_instance_cre
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1235,7 +1272,7 @@ void CLuaDiscordDefs::DiscordOnStageInstanceUpdate(const dpp::stage_instance_upd
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1245,7 +1282,7 @@ void CLuaDiscordDefs::DiscordOnStageInstanceDelete(const dpp::stage_instance_del
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1255,7 +1292,7 @@ void CLuaDiscordDefs::DiscordOnEntitlementCreate(const dpp::entitlement_create_t
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1265,7 +1302,7 @@ void CLuaDiscordDefs::DiscordOnEntitlementUpdate(const dpp::entitlement_update_t
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);
@@ -1275,7 +1312,7 @@ void CLuaDiscordDefs::DiscordOnEntitlementDelete(const dpp::entitlement_delete_t
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
     {
-        CLuaMain luaMain = lua_getownercluamain(callback.GetLuaVM());
+        CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
         arguments.Call(&luaMain, callback);

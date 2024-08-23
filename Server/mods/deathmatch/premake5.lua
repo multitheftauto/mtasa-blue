@@ -34,11 +34,13 @@ project "Deathmatch"
 		}
 
 	defines { "SDK_WITH_BCRYPT" }
+	undefines { "DPP_BUILD" }
 	links {
 		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
 	}
 	libdirs {
 		buildpath('server'),
+		buildpath('server/mods/deathmatch'),
 	}
 
 	vpaths {
@@ -74,15 +76,22 @@ project "Deathmatch"
 
 	filter "platforms:x64"
 		targetdir(buildpath("server/x64"))
-
+		libdirs { buildpath('server/x64') }
 	filter "platforms:arm"
 		targetdir(buildpath("server/arm"))
-
+		libdirs { buildpath('server/arm') }
 	filter "platforms:arm64"
 		targetdir(buildpath("server/arm64"))
+		libdirs { buildpath('server/arm64') }
 	
-	filter "configurations:Debug"
-		links { "discord-bot_d" }
+	filter { "configurations:Debug", "architecture:x64" }
+		links { "discord-bot-x64_d.lib" }
 
-	filter "configurations:not Debug"
-		links { "discord-bot" }
+	filter { "configurations:Release", "architecture:x64" }
+		links { "discord-bot-x64.lib" }
+
+	filter { "configurations:Debug", "architecture:x86" }
+		links { "discord-bot-x86_d.lib" }
+
+	filter { "configurations:Release", "architecture:x86" }
+		links { "discord-bot-x86.lib" }

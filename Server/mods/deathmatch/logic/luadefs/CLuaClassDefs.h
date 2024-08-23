@@ -45,4 +45,5 @@ public:
     static const char* GetBanClass(CBan* pBan);
     static const char* GetQueryClass(CDbJobData* pJobData);
     static const char* GetElementClass(CElement* pElement);
+    static const char* GetDiscordGuildClass() noexcept;
 };

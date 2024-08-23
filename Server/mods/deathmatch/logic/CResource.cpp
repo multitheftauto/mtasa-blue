@@ -1039,6 +1039,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     // Sort by priority, for start grouping on the client
     m_StartedResources.sort([](CResource* a, CResource* b) { return a->m_iDownloadPriorityGroup > b->m_iDownloadPriorityGroup; });
 
+    m_discord = std::make_unique<CDiscord>();
+
     return true;
 }
 
@@ -1174,6 +1176,8 @@ bool CResource::Stop(bool bManualStop)
 
     OnResourceStateChange("loaded");
     m_eState = EResourceState::Loaded;
+
+    m_discord.reset();
     return true;
 }
 

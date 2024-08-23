@@ -1500,7 +1500,7 @@ json sticker_pack::to_json_impl(bool with_id) const {
 		try {
 			j["stickers"].push_back(json::parse(s.second.build_json(with_id)));
 		}
-		catch (const std::exception &e) {
+		catch (const std::exception&) {
 			/* Protection against malformed json in sticker */
 		}
 	}

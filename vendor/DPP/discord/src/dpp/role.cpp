@@ -477,7 +477,7 @@ json application_role_connection::to_json_impl(bool with_id) const {
 		try {
 			j["metadata"] = json::parse(std::get<application_role_connection_metadata>(metadata).build_json());
 		}
-		catch (const std::exception &e) {
+		catch (const std::exception&) {
 			/* Protection against malformed json in metadata */
 		}
 	}

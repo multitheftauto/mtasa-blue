@@ -54,7 +54,7 @@ websocket_client::websocket_client(const std::string &hostname, const std::strin
 	 * The nonce MUST be selected randomly for each connection.
 	 */
 	key = to_hex<uint64_t>(k);
-	key = base64_encode(reinterpret_cast<const unsigned char*>(key.c_str()), key.length());
+	key = base64_encode(reinterpret_cast<const unsigned char*>(key.c_str()), static_cast<unsigned int>(key.length()));
 }
 
 void websocket_client::connect()
@@ -85,7 +85,7 @@ size_t websocket_client::fill_header(unsigned char* outbuf, size_t sendlength, w
 	outbuf[pos++] = WS_FINBIT | opcode;
 
 	if (sendlength <= WS_MAX_PAYLOAD_LENGTH_SMALL) {
-		outbuf[pos++] = (unsigned int)sendlength;
+        outbuf[pos++] = static_cast<unsigned char>(sendlength);
 	} else if (sendlength <= WS_MAX_PAYLOAD_LENGTH_LARGE) {
 		outbuf[pos++] = WS_PAYLOAD_LENGTH_MAGIC_LARGE;
 		outbuf[pos++] = (sendlength >> 8) & 0xff;
@@ -236,15 +236,17 @@ bool websocket_client::parseheader(std::string &data)
 					return false;
 				}
 
+				auto lenFinal = static_cast<size_t>(len);
+
 				if ((opcode & ~WS_FINBIT) == OP_PING || (opcode & ~WS_FINBIT) == OP_PONG) {
-					handle_ping_pong((opcode & ~WS_FINBIT) == OP_PING, data.substr(payloadstartoffset, len));
+                    handle_ping_pong((opcode & ~WS_FINBIT) == OP_PING, data.substr(payloadstartoffset, lenFinal));
 				} else {
 					/* Pass this frame to the deriving class */
-					this->handle_frame(data.substr(payloadstartoffset, len));
+                    this->handle_frame(data.substr(payloadstartoffset, lenFinal));
 				}
 
 				/* Remove this frame from the input buffer */
-				data.erase(data.begin(), data.begin() + payloadstartoffset + len);
+                data.erase(data.begin(), data.begin() + payloadstartoffset + lenFinal);
 
 				return true;
 			}

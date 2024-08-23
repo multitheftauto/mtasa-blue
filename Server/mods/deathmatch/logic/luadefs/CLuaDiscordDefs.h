@@ -19,8 +19,10 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-
-    static bool DiscordOnEvent(IDiscord::DiscordEvent event, CLuaFunctionRef callback) noexcept;
+    static bool           DiscordStart(lua_State* luaVM);
+    static void           DiscordLogin(lua_State* luaVM, std::string token) noexcept;
+    static bool           DiscordOnEvent(lua_State* luaVM, IDiscord::DiscordEvent event, CLuaFunctionRef callback) noexcept;
+    static CDiscordGuild* DiscordGetGuild(lua_State* luaVM, std::string id) noexcept;
 
     // NOT USABLE FROM LUA
     static void DiscordOnVoiceStateUpdate(const dpp::voice_state_update_t& event, const CLuaFunctionRef callback) noexcept;

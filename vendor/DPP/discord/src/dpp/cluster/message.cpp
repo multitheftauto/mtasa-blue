@@ -178,7 +178,7 @@ void cluster::poll_get_answer_voters(const message& m, uint32_t answer_id, snowf
 	};
 
 	if (after > 0) {
-		parameters["after"] = after;
+		parameters["after"] = after.str();
 	}
 	rest_request_list<user>(this, API_PATH "/channels", std::to_string(m.channel_id), "polls/" + std::to_string(m.id) + "/answers/" + std::to_string(answer_id) + utility::make_url_parameters(parameters), m_get, "", std::move(callback), "id", "users");
 }
@@ -189,7 +189,7 @@ void cluster::poll_get_answer_voters(snowflake message_id, snowflake channel_id,
 	};
 
 	if (after > 0) {
-		parameters["after"] = after;
+		parameters["after"] = after.str();
 	}
 	rest_request_list<user>(this, API_PATH "/channels", std::to_string(channel_id), "polls/" + std::to_string(message_id) + "/answers/" + std::to_string(answer_id) + utility::make_url_parameters(parameters), m_get, "", std::move(callback), "id", "users");
 }

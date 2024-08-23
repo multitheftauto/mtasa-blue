@@ -83,6 +83,7 @@ namespace lua
     inline void Push(lua_State* L, const CTextDisplay* value) { lua_pushtextdisplay(L, const_cast<CTextDisplay*>(value)); }
     inline void Push(lua_State* L, const CTextItem* value) { lua_pushtextitem(L, const_cast<CTextItem*>(value)); }
     inline void Push(lua_State* L, const CDbJobData* value) { lua_pushquery(L, const_cast<CDbJobData*>(value)); }
+    inline void Push(lua_State* L, const CDiscordGuild* value) { lua_pushdiscordguild(L, value); }
     #endif
     inline void Push(lua_State* L, const CResource* value) { lua_pushresource(L, const_cast<CResource*>(value)); }
     inline void Push(lua_State* L, const CXMLNode* value) { lua_pushxmlnode(L, const_cast<CXMLNode*>(value)); }

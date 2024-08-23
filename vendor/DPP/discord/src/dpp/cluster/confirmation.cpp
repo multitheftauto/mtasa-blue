@@ -154,7 +154,7 @@ error_info confirmation_callback_t::get_error() const {
 
 			return e;
 		}
-		catch (const std::exception &e) {
+		catch (const std::exception&) {
 			return {};
 		}
 	}

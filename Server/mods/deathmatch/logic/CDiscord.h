@@ -11,8 +11,25 @@
 
 #pragma once
 
-#include "dpp/dpp.h"
-#include <dpp/event_router.h>
+#ifdef _WIN32
+    #include <dpp/win32_safe_warnings.h>
+#endif
+#include <DPP/dpp.h>
+
+// Interfaces for modules
+
+class IDiscordGuild : public dpp::guild
+{
+public:
+    IDiscordGuild();
+    ~IDiscordGuild();
+
+    std::uint32_t         GetScriptID() const noexcept;
+    static IDiscordGuild* GetFromSciptID(std::uint32_t id);
+
+protected:
+    std::uint32_t m_scriptID;
+};
 
 class IDiscord : public dpp::cluster
 {
@@ -105,10 +122,31 @@ public:
 
 public:
     IDiscord() noexcept;
+    ~IDiscord() noexcept;
 
-    virtual void login(const std::string_view& token) noexcept = 0;
-    virtual void start() noexcept = 0;
-    void         start(bool) = delete;
+    bool HasStarted() const noexcept;
+
+    void login(const std::string_view& token) noexcept;
+    void start();
+    void start(bool) = delete;
+    void stop();
+
+    template <typename F>
+    void on(DiscordEvent event, F&& func);
+
+    virtual IDiscordGuild* GetGuild(dpp::snowflake id) const noexcept = 0;
+
+protected:
+    std::atomic<bool> m_hasStarted;
+    std::unordered_map<DiscordEvent, std::vector<bool>> m_eventHandlers;
+};
+
+// Usable classes
+
+class CDiscordGuild : public IDiscordGuild
+{
+public:
+    static CDiscordGuild* GetFromSciptID(std::uint32_t id);
 };
 
 class CDiscord : public IDiscord
@@ -116,7 +154,7 @@ class CDiscord : public IDiscord
 public:
     CDiscord() noexcept;
 
-    void login(const std::string_view& token) noexcept override;
-    void start() noexcept override;
+    CDiscordGuild* GetGuild(dpp::snowflake id) const noexcept override;
+
 protected:
 };

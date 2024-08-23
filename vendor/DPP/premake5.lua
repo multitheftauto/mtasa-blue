@@ -2,17 +2,12 @@ project "DiscordBot"
     language "C++"
     kind "SharedLib"
     targetname "discord-bot"
-	targetdir(buildpath("server"))
  
     includedirs {
         "discord/include",
         "discord/include/dpp",
         "discord/win32/include"
     }
- 
-    characterset "MBCS"
-    functionlevellinking "off"
-    editandcontinue 'off'
  
     vpaths {
         ["Headers/*"] = "discord/include/dpp/**.h",
@@ -36,16 +31,27 @@ project "DiscordBot"
         }
  
     filter "configurations:Debug"
-        runtime 'debug'
-        defines {
-            '_DEBUG',
+        links {
+            'opus_d.lib',
         }
  
     filter "configurations:Release"
-        runtime 'release'
-        defines {
-            'NDEBUG',
+        links {
+            'opus.lib',
         }
+
+    filter "platforms:x86"
+        links {
+            'libssl-3.lib',
+            'libcrypto-3.lib',
+        }
+        targetdir(buildpath("server/mods/deathmatch"))
+    filter "platforms:x64"
+        links {
+            'libssl-3-x64.lib',
+            'libcrypto-3-x64.lib',
+        }
+        targetdir(buildpath("server/x64"))
  
     filter "system:windows"
         defines {
@@ -54,24 +60,30 @@ project "DiscordBot"
             "_WINSOCK_DEPRECATED_NO_WARNINGS",
             "WIN32_LEAN_AND_MEAN",
         }
-        libdirs {
-            'discord/win32/lib/'
-        }
         links {
-            'libssl.lib',
-            'libcrypto.lib',
-            'zlib.lib',
             'libsodium.lib',
-            'opus.lib',
-            'kernel32.lib',
-            'user32.lib',
-            'gdi32.lib',
-            'winspool.lib',
-            'shell32.lib',
-            'ole32.lib',
-            'oleaut32.lib',
-            'uuid.lib',
-            'comdlg32.lib',
-            'advapi32.lib',
+            'zlib',
         }
         buildoptions { '/bigobj' }
+    
+    filter { "configurations:Debug", "platforms:x86" }
+        libdirs {
+            'discord/libs/x86/Debug'
+        }
+		targetsuffix "-x86_d"
+    filter { "configurations:Release", "platforms:x86" }
+        libdirs {
+            'discord/libs/x86/Release'
+        }
+		targetsuffix "-x86"
+    
+    filter { "configurations:Debug", "platforms:x64" }
+        libdirs {
+            'discord/libs/x64/Debug'
+        }
+		targetsuffix "-x64_d"
+    filter { "configurations:Release", "platforms:x64" }
+        libdirs {
+            'discord/libs/x64/Release'
+        }
+		targetsuffix "-x64"
