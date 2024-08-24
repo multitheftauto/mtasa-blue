@@ -98,8 +98,17 @@ void CPedSA::Init()
 
 void CPedSA::SetModelIndex(DWORD dwModelIndex)
 {
-    DWORD dwFunction = FUNC_SetModelIndex;
+    // Delete any existing RwObject first
+    DWORD dwFunction = GetPedInterface()->vtbl->DeleteRwObject;
     DWORD dwThis = (DWORD)GetInterface();
+    _asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+
+    // Set new model
+    dwFunction = FUNC_SetModelIndex;
     _asm
     {
         mov     ecx, dwThis

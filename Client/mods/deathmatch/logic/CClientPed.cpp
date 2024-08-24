@@ -3940,8 +3940,6 @@ void CClientPed::_ChangeModel()
             #ifdef NO_CRASH_FIX_TEST
                 m_pPlayerPed->RemoveGeometryRef();
             #endif
-                // As we will have problem removing the geometry later, we might as well keep the model cached until exit
-                g_pCore->AddModelToPersistentCache((ushort)m_ulModel);
             }
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
