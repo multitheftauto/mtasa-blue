@@ -106,7 +106,11 @@ void CResourceModelStreamer::ReleaseAll()
 
 void CResourceModelStreamer::FullyReleaseModel(std::uint16_t modelId)
 {
-    std::uint16_t &refsCount = m_requestedModels[modelId];
+    auto refs = m_requestedModels.find(modelId);
+    if (refs == m_requestedModels.end())
+        return;
+
+    std::uint16_t refsCount = refs->second;
 
     if (refsCount > 0)
     {
