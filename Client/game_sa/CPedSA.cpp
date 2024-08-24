@@ -104,7 +104,7 @@ void CPedSA::SetModelIndex(DWORD dwModelIndex)
     _asm
     {
         mov     ecx, dwThis
-        call    dwFunc
+        call    dwFunction
     }
 
     // Set new model
