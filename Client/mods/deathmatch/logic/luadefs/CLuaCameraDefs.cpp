@@ -43,6 +43,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"setCameraDrunkLevel", ArgumentParserWarn<false, SetCameraDrunkLevel>},
 
         {"shakeCamera", ArgumentParser<ShakeCamera>},
+        {"resetShakeCamera", ArgumentParser<ResetShakeCamera>},
     };
 
     // Add functions
@@ -559,5 +560,11 @@ bool CLuaCameraDefs::ShakeCamera(float radius, std::optional<float> x, std::opti
     }
     m_pManager->GetCamera()->ShakeCamera(radius, *x, *y, *z);
 
+    return true;
+}
+
+bool CLuaCameraDefs::ResetShakeCamera() noexcept
+{
+    m_pManager->GetCamera()->ResetShakeCamera();
     return true;
 }

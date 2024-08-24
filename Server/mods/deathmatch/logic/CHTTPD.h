@@ -27,10 +27,10 @@ public:
     CHTTPD();            // start the initial server
     ~CHTTPD();
     // EHS interface
-    HttpResponse* RouteRequest(HttpRequest* ipoHttpRequest);
-    ResponseCode  HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
-    void          HttpPulse();
-    bool          ShouldAllowConnection(const char* szAddress);
+    HttpResponse*  RouteRequest(HttpRequest* ipoHttpRequest);
+    HttpStatusCode HandleRequest(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
+    void           HttpPulse();
+    bool           ShouldAllowConnection(const char* szAddress);
 
     // CHTTPD methods
     bool            StartHTTPD(const char* szIP, unsigned int port);
@@ -39,20 +39,20 @@ public:
     CResource*      GetResource() { return m_resource; }
     class CAccount* CheckAuthentication(HttpRequest* ipoHttpRequest);
     void            SetDefaultResource(const char* szResourceName) { m_strDefaultResourceName = szResourceName ? szResourceName : ""; }
-    ResponseCode    RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
+    HttpStatusCode  RequestLogin(HttpRequest* ipoHttpRequest, HttpResponse* ipoHttpResponse);
 
     void StartAPI() noexcept;
     void StopAPI() noexcept;
 
 private:
-
-    CResource*  m_resource;
-    CHTTPD*     m_server;
+    CResource*  m_resource{};
+    CHTTPD*     m_server{};
+    
     std::string m_strDefaultResourceName;            // default resource name
 
     EHSServerParameters m_Parameters;
 
-    bool m_bStartedServer;
+    bool m_bStartedServer{};
 
     class CAccount*             m_pGuestAccount;
     std::map<string, long long> m_LoggedInMap;
