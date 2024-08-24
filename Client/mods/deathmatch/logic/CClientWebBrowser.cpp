@@ -305,6 +305,16 @@ void CClientWebBrowser::Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHan
     pHandler->SetResponse(result);
 }
 
+void CClientWebBrowser::Events_OnConsoleMessage(const SString& strMessage, const SString& strSource, int line, short level)
+{
+    CLuaArguments Arguments;
+    Arguments.PushString(strMessage);
+    Arguments.PushString(strSource);
+    Arguments.PushNumber(line);
+    Arguments.PushNumber(level);
+    CallEvent("onClientBrowserConsoleMessage", Arguments, false);
+}
+
 bool CClientWebBrowser::AddAjaxHandler(const SString& strURL, ajax_callback_t& handler)
 {
     if (!m_pWebView->RegisterAjaxHandler(strURL))

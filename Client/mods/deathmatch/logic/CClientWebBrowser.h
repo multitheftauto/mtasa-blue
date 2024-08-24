@@ -84,6 +84,7 @@ public:
     bool Events_OnResourceFileCheck(const SString& strURL, CBuffer& outFileData) override;
     void Events_OnResourceBlocked(const SString& strURL, const SString& strDomain, unsigned char reason) override;
     void Events_OnAjaxRequest(CAjaxResourceHandlerInterface* pHandler, const SString& strURL) override;
+    void Events_OnConsoleMessage(const SString& strMessage, const SString& strSource, int line, short level);
 
 private:
     CWebViewInterface*                 m_pWebView;
