@@ -29,7 +29,7 @@
 
 // Vendor
 #ifndef _
-#define _ //Use a dummy localisation define for modules that don't need it
+#define _(x) x //Use a dummy localisation define for modules that don't need it
 #endif
 
 #include "SString.h"

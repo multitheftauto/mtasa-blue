@@ -14,7 +14,7 @@
 #ifdef _WIN32
     #include <dpp/win32_safe_warnings.h>
 #endif
-#include <DPP/dpp.h>
+#include <dpp/dpp.h>
 
 // Interfaces for modules
 
