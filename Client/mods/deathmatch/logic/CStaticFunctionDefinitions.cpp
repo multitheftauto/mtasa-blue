@@ -1247,47 +1247,44 @@ bool CStaticFunctionDefinitions::SetElementAngularVelocity(CClientEntity& Entity
 
 bool CStaticFunctionDefinitions::SetElementParent(CClientEntity& Entity, CClientEntity& Parent, CLuaMain* pLuaMain)
 {
-    if (&Entity != &Parent && !Entity.IsMyChild(&Parent, true))
+    if (&Entity == &Parent || Entity.IsMyChild(&Parent, true))
+        return false;
+
+    if (Entity.GetType() == CCLIENTCAMERA || Parent.GetType() == CCLIENTCAMERA)
+        return false;
+
+    if (Entity.GetType() == CCLIENTGUI)
     {
-        if (Entity.GetType() == CCLIENTCAMERA || Parent.GetType() == CCLIENTCAMERA)
-        {
+        if (Parent.GetType() != CCLIENTGUI && &Parent != pLuaMain->GetResource()->GetResourceGUIEntity())
             return false;
-        }
-        else if (Entity.GetType() == CCLIENTGUI)
+
+        CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
+
+        GUIElement.SetParent(&Parent);
+        return true;
+    }
+
+    CClientEntity* pTemp = &Parent;
+    CClientEntity* pRoot = m_pRootEntity;
+    bool           bValidParent = false;
+    while (pTemp != pRoot && pTemp != NULL)
+    {
+        const char* szTypeName = pTemp->GetTypeName();
+        if (szTypeName && strcmp(szTypeName, "map") == 0)
         {
-            if (Parent.GetType() == CCLIENTGUI || &Parent == pLuaMain->GetResource()->GetResourceGUIEntity())
-            {
-                CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-
-                GUIElement.SetParent(&Parent);
-                return true;
-            }
+            bValidParent = true;            // parents must be a map
+            break;
         }
-        else
-        {
-            CClientEntity* pTemp = &Parent;
-            CClientEntity* pRoot = m_pRootEntity;
-            bool           bValidParent = false;
-            while (pTemp != pRoot && pTemp != NULL)
-            {
-                const char* szTypeName = pTemp->GetTypeName();
-                if (szTypeName && strcmp(szTypeName, "map") == 0)
-                {
-                    bValidParent = true;            // parents must be a map
-                    break;
-                }
 
-                pTemp = pTemp->GetParent();
-            }
+        pTemp = pTemp->GetParent();
+    }
 
-            // Make sure the entity we move is a client entity or we get a problem
-            if (bValidParent && Entity.IsLocalEntity())
-            {
-                // Set the new parent
-                Entity.SetParent(&Parent);
-                return true;
-            }
-        }
+    // Make sure the entity we move is a client entity or we get a problem
+    if (bValidParent && Entity.IsLocalEntity())
+    {
+        // Set the new parent
+        Entity.SetParent(&Parent);
+        return true;
     }
 
     return false;
