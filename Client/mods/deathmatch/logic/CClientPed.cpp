@@ -3927,20 +3927,7 @@ void CClientPed::_ChangeModel()
                 // So make sure clothes geometry is built now...
                 m_pClothes->AddAllToModel();
                 m_pPlayerPed->RebuildPlayer();
-
-                // ...and decrement the extra ref
-            #ifdef NO_CRASH_FIX_TEST2
-                m_pPlayerPed->RemoveGeometryRef();
-            #endif
-            }
-            else
-            {
-                // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
-                // So decrement the extra ref here
-            #ifdef NO_CRASH_FIX_TEST
-                m_pPlayerPed->RemoveGeometryRef();
-            #endif
-            }
+            }    
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
             pLoadedModel->RemoveRef(true);
