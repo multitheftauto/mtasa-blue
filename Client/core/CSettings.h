@@ -165,7 +165,6 @@ protected:
     CGUICheckBox*  m_pCheckBoxHighDetailVehicles;
     CGUICheckBox*  m_pCheckBoxHighDetailPeds;
     CGUICheckBox*  m_pCheckBoxBlur;
-    CGUICheckBox*  m_pCheckBoxPhotoSaving;
     CGUICheckBox*  m_pCheckBoxCoronaReflections;
     CGUICheckBox*  m_pCheckBoxDynamicPedShadows;
     CGUILabel*     m_pFieldOfViewLabel;
@@ -214,6 +213,7 @@ protected:
     CGUILabel*     m_pWin8Label;
     CGUICheckBox*  m_pWin8ColorCheckBox;
     CGUICheckBox*  m_pWin8MouseCheckBox;
+    CGUICheckBox*  m_pPhotoSavingCheckbox;
     CGUILabel*     m_pUpdateBuildTypeLabel;
     CGUIComboBox*  m_pUpdateBuildTypeCombo;
     CGUILabel*     m_pUpdateAutoInstallLabel;

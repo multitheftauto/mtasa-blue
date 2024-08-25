@@ -1184,9 +1184,9 @@ void CSettings::CreateGUI()
     vecTemp.fY += fLineHeight;
 
     // Enable camera photos getting saved to documents folder
-    m_pCheckBoxPhotoSaving = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
-    m_pCheckBoxPhotoSaving->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
-    m_pCheckBoxPhotoSaving->AutoSize(NULL, 20.0f);
+    m_pPhotoSavingCheckbox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Save photos taken by camera weapon to GTA San Andreas User Files folder"), true));
+    m_pPhotoSavingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pPhotoSavingCheckbox->AutoSize(NULL, 20.0f);
     vecTemp.fY += fLineHeight;
 
     // Auto updater section label
@@ -1599,11 +1599,6 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("blur", bBlur);
     m_pCheckBoxBlur->SetSelected(bBlur);
 
-    // Save photos in documents folder
-    bool photoSaving;
-    CVARS_GET("photosaving", photoSaving);
-    m_pCheckBoxPhotoSaving->SetSelected(photoSaving);
-
     // Corona rain reflections
     bool bCoronaReflections;
     CVARS_GET("corona_reflections", bCoronaReflections);
@@ -1842,7 +1837,6 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
     CVARS_SET("blur", true);
-    CVARS_SET("photosaving", true);
     CVARS_SET("corona_reflections", false);
     CVARS_SET("dynamic_ped_shadows", false);
     gameSettings->UpdateFieldOfViewFromSettings();
@@ -3205,6 +3199,10 @@ void CSettings::LoadData()
     iVar = GetApplicationSettingInt("Win8MouseFix");
     m_pWin8MouseCheckBox->SetSelected(iVar != 0);
 
+    // Save camera photos inside user documents folder
+    CVARS_GET("photosaving", bVar);
+    m_pPhotoSavingCheckbox->SetSelected(bVar);
+
     // Update build type
     CVARS_GET("update_build_type", iVar);
     if (iVar == 0 || iVar == 1)
@@ -3532,11 +3530,6 @@ void CSettings::SaveData()
     CVARS_SET("blur", bBlur);
     gameSettings->ResetBlurEnabled();
 
-    // Save photos in documents folder
-    bool photoSaving = m_pCheckBoxPhotoSaving->GetSelected();
-    CVARS_SET("photosaving", photoSaving);
-    CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
-
     // Corona rain reflections
     bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();
     CVARS_SET("corona_reflections", bCoronaReflections);
@@ -3598,6 +3591,11 @@ void CSettings::SaveData()
 
     // Windows 8 mouse fix
     SetApplicationSettingInt("Win8MouseFix", m_pWin8MouseCheckBox->GetSelected());
+
+    // Save photos in documents folder
+    bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
+    CVARS_SET("photosaving", photoSaving);
+    CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
 
     // Debug setting
     if (CGUIListItem* pSelected = m_pDebugSettingCombo->GetSelectedItem())
