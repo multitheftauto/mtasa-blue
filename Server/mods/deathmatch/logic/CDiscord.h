@@ -15,20 +15,33 @@
     #include <dpp/win32_safe_warnings.h>
 #endif
 #include <dpp/dpp.h>
+#include <CIdArray.h>
 
 // Interfaces for modules
 
 class IDiscordGuild : public dpp::guild
 {
 public:
-    IDiscordGuild();
-    ~IDiscordGuild();
-
-    std::uint32_t         GetScriptID() const noexcept;
+    virtual ~IDiscordGuild() = 0;
+    virtual std::uint32_t GetScriptID() const noexcept = 0;
     static IDiscordGuild* GetFromSciptID(std::uint32_t id);
 
 protected:
-    std::uint32_t m_scriptID;
+};
+
+class CDiscordGuild : public IDiscordGuild
+{
+public:
+    CDiscordGuild();
+    CDiscordGuild(dpp::guild guild);
+    CDiscordGuild(const dpp::guild* guild);
+    ~CDiscordGuild() override;
+
+    static CDiscordGuild* GetFromSciptID(std::uint32_t id);
+    std::uint32_t         GetScriptID() const noexcept override;
+
+protected:
+    std::uint32_t m_scriptID{INVALID_ARRAY_ID};
 };
 
 class IDiscord : public dpp::cluster
@@ -122,39 +135,41 @@ public:
 
 public:
     IDiscord() noexcept;
-    ~IDiscord() noexcept;
+    virtual ~IDiscord() noexcept = 0;
 
-    bool HasStarted() const noexcept;
+    virtual bool HasStarted() const noexcept = 0;
 
-    void login(const std::string_view& token) noexcept;
-    void start();
-    void start(bool) = delete;
-    void stop();
+    virtual void login(const std::string_view& token) noexcept = 0;
+    virtual void start() = 0;
+    virtual void start(bool) = delete;
+    virtual void stop() = 0;
 
-    template <typename F>
-    void on(DiscordEvent event, F&& func);
-
-    virtual IDiscordGuild* GetGuild(dpp::snowflake id) const noexcept = 0;
+    static IDiscordGuild* GetGuild(dpp::snowflake id) noexcept;
 
 protected:
-    std::atomic<bool> m_hasStarted;
-    std::unordered_map<DiscordEvent, std::vector<bool>> m_eventHandlers;
 };
 
 // Usable classes
 
-class CDiscordGuild : public IDiscordGuild
-{
-public:
-    static CDiscordGuild* GetFromSciptID(std::uint32_t id);
-};
 
 class CDiscord : public IDiscord
 {
 public:
     CDiscord() noexcept;
+    ~CDiscord() override;
 
-    CDiscordGuild* GetGuild(dpp::snowflake id) const noexcept override;
+    bool         HasStarted() const noexcept override;
+
+    void login(const std::string_view& token) noexcept override;
+    void start() override;
+    void stop() override;
+
+    static CDiscordGuild* GetGuild(dpp::snowflake id) noexcept;
 
 protected:
+    std::atomic<bool>                                   m_hasStarted;
+
+    std::unordered_map<DiscordEvent, std::vector<dpp::event_handle>> m_eventHandlers;
+
+    static std::unordered_map<dpp::snowflake, std::unique_ptr<CDiscordGuild>> ms_guilds;
 };

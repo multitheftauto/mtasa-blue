@@ -116,7 +116,9 @@ extern bool DPP_EXPORT validate_configuration();
 }
 
 #ifndef _WIN32
-	#define SOCKET int
+	#ifndef SOCKET
+		#define SOCKET int
+	#endif
 #else
     #ifndef NOMINMAX
 		#define NOMINMAX

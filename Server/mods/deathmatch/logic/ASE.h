@@ -25,7 +25,9 @@
     #ifndef INVALID_SOCKET
         #define INVALID_SOCKET -1
     #endif
-typedef int SOCKET;
+    #ifndef SOCKET
+        #define SOCKET int
+    #endif
 #endif
 
 #include "CConnectHistory.h"

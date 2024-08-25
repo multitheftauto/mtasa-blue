@@ -11,40 +11,45 @@
 
 #include "StdInc.h"
 #include "CDiscord.h"
-#include <CIdArray.h>
 
 IDiscord::IDiscord() noexcept : dpp::cluster("")
 {
-    on_ready.attach([this](const dpp::ready_t& event) {
-        if (m_hasStarted)
-            return;
-
-        m_hasStarted = true;
-    });
-    on(DiscordEvent::on_ready, []() {});
 }
 
-IDiscord::~IDiscord() noexcept
+CDiscord::CDiscord() noexcept
+{
+    auto handle = on_ready.attach(
+        [this](const dpp::ready_t& event)
+        {
+            if (m_hasStarted)
+                return;
+
+            m_hasStarted = true;
+        });
+    m_eventHandlers[DiscordEvent::on_ready].push_back(handle);
+}
+
+CDiscord::~CDiscord() noexcept
 {
     this->stop();
 }
 
-bool IDiscord::HasStarted() const noexcept
+bool CDiscord::HasStarted() const noexcept
 {
     return m_hasStarted;
 }
 
-void IDiscord::login(const std::string_view& string) noexcept
+void CDiscord::login(const std::string_view& string) noexcept
 {
     this->token = string;
 }
 
-void IDiscord::start()
+void CDiscord::start()
 {
     dpp::cluster::start(dpp::st_return);
 }
 
-void IDiscord::stop()
+void CDiscord::stop()
 {
     if (!m_hasStarted)
         return;
@@ -52,44 +57,55 @@ void IDiscord::stop()
     this->shutdown();
 }
 
-template <typename F>
-void IDiscord::on(DiscordEvent event, F&& func)
-{
-
-}
-
-
-IDiscordGuild::IDiscordGuild()
+CDiscordGuild::CDiscordGuild()
 {
     m_scriptID = CIdArray::PopUniqueId(this, EIdClass::DISCORD_GUILD);
     m_scriptID = INVALID_ARRAY_ID;
 }
 
-IDiscordGuild::~IDiscordGuild()
+CDiscordGuild::CDiscordGuild(dpp::guild guild) : CDiscordGuild()
+{
+    *this = guild;
+}
+
+CDiscordGuild::CDiscordGuild(const dpp::guild* guild) : CDiscordGuild(guild ? *guild : dpp::guild())
+{
+}
+
+CDiscordGuild::~CDiscordGuild()
 {
     CIdArray::PushUniqueId(this, EIdClass::DISCORD_GUILD, m_scriptID);
 }
 
-std::uint32_t IDiscordGuild::GetScriptID() const noexcept
+std::uint32_t CDiscordGuild::GetScriptID() const noexcept
 {
     return m_scriptID;
 }
 
-IDiscordGuild* IDiscordGuild::GetFromSciptID(std::uint32_t id)
-{
-    return (IDiscordGuild*)CIdArray::FindEntry(id, EIdClass::DISCORD_GUILD);
-}
-
-CDiscord::CDiscord() noexcept
-{
-}
-
-CDiscordGuild* CDiscord::GetGuild(dpp::snowflake id) const noexcept
-{
-    return dynamic_cast<CDiscordGuild*>(dpp::find_guild(id));
-}
-
 CDiscordGuild* CDiscordGuild::GetFromSciptID(std::uint32_t id)
 {
-    return dynamic_cast<CDiscordGuild*>(IDiscordGuild::GetFromSciptID(id));
+    return static_cast<CDiscordGuild*>(CIdArray::FindEntry(id, EIdClass::DISCORD_GUILD));
+}
+
+IDiscordGuild* IDiscordGuild::GetFromSciptID(std::uint32_t id)
+{
+    return CDiscordGuild::GetFromSciptID(id);
+}
+
+CDiscordGuild* CDiscord::GetGuild(dpp::snowflake id) noexcept
+{
+    if (SharedUtil::MapContains(ms_guilds, id))
+        return ms_guilds[id].get();
+
+    auto guild = dpp::find_guild(id);
+    if (!guild)
+        return nullptr;
+
+    ms_guilds[id] = std::make_unique<CDiscordGuild>(*guild);
+    return ms_guilds[id].get();
+}
+
+IDiscordGuild* IDiscord::GetGuild(dpp::snowflake id) noexcept
+{
+    return dynamic_cast<IDiscordGuild*>(CDiscord::GetGuild(id));
 }
