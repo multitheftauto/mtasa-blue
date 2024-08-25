@@ -54,8 +54,10 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedBonePosition", GetPedBonePosition},
         {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
         {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
+        {"setElementBoneRotationQuaternion", ArgumentParser<SetElementBoneRotationQuaternion>},
         {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
         {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
+        {"getElementBoneRotationQuaternion", ArgumentParser<GetElementBoneRotationQuaternion>},
         {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
         {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
         {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
@@ -1010,6 +1012,12 @@ bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* ent
     return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll) : false;
 }
 
+bool CLuaPedDefs::SetElementBoneRotationQuaternion(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float x, float y, float z, float w)
+{
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBoneRotationQuat(static_cast<eBone>(boneId), x, y, z, w) : false;
+}
+
 std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
@@ -1025,6 +1033,15 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity && theEntity->GetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll))
         return std::make_tuple(yaw, pitch, roll);
+    return false;
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::GetElementBoneRotationQuaternion(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+{
+    float    x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
+    CEntity* theEntity = entity->GetGameEntity();
+    if (theEntity && theEntity->GetBoneRotationQuat(static_cast<eBone>(boneId), x, y, z, w))
+        return std::make_tuple(x, y, z, w);
     return false;
 }
 

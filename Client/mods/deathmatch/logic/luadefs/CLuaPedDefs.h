@@ -52,9 +52,11 @@ public:
     LUA_DECLARE(CanPedBeKnockedOffBike);
     static bool SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CVector position);
     static bool SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float yaw, float pitch, float roll);
+    static bool SetElementBoneRotationQuaternion(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float x, float y, float z, float w);
     static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
 
     static std::variant<bool, CLuaMultiReturn<float, float, float>> GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
+    static std::variant<bool, CLuaMultiReturn<float, float, float, float>> GetElementBoneRotationQuaternion(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId);
 
     static bool SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CMatrix boneMatrix);
 
