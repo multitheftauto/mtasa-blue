@@ -24,6 +24,9 @@ public:
     static bool           DiscordOnEvent(lua_State* luaVM, IDiscord::DiscordEvent event, CLuaFunctionRef callback) noexcept;
     static CDiscordGuild* DiscordGetGuild(lua_State* luaVM, std::string id) noexcept;
 
+    static std::vector<std::uint8_t> DiscordGetCache(lua_State* luaVM) noexcept;
+    static void DiscordSetCache(lua_State* luaVM) noexcept {}
+
     // NOT USABLE FROM LUA
     static void DiscordOnVoiceStateUpdate(const dpp::voice_state_update_t& event, const CLuaFunctionRef callback) noexcept;
     static void DiscordOnVoiceClientDisconnect(const dpp::voice_client_disconnect_t& event, const CLuaFunctionRef callback) noexcept;

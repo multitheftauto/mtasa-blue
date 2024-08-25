@@ -18,9 +18,13 @@ void CLuaDiscordDefs::LoadFunctions()
     // Backwards compatibility functions
     constexpr static const std::pair<const char*, lua_CFunction> functions[]
     {
-        {"discordOnEvent", ArgumentParser<DiscordOnEvent>},
-        {"discordLogin", ArgumentParser<DiscordLogin>},
         {"discordStart", ArgumentParser<DiscordStart>},
+        {"discordLogin", ArgumentParser<DiscordLogin>},
+        {"discordOnEvent", ArgumentParser<DiscordOnEvent>},
+
+        {"discordGetCache", ArgumentParser<DiscordGetCache>},
+        {"discordSetCache", ArgumentParser<DiscordSetCache>},
+
         {"discordGetGuild", ArgumentParser<DiscordGetGuild>},
     };
 
@@ -33,14 +37,13 @@ void CLuaDiscordDefs::AddClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
 
+    lua_classfunction(luaVM, "start", "discordStart");
+    lua_classfunction(luaVM, "login", "discordLogin");
+    lua_classfunction(luaVM, "on", "discordOnEvent");
+
+    lua_classvariable(luaVM, "cache", "discordSetCache", "discordGetCache");
+
     lua_registerclass(luaVM, "Discord");
-}
-
-void CLuaDiscordDefs::DiscordLogin(lua_State* luaVM, std::string token) noexcept
-{
-    static const auto discord = (&lua_getownerresource(luaVM))->GetDiscordManager();
-
-    discord->login(token);
 }
 
 bool CLuaDiscordDefs::DiscordStart(lua_State* luaVM)
@@ -62,10 +65,33 @@ bool CLuaDiscordDefs::DiscordStart(lua_State* luaVM)
     return true;
 }
 
+void CLuaDiscordDefs::DiscordLogin(lua_State* luaVM, std::string token) noexcept
+{
+    static const auto discord = (&lua_getownerresource(luaVM))->GetDiscordManager();
+
+    discord->login(token);
+}
+
+std::vector<std::uint8_t> CLuaDiscordDefs::DiscordGetCache(lua_State* luaVM) noexcept
+{
+    std::vector<std::uint8_t> policies;
+
+    static const auto discord = (&lua_getownerresource(luaVM))->GetDiscordManager();
+
+    policies.push_back(discord->cache_policy.channel_policy);
+    policies.push_back(discord->cache_policy.emoji_policy);
+    policies.push_back(discord->cache_policy.guild_policy);
+    policies.push_back(discord->cache_policy.role_policy);
+    policies.push_back(discord->cache_policy.user_policy);
+
+    return policies;
+}
+
 CDiscordGuild* CLuaDiscordDefs::DiscordGetGuild(lua_State* luaVM, std::string id) noexcept
 {
     static const auto discord = (&lua_getownerresource(luaVM))->GetDiscordManager();
-    return discord->GetGuild(id);
+    auto guild = discord->GetGuild(id);
+    return guild;
 }
 
 // ...
@@ -1098,6 +1124,23 @@ void CLuaDiscordDefs::DiscordOnIntegrationDelete(const dpp::integration_delete_t
         arguments.Call(&luaMain, callback);
     });
 }
+
+void PushGuild(CLuaArguments& arguments, const dpp::guild& thread)
+{
+}
+
+void PushThread(CLuaArguments& arguments, const dpp::thread& thread)
+{
+    thread.member;
+    thread.metadata;
+    thread.msg;
+    thread.applied_tags;
+    thread.total_messages_sent;
+    thread.message_count;
+    thread.member_count;
+    thread.newly_created;
+}
+
 void CLuaDiscordDefs::DiscordOnThreadCreate(const dpp::thread_create_t& event, const CLuaFunctionRef callback) noexcept
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
@@ -1105,6 +1148,8 @@ void CLuaDiscordDefs::DiscordOnThreadCreate(const dpp::thread_create_t& event, c
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushGuild(arguments, *event.creating_guild);
+        PushThread(arguments, event.created);
         arguments.Call(&luaMain, callback);
     });
 }
@@ -1115,6 +1160,8 @@ void CLuaDiscordDefs::DiscordOnThreadUpdate(const dpp::thread_update_t& event, c
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushGuild(arguments, *event.updating_guild);
+        PushThread(arguments, event.updated);
         arguments.Call(&luaMain, callback);
     });
 }
@@ -1125,9 +1172,12 @@ void CLuaDiscordDefs::DiscordOnThreadDelete(const dpp::thread_delete_t& event, c
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushGuild(arguments, *event.deleting_guild);
+        PushThread(arguments, event.deleted);
         arguments.Call(&luaMain, callback);
     });
 }
+
 void CLuaDiscordDefs::DiscordOnThreadListSync(const dpp::thread_list_sync_t& event, const CLuaFunctionRef callback) noexcept
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
@@ -1158,6 +1208,7 @@ void CLuaDiscordDefs::DiscordOnThreadMembersUpdate(const dpp::thread_members_upd
         arguments.Call(&luaMain, callback);
     });
 }
+
 void CLuaDiscordDefs::DiscordOnGuildScheduledEventCreate(const dpp::guild_scheduled_event_create_t& event, const CLuaFunctionRef callback) noexcept
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
@@ -1258,6 +1309,26 @@ void CLuaDiscordDefs::DiscordOnVoiceTrackMarker(const dpp::voice_track_marker_t&
         arguments.Call(&luaMain, callback);
     });
 }
+
+void PushStageInstance(CLuaArguments& arguments, const dpp::stage_instance& stage)
+{
+    arguments.PushString(stage.guild_id.str());
+    arguments.PushString(stage.channel_id.str());
+    arguments.PushString(stage.topic);
+    const char* level = "unknown";
+    switch (stage.privacy_level)
+    {
+        case dpp::stage_privacy_level::sp_guild_only:
+            level = "guild";
+            break;
+        case dpp::stage_privacy_level::sp_public:
+            level = "public";
+            break;
+    }
+    arguments.PushString(level);
+    arguments.PushBoolean(!stage.discoverable_disabled);
+}
+
 void CLuaDiscordDefs::DiscordOnStageInstanceCreate(const dpp::stage_instance_create_t& event, const CLuaFunctionRef callback) noexcept
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
@@ -1265,6 +1336,7 @@ void CLuaDiscordDefs::DiscordOnStageInstanceCreate(const dpp::stage_instance_cre
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushStageInstance(arguments, event.created);
         arguments.Call(&luaMain, callback);
     });
 }
@@ -1275,6 +1347,7 @@ void CLuaDiscordDefs::DiscordOnStageInstanceUpdate(const dpp::stage_instance_upd
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushStageInstance(arguments, event.updated);
         arguments.Call(&luaMain, callback);
     });
 }
@@ -1285,9 +1358,35 @@ void CLuaDiscordDefs::DiscordOnStageInstanceDelete(const dpp::stage_instance_del
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushStageInstance(arguments, event.deleted);
         arguments.Call(&luaMain, callback);
     });
 }
+
+void PushEntitlement(CLuaArguments& arguments, const dpp::entitlement& entitlement)
+{
+    arguments.PushString(entitlement.sku_id.str());
+    arguments.PushString(entitlement.application_id.str());
+    arguments.PushString(entitlement.owner_id.str());
+    const char* type = "unknown";
+    switch (entitlement.type)
+    {
+        case dpp::entitlement_type::GUILD_SUBSCRIPTION:
+            type = "guild";
+            break;
+        case dpp::entitlement_type::USER_SUBSCRIPTION:
+            type = "user";
+            break;
+        case dpp::entitlement_type::APPLICATION_SUBSCRIPTION:
+            type = "application";
+            break;
+    }
+    arguments.PushString(type);
+    arguments.PushString(std::to_string(entitlement.starts_at));
+    arguments.PushString(std::to_string(entitlement.ends_at));
+    arguments.PushNumber(entitlement.flags);
+}
+
 void CLuaDiscordDefs::DiscordOnEntitlementCreate(const dpp::entitlement_create_t& event, const CLuaFunctionRef callback) noexcept
 {
     CLuaShared::GetAsyncTaskScheduler()->PushTask([] { return true; }, [event, callback](bool)
@@ -1295,6 +1394,7 @@ void CLuaDiscordDefs::DiscordOnEntitlementCreate(const dpp::entitlement_create_t
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushEntitlement(arguments, event.created);
         arguments.Call(&luaMain, callback);
     });
 }
@@ -1305,6 +1405,7 @@ void CLuaDiscordDefs::DiscordOnEntitlementUpdate(const dpp::entitlement_update_t
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushEntitlement(arguments, event.updating_entitlement);
         arguments.Call(&luaMain, callback);
     });
 }
@@ -1315,6 +1416,7 @@ void CLuaDiscordDefs::DiscordOnEntitlementDelete(const dpp::entitlement_delete_t
         CLuaMain& luaMain = lua_getownercluamain(callback.GetLuaVM());
 
         CLuaArguments arguments;
+        PushEntitlement(arguments, event.deleted);
         arguments.Call(&luaMain, callback);
     });
 }
