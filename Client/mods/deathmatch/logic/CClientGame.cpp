@@ -33,6 +33,7 @@
 #include <game/CWeather.h>
 #include <game/Task.h>
 #include <game/CBuildingRemoval.h>
+#include "game/CClock.h"
 #include <windowsx.h>
 #include "CServerInfo.h"
 
@@ -5409,6 +5410,7 @@ void CClientGame::ResetMapInfo()
 
     // Hud
     g_pGame->GetHud()->SetComponentVisible(HUD_ALL, true);
+
     // Disable area names as they are on load until camera unfades
     g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     g_pGame->GetHud()->SetComponentVisible(HUD_VITAL_STATS, false);
@@ -5548,6 +5550,9 @@ void CClientGame::ResetMapInfo()
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
+
+    // Reset Frozen Time
+    g_pGame->GetClock()->ResetTimeFrozen();
 
     // Close all garages
     CGarage*  pGarage = NULL;
