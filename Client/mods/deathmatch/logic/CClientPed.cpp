@@ -1131,7 +1131,7 @@ CClientVehicle* CClientPed::GetRealOccupiedVehicle()
 
 CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClosestDoor, bool bCheckDriverDoor, bool bCheckPassengerDoors,
                                                        bool bCheckStreamedOutVehicles, unsigned int* uiClosestDoor, CVector* pClosestDoorPosition,
-                                                       float fWithinRange)
+                                                       float fWithinRange, bool localVehicles)
 {
     if (bGetPositionFromClosestDoor)
     {
@@ -1164,7 +1164,7 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
     {
         pTempVehicle = *iter;
         // Skip clientside vehicles as they are not enterable
-        if (pTempVehicle->IsLocalEntity())
+        if (pTempVehicle->IsLocalEntity() != localVehicles)
             continue;
 
         CVehicle* pGameVehicle = pTempVehicle->GetGameVehicle();
@@ -2679,9 +2679,6 @@ void CClientPed::WorldIgnore(bool bIgnore)
 
 void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 {
-    if (!m_pPlayerPed)
-        return;
-
     // ControllerState checks and fixes are done at the same same as everything else unless using alt pulse order
     bool bDoControllerStateFixPulse = g_pClientGame->IsUsingAlternatePulseOrder() ? !bDoStandardPulses : bDoStandardPulses;
 
@@ -2710,6 +2707,10 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
     // Do we have a player? (streamed in)
     if (m_pPlayerPed)
     {
+        // If it's local entity, update in/out vehicle state
+        if (IsLocalEntity())
+            UpdateVehicleInOut();
+
         // Handle waiting for the ground to load
         if (IsFrozenWaitingForGroundToLoad())
             HandleWaitingForGroundToLoad();
@@ -6433,14 +6434,7 @@ void CClientPed::UpdateStreamPosition(const CVector& vecInPosition)
 bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 {
     // Are we local player or ped we are syncing
-    if (!IsSyncing() && !IsLocalPlayer())
-    {
-        return false;
-    }
-
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
+    if ((!IsSyncing() && !IsLocalEntity()) && !IsLocalPlayer())
     {
         return false;
     }
@@ -6489,7 +6483,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     if (!pVehicle)
     {
         // Find the closest vehicle and door
-        CClientVehicle* pClosestVehicle = GetClosestEnterableVehicle(true, !bPassenger, bPassenger, false, &uiDoor, nullptr, 20.0f);
+        CClientVehicle* pClosestVehicle = GetClosestEnterableVehicle(true, !bPassenger, bPassenger, false, &uiDoor, nullptr, 20.0f, IsLocalEntity());
         if (pClosestVehicle)
         {
             pVehicle = pClosestVehicle;
@@ -6511,7 +6505,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
-    if (!pVehicle->IsEnterable())
+    if (!pVehicle->IsEnterable(IsLocalEntity()))
     {
         // Stop if the vehicle is not enterable
         return false;
@@ -6586,6 +6580,35 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
         return false;
     }
 
+    // If it's a local entity, we can just enter the vehicle
+    if (IsLocalEntity())
+    {
+        // If vehicle is not local, we can't enter it
+        if (!pVehicle->IsLocalEntity())
+        {
+            return false;
+        }
+
+        // Set the vehicle id we're about to enter
+        m_VehicleInOutID = pVehicle->GetID();
+        m_ucVehicleInOutSeat = uiSeat;
+        m_bIsJackingVehicle = false;
+
+        // Make ped enter vehicle
+        GetIntoVehicle(pVehicle, uiSeat, uiDoor);
+
+        // Remember that this ped is working on entering a vehicle
+        SetVehicleInOutState(VEHICLE_INOUT_GETTING_IN);
+
+        pVehicle->CalcAndUpdateCanBeDamagedFlag();
+        pVehicle->CalcAndUpdateTyresCanBurstFlag();
+
+        m_bIsGettingIntoVehicle = true;
+        m_bIsGettingOutOfVehicle = false;
+
+        return true;
+    }
+
     // Send an in request
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
     if (!pBitStream)
@@ -6635,14 +6658,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 bool CClientPed::ExitVehicle()
 {
     // Are we local player or ped we are syncing
-    if (!IsSyncing() && !IsLocalPlayer())
-    {
-        return false;
-    }
-
-    // Are we a clientside ped
-    // TODO: Add support for clientside peds
-    if (IsLocalEntity())
+    if ((!IsSyncing() && !IsLocalEntity()) && !IsLocalPlayer())
     {
         return false;
     }
@@ -6687,6 +6703,40 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
+    unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+
+    // If it's a local entity, we can just exit the vehicle
+    if (IsLocalEntity())
+    {
+        // Set the vehicle id and the seat we're about to exit from
+        m_VehicleInOutID = pOccupiedVehicle->GetID();
+        m_ucVehicleInOutSeat = GetOccupiedVehicleSeat();
+
+        // Call the onClientVehicleStartExit event for the ped
+        // Check if it is cancelled before making the ped exit the vehicle
+        CLuaArguments Arguments;
+        Arguments.PushElement(this);                    // player / ped
+        Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+        Arguments.PushNumber(0);                        // door
+
+        if (!pOccupiedVehicle->CallEvent("onClientVehicleStartExit", Arguments, true))
+        {
+            // Event has been cancelled
+            return false;
+        }
+
+        // Make ped exit vehicle
+        GetOutOfVehicle(ucDoor);
+
+        // Remember that this ped is working on leaving a vehicle
+        SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
+
+        m_bIsGettingIntoVehicle = false;
+        m_bIsGettingOutOfVehicle = true;
+
+        return true;
+    }
+
     // We're about to exit a vehicle
     // Send an out request
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
@@ -6706,7 +6756,6 @@ bool CClientPed::ExitVehicle()
     unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_REQUEST_OUT);
     pBitStream->WriteBits(&ucAction, 4);
 
-    unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
     if (ucDoor >= 2 && ucDoor <= 5)
     {
         ucDoor -= 2;
@@ -6752,6 +6801,57 @@ void CClientPed::ResetVehicleInOut()
 //////////////////////////////////////////////////////////////////
 void CClientPed::UpdateVehicleInOut()
 {
+    if (IsLocalEntity())
+    {
+        // If getting inside vehicle
+        if (m_bIsGettingIntoVehicle)
+        {
+            CClientVehicle* pVehicle = GetRealOccupiedVehicle();
+
+            if (pVehicle)
+            {
+                // Call the onClientVehicleEnter event for the ped
+                // Check if it is cancelled before allowing the ped to enter the vehicle
+                CLuaArguments Arguments;
+                Arguments.PushElement(this);                    // player / ped
+                Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+
+                if (!pVehicle->CallEvent("onClientVehicleEnter", Arguments, true))
+                {
+                    m_bIsGettingIntoVehicle = false;
+                    RemoveFromVehicle();
+                    return;
+                }
+
+                m_bIsGettingIntoVehicle = false;
+                m_VehicleInOutID = INVALID_ELEMENT_ID;
+                WarpIntoVehicle(pVehicle, m_ucVehicleInOutSeat);
+                SetVehicleInOutState(VEHICLE_INOUT_NONE);
+            }
+        }
+        else if (m_bIsGettingOutOfVehicle)
+        {
+            // If getting out of vehicle
+            CClientVehicle* pVehicle = GetRealOccupiedVehicle();
+            CClientVehicle* pOutVehicle = GetOccupiedVehicle();
+
+            if (!pVehicle)
+            {
+                // Call the onClientVehicleExit event for the ped
+                CLuaArguments Arguments;
+                Arguments.PushElement(this);                    // player / ped
+                Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+                pOutVehicle->CallEvent("onClientVehicleExit", Arguments, true);
+
+                m_bIsGettingOutOfVehicle = false;
+                m_VehicleInOutID = INVALID_ELEMENT_ID;
+                SetVehicleInOutState(VEHICLE_INOUT_NONE);
+            }
+        }
+
+        return;
+    }
+
     // We got told by the server to animate into a certain vehicle?
     if (m_VehicleInOutID != INVALID_ELEMENT_ID)
     {

@@ -3855,12 +3855,12 @@ void CClientVehicle::UpdateUnderFloorFix(const CVector& vecTargetPosition, bool 
     }
 }
 
-bool CClientVehicle::IsEnterable()
+bool CClientVehicle::IsEnterable(bool localEntity)
 {
     if (m_pVehicle)
     {
         // Server vehicle?
-        if (!IsLocalEntity())
+        if (IsLocalEntity() == localEntity)
         {
             if (GetHealth() > 0.0f)
             {
