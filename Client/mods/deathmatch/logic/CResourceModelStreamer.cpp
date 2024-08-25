@@ -110,11 +110,11 @@ void CResourceModelStreamer::FullyReleaseModel(std::uint16_t modelId)
     if (refs == m_requestedModels.end())
         return;
 
-    std::uint16_t refsCount = refs->second;
+    std::uint16_t& refsCount = refs->second;
 
     if (refsCount > 0)
     {
-        m_requestedModels[modelId] = 0;
+        refsCount = 0;
 
         CModelInfo* model = g_pGame->GetModelInfo(modelId);
 
