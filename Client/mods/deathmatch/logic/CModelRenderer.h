@@ -11,13 +11,6 @@
 
 #pragma once
 
-enum class EModelLoadingScheme : uint8_t
-{
-    Loaded = 0,
-    Async,
-    Blocking
-};
-
 class CModelRenderer final
 {
 public:
@@ -25,19 +18,15 @@ public:
     {
         CModelInfo* pModelInfo;
         CMatrix matrix;
-        EModelLoadingScheme scheme;
-        bool bLoaded;
 
-        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix, EModelLoadingScheme scheme) :
+        SModelToRender(CModelInfo* pModelInfo, const CMatrix& matrix) :
             pModelInfo(pModelInfo),
-            matrix(matrix),
-            scheme(scheme),
-            bLoaded(false)
+            matrix(matrix)
         {
         }
     };
 
-    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, EModelLoadingScheme scheme);
+    bool EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix);
 
     void Update();
 

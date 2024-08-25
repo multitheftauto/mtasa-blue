@@ -13,13 +13,18 @@
 #include "game\CRenderer.h"
 #include "game\CVisibilityPlugins.h"
 
-bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix, EModelLoadingScheme scheme)
+bool CModelRenderer::EnqueueModel(CModelInfo* pModelInfo, const CMatrix& matrix)
 {
-    if (!pModelInfo || g_pCore->IsWindowMinimized())
+    if (g_pCore->IsWindowMinimized())
         return false;
 
-    m_Queue.emplace_back(pModelInfo, matrix, scheme);
-    return true;
+    if (pModelInfo && pModelInfo->IsLoaded())
+    {
+        m_Queue.emplace_back(pModelInfo, matrix);
+        return true;
+    }
+
+    return false;
 }
 
 void CModelRenderer::Update()
@@ -29,18 +34,6 @@ void CModelRenderer::Update()
 
     for (auto& modelDesc : m_Queue)
     {
-        // Make sure that a model is loaded
-        modelDesc.bLoaded = modelDesc.pModelInfo->IsLoaded();
-        if (!modelDesc.bLoaded)
-        {     
-            if (modelDesc.scheme != EModelLoadingScheme::Loaded)
-                modelDesc.pModelInfo->Request(modelDesc.scheme == EModelLoadingScheme::Blocking ?
-                    EModelRequestType::BLOCKING : EModelRequestType::NON_BLOCKING, "Lua::DxDrawModel3D");
-
-            if (modelDesc.scheme == EModelLoadingScheme::Blocking)
-                modelDesc.bLoaded = modelDesc.pModelInfo->IsLoaded();
-        }
-
         // Insert transparent entities into a sorted list
         if (modelDesc.pModelInfo->GetIdeFlag(eModelIdeFlag::DRAW_LAST))
         {
@@ -57,9 +50,10 @@ void CModelRenderer::Render()
     CRenderer* pRenderer = g_pGame->GetRenderer();
     assert(pRenderer);    
 
+    // Draw opaque entities
     for (auto& modelDesc : m_Queue)
     {
-        if (modelDesc.bLoaded && !modelDesc.pModelInfo->GetIdeFlag(eModelIdeFlag::DRAW_LAST))
+        if (modelDesc.pModelInfo->IsLoaded() && !modelDesc.pModelInfo->GetIdeFlag(eModelIdeFlag::DRAW_LAST))
             pRenderer->RenderModel(modelDesc.pModelInfo, modelDesc.matrix);
     }
 
@@ -68,7 +62,7 @@ void CModelRenderer::Render()
 
 void CModelRenderer::RenderEntity(SModelToRender* modelDesc, float distance)
 {
-    if (!modelDesc->bLoaded)
+    if (!modelDesc->pModelInfo->IsLoaded())
         return;
 
     CRenderer* pRenderer = g_pGame->GetRenderer();
