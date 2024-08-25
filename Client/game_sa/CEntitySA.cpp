@@ -653,18 +653,15 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
 bool CEntitySA::SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w)
 {
     RpClump* clump = GetRpClump();
-    printf("SetBoneRotationQuat: %f %f %f %f\n", x, y, z, w);
     if (clump)
     {
         // updating the bone frame orientation will also update its children
         // This rotation is only applied when UpdateElementRpHAnim is called
         CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
         AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
-        printf("SetBoneRotationQuat 2: %f %f %f %f\n", x, y, z, w);
         if (frameData)
         {
             RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
-            printf("SetBoneRotationQuat 3: %f %f %f %f\n", x, y, z, w);
             boneOrientation->imag.x = x;
             boneOrientation->imag.y = y;
             boneOrientation->imag.z = z;
