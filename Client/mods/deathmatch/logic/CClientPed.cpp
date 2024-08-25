@@ -6703,7 +6703,7 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    unsigned char ucDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+    auto targetDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
 
     // If it's a local entity, we can just exit the vehicle
     if (IsLocalEntity())
@@ -6714,19 +6714,19 @@ bool CClientPed::ExitVehicle()
 
         // Call the onClientVehicleStartExit event for the ped
         // Check if it is cancelled before making the ped exit the vehicle
-        CLuaArguments Arguments;
-        Arguments.PushElement(this);                    // player / ped
-        Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
-        Arguments.PushNumber(0);                        // door
+        CLuaArguments arguments;
+        arguments.PushElement(this);                    // player / ped
+        arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+        arguments.PushNumber(0);                        // door
 
-        if (!pOccupiedVehicle->CallEvent("onClientVehicleStartExit", Arguments, true))
+        if (!pOccupiedVehicle->CallEvent("onClientVehicleStartExit", arguments, true))
         {
             // Event has been cancelled
             return false;
         }
 
         // Make ped exit vehicle
-        GetOutOfVehicle(ucDoor);
+        GetOutOfVehicle(targetDoor);
 
         // Remember that this ped is working on leaving a vehicle
         SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
@@ -6832,16 +6832,16 @@ void CClientPed::UpdateVehicleInOut()
         else if (m_bIsGettingOutOfVehicle)
         {
             // If getting out of vehicle
-            CClientVehicle* pVehicle = GetRealOccupiedVehicle();
-            CClientVehicle* pOutVehicle = GetOccupiedVehicle();
+            CClientVehicle* realVehicle = GetRealOccupiedVehicle();
+            CClientVehicle* networkVehicle = GetOccupiedVehicle();
 
-            if (!pVehicle)
+            if (!realVehicle)
             {
                 // Call the onClientVehicleExit event for the ped
                 CLuaArguments Arguments;
                 Arguments.PushElement(this);                    // player / ped
                 Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
-                pOutVehicle->CallEvent("onClientVehicleExit", Arguments, true);
+                networkVehicle->CallEvent("onClientVehicleExit", Arguments, true);
 
                 m_bIsGettingOutOfVehicle = false;
                 m_VehicleInOutID = INVALID_ELEMENT_ID;
