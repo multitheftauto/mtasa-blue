@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include "CDiscord.h"
 
+std::unordered_map<dpp::snowflake, std::unique_ptr<CDiscordGuild>> CDiscord::ms_guilds = {};
+
 IDiscord::IDiscord() noexcept : dpp::cluster("")
 {
 }

@@ -22,7 +22,6 @@
 class IDiscordGuild : public dpp::guild
 {
 public:
-    virtual ~IDiscordGuild() = 0;
     virtual std::uint32_t GetScriptID() const noexcept = 0;
     static IDiscordGuild* GetFromSciptID(std::uint32_t id);
 
@@ -135,7 +134,6 @@ public:
 
 public:
     IDiscord() noexcept;
-    virtual ~IDiscord() noexcept = 0;
 
     virtual bool HasStarted() const noexcept = 0;
 
@@ -156,7 +154,7 @@ class CDiscord : public IDiscord
 {
 public:
     CDiscord() noexcept;
-    ~CDiscord() override;
+    ~CDiscord() noexcept override;
 
     bool         HasStarted() const noexcept override;
 

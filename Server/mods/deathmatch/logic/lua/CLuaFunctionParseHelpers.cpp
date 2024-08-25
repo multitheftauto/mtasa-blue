@@ -569,7 +569,7 @@ CClient* UserDataCast(CClient* ptr, lua_State* luaState)
 
 CDiscordGuild* UserDataCast(CDiscordGuild* ptr, lua_State* luaState)
 {
-    return CDiscordGuild::GetFromSciptID(reinterpret_cast<std::uint32_t>(ptr));
+    return CDiscordGuild::GetFromSciptID(reinterpret_cast<std::uint32_t>(reinterpret_cast<std::uint32_t*>(ptr)));
 }
 
 //
