@@ -1283,7 +1283,7 @@ bool CheckService(uint uiStage)
 int GetFileAge(const SString& strPathFilename)
 {
     WIN32_FIND_DATAW findFileData;
-    HANDLE           hFind = FindFirstFileW(FromUTF8(strPathFilename), &findFileData);
+    HANDLE           hFind = FindFirstFileW(FromUTF8(strPathFilename).c_str(), &findFileData);
     if (hFind != INVALID_HANDLE_VALUE)
     {
         FindClose(hFind);
@@ -1682,7 +1682,7 @@ void BsodDetectionPreLaunch()
     SString          strMatch = PathJoin(GetSystemWindowsPath(), "MiniDump", "*");
     SString          strMinidumpTime;
     WIN32_FIND_DATAW findData;
-    HANDLE           hFind = FindFirstFileW(FromUTF8(strMatch), &findData);
+    HANDLE           hFind = FindFirstFileW(FromUTF8(strMatch).c_str(), &findData);
     if (hFind != INVALID_HANDLE_VALUE)
     {
         do

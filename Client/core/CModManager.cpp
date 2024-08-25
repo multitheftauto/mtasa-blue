@@ -338,18 +338,18 @@ void CModManager::InitializeModList(const char* szModFolderPath)
     filePathTranslator.SetCurrentWorkingDirectory("mta");
 
     // Create a search
-    hFind = FindFirstFileW(FromUTF8(strPathWildchars), &FindData);
+    hFind = FindFirstFileW(FromUTF8(strPathWildchars).c_str(), &FindData);
 
     // If we found a first file ...
     if (hFind != INVALID_HANDLE_VALUE)
     {
         // Add it to the list
-        VerifyAndAddEntry(szModFolderPath, ToUTF8(FindData.cFileName));
+        VerifyAndAddEntry(szModFolderPath, ToUTF8(FindData.cFileName).c_str());
 
         // Search until there aren't any files left
         while (FindNextFileW(hFind, &FindData) == TRUE)
         {
-            VerifyAndAddEntry(szModFolderPath, ToUTF8(FindData.cFileName));
+            VerifyAndAddEntry(szModFolderPath, ToUTF8(FindData.cFileName).c_str());
         }
 
         // End the search

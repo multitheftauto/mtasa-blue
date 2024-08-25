@@ -914,7 +914,7 @@ void CServerBrowser::CreateHistoryList()
     for (CServerListReverseIterator it = m_ServersHistory.ReverseIteratorBegin(); it != m_ServersHistory.ReverseIteratorEnd(); it++)
     {
         CServerListItem* pServer = *it;
-        if (pServer->strEndpoint)
+        if (!pServer->strEndpoint.empty())
         {
             bEmpty = false;
             for (unsigned int i = 0; i < SERVER_BROWSER_TYPE_COUNT; i++)
@@ -1078,21 +1078,21 @@ void CServerBrowser::AddServerToList(CServerListItem* pServer, const ServerBrows
             pServer->iRowIndex = iIndex;
         }
 
-        const char*   szVersion = !bIncludeOtherVersions ? "" : pServer->strVersion.c_str();
-        const SString strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
+        const std::string strVersion = !bIncludeOtherVersions ? "" : pServer->strVersion;
+        const std::string strVersionSortKey = pServer->strVersionSortKey + pServer->strTieBreakSortKey;
 
-        const char*   szPlayers = pServer->nMaxPlayers == 0 ? "" : SString("%d / %d", pServer->nPlayers, pServer->nMaxPlayers).c_str();
-        const SString strPlayersSortKey = SString("%04d-", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0) + pServer->strTieBreakSortKey;
+        const std::string strPlayers = pServer->nMaxPlayers == 0 ? "" : std::format("{} / {}", pServer->nPlayers, pServer->nMaxPlayers);
+        const std::string strPlayersSortKey = std::format("{:04d}-{}", pServer->nMaxPlayers ? pServer->nPlayers + 1 : 0, pServer->strTieBreakSortKey);
 
-        const char*   szPing = pServer->nPing == 9999 ? "" : SString("%d", pServer->nPing).c_str();
-        const SString strPingSortKey = SString("%04d-", pServer->nPing) + pServer->strTieBreakSortKey;
+        const std::string strPing = pServer->nPing == 9999 ? "" : std::to_string(pServer->nPing);
+        const std::string strPingSortKey = std::format("{:04d}-{}", pServer->nPing, pServer->strTieBreakSortKey);
 
         // The row index could change at any point here if list sorting is enabled
-        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hVersion[Type], szVersion, false, false, true, strVersionSortKey);
+        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hVersion[Type], strVersion.c_str(), false, false, true, strVersionSortKey.c_str());
         iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hName[Type], pServer->strName.c_str(), false, false, true, pServer->strNameSortKey);
         iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hGame[Type], pServer->strGameMode.c_str(), false, false, true);
-        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hPlayers[Type], szPlayers, false, false, true, strPlayersSortKey);
-        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hPing[Type], szPing, false, false, true, strPingSortKey);
+        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hPlayers[Type], strPlayers.c_str(), false, false, true, strPlayersSortKey.c_str());
+        iIndex = m_pServerList[Type]->SetItemText(iIndex, m_hPing[Type], strPing.c_str(), false, false, true, strPingSortKey.c_str());
 
         // Locked icon
         m_pServerList[Type]->SetItemImage(iIndex, m_hLocked[Type], pServer->bPassworded ? m_pLockedIcon : NULL);

@@ -101,12 +101,12 @@ bool CCommands::Execute(const char* szCommand, const char* szParametersIn, bool 
             if (szParameters[0] == '/')
             {
                 // Copy the characters after the slash to the 0 terminator to a seperate buffer
-                char szBuffer[256];
-                strncpy(szBuffer, szParameters.get() + 1, 256);
-                szBuffer[255] = 0;
+                std::array<char, 256> szBuffer = {};
+                strncpy(szBuffer.data(), szParameters.get() + 1, szBuffer.size() - 1);
+                szBuffer.back() = '\0';
 
                 // Split it into command and arguments
-                szCommand = strtok(szBuffer, " ");
+                szCommand = strtok(szBuffer.data(), " ");
                 if (!szCommand)
                     return false;
 
