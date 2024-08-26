@@ -6812,7 +6812,7 @@ void CClientPed::UpdateVehicleInOut()
             {
                 // Call the onClientVehicleEnter event for the ped
                 // Check if it is cancelled before allowing the ped to enter the vehicle
-                CLuaArguments Arguments;
+                CLuaArguments arguments;
                 Arguments.PushElement(this);                    // player / ped
                 Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
 
@@ -6838,7 +6838,7 @@ void CClientPed::UpdateVehicleInOut()
             if (!realVehicle)
             {
                 // Call the onClientVehicleExit event for the ped
-                CLuaArguments Arguments;
+                CLuaArguments arguments;
                 Arguments.PushElement(this);                    // player / ped
                 Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
                 networkVehicle->CallEvent("onClientVehicleExit", Arguments, true);
