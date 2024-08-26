@@ -1010,7 +1010,7 @@ bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* ent
 {
     if (boneId > BONE_RIGHTFOOT)
     {
-        throw std::invalid_argument("Invalid bone ID");
+        throw LuaFunctionError("Invalid bone ID");
     }
 
     CEntity* theEntity = entity->GetGameEntity();
@@ -1021,7 +1021,7 @@ bool CLuaPedDefs::SetElementBoneRotationQuaternion(lua_State* const luaVM, CClie
 {
     if (boneId > BONE_RIGHTFOOT)
     {
-        throw std::invalid_argument("Invalid bone ID");
+        throw LuaFunctionError("Invalid bone ID");
     }
 
     CEntity* theEntity = entity->GetGameEntity();
@@ -1041,7 +1041,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
 {
     if (boneId > BONE_RIGHTFOOT)
     {
-        throw std::invalid_argument("Invalid bone ID");
+        throw LuaFunctionError("Invalid bone ID");
     }
 
     float    yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
@@ -1055,7 +1055,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::Get
 {
     if (boneId > BONE_RIGHTFOOT)
     {
-        throw std::invalid_argument("Invalid bone ID");
+        throw LuaFunctionError("Invalid bone ID");
     }
 
     float    x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
