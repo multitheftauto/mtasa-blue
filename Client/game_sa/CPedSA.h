@@ -295,7 +295,6 @@ public:
     CPedSAInterface* GetPedInterface() { return (CPedSAInterface*)GetInterface(); }
     void             Init();
     void             SetModelIndex(DWORD dwModelIndex);
-    void             RemoveGeometryRef();
     void             AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, float fRotationLimit, eWeaponType weaponType,
                                        bool bChangeCamera);
     void             DetachPedFromEntity();
