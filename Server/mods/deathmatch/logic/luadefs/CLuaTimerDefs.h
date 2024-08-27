@@ -20,6 +20,8 @@ public:
 
     LUA_DECLARE(SetTimer);
     LUA_DECLARE(KillTimer);
+    LUA_DECLARE(IsTimerPaused);
+    LUA_DECLARE(PauseTimer);
     LUA_DECLARE(ResetTimer);
     LUA_DECLARE(GetTimers);
     LUA_DECLARE(IsTimer);
