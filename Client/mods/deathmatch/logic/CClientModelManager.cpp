@@ -73,7 +73,7 @@ int CClientModelManager::GetFirstFreeModelID(void)
 
 int CClientModelManager::GetFreeTxdModelID()
 {
-    ushort usTxdId = g_pGame->GetPools()->GetFreeTextureDictonarySlot();
+    ushort usTxdId = g_pGame->GetPools()->GetTxdPool().GetFreeTextureDictonarySlot();
     if (usTxdId == -1)
         return INVALID_MODEL_ID;
     return MAX_MODEL_DFF_ID + usTxdId;
