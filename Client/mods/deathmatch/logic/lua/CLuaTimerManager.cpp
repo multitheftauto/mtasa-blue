@@ -22,7 +22,7 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
     // Use a separate queue to avoid trouble
     for (CFastList<CLuaTimer*>::const_iterator iter = m_TimerList.begin(); iter != m_TimerList.end(); iter++)
     {
-        if (!(**iter).IsPaused())
+        if (!(*iter)->IsPaused())
             m_ProcessQueue.push_back(*iter);
     }
 
@@ -111,7 +111,7 @@ void CLuaTimerManager::RemoveAllTimers()
     m_pProcessingTimer = NULL;
 }
 
-void CLuaTimerManager::PauseTimer(CLuaTimer* pLuaTimer, bool bPaused)
+void CLuaTimerManager::SetTimerPaused(CLuaTimer* pLuaTimer, bool bPaused)
 {
     assert(pLuaTimer);
 
