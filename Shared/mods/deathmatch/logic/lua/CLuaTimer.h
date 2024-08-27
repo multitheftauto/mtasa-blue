@@ -17,7 +17,7 @@ class CLuaTimer;
 #include "lua/LuaCommon.h"
 #include "lua/CLuaArguments.h"
 
-#define LUA_TIMER_MIN_INTERVAL      0
+#define LUA_TIMER_MIN_INTERVAL 0
 
 class CLuaTimer
 {
@@ -35,7 +35,7 @@ public:
 
     unsigned int GetRepeats() const { return m_uiRepeats; };
     void         SetRepeats(unsigned int uiRepeats) { m_uiRepeats = uiRepeats; }
-    bool         IsPaused() const { return m_bPaused; };
+    bool         IsPaused() const noexcept { return m_Paused; };
     void         SetPaused(bool bPaused);
 
     void ExecuteTimer(class CLuaMain* pLuaMain);
@@ -47,12 +47,12 @@ public:
     void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; }
 
 private:
-    bool            m_bPaused;
+    bool            m_Paused;
     CLuaFunctionRef m_iLuaFunction;
     CLuaArguments   m_Arguments;
     CTickCount      m_llStartTime;
     CTickCount      m_llDelay;
-    CTickCount      m_llPausedRemainingTime;
+    CTickCount      m_PausedRemainingTime;
     unsigned int    m_uiRepeats;
     uint            m_uiScriptID;
     SLuaDebugInfo   m_LuaDebugInfo;
