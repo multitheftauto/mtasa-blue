@@ -116,7 +116,7 @@ void CLuaTimerManager::PauseTimer(CLuaTimer* pLuaTimer, bool bPaused)
     assert(pLuaTimer);
 
     pLuaTimer->SetPaused(bPaused);
-    if (!bPaused)
+    if (bPaused)
         ListRemove(m_ProcessQueue, pLuaTimer);
 }
 
