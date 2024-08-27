@@ -6813,10 +6813,10 @@ void CClientPed::UpdateVehicleInOut()
                 // Call the onClientVehicleEnter event for the ped
                 // Check if it is cancelled before allowing the ped to enter the vehicle
                 CLuaArguments arguments;
-                Arguments.PushElement(this);                    // player / ped
-                Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+                arguments.PushElement(this);                    // player / ped
+                arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
 
-                if (!pVehicle->CallEvent("onClientVehicleEnter", Arguments, true))
+                if (!pVehicle->CallEvent("onClientVehicleEnter", arguments, true))
                 {
                     m_bIsGettingIntoVehicle = false;
                     RemoveFromVehicle();
@@ -6839,9 +6839,9 @@ void CClientPed::UpdateVehicleInOut()
             {
                 // Call the onClientVehicleExit event for the ped
                 CLuaArguments arguments;
-                Arguments.PushElement(this);                    // player / ped
-                Arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
-                networkVehicle->CallEvent("onClientVehicleExit", Arguments, true);
+                arguments.PushElement(this);                    // player / ped
+                arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
+                networkVehicle->CallEvent("onClientVehicleExit", arguments, true);
 
                 m_bIsGettingOutOfVehicle = false;
                 m_VehicleInOutID = INVALID_ELEMENT_ID;
