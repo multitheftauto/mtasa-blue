@@ -102,6 +102,9 @@ public:
     CTrainSAInterface*              m_nextCarriage;
     CDoorSAInterface                m_aDoors[MAX_DOORS];
     RwFrame*                        m_aTrainNodes[eTrainNode::NUM_NODES];
+
+public:
+    void __thiscall FindPositionOnTrackFromCoors();
 };
 static_assert(sizeof(CTrainSAInterface) == 0x6AC, "Invalid size for CTrainSAInterface");
 

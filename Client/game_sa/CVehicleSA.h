@@ -381,6 +381,11 @@ public:
     int16_t    m_peviousRemapTxd;
     int16_t    m_remapTxd;
     RwTexture* m_pRemapTexture;
+
+public:
+    void __thiscall SetRemap(int remap);
+    int __thiscall GetRemapIndex() const;
+    void __thiscall SetRemapTexDictionary(int remapDict);
 };
 static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
 
@@ -524,8 +529,8 @@ public:
     void       SetRopeHeightForHeli(float fRopeHeight);
     CPhysical* QueryPickedUpEntityWithWinch();
 
-    void SetRemap(int iRemap);
-    int  GetRemapIndex();
+    void SetRemap(int remap);
+    int  GetRemapIndex() const;
     void SetRemapTexDictionary(int iRemapTextureDictionary);
 
     bool           IsDamaged() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bIsDamaged; };

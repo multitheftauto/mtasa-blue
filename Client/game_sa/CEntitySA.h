@@ -17,6 +17,12 @@
 #include <CVector2D.h>
 #include <CVector.h>
 
+template <typename ReturnType, typename... ArgsType>
+inline ReturnType GTAFunction(DWORD function, ArgsType... args)
+{
+    return (ReturnType(__thiscall*)(ArgsType...)function)(args);
+};
+
 #define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
 
 #define FUNC_SetRwObjectAlpha                               0x5332C0
