@@ -35,6 +35,8 @@ public:
 
     unsigned int GetRepeats() const { return m_uiRepeats; };
     void         SetRepeats(unsigned int uiRepeats) { m_uiRepeats = uiRepeats; }
+    bool         IsPaused() const { return m_bPaused; };
+    void         SetPaused(bool bPaused);
 
     void ExecuteTimer(class CLuaMain* pLuaMain);
 
@@ -45,10 +47,12 @@ public:
     void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; }
 
 private:
+    bool            m_bPaused;
     CLuaFunctionRef m_iLuaFunction;
     CLuaArguments   m_Arguments;
     CTickCount      m_llStartTime;
     CTickCount      m_llDelay;
+    CTickCount      m_llPausedRemainingTime;
     unsigned int    m_uiRepeats;
     uint            m_uiScriptID;
     SLuaDebugInfo   m_LuaDebugInfo;
