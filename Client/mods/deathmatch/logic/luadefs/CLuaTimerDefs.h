@@ -20,10 +20,10 @@ public:
 
     LUA_DECLARE(SetTimer);
     LUA_DECLARE(KillTimer);
-    LUA_DECLARE(IsTimerPaused);
-    LUA_DECLARE(PauseTimer);
     LUA_DECLARE(ResetTimer);
     LUA_DECLARE(GetTimers);
     LUA_DECLARE(IsTimer);
     LUA_DECLARE(GetTimerDetails);
+    static bool IsTimerPaused(lua_State* luaVM, CLuaTimer* pLuaTimer);
+    static bool SetTimerPaused(lua_State* luaVM, CLuaTimer* pLuaTimer, bool bPaused);
 };
