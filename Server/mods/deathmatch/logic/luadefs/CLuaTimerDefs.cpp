@@ -17,6 +17,7 @@ void CLuaTimerDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         {"setTimer", SetTimer},   {"killTimer", KillTimer}, {"resetTimer", ResetTimer},
+        {"pauseTimer", PauseTimer}, {"isTimerPaused", IsTimerPaused},
         {"getTimers", GetTimers}, {"isTimer", IsTimer},     {"getTimerDetails", GetTimerDetails},
     };
 
@@ -33,6 +34,9 @@ void CLuaTimerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "destroy", "killTimer");
     lua_classfunction(luaVM, "reset", "resetTimer");
     lua_classfunction(luaVM, "isValid", "isTimer");
+
+    lua_classfunction(luaVM, "isPaused", "isTimerPaused");
+    lua_classfunction(luaVM, "setPaused", "pauseTimer");
 
     lua_classfunction(luaVM, "getDetails", "getTimerDetails");
 
@@ -113,6 +117,60 @@ int CLuaTimerDefs::KillTimer(lua_State* luaVM)
     lua_pushboolean(luaVM, false);
     return 1;
 }
+
+int CLuaTimerDefs::IsTimerPaused(lua_State* luaVM)
+{
+    //  bool isTimerPaused ( timer theTimer )
+    CLuaTimer* pLuaTimer;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pLuaTimer);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (luaMain)
+        {
+            bool bIsPaused = pLuaTimer->IsPaused();
+            lua_pushboolean(luaVM, bIsPaused);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+
+int CLuaTimerDefs::PauseTimer(lua_State* luaVM)
+{
+    //  bool pauseTimer ( timer theTimer, bool paused )
+    CLuaTimer* pLuaTimer;
+    bool       bPaused;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pLuaTimer);
+    argStream.ReadBool(bPaused);
+
+    if (!argStream.HasErrors())
+    {
+        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+        if (luaMain)
+        {
+            luaMain->GetTimerManager()->PauseTimer(pLuaTimer, bPaused);
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 
 int CLuaTimerDefs::ResetTimer(lua_State* luaVM)
 {
