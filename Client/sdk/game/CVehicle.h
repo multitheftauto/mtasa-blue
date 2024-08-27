@@ -244,6 +244,7 @@ public:
     virtual int  GetWheelFrictionState(BYTE bWheel) = 0;
 
     virtual class CVehicleSAInterface* GetVehicleInterface() = 0;
+    virtual const class CVehicleSAInterface* GetVehicleInterface() const noexcept = 0;
 
     virtual float GetHealth() = 0;
     virtual void  SetHealth(float fHealth) = 0;

@@ -400,7 +400,7 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
     }
 }
 
-WORD CEntitySA::GetModelIndex()
+WORD CEntitySA::GetModelIndex() const
 {
     return m_pInterface->m_nModelIndex;
 }

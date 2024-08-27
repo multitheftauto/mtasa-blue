@@ -70,7 +70,7 @@ public:
     virtual CVector*                  GetPosition() = 0;
     virtual CMatrix*                  GetMatrix(CMatrix* matrix) = 0;
     virtual void                      SetMatrix(CMatrix* matrix) = 0;
-    virtual WORD                      GetModelIndex() = 0;
+    virtual WORD                      GetModelIndex() const = 0;
     virtual eEntityType               GetEntityType() = 0;
     virtual float                     GetDistanceFromCentreOfMassToBaseOfModel() = 0;
     virtual void                      SetEntityStatus(eEntityStatus bStatus) = 0;

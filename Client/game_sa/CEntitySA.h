@@ -253,7 +253,8 @@ public:
     CEntitySAInterface* m_pInterface;
 
     CEntitySA();
-    CEntitySAInterface* GetInterface() { return m_pInterface; };
+    CEntitySAInterface* GetInterface() { return m_pInterface; }
+    const CEntitySAInterface* GetInterface() const noexcept { return m_pInterface; }
     void                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
     bool IsPed() { return GetEntityType() == ENTITY_TYPE_PED; }
@@ -277,7 +278,7 @@ public:
     CMatrix*     GetMatrix(CMatrix* matrix);
     CMatrix*     GetMatrixInternal(CMatrix* matrix);
     void         SetMatrix(CMatrix* matrix);
-    WORD         GetModelIndex();
+    WORD         GetModelIndex() const;
     eEntityType  GetEntityType();
     bool         IsOnScreen();
     bool         IsFullyVisible();
