@@ -91,5 +91,9 @@ CTickCount CLuaTimer::GetTimeLeft()
 
     CTickCount llCurrentTime = CTickCount::Now();
     CTickCount llTimeLeft = m_llStartTime + m_llDelay - llCurrentTime;
+
+    if (IsPaused())
+        return m_llPausedRemainingTime;
+
     return llTimeLeft.ToLongLong() < 0LL ? CTickCount(0LL) : llTimeLeft;
 }
