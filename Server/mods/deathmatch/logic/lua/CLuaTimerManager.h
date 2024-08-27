@@ -36,7 +36,7 @@ public:
     void          RemoveAllTimers();
     unsigned long GetTimerCount() const { return m_TimerList.size(); }
 
-    void PauseTimer(CLuaTimer* pLuaTimer, bool bPaused);
+    void SetTimerPaused(CLuaTimer* pLuaTimer, bool bPaused);
     void ResetTimer(CLuaTimer* pLuaTimer);
 
     CFastList<CLuaTimer*>::const_iterator IterBegin() { return m_TimerList.begin(); }
