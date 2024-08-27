@@ -27,10 +27,9 @@ void CLuaTimerManager::DoPulse(CLuaMain* pLuaMain)
     // What kind of problems are we trying to avoid? Doing a copy each frame isn't quite efficient
     for (CFastList<CLuaTimer*>::const_iterator iter = m_TimerList.begin(); iter != m_TimerList.end(); ++iter)
     {
-        if (!(**iter).IsPaused())
+        if (!(*iter)->IsPaused())
             m_ProcessQueue.push_back(*iter);
     }
-        
 
     while (!m_ProcessQueue.empty())
     {
@@ -117,7 +116,7 @@ void CLuaTimerManager::RemoveAllTimers()
     m_pProcessingTimer = NULL;
 }
 
-void CLuaTimerManager::PauseTimer(CLuaTimer* pLuaTimer, bool bPaused)
+void CLuaTimerManager::SetTimerPaused(CLuaTimer* pLuaTimer, bool bPaused)
 {
     assert(pLuaTimer);
 
