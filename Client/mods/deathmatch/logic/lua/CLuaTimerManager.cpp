@@ -111,14 +111,15 @@ void CLuaTimerManager::RemoveAllTimers()
     m_pProcessingTimer = NULL;
 }
 
-void CLuaTimerManager::SetTimerPaused(CLuaTimer* pLuaTimer, bool bPaused)
+void CLuaTimerManager::SetTimerPaused(CLuaTimer* timer, bool paused)
 {
-    assert(pLuaTimer);
+    assert(timer);
 
-    pLuaTimer->SetPaused(bPaused);
-    if (bPaused)
-        ListRemove(m_ProcessQueue, pLuaTimer);
+    timer->SetPaused(paused);
+    if (paused)
+        ListRemove(m_ProcessQueue, timer);
 }
+
 
 void CLuaTimerManager::ResetTimer(CLuaTimer* pLuaTimer)
 {
