@@ -428,9 +428,8 @@ private:
     int    GetMilliseconds(CGUIEdit* pEdit);
     void   SetMilliseconds(CGUIEdit* pEdit, int milliseconds);
 
-    bool m_bChatLayoutChanged = false;
-    void SetChatLayoutChanged(bool changed) { this->m_bChatLayoutChanged = changed; };
-    bool GetChatLayoutChanged() { return this->m_bChatLayoutChanged; };
+    void SetChatLayoutChanged(bool changed) { m_bChatLayoutChanged = changed; };
+    bool GetChatLayoutChanged() const { return m_bChatLayoutChanged; };
 
     void ResetGTAVolume();
     void SetRadioVolume(float fVolume);
@@ -472,4 +471,6 @@ private:
     int   m_iMaxAnisotropic;
 
     std::list<SKeyBindSection*> m_pKeyBindSections;
+
+    bool m_bChatLayoutChanged = false;
 };
