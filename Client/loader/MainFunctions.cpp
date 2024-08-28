@@ -1115,7 +1115,7 @@ int LaunchGame(SString strCmdLine)
     const SString strGTAPath = GetGTAPath();
     const SString strMTASAPath = GetMTASAPath();
     SString       strMtaDir = PathJoin(strMTASAPath, "mta");
-    SString       strGTAEXEPath = ToUTF8(GetGameExecutablePath().wstring());
+    SString       strGTAEXEPath = PathToUtf8(GetGameExecutablePath());
 
     SetDllDirectory(strMtaDir);
     if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())

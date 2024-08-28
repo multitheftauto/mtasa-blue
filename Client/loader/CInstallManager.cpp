@@ -655,13 +655,13 @@ SString CInstallManager::_PrepareLaunchLocation()
                 if (fs::is_regular_file(sourcePath, ec))
                 {
                     SString strMessage(_("MTA:SA cannot launch because copying a file failed:"));
-                    strMessage += "\n\n" + ToUTF8(targetPath.wstring());
+                    strMessage += "\n\n" + PathToUtf8(targetPath);
                     BrowseToSolution("copy-files", ASK_GO_ONLINE, strMessage);
                 }
                 else
                 {
                     SString strMessage(_("MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"));
-                    strMessage += "\n\n" + ToUTF8(sourcePath.wstring());
+                    strMessage += "\n\n" + PathToUtf8(sourcePath);
                     BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
                 }
 
@@ -693,7 +693,7 @@ SString CInstallManager::_ProcessGtaPatchCheck()
     if (!FileGenerator::IsPatchBase(patchBasePath))
     {
         SString strMessage(_("MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"));
-        strMessage += "\n\n" + ToUTF8(patchBasePath.wstring());
+        strMessage += "\n\n" + PathToUtf8(patchBasePath);
         BrowseToSolution("gengta_pakfiles", ASK_GO_ONLINE, strMessage);
         return "quit";
     }
@@ -701,7 +701,7 @@ SString CInstallManager::_ProcessGtaPatchCheck()
     if (!FileGenerator::IsPatchDiff(patchDiffPath))
     {
         SString strMessage(_("MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"));
-        strMessage += "\n\n" + ToUTF8(patchDiffPath.wstring());
+        strMessage += "\n\n" + PathToUtf8(patchDiffPath);
         BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
         return "quit";
     }
@@ -771,7 +771,7 @@ SString CInstallManager::_ProcessGtaDllCheck()
         if (isAdmin)
         {
             SString strMessage(_("MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"));
-            strMessage += "\n\n" + ToUTF8(dependecyPath.wstring());
+            strMessage += "\n\n" + PathToUtf8(dependecyPath);
             BrowseToSolution(SString("gendep_error&name=%s", dependency.fileName), ASK_GO_ONLINE, strMessage);
             return "quit";
         }
@@ -826,7 +826,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
             if (isAdmin)
             {
                 SString strMessage(_("MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"));
-                strMessage += "\n\n" + ToUTF8(gtaExePath.wstring());
+                strMessage += "\n\n" + PathToUtf8(gtaExePath);
                 strMessage +=
                     "\n\n" +
                     _("Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA.");
@@ -851,7 +851,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
             if (isAdmin)
             {
                 SString strMessage(_("MTA:SA cannot launch because the GTA:SA executable is not loadable:"));
-                strMessage += "\n\n" + ToUTF8(gtaExePath.wstring());
+                strMessage += "\n\n" + PathToUtf8(gtaExePath);
                 BrowseToSolution(SString("gengta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
                 return "quit";
             }
@@ -874,7 +874,7 @@ SString CInstallManager::_ProcessGtaVersionCheck()
         if (isAdmin)
         {
             SString strMessage(_("MTA:SA cannot launch because patching GTA:SA has failed:"));
-            strMessage += "\n\n" + ToUTF8(gtaExePath.wstring());
+            strMessage += "\n\n" + PathToUtf8(gtaExePath);
             BrowseToSolution(SString("patchgta_error&code=%d", ec.value()), ASK_GO_ONLINE, strMessage);
             return "quit";
         }

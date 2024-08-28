@@ -642,6 +642,14 @@ std::string SharedUtil::ToUTF8(const std::wstring& wstrPath)
 #endif
 }
 
+// C++20?
+#if __cplusplus >= 202002L
+std::string SharedUtil::PathToUtf8(const std::filesystem::path& path)
+{
+    return ToUTF8(path.wstring());
+}
+#endif
+
 #ifdef _WIN32
 ///////////////////////////////////////////////////////////////
 //

@@ -7,12 +7,25 @@
  *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
+
 #pragma once
 
 #include <vector>
 #include "SharedUtil.IntTypes.h"
 #include "SString.h"
 #include "WString.h"
+
+// C++20?
+#if __cplusplus >= 202002L
+// Forward declaration of std::filesystem::path to avoid including the <filesystem>
+namespace std
+{
+    namespace filesystem
+    {
+        class path;
+    }
+}
+#endif
 
 namespace SharedUtil
 {
@@ -100,6 +113,11 @@ namespace SharedUtil
 
     std::wstring FromUTF8(const std::string& strPath);
     std::string  ToUTF8(const std::wstring& wstrPath);
+
+    // C++20?
+    #if __cplusplus >= 202002L
+    std::string PathToUtf8(const std::filesystem::path& path);
+    #endif
 
     std::vector<std::string> ListDir(const char* szPath) noexcept;
 

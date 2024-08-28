@@ -107,7 +107,7 @@ namespace SharedUtil
     {
     #ifdef UTF8_FILE_HOOKS_PERSONALITY_Core
         static SString gtaDirCP = ToACP(g_gtaDirectory);
-        static SString gtaDirUTF8 = ToUTF8(g_gtaDirectory.wstring());
+        static SString gtaDirUTF8 = PathToUtf8(g_gtaDirectory);
         if (strOriginal.BeginsWithI(gtaDirCP))
         {
             SString tail = strOriginal.SubStr(gtaDirCP.length());
