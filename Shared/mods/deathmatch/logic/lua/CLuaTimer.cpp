@@ -23,7 +23,7 @@ CLuaTimer::CLuaTimer(const CLuaFunctionRef& iLuaFunction, const CLuaArguments& A
     m_uiRepeats = 1;
     m_iLuaFunction = iLuaFunction;
     m_Arguments = Arguments;
-    m_Paused = false;
+    m_paused = false;
 }
 
 CLuaTimer::~CLuaTimer()
@@ -65,15 +65,15 @@ void CLuaTimer::ExecuteTimer(CLuaMain* pLuaMain)
     }
 }
 
-void CLuaTimer::SetPaused(bool bPaused)
+void CLuaTimer::SetPaused(bool paused)
 {
-    if (bPaused == IsPaused())
+    if (paused == IsPaused())
         return;
 
     CTickCount llTimeRemaining = GetTimeLeft();
-    if (bPaused)
+    if (paused)
     {
-        m_PausedRemainingTime = llTimeRemaining.ToLongLong() == 0LL ? m_llDelay : llTimeRemaining;
+        m_pausedRemainingTime = llTimeRemaining.ToLongLong() == 0LL ? m_llDelay : llTimeRemaining;
     }
     else
     {
@@ -81,13 +81,13 @@ void CLuaTimer::SetPaused(bool bPaused)
         CTickCount llNewStartTime = llCurrentTime - (m_llDelay - llTimeRemaining);
         SetStartTime(llNewStartTime);
     }
-    m_Paused = bPaused;
+    m_paused = paused;
 }
 
 CTickCount CLuaTimer::GetTimeLeft()
 {
     if (IsPaused())
-        return m_PausedRemainingTime;
+        return m_pausedRemainingTime;
 
     CTickCount llCurrentTime = CTickCount::Now();
     CTickCount llTimeLeft = m_llStartTime + m_llDelay - llCurrentTime;
