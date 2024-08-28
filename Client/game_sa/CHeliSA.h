@@ -57,6 +57,5 @@ class CHeliSA final : public virtual CHeli, public virtual CAutomobileSA
 {
 public:
     CHeliSA(CHeliSAInterface* pInterface);
-    CHeliSAInterface*       GetHeliInterface() noexcept { return reinterpret_cast<CHeliSAInterface*>(GetInterface()); }
-    //const CHeliSAInterface* GetHeliInterface() const noexcept { return reinterpret_cast<const CHeliSAInterface*>(GetInterface()); }
+    CHeliSAInterface* GetHeliInterface() noexcept { return reinterpret_cast<CHeliSAInterface*>(GetInterface()); }
 };
