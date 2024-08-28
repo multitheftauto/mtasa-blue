@@ -47,7 +47,6 @@ public:
     virtual void OnClientClose();
     virtual void UpdatePedModelCaching(const std::map<ushort, float>& newNeedCacheList);
     virtual void UpdateVehicleModelCaching(const std::map<ushort, float>& newNeedCacheList);
-    virtual void AddModelToPersistentCache(ushort usModelId);
     virtual void SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds);
 
     // CModelCacheManagerImpl methods
@@ -72,7 +71,6 @@ protected:
     bool                              m_IsUsingCustomVehicleCacheLimit{}; //< If `true` the value is set by the scripter, otherwise is calculated in `DoPulse()`
     std::map<ushort, SModelCacheInfo> m_PedModelCacheInfoMap{};
     std::map<ushort, SModelCacheInfo> m_VehicleModelCacheInfoMap{};
-    std::set<ushort>                  m_PermoLoadedModels{};
 };
 
 ///////////////////////////////////////////////////////////////
@@ -263,22 +261,6 @@ void CModelCacheManagerImpl::DoPulse()
     if (!m_IsUsingCustomVehicleCacheLimit) {
         SSamplePoint<float> vehPoints[] = {{65536, 7}, {98304, 28}, {131072, 56}, {262144, 56}};
         m_uiMaxCachedVehicleModels = (int)EvalSamplePosition<float>(vehPoints, NUMELMS(vehPoints), (float)iStreamingMemoryAvailableKB);
-    }
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CModelCacheManagerImpl::AddModelToPersistentCache
-//
-// Keep this model around 4 evar now
-//
-///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::AddModelToPersistentCache(ushort usModelId)
-{
-    if (!MapContains(m_PermoLoadedModels, usModelId))
-    {
-        AddModelRefCount(usModelId);
-        MapInsert(m_PermoLoadedModels, usModelId);
     }
 }
 
@@ -542,13 +524,5 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
                 OutputDebugLine(SString("[Cache] End caching model %d  (OnRestreamModel)", usModelId));
             }
         }
-    }
-
-    // Also check the permo list
-    if (MapContains(m_PermoLoadedModels, usModelId))
-    {
-        SubModelRefCount(usModelId);
-        MapRemove(m_PermoLoadedModels, usModelId);
-        OutputDebugLine(SString("[Cache] End permo-caching model %d  (OnRestreamModel)", usModelId));
-    }
+    }   
 }
