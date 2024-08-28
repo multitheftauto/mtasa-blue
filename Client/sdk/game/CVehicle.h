@@ -318,7 +318,7 @@ public:
     virtual void                              UpdateLandingGearPosition() = 0;
     virtual bool                              SetPlateText(const SString& strText) = 0;
     virtual bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState) = 0;
-    virtual float                             GetWheelScale() = 0;
+    virtual float                             GetWheelScale() const = 0;
     virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
 

@@ -21,6 +21,7 @@
 #include "CDoorSA.h"
 #include "CColPointSA.h"
 #include "CAEVehicleAudioEntitySA.h"
+#include "CNodeSA.h"
 
 class CFxSystemSAInterface;
 class CTrainSAInterface;
@@ -95,11 +96,11 @@ constexpr DWORD FUNC_CVehicle_DoSunGlare            = 0x6DD6F0;
 
 struct SRailNodeSA
 {
-    short sX;                       // x coordinate times 8
-    short sY;                       // y coordinate times 8
-    short sZ;                       // z coordinate times 8
-    WORD  sRailDistance;            // on-rail distance times 3.33333334
-    WORD  padding;
+    WORD sX;                       // x coordinate times 8
+    WORD sY;                       // y coordinate times 8
+    WORD sZ;                       // z coordinate times 8
+    WORD sRailDistance;            // on-rail distance times 3.33333334
+    WORD padding;
 };
 
 class CVehicleSAInterfaceVTBL : public CEntitySAInterfaceVTBL
@@ -227,57 +228,106 @@ struct CVehicleFlags
 
 struct CTransmissionGear
 {
-    float maxGearVelocity;
-    float changeUpVelocity;
-    float changeDownVelocity;
+    float maxGearVelocity;    // +0
+    float changeUpVelocity;   // +4
+    float changeDownVelocity; // +8
 };
 
 struct CTransmission
 {
-    CTransmissionGear gears[6];
+    CTransmissionGear gears[6];        // +0
 
-    BYTE  driveType;
-    BYTE  engineType;
-    BYTE  numOfGears;
-    BYTE  pad;
-    DWORD handlingFlags;
-    float engineAcceleration;
-    float engineInertia;
-    float maxGearVelocity;
-    BYTE  pad2[4];
-    float minGearVelocity;
-    float curSpeed;
+    std::uint8_t driveType;            // +48
+    std::uint8_t engineType;           // +49
+    std::uint8_t numOfGears;           // +4A
+    std::uint8_t pad;                  // +4B
+    std::uint32_t handlingFlags;       // +4C
+    float engineAcceleration;          // +50
+    float engineInertia;               // +54
+    float maxGearVelocity;             // +58
+    std::uint32_t pad2;                // +5C
+    float maxReverseGearVelocity;      // +60
+    float curSpeed;                    // +64
 };
 
 class CAutoPilot
 {
-    BYTE pad[56];
+public:
+    CNodeAddressSA* m_currentAddress;               // +0
+    CNodeAddressSA* m_startingRouteNode;            // +4
+    CNodeAddressSA* field_8;                        // +8
+    std::uint32_t   dwordC;                         // +C
+
+    std::uint32_t   m_speedScaleFactor;                     // +10
+    std::uint16_t   m_currentPathNodeInfo;                  // +14
+    std::uint16_t   m_nextPathNodeInfo;                     // +16
+    std::uint16_t   m_previousPathNodeInfo;                 // +18
+    std::uint8_t    _pad1[2];                               // +1A
+    std::uint32_t   m_timeToStartMission;                   // +1C
+    std::uint32_t   m_timeSwitchedToRealPhysics;            // +20
+    std::uint8_t    field_24;                               // +24
+    std::uint8_t    _smthCurr;                              // +25
+    std::uint8_t    _smthNext;                              // +26
+    std::uint8_t    m_currentLane;                          // +27
+    std::uint8_t    m_nextLane;                             // +28
+    std::uint8_t    m_carDrivingStyle;                      // +29
+    std::uint8_t    m_carMission;                           // +2A
+    std::uint8_t    m_tempAction;                           // +2B
+    std::uint32_t   m_tempActionTime;                       // +2C
+    std::uint32_t   m_someStartTime;                        // +30
+    std::uint8_t    byte34;                                 // +34
+    std::uint8_t    byte35;                                 // +35
+    std::uint8_t    f36[2];                                 // +36
+    std::uint32_t   m_speed;                                // +38
+    std::uint32_t   m_maxTrafficSpeed;                      // +3C
+    std::uint8_t    m_cruiseSpeed;                          // +40
+    std::uint8_t    byte41;                                 // +41
+    std::uint8_t    f42[2];                                 // +42
+    std::uint32_t   float44;                                // +44
+    std::uint8_t    f48;                                    // +48
+    std::uint8_t    byte49;                                 // +49
+    std::uint8_t    byte4A;                                 // +4A
+    std::uint8_t    m_carCtrlFlags;                         // +4B
+    std::uint8_t    byte4C;                                 // +4C
+    std::uint8_t    m_straightLineDistance;                 // +4D
+    std::uint8_t    byte4E;                                 // +4E
+    std::uint8_t    byte4F;                                 // +4F
+    std::uint8_t    byte50;                                 // +50
+    std::uint8_t    f51[11];                                // +51
+    CVector         m_destinationCoors;                     // +5C
+    CNodeAddressSA* m_pathFindNodesInfo[8];                 // +68
+    std::uint16_t   m_pathFindNodesCount;                   // +88
+    std::uint8_t    f8A[2];                                 // +8A
+    std::uint32_t   m_targetCar;                            // +8C
+    std::uint32_t   m_carWeMakingSlowDownFor;               // +90
+    std::uint8_t    m_vehicleRecordingId;                   // +94
+    std::uint8_t    m_planeDogfightSomething;               // +95
+    std::uint16_t   field_96;                               // +96
 };
+static_assert(sizeof(CAutoPilot) == 0x98, "Invalid size");
 
 #define MAX_UPGRADES_ATTACHED 15 // perhaps?
 
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
-    CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312
+    CAEVehicleAudioEntitySAInterface m_vehicleAudioEntity; // +138
 
-    tHandlingDataSA*       pHandlingData;                  // +900
-    tFlyingHandlingDataSA* pFlyingHandlingData;            // +904
-    DWORD                  dwHandlingFlags;                // +908
-    int                    pad52321[21];
+    tHandlingDataSA*       m_handlingData;                 // +384
+    tFlyingHandlingDataSA* m_flyingHandlingData;           // +388
+    DWORD                  m_handlingFlags;                // +38C
 
-    DWORD        dwUnknown1201;            // +996
-    DWORD        dwUnknown1202;            // +1000
-    std::uint32_t hFlagsLocal;              // +1004
+    CAutoPilot    m_autoPilot;                             // +390
+    CVehicleFlags m_vehicleFlags;                          // +428
+    std::uint32_t m_creationTime;                          // +430 ; GetTimeInMilliseconds when this vehicle was created.
 
-    CAutoPilot    AutoPilot;                   // +1008
-    CVehicleFlags m_nVehicleFlags;             // +1064?
-    std::uint32_t m_TimeOfCreation;            // GetTimeInMilliseconds when this vehicle was created.
-
-    std::uint8_t  m_colour1, m_colour2, m_colour3, m_colour4;
-    char          m_comp1, m_comp2;
-    short         m_upgrades[MAX_UPGRADES_ATTACHED];            // 1082
-    float         m_fWheelScale;                                // 1112
+    std::uint8_t m_primaryColor;                           // +434
+    std::uint8_t m_secondaryColor;                         // +435
+    std::uint8_t m_tertiaryColor;                          // +436
+    std::uint8_t m_quaternaryColor;                        // +437
+    std::uint8_t m_extras[2];                              // +438
+    std::uint16_t m_upgrades[MAX_UPGRADES_ATTACHED];       // +43A
+    float         m_wheelScale;                            // +458
 
     std::uint16_t CarAlarmState;               // 1116
     std::uint16_t ForcedRandomSeed;            // if this is non-zero the random wander gets deterministic
@@ -337,17 +387,17 @@ public:
     CVehicleSAInterface* m_trailerVehicle;            // 1224
 
     CPedSAInterface* m_bombPlanter;                         // 1228
-    uint32_t         m_deleteAfterTime;                     // 1232
-    uint32_t         m_lastGunFireTime;                     // 1236
-    uint32_t         m_lastBlowUpTime;                      // 1240
-    uint16_t         m_policeChaseLeaveCarTimer;            // 1244
-    uint16_t         m_delayedExplosionTimer;               // 1246
+    std::uint32_t    m_deleteAfterTime;                     // 1232
+    std::uint32_t    m_lastGunFireTime;                     // 1236
+    std::uint32_t    m_lastBlowUpTime;                      // 1240
+    std::uint16_t    m_policeChaseLeaveCarTimer;            // 1244
+    std::uint16_t    m_delayedExplosionTimer;               // 1246
     void*            m_responsibleForDetonation;            // 1248
     float            m_frontGroundZ;                        // 1252
     float            m_rearGroundZ;                         // 1256
 
     /*** BEGIN SECTION that was added by us ***/
-    uint8_t   _padding1262[8];            // 1260
+    std::uint8_t _padding1262[8];            // 1260
     CVehicle* m_pVehicle;                 // 1268
     /*** END SECTION that was added by us ***/
 
@@ -367,7 +417,7 @@ public:
     CFxSystemSAInterface* m_overheatParticle;
     CFxSystemSAInterface* m_fireParticle;
     CFxSystemSAInterface* m_dustParticle;
-    uint32_t              m_renderLights;
+    std::uint32_t         m_renderLights;
 
     // 1416
     RwTexture* m_pCustomPlateTexture;
@@ -375,11 +425,11 @@ public:
     float m_steeringLeftRight;
 
     // 1424
-    uint8_t  m_vehicleClass;
-    uint32_t m_vehicleSubClass;
+    std::uint8_t  m_vehicleClass;
+    std::uint32_t m_vehicleSubClass;
 
-    int16_t    m_peviousRemapTxd;
-    int16_t    m_remapTxd;
+    std::int16_t m_peviousRemapTxd;
+    std::int16_t m_remapTxd;
     RwTexture* m_pRemapTexture;
 
 public:
@@ -387,7 +437,7 @@ public:
     int __thiscall GetRemapIndex() const;
     void __thiscall SetRemapTexDictionary(int remapDict);
 };
-static_assert(sizeof(CVehicleSAInterface) == 1440, "Invalid size for CVehicleSAInterface");
+static_assert(sizeof(CVehicleSAInterface) == 0x5A0, "Invalid size for CVehicleSAInterface");
 
 class CAutomobileSAInterface;
 
@@ -493,8 +543,8 @@ public:
     CPed* GetPassenger(std::uint8_t ucSlot);
     bool  IsBeingDriven();
 
-    bool IsEngineBroken() { return GetVehicleInterface()->m_nVehicleFlags.bEngineBroken; };
-    void SetEngineBroken(bool bEngineBroken) { GetVehicleInterface()->m_nVehicleFlags.bEngineBroken = bEngineBroken; }
+    bool IsEngineBroken() { return GetVehicleInterface()->m_vehicleFlags.bEngineBroken; };
+    void SetEngineBroken(bool bEngineBroken) { GetVehicleInterface()->m_vehicleFlags.bEngineBroken = bEngineBroken; }
 
     void          PlaceBikeOnRoadProperly();
     void          PlaceAutomobileOnRoadProperly();
@@ -533,45 +583,45 @@ public:
     int  GetRemapIndex() const;
     void SetRemapTexDictionary(int iRemapTextureDictionary);
 
-    bool           IsDamaged() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bIsDamaged; };
-    bool           IsDrowning() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bIsDrowning; };
-    bool           IsEngineOn() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bEngineOn; };
-    bool           IsHandbrakeOn() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bIsHandbrakeOn; };
-    bool           IsRCVehicle() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bIsRCVehicle; };
-    bool           GetAlwaysLeaveSkidMarks() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bAlwaysSkidMarks; };
-    bool           GetCanBeDamaged() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bCanBeDamaged; };
-    bool           GetCanBeTargettedByHeatSeekingMissiles() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bVehicleCanBeTargettedByHS; };
-    bool           GetCanShootPetrolTank() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bPetrolTankIsWeakPoint; };
-    bool           GetChangeColourWhenRemapping() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bDontSetColourWhenRemapping; };
-    bool           GetComedyControls() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bComedyControls; };
-    bool           GetGunSwitchedOff() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bGunSwitchedOff; };
-    bool           GetLightsOn() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bLightsOn; };
+    bool           IsDamaged() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bIsDamaged; };
+    bool           IsDrowning() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bIsDrowning; };
+    bool           IsEngineOn() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bEngineOn; };
+    bool           IsHandbrakeOn() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bIsHandbrakeOn; };
+    bool           IsRCVehicle() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bIsRCVehicle; };
+    bool           GetAlwaysLeaveSkidMarks() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bAlwaysSkidMarks; };
+    bool           GetCanBeDamaged() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bCanBeDamaged; };
+    bool           GetCanBeTargettedByHeatSeekingMissiles() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bVehicleCanBeTargettedByHS; };
+    bool           GetCanShootPetrolTank() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bPetrolTankIsWeakPoint; };
+    bool           GetChangeColourWhenRemapping() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bDontSetColourWhenRemapping; };
+    bool           GetComedyControls() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bComedyControls; };
+    bool           GetGunSwitchedOff() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bGunSwitchedOff; };
+    bool           GetLightsOn() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bLightsOn; };
     std::uint32_t  GetOverrideLights() const noexcept { return GetVehicleInterface()->OverrideLights; }
-    bool           GetTakeLessDamage() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bTakeLessDamage; };
-    bool           GetTyresDontBurst() const noexcept { return GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst; };
+    bool           GetTakeLessDamage() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bTakeLessDamage; };
+    bool           GetTyresDontBurst() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bTyresDontBurst; };
     std::uint16_t  GetAdjustablePropertyValue() const noexcept { return *reinterpret_cast<std::uint16_t*>(reinterpret_cast<unsigned long>(m_pInterface) + 2156); };
     float          GetHeliRotorSpeed() const noexcept { return *reinterpret_cast<float*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 2124); };
     float          GetPlaneRotorSpeed() const;
 
-    unsigned long  GetExplodeTime() const noexcept { return *reinterpret_cast<unsigned long*>(reinterpret_cast<std::uin32_t>(m_pInterface) + 1240); };
+    unsigned long  GetExplodeTime() const noexcept { return *reinterpret_cast<unsigned long*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 1240); };
 
     char  GetNitroCount() const noexcept { return GetVehicleInterface()->m_nNitroBoosts; }
     float GetNitroLevel();
 
-    void SetAlwaysLeaveSkidMarks(bool bAlwaysLeaveSkidMarks) { GetVehicleInterface()->m_nVehicleFlags.bAlwaysSkidMarks = bAlwaysLeaveSkidMarks; };
-    void SetCanBeDamaged(bool bCanBeDamaged) { GetVehicleInterface()->m_nVehicleFlags.bCanBeDamaged = bCanBeDamaged; };
-    void SetCanBeTargettedByHeatSeekingMissiles(bool bEnabled) { GetVehicleInterface()->m_nVehicleFlags.bVehicleCanBeTargettedByHS = bEnabled; };
-    void SetCanShootPetrolTank(bool bCanShoot) { GetVehicleInterface()->m_nVehicleFlags.bPetrolTankIsWeakPoint = bCanShoot; };
-    void SetChangeColourWhenRemapping(bool bChangeColour) { GetVehicleInterface()->m_nVehicleFlags.bDontSetColourWhenRemapping; };
-    void SetComedyControls(bool bComedyControls) { GetVehicleInterface()->m_nVehicleFlags.bComedyControls = bComedyControls; };
+    void SetAlwaysLeaveSkidMarks(bool bAlwaysLeaveSkidMarks) { GetVehicleInterface()->m_vehicleFlags.bAlwaysSkidMarks = bAlwaysLeaveSkidMarks; };
+    void SetCanBeDamaged(bool bCanBeDamaged) { GetVehicleInterface()->m_vehicleFlags.bCanBeDamaged = bCanBeDamaged; };
+    void SetCanBeTargettedByHeatSeekingMissiles(bool bEnabled) { GetVehicleInterface()->m_vehicleFlags.bVehicleCanBeTargettedByHS = bEnabled; };
+    void SetCanShootPetrolTank(bool bCanShoot) { GetVehicleInterface()->m_vehicleFlags.bPetrolTankIsWeakPoint = bCanShoot; };
+    void SetChangeColourWhenRemapping(bool bChangeColour) { GetVehicleInterface()->m_vehicleFlags.bDontSetColourWhenRemapping; };
+    void SetComedyControls(bool bComedyControls) { GetVehicleInterface()->m_vehicleFlags.bComedyControls = bComedyControls; };
     void SetEngineOn(bool bEngineOn);
-    void SetGunSwitchedOff(bool bGunsOff) { GetVehicleInterface()->m_nVehicleFlags.bGunSwitchedOff = bGunsOff; };
-    void SetHandbrakeOn(bool bHandbrakeOn) { GetVehicleInterface()->m_nVehicleFlags.bIsHandbrakeOn = bHandbrakeOn; };
-    void SetLightsOn(bool bLightsOn) { GetVehicleInterface()->m_nVehicleFlags.bLightsOn = bLightsOn; };
+    void SetGunSwitchedOff(bool bGunsOff) { GetVehicleInterface()->m_vehicleFlags.bGunSwitchedOff = bGunsOff; };
+    void SetHandbrakeOn(bool bHandbrakeOn) { GetVehicleInterface()->m_vehicleFlags.bIsHandbrakeOn = bHandbrakeOn; };
+    void SetLightsOn(bool bLightsOn) { GetVehicleInterface()->m_vehicleFlags.bLightsOn = bLightsOn; };
     void SetOverrideLights(std::uint32_t uiOverrideLights) { GetVehicleInterface()->OverrideLights = uiOverrideLights; }
     void SetTaxiLightOn(bool bLightOn);
-    void SetTakeLessDamage(bool bTakeLessDamage) { GetVehicleInterface()->m_nVehicleFlags.bTakeLessDamage = bTakeLessDamage; };
-    void SetTyresDontBurst(bool bTyresDontBurst) { GetVehicleInterface()->m_nVehicleFlags.bTyresDontBurst = bTyresDontBurst; };
+    void SetTakeLessDamage(bool bTakeLessDamage) { GetVehicleInterface()->m_vehicleFlags.bTakeLessDamage = bTakeLessDamage; };
+    void SetTyresDontBurst(bool bTyresDontBurst) { GetVehicleInterface()->m_vehicleFlags.bTyresDontBurst = bTyresDontBurst; };
     void SetAdjustablePropertyValue(std::uint16_t usAdjustableProperty)
     {
         *reinterpret_cast<std::uint16_t*>(reinterpret_cast<std::uint32_t>(m_pInterface) + 2156) = usAdjustableProperty;
@@ -673,8 +723,8 @@ public:
     std::map<SString, SVehicleFrame>& GetComponentMap() { return m_ExtraFrames; }
     bool                              SetPlateText(const SString& strText);
     bool                              SetWindowOpenFlagState(std::uint8_t ucWindow, bool bState);
-    float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
-    void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
+    float                             GetWheelScale() const override { return GetVehicleInterface()->m_wheelScale; }
+    void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_wheelScale = fWheelScale; }
 
     void UpdateLandingGearPosition();
 
