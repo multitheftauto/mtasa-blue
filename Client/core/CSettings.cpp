@@ -3932,7 +3932,7 @@ void CSettings::SaveChatSetting(const char* szCVar, int iVal)
     }
 }
 
-void CSettings::SaveChatSetting(const char* szCVar, std::string strVal)
+void CSettings::SaveChatSetting(const char* szCVar, const std::string& strVal)
 {
     // Save value to the CVar if it's different from previous
     std::string strPreviousValue;

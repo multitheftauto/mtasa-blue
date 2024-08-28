@@ -421,7 +421,7 @@ private:
     void   LoadChatColorFromString(eChatColorType eType, const std::string& strColor);
     void   SaveChatColor(eChatColorType eType, const char* szCVar);
     void   SaveChatSetting(const char* szCVar, int iVal);
-    void   SaveChatSetting(const char* szCVar, std::string strVal);
+    void   SaveChatSetting(const char* szCVar, const std::string& strVal);
     void   SaveChatSetting(const char* szCVar, bool bVal);
     CColor GetChatColorValues(eChatColorType eType);
     void   SetChatColorValues(eChatColorType eType, CColor pColor);
