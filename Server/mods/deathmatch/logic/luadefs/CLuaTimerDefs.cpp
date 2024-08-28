@@ -115,25 +115,19 @@ int CLuaTimerDefs::KillTimer(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaTimerDefs::IsTimerPaused(lua_State* luaVM, CLuaTimer* pLuaTimer)
+bool CLuaTimerDefs::IsTimerPaused(CLuaTimer* timer) noexcept
 {
-    //  bool isTimerPaused ( timer theTimer )
-    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (!luaMain)
-        return false;
-
-    bool bIsPaused = pLuaTimer->IsPaused();
-    return bIsPaused;
+    return timer->IsPaused();
 }
 
-bool CLuaTimerDefs::SetTimerPaused(lua_State* luaVM, CLuaTimer* pLuaTimer, bool bPaused)
+bool CLuaTimerDefs::SetTimerPaused(lua_State* luaVM, CLuaTimer* timer, bool paused)
 {
-    //  bool pauseTimer ( timer theTimer, bool paused )
+    //  bool setTimerPaused ( timer theTimer, bool paused )
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!luaMain)
         return false;
 
-    luaMain->GetTimerManager()->SetTimerPaused(pLuaTimer, bPaused);
+    luaMain->GetTimerManager()->SetTimerPaused(timer, paused);
     return true;
 }
 
