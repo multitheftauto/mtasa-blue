@@ -272,7 +272,6 @@ public:
     virtual bool IsHeliSearchLightVisible() = 0;
     virtual void SetHeliSearchLightVisible(bool bVisible) = 0;
 
-    virtual CColModel* GetSpecialColModel() = 0;
     virtual bool       UpdateMovingCollision(float fAngle) = 0;
 
     virtual void RecalculateHandling() = 0;

@@ -106,7 +106,7 @@ public:
     float                     m_fMoveDirection;
     int                       field_8B4[6];
     int                       field_8C8[6];
-    float                     m_fBurningTime;
+    float                     m_burningTime;
     CEntitySAInterface*       m_pWheelCollisionEntity[4];
     CVector                   m_vWheelCollisionPos[4];
     char                      field_924;

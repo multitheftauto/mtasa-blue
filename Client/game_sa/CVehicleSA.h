@@ -381,7 +381,7 @@ public:
     float m_fWheelSpinForAudio;
 
     // 1216
-    float m_nHealth;            // 1000.0f = full health. 0 -> explode
+    float m_health;            // 1000.0f = full health. 0 -> explode
 
     CVehicleSAInterface* m_towingVehicle;             // 1220
     CVehicleSAInterface* m_trailerVehicle;            // 1224
@@ -543,22 +543,22 @@ public:
     CPed* GetPassenger(std::uint8_t ucSlot);
     bool  IsBeingDriven();
 
-    bool IsEngineBroken() { return GetVehicleInterface()->m_vehicleFlags.bEngineBroken; };
-    void SetEngineBroken(bool bEngineBroken) { GetVehicleInterface()->m_vehicleFlags.bEngineBroken = bEngineBroken; }
+    bool IsEngineBroken() const noexcept { return GetVehicleInterface()->m_vehicleFlags.bEngineBroken; };
+    void SetEngineBroken(bool broken) noexcept { GetVehicleInterface()->m_vehicleFlags.bEngineBroken = broken; }
 
     void          PlaceBikeOnRoadProperly();
     void          PlaceAutomobileOnRoadProperly();
     void          SetColor(SharedUtil::SColor color1, SharedUtil::SColor color2, SharedUtil::SColor color3, SharedUtil::SColor color4, int);
     void          GetColor(SharedUtil::SColor* color1, SharedUtil::SColor* color2, SharedUtil::SColor* color3, SharedUtil::SColor* color4, bool bFixedForGTA);
-    bool          IsSirenOrAlarmActive();
+    bool          IsSirenOrAlarmActive() const;
     void          SetSirenOrAlarmActive(bool bActive);
-    void          SetAlpha(std::uint8_t ucAlpha) { m_ucAlpha = ucAlpha; }
-    std::uint8_t GetAlpha() { return m_ucAlpha; }
+    void          SetAlpha(std::uint8_t alpha) noexcept { m_ucAlpha = alpha; }
+    std::uint8_t GetAlpha() const noexcept { return m_ucAlpha; }
 
     void  SetLandingGearDown(bool bLandingGearDown);
-    float GetLandingGearPosition();
+    float GetLandingGearPosition() const;
     void  SetLandingGearPosition(float fPosition);
-    bool  IsLandingGearDown();
+    bool  IsLandingGearDown() const;
     void  Fix();
 
     void BlowUp(CEntity* pCreator, unsigned long ulUnknown);
@@ -671,7 +671,6 @@ public:
     bool IsHeliSearchLightVisible();
     void SetHeliSearchLightVisible(bool bVisible);
 
-    CColModel* GetSpecialColModel();
     bool       UpdateMovingCollision(float fAngle);
 
     void RecalculateHandling();
