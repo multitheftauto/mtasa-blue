@@ -54,10 +54,10 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedBonePosition", GetPedBonePosition},
         {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
         {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
-        {"setElementBoneRotationQuaternion", ArgumentParser<SetElementBoneRotationQuaternion>},
+        {"setElementBoneQuaternion", ArgumentParser<SetElementBoneQuaternion>},
         {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
         {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
-        {"getElementBoneRotationQuaternion", ArgumentParser<GetElementBoneRotationQuaternion>},
+        {"getElementBoneQuaternion", ArgumentParser<GetElementBoneQuaternion>},
         {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
         {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
         {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
@@ -1017,7 +1017,7 @@ bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* ent
     return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll) : false;
 }
 
-bool CLuaPedDefs::SetElementBoneRotationQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float x, float y, float z, float w)
+bool CLuaPedDefs::SetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float x, float y, float z, float w)
 {
     if (boneId > BONE_RIGHTFOOT)
     {
@@ -1051,7 +1051,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
     return false;
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::GetElementBoneRotationQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
+std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::GetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
 {
     if (boneId > BONE_RIGHTFOOT)
     {
