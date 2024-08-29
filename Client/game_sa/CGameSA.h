@@ -173,7 +173,7 @@ public:
     CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
-    CRenderer*                GetRenderer() const override { return m_pRenderer.get(); }
+    CRenderer*                GetRenderer() const noexcept override { return m_pRenderer.get(); }
     
     CWeaponInfo*                    GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD);
     CModelInfo*                     GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false);
