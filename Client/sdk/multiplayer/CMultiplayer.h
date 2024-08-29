@@ -115,7 +115,7 @@ typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* p
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
 typedef bool(VehicleCollisionHandler)(class CVehicleSAInterface*& pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                       float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
-                                      CVector vecCollisionVelocity);
+                                      CVector vecCollisionVelocity, bool isProjectile);
 typedef bool(VehicleDamageHandler)(CEntitySAInterface* pVehicle, float fLoss, CEntitySAInterface* pAttacker, eWeaponType weaponType,
                                    const CVector& vecDamagePos, uchar ucTyre);
 typedef bool(HeliKillHandler)(class CVehicleSAInterface* pVehicle, class CEntitySAInterface* pHitInterface);
@@ -427,8 +427,7 @@ public:
 
     virtual CLimits* GetLimits() = 0;
 
-    virtual bool IsSuspensionEnabled() = 0;
-    virtual void SetSuspensionEnabled(bool bEnabled) = 0;
+    virtual void UpdateVehicleSuspension() noexcept = 0;
 
     virtual void FlushClothesCache() = 0;
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading) = 0;
