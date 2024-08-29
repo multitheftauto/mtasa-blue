@@ -191,7 +191,6 @@ public:
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
     virtual void SetModelIndex(unsigned long ulModel) = 0;
-    virtual void RemoveGeometryRef() = 0;
 
     virtual float    GetHealth() = 0;
     virtual void     SetHealth(float fHealth) = 0;
