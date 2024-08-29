@@ -44,7 +44,7 @@ project "Core"
 		links { "breakpad", "rt" }
 		buildoptions { "-pthread" }
 		linkoptions { "-pthread" }
-		linkoptions { "-l:libncursesw.so.5" }
+		linkoptions { "-l:libncursesw.so.6" }
 
 	filter "system:macosx"
 		links { "ncurses", "breakpad", "CoreFoundation.framework" }

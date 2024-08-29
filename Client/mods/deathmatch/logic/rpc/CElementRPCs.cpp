@@ -64,22 +64,20 @@ void CElementRPCs::SetElementParent(CClientEntity* pSource, NetBitStreamInterfac
 {
     // Read out the entity id and parent id
     ElementID ParentID;
-    if (bitStream.Read(ParentID))
-    {
-        CClientEntity* pParent = CElementIDs::GetElement(ParentID);
-        if (pParent)
-        {
-            pSource->SetParent(pParent);
-        }
-        else
-        {
-            // TODO: raise an error
-        }
-    }
-    else
-    {
-        // TODO: raise an error
-    }
+    if (!bitStream.Read(ParentID))
+        return;
+
+    CClientEntity* pParent = CElementIDs::GetElement(ParentID);
+    if (!pParent)
+        return;
+
+    if (pParent->IsMyChild(pSource, true))
+        return;
+
+    if (pSource->IsMyChild(pParent, true))
+        return;
+
+    pSource->SetParent(pParent);
 }
 
 void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface& bitStream)
