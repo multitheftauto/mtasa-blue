@@ -189,6 +189,7 @@
       <right name="function.addAccount" access="true" />
       <right name="function.setAccountName" access="true" />
       <right name="function.setAccountPassword" access="true" />
+      <right name="function.setAccountSerial" access="true" />
       <right name="function.renameResource" access="true" />
       <right name="function.deleteResource" access="true" />
    </acl>
@@ -245,7 +246,6 @@
       <right name="function.updateResourceACLRequest" access="true" />
       <right name="function.shutdown" access="true" />
       <right name="function.setPlayerScriptDebugLevel" access="true" />
-      <right name="function.setAccountSerial" access="true" />
       <right name="function.removeAccount" access="true" />
    </acl>
    <acl name="RPC">
