@@ -1853,7 +1853,6 @@ namespace SharedUtil
             cpu = 0;
 
         return cpu;
-    #endif
 #else
         // This should work on Linux
         return sched_getcpu();
