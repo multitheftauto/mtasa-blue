@@ -5039,12 +5039,12 @@ std::string CClientVehicle::GetName() const noexcept
     return m_pVehicle->GetVehicleName();
 }
 
-bool CClientVehicle::SetName(std::string name) noexcept
+bool CClientVehicle::SetName(const std::string& name) noexcept
 {
     return m_pVehicle->SetVehicleName(name);
 }
 
-bool CClientVehicle::SetName(std::uint16_t id, std::string name) noexcept
+bool CClientVehicle::SetName(const std::uint16_t& id, const std::string& name) noexcept
 {
     return g_pGame->SetVehicleName(id, name);
 }

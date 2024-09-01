@@ -684,7 +684,7 @@ public:
     float                             GetWheelScale() override { return GetVehicleInterface()->m_fWheelScale; }
     void                              SetWheelScale(float fWheelScale) override { GetVehicleInterface()->m_fWheelScale = fWheelScale; }
     std::string                       GetVehicleName() const noexcept;
-    bool                              SetVehicleName(std::string name) noexcept;
+    bool                              SetVehicleName(const std::string& name) noexcept;
 
     void UpdateLandingGearPosition();
 

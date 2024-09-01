@@ -321,7 +321,7 @@ public:
     virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
     virtual std::string                       GetVehicleName() const noexcept = 0;
-    virtual bool                              SetVehicleName(std::string name) noexcept = 0;
+    virtual bool                              SetVehicleName(const std::string& name) noexcept = 0;
 
     virtual bool GetDummyPosition(eVehicleDummies dummy, CVector& position) const = 0;
     virtual bool SetDummyPosition(eVehicleDummies dummy, const CVector& position) = 0;

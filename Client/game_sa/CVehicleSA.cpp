@@ -26,7 +26,6 @@
 #include "CWorldSA.h"
 #include "CPlayerInfoSA.h"
 #include "CTextSA.h"
-#include "../mods/deathmatch/logic/CVehicleNames.h"
 
 extern CGameSA* pGame;
 
@@ -53,10 +52,6 @@ void _declspec(naked) HOOK_Vehicle_PreRender(void)
         retn
     }
 }
-
-static const auto& vehicleRefNames = CGameSA::GetVehicleRefNames();
-static auto&       vehicleIDNames = CGameSA::GetVehicleIDNames();
-static const auto& originalVehNames = CGameSA::GetOriginalVehicleNames();
 
 void CVehicleSA::HOOK_CCurrentVehicle__Process()
 {
@@ -86,14 +81,9 @@ void CVehicleSA::HOOK_CCurrentVehicle__Process()
     }
     auto modelIndex = playerPed->pVehicle->m_nModelIndex;
 
-    if (vehicleRefNames.size() > 0)
-    {
-        const CVehicle* temp1 = this;
-        const CVehicle* temp2 = (*vehicleRefNames.begin()).first;
-
-        auto temp3 = temp1 == temp2;
-        auto temp4 = 0;
-    }
+    const auto& vehicleRefNames = CGameSA::GetVehicleRefNames();
+    auto&       vehicleIDNames = CGameSA::GetVehicleIDNames();
+    const auto& originalVehNames = CGameSA::GetOriginalVehicleNames();
 
     if (SharedUtil::MapContains(vehicleRefNames, this))
     {
@@ -2342,6 +2332,10 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
 
 std::string CVehicleSA::GetVehicleName() const noexcept
 {
+    const auto& vehicleRefNames = CGameSA::GetVehicleRefNames();
+    const auto& vehicleIDNames = CGameSA::GetVehicleIDNames();
+    const auto& originalVehNames = CGameSA::GetOriginalVehicleNames();
+
     if (SharedUtil::MapContains(vehicleRefNames, this))
         return vehicleRefNames.at(this);
 
@@ -2355,12 +2349,12 @@ std::string CVehicleSA::GetVehicleName() const noexcept
     return "";
 }
 
-bool CVehicleSA::SetVehicleName(std::string name) noexcept
+bool CVehicleSA::SetVehicleName(const std::string& name) noexcept
 {
     if (name.size() > 63)
         return false;
 
-    static auto& vehicleRefNames = CGameSA::GetVehicleRefNames();
+    auto& vehicleRefNames = CGameSA::GetVehicleRefNames();
 
     vehicleRefNames[this] = name;
 

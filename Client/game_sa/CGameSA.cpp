@@ -282,7 +282,7 @@ const std::unordered_map<std::uint16_t, std::string> CGameSA::g_originalVehicleN
 };
 
 std::unordered_map<std::uint16_t, std::string> CGameSA::g_vehicleIDNames = {};
-std::unordered_map<const CVehicleSA*, std::string> CGameSA::g_vehicleRefNames = {};
+std::unordered_map<const CVehicle*, std::string> CGameSA::g_vehicleRefNames = {};
 
 /**
  * \todo allow the addon to change the size of the pools (see 0x4C0270 - CPools::Initialise) (in start game?)
@@ -1325,7 +1325,7 @@ CObjectGroupPhysicalProperties* CGameSA::GetObjectGroupPhysicalProperties(unsign
     return nullptr;
 }
 
-bool CGameSA::SetVehicleName(std::uint16_t id, std::string name) noexcept
+bool CGameSA::SetVehicleName(const std::uint16_t& id, const std::string& name) noexcept
 {
     if (name.size() > 63)
         return false;
