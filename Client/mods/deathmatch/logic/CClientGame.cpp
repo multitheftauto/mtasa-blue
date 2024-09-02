@@ -5417,7 +5417,7 @@ void CClientGame::ResetMapInfo()
     m_bHudAreaNameDisabled = false;
 
     // Reset world special properties, world properties, weather properties etc
-    ResetAllWorldProperties(true, true, true, true, true);
+    ResetWorldProperties(true, true, true, true, true);
 
     // Wanted-level
     SetWanted(0);
@@ -6731,7 +6731,7 @@ void CClientGame::ReinitMarkers()
     g_pGame->Get3DMarkers()->ReinitMarkers();
 }
 
-void CClientGame::ResetAllWorldProperties(bool resetSpecialProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds)
+void CClientGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds)
 {
     // Reset all setWorldSpecialPropertyEnabled to default
     if (resetSpecialProperties)

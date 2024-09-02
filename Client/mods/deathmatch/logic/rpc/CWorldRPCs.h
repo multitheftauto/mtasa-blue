@@ -65,5 +65,5 @@ public:
     DECLARE_RPC(ResetMoonSize);
     DECLARE_RPC(SetSyncIntervals);
     DECLARE_RPC(SetWorldSpecialPropertyEnabled);
-    DECLARE_RPC(ResetAllWorldProperties);
+    DECLARE_RPC(ResetWorldProperties);
 };

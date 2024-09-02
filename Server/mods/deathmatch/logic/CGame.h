@@ -432,7 +432,7 @@ public:
     int  GetMoonSize() { return m_iMoonSize; }
     void SetMoonSize(int iMoonSize) { m_iMoonSize = iMoonSize; }
 
-    void ResetAllWorldProperties(bool resetSpecialWorldProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds, bool resetGlitches, bool resetJetpackWeapons);
+    void ResetWorldProperties(bool resetSpecialWorldProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds, bool resetGlitches, bool resetJetpackWeapons);
 
     void PrintLogOutputFromNetModule();
     void StartOpenPortsTest();

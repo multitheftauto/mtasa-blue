@@ -72,7 +72,7 @@ void CWorldRPCs::LoadFunctions()
 
     AddHandler(SET_WORLD_SPECIAL_PROPERTY, SetWorldSpecialPropertyEnabled, "SetWorldSpecialPropertyEnabled");
 
-    AddHandler(RESET_ALL_WORLD_PROPERTIES, ResetAllWorldProperties, "ResetAllWorldProperties");
+    AddHandler(RESET_WORLD_PROPERTIES, ResetWorldProperties, "ResetWorldProperties");
 }
 
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
@@ -646,7 +646,7 @@ void CWorldRPCs::SetWorldSpecialPropertyEnabled(NetBitStreamInterface& bitStream
     }
 }
 
-void CWorldRPCs::ResetAllWorldProperties(NetBitStreamInterface& bitStream)
+void CWorldRPCs::ResetWorldProperties(NetBitStreamInterface& bitStream)
 {
     bool resetSpecialProperties = bitStream.ReadBit();
     bool resetWorldProperties = bitStream.ReadBit();
@@ -654,5 +654,5 @@ void CWorldRPCs::ResetAllWorldProperties(NetBitStreamInterface& bitStream)
     bool resetLODs = bitStream.ReadBit();
     bool resetSounds = bitStream.ReadBit();
 
-    g_pClientGame->ResetAllWorldProperties(resetSpecialProperties, resetWorldProperties, resetWeatherProperties, resetLODs, resetSounds);
+    g_pClientGame->ResetWorldProperties(resetSpecialProperties, resetWorldProperties, resetWeatherProperties, resetLODs, resetSounds);
 }

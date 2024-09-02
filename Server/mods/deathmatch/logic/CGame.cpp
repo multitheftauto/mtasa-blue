@@ -4396,7 +4396,7 @@ void CGame::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
     }
 }
 
-void CGame::ResetAllWorldProperties(bool resetSpecialProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds, bool resetGlitches, bool resetJetpackWeapons)
+void CGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds, bool resetGlitches, bool resetJetpackWeapons)
 {
     // Reset all setWorldSpecialPropertyEnabled to default
     if (resetSpecialProperties)
@@ -4498,7 +4498,7 @@ void CGame::ResetAllWorldProperties(bool resetSpecialProperties, bool resetWorld
     bitStream->WriteBit(resetWeatherProperties);
     bitStream->WriteBit(resetLODs);
     bitStream->WriteBit(resetSounds);
-    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(RESET_ALL_WORLD_PROPERTIES, *bitStream.pBitStream));
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(RESET_WORLD_PROPERTIES, *bitStream.pBitStream));
 }
 
 //
