@@ -283,5 +283,7 @@ enum eElementRPCFunctions
 
     SET_MARKER_TARGET_ARROW_PROPERTIES,
 
+    RESET_ALL_WORLD_PROPERTIES,
+
     NUM_RPC_FUNCS            // Add above this line
 };

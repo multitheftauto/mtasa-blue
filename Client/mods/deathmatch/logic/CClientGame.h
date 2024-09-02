@@ -408,6 +408,8 @@ public:
     bool SetBirdsEnabled(bool bEnabled);
     bool GetBirdsEnabled();
 
+    void ResetAllWorldProperties(bool resetSpecialWorldProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds);
+
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
 
     void ChangeVehicleWeapon(bool bNext);

@@ -134,5 +134,7 @@ public:
     static bool SetTimeFrozen(bool value) noexcept;
     static bool IsTimeFrozen() noexcept;
     static bool ResetTimeFrozen() noexcept;
-    };
+
+    static void ResetAllWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept;
+};
 
