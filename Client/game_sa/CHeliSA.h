@@ -48,9 +48,11 @@ public:
     std::uint8_t  ___pad3[2];                            // 0xA12
     std::int32_t  field_A14;                             // 0xA14
 };
+static_assert(sizeof(CHeliSAInterface) == 0xA18, "Invalid size for CHeliSAInterface");
 
 class CHeliSA final : public virtual CHeli, public virtual CAutomobileSA
 {
 public:
     CHeliSA(CHeliSAInterface* pInterface);
+    CHeliSAInterface* GetHeliInterface() noexcept { return reinterpret_cast<CHeliSAInterface*>(GetInterface()); }
 };

@@ -693,4 +693,5 @@ private:
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();
+    void           DumpVehicleFrames();
 };
