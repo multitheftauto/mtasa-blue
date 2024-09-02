@@ -325,8 +325,8 @@ public:
     CPedSAInterface* GetPedInterface() noexcept { return static_cast<CPedSAInterface*>(m_pInterface); }
     const CPedSAInterface* GetPedInterface() const noexcept { return static_cast<const CPedSAInterface*>(m_pInterface); }
     void             Init();
+    
     void             SetModelIndex(DWORD modelIndex);
-    void             RemoveGeometryRef();
     void             AttachPedToEntity(DWORD entityInteface, CVector* vector, std::uint16_t direction, float rotationLimit, eWeaponType weaponType, bool changeCamera);
     void             DetachPedFromEntity();
 

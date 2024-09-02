@@ -88,24 +88,6 @@ void CPedSA::SetModelIndex(DWORD modelIndex)
     GetPedInterface()->pedSound.m_bIsFemale = (dwType == 5 || dwType == 22);
 }
 
-// Hacky thing done for the local player when changing model
-void CPedSA::RemoveGeometryRef()
-{
-    RpClump* clump = GetInterface()->m_pRwObject;
-    if (!clump)
-        return;
-
-    RpAtomic* atomic = reinterpret_cast<RpAtomic*>((clump->atomics.root.next) - 0x8);
-    if (!atomic)
-        return;
-
-    RpGeometry* geometry = atomic->geometry;
-    if (!geometry || geometry->refs <= 0)
-        return;
-
-    geometry->refs--;
-}
-
 bool CPedSA::IsInWater() noexcept
 {
     CTask* task = GetPedIntelligence()->GetTaskManager()->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);

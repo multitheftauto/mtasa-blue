@@ -207,6 +207,8 @@ public:
     constexpr int GetDefaultCharacterLimit() const { return m_iDefaultCharacterLimit; }
     constexpr int GetMaxCharacterLimit() const { return m_iMaxCharacterLimit; }
 
+    float GetChatBottomPosition() const noexcept;
+
 private:
     void LoadCVars();
 

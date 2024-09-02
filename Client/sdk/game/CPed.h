@@ -190,8 +190,7 @@ public:
     virtual CVehicle* GetVehicle() = 0;
     virtual void      Respawn(const CVector* position, bool cameraCut) = 0;
 
-    virtual void SetModelIndex(DWORD modelIndex) = 0;
-    virtual void RemoveGeometryRef() = 0;
+    virtual void SetModelIndex(unsigned long ulModel) = 0;
 
     virtual float    GetHealth() const = 0;
     virtual void     SetHealth(float health) = 0;
