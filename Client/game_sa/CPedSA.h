@@ -330,7 +330,7 @@ public:
     void             AttachPedToEntity(DWORD entityInteface, CVector* vector, std::uint16_t direction, float rotationLimit, eWeaponType weaponType, bool changeCamera);
     void             DetachPedFromEntity();
 
-    CVehicle* GetVehicle();
+    CVehicle* GetVehicle() const noexcept;
     void      Respawn(const CVector* position, bool cameraCut);
     bool      AddProjectile(eWeaponType weaponType, CVector origin, float force, const CVector* target, const CEntity* targetEntity);
 
@@ -372,7 +372,7 @@ public:
     bool IsDucking() const { return GetPedInterface()->pedFlags.bIsDucking; }
     void SetDucking(bool duck) { GetPedInterface()->pedFlags.bIsDucking = duck; }
 
-    bool IsInWater() noexcept;
+    bool IsInWater() const noexcept;
 
     int  GetCantBeKnockedOffBike() const { return GetPedInterface()->pedFlags.CantBeKnockedOffBike; }
     void SetCantBeKnockedOffBike(int cantBeKnockedOffBike) { GetPedInterface()->pedFlags.CantBeKnockedOffBike = cantBeKnockedOffBike; }
@@ -386,11 +386,11 @@ public:
     eFightingStyle GetFightingStyle() const { return static_cast<eFightingStyle>(GetPedInterface()->bFightingStyle); }
     void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra = 6);
 
-    CEntity* GetContactEntity() noexcept;
+    CEntity* GetContactEntity() const noexcept;
 
     std::uint8_t GetRunState() const { return static_cast<std::uint8_t>(GetPedInterface()->moveState); }
 
-    CEntity* GetTargetedEntity();
+    CEntity* GetTargetedEntity() const noexcept;
     void     SetTargetedEntity(CEntity* targetEntity);
 
     bool GetCanBeShotInVehicle() const { return GetPedInterface()->pedFlags.bCanBeShotInVehicle; }

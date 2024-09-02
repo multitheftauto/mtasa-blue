@@ -187,7 +187,7 @@ public:
 
     virtual void DetachPedFromEntity() = 0;
 
-    virtual CVehicle* GetVehicle() = 0;
+    virtual CVehicle* GetVehicle() const noexcept = 0;
     virtual void      Respawn(const CVector* position, bool cameraCut) = 0;
 
     virtual void SetModelIndex(unsigned long ulModel) = 0;
@@ -223,7 +223,7 @@ public:
 
     virtual bool IsDucking() const = 0;
     virtual void SetDucking(bool duck) = 0;
-    virtual bool IsInWater() noexcept = 0;
+    virtual bool IsInWater() const noexcept = 0;
     virtual int  GetCantBeKnockedOffBike() const = 0;
     virtual void SetCantBeKnockedOffBike(int cantBeKnockedOffBike) = 0;
 
@@ -238,11 +238,11 @@ public:
     virtual eFightingStyle GetFightingStyle() const = 0;
     virtual void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra) = 0;
 
-    virtual CEntity* GetContactEntity() noexcept = 0;
+    virtual CEntity* GetContactEntity() const noexcept = 0;
 
     virtual std::uint8_t GetRunState() const = 0;
 
-    virtual CEntity* GetTargetedEntity() = 0;
+    virtual CEntity* GetTargetedEntity() const noexcept = 0;
     virtual void     SetTargetedEntity(CEntity* targetEntity) = 0;
 
     virtual bool GetCanBeShotInVehicle() const = 0;

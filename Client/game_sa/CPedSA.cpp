@@ -88,7 +88,7 @@ void CPedSA::SetModelIndex(DWORD modelIndex)
     GetPedInterface()->pedSound.m_bIsFemale = (dwType == 5 || dwType == 22);
 }
 
-bool CPedSA::IsInWater() noexcept
+bool CPedSA::IsInWater() const noexcept
 {
     CTask* task = GetPedIntelligence()->GetTaskManager()->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
     return (task && task->GetTaskType() == TASK_COMPLEX_IN_WATER);
@@ -133,9 +133,9 @@ void CPedSA::AttachPedToEntity(DWORD entityInteface, CVector* vector, std::uint1
         pedInterface->bPedType = pedType;
 }
 
-CVehicle* CPedSA::GetVehicle()
+CVehicle* CPedSA::GetVehicle() const noexcept
 {
-    CPedSAInterface* pedInterface = GetPedInterface();
+    const CPedSAInterface* pedInterface = GetPedInterface();
     if (!pedInterface || !pedInterface->pedFlags.bInVehicle)
         return nullptr;
 
@@ -389,7 +389,7 @@ void CPedSA::SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra)
         pedInterface->bFightingStyleExtra |= (1 << (styleExtra - 1));
 }
 
-CEntity* CPedSA::GetContactEntity() noexcept
+CEntity* CPedSA::GetContactEntity() const noexcept
 {
     CEntitySAInterface* contactInterface = GetPedInterface()->pContactEntity;
     if (!contactInterface)
@@ -413,7 +413,7 @@ CEntity* CPedSA::GetContactEntity() noexcept
     }
 }
 
-CEntity* CPedSA::GetTargetedEntity()
+CEntity* CPedSA::GetTargetedEntity() const noexcept
 {
     CEntitySAInterface* targetInterface = GetPedInterface()->pTargetedEntity;
     if (!targetInterface)
