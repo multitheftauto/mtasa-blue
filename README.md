@@ -64,8 +64,8 @@ You can build the MTA:SA server on GNU/Linux distributions only for x86, x86_64,
 - git
 - make
 - GNU GCC compiler (version 10 or newer)
-- libncursesw5
-- libncursesw5-dev
+- libncursesw6
+- libncurses-dev
 - libmysqlclient-dev
 
 **Build instructions: Script**

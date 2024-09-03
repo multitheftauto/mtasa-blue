@@ -1103,7 +1103,7 @@ bool CMainConfig::GetSettingTable(const SString& strName, const char** szAttribN
                 resultLine.PushString(pAttribute->GetValue());
             }
 
-            if (resultLine.Count() != 0)
+            if (resultLine.IsNotEmpty())
             {
                 outTable->PushNumber(uiLuaIndex++);
                 outTable->PushTable(&resultLine);
@@ -1111,7 +1111,7 @@ bool CMainConfig::GetSettingTable(const SString& strName, const char** szAttribN
         }
     } while (pNode);
 
-    return outTable->Count() != 0;
+    return outTable->IsNotEmpty();
 }
 
 //////////////////////////////////////////////////////////////////////
