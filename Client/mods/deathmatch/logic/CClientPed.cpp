@@ -6419,7 +6419,7 @@ void CClientPed::UpdateStreamPosition(const CVector& vecInPosition)
 bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 {
     // Are we local player or ped we are syncing
-    if ((!IsSyncing() && !IsLocalEntity()) && !IsLocalPlayer())
+    if (!IsSyncing() && !IsLocalEntity() && !IsLocalPlayer())
     {
         return false;
     }
@@ -6559,20 +6559,15 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
     Arguments.PushNumber(uiSeat);            // seat
     Arguments.PushNumber(uiDoor);            // door
 
-    if (!pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true))
-    {
-        // Event has been cancelled
+    if (!pVehicle->CallEvent("onClientVehicleStartEnter", Arguments, true)) // Event has been cancelled
         return false;
-    }
 
     // If it's a local entity, we can just enter the vehicle
     if (IsLocalEntity())
     {
         // If vehicle is not local, we can't enter it
         if (!pVehicle->IsLocalEntity())
-        {
             return false;
-        }
 
         // Set the vehicle id we're about to enter
         m_VehicleInOutID = pVehicle->GetID();
@@ -6643,7 +6638,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger)
 bool CClientPed::ExitVehicle()
 {
     // Are we local player or ped we are syncing
-    if ((!IsSyncing() && !IsLocalEntity()) && !IsLocalPlayer())
+    if (!IsSyncing() && !IsLocalEntity() && !IsLocalPlayer())
     {
         return false;
     }
@@ -6688,7 +6683,7 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    auto targetDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+    int8_t targetDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
 
     // If it's a local entity, we can just exit the vehicle
     if (IsLocalEntity())
@@ -6704,11 +6699,8 @@ bool CClientPed::ExitVehicle()
         arguments.PushNumber(m_ucVehicleInOutSeat);     // seat
         arguments.PushNumber(0);                        // door
 
-        if (!pOccupiedVehicle->CallEvent("onClientVehicleStartExit", arguments, true))
-        {
-            // Event has been cancelled
+        if (!pOccupiedVehicle->CallEvent("onClientVehicleStartExit", arguments, true)) // Event has been cancelled
             return false;
-        }
 
         // Make ped exit vehicle
         GetOutOfVehicle(targetDoor);
@@ -6741,10 +6733,10 @@ bool CClientPed::ExitVehicle()
     unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_REQUEST_OUT);
     pBitStream->WriteBits(&ucAction, 4);
 
-    if (ucDoor >= 2 && ucDoor <= 5)
+    if (targetDoor >= 2 && targetDoor <= 5)
     {
-        ucDoor -= 2;
-        pBitStream->WriteBits(&ucDoor, 2);
+        targetDoor -= 2;
+        pBitStream->WriteBits(&targetDoor, 2);
     }
 
     // Send and destroy it
