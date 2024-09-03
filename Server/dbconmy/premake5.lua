@@ -41,6 +41,7 @@ project "Dbconmy"
 		includedirs {
 			os.findheader("mysql.h", {
 				"/usr/local/opt/mysql/include/mysql",
+				"/opt/homebrew/include/mysql",
 				"/opt/osxcross/macports/pkgs/opt/local/include/mysql8/mysql",
 			})
 		}
