@@ -101,7 +101,14 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     // Remove plant
     pGame->GetPlantManager()->RemovePlant(pInterface);
 
-    RemoveBuildingFromWorld(pInterface);
+    // Remove shadow
+    pInterface->RemoveShadows();
+
+    // Remove building from world
+    pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
+
+    // Call virtual destructor
+    ((void*(__thiscall*)(void*, char))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 0);
 
     // Remove col reference
     auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
