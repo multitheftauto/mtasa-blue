@@ -751,6 +751,9 @@ bool CModelInfoSA::IsValid()
     if (!ppModelInfo[m_dwModelID])
         return false;
 
+    if (!IsAllocatedInArchive())
+        return false;
+    
     return true;
 }
 
