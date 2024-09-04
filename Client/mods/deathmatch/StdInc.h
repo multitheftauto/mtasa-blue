@@ -105,6 +105,7 @@
 #include <CScriptFile.h>
 #include <CWeaponNames.h>
 #include <CVehicleNames.h>
+#include <CModelRenderer.h>
 #include <lua/CLuaCFunctions.h>
 #include <lua/CLuaArguments.h>
 #include <lua/CLuaMain.h>
