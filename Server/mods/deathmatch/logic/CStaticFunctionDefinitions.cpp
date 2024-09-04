@@ -8358,6 +8358,43 @@ bool CStaticFunctionDefinitions::SetObjectBreakable(CElement* pElement, const bo
     return false;
 }
 
+bool CStaticFunctionDefinitions::RespawnObject(CElement* const pElement) noexcept
+{
+    RUN_CHILDREN(RespawnObject(*iter));
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+    if (!pObject)
+        return false;
+
+    CBitStream BitStream;
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, RESPAWN_OBJECT, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::ToggleObjectRespawn(CElement* const pElement, const bool bRespawn) noexcept
+{
+    RUN_CHILDREN(ToggleObjectRespawn(*iter, bRespawn));
+
+    if (!IS_OBJECT(pElement))
+        return false;
+
+    CObject* pObject = static_cast<CObject*>(pElement);
+    if (!pObject)
+        return false;
+
+    pObject->SetRespawnEnabled(bRespawn);
+
+    CBitStream BitStream;
+    BitStream->WriteBit(bRespawn);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, TOGGLE_OBJECT_RESPAWN, *BitStream.pBitStream));
+
+    return true;
+}
+
 CRadarArea* CStaticFunctionDefinitions::CreateRadarArea(CResource* pResource, const CVector2D& vecPosition2D, const CVector2D& vecSize, const SColor color,
                                                         CElement* pVisibleTo)
 {
