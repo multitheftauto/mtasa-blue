@@ -6683,7 +6683,7 @@ bool CClientPed::ExitVehicle()
         return false;
     }
 
-    int8_t targetDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
+    std::int8_t targetDoor = g_pGame->GetCarEnterExit()->ComputeTargetDoorToExit(m_pPlayerPed, pOccupiedVehicle->GetGameVehicle());
 
     // If it's a local entity, we can just exit the vehicle
     if (IsLocalEntity())
