@@ -81,6 +81,9 @@ public:
     bool IsBreakable() { return m_bBreakable; }
     void SetBreakable(bool bBreakable) { m_bBreakable = bBreakable; }
 
+    bool IsRespawnEnabled() const noexcept { return m_bRespawnable; }
+    void SetRespawnEnabled(bool bRespawn) noexcept { m_bRespawnable = bRespawn; }
+
 protected:
     bool ReadSpecialData(const int iLine) override;
 
@@ -96,6 +99,7 @@ private:
     bool            m_bSyncable;
     CPlayer*        m_pSyncer;
     bool            m_bVisibleInAllDimensions = false;
+    bool            m_bRespawnable;
 
 protected:
     bool m_bCollisionsEnabled;

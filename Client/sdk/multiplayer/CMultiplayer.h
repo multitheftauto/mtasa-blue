@@ -104,6 +104,7 @@ typedef void(IdleHandler)();
 typedef void(PreFxRenderHandler)();
 typedef void(PostColorFilterRenderHandler)();
 typedef void(PreHudRenderHandler)();
+typedef void(RenderEverythingBarRoadsHandler)();
 typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
 typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                       AssocGroupId animGroup, AnimationId animID);
@@ -385,6 +386,7 @@ public:
     virtual void SetRender3DStuffHandler(Render3DStuffHandler* pHandler) = 0;
     virtual void SetPreRenderSkyHandler(PreRenderSkyHandler* pHandler) = 0;
     virtual void SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler) = 0;
+    virtual void SetRenderEverythingBarRoadsHandler(RenderEverythingBarRoadsHandler* pHandler) = 0;
 
     virtual void Reset() = 0;
 
