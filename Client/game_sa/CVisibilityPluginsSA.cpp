@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include "CVisibilityPluginsSA.h"
 
+#define FUNC_CVisibilityPlugins_InsertEntityIntoEntityList 0x733DD0
+
 void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
     DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
@@ -50,4 +52,9 @@ int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
         mov     iResult, eax
     }
     return iResult;
+}
+
+bool CVisibilityPluginsSA::InsertEntityIntoEntityList(void* entity, float distance, void* callback)
+{
+    return ((bool(_cdecl*)(void*, float, void*))FUNC_CVisibilityPlugins_InsertEntityIntoEntityList)(entity, distance, callback);
 }
