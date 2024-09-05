@@ -129,7 +129,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"resetBlurLevel", ResetBlurLevel},
                                                                              {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
                                                                              {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
-
+                                                                             {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
+                                                                             
                                                                              // World check funcs
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
@@ -2265,4 +2266,9 @@ bool CLuaWorldDefs::SetVolumetricShadowsEnabled(bool enable) noexcept
 bool CLuaWorldDefs::IsVolumetricShadowsEnabled() noexcept
 {
     return g_pGame->GetSettings()->IsVolumetricShadowsEnabled();
+}
+
+bool CLuaWorldDefs::ResetVolumetricShadows() noexcept
+{
+    return g_pGame->GetSettings()->ResetVolumetricShadows();
 }

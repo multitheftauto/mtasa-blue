@@ -273,7 +273,7 @@ void CSettingsSA::Save()
     }
 }
 
-bool CSettingsSA::IsVolumetricShadowsEnabled()
+bool CSettingsSA::IsVolumetricShadowsEnabled() const noexcept
 {
     return m_bVolumetricShadowsEnabled && !m_bVolumetricShadowsSuspended;
 }
@@ -288,11 +288,17 @@ void CSettingsSA::SetVolumetricShadowsEnabled(bool bEnable)
 }
 
 
-bool CSettingsSA::GetVolumetricShadowsEnabledByVideoSetting()
+bool CSettingsSA::GetVolumetricShadowsEnabledByVideoSetting() const noexcept
 {
     bool volumetricShadow;
     g_pCore->GetCVars()->Get("volumetric_shadows", volumetricShadow);
     return volumetricShadow;
+}
+
+bool CSettingsSA::ResetVolumetricShadows() noexcept
+{
+    pGame->GetSettings()->SetVolumetricShadowsEnabled(pGame->GetSettings()->GetVolumetricShadowsEnabledByVideoSetting());
+    return true;
 }
 
 void CSettingsSA::SetVolumetricShadowsSuspended(bool bSuspended)

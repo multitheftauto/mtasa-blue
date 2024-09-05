@@ -137,5 +137,6 @@ public:
 
     static bool SetVolumetricShadowsEnabled(bool enable) noexcept;
     static bool IsVolumetricShadowsEnabled() noexcept;
+    static bool ResetVolumetricShadows() noexcept;
     };
 
