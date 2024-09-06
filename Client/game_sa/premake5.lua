@@ -6,7 +6,7 @@ project "Game SA"
 
 	-- HACK(Jusonex): Temp fix for ebp not being set in naked functions
 	-- More information on this in multiplayer_sa's premake5.lua
-	cppdialect "C++14"
+	cppdialect "C++20"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"

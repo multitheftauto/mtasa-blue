@@ -37,15 +37,15 @@ CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(SFileObjectInstance* obj)
 class CAtomicModelInfo
 {
 public:
-    void CAtomicModelInfo::DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfo*))(*(void***)this)[8])(this); }
+    void DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfo*))(*(void***)this)[8])(this); }
 
-    void CAtomicModelInfo::SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfo*, RpAtomic*))(*(void***)this)[15])(this, atomic); }
+    void SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfo*, RpAtomic*))(*(void***)this)[15])(this, atomic); }
 };
 
 class CDamagableModelInfo
 {
 public:
-    void CDamagableModelInfo::SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CDamagableModelInfo*, RpAtomic*))0x4C48D0)(this, atomic); }
+    void SetDamagedAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CDamagableModelInfo*, RpAtomic*))0x4C48D0)(this, atomic); }
 };
 
 static char* GetFrameNodeName(RwFrame* frame)
