@@ -6878,6 +6878,9 @@ void CClientGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWo
     g_pMultiplayer->ResetWater();
     GetManager()->GetWaterManager()->ResetWorldWaterLevel();
     GetManager()->GetWaterManager()->SetWaveLevel(0.0f);
+
+    // Reset volumetric shadows
+    g_pGame->GetSettings()->ResetVolumetricShadows();
 }
 
 void CClientGame::OnWindowFocusChange(bool state)
