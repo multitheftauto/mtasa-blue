@@ -5558,6 +5558,7 @@ void CClientGame::ResetMapInfo()
     g_pGame->GetWeather()->ResetWaterFog();
     g_pGame->GetWeather()->ResetSandstorm();
     g_pGame->GetWeather()->ResetRainbow();
+    g_pGame->GetSettings()->ResetVolumetricShadows();
 
     // Disable the change of any player stats
     g_pMultiplayer->SetLocalStatsStatic(true);
