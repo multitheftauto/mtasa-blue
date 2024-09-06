@@ -283,5 +283,8 @@ enum eElementRPCFunctions
 
     SET_MARKER_TARGET_ARROW_PROPERTIES,
 
+    RESPAWN_OBJECT,
+    TOGGLE_OBJECT_RESPAWN,
+
     NUM_RPC_FUNCS            // Add above this line
 };
