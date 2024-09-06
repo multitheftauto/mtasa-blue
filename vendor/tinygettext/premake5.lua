@@ -3,6 +3,8 @@ project "tinygettext"
 	kind "StaticLib"
 	targetname "tinygettext"
 
+	cppdialect "C++20"
+
 	includedirs {
 		"../../Shared/sdk",
 		".",
