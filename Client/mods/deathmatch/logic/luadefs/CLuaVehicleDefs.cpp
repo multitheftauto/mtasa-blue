@@ -4277,6 +4277,11 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
 
 bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount)
 {
+    /* 
+    unsigned long ucModel = 0;
+    ucModel = vehicle->GetModel();
+    CVehicleNames::GetVehicleTypeName(ucModel);
+    */
 
     if (ucSirenType >= 1 && ucSirenType <= 6)
     {
