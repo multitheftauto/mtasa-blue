@@ -4287,7 +4287,10 @@ bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char uc
     {
         if (ucSirenCount <= SIREN_COUNT_MAX)
         {
-            vehicle->GiveVehicleSirens(ucSirenType, ucSirenCount); 
+         
+
+            vehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
+           // vehicle->SetVehicleFlags(bEnable360, bEnableRandomiser, bEnableLOSCheck, bEnableSilent);
         }
     }
  
