@@ -104,6 +104,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable},
         {"setVehicleSirensOn", SetVehicleSirensOn},
         {"addVehicleUpgrade", AddVehicleUpgrade},
+        {"addVehicleSirens", ArgumentParser<addVehicleSirens>},
         {"removeVehicleUpgrade", RemoveVehicleUpgrade},
         {"setVehicleDoorState", SetVehicleDoorState},
         {"setVehicleWheelStates", SetVehicleWheelStates},
@@ -4273,3 +4274,18 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
 
     return entryPoints;
 }
+
+bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount)
+{
+
+    if (ucSirenType >= 1 && ucSirenType <= 6)
+    {
+        if (ucSirenCount <= SIREN_COUNT_MAX)
+        {
+            vehicle->GiveVehicleSirens(ucSirenType, ucSirenCount); 
+        }
+    }
+ 
+    return true;
+}
+
