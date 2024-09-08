@@ -165,7 +165,8 @@ public:
                                                                                                 const std::optional<eResizableVehicleWheelGroup> eWheelGroup);
     static bool SetVehicleModelWheelSize(const unsigned short usModel, const eResizableVehicleWheelGroup eWheelGroup, const float fWheelSize);
     static int  GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsigned char wheel);
-    static bool addVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount, std::optional<bool> bEnable360, std::optional<bool> bEnableLOSCheck, std::optional<bool> bEnableRandomiser,  std::optional<bool> bEnableSilent );
+    static bool AddVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount, std::optional<bool> bEnable360, std::optional<bool> bEnableLOSCheck, std::optional<bool> bEnableRandomiser,  std::optional<bool> bEnableSilent );
+    static bool RemoveVehicleSirens(CClientVehicle* vehicle);
 
     // Components
     LUA_DECLARE(SetVehicleComponentPosition);

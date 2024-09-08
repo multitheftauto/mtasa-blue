@@ -104,8 +104,9 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleDoorsUndamageable", SetVehicleDoorsUndamageable},
         {"setVehicleSirensOn", SetVehicleSirensOn},
         {"addVehicleUpgrade", AddVehicleUpgrade},
-        {"addVehicleSirens", ArgumentParser<addVehicleSirens>},
+        {"addVehicleSirens", ArgumentParser<AddVehicleSirens>},
         {"removeVehicleUpgrade", RemoveVehicleUpgrade},
+        {"removeVehicleSirens", ArgumentParser<RemoveVehicleSirens>},
         {"setVehicleDoorState", SetVehicleDoorState},
         {"setVehicleWheelStates", SetVehicleWheelStates},
         {"setVehicleLightState", SetVehicleLightState},
@@ -4275,7 +4276,7 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
     return entryPoints;
 }
 
-bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount,  std::optional<bool> bEnable360,  std::optional<bool> bEnableLOSCheck ,  std::optional<bool> bEnableRandomiser,  std::optional<bool> bEnableSilent)
+bool CLuaVehicleDefs::AddVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount,  std::optional<bool> bEnable360,  std::optional<bool> bEnableLOSCheck ,  std::optional<bool> bEnableRandomiser,  std::optional<bool> bEnableSilent)
 {
     eClientVehicleType vehicleType = vehicle->GetVehicleType();
 
@@ -4293,5 +4294,11 @@ bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char uc
         }
     }
     return false;
+}
+
+bool CLuaVehicleDefs::RemoveVehicleSirens(CClientVehicle* vehicle)
+{
+    vehicle->RemoveVehicleSirens();
+    return true;
 }
 
