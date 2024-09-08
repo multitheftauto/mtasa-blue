@@ -4275,7 +4275,7 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
     return entryPoints;
 }
 
-bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount)
+bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount,  std::optional<bool> bEnable360,  std::optional<bool> bEnableLOSCheck ,  std::optional<bool> bEnableRandomiser,  std::optional<bool> bEnableSilent)
 {
     /* 
     unsigned long ucModel = 0;
@@ -4287,13 +4287,12 @@ bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char uc
     {
         if (ucSirenCount <= SIREN_COUNT_MAX)
         {
-         
-
             vehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
-           // vehicle->SetVehicleFlags(bEnable360, bEnableRandomiser, bEnableLOSCheck, bEnableSilent);
+            vehicle->SetVehicleFlags(bEnable360.value_or(false), bEnableRandomiser.value_or(true), bEnableLOSCheck.value_or(true), bEnableSilent.value_or(false));
+            return true;
         }
     }
  
-    return true;
+    return false;
 }
 
