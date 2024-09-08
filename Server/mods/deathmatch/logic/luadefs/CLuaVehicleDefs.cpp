@@ -2985,7 +2985,7 @@ int CLuaVehicleDefs::SetVehiclePlateText(lua_State* luaVM)
 }
 
 
-bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* pVehicle, bool state)
+bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* pVehicle, bool state) noexcept
 {
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit(state);
