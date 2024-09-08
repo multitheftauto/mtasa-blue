@@ -4277,22 +4277,21 @@ std::variant<bool, std::array<CVector, 4>> CLuaVehicleDefs::OOP_GetVehicleEntryP
 
 bool CLuaVehicleDefs::addVehicleSirens(CClientVehicle* vehicle, unsigned char ucSirenType, unsigned char ucSirenCount,  std::optional<bool> bEnable360,  std::optional<bool> bEnableLOSCheck ,  std::optional<bool> bEnableRandomiser,  std::optional<bool> bEnableSilent)
 {
-    /* 
-    unsigned long ucModel = 0;
-    ucModel = vehicle->GetModel();
-    CVehicleNames::GetVehicleTypeName(ucModel);
-    */
+    eClientVehicleType vehicleType = vehicle->GetVehicleType();
 
-    if (ucSirenType >= 1 && ucSirenType <= 6)
+    if (vehicleType != CLIENTVEHICLE_PLANE && vehicleType != CLIENTVEHICLE_BOAT && vehicleType != CLIENTVEHICLE_TRAILER && vehicleType != CLIENTVEHICLE_HELI &&
+          vehicleType != CLIENTVEHICLE_BIKE && vehicleType != CLIENTVEHICLE_BMX)
     {
-        if (ucSirenCount <= SIREN_COUNT_MAX)
+        if (ucSirenType >= 1 && ucSirenType <= 6)
         {
+            if (ucSirenCount <= SIREN_COUNT_MAX)
+            {
             vehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
             vehicle->SetVehicleFlags(bEnable360.value_or(false), bEnableRandomiser.value_or(true), bEnableLOSCheck.value_or(true), bEnableSilent.value_or(false));
             return true;
+            }
         }
     }
- 
     return false;
 }
 
