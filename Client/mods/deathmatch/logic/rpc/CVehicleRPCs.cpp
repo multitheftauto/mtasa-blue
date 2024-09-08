@@ -52,6 +52,7 @@ void CVehicleRPCs::LoadFunctions()
     AddHandler(REMOVE_VEHICLE_SIRENS, RemoveVehicleSirens, "removeVehicleSirens");
     AddHandler(SET_VEHICLE_SIRENS, SetVehicleSirens, "setVehicleSirens");
     AddHandler(SET_VEHICLE_PLATE_TEXT, SetVehiclePlateText, "setVehiclePlateText");
+    AddHandler(SET_VEHICLE_NITRO_ACTIVATED, SetVehicleNitroActivated, "SetVehicleNitroActivated");
 }
 
 void CVehicleRPCs::DestroyAllVehicles(NetBitStreamInterface& bitStream)
@@ -652,4 +653,26 @@ void CVehicleRPCs::SetVehiclePlateText(CClientEntity* pSourceEntity, NetBitStrea
             pVehicle->SetRegPlate(strText);
         }
     }
+}
+
+
+void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream)
+{
+    bool state;
+    if (bitStream.ReadBit(state))
+    {
+        CClientVehicle* pVehicle = m_pVehicleManager->Get(pSourceEntity->GetID());
+        if (pVehicle)
+        {
+            if (pVehicle->IsNitroInstalled())
+            {
+                if (state)
+                    pVehicle->SetNitroLevel(pVehicle->GetNitroLevel() - 1.0001f);
+                else
+                    pVehicle->SetNitroLevel(pVehicle->GetNitroLevel() + 1.0001f);
+               
+            }
+        }
+    }
+
 }
