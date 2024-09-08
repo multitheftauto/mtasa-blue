@@ -126,5 +126,5 @@ public:
     LUA_DECLARE(GetVehicleSirenParams);
     LUA_DECLARE(SetVehiclePlateText);
 
-    static bool SetVehicleNitroActivated(CVehicle* pVehicle, bool state) noexcept;
+    static bool SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept;
 };

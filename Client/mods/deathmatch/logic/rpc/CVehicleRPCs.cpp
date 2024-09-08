@@ -662,17 +662,17 @@ void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBit
     if (!bitStream.ReadBit(state))
         return;           
 
-    CClientVehicle* pVehicle = m_pVehicleManager->Get(pSourceEntity->GetID());
-    if (!pVehicle)
+    CClientVehicle* vehicle = m_pVehicleManager->Get(pSourceEntity->GetID());
+    if (!vehicle)
         return;          
 
-    if (!pVehicle->IsNitroInstalled())
+    if (!vehicle->IsNitroInstalled())
         return;            
 
     // Apply nitro level change
     if (state)
-        pVehicle->SetNitroLevel(pVehicle->GetNitroLevel() - 1.0001f);
+        vehicle->SetNitroLevel(vehicle->GetNitroLevel() - 1.0001f);
     else
-        pVehicle->SetNitroLevel(pVehicle->GetNitroLevel() + 1.0001f);
+        vehicle->SetNitroLevel(vehicle->GetNitroLevel() + 1.0001f);
 
 }

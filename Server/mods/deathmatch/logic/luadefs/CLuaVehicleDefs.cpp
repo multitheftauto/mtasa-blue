@@ -126,7 +126,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleSirens", GetVehicleSirens},
         {"getVehicleSirenParams", GetVehicleSirenParams},
         {"setVehiclePlateText", SetVehiclePlateText},
-        {"setVehicleNitroActivated", ArgumentParser <SetVehicleNitroActivated>},
+        {"setVehicleNitroActivated", ArgumentParser<SetVehicleNitroActivated>},
     };
 
     // Add functions
@@ -2985,11 +2985,11 @@ int CLuaVehicleDefs::SetVehiclePlateText(lua_State* luaVM)
 }
 
 
-bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* pVehicle, bool state) noexcept
+bool CLuaVehicleDefs::SetVehicleNitroActivated(CVehicle* vehicle, bool state) noexcept
 {
     CBitStream BitStream;
     BitStream.pBitStream->WriteBit(state);
 
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_NITRO_ACTIVATED, *BitStream.pBitStream));
     return true;
 }
