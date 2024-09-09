@@ -1644,6 +1644,10 @@ void CClientVehicle::SetCollisionEnabled(bool bCollisionEnabled)
     if (m_pVehicle && m_bHasAdjustableProperty)
         m_pVehicle->SetUsesCollision(bCollisionEnabled);
 
+    // Remove all contacts
+    for (const auto& ped : m_Contacts)
+        RemoveContact(ped);
+
     m_bIsCollisionEnabled = bCollisionEnabled;
 }
 
