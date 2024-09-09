@@ -5,7 +5,7 @@ premake.modules.install_cef = {}
 -- Config variables
 local CEF_PATH = "vendor/cef3/cef/"
 local CEF_TEMP_PATH = "vendor/cef3/"
-local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
+local CEF_URL_PREFIX = "https://mirror-cdn.multitheftauto.com/vendor/cef/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
