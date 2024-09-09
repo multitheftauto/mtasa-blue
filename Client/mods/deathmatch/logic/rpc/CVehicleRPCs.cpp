@@ -658,9 +658,7 @@ void CVehicleRPCs::SetVehiclePlateText(CClientEntity* pSourceEntity, NetBitStrea
 
 void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBitStreamInterface& bitStream)
 {
-    bool state;
-    if (!bitStream.ReadBit(state))
-        return;           
+    bool state = bitStream.ReadBit();
 
     CClientVehicle* vehicle = m_pVehicleManager->Get(pSourceEntity->GetID());
     if (!vehicle)
@@ -674,5 +672,4 @@ void CVehicleRPCs::SetVehicleNitroActivated(CClientEntity* pSourceEntity, NetBit
         vehicle->SetNitroLevel(vehicle->GetNitroLevel() - 1.0001f);
     else
         vehicle->SetNitroLevel(vehicle->GetNitroLevel() + 1.0001f);
-
 }
