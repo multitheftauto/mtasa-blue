@@ -5429,7 +5429,13 @@ void CClientGame::ResetMapInfo()
     m_bHudAreaNameDisabled = false;
 
     // Reset world special properties, world properties, weather properties etc
-    ResetWorldProperties(true, true, true, true, true);
+    ResetWorldPropsInfo desc;
+    desc.resetSpecialProperties = true;
+    desc.resetWorldProperties = true;
+    desc.resetWeatherProperties = true;
+    desc.resetLODs = true;
+    desc.resetSounds = true;
+    ResetWorldProperties(desc);
 
     // Wanted-level
     SetWanted(0);
@@ -6744,10 +6750,10 @@ void CClientGame::ReinitMarkers()
     g_pGame->Get3DMarkers()->ReinitMarkers();
 }
 
-void CClientGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds)
+void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
 {
     // Reset all setWorldSpecialPropertyEnabled to default
-    if (resetSpecialProperties)
+    if (resetPropsInfo.resetSpecialProperties)
     {
         g_pGame->SetCheatEnabled("hovercars", false);
         g_pGame->SetCheatEnabled("aircars", false);
@@ -6769,7 +6775,7 @@ void CClientGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWo
     }
 
     // Reset all setWorldProperty to default
-    if (resetWorldProperties)
+    if (resetPropsInfo.resetWorldProperties)
     {
         g_pMultiplayer->ResetAmbientColor();
         g_pMultiplayer->ResetAmbientObjectColor();
@@ -6796,7 +6802,7 @@ void CClientGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWo
     }
 
     // Reset all weather stuff like heat haze, wind velocity etc
-    if (resetWeatherProperties)
+    if (resetPropsInfo.resetWeatherProperties)
     {
         g_pMultiplayer->ResetHeatHaze();
         g_pMultiplayer->RestoreFogDistance();
@@ -6811,14 +6817,14 @@ void CClientGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWo
     }
 
     // Reset LODs
-    if (resetLODs)
+    if (resetPropsInfo.resetLODs)
     {
         g_pGame->GetSettings()->ResetVehiclesLODDistance(true);
         g_pGame->GetSettings()->ResetPedsLODDistance(true);
     }
 
     // Reset & restore sounds
-    if (resetSounds)
+    if (resetPropsInfo.resetSounds)
     {
         g_pMultiplayer->SetInteriorSoundsEnabled(true);
         g_pGame->GetAudioEngine()->ResetAmbientSounds();

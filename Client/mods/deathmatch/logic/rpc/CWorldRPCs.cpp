@@ -654,5 +654,5 @@ void CWorldRPCs::ResetWorldProperties(NetBitStreamInterface& bitStream)
     bool resetLODs = bitStream.ReadBit();
     bool resetSounds = bitStream.ReadBit();
 
-    g_pClientGame->ResetWorldProperties(resetSpecialProperties, resetWorldProperties, resetWeatherProperties, resetLODs, resetSounds);
+    g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialProperties, resetWorldProperties, resetWeatherProperties, resetLODs, resetSounds});
 }

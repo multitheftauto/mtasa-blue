@@ -4396,10 +4396,10 @@ void CGame::SetJetpackWeaponEnabled(eWeaponType weaponType, bool bEnabled)
     }
 }
 
-void CGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWorldProperties, bool resetWeatherProperties, bool resetLODs, bool resetSounds, bool resetGlitches, bool resetJetpackWeapons)
+void CGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
 {
     // Reset all setWorldSpecialPropertyEnabled to default
-    if (resetSpecialProperties)
+    if (resetPropsInfo.resetSpecialProperties)
     {
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::HOVERCARS, false);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::AIRCARS, false);
@@ -4420,7 +4420,7 @@ void CGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWorldPro
     }
 
     // Reset all weather stuff like heat haze, wind velocity etc
-    if (resetWeatherProperties)
+    if (resetPropsInfo.resetWeatherProperties)
     {
         g_pGame->SetHasHeatHaze(false);
         g_pGame->SetHasFogDistance(false);
@@ -4436,18 +4436,18 @@ void CGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWorldPro
     }
 
     // Restore interiors sounds
-    if (resetSounds)
+    if (resetPropsInfo.resetSounds)
         g_pGame->SetInteriorSoundsEnabled(true);
 
     // Disable all glitches
-    if (resetGlitches)
+    if (resetPropsInfo.resetGlitches)
     {
         for (const auto& iter : m_GlitchNames)
             CStaticFunctionDefinitions::SetGlitchEnabled(iter.first, false);
     }
 
     // Reset jetpack weapons
-    if (resetJetpackWeapons)
+    if (resetPropsInfo.resetJetpackWeapons)
     {
         for (std::uint8_t i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; i++)
             CStaticFunctionDefinitions::SetJetpackWeaponEnabled(static_cast<eWeaponType>(i), false);
@@ -4493,11 +4493,11 @@ void CGame::ResetWorldProperties(bool resetSpecialProperties, bool resetWorldPro
 
     // Send it to everyone
     CBitStream bitStream;
-    bitStream->WriteBit(resetSpecialProperties);
-    bitStream->WriteBit(resetWorldProperties);
-    bitStream->WriteBit(resetWeatherProperties);
-    bitStream->WriteBit(resetLODs);
-    bitStream->WriteBit(resetSounds);
+    bitStream->WriteBit(resetPropsInfo.resetSpecialProperties);
+    bitStream->WriteBit(resetPropsInfo.resetWorldProperties);
+    bitStream->WriteBit(resetPropsInfo.resetWeatherProperties);
+    bitStream->WriteBit(resetPropsInfo.resetLODs);
+    bitStream->WriteBit(resetPropsInfo.resetSounds);
     m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(RESET_WORLD_PROPERTIES, *bitStream.pBitStream));
 }
 

@@ -1452,5 +1452,5 @@ int CLuaWorldDefs::getOcclusionsEnabled(lua_State* luaVM)
 
 void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds, std::optional<bool> resetGlitches, std::optional<bool> resetJetpackWeapons) noexcept
 {
-    g_pGame->ResetWorldProperties(resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true), resetGlitches.value_or(true), resetJetpackWeapons.value_or(true));
+    g_pGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true), resetGlitches.value_or(true), resetJetpackWeapons.value_or(true)});
 }
