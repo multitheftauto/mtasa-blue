@@ -1003,7 +1003,9 @@ int CLuaPedDefs::CanPedBeKnockedOffBike(lua_State* luaVM)
 bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CVector position)
 {
     CEntity* theEntity = entity->GetGameEntity();
-    return theEntity ? theEntity->SetBonePosition(static_cast<eBone>(boneId), position) : false;
+    if (!theEntity)
+        return false;
+    return theEntity->SetBonePosition(static_cast<eBone>(boneId), position);
 }
 
 bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float yaw, float pitch, float roll)
@@ -1012,7 +1014,9 @@ bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* ent
         throw LuaFunctionError("Invalid bone ID", false);
 
     CEntity* theEntity = entity->GetGameEntity();
-    return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll) : false;
+    if (!theEntity)
+        return false;
+    return theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll);
 }
 
 bool CLuaPedDefs::SetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float x, float y, float z, float w)

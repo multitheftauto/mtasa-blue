@@ -670,7 +670,6 @@ bool CEntitySA::SetBoneRotationQuat(eBone boneId, float x, float y, float z, flo
         theInterface->bDontUpdateHierarchy = false;
         
     return true;
-    return false;
 }
 
 bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
