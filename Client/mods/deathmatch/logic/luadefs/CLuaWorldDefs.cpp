@@ -130,7 +130,8 @@ void CLuaWorldDefs::LoadFunctions()
                                                                              {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
                                                                              {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
                                                                              {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
-                                                                             
+                                                                             {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
+      
                                                                              // World check funcs
                                                                              {"areTrafficLightsLocked", AreTrafficLightsLocked},
                                                                              {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
@@ -2271,4 +2272,9 @@ bool CLuaWorldDefs::IsVolumetricShadowsEnabled() noexcept
 bool CLuaWorldDefs::ResetVolumetricShadows() noexcept
 {
     return g_pGame->GetSettings()->ResetVolumetricShadows();
+}
+
+void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept
+{
+    g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true)});
 }
