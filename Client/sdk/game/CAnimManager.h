@@ -1,11 +1,11 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/game/CAnimManager.h
+ *  FILE:        Client/sdk/game/CAnimManager.h
  *  PURPOSE:     Animation manager interface
  *
- *  Multi Theft Auto is available from http://www.multitheftauto.com/
+ *  Multi Theft Auto is available from https://multitheftauto.com/
  *
  *****************************************************************************/
 
@@ -66,14 +66,14 @@ public:
     virtual int                         GetAnimationBlockIndex(const char* szName) = 0;
     virtual int                         RegisterAnimBlock(const char* szName) = 0;
 
-    virtual AnimAssocGroup_type GetAnimBlendAssoc(AssocGroupId groupID) = 0;
+    virtual AnimAssocGroup_type GetAnimBlendAssoc(AssocGroupId groupID) const = 0;
     virtual AssocGroupId        GetFirstAssocGroup(const char* szName) = 0;
 
     virtual const char* GetAnimGroupName(AssocGroupId groupID) = 0;
     virtual const char* GetAnimBlockName(AssocGroupId groupID) = 0;
 
     virtual AnimBlendAssoc_type     CreateAnimAssociation(AssocGroupId animGroup, AnimationId animID) = 0;
-    virtual StaticAssocIntface_type GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID) = 0;
+    virtual StaticAssocIntface_type GetAnimStaticAssociation(eAnimGroup animGroup, eAnimID animID) const = 0;
     virtual AnimBlendAssoc_type     GetAnimAssociation(AssocGroupId animGroup, const char* szAnimName) = 0;
     virtual AnimBlendAssoc_type     AddAnimation(RpClump* pClump, AssocGroupId animGroup, AnimationId animID) = 0;
     virtual AnimBlendAssoc_type     AddAnimation(RpClump* pClump, CAnimBlendHierarchy*, int ID) = 0;
@@ -128,7 +128,10 @@ public:
     virtual void                                 DeleteCustomAnimHierarchyInterface(CAnimBlendHierarchySAInterface* pInterface) = 0;
     virtual void                                 DeleteCustomAnimSequenceInterface(CAnimBlendSequenceSAInterface* pInterface) = 0;
 
-    virtual bool           isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
-    virtual const SString& GetGateWayBlockName() = 0;
-    virtual const SString& GetGateWayAnimationName() = 0;
+    virtual bool              isGateWayAnimationHierarchy(CAnimBlendHierarchySAInterface* pInterface) = 0;
+    virtual const char* GetGateWayBlockName() const = 0;
+    virtual const char* GetGateWayAnimationName() const = 0;
+
+    virtual bool IsValidGroup(std::uint32_t uiAnimGroup) const = 0;
+    virtual bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) const = 0;
 };

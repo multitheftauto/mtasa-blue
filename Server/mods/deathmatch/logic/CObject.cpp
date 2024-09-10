@@ -33,6 +33,7 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
     m_bIsFrozen = false;
     m_bDoubleSided = false;
     m_bBreakable = false;
+    m_bRespawnable = false;
     m_bInWater = false;
     m_bIsStatic = true;
     m_bIsMoving = false;
@@ -68,6 +69,7 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     m_bBreakable = Copy.m_bBreakable;
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
+    m_bRespawnable = Copy.m_bRespawnable;
     m_bInWater = Copy.m_bInWater;
     m_bIsStatic = Copy.m_bIsStatic;
 

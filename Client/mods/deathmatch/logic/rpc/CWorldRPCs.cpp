@@ -17,6 +17,7 @@
 #include <game/CGarage.h>
 #include <game/CClock.h>
 #include <game/CWeaponStatManager.h>
+#include <game/CBuildingRemoval.h>
 #include "CWorldRPCs.h"
 
 void CWorldRPCs::LoadFunctions()
@@ -70,6 +71,8 @@ void CWorldRPCs::LoadFunctions()
     AddHandler(RESET_MOON_SIZE, ResetMoonSize, "ResetMoonSize");
 
     AddHandler(SET_WORLD_SPECIAL_PROPERTY, SetWorldSpecialPropertyEnabled, "SetWorldSpecialPropertyEnabled");
+
+    AddHandler(RESET_WORLD_PROPERTIES, ResetWorldProperties, "ResetWorldProperties");
 }
 
 void CWorldRPCs::SetTime(NetBitStreamInterface& bitStream)
@@ -582,7 +585,7 @@ void CWorldRPCs::RemoveWorldModel(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RemoveBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 }
 
@@ -597,13 +600,13 @@ void CWorldRPCs::RestoreWorldModel(NetBitStreamInterface& bitStream)
         {
             bitStream.Read(cInterior);
         }
-        g_pGame->GetWorld()->RestoreBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
+        g_pGame->GetBuildingRemoval()->RestoreBuilding(usModel, fRadius, fX, fY, fZ, cInterior);
     }
 }
 
 void CWorldRPCs::RestoreAllWorldModels(NetBitStreamInterface& bitStream)
 {
-    g_pGame->GetWorld()->ClearRemovedBuildingLists();
+    g_pGame->GetBuildingRemoval()->ClearRemovedBuildingLists();
 }
 
 void CWorldRPCs::SetSyncIntervals(NetBitStreamInterface& bitStream)
@@ -641,4 +644,15 @@ void CWorldRPCs::SetWorldSpecialPropertyEnabled(NetBitStreamInterface& bitStream
     {
         g_pClientGame->SetWorldSpecialProperty((WorldSpecialProperty)property, isEnabled);
     }
+}
+
+void CWorldRPCs::ResetWorldProperties(NetBitStreamInterface& bitStream)
+{
+    bool resetSpecialProperties = bitStream.ReadBit();
+    bool resetWorldProperties = bitStream.ReadBit();
+    bool resetWeatherProperties = bitStream.ReadBit();
+    bool resetLODs = bitStream.ReadBit();
+    bool resetSounds = bitStream.ReadBit();
+
+    g_pClientGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialProperties, resetWorldProperties, resetWeatherProperties, resetLODs, resetSounds});
 }

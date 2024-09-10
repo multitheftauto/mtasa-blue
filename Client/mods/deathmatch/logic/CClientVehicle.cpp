@@ -13,6 +13,7 @@
 #include <game/CBikeHandlingEntry.h>
 #include <game/CBoat.h>
 #include <game/CBoatHandlingEntry.h>
+#include <game/CCarEnterExit.h>
 #include <game/CDoor.h>
 #include <game/CFlyingHandlingEntry.h>
 #include <game/CHandlingEntry.h>
@@ -1614,6 +1615,14 @@ bool CClientVehicle::SetRotorSpeed(float fSpeed)
     }
 }
 
+bool CClientVehicle::SetWheelsRotation(float fRot1, float fRot2, float fRot3, float fRot4) noexcept
+{
+    if (!m_pVehicle)
+        return false;
+
+    return m_pVehicle->SetVehicleWheelRotation(fRot1, fRot2, fRot3, fRot4);
+}
+
 bool CClientVehicle::IsHeliSearchLightVisible()
 {
     if (m_pVehicle && m_eVehicleType == CLIENTVEHICLE_HELI)
@@ -1634,6 +1643,10 @@ void CClientVehicle::SetCollisionEnabled(bool bCollisionEnabled)
 {
     if (m_pVehicle && m_bHasAdjustableProperty)
         m_pVehicle->SetUsesCollision(bCollisionEnabled);
+
+    // Remove all contacts
+    for (const auto& ped : m_Contacts)
+        RemoveContact(ped);
 
     m_bIsCollisionEnabled = bCollisionEnabled;
 }
@@ -5022,4 +5035,18 @@ void CClientVehicle::ResetWheelScale()
         m_fWheelScale = 1.0f;
 
     m_bWheelScaleChanged = false;
+}
+
+CVector CClientVehicle::GetEntryPoint(std::uint32_t entryPointIndex)
+{
+    static const uint32_t lookup[4] = {10, 8, 11, 9};
+    assert(entryPointIndex < 4);
+    const std::uint32_t saDoorIndex = lookup[entryPointIndex];
+
+    CVector      entryPoint;
+    CVehicle*    gameVehicle = GetGameVehicle();
+
+    g_pGame->GetCarEnterExit()->GetPositionToOpenCarDoor(entryPoint, gameVehicle, saDoorIndex);
+
+    return entryPoint;
 }

@@ -81,6 +81,9 @@ public:
     bool IsBreakable() const { return m_bBreakable; }
     void SetBreakable(bool bBreakable) { m_bBreakable = bBreakable; }
 
+    bool IsRespawnEnabled() const noexcept { return m_bRespawnable; }
+    void SetRespawnEnabled(bool bRespawn) noexcept { m_bRespawnable = bRespawn; }
+
     CVector GetMoveSpeed() const { return m_vecMoveSpeed; }
     void    SetMoveSpeed(CVector vecMoveSpeed);
 
@@ -111,7 +114,7 @@ public:
     CVector GetCenterOfMass() const { return m_vecCenterOfMass; }
     void    SetCenterOfMass(CVector vecCenterOfMass) { m_vecCenterOfMass = vecCenterOfMass; }
 
-    protected:
+protected:
     bool ReadSpecialData(const int iLine) override;
 
 private:
@@ -126,6 +129,7 @@ private:
     bool            m_bSyncable;
     CPlayer*        m_pSyncer;
     bool            m_bVisibleInAllDimensions = false;
+    bool            m_bRespawnable;
     CVector         m_vecMoveSpeed;
     CVector         m_vecTurnSpeed;
     bool            m_bInWater;

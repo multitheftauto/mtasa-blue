@@ -90,6 +90,7 @@ enum class WorldSpecialProperty
     FIREBALLDESTRUCT,
     ROADSIGNSTEXT,
     EXTENDEDWATERCANNONS,
+    TUNNELWEATHERBLEND,
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 

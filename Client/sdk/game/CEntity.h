@@ -112,7 +112,9 @@ public:
     virtual bool      SetBoneMatrix(eBone boneId, const CMatrix& matrix) = 0;
 
     virtual bool GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& roll) = 0;
+    virtual bool GetBoneRotationQuat(eBone boneId, float& x, float& y, float& z, float& w) = 0;
     virtual bool SetBoneRotation(eBone boneId, float yaw, float pitch, float roll) = 0;
+    virtual bool SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w) = 0;
     virtual bool GetBonePosition(eBone boneId, CVector& position) = 0;
     virtual bool SetBonePosition(eBone boneId, const CVector& position) = 0;
 };

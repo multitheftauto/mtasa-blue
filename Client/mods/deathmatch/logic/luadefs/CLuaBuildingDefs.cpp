@@ -30,10 +30,10 @@ void CLuaBuildingDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "createBuilding");
 
-    lua_registerclass(luaVM, "Building");
+    lua_registerclass(luaVM, "Building", "Element");
 }
 
-CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16_t modelId, CVector pos, CVector rot, std::optional<uint8_t> interior)
+CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::uint16_t modelId, CVector pos, std::optional<CVector> rot, std::optional<std::uint8_t> interior)
 {
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
 
@@ -45,15 +45,17 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
     if (!CClientBuildingManager::IsValidModel(modelId))
         throw std::invalid_argument("Invalid building model id");
 
-    if (!g_pGame->GetPools()->GetBuildingsPool().HasFreeBuildingSlot())
-        throw std::invalid_argument("No free slot in buildings pool");
-
     if (!CClientBuildingManager::IsValidPosition(pos))
         throw std::invalid_argument("Position is outside of game world");
 
-    ConvertDegreesToRadians(rot);
+    if (rot.has_value())
+        ConvertDegreesToRadians(rot.value());
+    else
+        rot.emplace(CVector(0, 0, 0));
 
-    CClientBuilding* pBuilding = new CClientBuilding(m_pManager, INVALID_ELEMENT_ID, modelId, pos, rot, interior.value_or(0));
+    m_pBuildingManager->ResizePoolIfNeeds();
+
+    CClientBuilding* pBuilding = new CClientBuilding(m_pManager, INVALID_ELEMENT_ID, modelId, pos, rot.value() , interior.value_or(0));
 
     CClientEntity* pRoot = pResource->GetResourceDynamicEntity();
     pBuilding->SetParent(pRoot);
@@ -63,25 +65,10 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, uint16
 
 void CLuaBuildingDefs::RemoveAllGameBuildings()
 {
-    // We do not want to remove scripted buildings
-    // But we need remove them from the buildings pool for a bit...
-    m_pBuildingManager->DestroyAllForABit();
-
-    // This function makes buildings backup without scripted buildings
-    g_pGame->RemoveAllBuildings();
-
-    // ... And restore here
-    m_pBuildingManager->RestoreDestroyed();
+    m_pBuildingManager->RemoveAllGameBuildings();
 }
 
 void CLuaBuildingDefs::RestoreGameBuildings()
 {
-    // We want to restore the game buildings to the same positions as they were before the backup.
-    // Remove scripted buildings for a bit
-    m_pBuildingManager->DestroyAllForABit();
-
-    g_pGame->RestoreGameBuildings();
-
-    // Restore what we can
-    m_pBuildingManager->RestoreDestroyed();
+    m_pBuildingManager->RestoreAllGameBuildings();
 }

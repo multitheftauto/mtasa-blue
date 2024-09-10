@@ -15,7 +15,7 @@ ENV AS_BUILDAGENT=0 \
 RUN apt-get update && \
     apt-get install -y software-properties-common wget ca-certificates git build-essential \
         gcc-10 g++-10 curl subversion ncftp \
-        libncurses-dev libncursesw5 libmysqlclient-dev
+        libncurses-dev libncursesw6 libmysqlclient-dev
 
 # Set build directory
 VOLUME /build

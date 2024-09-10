@@ -19,12 +19,14 @@ void CLuaObjectDefs::LoadFunctions()
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Object create/destroy funcs
         {"createObject", CreateObject},
+        {"respawnObject", ArgumentParser<RespawnObject>},
 
         // Object get funcs
         {"getObjectRotation", GetObjectRotation},
         {"getObjectScale", GetObjectScale},
         {"isObjectBreakable", ArgumentParser<IsObjectBreakable>},
         {"isObjectMoving", ArgumentParser<IsObjectMoving>},
+        {"isObjectRespawnable", ArgumentParser<IsObjectRespawnable>},
         {"getObjectProperty", GetObjectProperty},
 
         // Object set funcs
@@ -34,6 +36,7 @@ void CLuaObjectDefs::LoadFunctions()
         {"moveObject", MoveObject},
         {"stopObject", StopObject},
         {"breakObject", ArgumentParser<BreakObject>},
+        {"toggleObjectRespawn", ArgumentParser<ToggleObjectRespawn>},
         {"setObjectProperty", ArgumentParser<SetObjectProperty>},
     };
 
@@ -50,19 +53,23 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "move", "moveObject");
     lua_classfunction(luaVM, "stop", "stopObject");
     lua_classfunction(luaVM, "break", "breakObject");
+    lua_classfunction(luaVM, "respawn", "respawnObject");
 
     lua_classfunction(luaVM, "getScale", "getObjectScale");
     lua_classfunction(luaVM, "setScale", "setObjectScale");
     lua_classfunction(luaVM, "isBreakable", "isObjectBreakable");
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
     lua_classfunction(luaVM, "isMoving", "isObjectMoving");
+    lua_classfunction(luaVM, "toggleRespawn", "toggleObjectRespawn");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
     lua_classfunction(luaVM, "getProperty", "getObjectProperty");
     lua_classfunction(luaVM, "setProperty", "setObjectProperty");
 
+
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
     lua_classvariable(luaVM, "moving", nullptr, "isObjectMoving");
+    lua_classvariable(luaVM, "isRespawnable", nullptr, "isObjectRespawnable");
     lua_classvariable(luaVM, "properties", nullptr, GetObjectProperties);
 
     lua_registerclass(luaVM, "Object", "Element");
@@ -412,4 +419,19 @@ int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
 bool CLuaObjectDefs::SetObjectProperty(CObject* const pObject, const std::string sProperty, const std::variant<float, CVector> vValue)
 {
     return CStaticFunctionDefinitions::SetObjectProperty(pObject, sProperty, vValue);
+}
+
+bool CLuaObjectDefs::RespawnObject(CObject* const pObject) noexcept
+{
+    return CStaticFunctionDefinitions::RespawnObject(pObject);
+}
+
+bool CLuaObjectDefs::ToggleObjectRespawn(CObject* const pObject, const bool bRespawn) noexcept
+{
+    return CStaticFunctionDefinitions::ToggleObjectRespawn(pObject, bRespawn);
+}
+
+bool CLuaObjectDefs::IsObjectRespawnable(CObject* const pObject) noexcept
+{
+    return pObject->IsRespawnEnabled();
 }

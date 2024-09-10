@@ -25,6 +25,7 @@ class CTaskManager;
 class CVehicle;
 class CWeapon;
 class CWeaponStat;
+class CProjectileSAInterface;
 
 enum ePedPieceTypes
 {
@@ -170,6 +171,13 @@ namespace EPedWeaponAudioEvent
 }
 using EPedWeaponAudioEvent::EPedWeaponAudioEventType;
 
+struct SSatchelsData
+{
+    CProjectileSAInterface* pProjectileInterface;
+    CVector*                vecAttachedOffsets;
+    CVector*                vecAttachedRotation;
+};
+
 class CPed : public virtual CPhysical
 {
 public:
@@ -183,7 +191,6 @@ public:
     virtual void      Respawn(CVector* position, bool bCameraCut) = 0;
 
     virtual void SetModelIndex(unsigned long ulModel) = 0;
-    virtual void RemoveGeometryRef() = 0;
 
     virtual float    GetHealth() = 0;
     virtual void     SetHealth(float fHealth) = 0;
@@ -277,4 +284,6 @@ public:
     virtual CPedIKSAInterface*      GetPedIKInterface() = 0;
     virtual void*                   GetPedNodeInterface(std::int32_t nodeId) = 0;
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
+
+    virtual void GetAttachedSatchels(std::vector<SSatchelsData> &satchelsList) const = 0;
 };

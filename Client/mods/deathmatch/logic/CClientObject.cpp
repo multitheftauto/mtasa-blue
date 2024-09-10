@@ -373,6 +373,10 @@ void CClientObject::SetCollisionEnabled(bool bCollisionEnabled)
     if (m_pObject)
         m_pObject->SetUsesCollision(bCollisionEnabled);
 
+    // Remove all contacts
+    for (const auto& ped : m_Contacts)
+        RemoveContact(ped);
+
     m_bUsesCollision = bCollisionEnabled;
 }
 
