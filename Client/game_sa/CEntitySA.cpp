@@ -603,6 +603,28 @@ bool CEntitySA::GetBoneRotation(eBone boneId, float& yaw, float& pitch, float& r
     return false;
 }
 
+bool CEntitySA::GetBoneRotationQuat(eBone boneId, float& x, float& y, float& z, float& w)
+{
+    RpClump* clump = GetRpClump();
+    if (clump)
+    {
+        // updating the bone frame orientation will also update its children
+        // This rotation is only applied when UpdateElementRpHAnim is called
+        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
+        AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+        if (frameData)
+        {
+            RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+            x = boneOrientation->imag.x;
+            y = boneOrientation->imag.y;
+            z = boneOrientation->imag.z;
+            w = boneOrientation->real;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll)
 {
     RpClump* clump = GetRpClump();
@@ -617,6 +639,33 @@ bool CEntitySA::SetBoneRotation(eBone boneId, float yaw, float pitch, float roll
             RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
             RwV3d   angles = {yaw, roll, pitch};
             BoneNode_cSAInterface::EulerToQuat(&angles, boneOrientation);
+            CEntitySAInterface* theInterface = GetInterface();
+            if (theInterface)
+            {
+                theInterface->bDontUpdateHierarchy = false;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CEntitySA::SetBoneRotationQuat(eBone boneId, float x, float y, float z, float w)
+{
+    RpClump* clump = GetRpClump();
+    if (clump)
+    {
+        // updating the bone frame orientation will also update its children
+        // This rotation is only applied when UpdateElementRpHAnim is called
+        CAnimBlendClumpDataSAInterface* clumpDataInterface = *pGame->GetClumpData(clump);
+        AnimBlendFrameData*             frameData = clumpDataInterface->GetFrameDataByNodeId(boneId);
+        if (frameData)
+        {
+            RtQuat* boneOrientation = &frameData->m_pIFrame->orientation;
+            boneOrientation->imag.x = x;
+            boneOrientation->imag.y = y;
+            boneOrientation->imag.z = z;
+            boneOrientation->real = w;
             CEntitySAInterface* theInterface = GetInterface();
             if (theInterface)
             {
