@@ -110,11 +110,14 @@ void CClientBuilding::SetUsesCollision(bool state)
     if (m_usesCollision == state)
         return;
 
-    m_usesCollision = state;
     if (m_pBuilding)
-    {
         m_pBuilding->SetUsesCollision(state);
-    }
+
+    // Remove all contacts
+    for (const auto& ped : m_Contacts)
+        RemoveContact(ped);
+
+    m_usesCollision = state;
 }
 
 void CClientBuilding::Create()
@@ -145,7 +148,7 @@ void CClientBuilding::Destroy()
     if (!m_pBuilding)
         return;
 
-    if (m_pHighBuilding)
+    if (m_pHighBuilding && m_pHighBuilding->IsValid())
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
     }

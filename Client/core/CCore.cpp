@@ -2181,11 +2181,6 @@ CModelCacheManager* CCore::GetModelCacheManager()
     return m_pModelCacheManager;
 }
 
-void CCore::AddModelToPersistentCache(ushort usModelId)
-{
-    return GetModelCacheManager()->AddModelToPersistentCache(usModelId);
-}
-
 void CCore::StaticIdleHandler()
 {
     g_pCore->IdleHandler();

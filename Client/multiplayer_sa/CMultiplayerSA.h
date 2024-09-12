@@ -268,6 +268,7 @@ public:
     void SetRender3DStuffHandler(Render3DStuffHandler* pHandler);
     void SetPreRenderSkyHandler(PreRenderSkyHandler* pHandler);
     void SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler);
+    void SetRenderEverythingBarRoadsHandler(RenderEverythingBarRoadsHandler* pHandler) override;
 
     void Reset();
 
@@ -310,8 +311,7 @@ public:
 
     CLimits* GetLimits() { return &m_limits; }
 
-    void SetSuspensionEnabled(bool bEnabled);
-    bool IsSuspensionEnabled() { return m_bSuspensionEnabled; };
+    void UpdateVehicleSuspension() noexcept;
 
     virtual void FlushClothesCache();
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading);
@@ -362,7 +362,6 @@ public:
     bool         m_bBadDrivebyHitboxesDisabled;
 
 private:
-    bool                m_bSuspensionEnabled;
     std::vector<char>   m_PlayerImgCache;
     EFastClothesLoading m_FastClothesLoading;
     CLimitsSA           m_limits;

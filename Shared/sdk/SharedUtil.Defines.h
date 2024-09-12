@@ -26,10 +26,12 @@
 //
 // Architecture
 //
-#if defined( _M_X64 ) || defined( __x86_64__ ) || defined( _M_AMD64 )
+#if defined( _M_X64 ) || defined( __x86_64__ ) || defined( _M_AMD64 ) || defined( __amd64__ ) 
     #define ANY_x64
     #ifdef _WIN64
         #define WIN_x64
+    #elif defined(__APPLE__)
+        #define APPLE_x64
     #else
         #define LINUX_x64
     #endif
@@ -37,6 +39,8 @@
     #define ANY_arm64
     #ifdef _M_ARM64
         #define WIN_arm64
+    #elif defined(__APPLE__)
+        #define APPLE_arm64
     #else
         #define LINUX_arm64
     #endif
