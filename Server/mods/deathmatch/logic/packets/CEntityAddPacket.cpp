@@ -301,6 +301,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
                         BitStream.WriteBit(pObject->GetHealth() <= 0);
 
+                    // Respawnable
+                    if (BitStream.Can(eBitStreamVersion::RespawnObject_Serverside))
+                        BitStream.WriteBit(pObject->IsRespawnEnabled());
+
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
                         CCustomWeapon* pWeapon = static_cast<CCustomWeapon*>(pElement);

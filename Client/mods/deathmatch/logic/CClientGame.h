@@ -71,6 +71,15 @@ struct SMiscGameSettings
     bool bAllowShotgunDamageFix;
 };
 
+struct ResetWorldPropsInfo
+{
+    bool resetSpecialProperties{};
+    bool resetWorldProperties{};
+    bool resetWeatherProperties{};
+    bool resetLODs{};
+    bool resetSounds{};
+};
+
 class CClientGame
 {
     friend class CPacketHandler;
@@ -409,6 +418,8 @@ public:
 
     bool SetBirdsEnabled(bool bEnabled);
     bool GetBirdsEnabled();
+
+    void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
 

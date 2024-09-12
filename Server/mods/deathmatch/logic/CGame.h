@@ -134,6 +134,17 @@ class CWeaponDamageCheckPacket;
 
 typedef SFixedArray<bool, MAX_GARAGES> SGarageStates;
 
+struct ResetWorldPropsInfo
+{
+    bool resetSpecialProperties{};
+    bool resetWorldProperties{};
+    bool resetWeatherProperties{};
+    bool resetLODs{};
+    bool resetSounds{};
+    bool resetGlitches{};
+    bool resetJetpackWeapons{};
+};
+
 // CSendList - Can be used like a std::list of players for sending packets.
 //             Used to construct an optimized list of players for CGame::Broadcast
 class CSendList : public std::multimap<ushort, CPlayer*>
@@ -431,6 +442,8 @@ public:
 
     int  GetMoonSize() { return m_iMoonSize; }
     void SetMoonSize(int iMoonSize) { m_iMoonSize = iMoonSize; }
+
+    void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
 
     void PrintLogOutputFromNetModule();
     void StartOpenPortsTest();
