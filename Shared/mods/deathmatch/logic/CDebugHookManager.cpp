@@ -659,7 +659,9 @@ bool CDebugHookManager::CallHook(const char* szName, const std::vector<SDebugHoo
             CLuaArgument* returnedValue = *returnValues.begin();
             if (returnedValue->GetType() == LUA_TSTRING)
             {
-                if (returnedValue->GetString() == "skip")
+                // We don't want to skip the creation of new debug hooks
+                SString& strName = SString("%s", szName);
+                if (returnedValue->GetString() == "skip" && strName != "addDebugHook")
                     bSkip = true;
             }
         }
