@@ -21,4 +21,6 @@ class CVisibilityPluginsSA : public CVisibilityPlugins
 public:
     void SetClumpAlpha(RpClump* pClump, int iAlpha);
     int  GetAtomicId(RwObject* pAtomic);
+
+    bool InsertEntityIntoEntityList(void* entity, float distance, void* callback);
 };

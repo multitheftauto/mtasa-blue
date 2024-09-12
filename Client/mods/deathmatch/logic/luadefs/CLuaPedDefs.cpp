@@ -54,8 +54,10 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedBonePosition", GetPedBonePosition},
         {"setElementBonePosition", ArgumentParser<SetElementBonePosition>},
         {"setElementBoneRotation", ArgumentParser<SetElementBoneRotation>},
+        {"setElementBoneQuaternion", ArgumentParser<SetElementBoneQuaternion>},
         {"getElementBonePosition", ArgumentParser<GetElementBonePosition>},
         {"getElementBoneRotation", ArgumentParser<GetElementBoneRotation>},
+        {"getElementBoneQuaternion", ArgumentParser<GetElementBoneQuaternion>},
         {"setElementBoneMatrix", ArgumentParser<SetElementBoneMatrix>},
         {"getElementBoneMatrix", ArgumentParser<GetElementBoneMatrix>},
         {"updateElementRpHAnim", ArgumentParser<UpdateElementRpHAnim>},
@@ -998,19 +1000,31 @@ int CLuaPedDefs::CanPedBeKnockedOffBike(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CVector position)
+bool CLuaPedDefs::SetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CVector position)
 {
     CEntity* theEntity = entity->GetGameEntity();
     return theEntity ? theEntity->SetBonePosition(static_cast<eBone>(boneId), position) : false;
 }
 
-bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, float yaw, float pitch, float roll)
+bool CLuaPedDefs::SetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float yaw, float pitch, float roll)
 {
+    if (boneId > BONE_RIGHTFOOT)
+        throw LuaFunctionError("Invalid bone ID");
+
     CEntity* theEntity = entity->GetGameEntity();
     return theEntity ? theEntity->SetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll) : false;
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+bool CLuaPedDefs::SetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, float x, float y, float z, float w)
+{
+    if (boneId > BONE_RIGHTFOOT)
+        throw LuaFunctionError("Invalid bone ID");
+
+    CEntity* theEntity = entity->GetGameEntity();
+    return theEntity ? theEntity->SetBoneRotationQuat(static_cast<eBone>(boneId), x, y, z, w) : false;
+}
+
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBonePosition(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     CVector  position;
@@ -1019,8 +1033,11 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
     return false;
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElementBoneRotation(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
 {
+    if (boneId > BONE_RIGHTFOOT)
+        throw LuaFunctionError("Invalid bone ID");
+
     float    yaw = 0.0f, pitch = 0.0f, roll = 0.0f;
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity && theEntity->GetBoneRotation(static_cast<eBone>(boneId), yaw, pitch, roll))
@@ -1028,13 +1045,25 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaPedDefs::GetElement
     return false;
 }
 
-bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId, CMatrix boneMatrix)
+std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::GetElementBoneQuaternion(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
+{
+    if (boneId > BONE_RIGHTFOOT)
+        throw LuaFunctionError("Invalid bone ID");
+
+    float    x = 0.0f, y = 0.0f, z = 0.0f, w = 0.0f;
+    CEntity* theEntity = entity->GetGameEntity();
+    if (theEntity && theEntity->GetBoneRotationQuat(static_cast<eBone>(boneId), x, y, z, w))
+        return std::make_tuple(x, y, z, w);
+    return false;
+}
+
+bool CLuaPedDefs::SetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId, CMatrix boneMatrix)
 {
     CEntity* theEntity = entity->GetGameEntity();
     return theEntity ? theEntity->SetBoneMatrix(static_cast<eBone>(boneId), boneMatrix) : false;
 }
 
-std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::int32_t boneId)
+std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* const luaVM, CClientPed* entity, std::uint32_t boneId)
 {
     CEntity* theEntity = entity->GetGameEntity();
     if (theEntity)
