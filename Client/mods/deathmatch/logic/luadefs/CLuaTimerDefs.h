@@ -24,4 +24,6 @@ public:
     LUA_DECLARE(GetTimers);
     LUA_DECLARE(IsTimer);
     LUA_DECLARE(GetTimerDetails);
+    static bool IsTimerPaused(CLuaTimer* timer) noexcept;
+    static bool SetTimerPaused(lua_State* luaVM, CLuaTimer* timer, bool paused);
 };
