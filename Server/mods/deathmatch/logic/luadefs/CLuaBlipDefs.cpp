@@ -30,7 +30,7 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, const CVec
 
     CResource* resource = &lua_getownerresource(luaVM);
     if (!resource)
-        throw LuaFunctionError("Couldn't find the resource element. Please restart the resource and try again");
+        throw LuaFunctionError("Couldn't find the resource element. Please restart the resource and try again", false);
 
     CBlip* radarMarker = CStaticFunctionDefinitions::CreateBlip(resource, vecPosition, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383), visibleTo.value_or(nullptr));
     if (!radarMarker)
@@ -56,7 +56,7 @@ std::variant<CBlip*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_State* luaVM, 
 
     CResource* resource = &lua_getownerresource(luaVM);
     if (!resource)
-        throw LuaFunctionError("Couldn't find the resource element. Please restart the resource and try again");
+        throw LuaFunctionError("Couldn't find the resource element. Please restart the resource and try again", false);
 
     CBlip* radarMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo(resource, entity, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0), visibleDistance.value_or(16383), visibleTo.value_or(nullptr));
     if (!radarMarker)
