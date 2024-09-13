@@ -661,8 +661,7 @@ void CVehicleRPCs::SpawnVehicleFlyingComponent(CClientEntity* const sourceEntity
     if (!vehicle)
         return;
 
-    std::uint8_t nodeIndex;
-    std::uint8_t collisionType;
+    std::uint8_t nodeIndex, collisionType;
     std::int32_t removalTime;
 
     if (bitStream.Read(nodeIndex) && bitStream.Read(collisionType) && bitStream.Read(removalTime))

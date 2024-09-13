@@ -1502,13 +1502,13 @@ void CVehicleSA::SetGravity(const CVector* pvecGravity)
     m_vecGravity = *pvecGravity;
 }
 
-bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisionTypes collisionType, std::int32_t removalTime)
+bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime)
 {
-    if (nodeIndex < 1)
+    if (nodeIndex == eCarNodes::NONE)
         return false;
 
     DWORD nodesOffset = OFFSET_CAutomobile_Nodes;
-    RwFrame* defaultBikeChassisFrame;
+    RwFrame* defaultBikeChassisFrame = nullptr;
 
     // CBike, CBmx, CBoat and CTrain don't inherit CAutomobile so let's do it manually!
     switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
@@ -1525,11 +1525,7 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
         }
         case VehicleClass::TRAIN:
         {
-            auto* trainInterface = static_cast<CTrainSAInterface*>(GetVehicleInterface());
-            if (!trainInterface)
-                return false;
-
-            if (nodeIndex >= sizeof(trainInterface->m_aTrainNodes) / sizeof(RwFrame*))
+            if (static_cast<eTrainNodes>(nodeIndex) >= eTrainNodes::NUM_NODES)
                 return false;
 
             nodesOffset = OFFSET_CTrain_Nodes;
@@ -1542,18 +1538,18 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
             if (!bikeInterface)
                 return false;
 
-            if (nodeIndex >= sizeof(bikeInterface->m_apModelNodes) / sizeof(RwFrame*))
+            if (static_cast<eBikeNodes>(nodeIndex) >= eBikeNodes::NUM_NODES)
                 return false;
 
             nodesOffset = OFFSET_CBike_Nodes;
-            if (nodeIndex != 1)
+            if (static_cast<eBikeNodes>(nodeIndex) != eBikeNodes::CHASSIS)
                 break;
 
             // Set the correct "bike_chassis" frame for bikes
             defaultBikeChassisFrame = bikeInterface->m_apModelNodes[1];
             if (defaultBikeChassisFrame && std::strcmp(defaultBikeChassisFrame->szName, "chassis_dummy") == 0)
             {
-                RwFrame* correctChassisFrame = ((RwFrame * (__cdecl*)(RpClump*, const char*))FUNC_CClumpModelInfo_GetFrameFromName)(bikeInterface->m_pRwObject, "chassis");
+                RwFrame* correctChassisFrame = RwFrameFindFrame(RpGetFrame(bikeInterface->m_pRwObject), "chassis");
                 if (correctChassisFrame)
                     bikeInterface->m_apModelNodes[1] = correctChassisFrame;
             }
@@ -1561,11 +1557,7 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
         }
         case VehicleClass::BOAT:
         {
-            auto* boatInterface = static_cast<CBoatSAInterface*>(GetVehicleInterface());
-            if (!boatInterface)
-                return false;
-
-            if (nodeIndex >= sizeof(boatInterface->pBoatParts) / sizeof(RwFrame*))
+            if (static_cast<eBoatNodes>(nodeIndex) >= eBoatNodes::NUM_NODES)
                 return false;
 
             nodesOffset = OFFSET_CBoat_Nodes;
@@ -1579,24 +1571,15 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
     MemPut(0x6A85B3, nodesOffset);
     MemPut(0x6A8631, nodesOffset);
 
-    DWORD dwInterface = (DWORD)GetInterface();
-    DWORD dwFunc = FUNC_CAutomobile__SpawnFlyingComponent;
-    DWORD dwReturn;
-    _asm
-    {
-        mov ecx, dwInterface
-        push collisionType
-        push nodeIndex
-        call dwFunc
-        mov dwReturn, eax
-    }
+    auto* componentObject = ((CObjectSAInterface * (__thiscall*)(CVehicleSAInterface*, int, int)) FUNC_CAutomobile__SpawnFlyingComponent)(GetVehicleInterface(), static_cast<int>(nodeIndex), static_cast<int>(collisionType));
 
     // Restore default nodes array in CAutomobile::SpawnFlyingComponent
+    // CAutomobile::m_aCarNodes offset
     MemPut(0x6A85B3, 0x648);
     MemPut(0x6A8631, 0x648);
 
     // Restore default chassis frame for bikes
-    if (nodeIndex == 1 && defaultBikeChassisFrame)
+    if (static_cast<eBikeNodes>(nodeIndex) == eBikeNodes::CHASSIS && defaultBikeChassisFrame)
     {
         auto* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
         if (bikeInterface && bikeInterface->m_apModelNodes)
@@ -1606,11 +1589,7 @@ bool CVehicleSA::SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisio
     if (removalTime <= -1)
         return true;
 
-    auto* componentObject = reinterpret_cast<CObjectSAInterface*>((DWORD*)dwReturn);
-    if (!componentObject)
-        return;
-
-    int CTimer_ms = *(int*)0xB7CB84; // CTimer::m_snTimeInMilliseconds
+    std::uint32_t CTimer_ms = *reinterpret_cast<std::uint32_t*>(VAR_CTimer_snTimeInMilliseconds);
     componentObject->uiObjectRemovalTime = CTimer_ms + static_cast<std::uint32_t>(removalTime);
 
     return true;
@@ -1623,16 +1602,16 @@ void CVehicleSA::SetWheelVisibility(eWheelPosition wheel, bool bVisible)
     switch (wheel)
     {
         case FRONT_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_LF];
+            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_LF)];
             break;
         case REAR_LEFT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_LB];
+            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_LB)];
             break;
         case FRONT_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_RF];
+            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_RF)];
             break;
         case REAR_RIGHT_WHEEL:
-            pFrame = vehicle->m_aCarNodes[CAR_NODE_WHEEL_RB];
+            pFrame = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::WHEEL_RB)];
             break;
         default:
             break;

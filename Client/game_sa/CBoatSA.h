@@ -14,33 +14,30 @@
 #include <game/CBoat.h>
 #include "CVehicleSA.h"
 
-namespace eBoatNodes
+enum class eBoatNodes
 {
-    enum
-    {
-        NONE = 0,
-        MOVING,
-        WINDSCREEN,
-        RUDDER,
-        FLAP_LEFT,
-        FLAP_RIGHT,
-        REARFLAP_LEFT,
-        REARFLAP_RIGHT,
-        STATIC_PROP,
-        MOVING_PROP,
-        STATIC_PROP2,
-        MOVING_PROP2,
+    NONE = 0,
+    MOVING,
+    WINDSCREEN,
+    RUDDER,
+    FLAP_LEFT,
+    FLAP_RIGHT,
+    REARFLAP_LEFT,
+    REARFLAP_RIGHT,
+    STATIC_PROP,
+    MOVING_PROP,
+    STATIC_PROP2,
+    MOVING_PROP2,
 
-        NUM_NODES
-    };
-}
+    NUM_NODES
+};
 
 class CBoatSAInterface : public CVehicleSAInterface
 {
 public:
     uint32               pad1[3];                                 // 1440
     uint32               BoatFlags;                               // 1452
-    RwFrame*             pBoatParts[eBoatNodes::NUM_NODES];       // 1456
+    RwFrame*             pBoatParts[static_cast<std::size_t>(eBoatNodes::NUM_NODES)];       // 1456
     uint32               pad2[3];                                 // 1500
     uint16               pad3;                                    // 1512
     uint8                pad4[2];                                 // 1514

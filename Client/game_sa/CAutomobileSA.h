@@ -20,7 +20,6 @@
 
 #define MAX_PASSENGER_COUNT     8
 #define MAX_DOORS               6 // also in CDamageManager
-#define CAR_NODES_NUM           25
 
 class CBouncingPanelSAInterface
 {
@@ -38,7 +37,7 @@ class CAutomobileSAInterface : public CVehicleSAInterface
 public:
     CDamageManagerSAInterface m_damageManager;
     CDoorSAInterface          m_doors[MAX_DOORS];
-    RwFrame*                  m_aCarNodes[CAR_NODES_NUM];
+    RwFrame*                  m_aCarNodes[static_cast<std::size_t>(eCarNodes::NUM_NODES)];
     CBouncingPanelSAInterface m_panels[3];
     CDoorSAInterface          m_swingingChassis;
     CColPointSAInterface      m_wheelColPoint[MAX_WHEELS];

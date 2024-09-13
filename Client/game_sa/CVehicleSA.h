@@ -106,6 +106,8 @@ struct RwTexture;
 #define OFFSET_CBike_Nodes 0x5A0
 #define OFFSET_CBoat_Nodes 0x5B0
 
+#define VAR_CTimer_snTimeInMilliseconds 0xB7CB84
+
 struct SRailNodeSA
 {
     short sX;                       // x coordinate times 8
@@ -616,7 +618,7 @@ public:
     SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
     void               SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
 
-    bool     SpawnFlyingComponent(eCarNodes nodeIndex, eCarComponentCollisionTypes collisionType, std::int32_t removalTime = -1);
+    bool     SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1);
     void     SetWheelVisibility(eWheelPosition wheel, bool bVisible);
     CVector  GetWheelPosition(eWheelPosition wheel);
 

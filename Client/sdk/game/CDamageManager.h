@@ -121,38 +121,38 @@ enum eLights
     MAX_LIGHTS            // MUST BE 16 OR LESS
 };
 
-enum eCarNodes
+enum class eCarNodes
 {
-    CAR_NODE_NONE = 0,
-    CAR_NODE_CHASSIS,
-    CAR_NODE_WHEEL_RF,
-    CAR_NODE_WHEEL_RM,
-    CAR_NODE_WHEEL_RB,
-    CAR_NODE_WHEEL_LF,
-    CAR_NODE_WHEEL_LM,
-    CAR_NODE_WHEEL_LB,
-    CAR_NODE_DOOR_RF,
-    CAR_NODE_DOOR_RR,
-    CAR_NODE_DOOR_LF,
-    CAR_NODE_DOOR_LR,
-    CAR_NODE_BUMP_FRONT,
-    CAR_NODE_BUMP_REAR,
-    CAR_NODE_WING_RF,
-    CAR_NODE_WING_LF,
-    CAR_NODE_BONNET,
-    CAR_NODE_BOOT,
-    CAR_NODE_WINDSCREEN,
-    CAR_NODE_EXHAUST,
-    CAR_NODE_MISC_A,
-    CAR_NODE_MISC_B,
-    CAR_NODE_MISC_C,
-    CAR_NODE_MISC_D,
-    CAR_NODE_MISC_E,
+    NONE = 0,
+    CHASSIS,
+    WHEEL_RF,
+    WHEEL_RM,
+    WHEEL_RB,
+    WHEEL_LF,
+    WHEEL_LM,
+    WHEEL_LB,
+    DOOR_RF,
+    DOOR_RR,
+    DOOR_LF,
+    DOOR_LR,
+    BUMP_FRONT,
+    BUMP_REAR,
+    WING_RF,
+    WING_LF,
+    BONNET,
+    BOOT,
+    WINDSCREEN,
+    EXHAUST,
+    MISC_A,
+    MISC_B,
+    MISC_C,
+    MISC_D,
+    MISC_E,
 
-    CAR_NUM_NODES
+    NUM_NODES
 };
 
-enum eCarComponentCollisionTypes
+enum class eCarComponentCollisionTypes
 {
     COL_NODE_BUMPER = 0,
     COL_NODE_WHEEL,
