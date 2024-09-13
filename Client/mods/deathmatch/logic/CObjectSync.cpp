@@ -226,12 +226,11 @@ void CObjectSync::Update()
 
 void CObjectSync::WriteObjectInformation(NetBitStreamInterface* pBitStream, CDeathmatchObject* pObject)
 {
-    CVector vecPosition, vecRotation, vecVelocity, vecAngularVelocity, vecCenterOfMass;
+    CVector vecPosition, vecRotation, vecVelocity, vecAngularVelocity;
     pObject->GetPosition(vecPosition);
     pObject->GetRotationRadians(vecRotation);
     pObject->GetMoveSpeed(vecVelocity);
     pObject->GetTurnSpeed(vecAngularVelocity);
-    pObject->GetCenterOfMass(vecCenterOfMass);
 
     unsigned int ucFlags = 0;
 
@@ -247,18 +246,6 @@ void CObjectSync::WriteObjectInformation(NetBitStreamInterface* pBitStream, CDea
         ucFlags |= 0x10;
     if (pObject->IsInWater() != pObject->m_LastSyncedData.bIsInWater)
         ucFlags |= 0x20;
-    if (pObject->GetMass() != pObject->m_LastSyncedData.fMass)
-        ucFlags |= 0x40;
-    if (pObject->GetTurnMass() != pObject->m_LastSyncedData.fTurnMass)
-        ucFlags |= 0x80;
-    if (pObject->GetAirResistance() != pObject->m_LastSyncedData.fAirResistance)
-        ucFlags |= 0x100;
-    if (pObject->GetElasticity() != pObject->m_LastSyncedData.fElasticity)
-        ucFlags |= 0x200;
-    if (pObject->GetBuoyancyConstant() != pObject->m_LastSyncedData.fBuoyancyConstant)
-        ucFlags |= 0x400;
-    if (vecCenterOfMass != pObject->m_LastSyncedData.vecCenterOfMass)
-        ucFlags |= 0x800;
 
     // Don't sync if nothing changed
     if (ucFlags == 0)
@@ -332,65 +319,5 @@ void CObjectSync::WriteObjectInformation(NetBitStreamInterface* pBitStream, CDea
         pBitStream->WriteBit(bIsInWater);
 
         pObject->m_LastSyncedData.bIsInWater = bIsInWater;
-    }
-
-    // Write properties
-
-    // Write mass
-    if (ucFlags & 0x40)
-    {
-        float fMass = pObject->GetMass();
-        pBitStream->Write(fMass);
-
-        pObject->m_LastSyncedData.fMass = fMass;
-    }
-
-    // Write turn mass
-    if (ucFlags & 0x80)
-    {
-        float fTurnMass = pObject->GetTurnMass();
-        pBitStream->Write(fTurnMass);
-
-        pObject->m_LastSyncedData.fTurnMass = fTurnMass;
-    }
-
-    // Write air resistance
-    if (ucFlags & 0x100)
-    {
-        float fAirResistance = pObject->GetAirResistance();
-        pBitStream->Write(fAirResistance);
-
-        pObject->m_LastSyncedData.fAirResistance = fAirResistance;
-    }
-
-    // Write elasiticy
-    if (ucFlags & 0x200)
-    {
-        float fElasticity = pObject->GetElasticity();
-        pBitStream->Write(fElasticity);
-
-        pObject->m_LastSyncedData.fElasticity = fElasticity;
-    }
-
-    // Write buoyancy constant
-    if (ucFlags & 0x400)
-    {
-        float fBuoyancyConstant = pObject->GetBuoyancyConstant();
-        pBitStream->Write(fBuoyancyConstant);
-
-        pObject->m_LastSyncedData.fBuoyancyConstant = fBuoyancyConstant;
-    }
-
-    // Write center of mass
-    if (ucFlags & 0x800)
-    {
-        CVector vecCenterOfMass;
-        pObject->GetCenterOfMass(vecCenterOfMass);
-
-        pBitStream->Write(vecCenterOfMass.fX);
-        pBitStream->Write(vecCenterOfMass.fY);
-        pBitStream->Write(vecCenterOfMass.fZ);
-
-        pObject->m_LastSyncedData.vecCenterOfMass = vecCenterOfMass;
     }
 }

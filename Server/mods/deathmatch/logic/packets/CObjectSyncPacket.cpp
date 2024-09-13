@@ -98,67 +98,6 @@ bool CObjectSyncPacket::Read(NetBitStreamInterface& BitStream)
         if (flags & 0x20)
             pData->bIsInWater = BitStream.ReadBit();
 
-        // Read properties
-        // Read mass
-        if (flags & 0x40)
-        {
-            float fMass;
-            if (!BitStream.Read(fMass))
-                return false;
-
-            pData->fMass = fMass;
-        }
-
-        // Read turn mass
-        if (flags & 0x80)
-        {
-            float fTurnMass;
-            if (!BitStream.Read(fTurnMass))
-                return false;
-
-            pData->fTurnMass = fTurnMass;
-        }
-
-        // Read air resistance
-        if (flags & 0x100)
-        {
-            float fAirResistance;
-            if (!BitStream.Read(fAirResistance))
-                return false;
-
-            pData->fAirResistance = fAirResistance;
-        }
-
-        // Read elasticity
-        if (flags & 0x200)
-        {
-            float fElasticity;
-            if (!BitStream.Read(fElasticity))
-                return false;
-
-            pData->fElasticity = fElasticity;
-        }
-
-        // Read Buoyancy Constant
-        if (flags & 0x400)
-        {
-            float fBuoyancyConstant;
-            if (!BitStream.Read(fBuoyancyConstant))
-                return false;
-
-            pData->fBuoyancyConstant = fBuoyancyConstant;
-        }
-
-        // Read center of mass
-        if (flags & 0x800)
-        {
-            CVector centerOfMass;
-            if (!BitStream.Read(centerOfMass.fX) || !BitStream.Read(centerOfMass.fY) || !BitStream.Read(centerOfMass.fZ))
-                return false;
-
-            pData->vecCenterOfMass = centerOfMass;
-        }
-
         // Add it to our list
         m_Syncs.push_back(pData);
     }
@@ -232,36 +171,6 @@ bool CObjectSyncPacket::Write(NetBitStreamInterface& BitStream) const
             // Write the inWater state
             if (flags & 0x20)
                 BitStream.WriteBit(pData->bIsInWater);
-
-            // Write the properties
-            // Write mass
-            if (flags & 0x40)
-                BitStream.Write(pData->fMass);
-
-            // Write turn mass
-            if (flags & 0x80)
-                BitStream.Write(pData->fTurnMass);
-
-            // Write air resistance
-            if (flags & 0x100)
-                BitStream.Write(pData->fAirResistance);
-
-            // Write elasticity
-            if (flags & 0x200)
-                BitStream.Write(pData->fElasticity);
-
-            // Write buoyancy constant
-            if (flags & 0x400)
-                BitStream.Write(pData->fBuoyancyConstant);
-
-            // Write center of mass
-            if (flags & 0x800)
-            {
-                CVector centerOfMass = pData->vecCenterOfMass;
-                BitStream.Write(centerOfMass.fX);
-                BitStream.Write(centerOfMass.fY);
-                BitStream.Write(centerOfMass.fZ);
-            }
 
             // We've sent atleast one sync
             bSent = true;

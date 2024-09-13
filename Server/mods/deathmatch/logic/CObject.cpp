@@ -38,13 +38,6 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
     m_bIsStatic = true;
     m_bIsMoving = false;
 
-    m_fMass = -1.0f;
-    m_fTurnMass = -1.0f;
-    m_fAirResistance = -1.0f;
-    m_fElasticity = -1.0f;
-    m_fBuoyancyConstant = -1.0f;
-    m_vecCenterOfMass = CVector(0.0f, 0.0f, 0.0f);
-
     m_bCollisionsEnabled = true;
 
     // Add us to the manager's list

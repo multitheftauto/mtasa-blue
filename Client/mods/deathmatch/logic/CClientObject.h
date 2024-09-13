@@ -24,11 +24,6 @@ struct SLastSyncedObjectData
     CVector vecTurnVelocity;
     float   fHealth;
     bool    bIsInWater;
-    float   fMass;
-    float   fTurnMass;
-    float   fAirResistance;
-    float   fElasticity;
-    float   fBuoyancyConstant;
     CVector vecCenterOfMass;
 };
 
@@ -44,10 +39,11 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTOBJECT; };
+    eClientEntityType GetType() const { return CCLIENTOBJECT; }
 
-    CObject*       GetGameObject() const { return m_pObject; }
-    const CEntity* GetGameEntity() const { return m_pObject; }
+    CObject*       GetGameObject() const noexcept { return m_pObject; }
+    CEntity*       GetGameEntity() noexcept { return m_pObject; }
+    const CEntity* GetGameEntity() const noexcept { return m_pObject; }
 
     void            GetPosition(CVector& vecPosition) const;
     void            SetPosition(const CVector& vecPosition);

@@ -94,8 +94,6 @@ enum class WorldSpecialProperty
 };
 DECLARE_ENUM_CLASS(WorldSpecialProperty);
 
-DECLARE_ENUM(ePacketID);
-
 enum eObjectProperty
 {
     OBJECT_PROPERTY_ALL,
@@ -108,3 +106,5 @@ enum eObjectProperty
     OBJECT_PROPERTY_MAX,
 };
 DECLARE_ENUM(eObjectProperty);
+
+DECLARE_ENUM(ePacketID);

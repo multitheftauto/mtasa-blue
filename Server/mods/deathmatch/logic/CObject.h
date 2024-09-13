@@ -96,24 +96,6 @@ public:
     bool IsInWater() const { return m_bInWater; }
     void SetInWater(bool bInWater) { m_bInWater = bInWater; }
 
-    float GetMass() const { return m_fMass; }
-    void  SetMass(float fMass) { m_fMass = fMass; };
-
-    float GetTurnMass() const { return m_fTurnMass; }
-    void SetTurnMass(float fTurnMass) { m_fTurnMass = fTurnMass; }
-
-    float GetAirResistance() const { return m_fAirResistance; }
-    void  SetAirResistance(float fResistance) { m_fAirResistance = fResistance; }
-
-    float GetElasticity() const { return m_fElasticity; }
-    void  SetElasticity(float fElasticity) { m_fElasticity = fElasticity; }
-
-    float GetBuoyancyConstant() const { return m_fBuoyancyConstant; }
-    void  SetBuoyancyConstant(float fBuoyancy) { m_fBuoyancyConstant = fBuoyancy; }
-
-    CVector GetCenterOfMass() const { return m_vecCenterOfMass; }
-    void    SetCenterOfMass(CVector vecCenterOfMass) { m_vecCenterOfMass = vecCenterOfMass; }
-
 protected:
     bool ReadSpecialData(const int iLine) override;
 
@@ -134,14 +116,6 @@ private:
     CVector         m_vecTurnSpeed;
     bool            m_bInWater;
     bool            m_bIsStatic;            // true if the object never moved using setElementVelocity/setElementAngularVelocity
-
-    // Properties
-    float m_fMass;
-    float m_fTurnMass;
-    float m_fAirResistance;
-    float m_fElasticity;
-    float m_fBuoyancyConstant;
-    CVector m_vecCenterOfMass;
 
 protected:
     bool m_bCollisionsEnabled;

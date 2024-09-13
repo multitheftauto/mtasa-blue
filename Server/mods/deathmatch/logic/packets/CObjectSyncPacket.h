@@ -28,12 +28,6 @@ public:
         float         fHealth;
         bool          bIsInWater;
         ElementID     attackerID;
-        float         fMass;
-        float         fTurnMass;
-        float         fAirResistance;
-        float         fElasticity;
-        float         fBuoyancyConstant;
-        CVector       vecCenterOfMass;
 
         unsigned char ucSyncTimeContext;
         unsigned int ucFlags;

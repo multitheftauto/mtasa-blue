@@ -27,7 +27,6 @@ void CLuaObjectDefs::LoadFunctions()
         {"isObjectBreakable", ArgumentParser<IsObjectBreakable>},
         {"isObjectMoving", ArgumentParser<IsObjectMoving>},
         {"isObjectRespawnable", ArgumentParser<IsObjectRespawnable>},
-        {"getObjectProperty", GetObjectProperty},
 
         // Object set funcs
         {"setObjectRotation", SetObjectRotation},
@@ -37,7 +36,6 @@ void CLuaObjectDefs::LoadFunctions()
         {"stopObject", StopObject},
         {"breakObject", ArgumentParser<BreakObject>},
         {"toggleObjectRespawn", ArgumentParser<ToggleObjectRespawn>},
-        {"setObjectProperty", ArgumentParser<SetObjectProperty>},
     };
 
     // Add functions
@@ -61,16 +59,11 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setBreakable", "setObjectBreakable");
     lua_classfunction(luaVM, "isMoving", "isObjectMoving");
     lua_classfunction(luaVM, "toggleRespawn", "toggleObjectRespawn");
-    lua_classfunction(luaVM, "getProperties", GetObjectProperties);
-    lua_classfunction(luaVM, "getProperty", "getObjectProperty");
-    lua_classfunction(luaVM, "setProperty", "setObjectProperty");
-
 
     lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
     lua_classvariable(luaVM, "moving", nullptr, "isObjectMoving");
     lua_classvariable(luaVM, "isRespawnable", nullptr, "isObjectRespawnable");
-    lua_classvariable(luaVM, "properties", nullptr, GetObjectProperties);
 
     lua_registerclass(luaVM, "Object", "Element");
 }
@@ -324,101 +317,6 @@ bool CLuaObjectDefs::SetObjectBreakable(CObject* const pObject, const bool bBrea
 bool CLuaObjectDefs::BreakObject(CObject* const pObject)
 {
     return CStaticFunctionDefinitions::BreakObject(pObject);
-}
-
-int CLuaObjectDefs::GetObjectProperties(lua_State* luaVM)
-{
-    lua_pushstring(luaVM, "all");
-    return GetObjectProperty(luaVM);
-}
-
-int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
-{
-    CObject* pObject;
-    eObjectProperty eProperty;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pObject);
-    argStream.ReadEnumString(eProperty, eObjectProperty::OBJECT_PROPERTY_MAX);
-
-    if (argStream.HasErrors())
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    switch (eProperty)
-    {
-        case OBJECT_PROPERTY_ALL:
-        {
-            lua_newtable(luaVM);
-
-            lua_pushnumber(luaVM, pObject->GetMass());
-            lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_MASS));
-
-            lua_pushnumber(luaVM, pObject->GetTurnMass());
-            lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_TURNMASS));
-
-            lua_pushnumber(luaVM, pObject->GetAirResistance());
-            lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_AIRRESISTANCE));
-
-            lua_pushnumber(luaVM, pObject->GetElasticity());
-            lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_ELASTICITY));
-
-            lua_pushvector(luaVM, pObject->GetCenterOfMass());
-            lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_CENTEROFMASS));
-
-            lua_pushnumber(luaVM, pObject->GetBuoyancyConstant());
-            lua_setfield(luaVM, -2, EnumToString(eObjectProperty::OBJECT_PROPERTY_BUOYANCY));
-            return 1;
-            break;
-        }
-        case OBJECT_PROPERTY_MASS:
-        {
-            lua_pushnumber(luaVM, pObject->GetMass());
-            return 1;
-            break;
-        }
-        case OBJECT_PROPERTY_TURNMASS:
-        {
-            lua_pushnumber(luaVM, pObject->GetTurnMass());
-            return 1;
-            break;
-        }
-        case OBJECT_PROPERTY_AIRRESISTANCE:
-        {
-            lua_pushnumber(luaVM, pObject->GetAirResistance());
-            return 1;
-            break;
-        }
-        case OBJECT_PROPERTY_ELASTICITY:
-        {
-            lua_pushnumber(luaVM, pObject->GetElasticity());
-            return 1;
-        }   
-        case OBJECT_PROPERTY_CENTEROFMASS:
-        {
-            CVector vecCenterOfMass = pObject->GetCenterOfMass();
-            lua_pushnumber(luaVM, vecCenterOfMass.fX);
-            lua_pushnumber(luaVM, vecCenterOfMass.fY);
-            lua_pushnumber(luaVM, vecCenterOfMass.fZ);
-
-            return 1;
-            break;
-        }
-        case OBJECT_PROPERTY_BUOYANCY:
-        {
-            lua_pushnumber(luaVM, pObject->GetBuoyancyConstant());
-            return 1;
-            break;
-        }
-    }
-}
-
-bool CLuaObjectDefs::SetObjectProperty(CObject* const pObject, const std::string sProperty, const std::variant<float, CVector> vValue)
-{
-    return CStaticFunctionDefinitions::SetObjectProperty(pObject, sProperty, vValue);
 }
 
 bool CLuaObjectDefs::RespawnObject(CObject* const pObject) noexcept

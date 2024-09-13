@@ -273,19 +273,6 @@ void CObjectSync::Packet_ObjectSync(CObjectSyncPacket& Packet)
         }
         if (pData->ucFlags & 0x20)            // Sync inWater state from client
             pObject->SetInWater(pData->bIsInWater);
-        // Sync properties
-        if (pData->ucFlags & 0x40)
-            pObject->SetMass(pData->fMass);
-        if (pData->ucFlags & 0x80)
-            pObject->SetTurnMass(pData->fTurnMass);
-        if (pData->ucFlags & 0x100)
-            pObject->SetAirResistance(pData->fAirResistance);
-        if (pData->ucFlags & 0x200)
-            pObject->SetElasticity(pData->fElasticity);
-        if (pData->ucFlags & 0x400)
-            pObject->SetBuoyancyConstant(pData->fBuoyancyConstant);
-        if (pData->ucFlags & 0x800)
-            pObject->SetCenterOfMass(pData->vecCenterOfMass);
 
         // Send this sync
         pData->bSend = true;

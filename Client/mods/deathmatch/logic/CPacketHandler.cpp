@@ -2731,10 +2731,8 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         // bool                         (1)     - frozen
         // SObjectHealthSync            (?)     - health
         // bool                         (1)     - is break
-        // bool                 (1)     - respawnable
+        // bool                         (1)     - respawnable
         // bool                         (1)     - static flag
-        // float                        (4)     - properties (mass, turnMass etc)
-        // CVector                      (12)    - center_of_mass property
 
         // Pickups:
         // CVector              (12)    - position
@@ -3104,31 +3102,10 @@ retry:
                         if (bitStream.Can(eBitStreamVersion::RespawnObject_Serverside))
                             pObject->SetRespawnEnabled(bitStream.ReadBit());
                       
-                        // Set static & properties
+                        // Set static flag
                         if (bitStream.Can(eBitStreamVersion::ObjectSync_FixAndUpdate))
                         {
                             pObject->SetStatic(bitStream.ReadBit());
-
-                            float fMass, fTurnMass, fAirResistance, fElasticity, fBuoyancy;
-                            CVector centerOfMass;
-
-                            if (bitStream.Read(fMass))
-                                pObject->SetMass(fMass);
-
-                            if (bitStream.Read(fTurnMass))
-                                pObject->SetTurnMass(fTurnMass);
-
-                            if (bitStream.Read(fAirResistance))
-                                pObject->SetAirResistance(fAirResistance);
-
-                            if (bitStream.Read(fElasticity))
-                                pObject->SetElasticity(fElasticity);
-
-                            if (bitStream.Read(fBuoyancy))
-                                pObject->SetBuoyancyConstant(fBuoyancy);
-
-                            if (bitStream.Read(centerOfMass.fX) && bitStream.Read(centerOfMass.fY) && bitStream.Read(centerOfMass.fZ))
-                                pObject->SetCenterOfMass(centerOfMass);
                         }
 
                         pObject->SetCollisionEnabled(bCollisonsEnabled);

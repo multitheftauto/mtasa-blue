@@ -301,21 +301,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     if (BitStream.Can(eBitStreamVersion::BreakObject_Serverside))
                         BitStream.WriteBit(pObject->GetHealth() <= 0);
                   
-                    // Static & properties
+                    // Static flag
                     if (BitStream.Can(eBitStreamVersion::ObjectSync_FixAndUpdate))
                     {
                         BitStream.WriteBit(pObject->IsStatic());
-
-                        BitStream.Write(pObject->GetMass());
-                        BitStream.Write(pObject->GetTurnMass());
-                        BitStream.Write(pObject->GetAirResistance());
-                        BitStream.Write(pObject->GetElasticity());
-                        BitStream.Write(pObject->GetBuoyancyConstant());
-
-                        CVector vecCenterOfMass = pObject->GetCenterOfMass();
-                        BitStream.Write(vecCenterOfMass.fX);
-                        BitStream.Write(vecCenterOfMass.fY);
-                        BitStream.Write(vecCenterOfMass.fZ);
                     }
 
                     // Respawnable

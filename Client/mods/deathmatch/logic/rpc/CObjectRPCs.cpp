@@ -24,7 +24,6 @@ void CObjectRPCs::LoadFunctions()
     AddHandler(BREAK_OBJECT, BreakObject, "BreakObject");
     AddHandler(RESPAWN_OBJECT, RespawnObject, "RespawnObject");
     AddHandler(TOGGLE_OBJECT_RESPAWN, ToggleObjectRespawn, "ToggleObjectRespawn");
-    AddHandler(SET_OBJECT_PROPERTY, SetObjectProperty, "SetObjectProperty");
 }
 
 void CObjectRPCs::DestroyAllObjects(NetBitStreamInterface& bitStream)
@@ -153,58 +152,4 @@ void CObjectRPCs::ToggleObjectRespawn(CClientEntity* pSource, NetBitStreamInterf
 
     if (pObject)
         pObject->SetRespawnEnabled(bitStream.ReadBit());
-}
-
-void CObjectRPCs::SetObjectProperty(CClientEntity* pSource, NetBitStreamInterface& bitStream)
-{
-    auto* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
-    if (!pObject)
-        return;
-
-    SString sProperty;
-    if (!bitStream.ReadString(sProperty))
-        return;
-
-    float   fValue;
-    CVector vecValue;
-    if (!bitStream.Read(fValue) && (!bitStream.Read(vecValue.fX) || !bitStream.Read(vecValue.fY) || !bitStream.Read(vecValue.fZ)))
-        return;
-
-    eObjectProperty eProperty;
-    if (!StringToEnum(sProperty, eProperty))
-        return;
-
-    switch (eProperty)
-    {
-        case OBJECT_PROPERTY_MASS:
-        {
-            pObject->SetMass(fValue);
-            break;
-        }
-        case OBJECT_PROPERTY_TURNMASS:
-        {
-            pObject->SetTurnMass(fValue);
-            break;
-        }
-        case OBJECT_PROPERTY_AIRRESISTANCE:
-        {
-            pObject->SetAirResistance(fValue);
-            break;
-        }
-        case OBJECT_PROPERTY_ELASTICITY:
-        {
-            pObject->SetElasticity(fValue);
-            break;
-        }
-        case OBJECT_PROPERTY_CENTEROFMASS:
-        {
-            pObject->SetCenterOfMass(vecValue);
-            break;
-        }
-        case OBJECT_PROPERTY_BUOYANCY:
-        {
-            pObject->SetBuoyancyConstant(fValue);
-            break;
-        }
-    }
 }
