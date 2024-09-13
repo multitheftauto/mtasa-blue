@@ -71,7 +71,6 @@ bool CWebCore::Initialise()
 #else
     CefString(&settings.browser_subprocess_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\CEFLauncher_d.exe")));
 #endif
-    CefString(&settings.resources_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF")));
     CefString(&settings.cache_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cache")));
     CefString(&settings.locales_dir_path).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\locales")));
     CefString(&settings.log_file).FromWString(FromUTF8(CalcMTASAPath("MTA\\CEF\\cefdebug.txt")));
