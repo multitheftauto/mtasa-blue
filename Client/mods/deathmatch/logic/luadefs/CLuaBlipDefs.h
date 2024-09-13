@@ -11,7 +11,6 @@
 
 #pragma once
 #include "CLuaDefs.h"
-#include <lua/CLuaMultiReturn.h>
 
 class CLuaBlipDefs : public CLuaDefs
 {
@@ -19,21 +18,22 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
+private:
     // Create functions
-    static std::variant<CClientRadarMarker*, bool> CreateBlip(lua_State* const luaVM, const CVector vecPosition, const std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, const std::optional<std::uint8_t> r, const std::optional<std::uint8_t> g, const std::optional<std::uint8_t> b, const std::optional<std::uint8_t> a, const std::optional<std::int16_t> ordering, const std::optional<std::uint16_t> visibleDistance);
-    static std::variant<CClientRadarMarker*, bool> CreateBlipAttachedTo(lua_State* const luaVM, CClientEntity* const entity, const std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, const std::optional<std::uint8_t> r, const std::optional<std::uint8_t> g, const std::optional<std::uint8_t> b, const std::optional<std::uint8_t> a, const std::optional<std::int16_t> ordering, const std::optional<std::uint16_t> visibleDistance);
+    static std::variant<CClientRadarMarker*, bool> CreateBlip(lua_State* luaVM, const CVector vecPosition, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance);
+    static std::variant<CClientRadarMarker*, bool> CreateBlipAttachedTo(lua_State* luaVM, CClientEntity* entity, std::optional<std::uint8_t> icon, std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance);
 
     // Get functions
-    static std::uint8_t                                                            GetBlipIcon(CClientRadarMarker* const radarMarker) noexcept;
-    static std::uint8_t                                                            GetBlipSize(CClientRadarMarker* const radarMarker) noexcept;
-    static CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t> GetBlipColor(CClientRadarMarker* const radarMarker) noexcept;
-    static std::int16_t                                                            GetBlipOrdering(CClientRadarMarker* const radarMarker) noexcept;
-    static std::uint16_t                                                           GetBlipVisibleDistance(CClientRadarMarker* const radarMarker) noexcept;
+    static auto GetBlipIcon(CClientRadarMarker* radarMarker) noexcept;
+    static auto GetBlipSize(CClientRadarMarker* radarMarker) noexcept;
+    static auto GetBlipColor(CClientRadarMarker* radarMarker) noexcept;
+    static auto GetBlipOrdering(CClientRadarMarker* radarMarker) noexcept;
+    static auto GetBlipVisibleDistance(CClientRadarMarker* radarMarker) noexcept;
 
     // Set functions
-    static bool SetBlipIcon(CClientRadarMarker* const radarMarker, const std::uint8_t icon);
-    static bool SetBlipSize(lua_State* const luaVM, CClientRadarMarker* const radarMarker, std::uint8_t size) noexcept;
-    static bool SetBlipColor(CClientRadarMarker* const radarMarker, const std::uint8_t r, const std::uint8_t g, const std::uint8_t b, const std::uint8_t a) noexcept;
-    static bool SetBlipOrdering(CClientRadarMarker* const radarMarker, const std::int16_t ordering) noexcept;
-    static bool SetBlipVisibleDistance(CClientRadarMarker* const radarMarker, const std::uint16_t visibleDistance) noexcept;
+    static bool SetBlipIcon(CClientRadarMarker* radarMarker, std::uint8_t icon);
+    static bool SetBlipSize(lua_State* luaVM, CClientRadarMarker* radarMarker, std::uint8_t size) noexcept;
+    static bool SetBlipColor(CClientRadarMarker* radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a) noexcept;
+    static bool SetBlipOrdering(CClientRadarMarker* radarMarker, std::int16_t ordering) noexcept;
+    static bool SetBlipVisibleDistance(CClientRadarMarker* radarMarker, std::uint16_t visibleDistance) noexcept;
 };
