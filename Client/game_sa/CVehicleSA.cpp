@@ -1586,7 +1586,7 @@ bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComp
             bikeInterface->m_apModelNodes[1] = defaultBikeChassisFrame;
     }
 
-    if (removalTime <= -1)
+    if (removalTime <= -1 || !componentObject)
         return true;
 
     std::uint32_t CTimer_ms = *reinterpret_cast<std::uint32_t*>(VAR_CTimer_snTimeInMilliseconds);
