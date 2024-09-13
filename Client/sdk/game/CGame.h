@@ -68,6 +68,7 @@ class CWeather;
 class CWorld;
 class CIplStore;
 class CBuildingRemoval;
+class CRenderer;
 enum eEntityType;
 enum ePedPieceTypes;
 
@@ -149,6 +150,7 @@ public:
     virtual CPointLights*             GetPointLights() = 0;
     virtual CColStore*                GetCollisionStore() = 0;
     virtual CBuildingRemoval*         GetBuildingRemoval() = 0;
+    virtual CRenderer*                GetRenderer() const noexcept = 0;
 
     virtual CWeaponInfo* GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill = WEAPONSKILL_STD) = 0;
     virtual CModelInfo*  GetModelInfo(DWORD dwModelID, bool bCanBeInvalid = false) = 0;
@@ -268,7 +270,7 @@ public:
     virtual int32_t GetBaseIDforSCM() = 0;
     virtual int32_t GetCountOfAllFileIDs() = 0;
 
-    virtual void RemoveAllBuildings(bool clearBuildingRemoval = true) = 0;
+    virtual void RemoveAllBuildings() = 0;
     virtual void RestoreGameBuildings() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;

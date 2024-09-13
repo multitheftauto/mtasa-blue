@@ -104,6 +104,7 @@ typedef void(IdleHandler)();
 typedef void(PreFxRenderHandler)();
 typedef void(PostColorFilterRenderHandler)();
 typedef void(PreHudRenderHandler)();
+typedef void(RenderEverythingBarRoadsHandler)();
 typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
 typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                       AssocGroupId animGroup, AnimationId animID);
@@ -115,7 +116,7 @@ typedef bool(BlendAnimationHierarchyHandler)(CAnimBlendAssociationSAInterface* p
 typedef bool(ProcessCollisionHandler)(class CEntitySAInterface* pThisInterface, class CEntitySAInterface* pOtherInterface);
 typedef bool(VehicleCollisionHandler)(class CVehicleSAInterface*& pCollidingVehicle, class CEntitySAInterface* pCollidedVehicle, int iModelIndex,
                                       float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
-                                      CVector vecCollisionVelocity);
+                                      CVector vecCollisionVelocity, bool isProjectile);
 typedef bool(VehicleDamageHandler)(CEntitySAInterface* pVehicle, float fLoss, CEntitySAInterface* pAttacker, eWeaponType weaponType,
                                    const CVector& vecDamagePos, uchar ucTyre);
 typedef bool(HeliKillHandler)(class CVehicleSAInterface* pVehicle, class CEntitySAInterface* pHitInterface);
@@ -385,6 +386,7 @@ public:
     virtual void SetRender3DStuffHandler(Render3DStuffHandler* pHandler) = 0;
     virtual void SetPreRenderSkyHandler(PreRenderSkyHandler* pHandler) = 0;
     virtual void SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler) = 0;
+    virtual void SetRenderEverythingBarRoadsHandler(RenderEverythingBarRoadsHandler* pHandler) = 0;
 
     virtual void Reset() = 0;
 
@@ -427,8 +429,7 @@ public:
 
     virtual CLimits* GetLimits() = 0;
 
-    virtual bool IsSuspensionEnabled() = 0;
-    virtual void SetSuspensionEnabled(bool bEnabled) = 0;
+    virtual void UpdateVehicleSuspension() noexcept = 0;
 
     virtual void FlushClothesCache() = 0;
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading) = 0;
