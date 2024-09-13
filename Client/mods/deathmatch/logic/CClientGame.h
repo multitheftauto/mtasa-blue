@@ -71,6 +71,15 @@ struct SMiscGameSettings
     bool bAllowShotgunDamageFix;
 };
 
+struct ResetWorldPropsInfo
+{
+    bool resetSpecialProperties{};
+    bool resetWorldProperties{};
+    bool resetWeatherProperties{};
+    bool resetLODs{};
+    bool resetSounds{};
+};
+
 class CClientGame
 {
     friend class CPacketHandler;
@@ -308,6 +317,8 @@ public:
     CRemoteCalls*                 GetRemoteCalls() { return m_pRemoteCalls; }
     CResourceFileDownloadManager* GetResourceFileDownloadManager() { return m_pResourceFileDownloadManager; }
 
+    CModelRenderer* GetModelRenderer() const noexcept { return m_pModelRenderer.get(); }
+
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
 
     // Status toggles
@@ -408,6 +419,8 @@ public:
     bool SetBirdsEnabled(bool bEnabled);
     bool GetBirdsEnabled();
 
+    void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
+
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
 
     void ChangeVehicleWeapon(bool bNext);
@@ -441,7 +454,7 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
-    void RestreamWorld(bool removeBigBuildings);
+    void RestreamWorld();
     void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
@@ -504,6 +517,7 @@ private:
     static void                              StaticRender3DStuffHandler();
     static void                              StaticPreRenderSkyHandler();
     static void                              StaticRenderHeliLightHandler();
+    static void                              StaticRenderEverythingBarRoadsHandler();
     static bool                              StaticChokingHandler(unsigned char ucWeaponType);
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
@@ -522,7 +536,7 @@ private:
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     static bool StaticVehicleCollisionHandler(CVehicleSAInterface*& pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
                                               float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
-                                              CVector vecCollisionVelocity);
+                                              CVector vecCollisionVelocity, bool isProjectile);
     static bool StaticVehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                            const CVector& vecDamagePos, uchar ucTyre);
     static bool StaticHeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
@@ -567,7 +581,7 @@ private:
                                                RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     bool        VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
-                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity);
+                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity, bool isProjectile);
     bool        VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                      const CVector& vecDamagePos, uchar ucTyre);
     bool        HeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
@@ -697,6 +711,8 @@ private:
     CDebugHookManager*            m_pDebugHookManager;
     CRemoteCalls*                 m_pRemoteCalls;
     CResourceFileDownloadManager* m_pResourceFileDownloadManager;
+
+    std::unique_ptr<CModelRenderer> m_pModelRenderer;
 
     // Revised facilities
     CServer m_Server;
