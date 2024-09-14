@@ -4937,7 +4937,7 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens(CVehicle* pVehicle, unsigned 
     if (ucSirenType < 1 || ucSirenType > 6)
         return false;
 
-    if (ucSirenCount < 0 || ucSirenCount > SIREN_COUNT_MAX)
+    if (ucSirenCount > SIREN_COUNT_MAX)
         return false;
 
     pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens = true;
