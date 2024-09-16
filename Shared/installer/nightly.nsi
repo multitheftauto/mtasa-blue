@@ -702,9 +702,8 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
 	# Below file was included in the deprecation referenced above, but already disabled in MTA beforehand
         #File "${FILES_ROOT}\mta\CEF\cef_extensions.pak"
 
-		# CEF locales
-        SetOutPath "$INSTDIR\MTA\"
-        File "${FILES_ROOT}\mta\en-US.pak"
+        SetOutPath "$INSTDIR\MTA\CEF\locales"
+        File "${FILES_ROOT}\mta\CEF\locales\en-US.pak"
 
 
         ${If} "$(LANGUAGE_CODE)" != ""
