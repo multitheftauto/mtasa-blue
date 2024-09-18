@@ -280,6 +280,12 @@ public:
     CPed* GetJackingPed() { return m_pJackingPed; }
     void  SetJackingPed(CPed* pPed);
 
+    float GetNitroLevel() const noexcept { return m_nitroLevel; }
+    void  SetNitroLevel(float level) noexcept { m_nitroLevel = level; }
+
+    bool IsNitroActivated() const noexcept { return m_nitroLevel > 0; }
+    void SetNitroActivated(bool activated) noexcept { m_nitroLevel = activated ? 1 : 0; }
+
     bool IsInWater() { return m_bInWater; }
     void SetInWater(bool bInWater) { m_bInWater = bInWater; }
 
@@ -452,6 +458,8 @@ private:
     CVector    m_vecStationaryCheckPosition;
     bool       m_bNeedsDimensionResync;
     ushort     m_usLastUnoccupiedSyncDimension;
+
+    float m_nitroLevel;
 
 public:            // 'Safe' variables (that have no need for accessors)
     bool                                   m_bDamageProof;

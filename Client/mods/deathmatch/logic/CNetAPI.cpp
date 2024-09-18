@@ -1548,6 +1548,15 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     pPlayer->SetLastPuresyncTime(CClientTime::GetTime());
     pPlayer->IncrementVehicleSync();
     pPlayer->SetLastPuresyncType(PURESYNC_TYPE_PURESYNC);
+
+    if (BitStream.Can(eBitStreamVersion::IsVehicleNitroActivated_Serverside))
+    {
+        float vehicleNitro;
+        if (!BitStream.Read(vehicleNitro))
+            return;
+
+        pVehicle->SetNitroLevel(vehicleNitro);
+    }
 }
 
 void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVehicle, NetBitStreamInterface& BitStream)
@@ -1768,6 +1777,8 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
 
     // Write the sent position to the interpolator
     AddInterpolation(vecPosition);
+
+    BitStream.Write(static_cast<std::int8_t>(pVehicle->GetNitroLevel()));
 }
 
 bool CNetAPI::ReadSmallKeysync(CControllerState& ControllerState, NetBitStreamInterface& BitStream)

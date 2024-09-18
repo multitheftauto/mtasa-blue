@@ -73,6 +73,7 @@ private:
         CVector VehRotationDeg;
         CVector BothVelocity;
         CVector VehTurnSpeed;
+        float VehNitroLevel;
 
         float fVehHealth;
 

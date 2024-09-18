@@ -68,6 +68,10 @@ public:
     LUA_DECLARE(GetVehicleHeadLightColor);
     LUA_DECLARE(GetVehicleDoorOpenRatio);
 
+    static bool IsVehicleNitroActivated(CVehicle* vehicle) noexcept;
+    static float GetVehicleNitroLevel(CVehicle* vehicle) noexcept;
+    static void SetVehicleNitroLevel(CVehicle* vehicle, std::int8_t level) noexcept;
+
     // Vehicle set functions
     LUA_DECLARE(FixVehicle);
     LUA_DECLARE(SetVehicleRotation);
