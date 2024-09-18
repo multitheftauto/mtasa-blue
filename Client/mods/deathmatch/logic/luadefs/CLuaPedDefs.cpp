@@ -70,7 +70,7 @@ void CLuaPedDefs::LoadFunctions()
         {"canPedBeKnockedOffBike", CanPedBeKnockedOffBike},
         {"getPedAnimation", GetPedAnimation},
         {"getPedAnimationProgress", ArgumentParser<GetPedAnimationProgress>},
-
+        {"getPedAnimationSpeed", ArgumentParser<GetPedAnimationSpeed>},
         {"getPedWalkingStyle", GetPedMoveAnim},
         {"getPedControlState", GetPedControlState},
         {"getPedAnalogControlState", GetPedAnalogControlState},
@@ -2284,9 +2284,14 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
     return 1;
 }
 
-float CLuaPedDefs::GetPedAnimationProgress(CClientEntity* ped, std::string animName)
+float CLuaPedDefs::GetPedAnimationProgress(CClientEntity* ped)
 {
-    return CStaticFunctionDefinitions::GetPedAnimationProgress(*ped, animName);
+    return CStaticFunctionDefinitions::GetPedAnimationProgress(*ped);
+}
+
+float CLuaPedDefs::GetPedAnimationSpeed(CClientEntity* ped)
+{
+    return CStaticFunctionDefinitions::GetPedAnimationSpeed(*ped);
 }
 
 int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)

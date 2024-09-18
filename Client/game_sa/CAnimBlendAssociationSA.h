@@ -164,7 +164,7 @@ public:
     void  SetBlendAmount(float fAmount) { m_pInterface->fBlendAmount = fAmount; }
     void  SetCurrentProgress(float fProgress);
     float GetCurrentProgress() const noexcept { return m_pInterface->fCurrentTime; }
-    float GetCurrentSpeed() { return m_pInterface->fSpeed; }
+    float GetCurrentSpeed() const noexcept { return m_pInterface->fSpeed; }
     void  SetCurrentSpeed(float fSpeed) { m_pInterface->fSpeed = fSpeed; }
     void  SetAnimID(short sAnimID) { m_pInterface->sAnimID = sAnimID; }
     void  SetAnimGroup(short sAnimGroup) { m_pInterface->sAnimGroup = sAnimGroup; }
