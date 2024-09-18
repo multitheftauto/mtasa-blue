@@ -39,6 +39,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleTurnVelocity", GetVehicleTurnVelocity},
         {"getVehicleTurretPosition", GetVehicleTurretPosition},
         {"getVehicleMaxPassengers", GetVehicleMaxPassengers},
+        {"isVehicleLocked", IsVehicleLocked},
         {"getVehiclesOfType", GetVehiclesOfType},
         {"getVehicleUpgradeOnSlot", GetVehicleUpgradeOnSlot},
         {"getVehicleUpgrades", GetVehicleUpgrades},
@@ -53,17 +54,15 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getVehicleTowingVehicle", GetVehicleTowingVehicle},
         {"getVehiclePaintjob", GetVehiclePaintjob},
         {"getVehiclePlateText", GetVehiclePlateText},
-        {"getVehicleEngineState", GetVehicleEngineState},
-        {"getTrainDirection", GetTrainDirection},
-        {"getTrainSpeed", GetTrainSpeed},
-        {"isVehicleNitroActivated", ArgumentParser<IsVehicleNitroActivated>},
-        {"isVehicleLocked", IsVehicleLocked},
         {"isVehicleDamageProof", IsVehicleDamageProof},
         {"isVehicleFuelTankExplodable", IsVehicleFuelTankExplodable},
         {"isVehicleFrozen", IsVehicleFrozen},
         {"isVehicleOnGround", IsVehicleOnGround},
+        {"getVehicleEngineState", GetVehicleEngineState},
         {"isTrainDerailed", IsTrainDerailed},
         {"isTrainDerailable", IsTrainDerailable},
+        {"getTrainDirection", GetTrainDirection},
+        {"getTrainSpeed", GetTrainSpeed},
         //{"getTrainTrack", ArgumentParser<GetTrainTrack>},
         {"getTrainPosition", GetTrainPosition},
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
@@ -348,21 +347,6 @@ int CLuaVehicleDefs::CreateVehicle(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
-}
-
-bool CLuaVehicleDefs::IsVehicleNitroActivated(CVehicle* vehicle) noexcept
-{
-    return vehicle->IsNitroActivated();
-}
-
-float CLuaVehicleDefs::GetVehicleNitroLevel(CVehicle* vehicle) noexcept
-{
-    return vehicle->GetNitroLevel();
-}
-
-void CLuaVehicleDefs::SetVehicleNitroLevel(CVehicle* vehicle, std::int8_t level) noexcept
-{
-    vehicle->SetNitroLevel(level);
 }
 
 int CLuaVehicleDefs::GetVehicleType(lua_State* luaVM)
