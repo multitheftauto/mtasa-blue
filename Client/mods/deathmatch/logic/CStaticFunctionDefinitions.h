@@ -169,9 +169,7 @@ public:
                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
 
     static bool  SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
-    static float GetPedAnimationProgress(CClientEntity& entity);
     static bool  SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
-    static float GetPedAnimationSpeed(CClientEntity& entity);
 
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);

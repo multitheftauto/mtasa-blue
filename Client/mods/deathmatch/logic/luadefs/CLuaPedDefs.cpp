@@ -12,7 +12,9 @@
 #include "StdInc.h"
 #include <game/CWeapon.h>
 #include "lua/CLuaFunctionParser.h"
-#include "CMatrix_Pad.h"
+#include <game/CTasks.h>
+#include <game/TaskBasic.h>
+#include <game/CAnimManager.h>
 
 #define MIN_CLIENT_REQ_REMOVEPEDFROMVEHICLE_CLIENTSIDE "1.3.0-9.04482"
 #define MIN_CLIENT_REQ_WARPPEDINTOVEHICLE_CLIENTSIDE "1.3.0-9.04482"
@@ -71,6 +73,7 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedAnimation", GetPedAnimation},
         {"getPedAnimationProgress", ArgumentParser<GetPedAnimationProgress>},
         {"getPedAnimationSpeed", ArgumentParser<GetPedAnimationSpeed>},
+        {"getPedAnimationLength", ArgumentParser<GetPedAnimationLength>},        
         {"getPedWalkingStyle", GetPedMoveAnim},
         {"getPedControlState", GetPedControlState},
         {"getPedAnalogControlState", GetPedAnalogControlState},
@@ -2284,14 +2287,64 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
     return 1;
 }
 
-float CLuaPedDefs::GetPedAnimationProgress(CClientEntity* ped)
+float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
 {
-    return CStaticFunctionDefinitions::GetPedAnimationProgress(*ped);
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetCurrentProgress() / animAssociation->GetLength();
 }
 
-float CLuaPedDefs::GetPedAnimationSpeed(CClientEntity* ped)
+float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
 {
-    return CStaticFunctionDefinitions::GetPedAnimationSpeed(*ped);
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetCurrentSpeed();
+}
+
+float CLuaPedDefs::GetPedAnimationLength(CClientPed* ped)
+{
+    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
+    std::int32_t type = currentTask->GetTaskType();
+
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped->GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetLength();
 }
 
 int CLuaPedDefs::SetPedAnimationSpeed(lua_State* luaVM)

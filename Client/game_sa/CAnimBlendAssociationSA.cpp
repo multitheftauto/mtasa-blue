@@ -113,6 +113,11 @@ std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy()
     return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);
 }
 
+const std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy() const noexcept
+{
+    return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);
+}
+
 void CAnimBlendAssociationSA::SetCurrentProgress(float fProgress)
 {
     float fTime = m_pInterface->pAnimHierarchy->fTotalTime * fProgress;

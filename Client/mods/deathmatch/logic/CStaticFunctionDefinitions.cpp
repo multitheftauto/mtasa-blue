@@ -2285,27 +2285,6 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
     return false;
 }
 
-float CStaticFunctionDefinitions::GetPedAnimationProgress(CClientEntity& entity)
-{
-    CClientPed& ped = static_cast<CClientPed&>(entity);
-
-    auto* currentTask = ped.GetTaskManager()->GetActiveTask();
-    auto  type = currentTask->GetTaskType();
-    // check if animation (task type is 401)
-    if (type != 401)
-        return -1.0f;
-
-    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
-    if (!animation)
-        return -1.0f;
-
-    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped.GetClump(), animation->GetAnimName());
-    if (!animAssociation)
-        return -1.0f;
-
-    return animAssociation->GetCurrentProgress();
-}
-
 bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed)
 {
     RUN_CHILDREN(SetPedAnimationSpeed(**iter, strAnimName, fSpeed))
@@ -2325,27 +2304,6 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, con
     }
 
     return false;
-}
-
-float CStaticFunctionDefinitions::GetPedAnimationSpeed(CClientEntity& entity)
-{
-    CClientPed& ped = static_cast<CClientPed&>(entity);
-
-    auto* currentTask = ped.GetTaskManager()->GetActiveTask();
-    auto  type = currentTask->GetTaskType();
-    // check if animation (task type is 401)
-    if (type != 401)
-        return -1.0f;
-
-    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
-    if (!animation)
-        return -1.0f;
-
-    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped.GetClump(), animation->GetAnimName());
-    if (!animAssociation)
-        return -1.0f;
-
-    return animAssociation->GetCurrentSpeed();
 }
 
 bool CStaticFunctionDefinitions::SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim)
