@@ -28,7 +28,7 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CBuildingRemoval.h>
-#include <game/Task.h>
+#include <game/TaskBasic.h>
 
 using std::list;
 
@@ -2283,6 +2283,30 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
     }
 
     return false;
+}
+
+float CStaticFunctionDefinitions::GetPedAnimationProgress(CClientEntity& entity, const std::string& animName)
+{
+    if (animName.empty())
+        return -1.0f;
+
+    CClientPed& ped = static_cast<CClientPed&>(entity);
+
+    auto* currentTask = ped.GetTaskManager()->GetActiveTask();
+    auto  type = currentTask->GetTaskType();
+    // check if animation (task type is 401)
+    if (type != 401)
+        return -1.0f;
+
+    auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
+    if (!animation)
+        return -1.0f;
+
+    auto animAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(ped.GetClump(), animation->GetAnimName());
+    if (!animAssociation)
+        return -1.0f;
+
+    return animAssociation->GetCurrentProgress();
 }
 
 bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed)

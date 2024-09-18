@@ -168,6 +168,7 @@ public:
     static bool SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
     static bool SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
+    static float GetPedAnimationProgress(CClientEntity& entity, const std::string& animName);
     static bool SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);

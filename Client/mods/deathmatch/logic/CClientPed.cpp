@@ -5691,28 +5691,6 @@ bool CClientPed::IsRunningAnimation()
     return (m_AnimationCache.bLoop && m_pAnimationBlock);
 }
 
-void CClientPed::RunAnimation(AssocGroupId animGroup, AnimationId animID)
-{
-    KillAnimation();
-
-    if (m_pPlayerPed)
-    {
-        // Remove jetpack now so it doesn't stay on (#9522#c25612)
-        if (HasJetPack())
-            SetHasJetPack(false);
-
-        // Let's not choke them any longer
-        if (IsChoking())
-            SetChoking(false);
-
-        CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunAnim(animGroup, animID, 4.0f, TASK_SIMPLE_ANIM, "TASK_SIMPLE_ANIM");
-        if (pTask)
-        {
-            pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
-        }
-    }
-}
-
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
                                    bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {

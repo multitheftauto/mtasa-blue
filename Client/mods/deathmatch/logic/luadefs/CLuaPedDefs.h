@@ -71,6 +71,7 @@ public:
     LUA_DECLARE(IsPedDoingGangDriveby);
     LUA_DECLARE(GetPedFightingStyle);
     LUA_DECLARE(GetPedAnimation);
+    static float GetPedAnimationProgress(CClientEntity* ped, std::string animName);
     LUA_DECLARE(GetPedMoveState);
     LUA_DECLARE(GetPedMoveAnim);
     LUA_DECLARE(IsPedHeadless);
