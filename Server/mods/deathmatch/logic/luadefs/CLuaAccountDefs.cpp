@@ -14,28 +14,9 @@
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
 
-class TestAbc
-{
-public:
-    virtual int a() { return 123; }
-};
-
-class TestDef : public TestAbc
-{
-public:
-    virtual int a() override { return 456; }
-};
-
-void abc(std::unordered_map<std::string, std::unordered_map<std::string, std::variant<float, std::string>>> map)
-{
-    throw LuaFunctionError("Hello, World");
-}
-
 void CLuaAccountDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        {"abc", ArgumentParser<abc>},
-
         // Log in/out funcs
         {"logIn", LogIn},
         {"logOut", LogOut},
