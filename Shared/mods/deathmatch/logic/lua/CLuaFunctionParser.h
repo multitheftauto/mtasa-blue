@@ -46,19 +46,16 @@ struct CLuaFunctionParserBase
     // Translates a variant type to a list of names separated by slashes
     // std::variant<bool, int, float> => bool/int/float
     template <typename T>
-    void TypeToNameVariant(std::string& accumulator)
+    void TypeToNameVariant(SString& accumulator)
     {
-        using variant_t = is_variant<T>;
-        using rest_t = typename variant_t::rest_t;
-        static_assert(variant_t::value, "Not a variant!");
-
+        using param = typename is_variant<T>::param1_t;
         if (accumulator.empty())
-            accumulator = TypeToName<typename variant_t::param1_t>();
+            accumulator = TypeToName<param>();
         else
-            accumulator += "/" + TypeToName<typename variant_t::param1_t>();
-
-        if constexpr (variant_t::count != 1)
-            return TypeToNameVariant<rest_t>(accumulator);
+            accumulator += "/" + TypeToName<param>();
+            
+        if constexpr (is_variant<T>::count != 1)
+            return TypeToNameVariant<typename is_variant<T>::rest_t>(accumulator);
     }
 
     template <typename T>
