@@ -584,8 +584,8 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
         return strQuery;
 
     // Determine connection type
-    SString* pstrType = MapFind(m_ConnectionTypeMap, hConnection);
-    SString  strType = pstrType ? *pstrType : "";
+    std::string* pstrType = MapFind(m_ConnectionTypeMap, hConnection);
+    std::string  strType = pstrType ? *pstrType : "";
 
     if (strType == "sqlite")
         return InsertQueryArgumentsSqlite(strQuery, pArgs);
@@ -607,8 +607,8 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
 SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection, const char* szQuery, va_list vl)
 {
     // Determine connection type
-    SString* pstrType = MapFind(m_ConnectionTypeMap, hConnection);
-    SString  strType = pstrType ? *pstrType : "";
+    std::string* pstrType = MapFind(m_ConnectionTypeMap, hConnection);
+    std::string  strType = pstrType ? *pstrType : "";
 
     if (strType == "sqlite")
         return InsertQueryArgumentsSqlite(szQuery, vl);

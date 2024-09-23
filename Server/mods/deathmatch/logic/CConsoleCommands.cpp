@@ -31,7 +31,7 @@ extern CGame* g_pGame;
 static std::string GetAdminNameForLog(CClient* pClient)
 {
     std::string strName = pClient->GetNick();
-    std::string strAccountName = pClient->GetAccount() ? pClient->GetAccount()->GetName() : "no account";
+    std::string strAccountName = pClient->GetAccount() ? pClient->GetAccount()->GetName().c_str() : "no account";
     if (strName == strAccountName)
         return strName;
     return SString("%s(%s)", strName.c_str(), strAccountName.c_str());
@@ -1587,9 +1587,9 @@ bool DoAclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient,
 
     std::vector<SString> parts;
     SStringX(szArguments).Split(" ", parts);
-    const SString& strAction = parts.size() > 0 ? parts[0] : "";
-    const SString& strResourceName = parts.size() > 1 ? parts[1] : "";
-    const SString& strRightName = parts.size() > 2 ? parts[2] : "";
+    const SString& strAction = parts.size() > 0 ? parts[0] : SString();
+    const SString& strResourceName = parts.size() > 1 ? parts[1] : SString();
+    const SString& strRightName = parts.size() > 2 ? parts[2] : SString();
 
     bool bList = strAction == "list";
     bool bAllow = strAction == "allow";
@@ -1608,7 +1608,7 @@ bool DoAclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient,
             pEchoClient->SendConsole("aclrequest: No loaded resources have any requests");
         return true;
     }
-    else if (bList | bAllow | bDeny)
+    else if (bList || bAllow || bDeny)
     {
         CResource* pResource = g_pGame->GetResourceManager()->GetResource(strResourceName);
         if (!pResource)
@@ -1635,6 +1635,8 @@ bool DoAclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient,
     return false;
 }
 
+#include <filesystem>
+
 bool CConsoleCommands::AclRequest(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
 {
     BeginConsoleOutputCapture(pEchoClient);
@@ -1657,8 +1659,8 @@ bool CConsoleCommands::AuthorizeSerial(CConsole* pConsole, const char* szArgumen
 
     std::vector<SString> parts;
     SStringX(szArguments).Split(" ", parts);
-    const SString& strAccountName = parts.size() > 0 ? parts[0] : "";
-    const SString& strAction = parts.size() > 1 ? parts[1] : "";
+    const SString& strAccountName = parts.size() > 0 ? parts[0] : SString();
+    const SString& strAction = parts.size() > 1 ? parts[1] : SString();
 
     bool bList = strAction == "list";
     bool bAllow = strAction == "";

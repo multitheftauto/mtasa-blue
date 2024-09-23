@@ -230,8 +230,9 @@ void CLuaDefs::DidUseFunction(lua_CFunction f, lua_State* luaVM)
                 if (pFunction)
                 {
                     CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromLuaState(info.luaVM);
-                    SString    strResourceName = pResource ? pResource->GetName() : "unknown";
-                    CPerfStatFunctionTiming::GetSingleton()->UpdateTiming(strResourceName, pFunction->GetName().c_str(), elapsedTime, uiDeltaBytes);
+                    CPerfStatFunctionTiming::GetSingleton()->UpdateTiming(
+                        pResource ? pResource->GetName() : SString("unknown"),
+                        pFunction->GetName().c_str(), elapsedTime, uiDeltaBytes);
                 }
             }
 

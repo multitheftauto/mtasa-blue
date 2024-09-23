@@ -1,4 +1,5 @@
 project "Deathmatch"
+	cppdialect "C++20"
 	language "C++"
 	kind "SharedLib"
 	targetname "deathmatch"

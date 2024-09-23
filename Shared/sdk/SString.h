@@ -30,6 +30,7 @@ public:
 
     SString(const char* szText) : std::string(szText ? szText : "") {}
 
+    template <int=0>
     explicit SString(const char* szFormat, ...) : std::string()
     {
         if (szFormat)
