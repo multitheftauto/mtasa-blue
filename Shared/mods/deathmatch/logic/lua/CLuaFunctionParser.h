@@ -53,13 +53,13 @@ struct CLuaFunctionParserBase
             accumulator = TypeToName<param>();
         else
             accumulator += "/" + TypeToName<param>();
-            
+
         if constexpr (is_variant<T>::count != 1)
             return TypeToNameVariant<typename is_variant<T>::rest_t>(accumulator);
     }
 
     template <typename T>
-    std::string TypeToName()
+    SString TypeToName()
     {
         if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view> || std::is_same_v<T, SString>)
             return "string";
