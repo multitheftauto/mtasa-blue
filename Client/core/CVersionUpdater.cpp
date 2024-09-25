@@ -1912,7 +1912,7 @@ void CVersionUpdater::_DialogUpdateQueryError()
     // Display message
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("UPDATE CHECK"));
-    GetQuestionBox().SetMessage(_("Update not currently avalable.\n\nPlease check www.mtasa.com"));
+    GetQuestionBox().SetMessage(_("An update is currently not available.\n\nPlease check www.mtasa.com"));
     GetQuestionBox().SetButton(0, _("OK"));
     GetQuestionBox().Show();
     _PollAnyButton();
