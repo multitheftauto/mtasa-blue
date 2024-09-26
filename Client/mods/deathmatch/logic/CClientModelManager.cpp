@@ -49,6 +49,9 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
     int modelId = pModel->GetModelID();
     if (m_Models[modelId] != nullptr)
     {
+        CResource* perentResource = m_Models[modelId]->GetParentResource();
+        if (perentResource)
+            perentResource->GetResourceModelStreamer()->FullyReleaseModel(modelId);
         m_Models[modelId]->RestoreEntitiesUsingThisModel();
         m_Models[modelId] = nullptr;
         m_modelCount--;
