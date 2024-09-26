@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <map>
+#include <unordered_map>
 
 class CResourceModelStreamer
 {
@@ -26,5 +26,5 @@ public:
     void FullyReleaseModel(std::uint16_t modelId);
 
 private:
-    std::map<std::uint16_t, std::uint16_t> m_requestedModels;
+    std::unordered_map<std::uint16_t, std::uint16_t> m_requestedModels;
 };
