@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-27 14:14+0000\n"
-"PO-Revision-Date: 2024-01-27 14:21\n"
+"POT-Creation-Date: 2024-09-27 04:28+0000\n"
+"PO-Revision-Date: 2024-09-27 05:30\n"
 "Last-Translator: \n"
 "Language-Team: Croatian\n"
 "Language: hr_HR\n"
@@ -17,56 +17,18 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/game_sa/CSettingsSA.cpp:753
+#: Client/game_sa/CSettingsSA.cpp:767
 msgid "Can't find valid screen resolution."
 msgstr "Nije moguće pronaći ispravnu rezoluciju zaslona."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:829
+#: Client/game_sa/CSettingsSA.cpp:843
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Jeste li sigurni da želite koristiti ovu rezoluciju zaslona?"
 
-#: Client/game_sa/CSettingsSA.cpp:831 Client/loader/Dialogs.cpp:194
+#: Client/game_sa/CSettingsSA.cpp:845 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
 msgstr ""
-
-#. Create buttons
-#. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4767 Client/core/CVersionUpdater.cpp:1607
-#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
-#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
-#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
-#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
-#: Client/core/CVersionUpdater.cpp:2152 Client/loader/Dialogs.cpp:133
-msgid "OK"
-msgstr "U redu"
-
-#. Cancel button
-#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4766 Client/core/CVersionUpdater.cpp:1790
-#: Client/core/CVersionUpdater.cpp:1806 Client/core/CVersionUpdater.cpp:1841
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/loader/Dialogs.cpp:136
-msgid "Cancel"
-msgstr "Odustani"
-
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CMainMenu.cpp:1200
-#: Client/core/CSettings.cpp:1377 Client/core/CSettings.cpp:1401
-#: Client/core/CSettings.cpp:4471 Client/core/CSettings.cpp:4545
-#: Client/core/CSettings.cpp:4575 Client/core/CSettings.cpp:4624
-#: Client/core/CQuestionBox.cpp:195 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878
-#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
-msgid "Yes"
-msgstr "Da"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -84,7 +46,7 @@ msgstr "NIKADA NE UNOSITE OSJETLJIVE PODATKE DA SPRIJEČITE NJIHOVU KRAĐU"
 msgid "Remember decision"
 msgstr "Zapamti odluku"
 
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:962
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:974
 msgid "Allow"
 msgstr "Dopusti"
 
@@ -93,9 +55,1885 @@ msgid "Deny"
 msgstr "Odbij"
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1360
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1450
 msgid "Problem with graphics driver"
 msgstr "Problem s grafičkim driverima"
+
+#: Client/mods/deathmatch/CClient.cpp:36
+msgid "This version has expired."
+msgstr "Ova verzija je istekla."
+
+#: Client/mods/deathmatch/CClient.cpp:56
+msgid "disconnect from the game"
+msgstr "isključi se iz igre"
+
+#: Client/mods/deathmatch/CClient.cpp:57
+msgid "shows the nametags"
+msgstr "pokazuje oznake s imenom"
+
+#: Client/mods/deathmatch/CClient.cpp:58
+msgid "shows the chatbox"
+msgstr "prikazuje statistike memorije"
+
+#: Client/mods/deathmatch/CClient.cpp:59
+msgid "shows the network statistics"
+msgstr "prikazuje statistike memorije"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: Client/mods/deathmatch/CClient.cpp:62
+msgid "open the chat input"
+msgstr "otvori unos čavrljanja"
+
+#: Client/mods/deathmatch/CClient.cpp:63
+msgid "transmits voice to other players"
+msgstr "prenosi glas na druge igrače"
+
+#: Client/mods/deathmatch/CClient.cpp:64
+msgid "enters a car as passenger"
+msgstr "ulazi u vozilo kao suvozač"
+
+#: Client/mods/deathmatch/CClient.cpp:65
+msgid "next radio channel"
+msgstr "sljedeći radio kanal"
+
+#: Client/mods/deathmatch/CClient.cpp:66
+msgid "previous radio channel"
+msgstr "prethodni radio kanal"
+
+#: Client/mods/deathmatch/CClient.cpp:67
+msgid "enables the radar view"
+msgstr "omogučuje radarski prikaz"
+
+#: Client/mods/deathmatch/CClient.cpp:68
+msgid "zooms the radar in"
+msgstr "povećava prikaz radara"
+
+#: Client/mods/deathmatch/CClient.cpp:69
+msgid "zooms the radar out"
+msgstr "smanjuje prikaz radara"
+
+#: Client/mods/deathmatch/CClient.cpp:70
+msgid "moves the radar north"
+msgstr "pomiče radar na sjever"
+
+#: Client/mods/deathmatch/CClient.cpp:71
+msgid "moves the radar south"
+msgstr "pomiče radar na jug"
+
+#: Client/mods/deathmatch/CClient.cpp:72
+msgid "moves the radar east"
+msgstr "pomiče radar na istok"
+
+#: Client/mods/deathmatch/CClient.cpp:73
+msgid "moves the radar west"
+msgstr "pomiče radar na zapad"
+
+#: Client/mods/deathmatch/CClient.cpp:74
+msgid "attaches the radar"
+msgstr "pridaje radar"
+
+#: Client/mods/deathmatch/CClient.cpp:75
+msgid "reduces radar opacity"
+msgstr "smanjuje prozirnost radara"
+
+#: Client/mods/deathmatch/CClient.cpp:76
+msgid "increases radar opacity"
+msgstr "povećava prozirnost radara"
+
+#: Client/mods/deathmatch/CClient.cpp:77
+msgid "toggles radar help text"
+msgstr "uključuje/isključuje pomoćni tekst radara"
+
+#: Client/mods/deathmatch/CClient.cpp:78
+msgid "sends a message to the targetted player"
+msgstr "šalje poruku određenom igraču"
+
+#: Client/mods/deathmatch/CClient.cpp:79
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "mijenja na sljedeće oružje u vozilu"
+
+#: Client/mods/deathmatch/CClient.cpp:80
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "mijenja na prethodno oružje u vozilu"
+
+#: Client/mods/deathmatch/CClient.cpp:81
+msgid "outputs info about the current server"
+msgstr "izbacuje informacije o trenutnom serveru"
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: Client/mods/deathmatch/CClient.cpp:84
+msgid "defines the scale multiplier of all text-displays"
+msgstr "definira skalu multiplikatora svih tekst-prikaza"
+
+#. Development mode
+#: Client/mods/deathmatch/CClient.cpp:91
+msgid "(Development mode) shows the colshapes"
+msgstr "(Razvojni način) prikazuje colshapeove"
+
+#: Client/mods/deathmatch/CClient.cpp:92
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(Razvitak) prikazuje colshapeove"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Pogreška preuzimanja: %s"
+
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CClientGame.cpp:641
+#: Client/mods/deathmatch/logic/CClientGame.cpp:715
+#: Client/mods/deathmatch/logic/CClientGame.cpp:739
+#: Client/mods/deathmatch/logic/CClientGame.cpp:761
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1174
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1333
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1370
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1431
+#: Client/core/CSettings.cpp:2941 Client/core/CSettings.cpp:4166
+#: Client/core/CSettings.cpp:4194 Client/core/CSettings.cpp:4764
+#: Client/core/CCore.cpp:1275 Client/core/CCore.cpp:1288
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/core/DXHook/CDirect3DHook9.cpp:127
+#: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
+#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
+#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "Pogreška"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:506
+msgid "Disconnected: Invalid nickname"
+msgstr "Odspojeni: Nevažeći nadimak"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:510
+msgid "Disconnect from server"
+msgstr "Prekini vezu s poslužiteljem"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:514
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "Odspojeni: Serial je prognan.\n"
+"Razlog: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "Odspojeni: Prognani ste.\n"
+"Razlog: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:526
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "Odspojeni: Račun je prognan.\n"
+"Razlog: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:531
+msgid "Disconnected: Version mismatch"
+msgstr "Odspojeni: Neusklađenost verzija"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "Odspojeni: Previše igrača se pridružuje istovremeno. Molimo pričekajte minutu, te se ponovno povežite."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:539
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "Odspojeni: Poslužitelj je sa drukčije grane.\n"
+"Informacija: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "Odspojeni: Loša verzija.\n"
+"Informacija: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:549
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "Odspojeni: Poslužitelj je na novijoj građi.\n"
+"Informacija: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "Odspojeni: Poslužitelj je na starijoj građi.\n"
+"Informacija: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:559
+msgid "Disconnected: Nick already in use"
+msgstr "Odspojeni: Nadimak se već koristi"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+msgid "Disconnected: Player element could not be created."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:567
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Odspojeni: Poslužitelj je odbacio vezu: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:572
+msgid "Disconnected: Serial verification failed"
+msgstr "Odspojeni: Potvrda seriala neuspjela"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "Odspojeni: Veza nesinkronizirana %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:585
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "Odspojeni: Izbacio/la vas je %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:590
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "Odspojeni: Prognao/la vas je %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "Odspojeni: Server ugašen ili se ponovno pali"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+msgid "You were kicked from the game"
+msgstr "Izbačeni ste iz igre"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
+msgid "Please replace gta_sa.exe"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
+msgid "This server does not allow virtual machines"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
+msgid "This server requires driver signing to be enabled"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+msgid "Please restart your PC"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
+msgid "This server has detected missing anti-cheat components"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
+msgid "Try restarting MTA"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
+msgid "Please replace gta3.img or gta_int.img"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
+msgid "This server does not allow Wine"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:650
+msgid "Time Remaining: "
+msgstr "Preostalo Vrijeme:"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:660
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d dan"
+msgstr[1] "%d dana"
+msgstr[2] "%d dana"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:662
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d sat"
+msgstr[1] "%d sata"
+msgstr[2] "%d sati"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:664
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuta"
+msgstr[1] "%d minute"
+msgstr[2] "%d minuta"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:666
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d sekunda"
+msgstr[1] "%d sekunde"
+msgstr[2] "%d sekundi"
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:670
+msgid "Disconnected"
+msgstr "Veza prekinuta"
+
+#: Client/mods/deathmatch/logic/CResource.cpp:375
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1089
+#: Client/core/CSettings.cpp:3483 Client/core/CCore.cpp:674
+msgid "In-game"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:374
+msgid "Flying a UFO around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:374
+msgid "Cruising around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:374
+msgid "Riding the waves of"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:375
+msgid "Riding the train in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:375
+msgid "Flying around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
+msgid "Riding around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
+msgid "Monster truckin' around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
+msgid "Quaddin' around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+msgid "Bunny hopping around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+msgid "Doing weird stuff in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:381
+msgid "Climbing around in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:382
+#: Client/mods/deathmatch/logic/CClientGame.cpp:383
+msgid "Doing a drive-by in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+msgid "Blub blub..."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+msgid "Breathing water"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+msgid "Drowning in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:387
+msgid "Ducking for cover in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:388
+msgid "Fighting in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:389
+msgid "Throwing fists in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:390
+msgid "Blastin' fools in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+msgid "Shooting up"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:392
+msgid "Jetpacking in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:393
+msgid "Literally on fire in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+msgid "Burning up in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:395
+msgid "Swimming in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:396
+msgid "Floating around in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:397
+msgid "Being chased by a shark"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:398
+msgid "Choking to death in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:533
+#: Client/core/CSettings.cpp:3479 Client/core/CCore.cpp:674
+#: Client/core/CMainMenu.cpp:304
+msgid "Main menu"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:641
+#: Client/mods/deathmatch/logic/CClientGame.cpp:739
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Nevaljan nadimak! Molimo idite u postavke i postavite novi!"
+
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:657
+#: Client/core/CConnectManager.cpp:148
+msgid "CONNECTING"
+msgstr "POVEZIVANJE"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:657
+msgid "Entering the game ..."
+msgstr "Ulazak u igru ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:715
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Nije spojeno: molimo koristite Brzo Povezivanje ili 'poveži' naredbu za spajanje na poslužitelj."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:761
+msgid "Could not start the local server. See console for details."
+msgstr "Lokalni poslužitelj se nije mogao pokrenuti. Pogledajte konzolu za detalje."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:771
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
+msgid "Local Server"
+msgstr "Lokalni Poslužitelj"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:771
+msgid "Starting local server ..."
+msgstr "Pokretanje lokalnog poslužitelja ..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1019
+msgid "Area 51"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1028
+msgid "Walking around "
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1174
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "Izbačeni ste iz igre ( %s )"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
+msgid "Connecting to local server..."
+msgstr "Povezivanje na lokalni poslužitelj..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+msgid "Error connecting to server."
+msgstr "Greška prilikom spajanja na poslužitelj."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+msgid "Connecting to local server timed out. See console for details."
+msgstr "Povezivanje sa lokalnim poslužiteljem isteklo. Pogledajte konzolu za detalje."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1333
+#: Client/core/CConnectManager.cpp:263
+msgid "Connection timed out"
+msgstr "Veza je istekla"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1370
+msgid "Connection with the server was lost"
+msgstr "Veza sa poslužiteljem se prekinula!"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1381
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+msgid "Disconnected: unknown protocol error"
+msgstr "Odspojeni: nepoznata greška protokola"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1385
+#: Client/core/CConnectManager.cpp:285
+msgid "Disconnected: disconnected remotely"
+msgstr "Odspojeni: odspojeni ste daljinski"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
+#: Client/core/CConnectManager.cpp:289
+msgid "Disconnected: connection lost remotely"
+msgstr "Odspojeni: veza izgubljena daljinski"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
+#: Client/core/CConnectManager.cpp:293
+msgid "Disconnected: you are banned from this server"
+msgstr "Odspojeni: trajno ste izbačeni sa ovog servera"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
+msgid "Disconnected: the server is currently full"
+msgstr "Odspojeni: server je trenutno pun"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
+#: Client/core/CConnectManager.cpp:300
+msgid "Disconnected: disconnected from the server"
+msgstr "Odspojeni: odspojeni sa servera"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
+#: Client/core/CConnectManager.cpp:304
+msgid "Disconnected: connection to the server was lost"
+msgstr "Odspojeni: veza sa serverom se izgubila"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
+msgid "Disconnected: invalid password specified"
+msgstr "Odspojeni: nevažeća lozinka određena"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
+#: Client/core/CConnectManager.cpp:311
+msgid "Disconnected: connection was refused"
+msgstr "Odspojeni: veza je odbijena"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1431
+msgid "MTA Client verification failed!"
+msgstr "Potvrda MTA klijenta neuspjela!"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+msgid "In a ditch"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+msgid "En-route to hospital"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+msgid "Meeting their maker"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+msgid "Regretting their decisions"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+msgid "Wasted"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "POKRENI IGRU"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:442 Client/core/CSettings.cpp:630
+#: Client/core/CSettings.cpp:904 Client/core/CSettings.cpp:2018
+msgid "General"
+msgstr "Općenito"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "Resursi"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Ime poslužitelja:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Lozinka:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Ime poslužitelja:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "Odašiljanje:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr ""
+
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Odabrano"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Sve"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Pokreni"
+
+#. Cancel button
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4784
+#: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
+#: Client/core/CVersionUpdater.cpp:1841 Client/loader/Dialogs.cpp:136
+#: Client/gui/CGUIMessageBox_Impl.cpp:68
+msgid "Cancel"
+msgstr "Odustani"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Napredak skidanja mape:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Napredak Skidanja: "
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s od %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Odspojite se da prekinete skidanje"
+
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Uslikavanje dobilo %d bajta, ali očekivano je %d"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Uslikavanje neuspjelo"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Screenshot uzet: '%s'"
+
+#. Create window (with frame) if it will fit inside the screen resolution
+#: Client/core/CSettings.cpp:84
+msgid "SETTINGS"
+msgstr "POSTAVKE"
+
+#: Client/core/CSettings.cpp:116
+msgid "Multiplayer"
+msgstr ""
+
+#: Client/core/CSettings.cpp:117
+msgid "Video"
+msgstr "Slika"
+
+#: Client/core/CSettings.cpp:118
+msgid "Audio"
+msgstr "Zvuk"
+
+#: Client/core/CSettings.cpp:119
+msgid "Binds"
+msgstr "Povezane kontrole"
+
+#: Client/core/CSettings.cpp:120
+msgid "Controls"
+msgstr "Kontrole"
+
+#: Client/core/CSettings.cpp:121
+msgid "Interface"
+msgstr "Sučelje"
+
+#: Client/core/CSettings.cpp:122
+msgid "Web Browser"
+msgstr "Internet preglednik"
+
+#: Client/core/CSettings.cpp:123
+msgid "Advanced"
+msgstr "Napredno"
+
+#. Create buttons
+#. OK button
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4785
+#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
+#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
+#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
+#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
+#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/loader/Dialogs.cpp:133 Client/gui/CGUIMessageBox_Impl.cpp:64
+msgid "OK"
+msgstr "U redu"
+
+#: Client/core/CSettings.cpp:147 Client/core/CSettings.cpp:338
+#: Client/core/CSettings.cpp:617 Client/core/CSettings.cpp:889
+msgid "Load defaults"
+msgstr "Učitaj zadano"
+
+#. *
+#. *  Controls tab
+#. *
+#: Client/core/CSettings.cpp:157 Client/core/CSettings.cpp:181
+msgid "Mouse sensitivity:"
+msgstr "Osjetljivost miša:"
+
+#. VerticalAimSensitivity
+#: Client/core/CSettings.cpp:157 Client/core/CSettings.cpp:199
+msgid "Vertical aim sensitivity:"
+msgstr "Osjetljivost vertikalnog ciljnika:"
+
+#. Mouse Options
+#: Client/core/CSettings.cpp:160
+msgid "Mouse options"
+msgstr "Postavke miša"
+
+#: Client/core/CSettings.cpp:167
+msgid "Invert mouse vertically"
+msgstr "Vertikalno okreni miš"
+
+#: Client/core/CSettings.cpp:171
+msgid "Steer with mouse"
+msgstr "Vozi mišem"
+
+#: Client/core/CSettings.cpp:175
+msgid "Fly with mouse"
+msgstr "Leti mišem"
+
+#. Joypad options
+#: Client/core/CSettings.cpp:217
+msgid "Joypad options"
+msgstr "Joypad postavke"
+
+#: Client/core/CSettings.cpp:230
+msgid "Standard controls (Mouse + Keyboard)"
+msgstr "Standardne kontrole (Miš + Tipkovnica)"
+
+#: Client/core/CSettings.cpp:237
+msgid "Classic controls (Joypad)"
+msgstr "Klasične kontrole (Joypad)"
+
+#: Client/core/CSettings.cpp:274
+msgid "Dead Zone"
+msgstr "Mrtva Zona"
+
+#: Client/core/CSettings.cpp:279
+msgid "Saturation"
+msgstr "Zasićenje"
+
+#: Client/core/CSettings.cpp:285
+msgid "Use the 'Binds' tab for joypad buttons."
+msgstr "Koristite 'Povezane kontrole' za joypad tipke."
+
+#: Client/core/CSettings.cpp:324
+msgid "Left Stick"
+msgstr "Lijeva palica"
+
+#: Client/core/CSettings.cpp:330
+msgid "Right Stick"
+msgstr "Desna palica"
+
+#: Client/core/CSettings.cpp:345
+msgid "DESCRIPTION"
+msgstr "OPIS"
+
+#: Client/core/CSettings.cpp:346
+msgid "KEY"
+msgstr "TIPKA"
+
+#: Client/core/CSettings.cpp:348
+msgid "ALT. KEY"
+msgstr "ALT. TIPKA"
+
+#. *
+#. *    Multiplayer tab
+#. *
+#: Client/core/CSettings.cpp:353 Client/core/CSettings.cpp:356
+msgid "Nick:"
+msgstr "Nadimak:"
+
+#: Client/core/CSettings.cpp:378
+msgid "Save server passwords"
+msgstr "Spremi lozinke servera"
+
+#: Client/core/CSettings.cpp:383
+msgid "Auto-refresh server browser"
+msgstr "Automatski-osvježi pretraživač"
+
+#: Client/core/CSettings.cpp:388
+msgid "Allow screen upload"
+msgstr "Dopusti upload zaslona"
+
+#: Client/core/CSettings.cpp:393
+msgid "Allow external sounds"
+msgstr ""
+
+#: Client/core/CSettings.cpp:398
+msgid "Always show download window"
+msgstr ""
+
+#: Client/core/CSettings.cpp:403
+msgid "Allow connecting with Discord Rich Presence"
+msgstr ""
+
+#: Client/core/CSettings.cpp:408
+msgid "Use customized GTA:SA files"
+msgstr "Koristi prilagođene GTA:SA datoteke"
+
+#: Client/core/CSettings.cpp:413
+msgid "Map rendering options"
+msgstr "Postavke učitavanja mape"
+
+#: Client/core/CSettings.cpp:419 Client/core/CSettings.cpp:628
+msgid "Opacity:"
+msgstr "Neprozirnost:"
+
+#. *
+#. *  Audio tab
+#. *
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:448
+msgid "Master volume:"
+msgstr "Glavna glasnoća:"
+
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:467
+msgid "Radio volume:"
+msgstr "Jačina zvuka radija:"
+
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:486
+msgid "SFX volume:"
+msgstr "Jačina zvuka efekata:"
+
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:505
+msgid "MTA volume:"
+msgstr "Jačina zvuka igre:"
+
+#: Client/core/CSettings.cpp:440 Client/core/CSettings.cpp:524
+msgid "Voice volume:"
+msgstr "Jačina zvuka glasa:"
+
+#: Client/core/CSettings.cpp:440 Client/core/CSettings.cpp:565
+msgid "Play mode:"
+msgstr "Način igre:"
+
+#: Client/core/CSettings.cpp:543
+msgid "Radio options"
+msgstr "Radio mogućnosti"
+
+#: Client/core/CSettings.cpp:549
+msgid "Radio Equalizer"
+msgstr "Radijski ujednačivač"
+
+#: Client/core/CSettings.cpp:554
+msgid "Radio Auto-tune"
+msgstr "Samopodešavanje radija"
+
+#: Client/core/CSettings.cpp:559
+msgid "Usertrack options"
+msgstr "Postavke korisničkih zapisa"
+
+#: Client/core/CSettings.cpp:573 Client/core/CSettings.cpp:3087
+msgid "Radio"
+msgstr ""
+
+#: Client/core/CSettings.cpp:574 Client/core/CSettings.cpp:3089
+msgid "Random"
+msgstr "Nasumično"
+
+#: Client/core/CSettings.cpp:575 Client/core/CSettings.cpp:3091
+msgid "Sequential"
+msgstr "Sekvencionalni"
+
+#: Client/core/CSettings.cpp:578
+msgid "Automatic Media Scan"
+msgstr "Automatsko Skeniranje Medija"
+
+#: Client/core/CSettings.cpp:585
+msgid "Mute options"
+msgstr "Opcije utišavanja"
+
+#: Client/core/CSettings.cpp:591
+msgid "Mute All sounds when minimized"
+msgstr "Utišaj sve zvukove kada je minimizirano"
+
+#: Client/core/CSettings.cpp:596
+msgid "Mute Radio sounds when minimized"
+msgstr "Isključi zvukove radija kada je minimizirano"
+
+#: Client/core/CSettings.cpp:601
+msgid "Mute SFX sounds when minimized"
+msgstr "Isključi zvukove efekata kada je minimizirano"
+
+#: Client/core/CSettings.cpp:606
+msgid "Mute MTA sounds when minimized"
+msgstr "Isključi MTA zvukove kada je minimizirano"
+
+#: Client/core/CSettings.cpp:611
+msgid "Mute Voice sounds when minimized"
+msgstr "Isključi zvukove glasa kada je minimizirano"
+
+#. *
+#. *  Video tab
+#. *
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:636
+msgid "Resolution:"
+msgstr "Rezolucija:"
+
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:683
+msgid "FOV:"
+msgstr "Udaljenost slike:"
+
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:699
+msgid "Draw Distance:"
+msgstr "Udaljenost Slike:"
+
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:717
+msgid "Brightness:"
+msgstr "Svjetlina:"
+
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:735
+msgid "FX Quality:"
+msgstr "FX Kvaliteta:"
+
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:749
+msgid "Anisotropic filtering:"
+msgstr "Anizotropno filtriranje:"
+
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:776
+msgid "Anti-aliasing:"
+msgstr "Zaglađivanje rubova:"
+
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:790
+msgid "Aspect Ratio:"
+msgstr "Omjer prikaza:"
+
+#: Client/core/CSettings.cpp:648
+msgid "Windowed"
+msgstr "U prozoru"
+
+#: Client/core/CSettings.cpp:654
+msgid "DPI aware"
+msgstr ""
+
+#: Client/core/CSettings.cpp:662 Client/core/CSettings.cpp:1004
+#: Client/loader/MainFunctions.cpp:389
+msgid "Fullscreen mode:"
+msgstr "Preko punog zaslona:"
+
+#: Client/core/CSettings.cpp:669 Client/core/CSettings.cpp:1613
+msgid "Standard"
+msgstr "Standardno"
+
+#: Client/core/CSettings.cpp:670 Client/core/CSettings.cpp:1615
+#: Client/loader/MainFunctions.cpp:389
+msgid "Borderless window"
+msgstr "Prozor bez okvira"
+
+#: Client/core/CSettings.cpp:671 Client/core/CSettings.cpp:1617
+msgid "Borderless keep res"
+msgstr "Rezolucija bez rubova"
+
+#: Client/core/CSettings.cpp:675
+msgid "Mip Mapping"
+msgstr "Mip Mapiranje"
+
+#: Client/core/CSettings.cpp:743 Client/core/CSettings.cpp:1517
+msgid "Low"
+msgstr "Nisko"
+
+#: Client/core/CSettings.cpp:744 Client/core/CSettings.cpp:1519
+msgid "Medium"
+msgstr "Srednje"
+
+#: Client/core/CSettings.cpp:745 Client/core/CSettings.cpp:1086
+#: Client/core/CSettings.cpp:1521 Client/core/CSettings.cpp:3145
+msgid "High"
+msgstr "Visoko"
+
+#: Client/core/CSettings.cpp:746 Client/core/CSettings.cpp:1523
+msgid "Very high"
+msgstr "Vrlo visoko"
+
+#: Client/core/CSettings.cpp:761 Client/core/CSettings.cpp:784
+#: Client/core/CSettings.cpp:1017 Client/core/CSettings.cpp:1071
+#: Client/core/CSettings.cpp:1201 Client/core/CSettings.cpp:1527
+#: Client/core/CSettings.cpp:3152 Client/core/CSettings.cpp:3184
+#: Client/core/CSettings.cpp:3206 Client/core/CSettings.cpp:4234
+msgid "Off"
+msgstr "Isključeno"
+
+#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1529
+msgid "1x"
+msgstr ""
+
+#: Client/core/CSettings.cpp:786 Client/core/CSettings.cpp:1531
+msgid "2x"
+msgstr ""
+
+#: Client/core/CSettings.cpp:787 Client/core/CSettings.cpp:1533
+msgid "3x"
+msgstr ""
+
+#: Client/core/CSettings.cpp:800 Client/core/CSettings.cpp:1019
+#: Client/core/CSettings.cpp:1539 Client/core/CSettings.cpp:3154
+msgid "Auto"
+msgstr "Automatski"
+
+#: Client/core/CSettings.cpp:801 Client/core/CSettings.cpp:1541
+msgid "4:3"
+msgstr ""
+
+#: Client/core/CSettings.cpp:802 Client/core/CSettings.cpp:1543
+msgid "16:10"
+msgstr ""
+
+#: Client/core/CSettings.cpp:803 Client/core/CSettings.cpp:1545
+msgid "16:9"
+msgstr ""
+
+#: Client/core/CSettings.cpp:806
+msgid "HUD Match Aspect Ratio"
+msgstr "HUD rejting prilagodbe"
+
+#: Client/core/CSettings.cpp:812
+msgid "Volumetric Shadows"
+msgstr "Volumetrične sjene"
+
+#: Client/core/CSettings.cpp:816
+msgid "Grass effect"
+msgstr "Efekt trave"
+
+#: Client/core/CSettings.cpp:820
+msgid "Heat haze"
+msgstr "Toplinska magla"
+
+#: Client/core/CSettings.cpp:824
+msgid "Tyre Smoke etc"
+msgstr "Dim guma itd"
+
+#: Client/core/CSettings.cpp:828
+msgid "Dynamic ped shadows"
+msgstr ""
+
+#: Client/core/CSettings.cpp:832
+msgid "Motion blur"
+msgstr ""
+
+#: Client/core/CSettings.cpp:837
+msgid "Full Screen Minimize"
+msgstr "Minimiziraj Puni Zaslon"
+
+#: Client/core/CSettings.cpp:849
+msgid "Enable Device Selection Dialog"
+msgstr "Omogući prozor za odabir uređaja"
+
+#: Client/core/CSettings.cpp:861
+msgid "Show unsafe resolutions"
+msgstr "Pokaži nesigurne rezolucije"
+
+#: Client/core/CSettings.cpp:873
+msgid "Render vehicles always in high detail"
+msgstr "Prikazuj vozila uvijek s visokim detaljima"
+
+#: Client/core/CSettings.cpp:877
+msgid "Render peds always in high detail"
+msgstr ""
+
+#: Client/core/CSettings.cpp:881
+msgid "Corona rain reflections"
+msgstr ""
+
+#: Client/core/CSettings.cpp:910
+msgid "Enable remote websites"
+msgstr "Omogući udaljene web stranice"
+
+#: Client/core/CSettings.cpp:915
+msgid "Enable Javascript on remote websites"
+msgstr "Omogući Javascript na udaljenim web stranicama"
+
+#: Client/core/CSettings.cpp:920
+msgid "Custom blacklist"
+msgstr "Blokirano po izboru"
+
+#: Client/core/CSettings.cpp:931 Client/core/CSettings.cpp:966
+msgid "Enter a domain e.g. google.com"
+msgstr "Unesi domenu npr. google.com"
+
+#: Client/core/CSettings.cpp:939
+msgid "Block"
+msgstr "Blokiraj"
+
+#: Client/core/CSettings.cpp:947 Client/core/CSettings.cpp:982
+msgid "Domain"
+msgstr "Domena"
+
+#: Client/core/CSettings.cpp:949 Client/core/CSettings.cpp:984
+msgid "Remove domain"
+msgstr "Ukloni domenu"
+
+#. Reset vecTemp
+#: Client/core/CSettings.cpp:955
+msgid "Custom whitelist"
+msgstr "Dopušteno po izboru"
+
+#. Misc section label
+#: Client/core/CSettings.cpp:997
+msgid "Misc"
+msgstr "Razno"
+
+#. Fast clothes loading
+#: Client/core/CSettings.cpp:1003 Client/core/CSettings.cpp:1010
+#: Client/core/CSettings.cpp:4803
+msgid "Fast CJ clothes loading:"
+msgstr "Brzo učitavanje CJ-eve odjeće:"
+
+#. Browser scan speed
+#: Client/core/CSettings.cpp:1003 Client/core/CSettings.cpp:1024
+#: Client/core/CSettings.cpp:4805
+msgid "Browser speed:"
+msgstr "Brzina pretraživača:"
+
+#. Single download
+#: Client/core/CSettings.cpp:1003 Client/core/CSettings.cpp:1038
+#: Client/core/CSettings.cpp:4807
+msgid "Single connection:"
+msgstr "Jednostavna veza:"
+
+#. Packet tag
+#: Client/core/CSettings.cpp:1003 Client/core/CSettings.cpp:1051
+#: Client/core/CSettings.cpp:4809
+msgid "Packet tag:"
+msgstr "Oznaka paketa:"
+
+#. Progress animation
+#: Client/core/CSettings.cpp:1004 Client/core/CSettings.cpp:1064
+#: Client/core/CSettings.cpp:4811
+msgid "Progress animation:"
+msgstr "Napredak animacije:"
+
+#. Process priority
+#: Client/core/CSettings.cpp:1004 Client/core/CSettings.cpp:1077
+#: Client/core/CSettings.cpp:4801
+msgid "Process priority:"
+msgstr "Prioritet procesa:"
+
+#. Debug setting
+#: Client/core/CSettings.cpp:1004 Client/core/CSettings.cpp:1091
+#: Client/core/CSettings.cpp:4813
+msgid "Debug setting:"
+msgstr "Debug postavka:"
+
+#. Streaming memory
+#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1114
+#: Client/core/CSettings.cpp:4815
+msgid "Streaming memory:"
+msgstr "Memorija strujanja:"
+
+#. Update build type
+#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1215
+msgid "Update build type:"
+msgstr "Tip ažuriranja:"
+
+#. UpdateAutoInstall
+#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1194
+msgid "Install important updates:"
+msgstr "Instaliraj važna ažuriranja:"
+
+#: Client/core/CSettings.cpp:1018 Client/core/CSettings.cpp:1046
+#: Client/core/CSettings.cpp:1059 Client/core/CSettings.cpp:3156
+#: Client/core/CSettings.cpp:3172 Client/core/CSettings.cpp:3179
+msgid "On"
+msgstr "Uključeno"
+
+#: Client/core/CSettings.cpp:1031 Client/core/CSettings.cpp:3161
+msgid "Very slow"
+msgstr "Vrlo sporo"
+
+#: Client/core/CSettings.cpp:1032 Client/core/CSettings.cpp:1045
+#: Client/core/CSettings.cpp:1058 Client/core/CSettings.cpp:1072
+#: Client/core/CSettings.cpp:1098 Client/core/CSettings.cpp:1110
+#: Client/core/CSettings.cpp:1202 Client/core/CSettings.cpp:1222
+#: Client/core/CSettings.cpp:3163 Client/core/CSettings.cpp:3170
+#: Client/core/CSettings.cpp:3177 Client/core/CSettings.cpp:3186
+#: Client/core/CSettings.cpp:3199
+msgid "Default"
+msgstr "Uobičajeno"
+
+#: Client/core/CSettings.cpp:1033 Client/core/CSettings.cpp:3165
+msgid "Fast"
+msgstr "Brzo"
+
+#: Client/core/CSettings.cpp:1084 Client/core/CSettings.cpp:3141
+msgid "Normal"
+msgstr "Normalno"
+
+#: Client/core/CSettings.cpp:1085 Client/core/CSettings.cpp:3143
+msgid "Above normal"
+msgstr "Iznad prosjeka"
+
+#: Client/core/CSettings.cpp:1121
+msgid "Min"
+msgstr "Minimalno"
+
+#: Client/core/CSettings.cpp:1134
+msgid "Max"
+msgstr "Maksimalno"
+
+#. Windows 8 compatibility
+#: Client/core/CSettings.cpp:1141
+msgid "Windows 8 compatibility:"
+msgstr "Windows 8 kompatibilnost:"
+
+#: Client/core/CSettings.cpp:1145
+msgid "16-bit color"
+msgstr "16-bitna boja"
+
+#: Client/core/CSettings.cpp:1150
+msgid "Mouse fix"
+msgstr "Miš fix"
+
+#. Cache path info
+#: Client/core/CSettings.cpp:1168
+msgid "Client resource files:"
+msgstr "Klijentske datoteke resursa:"
+
+#: Client/core/CSettings.cpp:1172
+msgid "Show in Explorer"
+msgstr "Pokaži u pretraživaču"
+
+#. Auto updater section label
+#: Client/core/CSettings.cpp:1187 Client/core/CSettings.cpp:1190
+msgid "Auto updater"
+msgstr "Automatsko ažuriranje"
+
+#. Check for updates
+#: Client/core/CSettings.cpp:1228
+msgid "Check for update now"
+msgstr "Provjeri za nadogradnju"
+
+#: Client/core/CSettings.cpp:1382
+msgid "Some settings will be changed when you next start MTA"
+msgstr "Neke postavke će se promijeniti kada ponovno upalite MTA"
+
+#: Client/core/CSettings.cpp:1383
+msgid "\n\n"
+"Do you want to restart now?"
+msgstr "\n\n"
+"Želite li ponovno pokrenuti sada?"
+
+#: Client/core/CSettings.cpp:1386
+msgid "RESTART REQUIRED"
+msgstr "PONOVNO POKRETANJE POTREBNO"
+
+#: Client/core/CSettings.cpp:1388 Client/core/CSettings.cpp:1412
+#: Client/core/CSettings.cpp:4488 Client/core/CSettings.cpp:4562
+#: Client/core/CSettings.cpp:4592 Client/core/CSettings.cpp:4641
+#: Client/core/CQuestionBox.cpp:194 Client/core/CMainMenu.cpp:1199
+#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
+#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
+#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:132
+msgid "No"
+msgstr "Ne"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/core/CSettings.cpp:1389 Client/core/CSettings.cpp:1413
+#: Client/core/CSettings.cpp:4489 Client/core/CSettings.cpp:4563
+#: Client/core/CSettings.cpp:4593 Client/core/CSettings.cpp:4642
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1200
+#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
+#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
+#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
+#: Client/gui/CGUIMessageBox_Impl.cpp:72
+msgid "Yes"
+msgstr "Da"
+
+#: Client/core/CSettings.cpp:1406
+msgid "Some settings will be changed when you disconnect the current server"
+msgstr "Neke postavke će se promijeniti kada se odspojite s trenutnog servera"
+
+#: Client/core/CSettings.cpp:1407
+msgid "\n\n"
+"Do you want to disconnect now?"
+msgstr "\n\n"
+"Želite li se odspojiti sada?"
+
+#: Client/core/CSettings.cpp:1410
+msgid "DISCONNECT REQUIRED"
+msgstr "ODSPAJANJE POTREBNO"
+
+#. Update the joystick name
+#: Client/core/CSettings.cpp:1737
+msgid "Joypad not detected  -  Check connections and restart game"
+msgstr "Joypad nije detektiran - Provjerite veze i ponovno pokrenite igru"
+
+#: Client/core/CSettings.cpp:1932
+msgid "Binding axis"
+msgstr "Povezna os"
+
+#: Client/core/CSettings.cpp:1932
+msgid "Move an axis to bind, or escape to clear"
+msgstr "Pomakni os za povezivanje, ili escape za brisanje"
+
+#: Client/core/CSettings.cpp:2009
+msgid "Language:"
+msgstr "Jezik:"
+
+#: Client/core/CSettings.cpp:2009
+msgid "Skin:"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2009
+msgid "Presets:"
+msgstr "Podešenja:"
+
+#: Client/core/CSettings.cpp:2058
+msgid "Chat"
+msgstr "Čavrljanje"
+
+#: Client/core/CSettings.cpp:2075
+msgid "Load"
+msgstr "Učitaj"
+
+#: Client/core/CSettings.cpp:2087
+msgid "Colors"
+msgstr "Boje"
+
+#: Client/core/CSettings.cpp:2088
+msgid "Layout"
+msgstr "Izgled"
+
+#: Client/core/CSettings.cpp:2089 Client/core/CSettings.cpp:2335
+msgid "Options"
+msgstr "Opcije"
+
+#: Client/core/CSettings.cpp:2095
+msgid "Chat Background"
+msgstr "Pozadina chat-a"
+
+#: Client/core/CSettings.cpp:2095
+msgid "Chat Text"
+msgstr "Tekst Čavrljanja"
+
+#: Client/core/CSettings.cpp:2095
+msgid "Input Background"
+msgstr "Pozadina unosa"
+
+#: Client/core/CSettings.cpp:2095
+msgid "Input Text"
+msgstr "Ulazni Tekst"
+
+#: Client/core/CSettings.cpp:2118
+msgid "Lines:"
+msgstr "Linije:"
+
+#: Client/core/CSettings.cpp:2118
+msgid "Scale:"
+msgstr "Skaliranje:"
+
+#: Client/core/CSettings.cpp:2118
+msgid "Width:"
+msgstr "Širina:"
+
+#: Client/core/CSettings.cpp:2121
+msgid "Size"
+msgstr "Veličina"
+
+#: Client/core/CSettings.cpp:2170
+msgid "after"
+msgstr "poslije"
+
+#: Client/core/CSettings.cpp:2170
+msgid "for"
+msgstr "za"
+
+#: Client/core/CSettings.cpp:2170
+msgid "sec"
+msgstr "sek"
+
+#: Client/core/CSettings.cpp:2173
+msgid "Fading"
+msgstr "Blijeđenje"
+
+#: Client/core/CSettings.cpp:2179
+msgid "Fade out old lines"
+msgstr "Postepeno blijedi stari tekst"
+
+#: Client/core/CSettings.cpp:2219
+msgid "Horizontal:"
+msgstr "Horizontalno:"
+
+#: Client/core/CSettings.cpp:2219
+msgid "Vertical:"
+msgstr "Vertikalno:"
+
+#: Client/core/CSettings.cpp:2219
+msgid "Text-Align:"
+msgstr "Poravnanje teksta:"
+
+#: Client/core/CSettings.cpp:2219
+msgid "X-Offset:"
+msgstr "X-pomak:"
+
+#: Client/core/CSettings.cpp:2220
+msgid "Y-Offset:"
+msgstr "Y-Pomak:"
+
+#: Client/core/CSettings.cpp:2226
+msgid "Position"
+msgstr "Položaj"
+
+#: Client/core/CSettings.cpp:2240 Client/core/CSettings.cpp:2268
+#: Client/core/CKeyBinds.cpp:191
+msgid "Left"
+msgstr "Lijevo"
+
+#: Client/core/CSettings.cpp:2241 Client/core/CSettings.cpp:2255
+msgid "Center"
+msgstr "Centar"
+
+#: Client/core/CSettings.cpp:2242 Client/core/CSettings.cpp:2269
+#: Client/core/CKeyBinds.cpp:192
+msgid "Right"
+msgstr "Desno"
+
+#: Client/core/CSettings.cpp:2254
+msgid "Top"
+msgstr "Vrh"
+
+#: Client/core/CSettings.cpp:2256
+msgid "Bottom"
+msgstr "Dno"
+
+#: Client/core/CSettings.cpp:2304
+msgid "Font"
+msgstr ""
+
+#: Client/core/CSettings.cpp:2341
+msgid "Hide background when not typing"
+msgstr "Sakrij pozadinu kada se ne tipka"
+
+#: Client/core/CSettings.cpp:2346
+msgid "Nickname completion using the \"Tab\" key"
+msgstr "Nadopunjavanje nadimaka koristeći \"Tab\" tipku"
+
+#: Client/core/CSettings.cpp:2351
+msgid "Allow server to flash the window"
+msgstr "Dopusti serveru treperenje prozora"
+
+#: Client/core/CSettings.cpp:2356
+msgid "Allow tray balloon notifications"
+msgstr "Dozvoli obavijesti alatne trake"
+
+#: Client/core/CSettings.cpp:2361
+msgid "Chat text black/white outline"
+msgstr "Crno/bijelo podebljanje teksta"
+
+#. Create a messagebox to notify the user
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. Create a messagebox to notify the user
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#: Client/core/CSettings.cpp:2610 Client/core/CSettings.cpp:2617
+msgid "Press a key to bind, or escape to clear"
+msgstr "Pritisni tipku za povezivanje, ili escape za brisanje"
+
+#: Client/core/CSettings.cpp:2611
+msgid "Binding a primary key"
+msgstr "Povezivanje primarne tipke"
+
+#: Client/core/CSettings.cpp:2618
+msgid "Binding a secondary key"
+msgstr "Povezivanje sekundarne tipke"
+
+#: Client/core/CSettings.cpp:2694
+msgid "GTA GAME CONTROLS"
+msgstr "GTA KONTROLE"
+
+#: Client/core/CSettings.cpp:2696
+msgid "MULTIPLAYER CONTROLS"
+msgstr "MULTIPLAYER KONTROLE"
+
+#: Client/core/CSettings.cpp:2941 Client/core/CSettings.cpp:4764
+msgid "Your nickname contains invalid characters!"
+msgstr "Vaš nadimak sadrži neispravne znakove!"
+
+#: Client/core/CSettings.cpp:3778
+msgid "Red:"
+msgstr "Crveno:"
+
+#: Client/core/CSettings.cpp:3778
+msgid "Green:"
+msgstr "Zeleno:"
+
+#: Client/core/CSettings.cpp:3778
+msgid "Blue:"
+msgstr "Plava:"
+
+#: Client/core/CSettings.cpp:3778
+msgid "Transparency:"
+msgstr "Prozirnost:"
+
+#: Client/core/CSettings.cpp:3781
+msgid "Color"
+msgstr "Boja"
+
+#: Client/core/CSettings.cpp:3858
+msgid "Preview"
+msgstr "Pregled"
+
+#: Client/core/CSettings.cpp:4166
+msgid "Please disconnect before changing language"
+msgstr "Molimo odspojite se prije mijenjanja jezika"
+
+#: Client/core/CSettings.cpp:4194
+msgid "Please disconnect before changing skin"
+msgstr "Molimo odspojite se prije mijenjanja skin-a"
+
+#: Client/core/CSettings.cpp:4482
+msgid "Volmetric shadows can cause some systems to slow down.\n\n"
+"Are you sure you want to enable them?"
+msgstr "Volumetrične sjene mogu uzrokovati usporavanje nekih sistema.\n\n"
+"Jeste li sigurni da ih želite omogućiti?"
+
+#: Client/core/CSettings.cpp:4486
+msgid "PERFORMANCE WARNING"
+msgstr "UPOZORENJE ZA PERFORMANSE"
+
+#: Client/core/CSettings.cpp:4506
+msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
+"(The chat box and GUI is excluded from the upload)\n"
+msgstr "Upload zaslona je potreban za neke poslužitelje zbog anti-cheat razloga.\n\n"
+"(Chat i grafičko sučelje nisu uključeni u upload)\n"
+
+#: Client/core/CSettings.cpp:4508
+msgid "SCREEN UPLOAD INFORMATION"
+msgstr "INFORMACIJA UPLOAD-a ZASLONA"
+
+#: Client/core/CSettings.cpp:4523
+msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
+"Disabling this setting may decrease network\n"
+"bandwidth consumption.\n"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4526
+msgid "EXTERNAL SOUNDS"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4555
+msgid "It seems that you have the Rich Presence connection option enabled.\n"
+"Do you want to allow servers to share their data?\n\n"
+"This includes yours unique ID identifier."
+msgstr ""
+
+#: Client/core/CSettings.cpp:4560
+msgid "CONSENT TO ALLOW DATA SHARING"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4584
+msgid "Some files in your GTA:SA data directory are customized.\n"
+"MTA will only use these modified files if this check box is ticked.\n\n"
+"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
+"Are you sure you want to use them?"
+msgstr "Neki fajlovi u vašem GTA:SA direktoriju podataka su promijenjeni.\n"
+"MTA će samo koristiti te promijenjene fajlove ako je ovaj potvrdni okvir označen.\n\n"
+"Međutim, PROMIJENJENI GTA:SA FAJLOVI SU BLOKIRANI OD VEĆINE SERVERA\n\n"
+"Jeste li sigurni da ih želite koristiti?"
+
+#: Client/core/CSettings.cpp:4590 Client/core/CVersionUpdater.cpp:2081
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "PROMIJENJENE GTA:SA DATOTEKE"
+
+#: Client/core/CSettings.cpp:4633
+msgid "Enabling DPI awareness is an experimental feature and\n"
+"we only recommend it when you play MTA:SA on a scaled monitor.\n"
+"You may experience graphical issues if you enable this option.\n\n"
+"Are you sure you want to enable this option?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4639
+msgid "EXPERIMENTAL FEATURE"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4782
+msgid "Please enter a nickname"
+msgstr "Molimo unesite nadimak"
+
+#: Client/core/CSettings.cpp:4783
+msgid "Please enter a nickname to be used ingame.  \n"
+"This will be your name when you connect to and play in a server"
+msgstr "Molimo unesite nadimak koji će biti korišten u igri. \n"
+"Ovo će biti vaše ime kada se povežete i igrate na poslužitelju"
+
+#: Client/core/CSettings.cpp:4801
+msgid "Very experimental feature."
+msgstr "Vrlo eksperimentalna značajka."
+
+#: Client/core/CSettings.cpp:4803
+msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
+msgstr "Zaustavlja staje s CJ-ovim varijacijama (Koristi 65MB više RAMA)"
+
+#: Client/core/CSettings.cpp:4805
+msgid "Older routers may require a slower scan speed."
+msgstr "Stariji routeri mogu zahtijevati sporiju brzinu skeniranja."
+
+#: Client/core/CSettings.cpp:4807
+msgid "Switch on to use only one connection when downloading."
+msgstr "Uključi da koristiš samo jednu vezu pri skidanju."
+
+#: Client/core/CSettings.cpp:4809
+msgid "Tag network packets to help ISPs identify MTA traffic."
+msgstr "Označi mrežne pakete da biste pomogli pružatelju internet usluge pri identifikaciji MTA prometa."
+
+#: Client/core/CSettings.cpp:4811
+msgid "Spinning circle animation at the bottom of the screen"
+msgstr "Kružna animacija pri dnu zaslona"
+
+#: Client/core/CSettings.cpp:4813
+msgid "Select default always. (This setting is not saved)"
+msgstr "Odaberi zadano uvijek. (Ova postavka nije snimljena)"
+
+#: Client/core/CSettings.cpp:4815
+msgid "Maximum is usually best"
+msgstr "Maksimum je obično najbolji"
+
+#: Client/core/CSettings.cpp:4817 Client/core/CSettings.cpp:4819
+msgid "Auto updater:"
+msgstr "Automatska provjera ažuriranja:"
+
+#: Client/core/CSettings.cpp:4817
+msgid "Select default unless you like filling out bug reports."
+msgstr "Izaberi zadano osim ako voliš popunjavati velike izvještaje bugova."
+
+#: Client/core/CSettings.cpp:4819
+msgid "Select default to automatically install important updates."
+msgstr "Odaberite zadano da biste automatski instalirali važna ažuriranja."
+
+#: Client/core/CSettings.cpp:4821
+msgid "16-bit color:"
+msgstr "16-bitna boja"
+
+#: Client/core/CSettings.cpp:4821
+msgid "Enable 16 bit color modes - Requires MTA restart"
+msgstr "Omogući 16-bitne načine boja - Zahtijeva ponovno pokretanje MTA"
+
+#: Client/core/CSettings.cpp:4823
+msgid "Mouse fix:"
+msgstr "Miš fix:"
+
+#: Client/core/CSettings.cpp:4823
+msgid "Mouse movement fix - May need PC restart"
+msgstr "Popravak pomicanja miša - Može zahtijevati ponovno pokretanje računala"
+
+#: Client/core/CCore.cpp:811 Client/loader/CInstallManager.cpp:1057
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA ne može nastaviti jer disk %s nema dovoljno prostora."
+
+#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:129
+msgid "Fatal error"
+msgstr "Ozbiljna greška"
+
+#: Client/core/CCore.cpp:938
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "ZA POPRAVAK, UKLONITE OVU DATOTEKU:"
+
+#: Client/core/CCore.cpp:970
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "Modul %s je neispravan!"
+
+#: Client/core/CCore.cpp:1275
+msgid "Error executing URL"
+msgstr "Pogreška tijekom izvršavanja URL-a"
+
+#: Client/core/CCore.cpp:1287
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Pogreška tijekom rada modifikacije navedene u naredbenom retku ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1389
+msgid "this help screen"
+msgstr "ovaj pomoćni zaslon"
+
+#: Client/core/CCore.cpp:1390 Client/core/CCore.cpp:1391
+msgid "exits the application"
+msgstr "izlazi iz aplikacije"
+
+#: Client/core/CCore.cpp:1392
+msgid "shows the version"
+msgstr "pokazuje verziju"
+
+#: Client/core/CCore.cpp:1393
+msgid "shows the time"
+msgstr "prikazuje vrijeme"
+
+#: Client/core/CCore.cpp:1394
+msgid "shows the hud"
+msgstr "prikazuje hud"
+
+#: Client/core/CCore.cpp:1395
+msgid "shows all the binds"
+msgstr "prikazuje sve kontrole"
+
+#: Client/core/CCore.cpp:1396
+msgid "shows your serial"
+msgstr "prikazuje tvoj serijski broj"
+
+#: Client/core/CCore.cpp:1405
+msgid "connects to a server (host port nick pass)"
+msgstr "spaja se na server (poslužitelj port nadimak lozinka)"
+
+#: Client/core/CCore.cpp:1406
+msgid "connects to a previous server"
+msgstr "spaja se na prethodni server"
+
+#: Client/core/CCore.cpp:1407
+msgid "binds a key (key control)"
+msgstr "veže tipku (tipka kontrole)"
+
+#: Client/core/CCore.cpp:1408
+msgid "unbinds a key (key)"
+msgstr "odvezuje tipku (tipka)"
+
+#: Client/core/CCore.cpp:1409
+msgid "copies the default gta controls"
+msgstr "kopira zadane GTA kontrole"
+
+#: Client/core/CCore.cpp:1410
+msgid "outputs a screenshot"
+msgstr "izbacuje fotografiju"
+
+#: Client/core/CCore.cpp:1411
+msgid "immediately saves the config"
+msgstr "odmah sprema konfiguraciju"
+
+#: Client/core/CCore.cpp:1413
+msgid "clears the debug view"
+msgstr "čisti debug pregled"
+
+#: Client/core/CCore.cpp:1414
+msgid "scrolls the chatbox upwards"
+msgstr "pomiče čavrljanje nagore"
+
+#: Client/core/CCore.cpp:1415
+msgid "scrolls the chatbox downwards"
+msgstr "pomiče čavrljanje nadolje"
+
+#: Client/core/CCore.cpp:1416
+msgid "scrolls the debug view upwards"
+msgstr "pomiče debug nagore"
+
+#: Client/core/CCore.cpp:1417
+msgid "scrolls the debug view downwards"
+msgstr "pomiče debug nadolje"
+
+#: Client/core/CCore.cpp:1420
+msgid "shows the memory statistics"
+msgstr "prikazuje statistike memorije"
+
+#: Client/core/CCore.cpp:1421
+msgid "shows the frame timing graph"
+msgstr "prikazuje okvir vremenskog grafa"
+
+#: Client/core/CCore.cpp:1425
+msgid "for developers: reload news"
+msgstr ""
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Povezivanje neuspjelo. Nevažeći nadimak unesen!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Povezivanje neuspjelo. Nevažeći poslužitelj unesen!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Povezivanje na %s sa portom %u je neuspjelo!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Povezivanje na %s:%u ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Takva modifikacija nije instalirana (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Pogrešan odgovor poslužitelja (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Pogrešan odgovor poslužitelja (1)"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -116,16 +1954,6 @@ msgstr "Naprijed"
 #: Client/core/CKeyBinds.cpp:190
 msgid "Backwards"
 msgstr "Unatrag"
-
-#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2228
-#: Client/core/CSettings.cpp:2256
-msgid "Left"
-msgstr "Lijevo"
-
-#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2230
-#: Client/core/CSettings.cpp:2257
-msgid "Right"
-msgstr "Desno"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
@@ -279,148 +2107,10 @@ msgstr "Grupna kontrola naprijed"
 msgid "Group control backwards"
 msgstr "Grupna kontrola nazad"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Povezivanje neuspjelo. Nevažeći nadimak unesen!"
-
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4148
-#: Client/core/CSettings.cpp:4176 Client/core/CSettings.cpp:4746
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1275
-#: Client/core/CCore.cpp:1288 Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:635
-#: Client/mods/deathmatch/logic/CClientGame.cpp:709
-#: Client/mods/deathmatch/logic/CClientGame.cpp:733
-#: Client/mods/deathmatch/logic/CClientGame.cpp:755
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1171
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1330
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1367
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1416
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1428
-#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
-#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "Pogreška"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Povezivanje neuspjelo. Nevažeći poslužitelj unesen!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Povezivanje na %s sa portom %u je neuspjelo!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Povezivanje na %s:%u ..."
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:651
-msgid "CONNECTING"
-msgstr "POVEZIVANJE"
-
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1330
-msgid "Connection timed out"
-msgstr "Veza je istekla"
-
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
-msgid "Disconnected: unknown protocol error"
-msgstr "Odspojeni: nepoznata greška protokola"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1382
-msgid "Disconnected: disconnected remotely"
-msgstr "Odspojeni: odspojeni ste daljinski"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1386
-msgid "Disconnected: connection lost remotely"
-msgstr "Odspojeni: veza izgubljena daljinski"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1390
-msgid "Disconnected: you are banned from this server"
-msgstr "Odspojeni: trajno ste izbačeni sa ovog servera"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
-msgid "Disconnected: disconnected from the server"
-msgstr "Odspojeni: odspojeni sa servera"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1402
-msgid "Disconnected: connection to the server was lost"
-msgstr "Odspojeni: veza sa serverom se izgubila"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1410
-msgid "Disconnected: connection was refused"
-msgstr "Odspojeni: veza je odbijena"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Takva modifikacija nije instalirana (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Pogrešan odgovor poslužitelja (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Pogrešan odgovor poslužitelja (1)"
-
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "Programiranje"
-
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "Doprinositelji"
-
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "Dizajn igre / Skriptanje"
-
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "Lokalizacija jezika"
-
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "Doprinositelji zakrpa"
-
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "Posebne zahvale"
-
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr ""
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Model kojeg ste izabrali nije se mogao učitati, te se također zadani model nije mogao učitati, molimo ponovno instalirajte MTA."
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
@@ -431,1049 +2121,6 @@ msgstr ""
 #: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
 msgid "Visit latest news article"
 msgstr ""
-
-#: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
-#: Client/core/CCore.cpp:674 Client/mods/deathmatch/logic/CClientGame.cpp:527
-msgid "Main menu"
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:333
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Upotrebljavate gradilište značajki! Ovo je samo test koji se ne može koristiti za povezivanje s javnim poslužiteljima!"
-
-#: Client/core/CMainMenu.cpp:352
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA prestaje sa ažuriranjima na XP/Vista nakon srpnja 2019-e godine.\n\n"
-"Ako želite igrati na najnovijim serverima nadogradite Windows."
-
-#: Client/core/CMainMenu.cpp:1193
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Odspojit će te se sa trenutnog servera.\n\n"
-"Jeste li sigurni da se želite odspojiti?"
-
-#: Client/core/CMainMenu.cpp:1197
-msgid "DISCONNECT WARNING"
-msgstr "ODSPAJANJE UPOZORENJE"
-
-#: Client/core/CMainMenu.cpp:1199 Client/core/CSettings.cpp:1376
-#: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4470
-#: Client/core/CSettings.cpp:4544 Client/core/CSettings.cpp:4574
-#: Client/core/CSettings.cpp:4623 Client/core/CQuestionBox.cpp:194
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:132
-msgid "No"
-msgstr "Ne"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONZOLA"
-
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Os ubrzanja"
-
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Os kočnice"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Nepoznata naredba ili klijentska varijabla: "
-
-#. Create window (with frame) if it will fit inside the screen resolution
-#: Client/core/CSettings.cpp:84
-msgid "SETTINGS"
-msgstr "POSTAVKE"
-
-#: Client/core/CSettings.cpp:116
-msgid "Multiplayer"
-msgstr ""
-
-#: Client/core/CSettings.cpp:117
-msgid "Video"
-msgstr "Slika"
-
-#: Client/core/CSettings.cpp:118
-msgid "Audio"
-msgstr "Zvuk"
-
-#: Client/core/CSettings.cpp:119
-msgid "Binds"
-msgstr "Povezane kontrole"
-
-#: Client/core/CSettings.cpp:120
-msgid "Controls"
-msgstr "Kontrole"
-
-#: Client/core/CSettings.cpp:121
-msgid "Interface"
-msgstr "Sučelje"
-
-#: Client/core/CSettings.cpp:122
-msgid "Web Browser"
-msgstr "Internet preglednik"
-
-#: Client/core/CSettings.cpp:123
-msgid "Advanced"
-msgstr "Napredno"
-
-#: Client/core/CSettings.cpp:147 Client/core/CSettings.cpp:338
-#: Client/core/CSettings.cpp:605 Client/core/CSettings.cpp:877
-msgid "Load defaults"
-msgstr "Učitaj zadano"
-
-#. *
-#. *  Controls tab
-#. *
-#: Client/core/CSettings.cpp:157 Client/core/CSettings.cpp:181
-msgid "Mouse sensitivity:"
-msgstr "Osjetljivost miša:"
-
-#. VerticalAimSensitivity
-#: Client/core/CSettings.cpp:157 Client/core/CSettings.cpp:199
-msgid "Vertical aim sensitivity:"
-msgstr "Osjetljivost vertikalnog ciljnika:"
-
-#. Mouse Options
-#: Client/core/CSettings.cpp:160
-msgid "Mouse options"
-msgstr "Postavke miša"
-
-#: Client/core/CSettings.cpp:167
-msgid "Invert mouse vertically"
-msgstr "Vertikalno okreni miš"
-
-#: Client/core/CSettings.cpp:171
-msgid "Steer with mouse"
-msgstr "Vozi mišem"
-
-#: Client/core/CSettings.cpp:175
-msgid "Fly with mouse"
-msgstr "Leti mišem"
-
-#. Joypad options
-#: Client/core/CSettings.cpp:217
-msgid "Joypad options"
-msgstr "Joypad postavke"
-
-#: Client/core/CSettings.cpp:230
-msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Standardne kontrole (Miš + Tipkovnica)"
-
-#: Client/core/CSettings.cpp:237
-msgid "Classic controls (Joypad)"
-msgstr "Klasične kontrole (Joypad)"
-
-#: Client/core/CSettings.cpp:274
-msgid "Dead Zone"
-msgstr "Mrtva Zona"
-
-#: Client/core/CSettings.cpp:279
-msgid "Saturation"
-msgstr "Zasićenje"
-
-#: Client/core/CSettings.cpp:285
-msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Koristite 'Povezane kontrole' za joypad tipke."
-
-#: Client/core/CSettings.cpp:324
-msgid "Left Stick"
-msgstr "Lijeva palica"
-
-#: Client/core/CSettings.cpp:330
-msgid "Right Stick"
-msgstr "Desna palica"
-
-#: Client/core/CSettings.cpp:345
-msgid "DESCRIPTION"
-msgstr "OPIS"
-
-#: Client/core/CSettings.cpp:346
-msgid "KEY"
-msgstr "TIPKA"
-
-#: Client/core/CSettings.cpp:348
-msgid "ALT. KEY"
-msgstr "ALT. TIPKA"
-
-#. *
-#. *    Multiplayer tab
-#. *
-#: Client/core/CSettings.cpp:353 Client/core/CSettings.cpp:356
-msgid "Nick:"
-msgstr "Nadimak:"
-
-#: Client/core/CSettings.cpp:366
-msgid "Save server passwords"
-msgstr "Spremi lozinke servera"
-
-#: Client/core/CSettings.cpp:371
-msgid "Auto-refresh server browser"
-msgstr "Automatski-osvježi pretraživač"
-
-#: Client/core/CSettings.cpp:376
-msgid "Allow screen upload"
-msgstr "Dopusti upload zaslona"
-
-#: Client/core/CSettings.cpp:381
-msgid "Allow external sounds"
-msgstr ""
-
-#: Client/core/CSettings.cpp:386
-msgid "Always show download window"
-msgstr ""
-
-#: Client/core/CSettings.cpp:391
-msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
-
-#: Client/core/CSettings.cpp:396
-msgid "Use customized GTA:SA files"
-msgstr "Koristi prilagođene GTA:SA datoteke"
-
-#: Client/core/CSettings.cpp:401
-msgid "Map rendering options"
-msgstr "Postavke učitavanja mape"
-
-#: Client/core/CSettings.cpp:407 Client/core/CSettings.cpp:616
-msgid "Opacity:"
-msgstr "Neprozirnost:"
-
-#. *
-#. *  Audio tab
-#. *
-#: Client/core/CSettings.cpp:427 Client/core/CSettings.cpp:436
-msgid "Master volume:"
-msgstr "Glavna glasnoća:"
-
-#: Client/core/CSettings.cpp:427 Client/core/CSettings.cpp:455
-msgid "Radio volume:"
-msgstr "Jačina zvuka radija:"
-
-#: Client/core/CSettings.cpp:427 Client/core/CSettings.cpp:474
-msgid "SFX volume:"
-msgstr "Jačina zvuka efekata:"
-
-#: Client/core/CSettings.cpp:427 Client/core/CSettings.cpp:493
-msgid "MTA volume:"
-msgstr "Jačina zvuka igre:"
-
-#: Client/core/CSettings.cpp:428 Client/core/CSettings.cpp:512
-msgid "Voice volume:"
-msgstr "Jačina zvuka glasa:"
-
-#: Client/core/CSettings.cpp:428 Client/core/CSettings.cpp:553
-msgid "Play mode:"
-msgstr "Način igre:"
-
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/core/CSettings.cpp:430 Client/core/CSettings.cpp:618
-#: Client/core/CSettings.cpp:892 Client/core/CSettings.cpp:2006
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-msgid "General"
-msgstr "Općenito"
-
-#: Client/core/CSettings.cpp:531
-msgid "Radio options"
-msgstr "Radio mogućnosti"
-
-#: Client/core/CSettings.cpp:537
-msgid "Radio Equalizer"
-msgstr "Radijski ujednačivač"
-
-#: Client/core/CSettings.cpp:542
-msgid "Radio Auto-tune"
-msgstr "Samopodešavanje radija"
-
-#: Client/core/CSettings.cpp:547
-msgid "Usertrack options"
-msgstr "Postavke korisničkih zapisa"
-
-#: Client/core/CSettings.cpp:561 Client/core/CSettings.cpp:3069
-msgid "Radio"
-msgstr ""
-
-#: Client/core/CSettings.cpp:562 Client/core/CSettings.cpp:3071
-msgid "Random"
-msgstr "Nasumično"
-
-#: Client/core/CSettings.cpp:563 Client/core/CSettings.cpp:3073
-msgid "Sequential"
-msgstr "Sekvencionalni"
-
-#: Client/core/CSettings.cpp:566
-msgid "Automatic Media Scan"
-msgstr "Automatsko Skeniranje Medija"
-
-#: Client/core/CSettings.cpp:573
-msgid "Mute options"
-msgstr "Opcije utišavanja"
-
-#: Client/core/CSettings.cpp:579
-msgid "Mute All sounds when minimized"
-msgstr "Utišaj sve zvukove kada je minimizirano"
-
-#: Client/core/CSettings.cpp:584
-msgid "Mute Radio sounds when minimized"
-msgstr "Isključi zvukove radija kada je minimizirano"
-
-#: Client/core/CSettings.cpp:589
-msgid "Mute SFX sounds when minimized"
-msgstr "Isključi zvukove efekata kada je minimizirano"
-
-#: Client/core/CSettings.cpp:594
-msgid "Mute MTA sounds when minimized"
-msgstr "Isključi MTA zvukove kada je minimizirano"
-
-#: Client/core/CSettings.cpp:599
-msgid "Mute Voice sounds when minimized"
-msgstr "Isključi zvukove glasa kada je minimizirano"
-
-#. *
-#. *  Video tab
-#. *
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:624
-msgid "Resolution:"
-msgstr "Rezolucija:"
-
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:671
-msgid "FOV:"
-msgstr "Udaljenost slike:"
-
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:687
-msgid "Draw Distance:"
-msgstr "Udaljenost Slike:"
-
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:705
-msgid "Brightness:"
-msgstr "Svjetlina:"
-
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:723
-msgid "FX Quality:"
-msgstr "FX Kvaliteta:"
-
-#: Client/core/CSettings.cpp:616 Client/core/CSettings.cpp:737
-msgid "Anisotropic filtering:"
-msgstr "Anizotropno filtriranje:"
-
-#: Client/core/CSettings.cpp:616 Client/core/CSettings.cpp:764
-msgid "Anti-aliasing:"
-msgstr "Zaglađivanje rubova:"
-
-#: Client/core/CSettings.cpp:616 Client/core/CSettings.cpp:778
-msgid "Aspect Ratio:"
-msgstr "Omjer prikaza:"
-
-#: Client/core/CSettings.cpp:636
-msgid "Windowed"
-msgstr "U prozoru"
-
-#: Client/core/CSettings.cpp:642
-msgid "DPI aware"
-msgstr ""
-
-#: Client/core/CSettings.cpp:650 Client/core/CSettings.cpp:992
-#: Client/loader/MainFunctions.cpp:389
-msgid "Fullscreen mode:"
-msgstr "Preko punog zaslona:"
-
-#: Client/core/CSettings.cpp:657 Client/core/CSettings.cpp:1601
-msgid "Standard"
-msgstr "Standardno"
-
-#: Client/core/CSettings.cpp:658 Client/core/CSettings.cpp:1603
-#: Client/loader/MainFunctions.cpp:389
-msgid "Borderless window"
-msgstr "Prozor bez okvira"
-
-#: Client/core/CSettings.cpp:659 Client/core/CSettings.cpp:1605
-msgid "Borderless keep res"
-msgstr "Rezolucija bez rubova"
-
-#: Client/core/CSettings.cpp:663
-msgid "Mip Mapping"
-msgstr "Mip Mapiranje"
-
-#: Client/core/CSettings.cpp:731 Client/core/CSettings.cpp:1505
-msgid "Low"
-msgstr "Nisko"
-
-#: Client/core/CSettings.cpp:732 Client/core/CSettings.cpp:1507
-msgid "Medium"
-msgstr "Srednje"
-
-#: Client/core/CSettings.cpp:733 Client/core/CSettings.cpp:1074
-#: Client/core/CSettings.cpp:1509 Client/core/CSettings.cpp:3127
-msgid "High"
-msgstr "Visoko"
-
-#: Client/core/CSettings.cpp:734 Client/core/CSettings.cpp:1511
-msgid "Very high"
-msgstr "Vrlo visoko"
-
-#: Client/core/CSettings.cpp:749 Client/core/CSettings.cpp:772
-#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1059
-#: Client/core/CSettings.cpp:1189 Client/core/CSettings.cpp:1515
-#: Client/core/CSettings.cpp:3134 Client/core/CSettings.cpp:3166
-#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4216
-msgid "Off"
-msgstr "Isključeno"
-
-#: Client/core/CSettings.cpp:773 Client/core/CSettings.cpp:1517
-msgid "1x"
-msgstr ""
-
-#: Client/core/CSettings.cpp:774 Client/core/CSettings.cpp:1519
-msgid "2x"
-msgstr ""
-
-#: Client/core/CSettings.cpp:775 Client/core/CSettings.cpp:1521
-msgid "3x"
-msgstr ""
-
-#: Client/core/CSettings.cpp:788 Client/core/CSettings.cpp:1007
-#: Client/core/CSettings.cpp:1527 Client/core/CSettings.cpp:3136
-msgid "Auto"
-msgstr "Automatski"
-
-#: Client/core/CSettings.cpp:789 Client/core/CSettings.cpp:1529
-msgid "4:3"
-msgstr ""
-
-#: Client/core/CSettings.cpp:790 Client/core/CSettings.cpp:1531
-msgid "16:10"
-msgstr ""
-
-#: Client/core/CSettings.cpp:791 Client/core/CSettings.cpp:1533
-msgid "16:9"
-msgstr ""
-
-#: Client/core/CSettings.cpp:794
-msgid "HUD Match Aspect Ratio"
-msgstr "HUD rejting prilagodbe"
-
-#: Client/core/CSettings.cpp:800
-msgid "Volumetric Shadows"
-msgstr "Volumetrične sjene"
-
-#: Client/core/CSettings.cpp:804
-msgid "Grass effect"
-msgstr "Efekt trave"
-
-#: Client/core/CSettings.cpp:808
-msgid "Heat haze"
-msgstr "Toplinska magla"
-
-#: Client/core/CSettings.cpp:812
-msgid "Tyre Smoke etc"
-msgstr "Dim guma itd"
-
-#: Client/core/CSettings.cpp:816
-msgid "Dynamic ped shadows"
-msgstr ""
-
-#: Client/core/CSettings.cpp:820
-msgid "Motion blur"
-msgstr ""
-
-#: Client/core/CSettings.cpp:825
-msgid "Full Screen Minimize"
-msgstr "Minimiziraj Puni Zaslon"
-
-#: Client/core/CSettings.cpp:837
-msgid "Enable Device Selection Dialog"
-msgstr "Omogući prozor za odabir uređaja"
-
-#: Client/core/CSettings.cpp:849
-msgid "Show unsafe resolutions"
-msgstr "Pokaži nesigurne rezolucije"
-
-#: Client/core/CSettings.cpp:861
-msgid "Render vehicles always in high detail"
-msgstr "Prikazuj vozila uvijek s visokim detaljima"
-
-#: Client/core/CSettings.cpp:865
-msgid "Render peds always in high detail"
-msgstr ""
-
-#: Client/core/CSettings.cpp:869
-msgid "Corona rain reflections"
-msgstr ""
-
-#: Client/core/CSettings.cpp:898
-msgid "Enable remote websites"
-msgstr "Omogući udaljene web stranice"
-
-#: Client/core/CSettings.cpp:903
-msgid "Enable Javascript on remote websites"
-msgstr "Omogući Javascript na udaljenim web stranicama"
-
-#: Client/core/CSettings.cpp:908
-msgid "Custom blacklist"
-msgstr "Blokirano po izboru"
-
-#: Client/core/CSettings.cpp:919 Client/core/CSettings.cpp:954
-msgid "Enter a domain e.g. google.com"
-msgstr "Unesi domenu npr. google.com"
-
-#: Client/core/CSettings.cpp:927
-msgid "Block"
-msgstr "Blokiraj"
-
-#: Client/core/CSettings.cpp:935 Client/core/CSettings.cpp:970
-msgid "Domain"
-msgstr "Domena"
-
-#: Client/core/CSettings.cpp:937 Client/core/CSettings.cpp:972
-msgid "Remove domain"
-msgstr "Ukloni domenu"
-
-#. Reset vecTemp
-#: Client/core/CSettings.cpp:943
-msgid "Custom whitelist"
-msgstr "Dopušteno po izboru"
-
-#. Misc section label
-#: Client/core/CSettings.cpp:985
-msgid "Misc"
-msgstr "Razno"
-
-#. Fast clothes loading
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:998
-#: Client/core/CSettings.cpp:4785
-msgid "Fast CJ clothes loading:"
-msgstr "Brzo učitavanje CJ-eve odjeće:"
-
-#. Browser scan speed
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1012
-#: Client/core/CSettings.cpp:4787
-msgid "Browser speed:"
-msgstr "Brzina pretraživača:"
-
-#. Single download
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1026
-#: Client/core/CSettings.cpp:4789
-msgid "Single connection:"
-msgstr "Jednostavna veza:"
-
-#. Packet tag
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1039
-#: Client/core/CSettings.cpp:4791
-msgid "Packet tag:"
-msgstr "Oznaka paketa:"
-
-#. Progress animation
-#: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1052
-#: Client/core/CSettings.cpp:4793
-msgid "Progress animation:"
-msgstr "Napredak animacije:"
-
-#. Process priority
-#: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1065
-#: Client/core/CSettings.cpp:4783
-msgid "Process priority:"
-msgstr "Prioritet procesa:"
-
-#. Debug setting
-#: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1079
-#: Client/core/CSettings.cpp:4795
-msgid "Debug setting:"
-msgstr "Debug postavka:"
-
-#. Streaming memory
-#: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1102
-#: Client/core/CSettings.cpp:4797
-msgid "Streaming memory:"
-msgstr "Memorija strujanja:"
-
-#. Update build type
-#: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1203
-msgid "Update build type:"
-msgstr "Tip ažuriranja:"
-
-#. UpdateAutoInstall
-#: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1182
-msgid "Install important updates:"
-msgstr "Instaliraj važna ažuriranja:"
-
-#: Client/core/CSettings.cpp:1006 Client/core/CSettings.cpp:1034
-#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:3138
-#: Client/core/CSettings.cpp:3154 Client/core/CSettings.cpp:3161
-msgid "On"
-msgstr "Uključeno"
-
-#: Client/core/CSettings.cpp:1019 Client/core/CSettings.cpp:3143
-msgid "Very slow"
-msgstr "Vrlo sporo"
-
-#: Client/core/CSettings.cpp:1020 Client/core/CSettings.cpp:1033
-#: Client/core/CSettings.cpp:1046 Client/core/CSettings.cpp:1060
-#: Client/core/CSettings.cpp:1086 Client/core/CSettings.cpp:1098
-#: Client/core/CSettings.cpp:1190 Client/core/CSettings.cpp:1210
-#: Client/core/CSettings.cpp:3145 Client/core/CSettings.cpp:3152
-#: Client/core/CSettings.cpp:3159 Client/core/CSettings.cpp:3168
-#: Client/core/CSettings.cpp:3181
-msgid "Default"
-msgstr "Uobičajeno"
-
-#: Client/core/CSettings.cpp:1021 Client/core/CSettings.cpp:3147
-msgid "Fast"
-msgstr "Brzo"
-
-#: Client/core/CSettings.cpp:1072 Client/core/CSettings.cpp:3123
-msgid "Normal"
-msgstr "Normalno"
-
-#: Client/core/CSettings.cpp:1073 Client/core/CSettings.cpp:3125
-msgid "Above normal"
-msgstr "Iznad prosjeka"
-
-#: Client/core/CSettings.cpp:1109
-msgid "Min"
-msgstr "Minimalno"
-
-#: Client/core/CSettings.cpp:1122
-msgid "Max"
-msgstr "Maksimalno"
-
-#. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1129
-msgid "Windows 8 compatibility:"
-msgstr "Windows 8 kompatibilnost:"
-
-#: Client/core/CSettings.cpp:1133
-msgid "16-bit color"
-msgstr "16-bitna boja"
-
-#: Client/core/CSettings.cpp:1138
-msgid "Mouse fix"
-msgstr "Miš fix"
-
-#. Cache path info
-#: Client/core/CSettings.cpp:1156
-msgid "Client resource files:"
-msgstr "Klijentske datoteke resursa:"
-
-#: Client/core/CSettings.cpp:1160
-msgid "Show in Explorer"
-msgstr "Pokaži u pretraživaču"
-
-#. Auto updater section label
-#: Client/core/CSettings.cpp:1175 Client/core/CSettings.cpp:1178
-msgid "Auto updater"
-msgstr "Automatsko ažuriranje"
-
-#. Check for updates
-#: Client/core/CSettings.cpp:1216
-msgid "Check for update now"
-msgstr "Provjeri za nadogradnju"
-
-#: Client/core/CSettings.cpp:1370
-msgid "Some settings will be changed when you next start MTA"
-msgstr "Neke postavke će se promijeniti kada ponovno upalite MTA"
-
-#: Client/core/CSettings.cpp:1371
-msgid "\n\n"
-"Do you want to restart now?"
-msgstr "\n\n"
-"Želite li ponovno pokrenuti sada?"
-
-#: Client/core/CSettings.cpp:1374
-msgid "RESTART REQUIRED"
-msgstr "PONOVNO POKRETANJE POTREBNO"
-
-#: Client/core/CSettings.cpp:1394
-msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Neke postavke će se promijeniti kada se odspojite s trenutnog servera"
-
-#: Client/core/CSettings.cpp:1395
-msgid "\n\n"
-"Do you want to disconnect now?"
-msgstr "\n\n"
-"Želite li se odspojiti sada?"
-
-#: Client/core/CSettings.cpp:1398
-msgid "DISCONNECT REQUIRED"
-msgstr "ODSPAJANJE POTREBNO"
-
-#. Update the joystick name
-#: Client/core/CSettings.cpp:1725
-msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Joypad nije detektiran - Provjerite veze i ponovno pokrenite igru"
-
-#: Client/core/CSettings.cpp:1920
-msgid "Binding axis"
-msgstr "Povezna os"
-
-#: Client/core/CSettings.cpp:1920
-msgid "Move an axis to bind, or escape to clear"
-msgstr "Pomakni os za povezivanje, ili escape za brisanje"
-
-#: Client/core/CSettings.cpp:1997
-msgid "Language:"
-msgstr "Jezik:"
-
-#: Client/core/CSettings.cpp:1997
-msgid "Skin:"
-msgstr ""
-
-#: Client/core/CSettings.cpp:1997
-msgid "Presets:"
-msgstr "Podešenja:"
-
-#: Client/core/CSettings.cpp:2046
-msgid "Chat"
-msgstr "Čavrljanje"
-
-#: Client/core/CSettings.cpp:2063
-msgid "Load"
-msgstr "Učitaj"
-
-#: Client/core/CSettings.cpp:2075
-msgid "Colors"
-msgstr "Boje"
-
-#: Client/core/CSettings.cpp:2076
-msgid "Layout"
-msgstr "Izgled"
-
-#: Client/core/CSettings.cpp:2077 Client/core/CSettings.cpp:2323
-msgid "Options"
-msgstr "Opcije"
-
-#: Client/core/CSettings.cpp:2083
-msgid "Chat Background"
-msgstr "Pozadina chat-a"
-
-#: Client/core/CSettings.cpp:2083
-msgid "Chat Text"
-msgstr "Tekst Čavrljanja"
-
-#: Client/core/CSettings.cpp:2083
-msgid "Input Background"
-msgstr "Pozadina unosa"
-
-#: Client/core/CSettings.cpp:2083
-msgid "Input Text"
-msgstr "Ulazni Tekst"
-
-#: Client/core/CSettings.cpp:2106
-msgid "Lines:"
-msgstr "Linije:"
-
-#: Client/core/CSettings.cpp:2106
-msgid "Scale:"
-msgstr "Skaliranje:"
-
-#: Client/core/CSettings.cpp:2106
-msgid "Width:"
-msgstr "Širina:"
-
-#: Client/core/CSettings.cpp:2109
-msgid "Size"
-msgstr "Veličina"
-
-#: Client/core/CSettings.cpp:2158
-msgid "after"
-msgstr "poslije"
-
-#: Client/core/CSettings.cpp:2158
-msgid "for"
-msgstr "za"
-
-#: Client/core/CSettings.cpp:2158
-msgid "sec"
-msgstr "sek"
-
-#: Client/core/CSettings.cpp:2161
-msgid "Fading"
-msgstr "Blijeđenje"
-
-#: Client/core/CSettings.cpp:2167
-msgid "Fade out old lines"
-msgstr "Postepeno blijedi stari tekst"
-
-#: Client/core/CSettings.cpp:2207
-msgid "Horizontal:"
-msgstr "Horizontalno:"
-
-#: Client/core/CSettings.cpp:2207
-msgid "Vertical:"
-msgstr "Vertikalno:"
-
-#: Client/core/CSettings.cpp:2207
-msgid "Text-Align:"
-msgstr "Poravnanje teksta:"
-
-#: Client/core/CSettings.cpp:2207
-msgid "X-Offset:"
-msgstr "X-pomak:"
-
-#: Client/core/CSettings.cpp:2208
-msgid "Y-Offset:"
-msgstr "Y-Pomak:"
-
-#: Client/core/CSettings.cpp:2214
-msgid "Position"
-msgstr "Položaj"
-
-#: Client/core/CSettings.cpp:2229 Client/core/CSettings.cpp:2243
-msgid "Center"
-msgstr "Centar"
-
-#: Client/core/CSettings.cpp:2242
-msgid "Top"
-msgstr "Vrh"
-
-#: Client/core/CSettings.cpp:2244
-msgid "Bottom"
-msgstr "Dno"
-
-#: Client/core/CSettings.cpp:2292
-msgid "Font"
-msgstr ""
-
-#: Client/core/CSettings.cpp:2329
-msgid "Hide background when not typing"
-msgstr "Sakrij pozadinu kada se ne tipka"
-
-#: Client/core/CSettings.cpp:2334
-msgid "Nickname completion using the \"Tab\" key"
-msgstr "Nadopunjavanje nadimaka koristeći \"Tab\" tipku"
-
-#: Client/core/CSettings.cpp:2339
-msgid "Allow server to flash the window"
-msgstr "Dopusti serveru treperenje prozora"
-
-#: Client/core/CSettings.cpp:2344
-msgid "Allow tray balloon notifications"
-msgstr "Dozvoli obavijesti alatne trake"
-
-#: Client/core/CSettings.cpp:2349
-msgid "Chat text black/white outline"
-msgstr "Crno/bijelo podebljanje teksta"
-
-#. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:2598 Client/core/CSettings.cpp:2605
-msgid "Press a key to bind, or escape to clear"
-msgstr "Pritisni tipku za povezivanje, ili escape za brisanje"
-
-#: Client/core/CSettings.cpp:2599
-msgid "Binding a primary key"
-msgstr "Povezivanje primarne tipke"
-
-#: Client/core/CSettings.cpp:2606
-msgid "Binding a secondary key"
-msgstr "Povezivanje sekundarne tipke"
-
-#: Client/core/CSettings.cpp:2682
-msgid "GTA GAME CONTROLS"
-msgstr "GTA KONTROLE"
-
-#: Client/core/CSettings.cpp:2684
-msgid "MULTIPLAYER CONTROLS"
-msgstr "MULTIPLAYER KONTROLE"
-
-#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4746
-msgid "Your nickname contains invalid characters!"
-msgstr "Vaš nadimak sadrži neispravne znakove!"
-
-#: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
-#: Client/mods/deathmatch/logic/CResource.cpp:372
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1083
-msgid "In-game"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3760
-msgid "Red:"
-msgstr "Crveno:"
-
-#: Client/core/CSettings.cpp:3760
-msgid "Green:"
-msgstr "Zeleno:"
-
-#: Client/core/CSettings.cpp:3760
-msgid "Blue:"
-msgstr "Plava:"
-
-#: Client/core/CSettings.cpp:3760
-msgid "Transparency:"
-msgstr "Prozirnost:"
-
-#: Client/core/CSettings.cpp:3763
-msgid "Color"
-msgstr "Boja"
-
-#: Client/core/CSettings.cpp:3840
-msgid "Preview"
-msgstr "Pregled"
-
-#: Client/core/CSettings.cpp:4148
-msgid "Please disconnect before changing language"
-msgstr "Molimo odspojite se prije mijenjanja jezika"
-
-#: Client/core/CSettings.cpp:4176
-msgid "Please disconnect before changing skin"
-msgstr "Molimo odspojite se prije mijenjanja skin-a"
-
-#: Client/core/CSettings.cpp:4464
-msgid "Volmetric shadows can cause some systems to slow down.\n\n"
-"Are you sure you want to enable them?"
-msgstr "Volumetrične sjene mogu uzrokovati usporavanje nekih sistema.\n\n"
-"Jeste li sigurni da ih želite omogućiti?"
-
-#: Client/core/CSettings.cpp:4468
-msgid "PERFORMANCE WARNING"
-msgstr "UPOZORENJE ZA PERFORMANSE"
-
-#: Client/core/CSettings.cpp:4488
-msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
-"(The chat box and GUI is excluded from the upload)\n"
-msgstr "Upload zaslona je potreban za neke poslužitelje zbog anti-cheat razloga.\n\n"
-"(Chat i grafičko sučelje nisu uključeni u upload)\n"
-
-#: Client/core/CSettings.cpp:4490
-msgid "SCREEN UPLOAD INFORMATION"
-msgstr "INFORMACIJA UPLOAD-a ZASLONA"
-
-#: Client/core/CSettings.cpp:4505
-msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
-"Disabling this setting may decrease network\n"
-"bandwidth consumption.\n"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4508
-msgid "EXTERNAL SOUNDS"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4537
-msgid "It seems that you have the Rich Presence connection option enabled.\n"
-"Do you want to allow servers to share their data?\n\n"
-"This includes yours unique ID identifier."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4542
-msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4566
-msgid "Some files in your GTA:SA data directory are customized.\n"
-"MTA will only use these modified files if this check box is ticked.\n\n"
-"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
-"Are you sure you want to use them?"
-msgstr "Neki fajlovi u vašem GTA:SA direktoriju podataka su promijenjeni.\n"
-"MTA će samo koristiti te promijenjene fajlove ako je ovaj potvrdni okvir označen.\n\n"
-"Međutim, PROMIJENJENI GTA:SA FAJLOVI SU BLOKIRANI OD VEĆINE SERVERA\n\n"
-"Jeste li sigurni da ih želite koristiti?"
-
-#: Client/core/CSettings.cpp:4572 Client/core/CVersionUpdater.cpp:2081
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "PROMIJENJENE GTA:SA DATOTEKE"
-
-#: Client/core/CSettings.cpp:4615
-msgid "Enabling DPI awareness is an experimental feature and\n"
-"we only recommend it when you play MTA:SA on a scaled monitor.\n"
-"You may experience graphical issues if you enable this option.\n\n"
-"Are you sure you want to enable this option?"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4621
-msgid "EXPERIMENTAL FEATURE"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4764
-msgid "Please enter a nickname"
-msgstr "Molimo unesite nadimak"
-
-#: Client/core/CSettings.cpp:4765
-msgid "Please enter a nickname to be used ingame.  \n"
-"This will be your name when you connect to and play in a server"
-msgstr "Molimo unesite nadimak koji će biti korišten u igri. \n"
-"Ovo će biti vaše ime kada se povežete i igrate na poslužitelju"
-
-#: Client/core/CSettings.cpp:4783
-msgid "Very experimental feature."
-msgstr "Vrlo eksperimentalna značajka."
-
-#: Client/core/CSettings.cpp:4785
-msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "Zaustavlja staje s CJ-ovim varijacijama (Koristi 65MB više RAMA)"
-
-#: Client/core/CSettings.cpp:4787
-msgid "Older routers may require a slower scan speed."
-msgstr "Stariji routeri mogu zahtijevati sporiju brzinu skeniranja."
-
-#: Client/core/CSettings.cpp:4789
-msgid "Switch on to use only one connection when downloading."
-msgstr "Uključi da koristiš samo jednu vezu pri skidanju."
-
-#: Client/core/CSettings.cpp:4791
-msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "Označi mrežne pakete da biste pomogli pružatelju internet usluge pri identifikaciji MTA prometa."
-
-#: Client/core/CSettings.cpp:4793
-msgid "Spinning circle animation at the bottom of the screen"
-msgstr "Kružna animacija pri dnu zaslona"
-
-#: Client/core/CSettings.cpp:4795
-msgid "Select default always. (This setting is not saved)"
-msgstr "Odaberi zadano uvijek. (Ova postavka nije snimljena)"
-
-#: Client/core/CSettings.cpp:4797
-msgid "Maximum is usually best"
-msgstr "Maksimum je obično najbolji"
-
-#: Client/core/CSettings.cpp:4799 Client/core/CSettings.cpp:4801
-msgid "Auto updater:"
-msgstr "Automatska provjera ažuriranja:"
-
-#: Client/core/CSettings.cpp:4799
-msgid "Select default unless you like filling out bug reports."
-msgstr "Izaberi zadano osim ako voliš popunjavati velike izvještaje bugova."
-
-#: Client/core/CSettings.cpp:4801
-msgid "Select default to automatically install important updates."
-msgstr "Odaberite zadano da biste automatski instalirali važna ažuriranja."
-
-#: Client/core/CSettings.cpp:4803
-msgid "16-bit color:"
-msgstr "16-bitna boja"
-
-#: Client/core/CSettings.cpp:4803
-msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "Omogući 16-bitne načine boja - Zahtijeva ponovno pokretanje MTA"
-
-#: Client/core/CSettings.cpp:4805
-msgid "Mouse fix:"
-msgstr "Miš fix:"
-
-#: Client/core/CSettings.cpp:4805
-msgid "Mouse movement fix - May need PC restart"
-msgstr "Popravak pomicanja miša - Može zahtijevati ponovno pokretanje računala"
-
-#: Client/core/CScreenShot.cpp:104
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Uslikavanje dobilo %d bajta, ali očekivano je %d"
-
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "Uslikavanje neuspjelo"
-
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Screenshot uzet: '%s'"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -1520,14 +2167,75 @@ msgstr "Konfiguracijska datoteka je spremljena"
 msgid "* Your serial is: %s"
 msgstr "* Vaš serijski broj je: %s"
 
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Model kojeg ste izabrali nije se mogao učitati, te se također zadani model nije mogao učitati, molimo ponovno instalirajte MTA."
+#. Unknown command
+#: Client/core/CCommands.cpp:223
+msgid "Unknown command or cvar: "
+msgstr "Nepoznata naredba ili klijentska varijabla: "
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Želite li vidjeti online pomoć oko ovog problema ?"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "Programiranje"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "Doprinositelji"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "Dizajn igre / Skriptanje"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "Lokalizacija jezika"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "Doprinositelji zakrpa"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "Posebne zahvale"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr ""
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Os ubrzanja"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Os kočnice"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Hrvatski"
+
+#: Client/core/CMainMenu.cpp:333
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Upotrebljavate gradilište značajki! Ovo je samo test koji se ne može koristiti za povezivanje s javnim poslužiteljima!"
+
+#: Client/core/CMainMenu.cpp:352
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA prestaje sa ažuriranjima na XP/Vista nakon srpnja 2019-e godine.\n\n"
+"Ako želite igrati na najnovijim serverima nadogradite Windows."
+
+#: Client/core/CMainMenu.cpp:1193
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Odspojit će te se sa trenutnog servera.\n\n"
+"Jeste li sigurni da se želite odspojiti?"
+
+#: Client/core/CMainMenu.cpp:1197
+msgid "DISCONNECT WARNING"
+msgstr "ODSPAJANJE UPOZORENJE"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -1610,10 +2318,9 @@ msgstr "Poslužitelj preporuča nadogradnju, ali ne osnovnu.\n\n"
 "Želite li nadograditi sada ?"
 
 #: Client/core/CVersionUpdater.cpp:1915
-msgid "Update not currently avalable.\n\n"
+msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr "Ažuriranje nije trenutno dostupno.\n\n"
-"Molimo posjetite www.mtasa.com"
+msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -1670,135 +2377,10 @@ msgid "\n\n"
 msgstr "\n\n"
 "Čekanje odgovora - %-3d"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Hrvatski"
-
-#: Client/core/CCore.cpp:811 Client/loader/CInstallManager.cpp:1057
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA ne može nastaviti jer disk %s nema dovoljno prostora."
-
-#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Ozbiljna greška"
-
-#: Client/core/CCore.cpp:938
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "ZA POPRAVAK, UKLONITE OVU DATOTEKU:"
-
-#: Client/core/CCore.cpp:970
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "Modul %s je neispravan!"
-
-#: Client/core/CCore.cpp:1275
-msgid "Error executing URL"
-msgstr "Pogreška tijekom izvršavanja URL-a"
-
-#: Client/core/CCore.cpp:1287
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Pogreška tijekom rada modifikacije navedene u naredbenom retku ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1389
-msgid "this help screen"
-msgstr "ovaj pomoćni zaslon"
-
-#: Client/core/CCore.cpp:1390 Client/core/CCore.cpp:1391
-msgid "exits the application"
-msgstr "izlazi iz aplikacije"
-
-#: Client/core/CCore.cpp:1392
-msgid "shows the version"
-msgstr "pokazuje verziju"
-
-#: Client/core/CCore.cpp:1393
-msgid "shows the time"
-msgstr "prikazuje vrijeme"
-
-#: Client/core/CCore.cpp:1394
-msgid "shows the hud"
-msgstr "prikazuje hud"
-
-#: Client/core/CCore.cpp:1395
-msgid "shows all the binds"
-msgstr "prikazuje sve kontrole"
-
-#: Client/core/CCore.cpp:1396
-msgid "shows your serial"
-msgstr "prikazuje tvoj serijski broj"
-
-#: Client/core/CCore.cpp:1405
-msgid "connects to a server (host port nick pass)"
-msgstr "spaja se na server (poslužitelj port nadimak lozinka)"
-
-#: Client/core/CCore.cpp:1406
-msgid "connects to a previous server"
-msgstr "spaja se na prethodni server"
-
-#: Client/core/CCore.cpp:1407
-msgid "binds a key (key control)"
-msgstr "veže tipku (tipka kontrole)"
-
-#: Client/core/CCore.cpp:1408
-msgid "unbinds a key (key)"
-msgstr "odvezuje tipku (tipka)"
-
-#: Client/core/CCore.cpp:1409
-msgid "copies the default gta controls"
-msgstr "kopira zadane GTA kontrole"
-
-#: Client/core/CCore.cpp:1410
-msgid "outputs a screenshot"
-msgstr "izbacuje fotografiju"
-
-#: Client/core/CCore.cpp:1411
-msgid "immediately saves the config"
-msgstr "odmah sprema konfiguraciju"
-
-#: Client/core/CCore.cpp:1413
-msgid "clears the debug view"
-msgstr "čisti debug pregled"
-
-#: Client/core/CCore.cpp:1414
-msgid "scrolls the chatbox upwards"
-msgstr "pomiče čavrljanje nagore"
-
-#: Client/core/CCore.cpp:1415
-msgid "scrolls the chatbox downwards"
-msgstr "pomiče čavrljanje nadolje"
-
-#: Client/core/CCore.cpp:1416
-msgid "scrolls the debug view upwards"
-msgstr "pomiče debug nagore"
-
-#: Client/core/CCore.cpp:1417
-msgid "scrolls the debug view downwards"
-msgstr "pomiče debug nadolje"
-
-#: Client/core/CCore.cpp:1420
-msgid "shows the memory statistics"
-msgstr "prikazuje statistike memorije"
-
-#: Client/core/CCore.cpp:1421
-msgid "shows the frame timing graph"
-msgstr "prikazuje okvir vremenskog grafa"
-
-#: Client/core/CCore.cpp:1425
-msgid "for developers: reload news"
-msgstr ""
-
-#: Client/core/DXHook/CDirect3DHook9.cpp:124
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Nije moguće učitati Direct3D9.\n\n"
-"Molimo provjerite imate li instalirane DirectX End-User Runtime i\n"
-"posljednje Windows servisne zakrpe."
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONZOLA"
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 msgid "Idle"
@@ -1952,12 +2534,6 @@ msgstr "Pretraživanje..."
 msgid "SERVER BROWSER"
 msgstr "PREGLEDNIK POSLUŽITELJA"
 
-#. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-msgid "Internet"
-msgstr ""
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
 msgstr "Lokalni"
@@ -2101,794 +2677,17 @@ msgstr "Nepoznati protokol"
 msgid "Please use the mtasa:// protocol!"
 msgstr "Molimo Vas da koristite mtasa:// protokol!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:635
-#: Client/mods/deathmatch/logic/CClientGame.cpp:733
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Nevaljan nadimak! Molimo idite u postavke i postavite novi!"
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Morate izabrati poslužitelj na koji ćete se povezati."
 
-#: Client/mods/deathmatch/CClient.cpp:36
-msgid "This version has expired."
-msgstr "Ova verzija je istekla."
-
-#: Client/mods/deathmatch/CClient.cpp:56
-msgid "disconnect from the game"
-msgstr "isključi se iz igre"
-
-#: Client/mods/deathmatch/CClient.cpp:57
-msgid "shows the nametags"
-msgstr "pokazuje oznake s imenom"
-
-#: Client/mods/deathmatch/CClient.cpp:58
-msgid "shows the chatbox"
-msgstr "prikazuje statistike memorije"
-
-#: Client/mods/deathmatch/CClient.cpp:59
-msgid "shows the network statistics"
-msgstr "prikazuje statistike memorije"
-
-#. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
-msgid "open the chat input"
-msgstr "otvori unos čavrljanja"
-
-#: Client/mods/deathmatch/CClient.cpp:64
-msgid "transmits voice to other players"
-msgstr "prenosi glas na druge igrače"
-
-#: Client/mods/deathmatch/CClient.cpp:65
-msgid "enters a car as passenger"
-msgstr "ulazi u vozilo kao suvozač"
-
-#: Client/mods/deathmatch/CClient.cpp:66
-msgid "next radio channel"
-msgstr "sljedeći radio kanal"
-
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "previous radio channel"
-msgstr "prethodni radio kanal"
-
-#: Client/mods/deathmatch/CClient.cpp:68
-msgid "enables the radar view"
-msgstr "omogučuje radarski prikaz"
-
-#: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the radar in"
-msgstr "povećava prikaz radara"
-
-#: Client/mods/deathmatch/CClient.cpp:70
-msgid "zooms the radar out"
-msgstr "smanjuje prikaz radara"
-
-#: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the radar north"
-msgstr "pomiče radar na sjever"
-
-#: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the radar south"
-msgstr "pomiče radar na jug"
-
-#: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the radar east"
-msgstr "pomiče radar na istok"
-
-#: Client/mods/deathmatch/CClient.cpp:74
-msgid "moves the radar west"
-msgstr "pomiče radar na zapad"
-
-#: Client/mods/deathmatch/CClient.cpp:75
-msgid "attaches the radar"
-msgstr "pridaje radar"
-
-#: Client/mods/deathmatch/CClient.cpp:76
-msgid "reduces radar opacity"
-msgstr "smanjuje prozirnost radara"
-
-#: Client/mods/deathmatch/CClient.cpp:77
-msgid "increases radar opacity"
-msgstr "povećava prozirnost radara"
-
-#: Client/mods/deathmatch/CClient.cpp:78
-msgid "toggles radar help text"
-msgstr "uključuje/isključuje pomoćni tekst radara"
-
-#: Client/mods/deathmatch/CClient.cpp:79
-msgid "sends a message to the targetted player"
-msgstr "šalje poruku određenom igraču"
-
-#: Client/mods/deathmatch/CClient.cpp:80
-msgid "changes to the next weapon whilst in a vehicle"
-msgstr "mijenja na sljedeće oružje u vozilu"
-
-#: Client/mods/deathmatch/CClient.cpp:81
-msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "mijenja na prethodno oružje u vozilu"
-
-#: Client/mods/deathmatch/CClient.cpp:82
-msgid "outputs info about the current server"
-msgstr "izbacuje informacije o trenutnom serveru"
-
-#. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
-msgid "defines the scale multiplier of all text-displays"
-msgstr "definira skalu multiplikatora svih tekst-prikaza"
-
-#. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
-msgid "(Development mode) shows the colshapes"
-msgstr "(Razvojni način) prikazuje colshapeove"
-
-#: Client/mods/deathmatch/CClient.cpp:93
-msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Razvitak) prikazuje colshapeove"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:505
-msgid "Disconnected: Invalid nickname"
-msgstr "Odspojeni: Nevažeći nadimak"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
-msgid "Disconnect from server"
-msgstr "Prekini vezu s poslužiteljem"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
-#, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "Odspojeni: Serial je prognan.\n"
-"Razlog: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
-#, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "Odspojeni: Prognani ste.\n"
-"Razlog: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
-#, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "Odspojeni: Račun je prognan.\n"
-"Razlog: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
-msgid "Disconnected: Version mismatch"
-msgstr "Odspojeni: Neusklađenost verzija"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:534
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Odspojeni: Previše igrača se pridružuje istovremeno. Molimo pričekajte minutu, te se ponovno povežite."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:538
-#, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "Odspojeni: Poslužitelj je sa drukčije grane.\n"
-"Informacija: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:543
-#, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "Odspojeni: Loša verzija.\n"
-"Informacija: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "Odspojeni: Poslužitelj je na novijoj građi.\n"
-"Informacija: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "Odspojeni: Poslužitelj je na starijoj građi.\n"
-"Informacija: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:558
-msgid "Disconnected: Nick already in use"
-msgstr "Odspojeni: Nadimak se već koristi"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
-msgid "Disconnected: Player element could not be created."
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
-#, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "Odspojeni: Poslužitelj je odbacio vezu: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
-msgid "Disconnected: Serial verification failed"
-msgstr "Odspojeni: Potvrda seriala neuspjela"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
-#, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "Odspojeni: Veza nesinkronizirana %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:584
-#, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "Odspojeni: Izbacio/la vas je %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "Odspojeni: Prognao/la vas je %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "Odspojeni: Server ugašen ili se ponovno pali"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
-msgid "You were kicked from the game"
-msgstr "Izbačeni ste iz igre"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
-msgid "This server requires a non-modifed gta_sa.exe"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
-msgid "Please replace gta_sa.exe"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
-msgid "This server does not allow virtual machines"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
-msgid "This server requires driver signing to be enabled"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
-msgid "Please restart your PC"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
-msgid "This server has detected missing anti-cheat components"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
-msgid "Try restarting MTA"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
-msgid "Please replace gta3.img or gta_int.img"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
-msgid "This server does not allow Wine"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
-msgid "Ensure no other program is modifying MTA:SA"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
-msgid "Time Remaining: "
-msgstr "Preostalo Vrijeme:"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d dan"
-msgstr[1] "%d dana"
-msgstr[2] "%d dana"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d sat"
-msgstr[1] "%d sata"
-msgstr[2] "%d sati"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuta"
-msgstr[1] "%d minute"
-msgstr[2] "%d minuta"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d sekunda"
-msgstr[1] "%d sekunde"
-msgstr[2] "%d sekundi"
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
-msgid "Disconnected"
-msgstr "Veza prekinuta"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Pogreška preuzimanja: %s"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "POKRENI IGRU"
-
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "Resursi"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Ime poslužitelja:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Lozinka:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Ime poslužitelja:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "Odašiljanje:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Odabrano"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Sve"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Pokreni"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:370
-msgid "Flying a UFO around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:370
-msgid "Cruising around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:370
-msgid "Riding the waves of"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:371
-msgid "Riding the train in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:371
-msgid "Flying around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:372
-msgid "Riding around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:372
-msgid "Monster truckin' around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:372
-msgid "Quaddin' around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:373
-msgid "Bunny hopping around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:373
-msgid "Doing weird stuff in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:377
-msgid "Climbing around in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:378
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
-msgid "Doing a drive-by in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:380
-msgid "Blub blub..."
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:381
-msgid "Breathing water"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:382
-msgid "Drowning in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:383
-msgid "Ducking for cover in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:384
-msgid "Fighting in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:385
-msgid "Throwing fists in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
-msgid "Blastin' fools in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:387
-msgid "Shooting up"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:388
-msgid "Jetpacking in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:389
-msgid "Literally on fire in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:390
-msgid "Burning up in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:391
-msgid "Swimming in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:392
-msgid "Floating around in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:393
-msgid "Being chased by a shark"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:394
-msgid "Choking to death in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:651
-msgid "Entering the game ..."
-msgstr "Ulazak u igru ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:709
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Nije spojeno: molimo koristite Brzo Povezivanje ili 'poveži' naredbu za spajanje na poslužitelj."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:755
-msgid "Could not start the local server. See console for details."
-msgstr "Lokalni poslužitelj se nije mogao pokrenuti. Pogledajte konzolu za detalje."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:765
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-msgid "Local Server"
-msgstr "Lokalni Poslužitelj"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:765
-msgid "Starting local server ..."
-msgstr "Pokretanje lokalnog poslužitelja ..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1013
-msgid "Area 51"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1022
-msgid "Walking around "
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1171
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "Izbačeni ste iz igre ( %s )"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-msgid "Connecting to local server..."
-msgstr "Povezivanje na lokalni poslužitelj..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
-msgid "Error connecting to server."
-msgstr "Greška prilikom spajanja na poslužitelj."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-msgid "Connecting to local server timed out. See console for details."
-msgstr "Povezivanje sa lokalnim poslužiteljem isteklo. Pogledajte konzolu za detalje."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1367
-msgid "Connection with the server was lost"
-msgstr "Veza sa poslužiteljem se prekinula!"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1394
-msgid "Disconnected: the server is currently full"
-msgstr "Odspojeni: server je trenutno pun"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1406
-msgid "Disconnected: invalid password specified"
-msgstr "Odspojeni: nevažeća lozinka određena"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1428
-msgid "MTA Client verification failed!"
-msgstr "Potvrda MTA klijenta neuspjela!"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
-msgid "In a ditch"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
-msgid "En-route to hospital"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
-msgid "Meeting their maker"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
-msgid "Regretting their decisions"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
-msgid "Wasted"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Napredak skidanja mape:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Napredak Skidanja: "
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s od %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Odspojite se da prekinete skidanje"
-
-#: Client/loader/Utils.cpp:534 Client/loader/Dialogs.cpp:890
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "U potrazi za Grand Theft Auto San Andreasom"
-
-#: Client/loader/Utils.cpp:536 Client/loader/Dialogs.cpp:893
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Molimo pokrenite Grand Theft Auto San Andreas"
-
-#: Client/loader/Utils.cpp:600
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Odaberite vaš Grand Theft Auto: San Andreas Instalacijski Direktorij"
-
-#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA treba dozvolu Administratora za sljedeći zadatak:\n\n"
-"'%s'\n\n"
-"Molimo potvrdite u sljedećem prozoru."
-
-#: Client/loader/Utils.cpp:1069
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Pogreška učitavanja %s module! (%s)"
-
-#: Client/loader/Utils.cpp:1394 Client/loader/Dialogs.cpp:914
-msgid "Copying files..."
-msgstr "Kopiranje fajlova..."
-
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:919
-msgid "Copy finished early. Everything OK."
-msgstr "Kopija završena ranije. Sve OK."
-
-#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:924
-msgid "Finishing..."
-msgstr "Završavam..."
-
-#: Client/loader/Utils.cpp:1462 Client/loader/Dialogs.cpp:928
-msgid "Done!"
-msgstr "Završeno!"
-
-#: Client/loader/Utils.cpp:1502
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Nova instalacija %s je pronađena.\n\n"
-"Želite li kopirati svoje postavke iz %s?"
-
-#: Client/loader/Utils.cpp:1541
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA je imao problema s otvaranjem datoteke '%s'"
-
-#: Client/loader/Utils.cpp:1563
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "Nedostaje datoteka '%s' u GTA:SA."
-
-#: Client/loader/Utils.cpp:1588
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA je imao poteškoća pri učitavanju modela."
-
-#: Client/loader/Utils.cpp:1590
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Ako ste nedavno mijenjali gta3.img, pokušajte reinstalacijom GTA:SA."
-
-#: Client/loader/Utils.cpp:1615
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA je imao poteškoća pri dodavanju dodatka na vozilo."
-
-#: Client/loader/Utils.cpp:1634
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA je pronašao greške u datoteci '%s'"
-
-#: Client/loader/Utils.cpp:1716
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Je li se Vaše računalo ponovno pokrenulo tijekom igranja MTA:SA?"
-
-#: Client/loader/Utils.cpp:1781
-msgid "Please terminate the following programs before continuing:"
-msgstr "Molimo ugasite sljedeće programe prije nego što nastavite:"
-
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr ""
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr ""
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr ""
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Instalacija dogradnji..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Otpakiravam datoteke..."
-
-#: Client/loader/CInstallManager.cpp:376
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA nije mogao dovršiti sljedeći zadatak:\n\n"
-"'%s'\n"
-
-#: Client/loader/CInstallManager.cpp:426
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** Pad je uzrokovan greškom drivera grafičke kartice **\n\n"
-"** Molimo ažurirajte svoje drivere grafičke kartice **"
-
-#: Client/loader/CInstallManager.cpp:532
-msgid "Install updated MTA:SA files"
-msgstr "Instaliraj ažurirane MTA:SA fajlove."
-
-#: Client/loader/CInstallManager.cpp:552
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Nemoguće nadograditi zbog sukoba datoteka. Molimo zatvorite ostale aplikacije i pokušajte ponovno"
-
-#: Client/loader/CInstallManager.cpp:561
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto nije instaliran prikladno, molimo instalirajte ponovno. %s"
-
-#: Client/loader/CInstallManager.cpp:613
-msgid "Create GTA:SA junctions"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:657
-msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
-msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:672
-msgid "Copy MTA:SA files"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
-msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:780
-msgid "Patch GTA:SA dependency"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:828
-msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:832
-msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:838
-msgid "Generate GTA:SA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:853
-msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
-msgid "Patch GTA:SA"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:876
-msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr ""
-
-#: Client/loader/CInstallManager.cpp:1113
-msgid "Missing file:"
-msgstr "Nedostaje datoteka:"
-
-#: Client/loader/CInstallManager.cpp:1117
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Ako se MTA ne učita, molimo ponovno instalirajte GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:1152
-msgid "Update install settings"
-msgstr "Nadogradi instalacijske postavke"
-
-#: Client/loader/CInstallManager.cpp:1291
-msgid "Update compatibility settings"
-msgstr "Ažuriraj postavke kompatibilnosti"
+#: Client/core/DXHook/CDirect3DHook9.cpp:124
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Nije moguće učitati Direct3D9.\n\n"
+"Molimo provjerite imate li instalirane DirectX End-User Runtime i\n"
+"posljednje Windows servisne zakrpe."
 
 #: Client/loader/Dialogs.cpp:134
 msgid "Quit"
@@ -3012,6 +2811,117 @@ msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "Ne želim instalirati anti virusni program.\n"
 "Želim da moje računalo bude usporeno."
+
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:534
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "U potrazi za Grand Theft Auto San Andreasom"
+
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:536
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Molimo pokrenite Grand Theft Auto San Andreas"
+
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:852
+msgid "Installing update..."
+msgstr "Instalacija dogradnji..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:934
+msgid "Extracting files..."
+msgstr "Otpakiravam datoteke..."
+
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1394
+msgid "Copying files..."
+msgstr "Kopiranje fajlova..."
+
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1454
+msgid "Copy finished early. Everything OK."
+msgstr "Kopija završena ranije. Sve OK."
+
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1460
+msgid "Finishing..."
+msgstr "Završavam..."
+
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1462
+msgid "Done!"
+msgstr "Završeno!"
+
+#: Client/loader/Utils.cpp:600
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Odaberite vaš Grand Theft Auto: San Andreas Instalacijski Direktorij"
+
+#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA treba dozvolu Administratora za sljedeći zadatak:\n\n"
+"'%s'\n\n"
+"Molimo potvrdite u sljedećem prozoru."
+
+#: Client/loader/Utils.cpp:1069
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "Pogreška učitavanja %s module! (%s)"
+
+#: Client/loader/Utils.cpp:1502
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Nova instalacija %s je pronađena.\n\n"
+"Želite li kopirati svoje postavke iz %s?"
+
+#: Client/loader/Utils.cpp:1541
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA je imao problema s otvaranjem datoteke '%s'"
+
+#: Client/loader/Utils.cpp:1563
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "Nedostaje datoteka '%s' u GTA:SA."
+
+#: Client/loader/Utils.cpp:1588
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA je imao poteškoća pri učitavanju modela."
+
+#: Client/loader/Utils.cpp:1590
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Ako ste nedavno mijenjali gta3.img, pokušajte reinstalacijom GTA:SA."
+
+#: Client/loader/Utils.cpp:1615
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA je imao poteškoća pri dodavanju dodatka na vozilo."
+
+#: Client/loader/Utils.cpp:1634
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA je pronašao greške u datoteci '%s'"
+
+#: Client/loader/Utils.cpp:1716
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Je li se Vaše računalo ponovno pokrenulo tijekom igranja MTA:SA?"
+
+#: Client/loader/Utils.cpp:1781
+msgid "Please terminate the following programs before continuing:"
+msgstr "Molimo ugasite sljedeće programe prije nego što nastavite:"
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr ""
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr ""
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr ""
 
 #: Client/loader/MainFunctions.cpp:248
 msgid "Trouble restarting MTA:SA\n\n"
@@ -3203,8 +3113,98 @@ msgstr "Nije moguće pokrenuti Grand Theft Auto: San Andreas. Molimo pokušajte 
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas se možda nije pokrenuo ispravno. Želite li ga zaustaviti?"
 
+#: Client/loader/CInstallManager.cpp:376
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA nije mogao dovršiti sljedeći zadatak:\n\n"
+"'%s'\n"
+
+#: Client/loader/CInstallManager.cpp:426
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** Pad je uzrokovan greškom drivera grafičke kartice **\n\n"
+"** Molimo ažurirajte svoje drivere grafičke kartice **"
+
+#: Client/loader/CInstallManager.cpp:532
+msgid "Install updated MTA:SA files"
+msgstr "Instaliraj ažurirane MTA:SA fajlove."
+
+#: Client/loader/CInstallManager.cpp:552
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Nemoguće nadograditi zbog sukoba datoteka. Molimo zatvorite ostale aplikacije i pokušajte ponovno"
+
+#: Client/loader/CInstallManager.cpp:561
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Auto nije instaliran prikladno, molimo instalirajte ponovno. %s"
+
+#: Client/loader/CInstallManager.cpp:613
+msgid "Create GTA:SA junctions"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:657
+msgid "MTA:SA cannot launch because copying a file failed:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:672
+msgid "Copy MTA:SA files"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:780
+msgid "Patch GTA:SA dependency"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:828
+msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:832
+msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:838
+msgid "Generate GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:853
+msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
+msgid "Patch GTA:SA"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:876
+msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
+msgstr ""
+
+#: Client/loader/CInstallManager.cpp:1113
+msgid "Missing file:"
+msgstr "Nedostaje datoteka:"
+
+#: Client/loader/CInstallManager.cpp:1117
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Ako se MTA ne učita, molimo ponovno instalirajte GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:1152
+msgid "Update install settings"
+msgstr "Nadogradi instalacijske postavke"
+
+#: Client/loader/CInstallManager.cpp:1305
+msgid "Update compatibility settings"
+msgstr "Ažuriraj postavke kompatibilnosti"
+
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:109
+#: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Ozbiljna greška (%u). Ako problem ustraje, molimo posjetite mtasa.com za podršku."
@@ -3213,12 +3213,12 @@ msgstr "Ozbiljna greška (%u). Ako problem ustraje, molimo posjetite mtasa.com z
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:125
+#: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Protokolna greška (%u). Ako problem ustraje, molimo posjetite mtasa.com ili podršku."
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:127
+#: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
 msgstr "Greška pri spajanju"
 
