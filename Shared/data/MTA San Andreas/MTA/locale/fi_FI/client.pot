@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-27 14:14+0000\n"
-"PO-Revision-Date: 2024-01-27 14:21\n"
+"POT-Creation-Date: 2024-09-27 04:28+0000\n"
+"PO-Revision-Date: 2024-09-27 04:30\n"
 "Last-Translator: \n"
 "Language-Team: Finnish\n"
 "Language: fi_FI\n"
@@ -17,56 +17,18 @@ msgstr ""
 "X-Crowdin-File: /[multitheftauto.mtasa-blue] master/Shared/data/MTA San Andreas/MTA/locale/en_US/client.pot\n"
 "X-Crowdin-File-ID: 87\n"
 
-#: Client/game_sa/CSettingsSA.cpp:753
+#: Client/game_sa/CSettingsSA.cpp:767
 msgid "Can't find valid screen resolution."
 msgstr "Näytön resoluutiota ei löydy."
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:829
+#: Client/game_sa/CSettingsSA.cpp:843
 msgid "Are you sure you want to use this screen resolution?"
 msgstr "Haluatko varmasti käyttää tätä näytön resoluutiota?"
 
-#: Client/game_sa/CSettingsSA.cpp:831 Client/loader/Dialogs.cpp:194
+#: Client/game_sa/CSettingsSA.cpp:845 Client/loader/Dialogs.cpp:194
 msgid "MTA: San Andreas"
 msgstr "MTA: San Andreas"
-
-#. Create buttons
-#. OK button
-#: Client/gui/CGUIMessageBox_Impl.cpp:64 Client/core/CSettings.cpp:127
-#: Client/core/CSettings.cpp:4767 Client/core/CVersionUpdater.cpp:1607
-#: Client/core/CVersionUpdater.cpp:1823 Client/core/CVersionUpdater.cpp:1916
-#: Client/core/CVersionUpdater.cpp:1938 Client/core/CVersionUpdater.cpp:1956
-#: Client/core/CVersionUpdater.cpp:1968 Client/core/CVersionUpdater.cpp:2120
-#: Client/core/CVersionUpdater.cpp:2129 Client/core/CVersionUpdater.cpp:2138
-#: Client/core/CVersionUpdater.cpp:2152 Client/loader/Dialogs.cpp:133
-msgid "OK"
-msgstr "OK"
-
-#. Cancel button
-#: Client/gui/CGUIMessageBox_Impl.cpp:68 Client/core/CSettings.cpp:132
-#: Client/core/CSettings.cpp:4766 Client/core/CVersionUpdater.cpp:1790
-#: Client/core/CVersionUpdater.cpp:1806 Client/core/CVersionUpdater.cpp:1841
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
-#: Client/loader/Dialogs.cpp:136
-msgid "Cancel"
-msgstr "Peruuta"
-
-#. /////////////////////////////////////////////////////////////////////////
-#.
-#. Dialog strings
-#.
-#.
-#. /////////////////////////////////////////////////////////////////////////
-#: Client/gui/CGUIMessageBox_Impl.cpp:72 Client/core/CMainMenu.cpp:1200
-#: Client/core/CSettings.cpp:1377 Client/core/CSettings.cpp:1401
-#: Client/core/CSettings.cpp:4471 Client/core/CSettings.cpp:4545
-#: Client/core/CSettings.cpp:4575 Client/core/CSettings.cpp:4624
-#: Client/core/CQuestionBox.cpp:195 Client/core/CVersionUpdater.cpp:1572
-#: Client/core/CVersionUpdater.cpp:1590 Client/core/CVersionUpdater.cpp:1859
-#: Client/core/CVersionUpdater.cpp:1878
-#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
-msgid "Yes"
-msgstr "Kyllä"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
@@ -84,7 +46,7 @@ msgstr "ÄLÄ KOSKAAN SYÖTÄ ARKALUONTOISTA TIETOA, JOTTA VOIT SUOJATA NIITÄ V
 msgid "Remember decision"
 msgstr "Muista valinta jatkossa"
 
-#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:962
+#: Client/cefweb/CWebsiteRequests.cpp:51 Client/core/CSettings.cpp:974
 msgid "Allow"
 msgstr "Salli"
 
@@ -93,9 +55,1885 @@ msgid "Deny"
 msgstr "Estä"
 
 #. Couldn't create render target for CPostEffects
-#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1360
+#: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:1450
 msgid "Problem with graphics driver"
 msgstr "Ongelma grafiikka-ajurin kanssa"
+
+#: Client/mods/deathmatch/CClient.cpp:36
+msgid "This version has expired."
+msgstr "Tämä versio on vanhentunut."
+
+#: Client/mods/deathmatch/CClient.cpp:56
+msgid "disconnect from the game"
+msgstr "katkaise yhteys palvelimeen"
+
+#: Client/mods/deathmatch/CClient.cpp:57
+msgid "shows the nametags"
+msgstr "näyttää nimitagit"
+
+#: Client/mods/deathmatch/CClient.cpp:58
+msgid "shows the chatbox"
+msgstr "näyttää chatin"
+
+#: Client/mods/deathmatch/CClient.cpp:59
+msgid "shows the network statistics"
+msgstr "näyttää verkkotilastot"
+
+#. Key commands (registered as 'mod commands', can be disabled)
+#: Client/mods/deathmatch/CClient.cpp:62
+msgid "open the chat input"
+msgstr "avaa chatin syöttökentän"
+
+#: Client/mods/deathmatch/CClient.cpp:63
+msgid "transmits voice to other players"
+msgstr "lähettää ääntä toisille pelaajille"
+
+#: Client/mods/deathmatch/CClient.cpp:64
+msgid "enters a car as passenger"
+msgstr "nousee autoon matkustajana"
+
+#: Client/mods/deathmatch/CClient.cpp:65
+msgid "next radio channel"
+msgstr "seuraava radiokanava"
+
+#: Client/mods/deathmatch/CClient.cpp:66
+msgid "previous radio channel"
+msgstr "edellinen radiokanava"
+
+#: Client/mods/deathmatch/CClient.cpp:67
+msgid "enables the radar view"
+msgstr "näyttää/piilottaa kartan"
+
+#: Client/mods/deathmatch/CClient.cpp:68
+msgid "zooms the radar in"
+msgstr "zoomaa karttaa sisään"
+
+#: Client/mods/deathmatch/CClient.cpp:69
+msgid "zooms the radar out"
+msgstr "zoomaa karttaa ulos"
+
+#: Client/mods/deathmatch/CClient.cpp:70
+msgid "moves the radar north"
+msgstr "liikuttaa karttaa pohjoiseen"
+
+#: Client/mods/deathmatch/CClient.cpp:71
+msgid "moves the radar south"
+msgstr "liikuttaa karttaa etelään"
+
+#: Client/mods/deathmatch/CClient.cpp:72
+msgid "moves the radar east"
+msgstr "liikuttaa karttaa itään"
+
+#: Client/mods/deathmatch/CClient.cpp:73
+msgid "moves the radar west"
+msgstr "liikuttaa karttaa länteen"
+
+#: Client/mods/deathmatch/CClient.cpp:74
+msgid "attaches the radar"
+msgstr "kiinnittää kartan"
+
+#: Client/mods/deathmatch/CClient.cpp:75
+msgid "reduces radar opacity"
+msgstr "vähentää kartan läpinäkyvyyttä"
+
+#: Client/mods/deathmatch/CClient.cpp:76
+msgid "increases radar opacity"
+msgstr "lisää kartan läpinäkyvyyttä"
+
+#: Client/mods/deathmatch/CClient.cpp:77
+msgid "toggles radar help text"
+msgstr "näyttää/piilottaa kartan ohjeen"
+
+#: Client/mods/deathmatch/CClient.cpp:78
+msgid "sends a message to the targetted player"
+msgstr "lähettää yksityisviestin kyseiselle pelaajalle"
+
+#: Client/mods/deathmatch/CClient.cpp:79
+msgid "changes to the next weapon whilst in a vehicle"
+msgstr "vaihtaa seuraavaan aseeseen kun olet ajoneuvossa sisällä"
+
+#: Client/mods/deathmatch/CClient.cpp:80
+msgid "changes to the previous weapon whilst in a vehicle"
+msgstr "vaihtaa edelliseen aseeseen kun olet ajoneuvossa sisällä"
+
+#: Client/mods/deathmatch/CClient.cpp:81
+msgid "outputs info about the current server"
+msgstr "tulostaa konsoliin tietoja pelipalvelimesta"
+
+#. ACHTUNG" Should this be handled by the atomic cvar setter?
+#: Client/mods/deathmatch/CClient.cpp:84
+msgid "defines the scale multiplier of all text-displays"
+msgstr "määrittää kaikkien text-display elementtien skaalan"
+
+#. Development mode
+#: Client/mods/deathmatch/CClient.cpp:91
+msgid "(Development mode) shows the colshapes"
+msgstr "(Kehitystila) näyttää/piilottaa colshapet"
+
+#: Client/mods/deathmatch/CClient.cpp:92
+msgid "(Development mode) prints world sound ids into the debug window"
+msgstr "(Kehitystila) tulostaa maailman äänten id:t debug konsoliin"
+
+#. Throw the error and disconnect
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
+#, c-format
+msgid "Download error: %s"
+msgstr "Latausvirhe: %s"
+
+#. Show timeout message and disconnect
+#. Display an error, reset the error status and exit
+#. Show a message that the connection timed out and abort
+#. Show failed message and abort the attempt
+#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
+#: Client/mods/deathmatch/logic/CClientGame.cpp:641
+#: Client/mods/deathmatch/logic/CClientGame.cpp:715
+#: Client/mods/deathmatch/logic/CClientGame.cpp:739
+#: Client/mods/deathmatch/logic/CClientGame.cpp:761
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1174
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1333
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1370
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1419
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1431
+#: Client/core/CSettings.cpp:2941 Client/core/CSettings.cpp:4166
+#: Client/core/CSettings.cpp:4194 Client/core/CSettings.cpp:4764
+#: Client/core/CCore.cpp:1275 Client/core/CCore.cpp:1288
+#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
+#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
+#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
+#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
+#: Client/core/CGUI.cpp:87 Client/core/ServerBrowser/CServerBrowser.cpp:1278
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
+#: Client/core/DXHook/CDirect3DHook9.cpp:127
+#: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
+#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
+#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
+#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
+#: Shared/sdk/SharedUtil.Misc.hpp:137
+msgid "Error"
+msgstr "Virhe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:506
+msgid "Disconnected: Invalid nickname"
+msgstr "Yhteys katkaistu: Virheellinen nimimerkki"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:510
+msgid "Disconnect from server"
+msgstr "Katkaise yhteys palvelimeen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:514
+#, c-format
+msgid "Disconnected: Serial is banned.\n"
+"Reason: %s"
+msgstr "Yhteys katkaistu: Sarjanumero on estetty.\n"
+"Syy: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:520
+#, c-format
+msgid "Disconnected: You are banned.\n"
+"Reason: %s"
+msgstr "Yhteys katkaistu: Sinut on estetty.\n"
+"Syy: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:526
+#, c-format
+msgid "Disconnected: Account is banned.\n"
+"Reason: %s"
+msgstr "Yhteys katkaistu: Tili on estetty.\n"
+"Syy: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:531
+msgid "Disconnected: Version mismatch"
+msgstr "Yhteys katkaistu: Versio ei täsmää"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:535
+msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
+msgstr "Yhteys katkaistu: Liittymistulva. Ole hyvä ja odota minuutti, yhdistä sitten uudelleen."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:539
+#, c-format
+msgid "Disconnected: Server from different branch.\n"
+"Information: %s"
+msgstr "Yhteys katkaistu: Palvelin on eri juuressa.\n"
+"Tiedot: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:544
+#, c-format
+msgid "Disconnected: Bad version.\n"
+"Information: %s"
+msgstr "Yhteys katkaistu: Väärä versio.\n"
+"Tiedot: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:549
+#, c-format
+msgid "Disconnected: Server is running a newer build.\n"
+"Information: %s"
+msgstr "Yhteys katkaistu: Palvelin pyörii uudemmalla versiolla.\n"
+"Tiedot: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:554
+#, c-format
+msgid "Disconnected: Server is running an older build.\n"
+"Information: %s"
+msgstr "Yhteys katkaistu: Palvelin pyörii vanhemmalla versiolla.\n"
+"Tiedot: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:559
+msgid "Disconnected: Nick already in use"
+msgstr "Yhteys katkaistu: Nimimerkki on jo käytössä"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:563
+msgid "Disconnected: Player element could not be created."
+msgstr "Yhteys katkaistu: Hahmoa ei pystytty luomaan."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:567
+#, c-format
+msgid "Disconnected: Server refused the connection: %s"
+msgstr "Yhteys katkaistu: Palvelin esti yhteyden: %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:572
+msgid "Disconnected: Serial verification failed"
+msgstr "Yhteys katkaistu: Sarjanumeron varnennus epäonnistui"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:576
+#, c-format
+msgid "Disconnected: Connection desync %s"
+msgstr "Yhteys katkaistu: Synkronointivirhe %s"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:585
+#, c-format
+msgid "Disconnected: You were kicked by %s"
+msgstr "Yhteys katkaistu: Käyttäjä %s poisti sinut palvelimelta"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:590
+#, c-format
+msgid "Disconnected: You were banned by %s"
+msgstr "Yhteys katkaistu: Käyttäjä %s antoi sinulle porttikiellon"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:601
+msgid "Disconnected: Server shutdown or restarting"
+msgstr "Yhteys katkaistu: Palvelin sammuu tai käynnistyy uudelleen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
+msgid "You were kicked from the game"
+msgstr "Sinut potkittiin pelistä"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
+msgid "This server requires a non-modifed gta_sa.exe"
+msgstr "Tämä palvelin vaatii muokkaamattoman gta_sa.exe:n"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
+msgid "Please replace gta_sa.exe"
+msgstr "Ole hyvä ja korvaa gta_sa.exe"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
+msgid "This server does not allow custom D3D9.DLLs"
+msgstr "Tämä pelipalvelin ei salli kustomoituja D3D9.DLL tiedostoja"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
+msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
+msgstr "Poista D3D9.DLL GTA asennushakemistosta ja käynnistä MTA uudelleen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
+msgid "This server does not allow virtual machines"
+msgstr "Tämä pelipalvelin ei salli virtuaalikoneita"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
+msgid "This server requires driver signing to be enabled"
+msgstr "Ajurien allekirjoitus on oltava käytössä pelataksesi tällä palvelimella."
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
+msgid "Please restart your PC"
+msgstr "Ole hyvä ja käynnistä tietokoneesi uudelleen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
+msgid "This server has detected missing anti-cheat components"
+msgstr "Tämä palvelin on havainnut puuttuvia komponentteja huijauksen estosta"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
+msgid "Try restarting MTA"
+msgstr "Kokeile käynnistää MTA uudelleen"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
+msgid "This server requires a non-modifed gta3.img and gta_int.img"
+msgstr "Tämä palvelin vaatii muokkaamattoman gta3.img:n ja gta_int.img:n"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
+msgid "Please replace gta3.img or gta_int.img"
+msgstr "Ole hyvä ja korvaa gta3.img tai gta_int.img"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
+msgid "This server does not allow Wine"
+msgstr "Wine ei ole sallittu tällä pelipalvelimella"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
+msgid "Ensure no other program is modifying MTA:SA"
+msgstr "Varmista että mikään toinen ohjelma ei muuta MTA:ta"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:650
+msgid "Time Remaining: "
+msgstr "Aikaa jäljellä: "
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:660
+#, c-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] "%d päivä"
+msgstr[1] "%d päivää"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:662
+#, c-format
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d tunti"
+msgstr[1] "%d tuntia"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:664
+#, c-format
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d minuutti"
+msgstr[1] "%d minuuttia"
+
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:666
+#, c-format
+msgid "%d second"
+msgid_plural "%d seconds"
+msgstr[0] "%d sekunti"
+msgstr[1] "%d sekuntia"
+
+#. Display the error
+#: Client/mods/deathmatch/logic/CPacketHandler.cpp:670
+msgid "Disconnected"
+msgstr "Yhteys katkaistu"
+
+#: Client/mods/deathmatch/logic/CResource.cpp:375
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1089
+#: Client/core/CSettings.cpp:3483 Client/core/CCore.cpp:674
+msgid "In-game"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:374
+msgid "Flying a UFO around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:374
+msgid "Cruising around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:374
+msgid "Riding the waves of"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:375
+msgid "Riding the train in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:375
+msgid "Flying around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
+msgid "Riding around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
+msgid "Monster truckin' around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:376
+msgid "Quaddin' around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+msgid "Bunny hopping around"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:377
+msgid "Doing weird stuff in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:381
+msgid "Climbing around in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:382
+#: Client/mods/deathmatch/logic/CClientGame.cpp:383
+msgid "Doing a drive-by in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:384
+msgid "Blub blub..."
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:385
+msgid "Breathing water"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:386
+msgid "Drowning in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:387
+msgid "Ducking for cover in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:388
+msgid "Fighting in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:389
+msgid "Throwing fists in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:390
+msgid "Blastin' fools in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:391
+msgid "Shooting up"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:392
+msgid "Jetpacking in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:393
+msgid "Literally on fire in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:394
+msgid "Burning up in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:395
+msgid "Swimming in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:396
+msgid "Floating around in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:397
+msgid "Being chased by a shark"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:398
+msgid "Choking to death in"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:533
+#: Client/core/CSettings.cpp:3479 Client/core/CCore.cpp:674
+#: Client/core/CMainMenu.cpp:304
+msgid "Main menu"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:641
+#: Client/mods/deathmatch/logic/CClientGame.cpp:739
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
+#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
+msgid "Invalid nickname! Please go to Settings and set a new one!"
+msgstr "Virheellinen nimimerkki! Määritä itsellesi uusi nimimerkki Asetukset-valikosta!"
+
+#. Display the status box
+#: Client/mods/deathmatch/logic/CClientGame.cpp:657
+#: Client/core/CConnectManager.cpp:148
+msgid "CONNECTING"
+msgstr "YHDISTETÄÄN"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:657
+msgid "Entering the game ..."
+msgstr "Liitytään peliin..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:715
+msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
+msgstr "Ei yhdistetty; ole hyvä ja käytä Yhdistä-painiketta tai 'connect' komentoa yhdistääksesi pelipalvelimelle."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:761
+msgid "Could not start the local server. See console for details."
+msgstr "Paikallisen palvelimen käynnistäminen epäonnistui. Katso lisätietoja konsolista."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:771
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
+msgid "Local Server"
+msgstr "Paikallinen palvelin"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:771
+msgid "Starting local server ..."
+msgstr "Käynnistetään paikallista palvelinta..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1019
+msgid "Area 51"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1028
+msgid "Walking around "
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1174
+#, c-format
+msgid "You were kicked from the game ( %s )"
+msgstr "Sinut potkittiin pelistä (%s)"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1243
+msgid "Connecting to local server..."
+msgstr "Yhdistetään paikalliselle palvelimelle..."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1254
+msgid "Error connecting to server."
+msgstr "Virhe yhdistettäessä palvelimeen."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1264
+msgid "Connecting to local server timed out. See console for details."
+msgstr "Paikalliselle palvelimelle yhdistäminen aikakatkaistiin. Katso konsolista lisätietoja."
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1333
+#: Client/core/CConnectManager.cpp:263
+msgid "Connection timed out"
+msgstr "Yhteyden aikakatkaisu"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1370
+msgid "Connection with the server was lost"
+msgstr "Yhteys palvelimeen menetetty"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1381
+#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
+msgid "Disconnected: unknown protocol error"
+msgstr "Yhteys katkaistu: isäntä katkaisi yhteyden"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1385
+#: Client/core/CConnectManager.cpp:285
+msgid "Disconnected: disconnected remotely"
+msgstr "Yhteys katkaistu: yhteys katkaistu etänä"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1389
+#: Client/core/CConnectManager.cpp:289
+msgid "Disconnected: connection lost remotely"
+msgstr "Yhteys katkaistu: yhteys menetetty etänä"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1393
+#: Client/core/CConnectManager.cpp:293
+msgid "Disconnected: you are banned from this server"
+msgstr "Yhteys katkaistu: sinulla on porttikielto tälle palvelimelle"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1397
+msgid "Disconnected: the server is currently full"
+msgstr "Yhteys katkaistu: Palvelin on täynnä"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1401
+#: Client/core/CConnectManager.cpp:300
+msgid "Disconnected: disconnected from the server"
+msgstr "Yhteys katkaistu: palvelin katkaisi yhteyden"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1405
+#: Client/core/CConnectManager.cpp:304
+msgid "Disconnected: connection to the server was lost"
+msgstr "Yhteys katkaistu: yhteys palvelimeen menetetty"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1409
+msgid "Disconnected: invalid password specified"
+msgstr "Yhteys katkaistu: Väärä salasana"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1413
+#: Client/core/CConnectManager.cpp:311
+msgid "Disconnected: connection was refused"
+msgstr "Yhteys katkaistu: yhteys evättiin"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:1431
+msgid "MTA Client verification failed!"
+msgstr "MTA:n varmennus epäonnistui!"
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+msgid "In a ditch"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+msgid "En-route to hospital"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5623
+msgid "Meeting their maker"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+msgid "Regretting their decisions"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CClientGame.cpp:5624
+msgid "Wasted"
+msgstr ""
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
+msgid "HOST GAME"
+msgstr "ISÄNNÖI PELIÄ"
+
+#. *
+#. * Webbrowser tab
+#. *
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
+#: Client/core/CSettings.cpp:442 Client/core/CSettings.cpp:630
+#: Client/core/CSettings.cpp:904 Client/core/CSettings.cpp:2018
+msgid "General"
+msgstr "Yleinen"
+
+#. m_pTabs->CreateTab ( "Gamemode" );
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
+msgid "Resources"
+msgstr "Resurssit"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
+msgid "Server name:"
+msgstr "Palvelimen nimi:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
+msgid "Password:"
+msgstr "Salasana:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
+msgid "Max players:"
+msgstr "Max. pelaajat:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
+msgid "Broadcast:"
+msgstr "Broadcast:"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
+msgid "LAN"
+msgstr "LAN"
+
+#. Create the tabs
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
+#: Client/core/ServerBrowser/CServerBrowser.cpp:133
+msgid "Internet"
+msgstr "Internet"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
+msgid "Selected"
+msgstr "Valittu"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
+msgid "All"
+msgstr "Kaikki"
+
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
+msgid "Start"
+msgstr "Käynnistä"
+
+#. Cancel button
+#: Client/mods/deathmatch/logic/CLocalServer.cpp:123
+#: Client/core/CSettings.cpp:132 Client/core/CSettings.cpp:4784
+#: Client/core/CVersionUpdater.cpp:1790 Client/core/CVersionUpdater.cpp:1806
+#: Client/core/CVersionUpdater.cpp:1841 Client/loader/Dialogs.cpp:136
+#: Client/gui/CGUIMessageBox_Impl.cpp:68
+msgid "Cancel"
+msgstr "Peruuta"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
+msgid "Map download progress:"
+msgstr "Kartan latauksen edistyminen:"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
+msgid "Download Progress:"
+msgstr "Latauksen edistyminen:"
+
+#. Find our largest piece of text, so we can size accordingly
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
+#, c-format
+msgid "%s of %s"
+msgstr "%s / %s"
+
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
+#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
+msgid "Disconnect to cancel download"
+msgstr "Katkaise yhteys peruuttaaksesi latauksen"
+
+#: Client/core/CScreenShot.cpp:104
+#, c-format
+msgid "Screenshot got %d bytes, but expected %d"
+msgstr "Kuvakaappaus on %d tavua, kun odotettiin %d tavua"
+
+#: Client/core/CScreenShot.cpp:110
+msgid "Screenshot failed"
+msgstr "Kuvankaappaus epäonnistui"
+
+#: Client/core/CScreenShot.cpp:160
+#, c-format
+msgid "Screenshot taken: '%s'"
+msgstr "Kuvankaappaus otettu: '%s'"
+
+#. Create window (with frame) if it will fit inside the screen resolution
+#: Client/core/CSettings.cpp:84
+msgid "SETTINGS"
+msgstr "ASETUKSET"
+
+#: Client/core/CSettings.cpp:116
+msgid "Multiplayer"
+msgstr "Moninpeli"
+
+#: Client/core/CSettings.cpp:117
+msgid "Video"
+msgstr "Kuva"
+
+#: Client/core/CSettings.cpp:118
+msgid "Audio"
+msgstr "Ääni"
+
+#: Client/core/CSettings.cpp:119
+msgid "Binds"
+msgstr "Näppäinmääritykset"
+
+#: Client/core/CSettings.cpp:120
+msgid "Controls"
+msgstr "Ohjaus"
+
+#: Client/core/CSettings.cpp:121
+msgid "Interface"
+msgstr "Käyttöliittymä"
+
+#: Client/core/CSettings.cpp:122
+msgid "Web Browser"
+msgstr "Nettiselain"
+
+#: Client/core/CSettings.cpp:123
+msgid "Advanced"
+msgstr "Lisäasetukset"
+
+#. Create buttons
+#. OK button
+#: Client/core/CSettings.cpp:127 Client/core/CSettings.cpp:4785
+#: Client/core/CVersionUpdater.cpp:1607 Client/core/CVersionUpdater.cpp:1823
+#: Client/core/CVersionUpdater.cpp:1916 Client/core/CVersionUpdater.cpp:1938
+#: Client/core/CVersionUpdater.cpp:1956 Client/core/CVersionUpdater.cpp:1968
+#: Client/core/CVersionUpdater.cpp:2120 Client/core/CVersionUpdater.cpp:2129
+#: Client/core/CVersionUpdater.cpp:2138 Client/core/CVersionUpdater.cpp:2152
+#: Client/loader/Dialogs.cpp:133 Client/gui/CGUIMessageBox_Impl.cpp:64
+msgid "OK"
+msgstr "OK"
+
+#: Client/core/CSettings.cpp:147 Client/core/CSettings.cpp:338
+#: Client/core/CSettings.cpp:617 Client/core/CSettings.cpp:889
+msgid "Load defaults"
+msgstr "Palauta oletusarvot"
+
+#. *
+#. *  Controls tab
+#. *
+#: Client/core/CSettings.cpp:157 Client/core/CSettings.cpp:181
+msgid "Mouse sensitivity:"
+msgstr "Hiiren herkkyys:"
+
+#. VerticalAimSensitivity
+#: Client/core/CSettings.cpp:157 Client/core/CSettings.cpp:199
+msgid "Vertical aim sensitivity:"
+msgstr "Pystysuuntainen tähtäysherkkyys:"
+
+#. Mouse Options
+#: Client/core/CSettings.cpp:160
+msgid "Mouse options"
+msgstr "Hiiren asetukset"
+
+#: Client/core/CSettings.cpp:167
+msgid "Invert mouse vertically"
+msgstr "Käänteinen hiiren liike pystysuunnassa"
+
+#: Client/core/CSettings.cpp:171
+msgid "Steer with mouse"
+msgstr "Ohjaa hiirellä"
+
+#: Client/core/CSettings.cpp:175
+msgid "Fly with mouse"
+msgstr "Lennä hiirellä"
+
+#. Joypad options
+#: Client/core/CSettings.cpp:217
+msgid "Joypad options"
+msgstr "Peliohjaimen asetukset"
+
+#: Client/core/CSettings.cpp:230
+msgid "Standard controls (Mouse + Keyboard)"
+msgstr "Tavallinen ohjaus (hiiri + näppäimistö)"
+
+#: Client/core/CSettings.cpp:237
+msgid "Classic controls (Joypad)"
+msgstr "Klassinen ohjaus (peliohjain)"
+
+#: Client/core/CSettings.cpp:274
+msgid "Dead Zone"
+msgstr "Kuollut alue"
+
+#: Client/core/CSettings.cpp:279
+msgid "Saturation"
+msgstr "Kylläisyys"
+
+#: Client/core/CSettings.cpp:285
+msgid "Use the 'Binds' tab for joypad buttons."
+msgstr "Käytä 'Näppäinmääritykset' välilehteä sauvan painikkeiden määritykseen."
+
+#: Client/core/CSettings.cpp:324
+msgid "Left Stick"
+msgstr "Vasen sauva"
+
+#: Client/core/CSettings.cpp:330
+msgid "Right Stick"
+msgstr "Oikea sauva"
+
+#: Client/core/CSettings.cpp:345
+msgid "DESCRIPTION"
+msgstr "KUVAUS"
+
+#: Client/core/CSettings.cpp:346
+msgid "KEY"
+msgstr "NÄPPÄIN"
+
+#: Client/core/CSettings.cpp:348
+msgid "ALT. KEY"
+msgstr "TOISSIJ. NÄPPÄIN"
+
+#. *
+#. *    Multiplayer tab
+#. *
+#: Client/core/CSettings.cpp:353 Client/core/CSettings.cpp:356
+msgid "Nick:"
+msgstr "Nimimerkki:"
+
+#: Client/core/CSettings.cpp:378
+msgid "Save server passwords"
+msgstr "Tallenna palvelinten salasanat"
+
+#: Client/core/CSettings.cpp:383
+msgid "Auto-refresh server browser"
+msgstr "Päivitä palvelinselain automaattisesti"
+
+#: Client/core/CSettings.cpp:388
+msgid "Allow screen upload"
+msgstr "Salli kuvakaappauksen lähetys"
+
+#: Client/core/CSettings.cpp:393
+msgid "Allow external sounds"
+msgstr "Salli ulkoiset äänet"
+
+#: Client/core/CSettings.cpp:398
+msgid "Always show download window"
+msgstr "Näytä latausikkuna aina"
+
+#: Client/core/CSettings.cpp:403
+msgid "Allow connecting with Discord Rich Presence"
+msgstr ""
+
+#: Client/core/CSettings.cpp:408
+msgid "Use customized GTA:SA files"
+msgstr "Käytä muokattuja GTA:SA-tiedostoja"
+
+#: Client/core/CSettings.cpp:413
+msgid "Map rendering options"
+msgstr "Kartan renderöintiasetukset"
+
+#: Client/core/CSettings.cpp:419 Client/core/CSettings.cpp:628
+msgid "Opacity:"
+msgstr "Läpinäkyvyys:"
+
+#. *
+#. *  Audio tab
+#. *
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:448
+msgid "Master volume:"
+msgstr "Pää-äänenvoimakkuus:"
+
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:467
+msgid "Radio volume:"
+msgstr "Radion äänenvoimakkuus:"
+
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:486
+msgid "SFX volume:"
+msgstr "Äänitehosteiden voimakkuus:"
+
+#: Client/core/CSettings.cpp:439 Client/core/CSettings.cpp:505
+msgid "MTA volume:"
+msgstr "MTA:n äänenvoimakkuus:"
+
+#: Client/core/CSettings.cpp:440 Client/core/CSettings.cpp:524
+msgid "Voice volume:"
+msgstr "Puheen voimakkuus:"
+
+#: Client/core/CSettings.cpp:440 Client/core/CSettings.cpp:565
+msgid "Play mode:"
+msgstr "Toistomoodi:"
+
+#: Client/core/CSettings.cpp:543
+msgid "Radio options"
+msgstr "Radioasetukset"
+
+#: Client/core/CSettings.cpp:549
+msgid "Radio Equalizer"
+msgstr "Radion taajuuskorjain"
+
+#: Client/core/CSettings.cpp:554
+msgid "Radio Auto-tune"
+msgstr "Radion automaattinen viritys"
+
+#: Client/core/CSettings.cpp:559
+msgid "Usertrack options"
+msgstr "Käyttäjäradion asetukset"
+
+#: Client/core/CSettings.cpp:573 Client/core/CSettings.cpp:3087
+msgid "Radio"
+msgstr "Radio"
+
+#: Client/core/CSettings.cpp:574 Client/core/CSettings.cpp:3089
+msgid "Random"
+msgstr "Satunnainen"
+
+#: Client/core/CSettings.cpp:575 Client/core/CSettings.cpp:3091
+msgid "Sequential"
+msgstr "Peräkkäinen"
+
+#: Client/core/CSettings.cpp:578
+msgid "Automatic Media Scan"
+msgstr "Automaattinen median haku"
+
+#: Client/core/CSettings.cpp:585
+msgid "Mute options"
+msgstr "Mykistysasetukset"
+
+#: Client/core/CSettings.cpp:591
+msgid "Mute All sounds when minimized"
+msgstr "Mykistä kaikki äänet, kun peli on pienennetty"
+
+#: Client/core/CSettings.cpp:596
+msgid "Mute Radio sounds when minimized"
+msgstr "Hiljennä radio, kun peli pienennetään"
+
+#: Client/core/CSettings.cpp:601
+msgid "Mute SFX sounds when minimized"
+msgstr "Hiljennä äänitehosteet, kun peli pienennetään"
+
+#: Client/core/CSettings.cpp:606
+msgid "Mute MTA sounds when minimized"
+msgstr "Hiljennä MTA:n äänet, kun peli pienennetään"
+
+#: Client/core/CSettings.cpp:611
+msgid "Mute Voice sounds when minimized"
+msgstr "Hiljennä puhe, kun peli pienennetään"
+
+#. *
+#. *  Video tab
+#. *
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:636
+msgid "Resolution:"
+msgstr "Tarkkuus:"
+
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:683
+msgid "FOV:"
+msgstr "Näkökenttä (FOV):"
+
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:699
+msgid "Draw Distance:"
+msgstr "Piirtoetäisyys (LOD):"
+
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:717
+msgid "Brightness:"
+msgstr "Kirkkaus:"
+
+#: Client/core/CSettings.cpp:627 Client/core/CSettings.cpp:735
+msgid "FX Quality:"
+msgstr "Laatu:"
+
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:749
+msgid "Anisotropic filtering:"
+msgstr "Anisotrooppinen suodatus:"
+
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:776
+msgid "Anti-aliasing:"
+msgstr "Reunojen pehmennys:"
+
+#: Client/core/CSettings.cpp:628 Client/core/CSettings.cpp:790
+msgid "Aspect Ratio:"
+msgstr "Kuvasuhde:"
+
+#: Client/core/CSettings.cpp:648
+msgid "Windowed"
+msgstr "Ikkunallinen"
+
+#: Client/core/CSettings.cpp:654
+msgid "DPI aware"
+msgstr "DPI-tietoinen"
+
+#: Client/core/CSettings.cpp:662 Client/core/CSettings.cpp:1004
+#: Client/loader/MainFunctions.cpp:389
+msgid "Fullscreen mode:"
+msgstr "Koko näytön tila:"
+
+#: Client/core/CSettings.cpp:669 Client/core/CSettings.cpp:1613
+msgid "Standard"
+msgstr "Vakio"
+
+#: Client/core/CSettings.cpp:670 Client/core/CSettings.cpp:1615
+#: Client/loader/MainFunctions.cpp:389
+msgid "Borderless window"
+msgstr "Reunaton ikkuna"
+
+#: Client/core/CSettings.cpp:671 Client/core/CSettings.cpp:1617
+msgid "Borderless keep res"
+msgstr "Reunaton pidä res"
+
+#: Client/core/CSettings.cpp:675
+msgid "Mip Mapping"
+msgstr "Mip-kartoitus"
+
+#: Client/core/CSettings.cpp:743 Client/core/CSettings.cpp:1517
+msgid "Low"
+msgstr "Matala"
+
+#: Client/core/CSettings.cpp:744 Client/core/CSettings.cpp:1519
+msgid "Medium"
+msgstr "Keskitaso"
+
+#: Client/core/CSettings.cpp:745 Client/core/CSettings.cpp:1086
+#: Client/core/CSettings.cpp:1521 Client/core/CSettings.cpp:3145
+msgid "High"
+msgstr "Korkea"
+
+#: Client/core/CSettings.cpp:746 Client/core/CSettings.cpp:1523
+msgid "Very high"
+msgstr "Erittäin korkea"
+
+#: Client/core/CSettings.cpp:761 Client/core/CSettings.cpp:784
+#: Client/core/CSettings.cpp:1017 Client/core/CSettings.cpp:1071
+#: Client/core/CSettings.cpp:1201 Client/core/CSettings.cpp:1527
+#: Client/core/CSettings.cpp:3152 Client/core/CSettings.cpp:3184
+#: Client/core/CSettings.cpp:3206 Client/core/CSettings.cpp:4234
+msgid "Off"
+msgstr "Pois käytöstä"
+
+#: Client/core/CSettings.cpp:785 Client/core/CSettings.cpp:1529
+msgid "1x"
+msgstr "1x"
+
+#: Client/core/CSettings.cpp:786 Client/core/CSettings.cpp:1531
+msgid "2x"
+msgstr "2x"
+
+#: Client/core/CSettings.cpp:787 Client/core/CSettings.cpp:1533
+msgid "3x"
+msgstr "3x"
+
+#: Client/core/CSettings.cpp:800 Client/core/CSettings.cpp:1019
+#: Client/core/CSettings.cpp:1539 Client/core/CSettings.cpp:3154
+msgid "Auto"
+msgstr "Automaattinen"
+
+#: Client/core/CSettings.cpp:801 Client/core/CSettings.cpp:1541
+msgid "4:3"
+msgstr "4:3"
+
+#: Client/core/CSettings.cpp:802 Client/core/CSettings.cpp:1543
+msgid "16:10"
+msgstr "16:10"
+
+#: Client/core/CSettings.cpp:803 Client/core/CSettings.cpp:1545
+msgid "16:9"
+msgstr "16:9"
+
+#: Client/core/CSettings.cpp:806
+msgid "HUD Match Aspect Ratio"
+msgstr "HUD vastaa kuvasuhdetta"
+
+#: Client/core/CSettings.cpp:812
+msgid "Volumetric Shadows"
+msgstr "Volumetriset varjot"
+
+#: Client/core/CSettings.cpp:816
+msgid "Grass effect"
+msgstr "Ruohoefekti"
+
+#: Client/core/CSettings.cpp:820
+msgid "Heat haze"
+msgstr "Lämpöaallot"
+
+#: Client/core/CSettings.cpp:824
+msgid "Tyre Smoke etc"
+msgstr "Renkaan savua jne"
+
+#: Client/core/CSettings.cpp:828
+msgid "Dynamic ped shadows"
+msgstr "Dynaamiset varjot"
+
+#: Client/core/CSettings.cpp:832
+msgid "Motion blur"
+msgstr "Motion blur"
+
+#: Client/core/CSettings.cpp:837
+msgid "Full Screen Minimize"
+msgstr "Koko näytön pienennys"
+
+#: Client/core/CSettings.cpp:849
+msgid "Enable Device Selection Dialog"
+msgstr "Ota käyttöön näytön valintaikkuna käynnistäessä"
+
+#: Client/core/CSettings.cpp:861
+msgid "Show unsafe resolutions"
+msgstr "Näytä epäturvalliset resoluutiot"
+
+#: Client/core/CSettings.cpp:873
+msgid "Render vehicles always in high detail"
+msgstr "Renderöi ajoneuvot aina yksityiskohtaisesti"
+
+#: Client/core/CSettings.cpp:877
+msgid "Render peds always in high detail"
+msgstr "Renderöi hahmot aina yksityiskohtaisesti"
+
+#: Client/core/CSettings.cpp:881
+msgid "Corona rain reflections"
+msgstr "Koronan heijastukset sateella"
+
+#: Client/core/CSettings.cpp:910
+msgid "Enable remote websites"
+msgstr "Ota etäsivustot käyttöön"
+
+#: Client/core/CSettings.cpp:915
+msgid "Enable Javascript on remote websites"
+msgstr "Ota JavaScript käyttöön etäsivustoilla"
+
+#: Client/core/CSettings.cpp:920
+msgid "Custom blacklist"
+msgstr "Mukautettu musta lista"
+
+#: Client/core/CSettings.cpp:931 Client/core/CSettings.cpp:966
+msgid "Enter a domain e.g. google.com"
+msgstr "Syötä verkkotunnus esim. google.com"
+
+#: Client/core/CSettings.cpp:939
+msgid "Block"
+msgstr "Estä"
+
+#: Client/core/CSettings.cpp:947 Client/core/CSettings.cpp:982
+msgid "Domain"
+msgstr "Verkkotunnus"
+
+#: Client/core/CSettings.cpp:949 Client/core/CSettings.cpp:984
+msgid "Remove domain"
+msgstr "Poista verkkotunnus"
+
+#. Reset vecTemp
+#: Client/core/CSettings.cpp:955
+msgid "Custom whitelist"
+msgstr "Mukautettu sallittujen lista"
+
+#. Misc section label
+#: Client/core/CSettings.cpp:997
+msgid "Misc"
+msgstr "Muut"
+
+#. Fast clothes loading
+#: Client/core/CSettings.cpp:1003 Client/core/CSettings.cpp:1010
+#: Client/core/CSettings.cpp:4803
+msgid "Fast CJ clothes loading:"
+msgstr "Nopea CJ:n vaatteiden lataus:"
+
+#. Browser scan speed
+#: Client/core/CSettings.cpp:1003 Client/core/CSettings.cpp:1024
+#: Client/core/CSettings.cpp:4805
+msgid "Browser speed:"
+msgstr "Palvelinselaimen nopeus:"
+
+#. Single download
+#: Client/core/CSettings.cpp:1003 Client/core/CSettings.cpp:1038
+#: Client/core/CSettings.cpp:4807
+msgid "Single connection:"
+msgstr "Yksittäinen yhteys:"
+
+#. Packet tag
+#: Client/core/CSettings.cpp:1003 Client/core/CSettings.cpp:1051
+#: Client/core/CSettings.cpp:4809
+msgid "Packet tag:"
+msgstr "Pakettien merkintä:"
+
+#. Progress animation
+#: Client/core/CSettings.cpp:1004 Client/core/CSettings.cpp:1064
+#: Client/core/CSettings.cpp:4811
+msgid "Progress animation:"
+msgstr "Etenemisanimaatio:"
+
+#. Process priority
+#: Client/core/CSettings.cpp:1004 Client/core/CSettings.cpp:1077
+#: Client/core/CSettings.cpp:4801
+msgid "Process priority:"
+msgstr "Prosessin prioriteetti:"
+
+#. Debug setting
+#: Client/core/CSettings.cpp:1004 Client/core/CSettings.cpp:1091
+#: Client/core/CSettings.cpp:4813
+msgid "Debug setting:"
+msgstr "Vianetsintäasetukset:"
+
+#. Streaming memory
+#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1114
+#: Client/core/CSettings.cpp:4815
+msgid "Streaming memory:"
+msgstr "Suoratoistomuisti:"
+
+#. Update build type
+#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1215
+msgid "Update build type:"
+msgstr "Päivityksen tyyppi:"
+
+#. UpdateAutoInstall
+#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1194
+msgid "Install important updates:"
+msgstr "Asenna tärkeät päivitykset:"
+
+#: Client/core/CSettings.cpp:1018 Client/core/CSettings.cpp:1046
+#: Client/core/CSettings.cpp:1059 Client/core/CSettings.cpp:3156
+#: Client/core/CSettings.cpp:3172 Client/core/CSettings.cpp:3179
+msgid "On"
+msgstr "Päällä"
+
+#: Client/core/CSettings.cpp:1031 Client/core/CSettings.cpp:3161
+msgid "Very slow"
+msgstr "Erittäin hidas"
+
+#: Client/core/CSettings.cpp:1032 Client/core/CSettings.cpp:1045
+#: Client/core/CSettings.cpp:1058 Client/core/CSettings.cpp:1072
+#: Client/core/CSettings.cpp:1098 Client/core/CSettings.cpp:1110
+#: Client/core/CSettings.cpp:1202 Client/core/CSettings.cpp:1222
+#: Client/core/CSettings.cpp:3163 Client/core/CSettings.cpp:3170
+#: Client/core/CSettings.cpp:3177 Client/core/CSettings.cpp:3186
+#: Client/core/CSettings.cpp:3199
+msgid "Default"
+msgstr "Oletus"
+
+#: Client/core/CSettings.cpp:1033 Client/core/CSettings.cpp:3165
+msgid "Fast"
+msgstr "Nopea"
+
+#: Client/core/CSettings.cpp:1084 Client/core/CSettings.cpp:3141
+msgid "Normal"
+msgstr "Normaali"
+
+#: Client/core/CSettings.cpp:1085 Client/core/CSettings.cpp:3143
+msgid "Above normal"
+msgstr "Normaalia parempi"
+
+#: Client/core/CSettings.cpp:1121
+msgid "Min"
+msgstr "Min"
+
+#: Client/core/CSettings.cpp:1134
+msgid "Max"
+msgstr "Max"
+
+#. Windows 8 compatibility
+#: Client/core/CSettings.cpp:1141
+msgid "Windows 8 compatibility:"
+msgstr "Windows 8 yhteensopivuus:"
+
+#: Client/core/CSettings.cpp:1145
+msgid "16-bit color"
+msgstr "16-bittinen väri"
+
+#: Client/core/CSettings.cpp:1150
+msgid "Mouse fix"
+msgstr "Hiiren korjaus"
+
+#. Cache path info
+#: Client/core/CSettings.cpp:1168
+msgid "Client resource files:"
+msgstr "Resurssitiedostot:"
+
+#: Client/core/CSettings.cpp:1172
+msgid "Show in Explorer"
+msgstr "Avaa resurssienhallinnassa"
+
+#. Auto updater section label
+#: Client/core/CSettings.cpp:1187 Client/core/CSettings.cpp:1190
+msgid "Auto updater"
+msgstr "Automaattinen päivitys"
+
+#. Check for updates
+#: Client/core/CSettings.cpp:1228
+msgid "Check for update now"
+msgstr "Tarkista päivitykset nyt"
+
+#: Client/core/CSettings.cpp:1382
+msgid "Some settings will be changed when you next start MTA"
+msgstr "Jotkut asetukset muuttuvat, kun seuraavan kerran käynnistät MTA:n"
+
+#: Client/core/CSettings.cpp:1383
+msgid "\n\n"
+"Do you want to restart now?"
+msgstr "\n\n"
+"Haluatko käynnistää uudelleen nyt?"
+
+#: Client/core/CSettings.cpp:1386
+msgid "RESTART REQUIRED"
+msgstr "UUDELLEENKÄYNNISTYS VAADITAAN"
+
+#: Client/core/CSettings.cpp:1388 Client/core/CSettings.cpp:1412
+#: Client/core/CSettings.cpp:4488 Client/core/CSettings.cpp:4562
+#: Client/core/CSettings.cpp:4592 Client/core/CSettings.cpp:4641
+#: Client/core/CQuestionBox.cpp:194 Client/core/CMainMenu.cpp:1199
+#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
+#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
+#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:132
+msgid "No"
+msgstr "Ei"
+
+#. /////////////////////////////////////////////////////////////////////////
+#.
+#. Dialog strings
+#.
+#.
+#. /////////////////////////////////////////////////////////////////////////
+#: Client/core/CSettings.cpp:1389 Client/core/CSettings.cpp:1413
+#: Client/core/CSettings.cpp:4489 Client/core/CSettings.cpp:4563
+#: Client/core/CSettings.cpp:4593 Client/core/CSettings.cpp:4642
+#: Client/core/CQuestionBox.cpp:195 Client/core/CMainMenu.cpp:1200
+#: Client/core/CVersionUpdater.cpp:1572 Client/core/CVersionUpdater.cpp:1590
+#: Client/core/CVersionUpdater.cpp:1859 Client/core/CVersionUpdater.cpp:1878
+#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:131
+#: Client/gui/CGUIMessageBox_Impl.cpp:72
+msgid "Yes"
+msgstr "Kyllä"
+
+#: Client/core/CSettings.cpp:1406
+msgid "Some settings will be changed when you disconnect the current server"
+msgstr "Jotkut asetukset muuttuvat, kun katkaiset yhteyden nykyiseen palvelimeen"
+
+#: Client/core/CSettings.cpp:1407
+msgid "\n\n"
+"Do you want to disconnect now?"
+msgstr "\n\n"
+"Haluatko katkaista yhteyden?"
+
+#: Client/core/CSettings.cpp:1410
+msgid "DISCONNECT REQUIRED"
+msgstr "VAADITAAN YHTEYDEN KATKAISEMINEN"
+
+#. Update the joystick name
+#: Client/core/CSettings.cpp:1737
+msgid "Joypad not detected  -  Check connections and restart game"
+msgstr "Sauvaohjainta ei havaittu - Tarkista liitännät ja käynnistä peli uudelleen"
+
+#: Client/core/CSettings.cpp:1932
+msgid "Binding axis"
+msgstr "Sitova akseli"
+
+#: Client/core/CSettings.cpp:1932
+msgid "Move an axis to bind, or escape to clear"
+msgstr "Liikuta akselia määrittääksesi, tai paina poistumisnäppäintä tyhjentääksesi"
+
+#: Client/core/CSettings.cpp:2009
+msgid "Language:"
+msgstr "Kieli:"
+
+#: Client/core/CSettings.cpp:2009
+msgid "Skin:"
+msgstr "Ulkoasu:"
+
+#: Client/core/CSettings.cpp:2009
+msgid "Presets:"
+msgstr "Esiasetukset:"
+
+#: Client/core/CSettings.cpp:2058
+msgid "Chat"
+msgstr "Chatti"
+
+#: Client/core/CSettings.cpp:2075
+msgid "Load"
+msgstr "Lataa"
+
+#: Client/core/CSettings.cpp:2087
+msgid "Colors"
+msgstr "Värit"
+
+#: Client/core/CSettings.cpp:2088
+msgid "Layout"
+msgstr "Asettelu"
+
+#: Client/core/CSettings.cpp:2089 Client/core/CSettings.cpp:2335
+msgid "Options"
+msgstr "Asetukset"
+
+#: Client/core/CSettings.cpp:2095
+msgid "Chat Background"
+msgstr "Chatin tausta"
+
+#: Client/core/CSettings.cpp:2095
+msgid "Chat Text"
+msgstr "Chatin teksti"
+
+#: Client/core/CSettings.cpp:2095
+msgid "Input Background"
+msgstr "Syötön tausta"
+
+#: Client/core/CSettings.cpp:2095
+msgid "Input Text"
+msgstr "Syötön teksti"
+
+#: Client/core/CSettings.cpp:2118
+msgid "Lines:"
+msgstr "Rivit:"
+
+#: Client/core/CSettings.cpp:2118
+msgid "Scale:"
+msgstr "Skaalaus:"
+
+#: Client/core/CSettings.cpp:2118
+msgid "Width:"
+msgstr "Leveys:"
+
+#: Client/core/CSettings.cpp:2121
+msgid "Size"
+msgstr "Koko"
+
+#: Client/core/CSettings.cpp:2170
+msgid "after"
+msgstr "jälkeen"
+
+#: Client/core/CSettings.cpp:2170
+msgid "for"
+msgstr "kesto"
+
+#: Client/core/CSettings.cpp:2170
+msgid "sec"
+msgstr "sek"
+
+#: Client/core/CSettings.cpp:2173
+msgid "Fading"
+msgstr "Häivytys"
+
+#: Client/core/CSettings.cpp:2179
+msgid "Fade out old lines"
+msgstr "Häivytä vanhat linjat"
+
+#: Client/core/CSettings.cpp:2219
+msgid "Horizontal:"
+msgstr "Vaakasuora:"
+
+#: Client/core/CSettings.cpp:2219
+msgid "Vertical:"
+msgstr "Pystysuora:"
+
+#: Client/core/CSettings.cpp:2219
+msgid "Text-Align:"
+msgstr "Tekstin tasaus:"
+
+#: Client/core/CSettings.cpp:2219
+msgid "X-Offset:"
+msgstr "X-etäisyys:"
+
+#: Client/core/CSettings.cpp:2220
+msgid "Y-Offset:"
+msgstr "Y-etäisyys:"
+
+#: Client/core/CSettings.cpp:2226
+msgid "Position"
+msgstr "Sijainti"
+
+#: Client/core/CSettings.cpp:2240 Client/core/CSettings.cpp:2268
+#: Client/core/CKeyBinds.cpp:191
+msgid "Left"
+msgstr "Vasemmalle"
+
+#: Client/core/CSettings.cpp:2241 Client/core/CSettings.cpp:2255
+msgid "Center"
+msgstr "Keskikohta"
+
+#: Client/core/CSettings.cpp:2242 Client/core/CSettings.cpp:2269
+#: Client/core/CKeyBinds.cpp:192
+msgid "Right"
+msgstr "Oikealle"
+
+#: Client/core/CSettings.cpp:2254
+msgid "Top"
+msgstr "Ylä"
+
+#: Client/core/CSettings.cpp:2256
+msgid "Bottom"
+msgstr "Ala"
+
+#: Client/core/CSettings.cpp:2304
+msgid "Font"
+msgstr "Fontti"
+
+#: Client/core/CSettings.cpp:2341
+msgid "Hide background when not typing"
+msgstr "Piilota tausta, kun et kirjoita"
+
+#: Client/core/CSettings.cpp:2346
+msgid "Nickname completion using the \"Tab\" key"
+msgstr "Nimen täyttö sarkaimen avulla"
+
+#: Client/core/CSettings.cpp:2351
+msgid "Allow server to flash the window"
+msgstr "Salli palvelimen väläyttää ikkunaa"
+
+#: Client/core/CSettings.cpp:2356
+msgid "Allow tray balloon notifications"
+msgstr "Salli ilmoitukset tehtäväpalkissa"
+
+#: Client/core/CSettings.cpp:2361
+msgid "Chat text black/white outline"
+msgstr "Chatin tekstin musta/valko ääriviiva"
+
+#. Create a messagebox to notify the user
+#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#. Create a messagebox to notify the user
+#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
+#: Client/core/CSettings.cpp:2610 Client/core/CSettings.cpp:2617
+msgid "Press a key to bind, or escape to clear"
+msgstr "Paina näppäintä määrittääksesi, tai paina poistumisnäppäintä tyhjentääksesi"
+
+#: Client/core/CSettings.cpp:2611
+msgid "Binding a primary key"
+msgstr "Ensisijaisen näppäimen määritys"
+
+#: Client/core/CSettings.cpp:2618
+msgid "Binding a secondary key"
+msgstr "Toissijaisen näppäimen määritys"
+
+#: Client/core/CSettings.cpp:2694
+msgid "GTA GAME CONTROLS"
+msgstr "GTA OHJAINASETUKSET"
+
+#: Client/core/CSettings.cpp:2696
+msgid "MULTIPLAYER CONTROLS"
+msgstr "MONINPELIN OHJAINASETUKSET"
+
+#: Client/core/CSettings.cpp:2941 Client/core/CSettings.cpp:4764
+msgid "Your nickname contains invalid characters!"
+msgstr "Nimesi sisältää virheellisiä merkkejä!"
+
+#: Client/core/CSettings.cpp:3778
+msgid "Red:"
+msgstr "Punainen:"
+
+#: Client/core/CSettings.cpp:3778
+msgid "Green:"
+msgstr "Vihreä:"
+
+#: Client/core/CSettings.cpp:3778
+msgid "Blue:"
+msgstr "Sininen:"
+
+#: Client/core/CSettings.cpp:3778
+msgid "Transparency:"
+msgstr "Läpinäkyvyys:"
+
+#: Client/core/CSettings.cpp:3781
+msgid "Color"
+msgstr "Väri"
+
+#: Client/core/CSettings.cpp:3858
+msgid "Preview"
+msgstr "Esikatselu"
+
+#: Client/core/CSettings.cpp:4166
+msgid "Please disconnect before changing language"
+msgstr "Ole hyvä ja katkaise yhteys ennen kielen vaihtamista"
+
+#: Client/core/CSettings.cpp:4194
+msgid "Please disconnect before changing skin"
+msgstr "Ole hyvä ja poistu pelipalvelimelta ennen ulkoasun vaihtamista"
+
+#: Client/core/CSettings.cpp:4482
+msgid "Volmetric shadows can cause some systems to slow down.\n\n"
+"Are you sure you want to enable them?"
+msgstr "Volumetriset varjot voivat hidastaa joitakin järjestelmiä.\n\n"
+"Haluatko varmasti ottaa ne käyttöön?"
+
+#: Client/core/CSettings.cpp:4486
+msgid "PERFORMANCE WARNING"
+msgstr "SUORITUSKYKYVAROITUS"
+
+#: Client/core/CSettings.cpp:4506
+msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
+"(The chat box and GUI is excluded from the upload)\n"
+msgstr "Kuvakaappuksen lähetys on vaadittu jollain palvelimilla huijauksen eston takia.\n\n"
+"(Chatti ja graafinen käyttöliittymä on piilotettu kuvakaappauksesta)\n"
+
+#: Client/core/CSettings.cpp:4508
+msgid "SCREEN UPLOAD INFORMATION"
+msgstr "KUVAKAAPPAUKSEN LÄHETYS"
+
+#: Client/core/CSettings.cpp:4523
+msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
+"Disabling this setting may decrease network\n"
+"bandwidth consumption.\n"
+msgstr "Jotkut skriptit saattavat toistaa ääniä, kuten radiota, internetistä.\n\n"
+"Tämän asetuksen poistaminen käytöstä voi vähentää verkon kulutusta.\n"
+
+#: Client/core/CSettings.cpp:4526
+msgid "EXTERNAL SOUNDS"
+msgstr "ULKOISET ÄÄNET"
+
+#: Client/core/CSettings.cpp:4555
+msgid "It seems that you have the Rich Presence connection option enabled.\n"
+"Do you want to allow servers to share their data?\n\n"
+"This includes yours unique ID identifier."
+msgstr ""
+
+#: Client/core/CSettings.cpp:4560
+msgid "CONSENT TO ALLOW DATA SHARING"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4584
+msgid "Some files in your GTA:SA data directory are customized.\n"
+"MTA will only use these modified files if this check box is ticked.\n\n"
+"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
+"Are you sure you want to use them?"
+msgstr "Jotkin tiedostot GTA:SA hakemistossasi ovat muokattuja.\n"
+"MTA käyttää muokattuja tiedostoja vain, jos tämä valinta on käytössä.\n\n"
+"Huomaa, että muokatut GTA:SA tiedostot ovat estettyjä monilla pelipalvelimilla!\n\n"
+"Oletko varma että haluat käyttää niitä?"
+
+#: Client/core/CSettings.cpp:4590 Client/core/CVersionUpdater.cpp:2081
+msgid "CUSTOMIZED GTA:SA FILES"
+msgstr "MUKAUTETUT GTA:SA TIEDOSTOT"
+
+#: Client/core/CSettings.cpp:4633
+msgid "Enabling DPI awareness is an experimental feature and\n"
+"we only recommend it when you play MTA:SA on a scaled monitor.\n"
+"You may experience graphical issues if you enable this option.\n\n"
+"Are you sure you want to enable this option?"
+msgstr "DPI-tietoisuus on kokeellinen ominaisuus ja suosittelemme\n"
+"sitä vain kun pelaat MTA:ta skaalautuneessa koossa.\n"
+"Saatat kokea visuaalisia häiriöitä jos käytät tätä asetusta.\n\n"
+"Oletko varma että haluat käyttää tätä asetusta?"
+
+#: Client/core/CSettings.cpp:4639
+msgid "EXPERIMENTAL FEATURE"
+msgstr "KOKEELLINEN OMINAISUUS"
+
+#: Client/core/CSettings.cpp:4782
+msgid "Please enter a nickname"
+msgstr "Ole hyvä ja syötä nimimerkki"
+
+#: Client/core/CSettings.cpp:4783
+msgid "Please enter a nickname to be used ingame.  \n"
+"This will be your name when you connect to and play in a server"
+msgstr "Ole hyvä ja syötä nimimerkki.\n"
+"Tämä on nimesi joka näkyy liittyessäsi ja pelatessasi palvelimella"
+
+#: Client/core/CSettings.cpp:4801
+msgid "Very experimental feature."
+msgstr "Erityisen kokeellinen ominaisuus."
+
+#: Client/core/CSettings.cpp:4803
+msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
+msgstr "Auttaa CJ-variaatioiden latausten kanssa (Käyttää 65MB enemmän muistia)"
+
+#: Client/core/CSettings.cpp:4805
+msgid "Older routers may require a slower scan speed."
+msgstr "Vanhemmat reitittimet voivat vaatia hitaamman skannausnopeuden."
+
+#: Client/core/CSettings.cpp:4807
+msgid "Switch on to use only one connection when downloading."
+msgstr "Valitse tämä käyttääksesi vain yhtä yhteyttä latauksissa."
+
+#: Client/core/CSettings.cpp:4809
+msgid "Tag network packets to help ISPs identify MTA traffic."
+msgstr "Merkitsee paketit auttaakseen internet-palveluntarjoajia tunnistamaan MTA:n verkkoliikenteen."
+
+#: Client/core/CSettings.cpp:4811
+msgid "Spinning circle animation at the bottom of the screen"
+msgstr "Pyörivä latausanimaatio ruudun alareunassa"
+
+#: Client/core/CSettings.cpp:4813
+msgid "Select default always. (This setting is not saved)"
+msgstr "Valitse oletus aina. (Tätä asetusta ei tallenneta)"
+
+#: Client/core/CSettings.cpp:4815
+msgid "Maximum is usually best"
+msgstr "Korkein asetus on yleensä paras"
+
+#: Client/core/CSettings.cpp:4817 Client/core/CSettings.cpp:4819
+msgid "Auto updater:"
+msgstr "Automaattinen päivitys:"
+
+#: Client/core/CSettings.cpp:4817
+msgid "Select default unless you like filling out bug reports."
+msgstr "Valitse oletus ellet pidä bugien raportoinnista."
+
+#: Client/core/CSettings.cpp:4819
+msgid "Select default to automatically install important updates."
+msgstr "Valitse oletus asentaaksesi tärkeät päivitykset automaattisesti."
+
+#: Client/core/CSettings.cpp:4821
+msgid "16-bit color:"
+msgstr "16-bittinen väri:"
+
+#: Client/core/CSettings.cpp:4821
+msgid "Enable 16 bit color modes - Requires MTA restart"
+msgstr "Käytä 16 bittistä väriavaruutta - Tarvitsee MTA:n uudelleenkäynnistyksen"
+
+#: Client/core/CSettings.cpp:4823
+msgid "Mouse fix:"
+msgstr "Hiiren korjaus:"
+
+#: Client/core/CSettings.cpp:4823
+msgid "Mouse movement fix - May need PC restart"
+msgstr "Hiiren liikkeen korjaus - Saattaa tarvita PC:n uudelleenkäynnistyksen"
+
+#: Client/core/CCore.cpp:811 Client/loader/CInstallManager.cpp:1057
+#, c-format
+msgid "MTA:SA cannot continue because drive %s does not have enough space."
+msgstr "MTA:SA ei voi jatkaa, koska %s levyllä ei ole tarpeeksi tilaa."
+
+#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:129
+msgid "Fatal error"
+msgstr "Vakava virhe"
+
+#: Client/core/CCore.cpp:938
+msgid "TO FIX, REMOVE THIS FILE:"
+msgstr "KORJAA POISTAMALLA TÄMÄ TIEDOSTO:"
+
+#: Client/core/CCore.cpp:970
+#, c-format
+msgid "%s module is incorrect!"
+msgstr "%s moduuli on väärä!"
+
+#: Client/core/CCore.cpp:1275
+msgid "Error executing URL"
+msgstr "Virhe suoritettaessa URL:ää"
+
+#: Client/core/CCore.cpp:1287
+#, c-format
+msgid "Error running mod specified in command line ('%s')"
+msgstr "Virhe suoritettaessa komentorivillä määriteltyä modia ('%s')"
+
+#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
+#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
+#: Client/core/CCore.cpp:1389
+msgid "this help screen"
+msgstr "tämä ohje"
+
+#: Client/core/CCore.cpp:1390 Client/core/CCore.cpp:1391
+msgid "exits the application"
+msgstr "poistuu sovelluksesta"
+
+#: Client/core/CCore.cpp:1392
+msgid "shows the version"
+msgstr "näyttää version"
+
+#: Client/core/CCore.cpp:1393
+msgid "shows the time"
+msgstr "näyttää ajan"
+
+#: Client/core/CCore.cpp:1394
+msgid "shows the hud"
+msgstr "näyttää hud:n"
+
+#: Client/core/CCore.cpp:1395
+msgid "shows all the binds"
+msgstr "näyttää kaikki näppäinmääritykset"
+
+#: Client/core/CCore.cpp:1396
+msgid "shows your serial"
+msgstr "näyttää serialin"
+
+#: Client/core/CCore.cpp:1405
+msgid "connects to a server (host port nick pass)"
+msgstr "yhdistää palvelimeen (isäntä portti nimimerkki salasana)"
+
+#: Client/core/CCore.cpp:1406
+msgid "connects to a previous server"
+msgstr "yhdistää aikaisempaan palvelimeen"
+
+#: Client/core/CCore.cpp:1407
+msgid "binds a key (key control)"
+msgstr "määrittää näppäimen"
+
+#: Client/core/CCore.cpp:1408
+msgid "unbinds a key (key)"
+msgstr "poistaa näppäimen määrityksen"
+
+#: Client/core/CCore.cpp:1409
+msgid "copies the default gta controls"
+msgstr "kopioi gta:n oletusnäppäinmääritykset"
+
+#: Client/core/CCore.cpp:1410
+msgid "outputs a screenshot"
+msgstr "ottaa kuvakaappauksen"
+
+#: Client/core/CCore.cpp:1411
+msgid "immediately saves the config"
+msgstr "tallentaa asetustiedoston välittömästi"
+
+#: Client/core/CCore.cpp:1413
+msgid "clears the debug view"
+msgstr "tyhjentää vianetsintäikkunan"
+
+#: Client/core/CCore.cpp:1414
+msgid "scrolls the chatbox upwards"
+msgstr "vierittää chat-ruutua ylöspäin"
+
+#: Client/core/CCore.cpp:1415
+msgid "scrolls the chatbox downwards"
+msgstr "vierittää chat-ruutua alaspäin"
+
+#: Client/core/CCore.cpp:1416
+msgid "scrolls the debug view upwards"
+msgstr "vierittää vianetsintäikkunaa ylöspäin"
+
+#: Client/core/CCore.cpp:1417
+msgid "scrolls the debug view downwards"
+msgstr "vierittää vianetsintäikkunaa alaspäin"
+
+#: Client/core/CCore.cpp:1420
+msgid "shows the memory statistics"
+msgstr "näyttää muistitilastot"
+
+#: Client/core/CCore.cpp:1421
+msgid "shows the frame timing graph"
+msgstr "näyttää ruutuaikakuvaajan"
+
+#: Client/core/CCore.cpp:1425
+msgid "for developers: reload news"
+msgstr "kehittäjille: päivitä uutiset"
+
+#: Client/core/CConnectManager.cpp:79
+msgid "Connecting failed. Invalid nick provided!"
+msgstr "Yhdistäminen epäonnistui. Virheellinen nimimerkki!"
+
+#: Client/core/CConnectManager.cpp:110
+msgid "Connecting failed. Invalid host provided!"
+msgstr "Yhdistäminen epäonnistui. Virheellinen isäntä!"
+
+#: Client/core/CConnectManager.cpp:126
+#, c-format
+msgid "Connecting to %s at port %u failed!"
+msgstr "Yhdistäminen osoitteeseen %s portissa %u epäonnistui!"
+
+#. Display the status box
+#: Client/core/CConnectManager.cpp:147
+#, c-format
+msgid "Connecting to %s:%u ..."
+msgstr "Yhdistetään osoitteeseen %s:%u ..."
+
+#. Failed loading the mod
+#: Client/core/CConnectManager.cpp:403
+#, c-format
+msgid "No such mod installed (%s)"
+msgstr "Modia ei asennettu (%s)"
+
+#: Client/core/CConnectManager.cpp:411
+msgid "Bad server response (2)"
+msgstr "Virheellinen vastaus palvelimelta (2)"
+
+#: Client/core/CConnectManager.cpp:421
+msgid "Bad server response (1)"
+msgstr "Virheellinen vastaus palvelimelta (1)"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -116,16 +1954,6 @@ msgstr "Eteenpäin"
 #: Client/core/CKeyBinds.cpp:190
 msgid "Backwards"
 msgstr "Taaksepäin"
-
-#: Client/core/CKeyBinds.cpp:191 Client/core/CSettings.cpp:2228
-#: Client/core/CSettings.cpp:2256
-msgid "Left"
-msgstr "Vasemmalle"
-
-#: Client/core/CKeyBinds.cpp:192 Client/core/CSettings.cpp:2230
-#: Client/core/CSettings.cpp:2257
-msgid "Right"
-msgstr "Oikealle"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
@@ -279,148 +2107,10 @@ msgstr "Eteenpäin (ryhmäohjaus)"
 msgid "Group control backwards"
 msgstr "Taaksepäin (ryhmäohjaus)"
 
-#: Client/core/CConnectManager.cpp:79
-msgid "Connecting failed. Invalid nick provided!"
-msgstr "Yhdistäminen epäonnistui. Virheellinen nimimerkki!"
-
-#. Show a message that the connection timed out and abort
-#. Show failed message and abort the attempt
-#. Show timeout message and disconnect
-#. Display an error, reset the error status and exit
-#: Client/core/CConnectManager.cpp:80 Client/core/CConnectManager.cpp:111
-#: Client/core/CConnectManager.cpp:127 Client/core/CConnectManager.cpp:263
-#: Client/core/CConnectManager.cpp:321 Client/core/CConnectManager.cpp:404
-#: Client/core/CConnectManager.cpp:411 Client/core/CConnectManager.cpp:421
-#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4148
-#: Client/core/CSettings.cpp:4176 Client/core/CSettings.cpp:4746
-#: Client/core/CGUI.cpp:87 Client/core/CCore.cpp:1275
-#: Client/core/CCore.cpp:1288 Client/core/DXHook/CDirect3DHook9.cpp:127
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1278
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1406
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:145
-#: Client/mods/deathmatch/logic/CClientGame.cpp:635
-#: Client/mods/deathmatch/logic/CClientGame.cpp:709
-#: Client/mods/deathmatch/logic/CClientGame.cpp:733
-#: Client/mods/deathmatch/logic/CClientGame.cpp:755
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1171
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1330
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1367
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1416
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1428
-#: Client/loader/CInstallManager.cpp:552 Client/loader/CInstallManager.cpp:561
-#: Client/loader/MainFunctions.cpp:252 Client/loader/MainFunctions.cpp:267
-#: Client/loader/MainFunctions.cpp:269 Client/loader/MainFunctions.cpp:846
-#: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
-#: Shared/sdk/SharedUtil.Misc.hpp:137
-msgid "Error"
-msgstr "Virhe"
-
-#: Client/core/CConnectManager.cpp:110
-msgid "Connecting failed. Invalid host provided!"
-msgstr "Yhdistäminen epäonnistui. Virheellinen isäntä!"
-
-#: Client/core/CConnectManager.cpp:126
-#, c-format
-msgid "Connecting to %s at port %u failed!"
-msgstr "Yhdistäminen osoitteeseen %s portissa %u epäonnistui!"
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:147
-#, c-format
-msgid "Connecting to %s:%u ..."
-msgstr "Yhdistetään osoitteeseen %s:%u ..."
-
-#. Display the status box
-#: Client/core/CConnectManager.cpp:148
-#: Client/mods/deathmatch/logic/CClientGame.cpp:651
-msgid "CONNECTING"
-msgstr "YHDISTETÄÄN"
-
-#: Client/core/CConnectManager.cpp:263
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1330
-msgid "Connection timed out"
-msgstr "Yhteyden aikakatkaisu"
-
-#: Client/core/CConnectManager.cpp:277 Client/core/CConnectManager.cpp:281
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1378
-msgid "Disconnected: unknown protocol error"
-msgstr "Yhteys katkaistu: isäntä katkaisi yhteyden"
-
-#: Client/core/CConnectManager.cpp:285
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1382
-msgid "Disconnected: disconnected remotely"
-msgstr "Yhteys katkaistu: yhteys katkaistu etänä"
-
-#: Client/core/CConnectManager.cpp:289
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1386
-msgid "Disconnected: connection lost remotely"
-msgstr "Yhteys katkaistu: yhteys menetetty etänä"
-
-#: Client/core/CConnectManager.cpp:293
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1390
-msgid "Disconnected: you are banned from this server"
-msgstr "Yhteys katkaistu: sinulla on porttikielto tälle palvelimelle"
-
-#: Client/core/CConnectManager.cpp:300
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1398
-msgid "Disconnected: disconnected from the server"
-msgstr "Yhteys katkaistu: palvelin katkaisi yhteyden"
-
-#: Client/core/CConnectManager.cpp:304
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1402
-msgid "Disconnected: connection to the server was lost"
-msgstr "Yhteys katkaistu: yhteys palvelimeen menetetty"
-
-#: Client/core/CConnectManager.cpp:311
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1410
-msgid "Disconnected: connection was refused"
-msgstr "Yhteys katkaistu: yhteys evättiin"
-
-#. Failed loading the mod
-#: Client/core/CConnectManager.cpp:403
-#, c-format
-msgid "No such mod installed (%s)"
-msgstr "Modia ei asennettu (%s)"
-
-#: Client/core/CConnectManager.cpp:411
-msgid "Bad server response (2)"
-msgstr "Virheellinen vastaus palvelimelta (2)"
-
-#: Client/core/CConnectManager.cpp:421
-msgid "Bad server response (1)"
-msgstr "Virheellinen vastaus palvelimelta (1)"
-
-#: Client/core/CCredits.cpp:34
-msgid "Programming"
-msgstr "Ohjelmointi"
-
-#: Client/core/CCredits.cpp:63
-msgid "Contributors"
-msgstr "Avustajat"
-
-#: Client/core/CCredits.cpp:84
-msgid "Game Design / Scripting"
-msgstr "Pelisuunnittelu / Skriptaus"
-
-#: Client/core/CCredits.cpp:104
-msgid "Language Localization"
-msgstr "Lokalisointi"
-
-#: Client/core/CCredits.cpp:110
-msgid "Patch contributors"
-msgstr "Kehitykseen osallistuneet"
-
-#: Client/core/CCredits.cpp:234
-msgid "Special Thanks"
-msgstr "Erityiskiitokset"
-
-#: Client/core/CCredits.cpp:265
-msgid "This software and project makes use of the following libraries and software:"
-msgstr "Tämä ohjelmisto ja projekti käyttää hyväksi seuraavia kirjastoja ja ohjelmia:"
+#. Even the default skin doesn't work, so give up
+#: Client/core/CGUI.cpp:86
+msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
+msgstr "Valitsemaasi ulkoasua ei voitu ladata, oletusulkoasua ei voitu myöskään ladata. Ole hyvä ja asenna MTA uudelleen."
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:153
@@ -431,1053 +2121,6 @@ msgstr "UUTISET"
 #: Client/core/CNewsBrowser.cpp:171 Client/core/CNewsBrowser.cpp:172
 msgid "Visit latest news article"
 msgstr "Tutustu uusimpaan uutisartikkeliin"
-
-#: Client/core/CMainMenu.cpp:304 Client/core/CSettings.cpp:3461
-#: Client/core/CCore.cpp:674 Client/mods/deathmatch/logic/CClientGame.cpp:527
-msgid "Main menu"
-msgstr ""
-
-#: Client/core/CMainMenu.cpp:333
-msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Käytät ominaisuushaara-koontiversiota! Tämä on vain testiversio, jota ei voida käyttää yhteyden muodostamiseen julkisiin palvelimiin!"
-
-#: Client/core/CMainMenu.cpp:352
-msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
-"Upgrade Windows to play on the latest servers."
-msgstr "MTA ei saa päivityksiä XP/Vistaan ​​heinäkuun 2019 jälkeen.\n\n"
-" Päivitä Windows pelataksesi uusimmilla palvelimilla."
-
-#: Client/core/CMainMenu.cpp:1193
-msgid "This will disconnect you from the current server.\n\n"
-"Are you sure you want to disconnect?"
-msgstr "Tämä katkaisee yhteyden nykyiseen palvelimeen.\n\n"
-"Haluatko varmasti katkaista yhteyden?"
-
-#: Client/core/CMainMenu.cpp:1197
-msgid "DISCONNECT WARNING"
-msgstr "VAROITUS YHTEYDEN KATKAISUSTA"
-
-#: Client/core/CMainMenu.cpp:1199 Client/core/CSettings.cpp:1376
-#: Client/core/CSettings.cpp:1400 Client/core/CSettings.cpp:4470
-#: Client/core/CSettings.cpp:4544 Client/core/CSettings.cpp:4574
-#: Client/core/CSettings.cpp:4623 Client/core/CQuestionBox.cpp:194
-#: Client/core/CVersionUpdater.cpp:1571 Client/core/CVersionUpdater.cpp:1589
-#: Client/core/CVersionUpdater.cpp:1858 Client/core/CVersionUpdater.cpp:1877
-#: Client/core/ServerBrowser/CServerInfo.cpp:479 Client/loader/Dialogs.cpp:132
-msgid "No"
-msgstr "Ei"
-
-#. Create window
-#: Client/core/CConsole.cpp:417
-msgid "CONSOLE"
-msgstr "KONSOLI"
-
-#: Client/core/CJoystickManager.cpp:1578
-msgid "Accelerate Axis"
-msgstr "Kiihdytysakseli"
-
-#: Client/core/CJoystickManager.cpp:1580
-msgid "Brake Axis"
-msgstr "Jarrutusakseli"
-
-#. Unknown command
-#: Client/core/CCommands.cpp:216
-msgid "Unknown command or cvar: "
-msgstr "Tuntematon komento tai cvar: "
-
-#. Create window (with frame) if it will fit inside the screen resolution
-#: Client/core/CSettings.cpp:84
-msgid "SETTINGS"
-msgstr "ASETUKSET"
-
-#: Client/core/CSettings.cpp:116
-msgid "Multiplayer"
-msgstr "Moninpeli"
-
-#: Client/core/CSettings.cpp:117
-msgid "Video"
-msgstr "Kuva"
-
-#: Client/core/CSettings.cpp:118
-msgid "Audio"
-msgstr "Ääni"
-
-#: Client/core/CSettings.cpp:119
-msgid "Binds"
-msgstr "Näppäinmääritykset"
-
-#: Client/core/CSettings.cpp:120
-msgid "Controls"
-msgstr "Ohjaus"
-
-#: Client/core/CSettings.cpp:121
-msgid "Interface"
-msgstr "Käyttöliittymä"
-
-#: Client/core/CSettings.cpp:122
-msgid "Web Browser"
-msgstr "Nettiselain"
-
-#: Client/core/CSettings.cpp:123
-msgid "Advanced"
-msgstr "Lisäasetukset"
-
-#: Client/core/CSettings.cpp:147 Client/core/CSettings.cpp:338
-#: Client/core/CSettings.cpp:605 Client/core/CSettings.cpp:877
-msgid "Load defaults"
-msgstr "Palauta oletusarvot"
-
-#. *
-#. *  Controls tab
-#. *
-#: Client/core/CSettings.cpp:157 Client/core/CSettings.cpp:181
-msgid "Mouse sensitivity:"
-msgstr "Hiiren herkkyys:"
-
-#. VerticalAimSensitivity
-#: Client/core/CSettings.cpp:157 Client/core/CSettings.cpp:199
-msgid "Vertical aim sensitivity:"
-msgstr "Pystysuuntainen tähtäysherkkyys:"
-
-#. Mouse Options
-#: Client/core/CSettings.cpp:160
-msgid "Mouse options"
-msgstr "Hiiren asetukset"
-
-#: Client/core/CSettings.cpp:167
-msgid "Invert mouse vertically"
-msgstr "Käänteinen hiiren liike pystysuunnassa"
-
-#: Client/core/CSettings.cpp:171
-msgid "Steer with mouse"
-msgstr "Ohjaa hiirellä"
-
-#: Client/core/CSettings.cpp:175
-msgid "Fly with mouse"
-msgstr "Lennä hiirellä"
-
-#. Joypad options
-#: Client/core/CSettings.cpp:217
-msgid "Joypad options"
-msgstr "Peliohjaimen asetukset"
-
-#: Client/core/CSettings.cpp:230
-msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Tavallinen ohjaus (hiiri + näppäimistö)"
-
-#: Client/core/CSettings.cpp:237
-msgid "Classic controls (Joypad)"
-msgstr "Klassinen ohjaus (peliohjain)"
-
-#: Client/core/CSettings.cpp:274
-msgid "Dead Zone"
-msgstr "Kuollut alue"
-
-#: Client/core/CSettings.cpp:279
-msgid "Saturation"
-msgstr "Kylläisyys"
-
-#: Client/core/CSettings.cpp:285
-msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Käytä 'Näppäinmääritykset' välilehteä sauvan painikkeiden määritykseen."
-
-#: Client/core/CSettings.cpp:324
-msgid "Left Stick"
-msgstr "Vasen sauva"
-
-#: Client/core/CSettings.cpp:330
-msgid "Right Stick"
-msgstr "Oikea sauva"
-
-#: Client/core/CSettings.cpp:345
-msgid "DESCRIPTION"
-msgstr "KUVAUS"
-
-#: Client/core/CSettings.cpp:346
-msgid "KEY"
-msgstr "NÄPPÄIN"
-
-#: Client/core/CSettings.cpp:348
-msgid "ALT. KEY"
-msgstr "TOISSIJ. NÄPPÄIN"
-
-#. *
-#. *    Multiplayer tab
-#. *
-#: Client/core/CSettings.cpp:353 Client/core/CSettings.cpp:356
-msgid "Nick:"
-msgstr "Nimimerkki:"
-
-#: Client/core/CSettings.cpp:366
-msgid "Save server passwords"
-msgstr "Tallenna palvelinten salasanat"
-
-#: Client/core/CSettings.cpp:371
-msgid "Auto-refresh server browser"
-msgstr "Päivitä palvelinselain automaattisesti"
-
-#: Client/core/CSettings.cpp:376
-msgid "Allow screen upload"
-msgstr "Salli kuvakaappauksen lähetys"
-
-#: Client/core/CSettings.cpp:381
-msgid "Allow external sounds"
-msgstr "Salli ulkoiset äänet"
-
-#: Client/core/CSettings.cpp:386
-msgid "Always show download window"
-msgstr "Näytä latausikkuna aina"
-
-#: Client/core/CSettings.cpp:391
-msgid "Allow connecting with Discord Rich Presence"
-msgstr ""
-
-#: Client/core/CSettings.cpp:396
-msgid "Use customized GTA:SA files"
-msgstr "Käytä muokattuja GTA:SA-tiedostoja"
-
-#: Client/core/CSettings.cpp:401
-msgid "Map rendering options"
-msgstr "Kartan renderöintiasetukset"
-
-#: Client/core/CSettings.cpp:407 Client/core/CSettings.cpp:616
-msgid "Opacity:"
-msgstr "Läpinäkyvyys:"
-
-#. *
-#. *  Audio tab
-#. *
-#: Client/core/CSettings.cpp:427 Client/core/CSettings.cpp:436
-msgid "Master volume:"
-msgstr "Pää-äänenvoimakkuus:"
-
-#: Client/core/CSettings.cpp:427 Client/core/CSettings.cpp:455
-msgid "Radio volume:"
-msgstr "Radion äänenvoimakkuus:"
-
-#: Client/core/CSettings.cpp:427 Client/core/CSettings.cpp:474
-msgid "SFX volume:"
-msgstr "Äänitehosteiden voimakkuus:"
-
-#: Client/core/CSettings.cpp:427 Client/core/CSettings.cpp:493
-msgid "MTA volume:"
-msgstr "MTA:n äänenvoimakkuus:"
-
-#: Client/core/CSettings.cpp:428 Client/core/CSettings.cpp:512
-msgid "Voice volume:"
-msgstr "Puheen voimakkuus:"
-
-#: Client/core/CSettings.cpp:428 Client/core/CSettings.cpp:553
-msgid "Play mode:"
-msgstr "Toistomoodi:"
-
-#. *
-#. * Webbrowser tab
-#. *
-#: Client/core/CSettings.cpp:430 Client/core/CSettings.cpp:618
-#: Client/core/CSettings.cpp:892 Client/core/CSettings.cpp:2006
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:51
-msgid "General"
-msgstr "Yleinen"
-
-#: Client/core/CSettings.cpp:531
-msgid "Radio options"
-msgstr "Radioasetukset"
-
-#: Client/core/CSettings.cpp:537
-msgid "Radio Equalizer"
-msgstr "Radion taajuuskorjain"
-
-#: Client/core/CSettings.cpp:542
-msgid "Radio Auto-tune"
-msgstr "Radion automaattinen viritys"
-
-#: Client/core/CSettings.cpp:547
-msgid "Usertrack options"
-msgstr "Käyttäjäradion asetukset"
-
-#: Client/core/CSettings.cpp:561 Client/core/CSettings.cpp:3069
-msgid "Radio"
-msgstr "Radio"
-
-#: Client/core/CSettings.cpp:562 Client/core/CSettings.cpp:3071
-msgid "Random"
-msgstr "Satunnainen"
-
-#: Client/core/CSettings.cpp:563 Client/core/CSettings.cpp:3073
-msgid "Sequential"
-msgstr "Peräkkäinen"
-
-#: Client/core/CSettings.cpp:566
-msgid "Automatic Media Scan"
-msgstr "Automaattinen median haku"
-
-#: Client/core/CSettings.cpp:573
-msgid "Mute options"
-msgstr "Mykistysasetukset"
-
-#: Client/core/CSettings.cpp:579
-msgid "Mute All sounds when minimized"
-msgstr "Mykistä kaikki äänet, kun peli on pienennetty"
-
-#: Client/core/CSettings.cpp:584
-msgid "Mute Radio sounds when minimized"
-msgstr "Hiljennä radio, kun peli pienennetään"
-
-#: Client/core/CSettings.cpp:589
-msgid "Mute SFX sounds when minimized"
-msgstr "Hiljennä äänitehosteet, kun peli pienennetään"
-
-#: Client/core/CSettings.cpp:594
-msgid "Mute MTA sounds when minimized"
-msgstr "Hiljennä MTA:n äänet, kun peli pienennetään"
-
-#: Client/core/CSettings.cpp:599
-msgid "Mute Voice sounds when minimized"
-msgstr "Hiljennä puhe, kun peli pienennetään"
-
-#. *
-#. *  Video tab
-#. *
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:624
-msgid "Resolution:"
-msgstr "Tarkkuus:"
-
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:671
-msgid "FOV:"
-msgstr "Näkökenttä (FOV):"
-
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:687
-msgid "Draw Distance:"
-msgstr "Piirtoetäisyys (LOD):"
-
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:705
-msgid "Brightness:"
-msgstr "Kirkkaus:"
-
-#: Client/core/CSettings.cpp:615 Client/core/CSettings.cpp:723
-msgid "FX Quality:"
-msgstr "Laatu:"
-
-#: Client/core/CSettings.cpp:616 Client/core/CSettings.cpp:737
-msgid "Anisotropic filtering:"
-msgstr "Anisotrooppinen suodatus:"
-
-#: Client/core/CSettings.cpp:616 Client/core/CSettings.cpp:764
-msgid "Anti-aliasing:"
-msgstr "Reunojen pehmennys:"
-
-#: Client/core/CSettings.cpp:616 Client/core/CSettings.cpp:778
-msgid "Aspect Ratio:"
-msgstr "Kuvasuhde:"
-
-#: Client/core/CSettings.cpp:636
-msgid "Windowed"
-msgstr "Ikkunallinen"
-
-#: Client/core/CSettings.cpp:642
-msgid "DPI aware"
-msgstr "DPI-tietoinen"
-
-#: Client/core/CSettings.cpp:650 Client/core/CSettings.cpp:992
-#: Client/loader/MainFunctions.cpp:389
-msgid "Fullscreen mode:"
-msgstr "Koko näytön tila:"
-
-#: Client/core/CSettings.cpp:657 Client/core/CSettings.cpp:1601
-msgid "Standard"
-msgstr "Vakio"
-
-#: Client/core/CSettings.cpp:658 Client/core/CSettings.cpp:1603
-#: Client/loader/MainFunctions.cpp:389
-msgid "Borderless window"
-msgstr "Reunaton ikkuna"
-
-#: Client/core/CSettings.cpp:659 Client/core/CSettings.cpp:1605
-msgid "Borderless keep res"
-msgstr "Reunaton pidä res"
-
-#: Client/core/CSettings.cpp:663
-msgid "Mip Mapping"
-msgstr "Mip-kartoitus"
-
-#: Client/core/CSettings.cpp:731 Client/core/CSettings.cpp:1505
-msgid "Low"
-msgstr "Matala"
-
-#: Client/core/CSettings.cpp:732 Client/core/CSettings.cpp:1507
-msgid "Medium"
-msgstr "Keskitaso"
-
-#: Client/core/CSettings.cpp:733 Client/core/CSettings.cpp:1074
-#: Client/core/CSettings.cpp:1509 Client/core/CSettings.cpp:3127
-msgid "High"
-msgstr "Korkea"
-
-#: Client/core/CSettings.cpp:734 Client/core/CSettings.cpp:1511
-msgid "Very high"
-msgstr "Erittäin korkea"
-
-#: Client/core/CSettings.cpp:749 Client/core/CSettings.cpp:772
-#: Client/core/CSettings.cpp:1005 Client/core/CSettings.cpp:1059
-#: Client/core/CSettings.cpp:1189 Client/core/CSettings.cpp:1515
-#: Client/core/CSettings.cpp:3134 Client/core/CSettings.cpp:3166
-#: Client/core/CSettings.cpp:3188 Client/core/CSettings.cpp:4216
-msgid "Off"
-msgstr "Pois käytöstä"
-
-#: Client/core/CSettings.cpp:773 Client/core/CSettings.cpp:1517
-msgid "1x"
-msgstr "1x"
-
-#: Client/core/CSettings.cpp:774 Client/core/CSettings.cpp:1519
-msgid "2x"
-msgstr "2x"
-
-#: Client/core/CSettings.cpp:775 Client/core/CSettings.cpp:1521
-msgid "3x"
-msgstr "3x"
-
-#: Client/core/CSettings.cpp:788 Client/core/CSettings.cpp:1007
-#: Client/core/CSettings.cpp:1527 Client/core/CSettings.cpp:3136
-msgid "Auto"
-msgstr "Automaattinen"
-
-#: Client/core/CSettings.cpp:789 Client/core/CSettings.cpp:1529
-msgid "4:3"
-msgstr "4:3"
-
-#: Client/core/CSettings.cpp:790 Client/core/CSettings.cpp:1531
-msgid "16:10"
-msgstr "16:10"
-
-#: Client/core/CSettings.cpp:791 Client/core/CSettings.cpp:1533
-msgid "16:9"
-msgstr "16:9"
-
-#: Client/core/CSettings.cpp:794
-msgid "HUD Match Aspect Ratio"
-msgstr "HUD vastaa kuvasuhdetta"
-
-#: Client/core/CSettings.cpp:800
-msgid "Volumetric Shadows"
-msgstr "Volumetriset varjot"
-
-#: Client/core/CSettings.cpp:804
-msgid "Grass effect"
-msgstr "Ruohoefekti"
-
-#: Client/core/CSettings.cpp:808
-msgid "Heat haze"
-msgstr "Lämpöaallot"
-
-#: Client/core/CSettings.cpp:812
-msgid "Tyre Smoke etc"
-msgstr "Renkaan savua jne"
-
-#: Client/core/CSettings.cpp:816
-msgid "Dynamic ped shadows"
-msgstr "Dynaamiset varjot"
-
-#: Client/core/CSettings.cpp:820
-msgid "Motion blur"
-msgstr "Motion blur"
-
-#: Client/core/CSettings.cpp:825
-msgid "Full Screen Minimize"
-msgstr "Koko näytön pienennys"
-
-#: Client/core/CSettings.cpp:837
-msgid "Enable Device Selection Dialog"
-msgstr "Ota käyttöön näytön valintaikkuna käynnistäessä"
-
-#: Client/core/CSettings.cpp:849
-msgid "Show unsafe resolutions"
-msgstr "Näytä epäturvalliset resoluutiot"
-
-#: Client/core/CSettings.cpp:861
-msgid "Render vehicles always in high detail"
-msgstr "Renderöi ajoneuvot aina yksityiskohtaisesti"
-
-#: Client/core/CSettings.cpp:865
-msgid "Render peds always in high detail"
-msgstr "Renderöi hahmot aina yksityiskohtaisesti"
-
-#: Client/core/CSettings.cpp:869
-msgid "Corona rain reflections"
-msgstr "Koronan heijastukset sateella"
-
-#: Client/core/CSettings.cpp:898
-msgid "Enable remote websites"
-msgstr "Ota etäsivustot käyttöön"
-
-#: Client/core/CSettings.cpp:903
-msgid "Enable Javascript on remote websites"
-msgstr "Ota JavaScript käyttöön etäsivustoilla"
-
-#: Client/core/CSettings.cpp:908
-msgid "Custom blacklist"
-msgstr "Mukautettu musta lista"
-
-#: Client/core/CSettings.cpp:919 Client/core/CSettings.cpp:954
-msgid "Enter a domain e.g. google.com"
-msgstr "Syötä verkkotunnus esim. google.com"
-
-#: Client/core/CSettings.cpp:927
-msgid "Block"
-msgstr "Estä"
-
-#: Client/core/CSettings.cpp:935 Client/core/CSettings.cpp:970
-msgid "Domain"
-msgstr "Verkkotunnus"
-
-#: Client/core/CSettings.cpp:937 Client/core/CSettings.cpp:972
-msgid "Remove domain"
-msgstr "Poista verkkotunnus"
-
-#. Reset vecTemp
-#: Client/core/CSettings.cpp:943
-msgid "Custom whitelist"
-msgstr "Mukautettu sallittujen lista"
-
-#. Misc section label
-#: Client/core/CSettings.cpp:985
-msgid "Misc"
-msgstr "Muut"
-
-#. Fast clothes loading
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:998
-#: Client/core/CSettings.cpp:4785
-msgid "Fast CJ clothes loading:"
-msgstr "Nopea CJ:n vaatteiden lataus:"
-
-#. Browser scan speed
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1012
-#: Client/core/CSettings.cpp:4787
-msgid "Browser speed:"
-msgstr "Palvelinselaimen nopeus:"
-
-#. Single download
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1026
-#: Client/core/CSettings.cpp:4789
-msgid "Single connection:"
-msgstr "Yksittäinen yhteys:"
-
-#. Packet tag
-#: Client/core/CSettings.cpp:991 Client/core/CSettings.cpp:1039
-#: Client/core/CSettings.cpp:4791
-msgid "Packet tag:"
-msgstr "Pakettien merkintä:"
-
-#. Progress animation
-#: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1052
-#: Client/core/CSettings.cpp:4793
-msgid "Progress animation:"
-msgstr "Etenemisanimaatio:"
-
-#. Process priority
-#: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1065
-#: Client/core/CSettings.cpp:4783
-msgid "Process priority:"
-msgstr "Prosessin prioriteetti:"
-
-#. Debug setting
-#: Client/core/CSettings.cpp:992 Client/core/CSettings.cpp:1079
-#: Client/core/CSettings.cpp:4795
-msgid "Debug setting:"
-msgstr "Vianetsintäasetukset:"
-
-#. Streaming memory
-#: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1102
-#: Client/core/CSettings.cpp:4797
-msgid "Streaming memory:"
-msgstr "Suoratoistomuisti:"
-
-#. Update build type
-#: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1203
-msgid "Update build type:"
-msgstr "Päivityksen tyyppi:"
-
-#. UpdateAutoInstall
-#: Client/core/CSettings.cpp:993 Client/core/CSettings.cpp:1182
-msgid "Install important updates:"
-msgstr "Asenna tärkeät päivitykset:"
-
-#: Client/core/CSettings.cpp:1006 Client/core/CSettings.cpp:1034
-#: Client/core/CSettings.cpp:1047 Client/core/CSettings.cpp:3138
-#: Client/core/CSettings.cpp:3154 Client/core/CSettings.cpp:3161
-msgid "On"
-msgstr "Päällä"
-
-#: Client/core/CSettings.cpp:1019 Client/core/CSettings.cpp:3143
-msgid "Very slow"
-msgstr "Erittäin hidas"
-
-#: Client/core/CSettings.cpp:1020 Client/core/CSettings.cpp:1033
-#: Client/core/CSettings.cpp:1046 Client/core/CSettings.cpp:1060
-#: Client/core/CSettings.cpp:1086 Client/core/CSettings.cpp:1098
-#: Client/core/CSettings.cpp:1190 Client/core/CSettings.cpp:1210
-#: Client/core/CSettings.cpp:3145 Client/core/CSettings.cpp:3152
-#: Client/core/CSettings.cpp:3159 Client/core/CSettings.cpp:3168
-#: Client/core/CSettings.cpp:3181
-msgid "Default"
-msgstr "Oletus"
-
-#: Client/core/CSettings.cpp:1021 Client/core/CSettings.cpp:3147
-msgid "Fast"
-msgstr "Nopea"
-
-#: Client/core/CSettings.cpp:1072 Client/core/CSettings.cpp:3123
-msgid "Normal"
-msgstr "Normaali"
-
-#: Client/core/CSettings.cpp:1073 Client/core/CSettings.cpp:3125
-msgid "Above normal"
-msgstr "Normaalia parempi"
-
-#: Client/core/CSettings.cpp:1109
-msgid "Min"
-msgstr "Min"
-
-#: Client/core/CSettings.cpp:1122
-msgid "Max"
-msgstr "Max"
-
-#. Windows 8 compatibility
-#: Client/core/CSettings.cpp:1129
-msgid "Windows 8 compatibility:"
-msgstr "Windows 8 yhteensopivuus:"
-
-#: Client/core/CSettings.cpp:1133
-msgid "16-bit color"
-msgstr "16-bittinen väri"
-
-#: Client/core/CSettings.cpp:1138
-msgid "Mouse fix"
-msgstr "Hiiren korjaus"
-
-#. Cache path info
-#: Client/core/CSettings.cpp:1156
-msgid "Client resource files:"
-msgstr "Resurssitiedostot:"
-
-#: Client/core/CSettings.cpp:1160
-msgid "Show in Explorer"
-msgstr "Avaa resurssienhallinnassa"
-
-#. Auto updater section label
-#: Client/core/CSettings.cpp:1175 Client/core/CSettings.cpp:1178
-msgid "Auto updater"
-msgstr "Automaattinen päivitys"
-
-#. Check for updates
-#: Client/core/CSettings.cpp:1216
-msgid "Check for update now"
-msgstr "Tarkista päivitykset nyt"
-
-#: Client/core/CSettings.cpp:1370
-msgid "Some settings will be changed when you next start MTA"
-msgstr "Jotkut asetukset muuttuvat, kun seuraavan kerran käynnistät MTA:n"
-
-#: Client/core/CSettings.cpp:1371
-msgid "\n\n"
-"Do you want to restart now?"
-msgstr "\n\n"
-"Haluatko käynnistää uudelleen nyt?"
-
-#: Client/core/CSettings.cpp:1374
-msgid "RESTART REQUIRED"
-msgstr "UUDELLEENKÄYNNISTYS VAADITAAN"
-
-#: Client/core/CSettings.cpp:1394
-msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Jotkut asetukset muuttuvat, kun katkaiset yhteyden nykyiseen palvelimeen"
-
-#: Client/core/CSettings.cpp:1395
-msgid "\n\n"
-"Do you want to disconnect now?"
-msgstr "\n\n"
-"Haluatko katkaista yhteyden?"
-
-#: Client/core/CSettings.cpp:1398
-msgid "DISCONNECT REQUIRED"
-msgstr "VAADITAAN YHTEYDEN KATKAISEMINEN"
-
-#. Update the joystick name
-#: Client/core/CSettings.cpp:1725
-msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Sauvaohjainta ei havaittu - Tarkista liitännät ja käynnistä peli uudelleen"
-
-#: Client/core/CSettings.cpp:1920
-msgid "Binding axis"
-msgstr "Sitova akseli"
-
-#: Client/core/CSettings.cpp:1920
-msgid "Move an axis to bind, or escape to clear"
-msgstr "Liikuta akselia määrittääksesi, tai paina poistumisnäppäintä tyhjentääksesi"
-
-#: Client/core/CSettings.cpp:1997
-msgid "Language:"
-msgstr "Kieli:"
-
-#: Client/core/CSettings.cpp:1997
-msgid "Skin:"
-msgstr "Ulkoasu:"
-
-#: Client/core/CSettings.cpp:1997
-msgid "Presets:"
-msgstr "Esiasetukset:"
-
-#: Client/core/CSettings.cpp:2046
-msgid "Chat"
-msgstr "Chatti"
-
-#: Client/core/CSettings.cpp:2063
-msgid "Load"
-msgstr "Lataa"
-
-#: Client/core/CSettings.cpp:2075
-msgid "Colors"
-msgstr "Värit"
-
-#: Client/core/CSettings.cpp:2076
-msgid "Layout"
-msgstr "Asettelu"
-
-#: Client/core/CSettings.cpp:2077 Client/core/CSettings.cpp:2323
-msgid "Options"
-msgstr "Asetukset"
-
-#: Client/core/CSettings.cpp:2083
-msgid "Chat Background"
-msgstr "Chatin tausta"
-
-#: Client/core/CSettings.cpp:2083
-msgid "Chat Text"
-msgstr "Chatin teksti"
-
-#: Client/core/CSettings.cpp:2083
-msgid "Input Background"
-msgstr "Syötön tausta"
-
-#: Client/core/CSettings.cpp:2083
-msgid "Input Text"
-msgstr "Syötön teksti"
-
-#: Client/core/CSettings.cpp:2106
-msgid "Lines:"
-msgstr "Rivit:"
-
-#: Client/core/CSettings.cpp:2106
-msgid "Scale:"
-msgstr "Skaalaus:"
-
-#: Client/core/CSettings.cpp:2106
-msgid "Width:"
-msgstr "Leveys:"
-
-#: Client/core/CSettings.cpp:2109
-msgid "Size"
-msgstr "Koko"
-
-#: Client/core/CSettings.cpp:2158
-msgid "after"
-msgstr "jälkeen"
-
-#: Client/core/CSettings.cpp:2158
-msgid "for"
-msgstr "kesto"
-
-#: Client/core/CSettings.cpp:2158
-msgid "sec"
-msgstr "sek"
-
-#: Client/core/CSettings.cpp:2161
-msgid "Fading"
-msgstr "Häivytys"
-
-#: Client/core/CSettings.cpp:2167
-msgid "Fade out old lines"
-msgstr "Häivytä vanhat linjat"
-
-#: Client/core/CSettings.cpp:2207
-msgid "Horizontal:"
-msgstr "Vaakasuora:"
-
-#: Client/core/CSettings.cpp:2207
-msgid "Vertical:"
-msgstr "Pystysuora:"
-
-#: Client/core/CSettings.cpp:2207
-msgid "Text-Align:"
-msgstr "Tekstin tasaus:"
-
-#: Client/core/CSettings.cpp:2207
-msgid "X-Offset:"
-msgstr "X-etäisyys:"
-
-#: Client/core/CSettings.cpp:2208
-msgid "Y-Offset:"
-msgstr "Y-etäisyys:"
-
-#: Client/core/CSettings.cpp:2214
-msgid "Position"
-msgstr "Sijainti"
-
-#: Client/core/CSettings.cpp:2229 Client/core/CSettings.cpp:2243
-msgid "Center"
-msgstr "Keskikohta"
-
-#: Client/core/CSettings.cpp:2242
-msgid "Top"
-msgstr "Ylä"
-
-#: Client/core/CSettings.cpp:2244
-msgid "Bottom"
-msgstr "Ala"
-
-#: Client/core/CSettings.cpp:2292
-msgid "Font"
-msgstr "Fontti"
-
-#: Client/core/CSettings.cpp:2329
-msgid "Hide background when not typing"
-msgstr "Piilota tausta, kun et kirjoita"
-
-#: Client/core/CSettings.cpp:2334
-msgid "Nickname completion using the \"Tab\" key"
-msgstr "Nimen täyttö sarkaimen avulla"
-
-#: Client/core/CSettings.cpp:2339
-msgid "Allow server to flash the window"
-msgstr "Salli palvelimen väläyttää ikkunaa"
-
-#: Client/core/CSettings.cpp:2344
-msgid "Allow tray balloon notifications"
-msgstr "Salli ilmoitukset tehtäväpalkissa"
-
-#: Client/core/CSettings.cpp:2349
-msgid "Chat text black/white outline"
-msgstr "Chatin tekstin musta/valko ääriviiva"
-
-#. Create a messagebox to notify the user
-#. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#. Create a messagebox to notify the user
-#. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
-#: Client/core/CSettings.cpp:2598 Client/core/CSettings.cpp:2605
-msgid "Press a key to bind, or escape to clear"
-msgstr "Paina näppäintä määrittääksesi, tai paina poistumisnäppäintä tyhjentääksesi"
-
-#: Client/core/CSettings.cpp:2599
-msgid "Binding a primary key"
-msgstr "Ensisijaisen näppäimen määritys"
-
-#: Client/core/CSettings.cpp:2606
-msgid "Binding a secondary key"
-msgstr "Toissijaisen näppäimen määritys"
-
-#: Client/core/CSettings.cpp:2682
-msgid "GTA GAME CONTROLS"
-msgstr "GTA OHJAINASETUKSET"
-
-#: Client/core/CSettings.cpp:2684
-msgid "MULTIPLAYER CONTROLS"
-msgstr "MONINPELIN OHJAINASETUKSET"
-
-#: Client/core/CSettings.cpp:2929 Client/core/CSettings.cpp:4746
-msgid "Your nickname contains invalid characters!"
-msgstr "Nimesi sisältää virheellisiä merkkejä!"
-
-#: Client/core/CSettings.cpp:3465 Client/core/CCore.cpp:674
-#: Client/mods/deathmatch/logic/CResource.cpp:372
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1083
-msgid "In-game"
-msgstr ""
-
-#: Client/core/CSettings.cpp:3760
-msgid "Red:"
-msgstr "Punainen:"
-
-#: Client/core/CSettings.cpp:3760
-msgid "Green:"
-msgstr "Vihreä:"
-
-#: Client/core/CSettings.cpp:3760
-msgid "Blue:"
-msgstr "Sininen:"
-
-#: Client/core/CSettings.cpp:3760
-msgid "Transparency:"
-msgstr "Läpinäkyvyys:"
-
-#: Client/core/CSettings.cpp:3763
-msgid "Color"
-msgstr "Väri"
-
-#: Client/core/CSettings.cpp:3840
-msgid "Preview"
-msgstr "Esikatselu"
-
-#: Client/core/CSettings.cpp:4148
-msgid "Please disconnect before changing language"
-msgstr "Ole hyvä ja katkaise yhteys ennen kielen vaihtamista"
-
-#: Client/core/CSettings.cpp:4176
-msgid "Please disconnect before changing skin"
-msgstr "Ole hyvä ja poistu pelipalvelimelta ennen ulkoasun vaihtamista"
-
-#: Client/core/CSettings.cpp:4464
-msgid "Volmetric shadows can cause some systems to slow down.\n\n"
-"Are you sure you want to enable them?"
-msgstr "Volumetriset varjot voivat hidastaa joitakin järjestelmiä.\n\n"
-"Haluatko varmasti ottaa ne käyttöön?"
-
-#: Client/core/CSettings.cpp:4468
-msgid "PERFORMANCE WARNING"
-msgstr "SUORITUSKYKYVAROITUS"
-
-#: Client/core/CSettings.cpp:4488
-msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
-"(The chat box and GUI is excluded from the upload)\n"
-msgstr "Kuvakaappuksen lähetys on vaadittu jollain palvelimilla huijauksen eston takia.\n\n"
-"(Chatti ja graafinen käyttöliittymä on piilotettu kuvakaappauksesta)\n"
-
-#: Client/core/CSettings.cpp:4490
-msgid "SCREEN UPLOAD INFORMATION"
-msgstr "KUVAKAAPPAUKSEN LÄHETYS"
-
-#: Client/core/CSettings.cpp:4505
-msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
-"Disabling this setting may decrease network\n"
-"bandwidth consumption.\n"
-msgstr "Jotkut skriptit saattavat toistaa ääniä, kuten radiota, internetistä.\n\n"
-"Tämän asetuksen poistaminen käytöstä voi vähentää verkon kulutusta.\n"
-
-#: Client/core/CSettings.cpp:4508
-msgid "EXTERNAL SOUNDS"
-msgstr "ULKOISET ÄÄNET"
-
-#: Client/core/CSettings.cpp:4537
-msgid "It seems that you have the Rich Presence connection option enabled.\n"
-"Do you want to allow servers to share their data?\n\n"
-"This includes yours unique ID identifier."
-msgstr ""
-
-#: Client/core/CSettings.cpp:4542
-msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr ""
-
-#: Client/core/CSettings.cpp:4566
-msgid "Some files in your GTA:SA data directory are customized.\n"
-"MTA will only use these modified files if this check box is ticked.\n\n"
-"However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
-"Are you sure you want to use them?"
-msgstr "Jotkin tiedostot GTA:SA hakemistossasi ovat muokattuja.\n"
-"MTA käyttää muokattuja tiedostoja vain, jos tämä valinta on käytössä.\n\n"
-"Huomaa, että muokatut GTA:SA tiedostot ovat estettyjä monilla pelipalvelimilla!\n\n"
-"Oletko varma että haluat käyttää niitä?"
-
-#: Client/core/CSettings.cpp:4572 Client/core/CVersionUpdater.cpp:2081
-msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "MUKAUTETUT GTA:SA TIEDOSTOT"
-
-#: Client/core/CSettings.cpp:4615
-msgid "Enabling DPI awareness is an experimental feature and\n"
-"we only recommend it when you play MTA:SA on a scaled monitor.\n"
-"You may experience graphical issues if you enable this option.\n\n"
-"Are you sure you want to enable this option?"
-msgstr "DPI-tietoisuus on kokeellinen ominaisuus ja suosittelemme\n"
-"sitä vain kun pelaat MTA:ta skaalautuneessa koossa.\n"
-"Saatat kokea visuaalisia häiriöitä jos käytät tätä asetusta.\n\n"
-"Oletko varma että haluat käyttää tätä asetusta?"
-
-#: Client/core/CSettings.cpp:4621
-msgid "EXPERIMENTAL FEATURE"
-msgstr "KOKEELLINEN OMINAISUUS"
-
-#: Client/core/CSettings.cpp:4764
-msgid "Please enter a nickname"
-msgstr "Ole hyvä ja syötä nimimerkki"
-
-#: Client/core/CSettings.cpp:4765
-msgid "Please enter a nickname to be used ingame.  \n"
-"This will be your name when you connect to and play in a server"
-msgstr "Ole hyvä ja syötä nimimerkki.\n"
-"Tämä on nimesi joka näkyy liittyessäsi ja pelatessasi palvelimella"
-
-#: Client/core/CSettings.cpp:4783
-msgid "Very experimental feature."
-msgstr "Erityisen kokeellinen ominaisuus."
-
-#: Client/core/CSettings.cpp:4785
-msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "Auttaa CJ-variaatioiden latausten kanssa (Käyttää 65MB enemmän muistia)"
-
-#: Client/core/CSettings.cpp:4787
-msgid "Older routers may require a slower scan speed."
-msgstr "Vanhemmat reitittimet voivat vaatia hitaamman skannausnopeuden."
-
-#: Client/core/CSettings.cpp:4789
-msgid "Switch on to use only one connection when downloading."
-msgstr "Valitse tämä käyttääksesi vain yhtä yhteyttä latauksissa."
-
-#: Client/core/CSettings.cpp:4791
-msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "Merkitsee paketit auttaakseen internet-palveluntarjoajia tunnistamaan MTA:n verkkoliikenteen."
-
-#: Client/core/CSettings.cpp:4793
-msgid "Spinning circle animation at the bottom of the screen"
-msgstr "Pyörivä latausanimaatio ruudun alareunassa"
-
-#: Client/core/CSettings.cpp:4795
-msgid "Select default always. (This setting is not saved)"
-msgstr "Valitse oletus aina. (Tätä asetusta ei tallenneta)"
-
-#: Client/core/CSettings.cpp:4797
-msgid "Maximum is usually best"
-msgstr "Korkein asetus on yleensä paras"
-
-#: Client/core/CSettings.cpp:4799 Client/core/CSettings.cpp:4801
-msgid "Auto updater:"
-msgstr "Automaattinen päivitys:"
-
-#: Client/core/CSettings.cpp:4799
-msgid "Select default unless you like filling out bug reports."
-msgstr "Valitse oletus ellet pidä bugien raportoinnista."
-
-#: Client/core/CSettings.cpp:4801
-msgid "Select default to automatically install important updates."
-msgstr "Valitse oletus asentaaksesi tärkeät päivitykset automaattisesti."
-
-#: Client/core/CSettings.cpp:4803
-msgid "16-bit color:"
-msgstr "16-bittinen väri:"
-
-#: Client/core/CSettings.cpp:4803
-msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "Käytä 16 bittistä väriavaruutta - Tarvitsee MTA:n uudelleenkäynnistyksen"
-
-#: Client/core/CSettings.cpp:4805
-msgid "Mouse fix:"
-msgstr "Hiiren korjaus:"
-
-#: Client/core/CSettings.cpp:4805
-msgid "Mouse movement fix - May need PC restart"
-msgstr "Hiiren liikkeen korjaus - Saattaa tarvita PC:n uudelleenkäynnistyksen"
-
-#: Client/core/CScreenShot.cpp:104
-#, c-format
-msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Kuvakaappaus on %d tavua, kun odotettiin %d tavua"
-
-#: Client/core/CScreenShot.cpp:110
-msgid "Screenshot failed"
-msgstr "Kuvankaappaus epäonnistui"
-
-#: Client/core/CScreenShot.cpp:160
-#, c-format
-msgid "Screenshot taken: '%s'"
-msgstr "Kuvankaappaus otettu: '%s'"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -1524,14 +2167,75 @@ msgstr "Kokoonpanotiedosto tallennettiin"
 msgid "* Your serial is: %s"
 msgstr "* Serialisi on: %s"
 
-#. Even the default skin doesn't work, so give up
-#: Client/core/CGUI.cpp:86
-msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Valitsemaasi ulkoasua ei voitu ladata, oletusulkoasua ei voitu myöskään ladata. Ole hyvä ja asenna MTA uudelleen."
+#. Unknown command
+#: Client/core/CCommands.cpp:223
+msgid "Unknown command or cvar: "
+msgstr "Tuntematon komento tai cvar: "
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:688
 msgid "Do you want to see some on-line help about this problem ?"
 msgstr "Haluatko etsiä apua tähän ongelmaan?"
+
+#: Client/core/CCredits.cpp:34
+msgid "Programming"
+msgstr "Ohjelmointi"
+
+#: Client/core/CCredits.cpp:63
+msgid "Contributors"
+msgstr "Avustajat"
+
+#: Client/core/CCredits.cpp:84
+msgid "Game Design / Scripting"
+msgstr "Pelisuunnittelu / Skriptaus"
+
+#: Client/core/CCredits.cpp:104
+msgid "Language Localization"
+msgstr "Lokalisointi"
+
+#: Client/core/CCredits.cpp:110
+msgid "Patch contributors"
+msgstr "Kehitykseen osallistuneet"
+
+#: Client/core/CCredits.cpp:234
+msgid "Special Thanks"
+msgstr "Erityiskiitokset"
+
+#: Client/core/CCredits.cpp:265
+msgid "This software and project makes use of the following libraries and software:"
+msgstr "Tämä ohjelmisto ja projekti käyttää hyväksi seuraavia kirjastoja ja ohjelmia:"
+
+#: Client/core/CJoystickManager.cpp:1578
+msgid "Accelerate Axis"
+msgstr "Kiihdytysakseli"
+
+#: Client/core/CJoystickManager.cpp:1580
+msgid "Brake Axis"
+msgstr "Jarrutusakseli"
+
+#. TRANSLATORS: Replace with your language native name
+#: Client/core/CLocalization.cpp:16
+msgid "English"
+msgstr "Suomi"
+
+#: Client/core/CMainMenu.cpp:333
+msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
+msgstr "Käytät ominaisuushaara-koontiversiota! Tämä on vain testiversio, jota ei voida käyttää yhteyden muodostamiseen julkisiin palvelimiin!"
+
+#: Client/core/CMainMenu.cpp:352
+msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
+"Upgrade Windows to play on the latest servers."
+msgstr "MTA ei saa päivityksiä XP/Vistaan ​​heinäkuun 2019 jälkeen.\n\n"
+" Päivitä Windows pelataksesi uusimmilla palvelimilla."
+
+#: Client/core/CMainMenu.cpp:1193
+msgid "This will disconnect you from the current server.\n\n"
+"Are you sure you want to disconnect?"
+msgstr "Tämä katkaisee yhteyden nykyiseen palvelimeen.\n\n"
+"Haluatko varmasti katkaista yhteyden?"
+
+#: Client/core/CMainMenu.cpp:1197
+msgid "DISCONNECT WARNING"
+msgstr "VAROITUS YHTEYDEN KATKAISUSTA"
 
 #: Client/core/CVersionUpdater.cpp:626
 msgid "Busy"
@@ -1614,10 +2318,9 @@ msgstr "Palvelin sanoo, että MTA:n päivitys on suositeltavaa, mutta ei vältt�
 "Haluatko päivittää nyt?"
 
 #: Client/core/CVersionUpdater.cpp:1915
-msgid "Update not currently avalable.\n\n"
+msgid "An update is currently not available.\n\n"
 "Please check www.mtasa.com"
-msgstr "Päivitystä ei ole tällä hetkellä saatavilla.\n\n"
-"Ole hyvä ja tarkista osoitteesta www.mtasa.com"
+msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1936 Client/core/CVersionUpdater.cpp:2118
 msgid "ERROR SAVING"
@@ -1674,135 +2377,10 @@ msgid "\n\n"
 msgstr "\n\n"
 "Odotetaan vastausta -  %-3d"
 
-#. TRANSLATORS: Replace with your language native name
-#: Client/core/CLocalization.cpp:16
-msgid "English"
-msgstr "Suomi"
-
-#: Client/core/CCore.cpp:811 Client/loader/CInstallManager.cpp:1057
-#, c-format
-msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA ei voi jatkaa, koska %s levyllä ei ole tarpeeksi tilaa."
-
-#: Client/core/CCore.cpp:813 Shared/mods/deathmatch/logic/Utils.cpp:111
-msgid "Fatal error"
-msgstr "Vakava virhe"
-
-#: Client/core/CCore.cpp:938
-msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "KORJAA POISTAMALLA TÄMÄ TIEDOSTO:"
-
-#: Client/core/CCore.cpp:970
-#, c-format
-msgid "%s module is incorrect!"
-msgstr "%s moduuli on väärä!"
-
-#: Client/core/CCore.cpp:1275
-msgid "Error executing URL"
-msgstr "Virhe suoritettaessa URL:ää"
-
-#: Client/core/CCore.cpp:1287
-#, c-format
-msgid "Error running mod specified in command line ('%s')"
-msgstr "Virhe suoritettaessa komentorivillä määriteltyä modia ('%s')"
-
-#. m_pCommands->Add ( "e", CCommandFuncs::Editor );
-#. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
-#: Client/core/CCore.cpp:1389
-msgid "this help screen"
-msgstr "tämä ohje"
-
-#: Client/core/CCore.cpp:1390 Client/core/CCore.cpp:1391
-msgid "exits the application"
-msgstr "poistuu sovelluksesta"
-
-#: Client/core/CCore.cpp:1392
-msgid "shows the version"
-msgstr "näyttää version"
-
-#: Client/core/CCore.cpp:1393
-msgid "shows the time"
-msgstr "näyttää ajan"
-
-#: Client/core/CCore.cpp:1394
-msgid "shows the hud"
-msgstr "näyttää hud:n"
-
-#: Client/core/CCore.cpp:1395
-msgid "shows all the binds"
-msgstr "näyttää kaikki näppäinmääritykset"
-
-#: Client/core/CCore.cpp:1396
-msgid "shows your serial"
-msgstr "näyttää serialin"
-
-#: Client/core/CCore.cpp:1405
-msgid "connects to a server (host port nick pass)"
-msgstr "yhdistää palvelimeen (isäntä portti nimimerkki salasana)"
-
-#: Client/core/CCore.cpp:1406
-msgid "connects to a previous server"
-msgstr "yhdistää aikaisempaan palvelimeen"
-
-#: Client/core/CCore.cpp:1407
-msgid "binds a key (key control)"
-msgstr "määrittää näppäimen"
-
-#: Client/core/CCore.cpp:1408
-msgid "unbinds a key (key)"
-msgstr "poistaa näppäimen määrityksen"
-
-#: Client/core/CCore.cpp:1409
-msgid "copies the default gta controls"
-msgstr "kopioi gta:n oletusnäppäinmääritykset"
-
-#: Client/core/CCore.cpp:1410
-msgid "outputs a screenshot"
-msgstr "ottaa kuvakaappauksen"
-
-#: Client/core/CCore.cpp:1411
-msgid "immediately saves the config"
-msgstr "tallentaa asetustiedoston välittömästi"
-
-#: Client/core/CCore.cpp:1413
-msgid "clears the debug view"
-msgstr "tyhjentää vianetsintäikkunan"
-
-#: Client/core/CCore.cpp:1414
-msgid "scrolls the chatbox upwards"
-msgstr "vierittää chat-ruutua ylöspäin"
-
-#: Client/core/CCore.cpp:1415
-msgid "scrolls the chatbox downwards"
-msgstr "vierittää chat-ruutua alaspäin"
-
-#: Client/core/CCore.cpp:1416
-msgid "scrolls the debug view upwards"
-msgstr "vierittää vianetsintäikkunaa ylöspäin"
-
-#: Client/core/CCore.cpp:1417
-msgid "scrolls the debug view downwards"
-msgstr "vierittää vianetsintäikkunaa alaspäin"
-
-#: Client/core/CCore.cpp:1420
-msgid "shows the memory statistics"
-msgstr "näyttää muistitilastot"
-
-#: Client/core/CCore.cpp:1421
-msgid "shows the frame timing graph"
-msgstr "näyttää ruutuaikakuvaajan"
-
-#: Client/core/CCore.cpp:1425
-msgid "for developers: reload news"
-msgstr "kehittäjille: päivitä uutiset"
-
-#: Client/core/DXHook/CDirect3DHook9.cpp:124
-msgid "Could not initialize Direct3D9.\n\n"
-"Please ensure the DirectX End-User Runtime and\n"
-"latest Windows Service Packs are installed correctly."
-msgstr "Direct3D9:n alustaminen epäonnistui.\n\n"
-"Varmista, että DirectX End-User Runtime sekä\n"
-"viimeisimmät Windows Service Packit on asennettu oikein."
+#. Create window
+#: Client/core/CConsole.cpp:417
+msgid "CONSOLE"
+msgstr "KONSOLI"
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 msgid "Idle"
@@ -1954,12 +2532,6 @@ msgstr "Pyydetään tietoja..."
 msgid "SERVER BROWSER"
 msgstr "PALVELINSELAIN"
 
-#. Create the tabs
-#: Client/core/ServerBrowser/CServerBrowser.cpp:133
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:90
-msgid "Internet"
-msgstr "Internet"
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:134
 msgid "Local"
 msgstr "LAN"
@@ -2103,795 +2675,17 @@ msgstr "Tuntematon protokolla"
 msgid "Please use the mtasa:// protocol!"
 msgstr "Käytä mtasa://-protokollaa!"
 
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1300
-#: Client/core/ServerBrowser/CServerBrowser.cpp:1357
-#: Client/mods/deathmatch/logic/CClientGame.cpp:635
-#: Client/mods/deathmatch/logic/CClientGame.cpp:733
-msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Virheellinen nimimerkki! Määritä itsellesi uusi nimimerkki Asetukset-valikosta!"
-
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1380
 msgid "You have to select a server to connect to."
 msgstr "Sinun on valittava palvelin, johon yhdistetään."
 
-#: Client/mods/deathmatch/CClient.cpp:36
-msgid "This version has expired."
-msgstr "Tämä versio on vanhentunut."
-
-#: Client/mods/deathmatch/CClient.cpp:56
-msgid "disconnect from the game"
-msgstr "katkaise yhteys palvelimeen"
-
-#: Client/mods/deathmatch/CClient.cpp:57
-msgid "shows the nametags"
-msgstr "näyttää nimitagit"
-
-#: Client/mods/deathmatch/CClient.cpp:58
-msgid "shows the chatbox"
-msgstr "näyttää chatin"
-
-#: Client/mods/deathmatch/CClient.cpp:59
-msgid "shows the network statistics"
-msgstr "näyttää verkkotilastot"
-
-#. Key commands (registered as 'mod commands', can be disabled)
-#: Client/mods/deathmatch/CClient.cpp:63
-msgid "open the chat input"
-msgstr "avaa chatin syöttökentän"
-
-#: Client/mods/deathmatch/CClient.cpp:64
-msgid "transmits voice to other players"
-msgstr "lähettää ääntä toisille pelaajille"
-
-#: Client/mods/deathmatch/CClient.cpp:65
-msgid "enters a car as passenger"
-msgstr "nousee autoon matkustajana"
-
-#: Client/mods/deathmatch/CClient.cpp:66
-msgid "next radio channel"
-msgstr "seuraava radiokanava"
-
-#: Client/mods/deathmatch/CClient.cpp:67
-msgid "previous radio channel"
-msgstr "edellinen radiokanava"
-
-#: Client/mods/deathmatch/CClient.cpp:68
-msgid "enables the radar view"
-msgstr "näyttää/piilottaa kartan"
-
-#: Client/mods/deathmatch/CClient.cpp:69
-msgid "zooms the radar in"
-msgstr "zoomaa karttaa sisään"
-
-#: Client/mods/deathmatch/CClient.cpp:70
-msgid "zooms the radar out"
-msgstr "zoomaa karttaa ulos"
-
-#: Client/mods/deathmatch/CClient.cpp:71
-msgid "moves the radar north"
-msgstr "liikuttaa karttaa pohjoiseen"
-
-#: Client/mods/deathmatch/CClient.cpp:72
-msgid "moves the radar south"
-msgstr "liikuttaa karttaa etelään"
-
-#: Client/mods/deathmatch/CClient.cpp:73
-msgid "moves the radar east"
-msgstr "liikuttaa karttaa itään"
-
-#: Client/mods/deathmatch/CClient.cpp:74
-msgid "moves the radar west"
-msgstr "liikuttaa karttaa länteen"
-
-#: Client/mods/deathmatch/CClient.cpp:75
-msgid "attaches the radar"
-msgstr "kiinnittää kartan"
-
-#: Client/mods/deathmatch/CClient.cpp:76
-msgid "reduces radar opacity"
-msgstr "vähentää kartan läpinäkyvyyttä"
-
-#: Client/mods/deathmatch/CClient.cpp:77
-msgid "increases radar opacity"
-msgstr "lisää kartan läpinäkyvyyttä"
-
-#: Client/mods/deathmatch/CClient.cpp:78
-msgid "toggles radar help text"
-msgstr "näyttää/piilottaa kartan ohjeen"
-
-#: Client/mods/deathmatch/CClient.cpp:79
-msgid "sends a message to the targetted player"
-msgstr "lähettää yksityisviestin kyseiselle pelaajalle"
-
-#: Client/mods/deathmatch/CClient.cpp:80
-msgid "changes to the next weapon whilst in a vehicle"
-msgstr "vaihtaa seuraavaan aseeseen kun olet ajoneuvossa sisällä"
-
-#: Client/mods/deathmatch/CClient.cpp:81
-msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "vaihtaa edelliseen aseeseen kun olet ajoneuvossa sisällä"
-
-#: Client/mods/deathmatch/CClient.cpp:82
-msgid "outputs info about the current server"
-msgstr "tulostaa konsoliin tietoja pelipalvelimesta"
-
-#. ACHTUNG" Should this be handled by the atomic cvar setter?
-#: Client/mods/deathmatch/CClient.cpp:85
-msgid "defines the scale multiplier of all text-displays"
-msgstr "määrittää kaikkien text-display elementtien skaalan"
-
-#. Development mode
-#: Client/mods/deathmatch/CClient.cpp:92
-msgid "(Development mode) shows the colshapes"
-msgstr "(Kehitystila) näyttää/piilottaa colshapet"
-
-#: Client/mods/deathmatch/CClient.cpp:93
-msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Kehitystila) tulostaa maailman äänten id:t debug konsoliin"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:505
-msgid "Disconnected: Invalid nickname"
-msgstr "Yhteys katkaistu: Virheellinen nimimerkki"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:509
-msgid "Disconnect from server"
-msgstr "Katkaise yhteys palvelimeen"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:513
-#, c-format
-msgid "Disconnected: Serial is banned.\n"
-"Reason: %s"
-msgstr "Yhteys katkaistu: Sarjanumero on estetty.\n"
-"Syy: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:519
-#, c-format
-msgid "Disconnected: You are banned.\n"
-"Reason: %s"
-msgstr "Yhteys katkaistu: Sinut on estetty.\n"
-"Syy: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:525
-#, c-format
-msgid "Disconnected: Account is banned.\n"
-"Reason: %s"
-msgstr "Yhteys katkaistu: Tili on estetty.\n"
-"Syy: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:530
-msgid "Disconnected: Version mismatch"
-msgstr "Yhteys katkaistu: Versio ei täsmää"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:534
-msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Yhteys katkaistu: Liittymistulva. Ole hyvä ja odota minuutti, yhdistä sitten uudelleen."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:538
-#, c-format
-msgid "Disconnected: Server from different branch.\n"
-"Information: %s"
-msgstr "Yhteys katkaistu: Palvelin on eri juuressa.\n"
-"Tiedot: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:543
-#, c-format
-msgid "Disconnected: Bad version.\n"
-"Information: %s"
-msgstr "Yhteys katkaistu: Väärä versio.\n"
-"Tiedot: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:548
-#, c-format
-msgid "Disconnected: Server is running a newer build.\n"
-"Information: %s"
-msgstr "Yhteys katkaistu: Palvelin pyörii uudemmalla versiolla.\n"
-"Tiedot: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:553
-#, c-format
-msgid "Disconnected: Server is running an older build.\n"
-"Information: %s"
-msgstr "Yhteys katkaistu: Palvelin pyörii vanhemmalla versiolla.\n"
-"Tiedot: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:558
-msgid "Disconnected: Nick already in use"
-msgstr "Yhteys katkaistu: Nimimerkki on jo käytössä"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:562
-msgid "Disconnected: Player element could not be created."
-msgstr "Yhteys katkaistu: Hahmoa ei pystytty luomaan."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:566
-#, c-format
-msgid "Disconnected: Server refused the connection: %s"
-msgstr "Yhteys katkaistu: Palvelin esti yhteyden: %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:571
-msgid "Disconnected: Serial verification failed"
-msgstr "Yhteys katkaistu: Sarjanumeron varnennus epäonnistui"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:575
-#, c-format
-msgid "Disconnected: Connection desync %s"
-msgstr "Yhteys katkaistu: Synkronointivirhe %s"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:584
-#, c-format
-msgid "Disconnected: You were kicked by %s"
-msgstr "Yhteys katkaistu: Käyttäjä %s poisti sinut palvelimelta"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:589
-#, c-format
-msgid "Disconnected: You were banned by %s"
-msgstr "Yhteys katkaistu: Käyttäjä %s antoi sinulle porttikiellon"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:600
-msgid "Disconnected: Server shutdown or restarting"
-msgstr "Yhteys katkaistu: Palvelin sammuu tai käynnistyy uudelleen"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:620
-msgid "You were kicked from the game"
-msgstr "Sinut potkittiin pelistä"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:621
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
-msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Tämä palvelin vaatii muokkaamattoman gta_sa.exe:n"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
-msgid "Please replace gta_sa.exe"
-msgstr "Ole hyvä ja korvaa gta_sa.exe"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
-msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Tämä pelipalvelin ei salli kustomoituja D3D9.DLL tiedostoja"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
-msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "Poista D3D9.DLL GTA asennushakemistosta ja käynnistä MTA uudelleen"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
-msgid "This server does not allow virtual machines"
-msgstr "Tämä pelipalvelin ei salli virtuaalikoneita"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
-msgid "This server requires driver signing to be enabled"
-msgstr "Ajurien allekirjoitus on oltava käytössä pelataksesi tällä palvelimella."
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
-msgid "Please restart your PC"
-msgstr "Ole hyvä ja käynnistä tietokoneesi uudelleen"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
-msgid "This server has detected missing anti-cheat components"
-msgstr "Tämä palvelin on havainnut puuttuvia komponentteja huijauksen estosta"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
-msgid "Try restarting MTA"
-msgstr "Kokeile käynnistää MTA uudelleen"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
-msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Tämä palvelin vaatii muokkaamattoman gta3.img:n ja gta_int.img:n"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
-msgid "Please replace gta3.img or gta_int.img"
-msgstr "Ole hyvä ja korvaa gta3.img tai gta_int.img"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
-msgid "This server does not allow Wine"
-msgstr "Wine ei ole sallittu tällä pelipalvelimella"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
-msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Varmista että mikään toinen ohjelma ei muuta MTA:ta"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:649
-msgid "Time Remaining: "
-msgstr "Aikaa jäljellä: "
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:659
-#, c-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] "%d päivä"
-msgstr[1] "%d päivää"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
-#, c-format
-msgid "%d hour"
-msgid_plural "%d hours"
-msgstr[0] "%d tunti"
-msgstr[1] "%d tuntia"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
-#, c-format
-msgid "%d minute"
-msgid_plural "%d minutes"
-msgstr[0] "%d minuutti"
-msgstr[1] "%d minuuttia"
-
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
-#, c-format
-msgid "%d second"
-msgid_plural "%d seconds"
-msgstr[0] "%d sekunti"
-msgstr[1] "%d sekuntia"
-
-#. Display the error
-#: Client/mods/deathmatch/logic/CPacketHandler.cpp:669
-msgid "Disconnected"
-msgstr "Yhteys katkaistu"
-
-#. Throw the error and disconnect
-#: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
-#, c-format
-msgid "Download error: %s"
-msgstr "Latausvirhe: %s"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:37
-msgid "HOST GAME"
-msgstr "ISÄNNÖI PELIÄ"
-
-#. m_pTabs->CreateTab ( "Gamemode" );
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:53
-msgid "Resources"
-msgstr "Resurssit"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:55
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:57
-msgid "Server name:"
-msgstr "Palvelimen nimi:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:64
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:66
-msgid "Password:"
-msgstr "Salasana:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:73
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:75
-msgid "Max players:"
-msgstr "Max. pelaajat:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:82
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:84
-msgid "Broadcast:"
-msgstr "Broadcast:"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:86
-msgid "LAN"
-msgstr "LAN"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:99
-msgid "Selected"
-msgstr "Valittu"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:116
-msgid "All"
-msgstr "Kaikki"
-
-#: Client/mods/deathmatch/logic/CLocalServer.cpp:118
-msgid "Start"
-msgstr "Käynnistä"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:370
-msgid "Flying a UFO around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:370
-msgid "Cruising around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:370
-msgid "Riding the waves of"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:371
-msgid "Riding the train in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:371
-msgid "Flying around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:372
-msgid "Riding around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:372
-msgid "Monster truckin' around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:372
-msgid "Quaddin' around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:373
-msgid "Bunny hopping around"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:373
-msgid "Doing weird stuff in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:377
-msgid "Climbing around in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:378
-#: Client/mods/deathmatch/logic/CClientGame.cpp:379
-msgid "Doing a drive-by in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:380
-msgid "Blub blub..."
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:381
-msgid "Breathing water"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:382
-msgid "Drowning in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:383
-msgid "Ducking for cover in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:384
-msgid "Fighting in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:385
-msgid "Throwing fists in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:386
-msgid "Blastin' fools in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:387
-msgid "Shooting up"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:388
-msgid "Jetpacking in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:389
-msgid "Literally on fire in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:390
-msgid "Burning up in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:391
-msgid "Swimming in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:392
-msgid "Floating around in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:393
-msgid "Being chased by a shark"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:394
-msgid "Choking to death in"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:651
-msgid "Entering the game ..."
-msgstr "Liitytään peliin..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:709
-msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Ei yhdistetty; ole hyvä ja käytä Yhdistä-painiketta tai 'connect' komentoa yhdistääksesi pelipalvelimelle."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:755
-msgid "Could not start the local server. See console for details."
-msgstr "Paikallisen palvelimen käynnistäminen epäonnistui. Katso lisätietoja konsolista."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:765
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-msgid "Local Server"
-msgstr "Paikallinen palvelin"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:765
-msgid "Starting local server ..."
-msgstr "Käynnistetään paikallista palvelinta..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1013
-msgid "Area 51"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1022
-msgid "Walking around "
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1171
-#, c-format
-msgid "You were kicked from the game ( %s )"
-msgstr "Sinut potkittiin pelistä (%s)"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1240
-msgid "Connecting to local server..."
-msgstr "Yhdistetään paikalliselle palvelimelle..."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1251
-msgid "Error connecting to server."
-msgstr "Virhe yhdistettäessä palvelimeen."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1261
-msgid "Connecting to local server timed out. See console for details."
-msgstr "Paikalliselle palvelimelle yhdistäminen aikakatkaistiin. Katso konsolista lisätietoja."
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1367
-msgid "Connection with the server was lost"
-msgstr "Yhteys palvelimeen menetetty"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1394
-msgid "Disconnected: the server is currently full"
-msgstr "Yhteys katkaistu: Palvelin on täynnä"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1406
-msgid "Disconnected: invalid password specified"
-msgstr "Yhteys katkaistu: Väärä salasana"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:1428
-msgid "MTA Client verification failed!"
-msgstr "MTA:n varmennus epäonnistui!"
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
-msgid "In a ditch"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
-msgid "En-route to hospital"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5693
-msgid "Meeting their maker"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
-msgid "Regretting their decisions"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CClientGame.cpp:5694
-msgid "Wasted"
-msgstr ""
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:25
-msgid "Map download progress:"
-msgstr "Kartan latauksen edistyminen:"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:28
-msgid "Download Progress:"
-msgstr "Latauksen edistyminen:"
-
-#. Find our largest piece of text, so we can size accordingly
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:42
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:105
-#, c-format
-msgid "%s of %s"
-msgstr "%s / %s"
-
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:44
-#: Client/mods/deathmatch/logic/CTransferBox.cpp:65
-msgid "Disconnect to cancel download"
-msgstr "Katkaise yhteys peruuttaaksesi latauksen"
-
-#: Client/loader/Utils.cpp:534 Client/loader/Dialogs.cpp:890
-msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Etsitään Grand Theft Auto San Andreasia"
-
-#: Client/loader/Utils.cpp:536 Client/loader/Dialogs.cpp:893
-msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Käynnistä Grand Theft Auto San Andreas"
-
-#: Client/loader/Utils.cpp:600
-msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Valitse Grand Theft Auto: San Andreaksen asennushakemisto"
-
-#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
-#, c-format
-msgid "MTA:SA needs Administrator access for the following task:\n\n"
-"  '%s'\n\n"
-"Please confirm in the next window."
-msgstr "MTA:SA tarvitsee järjestelmänvalvojan käyttöoikeudet seuraavaan tehtävään:\n\n"
-"  '%s'\n\n"
-"Vahvista seuraavassa ikkunassa."
-
-#: Client/loader/Utils.cpp:1069
-#, c-format
-msgid "Error loading %s module! (%s)"
-msgstr "Virhe ladatessa %s moduulia! (%s)"
-
-#: Client/loader/Utils.cpp:1394 Client/loader/Dialogs.cpp:914
-msgid "Copying files..."
-msgstr "Kopioidaan tiedostoja..."
-
-#: Client/loader/Utils.cpp:1454 Client/loader/Dialogs.cpp:919
-msgid "Copy finished early. Everything OK."
-msgstr "Kopiointi valmistui etuajassa. Kaikki OK."
-
-#: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:924
-msgid "Finishing..."
-msgstr "Viimeistellään…"
-
-#: Client/loader/Utils.cpp:1462 Client/loader/Dialogs.cpp:928
-msgid "Done!"
-msgstr "Valmis!"
-
-#: Client/loader/Utils.cpp:1502
-#, c-format
-msgid "New installation of %s detected.\n\n"
-"Do you want to copy your settings from %s ?"
-msgstr "Uusi %s asennus havaittu.\n\n"
-"Haluatko kopioida asetuksesi %s:sta?"
-
-#: Client/loader/Utils.cpp:1541
-#, c-format
-msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA törmäsi ongelmaan avatessaan tiedostoa '%s'"
-
-#: Client/loader/Utils.cpp:1563
-#, c-format
-msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA:sta puuttuu tiedosto '%s'."
-
-#: Client/loader/Utils.cpp:1588
-msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA törmäsi ongelmaan ladatessaan mallia."
-
-#: Client/loader/Utils.cpp:1590
-msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Jos muokkasit gta3.img tiedostoa viime aikoina, kokeile asentaa GTA:SA uudelleen."
-
-#: Client/loader/Utils.cpp:1615
-msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA törmäsi ongelmaan lisätessään tehostusta ajoneuvoon."
-
-#: Client/loader/Utils.cpp:1634
-#, c-format
-msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA löysi virheitä tiedostossa '%s'"
-
-#: Client/loader/Utils.cpp:1716
-msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Käynnistyikö tietokoneesi uudelleen pelatessasi MTA:ta?"
-
-#: Client/loader/Utils.cpp:1781
-msgid "Please terminate the following programs before continuing:"
-msgstr "Ole hyvä ja lopeta seuraavat ohjelmat ennen jatkamista:"
-
-#: Client/loader/Install.cpp:265
-msgid "Unknown"
-msgstr "Tuntematon"
-
-#: Client/loader/Install.cpp:272
-#, c-format
-msgid "The file '%s' is currently locked by %zu processes.\n\n"
-"Do you want to terminate the following processes and continue updating?\n\n"
-"%s"
-msgstr "Tiedosto '%s' on lukittuna %zu prosessin toimesta.\n\n"
-"Haluatko lopettaa seuraavat prosessit ja jatkaa päivitystä?\n\n"
-"%s"
-
-#: Client/loader/Install.cpp:479
-#, c-format
-msgid "Your installation may be corrupt now.\n\n"
-"%zu out of %zu files could not be restored from the backup.\n\n"
-"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
-"or try running the update with administrator rights."
-msgstr "Asennuksesi saattaa olla korruptoitunut.\n\n"
-"%zu/%zu tiedostoa ei voitu palauttaa varmuuskopiosta.\n\n"
-"Asenna Multi Theft Auto uudelleen osoitteesta www.multitheftauto.com\n"
-"tai kokeile päivittää järjestelmänvalvojan oikeuksilla."
-
-#: Client/loader/Install.cpp:849 Client/loader/Dialogs.cpp:901
-msgid "Installing update..."
-msgstr "Asennetaan päivitystä..."
-
-#: Client/loader/Install.cpp:931 Client/loader/Dialogs.cpp:909
-msgid "Extracting files..."
-msgstr "Puretaan tiedostoja..."
-
-#: Client/loader/CInstallManager.cpp:376
-#, c-format
-msgid "MTA:SA could not complete the following task:\n\n"
-"  '%s'\n"
-msgstr "MTA:SA ei voinut suorittaa seuraavaa tehtävää:\n\n"
-"  '%s'\n"
-
-#: Client/loader/CInstallManager.cpp:426
-msgid "** The crash was caused by a graphics driver error **\n\n"
-"** Please update your graphics drivers **"
-msgstr "** Ohjelma kaatui grafiikka-ajurin virheen myötä **\n\n"
-"** Ole hyvä ja päivitä grafiikka-ajurisi **"
-
-#: Client/loader/CInstallManager.cpp:532
-msgid "Install updated MTA:SA files"
-msgstr "Asenna päivitetyt MTA:SA-tiedostot"
-
-#: Client/loader/CInstallManager.cpp:552
-msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Päivitys epäonnistui tiedostojen välisen ristiriidan takia. Ole hyvä ja sulje muut sovellukset ja kokeile uudelleen."
-
-#: Client/loader/CInstallManager.cpp:561
-#, c-format
-msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Autoa ei ole asennettu oikein, ole hyvä ja asenna se uudelleen. %s"
-
-#: Client/loader/CInstallManager.cpp:613
-msgid "Create GTA:SA junctions"
-msgstr "Luo GTA:SA risteykset"
-
-#: Client/loader/CInstallManager.cpp:657
-msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA ei pysty käynnistymään koska tiedoston kopiointi epäonnistui:"
-
-#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
-msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SA ei pysty käynnistymään koska jokin MTA:n tiedosto on virheellinen tai ei löydy:"
-
-#: Client/loader/CInstallManager.cpp:672
-msgid "Copy MTA:SA files"
-msgstr "Kopioi MTA:SA tiedostot"
-
-#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
-msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "MTA:SA ei pysty käynnistymään koska jokin GTA:SA:n tiedosto on virheellinen tai ei löydy:"
-
-#: Client/loader/CInstallManager.cpp:780
-msgid "Patch GTA:SA dependency"
-msgstr "Korjaa GTA:SA riippuvuus"
-
-#: Client/loader/CInstallManager.cpp:828
-msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA on virheellinen tai ei löydy:"
-
-#: Client/loader/CInstallManager.cpp:832
-msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "Tarkista antiviruksestasi mahdollinen karanteeni tai muu esto, lisää GTA:SA:lle poikkeus, ja kokeile sitten käynnistää MTA:SA uudelleen."
-
-#: Client/loader/CInstallManager.cpp:838
-msgid "Generate GTA:SA"
-msgstr "Generoi GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:853
-msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA:ta ei voida ladata käyttöön:"
-
-#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
-msgid "Patch GTA:SA"
-msgstr "Korjaa GTA:SA"
-
-#: Client/loader/CInstallManager.cpp:876
-msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA:n korjaus epäonnistui:"
-
-#: Client/loader/CInstallManager.cpp:1113
-msgid "Missing file:"
-msgstr "Puuttuva tiedosto:"
-
-#: Client/loader/CInstallManager.cpp:1117
-msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Jos MTA ei lataudu, asenna GTA:SA uudelleen"
-
-#: Client/loader/CInstallManager.cpp:1152
-msgid "Update install settings"
-msgstr "Päivitä asennusasetukset"
-
-#: Client/loader/CInstallManager.cpp:1291
-msgid "Update compatibility settings"
-msgstr "Päivitä yhteensopivuusasetukset"
+#: Client/core/DXHook/CDirect3DHook9.cpp:124
+msgid "Could not initialize Direct3D9.\n\n"
+"Please ensure the DirectX End-User Runtime and\n"
+"latest Windows Service Packs are installed correctly."
+msgstr "Direct3D9:n alustaminen epäonnistui.\n\n"
+"Varmista, että DirectX End-User Runtime sekä\n"
+"viimeisimmät Windows Service Packit on asennettu oikein."
 
 #: Client/loader/Dialogs.cpp:134
 msgid "Quit"
@@ -3016,6 +2810,122 @@ msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
 msgstr "En asenna virustorjuntaa.\n"
 "Haluan tietokoneeni lagaavan ja olevan osa bottiverkkoa."
+
+#: Client/loader/Dialogs.cpp:890 Client/loader/Utils.cpp:534
+msgid "Searching for Grand Theft Auto San Andreas"
+msgstr "Etsitään Grand Theft Auto San Andreasia"
+
+#: Client/loader/Dialogs.cpp:893 Client/loader/Utils.cpp:536
+msgid "Please start Grand Theft Auto San Andreas"
+msgstr "Käynnistä Grand Theft Auto San Andreas"
+
+#: Client/loader/Dialogs.cpp:901 Client/loader/Install.cpp:852
+msgid "Installing update..."
+msgstr "Asennetaan päivitystä..."
+
+#: Client/loader/Dialogs.cpp:909 Client/loader/Install.cpp:934
+msgid "Extracting files..."
+msgstr "Puretaan tiedostoja..."
+
+#: Client/loader/Dialogs.cpp:914 Client/loader/Utils.cpp:1394
+msgid "Copying files..."
+msgstr "Kopioidaan tiedostoja..."
+
+#: Client/loader/Dialogs.cpp:919 Client/loader/Utils.cpp:1454
+msgid "Copy finished early. Everything OK."
+msgstr "Kopiointi valmistui etuajassa. Kaikki OK."
+
+#: Client/loader/Dialogs.cpp:924 Client/loader/Utils.cpp:1460
+msgid "Finishing..."
+msgstr "Viimeistellään…"
+
+#: Client/loader/Dialogs.cpp:928 Client/loader/Utils.cpp:1462
+msgid "Done!"
+msgstr "Valmis!"
+
+#: Client/loader/Utils.cpp:600
+msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
+msgstr "Valitse Grand Theft Auto: San Andreaksen asennushakemisto"
+
+#: Client/loader/Utils.cpp:968 Client/loader/CInstallManager.cpp:361
+#, c-format
+msgid "MTA:SA needs Administrator access for the following task:\n\n"
+"  '%s'\n\n"
+"Please confirm in the next window."
+msgstr "MTA:SA tarvitsee järjestelmänvalvojan käyttöoikeudet seuraavaan tehtävään:\n\n"
+"  '%s'\n\n"
+"Vahvista seuraavassa ikkunassa."
+
+#: Client/loader/Utils.cpp:1069
+#, c-format
+msgid "Error loading %s module! (%s)"
+msgstr "Virhe ladatessa %s moduulia! (%s)"
+
+#: Client/loader/Utils.cpp:1502
+#, c-format
+msgid "New installation of %s detected.\n\n"
+"Do you want to copy your settings from %s ?"
+msgstr "Uusi %s asennus havaittu.\n\n"
+"Haluatko kopioida asetuksesi %s:sta?"
+
+#: Client/loader/Utils.cpp:1541
+#, c-format
+msgid "GTA:SA had trouble opening the file '%s'"
+msgstr "GTA:SA törmäsi ongelmaan avatessaan tiedostoa '%s'"
+
+#: Client/loader/Utils.cpp:1563
+#, c-format
+msgid "GTA:SA is missing the file '%s'."
+msgstr "GTA:SA:sta puuttuu tiedosto '%s'."
+
+#: Client/loader/Utils.cpp:1588
+msgid "GTA:SA had trouble loading a model."
+msgstr "GTA:SA törmäsi ongelmaan ladatessaan mallia."
+
+#: Client/loader/Utils.cpp:1590
+msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
+msgstr "Jos muokkasit gta3.img tiedostoa viime aikoina, kokeile asentaa GTA:SA uudelleen."
+
+#: Client/loader/Utils.cpp:1615
+msgid "GTA:SA had trouble adding an upgrade to a vehicle."
+msgstr "GTA:SA törmäsi ongelmaan lisätessään tehostusta ajoneuvoon."
+
+#: Client/loader/Utils.cpp:1634
+#, c-format
+msgid "GTA:SA found errors in the file '%s'"
+msgstr "GTA:SA löysi virheitä tiedostossa '%s'"
+
+#: Client/loader/Utils.cpp:1716
+msgid "Did your computer restart when playing MTA:SA?"
+msgstr "Käynnistyikö tietokoneesi uudelleen pelatessasi MTA:ta?"
+
+#: Client/loader/Utils.cpp:1781
+msgid "Please terminate the following programs before continuing:"
+msgstr "Ole hyvä ja lopeta seuraavat ohjelmat ennen jatkamista:"
+
+#: Client/loader/Install.cpp:265
+msgid "Unknown"
+msgstr "Tuntematon"
+
+#: Client/loader/Install.cpp:272
+#, c-format
+msgid "The file '%s' is currently locked by %zu processes.\n\n"
+"Do you want to terminate the following processes and continue updating?\n\n"
+"%s"
+msgstr "Tiedosto '%s' on lukittuna %zu prosessin toimesta.\n\n"
+"Haluatko lopettaa seuraavat prosessit ja jatkaa päivitystä?\n\n"
+"%s"
+
+#: Client/loader/Install.cpp:479
+#, c-format
+msgid "Your installation may be corrupt now.\n\n"
+"%zu out of %zu files could not be restored from the backup.\n\n"
+"You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
+"or try running the update with administrator rights."
+msgstr "Asennuksesi saattaa olla korruptoitunut.\n\n"
+"%zu/%zu tiedostoa ei voitu palauttaa varmuuskopiosta.\n\n"
+"Asenna Multi Theft Auto uudelleen osoitteesta www.multitheftauto.com\n"
+"tai kokeile päivittää järjestelmänvalvojan oikeuksilla."
 
 #: Client/loader/MainFunctions.cpp:248
 msgid "Trouble restarting MTA:SA\n\n"
@@ -3210,8 +3120,98 @@ msgstr "Grand Theft Auto: San Andreasta ei voitu käynnistää. Ole hyvä ja kok
 msgid "GTA: San Andreas may not have launched correctly. Do you want to terminate it?"
 msgstr "GTA: San Andreas ei välttämättä käynnistynyt oikein. Haluatko lopettaa sen?"
 
+#: Client/loader/CInstallManager.cpp:376
+#, c-format
+msgid "MTA:SA could not complete the following task:\n\n"
+"  '%s'\n"
+msgstr "MTA:SA ei voinut suorittaa seuraavaa tehtävää:\n\n"
+"  '%s'\n"
+
+#: Client/loader/CInstallManager.cpp:426
+msgid "** The crash was caused by a graphics driver error **\n\n"
+"** Please update your graphics drivers **"
+msgstr "** Ohjelma kaatui grafiikka-ajurin virheen myötä **\n\n"
+"** Ole hyvä ja päivitä grafiikka-ajurisi **"
+
+#: Client/loader/CInstallManager.cpp:532
+msgid "Install updated MTA:SA files"
+msgstr "Asenna päivitetyt MTA:SA-tiedostot"
+
+#: Client/loader/CInstallManager.cpp:552
+msgid "Could not update due to file conflicts. Please close other applications and retry"
+msgstr "Päivitys epäonnistui tiedostojen välisen ristiriidan takia. Ole hyvä ja sulje muut sovellukset ja kokeile uudelleen."
+
+#: Client/loader/CInstallManager.cpp:561
+#, c-format
+msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
+msgstr "Multi Theft Autoa ei ole asennettu oikein, ole hyvä ja asenna se uudelleen. %s"
+
+#: Client/loader/CInstallManager.cpp:613
+msgid "Create GTA:SA junctions"
+msgstr "Luo GTA:SA risteykset"
+
+#: Client/loader/CInstallManager.cpp:657
+msgid "MTA:SA cannot launch because copying a file failed:"
+msgstr "MTA:SA ei pysty käynnistymään koska tiedoston kopiointi epäonnistui:"
+
+#: Client/loader/CInstallManager.cpp:663 Client/loader/CInstallManager.cpp:703
+msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
+msgstr "MTA:SA ei pysty käynnistymään koska jokin MTA:n tiedosto on virheellinen tai ei löydy:"
+
+#: Client/loader/CInstallManager.cpp:672
+msgid "Copy MTA:SA files"
+msgstr "Kopioi MTA:SA tiedostot"
+
+#: Client/loader/CInstallManager.cpp:695 Client/loader/CInstallManager.cpp:773
+msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
+msgstr "MTA:SA ei pysty käynnistymään koska jokin GTA:SA:n tiedosto on virheellinen tai ei löydy:"
+
+#: Client/loader/CInstallManager.cpp:780
+msgid "Patch GTA:SA dependency"
+msgstr "Korjaa GTA:SA riippuvuus"
+
+#: Client/loader/CInstallManager.cpp:828
+msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
+msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA on virheellinen tai ei löydy:"
+
+#: Client/loader/CInstallManager.cpp:832
+msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
+msgstr "Tarkista antiviruksestasi mahdollinen karanteeni tai muu esto, lisää GTA:SA:lle poikkeus, ja kokeile sitten käynnistää MTA:SA uudelleen."
+
+#: Client/loader/CInstallManager.cpp:838
+msgid "Generate GTA:SA"
+msgstr "Generoi GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:853
+msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
+msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA:ta ei voida ladata käyttöön:"
+
+#: Client/loader/CInstallManager.cpp:860 Client/loader/CInstallManager.cpp:883
+msgid "Patch GTA:SA"
+msgstr "Korjaa GTA:SA"
+
+#: Client/loader/CInstallManager.cpp:876
+msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
+msgstr "MTA:SA ei pysty käynnistymään koska GTA:SA:n korjaus epäonnistui:"
+
+#: Client/loader/CInstallManager.cpp:1113
+msgid "Missing file:"
+msgstr "Puuttuva tiedosto:"
+
+#: Client/loader/CInstallManager.cpp:1117
+msgid "If MTA fails to load, please re-install GTA:SA"
+msgstr "Jos MTA ei lataudu, asenna GTA:SA uudelleen"
+
+#: Client/loader/CInstallManager.cpp:1152
+msgid "Update install settings"
+msgstr "Päivitä asennusasetukset"
+
+#: Client/loader/CInstallManager.cpp:1305
+msgid "Update compatibility settings"
+msgstr "Päivitä yhteensopivuusasetukset"
+
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:109
+#: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Vakava virhe (%u). Jos ongelma jatkuu, katso lisätietoja osoitteesta mtasa.com."
@@ -3220,12 +3220,12 @@ msgstr "Vakava virhe (%u). Jos ongelma jatkuu, katso lisätietoja osoitteesta mt
 #. assert ( 0 );
 #. #endif
 #. Populate the message and show the box
-#: Shared/mods/deathmatch/logic/Utils.cpp:125
+#: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out mtasa.com for support."
 msgstr "Protokollavirhe (%u). Jos ongelma jatkuu, hae apua osoitteesta mtasa.com."
 
-#: Shared/mods/deathmatch/logic/Utils.cpp:127
+#: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
 msgstr "Yhteysvirhe"
 
