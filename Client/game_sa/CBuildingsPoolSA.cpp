@@ -151,8 +151,8 @@ void CBuildingsPoolSA::RemoveAllBuildings()
 
             RemoveBuildingFromWorld(building);
 
-            if (building->Placeable.matrix)
-                ((void(__thiscall*)(void*))0x54F3B0)(building);
+            if (building->HasMatrix())
+                building->RemoveMatrix();
 
             pBuildsingsPool->Release(i);
 

@@ -242,6 +242,10 @@ public:
         using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
         ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
     };
+
+    bool HasMatrix() const noexcept { return Placeable.matrix != nullptr; };
+
+    void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 
