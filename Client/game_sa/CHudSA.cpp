@@ -11,6 +11,10 @@
 
 #include "StdInc.h"
 #include "CHudSA.h"
+#include "CGameSA.h"
+#include "CCameraSA.h"
+
+extern CGameSA* pGame;
 
 char szVehicleName[50] = {'\0'};
 char szZoneName[50] = {'\0'};
@@ -170,4 +174,39 @@ void CHudSA::ResetComponentAdjustment()
     MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);
     MemPut<float>(m_pfCameraCrosshairScale, 192.0f);
     m_fSniperCrosshairScale = 210.0f;
+}
+
+bool CHudSA::IsCrosshairVisible()
+{
+    if (!IsComponentVisible(HUD_CROSSHAIR))
+        return false;
+
+    CCamera* camera = pGame->GetCamera();
+    eCamMode cameraViewMode = static_cast<eCamMode>(camera->GetCam(camera->GetActiveCam())->GetMode());
+
+    switch (cameraViewMode)
+    {
+        case MODE_SNIPER_RUNABOUT:
+        case MODE_ROCKETLAUNCHER_RUNABOUT:
+        case MODE_ROCKETLAUNCHER_RUNABOUT_HS:
+        case MODE_M16_1STPERSON_RUNABOUT:
+        case MODE_1STPERSON_RUNABOUT:
+        case MODE_AIMWEAPON:
+        case MODE_AIMWEAPON_ATTACHED:
+        case MODE_AIMWEAPON_FROMCAR:
+        case MODE_M16_1STPERSON:
+        case MODE_HELICANNON_1STPERSON:
+        case MODE_SNIPER:
+        case MODE_ROCKETLAUNCHER:
+        case MODE_ROCKETLAUNCHER_HS:
+        case MODE_AIMING:
+        case MODE_CAMERA:
+            return true;
+        default:
+            break;
+    }
+
+    // Check CTheScripts::bDrawCrossHair
+    std::uint8_t crossHairType = *reinterpret_cast<std::uint8_t*>(VAR_CTheScripts_bDrawCrossHair);
+    return crossHairType > 0;
 }
