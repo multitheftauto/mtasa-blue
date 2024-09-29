@@ -70,9 +70,6 @@ struct RwTexture;
 
 #define VARS_CarCounts                          0x969094 // 5 values for each vehicle type
 
-// Used when deleting vehicles
-#define VTBL_CPlaceable                         0x863C40
-
 #define MAX_PASSENGERS                          8
 
 #define NUM_RAILTRACKS                          4
@@ -101,55 +98,6 @@ struct SRailNodeSA
     short sZ;                       // z coordinate times 8
     WORD  sRailDistance;            // on-rail distance times 3.33333334
     WORD  padding;
-};
-
-class CVehicleSAInterfaceVTBL : public CEntitySAInterfaceVTBL
-{
-public:
-    DWORD ProcessEntityCollision;                  // +58h
-    DWORD ProcessControlCollisionCheck;            // +5Ch
-    DWORD ProcessControlInputs;                    // +60h
-    DWORD GetComponentWorldPosition;               // +64h
-    DWORD IsComponentPresent;                      // +68h
-    DWORD OpenDoor;                                // +6Ch
-    DWORD ProcessOpenDoor;                         // +70h
-    DWORD GetDoorAngleOpenRatio;                   // +74h
-    DWORD GetDoorAngleOpenRatio_;                  // +78h
-    DWORD IsDoorReady;                             // +7Ch
-    DWORD IsDoorReady_;                            // +80h
-    DWORD IsDoorFullyOpen;                         // +84h
-    DWORD IsDoorFullyOpen_;                        // +88h
-    DWORD IsDoorClosed;                            // +8Ch
-    DWORD IsDoorClosed_;                           // +90h
-    DWORD IsDoorMissing;                           // +94h
-    DWORD IsDoorMissing_;                          // +98h
-    DWORD IsOpenTopCar;                            // +9Ch
-    DWORD RemoveRefsToVehicle;                     // +A0h
-    DWORD BlowUpCar;                               // +A4h
-    DWORD BlowUpCarCutSceneNoExtras;               // +A8h
-    DWORD SetUpWheelColModel;                      // +ACh
-    DWORD BurstTyre;                               // +B0h
-    DWORD IsRoomForPedToLeaveCar;                  // +B4h
-    DWORD ProcessDrivingAnims;                     // +B8h
-    DWORD GetRideAnimData;                         // +BCh
-    DWORD SetupSuspensionLines;                    // +C0h
-    DWORD AddMovingCollisionSpeed;                 // +C4h
-    DWORD Fix;                                     // +C8h
-    DWORD SetupDamageAfterLoad;                    // +CCh
-    DWORD DoBurstAndSoftGroundRatios;              // +D0h
-    DWORD GetHeightAboveRoad;                      // +D4h
-    DWORD PlayCarHorn;                             // +D8h
-    DWORD GetNumContactWheels;                     // +DCh
-    DWORD VehicleDamage;                           // +E0h
-    DWORD CanPedStepOutCar;                        // +E4h
-    DWORD CanPedJumpOutCar;                        // +E8h
-    DWORD GetTowHitchPos;                          // +ECh
-    DWORD GetTowbarPos;                            // +F0h
-    DWORD SetTowLink;                              // +F4h
-    DWORD BreakTowLink;                            // +F8h
-    DWORD FindWheelWidth;                          // +FCh
-    DWORD Save;                                    // +100h
-    DWORD Load;                                    // +104h
 };
 
 struct CVehicleFlags
@@ -258,6 +206,53 @@ class CAutoPilot
 
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
+public:
+    // Some virtual functions are not defined propertly
+    virtual void ProcessEntityCollision() = 0;
+    virtual void ProcessControlCollisionCheck() = 0;
+    virtual void ProcessControlInputs() = 0;
+    virtual void GetComponentWorldPosition() = 0;
+    virtual void IsComponentPresent() = 0;
+    virtual void OpenDoor(CEntitySAInterface* entity, std::uint32_t doorFrameId, std::uint32_t doorId, float ratio, bool makeNoise) = 0;
+    virtual void ProcessOpenDoor() = 0;
+    virtual void GetDoorAngleOpenRatio() = 0;
+    virtual void GetDoorAngleOpenRatio_() = 0;
+    virtual void IsDoorReady() = 0;
+    virtual void IsDoorReady_() = 0;
+    virtual void IsDoorFullyOpen() = 0;
+    virtual void IsDoorFullyOpen_() = 0;
+    virtual void IsDoorClosed() = 0;
+    virtual void IsDoorClosed_() = 0;
+    virtual void IsDoorMissing() = 0;
+    virtual void IsDoorMissing_() = 0;
+    virtual void IsOpenTopCar() = 0;
+    virtual void RemoveRefsToVehicle() = 0;
+    virtual void BlowUpCar(CEntitySAInterface* creator, std::uint32_t unknown) = 0;
+    virtual void BlowUpCarCutSceneNoExtras() = 0;
+    virtual void SetUpWheelColModel() = 0;
+    virtual void BurstTyre(std::uint8_t tireId, bool unused) = 0;
+    virtual void IsRoomForPedToLeaveCar() = 0;
+    virtual void ProcessDrivingAnims() = 0;
+    virtual void GetRideAnimData() = 0;
+    virtual void SetupSuspensionLines() = 0;
+    virtual void AddMovingCollisionSpeed() = 0;
+    virtual void Fix() = 0;
+    virtual void SetupDamageAfterLoad() = 0;
+    virtual void DoBurstAndSoftGroundRatios() = 0;
+    virtual void GetHeightAboveRoad() = 0;
+    virtual void PlayCarHorn() = 0;
+    virtual void GetNumContactWheels() = 0;
+    virtual void VehicleDamage() = 0;
+    virtual void CanPedStepOutCar() = 0;
+    virtual void CanPedJumpOutCar() = 0;
+    virtual bool GetTowHitchPos(CVector* pVector, CVehicleSAInterface* anotherVehicle) = 0;
+    virtual bool GetTowbarPos(CVector* pVector, bool ignoreModelType, CVehicleSAInterface* pTrailer) = 0;
+    virtual void SetTowLink() = 0;
+    virtual bool BreakTowLink() = 0;
+    virtual void FindWheelWidth() = 0;
+    virtual void Save() = 0;
+    virtual void Load() = 0;                                 
+
 public:
     CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312
 
@@ -375,7 +370,7 @@ public:
     float m_steeringLeftRight;
 
     // 1424
-    uint8_t  m_vehicleClass;
+    VehicleClass m_vehicleClass;
     uint32_t m_vehicleSubClass;
 
     int16_t    m_peviousRemapTxd;

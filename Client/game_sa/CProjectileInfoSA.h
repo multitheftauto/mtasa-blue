@@ -25,8 +25,6 @@
 #define ARRAY_CProjectile                   0xC89110 //##SA##
 #define ARRAY_CProjectileInfo               0xC891A8 //##SA##
 
-#define VTBL_CProjectile 0x867030
-
 // #pragma pack(push,1)
 class CProjectileInfoSAInterface
 {

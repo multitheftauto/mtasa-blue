@@ -77,13 +77,9 @@ public:
 
 /*** END PURE R* CLASSES ***/
 
-class CCameraSAInterface
+class CCameraSAInterface : public CPlaceableSAInterface
 {
 public:
-    // CPlaceable
-    CPlaceableSAInterface Placeable;
-    // End CPlaceable
-
     // move these out the class, have decided to set up a mirrored enumerated type thingy at the top
     bool          m_bAboveGroundTrainNodesLoaded;
     bool          m_bBelowGroundTrainNodesLoaded;

@@ -985,14 +985,14 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             CEntitySAInterface* pEntity = (CEntitySAInterface*)pSectorEntry[0];
 
             // Possible bug - pEntity seems to be invalid here occasionally
-            if (pEntity->vtbl->DeleteRwObject != 0x00534030)
+            if (!pEntity->IsUsesEntityDeleteRwObject())
             {
                 // Log info
                 OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
                                           i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols));
                 // Assert in debug
                 #if MTA_DEBUG
-                assert(pEntity->vtbl->DeleteRwObject == 0x00534030);
+                assert(!pEntity->IsUsesEntityDeleteRwObject());
                 #endif
                 pSectorEntry = (DWORD*)pSectorEntry[1];
                 continue;

@@ -108,7 +108,7 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     pGame->GetWorld()->Remove(pInterface, CBuildingPool_Destructor);
 
     // Call virtual destructor
-    ((void*(__thiscall*)(void*, char))pInterface->vtbl->SCALAR_DELETING_DESTRUCTOR)(pInterface, 0);
+    pInterface->Destructor(false);
 
     // Remove col reference
     auto modelInfo = pGame->GetModelInfo(pBuilding->GetModelIndex());
@@ -140,7 +140,7 @@ void CBuildingsPoolSA::RemoveAllBuildings()
     using CStencilShadowObjects_dtorAll = void* (*)();
     ((CStencilShadowObjects_dtorAll)0x711390)();
 
-    m_pOriginalBuildingsBackup = std::make_unique<std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS>>();
+    m_pOriginalBuildingsBackup = std::make_unique<backup_array_t>();
 
     auto pBuildsingsPool = (*m_ppBuildingPoolInterface);
     for (size_t i = 0; i < MAX_BUILDINGS; i++)
@@ -154,7 +154,7 @@ void CBuildingsPoolSA::RemoveAllBuildings()
             pBuildsingsPool->Release(i);
 
             (*m_pOriginalBuildingsBackup)[i].first = true;
-            (*m_pOriginalBuildingsBackup)[i].second = *building;
+            std::memcpy(&(*m_pOriginalBuildingsBackup)[i].second, building, sizeof(CBuildingSAInterface));
         }
         else
         {
@@ -174,9 +174,8 @@ void CBuildingsPoolSA::RestoreAllBuildings()
     {
         if (originalData[i].first)
         {
-            pBuildsingsPool->AllocateAt(i);
-            auto pBuilding = pBuildsingsPool->GetObject(i);
-            *pBuilding = originalData[i].second;
+            auto* pBuilding = pBuildsingsPool->AllocateAtNoInit(i);
+            std::memcpy(pBuilding, &originalData[i].second, sizeof(CBuildingSAInterface));
 
             pGame->GetWorld()->Add(pBuilding, CBuildingPool_Constructor);
         }
@@ -286,13 +285,13 @@ void CBuildingsPoolSA::UpdateIplEntrysPointers(uint32_t offset)
 
 void CBuildingsPoolSA::UpdateBackupLodPointers(uint32_t offset)
 {
-    std::array<std::pair<bool, CBuildingSAInterface>, MAX_BUILDINGS> *arr = m_pOriginalBuildingsBackup.get();
+    backup_array_t* arr = m_pOriginalBuildingsBackup.get();
     for (auto i = 0; i < MAX_BUILDINGS; i++)
     {
-        std::pair<bool, CBuildingSAInterface>* data = &(*arr)[i];
+        std::pair<bool, building_buffer_t>* data = &(*arr)[i];
         if (data->first)
         {
-            CBuildingSAInterface* building = &data->second;
+            CBuildingSAInterface* building = reinterpret_cast<CBuildingSAInterface*>(&data->second);
             if (building->m_pLod != nullptr)
             {
                 building->m_pLod = (CBuildingSAInterface*)((uint32_t)building->m_pLod + offset);

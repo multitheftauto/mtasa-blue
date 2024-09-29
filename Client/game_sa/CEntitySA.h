@@ -12,10 +12,9 @@
 #pragma once
 
 #include <game/CEntity.h>
+#include "CPlaceableSA.h"
 #include <CMatrix.h>
-#include <CMatrix_Pad.h>
 #include <CVector2D.h>
-#include <CVector.h>
 
 #define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
 
@@ -31,32 +30,6 @@
 #define FUNC_RpAnimBlendClumpGetAssociation                 0x4D6870
 
 class CRect;
-class CEntitySAInterfaceVTBL
-{
-public:
-    DWORD SCALAR_DELETING_DESTRUCTOR;                 // +0h
-    DWORD Add_CRect;                                  // +4h
-    DWORD Add;                                        // +8h
-    DWORD Remove;                                     // +Ch
-    DWORD SetIsStatic;                                // +10h
-    DWORD SetModelIndex;                              // +14h
-    DWORD SetModelIndexNoCreate;                      // +18h
-    DWORD CreateRwObject;                             // +1Ch
-    DWORD DeleteRwObject;                             // +20h
-    DWORD GetBoundRect;                               // +24h
-    DWORD ProcessControl;                             // +28h
-    DWORD ProcessCollision;                           // +2Ch
-    DWORD ProcessShift;                               // +30h
-    DWORD TestCollision;                              // +34h
-    DWORD Teleport;                                   // +38h
-    DWORD SpecialEntityPreCollisionStuff;             // +3Ch
-    DWORD SpecialEntityCalcCollisionSteps;            // +40h
-    DWORD PreRender;                                  // +44h
-    DWORD Render;                                     // +48h
-    DWORD SetupLighting;                              // +4Ch
-    DWORD RemoveLighting;                             // +50h
-    DWORD FlagToDestroyWhenNextProcessed;             // +54h
-};
 
 /**
  * \todo Move CReferences (and others below?) into it's own file
@@ -106,27 +79,9 @@ public:
 };
 static_assert(sizeof(XYZStore) == 0x1FC, "Invalid size for XYZStore");
 
-class CSimpleTransformSAInterface            // 16 bytes
+class CEntitySAInterface : public CPlaceableSAInterface
 {
 public:
-    CVector m_translate;
-    float   m_heading;
-};
-
-class CPlaceableSAInterface            // 20 bytes
-{
-public:
-    CSimpleTransformSAInterface m_transform;
-    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later
-};
-
-class CEntitySAInterface
-{
-public:
-    CEntitySAInterfaceVTBL* vtbl;            // the virtual table
-
-    CPlaceableSAInterface Placeable;            // 4
-
     RpClump* m_pRwObject;            // 24
     /********** BEGIN CFLAGS **************/
     unsigned long bUsesCollision : 1;                 // does entity use collision
@@ -237,11 +192,7 @@ public:
         ((CStencilShadow_dtorByOwner)0x711730)(this);
     };
 
-    void DeleteRwObject()
-    {
-        using vtbl_DeleteRwObject = void(__thiscall*)(CEntitySAInterface * pEntity);
-        ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
-    };
+    bool IsUsesEntityDeleteRwObject() { return *(*reinterpret_cast<std::uint32_t**>(this) + 0x20) == 0x00534030; };
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
 

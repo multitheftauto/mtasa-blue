@@ -36,12 +36,12 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
     if (!pProjectileSA)
         return;
 
-    CEntitySAInterface* projectileInterface = pProjectileSA->GetInterface();
+    CProjectileSAInterface* projectileInterface = pProjectileSA->GetProjectileInterface();
 
     // Check that this infact is a CProjectile
     // This is perhaps the fix for a crash where it jumps to 0x42480000
     // The proper cause should be figured out instead though as this is a rather unsafe fix.
-    if ((DWORD)projectileInterface->vtbl == VTBL_CProjectile)
+    if (projectileInterface->IsProjectableVTBL())
     {
         // Has it not already been removed by GTA?
         if (pProjectileInfo->IsActive())
