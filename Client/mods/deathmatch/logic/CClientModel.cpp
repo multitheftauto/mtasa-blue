@@ -84,9 +84,6 @@ bool CClientModel::Deallocate()
     if (!m_bAllocatedByUs)
         return false;
 
-    if (m_pParentResource)
-        m_pParentResource->GetResourceModelStreamer()->FullyReleaseModel(m_iModelID);
-
     SetParentResource(nullptr);
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
