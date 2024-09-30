@@ -128,15 +128,6 @@ public:
     bool          m_bAllowShootingWith2PlayersInCar;
     bool          m_bDisableFirstPersonInCar;
     static bool   m_bUseMouse3rdPerson;
-#ifndef FINALBUILD
-    bool bStaticFrustum;
-#endif
-
-    // for debug keyboard stuff
-#ifndef MASTER
-    unsigned char display_kbd_debug;
-    float         kbd_fov_value;
-#endif // MASTER
 
     // The following fields allow the level designers to specify the camera for 2 player games.
     short m_ModeForTwoPlayersSeparateCars;
