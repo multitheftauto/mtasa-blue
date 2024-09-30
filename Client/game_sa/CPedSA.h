@@ -9,8 +9,6 @@
  *
  *****************************************************************************/
 
-class CPedSA;
-
 #pragma once
 
 #include <game/CPed.h>
@@ -20,53 +18,49 @@ class CPedSA;
 #include "CFireSA.h"
 #include "CPedIKSA.h"
 #include "CPhysicalSA.h"
-
 #include "CPedSoundSA.h"
 #include "CPoolsSA.h"
-#include "CVehicleSA.h"
 #include "CWeaponSA.h"
-
-class CPedIntelligenceSA;
-class CPlayerPedDataSAInterface;
-class CPedIntelligenceSAInterface;
-
 #include "CPedIntelligenceSA.h"
 
-#define SIZEOF_CPLAYERPED                           1956
+class CPlayerPedDataSAInterface;
+class CVehicleSAInterface;
 
-#define FUNC_SetModelIndex                          0x5E4880
-#define FUNC_AttachPedToEntity                      0x5E7CB0
-#define FUNC_RestorePlayerStuffDuringResurrection   0x442060
-#define FUNC_SetIsStanding                          0x4ABBE0
-#define FUNC_MakeChangesForNewWeapon_Slot           0x60D000
+// CPed
+#define FUNC_AttachPedToEntity          0x5E7CB0            // CPed::AttachPedToEntity
+#define FUNC_DetachPedFromEntity        0x5E7EC0            // CPed::DettachPedFromEntity
+#define FUNC_SetModelIndex              0x5E4880            // CPed::SetModelIndex
+#define FUNC_SetIsStanding              0x4ABBE0            // CPed::SetIsStanding
+#define FUNC_SetCurrentWeapon           0x5E61F0            // CPed::SetCurrentWeapon
+#define FUNC_GiveWeapon                 0x5E6080            // CPed::GiveWeapon
+#define FUNC_ClearWeapon                0x5E62B0            // CPed::ClearWeapon
+#define FUNC_RemoveWeaponModel          0x5E3990            // CPed::RemoveWeaponModel
+#define FUNC_GetBonePosition            0x5E4280            // CPed::GetBonePosition
+#define FUNC_GetTransformedBonePosition 0x5E01C0            // CPed::GetTransformedBonePosition
+#define FUNC_TakeOffGoggles             0x5E6010            // CPed::TakeOffGoggles
+#define FUNC_PutOnGoggles               0x5E3AE0            // CPed::PutOnGoggles
+#define FUNC_RemoveGogglesModel         0x5DF170            // CPed::RemoveGogglesModel
+#define FUNC_CPed_RemoveBodyPart        0x5F0140            // CPed::RemoveBodyPart
+#define FUNC_PreRenderAfterTest         0x5E65A0            // CPed::PreRenderAfterTest
 
-#define FUNC_CPedClothesDesc__SetTextureAndModel    0x5A8080
-#define FUNC_CClothes__RebuildPlayer                0x5A82C0
-#define FUNC_CAEPedWeaponAudioEntity__AddAudioEvent 0x4E69F0
+// CPlayerPed
+#define FUNC_MakeChangesForNewWeapon_Slot 0x60D000            // CPlayerPed::MakeChangesForNewWeapon
 
-#define FUNC_QuitEnteringCar                        0x650130 // really belongs in CCarEnterExit
+// CPedClothesDesc && CClothes
+#define FUNC_CPedClothesDesc__SetTextureAndModel 0x5A8080            // CPedClothesDesc::SetTextureAndModel
+#define FUNC_CClothes__RebuildPlayer             0x5A82C0            // CClothes::RebuildPlayer
 
-#define FUNC_SetCurrentWeapon           0x5E61F0
-#define FUNC_GiveWeapon                 0x5E6080
-#define FUNC_GetBonePosition            0x5E4280
-#define FUNC_GetTransformedBonePosition 0x5E01C0
-#define FUNC_IsWearingGoggles           0x479D10
-#define FUNC_TakeOffGoggles             0x5E6010
-#define FUNC_PutOnGoggles               0x5E3AE0
-#define FUNC_RemoveWeaponModel          0x5E3990
-#define FUNC_RemoveGogglesModel         0x5DF170
-#define FUNC_ClearWeapon                0x5E62B0
-#define FUNC_DetachPedFromEntity        0x5E7EC0
-#define FUNC_CPed_RemoveBodyPart        0x5f0140
-#define FUNC_PreRenderAfterTest         0x5E65A0
+// CAEPedWeaponAudioEntity
+#define FUNC_CAEPedWeaponAudioEntity__AddAudioEvent 0x4E69F0            // CAEPedWeaponAudioEntity::AddAudioEvent
 
-#define VAR_LocalPlayer                 0x94AD28
+// CGameLogic
+#define FUNC_RestorePlayerStuffDuringResurrection 0x442060            // CGameLogic::RestorePlayerStuffDuringResurrection
+#define FUNC_SortOutStreamingAndMemory            0x441440            // CGameLogic::SortOutStreamingAndMemory
 
-//+1328 = Ped state
-//+1344 = ped health
 class CPedFlags
 {
 public:
+    // m_nPedFlags
     unsigned int bIsStanding : 1;                     // is ped standing on something
     unsigned int bWasStanding : 1;                    // was ped standing on something
     unsigned int bIsLooking : 1;                      // is ped looking at something or in a direction
@@ -91,8 +85,7 @@ public:
     unsigned int bStopAndShoot : 1;                   // Ped cannot reach target to attack with fist, need to use gun
     unsigned int bIsPedDieAnimPlaying : 1;            // is ped die animation finished so can dead now
     unsigned int bStayInSamePlace : 1;                // when set, ped stays put
-    unsigned int
-        bKindaStayInSamePlace : 1;                    // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
+    unsigned int bKindaStayInSamePlace : 1;                    // when set, ped doesn't seek out opponent or cover large distances. Will still shuffle and look for cover
     unsigned int bBeingChasedByPolice : 1;            // use nodes for routefind
 
     unsigned int bNotAllowedToDuck : 1;              // Is this ped allowed to duck at all?
@@ -104,6 +97,7 @@ public:
     unsigned int bStillOnValidPoly : 1;            // set if the polygon the ped is on is still valid for collision
     unsigned int bAllowMedicsToReviveMe : 1;
 
+    // m_nSecondPedFlags
     unsigned int bResetWalkAnims : 1;
     unsigned int bOnBoat : 1;                          // flee but only using nodes
     unsigned int bBusJacked : 1;                       // flee but only using nodes
@@ -140,6 +134,7 @@ public:
     unsigned int bCrouchWhenScared : 1;
     unsigned int bKnockedOffBike : 1;
 
+    // m_nThirdPedFlags
     unsigned int bDonePositionOutOfCollision : 1;
     unsigned int bDontRender : 1;
     unsigned int bHasBeenAddedToPopulation : 1;
@@ -175,8 +170,9 @@ public:
     unsigned int bIsCached : 1;
     unsigned int bPushOtherPeds : 1;            // GETS RESET EVERY FRAME - SET IN TASK: want to push other peds around (eg. leader of a group or ped trying to
                                                 // get in a car)
-    unsigned int bHasBulletProofVest : 1;
 
+    // m_nFourthPedFlags
+    unsigned int bHasBulletProofVest : 1;
     unsigned int bUsingMobilePhone : 1;
     unsigned int bUpperBodyDamageAnimsOnly : 1;
     unsigned int bStuckUnderCar : 1;
@@ -199,73 +195,107 @@ public:
     unsigned int bJustGotOffTrain : 1;
     unsigned int bDeathPickupsPersist : 1;
     unsigned int bTestForShotInVehicle : 1;
-    // #ifdef GTA_REPLAY
     unsigned int bUsedForReplay : 1;            // This ped is controlled by replay and should be removed when replay is done.
-    // #endif
 };
 
-class CPedWeaponAudioEntitySAInterface
+class CPedSAInterface : public CPhysicalSAInterface
 {
 public:
-};
-
-class CVehicleSAInterface;
-
-class CPedSAInterface : public CPhysicalSAInterface            // +1420  = current vehicle   312 first byte
-{
-public:
-    // current weapon slot 1184 ( and +1816?)
-    // CPedIKSAInterface     pedIK; // 528
-    // CWeaponSAInterface    Weapons[9]; // 1032
-    BYTE                             bPad[348];
-    CPedSoundSAInterface             pedSound;
-    BYTE                             bPad11[256 - sizeof(CPedSoundSAInterface)];
+    CPedSoundEntitySAInterface       pedAudio;            // CAEPedAudioEntity
+    CPedSoundSAInterface             pedSound;            // CAEPedSpeechAudioEntity
     CPedWeaponAudioEntitySAInterface weaponAudioEntity;
-    BYTE                             bPad12[216 - sizeof(CPedWeaponAudioEntitySAInterface)];
-    CPedFlags                        pedFlags;            // 1132 (16 bytes long including alignment probably)
+    std::uint8_t                     unk_43C[36];
+    std::uint8_t                     unk_460[8];
+    int                              unk_468;
+    CPedFlags                        pedFlags;
     CPedIntelligenceSAInterface*     pPedIntelligence;
-    CPlayerPedDataSAInterface*       pPlayerData;            // 1152
-    BYTE                             bPad4a[4];
-    void*                            pedNodes[19];
-    int                              iMoveAnimGroup;            // 1236
-    BYTE                             bPad4b[52];
-    CPedIKSAInterface                pedIK;            // 1292 (length 32 bytes)
-    int                              bPad5[5];
-
-    float fHealth;
-    int   iUnknown121;
-    float fArmor;
-
-    int iUnknown313[3];            // +1356
-    // +1368 = rotation
-    float               fCurrentRotation;
-    float               fTargetRotation;
-    float               fRotationSpeed;
-    float               fMoveAnim;
-    CEntitySAInterface* pContactEntity;
-    CVector             unk_56C;
-    CVector             unk_578;
-
-    CEntitySAInterface*  pLastContactEntity;
-    CVehicleSAInterface* pLastVehicle;
-    CVehicleSAInterface* pVehicle;
-
-    int                 unk_590;
-    int                 unk_594;
-    BYTE                bPedType;                    // ped type? 0 = player, >1 = ped?  // 1432
-    BYTE                bPad9[7];
-    CWeaponSAInterface  Weapons[WEAPONSLOT_MAX];
-    // weapons at +1440 ends at +1804
-    BYTE                bPad4[12];
-    BYTE                bCurrentWeaponSlot;            // is actually here
-    BYTE                bPad6[20];
-    BYTE                bFightingStyle;            // 1837
-    BYTE                bFightingStyleExtra;
-    BYTE                bPad7[1];
-    CFireSAInterface*   pFireOnPed;
-    BYTE                bPad10[104];
-    CEntitySAInterface* pTargetedEntity;            // 1948
+    CPlayerPedDataSAInterface*       pPlayerData;
+    std::uint8_t                     createdBy;
+    std::uint8_t                     _pad0[3];
+    void*                            pedNodes[19];            // AnimBlendFrameData*
+    int                              iMoveAnimGroup;
+    CVector2D                        vecAnimMovingShiftLocal;
+    std::uint8_t                     pedAcquaintance[20];            // CPedAcquaintance
+    RpClump*                         pWeaponObject;
+    RwFrame*                         pGunflashObject;
+    RpClump*                         pGogglesObject;
+    bool*                            pGogglesState;
+    std::int16_t                     weaponGunflashStateLeftHand;
+    std::int16_t                     unk_506;
+    std::int16_t                     weaponGunflashStateRightHand;
+    std::int16_t                     unk_50A;
+    CPedIKSAInterface                pedIK;
+    int                              unk_52C;
+    int                              pedState;
+    int                              moveState;
+    int                              swimmingMoveState;
+    int                              unk_53C;
+    float                            fHealth;
+    float                            fMaxHealth;
+    float                            fArmor;
+    DWORD                            dwTimeTillWeNeedThisPed;
+    CVector2D                        vecAnimMovingShift;
+    float                            fCurrentRotation;
+    float                            fTargetRotation;
+    float                            fRotationSpeed;
+    float                            fMoveAnim;
+    CEntitySAInterface*              pContactEntity;
+    CVector                          unk_56C;
+    CVector                          unk_578;
+    CEntitySAInterface*              pLastContactEntity;
+    CVehicleSAInterface*             pLastVehicle;
+    CVehicleSAInterface*             pVehicle;
+    int                              unk_590;
+    int                              unk_594;
+    int                              bPedType;            // ped type? 0 = player, >1 = ped?
+    void*                            pPedStats;
+    CWeaponSAInterface               Weapons[WEAPONSLOT_MAX];
+    int                              savedWeapon;
+    int                              delayedWeapon;
+    DWORD                            dwDelayedWeaponAmmo;
+    std::uint8_t                     bCurrentWeaponSlot;
+    std::uint8_t                     weaponShootingRate;
+    std::uint8_t                     weaponAccuracy;
+    std::uint8_t                     _pad;
+    CEntitySAInterface*              pTargetedObject;
+    int                              unk_720;
+    int                              unk_724;
+    int                              unk_728;
+    std::uint8_t                     weaponSkill;
+    std::uint8_t                     bFightingStyle;
+    std::uint8_t                     bFightingStyleExtra;
+    std::uint8_t                     bPad7;
+    CFireSAInterface*                pFireOnPed;
+    int                              unk_734;
+    CEntitySAInterface*              pLookAtEntity;
+    float                            fLookHeading;
+    DWORD                            dwWeaponModelID;
+    int                              unk_744;
+    DWORD                            dwLookTime;
+    int                              unk_74C;
+    DWORD                            dwTimeWhenDead;            // death time in MS
+    std::uint8_t                     bodyPartToRemove;
+    std::int16_t                     unk_755;
+    std::int16_t                     moneyCount;
+    std::int16_t                     unk_758;
+    int                              unk_75C;
+    std::uint8_t                     lastWeaponDamage;
+    std::uint8_t                     unk_761[3];
+    CEntitySAInterface*              pTargetedEntity;
+    std::int16_t                     unk_768;
+    CVector                          vecTurretOffset;
+    float                            fTurretAngleA;
+    float                            fTurretAngleB;
+    DWORD                            dwTurretPosnMode;
+    DWORD                            dwTurretAmmo;
+    void*                            pCoverPoint;            // CCoverPoint*
+    void*                            pEnex;                  // CEntryExit*
+    float                            fRemovalDistMultiplier;
+    std::int16_t                     specialModelIndex;
+    std::int16_t                     unk_796;
+    int                              unk_798;
 };
+static_assert(sizeof(CPedSAInterface) == 0x79C, "Invalid size for CPedSAInterface");
 
 class CPedSA : public virtual CPed, public virtual CPhysicalSA
 {
@@ -278,133 +308,133 @@ private:
     CPedSAInterface*    m_pPedInterface{};
     CPedSoundSA*        m_pPedSound{};
 
-    short m_sDefaultVoiceType;
-    short m_sDefaultVoiceID;
+    std::int16_t m_sDefaultVoiceType;
+    std::int16_t m_sDefaultVoiceID;
 
     DWORD         m_dwType;
-    unsigned char m_ucOccupiedSeat;
+    std::uint8_t  m_ucOccupiedSeat;
 
 protected:
     int m_iCustomMoveAnim{ 0 };
 
 public:
-    CPedSA(CPedSAInterface* pedInterface = nullptr) noexcept;
+    CPedSA(CPedSAInterface* pedInterface = nullptr);
     ~CPedSA();
 
-    void             SetInterface(CEntitySAInterface* intInterface);
-    CPedSAInterface* GetPedInterface() { return (CPedSAInterface*)GetInterface(); }
+    void             SetInterface(CEntitySAInterface* intInterface) noexcept { m_pInterface = intInterface; }
+    CPedSAInterface* GetPedInterface() noexcept { return static_cast<CPedSAInterface*>(m_pInterface); }
+    const CPedSAInterface* GetPedInterface() const noexcept { return static_cast<const CPedSAInterface*>(m_pInterface); }
     void             Init();
-    void             SetModelIndex(DWORD dwModelIndex);
-    void             AttachPedToEntity(DWORD dwEntityInterface, CVector* vector, unsigned short sDirection, float fRotationLimit, eWeaponType weaponType,
-                                       bool bChangeCamera);
+    
+    void             SetModelIndex(DWORD modelIndex);
+    void             AttachPedToEntity(DWORD entityInteface, CVector* vector, std::uint16_t direction, float rotationLimit, eWeaponType weaponType, bool changeCamera);
     void             DetachPedFromEntity();
 
-    CVehicle* GetVehicle();
-    void      Respawn(CVector* position, bool bCameraCut);
-    bool      AddProjectile(eWeaponType eWeapon, CVector vecOrigin, float fForce, CVector* target, CEntity* targetEntity);
+    CVehicle* GetVehicle() const noexcept;
+    void      Respawn(const CVector* position, bool cameraCut);
+    bool      AddProjectile(eWeaponType weaponType, CVector origin, float force, const CVector* target, const CEntity* targetEntity);
 
-    float GetHealth();
-    void  SetHealth(float fHealth);
+    float GetHealth() const { return GetPedInterface()->fHealth; }
+    void  SetHealth(float health) { GetPedInterface()->fHealth = health; }
 
-    float GetArmor();
-    void  SetArmor(float fArmor);
+    float GetArmor() const { return GetPedInterface()->fArmor; }
+    void  SetArmor(float armor) { GetPedInterface()->fArmor = armor; }
 
-    float GetOxygenLevel();
-    void  SetOxygenLevel(float fOxygen);
+    float GetOxygenLevel() const;
+    void SetOxygenLevel(float oxygen);
 
-    CWeapon* GiveWeapon(eWeaponType weaponType, unsigned int uiAmmo, eWeaponSkill skill);
-    CWeapon* GetWeapon(eWeaponSlot weaponSlot);
-    CWeapon* GetWeapon(eWeaponType weaponType);
-    void     ClearWeapons();
-    void     RemoveWeaponModel(int iModel);
+    CWeapon* GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill skill);
+    CWeapon* GetWeapon(eWeaponSlot weaponSlot) const noexcept;
+    CWeapon* GetWeapon(eWeaponType weaponType) const noexcept;
+    void     ClearWeapons() noexcept;
+    void     RemoveWeaponModel(int model);
     void     ClearWeapon(eWeaponType weaponType);
 
-    void              SetIsStanding(bool bStanding);
-    CPedIntelligence* GetPedIntelligence() { return m_pPedIntelligence; }
-    CPedSound*        GetPedSound() { return m_pPedSound; }
-    DWORD             GetType();
-    void              SetType(DWORD dwType);
+    void              SetIsStanding(bool standing);
+    CPedIntelligence* GetPedIntelligence() const noexcept { return m_pPedIntelligence; }
+    CPedSound*        GetPedSound() const noexcept { return m_pPedSound; }
+    DWORD             GetType() const noexcept { return m_dwType; }
+    void              SetType(DWORD type) noexcept { m_dwType = type; }
 
     virtual void RestoreLastGoodPhysicsState();
-    float        GetCurrentRotation();
-    float        GetTargetRotation();
-    void         SetCurrentRotation(float fRotation);
-    void         SetTargetRotation(float fRotation);
+    float        GetCurrentRotation() const { return GetPedInterface()->fCurrentRotation; }
+    float        GetTargetRotation() const { return GetPedInterface()->fTargetRotation; }
+    void         SetCurrentRotation(float rotation) { GetPedInterface()->fCurrentRotation = rotation; }
+    void         SetTargetRotation(float rotation) { GetPedInterface()->fTargetRotation = rotation; }
 
-    eWeaponSlot GetCurrentWeaponSlot();
+    eWeaponSlot GetCurrentWeaponSlot() const { return static_cast<eWeaponSlot>(GetPedInterface()->bCurrentWeaponSlot); }
     void        SetCurrentWeaponSlot(eWeaponSlot weaponSlot);
 
-    CVector* GetBonePosition(eBone bone, CVector* vecPosition);
-    CVector* GetTransformedBonePosition(eBone bone, CVector* vecPosition);
+    CVector* GetBonePosition(eBone bone, CVector* position);
+    CVector* GetTransformedBonePosition(eBone bone, CVector* position);
     void     ApplySwimAndSlopeRotations();
 
-    bool IsDucking();
-    void SetDucking(bool bDuck);
+    bool IsDucking() const { return GetPedInterface()->pedFlags.bIsDucking; }
+    void SetDucking(bool duck) { GetPedInterface()->pedFlags.bIsDucking = duck; }
 
-    bool IsInWater();
+    bool IsInWater() const noexcept;
 
-    int  GetCantBeKnockedOffBike();
-    void SetCantBeKnockedOffBike(int iCantBeKnockedOffBike);
-    void QuitEnteringCar(CVehicle* vehicle, int iSeat, bool bUnknown);
+    int  GetCantBeKnockedOffBike() const { return GetPedInterface()->pedFlags.CantBeKnockedOffBike; }
+    void SetCantBeKnockedOffBike(int cantBeKnockedOffBike) { GetPedInterface()->pedFlags.CantBeKnockedOffBike = cantBeKnockedOffBike; }
 
-    bool IsWearingGoggles();
-    void SetGogglesState(bool bIsWearingThem);
+    bool IsWearingGoggles() const { return GetPedInterface()->pGogglesObject != nullptr; }
+    void SetGogglesState(bool isWearingThem);
 
-    void SetClothesTextureAndModel(const char* szTexture, const char* szModel, int textureType);
+    void SetClothesTextureAndModel(const char* texture, const char* model, int textureType);
     void RebuildPlayer();
 
-    eFightingStyle GetFightingStyle();
-    void           SetFightingStyle(eFightingStyle style, BYTE bStyleExtra = 6);
+    eFightingStyle GetFightingStyle() const { return static_cast<eFightingStyle>(GetPedInterface()->bFightingStyle); }
+    void           SetFightingStyle(eFightingStyle style, std::uint8_t styleExtra = 6);
 
-    CEntity* GetContactEntity();
+    CEntity* GetContactEntity() const noexcept;
 
-    unsigned char GetRunState();
+    std::uint8_t GetRunState() const { return static_cast<std::uint8_t>(GetPedInterface()->moveState); }
 
-    CEntity* GetTargetedEntity();
-    void     SetTargetedEntity(CEntity* pEntity);
+    CEntity* GetTargetedEntity() const noexcept;
+    void     SetTargetedEntity(CEntity* targetEntity);
 
-    bool GetCanBeShotInVehicle();
-    bool GetTestForShotInVehicle();
+    bool GetCanBeShotInVehicle() const { return GetPedInterface()->pedFlags.bCanBeShotInVehicle; }
+    bool GetTestForShotInVehicle() const { return GetPedInterface()->pedFlags.bTestForShotInVehicle; }
 
-    void SetCanBeShotInVehicle(bool bShot);
-    void SetTestForShotInVehicle(bool bTest);
+    void SetCanBeShotInVehicle(bool shot) { GetPedInterface()->pedFlags.bCanBeShotInVehicle = shot; }
+    void SetTestForShotInVehicle(bool test) { GetPedInterface()->pedFlags.bTestForShotInVehicle = test; }
 
-    bool InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector* vecPosition, const CVector* vecRotation);
+    bool InternalAttachEntityToEntity(DWORD entityInterface, const CVector* position, const CVector* rotation) override;
 
-    BYTE GetOccupiedSeat() { return m_ucOccupiedSeat; }
-    void SetOccupiedSeat(BYTE seat) { m_ucOccupiedSeat = seat; }
+    std::uint8_t GetOccupiedSeat() const noexcept { return m_ucOccupiedSeat; }
+    void SetOccupiedSeat(std::uint8_t seat) noexcept { m_ucOccupiedSeat = seat; }
 
-    void RemoveBodyPart(int i, char c);
+    void RemoveBodyPart(std::uint8_t boneID, std::uint8_t direction);
 
-    void         SetFootBlood(unsigned int uiFootBlood);
-    unsigned int GetFootBlood();
+    void         SetFootBlood(std::uint32_t footBlood);
+    std::uint32_t GetFootBlood() const;
 
-    bool IsBleeding();
-    void SetBleeding(bool bBleeding);
+    bool IsBleeding() const { return GetPedInterface()->pedFlags.bPedIsBleeding; }
+    void SetBleeding(bool bleeding) { GetPedInterface()->pedFlags.bPedIsBleeding = bleeding; }
 
-    bool IsOnFire();
-    void SetOnFire(bool bOnFire);
+    bool IsOnFire() const { return GetPedInterface()->pFireOnPed != nullptr; }
+    void SetOnFire(bool onFire);
 
-    bool GetStayInSamePlace() { return GetPedInterface()->pedFlags.bStayInSamePlace; }
-    void SetStayInSamePlace(bool bStay);
+    bool GetStayInSamePlace() const { return GetPedInterface()->pedFlags.bStayInSamePlace; }
+    void SetStayInSamePlace(bool stay) { GetPedInterface()->pedFlags.bStayInSamePlace = stay; }
 
-    void GetVoice(short* psVoiceType, short* psVoiceID);
-    void GetVoice(const char** pszVoiceType, const char** pszVoice);
-    void SetVoice(short sVoiceType, short sVoiceID);
-    void SetVoice(const char* szVoiceType, const char* szVoice);
-    void ResetVoice();
-    void SetLanding(bool bIsLanding) { GetPedInterface()->pedFlags.bIsLanding = bIsLanding; }
+    void GetVoice(std::int16_t* voiceType, std::int16_t* voiceID) const;
+    void GetVoice(const char** voiceType, const char** voice) const;
+    void SetVoice(std::int16_t voiceType, std::int16_t voiceID);
+    void SetVoice(const char* voiceType, const char* voice);
+    void ResetVoice() { SetVoice(m_sDefaultVoiceType, m_sDefaultVoiceID); }
+    void SetLanding(bool isLanding) { GetPedInterface()->pedFlags.bIsLanding = isLanding; }
     void SetUpdateMetricsRequired(bool required) { GetPedInterface()->pedFlags.bUpdateMatricesRequired = required; }
 
-    CWeaponStat* GetCurrentWeaponStat();
-    float        GetCurrentWeaponRange();
+    CWeaponStat* GetCurrentWeaponStat() const noexcept;
+    float        GetCurrentWeaponRange() const noexcept;
     void         AddWeaponAudioEvent(EPedWeaponAudioEventType audioEventType);
 
-    virtual int GetCustomMoveAnim();
-    bool        IsDoingGangDriveby();
+    virtual int GetCustomMoveAnim() const noexcept { return m_iCustomMoveAnim; }
+    bool        IsDoingGangDriveby() const noexcept;
 
-    CPedIKSAInterface*      GetPedIKInterface() { return &reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedIK; }
-    void*                   GetPedNodeInterface(std::int32_t nodeId) { return reinterpret_cast<CPedSAInterface*>(m_pInterface)->pedNodes[nodeId]; }
+    CPedIKSAInterface*      GetPedIKInterface() { return &GetPedInterface()->pedIK; }
+    void*                   GetPedNodeInterface(std::int32_t nodeId) { return GetPedInterface()->pedNodes[nodeId]; }
     std::unique_ptr<CPedIK> GetPedIK() { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
     static void             StaticSetHooks();
 

@@ -12,6 +12,10 @@
 #pragma once
 
 #include <game/CPedSound.h>
+#include "CAudioEngineSA.h"
+#include "CAEVehicleAudioEntitySA.h"
+
+class CPedSAInterface;
 
 #define FUNC_CAEPedSound__GetVoice          0x4E3CD0        // 4E3CD0 ; public: static short __cdecl CAEPedSound::GetVoice(char *,short)
 #define FUNC_CAEPedSound__GetAudioPedType   0x4E3C60        // 4E3C60 ; public: static short __cdecl CAEPedSound::GetAudioPedType(char *)
@@ -50,15 +54,62 @@ typedef struct
     char szName[20];
 } SPedVoiceName;
 
-class CPedSoundSAInterface
+// CAEPedSpeechAudioEntity
+class CPedSoundSAInterface : public CAEAudioEntity
 {
 public:
-    BYTE  ucPad1[0x92];
-    short m_sVoiceType;
-    short m_sVoiceID;
-    short m_bIsFemale;
-    BYTE  ucPad2[1];
-    bool  m_bDisabled;
+    std::uint8_t unk_7C[14];
+    std::int8_t  unk_90;
+    std::uint8_t unk_91;
+    std::int16_t m_sVoiceType;
+    std::int16_t m_sVoiceID;
+    std::int16_t m_bIsFemale;            // 0 = male, 1 = female
+    bool         m_bTalking;
+    bool         m_bDisabled;            // m_bEnableSpeech
+    bool         m_bEnableSpeechForScripts;
+    std::uint8_t m_vocalEnableFlag;
+    std::uint8_t unk_9C[4];            // From 9C to 9F
+    CAESound*    m_pSound;             // CSound*
+    std::int16_t m_soundId;
+    std::int16_t m_bankId;
+    std::int16_t m_pedSpeechSlotIndex;
+    std::uint8_t unk_A4[4];
+    float        m_fVoiceVolume;
+    std::int16_t m_sPhraseId;
+    std::int16_t unk_B2;
+    std::uint8_t unk_B4[76];
+};
+
+// CAEPedAudioEntity
+class CPedSoundEntitySAInterface : public CAEAudioEntity
+{
+public:
+    std::uint8_t           unk_7C[24];            // from 7C to 8C
+    CPedSAInterface*       ped;
+    std::uint8_t           unk_98[16];            // from 98 to A8
+    CAETwinLoopSoundEntity twinLoopSoundEntity;
+    std::uint8_t           unk_150[12];            // from 150 to 15C
+};
+
+// CAEPedWeaponAudioEntity
+class CPedWeaponAudioEntitySAInterface : public CAEAudioEntity
+{
+public:
+    bool                playedMiniGunFireSound;
+    bool                unk_7D;               // CAEWeaponAudioEntity::PlayMiniGunFireSounds
+    std::uint8_t        unk_7E[2];            // from 7E to 7F
+    std::uint8_t        chainsawSoundState;
+    std::uint8_t        unk_81[3];            // from 81 to 83
+    std::uint32_t       flameThrowerLastPlayedTime;
+    std::uint32_t       spraycanLastPlayedTime;
+    std::uint32_t       extinguisherLastPlayedTime;
+    std::uint32_t       miniGunFireSoundPlayedTime;
+    std::uint32_t       timeChainsaw;
+    std::uint32_t       timeLastFired;
+    void*               sounds;
+    bool                active;
+    std::uint8_t        unk_A1[3];            // from A1 to A3
+    CPedSAInterface*    ped;
 };
 
 class CPedSoundSA : public CPedSound
