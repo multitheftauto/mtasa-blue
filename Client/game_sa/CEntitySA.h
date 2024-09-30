@@ -17,6 +17,12 @@
 #include <CVector2D.h>
 #include <CVector.h>
 
+template <typename ReturnType, typename... ArgsType>
+inline ReturnType GTAFunction(DWORD function, ArgsType... args)
+{
+    return (ReturnType(__thiscall*)(ArgsType...)function)(args);
+};
+
 #define FUNC_GetDistanceFromCentreOfMassToBaseOfModel       0x536BE0
 
 #define FUNC_SetRwObjectAlpha                               0x5332C0
@@ -253,7 +259,8 @@ public:
     CEntitySAInterface* m_pInterface;
 
     CEntitySA();
-    CEntitySAInterface* GetInterface() { return m_pInterface; };
+    CEntitySAInterface* GetInterface() { return m_pInterface; }
+    const CEntitySAInterface* GetInterface() const noexcept { return m_pInterface; }
     void                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
     bool IsPed() { return GetEntityType() == ENTITY_TYPE_PED; }
@@ -277,7 +284,7 @@ public:
     CMatrix*     GetMatrix(CMatrix* matrix);
     CMatrix*     GetMatrixInternal(CMatrix* matrix);
     void         SetMatrix(CMatrix* matrix);
-    WORD         GetModelIndex();
+    WORD         GetModelIndex() const;
     eEntityType  GetEntityType();
     bool         IsOnScreen();
     bool         IsFullyVisible();

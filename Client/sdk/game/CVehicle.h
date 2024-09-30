@@ -244,6 +244,7 @@ public:
     virtual int  GetWheelFrictionState(BYTE bWheel) = 0;
 
     virtual class CVehicleSAInterface* GetVehicleInterface() = 0;
+    virtual const class CVehicleSAInterface* GetVehicleInterface() const noexcept = 0;
 
     virtual float GetHealth() = 0;
     virtual void  SetHealth(float fHealth) = 0;
@@ -271,7 +272,6 @@ public:
     virtual bool IsHeliSearchLightVisible() = 0;
     virtual void SetHeliSearchLightVisible(bool bVisible) = 0;
 
-    virtual CColModel* GetSpecialColModel() = 0;
     virtual bool       UpdateMovingCollision(float fAngle) = 0;
 
     virtual void RecalculateHandling() = 0;
@@ -317,7 +317,7 @@ public:
     virtual void                              UpdateLandingGearPosition() = 0;
     virtual bool                              SetPlateText(const SString& strText) = 0;
     virtual bool                              SetWindowOpenFlagState(unsigned char ucWindow, bool bState) = 0;
-    virtual float                             GetWheelScale() = 0;
+    virtual float                             GetWheelScale() const = 0;
     virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
 

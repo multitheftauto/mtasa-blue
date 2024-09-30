@@ -533,7 +533,7 @@ public:
 
     void SetHeliBladeCollisionsEnabled(bool bEnable) { m_bEnableHeliBladeCollisions = bEnable; }
 
-    float GetWheelScale();
+    float GetWheelScale() const;
     void  SetWheelScale(float fWheelScale);
     void  ResetWheelScale();
 

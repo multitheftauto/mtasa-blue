@@ -5016,7 +5016,7 @@ void CClientVehicle::SetWheelScale(float fWheelScale)
     m_bWheelScaleChanged = true;
 }
 
-float CClientVehicle::GetWheelScale()
+float CClientVehicle::GetWheelScale() const
 {
     return m_pVehicle ? m_pVehicle->GetWheelScale() : m_fWheelScale;
 }

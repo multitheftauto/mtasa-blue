@@ -16,3 +16,8 @@ CTrainSA::CTrainSA(CTrainSAInterface* pInterface)
     SetInterface(pInterface);
     Init();
 }
+
+void __thiscall CTrainSAInterface::FindPositionOnTrackFromCoors()
+{
+    GTAFunction<void, CTrainSAInterface*>(FUNC_CTrain_FindPositionOnTrackFromCoors, this);
+}
