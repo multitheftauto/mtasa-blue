@@ -142,7 +142,7 @@ void CEntitySA::Teleport(float fX, float fY, float fZ)
     if (m_pInterface->matrix)
     {
         SetPosition(fX, fY, fZ);
-        m_pInterface->Teleport(fX, fY, fZ, true);
+        m_pInterface->Teleport(CVector(fX, fY, fZ), true);
     }
     else
     {

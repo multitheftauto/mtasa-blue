@@ -24,6 +24,7 @@
 
 class CFxSystemSAInterface;
 class CTrainSAInterface;
+class CColModelSAInterface;
 struct RwTexture;
 
 #define SIZEOF_CHELI                            2584
@@ -207,51 +208,59 @@ class CAutoPilot
 class CVehicleSAInterface : public CPhysicalSAInterface
 {
 public:
-    // Some virtual functions are not defined propertly
-    virtual void ProcessEntityCollision() = 0;
-    virtual void ProcessControlCollisionCheck() = 0;
-    virtual void ProcessControlInputs() = 0;
-    virtual void GetComponentWorldPosition() = 0;
-    virtual void IsComponentPresent() = 0;
-    virtual void OpenDoor(CEntitySAInterface* entity, std::uint32_t doorFrameId, std::uint32_t doorId, float ratio, bool makeNoise) = 0;
-    virtual void ProcessOpenDoor() = 0;
-    virtual void GetDoorAngleOpenRatio() = 0;
-    virtual void GetDoorAngleOpenRatio_() = 0;
-    virtual void IsDoorReady() = 0;
-    virtual void IsDoorReady_() = 0;
-    virtual void IsDoorFullyOpen() = 0;
-    virtual void IsDoorFullyOpen_() = 0;
-    virtual void IsDoorClosed() = 0;
-    virtual void IsDoorClosed_() = 0;
-    virtual void IsDoorMissing() = 0;
-    virtual void IsDoorMissing_() = 0;
-    virtual void IsOpenTopCar() = 0;
-    virtual void RemoveRefsToVehicle() = 0;
-    virtual void BlowUpCar(CEntitySAInterface* creator, std::uint32_t unknown) = 0;
-    virtual void BlowUpCarCutSceneNoExtras() = 0;
-    virtual void SetUpWheelColModel() = 0;
-    virtual void BurstTyre(std::uint8_t tireId, bool unused) = 0;
-    virtual void IsRoomForPedToLeaveCar() = 0;
-    virtual void ProcessDrivingAnims() = 0;
-    virtual void GetRideAnimData() = 0;
-    virtual void SetupSuspensionLines() = 0;
-    virtual void AddMovingCollisionSpeed() = 0;
-    virtual void Fix() = 0;
-    virtual void SetupDamageAfterLoad() = 0;
-    virtual void DoBurstAndSoftGroundRatios() = 0;
-    virtual void GetHeightAboveRoad() = 0;
-    virtual void PlayCarHorn() = 0;
-    virtual void GetNumContactWheels() = 0;
-    virtual void VehicleDamage() = 0;
-    virtual void CanPedStepOutCar() = 0;
-    virtual void CanPedJumpOutCar() = 0;
-    virtual bool GetTowHitchPos(CVector* pVector, CVehicleSAInterface* anotherVehicle) = 0;
-    virtual bool GetTowbarPos(CVector* pVector, bool ignoreModelType, CVehicleSAInterface* pTrailer) = 0;
-    virtual void SetTowLink() = 0;
-    virtual bool BreakTowLink() = 0;
-    virtual void FindWheelWidth() = 0;
-    virtual void Save() = 0;
-    virtual void Load() = 0;                                 
+    virtual void ProcessControlCollisionCheck(bool applySpeed) = 0;
+    virtual void ProcessControlInputs(std::uint8_t playerNum) = 0;
+    virtual void GetComponentWorldPosition(std::int32_t componentId, CVector& outPos) = 0;
+    virtual bool IsComponentPresent(std::int32_t componentId) = 0;
+    virtual void OpenDoor(CPedSAInterface* entity, std::uint32_t doorFrameId, std::uint32_t doorId, float ratio, bool makeNoise) = 0;
+    virtual void ProcessOpenDoor(CPedSAInterface* ped, std::uint32_t doorComponentId, std::uint32_t animGroup, std::uint32_t animId, float fTime) = 0;
+
+    virtual float GetDoorAngleOpenRatio(std::uint32_t door) = 0;
+    virtual float GetDoorAngleOpenRatio_(std::uint8_t door) = 0;
+
+    virtual bool IsDoorReady(std::uint32_t door) = 0;
+    virtual bool IsDoorReady_(std::uint8_t door) = 0;
+    virtual bool IsDoorFullyOpen(std::uint32_t door) = 0;
+    virtual bool IsDoorFullyOpen_(std::uint8_t door) = 0;
+    virtual bool IsDoorClosed(std::uint32_t door) = 0;
+    virtual bool IsDoorClosed_(std::uint8_t door) = 0;
+    virtual bool IsDoorMissing(std::uint32_t door) = 0;
+    virtual bool IsDoorMissing_(std::uint8_t door) = 0;
+
+    virtual bool IsOpenTopCar() = 0;
+
+    virtual void RemoveRefsToVehicle(CEntitySAInterface* entity) = 0;
+    virtual void BlowUpCar(CEntitySAInterface* creator, bool bHideExplosion) = 0;
+    virtual void BlowUpCarCutSceneNoExtras(bool bNoCamShake, bool bNoSpawnFlyingComps, bool bDetachWheels, bool bExplosionSound) = 0;
+    virtual bool SetUpWheelColModel(CColModelSAInterface* wheelCol) = 0;
+    virtual bool BurstTyre(std::uint8_t tireId, bool bPhysicalEffect) = 0;
+    virtual bool IsRoomForPedToLeaveCar(std::uint32_t doorId, CVector* arg) = 0;
+    virtual void ProcessDrivingAnims(CPedSAInterface* driver, bool bBlend) = 0;
+
+    virtual void* GetRideAnimData() = 0;
+
+    virtual void    SetupSuspensionLines() = 0;
+    virtual CVector AddMovingCollisionSpeed(CVector& point) = 0;
+    virtual void    Fix() = 0;
+    virtual void    SetupDamageAfterLoad() = 0;
+    virtual void    DoBurstAndSoftGroundRatios() = 0;
+
+    virtual float GetHeightAboveRoad() = 0;
+
+    virtual void         PlayCarHorn() = 0;
+    virtual std::int32_t GetNumContactWheels() = 0;
+
+    virtual void  VehicleDamage(float damageIntensity, std::uint16_t collisionComponent, CEntitySAInterface* damager, CVector* vecCollisionCoors,
+                                CVector* vecCollisionDirection, eWeaponType weapon) = 0;
+    virtual bool  CanPedStepOutCar(bool bIgnoreSpeedUpright = false) = 0;
+    virtual bool  CanPedJumpOutCar(CPedSAInterface* ped) = 0;
+    virtual bool  GetTowHitchPos(CVector* pVector, bool bCheckModelInfo, CVehicleSAInterface* anotherVehicle) = 0;
+    virtual bool  GetTowbarPos(CVector* pVector, bool ignoreModelType, CVehicleSAInterface* pTrailer) = 0;
+    virtual void  SetTowLink() = 0;
+    virtual bool  BreakTowLink() = 0;
+    virtual float FindWheelWidth() = 0;
+    virtual bool  Save() = 0;
+    virtual bool  Load() = 0;
 
 public:
     CAEVehicleAudioEntitySAInterface m_VehicleAudioEntity;            // 312

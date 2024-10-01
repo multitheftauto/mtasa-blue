@@ -602,10 +602,9 @@ CDoorSA* CVehicleSA::GetDoor(unsigned char ucDoor)
     return 0;
 }
 
-static const int s_iCarNodeIndexes[6] = {0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09};
-
 void CVehicleSA::OpenDoor(unsigned char ucDoor, float fRatio, bool bMakeNoise)
 {
+    static const int s_iCarNodeIndexes[6] = {0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09};
     return GetVehicleInterface()->OpenDoor(nullptr, s_iCarNodeIndexes[ucDoor], ucDoor, fRatio, bMakeNoise);
 }
 
@@ -732,7 +731,7 @@ bool CVehicleSA::GetTowBarPos(CVector* pVector, CVehicle* pTrailer)
 
 bool CVehicleSA::GetTowHitchPos(CVector* pVector)
 {
-    return GetVehicleInterface()->GetTowHitchPos(pVector, nullptr);
+    return GetVehicleInterface()->GetTowHitchPos(pVector, true, nullptr);
 }
 
 bool CVehicleSA::IsUpsideDown()

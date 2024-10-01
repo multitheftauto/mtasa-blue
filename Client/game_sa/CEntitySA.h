@@ -29,6 +29,7 @@
 // not in CEntity really
 #define FUNC_RpAnimBlendClumpGetAssociation                 0x4D6870
 
+class CPhysicalSAInterface;
 class CRect;
 
 /**
@@ -81,6 +82,30 @@ static_assert(sizeof(XYZStore) == 0x1FC, "Invalid size for XYZStore");
 
 class CEntitySAInterface : public CPlaceableSAInterface
 {
+public:
+    virtual void         Add() = 0;
+    virtual void         Add(const CRect& rect) = 0;
+    virtual void         Remove() = 0;
+    virtual void         SetIsStatic(bool isStatic) = 0;
+    virtual void         SetModelIndex(std::uint32_t model) = 0;
+    virtual void         SetModelIndexNoCreate(std::uint32_t model) = 0;
+    virtual void         CreateRwObject() = 0;
+    virtual void         DeleteRwObject() = 0;
+    virtual CRect        GetBoundRect() = 0;
+    virtual void         ProcessControl() = 0;
+    virtual void         ProcessCollision() = 0;
+    virtual void         ProcessShift() = 0;
+    virtual bool         TestCollision(bool bApplySpeed) = 0;
+    virtual void         Teleport(CVector destination, bool resetRotation) = 0;
+    virtual void         SpecialEntityPreCollisionStuff(CPhysicalSAInterface* colPhysical, bool bIgnoreStuckCheck, bool& bCollisionDisabled,
+                                                        bool& bCollidedEntityCollisionIgnored, bool& bCollidedEntityUnableToMove, bool& bThisOrCollidedEntityStuck) = 0;
+    virtual std::uint8_t SpecialEntityCalcCollisionSteps(bool& bProcessCollisionBeforeSettingTimeStep, bool& unk2) = 0;
+    virtual void         PreRender() = 0;
+    virtual void         Render() = 0;
+    virtual bool         SetupLighting() = 0;
+    virtual void*        RemoveLighting(bool bRemove) = 0;
+    virtual void         FlagToDestroyWhenNextProcessed() = 0;
+
 public:
     RpClump* m_pRwObject;            // 24
     /********** BEGIN CFLAGS **************/
