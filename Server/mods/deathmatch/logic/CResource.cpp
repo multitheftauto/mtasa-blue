@@ -3011,7 +3011,7 @@ HttpStatusCode CResource::HandleRequestRouter(HttpRequest* request, HttpResponse
         luaRequest.PushString("path");
         luaRequest.PushString(path);
 
-        luaRequest.PushString("absolute_path");
+        luaRequest.PushString("absolutePath");
         luaRequest.PushString(request->sOriginalUri);
 
         luaRequest.PushString("hostname");
