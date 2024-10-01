@@ -123,7 +123,7 @@ public:
 class CEntitySAInterface
 {
 public:
-    CEntitySAInterfaceVTBL* vtbl;            // the virtual table
+    CEntitySAInterfaceVTBL* vtbl;            // the virtual table it should be in the CPlaceableSAInterface
 
     CPlaceableSAInterface Placeable;            // 4
 
