@@ -10,7 +10,7 @@
 #include <CMatrix_Pad.h>
 #include <CVector.h>
 
-#define VTBL_CPlaceable 0x863C40
+constexpr std::uint32_t VTBL_CPlaceable = 0x863C40;
 
 class CSimpleTransformSAInterface            // 16 bytes
 {
@@ -24,8 +24,8 @@ class CPlaceableSAInterface
 public:
     virtual void* Destructor(bool free) = 0;
 
-    bool IsPlaceableVTBL() const { return *reinterpret_cast<const std::uint32_t*>(this) == VTBL_CPlaceable; };
-    bool HasVTBL() const { return *reinterpret_cast<const std::uint32_t*>(this) != 0; };
+    bool IsPlaceableVTBL() const { return *reinterpret_cast<const void* const*>(this) == (void*)VTBL_CPlaceable; };
+    bool HasVTBL() const { return *reinterpret_cast<const void* const*>(this) != nullptr; };
 
 public:
     CSimpleTransformSAInterface m_transform;
