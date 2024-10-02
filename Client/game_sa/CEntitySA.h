@@ -243,7 +243,7 @@ public:
         ((vtbl_DeleteRwObject)this->vtbl->DeleteRwObject)(this);
     };
 
-    bool HasMatrix() const noexcept { return Placeable.matrix != nullptr; };
+    bool HasMatrix() const noexcept { return Placeable.matrix != nullptr; }
 
     void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
 };
