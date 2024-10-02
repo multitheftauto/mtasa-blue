@@ -13,6 +13,7 @@
 #include <game/CAudioEngine.h>
 #include <game/CRenderWare.h>
 #include <game/CHud.h>
+#include <game/CStreaming.h>
 #include <type_traits>
 
 enum eLuaType
@@ -84,6 +85,9 @@ DECLARE_ENUM_CLASS(_D3DFORMAT);
 DECLARE_ENUM_CLASS(eRenderStage);
 DECLARE_ENUM_CLASS(eFxParticleSystems);
 DECLARE_ENUM(ePools);
+DECLARE_ENUM(eWorldProperty);
+DECLARE_ENUM_CLASS(eModelLoadState);
+DECLARE_ENUM_CLASS(PreloadAreaOption);
 
 class CRemoteCall;
 
@@ -496,6 +500,10 @@ inline SString GetClassTypeName(eSoundEffectParams::ParamEq*)
 inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
 {
     return "soundeffect-params-reverb";
+}
+inline SString GetClassTypeName(eWorldProperty*)
+{
+    return "world-property";
 }
 
 inline SString GetClassTypeName(CClientVectorGraphic*)

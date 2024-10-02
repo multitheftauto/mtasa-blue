@@ -38,7 +38,6 @@
 #include "CResourceManager.h"
 #include "CScriptKeyBinds.h"
 #include "CElementDeleter.h"
-#include "CFoo.h"
 #include "CRegisteredCommands.h"
 #include "CClientGUIElement.h"
 #include "CLocalServer.h"
@@ -70,6 +69,15 @@ struct SMiscGameSettings
     bool bAllowFastSprintFix;
     bool bAllowBadDrivebyHitboxFix;
     bool bAllowShotgunDamageFix;
+};
+
+struct ResetWorldPropsInfo
+{
+    bool resetSpecialProperties{};
+    bool resetWorldProperties{};
+    bool resetWeatherProperties{};
+    bool resetLODs{};
+    bool resetSounds{};
 };
 
 class CClientGame
@@ -309,11 +317,12 @@ public:
     CRemoteCalls*                 GetRemoteCalls() { return m_pRemoteCalls; }
     CResourceFileDownloadManager* GetResourceFileDownloadManager() { return m_pResourceFileDownloadManager; }
 
+    CModelRenderer* GetModelRenderer() const noexcept { return m_pModelRenderer.get(); }
+
     SharedUtil::CAsyncTaskScheduler* GetAsyncTaskScheduler() { return m_pAsyncTaskScheduler; }
 
     // Status toggles
     void ShowNetstat(int iCmd);
-    void ShowEaeg(bool bShow);
     void ShowFPS(bool bShow) { m_bShowFPS = bShow; };
 
 #if defined(MTA_DEBUG) || defined(MTA_BETA)
@@ -410,6 +419,8 @@ public:
     bool SetBirdsEnabled(bool bEnabled);
     bool GetBirdsEnabled();
 
+    void ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo);
+
     CTransferBox* GetTransferBox() { return m_pTransferBox; };
 
     void ChangeVehicleWeapon(bool bNext);
@@ -443,7 +454,7 @@ public:
 
     bool TriggerBrowserRequestResultEvent(const std::unordered_set<SString>& newPages);
     void RestreamModel(unsigned short usModel);
-    void RestreamWorld(bool removeBigBuildings);
+    void RestreamWorld();
     void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
@@ -506,11 +517,13 @@ private:
     static void                              StaticRender3DStuffHandler();
     static void                              StaticPreRenderSkyHandler();
     static void                              StaticRenderHeliLightHandler();
+    static void                              StaticRenderEverythingBarRoadsHandler();
     static bool                              StaticChokingHandler(unsigned char ucWeaponType);
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
     static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
     static void                              StaticPreFxRenderHandler();
+    static void                              StaticPostColorFilterRenderHandler();
     static void                              StaticPreHudRenderHandler();
     static void                              StaticCAnimBlendAssocDestructorHandler(CAnimBlendAssociationSAInterface* pThis);
     static CAnimBlendAssociationSAInterface* StaticAddAnimationHandler(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
@@ -523,7 +536,7 @@ private:
     static bool StaticProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     static bool StaticVehicleCollisionHandler(CVehicleSAInterface*& pThisInterface, CEntitySAInterface* pOtherInterface, int iModelIndex,
                                               float fDamageImpulseMag, float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos,
-                                              CVector vecCollisionVelocity);
+                                              CVector vecCollisionVelocity, bool isProjectile);
     static bool StaticVehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                            const CVector& vecDamagePos, uchar ucTyre);
     static bool StaticHeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
@@ -568,7 +581,7 @@ private:
                                                RpClump* pClump);
     bool        ProcessCollisionHandler(CEntitySAInterface* pThisInterface, CEntitySAInterface* pOtherInterface);
     bool        VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedVehicle, int iModelIndex, float fDamageImpulseMag,
-                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity);
+                                        float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity, bool isProjectile);
     bool        VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, float fLoss, CEntitySAInterface* pAttackerInterface, eWeaponType weaponType,
                                      const CVector& vecDamagePos, uchar ucTyre);
     bool        HeliKillHandler(CVehicleSAInterface* pHeli, CEntitySAInterface* pHitInterface);
@@ -699,6 +712,8 @@ private:
     CRemoteCalls*                 m_pRemoteCalls;
     CResourceFileDownloadManager* m_pResourceFileDownloadManager;
 
+    std::unique_ptr<CModelRenderer> m_pModelRenderer;
+
     // Revised facilities
     CServer m_Server;
 
@@ -812,10 +827,6 @@ private:
     bool m_bDevelopmentMode;
     bool m_bShowCollision;
     bool m_bShowSound;
-
-    // Debug class. Empty in release.
-public:
-    CFoo m_Foo;
 
 private:
     CEvents                                     m_Events;

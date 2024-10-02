@@ -58,6 +58,7 @@
 #include "D3DResourceSystemSA.h"
 #include "CIplStoreSA.h"
 #include "CBuildingRemovalSA.h"
+#include "CCheckpointSA.h"
 
 extern CGameSA* pGame;
 
@@ -143,6 +144,8 @@ CGameSA::CGameSA()
     m_pCoverManager = new CCoverManagerSA();
     m_pPlantManager = new CPlantManagerSA();
     m_pBuildingRemoval = new CBuildingRemovalSA();
+
+    m_pRenderer = std::make_unique<CRendererSA>();
 
     // Normal weapon types (WEAPONSKILL_STD)
     for (int i = 0; i < NUM_WeaponInfosStdSkill; i++)
@@ -238,6 +241,7 @@ CGameSA::CGameSA()
     CFileLoaderSA::StaticSetHooks();
     D3DResourceSystemSA::StaticSetHooks();
     CVehicleSA::StaticSetHooks();
+    CCheckpointSA::StaticSetHooks();
 }
 
 CGameSA::~CGameSA()
@@ -664,7 +668,7 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
     m_isCoronaZTestEnabled = isEnabled;
 }
 
-void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
+void CGameSA::SetWaterCreaturesEnabled(bool isEnabled) 
 {
     if (isEnabled == m_areWaterCreaturesEnabled)
         return;
@@ -682,6 +686,29 @@ void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
     }
 
     m_areWaterCreaturesEnabled = isEnabled;
+}
+
+void CGameSA::SetTunnelWeatherBlendEnabled(bool isEnabled)
+{
+    if (isEnabled == m_isTunnelWeatherBlendEnabled)
+        return;
+    // CWeather::UpdateInTunnelness
+    DWORD functionAddress = 0x72B630; 
+    if (isEnabled)
+    {
+        // Restore original bytes: 83 EC 20
+        MemPut<BYTE>(functionAddress, 0x83);                // Restore 83
+        MemPut<BYTE>(functionAddress + 1, 0xEC);            // Restore EC
+        MemPut<BYTE>(functionAddress + 2, 0x20);            // Restore 20
+    }
+    else
+    {
+        // Patch CWeather::UpdateInTunnelness               (Found By AlexTMjugador)
+        MemPut<BYTE>(functionAddress, 0xC3);                // Write C3 (RET)
+        MemPut<BYTE>(functionAddress + 1, 0x90);            // Write 90 (NOP)
+        MemPut<BYTE>(functionAddress + 2, 0x90);            // Write 90 (NOP)
+    }
+    m_isTunnelWeatherBlendEnabled = isEnabled;
 }
 
 void CGameSA::SetBurnFlippedCarsEnabled(bool isEnabled)
@@ -986,6 +1013,10 @@ void CGameSA::RemoveAllBuildings()
 
     m_pPools->GetDummyPool().RemoveAllBuildingLods();
     m_pPools->GetBuildingsPool().RemoveAllBuildings();
+
+    auto pBuildingRemoval = static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval);
+    pBuildingRemoval->DropCaches();
+
     m_isBuildingsRemoved = true;
 }
 
@@ -1005,8 +1036,11 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
     {
         RemoveAllBuildings();
     }
+    else
+    {
+        static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
+    }
 
-    ((CBuildingRemovalSA*)GetBuildingRemoval())->DropCaches();
     bool status = m_pPools->GetBuildingsPool().Resize(size);
 
     if (shouldRemoveBuilding)

@@ -29,6 +29,8 @@ public:
     LUA_DECLARE(GetPlayerTeam);
     LUA_DECLARE(GetPlayerMoney);
     LUA_DECLARE(GetPlayerWantedLevel);
+    static std::uint8_t GetPlayerScriptDebugLevel() noexcept;
+    static bool         IsPlayerCrosshairVisible();
 
     // Player set
     LUA_DECLARE(ShowPlayerHudComponent);

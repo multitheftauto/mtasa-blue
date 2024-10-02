@@ -550,11 +550,27 @@ enum class eBitStreamVersion : unsigned short
 
     // Add breakObject to serverside as well
     // 2024-05-31
-    BreakObject_Serverside,
-
+    BreakObject_Serverside,   
+    
     // Ped syncronization revision
     // 2024-06-16
     PedSync_Revision,
+
+    // Add "extendedwatercannons" to setWorldSpecialPropertyEnabled
+    // 2024-06-30
+    WorldSpecialProperty_TunnelWeatherBlend,
+
+    // Checkpoint & arrow alpha fix
+    // 2024-07-03
+    Marker_IgnoreAlphaLimits,
+
+    // Add "setMarkerTargetArrowProperties"
+    // 2024-07-05
+    SetMarkerTargetArrowProperties,
+
+    // Add respawnObject and toggleObjectRespawn to serverside
+    // 2024-09-04
+    RespawnObject_Serverside,
 
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.

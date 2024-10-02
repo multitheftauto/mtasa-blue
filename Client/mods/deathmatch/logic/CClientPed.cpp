@@ -1761,6 +1761,11 @@ void CClientPed::InternalSetHealth(float fHealth)
             }
             else
             {
+                // Ped is alive again (Fix #414)
+                UnlockHealth();
+                UnlockArmor();
+                SetIsDead(false);
+
                 // Recreate the player
                 ReCreateModel();
             }
@@ -3868,6 +3873,10 @@ void CClientPed::_ChangeModel()
             SetStat(23, 0.0f);
         }
 
+        // Store attached satchels
+        std::vector<SSatchelsData> attachedSatchels;
+        m_pPlayerPed->GetAttachedSatchels(attachedSatchels);
+
         if (m_bIsLocalPlayer)
         {
             // TODO: Create a simple function to save and restore player states and use it
@@ -3918,22 +3927,7 @@ void CClientPed::_ChangeModel()
                 // So make sure clothes geometry is built now...
                 m_pClothes->AddAllToModel();
                 m_pPlayerPed->RebuildPlayer();
-
-                // ...and decrement the extra ref
-            #ifdef NO_CRASH_FIX_TEST2
-                m_pPlayerPed->RemoveGeometryRef();
-            #endif
-            }
-            else
-            {
-                // When the local player changes to another (non CJ) model, the geometry gets an extra ref from somewhere, causing a memory leak.
-                // So decrement the extra ref here
-            #ifdef NO_CRASH_FIX_TEST
-                m_pPlayerPed->RemoveGeometryRef();
-            #endif
-                // As we will have problem removing the geometry later, we might as well keep the model cached until exit
-                g_pCore->AddModelToPersistentCache((ushort)m_ulModel);
-            }
+            }    
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
             pLoadedModel->RemoveRef(true);
@@ -3980,6 +3974,19 @@ void CClientPed::_ChangeModel()
 
             // Create the new with the new skin
             _CreateModel();
+        }
+
+        // ReAttach satchels
+        CClientProjectileManager* pProjectileManager = m_pManager->GetProjectileManager();
+
+        for (const SSatchelsData& satchelData : attachedSatchels)
+        {
+            CClientProjectile* pSatchel = pProjectileManager->Get((CEntitySAInterface*)satchelData.pProjectileInterface);
+            if (!pSatchel || pSatchel->IsBeingDeleted())
+                continue;
+
+            pSatchel->SetAttachedOffsets(*satchelData.vecAttachedOffsets, *satchelData.vecAttachedRotation);
+            pSatchel->InternalAttachTo(this);
         }
 
         g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter(true);
@@ -5205,6 +5212,8 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             float         fTargetRotation = m_pPlayerPed->GetTargetRotation();
             unsigned char ucInterior = GetInterior();
             unsigned char ucCameraInterior = static_cast<unsigned char>(g_pGame->GetWorld()->GetCurrentArea());
+            bool          bOldNightVision = g_pMultiplayer->IsNightVisionEnabled();
+            bool          bOldThermalVision = g_pMultiplayer->IsThermalVisionEnabled();
 
             // Don't allow any camera movement if we're in fixed mode
             if (m_pManager->GetCamera()->IsInFixedMode())
@@ -5214,6 +5223,9 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             SetPosition(*pvecPosition);
 
             m_pPlayerPed->SetLanding(false);
+
+            // Set it to 0 (Fix #501)
+            SetCurrentWeaponSlot(eWeaponSlot::WEAPONSLOT_TYPE_UNARMED);
 
             if (bRestoreState)
             {
@@ -5229,6 +5241,10 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
             }
             // Restore the camera's interior whether we're restoring player states or not
             g_pGame->GetWorld()->SetCurrentArea(ucCameraInterior);
+
+            // Reset goggle effect 
+            g_pMultiplayer->SetNightVisionEnabled(bOldNightVision, false);
+            g_pMultiplayer->SetThermalVisionEnabled(bOldThermalVision, false);
 
             // Reattach us
             if (pAttachedTo && pAttachedTo->IsEntityAttached(this))

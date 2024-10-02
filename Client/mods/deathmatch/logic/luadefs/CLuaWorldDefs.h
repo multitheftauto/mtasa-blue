@@ -126,4 +126,20 @@ public:
     static bool  SetCoronaReflectionsEnabled(uchar ucEnabled);
     static uchar GetCoronaReflectionsEnabled();
     static bool  ResetCoronaReflectionsEnabled();
+
+    static std::variant<bool, float, CLuaMultiReturn<float, float, float>> GetWorldProperty(eWorldProperty property);
+    static bool SetWorldProperty(eWorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3);
+    static bool ResetWorldProperty(eWorldProperty property);
+
+    static bool SetTimeFrozen(bool value) noexcept;
+    static bool IsTimeFrozen() noexcept;
+    static bool ResetTimeFrozen() noexcept;
+    
+    static bool SetVolumetricShadowsEnabled(bool enable) noexcept;
+    static bool IsVolumetricShadowsEnabled() noexcept;
+    static bool ResetVolumetricShadows() noexcept;
+    
+    static void ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds) noexcept;
+    
 };
+

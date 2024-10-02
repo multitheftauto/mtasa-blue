@@ -20,6 +20,7 @@
 
 class CRemoteDataSA;
 #define DEFAULT_NEAR_CLIP_DISTANCE  ( 0.3f )
+#define DEFAULT_SHADOWS_OFFSET      ( 0.013f ) // GTA default = 0.06f
 
 enum eRadioStationID
 {
@@ -115,6 +116,7 @@ public:
     void SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler);
     void SetIdleHandler(IdleHandler* pHandler);
     void SetPreFxRenderHandler(PreFxRenderHandler* pHandler);
+    void SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler) override;
     void SetPreHudRenderHandler(PreHudRenderHandler* pHandler);
     void DisableCallsToCAnimBlendNode(bool bDisableCalls);
     void SetCAnimBlendAssocDestructorHandler(CAnimBlendAssocDestructorHandler* pHandler);
@@ -195,6 +197,58 @@ public:
     int   GetMoonSize();
     void  ResetMoonSize();
 
+    void  GetAmbientColor(float& red, float& green, float& blue) const;
+    bool  SetAmbientColor(float red, float green, float blue);
+    bool  ResetAmbientColor();
+
+    void  GetAmbientObjectColor(float& red, float& green, float& blue) const;
+    bool  SetAmbientObjectColor(float red, float green, float blue);
+    bool  ResetAmbientObjectColor();
+
+    void  GetDirectionalColor(float& red, float& green, float& blue) const;
+    bool  SetDirectionalColor(float red, float green, float blue);
+    bool  ResetDirectionalColor();
+
+    float GetSpriteSize() const;
+    bool  SetSpriteSize(float size);
+    bool  ResetSpriteSize();
+
+    float GetSpriteBrightness() const;
+    bool  SetSpriteBrightness(float brightness);
+    bool  ResetSpriteBrightness();
+
+    int16 GetPoleShadowStrength() const;
+    bool  SetPoleShadowStrength(int16 strength);
+    bool  ResetPoleShadowStrength();
+
+    int16 GetShadowStrength() const;
+    bool  SetShadowStrength(int16 strength);
+    bool  ResetShadowStrength();
+
+    float GetShadowsOffset() const;
+    bool  SetShadowsOffset(float offset);
+    bool  ResetShadowsOffset();
+
+    float GetLightsOnGroundBrightness() const;
+    bool  SetLightsOnGroundBrightness(float brightness);
+    bool  ResetLightsOnGroundBrightness();
+
+    void  GetLowCloudsColor(int16& red, int16& green, int16& blue) const;
+    bool  SetLowCloudsColor(int16 red, int16 green, int16 blue);
+    bool  ResetLowCloudsColor();
+
+    void  GetBottomCloudsColor(int16& red, int16& green, int16& blue) const;
+    bool  SetBottomCloudsColor(int16 red, int16 green, int16 blue);
+    bool  ResetBottomCloudsColor();
+
+    float GetCloudsAlpha1() const;
+    bool  SetCloudsAlpha1(float alpha);
+    bool  ResetCloudsAlpha1();
+
+    float GetIllumination() const;
+    bool  SetIllumination(float illumination);
+    bool  ResetIllumination();
+
     void SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     void SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled);
     bool IsNightVisionEnabled();
@@ -214,6 +268,7 @@ public:
     void SetRender3DStuffHandler(Render3DStuffHandler* pHandler);
     void SetPreRenderSkyHandler(PreRenderSkyHandler* pHandler);
     void SetRenderHeliLightHandler(RenderHeliLightHandler* pHandler);
+    void SetRenderEverythingBarRoadsHandler(RenderEverythingBarRoadsHandler* pHandler) override;
 
     void Reset();
 
@@ -256,8 +311,7 @@ public:
 
     CLimits* GetLimits() { return &m_limits; }
 
-    void SetSuspensionEnabled(bool bEnabled);
-    bool IsSuspensionEnabled() { return m_bSuspensionEnabled; };
+    void UpdateVehicleSuspension() noexcept;
 
     virtual void FlushClothesCache();
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading);
@@ -308,7 +362,6 @@ public:
     bool         m_bBadDrivebyHitboxesDisabled;
 
 private:
-    bool                m_bSuspensionEnabled;
     std::vector<char>   m_PlayerImgCache;
     EFastClothesLoading m_FastClothesLoading;
     CLimitsSA           m_limits;

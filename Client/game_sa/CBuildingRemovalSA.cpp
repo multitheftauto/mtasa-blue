@@ -716,4 +716,10 @@ void CBuildingRemovalSA::DropCaches()
 
     m_pBinaryBuildings->clear();
     m_pDataBuildings->clear();
+
+    for (auto &pRemoval : *m_pBuildingRemovals)
+    {
+        pRemoval.second->m_pDataRemoveList->clear();
+        pRemoval.second->m_pBinaryRemoveList->clear();
+    }
 }
