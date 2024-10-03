@@ -270,7 +270,7 @@ public:
     BYTE                bFightingStyleExtra;
     BYTE                bPad7[1];
     CFireSAInterface*   pFireOnPed;
-    BYTE                bPad10[100];
+    BYTE                bPad10[104];
     CEntitySAInterface* pTargetedEntity;            // 1948
 };
 
