@@ -5,21 +5,30 @@
          and on Game-Monitor. It is a required parameter. -->
     <servername>Default MTA Server</servername>
 
-    <!-- These 'rules' are parameters for the server browser.
-         They are optional and can be left empty. -->
-    <!-- description: A brief description of the server. -->
+    <!-- These rules are optional parameters for the server browser/list (they can be left empty).
+         Each rule has their own requirements. Read carefully. -->
+
+    <!-- A brief description of the server. -->
     <rule name="description" value="" />
-    <!-- languages: A comma separated list of languages that the server supports (e.g. en). -->
+
+    <!-- A comma separated list of languages that the server supports (e.g. en). -->
     <rule name="languages" value="" />
+
     <!-- tags: A comma separated list of tags that describe the server (e.g. freeroam, roleplay). -->
     <rule name="tags" value="" />
-    <!-- website_url: The URL of the server's website. -->
-    <rule name="website_url" value="" />
-    <!-- icon_url: The URL of the server's icon. Must be uploaded to https://upload.mtasa.com/server-media/ -->
-    <rule name="icon_url" value="" />
-    <!-- banner_url: The URL of the server's banner. Must be uploaded to https://upload.mtasa.com/server-media/ -->
-    <rule name="banner_url" value="" />
 
+    <!-- The URL of the server's website. -->
+    <rule name="website_url" value="" />
+
+    <!-- A social media URL #1 (e.g. Discord). -->
+    <rule name="social1_url" value="" />
+
+    <!-- A social media URL #2 (e.g. YouTube). -->
+    <rule name="social2_url" value="" />
+
+    <!-- A social media URL #3 (e.g. Facebook). -->
+    <rule name="social3_url" value="" />
+    
     <!-- This parameter specifies the contact email addresses for the owner(s) of this server.
          The email addresses will not be publicly available, and only used by MTA administrators
          to contact the server owner.
@@ -39,16 +48,16 @@
     <!-- This parameter specifies the UDP port on which the server will be accepting incoming player
          connections; default value: 22003. It is a required parameter. -->
     <serverport>22003</serverport>
-
+    
     <!-- This parameter specifies the number of maximum player slots available on the server; default
          value: 32. It is a required parameter. -->
     <maxplayers>32</maxplayers>
-
+        
     <!-- This parameter specifies the TCP port on which the server will be accepting incoming http
          connections. It can be set to the same value as <serverport>. It is a required parameter
          if <httpserver> is set to 1. -->
     <httpport>22005</httpport>
-
+    
     <!-- If set, this parameter specifies the external URL from which clients will be able to download
          needed resources ingame. If not set (or the external URL files are incorrect), resource downloads
          are switched to the internal http server. -->
@@ -193,7 +202,7 @@
     <!-- Specifies the location and name of the file used to log loadstring function calls.
          If left blank or not set, no logging is done. -->
     <!-- <loadstringfile>logs/loadstring.log</loadstringfile> -->
-
+    
     <!-- This parameter specifies the location and name of the Access Control List settings file. If left
          blank, server will use acl.xml file, located in the same folder as this configuration file. -->
     <acl>acl.xml</acl>
@@ -217,12 +226,12 @@
     <!-- This parameter specifies whether or not to enable player voice chat in-game
          Values: 0 - disabled , 1 - enabled -->
     <voice>0</voice>
-
+    
     <!-- This parameter specifies the sample rate for voice chat.  'voice' parameter must be set to 1 for this to be effective.
          Higher settings use more bandwidth and increase the sampling quality of voice chat
          Values: 0 - Narrowband (8kHz), 1 - Wideband (16kHz), 2 - Ultrawideband (32kHz).  Default - 1 -->
     <voice_samplerate>1</voice_samplerate>
-
+    
     <!-- This parameter specifies the voice quality for voice chat.  'voice' parameter must be set to 1 for this to be effective.
          Higher settings use more bandwidth and increase the the overall quality of voice chat
          Available range: 0 to 10.  Default - 4 -->
