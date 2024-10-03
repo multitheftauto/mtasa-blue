@@ -166,7 +166,7 @@ void CVehicleSA::Init()
     SetColor(m_RGBColors[0], m_RGBColors[1], m_RGBColors[2], m_RGBColors[3], 0);
 
     // Initialize doors depending on the vehicle type.
-    DWORD dwOffset = 0;
+    std::uint32_t doorArrayOffset;
 
     switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
     {
@@ -177,22 +177,25 @@ void CVehicleSA::Init()
         case VehicleClass::PLANE:
         case VehicleClass::TRAILER:
         {
-            dwOffset = 1464;
+            doorArrayOffset = 1464;
+            break;
         }
         case VehicleClass::TRAIN:
         {
-            dwOffset = 1496;
+            doorArrayOffset = 1496;
+            break;
         }
         default:
+            doorArrayOffset = 0;
             break;
     }
 
-    if (dwOffset != 0)
+    if (doorArrayOffset != 0)
     {
-        for (unsigned int i = 0; i < sizeof(m_doors) / sizeof(m_doors[0]); ++i)
+        for (std::uint32_t i = 0; i < sizeof(m_doors) / sizeof(m_doors[0]); ++i)
         {
-            DWORD dwInterface = (DWORD)GetInterface();
-            DWORD dwDoorAddress = dwInterface + dwOffset + i * 24;
+            std::uint32_t dwInterface = (std::uint32_t)GetInterface();
+            std::uint32_t dwDoorAddress = dwInterface + doorArrayOffset + i * 24;
             m_doors[i].SetInterface((CDoorSAInterface*)dwDoorAddress);
         }
     }
