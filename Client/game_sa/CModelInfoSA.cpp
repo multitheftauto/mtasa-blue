@@ -992,7 +992,7 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
                                           i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols));
                 // Assert in debug
                 #if MTA_DEBUG
-                assert(!pEntity->IsUsesEntityDeleteRwObject());
+                assert(pEntity->IsUsesEntityDeleteRwObject());
                 #endif
                 pSectorEntry = (DWORD*)pSectorEntry[1];
                 continue;
