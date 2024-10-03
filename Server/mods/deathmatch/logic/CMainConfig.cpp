@@ -134,18 +134,18 @@ bool CMainConfig::Load()
     }
 
     // Grab rules
-    CXMLNode* pNode = nullptr;
-    std::size_t uiCurrentIndex = 0;
-    while (pNode = m_pRootNode->FindSubNode("rule", uiCurrentIndex++))
+    CXMLNode* currentNode = nullptr;
+    std::size_t currentIndex = 0;
+    while (currentNode = m_pRootNode->FindSubNode("rule", currentIndex++))
     {
-        CXMLAttribute* pAttribute = pNode->GetAttributes().Find("name");
-        SString        strName = pAttribute ? pAttribute->GetValue() : SString{};
+        CXMLAttribute* attribute = currentNode->GetAttributes().Find("name");
+        SString ruleName = attribute ? attribute->GetValue() : SString{};
 
-        pAttribute = pNode->GetAttributes().Find("value");
-        SString strValue = pAttribute ? pAttribute->GetValue() : SString{};
+        attribute = currentNode->GetAttributes().Find("value");
+        SString ruleValue = attribute ? attribute->GetValue() : SString{};
 
-        if (!strName.empty() && !strValue.empty())
-            m_RulesForASEMap[std::move(strName)] = std::move(strValue);
+        if (!ruleName.empty() && !ruleValue.empty())
+            m_RulesForASEMap[std::move(ruleName)] = std::move(ruleValue);
     }
 
     // Grab the forced server ip(s)
@@ -247,21 +247,21 @@ bool CMainConfig::Load()
     GetInteger(m_pRootNode, "verifyclientsettings", m_iEnableClientChecks);
 
     // Handle the <client_file> nodes
-    pNode = nullptr;
-    uiCurrentIndex = 0;
+    currentNode = nullptr;
+    currentIndex = 0;
     do
     {
         // Grab the current script node
-        pNode = m_pRootNode->FindSubNode("client_file", uiCurrentIndex++);
-        if (pNode)
+        currentNode = m_pRootNode->FindSubNode("client_file", currentIndex++);
+        if (currentNode)
         {
             // Grab its "name" attribute
-            CXMLAttribute* pAttribute = pNode->GetAttributes().Find("name");
+            CXMLAttribute* pAttribute = currentNode->GetAttributes().Find("name");
             SString        strName = pAttribute ? pAttribute->GetValue() : "";
             strName = strName.Replace("\\", "/").ToLower();
 
             // Grab its "verify" attribute
-            pAttribute = pNode->GetAttributes().Find("verify");
+            pAttribute = currentNode->GetAttributes().Find("verify");
             SString strVerify = pAttribute ? pAttribute->GetValue() : "";
             bool    bVerify = strVerify == "true" || strVerify == "yes" || strVerify == "1";
 
@@ -283,7 +283,7 @@ bool CMainConfig::Load()
             if (!bFound)
                 CLogger::ErrorPrintf("Unknown client_file '%s'\n", *strName);
         }
-    } while (pNode);
+    } while (currentNode);
 
     // allow_gta3_img_mods
     SString strImgMods;
