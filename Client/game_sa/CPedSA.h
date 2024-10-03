@@ -265,11 +265,12 @@ public:
     BYTE                bCurrentWeaponSlot;            // is actually here
     BYTE                bPad6[3];
     CEntitySAInterface* pTargetedObject;
+    BYTE                tempPad[13];
     BYTE                bFightingStyle;            // 1837
     BYTE                bFightingStyleExtra;
     BYTE                bPad7[1];
     CFireSAInterface*   pFireOnPed;
-    BYTE                bPad10[104];
+    BYTE                bPad10[100];
     CEntitySAInterface* pTargetedEntity;            // 1948
 };
 
