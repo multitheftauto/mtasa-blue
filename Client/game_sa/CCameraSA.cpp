@@ -458,3 +458,8 @@ void CCameraSA::ResetShakeCamera() noexcept
 {
     GetInterface()->m_fCamShakeForce = 0.0f;
 }
+
+std::uint8_t CCameraSA::GetTransitionState()
+{
+    return GetInterface()->m_uiTransitionState;
+}

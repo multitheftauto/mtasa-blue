@@ -127,7 +127,6 @@ public:
     bool          m_bCooperativeCamMode;
     bool          m_bAllowShootingWith2PlayersInCar;
     bool          m_bDisableFirstPersonInCar;
-    static bool   m_bUseMouse3rdPerson;
 
     // The following fields allow the level designers to specify the camera for 2 player games.
     short m_ModeForTwoPlayersSeparateCars;
@@ -417,4 +416,6 @@ public:
 
     void ShakeCamera(float radius, float x, float y, float z) noexcept override;
     void ResetShakeCamera() noexcept override;
+
+    std::uint8_t GetTransitionState();
 };

@@ -216,7 +216,7 @@ public:
         using CStencilShadow_dtorByOwner = void*(__cdecl*)(CEntitySAInterface * pEntity);
         ((CStencilShadow_dtorByOwner)0x711730)(this);
     };
-
+    
     bool IsUsesEntityDeleteRwObject() { return *(*reinterpret_cast<std::uint32_t**>(this) + 0x20) == 0x00534030; };
 };
 static_assert(sizeof(CEntitySAInterface) == 0x38, "Invalid size for CEntitySAInterface");
