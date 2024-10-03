@@ -87,6 +87,7 @@ public:
     unsigned int                GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
     const std::string&          GetAccessControlListFile() { return m_strAccessControlListFile; };
     bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
+    std::map<SString, SString>  GetRulesForASE() { return m_RulesForASEMap; };
     bool                        IsDisableAC(const char* szTagAC) { return MapContains(m_DisableComboACMap, szTagAC); };
     bool                        IsEnableDiagnostic(const char* szTag) { return MapContains(m_EnableDiagnosticMap, szTag); };
     CMtaVersion                 GetMinClientVersion() { return m_strMinClientVersion; }
@@ -190,6 +191,7 @@ private:
     unsigned short             m_usFPSLimit;
     int                        m_bDontBroadcastLan;
     std::set<SString>          m_DisableComboACMap;
+    std::map<SString, SString> m_RulesForASEMap;
     std::set<SString>          m_EnableDiagnosticMap;
     std::vector<SString>       m_AuthSerialGroupList;
     bool                       m_bAuthSerialHttpEnabled;

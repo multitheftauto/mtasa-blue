@@ -133,6 +133,31 @@ bool CMainConfig::Load()
         return false;
     }
 
+    // Grab rules
+    CXMLNode* pNode = nullptr;
+    unsigned int uiCurrentIndex = 0;
+    do
+    {
+        // Grab the current script node
+        pNode = m_pRootNode->FindSubNode("rule", uiCurrentIndex++);
+        if (pNode)
+        {
+            // Grab its "name" attribute
+            CXMLAttribute* pAttribute = pNode->GetAttributes().Find("name");
+            SString        strName = pAttribute ? pAttribute->GetValue() : "";
+
+            // Grab its "value" attribute
+            pAttribute = pNode->GetAttributes().Find("value");
+            SString strValue = pAttribute ? pAttribute->GetValue() : "";
+
+            // Ignore if name or value are empty
+            if (strName != "" && strValue != "") {
+                // Store the key value pair
+                m_RulesForASEMap[strName] = strValue;
+            }
+        }
+    } while (pNode);
+
     // Grab the forced server ip(s)
     GetString(m_pRootNode, "serverip", m_strServerIP);
     m_strServerIP = SString(m_strServerIP).Replace(" ", "");
@@ -232,8 +257,8 @@ bool CMainConfig::Load()
     GetInteger(m_pRootNode, "verifyclientsettings", m_iEnableClientChecks);
 
     // Handle the <client_file> nodes
-    CXMLNode*    pNode = NULL;
-    unsigned int uiCurrentIndex = 0;
+    pNode = nullptr;
+    uiCurrentIndex = 0;
     do
     {
         // Grab the current script node
