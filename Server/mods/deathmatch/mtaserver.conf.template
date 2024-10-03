@@ -14,7 +14,7 @@
     <!-- A comma separated list of languages that the server supports (e.g. en). -->
     <rule name="languages" value="" />
 
-    <!-- tags: A comma separated list of tags that describe the server (e.g. freeroam, roleplay). -->
+    <!-- A comma separated list of tags that describe the server (e.g. freeroam,roleplay). -->
     <rule name="tags" value="" />
 
     <!-- The URL of the server's website. -->
