@@ -135,7 +135,7 @@ bool CMainConfig::Load()
 
     // Grab rules
     CXMLNode* pNode = nullptr;
-    unsigned int uiCurrentIndex = 0;
+    std::size_t uiCurrentIndex = 0;
     do
     {
         // Grab the current script node
@@ -144,17 +144,15 @@ bool CMainConfig::Load()
         {
             // Grab its "name" attribute
             CXMLAttribute* pAttribute = pNode->GetAttributes().Find("name");
-            SString        strName = pAttribute ? pAttribute->GetValue() : "";
+            SString        strName = pAttribute ? pAttribute->GetValue() : SString{};
 
             // Grab its "value" attribute
             pAttribute = pNode->GetAttributes().Find("value");
-            SString strValue = pAttribute ? pAttribute->GetValue() : "";
+            SString strValue = pAttribute ? pAttribute->GetValue() : SString{};
 
             // Ignore if name or value are empty
-            if (strName != "" && strValue != "") {
-                // Store the key value pair
-                m_RulesForASEMap[strName] = strValue;
-            }
+            if (!strName.empty() && !strValue.empty())
+                m_RulesForASEMap[std::move(strName)] = std::move(strValue);
         }
     } while (pNode);
 
