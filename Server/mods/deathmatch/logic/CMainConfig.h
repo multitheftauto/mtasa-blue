@@ -87,7 +87,7 @@ public:
     unsigned int                GetScriptDebugLogLevel() { return m_uiScriptDebugLogLevel; };
     const std::string&          GetAccessControlListFile() { return m_strAccessControlListFile; };
     bool                        GetSerialVerificationEnabled() { return m_bVerifySerials; };
-    std::map<SString, SString>  GetRulesForASE() { return m_RulesForASEMap; };
+    const std::map<SString, SString>& GetRulesForASE() const noexcept { return m_RulesForASEMap; };
     bool                        IsDisableAC(const char* szTagAC) { return MapContains(m_DisableComboACMap, szTagAC); };
     bool                        IsEnableDiagnostic(const char* szTag) { return MapContains(m_EnableDiagnosticMap, szTag); };
     CMtaVersion                 GetMinClientVersion() { return m_strMinClientVersion; }
