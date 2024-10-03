@@ -136,25 +136,17 @@ bool CMainConfig::Load()
     // Grab rules
     CXMLNode* pNode = nullptr;
     std::size_t uiCurrentIndex = 0;
-    do
+    while (pNode = m_pRootNode->FindSubNode("rule", uiCurrentIndex++))
     {
-        // Grab the current script node
-        pNode = m_pRootNode->FindSubNode("rule", uiCurrentIndex++);
-        if (pNode)
-        {
-            // Grab its "name" attribute
-            CXMLAttribute* pAttribute = pNode->GetAttributes().Find("name");
-            SString        strName = pAttribute ? pAttribute->GetValue() : SString{};
+        CXMLAttribute* pAttribute = pNode->GetAttributes().Find("name");
+        SString        strName = pAttribute ? pAttribute->GetValue() : SString{};
 
-            // Grab its "value" attribute
-            pAttribute = pNode->GetAttributes().Find("value");
-            SString strValue = pAttribute ? pAttribute->GetValue() : SString{};
+        pAttribute = pNode->GetAttributes().Find("value");
+        SString strValue = pAttribute ? pAttribute->GetValue() : SString{};
 
-            // Ignore if name or value are empty
-            if (!strName.empty() && !strValue.empty())
-                m_RulesForASEMap[std::move(strName)] = std::move(strValue);
-        }
-    } while (pNode);
+        if (!strName.empty() && !strValue.empty())
+            m_RulesForASEMap[std::move(strName)] = std::move(strValue);
+    }
 
     // Grab the forced server ip(s)
     GetString(m_pRootNode, "serverip", m_strServerIP);

@@ -968,8 +968,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
 
         // Set the Rules loaded from config
         std::map<SString, SString> rulesMap = m_pMainConfig->GetRulesForASE();
-        for (const auto& rule : rulesMap)
-            m_pASE->SetRuleValue(rule.first, rule.second);
+        for (const auto& [key, value] : rulesMap)
+            m_pASE->SetRuleValue(key, value);
     }
 
     ApplyAseSetting();
